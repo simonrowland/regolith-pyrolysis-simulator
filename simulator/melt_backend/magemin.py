@@ -93,6 +93,8 @@ library is called.
 
 from __future__ import annotations
 
+from contextlib import contextmanager
+import fcntl
 import math
 import os
 import shutil
@@ -102,7 +104,7 @@ import time
 import warnings
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Mapping, Optional, Tuple
+from typing import Any, Dict, Iterator, List, Mapping, Optional, Tuple
 
 from engines.domain_reason import OutOfDomainReason
 from simulator.melt_backend.base import (
@@ -134,6 +136,40 @@ from simulator.state import OXIDE_SPECIES
 
 MAGEMIN_WARM_CALL_TIMEOUT_S = 2.0
 MAGEMIN_WARM_LIQUIDUS_BUDGET_S = 15.0
+_MAGEMIN_SUBPROCESS_LOCK = Path(
+    tempfile.gettempdir(),
+    'regolith-pyrolysis-simulator',
+    f'magemin-subprocess-{os.getuid()}.lock',
+)
+
+
+@contextmanager
+def _magemin_subprocess_slot(timeout_s: float) -> Iterator[None]:
+    """Serialize MAGEMin executable launches across simulator processes."""
+    deadline = time.monotonic() + max(0.001, float(timeout_s))
+    _MAGEMIN_SUBPROCESS_LOCK.parent.mkdir(parents=True, exist_ok=True)
+    lock_file = _MAGEMIN_SUBPROCESS_LOCK.open('a+b')
+    acquired = False
+    try:
+        while True:
+            try:
+                fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+                acquired = True
+                break
+            except BlockingIOError:
+                remaining = deadline - time.monotonic()
+                if remaining <= 0.0:
+                    raise RuntimeError(
+                        f'MAGEMin subprocess slot timed out after {timeout_s:g}s'
+                    )
+                time.sleep(min(0.01, remaining))
+        yield
+    finally:
+        try:
+            if acquired:
+                fcntl.flock(lock_file.fileno(), fcntl.LOCK_UN)
+        finally:
+            lock_file.close()
 
 
 @dataclass(frozen=True)
@@ -1330,16 +1366,25 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     'MAGEMin call cancelled: aggregate liquidus budget exhausted'
                 )
             timeout_s = min(configured_timeout_s, remaining)
+        call_started = time.monotonic()
         try:
-            with tempfile.TemporaryDirectory() as tmpdir:
-                completed = subprocess.run(  # noqa: S603 - adapter-built
-                    args,
-                    cwd=tmpdir,
-                    capture_output=True,
-                    text=True,
-                    timeout=timeout_s,
-                    check=False,
+            with _magemin_subprocess_slot(timeout_s):
+                remaining_timeout_s = timeout_s - max(
+                    0.0, time.monotonic() - call_started
                 )
+                if remaining_timeout_s <= 0.0:
+                    raise RuntimeError(
+                        'MAGEMin call cancelled while waiting for subprocess slot'
+                    )
+                with tempfile.TemporaryDirectory() as tmpdir:
+                    completed = subprocess.run(  # noqa: S603 - adapter-built
+                        args,
+                        cwd=tmpdir,
+                        capture_output=True,
+                        text=True,
+                        timeout=remaining_timeout_s,
+                        check=False,
+                    )
         except subprocess.TimeoutExpired as exc:
             raise RuntimeError(
                 f'MAGEMin binary timed out after {timeout_s:g}s'

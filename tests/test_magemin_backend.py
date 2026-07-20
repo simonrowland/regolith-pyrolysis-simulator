@@ -15,6 +15,8 @@ import re
 import subprocess
 import sys
 import tempfile
+import threading
+import time
 import types
 import warnings
 from pathlib import Path
@@ -695,7 +697,8 @@ def test_magemin_subprocess_timeout_clamped_to_remaining_budget(monkeypatch):
             fO2_log=-8.0,
             call_timeout_s=1.5,
         )
-    assert seen_timeouts == [pytest.approx(1.5)]
+    assert len(seen_timeouts) == 1
+    assert 0.0 < seen_timeouts[0] <= 1.5
 
 
 def test_magemin_liquidus_subprocess_path_preserves_budget_diagnostics(
@@ -1735,6 +1738,78 @@ def test_magemin_subprocess_runs_in_fresh_temp_cwd(monkeypatch, tmp_path):
     binary_arg = Path(captured["args"][0])
     assert binary_arg.is_absolute()
     assert binary_arg == fake_binary.resolve()
+
+
+def test_magemin_subprocess_launches_are_serialized_across_callers(
+    monkeypatch, tmp_path
+):
+    """Concurrent adapters must not launch multiple MAGEMin executables."""
+    import simulator.melt_backend.magemin as magemin_module
+
+    first_entered = threading.Event()
+    release_first = threading.Event()
+    state_lock = threading.Lock()
+    state = {'active': 0, 'calls': 0, 'max_active': 0}
+
+    class FakeCompleted:
+        returncode = 0
+        stderr = ''
+        stdout = 'Phase : liq\nMode  : 1.000\n'
+
+    def fake_subprocess_run(_args, **_kwargs):
+        with state_lock:
+            state['active'] += 1
+            state['calls'] += 1
+            state['max_active'] = max(state['max_active'], state['active'])
+            call_number = state['calls']
+        try:
+            if call_number == 1:
+                first_entered.set()
+                assert release_first.wait(timeout=1.0)
+            return FakeCompleted()
+        finally:
+            with state_lock:
+                state['active'] -= 1
+
+    fake_binary = tmp_path / 'MAGEMin'
+    fake_binary.write_text('', encoding='utf-8')
+    monkeypatch.setattr(magemin_module.subprocess, 'run', fake_subprocess_run)
+
+    backend = MAGEMinBackend()
+    backend._binary_path = fake_binary
+    backend._database = 'ig'
+    backend._config = {'timeout_s': 1.0}
+    projection = backend._build_db_bulk_projection(
+        {'SiO2': 60.0, 'MgO': 40.0}, database='ig'
+    )
+    errors = []
+
+    def solve():
+        try:
+            backend._call_magemin_subprocess(
+                bulk_projection=projection,
+                temperature_C=1200.0,
+                pressure_kbar=0.001,
+                fO2_log=-8.0,
+            )
+        except BaseException as exc:  # surfaced below from the test threads
+            errors.append(exc)
+
+    first = threading.Thread(target=solve)
+    second = threading.Thread(target=solve)
+    first.start()
+    assert first_entered.wait(timeout=1.0)
+    second.start()
+    time.sleep(0.05)
+    assert state['calls'] == 1
+    release_first.set()
+    first.join(timeout=1.0)
+    second.join(timeout=1.0)
+
+    assert not first.is_alive()
+    assert not second.is_alive()
+    assert errors == []
+    assert state == {'active': 0, 'calls': 2, 'max_active': 1}
 
 
 @pytest.mark.skipif(
