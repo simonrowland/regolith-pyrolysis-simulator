@@ -293,6 +293,7 @@
     ].join("");
     const detailRows = [
       ["IW-buffer log₁₀ fO₂ (absolute, not ΔIW)", numberValue(redox, "iw_log")],
+      ["ΔIW", pendingValue()],
       ["Temperature", numberValue(redox, "temperature_K", "K")],
       ["Melt-headspace pressure", numberValue(redox, "pressure_bar", "bar")],
       [`${fe2o3} / ${feo} molar ratio`, numberValue(redox, "fe2o3_over_feo_molar")],

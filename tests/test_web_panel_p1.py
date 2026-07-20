@@ -163,6 +163,17 @@ def _assert_fact_value(html: str, label: str, value: str) -> None:
     assert f'<th scope="row">{label}</th><td>{value}</td>' in html
 
 
+def _assert_metric_not_value(html: str, label: str, value: str) -> None:
+    assert (
+        f'<div class="k">{label}</div><div class="v">{value}</div>'
+        not in html
+    )
+
+
+def _assert_fact_not_value(html: str, label: str, value: str) -> None:
+    assert f'<th scope="row">{label}</th><td>{value}</td>' not in html
+
+
 def _assert_chip_value(
     html: str,
     label: str,
@@ -267,6 +278,7 @@ def test_p1_renders_terminal_redox_partition_breakdown_and_stage3() -> None:
     redox_summary = _table_region(terminal, "Redox-source forcing summary")
     ferric_divergence = _table_region(terminal, "Ferric divergence")
     respeciation = _table_region(terminal, "Fe redox respeciation")
+    source_context = _table_region(terminal, "Source context")
     skipped = _table_region(terminal, "Skipped reasons by source label")
     refusal = _table_region(terminal, "Refusal context")
 
@@ -279,6 +291,12 @@ def test_p1_renders_terminal_redox_partition_breakdown_and_stage3() -> None:
     _assert_metric_value(terminal, "Native Fe fraction", "0.11")
     assert "-99" not in terminal
     _assert_fact_value(core_detail, "Fe₂O₃ / FeO molar ratio", "0.25")
+    _assert_fact_value(
+        core_detail,
+        "IW-buffer log₁₀ fO₂ (absolute, not ΔIW)",
+        "-10",
+    )
+    _assert_fact_pending(core_detail, "ΔIW")
     _assert_fact_value(core_detail, "FeO equivalent", "7.8 wt%")
     _assert_metric_value(terminal, "Native Fe pool", "12.5 mol")
     _assert_metric_value(terminal, "Vapor route", "0.5 mol")
@@ -310,6 +328,10 @@ def test_p1_renders_terminal_redox_partition_breakdown_and_stage3() -> None:
     _assert_fact_value(respeciation, "O2 account", "Overhead gas")
     _assert_fact_value(respeciation, "Oxygen source", "overhead_gas")
     assert "Fe redox respeciation pending" not in respeciation
+    _assert_fact_value(source_context, "Campaign", "C2A")
+    _assert_fact_value(source_context, "Hour", "89")
+    _assert_fact_value(source_context, "Campaign hour", "4")
+    assert "Source context pending" not in source_context
     _assert_metric_value(terminal, "Stage 3 Fe", "0.42 kg")
     _assert_metric_value(terminal, "Stage 3 total", "4.2 kg")
     _assert_metric_value(terminal, "Stage 3 Fe concentration", "10 wt%")
@@ -449,6 +471,40 @@ def test_p1_surfaces_explicit_and_missing_authority_flags() -> None:
         r'<span class="chip sec-p1-flag [^"]*"[^>]*>Status · no_iron</span>',
         no_iron_flags,
     )
+
+    flag_specs = {
+        "authoritative": ("Authoritative", "sec-p1-flag-clear"),
+        "diagnostic_only": ("Diagnostic only", "sec-p1-flag-caution"),
+        "extrapolation": ("Extrapolation", "sec-p1-flag-caution"),
+        "high_uncertainty": ("High uncertainty", "sec-p1-flag-caution"),
+    }
+    for enabled_key, _ in flag_specs.items():
+        one_hot = _core_redox(
+            authoritative=False,
+            diagnostic_only=False,
+            extrapolation=False,
+            high_uncertainty=False,
+        )
+        one_hot[enabled_key] = True
+        one_hot_flags = _flags_region(
+            _terminal_region(_render_panel(_artifact({"fe_redox_split": one_hot})))
+        )
+        for key, (label, true_class) in flag_specs.items():
+            expected_value = "yes" if key == enabled_key else "no"
+            if key == enabled_key:
+                expected_class = true_class
+            else:
+                expected_class = (
+                    "sec-p1-flag-caution"
+                    if key == "authoritative"
+                    else "sec-p1-flag-clear"
+                )
+            _assert_chip_value(
+                one_hot_flags,
+                label,
+                expected_value,
+                expected_class,
+            )
 
 
 def test_p1_null_empty_and_malformed_authority_metadata_are_distinct() -> None:
@@ -640,6 +696,7 @@ def test_p1_partial_inputs_never_drive_viewer_derivations() -> None:
         )
     )
     terminal = _terminal_region(html)
+    core_detail = _table_region(terminal, "Terminal Fe-redox state detail")
     partition = _table_region(terminal, "Native Fe partition detail")
     redox_summary = _table_region(terminal, "Redox-source forcing summary")
     missing_ferric = _core_redox(fe3_over_sigma_fe=0.3456)
@@ -666,6 +723,112 @@ def test_p1_partial_inputs_never_drive_viewer_derivations() -> None:
         uncondensed_terminal, "Native Fe partition detail"
     )
 
+    def partition_region_for(partition_fields: dict) -> str:
+        redox = _core_redox(native_fe_partition=partition_fields)
+        rendered = _terminal_region(
+            _render_panel(_artifact({"fe_redox_split": redox}))
+        )
+        return _table_region(rendered, "Native Fe partition detail")
+
+    pool_missing_terminal = _terminal_region(
+        _render_panel(
+            _artifact(
+                {
+                    "fe_redox_split": _core_redox(
+                        native_fe_partition={
+                            "native_fe_vapor_mol": 2.25,
+                            "native_fe_tap_mol": 7.75,
+                        }
+                    )
+                }
+            )
+        )
+    )
+    vapor_missing_terminal = _terminal_region(
+        _render_panel(
+            _artifact(
+                {
+                    "fe_redox_split": _core_redox(
+                        native_fe_partition={
+                            "native_fe_pool_mol": 10.0,
+                            "native_fe_tap_mol": 7.75,
+                        }
+                    )
+                }
+            )
+        )
+    )
+    mol_capacity_missing_terminal = _terminal_region(
+        _render_panel(
+            _artifact(
+                {
+                    "fe_redox_split": _core_redox(
+                        native_fe_partition={
+                            "native_fe_vapor_capacity_kg_hr": 0.22338,
+                        }
+                    )
+                }
+            )
+        )
+    )
+    mol_capacity_from_residual_missing_terminal = _terminal_region(
+        _render_panel(
+            _artifact(
+                {
+                    "fe_redox_split": _core_redox(
+                        native_fe_partition={
+                            "native_fe_vapor_mol": 2.25,
+                            "ordinary_melt_fe_residual_capacity_mol_hr": 1.75,
+                        }
+                    )
+                }
+            )
+        )
+    )
+    vapor_from_fraction_missing_terminal = _terminal_region(
+        _render_panel(
+            _artifact(
+                {
+                    "fe_redox_split": _core_redox(
+                        native_fe_partition={
+                            "native_fe_pool_mol": 10.0,
+                            "native_fe_vapor_escape_fraction_of_pool": 0.225,
+                        }
+                    )
+                }
+            )
+        )
+    )
+    uncondensed_mol_missing_partition = partition_region_for(
+        {
+            "native_fe_pool_mol": 10.0,
+            "native_fe_uncondensed_fraction_of_pool": 0.2,
+        }
+    )
+    reverse_ferric = _core_redox(ferrous_frac=0.5432, native_fe_frac=0.3211)
+    reverse_ferric.pop("ferric_frac")
+    reverse_ferric_terminal = _terminal_region(
+        _render_panel(_artifact({"fe_redox_split": reverse_ferric}))
+    )
+    stage_fe_missing_terminal = _terminal_region(
+        _render_panel(
+            _artifact({"stage_3_capture": {"total_kg": 8.0, "Fe_wt_pct": 25.0}})
+        )
+    )
+    stage_total_missing_terminal = _terminal_region(
+        _render_panel(
+            _artifact({"stage_3_capture": {"Fe_kg": 2.0, "Fe_wt_pct": 25.0}})
+        )
+    )
+    delta_ln_missing_summary = _table_region(
+        _terminal_region(
+            _render_panel(
+                _artifact({"redox_source_breakdown": {"delta_log10_fO2": 2.0}})
+            )
+        ),
+        "Redox-source forcing summary",
+    )
+
     _assert_metric_pending(terminal, "Fe³⁺ / ΣFe")
     _assert_metric_pending(terminal, "Ferrous fraction")
     _assert_metric_pending(terminal, "Tap route")
@@ -678,30 +841,86 @@ def test_p1_partial_inputs_never_drive_viewer_derivations() -> None:
     _assert_fact_pending(redox_summary, "Net attempted redox-source terms")
     _assert_fact_pending(redox_summary, "Change in log₁₀ fO₂")
     _assert_metric_pending(missing_ferric_terminal, "Ferric fraction")
-    assert (
-        '<div class="k">Ferric fraction</div><div class="v">0.3456</div>'
-        not in missing_ferric_terminal
-    )
+    _assert_metric_not_value(missing_ferric_terminal, "Ferric fraction", "0.3456")
     _assert_metric_pending(missing_native_terminal, "Native Fe fraction")
-    assert (
-        '<div class="k">Native Fe fraction</div><div class="v">0.2532</div>'
-        not in missing_native_terminal
-    )
+    _assert_metric_not_value(missing_native_terminal, "Native Fe fraction", "0.2532")
     _assert_fact_pending(uncondensed_partition, "Uncondensed fraction of native Fe pool")
-    assert (
-        '<th scope="row">Uncondensed fraction of native Fe pool</th><td>0.2</td>'
-        not in uncondensed_partition
+    _assert_fact_not_value(
+        uncondensed_partition,
+        "Uncondensed fraction of native Fe pool",
+        "0.2",
     )
-    assert ">0.2<" not in uncondensed_partition
-    assert "IW-buffer log₁₀ fO₂ (absolute, not ΔIW)" in terminal
-    assert ">2.5<" not in terminal
-    assert "0.6421" not in terminal
-    assert "8.5 mol" not in terminal
-    assert "0.2273" not in terminal
-    assert "0.15" not in terminal
-    assert "0.2234 kg/h" not in terminal
-    assert "1.5 mol/h" not in terminal
-    assert "0.1396 kg" not in terminal
-    assert "3.333" not in terminal
-    assert "3.457" not in terminal
-    assert "25 wt%" not in terminal
+    _assert_metric_pending(pool_missing_terminal, "Native Fe pool")
+    _assert_metric_not_value(pool_missing_terminal, "Native Fe pool", "10 mol")
+    _assert_metric_pending(vapor_missing_terminal, "Vapor route")
+    _assert_metric_not_value(vapor_missing_terminal, "Vapor route", "2.25 mol")
+    _assert_metric_pending(mol_capacity_missing_terminal, "Vapor capacity")
+    _assert_metric_not_value(
+        mol_capacity_missing_terminal,
+        "Vapor capacity",
+        "4 mol/h",
+    )
+    _assert_metric_pending(
+        mol_capacity_from_residual_missing_terminal,
+        "Vapor capacity",
+    )
+    _assert_metric_not_value(
+        mol_capacity_from_residual_missing_terminal,
+        "Vapor capacity",
+        "4 mol/h",
+    )
+    _assert_metric_pending(vapor_from_fraction_missing_terminal, "Vapor route")
+    _assert_metric_not_value(
+        vapor_from_fraction_missing_terminal,
+        "Vapor route",
+        "2.25 mol",
+    )
+    _assert_fact_pending(uncondensed_mol_missing_partition, "Uncondensed native Fe")
+    _assert_fact_not_value(
+        uncondensed_mol_missing_partition,
+        "Uncondensed native Fe",
+        "2 mol",
+    )
+    _assert_metric_pending(reverse_ferric_terminal, "Ferric fraction")
+    _assert_metric_not_value(reverse_ferric_terminal, "Ferric fraction", "0.1357")
+    _assert_metric_pending(stage_fe_missing_terminal, "Stage 3 Fe")
+    _assert_metric_not_value(stage_fe_missing_terminal, "Stage 3 Fe", "2 kg")
+    _assert_metric_pending(stage_total_missing_terminal, "Stage 3 total")
+    _assert_metric_not_value(stage_total_missing_terminal, "Stage 3 total", "8 kg")
+    _assert_fact_pending(delta_ln_missing_summary, "Change in ln fO₂")
+    _assert_fact_not_value(delta_ln_missing_summary, "Change in ln fO₂", "4.605")
+    _assert_fact_value(
+        core_detail,
+        "IW-buffer log₁₀ fO₂ (absolute, not ΔIW)",
+        "-10.5",
+    )
+    _assert_fact_pending(core_detail, "ΔIW")
+    _assert_fact_not_value(core_detail, "ΔIW", "2.5")
+    _assert_metric_not_value(terminal, "Fe³⁺ / ΣFe", "0.1234")
+    _assert_metric_not_value(terminal, "Ferrous fraction", "0.6421")
+    _assert_metric_not_value(terminal, "Tap route", "8.5 mol")
+    _assert_fact_not_value(
+        partition,
+        "Native Fe pool fraction routed as vapor",
+        "0.2273",
+    )
+    _assert_fact_not_value(
+        partition,
+        "Uncondensed fraction of native Fe pool",
+        "0.15",
+    )
+    _assert_fact_not_value(partition, "Fe vapor mass capacity", "0.2234 kg/h")
+    _assert_fact_not_value(
+        partition,
+        "Residual capacity for ordinary melt Fe",
+        "1.5 mol/h",
+    )
+    _assert_fact_not_value(partition, "Condensed native Fe mass", "0.1396 kg")
+    _assert_fact_not_value(partition, "Condensed native Fe mass", "0.04747 kg")
+    _assert_fact_not_value(
+        redox_summary,
+        "Net attempted redox-source terms",
+        "3.333 mol O₂-eq",
+    )
+    _assert_fact_not_value(redox_summary, "Change in log₁₀ fO₂", "3.457")
+    _assert_metric_not_value(terminal, "Stage 3 Fe concentration", "25 wt%")
