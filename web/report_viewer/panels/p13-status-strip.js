@@ -9,13 +9,33 @@
   const isObject = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
   const hasNumber = (value) => typeof value === "number" && Number.isFinite(value);
 
+  function valueState(value) {
+    if (value === undefined || value === null) return "absent";
+    if (value === "") return "empty";
+    return hasNumber(value) ? "number" : "malformed";
+  }
+
+  function malformedType(value) {
+    if (Array.isArray(value)) return "array";
+    return typeof value === "object" ? "object" : typeof value;
+  }
+
   function numberText(value, unit = "") {
+    const state = valueState(value);
+    if (state === "absent") return "not emitted";
+    if (state === "empty") return "emitted empty";
+    if (state === "malformed") return `malformed (${malformedType(value)})`;
     return esc(fmtNum(value, unit));
   }
 
+  function scalarDisplay(value, missing = "not emitted") {
+    if (value === undefined || value === null) return missing;
+    if (value === "") return "emitted empty";
+    return scalarText(value);
+  }
+
   function scalarValue(value, missing = "not emitted") {
-    if (value === undefined || value === null || value === "") return missing;
-    return esc(scalarText(value));
+    return esc(scalarDisplay(value, missing));
   }
 
   function detailRow(label, value) {
@@ -32,9 +52,7 @@
     ];
     const chips = definitions.filter(([key]) => hasOwn(redox, key)).map(([key, label]) => {
       const value = redox[key];
-      const text = key === "authority"
-        ? `authority: ${scalarText(value)}`
-        : value === true ? label : `${label}: ${scalarText(value)}`;
+      const text = `${label}: ${scalarDisplay(value)}`;
       const caution = (key === "authoritative" && value === false)
         || (["diagnostic_only", "extrapolation", "high_uncertainty"].includes(key) && value === true);
       return `<span class="sec-p13-chip${caution ? " sec-p13-chip--caution" : ""}">${esc(text)}</span>`;
@@ -112,10 +130,14 @@
   }
 
   function emittedKn(summary) {
-    if (!summary) return null;
+    if (!summary || !hasOwn(summary, "Kn")) return { state: "absent", value: null };
     const value = summary.Kn;
-    if (hasNumber(value)) return value;
-    return isObject(value) && hasNumber(value.knudsen_number) ? value.knudsen_number : null;
+    if (!isObject(value)) return { state: valueState(value), value };
+    const keys = Object.keys(value);
+    if (!keys.length) return { state: "empty", value: "" };
+    if (!hasOwn(value, "knudsen_number")) return { state: "malformed", value };
+    const nested = value.knudsen_number;
+    return { state: valueState(nested), value: nested };
   }
 
   function flowTile(summary) {
@@ -128,15 +150,16 @@
     const regimeLabel = regimeLabels[regime]
       || (regime ? `regime token: ${esc(regime)}` : "regime not emitted");
     const kn = emittedKn(summary);
-    const gauge = kn === null
-      ? `<div class="sec-p13-gauge sec-p13-gauge--pending" aria-label="Knudsen number not emitted"></div>`
-      : `<meter class="sec-p13-gauge" min="0" max="1" low="0.01" high="0.1" optimum="0" value="${esc(String(kn))}" aria-label="Emitted Knudsen number ${esc(String(kn))}; low is the viscous end and high is the ballistic end"></meter>`;
+    const knText = numberText(kn.value);
+    const gauge = kn.state !== "number"
+      ? `<div class="sec-p13-gauge sec-p13-gauge--pending" aria-label="Knudsen number ${esc(knText)}"></div>`
+      : `<meter class="sec-p13-gauge" min="0" max="1" low="0.01" high="0.1" optimum="0" value="${esc(String(kn.value))}" aria-label="Emitted Knudsen number ${esc(String(kn.value))}; low is the viscous end and high is the ballistic end"></meter>`;
     const formula = scalarValue(summary?.transport_formula_id);
 
     return `<article class="sec-p13-tile sec-p13-flow" aria-labelledby="sec-p13-flow-title">
       <div class="sec-p13-tile-title" id="sec-p13-flow-title">Flow regime</div>
       <div class="sec-p13-headline">${regimeLabel}</div>
-      <div class="sec-p13-fact">Kn ${kn === null ? "not emitted" : numberText(kn)}</div>
+      <div class="sec-p13-fact">Kn ${knText}</div>
       ${gauge}
       <div class="sec-p13-gauge-labels" aria-hidden="true"><span>viscous / swept</span><span>ballistic</span></div>
       <details class="sec-p13-details">
@@ -176,21 +199,24 @@
   function derivedVoltageDetail(diagnostic) {
     const value = diagnostic.derived_Ed_V;
     if (value === undefined || value === null) return "not emitted";
+    if (value === "") return "emitted empty";
     if (hasNumber(value)) return "voltage withheld; per-species authority/status not emitted";
-    if (!isObject(value)) return `malformed diagnostic value (${esc(typeof value)})`;
+    if (!isObject(value)) return `malformed diagnostic value (${esc(malformedType(value))})`;
     const entries = Object.entries(value);
-    if (!entries.length) return "not emitted";
+    if (!entries.length) return "emitted empty";
     return entries.map(([species, voltage]) => {
       const label = esc(prettySpecies(species));
-      if (!hasNumber(voltage)) return `${label}: ${numberText(voltage, "V")}`;
       const emittedMetadata = voltageMetadata(diagnostic, species);
+      const metadataText = emittedMetadata
+        ? ` · voltage authority: ${scalarValue(emittedMetadata.authority)}`
+          + ` · voltage authoritative: ${scalarValue(emittedMetadata.authoritative)}`
+          + ` · voltage status: ${scalarValue(emittedMetadata.status)}`
+        : "";
+      if (!hasNumber(voltage)) return `${label}: ${numberText(voltage, "V")}${metadataText}`;
       if (!emittedMetadata) {
         return `${label}: voltage withheld; per-species authority/status not emitted`;
       }
-      return `${label}: ${numberText(voltage, "V")}`
-        + ` · voltage authority: ${scalarValue(emittedMetadata.authority)}`
-        + ` · voltage authoritative: ${scalarValue(emittedMetadata.authoritative)}`
-        + ` · voltage status: ${scalarValue(emittedMetadata.status)}`;
+      return `${label}: ${numberText(voltage, "V")}${metadataText}`;
     }).join("<br>");
   }
 
@@ -260,9 +286,10 @@
     if (typeof document === "undefined") return;
     const section = document.querySelector(`#${SECTION_ID}`);
     const stepper = document.querySelector(".stepper");
-    const stepperSection = stepper && typeof stepper.closest === "function" ? stepper.closest("section") : null;
-    if (!section || !stepperSection || typeof stepperSection.insertAdjacentElement !== "function") return;
-    if (stepperSection.nextElementSibling !== section) stepperSection.insertAdjacentElement("afterend", section);
+    const currentGrid = document.querySelector("#current-grid");
+    if (!section || !stepper || !currentGrid || currentGrid.parentElement !== stepper
+      || typeof stepper.insertBefore !== "function") return;
+    if (currentGrid.previousElementSibling !== section) stepper.insertBefore(section, currentGrid);
   }
 
   function render(artifact) {

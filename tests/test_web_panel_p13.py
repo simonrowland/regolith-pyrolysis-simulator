@@ -28,7 +28,7 @@ const artifact = JSON.parse(process.argv[4]);
 const indexes = JSON.parse(process.argv[5]);
 const domMode = process.argv[6];
 const live = { innerHTML: "" };
-const panelSection = {};
+const panelSection = { parentElement: null, nextElementSibling: null };
 const timestepSection = {
   nextElementSibling: null,
   inserted: 0,
@@ -38,7 +38,19 @@ const timestepSection = {
     this.inserted += 1;
   }
 };
-const stepper = { closest(selector) { return selector === "section" ? timestepSection : null; } };
+const currentGrid = { parentElement: null, previousElementSibling: null };
+const stepper = {
+  inserted: 0,
+  closest(selector) { return selector === "section" ? timestepSection : null; },
+  insertBefore(element, reference) {
+    if (reference !== currentGrid) throw new Error("unexpected insertion anchor");
+    element.parentElement = this;
+    element.nextElementSibling = reference;
+    reference.previousElementSibling = element;
+    this.inserted += 1;
+  }
+};
+currentGrid.parentElement = stepper;
 const context = { console };
 if (domMode !== "none") {
   context.document = {
@@ -47,7 +59,8 @@ if (domMode !== "none") {
       return {
         "#p13-status-strip-live": live,
         "#sec-p13-status-strip": panelSection,
-        ".stepper": stepper
+        ".stepper": stepper,
+        "#current-grid": currentGrid
       }[selector] || null;
     }
   };
@@ -68,7 +81,10 @@ process.stdout.write(JSON.stringify({
   hasOnTimestep: typeof panel.onTimestep === "function",
   rendered,
   updates,
-  inserted: timestepSection.inserted
+  inserted: stepper.inserted,
+  pinnedInsideStepper: panelSection.parentElement === stepper,
+  pinnedBeforeCurrentGrid: panelSection.nextElementSibling === currentGrid
+    && currentGrid.previousElementSibling === panelSection
 }));
 """
     completed = subprocess.run(
@@ -180,7 +196,6 @@ def test_p13_registers_renders_emitted_facts_and_pins_on_update() -> None:
 
     assert result["id"] == "sec-p13-status-strip"
     assert result["hasRender"] and result["hasOnTimestep"]
-    assert result["inserted"] == 1
     assert "log fO₂ -9" in html
     assert "IW buffer log fO₂ -71.6" in html
     assert "ΔIW not emitted" in html
@@ -191,10 +206,11 @@ def test_p13_registers_renders_emitted_facts_and_pins_on_update() -> None:
     assert "backend redox ledger" in html
     assert "Reference</dt><dd>IW buffer</dd>" in html
     assert "Redox diagnostic status" in html
-    assert "authoritative: false" in html
-    assert "diagnostic_only" in html
-    assert "extrapolation" in html
-    assert "high_uncertainty" in html
+    redox = _tile(html, "redox", "flow")
+    assert ">authoritative: false</span>" in redox
+    assert ">diagnostic_only: true</span>" in redox
+    assert ">extrapolation: true</span>" in redox
+    assert ">high_uncertainty: true</span>" in redox
     assert "viscous / swept" in html
     assert "Kn 0.00382" in html
     assert "bernoulli_swept_v2" in html
@@ -209,6 +225,17 @@ def test_p13_registers_renders_emitted_facts_and_pins_on_update() -> None:
     assert "MRE activity: not emitted" in html
     flow = _tile(update, "flow", "mre")
     assert _class_inner(flow, "sec-p13-headline") == "viscous / swept"
+
+
+def test_p13_pins_inside_stepper_immediately_before_current_grid() -> None:
+    result = _run_panel(
+        {"timesteps": [{"summary": _present_summary()}]},
+        [0, 0],
+    )
+
+    assert result["inserted"] == 1
+    assert result["pinnedInsideStepper"] is True
+    assert result["pinnedBeforeCurrentGrid"] is True
 
 
 def test_p13_on_timestep_replaces_present_values_with_honest_pending() -> None:
@@ -323,6 +350,26 @@ def test_p13_non_authoritative_voltage_keeps_species_flags() -> None:
     assert "ellingham_fallback:ellingham_nonpositive_refused:voltage" in html
 
 
+def test_p13_missing_voltage_keeps_emitted_species_authority_and_status() -> None:
+    summary = _present_summary()
+    diagnostic = summary["mre_ellingham_ladder_diagnostic"]
+    diagnostic["derived_Ed_V"] = {"CoO": None}
+    diagnostic["species"] = {
+        "CoO": {
+            "voltage_authority": None,
+            "voltage_authoritative": False,
+            "status": "decomposition_voltage_unavailable",
+        }
+    }
+    html = _run_panel({"timesteps": [{"summary": summary}]})["rendered"]
+    mre = _tile(html, "mre")
+
+    assert "CoO: not emitted" in mre
+    assert "voltage authority: not emitted" in mre
+    assert "voltage authoritative: false" in mre
+    assert "voltage status: decomposition_voltage_unavailable" in mre
+
+
 def test_p13_partial_subtrees_withhold_absent_numbers_and_unqualified_voltage() -> None:
     summary = {
         "campaign": "C5",
@@ -354,6 +401,34 @@ def test_p13_partial_subtrees_withhold_absent_numbers_and_unqualified_voltage() 
     assert "ΔIW 70" not in html
 
 
+def test_p13_emitted_fraction_parts_do_not_synthesize_missing_ratio() -> None:
+    summary = _present_summary()
+    redox_summary = summary["fe_redox_split"]
+    redox_summary.pop("fe3_over_sigma_fe")
+    redox_summary["ferric_frac"] = 0.25
+    redox_summary["ferrous_frac"] = 0.75
+    html = _run_panel({"timesteps": [{"summary": summary}]})["rendered"]
+    redox = _tile(html, "redox", "flow")
+
+    assert _class_inner(redox, "sec-p13-fact") == "Ferric 0.25 · ferrous 0.75"
+    assert "Fe³⁺/ΣFe</dt><dd>not emitted</dd>" in redox
+    assert "Fe³⁺/ΣFe 0.25" not in redox
+
+
+def test_p13_object_kn_does_not_infer_missing_regime() -> None:
+    summary = _present_summary()
+    summary.pop("regime")
+    summary["Kn"] = {"knudsen_number": 0.0038}
+    html = _run_panel({"timesteps": [{"summary": summary}]})["rendered"]
+    flow = _tile(html, "flow", "mre")
+    headline = _class_inner(flow, "sec-p13-headline")
+
+    assert "Kn 0.0038" in flow
+    assert headline == "regime not emitted"
+    assert "viscous / swept" not in headline
+    assert "ballistic" not in headline
+
+
 @pytest.mark.parametrize(
     ("regime", "expected"),
     [
@@ -382,30 +457,136 @@ def test_p13_successful_ladder_cannot_imply_mre_activity() -> None:
 
 
 def test_p13_all_artifact_text_routes_escape_exactly_once() -> None:
-    hostile = '<img src=x onerror="boom">'
-    encoded = "&lt;img src=x onerror=&quot;boom&quot;&gt;"
     summary = _present_summary()
     redox = summary["fe_redox_split"]
-    for key in ("source", "reference", "skip_reason", "refusal_context", "authority"):
-        redox[key] = hostile
-    summary["regime"] = hostile
+    redox_values = {
+        "status": "<redox-status>",
+        "source": "<redox-source>",
+        "reference": "<redox-reference>",
+        "skip_reason": "<redox-skip-reason>",
+        "refusal_context": "<redox-refusal-context>",
+        "authority": "<redox-authority>",
+    }
+    redox.update(redox_values)
+    summary["regime"] = "<flow-regime>"
+    summary["campaign"] = "<campaign-route>"
     diagnostic = summary["mre_ellingham_ladder_diagnostic"]
-    for key in ("authority", "status", "source", "reference", "skip_reason", "refusal_context"):
-        diagnostic[key] = hostile
-    diagnostic["derived_Ed_V"] = {hostile: 1.2}
+    diagnostic_values = {
+        "authority": "<diagnostic-authority>",
+        "status": "<diagnostic-status>",
+        "source": "<diagnostic-source>",
+        "reference": "<diagnostic-reference>",
+        "skip_reason": "<diagnostic-skip-reason>",
+        "refusal_context": "<diagnostic-refusal-context>",
+    }
+    diagnostic.update(diagnostic_values)
+    diagnostic["derived_Ed_V"] = {"<species-route>": 1.2}
     diagnostic["species"] = {
-        hostile: {
-            "voltage_authority": hostile,
+        "<species-route>": {
+            "voltage_authority": "<voltage-authority-route>",
             "voltage_authoritative": False,
-            "status": hostile,
+            "status": "<voltage-status-route>",
         }
     }
     html = _run_panel({"timesteps": [{"summary": summary}]})["rendered"]
+    redox_html = _tile(html, "redox", "flow")
+    flow_html = _tile(html, "flow", "mre")
+    mre_html = _tile(html, "mre")
 
-    assert encoded in html
-    assert "<img" not in html
-    assert "&amp;lt;img" not in html
-    assert f"{encoded}: 1.2 V" in html
+    for label, value in (
+        ("Redox diagnostic status", "redox-status"),
+        ("Source", "redox-source"),
+        ("Reference", "redox-reference"),
+        ("Skip reason", "redox-skip-reason"),
+        ("Refusal context", "redox-refusal-context"),
+    ):
+        assert f"{label}</dt><dd>&lt;{value}&gt;</dd>" in redox_html
+    assert "authority: &lt;redox-authority&gt;" in redox_html
+    assert _class_inner(flow_html, "sec-p13-headline") == (
+        "regime token: &lt;flow-regime&gt;"
+    )
+    assert "Campaign: &lt;campaign-route&gt;" in mre_html
+    for label, value in (
+        ("Authority", "diagnostic-authority"),
+        ("Status", "diagnostic-status"),
+        ("Source", "diagnostic-source"),
+        ("Reference", "diagnostic-reference"),
+        ("Skip reason", "diagnostic-skip-reason"),
+        ("Refusal context", "diagnostic-refusal-context"),
+    ):
+        assert f"{label}</dt><dd>&lt;{value}&gt;</dd>" in mre_html
+    assert "&lt;species-route&gt;: 1.2 V" in mre_html
+    assert "voltage authority: &lt;voltage-authority-route&gt;" in mre_html
+    assert "voltage status: &lt;voltage-status-route&gt;" in mre_html
+    assert not any(
+        raw in html
+        for raw in (
+            *redox_values.values(),
+            *diagnostic_values.values(),
+            "<flow-regime>",
+            "<campaign-route>",
+            "<species-route>",
+            "<voltage-authority-route>",
+            "<voltage-status-route>",
+        )
+    )
+    assert "&amp;lt;" not in html
+
+
+@pytest.mark.parametrize(
+    ("value", "expected_scalar", "expected_kn", "expected_voltage"),
+    [
+        (None, "not emitted", "not emitted", "not emitted"),
+        ("", "emitted empty", "emitted empty", "emitted empty"),
+        (
+            {"unexpected": 1},
+            "malformed (object)",
+            "malformed (object)",
+            "malformed (object)",
+        ),
+        (0, "0", "0", "0 V"),
+    ],
+)
+def test_p13_numeric_routes_distinguish_absent_empty_malformed_and_zero(
+    value: Any,
+    expected_scalar: str,
+    expected_kn: str,
+    expected_voltage: str,
+) -> None:
+    summary = _present_summary()
+    summary["fe_redox_split"]["fO2_log"] = value
+    summary["fe_redox_split"]["status"] = value
+    summary["Kn"] = value
+    diagnostic = summary["mre_ellingham_ladder_diagnostic"]
+    diagnostic["derived_Ed_V"] = {"CoO": value}
+    diagnostic["species"] = {
+        "CoO": {
+            "voltage_authority": None,
+            "voltage_authoritative": False,
+            "status": "decomposition_voltage_unavailable",
+        }
+    }
+    html = _run_panel({"timesteps": [{"summary": summary}]})["rendered"]
+    redox = _tile(html, "redox", "flow")
+    flow = _tile(html, "flow", "mre")
+    mre = _tile(html, "mre")
+
+    assert f"log fO₂</dt><dd>{expected_scalar}</dd>" in redox
+    assert f"Redox diagnostic status</dt><dd>{expected_scalar}</dd>" in redox
+    assert f"Kn {expected_kn}" in flow
+    assert f"CoO: {expected_voltage}" in mre
+
+
+def test_p13_empty_emitted_maps_are_not_rendered_as_absent() -> None:
+    summary = _present_summary()
+    summary["Kn"] = {}
+    summary["mre_ellingham_ladder_diagnostic"]["derived_Ed_V"] = {}
+    html = _run_panel({"timesteps": [{"summary": summary}]})["rendered"]
+    flow = _tile(html, "flow", "mre")
+    mre = _tile(html, "mre")
+
+    assert "Kn emitted empty" in flow
+    assert "Derived Ed</dt><dd>emitted empty</dd>" in mre
 
 
 @pytest.mark.parametrize(
