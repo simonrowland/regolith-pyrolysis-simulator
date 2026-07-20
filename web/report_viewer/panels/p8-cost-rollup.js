@@ -12,7 +12,7 @@
   ];
 
   const TOTAL_FIELDS = [
-    ["total_cost_usd", "Canonical total cost", "USD", true],
+    ["total_cost_usd", "Canonical energy cost total", "USD", true],
     ["electrical_energy_kWh", "Total electrical energy", "kWh"],
     ["electrical_cost_usd", "Total electrical cost", "USD"],
     ["process_electrical_energy_kWh", "Process electrical energy", "kWh"],
@@ -23,6 +23,8 @@
     ["solar_heat_cost_usd", "Solar heat cost", "USD"]
   ];
 
+  const MONEY_PROJECTION_LABEL = "Diagnostic money projection · not viewer price authority";
+
   const LABELS = Object.freeze({
     schema_version: "Schema version",
     policy_id: "Allocation policy",
@@ -30,7 +32,7 @@
     transition_count: "Cost-ledger transitions",
     transition_balance_max_abs: "Maximum absolute transition residual",
     owner_ratify_placeholder_count: "Emitted placeholder count",
-    owner_ratify_money_projection: "Legacy-placeholder money projection",
+    owner_ratify_money_projection: MONEY_PROJECTION_LABEL,
     allocation_status: "Allocation status",
     thermal_proxy: "Thermal proxy definition",
     auxiliary_electrical_kWh: "Auxiliary electrical energy",
@@ -68,9 +70,25 @@
     return `<span class="sec-p8-inline-pending">pending · ${esc(path)} not emitted</span>`;
   }
 
+  function malformedInline(path, expected) {
+    return `<span class="sec-p8-inline-pending">malformed · ${esc(path)} expected ${esc(expected)}</span>`;
+  }
+
+  function emptyInline(path, kind) {
+    return `<span class="sec-p8-inline-pending">empty · ${esc(path)} emitted ${esc(kind)}</span>`;
+  }
+
+  function structuredProblem(value, path, expected, absentMessage = `${path} is not emitted; no value is inferred.`) {
+    if (value === undefined) return pending(path, absentMessage);
+    if (value === null) return pending(path, `${path} was emitted null; no value is inferred.`);
+    return pending(path, `${path} was emitted malformed; expected ${expected}; no value is inferred.`);
+  }
+
   function formatLeaf(value, key, path) {
-    if (value === null || value === undefined) return pendingInline(path);
+    if (value === undefined) return pendingInline(path);
+    if (value === null) return emptyInline(path, "null");
     if (typeof value === "number") {
+      if (!Number.isFinite(value)) return malformedInline(path, "a finite number");
       const units = ({
         owner_ratify_money_projection: "USD",
         auxiliary_electrical_kWh: "kWh",
@@ -80,8 +98,10 @@
       return `<span class="mono">${esc(fmtNum(value, units))}</span>`;
     }
     if (typeof value === "boolean") return esc(value ? "true" : "false");
-    if (typeof value === "string") return `<span class="mono">${esc(value)}</span>`;
-    return pendingInline(path);
+    if (typeof value === "string") return value.trim()
+      ? `<span class="mono">${esc(value)}</span>`
+      : emptyInline(path, "an empty string");
+    return malformedInline(path, "a scalar");
   }
 
   function renderTree(value, path, key = "") {
@@ -106,51 +126,68 @@
     return formatLeaf(value, key, path);
   }
 
-  function expectedLeaf(record, key, label, unit, path) {
+  function numericValue(record, key, unit, path) {
     const valuePath = `${path}.${key}`;
-    const value = hasOwn(record, key) && typeof record[key] === "number" && Number.isFinite(record[key])
+    if (!hasOwn(record, key)) return pendingInline(valuePath);
+    return typeof record[key] === "number" && Number.isFinite(record[key])
       ? `<span class="mono">${esc(fmtNum(record[key], unit))}</span>`
-      : pendingInline(valuePath);
+      : malformedInline(valuePath, "a finite number");
+  }
+
+  function expectedLeaf(record, key, label, unit, path) {
+    const value = numericValue(record, key, unit, path);
     return `<div class="sec-p8-field"><span>${esc(label)}</span><b>${value}</b></div>`;
   }
 
-  function expectedScalar(record, key, label, path) {
+  function scalarValue(record, key, path) {
     const valuePath = `${path}.${key}`;
-    const value = hasOwn(record, key) && !isRecord(record[key]) && !Array.isArray(record[key])
-      ? formatLeaf(record[key], key, valuePath)
-      : pendingInline(valuePath);
+    if (!hasOwn(record, key)) return pendingInline(valuePath);
+    if (record[key] === null) return emptyInline(valuePath, "null");
+    if (typeof record[key] === "string" && !record[key].trim()) return emptyInline(valuePath, "an empty string");
+    if (isRecord(record[key]) || Array.isArray(record[key])) return malformedInline(valuePath, "a scalar");
+    return formatLeaf(record[key], key, valuePath);
+  }
+
+  function expectedScalar(record, key, label, path) {
+    const value = scalarValue(record, key, path);
     return `<div class="sec-p8-field"><span>${esc(label)}</span><b>${value}</b></div>`;
   }
 
   function renderCostTotals(totals) {
     const path = "terminal.cost_totals";
-    if (!isRecord(totals)) return pending(path);
+    if (!isRecord(totals)) return structuredProblem(totals, path, "an object");
     if (!Object.keys(totals).length) return pending(path, `${path} was emitted empty; no total is inferred.`);
     const known = new Set([...TOTAL_FIELDS.map(([key]) => key), "basis_note"]);
     const cards = TOTAL_FIELDS.map(([key, label, unit, headline]) =>
-      `<div class="metric${headline ? " sec-p8-headline" : ""}"><div class="k">${esc(label)}</div><div class="v">${hasOwn(totals, key) && typeof totals[key] === "number" && Number.isFinite(totals[key])
-        ? esc(fmtNum(totals[key], unit))
-        : pendingInline(`${path}.${key}`)}</div></div>`
+      `<div class="metric${headline ? " sec-p8-headline" : ""}"><div class="k">${esc(label)}</div><div class="v">${numericValue(totals, key, unit, path)}</div></div>`
     ).join("");
-    const basis = hasOwn(totals, "basis_note")
-      ? `<div class="note"><b>Emitted cost basis:</b> ${formatLeaf(totals.basis_note, "basis_note", `${path}.basis_note`)}</div>`
-      : "";
+    const basis = `<div class="note"><b>Emitted cost basis:</b> ${scalarValue(totals, "basis_note", path)}</div>`;
     const extras = Object.fromEntries(Object.entries(totals).filter(([key]) => !known.has(key)));
-    return `<div class="sec-p8-metrics">${cards}</div>${basis}${Object.keys(extras).length
+    return `<div class="sec-p8-metrics">${cards}</div>` +
+      `<p class="sec-p8-caption">Canonical energy-cost scope: electrical + evaporation solar heat.</p>` +
+      `${basis}${Object.keys(extras).length
       ? `<details class="sec-p8-details"><summary>Other emitted canonical-total fields</summary>${renderTree(extras, path)}</details>`
       : ""}`;
   }
 
   function renderCostBlock(costBlock) {
     const path = "header.cost_block";
-    if (!isRecord(costBlock)) return pending(path, `${path} is not emitted; viewer price authority is unavailable.`);
+    if (!isRecord(costBlock)) return structuredProblem(costBlock, path, "an object", `${path} is not emitted; viewer price authority is unavailable.`);
+    const pricesPresent = ["electrical_cost_per_kWh", "solar_heat_cost_per_kWh"].every(key =>
+      hasOwn(costBlock, key) && typeof costBlock[key] === "number" && Number.isFinite(costBlock[key])
+    );
+    const provenancePresent = hasOwn(costBlock, "provenance") &&
+      typeof costBlock.provenance === "string" && Boolean(costBlock.provenance.trim());
+    const caption = pricesPresent && provenancePresent
+      ? "Canonical energy-cost totals use these artifact price inputs. Diagnostic allocation projections below do not."
+      : "Canonical-total price provenance cannot be validated from this artifact; canonical totals remain artifact-emitted values.";
     return `<div class="card sec-p8-price-card"><div class="ct">Viewer price inputs · header.cost_block</div>` +
       expectedLeaf(costBlock, "electrical_cost_per_kWh", "Electrical price", "USD/kWh", path) +
       expectedLeaf(costBlock, "solar_heat_cost_per_kWh", "Solar heat price", "USD/kWh", path) +
       `<div class="sec-p8-field"><span>Provenance</span><b>${hasOwn(costBlock, "provenance")
         ? formatLeaf(costBlock.provenance, "provenance", `${path}.provenance`)
         : pendingInline(`${path}.provenance`)}</b></div>` +
-      `<p class="sec-p8-caption">Canonical totals use these artifact price inputs. Diagnostic allocation projections below do not.</p></div>`;
+      `<p class="sec-p8-caption">${esc(caption)}</p></div>`;
   }
 
   function splitAccountSpecies(rawKey) {
@@ -161,7 +198,8 @@
   }
 
   function costVector(vector, path) {
-    if (!isRecord(vector)) return pending(path);
+    if (!isRecord(vector)) return structuredProblem(vector, path, "an object");
+    if (!Object.keys(vector).length) return pending(path, `${path} was emitted empty; zero is not inferred.`);
     return `<div class="sec-p8-vector">${COST_VECTOR_FIELDS.map(([key, label, unit]) =>
       expectedLeaf(vector, key, label, unit, path)
     ).join("")}</div>`;
@@ -177,22 +215,19 @@
   }
 
   function renderProductEntry(rawKey, entry, path) {
-    if (!isRecord(entry)) return pending(path);
+    if (!isRecord(entry)) return structuredProblem(entry, path, "an object");
     const known = new Set(["quantity_kg", "accumulated_cost", "owner_ratify_money_projection"]);
     const extras = Object.fromEntries(Object.entries(entry).filter(([key]) => !known.has(key)));
     return `<details class="sec-p8-map-entry"><summary>${mapEntrySummary(rawKey)}</summary>` +
       expectedLeaf(entry, "quantity_kg", "Product quantity", "kg", path) +
-      `<div class="sec-p8-subhead">Accumulated physical cost vector</div>${hasOwn(entry, "accumulated_cost")
-        ? costVector(entry.accumulated_cost, `${path}.accumulated_cost`)
-        : pending(`${path}.accumulated_cost`)}` +
-      expectedLeaf(entry, "owner_ratify_money_projection", "Legacy-placeholder money projection · not viewer price authority", "USD", path) +
+      `<div class="sec-p8-subhead">Accumulated physical cost vector</div>${costVector(entry.accumulated_cost, `${path}.accumulated_cost`)}` +
+      expectedLeaf(entry, "owner_ratify_money_projection", MONEY_PROJECTION_LABEL, "USD", path) +
       (Object.keys(extras).length ? renderTree(extras, path) : "") + `</details>`;
   }
 
   function renderCostMap(map, path, productRows) {
-    if (!isRecord(map) || !Object.keys(map).length) {
-      return pending(path, `${path} has no emitted rows; sparse allocation is not displayed as zero.`);
-    }
+    if (!isRecord(map)) return structuredProblem(map, path, "an object", `${path} is not emitted; sparse allocation is not displayed as zero.`);
+    if (!Object.keys(map).length) return pending(path, `${path} was emitted empty; sparse allocation is not displayed as zero.`);
     return `<div class="sec-p8-map">${Object.entries(map).map(([rawKey, entry]) => {
       const entryPath = `${path}.${rawKey}`;
       return productRows
@@ -203,47 +238,44 @@
 
   function renderRunInput(value) {
     const path = "terminal.run_metadata.cost_rollup_diagnostic.run_input_cost";
-    if (!isRecord(value)) return pending(path);
+    if (!isRecord(value)) return structuredProblem(value, path, "an object");
     return expectedScalar(value, "thermal_proxy", "Thermal proxy definition", path) +
       expectedScalar(value, "allocation_status", "Allocation status", path) +
-      `<div class="sec-p8-subhead">Furnace-input physical cost vector</div>${hasOwn(value, "physical_cost")
-        ? costVector(value.physical_cost, `${path}.physical_cost`)
-        : pending(`${path}.physical_cost`)}` +
-      expectedLeaf(value, "owner_ratify_money_projection", "Legacy-placeholder money projection · not viewer price authority", "USD", path);
+      `<div class="sec-p8-subhead">Furnace-input physical cost vector</div>${costVector(value.physical_cost, `${path}.physical_cost`)}` +
+      expectedLeaf(value, "owner_ratify_money_projection", MONEY_PROJECTION_LABEL, "USD", path);
   }
 
   function renderAuxiliary(value) {
     const path = "terminal.run_metadata.cost_rollup_diagnostic.auxiliary_electrical_diagnostic";
-    if (!isRecord(value)) return pending(path);
-    const rest = Object.fromEntries(Object.entries(value).filter(([key]) => key !== "auxiliary_electrical_kWh"));
+    if (!isRecord(value)) return structuredProblem(value, path, "an object");
+    const componentsPath = `${path}.components_kWh`;
+    const components = !hasOwn(value, "components_kWh")
+      ? pending(componentsPath)
+      : !isRecord(value.components_kWh)
+        ? structuredProblem(value.components_kWh, componentsPath, "an object")
+        : !Object.keys(value.components_kWh).length
+          ? pending(componentsPath, `${componentsPath} was emitted empty; zero is not inferred.`)
+          : renderTree(value.components_kWh, componentsPath);
+    const rest = Object.fromEntries(Object.entries(value).filter(([key]) => !["auxiliary_electrical_kWh", "components_kWh"].includes(key)));
     return expectedLeaf(value, "auxiliary_electrical_kWh", "Emitted auxiliary electrical energy", "kWh", path) +
-      (Object.keys(rest).length ? renderTree(rest, path) : pending(`${path}.components_kWh`));
+      `<div class="sec-p8-subhead">Emitted component energies</div>${components}` +
+      (Object.keys(rest).length ? renderTree(rest, path) : "");
   }
 
   function renderPumping(value) {
     const path = "terminal.run_metadata.cost_rollup_diagnostic.pumping_diagnostic";
-    if (!isRecord(value)) return pending(path);
+    if (!isRecord(value)) return structuredProblem(value, path, "an object");
     const rest = Object.fromEntries(Object.entries(value).filter(([key]) => !["status", "pumping_electrical_kWh"].includes(key)));
-    const resolved = value.status === "ok" || value.status === "resolved";
-    const pumpingValue = hasOwn(value, "pumping_electrical_kWh") && typeof value.pumping_electrical_kWh === "number" && Number.isFinite(value.pumping_electrical_kWh)
-      ? `<span class="mono">${esc(fmtNum(value.pumping_electrical_kWh, "kWh"))}</span>`
-      : pendingInline(`${path}.pumping_electrical_kWh`);
-    const statusLabel = typeof value.status === "string" && value.status.trim() ? value.status.trim() : "not emitted";
-    const canonicalTreatment = resolved
-      ? "status is eligible for canonical inclusion; terminal.cost_totals remains authoritative"
-      : `excluded by the canonical cost-total emitter because status is ${statusLabel}`;
     return expectedScalar(value, "status", "Emitted pumping status", path) +
-      `<div class="sec-p8-field"><span>Emitted pumping diagnostic energy</span><b>${pumpingValue}</b></div>` +
-      `<div class="sec-p8-field"><span>Canonical-total treatment</span><b>${esc(canonicalTreatment)}</b></div>` +
-      `<div class="note">Pumping is a rough diagnostic, not a validated pump design. Its emitted status governs whether canonical totals include its energy.</div>` +
+      expectedLeaf(value, "pumping_electrical_kWh", "Emitted pumping diagnostic energy", "kWh", path) +
+      `<div class="note">Pumping is a rough diagnostic, not a validated pump design. Canonical inclusion, when emitted, is described by terminal.cost_totals.basis_note.</div>` +
       (Object.keys(rest).length ? renderTree(rest, path) : "");
   }
 
   function renderPlaceholders(diagnostic) {
     const path = "terminal.run_metadata.cost_rollup_diagnostic.owner_ratify_placeholders";
-    if (!hasOwn(diagnostic, "owner_ratify_placeholders") || !Array.isArray(diagnostic.owner_ratify_placeholders)) {
-      return pending(path, `${path} is not emitted; placeholder authority is not inferred.`);
-    }
+    if (!hasOwn(diagnostic, "owner_ratify_placeholders")) return pending(path, `${path} is not emitted; placeholder authority is not inferred.`);
+    if (!Array.isArray(diagnostic.owner_ratify_placeholders)) return structuredProblem(diagnostic.owner_ratify_placeholders, path, "a list");
     if (!diagnostic.owner_ratify_placeholders.length) {
       return `<div class="sec-p8-empty">Emitted placeholder list is empty. This does not make diagnostic projections viewer price authority.</div>`;
     }
@@ -252,21 +284,37 @@
 
   function renderWarnings(diagnostic) {
     const path = "terminal.run_metadata.cost_rollup_diagnostic.warnings";
-    if (!hasOwn(diagnostic, "warnings") || !Array.isArray(diagnostic.warnings)) return pending(path);
+    if (!hasOwn(diagnostic, "warnings")) return pending(path);
+    if (!Array.isArray(diagnostic.warnings)) return structuredProblem(diagnostic.warnings, path, "a list");
     if (!diagnostic.warnings.length) return `<div class="sec-p8-empty">Emitted warning list is empty.</div>`;
     return renderTree(diagnostic.warnings, path, "warning");
   }
 
   function renderDiagnostic(diagnostic) {
     const path = "terminal.run_metadata.cost_rollup_diagnostic";
-    if (!isRecord(diagnostic)) return pending(path, `${path} is not emitted; no allocation depth is inferred.`);
+    if (!isRecord(diagnostic)) return structuredProblem(diagnostic, path, "an object", `${path} is not emitted; no allocation depth is inferred.`);
     const priceBasis = expectedScalar(diagnostic, "price_basis", "Emitted diagnostic price basis", path);
+    const rawPriceBasis = diagnostic.price_basis;
+    let authorityMessage;
+    if (!hasOwn(diagnostic, "price_basis")) {
+      authorityMessage = "Diagnostic price basis is not emitted; money-projection authority cannot be validated from this artifact.";
+    } else if (rawPriceBasis === null) {
+      authorityMessage = "Diagnostic price basis was emitted null; money-projection authority cannot be validated from this artifact.";
+    } else if (typeof rawPriceBasis === "string" && !rawPriceBasis.trim()) {
+      authorityMessage = "Diagnostic price basis was emitted empty; money-projection authority cannot be validated from this artifact.";
+    } else if (typeof rawPriceBasis !== "string") {
+      authorityMessage = "Diagnostic price basis was emitted malformed; money-projection authority cannot be validated from this artifact.";
+    } else if (rawPriceBasis === "legacy_placeholder_awaiting_owner_ratification") {
+      authorityMessage = "Money projections use the emitted legacy-placeholder basis and require owner ratification.";
+    } else {
+      authorityMessage = "Money projections use the emitted diagnostic price basis shown above; they remain separate from viewer price authority.";
+    }
     const identity = expectedScalar(diagnostic, "schema_version", "Schema version", path) +
       expectedScalar(diagnostic, "policy_id", "Allocation policy", path) +
       expectedLeaf(diagnostic, "transition_count", "Cost-ledger transitions", "", path) +
       expectedLeaf(diagnostic, "transition_balance_max_abs", "Maximum absolute transition residual · native cost-vector component", "", path) +
       expectedLeaf(diagnostic, "owner_ratify_placeholder_count", "Emitted placeholder count", "", path);
-    return `<div class="sec-p8-authority"><b>Diagnostic allocation · not viewer price authority</b>${priceBasis}<p>Money projections retain the emitted legacy placeholder basis and require owner ratification.</p></div>` +
+    return `<div class="sec-p8-authority"><b>Diagnostic allocation · not viewer price authority</b>${priceBasis}<p>${esc(authorityMessage)}</p></div>` +
       `<details class="sec-p8-details"><summary>Diagnostic allocation depth</summary>` +
       `<div class="sec-p8-identity">${identity}</div>` +
       `<details class="sec-p8-details" open><summary>Owner-ratification placeholders</summary>${renderPlaceholders(diagnostic)}</details>` +
@@ -285,7 +333,7 @@
     const diagnostic = artifact?.terminal?.run_metadata?.cost_rollup_diagnostic;
     return `<section class="sec-p8-cost-rollup" id="sec-p8-cost-rollup">` +
       `<h2><span class="sect">P8</span>Cost rollup depth</h2>` +
-      `<p class="sub">Canonical totals and their artifact price provenance, followed by diagnostic allocation depth with its legacy-placeholder caveats intact.</p>` +
+      `<p class="sub">Canonical energy-cost totals and artifact price provenance, followed by diagnostic allocation depth with emitted basis disclosures intact.</p>` +
       `<div class="sec-p8-head"><div>${renderCostTotals(totals)}</div>${renderCostBlock(costBlock)}</div>` +
       renderDiagnostic(diagnostic) +
       `</section>`;
