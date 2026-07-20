@@ -116,7 +116,16 @@
     return `hsl(${hash % 360}, 45%, 52%)`;
   }
 
+  // Escape untrusted artifact/URL text before interpolating into innerHTML. Shared so panel
+  // modules (loaded separately from report-viewer.js) reach the SAME helper instead of
+  // redefining a security primitive. Matches the shell's local esc() byte-for-byte.
+  function esc(value) {
+    return String(value ?? "—").replace(/[&<>'"]/g, (character) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
+    }[character]));
+  }
+
   root.ReportLabels = Object.freeze({
-    fmtNum, fmtRunId, prettySpecies, accountLabel, prettyFeedstock, prettyChemText, speciesColor
+    fmtNum, fmtRunId, prettySpecies, accountLabel, prettyFeedstock, prettyChemText, speciesColor, esc
   });
 }(globalThis));
