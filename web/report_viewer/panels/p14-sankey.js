@@ -126,15 +126,17 @@
     };
   }
 
-  function ribbonBackground(groups, total) {
-    const visible = groups.major.map((entry) => ({ color: speciesColor(entry.name), value: entry.value }));
-    groups.trace.forEach((entry) => visible.push({ color: speciesColor(entry.name), value: entry.value }));
+  // Callers pass only the segments they paint (account major ribbons, or the global
+  // trace node members). Every painted segment must go through speciesColor() — no
+  // separate untested color arm.
+  function ribbonBackground(entries, total) {
     let cursor = 0;
-    return visible.map((entry) => {
+    return entries.map((entry) => {
+      const color = speciesColor(entry.name);
       const start = cursor / total * 100;
       cursor += entry.value;
       const end = cursor / total * 100;
-      return `${entry.color} ${start.toFixed(4)}%, ${entry.color} ${end.toFixed(4)}%`;
+      return `${color} ${start.toFixed(4)}%, ${color} ${end.toFixed(4)}%`;
     }).join(", ");
   }
 
@@ -226,7 +228,7 @@
       const visibleTotal = groups.major.reduce((sum, entry) => sum + entry.value, 0);
       const ratio = visibleTotal / largestVisible;
       const width = (scale === "sqrt" ? Math.sqrt(ratio) : ratio) * 100;
-      const background = ribbonBackground({ major: groups.major, trace: [] }, visibleTotal);
+      const background = ribbonBackground(groups.major, visibleTotal);
       const hover = `${accountLabel(account.account)} — emitted mol: ${inventoryText}`;
       const ariaQuantity = visibleTotal === account.total
         ? `${fmtNum(account.total, "mol")} account display sum`
@@ -261,7 +263,7 @@
     const speciesCount = new Set(members.map((member) => member.name)).size;
     const widthRatio = total / largestVisible;
     const width = (scale === "sqrt" ? Math.sqrt(widthRatio) : widthRatio) * 100;
-    const background = ribbonBackground({ major: members, trace: [] }, total);
+    const background = ribbonBackground(members, total);
     const memberText = members.map((member) => `${accountLabel(member.account)} · ${prettySpecies(member.name)} ${fmtNum(member.value, "mol")}`).join("; ");
     const tracePercent = TRACE_FRACTION * 100;
     return `<div class="sec-p14-row sec-p14-trace-node"><div class="sec-p14-track">`
