@@ -76,6 +76,11 @@ h1 { margin: 30px 0 6px; font-size: clamp(30px, 5vw, 56px); letter-spacing: -.04
 .metric .k, .ct { color: var(--ink-3); font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
 .metric .v, .cbig { margin-top: 10px; font-size: clamp(21px, 3vw, 30px); font-weight: 780; letter-spacing: -.03em; }
 .metric small, .cbig small { color: var(--ink-3); font-size: 11px; font-weight: 500; letter-spacing: 0; }
+/* Metric captions only: they follow a headline value with no separating
+   whitespace in the markup, so inline rendering reads as "$19,911.12canonical
+   defaults". `.cbig small` keeps its inline flow — those captions ARE preceded
+   by a space ("19 hours") and stacking them is a regression, not a fix. */
+.metric small { display: block; margin-top: 4px; }
 
 section { margin: 42px 0; scroll-margin-top: 20px; }
 h2 { margin: 0; padding-top: 14px; border-top: 1px solid var(--ink); font-size: 20px; letter-spacing: -.02em; }
@@ -168,7 +173,9 @@ tr:last-child td { border-bottom: 0; }
 .folder-button, .star-button, .load-button, .settings-actions button, .settings-actions .settings-action { padding: 8px 11px; border: 1px solid var(--rule); border-radius: 4px; background: var(--panel); color: var(--ink); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; }
 .folder-button.active, .star-button.active, .settings-actions button:not(:disabled), .settings-actions a.settings-action[download] { border-color: var(--orange); background: var(--amber-soft); }
 .settings-actions button:disabled { cursor: not-allowed; opacity: .45; }
-.folder-count { color: var(--ink-3); font-weight: 600; }
+/* The button is inline-flex, which drops the whitespace-only text node between
+   the label and the count ("All104"); restore the gap explicitly. */
+.folder-count { margin-left: 6px; color: var(--ink-3); font-weight: 600; }
 .filter-controls label { color: var(--ink-3); font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; min-width: 0; flex: 1 1 160px; }
 .filter-controls input, .filter-controls select {
   display: block; width: 100%; min-width: 0; max-width: 100%; margin-top: 5px; padding: 8px;

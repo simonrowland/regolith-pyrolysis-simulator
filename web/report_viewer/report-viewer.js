@@ -67,6 +67,17 @@ const runTitle = (header) => {
   return name && !isHashLike(name) ? name : `Untitled run · ${fmtRunId(header.run_id ?? name)}`;
 };
 const accountSpan = (value) => `<span title="${esc(value)}">${esc(accountLabel(value))}</span>`;
+// Engine identity strings can be long provenance blobs (binary path, host,
+// sha256 digest). Show a readable head; the full value stays on the tooltip so
+// nothing emitted is lost.
+const IDENTITY_MAX = 44;
+const identitySpan = (value) => {
+  const text = String(value);
+  if (isHashLike(text)) return runIdSpan(text);
+  return text.length > IDENTITY_MAX
+    ? `<span title="${esc(text)}">${esc(text.slice(0, IDENTITY_MAX).trimEnd())}…</span>`
+    : esc(text);
+};
 const speciesSpan = (value) => esc(prettySpecies(value));
 // Ledger cells must never fabricate: JS coercion turns true into "1 mol" and
 // []/false/whitespace into "0 mol". Only real finite numbers render as mol.
@@ -215,7 +226,10 @@ function yieldsSection(rows, terminal) {
   const max = Math.max(maxPresent(Object.values(evolved)) ?? 0, 1);
   const chips = ELLINGHAM_ORDER.map((element) => {
     const widthPct = Math.min(100, Math.sqrt((n(evolved[element]) ?? 0) / max) * 100);
-    return `<div class="yield-chip"><div class="el">${speciesSpan(element)}</div><div class="kg">${exactKg(evolved[element])} evolved</div><div class="bar"><i style="width:${widthPct.toFixed(2)}%"></i></div></div>`;
+    // "evolved" qualifies a mass; an absent species reads "not emitted", never
+    // "not emitted evolved".
+    const mass = hasNumber(evolved[element]) ? `${exactKg(evolved[element])} evolved` : exactKg(evolved[element]);
+    return `<div class="yield-chip"><div class="el">${speciesSpan(element)}</div><div class="kg">${mass}</div><div class="bar"><i style="width:${widthPct.toFixed(2)}%"></i></div></div>`;
   }).join("");
   const gap = terminal.yield_disposition ? "" : `<div class="note">Per-species feedstock-yield fractions are pending <span class="mono">yield_disposition</span>; none are inferred here.</div>`;
   // "Evolved" only — not recovered product mass or feedstock-origin yield fractions.
@@ -525,7 +539,7 @@ function provenanceSection(artifact) {
     ["Kernel commit", artifact.header.engine_identity?.kernel_commit_sha],
     ["Engine cache version", artifact.header.engine_identity?.cache_version]
   ];
-  return section(10, "Provenance & confidence", "Status-bearing metadata preserved from the frozen artifact.", `<div class="table-wrap"><table><tbody>${facts.map(([key, value]) => `<tr><th>${esc(key)}</th><td class="mono">${esc(value)}</td></tr>`).join("")}${identityFacts.map(([key, value]) => `<tr><th>${esc(key)}</th><td class="mono">${value == null ? "not emitted" : runIdSpan(value)}</td></tr>`).join("")}</tbody></table></div>${confidenceContent}`);
+  return section(10, "Provenance & confidence", "Status-bearing metadata preserved from the frozen artifact.", `<div class="table-wrap"><table><tbody>${facts.map(([key, value]) => `<tr><th>${esc(key)}</th><td class="mono">${esc(value)}</td></tr>`).join("")}${identityFacts.map(([key, value]) => `<tr><th>${esc(key)}</th><td class="mono">${value == null ? "not emitted" : identitySpan(value)}</td></tr>`).join("")}</tbody></table></div>${confidenceContent}`);
 }
 
 // Blind-fire panel registry: panels live in their OWN module files under panels/ and

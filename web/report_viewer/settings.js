@@ -61,6 +61,19 @@ function formatScalar(value) {
   return esc(JSON.stringify(value));
 }
 
+// Engine-identity values only. cache_version carries a provenance blob (binary
+// path, host, sha256 digest) that dumps ~250 chars of line noise into the
+// table; show a readable head with the full value on the tooltip. Config and
+// setpoint leaves keep formatScalar's untruncated rendering.
+const IDENTITY_MAX = 60;
+
+function formatIdentityScalar(value) {
+  if (typeof value !== "string" || isHashLike(value) || value.length <= IDENTITY_MAX) {
+    return formatScalar(value);
+  }
+  return `<span title="${esc(value)}">${esc(value.slice(0, IDENTITY_MAX).trimEnd())}…</span>`;
+}
+
 function costBlock(cost) {
   if (!cost || typeof cost !== "object") {
     return pending("Pending W-A5a", "header.cost_block is absent.");
@@ -96,7 +109,7 @@ function engineIdentityBlock(identity) {
   }
   const rows = entries.map(([key, value]) => {
     const label = ENGINE_IDENTITY_LABELS[key] || key;
-    return `<tr><th>${esc(label)}</th><td class="mono">${formatScalar(value)}</td></tr>`;
+    return `<tr><th>${esc(label)}</th><td class="mono">${formatIdentityScalar(value)}</td></tr>`;
   }).join("");
   return `<div class="table-wrap"><table><tbody>${rows}</tbody></table></div>`;
 }
