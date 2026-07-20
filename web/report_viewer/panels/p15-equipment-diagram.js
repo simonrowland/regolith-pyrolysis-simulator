@@ -19,10 +19,10 @@
   ]);
   const STAGES = Object.freeze([
     { key: "stage_0", label: "Hot Duct (IR)", campaigns: ["C0", "C0B"] },
-    { key: "stage_1_fe_condenser", label: "Fe Condenser", campaigns: ["C2B"], productSpecies: "Fe" },
+    { key: "stage_1_fe_condenser", label: "Fe Condenser", campaigns: ["C2B"], productSpecies: ["Fe"] },
     { key: "stage_2_cr_oxide_harvest", label: "Cr Oxide Harvester", campaigns: [] },
-    { key: "stage_3_sio_zone", label: "SiO Zone", campaigns: ["C2A", "C2A_STAGED"], productSpecies: "SiO" },
-    { key: "stage_4_alkali_mg_cyclone", label: "Alkali/Mg Cyclone", campaigns: ["C3_K", "C3_NA", "C4"], productSpecies: "Mg" },
+    { key: "stage_3_sio_zone", label: "SiO Zone", campaigns: ["C2A", "C2A_STAGED"], productSpecies: ["SiO", "SiO2"] },
+    { key: "stage_4_alkali_mg_cyclone", label: "Alkali/Mg Cyclone", campaigns: ["C3_K", "C3_NA", "C4"], productSpecies: ["Na", "K", "Mg"] },
     { key: "stage_5", label: "Vortex Dust Filter", campaigns: [] },
     { key: "stage_6", label: "Turbine-Compressor", campaigns: [] },
     { key: "stage_7", label: "Turbine Outlet Monitor", campaigns: [] },
@@ -102,6 +102,12 @@
     return `<span class="sec-p15-flag" title="${esc(String(value))}">${esc(label)} · ${esc(rendered)}</span>`;
   }
 
+  function textChip(label, value) {
+    if (typeof value !== "string" || !value.trim()) return "";
+    const rendered = value.trim();
+    return `<span class="sec-p15-flag" title="${esc(rendered)}">${esc(label)} · ${esc(rendered)}</span>`;
+  }
+
   function stageSpeciesGroup(label, value) {
     return `<div class="sec-p15-stage-group"><span>${esc(label)}</span>${speciesList(value, "kg", "None emitted")}</div>`;
   }
@@ -114,18 +120,20 @@
     const active = stageDefinition.campaigns.includes(campaign);
     const activeClass = active ? " sec-p15-stage--active" : "";
     const designated = asMap(stage?.designated_species_kg);
-    const emittedProduct = Boolean(
-      stageDefinition.productSpecies &&
-      designated &&
-      hasNumber(designated[stageDefinition.productSpecies]) &&
-      designated[stageDefinition.productSpecies] > 0
-    );
+    const emittedProductSpecies = stageDefinition.productSpecies?.find((species) => (
+      designated && hasNumber(designated[species]) && designated[species] > 0
+    ));
+    const emittedProduct = Boolean(emittedProductSpecies);
     const productClass = emittedProduct ? " sec-p15-stage--product" : "";
     const productStyle = emittedProduct
-      ? ` style="--sec-p15-product:${esc(speciesColor(stageDefinition.productSpecies))}"`
+      ? ` style="--sec-p15-product:${esc(speciesColor(emittedProductSpecies))}"`
       : "";
     const routeNote = stageDefinition.productSpecies
-      ? `<span class="sec-p15-stage-route">${esc(`Designed product route · ${prettySpecies(stageDefinition.productSpecies)} · collection not implied`)}</span>`
+      ? `<span class="sec-p15-stage-route">${esc(
+        `Designed product route · ${stageDefinition.productSpecies.map(prettySpecies).join(" / ")} · ${
+          emittedProduct ? "terminal designated mass emitted" : "collection not implied"
+        }`
+      )}</span>`
       : "";
     const activeText = active ? " · designed campaign-route focus; activity not emitted" : "";
     if (!stage) {
@@ -217,11 +225,23 @@
     const segments = storedO2Accounts(ledger).map((account) => {
       const accountPresent = hasOwn(ledger, account);
       const species = accountPresent ? asMap(ledger[account]) : null;
-      const amount = species && hasNumber(species.O2) ? species.O2 : null;
+      const o2Present = Boolean(species && hasOwn(species, "O2"));
+      const amount = o2Present && hasNumber(species.O2) && species.O2 >= 0
+        ? species.O2
+        : null;
       const label = accountLabel(account);
-      const value = amount === null
-        ? (accountPresent ? "O₂ not emitted for this account this hour" : "Not emitted for this hour")
-        : fmtNum(amount, "mol");
+      let value;
+      if (!accountPresent) {
+        value = "Not emitted for this hour";
+      } else if (!species) {
+        value = "Pending — malformed account emitted";
+      } else if (!o2Present) {
+        value = "O₂ not emitted for this account this hour";
+      } else if (amount === null) {
+        value = "Pending — malformed O₂ quantity emitted";
+      } else {
+        value = fmtNum(amount, "mol");
+      }
       const stateClass = amount === null ? " sec-p15-cryo-segment--pending" : "";
       return `<div class="sec-p15-cryo-segment${stateClass}" data-account-slot="${esc(account)}" ` +
         `style="--sec-p15-species:${esc(speciesColor("O2"))}" title="${esc(account)}">` +
@@ -296,13 +316,35 @@
     if (!pools) return [];
     const flags = [];
     Object.entries(pools).forEach(([poolName, pool]) => {
-      const provenance = asMap(asMap(pool)?.density_correlation_provenance);
+      const poolRecord = asMap(pool);
+      const provenance = asMap(poolRecord?.density_correlation_provenance);
       Object.entries(provenance || {}).forEach(([species, record]) => {
-        flags.push(flagChip(
-          `${readableToken(poolName)} ${prettySpecies(species)} density provenance`,
-          asMap(record)?.status
-        ));
+        const densityRecord = asMap(record);
+        const baseLabel = `${readableToken(poolName)} ${prettySpecies(species)} density`;
+        if (!densityRecord) {
+          flags.push(textChip(`${baseLabel} provenance`, "malformed emitted record"));
+          return;
+        }
+        flags.push(flagChip(`${baseLabel} status`, densityRecord.status));
+        flags.push(textChip(`${baseLabel} source`, densityRecord.source));
+        if (hasOwn(densityRecord, "valid_range_K")) {
+          const range = densityRecord.valid_range_K;
+          const rangeText = Array.isArray(range) && range.length === 2 && range.every(hasNumber)
+            ? `${fmtNum(range[0], "K")} to ${fmtNum(range[1], "K")}`
+            : "malformed emitted value";
+          flags.push(textChip(`${baseLabel} valid range`, rangeText));
+        }
+        if (hasOwn(densityRecord, "temperature_K")) {
+          const temperature = hasNumber(densityRecord.temperature_K)
+            ? fmtNum(densityRecord.temperature_K, "K")
+            : "malformed emitted value";
+          flags.push(textChip(`${baseLabel} evaluation temperature`, temperature));
+        }
       });
+      flags.push(flagChip(
+        `${readableToken(poolName)} buoyancy verdict`,
+        asMap(poolRecord?.buoyancy)?.verdict
+      ));
     });
     return [...new Set(flags.filter(Boolean))];
   }

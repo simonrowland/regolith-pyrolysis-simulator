@@ -232,8 +232,14 @@ def test_present_artifact_renders_route_specific_values_and_authority() -> None:
                         "pools": {
                             "bottom_pool": {
                                 "density_correlation_provenance": {
-                                    "Fe": {"status": "extrapolated_below_valid_range"}
-                                }
+                                    "Fe": {
+                                        "source": "Assael et al. (2006)",
+                                        "valid_range_K": [1809.0, 2480.0],
+                                        "temperature_K": 1423.15,
+                                        "status": "extrapolated_below_valid_range",
+                                    }
+                                },
+                                "buoyancy": {"verdict": "sink"},
                             }
                         },
                     },
@@ -269,7 +275,12 @@ def test_present_artifact_renders_route_specific_values_and_authority() -> None:
     assert "Behavior · unchanged diagnostic only" in html
     assert "Melt density fallback · engaged" in html
     assert "Melt density tier · fallback basaltic melt constant engine density unavailable" in html
-    assert "bottom pool Fe density provenance · extrapolated below valid range" in html
+    authority = _authority(html)
+    assert "bottom pool Fe density status · extrapolated below valid range" in authority
+    assert "bottom pool Fe density source · Assael et al. (2006)" in authority
+    assert "bottom pool Fe density valid range · 1,809 K to 2,480 K" in authority
+    assert "bottom pool Fe density evaluation temperature · 1,423 K" in authority
+    assert "bottom pool buoyancy verdict · sink" in authority
     assert "Bottom-pool diagnostic inventory · no tap gate" in html
     assert "Tap flow / disposition pending — not emitted" in html
     assert "carrier separation / recycle target · recovery not emitted" in html
@@ -324,12 +335,21 @@ def test_sparse_o2_accounts_stay_separate_and_missing_bin_is_pending() -> None:
                     "terminal.oxygen_melt_offgas_vented_to_vacuum": {"O2": 99.0},
                 },
             },
+            {
+                "hour": 80,
+                "summary": {"campaign": "C5"},
+                "ledger": {
+                    "terminal.oxygen_melt_offgas_stored": {},
+                    "terminal.oxygen_mre_anode_stored": {"O2": 0.0},
+                },
+            },
         ],
         "terminal": {"stage_purity": {}},
     }
 
     first = _run_panel(artifact, 0)["stateHtml"]
     second = _run_panel(artifact, 1)["stateHtml"]
+    partial = _run_panel(artifact, 2)["stateHtml"]
 
     assert "2 mol" in _account_segment(
         first, "terminal.oxygen_melt_offgas_stored"
@@ -348,6 +368,44 @@ def test_sparse_o2_accounts_stay_separate_and_missing_bin_is_pending() -> None:
     assert "vented_to_vacuum" not in first + second
     assert "total stored" not in (first + second).lower()
     assert "Separate raw-ledger bins · mol · no combined total" in first
+    missing_o2 = _account_segment(
+        partial, "terminal.oxygen_melt_offgas_stored"
+    )
+    emitted_zero = _account_segment(
+        partial, "terminal.oxygen_mre_anode_stored"
+    )
+    assert "O₂ not emitted for this account this hour" in missing_o2
+    assert "0 mol" not in missing_o2
+    assert "0 mol" in emitted_zero
+    assert "sec-p15-cryo-segment--pending" not in emitted_zero
+
+
+def test_negative_and_malformed_stored_o2_are_pending() -> None:
+    artifact = {
+        "timesteps": [{
+            "hour": 1,
+            "summary": {"campaign": "C0"},
+            "ledger": {
+                "terminal.oxygen_melt_offgas_stored": {"O2": -2.0},
+                "terminal.oxygen_mre_anode_stored": ["malformed"],
+            },
+        }],
+        "terminal": {"stage_purity": {}},
+    }
+
+    html = _run_panel(artifact)["html"]
+    negative = _account_segment(
+        html, "terminal.oxygen_melt_offgas_stored"
+    )
+    malformed = _account_segment(
+        html, "terminal.oxygen_mre_anode_stored"
+    )
+
+    assert "Pending — malformed O₂ quantity emitted" in negative
+    assert "-2 mol" not in negative
+    assert "sec-p15-cryo-segment--pending" in negative
+    assert "Pending — malformed account emitted" in malformed
+    assert "sec-p15-cryo-segment--pending" in malformed
 
 
 def test_partial_inputs_do_not_feed_missing_backend_values() -> None:
@@ -521,6 +579,7 @@ def test_artifact_values_are_escaped_in_rendered_output() -> None:
 
     html = _run_panel(artifact)["html"]
     selected = _selected_timestep(html)
+    warning_stage = _stage_card(html, "stage_1_fe_condenser")
 
     assert "<img" not in html
     assert "<script" not in html
@@ -530,6 +589,8 @@ def test_artifact_values_are_escaped_in_rendered_output() -> None:
     assert "&lt;svg/onload=metric&gt;" in html
     assert "<strong>Hour &lt;img src=x onerror=hour&gt; · &lt;img src=x onerror=campaign_unique&gt;</strong>" in selected
     assert "&amp;lt;img src=x onerror=campaign_unique" not in selected
+    assert '<p class="sec-p15-stage-warning">&lt;/p&gt;&lt;script&gt;alert(2)&lt;/script&gt;</p>' in warning_stage
+    assert "&amp;lt;" not in warning_stage
 
 
 def test_diagnostic_pool_inventory_and_density_authority_use_emitted_values() -> None:
@@ -552,8 +613,14 @@ def test_diagnostic_pool_inventory_and_density_authority_use_emitted_values() ->
                         "pools": {
                             "bottom_pool": {
                                 "density_correlation_provenance": {
-                                    "Fe": {"status": "extrapolated_below_valid_range"}
-                                }
+                                    "Fe": {
+                                        "source": "Assael et al. (2006), J. Phys. Chem. Ref. Data 35, 285-300, doi:10.1063/1.2149380",
+                                        "valid_range_K": [1809.0, 2480.0],
+                                        "temperature_K": 1423.15,
+                                        "status": "extrapolated_below_valid_range",
+                                    }
+                                },
+                                "buoyancy": {"verdict": "sink"},
                             }
                         },
                     },
@@ -619,7 +686,11 @@ def test_diagnostic_pool_inventory_and_density_authority_use_emitted_values() ->
     assert "tap-carried" not in bottom_pool
     assert "Melt density fallback · engaged" in authority
     assert "Melt density tier · fallback basaltic melt constant engine density unavailable" in authority
-    assert "bottom pool Fe density provenance · extrapolated below valid range" in authority
+    assert "bottom pool Fe density status · extrapolated below valid range" in authority
+    assert "bottom pool Fe density source · Assael et al. (2006), J. Phys. Chem. Ref. Data 35, 285-300, doi:10.1063/1.2149380" in authority
+    assert "bottom pool Fe density valid range · 1,809 K to 2,480 K" in authority
+    assert "bottom pool Fe density evaluation temperature · 1,423 K" in authority
+    assert "bottom pool buoyancy verdict · sink" in authority
     assert "Pending — not emitted" in partial_pool
     assert "9 mol" not in partial_pool
     assert "Pending — malformed species container emitted" in malformed_pool
@@ -628,33 +699,62 @@ def test_diagnostic_pool_inventory_and_density_authority_use_emitted_values() ->
 
 
 def test_product_stripe_requires_positive_matching_emitted_species() -> None:
-    stages = _stage_purity()
-    stages["stage_3_sio_zone"] = {
-        "label": "SiO Zone",
-        "designated_species_kg": {"Fe": 1.0},
-        "coproduct_species_kg": {},
-        "impurity_species_kg": {},
-        "designated_kg": 0.0,
-        "impurity_kg": 0.0,
-        "total_kg": 0.0,
-        "purity_fraction": 1.0,
-        "verdict": "PURE",
-    }
-    artifact = {
+    def stage_snapshot(species: str) -> dict:
+        return {
+            "label": "Product stage",
+            "designated_species_kg": {species: 1.0},
+            "coproduct_species_kg": {},
+            "impurity_species_kg": {},
+            "designated_kg": 1.0,
+            "impurity_kg": 0.0,
+            "total_kg": 1.0,
+            "purity_fraction": 1.0,
+            "verdict": "PURE",
+        }
+
+    accepted_cases = [
+        ("stage_1_fe_condenser", "Fe", "Designed product route · Fe"),
+        ("stage_3_sio_zone", "SiO", "Designed product route · SiO / SiO₂"),
+        ("stage_3_sio_zone", "SiO2", "Designed product route · SiO / SiO₂"),
+        ("stage_4_alkali_mg_cyclone", "Na", "Designed product route · Na / K / Mg"),
+        ("stage_4_alkali_mg_cyclone", "K", "Designed product route · Na / K / Mg"),
+        ("stage_4_alkali_mg_cyclone", "Mg", "Designed product route · Na / K / Mg"),
+    ]
+    for stage_key, species, route_label in accepted_cases:
+        stages = _stage_purity()
+        stages[stage_key] = stage_snapshot(species)
+        artifact = {
+            "timesteps": [{"hour": 1, "summary": {"campaign": "C0"}, "ledger": {}}],
+            "terminal": {"stage_purity": stages},
+        }
+        stage = _stage_card(_run_panel(artifact)["html"], stage_key)
+
+        assert "sec-p15-stage--product" in stage
+        assert route_label in stage
+        assert "terminal designated mass emitted" in stage
+        assert "collection not implied" not in stage
+
+    foreign_stages = _stage_purity()
+    foreign_stages["stage_3_sio_zone"] = stage_snapshot("Fe")
+    foreign_artifact = {
         "timesteps": [{"hour": 1, "summary": {"campaign": "C0"}, "ledger": {}}],
-        "terminal": {"stage_purity": stages},
+        "terminal": {"stage_purity": foreign_stages},
     }
+    foreign_stage = _stage_card(
+        _run_panel(foreign_artifact)["html"], "stage_3_sio_zone"
+    )
+    empty_alkali_stage = _stage_card(
+        _run_panel({
+            "timesteps": [{"hour": 1, "summary": {"campaign": "C0"}, "ledger": {}}],
+            "terminal": {"stage_purity": _stage_purity()},
+        })["html"],
+        "stage_4_alkali_mg_cyclone",
+    )
 
-    html = _run_panel(artifact)["html"]
-    fe_stage = _stage_card(html, "stage_1_fe_condenser")
-    sio_stage = _stage_card(html, "stage_3_sio_zone")
-    mg_stage = _stage_card(html, "stage_4_alkali_mg_cyclone")
-
-    assert "sec-p15-stage--product" in fe_stage
-    assert "sec-p15-stage--product" not in sio_stage
-    assert "sec-p15-stage--product" not in mg_stage
-    assert "Designed product route · SiO · collection not implied" in sio_stage
-    assert "Designed product route · Mg · collection not implied" in mg_stage
+    assert "sec-p15-stage--product" not in foreign_stage
+    assert "Designed product route · SiO / SiO₂ · collection not implied" in foreign_stage
+    assert "sec-p15-stage--product" not in empty_alkali_stage
+    assert "Designed product route · Na / K / Mg · collection not implied" in empty_alkali_stage
 
 
 def test_species_presence_visuals_distinguish_absent_empty_zero_and_malformed() -> None:
@@ -693,6 +793,18 @@ def test_species_presence_visuals_distinguish_absent_empty_zero_and_malformed() 
                 },
                 "ledger": {},
             },
+            {
+                "hour": 4,
+                "summary": {
+                    "campaign": "C0",
+                    "wall_deposit_cumulative_kg": {
+                        "stage_0_to_stage_1": {"Fe": "1.0"}
+                    },
+                    "vapor_species_kg_hr": {"Fe": "1.0"},
+                    "metal_yields_kg": {"Fe": "1.0"},
+                },
+                "ledger": {},
+            },
         ],
         "terminal": {"stage_purity": {}},
     }
@@ -701,6 +813,7 @@ def test_species_presence_visuals_distinguish_absent_empty_zero_and_malformed() 
     empty = _run_panel(artifact, 1)["stateHtml"]
     zero = _run_panel(artifact, 2)["stateHtml"]
     malformed = _run_panel(artifact, 3)["stateHtml"]
+    nonnumeric = _run_panel(artifact, 4)["stateHtml"]
 
     assert "Cumulative wall deposit not emitted for stage 0 to 1" in _pipe_segment(
         absent, "stage_0_to_stage_1"
@@ -727,6 +840,13 @@ def test_species_presence_visuals_distinguish_absent_empty_zero_and_malformed() 
     assert "evolved vapor flux" not in _vapor(malformed)
     assert "Pending — malformed species container emitted" in _readout(
         malformed, "metal-product-yields"
+    )
+    assert "Cumulative wall deposit malformed for stage 0 to 1" in _pipe_segment(
+        nonnumeric, "stage_0_to_stage_1"
+    )
+    assert "Vapor flux malformed" in _vapor(nonnumeric)
+    assert "Pending — malformed species quantity emitted" in _readout(
+        nonnumeric, "metal-product-yields"
     )
 
 
