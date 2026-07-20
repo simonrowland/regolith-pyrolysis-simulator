@@ -468,6 +468,10 @@ body {
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: var(--space-4);
     font-size: 13px;
+    /* Backend tokens arrive as long unbreakable words; without this one of them
+       widens the whole page instead of wrapping in its own cell. */
+    overflow-wrap: anywhere;
+    min-width: 0;
 }
 
 /* Disclosure triangles */

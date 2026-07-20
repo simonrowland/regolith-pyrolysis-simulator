@@ -152,7 +152,23 @@ socket.on('simulation_tick', (data) => {
     setEl('energy-electrical', data.energy_electrical_kWh.toFixed(3) + ' kWh');
     setEl('energy-evaporation',
         data.energy_evaporation_thermal_kWh.toFixed(3) + ' kWh');
-    setEl('energy-scope', data.energy_scope);
+    // The backend emits energy_scope as a raw token
+    // ("electrical_plus_known_evaporation_enthalpy"). Rendering it verbatim put a
+    // raw ledger identifier on screen and, being one unbreakable 42-char word,
+    // forced page-level horizontal overflow at 1440px. Space it out for reading;
+    // the exact token stays on the tooltip.
+    const scopeEl = document.getElementById('energy-scope');
+    if (scopeEl) {
+        const raw = data.energy_scope;
+        if (typeof raw === 'string' && raw) {
+            const pretty = raw.replace(/_/g, ' ').replace(/^./, (c) => c.toUpperCase());
+            scopeEl.textContent = pretty;
+            scopeEl.title = raw;
+        } else {
+            scopeEl.textContent = 'not emitted';
+            scopeEl.removeAttribute('title');
+        }
+    }
     setEl('furnace-heat-status',
         data.furnace_heat_status
             + '; feed sensible, fusion, radiation, full furnace heat omitted');

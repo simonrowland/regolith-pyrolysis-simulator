@@ -200,8 +200,13 @@ def test_simulation_tick_payload_renders_operator_dom_readouts(
     assert rendered["text"]["energy-evaporation"] == (
         f"{payload['energy_evaporation_thermal_kWh']:.3f} kWh"
     )
+    # The scope token is spaced out for reading, exactly as `atmosphere` is
+    # rendered "Hard vacuum" rather than "hard_vacuum" above. Displaying the raw
+    # identifier put a ledger variable name on screen and, as one unbreakable
+    # 42-character word, widened the whole page past the viewport at 1440px.
+    # Nothing is lost: the exact token stays on the element's title.
     assert rendered["text"]["energy-scope"] == (
-        "electrical_plus_known_evaporation_enthalpy"
+        "Electrical plus known evaporation enthalpy"
     )
     assert rendered["text"]["furnace-heat-status"] == (
         "partial; feed sensible, fusion, radiation, full furnace heat omitted"
