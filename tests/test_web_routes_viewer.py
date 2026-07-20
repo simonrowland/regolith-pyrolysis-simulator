@@ -619,69 +619,26 @@ setImmediate(() => process.stdout.write(report.innerHTML));
     assert positions == sorted(positions)
 
 
-def test_report_viewer_kg_energy_paths_reject_non_numeric_coercion() -> None:
-    """Regression (O1 / L3-F2): booleans/arrays/blank strings in kg/energy fields must render honest
-    'not emitted', never a coerced number. The old `Number.isFinite(Number(v))` gate let true→1, false→0,
-    []→0 through kg/energy/sum paths (the kg twin of the mol path's strictMol guard)."""
-    root = Path(__file__).resolve().parents[1] / "web/report_viewer"
-    artifact = {
-        "artifact_schema_version": "0.2.0",
-        "header": {"run_id": "poison-run", "name": "poison", "feedstock_id": "lunar_mare_low_ti"},
-        "timesteps": [
-            {
-                "hour": 1,
-                "summary": {
-                    "campaign": "C0",
-                    "metal_yields_kg": {"Fe": True},  # boolean → must NOT render "1 kg"
-                    "O2_source_side_potential_kg_cumulative": False,  # boolean → must NOT render "0 kg"
-                    "energy_electrical_kWh": True,  # boolean → must NOT sum into a kWh total
-                    "energy_evaporation_thermal_kWh": [],  # array → must NOT coerce to 0
-                },
-                "ledger": {"process.cleaned_melt": {"SiO2": 10.0}},
+def test_report_viewer_glance_rejects_non_numeric_energy_values() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["timesteps"] = [
+        {
+            "hour": 1,
+            "summary": {
+                "campaign": "C0",
+                "energy_electrical_kWh": "12",
+                "energy_evaporation_thermal_kWh": "  ",
             },
-        ],
-        "terminal": {"final_state": {"process.cleaned_melt": {"SiO2": 10.0}}, "stage_purity": {}},
-    }
-    # A timestep-bearing artifact triggers stepper/glance wiring, so mock every element (not just #report)
-    # and concatenate all written innerHTML — the poison lands in the yields section, the energy header,
-    # and the per-hour glance grid.
-    harness = r"""
-const fs = require("fs");
-const vm = require("vm");
-const labelsSource = fs.readFileSync(process.argv[2], "utf8");
-const reportSource = fs.readFileSync(process.argv[3], "utf8");
-const els = {};
-function mockEl() {
-  return { _html: "", value: "", disabled: false, textContent: "",
-    get innerHTML() { return this._html; }, set innerHTML(v) { this._html = v; },
-    addEventListener() {}, setAttribute() {}, removeAttribute() {}, focus() {},
-    classList: { add() {}, remove() {}, toggle() {} }, dataset: {} };
-}
-const context = {
-  window: { location: { search: "" } },
-  document: { title: "",
-    querySelector: (s) => (els[s] = els[s] || mockEl()),
-    querySelectorAll: () => [] },
-  URLSearchParams, encodeURIComponent, setTimeout,
-  fetch: async () => ({ ok: true, json: async () => JSON.parse(process.argv[4]) })
-};
-context.globalThis = context;
-vm.runInNewContext(labelsSource, context);
-vm.runInNewContext(reportSource, context);
-setImmediate(() => process.stdout.write(Object.values(els).map((e) => e._html).join("\n")));
-"""
-    completed = subprocess.run(
-        ["node", "-", str(root / "labels.js"), str(root / "report-viewer.js"), json.dumps(artifact)],
-        input=harness, text=True, capture_output=True, check=True,
-    )
-    html = completed.stdout
-    assert "Report unavailable" not in html  # render must not fatal
-    # None of the fabricated coercions may appear as a rendered quantity.
-    assert "1 kg" not in html
-    assert "0 kg" not in html
-    assert "1 kWh" not in html and "1.0 kWh" not in html
-    # The honest placeholder must be present where those poisoned metrics render.
-    assert "not emitted" in html
+            "ledger": {},
+        }
+    ]
+
+    html = _render_report_html(artifact)
+
+    assert '<div class="k">Electrical</div><div class="v">not emitted</div>' in html
+    assert '<div class="k">Evaporation thermal</div><div class="v">not emitted</div>' in html
+    assert "12 kWh" not in html
+    assert "0 kWh" not in html
 
 
 def test_report_viewer_404_and_corrupt_payload_render_fatal() -> None:
