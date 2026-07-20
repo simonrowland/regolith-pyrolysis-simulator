@@ -29,8 +29,12 @@ const scalarText = (value) => value !== null && typeof value === "object"
 const esc = (value) => scalarText(value).replace(/[&<>'"]/g, (c) => ({
   "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
 }[c]));
-const hasNumber = (value) => value !== null && value !== "" && Number.isFinite(Number(value));
-const n = (value) => hasNumber(value) ? Number(value) : null;
+// Accept ONLY a real finite number — never coerce. JS Number() turns true→1, false→0, []→0,
+// "  "→0, "12"→12, so the old `Number.isFinite(Number(v))` gate let booleans/arrays/blank strings
+// through the kg/energy/sum paths and fabricated a confident "0 kg O₂" / "1 kg Fe" / energy total.
+// This is the kg/energy twin of the mol path's strictMol guard — same contract (typeof number).
+const hasNumber = (value) => typeof value === "number" && Number.isFinite(value);
+const n = (value) => hasNumber(value) ? value : null;
 const sourceSideO2 = (row) => {
   const canonical = row?.O2_source_side_potential_kg_cumulative;
   if (typeof canonical === "number" && Number.isFinite(canonical)) return canonical;
