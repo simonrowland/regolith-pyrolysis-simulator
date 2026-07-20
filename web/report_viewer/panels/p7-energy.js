@@ -5,14 +5,14 @@
 
   const CUMULATIVE_COMPONENTS = Object.freeze([
     ["electrical", "Electrical load"],
-    ["evaporation_thermal", "Known evaporation thermal sink"],
+    ["evaporation_thermal", "Diagnostic evaporation-enthalpy estimate"],
     ["latent", "Latent vaporization component"],
-    ["dissociation", "Dissociation component"],
+    ["dissociation", "Reaction / dissociation component"],
     ["electrical_plus_evaporation", "Scoped electrical + evaporation energy"]
   ]);
 
   const EVAPORATION_COMPONENTS = Object.freeze([
-    ["evaporation_enthalpy_sink", "Evaporation enthalpy sink"],
+    ["evaporation_enthalpy_sink", "Diagnostic evaporation-enthalpy sink estimate"],
     ["reaction_disproportionation_enthalpy_sink", "Reaction / disproportionation enthalpy sink"],
     ["product_vapor_enthalpy_sink", "Product-vapor enthalpy sink"],
     ["net_unallocated", "Net unallocated"]
@@ -27,8 +27,15 @@
   }
 
   function readableToken(value) {
-    const raw = scalarText(value, "not emitted").trim();
-    if (!raw) return "not emitted";
+    if (value === undefined) return "Not emitted";
+    if (value === null || (typeof value === "string" && !value.trim())) {
+      return "Emitted empty";
+    }
+    if (typeof value !== "string") {
+      const kind = Array.isArray(value) ? "array" : typeof value;
+      return `Malformed (${kind})`;
+    }
+    const raw = scalarText(value).trim();
     const words = raw
       .replace(/[_-]+/g, " ")
       .replace(/\s+/g, " ");
@@ -43,27 +50,34 @@
     return readableToken(value);
   }
 
-  function caveatBlock(summary) {
+  function caveatBlock(summary, diagnostic = false) {
     const scope = isRecord(summary) ? summary.energy_scope : undefined;
     const furnaceHeatStatus = isRecord(summary) ? summary.furnace_heat_status : undefined;
     return `<div class="sec-p7-energy-caveats" aria-label="Energy scope and furnace heat coverage">` +
       `<span class="sec-p7-energy-chip"><b>Scope</b> · ${esc(readableScope(scope))}</span>` +
       `<span class="sec-p7-energy-chip"><b>Furnace heat</b> · ${esc(readableToken(furnaceHeatStatus))}</span>` +
+      (diagnostic
+        ? `<span class="sec-p7-energy-chip"><b>Diagnostic</b> · Ledger-neutral estimate</span>`
+        : "") +
       `</div>`;
   }
 
   function emittedValue(value) {
-    return isFiniteNumber(value)
-      ? esc(fmtNum(value, "kWh"))
-      : `<span class="sec-p7-energy-missing">pending · not emitted</span>`;
+    if (isFiniteNumber(value)) return esc(fmtNum(value, "kWh"));
+    let state = "malformed";
+    if (value === undefined) state = "not emitted";
+    if (value === null || (typeof value === "string" && !value.trim())) {
+      state = "emitted empty";
+    }
+    return `<span class="sec-p7-energy-missing">pending · ${state}</span>`;
   }
 
-  function metricCard(label, value, basis, summary, tone) {
+  function metricCard(label, value, basis, summary, tone, diagnostic = false) {
     return `<article class="sec-p7-energy-card sec-p7-energy-${tone}">` +
       `<h3>${esc(label)}</h3>` +
       `<div class="sec-p7-energy-value">${emittedValue(value)}</div>` +
       `<p class="sec-p7-energy-basis">${esc(basis)}</p>` +
-      caveatBlock(summary) +
+      caveatBlock(summary, diagnostic) +
       `</article>`;
   }
 
@@ -86,28 +100,56 @@
   }
 
   function breakdownCard(title, basis, breakdown, expectedComponents, summary) {
-    const absent = !isRecord(breakdown)
-      ? `<div class="sec-p7-energy-pending"><b>Pending breakdown</b><span>Breakdown not emitted; no components are inferred.</span></div>`
+    let notice = "";
+    if (breakdown === undefined) {
+      notice = "Breakdown not emitted; no components are inferred.";
+    } else if (breakdown === null || (isRecord(breakdown) && !Object.keys(breakdown).length)) {
+      notice = "Emitted breakdown is empty; no components are inferred.";
+    } else if (!isRecord(breakdown)) {
+      notice = "Emitted breakdown is malformed; no components are inferred.";
+    }
+    const pending = notice
+      ? `<div class="sec-p7-energy-pending"><b>Pending breakdown</b><span>${notice}</span></div>`
       : "";
     return `<article class="sec-p7-energy-breakdown">` +
       `<h3>${esc(title)}</h3>` +
       `<p class="sec-p7-energy-basis">${esc(basis)}</p>` +
-      absent +
+      pending +
       `<div class="sec-p7-energy-table-wrap"><table><thead><tr><th>Emitted component</th><th>Energy · kWh</th></tr></thead>` +
       `<tbody>${breakdownRows(breakdown, expectedComponents)}</tbody></table></div>` +
-      caveatBlock(summary) +
+      caveatBlock(summary, true) +
       `</article>`;
   }
 
-  function render(artifact, rows) {
-    const summary = Array.isArray(rows) && rows.length ? rows.at(-1) : null;
-    if (!isRecord(summary)) {
+  function pendingPanel(message) {
       return `<section class="sec-p7-energy" id="sec-p7-energy">` +
         `<h2><span class="sect">07</span>Energy breakdown</h2>` +
-        `<p class="sub">Electrical load and the known evaporation-enthalpy sink, without viewer-derived totals.</p>` +
-        `<div class="sec-p7-energy-pending"><b>Pending energy data</b><span>No terminal timestep summary was emitted.</span></div>` +
+        `<p class="sub">Electrical load and the diagnostic evaporation-enthalpy estimate, without viewer-derived totals.</p>` +
+        `<div class="sec-p7-energy-pending"><b>Pending energy data</b><span>${message}</span></div>` +
         caveatBlock(null) +
         `</section>`;
+  }
+
+  function render(artifact, rows) {
+    if (rows === undefined) {
+      return pendingPanel("No terminal timestep summary was emitted.");
+    }
+    if (rows === null || (Array.isArray(rows) && !rows.length)) {
+      return pendingPanel("Terminal timestep rows were empty.");
+    }
+    if (!Array.isArray(rows)) {
+      return pendingPanel("Terminal timestep rows were malformed.");
+    }
+
+    const summary = rows.at(-1);
+    if (summary === undefined) {
+      return pendingPanel("No terminal timestep summary was emitted.");
+    }
+    if (summary === null || (typeof summary === "string" && !summary.trim())) {
+      return pendingPanel("Terminal timestep summary was empty.");
+    }
+    if (!isRecord(summary)) {
+      return pendingPanel("Terminal timestep summary was malformed.");
     }
 
     const cumulative = isRecord(summary.energy_cumulative_breakdown_kWh)
@@ -116,16 +158,16 @@
 
     return `<section class="sec-p7-energy" id="sec-p7-energy">` +
       `<h2><span class="sect">07</span>Energy breakdown</h2>` +
-      `<p class="sub">Electrical load beside the emitted known evaporation-enthalpy sink. Scope and furnace-heat coverage travel with every value.</p>` +
+      `<p class="sub">Electrical load beside the emitted diagnostic evaporation-enthalpy estimate. Scope, furnace-heat coverage, and diagnostic authority travel with every affected value.</p>` +
       `<div class="sec-p7-energy-grid">` +
       metricCard("Cumulative electrical load", cumulative?.electrical, "Cumulative through the terminal timestep", summary, "electrical") +
-      metricCard("Cumulative known evaporation thermal sink", cumulative?.evaporation_thermal, "Cumulative through the terminal timestep", summary, "thermal") +
+      metricCard("Cumulative diagnostic evaporation-enthalpy estimate", cumulative?.evaporation_thermal, "Cumulative through the terminal timestep", summary, "thermal", true) +
       metricCard("Electrical energy", summary.energy_electrical_kWh, "Terminal timestep · one-hour interval", summary, "electrical") +
-      metricCard("Known evaporation thermal sink", summary.energy_evaporation_thermal_kWh, "Terminal timestep · one-hour interval", summary, "thermal") +
-      metricCard("Latent vaporization component", summary.energy_latent_kWh, "Terminal timestep · one-hour interval", summary, "thermal") +
-      metricCard("Dissociation component", summary.energy_dissociation_kWh, "Terminal timestep · one-hour interval", summary, "thermal") +
-      metricCard("Terminal-timestep scoped combined energy", summary.energy_electrical_plus_evaporation_kWh, "Terminal timestep · one-hour interval · not viewer-summed", summary, "combined") +
-      metricCard("Cumulative scoped combined energy", summary.energy_electrical_plus_evaporation_cumulative_kWh, "Cumulative through the terminal timestep · not viewer-summed", summary, "combined") +
+      metricCard("Diagnostic evaporation-enthalpy estimate", summary.energy_evaporation_thermal_kWh, "Terminal timestep · one-hour interval", summary, "thermal", true) +
+      metricCard("Latent vaporization component", summary.energy_latent_kWh, "Terminal timestep · one-hour interval", summary, "thermal", true) +
+      metricCard("Reaction / dissociation component", summary.energy_dissociation_kWh, "Terminal timestep · one-hour interval", summary, "thermal", true) +
+      metricCard("Terminal-timestep scoped combined energy", summary.energy_electrical_plus_evaporation_kWh, "Terminal timestep · one-hour interval · not viewer-summed", summary, "combined", true) +
+      metricCard("Cumulative scoped combined energy", summary.energy_electrical_plus_evaporation_cumulative_kWh, "Cumulative through the terminal timestep · not viewer-summed", summary, "combined", true) +
       `</div>` +
       `<div class="sec-p7-energy-breakdowns">` +
       breakdownCard(
@@ -136,7 +178,7 @@
         summary
       ) +
       breakdownCard(
-        "Terminal-timestep evaporation breakdown",
+        "Terminal-timestep diagnostic evaporation breakdown",
         "One-hour interval. The total sink overlaps its emitted latent and reaction components; these rows are not summed in this viewer.",
         summary.energy_evaporation_breakdown_kWh,
         EVAPORATION_COMPONENTS,

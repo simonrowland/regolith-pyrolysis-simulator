@@ -1,4 +1,5 @@
 import json
+import re
 import subprocess
 from pathlib import Path
 
@@ -6,6 +7,34 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1] / "web" / "report_viewer"
 LABELS_PATH = ROOT / "labels.js"
 PANEL_PATH = ROOT / "panels" / "p7-energy.js"
+DERIVE_ROWS = object()
+UNDEFINED_ROWS = object()
+
+METRIC_HEADINGS = (
+    "Cumulative electrical load",
+    "Cumulative diagnostic evaporation-enthalpy estimate",
+    "Electrical energy",
+    "Diagnostic evaporation-enthalpy estimate",
+    "Latent vaporization component",
+    "Reaction / dissociation component",
+    "Terminal-timestep scoped combined energy",
+    "Cumulative scoped combined energy",
+)
+
+CUMULATIVE_ROWS = (
+    "Electrical load",
+    "Diagnostic evaporation-enthalpy estimate",
+    "Latent vaporization component",
+    "Reaction / dissociation component",
+    "Scoped electrical + evaporation energy",
+)
+
+EVAPORATION_ROWS = (
+    "Diagnostic evaporation-enthalpy sink estimate",
+    "Reaction / disproportionation enthalpy sink",
+    "Product-vapor enthalpy sink",
+    "Net unallocated",
+)
 
 
 def _artifact(*summaries: dict) -> dict:
@@ -14,7 +43,14 @@ def _artifact(*summaries: dict) -> dict:
     }
 
 
-def _render_panel(artifact: dict) -> str:
+def _render_panel(artifact: dict, rows=DERIVE_ROWS) -> str:
+    payload = {"artifact": artifact, "rows_mode": "derive"}
+    if rows is UNDEFINED_ROWS:
+        payload["rows_mode"] = "undefined"
+    elif rows is not DERIVE_ROWS:
+        payload["rows_mode"] = "explicit"
+        payload["rows"] = rows
+
     harness = r"""
 const fs = require("fs");
 const vm = require("vm");
@@ -23,19 +59,52 @@ context.globalThis = context;
 vm.createContext(context);
 vm.runInContext(fs.readFileSync(process.argv[2], "utf8"), context);
 vm.runInContext(fs.readFileSync(process.argv[3], "utf8"), context);
-const artifact = JSON.parse(process.argv[4]);
-const rows = artifact.timesteps.map((timestep) => timestep.summary);
+function reviveSpecial(value) {
+  if (value === "__P7_NAN__") return Number.NaN;
+  if (Array.isArray(value)) return value.map(reviveSpecial);
+  if (value !== null && typeof value === "object") {
+    return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, reviveSpecial(item)]));
+  }
+  return value;
+}
+const payload = reviveSpecial(JSON.parse(process.argv[4]));
+const artifact = payload.artifact;
+const rows = payload.rows_mode === "derive"
+  ? artifact.timesteps.map((timestep) => timestep.summary)
+  : (payload.rows_mode === "undefined" ? undefined : payload.rows);
 const panel = context.ReportPanels.find((candidate) => candidate.id === "sec-p7-energy");
 process.stdout.write(panel.render(artifact, rows, [], {}));
 """
     completed = subprocess.run(
-        ["node", "-", str(LABELS_PATH), str(PANEL_PATH), json.dumps(artifact)],
+        ["node", "-", str(LABELS_PATH), str(PANEL_PATH), json.dumps(payload)],
         input=harness,
         text=True,
         capture_output=True,
         check=True,
     )
     return completed.stdout
+
+
+def _articles(html: str) -> list[str]:
+    return re.findall(r"<article\b.*?</article>", html)
+
+
+def _article(html: str, heading: str) -> str:
+    matches = [article for article in _articles(html) if f"<h3>{heading}</h3>" in article]
+    assert len(matches) == 1, f"expected one article headed {heading!r}, got {len(matches)}"
+    return matches[0]
+
+
+def _row(html: str, label: str) -> str:
+    marker = f'<th scope="row">{label}</th>'
+    marker_at = html.index(marker)
+    start = html.rfind("<tr>", 0, marker_at)
+    end = html.index("</tr>", marker_at) + len("</tr>")
+    return html[start:end]
+
+
+def _missing(state: str = "not emitted") -> str:
+    return f'<span class="sec-p7-energy-missing">pending · {state}</span>'
 
 
 def _complete_summary(**overrides) -> dict:
@@ -78,7 +147,7 @@ def test_present_fields_render_emitted_values_and_readable_breakdown_keys():
         '<p class="sec-p7-energy-basis">Cumulative through the terminal timestep</p>'
     ) in html
     assert (
-        '<h3>Cumulative known evaporation thermal sink</h3>'
+        '<h3>Cumulative diagnostic evaporation-enthalpy estimate</h3>'
         '<div class="sec-p7-energy-value">43.25 kWh</div>'
         '<p class="sec-p7-energy-basis">Cumulative through the terminal timestep</p>'
     ) in html
@@ -88,7 +157,7 @@ def test_present_fields_render_emitted_values_and_readable_breakdown_keys():
         '<p class="sec-p7-energy-basis">Terminal timestep · one-hour interval</p>'
     ) in html
     assert (
-        '<h3>Known evaporation thermal sink</h3>'
+        '<h3>Diagnostic evaporation-enthalpy estimate</h3>'
         '<div class="sec-p7-energy-value">7.25 kWh</div>'
         '<p class="sec-p7-energy-basis">Terminal timestep · one-hour interval</p>'
     ) in html
@@ -98,7 +167,7 @@ def test_present_fields_render_emitted_values_and_readable_breakdown_keys():
         '<p class="sec-p7-energy-basis">Terminal timestep · one-hour interval</p>'
     ) in html
     assert (
-        '<h3>Dissociation component</h3>'
+        '<h3>Reaction / dissociation component</h3>'
         '<div class="sec-p7-energy-value">6 kWh</div>'
         '<p class="sec-p7-energy-basis">Terminal timestep · one-hour interval</p>'
     ) in html
@@ -112,8 +181,23 @@ def test_present_fields_render_emitted_values_and_readable_breakdown_keys():
         '<div class="sec-p7-energy-value">123.5 kWh</div>'
         '<p class="sec-p7-energy-basis">Cumulative through the terminal timestep · not viewer-summed</p>'
     ) in html
-    assert '<th scope="row">Electrical load</th><td>80.25 kWh</td>' in html
-    assert '<th scope="row">Evaporation enthalpy sink</th><td>7.25 kWh</td>' in html
+    expected_rows = {
+        "Electrical load": "80.25 kWh",
+        "Diagnostic evaporation-enthalpy estimate": "43.25 kWh",
+        "Latent vaporization component": "12.5 kWh",
+        "Reaction / dissociation component": "30.75 kWh",
+        "Scoped electrical + evaporation energy": "123.5 kWh",
+        "Diagnostic evaporation-enthalpy sink estimate": "7.25 kWh",
+        "Reaction / disproportionation enthalpy sink": "6 kWh",
+        "Product-vapor enthalpy sink": "1.25 kWh",
+        "Net unallocated": "0 kWh",
+    }
+    for label, value in expected_rows.items():
+        assert f'<th scope="row">{label}</th><td>{value}</td>' in html
+
+    for article in _articles(html):
+        assert article.count("<b>Scope</b> · Electrical + known evaporation enthalpy") == 1
+        assert article.count("<b>Furnace heat</b> · Partial") == 1
     assert "Custom heat sink" in html
     assert "Custom trace" in html
     assert "custom_heat_sink" not in html
@@ -123,9 +207,10 @@ def test_present_fields_render_emitted_values_and_readable_breakdown_keys():
 def test_absent_fields_render_pending_without_zero_fallback():
     html = _render_panel(_artifact({}))
 
-    assert "Cumulative electrical load" in html
-    assert "Known evaporation thermal sink" in html
-    assert "pending · not emitted" in html
+    for heading in METRIC_HEADINGS:
+        assert _missing() in _article(html, heading)
+    for label in CUMULATIVE_ROWS + EVAPORATION_ROWS:
+        assert _row(html, label) == f'<tr><th scope="row">{label}</th><td>{_missing()}</td></tr>'
     assert "Breakdown not emitted; no components are inferred." in html
     assert ">0 kWh<" not in html
     assert "Scope</b> · Not emitted" in html
@@ -133,40 +218,133 @@ def test_absent_fields_render_pending_without_zero_fallback():
 
 
 def test_partial_inputs_do_not_manufacture_derived_energy():
-    hourly_html = _render_panel(_artifact(
-        {
-            "energy_electrical_kWh": 13.0,
-            "energy_evaporation_thermal_kWh": 4.0,
-        },
-        {
-            "energy_electrical_kWh": 17.0,
-            "energy_evaporation_thermal_kWh": 7.0,
-            "energy_cumulative_breakdown_kWh": {
-                "latent": 2.0,
-                "dissociation": 5.0,
-            },
-        },
-    ))
-    thermal_html = _render_panel(_artifact({
+    hourly_html = _render_panel(_artifact({
+        "energy_electrical_kWh": 13.0,
         "energy_latent_kWh": 3.0,
         "energy_dissociation_kWh": 8.0,
     }))
-    cumulative_html = _render_panel(_artifact({
+    cumulative_thermal_html = _render_panel(_artifact({
+        "energy_cumulative_breakdown_kWh": {
+            "latent": 2.0,
+            "dissociation": 5.0,
+        },
+    }))
+    cumulative_combined_html = _render_panel(_artifact({
         "energy_cumulative_breakdown_kWh": {
             "electrical": 70.0,
             "evaporation_thermal": 20.0,
         },
     }))
+    evaporation_html = _render_panel(_artifact({
+        "energy_evaporation_breakdown_kWh": {
+            "reaction_disproportionation_enthalpy_sink": 6.0,
+            "product_vapor_enthalpy_sink": 1.25,
+        },
+    }))
+    duplicate_html = _render_panel(_artifact({
+        "energy_cumulative_breakdown_kWh": {
+            "latent": 2.0,
+            "electrical_plus_evaporation": 91.0,
+        },
+        "energy_evaporation_breakdown_kWh": {
+            "evaporation_enthalpy_sink": 7.25,
+            "reaction_disproportionation_enthalpy_sink": 6.0,
+            "product_vapor_enthalpy_sink": 1.25,
+        },
+    }))
+    multi_hour_html = _render_panel(_artifact(
+        {
+            "energy_electrical_kWh": 13.0,
+            "energy_evaporation_thermal_kWh": 4.0,
+            "energy_latent_kWh": 1.0,
+            "energy_dissociation_kWh": 3.0,
+            "energy_electrical_plus_evaporation_kWh": 17.0,
+        },
+        {
+            "energy_electrical_kWh": 17.0,
+            "energy_evaporation_thermal_kWh": 7.0,
+            "energy_latent_kWh": 2.0,
+            "energy_dissociation_kWh": 5.0,
+            "energy_electrical_plus_evaporation_kWh": 24.0,
+        },
+    ))
 
-    assert "24 kWh" not in hourly_html
-    assert "30 kWh" not in hourly_html
-    assert "11 kWh" not in hourly_html
-    assert "41 kWh" not in hourly_html
-    assert "11 kWh" not in thermal_html
-    assert "90 kWh" not in cumulative_html
-    assert "pending · not emitted" in hourly_html
-    assert "pending · not emitted" in thermal_html
-    assert "pending · not emitted" in cumulative_html
+    hourly_thermal = _article(hourly_html, "Diagnostic evaporation-enthalpy estimate")
+    hourly_combined = _article(hourly_html, "Terminal-timestep scoped combined energy")
+    assert _missing() in hourly_thermal and "11 kWh" not in hourly_thermal
+    assert _missing() in hourly_combined and "24 kWh" not in hourly_combined
+
+    cumulative_thermal = _article(
+        cumulative_thermal_html, "Cumulative diagnostic evaporation-enthalpy estimate"
+    )
+    assert _missing() in cumulative_thermal and "7 kWh" not in cumulative_thermal
+    cumulative_thermal_row = _row(
+        cumulative_thermal_html, "Diagnostic evaporation-enthalpy estimate"
+    )
+    assert _missing() in cumulative_thermal_row and "7 kWh" not in cumulative_thermal_row
+    # Hourly cards must not fall back to cumulative component values (F5).
+    for heading, forbidden in (
+        ("Latent vaporization component", "2 kWh"),
+        ("Reaction / dissociation component", "5 kWh"),
+    ):
+        article = _article(cumulative_thermal_html, heading)
+        assert _missing() in article
+        assert forbidden not in article
+    assert (
+        _row(cumulative_thermal_html, "Latent vaporization component")
+        == f'<tr><th scope="row">Latent vaporization component</th><td>2 kWh</td></tr>'
+    )
+    assert (
+        _row(cumulative_thermal_html, "Reaction / dissociation component")
+        == f'<tr><th scope="row">Reaction / dissociation component</th><td>5 kWh</td></tr>'
+    )
+
+    cumulative_combined = _article(
+        cumulative_combined_html, "Cumulative scoped combined energy"
+    )
+    assert _missing() in cumulative_combined and "90 kWh" not in cumulative_combined
+    cumulative_combined_row = _row(
+        cumulative_combined_html, "Scoped electrical + evaporation energy"
+    )
+    assert _missing() in cumulative_combined_row and "90 kWh" not in cumulative_combined_row
+
+    evaporation_total = _row(
+        evaporation_html, "Diagnostic evaporation-enthalpy sink estimate"
+    )
+    assert _missing() in evaporation_total and "7.25 kWh" not in evaporation_total
+
+    duplicate_targets = {
+        "Latent vaporization component": "2 kWh",
+        "Reaction / dissociation component": "6 kWh",
+        "Diagnostic evaporation-enthalpy estimate": "7.25 kWh",
+        "Terminal-timestep scoped combined energy": "91 kWh",
+        "Cumulative scoped combined energy": "91 kWh",
+    }
+    for heading, forbidden_value in duplicate_targets.items():
+        article = _article(duplicate_html, heading)
+        assert _missing() in article
+        assert forbidden_value not in article
+
+    cumulative_sum_targets = {
+        "Cumulative electrical load": "30 kWh",
+        "Cumulative diagnostic evaporation-enthalpy estimate": "11 kWh",
+        "Cumulative scoped combined energy": "41 kWh",
+    }
+    for heading, forbidden_value in cumulative_sum_targets.items():
+        article = _article(multi_hour_html, heading)
+        assert _missing() in article
+        assert forbidden_value not in article
+    cumulative_sum_rows = {
+        "Electrical load": "30 kWh",
+        "Diagnostic evaporation-enthalpy estimate": "11 kWh",
+        "Latent vaporization component": "3 kWh",
+        "Reaction / dissociation component": "8 kWh",
+        "Scoped electrical + evaporation energy": "41 kWh",
+    }
+    for label, forbidden_value in cumulative_sum_rows.items():
+        row = _row(multi_hour_html, label)
+        assert _missing() in row
+        assert forbidden_value not in row
 
 
 def test_sparse_breakdowns_keep_missing_components_pending():
@@ -179,14 +357,15 @@ def test_sparse_breakdowns_keep_missing_components_pending():
         "furnace_heat_status": "partial",
     }))
 
-    assert (
-        '<th scope="row">Known evaporation thermal sink</th>'
-        '<td><span class="sec-p7-energy-missing">pending · not emitted</span></td>'
-    ) in html
-    assert (
-        '<th scope="row">Net unallocated</th>'
-        '<td><span class="sec-p7-energy-missing">pending · not emitted</span></td>'
-    ) in html
+    assert _row(html, "Electrical load") == (
+        '<tr><th scope="row">Electrical load</th><td>50 kWh</td></tr>'
+    )
+    assert _row(html, "Diagnostic evaporation-enthalpy sink estimate") == (
+        '<tr><th scope="row">Diagnostic evaporation-enthalpy sink estimate</th>'
+        '<td>5 kWh</td></tr>'
+    )
+    for label in CUMULATIVE_ROWS[1:] + EVAPORATION_ROWS[1:]:
+        assert _row(html, label) == f'<tr><th scope="row">{label}</th><td>{_missing()}</td></tr>'
     assert ">0 kWh<" not in html
 
 
@@ -196,9 +375,110 @@ def test_electrical_only_scope_and_heat_status_repeat_on_every_card():
         furnace_heat_status="not_tracked",
     )))
 
-    assert html.count("Electrical only") == 10
-    assert html.count("Not tracked") == 10
-    assert html.count('aria-label="Energy scope and furnace heat coverage"') == 10
+    articles = _articles(html)
+    assert len(articles) == 10
+    for article in articles:
+        assert article.count("<b>Scope</b> · Electrical only") == 1
+        assert article.count("<b>Furnace heat</b> · Not tracked") == 1
+        assert article.count('aria-label="Energy scope and furnace heat coverage"') == 1
+
+
+def test_diagnostic_authority_qualifier_repeats_on_every_affected_article():
+    html = _render_panel(_artifact(_complete_summary()))
+    diagnostic_headings = METRIC_HEADINGS[1:2] + METRIC_HEADINGS[3:] + (
+        "Cumulative emitted component breakdown",
+        "Terminal-timestep diagnostic evaporation breakdown",
+    )
+
+    for heading in diagnostic_headings:
+        article = _article(html, heading)
+        assert article.count("<b>Diagnostic</b> · Ledger-neutral estimate") == 1
+    for heading in ("Cumulative electrical load", "Electrical energy"):
+        assert "<b>Diagnostic</b>" not in _article(html, heading)
+
+
+def test_cro2_oxidation_uses_mixed_reaction_dissociation_label():
+    html = _render_panel(_artifact(_complete_summary(
+        energy_dissociation_kWh=1.63548484218,
+        energy_cumulative_breakdown_kWh={"dissociation": 3.27096968436},
+        energy_evaporation_breakdown_kWh={
+            "reaction_disproportionation_enthalpy_sink": 1.63548484218,
+        },
+    )))
+
+    hourly = _article(html, "Reaction / dissociation component")
+    assert '<div class="sec-p7-energy-value">1.635 kWh</div>' in hourly
+    assert _row(html, "Reaction / dissociation component") == (
+        '<tr><th scope="row">Reaction / dissociation component</th><td>3.271 kWh</td></tr>'
+    )
+    assert "<h3>Dissociation component</h3>" not in html
+
+
+def test_terminal_row_is_the_only_summary_source():
+    html = _render_panel(_artifact(
+        _complete_summary(
+            energy_electrical_kWh=13.0,
+            energy_electrical_plus_evaporation_cumulative_kWh=10.0,
+            energy_cumulative_breakdown_kWh={"electrical": 9.0},
+        ),
+        _complete_summary(
+            energy_electrical_kWh=17.0,
+            energy_electrical_plus_evaporation_cumulative_kWh=123.5,
+            energy_cumulative_breakdown_kWh={"electrical": 80.25},
+        ),
+    ))
+
+    electrical = _article(html, "Electrical energy")
+    cumulative_electrical = _article(html, "Cumulative electrical load")
+    cumulative_combined = _article(html, "Cumulative scoped combined energy")
+    assert ">17 kWh<" in electrical and ">13 kWh<" not in electrical
+    assert ">80.25 kWh<" in cumulative_electrical and ">9 kWh<" not in cumulative_electrical
+    assert ">123.5 kWh<" in cumulative_combined and ">10 kWh<" not in cumulative_combined
+
+
+def test_direct_render_distinguishes_absent_empty_malformed_and_zero():
+    absent = _render_panel({}, rows=UNDEFINED_ROWS)
+    null_rows = _render_panel({}, rows=None)
+    empty_rows = _render_panel({}, rows=[])
+    malformed_rows = _render_panel({}, rows={"summary": {}})
+    empty_summary = _render_panel({}, rows=[None])
+    malformed_summary = _render_panel({}, rows=[42])
+    values = _render_panel({}, rows=[{
+        "energy_electrical_kWh": None,
+        "energy_evaporation_thermal_kWh": "",
+        "energy_latent_kWh": "not-a-number",
+        "energy_dissociation_kWh": 0,
+        "energy_electrical_plus_evaporation_kWh": "__P7_NAN__",
+        "energy_cumulative_breakdown_kWh": {},
+        "energy_evaporation_breakdown_kWh": [],
+        "energy_scope": "",
+        "furnace_heat_status": {},
+    }])
+
+    assert "No terminal timestep summary was emitted." in absent
+    assert "Terminal timestep rows were empty." in null_rows
+    assert "Terminal timestep rows were empty." in empty_rows
+    assert "Terminal timestep rows were malformed." in malformed_rows
+    assert "Terminal timestep summary was empty." in empty_summary
+    assert "Terminal timestep summary was malformed." in malformed_summary
+    assert _missing("emitted empty") in _article(values, "Electrical energy")
+    assert _missing("emitted empty") in _article(
+        values, "Diagnostic evaporation-enthalpy estimate"
+    )
+    assert _missing("malformed") in _article(values, "Latent vaporization component")
+    assert ">0 kWh<" in _article(values, "Reaction / dissociation component")
+    assert _missing("malformed") in _article(
+        values, "Terminal-timestep scoped combined energy"
+    )
+    assert "Emitted breakdown is empty; no components are inferred." in _article(
+        values, "Cumulative emitted component breakdown"
+    )
+    assert "Emitted breakdown is malformed; no components are inferred." in _article(
+        values, "Terminal-timestep diagnostic evaporation breakdown"
+    )
+    for article in _articles(values):
+        assert "<b>Scope</b> · Emitted empty" in article
+        assert "<b>Furnace heat</b> · Malformed (object)" in article
 
 
 def test_artifact_labels_are_escaped():
