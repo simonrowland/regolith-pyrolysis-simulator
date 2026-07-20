@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import re
 import subprocess
 
 import pytest
@@ -571,6 +572,39 @@ def test_report_viewer_css_has_responsive_and_dark_layout_guards() -> None:
     assert ".status-banner.failed" in css
     assert "word-break: break-word" in css
     assert ".table-wrap" in css and "overflow-x: auto" in css
+
+
+def test_demo_note_light_mode_contrast_meets_wcag_aa() -> None:
+    css = (
+        Path(__file__).resolve().parents[1] / "web/report_viewer/report-viewer.css"
+    ).read_text(encoding="utf-8")
+    light_css, dark_css = css.split("@media (prefers-color-scheme: dark)", maxsplit=1)
+    colors = dict(re.findall(r"--([\w-]+):\s*(#[0-9a-fA-F]{6})", light_css))
+    demo_rule = re.search(
+        r"(?m)^\.demo-note\s*\{[^}]*color:\s*var\(--([\w-]+)\)",
+        light_css,
+    )
+    assert demo_rule is not None
+    assert demo_rule.group(1) == "warning-ink"
+    foreground = colors[demo_rule.group(1)]
+
+    def luminance(hex_color: str) -> float:
+        channels = [int(hex_color[index : index + 2], 16) / 255 for index in (1, 3, 5)]
+        linear = [
+            channel / 12.92
+            if channel <= 0.04045
+            else ((channel + 0.055) / 1.055) ** 2.4
+            for channel in channels
+        ]
+        return sum(weight * channel for weight, channel in zip((0.2126, 0.7152, 0.0722), linear))
+
+    def contrast(left: str, right: str) -> float:
+        lighter, darker = sorted((luminance(left), luminance(right)), reverse=True)
+        return (lighter + 0.05) / (darker + 0.05)
+
+    assert contrast(foreground, colors["paper"]) >= 4.5
+    assert contrast(foreground, colors["panel"]) >= 4.5
+    assert re.search(r"\.demo-note\s*\{\s*color:\s*#ffc767;\s*\}", dark_css)
 
 
 def test_library_headline_chips_respect_yield_semantics_and_hide_hash_titles() -> None:
