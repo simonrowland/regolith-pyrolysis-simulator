@@ -46,6 +46,10 @@
   const isObjectMap = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
   const isFiniteNumber = (value) => typeof value === "number" && Number.isFinite(value);
   const molText = (value) => esc(fmtNum(value, "mol"));
+  // Emitter truth: simulator/accounting/ledger.py only permits allow_negative on reservoir.*.
+  // Normal terminal/process accounts reject overdraft; a corrupt artifact must not be laundered
+  // into an authorized "signed reservoir credit" claim.
+  const isCreditAccount = (account) => String(account).startsWith("reservoir.");
 
   function stableAccountId(account) {
     const text = String(account);
@@ -83,10 +87,18 @@
 
   function accountData(account, species) {
     if (!isObjectMap(species)) {
-      return { account, species, entries: [], total: null, positiveTotal: null, malformed: true };
+      return {
+        account, species, entries: [], total: null, positiveTotal: null,
+        malformed: true, invalidNegative: false, signedCredit: false
+      };
     }
     const entries = Object.entries(species).map(([name, value]) => ({ name, value }));
-    const malformed = entries.some((entry) => !isFiniteNumber(entry.value));
+    const nonNumeric = entries.some((entry) => !isFiniteNumber(entry.value));
+    const hasNegative = entries.some((entry) => isFiniteNumber(entry.value) && entry.value < 0);
+    const creditAccount = isCreditAccount(account);
+    // Producer-forbidden: negative inventory on non-reservoir accounts.
+    const invalidNegative = hasNegative && !creditAccount;
+    const malformed = nonNumeric || invalidNegative;
     return {
       account,
       species,
@@ -96,7 +108,9 @@
         (sum, entry) => sum + (entry.value > 0 ? entry.value : 0),
         0
       ),
-      malformed
+      malformed,
+      invalidNegative,
+      signedCredit: !malformed && creditAccount && hasNegative
     };
   }
 
@@ -178,9 +192,12 @@
   function accountDetail(account, groups) {
     const detailId = stableAccountId(account.account);
     if (account.malformed) {
+      const reason = account.invalidNegative
+        ? "invalid negative inventory · only reservoir.* accounts may carry signed credit balances · values pending"
+        : "malformed species map · values pending";
       return `<details class="sec-p14-account-detail" id="${esc(detailId)}">`
         + `<summary>${esc(accountLabel(account.account))}</summary>`
-        + `<p class="sec-p14-account-key"><code>${esc(account.account)}</code> · malformed species map · values pending</p></details>`;
+        + `<p class="sec-p14-account-key"><code>${esc(account.account)}</code> · ${reason}</p></details>`;
     }
     const rows = account.entries.length
       ? account.entries.map((entry) => `<tr><td>${esc(prettySpecies(entry.name))}</td>`
@@ -202,7 +219,9 @@
     let ribbon = "";
     let status = "";
     if (account.malformed) {
-      status = `<span class="sec-p14-non-ribbon">width pending · malformed species map</span>`;
+      status = account.invalidNegative
+        ? `<span class="sec-p14-non-ribbon">invalid negative inventory · not a producer credit account · no Sankey width</span>`
+        : `<span class="sec-p14-non-ribbon">width pending · malformed species map</span>`;
     } else if (groups.major.length) {
       const visibleTotal = groups.major.reduce((sum, entry) => sum + entry.value, 0);
       const ratio = visibleTotal / largestVisible;
@@ -215,14 +234,14 @@
       ribbon = `<a class="sec-p14-ribbon" href="#${esc(detailId)}" data-p14-account="${esc(account.account)}"`
         + ` style="--sec-p14-width:${width.toFixed(5)}%;--sec-p14-ribbon:linear-gradient(90deg,${esc(background)})"`
         + ` title="${esc(hover)}" aria-label="${esc(`${accountLabel(account.account)}, ${ariaQuantity}, mol basis`)}"></a>`;
-      if (account.total < 0 || account.entries.some((entry) => isFiniteNumber(entry.value) && entry.value < 0)) {
-        status = `<span class="sec-p14-non-ribbon">signed negative components excluded from ribbon width</span>`;
+      if (account.signedCredit) {
+        status = `<span class="sec-p14-non-ribbon">signed reservoir credit components excluded from ribbon width</span>`;
       } else if (groups.trace.length) {
         status = `<span class="sec-p14-trace">${groups.trace.length} species merged into global trace node</span>`;
       }
     } else if (groups.trace.length) {
       status = `<span class="sec-p14-trace">positive inventory merged into global trace node</span>`;
-    } else if (account.total < 0) {
+    } else if (account.signedCredit && account.total < 0) {
       status = `<span class="sec-p14-signed">signed reservoir credit balance · no Sankey width</span>`;
     } else if (!account.entries.length) {
       status = `<span class="sec-p14-empty">emitted empty account · no ribbon</span>`;
@@ -264,27 +283,35 @@
       + `<tbody>${rows}</tbody></table></div></details>`;
   }
 
+  const SECTION_TITLE = "Terminal account-inventory distribution";
+  const SECTION_SUBTITLE = "Terminal snapshot only · mol basis · account disposition at termination, not process movement, feedstock provenance, yield, charge, or molecule-mol conservation.";
+
+  function sectionChrome(body) {
+    return `<section class="sec-p14-sankey" id="${PANEL_ID}"><h2><span class="sect">14</span>${SECTION_TITLE}</h2>`
+      + `<p class="sub">${SECTION_SUBTITLE}</p>${body}</section>`;
+  }
+
   function render(artifact) {
     const terminal = isObjectMap(artifact?.terminal) ? artifact.terminal : {};
     if (!own(terminal, "final_state")) {
-      return `<section class="sec-p14-sankey" id="${PANEL_ID}"><h2><span class="sect">14</span>Terminal account-inventory distribution</h2>`
-        + `<p class="sub">Terminal snapshot only · mol basis · not process movement, feedstock provenance, yield, or a conservation claim.</p>`
-        + `<div class="pending sec-p14-pending"><strong>Pending terminal inventory</strong><p>terminal.final_state is not emitted for this run.</p></div>`
-        + `${provenanceTier(terminal)}</section>`;
+      return sectionChrome(
+        `<div class="pending sec-p14-pending"><strong>Pending terminal inventory</strong><p>terminal.final_state is not emitted for this run.</p></div>`
+        + `${provenanceTier(terminal)}`
+      );
     }
     const finalState = terminal.final_state;
     if (!isObjectMap(finalState)) {
-      return `<section class="sec-p14-sankey" id="${PANEL_ID}"><h2><span class="sect">14</span>Terminal account-inventory distribution</h2>`
-        + `<p class="sub">Terminal snapshot only · mol basis · not process movement, feedstock provenance, yield, or a conservation claim.</p>`
-        + `<div class="pending sec-p14-pending"><strong>Malformed terminal inventory</strong><p>terminal.final_state is present but is not an account map.</p></div>`
-        + `${provenanceTier(terminal)}</section>`;
+      return sectionChrome(
+        `<div class="pending sec-p14-pending"><strong>Malformed terminal inventory</strong><p>terminal.final_state is present but is not an account map.</p></div>`
+        + `${provenanceTier(terminal)}`
+      );
     }
     const rawAccounts = orderedAccounts(finalState);
     if (!rawAccounts.length) {
-      return `<section class="sec-p14-sankey" id="${PANEL_ID}"><h2><span class="sect">14</span>Terminal account-inventory distribution</h2>`
-        + `<p class="sub">Terminal snapshot only · mol basis · not process movement, feedstock provenance, yield, or a conservation claim.</p>`
-        + `<div class="pending sec-p14-pending"><strong>Empty terminal inventory</strong><p>terminal.final_state was emitted with no account keys.</p></div>`
-        + `${provenanceTier(terminal)}</section>`;
+      return sectionChrome(
+        `<div class="pending sec-p14-pending"><strong>Empty terminal inventory</strong><p>terminal.final_state was emitted with no account keys.</p></div>`
+        + `${provenanceTier(terminal)}`
+      );
     }
 
     const accounts = rawAccounts.map(({ account, species }) => accountData(account, species));
@@ -312,20 +339,21 @@
       ? `<span class="sec-p14-badge sec-p14-scale">widths √-scaled for readability — hover for true mol</span>`
       : `<span class="sec-p14-badge">linear ribbon widths</span>`;
     const totalText = displayTotal === null ? "pending · incomplete numeric account map" : fmtNum(displayTotal, "mol");
-    const signed = accounts.some((account) => account.entries.some((entry) => isFiniteNumber(entry.value) && entry.value < 0));
-    const signedNote = signed
-      ? `<div class="note sec-p14-note">Signed reservoir credit balances are included in the displayed Σ, but have no Sankey width. Positive ribbons are not expected to close to that signed display total.</div>`
+    // Credit note only when a producer-approved reservoir account actually carries a signed balance.
+    const signedCredit = accounts.some((account) => account.signedCredit);
+    const signedNote = signedCredit
+      ? `<div class="note sec-p14-note sec-p14-credit-note">Signed reservoir credit balances are included in the displayed Σ, but have no Sankey width. Positive ribbons are not expected to close to that signed display total.</div>`
       : "";
 
-    return `<section class="sec-p14-sankey" id="${PANEL_ID}"><h2><span class="sect">14</span>Terminal account-inventory distribution</h2>`
-      + `<p class="sub">Terminal snapshot only · mol basis · account disposition at termination, not process movement, feedstock provenance, yield, charge, or molecule-mol conservation.</p>`
-      + `<div class="sec-p14-badges"><span class="sec-p14-badge">mol basis</span>${scaleBadge}</div>`
+    return sectionChrome(
+      `<div class="sec-p14-badges"><span class="sec-p14-badge">mol basis</span>${scaleBadge}</div>`
       + `<div class="sec-p14-flow"><div class="sec-p14-source"><strong>terminal inventory total (Σ accounts, mol — display total, not charge)</strong>`
       + `<span>${esc(totalText)}</span><small>Viewer display sum of emitted numeric species. kg-projected tier pending — backend kg projection not emitted.</small></div>`
       + `<div class="sec-p14-accounts">${rows}</div></div>${signedNote}`
-      + `<div class="note sec-p14-note">${availabilityNote(finalState)}</div>`
+      + `<div class="note sec-p14-note sec-p14-availability-note">${availabilityNote(finalState)}</div>`
       + `<details class="sec-p14-ledger"><summary>Underlying emitted account ledger · mol basis</summary>${details}</details>`
-      + `${provenanceTier(terminal)}</section>`;
+      + `${provenanceTier(terminal)}`
+    );
   }
 
   function installAccountLinks() {
