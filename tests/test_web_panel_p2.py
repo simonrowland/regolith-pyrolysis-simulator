@@ -54,6 +54,14 @@ def _interface_row(html: str, label: str) -> str:
     return _between(html, marker, "</div>")
 
 
+def _container_notice(html: str, region: str) -> str:
+    marker = (
+        '<div class="pending sec-p2-inline-pending" '
+        f'data-p2-container="{region}">'
+    )
+    return _between(html, marker, "</div>")
+
+
 def _artifact(*, stratification: dict | None, final_state: dict | None = None) -> dict:
     summary = {}
     if stratification is not None:
@@ -441,6 +449,181 @@ def test_p2_renders_unclassified_staging_as_a_distinct_literal_bin() -> None:
         "</details>",
     )
     assert 'Co</b> <span title="0 mol">0 mol</span>' in zero_region
+
+
+def test_p2_newest_malformed_stratification_does_not_fall_back_to_older_map() -> None:
+    artifact = _artifact(stratification=None)
+    artifact["timesteps"] = [
+        {
+            "hour": 11,
+            "summary": {"metal_phase_stratification": _present_stratification()},
+        },
+        {
+            "hour": 12,
+            "summary": {"metal_phase_stratification": []},
+        },
+    ]
+
+    html = _render(artifact)
+    assert 'data-p2-container="stratification"' in html
+    malformed = _between(
+        html,
+        '<div class="pending sec-p2-panel-pending" '
+        'data-p2-container="stratification">',
+        "</div>",
+    )
+
+    assert "Latest emitted stratification (hour 12)" in html
+    assert "Malformed metal-phase stratification" in malformed
+    assert "Older timestep reports are not substituted" in malformed
+    assert "1673.15 K" not in html
+    assert "Al 88.25 wt% · largest emitted share" not in html
+
+
+def test_p2_distinguishes_enclosing_container_states() -> None:
+    cases = (
+        ("absent", "Not emitted", "was not emitted"),
+        ("empty", "Empty", "map is empty"),
+        ("malformed", "Malformed", "is not a map"),
+        ("zero", "Malformed", "is not a map"),
+    )
+
+    for state, heading, detail in cases:
+        pools = _present_stratification()
+        if state == "absent":
+            pools.pop("pools")
+        elif state == "empty":
+            pools["pools"] = {}
+        elif state == "malformed":
+            pools["pools"] = []
+        else:
+            pools["pools"] = 0
+        pools_notice = _container_notice(
+            _render(_artifact(stratification=pools)),
+            "pools",
+        )
+        assert f"<strong>{heading}</strong>" in pools_notice
+        assert detail in pools_notice
+
+        pool_member = _present_stratification()
+        if state == "absent":
+            pool_member["pools"].pop("float_layer")
+        elif state == "empty":
+            pool_member["pools"]["float_layer"] = {}
+        elif state == "malformed":
+            pool_member["pools"]["float_layer"] = []
+        else:
+            pool_member["pools"]["float_layer"] = 0
+        pool_member_notice = _container_notice(
+            _tap_card(_render(_artifact(stratification=pool_member)), "float"),
+            "pool-float",
+        )
+        assert f"<strong>{heading}</strong>" in pool_member_notice
+        assert detail in pool_member_notice
+
+        interface = _present_stratification()
+        if state == "absent":
+            interface.pop("interface")
+        elif state == "empty":
+            interface["interface"] = {}
+        elif state == "malformed":
+            interface["interface"] = []
+        else:
+            interface["interface"] = 0
+        interface_html = _render(_artifact(stratification=interface))
+        interface_notice = _container_notice(interface_html, "interface")
+        assert f"<strong>{heading}</strong>" in interface_notice
+        assert detail in interface_notice
+        if state in {"malformed", "zero"}:
+            assert "Aggressive float-tap assumption: malformed" in _tap_card(
+                interface_html,
+                "float",
+            )
+
+        for field, region in (
+            ("buoyancy", "buoyancy"),
+            ("density_correlation_provenance", "density-provenance"),
+        ):
+            nested = _present_stratification()
+            if state == "absent":
+                nested["pools"]["float_layer"].pop(field)
+            elif state == "empty":
+                nested["pools"]["float_layer"][field] = {}
+            elif state == "malformed":
+                nested["pools"]["float_layer"][field] = []
+            else:
+                nested["pools"]["float_layer"][field] = 0
+            nested_notice = _container_notice(
+                _tap_card(_render(_artifact(stratification=nested)), "float"),
+                region,
+            )
+            assert f"<strong>{heading}</strong>" in nested_notice
+            assert detail in nested_notice
+
+        provenance = _present_stratification()
+        if state == "absent":
+            provenance.pop("provenance")
+        elif state == "empty":
+            provenance["provenance"] = {}
+        elif state == "malformed":
+            provenance["provenance"] = []
+        else:
+            provenance["provenance"] = 0
+        provenance_notice = _container_notice(
+            _render(_artifact(stratification=provenance)),
+            "provenance",
+        )
+        assert f"<strong>{heading}</strong>" in provenance_notice
+        assert detail in provenance_notice
+
+        final_state_artifact = _artifact(
+            stratification=_present_stratification(),
+            final_state={"process.metal_phase_bottom_pool": {"Fe": 1.0}},
+        )
+        if state == "absent":
+            final_state_artifact["terminal"].pop("final_state")
+        elif state == "empty":
+            final_state_artifact["terminal"]["final_state"] = {}
+        elif state == "malformed":
+            final_state_artifact["terminal"]["final_state"] = []
+        else:
+            final_state_artifact["terminal"]["final_state"] = 0
+        final_state_notice = _container_notice(
+            _render(final_state_artifact),
+            "final-state",
+        )
+        assert f"<strong>{heading}</strong>" in final_state_notice
+        assert detail in final_state_notice
+
+        terminal_artifact = _artifact(stratification=_present_stratification())
+        if state == "absent":
+            terminal_artifact.pop("terminal")
+        elif state == "empty":
+            terminal_artifact["terminal"] = {}
+        elif state == "malformed":
+            terminal_artifact["terminal"] = []
+        else:
+            terminal_artifact["terminal"] = 0
+        terminal_notice = _container_notice(
+            _render(terminal_artifact),
+            "terminal",
+        )
+        expected_terminal_heading = "Empty" if state == "empty" else heading
+        assert f"<strong>{expected_terminal_heading}</strong>" in terminal_notice
+        assert detail in terminal_notice
+
+    present = _render(_artifact(
+        stratification=_present_stratification(),
+        final_state={"process.metal_phase_bottom_pool": {"Fe": 1.0}},
+    ))
+    assert 'data-p2-container="pools"' not in present
+    assert 'data-p2-container="pool-float"' not in present
+    assert 'data-p2-container="interface"' not in present
+    assert 'data-p2-container="buoyancy"' not in present
+    assert 'data-p2-container="density-provenance"' not in present
+    assert 'data-p2-container="provenance"' not in present
+    assert 'data-p2-container="terminal"' not in present
+    assert 'data-p2-container="final-state"' not in present
 
 
 def test_p2_escapes_untrusted_artifact_values() -> None:

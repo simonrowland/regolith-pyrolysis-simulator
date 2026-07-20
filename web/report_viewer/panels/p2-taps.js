@@ -73,6 +73,25 @@
       .join("");
   }
 
+  function mapContainerNotice(value, label, region) {
+    let state;
+    let detail;
+    if (value === undefined) {
+      state = "Not emitted";
+      detail = `${label} was not emitted.`;
+    } else if (!isMap(value)) {
+      state = "Malformed";
+      detail = `Emitted ${label} is not a map.`;
+    } else if (!Object.keys(value).length) {
+      state = "Empty";
+      detail = `Emitted ${label} map is empty.`;
+    } else {
+      return "";
+    }
+    return `<div class="pending sec-p2-inline-pending" data-p2-container="${esc(region)}">` +
+      `<strong>${state}</strong><p>${esc(detail)}</p></div>`;
+  }
+
   function gradeBlock(pool) {
     const hasComposition = isMap(pool) && Object.prototype.hasOwnProperty.call(pool, "composition_wt_pct");
     if (!hasComposition) {
@@ -133,6 +152,7 @@
   }
 
   function booleanState(container, key) {
+    if (container !== undefined && !isMap(container)) return "malformed";
     if (!isMap(container) || !Object.prototype.hasOwnProperty.call(container, key)) {
       return "not emitted";
     }
@@ -149,12 +169,13 @@
   }
 
   function renderDensityProvenance(pool) {
-    const provenance = isMap(pool?.density_correlation_provenance)
-      ? pool.density_correlation_provenance
-      : null;
-    if (!provenance || !Object.keys(provenance).length) {
-      return `<div class="pending sec-p2-inline-pending"><strong>Not emitted</strong><p>Density-correlation provenance is unavailable.</p></div>`;
-    }
+    const provenance = pool?.density_correlation_provenance;
+    const containerNotice = mapContainerNotice(
+      provenance,
+      "density-correlation provenance",
+      "density-provenance"
+    );
+    if (containerNotice) return containerNotice;
     return Object.entries(provenance).map(([species, record]) => {
       if (!isMap(record)) {
         return `<div class="sec-p2-provenance"><b>${esc(prettySpecies(species))}</b><span>Malformed provenance record.</span></div>`;
@@ -171,8 +192,13 @@
   }
 
   function renderBuoyancy(pool) {
-    const buoyancy = isMap(pool?.buoyancy) ? pool.buoyancy : null;
-    if (!buoyancy) return `<div class="pending sec-p2-inline-pending"><strong>Not emitted</strong><p>Buoyancy diagnostic is unavailable.</p></div>`;
+    const buoyancy = pool?.buoyancy;
+    const containerNotice = mapContainerNotice(
+      buoyancy,
+      "buoyancy diagnostic",
+      "buoyancy"
+    );
+    if (containerNotice) return containerNotice;
     return `<div class="sec-p2-kv"><span>Emitted verdict</span><b>${esc(readableStatus(buoyancy.verdict))}</b></div>` +
       `<div class="sec-p2-kv"><span>Alloy density</span><b>${exact(buoyancy.alloy_density_kg_m3, "kg/m³")}</b></div>` +
       `<div class="sec-p2-kv"><span>Melt density</span><b>${exact(buoyancy.melt_density_kg_m3, "kg/m³")}</b></div>` +
@@ -199,9 +225,11 @@
   function renderTapCard({ cardId, title, intent, pool, terminalAccount, interfaceReport, showAssumption = false }) {
     const grade = gradeBlock(pool);
     const poolExists = isMap(pool);
+    const poolNotice = mapContainerNotice(pool, `${title} pool`, `pool-${cardId}`);
     return `<article class="card sec-p2-card" data-p2-card="${esc(cardId)}">` +
       `<div class="sec-p2-card-head"><div><div class="ct">${esc(title)}</div>` +
       `<div class="cbig">${esc(grade.headline)}</div></div>${showAssumption ? assumptionChip(interfaceReport) : ""}</div>` +
+      `${poolNotice}` +
       `<p class="sec-p2-intent">${esc(intent)}</p>` +
       `<div class="sec-p2-grade" aria-label="${esc(`${title} emitted elemental composition by weight`)}">${grade.chips}</div>` +
       `<div class="sec-p2-contaminants" aria-label="${esc(`${title} cobalt and nickel contaminant grades`)}">${grade.contaminants}</div>` +
@@ -228,9 +256,12 @@
   }
 
   function renderInterface(interfaceReport) {
-    if (!isMap(interfaceReport)) {
-      return `<div class="pending"><strong>Not emitted</strong><p>Float-layer interface geometry is unavailable. No film thickness or coverage is inferred.</p></div>`;
-    }
+    const containerNotice = mapContainerNotice(
+      interfaceReport,
+      "float-layer interface",
+      "interface"
+    );
+    if (containerNotice) return containerNotice;
     const assumptionState = booleanState(
       interfaceReport,
       "aggressive_float_tap_assumption_load_bearing"
@@ -249,28 +280,44 @@
   function latestStratification(artifact) {
     const timesteps = Array.isArray(artifact?.timesteps) ? artifact.timesteps : [];
     for (let index = timesteps.length - 1; index >= 0; index -= 1) {
-      const value = timesteps[index]?.summary?.metal_phase_stratification;
-      if (isMap(value)) return { report: value, hour: timesteps[index]?.hour };
+      const summary = timesteps[index]?.summary;
+      if (!isMap(summary) || !Object.prototype.hasOwnProperty.call(summary, "metal_phase_stratification")) continue;
+      return { report: summary.metal_phase_stratification, hour: timesteps[index]?.hour };
     }
     return null;
   }
 
   function render(artifact) {
-    const finalState = isMap(artifact?.terminal?.final_state) ? artifact.terminal.final_state : {};
+    const terminalValue = artifact?.terminal;
+    const finalStateValue = isMap(terminalValue) ? terminalValue.final_state : undefined;
+    const finalState = isMap(finalStateValue) ? finalStateValue : {};
     const selected = latestStratification(artifact);
     const stratification = selected?.report;
-    const pools = isMap(stratification?.pools) ? stratification.pools : {};
-    const interfaceReport = isMap(stratification?.interface) ? stratification.interface : null;
+    const poolsValue = stratification?.pools;
+    const pools = isMap(poolsValue) ? poolsValue : {};
+    const interfaceReport = stratification?.interface;
     const hour = selected ? esc(scalarText(selected.hour, "not emitted")) : "not emitted";
     const absent = selected
       ? ""
       : `<div class="pending sec-p2-panel-pending"><strong>Pending metal-phase stratification</strong><p>No timestep emitted metal-phase stratification. Elemental tap grade, density, buoyancy, and interface geometry remain pending; terminal mol accounts are shown without conversion.</p></div>`;
-    const provenance = isMap(stratification?.provenance) ? stratification.provenance : null;
+    const malformed = selected && !isMap(stratification)
+      ? `<div class="pending sec-p2-panel-pending" data-p2-container="stratification"><strong>Malformed metal-phase stratification</strong><p>The latest emitted stratification value is not a map. Older timestep reports are not substituted.</p></div>`
+      : "";
+    const provenanceValue = stratification?.provenance;
+    const provenance = isMap(provenanceValue) ? provenanceValue : null;
+    const containerNotices = isMap(stratification)
+      ? mapContainerNotice(poolsValue, "stratification pools", "pools") +
+        mapContainerNotice(provenanceValue, "stratification provenance", "provenance")
+      : "";
+    const terminalNotice = mapContainerNotice(terminalValue, "terminal artifact", "terminal");
+    const finalStateNotice = isMap(terminalValue)
+      ? mapContainerNotice(finalStateValue, "terminal final-state", "final-state")
+      : "";
 
     return `<section id="sec-p2-taps" class="sec-p2-taps">` +
       `<h2><span class="sect">P2</span>Metal-pot taps &amp; stratification</h2>` +
       `<p class="sub">Latest emitted stratification (hour ${hour}) plus literal terminal tap accounts. Elemental wt% is backend-emitted; terminal amounts remain mol.</p>` +
-      `${absent}<div class="sec-p2-flags" data-p2-flags="stratification">` +
+      `${absent}${malformed}${containerNotices}${terminalNotice}${finalStateNotice}<div class="sec-p2-flags" data-p2-flags="stratification">` +
       `${statusChip("Diagnostic status", stratification?.status)}` +
       `${statusChip("Mode", stratification?.mode)}` +
       `${statusChip("Extraction behavior", stratification?.existing_extraction_behavior)}` +
