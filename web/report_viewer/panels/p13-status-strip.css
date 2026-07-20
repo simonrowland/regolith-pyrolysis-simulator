@@ -1,0 +1,176 @@
+.sec-p13-status-strip {
+  position: sticky;
+  top: 8px;
+  z-index: 5;
+  margin: 14px 0 28px;
+  padding: 12px;
+  border: 1px solid var(--rule);
+  background: color-mix(in srgb, var(--panel) 94%, transparent);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(8px);
+}
+
+.sec-p13-status-strip h2 {
+  padding-top: 0;
+  border-top: 0;
+  font-size: 15px;
+}
+
+.sec-p13-status-strip .sec-p13-sub {
+  margin: 3px 0 10px;
+  color: var(--ink-3);
+  font-size: 11px;
+}
+
+.sec-p13-status-strip .sec-p13-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.sec-p13-status-strip .sec-p13-tile {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  background: var(--panel);
+}
+
+.sec-p13-status-strip .sec-p13-redox { border-left: 3px solid var(--orange); }
+.sec-p13-status-strip .sec-p13-flow { border-left: 3px solid var(--blue); }
+.sec-p13-status-strip .sec-p13-mre { border-left: 3px solid var(--green); }
+
+.sec-p13-status-strip .sec-p13-tile-title {
+  color: var(--ink-3);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.sec-p13-status-strip .sec-p13-headline {
+  margin-top: 5px;
+  font: 750 14px/1.25 "SFMono-Regular", Consolas, monospace;
+  overflow-wrap: anywhere;
+}
+
+.sec-p13-status-strip .sec-p13-headline--failed { color: var(--red); }
+
+.sec-p13-status-strip .sec-p13-fact,
+.sec-p13-status-strip .sec-p13-activity {
+  margin-top: 5px;
+  color: var(--ink-2);
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+.sec-p13-status-strip .sec-p13-activity {
+  padding-top: 6px;
+  border-top: 1px solid var(--rule);
+  font-weight: 700;
+}
+
+.sec-p13-status-strip .sec-p13-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.sec-p13-status-strip .sec-p13-chip {
+  display: inline-flex;
+  max-width: 100%;
+  padding: 3px 6px;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--blue) 8%, var(--panel));
+  color: var(--ink-2);
+  font: 700 9px/1.2 "SFMono-Regular", Consolas, monospace;
+  overflow-wrap: anywhere;
+}
+
+.sec-p13-status-strip .sec-p13-chip--caution {
+  border-color: color-mix(in srgb, var(--orange) 55%, var(--rule));
+  background: var(--amber-soft);
+  color: var(--warning-ink);
+}
+
+.sec-p13-status-strip .sec-p13-chip--pending {
+  border-style: dashed;
+  background: transparent;
+}
+
+.sec-p13-status-strip .sec-p13-gauge {
+  display: block;
+  width: 100%;
+  height: 8px;
+  margin-top: 7px;
+  accent-color: var(--blue);
+}
+
+.sec-p13-status-strip .sec-p13-gauge--pending {
+  border: 1px dashed var(--rule);
+  border-radius: 999px;
+}
+
+.sec-p13-status-strip .sec-p13-gauge-labels {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 2px;
+  color: var(--ink-3);
+  font-size: 8px;
+}
+
+.sec-p13-status-strip .sec-p13-gauge-labels span:last-child { color: var(--warning-ink); }
+
+.sec-p13-status-strip .sec-p13-details {
+  margin-top: 7px;
+  padding-top: 6px;
+  border-top: 1px solid var(--rule);
+  color: var(--ink-2);
+  font-size: 10px;
+}
+
+.sec-p13-status-strip .sec-p13-details summary {
+  cursor: pointer;
+  color: var(--blue);
+  font-weight: 700;
+}
+
+.sec-p13-status-strip .sec-p13-details dl { margin: 6px 0 0; }
+
+.sec-p13-status-strip .sec-p13-detail-row {
+  display: grid;
+  grid-template-columns: minmax(5.5rem, auto) 1fr;
+  gap: 8px;
+  padding: 3px 0;
+}
+
+.sec-p13-status-strip .sec-p13-detail-row dt { color: var(--ink-3); }
+
+.sec-p13-status-strip .sec-p13-detail-row dd {
+  min-width: 0;
+  margin: 0;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  overflow-wrap: anywhere;
+}
+
+.sec-p13-status-strip .sec-p13-pending {
+  display: flex;
+  gap: 8px;
+  padding: 10px;
+  border: 1px dashed var(--orange);
+  background: var(--amber-soft);
+  color: var(--warning-ink);
+  font-size: 11px;
+}
+
+@media (max-width: 768px) {
+  .sec-p13-status-strip { position: static; }
+  .sec-p13-status-strip .sec-p13-grid { grid-template-columns: 1fr; }
+}
+
+@media print {
+  .sec-p13-status-strip { position: static; box-shadow: none; backdrop-filter: none; }
+}
