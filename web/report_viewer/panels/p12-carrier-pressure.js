@@ -31,7 +31,7 @@
     const carrierIdentity = typeof row?.carrier_identity === "string" && row.carrier_identity.trim()
       ? row.carrier_identity.trim()
       : null;
-    const hasCarrierPressure = isFiniteNumber(row?.p_carrier_bar);
+    const hasCarrierPressure = isFiniteNumber(row?.p_carrier_bar) && row.p_carrier_bar > 0;
     const hasCarrierIdentity = carrierIdentity !== null;
     const identityLabel = hasCarrierIdentity ? esc(prettySpecies(carrierIdentity)) : "Carrier";
     const carrierHeadline = hasCarrierIdentity || hasCarrierPressure
