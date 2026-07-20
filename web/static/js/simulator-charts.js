@@ -52,6 +52,10 @@ Plotly.newPlot('chart-pressure', [{
 // Mass flow (evaporation rates by species)
 const flowTraces = {};
 let flowInitialized = false;
+const flowColors = [
+    '#dc2626', '#2563eb', '#22c55e', '#eab308',
+    '#8b5cf6', '#06b6d4', '#f97316', '#ec4899',
+];
 
 // Absolute composition chart (oxides above x-axis, metals below)
 const metalColors = {
@@ -197,21 +201,41 @@ function initCompositionChart(wt) {
     compInitialized = true;
 }
 
+function flowTraceForSpecies(species, index) {
+    return {
+        x: [], y: [], mode: 'lines', name: species,
+        line: { color: flowColors[index % flowColors.length], width: 2 },
+    };
+}
+
 function initFlowChart(species) {
-    const colors = ['#dc2626', '#2563eb', '#22c55e', '#eab308', '#8b5cf6', '#06b6d4', '#f97316', '#ec4899'];
-    const traces = [];
-    let idx = 0;
-    for (const sp of species) {
-        traces.push({
-            x: [], y: [], mode: 'lines', name: sp,
-            line: { color: colors[idx % colors.length], width: 2 },
-        });
-        flowTraces[sp] = idx++;
-    }
+    for (const existing of Object.keys(flowTraces)) delete flowTraces[existing];
+    const traces = species.map((sp, index) => {
+        flowTraces[sp] = index;
+        return flowTraceForSpecies(sp, index);
+    });
     Plotly.newPlot('chart-massflow', traces, {
         ...chartLayout,
         title: { text: 'Evaporation Flux', font: { size: 13 } },
         yaxis: { ...chartLayout.yaxis, title: 'kg/hr' },
     }, chartConfig);
     flowInitialized = true;
+}
+
+function ensureFlowChartSpecies(species) {
+    if (!flowInitialized) {
+        if (species.length) initFlowChart(species);
+        return;
+    }
+    const additions = species.filter(
+        sp => !Object.prototype.hasOwnProperty.call(flowTraces, sp)
+    );
+    if (!additions.length) return;
+
+    let index = Object.keys(flowTraces).length;
+    const traces = additions.map(sp => {
+        flowTraces[sp] = index;
+        return flowTraceForSpecies(sp, index++);
+    });
+    Plotly.addTraces('chart-massflow', traces);
 }
