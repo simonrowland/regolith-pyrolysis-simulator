@@ -67,19 +67,29 @@
   function activityDetail(stage) {
     if (!own(stage, "activity")) return pending("per-species activity not emitted");
     if (!isRecord(stage.activity)) return pending("per-species activity map is malformed");
-    const entries = Object.entries(stage.activity);
-    if (!entries.length) return pending("emitted activity map contains no species states");
-    return `<ul class="sec-p4-activity-list">${entries.map(([species, active]) => {
-      const state = typeof active === "boolean" ? (active ? "ACTIVE" : "IDLE") : "PENDING";
+    const speciesList = [...new Set([
+      ...(Array.isArray(stage.accepted_species) ? stage.accepted_species : []),
+      ...Object.keys(stage.activity)
+    ])];
+    if (!speciesList.length) return pending("emitted activity map contains no species states");
+    return `<ul class="sec-p4-activity-list">${speciesList.map((species) => {
+      const active = stage.activity[species];
+      const state = !own(stage.activity, species)
+        ? "PENDING"
+        : typeof active === "boolean" ? (active ? "ACTIVE" : "IDLE") : "PENDING";
       return `<li>${speciesName(species)}<b>${state}</b></li>`;
     }).join("")}</ul>`;
+  }
+
+  function authorityValue(value) {
+    return esc(isRecord(value) || Array.isArray(value) ? JSON.stringify(value) : value);
   }
 
   function authorityDetail(stage) {
     const entries = authorityFields.filter(([field]) => own(stage, field));
     if (!entries.length) return "";
     return `<div class="sec-p4-authority"><h4>Authority &amp; context</h4>${entries.map(([field, label]) =>
-      `<span><b>${esc(label)}</b> ${esc(stage[field])}</span>`
+      `<span><b>${esc(label)}</b> ${authorityValue(stage[field])}</span>`
     ).join("")}</div>`;
   }
 
@@ -89,14 +99,6 @@
     return stage.warning.trim()
       ? `<p class="sec-p4-warning">${esc(stage.warning)}</p>`
       : `<p class="sec-p4-warning"><span class="sec-p4-empty-value">No warning text in emitted field</span></p>`;
-  }
-
-  function activityQualifier(stage) {
-    if (!own(stage, "activity") || !isRecord(stage.activity)) return "";
-    const values = Object.values(stage.activity);
-    return values.length && values.every((value) => value === false)
-      ? `<span class="sec-p4-qualifier">IDLE</span>`
-      : "";
   }
 
   function verdict(stage) {
@@ -123,13 +125,15 @@
       : !hasNumber(stage.stage_number)
         ? pending("stage number is malformed")
         : `Stage ${esc(fmtNum(stage.stage_number))}`;
-    const trace = hasNumber(stage.total_kg) && stage.total_kg < 0.01
-      ? `<span class="sec-p4-qualifier">trace · &lt;0.01 kg total</span>`
-      : "";
+    const massQualifier = hasNumber(stage.total_kg) && stage.total_kg === 0
+      ? `<span class="sec-p4-qualifier">empty · 0 kg total</span>`
+      : hasNumber(stage.total_kg) && stage.total_kg > 0 && stage.total_kg < 0.01
+        ? `<span class="sec-p4-qualifier">trace · &lt;0.01 kg total</span>`
+        : "";
 
     return `<article class="sec-p4-stage-card"><div class="sec-p4-stage-head">` +
       `<div><div class="sec-p4-stage-number">${stageNumber}</div><h3>${label}</h3></div>` +
-      `<div class="sec-p4-verdict-line">${verdict(stage)}${trace}${activityQualifier(stage)}</div></div>` +
+      `<div class="sec-p4-verdict-line">${verdict(stage)}${massQualifier}</div></div>` +
       `<div class="sec-p4-headline"><div><span>Total stage mass</span>` +
       `<b>${stageNumberValue(stage, "total_kg", "kg")}</b></div>` +
       `<div><span>Purity fraction</span><b>${stageNumberValue(stage, "purity_fraction", "")}</b></div></div>` +
@@ -160,7 +164,7 @@
           : `<div class="sec-p4-stage-grid">${stages.map(stageCard).join("")}</div>`;
 
     return `<section id="sec-p4-stage-purity" class="sec-p4-stage-purity" aria-labelledby="sec-p4-stage-purity-title">` +
-      `<h2 id="sec-p4-stage-purity-title"><span class="sect">P4</span>Condenser stage purity</h2>` +
+      `<h2 id="sec-p4-stage-purity-title"><span class="sect">P4</span>Condensation-train stage purity</h2>` +
       `<p class="sub">Backend-emitted stage mass, grade, activity, and verdict. Purity and totals are not recomputed in the viewer.</p>` +
       `${body}</section>`;
   }
