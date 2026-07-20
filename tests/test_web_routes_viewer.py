@@ -1524,6 +1524,26 @@ def test_wall_deposit_total_is_disclosed_viewer_side_sum_with_segments() -> None
     assert "Provisional wall geometry." in html
 
 
+def test_wall_deposit_empty_segment_stays_pending() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["timesteps"] = [
+        {
+            "hour": 1,
+            "summary": {
+                "campaign": "C0",
+                "wall_deposit_cumulative_kg": {"stage_0_to_1": {}},
+            },
+            "ledger": {},
+        }
+    ]
+
+    html = _render_report_html(artifact)
+
+    assert "none emitted" in html
+    assert "viewer-side sum (no emitted total)" not in html
+    assert ">0 kg</span>" not in html
+
+
 def test_cleaned_melt_title_requires_emitted_ceramic_classification() -> None:
     artifact = _artifact(recipe_snapshot=None)
     artifact["timesteps"] = [

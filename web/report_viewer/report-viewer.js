@@ -484,7 +484,7 @@ function wallAndOxygenSection(artifact, rows) {
     }).join(" · ") || "none emitted";
     return `<tr><td class="mono">${esc(segment)}</td><td>${rendered}</td></tr>`;
   }).join("") : "";
-  const wallTotal = wallComplete ? sum(wallNumbers) : null;
+  const wallTotal = wallComplete && wallNumbers.length ? sum(wallNumbers) : null;
   const pumping = terminal.run_metadata?.cost_rollup_diagnostic?.pumping_diagnostic;
   const geometryNotice = terminal.run_metadata?.knudsen_regime_diagnostic?.stage_area_geometry_provenance_notice;
   const wallAuthorityNotice = geometryNotice?.status === "provisional"
@@ -501,7 +501,7 @@ function wallAndOxygenSection(artifact, rows) {
   const wallBreakdown = wallSegments
     ? `<div class="table-wrap"><table><thead><tr><th>Emitted segment</th><th>Species · kg</th></tr></thead><tbody>${wallRows}</tbody></table></div>`
     : `<div class="kv"><span>Per-segment breakdown</span><b>not emitted</b></div>`;
-  const wall = `<div class="card"><div class="ct">Observed wall deposits · cumulative timestep series</div><div class="cbig">${wallComplete ? `${exactKg(wallTotal)} <small>viewer-side sum (no emitted total)</small>` : "not emitted"}</div>${wallAuthorityNotice}${wallBreakdown}<div class="kv"><span>Current transport</span><b>${esc(last.regime)} · Kn ${exactValue(last.Kn && typeof last.Kn === "object" ? last.Kn.knudsen_number : last.Kn, "")}</b></div></div>`;
+  const wall = `<div class="card"><div class="ct">Observed wall deposits · cumulative timestep series</div><div class="cbig">${hasNumber(wallTotal) ? `${exactKg(wallTotal)} <small>viewer-side sum (no emitted total)</small>` : "not emitted"}</div>${wallAuthorityNotice}${wallBreakdown}<div class="kv"><span>Current transport</span><b>${esc(last.regime)} · Kn ${exactValue(last.Kn && typeof last.Kn === "object" ? last.Kn.knudsen_number : last.Kn, "")}</b></div></div>`;
   // Human basis only — raw ledger field names stay out of the visible report surface.
   const oxygen = `<div class="card"><div class="ct">${esc(o2Label)}</div><div class="cbig">${exactKg(o2)}</div><div class="kv"><span>Basis</span><b>cumulative source-side potential · not recovered product</b></div><div class="kv"><span>Pumping energy</span><b>${pumpingEnergy}</b></div><div class="kv"><span>Pumping status</span><b>${esc(pumping?.status ?? "not emitted")}</b></div></div>`;
   return section(7, "Wall risk, oxygen & pumping", "Observed deposits and terminal diagnostics only; wall lifetime remains unassessed. O₂ figures use the artifact's source-side potential metric — not recovered yield.", `<div class="cards">${wall}${oxygen}</div>${pending("W-D4", "terminal.wall_lifetime is absent. Wall lifetime is not assessed; this viewer does not issue a CLEAR verdict.")}`);
