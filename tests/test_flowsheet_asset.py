@@ -108,6 +108,8 @@ V7_SPECIES_PRIMARY = {
     "U",
     # RUMP
     "BeO",  # v8: rump chips are oxides
+    "Fe⁰",  # v9: furnace melt taps (owner 2026-07-20)
+    "Si⁰",  # v9: furnace melt taps
     "ZrO2",
     "HfO2",
     "Sc2O3",
@@ -471,12 +473,12 @@ def test_one_marker_end_per_edge_path(renderer, flowsheet):
 # Canonical sha256 of sorted (bin_id, chip, status, condition_note, members).
 # Computed from data/flowsheet.yaml membership set only — see membership_lock_hash().
 MEMBERSHIP_LOCK_HASH = (
-    "c158688a3c05c288e8db839add470130b98d048e5e73ead544cc663b5296dbc8"
+    "41a411d42f1669c9af2e238c18df155787b70f68d4e5b5528978e620a98b9673"
 )
 
 
 def test_membership_lock_header(flowsheet):
-    assert flowsheet.get("map_version") == "v8"
+    assert flowsheet.get("map_version") == "v9"
     assert flowsheet.get("locked") is True
     assert flowsheet.get("locked_at")
     assert flowsheet["schema_version"] == 1
@@ -550,7 +552,7 @@ def test_review_provenance_fields_parse(flowsheet):
                     seen_v8 += 1
                 else:
                     # Most chips inherit the v7 reviewed-map finding for their bin
-                    assert rev["map"] in ("v7", "v8")
+                    assert rev["map"] in ("v7", "v8", "v9")
                     if rev["map"] == "v7":
                         assert rev.get("finding"), sp["symbol_or_group"]
                         seen_v7 += 1

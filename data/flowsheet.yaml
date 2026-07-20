@@ -1,5 +1,5 @@
 # Plant flowsheet — canonical block-diagram graph (v7 map + v8 gas/cistern delta).
-# LOCKED membership map_version=v8 — see MEMBERSHIP LOCK contract below.
+# LOCKED membership map_version=v9 — see MEMBERSHIP LOCK contract below.
 # Authority: docs-private/research/2026-07-19-plant-flowsheet/spec.md (v7 + v8 delta).
 # Schema version 1. Renderer: scripts/render_flowsheet.py
 #
@@ -76,7 +76,7 @@
 # the membership hash — edit those freely without a version bump.
 # ---------------------------------------------------------------------------
 
-map_version: "v8"
+map_version: "v9"
 locked: true
 locked_at: "2026-07-20"
 
@@ -237,6 +237,31 @@ blocks:
         species:
           - {symbol_or_group: glass, status: reviewed, review: {map: "v7", finding: "speciation F17-F18"}}
       # v8: non-condensable gas conditioning between SiO baffles and O₂ terminal
+      - id: melt_taps
+        title: FURNACE MELT TAPS
+        subtitle: "melt-side product exits — not overhead-gas stages"
+        kind: product
+        admission:
+          any_of:
+            # Fe⁰: the shuttle exit — FeO reducible by the Na/K reductant class
+            # (Ellingham sense-1: alkali oxides more stable than FeO in the
+            # staged-cool window), drained as liquid metal, not vapor.
+            - {reducibility: shuttle_reducible, form: native_metal_liquid}
+            # Si⁰: deep-reduction campaign product; liquid Si floats (top skim).
+            - {reducibility: deep_reduction_only, form: native_metal_liquid}
+        # v9: the two melt-side exits the v7 map omitted (owner 2026-07-20).
+        # Fe⁰: the North Star's SECOND Fe exit — Na/K shuttle reduces FeO in the
+        # melt; liquid Fe drains from the melt bottom at lower T than the
+        # Fe-vapor window (distinct from the Fe condenser pool).
+        # Si⁰: deep-reduction route — liquid Si (ρ≈2.57) floats on the denser
+        # silicate melt (~2.7) → top skim.
+        species:
+          - {symbol_or_group: "Fe⁰", status: reviewed, review: {map: "v9"}}
+          - {symbol_or_group: "Si⁰", status: conditional, condition_note: "deep-reduction campaign only; floats → top skim", review: {map: "v9"}}
+        notes:
+          - "Fe⁰ bottom tap: shuttle-reduced liquid iron, drains at melt bottom (2nd Fe exit, lower T than the vapor window)"
+          - "Si⁰ top skim: ρ 2.57 vs melt ~2.7 — reduced Si floats; campaign-gated"
+
       - id: gas_conditioning
         title: GAS CONDITIONING (non-condensables)
         kind: process
