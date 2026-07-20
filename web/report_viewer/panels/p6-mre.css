@@ -1,0 +1,262 @@
+.sec-p6-mre .sec-p6-block {
+  margin-top: 12px;
+  padding: 15px;
+  border: 1px solid var(--rule);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.sec-p6-mre .sec-p6-block-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.sec-p6-mre .sec-p6-block-head h3,
+.sec-p6-mre .sec-p6-disclosure h4,
+.sec-p6-mre .sec-p6-species-card h4,
+.sec-p6-mre .sec-p6-yield-card h4 {
+  margin: 0;
+}
+
+.sec-p6-mre .sec-p6-block-head p,
+.sec-p6-mre .sec-p6-o2 p {
+  margin: 5px 0 0;
+  color: var(--ink-3);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.sec-p6-mre .sec-p6-chip-row,
+.sec-p6-mre .sec-p6-species-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.sec-p6-mre .sec-p6-chip {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 26rem;
+  padding: 6px 9px;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  color: var(--ink-2);
+  background: var(--paper);
+  font: 10px/1.35 "SFMono-Regular", Consolas, monospace;
+  overflow-wrap: anywhere;
+}
+
+.sec-p6-mre .sec-p6-chip b {
+  color: var(--ink-3);
+  font-size: 8px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.sec-p6-mre .sec-p6-chip.sec-p6-warn {
+  border-color: color-mix(in srgb, var(--orange) 55%, var(--rule));
+  background: color-mix(in srgb, var(--orange) 8%, var(--panel));
+}
+
+.sec-p6-mre .sec-p6-headline,
+.sec-p6-mre .sec-p6-direct {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.sec-p6-mre .sec-p6-headline > div,
+.sec-p6-mre .sec-p6-direct > div {
+  min-width: 0;
+  padding: 11px;
+  border-left: 3px solid var(--blue);
+  background: var(--blue-soft);
+}
+
+.sec-p6-mre .sec-p6-headline span:first-child,
+.sec-p6-mre .sec-p6-direct span,
+.sec-p6-mre .sec-p6-o2 span {
+  display: block;
+  color: var(--ink-3);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.sec-p6-mre .sec-p6-headline b,
+.sec-p6-mre .sec-p6-direct b,
+.sec-p6-mre .sec-p6-o2 b {
+  display: block;
+  margin-top: 6px;
+  font: 700 14px/1.35 "SFMono-Regular", Consolas, monospace;
+  overflow-wrap: anywhere;
+}
+
+.sec-p6-mre .sec-p6-direct {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.sec-p6-mre .sec-p6-direct > div {
+  border-left-color: var(--orange);
+  background: color-mix(in srgb, var(--orange) 7%, var(--panel));
+}
+
+.sec-p6-mre .sec-p6-direct small {
+  display: block;
+  margin-top: 4px;
+  color: var(--ink-3);
+  font-size: 10px;
+}
+
+.sec-p6-mre .sec-p6-disclosure {
+  margin-top: 14px;
+  border-top: 1px solid var(--rule);
+}
+
+.sec-p6-mre .sec-p6-disclosure summary {
+  padding: 11px 2px;
+  color: var(--ink-2);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.sec-p6-mre .sec-p6-disclosure h4 {
+  margin-top: 18px;
+  color: var(--ink-2);
+  font-size: 11px;
+}
+
+.sec-p6-mre .sec-p6-meta,
+.sec-p6-mre .sec-p6-species-cards,
+.sec-p6-mre .sec-p6-yield-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.sec-p6-mre .sec-p6-kv {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: 11px;
+}
+
+.sec-p6-mre .sec-p6-kv span:first-child {
+  color: var(--ink-3);
+}
+
+.sec-p6-mre .sec-p6-kv b {
+  text-align: right;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  overflow-wrap: anywhere;
+}
+
+.sec-p6-mre .sec-p6-authority-list,
+.sec-p6-mre .sec-p6-species-cards,
+.sec-p6-mre .sec-p6-yield-list {
+  margin-top: 8px;
+}
+
+.sec-p6-mre .sec-p6-authority-row,
+.sec-p6-mre .sec-p6-species-card,
+.sec-p6-mre .sec-p6-yield-card {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--rule);
+  background: var(--paper);
+}
+
+.sec-p6-mre .sec-p6-authority-row + .sec-p6-authority-row {
+  margin-top: 8px;
+}
+
+.sec-p6-mre .sec-p6-species {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: "SFMono-Regular", Consolas, monospace;
+}
+
+.sec-p6-mre .sec-p6-species i {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--species-color);
+}
+
+.sec-p6-mre .sec-p6-not-emitted,
+.sec-p6-mre .sec-p6-empty {
+  color: var(--ink-3);
+  font-style: italic;
+  font-weight: 500;
+}
+
+.sec-p6-mre .sec-p6-pending {
+  margin-top: 10px;
+}
+
+.sec-p6-mre .sec-p6-note {
+  margin-top: 8px;
+}
+
+.sec-p6-mre .sec-p6-o2 > div {
+  border-left: 3px solid var(--blue);
+  padding-left: 11px;
+}
+
+@media (max-width: 768px) {
+  .sec-p6-mre .sec-p6-block-head {
+    display: block;
+  }
+
+  .sec-p6-mre .sec-p6-block-head .sec-p6-chip-row {
+    margin-top: 10px;
+  }
+
+  .sec-p6-mre .sec-p6-headline,
+  .sec-p6-mre .sec-p6-direct,
+  .sec-p6-mre .sec-p6-meta,
+  .sec-p6-mre .sec-p6-species-cards,
+  .sec-p6-mre .sec-p6-yield-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 420px) {
+  .sec-p6-mre .sec-p6-headline,
+  .sec-p6-mre .sec-p6-direct,
+  .sec-p6-mre .sec-p6-meta,
+  .sec-p6-mre .sec-p6-species-cards,
+  .sec-p6-mre .sec-p6-yield-list {
+    grid-template-columns: 1fr;
+  }
+
+  .sec-p6-mre .sec-p6-kv {
+    display: block;
+  }
+
+  .sec-p6-mre .sec-p6-kv b {
+    display: block;
+    margin-top: 4px;
+    text-align: left;
+  }
+}
+
+@media print {
+  .sec-p6-mre .sec-p6-block,
+  .sec-p6-mre .sec-p6-direct > div {
+    break-inside: avoid;
+    box-shadow: none;
+  }
+}
