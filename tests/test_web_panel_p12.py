@@ -162,9 +162,16 @@ def test_p12_absent_carrier_is_pending_not_zero() -> None:
     html = _render_panel(_artifact({}))
 
     assert "Pending carrier_identity / P_total−pO₂ is not used as a substitute." in html
+    assert "Carrier pressure field · not emitted." in html
     assert "0 mbar" not in html
     assert "Carrier partial pressure</div>" not in html
-    assert html.count("not emitted") == 2
+    for label in ("Total overhead pressure", "O₂ partial pressure"):
+        expected_metric = (
+            f'<div class="sec-p12-label">{label}</div>'
+            '<div class="sec-p12-value">not emitted</div>'
+            '<div class="sec-p12-detail">Pending artifact field.</div>'
+        )
+        assert expected_metric in html
 
 
 def test_p12_surfaces_artifact_provenance_without_inventing_authority() -> None:
@@ -308,29 +315,41 @@ def test_p12_partial_context_values_are_never_derived() -> None:
 
 
 def test_p12_malformed_pressure_scalars_are_not_emitted_values() -> None:
-    unavailable_or_malformed_values = (None, "", False, "0.003", [], {})
+    unavailable_or_malformed_values = (
+        (None, "empty", "Artifact field is present but empty."),
+        ("", "empty", "Artifact field is present but empty."),
+        (False, "malformed", "Artifact field is present but not a finite number."),
+        ("0.003", "malformed", "Artifact field is present but not a finite number."),
+        ([], "malformed", "Artifact field is present but not a finite number."),
+        ({}, "malformed", "Artifact field is present but not a finite number."),
+    )
     context_expectations = {
         "P_total_bar": "Total overhead pressure",
         "pO2_bar": "O₂ partial pressure",
     }
 
     for field in ("p_carrier_bar", *context_expectations):
-        for value in unavailable_or_malformed_values:
-            html = _render_panel(_artifact({field: value}))
+        for value, state, detail in unavailable_or_malformed_values:
+            summary = {field: value}
+            if field == "p_carrier_bar":
+                summary["carrier_identity"] = "N2"
+            html = _render_panel(_artifact(summary))
 
             assert (
                 "Pending carrier_identity / P_total−pO₂ is not used as a substitute."
                 in html
             )
             if field == "p_carrier_bar":
-                assert '<div class="sec-p12-headline">' not in html
-                assert "mbar" not in html
+                assert '<div class="sec-p12-label">N₂ partial pressure</div>' in html
+                assert '<div class="sec-p12-headline-value">' not in html
+                assert f"Carrier identity emitted; pressure field {state}." in html
+                assert f"Carrier pressure field · {state}." in html
             else:
                 label = context_expectations[field]
                 expected_metric = (
                     f'<div class="sec-p12-label">{label}</div>'
-                    '<div class="sec-p12-value">not emitted</div>'
-                    '<div class="sec-p12-detail">Pending artifact field.</div>'
+                    f'<div class="sec-p12-value">{state}</div>'
+                    f'<div class="sec-p12-detail">{detail}</div>'
                 )
                 assert expected_metric in html
 
@@ -356,7 +375,11 @@ def test_p12_empty_or_malformed_identity_stays_pending_without_inference() -> No
 
 
 def test_p12_zero_is_classified_by_emitter_field_semantics() -> None:
-    for invalid_carrier in (0, -0.001):
+    invalid_carriers = (
+        (0, "zero"),
+        (-0.001, "negative"),
+    )
+    for invalid_carrier, state in invalid_carriers:
         carrier_html = _render_panel(
             _artifact(
                 {
@@ -371,7 +394,14 @@ def test_p12_zero_is_classified_by_emitter_field_semantics() -> None:
             in carrier_html
         )
         assert '<div class="sec-p12-headline-value">' not in carrier_html
-        assert "Carrier identity only; pressure not emitted." in carrier_html
+        assert (
+            f"Carrier identity emitted; pressure field {state} "
+            "(outside positive emitter contract)." in carrier_html
+        )
+        assert (
+            f"Carrier pressure field · {state} "
+            "(outside positive emitter contract)." in carrier_html
+        )
         assert "bar to mbar unit conversion" not in carrier_html
 
     context_html = _render_panel(_artifact({"P_total_bar": 0, "pO2_bar": 0}))
