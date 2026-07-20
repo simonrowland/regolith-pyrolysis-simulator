@@ -673,6 +673,39 @@ setTimeout(() => {
     assert 'aria-labelledby="indexed-runs-heading"' in result["library"]
 
 
+def test_library_pretty_prints_feedstock_ids() -> None:
+    root = Path(__file__).resolve().parents[1] / "web" / "report_viewer"
+    harness = r"""
+const fs = require("fs");
+const vm = require("vm");
+const labelsSource = fs.readFileSync(process.argv[2], "utf8");
+const librarySource = fs.readFileSync(process.argv[3], "utf8");
+const context = {
+  window: { location: { href: "" } },
+  document: { querySelector() { return null; } },
+  encodeURIComponent,
+  fetch: () => new Promise(() => {}),
+  console
+};
+context.globalThis = context;
+vm.createContext(context);
+vm.runInContext(labelsSource, context);
+vm.runInContext(librarySource, context);
+context.testRun = { feedstock_id: "lunar_mare_low_ti" };
+process.stdout.write(JSON.stringify(vm.runInContext("runMetaLine(testRun)", context)));
+"""
+
+    completed = subprocess.run(
+        ["node", "-", str(root / "labels.js"), str(root / "library.js")],
+        input=harness,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+
+    assert json.loads(completed.stdout) == ["Lunar Mare Low Ti"]
+
+
 def test_report_viewer_stepper_exposes_keyboard_controls() -> None:
     root = Path(__file__).resolve().parents[1] / "web/report_viewer"
     artifact = {
@@ -1255,7 +1288,8 @@ setImmediate(() => {
     assert "O₂ recovered" not in html
     # No "unfiled" noise when folder absent; structured meta present.
     assert "unfiled" not in html
-    assert "lunar_mare_low_ti" in html
+    assert "Lunar Mare Low Ti" in html
+    assert "lunar_mare_low_ti" not in html
     assert "C0→C6" in html
     # Named static sample keeps human title; demo without artifact stays disabled.
     assert "Full-sequence lunar" in html
@@ -1343,11 +1377,12 @@ setImmediate(() => { process.stdout.write((els["run-list"] && els["run-list"]._h
         input=harness, text=True, capture_output=True, check=True,
     )
     html = completed.stdout
+    lower_html = html.lower()
     # The raw markup must NOT appear; the escaped form must.
-    assert "<span onmouseover" not in html
-    assert "<script>alert(2)" not in html
-    assert "&lt;span onmouseover" in html
-    assert "&lt;script&gt;alert(2)" in html
+    assert "<span onmouseover" not in lower_html
+    assert "<script>alert(2)" not in lower_html
+    assert "&lt;span onmouseover" in lower_html
+    assert "&lt;script&gt;alert(2)" in lower_html
 
 
 def test_settings_script_readable_labels_and_honest_absent_fields() -> None:

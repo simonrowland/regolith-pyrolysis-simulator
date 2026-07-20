@@ -1,6 +1,6 @@
 "use strict";
 
-const { fmtNum, fmtRunId, prettySpecies } = globalThis.ReportLabels;
+const { fmtNum, fmtRunId, prettySpecies, prettyFeedstock } = globalThis.ReportLabels;
 const LIVE_RUNS_URL = "/api/runs";
 const STATIC_RUNS_URL = "./runs-index.json";
 const SYSTEM_FOLDERS = ["All", "Favorites", "My runs", "Default runs", "Bootstrap ladder"];
@@ -118,7 +118,7 @@ function runMetaLine(run) {
   // Prefer structured fields over the API's yield-only summary string (often unformatted
   // multi-sig-fig noise that duplicates the yield chips).
   const parts = [];
-  if (run.feedstock_id) parts.push(String(run.feedstock_id));
+  if (run.feedstock_id) parts.push(prettyFeedstock(run.feedstock_id));
   if (Array.isArray(run.campaign_chain) && run.campaign_chain.length) {
     parts.push(run.campaign_chain.map((step) => String(step)).join("→"));
   }
