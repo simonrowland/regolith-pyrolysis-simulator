@@ -45,6 +45,14 @@
     "reservoir.stage0_process_gas": "Stage 0 process gas"
   });
 
+  // These helpers stringify their input, so a non-scalar would surface as
+  // "[object Object]" inside a label. Malformed data says so instead.
+  function scalarText(value) {
+    return value !== null && typeof value === "object"
+      ? `malformed (${Array.isArray(value) ? "array" : "object"})`
+      : value;
+  }
+
   function fmtNum(value, unit = "") {
     if (value === null || value === undefined || value === "" || typeof value === "boolean") return "not emitted";
     const numeric = Number(value);
@@ -56,18 +64,21 @@
   }
 
   function fmtRunId(id) {
-    const value = String(id ?? "");
+    const value = String(scalarText(id) ?? "");
     const hashLike = /^(?:[0-9a-f]{24,}|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i;
     return hashLike.test(value) ? `${value.slice(0, 8)}…` : value;
   }
 
   function prettySpecies(name) {
-    const value = String(name ?? "");
+    const value = String(scalarText(name) ?? "");
     if (!/^(?:[A-Z][a-z]?\d*)+$/.test(value)) return value;
     return value.replace(/\d/g, (digit) => SUBSCRIPTS[digit]);
   }
 
   function accountLabel(account) {
+    // Return the marker verbatim — the title-casing below would render it as
+    // "Malformed (Object)" and break the shared vocabulary.
+    if (account !== null && typeof account === "object") return scalarText(account);
     const value = String(account ?? "");
     if (ACCOUNT_LABELS[value]) return ACCOUNT_LABELS[value];
     const wallSegment = value.match(/^process\.wall_deposit_segment_stage_(\d+)_to_stage_(\d+)$/);
@@ -81,6 +92,8 @@
 
   // Snake/kebab feedstock ids → readable title case (lunar_mare_low_ti → Lunar Mare Low Ti).
   function prettyFeedstock(id) {
+    // As accountLabel: the title-casing below would corrupt the marker.
+    if (id !== null && typeof id === "object") return scalarText(id);
     const value = String(id ?? "").trim();
     if (!value) return "not emitted";
     return value
@@ -92,7 +105,7 @@
 
   // Subscript digits inside free-text chemical tokens (O2 → O₂) without inventing species.
   function prettyChemText(text) {
-    return String(text ?? "").replace(/\b(?:[A-Z][a-z]?\d*)+\b/g, (token) => prettySpecies(token));
+    return String(scalarText(text) ?? "").replace(/\b(?:[A-Z][a-z]?\d*)+\b/g, (token) => prettySpecies(token));
   }
 
   // One stable species colour grammar for every panel (bars, ribbons, chips, stage fills).

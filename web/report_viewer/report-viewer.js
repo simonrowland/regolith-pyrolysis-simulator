@@ -20,7 +20,13 @@ const DISPOSITION_GROUPS = Object.freeze([
 ]);
 
 const $ = (selector, root = document) => root.querySelector(selector);
-const esc = (value) => String(value ?? "—").replace(/[&<>'"]/g, (c) => ({
+// String coercion turns an object into "[object Object]" on screen — the text
+// twin of the strictMol number problem. A non-scalar where text was expected is
+// malformed data, and says so; it is never rendered as if it were a value.
+const scalarText = (value) => value !== null && typeof value === "object"
+  ? `malformed (${Array.isArray(value) ? "array" : "object"})`
+  : String(value ?? "—");
+const esc = (value) => scalarText(value).replace(/[&<>'"]/g, (c) => ({
   "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
 }[c]));
 const hasNumber = (value) => value !== null && value !== "" && Number.isFinite(Number(value));
@@ -72,7 +78,7 @@ const accountSpan = (value) => `<span title="${esc(value)}">${esc(accountLabel(v
 // nothing emitted is lost.
 const IDENTITY_MAX = 44;
 const identitySpan = (value) => {
-  const text = String(value);
+  const text = scalarText(value);
   if (isHashLike(text)) return runIdSpan(text);
   return text.length > IDENTITY_MAX
     ? `<span title="${esc(text)}">${esc(text.slice(0, IDENTITY_MAX).trimEnd())}…</span>`
@@ -187,9 +193,15 @@ function makeHeader(artifact, rows, energy) {
   const temperatures = rows.map((row) => row.T_C);
   const peakTemperature = temperatures.length && temperatures.every(hasNumber) ? maxPresent(temperatures) : null;
   const reportedEnergy = hasNumber(energy.electrical) && hasNumber(energy.evaporation) ? energy.electrical + energy.evaporation : null;
-  const campaignChain = Array.isArray(header.campaign_chain) ? header.campaign_chain.join("→") || "—" : "—";
+  // join() coerces before esc() can guard, so map entries through scalarText first.
+  const campaignChain = Array.isArray(header.campaign_chain)
+    ? header.campaign_chain.map(scalarText).join("→") || "—"
+    : "—";
   const status = artifact.execution_status;
-  const failureText = [artifact.failure?.reason, artifact.failure?.error_message].filter(Boolean).join(" · ") || "No failure reason or error message was emitted in this artifact.";
+  // join() coerces before esc() can guard, so scalar-check the parts first.
+  const failureText = [artifact.failure?.reason, artifact.failure?.error_message]
+    .filter(Boolean).map(scalarText).join(" · ")
+    || "No failure reason or error message was emitted in this artifact.";
   const costProvenance = typeof header.cost_block?.provenance === "string" && header.cost_block.provenance.trim()
     ? header.cost_block.provenance.trim()
     : null;
@@ -533,7 +545,8 @@ function provenanceSection(artifact) {
     ["Artifact schema", artifact.artifact_schema_version], ["Runner schema", meta.schema_version],
     ["Backend evidence", meta.evidence_class], ["Backend authoritative", meta.backend_authoritative],
     ["Certification allowed", meta.certification_allowed], ["Hours requested / completed", `${hoursRequested} / ${hoursCompleted}`],
-    ["Mass-balance residual", `${fmtNum(closure.residual_pct ?? closure.residual, "%")} · ${closure.basis || "basis not emitted"}`]
+    // Concatenation coerces before esc() can guard, so scalar-check the basis here.
+    ["Mass-balance residual", `${fmtNum(closure.residual_pct ?? closure.residual, "%")} · ${scalarText(closure.basis || "basis not emitted")}`]
   ];
   const identityFacts = [
     ["Kernel commit", artifact.header.engine_identity?.kernel_commit_sha],
@@ -570,7 +583,7 @@ function renderCurrent(artifact, index) {
   const hour = timestep.hour === undefined || timestep.hour === null ? "not emitted" : String(timestep.hour);
   const count = artifact.timesteps.length;
   const stepOutput = $("#step-output");
-  if (stepOutput) stepOutput.textContent = `Hour ${hour} · ${row.campaign ?? "campaign not emitted"}`;
+  if (stepOutput) stepOutput.textContent = `Hour ${hour} · ${scalarText(row.campaign ?? "campaign not emitted")}`;
   const pill = $("#step-position") || $("#step-pill") || $(".status-pill");
   if (pill) pill.textContent = `${index + 1} / ${count}`;
   const stepper = $("#stepper");

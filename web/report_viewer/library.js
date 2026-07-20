@@ -9,7 +9,12 @@ const isHashLike = (value) => typeof value === "string"
   && /^(?:[0-9a-f]{24,}|[0-9a-f]{8}-[0-9a-f-]{27,})$/i.test(value.trim());
 
 const $ = (selector, root = document) => root.querySelector(selector);
-const esc = (value) => String(value ?? "—").replace(/[&<>'"]/g, (character) => ({
+// Matches report-viewer: a non-scalar where text was expected is malformed
+// index data and says so, rather than coercing to "[object Object]" on screen.
+const scalarText = (value) => value !== null && typeof value === "object"
+  ? `malformed (${Array.isArray(value) ? "array" : "object"})`
+  : String(value ?? "—");
+const esc = (value) => scalarText(value).replace(/[&<>'"]/g, (character) => ({
   "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
 }[character]));
 const hasNumber = (value) => value !== null && value !== "" && Number.isFinite(Number(value));
@@ -118,9 +123,11 @@ function runMetaLine(run) {
   // Prefer structured fields over the API's yield-only summary string (often unformatted
   // multi-sig-fig noise that duplicates the yield chips).
   const parts = [];
+  // prettyFeedstock pretty-prints strings AND returns the malformed-marker for non-scalars
+  // (its own scalarText guard), so it subsumes the [object Object] fix here.
   if (run.feedstock_id) parts.push(prettyFeedstock(run.feedstock_id));
   if (Array.isArray(run.campaign_chain) && run.campaign_chain.length) {
-    parts.push(run.campaign_chain.map((step) => String(step)).join("→"));
+    parts.push(run.campaign_chain.map(scalarText).join("→"));
   }
   const hasYields = Boolean(
     run.headline_yields_kg
@@ -132,7 +139,7 @@ function runMetaLine(run) {
   if (hasNumber(run.hours)) parts.push(exactNumber(run.hours, "h"));
   if (hasNumber(run.peak_T_C)) parts.push(`peak ${exactNumber(run.peak_T_C, "°C")}`);
   if (run.created_at) {
-    const stamp = String(run.created_at);
+    const stamp = scalarText(run.created_at);
     const day = stamp.slice(0, 10);
     parts.push(/^\d{4}-\d{2}-\d{2}$/.test(day) ? day : stamp);
   }
