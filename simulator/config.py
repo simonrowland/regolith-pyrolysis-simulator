@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from copy import deepcopy
 from dataclasses import dataclass
+from functools import lru_cache
 from hashlib import sha256
 import json
 import math
@@ -114,21 +116,18 @@ def functional_data_yaml_digest(value: Any) -> str:
     return sha256(_FUNCTIONAL_DATA_DIGEST_PREFIX + canonical).hexdigest()
 
 
-def _load_required_yaml(
+@lru_cache(maxsize=32)
+def _parse_required_yaml(
+    raw: bytes,
+    functional_digest: bool,
     path: Path,
-    *,
-    functional_digest: bool = False,
 ) -> tuple[dict[str, Any], str]:
-    if not path.exists():
-        raise FileNotFoundError(f"required config file missing: {path}")
-    raw = path.read_bytes()
     parsed = yaml.safe_load(raw.decode("utf-8"))
     if not isinstance(parsed, dict):
         raise TypeError(
             f"required config file must have a mapping root: {path}; "
             f"got {type(parsed).__name__}"
         )
-    loaded = parsed
     digest = (
         # #89 review-fold: digest the ACTUAL parsed root, not the `or {}` fallback,
         # so a degenerate root ({}, [], null, empty file, scalar) hashes distinctly
@@ -137,7 +136,21 @@ def _load_required_yaml(
         if functional_digest
         else sha256(raw).hexdigest()
     )
-    return loaded, digest
+    return parsed, digest
+
+
+def _load_required_yaml(
+    path: Path,
+    *,
+    functional_digest: bool = False,
+) -> tuple[dict[str, Any], str]:
+    if not path.exists():
+        raise FileNotFoundError(f"required config file missing: {path}")
+    raw = path.read_bytes()
+    loaded, digest = _parse_required_yaml(raw, functional_digest, path)
+    # Cached parse results never escape: callers historically receive a fresh,
+    # mutable mapping on every load and may safely modify it in-place.
+    return deepcopy(loaded), digest
 
 
 def load_config_bundle(

@@ -76,6 +76,39 @@ def test_liquidus_finder_is_deterministic():
     assert first == second
 
 
+def test_liquidus_finder_reuses_duplicate_bisection_temperatures(monkeypatch):
+    sampled_temperatures: list[float] = []
+    remaining_seen: list[float] = []
+    clock = {'t': 0.0}
+
+    def step_fraction(temperature_C: float, remaining_budget_s=None) -> float:
+        sampled_temperatures.append(float(temperature_C))
+        remaining_seen.append(float(remaining_budget_s))
+        clock['t'] += 0.01
+        return 0.0 if temperature_C < 1250.0 else 1.0
+
+    monkeypatch.setattr(liquidus_module.time, 'monotonic', lambda: clock['t'])
+    result = find_liquidus_solidus_by_fraction(
+        step_fraction,
+        min_T_C=800.0,
+        max_T_C=1500.0,
+        scan_step_C=100.0,
+        tolerance_C=1.0,
+        budget_s=1.0,
+    )
+
+    assert result.status == 'ok'
+    assert result.solidus_T_C == pytest.approx(1249.21875)
+    assert result.liquidus_T_C == pytest.approx(1250.0)
+    assert result.iterations == 14
+    assert len(result.samples) == 22
+    assert len(sampled_temperatures) == 15
+    assert len(set(sampled_temperatures)) == 15
+    assert remaining_seen[0] == pytest.approx(1.0)
+    assert remaining_seen[-1] == pytest.approx(0.86)
+    assert result.diagnostics == {}
+
+
 def test_liquidus_finder_refuses_magemin_scale_nonmonotone_dip():
     # 0.09 / 0.33 / 0.05 MAGEMin frac_M dips were observed in the
     # 2026-05-26 freeze-gate flip blast-radius on lunar/mars C2A cases.

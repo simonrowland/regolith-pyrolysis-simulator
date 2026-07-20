@@ -297,7 +297,7 @@ def test_product_summary_sums_duplicate_volatile_species():
     (False, True),
     ids=("freeze_gate_off", "freeze_gate_on"),
 )
-@pytest.mark.serial  # ~163s MAGEMin freeze-gate; clips/SIGALRMs under xdist (AGENTS.md)
+@pytest.mark.serial  # Stubbed liquidus; retain serial until xdist/co-load is re-proven.
 @pytest.mark.xdist_group("serial")
 def test_c2a_staged_freeze_gate_on_closes_mass_balance(
     monkeypatch,

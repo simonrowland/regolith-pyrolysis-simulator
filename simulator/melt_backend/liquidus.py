@@ -14,7 +14,7 @@ from simulator.melt_backend.base import LiquidFractionInvalidError
 # MAGEMin-facing default only - the generic finder stays unbounded so
 # AlphaMELTS (and pure-function unit tests) are not silently wall-capped.
 #
-# Derivation for DEFAULT_LIQUIDUS_FINDER_BUDGET_S (900 s):
+# Derivation for DEFAULT_LIQUIDUS_FINDER_BUDGET_S (300 s):
 #   Premise: a legitimate real MAGEMin freeze-gate search on lunar mare
 #   is documented at ~163 s wall (37-point 400-2200 C / 50 C grid +
 #   bisection; AGENTS.md test-timeout invariant / M5 MacBook Pro).
@@ -23,13 +23,14 @@ from simulator.melt_backend.base import LiquidFractionInvalidError
 #   calls. Per-call timeout default is 60 s, so a between-calls-only
 #   budget would admit up to ~budget + 60 s of overrun per call; under
 #   per-call limits alone the pathological case is 101 * 60 s ~ 101 min.
-#   Algebra: budget >= n_calls * p95_call * headroom with headroom >= 2.
-#   Healthy p95 is far below the 60 s ceiling (order ~1-4 s); using a
-#   conservative 4 s p95: 101 * 4 * 2.2 ~ 890 s -> round to 900 s.
-#   Sanity: 900 / 163 ~ 5.5x headroom on the documented real search, and
-#   900 << 101 min so the aggregate still bounds the spinel-hang class.
+#   The shared warm pool now owns normal runtime liquidus searches under its
+#   separate 15 s budget. This default remains only for explicit cold-worker
+#   diagnostics. Preserve margin over the measured 163 s cold search without
+#   retaining the former pre-pool 900 s ceiling: 163 s * 1.8 = 293.4 s,
+#   rounded to 300 s. Sanity: 300 s is still 1.84x the cold measurement and
+#   far below 101 * 60 s, so it bounds the spinel-hang class.
 # Unit check: all terms in seconds; product is seconds.
-DEFAULT_LIQUIDUS_FINDER_BUDGET_S = 900.0
+DEFAULT_LIQUIDUS_FINDER_BUDGET_S = 300.0
 MAX_LIQUIDUS_SCAN_POINTS = 100_000
 LIQUIDUS_REFUSAL_STATUSES = frozenset({
     'not_converged',
@@ -259,6 +260,7 @@ def find_liquidus_solidus_by_fraction(
     liquid_threshold = 1.0 - float(liquid_epsilon)
     solid_threshold = float(solid_epsilon)
     samples: list[MeltFractionSample] = []
+    raw_fraction_by_temperature: dict[float, float] = {}
     smoothing_warnings: list[str] = []
     iterations = 0
     start_time = time.monotonic()
@@ -325,20 +327,25 @@ def find_liquidus_solidus_by_fraction(
         if remaining is not None and remaining <= 0.0:
             raise _LiquidusFinderBudgetExceeded(budget_warning())
         last_T_C = float(T_C)
-        try:
-            raw = _invoke_sample_fraction(
-                sample_fraction,
-                float(T_C),
-                remaining_budget_s=remaining,
-            )
-        except _LiquidusFinderBudgetExceeded:
-            raise
-        except Exception as exc:  # noqa: BLE001 - engine-boundary sample guard
-            _raise_budget_if_engine_exhausted(exc)
-            raise
+        temperature_C = float(T_C)
+        if temperature_C in raw_fraction_by_temperature:
+            raw = raw_fraction_by_temperature[temperature_C]
+        else:
+            try:
+                raw = _invoke_sample_fraction(
+                    sample_fraction,
+                    temperature_C,
+                    remaining_budget_s=remaining,
+                )
+            except _LiquidusFinderBudgetExceeded:
+                raise
+            except Exception as exc:  # noqa: BLE001 - engine-boundary sample guard
+                _raise_budget_if_engine_exhausted(exc)
+                raise
+            raw_fraction_by_temperature[temperature_C] = raw
         frac = _clamp_fraction(raw)
         point = _monotone_point(
-            MeltFractionSample(float(T_C), frac),
+            MeltFractionSample(temperature_C, frac),
             samples,
             tolerance=monotonicity_tolerance,
             smoothing_max=monotone_smoothing_max,

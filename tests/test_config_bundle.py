@@ -7,6 +7,7 @@ import shutil
 import pytest
 import yaml
 
+import simulator.config as config_module
 from simulator.config import (
     DEFAULT_DATA_DIR,
     functional_data_yaml_digest,
@@ -65,6 +66,40 @@ def test_load_config_bundle_digests_are_stable_and_scoped() -> None:
             )
         else:
             assert first.digests[name] == sha256(path.read_bytes()).hexdigest()
+
+
+def test_load_config_bundle_reuses_exact_yaml_parse_without_sharing_mutations(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    config_module._parse_required_yaml.cache_clear()
+    original_safe_load = yaml.safe_load
+    parse_calls = 0
+
+    def counted_safe_load(value: str) -> object:
+        nonlocal parse_calls
+        parse_calls += 1
+        return original_safe_load(value)
+
+    monkeypatch.setattr(config_module.yaml, "safe_load", counted_safe_load)
+    first = load_config_bundle()
+    first.setpoints["perf_cache_mutation_probe"] = True
+    second = load_config_bundle()
+
+    assert parse_calls == len(REQUIRED_CONFIGS)
+    assert "perf_cache_mutation_probe" not in second.setpoints
+
+
+def test_load_config_bundle_parse_cache_tracks_exact_file_bytes(tmp_path: Path) -> None:
+    _write_minimal_config_bundle(tmp_path)
+    first = load_config_bundle(tmp_path)
+    setpoints_path = tmp_path / REQUIRED_CONFIGS["setpoints"]
+    setpoints_path.write_text(setpoints_path.read_text() + "changed: true\n")
+
+    second = load_config_bundle(tmp_path)
+
+    assert "changed" not in first.setpoints
+    assert second.setpoints["changed"] is True
+    assert first.digests["setpoints"] != second.digests["setpoints"]
 
 
 def test_functional_data_digest_resolves_mre_canonical_voltage_tokens() -> None:

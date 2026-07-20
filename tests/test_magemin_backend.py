@@ -265,6 +265,10 @@ def test_magemin_liquidus_budget_is_tight_only_for_warm_pool(
     assert captured['budget_s'] == pytest.approx(expected_budget_s)
 
 
+def test_magemin_cold_liquidus_budget_retains_bounded_diagnostic_headroom():
+    assert liquidus_module.DEFAULT_LIQUIDUS_FINDER_BUDGET_S == pytest.approx(300.0)
+
+
 def test_magemin_and_alphamelts_reject_exact_major_oxide_boundary():
     boundary = {'SiO2': 50.0, 'MgO': 45.0}
 
