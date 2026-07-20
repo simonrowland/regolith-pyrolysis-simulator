@@ -136,6 +136,66 @@ setImmediate(() => process.stdout.write(report.innerHTML));
         assert "Pending W-A10" in completed.stdout
 
 
+def test_report_viewer_no_rows_pumping_is_pending_not_measured_zero() -> None:
+    root = Path(__file__).resolve().parents[1] / "web" / "report_viewer"
+    artifact = {
+        "artifact_schema_version": "0.2.0",
+        "execution_status": "partial",
+        "lifecycle": "cancelled",
+        "header": {"run_id": "zero-timestep"},
+        "timesteps": [],
+        "terminal": {
+            "run_metadata": {
+                "cost_rollup_diagnostic": {
+                    "pumping_diagnostic": {
+                        "status": "no_rows",
+                        "rows": [],
+                        "pumping_electrical_kWh": 0.0,
+                    }
+                }
+            }
+        },
+    }
+    harness = r"""
+const fs = require("fs");
+const vm = require("vm");
+const labelsSource = fs.readFileSync(process.argv[2], "utf8");
+const reportSource = fs.readFileSync(process.argv[3], "utf8");
+const report = { innerHTML: "" };
+const context = {
+  window: { location: { search: "" } },
+  document: {
+    title: "",
+    querySelector: (selector) => selector === "#report" ? report : null,
+    querySelectorAll: () => []
+  },
+  URLSearchParams,
+  encodeURIComponent,
+  fetch: async () => ({ ok: true, json: async () => JSON.parse(process.argv[4]) })
+};
+context.globalThis = context;
+vm.runInNewContext(labelsSource, context);
+vm.runInNewContext(reportSource, context);
+setImmediate(() => process.stdout.write(report.innerHTML));
+"""
+
+    completed = subprocess.run(
+        [
+            "node", "-", str(root / "labels.js"),
+            str(root / "report-viewer.js"), json.dumps(artifact),
+        ],
+        input=harness,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    html = completed.stdout
+
+    assert "Pumping energy</span><b>not computed — no rows" in html
+    assert "Pumping status</span><b>no_rows" in html
+    assert "Pumping energy</span><b><span title=\"0 kWh\">0 kWh" not in html
+
+
 def test_report_viewer_renders_account_disposition_without_yield_claims() -> None:
     root = Path(__file__).resolve().parents[1] / "web/report_viewer"
     artifact = {
