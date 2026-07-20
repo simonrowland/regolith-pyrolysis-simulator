@@ -48,17 +48,37 @@
       .sort(([left], [right]) => left.localeCompare(right));
   }
 
-  function speciesList(value, unit, emptyText) {
+  function speciesQuantityState(value) {
     const values = asMap(value);
-    if (!values) {
-      return `<div class="sec-p15-inline-pending">${esc("Pending — not emitted")}</div>`;
-    }
+    if (!values) return null;
     const entries = numericEntries(values);
-    if (!entries.length) {
-      const message = Object.keys(values).length ? "No numeric species values emitted" : emptyText;
+    return {
+      values,
+      positive: entries.filter(([, amount]) => amount > 0),
+      zero: entries.filter(([, amount]) => amount === 0),
+      negative: entries.filter(([, amount]) => amount < 0),
+      malformed: Object.entries(values).filter(([, amount]) => !hasNumber(amount)),
+    };
+  }
+
+  function speciesList(value, unit, emptyText) {
+    const state = speciesQuantityState(value);
+    if (!state) {
+      const message = value === undefined
+        ? "Pending — not emitted"
+        : "Pending — malformed species container emitted";
+      return `<div class="sec-p15-inline-pending">${esc(message)}</div>`;
+    }
+    if (state.negative.length || state.malformed.length) {
+      return `<div class="sec-p15-inline-pending">${esc("Pending — malformed species quantity emitted")}</div>`;
+    }
+    if (!state.positive.length) {
+      const message = state.zero.length
+        ? "Emitted zero species quantity"
+        : emptyText;
       return `<div class="sec-p15-empty">${esc(message)}</div>`;
     }
-    return `<ul class="sec-p15-species-list">${entries.map(([species, amount]) => (
+    return `<ul class="sec-p15-species-list">${state.positive.map(([species, amount]) => (
       `<li><i style="--sec-p15-species:${esc(speciesColor(species))}"></i>` +
       `<span>${esc(prettySpecies(species))}</span><strong>${esc(fmtNum(amount, unit))}</strong></li>`
     )).join("")}</ul>`;
@@ -71,8 +91,15 @@
   }
 
   function flagChip(label, value) {
-    if (typeof value !== "string" || !value.trim()) return "";
-    return `<span class="sec-p15-flag" title="${esc(value)}">${esc(label)} · ${esc(readableToken(value))}</span>`;
+    let rendered;
+    if (typeof value === "boolean") {
+      rendered = value ? "engaged" : "not engaged";
+    } else if (typeof value === "string" && value.trim()) {
+      rendered = readableToken(value);
+    } else {
+      return "";
+    }
+    return `<span class="sec-p15-flag" title="${esc(String(value))}">${esc(label)} · ${esc(rendered)}</span>`;
   }
 
   function stageSpeciesGroup(label, value) {
@@ -86,15 +113,25 @@
       : stageDefinition.label;
     const active = stageDefinition.campaigns.includes(campaign);
     const activeClass = active ? " sec-p15-stage--active" : "";
-    const productClass = stageDefinition.productSpecies ? " sec-p15-stage--product" : "";
-    const productStyle = stageDefinition.productSpecies
+    const designated = asMap(stage?.designated_species_kg);
+    const emittedProduct = Boolean(
+      stageDefinition.productSpecies &&
+      designated &&
+      hasNumber(designated[stageDefinition.productSpecies]) &&
+      designated[stageDefinition.productSpecies] > 0
+    );
+    const productClass = emittedProduct ? " sec-p15-stage--product" : "";
+    const productStyle = emittedProduct
       ? ` style="--sec-p15-product:${esc(speciesColor(stageDefinition.productSpecies))}"`
       : "";
-    const activeText = active ? " · viewer campaign focus" : "";
+    const routeNote = stageDefinition.productSpecies
+      ? `<span class="sec-p15-stage-route">${esc(`Designed product route · ${prettySpecies(stageDefinition.productSpecies)} · collection not implied`)}</span>`
+      : "";
+    const activeText = active ? " · designed campaign-route focus; activity not emitted" : "";
     if (!stage) {
       return `<article class="sec-p15-stage${productClass}${activeClass}" data-stage="${stageDefinition.key}"${productStyle} aria-label="${esc(`${label}${activeText}`)}">` +
         `<div class="sec-p15-stage-number">${esc(String(STAGES.indexOf(stageDefinition)))}</div>` +
-        `<h4>${esc(label)}</h4><div class="sec-p15-inline-pending">${esc("Terminal stage snapshot pending — not emitted")}</div>` +
+        `<h4>${esc(label)}</h4>${routeNote}<div class="sec-p15-inline-pending">${esc("Terminal stage snapshot pending — not emitted")}</div>` +
         `</article>`;
     }
 
@@ -110,9 +147,9 @@
       : "";
     return `<article class="sec-p15-stage${productClass}${activeClass}" data-stage="${stageDefinition.key}"${productStyle} aria-label="${esc(`${label}${activeText}`)}">` +
       `<div class="sec-p15-stage-number">${esc(String(STAGES.indexOf(stageDefinition)))}</div>` +
-      `<h4>${esc(label)}</h4>` +
+      `<h4>${esc(label)}</h4>${routeNote}` +
       `<span class="sec-p15-verdict${verdictClass}">${esc(verdict)}</span>${emptyStage}${warning}` +
-      metric("Accepted mass (designated + coproduct)", stage.designated_kg, "kg") +
+      metric("Designated + coproduct mass", stage.designated_kg, "kg") +
       metric("Impurity mass", stage.impurity_kg, "kg") +
       metric("Emitted purity fraction", stage.purity_fraction, "") +
       `<details class="sec-p15-stage-detail"><summary>Terminal species split</summary>` +
@@ -124,16 +161,26 @@
 
   function pipeSegment(summary, index) {
     const segment = `stage_${index}_to_stage_${index + 1}`;
+    const containerPresent = hasOwn(summary, "wall_deposit_cumulative_kg");
     const deposits = asMap(summary.wall_deposit_cumulative_kg);
-    const emittedSegment = deposits && hasOwn(deposits, segment) ? asMap(deposits[segment]) : null;
-    const entries = numericEntries(emittedSegment);
-    const description = entries.length
-      ? `Cumulative wall deposit, stage ${index} to ${index + 1}: ${entries.map(([species, amount]) => `${prettySpecies(species)} ${fmtNum(amount, "kg")}`).join(", ")}`
-      : `Cumulative wall deposit not emitted for stage ${index} to ${index + 1} at this hour`;
-    const stripes = entries.length
-      ? entries.map(([species]) => `<i style="--sec-p15-species:${esc(speciesColor(species))}"></i>`).join("")
+    const segmentPresent = Boolean(deposits && hasOwn(deposits, segment));
+    const state = segmentPresent ? speciesQuantityState(deposits[segment]) : null;
+    let description;
+    if (!containerPresent) {
+      description = `Cumulative wall deposit not emitted for stage ${index} to ${index + 1} at this hour`;
+    } else if (!deposits || (segmentPresent && !state) || state?.negative.length || state?.malformed.length) {
+      description = `Cumulative wall deposit malformed for stage ${index} to ${index + 1} at this hour`;
+    } else if (!segmentPresent || (!state.positive.length && !state.zero.length)) {
+      description = `No non-negligible cumulative wall deposit recorded for stage ${index} to ${index + 1}`;
+    } else if (!state.positive.length) {
+      description = `Cumulative wall deposit emitted as zero for stage ${index} to ${index + 1}`;
+    } else {
+      description = `Cumulative wall deposit, stage ${index} to ${index + 1}: ${state.positive.map(([species, amount]) => `${prettySpecies(species)} ${fmtNum(amount, "kg")}`).join(", ")}`;
+    }
+    const stripes = state?.positive.length && !state.negative.length && !state.malformed.length
+      ? state.positive.map(([species]) => `<i style="--sec-p15-species:${esc(speciesColor(species))}"></i>`).join("")
       : `<i class="sec-p15-pipe-empty"></i>`;
-    return `<div class="sec-p15-pipe" aria-label="${esc(description)}" title="${esc(description)}">` +
+    return `<div class="sec-p15-pipe" data-segment="${esc(segment)}" aria-label="${esc(description)}" title="${esc(description)}">` +
       `<span class="sec-p15-pipe-flow">→</span><span class="sec-p15-pipe-coating">${stripes}</span></div>`;
   }
 
@@ -214,24 +261,50 @@
   }
 
   function vaporArrows(summary) {
-    const flux = asMap(summary.vapor_species_kg_hr);
-    const entries = numericEntries(flux);
-    if (!flux) {
+    const fieldPresent = hasOwn(summary, "vapor_species_kg_hr");
+    const state = speciesQuantityState(summary.vapor_species_kg_hr);
+    if (!fieldPresent) {
       return `<div class="sec-p15-vapor sec-p15-vapor--pending" aria-label="${esc("Vapor flux not emitted")}"><i>↑</i></div>`;
     }
-    if (!entries.length) {
-      return `<div class="sec-p15-vapor" aria-label="${esc("No positive vapor species emitted this hour")}"><i>↑</i></div>`;
+    if (!state || state.negative.length || state.malformed.length) {
+      return `<div class="sec-p15-vapor sec-p15-vapor--pending" aria-label="${esc("Vapor flux malformed — negative or non-numeric species quantity emitted")}"><i>↑</i></div>`;
     }
-    return `<div class="sec-p15-vapor" aria-label="Evolved vapor flux">${entries.map(([species, amount]) => (
+    if (!state.positive.length) {
+      const description = state.zero.length
+        ? "Vapor species emitted as zero this hour"
+        : "No non-negligible vapor species recorded this hour";
+      return `<div class="sec-p15-vapor" aria-label="${esc(description)}"><i>↑</i></div>`;
+    }
+    return `<div class="sec-p15-vapor" aria-label="Evolved vapor flux">${state.positive.map(([species, amount]) => (
       `<i style="--sec-p15-species:${esc(speciesColor(species))}" title="${esc(`${prettySpecies(species)} evolved vapor flux ${fmtNum(amount, "kg/h")}`)}">↑</i>`
     )).join("")}</div>`;
   }
 
   function tapCard(label, poolName, stratification) {
-    const carried = asMap(stratification?.carried_mol);
-    const emitted = carried && hasOwn(carried, poolName) ? carried[poolName] : null;
+    const poolsPresent = Boolean(stratification && hasOwn(stratification, "pool_mol_after"));
+    const rawPools = stratification?.pool_mol_after;
+    const pools = asMap(rawPools);
+    const emitted = !poolsPresent
+      ? undefined
+      : (!pools ? rawPools : (hasOwn(pools, poolName) ? pools[poolName] : undefined));
     return `<div class="sec-p15-tap" data-pool="${poolName}"><span>${esc(label)}</span>` +
-      speciesList(emitted, "mol", "No positive tap-carried mol emitted") + `</div>`;
+      speciesList(emitted, "mol", "No positive diagnostic pool inventory emitted") + `</div>`;
+  }
+
+  function densityProvenanceFlags(stratification) {
+    const pools = asMap(stratification?.pools);
+    if (!pools) return [];
+    const flags = [];
+    Object.entries(pools).forEach(([poolName, pool]) => {
+      const provenance = asMap(asMap(pool)?.density_correlation_provenance);
+      Object.entries(provenance || {}).forEach(([species, record]) => {
+        flags.push(flagChip(
+          `${readableToken(poolName)} ${prettySpecies(species)} density provenance`,
+          asMap(record)?.status
+        ));
+      });
+    });
+    return [...new Set(flags.filter(Boolean))];
   }
 
   function tapAuthority(stratification) {
@@ -244,6 +317,9 @@
       flagChip("Source", provenance?.account_state_source),
       flagChip("Derivation", provenance?.diagnostic_derivation),
       flagChip("Behavior", stratification.existing_extraction_behavior),
+      flagChip("Melt density fallback", stratification.melt_density_fallback_engaged),
+      flagChip("Melt density tier", stratification.melt_density_tier),
+      ...densityProvenanceFlags(stratification),
     ].filter(Boolean);
     return flags.length
       ? `<div class="sec-p15-flags">${flags.join("")}</div>`
@@ -258,24 +334,25 @@
       `<span>${esc("Current melt mass pending")}</span></div></div>` +
       `<div class="sec-p15-charge">${esc(hasNumber(charge) ? `${fmtNum(charge, "kg")} initial charge` : "Initial charge not emitted")}` +
       `<small>${esc("Per-hour melt mass is not emitted; depletion is not derived from routed yields")}</small></div>` +
-      `<div class="sec-p15-tap-arrow">↓</div><div class="sec-p15-taps">` +
-      tapCard("Bottom-pool tap view · diagnostic carried mol", "bottom_pool", stratification) +
-      tapCard("Float-layer skim view · diagnostic carried mol", "float_layer", stratification) +
-      `</div><details class="sec-p15-authority"><summary>Tap authority</summary>${tapAuthority(stratification)}</details></div>`;
+      `<div class="sec-p15-tap-arrow" aria-label="${esc("Tap route shown; tap flow and disposition not emitted")}">↓` +
+      `<span>${esc("Tap flow / disposition pending — not emitted")}</span></div><div class="sec-p15-taps">` +
+      tapCard("Bottom-pool diagnostic inventory · no tap gate", "bottom_pool", stratification) +
+      tapCard("Float-layer diagnostic inventory · no tap gate", "float_layer", stratification) +
+      `</div><div class="sec-p15-authority"><strong>${esc("Diagnostic authority")}</strong>${tapAuthority(stratification)}</div></div>`;
   }
 
   function trainTotal(summary) {
-    const train = asMap(summary.condensation_train_kg);
+    const train = summary.condensation_train_kg;
     return `<div class="sec-p15-readout"><span>${esc("Cumulative train species inventory · selected hour")}</span>` +
       speciesList(train, "kg", "No positive train inventory emitted") +
       `<small>${esc("One train-wide species map; not allocated to stages")}</small></div>`;
   }
 
   function pulledFromPot(summary) {
-    const yields = asMap(summary.metal_yields_kg);
-    return `<div class="sec-p15-readout"><span>${esc("Pulled from pot · cumulative routed mass")}</span>` +
-      speciesList(yields, "kg", "No positive routed mass emitted") +
-      `<small>${esc("Readout only; never used as a condenser fill")}</small></div>`;
+    const yields = summary.metal_yields_kg;
+    return `<div class="sec-p15-readout" data-readout="metal-product-yields"><span>${esc("Metal product yields · cumulative product-ledger projection")}</span>` +
+      speciesList(yields, "kg", "No positive metal product yield emitted") +
+      `<small>${esc("Route-wide product readout only; never used as a condenser fill")}</small></div>`;
   }
 
   function pumpAndVent(summary) {
@@ -313,9 +390,15 @@
     const hour = timestep.hour === null || timestep.hour === undefined
       ? "not emitted"
       : scalarText(timestep.hour);
+    const focusedStage = STAGES.find((stage) => stage.campaigns.includes(campaign));
+    const focusText = focusedStage
+      ? `Designed campaign-route cue: ${focusedStage.label} · not emitted stage activity`
+      : (campaign === "campaign not emitted"
+        ? "Campaign-to-stage focus pending — campaign not emitted"
+        : `Campaign-to-stage map not emitted for ${campaign}; no stage glow inferred`);
     return `<div class="sec-p15-now"><div><span>${esc("Selected timestep")}</span>` +
       `<strong>Hour ${esc(hour)} · ${esc(campaign)}</strong></div>` +
-      `<small>${esc("Campaign glow is viewer context only; stage contents remain terminal snapshots")}</small></div>` +
+      `<small>${esc(focusText)}</small></div>` +
       `<div class="sec-p15-process-grid">` +
       `<div class="sec-p15-zone sec-p15-zone--cryo"><span class="sec-p15-kicker">Cryo train</span>${cryoStore(timestep)}${sourceSideO2(summary)}</div>` +
       `<div class="sec-p15-zone sec-p15-zone--pot"><span class="sec-p15-kicker">Melt pot + taps</span>${meltPot(artifact, summary)}</div>` +
@@ -342,8 +425,8 @@
     return `<section class="sec-p15-equipment" id="${PANEL_ID}">` +
       `<h2><span class="sect">15</span>${esc("Equipment process schematic")}</h2>` +
       `<p class="sub">${esc("Scrub-driven artifact view · route-specific inventories · terminal condenser snapshots")}</p>` +
-      `<div class="sec-p15-legend"><span>${esc("Solid colour = emitted species")}</span>` +
-      `<span>${esc("Dashed = pending / not emitted")}</span><span>${esc("Glow = viewer campaign focus")}</span></div>` +
+      `<div class="sec-p15-legend"><span>${esc("Solid colour = positive emitted species")}</span>` +
+      `<span>${esc("Dashed = pending / not emitted")}</span><span>${esc("Glow = designed campaign-route cue, not emitted activity")}</span></div>` +
       `<div class="sec-p15-sr-only" id="${STATUS_ID}" role="status" aria-live="polite" aria-atomic="true">${esc(timestepStatus(artifact, 0))}</div>` +
       `<div class="sec-p15-equipment-state" id="${STATE_ID}">${equipmentState(artifact, 0)}</div>` +
       `</section>`;

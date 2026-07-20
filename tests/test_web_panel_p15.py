@@ -79,6 +79,86 @@ def _account_segment(html: str, account: str) -> str:
     return match.group(0)
 
 
+def _pipe_segment(html: str, segment: str) -> str:
+    match = re.search(
+        rf'<div class="sec-p15-pipe" data-segment="{re.escape(segment)}".*?</div>',
+        html,
+        flags=re.DOTALL,
+    )
+    assert match is not None
+    return match.group(0)
+
+
+def _tap_card(html: str, pool: str) -> str:
+    match = re.search(
+        rf'<div class="sec-p15-tap" data-pool="{re.escape(pool)}">.*?</(?:ul|div)></div>',
+        html,
+        flags=re.DOTALL,
+    )
+    assert match is not None
+    return match.group(0)
+
+
+def _readout(html: str, key: str) -> str:
+    match = re.search(
+        rf'<div class="sec-p15-readout" data-readout="{re.escape(key)}">.*?</small></div>',
+        html,
+        flags=re.DOTALL,
+    )
+    assert match is not None
+    return match.group(0)
+
+
+def _selected_timestep(html: str) -> str:
+    match = re.search(
+        r'<div class="sec-p15-now">.*?</small></div>',
+        html,
+        flags=re.DOTALL,
+    )
+    assert match is not None
+    return match.group(0)
+
+
+def _source_o2(html: str) -> str:
+    match = re.search(
+        r'<div class="sec-p15-source-o2(?: [^"]*)?">.*?</div>',
+        html,
+        flags=re.DOTALL,
+    )
+    assert match is not None
+    return match.group(0)
+
+
+def _gas_dome(html: str) -> str:
+    match = re.search(
+        r'<div class="sec-p15-dome">.*?</div></div>',
+        html,
+        flags=re.DOTALL,
+    )
+    assert match is not None
+    return match.group(0)
+
+
+def _vapor(html: str) -> str:
+    match = re.search(
+        r'<div class="sec-p15-vapor[^"]*"[^>]*>.*?</div>',
+        html,
+        flags=re.DOTALL,
+    )
+    assert match is not None
+    return match.group(0)
+
+
+def _authority(html: str) -> str:
+    match = re.search(
+        r'<div class="sec-p15-authority">.*?</div></div>',
+        html,
+        flags=re.DOTALL,
+    )
+    assert match is not None
+    return match.group(0)
+
+
 def _stage_purity() -> dict:
     return {
         "stage_0": {
@@ -135,6 +215,8 @@ def test_present_artifact_renders_route_specific_values_and_authority() -> None:
                     "metal_phase_stratification": {
                         "status": "diagnostic_only_no_tap_gate",
                         "existing_extraction_behavior": "unchanged_diagnostic_only",
+                        "melt_density_fallback_engaged": True,
+                        "melt_density_tier": "fallback_basaltic_melt_constant_engine_density_unavailable",
                         "provenance": {
                             "account_state_source": "builtin-authored",
                             "diagnostic_derivation": "builtin-committed"
@@ -142,6 +224,17 @@ def test_present_artifact_renders_route_specific_values_and_authority() -> None:
                         "carried_mol": {
                             "bottom_pool": {"Fe": 3.5},
                             "float_layer": {"Al": 1.25},
+                        },
+                        "pool_mol_after": {
+                            "bottom_pool": {"Fe": 4.5},
+                            "float_layer": {"Al": 2.25},
+                        },
+                        "pools": {
+                            "bottom_pool": {
+                                "density_correlation_provenance": {
+                                    "Fe": {"status": "extrapolated_below_valid_range"}
+                                }
+                            }
                         },
                     },
                 },
@@ -163,15 +256,22 @@ def test_present_artifact_renders_route_specific_values_and_authority() -> None:
     assert 'id="p15-equipment-state" aria-live' not in html
     assert 'id="p15-equipment-status" role="status" aria-live="polite"' in html
     assert "Hour 28 · C2B" in html
-    assert metric_label in html
-    assert "18 kg" in html
-    assert "3.5 mol" in html
-    assert "1.25 mol" in html
+    source_o2 = _source_o2(html)
+    assert metric_label in source_o2
+    assert "18 kg" in source_o2
+    assert "4.5 mol" in _tap_card(html, "bottom_pool")
+    assert "2.25 mol" in _tap_card(html, "float_layer")
+    assert "3.5 mol" not in _tap_card(html, "bottom_pool")
+    assert "1.25 mol" not in _tap_card(html, "float_layer")
     assert "Status · diagnostic only no tap gate" in html
     assert "Source · builtin authored" in html
     assert "Derivation · builtin committed" in html
     assert "Behavior · unchanged diagnostic only" in html
-    assert "Bottom-pool tap view · diagnostic carried mol" in html
+    assert "Melt density fallback · engaged" in html
+    assert "Melt density tier · fallback basaltic melt constant engine density unavailable" in html
+    assert "bottom pool Fe density provenance · extrapolated below valid range" in html
+    assert "Bottom-pool diagnostic inventory · no tap gate" in html
+    assert "Tap flow / disposition pending — not emitted" in html
     assert "carrier separation / recycle target · recovery not emitted" in html
     assert "CONTAMINATED" in html
     assert "non-designated condensate present" in html
@@ -184,10 +284,12 @@ def test_present_artifact_renders_route_specific_values_and_authority() -> None:
     stage_one = _stage_card(html, "stage_1_fe_condenser")
     assert "sec-p15-stage--active" in stage_one
     assert "sec-p15-stage--product" in stage_one
+    assert "Designated + coproduct mass" in stage_one
+    assert "Accepted mass" not in stage_one
     assert "5.00e-6 kg" in stage_one
     assert "132 kg" not in stage_one
-    assert "sec-p15-stage--product" in _stage_card(html, "stage_3_sio_zone")
-    assert "sec-p15-stage--product" in _stage_card(
+    assert "sec-p15-stage--product" not in _stage_card(html, "stage_3_sio_zone")
+    assert "sec-p15-stage--product" not in _stage_card(
         html, "stage_4_alkali_mg_cyclone"
     )
 
@@ -210,14 +312,16 @@ def test_sparse_o2_accounts_stay_separate_and_missing_bin_is_pending() -> None:
                 "hour": 28,
                 "summary": {"campaign": "C0"},
                 "ledger": {
-                    "terminal.oxygen_melt_offgas_stored": {"O2": 2.0}
+                    "terminal.oxygen_melt_offgas_stored": {"O2": 2.0},
+                    "terminal.oxygen_melt_offgas_vented_to_vacuum": {"O2": 99.0},
                 },
             },
             {
                 "hour": 79,
                 "summary": {"campaign": "C5"},
                 "ledger": {
-                    "terminal.oxygen_mre_anode_stored": {"O2": 8.0}
+                    "terminal.oxygen_mre_anode_stored": {"O2": 8.0},
+                    "terminal.oxygen_melt_offgas_vented_to_vacuum": {"O2": 99.0},
                 },
             },
         ],
@@ -240,13 +344,18 @@ def test_sparse_o2_accounts_stay_separate_and_missing_bin_is_pending() -> None:
         second, "terminal.oxygen_melt_offgas_stored"
     )
     assert "10 mol" not in first + second
+    assert "99 mol" not in first + second
+    assert "vented_to_vacuum" not in first + second
     assert "total stored" not in (first + second).lower()
     assert "Separate raw-ledger bins · mol · no combined total" in first
 
 
 def test_partial_inputs_do_not_feed_missing_backend_values() -> None:
     artifact = {
-        "header": {"charge_mass_kg": 1000.0},
+        "header": {
+            "charge_mass_kg": 1000.0,
+            "effective_config": {"carrier_identity": "He", "p_carrier_bar": 0.9},
+        },
         "timesteps": [
             {
                 "hour": 12,
@@ -254,7 +363,6 @@ def test_partial_inputs_do_not_feed_missing_backend_values() -> None:
                     "campaign": "C2B",
                     "P_total_bar": 1.2,
                     "pO2_bar": 0.2,
-                    "carrier_identity": "He",
                     "O2_metric_label": "source-side potential (not recovered)",
                     "metal_yields_kg": {"Fe": 132.0},
                     "wall_deposit_delta_kg": {
@@ -265,7 +373,7 @@ def test_partial_inputs_do_not_feed_missing_backend_values() -> None:
                         "pools": {
                             "bottom_pool": {"species_mol": {"Fe": 7.0}}
                         },
-                        "pool_mol_after": {"bottom_pool": {"Fe": 7.0}},
+                        "pool_mol_after": {"bottom_pool": {"Fe": 6.0}},
                     },
                 },
                 "ledger": {
@@ -292,13 +400,16 @@ def test_partial_inputs_do_not_feed_missing_backend_values() -> None:
     stage_one = _stage_card(html, "stage_1_fe_condenser")
 
     assert "carrier pressure not emitted" in html
+    assert "carrier not emitted" in _gas_dome(html)
+    assert "He" not in _gas_dome(html)
     assert "Cumulative train species inventory · selected hour" in html
     assert "Source-side O₂ readout pending" in html
     assert "Current melt mass pending" in html
     assert "Per-hour per-stage inventory pending producer emit" in html
     assert stage_one.count("Pending — not emitted") >= 2
     assert "1 bar" not in html
-    assert "7 mol" not in html
+    assert "6 mol" in _tap_card(html, "bottom_pool")
+    assert "7 mol" not in _tap_card(html, "bottom_pool")
     assert "7 kg" not in html
     assert "4.2 kg" not in html
     assert "12 kg" not in html
@@ -314,7 +425,7 @@ def test_on_timestep_scrub_updates_hour_campaign_taps_o2_and_coating() -> None:
                 "summary": {
                     "campaign": "C2B",
                     "metal_phase_stratification": {
-                        "carried_mol": {
+                        "pool_mol_after": {
                             "bottom_pool": {"Fe": 1.0},
                             "float_layer": {},
                         }
@@ -332,7 +443,7 @@ def test_on_timestep_scrub_updates_hour_campaign_taps_o2_and_coating() -> None:
                 "summary": {
                     "campaign": "C4",
                     "metal_phase_stratification": {
-                        "carried_mol": {
+                        "pool_mol_after": {
                             "bottom_pool": {},
                             "float_layer": {"Mg": 2.0},
                         }
@@ -357,8 +468,11 @@ def test_on_timestep_scrub_updates_hour_campaign_taps_o2_and_coating() -> None:
     assert "Hour 79 · C4" in second
     assert second_result["statusText"] == "Hour 79 · C4"
     assert "Hour 28 · C2B" not in second
-    assert "2 mol" in second
-    assert "0.4 kg" in second
+    assert "2 mol" in _tap_card(second, "float_layer")
+    target_pipe = _pipe_segment(second, "stage_3_to_stage_4")
+    assert "Cumulative wall deposit, stage 3 to 4: Mg 0.4 kg" in target_pipe
+    assert "0.4 kg" not in _pipe_segment(second, "stage_2_to_stage_3")
+    assert "0.4 kg" not in _pipe_segment(second, "stage_4_to_stage_5")
     assert "8 mol" in _account_segment(
         second, "terminal.oxygen_mre_anode_stored"
     )
@@ -377,7 +491,7 @@ def test_artifact_values_are_escaped_in_rendered_output() -> None:
             {
                 "hour": "<img src=x onerror=hour>",
                 "summary": {
-                    "campaign": "<img src=x onerror=campaign>",
+                    "campaign": "<img src=x onerror=campaign_unique>",
                     "carrier_identity": "<script>alert(1)</script>",
                     "O2_yield_kg_cumulative": 1.0,
                     "O2_metric_label": "source <svg/onload=metric>",
@@ -406,6 +520,7 @@ def test_artifact_values_are_escaped_in_rendered_output() -> None:
     }
 
     html = _run_panel(artifact)["html"]
+    selected = _selected_timestep(html)
 
     assert "<img" not in html
     assert "<script" not in html
@@ -413,3 +528,258 @@ def test_artifact_values_are_escaped_in_rendered_output() -> None:
     assert "&lt;img" in html
     assert "&lt;script&gt;" in html
     assert "&lt;svg/onload=metric&gt;" in html
+    assert "<strong>Hour &lt;img src=x onerror=hour&gt; · &lt;img src=x onerror=campaign_unique&gt;</strong>" in selected
+    assert "&amp;lt;img src=x onerror=campaign_unique" not in selected
+
+
+def test_diagnostic_pool_inventory_and_density_authority_use_emitted_values() -> None:
+    artifact = {
+        "timesteps": [
+            {
+                "hour": 32,
+                "summary": {
+                    "campaign": "C2B",
+                    "metal_phase_stratification": {
+                        "status": "diagnostic_only_no_tap_gate",
+                        "carried_mol": {"bottom_pool": {"Fe": 1.0}},
+                        "assigned_mol": {"bottom_pool": {"Fe": 8.0}},
+                        "pool_mol_after": {
+                            "bottom_pool": {"Fe": 10.0},
+                            "float_layer": {},
+                        },
+                        "melt_density_fallback_engaged": True,
+                        "melt_density_tier": "fallback_basaltic_melt_constant_engine_density_unavailable",
+                        "pools": {
+                            "bottom_pool": {
+                                "density_correlation_provenance": {
+                                    "Fe": {"status": "extrapolated_below_valid_range"}
+                                }
+                            }
+                        },
+                    },
+                },
+                "ledger": {},
+            },
+            {
+                "hour": 33,
+                "summary": {
+                    "campaign": "C2B",
+                    "metal_phase_stratification": {
+                        "status": "diagnostic_only_no_tap_gate",
+                        "carried_mol": {"bottom_pool": {"Fe": 1.0}},
+                        "assigned_mol": {"bottom_pool": {"Fe": 8.0}},
+                        "pools": {
+                            "bottom_pool": {
+                                "density_correlation_provenance": {}
+                            }
+                        }
+                    },
+                },
+                "ledger": {},
+            },
+            {
+                "hour": 34,
+                "summary": {
+                    "campaign": "C2B",
+                    "metal_phase_stratification": {
+                        "status": "diagnostic_only_no_tap_gate",
+                        "pool_mol_after": None,
+                    },
+                },
+                "ledger": {},
+            },
+            {
+                "hour": 35,
+                "summary": {
+                    "campaign": "C2B",
+                    "metal_phase_stratification": {
+                        "status": "diagnostic_only_no_tap_gate",
+                        "pool_mol_after": {"bottom_pool": {}},
+                    },
+                },
+                "ledger": {},
+            },
+        ],
+        "terminal": {"stage_purity": {}},
+    }
+
+    html = _run_panel(artifact)["html"]
+    bottom_pool = _tap_card(html, "bottom_pool")
+    authority = _authority(html)
+    partial_pool = _tap_card(_run_panel(artifact, 1)["stateHtml"], "bottom_pool")
+    malformed_pool = _tap_card(_run_panel(artifact, 2)["stateHtml"], "bottom_pool")
+    missing_sibling_pool = _tap_card(
+        _run_panel(artifact, 3)["stateHtml"], "float_layer"
+    )
+
+    assert "Bottom-pool diagnostic inventory · no tap gate" in bottom_pool
+    assert "10 mol" in bottom_pool
+    assert "1 mol" not in bottom_pool
+    assert "9 mol" not in bottom_pool
+    assert "tap-carried" not in bottom_pool
+    assert "Melt density fallback · engaged" in authority
+    assert "Melt density tier · fallback basaltic melt constant engine density unavailable" in authority
+    assert "bottom pool Fe density provenance · extrapolated below valid range" in authority
+    assert "Pending — not emitted" in partial_pool
+    assert "9 mol" not in partial_pool
+    assert "Pending — malformed species container emitted" in malformed_pool
+    assert "Pending — not emitted" in missing_sibling_pool
+    assert "No positive diagnostic pool inventory emitted" not in missing_sibling_pool
+
+
+def test_product_stripe_requires_positive_matching_emitted_species() -> None:
+    stages = _stage_purity()
+    stages["stage_3_sio_zone"] = {
+        "label": "SiO Zone",
+        "designated_species_kg": {"Fe": 1.0},
+        "coproduct_species_kg": {},
+        "impurity_species_kg": {},
+        "designated_kg": 0.0,
+        "impurity_kg": 0.0,
+        "total_kg": 0.0,
+        "purity_fraction": 1.0,
+        "verdict": "PURE",
+    }
+    artifact = {
+        "timesteps": [{"hour": 1, "summary": {"campaign": "C0"}, "ledger": {}}],
+        "terminal": {"stage_purity": stages},
+    }
+
+    html = _run_panel(artifact)["html"]
+    fe_stage = _stage_card(html, "stage_1_fe_condenser")
+    sio_stage = _stage_card(html, "stage_3_sio_zone")
+    mg_stage = _stage_card(html, "stage_4_alkali_mg_cyclone")
+
+    assert "sec-p15-stage--product" in fe_stage
+    assert "sec-p15-stage--product" not in sio_stage
+    assert "sec-p15-stage--product" not in mg_stage
+    assert "Designed product route · SiO · collection not implied" in sio_stage
+    assert "Designed product route · Mg · collection not implied" in mg_stage
+
+
+def test_species_presence_visuals_distinguish_absent_empty_zero_and_malformed() -> None:
+    artifact = {
+        "timesteps": [
+            {"hour": 0, "summary": {"campaign": "C0"}, "ledger": {}},
+            {
+                "hour": 1,
+                "summary": {
+                    "campaign": "C0",
+                    "wall_deposit_cumulative_kg": {},
+                    "vapor_species_kg_hr": {},
+                },
+                "ledger": {},
+            },
+            {
+                "hour": 2,
+                "summary": {
+                    "campaign": "C0",
+                    "wall_deposit_cumulative_kg": {
+                        "stage_0_to_stage_1": {"Fe": 0.0}
+                    },
+                    "vapor_species_kg_hr": {"Fe": 0.0},
+                },
+                "ledger": {},
+            },
+            {
+                "hour": 3,
+                "summary": {
+                    "campaign": "C0",
+                    "wall_deposit_cumulative_kg": {
+                        "stage_0_to_stage_1": {"Fe": -1.0}
+                    },
+                    "vapor_species_kg_hr": {"Fe": -1.0},
+                    "metal_yields_kg": None,
+                },
+                "ledger": {},
+            },
+        ],
+        "terminal": {"stage_purity": {}},
+    }
+
+    absent = _run_panel(artifact, 0)["stateHtml"]
+    empty = _run_panel(artifact, 1)["stateHtml"]
+    zero = _run_panel(artifact, 2)["stateHtml"]
+    malformed = _run_panel(artifact, 3)["stateHtml"]
+
+    assert "Cumulative wall deposit not emitted for stage 0 to 1" in _pipe_segment(
+        absent, "stage_0_to_stage_1"
+    )
+    assert "Vapor flux not emitted" in _vapor(absent)
+    assert "Pending — not emitted" in _readout(absent, "metal-product-yields")
+    assert "No non-negligible cumulative wall deposit recorded for stage 0 to 1" in _pipe_segment(
+        empty, "stage_0_to_stage_1"
+    )
+    assert "No non-negligible vapor species recorded this hour" in _vapor(empty)
+    assert "Cumulative wall deposit emitted as zero for stage 0 to 1" in _pipe_segment(
+        zero, "stage_0_to_stage_1"
+    )
+    assert "--sec-p15-species" not in _pipe_segment(zero, "stage_0_to_stage_1")
+    assert "Vapor species emitted as zero this hour" in _vapor(zero)
+    assert "evolved vapor flux" not in _vapor(zero)
+    assert "Cumulative wall deposit malformed for stage 0 to 1" in _pipe_segment(
+        malformed, "stage_0_to_stage_1"
+    )
+    assert "--sec-p15-species" not in _pipe_segment(
+        malformed, "stage_0_to_stage_1"
+    )
+    assert "Vapor flux malformed" in _vapor(malformed)
+    assert "evolved vapor flux" not in _vapor(malformed)
+    assert "Pending — malformed species container emitted" in _readout(
+        malformed, "metal-product-yields"
+    )
+
+
+def test_missing_purity_is_not_derived_from_emitted_stage_masses() -> None:
+    artifact = {
+        "timesteps": [{"hour": 1, "summary": {"campaign": "C0"}, "ledger": {}}],
+        "terminal": {
+            "stage_purity": {
+                "stage_1_fe_condenser": {
+                    "label": "Fe Condenser",
+                    "designated_species_kg": {"Fe": 7.0},
+                    "coproduct_species_kg": {},
+                    "impurity_species_kg": {"Si": 2.0},
+                    "designated_kg": 7.0,
+                    "impurity_kg": 2.0,
+                    "total_kg": 9.0,
+                    "verdict": "CONTAMINATED",
+                }
+            }
+        },
+    }
+
+    stage = _stage_card(_run_panel(artifact)["html"], "stage_1_fe_condenser")
+
+    assert "<span>Emitted purity fraction</span><strong>Pending — not emitted</strong>" in stage
+    assert "0.7778" not in stage
+
+
+def test_product_yield_readout_uses_emitter_semantics() -> None:
+    artifact = {
+        "timesteps": [{
+            "hour": 1,
+            "summary": {"campaign": "C0", "metal_yields_kg": {"Fe": 132.0}},
+            "ledger": {},
+        }],
+        "terminal": {"stage_purity": {}},
+    }
+
+    readout = _readout(_run_panel(artifact)["html"], "metal-product-yields")
+
+    assert "Metal product yields · cumulative product-ledger projection" in readout
+    assert "132 kg" in readout
+    assert "Route-wide product readout only; never used as a condenser fill" in readout
+    assert "not recovered product" not in readout
+
+
+def test_unmapped_campaign_is_explicit_and_does_not_glow_a_stage() -> None:
+    artifact = {
+        "timesteps": [{"hour": 79, "summary": {"campaign": "C5"}, "ledger": {}}],
+        "terminal": {"stage_purity": _stage_purity()},
+    }
+
+    html = _run_panel(artifact)["html"]
+
+    assert "Campaign-to-stage map not emitted for C5; no stage glow inferred" in _selected_timestep(html)
+    assert "sec-p15-stage--active" not in html

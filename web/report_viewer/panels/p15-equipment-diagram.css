@@ -287,9 +287,16 @@
 }
 
 .sec-p15-equipment .sec-p15-tap-arrow {
+  display: grid;
+  gap: 1px;
   color: var(--orange);
   font-size: 20px;
   text-align: center;
+}
+
+.sec-p15-equipment .sec-p15-tap-arrow span {
+  color: var(--ink-3);
+  font: 700 10px/1.25 Inter, ui-sans-serif, sans-serif;
 }
 
 .sec-p15-equipment .sec-p15-taps {
@@ -318,6 +325,11 @@
   margin-top: 8px;
   color: var(--ink-2);
   font-size: 11px;
+}
+
+.sec-p15-equipment .sec-p15-authority > strong {
+  display: block;
+  margin-bottom: 5px;
 }
 
 .sec-p15-equipment .sec-p15-authority summary,
@@ -413,6 +425,16 @@
   min-height: 32px;
   margin: 0 14px 7px 0;
   font-size: 12px;
+  line-height: 1.25;
+}
+
+.sec-p15-equipment .sec-p15-stage-route {
+  display: block;
+  min-height: 28px;
+  margin: -2px 0 6px;
+  color: var(--ink-3);
+  font-size: 9px;
+  font-weight: 700;
   line-height: 1.25;
 }
 
