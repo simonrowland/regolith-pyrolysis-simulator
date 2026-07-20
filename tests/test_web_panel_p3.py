@@ -15,6 +15,7 @@ def _render_panel(
     *,
     timestep_index: int | None = None,
     target_present: bool = True,
+    species_color: str | None = None,
 ) -> dict:
     harness = r"""
 const fs = require("fs");
@@ -27,6 +28,12 @@ const context = {
 context.globalThis = context;
 vm.createContext(context);
 vm.runInContext(fs.readFileSync(process.argv[2], "utf8"), context);
+if (process.argv[7] !== "none") {
+  context.ReportLabels = Object.freeze({
+    ...context.ReportLabels,
+    speciesColor: () => process.argv[7],
+  });
+}
 vm.runInContext(fs.readFileSync(process.argv[3], "utf8"), context);
 const artifact = JSON.parse(process.argv[4]);
 const panel = context.ReportPanels[0];
@@ -42,6 +49,7 @@ process.stdout.write(JSON.stringify({ html, hourly: hourly.innerHTML, id: panel.
             json.dumps(artifact),
             "none" if timestep_index is None else str(timestep_index),
             "yes" if target_present else "no",
+            "none" if species_color is None else species_color,
         ],
         input=harness,
         text=True,
@@ -72,6 +80,22 @@ def _cell_texts(row: str) -> list[str]:
         " ".join(unescape(re.sub(r"<[^>]+>", " ", cell)).split())
         for cell in cells
     ]
+
+
+def _text(rendered: str) -> str:
+    return " ".join(unescape(re.sub(r"<[^>]+>", " ", rendered)).split())
+
+
+def _header_texts(rendered: str) -> list[str]:
+    match = re.search(r"<thead>(.*?)</thead>", rendered)
+    assert match is not None
+    return _cell_texts(match.group(1))
+
+
+def _table_body_rows(rendered: str) -> list[str]:
+    match = re.search(r"<tbody>(.*?)</tbody>", rendered)
+    assert match is not None
+    return re.findall(r"<tr(?:\s[^>]*)?>.*?</tr>", match.group(1))
 
 
 def _species_text_and_title(row: str) -> tuple[str, str]:
@@ -131,7 +155,7 @@ def test_p3_renders_species_segments_flux_kn_and_selected_hour() -> None:
         }
     ]
 
-    rendered = _render_panel(artifact, timestep_index=0)
+    rendered = _render_panel(artifact, timestep_index=0, species_color="#123abc")
     html = rendered["html"]
     species_table = _region(
         html,
@@ -156,8 +180,8 @@ def test_p3_renders_species_segments_flux_kn_and_selected_hour() -> None:
         "0.01 kg", "not emitted", "not emitted", "Per-species status not emitted",
     ]
     assert _cell_texts(na_row)[1] == "0 kg"
-    assert 'style="background:#7570b3"' in sio_row
-    assert 'style="background:#d95f02"' in fe_row
+    assert 'style="background:#123abc"' in sio_row
+    assert 'style="background:#123abc"' in fe_row
     assert _cell_texts(_row_with(segment_region, 'title="SiO"')) == [
         "Wall deposit · stage 0→1", "SiO", "0.2 kg",
     ]
@@ -167,23 +191,32 @@ def test_p3_renders_species_segments_flux_kn_and_selected_hour() -> None:
     assert _cell_texts(_row_with(segment_region, 'title="Fe"')) == [
         "Wall deposit · stage 1→2", "Fe", "0.01 kg",
     ]
+    assert _header_texts(segment_region) == [
+        "Wall segment", "Species", "Terminal deposited mass · kg",
+    ]
+    assert len(_table_body_rows(segment_region)) == 3
     assert "Regime</b> viscous" in html and "Kn</b> 0.0038" in html
     assert "SiO watch species" in html
     assert "Pump outlet</b> not applicable until p0" in html
     assert "Selected hour · 7" in rendered["hourly"]
     assert _cell_texts(_row_with(rendered["hourly"], 'title="SiO"')) == [
-        "Wall deposit · stage 0→1", "SiO", "0.004 kg/hour", "0.25 kg",
+        "Wall deposit · stage 0→1", "SiO", "0.004 kg", "0.25 kg",
     ]
     assert _cell_texts(_row_with(rendered["hourly"], 'title="Na"')) == [
-        "Wall deposit · stage 0→1", "Na", "0.001 kg/hour", "0.03 kg",
+        "Wall deposit · stage 0→1", "Na", "0.001 kg", "0.03 kg",
     ]
     assert _cell_texts(_row_with(rendered["hourly"], 'title="Fe"')) == [
-        "Wall deposit · stage 1→2", "Fe", "0.002 kg/hour", "0.01 kg",
+        "Wall deposit · stage 1→2", "Fe", "0.002 kg", "0.01 kg",
     ]
+    assert _header_texts(rendered["hourly"]) == [
+        "Wall segment", "Species", "Deposit this hour · kg", "Running wall load · kg",
+    ]
+    assert "kg/hour" not in rendered["hourly"] and "kg/hr" not in rendered["hourly"]
     assert "Terminal aggregate · kg" in species_table
     assert "Current coating flux · kg/hr" in species_table
     assert "Diagnostic cumulative · kg" in species_table
     assert "mol" not in species_table
+    assert "mol" not in html and "mol" not in rendered["hourly"]
 
     diagnostic_only = _artifact()
     diagnostic_only["terminal"] = {
@@ -207,11 +240,12 @@ def test_p3_renders_species_segments_flux_kn_and_selected_hour() -> None:
     pump_html = _render_panel(pump_map)["html"]
     pump_region = _region(
         pump_html,
-        "<summary>Pump-outlet loss context</summary>",
+        "<summary>Pump-outlet context</summary>",
         "</details>",
     )
     assert _cell_texts(_row_with(pump_region, 'title="Fe"')) == ["Fe", "0.02 kg"]
     assert _cell_texts(_row_with(pump_region, 'title="SiO"')) == ["SiO", "0 kg"]
+    assert _header_texts(pump_region) == ["Species", "Pump outlet · kg"]
 
 
 def test_p3_absent_fields_stay_pending_without_coating_verdict() -> None:
@@ -223,7 +257,7 @@ def test_p3_absent_fields_stay_pending_without_coating_verdict() -> None:
     assert "Wall lifetime not assessed" in html
     lifetime_region = _region(html, '<div class="sec-p3-lifetime">', "</div>")
     assert "no viewer pass/fail verdict is issued" in lifetime_region
-    assert all(token not in lifetime_region for token in ("CLEAR", "ruined", "campaigns_to_resinter"))
+    assert all(token not in html for token in ("CLEAR", "ruined", "campaigns_to_resinter"))
     assert "0 kg" not in html
 
     for malformed_lifetime in (None, "unknown", []):
@@ -232,12 +266,14 @@ def test_p3_absent_fields_stay_pending_without_coating_verdict() -> None:
         malformed_html = _render_panel(artifact)["html"]
         assert "Wall lifetime malformed" in malformed_html
         assert "Wall lifetime diagnostic emitted" not in malformed_html
+        assert all(token not in malformed_html for token in ("CLEAR", "ruined", "campaigns_to_resinter"))
 
     empty_lifetime = _artifact()
     empty_lifetime["terminal"]["wall_lifetime"] = {}
     empty_lifetime_html = _render_panel(empty_lifetime)["html"]
     assert "Wall lifetime empty" in empty_lifetime_html
     assert "Wall lifetime malformed" not in empty_lifetime_html
+    assert all(token not in empty_lifetime_html for token in ("CLEAR", "ruined", "campaigns_to_resinter"))
 
     sparse_knudsen = _artifact()
     sparse_knudsen["terminal"] = {
@@ -318,11 +354,14 @@ def test_p3_surfaces_diagnostic_authority_uncertainty_and_escapes_values() -> No
         "final": {"wall_deposit_by_species_kg": {"SiO<script>": 0.5}},
         "run_metadata": {
             "pressure_coating_pareto_diagnostic": {
-                "status": "provisional",
+                "status": "unavailable",
                 "authoritative": False,
                 "diagnostic_only": True,
+                "extrapolation": True,
                 "high_uncertainty": True,
                 "source": "model <draft>",
+                "reference": "reference <draft>",
+                "skip_reason": "coverage <missing>",
                 "by_species": {
                     "SiO<script>": {
                         "status": "unavailable",
@@ -337,7 +376,21 @@ def test_p3_surfaces_diagnostic_authority_uncertainty_and_escapes_values() -> No
                     "provisional": True,
                     "output_status": "status_bearing",
                     "source_class": "engineering-default",
+                    "severity": "warning",
+                    "code": "wall_deposit_surface_geometry_provenance",
+                    "usage": ["stage_area_m2_by_stage", "coating_lifespan"],
                     "message": 'geometry "not certified"',
+                    "stage_area_ratio_provenance_by_stage": {
+                        "stage_0_to_stage_1": {
+                            "stage": "stage_0_to_stage_1",
+                            "ratio": 0,
+                            "status": "provisional",
+                            "output_status": "status_bearing",
+                            "source_class": "engineering-default",
+                            "source": "engineering-default: baffled <throat>",
+                            "usage": "condensation_surface_area",
+                        },
+                    },
                 },
             },
         },
@@ -355,21 +408,46 @@ def test_p3_surfaces_diagnostic_authority_uncertainty_and_escapes_values() -> No
         '<details class="sec-p3-details"><summary>Per-wall-segment terminal breakdown',
     )
     species_row = _row_with(species_table, 'title="SiO&lt;script&gt;"')
-    geometry_region = _region(html, '<div class="sec-p3-geometry">', "</div></div>")
+    geometry_region = _region(
+        html,
+        '<div class="sec-p3-geometry">',
+        '<div class="sec-p3-coating-status">',
+    )
 
     assert "Coating replay diagnostic status" in coating_region
-    assert "Diagnostic-only surface (schema)" in coating_region
+    assert "Diagnostic-only replay surface" in coating_region
+    assert "status reports diagnostic availability" in coating_region
+    assert "status is operational" not in coating_region
+    assert "Status</b> unavailable" in coating_region
     assert "Authoritative</b> no" in coating_region
     assert "Diagnostic only</b> yes" in coating_region
+    assert "Extrapolation</b> yes" in coating_region
     assert "High uncertainty</b> yes" in coating_region
     assert "Source</b> model &lt;draft&gt;" in coating_region
+    assert "Reference</b> reference &lt;draft&gt;" in coating_region
+    assert "Skip reason</b> coverage &lt;missing&gt;" in coating_region
     assert "Reason</b> coverage &lt;missing&gt;" in species_row
     assert "Source class</b> engineering default" in geometry_region
     assert "Provisional</b> yes" in geometry_region
     assert "Output status</b> status bearing" in geometry_region
+    assert "Severity</b> warning" in geometry_region
+    assert "Code</b> wall_deposit_surface_geometry_provenance" in geometry_region
+    assert "Usage</b> stage_area_m2_by_stage, coating_lifespan" in geometry_region
+    stage_row = _row_with(geometry_region, "stage_0_to_stage_1")
+    assert _cell_texts(stage_row) == [
+        "stage_0_to_stage_1",
+        "stage_0_to_stage_1",
+        "0",
+        "provisional",
+        "status_bearing",
+        "engineering-default",
+        "engineering-default: baffled <throat>",
+        "condensation_surface_area",
+    ]
     assert _species_text_and_title(species_row) == ("SiO<script>", "SiO<script>")
     assert 'title="geometry &quot;not certified&quot;"' in geometry_region
     assert "<script>" not in species_row and 'geometry "not certified"' not in geometry_region
+    assert "baffled <throat>" not in geometry_region
 
 
 def test_p3_partial_maps_never_backfill_terminal_or_flux_values() -> None:
@@ -408,7 +486,7 @@ def test_p3_partial_maps_never_backfill_terminal_or_flux_values() -> None:
         "not emitted", "not emitted", "1.11 kg", "Status ok",
     ]
     assert "1.271 kg" not in species_row
-    assert "0.271 kg/hour" not in species_row
+    assert "0.271 kg" not in species_row
     assert "Wall lifetime not assessed" in html
     lifetime_region = _region(html, '<div class="sec-p3-lifetime">', "</div>")
     assert all(token not in lifetime_region for token in ("CLEAR", "ruined", "campaigns_to_resinter"))
@@ -445,10 +523,10 @@ def test_p3_partial_maps_never_backfill_terminal_or_flux_values() -> None:
         "2.345 kg", "not emitted", "not emitted", "Status ok",
     ]
     assert "Per-segment deposits pending" in reverse_html
-    assert "0.333 kg/hour" not in reverse_row
+    assert "0.333 kg" not in reverse_row
     assert "0.8 kg" not in reverse_row
-    assert "0.333 kg/hour" in reverse_render["hourly"]
-    assert "0.333 kg</span>" not in reverse_render["hourly"]
+    assert "0.333 kg" in reverse_render["hourly"]
+    assert "kg/hour" not in reverse_render["hourly"]
 
     reverse_last = _render_panel(reverse, timestep_index=1)["hourly"]
     assert "0.8 kg" in reverse_last
@@ -480,7 +558,9 @@ def test_p3_production_shape_labels_schema_and_fallback_status_precisely() -> No
     assert coating["status"] == "ok"
     assert "diagnostic_only" not in coating and "authoritative" not in coating
     assert "Coating replay diagnostic status" in coating_region
-    assert "Diagnostic-only surface (schema)" in coating_region
+    assert "Diagnostic-only replay surface" in coating_region
+    assert "status reports diagnostic availability" in coating_region
+    assert "status is operational" not in coating_region
     assert "Status</b> ok" in coating_region
     assert "authority" not in coating_region.lower()
     assert "Diagnostic cumulative · kg" in species_table
@@ -495,29 +575,89 @@ def test_p3_production_shape_labels_schema_and_fallback_status_precisely() -> No
         assert cells[4] == "Per-species status not emitted"
 
 
-def test_p3_mixed_partial_sources_rank_each_species_by_best_emitted_value() -> None:
-    artifact = _artifact()
-    artifact["terminal"] = {
-        "final": {"wall_deposit_by_species_kg": {"SiO": 1.0}},
-        "run_metadata": {
-            "pressure_coating_pareto_diagnostic": {
-                "current": {"wall_deposit_cumulative_kg_by_species": {"Fe": 100.0}},
-            }
+def test_p3_species_ranking_uses_one_table_wide_emitted_metric() -> None:
+    def species_table(artifact: object) -> str:
+        return _region(
+            _render_panel(artifact)["html"],
+            "<h3>Wall deposit by species</h3>",
+            '<details class="sec-p3-details"><summary>Per-wall-segment terminal breakdown',
+        )
+
+    terminal_first = {
+        "terminal": {
+            "final": {"wall_deposit_by_species_kg": {"SiO": 1.0}},
+            "run_metadata": {
+                "pressure_coating_pareto_diagnostic": {
+                    "current": {"wall_deposit_cumulative_kg_by_species": {"Fe": 100.0}},
+                },
+            },
         },
+        "timesteps": [],
     }
-
-    species_table = _region(
-        _render_panel(artifact)["html"],
-        "<h3>Wall deposit by species</h3>",
-        '<details class="sec-p3-details"><summary>Per-wall-segment terminal breakdown',
-    )
-
-    assert species_table.index('title="Fe"') < species_table.index('title="SiO"')
-    assert _cell_texts(_row_with(species_table, 'title="Fe"'))[1:] == [
+    terminal_table = species_table(terminal_first)
+    assert terminal_table.index('title="SiO"') < terminal_table.index('title="Fe"')
+    assert _cell_texts(_row_with(terminal_table, 'title="SiO"'))[1:] == [
+        "1 kg", "not emitted", "not emitted", "Per-species status not emitted",
+    ]
+    assert _cell_texts(_row_with(terminal_table, 'title="Fe"'))[1:] == [
         "not emitted", "not emitted", "100 kg", "Per-species status not emitted",
     ]
-    assert _cell_texts(_row_with(species_table, 'title="SiO"'))[1:] == [
-        "1 kg", "not emitted", "not emitted", "Per-species status not emitted",
+
+    reverse_magnitude = {
+        "terminal": {
+            "final": {"wall_deposit_by_species_kg": {"SiO": 100.0}},
+            "run_metadata": {
+                "pressure_coating_pareto_diagnostic": {
+                    "current": {"wall_deposit_cumulative_kg_by_species": {"Fe": 1.0}},
+                },
+            },
+        },
+        "timesteps": [],
+    }
+    reverse_table = species_table(reverse_magnitude)
+    assert reverse_table.index('title="SiO"') < reverse_table.index('title="Fe"')
+
+    cumulative_over_flux = {
+        "terminal": {
+            "run_metadata": {
+                "pressure_coating_pareto_diagnostic": {
+                    "current": {
+                        "wall_deposit_cumulative_kg_by_species": {"SiO": 0.01},
+                        "wall_deposit_flux_kg_hr_by_species": {"Fe": 100.0},
+                    },
+                },
+            },
+        },
+        "timesteps": [],
+    }
+    cumulative_table = species_table(cumulative_over_flux)
+    assert cumulative_table.index('title="SiO"') < cumulative_table.index('title="Fe"')
+    assert _cell_texts(_row_with(cumulative_table, 'title="SiO"'))[1:4] == [
+        "not emitted", "not emitted", "0.01 kg",
+    ]
+    assert _cell_texts(_row_with(cumulative_table, 'title="Fe"'))[1:4] == [
+        "not emitted", "100 kg/hr", "not emitted",
+    ]
+
+    flux_only = {
+        "terminal": {
+            "run_metadata": {
+                "pressure_coating_pareto_diagnostic": {
+                    "current": {
+                        "wall_deposit_flux_kg_hr_by_species": {"SiO": 100.0, "Fe": 1.0},
+                    },
+                },
+            },
+        },
+        "timesteps": [],
+    }
+    flux_table = species_table(flux_only)
+    assert flux_table.index('title="SiO"') < flux_table.index('title="Fe"')
+    assert _cell_texts(_row_with(flux_table, 'title="SiO"'))[1:4] == [
+        "not emitted", "100 kg/hr", "not emitted",
+    ]
+    assert _cell_texts(_row_with(flux_table, 'title="Fe"'))[1:4] == [
+        "not emitted", "1 kg/hr", "not emitted",
     ]
 
 
@@ -563,23 +703,19 @@ def test_p3_wall_lifetime_present_path_surfaces_payload_without_viewer_verdict()
         "nested_evidence": {"ignored": True},
     }
 
+    html = _render_panel(artifact)["html"]
     lifetime = _region(
-        _render_panel(artifact)["html"],
+        html,
         '<div class="sec-p3-lifetime">',
-        "</div>",
+        "</div></section>",
     )
 
-    assert "Wall lifetime diagnostic emitted" in lifetime
-    assert "No viewer-derived pass/fail verdict" in lifetime
-    assert "Status</b> ok" in lifetime
-    assert "Authoritative</b> no" in lifetime
-    assert "Diagnostic only</b> yes" in lifetime
-    assert "Campaigns to resinter</b> 5" in lifetime
-    assert "Notes</b> model &lt;draft&gt;" in lifetime
-    assert "Nested evidence</b> emitted (object)" in lifetime
-    # Emitting payload numbers is required; inventing a gate chip is still forbidden.
-    assert "CLEAR" not in lifetime
-    assert "ruined" not in lifetime
+    assert _text(lifetime) == (
+        "Wall lifetime diagnostic emitted No viewer-derived pass/fail verdict. "
+        "Status ok Authoritative no Diagnostic only yes Campaigns to resinter 5 "
+        "Nested evidence emitted (object) Notes model <draft>"
+    )
+    assert all(token not in html for token in ("CLEAR", "ruined", "campaigns_to_resinter"))
 
 
 def test_p3_container_states_stay_distinct_in_routing_and_context_regions() -> None:
@@ -864,9 +1000,10 @@ def test_p3_hourly_container_states_and_partial_histories_never_derive_values() 
         "not emitted", "not emitted", "not emitted", "Status ok",
     ]
     assert _cell_texts(_row_with(delta_render["hourly"], 'title="SiO"'))[2:] == [
-        "0.222 kg/hour", "not emitted",
+        "0.222 kg", "not emitted",
     ]
     assert "0.333 kg" not in delta_species and "0.333 kg" not in delta_render["hourly"]
+    assert "kg/hour" not in delta_render["hourly"] and "kg/hr" not in delta_render["hourly"]
 
     cumulative_history = {
         "terminal": {
@@ -893,5 +1030,5 @@ def test_p3_hourly_container_states_and_partial_histories_never_derive_values() 
     assert _cell_texts(_row_with(cumulative_render["hourly"], 'title="SiO"'))[2:] == [
         "not emitted", "0.8 kg",
     ]
-    assert "0.3 kg/hour" not in cumulative_species
-    assert "0.3 kg/hour" not in cumulative_render["hourly"]
+    assert "0.3 kg" not in cumulative_species
+    assert "0.3 kg" not in cumulative_render["hourly"]

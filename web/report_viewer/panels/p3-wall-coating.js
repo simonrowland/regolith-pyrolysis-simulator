@@ -131,16 +131,16 @@
     });
     const rank = (species) => {
       const terminal = numberClaim(aggregate, species);
-      if (terminal.state === "value") return terminal.value;
       const entry = isRecord(bySpecies) && isRecord(bySpecies[species]) ? bySpecies[species] : null;
       const cumulative = diagnosticClaim(entry, "cumulative_wall_deposit_kg", currentCumulative, species);
-      if (cumulative.state === "value") return cumulative.value;
       const flux = diagnosticClaim(entry, "current_wall_deposit_flux_kg_hr", currentFlux, species);
-      return flux.state === "value" ? flux.value : null;
+      return [terminal, cumulative, flux].map((claim) => claim.state === "value" ? claim.value : null);
     };
+    const ranks = new Map([...names].map((species) => [species, rank(species)]));
+    const metric = [0, 1, 2].find((index) => [...ranks.values()].some((values) => values[index] !== null));
     return [...names].sort((left, right) => {
-      const leftValue = rank(left);
-      const rightValue = rank(right);
+      const leftValue = metric === undefined ? null : ranks.get(left)[metric];
+      const rightValue = metric === undefined ? null : ranks.get(right)[metric];
       if (leftValue !== null && rightValue !== null && leftValue !== rightValue) return rightValue - leftValue;
       if (leftValue !== null && rightValue === null) return -1;
       if (leftValue === null && rightValue !== null) return 1;
@@ -259,6 +259,76 @@
       : pending("Pump-outlet map empty", "The emitted pump-outlet map contains no per-species entries.");
   }
 
+  function emittedValueText(record, key) {
+    if (!isRecord(record) || !own(record, key)) return "not emitted";
+    const raw = record[key];
+    if (typeof raw === "string") return raw.trim() ? scalarText(raw) : "empty";
+    if (isNumber(raw)) return fmtNum(raw);
+    if (typeof raw === "boolean") return raw ? "yes" : "no";
+    if (Array.isArray(raw)) {
+      if (!raw.length) return "empty";
+      if (!raw.every((value) => typeof value === "string" || isNumber(value) || typeof value === "boolean")) {
+        return "malformed (array)";
+      }
+      return raw.map((value) => {
+        if (typeof value === "string") return value.trim() ? scalarText(value) : "empty";
+        if (isNumber(value)) return fmtNum(value);
+        return value ? "yes" : "no";
+      }).join(", ");
+    }
+    return `malformed (${malformedType(raw)})`;
+  }
+
+  function renderGeometryProvenance(geometryClaim) {
+    if (!geometryClaim || geometryClaim.state === "absent") return "";
+    if (geometryClaim.state !== "value") return badge("Geometry notice", claimText(geometryClaim));
+    const geometry = geometryClaim.value;
+    const message = own(geometry, "message")
+      ? typeof geometry.message === "string" && geometry.message.trim()
+        ? badge("Details", "hover", geometry.message)
+        : typeof geometry.message === "string"
+          ? badge("Details", "empty")
+          : badge("Details", `malformed (${malformedType(geometry.message)})`)
+      : "";
+    const provenanceBadges = [
+      diagnosticBadges(geometry),
+      ...[["severity", "Severity"], ["code", "Code"], ["usage", "Usage"]]
+        .filter(([key]) => own(geometry, key))
+        .map(([key, label]) => badge(label, emittedValueText(geometry, key))),
+      message,
+    ].join("");
+    const stagesClaim = recordFieldClaim(geometry, "stage_area_ratio_provenance_by_stage");
+    let stages = "";
+    if (stagesClaim.state === "value") {
+      const rows = Object.keys(stagesClaim.value).sort().map((mapStage) => {
+        const stageClaim = recordFieldClaim(stagesClaim.value, mapStage);
+        if (stageClaim.state !== "value") {
+          return `<tr><th scope="row">${esc(mapStage)}</th><td colspan="7">${esc(claimText(stageClaim))}</td></tr>`;
+        }
+        const record = isRecord(stageClaim.value) ? stageClaim.value : {};
+        return `<tr><th scope="row">${esc(mapStage)}</th>` +
+          `<td>${esc(emittedValueText(record, "stage"))}</td>` +
+          `<td class="num">${esc(emittedValueText(record, "ratio"))}</td>` +
+          `<td>${esc(emittedValueText(record, "status"))}</td>` +
+          `<td>${esc(emittedValueText(record, "output_status"))}</td>` +
+          `<td>${esc(emittedValueText(record, "source_class"))}</td>` +
+          `<td>${esc(emittedValueText(record, "source"))}</td>` +
+          `<td>${esc(emittedValueText(record, "usage"))}</td></tr>`;
+      }).join("");
+      stages = rows
+        ? `<details class="sec-p3-details"><summary>Stage-area ratio provenance</summary>` +
+          `<div class="table-wrap"><table><thead><tr><th>Map stage</th><th>Emitted stage</th>` +
+          `<th class="num">Ratio</th><th>Status</th><th>Output status</th><th>Source class</th>` +
+          `<th>Source</th><th>Usage</th></tr></thead><tbody>${rows}</tbody></table></div></details>`
+        : badge("Stage-area provenance", "empty");
+    } else if (stagesClaim.state !== "absent") {
+      stages = badge("Stage-area provenance", claimText(stagesClaim));
+    }
+    return provenanceBadges || stages
+      ? `<div class="sec-p3-badges">${provenanceBadges}</div>${stages}`
+      : badge("Geometry notice", "emitted (no supported fields)");
+  }
+
   function renderKnudsen(knudsenClaim) {
     if (!knudsenClaim || knudsenClaim.state === "absent") {
       return pending("Transport context pending", "The terminal Knudsen-regime diagnostic was not emitted.");
@@ -287,22 +357,12 @@
     }
     chips.push(diagnosticBadges(knudsen));
     const geometryClaim = recordFieldClaim(knudsen, "stage_area_geometry_provenance_notice");
-    const geometry = isRecord(geometryClaim.value) ? geometryClaim.value : null;
-    const geometryMessage = geometry && own(geometry, "message")
-      ? typeof geometry.message === "string" && geometry.message.trim()
-        ? badge("Details", "hover", geometry.message)
-        : typeof geometry.message === "string"
-          ? badge("Details", "empty")
-          : badge("Details", `malformed (${malformedType(geometry.message)})`)
-      : "";
-    const geometryBadges = geometryClaim.state === "value"
-      ? (diagnosticBadges(geometry) + geometryMessage || badge("Geometry notice", "emitted (no supported fields)"))
-      : geometryClaim.state === "absent" ? "" : badge("Geometry notice", claimText(geometryClaim));
-    if (!chips.join("") && !geometryBadges) {
+    const geometryProvenance = renderGeometryProvenance(geometryClaim);
+    if (!chips.join("") && !geometryProvenance) {
       return pending("Transport context emitted", "The terminal Knudsen-regime diagnostic contains no P3-supported context fields.");
     }
     return `<div class="sec-p3-badges">${chips.join("")}</div>` +
-      (geometryBadges ? `<div class="sec-p3-geometry"><span>Coating geometry provenance</span><div class="sec-p3-badges">${geometryBadges}</div></div>` : "");
+      (geometryProvenance ? `<div class="sec-p3-geometry"><span>Coating geometry provenance</span>${geometryProvenance}</div>` : "");
   }
 
   function fieldLabel(key) {
@@ -418,7 +478,7 @@
       ]);
       [...species].sort().forEach((name) => {
         rows.push(`<tr><th scope="row">${esc(accountLabel(`process.wall_deposit_segment_${segment}`))}</th>` +
-          `<td>${speciesLabel(name)}</td><td class="num">${numberCell(nestedNumberClaim(deltaSpeciesClaim, name), "kg/hour")}</td>` +
+          `<td>${speciesLabel(name)}</td><td class="num">${numberCell(nestedNumberClaim(deltaSpeciesClaim, name), "kg")}</td>` +
           `<td class="num">${numberCell(nestedNumberClaim(cumulativeSpeciesClaim, name), "kg")}</td></tr>`);
       });
     });
@@ -430,7 +490,7 @@
       ));
     }
     return heading + `<div class="table-wrap"><table><thead><tr><th>Wall segment</th><th>Species</th>` +
-      `<th class="num">Hourly deposit · kg/hour</th><th class="num">Running wall load · kg</th>` +
+      `<th class="num">Deposit this hour · kg</th><th class="num">Running wall load · kg</th>` +
       `</tr></thead><tbody>${rows.join("")}</tbody></table></div>${notes}`;
   }
 
@@ -473,13 +533,13 @@
       `<p class="sub">Per-species wall inventory and emitted coating rate. Coating is continuous rate → lifetime evidence, not a viewer pass/fail gate.</p>` +
       `${sourceState}<div class="sec-p3-context"><div><span>Transport context</span>${renderKnudsen(knudsenClaim)}</div>` +
       `<div class="sec-p3-coating-status"><span>Coating replay diagnostic status</span>` +
-      `<small>Diagnostic-only surface (schema); emitted status is operational.</small>` +
+      `<small>Diagnostic-only replay surface; emitted status reports diagnostic availability, not coating condition or an operating-state/pass/fail verdict.</small>` +
       `<div class="sec-p3-badges">${coatingFlags || badge("Diagnostic status", "not emitted")}</div></div></div>` +
       `<h3>Wall deposit by species</h3>${renderSpeciesTable(final, coatingClaim)}` +
       `<details class="sec-p3-details"><summary>Per-wall-segment terminal breakdown</summary>${renderSegmentBreakdown(final)}</details>` +
       `<details class="sec-p3-details"><summary>Selected-hour segment telemetry</summary>` +
       `<div id="sec-p3-wall-coating-hourly">${renderHourly(summaryClaim, hourClaim, selectedClaim, timestepsClaim)}</div></details>` +
-      `<details class="sec-p3-details"><summary>Pump-outlet loss context</summary>${renderPumpOutlet(final)}</details>` +
+      `<details class="sec-p3-details"><summary>Pump-outlet context</summary>${renderPumpOutlet(final)}</details>` +
       `${renderLifetime(terminalClaim)}</section>`;
   }
 
