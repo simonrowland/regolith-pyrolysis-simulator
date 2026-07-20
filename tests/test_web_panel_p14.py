@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import re
 import subprocess
 
 
@@ -9,7 +10,13 @@ ROOT = Path(__file__).resolve().parents[1]
 VIEWER = ROOT / "web" / "report_viewer"
 
 
-def _render_panel(artifact: dict, *, click_account: str = "") -> dict:
+def _render_panel(
+    artifact: dict,
+    *,
+    click_account: str = "",
+    shared_row: bool = True,
+    species_colors: dict[str, str] | None = None,
+) -> dict:
     harness = r"""
 const fs = require("fs");
 const vm = require("vm");
@@ -17,11 +24,14 @@ const labelsSource = fs.readFileSync(process.argv[2], "utf8");
 const panelSource = fs.readFileSync(process.argv[3], "utf8");
 const artifact = JSON.parse(process.argv[4]);
 const clickAccount = process.argv[5];
+const options = JSON.parse(process.argv[6]);
 let clickHandler = null;
+const ledgerDisclosure = { open: false };
 const localDetail = {
   open: false, removedId: false, scrolled: 0,
   removeAttribute(name) { if (name === "id") this.removedId = true; },
-  scrollIntoView() { this.scrolled += 1; }
+  scrollIntoView() { this.scrolled += 1; },
+  closest(selector) { return selector === "details.sec-p14-ledger" ? ledgerDisclosure : null; }
 };
 const accountSpan = { getAttribute(name) { return name === "title" ? clickAccount : null; } };
 const sharedRow = {
@@ -37,13 +47,22 @@ const context = {
     addEventListener(type, handler) { if (type === "click") clickHandler = handler; },
     getElementById() { return localDetail; },
     querySelectorAll(selector) {
-      return selector === ".disposition-group tbody tr" && clickAccount ? [sharedRow] : [];
+      return selector === ".disposition-group tbody tr" && clickAccount && options.sharedRow ? [sharedRow] : [];
     }
   }
 };
 context.globalThis = context;
 vm.createContext(context);
 vm.runInContext(labelsSource, context);
+const sharedSpeciesColor = context.ReportLabels.speciesColor;
+context.ReportLabels = {
+  ...context.ReportLabels,
+  speciesColor(species) {
+    return Object.prototype.hasOwnProperty.call(options.speciesColors, species)
+      ? options.speciesColors[species]
+      : sharedSpeciesColor(species);
+  }
+};
 vm.runInContext(panelSource, context);
 const panel = context.ReportPanels[0];
 const html = panel.render(artifact, [], [], {});
@@ -72,7 +91,10 @@ process.stdout.write(JSON.stringify({
     rowScrolled: sharedRow.scrolled,
     rowFocused: sharedRow.focused,
     rowTabIndex: sharedRow.attributes.tabindex || null,
-    localIdRemoved: localDetail.removedId
+    localIdRemoved: localDetail.removedId,
+    localOpen: localDetail.open,
+    localScrolled: localDetail.scrolled,
+    ledgerOpen: ledgerDisclosure.open
   }
 }));
 """
@@ -84,6 +106,12 @@ process.stdout.write(JSON.stringify({
             str(VIEWER / "panels" / "p14-sankey.js"),
             json.dumps(artifact),
             click_account,
+            json.dumps(
+                {
+                    "sharedRow": shared_row,
+                    "speciesColors": species_colors or {},
+                }
+            ),
         ],
         input=harness,
         text=True,
@@ -95,6 +123,43 @@ process.stdout.write(JSON.stringify({
 
 def _artifact(terminal: dict) -> dict:
     return {"terminal": terminal}
+
+
+def _html_region(html: str, start_marker: str, end_marker: str) -> str:
+    start = html.index(start_marker)
+    end = html.index(end_marker, start) + len(end_marker)
+    return html[start:end]
+
+
+def _html_region_containing(
+    html: str,
+    marker: str,
+    start_marker: str,
+    end_marker: str,
+) -> str:
+    marker_index = html.index(marker)
+    start = html.rfind(start_marker, 0, marker_index)
+    if start < 0:
+        raise AssertionError(f"missing region start {start_marker!r} before {marker!r}")
+    end = html.index(end_marker, marker_index) + len(end_marker)
+    return html[start:end]
+
+
+def _account_row(html: str, account: str) -> str:
+    return _html_region_containing(
+        html,
+        f'data-p14-account="{account}"',
+        '<div class="sec-p14-row">',
+        "</div></div>",
+    )
+
+
+def _source_region(html: str) -> str:
+    return _html_region(html, '<div class="sec-p14-source">', "</div>")
+
+
+def _provenance_region(html: str) -> str:
+    return _html_region(html, '<details class="sec-p14-provenance">', "</details>")
 
 
 def test_p14_renders_emitted_accounts_trace_scaling_o2_and_interaction() -> None:
@@ -111,13 +176,13 @@ def test_p14_renders_emitted_accounts_trace_scaling_o2_and_interaction() -> None
             }
         ),
         click_account="terminal.offgas",
+        species_colors={"Fe": "#13579b", "O2": "#2468ac"},
     )
     html = state["html"]
 
     assert state["id"] == "sec-p14-sankey"
     assert state["panelCount"] == 1
     assert "terminal inventory total (Σ accounts, mol — display total, not charge)" in html
-    assert "mol basis" in html
     assert "widths √-scaled for readability — hover for true mol" in html
     assert 'class="sec-p14-row sec-p14-trace-node"' in html
     assert "trace inventory (2 species)" in html
@@ -132,8 +197,8 @@ def test_p14_renders_emitted_accounts_trace_scaling_o2_and_interaction() -> None
     ) < html.index('data-p14-account="terminal.oxygen_mre_anode_stored"') < html.index(
         'data-p14-account="terminal.offgas"'
     ) < html.index('data-p14-account="process.cleaned_melt"')
-    assert "#d95f02" in html  # Fe family from shared speciesColor().
-    assert "#2b8cbe" in html  # O family from shared speciesColor().
+    assert "#13579b" in _account_row(html, "process.metal_phase_bottom_pool")
+    assert "#2468ac" in _account_row(html, "terminal.oxygen_melt_offgas_stored")
     assert "kg-projected tier pending — backend kg projection not emitted" in html
     assert state["interaction"] == {
         "handlerInstalled": True,
@@ -142,8 +207,90 @@ def test_p14_renders_emitted_accounts_trace_scaling_o2_and_interaction() -> None
         "rowFocused": 1,
         "rowTabIndex": "-1",
         "localIdRemoved": True,
+        "localOpen": False,
+        "localScrolled": 0,
+        "ledgerOpen": False,
     }
     assert state["interaction"]["rowId"].startswith("sec-p14-account-terminal-offgas-")
+
+
+def test_p14_distinct_o2_disposition_accounts_are_never_trace_clustered() -> None:
+    o2_accounts = {
+        "terminal.oxygen_stage0_stored": 1.0,
+        "terminal.oxygen_melt_offgas_stored": 2.0,
+        "terminal.oxygen_melt_offgas_vented_to_vacuum": 3.0,
+        "terminal.oxygen_bubbler_external_vented_to_vacuum": 4.0,
+        "terminal.oxygen_melt_offgas_captured": 5.0,
+        "terminal.oxygen_mre_anode_stored": 6.0,
+        "reservoir.oxygen_cistern_liquid_inventory": 7.0,
+    }
+    html = _render_panel(
+        _artifact(
+            {
+                "final_state": {
+                    "process.cleaned_melt": {"SiO2": 10_000.0},
+                    **{account: {"O2": value} for account, value in o2_accounts.items()},
+                }
+            }
+        )
+    )["html"]
+
+    for account in o2_accounts:
+        row = _account_row(html, account)
+        assert row.count(f'data-p14-account="{account}"') == 2
+        assert 'class="sec-p14-ribbon"' in row
+        assert "merged into global trace node" not in row
+    assert 'class="sec-p14-row sec-p14-trace-node"' not in html
+
+
+def test_p14_basis_badge_and_source_total_stay_mol_native() -> None:
+    html = _render_panel(
+        _artifact({"final_state": {"terminal.offgas": {"Fe": 2.0}}})
+    )["html"]
+    badges = _html_region(html, '<div class="sec-p14-badges">', "</div>")
+    source = _source_region(html)
+
+    assert '<span class="sec-p14-badge">mol basis</span>' in badges
+    assert "kg basis" not in badges
+    assert re.search(r"<span>[^<]*\bmol</span>", source)
+    assert not re.search(r"<span>[^<]*\bkg</span>", source)
+
+
+def test_p14_mixed_trace_tooltip_lists_each_species_once() -> None:
+    html = _render_panel(
+        _artifact(
+            {
+                "final_state": {
+                    "process.cleaned_melt": {"SiO2": 10_000.0},
+                    "terminal.offgas": {"Fe": 100.0, "Na": 0.1},
+                }
+            }
+        )
+    )["html"]
+    offgas_row = _account_row(html, "terminal.offgas")
+
+    assert 'title="Offgas — emitted mol: Fe 100 mol; Na 0.1 mol"' in offgas_row
+    assert offgas_row.count("Na 0.1 mol") == 1
+
+
+def test_p14_trace_disclosure_uses_active_threshold() -> None:
+    html = _render_panel(
+        _artifact(
+            {
+                "final_state": {
+                    "process.cleaned_melt": {"SiO2": 10_000.0},
+                    "terminal.offgas": {"Fe": 100.0, "Na": 0.1},
+                }
+            }
+        )
+    )["html"]
+    trace_row = _html_region(
+        html,
+        '<div class="sec-p14-row sec-p14-trace-node">',
+        "</div></div>",
+    )
+
+    assert "each member &lt; 0.5% of displayed terminal mol" in trace_row
 
 
 def test_p14_absent_final_state_and_provenance_stay_pending() -> None:
@@ -156,7 +303,28 @@ def test_p14_absent_final_state_and_provenance_stay_pending() -> None:
     assert "sec-p14-ribbon" not in html
 
 
-def test_p14_present_provenance_surfaces_authority_but_not_derived_shares() -> None:
+def test_p14_distinguishes_empty_and_malformed_final_state() -> None:
+    empty_html = _render_panel(_artifact({"final_state": {}}))["html"]
+    empty_region = _html_region(
+        empty_html,
+        '<div class="pending sec-p14-pending">',
+        "</div>",
+    )
+    assert "Empty terminal inventory" in empty_region
+    assert "terminal.final_state was emitted with no account keys." in empty_region
+
+    for malformed in (None, [], "not-an-account-map", 0):
+        malformed_html = _render_panel(_artifact({"final_state": malformed}))["html"]
+        malformed_region = _html_region(
+            malformed_html,
+            '<div class="pending sec-p14-pending">',
+            "</div>",
+        )
+        assert "Malformed terminal inventory" in malformed_region
+        assert "present but is not an account map" in malformed_region
+
+
+def test_p14_present_provenance_surfaces_all_authority_values() -> None:
     html = _render_panel(
         _artifact(
             {
@@ -165,29 +333,147 @@ def test_p14_present_provenance_surfaces_authority_but_not_derived_shares() -> N
                     "basis": "target_atom_equivalent",
                     "authoritative": False,
                     "diagnostic_only": True,
-                    "status": "partial",
+                    "extrapolation": "tail<fit>",
+                    "high_uncertainty": True,
+                    "status": "partial<state>",
                     "source": "<untrusted source>",
+                    "reference": "ref&catalog",
+                    "skip_reason": "coverage < floor",
+                },
+            }
+        )
+    )["html"]
+    provenance = _provenance_region(html)
+
+    assert "yield_disposition emitted · provenance schema check" in provenance
+    assert "basis</b> target_atom_equivalent" in provenance
+    assert "authoritative</b> false" in provenance
+    assert "diagnostic only</b> true" in provenance
+    assert "extrapolation</b> tail&lt;fit&gt;" in provenance
+    assert "high uncertainty</b> true" in provenance
+    assert "status</b> partial&lt;state&gt;" in provenance
+    assert "source</b> &lt;untrusted source&gt;" in provenance
+    assert "reference</b> ref&amp;catalog" in provenance
+    assert "skip reason</b> coverage &lt; floor" in provenance
+
+
+def test_p14_provenance_partial_path_does_not_derive_shares() -> None:
+    html = _render_panel(
+        _artifact(
+            {
+                "final_state": {"terminal.offgas": {"Na": 5.0}},
+                "yield_disposition": {
+                    "basis": "target_atom_equivalent",
                     "targets": {
                         "Fe": {
                             "denominator_target_equiv_mol": 2.0,
-                            "yield_fraction": 0.5,
+                            "yield_fraction": 0.3141592653,
                         }
                     },
                 },
             }
         )
     )["html"]
+    provenance = _provenance_region(html)
 
-    assert "yield_disposition emitted · provenance schema check" in html
-    assert "target_atom_equivalent" in html
-    assert "authoritative</b> false" in html
-    assert "diagnostic only</b> true" in html
-    assert "status</b> partial" in html
-    assert "&lt;untrusted source&gt;" in html
-    assert "Pending origin-resolved shares" in html
-    assert "No feedstock percentages are inferred" in html
-    assert "50%" not in html
-    assert "yield fraction" not in html.lower()
+    assert "Pending origin-resolved shares" in provenance
+    assert "No feedstock percentages are inferred" in provenance
+    assert "0.3141592653" not in provenance
+    assert "31.4159" not in provenance
+    assert "0.3142" not in provenance
+    assert "31.42" not in provenance
+    assert provenance == (
+        '<details class="sec-p14-provenance"><summary>yield_disposition emitted · '
+        'provenance schema check</summary><div class="sec-p14-flags"><span '
+        'class="sec-p14-flag"><b>basis</b> target_atom_equivalent</span></div>'
+        '<div class="pending sec-p14-provenance-pending"><strong>Pending '
+        'origin-resolved shares</strong><p>This payload does not expose a '
+        'producer-defined chart-ready origin-to-account link schema. No feedstock '
+        'percentages are inferred from target fractions or terminal mol inventories.'
+        '</p></div></details>'
+    )
+
+
+def test_p14_artifact_text_is_escaped_exactly_once() -> None:
+    html = _render_panel(
+        _artifact(
+            {
+                "final_state": {
+                    "process.<b>acct&raw</b>": {
+                        "Fe<script>&raw</script>": 2.0,
+                    }
+                },
+                "yield_disposition": {"basis": "<basis&raw>"},
+            }
+        )
+    )["html"]
+    provenance = _provenance_region(html)
+    account_detail = _html_region_containing(
+        html,
+        "<code>process.&lt;b&gt;acct&amp;raw&lt;/b&gt;</code>",
+        '<details class="sec-p14-account-detail"',
+        "</details>",
+    )
+
+    assert "basis</b> &lt;basis&amp;raw&gt;" in provenance
+    assert "process.&lt;b&gt;acct&amp;raw&lt;/b&gt;" in account_detail
+    assert "Fe&lt;script&gt;&amp;raw&lt;/script&gt;" in account_detail
+    assert "<basis&raw>" not in html
+    assert "<b>acct&raw</b>" not in html
+    assert "<B>Acct&Raw</B>" not in html
+    assert "<script>&raw</script>" not in html
+    assert "&amp;lt;" not in html
+    assert "&amp;amp;" not in html
+
+
+def test_p14_sparse_note_names_only_emitted_standins() -> None:
+    html = _render_panel(
+        _artifact({"final_state": {"terminal.offgas": {"Na": 5.0}}})
+    )["html"]
+    note = _html_region(html, '<div class="note sec-p14-note">', "</div>")
+
+    assert "destinations are not inferred when their account keys are absent" in note
+    assert "No aggregate condensation-train or cleaned-melt stand-in account is emitted" in note
+    assert "remain the available terminal accounts" not in note
+
+
+def test_p14_local_deep_link_fallback_opens_ledger_detail() -> None:
+    state = _render_panel(
+        _artifact({"final_state": {"terminal.offgas": {"Na": 5.0}}}),
+        click_account="terminal.offgas",
+        shared_row=False,
+    )
+
+    assert 'data-p14-account="terminal.offgas"' in _account_row(
+        state["html"], "terminal.offgas"
+    )
+    assert state["interaction"] == {
+        "handlerInstalled": True,
+        "rowId": "",
+        "rowScrolled": 0,
+        "rowFocused": 0,
+        "rowTabIndex": None,
+        "localIdRemoved": False,
+        "localOpen": True,
+        "localScrolled": 1,
+        "ledgerOpen": True,
+    }
+
+
+def test_p14_mol_map_does_not_derive_kg_projection() -> None:
+    html = _render_panel(
+        _artifact(
+            {
+                "final_state": {
+                    "terminal.oxygen_mre_anode_stored": {"O2": 2.0},
+                }
+            }
+        )
+    )["html"]
+    source = _source_region(html)
+
+    assert "kg-projected tier pending — backend kg projection not emitted" in source
+    assert "0.064 kg" not in source
 
 
 def test_p14_partial_numeric_map_does_not_derive_totals_or_widths() -> None:
@@ -201,14 +487,19 @@ def test_p14_partial_numeric_map_does_not_derive_totals_or_widths() -> None:
             }
         )
     )["html"]
+    source = _source_region(html)
+    offgas_row = _account_row(html, "terminal.offgas")
+    cleaned_melt_row = _account_row(html, "process.cleaned_melt")
 
-    assert "pending · incomplete numeric account map" in html
-    assert "account display sum pending" in html
-    assert "width pending · malformed species map" in html
+    assert "pending · incomplete numeric account map" in source
+    assert "14 mol" not in source
+    assert "account display sum pending" in offgas_row
+    assert "width pending · malformed species map" in offgas_row
+    assert 'class="sec-p14-ribbon"' not in offgas_row
+    assert 'class="sec-p14-ribbon"' in cleaned_melt_row
     assert "Fe</td><td class=\"num\">5 mol" in html
     assert "Si</td><td class=\"num\">non-numeric (string)" in html
     assert "Si 7 mol" not in html
-    assert html.count('class="sec-p14-ribbon"') == 1
 
 
 def test_p14_zero_and_signed_credit_accounts_are_not_trace_or_ribbons() -> None:

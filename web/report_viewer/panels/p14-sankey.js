@@ -9,8 +9,13 @@
   const TRACE_FRACTION = 0.005;
   const SQRT_SCALE_RATIO = 20;
   const SEPARATE_O2_ACCOUNTS = Object.freeze(new Set([
+    "terminal.oxygen_stage0_stored",
     "terminal.oxygen_melt_offgas_stored",
-    "terminal.oxygen_mre_anode_stored"
+    "terminal.oxygen_melt_offgas_vented_to_vacuum",
+    "terminal.oxygen_bubbler_external_vented_to_vacuum",
+    "terminal.oxygen_melt_offgas_captured",
+    "terminal.oxygen_mre_anode_stored",
+    "reservoir.oxygen_cistern_liquid_inventory"
   ]));
   const AUTHORITY_FIELDS = Object.freeze([
     "authoritative", "diagnostic_only", "extrapolation", "high_uncertainty",
@@ -22,8 +27,13 @@
     "terminal.drain_tap_material": 2,
     "process.metal_phase": 3,
     "process.condensation_train": 10,
+    "terminal.oxygen_stage0_stored": 19,
     "terminal.oxygen_melt_offgas_stored": 20,
-    "terminal.oxygen_mre_anode_stored": 21,
+    "terminal.oxygen_melt_offgas_vented_to_vacuum": 21,
+    "terminal.oxygen_bubbler_external_vented_to_vacuum": 22,
+    "terminal.oxygen_melt_offgas_captured": 23,
+    "terminal.oxygen_mre_anode_stored": 24,
+    "reservoir.oxygen_cistern_liquid_inventory": 25,
     "terminal.offgas": 30,
     "process.overhead_gas": 50,
     "process.reagent_inventory": 51,
@@ -151,6 +161,18 @@
       + `No feedstock percentages are inferred from target fractions or terminal mol inventories.</p></div></details>`;
   }
 
+  function availabilityNote(finalState) {
+    const standIns = ["process.condensation_train", "process.cleaned_melt"]
+      .filter((account) => own(finalState, account))
+      .map((account) => esc(accountLabel(account)));
+    const standInText = standIns.length
+      ? `Emitted aggregate terminal stand-ins in this run: ${standIns.join(", ")}.`
+      : "No aggregate condensation-train or cleaned-melt stand-in account is emitted in this run.";
+    return `Only literal account keys emitted under terminal.final_state are shown. `
+      + `Dedicated per-stage condenser, glass, refractory-rump, and ceramic-product destinations are not inferred when their account keys are absent. `
+      + standInText;
+  }
+
   function accountDetail(account, groups) {
     const detailId = stableAccountId(account.account);
     const rows = account.entries.length
@@ -170,9 +192,6 @@
   function accountRow(account, groups, scale, largestVisible) {
     const detailId = stableAccountId(account.account);
     const inventoryText = speciesInventoryText(account.entries);
-    const traceText = groups.trace.length
-      ? `; trace inventory (${groups.trace.length} species): ${speciesInventoryText(groups.trace)}`
-      : "";
     let ribbon = "";
     let status = "";
     if (account.malformed) {
@@ -182,7 +201,7 @@
       const ratio = visibleTotal / largestVisible;
       const width = (scale === "sqrt" ? Math.sqrt(ratio) : ratio) * 100;
       const background = ribbonBackground({ major: groups.major, trace: [] }, visibleTotal);
-      const hover = `${accountLabel(account.account)} — emitted mol: ${inventoryText}${traceText}`;
+      const hover = `${accountLabel(account.account)} — emitted mol: ${inventoryText}`;
       ribbon = `<a class="sec-p14-ribbon" href="#${esc(detailId)}" data-p14-account="${esc(account.account)}"`
         + ` style="--sec-p14-width:${width.toFixed(5)}%;--sec-p14-ribbon:linear-gradient(90deg,${esc(background)})"`
         + ` title="${esc(hover)}" aria-label="${esc(`${accountLabel(account.account)}, ${fmtNum(visibleTotal, "mol")}, mol basis`)}"></a>`;
@@ -213,12 +232,13 @@
     const width = (scale === "sqrt" ? Math.sqrt(widthRatio) : widthRatio) * 100;
     const background = ribbonBackground({ major: members, trace: [] }, total);
     const memberText = members.map((member) => `${accountLabel(member.account)} · ${prettySpecies(member.name)} ${fmtNum(member.value, "mol")}`).join("; ");
+    const tracePercent = TRACE_FRACTION * 100;
     return `<div class="sec-p14-row sec-p14-trace-node"><div class="sec-p14-track">`
       + `<a class="sec-p14-ribbon" href="#${detailId}" data-p14-trace="true"`
       + ` style="--sec-p14-width:${width.toFixed(5)}%;--sec-p14-ribbon:linear-gradient(90deg,${esc(background)})"`
       + ` title="${esc(`trace inventory members — ${memberText}`)}" aria-label="${esc(`trace inventory, ${speciesCount} species, ${fmtNum(total, "mol")}, mol basis`)}"></a></div>`
       + `<div class="sec-p14-destination"><a href="#${detailId}" data-p14-trace="true">trace inventory (${speciesCount} species)</a>`
-      + `<span>${molText(total)} · viewer-clustered display node</span><span>each member &lt; 0.5% of displayed terminal mol</span></div></div>`;
+      + `<span>${molText(total)} · viewer-clustered display node</span><span>each member &lt; ${esc(tracePercent)}% of displayed terminal mol</span></div></div>`;
   }
 
   function traceDetail(members) {
@@ -291,7 +311,7 @@
       + `<div class="sec-p14-flow"><div class="sec-p14-source"><strong>terminal inventory total (Σ accounts, mol — display total, not charge)</strong>`
       + `<span>${esc(totalText)}</span><small>Viewer display sum of emitted numeric species. kg-projected tier pending — backend kg projection not emitted.</small></div>`
       + `<div class="sec-p14-accounts">${rows}</div></div>${signedNote}`
-      + `<div class="note sec-p14-note">Only literal account keys emitted under terminal.final_state are shown. Per-stage condenser, glass, refractory-rump, and ceramic-product accounts are not emitted; aggregate condensation train and cleaned melt remain the available terminal accounts.</div>`
+      + `<div class="note sec-p14-note">${availabilityNote(finalState)}</div>`
       + `<details class="sec-p14-ledger"><summary>Underlying emitted account ledger · mol basis</summary>${details}</details>`
       + `${provenanceTier(terminal)}</section>`;
   }
