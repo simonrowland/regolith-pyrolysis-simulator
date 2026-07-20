@@ -73,27 +73,57 @@
 
   function fieldValue(record, key, label, options = {}) {
     if (record === MALFORMED_RECORD) return pending(`${label} unavailable because its parent record is malformed`);
-    if (!isRecord(record) || !own(record, key) || record[key] === null || record[key] === "") {
-      return pending(`${label} not emitted`);
+    if (!isRecord(record) || !own(record, key)) return pending(`${label} not emitted`);
+    if (record[key] === null) return pending(`${label} emitted as null`);
+    if (typeof record[key] === "string" && !record[key].trim()) {
+      return empty(`${label}: emitted string is empty`);
     }
     return scalarValue(record[key], label, options);
   }
 
   function realActiveValue(metadata) {
     if (metadata === MALFORMED_RECORD) return pending("Real-engine state unavailable because run metadata is malformed");
-    if (!isRecord(metadata) || !own(metadata, "backend_real_active") || metadata.backend_real_active === null) {
-      return pending("Real-engine state not emitted");
-    }
+    if (!isRecord(metadata) || !own(metadata, "backend_real_active")) return pending("Real-engine state not emitted");
+    if (metadata.backend_real_active === null) return pending("Real-engine state emitted as null");
     if (typeof metadata.backend_real_active !== "boolean") return pending("Real-engine state is malformed");
     return `<span class="sec-p9-explicit-state">${metadata.backend_real_active ? "Yes" : "No"} <small>(emitted)</small></span>`;
   }
 
   function listValue(record, key, label) {
     if (record === MALFORMED_RECORD) return pending(`${label} unavailable because its parent record is malformed`);
-    if (!isRecord(record) || !own(record, key) || record[key] === null) return pending(`${label} not emitted`);
+    if (!isRecord(record) || !own(record, key)) return pending(`${label} not emitted`);
+    if (record[key] === null) return pending(`${label} emitted as null`);
     if (!Array.isArray(record[key])) return pending(`${label} is malformed`);
     if (!record[key].length) return empty(`${label}: emitted list is empty`);
     return `<ul class="sec-p9-inline-list">${record[key].map((value) => `<li>${treeValue(value, key)}</li>`).join("")}</ul>`;
+  }
+
+  function degradationReasonValue(metadata) {
+    if (metadata === MALFORMED_RECORD) {
+      return pending("Degradation reason unavailable because its parent record is malformed");
+    }
+    if (!isRecord(metadata)) return pending("Degradation reason not emitted");
+    if (own(metadata, "degradation_reason")) {
+      return fieldValue(metadata, "degradation_reason", "Degradation reason");
+    }
+    if (Array.isArray(metadata.degraded_from) && metadata.degraded_from.length) {
+      return pending("Degradation reason not emitted");
+    }
+    return empty("No degradation reason in emitted fields");
+  }
+
+  function degradationOriginValue(metadata) {
+    if (metadata === MALFORMED_RECORD) {
+      return pending("Degradation origin unavailable because its parent record is malformed");
+    }
+    if (!isRecord(metadata)) return pending("Degradation origin not emitted");
+    if (own(metadata, "degraded_from")) {
+      return listValue(metadata, "degraded_from", "Degradation origin");
+    }
+    if (typeof metadata.degradation_reason === "string" && metadata.degradation_reason.trim()) {
+      return pending("Degradation origin not emitted");
+    }
+    return empty("No degradation origin in emitted fields");
   }
 
   function speciesLabel(species) {
@@ -104,9 +134,8 @@
   function additivesValue(metadata) {
     const label = "Additives";
     if (metadata === MALFORMED_RECORD) return pending(`${label} unavailable because run metadata is malformed`);
-    if (!isRecord(metadata) || !own(metadata, "additives_kg") || metadata.additives_kg === null) {
-      return pending(`${label} not emitted`);
-    }
+    if (!isRecord(metadata) || !own(metadata, "additives_kg")) return pending(`${label} not emitted`);
+    if (metadata.additives_kg === null) return pending(`${label} emitted as null`);
     if (!isRecord(metadata.additives_kg)) return pending(`${label} map is malformed`);
     const entries = Object.entries(metadata.additives_kg);
     if (!entries.length) return empty("No additive entries in emitted map");
@@ -164,15 +193,19 @@
     ));
     const extras = Object.entries(identity)
       .filter(([key]) => !known.has(key))
-      .map(([key, value]) => detailRow(humanize(key), treeValue(value, key)));
+      .map(([key, value]) => detailRow(
+        // FIELD_LABELS.authoritative is the engine-chain slot name ("Authoritative
+        // provider"); identity extras are boolean trust flags, so use the short label.
+        key === "authoritative" ? "Authoritative" : humanize(key),
+        treeValue(value, key)
+      ));
     return `<dl class="sec-p9-facts">${rows.join("")}${extras.join("")}</dl>`;
   }
 
   function engineChainValue(metadata) {
     if (metadata === MALFORMED_RECORD) return pending("Engine chain unavailable because run metadata is malformed");
-    if (!isRecord(metadata) || !own(metadata, "engines_used") || metadata.engines_used === null) {
-      return pending("Engine chain not emitted");
-    }
+    if (!isRecord(metadata) || !own(metadata, "engines_used")) return pending("Engine chain not emitted");
+    if (metadata.engines_used === null) return pending("Engine chain emitted as null");
     if (!isRecord(metadata.engines_used)) return pending("Engine chain is malformed");
     return treeValue(metadata.engines_used, "engines_used");
   }
@@ -215,7 +248,7 @@
       detailRow("Additives", additivesValue(metadata)),
       detailRow("Track", fieldValue(metadata, "track", "Track")),
       detailRow("Started at (UTC)", fieldValue(metadata, "started_at_utc", "Start time")),
-      detailRow("Run metadata commit", fieldValue(metadata, "kernel_commit_sha", "Run metadata commit", { identifier: true }))
+      detailRow("Kernel commit SHA", fieldValue(metadata, "kernel_commit_sha", "Kernel commit SHA", { identifier: true }))
     ].join("");
 
     const backendFacts = [
@@ -223,11 +256,11 @@
       detailRow("Backend status", fieldValue(metadata, "backend_status", "Backend status")),
       detailRow("Runtime status", fieldValue(metadata, "runtime_status", "Runtime status")),
       detailRow("Real engine active", realActiveValue(metadata)),
-      detailRow("Degradation reason", fieldValue(metadata, "degradation_reason", "Degradation reason")),
-      detailRow("Degraded from", listValue(metadata, "degraded_from", "Degradation origin")),
+      detailRow("Degradation reason", degradationReasonValue(metadata)),
+      detailRow("Degraded from", degradationOriginValue(metadata)),
       detailRow("Evidence class", fieldValue(metadata, "evidence_class", "Evidence class")),
-      detailRow("Backend authoritative", fieldValue(metadata, "backend_authoritative", "Backend authority")),
-      detailRow("Certification allowed", fieldValue(metadata, "certification_allowed", "Certification permission")),
+      detailRow("Backend authoritative", fieldValue(metadata, "backend_authoritative", "Backend authoritative")),
+      detailRow("Certification allowed", fieldValue(metadata, "certification_allowed", "Certification allowed")),
       detailRow("Label source", fieldValue(metadata, "label_source", "Label source")),
       detailRow("Label sources", listValue(metadata, "label_sources", "Label sources"))
     ].join("");
@@ -247,12 +280,15 @@
       : identity
         ? ""
         : `<div class="pending"><strong>Pending</strong><p>header.engine_identity is not emitted.</p></div>`;
+    const degradationStateContext = isRecord(metadata) && own(metadata, "degradation_reason")
+      ? `<div class="sec-p9-state-context"><span>Degradation reason</span>${fieldValue(metadata, "degradation_reason", "Degradation reason")}</div>`
+      : "";
 
     return `<section id="sec-p9-provenance" class="sec-p9-provenance" aria-labelledby="sec-p9-provenance-title">` +
       `<h2 id="sec-p9-provenance-title"><span class="sect">P9</span>Run &amp; engine provenance</h2>` +
       `<p class="sub">Emitted run identity, backend state, evidence class, and engine chain. No confidence tier is computed in the viewer.</p>` +
       `${metadataNotice}${identityNotice}<div class="sec-p9-badges">${badges}</div>` +
-      `<div class="sec-p9-state-context"><span>Degradation reason</span>${fieldValue(metadata, "degradation_reason", "Degradation reason")}</div>` +
+      degradationStateContext +
       `<details class="sec-p9-details"><summary>Full run, engine, and label provenance</summary>` +
       `<div class="sec-p9-detail-grid">` +
       `<article><h3>Run input provenance</h3><dl class="sec-p9-facts">${runFacts}</dl></article>` +

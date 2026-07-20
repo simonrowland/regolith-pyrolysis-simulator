@@ -34,6 +34,29 @@ process.stdout.write(panel.render(JSON.parse(process.argv[4]), [], [], {}));
     return completed.stdout
 
 
+def _article(html: str, heading: str) -> str:
+    heading_marker = f"<h3>{heading}</h3>"
+    heading_start = html.index(heading_marker)
+    article_start = html.rfind("<article", 0, heading_start)
+    article_end = html.index("</article>", heading_start) + len("</article>")
+    return html[article_start:article_end]
+
+
+def _detail_value(region: str, label: str) -> str:
+    marker = f"<dt>{label}</dt><dd>"
+    return region.split(marker, 1)[1].split("</dd>", 1)[0]
+
+
+def _badge_value(html: str, label: str) -> str:
+    marker = f"<span>{label}</span><b>"
+    return html.split(marker, 1)[1].split("</b>", 1)[0]
+
+
+def _state_context(html: str) -> str:
+    marker = '<div class="sec-p9-state-context">'
+    return html.split(marker, 1)[1].split("</div>", 1)[0]
+
+
 def _complete_metadata(**overrides) -> dict:
     metadata = {
         "feedstock_id": "lunar_mare_low_ti",
@@ -44,7 +67,6 @@ def _complete_metadata(**overrides) -> dict:
         "backend": "magemin",
         "backend_status": "ok",
         "runtime_status": "ok",
-        "degradation_reason": "none",
         "backend_real_active": True,
         "backend_authoritative": True,
         "evidence_class": "magemin",
@@ -64,7 +86,6 @@ def _complete_metadata(**overrides) -> dict:
         },
         "label_source": "proof_inputs",
         "label_sources": ["proof_inputs", "backend_selection:auto"],
-        "degraded_from": [],
     }
     metadata.update(overrides)
     return metadata
@@ -85,21 +106,42 @@ def test_p9_real_run_renders_complete_provenance() -> None:
     }
 
     html = _render_panel(artifact)
+    run_input = _article(html, "Run input provenance")
+    backend = _article(html, "Backend evidence &amp; degradation")
+    identity = _article(html, "Artifact engine identity")
+    engine_chain = _article(html, "Engine chain")
 
     assert 'id="sec-p9-provenance"' in html
-    assert "Lunar Mare Low Ti" in html
-    assert "C2A" in html and "125.5 kg" in html
-    assert "1.25 kg" in html and "0.5 kg" in html
-    assert "pyrolysis" in html and "magemin" in html
-    assert "Real engine active" in html and "Yes <small>(emitted)</small>" in html
-    assert "2026-07-20T12:34:56Z" in html
-    assert "01234567…" in html and f'title="{sha}"' in html
-    assert 'tabindex="0"' in html
-    assert "Vapor Pressure" in html and "builtin-vapor-pressure" in html
-    assert "Authoritative provider" in html and "Shadow providers" in html
-    assert "No fallback provider in emitted field" in html
-    assert "proof_inputs" in html and "backend_selection:auto" in html
+    assert _badge_value(html, "Feedstock") == "Lunar Mare Low Ti"
+    assert _badge_value(html, "Campaign") == "C2A"
+    assert _badge_value(html, "Track") == "pyrolysis"
+    assert _badge_value(html, "Backend") == "magemin"
+    assert _badge_value(html, "Backend status") == "ok"
+    assert _badge_value(html, "Runtime status") == "ok"
+    assert "Yes <small>(emitted)</small>" in _badge_value(html, "Real engine active")
+    assert _detail_value(run_input, "Charge mass") == "125.5 kg"
+    assert "1.25 kg" in _detail_value(run_input, "Additives")
+    assert "0.5 kg" in _detail_value(run_input, "Additives")
+    assert _detail_value(run_input, "Started at (UTC)") == "2026-07-20T12:34:56Z"
+    run_sha = _detail_value(run_input, "Kernel commit SHA")
+    assert "01234567…" in run_sha and f'title="{sha}"' in run_sha
+    assert 'tabindex="0"' in run_sha
+    assert _detail_value(backend, "Backend status") == "ok"
+    assert _detail_value(backend, "Backend authoritative") == "true"
+    assert _detail_value(backend, "Certification allowed") == "true"
+    assert "No degradation reason in emitted fields" in _detail_value(backend, "Degradation reason")
+    assert "No degradation origin in emitted fields" in _detail_value(backend, "Degraded from")
+    assert "sec-p9-state-context" not in html
+    assert f'title="{sha}"' in _detail_value(identity, "Kernel commit SHA")
+    assert "builtin-vapor-pressure" in _detail_value(engine_chain, "Vapor Pressure")
+    assert "magemin" in _detail_value(engine_chain, "Authoritative provider")
+    assert "alphamelts" in _detail_value(engine_chain, "Shadow providers")
+    assert "No fallback provider in emitted field" in engine_chain
+    assert "proof_inputs" in _detail_value(backend, "Label source")
+    assert "backend_selection:auto" in _detail_value(backend, "Label sources")
     assert "No confidence tier is computed" in html
+    assert "Confidence grade" not in html
+    assert "sec-p9-confidence" not in html
 
 
 def test_p9_degraded_run_keeps_reason_and_origin_and_never_claims_grounded() -> None:
@@ -120,20 +162,28 @@ def test_p9_degraded_run_keeps_reason_and_origin_and_never_claims_grounded() -> 
         "header": {"engine_identity": {"name": "internal-analytical"}},
         "terminal": {"run_metadata": metadata},
     })
+    backend = _article(html, "Backend evidence &amp; degradation")
+    reason_context = _state_context(html)
 
-    assert "internal-analytical" in html
-    assert "unavailable" in html
-    assert "diagnostic_only" in html
-    assert "legacy_backend_authoritative" in html
-    assert "No <small>(emitted)</small>" in html
-    assert "Backend authoritative</dt><dd>false" in html
-    assert "Certification allowed</dt><dd>false" in html
+    assert _badge_value(html, "Backend") == "internal-analytical"
+    assert _badge_value(html, "Backend status") == "unavailable"
+    assert "No <small>(emitted)</small>" in _badge_value(html, "Real engine active")
+    assert "diagnostic_only" in reason_context
+    assert "not emitted" not in reason_context
+    assert _detail_value(backend, "Degradation reason") == "diagnostic_only"
+    origin = _detail_value(backend, "Degraded from")
+    assert "diagnostic_only" in origin and "unavailable" in origin
+    assert "legacy_backend_authoritative" in _detail_value(backend, "Label sources")
+    assert _detail_value(backend, "Backend authoritative") == "false"
+    assert _detail_value(backend, "Certification allowed") == "false"
     assert "grounded" not in html.lower()
     assert "Yes <small>(emitted)</small>" not in html
 
 
 def test_p9_absent_provenance_stays_pending_without_defaults() -> None:
     html = _render_panel({"header": {}, "terminal": {}})
+    run_input = _article(html, "Run input provenance")
+    backend = _article(html, "Backend evidence &amp; degradation")
 
     assert "terminal.run_metadata is not emitted" in html
     assert "header.engine_identity is not emitted" in html
@@ -145,6 +195,16 @@ def test_p9_absent_provenance_stays_pending_without_defaults() -> None:
     assert "Start time not emitted" in html
     assert "Engine chain not emitted" in html
     assert "Label source not emitted" in html
+    additives = _detail_value(run_input, "Additives")
+    assert "Additives not emitted" in additives
+    assert "No additive entries in emitted map" not in additives
+    label_sources = _detail_value(backend, "Label sources")
+    degradation_origin = _detail_value(backend, "Degraded from")
+    assert "Label sources not emitted" in label_sources
+    assert "Degradation origin not emitted" in degradation_origin
+    assert "emitted list is empty" not in label_sources
+    assert "emitted list is empty" not in degradation_origin
+    assert "sec-p9-state-context" not in html
     assert "0 kg" not in html
     assert "internal-analytical" not in html
     assert "grounded" not in html.lower()
@@ -161,6 +221,7 @@ def test_p9_engine_identity_preserves_authority_uncertainty_and_escapes() -> Non
         "authoritative": False,
         "diagnostic_only": True,
         "high_uncertainty": True,
+        "extrapolation": True,
         "source": '<img src=x onerror="bad()">',
         "reference": "audit-R9",
         "skip_reason": "license unavailable",
@@ -169,13 +230,16 @@ def test_p9_engine_identity_preserves_authority_uncertainty_and_escapes() -> Non
         "header": {"engine_identity": identity},
         "terminal": {"run_metadata": _complete_metadata()},
     })
+    identity_region = _article(html, "Artifact engine identity")
 
-    assert "Status" in html and "provisional" in html
-    assert "Version" in html and "7.2&lt;unsafe&gt;" in html
-    assert "Authoritative" in html and "false" in html
-    assert "Diagnostic only" in html and "true" in html
-    assert "High uncertainty" in html
-    assert "audit-R9" in html and "license unavailable" in html
+    assert _detail_value(identity_region, "Status") == '<span class="sec-p9-mono-value">provisional</span>'
+    assert _detail_value(identity_region, "Version") == '<span class="sec-p9-mono-value">7.2&lt;unsafe&gt;</span>'
+    assert _detail_value(identity_region, "Authoritative") == '<span class="sec-p9-mono-value">false</span>'
+    assert _detail_value(identity_region, "Diagnostic only") == '<span class="sec-p9-mono-value">true</span>'
+    assert _detail_value(identity_region, "High uncertainty") == '<span class="sec-p9-mono-value">true</span>'
+    assert _detail_value(identity_region, "Extrapolation") == '<span class="sec-p9-mono-value">true</span>'
+    assert "audit-R9" in _detail_value(identity_region, "Reference")
+    assert "license unavailable" in _detail_value(identity_region, "Skip reason")
     assert "engine&lt;script&gt;bad()&lt;/script&gt;" in html
     assert "&lt;img src=x onerror=&quot;bad()&quot;&gt;" in html
     assert "<script>" not in html and "<img" not in html
@@ -206,23 +270,36 @@ def test_p9_partial_fields_are_not_inferred_from_related_values() -> None:
     }
 
     html = _render_panel(artifact)
+    run_input = _article(html, "Run input provenance")
+    backend = _article(html, "Backend evidence &amp; degradation")
+    identity = _article(html, "Artifact engine identity")
 
-    assert "alphamelts" in html and "real" in html
-    assert "Runtime status not emitted" in html
-    assert "Real-engine state not emitted" in html
-    assert "Label source not emitted" in html and "source-from-list" in html
-    assert "Degradation reason not emitted" in html and "legacy-origin" in html
-    assert "Engine chain not emitted" in html
-    assert "Run metadata commit not emitted" in html and "header-identity-sha" in html
-    assert "Charge mass not emitted" in html
-    assert "Feedstock not emitted" in html and "Campaign not emitted" in html
-    assert "Start time not emitted" in html
-    assert "Certification permission not emitted" in html
-    assert "Evidence class not emitted" in html
-    assert "Backend wire token not emitted" in html
-    assert "Cache version not emitted" in html
-    assert "0.75 kg" in html and "0.5 kg" in html
-    assert "1.25 kg" not in html and "999 kg" not in html
+    assert _badge_value(html, "Backend") == "alphamelts"
+    assert _badge_value(html, "Backend status") == "real"
+    assert _detail_value(backend, "Backend status") == "real"
+    assert "Runtime status not emitted" in _detail_value(backend, "Runtime status")
+    assert "Real-engine state not emitted" in _detail_value(backend, "Real engine active")
+    assert "Label source not emitted" in _detail_value(backend, "Label source")
+    assert "source-from-list" in _detail_value(backend, "Label sources")
+    assert "Degradation reason not emitted" in _detail_value(backend, "Degradation reason")
+    assert "legacy-origin" in _detail_value(backend, "Degraded from")
+    assert "Engine chain not emitted" in _article(html, "Engine chain")
+    assert "Kernel commit SHA not emitted" in _detail_value(run_input, "Kernel commit SHA")
+    assert "header-identity-sha" in _detail_value(identity, "Kernel commit SHA")
+    charge_mass = _detail_value(run_input, "Charge mass")
+    assert "Charge mass not emitted" in charge_mass
+    assert "999 kg" not in charge_mass
+    assert "Feedstock ID not emitted" in _detail_value(run_input, "Feedstock ID")
+    assert "Campaign not emitted" in _detail_value(run_input, "Campaign")
+    assert "Start time not emitted" in _detail_value(run_input, "Started at (UTC)")
+    assert "Certification allowed not emitted" in _detail_value(backend, "Certification allowed")
+    assert "Evidence class not emitted" in _detail_value(backend, "Evidence class")
+    assert _detail_value(backend, "Backend authoritative") == "true"
+    assert "Backend wire token not emitted" in _detail_value(identity, "Backend wire token")
+    assert "Cache version not emitted" in _detail_value(identity, "Cache version")
+    additives = _detail_value(run_input, "Additives")
+    assert "0.75 kg" in additives and "0.5 kg" in additives
+    assert "1.25 kg" not in additives
     assert "Yes <small>(emitted)</small>" not in html
     assert "grounded" not in html.lower()
 
@@ -240,10 +317,94 @@ def test_p9_malformed_parent_records_are_not_reported_as_absent() -> None:
         "header": {"engine_identity": ["not", "an", "object"]},
         "terminal": {"run_metadata": "not-an-object"},
     })
+    run_input = _article(html, "Run input provenance")
+    backend = _article(html, "Backend evidence &amp; degradation")
 
     assert "terminal.run_metadata is malformed; expected an object" in html
     assert "header.engine_identity is malformed; expected an object" in html
     assert "Real-engine state unavailable because run metadata is malformed" in html
     assert "Engine chain unavailable because run metadata is malformed" in html
+    assert "Feedstock ID unavailable because its parent record is malformed" in _detail_value(run_input, "Feedstock ID")
+    assert "Backend status unavailable because its parent record is malformed" in _detail_value(backend, "Backend status")
+    assert "Charge mass unavailable because its parent record is malformed" in _detail_value(run_input, "Charge mass")
+    assert "Engine identity unavailable because its parent record is malformed" in _badge_value(html, "Engine identity")
+    assert "Feedstock ID not emitted" not in _detail_value(run_input, "Feedstock ID")
+    assert "Backend status not emitted" not in _detail_value(backend, "Backend status")
+    assert "Charge mass not emitted" not in _detail_value(run_input, "Charge mass")
+    assert "Engine identity not emitted" not in _badge_value(html, "Engine identity")
     assert "terminal.run_metadata is not emitted" not in html
     assert "header.engine_identity is not emitted" not in html
+
+
+def test_p9_present_empty_malformed_null_and_zero_states_stay_distinct() -> None:
+    html = _render_panel({
+        "header": {"engine_identity": {"name": "state-check"}},
+        "terminal": {
+            "run_metadata": {
+                "campaign": "",
+                "mass_kg": 0,
+                "additives_kg": {"C": 0},
+                "backend_status": [],
+                "backend_real_active": None,
+                "label_source": None,
+                "label_sources": [],
+                "degraded_from": None,
+                "engines_used": None,
+            }
+        },
+    })
+    run_input = _article(html, "Run input provenance")
+    backend = _article(html, "Backend evidence &amp; degradation")
+
+    campaign = _detail_value(run_input, "Campaign")
+    assert "Campaign: emitted string is empty" in campaign
+    assert "Campaign not emitted" not in campaign
+    assert _detail_value(run_input, "Charge mass") == "0 kg"
+    assert "0 kg" in _detail_value(run_input, "Additives")
+    assert "Backend status is malformed" in _detail_value(backend, "Backend status")
+    assert "Real-engine state emitted as null" in _detail_value(backend, "Real engine active")
+    assert "Label source emitted as null" in _detail_value(backend, "Label source")
+    assert "Label sources: emitted list is empty" in _detail_value(backend, "Label sources")
+    assert "Degradation origin emitted as null" in _detail_value(backend, "Degraded from")
+    assert "Engine chain emitted as null" in _article(html, "Engine chain")
+
+    null_additives_html = _render_panel({
+        "header": {"engine_identity": {"name": "state-check"}},
+        "terminal": {"run_metadata": {"additives_kg": None}},
+    })
+    assert "Additives emitted as null" in _detail_value(
+        _article(null_additives_html, "Run input provenance"), "Additives"
+    )
+
+    empty_maps_html = _render_panel({
+        "header": {"engine_identity": {"name": "state-check"}},
+        "terminal": {"run_metadata": {"additives_kg": {}, "engines_used": {}}},
+    })
+    assert "No additive entries in emitted map" in _detail_value(
+        _article(empty_maps_html, "Run input provenance"), "Additives"
+    )
+    assert "Emitted map is empty" in _article(empty_maps_html, "Engine chain")
+
+    malformed_shapes_html = _render_panel({
+        "header": {"engine_identity": {"name": "state-check"}},
+        "terminal": {
+            "run_metadata": {
+                "additives_kg": [],
+                "backend_real_active": "yes",
+                "engines_used": [],
+            }
+        },
+    })
+    malformed_run_input = _article(malformed_shapes_html, "Run input provenance")
+    malformed_backend = _article(malformed_shapes_html, "Backend evidence &amp; degradation")
+    assert "Additives map is malformed" in _detail_value(malformed_run_input, "Additives")
+    assert "Real-engine state is malformed" in _detail_value(malformed_backend, "Real engine active")
+    assert "Engine chain is malformed" in _article(malformed_shapes_html, "Engine chain")
+
+    malformed_mass_html = _render_panel({
+        "header": {"engine_identity": {"name": "state-check"}},
+        "terminal": {"run_metadata": {"additives_kg": {"C": "bad-mass"}}},
+    })
+    assert "Additive mass is malformed" in _detail_value(
+        _article(malformed_mass_html, "Run input provenance"), "Additives"
+    )
