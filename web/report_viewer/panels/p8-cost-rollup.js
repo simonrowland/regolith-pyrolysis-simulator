@@ -23,6 +23,18 @@
     ["solar_heat_cost_usd", "Solar heat cost", "USD"]
   ];
 
+  // Always co-emitted by simulator/accounting/run_artifact.py::_canonical_energy_cost_totals
+  // on success. Optional pumping_* and basis_note are not required for binding.
+  const CANONICAL_TOTAL_CORE = [
+    "total_cost_usd",
+    "electrical_cost_usd",
+    "solar_heat_cost_usd",
+    "electrical_energy_kWh",
+    "process_electrical_energy_kWh",
+    "process_electrical_cost_usd",
+    "evaporation_thermal_energy_kWh"
+  ];
+
   const MONEY_PROJECTION_LABEL = "Diagnostic money projection · not viewer price authority";
 
   const LABELS = Object.freeze({
@@ -37,6 +49,7 @@
     thermal_proxy: "Thermal proxy definition",
     auxiliary_electrical_kWh: "Auxiliary electrical energy",
     pumping_electrical_kWh: "Pumping electrical energy",
+    energy_kWh: "Pump stage energy",
     components_kWh: "Component energies",
     parameter_metadata: "Parameter metadata",
     ambient_pressure_pa: "Ambient pressure",
@@ -44,7 +57,24 @@
     feedstock_id: "Feedstock",
     source_tag: "Source tag",
     ratification_note: "Ratification note",
-    import_context: "Import context"
+    import_context: "Import context",
+    required_pump_speed_m3_s: "Required pump speed",
+    line_conductance_m3_s: "Line conductance",
+    effective_speed_ceiling_m3_s: "Effective speed ceiling",
+    feasible: "Feasible",
+    units: "Units",
+    ticket: "Ticket"
+  });
+
+  const LEAF_UNITS = Object.freeze({
+    owner_ratify_money_projection: "USD",
+    auxiliary_electrical_kWh: "kWh",
+    pumping_electrical_kWh: "kWh",
+    energy_kWh: "kWh",
+    ambient_pressure_pa: "Pa",
+    required_pump_speed_m3_s: "m\u00b3/s",
+    line_conductance_m3_s: "m\u00b3/s",
+    effective_speed_ceiling_m3_s: "m\u00b3/s"
   });
 
   function isRecord(value) {
@@ -55,11 +85,36 @@
     return isRecord(value) && Object.prototype.hasOwnProperty.call(value, key);
   }
 
+  function finiteNumber(value) {
+    return typeof value === "number" && Number.isFinite(value);
+  }
+
+  function hasCanonicalTotals(totals) {
+    return isRecord(totals) && CANONICAL_TOTAL_CORE.every(key => finiteNumber(totals[key]));
+  }
+
+  function hasAnyCanonicalTotalField(totals) {
+    return isRecord(totals) && TOTAL_FIELDS.some(([key]) => finiteNumber(totals[key]));
+  }
+
   function readableKey(key) {
     const value = String(key);
     if (LABELS[value]) return LABELS[value];
+    // Avoid turning unit-bearing suffixes like m3_s into "m3 s" (loses the division).
+    if (/_m3_s$/i.test(value)) {
+      const stem = value.slice(0, -5).replace(/([a-z])([A-Z])/g, "$1 $2").replace(/[._-]+/g, " ").trim();
+      return stem ? `${stem.charAt(0).toUpperCase() + stem.slice(1)} (m\u00b3/s)` : "Volumetric rate (m\u00b3/s)";
+    }
     const words = value.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/[._-]+/g, " ").trim();
     return words ? words.charAt(0).toUpperCase() + words.slice(1) : "Unlabelled field";
+  }
+
+  function leafUnit(key, path) {
+    if (LEAF_UNITS[key]) return LEAF_UNITS[key];
+    if (path.includes(".components_kWh.")) return "kWh";
+    if (/_m3_s$/i.test(String(key))) return "m\u00b3/s";
+    if (/_kWh$/i.test(String(key))) return "kWh";
+    return "";
   }
 
   function pending(path, message = `${path} is not emitted; no value is inferred.`) {
@@ -89,13 +144,7 @@
     if (value === null) return emptyInline(path, "null");
     if (typeof value === "number") {
       if (!Number.isFinite(value)) return malformedInline(path, "a finite number");
-      const units = ({
-        owner_ratify_money_projection: "USD",
-        auxiliary_electrical_kWh: "kWh",
-        pumping_electrical_kWh: "kWh",
-        ambient_pressure_pa: "Pa"
-      })[key] || (path.includes(".components_kWh.") ? "kWh" : "");
-      return `<span class="mono">${esc(fmtNum(value, units))}</span>`;
+      return `<span class="mono">${esc(fmtNum(value, leafUnit(key, path)))}</span>`;
     }
     if (typeof value === "boolean") return esc(value ? "true" : "false");
     if (typeof value === "string") return value.trim()
@@ -153,6 +202,26 @@
     return `<div class="sec-p8-field"><span>${esc(label)}</span><b>${value}</b></div>`;
   }
 
+  function totalsBindingState(costTotals) {
+    if (hasCanonicalTotals(costTotals)) return "canonical";
+    if (costTotals === undefined) return "absent";
+    if (costTotals === null) return "null";
+    if (isRecord(costTotals) && !Object.keys(costTotals).length) return "empty";
+    if (isRecord(costTotals)) return "partial";
+    return "malformed";
+  }
+
+  function totalsStatePhrase(state) {
+    if (state === "canonical") return "canonical totals remain artifact-emitted values";
+    if (state === "absent") return "canonical energy-cost totals are not emitted in this artifact";
+    if (state === "null") return "canonical energy-cost totals were emitted null, so no price-to-total binding is inferred";
+    if (state === "empty") return "canonical energy-cost totals were emitted empty, so no price-to-total binding is inferred";
+    if (state === "partial") {
+      return "terminal.cost_totals is present but no complete canonical energy-cost field set is emitted; no price-to-total binding is inferred";
+    }
+    return "canonical energy-cost totals were emitted malformed, so no price-to-total binding is inferred";
+  }
+
   function renderCostTotals(totals) {
     const path = "terminal.cost_totals";
     if (!isRecord(totals)) return structuredProblem(totals, path, "an object");
@@ -163,8 +232,13 @@
     ).join("");
     const basis = `<div class="note"><b>Emitted cost basis:</b> ${scalarValue(totals, "basis_note", path)}</div>`;
     const extras = Object.fromEntries(Object.entries(totals).filter(([key]) => !known.has(key)));
+    // Scope caption only when at least one known energy/cost total leaf is finite —
+    // a foreign-key-only bag is not a canonical energy-cost scope claim.
+    const scopeCaption = hasAnyCanonicalTotalField(totals) || hasCanonicalTotals(totals)
+      ? `<p class="sec-p8-caption">Canonical energy-cost scope: electrical + evaporation solar heat.</p>`
+      : `<p class="sec-p8-caption">terminal.cost_totals is present but no canonical energy-cost fields are emitted; no price-to-total binding is inferred.</p>`;
     return `<div class="sec-p8-metrics">${cards}</div>` +
-      `<p class="sec-p8-caption">Canonical energy-cost scope: electrical + evaporation solar heat.</p>` +
+      scopeCaption +
       `${basis}${Object.keys(extras).length
       ? `<details class="sec-p8-details"><summary>Other emitted canonical-total fields</summary>${renderTree(extras, path)}</details>`
       : ""}`;
@@ -174,22 +248,26 @@
     const path = "header.cost_block";
     if (!isRecord(costBlock)) return structuredProblem(costBlock, path, "an object", `${path} is not emitted; viewer price authority is unavailable.`);
     const pricesPresent = ["electrical_cost_per_kWh", "solar_heat_cost_per_kWh"].every(key =>
-      hasOwn(costBlock, key) && typeof costBlock[key] === "number" && Number.isFinite(costBlock[key])
+      hasOwn(costBlock, key) && finiteNumber(costBlock[key])
     );
     const provenancePresent = hasOwn(costBlock, "provenance") &&
       typeof costBlock.provenance === "string" && Boolean(costBlock.provenance.trim());
-    const totalsPresent = isRecord(costTotals) && Object.keys(costTotals).length > 0;
+    const totalsState = totalsBindingState(costTotals);
     let caption;
     if (!pricesPresent || !provenancePresent) {
-      caption = "Canonical-total price provenance cannot be validated from this artifact; canonical totals remain artifact-emitted values.";
-    } else if (totalsPresent) {
+      // Incomplete provenance never claims a binding, and must not claim
+      // "totals remain artifact-emitted" when no complete totals were emitted.
+      caption = `Canonical-total price provenance cannot be validated from this artifact; ${totalsStatePhrase(totalsState)}.`;
+    } else if (totalsState === "canonical") {
       caption = "Emitted canonical energy-cost totals use these artifact price inputs. Diagnostic allocation projections below do not.";
-    } else if (costTotals === undefined) {
+    } else if (totalsState === "absent") {
       caption = "Viewer price inputs are emitted in header.cost_block; canonical energy-cost totals are not emitted in this artifact.";
-    } else if (costTotals === null) {
+    } else if (totalsState === "null") {
       caption = "Viewer price inputs are emitted in header.cost_block; canonical energy-cost totals were emitted null, so no price-to-total binding is inferred.";
-    } else if (isRecord(costTotals)) {
+    } else if (totalsState === "empty") {
       caption = "Viewer price inputs are emitted in header.cost_block; canonical energy-cost totals were emitted empty, so no price-to-total binding is inferred.";
+    } else if (totalsState === "partial") {
+      caption = "Viewer price inputs are emitted in header.cost_block; terminal.cost_totals is present but no complete canonical energy-cost field set is emitted; no price-to-total binding is inferred.";
     } else {
       caption = "Viewer price inputs are emitted in header.cost_block; canonical energy-cost totals were emitted malformed, so no price-to-total binding is inferred.";
     }

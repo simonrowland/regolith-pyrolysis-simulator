@@ -158,7 +158,13 @@ def _full_artifact() -> dict:
                             "status": "owner-ratify-placeholder",
                             "ratification_note": "owner must ratify",
                         }],
-                        "rows": [{"flow_kg_h": 1.5}],
+                        # Emitter-shaped row keys from simulator/pumping_cost.py::SubambientPumpCost.to_json
+                        "rows": [{
+                            "energy_kWh": 1.5,
+                            "required_pump_speed_m3_s": 2.0,
+                            "line_conductance_m3_s": 3.0,
+                            "effective_speed_ceiling_m3_s": 4.0,
+                        }],
                     },
                     "warnings": ["allocation <warning>"],
                     "owner_ratify_placeholders": [{
@@ -186,6 +192,10 @@ def test_present_rollup_renders_emitted_depth_and_escapes() -> None:
     placeholders = _between(html, "<summary>Owner-ratification placeholders</summary>", "<summary>Product allocations</summary>")
     pumping = _between(html, "<summary>Pumping diagnostic</summary>", "<summary>Warnings</summary>")
 
+    identity = _between(html, '<div class="sec-p8-identity">', "</div><details")
+    auxiliary = _between(html, "<summary>Auxiliary electrical diagnostic</summary>", "<summary>Pumping diagnostic</summary>")
+    run_input = _between(html, "<summary>Run input cost</summary>", "<summary>Auxiliary electrical diagnostic</summary>")
+
     assert rendered["id"] == "sec-p8-cost-rollup"
     assert "Canonical energy cost total" in totals
     assert "Canonical total cost" not in totals
@@ -194,12 +204,34 @@ def test_present_rollup_renders_emitted_depth_and_escapes() -> None:
     assert "pending · terminal.cost_totals.basis_note not emitted" in totals
     assert "Emitted canonical energy-cost totals use these artifact price inputs" in headline
     assert "owner &lt;source&gt;" in headline
-    assert "policy &lt;unsafe&gt;" in _between(html, '<div class="sec-p8-identity">', "</div><details")
+    assert "policy &lt;unsafe&gt;" in identity
+    residual = _field_value(identity, "Maximum absolute transition residual · native cost-vector component")
+    assert "cost-ledger-v1" in _field_value(identity, "Schema version")
+    assert "7" in _field_value(identity, "Cost-ledger transitions")
+    assert "1.00e-13" in residual
     assert "Cleaned melt · SiO₂" in products
     assert "Metal pool (bottom) · Fe" in inventory
     assert "50631 USD" in products or "50,630 USD" in products
     assert "resolved" in _field_value(pumping, "Emitted pumping status")
+    assert "true" in _tree_value(pumping, "Feasible")
+    assert "pumping-cost-rollup-v1" in _tree_value(pumping, "Schema version")
+    assert "auxiliary-electrical-rollup-v1" in _tree_value(auxiliary, "Schema version")
+    assert "Required pump speed" in pumping
+    assert "2 m³/s" in pumping
+    assert "Line conductance" in pumping
+    assert "3 m³/s" in pumping
+    assert "Effective speed ceiling" in pumping
+    assert "4 m³/s" in pumping
+    assert "m3 s" not in pumping  # underscore→space must not mangle m3_s units
+    assert "1.5 kWh" in pumping  # per-row energy_kWh, not invented row key
+    assert "fraction" in _tree_value(pumping, "Units")
+    assert "COST-PARAM-PUMP" in _tree_value(pumping, "Ticket")
+    assert "owner must ratify" in _tree_value(pumping, "Ratification note")
+    assert "thermal_flux_h = absolute_temperature_K * duration_h" in _field_value(run_input, "Thermal proxy definition")
     assert PUMPING_NOTE in pumping
+    # Exact approved pumping note only — no appended inclusion reinterpretation.
+    assert pumping.count(PUMPING_NOTE) == 1
+    assert "Status resolved means pumping is included" not in pumping
     assert "Canonical-total treatment" not in pumping
     assert "eligible for canonical inclusion" not in pumping
     assert "owner-ratify-placeholder" in _tree_value(placeholders, "Status")
@@ -255,8 +287,12 @@ def test_partial_totals_and_sparse_maps_do_not_derive() -> None:
     products = _between(html, "<summary>Product allocations</summary>", "<summary>Active inventory allocations</summary>")
     inventory = _between(html, "<summary>Active inventory allocations</summary>", "<summary>Run input cost</summary>")
 
+    price_caption = html.split('<div class="card sec-p8-price-card">', 1)[1].split('<p class="sec-p8-caption">', 1)[1].split("</p>", 1)[0]
     assert "pending · terminal.cost_totals.total_cost_usd not emitted" in html
     assert "23 USD" not in html
+    # Incomplete core (missing total_cost_usd) is not a typed canonical result → no binding claim.
+    assert "Emitted canonical energy-cost totals use these artifact price inputs" not in price_caption
+    assert "no complete canonical energy-cost field set is emitted" in price_caption
     assert "product_costs was emitted empty; sparse allocation is not displayed as zero" in html
     assert "active_inventory_costs was emitted empty; sparse allocation is not displayed as zero" in html
     assert ">0 USD<" not in products
@@ -321,9 +357,10 @@ def test_partial_nested_diagnostics_stay_pending_without_reconstruction() -> Non
     diagnostic["run_input_cost"].pop("owner_ratify_money_projection")
     diagnostic["auxiliary_electrical_diagnostic"].pop("auxiliary_electrical_kWh")
     diagnostic["pumping_diagnostic"].pop("pumping_electrical_kWh")
+    # Emitter-shaped row energy key (simulator/pumping_cost.py) — not invented pumping_electrical_kWh.
     diagnostic["pumping_diagnostic"]["rows"] = [
-        {"pumping_electrical_kWh": 31.0},
-        {"pumping_electrical_kWh": 57.0},
+        {"energy_kWh": 31.0},
+        {"energy_kWh": 57.0},
     ]
 
     html = _render_panel(artifact)["html"]
@@ -334,6 +371,7 @@ def test_partial_nested_diagnostics_stay_pending_without_reconstruction() -> Non
     pumping = _between(html, "<summary>Pumping diagnostic</summary>", "<summary>Warnings</summary>")
     product_money = _field_value(products, "Diagnostic money projection · not viewer price authority")
     input_money = _field_value(run_input, "Diagnostic money projection · not viewer price authority")
+    top_energy = _field_value(pumping, "Emitted pumping diagnostic energy")
 
     assert "pending · terminal.run_metadata.cost_rollup_diagnostic.owner_ratify_placeholder_count not emitted" in identity
     assert "5" not in _field_value(identity, "Emitted placeholder count")
@@ -342,7 +380,8 @@ def test_partial_nested_diagnostics_stay_pending_without_reconstruction() -> Non
     assert "pending · terminal.run_metadata.cost_rollup_diagnostic.run_input_cost.owner_ratify_money_projection not emitted" in input_money
     assert "USD" not in input_money
     assert "pending · terminal.run_metadata.cost_rollup_diagnostic.auxiliary_electrical_diagnostic.auxiliary_electrical_kWh not emitted" in auxiliary
-    assert "pending · terminal.run_metadata.cost_rollup_diagnostic.pumping_diagnostic.pumping_electrical_kWh not emitted" in pumping
+    assert "pending · terminal.run_metadata.cost_rollup_diagnostic.pumping_diagnostic.pumping_electrical_kWh not emitted" in top_energy
+    assert "88 kWh" not in top_energy
     assert "31 kWh" in pumping
     assert "57 kWh" in pumping
     assert "88 kWh" not in pumping
@@ -497,8 +536,13 @@ def test_hostile_map_keys_escape_once_and_two_same_map_bins_survive() -> None:
     assert "<script>" not in species_summary
     assert "&amp;lt;script" not in species_summary
     assert hostile_account in rendered["helperCalls"]["esc"]
+    # Visible account labels must also pass through shared esc (not a local identity).
+    assert any("Img Src=X Onerror=Alert(1)" in call or "img src=x" in call
+               for call in rendered["helperCalls"]["esc"])
     assert "SiO2" in rendered["helperCalls"]["speciesColor"]
     assert "O2<script>alert(2)</script>" in rendered["helperCalls"]["speciesColor"]
+    # Sentinel colour return must appear in rendered marker style (not discarded).
+    assert 'style="background:rgb(1, 2, 3)"' in products
 
 
 def test_partial_cost_vectors_keep_every_missing_leaf_pending() -> None:
@@ -543,18 +587,21 @@ def test_resolved_pumping_with_rows_but_no_total_does_not_infer_treatment() -> N
     artifact = _full_artifact()
     diagnostic = artifact["terminal"]["run_metadata"]["cost_rollup_diagnostic"]
     diagnostic["pumping_diagnostic"].pop("pumping_electrical_kWh")
+    # Real emitter row key is energy_kWh (SubambientPumpCost.to_json), not pumping_electrical_kWh.
     diagnostic["pumping_diagnostic"]["rows"] = [
-        {"pumping_electrical_kWh": 1.0},
-        {"pumping_electrical_kWh": 2.0},
+        {"energy_kWh": 1.0},
+        {"energy_kWh": 2.0},
     ]
     artifact["terminal"].pop("cost_totals")
 
     html = _render_panel(artifact)["html"]
     pumping = _between(html, "<summary>Pumping diagnostic</summary>", "<summary>Warnings</summary>")
     totals = html.split('<div class="card sec-p8-price-card">', 1)[0]
+    top_energy = _field_value(pumping, "Emitted pumping diagnostic energy")
 
     assert "resolved" in _field_value(pumping, "Emitted pumping status")
-    assert "pending · terminal.run_metadata.cost_rollup_diagnostic.pumping_diagnostic.pumping_electrical_kWh not emitted" in _field_value(pumping, "Emitted pumping diagnostic energy")
+    assert "pending · terminal.run_metadata.cost_rollup_diagnostic.pumping_diagnostic.pumping_electrical_kWh not emitted" in top_energy
+    assert "3 kWh" not in top_energy
     assert "1 kWh" in pumping
     assert "2 kWh" in pumping
     assert "3 kWh" not in pumping
@@ -578,14 +625,15 @@ def test_missing_cost_basis_note_is_not_reconstructed_from_pumping_inputs() -> N
 def test_price_caption_requires_emitted_totals_and_complete_provenance() -> None:
     artifact = _full_artifact()
     html = _render_panel(artifact)["html"]
-    price_card = html.split('<div class="card sec-p8-price-card">', 1)[1].split("</div></div>", 1)[0]
+    price_card = html.split('<div class="card sec-p8-price-card">', 1)[1].split('<p class="sec-p8-caption">', 1)[1].split("</p>", 1)[0]
     assert "Emitted canonical energy-cost totals use these artifact price inputs" in price_card
 
     artifact["terminal"].pop("cost_totals")
     no_totals_html = _render_panel(artifact)["html"]
-    no_totals_card = no_totals_html.split('<div class="card sec-p8-price-card">', 1)[1].split("</div></div>", 1)[0]
-    assert "canonical energy-cost totals are not emitted in this artifact" in no_totals_card
-    assert "Emitted canonical energy-cost totals use these artifact price inputs" not in no_totals_card
+    no_totals_card = no_totals_html.split('<div class="card sec-p8-price-card">', 1)[1]
+    no_totals_caption = no_totals_card.split('<p class="sec-p8-caption">', 1)[1].split("</p>", 1)[0]
+    assert "canonical energy-cost totals are not emitted in this artifact" in no_totals_caption
+    assert "Emitted canonical energy-cost totals use these artifact price inputs" not in no_totals_caption
 
     totals_states = [
         ({}, "canonical energy-cost totals were emitted empty"),
@@ -596,9 +644,46 @@ def test_price_caption_requires_emitted_totals_and_complete_provenance() -> None
         partial = _full_artifact()
         partial["terminal"]["cost_totals"] = totals_value
         partial_html = _render_panel(partial)["html"]
-        partial_card = partial_html.split('<div class="card sec-p8-price-card">', 1)[1].split("</div></div>", 1)[0]
-        assert expected_caption in partial_card
-        assert "Emitted canonical energy-cost totals use these artifact price inputs" not in partial_card
+        partial_caption = partial_html.split('<div class="card sec-p8-price-card">', 1)[1].split('<p class="sec-p8-caption">', 1)[1].split("</p>", 1)[0]
+        assert expected_caption in partial_caption
+        assert "Emitted canonical energy-cost totals use these artifact price inputs" not in partial_caption
+
+    # Non-empty partial / foreign-key / null-only bags must not claim price binding (F1 / codex P1).
+    for partial_totals in (
+        {"unexpected": True},
+        {"basis_note": "only-note"},
+        {"total_cost_usd": None},
+        {"basis_note": "not canonical", "foreign": 1},
+    ):
+        bag = _full_artifact()
+        bag["terminal"]["cost_totals"] = partial_totals
+        bag_html = _render_panel(bag)["html"]
+        bag_caption = bag_html.split('<div class="card sec-p8-price-card">', 1)[1].split('<p class="sec-p8-caption">', 1)[1].split("</p>", 1)[0]
+        totals_region = bag_html.split('<div class="card sec-p8-price-card">', 1)[0]
+        assert "no complete canonical energy-cost field set is emitted" in bag_caption or \
+            "no price-to-total binding is inferred" in bag_caption
+        assert "Emitted canonical energy-cost totals use these artifact price inputs" not in bag_caption
+        assert "Canonical energy-cost scope: electrical + evaporation solar heat." not in totals_region
+        assert "no canonical energy-cost fields are emitted" in totals_region or \
+            "pending · terminal.cost_totals.total_cost_usd not emitted" in totals_region
+
+    # Incomplete prices must nest totals state — not claim totals remain emitted when absent (F2).
+    incomplete_absent = _full_artifact()
+    incomplete_absent["header"]["cost_block"].pop("solar_heat_cost_per_kWh")
+    incomplete_absent["terminal"].pop("cost_totals")
+    incomplete_absent_html = _render_panel(incomplete_absent)["html"]
+    incomplete_absent_caption = incomplete_absent_html.split('<div class="card sec-p8-price-card">', 1)[1].split('<p class="sec-p8-caption">', 1)[1].split("</p>", 1)[0]
+    assert "Canonical-total price provenance cannot be validated from this artifact" in incomplete_absent_caption
+    assert "canonical energy-cost totals are not emitted in this artifact" in incomplete_absent_caption
+    assert "canonical totals remain artifact-emitted values" not in incomplete_absent_caption
+
+    incomplete_partial = _full_artifact()
+    incomplete_partial["header"]["cost_block"].pop("solar_heat_cost_per_kWh")
+    incomplete_partial["terminal"]["cost_totals"] = {"basis_note": "only"}
+    incomplete_partial_html = _render_panel(incomplete_partial)["html"]
+    incomplete_partial_caption = incomplete_partial_html.split('<div class="card sec-p8-price-card">', 1)[1].split('<p class="sec-p8-caption">', 1)[1].split("</p>", 1)[0]
+    assert "no complete canonical energy-cost field set is emitted" in incomplete_partial_caption
+    assert "canonical totals remain artifact-emitted values" not in incomplete_partial_caption
 
     for provenance in (None, "", []):
         incomplete = _full_artifact()
@@ -607,18 +692,28 @@ def test_price_caption_requires_emitted_totals_and_complete_provenance() -> None
         else:
             incomplete["header"]["cost_block"]["provenance"] = provenance
         incomplete_html = _render_panel(incomplete)["html"]
-        incomplete_card = incomplete_html.split('<div class="card sec-p8-price-card">', 1)[1].split("</div></div>", 1)[0]
-        assert "Canonical-total price provenance cannot be validated from this artifact" in incomplete_card
-        assert "Emitted canonical energy-cost totals use these artifact price inputs" not in incomplete_card
+        incomplete_caption = incomplete_html.split('<div class="card sec-p8-price-card">', 1)[1].split('<p class="sec-p8-caption">', 1)[1].split("</p>", 1)[0]
+        assert "Canonical-total price provenance cannot be validated from this artifact" in incomplete_caption
+        assert "canonical totals remain artifact-emitted values" in incomplete_caption  # full totals still present
+        assert "Emitted canonical energy-cost totals use these artifact price inputs" not in incomplete_caption
 
     zero_prices = _full_artifact()
     zero_prices["header"]["cost_block"]["electrical_cost_per_kWh"] = 0.0
     zero_prices["header"]["cost_block"]["solar_heat_cost_per_kWh"] = 0.0
     zero_html = _render_panel(zero_prices)["html"]
-    zero_card = zero_html.split('<div class="card sec-p8-price-card">', 1)[1].split("</div></div>", 1)[0]
+    zero_card = zero_html.split('<div class="card sec-p8-price-card">', 1)[1]
+    zero_caption = zero_card.split('<p class="sec-p8-caption">', 1)[1].split("</p>", 1)[0]
     assert "0 USD/kWh" in _field_value(zero_card, "Electrical price")
     assert "0 USD/kWh" in _field_value(zero_card, "Solar heat price")
-    assert "Emitted canonical energy-cost totals use these artifact price inputs" in zero_card
+    assert "Emitted canonical energy-cost totals use these artifact price inputs" in zero_caption
+
+    # Provenance null is empty-null, not pending-absent.
+    null_prov = _full_artifact()
+    null_prov["header"]["cost_block"]["provenance"] = None
+    null_prov_html = _render_panel(null_prov)["html"]
+    null_prov_card = null_prov_html.split('<div class="card sec-p8-price-card">', 1)[1]
+    assert "empty · header.cost_block.provenance emitted null" in _field_value(null_prov_card, "Provenance")
+    assert "Canonical-total price provenance cannot be validated from this artifact" in null_prov_card
 
 
 def test_import_context_preserves_authority_values_and_four_states() -> None:
@@ -702,3 +797,95 @@ def test_malformed_roots_render_pending_without_throwing() -> None:
         assert "Pending · terminal.cost_totals" in html
         assert "Pending · header.cost_block" in html
         assert "Pending · terminal.run_metadata.cost_rollup_diagnostic" in html
+
+
+def test_same_species_oxygen_dual_bins_remain_distinct() -> None:
+    """AGENTS.md: oxygen_mre_anode_stored vs oxygen_melt_offgas_stored stay distinct.
+
+    Mutation this catches: collapse map entries by species (last wins) before render.
+    """
+    artifact = _full_artifact()
+    product = next(iter(artifact["terminal"]["run_metadata"]["cost_rollup_diagnostic"]["product_costs"].values()))
+    mre = copy.deepcopy(product)
+    offgas = copy.deepcopy(product)
+    mre["quantity_kg"] = 1.0
+    offgas["quantity_kg"] = 2.0
+    artifact["terminal"]["run_metadata"]["cost_rollup_diagnostic"]["product_costs"] = {
+        "terminal.oxygen_mre_anode_stored:O2": mre,
+        "terminal.oxygen_melt_offgas_stored:O2": offgas,
+    }
+
+    html = _render_panel(artifact)["html"]
+    products = _between(html, "<summary>Product allocations</summary>", "<summary>Active inventory allocations</summary>")
+    summaries = [part.split("</summary>", 1)[0] for part in products.split("<summary>")[1:]]
+
+    assert len(summaries) == 2
+    assert any("O₂ stored · MRE anode" in s and "O₂" in s for s in summaries)
+    assert any("O₂ stored · melt offgas" in s for s in summaries)
+    # Distinct quantities survive; collapse-by-species would keep only one entry.
+    assert products.count("1 kg") >= 1
+    assert products.count("2 kg") >= 1
+    assert 'title="terminal.oxygen_mre_anode_stored:O2"' in products
+    assert 'title="terminal.oxygen_melt_offgas_stored:O2"' in products
+
+
+def test_pumping_volumetric_fields_use_cubic_metres_per_second() -> None:
+    """Emitter pumping rows use *_m3_s volumetric speed/conductance (pumping_cost.py).
+
+    Mutation this catches: readableKey underscore→space yields 'm3 s' instead of m³/s.
+    """
+    artifact = _full_artifact()
+    artifact["terminal"]["run_metadata"]["cost_rollup_diagnostic"]["pumping_diagnostic"]["rows"] = [{
+        "required_pump_speed_m3_s": 2.0,
+        "line_conductance_m3_s": 3.0,
+        "effective_speed_ceiling_m3_s": 4.0,
+    }]
+    pumping = _between(
+        _render_panel(artifact)["html"],
+        "<summary>Pumping diagnostic</summary>",
+        "<summary>Warnings</summary>",
+    )
+    assert "Required pump speed" in pumping
+    assert "2 m³/s" in _tree_value(pumping, "Required pump speed")
+    assert "3 m³/s" in _tree_value(pumping, "Line conductance")
+    assert "4 m³/s" in _tree_value(pumping, "Effective speed ceiling")
+    assert "m3 s" not in pumping
+    assert "m³ s" not in pumping
+
+
+def test_thermal_proxy_absent_is_not_hardcoded_from_formula_knowledge() -> None:
+    """Partial path: thermal_proxy ingredients known elsewhere, leaf absent → pending.
+
+    Mutation this catches: hardcode thermal_proxy formula when key absent.
+    """
+    artifact = _full_artifact()
+    run_input = artifact["terminal"]["run_metadata"]["cost_rollup_diagnostic"]["run_input_cost"]
+    run_input.pop("thermal_proxy")
+    region = _between(
+        _render_panel(artifact)["html"],
+        "<summary>Run input cost</summary>",
+        "<summary>Auxiliary electrical diagnostic</summary>",
+    )
+    value = _field_value(region, "Thermal proxy definition")
+    assert "pending · terminal.run_metadata.cost_rollup_diagnostic.run_input_cost.thermal_proxy not emitted" in value
+    assert "absolute_temperature_K" not in value
+    assert "thermal_flux_h =" not in value
+
+
+def test_coverage_fields_render_emitted_authority_values() -> None:
+    """Mandatory diagnostic coverage must surface emitted values, not just exist in source.
+
+    Mutations this catches (codex P2): drop transition_count / residual rows; exclude
+    schema_version or feasible from rest filters.
+    """
+    html = _render_panel(_full_artifact())["html"]
+    identity = _between(html, '<div class="sec-p8-identity">', "</div><details")
+    auxiliary = _between(html, "<summary>Auxiliary electrical diagnostic</summary>", "<summary>Pumping diagnostic</summary>")
+    pumping = _between(html, "<summary>Pumping diagnostic</summary>", "<summary>Warnings</summary>")
+
+    assert "cost-ledger-v1" in _field_value(identity, "Schema version")
+    assert "7" in _field_value(identity, "Cost-ledger transitions")
+    assert "1.00e-13" in _field_value(identity, "Maximum absolute transition residual · native cost-vector component")
+    assert "auxiliary-electrical-rollup-v1" in _tree_value(auxiliary, "Schema version")
+    assert "pumping-cost-rollup-v1" in _tree_value(pumping, "Schema version")
+    assert "true" in _tree_value(pumping, "Feasible")
