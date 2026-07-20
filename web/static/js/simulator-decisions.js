@@ -9,9 +9,7 @@ socket.on('decision_required', (data) => {
 });
 
 function showDecisionModal(data) {
-    // Remove any existing modal
-    const existing = document.getElementById('decision-modal');
-    if (existing) existing.remove();
+    resetDecisionModal();
 
     const overlay = document.createElement('div');
     overlay.id = 'decision-modal';
@@ -59,6 +57,7 @@ function showDecisionModal(data) {
 // --- Completion handler ---
 
 socket.on('simulation_complete', (data) => {
+    resetDecisionModal();
     const el = document.getElementById('status-text');
     if (el) el.textContent = 'Complete';
     document.getElementById('btn-start').disabled = false;
