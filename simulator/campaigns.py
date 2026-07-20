@@ -61,6 +61,11 @@ C2A_STAGED_PN2_BAND_REFUSAL_REASON = (
 )
 C6_HOLD_TARGET_INVALID_REFUSAL_REASON = 'c6_hold_target_nonfinite'
 C6_HOLD_ACQUISITION_REFUSAL_REASON = 'c6_hold_target_not_acquired'
+C4_TARGET_WINDOW_ACQUISITION_REFUSAL_REASON = 'c4_target_window_not_acquired'
+C4_PROCESS_WINDOW_LOST_REFUSAL_REASON = 'c4_process_window_lost'
+C4_PROCESS_WALL_CLOCK_EXHAUSTED_REFUSAL_REASON = (
+    'c4_process_wall_clock_exhausted'
+)
 
 
 class CampaignPressureSetpointRefusal(ValueError):
@@ -96,14 +101,27 @@ class CampaignHoldTargetRefusal(ValueError):
         super().__init__(f'{self.reason}: {self.diagnostic}')
 
 
-class CampaignHoldAcquisitionRefusal(ValueError):
+class CampaignEndpointRefusal(ValueError):
+    """Typed refusal when a campaign cannot establish or retain its process state."""
+
+    reason = 'campaign_endpoint_refused'
+    terminal_refusal = True
+
+    def __init__(self, diagnostic: Mapping[str, object]):
+        self.diagnostic = dict(diagnostic)
+        self.diagnostic.setdefault('reason_refused', self.reason)
+        self.reason = str(self.diagnostic['reason_refused'])
+        super().__init__(f'{self.reason}: {self.diagnostic}')
+
+
+class CampaignHoldAcquisitionRefusal(CampaignEndpointRefusal):
     """Typed refusal when C6 exhausts its wall clock before static hold."""
 
     reason = C6_HOLD_ACQUISITION_REFUSAL_REASON
 
-    def __init__(self, diagnostic: Mapping[str, object]):
-        self.diagnostic = dict(diagnostic)
-        super().__init__(f'{self.reason}: {self.diagnostic}')
+
+class CampaignC4EndpointRefusal(CampaignEndpointRefusal):
+    """Typed refusal when C4 cannot acquire or retain its process window."""
 
 
 @lru_cache(maxsize=None)
@@ -239,6 +257,7 @@ class CampaignManager:
         self._pending_post_mg_c2a_overrides: dict | None = None
         self._active_post_mg_c2a_overrides: dict | None = None
         self._materialized_target_T_C_by_phase: dict[CampaignPhase, float] = {}
+        self.last_c4_termination: dict[str, object] | None = None
 
     _CONFIG_KEY_BY_PHASE = {
         CampaignPhase.C0B: 'C0b_p_cleanup',
@@ -707,6 +726,42 @@ class CampaignManager:
                 'C6.max_target_acquisition_hr must be finite and positive'
             )
         return limit, 'setpoint:C6.max_target_acquisition_hr'
+
+    def _c4_temperature_window(self) -> tuple[float, float]:
+        value = self._campaign_config(CampaignPhase.C4).get('temp_range_C')
+        if not isinstance(value, (list, tuple)) or len(value) != 2:
+            raise ValueError('C4.temp_range_C must contain exactly two values')
+        low_C = self._required_float(value[0], 'C4.temp_range_C[0]')
+        high_C = self._required_float(value[1], 'C4.temp_range_C[1]')
+        if (
+            not math.isfinite(low_C)
+            or not math.isfinite(high_C)
+            or low_C >= high_C
+        ):
+            raise ValueError('C4.temp_range_C must be finite and increasing')
+        return low_C, high_C
+
+    def _c4_target_acquisition_limit(self) -> tuple[float, str]:
+        value = self._campaign_config(CampaignPhase.C4).get(
+            'max_target_acquisition_hr'
+        )
+        limit = self._required_float(value, 'C4.max_target_acquisition_hr')
+        if not math.isfinite(limit) or limit <= 0.0:
+            raise ValueError(
+                'C4.max_target_acquisition_hr must be finite and positive'
+            )
+        return limit, 'setpoint:C4.max_target_acquisition_hr'
+
+    def _c4_process_wall_clock_limit(self) -> tuple[float, str]:
+        value = self._campaign_config(CampaignPhase.C4).get(
+            'max_process_wall_clock_hr'
+        )
+        limit = self._required_float(value, 'C4.max_process_wall_clock_hr')
+        if not math.isfinite(limit) or limit <= 0.0:
+            raise ValueError(
+                'C4.max_process_wall_clock_hr must be finite and positive'
+            )
+        return limit, 'setpoint:C4.max_process_wall_clock_hr'
 
     @staticmethod
     def c6_at_hold_target(
@@ -1205,6 +1260,8 @@ class CampaignManager:
             self._c2a_staged_cumulative_yield_mol_by_species = {}
             self._c2a_staged_last_log_slope_by_species = {}
             self.last_c2a_staged_termination = None
+        elif campaign == CampaignPhase.C4:
+            self.last_c4_termination = None
 
         if campaign == CampaignPhase.C0:
             ambient_pressure = max(
@@ -1718,7 +1775,7 @@ class CampaignManager:
         # hold-acquisition refusal below so the wall clock cannot claim a
         # successful reaction without provider dispatch.
         ovr = self._campaign_overrides(campaign)
-        if campaign != CampaignPhase.C6 and 'max_hours' in ovr:
+        if campaign not in (CampaignPhase.C4, CampaignPhase.C6) and 'max_hours' in ovr:
             max_h = float(ovr['max_hours'])
             if max_h > 0 and completed_campaign_hour >= max_h:
                 return True
@@ -1961,10 +2018,139 @@ class CampaignManager:
             if not species:
                 raise ValueError('C4.soft_endpoint.species is required')
             rate = evap_flux.species_kg_hr.get(species, 0.0)
-            if melt.campaign_hour >= min_hold_hr and rate < threshold_kg_hr:
+            window_low_C, window_high_C = self._c4_temperature_window()
+            requested_window_C = [window_low_C, window_high_C]
+            acquisition_limit_hr, acquisition_limit_source = (
+                self._c4_target_acquisition_limit()
+            )
+            process_limit_hr, process_limit_source = (
+                self._c4_process_wall_clock_limit()
+            )
+            c4_snapshots = [
+                snapshot
+                for snapshot in record.snapshots
+                if snapshot.campaign == CampaignPhase.C4
+            ]
+            prior_acquisition_indexes = [
+                index
+                for index, snapshot in enumerate(c4_snapshots)
+                if float(snapshot.temperature_C) >= window_low_C
+            ]
+            current_acquired = float(melt.temperature_C) >= window_low_C
+            if not prior_acquisition_indexes and not current_acquired:
+                if completed_campaign_hour >= acquisition_limit_hr:
+                    diagnostic = {
+                        'reason_refused': (
+                            C4_TARGET_WINDOW_ACQUISITION_REFUSAL_REASON
+                        ),
+                        'requested_window_C': requested_window_C,
+                        'temperature_C': float(melt.temperature_C),
+                        'elapsed_hours': completed_campaign_hour,
+                        'completed_campaign_hour': completed_campaign_hour,
+                        'acquisition_limit_hr': acquisition_limit_hr,
+                        'acquisition_limit_source': acquisition_limit_source,
+                    }
+                    if transport_state is not None:
+                        diagnostic['binding_transport_state'] = dict(
+                            transport_state
+                        )
+                    raise CampaignC4EndpointRefusal(diagnostic)
+                return False
+
+            current_in_window = (
+                window_low_C
+                <= float(melt.temperature_C)
+                <= window_high_C
+            )
+            prior_in_window = [
+                snapshot
+                for snapshot in c4_snapshots
+                if window_low_C
+                <= float(snapshot.temperature_C)
+                <= window_high_C
+            ]
+            completed_window_hr = float(
+                len(prior_in_window) + int(current_in_window)
+            )
+            if prior_acquisition_indexes:
+                acquisition_completed_hour = (
+                    completed_campaign_hour
+                    - len(c4_snapshots)
+                    + prior_acquisition_indexes[0]
+                )
+            else:
+                acquisition_completed_hour = completed_campaign_hour
+            process_elapsed_hr = (
+                completed_campaign_hour - acquisition_completed_hour + 1.0
+            )
+
+            signal_armed = any(
+                window_low_C
+                <= float(snapshot.temperature_C)
+                <= window_high_C
+                and float(
+                    getattr(snapshot, 'evap_flux', EvaporationFlux())
+                    .species_kg_hr.get(species, 0.0)
+                ) > threshold_kg_hr
+                for snapshot in c4_snapshots
+            ) or (current_in_window and rate > threshold_kg_hr)
+            if (
+                current_in_window
+                and signal_armed
+                and completed_window_hr >= min_hold_hr
+                and rate < threshold_kg_hr
+            ):
+                self.last_c4_termination = {
+                    'outcome': 'mg_signal_depleted',
+                    'species': species,
+                    'rate_kg_hr': float(rate),
+                    'threshold_kg_hr': threshold_kg_hr,
+                    'completed_window_hr': completed_window_hr,
+                    'process_elapsed_hr': process_elapsed_hr,
+                }
                 return True
-            if completed_campaign_hour >= max_hold_hr:
+            if current_in_window and completed_window_hr >= max_hold_hr:
+                self.last_c4_termination = {
+                    'outcome': (
+                        'max_hold_signal_not_depleted'
+                        if signal_armed
+                        else 'max_hold_no_signal'
+                    ),
+                    'species': species,
+                    'rate_kg_hr': float(rate),
+                    'threshold_kg_hr': threshold_kg_hr,
+                    'completed_window_hr': completed_window_hr,
+                    'process_elapsed_hr': process_elapsed_hr,
+                }
                 return True
+
+            if process_elapsed_hr >= process_limit_hr:
+                # Truthful typed outcomes:
+                # - still in-window at the process ceiling → wall-clock
+                #   exhaustion (operator max_hold can exceed this ceiling via
+                #   max_hours override; the process wall is the hard cap)
+                # - acquired then left the window → process window lost
+                reason_refused = (
+                    C4_PROCESS_WALL_CLOCK_EXHAUSTED_REFUSAL_REASON
+                    if current_in_window
+                    else C4_PROCESS_WINDOW_LOST_REFUSAL_REASON
+                )
+                diagnostic = {
+                    'reason_refused': reason_refused,
+                    'requested_window_C': requested_window_C,
+                    'temperature_C': float(melt.temperature_C),
+                    'elapsed_hours': process_elapsed_hr,
+                    'completed_window_hr': completed_window_hr,
+                    'process_wall_clock_limit_hr': process_limit_hr,
+                    'process_wall_clock_limit_source': process_limit_source,
+                    'operator_max_hold_hr': float(max_hold_hr),
+                    'current_in_window': bool(current_in_window),
+                }
+                if transport_state is not None:
+                    diagnostic['binding_transport_state'] = dict(
+                        transport_state
+                    )
+                raise CampaignC4EndpointRefusal(diagnostic)
 
         elif campaign == CampaignPhase.C5:
             endpoint = self._configured_endpoint(campaign, 'endpoint')

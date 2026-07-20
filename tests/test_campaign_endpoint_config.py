@@ -2,15 +2,18 @@ from __future__ import annotations
 
 import copy
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 import yaml
 
 from simulator.campaigns import (
+    CampaignC4EndpointRefusal,
     CampaignHoldAcquisitionRefusal,
     CampaignHoldTargetRefusal,
     CampaignManager,
 )
+from simulator.core import PyrolysisSimulator
 from simulator.state import (
     BatchRecord,
     CampaignPhase,
@@ -154,8 +157,8 @@ def test_c2a_staged_endpoint_prevalidates_all_species_before_yield_mutation():
         (CampaignPhase.C3_NA, 18, 25.0, _flux(), BatchRecord(path="A"), None, 0.0, 100.0, 0, True),
         (CampaignPhase.C3_NA, 35, 25.0, _flux(), BatchRecord(path="B"), None, 0.0, 100.0, 0, True),
         (CampaignPhase.C4, 6, 25.0, _flux(Mg=0.02), BatchRecord(), None, 0.0, 100.0, 0, False),
-        (CampaignPhase.C4, 6, 25.0, _flux(Mg=0.019), BatchRecord(), None, 0.0, 100.0, 0, True),
-        (CampaignPhase.C4, 20, 25.0, _flux(Mg=9.0), BatchRecord(), None, 0.0, 100.0, 0, True),
+        (CampaignPhase.C4, 6, 25.0, _flux(Mg=0.019), BatchRecord(), None, 0.0, 100.0, 0, False),
+        (CampaignPhase.C4, 20, 25.0, _flux(Mg=9.0), BatchRecord(), None, 0.0, 100.0, 0, False),
         (CampaignPhase.C5, 14, 25.0, _flux(), BatchRecord(branch="two"), None, 0.0, 100.0, 0, False),
         (CampaignPhase.C5, 15, 25.0, _flux(), BatchRecord(branch="two"), None, 0.0, 100.0, 0, False),
         (CampaignPhase.C5, 10, 25.0, _flux(), BatchRecord(branch="two"), None, 1.6, 4.0, 1, False),
@@ -221,6 +224,232 @@ def test_configured_campaign_endpoints_match_legacy_trip_points(
     )
 
     assert manager.check_endpoint(melt, flux, CondensationTrain(), record) is expected
+
+
+def _c4_snapshot(*, temperature_C: float, mg_rate: float) -> HourSnapshot:
+    return HourSnapshot(
+        campaign=CampaignPhase.C4,
+        temperature_C=temperature_C,
+        evap_flux=_flux(Mg=mg_rate),
+    )
+
+
+def test_c4_acquired_low_rate_is_ineligible_until_signal_arms() -> None:
+    manager = CampaignManager(_setpoints())
+    record = BatchRecord(snapshots=[
+        _c4_snapshot(temperature_C=1580.0, mg_rate=0.019)
+        for _ in range(5)
+    ])
+
+    assert manager.check_endpoint(
+        _melt(CampaignPhase.C4, 5, temperature_C=1580.0),
+        _flux(Mg=0.019),
+        CondensationTrain(),
+        record,
+    ) is False
+
+
+def test_c4_acquired_high_rate_arms_without_ending() -> None:
+    manager = CampaignManager(_setpoints())
+    record = BatchRecord(snapshots=[
+        _c4_snapshot(temperature_C=1580.0, mg_rate=0.019)
+        for _ in range(5)
+    ])
+
+    assert manager.check_endpoint(
+        _melt(CampaignPhase.C4, 5, temperature_C=1580.0),
+        _flux(Mg=0.021),
+        CondensationTrain(),
+        record,
+    ) is False
+
+
+def test_c4_max_hold_without_signal_has_distinct_outcome() -> None:
+    manager = CampaignManager(_setpoints())
+    record = BatchRecord(snapshots=[
+        _c4_snapshot(temperature_C=1580.0, mg_rate=0.0)
+        for _ in range(19)
+    ])
+
+    assert manager.check_endpoint(
+        _melt(CampaignPhase.C4, 19, temperature_C=1580.0),
+        _flux(Mg=0.0),
+        CondensationTrain(),
+        record,
+    ) is True
+    assert manager.last_c4_termination == {
+        "outcome": "max_hold_no_signal",
+        "species": "Mg",
+        "rate_kg_hr": 0.0,
+        "threshold_kg_hr": 0.02,
+        "completed_window_hr": 20.0,
+        "process_elapsed_hr": 20.0,
+    }
+
+
+def test_c4_unreachable_window_is_typed_acquisition_refusal() -> None:
+    setpoints = _setpoints()
+    setpoints["campaigns"]["C4"]["max_target_acquisition_hr"] = 2.0
+    manager = CampaignManager(setpoints)
+
+    with pytest.raises(CampaignC4EndpointRefusal) as refusal:
+        manager.check_endpoint(
+            _melt(CampaignPhase.C4, 1, temperature_C=1220.0),
+            _flux(Mg=0.0),
+            CondensationTrain(),
+            BatchRecord(),
+        )
+    assert refusal.value.reason == "c4_target_window_not_acquired"
+    assert refusal.value.diagnostic["requested_window_C"] == [1580.0, 1670.0]
+    assert refusal.value.diagnostic["temperature_C"] == 1220.0
+    assert refusal.value.diagnostic["elapsed_hours"] == 2.0
+    assert refusal.value.diagnostic["acquisition_limit_source"] == (
+        "setpoint:C4.max_target_acquisition_hr"
+    )
+
+
+def test_c4_post_acquisition_window_loss_is_typed_refusal() -> None:
+    setpoints = _setpoints()
+    setpoints["campaigns"]["C4"]["max_process_wall_clock_hr"] = 3.0
+    manager = CampaignManager(setpoints)
+    record = BatchRecord(snapshots=[
+        _c4_snapshot(temperature_C=1580.0, mg_rate=0.021),
+        _c4_snapshot(temperature_C=1570.0, mg_rate=0.0),
+    ])
+
+    with pytest.raises(CampaignC4EndpointRefusal) as refusal:
+        manager.check_endpoint(
+            _melt(CampaignPhase.C4, 2, temperature_C=1570.0),
+            _flux(Mg=0.0),
+            CondensationTrain(),
+            record,
+        )
+    assert refusal.value.reason == "c4_process_window_lost"
+    assert refusal.value.diagnostic["elapsed_hours"] == 3.0
+    assert refusal.value.diagnostic["completed_window_hr"] == 1.0
+    assert refusal.value.diagnostic["current_in_window"] is False
+    assert refusal.value.diagnostic["process_wall_clock_limit_source"] == (
+        "setpoint:C4.max_process_wall_clock_hr"
+    )
+
+
+def test_c4_continuously_in_window_wall_clock_exhaustion_is_distinct() -> None:
+    """Operator max_hold can exceed process wall clock; still-in-window
+    exhaustion must not be mislabeled process_window_lost."""
+    setpoints = _setpoints()
+    # Process ceiling 40 h; operator max_hours becomes max_hold via
+    # _max_hold_hr and is intentionally larger than the process ceiling.
+    setpoints["campaigns"]["C4"]["max_process_wall_clock_hr"] = 40.0
+    manager = CampaignManager(setpoints)
+    manager.overrides["C4"] = {"max_hours": 100.0}
+    # 39 prior in-window snapshots + current in-window tick = 40 h wall.
+    record = BatchRecord(snapshots=[
+        _c4_snapshot(temperature_C=1580.0, mg_rate=1.0)
+        for _ in range(39)
+    ])
+
+    with pytest.raises(CampaignC4EndpointRefusal) as refusal:
+        manager.check_endpoint(
+            _melt(CampaignPhase.C4, 39, temperature_C=1580.0),
+            _flux(Mg=1.0),
+            CondensationTrain(),
+            record,
+        )
+    assert refusal.value.reason == "c4_process_wall_clock_exhausted"
+    assert refusal.value.diagnostic["elapsed_hours"] == 40.0
+    assert refusal.value.diagnostic["completed_window_hr"] == 40.0
+    assert refusal.value.diagnostic["current_in_window"] is True
+    assert refusal.value.diagnostic["operator_max_hold_hr"] == 100.0
+    assert refusal.value.diagnostic["process_wall_clock_limit_hr"] == 40.0
+    assert refusal.value.diagnostic["temperature_C"] == 1580.0
+
+
+def test_c4_rise_then_decay_ends_after_in_window_minimum() -> None:
+    manager = CampaignManager(_setpoints())
+    record = BatchRecord(snapshots=[
+        _c4_snapshot(temperature_C=1580.0, mg_rate=0.021),
+        *[
+            _c4_snapshot(temperature_C=1580.0, mg_rate=0.02)
+            for _ in range(4)
+        ],
+    ])
+
+    assert manager.check_endpoint(
+        _melt(CampaignPhase.C4, 5, temperature_C=1580.0),
+        _flux(Mg=0.019),
+        CondensationTrain(),
+        record,
+    ) is True
+    assert manager.last_c4_termination["outcome"] == "mg_signal_depleted"
+
+
+@pytest.mark.parametrize("invalid_limit", [float("nan"), float("inf"), 0.0, -1.0])
+def test_c4_configured_acquisition_ceiling_requires_finite_positive_value(
+    invalid_limit: float,
+) -> None:
+    setpoints = _setpoints()
+    setpoints["campaigns"]["C4"]["max_target_acquisition_hr"] = invalid_limit
+    manager = CampaignManager(setpoints)
+
+    with pytest.raises(
+        ValueError,
+        match="C4.max_target_acquisition_hr must be finite and positive",
+    ):
+        manager.check_endpoint(
+            _melt(CampaignPhase.C4, 0, temperature_C=1220.0),
+            _flux(Mg=0.0),
+            CondensationTrain(),
+            BatchRecord(),
+        )
+
+
+@pytest.mark.parametrize("invalid_limit", [float("nan"), float("inf"), 0.0, -1.0])
+def test_c4_process_wall_clock_ceiling_requires_finite_positive_value(
+    invalid_limit: float,
+) -> None:
+    setpoints = _setpoints()
+    setpoints["campaigns"]["C4"]["max_process_wall_clock_hr"] = invalid_limit
+    manager = CampaignManager(setpoints)
+
+    with pytest.raises(
+        ValueError,
+        match="C4.max_process_wall_clock_hr must be finite and positive",
+    ):
+        manager.check_endpoint(
+            _melt(CampaignPhase.C4, 0, temperature_C=1580.0),
+            _flux(Mg=0.0),
+            CondensationTrain(),
+            BatchRecord(),
+        )
+
+
+def test_c4_refusal_plumbing_does_not_store_as_c6() -> None:
+    setpoints = _setpoints()
+    setpoints["campaigns"]["C4"]["max_target_acquisition_hr"] = 1.0
+    sim = object.__new__(PyrolysisSimulator)
+    sim.campaign_mgr = CampaignManager(setpoints)
+    sim.melt = _melt(CampaignPhase.C4, 0, temperature_C=1220.0)
+    sim.train = CondensationTrain()
+    sim.record = BatchRecord()
+    sim.overhead = SimpleNamespace()
+    sim.pending_decision = object()
+    sim.paused_for_decision = True
+    sim._last_c4_refusal_diagnostic = {}
+    sim._c4_campaign_refused = False
+    sim._last_c6_refusal_diagnostic = {}
+    sim._c6_campaign_refused = False
+
+    assert sim._check_campaign_endpoint(_flux(Mg=0.0)) is True
+    assert sim._c4_campaign_refused is True
+    assert sim.campaign_endpoint_refused() is True
+    assert sim._c6_campaign_refused is False
+    assert sim._last_c6_refusal_diagnostic == {}
+    assert sim.pending_decision is None
+    assert sim.paused_for_decision is False
+    assert sim._last_c4_refusal_diagnostic["campaign"] == "C4"
+    assert sim._last_c4_refusal_diagnostic["diagnostic"]["reason_refused"] == (
+        "c4_target_window_not_acquired"
+    )
 
 
 def test_c6_current_at_target_tick_can_satisfy_composition_endpoint() -> None:

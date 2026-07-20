@@ -412,6 +412,10 @@ class SimSession:
 
     def decide(self, choice: str) -> None:
         sim = self._require_sim()
+        if getattr(sim, "campaign_endpoint_refused", lambda: False)():
+            raise RuntimeError(
+                "campaign endpoint refused; session is non-resumable"
+            )
         decision = sim.pending_decision
         if decision is None:
             raise RuntimeError("no pending decision")

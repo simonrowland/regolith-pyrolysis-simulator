@@ -2241,21 +2241,102 @@ def _start_background_loop(
                 break
 
             campaign_summary = step_result.campaign_summary
-            c6_refusal = (
-                campaign_summary.get('c6_refusal_diagnostic')
-                if isinstance(campaign_summary, Mapping)
-                else None
-            )
+            campaign_refusal = None
+            campaign_refusal_key = None
+            if isinstance(campaign_summary, Mapping):
+                for candidate_key in (
+                    'c4_refusal_diagnostic',
+                    'c6_refusal_diagnostic',
+                ):
+                    candidate = campaign_summary.get(candidate_key)
+                    if candidate:
+                        campaign_refusal = candidate
+                        campaign_refusal_key = candidate_key
+                        break
             if (
-                isinstance(c6_refusal, Mapping)
-                and c6_refusal.get('status') == 'refused'
+                isinstance(campaign_refusal, Mapping)
+                and campaign_refusal.get('status') == 'refused'
             ):
-                # Campaign-scoped refusal: the campaign summary emitted above
-                # is the operator-visible record.  Core has already selected
-                # the configured next campaign, so keep the run loop alive.
-                _safe_log(
-                    'C6 campaign refused; continuing configured batch sequence'
+                campaign_name = str(
+                    campaign_refusal.get('campaign') or ''
+                ).upper()
+                is_c4 = (
+                    campaign_refusal_key == 'c4_refusal_diagnostic'
+                    or campaign_name == 'C4'
                 )
+                is_c6 = (
+                    campaign_refusal_key == 'c6_refusal_diagnostic'
+                    or campaign_name == 'C6'
+                )
+                if is_c6 and not is_c4:
+                    # Campaign-scoped C6 refusal (boilrump): the campaign
+                    # summary emitted above is the operator-visible record.
+                    # Core advances to the configured next campaign, so keep
+                    # the run loop alive.
+                    _safe_log(
+                        'C6 campaign refused; continuing configured batch sequence'
+                    )
+                else:
+                    # C4 (or unknown) endpoint refusal is NON-RESUMABLE terminal.
+                    diagnostic = campaign_refusal.get('diagnostic')
+                    reason = (
+                        diagnostic.get('reason_refused')
+                        if isinstance(diagnostic, Mapping)
+                        else campaign_refusal.get('reason')
+                    )
+                    cname = str(
+                        campaign_refusal.get('campaign') or 'campaign'
+                    ).lower()
+                    reason = str(
+                        reason or f'{cname}_endpoint_refused'
+                    )
+                    refusal_payload = {
+                        'status': 'refused',
+                        'reason': reason,
+                        'message': reason,
+                        'backend_status': backend_status,
+                        'backend_authoritative': backend_authoritative,
+                        'backend_message': backend_message,
+                    }
+                    if campaign_refusal_key is not None:
+                        refusal_payload[campaign_refusal_key] = dict(
+                            campaign_refusal
+                        )
+                    with run_lock:
+                        current, _ = _current_simulation_state(sid, run_id)
+                        if (
+                            current is None
+                            or not current['running']
+                            or current.get('artifact_persisted')
+                        ):
+                            break
+                        artifact = persist_terminal(
+                            session,
+                            status='refused',
+                            reason=reason,
+                            error_message=reason,
+                            refusal_diagnostic=campaign_refusal,
+                        )
+                        if artifact is None:
+                            # Primary status stays persistence_failed (existing
+                            # tests pin that). Attach the original typed refusal
+                            # so operators still see C4/C6 context.
+                            persistence_payload = {
+                                'status': 'error',
+                                'reason': 'persistence_failed',
+                                'message': (
+                                    'Run was refused but its report was not saved'
+                                ),
+                                'original_refusal_reason': reason,
+                            }
+                            if campaign_refusal_key is not None:
+                                persistence_payload[campaign_refusal_key] = dict(
+                                    campaign_refusal
+                                )
+                            stop_with_status(persistence_payload)
+                            break
+                        stop_with_status(refusal_payload)
+                    break
 
             if step_result.decision_event is not None:
                 with _simulations_guard:

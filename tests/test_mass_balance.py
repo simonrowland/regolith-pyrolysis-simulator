@@ -199,7 +199,11 @@ def _run_c2a_staged_to_completion(sim) -> int:
             continue
         sim.step()
         steps += 1
-    assert sim.is_complete()
+        # Typed campaign-endpoint refusal is non-resumable (no next decision).
+        # Treat it as a finished batch for mass-balance closure checks.
+        if getattr(sim, "campaign_endpoint_refused", lambda: False)():
+            break
+    assert sim.is_complete() or sim.campaign_endpoint_refused()
     return steps
 
 
@@ -334,11 +338,12 @@ def test_c2a_staged_freeze_gate_on_closes_mass_balance(
 
     steps = _run_c2a_staged_to_completion(sim)
 
-    # C5 is default-off: the canonical staged path appends the 160-hour final
-    # continuous boiloff instead of MRE. Endpoint caps count the hour just
-    # processed, because check_endpoint runs before core increments
-    # campaign_hour.
-    assert steps == 179
+    # C5 is default-off. With the C4 non-resumable acquisition ceiling this
+    # C2A_STAGED→C4 path saturates transport and refuses at
+    # c4_target_window_not_acquired (T stuck ~1300 C) rather than fail-opening
+    # into C6 / final boiloff. Live semantic duration pin (not a golden);
+    # both freeze_gate modes refuse at the same acquisition ceiling hour.
+    assert steps == 72
     transition_names = {
         getattr(transition, "name", "")
         for transition in sim.atom_ledger.transitions

@@ -306,22 +306,72 @@ class RunExecutor:
                     failure_exc = RuntimeError(reason)
                     break
                 campaign_summary = result.campaign_summary
+                c4_refusal = (
+                    campaign_summary.get("c4_refusal_diagnostic")
+                    if isinstance(campaign_summary, Mapping)
+                    else None
+                )
                 c6_refusal = (
                     campaign_summary.get("c6_refusal_diagnostic")
                     if isinstance(campaign_summary, Mapping)
                     else None
                 )
+                campaign_refusal = None
+                refusal_kind = None  # "C4" | "C6"
                 if (
+                    isinstance(c4_refusal, Mapping)
+                    and c4_refusal.get("status") == "refused"
+                ):
+                    campaign_refusal = c4_refusal
+                    refusal_kind = "C4"
+                elif (
                     isinstance(c6_refusal, Mapping)
                     and c6_refusal.get("status") == "refused"
                 ):
-                    # C6 is one campaign in the batch sequence.  Its
-                    # thermite/window refusal is already recorded in the
-                    # campaign summary and core advances to the configured
-                    # next campaign.  Preserve the diagnostic for the final
-                    # artifact, but do not promote a campaign-scoped refusal
-                    # into a whole-run halt.
-                    refusal_diagnostic = dict(c6_refusal)
+                    campaign_refusal = c6_refusal
+                    refusal_kind = "C6"
+                if campaign_refusal is not None:
+                    is_c4 = refusal_kind == "C4"
+                    is_c6 = refusal_kind == "C6"
+                    if is_c4:
+                        # C4 endpoint refusal is NON-RESUMABLE terminal.
+                        refusal_diagnostic = dict(campaign_refusal)
+                        diagnostic = campaign_refusal.get("diagnostic")
+                        refusal_reason = (
+                            diagnostic.get("reason_refused")
+                            if isinstance(diagnostic, Mapping)
+                            else campaign_refusal.get("reason")
+                        )
+                        reason = str(
+                            refusal_reason or "c4_endpoint_refused"
+                        )
+                        error_message = reason
+                        status = "refused"
+                        failure_exc = RuntimeError(reason)
+                        break
+                    if is_c6:
+                        # C6 is one campaign in the batch sequence (boilrump).
+                        # Preserve diagnostic; do not halt the whole run.
+                        refusal_diagnostic = dict(campaign_refusal)
+                    else:
+                        # Unknown campaign-scoped refusal: fail closed.
+                        refusal_diagnostic = dict(campaign_refusal)
+                        diagnostic = campaign_refusal.get("diagnostic")
+                        refusal_reason = (
+                            diagnostic.get("reason_refused")
+                            if isinstance(diagnostic, Mapping)
+                            else campaign_refusal.get("reason")
+                        )
+                        cname = str(
+                            campaign_refusal.get("campaign") or "campaign"
+                        ).lower()
+                        reason = str(
+                            refusal_reason or f"{cname}_endpoint_refused"
+                        )
+                        error_message = reason
+                        status = "refused"
+                        failure_exc = RuntimeError(reason)
+                        break
             # Status semantics:
             #   * "ok"      -- the run consumed its full hour budget and
             #                  the simulator is either mid-batch or

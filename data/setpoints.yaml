@@ -406,6 +406,8 @@ campaigns:
   C4:
     label: "Mg Selective Pyrolysis (Branch Two)"
     temp_range_C: [1580, 1670]
+    max_target_acquisition_hr: 60       # 42 h nominal preheat from 1160 C at 10 C/h, plus latent-cooling margin
+    max_process_wall_clock_hr: 40       # finite wall clock around the 20 in-window reaction ticks
     dT_dt_C_per_hr: null                 # IR-controlled
     atmosphere: "controlled_O2"
     pO2_mbar: [0.08, 0.35]

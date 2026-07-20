@@ -842,6 +842,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # thermodynamic refusal were indistinguishable.
         self._last_shuttle_refusal_diagnostic: Dict[str, Any] = {}
         self._shuttle_refusal_history: list[Dict[str, Any]] = []
+        self._last_c4_refusal_diagnostic: Dict[str, Any] = {}
+        self._c4_campaign_refused = False
         self._last_c6_refusal_diagnostic: Dict[str, Any] = {}
         self._c6_campaign_refused = False
         self._last_c3_na_hold_adjustment: Dict[str, Any] = {}
@@ -1165,6 +1167,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._rump_expectation_warnings = []
         self._last_shuttle_refusal_diagnostic = {}
         self._shuttle_refusal_history = []
+        self._last_c4_refusal_diagnostic = {}
+        self._c4_campaign_refused = False
         self._last_c6_refusal_diagnostic = {}
         self._c6_campaign_refused = False
         self._last_c3_na_hold_adjustment = {}
@@ -10763,6 +10767,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if campaign == CampaignPhase.C3_NA and self.record.path == 'A_staged':
             self._recompute_staged_na_fe_hold_setpoint()
 
+        if campaign == CampaignPhase.C4:
+            self._last_c4_refusal_diagnostic = {}
+            self._c4_campaign_refused = False
+
         # Initialize thermite Mg inventory when entering C6
         if campaign == CampaignPhase.C6:
             self._last_c6_refusal_diagnostic = {}
@@ -11399,14 +11407,64 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if campaign_name == 'C7_CA_ALUMINOTHERMIC':
             summary['c7_product_report'] = dict(
                 getattr(self, '_c7_product_report', {}) or {})
+        elif campaign_name == 'C4':
+            summary['c4_termination'] = dict(
+                getattr(self.campaign_mgr, 'last_c4_termination', {}) or {})
+            c4_refusal = dict(
+                getattr(self, '_last_c4_refusal_diagnostic', {}) or {})
+            if c4_refusal:
+                summary['c4_refusal_diagnostic'] = c4_refusal
         elif campaign_name == 'C6':
             summary['c6_refusal_diagnostic'] = dict(
                 getattr(self, '_last_c6_refusal_diagnostic', {}) or {})
         return summary
 
+    def campaign_endpoint_refused(self) -> bool:
+        """True when a typed C4 endpoint refusal latched this batch non-resumably.
+
+        C6 thermite/window refusal is campaign-scoped: boilrump continues the
+        configured batch sequence, so it must not latch the session as
+        non-resumable for later campaigns. C4 acquisition/window refusal is
+        the non-resumable terminal latch (no AUTO_APPLY into C6).
+        """
+        return bool(self._c4_campaign_refused)
+
+    def _record_campaign_endpoint_refusal(
+        self,
+        diagnostic: Mapping[str, Any],
+    ) -> None:
+        campaign = self.melt.campaign
+        if campaign == CampaignPhase.C6:
+            # C6 endpoint/thermite refusal is campaign-scoped (boilrump):
+            # record diagnostic; campaign_done path still advances to the
+            # configured next campaign. Do not set a C4-style non-resumable
+            # latch (campaign_endpoint_refused is C4-only).
+            self._record_c6_refusal(diagnostic)
+            self.pending_decision = None
+            self.paused_for_decision = False
+            return
+        if campaign != CampaignPhase.C4:
+            raise RuntimeError(
+                f'Unsupported campaign endpoint refusal for {campaign.name}'
+            )
+        refusal = {
+            'status': 'refused',
+            'reaction_family': 'c4_mg_selective_pyrolysis',
+            'hour': int(self.melt.hour),
+            'campaign_hour': int(self.melt.campaign_hour),
+            'campaign': campaign.name,
+            'temperature_C': float(self.melt.temperature_C),
+            'diagnostic': dict(diagnostic),
+        }
+        self._last_c4_refusal_diagnostic = dict(refusal)
+        self._c4_campaign_refused = True
+        # Endpoint refusal is terminal: never expose a next decision.
+        self.pending_decision = None
+        self.paused_for_decision = False
+
     def _check_campaign_endpoint(self, evap_flux: EvaporationFlux) -> bool:
-        """Evaluate the endpoint and convert a C6 acquisition timeout to refusal."""
-        from simulator.campaigns import CampaignHoldAcquisitionRefusal
+        """Evaluate the endpoint and record typed campaign refusals."""
+        from simulator.campaigns import CampaignEndpointRefusal
 
         try:
             return self.campaign_mgr.check_endpoint(
@@ -11437,8 +11495,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     )),
                 },
             )
-        except CampaignHoldAcquisitionRefusal as exc:
-            self._record_c6_refusal(exc.diagnostic)
+        except CampaignEndpointRefusal as exc:
+            self._record_campaign_endpoint_refusal(exc.diagnostic)
             return True
 
     # ------------------------------------------------------------------
@@ -11936,26 +11994,43 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         next_campaign: CampaignPhase | None = None
         pending_decision: Any | None = None
         complete_after_snapshot = False
+        # C4 non-resumable latch vs C6 campaign-scoped refusal (boilrump).
+        c4_refused = bool(self._c4_campaign_refused)
         c6_refused = (
             self.melt.campaign == CampaignPhase.C6
             and self._c6_campaign_refused
         )
-        campaign_done = c6_refused or self._check_campaign_endpoint(evap_flux)
+        campaign_done = (
+            c4_refused
+            or c6_refused
+            or self._check_campaign_endpoint(evap_flux)
+        )
         if campaign_done:
             # Capture campaign summary before transitioning
             finishing_campaign = self.melt.campaign.name
             self._last_campaign_summary = self._capture_campaign_summary(
                 finishing_campaign)
 
-            next_campaign = self.campaign_mgr.get_next_campaign(
-                self.melt.campaign, self.record)
-            if next_campaign == CampaignPhase.COMPLETE:
-                complete_after_snapshot = True
+            # C4 typed endpoint refusal is non-resumable: capture the
+            # summary, never open a pending decision, and never start a
+            # later campaign (C4 refusal must not AUTO_APPLY into C6).
+            # C6 thermite/window refusal is campaign-scoped (boilrump):
+            # advance to the configured next campaign in the batch.
+            if self._c4_campaign_refused:
                 next_campaign = None
-            elif next_campaign is None:
-                # Decision needed before proceeding
-                pending_decision = self.campaign_mgr.get_decision(
+                pending_decision = None
+                self.pending_decision = None
+                self.paused_for_decision = False
+            else:
+                next_campaign = self.campaign_mgr.get_next_campaign(
                     self.melt.campaign, self.record)
+                if next_campaign == CampaignPhase.COMPLETE:
+                    complete_after_snapshot = True
+                    next_campaign = None
+                elif next_campaign is None:
+                    # Decision needed before proceeding
+                    pending_decision = self.campaign_mgr.get_decision(
+                        self.melt.campaign, self.record)
 
         backend_transition = getattr(equilibrium, 'ledger_transition', None)
         backend_controls_metal_phase = (
@@ -12246,6 +12321,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             choice:        The chosen option string
         """
         choice = str(choice)
+        if self.campaign_endpoint_refused():
+            raise RuntimeError(
+                'campaign endpoint refused; session is non-resumable'
+            )
         if decision_type not in _VALID_DECISION_CHOICES:
             raise ValueError(f"unsupported decision type {decision_type.name}")
         pending = self.pending_decision

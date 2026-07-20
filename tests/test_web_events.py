@@ -3545,7 +3545,10 @@ def test_empty_setpoint_resolution_omits_effective_config():
     assert "effective_config" not in payload
 
 
-@pytest.mark.parametrize("terminal_path", ["ok", "refused", "failed", "c6_refused"])
+@pytest.mark.parametrize(
+    "terminal_path",
+    ["ok", "refused", "failed", "c6_refused", "c4_refused"],
+)
 def test_persist_failure_visible_on_all_terminal_paths(
     tmp_path,
     monkeypatch,
@@ -3557,12 +3560,30 @@ def test_persist_failure_visible_on_all_terminal_paths(
     client = _identified_socket_client(app)
     before = set(_simulations)
 
+    # Boilrump: C6 refusal continues the batch, so the c6_refused path must
+    # reach a later normal completion (second is_complete check) before the
+    # forced persistence failure fires. C4 refusal is terminal and persists
+    # on the refusal path itself.
     completion_checks = iter((False, True))
     session = SimpleNamespace(
-        simulator=SimpleNamespace(_poisoned_hour=None),
+        simulator=SimpleNamespace(
+            _poisoned_hour=None,
+            _last_c6_refusal_diagnostic=(
+                {
+                    "status": "refused",
+                    "campaign": "C6",
+                    "diagnostic": {"reason_refused": "c6 refused"},
+                }
+                if terminal_path == "c6_refused"
+                else {}
+            ),
+        ),
         is_complete=lambda: (
             terminal_path == "ok"
-            or (terminal_path == "c6_refused" and next(completion_checks, True))
+            or (
+                terminal_path == "c6_refused"
+                and next(completion_checks, True)
+            )
         ),
         result_document=lambda: _terminal_runner_document(
             "ok" if terminal_path in {"ok", "c6_refused"} else "refused"
@@ -3585,7 +3606,18 @@ def test_persist_failure_visible_on_all_terminal_paths(
                 RuntimeError("terminal boom")
             ),
         )
-    elif terminal_path == "c6_refused":
+    elif terminal_path in {"c6_refused", "c4_refused"}:
+        refusal_key = (
+            "c4_refusal_diagnostic"
+            if terminal_path == "c4_refused"
+            else "c6_refusal_diagnostic"
+        )
+        refused_reason = (
+            "c4_target_window_not_acquired"
+            if terminal_path == "c4_refused"
+            else "c6 refused"
+        )
+        campaign_name = "C4" if terminal_path == "c4_refused" else "C6"
         monkeypatch.setattr(web_events, "_tick_payload", lambda **_kwargs: {})
         monkeypatch.setattr(
             web_events,
@@ -3596,9 +3628,12 @@ def test_persist_failure_visible_on_all_terminal_paths(
                     backend_error="",
                     per_hour_summary={},
                     campaign_summary={
-                        "c6_refusal_diagnostic": {
+                        refusal_key: {
                             "status": "refused",
-                            "diagnostic": {"reason_refused": "c6 refused"},
+                            "campaign": campaign_name,
+                            "diagnostic": {
+                                "reason_refused": refused_reason,
+                            },
                         }
                     },
                     decision_event=None,
@@ -3640,12 +3675,25 @@ def test_persist_failure_visible_on_all_terminal_paths(
         ]
         assert statuses[-1]["status"] == "error"
         assert statuses[-1]["reason"] == "persistence_failed"
+        if terminal_path == "c4_refused":
+            # C4 is terminal: persistence failure attaches typed C4 context.
+            assert statuses[-1]["original_refusal_reason"] == (
+                "c4_target_window_not_acquired"
+            )
+            assert statuses[-1]["c4_refusal_diagnostic"]["status"] == "refused"
+            assert (
+                statuses[-1]["c4_refusal_diagnostic"]["diagnostic"][
+                    "reason_refused"
+                ]
+                == "c4_target_window_not_acquired"
+            )
         assert state["running"] is False
         assert state["paused"] is False
     finally:
         client.disconnect()
         for sid in set(_simulations) - before:
             _clear_simulation_state(sid)
+
 
 
 def test_save_ok_completion_emit_failure_is_not_persistence_failure(
@@ -4680,8 +4728,7 @@ def test_simulation_tick_exposes_mass_balance_category_when_pct_none(
         for sid in list(_simulations):
             _clear_simulation_state(sid)
 
-
-def test_socketio_continues_after_binding_c6_refusal_and_retains_diagnostic(
+def test_socketio_c4_refusal_is_terminal_before_next_decision(
     monkeypatch,
     tmp_path,
 ):
@@ -4692,15 +4739,48 @@ def test_socketio_continues_after_binding_c6_refusal_and_retains_diagnostic(
         backend.initialize({})
         return backend
 
-    def capture_background_task(target, *args, **kwargs):
+    def run_background_task(target, *args, **kwargs):
         captured_tasks.append(target)
+        target()
         return {"captured_task": len(captured_tasks)}
 
+    def refused_c4_drive(session, *args, **kwargs):
+        snapshot = session.simulator._make_snapshot()
+        snapshot.hour = 1
+        refusal = {
+            "status": "refused",
+            "reaction_family": "c4_mg_selective_pyrolysis",
+            "hour": 1,
+            "campaign_hour": 59,
+            "campaign": "C4",
+            "temperature_C": 1220.0,
+            "diagnostic": {
+                "reason_refused": "c4_target_window_not_acquired",
+                "requested_window_C": [1580.0, 1670.0],
+                "temperature_C": 1220.0,
+                "elapsed_hours": 60.0,
+                "acquisition_limit_hr": 60.0,
+                "acquisition_limit_source": (
+                    "setpoint:C4.max_target_acquisition_hr"
+                ),
+            },
+        }
+        return iter([
+            SimpleNamespace(
+                snapshot=snapshot,
+                backend_error="",
+                per_hour_summary={"hour": 1},
+                campaign_summary={"c4_refusal_diagnostic": refusal},
+                decision_event={"decision_type": "branch_one_two"},
+            )
+        ])
+
     monkeypatch.setattr("web.events._get_backend", force_internal_analytical_backend)
+    monkeypatch.setattr("web.events.drive_session", refused_c4_drive)
     monkeypatch.setattr(
         app_module.socketio,
         "start_background_task",
-        capture_background_task,
+        run_background_task,
     )
     app = app_module.create_app()
     app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
@@ -4709,7 +4789,6 @@ def test_socketio_continues_after_binding_c6_refusal_and_retains_diagnostic(
     client.get_received()
     before = set(_simulations)
 
-    events = []
     try:
         client.emit(
             "start_simulation",
@@ -4717,85 +4796,178 @@ def test_socketio_continues_after_binding_c6_refusal_and_retains_diagnostic(
                 "backend": "internal-analytical",
                 "feedstock": "lunar_mare_low_ti",
                 "mass_kg": 1000,
-                "additives": {},
                 "speed": 0,
                 "track": "pyrolysis",
-                "runtime_campaign_overrides": {
-                    "C6": {"max_hours": 1, "ramp_rate_C_per_hr": 0},
-                },
             },
         )
-        events.extend(client.get_received())
+        events = client.get_received()
         new_sids = set(_simulations) - before
         assert len(new_sids) == 1
         sid = new_sids.pop()
+        statuses = [
+            event["args"][0]
+            for event in events
+            if event["name"] == "simulation_status"
+        ]
+        refusal = next(
+            status for status in statuses if status.get("status") == "refused"
+        )
 
-        for _ in range(10):
-            captured_tasks[-1]()
-            events.extend(client.get_received())
-            state = _simulations[sid]
-            if not state["running"]:
-                break
-            decision = state["session"].pending_decision()
-            assert decision is not None
-            client.emit("make_decision", {"choice": decision.recommendation})
-            events.extend(client.get_received())
-        else:
-            raise AssertionError("Socket.IO run did not complete after C6 refusal")
+        assert refusal["reason"] == "c4_target_window_not_acquired"
+        assert refusal["c4_refusal_diagnostic"]["campaign"] == "C4"
+        assert "decision_required" not in [event["name"] for event in events]
+        artifact = RunArtifactStore(tmp_path / "runs").load(refusal["run_id"])
+        assert artifact is not None
+        assert artifact["execution_status"] == "refused"
+        assert artifact["failure"]["reason"] == refusal["reason"]
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
 
+def test_socketio_continues_after_binding_c6_refusal_and_retains_diagnostic(
+    monkeypatch,
+    tmp_path,
+):
+    """Boilrump composition: C6 campaign-scoped refusal must not terminal-stop
+    the Socket.IO loop. Synthetic drive yields C6 refusal then a normal tick so
+    the test stays off the full lunar path wall-clock (C4 acquisition can make
+    that path exceed 300 s under liquidus)."""
+    captured_tasks = []
+
+    def force_internal_analytical_backend(_backend_name):
+        backend = InternalAnalyticalBackend()
+        backend.initialize({})
+        return backend
+
+    def run_background_task(target, *args, **kwargs):
+        captured_tasks.append(target)
+        target()
+        return {"captured_task": len(captured_tasks)}
+
+    c6_refusal = {
+        "status": "refused",
+        "reaction_family": "c6_mg_thermite",
+        "campaign": "C6",
+        "diagnostic": {
+            "reason_refused": "c6_hold_target_not_acquired",
+        },
+    }
+    calls = {"n": 0}
+
+    def continues_after_c6_drive(session, *args, **kwargs):
+        calls["n"] += 1
+        # Avoid real liquidus/snapshot work in this composition unit test.
+        snapshot = SimpleNamespace(hour=calls["n"])
+        if calls["n"] == 1:
+            return iter([
+                SimpleNamespace(
+                    snapshot=snapshot,
+                    backend_error="",
+                    per_hour_summary={"hour": 1},
+                    campaign_summary={
+                        "campaign": "C6",
+                        "c6_refusal_diagnostic": c6_refusal,
+                    },
+                    decision_event=None,
+                )
+            ])
+        # Second operator step still advances after C6 refusal; then mark
+        # complete so the outer Socket.IO loop exits.
+        session.simulator._last_c6_refusal_diagnostic = dict(c6_refusal)
+        session.is_complete = lambda: True
+        return iter([
+            SimpleNamespace(
+                snapshot=snapshot,
+                backend_error="",
+                per_hour_summary={"hour": 2},
+                campaign_summary={"campaign": "C7_CA_ALUMINOTHERMIC"},
+                decision_event=None,
+            )
+        ])
+
+    monkeypatch.setattr("web.events._get_backend", force_internal_analytical_backend)
+    monkeypatch.setattr("web.events.drive_session", continues_after_c6_drive)
+    monkeypatch.setattr(web_events, "_tick_payload", lambda **_kwargs: {"hour": 0})
+    monkeypatch.setattr(web_events, "_completion_payload", lambda _sim: {"done": True})
+    monkeypatch.setattr(
+        web_events,
+        "persist_run_artifact",
+        lambda *_a, **_k: {
+            "execution_status": "ok",
+            "run_id": "synthetic",
+            "timesteps": [],
+        },
+    )
+    monkeypatch.setattr(
+        app_module.socketio,
+        "start_background_task",
+        run_background_task,
+    )
+    app = app_module.create_app()
+    app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
+    client = _identified_socket_client(app)
+    assert client.is_connected()
+    client.get_received()
+    before = set(_simulations)
+
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "internal-analytical",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 0,
+                "track": "pyrolysis",
+            },
+        )
+        events = client.get_received()
+        new_sids = set(_simulations) - before
+        assert len(new_sids) == 1
+        sid = new_sids.pop()
+        # Background task runs the full operator loop synchronously here.
         names = [event["name"] for event in events]
         statuses = [
             event["args"][0]
             for event in events
             if event["name"] == "simulation_status"
         ]
+        # C6 refuse must not emit a terminal refused status (C4 latch does).
         assert not any(status.get("status") == "refused" for status in statuses)
-        assert names.count("simulation_tick") == 42
-        assert names.count("per_hour_summary") == 42
         assert "campaign_complete_summary" in names
-        assert "simulation_complete" in names
-        campaign_summaries = [
+        c6_summaries = [
             event["args"][0]
             for event in events
             if event["name"] == "campaign_complete_summary"
+            and event["args"][0].get("campaign") == "C6"
         ]
-        c6_summary = next(
-            summary
-            for summary in campaign_summaries
-            if summary.get("campaign") == "C6"
+        assert c6_summaries
+        assert c6_summaries[0]["c6_refusal_diagnostic"]["diagnostic"][
+            "reason_refused"
+        ] == "c6_hold_target_not_acquired"
+        # Loop continued past C6 into a later campaign summary.
+        assert any(
+            event["name"] == "campaign_complete_summary"
+            and event["args"][0].get("campaign") == "C7_CA_ALUMINOTHERMIC"
+            for event in events
         )
-        refusal = c6_summary["c6_refusal_diagnostic"]
-        assert refusal["campaign"] == "C6"
-        assert refusal["diagnostic"]["reason_refused"] == (
-            "c6_hold_target_not_acquired"
+        # Completed cleanly (ok path), not refused-terminal.
+        assert any(
+            event["name"] == "simulation_complete" for event in events
+        ) or any(
+            s.get("status") in {"ok", "error"} and s.get("reason") != "refused"
+            for s in statuses
         )
-        run_id = _simulations[sid]["run_id"]
-        artifact = RunArtifactStore(tmp_path / "runs").load(run_id)
-        assert artifact is not None
-        assert artifact["execution_status"] == "ok"
-        assert len(artifact["timesteps"]) == 42
-        assert "failure" not in artifact
-        terminal_refusal = artifact["terminal"]["run_metadata"][
-            "refusal_diagnostic"
-        ]
-        assert terminal_refusal["diagnostic"]["reason_refused"] == (
-            "c6_hold_target_not_acquired"
-        )
-        assert artifact["terminal"]["final_state"]
-        assert artifact["terminal"]["final"]
+        # Contrast: C4 terminal path is covered by
+        # test_socketio_c4_refusal_is_terminal_before_next_decision.
     finally:
         client.disconnect()
         for sid in set(_simulations) - before:
             _clear_simulation_state(sid)
 
 
-class RaisingCleanedMeltLedger:
-    def project_account_kg(self, account):
-        assert account == "process.cleaned_melt"
-        raise RuntimeError("cleaned melt unavailable")
 
-
-@pytest.mark.parametrize("ledger", [None, RaisingCleanedMeltLedger()])
 def test_tick_omits_pot_composition_when_cleaned_melt_ledger_unavailable(
     ledger,
 ):

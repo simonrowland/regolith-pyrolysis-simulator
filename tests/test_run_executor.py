@@ -12,6 +12,7 @@ from simulator.campaigns import (
     CampaignPressureSetpointRefusal,
 )
 from simulator.condensation import KnudsenRegimeRefusal
+from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.run_executor import (
     RunExecution,
     RunExecutor,
@@ -19,7 +20,13 @@ from simulator.run_executor import (
     _campaigns_elapsed_from_session_history,
 )
 from simulator.runner import PyrolysisRun
-from simulator.session import SimSession, SimSessionConfig, StepResult
+from simulator.session import (
+    DecisionPolicy,
+    SimSession,
+    SimSessionConfig,
+    StepResult,
+    drive_session,
+)
 from simulator.state import CampaignPhase, DecisionType
 from simulator.trace import PhysicsTrace
 
@@ -318,6 +325,81 @@ def test_pyrolysis_run_emits_binding_c6_refusal_diagnostic():
     )
 
 
+def test_run_executor_promotes_c4_acquisition_timeout_without_c6_mislabel() -> None:
+    config = _run(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C4",
+        hours=1,
+        additives_kg={},
+    )._session_config()
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    session = SimSession()
+    session.start(config, backend=backend)
+    session.simulator.campaign_mgr.campaigns["C4"][
+        "max_target_acquisition_hr"
+    ] = 1.0
+
+    execution = RunExecutor().execute_session(session, hours=1)
+
+    assert execution.status == "refused"
+    assert execution.reason == "c4_target_window_not_acquired"
+    assert execution.error_message == execution.reason
+    assert execution.refusal_diagnostic["campaign"] == "C4"
+    assert execution.refusal_diagnostic["reaction_family"] == (
+        "c4_mg_selective_pyrolysis"
+    )
+    assert execution.refusal_diagnostic["diagnostic"]["reason_refused"] == (
+        execution.reason
+    )
+    assert session.simulator._last_c6_refusal_diagnostic == {}
+
+
+def test_c4_refusal_is_non_resumable_under_auto_apply_and_decide() -> None:
+    """After a typed C4 endpoint refusal, core/session must not expose or
+    apply a next campaign decision. AUTO_APPLY and decide('yes') must not
+    start C6 (review construction: terminality fail-open)."""
+    config = _run(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C4",
+        hours=1,
+        additives_kg={},
+    )._session_config()
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    session = SimSession()
+    session.start(config, backend=backend)
+    # Branch two is the C4→C6 decision path under default-off C5.
+    session.simulator.record.branch = "two"
+    session.simulator.campaign_mgr.campaigns["C4"][
+        "max_target_acquisition_hr"
+    ] = 1.0
+
+    execution = RunExecutor().execute_session(session, hours=1)
+    assert execution.status == "refused"
+    assert execution.reason == "c4_target_window_not_acquired"
+    sim = session.simulator
+    assert sim._c4_campaign_refused is True
+    assert sim.campaign_endpoint_refused() is True
+    assert sim.melt.campaign == CampaignPhase.C4
+    assert sim.pending_decision is None
+    assert sim.paused_for_decision is False
+    assert session.pending_decision() is None
+
+    # Another AUTO_APPLY iteration must not create or apply C6_PROCEED.
+    list(drive_session(session, hours=2, policy=DecisionPolicy.AUTO_APPLY))
+    assert sim.melt.campaign == CampaignPhase.C4
+    assert sim.pending_decision is None
+    assert sim.paused_for_decision is False
+    assert sim._c6_campaign_refused is False
+    assert sim._last_c6_refusal_diagnostic == {}
+
+    # Direct decide cannot resume a terminally refused batch either.
+    with pytest.raises(RuntimeError, match="non-resumable"):
+        session.decide("yes")
+    assert sim.melt.campaign == CampaignPhase.C4
+
+
 def test_nonterminal_c6_refusal_does_not_mask_reporting_failure(
     monkeypatch,
 ):
@@ -337,6 +419,8 @@ def test_c6_acquisition_refusal_preserves_completed_tick_and_ledger_accounts():
     payload = _c6_acquisition_refusal_run().run()
 
     rows = payload["per_hour_summary"]
+    # Boilrump: C6 campaign-scoped refusal continues the batch; this fixture
+    # is a one-hour C6 acquisition refusal run, not the full CI sequence.
     assert payload["status"] == "partial"
     assert payload["reason"] == ""
     assert len(rows) == 1
