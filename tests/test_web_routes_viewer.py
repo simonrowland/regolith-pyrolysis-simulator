@@ -1455,6 +1455,36 @@ def test_settings_surfaces_price_ratification_flag() -> None:
     assert "electrical_usd_per_kWh" in rendered
 
 
+def test_ratified_price_basis_name_does_not_fabricate_authority_flag() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["header"]["cost_block"] = {
+        "electrical_cost_per_kWh": 10.0,
+        "solar_heat_cost_per_kWh": 0.05,
+    }
+    artifact["terminal"] = {
+        "run_metadata": {
+            "cost_rollup_diagnostic": {
+                "price_basis": "owner_ratified_placeholder_free_v2",
+                "owner_ratify_placeholder_count": 0,
+                "owner_ratify_placeholders": [],
+            }
+        }
+    }
+
+    report_html = _render_report_html(artifact)
+    settings_html = _run_viewer_expression(
+        "settings.js",
+        "costBlock({electrical_cost_per_kWh: 10, solar_heat_cost_per_kWh: 0.05}, "
+        "{terminal: {run_metadata: {cost_rollup_diagnostic: {"
+        'price_basis: "owner_ratified_placeholder_free_v2", '
+        "owner_ratify_placeholder_count: 0, owner_ratify_placeholders: []}}}})",
+    )
+
+    assert "unratified placeholder prices" not in report_html
+    assert "Price authority:" not in report_html
+    assert "Price authority:" not in settings_html
+
+
 def test_report_viewer_shows_stage_warning_beside_verdict() -> None:
     artifact = _artifact(recipe_snapshot=None)
     artifact["terminal"] = {

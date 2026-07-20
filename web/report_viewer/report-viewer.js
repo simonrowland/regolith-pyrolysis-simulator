@@ -100,13 +100,14 @@ function priceAuthority(artifact) {
   const count = hasNumber(rollup.owner_ratify_placeholder_count)
     ? rollup.owner_ratify_placeholder_count
     : null;
-  const names = (Array.isArray(rollup.owner_ratify_placeholders) ? rollup.owner_ratify_placeholders : [])
+  const placeholders = Array.isArray(rollup.owner_ratify_placeholders) ? rollup.owner_ratify_placeholders : [];
+  const names = placeholders
     .map((item) => item && typeof item === "object" && !Array.isArray(item) ? item.name : null)
     .filter((name) => typeof name === "string" && name.trim())
     .map((name) => name.trim());
-  const flagged = /placeholder|awaiting|unratified/i.test(basis)
-    || (count !== null && count > 0)
-    || names.length > 0;
+  const flagged = (count !== null && count > 0)
+    || placeholders.some((item) => item && typeof item === "object" && !Array.isArray(item)
+      && item.status === "owner-ratify-placeholder");
   return flagged ? { basis, count, names } : null;
 }
 
