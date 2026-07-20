@@ -740,6 +740,205 @@ process.stdout.write(JSON.stringify(vm.runInContext("runMetaLine(testRun)", cont
     assert json.loads(completed.stdout) == ["Lunar Mare Low Ti"]
 
 
+def test_library_preserves_focus_across_star_and_folder_rerenders() -> None:
+    root = Path(__file__).resolve().parents[1] / "web" / "report_viewer"
+    harness = r"""
+const fs = require("fs");
+const vm = require("vm");
+const labelsSource = fs.readFileSync(process.argv[2], "utf8");
+const librarySource = fs.readFileSync(process.argv[3], "utf8");
+const body = { tagName: "BODY", dataset: {}, isConnected: true };
+const document = { activeElement: body };
+const controls = { folder: new Map(), star: new Map() };
+
+function disconnect(map) {
+  for (const control of map.values()) {
+    control.isConnected = false;
+    if (document.activeElement === control) document.activeElement = body;
+  }
+  map.clear();
+}
+
+function makeControl(kind, value, disabled = false) {
+  return {
+    dataset: { [kind]: value },
+    disabled,
+    isConnected: true,
+    focus() {
+      if (!this.disabled && this.isConnected) document.activeElement = this;
+    },
+    closest(selector) {
+      return selector === `[data-${kind}]` ? this : null;
+    }
+  };
+}
+
+function makeElement(id, controlKind = null) {
+  return {
+    id,
+    dataset: {},
+    value: id === "run-sort" ? "created" : "",
+    _html: "",
+    listeners: {},
+    focus() { document.activeElement = this; },
+    addEventListener(type, listener) { (this.listeners[type] ||= []).push(listener); },
+    get innerHTML() { return this._html; },
+    set innerHTML(value) {
+      this._html = value;
+      if (!controlKind) return;
+      const current = controls[controlKind];
+      disconnect(current);
+      const pattern = new RegExp(`data-${controlKind}="([^"]+)"`, "g");
+      for (const match of value.matchAll(pattern)) {
+        const nearby = value.slice(Math.max(0, match.index - 180), match.index + 240);
+        const disabled = controlKind === "star" && /\sdisabled(?:\s|>)/.test(nearby);
+        current.set(match[1], makeControl(controlKind, match[1], disabled));
+      }
+    }
+  };
+}
+
+const elements = { library: makeElement("library") };
+Object.defineProperty(elements.library, "innerHTML", {
+  get() { return this._html || ""; },
+  set(value) {
+    this._html = value;
+    elements["folder-list"] = makeElement("folder-list", "folder");
+    elements["run-list"] = makeElement("run-list", "star");
+    elements["run-filter"] = makeElement("run-filter");
+    elements["run-sort"] = makeElement("run-sort");
+  }
+});
+document.querySelector = (selector) => elements[selector.startsWith("#") ? selector.slice(1) : selector] || null;
+document.querySelectorAll = (selector) => selector === "[data-folder]"
+  ? Array.from(controls.folder.values())
+  : selector === "[data-star]"
+    ? Array.from(controls.star.values())
+    : [];
+
+const pendingPatches = [];
+const context = {
+  window: { location: { href: "" } },
+  document,
+  encodeURIComponent,
+  fetch: (url, options) => {
+    if (String(url).endsWith("/meta")) {
+      const requested = JSON.parse(options.body).starred;
+      return new Promise((resolve) => pendingPatches.push({ requested, resolve }));
+    }
+    return new Promise(() => {});
+  },
+  console
+};
+context.globalThis = context;
+vm.createContext(context);
+vm.runInContext(labelsSource, context);
+vm.runInContext(librarySource, context);
+context.testIndex = [{
+  run_id: "focus-run",
+  name: "Focus run",
+  feedstock_id: "lunar_mare_low_ti",
+  status: "ok",
+  folder: "My runs",
+  live: true,
+  starred: false
+}, {
+  run_id: "error-run",
+  name: "Error run",
+  feedstock_id: "lunar_mare_low_ti",
+  status: "ok",
+  folder: "My runs",
+  live: true,
+  starred: true
+}, {
+  run_id: "static-run",
+  name: "Static run",
+  feedstock_id: "lunar_mare_low_ti",
+  status: "ok",
+  folder: "My runs",
+  live: false,
+  artifact: "index.html",
+  starred: true
+}];
+vm.runInContext("render(testIndex)", context);
+
+(async () => {
+  const click = elements.library.listeners.click[0];
+  const initialStar = controls.star.get("focus-run");
+  initialStar.focus();
+  const starPromise = click({ target: initialStar });
+  const pendingStar = document.activeElement.dataset.star;
+  const starPatch = pendingPatches.shift();
+  elements["run-filter"].focus();
+  starPatch.resolve({ ok: true, json: async () => ({ starred: starPatch.requested }) });
+  await starPromise;
+  const movedFocus = document.activeElement.id;
+
+  const initialFolder = controls.folder.get("Favorites");
+  initialFolder.focus();
+  await click({ target: initialFolder });
+  const settledFolder = document.activeElement.dataset.folder;
+
+  const errorStar = controls.star.get("error-run");
+  errorStar.focus();
+  const errorPromise = click({ target: errorStar });
+  const errorPatch = pendingPatches.shift();
+  errorPatch.resolve({
+    ok: false,
+    status: 500,
+    json: async () => ({ error: "save failed" })
+  });
+  await errorPromise;
+  const errorFocus = document.activeElement.dataset.star;
+
+  const liveStar = controls.star.get("focus-run");
+  liveStar.focus();
+  const liveUnstarPromise = click({ target: liveStar });
+  const liveUnstarPatch = pendingPatches.shift();
+  liveUnstarPatch.resolve({
+    ok: true,
+    json: async () => ({ starred: liveUnstarPatch.requested })
+  });
+  await liveUnstarPromise;
+  const liveUnstarFocus = document.activeElement.dataset.folder;
+  const liveStarRemoved = !controls.star.has("focus-run");
+
+  const staticStar = controls.star.get("static-run");
+  staticStar.focus();
+  await click({ target: staticStar });
+  const staticUnstarFocus = document.activeElement.dataset.folder;
+  const staticStarRemoved = !controls.star.has("static-run");
+
+  process.stdout.write(JSON.stringify({
+    pendingStar, movedFocus, settledFolder, errorFocus,
+    liveUnstarFocus, liveStarRemoved, staticUnstarFocus, staticStarRemoved,
+    bodyFocused: document.activeElement === body
+  }));
+})();
+"""
+
+    completed = subprocess.run(
+        ["node", "-", str(root / "labels.js"), str(root / "library.js")],
+        input=harness,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    result = json.loads(completed.stdout)
+
+    assert result == {
+        "pendingStar": "focus-run",
+        "movedFocus": "run-filter",
+        "settledFolder": "Favorites",
+        "errorFocus": "error-run",
+        "liveUnstarFocus": "Favorites",
+        "liveStarRemoved": True,
+        "staticUnstarFocus": "Favorites",
+        "staticStarRemoved": True,
+        "bodyFocused": False,
+    }
+
+
 def test_report_viewer_stepper_exposes_keyboard_controls() -> None:
     root = Path(__file__).resolve().parents[1] / "web/report_viewer"
     artifact = {
