@@ -202,6 +202,7 @@ def test_p1_renders_terminal_redox_partition_breakdown_and_stage3() -> None:
             "native_fe_tap_mol": 12.0,
             "native_fe_vapor_capacity_mol_hr": 0.75,
             "native_fe_vapor_capacity_kg_hr": 0.0419,
+            "ordinary_melt_fe_residual_capacity_mol_hr": 1.25,
             "native_fe_vapor_escape_fraction_of_pool": 0.04,
             "native_fe_uncondensed_mol": 0.1,
             "native_fe_uncondensed_fraction_of_pool": 0.008,
@@ -214,7 +215,7 @@ def test_p1_renders_terminal_redox_partition_breakdown_and_stage3() -> None:
                 "species": "Fe",
                 "alpha_s": 0.02,
                 "alpha_s_form": "scalar",
-                "alpha_s_extrapolated": False,
+                "alpha_s_extrapolated": True,
             },
             "source_label": "pure-component Antoine",
             "series_resistance": {
@@ -240,6 +241,16 @@ def test_p1_renders_terminal_redox_partition_breakdown_and_stage3() -> None:
             "delta_log10_fO2": 0.2,
             "redox_source_terms_applied": True,
             "redox_source_skip_reason": "not_liquid",
+            "terms_mol_o2_equiv_by_label": {
+                "redox_source:evaporative_metal_loss": 1.2,
+                "redox_source:c3_na_shuttle_reduction": 2.2,
+            },
+            "applied_terms_mol_o2_equiv_by_label": {
+                "redox_source:c3_na_shuttle_reduction": 2.2,
+            },
+            "skipped_terms_mol_o2_equiv_by_label": {
+                "redox_source:evaporative_metal_loss": 1.2,
+            },
             "skipped_reasons_by_label": {
                 "redox_source:<script>": "blocked & retained"
             },
@@ -275,7 +286,13 @@ def test_p1_renders_terminal_redox_partition_breakdown_and_stage3() -> None:
     core_detail = _table_region(terminal, "Terminal Fe-redox state detail")
     authority = _table_region(terminal, "Fe-redox authority and validity envelope")
     partition = _table_region(terminal, "Native Fe partition detail")
+    alpha_evaluation = _table_region(terminal, "Native Fe HKL alpha evaluation")
+    series_resistance = _table_region(terminal, "Native Fe series-resistance model")
+    saturation_event = _table_region(terminal, "Native Fe saturation event")
     redox_summary = _table_region(terminal, "Redox-source forcing summary")
+    attempted_terms = _table_region(terminal, "Attempted redox-source terms by label")
+    applied_terms = _table_region(terminal, "Applied redox-source terms by label")
+    skipped_terms = _table_region(terminal, "Skipped redox-source terms by label")
     ferric_divergence = _table_region(terminal, "Ferric divergence")
     respeciation = _table_region(terminal, "Fe redox respeciation")
     source_context = _table_region(terminal, "Source context")
@@ -297,28 +314,80 @@ def test_p1_renders_terminal_redox_partition_breakdown_and_stage3() -> None:
         "-10",
     )
     _assert_fact_pending(core_detail, "ΔIW")
+    _assert_fact_value(
+        core_detail,
+        "Kress91 pressure input (vacuum-floored)",
+        "0.001 bar",
+    )
+    assert "Melt-headspace pressure" not in core_detail
     _assert_fact_value(core_detail, "FeO equivalent", "7.8 wt%")
     _assert_metric_value(terminal, "Native Fe pool", "12.5 mol")
     _assert_metric_value(terminal, "Vapor route", "0.5 mol")
     _assert_metric_value(terminal, "Tap route", "12 mol")
+    _assert_metric_value(terminal, "Vapor capacity", "0.75 mol/h")
+    _assert_fact_value(partition, "Fe vapor mass capacity", "0.0419 kg/h")
+    _assert_fact_value(
+        partition,
+        "Residual capacity for ordinary melt Fe",
+        "1.25 mol/h",
+    )
     _assert_fact_value(partition, "Condensed native Fe mass", "0.01 kg")
+    _assert_fact_value(partition, "Uncondensed native Fe", "0.1 mol")
     _assert_fact_value(partition, "Native Fe pool fraction routed as vapor", "0.04")
     _assert_fact_value(partition, "Fe HKL alpha", "0.02")
     assert "Recovered product" not in partition
     assert "Collected product" not in partition
-    assert "Evaluated HKL alpha" in _table_region(terminal, "Native Fe HKL alpha evaluation")
-    assert "Limiting resistance" in _table_region(terminal, "Native Fe series-resistance model")
+    _assert_fact_value(alpha_evaluation, "Species", "Fe")
+    _assert_fact_value(alpha_evaluation, "Evaluated HKL alpha", "0.02")
+    _assert_fact_value(alpha_evaluation, "HKL alpha form", "scalar")
+    _assert_fact_value(alpha_evaluation, "HKL alpha extrapolated", "yes")
+    _assert_fact_value(series_resistance, "Limiting resistance", "gas")
+    _assert_fact_value(series_resistance, "Interface resistance fraction", "0.2")
+    _assert_fact_value(series_resistance, "Gas resistance fraction", "0.7")
+    _assert_fact_value(series_resistance, "Melt resistance fraction", "0.1")
     _assert_fact_value(
-        _table_region(terminal, "Native Fe saturation event"),
+        saturation_event,
         "Reason",
         "native_fe_saturation_split_applied",
     )
     _assert_fact_value(
-        _table_region(terminal, "Native Fe saturation event"),
+        saturation_event,
         "Event temperature",
         "1,600 °C",
     )
+    _assert_fact_value(saturation_event, "Status", "ok")
     _assert_fact_value(redox_summary, "Net attempted redox-source terms", "3.4 mol O₂-eq")
+    _assert_fact_value(redox_summary, "Combined skip reason", "not_liquid")
+    _assert_fact_value(
+        attempted_terms,
+        "redox_source:evaporative_metal_loss",
+        "1.2 mol O₂-eq",
+    )
+    _assert_fact_value(
+        attempted_terms,
+        "redox_source:c3_na_shuttle_reduction",
+        "2.2 mol O₂-eq",
+    )
+    _assert_fact_value(
+        applied_terms,
+        "redox_source:c3_na_shuttle_reduction",
+        "2.2 mol O₂-eq",
+    )
+    _assert_fact_not_value(
+        applied_terms,
+        "redox_source:evaporative_metal_loss",
+        "1.2 mol O₂-eq",
+    )
+    _assert_fact_value(
+        skipped_terms,
+        "redox_source:evaporative_metal_loss",
+        "1.2 mol O₂-eq",
+    )
+    _assert_fact_not_value(
+        skipped_terms,
+        "redox_source:c3_na_shuttle_reduction",
+        "2.2 mol O₂-eq",
+    )
     _assert_fact_value(ferric_divergence, "Implied ferric fraction", "0.2")
     _assert_fact_value(ferric_divergence, "Ledger ferric fraction", "0.18")
     _assert_fact_value(ferric_divergence, "Absolute ferric divergence", "0.02")
@@ -341,10 +410,17 @@ def test_p1_renders_terminal_redox_partition_breakdown_and_stage3() -> None:
         "simulator.fe_redox:&lt;script&gt;alert(1)&lt;/script&gt;",
     )
     _assert_fact_value(authority, "Reference", "Kress &amp; Carmichael &lt;unsafe&gt;")
+    _assert_fact_value(
+        partition,
+        "HKL alpha source",
+        "REF-016 &lt;script&gt;bad()&lt;/script&gt;",
+    )
     assert "<script>" not in html
-    assert "&amp;lt;" not in authority
+    assert "&amp;lt;" not in html
     assert "blocked &amp; retained" in skipped
     assert "gate &lt;closed&gt;" in refusal
+    assert "co-reported Stage 3 Fe capture/contamination" in html
+    assert "Stage 3 Fe consequence" not in html
     _assert_metric_value(selected, "Melt log₁₀ fO₂", "-99")
 
 
@@ -462,8 +538,8 @@ def test_p1_surfaces_explicit_and_missing_authority_flags() -> None:
     _assert_fact_pending(missing_authority, "Temperature-band case")
     _assert_fact_pending(missing_authority, "Temperature-band status")
     _assert_fact_pending(missing_authority, "Temperature-band source")
-    # Non-ok status must be chip-visible without opening the disclosure (Grok F2).
-    _assert_chip_value(no_iron_flags, "Status", "no_iron", "sec-p1-flag-clear")
+    # Non-ok status must be chip-visible and cautious without opening the disclosure.
+    _assert_chip_value(no_iron_flags, "Status", "no_iron", "sec-p1-flag-caution")
     _assert_chip_value(no_iron_flags, "Source", "none:no_iron", "sec-p1-flag-clear")
     _assert_chip_value(no_iron_flags, "Reference", "none emitted", "sec-p1-flag-caution")
     # Chip body text (not only a title= attribute) must carry no_iron.
@@ -556,7 +632,7 @@ def test_p1_null_empty_and_malformed_authority_metadata_are_distinct() -> None:
     )
     zero_flags = _flags_region(zero_terminal)
     assert zero_flags.count('title="status: 0; source: false; reference: 0"') == 7
-    _assert_chip_value(zero_flags, "Status", "0", "sec-p1-flag-clear")
+    _assert_chip_value(zero_flags, "Status", "0", "sec-p1-flag-caution")
     _assert_chip_value(zero_flags, "Source", "false", "sec-p1-flag-clear")
     _assert_chip_value(zero_flags, "Reference", "0", "sec-p1-flag-clear")
 
@@ -580,10 +656,73 @@ def test_p1_timestep_hour_states_distinguish_absent_empty_malformed_and_zero() -
 
 
 def test_p1_selected_timestep_view_tracks_inspector_index() -> None:
+    redox_88 = _core_redox(
+        fO2_log=-99.0,
+        status="no_iron",
+        source="none:no_iron",
+        authoritative=False,
+        native_fe_partition={
+            "native_fe_pool_mol": 12.0,
+            "native_fe_vapor_mol": 3.0,
+            "native_fe_tap_mol": 9.0,
+        },
+        native_fe_saturation_event={
+            "native_fe_event": "native_fe_partition_refused",
+            "native_fe_event_reason": "partition_refused",
+            "native_fe_event_status": "refused",
+            "temperature_C": 1200.0,
+        },
+    )
+    redox_89 = _core_redox(
+        fO2_log=-8.5,
+        native_fe_partition={
+            "native_fe_pool_mol": 22.0,
+            "native_fe_vapor_mol": 4.0,
+            "native_fe_tap_mol": 18.0,
+        },
+        native_fe_saturation_event={
+            "native_fe_event": "native_fe_partitioned_saturation",
+            "native_fe_event_reason": "partition_applied",
+            "native_fe_event_status": "ok",
+            "temperature_C": 1600.0,
+        },
+    )
     artifact = {
         "timesteps": [
-            {"hour": 88, "summary": {"fe_redox_split": _core_redox(fO2_log=-99.0)}},
-            {"hour": 89, "summary": {"fe_redox_split": _core_redox(fO2_log=-8.5)}},
+            {
+                "hour": 88,
+                "summary": {
+                    "fe_redox_split": redox_88,
+                    "redox_source_breakdown": {
+                        "net_mol_o2_equiv": 4.0,
+                        "redox_source_skip_reason": "no_melt_redox_capacity",
+                        "terms_mol_o2_equiv_by_label": {"redox_source:attempted_88": 4.0},
+                        "applied_terms_mol_o2_equiv_by_label": {},
+                        "skipped_terms_mol_o2_equiv_by_label": {
+                            "redox_source:attempted_88": 4.0
+                        },
+                        "redox_source_refusal_context": {"reason": "capacity_refusal"},
+                    },
+                    "stage_3_capture": {"Fe_kg": 5.0, "total_kg": 10.0, "Fe_wt_pct": 50.0},
+                },
+            },
+            {
+                "hour": 89,
+                "summary": {
+                    "fe_redox_split": redox_89,
+                    "redox_source_breakdown": {
+                        "net_mol_o2_equiv": 7.0,
+                        "redox_source_skip_reason": "not_liquid",
+                        "terms_mol_o2_equiv_by_label": {"redox_source:attempted_89": 7.0},
+                        "applied_terms_mol_o2_equiv_by_label": {
+                            "redox_source:attempted_89": 7.0
+                        },
+                        "skipped_terms_mol_o2_equiv_by_label": {},
+                        "redox_source_refusal_context": {"reason": "liquid_gate_refusal"},
+                    },
+                    "stage_3_capture": {"Fe_kg": 1.0, "total_kg": 20.0, "Fe_wt_pct": 5.0},
+                },
+            },
         ]
     }
 
@@ -593,13 +732,79 @@ def test_p1_selected_timestep_view_tracks_inspector_index() -> None:
 
     assert ">hour 88</span>" in initial
     _assert_metric_value(initial, "Melt log₁₀ fO₂", "-99")
-    assert "-8.5" not in initial
     assert ">hour 88</span>" in selected_88
     _assert_metric_value(selected_88, "Melt log₁₀ fO₂", "-99")
-    assert "-8.5" not in selected_88
+    _assert_chip_value(
+        _flags_region(selected_88),
+        "Status",
+        "no_iron",
+        "sec-p1-flag-caution",
+    )
+    _assert_chip_value(
+        _flags_region(selected_88),
+        "Authoritative",
+        "no",
+        "sec-p1-flag-caution",
+    )
+    _assert_metric_value(selected_88, "Native Fe pool", "12 mol")
+    _assert_fact_value(
+        _table_region(selected_88, "Native Fe saturation event"),
+        "Status",
+        "refused",
+    )
+    _assert_fact_value(
+        _table_region(selected_88, "Native Fe saturation event"),
+        "Reason",
+        "partition_refused",
+    )
+    _assert_fact_value(
+        _table_region(selected_88, "Redox-source forcing summary"),
+        "Net attempted redox-source terms",
+        "4 mol O₂-eq",
+    )
+    _assert_fact_value(
+        _table_region(selected_88, "Redox-source forcing summary"),
+        "Combined skip reason",
+        "no_melt_redox_capacity",
+    )
+    _assert_fact_value(
+        _table_region(selected_88, "Skipped redox-source terms by label"),
+        "redox_source:attempted_88",
+        "4 mol O₂-eq",
+    )
+    _assert_fact_value(
+        _table_region(selected_88, "Refusal context"),
+        "Reason",
+        "capacity_refusal",
+    )
+    _assert_metric_value(selected_88, "Stage 3 Fe", "5 kg")
+    _assert_metric_value(selected_88, "Stage 3 total", "10 kg")
+    _assert_metric_value(selected_88, "Stage 3 Fe concentration", "50 wt%")
+    assert "22 mol" not in selected_88
+    assert "liquid_gate_refusal" not in selected_88
     assert ">hour 89</span>" in selected_89
     _assert_metric_value(selected_89, "Melt log₁₀ fO₂", "-8.5")
-    assert "-99" not in selected_89
+    _assert_chip_value(_flags_region(selected_89), "Status", "ok", "sec-p1-flag-clear")
+    _assert_metric_value(selected_89, "Native Fe pool", "22 mol")
+    _assert_fact_value(
+        _table_region(selected_89, "Native Fe saturation event"),
+        "Reason",
+        "partition_applied",
+    )
+    _assert_fact_value(
+        _table_region(selected_89, "Redox-source forcing summary"),
+        "Net attempted redox-source terms",
+        "7 mol O₂-eq",
+    )
+    _assert_fact_value(
+        _table_region(selected_89, "Refusal context"),
+        "Reason",
+        "liquid_gate_refusal",
+    )
+    _assert_metric_value(selected_89, "Stage 3 Fe", "1 kg")
+    _assert_metric_value(selected_89, "Stage 3 Fe concentration", "5 wt%")
+    assert "12 mol" not in selected_89
+    assert "capacity_refusal" not in selected_89
 
 
 def test_p1_malformed_artifact_shapes_render_panel_local_pending() -> None:
@@ -637,6 +842,60 @@ def test_p1_malformed_artifact_shapes_render_panel_local_pending() -> None:
         assert "Stage 3 capture pending" in terminal
 
 
+def test_p1_on_timestep_handles_malformed_artifacts_and_indices() -> None:
+    malformed_artifacts = [
+        None,
+        {},
+        {"timesteps": None},
+        {"timesteps": "not-an-array"},
+        {"timesteps": []},
+        {"timesteps": [None]},
+        {"timesteps": [{}]},
+        {"timesteps": [{"hour": 1}]},
+        {"timesteps": [{"hour": 1, "summary": []}]},
+        {
+            "timesteps": [
+                {
+                    "hour": 1,
+                    "summary": {
+                        "fe_redox_split": [],
+                        "redox_source_breakdown": "malformed",
+                        "stage_3_capture": [],
+                    },
+                }
+            ]
+        },
+    ]
+
+    for artifact in malformed_artifacts:
+        selected = _render_panel_timestep(artifact, 0)
+        assert "Selected timestep Fe-redox" in selected
+        assert "Fe-redox state pending" in selected
+        assert "Native Fe partition pending" in selected
+        assert (
+            "summary.fe_redox_split.native_fe_partition is conditional and was not "
+            "emitted for the selected timestep"
+        ) in selected
+        assert "Native Fe saturation event pending" in selected
+        assert (
+            "summary.fe_redox_split.native_fe_saturation_event was not emitted for "
+            "the selected timestep"
+        ) in selected
+        assert "Redox-source breakdown pending" in selected
+        assert (
+            "The selected timestep does not emit summary.redox_source_breakdown"
+        ) in selected
+        assert "Stage 3 capture pending" in selected
+        assert "The selected timestep does not emit summary.stage_3_capture" in selected
+        assert "terminal timestep" not in selected
+
+    valid_artifact = _artifact({"fe_redox_split": _core_redox()}, hour=4)
+    for index in (-1, 1, 99):
+        selected = _render_panel_timestep(valid_artifact, index)
+        assert ">hour not emitted</span>" in selected
+        assert "Fe-redox state pending" in selected
+
+
 def test_p1_partition_and_event_absent_before_hour_89_are_not_zeroed() -> None:
     html = _render_panel(
         _artifact(
@@ -656,6 +915,125 @@ def test_p1_partition_and_event_absent_before_hour_89_are_not_zeroed() -> None:
     assert "Native Fe saturation event pending" in terminal
     assert "Native Fe pool</div>" not in terminal
     _assert_metric_value(terminal, "Stage 3 Fe", "0 kg")
+
+
+def test_p1_absent_core_numeric_fields_never_default_or_derive() -> None:
+    specs = [
+        ("fO2_log", "Melt log₁₀ fO₂", "metric", "0"),
+        ("fe3_over_sigma_fe", "Fe³⁺ / ΣFe", "metric", "0"),
+        ("ferric_frac", "Ferric fraction", "metric", "0"),
+        ("ferrous_frac", "Ferrous fraction", "metric", "0"),
+        ("native_fe_frac", "Native Fe fraction", "metric", "0"),
+        ("iw_log", "IW-buffer log₁₀ fO₂ (absolute, not ΔIW)", "fact", "0"),
+        ("temperature_K", "Temperature", "fact", "0 K"),
+        (
+            "pressure_bar",
+            "Kress91 pressure input (vacuum-floored)",
+            "fact",
+            "0 bar",
+        ),
+        ("fe2o3_over_feo_molar", "Fe₂O₃ / FeO molar ratio", "fact", "0"),
+        ("fe2o3_equiv_wt_pct", "Fe₂O₃ equivalent", "fact", "0 wt%"),
+        ("feo_equiv_wt_pct", "FeO equivalent", "fact", "0 wt%"),
+    ]
+
+    for key, label, region_kind, forbidden_zero in specs:
+        redox = _core_redox()
+        redox.pop(key)
+        terminal = _terminal_region(
+            _render_panel(
+                _artifact(
+                    {
+                        "T_C": 1726.85,
+                        "P_total_bar": 0.25,
+                        "pO2_bar": 1e-8,
+                        "fe_redox_split": redox,
+                    }
+                )
+            )
+        )
+        region = (
+            terminal
+            if region_kind == "metric"
+            else _table_region(terminal, "Terminal Fe-redox state detail")
+        )
+        if region_kind == "metric":
+            _assert_metric_pending(region, label)
+            _assert_metric_not_value(region, label, forbidden_zero)
+        else:
+            _assert_fact_pending(region, label)
+            _assert_fact_not_value(region, label, forbidden_zero)
+
+        if key == "fO2_log":
+            _assert_metric_not_value(region, label, "-8")
+        elif key == "temperature_K":
+            _assert_fact_not_value(region, label, "2,000 K")
+        elif key == "pressure_bar":
+            _assert_fact_not_value(region, label, "0.25 bar")
+
+
+def test_p1_redox_term_maps_distinguish_absent_empty_malformed_and_zero() -> None:
+    titles = (
+        "Attempted redox-source terms by label",
+        "Applied redox-source terms by label",
+        "Skipped redox-source terms by label",
+    )
+    absent = _terminal_region(
+        _render_panel(
+            _artifact({"redox_source_breakdown": {"net_mol_o2_equiv": 6.0}})
+        )
+    )
+    empty = _terminal_region(
+        _render_panel(
+            _artifact(
+                {
+                    "redox_source_breakdown": {
+                        "terms_mol_o2_equiv_by_label": {},
+                        "applied_terms_mol_o2_equiv_by_label": {},
+                        "skipped_terms_mol_o2_equiv_by_label": {},
+                    }
+                }
+            )
+        )
+    )
+    malformed = _terminal_region(
+        _render_panel(
+            _artifact(
+                {
+                    "redox_source_breakdown": {
+                        "terms_mol_o2_equiv_by_label": [],
+                        "applied_terms_mol_o2_equiv_by_label": "bad",
+                        "skipped_terms_mol_o2_equiv_by_label": 4,
+                    }
+                }
+            )
+        )
+    )
+    zero = _terminal_region(
+        _render_panel(
+            _artifact(
+                {
+                    "redox_source_breakdown": {
+                        "terms_mol_o2_equiv_by_label": {"redox_source:zero": 0.0},
+                        "applied_terms_mol_o2_equiv_by_label": {},
+                        "skipped_terms_mol_o2_equiv_by_label": {},
+                    }
+                }
+            )
+        )
+    )
+
+    for title in titles:
+        assert f"{title} pending" in absent
+        assert f"{title} malformed" in malformed
+        assert f"{title} pending" not in empty
+    assert empty.count("Emitted object contains no terms.") == 3
+    assert malformed.count("was emitted with a malformed non-object value") == 3
+    _assert_fact_value(
+        _table_region(zero, "Attempted redox-source terms by label"),
+        "redox_source:zero",
+        "0 mol O₂-eq",
+    )
 
 
 def test_p1_partial_inputs_never_drive_viewer_derivations() -> None:
@@ -699,6 +1077,7 @@ def test_p1_partial_inputs_never_drive_viewer_derivations() -> None:
     core_detail = _table_region(terminal, "Terminal Fe-redox state detail")
     partition = _table_region(terminal, "Native Fe partition detail")
     redox_summary = _table_region(terminal, "Redox-source forcing summary")
+    attempted_terms = _table_region(terminal, "Attempted redox-source terms by label")
     missing_ferric = _core_redox(fe3_over_sigma_fe=0.3456)
     missing_ferric.pop("ferric_frac")
     missing_ferric_terminal = _terminal_region(
@@ -840,6 +1219,11 @@ def test_p1_partial_inputs_never_drive_viewer_derivations() -> None:
     _assert_fact_pending(partition, "Native Fe pool fraction routed as vapor")
     _assert_fact_pending(redox_summary, "Net attempted redox-source terms")
     _assert_fact_pending(redox_summary, "Change in log₁₀ fO₂")
+    _assert_fact_value(attempted_terms, "term_a", "1.111 mol O₂-eq")
+    _assert_fact_value(attempted_terms, "term_b", "2.222 mol O₂-eq")
+    assert "Applied redox-source terms by label pending" in terminal
+    assert "Skipped redox-source terms by label pending" in terminal
+    _assert_fact_not_value(attempted_terms, "term_a", "3.333 mol O₂-eq")
     _assert_metric_pending(missing_ferric_terminal, "Ferric fraction")
     _assert_metric_not_value(missing_ferric_terminal, "Ferric fraction", "0.3456")
     _assert_metric_pending(missing_native_terminal, "Native Fe fraction")

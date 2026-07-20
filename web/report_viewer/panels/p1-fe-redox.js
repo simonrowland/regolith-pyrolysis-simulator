@@ -245,6 +245,35 @@
       : '<div class="sec-p1-empty-note">Emitted object contains no detail.</div>';
   }
 
+  function redoxTermTable(object, ariaLabel) {
+    const rows = Object.entries(object).map(([label, value]) => [
+      label,
+      isNumber(value) ? esc(fmtNum(value, "mol O₂-eq")) : esc("malformed")
+    ]);
+    return rows.length
+      ? factsTable(rows, ariaLabel)
+      : '<div class="sec-p1-empty-note">Emitted object contains no terms.</div>';
+  }
+
+  function redoxTermDisclosure(breakdown, key, title) {
+    if (!hasOwn(breakdown, key) || breakdown[key] === null || breakdown[key] === undefined) {
+      return `<details class="sec-p1-nested-disclosure"><summary>${esc(title)}</summary>${pendingBlock(
+        `${title} pending`,
+        `summary.redox_source_breakdown.${key} was not emitted.`
+      )}</details>`;
+    }
+    if (!isRecord(breakdown[key])) {
+      return `<details class="sec-p1-nested-disclosure"><summary>${esc(title)}</summary>${pendingBlock(
+        `${title} malformed`,
+        `summary.redox_source_breakdown.${key} was emitted with a malformed non-object value.`
+      )}</details>`;
+    }
+    return `<details class="sec-p1-nested-disclosure"><summary>${esc(title)}</summary>${redoxTermTable(
+      breakdown[key],
+      title
+    )}</details>`;
+  }
+
   function metric(label, value, note = "") {
     return `<div class="metric sec-p1-metric"><div class="k">${label}</div><div class="v">${value}</div>${note ? `<small>${note}</small>` : ""}</div>`;
   }
@@ -264,7 +293,7 @@
 
   function scalarChip(redox, key, label) {
     const state = scalarTextState(redox, key);
-    const cautious = state.kind !== "value";
+    const cautious = state.kind !== "value" || (key === "status" && state.value !== "ok");
     return `<span class="chip sec-p1-flag ${cautious ? "sec-p1-flag-caution" : "sec-p1-flag-clear"}" title="${esc(authorityTooltip(redox))}">${esc(label)} · ${esc(state.value)}</span>`;
   }
 
@@ -295,7 +324,7 @@
       ["IW-buffer log₁₀ fO₂ (absolute, not ΔIW)", numberValue(redox, "iw_log")],
       ["ΔIW", pendingValue()],
       ["Temperature", numberValue(redox, "temperature_K", "K")],
-      ["Melt-headspace pressure", numberValue(redox, "pressure_bar", "bar")],
+      ["Kress91 pressure input (vacuum-floored)", numberValue(redox, "pressure_bar", "bar")],
       [`${fe2o3} / ${feo} molar ratio`, numberValue(redox, "fe2o3_over_feo_molar")],
       [`${fe2o3} equivalent`, numberValue(redox, "fe2o3_equiv_wt_pct", "wt%")],
       [`${feo} equivalent`, numberValue(redox, "feo_equiv_wt_pct", "wt%")],
@@ -327,7 +356,7 @@
     return `<div class="sec-p1-flags" aria-label="Emitted Fe-redox diagnostic and Kress91 temperature-band flags">${chips}</div><div class="note sec-p1-authority-note">Authoritative, extrapolation and high uncertainty describe the Kress91 temperature band; diagnostic-only describes this Fe-redox split. None is whole-run confidence.</div><details class="sec-p1-disclosure"><summary>Authority and temperature-band detail</summary>${factsTable(rows, "Fe-redox authority and validity envelope")}</details>`;
   }
 
-  function renderPartition(redox) {
+  function renderPartition(redox, selected = false) {
     const partition = isRecord(redox) ? redox.native_fe_partition : null;
     const event = isRecord(redox) ? redox.native_fe_saturation_event : null;
     let partitionHtml;
@@ -372,7 +401,7 @@
     } else {
       partitionHtml = pendingBlock(
         "Native Fe partition pending",
-        "summary.fe_redox_split.native_fe_partition is conditional and was not emitted for the terminal timestep. No empty or zero partition is assumed."
+        `summary.fe_redox_split.native_fe_partition is conditional and was not emitted for the ${selected ? "selected" : "terminal"} timestep. No empty or zero partition is assumed.`
       );
     }
     const eventHtml = isRecord(event)
@@ -384,16 +413,16 @@
         ], "Native Fe saturation event")
       : pendingBlock(
           "Native Fe saturation event pending",
-          "summary.fe_redox_split.native_fe_saturation_event was not emitted for the terminal timestep."
+          `summary.fe_redox_split.native_fe_saturation_event was not emitted for the ${selected ? "selected" : "terminal"} timestep.`
         );
     return `<details class="sec-p1-disclosure"><summary>Native Fe partition and saturation event</summary><h3>Partition</h3>${partitionHtml}<h3>Saturation event</h3>${eventHtml}</details>`;
   }
 
-  function renderBreakdown(breakdown) {
+  function renderBreakdown(breakdown, selected = false) {
     if (!isRecord(breakdown)) {
       return pendingBlock(
         "Redox-source breakdown pending",
-        "The terminal timestep does not emit summary.redox_source_breakdown. Source forcing and refusal context are not inferred."
+        `The ${selected ? "selected" : "terminal"} timestep does not emit summary.redox_source_breakdown. Source forcing and refusal context are not inferred.`
       );
     }
     const summaryRows = [
@@ -404,6 +433,11 @@
       ["Combined skip reason", textValue(breakdown, "redox_source_skip_reason", "no skip reason")],
       ["Source campaign hour", numberValue(breakdown, "source_campaign_hour")]
     ];
+    const termMaps = [
+      { title: "Attempted redox-source terms by label", key: "terms_mol_o2_equiv_by_label" },
+      { title: "Applied redox-source terms by label", key: "applied_terms_mol_o2_equiv_by_label" },
+      { title: "Skipped redox-source terms by label", key: "skipped_terms_mol_o2_equiv_by_label" }
+    ].map(({ title, key }) => redoxTermDisclosure(breakdown, key, title)).join("");
     const nested = [
       { title: "Skipped reasons by source label", key: "skipped_reasons_by_label" },
       { title: "Ferric divergence", key: "ferric_divergence" },
@@ -417,14 +451,14 @@
         : pendingBlock(`${title} pending`, `summary.redox_source_breakdown.${key} was not emitted.`)
       }</details>`;
     }).join("");
-    return `${factsTable(summaryRows, "Redox-source forcing summary")}${nested}`;
+    return `${factsTable(summaryRows, "Redox-source forcing summary")}${termMaps}${nested}`;
   }
 
-  function renderStage3(stage3) {
+  function renderStage3(stage3, selected = false) {
     if (!isRecord(stage3)) {
       return pendingBlock(
         "Stage 3 capture pending",
-        "The terminal timestep does not emit summary.stage_3_capture. Fe contamination is not inferred."
+        `The ${selected ? "selected" : "terminal"} timestep does not emit summary.stage_3_capture. Fe contamination is not inferred.`
       );
     }
     return `<div class="sec-p1-stage3">${[
@@ -453,7 +487,11 @@
       : timesteps[selectedIndex];
     const summary = timestep && isRecord(timestep.summary) ? timestep.summary : null;
     const redox = summary && isRecord(summary.fe_redox_split) ? summary.fe_redox_split : null;
-    return `<div class="sec-p1-selected-head"><h3>Selected timestep Fe-redox</h3><span class="chip">hour ${timestepHourValue(timestep)}</span></div>${renderAuthority(redox)}${renderCore(redox, true)}`;
+    const breakdown = summary && isRecord(summary.redox_source_breakdown)
+      ? summary.redox_source_breakdown
+      : null;
+    const stage3 = summary && isRecord(summary.stage_3_capture) ? summary.stage_3_capture : null;
+    return `<div class="sec-p1-selected-head"><h3>Selected timestep Fe-redox</h3><span class="chip">hour ${timestepHourValue(timestep)}</span></div>${renderAuthority(redox)}${renderCore(redox, true)}${renderPartition(redox, true)}<details class="sec-p1-disclosure"><summary>Redox-source forcing, refusal and ferric divergence</summary>${renderBreakdown(breakdown, true)}</details><details class="sec-p1-disclosure"><summary>Stage 3 condenser Fe contamination</summary>${renderStage3(stage3, true)}</details>`;
   }
 
   function onTimestep(artifact, index) {
@@ -477,7 +515,7 @@
     const hour = timestepHourValue(terminalStep);
 
     const terminalHtml = `${renderAuthority(redox)}${renderCore(redox)}${renderPartition(redox)}<details class="sec-p1-disclosure"><summary>Redox-source forcing, refusal and ferric divergence</summary>${renderBreakdown(breakdown)}</details><details class="sec-p1-disclosure"><summary>Stage 3 condenser Fe contamination</summary>${renderStage3(stage3)}</details>`;
-    return `<section class="sec-p1-fe-redox" id="sec-p1-fe-redox" style="--sec-p1-fe:${esc(speciesColor("Fe"))}" aria-label="Fe redox diagnostics"><h2><span class="sect">P1</span>Melt Fe redox diagnostics</h2><p class="sub">Terminal timestep · hour ${hour}. Artifact-emitted SSO-R state and downstream Stage 3 Fe consequence; no viewer-derived redox or purity values.</p><div class="sec-p1-terminal-state" id="sec-p1-terminal-state">${terminalHtml}</div><div class="sec-p1-selected-timestep" id="sec-p1-selected-timestep" aria-live="polite"><div id="sec-p1-selected-timestep-body">${renderSelectedTimestep(artifact, 0)}</div></div></section>`;
+    return `<section class="sec-p1-fe-redox" id="sec-p1-fe-redox" style="--sec-p1-fe:${esc(speciesColor("Fe"))}" aria-label="Fe redox diagnostics"><h2><span class="sect">P1</span>Melt Fe redox diagnostics</h2><p class="sub">Terminal timestep · hour ${hour}. Artifact-emitted SSO-R state and co-reported Stage 3 Fe capture/contamination; no viewer-derived redox or purity values.</p><div class="sec-p1-terminal-state" id="sec-p1-terminal-state">${terminalHtml}</div><div class="sec-p1-selected-timestep" id="sec-p1-selected-timestep" aria-live="polite"><div id="sec-p1-selected-timestep-body">${renderSelectedTimestep(artifact, 0)}</div></div></section>`;
   }
 
   (root.ReportPanels = root.ReportPanels || []).push({
