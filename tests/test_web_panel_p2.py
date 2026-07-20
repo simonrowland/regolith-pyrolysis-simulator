@@ -10,7 +10,7 @@ LABELS = ROOT / "web/report_viewer/labels.js"
 PANEL = ROOT / "web/report_viewer/panels/p2-taps.js"
 
 
-def _render(artifact: dict) -> str:
+def _render(artifact: dict, *, species_color_sentinel: str | None = None) -> str:
     harness = r"""
 const fs = require("fs");
 const vm = require("vm");
@@ -18,13 +18,33 @@ const context = { console };
 context.globalThis = context;
 vm.createContext(context);
 vm.runInContext(fs.readFileSync(process.argv[2], "utf8"), context);
+const speciesColorSentinel = JSON.parse(process.argv[5]);
+if (speciesColorSentinel !== null) {
+  context.ReportLabels = Object.freeze({
+    ...context.ReportLabels,
+    speciesColor: () => speciesColorSentinel,
+  });
+}
 vm.runInContext(fs.readFileSync(process.argv[3], "utf8"), context);
+if (!Array.isArray(context.ReportPanels) || context.ReportPanels.length !== 1) {
+  throw new Error(`expected exactly one panel registration, got ${context.ReportPanels?.length}`);
+}
+if (context.ReportPanels[0].id !== "sec-p2-taps") {
+  throw new Error(`wrong panel registration id: ${context.ReportPanels[0].id}`);
+}
 const artifact = JSON.parse(process.argv[4]);
 const rows = (artifact.timesteps || []).map((timestep) => timestep.summary || {});
 process.stdout.write(context.ReportPanels[0].render(artifact, rows, [], {}));
 """
     completed = subprocess.run(
-        ["node", "-", str(LABELS), str(PANEL), json.dumps(artifact)],
+        [
+            "node",
+            "-",
+            str(LABELS),
+            str(PANEL),
+            json.dumps(artifact),
+            json.dumps(species_color_sentinel),
+        ],
         input=harness,
         text=True,
         capture_output=True,
@@ -150,7 +170,7 @@ def _present_stratification() -> dict:
     }
 
 
-def test_p2_renders_two_taps_contaminants_accounts_and_geometry() -> None:
+def test_p2_renders_two_product_inventories_contaminants_accounts_and_geometry() -> None:
     html = _render(_artifact(
         stratification=_present_stratification(),
         final_state={
@@ -161,13 +181,16 @@ def test_p2_renders_two_taps_contaminants_accounts_and_geometry() -> None:
     upper = _tap_card(html, "float")
     bottom = _tap_card(html, "bottom")
     upper_pool = _species_map_region(upper, "Stratified pool · mol by species")
-    upper_terminal = _species_map_region(upper, "Terminal ledger account · mol by species")
+    upper_terminal = _species_map_region(upper, "Final-state process pool · mol by species")
     bottom_pool = _species_map_region(bottom, "Stratified pool · mol by species")
-    bottom_terminal = _species_map_region(bottom, "Terminal ledger account · mol by species")
+    bottom_terminal = _species_map_region(bottom, "Final-state process pool · mol by species")
 
-    assert 'id="sec-p2-taps"' in html
-    assert "Upper float tap" in upper
-    assert "Bottom pool tap" in bottom
+    assert "Metal-pool product inventory &amp; stratification" in html
+    assert "Upper float-layer inventory" in upper
+    assert "Bottom-pool inventory" in bottom
+    assert "Inventory is product-classified; no drain tap is simulated" in html
+    assert "Upper float tap" not in upper
+    assert "Bottom pool tap" not in bottom
     assert 'Al</b> <span title="7 mol">7 mol</span>' in upper_pool
     assert 'Fe</b> <span title="100 mol">100 mol</span>' in bottom_pool
     assert "<b>Fe</b>" not in upper_pool
@@ -176,12 +199,13 @@ def test_p2_renders_two_taps_contaminants_accounts_and_geometry() -> None:
     assert 'Fe</b> <span title="1000 mol">1,000 mol</span>' in bottom_terminal
     assert "<b>Fe</b>" not in upper_terminal
     assert "<b>Al</b>" not in bottom_terminal
-    assert "Fe 97.1 wt% · largest emitted share" in bottom
+    assert "Fe 97.1 wt% · largest emitted pool share" in bottom
     assert 'Co contaminant</b> <span title="1.9 wt%">1.9 wt%</span>' in bottom
     assert 'Ni contaminant</b> <span title="1 wt%">1 wt%</span>' in bottom
     assert "Equivalent film thickness" in html and "5.00e-4 m" in html
     assert "Coverage fraction at reference thickness" in html and ">0.5<" in html
-    assert "Frozen kg tap views pending producer attach" in html
+    assert "Frozen kg product-pool views pending producer attach" in html
+    assert "literal terminal tap accounts" not in html
 
 
 def test_p2_absent_stratification_stays_pending_without_hiding_terminal_mol() -> None:
@@ -206,13 +230,13 @@ def test_p2_absent_stratification_stays_pending_without_hiding_terminal_mol() ->
     )
 
     assert "Pending metal-phase stratification" in html
-    assert "Elemental tap grade pending" in html
-    assert "Pool mol amounts are not converted into a grade" in html
+    assert "Elemental pool composition pending" in html
+    assert "Pool mol amounts are not converted into wt%" in html
     assert 'Fe</b> <span title="3 mol">3 mol</span>' in html
     assert "Emitted temperature</span><b>not emitted</b>" in state
     assert "Emitted melt density</span><b>not emitted</b>" in state
-    assert " wt%" not in upper_grade
-    assert " wt%" not in bottom_grade
+    assert " wt%</span>" not in upper_grade
+    assert " wt%</span>" not in bottom_grade
 
     partial = _present_stratification()
     partial.pop("temperature_K")
@@ -241,9 +265,9 @@ def test_p2_partial_composition_does_not_derive_wt_pct_from_species_mol() -> Non
         '<div class="sec-p2-kv">',
     )
 
-    assert "Elemental composition by weight was not emitted" in bottom_grade
-    assert "Pool mol amounts are not converted into a grade" in bottom_grade
-    assert " wt%" not in bottom_grade
+    assert "Elemental pool composition by weight was not emitted" in bottom_grade
+    assert "Pool mol amounts are not converted into wt%" in bottom_grade
+    assert " wt%</span>" not in bottom_grade
     assert 'Fe</b> <span title="2 mol">2 mol</span>' in _tap_card(html, "bottom")
     assert 'Co</b> <span title="1 mol">1 mol</span>' in _tap_card(html, "bottom")
 
@@ -345,9 +369,9 @@ def test_p2_distinguishes_grade_absent_empty_malformed_and_zero_states() -> None
         '<div class="sec-p2-contaminants"',
         '<div class="sec-p2-kv">',
     )
-    assert "Co not present in emitted grade" in present_contaminants
-    assert "Ni not present in emitted grade" in present_contaminants
-    assert "contaminant grade not emitted" not in present_contaminants
+    assert "Co not present in emitted composition" in present_contaminants
+    assert "Ni not present in emitted composition" in present_contaminants
+    assert "composition shares not emitted" not in present_contaminants
 
     absent = _present_stratification()
     absent["pools"]["bottom_pool"].pop("composition_wt_pct")
@@ -356,8 +380,8 @@ def test_p2_distinguishes_grade_absent_empty_malformed_and_zero_states() -> None
         '<div class="sec-p2-grade"',
         '<div class="sec-p2-kv">',
     )
-    assert "Elemental composition by weight was not emitted" in absent_grade
-    assert "Co and Ni contaminant grades not emitted" in absent_grade
+    assert "Elemental pool composition by weight was not emitted" in absent_grade
+    assert "Co and Ni composition shares not emitted" in absent_grade
 
     empty = _present_stratification()
     empty["pools"]["bottom_pool"]["composition_wt_pct"] = {}
@@ -366,8 +390,8 @@ def test_p2_distinguishes_grade_absent_empty_malformed_and_zero_states() -> None
         '<div class="sec-p2-grade"',
         '<div class="sec-p2-kv">',
     )
-    assert "No species present in emitted grade" in empty_grade
-    assert "Co not present in emitted grade" in empty_grade
+    assert "No species present in emitted composition" in empty_grade
+    assert "Co not present in emitted composition" in empty_grade
 
     malformed = _present_stratification()
     malformed["pools"]["bottom_pool"]["composition_wt_pct"] = []
@@ -376,8 +400,8 @@ def test_p2_distinguishes_grade_absent_empty_malformed_and_zero_states() -> None
         '<div class="sec-p2-grade"',
         '<div class="sec-p2-kv">',
     )
-    assert "Emitted elemental composition by weight is not a species map" in malformed_grade
-    assert "contaminant grades unavailable · emitted grade malformed" in malformed_grade
+    assert "Emitted elemental pool composition by weight is not a species map" in malformed_grade
+    assert "composition shares unavailable · emitted composition malformed" in malformed_grade
 
     mixed_malformed = _present_stratification()
     mixed_malformed["pools"]["bottom_pool"]["composition_wt_pct"] = {
@@ -388,18 +412,22 @@ def test_p2_distinguishes_grade_absent_empty_malformed_and_zero_states() -> None
         _render(_artifact(stratification=mixed_malformed)),
         "bottom",
     )
-    assert "Elemental tap grade malformed" in mixed_malformed_card
-    assert "largest emitted share" not in mixed_malformed_card
+    assert "Elemental pool composition malformed" in mixed_malformed_card
+    assert "largest emitted pool share" not in mixed_malformed_card
 
     zero = _present_stratification()
     zero["pools"]["bottom_pool"]["composition_wt_pct"] = {"Co": 0.0}
+    zero_card = _tap_card(_render(_artifact(stratification=zero)), "bottom")
     zero_grade = _between(
-        _tap_card(_render(_artifact(stratification=zero)), "bottom"),
+        zero_card,
         '<div class="sec-p2-grade"',
         '<div class="sec-p2-kv">',
     )
-    assert 'Co contaminant</b> <span title="0 wt%">0 wt%</span>' in zero_grade
-    assert "Ni not present in emitted grade" in zero_grade
+    assert "Elemental pool composition · no positive shares" in zero_card
+    assert "<b>Co</b> emitted 0 wt% · not a positive contaminant" in zero_grade
+    assert "Co contaminant</b>" not in zero_grade
+    assert "largest emitted pool share" not in zero_grade
+    assert "Ni not present in emitted composition" in zero_grade
 
 
 def test_p2_renders_unclassified_staging_as_a_distinct_literal_bin() -> None:
@@ -477,7 +505,7 @@ def test_p2_newest_malformed_stratification_does_not_fall_back_to_older_map() ->
     assert "Malformed metal-phase stratification" in malformed
     assert "Older timestep reports are not substituted" in malformed
     assert "1673.15 K" not in html
-    assert "Al 88.25 wt% · largest emitted share" not in html
+    assert "Al 88.25 wt% · largest emitted pool share" not in html
 
 
 def test_p2_distinguishes_enclosing_container_states() -> None:
@@ -553,12 +581,22 @@ def test_p2_distinguishes_enclosing_container_states() -> None:
                 nested["pools"]["float_layer"][field] = []
             else:
                 nested["pools"]["float_layer"][field] = 0
-            nested_notice = _container_notice(
-                _tap_card(_render(_artifact(stratification=nested)), "float"),
-                region,
+            nested_card = _tap_card(
+                _render(_artifact(stratification=nested)),
+                "float",
             )
+            nested_notice = _container_notice(nested_card, region)
             assert f"<strong>{heading}</strong>" in nested_notice
             assert detail in nested_notice
+            if field == "buoyancy":
+                summary_state = {
+                    "absent": "not emitted",
+                    "empty": "empty",
+                    "malformed": "malformed",
+                    "zero": "malformed",
+                }[state]
+                summary_row = _interface_row(nested_card, "Buoyancy verdict")
+                assert f"Buoyancy verdict</span><b>{summary_state}</b>" in summary_row
 
         provenance = _present_stratification()
         if state == "absent":
@@ -626,8 +664,125 @@ def test_p2_distinguishes_enclosing_container_states() -> None:
     assert 'data-p2-container="final-state"' not in present
 
 
+def test_p2_registers_stable_id_and_uses_shared_species_colors_in_every_region() -> None:
+    sentinel = "#123abc"
+    html = _render(
+        _artifact(stratification=_present_stratification()),
+        species_color_sentinel=sentinel,
+    )
+    upper_pool = _species_map_region(
+        _tap_card(html, "float"),
+        "Stratified pool · mol by species",
+    )
+    bottom = _tap_card(html, "bottom")
+    bottom_contaminants = _between(
+        bottom,
+        '<div class="sec-p2-contaminants"',
+        '<div class="sec-p2-kv">',
+    )
+    bottom_provenance = _between(
+        bottom,
+        "<h3>Density-correlation provenance</h3>",
+        '<div class="sec-p2-flags" data-p2-flags="pool">',
+    )
+
+    assert 'id="sec-p2-taps"' in html
+    assert f'style="--species-color:{sentinel}"' in upper_pool
+    assert f'style="--species-color:{sentinel}"' in bottom_contaminants
+    assert f'style="--species-color:{sentinel}"' in bottom_provenance
+
+
+def test_p2_partial_pool_density_stays_not_emitted_without_zero_or_copying_buoyancy() -> None:
+    stratification = _present_stratification()
+    stratification["pools"]["bottom_pool"].pop("density_kg_m3")
+
+    bottom = _tap_card(
+        _render(_artifact(stratification=stratification)),
+        "bottom",
+    )
+    row = _interface_row(bottom, "Pool density")
+
+    assert "Pool density</span><b>not emitted</b>" in row
+    assert "0 kg/m³" not in row
+    assert "7,200 kg/m³" not in row
+
+
+def test_p2_density_provenance_range_distinguishes_absent_from_malformed() -> None:
+    for state, expected in (
+        ("absent", "not emitted"),
+        ("empty", "malformed"),
+        ("short", "malformed"),
+        ("malformed_bound", "malformed"),
+    ):
+        stratification = _present_stratification()
+        record = stratification["pools"]["float_layer"]["density_correlation_provenance"]["Al"]
+        if state == "absent":
+            record.pop("valid_range_K")
+        elif state == "empty":
+            record["valid_range_K"] = []
+        elif state == "short":
+            record["valid_range_K"] = [933.0]
+        else:
+            record["valid_range_K"] = [None, 1190.0]
+
+        card = _tap_card(_render(_artifact(stratification=stratification)), "float")
+        provenance = _between(
+            card,
+            "<h3>Density-correlation provenance</h3>",
+            '<div class="sec-p2-flags" data-p2-flags="pool">',
+        )
+        assert f"fitted range {expected}" in provenance
+        if state != "absent":
+            assert "fitted range not emitted" not in provenance
+
+
+def test_p2_partial_buoyancy_verdict_stays_not_emitted_without_inference() -> None:
+    stratification = _present_stratification()
+    stratification["pools"]["bottom_pool"]["buoyancy"].pop("verdict")
+    bottom = _tap_card(
+        _render(_artifact(stratification=stratification)),
+        "bottom",
+    )
+    summary = _interface_row(bottom, "Buoyancy verdict")
+    detail = _between(
+        bottom,
+        "<h3>Buoyancy diagnostic</h3>",
+        "<h3>Density-correlation provenance</h3>",
+    )
+
+    assert "Buoyancy verdict</span><b>not emitted</b>" in summary
+    assert "Emitted verdict</span><b>not emitted</b>" in detail
+    assert "Float" not in summary and "Sink" not in summary
+    assert "Float" not in detail and "Sink" not in detail
+
+
+def test_p2_prettifies_emitted_buoyancy_ambiguous_verdict_in_summary_and_detail() -> None:
+    stratification = _present_stratification()
+    stratification["pools"]["bottom_pool"]["buoyancy"]["verdict"] = "BUOYANCY-AMBIGUOUS"
+    bottom = _tap_card(
+        _render(_artifact(stratification=stratification)),
+        "bottom",
+    )
+    summary = _interface_row(bottom, "Buoyancy verdict")
+    detail = _between(
+        bottom,
+        "<h3>Buoyancy diagnostic</h3>",
+        "<h3>Density-correlation provenance</h3>",
+    )
+
+    assert "Buoyancy verdict</span><b>Buoyancy ambiguous</b>" in summary
+    assert "Emitted verdict</span><b>Buoyancy ambiguous</b>" in detail
+    assert "BUOYANCY-AMBIGUOUS" not in summary
+    assert "BUOYANCY-AMBIGUOUS" not in detail
+
+
 def test_p2_escapes_untrusted_artifact_values() -> None:
     stratification = _present_stratification()
+    hostile_status = '<img src=x onerror="status()">'
+    hostile_mode = '<svg onload="mode()">'
+    hostile_hour = '<iframe srcdoc="hour()">'
+    stratification["status"] = hostile_status
+    stratification["mode"] = hostile_mode
     stratification["pools"]["bottom_pool"]["composition_wt_pct"] = {
         '<img src=x onerror="boom">': 12.5,
     }
@@ -640,9 +795,26 @@ def test_p2_escapes_untrusted_artifact_values() -> None:
         }
     }
 
-    html = _render(_artifact(stratification=stratification))
+    artifact = _artifact(stratification=stratification)
+    artifact["timesteps"][0]["hour"] = hostile_hour
+    html = _render(artifact)
+    top_flags = _between(
+        html,
+        '<div class="sec-p2-flags" data-p2-flags="stratification">',
+        "</div>",
+    )
+    subtitle = _between(html, '<p class="sub">', "</p>")
 
     assert '<img src=x onerror="boom">' not in html
     assert '&lt;img src=x onerror=&quot;boom&quot;&gt;' in html
     assert '<script>alert("x")</script>' not in html
     assert '&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt;' in html
+    assert hostile_status not in top_flags
+    assert '&lt;img src=x onerror=&quot;status()&quot;&gt;' in top_flags
+    assert '&amp;lt;img src=x onerror=&amp;quot;status()&amp;quot;&amp;gt;' not in top_flags
+    assert hostile_mode not in top_flags
+    assert '&lt;svg onload=&quot;mode()&quot;&gt;' in top_flags
+    assert '&amp;lt;svg onload=&amp;quot;mode()&amp;quot;&amp;gt;' not in top_flags
+    assert hostile_hour not in subtitle
+    assert '&lt;iframe srcdoc=&quot;hour()&quot;&gt;' in subtitle
+    assert '&amp;lt;iframe srcdoc=&amp;quot;hour()&amp;quot;&amp;gt;' not in subtitle
