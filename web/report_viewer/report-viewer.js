@@ -1,6 +1,6 @@
 "use strict";
 
-const { fmtNum, fmtRunId, prettySpecies, accountLabel, prettyFeedstock, prettyChemText } = globalThis.ReportLabels;
+const { fmtNum, fmtRunId, prettySpecies, accountLabel, prettyFeedstock, prettyChemText, speciesColor } = globalThis.ReportLabels;
 const RUN_ID = new URLSearchParams(window.location.search).get("run");
 const RUN_QUERY = RUN_ID ? `?run=${encodeURIComponent(RUN_ID)}` : "";
 const ARTIFACT_URL = RUN_ID
@@ -512,6 +512,28 @@ function provenanceSection(artifact) {
   return section(10, "Provenance & confidence", "Status-bearing metadata preserved from the frozen artifact.", `<div class="table-wrap"><table><tbody>${facts.map(([key, value]) => `<tr><th>${esc(key)}</th><td class="mono">${esc(value)}</td></tr>`).join("")}${identityFacts.map(([key, value]) => `<tr><th>${esc(key)}</th><td class="mono">${value == null ? "not emitted" : runIdSpan(value)}</td></tr>`).join("")}</tbody></table></div>${confidenceContent}`);
 }
 
+// Blind-fire panel registry: panels live in their OWN module files under panels/ and
+// self-register by pushing onto globalThis.ReportPanels — no worker edits this file (see
+// docs-private blind-fire-prompts/_PREAMBLE.md §3 section-ownership). The controller owns
+// the panel <script> tags in index.html; tag order = render order = panel number.
+// Entry shape: { id: "sec-p<N>-<slug>", render(artifact, rows, spans, energy),
+// onTimestep(artifact, index)? }. Panels render between the ceramic and cost sections; a
+// throwing panel is contained to its own section so it cannot take down the report, and
+// onTimestep lets a panel update as the stepper scrubs without touching renderCurrent.
+function panelRegistry() {
+  return Array.isArray(globalThis.ReportPanels) ? globalThis.ReportPanels : [];
+}
+
+function panelSectionsHtml(artifact, rows, spans, energy) {
+  return panelRegistry().map((panel) => {
+    try {
+      return panel.render(artifact, rows, spans, energy);
+    } catch (error) {
+      return `<section class="card" id="${esc(panel.id)}"><h2>${esc(panel.id)}</h2><div class="pending"><strong>Panel failed to render</strong><p class="mono">${esc(error && error.message ? error.message : String(error))}</p></div></section>`;
+    }
+  }).join("");
+}
+
 function renderCurrent(artifact, index) {
   const timestep = artifact.timesteps[index];
   const row = timestep.summary;
@@ -544,6 +566,14 @@ function renderCurrent(artifact, index) {
   const ledger = $("#timestep-ledger");
   if (ledger) ledger.innerHTML = renderTimestepLedger(timestep);
   updateMarkers(index, count);
+  panelRegistry().forEach((panel) => {
+    if (typeof panel.onTimestep !== "function") return;
+    try {
+      panel.onTimestep(artifact, index);
+    } catch (error) {
+      console.error(`panel ${panel.id} onTimestep failed:`, error);
+    }
+  });
 }
 
 function render(artifact) {
@@ -600,6 +630,7 @@ function render(artifact) {
     ledgerSection(artifact.terminal.final_state) +
     campaignBlock +
     tapsAndPuritySection(artifact.terminal) + wallAndOxygenSection(artifact, rows) + ceramicSection(artifact.terminal) +
+    panelSectionsHtml(artifact, rows, spans, energy) +
     costSection(artifact, energy) + provenanceSection(artifact) +
     `<footer class="footer"><span>Frozen flatfile report · engine-free · artifact-only rendering</span><span class="footer-links"><a href="./library.html">Run library</a><a href="./settings.html${RUN_QUERY}">Captured settings</a></span><span class="mono">${runIdSpan(artifact.header.run_id)}</span></footer>`;
   if (rows.length) {

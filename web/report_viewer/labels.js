@@ -95,7 +95,28 @@
     return String(text ?? "").replace(/\b(?:[A-Z][a-z]?\d*)+\b/g, (token) => prettySpecies(token));
   }
 
+  // One stable species colour grammar for every panel (bars, ribbons, chips, stage fills).
+  // Keyed by the token's LEAD element so a family shares a hue (Fe/FeO/FeSi, Si/SiO/SiO2, Na/Na2O…);
+  // mid-lightness hues chosen to stay legible on both themes. Unlisted species get a deterministic
+  // hash-hue fallback so the same token is always the same colour — never a per-panel hardcode.
+  const SPECIES_FAMILY_COLORS = Object.freeze({
+    Fe: "#d95f02", Si: "#7570b3", Na: "#e7298a", K: "#984ea3", Mg: "#1b9e77",
+    Ca: "#66a61e", Al: "#a6761d", Cr: "#e6ab02", Mn: "#b15928", Ti: "#35978f",
+    O: "#2b8cbe", N: "#7f7f7f", Ar: "#9e9e9e", He: "#bdbdbd", C: "#607d8b",
+    P: "#f06292", S: "#c2a300", Cl: "#4db6ac", Co: "#f4734f"
+  });
+
+  function speciesColor(name) {
+    const value = String(name ?? "").trim();
+    if (!value) return "#888888";
+    const element = (value.match(/^([A-Z][a-z]?)/) || [])[1];
+    if (element && SPECIES_FAMILY_COLORS[element]) return SPECIES_FAMILY_COLORS[element];
+    let hash = 0;
+    for (let i = 0; i < value.length; i += 1) hash = (hash * 31 + value.charCodeAt(i)) >>> 0;
+    return `hsl(${hash % 360}, 45%, 52%)`;
+  }
+
   root.ReportLabels = Object.freeze({
-    fmtNum, fmtRunId, prettySpecies, accountLabel, prettyFeedstock, prettyChemText
+    fmtNum, fmtRunId, prettySpecies, accountLabel, prettyFeedstock, prettyChemText, speciesColor
   });
 }(globalThis));
