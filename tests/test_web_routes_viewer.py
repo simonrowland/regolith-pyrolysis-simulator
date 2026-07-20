@@ -641,6 +641,43 @@ def test_report_viewer_glance_rejects_non_numeric_energy_values() -> None:
     assert "0 kWh" not in html
 
 
+def test_report_viewer_energy_aggregate_rejects_non_numeric_rows() -> None:
+    """Falsifiable guard on the AGGREGATION gate (strict `hasNumber` → sumPresent → reportedEnergy).
+
+    The sibling glance test above asserts current-grid cells, which render through the independently
+    hardened `fmtNum` — so it survives reverting `hasNumber` and cannot guard this path (review finding,
+    2026-07-20). Here a non-numeric row must poison the SUM into honest pending: with the old coercing
+    `Number.isFinite(Number(v))` gate, `[]` → 0 and the header would fabricate a 9 kWh total.
+    """
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["timesteps"] = [
+        {
+            "hour": 1,
+            "summary": {
+                "campaign": "C0",
+                "energy_electrical_kWh": 5.0,
+                "energy_evaporation_thermal_kWh": 2.0,
+            },
+            "ledger": {},
+        },
+        {
+            "hour": 2,
+            "summary": {
+                "campaign": "C0",
+                "energy_electrical_kWh": [],  # non-numeric → must void the aggregate
+                "energy_evaporation_thermal_kWh": 2.0,
+            },
+            "ledger": {},
+        },
+    ]
+
+    html = _render_report_html(artifact)
+
+    # Aggregate must refuse, not sum a coerced 0 into a confident total.
+    assert '<div class="k">Reported energy</div><div class="v">not emitted' in html
+    assert "9 kWh" not in html  # 5 + 0 + 2 + 2 under the old coercing gate
+
+
 def test_report_viewer_404_and_corrupt_payload_render_fatal() -> None:
     root = Path(__file__).resolve().parents[1] / "web/report_viewer"
     harness = r"""
