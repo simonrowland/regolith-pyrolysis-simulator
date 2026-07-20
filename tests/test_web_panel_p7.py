@@ -214,6 +214,24 @@ def test_present_fields_render_emitted_values_and_readable_breakdown_keys():
     }
     cumulative = _article(html, "Cumulative emitted component breakdown")
     evaporation = _article(html, "Terminal-timestep diagnostic evaporation breakdown")
+    # F2: basis paragraphs and kWh table headers must be asserted inside each
+    # breakdown article — global token searches cannot catch a basis swap or
+    # a unit-header relabel while values still look right.
+    assert (
+        '<p class="sec-p7-energy-basis">Cumulative through the terminal timestep. '
+        "The combined row is emitted; component rows are not summed in this viewer.</p>"
+    ) in cumulative
+    assert (
+        '<p class="sec-p7-energy-basis">One-hour interval. The total sink overlaps its '
+        "emitted latent and reaction components; these rows are not summed in this viewer.</p>"
+    ) in evaporation
+    assert cumulative.count("<th>Energy · kWh</th>") == 1
+    assert evaporation.count("<th>Energy · kWh</th>") == 1
+    assert "<th>Energy · kg</th>" not in cumulative
+    assert "<th>Energy · kg</th>" not in evaporation
+    # Cumulative table must not claim the hourly evaporation basis (and vice versa).
+    assert "One-hour interval" not in cumulative
+    assert "Cumulative through the terminal timestep" not in evaporation
     for label, value in cumulative_rows.items():
         assert _row(cumulative, label) == _expected_row(
             label, value, CUMULATIVE_ROW_AUTHORITIES.get(label)
@@ -225,7 +243,10 @@ def test_present_fields_render_emitted_values_and_readable_breakdown_keys():
         assert article.count("<b>Scope</b> · Electrical + known evaporation enthalpy") == 1
         assert article.count("<b>Furnace heat</b> · Partial") == 1
     assert "custom_heat_sink" not in html
-    assert "not viewer-summed" in html
+    # Combined metric cards still own the not-viewer-summed claim (region-checked above
+    # for breakdowns; card blocks already assert the full basis strings earlier).
+    assert "not viewer-summed" in _article(html, "Terminal-timestep scoped combined energy")
+    assert "not viewer-summed" in _article(html, "Cumulative scoped combined energy")
 
 
 def test_dynamic_breakdown_keys_render_their_emitted_values():
@@ -738,15 +759,35 @@ def test_electrical_only_scope_and_heat_status_repeat_on_every_card():
 
 def test_diagnostic_authority_is_bound_to_affected_emitted_values():
     html = _render_panel(_artifact(_complete_summary()))
-    diagnostic_headings = METRIC_HEADINGS[1:2] + METRIC_HEADINGS[3:] + (
+    # Pure diagnostic values only — not the mixed electrical+diagnostic totals.
+    pure_diagnostic_headings = (
+        "Cumulative diagnostic evaporation-enthalpy estimate",
+        "Diagnostic evaporation-enthalpy estimate",
+        "Latent vaporization component",
+        "Reaction / dissociation component",
         "Terminal-timestep diagnostic evaporation breakdown",
     )
+    mixed_combined_headings = (
+        "Terminal-timestep scoped combined energy",
+        "Cumulative scoped combined energy",
+    )
 
-    for heading in diagnostic_headings:
+    for heading in pure_diagnostic_headings:
         article = _article(html, heading)
         assert article.count("<b>Diagnostic</b> · Ledger-neutral estimate") == 1
+        assert COMBINED_ROW_AUTHORITY not in article
+    for heading in mixed_combined_headings:
+        article = _article(html, heading)
+        # Bound to the mixed qualifier string (emitted authority text), not merely
+        # the word "diagnostic" appearing somewhere in the card.
+        assert article.count(
+            f'<span class="sec-p7-energy-chip">{COMBINED_ROW_AUTHORITY}</span>'
+        ) == 1
+        assert "<b>Diagnostic</b> · Ledger-neutral estimate" not in article
     for heading in ("Cumulative electrical load", "Electrical energy"):
-        assert "<b>Diagnostic</b>" not in _article(html, heading)
+        electrical = _article(html, heading)
+        assert "<b>Diagnostic</b>" not in electrical
+        assert COMBINED_ROW_AUTHORITY not in electrical
 
     cumulative = _article(html, "Cumulative emitted component breakdown")
     assert "<b>Diagnostic</b>" not in cumulative

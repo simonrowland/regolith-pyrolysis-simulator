@@ -18,6 +18,12 @@
     ["net_unallocated", "Net unallocated"]
   ]);
 
+  // Authority chip strings must match emitter semantics:
+  // - pure diagnostic paths (evaporation thermal / latent / reaction) are ledger-neutral estimates
+  // - combined electrical+diagnostic totals only *contain* a diagnostic component
+  const PURE_DIAGNOSTIC_AUTHORITY = "Diagnostic · Ledger-neutral estimate";
+  const MIXED_COMBINED_AUTHORITY = "Contains diagnostic evaporation-enthalpy estimate";
+
   function isRecord(value) {
     return value !== null && typeof value === "object" && !Array.isArray(value);
   }
@@ -50,15 +56,24 @@
     return readableToken(value);
   }
 
-  function caveatBlock(summary, diagnostic = false) {
+  function authorityChip(authority) {
+    if (!authority) return "";
+    // Keep the established pure-diagnostic chip markup (bold lead-in). Mixed
+    // combined values use the full qualifier as plain chip text so they are
+    // not branded as purely diagnostic.
+    if (authority === PURE_DIAGNOSTIC_AUTHORITY) {
+      return `<span class="sec-p7-energy-chip"><b>Diagnostic</b> · Ledger-neutral estimate</span>`;
+    }
+    return `<span class="sec-p7-energy-chip">${esc(authority)}</span>`;
+  }
+
+  function caveatBlock(summary, authority = null) {
     const scope = isRecord(summary) ? summary.energy_scope : undefined;
     const furnaceHeatStatus = isRecord(summary) ? summary.furnace_heat_status : undefined;
     return `<div class="sec-p7-energy-caveats" aria-label="Energy scope and furnace heat coverage">` +
       `<span class="sec-p7-energy-chip"><b>Scope</b> · ${esc(readableScope(scope))}</span>` +
       `<span class="sec-p7-energy-chip"><b>Furnace heat</b> · ${esc(readableToken(furnaceHeatStatus))}</span>` +
-      (diagnostic
-        ? `<span class="sec-p7-energy-chip"><b>Diagnostic</b> · Ledger-neutral estimate</span>`
-        : "") +
+      authorityChip(authority) +
       `</div>`;
   }
 
@@ -72,12 +87,12 @@
     return `<span class="sec-p7-energy-missing">pending · ${state}</span>`;
   }
 
-  function metricCard(label, value, basis, summary, tone, diagnostic = false) {
+  function metricCard(label, value, basis, summary, tone, authority = null) {
     return `<article class="sec-p7-energy-card sec-p7-energy-${tone}">` +
       `<h3>${esc(label)}</h3>` +
       `<div class="sec-p7-energy-value">${emittedValue(value)}</div>` +
       `<p class="sec-p7-energy-basis">${esc(basis)}</p>` +
-      caveatBlock(summary, diagnostic) +
+      caveatBlock(summary, authority) +
       `</article>`;
   }
 
@@ -102,7 +117,7 @@
     return expected + extras;
   }
 
-  function breakdownCard(title, basis, breakdown, expectedComponents, summary, diagnostic = false) {
+  function breakdownCard(title, basis, breakdown, expectedComponents, summary, authority = null) {
     let notice = "";
     if (breakdown === undefined) {
       notice = "Breakdown not emitted; no components are inferred.";
@@ -120,7 +135,7 @@
       pending +
       `<div class="sec-p7-energy-table-wrap"><table><thead><tr><th>Emitted component</th><th>Energy · kWh</th></tr></thead>` +
       `<tbody>${breakdownRows(breakdown, expectedComponents)}</tbody></table></div>` +
-      caveatBlock(summary, diagnostic) +
+      caveatBlock(summary, authority) +
       `</article>`;
   }
 
@@ -164,13 +179,13 @@
       `<p class="sub">Electrical load beside the emitted diagnostic evaporation-enthalpy estimate. Scope, furnace-heat coverage, and diagnostic authority travel with every affected value.</p>` +
       `<div class="sec-p7-energy-grid">` +
       metricCard("Cumulative electrical load", cumulative?.electrical, "Cumulative through the terminal timestep", summary, "electrical") +
-      metricCard("Cumulative diagnostic evaporation-enthalpy estimate", cumulative?.evaporation_thermal, "Cumulative through the terminal timestep", summary, "thermal", true) +
+      metricCard("Cumulative diagnostic evaporation-enthalpy estimate", cumulative?.evaporation_thermal, "Cumulative through the terminal timestep", summary, "thermal", PURE_DIAGNOSTIC_AUTHORITY) +
       metricCard("Electrical energy", summary.energy_electrical_kWh, "Terminal timestep · one-hour interval", summary, "electrical") +
-      metricCard("Diagnostic evaporation-enthalpy estimate", summary.energy_evaporation_thermal_kWh, "Terminal timestep · one-hour interval", summary, "thermal", true) +
-      metricCard("Latent vaporization component", summary.energy_latent_kWh, "Terminal timestep · one-hour interval", summary, "thermal", true) +
-      metricCard("Reaction / dissociation component", summary.energy_dissociation_kWh, "Terminal timestep · one-hour interval", summary, "thermal", true) +
-      metricCard("Terminal-timestep scoped combined energy", summary.energy_electrical_plus_evaporation_kWh, "Terminal timestep · one-hour interval · not viewer-summed", summary, "combined", true) +
-      metricCard("Cumulative scoped combined energy", summary.energy_electrical_plus_evaporation_cumulative_kWh, "Cumulative through the terminal timestep · not viewer-summed", summary, "combined", true) +
+      metricCard("Diagnostic evaporation-enthalpy estimate", summary.energy_evaporation_thermal_kWh, "Terminal timestep · one-hour interval", summary, "thermal", PURE_DIAGNOSTIC_AUTHORITY) +
+      metricCard("Latent vaporization component", summary.energy_latent_kWh, "Terminal timestep · one-hour interval", summary, "thermal", PURE_DIAGNOSTIC_AUTHORITY) +
+      metricCard("Reaction / dissociation component", summary.energy_dissociation_kWh, "Terminal timestep · one-hour interval", summary, "thermal", PURE_DIAGNOSTIC_AUTHORITY) +
+      metricCard("Terminal-timestep scoped combined energy", summary.energy_electrical_plus_evaporation_kWh, "Terminal timestep · one-hour interval · not viewer-summed", summary, "combined", MIXED_COMBINED_AUTHORITY) +
+      metricCard("Cumulative scoped combined energy", summary.energy_electrical_plus_evaporation_cumulative_kWh, "Cumulative through the terminal timestep · not viewer-summed", summary, "combined", MIXED_COMBINED_AUTHORITY) +
       `</div>` +
       `<div class="sec-p7-energy-breakdowns">` +
       breakdownCard(
@@ -186,7 +201,7 @@
         summary.energy_evaporation_breakdown_kWh,
         EVAPORATION_COMPONENTS,
         summary,
-        true
+        PURE_DIAGNOSTIC_AUTHORITY
       ) +
       `</div>` +
       `</section>`;
