@@ -261,10 +261,19 @@ def test_demo_fill_changes_only_fill_level(renderer, flowsheet):
 def test_lint_passes_gracefully_without_trace_elements(renderer, flowsheet):
     result = renderer.lint_against_trace_elements(flowsheet)
     assert result.ok
-    # On this base, trace_elements.yaml is absent → skip
+    # On this base, trace_elements.yaml is absent → routing skip; admission still runs
     if not (REPO / "data" / "trace_elements.yaml").is_file():
         assert result.skipped
-        assert any("skip" in m.lower() or "SKIPPED" in result.report_text() for m in result.messages + [result.report_text()])
+        report = result.report_text()
+        assert any(
+            "skip" in m.lower() or "SKIPPED" in report
+            for m in result.messages + [report]
+        )
+        # Admission gate is active even without trace_elements
+        assert result.admission_results
+        assert any(r.outcome == "PASS" for r in result.admission_results)
+        assert any(r.outcome == "UNKNOWN" for r in result.admission_results)
+        assert all(r.outcome != "FAIL" for r in result.admission_results)
 
 
 def test_write_svg_roundtrip(renderer, flowsheet, tmp_path):
@@ -447,3 +456,216 @@ def test_one_marker_end_per_edge_path(renderer, flowsheet):
             (x1, y1), (x2, y2) = pts[-2], pts[-1]
             assert abs(x1 - x2) < 0.5, f"{edge.edge_id}: sky end not vertical"
             assert y2 < y1, f"{edge.edge_id}: sky end should point upward"
+
+
+# ---------------------------------------------------------------------------
+# Phase 1b — membership lock + bin admission predicates
+# ---------------------------------------------------------------------------
+#
+# TWO-TOUCH BUMP RITUAL (membership changes only):
+#   1. Bump data/flowsheet.yaml map_version (vN → vN+1)
+#   2. Re-pin MEMBERSHIP_LOCK_HASH below to membership_lock_hash(flowsheet)
+# Layout / annotation / edge edits must NOT change this hash (see stability test).
+# ---------------------------------------------------------------------------
+
+# Canonical sha256 of sorted (bin_id, chip, status, condition_note, members).
+# Computed from data/flowsheet.yaml membership set only — see membership_lock_hash().
+MEMBERSHIP_LOCK_HASH = (
+    "c158688a3c05c288e8db839add470130b98d048e5e73ead544cc663b5296dbc8"
+)
+
+
+def test_membership_lock_header(flowsheet):
+    assert flowsheet.get("map_version") == "v8"
+    assert flowsheet.get("locked") is True
+    assert flowsheet.get("locked_at")
+    assert flowsheet["schema_version"] == 1
+
+
+def test_membership_lock_hash_pinned(renderer, flowsheet):
+    """Pin the membership-set hash; re-pin only with map_version bump."""
+    digest = renderer.membership_lock_hash(flowsheet)
+    assert digest == MEMBERSHIP_LOCK_HASH, (
+        f"membership hash drifted to {digest!r}. If the chip set intentionally "
+        f"changed, bump map_version AND re-pin MEMBERSHIP_LOCK_HASH (two-touch)."
+    )
+
+
+def test_membership_hash_stable_under_annotation_edit(renderer, flowsheet):
+    """Layout/annotation/edge edits MUST NOT change the membership lock hash."""
+    import copy
+
+    base = renderer.membership_lock_hash(flowsheet)
+    mutated = copy.deepcopy(flowsheet)
+    # Edit notes, annotations, edge labels, ops — none are membership
+    mutated["notes"] = list(mutated.get("notes") or []) + ["hash-stability probe note"]
+    mutated["blocks"][0]["annotations"] = list(
+        mutated["blocks"][0].get("annotations") or []
+    ) + ["annotation edit must not move the lock hash"]
+    mutated["blocks"][0]["operating_conditions"] = "edited ops string"
+    if mutated.get("edges"):
+        mutated["edges"][0]["label"] = "edited edge label"
+    # review provenance is also non-membership
+    for block in mutated["blocks"]:
+        for sub in block.get("sub_boxes") or []:
+            for sp in sub.get("species") or []:
+                sp["review"] = {"map": "v8", "finding": "stability-probe"}
+            sub["admission"] = {
+                "any_of": [{"element": "__probe__"}],
+            }
+    assert renderer.membership_lock_hash(mutated) == base
+
+
+def test_membership_hash_moves_when_chip_status_changes(renderer, flowsheet):
+    """Sanity: a real membership edit (status) MUST change the hash."""
+    import copy
+
+    base = renderer.membership_lock_hash(flowsheet)
+    mutated = copy.deepcopy(flowsheet)
+    # Flip first reviewed chip to conditional with a note
+    for block in mutated["blocks"]:
+        for sub in block.get("sub_boxes") or []:
+            for sp in sub.get("species") or []:
+                if sp["status"] == "reviewed":
+                    sp["status"] = "conditional"
+                    sp["condition_note"] = "deliberate membership edit for hash test"
+                    assert renderer.membership_lock_hash(mutated) != base
+                    return
+    raise AssertionError("no reviewed chip found to flip")
+
+
+def test_review_provenance_fields_parse(flowsheet):
+    """Optional review: {map, finding?} parses; v7 bins carry findings; v8 chips map=v8."""
+    v8_chips = {"CO-CH4-organics", "CO2-CO", "P2-PO"}
+    seen_v7 = 0
+    seen_v8 = 0
+    for block in flowsheet["blocks"]:
+        for sub in block.get("sub_boxes") or []:
+            for sp in sub.get("species") or []:
+                rev = sp.get("review")
+                assert rev is not None, sp["symbol_or_group"]
+                assert "map" in rev
+                if sp["symbol_or_group"] in v8_chips:
+                    assert rev["map"] == "v8"
+                    seen_v8 += 1
+                else:
+                    # Most chips inherit the v7 reviewed-map finding for their bin
+                    assert rev["map"] in ("v7", "v8")
+                    if rev["map"] == "v7":
+                        assert rev.get("finding"), sp["symbol_or_group"]
+                        seen_v7 += 1
+    assert seen_v7 >= 50
+    assert seen_v8 == 3
+
+
+def test_every_bin_has_admission_block(flowsheet):
+    for block in flowsheet["blocks"]:
+        for sub in block.get("sub_boxes") or []:
+            adm = sub.get("admission")
+            assert isinstance(adm, dict), sub["id"]
+            assert adm.get("any_of") or adm.get("all_of"), sub["id"]
+
+
+def test_predicate_evaluator_pass_fail_unknown(renderer):
+    """Unit tests for evaluate_admission with synthetic facts."""
+    # PASS: any_of matches
+    adm = {
+        "any_of": [
+            {"volatile_as": "metal", "window": "trap_band"},
+            {"volatile_as": "oxide", "mode": "lance"},
+        ]
+    }
+    facts_pass = {"volatile_as": "metal", "window": "trap_band"}
+    assert renderer.evaluate_admission(adm, facts_pass) == "PASS"
+
+    # FAIL: all clauses fully present and mismatch
+    facts_fail = {"volatile_as": "gas", "window": "cryo", "mode": "reduce"}
+    # clauses need both fields — gas/cryo fails first clause; missing mode for second
+    # → UNKNOWN for second (mode missing). Make both fully specified mismatches:
+    facts_fail = {
+        "volatile_as": "gas",
+        "window": "cryo",
+        "mode": "reduce",
+    }
+    # first clause: volatile_as gas≠metal → FAIL; window cryo≠trap_band → FAIL
+    # second: volatile_as gas≠oxide → FAIL; mode reduce≠lance → FAIL
+    assert renderer.evaluate_admission(adm, facts_fail) == "FAIL"
+
+    # UNKNOWN: facts absent
+    assert renderer.evaluate_admission(adm, None) == "UNKNOWN"
+    assert renderer.evaluate_admission(adm, {}) == "UNKNOWN"
+    # UNKNOWN: field missing
+    assert (
+        renderer.evaluate_admission(adm, {"volatile_as": "metal"}) == "UNKNOWN"
+    )  # window missing
+
+    # all_of PASS / FAIL / UNKNOWN
+    adm_all = {"all_of": [{"reducibility": "not_reducible"}]}
+    assert (
+        renderer.evaluate_admission(adm_all, {"reducibility": "not_reducible"})
+        == "PASS"
+    )
+    assert (
+        renderer.evaluate_admission(adm_all, {"reducibility": "mg_reducible"})
+        == "FAIL"
+    )
+    assert renderer.evaluate_admission(adm_all, {"family": "alkali"}) == "UNKNOWN"
+
+
+def test_live_major_species_admission_green(renderer, flowsheet):
+    """Majors wired from Ellingham + vapor_pressures + process anchors must PASS."""
+    result = renderer.lint_against_trace_elements(flowsheet)
+    by_sym = {r.symbol: r for r in result.admission_results}
+    # rump irreducibles
+    for sym in ("BeO", "ZrO2", "HfO2", "Sc2O3"):
+        assert by_sym[sym].outcome == "PASS", (sym, by_sym[sym])
+    # ferroalloy
+    for sym in ("Fe", "Ni"):
+        assert by_sym[sym].outcome == "PASS", (sym, by_sym[sym])
+    # alkali cyclone volatility
+    for sym in ("Na", "K"):
+        assert by_sym[sym].outcome == "PASS", (sym, by_sym[sym])
+    # C6 / calciothermic / O2 / Mg
+    for sym in ("Al", "Ti", "Mg", "O2", "REE", "Y"):
+        assert by_sym[sym].outcome == "PASS", (sym, by_sym[sym])
+    assert result.ok
+    assert all(r.outcome != "FAIL" for r in result.admission_results)
+
+
+def test_deliberate_admission_contradiction_fails(renderer, flowsheet):
+    """Fixture: place Fe (siderophile) under rump not_reducible → FAIL fires."""
+    import copy
+
+    mutated = copy.deepcopy(flowsheet)
+    # Build a tiny synthetic sheet: Fe chip in rump_product
+    # Keep rump admission as not_reducible; force Fe facts via custom fact table
+    fact_table = {
+        "Fe": {
+            "element": "Fe",
+            "goldschmidt_class": "siderophile",
+            "reductant_class": "already-native",
+            "host_phase": "metal",
+            "reducibility": "mg_reducible",  # contradicts not_reducible
+        }
+    }
+    # Strip all chips except a single Fe planted in rump
+    for block in mutated["blocks"]:
+        for sub in block.get("sub_boxes") or []:
+            if sub["id"] == "rump_product":
+                sub["species"] = [
+                    {
+                        "symbol_or_group": "Fe",
+                        "status": "reviewed",
+                        "review": {"map": "v8"},
+                    }
+                ]
+                sub["admission"] = {"all_of": [{"reducibility": "not_reducible"}]}
+            else:
+                sub["species"] = []
+    results = renderer.evaluate_all_admissions(mutated, fact_table)
+    assert len(results) == 1
+    assert results[0].symbol == "Fe"
+    assert results[0].outcome == "FAIL"
+    lint = renderer.lint_against_trace_elements(mutated, fact_table=fact_table)
+    assert not lint.ok
+    assert any("admission FAIL" in e for e in lint.errors)

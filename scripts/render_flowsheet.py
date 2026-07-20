@@ -163,6 +163,12 @@ def validate_schema(data: dict[str, Any]) -> list[str]:
         errors.append("schema_version must be 1")
     if not data.get("title"):
         errors.append("title required")
+    # Membership lock fields (phase 1b) — required once locked
+    if data.get("locked") is True:
+        if not data.get("map_version"):
+            errors.append("locked flowsheet requires map_version")
+        if not data.get("locked_at"):
+            errors.append("locked flowsheet requires locked_at")
     if not isinstance(data.get("blocks"), list) or not data["blocks"]:
         errors.append("blocks must be a non-empty list")
         return errors
@@ -194,6 +200,18 @@ def validate_schema(data: dict[str, Any]) -> list[str]:
             if sid in seen_sub or sid in seen_block:
                 errors.append(f"duplicate sub_box/block id: {sid}")
             seen_sub.add(sid)
+            adm = sub.get("admission")
+            if adm is not None:
+                if not isinstance(adm, dict):
+                    errors.append(f"sub {sid}: admission must be a mapping")
+                else:
+                    if not (adm.get("any_of") or adm.get("all_of")):
+                        errors.append(
+                            f"sub {sid}: admission requires any_of and/or all_of"
+                        )
+                    for key in ("any_of", "all_of"):
+                        if key in adm and not isinstance(adm[key], list):
+                            errors.append(f"sub {sid}: admission.{key} must be a list")
             for sp in sub.get("species") or []:
                 sym = sp.get("symbol_or_group")
                 status = sp.get("status")
@@ -207,6 +225,12 @@ def validate_schema(data: dict[str, Any]) -> list[str]:
                     errors.append(f"{sym}: status must be reviewed|conditional")
                 if status == "conditional" and not sp.get("condition_note"):
                     errors.append(f"{sym}: conditional requires condition_note")
+                rev = sp.get("review")
+                if rev is not None:
+                    if not isinstance(rev, dict) or not rev.get("map"):
+                        errors.append(f"{sym}: review must be {{map, finding?}}")
+                    elif rev["map"] not in ("v7", "v8") and not str(rev["map"]).startswith("v"):
+                        errors.append(f"{sym}: review.map unexpected: {rev['map']!r}")
 
     for i, edge in enumerate(data.get("edges") or []):
         if edge.get("class") not in ("main", "oxygen", "reagent_return"):
@@ -226,13 +250,14 @@ def iter_species_chips(data: dict[str, Any]):
 
 
 def species_index(data: dict[str, Any]) -> dict[str, dict[str, Any]]:
-    """Map symbol_or_group -> {bin, status, condition_note}."""
+    """Map symbol_or_group -> {bin, status, condition_note, review}."""
     out: dict[str, dict[str, Any]] = {}
     for _bid, sid, sp in iter_species_chips(data):
         out[sp["symbol_or_group"]] = {
             "bin": sid,
             "status": sp["status"],
             "condition_note": sp.get("condition_note"),
+            "review": sp.get("review"),
         }
     return out
 
@@ -247,9 +272,461 @@ def aggregate_membership(data: dict[str, Any]) -> dict[str, str]:
     return mapping
 
 
+def aggregate_members_by_chip(data: dict[str, Any]) -> dict[str, tuple[str, ...]]:
+    """Map aggregate chip symbol -> sorted member tuple."""
+    out: dict[str, tuple[str, ...]] = {}
+    for agg in data.get("aggregates") or []:
+        out[str(agg["chip"])] = tuple(sorted(str(m) for m in (agg.get("members") or [])))
+    return out
+
+
+def membership_rows(data: dict[str, Any]) -> list[tuple[str, str, str, str, list[str]]]:
+    """Canonical membership set: sorted (bin, chip, status, condition_note, members).
+
+    Layout / annotations / edges are intentionally excluded — only chip placement
+    and aggregate membership participate in the lock hash.
+    """
+    members_by_chip = aggregate_members_by_chip(data)
+    rows: list[tuple[str, str, str, str, list[str]]] = []
+    for _bid, sid, sp in iter_species_chips(data):
+        sym = str(sp["symbol_or_group"])
+        rows.append(
+            (
+                str(sid),
+                sym,
+                str(sp["status"]),
+                str(sp.get("condition_note") or ""),
+                list(members_by_chip.get(sym, ())),
+            )
+        )
+    rows.sort()
+    return rows
+
+
+def membership_lock_hash(data: dict[str, Any]) -> str:
+    """SHA-256 of the canonical membership serialization (hex digest)."""
+    import json
+
+    payload = json.dumps(membership_rows(data), separators=(",", ":"), ensure_ascii=True)
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
 # ---------------------------------------------------------------------------
-# Drift lint vs data/trace_elements.yaml
+# Bin-admission predicates (fact-field refs; no physics values in YAML)
 # ---------------------------------------------------------------------------
+
+OUTCOME_PASS = "PASS"
+OUTCOME_FAIL = "FAIL"
+OUTCOME_UNKNOWN = "UNKNOWN"
+
+# Oxide / group chip → element key used when looking up facts
+_CHIP_TO_ELEMENT: dict[str, str] = {
+    "BeO": "Be",
+    "ZrO2": "Zr",
+    "HfO2": "Hf",
+    "Sc2O3": "Sc",
+    "MoO3": "Mo",
+    "WO3": "W",
+    "Re2O7": "Re",
+    "H2O": "H2O",
+    "CO2": "CO2",
+    "SO2": "SO2",
+    "O2": "O2",
+    "glass": "glass",
+    "salts": "salts",
+    "organics": "organics",
+    "REE": "REE",
+    "unreduced-residuals": "unreduced-residuals",
+    "CO-CH4-organics": "CO-CH4-organics",
+    "CO2-CO": "CO2-CO",
+    "P2-PO": "P2-PO",
+}
+
+
+def chip_fact_keys(symbol_or_group: str) -> list[str]:
+    """Lookup keys for a chip (symbol first, then oxide→element alias)."""
+    keys = [symbol_or_group]
+    alias = _CHIP_TO_ELEMENT.get(symbol_or_group)
+    if alias and alias not in keys:
+        keys.append(alias)
+    # strip trailing digits/oxide patterns lightly (e.g. leave as-is if not mapped)
+    return keys
+
+
+def evaluate_clause(clause: dict[str, Any], facts: dict[str, Any] | None) -> str:
+    """Evaluate one field-match clause against a species fact dict.
+
+    PASS  — every referenced field is present and equal
+    FAIL  — every referenced field is present and at least one differs
+    UNKNOWN — any referenced field is missing, or facts is None/empty
+    """
+    if not clause or not isinstance(clause, dict):
+        return OUTCOME_UNKNOWN
+    if not facts:
+        return OUTCOME_UNKNOWN
+    saw_mismatch = False
+    for key, expected in clause.items():
+        if key not in facts or facts[key] is None:
+            return OUTCOME_UNKNOWN
+        actual = facts[key]
+        # Normalize scalars to string for robust equality (yaml bool/int edge cases)
+        if actual != expected:
+            saw_mismatch = True
+    return OUTCOME_FAIL if saw_mismatch else OUTCOME_PASS
+
+
+def evaluate_admission(
+    admission: dict[str, Any] | None,
+    facts: dict[str, Any] | None,
+) -> str:
+    """Evaluate a bin admission block against species facts.
+
+    ``mode_fork`` is an annotation only (not a fact constraint).
+    Empty / missing admission → UNKNOWN (no gate to check).
+    """
+    if not admission:
+        return OUTCOME_UNKNOWN
+
+    any_of = admission.get("any_of") or []
+    all_of = admission.get("all_of") or []
+    if not any_of and not all_of:
+        return OUTCOME_UNKNOWN
+
+    # all_of: FAIL if any FAIL; UNKNOWN if any UNKNOWN (and no FAIL); else PASS
+    all_outcome = OUTCOME_PASS
+    if all_of:
+        outcomes = [evaluate_clause(c, facts) for c in all_of if isinstance(c, dict)]
+        if not outcomes:
+            all_outcome = OUTCOME_UNKNOWN
+        elif any(o == OUTCOME_FAIL for o in outcomes):
+            all_outcome = OUTCOME_FAIL
+        elif any(o == OUTCOME_UNKNOWN for o in outcomes):
+            all_outcome = OUTCOME_UNKNOWN
+        else:
+            all_outcome = OUTCOME_PASS
+
+    # any_of: PASS if any PASS; FAIL if all FAIL; else UNKNOWN
+    any_outcome = OUTCOME_PASS
+    if any_of:
+        outcomes = [evaluate_clause(c, facts) for c in any_of if isinstance(c, dict)]
+        if not outcomes:
+            any_outcome = OUTCOME_UNKNOWN
+        elif any(o == OUTCOME_PASS for o in outcomes):
+            any_outcome = OUTCOME_PASS
+        elif all(o == OUTCOME_FAIL for o in outcomes):
+            any_outcome = OUTCOME_FAIL
+        else:
+            any_outcome = OUTCOME_UNKNOWN
+
+    # Combine: if only one branch present, that is the result; if both, both must PASS
+    if any_of and all_of:
+        if all_outcome == OUTCOME_FAIL or any_outcome == OUTCOME_FAIL:
+            # FAIL only if the combined gate is contradicted:
+            # all_of FAIL is fatal; any_of FAIL is fatal only when all_of also not PASS-or-unknown soft
+            if all_outcome == OUTCOME_FAIL:
+                return OUTCOME_FAIL
+            if any_outcome == OUTCOME_FAIL and all_outcome == OUTCOME_PASS:
+                return OUTCOME_FAIL
+            if any_outcome == OUTCOME_FAIL and all_outcome == OUTCOME_UNKNOWN:
+                return OUTCOME_UNKNOWN
+        if all_outcome == OUTCOME_PASS and any_outcome == OUTCOME_PASS:
+            return OUTCOME_PASS
+        return OUTCOME_UNKNOWN
+    if all_of:
+        return all_outcome
+    return any_outcome
+
+
+def resolve_chip_facts(
+    symbol_or_group: str,
+    fact_table: dict[str, dict[str, Any]],
+) -> dict[str, Any] | None:
+    """Return fact dict for chip, or None if no fact source covers it."""
+    for key in chip_fact_keys(symbol_or_group):
+        if key in fact_table:
+            return fact_table[key]
+    return None
+
+
+def load_trace_element_facts(
+    trace_path: Path = TRACE_ELEMENTS_YAML,
+) -> dict[str, dict[str, Any]]:
+    """Map element id → fact fields from data/trace_elements.yaml (when present).
+
+    Field vocabulary aligns with the t-380 draft (family, reductant_class,
+    host_phase, volatile_as_oxide, destination_bins) plus normalized
+    ``reducibility`` / ``volatile_as`` / ``goldschmidt_class`` projections.
+    """
+    if not trace_path.is_file():
+        return {}
+    with trace_path.open("r", encoding="utf-8") as fh:
+        doc = yaml.safe_load(fh)
+    if not isinstance(doc, dict):
+        return {}
+    elements = doc.get("elements") or doc.get("species") or {}
+    if not isinstance(elements, dict):
+        return {}
+    out: dict[str, dict[str, Any]] = {}
+    for sym, rec in elements.items():
+        if not isinstance(rec, dict):
+            continue
+        facts: dict[str, Any] = {"element": str(sym)}
+        if rec.get("family") is not None:
+            facts["family"] = rec["family"]
+        if rec.get("reductant_class") is not None:
+            facts["reductant_class"] = rec["reductant_class"]
+            facts["reducibility"] = _reductant_to_reducibility(str(rec["reductant_class"]))
+        host = rec.get("host_phase")
+        if isinstance(host, list) and host:
+            # Prefer metal > sulfide > first
+            prefer = ("metal", "native", "alloy", "sulfide", "schreibersite")
+            chosen = None
+            for p in prefer:
+                for h in host:
+                    if p in str(h).lower():
+                        chosen = "metal" if p in ("metal", "native", "alloy", "schreibersite") else "sulfide"
+                        break
+                if chosen:
+                    break
+            facts["host_phase"] = chosen or str(host[0])
+        elif isinstance(host, str):
+            facts["host_phase"] = host
+        vox = rec.get("volatile_as_oxide")
+        if isinstance(vox, dict) and vox.get("value") is True:
+            facts["volatile_as"] = "oxide"
+            facts["mode"] = "lance"
+        elif isinstance(vox, dict) and vox.get("value") is False:
+            # may still be metal-volatile via family / Tc — leave unset unless family says
+            pass
+        family = str(rec.get("family") or "")
+        if family in ("alkali",):
+            facts.setdefault("volatile_as", "metal")
+            facts.setdefault("window", "alkali_band")
+            facts.setdefault("family", "alkali")
+        if family in ("chalcophile",) and facts.get("volatile_as") != "oxide":
+            facts.setdefault("window", "trap_band")
+        if family in ("siderophile",):
+            facts.setdefault("goldschmidt_class", "siderophile")
+        if family in ("halogen",):
+            facts.setdefault("family", "halogen")
+            facts.setdefault("window", "cryo")
+        # Goldschmidt projection from family when not set
+        if "goldschmidt_class" not in facts:
+            fam_map = {
+                "siderophile": "siderophile",
+                "chalcophile": "chalcophile",
+                "alkali": "lithophile",
+                "alkaline-earth": "lithophile",
+                "refractory-lithophile": "lithophile",
+                "volatile-lithophile": "lithophile",
+                "REE": "lithophile",
+                "actinide": "lithophile",
+                "halogen": "atmophile",
+                "noble-gas": "atmophile",
+            }
+            if family in fam_map:
+                facts["goldschmidt_class"] = fam_map[family]
+        out[str(sym)] = facts
+    return out
+
+
+def _reductant_to_reducibility(reductant_class: str) -> str:
+    """Normalize t-380 reductant_class → predicate reducibility token."""
+    rc = reductant_class.strip()
+    mapping = {
+        "Mg-C6": "mg_reducible",
+        "mg_reducible": "mg_reducible",
+        "Ca-calciothermic": "ca_reducible",
+        "ca_reducible": "ca_reducible",
+        "not-reducible": "not_reducible",
+        "not_reducible": "not_reducible",
+        "already-native": "already_native",
+        "thermal-vacuum": "thermal_vacuum",
+        "Na-K-shuttle": "na_k_shuttle",
+        "host-conditioned": "host_conditioned",
+        "redox-conditioned": "redox_conditioned",
+        "C0-release": "c0_release",
+    }
+    return mapping.get(rc, rc)
+
+
+def build_live_major_facts() -> dict[str, dict[str, Any]]:
+    """Fact rows for majors that can be checked WITHOUT trace_elements.yaml.
+
+    Sources:
+      - Ellingham ranks (Mg / Ca reducibility relative to process legs)
+      - vapor_pressures.yaml metal entries (alkali volatility window)
+      - Process-map anchors for rump irreducibles (Be/Zr/Hf/Sc absent from
+        the Mg/Ca-reducible Ellingham ranks on this base)
+    """
+    facts: dict[str, dict[str, Any]] = {}
+
+    # --- Rump irreducibles (process map + not in Mg/Ca reducible ranks) ---
+    for el, oxide in (("Be", "BeO"), ("Zr", "ZrO2"), ("Hf", "HfO2"), ("Sc", "Sc2O3")):
+        row = {
+            "element": el,
+            "reducibility": "not_reducible",
+            "reductant_class": "not-reducible",
+            "family": "refractory-lithophile",
+            "goldschmidt_class": "lithophile",
+        }
+        facts[el] = dict(row)
+        facts[oxide] = dict(row)
+
+    # --- Ferroalloy majors (siderophile / already-native) ---
+    for el in ("Fe", "Ni", "Co"):
+        facts[el] = {
+            "element": el,
+            "goldschmidt_class": "siderophile",
+            "reductant_class": "already-native",
+            "host_phase": "metal",
+        }
+
+    # --- Alkali cyclone from vapor_pressures (live VP table) ---
+    vp_path = REPO_ROOT / "data" / "vapor_pressures.yaml"
+    if vp_path.is_file():
+        try:
+            with vp_path.open("r", encoding="utf-8") as fh:
+                vp = yaml.safe_load(fh) or {}
+            metals = vp.get("metals") or {}
+            for el in ("Na", "K"):
+                if el in metals:
+                    facts[el] = {
+                        "element": el,
+                        "family": "alkali",
+                        "volatile_as": "metal",
+                        "window": "alkali_band",
+                        "goldschmidt_class": "lithophile",
+                        "reductant_class": "thermal-vacuum",
+                    }
+        except Exception:  # pragma: no cover — never crash lint
+            pass
+
+    # --- Ellingham-backed Mg/Ca reducibility for tabulated majors ---
+    try:
+        from simulator.chemistry.ellingham_thermo import (  # type: ignore
+            ELLINGHAM_THERMO,
+            ellingham_delta_g_kj_per_mol_o2,
+        )
+
+        t_k = 1600.0 + 273.15
+        dg_mg = ellingham_delta_g_kj_per_mol_o2("Mg", t_k)
+        dg_ca = ellingham_delta_g_kj_per_mol_o2("Ca", t_k)
+        for el in ELLINGHAM_THERMO:
+            if el in facts:
+                continue
+            try:
+                dg = ellingham_delta_g_kj_per_mol_o2(el, t_k)
+            except Exception:
+                continue
+            # More positive dG than MgO ⇒ oxide less stable ⇒ Mg-reducible
+            if dg > dg_mg + 1.0:
+                facts[el] = {
+                    "element": el,
+                    "reducibility": "mg_reducible",
+                    "reductant_class": "Mg-C6",
+                }
+            elif dg > dg_ca + 1.0:
+                facts[el] = {
+                    "element": el,
+                    "reducibility": "ca_reducible",
+                    "reductant_class": "Ca-calciothermic",
+                }
+            else:
+                # Oxide as stable as or more stable than CaO
+                facts[el] = {
+                    "element": el,
+                    "reducibility": "not_reducible",
+                    "reductant_class": "not-reducible",
+                }
+    except Exception:  # pragma: no cover
+        # Simulator import unavailable — still pin C6/calciothermic process anchors
+        for el in ("Al", "Ti", "Si", "Mn", "Cr"):
+            facts.setdefault(
+                el,
+                {
+                    "element": el,
+                    "reducibility": "mg_reducible",
+                    "reductant_class": "Mg-C6",
+                },
+            )
+
+    # Process-map C6 / calciothermic / crown anchors OVERRIDE pure Ellingham rank
+    # where plant practice differs (e.g. Al is Mg-reduced at C6 despite Al₂O₃
+    # sitting near/below MgO on the standard-state Ellingham line).
+    for el in ("Al", "Ti", "V", "Nb", "Ta"):
+        facts[el] = {
+            "element": el,
+            "reducibility": "mg_reducible",
+            "reductant_class": "Mg-C6",
+        }
+    for el, family in (
+        ("Y", "REE"),
+        ("Th", "actinide"),
+        ("U", "actinide"),
+        ("REE", "REE"),
+    ):
+        facts[el] = {
+            "element": el,
+            "reducibility": "ca_reducible",
+            "reductant_class": "Ca-calciothermic",
+            "family": family,
+        }
+    for el in ("Ca", "Sr", "Ba"):
+        facts[el] = {
+            "element": el,
+            "family": "alkaline-earth",
+            "goldschmidt_class": "lithophile",
+        }
+    for el in ("Eu", "Yb"):
+        facts[el] = {
+            "element": el,
+            "family": "REE",
+            "redox_split": "divalent_ree",
+        }
+    facts["Mg"] = {"element": "Mg"}
+    facts["O2"] = {"element": "O", "product": "oxygen"}
+    facts["glass"] = {"form": "sio_glass", "element": "Si"}
+    # Cryo majors (process products, not Ellingham metals)
+    for sym, extra in (
+        ("H2O", {"window": "cryo", "volatile_as": "gas", "family": "volatile-gas"}),
+        ("CO2", {"window": "cryo", "volatile_as": "gas", "family": "volatile-gas"}),
+        ("S", {"window": "cryo", "volatile_as": "gas"}),
+        ("SO2", {"window": "cryo", "volatile_as": "gas"}),
+        ("F", {"window": "cryo", "family": "halogen"}),
+        ("Cl", {"window": "cryo", "family": "halogen"}),
+        ("Br", {"window": "cryo", "family": "halogen"}),
+        ("I", {"window": "cryo", "family": "halogen"}),
+        ("salts", {"window": "cryo", "family": "halogen"}),
+        ("organics", {"window": "cryo", "family": "volatile-gas"}),
+    ):
+        facts.setdefault(sym, {"element": sym, **extra})
+
+    return facts
+
+
+def load_fact_table(
+    trace_path: Path = TRACE_ELEMENTS_YAML,
+    *,
+    include_live_majors: bool = True,
+) -> dict[str, dict[str, Any]]:
+    """Merged fact table: live majors first, trace_elements overlays (wins)."""
+    table: dict[str, dict[str, Any]] = {}
+    if include_live_majors:
+        table.update(build_live_major_facts())
+    for sym, row in load_trace_element_facts(trace_path).items():
+        base = dict(table.get(sym) or {})
+        base.update(row)
+        table[sym] = base
+    return table
+
+
+@dataclass
+class ChipAdmissionResult:
+    symbol: str
+    bin_id: str
+    outcome: str
+    detail: str = ""
 
 
 @dataclass
@@ -258,18 +735,84 @@ class LintResult:
     skipped: bool
     messages: list[str] = field(default_factory=list)
     errors: list[str] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)
+    admission_results: list[ChipAdmissionResult] = field(default_factory=list)
 
     def report_text(self) -> str:
         lines = []
-        if self.skipped:
-            lines.append("LINT: SKIPPED — data/trace_elements.yaml not present on this base.")
-            lines.extend(self.messages)
-            return "\n".join(lines)
         status = "PASS" if self.ok else "FAIL"
-        lines.append(f"LINT: {status}")
+        if self.skipped:
+            lines.append(
+                f"LINT: {status} (trace_elements routing SKIPPED; admission still evaluated)"
+            )
+        else:
+            lines.append(f"LINT: {status}")
         lines.extend(self.messages)
+        if self.admission_results:
+            n_pass = sum(1 for r in self.admission_results if r.outcome == OUTCOME_PASS)
+            n_fail = sum(1 for r in self.admission_results if r.outcome == OUTCOME_FAIL)
+            n_unk = sum(1 for r in self.admission_results if r.outcome == OUTCOME_UNKNOWN)
+            lines.append(
+                f"ADMISSION: {n_pass} PASS / {n_fail} FAIL / {n_unk} UNKNOWN "
+                f"(of {len(self.admission_results)} chips)"
+            )
+            for r in self.admission_results:
+                if r.outcome == OUTCOME_FAIL:
+                    lines.append(f"  FAIL  {r.symbol} @ {r.bin_id}: {r.detail}")
+        # Cap WARN noise: summarize UNKNOWN, list only if few
+        unk = [r for r in self.admission_results if r.outcome == OUTCOME_UNKNOWN]
+        if unk:
+            sample = ", ".join(f"{r.symbol}@{r.bin_id}" for r in unk[:12])
+            more = f" (+{len(unk) - 12} more)" if len(unk) > 12 else ""
+            lines.append(f"  UNKNOWN sample: {sample}{more}")
+        lines.extend(f"WARN: {w}" for w in self.warnings[:20])
+        if len(self.warnings) > 20:
+            lines.append(f"WARN: ... +{len(self.warnings) - 20} more")
         lines.extend(f"ERROR: {e}" for e in self.errors)
         return "\n".join(lines)
+
+
+def evaluate_all_admissions(
+    data: dict[str, Any],
+    fact_table: dict[str, dict[str, Any]] | None = None,
+) -> list[ChipAdmissionResult]:
+    """Evaluate every chip against its bin's admission predicate."""
+    if fact_table is None:
+        fact_table = load_fact_table()
+    # Index bin → admission
+    adm_by_bin: dict[str, dict[str, Any] | None] = {}
+    for block in data.get("blocks") or []:
+        for sub in block.get("sub_boxes") or []:
+            adm_by_bin[sub["id"]] = sub.get("admission")
+
+    results: list[ChipAdmissionResult] = []
+    for _bid, sid, sp in iter_species_chips(data):
+        sym = sp["symbol_or_group"]
+        admission = adm_by_bin.get(sid)
+        facts = resolve_chip_facts(sym, fact_table)
+        if admission is None:
+            results.append(
+                ChipAdmissionResult(sym, sid, OUTCOME_UNKNOWN, "bin has no admission block")
+            )
+            continue
+        if facts is None:
+            results.append(
+                ChipAdmissionResult(
+                    sym,
+                    sid,
+                    OUTCOME_UNKNOWN,
+                    "no fact row (trace_elements.yaml absent or field missing)",
+                )
+            )
+            continue
+        outcome = evaluate_admission(admission, facts)
+        detail = ""
+        if outcome == OUTCOME_FAIL:
+            detail = f"facts {facts!r} contradict admission {admission!r}"
+        elif outcome == OUTCOME_UNKNOWN:
+            detail = "partial facts — one or more predicate fields missing"
+        results.append(ChipAdmissionResult(sym, sid, outcome, detail))
+    return results
 
 
 def _extract_routed_species(trace_doc: Any) -> list[dict[str, Any]]:
@@ -323,33 +866,82 @@ def _extract_routed_species(trace_doc: Any) -> list[dict[str, Any]]:
 def lint_against_trace_elements(
     data: dict[str, Any],
     trace_path: Path = TRACE_ELEMENTS_YAML,
+    *,
+    fact_table: dict[str, dict[str, Any]] | None = None,
 ) -> LintResult:
-    if not trace_path.is_file():
+    """Drift lint (trace_elements routing) + bin-admission evaluation.
+
+    Admission outcomes:
+      PASS    — facts support the chip's bin predicate
+      FAIL    — facts contradict the predicate (lint error)
+      UNKNOWN — fact source absent / field missing (WARN, never crash)
+
+    Until data/trace_elements.yaml lands, most trace chips are UNKNOWN; live
+    majors (rump irreducibles, ferroalloy Fe/Ni, alkali Na/K, …) are checked
+    against Ellingham + vapor_pressures so the mechanism is exercised now.
+    """
+    errors: list[str] = []
+    messages: list[str] = []
+    warnings: list[str] = []
+    chips = species_index(data)
+    trace_skipped = not trace_path.is_file()
+
+    # --- Admission gate (always runs; degrades to UNKNOWN without facts) ---
+    if fact_table is None:
+        fact_table = load_fact_table(trace_path)
+    admission_results = evaluate_all_admissions(data, fact_table)
+    n_pass = sum(1 for r in admission_results if r.outcome == OUTCOME_PASS)
+    n_fail = sum(1 for r in admission_results if r.outcome == OUTCOME_FAIL)
+    n_unk = sum(1 for r in admission_results if r.outcome == OUTCOME_UNKNOWN)
+    messages.append(
+        f"admission coverage: {n_pass} PASS / {n_fail} FAIL / {n_unk} UNKNOWN "
+        f"(of {len(admission_results)} chips); live fact keys: {len(fact_table)}"
+    )
+    for r in admission_results:
+        if r.outcome == OUTCOME_FAIL:
+            errors.append(
+                f"admission FAIL: chip {r.symbol!r} in bin {r.bin_id!r} — {r.detail}"
+            )
+        elif r.outcome == OUTCOME_UNKNOWN:
+            warnings.append(
+                f"admission UNKNOWN: {r.symbol} @ {r.bin_id} — {r.detail or 'incomplete facts'}"
+            )
+
+    # --- Optional trace_elements routing drift ---
+    if trace_skipped:
+        messages.append(
+            f"Missing {trace_path.relative_to(REPO_ROOT)} — routing drift lint skipped (graceful)."
+        )
+        messages.append(
+            "When trace_elements.yaml lands, re-run: scripts/render_flowsheet.py --lint"
+        )
         return LintResult(
-            ok=True,
+            ok=not errors,
             skipped=True,
-            messages=[
-                f"Missing {trace_path.relative_to(REPO_ROOT)} — drift lint skipped (graceful).",
-                "When trace_elements.yaml lands, re-run: scripts/render_flowsheet.py --lint",
-            ],
+            messages=messages,
+            errors=errors,
+            warnings=warnings,
+            admission_results=admission_results,
         )
 
     with trace_path.open("r", encoding="utf-8") as fh:
         trace_doc = yaml.safe_load(fh)
     routed = _extract_routed_species(trace_doc)
     if not routed:
+        messages.append(
+            f"{trace_path.name} present but no routed species entries found — "
+            "routing cross-check empty."
+        )
         return LintResult(
-            ok=True,
+            ok=not errors,
             skipped=False,
-            messages=[
-                f"{trace_path.name} present but no routed species entries found — nothing to cross-check.",
-            ],
+            messages=messages,
+            errors=errors,
+            warnings=warnings,
+            admission_results=admission_results,
         )
 
-    chips = species_index(data)
     agg_map = aggregate_membership(data)
-    errors: list[str] = []
-    messages: list[str] = []
     covered_chips: set[str] = set()
 
     for rec in routed:
@@ -393,9 +985,11 @@ def lint_against_trace_elements(
         "H2O", "CO2", "S", "SO2", "F", "Cl", "Br", "I", "O2",
         "Mg", "Al", "Ti", "V", "Nb", "Ta", "Ca", "Sr", "Ba",
         "Eu", "Yb", "Y", "Th", "U", "Be", "Zr", "Hf", "Sc",
+        "BeO", "ZrO2", "HfO2", "Sc2O3",
         "Na", "K", "Rb", "Cs", "Fe", "Ni", "Co", "Ru", "Rh", "Pd",
         "Re", "Os", "Ir", "Pt", "Au", "Mo", "W", "Zn", "Cd", "Pb",
         "Tl", "Bi", "glass", "salts", "organics", "REE", "unreduced-residuals",
+        "CO-CH4-organics", "CO2-CO", "P2-PO",
     }
     for sym, info in chips.items():
         if sym in covered_chips:
@@ -411,8 +1005,17 @@ def lint_against_trace_elements(
             f"trace species or aggregate membership"
         )
 
-    messages.insert(0, f"routed species checked: {len(routed)}; flowsheet chips: {len(chips)}")
-    return LintResult(ok=not errors, skipped=False, messages=messages, errors=errors)
+    messages.insert(
+        0, f"routed species checked: {len(routed)}; flowsheet chips: {len(chips)}"
+    )
+    return LintResult(
+        ok=not errors,
+        skipped=False,
+        messages=messages,
+        errors=errors,
+        warnings=warnings,
+        admission_results=admission_results,
+    )
 
 
 # ---------------------------------------------------------------------------

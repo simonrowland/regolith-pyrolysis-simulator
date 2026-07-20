@@ -1,4 +1,5 @@
 # Plant flowsheet — canonical block-diagram graph (v7 map + v8 gas/cistern delta).
+# LOCKED membership map_version=v8 — see MEMBERSHIP LOCK contract below.
 # Authority: docs-private/research/2026-07-19-plant-flowsheet/spec.md (v7 + v8 delta).
 # Schema version 1. Renderer: scripts/render_flowsheet.py
 #
@@ -29,6 +30,14 @@
 #           - symbol_or_group: str
 #             status: reviewed | conditional
 #             condition_note: str?   # required semantics when status=conditional
+#             review: {map: "v7"|"v8", finding: str?}?  # provenance; optional
+#         admission:          # bin-gate predicate over species FACT fields (not physics values)
+#           any_of: [clause, ...]   # OR of field-match clauses
+#           all_of: [clause, ...]   # AND of field-match clauses
+#           mode_fork: c0?          # annotation: C0 lance/reduce fork applies
+#           # clause keys (fact field refs): goldschmidt_class, family, host_phase,
+#           #   reductant_class, reducibility, volatile_as, window, mode, form,
+#           #   product, element, redox_split, sulfide_affinity
 #         # Future PFD seams (optional, ignored by bubble renderer):
 #         equipment_tag: str?
 #
@@ -54,6 +63,22 @@
 #
 # notes: [str]
 # ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
+# MEMBERSHIP LOCK (two-touch bump ritual)
+# ---------------------------------------------------------------------------
+# map_version + locked + locked_at define the frozen membership contract.
+# Membership changes (add/remove/move chip, change status/condition_note, or
+# aggregate members) REQUIRE BOTH:
+#   1. bump map_version (vN → vN+1)
+#   2. re-pin MEMBERSHIP_LOCK_HASH in tests/test_flowsheet_asset.py
+# Layout, annotations, edges, labels, and operating_conditions do NOT touch
+# the membership hash — edit those freely without a version bump.
+# ---------------------------------------------------------------------------
+
+map_version: "v8"
+locked: true
+locked_at: "2026-07-20"
 
 schema_version: 1
 title: Plant flowsheet — solar furnace multiphase pyrolysis
@@ -89,26 +114,31 @@ blocks:
         annotations:
           - "ZnO holds under lance → later metal-condenser window"
           - "MoO₃/WO₃/Re₂O₇ = lance-only oxide branches"
+        admission:
+          any_of:
+            - {volatile_as: metal, window: trap_band}
+            - {volatile_as: oxide, mode: lance}
+          mode_fork: c0
         species:
-          - {symbol_or_group: Zn, status: reviewed}
-          - {symbol_or_group: Cd, status: reviewed}
-          - {symbol_or_group: Pb, status: reviewed}
-          - {symbol_or_group: Tl, status: reviewed}
-          - {symbol_or_group: Bi, status: reviewed}
-          - {symbol_or_group: In, status: conditional, condition_note: "needs proved volatile species or VP"}
-          - {symbol_or_group: Ag, status: conditional, condition_note: "volatile form; native Fe-pool path may prefer ferroalloy"}
-          - {symbol_or_group: Sn, status: conditional, condition_note: "volatile form; native Fe-pool path may prefer ferroalloy"}
-          - {symbol_or_group: Ge, status: conditional, condition_note: "volatile form; native Fe-pool path may prefer ferroalloy"}
-          - {symbol_or_group: Se, status: conditional, condition_note: "chalcophile host / mode gate"}
-          - {symbol_or_group: Sb, status: conditional, condition_note: "chalcophile host / mode gate"}
-          - {symbol_or_group: As, status: conditional, condition_note: "chalcophile host / mode gate"}
-          - {symbol_or_group: Te, status: conditional, condition_note: "chalcophile host / mode gate"}
-          - {symbol_or_group: Cu, status: conditional, condition_note: "volatile/sulfide branch; metal pool may prefer ferroalloy"}
-          - {symbol_or_group: Ga, status: conditional, condition_note: "surface-correlated film / VP gate"}
-          - {symbol_or_group: Hg, status: conditional, condition_note: "CI/CM body overlay; volatile capture"}
-          - {symbol_or_group: MoO3, status: conditional, condition_note: "lance-only oxide branch"}
-          - {symbol_or_group: WO3, status: conditional, condition_note: "lance-only oxide branch"}
-          - {symbol_or_group: Re2O7, status: conditional, condition_note: "lance-only oxide branch"}
+          - {symbol_or_group: Zn, status: reviewed, review: {map: "v7", finding: "thermo T27-T29; speciation F5/F10/F14-F19; consistency F10; body-sweep DIFF-A"}}
+          - {symbol_or_group: Cd, status: reviewed, review: {map: "v7", finding: "thermo T27-T29; speciation F5/F10/F14-F19; consistency F10; body-sweep DIFF-A"}}
+          - {symbol_or_group: Pb, status: reviewed, review: {map: "v7", finding: "thermo T27-T29; speciation F5/F10/F14-F19; consistency F10; body-sweep DIFF-A"}}
+          - {symbol_or_group: Tl, status: reviewed, review: {map: "v7", finding: "thermo T27-T29; speciation F5/F10/F14-F19; consistency F10; body-sweep DIFF-A"}}
+          - {symbol_or_group: Bi, status: reviewed, review: {map: "v7", finding: "thermo T27-T29; speciation F5/F10/F14-F19; consistency F10; body-sweep DIFF-A"}}
+          - {symbol_or_group: In, status: conditional, condition_note: "needs proved volatile species or VP", review: {map: "v7", finding: "thermo T27-T29; speciation F5/F10/F14-F19; consistency F10; body-sweep DIFF-A"}}
+          - {symbol_or_group: Ag, status: conditional, condition_note: "volatile form; native Fe-pool path may prefer ferroalloy", review: {map: "v7", finding: "thermo T27-T29; speciation F5/F10/F14-F19; consistency F10; body-sweep DIFF-A"}}
+          - {symbol_or_group: Sn, status: conditional, condition_note: "volatile form; native Fe-pool path may prefer ferroalloy", review: {map: "v7", finding: "thermo T27-T29; speciation F5/F10/F14-F19; consistency F10; body-sweep DIFF-A"}}
+          - {symbol_or_group: Ge, status: conditional, condition_note: "volatile form; native Fe-pool path may prefer ferroalloy", review: {map: "v7", finding: "thermo T27-T29; speciation F5/F10/F14-F19; consistency F10; body-sweep DIFF-A"}}
+          - {symbol_or_group: Se, status: conditional, condition_note: "chalcophile host / mode gate", review: {map: "v7", finding: "thermo T27-T29; speciation F5/F10/F14-F19; consistency F10; body-sweep DIFF-A"}}
+          - {symbol_or_group: Sb, status: conditional, condition_note: "chalcophile host / mode gate", review: {map: "v7", finding: "thermo T27-T29; speciation F5/F10/F14-F19; consistency F10; body-sweep DIFF-A"}}
+          - {symbol_or_group: As, status: conditional, condition_note: "chalcophile host / mode gate", review: {map: "v7", finding: "thermo T27-T29; speciation F5/F10/F14-F19; consistency F10; body-sweep DIFF-A"}}
+          - {symbol_or_group: Te, status: conditional, condition_note: "chalcophile host / mode gate", review: {map: "v7", finding: "thermo T27-T29; speciation F5/F10/F14-F19; consistency F10; body-sweep DIFF-A"}}
+          - {symbol_or_group: Cu, status: conditional, condition_note: "volatile/sulfide branch; metal pool may prefer ferroalloy", review: {map: "v7", finding: "thermo T27-T29; speciation F5/F10/F14-F19; consistency F10; body-sweep DIFF-A"}}
+          - {symbol_or_group: Ga, status: conditional, condition_note: "surface-correlated film / VP gate", review: {map: "v7", finding: "thermo T27-T29; speciation F5/F10/F14-F19; consistency F10; body-sweep DIFF-A"}}
+          - {symbol_or_group: Hg, status: conditional, condition_note: "CI/CM body overlay; volatile capture", review: {map: "v7", finding: "thermo T27-T29; speciation F5/F10/F14-F19; consistency F10; body-sweep DIFF-A"}}
+          - {symbol_or_group: MoO3, status: conditional, condition_note: "lance-only oxide branch", review: {map: "v7", finding: "thermo T27-T29; speciation F5/F10/F14-F19; consistency F10; body-sweep DIFF-A"}}
+          - {symbol_or_group: WO3, status: conditional, condition_note: "lance-only oxide branch", review: {map: "v7", finding: "thermo T27-T29; speciation F5/F10/F14-F19; consistency F10; body-sweep DIFF-A"}}
+          - {symbol_or_group: Re2O7, status: conditional, condition_note: "lance-only oxide branch", review: {map: "v7", finding: "thermo T27-T29; speciation F5/F10/F14-F19; consistency F10; body-sweep DIFF-A"}}
       - id: cryo_train
         title: CRYO TRAIN
         kind: product
@@ -117,23 +147,29 @@ blocks:
           - "P not blanket C0 (phosphate stays; schreibersite→Fe)"
           - "H/He/N: solar-wind / body overlay (conditional)"
           - "Elemental C does not volatilize <900 °C — carbon leaves as CO/CO₂/CH₄/COS gases"
+        admission:
+          any_of:
+            - {window: cryo}
+            - {volatile_as: gas, window: cryo}
+            - {family: halogen}
+            - {family: volatile-gas}
         species:
-          - {symbol_or_group: H2O, status: reviewed}
-          - {symbol_or_group: CO2, status: reviewed}
-          - {symbol_or_group: S, status: reviewed}
-          - {symbol_or_group: SO2, status: reviewed}
-          - {symbol_or_group: F, status: reviewed}
-          - {symbol_or_group: Cl, status: reviewed}
-          - {symbol_or_group: Br, status: reviewed}
-          - {symbol_or_group: I, status: reviewed}
-          - {symbol_or_group: salts, status: reviewed}
-          - {symbol_or_group: organics, status: reviewed}
+          - {symbol_or_group: H2O, status: reviewed, review: {map: "v7", finding: "speciation F7/F22-F23; consistency F3; body-sweep DIFF-B"}}
+          - {symbol_or_group: CO2, status: reviewed, review: {map: "v7", finding: "speciation F7/F22-F23; consistency F3; body-sweep DIFF-B"}}
+          - {symbol_or_group: S, status: reviewed, review: {map: "v7", finding: "speciation F7/F22-F23; consistency F3; body-sweep DIFF-B"}}
+          - {symbol_or_group: SO2, status: reviewed, review: {map: "v7", finding: "speciation F7/F22-F23; consistency F3; body-sweep DIFF-B"}}
+          - {symbol_or_group: F, status: reviewed, review: {map: "v7", finding: "speciation F7/F22-F23; consistency F3; body-sweep DIFF-B"}}
+          - {symbol_or_group: Cl, status: reviewed, review: {map: "v7", finding: "speciation F7/F22-F23; consistency F3; body-sweep DIFF-B"}}
+          - {symbol_or_group: Br, status: reviewed, review: {map: "v7", finding: "speciation F7/F22-F23; consistency F3; body-sweep DIFF-B"}}
+          - {symbol_or_group: I, status: reviewed, review: {map: "v7", finding: "speciation F7/F22-F23; consistency F3; body-sweep DIFF-B"}}
+          - {symbol_or_group: salts, status: reviewed, review: {map: "v7", finding: "speciation F7/F22-F23; consistency F3; body-sweep DIFF-B"}}
+          - {symbol_or_group: organics, status: reviewed, review: {map: "v7", finding: "speciation F7/F22-F23; consistency F3; body-sweep DIFF-B"}}
           # P primary home is ferroalloy (schreibersite); cryo only after proved conversion (condition_note there).
-          - {symbol_or_group: H, status: conditional, condition_note: "implanted solar-wind / body overlay"}
-          - {symbol_or_group: He, status: conditional, condition_note: "implanted solar-wind / body overlay"}
+          - {symbol_or_group: H, status: conditional, condition_note: "implanted solar-wind / body overlay", review: {map: "v7", finding: "speciation F7/F22-F23; consistency F3; body-sweep DIFF-B"}}
+          - {symbol_or_group: He, status: conditional, condition_note: "implanted solar-wind / body overlay", review: {map: "v7", finding: "speciation F7/F22-F23; consistency F3; body-sweep DIFF-B"}}
           # v8: bare elemental C removed — C does not volatilize <900 °C as the element
-          - {symbol_or_group: CO-CH4-organics, status: conditional, condition_note: "chondritic/solar-wind carbon leaves as CO/CO2/CH4/COS pyrolysis gases (not elemental C)"}
-          - {symbol_or_group: N, status: conditional, condition_note: "implanted solar-wind / body overlay"}
+          - {symbol_or_group: CO-CH4-organics, status: conditional, condition_note: "chondritic/solar-wind carbon leaves as CO/CO2/CH4/COS pyrolysis gases (not elemental C)", review: {map: "v8"}}
+          - {symbol_or_group: N, status: conditional, condition_note: "implanted solar-wind / body overlay", review: {map: "v7", finding: "speciation F7/F22-F23; consistency F3; body-sweep DIFF-B"}}
 
   - id: bernoulli_overhead
     title: BERNOULLI · OVERHEAD GAS
@@ -149,12 +185,16 @@ blocks:
         operating_conditions: "~1150 °C class alkali cut"
         annotations:
           - "Na/K cannot reduce Li₂O at 1150 °C; free/native Li may leave here"
+        admission:
+          any_of:
+            - {family: alkali}
+            - {volatile_as: metal, window: alkali_band}
         species:
-          - {symbol_or_group: Na, status: reviewed}
-          - {symbol_or_group: K, status: reviewed}
-          - {symbol_or_group: Rb, status: reviewed}
-          - {symbol_or_group: Cs, status: reviewed}
-          - {symbol_or_group: Li, status: conditional, condition_note: "free/native Li only; residual Li₂O waits for Mg-C6 / crown tail"}
+          - {symbol_or_group: Na, status: reviewed, review: {map: "v7", finding: "thermo T5; speciation F8; consistency F17"}}
+          - {symbol_or_group: K, status: reviewed, review: {map: "v7", finding: "thermo T5; speciation F8; consistency F17"}}
+          - {symbol_or_group: Rb, status: reviewed, review: {map: "v7", finding: "thermo T5; speciation F8; consistency F17"}}
+          - {symbol_or_group: Cs, status: reviewed, review: {map: "v7", finding: "thermo T5; speciation F8; consistency F17"}}
+          - {symbol_or_group: Li, status: conditional, condition_note: "free/native Li only; residual Li₂O waits for Mg-C6 / crown tail", review: {map: "v7", finding: "thermo T5; speciation F8; consistency F17"}}
       - id: ferroalloy_tap
         title: Fe CONDENSER · FERROALLOY
         kind: product
@@ -162,23 +202,28 @@ blocks:
         annotations:
           - "Metal/native + Fe-pool first; oxide/lance do not inherit"
           - "Cr/Mn: native→Fe; oxidic→C6; spinel→rump"
+        admission:
+          any_of:
+            - {goldschmidt_class: siderophile}
+            - {reductant_class: already-native}
+            - {host_phase: metal}
         species:
-          - {symbol_or_group: Fe, status: reviewed}
-          - {symbol_or_group: Ni, status: reviewed}
-          - {symbol_or_group: Co, status: reviewed}
-          - {symbol_or_group: Ru, status: reviewed}
-          - {symbol_or_group: Rh, status: reviewed}
-          - {symbol_or_group: Pd, status: reviewed}
-          - {symbol_or_group: Re, status: reviewed}
-          - {symbol_or_group: Os, status: reviewed}
-          - {symbol_or_group: Ir, status: reviewed}
-          - {symbol_or_group: Pt, status: reviewed}
-          - {symbol_or_group: Au, status: reviewed}
-          - {symbol_or_group: Mo, status: reviewed}
-          - {symbol_or_group: W, status: reviewed}
-          - {symbol_or_group: Cr, status: conditional, condition_note: "native/alloy/sulfide host only; oxidic Cr → C6"}
-          - {symbol_or_group: Mn, status: conditional, condition_note: "native/alloy/sulfide host; Mn vapor/Mg-crown tail remains conditional"}
-          - {symbol_or_group: P, status: conditional, condition_note: "schreibersite follows Fe; cryo only after proved conversion; residual reducible P may form AlP at C6"}
+          - {symbol_or_group: Fe, status: reviewed, review: {map: "v7", finding: "thermo T3/T28-T29; speciation F14/F21; consistency F10/F14; body-sweep DIFF-A"}}
+          - {symbol_or_group: Ni, status: reviewed, review: {map: "v7", finding: "thermo T3/T28-T29; speciation F14/F21; consistency F10/F14; body-sweep DIFF-A"}}
+          - {symbol_or_group: Co, status: reviewed, review: {map: "v7", finding: "thermo T3/T28-T29; speciation F14/F21; consistency F10/F14; body-sweep DIFF-A"}}
+          - {symbol_or_group: Ru, status: reviewed, review: {map: "v7", finding: "thermo T3/T28-T29; speciation F14/F21; consistency F10/F14; body-sweep DIFF-A"}}
+          - {symbol_or_group: Rh, status: reviewed, review: {map: "v7", finding: "thermo T3/T28-T29; speciation F14/F21; consistency F10/F14; body-sweep DIFF-A"}}
+          - {symbol_or_group: Pd, status: reviewed, review: {map: "v7", finding: "thermo T3/T28-T29; speciation F14/F21; consistency F10/F14; body-sweep DIFF-A"}}
+          - {symbol_or_group: Re, status: reviewed, review: {map: "v7", finding: "thermo T3/T28-T29; speciation F14/F21; consistency F10/F14; body-sweep DIFF-A"}}
+          - {symbol_or_group: Os, status: reviewed, review: {map: "v7", finding: "thermo T3/T28-T29; speciation F14/F21; consistency F10/F14; body-sweep DIFF-A"}}
+          - {symbol_or_group: Ir, status: reviewed, review: {map: "v7", finding: "thermo T3/T28-T29; speciation F14/F21; consistency F10/F14; body-sweep DIFF-A"}}
+          - {symbol_or_group: Pt, status: reviewed, review: {map: "v7", finding: "thermo T3/T28-T29; speciation F14/F21; consistency F10/F14; body-sweep DIFF-A"}}
+          - {symbol_or_group: Au, status: reviewed, review: {map: "v7", finding: "thermo T3/T28-T29; speciation F14/F21; consistency F10/F14; body-sweep DIFF-A"}}
+          - {symbol_or_group: Mo, status: reviewed, review: {map: "v7", finding: "thermo T3/T28-T29; speciation F14/F21; consistency F10/F14; body-sweep DIFF-A"}}
+          - {symbol_or_group: W, status: reviewed, review: {map: "v7", finding: "thermo T3/T28-T29; speciation F14/F21; consistency F10/F14; body-sweep DIFF-A"}}
+          - {symbol_or_group: Cr, status: conditional, condition_note: "native/alloy/sulfide host only; oxidic Cr → C6", review: {map: "v7", finding: "thermo T3/T28-T29; speciation F14/F21; consistency F10/F14; body-sweep DIFF-A"}}
+          - {symbol_or_group: Mn, status: conditional, condition_note: "native/alloy/sulfide host; Mn vapor/Mg-crown tail remains conditional", review: {map: "v7", finding: "thermo T3/T28-T29; speciation F14/F21; consistency F10/F14; body-sweep DIFF-A"}}
+          - {symbol_or_group: P, status: conditional, condition_note: "schreibersite follows Fe; cryo only after proved conversion; residual reducible P may form AlP at C6", review: {map: "v7", finding: "thermo T3/T28-T29; speciation F14/F21; consistency F10/F14; body-sweep DIFF-A"}}
           # Ag/Sn/Ge/Cu primary chips live on volatile-metal trap (cond); native Fe-pool alternate noted there.
       - id: sio_glass
         title: SiO BAFFLES · SiO-GLASS
@@ -186,8 +231,11 @@ blocks:
         operating_conditions: "Silica glass major stream"
         annotations:
           - "B/Ga trace placement remains UNCERTAIN — no reviewed trace chip"
+        admission:
+          any_of:
+            - {form: sio_glass}
         species:
-          - {symbol_or_group: glass, status: reviewed}
+          - {symbol_or_group: glass, status: reviewed, review: {map: "v7", finding: "speciation F17-F18"}}
       # v8: non-condensable gas conditioning between SiO baffles and O₂ terminal
       - id: gas_conditioning
         title: GAS CONDITIONING (non-condensables)
@@ -195,9 +243,13 @@ blocks:
         operating_conditions: "Non-condensable cleanup before O₂ pump / frost cistern"
         annotations:
           - "P cold trap ~280 °C BEFORE compressors; CO oxidized to CO₂; CO₂ frosts 195 K upstream of 90 K LOX"
+        admission:
+          any_of:
+            - {window: gas_conditioning}
+            - {volatile_as: gas, noncondensable: true}
         species:
-          - {symbol_or_group: CO2-CO, status: conditional, condition_note: "refractory-char burnout >900 °C; char survives C0, burns via melt O₂ / reduces FeO per REF-020"}
-          - {symbol_or_group: P2-PO, status: conditional, condition_note: "phosphate reduction >~1100 °C"}
+          - {symbol_or_group: CO2-CO, status: conditional, condition_note: "refractory-char burnout >900 °C; char survives C0, burns via melt O₂ / reduces FeO per REF-020", review: {map: "v8"}}
+          - {symbol_or_group: P2-PO, status: conditional, condition_note: "phosphate reduction >~1100 °C", review: {map: "v8"}}
       - id: lox_cistern
         title: O₂ PUMP → FROST CISTERN
         kind: storage
@@ -205,8 +257,11 @@ blocks:
         annotations:
           - "selective O₂ extraction (YSZ electrochemical pump ~0.5–1 kWh/kg, or zeolite VSA); buffer gas NEVER liquefied — N₂/Ar recirculate warm to the sweep loop (N₂ freezes 63 K / Ar 84 K vs O₂ 54 K — buffer reaching the frost cavern fouls it); distillation fallback only (Ar/O₂ 87/90 K hard cut — Ar dome circuits stay plumbing-separate from N₂)"
           - "O₂ split: cistern / vented / gettered (future); cistern→lance is a plant fact"
+        admission:
+          all_of:
+            - {product: oxygen}
         species:
-          - {symbol_or_group: O2, status: reviewed}
+          - {symbol_or_group: O2, status: reviewed, review: {map: "v7", finding: "v7 O2 terminal; v8 frost-cistern form"}}
 
   - id: mg_dome
     title: Mg DOME
@@ -221,8 +276,11 @@ blocks:
         title: Mg CROWN
         kind: product
         operating_conditions: "~550 K condenser"
+        admission:
+          all_of:
+            - {element: Mg}
         species:
-          - {symbol_or_group: Mg, status: reviewed}
+          - {symbol_or_group: Mg, status: reviewed, review: {map: "v7", finding: "thermo T22-T24/T37; speciation F6/F8/F26; consistency F6"}}
       - id: c6_magnesiothermic
         title: C6 MAGNESIOTHERMIC
         kind: product
@@ -232,12 +290,15 @@ blocks:
           - "VOx → Al-Ti-V; Nb/Ta compete at C6"
           - "Impurity caption: Fe·Si·Cr·Mn·AlP·MgS"
           - "ZrO₂ not Mg-reducible → rump"
+        admission:
+          all_of:
+            - {reducibility: mg_reducible}
         species:
-          - {symbol_or_group: Al, status: reviewed}
-          - {symbol_or_group: Ti, status: reviewed}
-          - {symbol_or_group: V, status: reviewed}
-          - {symbol_or_group: Nb, status: reviewed}
-          - {symbol_or_group: Ta, status: reviewed}
+          - {symbol_or_group: Al, status: reviewed, review: {map: "v7", finding: "thermo T3/T7-T14; speciation F1/F7/F9/F13; consistency F1/F4-F5"}}
+          - {symbol_or_group: Ti, status: reviewed, review: {map: "v7", finding: "thermo T3/T7-T14; speciation F1/F7/F9/F13; consistency F1/F4-F5"}}
+          - {symbol_or_group: V, status: reviewed, review: {map: "v7", finding: "thermo T3/T7-T14; speciation F1/F7/F9/F13; consistency F1/F4-F5"}}
+          - {symbol_or_group: Nb, status: reviewed, review: {map: "v7", finding: "thermo T3/T7-T14; speciation F1/F7/F9/F13; consistency F1/F4-F5"}}
+          - {symbol_or_group: Ta, status: reviewed, review: {map: "v7", finding: "thermo T3/T7-T14; speciation F1/F7/F9/F13; consistency F1/F4-F5"}}
 
   - id: ca_dome
     title: Ca DOME
@@ -254,12 +315,16 @@ blocks:
         annotations:
           - "No V chip (primary V is C6)"
           - "Sr/Ba residual can flash to calciothermic loop"
+        admission:
+          any_of:
+            - {family: alkaline-earth}
+            - {redox_split: divalent_ree}
         species:
-          - {symbol_or_group: Ca, status: reviewed}
-          - {symbol_or_group: Sr, status: reviewed}
-          - {symbol_or_group: Ba, status: reviewed}
-          - {symbol_or_group: Eu, status: reviewed}
-          - {symbol_or_group: Yb, status: reviewed}
+          - {symbol_or_group: Ca, status: reviewed, review: {map: "v7", finding: "speciation F4/F11/F25; consistency F1/F7-F8"}}
+          - {symbol_or_group: Sr, status: reviewed, review: {map: "v7", finding: "speciation F4/F11/F25; consistency F1/F7-F8"}}
+          - {symbol_or_group: Ba, status: reviewed, review: {map: "v7", finding: "speciation F4/F11/F25; consistency F1/F7-F8"}}
+          - {symbol_or_group: Eu, status: reviewed, review: {map: "v7", finding: "speciation F4/F11/F25; consistency F1/F7-F8"}}
+          - {symbol_or_group: Yb, status: reviewed, review: {map: "v7", finding: "speciation F4/F11/F25; consistency F1/F7-F8"}}
       - id: calciothermic
         title: CALCIOTHERMIC
         kind: product
@@ -268,11 +333,16 @@ blocks:
           - "REE·Y + Th·U (radiological product flag)"
           - "Residual Nb/Ta/Sr/Ba only if not earlier cut"
           - "Ti removed: primary Ti is C6"
+        admission:
+          any_of:
+            - {reducibility: ca_reducible}
+            - {family: REE}
+            - {family: actinide}
         species:
-          - {symbol_or_group: REE, status: reviewed}
-          - {symbol_or_group: Y, status: reviewed}
-          - {symbol_or_group: Th, status: reviewed}
-          - {symbol_or_group: U, status: reviewed}
+          - {symbol_or_group: REE, status: reviewed, review: {map: "v7", finding: "thermo T12/T16-T18; speciation F11-F13/F16/F24; consistency F4/F8-F9"}}
+          - {symbol_or_group: Y, status: reviewed, review: {map: "v7", finding: "thermo T12/T16-T18; speciation F11-F13/F16/F24; consistency F4/F8-F9"}}
+          - {symbol_or_group: Th, status: reviewed, review: {map: "v7", finding: "thermo T12/T16-T18; speciation F11-F13/F16/F24; consistency F4/F8-F9"}}
+          - {symbol_or_group: U, status: reviewed, review: {map: "v7", finding: "thermo T12/T16-T18; speciation F11-F13/F16/F24; consistency F4/F8-F9"}}
           # Residual conditional chips Nb,Ta,Sr,Ba live at C6 / Ca-crown primaries.
           # Listed here only via annotations + aggregates membership for lint honesty.
 
@@ -290,12 +360,15 @@ blocks:
         # v8 addendum 2: rump chips render as OXIDES — this is the unreduced-oxide
         # ceramic floor; a chip here = the oxide that nothing could reduce or
         # volatilize (opposite of every other bin's captured-reduced-form chips).
+        admission:
+          all_of:
+            - {reducibility: not_reducible}
         species:
-          - {symbol_or_group: BeO, status: reviewed}
-          - {symbol_or_group: ZrO2, status: reviewed}
-          - {symbol_or_group: HfO2, status: reviewed}
-          - {symbol_or_group: Sc2O3, status: reviewed}
-          - {symbol_or_group: unreduced-residuals, status: conditional, condition_note: "spinel/chromite/inaccessible oxide residue"}
+          - {symbol_or_group: BeO, status: reviewed, review: {map: "v7", finding: "thermo T10-T11/T15; speciation F20; consistency F11/F16"}}
+          - {symbol_or_group: ZrO2, status: reviewed, review: {map: "v7", finding: "thermo T10-T11/T15; speciation F20; consistency F11/F16"}}
+          - {symbol_or_group: HfO2, status: reviewed, review: {map: "v7", finding: "thermo T10-T11/T15; speciation F20; consistency F11/F16"}}
+          - {symbol_or_group: Sc2O3, status: reviewed, review: {map: "v7", finding: "thermo T10-T11/T15; speciation F20; consistency F11/F16"}}
+          - {symbol_or_group: unreduced-residuals, status: conditional, condition_note: "spinel/chromite/inaccessible oxide residue", review: {map: "v7", finding: "thermo T10-T11/T15; speciation F20; consistency F11/F16"}}
         notes:
           - "all species as oxides — refractory ceramic (CaO·Al2O3·REE-oxide bulk + these); liner feedstock for the next furnace"
           - "carbides/nitrides excluded by design: char burned out upstream; domes run Ar not N2"
