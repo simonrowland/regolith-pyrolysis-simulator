@@ -71,6 +71,9 @@ from simulator.physical_constants import GAS_CONSTANT
 
 
 ALPHAMELTS_LIQUIDUS_SEED_TEMPERATURE_C = 800.0
+ALPHAMELTS_SUBPROCESS_MIN_TEMPERATURE_C = (
+    ALPHAMELTS_LIQUIDUS_SEED_TEMPERATURE_C
+)
 ALPHAMELTS_PYTHON_MIN_PRESSURE_BAR = 1.0e-6
 ALPHAMELTS_SUBPROCESS_MIN_PRESSURE_BAR = 1.0
 # 20s is the established per-solve subprocess budget; bracket searches apply
@@ -110,6 +113,9 @@ ALPHAMELTS_REASON_RUN_MODE_INVALID = 'subprocess_run_mode_invalid'
 ALPHAMELTS_REASON_EXECUTED_T_MISSING = 'executed_temperature_missing'
 ALPHAMELTS_REASON_EXECUTED_T_MISMATCH = 'executed_temperature_mismatch'
 ALPHAMELTS_REASON_PRESSURE_UNSUPPORTED = 'subprocess_pressure_below_minimum'
+ALPHAMELTS_REASON_TEMPERATURE_UNSUPPORTED = (
+    'subprocess_temperature_below_minimum'
+)
 ALPHAMELTS_REASON_FO2_CONSTRAINT_INVALID = 'fo2_constraint_invalid'
 ALPHAMELTS_REASON_FO2_CONSTRAINT_UNAPPLIED = 'fo2_constraint_unapplied'
 ALPHAMELTS_REASON_SYSTEM_OUTPUT_MISSING = 'system_output_missing'
@@ -136,6 +142,7 @@ ALPHAMELTS_BACKEND_FAILURE_CATEGORY_BY_REASON = {
     ALPHAMELTS_REASON_EXECUTED_T_MISSING: 'parse_error',
     ALPHAMELTS_REASON_EXECUTED_T_MISMATCH: 'contract_error',
     ALPHAMELTS_REASON_PRESSURE_UNSUPPORTED: 'out_of_domain',
+    ALPHAMELTS_REASON_TEMPERATURE_UNSUPPORTED: 'out_of_domain',
     ALPHAMELTS_REASON_FO2_CONSTRAINT_INVALID: 'contract_error',
     ALPHAMELTS_REASON_FO2_CONSTRAINT_UNAPPLIED: 'contract_error',
     ALPHAMELTS_REASON_SYSTEM_OUTPUT_MISSING: 'parse_error',
@@ -174,6 +181,9 @@ ALPHAMELTS_BACKEND_FAILURE_MESSAGES = {
     ),
     ALPHAMELTS_REASON_PRESSURE_UNSUPPORTED: (
         'AlphaMELTS subprocess does not support the requested pressure'
+    ),
+    ALPHAMELTS_REASON_TEMPERATURE_UNSUPPORTED: (
+        'AlphaMELTS subprocess does not support the requested temperature'
     ),
     ALPHAMELTS_REASON_FO2_CONSTRAINT_INVALID: (
         'AlphaMELTS subprocess fO2 constraint was invalid'
@@ -1603,6 +1613,10 @@ class _MELTSBackendSupport(MeltBackend):
                             reason: OutOfDomainReason | str | None = None,
                             ) -> EquilibriumResult:
         diagnostics_out = dict(diagnostics or {})
+        diagnostics_out.setdefault(
+            'authoritative_for_requested_conditions',
+            False,
+        )
         structured_reason = reason_value(reason)
         if structured_reason is not None:
             diagnostics_out['backend_status_reason'] = structured_reason
@@ -2210,6 +2224,19 @@ class _MELTSBackendSupport(MeltBackend):
                 ALPHAMELTS_REASON_PRESSURE_UNSUPPORTED,
                 f'requested={requested_pressure_bar:g} bar; '
                 f'minimum={ALPHAMELTS_SUBPROCESS_MIN_PRESSURE_BAR:g} bar',
+            )
+        if requested_temperature_C < ALPHAMELTS_SUBPROCESS_MIN_TEMPERATURE_C:
+            return self._domain_gate_result(
+                requested_temperature_C,
+                requested_pressure_bar,
+                fO2_log,
+                [
+                    f'temperature {requested_temperature_C:g} C below '
+                    'subprocess minimum '
+                    f'{ALPHAMELTS_SUBPROCESS_MIN_TEMPERATURE_C:g} C'
+                ],
+                diagnostics=diagnostics,
+                reason=ALPHAMELTS_REASON_TEMPERATURE_UNSUPPORTED,
             )
         fO2_path, fO2_offset = self._subprocess_fo2_constraint(fO2_log)
         with tempfile.TemporaryDirectory() as tmpdir:

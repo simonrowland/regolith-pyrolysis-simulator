@@ -1234,6 +1234,65 @@ def test_alphamelts_subprocess_timeout_stays_loud_without_mode_flip(monkeypatch)
     assert backend._mode == 'subprocess'
 
 
+def test_alphamelts_subprocess_rejects_below_operating_floor_without_launch(
+    monkeypatch,
+):
+    backend = AlphaMELTSBackend()
+    backend._mode = 'subprocess'
+    backend._binary_path = Path('/tmp/fake-alphamelts')
+
+    def forbidden_run(*_args, **_kwargs):
+        raise AssertionError('out-of-domain point must not launch AlphaMELTS')
+
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts.subprocess.run',
+        forbidden_run,
+    )
+
+    result = backend.equilibrate(
+        temperature_C=75.0,
+        composition_kg=_melts_domain_composition(),
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        subprocess_run_mode='isothermal',
+    )
+
+    assert result.status == 'out_of_domain'
+    assert result.diagnostics['backend_status_reason'] == (
+        'subprocess_temperature_below_minimum'
+    )
+    assert result.diagnostics['backend_failure_category'] == 'out_of_domain'
+    assert backend._mode == 'subprocess'
+
+
+def test_alphamelts_subprocess_operating_floor_is_inclusive(monkeypatch):
+    backend = AlphaMELTSBackend()
+    backend._mode = 'subprocess'
+    backend._binary_path = Path('/tmp/fake-alphamelts')
+    calls = []
+
+    def fake_run(*args, **kwargs):
+        calls.append((args, kwargs))
+        return types.SimpleNamespace(returncode=-6, stdout='', stderr='')
+
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts.subprocess.run',
+        fake_run,
+    )
+
+    with pytest.raises(AlphaMELTSSubprocessContractError):
+        backend.equilibrate(
+            temperature_C=800.0,
+            composition_kg=_melts_domain_composition(),
+            fO2_log=-9.0,
+            pressure_bar=1.0,
+            subprocess_run_mode='isothermal',
+        )
+
+    assert len(calls) == 1
+    assert calls[0][1]['timeout'] == 20.0
+
+
 def test_alphamelts_python_native_hang_is_killed_and_marks_unavailable(
     monkeypatch,
 ):

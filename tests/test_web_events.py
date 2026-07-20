@@ -1952,6 +1952,19 @@ def test_furnace_material_dropdown_hydrates_honest_labels_at_source():
     assert ".catch(() => {})" not in ticks
 
 
+def test_live_ticks_refresh_backend_badge_without_losing_active_backend():
+    socket_source = (
+        _REPO_ROOT / "web/static/js/simulator-socket.js"
+    ).read_text()
+    tick_source = (
+        _REPO_ROOT / "web/static/js/simulator-ticks.js"
+    ).read_text()
+
+    assert "updateBackendBadge(data);" in tick_source
+    assert "badge.dataset.backendActive" in socket_source
+    assert "data.backend_status_reason" in socket_source
+
+
 def test_c4_start_payload_uses_rendered_setpoint_not_literal_1670():
     controls = (
         _REPO_ROOT / "web/static/js/simulator-controls.js"
@@ -2985,6 +2998,7 @@ def _terminal_runner_document(status: str) -> dict[str, object]:
 def test_run_loop_captures_detached_mol_ledger_at_hour_boundary(monkeypatch):
     sid = "test-hourly-ledger-capture"
     captured_payloads = []
+    captured_tick_kwargs = []
 
     class Ledger:
         balances = {"process.cleaned_melt": {"SiO2": 1.25}}
@@ -2993,7 +3007,15 @@ def test_run_loop_captures_detached_mol_ledger_at_hour_boundary(monkeypatch):
             return self.balances
 
     ledger = Ledger()
-    sim = SimpleNamespace(atom_ledger=ledger, _poisoned_hour=None)
+    sim = SimpleNamespace(
+        atom_ledger=ledger,
+        _poisoned_hour=None,
+        _last_backend_status="out_of_domain",
+        _last_backend_diagnostics={
+            "backend_status_reason": "subprocess_temperature_below_minimum",
+            "authoritative_for_requested_conditions": False,
+        },
+    )
 
     class Session:
         completed = False
@@ -3039,7 +3061,11 @@ def test_run_loop_captures_detached_mol_ledger_at_hour_boundary(monkeypatch):
         return {"execution_status": "ok"}
 
     monkeypatch.setattr(web_events, "drive_session", drive_one)
-    monkeypatch.setattr(web_events, "_tick_payload", lambda **_kwargs: {})
+    monkeypatch.setattr(
+        web_events,
+        "_tick_payload",
+        lambda **kwargs: captured_tick_kwargs.append(kwargs) or {},
+    )
     monkeypatch.setattr(web_events, "_completion_payload", lambda _sim: {})
     monkeypatch.setattr(web_events, "persist_run_artifact", capture_artifact)
 
@@ -3058,6 +3084,11 @@ def test_run_loop_captures_detached_mol_ledger_at_hour_boundary(monkeypatch):
         assert captured_payloads[0]["per_hour_ledger"] == {
             "1": {"process.cleaned_melt": {"SiO2": 1.25}}
         }
+        assert captured_tick_kwargs[0]["backend_status"] == "out_of_domain"
+        assert captured_tick_kwargs[0]["backend_status_reason"] == (
+            "subprocess_temperature_below_minimum"
+        )
+        assert captured_tick_kwargs[0]["backend_authoritative"] is False
     finally:
         _clear_simulation_state(sid)
 
@@ -4001,6 +4032,80 @@ def test_web_payloads_preserve_full_precision_mass_balance_error(
     assert tick_payload["mass_balance_error_breached"] is True
     assert completion_payload["mass_balance_error_pct"] == pytest.approx(6.25e-12)
     assert completion_payload["mass_balance_error_breached"] is True
+
+
+def test_tick_payload_exposes_non_authoritative_backend_domain_gate():
+    sim, snapshot = _sim_with_mass_balance_snapshot(0.0)
+
+    payload = _tick_payload(
+        sim=sim,
+        snapshot=snapshot,
+        backend_message="Using AlphaMELTSBackend",
+        backend_status="out_of_domain",
+        backend_status_reason="subprocess_temperature_below_minimum",
+        backend_authoritative=False,
+    )
+
+    assert payload["backend_status"] == "out_of_domain"
+    assert payload["backend_status_reason"] == (
+        "subprocess_temperature_below_minimum"
+    )
+    assert payload["backend_authoritative"] is False
+    assert payload["backend_fallback_active"] is False
+    assert payload["backend_message"] == "Using AlphaMELTSBackend"
+
+
+@pytest.mark.parametrize(
+    (
+        "fallback_status",
+        "fallback_authoritative",
+        "call_status",
+        "call_diagnostics",
+        "expected",
+    ),
+    [
+        (
+            "ok",
+            True,
+            "out_of_domain",
+            {
+                "backend_status_reason": (
+                    "subprocess_temperature_below_minimum"
+                ),
+                "authoritative_for_requested_conditions": False,
+            },
+            (
+                "out_of_domain",
+                "subprocess_temperature_below_minimum",
+                False,
+            ),
+        ),
+        (
+            "internal-analytical",
+            False,
+            "ok",
+            {},
+            ("ok", "", False),
+        ),
+    ],
+)
+def test_per_tick_backend_resolution_never_promotes_selection_authority(
+    fallback_status,
+    fallback_authoritative,
+    call_status,
+    call_diagnostics,
+    expected,
+):
+    sim = SimpleNamespace(
+        _last_backend_status=call_status,
+        _last_backend_diagnostics=call_diagnostics,
+    )
+
+    assert web_events._per_tick_backend_resolution(
+        sim,
+        fallback_status=fallback_status,
+        fallback_authoritative=fallback_authoritative,
+    ) == expected
 
 
 def test_web_mass_balance_threshold_matches_kernel_abort_invariant():

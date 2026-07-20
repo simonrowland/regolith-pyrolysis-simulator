@@ -1199,6 +1199,7 @@ def _tick_payload(
     backend_status: str,
     backend_authoritative: bool,
     backend_error: str = '',
+    backend_status_reason: str = '',
 ):
     """Build the public per-tick payload."""
     pot_composition = _pot_composition_kg(sim, snapshot)
@@ -1242,6 +1243,7 @@ def _tick_payload(
         'stage0_mass_balance_delta_kg': round(
             snapshot.inventory.stage0_mass_balance_delta_kg, 3),
         'backend_status': backend_status,
+        'backend_status_reason': backend_status_reason,
         'backend_authoritative': backend_authoritative,
         'backend_error': backend_error,
         'backend_fallback_active': bool(backend_error),
@@ -1379,6 +1381,31 @@ def _tick_payload(
         },
         'mre_energy_kWh': round(snapshot.energy.mre_kWh, 4),
     }
+
+
+def _per_tick_backend_resolution(
+    sim,
+    *,
+    fallback_status: str,
+    fallback_authoritative: bool,
+) -> tuple[str, str, bool]:
+    """Project call status without promoting the selected backend's authority."""
+    status = str(
+        getattr(sim, '_last_backend_status', fallback_status)
+        or fallback_status
+    )
+    diagnostics = dict(
+        getattr(sim, '_last_backend_diagnostics', {}) or {}
+    )
+    reason = str(diagnostics.get('backend_status_reason', '') or '')
+    authoritative = bool(
+        fallback_authoritative
+        and diagnostics.get(
+            'authoritative_for_requested_conditions',
+            status == 'ok',
+        )
+    )
+    return status, reason, authoritative
 
 
 def _completion_payload(sim):
@@ -2104,13 +2131,23 @@ def _start_background_loop(
                                 mol_by_account()
                             )
                     if step_result is not None:
+                        (
+                            step_backend_status,
+                            step_backend_status_reason,
+                            step_backend_authoritative,
+                        ) = _per_tick_backend_resolution(
+                            sim,
+                            fallback_status=backend_status,
+                            fallback_authoritative=backend_authoritative,
+                        )
                         tick_data = _tick_payload(
                             sim=sim,
                             snapshot=step_result.snapshot,
                             backend_message=backend_message,
-                            backend_status=backend_status,
-                            backend_authoritative=backend_authoritative,
+                            backend_status=step_backend_status,
+                            backend_authoritative=step_backend_authoritative,
                             backend_error=step_result.backend_error,
+                            backend_status_reason=step_backend_status_reason,
                         )
                         _record_last_recipe_capture(
                             sid,

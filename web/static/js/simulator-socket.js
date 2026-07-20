@@ -28,13 +28,17 @@ setConnectionReady(false);
 function updateBackendBadge(data) {
     const badge = document.getElementById('status-backend');
     if (!badge || !data) return;
-    const active = data.backend_active || 'unknown';
+    const active = data.backend_active || badge.dataset.backendActive || 'unknown';
+    badge.dataset.backendActive = active;
     const status = data.backend_status || 'unknown';
     const authoritative = data.backend_authoritative === true;
     badge.textContent = `Backend: ${active} / ${status}`;
     badge.className = 'backend-badge '
         + (authoritative ? 'backend-badge-ok' : 'backend-badge-internal-analytical');
-    badge.title = data.backend_status_message || data.backend_message || '';
+    badge.title = data.backend_status_message
+        || data.backend_status_reason
+        || data.backend_message
+        || '';
 }
 
 socket.on('connect', () => {
