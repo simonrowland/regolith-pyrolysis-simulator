@@ -18,6 +18,7 @@ def _run_panel(
     update_indexes: list[int] | None = None,
     *,
     dom_mode: str = "normal",
+    shared_esc_prefix: str = "",
 ) -> dict:
     harness = r"""
 const fs = require("fs");
@@ -27,6 +28,7 @@ const panelSource = fs.readFileSync(process.argv[3], "utf8");
 const artifact = JSON.parse(process.argv[4]);
 const indexes = JSON.parse(process.argv[5]);
 const domMode = process.argv[6];
+const sharedEscPrefix = process.argv[7];
 const live = { innerHTML: "" };
 const panelSection = { parentElement: null, nextElementSibling: null };
 const timestepSection = {
@@ -67,6 +69,13 @@ if (domMode !== "none") {
 }
 context.globalThis = context;
 vm.runInNewContext(labelsSource, context);
+if (sharedEscPrefix) {
+  const sharedEsc = context.ReportLabels.esc;
+  context.ReportLabels = {
+    ...context.ReportLabels,
+    esc: (value) => `${sharedEscPrefix}${sharedEsc(value)}`
+  };
+}
 vm.runInNewContext(panelSource, context);
 const panel = context.ReportPanels.find((entry) => entry.id === "sec-p13-status-strip");
 if (!panel) throw new Error("P13 panel did not register");
@@ -96,6 +105,7 @@ process.stdout.write(JSON.stringify({
             json.dumps(artifact),
             json.dumps(update_indexes or []),
             dom_mode,
+            shared_esc_prefix,
         ],
         input=harness,
         text=True,
@@ -122,6 +132,12 @@ def _tile(markup: str, tile_name: str, next_tile_name: str | None = None) -> str
             f'class="sec-p13-tile sec-p13-{next_tile_name}"', 1
         )[0]
     return fragment
+
+
+def _meter_attributes(markup: str) -> dict[str, str]:
+    match = re.search(r'<meter\b([^>]*)>', markup)
+    assert match, "missing rendered meter"
+    return dict(re.findall(r'(\w+)="([^"]*)"', match.group(1)))
 
 
 def _stylesheet_selectors(css: str) -> list[str]:
@@ -277,12 +293,15 @@ def test_p13_failed_ladder_surfaces_sentinel_and_withholds_voltage_evidence() ->
         "derived_Ed_V": {"FeO": 88.8},
         "certification": "diagnostic_uncertified",
         "authority": "static_fallback",
-        "status": "diagnostic_failed:solver_unavailable",
+        "status": 'diagnostic_failed:<img src=x onerror="boom">',
     }
     result = _run_panel({"timesteps": [{"summary": summary}]}, [0])
     html = result["updates"][0]
 
-    assert "diagnostic_failed:solver_unavailable" in html
+    assert (
+        "diagnostic_failed:&lt;img src=x onerror=&quot;boom&quot;&gt;" in html
+    )
+    assert '<img src=x onerror="boom">' not in html
     assert "diagnostic_uncertified" in html
     assert "static_fallback" in html
     assert "withheld because the emitted diagnostic status reports failure" in html
@@ -326,10 +345,87 @@ def test_p13_iw_is_absolute_and_delta_iw_stays_pending_without_emitted_offset() 
 
     assert "IW buffer log fO₂ -80" in redox
     assert "ΔIW not emitted" in redox
+    assert "ΔIW</dt><dd>not emitted</dd>" in redox
+    assert "ΔIW</dt><dd>70</dd>" not in redox
     assert "ΔIW -80" not in redox
     assert "ΔIW 70" not in redox
     assert "Native Fe 0.25 · event status not emitted" in redox
     assert "Native Fe 0.25 · ok" not in redox
+
+
+def test_p13_no_iron_status_keeps_sentinel_fractions_out_of_headline() -> None:
+    summary = _present_summary()
+    summary["fe_redox_split"] = {
+        "fO2_log": -10.0,
+        "iw_log": -80.0,
+        "status": "no_iron",
+        "source": "none:no_iron",
+        "fe3_over_sigma_fe": 0.0,
+        "ferric_frac": 0.0,
+        "ferrous_frac": 0.0,
+        "native_fe_frac": 0.0,
+    }
+    html = _run_panel({"timesteps": [{"summary": summary}]})["rendered"]
+    redox = _tile(html, "redox", "flow")
+    facts = re.findall(
+        r'<div class="sec-p13-fact">(.*?)</div>', redox, flags=re.DOTALL
+    )
+
+    assert facts == [
+        "Fe split: no iron (emitted status: no_iron)",
+        "Native Fe: no iron (emitted status: no_iron)",
+    ]
+    assert "Fe³⁺/ΣFe 0" not in " ".join(facts)
+    assert "Native Fe 0" not in " ".join(facts)
+    assert "Fe³⁺/ΣFe</dt><dd>0</dd>" in redox
+    assert "Native Fe fraction</dt><dd>0</dd>" in redox
+
+
+def test_p13_glanceable_ratio_binds_label_to_emitted_value() -> None:
+    html = _run_panel(
+        {"timesteps": [{"summary": _present_summary()}]}
+    )["rendered"]
+    redox = _tile(html, "redox", "flow")
+
+    assert _class_inner(redox, "sec-p13-fact") == "Fe³⁺/ΣFe 0.9984"
+
+
+def test_p13_partial_redox_object_discloses_missing_authority() -> None:
+    summary = _present_summary()
+    summary["fe_redox_split"] = {
+        "fO2_log": -10.0,
+        "iw_log": -80.0,
+        "status": "ok",
+    }
+    html = _run_panel({"timesteps": [{"summary": summary}]})["rendered"]
+    redox = _tile(html, "redox", "flow")
+
+    assert (
+        '<div class="sec-p13-chip-row" '
+        'aria-label="Emitted redox authority and uncertainty flags">'
+        '<span class="sec-p13-chip sec-p13-chip--pending">'
+        "authority not emitted</span></div>"
+    ) in redox
+    assert "authoritative: true" not in redox
+    assert "authoritative: false" not in redox
+
+
+def test_p13_missing_iw_log_stays_pending_in_headline_and_detail() -> None:
+    summary = _present_summary()
+    summary["fe_redox_split"] = {
+        "fO2_log": -9.0,
+        "status": "ok",
+    }
+    html = _run_panel({"timesteps": [{"summary": summary}]})["rendered"]
+    redox = _tile(html, "redox", "flow")
+    headline = re.search(
+        r'<div class="sec-p13-headline">(.*?)</div>', redox, flags=re.DOTALL
+    )
+    assert headline
+
+    assert "IW buffer log fO₂ not emitted" in headline.group(1)
+    assert "IW buffer log fO₂ 0" not in headline.group(1)
+    assert "IW buffer log fO₂</dt><dd>not emitted</dd>" in redox
 
 
 def test_p13_non_authoritative_voltage_keeps_species_flags() -> None:
@@ -372,6 +468,116 @@ def test_p13_missing_voltage_keeps_emitted_species_authority_and_status() -> Non
     assert "voltage status: decomposition_voltage_unavailable" in mre
 
 
+@pytest.mark.parametrize(
+    ("metadata_map", "missing_key"),
+    [
+        ("species", "voltage_authority"),
+        ("species", "voltage_authoritative"),
+        ("species", "status"),
+        ("non_authoritative_voltage_by_oxide", "authority"),
+        ("non_authoritative_voltage_by_oxide", "authoritative"),
+        ("non_authoritative_voltage_by_oxide", "status"),
+    ],
+)
+def test_p13_partial_voltage_metadata_preserves_each_emitted_flag(
+    metadata_map: str, missing_key: str
+) -> None:
+    summary = _present_summary()
+    diagnostic = summary["mre_ellingham_ladder_diagnostic"]
+    diagnostic["derived_Ed_V"] = {"FeO": 1.234}
+    if metadata_map == "species":
+        row = {
+            "voltage_authority": "ellingham_graph",
+            "voltage_authoritative": False,
+            "status": "ok",
+        }
+        diagnostic["species"] = {"FeO": row}
+        diagnostic.pop("non_authoritative_voltage_by_oxide", None)
+        labels = {
+            "voltage_authority": "voltage authority",
+            "voltage_authoritative": "voltage authoritative",
+            "status": "voltage status",
+        }
+    else:
+        row = {
+            "authority": "ellingham_fallback",
+            "authoritative": False,
+            "status": "fallback_only",
+        }
+        diagnostic.pop("species", None)
+        diagnostic["non_authoritative_voltage_by_oxide"] = {"FeO": row}
+        labels = {
+            "authority": "voltage authority",
+            "authoritative": "voltage authoritative",
+            "status": "voltage status",
+        }
+    row.pop(missing_key)
+
+    html = _run_panel({"timesteps": [{"summary": summary}]})["rendered"]
+    mre = _tile(html, "mre")
+
+    assert "FeO: voltage withheld" in mre
+    assert "FeO: 1.234 V" not in mre
+    for key, label in labels.items():
+        expected = "not emitted" if key == missing_key else str(row[key]).lower()
+        assert f"{label}: {expected}" in mre
+
+
+def test_p13_all_emitted_voltage_species_remain_visible() -> None:
+    summary = _present_summary()
+    diagnostic = summary["mre_ellingham_ladder_diagnostic"]
+    diagnostic["species"]["NiO"] = {
+        "voltage_authority": "nio_graph",
+        "voltage_authoritative": True,
+        "status": "nio_ok",
+    }
+    diagnostic["species"]["FeO"] = {
+        "voltage_authority": "feo_graph",
+        "voltage_authoritative": False,
+        "status": "feo_review",
+    }
+    html = _run_panel({"timesteps": [{"summary": summary}]})["rendered"]
+    mre = _tile(html, "mre")
+
+    derived = re.search(r"Derived Ed</dt><dd>(.*?)</dd>", mre, flags=re.DOTALL)
+    assert derived
+    assert derived.group(1).split("<br>") == [
+        "NiO: 4.752 V · voltage authority: nio_graph "
+        "· voltage authoritative: true · voltage status: nio_ok",
+        "FeO: 1.231 V · voltage authority: feo_graph "
+        "· voltage authoritative: false · voltage status: feo_review",
+    ]
+    assert {
+        row.split(":", 1)[0] for row in derived.group(1).split("<br>")
+    } == set(diagnostic["derived_Ed_V"])
+
+
+def test_p13_partial_diagnostic_discloses_missing_authority() -> None:
+    summary = _present_summary()
+    summary["mre_ellingham_ladder_diagnostic"] = {
+        "declared_rung_V": 4.75,
+        "certification": "diagnostic_uncertified",
+    }
+    html = _run_panel({"timesteps": [{"summary": summary}]})["rendered"]
+    mre = _tile(html, "mre")
+
+    assert "Ladder 4.75 V" in mre
+    assert "Authority</dt><dd>authority not emitted</dd>" in mre
+
+
+def test_p13_present_summary_without_campaign_stays_pending() -> None:
+    summary = _present_summary()
+    summary.pop("campaign")
+    html = _run_panel({"timesteps": [{"summary": summary}]})["rendered"]
+    mre = _tile(html, "mre")
+
+    assert (
+        '<div class="sec-p13-chip-row"><span class="sec-p13-chip">'
+        "Campaign: campaign not emitted</span></div>"
+    ) in mre
+    assert "Campaign: C5" not in mre
+
+
 def test_p13_partial_subtrees_withhold_absent_numbers_and_unqualified_voltage() -> None:
     summary = {
         "campaign": "C5",
@@ -398,7 +604,10 @@ def test_p13_partial_subtrees_withhold_absent_numbers_and_unqualified_voltage() 
     assert "Native Fe fraction</dt><dd>not emitted" in redox
     assert "Native Fe state not emitted" in redox
     assert "Ladder not emitted" in html
-    assert "FeO: voltage withheld; per-species authority/status not emitted" in html
+    assert "FeO: voltage withheld" in html
+    assert "voltage authority: not emitted" in html
+    assert "voltage authoritative: not emitted" in html
+    assert "voltage status: not emitted" in html
     assert "70 V" not in html
     assert "ΔIW 70" not in html
 
@@ -444,6 +653,31 @@ def test_p13_object_kn_does_not_infer_missing_regime() -> None:
     assert headline == "regime not emitted"
     assert "viscous / swept" not in headline
     assert "ballistic" not in headline
+
+
+@pytest.mark.parametrize("kn", [0.0, 0.0038201, 12.0])
+def test_p13_meter_value_tracks_emitted_kn(kn: float) -> None:
+    summary = _present_summary()
+    summary["Kn"] = kn
+    html = _run_panel({"timesteps": [{"summary": summary}]})["rendered"]
+    flow = _tile(html, "flow", "mre")
+    meter = _meter_attributes(flow)
+
+    assert float(meter["value"]) == kn
+
+
+def test_p13_transitional_meter_does_not_saturate_at_ballistic_endpoint() -> None:
+    summary = _present_summary()
+    summary["regime"] = "transitional"
+    summary["Kn"] = 7.188791553197268
+    html = _run_panel({"timesteps": [{"summary": summary}]})["rendered"]
+    flow = _tile(html, "flow", "mre")
+    meter = _meter_attributes(flow)
+
+    assert _class_inner(flow, "sec-p13-headline") == "transitional"
+    assert float(meter["value"]) == 7.188791553197268
+    assert float(meter["value"]) < float(meter["max"])
+    assert float(meter["high"]) == 10.0
 
 
 @pytest.mark.parametrize(
@@ -571,6 +805,18 @@ def test_p13_all_artifact_text_routes_escape_exactly_once() -> None:
         )
     )
     assert "&amp;lt;" not in html
+
+
+def test_p13_render_uses_shared_report_labels_escaper() -> None:
+    summary = _present_summary()
+    summary["campaign"] = "<campaign>"
+    html = _run_panel(
+        {"timesteps": [{"summary": summary}]},
+        shared_esc_prefix="shared-esc:",
+    )["rendered"]
+    mre = _tile(html, "mre")
+
+    assert "Campaign: shared-esc:&lt;campaign&gt;" in mre
 
 
 @pytest.mark.parametrize(

@@ -72,7 +72,10 @@
       </article>`;
     }
 
-    const ratio = hasNumber(redox.fe3_over_sigma_fe)
+    const noIron = redox.status === "no_iron";
+    const ratio = noIron
+      ? "Fe split: no iron (emitted status: no_iron)"
+      : hasNumber(redox.fe3_over_sigma_fe)
       ? `Fe³⁺/ΣFe ${numberText(redox.fe3_over_sigma_fe)}`
       : hasNumber(redox.ferric_frac) || hasNumber(redox.ferrous_frac)
         ? `Ferric ${numberText(redox.ferric_frac)} · ferrous ${numberText(redox.ferrous_frac)}`
@@ -80,7 +83,9 @@
     const nativeEvent = isObject(redox.native_fe_saturation_event)
       ? redox.native_fe_saturation_event
       : null;
-    const nativeState = hasNumber(redox.native_fe_frac) || nativeEvent
+    const nativeState = noIron
+      ? "Native Fe: no iron (emitted status: no_iron)"
+      : hasNumber(redox.native_fe_frac) || nativeEvent
       ? `Native Fe ${numberText(redox.native_fe_frac)} · event status${nativeEvent
         ? `: ${scalarValue(nativeEvent.native_fe_event_status)}`
         : " not emitted"}${nativeEvent && hasOwn(nativeEvent, "native_fe_event_reason")
@@ -153,7 +158,7 @@
     const knText = numberText(kn.value);
     const gauge = kn.state !== "number"
       ? `<div class="sec-p13-gauge sec-p13-gauge--pending" aria-label="Knudsen number ${esc(knText)}"></div>`
-      : `<meter class="sec-p13-gauge" min="0" max="1" low="0.01" high="0.1" optimum="0" value="${esc(String(kn.value))}" aria-label="Emitted Knudsen number ${esc(String(kn.value))}; low is the viscous end and high is the ballistic end"></meter>`;
+      : `<meter class="sec-p13-gauge" min="0" max="10" low="0.01" high="10" optimum="0" value="${esc(String(kn.value))}" aria-label="Emitted Knudsen number ${esc(String(kn.value))}; low is the viscous end and high is the ballistic end"></meter>`;
     const formula = scalarValue(summary?.transport_formula_id);
 
     return `<article class="sec-p13-tile sec-p13-flow" aria-labelledby="sec-p13-flow-title">
@@ -172,11 +177,11 @@
   function voltageMetadata(diagnostic, species) {
     const speciesRows = isObject(diagnostic.species) ? diagnostic.species : null;
     const speciesRow = speciesRows && isObject(speciesRows[species]) ? speciesRows[species] : null;
-    if (speciesRow
-      && hasOwn(speciesRow, "voltage_authority")
-      && hasOwn(speciesRow, "voltage_authoritative")
-      && hasOwn(speciesRow, "status")) {
+    if (speciesRow) {
       return {
+        complete: hasOwn(speciesRow, "voltage_authority")
+          && hasOwn(speciesRow, "voltage_authoritative")
+          && hasOwn(speciesRow, "status"),
         authority: speciesRow.voltage_authority,
         authoritative: speciesRow.voltage_authoritative,
         status: speciesRow.status
@@ -188,12 +193,15 @@
     const fallbackRow = fallbackRows && isObject(fallbackRows[species])
       ? fallbackRows[species]
       : null;
-    return fallbackRow
-      && hasOwn(fallbackRow, "authority")
-      && hasOwn(fallbackRow, "authoritative")
-      && hasOwn(fallbackRow, "status")
-      ? fallbackRow
-      : null;
+    if (!fallbackRow) return null;
+    return {
+      complete: hasOwn(fallbackRow, "authority")
+        && hasOwn(fallbackRow, "authoritative")
+        && hasOwn(fallbackRow, "status"),
+      authority: fallbackRow.authority,
+      authoritative: fallbackRow.authoritative,
+      status: fallbackRow.status
+    };
   }
 
   function derivedVoltageDetail(diagnostic) {
@@ -207,14 +215,12 @@
     return entries.map(([species, voltage]) => {
       const label = esc(prettySpecies(species));
       const emittedMetadata = voltageMetadata(diagnostic, species);
-      const metadataText = emittedMetadata
-        ? ` · voltage authority: ${scalarValue(emittedMetadata.authority)}`
-          + ` · voltage authoritative: ${scalarValue(emittedMetadata.authoritative)}`
-          + ` · voltage status: ${scalarValue(emittedMetadata.status)}`
-        : "";
+      const metadataText = ` · voltage authority: ${scalarValue(emittedMetadata?.authority)}`
+        + ` · voltage authoritative: ${scalarValue(emittedMetadata?.authoritative)}`
+        + ` · voltage status: ${scalarValue(emittedMetadata?.status)}`;
       if (!hasNumber(voltage)) return `${label}: ${numberText(voltage, "V")}${metadataText}`;
-      if (!emittedMetadata) {
-        return `${label}: voltage withheld; per-species authority/status not emitted`;
+      if (!emittedMetadata?.complete) {
+        return `${label}: voltage withheld${metadataText}`;
       }
       return `${label}: ${numberText(voltage, "V")}${metadataText}`;
     }).join("<br>");
@@ -225,8 +231,11 @@
       ? detailRow("Voltage evidence", "withheld because the emitted diagnostic status reports failure")
       : detailRow("Declared rung", numberText(diagnostic.declared_rung_V, "V"))
         + detailRow("Derived Ed", derivedVoltageDetail(diagnostic));
+    const authority = detailRow(
+      "Authority",
+      scalarValue(diagnostic.authority, "authority not emitted")
+    );
     const metadata = [
-      ["Authority", "authority"],
       ["Status", "status"],
       ["Source", "source"],
       ["Reference", "reference"],
@@ -235,7 +244,7 @@
     ].filter(([, key]) => hasOwn(diagnostic, key))
       .map(([label, key]) => detailRow(label, scalarValue(diagnostic[key])))
       .join("");
-    return voltageRows + metadata;
+    return voltageRows + authority + metadata;
   }
 
   function mreTile(summary) {
