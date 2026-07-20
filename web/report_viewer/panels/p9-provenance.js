@@ -154,11 +154,18 @@
     ).join("")}</ul>`;
   }
 
-  function treeValue(value, keyHint = "value") {
-    const label = humanize(keyHint);
-    if (value === null && keyHint === "fallback") return empty("No fallback provider in emitted field");
-    if (value === null && keyHint === "authoritative") return empty("No authoritative provider in emitted field");
-    if (value === null || value === undefined || value === "") return pending(`${label} emitted without a value`);
+  function isProviderSlotPath(path) {
+    return path.length === 4 && path[0] === "engines_used" && path[1] === "registry"
+      && (path[3] === "authoritative" || path[3] === "fallback");
+  }
+
+  function treeValue(value, keyHint = "value", path = [String(keyHint)]) {
+    const providerSlot = isProviderSlotPath(path);
+    const label = keyHint === "authoritative" && !providerSlot ? "Authoritative" : humanize(keyHint);
+    if (value === null && providerSlot && keyHint === "fallback") return empty("No fallback provider in emitted field");
+    if (value === null && providerSlot && keyHint === "authoritative") return empty("No authoritative provider in emitted field");
+    if (value === null) return pending(`${label} emitted as null`);
+    if (value === undefined || value === "") return pending(`${label} emitted without a value`);
     if (typeof value === "string") {
       return /(?:sha|hash|digest|commit)/i.test(String(keyHint))
         ? identifierValue(value, label)
@@ -168,14 +175,18 @@
     if (hasNumber(value)) return `<span class="sec-p9-mono-value">${esc(fmtNum(value))}</span>`;
     if (Array.isArray(value)) {
       if (!value.length) return empty("Emitted list is empty");
-      return `<ul class="sec-p9-tree-list">${value.map((item) => `<li>${treeValue(item, keyHint)}</li>`).join("")}</ul>`;
+      return `<ul class="sec-p9-tree-list">${value.map((item) => `<li>${treeValue(item, keyHint, path)}</li>`).join("")}</ul>`;
     }
     if (isRecord(value)) {
       const entries = Object.entries(value);
       if (!entries.length) return empty("Emitted map is empty");
-      return `<dl class="sec-p9-tree">${entries.map(([key, item]) =>
-        `<div><dt>${esc(key === "authoritative" && typeof item === "boolean" ? "Authoritative" : humanize(key))}</dt><dd>${treeValue(item, key)}</dd></div>`
-      ).join("")}</dl>`;
+      return `<dl class="sec-p9-tree">${entries.map(([key, item]) => {
+        const childPath = [...path, key];
+        const childLabel = key === "authoritative" && !isProviderSlotPath(childPath)
+          ? "Authoritative"
+          : humanize(key);
+        return `<div><dt>${esc(childLabel)}</dt><dd>${treeValue(item, key, childPath)}</dd></div>`;
+      }).join("")}</dl>`;
     }
     return pending(`${label} is malformed`);
   }

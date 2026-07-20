@@ -6,7 +6,7 @@ import re
 import subprocess
 
 
-def _render_panel(artifact: object) -> str:
+def _render_panel(artifact: object, *, species_color_spy_prefix: str = "") -> str:
     root = Path(__file__).resolve().parents[1] / "web/report_viewer"
     harness = r"""
 const fs = require("fs");
@@ -15,6 +15,13 @@ const context = { console };
 context.globalThis = context;
 vm.createContext(context);
 vm.runInContext(fs.readFileSync(process.argv[2], "utf8"), context);
+if (process.argv[5]) {
+  const prefix = process.argv[5];
+  context.ReportLabels = Object.freeze({
+    ...context.ReportLabels,
+    speciesColor: (species) => `${prefix}${species}`,
+  });
+}
 vm.runInContext(fs.readFileSync(process.argv[3], "utf8"), context);
 const panel = context.ReportPanels.find((item) => item.id === "sec-p9-provenance");
 process.stdout.write(panel.render(JSON.parse(process.argv[4]), [], [], {}));
@@ -26,28 +33,8 @@ process.stdout.write(panel.render(JSON.parse(process.argv[4]), [], [], {}));
             str(root / "labels.js"),
             str(root / "panels/p9-provenance.js"),
             json.dumps(artifact),
+            species_color_spy_prefix,
         ],
-        input=harness,
-        text=True,
-        capture_output=True,
-        check=True,
-    )
-    return completed.stdout
-
-
-def _shared_species_color(species: str) -> str:
-    root = Path(__file__).resolve().parents[1] / "web/report_viewer"
-    harness = r"""
-const fs = require("fs");
-const vm = require("vm");
-const context = { console };
-context.globalThis = context;
-vm.createContext(context);
-vm.runInContext(fs.readFileSync(process.argv[2], "utf8"), context);
-process.stdout.write(context.ReportLabels.speciesColor(process.argv[3]));
-"""
-    completed = subprocess.run(
-        ["node", "-", str(root / "labels.js"), species],
         input=harness,
         text=True,
         capture_output=True,
@@ -177,6 +164,7 @@ def test_p9_real_run_renders_complete_provenance() -> None:
     assert _badge_value(html, "Runtime status") == "ok"
     assert "Yes <small>(emitted)</small>" in _badge_value(html, "Real engine active")
     assert "sec-p9-badge-positive" in _badge_region(html, "Real engine active")
+    assert _badge_value(html, "Evidence class") == "magemin"
     assert _detail_value(run_input, "Charge mass") == "125.5 kg"
     assert "1.25 kg" in _detail_value(run_input, "Additives")
     assert "0.5 kg" in _detail_value(run_input, "Additives")
@@ -185,13 +173,18 @@ def test_p9_real_run_renders_complete_provenance() -> None:
     assert "01234567…" in run_sha and f'title="{sha}"' in run_sha
     assert 'tabindex="0"' in run_sha
     assert _detail_value(backend, "Backend status") == "ok"
+    assert _detail_value(backend, "Evidence class") == "magemin"
     assert _detail_value(backend, "Backend authoritative") == "true"
     assert _detail_value(backend, "Certification allowed") == "true"
     assert "Degradation reason not emitted" in _detail_value(backend, "Degradation reason")
     assert "Degraded from not emitted" in _detail_value(backend, "Degraded from")
     assert "sec-p9-state-context" not in html
     assert f'title="{sha}"' in _detail_value(identity, "Kernel commit SHA")
+    assert _detail_value(identity, "Cache version") == "magemin-7.2"
+    assert _detail_value(identity, "Backend wire token") == "magemin"
     assert "builtin-vapor-pressure" in _detail_value(engine_chain, "Vapor Pressure")
+    requested = _detail_value(engine_chain, "Requested providers")
+    assert _detail_value(requested, "Gate Liquid Fraction") == '<span class="sec-p9-mono-value">magemin</span>'
     assert "magemin" in _detail_value(engine_chain, "Authoritative provider")
     assert "alphamelts" in _detail_value(engine_chain, "Shadow providers")
     assert "No fallback provider in emitted field" in engine_chain
@@ -223,6 +216,7 @@ def test_p9_degraded_run_keeps_reason_and_origin_and_never_claims_grounded() -> 
 
     assert _badge_value(html, "Backend") == "internal-analytical"
     assert _badge_value(html, "Backend status") == "unavailable"
+    assert _badge_value(html, "Evidence class") == "internal-analytical"
     assert "No <small>(emitted)</small>" in _badge_value(html, "Real engine active")
     assert "sec-p9-badge-caution" in _badge_region(html, "Real engine active")
     assert "sec-p9-badge-positive" not in _badge_region(html, "Real engine active")
@@ -234,6 +228,7 @@ def test_p9_degraded_run_keeps_reason_and_origin_and_never_claims_grounded() -> 
     assert "legacy_backend_authoritative" in _detail_value(backend, "Label sources")
     assert _detail_value(backend, "Backend authoritative") == "false"
     assert _detail_value(backend, "Certification allowed") == "false"
+    assert _detail_value(backend, "Evidence class") == "internal-analytical"
     assert "Yes <small>(emitted)</small>" not in html
 
 
@@ -301,6 +296,55 @@ def test_p9_engine_identity_preserves_authority_uncertainty_and_escapes() -> Non
     assert "&lt;img src=x onerror=&quot;bad()&quot;&gt;" in html
     assert "<script>" not in html and "<img" not in html
     assert "[object Object]" not in html
+
+
+def test_p9_nullable_authority_flags_do_not_claim_provider_absence() -> None:
+    html = _render_panel({
+        "header": {
+            "engine_identity": {
+                "name": "state-check",
+                "authoritative": None,
+                "fallback": None,
+            }
+        },
+        "terminal": {
+            "run_metadata": {
+                "contributors": [{"authoritative": None, "fallback": None}],
+                "engines_used": {
+                    "registry": {
+                        "gate_liquid_fraction": {
+                            "authoritative": None,
+                            "fallback": None,
+                            "shadows": [],
+                        }
+                    }
+                },
+            }
+        },
+    })
+    identity = _article(html, "Artifact engine identity")
+    backend = _article(html, "Backend evidence &amp; degradation")
+    contributors = _detail_value(backend, "Contributors")
+    engine_chain = _article(html, "Engine chain")
+
+    identity_authority = _detail_value(identity, "Authoritative")
+    identity_fallback = _detail_value(identity, "Fallback provider")
+    contributor_authority = _detail_value(contributors, "Authoritative")
+    contributor_fallback = _detail_value(contributors, "Fallback provider")
+    assert "Authoritative emitted as null" in identity_authority
+    assert "Authoritative emitted as null" in contributor_authority
+    assert "Fallback provider emitted as null" in identity_fallback
+    assert "Fallback provider emitted as null" in contributor_fallback
+    assert "No authoritative provider" not in identity_authority
+    assert "No authoritative provider" not in contributor_authority
+    assert "No fallback provider" not in identity_fallback
+    assert "No fallback provider" not in contributor_fallback
+    assert "No authoritative provider in emitted field" in _detail_value(
+        engine_chain, "Authoritative provider"
+    )
+    assert "No fallback provider in emitted field" in _detail_value(
+        engine_chain, "Fallback provider"
+    )
 
 
 def test_p9_partial_fields_are_not_inferred_from_related_values() -> None:
@@ -513,6 +557,41 @@ def test_p9_list_values_are_escaped_exactly_once() -> None:
     assert "&amp;lt;" not in origin and "&amp;lt;" not in sources
 
 
+def test_p9_dynamic_keys_and_identifier_attributes_are_escaped_exactly_once() -> None:
+    hostile_species = "<img src=x onerror=bad()>"
+    hostile_intent = "<img src=x onerror=bad()>"
+    hostile_sha = '" onmouseover="bad()'
+    html = _render_panel({
+        "header": {
+            "engine_identity": {
+                "name": "state-check",
+                "kernel_commit_sha": hostile_sha,
+            }
+        },
+        "terminal": {
+            "run_metadata": {
+                "additives_kg": {hostile_species: 1.0},
+                "engines_used": {"requested": {hostile_intent: "magemin"}},
+            }
+        },
+    })
+    run_input = _article(html, "Run input provenance")
+    additives = _detail_value(run_input, "Additives")
+    identity = _article(html, "Artifact engine identity")
+    identifier = _detail_value(identity, "Kernel commit SHA")
+    engine_chain = _article(html, "Engine chain")
+    requested = _detail_value(engine_chain, "Requested providers")
+
+    assert "&lt;img src=x onerror=bad()&gt;" in additives
+    assert "1 kg" in additives
+    assert "<img" not in additives and "&amp;lt;" not in additives
+    assert 'title="&quot; onmouseover=&quot;bad()"' in identifier
+    assert 'title="" onmouseover="bad()"' not in identifier
+    assert "&amp;quot;" not in identifier
+    assert "&lt;Img Src=X Onerror=Bad()&gt;" in requested
+    assert "<img" not in requested.lower() and "&amp;lt;" not in requested
+
+
 def test_p9_optional_trust_fields_survive_with_emitted_values() -> None:
     html = _render_panel({
         "header": {"engine_identity": {"name": "magemin"}},
@@ -547,6 +626,16 @@ def test_p9_optional_trust_fields_survive_with_emitted_values() -> None:
     assert _detail_value(contributors, "Authoritative") == '<span class="sec-p9-mono-value">false</span>'
     assert _detail_value(contributors, "Diagnostic only") == '<span class="sec-p9-mono-value">true</span>'
     assert "<unsafe>" not in contributors and "&amp;lt;" not in contributors
+    assert "Evidence class not emitted" in _badge_value(html, "Evidence class")
+    assert "Evidence class not emitted" in _detail_value(backend, "Evidence class")
+    assert "melts" not in _detail_value(backend, "Evidence class")
+    assert "Real engine active not emitted" in _badge_value(html, "Real engine active")
+    assert "Real engine active not emitted" in _detail_value(backend, "Real engine active")
+    assert "false" not in _detail_value(backend, "Real engine active")
+    assert "Label source not emitted" in _detail_value(backend, "Label source")
+    assert "backend&lt;unsafe&gt;" not in _detail_value(backend, "Label source")
+    assert "Backend authoritative not emitted" in _detail_value(backend, "Backend authoritative")
+    assert "false" not in _detail_value(backend, "Backend authoritative")
 
 
 def test_p9_summary_chrome_has_exact_emitted_field_contract() -> None:
@@ -568,9 +657,10 @@ def test_p9_summary_chrome_has_exact_emitted_field_contract() -> None:
     chrome = _summary_chrome(html)
 
     assert _badge_labels(html) == expected_labels
-    assert chrome.startswith('<div class="sec-p9-badges">')
-    assert chrome.endswith("</div>")
-    assert chrome.count("<div") == 1
+    expected_chrome = '<div class="sec-p9-badges">' + "".join(
+        _badge_region(html, label) for label in expected_labels
+    ) + "</div>"
+    assert chrome == expected_chrome
 
 
 def test_p9_top_level_malformed_artifacts_render_pending() -> None:
@@ -590,12 +680,13 @@ def test_p9_top_level_malformed_artifacts_render_pending() -> None:
 def test_p9_additive_colors_use_shared_species_palette() -> None:
     html = _render_panel({
         "header": {"engine_identity": {"name": "magemin"}},
-        "terminal": {"run_metadata": {"additives_kg": {"C": 1.25, "Mg": 0.5}}},
-    })
+        "terminal": {"run_metadata": {"additives_kg": {"C": 1.25, "Mg": 0.5, "Fe": 0.25}}},
+    }, species_color_spy_prefix="sentinel-color-")
     additives = _detail_value(_article(html, "Run input provenance"), "Additives")
 
-    assert f'style="--species-color:{_shared_species_color("C")}"' in additives
-    assert f'style="--species-color:{_shared_species_color("Mg")}"' in additives
+    assert 'style="--species-color:sentinel-color-C"' in additives
+    assert 'style="--species-color:sentinel-color-Mg"' in additives
+    assert 'style="--species-color:sentinel-color-Fe"' in additives
 
 
 def test_p9_related_fields_do_not_fill_missing_provenance() -> None:
