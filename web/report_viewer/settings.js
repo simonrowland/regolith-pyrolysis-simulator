@@ -1,6 +1,6 @@
 "use strict";
 
-const { fmtNum, fmtRunId, prettySpecies } = globalThis.ReportLabels;
+const { scalarText, fmtNum, fmtRunId, prettySpecies, esc } = globalThis.ReportLabels;
 const RUN_ID = new URLSearchParams(window.location.search).get("run");
 const RUN_QUERY = RUN_ID ? `?run=${encodeURIComponent(RUN_ID)}` : "";
 const ARTIFACT_URL = RUN_ID
@@ -14,9 +14,6 @@ const ENGINE_IDENTITY_LABELS = Object.freeze({
   cache_version: "Engine cache version"
 });
 const $ = (selector, root = document) => root.querySelector(selector);
-const esc = (value) => String(value ?? "—").replace(/[&<>'"]/g, (character) => ({
-  "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
-}[character]));
 const hasNumber = (value) => typeof value === "number" && Number.isFinite(value);
 const displayNumber = (value, unit = "") => hasNumber(value)
   ? `<span title="${esc(`${String(value)}${unit ? ` ${unit}` : ""}`)}">${esc(fmtNum(value, unit))}</span>`
@@ -68,6 +65,11 @@ function formatScalar(value) {
 const IDENTITY_MAX = 60;
 
 function formatIdentityScalar(value) {
+  if (value !== null && typeof value === "object") {
+    let raw = "";
+    try { raw = JSON.stringify(value); } catch (_error) { raw = ""; }
+    return `<span${raw ? ` title="${esc(raw)}"` : ""}>${esc(scalarText(value))}</span>`;
+  }
   if (typeof value !== "string" || isHashLike(value) || value.length <= IDENTITY_MAX) {
     return formatScalar(value);
   }

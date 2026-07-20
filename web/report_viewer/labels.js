@@ -47,10 +47,10 @@
 
   // These helpers stringify their input, so a non-scalar would surface as
   // "[object Object]" inside a label. Malformed data says so instead.
-  function scalarText(value) {
+  function scalarText(value, missing = "—") {
     return value !== null && typeof value === "object"
       ? `malformed (${Array.isArray(value) ? "array" : "object"})`
-      : value;
+      : String(value ?? missing);
   }
 
   function fmtNum(value, unit = "") {
@@ -64,13 +64,13 @@
   }
 
   function fmtRunId(id) {
-    const value = String(scalarText(id) ?? "");
+    const value = scalarText(id, "");
     const hashLike = /^(?:[0-9a-f]{24,}|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i;
     return hashLike.test(value) ? `${value.slice(0, 8)}…` : value;
   }
 
   function prettySpecies(name) {
-    const value = String(scalarText(name) ?? "");
+    const value = scalarText(name, "");
     if (!/^(?:[A-Z][a-z]?\d*)+$/.test(value)) return value;
     return value.replace(/\d/g, (digit) => SUBSCRIPTS[digit]);
   }
@@ -79,7 +79,7 @@
     // Return the marker verbatim — the title-casing below would render it as
     // "Malformed (Object)" and break the shared vocabulary.
     if (account !== null && typeof account === "object") return scalarText(account);
-    const value = String(account ?? "");
+    const value = scalarText(account, "");
     if (ACCOUNT_LABELS[value]) return ACCOUNT_LABELS[value];
     const wallSegment = value.match(/^process\.wall_deposit_segment_stage_(\d+)_to_stage_(\d+)$/);
     if (wallSegment) return `Wall deposit · stage ${wallSegment[1]}→${wallSegment[2]}`;
@@ -94,7 +94,7 @@
   function prettyFeedstock(id) {
     // As accountLabel: the title-casing below would corrupt the marker.
     if (id !== null && typeof id === "object") return scalarText(id);
-    const value = String(id ?? "").trim();
+    const value = scalarText(id, "").trim();
     if (!value) return "not emitted";
     return value
       .replace(/[_-]+/g, " ")
@@ -105,7 +105,7 @@
 
   // Subscript digits inside free-text chemical tokens (O2 → O₂) without inventing species.
   function prettyChemText(text) {
-    return String(scalarText(text) ?? "").replace(/\b(?:[A-Z][a-z]?\d*)+\b/g, (token) => prettySpecies(token));
+    return scalarText(text, "").replace(/\b(?:[A-Z][a-z]?\d*)+\b/g, (token) => prettySpecies(token));
   }
 
   // One stable species colour grammar for every panel (bars, ribbons, chips, stage fills).
@@ -133,12 +133,12 @@
   // modules (loaded separately from report-viewer.js) reach the SAME helper instead of
   // redefining a security primitive. Matches the shell's local esc() byte-for-byte.
   function esc(value) {
-    return String(value ?? "—").replace(/[&<>'"]/g, (character) => ({
+    return scalarText(value).replace(/[&<>'"]/g, (character) => ({
       "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
     }[character]));
   }
 
   root.ReportLabels = Object.freeze({
-    fmtNum, fmtRunId, prettySpecies, accountLabel, prettyFeedstock, prettyChemText, speciesColor, esc
+    scalarText, fmtNum, fmtRunId, prettySpecies, accountLabel, prettyFeedstock, prettyChemText, speciesColor, esc
   });
 }(globalThis));

@@ -110,6 +110,39 @@ def _render_report_html(artifact: dict) -> str:
     return str(_render_report_state(artifact)["html"])
 
 
+def _run_viewer_expression(script_name: str, expression: str):
+    root = Path(__file__).resolve().parents[1] / "web/report_viewer"
+    harness = r"""
+const fs = require("fs");
+const vm = require("vm");
+const context = {
+  window: { location: { search: "", href: "" } },
+  document: { title: "", querySelector() { return null; }, querySelectorAll() { return []; } },
+  URLSearchParams,
+  encodeURIComponent,
+  fetch: () => new Promise(() => {}),
+  console,
+  setTimeout
+};
+context.globalThis = context;
+vm.createContext(context);
+vm.runInContext(fs.readFileSync(process.argv[2], "utf8"), context);
+vm.runInContext(fs.readFileSync(process.argv[3], "utf8"), context);
+process.stdout.write(JSON.stringify(vm.runInContext(process.argv[4], context)));
+"""
+    completed = subprocess.run(
+        [
+            "node", "-", str(root / "labels.js"),
+            str(root / script_name), expression,
+        ],
+        input=harness,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    return json.loads(completed.stdout)
+
+
 def test_report_viewer_serves_index_and_assets(tmp_path: Path) -> None:
     client = _app(tmp_path).test_client()
 
@@ -1300,6 +1333,48 @@ def test_report_viewer_guards_hours_and_absent_value_qualifiers() -> None:
     assert "not emitted peak" not in html
     assert '<th>Mass-balance residual</th><td class="mono">not emitted</td>' in html
     assert "not emitted · final-hour percent" not in html
+
+
+def test_shared_escape_marks_non_scalars_across_viewer_modules() -> None:
+    values = {
+        script: _run_viewer_expression(
+            script,
+            '[ReportLabels.esc({bad: 1}), esc({bad: 1}), esc([1, 2])]',
+        )
+        for script in ("report-viewer.js", "library.js", "settings.js")
+    }
+
+    for escaped in values.values():
+        assert escaped == [
+            "malformed (object)",
+            "malformed (object)",
+            "malformed (array)",
+        ]
+
+
+def test_non_scalar_engine_identity_preserves_raw_tooltip() -> None:
+    raw = '{&quot;path&quot;:&quot;/tmp/cache&quot;}'
+    report_value = _run_viewer_expression(
+        "report-viewer.js", 'identitySpan({path: "/tmp/cache"})',
+    )
+    settings_value = _run_viewer_expression(
+        "settings.js", 'formatIdentityScalar({path: "/tmp/cache"})',
+    )
+
+    for rendered in (report_value, settings_value):
+        assert "malformed (object)" in rendered
+        assert f'title="{raw}"' in rendered
+        assert "[object Object]" not in rendered
+
+
+def test_settings_recipe_pins_use_shared_scalar_guard() -> None:
+    rendered = _run_viewer_expression(
+        "settings.js",
+        'recipeSnapshotBlock({recipe_schema_version: "v1", pins: [{bad: 1}], setpoints_patch: {}})',
+    )
+
+    assert "malformed (object)" in rendered
+    assert "[object Object]" not in rendered
 
 
 def test_report_viewer_section_order_and_stepper_controls() -> None:

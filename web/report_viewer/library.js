@@ -1,6 +1,6 @@
 "use strict";
 
-const { fmtNum, fmtRunId, prettySpecies, prettyFeedstock } = globalThis.ReportLabels;
+const { scalarText, fmtNum, fmtRunId, prettySpecies, prettyFeedstock, esc } = globalThis.ReportLabels;
 const LIVE_RUNS_URL = "/api/runs";
 const STATIC_RUNS_URL = "./runs-index.json";
 const SYSTEM_FOLDERS = ["All", "Favorites", "My runs", "Default runs", "Bootstrap ladder"];
@@ -9,14 +9,6 @@ const isHashLike = (value) => typeof value === "string"
   && /^(?:[0-9a-f]{24,}|[0-9a-f]{8}-[0-9a-f-]{27,})$/i.test(value.trim());
 
 const $ = (selector, root = document) => root.querySelector(selector);
-// Matches report-viewer: a non-scalar where text was expected is malformed
-// index data and says so, rather than coercing to "[object Object]" on screen.
-const scalarText = (value) => value !== null && typeof value === "object"
-  ? `malformed (${Array.isArray(value) ? "array" : "object"})`
-  : String(value ?? "—");
-const esc = (value) => scalarText(value).replace(/[&<>'"]/g, (character) => ({
-  "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
-}[character]));
 const hasNumber = (value) => typeof value === "number" && Number.isFinite(value);
 const exactNumber = (value, unit) => hasNumber(value)
   ? `<span title="${esc(`${String(value)}${unit ? ` ${unit}` : ""}`)}">${esc(fmtNum(value, unit))}</span>`

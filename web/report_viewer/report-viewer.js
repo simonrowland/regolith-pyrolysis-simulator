@@ -1,6 +1,6 @@
 "use strict";
 
-const { fmtNum, fmtRunId, prettySpecies, accountLabel, prettyFeedstock, prettyChemText, speciesColor } = globalThis.ReportLabels;
+const { scalarText, fmtNum, fmtRunId, prettySpecies, accountLabel, prettyFeedstock, prettyChemText, speciesColor, esc } = globalThis.ReportLabels;
 const RUN_ID = new URLSearchParams(window.location.search).get("run");
 const RUN_QUERY = RUN_ID ? `?run=${encodeURIComponent(RUN_ID)}` : "";
 const ARTIFACT_URL = RUN_ID
@@ -20,15 +20,6 @@ const DISPOSITION_GROUPS = Object.freeze([
 ]);
 
 const $ = (selector, root = document) => root.querySelector(selector);
-// String coercion turns an object into "[object Object]" on screen — the text
-// twin of the strictMol number problem. A non-scalar where text was expected is
-// malformed data, and says so; it is never rendered as if it were a value.
-const scalarText = (value) => value !== null && typeof value === "object"
-  ? `malformed (${Array.isArray(value) ? "array" : "object"})`
-  : String(value ?? "—");
-const esc = (value) => scalarText(value).replace(/[&<>'"]/g, (c) => ({
-  "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
-}[c]));
 // Accept ONLY a real finite number — never coerce. JS Number() turns true→1, false→0, []→0,
 // "  "→0, "12"→12, so the old `Number.isFinite(Number(v))` gate let booleans/arrays/blank strings
 // through the kg/energy/sum paths and fabricated a confident "0 kg O₂" / "1 kg Fe" / energy total.
@@ -82,6 +73,11 @@ const accountSpan = (value) => `<span title="${esc(value)}">${esc(accountLabel(v
 // nothing emitted is lost.
 const IDENTITY_MAX = 44;
 const identitySpan = (value) => {
+  if (value !== null && typeof value === "object") {
+    let raw = "";
+    try { raw = JSON.stringify(value); } catch (_error) { raw = ""; }
+    return `<span${raw ? ` title="${esc(raw)}"` : ""}>${esc(scalarText(value))}</span>`;
+  }
   const text = scalarText(value);
   if (isHashLike(text)) return runIdSpan(text);
   return text.length > IDENTITY_MAX
