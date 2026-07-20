@@ -1618,6 +1618,30 @@ def test_absent_cost_totals_are_labeled_viewer_computed_estimate() -> None:
     assert "binds terminal.cost_totals" in canonical_html
 
 
+def test_incomplete_cost_inputs_stay_pending_without_estimate_label() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["header"]["cost_block"] = {
+        "electrical_cost_per_kWh": 10.0,
+    }
+    artifact["timesteps"] = [
+        {
+            "hour": 1,
+            "summary": {
+                "campaign": "C0",
+                "energy_electrical_kWh": 1.0,
+                "energy_evaporation_thermal_kWh": 2.0,
+            },
+            "ledger": {},
+        }
+    ]
+
+    html = _render_report_html(artifact)
+
+    assert "Pending cost estimate" in html
+    assert "viewer-computed estimate" not in html
+    assert "Total not emitted" not in html
+
+
 def test_absent_energy_avoids_broken_cost_formula() -> None:
     artifact = _artifact(recipe_snapshot=None)
     artifact["header"]["cost_block"] = {
