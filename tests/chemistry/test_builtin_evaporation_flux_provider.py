@@ -71,7 +71,7 @@ def _series_resistance_reference_flux(
     feeds the helper the right per-species args and reproduces its result -- NOT
     that the series-resistance MATH is independently correct. The math's
     first-principles properties (free-molecular limit, alpha_eff<=alpha_i,
-    double-count guard, stir saturation, Fuchs-Sutugin transition) are pinned
+    double-count guard, stir saturation, and vacuum gas-film limit) are pinned
     independently in ``tests/chemistry/test_evaporation_series_resistance_flux.py``.
     """
 
@@ -128,15 +128,15 @@ def _series_resistance_reference_flux(
             carrier_gas=carrier_gas,
             T_gas_K=float(getattr(sim.overhead, "headspace_temperature_K", 0.0) or T_K),
             melt_resistance_enabled=bool(
-                series_config.get("melt_resistance_enabled", True)
+                series_config.get("melt_resistance_enabled", False)
             ),
             melt_surface_renewal_base_kg_s_m2_pa=float(
-                series_config.get("melt_surface_renewal_base_kg_s_m2_pa", 1.0e-4)
+                series_config.get("melt_surface_renewal_base_kg_s_m2_pa", 0.0)
             ),
             melt_surface_renewal_source=str(
                 series_config.get(
                     "melt_surface_renewal_source",
-                    "owner-ratify:melt-side-surface-renewal-v1",
+                    "disabled:missing-species-state-dependent-melt-transfer-inputs",
                 )
             ),
             gas_resistance_enabled=bool(
@@ -217,6 +217,7 @@ def test_kernel_filters_provider_to_cleaned_melt_only(
             temperature_C=1400.0,
             pressure_bar=1e-6,
             control_inputs={
+                'overhead_pressure_pa': 0.0,
                 'vapor_pressures_Pa': {},
                 'overhead_partials_Pa': {},
                 'molar_mass_kg_mol': {},
@@ -260,6 +261,7 @@ def test_provider_emits_no_ledger_transition():
         pressure_bar=1e-6,
         fO2_log=None,
         control_inputs={
+            'overhead_pressure_pa': 0.0,
             'vapor_pressures_Pa': {'Na': 100.0},
             'overhead_partials_Pa': {},
             'molar_mass_kg_mol': {'Na': 0.023},
@@ -361,6 +363,7 @@ def test_provider_attaches_numerator_provenance_and_resistance_shares():
         pressure_bar=1e-6,
         fO2_log=None,
         control_inputs={
+            'overhead_pressure_pa': 0.0,
             'vapor_pressures_Pa': {'Na': 20.0},
             'vapor_pressures_source': {
                 'Na': 'builtin_authoritative:backsolved_vaporock_curve_fit',
@@ -560,6 +563,7 @@ def test_provider_matches_safarian_engh_pure_si_hkl_mass_flux():
         pressure_bar=1e-6,
         fO2_log=None,
         control_inputs={
+            'overhead_pressure_pa': 0.0,
             'vapor_pressures_Pa': {'Si': 0.27728678068938384},
             'overhead_partials_Pa': {'Si': 0.0},
             'molar_mass_kg_mol': {'Si': 0.02809},
@@ -629,6 +633,7 @@ def test_provider_skips_species_without_grounded_molar_mass():
         pressure_bar=1e-6,
         fO2_log=None,
         control_inputs={
+            'overhead_pressure_pa': 0.0,
             **base_controls,
             'vapor_pressures_Pa': {'Na': 100.0},
         },
@@ -640,6 +645,7 @@ def test_provider_skips_species_without_grounded_molar_mass():
         pressure_bar=1e-6,
         fO2_log=None,
         control_inputs={
+            'overhead_pressure_pa': 0.0,
             **base_controls,
             'vapor_pressures_Pa': {'Na': 100.0, 'Unobtainium': 100.0},
         },
@@ -683,6 +689,7 @@ def test_provider_short_circuits_below_400_k():
         pressure_bar=1e-6,
         fO2_log=None,
         control_inputs={
+            'overhead_pressure_pa': 0.0,
             'vapor_pressures_Pa': {'Na': 1e6},
             'overhead_partials_Pa': {},
             'molar_mass_kg_mol': {'Na': 0.023},
@@ -915,6 +922,9 @@ def _w3_result_with_controls(stir_control, **control_overrides):
     controls = {
         'vapor_pressures_Pa': {'Na': 100.0},
         'overhead_partials_Pa': {},
+        # True vacuum: Kn domain refusal is for nonzero overhead outside
+        # viscous Poiseuille validity; HKL unit tests use P=0 upper-bound path.
+        'overhead_pressure_pa': 0.0,
         'molar_mass_kg_mol': {'Na': 0.023},
         'stoich_by_species': {
             'Na': {
@@ -962,33 +972,86 @@ def test_provider_accepts_zero_melt_surface_area_as_valid_halt():
     assert result.diagnostic["evaporation_flux_kg_hr"] == {}
 
 
-def test_provider_zero_axial_stir_halts_melt_renewal_flux():
+def test_provider_zero_axial_stir_keeps_hkl_upper_bound_without_x6_multiplier():
     result = _w3_result_with_controls({"axial": 0.0})
 
     assert result.status == "ok"
-    assert result.diagnostic["evaporation_flux_kg_hr"] == {}
+    assert result.diagnostic["evaporation_flux_kg_hr"]["Na"] > 0.0
+    assert result.diagnostic["authority_class"] == "upper-bound"
+    assert result.diagnostic["authority_reason"] == (
+        "missing-species-state-dependent-melt-transfer-inputs"
+    )
     diagnostic = result.diagnostic["evaporation_series_resistance"]["Na"]
-    assert diagnostic["flux_kg_s_m2"] == 0.0
-    assert diagnostic["limiting_resistance_label"] == "melt"
+    assert diagnostic["r_melt"] == 0.0
+    assert diagnostic["melt_resistance_enabled"] is False
+    assert diagnostic["authority_class"] == "upper-bound"
+    assert diagnostic["authority_reason"] == (
+        "missing-species-state-dependent-melt-transfer-inputs"
+    )
 
 
-@pytest.mark.parametrize("conductance", [-1.0, 0.0, float("nan"), float("inf")])
-def test_provider_refuses_invalid_melt_renewal_conductance(conductance):
+def test_provider_refuses_universal_melt_renewal_model():
     result = _w3_result_with_controls(
         1.0,
         evaporation_series_resistance={
-            "melt_surface_renewal_base_kg_s_m2_pa": conductance,
+            "melt_resistance_enabled": True,
+            "melt_surface_renewal_base_kg_s_m2_pa": 1.0e-4,
         },
     )
 
     assert result.status == "refused"
     assert result.diagnostic["evaporation_flux_kg_hr"] == {}
-    assert result.diagnostic["reason"] == "invalid_melt_surface_renewal_base"
+    assert result.diagnostic["reason"] == "uncertified_melt_resistance_model"
+
+
+def test_provider_suppresses_ledger_yields_at_transitional_kn_domain():
+    # Kn≈0.1 at T=2023 K, D=0.12 m, P≈3.63 Pa — transitional. Viscous
+    # Poiseuille P_bulk is out of domain: ledger yields suppressed (empty
+    # flux + diagnostic-limited authority), not HKL-with-invalid-backpressure.
+    # Not a Kn safety/coating gate. Free-molecular + viscous paths remain.
+    result = _w3_result_with_controls(
+        1.0,
+        overhead_pressure_pa=3.632,
+        pipe_diameter_m=0.12,
+        gas_temperature_K=2023.15,
+    )
+
+    assert result.status == "ok"
+    assert result.diagnostic["reason"] == "viscous_p_bulk_transport_out_of_domain"
+    assert result.diagnostic["evaporation_flux_kg_hr"] == {}
+    assert result.diagnostic["ledger_yields_authorized"] is False
+    assert result.diagnostic["authority_class"] == "diagnostic-limited"
+    assert result.diagnostic["p_bulk_transport_domain"] == (
+        "out_of_domain_transitional"
+    )
+    assert result.diagnostic["knudsen_number"] > 0.01
+    assert result.diagnostic["knudsen_number"] < 10.0
+    assert "transport_model_validity_domain" in result.diagnostic["framing"]
+    assert any(
+        "viscous_p_bulk_transport_out_of_domain" in w for w in result.warnings
+    )
+
+    # Explicit hard-refuse helper still available for typed paths.
+    from simulator.evaporation import (
+        EvaporationFluxRefusal,
+        refuse_viscous_p_bulk_out_of_domain,
+    )
+    import pytest
+
+    with pytest.raises(EvaporationFluxRefusal) as ei:
+        refuse_viscous_p_bulk_out_of_domain(
+            knudsen_number=result.diagnostic["knudsen_number"],
+            overhead_pressure_pa=3.632,
+            pipe_diameter_m=0.12,
+            gas_temperature_K=2023.15,
+        )
+    assert ei.value.reason == "viscous_p_bulk_transport_out_of_domain"
 
 
 def test_provider_refuses_missing_species_transport_parameters():
     result = _w3_result_with_controls(
         1.0,
+        overhead_pressure_pa=1000.0,
         vapor_pressures_Pa={"Si": 100.0},
         molar_mass_kg_mol={"Si": 0.028085},
         stoich_by_species={
@@ -1016,6 +1079,11 @@ def test_provider_refuses_missing_species_transport_parameters():
 
 
 def test_provider_keeps_nonempty_computable_transport_set_when_flux_is_zero():
+    # Free-molecular / vacuum path (overhead_pressure_pa default 0): continuum
+    # gas film is off, so Chapman-Enskog parameters are not required. Si is
+    # therefore computable alongside Na (pre-Bug-B Fuchs film required CE for
+    # every species and excluded Si). Continuum CE failure is covered by
+    # test_provider_refuses_missing_species_transport_parameters at 1000 Pa.
     result = _w3_result_with_controls(
         1.0,
         melt_surface_area_m2=0.0,
@@ -1039,12 +1107,10 @@ def test_provider_keeps_nonempty_computable_transport_set_when_flux_is_zero():
 
     assert result.status == "ok"
     assert result.diagnostic["evaporation_flux_kg_hr"] == {}
-    assert set(result.diagnostic["evaporation_series_resistance"]) == {"Na"}
-    assert set(result.diagnostic["missing_transport_parameters"]) == {"Si"}
-    assert result.warnings == (
-        "excluded evaporation species with missing Chapman-Enskog transport "
-        "parameters: Si",
-    )
+    assert set(result.diagnostic["evaporation_series_resistance"]) == {"Na", "Si"}
+    assert "missing_transport_parameters" not in result.diagnostic
+    assert result.diagnostic["authority_class"] == "upper-bound"
+    assert result.warnings == ()
 
 
 def test_provider_refuses_dict_axial_nan():

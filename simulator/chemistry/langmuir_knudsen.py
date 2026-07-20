@@ -5,12 +5,13 @@ and zero induction stirring (``stir=0``, no melt-side renewal). Equilibrium-mode
 KEMS measures the thermodynamic driving force ``p_eq``; free-evaporation (Langmuir)
 measurements pin the kinetic coefficient ``alpha`` at that same surface.
 
-The furnace model layers transport enhancements on top of this baseline:
+The furnace model layers validated transport effects on top of this baseline:
 
-* overhead ``pN2`` lowers Kn and adds gas-side resistance ``r_gas`` (Fuchs-Sutugin
-  weight + Chapman-Enskog / Sherwood mass transfer), and
-* induction stirring adds melt-side renewal ``r_melt`` (axial) and gas-side Sherwood
-  enhancement (radial).
+* overhead ``pN2`` adds continuum gas-side resistance ``r_gas`` through
+  Chapman-Enskog / Sherwood mass transfer when ``Kn < 0.01``; outside that
+  regime chamber transmission is represented by the evolved ``p_bulk``, and
+* radial stirring can enhance continuum Sherwood transport. The melt term stays
+  disabled until species/composition-dependent liquid-transfer inputs exist.
 
 This module exposes the two limits and the three-resistance transition as clean
 analytical functions. The series physics is delegated to
@@ -234,18 +235,19 @@ def series_flux(
     radial_stir_factor: float = 1.0,
     carrier_gas: str = "N2",
     T_gas_K: float | None = None,
-    melt_resistance_enabled: bool = True,
+    melt_resistance_enabled: bool = False,
     gas_resistance_enabled: bool = True,
 ) -> LangmuirKnudsenDiagnostics:
     """Full three-resistance flux with explicit limit diagnostics.
 
-    Premise: interface, gas-film, and melt-renewal conductances act in series.
+    Premise: interface, gas-film, and melt-renewal conductances can act in
+    series only when each is expressed against the same pressure potential.
     Algebra stays delegated to the authoritative helper: ``J=delta_p /
-    (r_interface+r_gas+r_melt)`` and its existing Fuchs--Sutugin weight.
+    (r_interface+r_gas+r_melt)``.
     Every resistance has units ``m^2*Pa*s/kg``, so the result is kg/(m^2*s).
-    Limiting cases: ``Kn -> inf`` makes the Fuchs--Sutugin gas weight and
-    ``r_gas`` vanish, reducing to :func:`langmuir_flux` when melt renewal is
-    disabled; ``Kn -> 0`` makes the continuum gas film rate-limiting.
+    Limiting cases: free-molecular vacuum makes ``r_gas`` vanish, reducing to
+    :func:`langmuir_flux` while the ungrounded melt term is disabled;
+    ``Kn < 0.01`` enables the continuum gas film.
     """
     series = _series_resistance_evaporation_flux_kg_m2_s(
         species=species,

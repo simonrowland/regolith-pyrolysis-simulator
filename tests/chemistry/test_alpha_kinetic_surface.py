@@ -95,6 +95,7 @@ def test_evaporation_flux_diagnostic_traces_alpha_by_species():
         pressure_bar=1e-6,
         fO2_log=None,
         control_inputs={
+            "overhead_pressure_pa": 0.0,
             "vapor_pressures_Pa": {name: 100.0 for name in species},
             "overhead_partials_Pa": {},
             "molar_mass_kg_mol": {name: 0.05 for name in species},
@@ -147,6 +148,7 @@ def test_new_proxy_species_flux_scales_with_yaml_alpha():
         pressure_bar=1e-6,
         fO2_log=None,
         control_inputs={
+            "overhead_pressure_pa": 0.0,
             "vapor_pressures_Pa": {"Ca": 100.0, "Ti": 100.0},
             "overhead_partials_Pa": {},
             "molar_mass_kg_mol": {"Ca": 0.05, "Ti": 0.05},
@@ -189,6 +191,7 @@ def test_cro2_missing_alpha_refuses_only_cro2_and_retains_parent_oxide():
         pressure_bar=1e-6,
         fO2_log=None,
         control_inputs={
+            "overhead_pressure_pa": 0.0,
             "vapor_pressures_Pa": {"CrO2": 100.0, "Na": 100.0},
             "overhead_partials_Pa": {},
             "molar_mass_kg_mol": {"CrO2": 0.084, "Na": 0.023},
@@ -246,6 +249,7 @@ def test_grounded_cr_ignores_unmeasured_fallback_opt_in():
         pressure_bar=1e-6,
         fO2_log=None,
         control_inputs={
+            "overhead_pressure_pa": 0.0,
             "vapor_pressures_Pa": {"Cr": 100.0},
             "overhead_partials_Pa": {},
             "molar_mass_kg_mol": {"Cr": 0.052},

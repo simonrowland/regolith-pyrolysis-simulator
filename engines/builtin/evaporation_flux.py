@@ -68,10 +68,9 @@ from simulator.chemistry.kernel.provider import ChemistryProvider
 
 _DEFAULT_EVAPORATION_ALPHA = 1.0
 _NONTRIVIAL_FLUX_KG_HR = 1.0e-12
-FUCHS_SUTUGIN_GAS_ACCOMMODATION = 1.0
-DEFAULT_MELT_SURFACE_RENEWAL_BASE_KG_S_M2_PA = 1.0e-4
+DEFAULT_MELT_SURFACE_RENEWAL_BASE_KG_S_M2_PA = 0.0
 DEFAULT_MELT_SURFACE_RENEWAL_SOURCE = (
-    "owner-ratify:melt-side-surface-renewal-v1"
+    "disabled:missing-species-state-dependent-melt-transfer-inputs"
 )
 # EVAPORATION-only class proxy: CrO2 borrows SiO sigma and epsilon/k because
 # direct CrO2 transport data are absent, but retains its own molar mass. This
@@ -163,6 +162,12 @@ class SeriesEvaporationFlux:
             "k_mt_kg_s_m2_pa": self.k_mt_kg_s_m2_pa,
             "d_ab_m2_s": self.d_ab_m2_s,
             "transport_length_m": self.transport_length_m,
+            # HKL upper-bound authority (matrix policy i): R_m=0 until
+            # species/state melt-transfer inputs exist. Not certified flux.
+            "authority_class": "upper-bound",
+            "authority_reason": (
+                "missing-species-state-dependent-melt-transfer-inputs"
+            ),
         }
 
 
@@ -255,31 +260,6 @@ def _validated_stir_factor(value: Any, *, axis: str) -> float:
     return raw
 
 
-def _fuchs_sutugin_gas_resistance_weight(
-    knudsen_number: float,
-    accommodation: float = FUCHS_SUTUGIN_GAS_ACCOMMODATION,
-) -> float:
-    if accommodation <= 0.0 or not math.isfinite(accommodation):
-        accommodation = FUCHS_SUTUGIN_GAS_ACCOMMODATION
-    if math.isinf(knudsen_number):
-        return 0.0
-    if not math.isfinite(knudsen_number):
-        return 1.0
-    kn = max(0.0, float(knudsen_number))
-    four_over_three_a = 4.0 / (3.0 * accommodation)
-    denominator = (
-        1.0
-        + (four_over_three_a + 0.377) * kn
-        + four_over_three_a * kn * kn
-    )
-    if denominator <= 0.0 or not math.isfinite(denominator):
-        return 1.0
-    beta = (1.0 + kn) / denominator
-    if not math.isfinite(beta):
-        return 0.0
-    return max(0.0, min(1.0, beta))
-
-
 def _series_pressure_provenance_diagnostic(
     *,
     species: str,
@@ -358,7 +338,7 @@ def _zero_series_evaporation_flux(
     radial_stir_clamped: bool = False,
     frozen_skull_stir_clamped: bool = False,
     frozen_skull_stir_ceiling: float | str = "not_certified",
-    melt_resistance_enabled: bool = True,
+    melt_resistance_enabled: bool = False,
     melt_surface_renewal_base_kg_s_m2_pa: float = (
         DEFAULT_MELT_SURFACE_RENEWAL_BASE_KG_S_M2_PA
     ),
@@ -410,7 +390,7 @@ def _series_resistance_evaporation_flux_kg_m2_s(
     carrier_gas: str = "N2",
     *,
     T_gas_K: float | None = None,
-    melt_resistance_enabled: bool = True,
+    melt_resistance_enabled: bool = False,
     melt_surface_renewal_base_kg_s_m2_pa: float = (
         DEFAULT_MELT_SURFACE_RENEWAL_BASE_KG_S_M2_PA
     ),
@@ -508,34 +488,21 @@ def _series_resistance_evaporation_flux_kg_m2_s(
             transport_length_m=max(0.0, diameter_m),
         )
 
-    base_k_melt = _finite_float(
-        melt_surface_renewal_base_kg_s_m2_pa,
-        math.nan,
-    )
-    if melt_resistance_enabled and (
-        not math.isfinite(base_k_melt) or base_k_melt <= 0.0
-    ):
+    base_k_melt = _finite_float(melt_surface_renewal_base_kg_s_m2_pa, 0.0)
+    if melt_resistance_enabled:
+        # Premise: liquid transport is J=M_i*k_L,i*(C_b-C_s). Linearising
+        # p_eq(C) with H_i=dp_eq/dC_i gives the pressure-basis conductance
+        # k_m,i=M_i*k_L,i/H_i [kg Pa^-1 m^-2 s^-1 = s/m], hence
+        # R_m,i=H_i/(M_i*k_L,i) [m/s]. k_L,i itself requires a species- and
+        # composition-dependent D_i plus measured melt renewal/geometry.
+        # None of D_i, H_i, C_i, or a physical renewal rate exists in this
+        # request, so any positive universal coefficient (formerly 1e-4 s/m)
+        # is dimensionally shaped but ungrounded. Refuse it; R_m=0 below is
+        # explicitly the reconstructible HKL upper bound, consistent with
+        # Hashimoto/Fedkin vacuum free-evaporation being interface-controlled.
         raise EvaporationFluxConfigurationError(
-            "melt_surface_renewal_base_kg_s_m2_pa must be finite and positive"
-        )
-    if melt_resistance_enabled and axial_stir_applied == 0.0:
-        # k_melt = k0 * sqrt(stir); zero conductance gives R_melt = 1/k = inf,
-        # so a static surface halts renewal-limited evaporation.
-        return _zero_series_evaporation_flux(
-            alpha_intrinsic=alpha_intrinsic,
-            k_hk_kg_s_m2_pa=k_hk_kg_s_m2_pa,
-            r_interface=r_interface,
-            r_melt=math.inf,
-            axial_stir_applied=axial_stir_applied,
-            radial_stir_applied=radial_stir_applied,
-            axial_stir_clamped=axial_was_clamped,
-            radial_stir_clamped=radial_was_clamped,
-            frozen_skull_stir_clamped=frozen_skull_clamped,
-            frozen_skull_stir_ceiling=ceiling_diag,
-            melt_resistance_enabled=melt_resistance_enabled,
-            melt_surface_renewal_base_kg_s_m2_pa=base_k_melt,
-            melt_surface_renewal_source=melt_surface_renewal_source,
-            transport_length_m=diameter_m,
+            "authoritative melt resistance requires species- and state-specific "
+            "D_i, k_L,i, and dp_eq/dC_i; universal pressure conductance disabled"
         )
 
     if knudsen_number is None:
@@ -550,11 +517,28 @@ def _series_resistance_evaporation_flux_kg_m2_s(
             knudsen = float(knudsen_number)
         except (TypeError, ValueError):
             knudsen = math.inf
-    gas_weight = (
-        _fuchs_sutugin_gas_resistance_weight(knudsen)
-        if gas_resistance_enabled
-        else 0.0
-    )
+    from simulator.transport_constants import VISCOUS_KNUDSEN_MAX
+
+    if math.isnan(knudsen) or knudsen < 0.0:
+        raise EvaporationFluxConfigurationError(
+            "knudsen_number must be finite non-negative or positive infinity"
+        )
+
+    gas_weight = 0.0
+    if gas_resistance_enabled:
+        if knudsen < VISCOUS_KNUDSEN_MAX:
+            gas_weight = 1.0
+        # Premise: an open free-molecular vacuum has no stagnant carrier-gas
+        # film. Therefore R_g=0 locally. Continuum branch: k_g=M*Sh*D/(L*R*T)
+        # [s/m], R_g=1/k_g [m/s], only for Kn < VISCOUS_KNUDSEN_MAX (0.01).
+        # TRANSPORT-MODEL VALIDITY (not a Kn safety/coating gate): ledger-
+        # authoritative yields refuse when Kn >= VISCOUS_KNUDSEN_MAX and
+        # overhead_pressure > 0, because evolved P_bulk still comes from the
+        # viscous-only Poiseuille model (simulator/overhead.py). The 0.6.3
+        # optimizer floor (~1 mbar, Kn≈0.004) never enters that domain; t-379
+        # (0.7) supplies transitional/molecular conductance and lifts the
+        # validity refusal. Do not invent a molecular-flow model here. True
+        # vacuum (overhead_pressure=0) remains the reconstructible HKL bound.
 
     r_gas = 0.0
     k_mt_kg_s_m2_pa = 0.0
@@ -609,10 +593,6 @@ def _series_resistance_evaporation_flux_kg_m2_s(
         r_gas = gas_weight / k_mt_kg_s_m2_pa
 
     r_melt = 0.0
-    if melt_resistance_enabled:
-        surface_renewal = math.sqrt(axial_stir_applied)
-        k_melt_kg_s_m2_pa = base_k_melt * surface_renewal
-        r_melt = 1.0 / k_melt_kg_s_m2_pa
 
     denominator = r_interface + r_gas + r_melt
     if not math.isfinite(denominator) or denominator <= 0.0:
@@ -709,6 +689,33 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
 
         T_C = request.temperature_C
         T_K = T_C + 273.15
+        controls = unpack_controls(request)
+        # Uncertified melt-resistance model is refused at any T so the
+        # hostile config cannot ride a cold early-return (T<400) as silent ok.
+        series_config_early = controls.get("evaporation_series_resistance") or {}
+        if not isinstance(series_config_early, Mapping):
+            series_config_early = {}
+        melt_resistance_enabled_early = bool(
+            series_config_early.get(
+                "melt_resistance_enabled",
+                controls.get("melt_resistance_enabled", False),
+            )
+        )
+        if melt_resistance_enabled_early:
+            return IntentResult(
+                intent=ChemistryIntent.EVAPORATION_FLUX,
+                status="refused",
+                transition=None,
+                control_audit=control_audit,
+                diagnostic={
+                    "evaporation_flux_kg_hr": {},
+                    "reason": "uncertified_melt_resistance_model",
+                    "detail": (
+                        "requires species- and state-specific D_i, k_L,i, "
+                        "and dp_eq/dC_i"
+                    ),
+                },
+            )
         if T_K < 400:
             # Mirrors _calculate_evaporation: below 400 K, no significant
             # evaporation -- return an empty flux dict with ok status.
@@ -719,7 +726,6 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 diagnostic={"evaporation_flux_kg_hr": {}},
             )
 
-        controls = unpack_controls(request)
         vapor_pressures = dict(controls.get("vapor_pressures_Pa") or {})
         overhead_partials = dict(controls.get("overhead_partials_Pa") or {})
         vapor_pressure_sources = dict(controls.get("vapor_pressures_source") or {})
@@ -794,7 +800,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         melt_resistance_enabled = bool(
             series_config.get(
                 "melt_resistance_enabled",
-                controls.get("melt_resistance_enabled", True),
+                controls.get("melt_resistance_enabled", False),
             )
         )
         gas_resistance_enabled = bool(
@@ -816,21 +822,6 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 melt_surface_renewal_raw,
                 math.nan,
             )
-        if melt_resistance_enabled and (
-            not math.isfinite(melt_surface_renewal_base)
-            or melt_surface_renewal_base <= 0.0
-        ):
-            return IntentResult(
-                intent=ChemistryIntent.EVAPORATION_FLUX,
-                status="refused",
-                transition=None,
-                control_audit=control_audit,
-                diagnostic={
-                    "evaporation_flux_kg_hr": {},
-                    "reason": "invalid_melt_surface_renewal_base",
-                    "value": repr(melt_surface_renewal_raw),
-                },
-            )
         melt_surface_renewal_source = str(
             series_config.get(
                 "melt_surface_renewal_source",
@@ -840,6 +831,88 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 ),
             )
         )
+        # Ledger-authoritative EVAPORATION_FLUX: viscous Poiseuille P_bulk is
+        # out of domain when Kn exceeds VISCOUS_KNUDSEN_MAX at nonzero overhead.
+        # This is a transport-model validity domain (acceptance-matrix col 7),
+        # NOT a Kn safety gate and NOT a coating gate. Coating stays the
+        # continuous rate→lifespan model. 0.6.3 optimizer floor (~1 mbar,
+        # Kn≈0.004) never enters; t-379 (0.7) lifts this with real
+        # transitional/molecular conductance. True vacuum (P=0) keeps the HKL
+        # upper-bound path.
+        from simulator.transport_constants import (
+            FREE_MOLECULAR_KNUDSEN_MIN,
+            VISCOUS_KNUDSEN_MAX,
+        )
+        from simulator.condensation import _knudsen_number as _kn_eval
+
+        if overhead_pressure_pa > 0.0:
+            kn_domain = _kn_eval(
+                overhead_pressure_pa,
+                max(gas_temperature_K, 1.0),
+                max(pipe_diameter_m, 0.0) or 0.12,
+                carrier_gas=carrier_gas,
+            )
+            # Transitional only: viscous Poiseuille P_bulk is out of domain
+            # while free-molecular (Kn >= 10 or inf) keeps the HKL upper
+            # bound. 0.6.3 optimizer floor (~1 mbar, Kn≈0.004) is viscous.
+            transitional = (
+                math.isfinite(kn_domain)
+                and VISCOUS_KNUDSEN_MAX <= kn_domain < FREE_MOLECULAR_KNUDSEN_MIN
+            )
+            if transitional:
+                # TRANSPORT-MODEL VALIDITY (not Kn safety / not coating):
+                # suppress ledger-authoritative yields. Do not report HKL
+                # flux under an out-of-domain viscous Poiseuille P_bulk.
+                # status=ok + empty flux (not hard campaign refuse) so
+                # startup ramps that transit the transitional band can
+                # continue; yields are simply not authorized. Hard refuse
+                # remains available via refuse_viscous_p_bulk_out_of_domain
+                # for explicit ledger paths that must not soft-zero.
+                # 0.6.3 optimizer floor (~1 mbar, Kn≈0.004) is viscous.
+                # t-379 (0.7) supplies transitional/molecular conductance.
+                return IntentResult(
+                    intent=ChemistryIntent.EVAPORATION_FLUX,
+                    status="ok",
+                    transition=None,
+                    control_audit=control_audit,
+                    diagnostic={
+                        "evaporation_flux_kg_hr": {},
+                        "authority_class": "diagnostic-limited",
+                        "authority_reason": (
+                            "viscous_p_bulk_transport_out_of_domain"
+                        ),
+                        "reason": "viscous_p_bulk_transport_out_of_domain",
+                        "p_bulk_transport_domain": "out_of_domain_transitional",
+                        "ledger_yields_authorized": False,
+                        "detail": (
+                            "transitional Kn uses viscous Poiseuille P_bulk "
+                            f"outside Kn < {VISCOUS_KNUDSEN_MAX:g}; free-"
+                            f"molecular Kn >= {FREE_MOLECULAR_KNUDSEN_MIN:g} "
+                            "keeps HKL upper-bound; t-379 (0.7) lifts this"
+                        ),
+                        "knudsen_number": kn_domain,
+                        "model_domain": (
+                            f"viscous Poiseuille P_bulk: Kn < "
+                            f"{VISCOUS_KNUDSEN_MAX:g}; free-molecular HKL: "
+                            f"Kn >= {FREE_MOLECULAR_KNUDSEN_MIN:g}"
+                        ),
+                        "VISCOUS_KNUDSEN_MAX": VISCOUS_KNUDSEN_MAX,
+                        "FREE_MOLECULAR_KNUDSEN_MIN": FREE_MOLECULAR_KNUDSEN_MIN,
+                        "overhead_pressure_pa": overhead_pressure_pa,
+                        "pipe_diameter_m": pipe_diameter_m,
+                        "gas_temperature_K": gas_temperature_K,
+                        "carrier_gas": carrier_gas,
+                        "framing": (
+                            "transport_model_validity_domain"
+                            ";not_kn_safety_gate;not_coating_gate"
+                        ),
+                    },
+                    warnings=(
+                        "viscous_p_bulk_transport_out_of_domain: "
+                        "ledger evaporation yields suppressed in "
+                        "transitional Kn until t-379 (0.7)",
+                    ),
+                )
         alpha_by_species = _coerce_alpha_by_species(controls.get("alpha"))
         alpha_envelope_by_species = _coerce_alpha_envelope_by_species(
             controls.get("alpha_envelope")
@@ -1058,6 +1131,11 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             "flux_uncertainty_pct": flux_uncertainty_pct,
             "evaporation_series_resistance": series_flux_diagnostics,
             "temperature_C": T_C,
+            # Matrix policy (i): source flux is HKL upper bound while R_m=0.
+            "authority_class": "upper-bound",
+            "authority_reason": (
+                "missing-species-state-dependent-melt-transfer-inputs"
+            ),
         }
         species_refusals: dict[str, dict[str, float | str]] = {}
         if missing_alpha:

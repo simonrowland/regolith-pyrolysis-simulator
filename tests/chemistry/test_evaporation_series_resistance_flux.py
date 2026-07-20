@@ -38,7 +38,7 @@ _K_BASE = {
     "cold_skull_envelope": {"frozen_skull_stir_ceiling": MAX_STIR_FACTOR},
     "carrier_gas": "N2",
     "T_gas_K": 1800.0,
-    "melt_resistance_enabled": True,
+    "melt_resistance_enabled": False,
 }
 
 
@@ -66,6 +66,42 @@ def test_free_molecular_limit_recovers_intrinsic_alpha_hk():
     assert result.r_melt == 0.0
     assert result.flux_kg_s_m2 == pytest.approx(expected, rel=1e-12)
     assert result.alpha_effective == pytest.approx(_K_BASE["alpha_i"], rel=1e-12)
+
+
+@pytest.mark.parametrize(
+    ("species", "p_eq_pa", "molar_mass", "alpha", "expected_kg_hr"),
+    [
+        ("Fe", 78.0238, 0.055845, 0.02, 0.816697),
+        ("SiO", 21.7234, 0.044084, 0.52 * math.exp(-3685.0 / 2023.15), 0.849869),
+    ],
+)
+def test_1750c_true_vacuum_recovers_rederived_hkl_upper_bound(
+    species, p_eq_pa, molar_mass, alpha, expected_kg_hr
+):
+    result = _evap(
+        species=species,
+        P_eq_pa=p_eq_pa,
+        P_bulk_pa=0.0,
+        T_surface_K=2023.15,
+        T_gas_K=2023.15,
+        molar_mass_kg_mol=molar_mass,
+        alpha_i=alpha,
+        knudsen_number=None,
+        overhead_pressure_pa=0.0,
+        axial_stir_factor=6.0,
+        gas_resistance_enabled=True,
+    )
+
+    assert result.r_gas == 0.0
+    assert result.r_melt == 0.0
+    assert result.flux_kg_s_m2 * 0.2 * 3600.0 == pytest.approx(
+        expected_kg_hr, rel=5e-5
+    )
+    diag = result.as_diagnostic()
+    assert diag["authority_class"] == "upper-bound"
+    assert diag["authority_reason"] == (
+        "missing-species-state-dependent-melt-transfer-inputs"
+    )
 
 
 def test_continuum_limit_is_transport_limited_by_gas_resistance():
@@ -133,7 +169,7 @@ def test_resistances_move_monotonically_with_kn_and_stir_axes():
         ).r_melt
         for axial in (0.0, 1.0, 4.0, MAX_STIR_FACTOR, 1000.0)
     ]
-    assert melt_by_axial == sorted(melt_by_axial, reverse=True)
+    assert melt_by_axial == [0.0] * 5
 
     gas_by_radial = [
         _evap(
@@ -146,31 +182,36 @@ def test_resistances_move_monotonically_with_kn_and_stir_axes():
     assert gas_by_radial == sorted(gas_by_radial, reverse=True)
 
 
-def test_zero_axial_stir_halts_melt_renewal_limited_evaporation():
-    halted = _evap(axial_stir_factor=0.0, gas_resistance_enabled=False)
-    stirred = _evap(axial_stir_factor=1.0, gas_resistance_enabled=False)
+def test_axial_stir_does_not_multiply_hkl_or_add_unphysical_melt_resistance():
+    static = _evap(axial_stir_factor=0.0, gas_resistance_enabled=False)
+    stirred = _evap(axial_stir_factor=MAX_STIR_FACTOR, gas_resistance_enabled=False)
 
-    assert halted.flux_kg_s_m2 == 0.0
-    assert halted.alpha_effective == 0.0
-    assert math.isinf(halted.r_melt)
-    assert halted.as_diagnostic()["limiting_resistance_label"] == "melt"
-    assert stirred.flux_kg_s_m2 > 0.0
-
-    unsupported_transport = _evap(species="Si", axial_stir_factor=0.0)
-    assert unsupported_transport.flux_kg_s_m2 == 0.0
-    assert math.isinf(unsupported_transport.r_melt)
+    assert static.r_melt == 0.0
+    assert stirred.r_melt == 0.0
+    assert static.flux_kg_s_m2 == pytest.approx(stirred.flux_kg_s_m2, rel=1e-12)
+    assert static.alpha_effective == pytest.approx(_K_BASE["alpha_i"], rel=1e-12)
 
 
-@pytest.mark.parametrize("conductance", [-1.0, 0.0, float("nan"), float("inf")])
-def test_invalid_melt_renewal_conductance_refuses_flux(conductance):
+def test_universal_melt_renewal_conductance_is_uncertified_and_refused():
     with pytest.raises(
         EvaporationFluxConfigurationError,
-        match="melt_surface_renewal_base_kg_s_m2_pa must be finite and positive",
+        match="requires species- and state-specific",
     ):
         _evap(
-            melt_surface_renewal_base_kg_s_m2_pa=conductance,
+            melt_resistance_enabled=True,
+            melt_surface_renewal_base_kg_s_m2_pa=1.0e-4,
             gas_resistance_enabled=False,
         )
+
+
+def test_transition_and_free_molecular_regimes_do_not_apply_continuum_gas_film():
+    transitional = _evap(knudsen_number=1.0)
+    free_molecular = _evap(knudsen_number=FREE_MOLECULAR_KNUDSEN_MIN)
+
+    assert transitional.r_gas == 0.0
+    assert free_molecular.r_gas == 0.0
+    assert transitional.gas_resistance_weight == 0.0
+    assert free_molecular.gas_resistance_weight == 0.0
 
 
 def test_missing_chapman_enskog_parameters_do_not_fall_back_to_constant():
@@ -321,6 +362,7 @@ def test_grounded_cr_alpha_uses_series_resistance_path_without_fallback():
         control_inputs={
             "vapor_pressures_Pa": {"Cr": 100.0},
             "overhead_partials_Pa": {"Cr": 0.0},
+            "overhead_pressure_pa": 0.0,
             "molar_mass_kg_mol": {"Cr": 0.052},
             "stoich_by_species": {
                 "Cr": {

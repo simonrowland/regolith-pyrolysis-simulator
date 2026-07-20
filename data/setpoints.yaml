@@ -1923,6 +1923,11 @@ chemistry_kernel:
   # the placeholder policy.
   allow_unmeasured_alpha_fallback: false
   evaporation_series_resistance:
-    melt_resistance_enabled: true
-    melt_surface_renewal_base_kg_s_m2_pa: 1.0e-4
-    melt_surface_renewal_source: "owner-ratify:melt-side-surface-renewal-v1"
+    # J=M_i*k_L,i*Delta-C and Delta-p=H_i*Delta-C imply
+    # k_m,i=M_i*k_L,i/H_i [s/m], R_m,i=H_i/(M_i*k_L,i) [m/s]. Runtime has
+    # neither species/composition-specific D_i -> k_L,i nor H_i=dp_eq/dC_i;
+    # therefore the former universal 1e-4 s/m was not a derived coefficient.
+    # Disabled means R_m=0 and labels the source flux as the HKL upper bound,
+    # consistent with interface-controlled Hashimoto/Fedkin vacuum anchors.
+    melt_resistance_enabled: false
+    melt_surface_renewal_source: "disabled:missing-species-state-dependent-melt-transfer-inputs"

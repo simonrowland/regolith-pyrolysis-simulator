@@ -146,7 +146,7 @@ LAB_EXPOSED_MELT_AREA_BASIS = 'gram_lab_exposed_melt'
 # Viscous-regime wall mass-transfer model (post-F3 follow-on, 2026-05-27).
 # F3 added wall-side regime_factor = Kn/(Kn + 0.01): f -> 0 in viscous flow
 # and f -> 1 in free-molecular flow. This is the cold-wall deposition gate;
-# do not conflate it with the source-side Fuchs-Sutugin evaporation
+# do not conflate it with the source-side continuum evaporation
 # correction. The current wall flux composes HKL surface uptake and
 # Bird/Stewart/Lightfoot gas-side mass transfer as series resistances:
 #

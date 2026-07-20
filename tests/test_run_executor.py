@@ -740,3 +740,134 @@ def _ledger_mol_by_account(simulator: object) -> dict[str, dict[str, float]]:
         }
         for account, species_mol in sorted(ledger.items())
     }
+
+
+def _inject_hostile_melt_resistance(sim) -> None:
+    setpoints = dict(getattr(sim, "setpoints", {}) or {})
+    kernel = dict(setpoints.get("chemistry_kernel", {}) or {})
+    series = dict(kernel.get("evaporation_series_resistance", {}) or {})
+    series["melt_resistance_enabled"] = True
+    series["melt_surface_renewal_base_kg_s_m2_pa"] = 1.0e-4
+    kernel["evaporation_series_resistance"] = series
+    setpoints["chemistry_kernel"] = kernel
+    sim.setpoints = setpoints
+
+
+def _patch_hostile_melt_on_evaporation(monkeypatch) -> None:
+    """Ensure hostile config is live whenever flux projection runs."""
+    from simulator.core import PyrolysisSimulator
+
+    real = PyrolysisSimulator._calculate_evaporation
+
+    def wrapped(self, *args, **kwargs):
+        _inject_hostile_melt_resistance(self)
+        return real(self, *args, **kwargs)
+
+    monkeypatch.setattr(
+        PyrolysisSimulator, "_calculate_evaporation", wrapped
+    )
+
+
+def test_run_executor_refuses_uncertified_melt_resistance_model(monkeypatch):
+    """FIX1: hostile melt_resistance_enabled is a typed run refusal.
+
+    Projection path: provider status=refused → EvaporationFluxRefusal →
+    run_executor status=refused with persisted refusal_diagnostic.
+    """
+    _patch_hostile_melt_on_evaporation(monkeypatch)
+
+    execution = RunExecutor().execute(_run(hours=8)._session_config())
+
+    assert execution.status == "refused"
+    assert execution.reason == "uncertified_melt_resistance_model"
+    assert execution.refusal_diagnostic["reason"] == (
+        "uncertified_melt_resistance_model"
+    )
+    assert execution.refusal_diagnostic.get("evaporation_flux_kg_hr", {}) == {}
+
+
+def test_pyrolysis_run_emits_uncertified_melt_resistance_refusal_diagnostic(
+    monkeypatch,
+):
+    """End-to-end PyrolysisRun path persists refusal_diagnostic."""
+    _patch_hostile_melt_on_evaporation(monkeypatch)
+
+    payload = _run(hours=8).run()
+
+    assert payload["status"] == "refused"
+    assert payload["reason"] == "uncertified_melt_resistance_model"
+    diagnostic = payload["run_metadata"]["refusal_diagnostic"]
+    assert diagnostic["reason"] == "uncertified_melt_resistance_model"
+    assert diagnostic.get("evaporation_flux_kg_hr", {}) == {}
+
+
+def test_native_fe_helper_maps_melt_resistance_to_typed_refusal():
+    """core/extraction helper consumers map config errors to typed refusal."""
+    from engines.builtin.evaporation_flux import EvaporationFluxConfigurationError
+    from simulator.evaporation import (
+        EvaporationFluxRefusal,
+        evaporation_flux_refusal_from_configuration_error,
+    )
+
+    mapped = evaporation_flux_refusal_from_configuration_error(
+        EvaporationFluxConfigurationError(
+            "authoritative melt resistance requires species- and state-specific "
+            "D_i, k_L,i, and dp_eq/dC_i; universal pressure conductance disabled"
+        )
+    )
+    assert isinstance(mapped, EvaporationFluxRefusal)
+    assert mapped.reason == "uncertified_melt_resistance_model"
+    assert mapped.diagnostic["reason"] == "uncertified_melt_resistance_model"
+
+
+def test_provider_projection_raises_on_uncertified_melt_resistance():
+    """Projection path: non-OK provider result becomes EvaporationFluxRefusal."""
+    from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
+    from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
+    from simulator.chemistry.kernel.dto import ProviderAccountView
+    from simulator.evaporation import EvaporationFluxRefusal
+
+    provider = BuiltinEvaporationFluxProvider()
+    result = provider.dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.EVAPORATION_FLUX,
+            account_view=ProviderAccountView(
+                accounts={"process.cleaned_melt": {"Na2O": 1.0}},
+                species_formula_registry={},
+            ),
+            temperature_C=1500.0,
+            pressure_bar=1e-6,
+            fO2_log=None,
+            control_inputs={
+                "vapor_pressures_Pa": {"Na": 100.0},
+                "overhead_partials_Pa": {},
+                "overhead_pressure_pa": 0.0,
+                "molar_mass_kg_mol": {"Na": 0.023},
+                "stoich_by_species": {
+                    "Na": {
+                        "parent_oxide": "Na2O",
+                        "oxide_per_product_kg": 1.347,
+                        "O2_per_product_kg": 0.347,
+                    }
+                },
+                "available_oxide_kg": {"Na": 10.0},
+                "melt_surface_area_m2": 0.2,
+                "stir_factor": 1.0,
+                "alpha": 0.5,
+                "evaporation_series_resistance": {
+                    "melt_resistance_enabled": True,
+                    "melt_surface_renewal_base_kg_s_m2_pa": 1.0e-4,
+                },
+            },
+        )
+    )
+    assert result.status == "refused"
+    assert result.diagnostic["reason"] == "uncertified_melt_resistance_model"
+
+    with pytest.raises(EvaporationFluxRefusal) as ei:
+        if str(result.status) != "ok":
+            raise EvaporationFluxRefusal(
+                str(result.diagnostic.get("reason")),
+                dict(result.diagnostic),
+            )
+    assert ei.value.reason == "uncertified_melt_resistance_model"

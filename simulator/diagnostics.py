@@ -1023,15 +1023,15 @@ def pressure_coating_pareto_diagnostic(
             "carrier_gas": carrier_gas,
             "T_gas_K": gas_temperature_K,
             "melt_resistance_enabled": bool(
-                series.get("melt_resistance_enabled", True)
+                series.get("melt_resistance_enabled", False)
             ),
             "melt_surface_renewal_base_kg_s_m2_pa": _first_finite(
                 series.get("melt_surface_renewal_base_kg_s_m2_pa"),
-                1.0e-4,
+                0.0,
             ),
             "melt_surface_renewal_source": str(
                 series.get("melt_surface_renewal_source")
-                or "owner-ratify:melt-side-surface-renewal-v1"
+                or "disabled:missing-species-state-dependent-melt-transfer-inputs"
             ),
         }
 
@@ -1047,6 +1047,11 @@ def pressure_coating_pareto_diagnostic(
         flux_15mbar = flux_at(_CURRENT_SETPOINT_HIGH_PA)
         by_species[name] = {
             "status": "ok",
+            # HKL upper-bound (matrix policy i): R_m disabled / missing melt inputs.
+            "authority_class": "upper-bound",
+            "authority_reason": (
+                "missing-species-state-dependent-melt-transfer-inputs"
+            ),
             "P_eq_Pa": flux_kwargs["P_eq_pa"],
             "P_bulk_Pa": flux_kwargs["P_bulk_pa"],
             "alpha_intrinsic": flux_kwargs["alpha_i"],
@@ -1088,6 +1093,10 @@ def pressure_coating_pareto_diagnostic(
     return {
         "schema_version": "pressure-coating-pareto-v1",
         "status": "ok",
+        "authority_class": "upper-bound",
+        "authority_reason": (
+            "missing-species-state-dependent-melt-transfer-inputs"
+        ),
         "pressure_range_pa": {
             "min": _PRESSURE_SWEEP_MIN_PA,
             "max": _PRESSURE_SWEEP_MAX_PA,

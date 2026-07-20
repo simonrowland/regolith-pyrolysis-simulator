@@ -6575,8 +6575,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         from engines.builtin.evaporation_flux import (
             DEFAULT_MELT_SURFACE_RENEWAL_BASE_KG_S_M2_PA,
             DEFAULT_MELT_SURFACE_RENEWAL_SOURCE,
+            EvaporationFluxConfigurationError,
             _evaluate_alpha_control,
             _series_resistance_evaporation_flux_kg_m2_s,
+        )
+        from simulator.evaporation import (
+            evaporation_flux_refusal_from_configuration_error,
+            viscous_p_bulk_out_of_domain_diagnostic,
         )
         from engines.builtin.vapor_pressure import (
             COEFF_BLOCK_PURE_COMPONENT,
@@ -6652,7 +6657,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             getattr(self.overhead, 'headspace_temperature_K', 0.0) or T_K
         )
         melt_resistance_enabled = bool(
-            series_config.get('melt_resistance_enabled', True)
+            series_config.get('melt_resistance_enabled', False)
         )
         gas_resistance_enabled = bool(
             series_config.get('gas_resistance_enabled', True)
@@ -6670,29 +6675,48 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 DEFAULT_MELT_SURFACE_RENEWAL_SOURCE,
             )
         )
-        series_flux = _series_resistance_evaporation_flux_kg_m2_s(
-            species='Fe',
-            P_eq_pa=P_reference_Pa,
-            P_bulk_pa=P_bulk_Pa,
-            T_surface_K=T_K,
-            molar_mass_kg_mol=molar_mass_kg_mol,
-            alpha_i=alpha,
-            pipe_diameter_m=float(
-                getattr(self.overhead_model, 'pipe_diameter_m', 0.12)
-            ),
-            overhead_pressure_pa=overhead_pressure_pa,
-            axial_stir_factor=clamp_stir_factor(self.melt.stir_state.axial),
-            radial_stir_factor=clamp_stir_factor(self.melt.stir_state.radial),
-            carrier_gas=carrier_gas,
-            T_gas_K=gas_temperature_K,
-            melt_resistance_enabled=melt_resistance_enabled,
-            gas_resistance_enabled=gas_resistance_enabled,
-            melt_surface_renewal_base_kg_s_m2_pa=melt_surface_renewal_base,
-            melt_surface_renewal_source=melt_surface_renewal_source,
+        pipe_diameter_m = float(
+            getattr(self.overhead_model, 'pipe_diameter_m', 0.12)
         )
+        try:
+            series_flux = _series_resistance_evaporation_flux_kg_m2_s(
+                species='Fe',
+                P_eq_pa=P_reference_Pa,
+                P_bulk_pa=P_bulk_Pa,
+                T_surface_K=T_K,
+                molar_mass_kg_mol=molar_mass_kg_mol,
+                alpha_i=alpha,
+                pipe_diameter_m=pipe_diameter_m,
+                overhead_pressure_pa=overhead_pressure_pa,
+                axial_stir_factor=clamp_stir_factor(self.melt.stir_state.axial),
+                radial_stir_factor=clamp_stir_factor(self.melt.stir_state.radial),
+                carrier_gas=carrier_gas,
+                T_gas_K=gas_temperature_K,
+                melt_resistance_enabled=melt_resistance_enabled,
+                gas_resistance_enabled=gas_resistance_enabled,
+                melt_surface_renewal_base_kg_s_m2_pa=melt_surface_renewal_base,
+                melt_surface_renewal_source=melt_surface_renewal_source,
+            )
+        except EvaporationFluxConfigurationError as exc:
+            raise evaporation_flux_refusal_from_configuration_error(exc) from exc
+        # Transitional Kn domain: suppress vapor capacity (same honesty as
+        # provider diagnostic-limited empty flux) and emit the typed
+        # transport-model validity vocabulary — not bare upper-bound HKL
+        # labeling. Hard refuse remains for uncertified melt resistance
+        # above. t-379 lifts domain suppression.
+        domain_diag = viscous_p_bulk_out_of_domain_diagnostic(
+            knudsen_number=float(series_flux.knudsen_number),
+            overhead_pressure_pa=overhead_pressure_pa,
+            pipe_diameter_m=pipe_diameter_m,
+            gas_temperature_K=gas_temperature_K,
+            carrier_gas=str(carrier_gas),
+        )
+        _flux_kg_s_m2 = float(series_flux.flux_kg_s_m2)
+        if domain_diag is not None:
+            _flux_kg_s_m2 = 0.0
         capacity_kg_hr = max(
             0.0,
-            float(series_flux.flux_kg_s_m2)
+            _flux_kg_s_m2
             * max(0.0, float(self.melt.melt_surface_area_m2))
             * 3600.0,
         )
@@ -6700,6 +6724,35 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         vapor_mol = min(native_fe_available_mol, capacity_mol_hr)
         tap_mol = native_fe_available_mol - vapor_mol
         pool = native_fe_available_mol
+        series_diag = series_flux.as_diagnostic()
+        if domain_diag is not None:
+            # Relabel series diagnostic: HKL upper-bound authority is wrong
+            # when the viscous P_bulk carrier is out of domain — use the
+            # typed validity vocabulary (provider / C7 parity).
+            series_diag = dict(series_diag)
+            series_diag.update(
+                {
+                    'authority_class': domain_diag['authority_class'],
+                    'authority_reason': domain_diag['authority_reason'],
+                    'reason': domain_diag['reason'],
+                    'p_bulk_transport_domain': domain_diag[
+                        'p_bulk_transport_domain'
+                    ],
+                    'ledger_yields_authorized': False,
+                    'detail': domain_diag['detail'],
+                    'model_domain': domain_diag['model_domain'],
+                    'VISCOUS_KNUDSEN_MAX': domain_diag['VISCOUS_KNUDSEN_MAX'],
+                    'FREE_MOLECULAR_KNUDSEN_MIN': domain_diag[
+                        'FREE_MOLECULAR_KNUDSEN_MIN'
+                    ],
+                    'overhead_pressure_pa': domain_diag['overhead_pressure_pa'],
+                    'pipe_diameter_m': domain_diag['pipe_diameter_m'],
+                    'gas_temperature_K': domain_diag['gas_temperature_K'],
+                    'carrier_gas': domain_diag['carrier_gas'],
+                    'framing': domain_diag['framing'],
+                    'flux_kg_s_m2': 0.0,
+                }
+            )
         diagnostic = {
             'native_fe_pool_mol': pool,
             'native_fe_vapor_mol': vapor_mol,
@@ -6734,8 +6787,23 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 coefficient_block=coefficient_block,
                 temperature_K=T_K,
             ),
-            'series_resistance': series_flux.as_diagnostic(),
+            'series_resistance': series_diag,
         }
+        if domain_diag is not None:
+            diagnostic.update(
+                {
+                    'authority_class': domain_diag['authority_class'],
+                    'authority_reason': domain_diag['authority_reason'],
+                    'reason': domain_diag['reason'],
+                    'p_bulk_transport_domain': domain_diag[
+                        'p_bulk_transport_domain'
+                    ],
+                    'ledger_yields_authorized': False,
+                    'framing': domain_diag['framing'],
+                    'knudsen_number': domain_diag['knudsen_number'],
+                    'model_domain': domain_diag['model_domain'],
+                }
+            )
         return diagnostic
 
     def _apply_native_fe_saturation_split(

@@ -272,39 +272,39 @@ interior to the bulk gas: a melt-side surface-renewal resistance, the free-molec
 interface resistance, and the continuum boundary-layer gas-diffusion resistance:
 
 ```
-J = (P_eff − P_bulk) / ( r_melt + r_interface + r_gas )
+J = (P_eff − P_bulk) / ( r_interface + r_gas + r_melt )
 
   r_interface = 1 / (α × k_HKL)             free-molecular impingement
-  r_gas       = β_FS / k_MT                 gas-side boundary layer
-  r_melt      = melt-side surface renewal   (see below)
+  r_gas       = 1 / k_g                     continuum duct film only (Kn < 0.01)
+  r_melt      = 0                           HKL upper-bound (see below)
 
-  k_HKL = √( M / (2π R T) )                 free-molecular impingement rate
-  k_MT  = D_AB(T, P) × Sh                   boundary-layer (continuum) mass transfer
-  β_FS  = (1 + Kn) / (1 + (4/(3α_g)+0.377)Kn + (4/(3α_g))Kn²)
-                                                Fuchs-Sutugin gas-resistance weight; α_g = 1.0
+  k_HKL = √( M / (2π R T) )                 free-molecular impingement rate [s/m]
+  k_g   = M × Sh × D_AB / (L R T)           continuum mass transfer [s/m]
 ```
-<!-- impl: §4 -> engines/builtin/evaporation_flux.py _series_resistance_evaporation_flux_kg_m2_s:391 — three resistance flux -->
+<!-- impl: §4 -> engines/builtin/evaporation_flux.py _series_resistance_evaporation_flux_kg_m2_s — series resistance flux -->
 
-In the free-molecular limit (high Knudsen number) the Fuchs–Sutugin gas-resistance weight sends the
-gas-side boundary-layer resistance to zero and the Hertz–Knudsen interface term rate-limits; in the
-viscous limit (the millibar sweep-gas regime the recipes actually run in) the boundary-layer diffusion
-rate-limits. The diffusion coefficient `D_AB` is a per-species Chapman–Enskog value rather than a fixed
-constant, and the Sherwood number carries the **radial** induction-stirring enhancement,
-`Sh_eff = 3.66 × √max(1, radial_stir_factor)`. The radial default is 1.0, so the default Sherwood number
-is the laminar `Sh = 3.66`; `Sh_eff ≈ 9` occurs only when the radial factor is about 6.
-<!-- impl: §4 -> engines/builtin/evaporation_flux.py _fuchs_sutugin_gas_resistance_weight:252 — Fuchs gas weight -->
-<!-- impl: §4 -> simulator/condensation.py _stirring_enhanced_sherwood:1298 — radial Sherwood -->
+**Authority class: `upper-bound`.** With `r_melt = 0` the source flux is the reconstructible
+Hertz–Knudsen–Langmuir (HKL) upper bound, not certified melt-transport-limited flux. Species- and
+state-specific melt transfer inputs (`D_i`, `k_L,i`, `dp_eq/dC_i`) do not exist in the runtime request;
+the former universal scalar `1e-4·√axial_stir` conductance is **refused**
+(`uncertified_melt_resistance_model`) rather than silently re-enabled. Diagnostics and Pareto replay
+artifacts emit `authority_class: "upper-bound"` with
+`authority_reason: "missing-species-state-dependent-melt-transfer-inputs"`.
 
-The **melt-side surface-renewal resistance** `r_melt` accounts for the finite rate at which stirring
-brings fresh, un-depleted melt to the evaporating surface — a resistance in series with the gas-side
-terms, so a species cannot evaporate faster than the melt can resupply its surface concentration. It is
-an owner-ratified engineering term, enabled by default in the recipe data (`melt_resistance_enabled`),
-with a base surface-renewal conductance that scales with the **axial** induction-stirring axis via
-`√axial_stir_factor`. The axial default is 6.0 and controls melt-side renewal; it is intentionally
-separate from the radial Sherwood driver above. The full three-resistance series form and its derivation
-are documented in
+**Gas film.** Continuum `r_gas = 1/k_g` applies only for `Kn < VISCOUS_KNUDSEN_MAX` (0.01). There is no
+Fuchs–Sutugin weight and no unvalidated transitional film coefficient. At free-molecular / vacuum
+conditions the local film is off (`r_gas = 0`) and the flux approaches pure HKL on `Δp`. The diffusion
+coefficient `D_AB` is per-species Chapman–Enskog; Sherwood carries the **radial** induction-stirring
+enhancement `Sh_eff = 3.66 × √max(1, radial_stir_factor)` (default radial 1.0 → laminar `Sh = 3.66`).
+<!-- impl: §4 -> engines/builtin/evaporation_flux.py continuum R_g branch; simulator/condensation.py _stirring_enhanced_sherwood -->
+
+**Transport-model validity domain (not a Kn safety/coating gate).** Ledger-authoritative yields refuse
+when the flux evaluation's Kn exceeds `VISCOUS_KNUDSEN_MAX` at nonzero overhead, because evolved
+`P_bulk` still comes from the viscous-only Poiseuille model. The 0.6.3 optimizer floor (~1 mbar,
+Kn≈0.004) never enters that domain; t-379 (0.7) supplies transitional/molecular conductance and lifts
+the validity refusal. Coating remains the continuous rate→lifespan model. See
 [`docs/model-limitations.md`](model-limitations.md).
-<!-- impl: §4 -> engines/builtin/evaporation_flux.py _series_resistance_evaporation_flux_kg_m2_s:541 — axial melt renewal -->
+<!-- impl: §4 -> engines/builtin/evaporation_flux.py viscous_p_bulk_transport_out_of_domain -->
 
 ### §4.1 Directional (two-axis) induction stirring
 
@@ -312,9 +312,10 @@ The stirring in the paragraphs above is not a single knob. An industrial multi-c
 exposes two independent, physically orthogonal control axes, and the model carries both because they act on
 two different — and otherwise independent — transport resistances:
 
-- **Axial** stir is vertical electromagnetic circulation, bottom-to-surface. It renews the evaporating
-  surface with fresh, un-depleted melt, and enters as the melt-side surface-renewal term (`r_melt ∝ √axial`)
-  on the evaporation side. Its default is 6.0 — the mid-band of the documented 4–8× stirring window.
+- **Axial** stir is vertical electromagnetic circulation, bottom-to-surface. It is reserved for a future
+  species/state-dependent melt-side renewal term; with `r_melt = 0` (HKL upper-bound policy) axial stir
+  does **not** multiply source flux. Its default remains 6.0 for recipe compatibility and cold-skull
+  stir-ceiling diagnostics.
 - **Radial** stir is horizontal/azimuthal circulation — an in-plane vortex in the gas just above the melt. It
   thins the gas-side diffusion boundary layer and enters as the Sherwood enhancement (`Sh_eff = 3.66 ×
   √radial`) on the condensation/gas side. Its default is 1.0 — the no-stir laminar baseline `Sh = 3.66`.
@@ -400,16 +401,14 @@ comes from).
 
 **The Knudsen (equilibrium-effusion) limit.** A Knudsen-effusion mass-spectrometry (KEMS) cell holds the
 vapor near its saturation pressure and lets it effuse through a small orifice in free-molecular flow. In
-the model's terms this is the ballistic limit — high Knudsen number, so the Fuchs–Sutugin weight sends the
-gas-side resistance to zero — combined with a static, unstirred melt. KEMS is therefore the model's
-**zero-transport-enhancement baseline**: it measures the thermodynamic driving force (the equilibrium
-vapor pressure, and through it the melt-oxide activity) with neither of the furnace's two transport levers
-— the overhead sweep pressure and the induction stirring — engaged. This is why KEMS partial pressures are
-the primary anchor for the vapor-pressure and activity coefficients, and why stirring and sweep enter the
-furnace model only as enhancements layered on top of that baseline. Equilibrium-mode KEMS pins the
-activity (it is transport-independent); free-evaporation (Langmuir) measurements pin α at that same
-un-enhanced surface.
-<!-- impl: §4.4 -> engines/builtin/evaporation_flux.py _fuchs_sutugin_gas_resistance_weight:252 — ballistic gas limit -->
+the model's terms this is the ballistic limit — high Knudsen number, so the continuum gas-film term is
+off (`r_gas = 0`) and only the HKL interface resistance remains — combined with a static, unstirred melt.
+KEMS is therefore the model's **zero-transport-enhancement baseline**: it measures the thermodynamic
+driving force (the equilibrium vapor pressure, and through it the melt-oxide activity) with neither of
+the furnace's transport levers — the overhead sweep pressure and induction stirring — engaged as active
+enhancements. Equilibrium-mode KEMS pins the activity (it is transport-independent); free-evaporation
+(Langmuir) measurements pin α at that same un-enhanced surface.
+<!-- impl: §4.4 -> engines/builtin/evaporation_flux.py continuum-off free-molecular branch — ballistic gas limit -->
 
 **The metal-vapor back-pressure.** Between the two limits the net flux is driven by `P_eff − P_bulk`: the
 partial pressure of the species already in the bulk gas subtracts from the equilibrium pressure, so as a

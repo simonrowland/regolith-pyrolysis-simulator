@@ -56,6 +56,7 @@ def _sio_flux(alpha) -> float:
         temperature_C=1600.0,
         pressure_bar=1.0e-6,
         control_inputs={
+            "overhead_pressure_pa": 0.0,
             "vapor_pressures_Pa": {"SiO": SIO_ANCHOR_PRESSURE_PA},
             "overhead_partials_Pa": {"SiO": 0.0},
             "gas_pO2_bar": 1.0e-9,

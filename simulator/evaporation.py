@@ -46,6 +46,142 @@ class EvaporationFluxRefusal(ProviderUnavailableError):
         super().__init__(self.reason)
 
 
+def evaporation_flux_refusal_from_configuration_error(
+    exc: BaseException,
+) -> EvaporationFluxRefusal:
+    """Map helper configuration errors onto the runner's typed refusal set.
+
+    Direct helper consumers (native-Fe vapor, C7 Ca) previously raised
+    ``EvaporationFluxConfigurationError``, which is absent from
+    ``run_executor._ALL_TYPED_PHYSICS_REFUSALS`` and classified as an ordinary
+    failure. Normalize to ``EvaporationFluxRefusal`` so hostile melt-resistance
+    configs refuse on every path (projection, core, extraction).
+    """
+    detail = str(exc)
+    lowered = detail.lower()
+    if (
+        "melt resistance" in lowered
+        or "universal pressure conductance" in lowered
+    ):
+        reason = "uncertified_melt_resistance_model"
+    else:
+        reason = "evaporation_flux_configuration_error"
+    return EvaporationFluxRefusal(
+        reason,
+        {
+            "reason": reason,
+            "detail": detail,
+            "evaporation_flux_kg_hr": {},
+        },
+    )
+
+
+def viscous_p_bulk_out_of_domain_diagnostic(
+    *,
+    knudsen_number: float,
+    overhead_pressure_pa: float,
+    pipe_diameter_m: float,
+    gas_temperature_K: float,
+    carrier_gas: str = "N2",
+) -> dict[str, Any] | None:
+    """Soft diagnostic when ledger yields leave the viscous P_bulk domain.
+
+    TRANSPORT-MODEL VALIDITY DOMAIN (acceptance-matrix col 7) — NOT a Kn
+    safety gate and NOT a coating gate. Returns a typed diagnostic payload
+    when Kn is transitional at nonzero overhead (viscous Poiseuille P_bulk
+    out of domain); returns None when the operating point is in-domain
+    (viscous continuum, free-molecular, true vacuum, or non-finite Kn).
+
+    Consumers that must not soft-zero should call
+    ``refuse_viscous_p_bulk_out_of_domain`` instead. The 0.6.3 optimizer
+    floor (~1 mbar, Kn≈0.004) never enters this domain; t-379 (0.7) lifts
+    it with transitional/molecular conductance.
+    """
+    from simulator.transport_constants import (
+        FREE_MOLECULAR_KNUDSEN_MIN,
+        VISCOUS_KNUDSEN_MAX,
+    )
+
+    if overhead_pressure_pa <= 0.0:
+        return None
+    kn = float(knudsen_number)
+    # Viscous continuum: Poiseuille P_bulk is in-domain.
+    if math.isfinite(kn) and kn < VISCOUS_KNUDSEN_MAX:
+        return None
+    # Free-molecular / true vacuum: local R_g=0 and the HKL upper bound on
+    # Δp is reconstructible without a transitional film coefficient.
+    if math.isinf(kn) or (
+        math.isfinite(kn) and kn >= FREE_MOLECULAR_KNUDSEN_MIN
+    ):
+        return None
+    if not math.isfinite(kn):
+        return None
+    # Transitional band: continuum film is off but Poiseuille still evolves
+    # P_bulk — out-of-domain for ledger-authoritative yields until t-379.
+    return {
+        "authority_class": "diagnostic-limited",
+        "authority_reason": "viscous_p_bulk_transport_out_of_domain",
+        "reason": "viscous_p_bulk_transport_out_of_domain",
+        "p_bulk_transport_domain": "out_of_domain_transitional",
+        "ledger_yields_authorized": False,
+        "detail": (
+            "transitional Kn uses viscous Poiseuille P_bulk outside its "
+            f"validity domain (Kn < {VISCOUS_KNUDSEN_MAX:g}); free-"
+            f"molecular Kn >= {FREE_MOLECULAR_KNUDSEN_MIN:g} keeps the "
+            "HKL upper-bound path; t-379 (0.7) supplies transitional/"
+            "molecular conductance"
+        ),
+        "knudsen_number": kn,
+        "model_domain": (
+            f"viscous Poiseuille P_bulk: Kn < {VISCOUS_KNUDSEN_MAX:g}; "
+            f"free-molecular HKL upper-bound: Kn >= "
+            f"{FREE_MOLECULAR_KNUDSEN_MIN:g}"
+        ),
+        "VISCOUS_KNUDSEN_MAX": VISCOUS_KNUDSEN_MAX,
+        "FREE_MOLECULAR_KNUDSEN_MIN": FREE_MOLECULAR_KNUDSEN_MIN,
+        "overhead_pressure_pa": float(overhead_pressure_pa),
+        "pipe_diameter_m": float(pipe_diameter_m),
+        "gas_temperature_K": float(gas_temperature_K),
+        "carrier_gas": str(carrier_gas),
+        "framing": (
+            "transport_model_validity_domain"
+            ";not_kn_safety_gate;not_coating_gate"
+        ),
+        "evaporation_flux_kg_hr": {},
+    }
+
+
+def refuse_viscous_p_bulk_out_of_domain(
+    *,
+    knudsen_number: float,
+    overhead_pressure_pa: float,
+    pipe_diameter_m: float,
+    gas_temperature_K: float,
+    carrier_gas: str = "N2",
+) -> None:
+    """Typed refusal when ledger yields leave the viscous P_bulk domain.
+
+    TRANSPORT-MODEL VALIDITY DOMAIN (acceptance-matrix col 7) — NOT a Kn
+    safety gate and NOT a coating gate. Hard-raises when the soft
+    diagnostic helper reports transitional out-of-domain. Soft consumers
+    (provider projection, C7 extent, native-Fe partition) use
+    ``viscous_p_bulk_out_of_domain_diagnostic`` instead.
+    """
+    diagnostic = viscous_p_bulk_out_of_domain_diagnostic(
+        knudsen_number=knudsen_number,
+        overhead_pressure_pa=overhead_pressure_pa,
+        pipe_diameter_m=pipe_diameter_m,
+        gas_temperature_K=gas_temperature_K,
+        carrier_gas=carrier_gas,
+    )
+    if diagnostic is None:
+        return
+    raise EvaporationFluxRefusal(
+        "viscous_p_bulk_transport_out_of_domain",
+        diagnostic,
+    )
+
+
 # NOTE: the evaporation alpha default lives at engines/builtin/evaporation_flux.py
 # (_DEFAULT_EVAPORATION_ALPHA), which is the authoritative flux path; the former
 # duplicate here was dead (unused, not imported) and was removed (SC-09 / BUG-051).
@@ -160,8 +296,8 @@ class EvaporationMixin:
         where:
             alpha_i     = intrinsic Hertz-Knudsen evaporation coefficient
             k_HK_i      = sqrt(M_i / (2*pi*R*T))
-            R_gas_i     = gas-side Fuchs-Sutugin/Sherwood resistance
-            R_melt_i    = melt-side surface-renewal resistance
+            R_gas_i     = continuum-only gas-side Sherwood resistance
+            R_melt_i    = 0 until species/state melt-transfer inputs exist
             A_surface   = melt surface area (m²)
             P_eq_i      = effective equilibrium pressure from VAPOR_PRESSURE (Pa)
             P_bulk_i    = partial pressure above the melt (Pa)
@@ -194,6 +330,30 @@ class EvaporationMixin:
         T_K = self.melt.temperature_C + 273.15
         flux = EvaporationFlux()
         self._last_partial_melt_offgassing_diagnostic = {}
+
+        # Hostile uncertified melt model must refuse even below the 400 K
+        # kinetic floor so cold early hours cannot mask the config as ok.
+        kernel_config = dict(
+            (getattr(self, 'setpoints', {}) or {}).get('chemistry_kernel', {})
+            or {}
+        )
+        series_config = dict(
+            kernel_config.get('evaporation_series_resistance', {}) or {}
+        )
+        if bool(series_config.get('melt_resistance_enabled', False)):
+            diagnostic = {
+                'evaporation_flux_kg_hr': {},
+                'reason': 'uncertified_melt_resistance_model',
+                'detail': (
+                    'requires species- and state-specific D_i, k_L,i, '
+                    'and dp_eq/dC_i'
+                ),
+            }
+            self._last_evaporation_flux_diagnostic = diagnostic
+            raise EvaporationFluxRefusal(
+                'uncertified_melt_resistance_model',
+                diagnostic,
+            )
 
         if T_K < 400:  # Below any significant evaporation
             return flux
@@ -320,26 +480,35 @@ class EvaporationMixin:
                 'unmeasured_alpha_evaporation_fallback',
                 count=len(unmeasured_alpha_species),
             )
-        if str(kernel_result.status) != 'ok' and 'missing_alpha' in diagnostic:
-            missing = ', '.join(sorted(diagnostic['missing_alpha']))
-            raise EvaporationFluxRefusal(
-                "missing evaporation_alpha for sampled species: "
-                f"{missing}; set chemistry_kernel.allow_unmeasured_alpha_fallback "
-                "for alpha=1.0 prototype fallback",
-                diagnostic,
-            )
-        if (
-            str(kernel_result.status) != 'ok'
-            and 'missing_transport_parameters' in diagnostic
-        ):
-            missing = ', '.join(
-                sorted(diagnostic['missing_transport_parameters'])
-            )
-            raise EvaporationFluxRefusal(
-                'missing Chapman-Enskog transport parameters for sampled '
-                f'species: {missing}',
-                diagnostic,
-            )
+        # Promote EVERY non-OK EVAPORATION_FLUX result to a typed refusal.
+        # Previously only missing_alpha / missing_transport_parameters raised;
+        # other refusals (e.g. uncertified_melt_resistance_model,
+        # viscous_p_bulk_transport_out_of_domain) fell through to empty
+        # flux_kg_hr={} — silent zero evaporation, not a load-bearing refuse.
+        if str(kernel_result.status) != 'ok':
+            reason = str(diagnostic.get('reason') or '').strip()
+            if 'missing_alpha' in diagnostic:
+                missing = ', '.join(sorted(diagnostic['missing_alpha']))
+                reason = (
+                    "missing evaporation_alpha for sampled species: "
+                    f"{missing}; set chemistry_kernel.allow_unmeasured_alpha_fallback "
+                    "for alpha=1.0 prototype fallback"
+                )
+            elif 'missing_transport_parameters' in diagnostic and not reason:
+                missing = ', '.join(
+                    sorted(diagnostic['missing_transport_parameters'])
+                )
+                reason = (
+                    'missing Chapman-Enskog transport parameters for sampled '
+                    f'species: {missing}'
+                )
+            if not reason:
+                reason = (
+                    f"evaporation_flux_{kernel_result.status}"
+                    if kernel_result.status
+                    else "evaporation_flux_refused"
+                )
+            raise EvaporationFluxRefusal(reason, diagnostic)
         flux_kg_hr = diagnostic.get('evaporation_flux_kg_hr') or {}
         liquid_fraction_factor = 1.0
         if flux_kg_hr and self._freeze_gate_enabled():

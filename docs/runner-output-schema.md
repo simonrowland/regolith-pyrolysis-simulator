@@ -181,6 +181,8 @@ it does not introduce a new schema version.
   },
   "pressure_coating_pareto_diagnostic": {     // additive pressure/Kn/coating surface
     "schema_version": "pressure-coating-pareto-v1",
+    "authority_class": "upper-bound",        // HKL upper-bound (R_m=0 policy)
+    "authority_reason": "missing-species-state-dependent-melt-transfer-inputs",
     "gate": {
       "no_warning_knudsen_threshold": 0.01,
       "hard_refusal_knudsen_threshold": 10.0,
@@ -190,10 +192,14 @@ it does not introduce a new schema version.
       "wall_deposit_flux_kg_hr_by_species": {...}
     },
     "by_species": {
-      "Na": {"sweep": [...]},
-      "K":  {"sweep": [...]},
-      "SiO": {"sweep": [...]},
-      "Fe": {"sweep": [...]}
+      "Na": {
+        "authority_class": "upper-bound",
+        "authority_reason": "missing-species-state-dependent-melt-transfer-inputs",
+        "sweep": [...]
+      },
+      "K":  {"authority_class": "upper-bound", "sweep": [...]},
+      "SiO": {"authority_class": "upper-bound", "sweep": [...]},
+      "Fe": {"authority_class": "upper-bound", "sweep": [...]}
     }
   }
 }
@@ -226,7 +232,11 @@ it does not introduce a new schema version.
 * `pressure_coating_pareto_diagnostic` is diagnostic-only. It replays the
   latest evaporation series-resistance inputs across the overhead-pressure
   sweep, reports the actual Kn gate and characteristic length used by the
-  model, and exposes current absolute wall-deposit flux by species.
+  model, and exposes current absolute wall-deposit flux by species. With
+  melt resistance disabled the replayed source flux is an HKL **upper bound**;
+  the artifact carries machine-readable `authority_class: "upper-bound"` and
+  `authority_reason: "missing-species-state-dependent-melt-transfer-inputs"`
+  at both the top level and per-species entries.
 
 ## Final state
 
