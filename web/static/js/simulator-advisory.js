@@ -292,6 +292,14 @@ function renderProductLedgerPanel(payload) {
         setAdvisoryEmpty(content, 'product-ledger-state');
         return;
     }
+    const storyStatus = typeof data.product_story_status === 'string'
+        ? data.product_story_status
+        : null;
+    const panelStatus = !storyStatus || storyStatus === 'ok'
+        ? 'ok'
+        : storyStatus === 'degraded'
+            ? 'degraded'
+            : 'unavailable';
 
     advisoryClear(content);
     content.className = 'advisory-result';
@@ -343,9 +351,12 @@ function renderProductLedgerPanel(payload) {
 
     if (!sections) {
         setAdvisoryEmpty(content, 'product-ledger-state');
+        if (panelStatus !== 'ok') {
+            updateAdvisoryState('product-ledger-state', panelStatus);
+        }
         return;
     }
-    updateAdvisoryState('product-ledger-state', 'ok');
+    updateAdvisoryState('product-ledger-state', panelStatus);
 }
 
 function renderOverlapEvaporationPanel(payload) {
@@ -514,6 +525,33 @@ function thermalTrainHeadlineMetric(value, unit) {
 // acknowledgement from a PREVIOUS run cannot repopulate a cleared strip
 // (stale-ack race — a completed run's read can land after 'started').
 let thermalTrainHeadlineGeneration = 0;
+let completionPanelGeneration = 0;
+let completionPanelRunId = null;
+
+function clearAdvisoryPanelById(contentId, stateId) {
+    const content = document.getElementById(contentId);
+    if (content) {
+        setAdvisoryEmpty(content, stateId);
+        return;
+    }
+    updateAdvisoryState(stateId, 'n/a');
+}
+
+function clearCompletionBoundAdvisoryPanels() {
+    renderProductLedgerPanel(null);
+    renderCeramicRumpPanel(null);
+    // Present on the integration branch; absent on older simulator templates.
+    clearAdvisoryPanelById('industrial-glass-content', 'industrial-glass-state');
+    renderVaporPressureAuthorityPanel(null);
+    renderKnudsenRegimePanelFromDiagnostic(null);
+}
+
+function completionPayloadMatchesGeneration(payload) {
+    return !completionPanelRunId
+        || !payload
+        || !payload.run_id
+        || payload.run_id === completionPanelRunId;
+}
 
 function clearThermalTrainHeadline(label) {
     const panel = document.getElementById('thermal-train-headline');
@@ -621,6 +659,7 @@ socket.on('simulation_tick', (data) => {
 });
 
 socket.on('simulation_complete', (data) => {
+    if (!completionPayloadMatchesGeneration(data)) return;
     renderProductLedgerPanel(data);
     renderCeramicRumpPanel(data.ceramic_rump_panel);
     renderVaporPressureAuthorityPanel(data.vapor_pressure_authority_panel);
@@ -634,6 +673,9 @@ socket.on('simulation_complete', (data) => {
 socket.on('simulation_status', (data) => {
     if (data && data.status === 'started') {
         thermalTrainHeadlineGeneration += 1;
+        completionPanelGeneration += 1;
+        completionPanelRunId = data.run_id || `generation-${completionPanelGeneration}`;
+        clearCompletionBoundAdvisoryPanels();
         clearThermalTrainHeadline();
     }
     if (data && data.knudsen_regime_diagnostic) {

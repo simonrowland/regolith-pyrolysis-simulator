@@ -5,10 +5,15 @@ const input = JSON.parse(fs.readFileSync(0, 'utf8'));
 const html = String(input.html || '');
 const payload = input.payload || {};
 const eventName = String(input.event || '');
+const eventSequence = Array.isArray(input.events)
+  ? input.events
+  : [{ event: eventName, payload }];
 const scriptPath = input.script_path;
 const requestedIds = input.ids || [];
 
-if (!eventName) throw new Error('event is required');
+if (!eventSequence.length || eventSequence.some(item => !item || !item.event)) {
+  throw new Error('event or events is required');
+}
 if (!scriptPath) throw new Error('script_path is required');
 
 class Element {
@@ -109,12 +114,14 @@ vm.runInContext(fs.readFileSync(scriptPath, 'utf8'), context, {
   filename: scriptPath,
 });
 
-if (!handlers[eventName] || !handlers[eventName].length) {
-  throw new Error(`${eventName} handler was not registered`);
-}
-
-for (const handler of handlers[eventName]) {
-  handler(payload);
+for (const item of eventSequence) {
+  const eventHandlers = handlers[item.event];
+  if (!eventHandlers || !eventHandlers.length) {
+    throw new Error(`${item.event} handler was not registered`);
+  }
+  for (const handler of eventHandlers) {
+    handler(item.payload || {});
+  }
 }
 
 const output = {
