@@ -675,12 +675,32 @@ function panelRegistry() {
 }
 
 function panelSectionsHtml(artifact, rows, spans, energy) {
-  return panelRegistry().map((panel) => {
-    try {
-      return panel.render(artifact, rows, spans, energy);
-    } catch (error) {
-      return `<section class="card" id="${esc(panel.id)}"><h2>${esc(panel.id)}</h2><div class="pending"><strong>Panel failed to render</strong><p class="mono">${esc(error && error.message ? error.message : String(error))}</p></div></section>`;
+  return panelRegistry().map((panel, index) => {
+    // Read the id BEFORE the try: a null entry made the catch block itself
+    // throw on `panel.id`, which escaped containment and replaced the whole
+    // report with the fatal panel. One bad entry costs its own section, never
+    // the report.
+    const id = panel && typeof panel === "object" && typeof panel.id === "string" && panel.id.trim()
+      ? panel.id.trim()
+      : `panel-${index}`;
+    const failed = (message) => `<section class="card" id="${esc(id)}"><h2>${esc(id)}</h2>` +
+      `<div class="pending"><strong>Panel failed to render</strong><p class="mono">${esc(message)}</p></div></section>`;
+    if (!panel || typeof panel !== "object" || typeof panel.render !== "function") {
+      return failed("panel did not provide a render() function");
     }
+    let html;
+    try {
+      html = panel.render(artifact, rows, spans, energy);
+    } catch (error) {
+      return failed(error && error.message ? error.message : String(error));
+    }
+    // A non-string return is coerced by join(): an object splices
+    // "[object Object]" between sections. Absent output is a panel opting out.
+    if (html === undefined || html === null) return "";
+    if (typeof html !== "string") {
+      return failed(`panel render() returned ${Array.isArray(html) ? "an array" : typeof html}, not HTML`);
+    }
+    return html;
   }).join("");
 }
 
@@ -717,12 +737,15 @@ function renderCurrent(artifact, index) {
   const ledger = $("#timestep-ledger");
   if (ledger) ledger.innerHTML = renderTimestepLedger(timestep);
   updateMarkers(index, count);
-  panelRegistry().forEach((panel) => {
-    if (typeof panel.onTimestep !== "function") return;
+  panelRegistry().forEach((panel, panelIndex) => {
+    // Guard the entry itself: a null registry entry threw here, outside the
+    // try, and took the whole render down on every scrub.
+    if (!panel || typeof panel !== "object" || typeof panel.onTimestep !== "function") return;
     try {
       panel.onTimestep(artifact, index);
     } catch (error) {
-      console.error(`panel ${panel.id} onTimestep failed:`, error);
+      const id = typeof panel.id === "string" && panel.id.trim() ? panel.id.trim() : `panel-${panelIndex}`;
+      console.error(`panel ${id} onTimestep failed:`, error);
     }
   });
 }

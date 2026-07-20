@@ -3446,3 +3446,104 @@ def test_run_manifest_without_recipe_snapshot_returns_typed_error(tmp_path: Path
         "error": "artifact carries no recipe snapshot; export unavailable",
         "error_type": "run_manifest_unavailable",
     }
+
+
+def _render_report_html_with_panels(artifact: dict, panels_js: str) -> str:
+    """Render the report with panel modules registered on globalThis.ReportPanels."""
+    root = Path(__file__).resolve().parents[1] / "web/report_viewer"
+    harness = r"""
+const fs = require("fs");
+const vm = require("vm");
+const labelsSource = fs.readFileSync(process.argv[2], "utf8");
+const reportSource = fs.readFileSync(process.argv[3], "utf8");
+const nodes = new Map();
+function el(id) {
+  if (!nodes.has(id)) {
+    nodes.set(id, {
+      id, innerHTML: "", textContent: "", value: "", disabled: false,
+      attributes: {},
+      setAttribute(name, value) { this.attributes[name] = String(value); },
+      getAttribute(name) { return this.attributes[name] ?? null; },
+      addEventListener() {}, focus() {},
+      classList: { add() {}, remove() {}, toggle() {} }
+    });
+  }
+  return nodes.get(id);
+}
+const report = el("report");
+const context = {
+  window: { location: { search: "" } },
+  document: {
+    title: "",
+    querySelector(selector) {
+      if (selector === "#report") return report;
+      if (selector.startsWith("#")) return el(selector.slice(1));
+      if (selector === ".stepper") return el("stepper-root");
+      if (selector === ".status-pill") return el("status-pill");
+      return null;
+    },
+    querySelectorAll() { return []; }
+  },
+  URLSearchParams,
+  encodeURIComponent,
+  setTimeout,
+  console: { error() {}, warn() {}, log() {} },
+  fetch: async () => ({ ok: true, json: async () => JSON.parse(process.argv[4]) })
+};
+context.globalThis = context;
+vm.runInNewContext(labelsSource, context);
+vm.runInNewContext(process.argv[5], context);
+vm.runInNewContext(reportSource, context);
+setImmediate(() => process.stdout.write(
+  Array.from(nodes.values()).map((node) => node.innerHTML).join("\n")
+));
+"""
+    completed = subprocess.run(
+        ["node", "-", str(root / "labels.js"), str(root / "report-viewer.js"),
+         json.dumps(artifact), panels_js],
+        input=harness,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    return completed.stdout
+
+
+def _panel_artifact() -> dict:
+    return {
+        "artifact_schema_version": "0.2.0",
+        "execution_status": "ok",
+        "lifecycle": "complete",
+        "header": {"run_id": "panel-registry"},
+        "timesteps": [],
+        "terminal": {"final_state": {}},
+    }
+
+
+@pytest.mark.parametrize(
+    "panels_js,expect_notice",
+    [
+        ("globalThis.ReportPanels = [null];", True),
+        ("globalThis.ReportPanels = [{ id: 'p', render() { return { html: 'x' }; } }];", True),
+        ("globalThis.ReportPanels = [{ id: 'p', render() { return 42; } }];", True),
+        ("globalThis.ReportPanels = [{ id: 'p' }];", True),
+        ("globalThis.ReportPanels = [{ id: 'p', render() { return undefined; } }];", False),
+    ],
+)
+def test_panel_registry_contains_bad_panels(panels_js: str, expect_notice: bool) -> None:
+    """A misbehaving panel costs its own section, never the whole report.
+
+    A null entry previously made the catch block itself throw on `panel.id`,
+    which escaped containment and replaced the entire report with the fatal
+    panel; a non-string return was coerced by join() into "[object Object]".
+    """
+    html = _render_report_html_with_panels(_panel_artifact(), panels_js)
+
+    assert "[object Object]" not in html
+    # The report itself still rendered.
+    assert "Evolved metal mass" in html or "Full terminal ledger" in html
+    assert "Could not read the frozen artifact" not in html
+    if expect_notice:
+        assert "Panel failed to render" in html
+    else:
+        assert "Panel failed to render" not in html
