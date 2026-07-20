@@ -128,8 +128,10 @@ function runMetaLine(run) {
   );
   const summary = typeof run.summary === "string" ? run.summary.trim() : "";
   if (!hasYields && summary) parts.push(summary);
-  if (hasNumber(run.hours)) parts.push(exactNumber(run.hours, "h"));
-  if (hasNumber(run.peak_T_C)) parts.push(`peak ${exactNumber(run.peak_T_C, "°C")}`);
+  // Meta parts are escaped as untrusted text by runCard. Keep numeric parts as
+  // plain text too: returning exactNumber HTML here would be double-escaped.
+  if (hasNumber(run.hours)) parts.push(fmtNum(run.hours, "h"));
+  if (hasNumber(run.peak_T_C)) parts.push(`peak ${fmtNum(run.peak_T_C, "°C")}`);
   if (run.created_at) {
     const stamp = scalarText(run.created_at);
     const day = stamp.slice(0, 10);

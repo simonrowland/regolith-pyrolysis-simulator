@@ -1838,7 +1838,8 @@ def test_library_meta_line_escapes_span_injection() -> None:
             "created_at": "2026-07-20T00:00:00Z",
             "starred": False,
             "summary": "",
-            "hours": 1,
+            "hours": 12,
+            "peak_T_C": 1600,
         },
     ]
     harness = r"""
@@ -1891,6 +1892,10 @@ setImmediate(() => { process.stdout.write((els["run-list"] && els["run-list"]._h
     assert "<script>alert(2)" not in lower_html
     assert "&lt;span onmouseover" in lower_html
     assert "&lt;script&gt;alert(2)" in lower_html
+    assert "12 h" in html
+    assert "peak 1,600 °C" in html
+    assert "&lt;span title=&quot;12 h&quot;" not in html
+    assert "&lt;span title=&quot;1600 °C&quot;" not in html
 
 
 def test_settings_script_readable_labels_and_honest_absent_fields() -> None:
