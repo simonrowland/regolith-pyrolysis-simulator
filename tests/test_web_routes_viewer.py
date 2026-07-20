@@ -11,7 +11,6 @@ from flask import Flask
 
 from simulator.accounting.run_artifact import ARTIFACT_SCHEMA_VERSION
 from simulator.recipe_io import normalize_recipe_patch
-from simulator.runner import _METAL_PRODUCT_SPECIES
 from web.routes import bp
 from web.run_store import RunArtifactStore
 
@@ -90,7 +89,7 @@ vm.runInNewContext(reportSource, context);
 setImmediate(() => process.stdout.write(JSON.stringify({
   html: Array.from(nodes.values()).map((node) => node.innerHTML).join("\n"),
   nodes: Object.fromEntries(Array.from(nodes.entries()).map(([id, node]) => [id, {
-    text: node.textContent, attributes: node.attributes
+    html: node.innerHTML, text: node.textContent, attributes: node.attributes
   }]))
 })));
 """
@@ -109,6 +108,14 @@ setImmediate(() => process.stdout.write(JSON.stringify({
 
 def _render_report_html(artifact: dict) -> str:
     return str(_render_report_state(artifact)["html"])
+
+
+def _report_section(html: str, number: int) -> str:
+    marker = f'<span class="sect">{number:02d}</span>'
+    start = html.index(marker)
+    next_marker = f'<span class="sect">{number + 1:02d}</span>'
+    end = html.find(next_marker, start)
+    return html[start:] if end < 0 else html[start:end]
 
 
 def _run_viewer_expression(script_name: str, expression: str):
@@ -518,7 +525,7 @@ setImmediate(() => process.stdout.write(report.innerHTML));
     )
     html = completed.stdout
 
-    assert "Product accounts" in html
+    assert "Collection/output accounts · not product-story status" in html
     assert "Retained accounts" in html
     assert "Loss accounts" in html
     assert "Terminal inventory accounts" in html
@@ -560,7 +567,7 @@ def test_metal_phase_disposition_splits_ingots_from_unrecovered_species() -> Non
     }
 
     html = _render_report_html(artifact)
-    product_start = html.index("Product accounts")
+    product_start = html.index("Collection/output accounts · not product-story status")
     retained_start = html.index("Retained accounts")
     ledger_start = html.index('<span class="sect">04</span>Full terminal ledger')
     product_block = html[product_start:retained_start]
@@ -577,6 +584,28 @@ def test_metal_phase_disposition_splits_ingots_from_unrecovered_species() -> Non
     assert "Na" in retained_block
     assert "K" in retained_block
     assert "Mg" in retained_block
+
+
+def test_condensation_and_chromium_accounts_do_not_claim_product_story_status() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["terminal"] = {
+        "final_state": {
+            "process.condensation_train": {"CO2": 7.25},
+            "terminal.chromium_condensed_oxide_stored": {"Cr2O3": 8.5},
+            "process.cleaned_melt": {"Al2O3": 1.0},
+        }
+    }
+
+    disposition = _report_section(_render_report_html(artifact), 3)
+    collection_start = disposition.index(
+        "Collection/output accounts · not product-story status",
+    )
+    retained_start = disposition.index("Retained accounts")
+    collection_block = disposition[collection_start:retained_start]
+
+    assert 'CO₂ <span title="7.25 mol">7.25 mol</span>' in collection_block
+    assert 'Cr₂O₃ <span title="8.5 mol">8.5 mol</span>' in collection_block
+    assert "Product accounts" not in disposition
 
 
 
@@ -1297,9 +1326,9 @@ setImmediate(() => process.stdout.write(JSON.stringify({
     assert 'aria-label="Previous hour"' in html
     assert 'aria-label="Next hour"' in html
     assert 'aria-valuetext="Hour 1 of 2"' in html or "aria-valuetext" in html
-    assert "Product-ledger metal projection — Ellingham order" in html
+    assert "Product-ledger metal projection — emitter whitelist order" in html
     assert "Extraction yields" not in html
-    assert "Product accounts" in html
+    assert "Collection/output accounts · not product-story status" in html
     assert result["hasPrev"] and result["hasNext"] and result["hasInput"]
     assert "source-side O₂ potential (emitted; not recovered)" in html
     assert "O2_source_side_potential_kg_cumulative" not in html
@@ -1674,30 +1703,33 @@ def test_report_viewer_shows_stage_warning_beside_verdict() -> None:
     assert html.count('class="stage-warning"') == 1
 
 
-def test_metal_yields_are_labeled_as_a_mixed_account_product_ledger_projection() -> None:
+def test_metal_yields_render_emitted_ni_and_co_product_ledger_chips() -> None:
     artifact = _artifact(recipe_snapshot=None)
     artifact["timesteps"] = [
         {
             "hour": 1,
-            "summary": {"campaign": "C0", "metal_yields_kg": {"Fe": 12.5}},
+            "summary": {
+                "campaign": "C0",
+                "metal_yields_kg": {"Fe": 12.5, "Ni": 1.25, "Co": 2.75},
+            },
             "ledger": {},
         }
     ]
 
-    html = _render_report_html(artifact)
-    whitelist = ", ".join(_METAL_PRODUCT_SPECIES[:-1]) + f", and {_METAL_PRODUCT_SPECIES[-1]}"
+    yields = _report_section(_render_report_html(artifact), 1)
 
-    assert "Product-ledger metal projection — Ellingham order" in html
-    assert f"filtered to exact element keys {whitelist}" in html
-    assert "decorated reagent-bookkeeping keys" in html
-    assert "every other non-whitelisted species are excluded" in html
-    assert "Values are not recovery-only" in html
     assert (
         '<div class="el">Fe</div><div class="kg">'
         '<span title="12.5 kg">12.5 kg</span> product-ledger projection</div>'
-    ) in html
-    assert "Evolved metal mass" not in html
-    assert "Not recovered product mass" not in html
+    ) in yields
+    assert (
+        '<div class="el">Ni</div><div class="kg">'
+        '<span title="1.25 kg">1.25 kg</span> product-ledger projection</div>'
+    ) in yields
+    assert (
+        '<div class="el">Co</div><div class="kg">'
+        '<span title="2.75 kg">2.75 kg</span> product-ledger projection</div>'
+    ) in yields
 
 
 def test_run_store_emits_mixed_account_product_ledger_semantics_for_metals() -> None:
@@ -1757,49 +1789,159 @@ def test_terminal_ledger_rejects_non_object_species_maps() -> None:
     assert "1 b" not in html
 
 
-def test_artifact_species_map_arrays_do_not_fabricate_numeric_species_names() -> None:
+def test_array_c3_dose_does_not_fabricate_header_species() -> None:
     artifact = _artifact(recipe_snapshot=None)
     artifact["header"]["c3_dose"] = [101.0, 202.0]
     artifact["timesteps"] = [
         {
             "hour": 1,
-            "summary": {
-                "campaign": "C0",
-                "vapor_species_kg_hr": [11.0, 22.0],
-                "wall_deposit_cumulative_kg": {"stage_0_to_1": [31.0, 32.0]},
-            },
+            "summary": {"campaign": "C0"},
+            "ledger": {},
+        }
+    ]
+
+    html = _render_report_html(artifact)
+    header = html[:html.index('<span class="sect">01</span>')]
+
+    assert "C3 dose" not in header
+    assert "101 kg" not in header
+    assert "202 kg" not in header
+
+
+def test_array_vapor_map_does_not_fabricate_chart_species() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["timesteps"] = [
+        {
+            "hour": 1,
+            "summary": {"campaign": "C0", "vapor_species_kg_hr": [11.0, 22.0]},
+            "ledger": {},
+        }
+    ]
+
+    process = _report_section(_render_report_html(artifact), 2)
+    vapor_start = process.index("Vapor species surges · kg/h")
+    vapor_chart = process[vapor_start:]
+
+    assert "No numeric series values were emitted." in vapor_chart
+    assert '<svg id="vapor-chart"' not in vapor_chart
+    assert ">22</text>" not in vapor_chart
+
+
+def test_array_timestep_ledger_species_map_renders_malformed_row() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["timesteps"] = [
+        {
+            "hour": 1,
+            "summary": {"campaign": "C0"},
             "ledger": {"process.condensation_train": [41.0, 42.0]},
         }
     ]
+
+    state = _render_report_state(artifact)
+    ledger = state["nodes"]["timestep-ledger"]["html"]
+
+    assert "captured, malformed species map" in ledger
+    assert "41 mol" not in ledger
+    assert "42 mol" not in ledger
+
+
+def test_array_wall_segment_species_map_renders_malformed_row() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["timesteps"] = [
+        {
+            "hour": 1,
+            "summary": {
+                "campaign": "C0",
+                "wall_deposit_cumulative_kg": {"stage_0_to_1": [31.0, 32.0]},
+            },
+            "ledger": {},
+        }
+    ]
+
+    wall = _report_section(_render_report_html(artifact), 7)
+
+    assert "stage_0_to_1</td><td>malformed species map" in wall
+    assert "31 kg" not in wall
+    assert "32 kg" not in wall
+    assert "viewer-side sum" not in wall
+
+
+def test_array_terminal_ledger_species_map_renders_malformed_row() -> None:
+    artifact = _artifact(recipe_snapshot=None)
     artifact["terminal"] = {
-        "final_state": {
-            "process.metal_phase": [51.0, 52.0],
-            "process.cleaned_melt": [61.0, 62.0],
-        },
-        "stage_purity": [71.0, 72.0],
+        "final_state": {"process.condensation_train": [51.0, 52.0]},
     }
 
-    report_html = _render_report_html(artifact)
+    ledger = _report_section(_render_report_html(artifact), 4)
+
+    assert "captured, malformed species map" in ledger
+    assert "51 mol" not in ledger
+    assert "52 mol" not in ledger
+
+
+def test_array_disposition_species_map_stays_in_malformed_retained_row() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["terminal"] = {
+        "final_state": {"process.metal_phase": [51.0, 52.0]},
+    }
+
+    disposition = _report_section(_render_report_html(artifact), 3)
+    retained = disposition[disposition.index("Retained accounts"):]
+
+    assert "empty or malformed" in retained
+    assert "51 mol" not in retained
+    assert "52 mol" not in retained
+
+
+def test_array_stage_purity_renders_malformed_stage_map() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["terminal"] = {"stage_purity": [71.0, 72.0]}
+
+    purity = _report_section(_render_report_html(artifact), 6)
+
+    assert "terminal.stage_purity is present but is not a stage map" in purity
+    assert "71 kg" not in purity
+    assert "72 kg" not in purity
+
+
+def test_array_cleaned_melt_renders_malformed_species_map() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["timesteps"] = [
+        {"hour": 1, "summary": {"campaign": "C0"}, "ledger": {}}
+    ]
+    artifact["terminal"] = {
+        "final_state": {"process.cleaned_melt": [61.0, 62.0]},
+    }
+
+    ceramic = _report_section(_render_report_html(artifact), 8)
+
+    assert "process.cleaned_melt is present but is not a species map" in ceramic
+    assert "61 mol" not in ceramic
+    assert "62 mol" not in ceramic
+
+
+def test_array_library_headline_yields_render_no_species_chips() -> None:
     library_html = _run_viewer_expression(
         "library.js", "yieldChips({headline_yields_kg: [81, 82]})",
     )
-    settings = _run_viewer_expression(
-        "settings.js",
-        "({dose: c3DoseBlock([91, 92]), config: configEntries([{value: 1}])})",
+
+    assert library_html == ""
+
+
+def test_array_settings_dose_renders_not_captured() -> None:
+    dose = _run_viewer_expression("settings.js", "c3DoseBlock([91, 92])")
+
+    assert "Not captured" in dose
+    assert "91 kg" not in dose
+    assert "92 kg" not in dose
+
+
+def test_array_settings_config_has_no_entries() -> None:
+    config = _run_viewer_expression(
+        "settings.js", "configEntries([{value: 1}])",
     )
 
-    assert "C3 dose 0" not in report_html
-    assert "C3 dose 1" not in report_html
-    assert "</i>0</span>" not in report_html
-    assert "</i>1</span>" not in report_html
-    assert "captured, malformed species map" in report_html
-    assert "malformed species map" in report_html
-    assert '<div class="el">0</div>' not in library_html
-    assert '<div class="el">1</div>' not in library_html
-    assert library_html == ""
-    assert "<td>0</td>" not in settings["dose"]
-    assert "<td>1</td>" not in settings["dose"]
-    assert settings["config"] == []
+    assert config == []
 
 
 def test_yield_and_oxygen_exact_kg_surfaces_reject_numeric_coercion() -> None:
@@ -1882,7 +2024,25 @@ def test_wall_deposit_empty_segment_stays_pending() -> None:
     assert ">0 kg</span>" not in html
 
 
-def test_wall_deposit_empty_map_renders_not_emitted_instead_of_empty_table() -> None:
+def test_absent_wall_deposit_map_renders_unknown_state() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["timesteps"] = [
+        {
+            "hour": 1,
+            "summary": {"campaign": "C0"},
+            "ledger": {},
+        }
+    ]
+
+    wall = _report_section(_render_report_html(artifact), 7)
+
+    assert '<div class="cbig">not emitted</div>' in wall
+    assert '<span>Per-segment breakdown</span><b>not emitted</b>' in wall
+    assert "captured, empty map" not in wall
+    assert "captured, malformed map" not in wall
+
+
+def test_wall_deposit_empty_map_renders_captured_zero_state() -> None:
     artifact = _artifact(recipe_snapshot=None)
     artifact["timesteps"] = [
         {
@@ -1895,10 +2055,35 @@ def test_wall_deposit_empty_map_renders_not_emitted_instead_of_empty_table() -> 
         }
     ]
 
-    html = _render_report_html(artifact)
+    wall = _report_section(_render_report_html(artifact), 7)
 
-    assert '<span>Per-segment breakdown</span><b>not emitted</b>' in html
-    assert "<th>Emitted segment</th>" not in html
+    assert (
+        '<div class="cbig"><span title="0 kg">0 kg</span> '
+        '<small>captured empty map</small></div>'
+    ) in wall
+    assert '<span>Per-segment breakdown</span><b>captured, empty map</b>' in wall
+    assert "<th>Emitted segment</th>" not in wall
+
+
+def test_malformed_wall_deposit_map_renders_captured_malformed_state() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["timesteps"] = [
+        {
+            "hour": 1,
+            "summary": {
+                "campaign": "C0",
+                "wall_deposit_cumulative_kg": [{"GHOST": 97.0}],
+            },
+            "ledger": {},
+        }
+    ]
+
+    wall = _report_section(_render_report_html(artifact), 7)
+
+    assert '<div class="cbig">malformed</div>' in wall
+    assert '<span>Per-segment breakdown</span><b>captured, malformed map</b>' in wall
+    assert "GHOST" not in wall
+    assert "97 kg" not in wall
 
 
 def test_cleaned_melt_title_requires_emitted_ceramic_classification() -> None:
@@ -2127,6 +2312,19 @@ def test_sparse_stage_purity_verdict_stays_pending() -> None:
     assert '<span class="verdict unavailable">PENDING</span>' in html
     assert '<span class="verdict pure">PURE</span>' not in html
     assert "Verdict pending until stage masses are emitted." in html
+
+
+def test_malformed_stage_purity_record_renders_without_fatal_error() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["terminal"] = {"stage_purity": {"broken_stage": None}}
+
+    html = _render_report_html(artifact)
+    purity = _report_section(html, 6)
+
+    assert "Report unavailable" not in html
+    assert "Could not read the frozen artifact" not in html
+    assert '<span title="broken_stage">broken_stage</span>' in purity
+    assert "captured, malformed stage record" in purity
 
 
 def test_absent_accepted_species_stays_pending_but_emitted_empty_means_none() -> None:

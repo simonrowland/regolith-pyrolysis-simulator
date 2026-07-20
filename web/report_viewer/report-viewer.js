@@ -11,11 +11,11 @@ const ARTIFACT_URL = RUN_ID
   ? `/api/runs/${encodeURIComponent(RUN_ID)}`
   : "./sample-run-artifact.json";
 const SUPPORTED_ARTIFACT_SCHEMA_MAJOR = 0;
-const ELLINGHAM_ORDER = ["Na", "K", "Fe", "Cr", "Mn", "Mg", "Si", "Al", "Ti", "Ca"];
+const METAL_YIELD_ORDER = ["Fe", "Mg", "Al", "Ti", "Ca", "Cr", "Ni", "Co", "Mn", "Na", "K", "Si"];
 const COLORS = ["#e8940f", "#1f7798", "#468466", "#8b63a6", "#a95c43", "#6f8c9e"];
 const DISPOSITION_GROUPS = Object.freeze([
   // Account-role buckets only — not feedstock-origin or per-species yield tiers.
-  { key: "products", label: "Product accounts" },
+  { key: "collection_output", label: "Collection/output accounts · not product-story status" },
   { key: "retained", label: "Retained accounts" },
   { key: "losses", label: "Loss accounts" },
   { key: "terminal_inventory", label: "Terminal inventory accounts" },
@@ -255,7 +255,7 @@ function yieldsSection(rows, terminal) {
     ? {}
     : emittedProjection;
   const max = Math.max(maxPresent(Object.values(projection)) ?? 0, 1);
-  const chips = ELLINGHAM_ORDER.map((element) => {
+  const chips = METAL_YIELD_ORDER.map((element) => {
     const widthPct = Math.min(100, Math.sqrt((n(projection[element]) ?? 0) / max) * 100);
     const mass = hasNumber(projection[element])
       ? `${exactKg(projection[element])} product-ledger projection`
@@ -263,7 +263,7 @@ function yieldsSection(rows, terminal) {
     return `<div class="yield-chip"><div class="el">${speciesSpan(element)}</div><div class="kg">${mass}</div><div class="bar"><i style="width:${widthPct.toFixed(2)}%"></i></div></div>`;
   }).join("");
   const gap = terminal.yield_disposition ? "" : `<div class="note">Per-species feedstock-yield fractions are pending <span class="mono">yield_disposition</span>; none are inferred here.</div>`;
-  return section(1, "Product-ledger metal projection — Ellingham order", "Final hourly metal_yields_kg is the product-ledger projection filtered to exact element keys Fe, Mg, Al, Ti, Ca, Cr, Ni, Co, Mn, Na, K, and Si. Oxides, salts, halides, decorated reagent-bookkeeping keys, and every other non-whitelisted species are excluded. Values are not recovery-only; feedstock-origin fractions require yield_disposition.", `<div class="yield-track" aria-label="Product-ledger metal projection by element">${chips}</div>${gap}`);
+  return section(1, "Product-ledger metal projection — emitter whitelist order", "Final hourly metal_yields_kg is the product-ledger projection filtered by the emitter to exact element keys Fe, Mg, Al, Ti, Ca, Cr, Ni, Co, Mn, Na, K, and Si. This panel renders those same twelve keys in emitter whitelist order; absent keys display as not emitted. Oxides, salts, halides, decorated reagent-bookkeeping keys, and every other non-whitelisted species are excluded. Values are not recovery-only; feedstock-origin fractions require yield_disposition.", `<div class="yield-track" aria-label="Product-ledger metal projection by element">${chips}</div>${gap}`);
 }
 
 function processSection(artifact, rows, spans) {
@@ -365,14 +365,14 @@ function ledgerSection(finalState) {
 function dispositionRole(account, species = null) {
   if (METAL_PHASE_ACCOUNTS.has(account)) {
     if (typeof species !== "string") return "retained";
-    return METAL_PHASE_UNRECOVERED_SPECIES.has(species) ? "retained" : "products";
+    return METAL_PHASE_UNRECOVERED_SPECIES.has(species) ? "retained" : "collection_output";
   }
   if ([
     "process.condensation_train", "terminal.drain_tap_material",
     "terminal.chromium_condensed_oxide_stored", "terminal.oxygen_stage0_stored",
     "terminal.oxygen_mre_anode_stored", "terminal.oxygen_melt_offgas_stored",
     "terminal.oxygen_melt_offgas_captured", "reservoir.oxygen_cistern_liquid_inventory"
-  ].includes(account)) return "products";
+  ].includes(account)) return "collection_output";
   if ([
     "process.cleaned_melt", "terminal.slag", "process.solid_char_carbon",
     "process.raw_feedstock", "process.stage0_carbonate_feed", "process.stage0_perchlorate_feed",
@@ -422,7 +422,7 @@ function accountDispositionSection(finalState) {
     return `<div class="card disposition-group"><div class="ct">${esc(group.label)}</div><div class="cbig">not emitted</div><div class="table-wrap"><table><thead><tr><th>Account</th><th>Species · mol</th><th class="num">Account total · mol</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
   }).join("");
   const body = content || `<div class="pending"><strong>Not emitted</strong><p>No terminal final_state accounts were emitted.</p></div>`;
-  return section(3, "Account disposition", "Account disposition — where terminal inventory sits at run end, grouped by viewer role. Metal-phase accounts follow the emitted product-story split: ordinary metals are ingots; SiO/SiO₂ and captured Na/K/Mg remain unrecovered inventory. Account and group totals are pending because the artifact emits species components only; these groups are NOT atom balances and NOT per-species feedstock-yield fractions — those require origin resolution and arrive with yield_disposition (pending).", `<div class="cards disposition-groups">${body}</div><div class="note">Account and group totals were not emitted; none are summed in the viewer. Account disposition is not feedstock origin or recovered yield.</div>`);
+  return section(3, "Account disposition", "Account disposition — where terminal inventory sits at run end, grouped by viewer account location. The collection/output bucket does not claim product-story status: this artifact omits the stage provenance needed to split condensation inventory among glass, captured volatiles, ingots, and off-spec condensate, while the emitter classifies stored Cr₂O₃ as unclassified. Metal-phase accounts alone can follow the emitted product-story split from account/species truth: ordinary metals are ingots; SiO/SiO₂ and captured Na/K/Mg remain unrecovered inventory. Account and group totals are pending because the artifact emits species components only; these groups are NOT atom balances and NOT per-species feedstock-yield fractions — those require origin resolution and arrive with yield_disposition (pending).", `<div class="cards disposition-groups">${body}</div><div class="note">Account and group totals were not emitted; none are summed in the viewer. Account disposition is not feedstock origin or recovered yield.</div>`);
 }
 
 function campaignSection(artifact, spans) {
@@ -460,8 +460,12 @@ function tapsAndPuritySection(terminal) {
     return section(6, "Metal taps & stage purity", "Backend masses and purity inputs support the displayed verdict status. A verdict remains pending until stage masses are emitted; an absent supported verdict is unavailable.",
       `<div class="pending"><strong>Empty</strong><p>terminal.stage_purity was emitted with no stages.</p></div>`);
   }
-  const hasActivity = stages.some(([, stage]) => stage.activity && typeof stage.activity === "object" && !Array.isArray(stage.activity) && Object.values(stage.activity).some((value) => typeof value === "boolean"));
+  const isStageObject = (stage) => stage !== null && typeof stage === "object" && !Array.isArray(stage);
+  const hasActivity = stages.some(([, stage]) => isStageObject(stage) && stage.activity && typeof stage.activity === "object" && !Array.isArray(stage.activity) && Object.values(stage.activity).some((value) => typeof value === "boolean"));
   const stageRows = stages.map(([key, stage]) => {
+    if (!isStageObject(stage)) {
+      return `<tr><td><span title="${esc(key)}">${esc(key)}</span></td><td colspan="6"><span class="trace">captured, malformed stage record</span></td></tr>`;
+    }
     const backendVerdict = typeof stage.verdict === "string" && stage.verdict.trim() ? stage.verdict.trim().toUpperCase() : null;
     const hasMassSupport = [stage.total_kg, stage.designated_kg, stage.impurity_kg].some(hasNumber);
     const verdict = hasMassSupport ? backendVerdict ?? "UNAVAILABLE" : "PENDING";
@@ -492,8 +496,10 @@ function tapsAndPuritySection(terminal) {
 function wallAndOxygenSection(artifact, rows) {
   const terminal = artifact.terminal;
   const last = rows.at(-1) || {};
+  const hasWallDeposits = Object.prototype.hasOwnProperty.call(last, "wall_deposit_cumulative_kg");
   const wallDeposits = last.wall_deposit_cumulative_kg;
-  const wallSegments = wallDeposits && typeof wallDeposits === "object" && !Array.isArray(wallDeposits)
+  const wallMapValid = hasWallDeposits && wallDeposits !== null && typeof wallDeposits === "object" && !Array.isArray(wallDeposits);
+  const wallSegments = wallMapValid
     ? Object.entries(wallDeposits)
     : null;
   const wallNumbers = [];
@@ -512,6 +518,15 @@ function wallAndOxygenSection(artifact, rows) {
     return `<tr><td class="mono">${esc(segment)}</td><td>${rendered}</td></tr>`;
   }).join("") : "";
   const wallTotal = wallComplete && wallNumbers.length ? sum(wallNumbers) : null;
+  const wallSummary = !hasWallDeposits
+    ? "not emitted"
+    : !wallMapValid
+      ? "malformed"
+      : !wallSegments.length
+        ? `${exactKg(0)} <small>captured empty map</small>`
+        : hasNumber(wallTotal)
+          ? `${exactKg(wallTotal)} <small>viewer-side sum (no emitted total)</small>`
+          : "not emitted";
   const pumping = terminal.run_metadata?.cost_rollup_diagnostic?.pumping_diagnostic;
   const geometryNotice = terminal.run_metadata?.knudsen_regime_diagnostic?.stage_area_geometry_provenance_notice;
   const wallAuthorityNotice = geometryNotice?.status === "provisional"
@@ -526,10 +541,14 @@ function wallAndOxygenSection(artifact, rows) {
   const o2 = sourceSideO2(last);
   const o2MetricLabel = emittedToken(last.O2_metric_label);
   const o2Label = prettyChemText(o2MetricLabel || "O₂ metric label not emitted");
-  const wallBreakdown = wallSegments?.length
-    ? `<div class="table-wrap"><table><thead><tr><th>Emitted segment</th><th>Species · kg</th></tr></thead><tbody>${wallRows}</tbody></table></div>`
-    : `<div class="kv"><span>Per-segment breakdown</span><b>not emitted</b></div>`;
-  const wall = `<div class="card"><div class="ct">Observed wall deposits · cumulative timestep series</div><div class="cbig">${hasNumber(wallTotal) ? `${exactKg(wallTotal)} <small>viewer-side sum (no emitted total)</small>` : "not emitted"}</div>${wallAuthorityNotice}${wallBreakdown}<div class="kv"><span>Current transport</span><b>${esc(emittedToken(last.regime) || "not emitted")} · Kn ${exactValue(last.Kn && typeof last.Kn === "object" ? last.Kn.knudsen_number : last.Kn, "")}</b></div></div>`;
+  const wallBreakdown = !hasWallDeposits
+    ? `<div class="kv"><span>Per-segment breakdown</span><b>not emitted</b></div>`
+    : !wallMapValid
+      ? `<div class="kv"><span>Per-segment breakdown</span><b>captured, malformed map</b></div>`
+      : wallSegments.length
+        ? `<div class="table-wrap"><table><thead><tr><th>Emitted segment</th><th>Species · kg</th></tr></thead><tbody>${wallRows}</tbody></table></div>`
+        : `<div class="kv"><span>Per-segment breakdown</span><b>captured, empty map</b></div>`;
+  const wall = `<div class="card"><div class="ct">Observed wall deposits · cumulative timestep series</div><div class="cbig">${wallSummary}</div>${wallAuthorityNotice}${wallBreakdown}<div class="kv"><span>Current transport</span><b>${esc(emittedToken(last.regime) || "not emitted")} · Kn ${exactValue(last.Kn && typeof last.Kn === "object" ? last.Kn.knudsen_number : last.Kn, "")}</b></div></div>`;
   const o2Basis = o2MetricLabel
     ? esc(prettyChemText(o2MetricLabel))
     : "pending — O₂ metric label not emitted";
