@@ -238,6 +238,34 @@ def test_optimizer_table_partial_renders_tier_badges(client) -> None:
     assert html.count("ESTIMATED /") == counts["ESTIMATED"]
 
 
+def test_optimizer_unknown_cache_state_degrades_without_poisoning_table(client) -> None:
+    run_ids, _counts = _seed_tier_fixture(client)
+    run_id = run_ids[1]
+    run_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"]) / run_id
+    with sqlite3.connect(run_dir / "cache.sqlite") as conn:
+        key = conn.execute(
+            "SELECT cache_key FROM results WHERE candidate_id = ?",
+            ("candidate-estimated-bucket",),
+        ).fetchone()[0]
+    _patch_run_reference(
+        run_dir,
+        key,
+        cache_state="future_cache_state",
+    )
+    client.application.config["TESTING"] = False
+
+    table_response = client.get("/partials/optimizer-table?limit=10")
+    detail_response = client.get(f"/optimizer/runs/{run_id}/results/{key}")
+
+    assert table_response.status_code == 200
+    table = table_response.get_data(as_text=True)
+    assert "UNVERIFIED / future_cache_state" in table
+    assert "CERTIFIED / cached_exact" in table
+    assert "ESTIMATED / cached_interpolated" in table
+    assert detail_response.status_code == 200
+    assert "UNVERIFIED / future_cache_state" in detail_response.get_data(as_text=True)
+
+
 def test_optimizer_detail_renders_certified_and_compute_button(client) -> None:
     run_ids, _counts = _seed_tier_fixture(client)
     run_id = run_ids[0]
