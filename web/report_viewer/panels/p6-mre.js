@@ -172,9 +172,8 @@
       return pending("Pending ladder evidence", "summary.mre_ellingham_ladder_diagnostic is not emitted for any timestep.");
     }
     const ladder = result.value;
-    if (!isRecord(ladder) || !Object.keys(ladder).length) {
-      return pending("Malformed ladder evidence", "The latest emitted ladder value is not a populated object.");
-    }
+    if (!isRecord(ladder)) return pending("Malformed ladder evidence", "The latest emitted ladder value is not an object.");
+    if (!Object.keys(ladder).length) return pending("Empty ladder evidence", "The latest emitted ladder value is an empty object.");
     const statusChips = `<div class="sec-p6-chip-row">` +
       `${chip("Certification", own(ladder, "certification") ? ladder.certification : undefined, "sec-p6-warn")}` +
       `${chip("Authority", own(ladder, "authority") ? ladder.authority : undefined)}` +
@@ -198,9 +197,8 @@
       return pending("Pending uncertified yield", "summary.mre_uncertified_yield is not emitted for any timestep. No yield is inferred from ladder or oxygen data.");
     }
     const entries = result.value;
-    if (!isRecord(entries) || !Object.keys(entries).length) {
-      return pending("Malformed uncertified yield", "The latest emitted yield value is not a populated per-species object.");
-    }
+    if (!isRecord(entries)) return pending("Malformed uncertified yield", "The latest emitted yield value is not a per-species object.");
+    if (!Object.keys(entries).length) return pending("Empty uncertified yield", "The latest emitted yield value is an empty per-species object.");
     const required = [
       "source_species", "produced_species", "produced_kg", "produced_mol",
       "certification", "reference_V", "reference_status", "reason"
