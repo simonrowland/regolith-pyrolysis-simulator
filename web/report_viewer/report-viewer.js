@@ -25,6 +25,12 @@ const esc = (value) => String(value ?? "—").replace(/[&<>'"]/g, (c) => ({
 }[c]));
 const hasNumber = (value) => value !== null && value !== "" && Number.isFinite(Number(value));
 const n = (value) => hasNumber(value) ? Number(value) : null;
+const sourceSideO2 = (row) => {
+  const canonical = row?.O2_source_side_potential_kg_cumulative;
+  if (typeof canonical === "number" && Number.isFinite(canonical)) return canonical;
+  const legacy = row?.O2_yield_kg_cumulative;
+  return typeof legacy === "number" && Number.isFinite(legacy) ? legacy : null;
+};
 const sum = (values) => values.reduce((total, value) => total + (n(value) ?? 0), 0);
 const sumPresent = (values) => values.length && values.every(hasNumber) ? sum(values) : null;
 const sumObject = (object) => {
@@ -165,7 +171,7 @@ function makeHeader(artifact, rows, energy) {
   const header = artifact.header;
   const finalRow = rows.at(-1) || {};
   const finalMetal = finalRow.metal_yields_kg || {};
-  const o2 = finalRow.O2_source_side_potential_kg_cumulative ?? null;
+  const o2 = sourceSideO2(finalRow);
   const o2Label = prettyChemText(finalRow.O2_metric_label || "O₂ metric label not emitted");
   const temperatures = rows.map((row) => row.T_C);
   const peakTemperature = temperatures.length && temperatures.every(hasNumber) ? maxPresent(temperatures) : null;
@@ -431,7 +437,7 @@ function wallAndOxygenSection(artifact, rows) {
   const pumpingEnergy = pumping?.status === "no_rows"
     ? "not computed — no rows"
     : exactValue(pumping?.pumping_electrical_kWh, "kWh");
-  const o2 = last.O2_source_side_potential_kg_cumulative ?? null;
+  const o2 = sourceSideO2(last);
   const o2Label = prettyChemText(last.O2_metric_label || "O₂ metric label not emitted");
   const wall = `<div class="card"><div class="ct">Observed wall deposits · cumulative timestep series</div><div class="cbig">${exactKg(wallTotal)}</div>${wallAuthorityNotice}<div class="kv"><span>Species</span><b>${wallComplete ? Object.entries(wallSpecies).map(([key, value]) => `${speciesSpan(key)} ${exactKg(value)}`).join(" · ") || "none emitted" : "not emitted"}</b></div><div class="kv"><span>Current transport</span><b>${esc(last.regime)} · Kn ${exactValue(last.Kn && typeof last.Kn === "object" ? last.Kn.knudsen_number : last.Kn, "")}</b></div></div>`;
   // Human basis only — raw ledger field names stay out of the visible report surface.
@@ -569,7 +575,7 @@ function renderCurrent(artifact, index) {
       ["Temperature", fmtNum(row.T_C, "°C")], ["Total pressure", fmtNum(row.P_total_bar, "bar")],
       ["pO₂", fmtNum(row.pO2_bar, "bar")], ["Carrier pressure", fmtNum(row.p_carrier_bar, "bar")],
       ["Carrier identity", typeof row.carrier_identity === "string" && row.carrier_identity.trim() ? row.carrier_identity.trim() : "not emitted"], ["Electrical", fmtNum(row.energy_electrical_kWh, "kWh")],
-      ["Evaporation thermal", fmtNum(row.energy_evaporation_thermal_kWh, "kWh")], [prettyChemText(row.O2_metric_label || "O₂ metric label not emitted"), kg(row.O2_source_side_potential_kg_cumulative)],
+      ["Evaporation thermal", fmtNum(row.energy_evaporation_thermal_kWh, "kWh")], [prettyChemText(row.O2_metric_label || "O₂ metric label not emitted"), kg(sourceSideO2(row))],
       ["Regime", row.regime], ["Kn", row.Kn == null ? "not emitted" : row.Kn && typeof row.Kn === "object" ? sci(row.Kn.knudsen_number) : sci(row.Kn)]
     ].map(([key, value]) => `<div class="current"><div class="k">${esc(key)}</div><div class="v">${esc(value)}</div></div>`).join("");
   }

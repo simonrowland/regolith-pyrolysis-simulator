@@ -264,6 +264,107 @@ setImmediate(() => process.stdout.write(report.innerHTML));
     assert "wall geometry provisional" not in render(artifact)
 
 
+def test_report_viewer_uses_legacy_source_side_o2_alias_with_metric_label() -> None:
+    root = Path(__file__).resolve().parents[1] / "web" / "report_viewer"
+    artifact = {
+        "artifact_schema_version": "0.2.0",
+        "execution_status": "ok",
+        "lifecycle": "complete",
+        "header": {"run_id": "legacy-o2", "feedstock_id": "lunar_mare_low_ti"},
+        "timesteps": [
+            {
+                "hour": 1,
+                "summary": {
+                    "campaign": "C0",
+                    "O2_yield_kg_cumulative": 4.25,
+                    "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
+                },
+                "ledger": {},
+            }
+        ],
+        "terminal": {},
+    }
+    harness = r"""
+const fs = require("fs");
+const vm = require("vm");
+const labelsSource = fs.readFileSync(process.argv[2], "utf8");
+const reportSource = fs.readFileSync(process.argv[3], "utf8");
+const report = { innerHTML: "" };
+const nodes = new Map();
+function el(id) {
+  if (!nodes.has(id)) {
+    nodes.set(id, {
+      innerHTML: "", textContent: "", value: "0", disabled: false, style: {},
+      attributes: {}, addEventListener() {},
+      setAttribute(name, value) { this.attributes[name] = String(value); }
+    });
+  }
+  return nodes.get(id);
+}
+const context = {
+  window: { location: { search: "" } },
+  document: {
+    title: "",
+    querySelector(selector) {
+      if (selector === "#report") return report;
+      if (selector.startsWith("#")) return el(selector.slice(1));
+      if (selector === ".stepper") return el("stepper-root");
+      if (selector === ".status-pill") return el("step-pill");
+      return null;
+    },
+    querySelectorAll() { return []; }
+  },
+  URLSearchParams,
+  encodeURIComponent,
+  fetch: async () => ({ ok: true, json: async () => JSON.parse(process.argv[4]) })
+};
+context.globalThis = context;
+vm.createContext(context);
+vm.runInContext(labelsSource, context);
+vm.runInContext(reportSource, context);
+const fallbackCases = vm.runInContext(`[
+  sourceSideO2({
+    O2_source_side_potential_kg_cumulative: 1.5,
+    O2_yield_kg_cumulative: 2.5
+  }),
+  sourceSideO2({
+    O2_source_side_potential_kg_cumulative: " ",
+    O2_yield_kg_cumulative: 2.5
+  }),
+  sourceSideO2({
+    O2_source_side_potential_kg_cumulative: false,
+    O2_yield_kg_cumulative: []
+  })
+]`, context);
+setImmediate(() => process.stdout.write(JSON.stringify({
+  html: report.innerHTML,
+  current: el("current-grid").innerHTML,
+  fallbackCases
+})));
+"""
+
+    completed = subprocess.run(
+        [
+            "node", "-", str(root / "labels.js"),
+            str(root / "report-viewer.js"), json.dumps(artifact),
+        ],
+        input=harness,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    rendered = json.loads(completed.stdout)
+    html = rendered["html"]
+    current = rendered["current"]
+
+    assert html.count("4.25 kg") >= 2
+    assert "4.25 kg" in current
+    assert "source-side O₂ potential (emitted; not recovered)" in html
+    assert "source-side O₂ potential (emitted; not recovered)" in current
+    assert "O2_yield_kg_cumulative" not in html + current
+    assert rendered["fallbackCases"] == [1.5, 2.5, None]
+
+
 def test_report_viewer_renders_account_disposition_without_yield_claims() -> None:
     root = Path(__file__).resolve().parents[1] / "web/report_viewer"
     artifact = {
