@@ -76,17 +76,47 @@ function formatIdentityScalar(value) {
   return `<span title="${esc(value)}">${esc(value.slice(0, IDENTITY_MAX).trimEnd())}…</span>`;
 }
 
-function costBlock(cost) {
+function priceAuthority(artifact) {
+  const rollup = artifact?.terminal?.run_metadata?.cost_rollup_diagnostic;
+  if (!rollup || typeof rollup !== "object" || Array.isArray(rollup)) return null;
+  const basis = typeof rollup.price_basis === "string" ? rollup.price_basis.trim() : "";
+  const count = hasNumber(rollup.owner_ratify_placeholder_count)
+    ? rollup.owner_ratify_placeholder_count
+    : null;
+  const names = (Array.isArray(rollup.owner_ratify_placeholders) ? rollup.owner_ratify_placeholders : [])
+    .map((item) => item && typeof item === "object" && !Array.isArray(item) ? item.name : null)
+    .filter((name) => typeof name === "string" && name.trim())
+    .map((name) => name.trim());
+  const flagged = /placeholder|awaiting|unratified/i.test(basis)
+    || (count !== null && count > 0)
+    || names.length > 0;
+  return flagged ? { basis, count, names } : null;
+}
+
+function costBlock(cost, artifact) {
   if (!cost || typeof cost !== "object") {
     return pending("Pending W-A5a", "header.cost_block is absent.");
   }
   const provenance = typeof cost.provenance === "string" && cost.provenance.trim()
     ? cost.provenance.trim()
     : null;
+  const authority = priceAuthority(artifact);
+  const authorityParts = [
+    authority?.basis ? `basis <span class="mono">${esc(authority.basis)}</span>` : null,
+    authority && authority.count !== null && authority.count > 0
+      ? `${esc(fmtNum(authority.count))} placeholder price parameter${authority.count === 1 ? "" : "s"} awaiting owner ratification`
+      : null,
+    authority && authority.names.length
+      ? `parameters ${authority.names.map((name) => `<span class="mono">${esc(name)}</span>`).join(", ")}`
+      : null
+  ].filter(Boolean);
+  const authorityNote = authority
+    ? `<div class="note"><b>Price authority:</b> ${authorityParts.join(" · ")}</div>`
+    : "";
   return `<div class="cards">
     <div class="card"><div class="ct">Owner energy price · electrical</div><div class="cbig">${displayNumber(cost.electrical_cost_per_kWh, "USD/kWh")}</div></div>
     <div class="card"><div class="ct">Owner energy price · solar heat</div><div class="cbig">${displayNumber(cost.solar_heat_cost_per_kWh, "USD/kWh")}</div></div>
-  </div>${provenance ? `<div class="note">Price provenance: ${esc(provenance)}</div>` : ""}`;
+  </div>${authorityNote}${provenance ? `<div class="note">Price provenance: ${esc(provenance)}</div>` : ""}`;
 }
 
 function c3DoseBlock(dose) {
@@ -297,7 +327,7 @@ function render(artifact) {
   ${settingsField(1, "Recipe snapshot", "Captured recipe material only; absent values are not reconstructed.", recipeSnapshotBlock(header.recipe_snapshot))}
   ${settingsField(2, "Engine identity", "Backend identity recorded by the run header.", engineIdentityBlock(header.engine_identity))}
   ${settingsField(3, "C3 dose · kg by species", "Captured alkali-shuttle dose in kg (not mol); no recipe inference.", c3DoseBlock(header.c3_dose))}
-  ${settingsField(4, "Owner's two energy prices", "Electrical and solar-heat prices bind directly to header.cost_block.", costBlock(header.cost_block))}
+  ${settingsField(4, "Owner's two energy prices", "Electrical and solar-heat prices bind directly to header.cost_block.", costBlock(header.cost_block, artifact))}
   ${settingsField(5, "Effective config", "Per-key merged value and source; non-default sources sort first and are highlighted.", effectiveConfig(header.effective_config))}
   <footer class="footer"><span>Frozen header inspection · engine-free · no edit controls</span><a href="./library.html">Run library</a></footer>`;
   $("#download-run").addEventListener("click", () => downloadHeader(header));

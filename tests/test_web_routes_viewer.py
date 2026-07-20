@@ -1377,6 +1377,114 @@ def test_settings_recipe_pins_use_shared_scalar_guard() -> None:
     assert "[object Object]" not in rendered
 
 
+@pytest.mark.parametrize("unratified", [True, False])
+def test_report_viewer_surfaces_price_ratification_flag(unratified: bool) -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["header"]["cost_block"] = {
+        "electrical_cost_per_kWh": 10.0,
+        "solar_heat_cost_per_kWh": 0.05,
+    }
+    artifact["terminal"] = {
+        "run_metadata": {
+            "cost_rollup_diagnostic": {
+                "price_basis": (
+                    "legacy_placeholder_awaiting_owner_ratification"
+                    if unratified
+                    else "owner_ratified_v1"
+                ),
+                "owner_ratify_placeholder_count": 5 if unratified else 0,
+                "owner_ratify_placeholders": (
+                    [{"name": "electrical_usd_per_kWh"}] if unratified else []
+                ),
+            }
+        }
+    }
+
+    html = _render_report_html(artifact)
+
+    if unratified:
+        assert 'class="price-flag"' in html
+        assert "unratified placeholder prices (5)" in html
+        assert "Price authority:" in html
+        assert "legacy_placeholder_awaiting_owner_ratification" in html
+        assert "5 placeholder price parameters awaiting owner ratification" in html
+        assert "electrical_usd_per_kWh" in html
+    else:
+        assert "unratified placeholder prices" not in html
+        assert "Price authority:" not in html
+
+
+def test_price_authority_count_comes_from_emitted_field() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["header"]["cost_block"] = {
+        "electrical_cost_per_kWh": 10.0,
+        "solar_heat_cost_per_kWh": 0.05,
+    }
+    artifact["terminal"] = {
+        "run_metadata": {
+            "cost_rollup_diagnostic": {
+                "owner_ratify_placeholder_count": 5,
+                "owner_ratify_placeholders": [{"name": "launch_usd_per_kg"}],
+            }
+        }
+    }
+
+    html = _render_report_html(artifact)
+
+    assert "unratified placeholder prices (5)" in html
+    assert "5 placeholder price parameters" in html
+    assert "1 placeholder price parameter" not in html
+    assert "basis not named" not in html
+
+
+def test_settings_surfaces_price_ratification_flag() -> None:
+    rendered = _run_viewer_expression(
+        "settings.js",
+        "costBlock({electrical_cost_per_kWh: 10, solar_heat_cost_per_kWh: 0.05}, "
+        "{terminal: {run_metadata: {cost_rollup_diagnostic: {"
+        'price_basis: "legacy_placeholder_awaiting_owner_ratification", '
+        "owner_ratify_placeholder_count: 2, owner_ratify_placeholders: "
+        '[{name: "electrical_usd_per_kWh"}]}}}})',
+    )
+
+    assert "Price authority:" in rendered
+    assert "legacy_placeholder_awaiting_owner_ratification" in rendered
+    assert "2 placeholder price parameters" in rendered
+    assert "electrical_usd_per_kWh" in rendered
+
+
+def test_report_viewer_shows_stage_warning_beside_verdict() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["terminal"] = {
+        "stage_purity": {
+            "stage_1_fe_condenser": {
+                "label": "Fe Condenser",
+                "verdict": "pure",
+                "total_kg": 132.0,
+                "designated_kg": 132.0,
+                "impurity_kg": 0.0,
+                "purity_fraction": 0.9999999993,
+                "accepted_species": ["Fe"],
+                "warning": "non-designated condensate <present>",
+            },
+            "stage_2_quiet": {
+                "label": "Quiet Stage",
+                "verdict": "pure",
+                "total_kg": 1.0,
+                "purity_fraction": 1.0,
+                "accepted_species": ["Cr"],
+                "warning": "  ",
+            },
+        }
+    }
+
+    html = _render_report_html(artifact)
+
+    assert "non-designated condensate &lt;present&gt;" in html
+    assert "non-designated condensate <present>" not in html
+    assert html.count('class="stage-warning"') == 1
+
+
 def test_report_viewer_section_order_and_stepper_controls() -> None:
     """Report page: sequential sections, readable feedstock, stepper affordances."""
     root = Path(__file__).resolve().parents[1] / "web/report_viewer"

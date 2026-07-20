@@ -98,6 +98,25 @@ const money = (value) => hasNumber(value)
   : "not emitted";
 const sci = (value) => fmtNum(value);
 
+// The rollup owns the price-authority claim. Preserve its emitted basis,
+// count, and parameter names; never substitute array length for its count.
+function priceAuthority(artifact) {
+  const rollup = artifact?.terminal?.run_metadata?.cost_rollup_diagnostic;
+  if (!rollup || typeof rollup !== "object" || Array.isArray(rollup)) return null;
+  const basis = typeof rollup.price_basis === "string" ? rollup.price_basis.trim() : "";
+  const count = hasNumber(rollup.owner_ratify_placeholder_count)
+    ? rollup.owner_ratify_placeholder_count
+    : null;
+  const names = (Array.isArray(rollup.owner_ratify_placeholders) ? rollup.owner_ratify_placeholders : [])
+    .map((item) => item && typeof item === "object" && !Array.isArray(item) ? item.name : null)
+    .filter((name) => typeof name === "string" && name.trim())
+    .map((name) => name.trim());
+  const flagged = /placeholder|awaiting|unratified/i.test(basis)
+    || (count !== null && count > 0)
+    || names.length > 0;
+  return flagged ? { basis, count, names } : null;
+}
+
 function pending(task, message) {
   return `<div class="pending"><strong>Pending ${esc(task)}</strong><p>${esc(message)}</p></div>`;
 }
@@ -206,6 +225,11 @@ function makeHeader(artifact, rows, energy) {
     ? header.cost_block.provenance.trim()
     : null;
   const feedstockLabel = prettyFeedstock(header.feedstock_id);
+  const priceFlag = priceAuthority(artifact);
+  const priceFlagTip = [priceFlag?.basis, priceFlag?.names.join(", ")].filter(Boolean).join(" — ");
+  const priceFlagNote = priceFlag
+    ? `<small class="price-flag"${priceFlagTip ? ` title="${esc(priceFlagTip)}"` : ""}>unratified placeholder prices${priceFlag.count !== null && priceFlag.count > 0 ? ` (${esc(fmtNum(priceFlag.count))})` : ""}</small>`
+    : "";
   return `<header>
     <div class="masthead">
       <svg class="mark" viewBox="0 0 42 42" aria-hidden="true"><circle cx="16" cy="27" r="11" fill="none" stroke="currentColor" stroke-width="1.4"/><ellipse cx="16" cy="27" rx="4.8" ry="11" fill="none" stroke="currentColor"/><path d="M6 23q10-4 20 0M6 31q10 4 20 0M29 7l-4 8 8 4 5-2M25 15l-6 2-3-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="30" cy="5" r="2.6" fill="currentColor"/></svg>
@@ -228,7 +252,7 @@ function makeHeader(artifact, rows, energy) {
       <div class="metric"><div class="k">Fe evolved</div><div class="v">${kg(finalMetal.Fe)}</div></div>
       <div class="metric"><div class="k">${esc(o2Label)}</div><div class="v">${exactKg(o2)}</div></div>
       <div class="metric"><div class="k">Reported energy</div><div class="v">${exactValue(reportedEnergy, "kWh")} <small>electrical + evaporation thermal</small></div></div>
-      <div class="metric"><div class="k">Two-price energy cost</div><div class="v">${header.cost_block ? money(energy.totalCost) : "pending W-A5a"}${costProvenance ? `<small>${esc(costProvenance)}</small>` : ""}</div></div>
+      <div class="metric"><div class="k">Two-price energy cost</div><div class="v">${header.cost_block ? money(energy.totalCost) : "pending W-A5a"}${costProvenance ? `<small>${esc(costProvenance)}</small>` : ""}${priceFlagNote}</div></div>
     </div>
   </header>`;
 }
@@ -431,8 +455,11 @@ function tapsAndPuritySection(terminal) {
       ? acceptedSpecies.map((species) => typeof activity[species] === "boolean" ? `${speciesSpan(species)} · ${activity[species] ? "ACTIVE" : "IDLE"}` : speciesSpan(species)).join("<br>") || "none designated"
       : acceptedSpecies.map(speciesSpan).join(" · ") || "none designated";
     const stageTitle = stage.label || key;
+    const stageWarning = typeof stage.warning === "string" && stage.warning.trim()
+      ? stage.warning.trim()
+      : null;
     return `<tr><td><span title="${esc(key)}">${esc(stageTitle)}</span></td><td class="species-list">${speciesList}</td>` +
-      `<td class="num">${exactKg(stage.total_kg)}${trace}</td><td class="num">${exactKg(stage.designated_kg)}</td><td class="num">${exactKg(stage.impurity_kg)}</td><td class="num">${exactValue(hasNumber(stage.purity_fraction) ? Number(stage.purity_fraction) * 100 : null, "%")}</td><td><span class="verdict ${verdictClass}">${esc(verdict)}</span></td></tr>`;
+      `<td class="num">${exactKg(stage.total_kg)}${trace}</td><td class="num">${exactKg(stage.designated_kg)}</td><td class="num">${exactKg(stage.impurity_kg)}</td><td class="num">${exactValue(hasNumber(stage.purity_fraction) ? Number(stage.purity_fraction) * 100 : null, "%")}</td><td><span class="verdict ${verdictClass}">${esc(verdict)}</span>${stageWarning ? `<div class="stage-warning">${esc(stageWarning)}</div>` : ""}</td></tr>`;
   }).join("");
   return section(6, "Metal taps & stage purity", "Live backend masses, purity fraction, and verdict. An absent backend verdict is unavailable; trace is an annotation from total_kg. Hover a stage name for its raw stage key.",
     `<div class="table-wrap"><table><thead><tr><th>Stage</th><th>Accepted species</th><th class="num">Total</th><th class="num">Designated</th><th class="num">Impurity</th><th class="num">Purity</th><th>Backend verdict</th></tr></thead><tbody>${stageRows}</tbody></table></div>` +
@@ -513,11 +540,24 @@ function costSection(artifact, energy) {
   const basisNote = typeof energy.basisNote === "string" && energy.basisNote.trim()
     ? `<div class="note"><b>Cost basis:</b> ${esc(energy.basisNote.trim())}</div>`
     : "";
+  const authority = priceAuthority(artifact);
+  const authorityParts = [
+    authority?.basis ? `basis <span class="mono">${esc(authority.basis)}</span>` : null,
+    authority && authority.count !== null && authority.count > 0
+      ? `${esc(fmtNum(authority.count))} placeholder price parameter${authority.count === 1 ? "" : "s"} awaiting owner ratification`
+      : null,
+    authority && authority.names.length
+      ? `parameters ${authority.names.map((name) => `<span class="mono">${esc(name)}</span>`).join(", ")}`
+      : null
+  ].filter(Boolean);
+  const authorityNote = authority
+    ? `<div class="note price-authority"><b>Price authority:</b> ${authorityParts.join(" · ")}</div>`
+    : "";
   const totalFormula = energy.canonicalCostTotals
     ? `<div class="note"><b>Total ${money(energy.totalCost)}</b> binds terminal.cost_totals: ${exactValue(energy.electrical, "kWh")} total electrical plus ${exactValue(energy.thermal, "kWh")} evaporation thermal. Latent (${exactValue(energy.latent, "kWh")}) and dissociation (${exactValue(energy.dissociation, "kWh")}) are the breakdown of evaporation thermal, not additional energy.</div>`
     : `<div class="note"><b>Total ${money(energy.totalCost)}</b> = ${exactValue(energy.electrical, "kWh")} × ${money(prices.electrical_cost_per_kWh)} + ${exactValue(energy.thermal, "kWh")} evaporation thermal × ${money(prices.solar_heat_cost_per_kWh)}. Latent (${exactValue(energy.latent, "kWh")}) and dissociation (${exactValue(energy.dissociation, "kWh")}) are the breakdown of evaporation thermal, not additional energy.</div>`;
   return section(9, "Energy & two-price cost", "Canonical prices come only from header.cost_block.",
-    provenance + basisNote + `<div class="cards"><div class="card"><div class="ct">Electrical</div><div class="cbig">${exactValue(energy.electrical, "kWh")}</div>${pumpingRows}<div class="kv"><span>Price</span><b>${money(prices.electrical_cost_per_kWh)} / kWh</b></div><div class="kv"><span>Subtotal</span><b>${money(energy.electricalCost)}</b></div></div>` +
+    authorityNote + provenance + basisNote + `<div class="cards"><div class="card"><div class="ct">Electrical</div><div class="cbig">${exactValue(energy.electrical, "kWh")}</div>${pumpingRows}<div class="kv"><span>Price</span><b>${money(prices.electrical_cost_per_kWh)} / kWh</b></div><div class="kv"><span>Subtotal</span><b>${money(energy.electricalCost)}</b></div></div>` +
     `<div class="card"><div class="ct">Solar heat · evaporation thermal total</div><div class="cbig">${exactValue(energy.thermal, "kWh")}</div><div class="kv"><span>Latent breakdown</span><b>${exactValue(energy.latent, "kWh")}</b></div><div class="kv"><span>Dissociation breakdown</span><b>${exactValue(energy.dissociation, "kWh")}</b></div><div class="kv"><span>Price</span><b>${money(prices.solar_heat_cost_per_kWh)} / kWh</b></div><div class="kv"><span>Subtotal</span><b>${money(energy.thermalCost)}</b></div></div></div>` +
     `${hasCostShare ? `<div class="cost-stack" role="img" aria-label="${esc(`Cost share: ${fmtNum(electricalShare)}% electrical, ${fmtNum(100 - electricalShare)}% solar heat`)}"><span style="width:${electricalShare.toFixed(2)}%"></span><span style="width:${(100 - electricalShare).toFixed(2)}%"></span></div><div class="legend"><span><i class="swatch" style="background:var(--blue)" aria-hidden="true"></i>electrical cost</span><span><i class="swatch" style="background:var(--green)" aria-hidden="true"></i>solar-heat cost</span></div>` : pending("energy values", "Cost share is unavailable because one or more energy or price values were not emitted.")}` +
     totalFormula);
