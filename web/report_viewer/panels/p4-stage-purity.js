@@ -49,7 +49,7 @@
     const entries = Object.entries(stage[field]);
     if (!entries.length) {
       return `<div class="sec-p4-breakdown"><h4>${esc(title)} <small>kg basis</small></h4>` +
-        pending("emitted map contains no measured species values") + `</div>`;
+        `<span class="sec-p4-empty-value">emitted map contains no measured species values</span></div>`;
     }
     const items = entries.map(([species, mass]) =>
       `<li>${speciesName(species)}<b>${numberValue(mass, "kg", "species mass is malformed")}</b></li>`
@@ -71,13 +71,19 @@
       ...(Array.isArray(stage.accepted_species) ? stage.accepted_species : []),
       ...Object.keys(stage.activity)
     ])];
-    if (!speciesList.length) return pending("emitted activity map contains no species states");
+    if (!speciesList.length) {
+      return `<span class="sec-p4-empty-value">No species states in emitted activity map</span>`;
+    }
     return `<ul class="sec-p4-activity-list">${speciesList.map((species) => {
       const active = stage.activity[species];
-      const state = !own(stage.activity, species)
-        ? "PENDING"
-        : typeof active === "boolean" ? (active ? "ACTIVE" : "IDLE") : "PENDING";
-      return `<li>${speciesName(species)}<b>${state}</b></li>`;
+      const hasState = own(stage.activity, species);
+      const state = hasState && typeof active === "boolean" ? (active ? "ACTIVE" : "IDLE") : "PENDING";
+      const stateDetail = !hasState
+        ? `<span class="sec-p4-pending-value">activity state not emitted</span>`
+        : typeof active === "boolean"
+          ? ""
+          : `<span class="sec-p4-pending-value">activity state is malformed</span>`;
+      return `<li>${speciesName(species)}<b>${state}</b>${stateDetail}</li>`;
     }).join("")}</ul>`;
   }
 

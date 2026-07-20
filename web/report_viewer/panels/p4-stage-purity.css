@@ -105,6 +105,11 @@
 .sec-p4-stage-purity .sec-p4-breakdown dl { margin: 0; }
 .sec-p4-stage-purity .sec-p4-breakdown dt { color: var(--ink-3); }
 .sec-p4-stage-purity .sec-p4-breakdown dd { margin: 0; text-align: right; }
+.sec-p4-stage-purity .sec-p4-activity-list li { flex-wrap: wrap; }
+.sec-p4-stage-purity .sec-p4-activity-list li > .sec-p4-pending-value {
+  flex-basis: 100%;
+  text-align: right;
+}
 .sec-p4-stage-purity .sec-p4-species {
   display: inline-flex;
   align-items: center;
