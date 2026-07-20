@@ -399,6 +399,7 @@ def test_p14_artifact_text_is_escaped_exactly_once() -> None:
         _artifact(
             {
                 "final_state": {
+                    "process.cleaned_melt": {"SiO2": 10_000.0},
                     "process.<b>acct&raw</b>": {
                         "Fe<script>&raw</script>": 2.0,
                     }
@@ -414,10 +415,24 @@ def test_p14_artifact_text_is_escaped_exactly_once() -> None:
         '<details class="sec-p14-account-detail"',
         "</details>",
     )
+    trace_row = _html_region(
+        html,
+        '<div class="sec-p14-row sec-p14-trace-node">',
+        "</div></div>",
+    )
+    trace_detail = _html_region(
+        html,
+        '<details class="sec-p14-account-detail" id="sec-p14-trace-inventory">',
+        "</details>",
+    )
 
     assert "basis</b> &lt;basis&amp;raw&gt;" in provenance
     assert "process.&lt;b&gt;acct&amp;raw&lt;/b&gt;" in account_detail
     assert "Fe&lt;script&gt;&amp;raw&lt;/script&gt;" in account_detail
+    assert "&lt;B&gt;Acct&amp;Raw&lt;/B&gt; · Fe&lt;script&gt;&amp;raw&lt;/script&gt; 2 mol" in trace_row
+    assert "&lt;B&gt;Acct&amp;Raw&lt;/B&gt;" in trace_detail
+    assert "<code>process.&lt;b&gt;acct&amp;raw&lt;/b&gt;</code>" in trace_detail
+    assert "Fe&lt;script&gt;&amp;raw&lt;/script&gt;" in trace_detail
     assert "<basis&raw>" not in html
     assert "<b>acct&raw</b>" not in html
     assert "<B>Acct&Raw</B>" not in html
