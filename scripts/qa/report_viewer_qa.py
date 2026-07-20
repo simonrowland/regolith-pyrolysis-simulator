@@ -28,7 +28,7 @@ RUN_IDS = [
 ]
 
 REPORT_HEADINGS = [
-    "Product-ledger metal projection — Ellingham order",
+    "Product-ledger metal projection — emitter whitelist order",
     "Process record — per-hour telemetry",
     "Account disposition",
     "Full terminal ledger",

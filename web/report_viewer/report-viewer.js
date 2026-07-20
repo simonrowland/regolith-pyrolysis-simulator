@@ -770,7 +770,7 @@ function render(artifact) {
   // numbers match this visual order (no duplicate / out-of-order sect labels).
   const timestepSections = rows.length
     ? yieldsSection(rows, artifact.terminal) + processSection(artifact, rows, spans)
-    : section(1, "Product-ledger metal projection — Ellingham order", "No timestep rows were emitted for this run.", `<div class="pending"><strong>Not emitted</strong><p>The product-ledger metal projection is unavailable because this execution has zero timesteps.</p></div>`) +
+    : section(1, "Product-ledger metal projection — emitter whitelist order", "No timestep rows were emitted for this run.", `<div class="pending"><strong>Not emitted</strong><p>The product-ledger metal projection is unavailable because this execution has zero timesteps.</p></div>`) +
       section(2, "Process record — per-hour telemetry", "No timestep rows were emitted for this run.", `<div class="pending"><strong>Not emitted</strong><p>This execution has zero timesteps; header, failure, and terminal data remain available below.</p></div>`);
   const campaignBlock = rows.length
     ? campaignSection(artifact, spans)

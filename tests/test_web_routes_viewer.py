@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import json
 from pathlib import Path
 import re
@@ -118,6 +119,30 @@ def _report_section(html: str, number: int) -> str:
     return html[start:] if end < 0 else html[start:end]
 
 
+def _report_section_heading(html: str, number: int) -> str:
+    match = re.search(r"</span>([^<]+)</h2>", _report_section(html, number))
+    assert match is not None
+    return match.group(1)
+
+
+def _qa_report_headings() -> list[str]:
+    qa_path = (
+        Path(__file__).resolve().parents[1] / "scripts/qa/report_viewer_qa.py"
+    )
+    module = ast.parse(qa_path.read_text(encoding="utf-8"), filename=str(qa_path))
+    for statement in module.body:
+        if not isinstance(statement, ast.Assign):
+            continue
+        if any(
+            isinstance(target, ast.Name) and target.id == "REPORT_HEADINGS"
+            for target in statement.targets
+        ):
+            headings = ast.literal_eval(statement.value)
+            assert isinstance(headings, list)
+            return headings
+    raise AssertionError("scripts/qa/report_viewer_qa.py must define REPORT_HEADINGS")
+
+
 def _run_viewer_expression(script_name: str, expression: str):
     root = Path(__file__).resolve().parents[1] / "web/report_viewer"
     harness = r"""
@@ -164,6 +189,35 @@ def test_report_viewer_serves_index_and_assets(tmp_path: Path) -> None:
     assert b"Download run.yaml" in script.data
     assert labels.status_code == 200
     assert b"fmtRunId" in labels.data
+
+
+def test_report_heading_qa_oracle_uses_emitter_whitelist_order() -> None:
+    assert _qa_report_headings()[0] == (
+        "Product-ledger metal projection — emitter whitelist order"
+    )
+
+
+def test_populated_report_heading_uses_emitter_whitelist_order() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["timesteps"] = [
+        {
+            "hour": 1,
+            "summary": {"campaign": "C0", "metal_yields_kg": {"Fe": 1.0}},
+            "ledger": {},
+        }
+    ]
+
+    assert _report_section_heading(_render_report_html(artifact), 1) == (
+        "Product-ledger metal projection — emitter whitelist order"
+    )
+
+
+def test_zero_timestep_report_heading_uses_emitter_whitelist_order() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+
+    assert _report_section_heading(_render_report_html(artifact), 1) == (
+        "Product-ledger metal projection — emitter whitelist order"
+    )
 
 
 def test_report_viewer_reads_canonical_cost_provenance_key() -> None:
@@ -1421,6 +1475,69 @@ def test_report_viewer_modules_bind_shared_numeric_and_hash_behavior() -> None:
         assert ">1.235 kg</span>" in rendered
 
 
+def test_report_viewer_preserves_invalid_hash_near_miss() -> None:
+    near_miss = "01234567-abcdefabcdefabcdefabcdefabc"
+
+    rendered = _run_viewer_expression(
+        "report-viewer.js",
+        f"[runTitle({{name: {json.dumps(near_miss)}, run_id: \"stable-run-id\"}}), "
+        f"runTitle({{run_id: {json.dumps(near_miss)}}})]",
+    )
+
+    assert rendered == [near_miss, f"Untitled run · {near_miss}"]
+
+
+def test_library_preserves_invalid_hash_near_miss() -> None:
+    near_miss = "01234567-abcdefabcdefabcdefabcdefabc"
+
+    rendered = _run_viewer_expression(
+        "library.js",
+        f"[runDisplayTitle({{name: {json.dumps(near_miss)}, run_id: \"stable-run-id\"}}), "
+        f"runDisplayTitle({{run_id: {json.dumps(near_miss)}}})]",
+    )
+
+    assert rendered == [near_miss, f"Untitled run · {near_miss}"]
+
+
+def test_settings_preserves_invalid_hash_near_miss() -> None:
+    near_miss = "01234567-abcdefabcdefabcdefabcdefabc"
+
+    rendered = _run_viewer_expression(
+        "settings.js",
+        f"[settingsLede({{name: {json.dumps(near_miss)}, run_id: \"stable-run-id\"}}), "
+        f"settingsLede({{run_id: {json.dumps(near_miss)}}})]",
+    )
+
+    assert rendered == [
+        f'{near_miss} · <span class="mono"><span title="stable-run-id">'
+        "stable-run-id</span></span>",
+        f'<span class="mono"><span title="{near_miss}">{near_miss}</span></span>',
+    ]
+
+
+def test_report_labels_reject_nan_and_infinity_values() -> None:
+    rejected = _run_viewer_expression(
+        "report-viewer.js",
+        "[hasNumber(NaN), hasNumber(Infinity), hasNumber(-Infinity), "
+        'exactValue(NaN, "kg"), exactValue(Infinity, "kg"), '
+        'exactValue(-Infinity, "kg")]',
+    )
+
+    assert rejected == [False, False, False, "not emitted", "not emitted", "not emitted"]
+
+
+def test_report_viewer_rejects_nan_and_infinity_in_rendered_yield_values() -> None:
+    rendered = _run_viewer_expression(
+        "report-viewer.js",
+        "yieldsSection([{metal_yields_kg: {Fe: NaN, Ni: Infinity}}], {})",
+    )
+
+    assert '<div class="el">Fe</div><div class="kg">not emitted</div>' in rendered
+    assert '<div class="el">Ni</div><div class="kg">not emitted</div>' in rendered
+    assert "NaN" not in rendered
+    assert "Infinity" not in rendered
+
+
 def test_library_and_settings_reject_numeric_coercion() -> None:
     root = Path(__file__).resolve().parents[1] / "web/report_viewer"
     harness = r"""
@@ -1625,6 +1742,38 @@ def test_price_authority_status_only_placeholder_reaches_report_and_settings() -
         assert "status_only_energy_price" in rendered
 
 
+def test_report_price_authority_ignores_non_placeholder_status_only_record() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["terminal"] = {
+        "run_metadata": {
+            "cost_rollup_diagnostic": {
+                "owner_ratify_placeholder_count": 0,
+                "owner_ratify_placeholders": [
+                    {"name": "ratified_energy_price", "status": "ratified"}
+                ],
+            }
+        }
+    }
+
+    rendered = _render_report_html(artifact)
+
+    assert "Price authority:" not in rendered
+    assert "ratified_energy_price" not in rendered
+
+
+def test_settings_price_authority_ignores_non_placeholder_status_only_record() -> None:
+    rendered = _run_viewer_expression(
+        "settings.js",
+        "costBlock({electrical_cost_per_kWh: 10, solar_heat_cost_per_kWh: 0.05}, "
+        "{terminal: {run_metadata: {cost_rollup_diagnostic: {"
+        "owner_ratify_placeholder_count: 0, owner_ratify_placeholders: "
+        '[{name: "ratified_energy_price", status: "ratified"}]}}}})',
+    )
+
+    assert "Price authority:" not in rendered
+    assert "ratified_energy_price" not in rendered
+
+
 def test_settings_surfaces_price_ratification_flag() -> None:
     rendered = _run_viewer_expression(
         "settings.js",
@@ -1732,6 +1881,53 @@ def test_metal_yields_render_emitted_ni_and_co_product_ledger_chips() -> None:
     ) in yields
 
 
+def test_metal_yields_render_only_emitter_whitelist_values_in_order() -> None:
+    whitelist_values = {
+        "Fe": 1.25,
+        "Mg": 2.25,
+        "Al": 3.25,
+        "Ti": 4.25,
+        "Ca": 5.25,
+        "Cr": 6.25,
+        "Ni": 7.25,
+        "Co": 8.25,
+        "Mn": 9.25,
+        "Na": 10.25,
+        "K": 11.25,
+        "Si": 12.25,
+    }
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["timesteps"] = [
+        {
+            "hour": 1,
+            "summary": {
+                "campaign": "C0",
+                "metal_yields_kg": {
+                    **whitelist_values,
+                    "SiO2": 91.25,
+                    "Fe_reagent_bookkeeping": 92.5,
+                    "NaCl": 93.75,
+                },
+            },
+            "ledger": {},
+        }
+    ]
+
+    yields = _report_section(_render_report_html(artifact), 1)
+    positions = []
+    for element, value in whitelist_values.items():
+        chip = (
+            f'<div class="el">{element}</div><div class="kg">'
+            f'<span title="{value} kg">{value} kg</span> product-ledger projection'
+        )
+        assert chip in yields
+        positions.append(yields.index(chip))
+    assert positions == sorted(positions)
+    assert yields.count('class="yield-chip"') == len(whitelist_values)
+    for excluded_value in (91.25, 92.5, 93.75):
+        assert f'title="{excluded_value} kg"' not in yields
+
+
 def test_run_store_emits_mixed_account_product_ledger_semantics_for_metals() -> None:
     artifact = _artifact(recipe_snapshot=None)
     artifact["timesteps"] = [
@@ -1774,6 +1970,56 @@ def test_sparse_oxygen_metric_keeps_basis_pending() -> None:
     assert "O₂ metric label not emitted" in html
     assert "Basis</span><b>pending — O₂ metric label not emitted" in html
     assert "cumulative source-side potential · not recovered product" not in html
+
+
+def test_sparse_oxygen_metric_preserves_exact_emitted_value() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["timesteps"] = [
+        {
+            "hour": 1,
+            "summary": {
+                "campaign": "C0",
+                "O2_source_side_potential_kg_cumulative": 4.25,
+            },
+            "ledger": {},
+        }
+    ]
+
+    oxygen = _report_section(_render_report_html(artifact), 7)
+
+    assert '<div class="cbig"><span title="4.25 kg">4.25 kg</span></div>' in oxygen
+    assert "pending — O₂ metric label not emitted" in oxygen
+
+
+def test_sparse_oxygen_metric_preserves_exact_header_value() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["timesteps"] = [
+        {
+            "hour": 1,
+            "summary": {
+                "campaign": "C0",
+                "O2_source_side_potential_kg_cumulative": 4.25,
+            },
+            "ledger": {},
+        }
+    ]
+
+    html = _render_report_html(artifact)
+
+    assert (
+        '<div class="k">O₂ metric label not emitted</div><div class="v">'
+        '<span title="4.25 kg">4.25 kg</span></div>'
+    ) in html
+
+
+def test_library_sparse_oxygen_metric_preserves_exact_emitted_value() -> None:
+    rendered = _run_viewer_expression(
+        "library.js",
+        "yieldChips({O2_source_side_potential_kg_cumulative: 4.25})",
+    )
+
+    assert "O₂ basis pending (metric semantics not emitted)" in rendered
+    assert '<div class="kg"><span title="4.25 kg">4.25 kg</span></div>' in rendered
 
 
 def test_terminal_ledger_rejects_non_object_species_maps() -> None:
