@@ -196,6 +196,74 @@ setImmediate(() => process.stdout.write(report.innerHTML));
     assert "Pumping energy</span><b><span title=\"0 kWh\">0 kWh" not in html
 
 
+def test_report_viewer_surfaces_provisional_wall_geometry_authority() -> None:
+    root = Path(__file__).resolve().parents[1] / "web" / "report_viewer"
+    artifact = {
+        "artifact_schema_version": "0.2.0",
+        "execution_status": "ok",
+        "lifecycle": "complete",
+        "header": {"run_id": "provisional-wall"},
+        "timesteps": [],
+        "terminal": {
+            "run_metadata": {
+                "knudsen_regime_diagnostic": {
+                    "stage_area_geometry_provenance_notice": {
+                        "status": "provisional",
+                        "source_class": "engineering-default",
+                        "output_status": "status_bearing",
+                        "message": "Wall area is uncertified <surface>.",
+                    }
+                }
+            }
+        },
+    }
+    harness = r"""
+const fs = require("fs");
+const vm = require("vm");
+const labelsSource = fs.readFileSync(process.argv[2], "utf8");
+const reportSource = fs.readFileSync(process.argv[3], "utf8");
+const report = { innerHTML: "" };
+const context = {
+  window: { location: { search: "" } },
+  document: {
+    title: "",
+    querySelector: (selector) => selector === "#report" ? report : null,
+    querySelectorAll: () => []
+  },
+  URLSearchParams,
+  encodeURIComponent,
+  fetch: async () => ({ ok: true, json: async () => JSON.parse(process.argv[4]) })
+};
+context.globalThis = context;
+vm.runInNewContext(labelsSource, context);
+vm.runInNewContext(reportSource, context);
+setImmediate(() => process.stdout.write(report.innerHTML));
+"""
+
+    def render(payload: dict) -> str:
+        completed = subprocess.run(
+            [
+                "node", "-", str(root / "labels.js"),
+                str(root / "report-viewer.js"), json.dumps(payload),
+            ],
+            input=harness,
+            text=True,
+            capture_output=True,
+            check=True,
+        )
+        return completed.stdout
+
+    html = render(artifact)
+    assert "wall geometry provisional" in html
+    assert "source engineering-default" in html
+    assert "output status_bearing" in html
+    assert "Wall area is uncertified &lt;surface&gt;." in html
+    assert "Wall area is uncertified <surface>." not in html
+
+    del artifact["terminal"]["run_metadata"]
+    assert "wall geometry provisional" not in render(artifact)
+
+
 def test_report_viewer_renders_account_disposition_without_yield_claims() -> None:
     root = Path(__file__).resolve().parents[1] / "web/report_viewer"
     artifact = {

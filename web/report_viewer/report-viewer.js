@@ -421,12 +421,19 @@ function wallAndOxygenSection(artifact, rows) {
   }
   const wallTotal = wallComplete ? sumObject(wallSpecies) : null;
   const pumping = terminal.run_metadata?.cost_rollup_diagnostic?.pumping_diagnostic;
+  const geometryNotice = terminal.run_metadata?.knudsen_regime_diagnostic?.stage_area_geometry_provenance_notice;
+  const wallAuthorityNotice = geometryNotice?.status === "provisional"
+    ? `<div class="meta-chips"><span class="chip accent">wall geometry ${esc(geometryNotice.status)}</span>` +
+      `${geometryNotice.source_class ? `<span class="chip">source ${esc(geometryNotice.source_class)}</span>` : ""}` +
+      `${geometryNotice.output_status ? `<span class="chip">output ${esc(geometryNotice.output_status)}</span>` : ""}</div>` +
+      `${geometryNotice.message ? `<p class="sub">${esc(geometryNotice.message)}</p>` : ""}`
+    : "";
   const pumpingEnergy = pumping?.status === "no_rows"
     ? "not computed — no rows"
     : exactValue(pumping?.pumping_electrical_kWh, "kWh");
   const o2 = last.O2_source_side_potential_kg_cumulative ?? null;
   const o2Label = prettyChemText(last.O2_metric_label || "O₂ metric label not emitted");
-  const wall = `<div class="card"><div class="ct">Observed wall deposits · cumulative timestep series</div><div class="cbig">${exactKg(wallTotal)}</div><div class="kv"><span>Species</span><b>${wallComplete ? Object.entries(wallSpecies).map(([key, value]) => `${speciesSpan(key)} ${exactKg(value)}`).join(" · ") || "none emitted" : "not emitted"}</b></div><div class="kv"><span>Current transport</span><b>${esc(last.regime)} · Kn ${exactValue(last.Kn && typeof last.Kn === "object" ? last.Kn.knudsen_number : last.Kn, "")}</b></div></div>`;
+  const wall = `<div class="card"><div class="ct">Observed wall deposits · cumulative timestep series</div><div class="cbig">${exactKg(wallTotal)}</div>${wallAuthorityNotice}<div class="kv"><span>Species</span><b>${wallComplete ? Object.entries(wallSpecies).map(([key, value]) => `${speciesSpan(key)} ${exactKg(value)}`).join(" · ") || "none emitted" : "not emitted"}</b></div><div class="kv"><span>Current transport</span><b>${esc(last.regime)} · Kn ${exactValue(last.Kn && typeof last.Kn === "object" ? last.Kn.knudsen_number : last.Kn, "")}</b></div></div>`;
   // Human basis only — raw ledger field names stay out of the visible report surface.
   const oxygen = `<div class="card"><div class="ct">${esc(o2Label)}</div><div class="cbig">${exactKg(o2)}</div><div class="kv"><span>Basis</span><b>cumulative source-side potential · not recovered product</b></div><div class="kv"><span>Pumping energy</span><b>${pumpingEnergy}</b></div><div class="kv"><span>Pumping status</span><b>${esc(pumping?.status ?? "not emitted")}</b></div></div>`;
   return section(7, "Wall risk, oxygen & pumping", "Observed deposits and terminal diagnostics only; wall lifetime remains unassessed. O₂ figures use the artifact's source-side potential metric — not recovered yield.", `<div class="cards">${wall}${oxygen}</div>${pending("W-D4", "terminal.wall_lifetime is absent. Wall lifetime is not assessed; this viewer does not issue a CLEAR verdict.")}`);
