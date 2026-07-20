@@ -1046,6 +1046,81 @@ setImmediate(() => {
     assert "45454a0a" not in fallback["list"]
 
 
+def test_library_meta_line_escapes_span_injection() -> None:
+    """Regression: a run meta field containing '<span' must be escaped, not passed through raw.
+
+    runMetaLine emits only plain strings (feedstock_id / campaign chain / summary / date), all
+    untrusted artifact data. A prior substring bypass rendered any part containing '<span' as live
+    HTML → stored XSS in the library card meta line.
+    """
+    root = Path(__file__).resolve().parents[1] / "web" / "report_viewer"
+    static_runs: list = []
+    live_runs = [
+        {
+            "run_id": "xss-probe",
+            "name": "xss-probe",
+            # Hostile feedstock id carrying span+script markup.
+            "feedstock_id": '<span onmouseover="alert(1)">pwn</span><script>alert(2)</script>',
+            "campaign_chain": ["C0"],
+            "status": "ok",
+            "lifecycle": "complete",
+            "created_at": "2026-07-20T00:00:00Z",
+            "starred": False,
+            "summary": "",
+            "hours": 1,
+        },
+    ]
+    harness = r"""
+const fs = require("fs");
+const vm = require("vm");
+const labelsSource = fs.readFileSync(process.argv[2], "utf8");
+const librarySource = fs.readFileSync(process.argv[3], "utf8");
+const staticRuns = JSON.parse(process.argv[4]);
+const liveRuns = JSON.parse(process.argv[5]);
+function mockEl(id) {
+  return {
+    id, _html: "", value: "", disabled: false, dataset: {}, listeners: {},
+    addEventListener(type, fn) { (this.listeners[type] ||= []).push(fn); },
+    get innerHTML() { return this._html; },
+    set innerHTML(v) { this._html = v; }
+  };
+}
+const els = { library: mockEl("library") };
+const known = ["folder-list", "run-list", "run-filter", "run-sort"];
+Object.defineProperty(els.library, "innerHTML", {
+  get() { return this._html || ""; },
+  set(v) { this._html = v; for (const id of known) if (!els[id]) els[id] = mockEl(id); }
+});
+const sandbox = {
+  window: { location: { href: "" } },
+  document: { querySelector(sel) { const id = sel.startsWith("#") ? sel.slice(1) : sel; return els[id] || null; } },
+  encodeURIComponent,
+  fetch: async (url) => {
+    if (url === "./runs-index.json") return { ok: true, json: async () => staticRuns };
+    if (url === "/api/runs") return { ok: true, json: async () => liveRuns };
+    throw new Error(`unexpected fetch ${url}`);
+  },
+  setTimeout, console
+};
+sandbox.globalThis = sandbox;
+vm.createContext(sandbox);
+vm.runInContext(labelsSource, sandbox);
+vm.runInContext(librarySource, sandbox);
+setImmediate(() => { process.stdout.write((els["run-list"] && els["run-list"]._html) || ""); });
+"""
+    completed = subprocess.run(
+        ["node", "-", str(root / "labels.js"), str(root / "library.js"),
+         json.dumps(static_runs), json.dumps(live_runs)],
+        input=harness, text=True, capture_output=True, check=True,
+    )
+    html = completed.stdout
+    # The raw markup must NOT appear; the escaped form must.
+    assert "<span onmouseover" not in html
+    assert "<script>alert(2)" not in html
+    assert "&lt;span onmouseover" in html
+    assert "&lt;script&gt;alert(2)" in html
+
+
 def test_settings_script_readable_labels_and_honest_absent_fields() -> None:
     """Settings inspector must read as a scientific report, not line noise."""
     script_path = Path(__file__).resolve().parents[1] / "web/report_viewer/settings.js"

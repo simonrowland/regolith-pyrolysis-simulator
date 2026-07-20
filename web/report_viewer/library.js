@@ -160,8 +160,10 @@ function runCard(run) {
     ? `${esc(run.folder)} · ${esc(run.status)}${cancelledBadge}`
     : `${esc(run.status)}${cancelledBadge}`;
   const meta = runMetaLine(run);
+  // runMetaLine returns plain strings only (feedstock_id, campaign chain, summary, dates) — all
+  // untrusted artifact/index data. esc() every part; never pass raw markup through.
   const metaHtml = meta.length
-    ? `<p class="run-summary">${meta.map((part) => (part.includes("<span") ? part : esc(part))).join(" · ")}</p>`
+    ? `<p class="run-summary">${meta.map((part) => esc(part)).join(" · ")}</p>`
     : "";
   const loadDisabledAttrs = canLoad
     ? ` aria-label="${esc(`Load report for ${displayName}`)}"`
