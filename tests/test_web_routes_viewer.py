@@ -1758,6 +1758,46 @@ setImmediate(() => process.stdout.write(settings.innerHTML));
     assert "Download run.yaml unavailable" not in html
 
 
+def test_settings_yaml_export_preserves_numbers_through_pyyaml() -> None:
+    """Regression: the 'Download captured header (YAML)' export must not silently stringify numbers.
+
+    JS String(1e-9) === '1e-9', which PyYAML (YAML 1.1) resolves to a STRING, not a float —
+    so a downloaded header round-tripped ~every small config value to text (100/101 real runs).
+    yamlScalar must emit a dot-in-mantissa exponential ('1.0e-9') so the value parses back numeric.
+    """
+    settings_js = Path(__file__).resolve().parents[1] / "web/report_viewer/settings.js"
+    cases = {
+        "small": 1e-9, "neg_small": -1e-9, "big": 1e21,
+        "mantissa": 1.5e-7, "plain_float": 0.001, "with_frac": 1234.5,
+        "zero": 0, "int": 42, "vac_po2": 1e-09,
+    }
+    harness = r"""
+const fs = require("fs"), vm = require("vm");
+const src = fs.readFileSync(process.argv[2], "utf8");
+const ctx = { globalThis: {} }; ctx.globalThis = ctx;
+vm.createContext(ctx);
+// Load only the serializer functions (skip the DOM bootstrap).
+const slice = src.match(/function yamlScalar[\s\S]*?\n}\n\nfunction toYaml[\s\S]*?\n}\n/);
+vm.runInContext(slice[0], ctx);
+const cases = JSON.parse(process.argv[3]);
+const out = {};
+for (const [k, v] of Object.entries(cases)) out[k] = ctx.yamlScalar(v);
+process.stdout.write(JSON.stringify(out));
+"""
+    completed = subprocess.run(
+        ["node", "-", str(settings_js), json.dumps(cases)],
+        input=harness, text=True, capture_output=True, check=True,
+    )
+    emitted = json.loads(completed.stdout)
+    for key, original in cases.items():
+        parsed = yaml.safe_load(emitted[key])
+        assert isinstance(parsed, (int, float)) and not isinstance(parsed, bool), (
+            f"{key}={original!r} exported as {emitted[key]!r} -> parsed {parsed!r} ({type(parsed).__name__}), "
+            f"expected a number"
+        )
+        assert abs(parsed - original) <= abs(original) * 1e-12 + 1e-18
+
+
 def test_settings_script_gates_run_yaml_when_snapshot_malformed() -> None:
     script_path = Path(__file__).resolve().parents[1] / "web/report_viewer/settings.js"
     labels_path = script_path.with_name("labels.js")

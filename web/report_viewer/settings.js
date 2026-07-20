@@ -220,7 +220,20 @@ function effectiveConfig(config) {
 
 function yamlScalar(value) {
   if (value === null) return "null";
-  if (typeof value === "number" || typeof value === "boolean") return String(value);
+  if (typeof value === "boolean") return String(value);
+  if (typeof value === "number") {
+    // Non-finite values are not valid YAML 1.1 plain floats — quote them so they never
+    // masquerade as a parseable number.
+    if (!Number.isFinite(value)) return JSON.stringify(String(value));
+    let text = String(value);
+    // PyYAML (YAML 1.1) only resolves an exponential float when the mantissa carries a
+    // decimal point: "1.0e-9" parses to a float, "1e-9" parses to a STRING. JS String()
+    // emits the dot-less form (String(1e-9) === "1e-9"), silently stringifying ~every
+    // small config value on round-trip. Insert ".0" into a dot-less mantissa.
+    const exponential = text.match(/^(-?)(\d+)(e[-+]?\d+)$/i);
+    if (exponential) text = `${exponential[1]}${exponential[2]}.0${exponential[3]}`;
+    return text;
+  }
   return JSON.stringify(String(value));
 }
 
