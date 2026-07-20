@@ -17,7 +17,7 @@ const scalarText = (value) => value !== null && typeof value === "object"
 const esc = (value) => scalarText(value).replace(/[&<>'"]/g, (character) => ({
   "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
 }[character]));
-const hasNumber = (value) => value !== null && value !== "" && Number.isFinite(Number(value));
+const hasNumber = (value) => typeof value === "number" && Number.isFinite(value);
 const exactNumber = (value, unit) => hasNumber(value)
   ? `<span title="${esc(`${String(value)}${unit ? ` ${unit}` : ""}`)}">${esc(fmtNum(value, unit))}</span>`
   : "not emitted";

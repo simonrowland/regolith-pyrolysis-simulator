@@ -17,7 +17,7 @@ const $ = (selector, root = document) => root.querySelector(selector);
 const esc = (value) => String(value ?? "—").replace(/[&<>'"]/g, (character) => ({
   "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
 }[character]));
-const hasNumber = (value) => value !== null && value !== "" && Number.isFinite(Number(value));
+const hasNumber = (value) => typeof value === "number" && Number.isFinite(value);
 const displayNumber = (value, unit = "") => hasNumber(value)
   ? `<span title="${esc(`${String(value)}${unit ? ` ${unit}` : ""}`)}">${esc(fmtNum(value, unit))}</span>`
   : "not emitted";

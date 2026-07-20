@@ -45,6 +45,71 @@ def _artifact(*, recipe_snapshot: dict | None) -> dict:
     }
 
 
+def _render_report_state(artifact: dict) -> dict:
+    root = Path(__file__).resolve().parents[1] / "web/report_viewer"
+    harness = r"""
+const fs = require("fs");
+const vm = require("vm");
+const labelsSource = fs.readFileSync(process.argv[2], "utf8");
+const reportSource = fs.readFileSync(process.argv[3], "utf8");
+const nodes = new Map();
+function el(id) {
+  if (!nodes.has(id)) {
+    nodes.set(id, {
+      innerHTML: "", textContent: "", value: "0", disabled: false, style: {},
+      attributes: {}, addEventListener() {}, removeAttribute() {}, focus() {},
+      setAttribute(name, value) { this.attributes[name] = String(value); },
+      classList: { add() {}, remove() {}, toggle() {} }
+    });
+  }
+  return nodes.get(id);
+}
+const report = el("report");
+const context = {
+  window: { location: { search: "" } },
+  document: {
+    title: "",
+    querySelector(selector) {
+      if (selector === "#report") return report;
+      if (selector.startsWith("#")) return el(selector.slice(1));
+      if (selector === ".stepper") return el("stepper-root");
+      if (selector === ".status-pill") return el("status-pill");
+      return null;
+    },
+    querySelectorAll() { return []; }
+  },
+  URLSearchParams,
+  encodeURIComponent,
+  setTimeout,
+  fetch: async () => ({ ok: true, json: async () => JSON.parse(process.argv[4]) })
+};
+context.globalThis = context;
+vm.runInNewContext(labelsSource, context);
+vm.runInNewContext(reportSource, context);
+setImmediate(() => process.stdout.write(JSON.stringify({
+  html: Array.from(nodes.values()).map((node) => node.innerHTML).join("\n"),
+  nodes: Object.fromEntries(Array.from(nodes.entries()).map(([id, node]) => [id, {
+    text: node.textContent, attributes: node.attributes
+  }]))
+})));
+"""
+    completed = subprocess.run(
+        [
+            "node", "-", str(root / "labels.js"),
+            str(root / "report-viewer.js"), json.dumps(artifact),
+        ],
+        input=harness,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    return json.loads(completed.stdout)
+
+
+def _render_report_html(artifact: dict) -> str:
+    return str(_render_report_state(artifact)["html"])
+
+
 def test_report_viewer_serves_index_and_assets(tmp_path: Path) -> None:
     client = _app(tmp_path).test_client()
 
@@ -1141,7 +1206,8 @@ process.stdout.write(JSON.stringify({
   wall: accountLabel("process.wall_deposit_segment_stage_3_to_stage_4"),
   unknown: accountLabel("process.future_account"),
   feedstock: prettyFeedstock("lunar_mare_low_ti"),
-  chem: prettyChemText("source-side O2 potential (emitted; not recovered)")
+  chem: prettyChemText("source-side O2 potential (emitted; not recovered)"),
+  rejected: [fmtNum([], "kg"), fmtNum("  ", "kg"), fmtNum("12", "kg"), fmtNum(true, "kg")]
 }));
 """
     completed = subprocess.run(
@@ -1165,6 +1231,75 @@ process.stdout.write(JSON.stringify({
     assert result["unknown"] == "Future Account"
     assert result["feedstock"] == "Lunar Mare Low Ti"
     assert result["chem"] == "source-side O₂ potential (emitted; not recovered)"
+    assert result["rejected"] == ["not emitted"] * 4
+
+
+def test_library_and_settings_reject_numeric_coercion() -> None:
+    root = Path(__file__).resolve().parents[1] / "web/report_viewer"
+    harness = r"""
+const fs = require("fs");
+const vm = require("vm");
+const labelsSource = fs.readFileSync(process.argv[2], "utf8");
+function run(sourcePath, expression) {
+  const context = {
+    window: { location: { search: "", href: "" } },
+    document: { querySelector() { return null; } },
+    URLSearchParams,
+    encodeURIComponent,
+    fetch: () => new Promise(() => {}),
+    console
+  };
+  context.globalThis = context;
+  vm.createContext(context);
+  vm.runInContext(labelsSource, context);
+  vm.runInContext(fs.readFileSync(sourcePath, "utf8"), context);
+  return vm.runInContext(expression, context);
+}
+process.stdout.write(JSON.stringify({
+  library: run(process.argv[3], '[exactNumber([], "kg"), exactNumber("  ", "kg"), exactNumber("12", "kg")]'),
+  settings: run(process.argv[4], '[displayNumber([], "kg"), displayNumber("  ", "kg"), displayNumber("12", "kg")]')
+}));
+"""
+    completed = subprocess.run(
+        [
+            "node", "-", str(root / "labels.js"),
+            str(root / "library.js"), str(root / "settings.js"),
+        ],
+        input=harness,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    result = json.loads(completed.stdout)
+
+    assert result["library"] == ["not emitted"] * 3
+    assert result["settings"] == ["not emitted"] * 3
+
+
+def test_report_viewer_guards_hours_and_absent_value_qualifiers() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["timesteps"] = [
+        {
+            "hour": {"unexpected": 1},
+            "summary": {"campaign": "C0", "vapor_species_kg_hr": {}},
+            "ledger": {},
+        }
+    ]
+    artifact["terminal"] = {
+        "mass_balance_closure": {"basis": "final-hour percent"},
+    }
+
+    result = _render_report_state(artifact)
+    html = result["html"]
+
+    assert "[object Object]" not in html
+    assert 'aria-valuetext="Hour malformed (object) of 1"' in html
+    assert "<span>h malformed (object)</span>" in html
+    assert result["nodes"]["step-output"]["text"].startswith("Hour malformed (object)")
+    assert "peak temperature not emitted" in html
+    assert "not emitted peak" not in html
+    assert '<th>Mass-balance residual</th><td class="mono">not emitted</td>' in html
+    assert "not emitted · final-hour percent" not in html
 
 
 def test_report_viewer_section_order_and_stepper_controls() -> None:

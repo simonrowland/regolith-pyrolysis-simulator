@@ -217,7 +217,7 @@ function makeHeader(artifact, rows, energy) {
       <div class="doc-label">Run report<br><span class="mono">${runIdSpan(header.run_id)}</span></div>
     </div>
     <h1>${esc(runTitle(header))}</h1>
-    <p class="lede"><b>${exactValue(peakTemperature, "°C")} peak</b> · <span title="${esc(header.feedstock_id)}">${esc(feedstockLabel)}</span> · <b>${rows.length} hours</b> · ${esc(campaignChain)}</p>
+    <p class="lede"><b>${hasNumber(peakTemperature) ? `${exactValue(peakTemperature, "°C")} peak` : "peak temperature not emitted"}</b> · <span title="${esc(header.feedstock_id)}">${esc(feedstockLabel)}</span> · <b>${rows.length} hours</b> · ${esc(campaignChain)}</p>
     <div class="meta-chips">
       <span class="chip">charge ${kg(header.charge_mass_kg)}</span>
       <span class="chip">engine ${esc(header.engine_identity?.name)}</span>
@@ -277,8 +277,8 @@ function processSection(artifact, rows, spans) {
   const carrierPressureNote = hasCarrierPressure
     ? ""
     : pending("p_carrier_bar", "summary.p_carrier_bar is absent. P_total − pO₂ is not used as a substitute.");
-  const firstHour = artifact.timesteps[0].hour === undefined || artifact.timesteps[0].hour === null ? "not emitted" : String(artifact.timesteps[0].hour);
-  const lastHour = artifact.timesteps.at(-1).hour === undefined || artifact.timesteps.at(-1).hour === null ? "not emitted" : String(artifact.timesteps.at(-1).hour);
+  const firstHour = artifact.timesteps[0].hour === undefined || artifact.timesteps[0].hour === null ? "not emitted" : scalarText(artifact.timesteps[0].hour);
+  const lastHour = artifact.timesteps.at(-1).hour === undefined || artifact.timesteps.at(-1).hour === null ? "not emitted" : scalarText(artifact.timesteps.at(-1).hour);
   const firstCampaign = rows[0].campaign ?? "campaign not emitted";
   return section(2, "Process record — per-hour telemetry", "Frozen timestep summaries; shaded bands follow campaign boundaries.",
     `<div class="stepper" role="group" aria-label="Timestep inspector">` +
@@ -550,7 +550,9 @@ function provenanceSection(artifact) {
     ["Backend evidence", meta.evidence_class], ["Backend authoritative", meta.backend_authoritative],
     ["Certification allowed", meta.certification_allowed], ["Hours requested / completed", `${hoursRequested} / ${hoursCompleted}`],
     // Concatenation coerces before esc() can guard, so scalar-check the basis here.
-    ["Mass-balance residual", `${fmtNum(closure.residual_pct ?? closure.residual, "%")} · ${scalarText(closure.basis || "basis not emitted")}`]
+    ["Mass-balance residual", hasNumber(closure.residual_pct ?? closure.residual)
+      ? `${fmtNum(closure.residual_pct ?? closure.residual, "%")} · ${scalarText(closure.basis || "basis not emitted")}`
+      : "not emitted"]
   ];
   const identityFacts = [
     ["Kernel commit", artifact.header.engine_identity?.kernel_commit_sha],
@@ -584,7 +586,7 @@ function panelSectionsHtml(artifact, rows, spans, energy) {
 function renderCurrent(artifact, index) {
   const timestep = artifact.timesteps[index];
   const row = timestep.summary;
-  const hour = timestep.hour === undefined || timestep.hour === null ? "not emitted" : String(timestep.hour);
+  const hour = timestep.hour === undefined || timestep.hour === null ? "not emitted" : scalarText(timestep.hour);
   const count = artifact.timesteps.length;
   const stepOutput = $("#step-output");
   if (stepOutput) stepOutput.textContent = `Hour ${hour} · ${scalarText(row.campaign ?? "campaign not emitted")}`;

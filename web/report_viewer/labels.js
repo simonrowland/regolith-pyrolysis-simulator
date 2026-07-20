@@ -54,9 +54,9 @@
   }
 
   function fmtNum(value, unit = "") {
-    if (value === null || value === undefined || value === "" || typeof value === "boolean") return "not emitted";
-    const numeric = Number(value);
-    if (!Number.isFinite(numeric)) return "not emitted";
+    if (typeof value === "boolean") return "not emitted";
+    if (typeof value !== "number" || !Number.isFinite(value)) return "not emitted";
+    const numeric = value;
     const suffix = unit ? ` ${unit}` : "";
     if (numeric === 0) return `0${suffix}`;
     if (Math.abs(numeric) < 1e-3) return `${numeric.toExponential(2)}${suffix}`;
