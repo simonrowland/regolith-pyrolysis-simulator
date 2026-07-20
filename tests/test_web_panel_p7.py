@@ -36,6 +36,15 @@ EVAPORATION_ROWS = (
     "Net unallocated",
 )
 
+DIAGNOSTIC_ROW_AUTHORITY = "Diagnostic · Ledger-neutral estimate"
+COMBINED_ROW_AUTHORITY = "Contains diagnostic evaporation-enthalpy estimate"
+CUMULATIVE_ROW_AUTHORITIES = {
+    "Diagnostic evaporation-enthalpy estimate": DIAGNOSTIC_ROW_AUTHORITY,
+    "Latent vaporization component": DIAGNOSTIC_ROW_AUTHORITY,
+    "Reaction / dissociation component": DIAGNOSTIC_ROW_AUTHORITY,
+    "Scoped electrical + evaporation energy": COMBINED_ROW_AUTHORITY,
+}
+
 
 def _artifact(*summaries: dict) -> dict:
     return {
@@ -101,6 +110,15 @@ def _row(html: str, label: str) -> str:
     start = html.rfind("<tr>", 0, marker_at)
     end = html.index("</tr>", marker_at) + len("</tr>")
     return html[start:end]
+
+
+def _expected_row(label: str, value: str, authority: str | None = None) -> str:
+    badge = (
+        f'<span class="sec-p7-energy-row-authority">{authority}</span>'
+        if authority
+        else ""
+    )
+    return f'<tr><th scope="row">{label}</th><td>{value}{badge}</td></tr>'
 
 
 def _missing(state: str = "not emitted") -> str:
@@ -181,27 +199,46 @@ def test_present_fields_render_emitted_values_and_readable_breakdown_keys():
         '<div class="sec-p7-energy-value">123.5 kWh</div>'
         '<p class="sec-p7-energy-basis">Cumulative through the terminal timestep · not viewer-summed</p>'
     ) in html
-    expected_rows = {
+    cumulative_rows = {
         "Electrical load": "80.25 kWh",
         "Diagnostic evaporation-enthalpy estimate": "43.25 kWh",
         "Latent vaporization component": "12.5 kWh",
         "Reaction / dissociation component": "30.75 kWh",
         "Scoped electrical + evaporation energy": "123.5 kWh",
+    }
+    evaporation_rows = {
         "Diagnostic evaporation-enthalpy sink estimate": "7.25 kWh",
         "Reaction / dissociation enthalpy sink": "6 kWh",
         "Product-vapor enthalpy sink": "1.25 kWh",
         "Net unallocated": "0 kWh",
     }
-    for label, value in expected_rows.items():
-        assert f'<th scope="row">{label}</th><td>{value}</td>' in html
+    cumulative = _article(html, "Cumulative emitted component breakdown")
+    evaporation = _article(html, "Terminal-timestep diagnostic evaporation breakdown")
+    for label, value in cumulative_rows.items():
+        assert _row(cumulative, label) == _expected_row(
+            label, value, CUMULATIVE_ROW_AUTHORITIES.get(label)
+        )
+    for label, value in evaporation_rows.items():
+        assert _row(evaporation, label) == _expected_row(label, value)
 
     for article in _articles(html):
         assert article.count("<b>Scope</b> · Electrical + known evaporation enthalpy") == 1
         assert article.count("<b>Furnace heat</b> · Partial") == 1
-    assert "Custom heat sink" in html
-    assert "Custom trace" in html
     assert "custom_heat_sink" not in html
     assert "not viewer-summed" in html
+
+
+def test_dynamic_breakdown_keys_render_their_emitted_values():
+    html = _render_panel(_artifact(_complete_summary()))
+    cumulative = _article(html, "Cumulative emitted component breakdown")
+    evaporation = _article(html, "Terminal-timestep diagnostic evaporation breakdown")
+
+    assert _row(cumulative, "Custom heat sink") == _expected_row(
+        "Custom heat sink", "4.125 kWh"
+    )
+    assert _row(evaporation, "Custom trace") == _expected_row(
+        "Custom trace", "0.125 kWh"
+    )
 
 
 def test_absent_fields_render_pending_without_zero_fallback():
@@ -308,11 +345,11 @@ def test_partial_inputs_do_not_manufacture_derived_energy():
         assert forbidden not in article
     assert (
         _row(cumulative_thermal_html, "Latent vaporization component")
-        == f'<tr><th scope="row">Latent vaporization component</th><td>2 kWh</td></tr>'
+        == _expected_row("Latent vaporization component", "2 kWh", DIAGNOSTIC_ROW_AUTHORITY)
     )
     assert (
         _row(cumulative_thermal_html, "Reaction / dissociation component")
-        == f'<tr><th scope="row">Reaction / dissociation component</th><td>5 kWh</td></tr>'
+        == _expected_row("Reaction / dissociation component", "5 kWh", DIAGNOSTIC_ROW_AUTHORITY)
     )
 
     cumulative_combined = _article(
@@ -699,10 +736,9 @@ def test_electrical_only_scope_and_heat_status_repeat_on_every_card():
         assert article.count('aria-label="Energy scope and furnace heat coverage"') == 1
 
 
-def test_diagnostic_authority_qualifier_repeats_on_every_affected_article():
+def test_diagnostic_authority_is_bound_to_affected_emitted_values():
     html = _render_panel(_artifact(_complete_summary()))
     diagnostic_headings = METRIC_HEADINGS[1:2] + METRIC_HEADINGS[3:] + (
-        "Cumulative emitted component breakdown",
         "Terminal-timestep diagnostic evaporation breakdown",
     )
 
@@ -712,6 +748,23 @@ def test_diagnostic_authority_qualifier_repeats_on_every_affected_article():
     for heading in ("Cumulative electrical load", "Electrical energy"):
         assert "<b>Diagnostic</b>" not in _article(html, heading)
 
+    cumulative = _article(html, "Cumulative emitted component breakdown")
+    assert "<b>Diagnostic</b>" not in cumulative
+    assert _row(cumulative, "Electrical load") == _expected_row(
+        "Electrical load", "80.25 kWh"
+    )
+    for label, value in (
+        ("Diagnostic evaporation-enthalpy estimate", "43.25 kWh"),
+        ("Latent vaporization component", "12.5 kWh"),
+        ("Reaction / dissociation component", "30.75 kWh"),
+    ):
+        assert _row(cumulative, label) == _expected_row(
+            label, value, DIAGNOSTIC_ROW_AUTHORITY
+        )
+    assert _row(cumulative, "Scoped electrical + evaporation energy") == _expected_row(
+        "Scoped electrical + evaporation energy", "123.5 kWh", COMBINED_ROW_AUTHORITY
+    )
+
     missing_flags = _render_panel(_artifact({
         "energy_evaporation_thermal_kWh": 7.25,
     }))
@@ -719,6 +772,41 @@ def test_diagnostic_authority_qualifier_repeats_on_every_affected_article():
     assert diagnostic.count("<b>Diagnostic</b> · Ledger-neutral estimate") == 1
     assert diagnostic.count("<b>Scope</b> · Not emitted") == 1
     assert diagnostic.count("<b>Furnace heat</b> · Not emitted") == 1
+
+
+def test_zero_breakdown_values_keep_row_authority_and_dynamic_values():
+    html = _render_panel(_artifact(_complete_summary(
+        energy_cumulative_breakdown_kWh={
+            "electrical": 0.0,
+            "evaporation_thermal": 0.0,
+            "latent": 0.0,
+            "dissociation": 0.0,
+            "electrical_plus_evaporation": 0.0,
+            "custom_zero": 0.0,
+        },
+        energy_evaporation_breakdown_kWh={"custom_zero_trace": 0.0},
+    )))
+    cumulative = _article(html, "Cumulative emitted component breakdown")
+    evaporation = _article(html, "Terminal-timestep diagnostic evaporation breakdown")
+
+    assert _row(cumulative, "Electrical load") == _expected_row(
+        "Electrical load", "0 kWh"
+    )
+    for label in (
+        "Diagnostic evaporation-enthalpy estimate",
+        "Latent vaporization component",
+        "Reaction / dissociation component",
+    ):
+        assert _row(cumulative, label) == _expected_row(
+            label, "0 kWh", DIAGNOSTIC_ROW_AUTHORITY
+        )
+    assert _row(cumulative, "Scoped electrical + evaporation energy") == _expected_row(
+        "Scoped electrical + evaporation energy", "0 kWh", COMBINED_ROW_AUTHORITY
+    )
+    assert _row(cumulative, "Custom zero") == _expected_row("Custom zero", "0 kWh")
+    assert _row(evaporation, "Custom zero trace") == _expected_row(
+        "Custom zero trace", "0 kWh"
+    )
 
 
 def test_cro2_oxidation_uses_mixed_reaction_dissociation_label():
@@ -733,7 +821,9 @@ def test_cro2_oxidation_uses_mixed_reaction_dissociation_label():
     hourly = _article(html, "Reaction / dissociation component")
     assert '<div class="sec-p7-energy-value">1.635 kWh</div>' in hourly
     assert _row(html, "Reaction / dissociation component") == (
-        '<tr><th scope="row">Reaction / dissociation component</th><td>3.271 kWh</td></tr>'
+        _expected_row(
+            "Reaction / dissociation component", "3.271 kWh", DIAGNOSTIC_ROW_AUTHORITY
+        )
     )
     assert _row(html, "Reaction / dissociation enthalpy sink") == (
         '<tr><th scope="row">Reaction / dissociation enthalpy sink</th>'
@@ -825,3 +915,7 @@ def test_artifact_labels_are_escaped():
     assert '&lt;img src=x onerror=&quot;alert(1)&quot;&gt;' in html
     assert '&quot; onmouseover=&quot;alert(2)' in html
     assert '&lt;script&gt;alert(3)&lt;/script&gt;' in html
+    cumulative = _article(html, "Cumulative emitted component breakdown")
+    assert _row(cumulative, "&lt;script&gt;alert(3)&lt;/script&gt;") == _expected_row(
+        "&lt;script&gt;alert(3)&lt;/script&gt;", "2 kWh"
+    )

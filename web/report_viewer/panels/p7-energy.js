@@ -5,10 +5,10 @@
 
   const CUMULATIVE_COMPONENTS = Object.freeze([
     ["electrical", "Electrical load"],
-    ["evaporation_thermal", "Diagnostic evaporation-enthalpy estimate"],
-    ["latent", "Latent vaporization component"],
-    ["dissociation", "Reaction / dissociation component"],
-    ["electrical_plus_evaporation", "Scoped electrical + evaporation energy"]
+    ["evaporation_thermal", "Diagnostic evaporation-enthalpy estimate", "Diagnostic · Ledger-neutral estimate"],
+    ["latent", "Latent vaporization component", "Diagnostic · Ledger-neutral estimate"],
+    ["dissociation", "Reaction / dissociation component", "Diagnostic · Ledger-neutral estimate"],
+    ["electrical_plus_evaporation", "Scoped electrical + evaporation energy", "Contains diagnostic evaporation-enthalpy estimate"]
   ]);
 
   const EVAPORATION_COMPONENTS = Object.freeze([
@@ -81,15 +81,18 @@
       `</article>`;
   }
 
-  function breakdownRow(label, value) {
-    return `<tr><th scope="row">${esc(label)}</th><td>${emittedValue(value)}</td></tr>`;
+  function breakdownRow(label, value, authority) {
+    const authorityBadge = authority && isFiniteNumber(value)
+      ? `<span class="sec-p7-energy-row-authority">${esc(authority)}</span>`
+      : "";
+    return `<tr><th scope="row">${esc(label)}</th><td>${emittedValue(value)}${authorityBadge}</td></tr>`;
   }
 
   function breakdownRows(breakdown, expectedComponents) {
     const map = isRecord(breakdown) ? breakdown : {};
     const expectedKeys = new Set(expectedComponents.map(([key]) => key));
     const expected = expectedComponents
-      .map(([key, label]) => breakdownRow(label, map[key]))
+      .map(([key, label, authority]) => breakdownRow(label, map[key], authority))
       .join("");
     const extras = Object.keys(map)
       .filter((key) => !expectedKeys.has(key))
@@ -99,7 +102,7 @@
     return expected + extras;
   }
 
-  function breakdownCard(title, basis, breakdown, expectedComponents, summary) {
+  function breakdownCard(title, basis, breakdown, expectedComponents, summary, diagnostic = false) {
     let notice = "";
     if (breakdown === undefined) {
       notice = "Breakdown not emitted; no components are inferred.";
@@ -117,7 +120,7 @@
       pending +
       `<div class="sec-p7-energy-table-wrap"><table><thead><tr><th>Emitted component</th><th>Energy · kWh</th></tr></thead>` +
       `<tbody>${breakdownRows(breakdown, expectedComponents)}</tbody></table></div>` +
-      caveatBlock(summary, true) +
+      caveatBlock(summary, diagnostic) +
       `</article>`;
   }
 
@@ -182,7 +185,8 @@
         "One-hour interval. The total sink overlaps its emitted latent and reaction components; these rows are not summed in this viewer.",
         summary.energy_evaporation_breakdown_kWh,
         EVAPORATION_COMPONENTS,
-        summary
+        summary,
+        true
       ) +
       `</div>` +
       `</section>`;
