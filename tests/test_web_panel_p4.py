@@ -10,7 +10,11 @@ import pytest
 _UNDEFINED = object()
 
 
-def _render_panel(artifact: object = _UNDEFINED) -> str:
+def _render_panel(
+    artifact: object = _UNDEFINED,
+    *,
+    species_colors: dict[str, str] | None = None,
+) -> str:
     root = Path(__file__).resolve().parents[1] / "web/report_viewer"
     harness = r"""
 const fs = require("fs");
@@ -19,6 +23,13 @@ const context = { console };
 context.globalThis = context;
 vm.createContext(context);
 vm.runInContext(fs.readFileSync(process.argv[2], "utf8"), context);
+const colors = JSON.parse(process.argv[5]);
+const defaultSpeciesColor = context.ReportLabels.speciesColor;
+context.ReportLabels = Object.freeze({
+  ...context.ReportLabels,
+  speciesColor: (species) =>
+    Object.prototype.hasOwnProperty.call(colors, species) ? colors[species] : defaultSpeciesColor(species),
+});
 vm.runInContext(fs.readFileSync(process.argv[3], "utf8"), context);
 const panel = context.ReportPanels.find((item) => item.id === "sec-p4-stage-purity");
 const artifact = process.argv[4] === "__P4_UNDEFINED__" ? undefined : JSON.parse(process.argv[4]);
@@ -32,6 +43,7 @@ process.stdout.write(panel.render(artifact, [], [], {}));
             str(root / "labels.js"),
             str(root / "panels/p4-stage-purity.js"),
             payload,
+            json.dumps(species_colors or {}),
         ],
         input=harness,
         text=True,
@@ -43,6 +55,19 @@ process.stdout.write(panel.render(artifact, [], [], {}));
 
 def _between(html: str, start: str, end: str) -> str:
     return html.split(start, 1)[1].split(end, 1)[0]
+
+
+def _activity_region(html: str) -> str:
+    return _between(html, "<h4>Activity</h4>", "</div>")
+
+
+def _species_map_region(html: str, title: str) -> str:
+    start = f'<div class="sec-p4-breakdown"><h4>{title} <small>kg basis</small></h4>'
+    return _between(html, start, "</div>")
+
+
+def _collected_totals_region(html: str) -> str:
+    return _between(html, "<h4>Collected-stage totals <small>kg basis</small></h4>", "</dl>")
 
 
 def _headline_value(html: str, label: str) -> str:
@@ -73,6 +98,13 @@ def _complete_stage(**overrides) -> dict:
     return stage
 
 
+def _render_stage(stage: dict[str, object], **kwargs: object) -> str:
+    return _render_panel(
+        {"terminal": {"stage_purity": {"stage_1": stage}}},
+        **kwargs,
+    )
+
+
 def test_stage_purity_panel_renders_emitted_grade_breakdowns_and_activity() -> None:
     html = _render_panel({"terminal": {"stage_purity": {"stage_1": _complete_stage()}}})
 
@@ -86,8 +118,9 @@ def test_stage_purity_panel_renders_emitted_grade_breakdowns_and_activity() -> N
     assert "MIXED" in html
     assert "trace · &lt;0.01 kg total" not in _verdict_line(html)
     assert "empty · 0 kg total" not in _verdict_line(html)
-    assert "Designated + coproduct" in html
-    assert "1.27 kg" in html
+    collected_totals = _collected_totals_region(html)
+    assert "Designated + coproduct" in collected_totals
+    assert "1.27 kg" in collected_totals
     assert "Designated species" in html
     assert "1.25 kg" in html
     assert "Coproduct species" in html
@@ -138,7 +171,7 @@ def test_stage_purity_panel_keeps_sparse_and_empty_fields_pending() -> None:
     assert "per-species activity not emitted" in html
     assert "warning not emitted" in html
     assert "No accepted species in emitted contract" in html
-    assert "emitted map contains no measured species values" in html
+    assert "Emitted map contains no species mass values" in html
     assert "0 kg" not in html
 
 
@@ -175,6 +208,14 @@ def test_stage_purity_panel_distinguishes_malformed_values_from_absence() -> Non
     assert "purity_fraction is malformed" in html
     assert "backend verdict is malformed" in html
     assert "warning is malformed" in html
+
+
+def test_impossible_backend_verdict_is_malformed_not_rendered() -> None:
+    html = _render_stage(_complete_stage(verdict="RECOVERED"))
+
+    verdict_line = _verdict_line(html)
+    assert "Pending · backend verdict is malformed" in verdict_line
+    assert "RECOVERED" not in verdict_line
 
 
 def test_positive_trace_keeps_backend_verdict_without_stagewide_activity_badge() -> None:
@@ -342,3 +383,130 @@ def test_malformed_outer_artifacts_render_p4_pending_without_throwing(artifact: 
     assert 'id="sec-p4-stage-purity"' in html
     assert "Pending" in html
     assert "Panel failed to render" not in html
+
+
+def test_activity_rows_distinguish_boolean_missing_and_malformed_states() -> None:
+    html = _render_stage(
+        _complete_stage(
+            accepted_species=["Fe", "Co", "Ni", "Mn"],
+            activity={"Fe": True, "Co": False, "Ni": "yes"},
+        )
+    )
+
+    activity = _activity_region(html)
+    assert ">Fe</span><b>ACTIVE</b>" in activity
+    assert ">Co</span><b>IDLE</b>" in activity
+    assert (
+        '>Ni</span><b>PENDING</b><span class="sec-p4-pending-value">'
+        "activity state is malformed</span>"
+        in activity
+    )
+    assert (
+        '>Mn</span><b>PENDING</b><span class="sec-p4-pending-value">'
+        "activity state not emitted</span>"
+        in activity
+    )
+
+
+def test_empty_activity_map_is_empty_not_pending_without_contract_species() -> None:
+    html = _render_stage(_complete_stage(accepted_species=[], activity={}))
+
+    activity = _activity_region(html)
+    assert (
+        '<span class="sec-p4-empty-value">'
+        "No species states in emitted activity map</span>"
+        in activity
+    )
+    assert "Pending ·" not in activity
+
+
+def test_emitted_empty_species_maps_are_empty_not_pending() -> None:
+    html = _render_stage(
+        _complete_stage(
+            designated_species_kg={},
+            coproduct_species_kg={},
+            impurity_species_kg={},
+        )
+    )
+
+    for title in ("Designated species", "Coproduct species", "Impurity species"):
+        region = _species_map_region(html, title)
+        assert (
+            '<span class="sec-p4-empty-value">'
+            "Emitted map contains no species mass values</span>"
+            in region
+        )
+        assert "Pending ·" not in region
+
+
+def test_species_colors_are_bound_to_shared_helper_output() -> None:
+    html = _render_stage(
+        _complete_stage(accepted_species=["Fe", "SiO2"]),
+        species_colors={"Fe": "sentinel-fe", "SiO2": "sentinel-sio2"},
+    )
+
+    accepted = _between(html, "<h4>Accepted species</h4>", "</div>")
+    assert 'style="--species-color:sentinel-fe"' in accepted
+    assert 'style="--species-color:sentinel-sio2"' in accepted
+
+
+def test_subtitle_binds_backend_emission_and_no_recompute_claims() -> None:
+    html = _render_stage(_complete_stage())
+
+    subtitle = _between(html, '<p class="sub">', "</p>")
+    assert subtitle == (
+        "Backend-emitted stage mass, grade, activity, and verdict. "
+        "Purity and totals are not recomputed in the viewer."
+    )
+
+
+def test_partial_total_stays_pending_with_component_ingredients() -> None:
+    stage = _complete_stage()
+    stage.pop("total_kg")
+    html = _render_stage(stage)
+
+    total = _headline_value(html, "Total stage mass")
+    assert "Pending · total_kg not emitted" in total
+    assert "1.271 kg" not in total
+
+
+def test_partial_purity_stays_pending_with_ratio_ingredients() -> None:
+    stage = _complete_stage(designated_kg=0.5, total_kg=1.0)
+    stage.pop("purity_fraction")
+    html = _render_stage(stage)
+
+    purity = _headline_value(html, "Purity fraction")
+    assert "Pending · purity_fraction not emitted" in purity
+    assert "0.5" not in purity
+
+
+def test_partial_designated_total_stays_pending_with_species_ingredients() -> None:
+    stage = _complete_stage()
+    stage.pop("designated_kg")
+    html = _render_stage(stage)
+
+    totals = _collected_totals_region(html)
+    assert "Pending · designated_kg not emitted" in totals
+    assert "1.27 kg" not in totals
+
+
+def test_partial_impurity_total_stays_pending_with_species_ingredients() -> None:
+    stage = _complete_stage()
+    stage.pop("impurity_kg")
+    html = _render_stage(stage)
+
+    totals = _collected_totals_region(html)
+    assert "Pending · impurity_kg not emitted" in totals
+    assert "0.001 kg" not in totals
+
+
+def test_partial_verdict_stays_pending_with_purity_ingredient() -> None:
+    stage = _complete_stage()
+    stage.pop("verdict")
+    html = _render_stage(stage)
+
+    verdict = _verdict_line(html)
+    assert "Pending · backend verdict not emitted" in verdict
+    assert "PURE" not in verdict
+    assert "MIXED" not in verdict
+    assert "CONTAMINATED" not in verdict

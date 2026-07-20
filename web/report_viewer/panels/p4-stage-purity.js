@@ -49,7 +49,7 @@
     const entries = Object.entries(stage[field]);
     if (!entries.length) {
       return `<div class="sec-p4-breakdown"><h4>${esc(title)} <small>kg basis</small></h4>` +
-        `<span class="sec-p4-empty-value">emitted map contains no measured species values</span></div>`;
+        `<span class="sec-p4-empty-value">Emitted map contains no species mass values</span></div>`;
     }
     const items = entries.map(([species, mass]) =>
       `<li>${speciesName(species)}<b>${numberValue(mass, "kg", "species mass is malformed")}</b></li>`
@@ -109,10 +109,10 @@
 
   function verdict(stage) {
     if (!own(stage, "verdict")) return pending("backend verdict not emitted");
-    if (typeof stage.verdict !== "string" || !stage.verdict.trim()) return pending("backend verdict is malformed");
-    const verdictClass = ["PURE", "MIXED", "CONTAMINATED"].includes(stage.verdict)
-      ? stage.verdict.toLowerCase()
-      : "unknown";
+    if (typeof stage.verdict !== "string" || !["PURE", "MIXED", "CONTAMINATED"].includes(stage.verdict)) {
+      return pending("backend verdict is malformed");
+    }
+    const verdictClass = stage.verdict.toLowerCase();
     return `<span class="sec-p4-verdict sec-p4-verdict-${verdictClass}">${esc(stage.verdict)}</span>`;
   }
 
@@ -146,7 +146,7 @@
       `<details class="sec-p4-details"><summary>Accepted species, activity &amp; mass detail</summary>` +
       `<div class="sec-p4-detail-grid"><div class="sec-p4-breakdown"><h4>Accepted species</h4>${acceptedSpecies(stage)}</div>` +
       `<div class="sec-p4-breakdown"><h4>Activity</h4>${activityDetail(stage)}</div>` +
-      `<div class="sec-p4-breakdown"><h4>Emitted totals <small>kg basis</small></h4>` +
+      `<div class="sec-p4-breakdown"><h4>Collected-stage totals <small>kg basis</small></h4>` +
       `<dl><div><dt>Designated + coproduct</dt><dd>${stageNumberValue(stage, "designated_kg", "kg")}</dd></div>` +
       `<div><dt>Impurity</dt><dd>${stageNumberValue(stage, "impurity_kg", "kg")}</dd></div></dl></div>` +
       `${speciesMap(stage, "designated_species_kg", "Designated species")}` +
