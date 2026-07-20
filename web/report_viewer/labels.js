@@ -124,8 +124,9 @@
     if (!value) return "#888888";
     const element = (value.match(/^([A-Z][a-z]?)/) || [])[1];
     if (element && SPECIES_FAMILY_COLORS[element]) return SPECIES_FAMILY_COLORS[element];
+    const family = element || value;
     let hash = 0;
-    for (let i = 0; i < value.length; i += 1) hash = (hash * 31 + value.charCodeAt(i)) >>> 0;
+    for (let i = 0; i < family.length; i += 1) hash = (hash * 31 + family.charCodeAt(i)) >>> 0;
     return `hsl(${hash % 360}, 45%, 52%)`;
   }
 

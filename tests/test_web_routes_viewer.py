@@ -595,7 +595,7 @@ setImmediate(() => process.stdout.write(report.innerHTML));
     assert "Empty ledger" in html
     assert "terminal.final_state was emitted with no accounts" in html
     assert "Empty" in html and "stage_purity was emitted with no stages" in html
-    assert "process.cleaned_melt is absent" in html
+    assert "Terminal product classification is unavailable because this execution emitted zero timesteps" in html
     assert "Untitled run" in html
     assert "aaaaaaaa…" in html or "aaaaaaaa" in html
     assert "Execution status: partial" in html
@@ -607,7 +607,7 @@ setImmediate(() => process.stdout.write(report.innerHTML));
         "Campaign results",
         "Metal taps",
         "Wall risk",
-        "Terminal ceramic",
+        "Cleaned melt",
         "Energy",
         "Provenance",
     ]
@@ -1226,7 +1226,7 @@ def test_report_labels_format_scientific_values_and_identifiers() -> None:
     harness = r"""
 require(process.argv[2]);
 const {
-  fmtNum, fmtRunId, prettySpecies, accountLabel, prettyFeedstock, prettyChemText
+  fmtNum, fmtRunId, prettySpecies, accountLabel, prettyFeedstock, prettyChemText, speciesColor
 } = globalThis.ReportLabels;
 process.stdout.write(JSON.stringify({
   zero: fmtNum(0, "mol"),
@@ -1240,6 +1240,7 @@ process.stdout.write(JSON.stringify({
   unknown: accountLabel("process.future_account"),
   feedstock: prettyFeedstock("lunar_mare_low_ti"),
   chem: prettyChemText("source-side O2 potential (emitted; not recovered)"),
+  lithiumFamily: [speciesColor("Li"), speciesColor("Li2O")],
   rejected: [fmtNum([], "kg"), fmtNum("  ", "kg"), fmtNum("12", "kg"), fmtNum(true, "kg")]
 }));
 """
@@ -1264,6 +1265,7 @@ process.stdout.write(JSON.stringify({
     assert result["unknown"] == "Future Account"
     assert result["feedstock"] == "Lunar Mare Low Ti"
     assert result["chem"] == "source-side O₂ potential (emitted; not recovered)"
+    assert result["lithiumFamily"][0] == result["lithiumFamily"][1]
     assert result["rejected"] == ["not emitted"] * 4
 
 
@@ -1485,6 +1487,246 @@ def test_report_viewer_shows_stage_warning_beside_verdict() -> None:
     assert html.count('class="stage-warning"') == 1
 
 
+def test_wall_deposit_total_is_disclosed_viewer_side_sum_with_segments() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["timesteps"] = [
+        {
+            "hour": 1,
+            "summary": {
+                "campaign": "C0",
+                "wall_deposit_cumulative_kg": {
+                    "stage_0_to_1": {"Li": 1.0},
+                    "stage_1_to_2": {"Li2O": 0.481},
+                },
+            },
+            "ledger": {},
+        }
+    ]
+    artifact["terminal"] = {
+        "run_metadata": {
+            "knudsen_regime_diagnostic": {
+                "stage_area_geometry_provenance_notice": {
+                    "status": "provisional",
+                    "source_class": "engineering-default",
+                    "message": "Provisional wall geometry.",
+                }
+            }
+        }
+    }
+
+    html = _render_report_html(artifact)
+
+    assert '>1.481 kg</span> <small>viewer-side sum (no emitted total)</small>' in html
+    assert "stage_0_to_1" in html and "stage_1_to_2" in html
+    assert 'Li <span title="1 kg">1 kg</span>' in html
+    assert 'Li₂O <span title="0.481 kg">0.481 kg</span>' in html
+    assert "wall geometry provisional" in html
+    assert "Provisional wall geometry." in html
+
+
+def test_cleaned_melt_title_requires_emitted_ceramic_classification() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["timesteps"] = [
+        {"hour": 1, "summary": {"campaign": "C0"}, "ledger": {}}
+    ]
+    artifact["terminal"] = {
+        "final_state": {"process.cleaned_melt": {"SiO2": 1.0}},
+    }
+
+    html = _render_report_html(artifact)
+    assert '<span class="sect">08</span>Cleaned melt' in html
+    assert '<span class="sect">08</span>Terminal ceramic' not in html
+
+    artifact["terminal"]["terminal_product_taxonomy"] = {
+        "match_status": "matched_single",
+        "product_class": "oxide_ceramic",
+    }
+    classified_html = _render_report_html(artifact)
+    assert '<span class="sect">08</span>Terminal ceramic — cleaned melt' in classified_html
+
+
+def test_zero_timestep_cleaned_melt_is_not_presented_as_terminal_product() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact.update(execution_status="partial", lifecycle="cancelled")
+    artifact["terminal"] = {
+        "final_state": {"process.cleaned_melt": {"SiO2": 1.0, "Al2O3": 3.0}},
+    }
+
+    html = _render_report_html(artifact)
+
+    assert '<span class="sect">08</span>Cleaned melt' in html
+    assert '<span class="sect">08</span>Terminal ceramic' not in html
+    assert "Initial or unprocessed inventory is not presented as terminal product." in html
+    assert "Oxide / species" not in html
+
+
+def test_absent_cost_totals_are_labeled_viewer_computed_estimate() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["header"]["cost_block"] = {
+        "electrical_cost_per_kWh": 10.0,
+        "solar_heat_cost_per_kWh": 0.05,
+    }
+    artifact["timesteps"] = [
+        {
+            "hour": 1,
+            "summary": {
+                "campaign": "C0",
+                "energy_electrical_kWh": 1.0,
+                "energy_evaporation_thermal_kWh": 2.0,
+            },
+            "ledger": {},
+        }
+    ]
+
+    html = _render_report_html(artifact)
+    label = "viewer-computed estimate (no emitted cost total)"
+    assert html.count(label) >= 2  # headline and §09 arithmetic note
+
+    artifact["terminal"]["cost_totals"] = {
+        "process_electrical_energy_kWh": 1.0,
+        "pumping_electrical_energy_kWh": 0.0,
+        "electrical_energy_kWh": 1.0,
+        "evaporation_thermal_energy_kWh": 2.0,
+        "process_electrical_cost_usd": 10.0,
+        "pumping_electrical_cost_usd": 0.0,
+        "electrical_cost_usd": 10.0,
+        "solar_heat_cost_usd": 0.1,
+        "total_cost_usd": 10.1,
+    }
+    canonical_html = _render_report_html(artifact)
+    assert label not in canonical_html
+    assert "binds terminal.cost_totals" in canonical_html
+
+
+def test_absent_energy_avoids_broken_cost_formula() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["header"]["cost_block"] = {
+        "electrical_cost_per_kWh": 10.0,
+        "solar_heat_cost_per_kWh": 0.05,
+    }
+
+    html = _render_report_html(artifact)
+
+    assert "No electrical or evaporation-thermal energy was emitted" in html
+    assert "Total not emitted" not in html
+    assert "not emitted ×" not in html
+
+
+def test_temperature_chart_bottom_bound_carries_unit() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["timesteps"] = [
+        {"hour": 1, "summary": {"campaign": "C0", "T_C": 75.0}, "ledger": {}},
+        {"hour": 2, "summary": {"campaign": "C0", "T_C": 100.0}, "ledger": {}},
+    ]
+
+    html = _render_report_html(artifact)
+
+    assert re.search(r'<text class="chart-label" x="3" y="[^"]+">75 °C</text>', html)
+    assert not re.search(r'<text class="chart-label" x="3" y="[^"]+">75</text>', html)
+
+
+def test_subcent_money_never_renders_false_zero() -> None:
+    subcent, zero = _run_viewer_expression(
+        "report-viewer.js", "[money(0.000128), money(0)]",
+    )
+
+    assert subcent == '<span title="0.000128 USD">&lt; $0.01</span>'
+    assert zero == "$0.00"
+
+
+def test_viewer_does_not_derive_ledger_disposition_or_mol_percent_totals() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["timesteps"] = [
+        {"hour": 1, "summary": {"campaign": "C0"}, "ledger": {}}
+    ]
+    artifact["terminal"] = {
+        "final_state": {
+            "process.condensation_train": {"SiO2": 2.0, "Fe": 3.0},
+            "process.cleaned_melt": {"SiO2": 1.0, "Al2O3": 3.0},
+        }
+    }
+
+    html = _render_report_html(artifact)
+
+    assert "Account and group totals were not emitted; none are summed in the viewer." in html
+    assert "Account totals were not emitted; none are summed in the viewer." in html
+    assert "No mol% denominator or projection was emitted; none is derived in the viewer." in html
+    assert "mol% · emitted" in html
+    assert "<span title=\"5 mol\">5 mol</span>" not in html
+    assert "<span title=\"25 %\">25 %</span>" not in html
+
+
+def test_report_viewer_labels_timestep_summaries_as_viewer_derived() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["timesteps"] = [
+        {
+            "hour": 4,
+            "summary": {
+                "campaign": "C0", "T_C": 100.0,
+                "energy_electrical_kWh": 1.0,
+                "energy_evaporation_thermal_kWh": 2.0,
+            },
+            "ledger": {},
+        },
+        {
+            "hour": 8,
+            "summary": {
+                "campaign": "C0", "T_C": 200.0,
+                "energy_electrical_kWh": 3.0,
+                "energy_evaporation_thermal_kWh": 4.0,
+            },
+            "ledger": {},
+        },
+    ]
+
+    html = _render_report_html(artifact)
+
+    assert '<b><span title="200 °C">200 °C</span> viewer-derived peak</b>' in html
+    assert "2 viewer-derived timestep rows" in html
+    assert "Viewer-derived temperature range" in html
+    assert "Viewer-derived electrical + evaporation thermal" in html
+
+
+def test_zero_cost_total_has_no_cost_share_basis() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["header"]["cost_block"] = {
+        "electrical_cost_per_kWh": 0.1,
+        "solar_heat_cost_per_kWh": 0.2,
+    }
+    artifact["terminal"] = {
+        "cost_totals": {
+            "process_electrical_energy_kWh": 0.0,
+            "pumping_electrical_energy_kWh": 0.0,
+            "electrical_energy_kWh": 0.0,
+            "evaporation_thermal_energy_kWh": 0.0,
+            "process_electrical_cost_usd": 0.0,
+            "pumping_electrical_cost_usd": 0.0,
+            "electrical_cost_usd": 0.0,
+            "solar_heat_cost_usd": 0.0,
+            "total_cost_usd": 0.0,
+        }
+    }
+
+    html = _render_report_html(artifact)
+
+    assert "No cost basis" in html
+    assert "Emitted total cost is $0.00; there is no cost to apportion." in html
+    assert "Cost share is unavailable" not in html
+    assert 'class="cost-stack"' not in html
+
+
+def test_sparse_stage_purity_verdict_stays_pending() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["terminal"] = {"stage_purity": {"stage_1": {"verdict": "PURE"}}}
+
+    html = _render_report_html(artifact)
+
+    assert "Supported verdict" in html
+    assert '<span class="verdict unavailable">PENDING</span>' in html
+    assert '<span class="verdict pure">PURE</span>' not in html
+    assert "Verdict pending until stage masses are emitted." in html
+
+
 def test_report_viewer_section_order_and_stepper_controls() -> None:
     """Report page: sequential sections, readable feedstock, stepper affordances."""
     root = Path(__file__).resolve().parents[1] / "web/report_viewer"
@@ -1657,7 +1899,7 @@ setTimeout(() => {
         ("05", "Campaign results"),
         ("06", "Metal taps"),
         ("07", "Wall risk"),
-        ("08", "Terminal ceramic"),
+        ("08", "Cleaned melt"),
         ("09", "Energy"),
         ("10", "Provenance"),
     ]
