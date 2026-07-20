@@ -170,6 +170,53 @@ def effective_equilibrium_pressure_Pa(
             return 0.0
         fit_target = str(sp_data.get("fit_target", "") or "")
         metal_phase_kind = ellingham_metal_phase_kind(species, T_K)
+        liquid_rxn = sp_data.get("liquid_oxide_standard_reaction")
+        if (
+            fit_target != "standard_reaction_term"
+            and isinstance(liquid_rxn, Mapping)
+            and liquid_rxn.get("antoine")
+        ):
+            antoine_liq = liquid_rxn.get("antoine") or {}
+            P_reference_Pa = _antoine_reference_pressure_Pa(antoine_liq, T_K)
+            if P_reference_Pa is None:
+                return 0.0
+            activity_exponent = float(
+                liquid_rxn.get("oxide_activity_exponent", 1.0) or 1.0
+            )
+            P_eq_Pa = P_reference_Pa * (a_ox ** activity_exponent)
+            pO2_exponent = float(liquid_rxn.get("pO2_exponent", 0.0) or 0.0)
+            if pO2_exponent:
+                pO2_reference_bar = max(
+                    1e-30,
+                    float(liquid_rxn.get("pO2_reference_bar", 1.0) or 1.0),
+                )
+                P_eq_Pa *= (pO2 / pO2_reference_bar) ** pO2_exponent
+            return max(P_eq_Pa, 0.0)
+        gas_rail_rxn = sp_data.get("gas_rail_standard_reaction")
+        if (
+            fit_target != "standard_reaction_term"
+            and metal_phase_kind == ELLINGHAM_METAL_PHASE_GAS
+            and isinstance(gas_rail_rxn, Mapping)
+            and gas_rail_rxn.get("antoine")
+        ):
+            # Ca/Mg two-rail gas path: liquid-oxide standard reaction, not
+            # solid-oxide Ellingham gas fugacity (pairing fix 2026-07-20).
+            antoine_gas = gas_rail_rxn.get("antoine") or {}
+            P_reference_Pa = _antoine_reference_pressure_Pa(antoine_gas, T_K)
+            if P_reference_Pa is None:
+                return 0.0
+            activity_exponent = float(
+                gas_rail_rxn.get("oxide_activity_exponent", 1.0) or 1.0
+            )
+            P_eq_Pa = P_reference_Pa * (a_ox ** activity_exponent)
+            pO2_exponent = float(gas_rail_rxn.get("pO2_exponent", 0.0) or 0.0)
+            if pO2_exponent:
+                pO2_reference_bar = max(
+                    1e-30,
+                    float(gas_rail_rxn.get("pO2_reference_bar", 1.0) or 1.0),
+                )
+                P_eq_Pa *= (pO2 / pO2_reference_bar) ** pO2_exponent
+            return max(P_eq_Pa, 0.0)
         if (
             fit_target != "standard_reaction_term"
             and metal_phase_kind == ELLINGHAM_METAL_PHASE_GAS

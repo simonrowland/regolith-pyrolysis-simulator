@@ -121,6 +121,8 @@ FIT_TARGET_PSEUDO_VAPOROCK = "pseudo_psat_backsolved_from_vaporock"
 FIT_TARGET_STANDARD_REACTION = "standard_reaction_term"
 COEFF_BLOCK_ANTOINE = "antoine"
 COEFF_BLOCK_PURE_COMPONENT = "pure_component_antoine"
+GAS_RAIL_STANDARD_REACTION_KEY = "gas_rail_standard_reaction"
+LIQUID_OXIDE_STANDARD_REACTION_KEY = "liquid_oxide_standard_reaction"
 PSEUDO_VAPOROCK_CURVE_FIT_SOURCE = "vaporock_backsolved_curve_fit"
 ELLINGHAM_STANDARD_PRESSURE_PA = 100000.0
 _BUILTIN_VAPOR_SOURCE_CLASSES = frozenset(
@@ -134,6 +136,86 @@ _BUILTIN_VAPOR_SOURCE_CLASSES = frozenset(
 
 def _fit_target(row: Mapping[str, Any] | None) -> str:
     return str((row or {}).get("fit_target", "") or "").strip()
+
+
+def _gas_rail_standard_reaction_block(
+    row: Mapping[str, Any] | None,
+) -> Mapping[str, Any] | None:
+    """Optional liquid-oxide standard reaction for the gas rail only.
+
+    Used by Ca/Mg two-rail metals: condensed pure-component Antoine is
+    preserved below boiling; above boiling the solid-oxide Ellingham gas
+    term is replaced by a liquid-oxide standard reaction that matches the
+    pure-liquid Raoultian activity basis.
+    """
+
+    block = (row or {}).get(GAS_RAIL_STANDARD_REACTION_KEY)
+    return block if _is_mapping(block) else None
+
+
+def _liquid_oxide_standard_reaction_block(
+    row: Mapping[str, Any] | None,
+) -> Mapping[str, Any] | None:
+    """Optional full-T liquid-oxide standard reaction for oxide-coupled metal P.
+
+    Used by Al/Ti/Cr/Mn: pure-component Antoine remains the pure-metal Psat
+    sidecar (NBP/NIST ground truth); oxide-coupled runtime pressure uses this
+    liquid-standard term instead of solid-oxide Ellingham × activity.
+    """
+
+    block = (row or {}).get(LIQUID_OXIDE_STANDARD_REACTION_KEY)
+    return block if _is_mapping(block) else None
+
+def _standard_reaction_pressure_Pa(
+    *,
+    P_reference_Pa: float,
+    oxide_activity_value: float,
+    activity_exponent: float,
+    pO2_bar: float,
+    pO2_exponent: float,
+    pO2_reference_bar: float,
+) -> tuple[float, float, bool]:
+    """Return (P_eq_Pa, activity_factor, pO2_scaled) for a standard reaction."""
+
+    activity_factor = max(float(oxide_activity_value), 0.0) ** float(
+        activity_exponent
+    )
+    P_eq_Pa = float(P_reference_Pa) * activity_factor
+    pO2_scaled = False
+    if pO2_exponent:
+        p_ref = max(1e-30, float(pO2_reference_bar) or 1.0)
+        P_eq_Pa *= (max(float(pO2_bar), 1e-30) / p_ref) ** float(pO2_exponent)
+        pO2_scaled = True
+    return P_eq_Pa, activity_factor, pO2_scaled
+
+
+def _gamma_domain_authority(
+    parent_oxide: str,
+    temperature_K: float,
+    oxide_activity: Any,
+) -> dict[str, Any] | None:
+    """Typed out-of-domain result for constant-gamma table rows (K anchor)."""
+
+    from simulator.chemistry.melt_activity import MELT_OXIDE_ACTIVITY_COEFFICIENTS
+
+    coeff = MELT_OXIDE_ACTIVITY_COEFFICIENTS.get(parent_oxide)
+    if coeff is None or coeff.valid_range_K is None:
+        return None
+    low, high = (float(coeff.valid_range_K[0]), float(coeff.valid_range_K[1]))
+    if low <= float(temperature_K) <= high:
+        return {
+            "authority_status": "in_domain",
+            "gamma_domain_K": (low, high),
+            "temperature_K": float(temperature_K),
+            "gamma": float(oxide_activity.gamma),
+        }
+    return {
+        "authority_status": "out_of_gamma_domain",
+        "gamma_domain_K": (low, high),
+        "temperature_K": float(temperature_K),
+        "gamma": float(oxide_activity.gamma),
+        "anchor_T_K": coeff.anchor_T_K,
+    }
 
 
 def _is_mapping(value: Any) -> bool:
@@ -532,6 +614,40 @@ def _is_high_uncertainty(row: Mapping[str, Any] | None) -> bool:
     return tier in {"low", "very_low", "weak", "poor", "experimental"}
 
 
+def _species_authority_fields(
+    row: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    """Machine-readable authority/bracket labels from YAML (pressure-neutral).
+
+    Mirrors Bug B ``authority_class`` emission: labels ride on diagnostics /
+    provenance without changing computed P_eq. Used for interim demotions
+    (e.g. Na Alternative B compensating-errors bracket).
+    """
+
+    if not _is_mapping(row):
+        return {}
+    out: dict[str, Any] = {}
+    authority = row.get("authority_class")
+    if authority is not None and str(authority).strip():
+        out["authority_class"] = str(authority).strip()
+    if "declared_compensation" in row:
+        out["declared_compensation"] = bool(row.get("declared_compensation"))
+    note = row.get("declared_compensation_note")
+    if note is not None and str(note).strip():
+        out["declared_compensation_note"] = str(note).strip()
+    bracket = row.get("pressure_bracket")
+    if _is_mapping(bracket):
+        # Shallow copy; nested scalars only in the declared schema.
+        out["pressure_bracket"] = dict(bracket)
+        candidates = bracket.get("candidates")
+        if _is_mapping(candidates):
+            out["pressure_bracket"]["candidates"] = dict(candidates)
+    status = row.get("pseudo_antoine_status")
+    if status is not None and str(status).strip():
+        out["pseudo_antoine_status"] = str(status).strip()
+    return out
+
+
 def warn_pseudo_vapor_pressure_fallback(
     species: str,
     row: Mapping[str, Any] | None,
@@ -847,9 +963,14 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 fit_target != FIT_TARGET_STANDARD_REACTION
                 and metal_phase_kind == ELLINGHAM_METAL_PHASE_GAS
             )
+            liquid_rxn_early = _liquid_oxide_standard_reaction_block(sp_data)
+            # Oxide-coupled liquid-standard rows (Al/Ti/Cr/Mn) do not use the
+            # pure-component Antoine block for runtime P; that sidecar is NBP-
+            # only. Skip condensed-rail loading so pure-range refuse does not
+            # block the liquid-oxide standard path.
             coefficient_block: str | None = None
             P_reference_Pa: float | None = None
-            if not gas_standard_rail:
+            if not gas_standard_rail and liquid_rxn_early is None:
                 antoine, coefficient_block = vapor_pressure_antoine_coefficients(
                     sp_data,
                     temperature_K=T_K,
@@ -938,40 +1059,46 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     warnings.append(oxide_activity.warning)
                 activities[species] = oxide_activity.activity
 
-                # provenance: k_mox_liquid_standard_reaction
-                # Lamoreaux & Hildenbrand 1984 Tables 2/4
-                # (DOI 10.1063/1.555706) supplies the liquid KO0.5 standard
-                # term; DeMaria 1971 Table 1 is held-out pO2 validation only.
+                # provenance: liquid_oxide_standard_reaction
+                # K: Lamoreaux & Hildenbrand 1984 Tables 2/4 liquid KO0.5.
+                # Al/Ti/Cr/Mn: TE liquid oxide mu0 + JANAF metal(g) (2026-07-20
+                # pairing fix). Solid-oxide Ellingham is not used here.
                 activity_exponent = float(
                     sp_data.get("oxide_activity_exponent", 1.0) or 1.0
                 )
-                activity_factor = max(
-                    oxide_activity.activity,
-                    0.0,
-                ) ** activity_exponent
-                P_eq_Pa = _require_finite_vapor_value(
-                    P_reference_Pa * activity_factor,
-                    species=species,
-                    field="P_eq_activity",
-                )
-                pO2_scaled = False
                 pO2_exponent = float(sp_data.get("pO2_exponent", 0.0) or 0.0)
-                if pO2_exponent:
-                    # Melt-dissolved non-FeO oxide dissociation sees the
-                    # melt's oxygen chemical potential; headspace pO2 is only
-                    # the transport/backpressure channel.
-                    pO2_reference_bar = max(
-                        1e-30,
-                        float(sp_data.get("pO2_reference_bar", 1.0) or 1.0),
+                pO2_reference_bar = max(
+                    1e-30,
+                    float(sp_data.get("pO2_reference_bar", 1.0) or 1.0),
+                )
+                P_eq_raw, activity_factor, pO2_scaled = (
+                    _standard_reaction_pressure_Pa(
+                        P_reference_Pa=P_reference_Pa,
+                        oxide_activity_value=oxide_activity.activity,
+                        activity_exponent=activity_exponent,
+                        pO2_bar=melt_dissociation_pO2_bar,
+                        pO2_exponent=pO2_exponent,
+                        pO2_reference_bar=pO2_reference_bar,
                     )
-                    P_eq_Pa = _require_finite_vapor_value(
-                        P_eq_Pa
-                        * (melt_dissociation_pO2_bar / pO2_reference_bar)
-                        ** pO2_exponent,
-                        species=species,
-                        field="P_eq_pO2",
+                )
+                P_eq_Pa = _require_finite_vapor_value(
+                    P_eq_raw,
+                    species=species,
+                    field="P_eq_standard_reaction",
+                )
+                gamma_auth = _gamma_domain_authority(
+                    parent_oxide, T_K, oxide_activity
+                )
+                if (
+                    gamma_auth is not None
+                    and gamma_auth["authority_status"] == "out_of_gamma_domain"
+                ):
+                    warnings.append(
+                        f"{species} melt-oxide gamma out of declared domain "
+                        f"gamma_domain_K=[{gamma_auth['gamma_domain_K'][0]:g}, "
+                        f"{gamma_auth['gamma_domain_K'][1]:g}] at "
+                        f"{T_K:.2f} K (constant-gamma UNCERTIFIED)"
                     )
-                    pO2_scaled = True
                 if P_eq_Pa > 1e-15:
                     vapor_pressures[species] = P_eq_Pa
                     source_label = vapor_pressure_source_label(
@@ -985,6 +1112,14 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                             f"{source_label}:"
                             "extrapolated_beyond_valid_range_K"
                         )
+                    if (
+                        gamma_auth is not None
+                        and gamma_auth["authority_status"]
+                        == "out_of_gamma_domain"
+                    ):
+                        source_label = (
+                            f"{source_label}:out_of_gamma_domain"
+                        )
                     vapor_pressure_sources[species] = source_label
                     vapor_pressure_provenance[species] = {
                         "pressure_kind": _runtime_pressure_kind(
@@ -994,6 +1129,109 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                                 activity_factor != 1.0 or pO2_scaled
                             ),
                         ),
+                        "pressure_rail": "liquid_oxide_standard_reaction",
+                        "P_reference_Antoine_Pa": P_reference_Pa,
+                        "P_eq_Pa": P_eq_Pa,
+                        "pO2_bar": melt_dissociation_pO2_bar,
+                        "activity_factor": activity_factor,
+                        "oxide_activity_exponent": activity_exponent,
+                        "pO2_exponent": pO2_exponent,
+                        "source_label": source_label,
+                    }
+                    vapor_pressure_provenance[species].update(
+                        oxide_activity.provenance()
+                    )
+                    if gamma_auth is not None:
+                        vapor_pressure_provenance[species][
+                            "gamma_domain_authority"
+                        ] = gamma_auth
+                continue
+
+            # Al/Ti/Cr/Mn: liquid-oxide standard reaction for oxide-coupled P
+            # at all T; pure-component Antoine is NBP-only (not used here).
+            liquid_rxn = _liquid_oxide_standard_reaction_block(sp_data)
+            if liquid_rxn is not None and fit_target != FIT_TARGET_STANDARD_REACTION:
+                antoine_liq = liquid_rxn.get("antoine", {}) or {}
+                A_l = float(antoine_liq.get("A", 0.0) or 0.0)
+                B_l = float(antoine_liq.get("B", 0.0) or 0.0)
+                C_l = float(antoine_liq.get("C", 0.0) or 0.0)
+                if not (A_l > 0.0 and T_K > 300.0):
+                    continue
+                valid_liq = _range_tuple(liquid_rxn.get("valid_range_K"))
+                if valid_liq is not None:
+                    vlo, vhi = valid_liq
+                    if T_K < vlo or T_K > vhi:
+                        metal_extrapolations[species] = {
+                            "temperature_K": T_K,
+                            "valid_range_K": (vlo, vhi),
+                            "rail": "liquid_oxide_standard_reaction",
+                        }
+                        warnings.append(
+                            f"{species} liquid-oxide standard reaction "
+                            f"extrapolated beyond valid_range_K "
+                            f"[{vlo:g}, {vhi:g}] at {T_K:.3f} K"
+                        )
+                log_P_liq = A_l - B_l / (T_K + C_l)
+                P_reference_Pa = _pow10_pressure_or_raise(
+                    log_P_liq,
+                    species=species,
+                    field="P_reference_liquid_oxide_standard_reaction_Pa",
+                )
+                oxide_activity = melt_oxide_activity(
+                    parent_oxide, melt_account_mol
+                )
+                if oxide_activity is None or oxide_activity.activity <= 1e-10:
+                    continue
+                if oxide_activity.warning:
+                    warnings.append(oxide_activity.warning)
+                activities[species] = oxide_activity.activity
+                activity_exponent = float(
+                    liquid_rxn.get("oxide_activity_exponent", 1.0) or 1.0
+                )
+                pO2_exponent = float(
+                    liquid_rxn.get("pO2_exponent", 0.0) or 0.0
+                )
+                pO2_reference_bar = max(
+                    1e-30,
+                    float(liquid_rxn.get("pO2_reference_bar", 1.0) or 1.0),
+                )
+                P_eq_raw, activity_factor, pO2_scaled = (
+                    _standard_reaction_pressure_Pa(
+                        P_reference_Pa=P_reference_Pa,
+                        oxide_activity_value=oxide_activity.activity,
+                        activity_exponent=activity_exponent,
+                        pO2_bar=melt_dissociation_pO2_bar,
+                        pO2_exponent=pO2_exponent,
+                        pO2_reference_bar=pO2_reference_bar,
+                    )
+                )
+                P_eq_Pa = _require_finite_vapor_value(
+                    P_eq_raw,
+                    species=species,
+                    field="P_eq_liquid_oxide_standard_reaction",
+                )
+                if P_eq_Pa > 1e-15:
+                    vapor_pressures[species] = P_eq_Pa
+                    source_label = (
+                        "builtin_authoritative:"
+                        "liquid_oxide_standard_reaction"
+                    )
+                    if species in metal_extrapolations:
+                        source_label = (
+                            f"{source_label}:"
+                            "extrapolated_beyond_valid_range_K"
+                        )
+                    vapor_pressure_sources[species] = source_label
+                    vapor_pressure_provenance[species] = {
+                        "pressure_kind": _runtime_pressure_kind(
+                            sp_data,
+                            COEFF_BLOCK_ANTOINE,
+                            effective_scaled=(
+                                activity_factor != 1.0 or pO2_scaled
+                            ),
+                        ),
+                        "pressure_rail": "liquid_oxide_standard_reaction",
+                        "oxide_standard_state": "liquid",
                         "P_reference_Antoine_Pa": P_reference_Pa,
                         "P_eq_Pa": P_eq_Pa,
                         "pO2_bar": melt_dissociation_pO2_bar,
@@ -1007,6 +1245,111 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     )
                 continue
 
+            # Ca/Mg gas rail: liquid-oxide standard reaction replaces solid
+            # Ellingham gas fugacity while condensed pure-component rail stays.
+            gas_rail_rxn = _gas_rail_standard_reaction_block(sp_data)
+            if gas_standard_rail and gas_rail_rxn is not None:
+                antoine_gas = gas_rail_rxn.get("antoine", {}) or {}
+                A_g = float(antoine_gas.get("A", 0.0) or 0.0)
+                B_g = float(antoine_gas.get("B", 0.0) or 0.0)
+                C_g = float(antoine_gas.get("C", 0.0) or 0.0)
+                if not (A_g > 0.0 and T_K > 300.0):
+                    continue
+                valid_gas = _range_tuple(gas_rail_rxn.get("valid_range_K"))
+                if valid_gas is not None:
+                    vlo, vhi = valid_gas
+                    if T_K < vlo or T_K > vhi:
+                        metal_extrapolations[species] = {
+                            "temperature_K": T_K,
+                            "valid_range_K": (vlo, vhi),
+                            "rail": "gas_rail_standard_reaction",
+                        }
+                        warnings.append(
+                            f"{species} gas-rail liquid-oxide standard reaction "
+                            f"extrapolated beyond valid_range_K "
+                            f"[{vlo:g}, {vhi:g}] at {T_K:.3f} K"
+                        )
+                log_P_gas = A_g - B_g / (T_K + C_g)
+                P_reference_Pa = _pow10_pressure_or_raise(
+                    log_P_gas,
+                    species=species,
+                    field="P_reference_gas_rail_standard_reaction_Pa",
+                )
+                oxide_activity = melt_oxide_activity(
+                    parent_oxide, melt_account_mol
+                )
+                if oxide_activity is None or oxide_activity.activity <= 1e-10:
+                    continue
+                if oxide_activity.warning:
+                    warnings.append(oxide_activity.warning)
+                activities[species] = oxide_activity.activity
+                activity_exponent = float(
+                    gas_rail_rxn.get("oxide_activity_exponent", 1.0) or 1.0
+                )
+                pO2_exponent = float(
+                    gas_rail_rxn.get("pO2_exponent", 0.0) or 0.0
+                )
+                pO2_reference_bar = max(
+                    1e-30,
+                    float(gas_rail_rxn.get("pO2_reference_bar", 1.0) or 1.0),
+                )
+                # Premise: gas-rail P_ref is liquid-oxide standard reaction at
+                # a=1, fO2=1 bar. Algebra: P = P_ref * a * fO2^n with the
+                # melt dissociation pO2 channel (not transport-only). Unit Pa.
+                # Sanity: residual collapses to regenerated TE+JANAF grid.
+                P_eq_raw, activity_factor, pO2_scaled = (
+                    _standard_reaction_pressure_Pa(
+                        P_reference_Pa=P_reference_Pa,
+                        oxide_activity_value=oxide_activity.activity,
+                        activity_exponent=activity_exponent,
+                        pO2_bar=melt_dissociation_pO2_bar,
+                        pO2_exponent=pO2_exponent,
+                        pO2_reference_bar=pO2_reference_bar,
+                    )
+                )
+                P_eq_Pa = _require_finite_vapor_value(
+                    P_eq_raw,
+                    species=species,
+                    field="P_eq_gas_rail_standard_reaction",
+                )
+                if P_eq_Pa > 1e-15:
+                    vapor_pressures[species] = P_eq_Pa
+                    source_label = (
+                        "builtin_authoritative:"
+                        "gas_rail_liquid_oxide_standard_reaction"
+                    )
+                    if species in metal_extrapolations:
+                        source_label = (
+                            f"{source_label}:"
+                            "extrapolated_beyond_valid_range_K"
+                        )
+                    vapor_pressure_sources[species] = source_label
+                    vapor_pressure_provenance[species] = {
+                        "pressure_kind": _runtime_pressure_kind(
+                            sp_data,
+                            COEFF_BLOCK_ANTOINE,
+                            effective_scaled=(
+                                activity_factor != 1.0 or pO2_scaled
+                            ),
+                        ),
+                        "pressure_rail": "gas_rail_liquid_oxide_standard_reaction",
+                        "metal_standard_state": ELLINGHAM_METAL_PHASE_GAS,
+                        "oxide_standard_state": "liquid",
+                        "P_standard_Pa": ELLINGHAM_STANDARD_PRESSURE_PA,
+                        "P_reference_Antoine_Pa": P_reference_Pa,
+                        "P_eq_Pa": P_eq_Pa,
+                        "pO2_bar": melt_dissociation_pO2_bar,
+                        "activity_factor": activity_factor,
+                        "oxide_activity_exponent": activity_exponent,
+                        "pO2_exponent": pO2_exponent,
+                        "source_label": source_label,
+                    }
+                    vapor_pressure_provenance[species].update(
+                        oxide_activity.provenance()
+                    )
+                continue
+
+            fe_degraded_activity_basis = None
             if parent_oxide == 'FeO':
                 oxide_activity = None
                 if intrinsic_fO2_log is not None:
@@ -1020,7 +1363,18 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         floor_bar=vacuum_floor_bar,
                     )
                 else:
+                    # Documented degraded pre-existing public-caller path:
+                    # without an explicit intrinsic melt fO2 channel, Fe uses
+                    # FeO wt%/100 as a stand-in activity. Typed — never silent
+                    # as if it were Kress91 or a VapoRock state activity.
+                    # Matrix lock: do NOT splice VapoRock IW FeO activities.
                     a_oxide = comp_wt.get(parent_oxide, 0.0) / 100.0
+                    fe_degraded_activity_basis = "feo_weight_fraction"
+                    warnings.append(
+                        "Fe degraded_activity_basis=feo_weight_fraction: "
+                        "intrinsic_fO2_log absent; using FeO wt%/100 "
+                        "(documented degraded public-caller path, uncertified)"
+                    )
             else:
                 oxide_activity = melt_oxide_activity(parent_oxide, melt_account_mol)
                 if oxide_activity is None:
@@ -1199,6 +1553,15 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 }
                 if P_reference_Pa is not None:
                     provenance["P_reference_Antoine_Pa"] = P_reference_Pa
+                if parent_oxide == "FeO":
+                    if fe_degraded_activity_basis is not None:
+                        provenance["activity_basis"] = fe_degraded_activity_basis
+                        provenance["degraded_activity_basis"] = (
+                            fe_degraded_activity_basis
+                        )
+                    else:
+                        provenance["activity_basis"] = "kress91_ferrous"
+                        provenance["degraded_activity_basis"] = None
                 vapor_pressure_provenance[species] = provenance
                 if oxide_activity is not None:
                     vapor_pressure_provenance[species].update(
@@ -1320,35 +1683,50 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 )
                 pO2_scaled = True
 
-            # SiO suppression by pO2: p(SiO) scales as 1/sqrt(pO2).
-            # Premise: the fitted SiO Antoine row is calibrated at its
-            # declared pO2_reference_bar, not at the current body vacuum
-            # floor. Algebra: P = P_ref * sqrt(p_ref / pO2). Unit check:
-            # bar/bar is dimensionless. Sanity: changing lunar/asteroid
-            # environmental floors must not retune the SiO fit itself.
-            sio_reference_bar = vacuum_floor_bar
-            if name == 'SiO':
+            # SiO mass-action by pO2: p(SiO) scales as 1/sqrt(pO2).
+            # Premise: the fitted SiO Antoine row is the standard-reaction
+            # term at declared pO2_reference_bar (1e-9 bar), not at the body
+            # vacuum floor. Algebra for SiO2(l)->SiO(g)+0.5 O2(g):
+            #   P = P_ref * a_SiO2 * sqrt(p_ref / pO2)
+            # applied once on BOTH sides of p_ref (boost below ref, suppress
+            # above). Unit check: bar/bar is dimensionless. Sanity: at
+            # pO2=p_ref the factor is 1; at the legal lunar floor 1.3e-12 bar
+            # the factor is sqrt(1e-9/1.3e-12)≈27.735 — a silent clip to
+            # unity below p_ref was an under-extraction bug. Transport pO2
+            # is already fail-loud gated at the body/request vacuum floor
+            # (resolve_transport_pO2_bar); no additional silent pO2 floor
+            # belongs here. Body floors must not retune the SiO fit itself.
+            if name == 'SiO' and not pO2_exponent:
                 sio_reference_bar = max(
                     1e-30,
-                    float(data.get('pO2_reference_bar', vacuum_floor_bar) or vacuum_floor_bar),
+                    float(
+                        data.get('pO2_reference_bar', vacuum_floor_bar)
+                        or vacuum_floor_bar
+                    ),
                 )
-            if (
-                name == 'SiO'
-                and not pO2_exponent
-                and transport_pO2_bar > sio_reference_bar
-            ):
-                suppression = math.sqrt(sio_reference_bar / transport_pO2_bar)
+                mass_action = math.sqrt(sio_reference_bar / transport_pO2_bar)
                 P_eq_Pa = _require_finite_vapor_value(
-                    P_eq_Pa * suppression,
+                    P_eq_Pa * mass_action,
                     species=name,
-                    field="P_eq_suppressed",
+                    field="P_eq_mass_action",
                 )
                 pO2_scaled = True
 
             if P_eq_Pa > 1e-15:
                 vapor_pressures[name] = P_eq_Pa
+                # Oxide rows outside valid_range_K but inside an optional
+                # extrapolation_allowed_range_K remain diagnostic-limited
+                # (head demotion + suffix). SiO's source-validated domain now
+                # equals the process envelope [1400, 2273.15] K, so that band
+                # is no longer extrapolation; T above valid_range with no
+                # allowed band already raised above.
+                oxide_extrapolated = name in oxide_vapor_extrapolations
                 source_label = vapor_pressure_source_label(
-                    "builtin_authoritative",
+                    (
+                        "builtin_extrapolation_limited"
+                        if oxide_extrapolated
+                        else "builtin_authoritative"
+                    ),
                     data,
                     coefficient_block=COEFF_BLOCK_ANTOINE,
                     temperature_K=T_K,
@@ -1356,7 +1734,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         name in ellingham_extrapolations
                     ),
                 )
-                if name in oxide_vapor_extrapolations:
+                if oxide_extrapolated:
                     source_label = (
                         f"{source_label}:"
                         "extrapolated_beyond_valid_range_K"
@@ -1390,6 +1768,25 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     stacklevel=2,
                 )
 
+        # YAML authority/bracket labels (pressure-neutral; Bug B pattern).
+        species_authority: dict[str, dict[str, Any]] = {}
+        for species, provenance in vapor_pressure_provenance.items():
+            row = metals_data.get(species) or oxide_vapors_data.get(species)
+            authority_fields = _species_authority_fields(row)
+            if not authority_fields:
+                continue
+            provenance.update(authority_fields)
+            species_authority[species] = {
+                key: authority_fields[key]
+                for key in (
+                    "authority_class",
+                    "declared_compensation",
+                    "pressure_bracket",
+                    "pseudo_antoine_status",
+                )
+                if key in authority_fields
+            }
+
         diagnostic = {
             "vapor_pressures_Pa": vapor_pressures,
             "vapor_pressures_source": vapor_pressure_sources,
@@ -1419,6 +1816,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 "limitation": MELT_OXIDE_ACTIVITY_LIMITATION,
                 "alphamelts_cross_check_status": ALPHAMELTS_CROSS_CHECK_STATUS,
             },
+            "species_authority": species_authority,
         }
         if feo_activity_diagnostic is not None:
             diagnostic["a_FeO_calphad"] = feo_activity_diagnostic

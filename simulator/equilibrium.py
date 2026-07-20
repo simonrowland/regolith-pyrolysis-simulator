@@ -235,10 +235,14 @@ class EquilibriumMixin:
             COEFF_BLOCK_ANTOINE,
             FIT_TARGET_PSEUDO_VAPOROCK,
             FIT_TARGET_STANDARD_REACTION,
+            _gas_rail_standard_reaction_block,
             _is_noncertifying_pseudo_vapor_pressure_runtime,
+            _liquid_oxide_standard_reaction_block,
             _metadata_value,
             _pow10_pressure_or_raise,
+            _range_tuple,
             _require_finite_vapor_value,
+            _standard_reaction_pressure_Pa,
             reject_noncertifying_vapor_pressure_row,
             require_antoine_source_certified_temperature,
             vapor_pressure_source_label,
@@ -385,9 +389,10 @@ class EquilibriumMixin:
                 fit_target != FIT_TARGET_STANDARD_REACTION
                 and metal_phase_kind == ELLINGHAM_METAL_PHASE_GAS
             )
+            liquid_rxn_early = _liquid_oxide_standard_reaction_block(sp_data)
             coefficient_block: str | None = None
             P_reference_Pa: float | None = None
-            if not gas_standard_rail:
+            if not gas_standard_rail and liquid_rxn_early is None:
                 antoine, coefficient_block = vapor_pressure_antoine_coefficients(
                     sp_data,
                     temperature_K=T_K,
@@ -519,6 +524,151 @@ class EquilibriumMixin:
                         source_label = (
                             f'{source_label}:'
                             'extrapolated_beyond_valid_range_K'
+                        )
+                    vapor_pressure_sources[species] = source_label
+                continue
+
+            # Al/Ti/Cr/Mn: liquid-oxide standard reaction (pairing fix).
+            liquid_rxn = liquid_rxn_early
+            if liquid_rxn is not None and fit_target != FIT_TARGET_STANDARD_REACTION:
+                antoine_liq = liquid_rxn.get("antoine", {}) or {}
+                A_l = float(antoine_liq.get("A", 0.0) or 0.0)
+                B_l = float(antoine_liq.get("B", 0.0) or 0.0)
+                C_l = float(antoine_liq.get("C", 0.0) or 0.0)
+                if not (A_l > 0.0 and T_K > 300.0):
+                    continue
+                valid_liq = _range_tuple(liquid_rxn.get("valid_range_K"))
+                if valid_liq is not None:
+                    vlo, vhi = valid_liq
+                    if T_K < vlo or T_K > vhi:
+                        metal_extrapolations[species] = {
+                            "temperature_K": T_K,
+                            "valid_range_K": (vlo, vhi),
+                            "rail": "liquid_oxide_standard_reaction",
+                        }
+                        warnings.append(
+                            f"{species} liquid-oxide standard reaction "
+                            f"extrapolated beyond valid_range_K "
+                            f"[{vlo:g}, {vhi:g}] at {T_K:.3f} K"
+                        )
+                log_P_liq = A_l - B_l / (T_K + C_l)
+                P_reference_Pa = _pow10_pressure_or_raise(
+                    log_P_liq,
+                    species=species,
+                    field="P_reference_liquid_oxide_standard_reaction_Pa",
+                )
+                oxide_activity = melt_oxide_activity(
+                    parent_oxide,
+                    melt_account_mol,
+                )
+                if oxide_activity is None or oxide_activity.activity <= 1e-10:
+                    continue
+                activities[species] = oxide_activity.activity
+                activity_exponent = float(
+                    liquid_rxn.get("oxide_activity_exponent", 1.0) or 1.0
+                )
+                pO2_exponent = float(
+                    liquid_rxn.get("pO2_exponent", 0.0) or 0.0
+                )
+                pO2_reference_bar = max(
+                    1e-30,
+                    float(liquid_rxn.get("pO2_reference_bar", 1.0) or 1.0),
+                )
+                P_eq_raw, _af, _ps = _standard_reaction_pressure_Pa(
+                    P_reference_Pa=P_reference_Pa,
+                    oxide_activity_value=oxide_activity.activity,
+                    activity_exponent=activity_exponent,
+                    pO2_bar=melt_dissociation_pO2_bar,
+                    pO2_exponent=pO2_exponent,
+                    pO2_reference_bar=pO2_reference_bar,
+                )
+                P_effective_Pa = _require_finite_vapor_value(
+                    P_eq_raw,
+                    species=species,
+                    field="P_effective_liquid_oxide_standard_reaction",
+                )
+                if P_effective_Pa > 1e-15:
+                    vapor_pressures[species] = P_effective_Pa
+                    source_label = (
+                        "builtin_authoritative:liquid_oxide_standard_reaction"
+                    )
+                    if species in metal_extrapolations:
+                        source_label = (
+                            f"{source_label}:extrapolated_beyond_valid_range_K"
+                        )
+                    vapor_pressure_sources[species] = source_label
+                continue
+
+            # Ca/Mg gas rail: liquid-oxide standard reaction (pairing fix).
+            gas_rail_rxn = _gas_rail_standard_reaction_block(sp_data)
+            if gas_standard_rail and gas_rail_rxn is not None:
+                antoine_gas = gas_rail_rxn.get("antoine", {}) or {}
+                A_g = float(antoine_gas.get("A", 0.0) or 0.0)
+                B_g = float(antoine_gas.get("B", 0.0) or 0.0)
+                C_g = float(antoine_gas.get("C", 0.0) or 0.0)
+                if not (A_g > 0.0 and T_K > 300.0):
+                    continue
+                valid_gas = _range_tuple(gas_rail_rxn.get("valid_range_K"))
+                if valid_gas is not None:
+                    vlo, vhi = valid_gas
+                    if T_K < vlo or T_K > vhi:
+                        metal_extrapolations[species] = {
+                            "temperature_K": T_K,
+                            "valid_range_K": (vlo, vhi),
+                            "rail": "gas_rail_standard_reaction",
+                        }
+                        warnings.append(
+                            f"{species} gas-rail liquid-oxide standard reaction "
+                            f"extrapolated beyond valid_range_K "
+                            f"[{vlo:g}, {vhi:g}] at {T_K:.3f} K"
+                        )
+                log_P_gas = A_g - B_g / (T_K + C_g)
+                P_reference_Pa = _pow10_pressure_or_raise(
+                    log_P_gas,
+                    species=species,
+                    field="P_reference_gas_rail_standard_reaction_Pa",
+                )
+                oxide_activity = melt_oxide_activity(
+                    parent_oxide,
+                    melt_account_mol,
+                )
+                if oxide_activity is None or oxide_activity.activity <= 1e-10:
+                    continue
+                activities[species] = oxide_activity.activity
+                activity_exponent = float(
+                    gas_rail_rxn.get("oxide_activity_exponent", 1.0) or 1.0
+                )
+                pO2_exponent = float(
+                    gas_rail_rxn.get("pO2_exponent", 0.0) or 0.0
+                )
+                pO2_reference_bar = max(
+                    1e-30,
+                    float(gas_rail_rxn.get("pO2_reference_bar", 1.0) or 1.0),
+                )
+                P_eq_raw, _activity_factor, _pO2_scaled = (
+                    _standard_reaction_pressure_Pa(
+                        P_reference_Pa=P_reference_Pa,
+                        oxide_activity_value=oxide_activity.activity,
+                        activity_exponent=activity_exponent,
+                        pO2_bar=melt_dissociation_pO2_bar,
+                        pO2_exponent=pO2_exponent,
+                        pO2_reference_bar=pO2_reference_bar,
+                    )
+                )
+                P_effective_Pa = _require_finite_vapor_value(
+                    P_eq_raw,
+                    species=species,
+                    field="P_effective_gas_rail_standard_reaction",
+                )
+                if P_effective_Pa > 1e-15:
+                    vapor_pressures[species] = P_effective_Pa
+                    source_label = (
+                        "builtin_authoritative:"
+                        "gas_rail_liquid_oxide_standard_reaction"
+                    )
+                    if species in metal_extrapolations:
+                        source_label = (
+                            f"{source_label}:extrapolated_beyond_valid_range_K"
                         )
                     vapor_pressure_sources[species] = source_label
                 continue

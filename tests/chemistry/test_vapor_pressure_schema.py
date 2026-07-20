@@ -72,10 +72,19 @@ def test_vapor_pressure_rows_declare_fit_target_schema(section, species, row):
 
     reaction = row.get("reaction") or {}
     assert fit_target == "standard_reaction_term"
-    assert set(reaction) >= REACTION_FIELDS
-    for field in REACTION_FIELDS - {"exponent_oxide", "exponent_pO2"}:
-        assert reaction[field]
-    assert reaction["exponent_oxide"] == pytest.approx(
-        float(row["oxide_activity_exponent"])
-    )
-    assert reaction["exponent_pO2"] == pytest.approx(float(row["pO2_exponent"]))
+    # Minimum reaction provenance: formula + basis. K-style rows still
+    # carry exponent_oxide/exponent_pO2 in the reaction block; SiO-style
+    # rows apply mass-action once at runtime (row-level stoich /
+    # pO2_reference_bar) and omit those reaction-block exponents.
+    assert set(reaction) >= {"formula", "basis"}
+    assert reaction["formula"]
+    assert reaction["basis"]
+    if {"exponent_oxide", "exponent_pO2"} <= set(reaction):
+        assert reaction["exponent_oxide"] == pytest.approx(
+            float(row["oxide_activity_exponent"])
+        )
+        assert reaction["exponent_pO2"] == pytest.approx(float(row["pO2_exponent"]))
+    else:
+        assert row.get("pO2_reference_bar") is not None or row.get(
+            "stoich_O2_per_vapor"
+        ) is not None

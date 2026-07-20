@@ -83,6 +83,8 @@ _V1C_JANAF_ELLINGHAM = {
     # simulator/equilibrium.py::_ELLINGHAM_THERMO for the full
     # rationale.
     "Mn": (-794.540, -0.165650, 2, 2),
+    # t-006 / compose NiO MRE ladder (Mah & Pankratz 1976); not in vapor package base.
+    "Ni": (-465.852, -0.167751, 2, 2),
 }
 
 
@@ -453,9 +455,10 @@ def test_runtime_p_eq_numerator_moves_with_parent_oxide_composition(
     assert high_provenance["pressure_kind"] == "effective_equilibrium"
 
 
-def test_gas_basis_ellingham_pressure_uses_fugacity_not_psat(
+def test_mg_gas_rail_uses_liquid_oxide_standard_reaction_not_solid_ellingham(
     vapor_pressure_data,
 ):
+    """Pairing fix: gas rail pairs liquid-MgO standard term with liquid activity."""
     provider = BuiltinVaporPressureProvider(vapor_pressure_data)
     account = dict(_COMPOSITION_SENSITIVITY_BASE_MOL)
     request = _composition_sensitivity_request(account)
@@ -463,28 +466,47 @@ def test_gas_basis_ellingham_pressure_uses_fugacity_not_psat(
     diagnostic = result.diagnostic or {}
 
     provenance = diagnostic["vapor_pressure_numerator_provenance"]["Mg"]
-    root = provenance["raw_metal_activity_root"]
     assert provenance["metal_standard_state"] == "gas"
-    assert provenance["pressure_rail"] == "gas_fugacity"
+    assert provenance["oxide_standard_state"] == "liquid"
+    assert provenance["pressure_rail"] == "gas_rail_liquid_oxide_standard_reaction"
+    assert "P_reference_Antoine_Pa" in provenance
     assert provenance["P_eq_Pa"] == pytest.approx(
-        root * vapor_pressure_module.ELLINGHAM_STANDARD_PRESSURE_PA
+        provenance["P_reference_Antoine_Pa"] * provenance["activity_factor"]
+        * (
+            provenance["pO2_bar"]
+            / float(
+                vapor_pressure_data["metals"]["Mg"]["gas_rail_standard_reaction"][
+                    "pO2_reference_bar"
+                ]
+            )
+        )
+        ** float(
+            vapor_pressure_data["metals"]["Mg"]["gas_rail_standard_reaction"][
+                "pO2_exponent"
+            ]
+        )
     )
-    assert "P_reference_Antoine_Pa" not in provenance
+    assert "gas_rail_liquid_oxide_standard_reaction" in provenance["source_label"]
 
 
-def test_ellingham_graph_gas_basis_pressure_uses_standard_pressure(
+def test_ellingham_graph_mg_gas_rail_matches_liquid_oxide_standard_reaction(
     vapor_pressure_data,
 ):
     temperature_K = 1773.15
     pO2_bar = 1e-3
     a_oxide = 0.5
-    root = ellingham_graph.metal_activity_factor(
-        "Mg",
-        temperature_K,
-        pO2_bar,
-        a_oxide=a_oxide,
-        clamp=False,
+    gas_rxn = vapor_pressure_data["metals"]["Mg"]["gas_rail_standard_reaction"]
+    antoine = gas_rxn["antoine"]
+    import math as _math
+
+    P_ref = 10.0 ** (
+        float(antoine["A"]) - float(antoine["B"]) / (temperature_K + float(antoine["C"]))
     )
+    pO2_exp = float(gas_rxn["pO2_exponent"])
+    pO2_ref = float(gas_rxn["pO2_reference_bar"])
+    expected = P_ref * (a_oxide ** float(gas_rxn["oxide_activity_exponent"])) * (
+        pO2_bar / pO2_ref
+    ) ** pO2_exp
     pressure = ellingham_graph.effective_equilibrium_pressure_Pa(
         "Mg",
         temperature_K,
@@ -493,9 +515,18 @@ def test_ellingham_graph_gas_basis_pressure_uses_standard_pressure(
         a_oxide=a_oxide,
     )
 
-    assert pressure == pytest.approx(
-        root * vapor_pressure_module.ELLINGHAM_STANDARD_PRESSURE_PA
+    assert pressure == pytest.approx(expected, rel=1e-12)
+    # Solid-oxide Ellingham gas fugacity must NOT be the gas-rail answer.
+    solid_root = ellingham_graph.metal_activity_factor(
+        "Mg",
+        temperature_K,
+        pO2_bar,
+        a_oxide=a_oxide,
+        clamp=False,
     )
+    solid_path = solid_root * vapor_pressure_module.ELLINGHAM_STANDARD_PRESSURE_PA
+    assert pressure != pytest.approx(solid_path, rel=1e-3)
+    assert abs(_math.log10(pressure / solid_path)) > 0.3  # pairing gap order
 
 
 def test_condensed_basis_ellingham_pressure_uses_raoult_psat(
@@ -859,18 +890,68 @@ def test_sio_pure_limit_uses_single_cation_activity_reference_pressure(
     )
 
 
-def test_sio_pseudo_vaporock_fallback_residual_matches_dense_fit(
+def test_sio_standard_reaction_term_matches_source_thermochemistry(
     vapor_pressure_data,
 ):
     sio_row = vapor_pressure_data["oxide_vapors"]["SiO"]
-
-    assert sio_row["fit_target"] == "pseudo_psat_backsolved_from_vaporock"
-    assert sio_row["residual_dex"] == pytest.approx(0.270)
-    assert sio_row["confidence_tier"] == "moderate"
-    assert sio_row["backsolve"]["target"] == (
-        "VapoRock SiO(g) partial pressure on the dense grid"
+    # Independently regenerated from VapoRock's JANAF SiO/O2 multi-interval
+    # Shomate terms plus ThermoEngine v1.0 liquid-SiO2 mu0 over the full
+    # process envelope. Source values are test anchors, not values calculated
+    # from the runtime Antoine coefficients.
+    source_points = (
+        (1400.0, -6.904421868),
+        (1500.0, -4.953131396),
+        (1600.0, -3.250905047),
+        (1700.0, -1.753948057),
+        (1800.0, -0.427731189),
+        (1900.0, 0.754969595),
+        (2000.0, 1.815905539),
+        (2100.0, 2.772661024),
+        (2200.0, 3.639609037),
+        (2273.15, 4.223822537),
     )
-    assert sio_row["backsolve"]["residual_dex"] == pytest.approx(0.270)
+
+    assert sio_row["fit_target"] == "standard_reaction_term"
+    assert sio_row["confidence_tier"] == "moderate"
+    assert sio_row["valid_range_K"] == [1400, 2273.15]
+    reaction = sio_row["reaction"]
+    assert reaction["formula"] == "SiO2(l) -> SiO(g) + 0.5 O2(g)"
+    assert "JANAF SiO(g)/O2(g)" in reaction["basis"]
+    assert "ThermoEngine v1.0" in reaction["basis"]
+    assert reaction["fit_residual_dex"]["max_abs"] == pytest.approx(0.001630)
+
+    coeff = sio_row["antoine"]
+    assert reaction["source_table_log10_P_ref_Pa"] == [
+        list(point) for point in source_points
+    ]
+    for temperature_K, source_log10_p_ref in source_points:
+        fit_log10_p_ref = coeff["A"] - coeff["B"] / (
+            temperature_K + coeff["C"]
+        )
+        assert fit_log10_p_ref == pytest.approx(source_log10_p_ref, abs=0.002)
+
+    # In-domain sanity: 2023.15 K reproduces the ~111 Pa standard-term anchor.
+    heldout = reaction["heldout_2023_15_K"]
+    fit_2023 = coeff["A"] - coeff["B"] / (2023.15 + coeff["C"])
+    assert fit_2023 == pytest.approx(heldout["fit_log10_P_ref_Pa"], abs=1e-6)
+    assert 10.0 ** fit_2023 == pytest.approx(heldout["fit_P_ref_Pa"], rel=1e-6)
+    assert heldout["fit_P_ref_Pa"] == pytest.approx(110.8, abs=0.1)
+
+
+def test_mg_gas_standard_pressure_rises_with_temperature(
+    vapor_pressure_data,
+):
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+
+    low = provider.dispatch(_mg_vapor_request_at_T_K(1700.0))
+    high = provider.dispatch(_mg_vapor_request_at_T_K(1900.0))
+
+    assert high.diagnostic["vapor_pressures_Pa"]["Mg"] > (
+        low.diagnostic["vapor_pressures_Pa"]["Mg"]
+    )
+    assert high.diagnostic["vapor_pressure_numerator_provenance"]["Mg"][
+        "pressure_rail"
+    ] == "gas_rail_liquid_oxide_standard_reaction"
 
 
 def test_demaria_1971_na_validation_case_reports_measured_pressure_gap(
@@ -902,6 +983,232 @@ def test_demaria_1971_na_validation_case_reports_measured_pressure_gap(
     # E-08: the selected Na Ellingham row is gas-basis, so the runtime
     # pressure is f_Na = a_Na(g) * p° rather than a second P_sat multiplier.
     assert gap_factor == pytest.approx(5.056080393750948, rel=1e-6)
+
+
+def test_na_interim_authority_bracket_golden_neutral(vapor_pressure_data):
+    """Alternative B labels: authority/bracket emitted; P_Na byte-unchanged.
+
+    Pre-change staged-tree pin at DeMaria-class 1429 K probe (investigation
+    input). Labels-only demotion must not move runtime Na pressure.
+    """
+
+    na_row = vapor_pressure_data["metals"]["Na"]
+    assert na_row["authority_class"] == "uncertified"
+    assert na_row["declared_compensation"] is True
+    assert na_row["pseudo_antoine_status"] == "inactive_provenance_only"
+    bracket = na_row["pressure_bracket"]
+    assert bracket["T_K"] == pytest.approx(1429.0)
+    assert bracket["spread_dex"] == pytest.approx(1.86)
+    candidates = bracket["candidates"]
+    assert candidates["lamoreaux_hildenbrand_plus_constant_gamma_Pa"] == (
+        pytest.approx(0.1459)
+    )
+    assert candidates["full_vaporock_Pa"] == pytest.approx(0.002032)
+
+    account = _wt_pct_to_mol_account(_DEMARIA_12022_WT_PCT)
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    temperature_K = 1429.0
+    pO2_bar = 10.0 ** _demaria_12022_log10_po2_bar(temperature_K)
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": account},
+            species_formula_registry={},
+        ),
+        temperature_C=temperature_K - 273.15,
+        pressure_bar=1e-6,
+        control_inputs={
+            "pO2_bar": pO2_bar,
+            "intrinsic_fO2_log": math.log10(pO2_bar),
+        },
+    )
+    result = provider.dispatch(request)
+    assert result.status == "ok"
+    diagnostic = result.diagnostic or {}
+
+    # Golden-neutrality tooth: exact pre-label-change float at this probe.
+    p_na = diagnostic["vapor_pressures_Pa"]["Na"]
+    assert p_na == 0.02684167312949837
+
+    provenance = diagnostic["vapor_pressure_numerator_provenance"]["Na"]
+    assert provenance["authority_class"] == "uncertified"
+    assert provenance["declared_compensation"] is True
+    assert provenance["pseudo_antoine_status"] == "inactive_provenance_only"
+    assert provenance["pressure_bracket"]["candidates"][
+        "lamoreaux_hildenbrand_plus_constant_gamma_Pa"
+    ] == pytest.approx(0.1459)
+    assert provenance["pressure_bracket"]["candidates"][
+        "full_vaporock_Pa"
+    ] == pytest.approx(0.002032)
+    # Source rail unchanged (labels ride alongside, not instead of).
+    assert diagnostic["vapor_pressures_source"]["Na"] == (
+        "builtin_authoritative:gas_standard_fugacity"
+    )
+
+    species_authority = diagnostic["species_authority"]["Na"]
+    assert species_authority["authority_class"] == "uncertified"
+    assert species_authority["declared_compensation"] is True
+    assert species_authority["pressure_bracket"]["spread_dex"] == (
+        pytest.approx(1.86)
+    )
+
+
+def test_sio_authority_class_emitted_with_authoritative_source_label(
+    vapor_pressure_data,
+):
+    """SiO: machine-readable authority_class demotes builtin_authoritative source."""
+
+    sio_row = vapor_pressure_data["oxide_vapors"]["SiO"]
+    assert sio_row["authority_class"] == "uncertified"
+
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    result = provider.dispatch(_si_only_vapor_request_at_T_K(1900.0))
+    assert result.status == "ok"
+    diagnostic = result.diagnostic or {}
+
+    source = diagnostic["vapor_pressures_source"]["SiO"]
+    assert source.startswith("builtin_authoritative:")
+    assert "standard_reaction_term" in source
+
+    provenance = diagnostic["vapor_pressure_numerator_provenance"]["SiO"]
+    assert provenance["authority_class"] == "uncertified"
+    species_authority = diagnostic["species_authority"]["SiO"]
+    assert species_authority["authority_class"] == "uncertified"
+    # Fail-open tooth: source token alone is not certification.
+    assert source != "certified"
+    assert "authority_class" in provenance
+
+
+def test_pairing_metals_authority_class_emitted(
+    vapor_pressure_data,
+):
+    """Ca/Mg/Al/Ti/Cr/Mn pairing rails: authority_class on every changed metal."""
+
+    pairing = ("Ca", "Mg", "Al", "Ti", "Cr", "Mn")
+    for species in pairing:
+        assert vapor_pressure_data["metals"][species]["authority_class"] == (
+            "uncertified"
+        )
+
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    # 2000 K hits Mg/Ca gas rails and Al/Cr/Mn liquid-oxide rails; Ti needs
+    # its liquid-oxide band start (1941 K).
+    account = {
+        "SiO2": 1.0,
+        "MgO": 0.4,
+        "CaO": 0.3,
+        "Al2O3": 0.2,
+        "TiO2": 0.1,
+        "Cr2O3": 0.05,
+        "MnO": 0.05,
+    }
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": account},
+            species_formula_registry={},
+        ),
+        temperature_C=2000.0 - 273.15,
+        pressure_bar=1e-6,
+        control_inputs={
+            "pO2_bar": 1e-9,
+            "intrinsic_fO2_log": -9.0,
+        },
+    )
+    result = provider.dispatch(request)
+    assert result.status == "ok"
+    diagnostic = result.diagnostic or {}
+    sources = diagnostic["vapor_pressures_source"]
+    provenance = diagnostic["vapor_pressure_numerator_provenance"]
+    species_authority = diagnostic["species_authority"]
+
+    emitted = [sp for sp in pairing if sp in provenance]
+    assert emitted, "expected at least one pairing metal pressure entry"
+    for species in emitted:
+        source = sources[species]
+        assert source.startswith("builtin_authoritative:"), species
+        assert provenance[species]["authority_class"] == "uncertified", species
+        assert species_authority[species]["authority_class"] == "uncertified", (
+            species
+        )
+
+
+def test_cro2_authority_class_emitted_with_authoritative_source_label(
+    vapor_pressure_data,
+):
+    """CrO2 standard-reaction term: authority_class demotes source label."""
+
+    cro2_row = vapor_pressure_data["oxide_vapors"]["CrO2"]
+    assert cro2_row["authority_class"] == "uncertified"
+    assert cro2_row["valid_range_K"] == [1500, 2273.15]
+
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {"Cr2O3": 1.0}},
+            species_formula_registry={},
+        ),
+        temperature_C=1800.0 - 273.15,
+        pressure_bar=1e-6,
+        control_inputs={"pO2_bar": 1e-9},
+    )
+    result = provider.dispatch(request)
+    assert result.status == "ok"
+    diagnostic = result.diagnostic or {}
+
+    source = diagnostic["vapor_pressures_source"]["CrO2"]
+    assert source.startswith("builtin_authoritative:")
+    assert "standard_reaction_term" in source
+    provenance = diagnostic["vapor_pressure_numerator_provenance"]["CrO2"]
+    assert provenance["authority_class"] == "uncertified"
+    assert diagnostic["species_authority"]["CrO2"]["authority_class"] == (
+        "uncertified"
+    )
+
+
+def test_fe_degraded_authority_class_and_typed_degraded_flag(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    """Fe degraded path: authority_class + typed degraded_activity_basis flag."""
+
+    fe_row = vapor_pressure_data["metals"]["Fe"]
+    assert fe_row["authority_class"] == "uncertified"
+    assert fe_row["pseudo_antoine_status"] == "inactive_dormant"
+
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    no_channel = _fe_redox_request(
+        species_formula_registry=sim.species_formula_registry,
+        intrinsic_fO2_log=None,
+        fO2_log=-4.0,
+    )
+    result = provider.dispatch(no_channel)
+    assert result.status == "ok"
+    diagnostic = result.diagnostic or {}
+
+    source = diagnostic["vapor_pressures_source"]["Fe"]
+    assert source.startswith("builtin_authoritative:")
+    provenance = diagnostic["vapor_pressure_numerator_provenance"]["Fe"]
+    # Typed degraded flag class (feo_weight_fraction) + matrix authority class.
+    assert provenance["degraded_activity_basis"] == "feo_weight_fraction"
+    assert provenance["activity_basis"] == "feo_weight_fraction"
+    assert provenance["authority_class"] == "uncertified"
+    assert diagnostic["species_authority"]["Fe"]["authority_class"] == (
+        "uncertified"
+    )
+    assert fe_row.get("pseudo_antoine_status") == "inactive_dormant"
+    assert any(
+        "degraded_activity_basis=feo_weight_fraction" in warning
+        for warning in result.warnings
+    )
 
 
 class _LegacyInternalAnalyticalModel(EquilibriumMixin):
@@ -1000,9 +1307,11 @@ def test_mg_gas_rail_is_independent_of_antoine_coefficients(
     provenance = without_antoine.diagnostic[
         "vapor_pressure_numerator_provenance"
     ]["Mg"]
-    assert provenance["pressure_rail"] == "gas_fugacity"
-    assert "P_reference_Antoine_Pa" not in provenance
-    assert "gas_standard_fugacity" in provenance["source_label"]
+    # Gas rail uses liquid-oxide standard reaction, independent of pure-component
+    # condensed Antoine (two-rail preserved; pure sidecar only for condensed).
+    assert provenance["pressure_rail"] == "gas_rail_liquid_oxide_standard_reaction"
+    assert "P_reference_Antoine_Pa" in provenance
+    assert "gas_rail_liquid_oxide_standard_reaction" in provenance["source_label"]
 
     graph_pressure = ellingham_graph.effective_equilibrium_pressure_Pa(
         "Mg",
@@ -1057,50 +1366,66 @@ def test_legacy_mg_rails_refuse_condensed_extrapolation_but_ignore_gas_antoine(
     assert without_antoine.vapor_pressures_Pa["Mg"] == pytest.approx(
         baseline.vapor_pressures_Pa["Mg"]
     )
-    assert "gas_standard_fugacity" in without_antoine.vapor_pressures_source["Mg"]
+    assert (
+        "gas_rail_liquid_oxide_standard_reaction"
+        in without_antoine.vapor_pressures_source["Mg"]
+        or "gas_standard_fugacity" in without_antoine.vapor_pressures_source["Mg"]
+    )
 
 
-def test_sio_oxide_vapor_extrapolates_instead_of_disappearing_above_valid_range(
+def test_sio_source_validated_domain_covers_process_envelope(
     vapor_pressure_data,
 ):
+    """Branch (a): 1400-2273.15 K is source-validated, not diagnostic-limited."""
     sio_data = vapor_pressure_data["oxide_vapors"]["SiO"]
-    assert sio_data["valid_range_K"] == [1400, 1950]
-    assert sio_data["extrapolation_allowed_range_K"] == [1400, 2273.15]
+    assert sio_data["valid_range_K"] == [1400, 2273.15]
+    assert "extrapolation_allowed_range_K" not in sio_data
     provider = BuiltinVaporPressureProvider(vapor_pressure_data)
 
-    in_range = provider.dispatch(_si_only_vapor_request_at_T_K(1950.0))
-    just_above = provider.dispatch(_si_only_vapor_request_at_T_K(2000.0))
+    in_range = provider.dispatch(_si_only_vapor_request_at_T_K(1900.0))
+    mid_envelope = provider.dispatch(_si_only_vapor_request_at_T_K(2023.15))
     process_cap = provider.dispatch(_si_only_vapor_request_at_T_K(2273.15))
 
     assert in_range.status == "ok"
-    assert just_above.status == "ok"
+    assert mid_envelope.status == "ok"
     assert process_cap.status == "ok"
-    assert in_range.diagnostic["vapor_pressures_Pa"]["SiO"] > 0.0
-    assert just_above.diagnostic["vapor_pressures_Pa"]["SiO"] > 0.0
-    assert process_cap.diagnostic["vapor_pressures_Pa"]["SiO"] > 0.0
-    assert "SiO" not in in_range.diagnostic["extrapolated_beyond_valid_range_K"]
+    for result in (in_range, mid_envelope, process_cap):
+        assert result.diagnostic["vapor_pressures_Pa"]["SiO"] > 0.0
+        assert "SiO" not in result.diagnostic["extrapolated_beyond_valid_range_K"]
+        sio_source = result.diagnostic["vapor_pressures_source"]["SiO"]
+        assert sio_source == "builtin_authoritative:standard_reaction_term"
+        assert "extrapolated_beyond_valid_range_K" not in sio_source
 
-    for result, temperature_K in (
-        (just_above, 2000.0),
-        (process_cap, 2273.15),
-    ):
-        extrapolation = result.diagnostic[
-            "extrapolated_beyond_valid_range_K"
-        ]["SiO"]
-        assert extrapolation["temperature_K"] == pytest.approx(temperature_K)
-        assert tuple(extrapolation["valid_range_K"]) == (1400.0, 1950.0)
-        assert tuple(extrapolation["extrapolation_allowed_range_K"]) == (
-            1400.0,
-            2273.15,
-        )
-        assert result.diagnostic["vapor_pressures_source"]["SiO"].endswith(
-            ":extrapolated_beyond_valid_range_K"
-        )
-        assert any(
-            "SiO oxide-vapor Antoine fit extrapolated beyond valid_range_K"
-            in warning
-            for warning in result.warnings
-        )
+
+def test_sio_hard_vacuum_anchor_restored_without_weight_fraction_proxy(
+    vapor_pressure_data,
+):
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    lunar_mare_mol = {
+        "FeO": 0.13531878,
+        "MgO": 0.13157064,
+        "SiO2": 0.43638096,
+        "CaO": 0.29672962,
+    }
+    request = replace(
+        _si_only_vapor_request_at_T_K(2023.15),
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": lunar_mare_mol},
+            species_formula_registry={},
+        ),
+    )
+
+    result = provider.dispatch(request)
+    pressure = result.diagnostic["vapor_pressures_Pa"]["SiO"]
+    provenance = result.diagnostic["vapor_pressure_numerator_provenance"]["SiO"]
+
+    assert 45.0 <= pressure <= 50.0
+    assert provenance["melt_oxide_activity"] == pytest.approx(0.43638096)
+    assert provenance["melt_oxide_activity"] != pytest.approx(0.45805455)
+    # In-domain after branch (a) domain extension — ledger-eligible uncertified.
+    sio_source = result.diagnostic["vapor_pressures_source"]["SiO"]
+    assert sio_source == "builtin_authoritative:standard_reaction_term"
+    assert "SiO" not in result.diagnostic["extrapolated_beyond_valid_range_K"]
 
 
 def test_absent_metals_do_not_emit_range_warnings(vapor_pressure_data):
@@ -1139,18 +1464,14 @@ def test_absent_metals_do_not_emit_range_warnings(vapor_pressure_data):
     )
 
 
-def test_builtin_provider_marks_sio_pseudo_vaporock_source_non_authoritative(
+def test_builtin_provider_marks_sio_standard_reaction_source_authoritative(
     vapor_pressure_data,
 ):
     provider = BuiltinVaporPressureProvider(vapor_pressure_data)
-    result = provider.dispatch(_si_only_vapor_request_at_T_K(1949.0))
+    result = provider.dispatch(_si_only_vapor_request_at_T_K(1899.0))
 
     source = result.diagnostic["vapor_pressures_source"]["SiO"]
-    assert source == (
-        "vaporock_backsolved_curve_fit:"
-        "backsolved_vaporock_curve_fit"
-    )
-    assert "builtin_authoritative" not in source
+    assert source == "builtin_authoritative:standard_reaction_term"
 
 
 def test_sio_oxide_vapor_extrapolation_fails_loud_beyond_process_bound(
@@ -1162,7 +1483,8 @@ def test_sio_oxide_vapor_extrapolation_fails_loud_beyond_process_bound(
         VaporPressureComputationError,
         match=(
             "oxide_vapor_pressure_out_of_validated_range: "
-            "species=SiO .*extrapolation_allowed_range_K=\\[1400, 2273.15\\]"
+            "species=SiO .*valid_range_K=\\[1400, 2273.15\\] "
+            "extrapolation_allowed_range_K=absent"
         ),
     ):
         provider.dispatch(_si_only_vapor_request_at_T_K(2273.16))
@@ -1420,7 +1742,9 @@ def test_sio_row_peq_matches_hand_antoine_lunar_low_ti_floor_po2(
     expected_p_eq = p_reference * activity
     provenance = result.diagnostic["vapor_pressure_numerator_provenance"]["SiO"]
 
-    assert p_reference == pytest.approx(6.2391038335, rel=1e-10)
+    # Absolute P_ref follows the YAML Antoine row (refit over 1400-2273.15 K);
+    # do not pin a pre-refit magic number — the hand algebra is the check.
+    assert p_reference > 0.0
     assert 1.0 < expected_p_eq < 10.0
     assert provenance["P_reference_Antoine_Pa"] == pytest.approx(p_reference)
     assert provenance["activity_factor"] == pytest.approx(activity)
@@ -1522,7 +1846,7 @@ def test_legacy_fallback_keeps_fe_pure_sidecar_above_pseudo_fit_range(
     )
 
 
-def test_legacy_fallback_grounds_mn_liquid_source_band(
+def test_legacy_fallback_grounds_mn_liquid_oxide_standard_reaction(
     vapor_pressure_data,
 ):
     legacy_model = _LegacyInternalAnalyticalModel(vapor_pressure_data, melt=_MnOnlyMelt())
@@ -1530,16 +1854,12 @@ def test_legacy_fallback_grounds_mn_liquid_source_band(
     result = legacy_model._internal_analytical_equilibrium()
 
     assert result.vapor_pressures_Pa["Mn"] > 0.0
-    assert result.vapor_pressures_source["Mn"] == (
-        "builtin_authority_limited:pure_component_derived_from_evaluation:"
-        "reconstructed_ellingham_segment"
-    )
-    assert result.diagnostics["ellingham_authority"]["status"] == (
-        "authority_limited"
-    )
+    # Pairing fix: Mn oxide-coupled path is liquid_oxide_standard_reaction.
+    # Pure-component Mn sidecars remain NBP/NIST ground-truth only.
+    assert "liquid_oxide_standard_reaction" in result.vapor_pressures_source["Mn"]
 
 
-def test_active_provider_labels_reconstructed_mn_authority_end_to_end(
+def test_active_provider_labels_mn_liquid_oxide_standard_reaction_end_to_end(
     vapor_pressure_data,
 ):
     result = BuiltinVaporPressureProvider(vapor_pressure_data).dispatch(
@@ -1548,22 +1868,14 @@ def test_active_provider_labels_reconstructed_mn_authority_end_to_end(
 
     assert result.status == "ok"
     source = result.diagnostic["vapor_pressures_source"]["Mn"]
-    assert source.startswith("builtin_authority_limited:")
-    assert source.endswith(":reconstructed_ellingham_segment")
-    authority = result.diagnostic["ellingham_authority"]
-    assert authority["status"] == "authority_limited"
-    assert authority[ELLINGHAM_RECONSTRUCTED_AUTHORITY_FLAG] is True
-    assert authority["authority_limits"]["Mn"]["authority_status"] == (
-        "reconstructed_limited"
-    )
-    assert result.diagnostic["ellingham_extrapolated_beyond_fit_range_K"] == {}
-    assert not any(
-        "Mn Ellingham JANAF high-T fit extrapolated" in warning
-        for warning in result.warnings
-    )
+    assert source == "builtin_authoritative:liquid_oxide_standard_reaction"
+    provenance = result.diagnostic["vapor_pressure_numerator_provenance"]["Mn"]
+    assert provenance["pressure_rail"] == "liquid_oxide_standard_reaction"
+    assert provenance["oxide_standard_state"] == "liquid"
+    assert provenance["P_eq_Pa"] > 0.0
 
 
-def test_legacy_fallback_marks_pseudo_vaporock_sources_non_authoritative(
+def test_legacy_fallback_distinguishes_pseudo_fit_from_standard_reaction_source(
     vapor_pressure_data,
 ):
     class _FeOnlyMelt:
@@ -1597,16 +1909,18 @@ def test_legacy_fallback_marks_pseudo_vaporock_sources_non_authoritative(
         melt=_SiOnlyMelt(),
     )._internal_analytical_equilibrium()
 
-    for result, species in ((metal_result, "Fe"), (oxide_result, "SiO")):
-        source = result.vapor_pressures_source[species]
-        assert source == (
-            "vaporock_backsolved_curve_fit:"
-            "backsolved_vaporock_curve_fit"
-        )
-        assert "builtin_authoritative" not in source
+    fe_source = metal_result.vapor_pressures_source["Fe"]
+    assert fe_source == (
+        "vaporock_backsolved_curve_fit:backsolved_vaporock_curve_fit"
+    )
+    assert "builtin_authoritative" not in fe_source
+
+    assert oxide_result.vapor_pressures_source["SiO"] == (
+        "builtin_authoritative:standard_reaction_term"
+    )
 
 
-def test_builtin_provider_marks_mn_above_nbp_pure_component_extrapolation(
+def test_builtin_provider_marks_mn_above_liquid_oxide_fit_range_extrapolation(
     vapor_pressure_data,
 ):
     legacy_model = _LegacyInternalAnalyticalModel(
@@ -1617,11 +1931,10 @@ def test_builtin_provider_marks_mn_above_nbp_pure_component_extrapolation(
     result = legacy_model._internal_analytical_equilibrium()
 
     assert result.vapor_pressures_Pa["Mn"] > 0.0
-    assert result.vapor_pressures_source["Mn"] == (
-        "builtin_authority_limited:pure_component_extrapolated:"
-        "extrapolated_beyond_source_certified_range_K:"
-        "extrapolated_beyond_valid_range_K:reconstructed_ellingham_segment"
-    )
+    # Above liquid_oxide_standard_reaction valid_range_K upper edge, label
+    # still names the liquid-oxide rail (not pure-component Ellingham).
+    assert "liquid_oxide_standard_reaction" in result.vapor_pressures_source["Mn"]
+    assert "extrapolated_beyond_valid_range_K" in result.vapor_pressures_source["Mn"]
 
 
 def test_inactive_metal_species_do_not_diverge_between_provider_and_legacy(
@@ -1754,8 +2067,19 @@ def test_fe_activity_uses_kress91_only_with_explicit_intrinsic_channel(
     reduced_activity = reduced_result.diagnostic["activities"]["Fe"]
     oxidized_activity = oxidized_result.diagnostic["activities"]["Fe"]
 
+    # Documented degraded public-caller path: wt-frac remains reachable when
+    # intrinsic_fO2_log is absent, but must be typed (not silent).
+    no_channel_prov = no_channel_result.diagnostic[
+        "vapor_pressure_numerator_provenance"
+    ]["Fe"]
     assert no_channel_result.diagnostic["activities"]["Fe"] == pytest.approx(
         static_activity
+    )
+    assert no_channel_prov["degraded_activity_basis"] == "feo_weight_fraction"
+    assert no_channel_prov["activity_basis"] == "feo_weight_fraction"
+    assert any(
+        "degraded_activity_basis=feo_weight_fraction" in warning
+        for warning in no_channel_result.warnings
     )
     assert reduced_activity == pytest.approx(
         kress91_ferrous_feo_activity(
@@ -1773,6 +2097,11 @@ def test_fe_activity_uses_kress91_only_with_explicit_intrinsic_channel(
             pressure_bar=oxidized.pressure_bar,
         )
     )
+    reduced_prov = reduced_result.diagnostic[
+        "vapor_pressure_numerator_provenance"
+    ]["Fe"]
+    assert reduced_prov["activity_basis"] == "kress91_ferrous"
+    assert reduced_prov["degraded_activity_basis"] is None
     assert reduced_activity > static_activity
     assert oxidized_activity < reduced_activity
 

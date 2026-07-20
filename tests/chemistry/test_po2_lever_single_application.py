@@ -163,6 +163,44 @@ def test_non_feo_metal_dissociation_uses_intrinsic_melt_fo2(
     assert observed_slope == pytest.approx(expected_slope, abs=1.0e-9)
 
 
+def test_sio_mass_action_applies_below_reference_at_lunar_floor(
+    vapor_pressure_data,
+):
+    """pSiO ∝ 1/sqrt(pO2) across the full legal domain, not only pO2 > 1e-9.
+
+    Hostile construction from Codex Bug A post-fix2 review: a legal lunar-floor
+    request at 1.3e-12 bar must raise P_SiO by sqrt(1e-9/1.3e-12) ≈ 27.735
+    relative to the fit reference at 1e-9 bar. Silent clip below reference was
+    an under-extraction bug at deep vacuum.
+    """
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    temperature_C = 1800.0 - 273.15  # in-domain SiO standard-term
+    lunar_floor_bar = 1.3e-12
+    reference_bar = 1.0e-9
+
+    def pressure_at(pO2_bar: float) -> float:
+        result = provider.dispatch(
+            _request(
+                ChemistryIntent.VAPOR_PRESSURE,
+                pO2_bar,
+                temperature_C=temperature_C,
+                control_inputs={
+                    "pO2_bar": pO2_bar,
+                    "vacuum_floor_bar": lunar_floor_bar,
+                },
+            )
+        )
+        return result.diagnostic["vapor_pressures_Pa"]["SiO"]
+
+    p_ref = pressure_at(reference_bar)
+    p_lunar = pressure_at(lunar_floor_bar)
+    mass_action_ratio = math.sqrt(reference_bar / lunar_floor_bar)
+
+    assert p_ref > 0.0
+    assert p_lunar / p_ref == pytest.approx(mass_action_ratio, rel=1e-9)
+    assert mass_action_ratio == pytest.approx(27.7350098113, rel=1e-9)
+
+
 def test_feo_metal_dissociation_transport_denominator_unchanged(
     vapor_pressure_data,
 ):

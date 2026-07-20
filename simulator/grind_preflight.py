@@ -207,7 +207,7 @@ def assert_strict_vapor_source_report(
         str(source)
         for species_name, source in species.items()
         if _source_authority(source) not in approved_sources
-        or _is_noncertifying_mg_extrapolation(species_name, source)
+        or _is_noncertifying_vapor_extrapolation(species_name, source)
     }
     summary = report.get("summary")
     if isinstance(summary, Mapping):
@@ -631,9 +631,18 @@ def _source_authority(source: Any) -> str:
     return head
 
 
-def _is_noncertifying_mg_extrapolation(species: Any, source: Any) -> bool:
-    if str(species) != "Mg":
-        return False
+def _is_noncertifying_vapor_extrapolation(_species: Any, source: Any) -> bool:
+    """True when provenance marks range extrapolation (any species).
+
+    The head token alone is not sufficient: ``_source_authority`` keeps only
+    the first colon-separated segment, so a label such as
+    ``builtin_authoritative:standard_reaction_term:extrapolated_beyond_valid_range_K``
+    would otherwise pass ``APPROVED_LIVE_VAPOR_SOURCES``. The extrapolation
+    suffix must be load-bearing for SiO oxide vapors (and all other species) —
+    not Mg-only — or process-envelope extrapolation silently certifies ledger
+    yields. Species is retained for call-site symmetry; rejection is
+    token-driven today.
+    """
     tokens = set(str(source or "").split(":"))
     return bool(
         tokens
@@ -642,6 +651,10 @@ def _is_noncertifying_mg_extrapolation(species: Any, source: Any) -> bool:
             "extrapolated_beyond_valid_range_K",
         }
     )
+
+
+# Back-compat alias for any external importers of the Mg-named helper.
+_is_noncertifying_mg_extrapolation = _is_noncertifying_vapor_extrapolation
 
 
 def _summary_count(item: Any) -> int:

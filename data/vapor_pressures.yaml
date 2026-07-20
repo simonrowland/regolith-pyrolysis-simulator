@@ -43,8 +43,36 @@ metals:
     electrons_per_atom: 1
     parent_oxide: "Na2O"
     fit_target: "pseudo_psat_backsolved_from_vaporock"
+    # INTERIM Alternative B (2026-07-20 Na investigation / t-383): keep the
+    # active Chase/JANAF gas-standard + gamma_NaO0.5=1e-3 pair, demote
+    # authority, declare compensating-errors bracket. Labels only — runtime
+    # pressure path is unchanged (golden-neutral for B1).
+    authority_class: uncertified
+    declared_compensation: true
+    declared_compensation_note: >
+      Compensating-errors surface: Chase/JANAF gas-standard fugacity
+      (active high-T rail) paired with fixed gamma_NaO0.5=1e-3 (Sossi 2019
+      magnitude) is NOT an intentional DeMaria fit and is NOT a coherent
+      pure-system standard-plus-activity pair. The two coherent shadow
+      candidates at the investigation 1429 K input bracket ~1.86 dex
+      (L&H+gamma 0.1459 Pa vs full-VapoRock 0.002032 Pa). Pending t-383
+      paired re-ground; DeMaria 12022/12065 held-out validation only.
+    pressure_bracket:
+      T_K: 1429.0
+      condition: "investigation 2026-07-20-na-investigation stated DeMaria-class input"
+      reference: "docs-private/research/2026-07-20-na-investigation/report.md"
+      candidates:
+        lamoreaux_hildenbrand_plus_constant_gamma_Pa: 0.1459
+        full_vaporock_Pa: 0.002032
+      spread_dex: 1.86
+      active_rail: chase_janaf_gas_standard_fugacity_plus_gamma_1e-3
+      interim_treatment: alternative_B_declared_compensation
     residual_dex: 0.379
     confidence_tier: "low"
+    # Stale VapoRock-backsolved Antoine no longer drives the active high-T
+    # rail (gas_standard_fugacity). Kept for provenance only — do not retune
+    # as if it were the live Na pressure surface (t-383 / Alternative B).
+    pseudo_antoine_status: inactive_provenance_only
     backsolve:
       feedstock_grid: "dense seven-feedstock lunar/mars grid"
       fO2_convention: "Kress91 IW"
@@ -60,6 +88,8 @@ metals:
         n_samples: 217
         composition_basis: "VapoRock-supported silicate oxides; unsupported Stage 0 foulants removed, remaining oxides renormalized to 100 wt%"
         fit_objective: "bounded minimax absolute log10 residual; |C| <= 1000 K"
+        status: inactive_provenance_only
+        note: "Does not drive runtime high-T Na rail; active path is Ellingham gas_standard_fugacity + melt gamma"
     pure_component_antoine:
       source: "REF-041 NIST Chemistry WebBook SRD 69 Rodebush and Walters 1930 sodium (C7440235); log10(P/bar)=2.46077-1873.728/(T-416.372), converted to Pa by A+5"
       source_certification: "source_equation_fit"
@@ -91,14 +121,22 @@ metals:
           value: 0.13
           regime: "sealed equilibrium chamber; not representative of mbar-sweep pyrolysis"
     antoine:
-      # Bounded-minimax fallback fit to current VapoRock dense IW grid.
+      # PROVENANCE-ONLY (inactive): bounded-minimax fallback fit to a past
+      # VapoRock dense IW grid. Does NOT drive the active high-T Na rail.
+      # Active rail: Chase/JANAF gas_standard_fugacity + gamma_NaO0.5=1e-3.
       A: 5.185860
       B: 11127.434869
       C: 1000.0
     valid_range_K: [1400, 1900]
     boiling_point_C: 883
     condensation_T_C_at_1mbar: 480
-    notes: "Builtin authoritative effective curve; max residual 0.379 dex vs current VapoRock on the dense Kress91 IW grid. Low confidence; VapoRock is diagnostic-only when available."
+    notes: >
+      INTERIM uncertified (Alternative B, 2026-07-20): active high-T rail is
+      Chase/JANAF gas_standard_fugacity + fixed gamma_NaO0.5=1e-3 with
+      declared compensating-errors bracket (L&H+gamma 0.1459 Pa vs full
+      VapoRock 0.002032 Pa at 1429 K, ~1.86 dex). Stale YAML pseudo Antoine is
+      inactive/provenance-only. DeMaria 12022/12065 held-out pending t-383
+      paired re-ground. Do not certify or retune to DeMaria residual.
 
   K:
     formula: "K"
@@ -108,6 +146,12 @@ metals:
     fit_target: "standard_reaction_term"
     residual_dex: 0.000223
     confidence_tier: "uncertified_liquid_ko0_5_lamoreaux_hildenbrand"
+    gamma_domain_K: [1500.0, 1500.0]
+    gamma_authority: >-
+      Fixed gamma_KO0.5=3.5e-5 certified only at the 1500 K DeMaria/Sossi anchor.
+      Coefficient residual 0.000223 dex is good; gamma temperature extrapolation
+      dominates uncertainty and is UNCERTIFIED outside (1500,1500) K. Certifying
+      callers must treat out-of-domain gamma as authority-limited (DRIFT-HIGH).
     reaction:
       formula: "KO0.5(l) -> K(g) + 0.25 O2(g)"
       exponent_oxide: 1.0
@@ -182,6 +226,8 @@ metals:
     electrons_per_atom: 2
     parent_oxide: "MgO"
     fit_target: "pure_component_psat"
+    # Liquid-oxide pairing rail / high-T path: uncertified (matrix).
+    authority_class: uncertified
     extrapolation_policy: "refuse"
     source: "REF-033 CRC.b/Stull magnesium pressure-level table fit (1-100000 Pa); runtime pure-component source is pure_component_antoine"
     pure_component_antoine:
@@ -210,12 +256,42 @@ metals:
     condensation_T_C_at_1mbar: 580
     notes: "Runtime reference is the CRC/Stull pure-component Mg sidecar, multiplied by the builtin Ellingham MgO activity path. The 2026-06-14 VapoRock dense-grid pseudo-fit was removed on 2026-06-29 because its negative-B Antoine row was non-monotonic for T > 1000 K and non-certifying outside its fit intent."
 
+    gas_rail_standard_reaction:
+      formula: "MgO(l) -> Mg(g) + 0.5 O2(g)"
+      basis: >
+        VapoRock JANAF metal(g)/O2(g) + ThermoEngine v1.0 pure-liquid oxide
+        mu0; minimax refit over 1366-2273.15 K.
+        Closes solid-oxide Ellingham vs liquid-oxide activity pairing
+        (2026-07-20 vaporock-fit-audit).
+      standard_pressure_Pa: 100000.0
+      oxide_activity_exponent: 1.0
+      pO2_exponent: -0.5
+      pO2_reference_bar: 1.0
+      antoine:
+        A: 13.4693238
+        B: 32944.8707002
+        C: -109.5100000
+        derivation: >
+          Premise: liquid-oxide activity pairs with liquid-oxide standard
+          reaction. Algebra: delG0=G_M(g)+n*G_O2-mu0_oxide(l);
+          log10(P_ref/Pa)=5-delG0/(RT ln10); P=P_ref*a*fO2^n. Unit Pa.
+          Sanity: max residual 0.006291 dex vs TE+JANAF grid.
+      valid_range_K: [1366, 2273.15]
+      fit_residual_dex:
+        max_abs: 0.006291
+        rms: 0.002643
+        grid_K: [1366, 2273.15, 10]
+        method: minimax |log10P_fit-log10P_source| on 10 K grid
+      rail_scope: gas_only_two_rail_preserved
   Fe:
     formula: "Fe"
     molar_mass_g_mol: 55.845
     electrons_per_atom: 2
     parent_oxide: "FeO"
     fit_target: "pseudo_psat_backsolved_from_vaporock"
+    # Absolute Fe pressure residual / degraded activity path: uncertified (matrix).
+    authority_class: uncertified
+    pseudo_antoine_status: inactive_dormant
     residual_dex: 0.418
     confidence_tier: "low"
     backsolve:
@@ -236,6 +312,12 @@ metals:
     pure_component_antoine:
       source: "REF-012 CRC/NIST normal boiling point; CRC/NIST dH_vap~340 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
       provenance_class: "derived_from_evaluation"
+      construction_support_range_K: [1809.0, 3134.0]
+      construction: >-
+        Clausius-Clapeyron from CRC/NIST Tb + dH_vap; construction support band
+        declared for metadata honesty (audit 2026-07-20). Not a VapoRock fit.
+        Runtime selects this pure-component sidecar; the residual pseudo Antoine
+        block is dormant/inactive and must not be retuned (t-373 tail).
       A: 10.670336
       B: 17759.430841
       C: 0
@@ -265,6 +347,8 @@ metals:
     electrons_per_atom: 2
     parent_oxide: "CaO"
     fit_target: "pure_component_psat"
+    # Liquid-oxide pairing rail / high-T path: uncertified (matrix).
+    authority_class: uncertified
     source: "REF-043 NIST Chemistry WebBook SRD 69 Hartmann and Schneider 1929 calcium (C7440702); runtime pure-component source is pure_component_antoine"
     pure_component_antoine:
       source: "REF-043 NIST Chemistry WebBook SRD 69 Hartmann and Schneider 1929 calcium (C7440702); log10(P/bar)=2.78473-3121.368/(T-594.591), converted to Pa by A+5"
@@ -289,12 +373,41 @@ metals:
     condensation_T_C_at_1mbar: 780
     notes: "dH_vap ~ 182.3 kJ/mol. Significant above ~1500°C."
 
+    gas_rail_standard_reaction:
+      formula: "CaO(l) -> Ca(g) + 0.5 O2(g)"
+      basis: >
+        VapoRock JANAF metal(g)/O2(g) + ThermoEngine v1.0 pure-liquid oxide
+        mu0; minimax refit over 1757-2273.15 K.
+        Closes solid-oxide Ellingham vs liquid-oxide activity pairing
+        (2026-07-20 vaporock-fit-audit).
+      standard_pressure_Pa: 100000.0
+      oxide_activity_exponent: 1.0
+      pO2_exponent: -0.5
+      pO2_reference_bar: 1.0
+      antoine:
+        A: 12.2168914
+        B: 37873.6892331
+        C: -116.8900000
+        derivation: >
+          Premise: liquid-oxide activity pairs with liquid-oxide standard
+          reaction. Algebra: delG0=G_M(g)+n*G_O2-mu0_oxide(l);
+          log10(P_ref/Pa)=5-delG0/(RT ln10); P=P_ref*a*fO2^n. Unit Pa.
+          Sanity: max residual 0.000736 dex vs TE+JANAF grid.
+      valid_range_K: [1757, 2273.15]
+      fit_residual_dex:
+        max_abs: 0.000736
+        rms: 0.000323
+        grid_K: [1757, 2273.15, 10]
+        method: minimax |log10P_fit-log10P_source| on 10 K grid
+      rail_scope: gas_only_two_rail_preserved
   Al:
     formula: "Al"
     molar_mass_g_mol: 26.9815385
     electrons_per_atom: 3
     parent_oxide: "Al2O3"
     fit_target: "pure_component_psat"
+    # Liquid-oxide pairing rail / high-T path: uncertified (matrix).
+    authority_class: uncertified
     source: "REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 aluminum (C7429905); runtime pure-component source is pure_component_antoine"
     pure_component_antoine:
       source: "REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 aluminum (C7429905); log10(P/bar)=5.73623-13204.109/(T-24.306), converted to Pa by A+5"
@@ -319,6 +432,32 @@ metals:
     condensation_T_C_at_1mbar: 1180
     notes: "dH_vap ~ 332.0 kJ/mol. Negligible below 2500°C  --  not pyrolysable."
 
+    liquid_oxide_standard_reaction:
+      formula: "AlO1.5(l) -> Al(g) + 0.75 O2(g)"
+      basis: >
+        VapoRock JANAF metal(g)/O2(g) + ThermoEngine v1.0 pure-liquid oxide
+        mu0; minimax refit over 1400-2273.15 K.
+        Closes solid-oxide Ellingham vs liquid-oxide activity pairing
+        (2026-07-20 vaporock-fit-audit).
+      standard_pressure_Pa: 100000.0
+      oxide_activity_exponent: 1.0
+      pO2_exponent: -0.75
+      pO2_reference_bar: 1.0
+      antoine:
+        A: 17.2874548
+        B: 54230.9684109
+        C: -49.8900000
+        derivation: >
+          Premise: liquid-oxide activity pairs with liquid-oxide standard
+          reaction. Algebra: delG0=G_M(g)+n*G_O2-mu0_oxide(l);
+          log10(P_ref/Pa)=5-delG0/(RT ln10); P=P_ref*a*fO2^n. Unit Pa.
+          Sanity: max residual 0.003354 dex vs TE+JANAF grid.
+      valid_range_K: [1400, 2273.15]
+      fit_residual_dex:
+        max_abs: 0.003354
+        rms: 0.001434
+        grid_K: [1400, 2273.15, 10]
+        method: minimax |log10P_fit-log10P_source| on 10 K grid
   Si:
     formula: "Si"
     molar_mass_g_mol: 28.085
@@ -356,6 +495,8 @@ metals:
     electrons_per_atom: 4
     parent_oxide: "TiO2"
     fit_target: "pure_component_psat"
+    # Liquid-oxide pairing rail / high-T path: uncertified (matrix).
+    authority_class: uncertified
     source: "REF-032 CRC Handbook 84th ed. / Alcock-Itkin-Horrigan 1984 vapor-pressure equation for titanium; runtime pure-component source is pure_component_antoine"
     pure_component_antoine:
       source: "REF-032 Alcock-Itkin-Horrigan 1984 titanium liquid equation, CRC/CR2 Pa-converted form; dense 10 K minimax refit from 1941-2400 K plus exact 3560.15 K normal-boiling anchor to log10(P/Pa)=A-B/(T+C)"
@@ -404,12 +545,40 @@ metals:
     condensation_T_C_at_1mbar: 1500
     notes: "dH_vap ~ 444.3 kJ/mol. Not pyrolysable  --  extracted by Na shuttle or MRE."
 
+    liquid_oxide_standard_reaction:
+      formula: "TiO2(l) -> Ti(g) + O2(g)"
+      basis: >
+        VapoRock JANAF metal(g)/O2(g) + ThermoEngine v1.0 pure-liquid oxide
+        mu0; minimax refit over 1941-2273.15 K.
+        Closes solid-oxide Ellingham vs liquid-oxide activity pairing
+        (2026-07-20 vaporock-fit-audit).
+      standard_pressure_Pa: 100000.0
+      oxide_activity_exponent: 1.0
+      pO2_exponent: -1.0
+      pO2_reference_bar: 1.0
+      antoine:
+        A: 17.7414184
+        B: 63882.5899238
+        C: -74.4400000
+        derivation: >
+          Premise: liquid-oxide activity pairs with liquid-oxide standard
+          reaction. Algebra: delG0=G_M(g)+n*G_O2-mu0_oxide(l);
+          log10(P_ref/Pa)=5-delG0/(RT ln10); P=P_ref*a*fO2^n. Unit Pa.
+          Sanity: max residual 0.000120 dex vs TE+JANAF grid.
+      valid_range_K: [1941, 2273.15]
+      fit_residual_dex:
+        max_abs: 0.000120
+        rms: 0.000060
+        grid_K: [1941, 2273.15, 10]
+        method: minimax |log10P_fit-log10P_source| on 10 K grid
   Cr:
     formula: "Cr"
     molar_mass_g_mol: 52.00
     electrons_per_atom: 3
     parent_oxide: "Cr2O3"
     fit_target: "pure_component_psat"
+    # Liquid-oxide pairing rail / high-T path: uncertified (matrix).
+    authority_class: uncertified
     source: "REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 chromium (C7440473); runtime pure-component source is pure_component_antoine"
     pure_component_antoine:
       source: "REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 chromium (C7440473); log10(P/bar)=6.02371-16064.989/(T-83.86), converted to Pa by A+5"
@@ -442,12 +611,40 @@ metals:
     condensation_T_C_at_1mbar: 1280
     notes: "dH_vap ~ 396.9 kJ/mol. Trace amounts, extracted by Na shuttle."
 
+    liquid_oxide_standard_reaction:
+      formula: "CrO1.5(l) -> Cr(g) + 0.75 O2(g)"
+      basis: >
+        VapoRock JANAF metal(g)/O2(g) + ThermoEngine v1.0 pure-liquid oxide
+        mu0; minimax refit over 1400-2273.15 K.
+        Closes solid-oxide Ellingham vs liquid-oxide activity pairing
+        (2026-07-20 vaporock-fit-audit).
+      standard_pressure_Pa: 100000.0
+      oxide_activity_exponent: 1.0
+      pO2_exponent: -0.75
+      pO2_reference_bar: 1.0
+      antoine:
+        A: 17.1792790
+        B: 43230.1153980
+        C: -108.5000000
+        derivation: >
+          Premise: liquid-oxide activity pairs with liquid-oxide standard
+          reaction. Algebra: delG0=G_M(g)+n*G_O2-mu0_oxide(l);
+          log10(P_ref/Pa)=5-delG0/(RT ln10); P=P_ref*a*fO2^n. Unit Pa.
+          Sanity: max residual 0.006066 dex vs TE+JANAF grid.
+      valid_range_K: [1400, 2273.15]
+      fit_residual_dex:
+        max_abs: 0.006066
+        rms: 0.002591
+        grid_K: [1400, 2273.15, 10]
+        method: minimax |log10P_fit-log10P_source| on 10 K grid
   Mn:
     formula: "Mn"
     molar_mass_g_mol: 54.94
     electrons_per_atom: 2
     parent_oxide: "MnO"
     fit_target: "pure_component_psat"
+    # Liquid-oxide pairing rail / high-T path: uncertified (matrix).
+    authority_class: uncertified
     source: "REF-020 NIST-JANAF/Chase 1998 solid/liquid Mn->Mn(g) evaluation; REF-032 Alcock solid, REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as comparators; runtime pure-component source is pure_component_antoine"
     pure_component_antoine:
       source: "REF-020 NIST-JANAF/Chase 1998 Mn(s/l)->Mn(g) thermodynamic evaluation fit; REF-032 Alcock solid, REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as documented comparators"
@@ -561,31 +758,77 @@ metals:
     boiling_point_C: 2061
     condensation_T_C_at_1mbar: 1000
     notes: "dH_vap ~ 282.3 kJ/mol. Moderate volatility, trace amounts."
+    liquid_oxide_standard_reaction:
+      formula: "MnO(l) -> Mn(g) + 0.5 O2(g)"
+      basis: >
+        VapoRock JANAF metal(g)/O2(g) + ThermoEngine v1.0 pure-liquid oxide
+        mu0; minimax refit over 1519-2273.15 K.
+        Closes solid-oxide Ellingham vs liquid-oxide activity pairing
+        (2026-07-20 vaporock-fit-audit).
+      standard_pressure_Pa: 100000.0
+      oxide_activity_exponent: 1.0
+      pO2_exponent: -0.5
+      pO2_reference_bar: 1.0
+      antoine:
+        A: 12.5780234
+        B: 28619.0370835
+        C: -118.4900000
+        derivation: >
+          Premise: liquid-oxide activity pairs with liquid-oxide standard
+          reaction. Algebra: delG0=G_M(g)+n*G_O2-mu0_oxide(l);
+          log10(P_ref/Pa)=5-delG0/(RT ln10); P=P_ref*a*fO2^n. Unit Pa.
+          Sanity: max residual 0.001677 dex vs TE+JANAF grid.
+      valid_range_K: [1519, 2273.15]
+      fit_residual_dex:
+        max_abs: 0.001677
+        rms: 0.000716
+        grid_K: [1519, 2273.15, 10]
+        method: minimax |log10P_fit-log10P_source| on 10 K grid
+      authority_note: >
+        Mn(g) Shomate declared support starts at 2334.526 K; process-band
+        use is metastable extrapolation (diagnostic/authority-limited).
 
 oxide_vapors:
   SiO:
     formula: "SiO"
     molar_mass_g_mol: 44.084
     parent_oxide: "SiO2"
-    fit_target: "pseudo_psat_backsolved_from_vaporock"
-    residual_dex: 0.270
+    fit_target: "standard_reaction_term"
+    # Source-supported standard-reaction term; not dual-lab GT (matrix uncertified).
+    authority_class: uncertified
     confidence_tier: "moderate"
-    backsolve:
-      feedstock_grid: "dense seven-feedstock lunar/mars grid"
-      fO2_convention: "Kress91 IW"
-      # Descriptive fit note only; runtime uses the fitted SiO pseudo-psat with provider pO2.
-      activity_formula: "a_SiO2 * sqrt(1e-9 / pO2_bar) for pO2_bar > 1e-9; hard-vacuum reference otherwise"
-      target: "VapoRock SiO(g) partial pressure on the dense grid"
-      residual_dex: 0.270
-      old_metadata_residual_dex: 0.113
-      old_dense_residual_dex: 2.392
-      provenance:
-        generated_by: "scripts/vaporock_pseudo_antoine_refit.py"
-        temperature_K: {min: 1350, max: 1950, step: 20, count: 31}
-        feedstocks: ["lunar_mare_low_ti", "lunar_mare_high_ti", "lunar_highland", "lunar_pkt_kreep_average", "lunar_spa_kreep_influenced", "mars_basalt", "mars_sulfate_rich"]
-        n_samples: 217
-        composition_basis: "VapoRock-supported silicate oxides; unsupported Stage 0 foulants removed, remaining oxides renormalized to 100 wt%"
-        fit_objective: "bounded minimax absolute log10 residual; |C| <= 1000 K"
+    reaction:
+      formula: "SiO2(l) -> SiO(g) + 0.5 O2(g)"
+      basis: "VapoRock JANAF SiO(g)/O2(g) multi-interval Shomate (SiO 1100-6000 K; O2 700-2000 and 2000-6000 K) plus ThermoEngine v1.0 pure-liquid SiO2 mu0 (Berman liq_mod); composition-independent p0*Kp(T) minimax refit over 1400-2273.15 K"
+      standard_pressure_Pa: 100000.0
+      pO2_reference_bar: 1.0e-9
+      # Source grid regenerated 2026-07-19 (Bug A fix3 branch a): same
+      # thermochemical sources as the prior 1400-1900 K table, extended to the
+      # process-envelope ceiling because both JANAF gas intervals and the
+      # ThermoEngine liquid-SiO2 standard state are defined through 2273.15 K.
+      source_table_log10_P_ref_Pa:
+        - [1400.0, -6.904421868]
+        - [1500.0, -4.953131396]
+        - [1600.0, -3.250905047]
+        - [1700.0, -1.753948057]
+        - [1800.0, -0.427731189]
+        - [1900.0, 0.754969595]
+        - [2000.0, 1.815905539]
+        - [2100.0, 2.772661024]
+        - [2200.0, 3.639609037]
+        - [2273.15, 4.223822537]
+      fit_residual_dex:
+        max_abs: 0.001630
+        rms: 0.001162
+        grid_K: [1400, 2273.15, 20]
+        method: "minimax |log10P_fit - log10P_source| on 20 K dense grid"
+      heldout_2023_15_K:
+        # Was held-out above the old 1900 K fit band; now an in-domain sanity
+        # check on the extended source-validated domain.
+        source_log10_P_ref_Pa: 2.046088932
+        fit_log10_P_ref_Pa: 2.044520449
+        fit_P_ref_Pa: 110.795073
+        lunar_mare_activity_scaled_P_Pa: 48.36
     stoich_oxide_per_vapor: 1.362920787587333  # kg SiO2 consumed per kg SiO evaporated
     stoich_O2_per_vapor: 0.36292078758733326   # kg O2 freed per kg SiO evaporated
     evaporation_alpha:
@@ -606,17 +849,36 @@ oxide_vapors:
       envelope: [0.003, 0.067]
       tier: 2
     antoine:
-      # SiO vapor from SiO2 decomposition: SiO2(melt) -> SiO(g) + 1/2O2(g)
-      # Effective vapor pressure depends on a(SiO2) and pO2
-      # Bounded-minimax fallback fit to current VapoRock dense IW grid.
-      A: 28.062027
-      B: 79705.252727
-      C: 1000.0
-    # The fitted sample grid ends at 1950 K. Higher temperatures remain an
-    # explicit process-envelope extrapolation, not validated fit territory.
-    valid_range_K: [1400, 1950]
-    extrapolation_allowed_range_K: [1400, 2273.15]
-    extrapolation_basis: "Runtime process envelope only: 2273.15 K = 2000 C upper furnace bound from data/setpoints.yaml; not source validation. Provider must flag extrapolated_beyond_valid_range_K above valid_range_K."
+      # SiO vapor from SiO2 decomposition: SiO2(melt) -> SiO(g) + 1/2 O2(g)
+      # Premise: composition-independent standard term p0*Kp(T) from
+      #   JANAF SiO(g)/O2(g) multi-interval Shomate + ThermoEngine v1.0
+      #   pure-liquid SiO2 mu0 (Berman). Both sources are defined well above
+      #   the prior 1900 K pin (JANAF SiO to 6000 K; O2 second interval
+      #   2000-6000 K; ThermoEngine liquid G smooth through >=2500 K), so the
+      #   process envelope to 2273.15 K is source-supported, not a process-only
+      #   extrapolation band.
+      # Algebra at pO2_ref=1e-9 bar, a_SiO2=1:
+      #   delG0 = G_SiO + 0.5 G_O2 - mu0_SiO2(l)
+      #   Kp = exp(-delG0/(R T));  R=8.314 J/mol/K (VapoRock)
+      #   P_ref/Pa = 1e5 * Kp / sqrt(pO2_ref/1 bar)
+      #   log10(P_ref/Pa) ≈ A - B/(T+C)  (minimax refit)
+      # Runtime multiplies once by a_SiO2 * sqrt(pO2_ref/pO2) over the full
+      # legal transport-pO2 domain (no silent clip below pO2_ref).
+      # Unit check: Kp, activities, and fugacity ratios dimensionless; p0
+      # supplies Pa. Residual max |fit-source|=0.001630 dex on the 20 K grid
+      # 1400-2273.15 K (~2x the prior 0.000837 dex over the narrower 1400-1900
+      # band; still within the ~0.002 dex matrix acceptance).
+      # Sanity: B>0 => dlog10(P_ref)/dT = B/(T+C)^2 > 0; at 2023.15 K the
+      # in-domain fit gives P_ref≈110.80 Pa; lunar-mare a_SiO2≈0.43638 scales
+      # to ≈48.36 Pa (VapoRock hard-vacuum anchor ~48.17 Pa).
+      A: 21.4441302
+      B: 38290.4646
+      C: -49.3750070
+    # Source-validated domain = process envelope. Beyond 2273.15 K the
+    # provider fail-louds (typed oxide_vapor_pressure_out_of_validated_range);
+    # there is no diagnostic-only process-envelope extrapolation band left
+    # inside the furnace bound.
+    valid_range_K: [1400, 2273.15]
     condensation_T_C: [900, 1200]
     condensation_product: "amorphous SiO2 (disproportionation: 2SiO -> Si + SiO2)"
     condensation_products_mol_per_mol_vapor:
@@ -624,28 +886,35 @@ oxide_vapors:
       SiO2: 0.5
     # Descriptive equation note only; not a runtime suppression coefficient.
     suppression_equation: "p(SiO) = K(T) * a(SiO2) / sqrt pO2"
-    pO2_reference_bar: 1.0e-9  # calibrated SiO suppression reference; not body-dependent
+    pO2_reference_bar: 1.0e-9  # calibrated SiO mass-action reference; not body-dependent
     suppression_factor_at_1mbar_O2: ">300*"
     notes: |
-      THE problem species. At hard vacuum (pO2 ~1e-9 bar), SiO dominates
-      offgas above ~1400°C. At pO2 = 1 mbar, suppressed >300*.
-      Condenses as adhesive, corrosive amorphous silica below ~1200°C.
-      See [THERMO-1] in context-thermo.md.
-      Builtin fallback max residual 0.270 dex vs current VapoRock on the
-      dense Kress91 IW fit grid; extrapolation keeps prior runtime coverage
-      to 2200 K. Moderate confidence; VapoRock is diagnostic-only when
-      available.
+      THE problem species. At hard vacuum (pO2 ~1e-9 bar and below to the
+      legal body floor), SiO dominates offgas above ~1400°C. At pO2 = 1 mbar,
+      suppressed >300*. Condenses as adhesive, corrosive amorphous silica
+      below ~1200°C. See [THERMO-1] in context-thermo.md.
+      Composition-independent standard-reaction term from JANAF gas species
+      plus the ThermoEngine liquid-SiO2 standard state, source-validated over
+      1400-2273.15 K (authority class remains uncertified — honest label, not
+      dual-lab certified ground truth). Runtime applies a(SiO2) and the
+      mass-action pO2 factor exactly once over the full legal pO2 domain.
+      T>2273.15 K is typed refusal.
 
   CrO2:
     formula: "CrO2"
     molar_mass_g_mol: 83.9941
     parent_oxide: "Cr2O3"
     fit_target: "standard_reaction_term"
+    # Source-supported standard-reaction term; not dual-lab GT (matrix uncertified).
+    authority_class: uncertified
     reaction:
-      formula: "0.5 Cr2O3(s/l) + 0.25 O2(g) -> CrO2(g)"
-      exponent_oxide: 0.5
+      formula: "CrO1.5(l) + 0.25 O2(g) -> CrO2(g)"
+      exponent_oxide: 1.0
       exponent_pO2: 0.25
-      basis: "VapoRock fallback fit to JANAF0 CrO2(g) output"
+      basis: >-
+        JANAF CrO2(g)/O2 + ThermoEngine v1.0 pure-liquid CrO1.5 mu0;
+        composition-independent p0*Kp(T) minimax refit over 1500-2273.15 K.
+        Replaces stale fallback (+0.390 dex @1500 K) and extends process envelope.
     stoich_oxide_per_vapor: 0.904761167748687  # kg Cr2O3 consumed per kg CrO2 evaporated
     stoich_O2_per_vapor: -0.0952388322513129  # kg O2 consumed per kg CrO2 evaporated
     evaporation_alpha_policy:
@@ -653,15 +922,22 @@ oxide_vapors:
       policy: "fail_loud_missing_alpha"
       source: "REF-014 Fedkin et al. 2006 plus chromia-boiler literature; no isolated CrO2 HK alpha adopted"
     antoine:
-      # Fallback fit to VapoRock JANAF0 CrO2(g) output over 1500-2200 K:
-      # log10(P_Pa) = A - B/T_K + 0.5 log10(a_Cr2O3) + 0.25 log10(pO2_bar)
-      A: 12.9245114
-      B: 23732.9593
-      C: 0
-    oxide_activity_exponent: 0.5
+      # 2026-07-20 liquid-CrO1.5 standard-reaction refit (TE + JANAF):
+      # log10(P_ref_Pa) = A - B/(T_K+C) at a=1, fO2=1 bar; runtime multiplies
+      # a_CrO1.5 * fO2^0.25. Max residual 0.005059 dex on 10 K grid.
+      A: 11.1773865
+      B: 18397.4295704
+      C: -228.62
+      derivation: >-
+        Premise: liquid CrO1.5 standard matching single-cation activity.
+        Algebra: delG0=G_CrO2-mu0_CrO1.5-0.25 G_O2;
+        log10(P_ref/Pa)=5-delG0/(RT ln10); P=P_ref*a*fO2^0.25. Unit Pa.
+        Sanity: max residual 0.005059 dex (audit before +0.390 @1500 K).
+    oxide_activity_exponent: 1.0
     pO2_exponent: 0.25
     pO2_reference_bar: 1.0
-    valid_range_K: [1500, 2200]
+    residual_dex: 0.005059
+    valid_range_K: [1500, 2273.15]
     vaporock_janaf0_shomate:
       source_file: "../VapoRock/src/vaporock/data/JANAF0-vapor-data.csv"
       source_row: 34
@@ -704,9 +980,14 @@ foulant_vapor:
       B: 8388.497
       C: -82.638
     antoine:
-      A: 10.07184
-      B: 8388.497
-      C: -82.638
+      A: 11.1773865
+      B: 18397.4295704
+      C: -228.6200000
+      derivation: >
+        Premise: liquid CrO1.5 standard with single-cation activity.
+        Algebra: delG0=G_CrO2-mu0_CrO1.5-0.25 G_O2;
+        log10(P_ref/Pa)=5-delG0/(RT ln10); P=P_ref*a*fO2^0.25.
+        Sanity: max residual 0.005059 dex (audit before +0.390 @1500 K).
     valid_range_K: [1138, 1738]
     boiling_point_C: 1465
     condensation_T_C_at_1mbar: 900
@@ -721,6 +1002,11 @@ foulant_vapor:
     molar_mass_g_mol: 74.55
     fit_target: pure_component_psat
     carrier_is_own_vapor: true
+    source_drift_dex: 0.04427
+    source_drift_note: >-
+      DRIFT-LOW: ~0.044 dex mid-range Stull equation vs NBP-anchored
+      pure_component_antoine near 1550 K. Runtime ground-truth uses
+      pure_component_antoine; no coefficient retune in pairing wave.
     pure_component_antoine:
       source: "REF-002 NIST WebBook SRD 69 Stull 1947 KCl (C7447407); CRC bp 1420 C; Clausius-Clapeyron anchored at 1 atm (Stull raw overshoots bp)"
       provenance_class: "derived_from_evaluation"

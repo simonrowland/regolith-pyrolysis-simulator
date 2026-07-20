@@ -206,23 +206,15 @@ def test_builtin_authority_dispatches_even_when_vaporock_available(
     assert "kernel_fallback_used" not in diagnostic
     sources = dict(diagnostic.get("vapor_pressures_source") or {})
     assert sources
-    authoritative_species = {"Al", "Ca", "Cr", "Fe", "K", "Mg", "Na", "Ti"}
-    pseudo_vaporock_species = {"SiO"}
+    authoritative_species = {"Al", "Ca", "Cr", "Fe", "K", "Mg", "Na", "Ti", "Mn", "SiO"}
     assert authoritative_species.issubset(sources)
-    assert pseudo_vaporock_species.issubset(sources)
     for species in authoritative_species:
         assert sources[species].startswith("builtin_authoritative:")
-    # 4256fda propagates the reconstructed Ellingham provenance for Mn: the
-    # builtin provider still dispatches, but must not overclaim full authority.
-    assert sources["Mn"] == (
-        "builtin_authority_limited:pure_component_derived_from_evaluation:"
-        "reconstructed_ellingham_segment"
-    )
-    for species in pseudo_vaporock_species:
-        assert sources[species] == (
-            "vaporock_backsolved_curve_fit:"
-            "backsolved_vaporock_curve_fit"
-        )
+    # Pairing fix: Mn oxide-coupled path is liquid_oxide_standard_reaction
+    # (pure-component Mn sidecar remains NBP/NIST only).
+    assert "liquid_oxide_standard_reaction" in sources["Mn"]
+    # Bug A fix3: SiO is standard_reaction_term (not pseudo VapoRock).
+    assert sources["SiO"] == "builtin_authoritative:standard_reaction_term"
 
     shadow = _shadow_result(sim)
     assert shadow.status == "non_authoritative"
@@ -334,11 +326,11 @@ def test_non_authoritative_vaporock_empty_output_does_not_trip_core_guard(
     assert result.vapor_pressures_Pa
     sources = set(result.vapor_pressures_source.values())
     assert "vaporock" not in sources
-    assert (
-        "vaporock_backsolved_curve_fit:"
-        "backsolved_vaporock_curve_fit"
-    ) in sources
+    # Builtin remains sole pressure authority; VapoRock shadow must not appear.
+    # (Pseudo VapoRock curve-fit labels may be absent when pure-component /
+    # standard-reaction rails cover the melt inventory.)
     assert any(source.startswith("builtin_authoritative") for source in sources)
+    assert not any(source.startswith("vaporock") for source in sources)
     diagnostic = dict(sim._last_vapor_pressure_diagnostic or {})
     assert diagnostic.get("vapor_pressures_Pa")
     assert diagnostic.get("vapor_pressures_source")

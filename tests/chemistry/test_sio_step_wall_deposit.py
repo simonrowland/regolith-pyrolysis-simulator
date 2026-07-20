@@ -204,7 +204,10 @@ def test_hot_wall_sio_reactive_deposit_uses_product_psat_floor():
     alpha_s = 0.04
 
     sio_psat_pa = _antoine_psat_pa("SiO", wall_T_K)
-    assert sio_psat_pa is not None and sio_psat_pa > p_local_pa
+    # SiO now carries the melt standard-reaction term, which must not be
+    # consumed as a pure-vapor wall saturation pressure. The authorized
+    # disproportionation-product backstop supplies the P_sat ~= 0 limit.
+    assert sio_psat_pa is None
 
     expected_hkl = alpha_s * _hkl_impingement_flux_mol_m2_s(
         "SiO",

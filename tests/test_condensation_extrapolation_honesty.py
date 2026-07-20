@@ -60,15 +60,22 @@ def test_scalar_alpha_s_range_travels_through_stage_provenance():
 
 
 def test_wall_antoine_applied_path_reports_extrapolation_without_value_change():
-    T_wall_K = 1173.15
+    """Wall pure-Antoine honesty uses a metal rail (Ca), not SiO.
+
+    SiO is a melt standard-reaction term (fit_target=standard_reaction_term),
+    not a pure-species wall P_sat. Its oxide Antoine coefficients are not
+    wall-condensation certified; the reactive wall path uses the product
+    backstop. Probe Antoine telemetry on Ca, which still has a pure-component
+    condensed rail with a declared valid_range_K.
+    """
+    T_wall_K = 1900.0  # above Ca pure-component certified band
     local_pressure_pa = 100.0
-    # Ground truth: data/vapor_pressures.yaml SiO valid_range_K.
-    certified_range_K = condensation.VAPOR_PRESSURE_DATA["oxide_vapors"]["SiO"][
+    certified_range_K = condensation.VAPOR_PRESSURE_DATA["metals"]["Ca"][
         "valid_range_K"
     ]
-    assert certified_range_K == [1400, 1950]
+    assert certified_range_K[0] < T_wall_K or certified_range_K[1] < T_wall_K
     baseline_pressure = condensation._wall_deposition_driving_pressure_pa(
-        "SiO",
+        "Ca",
         local_pressure_pa,
         T_wall_K,
         reactive_product_backstop=False,
@@ -77,7 +84,7 @@ def test_wall_antoine_applied_path_reports_extrapolation_without_value_change():
     antoine_warnings: list[str] = []
 
     instrumented_pressure = condensation._wall_deposition_driving_pressure_pa(
-        "SiO",
+        "Ca",
         local_pressure_pa,
         T_wall_K,
         reactive_product_backstop=False,
@@ -86,32 +93,34 @@ def test_wall_antoine_applied_path_reports_extrapolation_without_value_change():
     )
 
     assert instrumented_pressure.hex() == baseline_pressure.hex()
-    assert antoine_extrapolations["SiO"]["temperature_K"] == pytest.approx(
+    assert antoine_extrapolations["Ca"]["temperature_K"] == pytest.approx(
         T_wall_K
     )
-    assert tuple(antoine_extrapolations["SiO"]["valid_range_K"]) == tuple(
-        certified_range_K
-    )
     assert any(
-        "SiO metal Antoine fit extrapolated beyond valid_range_K" in warning
-        and "1173.15 K" in warning
+        "Ca metal Antoine fit extrapolated beyond valid_range_K" in warning
         for warning in antoine_warnings
     )
 
-    in_range_extrapolations: dict[str, dict[str, object]] = {}
-    in_range_warnings: list[str] = []
-    in_range_pressure = condensation._wall_deposition_driving_pressure_pa(
+    # SiO standard-reaction term: no pure wall Antoine, no false extrapolation
+    # telemetry, and non-reactive driving pressure is zero without a product
+    # backstop (documented; not a silent pure-SiO Psat).
+    sio_range = condensation.VAPOR_PRESSURE_DATA["oxide_vapors"]["SiO"][
+        "valid_range_K"
+    ]
+    assert sio_range == [1400, 2273.15]
+    sio_extrap: dict[str, dict[str, object]] = {}
+    sio_warns: list[str] = []
+    sio_pressure = condensation._wall_deposition_driving_pressure_pa(
         "SiO",
         local_pressure_pa,
-        1500.0,
+        1173.15,
         reactive_product_backstop=False,
-        antoine_extrapolations=in_range_extrapolations,
-        antoine_extrapolation_warnings=in_range_warnings,
+        antoine_extrapolations=sio_extrap,
+        antoine_extrapolation_warnings=sio_warns,
     )
-
-    assert in_range_pressure >= 0.0
-    assert in_range_extrapolations == {}
-    assert in_range_warnings == []
+    assert sio_pressure == 0.0
+    assert sio_extrap == {}
+    assert sio_warns == []
 
 
 def test_antoine_extrapolation_records_count_same_species_stage_and_wall():
@@ -159,9 +168,11 @@ def test_antoine_extrapolation_records_count_same_species_stage_and_wall():
 
 
 def test_wall_deposition_flux_telemetry_keeps_applied_flux_identical():
-    T_wall_K = 1173.15
+    # Use Ca pure-component rail (has wall Antoine). SiO is a melt
+    # standard-reaction term without pure wall P_sat (see SiO row disposition).
+    T_wall_K = 1900.0
     kwargs = dict(
-        species="SiO",
+        species="Ca",
         P_local_pa=100.0,
         T_surface_K=T_wall_K,
         alpha_s=0.02,
@@ -183,7 +194,7 @@ def test_wall_deposition_flux_telemetry_keeps_applied_flux_identical():
     )
 
     assert instrumented_flux.hex() == baseline_flux.hex()
-    assert "SiO" in antoine_extrapolations
+    assert "Ca" in antoine_extrapolations
     assert antoine_warnings
 
 

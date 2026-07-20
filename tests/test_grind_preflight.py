@@ -254,18 +254,25 @@ def _write_pt1_store(
     *,
     source: str = "vaporock",
 ) -> None:
+    # Compose cache-design PT-1 keys use selection + payload authority (not the
+    # legacy key.vapor_pressure_provider blob alone). Emit both so the
+    # selection/authority mismatch gate and the vaporock rejection remain
+    # independently exercisable.
+    provider = {
+        "resolved_provider_id": source,
+        "authoritative_provider_id": source,
+    }
     key = {
         "schema_version": "pt1-test-key",
         "corpus_version": "test-corpus",
         "data_digests": {},
-        "vapor_pressure_provider": {
-            "resolved_provider_id": source,
-            "authoritative_provider_id": source,
-        },
+        "vapor_pressure_provider_selection": source,
+        "vapor_pressure_provider": provider,
     }
     payload = {
         "equilibrium_result": {},
         "last_vapor_pressures_source": {"Na": source, "SiO": source},
+        "authority": {"vapor_pressure": provider},
     }
     with sqlite3.connect(db_path) as conn:
         conn.execute(
@@ -353,6 +360,61 @@ def test_strict_vapor_source_report_rejects_extrapolated_mg() -> None:
 
     with pytest.raises(GrindSourceGateError, match="pure_component_extrapolated"):
         assert_strict_vapor_source_report(report, context="stored-result")
+
+
+def test_strict_vapor_source_report_rejects_extrapolated_sio_even_with_authoritative_head() -> None:
+    """Hostile construction: head approved but extrapolation suffix must fail.
+
+    SiO's source-validated domain is now [1400, 2273.15] K (Bug A fix3 branch a),
+    so live runtime no longer emits this suffix inside the process envelope.
+    The grind gate must still reject the token if any species carries it —
+    a consumer that strips to the head would fail-open.
+    """
+    source = (
+        "builtin_authoritative:standard_reaction_term:"
+        "extrapolated_beyond_valid_range_K"
+    )
+    report = {
+        "species": {"SiO": source},
+        "summary": {source: {"count": 1, "percentage": 100.0}},
+        "total_species": 1,
+    }
+
+    with pytest.raises(
+        GrindSourceGateError,
+        match="extrapolated_beyond_valid_range_K",
+    ):
+        assert_strict_vapor_source_report(report, context="stored-result")
+
+
+def test_strict_vapor_source_report_rejects_demoted_extrapolated_sio() -> None:
+    """Demoted extrapolation head remains noncertifying for any species."""
+    source = (
+        "builtin_extrapolation_limited:standard_reaction_term:"
+        "extrapolated_beyond_valid_range_K"
+    )
+    report = {
+        "species": {"SiO": source},
+        "summary": {source: {"count": 1, "percentage": 100.0}},
+        "total_species": 1,
+    }
+
+    with pytest.raises(GrindSourceGateError, match="builtin_extrapolation_limited"):
+        assert_strict_vapor_source_report(report, context="stored-result")
+
+
+def test_strict_vapor_source_report_accepts_in_domain_sio_standard_term() -> None:
+    """In-domain SiO standard term (incl. 2023.15 K after domain extension)."""
+    source = "builtin_authoritative:standard_reaction_term"
+    report = {
+        "species": {"SiO": source},
+        "summary": {source: {"count": 1, "percentage": 100.0}},
+        "total_species": 1,
+    }
+
+    summary = assert_strict_vapor_source_report(report, context="stored-result")
+    assert summary["total_species"] == 1
+    assert summary["summary"]["builtin_authoritative"] >= 1
 
 
 def test_strict_vapor_result_store_rejects_builtin_fallback_report(

@@ -4203,23 +4203,30 @@ def _wall_deposition_driving_pressure_pa(
                 f'for CrO2, got {species!r}'
             )
         return max(0.0, local_pressure_pa)
-    if P_sat_pa is None or not math.isfinite(P_sat_pa):
-        return 0.0
+    reactivity_class = None
     if reactive_product_backstop:
         reactivity_class = _sticking_reactivity_class(species)
+        if reactivity_class == 'reactive' and species != 'SiO':
+            raise ValueError(
+                'reactive wall-product backstop is C4b-authorized only '
+                f'for SiO, got {species!r}'
+            )
+    if P_sat_pa is None or not math.isfinite(P_sat_pa):
         if reactivity_class == 'reactive':
-            if species != 'SiO':
-                raise ValueError(
-                    'reactive wall-product backstop is C4b-authorized only '
-                    f'for SiO, got {species!r}'
-                )
-            if P_sat_pa < local_pressure_pa:
-                return max(0.0, local_pressure_pa - P_sat_pa)
-            # Reactive deposits are less-volatile wall products, not the vapor
-            # species. Today SiO uses the disproportionation-product limit
-            # P_sat ~= 0; this explicit hook can grow a real product P_sat later.
-            effective_product_psat_pa = 0.0
-            return max(0.0, local_pressure_pa - effective_product_psat_pa)
+            # SiO has a melt standard-reaction pressure, not a stable pure-SiO
+            # wall P_sat. Its authorized wall product is disproportionated
+            # Si/SiO2 with the existing first-order P_sat ~= 0 backstop, so the
+            # full local SiO pressure remains the deposition driving pressure.
+            return max(0.0, local_pressure_pa)
+        return 0.0
+    if reactivity_class == 'reactive':
+        if P_sat_pa < local_pressure_pa:
+            return max(0.0, local_pressure_pa - P_sat_pa)
+        # Reactive deposits are less-volatile wall products, not the vapor
+        # species. Today SiO uses the disproportionation-product limit
+        # P_sat ~= 0; this explicit hook can grow a real product P_sat later.
+        effective_product_psat_pa = 0.0
+        return max(0.0, local_pressure_pa - effective_product_psat_pa)
     return max(0.0, local_pressure_pa - P_sat_pa)
 
 
