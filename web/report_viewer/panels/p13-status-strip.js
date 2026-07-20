@@ -59,11 +59,18 @@
       : hasNumber(redox.ferric_frac) || hasNumber(redox.ferrous_frac)
         ? `Ferric ${numberText(redox.ferric_frac)} · ferrous ${numberText(redox.ferrous_frac)}`
         : "Fe split not emitted";
-    const nativeState = hasNumber(redox.native_fe_frac) || (redox.status !== undefined && redox.status !== null && redox.status !== "")
-      ? `Native Fe ${numberText(redox.native_fe_frac)} · ${scalarValue(redox.status, "status not emitted")}`
+    const nativeEvent = isObject(redox.native_fe_saturation_event)
+      ? redox.native_fe_saturation_event
+      : null;
+    const nativeState = hasNumber(redox.native_fe_frac) || nativeEvent
+      ? `Native Fe ${numberText(redox.native_fe_frac)} · event status${nativeEvent
+        ? `: ${scalarValue(nativeEvent.native_fe_event_status)}`
+        : " not emitted"}${nativeEvent && hasOwn(nativeEvent, "native_fe_event_reason")
+        ? ` · event reason: ${scalarValue(nativeEvent.native_fe_event_reason)}`
+        : ""}`
       : "Native Fe state not emitted";
     const metadata = [
-      ["Status", "status"],
+      ["Redox diagnostic status", "status"],
       ["Source", "source"],
       ["Reference", "reference"],
       ["Skip reason", "skip_reason"],
@@ -71,10 +78,19 @@
     ].filter(([, key]) => hasOwn(redox, key))
       .map(([label, key]) => detailRow(label, scalarValue(redox[key])))
       .join("");
+    const nativeMetadata = nativeEvent
+      ? [
+          ["Native Fe event", "native_fe_event"],
+          ["Native Fe event status", "native_fe_event_status"],
+          ["Native Fe event reason", "native_fe_event_reason"]
+        ].filter(([, key]) => hasOwn(nativeEvent, key))
+          .map(([label, key]) => detailRow(label, scalarValue(nativeEvent[key])))
+          .join("")
+      : "";
 
     return `<article class="sec-p13-tile sec-p13-redox" aria-labelledby="sec-p13-redox-title">
       <div class="sec-p13-tile-title" id="sec-p13-redox-title">Melt redox</div>
-      <div class="sec-p13-headline">log fO₂ ${numberText(redox.fO2_log)} <span aria-hidden="true">·</span> ΔIW ${numberText(redox.iw_log)}</div>
+      <div class="sec-p13-headline">log fO₂ ${numberText(redox.fO2_log)} <span aria-hidden="true">·</span> IW buffer log fO₂ ${numberText(redox.iw_log)} <span aria-hidden="true">·</span> ΔIW not emitted</div>
       <div class="sec-p13-fact">${ratio}</div>
       <div class="sec-p13-fact">${nativeState}</div>
       <div class="sec-p13-chip-row" aria-label="Emitted redox authority and uncertainty flags">${redoxAuthorityChips(redox)}</div>
@@ -82,11 +98,13 @@
         <summary>Redox detail</summary>
         <dl>
           ${detailRow("log fO₂", numberText(redox.fO2_log))}
-          ${detailRow("ΔIW", numberText(redox.iw_log))}
+          ${detailRow("IW buffer log fO₂", numberText(redox.iw_log))}
+          ${detailRow("ΔIW", "not emitted")}
           ${detailRow("Fe³⁺/ΣFe", numberText(redox.fe3_over_sigma_fe))}
           ${detailRow("Ferric fraction", numberText(redox.ferric_frac))}
           ${detailRow("Ferrous fraction", numberText(redox.ferrous_frac))}
           ${detailRow("Native Fe fraction", numberText(redox.native_fe_frac))}
+          ${nativeMetadata}
           ${metadata}
         </dl>
       </details>
@@ -128,22 +146,59 @@
     </article>`;
   }
 
-  function derivedVoltageDetail(value) {
+  function voltageMetadata(diagnostic, species) {
+    const speciesRows = isObject(diagnostic.species) ? diagnostic.species : null;
+    const speciesRow = speciesRows && isObject(speciesRows[species]) ? speciesRows[species] : null;
+    if (speciesRow
+      && hasOwn(speciesRow, "voltage_authority")
+      && hasOwn(speciesRow, "voltage_authoritative")
+      && hasOwn(speciesRow, "status")) {
+      return {
+        authority: speciesRow.voltage_authority,
+        authoritative: speciesRow.voltage_authoritative,
+        status: speciesRow.status
+      };
+    }
+    const fallbackRows = isObject(diagnostic.non_authoritative_voltage_by_oxide)
+      ? diagnostic.non_authoritative_voltage_by_oxide
+      : null;
+    const fallbackRow = fallbackRows && isObject(fallbackRows[species])
+      ? fallbackRows[species]
+      : null;
+    return fallbackRow
+      && hasOwn(fallbackRow, "authority")
+      && hasOwn(fallbackRow, "authoritative")
+      && hasOwn(fallbackRow, "status")
+      ? fallbackRow
+      : null;
+  }
+
+  function derivedVoltageDetail(diagnostic) {
+    const value = diagnostic.derived_Ed_V;
     if (value === undefined || value === null) return "not emitted";
-    if (hasNumber(value)) return numberText(value, "V");
+    if (hasNumber(value)) return "voltage withheld; per-species authority/status not emitted";
     if (!isObject(value)) return `malformed diagnostic value (${esc(typeof value)})`;
     const entries = Object.entries(value);
     if (!entries.length) return "not emitted";
-    return entries.map(([species, voltage]) =>
-      `${esc(prettySpecies(species))}: ${numberText(voltage, "V")}`
-    ).join("<br>");
+    return entries.map(([species, voltage]) => {
+      const label = esc(prettySpecies(species));
+      if (!hasNumber(voltage)) return `${label}: ${numberText(voltage, "V")}`;
+      const emittedMetadata = voltageMetadata(diagnostic, species);
+      if (!emittedMetadata) {
+        return `${label}: voltage withheld; per-species authority/status not emitted`;
+      }
+      return `${label}: ${numberText(voltage, "V")}`
+        + ` · voltage authority: ${scalarValue(emittedMetadata.authority)}`
+        + ` · voltage authoritative: ${scalarValue(emittedMetadata.authoritative)}`
+        + ` · voltage status: ${scalarValue(emittedMetadata.status)}`;
+    }).join("<br>");
   }
 
   function diagnosticMetadata(diagnostic, failed) {
     const voltageRows = failed
       ? detailRow("Voltage evidence", "withheld because the emitted diagnostic status reports failure")
       : detailRow("Declared rung", numberText(diagnostic.declared_rung_V, "V"))
-        + detailRow("Derived Ed", derivedVoltageDetail(diagnostic.derived_Ed_V));
+        + detailRow("Derived Ed", derivedVoltageDetail(diagnostic));
     const metadata = [
       ["Authority", "authority"],
       ["Status", "status"],
