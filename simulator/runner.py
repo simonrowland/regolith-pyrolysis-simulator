@@ -36,6 +36,8 @@ import json
 import math
 import subprocess
 import sys
+import threading
+import weakref
 from collections import Counter
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -1786,24 +1788,88 @@ def _project_wall_deposition_shadow_to_output(
     return projected
 
 
+@dataclass(frozen=True)
+class _WallDepositCumulativeCache:
+    snapshots: object
+    snapshot: HourSnapshot
+    index: int
+    cumulative: dict[tuple[str, str], float]
+
+
+_WALL_DEPOSIT_CUMULATIVE_CACHE: weakref.WeakKeyDictionary[
+    PyrolysisSimulator, _WallDepositCumulativeCache
+] = weakref.WeakKeyDictionary()
+_WALL_DEPOSIT_CUMULATIVE_CACHE_LOCK = threading.Lock()
+
+
 def _wall_deposit_cumulative_kg_at_snapshot(
     sim: PyrolysisSimulator,
     snapshot: HourSnapshot,
 ) -> dict[str, dict[str, float]]:
+    record = getattr(sim, "record", None)
+    snapshots = getattr(record, "snapshots", ()) or ()
+    try:
+        with _WALL_DEPOSIT_CUMULATIVE_CACHE_LOCK:
+            cached = _WALL_DEPOSIT_CUMULATIVE_CACHE.get(sim)
+            if cached is not None and cached.snapshots is snapshots:
+                # Live-run invariant: core appends a finalized HourSnapshot
+                # before SimSession projects its summary; earlier deltas are
+                # append-only. Out-of-order requests miss this fast path and
+                # rebuild from the authoritative snapshot sequence below.
+                if cached.snapshot is snapshot:
+                    cumulative = dict(cached.cumulative)
+                    return _nested_species_kg_from_segment_species(cumulative)
+                next_index = cached.index + 1
+                if (
+                    0 <= next_index < len(snapshots)
+                    and snapshots[next_index] is snapshot
+                ):
+                    cumulative = dict(cached.cumulative)
+                    for key, kg in (
+                        snapshot.wall_deposit_by_segment_species_delta.items()
+                    ):
+                        cumulative[key] = cumulative.get(key, 0.0) + float(kg)
+                    _WALL_DEPOSIT_CUMULATIVE_CACHE[sim] = (
+                        _WallDepositCumulativeCache(
+                            snapshots=snapshots,
+                            snapshot=snapshot,
+                            index=next_index,
+                            cumulative=cumulative,
+                        )
+                    )
+                    return _nested_species_kg_from_segment_species(cumulative)
+    except TypeError:
+        # Preserve support for unhashable simulator-like test doubles.
+        cached = None
+
     cumulative: dict[tuple[str, str], float] = {}
-    snapshots = tuple(getattr(getattr(sim, "record", None), "snapshots", ()) or ())
     found_snapshot = False
-    for item in snapshots:
+    found_index = -1
+    for index, item in enumerate(snapshots):
         if int(getattr(item, "hour", -1)) > int(snapshot.hour):
             break
         for key, kg in item.wall_deposit_by_segment_species_delta.items():
             cumulative[key] = cumulative.get(key, 0.0) + float(kg)
         if item is snapshot:
             found_snapshot = True
+            found_index = index
             break
     if not found_snapshot and snapshot not in snapshots:
         for key, kg in snapshot.wall_deposit_by_segment_species_delta.items():
             cumulative[key] = cumulative.get(key, 0.0) + float(kg)
+    if found_snapshot:
+        try:
+            with _WALL_DEPOSIT_CUMULATIVE_CACHE_LOCK:
+                _WALL_DEPOSIT_CUMULATIVE_CACHE[sim] = (
+                    _WallDepositCumulativeCache(
+                        snapshots=snapshots,
+                        snapshot=snapshot,
+                        index=found_index,
+                        cumulative=dict(cumulative),
+                    )
+                )
+        except TypeError:
+            pass
     return _nested_species_kg_from_segment_species(cumulative)
 
 

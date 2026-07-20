@@ -1,0 +1,395 @@
+{
+  "artifact_bytes": 553271,
+  "artifact_file_bytes": 815313,
+  "artifact_file_sha256": "a14502a4d700aadfddc8aa0bcce4c515c335516ba0dbe7abd8cb5cc98a405f0c",
+  "artifact_sha256": "a784e249c1e8cae16c6648c9cdff9a668c5ddb44826d2a89c1cb97435fcf8169",
+  "campaigns": [
+    "C0",
+    "C0B",
+    "C2A_STAGED",
+    "C3_NA",
+    "C4",
+    "C6"
+  ],
+  "cprofile_top": [
+    {
+      "calls": 5,
+      "cumulative_s": 73.768243626,
+      "function": "events.py:1994:run_loop",
+      "primitive_calls": 4,
+      "self_s": 0.001282589
+    },
+    {
+      "calls": 307,
+      "cumulative_s": 73.76163504600001,
+      "function": "profile_live_web.py:78:wrapper",
+      "primitive_calls": 265,
+      "self_s": 0.005227444
+    },
+    {
+      "calls": 80,
+      "cumulative_s": 72.809913584,
+      "function": "session.py:662:drive_session",
+      "primitive_calls": 79,
+      "self_s": 0.00014586700000000002
+    },
+    {
+      "calls": 40,
+      "cumulative_s": 72.809697793,
+      "function": "session.py:377:advance",
+      "primitive_calls": 39,
+      "self_s": 0.000353341
+    },
+    {
+      "calls": 40,
+      "cumulative_s": 72.749423127,
+      "function": "core.py:11453:step",
+      "primitive_calls": 39,
+      "self_s": 0.000669971
+    },
+    {
+      "calls": 40,
+      "cumulative_s": 67.45748174500001,
+      "function": "core.py:11509:_step_one_hour",
+      "primitive_calls": 39,
+      "self_s": 0.005330784000000001
+    },
+    {
+      "calls": 458,
+      "cumulative_s": 61.966975163,
+      "function": "core.py:1831:_dispatch_only",
+      "primitive_calls": 458,
+      "self_s": 0.001372004
+    },
+    {
+      "calls": 458,
+      "cumulative_s": 61.964708358,
+      "function": "planner.py:479:dispatch",
+      "primitive_calls": 458,
+      "self_s": 0.001369952
+    },
+    {
+      "calls": 457,
+      "cumulative_s": 61.963096762000006,
+      "function": "planner.py:595:_dispatch_through_provider",
+      "primitive_calls": 457,
+      "self_s": 0.006571656
+    },
+    {
+      "calls": 40,
+      "cumulative_s": 57.567665418000004,
+      "function": "core.py:4054:_establish_melt_redox_gate_authority_for_current_hour",
+      "primitive_calls": 39,
+      "self_s": 0.000141124
+    },
+    {
+      "calls": 40,
+      "cumulative_s": 57.567488835000006,
+      "function": "core.py:4093:_melt_redox_liquidus_gate_curve",
+      "primitive_calls": 39,
+      "self_s": 0.000810788
+    },
+    {
+      "calls": 10,
+      "cumulative_s": 57.561573165000006,
+      "function": "evaporation.py:769:_freeze_gate_curve",
+      "primitive_calls": 10,
+      "self_s": 0.000140454
+    },
+    {
+      "calls": 10,
+      "cumulative_s": 57.560251333000004,
+      "function": "evaporation.py:1078:_freeze_gate_curve_from_gate_dispatch",
+      "primitive_calls": 10,
+      "self_s": 0.000190282
+    },
+    {
+      "calls": 10,
+      "cumulative_s": 57.55643271,
+      "function": "provider.py:138:dispatch",
+      "primitive_calls": 10,
+      "self_s": 0.0005436200000000001
+    },
+    {
+      "calls": 445,
+      "cumulative_s": 57.320559041,
+      "function": "connection.py:253:poll",
+      "primitive_calls": 445,
+      "self_s": 0.000667872
+    },
+    {
+      "calls": 445,
+      "cumulative_s": 57.319799404,
+      "function": "connection.py:439:_poll",
+      "primitive_calls": 445,
+      "self_s": 0.001373286
+    },
+    {
+      "calls": 445,
+      "cumulative_s": 57.318426118000005,
+      "function": "connection.py:1122:wait",
+      "primitive_calls": 445,
+      "self_s": 0.0036025220000000004
+    },
+    {
+      "calls": 447,
+      "cumulative_s": 57.31099428700001,
+      "function": "selectors.py:402:select",
+      "primitive_calls": 447,
+      "self_s": 0.004044746
+    },
+    {
+      "calls": 447,
+      "cumulative_s": 57.306325078,
+      "function": "~:0:<method 'poll' of 'select.poll' objects>",
+      "primitive_calls": 447,
+      "self_s": 57.306325078
+    },
+    {
+      "calls": 10,
+      "cumulative_s": 56.818713210000006,
+      "function": "provider.py:461:_run_liquidus_finder",
+      "primitive_calls": 10,
+      "self_s": 0.000141796
+    },
+    {
+      "calls": 10,
+      "cumulative_s": 56.81856787500001,
+      "function": "magemin.py:648:find_liquidus_solidus",
+      "primitive_calls": 10,
+      "self_s": 0.000142749
+    },
+    {
+      "calls": 10,
+      "cumulative_s": 56.818232333000005,
+      "function": "liquidus.py:217:find_liquidus_solidus_by_fraction",
+      "primitive_calls": 10,
+      "self_s": 0.000488455
+    },
+    {
+      "calls": 444,
+      "cumulative_s": 56.81708925900001,
+      "function": "liquidus.py:321:sample",
+      "primitive_calls": 444,
+      "self_s": 0.0031339370000000003
+    },
+    {
+      "calls": 444,
+      "cumulative_s": 56.804246161,
+      "function": "liquidus.py:792:_invoke_sample_fraction",
+      "primitive_calls": 444,
+      "self_s": 0.0023665220000000002
+    },
+    {
+      "calls": 444,
+      "cumulative_s": 56.783161037000006,
+      "function": "magemin.py:711:sample_fraction",
+      "primitive_calls": 444,
+      "self_s": 0.0014893270000000001
+    },
+    {
+      "calls": 444,
+      "cumulative_s": 56.781409974000006,
+      "function": "magemin.py:395:equilibrate",
+      "primitive_calls": 444,
+      "self_s": 0.008508832000000001
+    },
+    {
+      "calls": 444,
+      "cumulative_s": 56.698870756000005,
+      "function": "magemin.py:1023:_call_magemin",
+      "primitive_calls": 444,
+      "self_s": 0.006371533
+    },
+    {
+      "calls": 444,
+      "cumulative_s": 56.652167552,
+      "function": "engine_pool.py:243:call",
+      "primitive_calls": 444,
+      "self_s": 0.0027391990000000003
+    },
+    {
+      "calls": 2569,
+      "cumulative_s": 5.595101582000001,
+      "function": "<frozen importlib._bootstrap>:1349:_find_and_load",
+      "primitive_calls": 31,
+      "self_s": 0.009367479
+    },
+    {
+      "calls": 2515,
+      "cumulative_s": 5.591618125,
+      "function": "<frozen importlib._bootstrap>:1304:_find_and_load_unlocked",
+      "primitive_calls": 20,
+      "self_s": 0.013617651000000001
+    },
+    {
+      "calls": 2442,
+      "cumulative_s": 5.583625921,
+      "function": "<frozen importlib._bootstrap>:911:_load_unlocked",
+      "primitive_calls": 19,
+      "self_s": 0.018280406000000003
+    },
+    {
+      "calls": 2249,
+      "cumulative_s": 5.583161499,
+      "function": "<frozen importlib._bootstrap_external>:993:exec_module",
+      "primitive_calls": 19,
+      "self_s": 0.0062918110000000005
+    },
+    {
+      "calls": 5700,
+      "cumulative_s": 5.580071997,
+      "function": "<frozen importlib._bootstrap>:480:_call_with_frames_removed",
+      "primitive_calls": 38,
+      "self_s": 0.0049389080000000005
+    },
+    {
+      "calls": 2709,
+      "cumulative_s": 5.579209081,
+      "function": "~:0:<built-in method builtins.exec>",
+      "primitive_calls": 19,
+      "self_s": 0.049405045
+    },
+    {
+      "calls": 70,
+      "cumulative_s": 5.548344458000001,
+      "function": "__init__.py:73:import_module",
+      "primitive_calls": 18,
+      "self_s": 7.6294e-05
+    },
+    {
+      "calls": 70,
+      "cumulative_s": 5.548320666,
+      "function": "<frozen importlib._bootstrap>:1375:_gcd_import",
+      "primitive_calls": 18,
+      "self_s": 5.0376e-05
+    },
+    {
+      "calls": 9,
+      "cumulative_s": 5.498309706000001,
+      "function": "liquidus.py:553:_bisect_liquidus",
+      "primitive_calls": 9,
+      "self_s": 4.4329e-05
+    },
+    {
+      "calls": 39,
+      "cumulative_s": 5.334003084,
+      "function": "core.py:11380:_snapshot_terminal_refusal_hour_state",
+      "primitive_calls": 39,
+      "self_s": 0.001269717
+    },
+    {
+      "calls": 39,
+      "cumulative_s": 5.321052709,
+      "function": "core.py:57:_deepcopy_refusal_state",
+      "primitive_calls": 39,
+      "self_s": 0.000323456
+    },
+    {
+      "calls": 9,
+      "cumulative_s": 5.301508708,
+      "function": "liquidus.py:531:_bisect_solidus",
+      "primitive_calls": 9,
+      "self_s": 4.3543e-05
+    }
+  ],
+  "event_counts": {
+    "campaign_complete_summary": 6,
+    "decision_required": 3,
+    "per_hour_summary": 39,
+    "simulation_complete": 1,
+    "simulation_status": 18,
+    "simulation_tick": 39
+  },
+  "events_bytes": 2270805,
+  "events_sha256": "8256bb93093c5b14f02b26b2933bd69cfb76e2dcfeeac212290e5af9aded165c",
+  "hours": 39,
+  "scenario": {
+    "backend": "internal-analytical",
+    "feedstock": "lunar_mare_low_ti",
+    "mass_kg": 1000.0,
+    "setpoint_overrides": {
+      "C0": {
+        "max_hours": 1.0,
+        "ramp_rate": 2000.0
+      },
+      "C0B": {
+        "max_hours": 1.0,
+        "ramp_rate": 2000.0
+      },
+      "C2A": {
+        "max_hours": 1.0,
+        "ramp_rate": 2000.0
+      },
+      "C2B": {
+        "max_hours": 1.0,
+        "ramp_rate": 2000.0
+      },
+      "C3_K": {
+        "max_hours": 1.0,
+        "ramp_rate": 2000.0
+      },
+      "C3_NA": {
+        "max_hours": 1.0,
+        "ramp_rate": 2000.0
+      },
+      "C4": {
+        "ramp_rate": 2000.0
+      },
+      "C5": {
+        "ramp_rate": 2000.0
+      }
+    },
+    "track": "pyrolysis"
+  },
+  "socket_packet_count": 106,
+  "socket_packet_stream_bytes": 2268896,
+  "socket_packet_stream_sha256": "c07ccf9c0942eda1deba7bda0d5b0afa42483d8e1b532af2c57dd029ffa278ae",
+  "timers": {
+    "artifact.save": {
+      "calls": 1,
+      "wall_s": 0.07476887502707541
+    },
+    "core.step": {
+      "calls": 39,
+      "wall_s": 72.79918925126549
+    },
+    "socket.emit": {
+      "calls": 106,
+      "wall_s": 0.11330462718615308
+    },
+    "socket.packet_encode": {
+      "calls": 106,
+      "wall_s": 0.012806383252609521
+    },
+    "summary.build": {
+      "calls": 39,
+      "wall_s": 0.05450550396926701
+    },
+    "summary.wall_cumulative": {
+      "calls": 39,
+      "wall_s": 0.0013649569009430707
+    },
+    "web.completion_payload": {
+      "calls": 1,
+      "wall_s": 0.1566099170013331
+    },
+    "web.full_runner_payload": {
+      "calls": 1,
+      "wall_s": 0.030442042043432593
+    },
+    "web.persist_terminal": {
+      "calls": 1,
+      "wall_s": 0.1265297089703381
+    },
+    "web.recipe_capture": {
+      "calls": 40,
+      "wall_s": 0.1476677519385703
+    },
+    "web.tick_payload": {
+      "calls": 39,
+      "wall_s": 0.4091859577456489
+    }
+  },
+  "wall_s": 76.4807741669938
+}

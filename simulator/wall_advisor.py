@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from functools import lru_cache
 import math
 from dataclasses import dataclass
 from pathlib import Path
@@ -237,7 +238,42 @@ class WallMaterialAssessment:
     operating_point: WallOperatingPoint
 
 
+def _wall_materials_cache_key(path: Path | str) -> tuple[str, int, int, int, int]:
+    resolved = Path(path).resolve()
+    stat = resolved.stat()
+    return (
+        str(resolved),
+        stat.st_ino,
+        stat.st_mtime_ns,
+        stat.st_ctime_ns,
+        stat.st_size,
+    )
+
+
+@lru_cache(maxsize=16)
+def _load_wall_materials_cached(
+    resolved_path: str,
+    _inode: int,
+    _mtime_ns: int,
+    _ctime_ns: int,
+    _size: int,
+) -> dict[str, Any]:
+    """Reuse a bundled material revision after its first completed parse."""
+    with Path(resolved_path).open() as handle:
+        data = yaml.safe_load(handle)
+    if not isinstance(data, dict) or not isinstance(data.get("materials"), dict):
+        raise ValueError(f"wall materials data is malformed: {resolved_path}")
+    return data
+
+
+def _wall_materials_data(path: Path | str) -> dict[str, Any]:
+    if Path(path).resolve() != DEFAULT_WALL_MATERIALS_PATH.resolve():
+        return load_wall_materials(path)
+    return _load_wall_materials_cached(*_wall_materials_cache_key(path))
+
+
 def load_wall_materials(path: Path | str = DEFAULT_WALL_MATERIALS_PATH) -> dict[str, Any]:
+    """Load a detached mutable copy of the selected wall-material dataset."""
     with Path(path).open() as handle:
         data = yaml.safe_load(handle)
     if not isinstance(data, dict) or not isinstance(data.get("materials"), dict):
@@ -266,7 +302,9 @@ def advise_wall_materials(
         p_buffer_mbar=p_buffer_mbar,
     )
     species = _normalize_active_species(active_species)
-    data = load_wall_materials(data_path)
+    # The advisor is read-only. Reuse the parsed revision across all three
+    # zones and hourly web ticks instead of reparsing identical YAML 3x/hour.
+    data = _wall_materials_data(data_path)
     reactive_exchange = data.get("reactive_exchange") or {}
     assessments = []
     for material_id, entry in data["materials"].items():

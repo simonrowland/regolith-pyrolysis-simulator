@@ -1,0 +1,395 @@
+{
+  "artifact_bytes": 553271,
+  "artifact_file_bytes": 815313,
+  "artifact_file_sha256": "a14502a4d700aadfddc8aa0bcce4c515c335516ba0dbe7abd8cb5cc98a405f0c",
+  "artifact_sha256": "a784e249c1e8cae16c6648c9cdff9a668c5ddb44826d2a89c1cb97435fcf8169",
+  "campaigns": [
+    "C0",
+    "C0B",
+    "C2A_STAGED",
+    "C3_NA",
+    "C4",
+    "C6"
+  ],
+  "cprofile_top": [
+    {
+      "calls": 5,
+      "cumulative_s": 95.20799975,
+      "function": "events.py:1994:run_loop",
+      "primitive_calls": 4,
+      "self_s": 0.001858442
+    },
+    {
+      "calls": 307,
+      "cumulative_s": 95.18835142100001,
+      "function": "profile_live_web.py:78:wrapper",
+      "primitive_calls": 265,
+      "self_s": 0.004711522
+    },
+    {
+      "calls": 80,
+      "cumulative_s": 79.155003924,
+      "function": "session.py:662:drive_session",
+      "primitive_calls": 79,
+      "self_s": 0.000164086
+    },
+    {
+      "calls": 40,
+      "cumulative_s": 79.15477550700001,
+      "function": "session.py:377:advance",
+      "primitive_calls": 39,
+      "self_s": 0.00038293100000000004
+    },
+    {
+      "calls": 40,
+      "cumulative_s": 79.049293253,
+      "function": "core.py:11453:step",
+      "primitive_calls": 39,
+      "self_s": 0.000699507
+    },
+    {
+      "calls": 40,
+      "cumulative_s": 68.724972913,
+      "function": "core.py:11509:_step_one_hour",
+      "primitive_calls": 39,
+      "self_s": 0.005951958
+    },
+    {
+      "calls": 458,
+      "cumulative_s": 61.099335375,
+      "function": "core.py:1831:_dispatch_only",
+      "primitive_calls": 458,
+      "self_s": 0.004121484
+    },
+    {
+      "calls": 458,
+      "cumulative_s": 61.094203588000006,
+      "function": "planner.py:479:dispatch",
+      "primitive_calls": 458,
+      "self_s": 0.001513999
+    },
+    {
+      "calls": 457,
+      "cumulative_s": 61.09242016100001,
+      "function": "planner.py:595:_dispatch_through_provider",
+      "primitive_calls": 457,
+      "self_s": 0.00503383
+    },
+    {
+      "calls": 40,
+      "cumulative_s": 59.399007957,
+      "function": "core.py:4054:_establish_melt_redox_gate_authority_for_current_hour",
+      "primitive_calls": 39,
+      "self_s": 0.00012054700000000001
+    },
+    {
+      "calls": 40,
+      "cumulative_s": 59.398870205,
+      "function": "core.py:4093:_melt_redox_liquidus_gate_curve",
+      "primitive_calls": 39,
+      "self_s": 0.000893056
+    },
+    {
+      "calls": 10,
+      "cumulative_s": 59.393125333,
+      "function": "evaporation.py:769:_freeze_gate_curve",
+      "primitive_calls": 10,
+      "self_s": 0.00012471000000000002
+    },
+    {
+      "calls": 10,
+      "cumulative_s": 59.392087709,
+      "function": "evaporation.py:1078:_freeze_gate_curve_from_gate_dispatch",
+      "primitive_calls": 10,
+      "self_s": 0.00012171500000000001
+    },
+    {
+      "calls": 10,
+      "cumulative_s": 59.384148041,
+      "function": "provider.py:138:dispatch",
+      "primitive_calls": 10,
+      "self_s": 0.00030737900000000004
+    },
+    {
+      "calls": 445,
+      "cumulative_s": 59.13605324500001,
+      "function": "connection.py:253:poll",
+      "primitive_calls": 445,
+      "self_s": 0.00059007
+    },
+    {
+      "calls": 445,
+      "cumulative_s": 59.13536804100001,
+      "function": "connection.py:439:_poll",
+      "primitive_calls": 445,
+      "self_s": 0.0012894500000000001
+    },
+    {
+      "calls": 445,
+      "cumulative_s": 59.134078591000005,
+      "function": "connection.py:1122:wait",
+      "primitive_calls": 445,
+      "self_s": 0.003413394
+    },
+    {
+      "calls": 447,
+      "cumulative_s": 59.131074305000006,
+      "function": "selectors.py:402:select",
+      "primitive_calls": 447,
+      "self_s": 0.004162679
+    },
+    {
+      "calls": 447,
+      "cumulative_s": 59.126301288,
+      "function": "~:0:<method 'poll' of 'select.poll' objects>",
+      "primitive_calls": 447,
+      "self_s": 59.126301288
+    },
+    {
+      "calls": 10,
+      "cumulative_s": 58.852280916000005,
+      "function": "provider.py:461:_run_liquidus_finder",
+      "primitive_calls": 10,
+      "self_s": 0.000260211
+    },
+    {
+      "calls": 10,
+      "cumulative_s": 58.852016499,
+      "function": "magemin.py:648:find_liquidus_solidus",
+      "primitive_calls": 10,
+      "self_s": 0.000114666
+    },
+    {
+      "calls": 10,
+      "cumulative_s": 58.85170183100001,
+      "function": "liquidus.py:217:find_liquidus_solidus_by_fraction",
+      "primitive_calls": 10,
+      "self_s": 0.00043288200000000005
+    },
+    {
+      "calls": 444,
+      "cumulative_s": 58.850484784,
+      "function": "liquidus.py:321:sample",
+      "primitive_calls": 444,
+      "self_s": 0.0030048790000000002
+    },
+    {
+      "calls": 444,
+      "cumulative_s": 58.837632329,
+      "function": "liquidus.py:792:_invoke_sample_fraction",
+      "primitive_calls": 444,
+      "self_s": 0.002136338
+    },
+    {
+      "calls": 444,
+      "cumulative_s": 58.816307207,
+      "function": "magemin.py:711:sample_fraction",
+      "primitive_calls": 444,
+      "self_s": 0.0015506410000000002
+    },
+    {
+      "calls": 444,
+      "cumulative_s": 58.814493377000005,
+      "function": "magemin.py:395:equilibrate",
+      "primitive_calls": 444,
+      "self_s": 0.008546823
+    },
+    {
+      "calls": 444,
+      "cumulative_s": 58.730269178,
+      "function": "magemin.py:1023:_call_magemin",
+      "primitive_calls": 444,
+      "self_s": 0.006330889
+    },
+    {
+      "calls": 444,
+      "cumulative_s": 58.666379736,
+      "function": "engine_pool.py:243:call",
+      "primitive_calls": 444,
+      "self_s": 0.0025915820000000003
+    },
+    {
+      "calls": 200,
+      "cumulative_s": 20.651730294,
+      "function": "__init__.py:117:safe_load",
+      "primitive_calls": 200,
+      "self_s": 0.0005534930000000001
+    },
+    {
+      "calls": 200,
+      "cumulative_s": 20.651176801000002,
+      "function": "__init__.py:74:load",
+      "primitive_calls": 200,
+      "self_s": 0.050599431
+    },
+    {
+      "calls": 200,
+      "cumulative_s": 20.569556363,
+      "function": "constructor.py:47:get_single_data",
+      "primitive_calls": 200,
+      "self_s": 0.0005157800000000001
+    },
+    {
+      "calls": 200,
+      "cumulative_s": 19.782732879,
+      "function": "composer.py:29:get_single_node",
+      "primitive_calls": 200,
+      "self_s": 0.00053204
+    },
+    {
+      "calls": 200,
+      "cumulative_s": 19.763109008,
+      "function": "composer.py:50:compose_document",
+      "primitive_calls": 200,
+      "self_s": 0.000363672
+    },
+    {
+      "calls": 269455,
+      "cumulative_s": 19.761772088,
+      "function": "composer.py:63:compose_node",
+      "primitive_calls": 200,
+      "self_s": 0.48376305300000005
+    },
+    {
+      "calls": 28852,
+      "cumulative_s": 19.746708418,
+      "function": "composer.py:117:compose_mapping_node",
+      "primitive_calls": 200,
+      "self_s": 0.23673548000000003
+    },
+    {
+      "calls": 793620,
+      "cumulative_s": 18.081231514000002,
+      "function": "parser.py:94:check_event",
+      "primitive_calls": 793620,
+      "self_s": 0.43473119600000004
+    },
+    {
+      "calls": 2066067,
+      "cumulative_s": 14.6016022,
+      "function": "scanner.py:113:check_token",
+      "primitive_calls": 2066067,
+      "self_s": 1.09726927
+    },
+    {
+      "calls": 39,
+      "cumulative_s": 14.498211582000001,
+      "function": "events.py:1193:_tick_payload",
+      "primitive_calls": 39,
+      "self_s": 0.002648857
+    },
+    {
+      "calls": 39,
+      "cumulative_s": 14.468469661,
+      "function": "advisory.py:56:wall_advisory_payload",
+      "primitive_calls": 39,
+      "self_s": 0.003683646
+    },
+    {
+      "calls": 51,
+      "cumulative_s": 14.460808709,
+      "function": "wall_advisor.py:284:advise_wall_materials",
+      "primitive_calls": 51,
+      "self_s": 0.001952418
+    }
+  ],
+  "event_counts": {
+    "campaign_complete_summary": 6,
+    "decision_required": 3,
+    "per_hour_summary": 39,
+    "simulation_complete": 1,
+    "simulation_status": 18,
+    "simulation_tick": 39
+  },
+  "events_bytes": 2270805,
+  "events_sha256": "8256bb93093c5b14f02b26b2933bd69cfb76e2dcfeeac212290e5af9aded165c",
+  "hours": 39,
+  "scenario": {
+    "backend": "internal-analytical",
+    "feedstock": "lunar_mare_low_ti",
+    "mass_kg": 1000.0,
+    "setpoint_overrides": {
+      "C0": {
+        "max_hours": 1.0,
+        "ramp_rate": 2000.0
+      },
+      "C0B": {
+        "max_hours": 1.0,
+        "ramp_rate": 2000.0
+      },
+      "C2A": {
+        "max_hours": 1.0,
+        "ramp_rate": 2000.0
+      },
+      "C2B": {
+        "max_hours": 1.0,
+        "ramp_rate": 2000.0
+      },
+      "C3_K": {
+        "max_hours": 1.0,
+        "ramp_rate": 2000.0
+      },
+      "C3_NA": {
+        "max_hours": 1.0,
+        "ramp_rate": 2000.0
+      },
+      "C4": {
+        "ramp_rate": 2000.0
+      },
+      "C5": {
+        "ramp_rate": 2000.0
+      }
+    },
+    "track": "pyrolysis"
+  },
+  "socket_packet_count": 106,
+  "socket_packet_stream_bytes": 2268896,
+  "socket_packet_stream_sha256": "c07ccf9c0942eda1deba7bda0d5b0afa42483d8e1b532af2c57dd029ffa278ae",
+  "timers": {
+    "artifact.save": {
+      "calls": 1,
+      "wall_s": 0.32312583399470896
+    },
+    "core.step": {
+      "calls": 39,
+      "wall_s": 79.08379241806688
+    },
+    "socket.emit": {
+      "calls": 106,
+      "wall_s": 0.20174124994082376
+    },
+    "socket.packet_encode": {
+      "calls": 106,
+      "wall_s": 0.022575674229301512
+    },
+    "summary.build": {
+      "calls": 39,
+      "wall_s": 0.10121266701025888
+    },
+    "summary.wall_cumulative": {
+      "calls": 39,
+      "wall_s": 0.0028882089536637068
+    },
+    "web.completion_payload": {
+      "calls": 1,
+      "wall_s": 0.6214063339866698
+    },
+    "web.full_runner_payload": {
+      "calls": 1,
+      "wall_s": 0.1535257080104202
+    },
+    "web.persist_terminal": {
+      "calls": 1,
+      "wall_s": 0.573619749979116
+    },
+    "web.recipe_capture": {
+      "calls": 40,
+      "wall_s": 0.13900466781342402
+    },
+    "web.tick_payload": {
+      "calls": 39,
+      "wall_s": 14.498375752009451
+    }
+  },
+  "wall_s": 97.1893935839762
+}
