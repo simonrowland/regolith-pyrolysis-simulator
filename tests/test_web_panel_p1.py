@@ -363,15 +363,42 @@ def test_p1_surfaces_explicit_and_missing_authority_flags() -> None:
     )
     explicit_html = _render_panel(_artifact({"fe_redox_split": explicit}))
     missing = _core_redox()
-    for key in ("authoritative", "diagnostic_only", "extrapolation", "high_uncertainty"):
+    for key in (
+        "authoritative",
+        "diagnostic_only",
+        "extrapolation",
+        "high_uncertainty",
+        "status",
+        "source",
+        "reference",
+        "temperature_band_case",
+        "temperature_band_status",
+        "temperature_band_source",
+    ):
         missing.pop(key)
     missing_html = _render_panel(_artifact({"fe_redox_split": missing}))
+    no_iron = _core_redox(
+        status="no_iron",
+        source="none:no_iron",
+        reference="",
+        fe3_over_sigma_fe=0.0,
+        ferric_frac=0.0,
+        ferrous_frac=0.0,
+        native_fe_frac=0.0,
+    )
+    no_iron_html = _render_panel(_artifact({"fe_redox_split": no_iron}))
     explicit_terminal = _terminal_region(explicit_html)
     missing_terminal = _terminal_region(missing_html)
+    no_iron_terminal = _terminal_region(no_iron_html)
     explicit_flags = _flags_region(explicit_terminal)
     missing_flags = _flags_region(missing_terminal)
+    no_iron_flags = _flags_region(no_iron_terminal)
     authority = _table_region(
         explicit_terminal,
+        "Fe-redox authority and validity envelope",
+    )
+    missing_authority = _table_region(
+        missing_terminal,
         "Fe-redox authority and validity envelope",
     )
 
@@ -400,10 +427,28 @@ def test_p1_surfaces_explicit_and_missing_authority_flags() -> None:
     _assert_fact_value(authority, "Temperature-band case", "within_band")
     _assert_fact_value(authority, "Temperature-band status", "grounded")
     _assert_fact_value(authority, "Temperature-band source", "Kress91 basalt range")
+    _assert_chip_value(missing_flags, "Status", "not emitted", "sec-p1-flag-caution")
+    _assert_chip_value(missing_flags, "Source", "not emitted", "sec-p1-flag-caution")
+    _assert_chip_value(missing_flags, "Reference", "not emitted", "sec-p1-flag-caution")
     _assert_chip_value(missing_flags, "Authoritative", "not emitted", "sec-p1-flag-caution")
     _assert_chip_value(missing_flags, "Diagnostic only", "not emitted", "sec-p1-flag-caution")
     _assert_chip_value(missing_flags, "Extrapolation", "not emitted", "sec-p1-flag-caution")
     _assert_chip_value(missing_flags, "High uncertainty", "not emitted", "sec-p1-flag-caution")
+    _assert_fact_pending(missing_authority, "Status")
+    _assert_fact_pending(missing_authority, "Source")
+    _assert_fact_pending(missing_authority, "Reference")
+    _assert_fact_pending(missing_authority, "Temperature-band case")
+    _assert_fact_pending(missing_authority, "Temperature-band status")
+    _assert_fact_pending(missing_authority, "Temperature-band source")
+    # Non-ok status must be chip-visible without opening the disclosure (Grok F2).
+    _assert_chip_value(no_iron_flags, "Status", "no_iron", "sec-p1-flag-clear")
+    _assert_chip_value(no_iron_flags, "Source", "none:no_iron", "sec-p1-flag-clear")
+    _assert_chip_value(no_iron_flags, "Reference", "none emitted", "sec-p1-flag-caution")
+    # Chip body text (not only a title= attribute) must carry no_iron.
+    assert re.search(
+        r'<span class="chip sec-p1-flag [^"]*"[^>]*>Status · no_iron</span>',
+        no_iron_flags,
+    )
 
 
 def test_p1_null_empty_and_malformed_authority_metadata_are_distinct() -> None:
@@ -607,6 +652,19 @@ def test_p1_partial_inputs_never_drive_viewer_derivations() -> None:
     missing_native_terminal = _terminal_region(
         _render_panel(_artifact({"fe_redox_split": missing_native}))
     )
+    # Codex partial tuple: ingredients present, emitted fraction absent → never 0.2.
+    uncondensed_partial = _core_redox(
+        native_fe_partition={
+            "native_fe_pool_mol": 10.0,
+            "native_fe_uncondensed_mol": 2.0,
+        }
+    )
+    uncondensed_terminal = _terminal_region(
+        _render_panel(_artifact({"fe_redox_split": uncondensed_partial}))
+    )
+    uncondensed_partition = _table_region(
+        uncondensed_terminal, "Native Fe partition detail"
+    )
 
     _assert_metric_pending(terminal, "Fe³⁺ / ΣFe")
     _assert_metric_pending(terminal, "Ferrous fraction")
@@ -629,6 +687,12 @@ def test_p1_partial_inputs_never_drive_viewer_derivations() -> None:
         '<div class="k">Native Fe fraction</div><div class="v">0.2532</div>'
         not in missing_native_terminal
     )
+    _assert_fact_pending(uncondensed_partition, "Uncondensed fraction of native Fe pool")
+    assert (
+        '<th scope="row">Uncondensed fraction of native Fe pool</th><td>0.2</td>'
+        not in uncondensed_partition
+    )
+    assert ">0.2<" not in uncondensed_partition
     assert "IW-buffer log₁₀ fO₂ (absolute, not ΔIW)" in terminal
     assert ">2.5<" not in terminal
     assert "0.6421" not in terminal
