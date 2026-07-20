@@ -7,6 +7,7 @@
 
   const isMap = (value) => Boolean(value) && typeof value === "object" && !Array.isArray(value);
   const hasNumber = (value) => typeof value === "number" && Number.isFinite(value);
+  const isValidWtShare = (value) => hasNumber(value) && value >= 0 && value <= 100;
 
   function exact(value, unit = "") {
     if (value === undefined) return "not emitted";
@@ -35,13 +36,29 @@
     return known[value] || value.replaceAll("_", " ");
   }
 
-  function statusChip(label, value, extraClass = "") {
-    const rendered = value === undefined
+  // Status / mode / tier / source fields are non-empty strings at the emitter.
+  // Wrong types (boolean, number, null, object) are malformed, not claims.
+  function stringStatusValue(value) {
+    return readableStatus(value);
+  }
+
+  // Authority and fallback flags are real booleans at the emitter.
+  // Strings like "true"/"false" and other types are malformed, not coerced.
+  function booleanStatusValue(value) {
+    if (value === undefined) return "not emitted";
+    if (typeof value !== "boolean") return "malformed";
+    return value ? "true" : "false";
+  }
+
+  function statusChip(label, value, extraClass = "", kind = "string") {
+    const rendered = kind === "boolean"
+      ? booleanStatusValue(value)
+      : stringStatusValue(value);
+    const raw = value === undefined
       ? "not emitted"
-      : typeof value === "boolean"
-        ? (value ? "true" : "false")
-        : readableStatus(value);
-    const raw = value === undefined ? "not emitted" : value === null ? "malformed" : scalarText(value);
+      : value === null
+        ? "malformed"
+        : scalarText(value);
     return `<span class="chip sec-p2-chip ${extraClass}" title="${esc(raw)}"><b>${esc(label)}:</b> ${esc(rendered)}</span>`;
   }
 
@@ -50,12 +67,15 @@
       `<b>${esc(prettySpecies(species))}</b> ${exact(value, unit)}</span>`;
   }
 
+  // Inventory maps are non-negative mol amounts at the emitter. Negative amounts
+  // are malformed inventory, not measured data; exact zero is preserved.
   function mapTokens(
     value,
     unit,
     missingText,
     emptyText = "No species entries present in emitted map.",
-    malformedText = "Emitted species map is malformed."
+    malformedText = "Emitted species map is malformed.",
+    { nonNegative = false } = {}
   ) {
     if (value === undefined) {
       return `<span class="trace">${esc(missingText)}</span>`;
@@ -68,9 +88,12 @@
         if (hasNumber(a[1]) && hasNumber(b[1])) return b[1] - a[1];
         return hasNumber(a[1]) ? -1 : hasNumber(b[1]) ? 1 : String(a[0]).localeCompare(String(b[0]));
       })
-      .map(([species, amount]) => hasNumber(amount)
-        ? speciesToken(species, amount, unit)
-        : `<span class="trace"><b>${esc(prettySpecies(species))}</b> amount malformed.</span>`)
+      .map(([species, amount]) => {
+        if (!hasNumber(amount) || (nonNegative && amount < 0)) {
+          return `<span class="trace"><b>${esc(prettySpecies(species))}</b> amount malformed.</span>`;
+        }
+        return speciesToken(species, amount, unit);
+      })
       .join("");
   }
 
@@ -93,7 +116,22 @@
       `<strong>${state}</strong><p>${esc(detail)}</p></div>`;
   }
 
-  function gradeBlock(pool) {
+  // When the parent pools container is present but unreadable, do not claim each
+  // child inventory was "not emitted" — that misstates a parent parse failure.
+  function poolsParentUnavailableNotice(cardId) {
+    return `<div class="pending sec-p2-inline-pending" data-p2-container="pool-${esc(cardId)}-unavailable">` +
+      `<strong>Unavailable</strong>` +
+      `<p>Stratification pools container malformed — child inventory unavailable.</p></div>`;
+  }
+
+  function gradeBlock(pool, poolsParentMalformed = false) {
+    if (poolsParentMalformed) {
+      return {
+        headline: "Elemental pool composition unavailable",
+        chips: `<div class="pending sec-p2-inline-pending"><strong>Unavailable</strong><p>Stratification pools container malformed — child composition unavailable. Pool mol amounts are not converted into wt%.</p></div>`,
+        contaminants: `<span class="trace">Co and Ni composition shares unavailable · pools container malformed.</span>`
+      };
+    }
     const hasComposition = isMap(pool) && Object.prototype.hasOwnProperty.call(pool, "composition_wt_pct");
     if (!hasComposition) {
       return {
@@ -112,18 +150,17 @@
 
     const composition = pool.composition_wt_pct;
     const entries = Object.entries(composition);
-    const numeric = entries
-      .filter(([, value]) => hasNumber(value) && value >= 0)
+    // Emitter pool_weight_percent shares are in [0, 100]. Values outside that
+    // closed range (or non-finite) are malformed inventory, not data.
+    const hasMalformedValue = entries.some(([, value]) => !isValidWtShare(value));
+    const positive = entries
+      .filter(([, value]) => isValidWtShare(value) && value > 0)
       .sort((a, b) => b[1] - a[1]);
-    const positive = numeric.filter(([, value]) => value > 0);
-    const hasMalformedValue = entries.some(([, value]) => !hasNumber(value) || value < 0);
-    // Any non-numeric or negative composition value makes the map malformed for
-    // headline purposes even when other shares are numeric — never promote a partial share as
-    // "largest emitted" over a broken map.
+    // Viewer selects the top share from the emitted map — label as viewer-computed.
     const headline = hasMalformedValue
       ? "Elemental pool composition malformed"
       : positive.length
-      ? `${prettySpecies(positive[0][0])} ${fmtNum(positive[0][1], "wt%")} · largest emitted pool share`
+      ? `Viewer-computed top species: ${prettySpecies(positive[0][0])} ${fmtNum(positive[0][1], "wt%")}`
       : entries.length
         ? "Elemental pool composition · no positive shares"
         : "Elemental pool composition · no species present";
@@ -133,7 +170,7 @@
           if (hasNumber(a[1]) && hasNumber(b[1])) return b[1] - a[1];
           return hasNumber(a[1]) ? -1 : hasNumber(b[1]) ? 1 : String(a[0]).localeCompare(String(b[0]));
         })
-        .map(([species, amount]) => hasNumber(amount) && amount >= 0
+        .map(([species, amount]) => isValidWtShare(amount)
           ? speciesToken(species, amount, "wt%")
           : `<span class="trace"><b>${esc(prettySpecies(species))}</b> composition value malformed.</span>`)
         .join("")
@@ -148,7 +185,7 @@
           : `${species} not present in emitted composition.`;
         return `<span class="trace">${esc(state)}</span>`;
       }
-      if (!hasNumber(composition[species]) || composition[species] < 0) {
+      if (!isValidWtShare(composition[species])) {
         return `<span class="trace">${esc(species)} composition share malformed.</span>`;
       }
       if (composition[species] === 0) {
@@ -177,6 +214,31 @@
     return `<span class="chip sec-p2-chip ${value === true ? "sec-p2-warning" : ""}">${esc(label)}</span>`;
   }
 
+  function provenanceSourceText(value) {
+    if (value === undefined) return "source not emitted";
+    if (typeof value !== "string") return "malformed";
+    if (!value.trim()) return "empty";
+    return value;
+  }
+
+  function fittedRangeText(record) {
+    if (!Object.prototype.hasOwnProperty.call(record, "valid_range_K")) {
+      return "not emitted";
+    }
+    const range = record.valid_range_K;
+    // Both endpoints must be finite numbers; a half-good pair is wholly malformed.
+    // Do not promote the other bound with a dash (avoids "malformed–1,190 K").
+    if (
+      !Array.isArray(range) ||
+      range.length !== 2 ||
+      !hasNumber(range[0]) ||
+      !hasNumber(range[1])
+    ) {
+      return "malformed";
+    }
+    return `${exact(range[0], "K")}–${exact(range[1], "K")}`;
+  }
+
   function renderDensityProvenance(pool) {
     const provenance = pool?.density_correlation_provenance;
     const containerNotice = mapContainerNotice(
@@ -189,17 +251,12 @@
       if (!isMap(record)) {
         return `<div class="sec-p2-provenance"><b>${esc(prettySpecies(species))}</b><span>Malformed provenance record.</span></div>`;
       }
-      const hasValidRange = Object.prototype.hasOwnProperty.call(record, "valid_range_K");
-      const validRange = !hasValidRange
-        ? "not emitted"
-        : Array.isArray(record.valid_range_K) && record.valid_range_K.length === 2
-          ? `${exact(record.valid_range_K[0], "K")}–${exact(record.valid_range_K[1], "K")}`
-          : "malformed";
+      const validRange = fittedRangeText(record);
       return `<div class="sec-p2-provenance">` +
         `<b style="--species-color:${esc(speciesColor(species))}">${esc(prettySpecies(species))}</b>` +
         `<span>${esc(readableStatus(record.status))}</span>` +
         `<span>Correlation temperature ${exact(record.temperature_K, "K")} · fitted range ${validRange}</span>` +
-        `<span>${esc(record.source ?? "source not emitted")}</span></div>`;
+        `<span>${esc(provenanceSourceText(record.source))}</span></div>`;
     }).join("");
   }
 
@@ -240,14 +297,34 @@
     };
     return Object.entries(labels)
       .filter(([key]) => Object.prototype.hasOwnProperty.call(value, key))
-      .map(([key, label]) => statusChip(label, value[key]))
+      .map(([key, label]) => statusChip(label, value[key], "", "boolean"))
       .join("");
   }
 
-  function renderTapCard({ cardId, title, intent, pool, terminalAccount, interfaceReport, showAssumption = false }) {
-    const grade = gradeBlock(pool);
+  function renderTapCard({
+    cardId,
+    title,
+    intent,
+    pool,
+    terminalAccount,
+    interfaceReport,
+    showAssumption = false,
+    poolsParentMalformed = false
+  }) {
+    const grade = gradeBlock(pool, poolsParentMalformed);
     const poolExists = isMap(pool);
-    const poolNotice = mapContainerNotice(pool, title, `pool-${cardId}`);
+    // Parent pools unreadable → one unavailable notice; do not say "not emitted".
+    const poolNotice = poolsParentMalformed
+      ? poolsParentUnavailableNotice(cardId)
+      : mapContainerNotice(pool, title, `pool-${cardId}`);
+    const densityValue = poolsParentMalformed
+      ? "unavailable"
+      : poolExists
+        ? exact(pool.density_kg_m3, "kg/m³")
+        : "not emitted";
+    const speciesMol = poolsParentMalformed
+      ? `<span class="trace">Pool species mol map unavailable · pools container malformed.</span>`
+      : mapTokens(pool?.species_mol, "mol", "Pool species mol map not emitted.", undefined, undefined, { nonNegative: true });
     return `<article class="card sec-p2-card" data-p2-card="${esc(cardId)}">` +
       `<div class="sec-p2-card-head"><div><div class="ct">${esc(title)}</div>` +
       `<div class="cbig">${esc(grade.headline)}</div></div>${showAssumption ? assumptionChip(interfaceReport) : ""}</div>` +
@@ -255,14 +332,14 @@
       `<p class="sec-p2-intent">${esc(intent)}</p>` +
       `<div class="sec-p2-grade" aria-label="${esc(`${title} emitted elemental pool composition by weight`)}">${grade.chips}</div>` +
       `<div class="sec-p2-contaminants" aria-label="${esc(`${title} cobalt and nickel composition shares`)}">${grade.contaminants}</div>` +
-      `<div class="sec-p2-kv"><span>Pool density</span><b>${poolExists ? exact(pool.density_kg_m3, "kg/m³") : "not emitted"}</b></div>` +
-      `<div class="sec-p2-kv"><span>Buoyancy verdict</span><b>${esc(buoyancySummary(pool))}</b></div>` +
+      `<div class="sec-p2-kv"><span>Pool density</span><b>${densityValue}</b></div>` +
+      `<div class="sec-p2-kv"><span>Buoyancy verdict</span><b>${esc(poolsParentMalformed ? "unavailable" : buoyancySummary(pool))}</b></div>` +
       `<details class="sec-p2-details"><summary>Phase amounts, final-state process pool, and diagnostic provenance</summary>` +
-      `<h3>Stratified pool · mol by species</h3><div class="sec-p2-species-list">${mapTokens(pool?.species_mol, "mol", "Pool species mol map not emitted.")}</div>` +
-      `<h3>Final-state process pool · mol by species</h3><div class="sec-p2-species-list">${mapTokens(terminalAccount, "mol", "Final-state process-pool mol map not emitted.")}</div>` +
-      `<h3>Buoyancy diagnostic</h3>${renderBuoyancy(pool)}` +
-      `<h3>Density-correlation provenance</h3>${renderDensityProvenance(pool)}` +
-      `<div class="sec-p2-flags" data-p2-flags="pool">${explicitAuthorityFlags(pool)}</div></details></article>`;
+      `<h3>Stratified pool · mol by species</h3><div class="sec-p2-species-list">${speciesMol}</div>` +
+      `<h3>Final-state process pool · mol by species</h3><div class="sec-p2-species-list">${mapTokens(terminalAccount, "mol", "Final-state process-pool mol map not emitted.", undefined, undefined, { nonNegative: true })}</div>` +
+      `<h3>Buoyancy diagnostic</h3>${poolsParentMalformed ? `<span class="trace">Buoyancy diagnostic unavailable · pools container malformed.</span>` : renderBuoyancy(pool)}` +
+      `<h3>Density-correlation provenance</h3>${poolsParentMalformed ? `<span class="trace">Density-correlation provenance unavailable · pools container malformed.</span>` : renderDensityProvenance(pool)}` +
+      `<div class="sec-p2-flags" data-p2-flags="pool">${poolExists ? explicitAuthorityFlags(pool) : ""}</div></details></article>`;
   }
 
   function renderUnclassifiedStaging(value) {
@@ -273,7 +350,8 @@
         "mol",
         "Unclassified metal staging mol map not emitted.",
         "No unclassified species present in emitted map.",
-        "Unclassified metal staging mol map is malformed."
+        "Unclassified metal staging mol map is malformed.",
+        { nonNegative: true }
       )}</div></details>`;
   }
 
@@ -315,9 +393,13 @@
     const finalState = isMap(finalStateValue) ? finalStateValue : {};
     const selected = latestStratification(artifact);
     const stratification = selected?.report;
-    const poolsValue = stratification?.pools;
+    const poolsValue = isMap(stratification) ? stratification.pools : undefined;
+    // Present non-map pools → parent malformed. Do not treat as empty {} missing children.
+    const poolsParentMalformed = isMap(stratification)
+      && Object.prototype.hasOwnProperty.call(stratification, "pools")
+      && !isMap(poolsValue);
     const pools = isMap(poolsValue) ? poolsValue : {};
-    const interfaceReport = stratification?.interface;
+    const interfaceReport = isMap(stratification) ? stratification.interface : undefined;
     const hour = selected ? esc(scalarText(selected.hour, "not emitted")) : "not emitted";
     const absent = selected
       ? ""
@@ -325,7 +407,7 @@
     const malformed = selected && !isMap(stratification)
       ? `<div class="pending sec-p2-panel-pending" data-p2-container="stratification"><strong>Malformed metal-phase stratification</strong><p>The latest emitted stratification value is not a map. Older timestep reports are not substituted.</p></div>`
       : "";
-    const provenanceValue = stratification?.provenance;
+    const provenanceValue = isMap(stratification) ? stratification.provenance : undefined;
     const provenance = isMap(provenanceValue) ? provenanceValue : null;
     const containerNotices = isMap(stratification)
       ? mapContainerNotice(poolsValue, "stratification pools", "pools") +
@@ -338,22 +420,23 @@
 
     return `<section id="sec-p2-taps" class="sec-p2-taps">` +
       `<h2><span class="sect">P2</span>Metal-pool product inventory &amp; stratification</h2>` +
-      `<p class="sub">Latest emitted stratification (hour ${hour}) plus final-state process-pool accounts. Elemental pool-composition wt% is backend-emitted; final-state pool amounts remain mol. Inventory is product-classified; no drain tap is simulated.</p>` +
+      // Scope: stratification accounts are not a drain tap; do not deny run-wide drain taps.
+      `<p class="sub">Latest emitted stratification (hour ${hour}) plus final-state process-pool accounts. Elemental pool-composition wt% is backend-emitted; final-state pool amounts remain mol. Inventory is product-classified. These stratification pool accounts do not represent a fired drain tap.</p>` +
       `${absent}${malformed}${containerNotices}${terminalNotice}${finalStateNotice}<div class="sec-p2-flags" data-p2-flags="stratification">` +
-      `${statusChip("Diagnostic status", stratification?.status)}` +
-      `${statusChip("Mode", stratification?.mode)}` +
-      `${statusChip("Extraction behavior", stratification?.existing_extraction_behavior)}` +
-      `${statusChip("Melt-density tier", stratification?.melt_density_tier)}` +
-      `${statusChip("Melt-density fallback engaged", stratification?.melt_density_fallback_engaged, stratification?.melt_density_fallback_engaged === true ? "sec-p2-warning" : "")}` +
-      `${statusChip("Account-state source", provenance?.account_state_source)}` +
-      `${statusChip("Diagnostic derivation", provenance?.diagnostic_derivation)}` +
+      `${statusChip("Diagnostic status", stratification?.status, "", "string")}` +
+      `${statusChip("Mode", stratification?.mode, "", "string")}` +
+      `${statusChip("Extraction behavior", stratification?.existing_extraction_behavior, "", "string")}` +
+      `${statusChip("Melt-density tier", stratification?.melt_density_tier, "", "string")}` +
+      `${statusChip("Melt-density fallback engaged", stratification?.melt_density_fallback_engaged, stratification?.melt_density_fallback_engaged === true ? "sec-p2-warning" : "", "boolean")}` +
+      `${statusChip("Account-state source", provenance?.account_state_source, "", "string")}` +
+      `${statusChip("Diagnostic derivation", provenance?.diagnostic_derivation, "", "string")}` +
       `${explicitAuthorityFlags(stratification)}</div>` +
       `<div class="sec-p2-state" data-p2-region="state"><div><span>Emitted temperature</span><b>${exact(stratification?.temperature_K, "K")}</b></div>` +
       `<div><span>Emitted melt density</span><b>${exact(stratification?.melt_density_kg_m3, "kg/m³")}</b></div></div>` +
       `<div class="sec-p2-grid">` +
-      `${renderTapCard({ cardId: "float", title: "Upper float-layer inventory", intent: "Al/Si float-layer product inventory", pool: pools.float_layer, terminalAccount: finalState["process.metal_phase_float_layer"], interfaceReport, showAssumption: true })}` +
-      `${renderTapCard({ cardId: "bottom", title: "Bottom-pool inventory", intent: "Fe/FeSi bottom-pool product inventory", pool: pools.bottom_pool, terminalAccount: finalState["process.metal_phase_bottom_pool"], interfaceReport })}` +
-      `</div>${renderUnclassifiedStaging(stratification?.unclassified_staging_mol)}${renderInterface(interfaceReport)}` +
+      `${renderTapCard({ cardId: "float", title: "Upper float-layer inventory", intent: "Al/Si float-layer product inventory", pool: pools.float_layer, terminalAccount: finalState["process.metal_phase_float_layer"], interfaceReport, showAssumption: true, poolsParentMalformed })}` +
+      `${renderTapCard({ cardId: "bottom", title: "Bottom-pool inventory", intent: "Fe/FeSi bottom-pool product inventory", pool: pools.bottom_pool, terminalAccount: finalState["process.metal_phase_bottom_pool"], interfaceReport, poolsParentMalformed })}` +
+      `</div>${renderUnclassifiedStaging(isMap(stratification) ? stratification.unclassified_staging_mol : undefined)}${renderInterface(interfaceReport)}` +
       `<div class="note"><b>Frozen kg product-pool views pending producer attach.</b> The artifact does not carry kg projections for these process pools; no kg composition or wt% is reconstructed from final-state mol accounts.</div>` +
       `</section>`;
   }
