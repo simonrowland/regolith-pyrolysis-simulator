@@ -31,7 +31,7 @@ CUMULATIVE_ROWS = (
 
 EVAPORATION_ROWS = (
     "Diagnostic evaporation-enthalpy sink estimate",
-    "Reaction / disproportionation enthalpy sink",
+    "Reaction / dissociation enthalpy sink",
     "Product-vapor enthalpy sink",
     "Net unallocated",
 )
@@ -188,7 +188,7 @@ def test_present_fields_render_emitted_values_and_readable_breakdown_keys():
         "Reaction / dissociation component": "30.75 kWh",
         "Scoped electrical + evaporation energy": "123.5 kWh",
         "Diagnostic evaporation-enthalpy sink estimate": "7.25 kWh",
-        "Reaction / disproportionation enthalpy sink": "6 kWh",
+        "Reaction / dissociation enthalpy sink": "6 kWh",
         "Product-vapor enthalpy sink": "1.25 kWh",
         "Net unallocated": "0 kWh",
     }
@@ -211,10 +211,26 @@ def test_absent_fields_render_pending_without_zero_fallback():
         assert _missing() in _article(html, heading)
     for label in CUMULATIVE_ROWS + EVAPORATION_ROWS:
         assert _row(html, label) == f'<tr><th scope="row">{label}</th><td>{_missing()}</td></tr>'
-    assert "Breakdown not emitted; no components are inferred." in html
+    for heading in (
+        "Cumulative emitted component breakdown",
+        "Terminal-timestep diagnostic evaporation breakdown",
+    ):
+        article = _article(html, heading)
+        assert "Breakdown not emitted; no components are inferred." in article
+    for article in _articles(html):
+        assert article.count("<b>Scope</b> · Not emitted") == 1
+        assert article.count("<b>Furnace heat</b> · Not emitted") == 1
     assert ">0 kWh<" not in html
-    assert "Scope</b> · Not emitted" in html
-    assert "Furnace heat</b> · Not emitted" in html
+
+    one_breakdown_absent = _render_panel(_artifact({
+        "energy_cumulative_breakdown_kWh": {"electrical": 4.0},
+    }))
+    cumulative = _article(one_breakdown_absent, "Cumulative emitted component breakdown")
+    evaporation = _article(
+        one_breakdown_absent, "Terminal-timestep diagnostic evaporation breakdown"
+    )
+    assert "Breakdown not emitted; no components are inferred." not in cumulative
+    assert "Breakdown not emitted; no components are inferred." in evaporation
 
 
 def test_partial_inputs_do_not_manufacture_derived_energy():
@@ -307,6 +323,13 @@ def test_partial_inputs_do_not_manufacture_derived_energy():
         cumulative_combined_html, "Scoped electrical + evaporation energy"
     )
     assert _missing() in cumulative_combined_row and "90 kWh" not in cumulative_combined_row
+    for heading, forbidden_value in (
+        ("Electrical energy", "70 kWh"),
+        ("Diagnostic evaporation-enthalpy estimate", "20 kWh"),
+    ):
+        article = _article(cumulative_combined_html, heading)
+        assert _missing() in article
+        assert forbidden_value not in article
 
     evaporation_total = _row(
         evaporation_html, "Diagnostic evaporation-enthalpy sink estimate"
@@ -345,6 +368,299 @@ def test_partial_inputs_do_not_manufacture_derived_energy():
         row = _row(multi_hour_html, label)
         assert _missing() in row
         assert forbidden_value not in row
+
+
+def test_hourly_combined_is_direct_emitted_value_not_viewer_sum():
+    absent = _render_panel(_artifact({
+        "energy_electrical_kWh": 10.0,
+        "energy_evaporation_thermal_kWh": 3.0,
+    }))
+    mismatch = _render_panel(_artifact({
+        "energy_electrical_kWh": 10.0,
+        "energy_evaporation_thermal_kWh": 3.0,
+        "energy_electrical_plus_evaporation_kWh": 99.0,
+    }))
+
+    absent_combined = _article(absent, "Terminal-timestep scoped combined energy")
+    assert _missing() in absent_combined
+    assert ">13 kWh<" not in absent_combined
+
+    emitted_combined = _article(mismatch, "Terminal-timestep scoped combined energy")
+    assert ">99 kWh<" in emitted_combined
+    assert ">13 kWh<" not in emitted_combined
+
+
+def test_partial_path_matrix_keeps_each_derivable_target_pending():
+    cases = (
+        (
+            "hourly electrical from combined minus thermal",
+            {
+                "energy_evaporation_thermal_kWh": 11.0,
+                "energy_electrical_plus_evaporation_kWh": 37.0,
+            },
+            (("article", "Electrical energy", "26 kWh"),),
+        ),
+        (
+            "hourly thermal from combined minus electrical",
+            {
+                "energy_electrical_kWh": 26.0,
+                "energy_electrical_plus_evaporation_kWh": 37.0,
+            },
+            (("article", "Diagnostic evaporation-enthalpy estimate", "11 kWh"),),
+        ),
+        (
+            "hourly latent from thermal minus reaction",
+            {
+                "energy_evaporation_thermal_kWh": 11.0,
+                "energy_dissociation_kWh": 7.0,
+            },
+            (("article", "Latent vaporization component", "4 kWh"),),
+        ),
+        (
+            "hourly reaction from thermal minus latent",
+            {
+                "energy_evaporation_thermal_kWh": 11.0,
+                "energy_latent_kWh": 4.0,
+            },
+            (("article", "Reaction / dissociation component", "7 kWh"),),
+        ),
+        (
+            "cumulative electrical from combined minus thermal",
+            {
+                "energy_cumulative_breakdown_kWh": {
+                    "evaporation_thermal": 11.0,
+                    "electrical_plus_evaporation": 37.0,
+                },
+            },
+            (
+                ("article", "Cumulative electrical load", "26 kWh"),
+                ("row", "Electrical load", "26 kWh"),
+            ),
+        ),
+        (
+            "cumulative thermal from combined minus electrical",
+            {
+                "energy_cumulative_breakdown_kWh": {
+                    "electrical": 26.0,
+                    "electrical_plus_evaporation": 37.0,
+                },
+            },
+            (
+                ("article", "Cumulative diagnostic evaporation-enthalpy estimate", "11 kWh"),
+                ("row", "Diagnostic evaporation-enthalpy estimate", "11 kWh"),
+            ),
+        ),
+        (
+            "cumulative latent from thermal minus reaction",
+            {
+                "energy_cumulative_breakdown_kWh": {
+                    "evaporation_thermal": 11.0,
+                    "dissociation": 7.0,
+                },
+            },
+            (("row", "Latent vaporization component", "4 kWh"),),
+        ),
+        (
+            "cumulative reaction from thermal minus latent",
+            {
+                "energy_cumulative_breakdown_kWh": {
+                    "evaporation_thermal": 11.0,
+                    "latent": 4.0,
+                },
+            },
+            (("row", "Reaction / dissociation component", "7 kWh"),),
+        ),
+        (
+            "cumulative combined from electrical plus thermal",
+            {
+                "energy_cumulative_breakdown_kWh": {
+                    "electrical": 26.0,
+                    "evaporation_thermal": 11.0,
+                },
+            },
+            (("row", "Scoped electrical + evaporation energy", "37 kWh"),),
+        ),
+        (
+            "cumulative headline from breakdown combined",
+            {
+                "energy_cumulative_breakdown_kWh": {
+                    "electrical_plus_evaporation": 91.0,
+                },
+            },
+            (("article", "Cumulative scoped combined energy", "91 kWh"),),
+        ),
+        (
+            "cumulative breakdown combined from headline",
+            {
+                "energy_electrical_plus_evaporation_cumulative_kWh": 91.0,
+            },
+            (("row", "Scoped electrical + evaporation energy", "91 kWh"),),
+        ),
+        (
+            "evaporation total from reaction plus product",
+            {
+                "energy_evaporation_breakdown_kWh": {
+                    "reaction_disproportionation_enthalpy_sink": 7.0,
+                    "product_vapor_enthalpy_sink": 4.0,
+                },
+            },
+            (("row", "Diagnostic evaporation-enthalpy sink estimate", "11 kWh"),),
+        ),
+        (
+            "evaporation reaction from total minus product",
+            {
+                "energy_evaporation_breakdown_kWh": {
+                    "evaporation_enthalpy_sink": 11.0,
+                    "product_vapor_enthalpy_sink": 4.0,
+                },
+            },
+            (("row", "Reaction / dissociation enthalpy sink", "7 kWh"),),
+        ),
+        (
+            "evaporation product from total minus reaction",
+            {
+                "energy_evaporation_breakdown_kWh": {
+                    "evaporation_enthalpy_sink": 11.0,
+                    "reaction_disproportionation_enthalpy_sink": 7.0,
+                },
+            },
+            (("row", "Product-vapor enthalpy sink", "4 kWh"),),
+        ),
+        (
+            "evaporation net from total minus allocated components",
+            {
+                "energy_evaporation_breakdown_kWh": {
+                    "evaporation_enthalpy_sink": 11.0,
+                    "reaction_disproportionation_enthalpy_sink": 7.0,
+                    "product_vapor_enthalpy_sink": 4.0,
+                },
+            },
+            (("row", "Net unallocated", "0 kWh"),),
+        ),
+        (
+            "hourly fields from cumulative breakdown",
+            {
+                "energy_cumulative_breakdown_kWh": {
+                    "electrical": 26.0,
+                    "evaporation_thermal": 11.0,
+                    "latent": 4.0,
+                    "dissociation": 7.0,
+                    "electrical_plus_evaporation": 37.0,
+                },
+            },
+            (
+                ("article", "Electrical energy", "26 kWh"),
+                ("article", "Diagnostic evaporation-enthalpy estimate", "11 kWh"),
+                ("article", "Latent vaporization component", "4 kWh"),
+                ("article", "Reaction / dissociation component", "7 kWh"),
+                ("article", "Terminal-timestep scoped combined energy", "37 kWh"),
+            ),
+        ),
+        (
+            "hourly fields from evaporation breakdown",
+            {
+                "energy_evaporation_breakdown_kWh": {
+                    "evaporation_enthalpy_sink": 11.0,
+                    "reaction_disproportionation_enthalpy_sink": 7.0,
+                    "product_vapor_enthalpy_sink": 4.0,
+                },
+            },
+            (
+                ("article", "Diagnostic evaporation-enthalpy estimate", "11 kWh"),
+                ("article", "Latent vaporization component", "4 kWh"),
+                ("article", "Reaction / dissociation component", "7 kWh"),
+            ),
+        ),
+        (
+            "cumulative fields from hourly values",
+            {
+                "energy_electrical_kWh": 26.0,
+                "energy_evaporation_thermal_kWh": 11.0,
+                "energy_latent_kWh": 4.0,
+                "energy_dissociation_kWh": 7.0,
+                "energy_electrical_plus_evaporation_kWh": 37.0,
+            },
+            (
+                ("article", "Cumulative electrical load", "26 kWh"),
+                ("article", "Cumulative diagnostic evaporation-enthalpy estimate", "11 kWh"),
+                ("article", "Cumulative scoped combined energy", "37 kWh"),
+                ("row", "Electrical load", "26 kWh"),
+                ("row", "Diagnostic evaporation-enthalpy estimate", "11 kWh"),
+                ("row", "Latent vaporization component", "4 kWh"),
+                ("row", "Reaction / dissociation component", "7 kWh"),
+                ("row", "Scoped electrical + evaporation energy", "37 kWh"),
+            ),
+        ),
+        (
+            "evaporation breakdown from hourly values",
+            {
+                "energy_evaporation_thermal_kWh": 11.0,
+                "energy_latent_kWh": 4.0,
+                "energy_dissociation_kWh": 7.0,
+            },
+            (
+                ("row", "Diagnostic evaporation-enthalpy sink estimate", "11 kWh"),
+                ("row", "Reaction / dissociation enthalpy sink", "7 kWh"),
+                ("row", "Product-vapor enthalpy sink", "4 kWh"),
+                ("row", "Net unallocated", "0 kWh"),
+            ),
+        ),
+    )
+
+    for case_name, summary, checks in cases:
+        html = _render_panel(_artifact(summary))
+        for region_kind, target, forbidden_value in checks:
+            region = _article(html, target) if region_kind == "article" else _row(html, target)
+            assert _missing() in region, case_name
+            assert f">{forbidden_value}<" not in region, case_name
+
+
+def test_cumulative_deltas_do_not_become_terminal_hourly_values():
+    html = _render_panel(_artifact(
+        {
+            "energy_electrical_plus_evaporation_cumulative_kWh": 14.0,
+            "energy_cumulative_breakdown_kWh": {
+                "electrical": 10.0,
+                "evaporation_thermal": 4.0,
+                "latent": 1.0,
+                "dissociation": 3.0,
+                "electrical_plus_evaporation": 14.0,
+            },
+        },
+        {
+            "energy_electrical_plus_evaporation_cumulative_kWh": 37.0,
+            "energy_cumulative_breakdown_kWh": {
+                "electrical": 26.0,
+                "evaporation_thermal": 11.0,
+                "latent": 4.0,
+                "dissociation": 7.0,
+                "electrical_plus_evaporation": 37.0,
+            },
+        },
+    ))
+
+    hourly_deltas = {
+        "Electrical energy": "16 kWh",
+        "Diagnostic evaporation-enthalpy estimate": "7 kWh",
+        "Latent vaporization component": "3 kWh",
+        "Reaction / dissociation component": "4 kWh",
+        "Terminal-timestep scoped combined energy": "23 kWh",
+    }
+    for heading, forbidden_value in hourly_deltas.items():
+        article = _article(html, heading)
+        assert _missing() in article
+        assert f">{forbidden_value}<" not in article
+
+    evaporation_deltas = {
+        "Diagnostic evaporation-enthalpy sink estimate": "7 kWh",
+        "Reaction / dissociation enthalpy sink": "4 kWh",
+        "Product-vapor enthalpy sink": "3 kWh",
+        "Net unallocated": "0 kWh",
+    }
+    for label, forbidden_value in evaporation_deltas.items():
+        row = _row(html, label)
+        assert _missing() in row
+        assert f">{forbidden_value}<" not in row
 
 
 def test_sparse_breakdowns_keep_missing_components_pending():
@@ -396,6 +712,14 @@ def test_diagnostic_authority_qualifier_repeats_on_every_affected_article():
     for heading in ("Cumulative electrical load", "Electrical energy"):
         assert "<b>Diagnostic</b>" not in _article(html, heading)
 
+    missing_flags = _render_panel(_artifact({
+        "energy_evaporation_thermal_kWh": 7.25,
+    }))
+    diagnostic = _article(missing_flags, "Diagnostic evaporation-enthalpy estimate")
+    assert diagnostic.count("<b>Diagnostic</b> · Ledger-neutral estimate") == 1
+    assert diagnostic.count("<b>Scope</b> · Not emitted") == 1
+    assert diagnostic.count("<b>Furnace heat</b> · Not emitted") == 1
+
 
 def test_cro2_oxidation_uses_mixed_reaction_dissociation_label():
     html = _render_panel(_artifact(_complete_summary(
@@ -411,7 +735,12 @@ def test_cro2_oxidation_uses_mixed_reaction_dissociation_label():
     assert _row(html, "Reaction / dissociation component") == (
         '<tr><th scope="row">Reaction / dissociation component</th><td>3.271 kWh</td></tr>'
     )
+    assert _row(html, "Reaction / dissociation enthalpy sink") == (
+        '<tr><th scope="row">Reaction / dissociation enthalpy sink</th>'
+        '<td>1.635 kWh</td></tr>'
+    )
     assert "<h3>Dissociation component</h3>" not in html
+    assert "Reaction / disproportionation enthalpy sink" not in html
 
 
 def test_terminal_row_is_the_only_summary_source():

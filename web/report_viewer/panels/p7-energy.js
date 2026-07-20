@@ -13,7 +13,7 @@
 
   const EVAPORATION_COMPONENTS = Object.freeze([
     ["evaporation_enthalpy_sink", "Diagnostic evaporation-enthalpy sink estimate"],
-    ["reaction_disproportionation_enthalpy_sink", "Reaction / disproportionation enthalpy sink"],
+    ["reaction_disproportionation_enthalpy_sink", "Reaction / dissociation enthalpy sink"],
     ["product_vapor_enthalpy_sink", "Product-vapor enthalpy sink"],
     ["net_unallocated", "Net unallocated"]
   ]);
