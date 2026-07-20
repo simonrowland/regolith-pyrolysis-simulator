@@ -11,6 +11,7 @@ from flask import Flask
 
 from simulator.accounting.run_artifact import ARTIFACT_SCHEMA_VERSION
 from simulator.recipe_io import normalize_recipe_patch
+from simulator.runner import _METAL_PRODUCT_SPECIES
 from web.routes import bp
 from web.run_store import RunArtifactStore
 
@@ -549,8 +550,11 @@ def test_metal_phase_disposition_splits_ingots_from_unrecovered_species() -> Non
         "final_state": {
             "process.metal_phase": {
                 "Fe": 3.0,
+                "SiO": 1.5,
                 "SiO2": 1.0,
                 "Na": 0.5,
+                "K": 0.25,
+                "Mg": 0.125,
             }
         }
     }
@@ -558,14 +562,21 @@ def test_metal_phase_disposition_splits_ingots_from_unrecovered_species() -> Non
     html = _render_report_html(artifact)
     product_start = html.index("Product accounts")
     retained_start = html.index("Retained accounts")
+    ledger_start = html.index('<span class="sect">04</span>Full terminal ledger')
     product_block = html[product_start:retained_start]
-    retained_block = html[retained_start:]
+    retained_block = html[retained_start:ledger_start]
 
     assert "Fe" in product_block
+    assert "SiO" not in product_block
     assert "SiO₂" not in product_block
     assert "Na" not in product_block
+    assert "K" not in product_block
+    assert "Mg" not in product_block
+    assert "SiO" in retained_block
     assert "SiO₂" in retained_block
     assert "Na" in retained_block
+    assert "K" in retained_block
+    assert "Mg" in retained_block
 
 
 
@@ -695,6 +706,13 @@ def test_report_viewer_uses_emitted_cumulative_energy_and_surfaces_its_scope() -
     assert "energy scope electrical plus known evaporation enthalpy" in html
     assert 'title="furnace_heat_status: partial"' in html
     assert "furnace heat partial" in html
+    assert (
+        '<div class="k">Energy scope</div>'
+        '<div class="v">electrical plus known evaporation enthalpy</div>'
+    ) in html
+    assert (
+        '<div class="k">Furnace heat status</div><div class="v">partial</div>'
+    ) in html
 
 
 def test_report_viewer_energy_aggregate_rejects_non_numeric_rows() -> None:
@@ -1346,29 +1364,32 @@ process.stdout.write(JSON.stringify({
     assert result["hashes"] == [True, True, False]
 
 
-def test_report_viewer_modules_use_shared_authority_numeric_and_hash_helpers() -> None:
-    root = Path(__file__).resolve().parents[1] / "web/report_viewer"
-    labels_source = (root / "labels.js").read_text(encoding="utf-8")
-    report_source = (root / "report-viewer.js").read_text(encoding="utf-8")
-    library_source = (root / "library.js").read_text(encoding="utf-8")
-    settings_source = (root / "settings.js").read_text(encoding="utf-8")
+def test_report_viewer_modules_bind_shared_numeric_and_hash_behavior() -> None:
+    raw_id = "0123456789abcdef0123456789abcdef"
+    encoded_id = json.dumps(raw_id)
+    report = _run_viewer_expression(
+        "report-viewer.js",
+        f'[runTitle({{name: {encoded_id}, run_id: {encoded_id}}}), '
+        'yieldsSection([{metal_yields_kg: {Fe: 1.234567}}], {})]',
+    )
+    library = _run_viewer_expression(
+        "library.js",
+        f'[runDisplayTitle({{name: {encoded_id}, run_id: {encoded_id}}}), '
+        'yieldChips({headline_yields_kg: {Fe: 1.234567}, '
+        'headline_yield_semantics: {Fe: "mixed_account_product_ledger_projection"}})]',
+    )
+    settings = _run_viewer_expression(
+        "settings.js",
+        f'[settingsLede({{name: {encoded_id}, run_id: {encoded_id}}}), '
+        'c3DoseBlock({Na_kg: 1.234567})]',
+    )
 
-    for helper in (
-        "hasNumber", "exactValue", "isHashLike", "priceAuthority",
-        "priceAuthorityNote",
-    ):
-        assert helper in labels_source
-    assert "function priceAuthority(" not in report_source
-    assert "function priceAuthority(" not in settings_source
-    assert "const hasNumber =" not in report_source
-    assert "const hasNumber =" not in library_source
-    assert "const hasNumber =" not in settings_source
-    assert "const exactValue =" not in report_source
-    assert "const exactNumber =" not in library_source
-    assert "const displayNumber =" not in settings_source
-    assert "const isHashLike =" not in report_source
-    assert "const isHashLike =" not in library_source
-    assert "const isHashLike =" not in settings_source
+    assert report[0] == "Untitled run · 01234567…"
+    assert library[0] == "Untitled run · 01234567…"
+    assert ">01234567…</span>" in settings[0]
+    for rendered in (report[1], library[1], settings[1]):
+        assert 'title="1.234567 kg"' in rendered
+        assert ">1.235 kg</span>" in rendered
 
 
 def test_library_and_settings_reject_numeric_coercion() -> None:
@@ -1541,6 +1562,40 @@ def test_price_authority_count_comes_from_emitted_field() -> None:
     assert "basis not named" not in html
 
 
+def test_price_authority_status_only_placeholder_reaches_report_and_settings() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["header"]["cost_block"] = {
+        "electrical_cost_per_kWh": 10.0,
+        "solar_heat_cost_per_kWh": 0.05,
+    }
+    artifact["terminal"] = {
+        "run_metadata": {
+            "cost_rollup_diagnostic": {
+                "owner_ratify_placeholder_count": 0,
+                "owner_ratify_placeholders": [
+                    {
+                        "name": "status_only_energy_price",
+                        "status": "owner-ratify-placeholder",
+                    }
+                ],
+            }
+        }
+    }
+
+    report_html = _render_report_html(artifact)
+    settings_html = _run_viewer_expression(
+        "settings.js",
+        "costBlock({electrical_cost_per_kWh: 10, solar_heat_cost_per_kWh: 0.05}, "
+        "{terminal: {run_metadata: {cost_rollup_diagnostic: {"
+        "owner_ratify_placeholder_count: 0, owner_ratify_placeholders: "
+        '[{name: "status_only_energy_price", status: "owner-ratify-placeholder"}]}}}})',
+    )
+
+    for rendered in (report_html, settings_html):
+        assert "Price authority:" in rendered
+        assert "status_only_energy_price" in rendered
+
+
 def test_settings_surfaces_price_ratification_flag() -> None:
     rendered = _run_viewer_expression(
         "settings.js",
@@ -1630,10 +1685,17 @@ def test_metal_yields_are_labeled_as_a_mixed_account_product_ledger_projection()
     ]
 
     html = _render_report_html(artifact)
+    whitelist = ", ".join(_METAL_PRODUCT_SPECIES[:-1]) + f", and {_METAL_PRODUCT_SPECIES[-1]}"
 
     assert "Product-ledger metal projection — Ellingham order" in html
-    assert "spans evolved, in-process, retained, and recovered accounts" in html
-    assert "not recovery-only" in html
+    assert f"filtered to exact element keys {whitelist}" in html
+    assert "decorated reagent-bookkeeping keys" in html
+    assert "every other non-whitelisted species are excluded" in html
+    assert "Values are not recovery-only" in html
+    assert (
+        '<div class="el">Fe</div><div class="kg">'
+        '<span title="12.5 kg">12.5 kg</span> product-ledger projection</div>'
+    ) in html
     assert "Evolved metal mass" not in html
     assert "Not recovered product mass" not in html
 
@@ -1649,6 +1711,17 @@ def test_run_store_emits_mixed_account_product_ledger_semantics_for_metals() -> 
     assert summary["headline_yield_semantics"]["Fe"] == (
         "mixed_account_product_ledger_projection"
     )
+
+
+def test_library_renders_persisted_evolved_product_semantics() -> None:
+    rendered = _run_viewer_expression(
+        "library.js",
+        'yieldChips({headline_yields_kg: {Fe: 7.75}, '
+        'headline_yield_semantics: {Fe: "evolved_product"}})',
+    )
+
+    assert '<span title="7.75 kg">7.75 kg</span>' in rendered
+    assert "product-ledger projection (mixed accounts; not recovery-only)" in rendered
 
 
 def test_sparse_oxygen_metric_keeps_basis_pending() -> None:
@@ -1682,6 +1755,51 @@ def test_terminal_ledger_rejects_non_object_species_maps() -> None:
     assert "captured, malformed species map" in html
     assert "0 a" not in html
     assert "1 b" not in html
+
+
+def test_artifact_species_map_arrays_do_not_fabricate_numeric_species_names() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["header"]["c3_dose"] = [101.0, 202.0]
+    artifact["timesteps"] = [
+        {
+            "hour": 1,
+            "summary": {
+                "campaign": "C0",
+                "vapor_species_kg_hr": [11.0, 22.0],
+                "wall_deposit_cumulative_kg": {"stage_0_to_1": [31.0, 32.0]},
+            },
+            "ledger": {"process.condensation_train": [41.0, 42.0]},
+        }
+    ]
+    artifact["terminal"] = {
+        "final_state": {
+            "process.metal_phase": [51.0, 52.0],
+            "process.cleaned_melt": [61.0, 62.0],
+        },
+        "stage_purity": [71.0, 72.0],
+    }
+
+    report_html = _render_report_html(artifact)
+    library_html = _run_viewer_expression(
+        "library.js", "yieldChips({headline_yields_kg: [81, 82]})",
+    )
+    settings = _run_viewer_expression(
+        "settings.js",
+        "({dose: c3DoseBlock([91, 92]), config: configEntries([{value: 1}])})",
+    )
+
+    assert "C3 dose 0" not in report_html
+    assert "C3 dose 1" not in report_html
+    assert "</i>0</span>" not in report_html
+    assert "</i>1</span>" not in report_html
+    assert "captured, malformed species map" in report_html
+    assert "malformed species map" in report_html
+    assert '<div class="el">0</div>' not in library_html
+    assert '<div class="el">1</div>' not in library_html
+    assert library_html == ""
+    assert "<td>0</td>" not in settings["dose"]
+    assert "<td>1</td>" not in settings["dose"]
+    assert settings["config"] == []
 
 
 def test_yield_and_oxygen_exact_kg_surfaces_reject_numeric_coercion() -> None:

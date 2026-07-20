@@ -183,7 +183,7 @@ function recipeSnapshotBlock(snapshot) {
 }
 
 function configEntries(config) {
-  if (!config || typeof config !== "object") return [];
+  if (!config || typeof config !== "object" || Array.isArray(config)) return [];
   return Object.entries(config).map(([key, item]) => {
     if (item && typeof item === "object" && !Array.isArray(item) && ("value" in item || "source" in item)) {
       return { key, value: item.value, source: item.source };
@@ -193,7 +193,7 @@ function configEntries(config) {
 }
 
 function effectiveConfig(config) {
-  if (!config || typeof config !== "object") {
+  if (!config || typeof config !== "object" || Array.isArray(config)) {
     return pending(
       "Effective config not captured",
       "This run's artifact does not carry header.effective_config (live runs record it at the submit merge point)."

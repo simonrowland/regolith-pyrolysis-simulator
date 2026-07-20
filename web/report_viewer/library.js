@@ -83,12 +83,12 @@ function yieldQualifier(species, semantics) {
 
 function yieldChips(run) {
   const yields = run.headline_yields_kg;
-  const semantics = run.headline_yield_semantics && typeof run.headline_yield_semantics === "object"
-    ? run.headline_yield_semantics
-    : {};
-  const entries = yields && typeof yields === "object"
-    ? Object.entries(yields).filter(([species]) => species !== "O2")
-    : [];
+  const semantics = !run.headline_yield_semantics || typeof run.headline_yield_semantics !== "object" || Array.isArray(run.headline_yield_semantics)
+    ? {}
+    : run.headline_yield_semantics;
+  const entries = !yields || typeof yields !== "object" || Array.isArray(yields)
+    ? []
+    : Object.entries(yields).filter(([species]) => species !== "O2");
   const chips = entries.map(([species, value]) => {
     const qualifier = yieldQualifier(species, semantics);
     return `<div class="yield-chip"><div class="el">${speciesSpan(species)}</div>` +
@@ -123,6 +123,7 @@ function runMetaLine(run) {
   const hasYields = Boolean(
     run.headline_yields_kg
     && typeof run.headline_yields_kg === "object"
+    && !Array.isArray(run.headline_yields_kg)
     && Object.keys(run.headline_yields_kg).length
   );
   const summary = typeof run.summary === "string" ? run.summary.trim() : "";

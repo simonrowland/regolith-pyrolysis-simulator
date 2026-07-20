@@ -185,7 +185,12 @@ function updateMarkers(index, count) {
 function makeHeader(artifact, rows, energy) {
   const header = artifact.header;
   const finalRow = rows.at(-1) || {};
-  const finalMetal = finalRow.metal_yields_kg || {};
+  const finalMetal = !finalRow.metal_yields_kg || typeof finalRow.metal_yields_kg !== "object" || Array.isArray(finalRow.metal_yields_kg)
+    ? {}
+    : finalRow.metal_yields_kg;
+  const c3Dose = !header.c3_dose || typeof header.c3_dose !== "object" || Array.isArray(header.c3_dose)
+    ? null
+    : header.c3_dose;
   const o2 = sourceSideO2(finalRow);
   const o2MetricLabel = emittedToken(finalRow.O2_metric_label);
   const o2Label = prettyChemText(o2MetricLabel || "O₂ metric label not emitted");
@@ -229,7 +234,7 @@ function makeHeader(artifact, rows, energy) {
       <span class="chip">schema ${esc(artifact.artifact_schema_version)}</span>
       <span class="chip" title="${esc(`energy_scope: ${energyScope || "not emitted"}`)}">energy scope ${esc(tokenLabel(energyScope))}</span>
       <span class="chip" title="${esc(`furnace_heat_status: ${furnaceHeatStatus || "not emitted"}`)}">furnace heat ${esc(tokenLabel(furnaceHeatStatus))}</span>
-      ${header.c3_dose && Object.keys(header.c3_dose).length ? `<span class="chip accent">C3 dose ${Object.entries(header.c3_dose).map(([key, value]) => `${speciesSpan(key.replace(/_kg$/, ""))} ${exactKg(value)}`).join(" · ")}</span>` : ""}
+      ${c3Dose && Object.keys(c3Dose).length ? `<span class="chip accent">C3 dose ${Object.entries(c3Dose).map(([key, value]) => `${speciesSpan(key.replace(/_kg$/, ""))} ${exactKg(value)}`).join(" · ")}</span>` : ""}
     </div>
     <div class="status-banner ${["failed", "refused"].includes(status) ? "failed" : ""}">
       <div class="status-icon">${status === "ok" ? "✓" : "!"}</div><div><strong>Execution status: ${esc(status)}</strong>
@@ -245,7 +250,10 @@ function makeHeader(artifact, rows, energy) {
 }
 
 function yieldsSection(rows, terminal) {
-  const projection = rows.at(-1).metal_yields_kg || {};
+  const emittedProjection = rows.at(-1).metal_yields_kg;
+  const projection = !emittedProjection || typeof emittedProjection !== "object" || Array.isArray(emittedProjection)
+    ? {}
+    : emittedProjection;
   const max = Math.max(maxPresent(Object.values(projection)) ?? 0, 1);
   const chips = ELLINGHAM_ORDER.map((element) => {
     const widthPct = Math.min(100, Math.sqrt((n(projection[element]) ?? 0) / max) * 100);
@@ -255,7 +263,7 @@ function yieldsSection(rows, terminal) {
     return `<div class="yield-chip"><div class="el">${speciesSpan(element)}</div><div class="kg">${mass}</div><div class="bar"><i style="width:${widthPct.toFixed(2)}%"></i></div></div>`;
   }).join("");
   const gap = terminal.yield_disposition ? "" : `<div class="note">Per-species feedstock-yield fractions are pending <span class="mono">yield_disposition</span>; none are inferred here.</div>`;
-  return section(1, "Product-ledger metal projection — Ellingham order", "Final hourly metal_yields_kg spans evolved, in-process, retained, and recovered accounts: offgas, Stage 0 salt/matte, tapped/stored material, metal pools, condensation train, overhead gas, and reagent bookkeeping. It is not recovery-only; feedstock-origin fractions require yield_disposition.", `<div class="yield-track" aria-label="Product-ledger metal projection by element">${chips}</div>${gap}`);
+  return section(1, "Product-ledger metal projection — Ellingham order", "Final hourly metal_yields_kg is the product-ledger projection filtered to exact element keys Fe, Mg, Al, Ti, Ca, Cr, Ni, Co, Mn, Na, K, and Si. Oxides, salts, halides, decorated reagent-bookkeeping keys, and every other non-whitelisted species are excluded. Values are not recovery-only; feedstock-origin fractions require yield_disposition.", `<div class="yield-track" aria-label="Product-ledger metal projection by element">${chips}</div>${gap}`);
 }
 
 function processSection(artifact, rows, spans) {
@@ -266,13 +274,17 @@ function processSection(artifact, rows, spans) {
   const carrierIdentities = [...new Set(rows.map((row) => row.carrier_identity).filter((value) => typeof value === "string" && value.trim()).map((value) => value.trim()))];
   const electrical = totalSeries(artifact.timesteps, "energy_electrical_kWh");
   const thermal = totalSeries(artifact.timesteps, "energy_evaporation_thermal_kWh");
-  const vaporKeys = [...new Set(rows.flatMap((row) => Object.keys(row.vapor_species_kg_hr || {})))];
-  const topVapors = vaporKeys.map((key) => ({ key, peak: maxPresent(rows.map((row) => row.vapor_species_kg_hr?.[key])) ?? 0 })).sort((a, b) => b.peak - a.peak).slice(0, 4);
+  const vaporSpeciesMaps = rows.map((row) => {
+    const species = row.vapor_species_kg_hr;
+    return !species || typeof species !== "object" || Array.isArray(species) ? {} : species;
+  });
+  const vaporKeys = [...new Set(vaporSpeciesMaps.flatMap((species) => Object.keys(species)))];
+  const topVapors = vaporKeys.map((key) => ({ key, peak: maxPresent(vaporSpeciesMaps.map((species) => species[key])) ?? 0 })).sort((a, b) => b.peak - a.peak).slice(0, 4);
   const charts = [
     lineChart("temperature-chart", "Melt temperature · °C", [{ label: "T °C", values: temperature, color: COLORS[0] }], { spans, minLabel: fmtNum(minPresent(temperature), "°C"), maxLabel: fmtNum(maxPresent(temperature), "°C") }),
     lineChart("pressure-chart", "O₂ partial pressure · bar (log scale)", [{ label: "pO₂ bar", values: pressure, color: COLORS[1] }], { log: true, spans, maxLabel: fmtNum(maxPresent(pressure), "bar") }),
     lineChart("energy-chart", "Viewer-derived cumulative energy · kWh", [{ label: "electrical", values: electrical, color: COLORS[1] }, { label: "thermal: evaporation total (latent + dissociation breakdown)", values: thermal, color: COLORS[2] }], { zero: true, spans }),
-    lineChart("vapor-chart", "Vapor species surges · kg/h", topVapors.map((item, index) => ({ label: prettySpecies(item.key), values: rows.map((row) => n(row.vapor_species_kg_hr?.[item.key])), color: COLORS[index] })), { zero: true, spans })
+    lineChart("vapor-chart", "Vapor species surges · kg/h", topVapors.map((item, index) => ({ label: prettySpecies(item.key), values: vaporSpeciesMaps.map((species) => n(species[item.key])), color: COLORS[index] })), { zero: true, spans })
   ];
   if (hasCarrierPressure) {
     charts.splice(2, 0, lineChart("carrier-pressure-chart", "Carrier pressure · bar", [{ label: "carrier bar", values: carrierPressure, color: COLORS[3] }], { spans, maxLabel: fmtNum(maxPresent(carrierPressure), "bar") }));
