@@ -80,7 +80,13 @@
 
 .sec-p15-equipment .sec-p15-process-grid {
   display: grid;
-  grid-template-columns: minmax(170px, .72fr) minmax(220px, .95fr) minmax(0, 2.5fr) minmax(150px, .7fr);
+  grid-template-columns:
+    minmax(170px, .72fr)
+    minmax(220px, .95fr)
+    22px
+    minmax(0, 2.5fr)
+    22px
+    minmax(150px, .7fr);
   min-width: 0;
   border: 1px solid var(--rule);
   background: var(--panel);
@@ -97,6 +103,23 @@
 }
 
 .sec-p15-equipment .sec-p15-zone:last-child {
+  border-right: 0;
+}
+
+.sec-p15-equipment .sec-p15-zone-connector {
+  display: grid;
+  place-items: center;
+  align-self: stretch;
+  min-height: 100%;
+  border-right: 1px solid var(--rule);
+  color: var(--ink-2);
+  font: 900 16px/1 "SFMono-Regular", Consolas, monospace;
+  background:
+    linear-gradient(180deg, transparent 0 42%, var(--rule) 42% 58%, transparent 58%),
+    var(--panel);
+}
+
+.sec-p15-equipment .sec-p15-zone-connector:last-child {
   border-right: 0;
 }
 
@@ -286,6 +309,26 @@
   font: 11px/1.4 Inter, ui-sans-serif, sans-serif;
 }
 
+.sec-p15-equipment .sec-p15-taps {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: 10px;
+  margin-top: 8px;
+  align-items: start;
+}
+
+.sec-p15-equipment .sec-p15-tap-route {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+/* Bottom tray sits under the pot with a downward route. */
+.sec-p15-equipment .sec-p15-tap-route--float {
+  /* Float skim at melt line with a lateral (sideways) route. */
+  margin-top: -18px;
+}
+
 .sec-p15-equipment .sec-p15-tap-arrow {
   display: grid;
   gap: 1px;
@@ -294,15 +337,22 @@
   text-align: center;
 }
 
+.sec-p15-equipment .sec-p15-tap-arrow--down {
+  justify-items: center;
+}
+
+.sec-p15-equipment .sec-p15-tap-arrow--side {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 4px;
+  justify-items: start;
+  text-align: left;
+  font-size: 18px;
+}
+
 .sec-p15-equipment .sec-p15-tap-arrow span {
   color: var(--ink-3);
   font: 700 10px/1.25 Inter, ui-sans-serif, sans-serif;
-}
-
-.sec-p15-equipment .sec-p15-taps {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 7px;
 }
 
 .sec-p15-equipment .sec-p15-tap {
@@ -310,6 +360,16 @@
   padding: 8px;
   border: 1px solid var(--sec-p15-steel);
   background: var(--panel);
+}
+
+.sec-p15-equipment .sec-p15-tap-route--bottom .sec-p15-tap {
+  border-top-width: 2px;
+  border-top-color: var(--orange);
+}
+
+.sec-p15-equipment .sec-p15-tap-route--float .sec-p15-tap {
+  border-left-width: 2px;
+  border-left-color: var(--orange);
 }
 
 .sec-p15-equipment .sec-p15-tap > span {

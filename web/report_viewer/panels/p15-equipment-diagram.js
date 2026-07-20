@@ -17,16 +17,23 @@
     "terminal.oxygen_melt_offgas_stored",
     "terminal.oxygen_mre_anode_stored",
   ]);
+  // Campaign → stage glow is a designed-route cue only (not emitted activity).
+  // C3_K/C3_NA are alkali-shuttle reagents; product destinations are Fe/Cr
+  // condenser stages and Ti metal-phase — not Stage 4 (see PRODUCT_DESTINATIONS).
   const STAGES = Object.freeze([
     { key: "stage_0", label: "Hot Duct (IR)", campaigns: ["C0", "C0B"] },
-    { key: "stage_1_fe_condenser", label: "Fe Condenser", campaigns: ["C2B"], productSpecies: ["Fe"] },
-    { key: "stage_2_cr_oxide_harvest", label: "Cr Oxide Harvester", campaigns: [] },
+    { key: "stage_1_fe_condenser", label: "Fe Condenser", campaigns: ["C2B", "C3_K", "C3_NA"], productSpecies: ["Fe"] },
+    { key: "stage_2_cr_oxide_harvest", label: "Cr Oxide Harvester", campaigns: ["C3_NA"], productSpecies: ["Cr", "CrO2"] },
     { key: "stage_3_sio_zone", label: "SiO Zone", campaigns: ["C2A", "C2A_STAGED"], productSpecies: ["SiO", "SiO2"] },
-    { key: "stage_4_alkali_mg_cyclone", label: "Alkali/Mg Cyclone", campaigns: ["C3_K", "C3_NA", "C4"], productSpecies: ["Na", "K", "Mg"] },
+    { key: "stage_4_alkali_mg_cyclone", label: "Alkali/Mg Cyclone", campaigns: ["C4"], productSpecies: ["Na", "K", "Mg"] },
     { key: "stage_5", label: "Vortex Dust Filter", campaigns: [] },
     { key: "stage_6", label: "Turbine-Compressor", campaigns: [] },
     { key: "stage_7", label: "Turbine Outlet Monitor", campaigns: [] },
   ]);
+  // Extra non-condenser destinations for multi-product campaigns (honest cue text).
+  const CAMPAIGN_NON_CONDENSER_NOTES = Object.freeze({
+    C3_NA: "Ti metal-phase (non-condenser)",
+  });
 
   const hasNumber = (value) => typeof value === "number" && Number.isFinite(value);
   const asMap = (value) => value && typeof value === "object" && !Array.isArray(value) ? value : null;
@@ -84,9 +91,21 @@
     )).join("")}</ul>`;
   }
 
-  function metric(label, value, unit) {
-    const rendered = hasNumber(value) ? fmtNum(value, unit) : "Pending — not emitted";
-    const pendingClass = hasNumber(value) ? "" : " sec-p15-metric--pending";
+  function metric(label, value, unit, options = {}) {
+    const { min = null, max = null } = options;
+    const finite = hasNumber(value);
+    const inDomain = finite
+      && (min === null || value >= min)
+      && (max === null || value <= max);
+    let rendered;
+    if (inDomain) {
+      rendered = fmtNum(value, unit);
+    } else if (finite) {
+      rendered = "Pending — malformed quantity emitted";
+    } else {
+      rendered = "Pending — not emitted";
+    }
+    const pendingClass = inDomain ? "" : " sec-p15-metric--pending";
     return `<div class="sec-p15-metric${pendingClass}"><span>${esc(label)}</span><strong>${esc(rendered)}</strong></div>`;
   }
 
@@ -143,23 +162,30 @@
         `</article>`;
     }
 
-    const verdict = typeof stage.verdict === "string" && stage.verdict.trim() ? stage.verdict.trim() : "PENDING";
+    const hasVerdict = typeof stage.verdict === "string" && stage.verdict.trim();
+    const verdict = hasVerdict ? stage.verdict.trim() : "PENDING";
     const verdictClass = ["PURE", "MIXED", "CONTAMINATED"].includes(verdict)
       ? ` sec-p15-verdict--${verdict.toLowerCase()}`
       : " sec-p15-verdict--pending";
     const warning = typeof stage.warning === "string" && stage.warning.trim()
       ? `<p class="sec-p15-stage-warning">${esc(stage.warning.trim())}</p>`
       : "";
-    const emptyStage = hasNumber(stage.total_kg) && stage.total_kg === 0
-      ? `<p class="sec-p15-stage-empty">${esc("No condensate emitted; verdict is the backend's empty-stage classification")}</p>`
-      : "";
+    // Empty-stage classification sentence only when the backend emitted a
+    // verdict; inventing "backend's empty-stage classification" for a missing
+    // verdict contradicts the PENDING badge and the artifact.
+    let emptyStage = "";
+    if (hasNumber(stage.total_kg) && stage.total_kg === 0) {
+      emptyStage = hasVerdict
+        ? `<p class="sec-p15-stage-empty">${esc("No condensate emitted; verdict is the backend's empty-stage classification")}</p>`
+        : `<p class="sec-p15-stage-empty">${esc("No condensate emitted; verdict pending — not emitted")}</p>`;
+    }
     return `<article class="sec-p15-stage${productClass}${activeClass}" data-stage="${stageDefinition.key}"${productStyle} aria-label="${esc(`${label}${activeText}`)}">` +
       `<div class="sec-p15-stage-number">${esc(String(STAGES.indexOf(stageDefinition)))}</div>` +
       `<h4>${esc(label)}</h4>${routeNote}` +
       `<span class="sec-p15-verdict${verdictClass}">${esc(verdict)}</span>${emptyStage}${warning}` +
-      metric("Designated + coproduct mass", stage.designated_kg, "kg") +
-      metric("Impurity mass", stage.impurity_kg, "kg") +
-      metric("Emitted purity fraction", stage.purity_fraction, "") +
+      metric("Designated + coproduct mass", stage.designated_kg, "kg", { min: 0 }) +
+      metric("Impurity mass", stage.impurity_kg, "kg", { min: 0 }) +
+      metric("Emitted purity fraction", stage.purity_fraction, "", { min: 0, max: 1 }) +
       `<details class="sec-p15-stage-detail"><summary>Terminal species split</summary>` +
       stageSpeciesGroup("Designated", stage.designated_species_kg) +
       stageSpeciesGroup("Coproduct", stage.coproduct_species_kg) +
@@ -253,15 +279,26 @@
   }
 
   function sourceSideO2(summary) {
+    // Label and kg value are independent emitter fields; preserve whichever
+    // arrived. Dropping an emitted O2_metric_label when kg is absent discards
+    // the human-facing "not recovered" authority (runner.py O2_metric_label).
     const label = typeof summary.O2_metric_label === "string" && summary.O2_metric_label.trim()
       ? summary.O2_metric_label.trim()
       : null;
     const amount = hasNumber(summary.O2_yield_kg_cumulative) ? summary.O2_yield_kg_cumulative : null;
-    if (label === null || amount === null) {
+    if (label === null && amount === null) {
       return `<div class="sec-p15-source-o2 sec-p15-inline-pending"><strong>${esc("Source-side O₂ readout pending")}</strong>` +
-        `<span>${esc("Metric label or cumulative kg value not emitted")}</span></div>`;
+        `<span>${esc("Metric label and cumulative kg value not emitted")}</span></div>`;
     }
-    return `<div class="sec-p15-source-o2"><strong>${esc(label)}</strong><span>${esc(fmtNum(amount, "kg"))}</span></div>`;
+    const renderedLabel = label !== null
+      ? label
+      : "Source-side O₂ metric label pending — not emitted";
+    const renderedAmount = amount !== null
+      ? fmtNum(amount, "kg")
+      : "Cumulative kg value pending — not emitted";
+    const pendingClass = (label === null || amount === null) ? " sec-p15-inline-pending" : "";
+    return `<div class="sec-p15-source-o2${pendingClass}"><strong>${esc(renderedLabel)}</strong>` +
+      `<span>${esc(renderedAmount)}</span></div>`;
   }
 
   function gasDome(summary) {
@@ -349,6 +386,44 @@
     return [...new Set(flags.filter(Boolean))];
   }
 
+  function siDestinationFlags(stratification) {
+    // Si pool placement is decided by si_destination_buoyancy (candidate-bottom
+    // buoyancy used to choose the pool). Pool-bulk buoyancy is post-routing and
+    // is not a substitute — surface the Si-destination verdict + uncertainty.
+    if (!hasOwn(stratification, "si_destination_buoyancy")) return [];
+    const siDest = asMap(stratification.si_destination_buoyancy);
+    if (!siDest) {
+      return [textChip("Si destination buoyancy", "malformed emitted record")];
+    }
+    const flags = [];
+    flags.push(flagChip("Si destination buoyancy verdict", siDest.verdict));
+    if (hasOwn(siDest, "delta_rho_kg_m3")) {
+      const delta = hasNumber(siDest.delta_rho_kg_m3)
+        ? fmtNum(siDest.delta_rho_kg_m3, "kg/m³")
+        : "malformed emitted value";
+      flags.push(textChip("Si destination Δρ", delta));
+    }
+    if (hasOwn(siDest, "ambiguity_threshold_kg_m3")) {
+      const threshold = hasNumber(siDest.ambiguity_threshold_kg_m3)
+        ? fmtNum(siDest.ambiguity_threshold_kg_m3, "kg/m³")
+        : "malformed emitted value";
+      flags.push(textChip("Si destination ambiguity threshold", threshold));
+    }
+    if (hasOwn(siDest, "melt_density_uncertainty_kg_m3")) {
+      const meltU = hasNumber(siDest.melt_density_uncertainty_kg_m3)
+        ? fmtNum(siDest.melt_density_uncertainty_kg_m3, "kg/m³")
+        : "malformed emitted value";
+      flags.push(textChip("Si destination melt density uncertainty", meltU));
+    }
+    if (hasOwn(siDest, "alloy_density_uncertainty_kg_m3")) {
+      const alloyU = hasNumber(siDest.alloy_density_uncertainty_kg_m3)
+        ? fmtNum(siDest.alloy_density_uncertainty_kg_m3, "kg/m³")
+        : "malformed emitted value";
+      flags.push(textChip("Si destination alloy density uncertainty", alloyU));
+    }
+    return flags.filter(Boolean);
+  }
+
   function tapAuthority(stratification) {
     if (!stratification) {
       return `<div class="sec-p15-inline-pending">${esc("Tap authority flags not emitted")}</div>`;
@@ -361,6 +436,7 @@
       flagChip("Behavior", stratification.existing_extraction_behavior),
       flagChip("Melt density fallback", stratification.melt_density_fallback_engaged),
       flagChip("Melt density tier", stratification.melt_density_tier),
+      ...siDestinationFlags(stratification),
       ...densityProvenanceFlags(stratification),
     ].filter(Boolean);
     return flags.length
@@ -376,18 +452,29 @@
       `<span>${esc("Current melt mass pending")}</span></div></div>` +
       `<div class="sec-p15-charge">${esc(hasNumber(charge) ? `${fmtNum(charge, "kg")} initial charge` : "Initial charge not emitted")}` +
       `<small>${esc("Per-hour melt mass is not emitted; depletion is not derived from routed yields")}</small></div>` +
-      `<div class="sec-p15-tap-arrow" aria-label="${esc("Tap route shown; tap flow and disposition not emitted")}">↓` +
-      `<span>${esc("Tap flow / disposition pending — not emitted")}</span></div><div class="sec-p15-taps">` +
+      `<div class="sec-p15-taps">` +
+      `<div class="sec-p15-tap-route sec-p15-tap-route--bottom">` +
+      `<div class="sec-p15-tap-arrow sec-p15-tap-arrow--down" aria-label="${esc("Bottom tray downward route; tap flow and disposition not emitted")}">↓` +
+      `<span>${esc("Bottom tray · downward · flow/disposition pending")}</span></div>` +
       tapCard("Bottom-pool diagnostic inventory · no tap gate", "bottom_pool", stratification) +
+      `</div>` +
+      `<div class="sec-p15-tap-route sec-p15-tap-route--float">` +
+      `<div class="sec-p15-tap-arrow sec-p15-tap-arrow--side" aria-label="${esc("Float skim lateral route; tap flow and disposition not emitted")}">→` +
+      `<span>${esc("Float skim · lateral · flow/disposition pending")}</span></div>` +
       tapCard("Float-layer diagnostic inventory · no tap gate", "float_layer", stratification) +
-      `</div><div class="sec-p15-authority"><strong>${esc("Diagnostic authority")}</strong>${tapAuthority(stratification)}</div></div>`;
+      `</div></div>` +
+      `<div class="sec-p15-authority"><strong>${esc("Diagnostic authority")}</strong>${tapAuthority(stratification)}</div></div>`;
   }
 
   function trainTotal(summary) {
+    // condensation_train_kg is the backend cumulative condensation projection
+    // (runner serializes snapshot.condensation_totals, which injects terminal
+    // melt-offgas stored O2). Do not call it pure metal-train inventory.
     const train = summary.condensation_train_kg;
-    return `<div class="sec-p15-readout"><span>${esc("Cumulative train species inventory · selected hour")}</span>` +
-      speciesList(train, "kg", "No positive train inventory emitted") +
-      `<small>${esc("One train-wide species map; not allocated to stages")}</small></div>`;
+    return `<div class="sec-p15-readout" data-readout="condensation-train-projection">` +
+      `<span>${esc("Cumulative condensation projection · selected hour")}</span>` +
+      speciesList(train, "kg", "No positive condensation projection emitted") +
+      `<small>${esc("Backend projection may include terminal melt-offgas stored O₂; not stage-allocated metal-train inventory alone")}</small></div>`;
   }
 
   function pulledFromPot(summary) {
@@ -432,20 +519,28 @@
     const hour = timestep.hour === null || timestep.hour === undefined
       ? "not emitted"
       : scalarText(timestep.hour);
-    const focusedStage = STAGES.find((stage) => stage.campaigns.includes(campaign));
-    const focusText = focusedStage
-      ? `Designed campaign-route cue: ${focusedStage.label} · not emitted stage activity`
-      : (campaign === "campaign not emitted"
-        ? "Campaign-to-stage focus pending — campaign not emitted"
-        : `Campaign-to-stage map not emitted for ${campaign}; no stage glow inferred`);
+    const focusedStages = STAGES.filter((stage) => stage.campaigns.includes(campaign));
+    const nonCondenserNote = CAMPAIGN_NON_CONDENSER_NOTES[campaign] || "";
+    let focusText;
+    if (focusedStages.length || nonCondenserNote) {
+      const cueParts = focusedStages.map((stage) => stage.label);
+      if (nonCondenserNote) cueParts.push(nonCondenserNote);
+      focusText = `Designed campaign-route cue: ${cueParts.join(" + ")} · not emitted stage activity`;
+    } else if (campaign === "campaign not emitted") {
+      focusText = "Campaign-to-stage focus pending — campaign not emitted";
+    } else {
+      focusText = `Campaign-to-stage map not emitted for ${campaign}; no stage glow inferred`;
+    }
     return `<div class="sec-p15-now"><div><span>${esc("Selected timestep")}</span>` +
       `<strong>Hour ${esc(hour)} · ${esc(campaign)}</strong></div>` +
       `<small>${esc(focusText)}</small></div>` +
       `<div class="sec-p15-process-grid">` +
       `<div class="sec-p15-zone sec-p15-zone--cryo"><span class="sec-p15-kicker">Cryo train</span>${cryoStore(timestep)}${sourceSideO2(summary)}</div>` +
       `<div class="sec-p15-zone sec-p15-zone--pot"><span class="sec-p15-kicker">Melt pot + taps</span>${meltPot(artifact, summary)}</div>` +
+      `<div class="sec-p15-zone-connector sec-p15-zone-connector--pot-train" role="img" aria-label="${esc("Pot vapor path to condensation train")}" title="${esc("Pot → condensation train")}">→</div>` +
       `<div class="sec-p15-zone sec-p15-zone--train">${stageTrain(artifact, summary, campaign)}` +
       `<div class="sec-p15-readout-row">${trainTotal(summary)}${pulledFromPot(summary)}</div></div>` +
+      `<div class="sec-p15-zone-connector sec-p15-zone-connector--train-pump" role="img" aria-label="${esc("Condensation train path to oxygen separation pump")}" title="${esc("Condensation train → O₂ separation pump")}">→</div>` +
       `<div class="sec-p15-zone sec-p15-zone--pump"><span class="sec-p15-kicker">Cold-end routing</span>${pumpAndVent(summary)}</div>` +
       `</div>`;
   }
