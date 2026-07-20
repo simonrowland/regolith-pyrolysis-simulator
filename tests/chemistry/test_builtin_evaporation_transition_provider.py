@@ -377,6 +377,10 @@ def test_provider_emits_expected_proposal_for_known_inputs(
 # ---------------------------------------------------------------------------
 
 
+# A_staged+MAGEMin composition wall-clock: mass-balance class measured
+# 1027 s on compose-0.6.3 (docs-private/research/2026-07-20-pool-diagnosis/report.md);
+# raise per-test ceiling to measured × 1.5 headroom (not global --timeout).
+@pytest.mark.timeout(1541)
 @pytest.mark.parametrize(
     "feedstock_key, additives_kg",
     [

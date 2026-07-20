@@ -1789,6 +1789,10 @@ def test_status_with_mass_balance_invariant_refuses_completed_run_without_eviden
         _status_with_mass_balance_invariant(execution, strict_result_contract=True)
 
 
+# A_staged+MAGEMin composition wall-clock: mass-balance class measured
+# 1027 s on compose-0.6.3 (docs-private/research/2026-07-20-pool-diagnosis/report.md);
+# raise per-test ceiling to measured × 1.5 headroom (not global --timeout).
+@pytest.mark.timeout(1541)
 def test_runner_records_operator_decision_in_shadow_trace():
     """When the simulator pauses for a decision mid-run, the runner
     auto-applies the recommendation and records an ``operator_decision``

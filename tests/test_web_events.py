@@ -4967,7 +4967,13 @@ def test_socketio_continues_after_binding_c6_refusal_and_retains_diagnostic(
             _clear_simulation_state(sid)
 
 
+class RaisingCleanedMeltLedger:
+    def project_account_kg(self, account):
+        assert account == "process.cleaned_melt"
+        raise RuntimeError("cleaned melt unavailable")
 
+
+@pytest.mark.parametrize("ledger", [None, RaisingCleanedMeltLedger()])
 def test_tick_omits_pot_composition_when_cleaned_melt_ledger_unavailable(
     ledger,
 ):

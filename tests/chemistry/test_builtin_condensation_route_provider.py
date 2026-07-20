@@ -2161,6 +2161,10 @@ def test_provider_skips_below_numerical_floor(
 # ---------------------------------------------------------------------------
 
 
+# A_staged+MAGEMin composition wall-clock: mass-balance class measured
+# 1027 s on compose-0.6.3 (docs-private/research/2026-07-20-pool-diagnosis/report.md);
+# raise per-test ceiling to measured × 1.5 headroom (not global --timeout).
+@pytest.mark.timeout(1541)
 @pytest.mark.parametrize(
     "feedstock_key, additives_kg",
     [
@@ -2303,6 +2307,10 @@ def test_full_run_mass_balance_holds_with_kernel_committed_condensation(
 # ---------------------------------------------------------------------------
 
 
+# A_staged+MAGEMin composition wall-clock: mass-balance class measured
+# 1027 s on compose-0.6.3 (docs-private/research/2026-07-20-pool-diagnosis/report.md);
+# raise per-test ceiling to measured × 1.5 headroom (not global --timeout).
+@pytest.mark.timeout(1541)
 @pytest.mark.parametrize(
     "feedstock_key, additives_kg",
     [

@@ -142,6 +142,10 @@ def test_na_shuttle_janaf_feo_crossover_is_below_practical_c3_temperature():
     assert crossover_C < 1200.0
 
 
+# A_staged+MAGEMin composition wall-clock: mass-balance class measured
+# 1027 s on compose-0.6.3 (docs-private/research/2026-07-20-pool-diagnosis/report.md);
+# raise per-test ceiling to measured × 1.5 headroom (not global --timeout).
+@pytest.mark.timeout(1541)
 def test_pyrolysis_track_c5_reduces_feo_without_additives():
     result = _run_pyrolysis_track()
     sim = result.simulator
@@ -473,6 +477,10 @@ def test_c3_shuttle_injects_na_from_condensed_alkali_alone():
     sim.atom_ledger.assert_balanced()
 
 
+# A_staged+MAGEMin composition wall-clock: mass-balance class measured
+# 1027 s on compose-0.6.3 (docs-private/research/2026-07-20-pool-diagnosis/report.md);
+# raise per-test ceiling to measured × 1.5 headroom (not global --timeout).
+@pytest.mark.timeout(1541)
 def test_pc_extract_fe_target_has_fe_product_after_full_pyrolysis_track():
     result = _run_pyrolysis_track()
     products = result.simulator.product_ledger()
@@ -484,6 +492,10 @@ def test_pc_extract_fe_target_has_fe_product_after_full_pyrolysis_track():
     assert fe_product > 80.0
 
 
+# A_staged+MAGEMin composition wall-clock: mass-balance class measured
+# 1027 s on compose-0.6.3 (docs-private/research/2026-07-20-pool-diagnosis/report.md);
+# raise per-test ceiling to measured × 1.5 headroom (not global --timeout).
+@pytest.mark.timeout(1541)
 def test_pc_extract_al_remains_infeasible_at_1p6v_c5_cap():
     result = _run_pyrolysis_track()
     al_left = result.simulator.melt.composition_kg.get("Al2O3", 0.0)

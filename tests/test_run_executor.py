@@ -441,6 +441,10 @@ def test_pyrolysis_run_completes_with_band_adjustment_provenance():
     assert "refusal_diagnostic" not in payload["run_metadata"]
 
 
+# A_staged+MAGEMin composition wall-clock: mass-balance class measured
+# 1027 s on compose-0.6.3 (docs-private/research/2026-07-20-pool-diagnosis/report.md);
+# raise per-test ceiling to measured × 1.5 headroom (not global --timeout).
+@pytest.mark.timeout(1541)
 def test_run_executor_partial_path_sets_status_and_decisions():
     run = _run(
         feedstock_id="lunar_mare_low_ti",
