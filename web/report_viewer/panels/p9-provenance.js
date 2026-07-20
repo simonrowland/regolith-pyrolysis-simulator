@@ -9,13 +9,17 @@
   const isRecord = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
   const hasNumber = (value) => typeof value === "number" && Number.isFinite(value);
   const MALFORMED_RECORD = Symbol("malformed provenance record");
+  // Registry projection + operator request echo (runner._engines_used), not an
+  // invocation/execution chain. Labels must not claim engines "ran" or "were used".
+  const ENGINES_USED_TITLE = "Configured engines (engines_used)";
   const PROVENANCE_LABELS = Object.freeze({
     started_at_utc: "Started at (UTC)",
     backend_real_active: "Real engine active",
     degradation_reason: "Degradation reason",
     degraded_from: "Degraded from",
     backend_authoritative: "Backend authoritative",
-    certification_allowed: "Certification allowed"
+    certification_allowed: "Certification allowed",
+    engines_used: ENGINES_USED_TITLE
   });
   const IDENTITY_FIELDS = Object.freeze([
     ["name", "Engine name"],
@@ -23,9 +27,21 @@
     ["backend_wire_token", "Backend wire token"],
     ["kernel_commit_sha", "Kernel commit SHA"]
   ]);
+  // Boolean trust/authority/uncertainty flags from the fidelity surface and
+  // identity/contributor extras. Path-aware: registry.*.authoritative is a
+  // provider-id string, not a boolean (see isBooleanTrustKey).
+  const BOOLEAN_TRUST_KEYS = Object.freeze(new Set([
+    "backend_authoritative",
+    "certification_allowed",
+    "requires_inherited_evidence_class",
+    "high_uncertainty",
+    "diagnostic_only",
+    "extrapolation",
+    "backend_real_active"
+  ]));
   const FIELD_LABELS = Object.freeze({
-    active: "Active providers",
-    requested: "Requested providers",
+    active: "Authoritative slots (registry projection)",
+    requested: "Requested providers (config echo)",
     registry: "Provider registry",
     authoritative: "Authoritative provider",
     fallback: "Fallback provider",
@@ -46,7 +62,8 @@
     requires_inherited_evidence_class: "Requires inherited evidence class",
     high_uncertainty: "High uncertainty",
     diagnostic_only: "Diagnostic only",
-    skip_reason: "Skip reason"
+    skip_reason: "Skip reason",
+    engines_used: ENGINES_USED_TITLE
   });
 
   function pending(message) {
@@ -65,11 +82,31 @@
   }
 
   function identifierValue(value, label) {
-    if (typeof value !== "string" || !value.trim()) return pending(`${label} is malformed`);
-    const exact = value.trim();
+    // Exact hash disclosure: surrounding whitespace is malformed provenance, not
+    // a display detail — do not silently trim it away from the accessible value.
+    if (typeof value !== "string" || !value.length || value !== value.trim()) {
+      return pending(`${label} is malformed`);
+    }
+    const exact = value;
     let compact = fmtRunId(exact);
     if (compact === exact && /^[0-9a-f]{12,}$/i.test(exact)) compact = `${exact.slice(0, 8)}…`;
     return `<span class="sec-p9-identifier" title="${esc(exact)}" aria-label="${esc(`${label}: ${exact}`)}" tabindex="0">${esc(compact)}</span>`;
+  }
+
+  function isProviderSlotPath(path) {
+    return path.length === 4 && path[0] === "engines_used" && path[1] === "registry"
+      && (path[3] === "authoritative" || path[3] === "fallback");
+  }
+
+  function isBooleanTrustKey(key, path) {
+    if (key === "authoritative") return !isProviderSlotPath(path);
+    return BOOLEAN_TRUST_KEYS.has(key);
+  }
+
+  function booleanScalar(value, label, { mono = true } = {}) {
+    if (typeof value !== "boolean") return pending(`${label} is malformed`);
+    const text = esc(String(value));
+    return mono ? `<span class="sec-p9-mono-value">${text}</span>` : text;
   }
 
   function scalarValue(value, label, options = {}) {
@@ -84,6 +121,8 @@
         ? esc(fmtNum(value, options.unit))
         : pending(`${label} is malformed`);
     }
+    // Top-level detail rows keep bare true/false (same shape as prior authority rows).
+    if (options.boolean) return booleanScalar(value, label, { mono: false });
     if (typeof value === "string" && value.trim()) return esc(value);
     if (typeof value === "boolean") return esc(String(value));
     if (hasNumber(value)) return esc(fmtNum(value));
@@ -154,11 +193,6 @@
     ).join("")}</ul>`;
   }
 
-  function isProviderSlotPath(path) {
-    return path.length === 4 && path[0] === "engines_used" && path[1] === "registry"
-      && (path[3] === "authoritative" || path[3] === "fallback");
-  }
-
   function treeValue(value, keyHint = "value", path = [String(keyHint)]) {
     const providerSlot = isProviderSlotPath(path);
     const label = keyHint === "authoritative" && !providerSlot ? "Authoritative" : humanize(keyHint);
@@ -166,6 +200,8 @@
     if (value === null && providerSlot && keyHint === "authoritative") return empty("No authoritative provider in emitted field");
     if (value === null) return pending(`${label} emitted as null`);
     if (value === undefined || value === "") return pending(`${label} emitted without a value`);
+    // Strict boolean trust flags: string/number never look like valid claims.
+    if (isBooleanTrustKey(keyHint, path)) return booleanScalar(value, label);
     if (typeof value === "string") {
       return /(?:sha|hash|digest|commit)/i.test(String(keyHint))
         ? identifierValue(value, label)
@@ -215,7 +251,7 @@
     const extras = Object.entries(identity)
       .filter(([key]) => !known.has(key))
       .map(([key, value]) => detailRow(
-        // FIELD_LABELS.authoritative is the engine-chain slot name ("Authoritative
+        // FIELD_LABELS.authoritative is the engines_used slot name ("Authoritative
         // provider"); identity extras are boolean trust flags, so use the short label.
         key === "authoritative" ? "Authoritative" : humanize(key),
         treeValue(value, key)
@@ -223,36 +259,97 @@
     return `<dl class="sec-p9-facts">${rows.join("")}${extras.join("")}</dl>`;
   }
 
-  function engineChainValue(metadata) {
-    if (metadata === MALFORMED_RECORD) return pending("Engine chain unavailable because a parent record is malformed");
-    if (!isRecord(metadata) || !own(metadata, "engines_used")) return pending("Engine chain not emitted");
-    if (metadata.engines_used === null) return pending("Engine chain emitted as null");
-    if (!isRecord(metadata.engines_used)) return pending("Engine chain is malformed");
+  function enginesUsedValue(metadata) {
+    const title = ENGINES_USED_TITLE;
+    if (metadata === MALFORMED_RECORD) return pending(`${title} unavailable because a parent record is malformed`);
+    if (!isRecord(metadata) || !own(metadata, "engines_used")) return pending(`${title} not emitted`);
+    if (metadata.engines_used === null) return pending(`${title} emitted as null`);
+    if (!isRecord(metadata.engines_used)) return pending(`${title} is malformed`);
     return treeValue(metadata.engines_used, "engines_used");
+  }
+
+  // Parent/child record diagnosis: absent / null / malformed / ok stay distinct.
+  // Do not collapse a broken parent into "child is malformed".
+  function resolveTopRecord(artifact, key) {
+    if (!isRecord(artifact)) return { kind: "artifact-malformed" };
+    if (!own(artifact, key)) return { kind: "absent" };
+    if (artifact[key] === null) return { kind: "null" };
+    if (!isRecord(artifact[key])) return { kind: "malformed" };
+    return { kind: "ok", value: artifact[key] };
+  }
+
+  function resolveChildRecord(parent, childKey) {
+    if (parent.kind === "artifact-malformed") return { kind: "artifact-malformed" };
+    if (parent.kind === "absent") return { kind: "absent" };
+    if (parent.kind === "null") return { kind: "parent-null" };
+    if (parent.kind === "malformed") return { kind: "parent-malformed" };
+    if (!own(parent.value, childKey)) return { kind: "absent" };
+    if (parent.value[childKey] === null) return { kind: "null" };
+    if (!isRecord(parent.value[childKey])) return { kind: "malformed" };
+    return { kind: "ok", value: parent.value[childKey] };
+  }
+
+  function recordForRender(resolved) {
+    if (resolved.kind === "ok") return resolved.value;
+    // Absent or present-as-null: no field values. Notices name the null case.
+    if (resolved.kind === "absent" || resolved.kind === "null") return null;
+    // parent-null / parent-malformed / malformed / artifact-malformed:
+    // fields read as unavailable because a parent record is broken.
+    return MALFORMED_RECORD;
+  }
+
+  function metadataNoticeHtml(terminal, metadata) {
+    if (terminal.kind === "artifact-malformed") {
+      return `<div class="pending"><strong>Pending</strong><p>terminal.run_metadata is unavailable because the artifact is malformed.</p></div>`;
+    }
+    if (terminal.kind === "null") {
+      return `<div class="pending"><strong>Pending</strong><p>terminal emitted as null; run_metadata unavailable.</p></div>`;
+    }
+    if (terminal.kind === "malformed") {
+      return `<div class="pending"><strong>Pending</strong><p>terminal is malformed; run_metadata unavailable.</p></div>`;
+    }
+    if (terminal.kind === "absent" || metadata.kind === "absent") {
+      return `<div class="pending"><strong>Pending</strong><p>terminal.run_metadata is not emitted.</p></div>`;
+    }
+    if (metadata.kind === "null") {
+      return `<div class="pending"><strong>Pending</strong><p>run_metadata emitted as null.</p></div>`;
+    }
+    if (metadata.kind === "malformed") {
+      return `<div class="pending"><strong>Pending</strong><p>terminal.run_metadata is malformed; expected an object.</p></div>`;
+    }
+    return "";
+  }
+
+  function identityNoticeHtml(header, identity) {
+    if (header.kind === "artifact-malformed") {
+      return `<div class="pending"><strong>Pending</strong><p>header.engine_identity is unavailable because the artifact is malformed.</p></div>`;
+    }
+    if (header.kind === "null") {
+      return `<div class="pending"><strong>Pending</strong><p>header emitted as null; engine_identity unavailable.</p></div>`;
+    }
+    if (header.kind === "malformed") {
+      return `<div class="pending"><strong>Pending</strong><p>header is malformed; engine_identity unavailable.</p></div>`;
+    }
+    if (header.kind === "absent" || identity.kind === "absent") {
+      return `<div class="pending"><strong>Pending</strong><p>header.engine_identity is not emitted.</p></div>`;
+    }
+    if (identity.kind === "null") {
+      return `<div class="pending"><strong>Pending</strong><p>engine_identity emitted as null.</p></div>`;
+    }
+    if (identity.kind === "malformed") {
+      return `<div class="pending"><strong>Pending</strong><p>header.engine_identity is malformed; expected an object.</p></div>`;
+    }
+    return "";
   }
 
   function render(artifact) {
     const artifactMalformed = !isRecord(artifact);
-    const header = artifactMalformed
-      ? MALFORMED_RECORD
-      : own(artifact, "header")
-      ? (isRecord(artifact.header) ? artifact.header : MALFORMED_RECORD)
-      : null;
-    const terminal = artifactMalformed
-      ? MALFORMED_RECORD
-      : own(artifact, "terminal")
-      ? (isRecord(artifact.terminal) ? artifact.terminal : MALFORMED_RECORD)
-      : null;
-    const metadata = terminal === MALFORMED_RECORD
-      ? MALFORMED_RECORD
-      : terminal && own(terminal, "run_metadata")
-        ? (isRecord(terminal.run_metadata) ? terminal.run_metadata : MALFORMED_RECORD)
-        : null;
-    const identity = header === MALFORMED_RECORD
-      ? MALFORMED_RECORD
-      : header && own(header, "engine_identity")
-        ? (isRecord(header.engine_identity) ? header.engine_identity : MALFORMED_RECORD)
-        : null;
+    const header = resolveTopRecord(artifact, "header");
+    const terminal = resolveTopRecord(artifact, "terminal");
+    const metadataResolved = resolveChildRecord(terminal, "run_metadata");
+    const identityResolved = resolveChildRecord(header, "engine_identity");
+    const metadata = recordForRender(metadataResolved);
+    const identity = recordForRender(identityResolved);
     const metadataRecord = isRecord(metadata) ? metadata : null;
 
     const badges = [
@@ -285,8 +382,14 @@
       detailRow(PROVENANCE_LABELS.degradation_reason, degradationReasonValue(metadata)),
       detailRow(PROVENANCE_LABELS.degraded_from, degradationOriginValue(metadata)),
       detailRow("Evidence class", fieldValue(metadata, "evidence_class", "Evidence class")),
-      detailRow(PROVENANCE_LABELS.backend_authoritative, fieldValue(metadata, "backend_authoritative", PROVENANCE_LABELS.backend_authoritative)),
-      detailRow(PROVENANCE_LABELS.certification_allowed, fieldValue(metadata, "certification_allowed", PROVENANCE_LABELS.certification_allowed)),
+      detailRow(
+        PROVENANCE_LABELS.backend_authoritative,
+        fieldValue(metadata, "backend_authoritative", PROVENANCE_LABELS.backend_authoritative, { boolean: true })
+      ),
+      detailRow(
+        PROVENANCE_LABELS.certification_allowed,
+        fieldValue(metadata, "certification_allowed", PROVENANCE_LABELS.certification_allowed, { boolean: true })
+      ),
       detailRow("Label source", fieldValue(metadata, "label_source", "Label source")),
       detailRow("Label sources", listValue(metadata, "label_sources", "Label sources"))
     ].join("");
@@ -299,27 +402,15 @@
     const artifactNotice = artifactMalformed
       ? `<div class="pending"><strong>Pending</strong><p>Artifact is malformed; expected an object.</p></div>`
       : "";
-    const metadataNotice = artifactMalformed
-      ? `<div class="pending"><strong>Pending</strong><p>terminal.run_metadata is unavailable because the artifact is malformed.</p></div>`
-      : metadata === MALFORMED_RECORD
-      ? `<div class="pending"><strong>Pending</strong><p>terminal.run_metadata is malformed; expected an object.</p></div>`
-      : metadata
-        ? ""
-        : `<div class="pending"><strong>Pending</strong><p>terminal.run_metadata is not emitted.</p></div>`;
-    const identityNotice = artifactMalformed
-      ? `<div class="pending"><strong>Pending</strong><p>header.engine_identity is unavailable because the artifact is malformed.</p></div>`
-      : identity === MALFORMED_RECORD
-      ? `<div class="pending"><strong>Pending</strong><p>header.engine_identity is malformed; expected an object.</p></div>`
-      : identity
-        ? ""
-        : `<div class="pending"><strong>Pending</strong><p>header.engine_identity is not emitted.</p></div>`;
+    const metadataNotice = metadataNoticeHtml(terminal, metadataResolved);
+    const identityNotice = identityNoticeHtml(header, identityResolved);
     const degradationStateContext = isRecord(metadata) && own(metadata, "degradation_reason")
       ? `<div class="sec-p9-state-context"><span>${PROVENANCE_LABELS.degradation_reason}</span>${fieldValue(metadata, "degradation_reason", PROVENANCE_LABELS.degradation_reason)}</div>`
       : "";
 
     return `<section id="sec-p9-provenance" class="sec-p9-provenance" aria-labelledby="sec-p9-provenance-title">` +
       `<h2 id="sec-p9-provenance-title"><span class="sect">P9</span>Run &amp; engine provenance</h2>` +
-      `<p class="sub">Emitted run identity, backend state, evidence class, and engine chain. No confidence tier is computed in the viewer.</p>` +
+      `<p class="sub">Emitted run identity, backend state, evidence class, and configured engines. No confidence tier is computed in the viewer.</p>` +
       `${artifactNotice}${metadataNotice}${identityNotice}<div class="sec-p9-badges">${badges}</div>` +
       degradationStateContext +
       `<details class="sec-p9-details"><summary>Full run, engine, and label provenance</summary>` +
@@ -327,9 +418,9 @@
       `<article><h3>Run input provenance</h3><dl class="sec-p9-facts">${runFacts}</dl></article>` +
       `<article><h3>Backend evidence &amp; degradation</h3><dl class="sec-p9-facts">${backendFacts}${optionalTrustFields}</dl></article>` +
       `<article><h3>Artifact engine identity</h3>${identityDetail(identity)}</article>` +
-      `<article class="sec-p9-engine-chain"><h3>Engine chain</h3>` +
-      `<p class="sec-p9-note">Kernel provider slots are shown as emitted; they do not establish real-backend activity.</p>` +
-      `${engineChainValue(metadata)}</article></div></details></section>`;
+      `<article class="sec-p9-engine-chain"><h3>${ENGINES_USED_TITLE}</h3>` +
+      `<p class="sec-p9-note">Provider registry projection and operator request echo as emitted — not an invocation or execution trace. Does not establish real-backend activity.</p>` +
+      `${enginesUsedValue(metadata)}</article></div></details></section>`;
   }
 
   (root.ReportPanels = root.ReportPanels || []).push({ id: "sec-p9-provenance", render });

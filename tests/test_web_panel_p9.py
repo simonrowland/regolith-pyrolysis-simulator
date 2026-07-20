@@ -6,7 +6,13 @@ import re
 import subprocess
 
 
-def _render_panel(artifact: object, *, species_color_spy_prefix: str = "") -> str:
+def _render_panel(
+    artifact: object,
+    *,
+    species_color_spy_prefix: str = "",
+    species_color_literal: str = "",
+    count_esc_calls: bool = False,
+) -> str:
     root = Path(__file__).resolve().parents[1] / "web/report_viewer"
     harness = r"""
 const fs = require("fs");
@@ -15,8 +21,22 @@ const context = { console };
 context.globalThis = context;
 vm.createContext(context);
 vm.runInContext(fs.readFileSync(process.argv[2], "utf8"), context);
-if (process.argv[5]) {
-  const prefix = process.argv[5];
+const opts = JSON.parse(process.argv[5] || "{}");
+let escCalls = 0;
+const baseEsc = context.ReportLabels.esc;
+if (opts.countEsc) {
+  context.ReportLabels = Object.freeze({
+    ...context.ReportLabels,
+    esc: (value) => { escCalls += 1; return baseEsc(value); },
+  });
+}
+if (opts.speciesColorLiteral) {
+  context.ReportLabels = Object.freeze({
+    ...context.ReportLabels,
+    speciesColor: () => opts.speciesColorLiteral,
+  });
+} else if (opts.speciesColorPrefix) {
+  const prefix = opts.speciesColorPrefix;
   context.ReportLabels = Object.freeze({
     ...context.ReportLabels,
     speciesColor: (species) => `${prefix}${species}`,
@@ -24,8 +44,18 @@ if (process.argv[5]) {
 }
 vm.runInContext(fs.readFileSync(process.argv[3], "utf8"), context);
 const panel = context.ReportPanels.find((item) => item.id === "sec-p9-provenance");
-process.stdout.write(panel.render(JSON.parse(process.argv[4]), [], [], {}));
+const html = panel.render(JSON.parse(process.argv[4]), [], [], {});
+if (opts.countEsc) {
+  process.stdout.write(JSON.stringify({ html, escCalls }));
+} else {
+  process.stdout.write(html);
+}
 """
+    options = {
+        "speciesColorPrefix": species_color_spy_prefix,
+        "speciesColorLiteral": species_color_literal,
+        "countEsc": count_esc_calls,
+    }
     completed = subprocess.run(
         [
             "node",
@@ -33,13 +63,15 @@ process.stdout.write(panel.render(JSON.parse(process.argv[4]), [], [], {}));
             str(root / "labels.js"),
             str(root / "panels/p9-provenance.js"),
             json.dumps(artifact),
-            species_color_spy_prefix,
+            json.dumps(options),
         ],
         input=harness,
         text=True,
         capture_output=True,
         check=True,
     )
+    if count_esc_calls:
+        return completed.stdout
     return completed.stdout
 
 
@@ -153,7 +185,7 @@ def test_p9_real_run_renders_complete_provenance() -> None:
     run_input = _article(html, "Run input provenance")
     backend = _article(html, "Backend evidence &amp; degradation")
     identity = _article(html, "Artifact engine identity")
-    engine_chain = _article(html, "Engine chain")
+    engine_chain = _article(html, "Configured engines (engines_used)")
 
     assert 'id="sec-p9-provenance"' in html
     assert _badge_value(html, "Feedstock") == "Lunar Mare Low Ti"
@@ -164,6 +196,8 @@ def test_p9_real_run_renders_complete_provenance() -> None:
     assert _badge_value(html, "Runtime status") == "ok"
     assert "Yes <small>(emitted)</small>" in _badge_value(html, "Real engine active")
     assert "sec-p9-badge-positive" in _badge_region(html, "Real engine active")
+    assert "sec-p9-badge-positive" in _badge_region(html, "Backend status")
+    assert "sec-p9-badge-positive" in _badge_region(html, "Runtime status")
     assert _badge_value(html, "Evidence class") == "magemin"
     assert _detail_value(run_input, "Charge mass") == "125.5 kg"
     assert "1.25 kg" in _detail_value(run_input, "Additives")
@@ -182,8 +216,14 @@ def test_p9_real_run_renders_complete_provenance() -> None:
     assert f'title="{sha}"' in _detail_value(identity, "Kernel commit SHA")
     assert _detail_value(identity, "Cache version") == "magemin-7.2"
     assert _detail_value(identity, "Backend wire token") == "magemin"
+    # Emitter: active = authoritative-slot projection; requested = config echo; not execution.
+    assert "Authoritative slots (registry projection)" in engine_chain
+    assert "Requested providers (config echo)" in engine_chain
+    assert "not an invocation or execution trace" in engine_chain
+    assert "Engine chain" not in engine_chain
+    assert "Active providers" not in engine_chain
     assert "builtin-vapor-pressure" in _detail_value(engine_chain, "Vapor Pressure")
-    requested = _detail_value(engine_chain, "Requested providers")
+    requested = _detail_value(engine_chain, "Requested providers (config echo)")
     assert _detail_value(requested, "Gate Liquid Fraction") == '<span class="sec-p9-mono-value">magemin</span>'
     assert "magemin" in _detail_value(engine_chain, "Authoritative provider")
     assert "alphamelts" in _detail_value(engine_chain, "Shadow providers")
@@ -191,6 +231,12 @@ def test_p9_real_run_renders_complete_provenance() -> None:
     assert "proof_inputs" in _detail_value(backend, "Label source")
     assert "backend_selection:auto" in _detail_value(backend, "Label sources")
     assert "No confidence tier is computed" in html
+    # Region-specific ban: no invented confidence/grounded tier in backend disclosure.
+    backend_labels = re.findall(r"<dt>([^<]+)</dt>", backend)
+    assert "Confidence tier" not in backend_labels
+    assert "Grounded" not in backend
+    assert not re.search(r"\bConfidence\b", backend)
+    assert not re.search(r"\bGrounded\b", html.split('<details', 1)[0])
 
 
 def test_p9_degraded_run_keeps_reason_and_origin_and_never_claims_grounded() -> None:
@@ -213,6 +259,7 @@ def test_p9_degraded_run_keeps_reason_and_origin_and_never_claims_grounded() -> 
     })
     backend = _article(html, "Backend evidence &amp; degradation")
     reason_context = _state_context(html)
+    chrome = _summary_chrome(html)
 
     assert _badge_value(html, "Backend") == "internal-analytical"
     assert _badge_value(html, "Backend status") == "unavailable"
@@ -220,6 +267,11 @@ def test_p9_degraded_run_keeps_reason_and_origin_and_never_claims_grounded() -> 
     assert "No <small>(emitted)</small>" in _badge_value(html, "Real engine active")
     assert "sec-p9-badge-caution" in _badge_region(html, "Real engine active")
     assert "sec-p9-badge-positive" not in _badge_region(html, "Real engine active")
+    # Unavailable status badges must use caution tone, never positive (F5).
+    assert "sec-p9-badge-caution" in _badge_region(html, "Backend status")
+    assert "sec-p9-badge-caution" in _badge_region(html, "Runtime status")
+    assert "sec-p9-badge-positive" not in _badge_region(html, "Backend status")
+    assert "sec-p9-badge-positive" not in _badge_region(html, "Runtime status")
     assert "diagnostic_only" in reason_context
     assert "not emitted" not in reason_context
     assert _detail_value(backend, "Degradation reason") == "diagnostic_only"
@@ -230,6 +282,21 @@ def test_p9_degraded_run_keeps_reason_and_origin_and_never_claims_grounded() -> 
     assert _detail_value(backend, "Certification allowed") == "false"
     assert _detail_value(backend, "Evidence class") == "internal-analytical"
     assert "Yes <small>(emitted)</small>" not in html
+    # Semantic ban on grounded/confidence claims in chrome, strip, and backend region.
+    assert not re.search(r"\bGrounded\b", chrome)
+    assert not re.search(r"\bGrounded\b", reason_context)
+    assert not re.search(r"\bGrounded\b", backend)
+    assert not re.search(r"\bConfidence\b", chrome)
+    assert not re.search(r"\bConfidence\b", reason_context)
+    assert "Confidence tier" not in re.findall(r"<dt>([^<]+)</dt>", backend)
+    # Degraded summary chrome: badges + degradation strip only.
+    expected_labels = [
+        "Feedstock", "Campaign", "Track", "Backend", "Backend status",
+        "Runtime status", "Real engine active", "Evidence class", "Engine identity",
+    ]
+    assert _badge_labels(html) == expected_labels
+    assert reason_context in chrome
+    assert "sec-p9-state-context" in chrome
 
 
 def test_p9_absent_provenance_stays_pending_without_defaults() -> None:
@@ -246,7 +313,7 @@ def test_p9_absent_provenance_stays_pending_without_defaults() -> None:
     assert "Real engine active not emitted" in _badge_value(html, "Real engine active")
     assert "Real engine active not emitted" in _detail_value(backend, "Real engine active")
     assert "Started at (UTC) not emitted" in html
-    assert "Engine chain not emitted" in html
+    assert "Configured engines (engines_used) not emitted" in html
     assert "Label source not emitted" in html
     additives = _detail_value(run_input, "Additives")
     assert "Additives not emitted" in additives
@@ -325,7 +392,7 @@ def test_p9_nullable_authority_flags_do_not_claim_provider_absence() -> None:
     identity = _article(html, "Artifact engine identity")
     backend = _article(html, "Backend evidence &amp; degradation")
     contributors = _detail_value(backend, "Contributors")
-    engine_chain = _article(html, "Engine chain")
+    engine_chain = _article(html, "Configured engines (engines_used)")
 
     identity_authority = _detail_value(identity, "Authoritative")
     identity_fallback = _detail_value(identity, "Fallback provider")
@@ -385,7 +452,7 @@ def test_p9_partial_fields_are_not_inferred_from_related_values() -> None:
     assert "source-from-list" in _detail_value(backend, "Label sources")
     assert "Degradation reason not emitted" in _detail_value(backend, "Degradation reason")
     assert "legacy-origin" in _detail_value(backend, "Degraded from")
-    assert "Engine chain not emitted" in _article(html, "Engine chain")
+    assert "Configured engines (engines_used) not emitted" in _article(html, "Configured engines (engines_used)")
     assert "Kernel commit SHA not emitted" in _detail_value(run_input, "Kernel commit SHA")
     assert "header-identity-sha" in _detail_value(identity, "Kernel commit SHA")
     charge_mass = _detail_value(run_input, "Charge mass")
@@ -424,7 +491,7 @@ def test_p9_malformed_parent_records_are_not_reported_as_absent() -> None:
     assert "terminal.run_metadata is malformed; expected an object" in html
     assert "header.engine_identity is malformed; expected an object" in html
     assert "Real engine active unavailable because a parent record is malformed" in html
-    assert "Engine chain unavailable because a parent record is malformed" in html
+    assert "Configured engines (engines_used) unavailable because a parent record is malformed" in html
     assert "Feedstock ID unavailable because its parent record is malformed" in _detail_value(run_input, "Feedstock ID")
     assert "Backend status unavailable because its parent record is malformed" in _detail_value(backend, "Backend status")
     assert "Charge mass unavailable because its parent record is malformed" in _detail_value(run_input, "Charge mass")
@@ -468,7 +535,7 @@ def test_p9_present_empty_malformed_null_and_zero_states_stay_distinct() -> None
     assert "Label source emitted as null" in _detail_value(backend, "Label source")
     assert "Label sources: emitted list is empty" in _detail_value(backend, "Label sources")
     assert "Degraded from emitted as null" in _detail_value(backend, "Degraded from")
-    assert "Engine chain emitted as null" in _article(html, "Engine chain")
+    assert "Configured engines (engines_used) emitted as null" in _article(html, "Configured engines (engines_used)")
 
     null_additives_html = _render_panel({
         "header": {"engine_identity": {"name": "state-check"}},
@@ -485,7 +552,7 @@ def test_p9_present_empty_malformed_null_and_zero_states_stay_distinct() -> None
     assert "No additive entries in emitted map" in _detail_value(
         _article(empty_maps_html, "Run input provenance"), "Additives"
     )
-    assert "Emitted map is empty" in _article(empty_maps_html, "Engine chain")
+    assert "Emitted map is empty" in _article(empty_maps_html, "Configured engines (engines_used)")
 
     malformed_shapes_html = _render_panel({
         "header": {"engine_identity": {"name": "state-check"}},
@@ -502,7 +569,7 @@ def test_p9_present_empty_malformed_null_and_zero_states_stay_distinct() -> None
     assert "Additives map is malformed" in _detail_value(malformed_run_input, "Additives")
     assert "Real engine active is malformed" in _detail_value(malformed_backend, "Real engine active")
     assert "Real engine active is malformed" in _badge_value(malformed_shapes_html, "Real engine active")
-    assert "Engine chain is malformed" in _article(malformed_shapes_html, "Engine chain")
+    assert "Configured engines (engines_used) is malformed" in _article(malformed_shapes_html, "Configured engines (engines_used)")
 
     malformed_mass_html = _render_panel({
         "header": {"engine_identity": {"name": "state-check"}},
@@ -579,8 +646,8 @@ def test_p9_dynamic_keys_and_identifier_attributes_are_escaped_exactly_once() ->
     additives = _detail_value(run_input, "Additives")
     identity = _article(html, "Artifact engine identity")
     identifier = _detail_value(identity, "Kernel commit SHA")
-    engine_chain = _article(html, "Engine chain")
-    requested = _detail_value(engine_chain, "Requested providers")
+    engine_chain = _article(html, "Configured engines (engines_used)")
+    requested = _detail_value(engine_chain, "Requested providers (config echo)")
 
     assert "&lt;img src=x onerror=bad()&gt;" in additives
     assert "1 kg" in additives
@@ -588,6 +655,9 @@ def test_p9_dynamic_keys_and_identifier_attributes_are_escaped_exactly_once() ->
     assert 'title="&quot; onmouseover=&quot;bad()"' in identifier
     assert 'title="" onmouseover="bad()"' not in identifier
     assert "&amp;quot;" not in identifier
+    # aria-label is an independent esc route from title (F6 / codex identifier attrs).
+    assert 'aria-label="Kernel commit SHA: &quot; onmouseover=&quot;bad()"' in identifier
+    assert 'aria-label="Kernel commit SHA: " onmouseover="bad()"' not in identifier
     assert "&lt;Img Src=X Onerror=Bad()&gt;" in requested
     assert "<img" not in requested.lower() and "&amp;lt;" not in requested
 
@@ -607,6 +677,10 @@ def test_p9_optional_trust_fields_survive_with_emitted_values() -> None:
                     "reference": "audit<R9>",
                     "authoritative": False,
                     "diagnostic_only": True,
+                    "status": "provisional",
+                    "high_uncertainty": True,
+                    "extrapolation": False,
+                    "skip_reason": "license unavailable",
                 }],
                 "requires_inherited_evidence_class": True,
             }
@@ -625,6 +699,11 @@ def test_p9_optional_trust_fields_survive_with_emitted_values() -> None:
     assert _detail_value(contributors, "Reference") == '<span class="sec-p9-mono-value">audit&lt;R9&gt;</span>'
     assert _detail_value(contributors, "Authoritative") == '<span class="sec-p9-mono-value">false</span>'
     assert _detail_value(contributors, "Diagnostic only") == '<span class="sec-p9-mono-value">true</span>'
+    # Nested mandated flags: selective drop of any one must fail (codex nested-flags finding).
+    assert _detail_value(contributors, "Status") == '<span class="sec-p9-mono-value">provisional</span>'
+    assert _detail_value(contributors, "High uncertainty") == '<span class="sec-p9-mono-value">true</span>'
+    assert _detail_value(contributors, "Extrapolation") == '<span class="sec-p9-mono-value">false</span>'
+    assert "license unavailable" in _detail_value(contributors, "Skip reason")
     assert "<unsafe>" not in contributors and "&amp;lt;" not in contributors
     assert "Evidence class not emitted" in _badge_value(html, "Evidence class")
     assert "Evidence class not emitted" in _detail_value(backend, "Evidence class")
@@ -687,6 +766,19 @@ def test_p9_additive_colors_use_shared_species_palette() -> None:
     assert 'style="--species-color:sentinel-color-C"' in additives
     assert 'style="--species-color:sentinel-color-Mg"' in additives
     assert 'style="--species-color:sentinel-color-Fe"' in additives
+
+    # speciesColor return is escaped into the style attribute (F7).
+    hostile_color = 'red; " onload="bad()'
+    hostile_html = _render_panel(
+        {
+            "header": {"engine_identity": {"name": "magemin"}},
+            "terminal": {"run_metadata": {"additives_kg": {"C": 1.0}}},
+        },
+        species_color_literal=hostile_color,
+    )
+    hostile_additives = _detail_value(_article(hostile_html, "Run input provenance"), "Additives")
+    assert 'style="--species-color:red; &quot; onload=&quot;bad()"' in hostile_additives
+    assert 'style="--species-color:red; " onload="bad()"' not in hostile_additives
 
 
 def test_p9_related_fields_do_not_fill_missing_provenance() -> None:
@@ -755,3 +847,192 @@ def test_p9_related_fields_do_not_fill_missing_provenance() -> None:
     assert "magemin" not in missing_identity_badge
     assert "Engine name not emitted" in missing_identity_name
     assert "magemin" not in missing_identity_name
+
+
+def test_p9_type_invalid_authority_flags_are_malformed_not_claims() -> None:
+    """String/number trust flags must not render as valid boolean claims (codex/grok F2)."""
+    html = _render_panel({
+        "header": {
+            "engine_identity": {
+                "name": "x",
+                "authoritative": "yes",
+                "high_uncertainty": 0,
+                "diagnostic_only": "false",
+                "extrapolation": 1,
+            }
+        },
+        "terminal": {
+            "run_metadata": {
+                "backend_authoritative": 1,
+                "certification_allowed": "yes",
+                "backend_real_active": True,
+                "requires_inherited_evidence_class": "false",
+                "contributors": [{
+                    "authoritative": "true",
+                    "diagnostic_only": 1,
+                    "high_uncertainty": "yes",
+                    "extrapolation": 0,
+                }],
+            }
+        },
+    })
+    backend = _article(html, "Backend evidence &amp; degradation")
+    identity = _article(html, "Artifact engine identity")
+    contributors = _detail_value(backend, "Contributors")
+
+    assert "Backend authoritative is malformed" in _detail_value(backend, "Backend authoritative")
+    assert "1" not in _detail_value(backend, "Backend authoritative")
+    assert "Certification allowed is malformed" in _detail_value(backend, "Certification allowed")
+    assert "yes" not in _detail_value(backend, "Certification allowed")
+    assert "Requires inherited evidence class is malformed" in _detail_value(
+        backend, "Requires inherited evidence class"
+    )
+    assert "Authoritative is malformed" in _detail_value(identity, "Authoritative")
+    assert "yes" not in _detail_value(identity, "Authoritative")
+    assert "High uncertainty is malformed" in _detail_value(identity, "High uncertainty")
+    # Numeric 0 must not look like a measured zero.
+    assert _detail_value(identity, "High uncertainty") != "0"
+    assert "0" not in _detail_value(identity, "High uncertainty")
+    assert "Diagnostic only is malformed" in _detail_value(identity, "Diagnostic only")
+    assert "false" not in _detail_value(identity, "Diagnostic only")
+    assert "Extrapolation is malformed" in _detail_value(identity, "Extrapolation")
+    assert "Authoritative is malformed" in _detail_value(contributors, "Authoritative")
+    assert "true" not in _detail_value(contributors, "Authoritative")
+    assert "Diagnostic only is malformed" in _detail_value(contributors, "Diagnostic only")
+    assert "High uncertainty is malformed" in _detail_value(contributors, "High uncertainty")
+    assert "Extrapolation is malformed" in _detail_value(contributors, "Extrapolation")
+    # Valid boolean real-active still works on the same artifact.
+    assert "Yes <small>(emitted)</small>" in _detail_value(backend, "Real engine active")
+
+
+def test_p9_hostile_feedstock_id_is_escaped_once_in_badge_and_detail() -> None:
+    """prettyFeedstock branch must still go through ReportLabels.esc (codex feedstock XSS)."""
+    hostile = "<img src=x onerror=bad()>"
+    html = _render_panel({
+        "header": {"engine_identity": {"name": "state-check"}},
+        "terminal": {"run_metadata": {"feedstock_id": hostile}},
+    })
+    badge = _badge_value(html, "Feedstock")
+    detail = _detail_value(_article(html, "Run input provenance"), "Feedstock ID")
+    # prettyFeedstock title-cases tokens; esc encodes the result once.
+    assert "&lt;" in badge and "&gt;" in badge
+    assert "<img" not in badge.lower()
+    assert "&amp;lt;" not in badge
+    assert "&lt;" in detail and "&gt;" in detail
+    assert "<img" not in detail.lower()
+    assert "&amp;lt;" not in detail
+
+
+def test_p9_real_active_without_backend_authoritative_stays_partial() -> None:
+    """Reverse partial: present real-active must not invent backend_authoritative (codex)."""
+    html = _render_panel({
+        "header": {"engine_identity": {"name": "state-check"}},
+        "terminal": {
+            "run_metadata": {
+                "backend_real_active": True,
+            }
+        },
+    })
+    backend = _article(html, "Backend evidence &amp; degradation")
+    authority = _detail_value(backend, "Backend authoritative")
+    real_active = _detail_value(backend, "Real engine active")
+
+    assert "Backend authoritative not emitted" in authority
+    assert "true" not in authority and "false" not in authority
+    assert "Yes <small>(emitted)</small>" in real_active
+    assert "Backend authoritative" not in _badge_value(html, "Real engine active")
+
+
+def test_p9_whitespace_bearing_identifier_is_malformed() -> None:
+    """Surrounding whitespace on a SHA is malformed provenance, not silently trimmed."""
+    padded = " deadbeef "
+    html = _render_panel({
+        "header": {
+            "engine_identity": {
+                "name": "state-check",
+                "kernel_commit_sha": padded,
+            }
+        },
+        "terminal": {"run_metadata": {"kernel_commit_sha": padded}},
+    })
+    run_sha = _detail_value(_article(html, "Run input provenance"), "Kernel commit SHA")
+    identity_sha = _detail_value(_article(html, "Artifact engine identity"), "Kernel commit SHA")
+
+    assert "Kernel commit SHA is malformed" in run_sha
+    assert "Kernel commit SHA is malformed" in identity_sha
+    assert "deadbeef" not in run_sha
+    assert "deadbeef" not in identity_sha
+    assert 'title="deadbeef"' not in html
+
+
+def test_p9_parent_null_and_malformed_are_diagnosed_at_the_broken_node() -> None:
+    """Parent null/malformed must not be reported as a malformed child (grok F3)."""
+    null_parents = _render_panel({"header": None, "terminal": None})
+    assert "terminal emitted as null; run_metadata unavailable" in null_parents
+    assert "header emitted as null; engine_identity unavailable" in null_parents
+    assert "terminal.run_metadata is malformed" not in null_parents
+    assert "header.engine_identity is malformed" not in null_parents
+
+    malformed_parents = _render_panel({"header": [], "terminal": "x"})
+    assert "terminal is malformed; run_metadata unavailable" in malformed_parents
+    assert "header is malformed; engine_identity unavailable" in malformed_parents
+    assert "terminal.run_metadata is malformed" not in malformed_parents
+    assert "header.engine_identity is malformed" not in malformed_parents
+
+    null_children = _render_panel({
+        "header": {"engine_identity": None},
+        "terminal": {"run_metadata": None},
+    })
+    assert "run_metadata emitted as null" in null_children
+    assert "engine_identity emitted as null" in null_children
+    assert "terminal.run_metadata is malformed" not in null_children
+    assert "header.engine_identity is malformed" not in null_children
+    assert "terminal.run_metadata is not emitted" not in null_children
+
+
+def test_p9_css_selectors_stay_scoped_under_panel_root() -> None:
+    """Every non-empty CSS rule must be under .sec-p9-provenance (F8)."""
+    css = (Path(__file__).resolve().parents[1] / "web/report_viewer/panels/p9-provenance.css").read_text()
+    # Strip comments then collect selector groups before each `{`.
+    stripped = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
+    selectors = re.findall(r"([^{}]+)\{", stripped)
+    assert selectors, "expected at least one CSS rule"
+    for group in selectors:
+        for selector in group.split(","):
+            selector = selector.strip()
+            if not selector:
+                continue
+            # Allow @media wrappers (selectors inside still checked as separate groups).
+            if selector.startswith("@"):
+                continue
+            assert selector.startswith(".sec-p9-provenance"), (
+                f"unscoped selector: {selector!r}"
+            )
+
+
+def test_p9_uses_shared_reportlabels_esc_for_hostile_artifact_text() -> None:
+    """Panel must call ReportLabels.esc (not a local twin) for hostile text (F8)."""
+    payload = _render_panel(
+        {
+            "header": {
+                "engine_identity": {
+                    "name": "<script>x</script>",
+                    "kernel_commit_sha": "abcdef0123456789abcdef0123456789",
+                }
+            },
+            "terminal": {
+                "run_metadata": {
+                    "feedstock_id": "<img src=x onerror=bad()>",
+                    "label_sources": ['" onload="bad()'],
+                }
+            },
+        },
+        count_esc_calls=True,
+    )
+    data = json.loads(payload)
+    html = data["html"]
+    assert data["escCalls"] >= 3
+    assert "&lt;script&gt;" in html
+    assert "<script>" not in html
+    assert "&lt;img" in html or "&lt;Img" in html
+    assert "<img" not in html.lower() or "&lt;img" in html.lower()
