@@ -282,11 +282,14 @@ def test_p9_degraded_run_keeps_reason_and_origin_and_never_claims_grounded() -> 
     assert _detail_value(backend, "Certification allowed") == "false"
     assert _detail_value(backend, "Evidence class") == "internal-analytical"
     assert "Yes <small>(emitted)</small>" not in html
-    # Semantic ban on grounded/confidence claims in chrome, strip, and backend region.
-    assert not re.search(r"\bGrounded\b", chrome)
+    # Semantic ban on grounded/confidence claims across the full visible shell
+    # (subtitle + chrome + strip + backend). Region-only bans let a subtitle
+    # claim survive while "No confidence tier is computed" remains present.
+    pre_details = html.split("<details", 1)[0]
+    assert not re.search(r"\bGrounded\b", pre_details)
     assert not re.search(r"\bGrounded\b", reason_context)
     assert not re.search(r"\bGrounded\b", backend)
-    assert not re.search(r"\bConfidence\b", chrome)
+    assert not re.search(r"\bConfidence\b", pre_details)
     assert not re.search(r"\bConfidence\b", reason_context)
     assert "Confidence tier" not in re.findall(r"<dt>([^<]+)</dt>", backend)
     # Degraded summary chrome: badges + degradation strip only.
