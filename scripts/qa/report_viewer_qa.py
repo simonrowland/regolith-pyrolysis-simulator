@@ -28,7 +28,7 @@ RUN_IDS = [
 ]
 
 REPORT_HEADINGS = [
-    "Evolved metal mass — Ellingham order",
+    "Product-ledger metal projection — Ellingham order",
     "Process record — per-hour telemetry",
     "Account disposition",
     "Full terminal ledger",

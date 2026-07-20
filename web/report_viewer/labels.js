@@ -47,7 +47,7 @@
 
   // These helpers stringify their input, so a non-scalar would surface as
   // "[object Object]" inside a label. Malformed data says so instead.
-  function scalarText(value, missing = "—") {
+  function scalarText(value, missing = "not emitted") {
     return value !== null && typeof value === "object"
       ? `malformed (${Array.isArray(value) ? "array" : "object"})`
       : String(value ?? missing);
@@ -63,10 +63,55 @@
     return `${numeric.toLocaleString(undefined, { maximumSignificantDigits: 4 })}${suffix}`;
   }
 
+  const hasNumber = (value) => typeof value === "number" && Number.isFinite(value);
+
+  function exactValue(value, unit = "") {
+    return hasNumber(value)
+      ? `<span title="${esc(`${String(value)}${unit ? ` ${unit}` : ""}`)}">${esc(fmtNum(value, unit))}</span>`
+      : "not emitted";
+  }
+
+  const isHashLike = (value) => typeof value === "string"
+    && /^(?:[0-9a-f]{24,}|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i.test(value.trim());
+
   function fmtRunId(id) {
     const value = scalarText(id, "");
-    const hashLike = /^(?:[0-9a-f]{24,}|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i;
-    return hashLike.test(value) ? `${value.slice(0, 8)}…` : value;
+    return isHashLike(value) ? `${value.slice(0, 8)}…` : value;
+  }
+
+  function priceAuthority(artifact) {
+    const rollup = artifact?.terminal?.run_metadata?.cost_rollup_diagnostic;
+    if (!rollup || typeof rollup !== "object" || Array.isArray(rollup)) return null;
+    const basis = typeof rollup.price_basis === "string" ? rollup.price_basis.trim() : "";
+    const count = hasNumber(rollup.owner_ratify_placeholder_count)
+      ? rollup.owner_ratify_placeholder_count
+      : null;
+    const placeholders = Array.isArray(rollup.owner_ratify_placeholders) ? rollup.owner_ratify_placeholders : [];
+    const names = placeholders
+      .map((item) => item && typeof item === "object" && !Array.isArray(item) ? item.name : null)
+      .filter((name) => typeof name === "string" && name.trim())
+      .map((name) => name.trim());
+    const flagged = (count !== null && count > 0)
+      || placeholders.some((item) => item && typeof item === "object" && !Array.isArray(item)
+        && item.status === "owner-ratify-placeholder");
+    return flagged ? { basis, count, names } : null;
+  }
+
+  function priceAuthorityNote(authority, extraClass = "") {
+    if (!authority) return "";
+    const authorityParts = [
+      authority.basis ? `basis <span class="mono">${esc(authority.basis)}</span>` : null,
+      authority.count !== null && authority.count > 0
+        ? `${esc(fmtNum(authority.count))} placeholder price parameter${authority.count === 1 ? "" : "s"} awaiting owner ratification`
+        : null,
+      authority.names.length
+        ? `parameters ${authority.names.map((name) => `<span class="mono">${esc(name)}</span>`).join(", ")}`
+        : null
+    ].filter(Boolean);
+    const classSuffix = typeof extraClass === "string" && extraClass.trim()
+      ? ` ${esc(extraClass.trim())}`
+      : "";
+    return `<div class="note${classSuffix}"><b>Price authority:</b> ${authorityParts.join(" · ")}</div>`;
   }
 
   function prettySpecies(name) {
@@ -140,6 +185,8 @@
   }
 
   root.ReportLabels = Object.freeze({
-    scalarText, fmtNum, fmtRunId, prettySpecies, accountLabel, prettyFeedstock, prettyChemText, speciesColor, esc
+    scalarText, fmtNum, fmtRunId, prettySpecies, accountLabel, prettyFeedstock,
+    prettyChemText, speciesColor, hasNumber, exactValue, isHashLike,
+    priceAuthority, priceAuthorityNote, esc
   });
 }(globalThis));

@@ -159,16 +159,16 @@ def test_report_viewer_serves_index_and_assets(tmp_path: Path) -> None:
 
 
 def test_report_viewer_reads_canonical_cost_provenance_key() -> None:
-    root = Path(__file__).resolve().parents[1] / "web" / "report_viewer"
-    report_source = (root / "report-viewer.js").read_text(encoding="utf-8")
-    settings_source = (root / "settings.js").read_text(encoding="utf-8")
-    sample = json.loads((root / "sample-run-artifact.json").read_text(encoding="utf-8"))
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["header"]["cost_block"] = {
+        "electrical_cost_per_kWh": 0.1,
+        "solar_heat_cost_per_kWh": 0.2,
+        "provenance": "canonical provenance marker",
+    }
 
-    assert "cost_block?.provenance" in report_source
-    assert "prices.provenance" in report_source
-    assert "cost.provenance" in settings_source
-    assert sample["header"]["cost_block"]["provenance"]
-    assert "_provenance" not in sample["header"]["cost_block"]
+    html = _render_report_html(artifact)
+
+    assert "Cost provenance:</b> canonical provenance marker" in html
 
 
 @pytest.mark.parametrize("include_activity", [False, True])
@@ -233,6 +233,7 @@ setImmediate(() => process.stdout.write(report.innerHTML));
         assert "ACTIVE" not in completed.stdout
         assert "IDLE" not in completed.stdout
         assert "Pending W-A10" in completed.stdout
+    assert '<th class="num">Designated + coproduct</th>' in completed.stdout
 
 
 def test_report_viewer_no_rows_pumping_is_pending_not_measured_zero() -> None:
@@ -534,11 +535,37 @@ setImmediate(() => process.stdout.write(report.innerHTML));
     # Group labels are account-role buckets, not origin/yield claims.
     assert "feedstock-origin" not in html
     assert "O2_source_side_potential_kg_cumulative" not in html
-    assert "cumulative source-side potential · not recovered product" in html
+    assert "pending — O₂ metric label not emitted" in html
+    assert "cumulative source-side potential · not recovered product" not in html
     assert "not feedstock origin or recovered yield" in html
     assert '<span class="sect">03</span>Account disposition' in html
     assert '<span class="sect">04</span>Full terminal ledger' in html
     assert html.count('<span class="sect">03</span>') == 1
+
+
+def test_metal_phase_disposition_splits_ingots_from_unrecovered_species() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["terminal"] = {
+        "final_state": {
+            "process.metal_phase": {
+                "Fe": 3.0,
+                "SiO2": 1.0,
+                "Na": 0.5,
+            }
+        }
+    }
+
+    html = _render_report_html(artifact)
+    product_start = html.index("Product accounts")
+    retained_start = html.index("Retained accounts")
+    product_block = html[product_start:retained_start]
+    retained_block = html[retained_start:]
+
+    assert "Fe" in product_block
+    assert "SiO₂" not in product_block
+    assert "Na" not in product_block
+    assert "SiO₂" in retained_block
+    assert "Na" in retained_block
 
 
 
@@ -600,7 +627,7 @@ setImmediate(() => process.stdout.write(report.innerHTML));
     assert "aaaaaaaa…" in html or "aaaaaaaa" in html
     assert "Execution status: partial" in html
     sections = [
-        "Evolved metal mass",
+        "Product-ledger metal projection",
         "Process record",
         "Account disposition",
         "Full terminal ledger",
@@ -641,15 +668,46 @@ def test_report_viewer_glance_rejects_non_numeric_energy_values() -> None:
     assert "0 kWh" not in html
 
 
-def test_report_viewer_energy_aggregate_rejects_non_numeric_rows() -> None:
-    """Falsifiable guard on the AGGREGATION gate (strict `hasNumber` → sumPresent → reportedEnergy).
+def test_report_viewer_uses_emitted_cumulative_energy_and_surfaces_its_scope() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["timesteps"] = [
+        {
+            "hour": 1,
+            "summary": {
+                "campaign": "C0",
+                "energy_electrical_kWh": 2.0,
+                "energy_evaporation_thermal_kWh": 3.0,
+                "energy_electrical_plus_evaporation_cumulative_kWh": 41.25,
+                "energy_scope": "electrical_plus_known_evaporation_enthalpy",
+                "furnace_heat_status": "partial",
+            },
+            "ledger": {},
+        }
+    ]
 
-    The sibling glance test above asserts current-grid cells, which render through the independently
-    hardened `fmtNum` — so it survives reverting `hasNumber` and cannot guard this path (review finding,
-    2026-07-20). Here a non-numeric row must poison the SUM into honest pending: with the old coercing
-    `Number.isFinite(Number(v))` gate, `[]` → 0 and the header would fabricate a 9 kWh total.
+    html = _render_report_html(artifact)
+
+    assert (
+        '<div class="k">Reported energy</div><div class="v">'
+        '<span title="41.25 kWh">41.25 kWh</span>'
+    ) in html
+    assert 'title="energy_scope: electrical_plus_known_evaporation_enthalpy"' in html
+    assert "energy scope electrical plus known evaporation enthalpy" in html
+    assert 'title="furnace_heat_status: partial"' in html
+    assert "furnace heat partial" in html
+
+
+def test_report_viewer_energy_aggregate_rejects_non_numeric_rows() -> None:
+    """Falsifiable guard on the viewer-computed cost aggregation path.
+
+    A non-numeric row must poison the sum into honest pending. With the old coercing
+    `Number.isFinite(Number(v))` gate, `[]` becomes zero and fabricates a $9 estimate.
     """
     artifact = _artifact(recipe_snapshot=None)
+    artifact["header"]["cost_block"] = {
+        "electrical_cost_per_kWh": 1.0,
+        "solar_heat_cost_per_kWh": 1.0,
+    }
     artifact["timesteps"] = [
         {
             "hour": 1,
@@ -673,9 +731,8 @@ def test_report_viewer_energy_aggregate_rejects_non_numeric_rows() -> None:
 
     html = _render_report_html(artifact)
 
-    # Aggregate must refuse, not sum a coerced 0 into a confident total.
-    assert '<div class="k">Reported energy</div><div class="v">not emitted' in html
-    assert "9 kWh" not in html  # 5 + 0 + 2 + 2 under the old coercing gate
+    assert "Pending cost estimate" in html
+    assert "Total $9.00" not in html
 
 
 def test_report_viewer_404_and_corrupt_payload_render_fatal() -> None:
@@ -728,7 +785,10 @@ def test_report_viewer_css_has_responsive_and_dark_layout_guards() -> None:
     assert "@media (prefers-color-scheme: dark)" in css
     assert ".status-banner.failed" in css
     assert "word-break: break-word" in css
-    assert ".table-wrap" in css and "overflow-x: auto" in css
+    assert re.search(
+        r"(?ms)^\.table-wrap\s*\{[^}]*\boverflow-x:\s*auto\s*;?[^}]*\}",
+        css,
+    )
 
 
 def test_demo_note_light_mode_contrast_meets_wcag_aa() -> None:
@@ -776,10 +836,22 @@ def test_library_headline_chips_respect_yield_semantics_and_hide_hash_titles() -
             "summary": "fixture",
             "headline_yields_kg": {"Fe": 12.5, "O2": 4.25},
             "headline_yield_semantics": {
-                "Fe": "evolved_product",
+                "Fe": "mixed_account_product_ledger_projection",
                 "O2": "source_side_potential",
             },
             "live": True,
+            "starred": False,
+        },
+        {
+            "run_id": "sparse-semantics",
+            "name": "Sparse semantics",
+            "status": "ok",
+            "lifecycle": "complete",
+            "folder": "Default runs",
+            "summary": "basis absent",
+            "headline_yields_kg": {"Fe": 1.0, "O2": 2.0},
+            "live": False,
+            "artifact": "index.html",
             "starred": False,
         },
         {
@@ -857,9 +929,11 @@ setTimeout(() => {
     assert "<h2>0123456789abcdef0123456789abcdef</h2>" not in html
     assert ">Untitled run · 01234567…</h2>" in html
     assert "Named demo" in html
-    assert "evolved" in html
+    assert "product-ledger projection (mixed accounts; not recovery-only)" in html
     assert "source-side potential (not recovered)" in html
     assert "not recovered" in html
+    assert "basis pending (semantics not emitted)" in html
+    assert "O₂ basis pending (metric semantics not emitted)" in html
     assert 'aria-label="Load report for Untitled run · 01234567…"' in html
     assert 'aria-labelledby="indexed-runs-heading"' in result["library"]
 
@@ -1205,7 +1279,7 @@ setImmediate(() => process.stdout.write(JSON.stringify({
     assert 'aria-label="Previous hour"' in html
     assert 'aria-label="Next hour"' in html
     assert 'aria-valuetext="Hour 1 of 2"' in html or "aria-valuetext" in html
-    assert "Evolved metal mass — Ellingham order" in html
+    assert "Product-ledger metal projection — Ellingham order" in html
     assert "Extraction yields" not in html
     assert "Product accounts" in html
     assert result["hasPrev"] and result["hasNext"] and result["hasInput"]
@@ -1220,7 +1294,8 @@ def test_report_labels_format_scientific_values_and_identifiers() -> None:
     harness = r"""
 require(process.argv[2]);
 const {
-  fmtNum, fmtRunId, prettySpecies, accountLabel, prettyFeedstock, prettyChemText, speciesColor
+  scalarText, fmtNum, fmtRunId, prettySpecies, accountLabel, prettyFeedstock,
+  prettyChemText, speciesColor, isHashLike
 } = globalThis.ReportLabels;
 process.stdout.write(JSON.stringify({
   zero: fmtNum(0, "mol"),
@@ -1235,7 +1310,13 @@ process.stdout.write(JSON.stringify({
   feedstock: prettyFeedstock("lunar_mare_low_ti"),
   chem: prettyChemText("source-side O2 potential (emitted; not recovered)"),
   lithiumFamily: [speciesColor("Li"), speciesColor("Li2O")],
-  rejected: [fmtNum([], "kg"), fmtNum("  ", "kg"), fmtNum("12", "kg"), fmtNum(true, "kg")]
+  rejected: [fmtNum([], "kg"), fmtNum("  ", "kg"), fmtNum("12", "kg"), fmtNum(true, "kg")],
+  absentText: scalarText(undefined),
+  hashes: [
+    isHashLike("0123456789abcdef0123456789abcdef"),
+    isHashLike("01234567-89ab-cdef-0123-456789abcdef"),
+    isHashLike("01234567-abcdefabcdefabcdefabcdefabc")
+  ]
 }));
 """
     completed = subprocess.run(
@@ -1261,6 +1342,33 @@ process.stdout.write(JSON.stringify({
     assert result["chem"] == "source-side O₂ potential (emitted; not recovered)"
     assert result["lithiumFamily"][0] == result["lithiumFamily"][1]
     assert result["rejected"] == ["not emitted"] * 4
+    assert result["absentText"] == "not emitted"
+    assert result["hashes"] == [True, True, False]
+
+
+def test_report_viewer_modules_use_shared_authority_numeric_and_hash_helpers() -> None:
+    root = Path(__file__).resolve().parents[1] / "web/report_viewer"
+    labels_source = (root / "labels.js").read_text(encoding="utf-8")
+    report_source = (root / "report-viewer.js").read_text(encoding="utf-8")
+    library_source = (root / "library.js").read_text(encoding="utf-8")
+    settings_source = (root / "settings.js").read_text(encoding="utf-8")
+
+    for helper in (
+        "hasNumber", "exactValue", "isHashLike", "priceAuthority",
+        "priceAuthorityNote",
+    ):
+        assert helper in labels_source
+    assert "function priceAuthority(" not in report_source
+    assert "function priceAuthority(" not in settings_source
+    assert "const hasNumber =" not in report_source
+    assert "const hasNumber =" not in library_source
+    assert "const hasNumber =" not in settings_source
+    assert "const exactValue =" not in report_source
+    assert "const exactNumber =" not in library_source
+    assert "const displayNumber =" not in settings_source
+    assert "const isHashLike =" not in report_source
+    assert "const isHashLike =" not in library_source
+    assert "const isHashLike =" not in settings_source
 
 
 def test_library_and_settings_reject_numeric_coercion() -> None:
@@ -1285,8 +1393,8 @@ function run(sourcePath, expression) {
   return vm.runInContext(expression, context);
 }
 process.stdout.write(JSON.stringify({
-  library: run(process.argv[3], '[exactNumber([], "kg"), exactNumber("  ", "kg"), exactNumber("12", "kg")]'),
-  settings: run(process.argv[4], '[displayNumber([], "kg"), displayNumber("  ", "kg"), displayNumber("12", "kg")]')
+  library: run(process.argv[3], '[exactValue([], "kg"), exactValue("  ", "kg"), exactValue("12", "kg")]'),
+  settings: run(process.argv[4], '[exactValue([], "kg"), exactValue("  ", "kg"), exactValue("12", "kg")]')
 }));
 """
     completed = subprocess.run(
@@ -1511,6 +1619,94 @@ def test_report_viewer_shows_stage_warning_beside_verdict() -> None:
     assert html.count('class="stage-warning"') == 1
 
 
+def test_metal_yields_are_labeled_as_a_mixed_account_product_ledger_projection() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["timesteps"] = [
+        {
+            "hour": 1,
+            "summary": {"campaign": "C0", "metal_yields_kg": {"Fe": 12.5}},
+            "ledger": {},
+        }
+    ]
+
+    html = _render_report_html(artifact)
+
+    assert "Product-ledger metal projection — Ellingham order" in html
+    assert "spans evolved, in-process, retained, and recovered accounts" in html
+    assert "not recovery-only" in html
+    assert "Evolved metal mass" not in html
+    assert "Not recovered product mass" not in html
+
+
+def test_run_store_emits_mixed_account_product_ledger_semantics_for_metals() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["timesteps"] = [
+        {"summary": {"hour": 1, "metal_yields_kg": {"Fe": 12.5}}}
+    ]
+
+    summary = RunArtifactStore._summary(artifact, "fallback-run")
+
+    assert summary["headline_yield_semantics"]["Fe"] == (
+        "mixed_account_product_ledger_projection"
+    )
+
+
+def test_sparse_oxygen_metric_keeps_basis_pending() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["timesteps"] = [
+        {
+            "hour": 1,
+            "summary": {
+                "campaign": "C0",
+                "O2_source_side_potential_kg_cumulative": 4.25,
+            },
+            "ledger": {},
+        }
+    ]
+
+    html = _render_report_html(artifact)
+
+    assert "O₂ metric label not emitted" in html
+    assert "Basis</span><b>pending — O₂ metric label not emitted" in html
+    assert "cumulative source-side potential · not recovered product" not in html
+
+
+def test_terminal_ledger_rejects_non_object_species_maps() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["terminal"] = {
+        "final_state": {"process.condensation_train": "ab"},
+    }
+
+    html = _render_report_html(artifact)
+
+    assert "captured, malformed species map" in html
+    assert "0 a" not in html
+    assert "1 b" not in html
+
+
+def test_yield_and_oxygen_exact_kg_surfaces_reject_numeric_coercion() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["timesteps"] = [
+        {
+            "hour": 1,
+            "summary": {
+                "campaign": "C0",
+                "metal_yields_kg": {"Fe": []},
+                "O2_source_side_potential_kg_cumulative": [],
+                "O2_metric_label": "source-side O2 potential",
+            },
+            "ledger": {},
+        }
+    ]
+
+    html = _render_report_html(artifact)
+
+    assert '<div class="k">Fe product-ledger projection</div><div class="v">not emitted</div>' in html
+    assert '<div class="ct">source-side O₂ potential</div><div class="cbig">not emitted</div>' in html
+    assert "0 kg" not in html
+    assert "1 kg" not in html
+
+
 def test_wall_deposit_total_is_disclosed_viewer_side_sum_with_segments() -> None:
     artifact = _artifact(recipe_snapshot=None)
     artifact["timesteps"] = [
@@ -1566,6 +1762,25 @@ def test_wall_deposit_empty_segment_stays_pending() -> None:
     assert "none emitted" in html
     assert "viewer-side sum (no emitted total)" not in html
     assert ">0 kg</span>" not in html
+
+
+def test_wall_deposit_empty_map_renders_not_emitted_instead_of_empty_table() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["timesteps"] = [
+        {
+            "hour": 1,
+            "summary": {
+                "campaign": "C0",
+                "wall_deposit_cumulative_kg": {},
+            },
+            "ledger": {},
+        }
+    ]
+
+    html = _render_report_html(artifact)
+
+    assert '<span>Per-segment breakdown</span><b>not emitted</b>' in html
+    assert "<th>Emitted segment</th>" not in html
 
 
 def test_cleaned_melt_title_requires_emitted_ceramic_classification() -> None:
@@ -1753,6 +1968,7 @@ def test_report_viewer_labels_timestep_summaries_as_viewer_derived() -> None:
     assert "2 viewer-derived timestep rows" in html
     assert "Viewer-derived temperature range" in html
     assert "Viewer-derived electrical + evaporation thermal" in html
+    assert "Viewer-derived cumulative energy · kWh" in html
 
 
 def test_zero_cost_total_has_no_cost_share_basis() -> None:
@@ -1793,6 +2009,46 @@ def test_sparse_stage_purity_verdict_stays_pending() -> None:
     assert '<span class="verdict unavailable">PENDING</span>' in html
     assert '<span class="verdict pure">PURE</span>' not in html
     assert "Verdict pending until stage masses are emitted." in html
+
+
+def test_absent_accepted_species_stays_pending_but_emitted_empty_means_none() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    base_stage = {
+        "total_kg": 1.0,
+        "designated_kg": 1.0,
+        "impurity_kg": 0.0,
+        "purity_fraction": 1.0,
+        "verdict": "PURE",
+    }
+    artifact["terminal"] = {
+        "stage_purity": {
+            "stage_1": dict(base_stage),
+            "stage_2": {**base_stage, "accepted_species": []},
+        }
+    }
+
+    html = _render_report_html(artifact)
+
+    assert "pending — accepted species not emitted" in html
+    assert html.count("none designated") == 1
+
+
+def test_empty_regime_renders_not_emitted_across_stepper_and_summary_cards() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["timesteps"] = [
+        {
+            "hour": 1,
+            "summary": {"campaign": "C0", "regime": ""},
+            "ledger": {},
+        }
+    ]
+
+    result = _render_report_state(artifact)
+    html = result["html"]
+
+    assert '<div class="k">Regime</div><div class="v">not emitted</div>' in html
+    assert '<span>End regime</span><b>not emitted</b>' in html
+    assert "Current transport</span><b>not emitted · Kn not emitted" in html
 
 
 def test_report_viewer_section_order_and_stepper_controls() -> None:
@@ -1960,7 +2216,7 @@ setTimeout(() => {
 
     # Sequential section numbers in visual order.
     sects = [
-        ("01", "Evolved metal mass"),
+        ("01", "Product-ledger metal projection"),
         ("02", "Process record"),
         ("03", "Account disposition"),
         ("04", "Full terminal ledger"),
@@ -2072,7 +2328,7 @@ setImmediate(() => process.stdout.write(JSON.stringify({ fetched, html: settings
 
 
 def test_library_renders_readable_cards_and_live_fallback() -> None:
-    """Library page: hash titles truncated, yields via fmtNum, O₂ source-side, fallback."""
+    """Library page: hash titles truncated, yields formatted, absent semantics pending."""
     root = Path(__file__).resolve().parents[1] / "web" / "report_viewer"
     static_runs = json.loads((root / "runs-index.json").read_text(encoding="utf-8"))
     live_runs = [
@@ -2204,13 +2460,13 @@ setImmediate(() => {
     assert "45454a0a…" in html  # truncated mono run id
     assert "CANCELLED" in html
     # Yield chips use fmtNum (≤4 sig figs / scientific for traces) as visible text.
-    # Full precision may remain only in title= tooltips (exactNumber), never as the chip body.
+    # Full precision may remain only in title= tooltips (exactValue), never as the chip body.
     assert "0.3598 kg" in html
     assert ">0.35979618445132294" not in html
     assert "1.63e-11 kg" in html
-    # O₂ honesty: source-side, never claimed as recovered product.
-    assert "O₂ source-side potential (not recovered)" in html
-    assert "not recovered" in html
+    # Sparse index rows do not get a source-side or recovery basis invented.
+    assert "O₂ basis pending (metric semantics not emitted)" in html
+    assert "O₂ source-side potential (not recovered)" not in html
     assert "O₂ recovered" not in html
     # No "unfiled" noise when folder absent; structured meta present.
     assert "unfiled" not in html
@@ -2438,7 +2694,10 @@ setImmediate(() => process.stdout.write(settings.innerHTML));
     assert "140 mol" not in html
     assert "1.25 mol" not in html
 
-    # Two-price block + provenance note (no silent defaults).
+    # Two-price block + provenance note (no silent defaults or owner claim).
+    assert "Two energy prices" in html
+    assert "Owner energy price" not in html
+    assert "Owner's two energy prices" not in html
     assert "10 USD/kWh" in html
     assert "0.05 USD/kWh" in html
     assert "Price provenance:" in html

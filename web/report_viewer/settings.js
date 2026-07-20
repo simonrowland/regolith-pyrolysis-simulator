@@ -1,6 +1,9 @@
 "use strict";
 
-const { scalarText, fmtNum, fmtRunId, prettySpecies, esc } = globalThis.ReportLabels;
+const {
+  scalarText, fmtNum, fmtRunId, prettySpecies, hasNumber, exactValue,
+  isHashLike, priceAuthority, priceAuthorityNote, esc
+} = globalThis.ReportLabels;
 const RUN_ID = new URLSearchParams(window.location.search).get("run");
 const RUN_QUERY = RUN_ID ? `?run=${encodeURIComponent(RUN_ID)}` : "";
 const ARTIFACT_URL = RUN_ID
@@ -14,12 +17,6 @@ const ENGINE_IDENTITY_LABELS = Object.freeze({
   cache_version: "Engine cache version"
 });
 const $ = (selector, root = document) => root.querySelector(selector);
-const hasNumber = (value) => typeof value === "number" && Number.isFinite(value);
-const displayNumber = (value, unit = "") => hasNumber(value)
-  ? `<span title="${esc(`${String(value)}${unit ? ` ${unit}` : ""}`)}">${esc(fmtNum(value, unit))}</span>`
-  : "not emitted";
-const isHashLike = (value) => typeof value === "string"
-  && /^(?:[0-9a-f]{24,}|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i.test(value.trim());
 const runIdSpan = (value) => `<span title="${esc(value)}">${esc(fmtRunId(value))}</span>`;
 const speciesSpan = (value) => esc(prettySpecies(value));
 // Nameless live runs mirror the run_id hash into `name`; do not dump 32 hex
@@ -50,7 +47,7 @@ function settingsField(number, title, subtitle, content) {
 
 function formatScalar(value) {
   if (value === undefined || value === null) return "not emitted";
-  if (typeof value === "number") return displayNumber(value);
+  if (typeof value === "number") return exactValue(value);
   if (typeof value === "boolean") return esc(String(value));
   if (typeof value === "string") {
     return isHashLike(value) ? runIdSpan(value) : esc(value);
@@ -76,24 +73,6 @@ function formatIdentityScalar(value) {
   return `<span title="${esc(value)}">${esc(value.slice(0, IDENTITY_MAX).trimEnd())}…</span>`;
 }
 
-function priceAuthority(artifact) {
-  const rollup = artifact?.terminal?.run_metadata?.cost_rollup_diagnostic;
-  if (!rollup || typeof rollup !== "object" || Array.isArray(rollup)) return null;
-  const basis = typeof rollup.price_basis === "string" ? rollup.price_basis.trim() : "";
-  const count = hasNumber(rollup.owner_ratify_placeholder_count)
-    ? rollup.owner_ratify_placeholder_count
-    : null;
-  const placeholders = Array.isArray(rollup.owner_ratify_placeholders) ? rollup.owner_ratify_placeholders : [];
-  const names = placeholders
-    .map((item) => item && typeof item === "object" && !Array.isArray(item) ? item.name : null)
-    .filter((name) => typeof name === "string" && name.trim())
-    .map((name) => name.trim());
-  const flagged = (count !== null && count > 0)
-    || placeholders.some((item) => item && typeof item === "object" && !Array.isArray(item)
-      && item.status === "owner-ratify-placeholder");
-  return flagged ? { basis, count, names } : null;
-}
-
 function costBlock(cost, artifact) {
   if (!cost || typeof cost !== "object") {
     return pending("Pending W-A5a", "header.cost_block is absent.");
@@ -102,21 +81,10 @@ function costBlock(cost, artifact) {
     ? cost.provenance.trim()
     : null;
   const authority = priceAuthority(artifact);
-  const authorityParts = [
-    authority?.basis ? `basis <span class="mono">${esc(authority.basis)}</span>` : null,
-    authority && authority.count !== null && authority.count > 0
-      ? `${esc(fmtNum(authority.count))} placeholder price parameter${authority.count === 1 ? "" : "s"} awaiting owner ratification`
-      : null,
-    authority && authority.names.length
-      ? `parameters ${authority.names.map((name) => `<span class="mono">${esc(name)}</span>`).join(", ")}`
-      : null
-  ].filter(Boolean);
-  const authorityNote = authority
-    ? `<div class="note"><b>Price authority:</b> ${authorityParts.join(" · ")}</div>`
-    : "";
+  const authorityNote = priceAuthorityNote(authority);
   return `<div class="cards">
-    <div class="card"><div class="ct">Owner energy price · electrical</div><div class="cbig">${displayNumber(cost.electrical_cost_per_kWh, "USD/kWh")}</div></div>
-    <div class="card"><div class="ct">Owner energy price · solar heat</div><div class="cbig">${displayNumber(cost.solar_heat_cost_per_kWh, "USD/kWh")}</div></div>
+    <div class="card"><div class="ct">Energy price · electrical</div><div class="cbig">${exactValue(cost.electrical_cost_per_kWh, "USD/kWh")}</div></div>
+    <div class="card"><div class="ct">Energy price · solar heat</div><div class="cbig">${exactValue(cost.solar_heat_cost_per_kWh, "USD/kWh")}</div></div>
   </div>${authorityNote}${provenance ? `<div class="note">Price provenance: ${esc(provenance)}</div>` : ""}`;
 }
 
@@ -126,7 +94,7 @@ function c3DoseBlock(dose) {
   }
   const rows = Object.entries(dose).map(([species, value]) => {
     const label = species.replace(/_kg$/, "");
-    return `<tr><td>${speciesSpan(label)}</td><td class="num">${displayNumber(value, "kg")}</td></tr>`;
+    return `<tr><td>${speciesSpan(label)}</td><td class="num">${exactValue(value, "kg")}</td></tr>`;
   }).join("");
   return `<div class="table-wrap"><table><thead><tr><th>Species</th><th class="num">Dose · kg</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
@@ -328,7 +296,7 @@ function render(artifact) {
   ${settingsField(1, "Recipe snapshot", "Captured recipe material only; absent values are not reconstructed.", recipeSnapshotBlock(header.recipe_snapshot))}
   ${settingsField(2, "Engine identity", "Backend identity recorded by the run header.", engineIdentityBlock(header.engine_identity))}
   ${settingsField(3, "C3 dose · kg by species", "Captured alkali-shuttle dose in kg (not mol); no recipe inference.", c3DoseBlock(header.c3_dose))}
-  ${settingsField(4, "Owner's two energy prices", "Electrical and solar-heat prices bind directly to header.cost_block.", costBlock(header.cost_block, artifact))}
+  ${settingsField(4, "Two energy prices", "Electrical and solar-heat prices bind directly to header.cost_block; provenance below states their authority.", costBlock(header.cost_block, artifact))}
   ${settingsField(5, "Effective config", "Per-key merged value and source; non-default sources sort first and are highlighted.", effectiveConfig(header.effective_config))}
   <footer class="footer"><span>Frozen header inspection · engine-free · no edit controls</span><a href="./library.html">Run library</a></footer>`;
   $("#download-run").addEventListener("click", () => downloadHeader(header));

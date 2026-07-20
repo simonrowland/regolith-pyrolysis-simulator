@@ -1,18 +1,13 @@
 "use strict";
 
-const { scalarText, fmtNum, fmtRunId, prettySpecies, prettyFeedstock, esc } = globalThis.ReportLabels;
+const {
+  scalarText, fmtNum, fmtRunId, prettySpecies, prettyFeedstock,
+  hasNumber, exactValue, isHashLike, esc
+} = globalThis.ReportLabels;
 const LIVE_RUNS_URL = "/api/runs";
 const STATIC_RUNS_URL = "./runs-index.json";
 const SYSTEM_FOLDERS = ["All", "Favorites", "My runs", "Default runs", "Bootstrap ladder"];
-// Match report-viewer: nameless live runs often use the raw hash as `name`.
-const isHashLike = (value) => typeof value === "string"
-  && /^(?:[0-9a-f]{24,}|[0-9a-f]{8}-[0-9a-f-]{27,})$/i.test(value.trim());
-
 const $ = (selector, root = document) => root.querySelector(selector);
-const hasNumber = (value) => typeof value === "number" && Number.isFinite(value);
-const exactNumber = (value, unit) => hasNumber(value)
-  ? `<span title="${esc(`${String(value)}${unit ? ` ${unit}` : ""}`)}">${esc(fmtNum(value, unit))}</span>`
-  : "not emitted";
 const runIdSpan = (value) => `<span title="${esc(value)}">${esc(fmtRunId(value))}</span>`;
 const speciesSpan = (value) => esc(prettySpecies(value));
 // Readable H2: never dump 32 hex chars as the card title (full id stays in the mono span + title).
@@ -74,14 +69,16 @@ function folderButtons() {
 }
 
 // Headline chips must not invent recovery/origin claims. Prefer explicit
-// headline_yield_semantics; O₂ without a label is source-side potential only.
+// headline_yield_semantics; absent metal or O₂ semantics stay pending.
 function yieldQualifier(species, semantics) {
   const key = String(species ?? "");
   const token = semantics && typeof semantics === "object" ? semantics[key] : null;
-  if (token === "evolved_product") return "evolved";
+  if (["mixed_account_product_ledger_projection", "evolved_product"].includes(token)) {
+    return "product-ledger projection (mixed accounts; not recovery-only)";
+  }
   if (token === "source_side_potential") return "source-side potential (not recovered)";
   if (typeof token === "string" && token.trim()) return token.trim().replace(/_/g, " ");
-  return "";
+  return "basis pending (semantics not emitted)";
 }
 
 function yieldChips(run) {
@@ -95,17 +92,19 @@ function yieldChips(run) {
   const chips = entries.map(([species, value]) => {
     const qualifier = yieldQualifier(species, semantics);
     return `<div class="yield-chip"><div class="el">${speciesSpan(species)}</div>` +
-      `<div class="kg">${exactNumber(value, "kg")}${qualifier ? ` · ${esc(qualifier)}` : ""}</div></div>`;
+      `<div class="kg">${exactValue(value, "kg")} · ${esc(qualifier)}</div></div>`;
   });
   const o2 = run.O2_source_side_potential_kg_cumulative ?? yields?.O2;
   if (o2 !== undefined || run.O2_metric_label || semantics.O2 === "source_side_potential") {
-    // Never present O₂ as recovered product mass: default label is source-side only.
-    const o2Label = run.O2_metric_label
-      || (semantics.O2 === "source_side_potential" || o2 !== undefined
+    const emittedLabel = typeof run.O2_metric_label === "string" && run.O2_metric_label.trim()
+      ? run.O2_metric_label.trim()
+      : null;
+    const o2Label = emittedLabel
+      || (semantics.O2 === "source_side_potential"
         ? "O₂ source-side potential (not recovered)"
-        : "O₂ metric label not emitted");
+        : "O₂ basis pending (metric semantics not emitted)");
     chips.push(`<div class="yield-chip"><div class="el">${esc(o2Label)}</div>` +
-      `<div class="kg">${exactNumber(o2, "kg")}</div></div>`);
+      `<div class="kg">${exactValue(o2, "kg")}</div></div>`);
   }
   if (!chips.length) return "";
   return `<div class="yield-track" aria-label="Headline mass metrics">${chips.join("")}</div>`;
@@ -129,7 +128,7 @@ function runMetaLine(run) {
   const summary = typeof run.summary === "string" ? run.summary.trim() : "";
   if (!hasYields && summary) parts.push(summary);
   // Meta parts are escaped as untrusted text by runCard. Keep numeric parts as
-  // plain text too: returning exactNumber HTML here would be double-escaped.
+  // plain text too: returning exactValue HTML here would be double-escaped.
   if (hasNumber(run.hours)) parts.push(fmtNum(run.hours, "h"));
   if (hasNumber(run.peak_T_C)) parts.push(`peak ${fmtNum(run.peak_T_C, "°C")}`);
   if (run.created_at) {

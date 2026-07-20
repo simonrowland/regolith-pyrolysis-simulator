@@ -294,7 +294,7 @@ def test_store_save_load_list_and_retention(tmp_path) -> None:
     assert summaries[0]["peak_T_C"] == 1400.0
     assert summaries[0]["headline_yields_kg"] == {"Fe": 12.5, "O2": 4.25}
     assert summaries[0]["headline_yield_semantics"] == {
-        "Fe": "evolved_product",
+        "Fe": "mixed_account_product_ledger_projection",
         "O2": "source_side_potential",
     }
     assert summaries[0]["hours"] == 2
