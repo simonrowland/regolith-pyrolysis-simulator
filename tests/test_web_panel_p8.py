@@ -168,6 +168,8 @@ def test_present_rollup_renders_emitted_depth_and_escapes() -> None:
     assert "Metal pool (bottom) · Fe" in inventory
     assert "50631 USD" in products or "50,630 USD" in products
     assert "resolved" in _field_value(pumping, "Emitted pumping status")
+    assert "Canonical-total treatment" not in pumping
+    assert "eligible for canonical inclusion" not in pumping
     assert "owner-ratify-placeholder" in _tree_value(placeholders, "Status")
     assert "owner-ratify-placeholder" in _tree_value(pumping, "Status")
     assert "allocation &lt;warning&gt;" in html
@@ -487,3 +489,17 @@ def test_resolved_pumping_with_rows_but_no_total_does_not_infer_treatment() -> N
     assert "Canonical-total treatment" not in pumping
     assert "eligible for canonical inclusion" not in pumping
     assert "excluded by the canonical cost-total emitter" not in pumping
+
+
+def test_missing_cost_basis_note_is_not_reconstructed_from_pumping_inputs() -> None:
+    artifact = _full_artifact()
+    artifact["terminal"]["cost_totals"].pop("basis_note")
+
+    html = _render_panel(artifact)["html"]
+    totals = html.split('<div class="card sec-p8-price-card">', 1)[0]
+    pumping = _between(html, "<summary>Pumping diagnostic</summary>", "<summary>Warnings</summary>")
+
+    assert "pending · terminal.cost_totals.basis_note not emitted" in totals
+    assert "pumping included after resolved status" not in totals
+    assert "Canonical-total treatment" not in pumping
+    assert "eligible for canonical inclusion" not in pumping
