@@ -224,6 +224,275 @@ def _force_socketio_internal_analytical(monkeypatch) -> list[tuple[object, tuple
     return captured_tasks
 
 
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        pytest.param("feedstock", _DELETE, id="feedstock-omitted"),
+        pytest.param("feedstock", None, id="feedstock-null"),
+        pytest.param("feedstock", "", id="feedstock-empty"),
+        pytest.param("feedstock", "   ", id="feedstock-blank"),
+        pytest.param("mass_kg", None, id="mass-null"),
+        pytest.param("mass_kg", "", id="mass-empty"),
+    ],
+)
+def test_web_start_event_refuses_missing_or_cleared_required_input(
+    monkeypatch,
+    field,
+    value,
+):
+    backend_called = False
+
+    def fail_if_backend_resolves(_backend_name):
+        nonlocal backend_called
+        backend_called = True
+        raise AssertionError("backend resolution should not run")
+
+    monkeypatch.setattr("web.events._get_backend", fail_if_backend_resolves)
+    app = app_module.create_app()
+    client = _identified_socket_client(app)
+    assert client.is_connected()
+    client.get_received()
+    before = set(_simulations)
+    payload = {
+        "backend": "internal-analytical",
+        "feedstock": "lunar_mare_low_ti",
+        "mass_kg": 1000,
+        "speed": 0,
+        "track": "pyrolysis",
+    }
+    if value is _DELETE:
+        payload.pop(field)
+    else:
+        payload[field] = value
+
+    try:
+        client.emit("start_simulation", payload)
+        statuses = [
+            event["args"][0]
+            for event in client.get_received()
+            if event["name"] == "simulation_status"
+        ]
+
+        assert statuses
+        assert statuses[-1]["status"] == "error"
+        assert statuses[-1]["error_type"] == "invalid_run_input"
+        assert field in statuses[-1]["message"]
+        assert set(_simulations) == before
+        assert backend_called is False
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
+def test_web_start_event_defaults_mass_only_when_field_is_absent(monkeypatch):
+    captured_tasks = _force_socketio_internal_analytical(monkeypatch)
+    app = app_module.create_app()
+    client = _identified_socket_client(app)
+    assert client.is_connected()
+    client.get_received()
+    before = set(_simulations)
+
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "internal-analytical",
+                "feedstock": "lunar_mare_low_ti",
+                "speed": 0,
+                "track": "pyrolysis",
+            },
+        )
+        statuses = [
+            event["args"][0]
+            for event in client.get_received()
+            if event["name"] == "simulation_status"
+        ]
+        created = set(_simulations) - before
+
+        assert statuses[-1]["status"] == "started"
+        assert len(created) == 1
+        state, _ = _current_simulation_state(created.pop())
+        assert state is not None
+        assert state["recipe_inputs"]["mass_kg"] == pytest.approx(1000.0)
+        assert len(captured_tasks) == 1
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
+def test_web_start_event_maps_invalid_mre_policy_to_typed_refuse(monkeypatch):
+    captured_tasks = _force_socketio_internal_analytical(monkeypatch)
+    app = app_module.create_app()
+    client = _identified_socket_client(app)
+    assert client.is_connected()
+    client.get_received()
+    before = set(_simulations)
+
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "internal-analytical",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 10,
+                "speed": 0,
+                "track": "pyrolysis",
+                "c5_enabled": True,
+            },
+        )
+        statuses = [
+            event["args"][0]
+            for event in client.get_received()
+            if event["name"] == "simulation_status"
+        ]
+
+        assert statuses[-1] == {
+            "status": "error",
+            "message": (
+                "c5_enabled requires mre_target_species or a positive "
+                "mre_max_voltage_V"
+            ),
+            "error_type": "invalid_run_input",
+        }
+        assert set(_simulations) == before
+        assert captured_tasks == []
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
+@pytest.mark.parametrize("path", ["/api/runs", "/api/runs/draft"])
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    [
+        pytest.param(
+            "feedstock",
+            _DELETE,
+            "feedstock is required",
+            id="feedstock-omitted",
+        ),
+        pytest.param(
+            "feedstock",
+            "   ",
+            "feedstock is required",
+            id="feedstock-blank",
+        ),
+        pytest.param("mass_kg", None, "mass_kg is required", id="mass-null"),
+        pytest.param("mass_kg", "", "mass_kg is required", id="mass-empty"),
+        pytest.param(
+            "c5_enabled",
+            True,
+            "c5_enabled requires mre_target_species",
+            id="c5-without-mre",
+        ),
+    ],
+)
+def test_web_run_command_refuses_invalid_input_with_typed_400(
+    monkeypatch,
+    path,
+    field,
+    value,
+    message,
+):
+    captured_tasks = _force_socketio_internal_analytical(monkeypatch)
+    app = app_module.create_app()
+    client = app.test_client()
+    payload = {
+        "backend": "internal-analytical",
+        "feedstock": "lunar_mare_low_ti",
+        "mass_kg": 10,
+        "speed": 0,
+        "track": "pyrolysis",
+    }
+    if value is _DELETE:
+        payload.pop(field)
+    else:
+        payload[field] = value
+
+    response = client.post(path, json=payload)
+
+    assert response.status_code == 400
+    assert response.get_json()["error_type"] == "invalid_run_input"
+    assert message in response.get_json()["error"]
+    assert captured_tasks == []
+
+
+@pytest.mark.parametrize("event_name", ["pause_simulation", "resume_simulation"])
+def test_web_control_event_refuses_without_active_run(event_name):
+    app = app_module.create_app()
+    client = _identified_socket_client(app)
+    assert client.is_connected()
+    client.get_received()
+
+    try:
+        client.emit(event_name)
+        statuses = [
+            event["args"][0]
+            for event in client.get_received()
+            if event["name"] == "simulation_status"
+        ]
+
+        assert statuses == [{
+            "status": "error",
+            "message": f"{event_name} requires an active run",
+            "error_type": "no_active_run",
+        }]
+    finally:
+        client.disconnect()
+
+
+@pytest.mark.parametrize("event_name", ["pause_simulation", "resume_simulation"])
+def test_web_control_event_does_not_misreport_replaced_run(
+    monkeypatch,
+    event_name,
+):
+    original_current_state = web_events._current_simulation_state
+    stale_lock = threading.RLock()
+    stale_state = {
+        "run_id": "stale-run",
+        "running": True,
+    }
+    lookups = 0
+
+    def replaced_state(_sid, run_id=None):
+        nonlocal lookups
+        lookups += 1
+        if run_id is None:
+            return stale_state, stale_lock
+        assert run_id == "stale-run"
+        return None, None
+
+    app = app_module.create_app()
+    client = _identified_socket_client(app)
+    assert client.is_connected()
+    client.get_received()
+    monkeypatch.setattr(web_events, "_current_simulation_state", replaced_state)
+
+    try:
+        client.emit(event_name)
+        statuses = [
+            event["args"][0]
+            for event in client.get_received()
+            if event["name"] == "simulation_status"
+        ]
+
+        assert lookups == 2
+        assert not any(
+            status.get("error_type") == "no_active_run"
+            for status in statuses
+        )
+    finally:
+        monkeypatch.setattr(
+            web_events,
+            "_current_simulation_state",
+            original_current_state,
+        )
+        client.disconnect()
+
+
 def test_socketio_ledger_api_is_byte_identical_read_only(monkeypatch):
     _force_socketio_internal_analytical(monkeypatch)
     app = app_module.create_app()

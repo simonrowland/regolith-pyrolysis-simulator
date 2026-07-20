@@ -814,7 +814,11 @@ def test_invalid_http_submit_does_not_destroy_active_run(tmp_path):
     with pytest.raises(web_events.RunCommandError, match="mass_kg must be numeric"):
         web_events.submit_run_command(
             _Socket(),
-            {"client_token": "invalid", "mass_kg": "bad"},
+            {
+                "client_token": "invalid",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": "bad",
+            },
             client_id="owner",
         )
 
@@ -1386,7 +1390,10 @@ def test_global_active_run_cap_is_shared_by_http_and_socket(
 def test_command_routes_share_socket_input_validation(path):
     response = app_module.create_app().test_client().post(
         path,
-        json={"mass_kg": "not-a-number"},
+        json={
+            "feedstock": "lunar_mare_low_ti",
+            "mass_kg": "not-a-number",
+        },
     )
 
     assert response.status_code == 400
@@ -1396,7 +1403,11 @@ def test_command_routes_share_socket_input_validation(path):
 def test_submit_rejects_compound_c5_enabled_with_typed_400():
     response = app_module.create_app().test_client().post(
         "/api/runs",
-        json={"c5_enabled": {"unexpected": True}},
+        json={
+            "feedstock": "lunar_mare_low_ti",
+            "mass_kg": 1000,
+            "c5_enabled": {"unexpected": True},
+        },
     )
 
     assert response.status_code == 400
@@ -1415,7 +1426,11 @@ def test_http_command_error_preserves_structured_socket_diagnostics(monkeypatch)
     monkeypatch.setattr(web_events, "_get_backend", unavailable)
     response = app_module.create_app().test_client().post(
         "/api/runs",
-        json={"backend": "missing"},
+        json={
+            "backend": "missing",
+            "feedstock": "lunar_mare_low_ti",
+            "mass_kg": 1000,
+        },
     )
 
     assert response.status_code == 400
