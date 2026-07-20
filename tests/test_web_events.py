@@ -3068,7 +3068,7 @@ def test_run_loop_captures_detached_mol_ledger_at_hour_boundary(monkeypatch):
         ("complete", "simulation_complete"),
         ("refused", "simulation_status"),
         ("failed", "simulation_status"),
-        ("c6_refused", "simulation_status"),
+        ("c6_refused", "simulation_complete"),
     ],
 )
 def test_terminal_state_finishes_before_terminal_emit(
@@ -3077,9 +3077,13 @@ def test_terminal_state_finishes_before_terminal_emit(
     terminal_event,
 ):
     sid = f"test-terminal-order-{terminal_path}"
+    completion_checks = iter((False, True))
     session = SimpleNamespace(
         simulator=SimpleNamespace(_poisoned_hour=None),
-        is_complete=lambda: terminal_path == "complete",
+        is_complete=lambda: (
+            terminal_path == "complete"
+            or (terminal_path == "c6_refused" and next(completion_checks, True))
+        ),
     )
     state, lock = _replace_simulation_state(sid, session, speed=0.0)
     observed = []
@@ -3522,11 +3526,15 @@ def test_persist_failure_visible_on_all_terminal_paths(
     client = _identified_socket_client(app)
     before = set(_simulations)
 
+    completion_checks = iter((False, True))
     session = SimpleNamespace(
         simulator=SimpleNamespace(_poisoned_hour=None),
-        is_complete=lambda: terminal_path == "ok",
+        is_complete=lambda: (
+            terminal_path == "ok"
+            or (terminal_path == "c6_refused" and next(completion_checks, True))
+        ),
         result_document=lambda: _terminal_runner_document(
-            "ok" if terminal_path == "ok" else "refused"
+            "ok" if terminal_path in {"ok", "c6_refused"} else "refused"
         ),
     )
     monkeypatch.setattr(web_events, "_completion_payload", lambda _sim: {"done": True})
@@ -3667,7 +3675,7 @@ def test_save_ok_completion_emit_failure_is_not_persistence_failure(
             _clear_simulation_state(sid)
 
 
-def test_c6_refusal_emit_failure_still_cleans_run_state(tmp_path, monkeypatch):
+def test_c6_campaign_refusal_continues_to_normal_completion(tmp_path, monkeypatch):
     captured_tasks = _force_socketio_internal_analytical(monkeypatch)
     logged = []
     monkeypatch.setattr(web_events, "_safe_log", logged.append)
@@ -3679,7 +3687,7 @@ def test_c6_refusal_emit_failure_still_cleans_run_state(tmp_path, monkeypatch):
 
     def fail_refusal_emit(socketio, sid, run_id, event, payload):
         if event == "simulation_status" and payload.get("status") == "refused":
-            raise RuntimeError("refusal transport failed")
+            raise AssertionError("campaign refusal must not emit terminal status")
         return original_emit_if_current(socketio, sid, run_id, event, payload)
 
     monkeypatch.setattr(web_events, "_emit_if_current", fail_refusal_emit)
@@ -3716,22 +3724,25 @@ def test_c6_refusal_emit_failure_still_cleans_run_state(tmp_path, monkeypatch):
         )
         sid = (set(_simulations) - before).pop()
         state = _simulations[sid]
+        completion_checks = iter((False, True))
         state["session"] = SimpleNamespace(
             simulator=SimpleNamespace(_poisoned_hour=None),
-            is_complete=lambda: False,
-            result_document=lambda: _terminal_runner_document("refused"),
+            is_complete=lambda: next(completion_checks, True),
+            result_document=lambda: _terminal_runner_document("ok"),
         )
         target, args, kwargs = captured_tasks.pop()
         target(*args, **kwargs)
 
         assert any(
-            "Simulation status emission failed: refusal transport failed" in message
+            "C6 campaign refused; continuing configured batch sequence" in message
             for message in logged
         )
         assert state["artifact_persisted"] is True
         assert state["running"] is False
         assert state["paused"] is False
-        assert RunArtifactStore(tmp_path / "runs").load(state["run_id"]) is not None
+        artifact = RunArtifactStore(tmp_path / "runs").load(state["run_id"])
+        assert artifact is not None
+        assert artifact["execution_status"] != "refused"
     finally:
         client.disconnect()
         for sid in set(_simulations) - before:
@@ -4565,7 +4576,7 @@ def test_simulation_tick_exposes_mass_balance_category_when_pct_none(
             _clear_simulation_state(sid)
 
 
-def test_socketio_reports_binding_c6_refusal_after_retaining_run_data(
+def test_socketio_continues_after_binding_c6_refusal_and_retains_diagnostic(
     monkeypatch,
     tmp_path,
 ):
@@ -4599,11 +4610,14 @@ def test_socketio_reports_binding_c6_refusal_after_retaining_run_data(
             "start_simulation",
             {
                 "backend": "internal-analytical",
-                "feedstock": "ci_carbonaceous_chondrite",
+                "feedstock": "lunar_mare_low_ti",
                 "mass_kg": 1000,
-                "additives": {"C": 30.0},
+                "additives": {},
                 "speed": 0,
                 "track": "pyrolysis",
+                "runtime_campaign_overrides": {
+                    "C6": {"max_hours": 1, "ramp_rate_C_per_hr": 0},
+                },
             },
         )
         events.extend(client.get_received())
@@ -4622,7 +4636,7 @@ def test_socketio_reports_binding_c6_refusal_after_retaining_run_data(
             client.emit("make_decision", {"choice": decision.recommendation})
             events.extend(client.get_received())
         else:
-            raise AssertionError("Socket.IO run did not reach the C6 refusal")
+            raise AssertionError("Socket.IO run did not complete after C6 refusal")
 
         names = [event["name"] for event in events]
         statuses = [
@@ -4630,57 +4644,38 @@ def test_socketio_reports_binding_c6_refusal_after_retaining_run_data(
             for event in events
             if event["name"] == "simulation_status"
         ]
-        refusal = next(
-            status for status in statuses if status.get("status") == "refused"
-        )
-        refusal_event_index = next(
-            index
-            for index, event in enumerate(events)
-            if (
-                event["name"] == "simulation_status"
-                and event["args"][0].get("status") == "refused"
-            )
-        )
-
-        # The refusal boundary preserves every completed pre-C6 tick; the
-        # refused C6 tick itself is not emitted as a completed tick.
+        assert not any(status.get("status") == "refused" for status in statuses)
         assert names.count("simulation_tick") == 42
         assert names.count("per_hour_summary") == 42
         assert "campaign_complete_summary" in names
-        assert "simulation_complete" not in names
-        assert max(
-            index
-            for index, name in enumerate(names)
-            if name in {"simulation_tick", "per_hour_summary"}
-        ) < refusal_event_index
-        assert set(refusal) == {
-            "status",
-            "reason",
-            "message",
-            "c6_refusal_diagnostic",
-            "backend_status",
-            "backend_authoritative",
-            "backend_message",
-            "run_id",
-        }
-        assert refusal["run_id"] == _simulations[sid]["run_id"]
-        assert refusal["reason"] == (
-            "c6_joint_thermodynamic_liquid_fraction_window_empty"
+        assert "simulation_complete" in names
+        campaign_summaries = [
+            event["args"][0]
+            for event in events
+            if event["name"] == "campaign_complete_summary"
+        ]
+        c6_summary = next(
+            summary
+            for summary in campaign_summaries
+            if summary.get("campaign") == "C6"
         )
-        assert refusal["message"] == refusal["reason"]
-        assert refusal["c6_refusal_diagnostic"]["campaign"] == "C6"
-        assert (
-            refusal["c6_refusal_diagnostic"]["diagnostic"]["reason_refused"]
-            == refusal["reason"]
+        refusal = c6_summary["c6_refusal_diagnostic"]
+        assert refusal["campaign"] == "C6"
+        assert refusal["diagnostic"]["reason_refused"] == (
+            "c6_hold_target_not_acquired"
         )
-        artifact = RunArtifactStore(tmp_path / "runs").load(refusal["run_id"])
+        run_id = _simulations[sid]["run_id"]
+        artifact = RunArtifactStore(tmp_path / "runs").load(run_id)
         assert artifact is not None
-        assert artifact["execution_status"] == "refused"
+        assert artifact["execution_status"] == "ok"
         assert len(artifact["timesteps"]) == 42
-        assert artifact["failure"] == {
-            "reason": refusal["reason"],
-            "error_message": refusal["reason"],
-        }
+        assert "failure" not in artifact
+        terminal_refusal = artifact["terminal"]["run_metadata"][
+            "refusal_diagnostic"
+        ]
+        assert terminal_refusal["diagnostic"]["reason_refused"] == (
+            "c6_hold_target_not_acquired"
+        )
         assert artifact["terminal"]["final_state"]
         assert artifact["terminal"]["final"]
     finally:

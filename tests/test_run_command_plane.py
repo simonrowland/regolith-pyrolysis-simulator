@@ -886,10 +886,10 @@ def test_http_terminal_run_releases_session_state(tmp_path, monkeypatch):
     assert sid not in web_events._sim_locks
 
 
-def test_c6_terminal_persist_excludes_concurrent_cancel(tmp_path, monkeypatch):
-    sid = "http:owner:c6-race"
+def test_c6_campaign_refusal_does_not_persist_terminal(tmp_path, monkeypatch):
+    sid = "http:owner:c6-campaign-refusal"
     store = RunArtifactStore(tmp_path / "runs")
-    state, _ = web_events._replace_simulation_state(
+    state, run_lock = web_events._replace_simulation_state(
         sid,
         _PartialSession(),
         speed=0.0,
@@ -897,46 +897,24 @@ def test_c6_terminal_persist_excludes_concurrent_cancel(tmp_path, monkeypatch):
         run_store=store,
     )
     state["http_owned"] = True
-
-    cancel_attempted = threading.Event()
-    cancel_acquired = threading.Event()
-    first_persist_entered = threading.Event()
-    release_persist = threading.Event()
-    inner_lock = threading.RLock()
-
-    class TrackingLock:
-        def __enter__(self):
-            if threading.current_thread().name == "cancel-c6":
-                cancel_attempted.set()
-            inner_lock.acquire()
-            if threading.current_thread().name == "cancel-c6":
-                cancel_acquired.set()
-            return self
-
-        def __exit__(self, *_args):
-            inner_lock.release()
-
-    run_lock = TrackingLock()
-    with web_events._simulations_guard:
-        web_events._sim_locks[sid] = run_lock
-
-    c6_refusal = {
-        "status": "refused",
-        "reason": "no_window",
-        "diagnostic": {"reason_refused": "no_window"},
-    }
     step = SimpleNamespace(
         per_hour_summary={"hour": 1},
         snapshot={},
         backend_error=None,
-        campaign_summary={"c6_refusal_diagnostic": c6_refusal},
+        campaign_summary={
+            "c6_refusal_diagnostic": {
+                "status": "refused",
+                "diagnostic": {"reason_refused": "no_window"},
+            }
+        },
         decision_event=None,
     )
-    monkeypatch.setattr(
-        web_events,
-        "drive_session",
-        lambda *_args, **_kwargs: iter([step]),
-    )
+
+    def drive_once(*_args, **_kwargs):
+        state["running"] = False
+        yield step
+
+    monkeypatch.setattr(web_events, "drive_session", drive_once)
     monkeypatch.setattr(web_events, "_tick_payload", lambda **_kwargs: {})
     monkeypatch.setattr(
         web_events,
@@ -944,27 +922,11 @@ def test_c6_terminal_persist_excludes_concurrent_cancel(tmp_path, monkeypatch):
         lambda *_args, **_kwargs: None,
     )
     persist_statuses = []
-
-    def blocking_persist(
-        _socketio,
-        persist_sid,
-        run_id,
-        _session,
-        *,
-        status,
-        **_kwargs,
-    ):
-        persist_statuses.append(status)
-        if len(persist_statuses) == 1:
-            first_persist_entered.set()
-            assert release_persist.wait(2)
-        with web_events._simulations_guard:
-            current = web_events._simulations.get(persist_sid)
-            if current is not None and current.get("run_id") == run_id:
-                current["artifact_persisted"] = True
-        return {"execution_status": status}
-
-    monkeypatch.setattr(web_events, "_persist_terminal", blocking_persist)
+    monkeypatch.setattr(
+        web_events,
+        "_persist_terminal",
+        lambda *_args, status, **_kwargs: persist_statuses.append(status),
+    )
 
     class CapturingSocket(_Socket):
         def start_background_task(self, target):
@@ -981,29 +943,10 @@ def test_c6_terminal_persist_excludes_concurrent_cancel(tmp_path, monkeypatch):
         "ok",
         True,
     )
-    loop_thread = threading.Thread(target=socket.target, name="c6-loop")
-    loop_thread.start()
-    assert first_persist_entered.wait(2)
+    socket.target()
 
-    cancel_thread = threading.Thread(
-        target=lambda: web_events._cancel_simulation_state(
-            socket,
-            sid,
-            reason="replaced_by_new_run",
-        ),
-        name="cancel-c6",
-    )
-    cancel_thread.start()
-    assert cancel_attempted.wait(2)
-    assert cancel_acquired.wait(0.05) is False
-    assert persist_statuses == ["refused"]
-
-    release_persist.set()
-    loop_thread.join(2)
-    cancel_thread.join(2)
-    assert loop_thread.is_alive() is False
-    assert cancel_thread.is_alive() is False
-    assert persist_statuses == ["refused"]
+    assert persist_statuses == []
+    assert store.load(state["run_id"]) is None
 
 
 def test_failure_terminal_persist_excludes_concurrent_cancel(monkeypatch):

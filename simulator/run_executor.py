@@ -234,7 +234,13 @@ class RunExecutor:
         status = "ok"
         error_message = ""
         reason = ""
-        refusal_diagnostic: dict[str, Any] = {}
+        # A live/web session may be projected after it has already advanced
+        # beyond a refused C6 campaign.  Seed from simulator state so the
+        # durable terminal artifact retains that campaign diagnostic even
+        # when this projection advances zero additional hours.
+        refusal_diagnostic = dict(
+            getattr(sim, "_last_c6_refusal_diagnostic", {}) or {}
+        )
         failure_exc: Exception | None = None
         hours = _coerce_nonnegative_hours(hours)
         snapshot_start = len(
@@ -309,18 +315,13 @@ class RunExecutor:
                     isinstance(c6_refusal, Mapping)
                     and c6_refusal.get("status") == "refused"
                 ):
+                    # C6 is one campaign in the batch sequence.  Its
+                    # thermite/window refusal is already recorded in the
+                    # campaign summary and core advances to the configured
+                    # next campaign.  Preserve the diagnostic for the final
+                    # artifact, but do not promote a campaign-scoped refusal
+                    # into a whole-run halt.
                     refusal_diagnostic = dict(c6_refusal)
-                    diagnostic = c6_refusal.get("diagnostic")
-                    refusal_reason = (
-                        diagnostic.get("reason_refused")
-                        if isinstance(diagnostic, Mapping)
-                        else c6_refusal.get("reason")
-                    )
-                    reason = str(refusal_reason or "c6_mg_thermite_refused")
-                    error_message = reason
-                    status = "refused"
-                    failure_exc = RuntimeError(reason)
-                    break
             # Status semantics:
             #   * "ok"      -- the run consumed its full hour budget and
             #                  the simulator is either mid-batch or

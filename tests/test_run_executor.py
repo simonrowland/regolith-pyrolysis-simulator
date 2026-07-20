@@ -280,36 +280,45 @@ def test_pyrolysis_run_emits_campaign_pressure_refusal_diagnostic(monkeypatch):
     assert "knudsen_regime_diagnostic" not in payload["run_metadata"]
 
 
-def test_run_executor_promotes_binding_c6_refusal_from_campaign_summary():
-    execution = RunExecutor().execute(_c6_refusal_run()._session_config())
-
-    assert execution.status == "refused"
-    assert execution.reason == (
-        "c6_joint_thermodynamic_liquid_fraction_window_empty"
+def test_run_executor_keeps_running_after_campaign_scoped_c6_refusal():
+    run = _c6_acquisition_refusal_run(
+        hours=2,
+        setpoints_patch={"campaigns": {"C7": {"enabled": True}}},
     )
-    assert execution.error_message == execution.reason
+    session = SimSession().start(run._session_config())
+    session.simulator.record.branch = "two"
+
+    execution = RunExecutor().execute_session(session, hours=2)
+
+    assert execution.status == "ok"
+    assert execution.reason == ""
+    assert execution.error_message == ""
     assert execution.refusal_diagnostic["status"] == "refused"
     assert execution.refusal_diagnostic["campaign"] == "C6"
     assert (
         execution.refusal_diagnostic["diagnostic"]["reason_refused"]
-        == execution.reason
+        == "c6_hold_target_not_acquired"
     )
+    assert [row["campaign"] for row in execution.per_hour] == [
+        "C6",
+        "C7_CA_ALUMINOTHERMIC",
+    ]
 
 
 def test_pyrolysis_run_emits_binding_c6_refusal_diagnostic():
-    payload = _c6_refusal_run().run()
+    payload = _c6_acquisition_refusal_run().run()
 
-    assert payload["status"] == "refused"
-    assert payload["reason"] == (
-        "c6_joint_thermodynamic_liquid_fraction_window_empty"
-    )
+    assert payload["status"] == "partial"
+    assert payload["reason"] == ""
     diagnostic = payload["run_metadata"]["refusal_diagnostic"]
     assert diagnostic["status"] == "refused"
     assert diagnostic["campaign"] == "C6"
-    assert diagnostic["diagnostic"]["reason_refused"] == payload["reason"]
+    assert diagnostic["diagnostic"]["reason_refused"] == (
+        "c6_hold_target_not_acquired"
+    )
 
 
-def test_run_executor_degraded_envelope_preserves_binding_c6_refusal(
+def test_nonterminal_c6_refusal_does_not_mask_reporting_failure(
     monkeypatch,
 ):
     def fail_cost_rollup(**_kwargs):
@@ -320,60 +329,20 @@ def test_run_executor_degraded_envelope_preserves_binding_c6_refusal(
         fail_cost_rollup,
     )
 
-    execution = RunExecutor().execute(_c6_refusal_run()._session_config())
-
-    assert execution.status == "refused"
-    assert execution.reason == (
-        "c6_joint_thermodynamic_liquid_fraction_window_empty"
-    )
-    assert execution.refusal_diagnostic["status"] == "refused"
-    assert "envelope detail unavailable" in execution.envelope_detail_unavailable
+    with pytest.raises(RuntimeError, match="cost rollup unavailable"):
+        RunExecutor().execute(_c6_acquisition_refusal_run()._session_config())
 
 
-def test_ci_c0_to_c6_refusal_preserves_prior_rows_and_ledger_accounts():
-    payload = _run(
-        feedstock_id="ci_carbonaceous_chondrite",
-        campaign="C0",
-        hours=500,
-    ).run()
+def test_c6_acquisition_refusal_preserves_completed_tick_and_ledger_accounts():
+    payload = _c6_acquisition_refusal_run().run()
 
     rows = payload["per_hour_summary"]
-    assert payload["status"] == "refused"
-    assert payload["reason"] == (
-        "c6_joint_thermodynamic_liquid_fraction_window_empty"
-    )
-    # The refusal boundary preserves every completed pre-C6 row; the refused
-    # C6 tick itself is not emitted as a completed row.
-    assert len(rows) == 42
-    assert list(dict.fromkeys(row["campaign"] for row in rows)) == [
-        "C0",
-        "C0B",
-        "C2A_STAGED",
-        "C3_NA",
-        "C4",
-        "C6",
-    ]
-    # Preservation contract: the pre-refusal campaigns' accounts survive the
-    # C6 refusal. Subset, not equality — additional accounts appearing as
-    # upstream chemistry fixes let MORE of the sequence execute (e.g.
-    # process.metal_phase once the Mg rail boundary landed) are legitimate.
-    assert set(payload["final_state"]) >= {
-        "process.cleaned_melt",
-        "process.condensation_train",
-        "process.overhead_gas",
-        "process.reagent_inventory",
-        "process.stage0_volatile_feed",
-        "process.wall_deposit_segment_stage_0_to_stage_1",
-        "process.wall_deposit_segment_stage_1_to_stage_2",
-        "reservoir.fo2_buffer",
-        "reservoir.reagent.C",
-        "reservoir.stage0_oxidant",
-        "terminal.offgas",
-        "terminal.oxygen_melt_offgas_stored",
-        "terminal.stage0_salt_phase",
-        "terminal.stage0_sulfide_matte",
-    }
-    assert set(payload) == set(_run().run())
+    assert payload["status"] == "partial"
+    assert payload["reason"] == ""
+    assert len(rows) == 1
+    assert rows[0]["campaign"] == "C6"
+    assert rows[0]["T_C"] == pytest.approx(25.0)
+    assert "process.cleaned_melt" in payload["final_state"]
 
 
 def test_pyrolysis_run_completes_with_band_adjustment_provenance():
@@ -731,6 +700,19 @@ def _c6_refusal_run() -> PyrolysisRun:
         hours=1,
         additives_kg={},
     )
+
+
+def _c6_acquisition_refusal_run(**overrides) -> PyrolysisRun:
+    options = {
+        "feedstock_id": "lunar_mare_low_ti",
+        "campaign": "C6",
+        "hours": 3,
+        "runtime_campaign_overrides": {
+            "C6": {"max_hours": 1, "ramp_rate_C_per_hr": 0},
+        },
+    }
+    options.update(overrides)
+    return _run(**options)
 
 
 def _pre_path_ab_c0b_ledger(

@@ -1828,7 +1828,11 @@ def _full_runner_payload(
         status=status,
         reason=reason,
         error_message=error_message,
-        refusal_diagnostic=dict(refusal_diagnostic or {}),
+        refusal_diagnostic=(
+            dict(refusal_diagnostic)
+            if refusal_diagnostic is not None
+            else dict(execution.refusal_diagnostic or {})
+        ),
     )
     if projector is None:
         raise RuntimeError('web session has no canonical runner projector')
@@ -2209,46 +2213,12 @@ def _start_background_loop(
                 isinstance(c6_refusal, Mapping)
                 and c6_refusal.get('status') == 'refused'
             ):
-                diagnostic = c6_refusal.get('diagnostic')
-                reason = (
-                    diagnostic.get('reason_refused')
-                    if isinstance(diagnostic, Mapping)
-                    else c6_refusal.get('reason')
+                # Campaign-scoped refusal: the campaign summary emitted above
+                # is the operator-visible record.  Core has already selected
+                # the configured next campaign, so keep the run loop alive.
+                _safe_log(
+                    'C6 campaign refused; continuing configured batch sequence'
                 )
-                reason = str(reason or 'c6_mg_thermite_refused')
-                refusal_payload = {
-                    'status': 'refused',
-                    'reason': reason,
-                    'message': reason,
-                    'c6_refusal_diagnostic': dict(c6_refusal),
-                    'backend_status': backend_status,
-                    'backend_authoritative': backend_authoritative,
-                    'backend_message': backend_message,
-                }
-                with run_lock:
-                    current, _ = _current_simulation_state(sid, run_id)
-                    if (
-                        current is None
-                        or not current['running']
-                        or current.get('artifact_persisted')
-                    ):
-                        break
-                    artifact = persist_terminal(
-                        session,
-                        status='refused',
-                        reason=reason,
-                        error_message=reason,
-                        refusal_diagnostic=c6_refusal,
-                    )
-                    if artifact is None:
-                        stop_with_status({
-                            'status': 'error',
-                            'reason': 'persistence_failed',
-                            'message': 'Run was refused but its report was not saved',
-                        })
-                        break
-                    stop_with_status(refusal_payload)
-                break
 
             if step_result.decision_event is not None:
                 with _simulations_guard:
