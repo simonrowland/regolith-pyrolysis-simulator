@@ -9,6 +9,14 @@
   const isRecord = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
   const hasNumber = (value) => typeof value === "number" && Number.isFinite(value);
   const MALFORMED_RECORD = Symbol("malformed provenance record");
+  const PROVENANCE_LABELS = Object.freeze({
+    started_at_utc: "Started at (UTC)",
+    backend_real_active: "Real engine active",
+    degradation_reason: "Degradation reason",
+    degraded_from: "Degraded from",
+    backend_authoritative: "Backend authoritative",
+    certification_allowed: "Certification allowed"
+  });
   const IDENTITY_FIELDS = Object.freeze([
     ["name", "Engine name"],
     ["cache_version", "Cache version"],
@@ -25,6 +33,17 @@
     backend_wire_token: "Backend wire token",
     cache_version: "Cache version",
     kernel_commit_sha: "Kernel commit SHA",
+    started_at_utc: PROVENANCE_LABELS.started_at_utc,
+    backend_real_active: PROVENANCE_LABELS.backend_real_active,
+    backend_status: "Backend status",
+    runtime_status: "Runtime status",
+    degradation_reason: PROVENANCE_LABELS.degradation_reason,
+    degraded_from: PROVENANCE_LABELS.degraded_from,
+    evidence_class: "Evidence class",
+    backend_authoritative: PROVENANCE_LABELS.backend_authoritative,
+    certification_allowed: PROVENANCE_LABELS.certification_allowed,
+    label_source: "Label source",
+    requires_inherited_evidence_class: "Requires inherited evidence class",
     high_uncertainty: "High uncertainty",
     diagnostic_only: "Diagnostic only",
     skip_reason: "Skip reason"
@@ -82,10 +101,11 @@
   }
 
   function realActiveValue(metadata) {
-    if (metadata === MALFORMED_RECORD) return pending("Real-engine state unavailable because run metadata is malformed");
-    if (!isRecord(metadata) || !own(metadata, "backend_real_active")) return pending("Real-engine state not emitted");
-    if (metadata.backend_real_active === null) return pending("Real-engine state emitted as null");
-    if (typeof metadata.backend_real_active !== "boolean") return pending("Real-engine state is malformed");
+    const label = PROVENANCE_LABELS.backend_real_active;
+    if (metadata === MALFORMED_RECORD) return pending(`${label} unavailable because a parent record is malformed`);
+    if (!isRecord(metadata) || !own(metadata, "backend_real_active")) return pending(`${label} not emitted`);
+    if (metadata.backend_real_active === null) return pending(`${label} emitted as null`);
+    if (typeof metadata.backend_real_active !== "boolean") return pending(`${label} is malformed`);
     return `<span class="sec-p9-explicit-state">${metadata.backend_real_active ? "Yes" : "No"} <small>(emitted)</small></span>`;
   }
 
@@ -99,31 +119,21 @@
   }
 
   function degradationReasonValue(metadata) {
+    const label = PROVENANCE_LABELS.degradation_reason;
     if (metadata === MALFORMED_RECORD) {
-      return pending("Degradation reason unavailable because its parent record is malformed");
+      return pending(`${label} unavailable because its parent record is malformed`);
     }
-    if (!isRecord(metadata)) return pending("Degradation reason not emitted");
-    if (own(metadata, "degradation_reason")) {
-      return fieldValue(metadata, "degradation_reason", "Degradation reason");
-    }
-    if (Array.isArray(metadata.degraded_from) && metadata.degraded_from.length) {
-      return pending("Degradation reason not emitted");
-    }
-    return empty("No degradation reason in emitted fields");
+    if (!isRecord(metadata) || !own(metadata, "degradation_reason")) return pending(`${label} not emitted`);
+    return fieldValue(metadata, "degradation_reason", label);
   }
 
   function degradationOriginValue(metadata) {
+    const label = PROVENANCE_LABELS.degraded_from;
     if (metadata === MALFORMED_RECORD) {
-      return pending("Degradation origin unavailable because its parent record is malformed");
+      return pending(`${label} unavailable because its parent record is malformed`);
     }
-    if (!isRecord(metadata)) return pending("Degradation origin not emitted");
-    if (own(metadata, "degraded_from")) {
-      return listValue(metadata, "degraded_from", "Degradation origin");
-    }
-    if (typeof metadata.degradation_reason === "string" && metadata.degradation_reason.trim()) {
-      return pending("Degradation origin not emitted");
-    }
-    return empty("No degradation origin in emitted fields");
+    if (!isRecord(metadata) || !own(metadata, "degraded_from")) return pending(`${label} not emitted`);
+    return listValue(metadata, "degraded_from", label);
   }
 
   function speciesLabel(species) {
@@ -133,7 +143,7 @@
 
   function additivesValue(metadata) {
     const label = "Additives";
-    if (metadata === MALFORMED_RECORD) return pending(`${label} unavailable because run metadata is malformed`);
+    if (metadata === MALFORMED_RECORD) return pending(`${label} unavailable because a parent record is malformed`);
     if (!isRecord(metadata) || !own(metadata, "additives_kg")) return pending(`${label} not emitted`);
     if (metadata.additives_kg === null) return pending(`${label} emitted as null`);
     if (!isRecord(metadata.additives_kg)) return pending(`${label} map is malformed`);
@@ -164,7 +174,7 @@
       const entries = Object.entries(value);
       if (!entries.length) return empty("Emitted map is empty");
       return `<dl class="sec-p9-tree">${entries.map(([key, item]) =>
-        `<div><dt>${esc(humanize(key))}</dt><dd>${treeValue(item, key)}</dd></div>`
+        `<div><dt>${esc(key === "authoritative" && typeof item === "boolean" ? "Authoritative" : humanize(key))}</dt><dd>${treeValue(item, key)}</dd></div>`
       ).join("")}</dl>`;
     }
     return pending(`${label} is malformed`);
@@ -184,7 +194,7 @@
   }
 
   function identityDetail(identity) {
-    if (identity === MALFORMED_RECORD) return pending("Engine identity is malformed; expected an object");
+    if (identity === MALFORMED_RECORD) return pending("Engine identity unavailable because a parent record is malformed");
     if (!isRecord(identity)) return pending("Engine identity not emitted");
     const known = new Set(IDENTITY_FIELDS.map(([key]) => key));
     const rows = IDENTITY_FIELDS.map(([key, label]) => detailRow(
@@ -203,7 +213,7 @@
   }
 
   function engineChainValue(metadata) {
-    if (metadata === MALFORMED_RECORD) return pending("Engine chain unavailable because run metadata is malformed");
+    if (metadata === MALFORMED_RECORD) return pending("Engine chain unavailable because a parent record is malformed");
     if (!isRecord(metadata) || !own(metadata, "engines_used")) return pending("Engine chain not emitted");
     if (metadata.engines_used === null) return pending("Engine chain emitted as null");
     if (!isRecord(metadata.engines_used)) return pending("Engine chain is malformed");
@@ -211,10 +221,15 @@
   }
 
   function render(artifact) {
-    const header = isRecord(artifact) && own(artifact, "header")
+    const artifactMalformed = !isRecord(artifact);
+    const header = artifactMalformed
+      ? MALFORMED_RECORD
+      : own(artifact, "header")
       ? (isRecord(artifact.header) ? artifact.header : MALFORMED_RECORD)
       : null;
-    const terminal = isRecord(artifact) && own(artifact, "terminal")
+    const terminal = artifactMalformed
+      ? MALFORMED_RECORD
+      : own(artifact, "terminal")
       ? (isRecord(artifact.terminal) ? artifact.terminal : MALFORMED_RECORD)
       : null;
     const metadata = terminal === MALFORMED_RECORD
@@ -236,7 +251,7 @@
       badge("Backend", fieldValue(metadata, "backend", "Backend")),
       badge("Backend status", fieldValue(metadata, "backend_status", "Backend status"), statusTone(metadataRecord?.backend_status)),
       badge("Runtime status", fieldValue(metadata, "runtime_status", "Runtime status"), statusTone(metadataRecord?.runtime_status)),
-      badge("Real engine active", realActiveValue(metadata), metadataRecord?.backend_real_active === true ? "positive" : metadataRecord?.backend_real_active === false ? "caution" : "pending"),
+      badge(PROVENANCE_LABELS.backend_real_active, realActiveValue(metadata), metadataRecord?.backend_real_active === true ? "positive" : metadataRecord?.backend_real_active === false ? "caution" : "pending"),
       badge("Evidence class", fieldValue(metadata, "evidence_class", "Evidence class")),
       badge("Engine identity", fieldValue(identity, "name", "Engine identity"))
     ].join("");
@@ -247,7 +262,7 @@
       detailRow("Charge mass", fieldValue(metadata, "mass_kg", "Charge mass", { unit: "kg" })),
       detailRow("Additives", additivesValue(metadata)),
       detailRow("Track", fieldValue(metadata, "track", "Track")),
-      detailRow("Started at (UTC)", fieldValue(metadata, "started_at_utc", "Start time")),
+      detailRow(PROVENANCE_LABELS.started_at_utc, fieldValue(metadata, "started_at_utc", PROVENANCE_LABELS.started_at_utc)),
       detailRow("Kernel commit SHA", fieldValue(metadata, "kernel_commit_sha", "Kernel commit SHA", { identifier: true }))
     ].join("");
 
@@ -255,12 +270,12 @@
       detailRow("Backend", fieldValue(metadata, "backend", "Backend")),
       detailRow("Backend status", fieldValue(metadata, "backend_status", "Backend status")),
       detailRow("Runtime status", fieldValue(metadata, "runtime_status", "Runtime status")),
-      detailRow("Real engine active", realActiveValue(metadata)),
-      detailRow("Degradation reason", degradationReasonValue(metadata)),
-      detailRow("Degraded from", degradationOriginValue(metadata)),
+      detailRow(PROVENANCE_LABELS.backend_real_active, realActiveValue(metadata)),
+      detailRow(PROVENANCE_LABELS.degradation_reason, degradationReasonValue(metadata)),
+      detailRow(PROVENANCE_LABELS.degraded_from, degradationOriginValue(metadata)),
       detailRow("Evidence class", fieldValue(metadata, "evidence_class", "Evidence class")),
-      detailRow("Backend authoritative", fieldValue(metadata, "backend_authoritative", "Backend authoritative")),
-      detailRow("Certification allowed", fieldValue(metadata, "certification_allowed", "Certification allowed")),
+      detailRow(PROVENANCE_LABELS.backend_authoritative, fieldValue(metadata, "backend_authoritative", PROVENANCE_LABELS.backend_authoritative)),
+      detailRow(PROVENANCE_LABELS.certification_allowed, fieldValue(metadata, "certification_allowed", PROVENANCE_LABELS.certification_allowed)),
       detailRow("Label source", fieldValue(metadata, "label_source", "Label source")),
       detailRow("Label sources", listValue(metadata, "label_sources", "Label sources"))
     ].join("");
@@ -270,24 +285,31 @@
       .map((key) => detailRow(humanize(key), treeValue(metadata[key], key)))
       .join("");
 
-    const metadataNotice = metadata === MALFORMED_RECORD
+    const artifactNotice = artifactMalformed
+      ? `<div class="pending"><strong>Pending</strong><p>Artifact is malformed; expected an object.</p></div>`
+      : "";
+    const metadataNotice = artifactMalformed
+      ? `<div class="pending"><strong>Pending</strong><p>terminal.run_metadata is unavailable because the artifact is malformed.</p></div>`
+      : metadata === MALFORMED_RECORD
       ? `<div class="pending"><strong>Pending</strong><p>terminal.run_metadata is malformed; expected an object.</p></div>`
       : metadata
         ? ""
         : `<div class="pending"><strong>Pending</strong><p>terminal.run_metadata is not emitted.</p></div>`;
-    const identityNotice = identity === MALFORMED_RECORD
+    const identityNotice = artifactMalformed
+      ? `<div class="pending"><strong>Pending</strong><p>header.engine_identity is unavailable because the artifact is malformed.</p></div>`
+      : identity === MALFORMED_RECORD
       ? `<div class="pending"><strong>Pending</strong><p>header.engine_identity is malformed; expected an object.</p></div>`
       : identity
         ? ""
         : `<div class="pending"><strong>Pending</strong><p>header.engine_identity is not emitted.</p></div>`;
     const degradationStateContext = isRecord(metadata) && own(metadata, "degradation_reason")
-      ? `<div class="sec-p9-state-context"><span>Degradation reason</span>${fieldValue(metadata, "degradation_reason", "Degradation reason")}</div>`
+      ? `<div class="sec-p9-state-context"><span>${PROVENANCE_LABELS.degradation_reason}</span>${fieldValue(metadata, "degradation_reason", PROVENANCE_LABELS.degradation_reason)}</div>`
       : "";
 
     return `<section id="sec-p9-provenance" class="sec-p9-provenance" aria-labelledby="sec-p9-provenance-title">` +
       `<h2 id="sec-p9-provenance-title"><span class="sect">P9</span>Run &amp; engine provenance</h2>` +
       `<p class="sub">Emitted run identity, backend state, evidence class, and engine chain. No confidence tier is computed in the viewer.</p>` +
-      `${metadataNotice}${identityNotice}<div class="sec-p9-badges">${badges}</div>` +
+      `${artifactNotice}${metadataNotice}${identityNotice}<div class="sec-p9-badges">${badges}</div>` +
       degradationStateContext +
       `<details class="sec-p9-details"><summary>Full run, engine, and label provenance</summary>` +
       `<div class="sec-p9-detail-grid">` +
