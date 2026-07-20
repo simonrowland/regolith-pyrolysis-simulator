@@ -162,6 +162,44 @@ def _provenance_region(html: str) -> str:
     return _html_region(html, '<details class="sec-p14-provenance">', "</details>")
 
 
+def _trace_row(html: str) -> str:
+    return _html_region(
+        html,
+        '<div class="sec-p14-row sec-p14-trace-node">',
+        "</div></div>",
+    )
+
+
+def _account_detail(html: str, account: str) -> str:
+    return _html_region_containing(
+        html,
+        f"<code>{account}</code>",
+        '<details class="sec-p14-account-detail"',
+        "</details>",
+    )
+
+
+def _ribbon_width(region: str) -> float:
+    match = re.search(r"--sec-p14-width:([0-9.]+)%", region)
+    if match is None:
+        raise AssertionError("missing rendered ribbon width")
+    return float(match.group(1))
+
+
+def _rendered_account_keys(html: str) -> set[str]:
+    return set(re.findall(r'data-p14-account="([^"]+)"', html))
+
+
+NUMERIC_KG = re.compile(
+    r"(?<![\w.])[-+]?(?:\d+(?:,\d{3})*(?:\.\d+)?|\.\d+)(?:[eE][-+]?\d+)?\s*kg\b",
+    re.IGNORECASE,
+)
+NUMERIC_MOL = re.compile(
+    r"(?<![\w.])[-+]?(?:\d+(?:,\d{3})*(?:\.\d+)?|\.\d+)(?:[eE][-+]?\d+)?\s*mol\b",
+    re.IGNORECASE,
+)
+
+
 def test_p14_renders_emitted_accounts_trace_scaling_o2_and_interaction() -> None:
     state = _render_panel(
         _artifact(
@@ -186,12 +224,31 @@ def test_p14_renders_emitted_accounts_trace_scaling_o2_and_interaction() -> None
     assert "widths √-scaled for readability — hover for true mol" in html
     assert 'class="sec-p14-row sec-p14-trace-node"' in html
     assert "trace inventory (2 species)" in html
-    assert "trace inventory members — Metal pool (bottom) · Cr 1 mol; Offgas · Na 3 mol" in html
+    trace_row = _trace_row(html)
+    trace_detail = _html_region(
+        html,
+        '<details class="sec-p14-account-detail" id="sec-p14-trace-inventory">',
+        "</details>",
+    )
+    assert (
+        'title="trace inventory members — Metal pool (bottom) · Cr 1 mol; '
+        'Offgas · Na 3 mol"'
+    ) in trace_row
+    assert "<span>4 mol · viewer-clustered display node</span>" in trace_row
+    assert 'aria-label="trace inventory, 2 species, 4 mol, mol basis"' in trace_row
+    assert '<th class="num">Emitted mol</th>' in trace_detail
+    assert NUMERIC_KG.search(html) is None
     assert "O₂ stored · melt offgas" in html
     assert "O₂ stored · MRE anode" in html
     assert html.count('data-p14-account="terminal.oxygen_melt_offgas_stored"') >= 2
     assert html.count('data-p14-account="terminal.oxygen_mre_anode_stored"') >= 2
-    assert 'data-p14-account="terminal.glass"' not in html
+    assert _rendered_account_keys(html) == {
+        "process.cleaned_melt",
+        "process.metal_phase_bottom_pool",
+        "terminal.oxygen_melt_offgas_stored",
+        "terminal.oxygen_mre_anode_stored",
+        "terminal.offgas",
+    }
     assert html.index('data-p14-account="process.metal_phase_bottom_pool"') < html.index(
         'data-p14-account="terminal.oxygen_melt_offgas_stored"'
     ) < html.index('data-p14-account="terminal.oxygen_mre_anode_stored"') < html.index(
@@ -216,44 +273,125 @@ def test_p14_renders_emitted_accounts_trace_scaling_o2_and_interaction() -> None
 
 def test_p14_distinct_o2_disposition_accounts_are_never_trace_clustered() -> None:
     o2_accounts = {
-        "terminal.oxygen_stage0_stored": 1.0,
-        "terminal.oxygen_melt_offgas_stored": 2.0,
-        "terminal.oxygen_melt_offgas_vented_to_vacuum": 3.0,
-        "terminal.oxygen_bubbler_external_vented_to_vacuum": 4.0,
-        "terminal.oxygen_melt_offgas_captured": 5.0,
-        "terminal.oxygen_mre_anode_stored": 6.0,
-        "reservoir.oxygen_cistern_liquid_inventory": 7.0,
+        "terminal.oxygen_stage0_stored": (1.0, "O₂ stored · Stage 0"),
+        "terminal.oxygen_melt_offgas_stored": (2.0, "O₂ stored · melt offgas"),
+        "terminal.oxygen_melt_offgas_vented_to_vacuum": (3.0, "O₂ vented · melt offgas"),
+        "terminal.oxygen_bubbler_external_vented_to_vacuum": (4.0, "O₂ vented · bubbler"),
+        "terminal.oxygen_melt_offgas_captured": (5.0, "O₂ captured · melt offgas"),
+        "terminal.oxygen_mre_anode_stored": (6.0, "O₂ stored · MRE anode"),
+        "reservoir.oxygen_cistern_liquid_inventory": (7.0, "O₂ cistern (LOX)"),
     }
     html = _render_panel(
         _artifact(
             {
                 "final_state": {
                     "process.cleaned_melt": {"SiO2": 10_000.0},
-                    **{account: {"O2": value} for account, value in o2_accounts.items()},
+                    **{account: {"O2": value} for account, (value, _) in o2_accounts.items()},
                 }
             }
         )
     )["html"]
 
-    for account in o2_accounts:
+    for account, (value, label) in o2_accounts.items():
         row = _account_row(html, account)
         assert row.count(f'data-p14-account="{account}"') == 2
         assert 'class="sec-p14-ribbon"' in row
         assert "merged into global trace node" not in row
+        assert f'>{label}</a><span>{value:g} mol · viewer display sum</span>' in row
     assert 'class="sec-p14-row sec-p14-trace-node"' not in html
 
 
 def test_p14_basis_badge_and_source_total_stay_mol_native() -> None:
     html = _render_panel(
-        _artifact({"final_state": {"terminal.offgas": {"Fe": 2.0}}})
+        _artifact(
+            {
+                "final_state": {
+                    "terminal.offgas": {"Fe": 2.375},
+                    "process.cleaned_melt": {"SiO2": 7.125},
+                }
+            }
+        )
     )["html"]
     badges = _html_region(html, '<div class="sec-p14-badges">', "</div>")
     source = _source_region(html)
+    offgas_row = _account_row(html, "terminal.offgas")
+    cleaned_melt_row = _account_row(html, "process.cleaned_melt")
+    offgas_detail = _account_detail(html, "terminal.offgas")
+    subtitle = _html_region(html, '<p class="sub">', "</p>")
+    ledger = _html_region(html, '<details class="sec-p14-ledger">', "</details>")
 
     assert '<span class="sec-p14-badge">mol basis</span>' in badges
     assert "kg basis" not in badges
-    assert re.search(r"<span>[^<]*\bmol</span>", source)
-    assert not re.search(r"<span>[^<]*\bkg</span>", source)
+    assert "<span>9.5 mol</span>" in source
+    assert "2.375 mol · viewer display sum" in offgas_row
+    assert "7.125 mol · viewer display sum" in cleaned_melt_row
+    assert "Offgas, 2.375 mol account display sum, mol basis" in offgas_row
+    assert "Offgas — emitted mol: Fe 2.375 mol" in offgas_row
+    assert "Terminal snapshot only · mol basis" in subtitle
+    assert "kg basis" not in subtitle
+    assert "<summary>Underlying emitted account ledger · mol basis</summary>" in ledger
+    assert "emitted basis: mol by species" in offgas_detail
+    assert '<th class="num">Emitted mol</th>' in offgas_detail
+    assert 'Fe</td><td class="num">2.375 mol' in offgas_detail
+    assert NUMERIC_KG.search(html) is None
+
+
+def test_p14_ribbon_widths_follow_sqrt_and_linear_scale_badges() -> None:
+    sqrt_html = _render_panel(
+        _artifact(
+            {
+                "final_state": {
+                    "process.cleaned_melt": {"SiO2": 10_000.0},
+                    "process.metal_phase_bottom_pool": {"Fe": 100.0},
+                    "terminal.offgas": {"Fe": 100.0, "Na": 1.0},
+                }
+            }
+        )
+    )["html"]
+
+    assert "widths √-scaled for readability — hover for true mol" in sqrt_html
+    assert _ribbon_width(_account_row(sqrt_html, "process.cleaned_melt")) == 100.0
+    assert _ribbon_width(_account_row(sqrt_html, "process.metal_phase_bottom_pool")) == 10.0
+    assert _ribbon_width(_account_row(sqrt_html, "terminal.offgas")) == 10.0
+    assert _ribbon_width(_trace_row(sqrt_html)) == 1.0
+
+    linear_html = _render_panel(
+        _artifact(
+            {
+                "final_state": {
+                    "process.cleaned_melt": {"SiO2": 100.0},
+                    "terminal.offgas": {"Fe": 25.0},
+                }
+            }
+        )
+    )["html"]
+
+    assert "linear ribbon widths" in linear_html
+    assert _ribbon_width(_account_row(linear_html, "process.cleaned_melt")) == 100.0
+    assert _ribbon_width(_account_row(linear_html, "terminal.offgas")) == 25.0
+
+
+def test_p14_partial_trace_aria_names_ribbon_and_full_account_sum() -> None:
+    html = _render_panel(
+        _artifact(
+            {
+                "final_state": {
+                    "process.cleaned_melt": {"SiO2": 10_000.0},
+                    "terminal.offgas": {
+                        "Fe": 1_000.0,
+                        **{f"trace-{index}": 6.0 for index in range(40)},
+                    },
+                }
+            }
+        )
+    )["html"]
+    row = _account_row(html, "terminal.offgas")
+
+    assert "1,240 mol · viewer display sum" in row
+    assert "40 species merged into global trace node" in row
+    assert (
+        'aria-label="Offgas, 1,000 mol ribbon of 1,240 mol account display sum, mol basis"'
+    ) in row
 
 
 def test_p14_mixed_trace_tooltip_lists_each_species_once() -> None:
@@ -279,27 +417,33 @@ def test_p14_trace_disclosure_uses_active_threshold() -> None:
             {
                 "final_state": {
                     "process.cleaned_melt": {"SiO2": 10_000.0},
-                    "terminal.offgas": {"Fe": 100.0, "Na": 0.1},
+                    "terminal.offgas": {"Fe": 51.0, "Na": 49.0},
                 }
             }
         )
     )["html"]
-    trace_row = _html_region(
-        html,
-        '<div class="sec-p14-row sec-p14-trace-node">',
-        "</div></div>",
-    )
+    trace_row = _trace_row(html)
+    offgas_row = _account_row(html, "terminal.offgas")
 
     assert "each member &lt; 0.5% of displayed terminal mol" in trace_row
+    assert 'title="trace inventory members — Offgas · Na 49 mol"' in trace_row
+    assert "Fe 51 mol" not in trace_row
+    assert "1 species merged into global trace node" in offgas_row
+    assert "51 mol ribbon of 100 mol account display sum" in offgas_row
 
 
 def test_p14_absent_final_state_and_provenance_stay_pending() -> None:
     html = _render_panel(_artifact({}))["html"]
+    pending = _html_region(
+        html,
+        '<div class="pending sec-p14-pending">',
+        "</div>",
+    )
 
-    assert "Pending terminal inventory" in html
-    assert "terminal.final_state is not emitted for this run." in html
+    assert "Pending terminal inventory" in pending
+    assert "terminal.final_state is not emitted for this run." in pending
     assert "feedstock-provenance tier pending (origin data not emitted for this run)." in html
-    assert "0 mol" not in html
+    assert re.search(r"\b0(?:\.0+)?\s*mol\b", pending) is None
     assert "sec-p14-ribbon" not in html
 
 
@@ -312,6 +456,8 @@ def test_p14_distinguishes_empty_and_malformed_final_state() -> None:
     )
     assert "Empty terminal inventory" in empty_region
     assert "terminal.final_state was emitted with no account keys." in empty_region
+    assert NUMERIC_MOL.search(empty_region) is None
+    assert "sec-p14-ribbon" not in empty_html
 
     for malformed in (None, [], "not-an-account-map", 0):
         malformed_html = _render_panel(_artifact({"final_state": malformed}))["html"]
@@ -322,6 +468,24 @@ def test_p14_distinguishes_empty_and_malformed_final_state() -> None:
         )
         assert "Malformed terminal inventory" in malformed_region
         assert "present but is not an account map" in malformed_region
+        assert NUMERIC_MOL.search(malformed_region) is None
+        assert "sec-p14-ribbon" not in malformed_html
+
+
+def test_p14_malformed_account_values_never_claim_empty_mol_inventory() -> None:
+    for malformed in (None, [], "not-a-species-map", 0, {"Fe": 5.0, "Si": "7"}):
+        html = _render_panel(
+            _artifact({"final_state": {"terminal.offgas": malformed}})
+        )["html"]
+        row = _account_row(html, "terminal.offgas")
+        detail = _account_detail(html, "terminal.offgas")
+
+        assert "account display sum pending" in row
+        assert "width pending · malformed species map" in row
+        assert "malformed species map · values pending" in detail
+        assert "emitted basis: mol by species" not in detail
+        assert "Emitted mol" not in detail
+        assert "emitted empty account" not in detail
 
 
 def test_p14_present_provenance_surfaces_all_authority_values() -> None:
@@ -355,6 +519,38 @@ def test_p14_present_provenance_surfaces_all_authority_values() -> None:
     assert "source</b> &lt;untrusted source&gt;" in provenance
     assert "reference</b> ref&amp;catalog" in provenance
     assert "skip reason</b> coverage &lt; floor" in provenance
+
+
+def test_p14_structured_authority_values_preserve_emitted_content() -> None:
+    html = _render_panel(
+        _artifact(
+            {
+                "final_state": {"terminal.offgas": {"Na": 5.0}},
+                "yield_disposition": {
+                    "basis": {"unit": "mol", "scope": "target"},
+                    "authoritative": False,
+                    "source": {"provider": "kernel", "version": "7"},
+                    "reference": {"doi": "10.1/example"},
+                    "skip_reason": {"code": "coverage", "detail": "floor<limit>"},
+                },
+            }
+        )
+    )["html"]
+    provenance = _provenance_region(html)
+
+    assert (
+        "basis</b> {&quot;unit&quot;:&quot;mol&quot;,&quot;scope&quot;:&quot;target&quot;}"
+    ) in provenance
+    assert "authoritative</b> false" in provenance
+    assert (
+        "source</b> {&quot;provider&quot;:&quot;kernel&quot;,&quot;version&quot;:&quot;7&quot;}"
+    ) in provenance
+    assert "reference</b> {&quot;doi&quot;:&quot;10.1/example&quot;}" in provenance
+    assert (
+        "skip reason</b> {&quot;code&quot;:&quot;coverage&quot;,&quot;detail&quot;:"
+        "&quot;floor&lt;limit&gt;&quot;}"
+    ) in provenance
+    assert "structured value" not in provenance
 
 
 def test_p14_provenance_partial_path_does_not_derive_shares() -> None:
@@ -488,7 +684,7 @@ def test_p14_mol_map_does_not_derive_kg_projection() -> None:
     source = _source_region(html)
 
     assert "kg-projected tier pending — backend kg projection not emitted" in source
-    assert "0.064 kg" not in source
+    assert NUMERIC_KG.search(html) is None
 
 
 def test_p14_partial_numeric_map_does_not_derive_totals_or_widths() -> None:
@@ -505,15 +701,17 @@ def test_p14_partial_numeric_map_does_not_derive_totals_or_widths() -> None:
     source = _source_region(html)
     offgas_row = _account_row(html, "terminal.offgas")
     cleaned_melt_row = _account_row(html, "process.cleaned_melt")
+    offgas_detail = _account_detail(html, "terminal.offgas")
 
     assert "pending · incomplete numeric account map" in source
-    assert "14 mol" not in source
+    assert NUMERIC_MOL.search(source) is None
     assert "account display sum pending" in offgas_row
     assert "width pending · malformed species map" in offgas_row
     assert 'class="sec-p14-ribbon"' not in offgas_row
     assert 'class="sec-p14-ribbon"' in cleaned_melt_row
-    assert "Fe</td><td class=\"num\">5 mol" in html
-    assert "Si</td><td class=\"num\">non-numeric (string)" in html
+    assert "malformed species map · values pending" in offgas_detail
+    assert "Emitted mol" not in offgas_detail
+    assert "Fe 5 mol" not in offgas_detail
     assert "Si 7 mol" not in html
 
 
@@ -529,10 +727,15 @@ def test_p14_zero_and_signed_credit_accounts_are_not_trace_or_ribbons() -> None:
             }
         )
     )["html"]
+    empty_row = _account_row(html, "process.metal_phase")
+    zero_row = _account_row(html, "terminal.offgas")
 
     assert "-8 mol · viewer display sum" in html
     assert "signed reservoir credit balance · no Sankey width" in html
-    assert html.count("emitted empty / zero inventory · no ribbon") == 2
+    assert "emitted empty account · no ribbon" in empty_row
+    assert "emitted zero inventory · no ribbon" not in empty_row
+    assert "emitted zero inventory · no ribbon" in zero_row
+    assert "emitted empty account · no ribbon" not in zero_row
     assert "trace inventory" not in html
     assert 'class="sec-p14-ribbon"' not in html
     assert "Signed reservoir credit balances are included in the displayed Σ" in html

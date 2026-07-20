@@ -132,11 +132,13 @@
     ).join("; ");
   }
 
+  function authorityValueText(value) {
+    return value !== null && typeof value === "object" ? JSON.stringify(value) : String(value);
+  }
+
   function authorityChips(payload) {
     return AUTHORITY_FIELDS.filter((field) => own(payload, field)).map((field) => {
-      const value = payload[field];
-      const scalar = value !== null && typeof value === "object" ? "structured value" : String(value);
-      return `<span class="sec-p14-flag"><b>${esc(field.replaceAll("_", " "))}</b> ${esc(scalar)}</span>`;
+      return `<span class="sec-p14-flag"><b>${esc(field.replaceAll("_", " "))}</b> ${esc(authorityValueText(payload[field]))}</span>`;
     }).join("");
   }
 
@@ -150,8 +152,8 @@
       return `<div class="pending sec-p14-provenance"><strong>Malformed provenance payload</strong>`
         + `<p>yield_disposition was emitted, but it is not an origin-resolved account map. No feedstock shares are shown.</p></div>`;
     }
-    const basis = own(payload, "basis") && payload.basis !== null && typeof payload.basis !== "object"
-      ? `<span class="sec-p14-flag"><b>basis</b> ${esc(payload.basis)}</span>`
+    const basis = own(payload, "basis")
+      ? `<span class="sec-p14-flag"><b>basis</b> ${esc(authorityValueText(payload.basis))}</span>`
       : "";
     const flags = authorityChips(payload);
     return `<details class="sec-p14-provenance"><summary>yield_disposition emitted · provenance schema check</summary>`
@@ -175,6 +177,11 @@
 
   function accountDetail(account, groups) {
     const detailId = stableAccountId(account.account);
+    if (account.malformed) {
+      return `<details class="sec-p14-account-detail" id="${esc(detailId)}">`
+        + `<summary>${esc(accountLabel(account.account))}</summary>`
+        + `<p class="sec-p14-account-key"><code>${esc(account.account)}</code> · malformed species map · values pending</p></details>`;
+    }
     const rows = account.entries.length
       ? account.entries.map((entry) => `<tr><td>${esc(prettySpecies(entry.name))}</td>`
         + `<td class="num">${isFiniteNumber(entry.value) ? molText(entry.value) : `non-numeric (${esc(Array.isArray(entry.value) ? "array" : typeof entry.value)})`}</td></tr>`).join("")
@@ -202,9 +209,12 @@
       const width = (scale === "sqrt" ? Math.sqrt(ratio) : ratio) * 100;
       const background = ribbonBackground({ major: groups.major, trace: [] }, visibleTotal);
       const hover = `${accountLabel(account.account)} — emitted mol: ${inventoryText}`;
+      const ariaQuantity = visibleTotal === account.total
+        ? `${fmtNum(account.total, "mol")} account display sum`
+        : `${fmtNum(visibleTotal, "mol")} ribbon of ${fmtNum(account.total, "mol")} account display sum`;
       ribbon = `<a class="sec-p14-ribbon" href="#${esc(detailId)}" data-p14-account="${esc(account.account)}"`
         + ` style="--sec-p14-width:${width.toFixed(5)}%;--sec-p14-ribbon:linear-gradient(90deg,${esc(background)})"`
-        + ` title="${esc(hover)}" aria-label="${esc(`${accountLabel(account.account)}, ${fmtNum(visibleTotal, "mol")}, mol basis`)}"></a>`;
+        + ` title="${esc(hover)}" aria-label="${esc(`${accountLabel(account.account)}, ${ariaQuantity}, mol basis`)}"></a>`;
       if (account.total < 0 || account.entries.some((entry) => isFiniteNumber(entry.value) && entry.value < 0)) {
         status = `<span class="sec-p14-non-ribbon">signed negative components excluded from ribbon width</span>`;
       } else if (groups.trace.length) {
@@ -214,8 +224,10 @@
       status = `<span class="sec-p14-trace">positive inventory merged into global trace node</span>`;
     } else if (account.total < 0) {
       status = `<span class="sec-p14-signed">signed reservoir credit balance · no Sankey width</span>`;
+    } else if (!account.entries.length) {
+      status = `<span class="sec-p14-empty">emitted empty account · no ribbon</span>`;
     } else {
-      status = `<span class="sec-p14-empty">emitted empty / zero inventory · no ribbon</span>`;
+      status = `<span class="sec-p14-empty">emitted zero inventory · no ribbon</span>`;
     }
     const total = account.total === null ? "account display sum pending" : `${fmtNum(account.total, "mol")} · viewer display sum`;
     return `<div class="sec-p14-row"><div class="sec-p14-track">${ribbon}</div>`
