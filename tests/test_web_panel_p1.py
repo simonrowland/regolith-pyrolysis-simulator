@@ -7,7 +7,7 @@ from pathlib import Path
 REPORT_ROOT = Path(__file__).resolve().parents[1] / "web" / "report_viewer"
 
 
-def _render_panel(artifact: dict) -> str:
+def _render_panel(artifact: object) -> str:
     harness = r"""
 const fs = require("fs");
 const vm = require("vm");
@@ -26,6 +26,44 @@ process.stdout.write(panel.render(JSON.parse(process.argv[4]), [], [], {}));
             str(REPORT_ROOT / "labels.js"),
             str(REPORT_ROOT / "panels" / "p1-fe-redox.js"),
             json.dumps(artifact),
+        ],
+        input=harness,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    return completed.stdout
+
+
+def _render_panel_timestep(artifact: object, index: int) -> str:
+    harness = r"""
+const fs = require("fs");
+const vm = require("vm");
+const selected = { innerHTML: "" };
+const context = {
+  console,
+  document: {
+    querySelector(selector) {
+      return selector === "#sec-p1-selected-timestep-body" ? selected : null;
+    }
+  }
+};
+context.globalThis = context;
+vm.createContext(context);
+vm.runInContext(fs.readFileSync(process.argv[2], "utf8"), context);
+vm.runInContext(fs.readFileSync(process.argv[3], "utf8"), context);
+const panel = context.ReportPanels.find((candidate) => candidate.id === "sec-p1-fe-redox");
+panel.onTimestep(JSON.parse(process.argv[4]), Number(process.argv[5]));
+process.stdout.write(selected.innerHTML);
+"""
+    completed = subprocess.run(
+        [
+            "node",
+            "-",
+            str(REPORT_ROOT / "labels.js"),
+            str(REPORT_ROOT / "panels" / "p1-fe-redox.js"),
+            json.dumps(artifact),
+            str(index),
         ],
         input=harness,
         text=True,
@@ -88,10 +126,65 @@ def _assert_fact_pending(html: str, label: str) -> None:
     assert re.search(pattern, html)
 
 
+def _terminal_region(html: str) -> str:
+    start = html.index('id="sec-p1-terminal-state"')
+    end = html.index('<div class="sec-p1-selected-timestep"', start)
+    return html[start:end]
+
+
+def _selected_region(html: str) -> str:
+    return html[html.index('id="sec-p1-selected-timestep"'):]
+
+
+def _table_region(html: str, aria_label: str) -> str:
+    match = re.search(
+        rf'<table aria-label="{re.escape(aria_label)}"><tbody>(.*?)</tbody></table>',
+        html,
+        flags=re.DOTALL,
+    )
+    assert match, f"missing table {aria_label!r}"
+    return match.group(1)
+
+
+def _flags_region(html: str) -> str:
+    start = html.index('<div class="sec-p1-flags"')
+    end = html.index('<div class="note sec-p1-authority-note">', start)
+    return html[start:end]
+
+
+def _assert_metric_value(html: str, label: str, value: str) -> None:
+    assert (
+        f'<div class="k">{label}</div><div class="v">{value}</div>'
+        in html
+    )
+
+
+def _assert_fact_value(html: str, label: str, value: str) -> None:
+    assert f'<th scope="row">{label}</th><td>{value}</td>' in html
+
+
+def _assert_chip_value(
+    html: str,
+    label: str,
+    value: str,
+    state_class: str,
+) -> None:
+    pattern = (
+        rf'<span class="chip sec-p1-flag {re.escape(state_class)}" title="[^"]*">'
+        + re.escape(f"{label} · {value}")
+        + r'</span>'
+    )
+    assert re.search(pattern, html)
+
+
 def test_p1_renders_terminal_redox_partition_breakdown_and_stage3() -> None:
     terminal_redox = _core_redox(
         source="simulator.fe_redox:<script>alert(1)</script>",
         reference="Kress & Carmichael <unsafe>",
+        fe3_over_sigma_fe=0.21,
+        ferric_frac=0.22,
+        ferrous_frac=0.67,
+        native_fe_frac=0.11,
         native_fe_partition={
             "native_fe_pool_mol": 12.5,
             "native_fe_vapor_mol": 0.5,
@@ -143,6 +236,7 @@ def test_p1_renders_terminal_redox_partition_breakdown_and_stage3() -> None:
                 "respeciation_status": "ok",
                 "direction": "oxidize",
                 "o2_account": "process.overhead_gas",
+                "oxygen_source": "overhead_gas",
             },
             "ferric_divergence": {
                 "status": "warning",
@@ -165,32 +259,71 @@ def test_p1_renders_terminal_redox_partition_breakdown_and_stage3() -> None:
     }
 
     html = _render_panel(artifact)
+    terminal = _terminal_region(html)
+    selected = _selected_region(html)
+    core_detail = _table_region(terminal, "Terminal Fe-redox state detail")
+    authority = _table_region(terminal, "Fe-redox authority and validity envelope")
+    partition = _table_region(terminal, "Native Fe partition detail")
+    redox_summary = _table_region(terminal, "Redox-source forcing summary")
+    ferric_divergence = _table_region(terminal, "Ferric divergence")
+    respeciation = _table_region(terminal, "Fe redox respeciation")
+    skipped = _table_region(terminal, "Skipped reasons by source label")
+    refusal = _table_region(terminal, "Refusal context")
 
     assert 'id="sec-p1-fe-redox"' in html
     assert "Terminal timestep · hour 89" in html
-    assert "Melt log₁₀ fO₂" in html
-    assert "-8.5" in html
-    assert "-99" not in html
-    assert "Fe₂O₃ / FeO molar ratio" in html
-    assert "12.5 mol" in html
-    assert "12 mol" in html
-    assert "Condensed native Fe mass" in html
-    assert "Native Fe pool fraction routed as vapor" in html
-    assert "Fe HKL alpha" in html
-    assert "Evaluated HKL alpha" in html
-    assert "Limiting resistance" in html
-    assert "native_fe_saturation_split_applied" in html
-    assert "1,600 °C" in html
-    assert "Net attempted redox-source terms" in html
-    assert "3.4 mol O₂-eq" in html
-    assert "Ferric divergence" in html
-    assert "0.42 kg" in html
-    assert "4.2 kg" in html
-    assert "10 wt%" in html
+    _assert_metric_value(terminal, "Melt log₁₀ fO₂", "-8.5")
+    _assert_metric_value(terminal, "Fe³⁺ / ΣFe", "0.21")
+    _assert_metric_value(terminal, "Ferric fraction", "0.22")
+    _assert_metric_value(terminal, "Ferrous fraction", "0.67")
+    _assert_metric_value(terminal, "Native Fe fraction", "0.11")
+    assert "-99" not in terminal
+    _assert_fact_value(core_detail, "Fe₂O₃ / FeO molar ratio", "0.25")
+    _assert_fact_value(core_detail, "FeO equivalent", "7.8 wt%")
+    _assert_metric_value(terminal, "Native Fe pool", "12.5 mol")
+    _assert_metric_value(terminal, "Vapor route", "0.5 mol")
+    _assert_metric_value(terminal, "Tap route", "12 mol")
+    _assert_fact_value(partition, "Condensed native Fe mass", "0.01 kg")
+    _assert_fact_value(partition, "Native Fe pool fraction routed as vapor", "0.04")
+    _assert_fact_value(partition, "Fe HKL alpha", "0.02")
+    assert "Recovered product" not in partition
+    assert "Collected product" not in partition
+    assert "Evaluated HKL alpha" in _table_region(terminal, "Native Fe HKL alpha evaluation")
+    assert "Limiting resistance" in _table_region(terminal, "Native Fe series-resistance model")
+    _assert_fact_value(
+        _table_region(terminal, "Native Fe saturation event"),
+        "Reason",
+        "native_fe_saturation_split_applied",
+    )
+    _assert_fact_value(
+        _table_region(terminal, "Native Fe saturation event"),
+        "Event temperature",
+        "1,600 °C",
+    )
+    _assert_fact_value(redox_summary, "Net attempted redox-source terms", "3.4 mol O₂-eq")
+    _assert_fact_value(ferric_divergence, "Implied ferric fraction", "0.2")
+    _assert_fact_value(ferric_divergence, "Ledger ferric fraction", "0.18")
+    _assert_fact_value(ferric_divergence, "Absolute ferric divergence", "0.02")
+    _assert_fact_value(ferric_divergence, "Warning", "yes")
+    assert "Ferric divergence pending" not in ferric_divergence
+    _assert_fact_value(respeciation, "Respeciation status", "ok")
+    _assert_fact_value(respeciation, "O2 account", "Overhead gas")
+    _assert_fact_value(respeciation, "Oxygen source", "overhead_gas")
+    assert "Fe redox respeciation pending" not in respeciation
+    _assert_metric_value(terminal, "Stage 3 Fe", "0.42 kg")
+    _assert_metric_value(terminal, "Stage 3 total", "4.2 kg")
+    _assert_metric_value(terminal, "Stage 3 Fe concentration", "10 wt%")
+    _assert_fact_value(
+        authority,
+        "Source",
+        "simulator.fe_redox:&lt;script&gt;alert(1)&lt;/script&gt;",
+    )
+    _assert_fact_value(authority, "Reference", "Kress &amp; Carmichael &lt;unsafe&gt;")
     assert "<script>" not in html
-    assert "&lt;script&gt;alert(1)&lt;/script&gt;" in html
-    assert "blocked &amp; retained" in html
-    assert "gate &lt;closed&gt;" in html
+    assert "&amp;lt;" not in authority
+    assert "blocked &amp; retained" in skipped
+    assert "gate &lt;closed&gt;" in refusal
+    _assert_metric_value(selected, "Melt log₁₀ fO₂", "-99")
 
 
 def test_p1_absent_terminal_envelope_and_conditionals_stay_pending() -> None:
@@ -199,40 +332,208 @@ def test_p1_absent_terminal_envelope_and_conditionals_stay_pending() -> None:
         _artifact({"redox_source_breakdown": {"redox_source_skip_reason": ""}})
     )
     missing_skip_html = _render_panel(_artifact({"redox_source_breakdown": {}}))
+    terminal = _terminal_region(html)
+    empty_skip_terminal = _terminal_region(empty_skip_html)
+    missing_skip_terminal = _terminal_region(missing_skip_html)
 
-    assert "Fe-redox state pending" in html
-    assert "No redox state is inferred" in html
-    assert "Native Fe partition pending" in html
-    assert "Native Fe saturation event pending" in html
-    assert "Redox-source breakdown pending" in html
-    assert "Stage 3 capture pending" in html
-    assert '<th scope="row">Combined skip reason</th><td>no skip reason</td>' in empty_skip_html
-    _assert_fact_pending(missing_skip_html, "Combined skip reason")
+    assert "Fe-redox state pending" in terminal
+    assert "The terminal timestep does not emit summary.fe_redox_split" in terminal
+    assert "No redox state is inferred" in terminal
+    assert "Native Fe partition pending" in terminal
+    assert "Native Fe saturation event pending" in terminal
+    assert "Redox-source breakdown pending" in terminal
+    assert "Stage 3 capture pending" in terminal
+    _assert_fact_value(
+        _table_region(empty_skip_terminal, "Redox-source forcing summary"),
+        "Combined skip reason",
+        "no skip reason",
+    )
+    _assert_fact_pending(
+        _table_region(missing_skip_terminal, "Redox-source forcing summary"),
+        "Combined skip reason",
+    )
 
 
 def test_p1_surfaces_explicit_and_missing_authority_flags() -> None:
     explicit = _core_redox(
         authoritative=False,
-        diagnostic_only=True,
+        diagnostic_only=False,
         extrapolation=True,
-        high_uncertainty=True,
+        high_uncertainty=False,
     )
     explicit_html = _render_panel(_artifact({"fe_redox_split": explicit}))
     missing = _core_redox()
     for key in ("authoritative", "diagnostic_only", "extrapolation", "high_uncertainty"):
         missing.pop(key)
     missing_html = _render_panel(_artifact({"fe_redox_split": missing}))
+    explicit_terminal = _terminal_region(explicit_html)
+    missing_terminal = _terminal_region(missing_html)
+    explicit_flags = _flags_region(explicit_terminal)
+    missing_flags = _flags_region(missing_terminal)
+    authority = _table_region(
+        explicit_terminal,
+        "Fe-redox authority and validity envelope",
+    )
 
-    assert "Authoritative · no" in explicit_html
-    assert "Diagnostic only · yes" in explicit_html
-    assert "Extrapolation · yes" in explicit_html
-    assert "High uncertainty · yes" in explicit_html
-    assert "diagnostic-only describes this Fe-redox split" in explicit_html
-    assert "None is whole-run confidence" in explicit_html
-    assert "Authoritative · not emitted" in missing_html
-    assert "Diagnostic only · not emitted" in missing_html
-    assert "Extrapolation · not emitted" in missing_html
-    assert "High uncertainty · not emitted" in missing_html
+    _assert_chip_value(explicit_flags, "Status", "ok", "sec-p1-flag-clear")
+    _assert_chip_value(
+        explicit_flags,
+        "Source",
+        "simulator.fe_redox:kress91_split",
+        "sec-p1-flag-clear",
+    )
+    _assert_chip_value(
+        explicit_flags,
+        "Reference",
+        "Kress and Carmichael 1991",
+        "sec-p1-flag-clear",
+    )
+    _assert_chip_value(explicit_flags, "Authoritative", "no", "sec-p1-flag-caution")
+    _assert_chip_value(explicit_flags, "Diagnostic only", "no", "sec-p1-flag-clear")
+    _assert_chip_value(explicit_flags, "Extrapolation", "yes", "sec-p1-flag-caution")
+    _assert_chip_value(explicit_flags, "High uncertainty", "no", "sec-p1-flag-clear")
+    assert "diagnostic-only describes this Fe-redox split" in explicit_terminal
+    assert "None is whole-run confidence" in explicit_terminal
+    _assert_fact_value(authority, "Status", "ok")
+    _assert_fact_value(authority, "Source", "simulator.fe_redox:kress91_split")
+    _assert_fact_value(authority, "Reference", "Kress and Carmichael 1991")
+    _assert_fact_value(authority, "Temperature-band case", "within_band")
+    _assert_fact_value(authority, "Temperature-band status", "grounded")
+    _assert_fact_value(authority, "Temperature-band source", "Kress91 basalt range")
+    _assert_chip_value(missing_flags, "Authoritative", "not emitted", "sec-p1-flag-caution")
+    _assert_chip_value(missing_flags, "Diagnostic only", "not emitted", "sec-p1-flag-caution")
+    _assert_chip_value(missing_flags, "Extrapolation", "not emitted", "sec-p1-flag-caution")
+    _assert_chip_value(missing_flags, "High uncertainty", "not emitted", "sec-p1-flag-caution")
+
+
+def test_p1_null_empty_and_malformed_authority_metadata_are_distinct() -> None:
+    malformed_redox = _core_redox(status=None, source=[], reference={})
+    malformed_terminal = _terminal_region(
+        _render_panel(_artifact({"fe_redox_split": malformed_redox}))
+    )
+    malformed_flags = _flags_region(malformed_terminal)
+    malformed_authority = _table_region(
+        malformed_terminal,
+        "Fe-redox authority and validity envelope",
+    )
+    malformed_tooltip = (
+        'title="status: not emitted; source: malformed; reference: malformed"'
+    )
+
+    assert malformed_flags.count(malformed_tooltip) == 7
+    _assert_chip_value(malformed_flags, "Status", "not emitted", "sec-p1-flag-caution")
+    _assert_chip_value(malformed_flags, "Source", "malformed", "sec-p1-flag-caution")
+    _assert_chip_value(malformed_flags, "Reference", "malformed", "sec-p1-flag-caution")
+    _assert_fact_pending(malformed_authority, "Status")
+    _assert_fact_value(malformed_authority, "Source", "malformed")
+    _assert_fact_value(malformed_authority, "Reference", "malformed")
+    assert "null" not in malformed_flags
+    assert "[object Object]" not in malformed_flags
+
+    empty_redox = _core_redox(status="", source="", reference="")
+    empty_terminal = _terminal_region(
+        _render_panel(_artifact({"fe_redox_split": empty_redox}))
+    )
+    empty_flags = _flags_region(empty_terminal)
+    empty_authority = _table_region(
+        empty_terminal,
+        "Fe-redox authority and validity envelope",
+    )
+    empty_tooltip = 'title="status: none emitted; source: none emitted; reference: none emitted"'
+
+    assert empty_flags.count(empty_tooltip) == 7
+    _assert_chip_value(empty_flags, "Status", "none emitted", "sec-p1-flag-caution")
+    _assert_chip_value(empty_flags, "Source", "none emitted", "sec-p1-flag-caution")
+    _assert_chip_value(empty_flags, "Reference", "none emitted", "sec-p1-flag-caution")
+    _assert_fact_value(empty_authority, "Status", "none emitted")
+    _assert_fact_value(empty_authority, "Source", "none emitted")
+    _assert_fact_value(empty_authority, "Reference", "none emitted")
+
+    zero_redox = _core_redox(status=0, source=False, reference=0)
+    zero_terminal = _terminal_region(
+        _render_panel(_artifact({"fe_redox_split": zero_redox}))
+    )
+    zero_flags = _flags_region(zero_terminal)
+    assert zero_flags.count('title="status: 0; source: false; reference: 0"') == 7
+    _assert_chip_value(zero_flags, "Status", "0", "sec-p1-flag-clear")
+    _assert_chip_value(zero_flags, "Source", "false", "sec-p1-flag-clear")
+    _assert_chip_value(zero_flags, "Reference", "0", "sec-p1-flag-clear")
+
+
+def test_p1_timestep_hour_states_distinguish_absent_empty_malformed_and_zero() -> None:
+    cases = [
+        ({"summary": {}}, "not emitted"),
+        ({"hour": None, "summary": {}}, "not emitted"),
+        ({"hour": "", "summary": {}}, "empty"),
+        ({"hour": {}, "summary": {}}, "malformed"),
+        ({"hour": [], "summary": {}}, "malformed"),
+        ({"hour": False, "summary": {}}, "malformed"),
+        ({"hour": "88", "summary": {}}, "malformed"),
+        ({"hour": 0, "summary": {}}, "0"),
+    ]
+
+    for timestep, expected in cases:
+        html = _render_panel({"timesteps": [timestep]})
+        assert f"Terminal timestep · hour {expected}." in html
+        assert f">hour {expected}</span>" in _selected_region(html)
+
+
+def test_p1_selected_timestep_view_tracks_inspector_index() -> None:
+    artifact = {
+        "timesteps": [
+            {"hour": 88, "summary": {"fe_redox_split": _core_redox(fO2_log=-99.0)}},
+            {"hour": 89, "summary": {"fe_redox_split": _core_redox(fO2_log=-8.5)}},
+        ]
+    }
+
+    initial = _selected_region(_render_panel(artifact))
+    selected_88 = _render_panel_timestep(artifact, 0)
+    selected_89 = _render_panel_timestep(artifact, 1)
+
+    assert ">hour 88</span>" in initial
+    _assert_metric_value(initial, "Melt log₁₀ fO₂", "-99")
+    assert "-8.5" not in initial
+    assert ">hour 88</span>" in selected_88
+    _assert_metric_value(selected_88, "Melt log₁₀ fO₂", "-99")
+    assert "-8.5" not in selected_88
+    assert ">hour 89</span>" in selected_89
+    _assert_metric_value(selected_89, "Melt log₁₀ fO₂", "-8.5")
+    assert "-99" not in selected_89
+
+
+def test_p1_malformed_artifact_shapes_render_panel_local_pending() -> None:
+    malformed_artifacts = [
+        None,
+        {},
+        {"timesteps": None},
+        {"timesteps": "not-an-array"},
+        {"timesteps": []},
+        {"timesteps": [None]},
+        {"timesteps": [{}]},
+        {"timesteps": [{"hour": 1}]},
+        {"timesteps": [{"hour": 1, "summary": []}]},
+        {
+            "timesteps": [
+                {
+                    "hour": 1,
+                    "summary": {
+                        "fe_redox_split": [],
+                        "redox_source_breakdown": "malformed",
+                        "stage_3_capture": [],
+                    },
+                }
+            ]
+        },
+    ]
+
+    for artifact in malformed_artifacts:
+        html = _render_panel(artifact)
+        terminal = _terminal_region(html)
+        assert 'id="sec-p1-fe-redox"' in html
+        assert "Fe-redox state pending" in terminal
+        assert "Native Fe partition pending" in terminal
+        assert "Redox-source breakdown pending" in terminal
+        assert "Stage 3 capture pending" in terminal
 
 
 def test_p1_partition_and_event_absent_before_hour_89_are_not_zeroed() -> None:
@@ -246,13 +547,14 @@ def test_p1_partition_and_event_absent_before_hour_89_are_not_zeroed() -> None:
             hour=88,
         )
     )
+    terminal = _terminal_region(html)
 
     assert "Terminal timestep · hour 88" in html
-    assert "Native Fe partition pending" in html
-    assert "No empty or zero partition is assumed" in html
-    assert "Native Fe saturation event pending" in html
-    assert "Native Fe pool</div>" not in html
-    assert "Stage 3 Fe</div><div class=\"v\">0 kg" in html
+    assert "Native Fe partition pending" in terminal
+    assert "No empty or zero partition is assumed" in terminal
+    assert "Native Fe saturation event pending" in terminal
+    assert "Native Fe pool</div>" not in terminal
+    _assert_metric_value(terminal, "Stage 3 Fe", "0 kg")
 
 
 def test_p1_partial_inputs_never_drive_viewer_derivations() -> None:
@@ -263,8 +565,10 @@ def test_p1_partial_inputs_never_drive_viewer_derivations() -> None:
         ferric_frac=0.1234,
         native_fe_frac=0.2345,
         native_fe_partition={
-            "native_fe_pool_mol": 14.9,
-            "native_fe_vapor_mol": 2.2,
+            "native_fe_pool_mol": 11.0,
+            "native_fe_vapor_mol": 2.5,
+            "native_fe_uncondensed_mol": 1.65,
+            "native_fe_vapor_capacity_mol_hr": 4.0,
         },
     )
     partial_redox.pop("ferrous_frac")
@@ -290,19 +594,50 @@ def test_p1_partial_inputs_never_drive_viewer_derivations() -> None:
             }
         )
     )
+    terminal = _terminal_region(html)
+    partition = _table_region(terminal, "Native Fe partition detail")
+    redox_summary = _table_region(terminal, "Redox-source forcing summary")
+    missing_ferric = _core_redox(fe3_over_sigma_fe=0.3456)
+    missing_ferric.pop("ferric_frac")
+    missing_ferric_terminal = _terminal_region(
+        _render_panel(_artifact({"fe_redox_split": missing_ferric}))
+    )
+    missing_native = _core_redox(ferric_frac=0.2468, ferrous_frac=0.5)
+    missing_native.pop("native_fe_frac")
+    missing_native_terminal = _terminal_region(
+        _render_panel(_artifact({"fe_redox_split": missing_native}))
+    )
 
-    _assert_metric_pending(html, "Fe³⁺ / ΣFe")
-    _assert_metric_pending(html, "Ferrous fraction")
-    _assert_metric_pending(html, "Tap route")
-    _assert_metric_pending(html, "Stage 3 Fe concentration")
-    _assert_fact_pending(html, "Native Fe pool fraction routed as vapor")
-    _assert_fact_pending(html, "Net attempted redox-source terms")
-    _assert_fact_pending(html, "Change in log₁₀ fO₂")
-    assert "IW-buffer log₁₀ fO₂ (absolute, not ΔIW)" in html
-    assert ">2.5<" not in html
-    assert "0.6421" not in html
-    assert "12.7 mol" not in html
-    assert "0.1477" not in html
-    assert "3.333" not in html
-    assert "3.457" not in html
-    assert "25 wt%" not in html
+    _assert_metric_pending(terminal, "Fe³⁺ / ΣFe")
+    _assert_metric_pending(terminal, "Ferrous fraction")
+    _assert_metric_pending(terminal, "Tap route")
+    _assert_metric_pending(terminal, "Stage 3 Fe concentration")
+    _assert_fact_pending(partition, "Fe vapor mass capacity")
+    _assert_fact_pending(partition, "Residual capacity for ordinary melt Fe")
+    _assert_fact_pending(partition, "Condensed native Fe mass")
+    _assert_fact_pending(partition, "Uncondensed fraction of native Fe pool")
+    _assert_fact_pending(partition, "Native Fe pool fraction routed as vapor")
+    _assert_fact_pending(redox_summary, "Net attempted redox-source terms")
+    _assert_fact_pending(redox_summary, "Change in log₁₀ fO₂")
+    _assert_metric_pending(missing_ferric_terminal, "Ferric fraction")
+    assert (
+        '<div class="k">Ferric fraction</div><div class="v">0.3456</div>'
+        not in missing_ferric_terminal
+    )
+    _assert_metric_pending(missing_native_terminal, "Native Fe fraction")
+    assert (
+        '<div class="k">Native Fe fraction</div><div class="v">0.2532</div>'
+        not in missing_native_terminal
+    )
+    assert "IW-buffer log₁₀ fO₂ (absolute, not ΔIW)" in terminal
+    assert ">2.5<" not in terminal
+    assert "0.6421" not in terminal
+    assert "8.5 mol" not in terminal
+    assert "0.2273" not in terminal
+    assert "0.15" not in terminal
+    assert "0.2234 kg/h" not in terminal
+    assert "1.5 mol/h" not in terminal
+    assert "0.1396 kg" not in terminal
+    assert "3.333" not in terminal
+    assert "3.457" not in terminal
+    assert "25 wt%" not in terminal

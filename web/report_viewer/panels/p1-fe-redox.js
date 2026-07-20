@@ -161,11 +161,23 @@
   }
 
   function textValue(object, key, emptyText = "none emitted") {
-    if (!hasOwn(object, key) || object[key] === null || typeof object[key] === "object") {
-      return pendingValue();
+    const state = scalarTextState(object, key, emptyText);
+    return state.kind === "absent" ? pendingValue() : esc(state.value);
+  }
+
+  function scalarTextState(object, key, emptyText = "none emitted") {
+    if (
+      !hasOwn(object, key)
+      || object[key] === null
+      || object[key] === undefined
+    ) {
+      return { kind: "absent", value: "not emitted" };
     }
+    if (typeof object[key] === "object") return { kind: "malformed", value: "malformed" };
     const value = String(object[key]);
-    return value ? esc(value) : esc(emptyText);
+    return value
+      ? { kind: "value", value }
+      : { kind: "empty", value: emptyText };
   }
 
   function booleanValue(object, key) {
@@ -243,12 +255,17 @@
 
   function authorityTooltip(redox) {
     if (!isRecord(redox)) return "Authority envelope not emitted.";
-    const parts = [
-      hasOwn(redox, "status") ? `status: ${String(redox.status)}` : "status: not emitted",
-      hasOwn(redox, "source") ? `source: ${String(redox.source)}` : "source: not emitted",
-      hasOwn(redox, "reference") ? `reference: ${String(redox.reference)}` : "reference: not emitted"
-    ];
+    const parts = ["status", "source", "reference"].map((key) => {
+      const state = scalarTextState(redox, key);
+      return `${key}: ${state.value}`;
+    });
     return parts.join("; ");
+  }
+
+  function scalarChip(redox, key, label) {
+    const state = scalarTextState(redox, key);
+    const cautious = state.kind !== "value";
+    return `<span class="chip sec-p1-flag ${cautious ? "sec-p1-flag-caution" : "sec-p1-flag-clear"}" title="${esc(authorityTooltip(redox))}">${esc(label)} · ${esc(state.value)}</span>`;
   }
 
   function flagChip(redox, key, label, cautiousWhen) {
@@ -258,11 +275,11 @@
     return `<span class="chip sec-p1-flag ${cautious ? "sec-p1-flag-caution" : "sec-p1-flag-clear"}" title="${esc(authorityTooltip(redox))}">${esc(label)} · ${esc(state)}</span>`;
   }
 
-  function renderCore(redox) {
+  function renderCore(redox, selected = false) {
     if (!isRecord(redox)) {
       return pendingBlock(
         "Fe-redox state pending",
-        "The terminal timestep does not emit summary.fe_redox_split. No redox state is inferred."
+        `The ${selected ? "selected" : "terminal"} timestep does not emit summary.fe_redox_split. No redox state is inferred.`
       );
     }
     const fe2o3 = esc(prettySpecies("Fe2O3"));
@@ -284,12 +301,15 @@
       ["Native Fe saturation", booleanValue(redox, "native_fe_saturation")],
       ["Native Fe threshold", textValue(redox, "native_fe_threshold")]
     ];
-    return `<div class="sec-p1-headline">${headline}</div>${factsTable(detailRows, "Terminal Fe-redox state detail")}`;
+    return `<div class="sec-p1-headline">${headline}</div>${factsTable(detailRows, `${selected ? "Selected timestep" : "Terminal"} Fe-redox state detail`)}`;
   }
 
   function renderAuthority(redox) {
     if (!isRecord(redox)) return "";
     const chips = [
+      scalarChip(redox, "status", "Status"),
+      scalarChip(redox, "source", "Source"),
+      scalarChip(redox, "reference", "Reference"),
       flagChip(redox, "authoritative", "Authoritative", false),
       flagChip(redox, "diagnostic_only", "Diagnostic only", true),
       flagChip(redox, "extrapolation", "Extrapolation", true),
@@ -413,6 +433,35 @@
     ].join("")}</div><div class="note sec-p1-link-note">Backend-emitted Stage 3 condenser capture. Fe wt% is never recomputed here. See the taps and stage-purity panels for downstream product detail.</div>`;
   }
 
+  function timestepHourValue(timestep) {
+    if (!isRecord(timestep) || !hasOwn(timestep, "hour") || timestep.hour === null || timestep.hour === undefined) {
+      return "not emitted";
+    }
+    if (timestep.hour === "") return "empty";
+    return isNumber(timestep.hour) ? esc(String(timestep.hour)) : "malformed";
+  }
+
+  function renderSelectedTimestep(artifact, index) {
+    const timesteps = artifact && Array.isArray(artifact.timesteps) ? artifact.timesteps : [];
+    const numericIndex = Number(index);
+    const selectedIndex = Number.isInteger(numericIndex) && numericIndex >= 0 && numericIndex < timesteps.length
+      ? numericIndex
+      : null;
+    const timestep = selectedIndex === null || !isRecord(timesteps[selectedIndex])
+      ? null
+      : timesteps[selectedIndex];
+    const summary = timestep && isRecord(timestep.summary) ? timestep.summary : null;
+    const redox = summary && isRecord(summary.fe_redox_split) ? summary.fe_redox_split : null;
+    return `<div class="sec-p1-selected-head"><h3>Selected timestep Fe-redox</h3><span class="chip">hour ${timestepHourValue(timestep)}</span></div>${renderAuthority(redox)}${renderCore(redox, true)}`;
+  }
+
+  function onTimestep(artifact, index) {
+    const target = root.document && typeof root.document.querySelector === "function"
+      ? root.document.querySelector("#sec-p1-selected-timestep-body")
+      : null;
+    if (target) target.innerHTML = renderSelectedTimestep(artifact, index);
+  }
+
   function render(artifact) {
     const timesteps = artifact && Array.isArray(artifact.timesteps) ? artifact.timesteps : [];
     const terminalStep = timesteps.length ? timesteps[timesteps.length - 1] : null;
@@ -424,15 +473,15 @@
       ? summary.redox_source_breakdown
       : null;
     const stage3 = summary && isRecord(summary.stage_3_capture) ? summary.stage_3_capture : null;
-    const hour = isRecord(terminalStep) && hasOwn(terminalStep, "hour")
-      ? esc(terminalStep.hour)
-      : "not emitted";
+    const hour = timestepHourValue(terminalStep);
 
-    return `<section class="sec-p1-fe-redox" id="sec-p1-fe-redox" style="--sec-p1-fe:${esc(speciesColor("Fe"))}" aria-label="Fe redox diagnostics at terminal timestep"><h2><span class="sect">P1</span>Melt Fe redox diagnostics</h2><p class="sub">Terminal timestep · hour ${hour}. Artifact-emitted SSO-R state and downstream Stage 3 Fe consequence; no viewer-derived redox or purity values.</p>${renderAuthority(redox)}${renderCore(redox)}${renderPartition(redox)}<details class="sec-p1-disclosure"><summary>Redox-source forcing, refusal and ferric divergence</summary>${renderBreakdown(breakdown)}</details><details class="sec-p1-disclosure"><summary>Stage 3 condenser Fe contamination</summary>${renderStage3(stage3)}</details></section>`;
+    const terminalHtml = `${renderAuthority(redox)}${renderCore(redox)}${renderPartition(redox)}<details class="sec-p1-disclosure"><summary>Redox-source forcing, refusal and ferric divergence</summary>${renderBreakdown(breakdown)}</details><details class="sec-p1-disclosure"><summary>Stage 3 condenser Fe contamination</summary>${renderStage3(stage3)}</details>`;
+    return `<section class="sec-p1-fe-redox" id="sec-p1-fe-redox" style="--sec-p1-fe:${esc(speciesColor("Fe"))}" aria-label="Fe redox diagnostics"><h2><span class="sect">P1</span>Melt Fe redox diagnostics</h2><p class="sub">Terminal timestep · hour ${hour}. Artifact-emitted SSO-R state and downstream Stage 3 Fe consequence; no viewer-derived redox or purity values.</p><div class="sec-p1-terminal-state" id="sec-p1-terminal-state">${terminalHtml}</div><div class="sec-p1-selected-timestep" id="sec-p1-selected-timestep" aria-live="polite"><div id="sec-p1-selected-timestep-body">${renderSelectedTimestep(artifact, 0)}</div></div></section>`;
   }
 
   (root.ReportPanels = root.ReportPanels || []).push({
     id: "sec-p1-fe-redox",
-    render
+    render,
+    onTimestep
   });
 }(globalThis));

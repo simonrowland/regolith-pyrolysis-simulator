@@ -127,6 +127,33 @@
   margin: 12px;
 }
 
+.sec-p1-fe-redox .sec-p1-selected-timestep {
+  margin-top: 18px;
+  padding: 13px;
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--sec-p1-fe);
+  background: color-mix(in srgb, var(--sec-p1-fe) 4%, var(--panel));
+}
+
+.sec-p1-fe-redox .sec-p1-selected-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.sec-p1-fe-redox .sec-p1-selected-head h3 {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 13px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.sec-p1-fe-redox .sec-p1-selected-timestep .sec-p1-flags {
+  margin-top: 12px;
+}
+
 @media (max-width: 900px) {
   .sec-p1-fe-redox .sec-p1-headline {
     grid-template-columns: repeat(2, minmax(0, 1fr));
