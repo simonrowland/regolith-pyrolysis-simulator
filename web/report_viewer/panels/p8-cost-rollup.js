@@ -170,7 +170,7 @@
       : ""}`;
   }
 
-  function renderCostBlock(costBlock) {
+  function renderCostBlock(costBlock, costTotals) {
     const path = "header.cost_block";
     if (!isRecord(costBlock)) return structuredProblem(costBlock, path, "an object", `${path} is not emitted; viewer price authority is unavailable.`);
     const pricesPresent = ["electrical_cost_per_kWh", "solar_heat_cost_per_kWh"].every(key =>
@@ -178,9 +178,21 @@
     );
     const provenancePresent = hasOwn(costBlock, "provenance") &&
       typeof costBlock.provenance === "string" && Boolean(costBlock.provenance.trim());
-    const caption = pricesPresent && provenancePresent
-      ? "Canonical energy-cost totals use these artifact price inputs. Diagnostic allocation projections below do not."
-      : "Canonical-total price provenance cannot be validated from this artifact; canonical totals remain artifact-emitted values.";
+    const totalsPresent = isRecord(costTotals) && Object.keys(costTotals).length > 0;
+    let caption;
+    if (!pricesPresent || !provenancePresent) {
+      caption = "Canonical-total price provenance cannot be validated from this artifact; canonical totals remain artifact-emitted values.";
+    } else if (totalsPresent) {
+      caption = "Emitted canonical energy-cost totals use these artifact price inputs. Diagnostic allocation projections below do not.";
+    } else if (costTotals === undefined) {
+      caption = "Viewer price inputs are emitted in header.cost_block; canonical energy-cost totals are not emitted in this artifact.";
+    } else if (costTotals === null) {
+      caption = "Viewer price inputs are emitted in header.cost_block; canonical energy-cost totals were emitted null, so no price-to-total binding is inferred.";
+    } else if (isRecord(costTotals)) {
+      caption = "Viewer price inputs are emitted in header.cost_block; canonical energy-cost totals were emitted empty, so no price-to-total binding is inferred.";
+    } else {
+      caption = "Viewer price inputs are emitted in header.cost_block; canonical energy-cost totals were emitted malformed, so no price-to-total binding is inferred.";
+    }
     return `<div class="card sec-p8-price-card"><div class="ct">Viewer price inputs · header.cost_block</div>` +
       expectedLeaf(costBlock, "electrical_cost_per_kWh", "Electrical price", "USD/kWh", path) +
       expectedLeaf(costBlock, "solar_heat_cost_per_kWh", "Solar heat price", "USD/kWh", path) +
@@ -268,8 +280,16 @@
     const rest = Object.fromEntries(Object.entries(value).filter(([key]) => !["status", "pumping_electrical_kWh"].includes(key)));
     return expectedScalar(value, "status", "Emitted pumping status", path) +
       expectedLeaf(value, "pumping_electrical_kWh", "Emitted pumping diagnostic energy", "kWh", path) +
-      `<div class="note">Pumping is a rough diagnostic, not a validated pump design. Canonical inclusion, when emitted, is described by terminal.cost_totals.basis_note.</div>` +
+      `<div class="note">Pumping is a rough diagnostic, not a validated pump design. Canonical pumping treatment is emitted only by terminal.cost_totals: pumping_electrical_energy_kWh and pumping_electrical_cost_usd record inclusion; optional basis_note records exclusion or status. Diagnostic status is not reinterpreted here.</div>` +
       (Object.keys(rest).length ? renderTree(rest, path) : "");
+  }
+
+  function renderImportContext(diagnostic) {
+    const path = "terminal.run_metadata.cost_rollup_diagnostic.import_context";
+    if (!hasOwn(diagnostic, "import_context")) return pending(path, `${path} is not emitted; import-classification authority is unavailable.`);
+    if (!isRecord(diagnostic.import_context)) return structuredProblem(diagnostic.import_context, path, "an object");
+    if (!Object.keys(diagnostic.import_context).length) return pending(path, `${path} was emitted empty; import-classification authority is not inferred.`);
+    return renderTree(diagnostic.import_context, path);
   }
 
   function renderPlaceholders(diagnostic) {
@@ -317,6 +337,7 @@
     return `<div class="sec-p8-authority"><b>Diagnostic allocation · not viewer price authority</b>${priceBasis}<p>${esc(authorityMessage)}</p></div>` +
       `<details class="sec-p8-details"><summary>Diagnostic allocation depth</summary>` +
       `<div class="sec-p8-identity">${identity}</div>` +
+      `<details class="sec-p8-details"><summary>Import classification context</summary>${renderImportContext(diagnostic)}</details>` +
       `<details class="sec-p8-details" open><summary>Owner-ratification placeholders</summary>${renderPlaceholders(diagnostic)}</details>` +
       `<details class="sec-p8-details"><summary>Product allocations</summary>${renderCostMap(diagnostic.product_costs, `${path}.product_costs`, true)}</details>` +
       `<details class="sec-p8-details"><summary>Active inventory allocations</summary>${renderCostMap(diagnostic.active_inventory_costs, `${path}.active_inventory_costs`, false)}</details>` +
@@ -334,7 +355,7 @@
     return `<section class="sec-p8-cost-rollup" id="sec-p8-cost-rollup">` +
       `<h2><span class="sect">P8</span>Cost rollup depth</h2>` +
       `<p class="sub">Canonical energy-cost totals and artifact price provenance, followed by diagnostic allocation depth with emitted basis disclosures intact.</p>` +
-      `<div class="sec-p8-head"><div>${renderCostTotals(totals)}</div>${renderCostBlock(costBlock)}</div>` +
+      `<div class="sec-p8-head"><div>${renderCostTotals(totals)}</div>${renderCostBlock(costBlock, totals)}</div>` +
       renderDiagnostic(diagnostic) +
       `</section>`;
   }
