@@ -1,0 +1,107 @@
+.sec-p10-vapor-source .sec-p10-envelope {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.sec-p10-vapor-source .sec-p10-envelope-card {
+  min-width: 0;
+  padding: 13px 14px;
+  border: 1px solid var(--rule);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.sec-p10-vapor-source .sec-p10-envelope-label {
+  color: var(--ink-3);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.sec-p10-vapor-source .sec-p10-envelope-value {
+  margin-top: 8px;
+  overflow-wrap: anywhere;
+  color: var(--ink);
+  font: 700 12px/1.45 "SFMono-Regular", Consolas, monospace;
+}
+
+.sec-p10-vapor-source .sec-p10-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.sec-p10-vapor-source .sec-p10-table-wrap {
+  min-width: 0;
+}
+
+.sec-p10-vapor-source .sec-p10-summary-table caption,
+.sec-p10-vapor-source .sec-p10-species-table caption {
+  padding: 10px 11px;
+  border-bottom: 1px solid var(--rule);
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 800;
+  text-align: left;
+}
+
+.sec-p10-vapor-source .sec-p10-token,
+.sec-p10-vapor-source .sec-p10-scalar {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  font-family: "SFMono-Regular", Consolas, monospace;
+}
+
+.sec-p10-vapor-source .sec-p10-species-block {
+  margin-top: 18px;
+}
+
+.sec-p10-vapor-source .sec-p10-species-block h3 {
+  margin: 0 0 8px;
+  font-size: 13px;
+}
+
+.sec-p10-vapor-source .sec-p10-species-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 7px;
+  border-radius: 50%;
+  background: var(--sec-p10-species-color);
+  vertical-align: 1px;
+}
+
+.sec-p10-vapor-source .sec-p10-empty {
+  min-height: 100%;
+  margin: 0;
+  padding: 14px;
+  border: 1px dashed var(--rule);
+  background: var(--panel);
+  color: var(--ink-3);
+  font-size: 12px;
+}
+
+.sec-p10-vapor-source .sec-p10-pending {
+  box-shadow: none;
+}
+
+.sec-p10-vapor-source .sec-p10-structured-pending {
+  margin-top: 10px;
+}
+
+.sec-p10-vapor-source .sec-p10-pending-value,
+.sec-p10-vapor-source .sec-p10-empty-value,
+.sec-p10-vapor-source .sec-p10-malformed {
+  color: var(--ink-3);
+  font-style: italic;
+  font-weight: 500;
+}
+
+@media (max-width: 700px) {
+  .sec-p10-vapor-source .sec-p10-summary-grid {
+    grid-template-columns: 1fr;
+  }
+}
