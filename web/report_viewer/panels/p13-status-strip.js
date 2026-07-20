@@ -63,53 +63,94 @@
   }
 
   function redoxTile(summary) {
-    const redox = summary && summary.fe_redox_split;
-    if (!isObject(redox)) {
+    if (!summary || !hasOwn(summary, "fe_redox_split")
+      || summary.fe_redox_split === null || summary.fe_redox_split === undefined) {
       return `<article class="sec-p13-tile sec-p13-redox" aria-labelledby="sec-p13-redox-title">
         <div class="sec-p13-tile-title" id="sec-p13-redox-title">Melt redox</div>
         <div class="sec-p13-headline">redox not emitted</div>
         <div class="sec-p13-chip-row"><span class="sec-p13-chip sec-p13-chip--pending">authority not emitted</span></div>
       </article>`;
     }
+    const redox = summary.fe_redox_split;
+    if (!isObject(redox)) {
+      return `<article class="sec-p13-tile sec-p13-redox" aria-labelledby="sec-p13-redox-title">
+        <div class="sec-p13-tile-title" id="sec-p13-redox-title">Melt redox</div>
+        <div class="sec-p13-headline">redox malformed (${esc(malformedType(redox))})</div>
+        <div class="sec-p13-chip-row"><span class="sec-p13-chip sec-p13-chip--pending">authority not emitted</span></div>
+      </article>`;
+    }
 
     const noIron = redox.status === "no_iron";
+    // Presence of the key (including malformed/empty) is not "not emitted".
     const ratio = noIron
       ? "Fe split: no iron (emitted status: no_iron)"
-      : hasNumber(redox.fe3_over_sigma_fe)
+      : hasOwn(redox, "fe3_over_sigma_fe")
       ? `Fe³⁺/ΣFe ${numberText(redox.fe3_over_sigma_fe)}`
-      : hasNumber(redox.ferric_frac) || hasNumber(redox.ferrous_frac)
+      : hasOwn(redox, "ferric_frac") || hasOwn(redox, "ferrous_frac")
         ? `Ferric ${numberText(redox.ferric_frac)} · ferrous ${numberText(redox.ferrous_frac)}`
         : "Fe split not emitted";
     const nativeEvent = isObject(redox.native_fe_saturation_event)
       ? redox.native_fe_saturation_event
       : null;
+    const nativeEventMalformed = hasOwn(redox, "native_fe_saturation_event")
+      && redox.native_fe_saturation_event !== null
+      && redox.native_fe_saturation_event !== undefined
+      && !nativeEvent;
+    const nativeProvenanceBits = [
+      hasOwn(redox, "native_fe_threshold")
+        ? `threshold: ${scalarValue(redox.native_fe_threshold)}`
+        : "",
+      hasOwn(redox, "native_fe_activity_source")
+        ? `activity source: ${scalarValue(redox.native_fe_activity_source)}`
+        : ""
+    ].filter(Boolean);
+    const nativeProvenanceSuffix = nativeProvenanceBits.length
+      ? ` · ${nativeProvenanceBits.join(" · ")}`
+      : "";
     const nativeState = noIron
-      ? "Native Fe: no iron (emitted status: no_iron)"
-      : hasNumber(redox.native_fe_frac) || nativeEvent
-      ? `Native Fe ${numberText(redox.native_fe_frac)} · event status${nativeEvent
-        ? `: ${scalarValue(nativeEvent.native_fe_event_status)}`
-        : " not emitted"}${nativeEvent && hasOwn(nativeEvent, "native_fe_event_reason")
+      ? `Native Fe: no iron (emitted status: no_iron)${nativeProvenanceSuffix}`
+      : hasOwn(redox, "native_fe_frac") || nativeEvent || nativeEventMalformed
+      ? `Native Fe ${numberText(redox.native_fe_frac)} · event status${
+          nativeEvent
+            ? `: ${scalarValue(nativeEvent.native_fe_event_status)}`
+            : nativeEventMalformed
+              ? ` malformed (${esc(malformedType(redox.native_fe_saturation_event))})`
+              : " not emitted"
+        }${nativeEvent && hasOwn(nativeEvent, "native_fe_event_reason")
         ? ` · event reason: ${scalarValue(nativeEvent.native_fe_event_reason)}`
-        : ""}`
+        : ""}${nativeProvenanceSuffix}`
       : "Native Fe state not emitted";
+    // source/reference are the Kress Fe³⁺/Fe²⁺ split provenance, not native-Fe.
+    // native_fe_activity_source / native_fe_threshold are Holzheid saturation (emitter).
     const metadata = [
       ["Redox diagnostic status", "status"],
-      ["Source", "source"],
-      ["Reference", "reference"],
+      ["Fe split source", "source"],
+      ["Fe split reference", "reference"],
       ["Skip reason", "skip_reason"],
       ["Refusal context", "refusal_context"]
     ].filter(([, key]) => hasOwn(redox, key))
       .map(([label, key]) => detailRow(label, scalarValue(redox[key])))
       .join("");
-    const nativeMetadata = nativeEvent
-      ? [
-          ["Native Fe event", "native_fe_event"],
-          ["Native Fe event status", "native_fe_event_status"],
-          ["Native Fe event reason", "native_fe_event_reason"]
-        ].filter(([, key]) => hasOwn(nativeEvent, key))
-          .map(([label, key]) => detailRow(label, scalarValue(nativeEvent[key])))
-          .join("")
-      : "";
+    const nativeMetadata = [
+      ...(nativeEvent
+        ? [
+            ["Native Fe event", "native_fe_event"],
+            ["Native Fe event status", "native_fe_event_status"],
+            ["Native Fe event reason", "native_fe_event_reason"]
+          ].filter(([, key]) => hasOwn(nativeEvent, key))
+            .map(([label, key]) => detailRow(label, scalarValue(nativeEvent[key])))
+        : nativeEventMalformed
+          ? [detailRow(
+              "Native Fe event",
+              `malformed (${esc(malformedType(redox.native_fe_saturation_event))})`
+            )]
+          : []),
+      ...[
+        ["Native Fe threshold", "native_fe_threshold"],
+        ["Native Fe activity source", "native_fe_activity_source"]
+      ].filter(([, key]) => hasOwn(redox, key))
+        .map(([label, key]) => detailRow(label, scalarValue(redox[key])))
+    ].join("");
 
     return `<article class="sec-p13-tile sec-p13-redox" aria-labelledby="sec-p13-redox-title">
       <div class="sec-p13-tile-title" id="sec-p13-redox-title">Melt redox</div>
@@ -145,21 +186,36 @@
     return { state: valueState(nested), value: nested };
   }
 
-  function flowTile(summary) {
-    const regime = typeof summary?.regime === "string" ? summary.regime : "";
+  function regimeHeadline(summary) {
+    if (!summary || !hasOwn(summary, "regime")
+      || summary.regime === null || summary.regime === undefined) {
+      return "regime not emitted";
+    }
+    const regime = summary.regime;
+    if (typeof regime !== "string") {
+      return `regime malformed (${esc(malformedType(regime))})`;
+    }
     const regimeLabels = {
       free_molecular: "ballistic",
       transitional: "transitional",
       viscous: "viscous / swept"
     };
-    const regimeLabel = regimeLabels[regime]
+    // Empty string is the emitter's "no regime token" state for early hours.
+    return regimeLabels[regime]
       || (regime ? `regime token: ${esc(regime)}` : "regime not emitted");
+  }
+
+  function flowTile(summary) {
+    const regimeLabel = regimeHeadline(summary);
     const kn = emittedKn(summary);
     const knText = numberText(kn.value);
     const gauge = kn.state !== "number"
       ? `<div class="sec-p13-gauge sec-p13-gauge--pending" aria-label="Knudsen number ${esc(knText)}"></div>`
       : `<meter class="sec-p13-gauge" min="0" max="10" low="0.01" high="10" optimum="0" value="${esc(String(kn.value))}" aria-label="Emitted Knudsen number ${esc(String(kn.value))}; low is the viscous end and high is the ballistic end"></meter>`;
-    const formula = scalarValue(summary?.transport_formula_id);
+    // Only transport_formula_id is displayed; never invent a backend formula id.
+    const formula = hasOwn(summary || {}, "transport_formula_id")
+      ? scalarValue(summary.transport_formula_id)
+      : "not emitted";
 
     return `<article class="sec-p13-tile sec-p13-flow" aria-labelledby="sec-p13-flow-title">
       <div class="sec-p13-tile-title" id="sec-p13-flow-title">Flow regime</div>
@@ -249,17 +305,26 @@
 
   function mreTile(summary) {
     const campaign = scalarValue(summary?.campaign, "campaign not emitted");
-    const diagnostic = summary && summary.mre_ellingham_ladder_diagnostic;
+    const hasDiagnosticKey = summary && hasOwn(summary, "mre_ellingham_ladder_diagnostic")
+      && summary.mre_ellingham_ladder_diagnostic !== null
+      && summary.mre_ellingham_ladder_diagnostic !== undefined;
+    const diagnostic = hasDiagnosticKey ? summary.mre_ellingham_ladder_diagnostic : null;
     const hasDiagnostic = isObject(diagnostic);
+    const diagnosticMalformed = hasDiagnosticKey && !hasDiagnostic;
     const status = hasDiagnostic && typeof diagnostic.status === "string" ? diagnostic.status : "";
     const failed = status.startsWith("diagnostic_failed:");
-    const ladderHeadline = !hasDiagnostic
-      ? "ladder diagnostic: not emitted"
-      : failed
-        ? `ladder diagnostic: ${esc(status)}`
-        : `Ladder ${numberText(diagnostic.declared_rung_V, "V")}`;
+    const ladderHeadline = diagnosticMalformed
+      ? `ladder diagnostic: malformed (${esc(malformedType(diagnostic))})`
+      : !hasDiagnostic
+        ? "ladder diagnostic: not emitted"
+        : failed
+          ? `ladder diagnostic: ${esc(status)}`
+          : `Ladder ${numberText(diagnostic.declared_rung_V, "V")}`;
+    // Never invent diagnostic_uncertified when certification key is absent.
     const certification = hasDiagnostic
-      ? scalarValue(diagnostic.certification, "certification not emitted")
+      ? (hasOwn(diagnostic, "certification")
+        ? scalarValue(diagnostic.certification, "certification not emitted")
+        : "certification not emitted")
       : "certification not emitted";
     const details = hasDiagnostic
       ? `<details class="sec-p13-details">

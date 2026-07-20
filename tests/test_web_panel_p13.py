@@ -223,7 +223,8 @@ def test_p13_registers_renders_emitted_facts_and_pins_on_update() -> None:
     assert "Native Fe 0 · event status: deferred" in redox
     assert "event reason: deferred_not_liquid_for_redox" in redox
     assert "backend redox ledger" in redox
-    assert "Reference</dt><dd>IW buffer</dd>" in redox
+    assert "Fe split source</dt><dd>backend redox ledger</dd>" in redox
+    assert "Fe split reference</dt><dd>IW buffer</dd>" in redox
     assert "Redox diagnostic status" in redox
     assert ">authoritative: false</span>" in redox
     assert ">diagnostic_only: true</span>" in redox
@@ -408,6 +409,193 @@ def test_p13_partial_redox_object_discloses_missing_authority() -> None:
     ) in redox
     assert "authoritative: true" not in redox
     assert "authoritative: false" not in redox
+
+
+def test_p13_native_fe_provenance_is_not_attributed_to_kress_split() -> None:
+    """Kress source/reference must not be the only provenance next to Native Fe.
+
+    Mutation: drop native_fe_activity_source / native_fe_threshold rows while
+    still showing Source/Reference (Kress) — fixture uses deliberately distinct
+    strings so both provenances must remain attached to the correct facts.
+    """
+    summary = _present_summary()
+    summary["fe_redox_split"] = {
+        "fO2_log": -9.0,
+        "iw_log": -10.0,
+        "fe3_over_sigma_fe": 0.5,
+        "native_fe_frac": 0.25,
+        "source": "simulator.fe_redox:kress91_split",
+        "reference": "Kress and Carmichael 1991 only-kress-ref",
+        "native_fe_threshold": "FeO_activity_saturation",
+        "native_fe_activity_source": (
+            "Holzheid1997 DOI 10.1016/S0009-2541(97)00030-2 "
+            "FeO(l)=Fe+0.5O2 saturation"
+        ),
+        "diagnostic_only": True,
+        "native_fe_saturation_event": {
+            "native_fe_event": "partitioned",
+            "native_fe_event_status": "partitioned",
+            "native_fe_event_reason": "above_threshold",
+        },
+    }
+    html = _run_panel({"timesteps": [{"summary": summary}]})["rendered"]
+    redox = _tile(html, "redox", "flow")
+    facts = re.findall(
+        r'<div class="sec-p13-fact">(.*?)</div>', redox, flags=re.DOTALL
+    )
+    native_fact = next(f for f in facts if f.startswith("Native Fe"))
+
+    assert "Native Fe 0.25" in native_fact
+    assert "activity source: Holzheid1997" in native_fact
+    assert "threshold: FeO_activity_saturation" in native_fact
+    assert "kress91_split" not in native_fact
+    assert "Kress and Carmichael" not in native_fact
+    assert (
+        "Native Fe activity source</dt><dd>Holzheid1997 DOI "
+        "10.1016/S0009-2541(97)00030-2 FeO(l)=Fe+0.5O2 saturation</dd>"
+    ) in redox
+    assert "Native Fe threshold</dt><dd>FeO_activity_saturation</dd>" in redox
+    assert (
+        "Fe split source</dt><dd>simulator.fe_redox:kress91_split</dd>" in redox
+    )
+    assert (
+        "Fe split reference</dt><dd>Kress and Carmichael 1991 only-kress-ref</dd>"
+        in redox
+    )
+    # Old generic labels would misattribute Kress to native Fe.
+    assert "Source</dt><dd>" not in redox
+    assert "Reference</dt><dd>" not in redox
+
+
+@pytest.mark.parametrize(
+    ("present_key", "present_value", "forbidden_chip"),
+    [
+        ("diagnostic_only", True, "authoritative:"),
+        ("extrapolation", True, "authoritative:"),
+        ("authoritative", False, "diagnostic_only:"),
+    ],
+)
+def test_p13_mixed_partial_redox_authority_does_not_fabricate_sibling_flags(
+    present_key: str, present_value: Any, forbidden_chip: str
+) -> None:
+    """Only emitted authority keys become chips; siblings stay absent.
+
+    Mutation: if (!hasOwn(redox,'authoritative') && redox.diagnostic_only===true)
+    redox.authoritative=false — mixed-partial map must reject the invented chip.
+    """
+    summary = _present_summary()
+    summary["fe_redox_split"] = {
+        "fO2_log": -10.0,
+        "iw_log": -80.0,
+        "status": "ok",
+        present_key: present_value,
+    }
+    html = _run_panel({"timesteps": [{"summary": summary}]})["rendered"]
+    redox = _tile(html, "redox", "flow")
+    chip_row = re.search(
+        r'<div class="sec-p13-chip-row"[^>]*'
+        r'aria-label="Emitted redox authority and uncertainty flags"[^>]*>'
+        r"(.*?)</div>",
+        redox,
+        flags=re.DOTALL,
+    )
+    assert chip_row, "missing redox authority chip row"
+    chips = chip_row.group(1)
+
+    assert f"{present_key}: {str(present_value).lower()}" in chips
+    assert forbidden_chip not in chips
+    assert "authority not emitted" not in chips
+
+
+def test_p13_malformed_child_fields_are_not_called_absent() -> None:
+    """Present-but-malformed children must not claim 'not emitted'.
+
+    Mutation: treat non-object fe_redox_split / non-string regime / non-object
+    ladder diagnostic as absent — suite must fail with exact malformed labels.
+    """
+    summary = {
+        "campaign": "C5",
+        "fe_redox_split": "bad-redox",
+        "regime": 7,
+        "Kn": 0.5,
+        "mre_ellingham_ladder_diagnostic": ["bad-diagnostic"],
+    }
+    html = _run_panel({"timesteps": [{"summary": summary}]})["rendered"]
+    redox = _tile(html, "redox", "flow")
+    flow = _tile(html, "flow", "mre")
+    mre = _tile(html, "mre")
+
+    assert _class_inner(redox, "sec-p13-headline") == "redox malformed (string)"
+    assert "redox not emitted" not in redox
+    assert _class_inner(flow, "sec-p13-headline") == "regime malformed (number)"
+    assert "regime not emitted" not in _class_inner(flow, "sec-p13-headline")
+    assert (
+        _class_inner(mre, "sec-p13-headline")
+        == "ladder diagnostic: malformed (array)"
+    )
+    assert "ladder diagnostic: not emitted" not in mre
+
+
+def test_p13_malformed_redox_fraction_fields_match_headline_and_detail() -> None:
+    """Object fraction values must not read as 'not emitted' in the headline."""
+    summary = _present_summary()
+    summary["fe_redox_split"] = {
+        "fO2_log": -9.0,
+        "iw_log": -10.0,
+        "fe3_over_sigma_fe": {"bad": True},
+        "native_fe_frac": {"bad": True},
+        "status": "ok",
+    }
+    html = _run_panel({"timesteps": [{"summary": summary}]})["rendered"]
+    redox = _tile(html, "redox", "flow")
+    facts = re.findall(
+        r'<div class="sec-p13-fact">(.*?)</div>', redox, flags=re.DOTALL
+    )
+
+    assert facts[0] == "Fe³⁺/ΣFe malformed (object)"
+    assert "Fe split not emitted" not in facts[0]
+    assert "Native Fe malformed (object)" in facts[1]
+    assert "Native Fe state not emitted" not in facts[1]
+    assert "Fe³⁺/ΣFe</dt><dd>malformed (object)</dd>" in redox
+    assert "Native Fe fraction</dt><dd>malformed (object)</dd>" in redox
+
+
+def test_p13_present_summary_without_transport_formula_stays_pending() -> None:
+    """Partial path: ingredients present, transport_formula_id absent.
+
+    Mutation: scalarValue(summary?.transport_formula_id ?? 'bernoulli_swept_v2')
+    — must fail; row stays 'not emitted' and no formula token appears.
+    """
+    summary = _present_summary()
+    summary.pop("transport_formula_id")
+    html = _run_panel({"timesteps": [{"summary": summary}]})["rendered"]
+    flow = _tile(html, "flow", "mre")
+
+    assert "Transport formula</dt><dd>not emitted</dd>" in flow
+    assert "bernoulli_swept_v2" not in flow
+    assert "not_applicable" not in flow
+    assert _class_inner(flow, "sec-p13-headline") == "viscous / swept"
+    assert "Kn 0.00382" in flow
+
+
+def test_p13_diagnostic_without_certification_does_not_fabricate_flag() -> None:
+    """Partial diagnostic: declared_rung + authority present, certification absent.
+
+    Mutation: default missing certification to diagnostic_uncertified —
+    chip must say certification not emitted and never invent the token.
+    """
+    summary = _present_summary()
+    summary["mre_ellingham_ladder_diagnostic"] = {
+        "declared_rung_V": 4.75,
+        "authority": "authoritative_ellingham_graph_with_static_fallback",
+    }
+    html = _run_panel({"timesteps": [{"summary": summary}]})["rendered"]
+    mre = _tile(html, "mre")
+
+    assert "Ladder 4.75 V" in mre
+    assert "certification not emitted" in mre
+    assert "diagnostic_uncertified" not in mre
+    assert "Authority</dt><dd>authoritative_ellingham_graph_with_static_fallback</dd>" in mre
 
 
 def test_p13_missing_iw_log_stays_pending_in_headline_and_detail() -> None:
@@ -664,6 +852,11 @@ def test_p13_meter_value_tracks_emitted_kn(kn: float) -> None:
     meter = _meter_attributes(flow)
 
     assert float(meter["value"]) == kn
+    # Emitter thresholds: VISCOUS_KNUDSEN_MAX=0.01, FREE_MOLECULAR_KNUDSEN_MIN=10.
+    assert meter["min"] == "0"
+    assert meter["max"] == "10"
+    assert meter["low"] == "0.01"
+    assert meter["high"] == "10"
 
 
 def test_p13_transitional_meter_does_not_saturate_at_ballistic_endpoint() -> None:
@@ -677,7 +870,11 @@ def test_p13_transitional_meter_does_not_saturate_at_ballistic_endpoint() -> Non
     assert _class_inner(flow, "sec-p13-headline") == "transitional"
     assert float(meter["value"]) == 7.188791553197268
     assert float(meter["value"]) < float(meter["max"])
-    assert float(meter["high"]) == 10.0
+    # Pin the ballistic endpoint exactly (max="100" would leave value < max and
+    # still paint free-molecular Kn mid-scale).
+    assert meter["max"] == "10"
+    assert meter["high"] == "10"
+    assert meter["low"] == "0.01"
 
 
 @pytest.mark.parametrize(
@@ -754,8 +951,8 @@ def test_p13_all_artifact_text_routes_escape_exactly_once() -> None:
 
     for label, value in (
         ("Redox diagnostic status", "redox-status"),
-        ("Source", "redox-source"),
-        ("Reference", "redox-reference"),
+        ("Fe split source", "redox-source"),
+        ("Fe split reference", "redox-reference"),
         ("Skip reason", "redox-skip-reason"),
         ("Refusal context", "redox-refusal-context"),
     ):
@@ -808,15 +1005,70 @@ def test_p13_all_artifact_text_routes_escape_exactly_once() -> None:
 
 
 def test_p13_render_uses_shared_report_labels_escaper() -> None:
+    """Every untrusted text route must go through shared ReportLabels.esc.
+
+    Mutation: local HTML-replace on unknown regime (or any one route) while
+    campaign still uses shared esc — must fail if that route lacks the prefix.
+    """
     summary = _present_summary()
     summary["campaign"] = "<campaign>"
+    summary["regime"] = "<unknown-regime-route>"
+    summary["transport_formula_id"] = "<transport-formula>"
+    redox = summary["fe_redox_split"]
+    redox["source"] = "<kress-source>"
+    redox["reference"] = "<kress-reference>"
+    redox["native_fe_activity_source"] = "<holzheid-source>"
+    redox["native_fe_threshold"] = "<native-threshold>"
+    redox["native_fe_saturation_event"] = {
+        "native_fe_event": "<native-event>",
+        "native_fe_event_status": "<native-status>",
+        "native_fe_event_reason": "<native-reason>",
+    }
+    diagnostic = summary["mre_ellingham_ladder_diagnostic"]
+    diagnostic["certification"] = "<certification>"
+    diagnostic["authority"] = "<diag-authority>"
+    diagnostic["status"] = "<diag-status>"
+    diagnostic["source"] = "<diag-source>"
+    diagnostic["derived_Ed_V"] = {"<species>": 1.2}
+    diagnostic["species"] = {
+        "<species>": {
+            "voltage_authority": "<v-auth>",
+            "voltage_authoritative": False,
+            "status": "<v-status>",
+        }
+    }
     html = _run_panel(
         {"timesteps": [{"summary": summary}]},
         shared_esc_prefix="shared-esc:",
     )["rendered"]
+    redox_html = _tile(html, "redox", "flow")
+    flow = _tile(html, "flow", "mre")
     mre = _tile(html, "mre")
 
     assert "Campaign: shared-esc:&lt;campaign&gt;" in mre
+    assert "regime token: shared-esc:&lt;unknown-regime-route&gt;" in flow
+    assert (
+        "Transport formula</dt><dd>shared-esc:&lt;transport-formula&gt;</dd>" in flow
+    )
+    assert "Fe split source</dt><dd>shared-esc:&lt;kress-source&gt;</dd>" in redox_html
+    assert (
+        "Fe split reference</dt><dd>shared-esc:&lt;kress-reference&gt;</dd>"
+        in redox_html
+    )
+    assert (
+        "Native Fe activity source</dt><dd>shared-esc:&lt;holzheid-source&gt;</dd>"
+        in redox_html
+    )
+    assert (
+        "Native Fe threshold</dt><dd>shared-esc:&lt;native-threshold&gt;</dd>"
+        in redox_html
+    )
+    assert "shared-esc:&lt;native-status&gt;" in redox_html
+    assert "shared-esc:&lt;native-event&gt;" in redox_html
+    assert "shared-esc:&lt;certification&gt;" in mre
+    assert "Authority</dt><dd>shared-esc:&lt;diag-authority&gt;</dd>" in mre
+    assert "shared-esc:&lt;species&gt;" in mre
+    assert "voltage authority: shared-esc:&lt;v-auth&gt;" in mre
 
 
 @pytest.mark.parametrize(
