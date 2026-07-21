@@ -284,6 +284,9 @@ def test_p13_on_timestep_replaces_present_values_with_honest_pending() -> None:
     assert "ladder diagnostic: not emitted" in second
     assert "MRE activity: not emitted" in second
     assert "4.75 V" not in second
+    # P2: real P0-gated sentinel must render verbatim, never as a landed formula name.
+    assert "Transport formula</dt><dd>not_applicable_until_p0</dd>" in second
+    assert "bernoulli_swept_v2" not in second
     assert result["inserted"] == 1
 
 
@@ -843,8 +846,16 @@ def test_p13_object_kn_does_not_infer_missing_regime() -> None:
     assert "ballistic" not in headline
 
 
-@pytest.mark.parametrize("kn", [0.0, 0.0038201, 12.0])
-def test_p13_meter_value_tracks_emitted_kn(kn: float) -> None:
+@pytest.mark.parametrize(
+    ("kn", "visible_kn"),
+    [
+        (0.0, "0"),
+        (0.0038201, "0.00382"),
+        (12.0, "12"),  # above ballistic threshold — visible fact must not clamp
+        (8459.99, "8,460"),  # sample-scale free-molecular Kn
+    ],
+)
+def test_p13_meter_value_tracks_emitted_kn(kn: float, visible_kn: str) -> None:
     summary = _present_summary()
     summary["Kn"] = kn
     html = _run_panel({"timesteps": [{"summary": summary}]})["rendered"]
@@ -852,6 +863,11 @@ def test_p13_meter_value_tracks_emitted_kn(kn: float) -> None:
     meter = _meter_attributes(flow)
 
     assert float(meter["value"]) == kn
+    # P2: visible Kn fact must track the emitted value, not only the <meter>.
+    # Clamping display text to 10 while leaving meter.value raw must fail here.
+    assert f'<div class="sec-p13-fact">Kn {visible_kn}</div>' in flow
+    if kn > 10:
+        assert '<div class="sec-p13-fact">Kn 10</div>' not in flow
     # Emitter thresholds: VISCOUS_KNUDSEN_MAX=0.01, FREE_MOLECULAR_KNUDSEN_MIN=10.
     assert meter["min"] == "0"
     assert meter["max"] == "10"
@@ -914,6 +930,12 @@ def test_p13_all_artifact_text_routes_escape_exactly_once() -> None:
         "skip_reason": "<redox-skip-reason>",
         "refusal_context": "<redox-refusal-context>",
         "authority": "<redox-authority>",
+        # P2: authority/uncertainty flag fields are distinct esc sinks (not only
+        # the free-text authority string).
+        "authoritative": "<auth-flag-authoritative>",
+        "diagnostic_only": "<auth-flag-diagnostic>",
+        "extrapolation": "<auth-flag-extrapolation>",
+        "high_uncertainty": "<auth-flag-high-uncertainty>",
     }
     redox.update(redox_values)
     native_event_values = {
@@ -968,6 +990,14 @@ def test_p13_all_artifact_text_routes_escape_exactly_once() -> None:
         "event reason: &lt;native-event-reason-route&gt;"
     ) in redox_html
     assert "authority: &lt;redox-authority&gt;" in redox_html
+    for flag_token in (
+        "authoritative: &lt;auth-flag-authoritative&gt;",
+        "diagnostic_only: &lt;auth-flag-diagnostic&gt;",
+        "extrapolation: &lt;auth-flag-extrapolation&gt;",
+        "high_uncertainty: &lt;auth-flag-high-uncertainty&gt;",
+    ):
+        assert flag_token in redox_html
+        assert flag_token.replace("&lt;", "<").replace("&gt;", ">") not in redox_html
     assert _class_inner(flow_html, "sec-p13-headline") == (
         "regime token: &lt;flow-regime&gt;"
     )

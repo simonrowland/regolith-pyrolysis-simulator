@@ -325,6 +325,23 @@ def test_p6_surfaces_nested_authority_uncertainty_and_escapes_values() -> None:
     assert _value_for_label(feo_card, "Voltage Authority") == "ellingham_graph"
     assert _value_for_label(feo_card, "Voltage Authoritative") == "true"
     assert _value_for_label(feo_card, "Status") == "ok"
+    # P2: per-oxide non-authoritative Authority chip is bound to the MnO row,
+    # not merely the duplicate ellingham_graph token on FeO Voltage Authority.
+    non_auth_region = _between(
+        ladder_region,
+        "<h4>Emitted non-authoritative voltage entries</h4>",
+        "<h4>Per-species diagnostic rows</h4>",
+    )
+    mno_row = re.search(
+        r'<div class="sec-p6-authority-row">.*?MnO.*?</div></div>',
+        non_auth_region,
+        re.DOTALL,
+    )
+    assert mno_row, "MnO non-authoritative row missing"
+    mno_html = mno_row.group(0)
+    assert '<b>Authority</b>ellingham_graph</span>' in mno_html
+    assert '<b>Authoritative</b>false</span>' in mno_html
+    assert "Static declared voltage</span><b>1.42 V</b>" in mno_html
     assert (
         '<b>Authoritative</b>false</span><span class="sec-p6-chip sec-p6-warn">'
         '<b>Status</b>&lt;script&gt;authority breach&lt;/script&gt;'

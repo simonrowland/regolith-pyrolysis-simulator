@@ -255,6 +255,23 @@ def test_p2_renders_two_product_inventories_contaminants_accounts_and_geometry()
     assert 'Ni contaminant</b> <span title="1 wt%">1 wt%</span>' in bottom
     assert "Equivalent film thickness" in html and "5.00e-4 m" in html
     assert "Coverage fraction at reference thickness" in html and ">0.5<" in html
+    # BATCH-TEST F1 / Lens 3: present-path interface geometry units (mass/area/coverage-ref).
+    # Partial-interface tests only guard absence; these pin value+unit when present.
+    assert (
+        'Float-layer mass</span><b><span title="0.25 kg">0.25 kg</span></b>'
+        in html
+    )
+    assert (
+        'Interface area</span><b><span title="0.2 m²">0.2 m²</span></b>'
+        in html
+    )
+    assert (
+        'Coverage reference thickness</span><b><span title="0.001 m">0.001 m</span></b>'
+        in html
+    )
+    assert "0.25 mol" not in _interface_row(html, "Float-layer mass")
+    assert "0.2 cm²" not in _interface_row(html, "Interface area")
+    assert "0.001 mm" not in _interface_row(html, "Coverage reference thickness")
     assert "Frozen kg product-pool views pending producer attach" in html
     assert "literal terminal tap accounts" not in html
     # F10 (codex): present density rows keep kg/m³ units.
@@ -1134,12 +1151,15 @@ def test_p2_escapes_untrusted_artifact_values() -> None:
         '<img src=x onerror="boom">': 12.5,
     }
     # F8: provenance species key is a distinct interpolation site.
+    # BATCH-TEST F2: provenance *status* free-text is a distinct esc sink from
+    # top-level stratification status and provenance source.
+    hostile_prov_status = '<img src=x onerror="provstatus()">'
     stratification["pools"]["bottom_pool"]["density_correlation_provenance"] = {
         hostile_species: {
             "source": '<script>alert("x")</script>',
             "valid_range_K": [1.0, 2.0],
             "temperature_K": 3.0,
-            "status": "within_valid_range",
+            "status": hostile_prov_status,
         }
     }
 
@@ -1171,6 +1191,13 @@ def test_p2_escapes_untrusted_artifact_values() -> None:
     assert '&lt;img src=x onerror=&quot;boom()&quot;&gt;' in bottom_provenance
     assert bottom_provenance.count("&lt;img src=x onerror=&quot;boom()&quot;&gt;") == 1
     assert '&amp;lt;img' not in bottom_provenance
+    # Provenance status free-text: single-encoded, never raw, never double-encoded.
+    assert hostile_prov_status not in bottom_provenance
+    assert '&lt;img src=x onerror=&quot;provstatus()&quot;&gt;' in bottom_provenance
+    assert bottom_provenance.count(
+        '&lt;img src=x onerror=&quot;provstatus()&quot;&gt;'
+    ) == 1
+    assert '&amp;lt;img src=x onerror=&amp;quot;provstatus()' not in bottom_provenance
 
 
 def test_p2_uses_shared_report_labels_esc() -> None:

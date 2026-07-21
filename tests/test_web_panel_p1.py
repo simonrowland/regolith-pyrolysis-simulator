@@ -207,7 +207,12 @@ def test_p1_renders_terminal_redox_partition_breakdown_and_stage3() -> None:
             "native_fe_uncondensed_mol": 0.1,
             "native_fe_uncondensed_fraction_of_pool": 0.008,
             "native_fe_condensed_kg": 0.01,
-            "native_fe_source_account": "process.cleaned_melt",
+            # Hostile account + refusal envelope: esc branch and mol-unit on
+            # suppressed-route must be falsifiable (codex P2 findings).
+            "native_fe_source_account": "<img src=x onerror=alert(1)>",
+            "native_fe_split_commit_status": "refused",
+            "native_fe_vapor_route_status": "suppressed_no_committed_split",
+            "native_fe_vapor_route_suppressed_mol": 2.5,
             "carrier_gas": "N2",
             "alpha_Fe": 0.02,
             "alpha_source": "REF-016 <script>bad()</script>",
@@ -321,6 +326,12 @@ def test_p1_renders_terminal_redox_partition_breakdown_and_stage3() -> None:
     )
     assert "Melt-headspace pressure" not in core_detail
     _assert_fact_value(core_detail, "FeO equivalent", "7.8 wt%")
+    # Present-path unit guards (gk P2): temperature K and Fe₂O₃ wt% survive unit swaps.
+    _assert_fact_value(core_detail, "Temperature", "1,800 K")
+    _assert_fact_value(core_detail, "Fe₂O₃ equivalent", "3.2 wt%")
+    _assert_fact_not_value(core_detail, "Temperature", "1,800 C")
+    _assert_fact_not_value(core_detail, "Temperature", "1,800 °C")
+    _assert_fact_not_value(core_detail, "Fe₂O₃ equivalent", "3.2 mol%")
     _assert_metric_value(terminal, "Native Fe pool", "12.5 mol")
     _assert_metric_value(terminal, "Vapor route", "0.5 mol")
     _assert_metric_value(terminal, "Tap route", "12 mol")
@@ -335,6 +346,20 @@ def test_p1_renders_terminal_redox_partition_breakdown_and_stage3() -> None:
     _assert_fact_value(partition, "Uncondensed native Fe", "0.1 mol")
     _assert_fact_value(partition, "Native Fe pool fraction routed as vapor", "0.04")
     _assert_fact_value(partition, "Fe HKL alpha", "0.02")
+    # Account-label esc: single-encoded hostile source account (accountLabel title-cases).
+    _assert_fact_value(
+        partition,
+        "Native Fe source account",
+        "&lt;Img Src=X Onerror=Alert(1)&gt;",
+    )
+    assert "<img src=x onerror=alert(1)>" not in partition
+    assert "<Img Src=X Onerror=Alert(1)>" not in partition
+    assert "&amp;lt;Img" not in partition
+    # Partition refusal/status + suppressed-route mol unit.
+    _assert_fact_value(partition, "Split commit status", "refused")
+    _assert_fact_value(partition, "Vapor route status", "suppressed_no_committed_split")
+    _assert_fact_value(partition, "Suppressed vapor route", "2.5 mol")
+    _assert_fact_not_value(partition, "Suppressed vapor route", "2.5 kg")
     assert "Recovered product" not in partition
     assert "Collected product" not in partition
     _assert_fact_value(alpha_evaluation, "Species", "Fe")
@@ -547,6 +572,29 @@ def test_p1_surfaces_explicit_and_missing_authority_flags() -> None:
         r'<span class="chip sec-p1-flag [^"]*"[^>]*>Status · no_iron</span>',
         no_iron_flags,
     )
+
+    # Malformed present authority booleans must not truthiness-coerce (codex P2).
+    malformed = _core_redox(
+        authoritative="false",
+        diagnostic_only="true",
+        extrapolation=1,
+        high_uncertainty=["yes"],
+    )
+    malformed_flags = _flags_region(
+        _terminal_region(_render_panel(_artifact({"fe_redox_split": malformed})))
+    )
+    for label in (
+        "Authoritative",
+        "Diagnostic only",
+        "Extrapolation",
+        "High uncertainty",
+    ):
+        _assert_chip_value(malformed_flags, label, "not emitted", "sec-p1-flag-caution")
+    # Bound chip values only (avoid substring match on "not emitted").
+    assert re.search(r">Authoritative · yes<", malformed_flags) is None
+    assert re.search(r">Authoritative · no<", malformed_flags) is None
+    assert re.search(r">Diagnostic only · yes<", malformed_flags) is None
+    assert re.search(r">Authoritative · not emitted<", malformed_flags)
 
     flag_specs = {
         "authoritative": ("Authoritative", "sec-p1-flag-clear"),
@@ -894,6 +942,70 @@ def test_p1_on_timestep_handles_malformed_artifacts_and_indices() -> None:
         selected = _render_panel_timestep(valid_artifact, index)
         assert ">hour not emitted</span>" in selected
         assert "Fe-redox state pending" in selected
+
+
+def test_p1_on_timestep_null_target_and_missing_document_are_safe() -> None:
+    """P3: onTimestep must no-op when document/target is absent (codex null-target)."""
+    harness = r"""
+const fs = require("fs");
+const vm = require("vm");
+const artifact = JSON.parse(process.argv[4]);
+const results = [];
+
+// No document at all.
+{
+  const context = { console };
+  context.globalThis = context;
+  vm.createContext(context);
+  vm.runInContext(fs.readFileSync(process.argv[2], "utf8"), context);
+  vm.runInContext(fs.readFileSync(process.argv[3], "utf8"), context);
+  const panel = context.ReportPanels.find((c) => c.id === "sec-p1-fe-redox");
+  try {
+    panel.onTimestep(artifact, 0);
+    results.push("no-document:ok");
+  } catch (err) {
+    results.push("no-document:throw:" + err.message);
+  }
+}
+
+// document present but target query returns null.
+{
+  const context = {
+    console,
+    document: { querySelector() { return null; } },
+  };
+  context.globalThis = context;
+  vm.createContext(context);
+  vm.runInContext(fs.readFileSync(process.argv[2], "utf8"), context);
+  vm.runInContext(fs.readFileSync(process.argv[3], "utf8"), context);
+  const panel = context.ReportPanels.find((c) => c.id === "sec-p1-fe-redox");
+  try {
+    panel.onTimestep(artifact, 0);
+    results.push("null-target:ok");
+  } catch (err) {
+    results.push("null-target:throw:" + err.message);
+  }
+}
+
+process.stdout.write(results.join("\n"));
+"""
+    completed = subprocess.run(
+        [
+            "node",
+            "-",
+            str(REPORT_ROOT / "labels.js"),
+            str(REPORT_ROOT / "panels" / "p1-fe-redox.js"),
+            json.dumps(_artifact({"fe_redox_split": _core_redox()}, hour=4)),
+        ],
+        input=harness,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    lines = completed.stdout.strip().splitlines()
+    assert "no-document:ok" in lines
+    assert "null-target:ok" in lines
+    assert not any("throw" in line for line in lines)
 
 
 def test_p1_partition_and_event_absent_before_hour_89_are_not_zeroed() -> None:

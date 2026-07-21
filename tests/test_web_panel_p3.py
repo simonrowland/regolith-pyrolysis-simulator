@@ -1032,3 +1032,100 @@ def test_p3_hourly_container_states_and_partial_histories_never_derive_values() 
     ]
     assert "0.3 kg" not in cumulative_species
     assert "0.3 kg" not in cumulative_render["hourly"]
+
+
+def test_p3_mol_native_final_state_is_not_relabeled_as_kg_wall_deposit() -> None:
+    """P2: mol-native final_state wall accounts must not become kg wall deposits."""
+    artifact = _artifact()
+    artifact["terminal"] = {
+        "final": {},
+        "final_state": {
+            "process.wall_deposit_segment_stage_0_to_stage_1": {"SiO": 2.0},
+        },
+    }
+    html = _render_panel(artifact)["html"]
+    species_region = _region(
+        html,
+        "<h3>Wall deposit by species</h3>",
+        '<details class="sec-p3-details"><summary>Per-wall-segment terminal breakdown',
+    )
+    assert "Per-species wall deposits pending" in species_region
+    assert "Terminal aggregate pending" in species_region
+    assert "2 kg" not in species_region
+    assert "2 mol" not in species_region
+    assert "process.wall_deposit_segment" not in species_region
+
+
+def test_p3_product_and_evolved_bins_do_not_backfill_wall_deposit_table() -> None:
+    """P2: metal yields / evolved vapor must stay out of the wall-deposit table."""
+    artifact = {
+        "terminal": {"final": {}},
+        "timesteps": [
+            {
+                "hour": 1,
+                "summary": {
+                    "metal_yields_kg": {"Fe": 1.0},
+                    "vapor_species_kg_hr": {"SiO": 0.5},
+                },
+            }
+        ],
+    }
+    rendered = _render_panel(artifact)
+    species_region = _region(
+        rendered["html"],
+        "<h3>Wall deposit by species</h3>",
+        '<details class="sec-p3-details"><summary>Per-wall-segment terminal breakdown',
+    )
+    assert "Per-species wall deposits pending" in species_region
+    assert "1 kg" not in species_region
+    assert "0.5 kg" not in species_region
+    assert 'title="Fe"' not in species_region
+    assert 'title="SiO"' not in species_region
+
+
+def test_p3_hostile_segment_keys_escape_once_in_terminal_and_hourly() -> None:
+    """P2: segment-key esc is a distinct sink from species-key esc."""
+    hostile = "</th><img src=x onerror=alert(1)><th>"
+    # Terminal segment map
+    terminal_art = _artifact()
+    terminal_art["terminal"] = {
+        "final": {
+            "deposit_by_surface_species_kg": {hostile: {"SiO": 1.0}},
+        }
+    }
+    terminal_html = _render_panel(terminal_art)["html"]
+    terminal_seg = _region(
+        terminal_html,
+        "<summary>Per-wall-segment terminal breakdown</summary>",
+        "</details>",
+    )
+    assert "<img" not in terminal_seg
+    assert "onerror=alert(1)" not in terminal_seg
+    # accountLabel title-cases free-text segment tails before esc.
+    assert (
+        "Wall Deposit Segment &lt;/Th&gt;&lt;Img Src=X Onerror=Alert(1)&gt;&lt;Th&gt;"
+        in terminal_seg
+    )
+    assert "&amp;lt;/Th&amp;gt;" not in terminal_seg
+
+    # Hourly segment maps (distinct esc site at renderHourlySegments).
+    hourly_art = {
+        "terminal": {"final": {}},
+        "timesteps": [
+            {
+                "hour": 3,
+                "summary": {
+                    "wall_deposit_delta_kg": {hostile: {"SiO": 0.2}},
+                    "wall_deposit_cumulative_kg": {hostile: {"SiO": 0.4}},
+                },
+            }
+        ],
+    }
+    hourly = _render_panel(hourly_art, timestep_index=0)["hourly"]
+    assert "<img" not in hourly
+    assert "onerror=alert(1)" not in hourly
+    assert (
+        "Wall Deposit Segment &lt;/Th&gt;&lt;Img Src=X Onerror=Alert(1)&gt;&lt;Th&gt;"
+        in hourly
+    )
+    assert "&amp;lt;/Th&amp;gt;" not in hourly
