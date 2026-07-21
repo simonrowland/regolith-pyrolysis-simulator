@@ -182,6 +182,8 @@ context.initO2BudgetChart = () => {
 context.initMeltInventoryChart = () => {
   context.meltInvInitialized = true;
 };
+// simulator-socket.js collaborator; badge rendering is not under test here
+context.updateBackendBadge = () => {};
 
 vm.createContext(context);
 vm.runInContext(fs.readFileSync(scriptPath, 'utf8'), context, {
