@@ -45,7 +45,7 @@ metals:
     fit_target: "pseudo_psat_backsolved_from_vaporock"
     # INTERIM Alternative B (2026-07-20 Na investigation / t-383): keep the
     # active Chase/JANAF gas-standard + gamma_NaO0.5=1e-3 pair, demote
-    # authority, declare compensating-errors bracket. Labels only — runtime
+    # authority, declare compensating-errors bracket. Labels only -- runtime
     # pressure path is unchanged (golden-neutral for B1).
     authority_class: uncertified
     declared_compensation: true
@@ -70,7 +70,7 @@ metals:
     residual_dex: 0.379
     confidence_tier: "low"
     # Stale VapoRock-backsolved Antoine no longer drives the active high-T
-    # rail (gas_standard_fugacity). Kept for provenance only — do not retune
+    # rail (gas_standard_fugacity). Kept for provenance only -- do not retune
     # as if it were the live Na pressure surface (t-383 / Alternative B).
     pseudo_antoine_status: inactive_provenance_only
     backsolve:
@@ -861,7 +861,7 @@ oxide_vapors:
       #   delG0 = G_SiO + 0.5 G_O2 - mu0_SiO2(l)
       #   Kp = exp(-delG0/(R T));  R=8.314 J/mol/K (VapoRock)
       #   P_ref/Pa = 1e5 * Kp / sqrt(pO2_ref/1 bar)
-      #   log10(P_ref/Pa) ≈ A - B/(T+C)  (minimax refit)
+      #   log10(P_ref/Pa) ~= A - B/(T+C)  (minimax refit)
       # Runtime multiplies once by a_SiO2 * sqrt(pO2_ref/pO2) over the full
       # legal transport-pO2 domain (no silent clip below pO2_ref).
       # Unit check: Kp, activities, and fugacity ratios dimensionless; p0
@@ -869,8 +869,8 @@ oxide_vapors:
       # 1400-2273.15 K (~2x the prior 0.000837 dex over the narrower 1400-1900
       # band; still within the ~0.002 dex matrix acceptance).
       # Sanity: B>0 => dlog10(P_ref)/dT = B/(T+C)^2 > 0; at 2023.15 K the
-      # in-domain fit gives P_ref≈110.80 Pa; lunar-mare a_SiO2≈0.43638 scales
-      # to ≈48.36 Pa (VapoRock hard-vacuum anchor ~48.17 Pa).
+      # in-domain fit gives P_ref~=110.80 Pa; lunar-mare a_SiO2~=0.43638 scales
+      # to ~=48.36 Pa (VapoRock hard-vacuum anchor ~48.17 Pa).
       A: 21.4441302
       B: 38290.4646
       C: -49.3750070
@@ -895,7 +895,7 @@ oxide_vapors:
       below ~1200°C. See [THERMO-1] in context-thermo.md.
       Composition-independent standard-reaction term from JANAF gas species
       plus the ThermoEngine liquid-SiO2 standard state, source-validated over
-      1400-2273.15 K (authority class remains uncertified — honest label, not
+      1400-2273.15 K (authority class remains uncertified -- honest label, not
       dual-lab certified ground truth). Runtime applies a(SiO2) and the
       mass-action pO2 factor exactly once over the full legal pO2 domain.
       T>2273.15 K is typed refusal.
