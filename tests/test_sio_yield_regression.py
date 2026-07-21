@@ -362,6 +362,10 @@ def test_sio_yield_diagnostics_include_wall_sticking_alpha_notice():
 
 
 def test_band_aware_hkl_route_captures_sio_in_stage_3():
+    sio_data = condensation_module.VAPOR_PRESSURE_DATA["oxide_vapors"]["SiO"]
+    assert sio_data["fit_target"] == "standard_reaction_term"
+    assert "pure_component_antoine" not in sio_data
+
     model = CondensationModel(CondensationTrain.create_default())
 
     route = model.route(
@@ -370,7 +374,7 @@ def test_band_aware_hkl_route_captures_sio_in_stage_3():
     )
 
     assert route.condensed_by_stage_species[3]["SiO"] > 0.0
-    assert route.condensed_by_stage_species[4]["SiO"] < 0.95
+    assert 0.0 < route.condensed_by_stage_species[4]["SiO"] < 0.95
     # Cold-wall SiO now uses the Pound 1972 unity condensation gate below the
     # Wetzel/Gail evaporation-Arrhenius validity floor, so less vapor remains
     # in offgas once it reaches cold stages.

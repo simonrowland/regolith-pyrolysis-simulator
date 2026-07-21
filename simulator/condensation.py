@@ -3188,9 +3188,19 @@ class CondensationModel:
                 overhead_pressure_pa=overhead_pressure_pa,
                 carrier_gas=self.carrier_gas,
                 vapor_pressure_data=self.vapor_pressure_data,
+                # Standard-reaction SiO rows intentionally have no pure-SiO
+                # wall P_sat.  At and below the declared condensation
+                # temperature, baffles materialize the disproportionation
+                # product instead of silently disabling capture when the melt
+                # reaction term is rejected as a wall pressure.  The
+                # temperature gate preserves colder downstream carryover
+                # without admitting hotter upstream stages.
+                reactive_product_backstop=(
+                    species == 'SiO'
+                    and T_surface_C <= T_cond_C
+                ),
                 # Wall CrO2 remains reversible; designated Stage 2 instead
                 # materializes the declared stable Cr2O3 + O2 product route.
-                reactive_product_backstop=False,
                 stable_condensation_product_backstop=(species == 'CrO2'),
                 antoine_extrapolations=antoine_extrapolations,
                 antoine_extrapolation_warnings=antoine_extrapolation_warnings,
