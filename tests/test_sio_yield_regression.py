@@ -6,7 +6,10 @@ from types import SimpleNamespace
 
 import pytest
 
-from engines.builtin.vapor_pressure import VaporPressureRangeError
+from engines.builtin.vapor_pressure import (
+    VAPOR_PRESSURE_RECONSTRUCTED_AUTHORITY_FLAG,
+    VaporPressureRangeError,
+)
 from simulator import condensation as condensation_module
 from simulator.condensation import CondensationModel, KnudsenRegimeRefusal
 from simulator.overhead import OverheadGasModel
@@ -441,25 +444,50 @@ def test_condensation_route_flags_metal_antoine_valid_range_extrapolation():
     assert route.remaining_by_species["Ca"] >= 0.0
 
 
-def test_wall_mg_psat_refuses_outside_source_certified_range():
-    assert condensation_module._antoine_psat_pa("Mg", 1361.0) > 0.0
+def test_wall_mg_psat_uses_reconstructed_segment_and_refuses_outside_envelope():
+    authority_limits: dict[str, dict[str, object]] = {}
+    for temperature_K in (1361.0, 1361.001, 1363.15, 1366.0):
+        assert condensation_module._antoine_psat_pa(
+            "Mg",
+            temperature_K,
+            antoine_extrapolations=authority_limits,
+        ) > 0.0
+        assert authority_limits["Mg"][
+            VAPOR_PRESSURE_RECONSTRUCTED_AUTHORITY_FLAG
+        ] is True
 
-    for temperature_K in (700.0, 1361.001):
+    for temperature_K in (700.0, 2273.151):
         with pytest.raises(
             VaporPressureRangeError,
             match=r"species=Mg consumer=wall_condensation",
         ):
             condensation_module._antoine_psat_pa("Mg", temperature_K)
 
-    warnings: list[str] = []
+    outside_authority_limits: dict[str, dict[str, object]] = {}
+    assert condensation_module._antoine_psat_pa(
+        "Mg",
+        1360.999,
+        antoine_extrapolations=outside_authority_limits,
+    ) > 0.0
+    with pytest.raises(VaporPressureRangeError):
+        condensation_module._antoine_psat_pa(
+            "Mg",
+            1366.001,
+            antoine_extrapolations=outside_authority_limits,
+        )
+    assert outside_authority_limits == {}
+
+    authority_limits = {}
     assert condensation_module._wall_deposition_driving_pressure_pa(
         "Mg",
         100.0,
         1361.001,
         reactive_product_backstop=False,
-        antoine_extrapolation_warnings=warnings,
+        antoine_extrapolations=authority_limits,
     ) == 0.0
-    assert any("consumer=wall_condensation" in warning for warning in warnings)
+    assert authority_limits["Mg"][
+        VAPOR_PRESSURE_RECONSTRUCTED_AUTHORITY_FLAG
+    ] is True
 
 
 def test_wall_deposit_uses_reactive_product_backstop_not_sio_reaction_term():
