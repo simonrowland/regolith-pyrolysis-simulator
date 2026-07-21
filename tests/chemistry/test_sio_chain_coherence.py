@@ -90,7 +90,11 @@ MAX_CHAIN_CLOSURE_ERR_PCT = 6.0e-5
 # and wall-capture composition; invariance remains bit-identical.
 # 2026-07-18 a91db36 flow-boundary transport rebaseline on corrected tip
 # 0990232; wall-temperature invariance remains bit-identical.
-PHASE3BIS_SIO_EVOLVED_KG = 7.61699622023e-06
+# 2026-07-21 B1 vapor-package regen: JANAF-refit P_sat/suppression fits move
+# the coupled evolved-SiO baseline down ~5.8x (declared class, same shift as
+# the sio_yield CLI goldens); all four wall temperatures still execute to the
+# SAME value — the invariance contract itself is untouched.
+PHASE3BIS_SIO_EVOLVED_KG = 1.31808462984e-06
 
 
 @lru_cache(maxsize=None)

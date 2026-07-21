@@ -487,22 +487,22 @@ def test_owner_pn2_anchor_reports_current_certification_state(smoke_payload):
         1576.0114767733974, rel=0.0, abs=1.0e-9
     )
     assert owner["native_fe_tap_mol"] == pytest.approx(
-        1573.920255077218, rel=0.0, abs=1.0e-9
+        1573.8956138175351, rel=0.0, abs=1.0e-9
     )
     assert owner["native_fe_vapor_mol"] == pytest.approx(
-        2.091221696179546, rel=0.0, abs=1.0e-12
+        2.1158629558621413, rel=0.0, abs=1.0e-12
     )
     assert owner["native_fe_vapor_escape_fraction_of_pool"] == pytest.approx(
-        0.0013269076570818822, rel=0.0, abs=1.0e-15
+        0.00134254286028043, rel=0.0, abs=1.0e-15
     )
     assert owner["stage_3_Fe_wt_pct"] == pytest.approx(
-        0.057149310772391514, rel=0.0, abs=1.0e-15
+        0.012185989306696739, rel=0.0, abs=1.0e-15
     )
     assert owner["ferric_divergence_material"] is False
     assert abs(owner["mass_balance_error_pct"]) <= 5e-12
     assert owner["SiO_provider_pO2_bar"] == pytest.approx(1.0e-9)
     assert owner["SiO_flux_kg_hr"] == pytest.approx(
-        0.016997554231818535, rel=0.0, abs=1.0e-15
+        0.02824157889055116, rel=0.0, abs=1.0e-15
     )
     requested_pO2_assertion = assertions[
         "owner_pN2_recipe_point_requested_pO2_semantics"

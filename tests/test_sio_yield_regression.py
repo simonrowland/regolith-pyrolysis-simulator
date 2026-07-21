@@ -509,9 +509,11 @@ def test_wall_mg_psat_uses_reconstructed_segment_and_refuses_outside_envelope():
 
 def test_wall_deposit_uses_reactive_product_backstop_not_sio_reaction_term():
     sio_data = condensation_module.VAPOR_PRESSURE_DATA["oxide_vapors"]["SiO"]
-    # Bug A source-range contract from the 1400-1900 K VapoRock declaration.
+    # Bug A source-range contract; B1 vapor package extends the SiO band to
+    # the declared gas-rail certified edge (data/vapor_pressures.yaml:
+    # total_source_certified_range_K upper bound 2273.15 K).
     certified_range_K = sio_data["valid_range_K"]
-    assert certified_range_K == [1400, 1900]
+    assert certified_range_K == [1400, 2273.15]
 
     model = CondensationModel(
         CondensationTrain.create_default(),

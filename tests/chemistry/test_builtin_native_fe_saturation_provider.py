@@ -33,7 +33,7 @@ METALLIC_TAP_DECLARED_ACCOUNTS = frozenset({
 PINNED_NATIVE_FE_MIGRATION_GOLDENS = {
     "lunar_mare_low_ti": {
         "native_fe_mol": 1610.7768609700126,
-        "native_vapor_Fe_kg": 0.15843535412267737,
+        "native_vapor_Fe_kg": 0.1682078458614615,
     },
     "mars_basalt": {
         # Recomputed after 9de6ffb8: counterfactual tracing attributes the

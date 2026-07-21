@@ -168,7 +168,7 @@ def test_builtin_sio_suppression_uses_calibrated_reference_not_body_floor():
     moon = pressure_for_body("moon")
     asteroid = pressure_for_body("asteroid")
 
-    assert moon == pytest.approx(0.06616218437532036)
+    assert moon == pytest.approx(0.08891212264103245)
     assert asteroid == pytest.approx(moon)
 
 
@@ -187,5 +187,5 @@ def test_legacy_sio_suppression_uses_calibrated_reference_not_body_floor():
     moon = pressure_for_body("moon")
     asteroid = pressure_for_body("asteroid")
 
-    assert moon == pytest.approx(0.9130172734006163)
+    assert moon == pytest.approx(1.2269592449589308)
     assert asteroid == pytest.approx(moon)

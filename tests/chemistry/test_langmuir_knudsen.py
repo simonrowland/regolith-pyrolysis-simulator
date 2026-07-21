@@ -157,9 +157,13 @@ def test_grounded_alpha_and_p_eq_match_provider_wiring():
     assert alpha_k == pytest.approx(0.13)
     assert alpha_sio == pytest.approx(0.52 * math.exp(-3685.0 / T_K))
     p_na = pseudo_antoine_p_eq_pa("Na", T_K)
-    p_sio = pseudo_antoine_p_eq_pa("SiO", T_K)
     assert p_na > 0.0
-    assert p_sio > 0.0
+    # B1 vapor package: SiO now carries a standard_reaction_term (melt
+    # activity + pO2 context), so raw pseudo-Antoine evaluation refuses for
+    # SiO exactly as it already did for K — the effective P_eq must come
+    # from the builtin provider.
+    with pytest.raises(ValueError, match="standard_reaction_term"):
+        pseudo_antoine_p_eq_pa("SiO", T_K)
     provider = _series_resistance_evaporation_flux_kg_m2_s(
         species="Na",
         P_eq_pa=p_na,

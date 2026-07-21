@@ -2505,7 +2505,7 @@ def test_pn2_native_fe_partition_e2e_drains_tap_and_reports_stage3_fe_wt() -> No
     assert partition["native_fe_pool_mol"] > 0.0
     assert partition["native_fe_tap_mol"] > partition["native_fe_vapor_mol"]
     assert partition["native_fe_vapor_escape_fraction_of_pool"] == pytest.approx(
-        0.001966576138843868,
+        0.0019900552692932983,
         rel=0.0,
         abs=1.0e-15,
     )

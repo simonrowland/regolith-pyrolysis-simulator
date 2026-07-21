@@ -97,8 +97,11 @@ def test_endpoint_rank_metric_is_not_labeled_as_kinetic_ordering() -> None:
     # the observed KEMS rows are unchanged, and this derived residual records it.
     # 2026-07-11 0.5.10 E-MOVE: current phase-basis/two-rail/Kress ordering
     # surface raises the endpoint-rank disagreement fraction.
+    # 2026-07-21 B1 vapor-package regen: corrected P_sat fits invert one more
+    # DS-003 endpoint pair (2/17 -> 3/17); observed KEMS rows unchanged —
+    # this residual is a recorded reproduction error, never a retune target.
     assert report.endpoint_rank_disagreement_fraction == pytest.approx(
-        0.11764705882352941
+        0.17647058823529413
     )
 
 
@@ -109,6 +112,8 @@ def test_markdown_report_contains_summary_and_json_pointer_for_long_skips() -> N
     assert "endpoint rank disagreement" in markdown
     assert "ordering inversions" not in markdown
     assert "| DS-007 | validated | 12 | 0.162 | 1.097 | - | - |" in markdown
-    assert "| DS-010 | validated | 7 | 1.392 | 1.920 | 0.222 |" in markdown
+    # 2026-07-21 B1: DS-010 median/max reproduction error re-measured under
+    # the corrected fits (1.392/1.920 -> 1.199/3.309); rank cell unchanged.
+    assert "| DS-010 | validated | 7 | 1.199 | 3.309 | 0.222 |" in markdown
     assert "more in JSON" in markdown
     assert "DS-010: fetch-dns-blocked" not in markdown

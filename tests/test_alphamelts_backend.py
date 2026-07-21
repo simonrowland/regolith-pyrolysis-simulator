@@ -5361,8 +5361,11 @@ def test_vapor_bridge_helper_unavailable_uses_explicit_antoine_fallback_nonempty
     assert source["Na"] == (
         "antoine_fallback_from_vaporock:backsolved_vaporock_curve_fit"
     )
+    # B1 vapor package: the SiO fallback row now carries the calibrated
+    # standard_reaction_term (melt-activity + pO2 context), and the
+    # provenance token reports it.
     assert source["SiO"] == (
-        "antoine_fallback_from_vaporock:backsolved_vaporock_curve_fit"
+        "antoine_fallback_from_vaporock:standard_reaction_term"
     )
     # FAIL-LOUD: the fallback is a real Antoine dict, NOT a silent {} that
     # would zero the evaporation flux.

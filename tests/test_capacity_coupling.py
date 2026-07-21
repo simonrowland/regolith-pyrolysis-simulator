@@ -462,23 +462,30 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         snapshot.overhead.transport_saturation_pct,
         snapshot.melt_mass_kg,
     ) == pytest.approx(
+        # 2026-07-21 B1 vapor-package regen: corrected (higher) P_sat raises
+        # hour-1 total evaporation 1.422 -> 2.621 kg/hr; transport saturation
+        # and evaporated melt mass follow the same shift. Head-result values
+        # recomputed from the executable under the quiesced gate.
         (
             1,
             1550.0,
-                1.4222800302948089,
-                617439.6183628871,
-                998.5715114831864,
+                2.621375151443563,
+                1161978.4904357793,
+                997.3707385338129,
         ),
         rel=1.0e-12,
         abs=1.0e-12,
     )
-    assert len(sim.atom_ledger.transitions) == 19
+    # 2026-07-21 B1 vapor-package regen: the re-grounded Ti row crosses its
+    # evolution threshold at this 1600 C hour-1 probe, adding evaporate_Ti +
+    # condense_Ti (19 -> 21 transitions).
+    assert len(sim.atom_ledger.transitions) == 21
     assert tuple(
         transition.reason for transition in sim.atom_ledger.transitions[-5:]
     ) == (
-        "evaporate_Cr",
-        "condense_Cr",
         "evaporate_Mn",
+        "evaporate_Ti",
+        "condense_Ti",
         "fe_redox_respeciation",
         "overhead_bleed",
     )

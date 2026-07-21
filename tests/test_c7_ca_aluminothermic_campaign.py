@@ -114,16 +114,26 @@ def test_c7_enabled_run_refuses_on_unfavorable_computed_margin_and_closes_mass(
         ree["REE_oxides_wt_pct_before_C7"], rel=0.0, abs=1e-12
     )
 
-    # The refusal is reported honestly: computed margin < 0 drives it, NOT the
-    # nominally-positive configured scalar. This is the V23 contract.
+    # 2026-07-21 B1 re-baseline: the composed transport-domain gate refuses
+    # BEFORE the thermo-margin evaluation, and the two gates are structurally
+    # disjoint on 0.6.3 physics — the whole C7 vacuum envelope
+    # (C7_MIN..MAX_TOTAL_PRESSURE_MBAR = 0.01..0.1 mbar) sits in the
+    # transitional Kn band (0.01 < Kn < 10) at C7 geometry/temperature
+    # (probed empirically at 0.01/0.02/0.05/10 mbar: transitional refusal
+    # inside the envelope, envelope refusal outside it). The margin branch is
+    # unreachable at ANY valid C7 operating point until t-379 (0.7) lands
+    # transitional/molecular conductance. The honest integration contract is
+    # therefore the transport refusal; the V23 margin contract (computed
+    # JANAF margin governs, reported honestly) remains covered at provider
+    # unit level in tests/chemistry/test_builtin_ca_aluminothermic_step_provider.py.
     refusal = document["c7_refusal_diagnostic"]
-    assert refusal["reason_refused"] == "c7_vacuum_shifted_thermo_margin_unfavorable"
-    assert refusal["computed_thermo_margin_kj_per_mol_o2"] == pytest.approx(
-        -153.94070649999992, rel=0.0, abs=1e-9
+    assert refusal["reason_refused"] == "viscous_p_bulk_transport_out_of_domain"
+    assert refusal["c7_transport_refusal"] == (
+        "viscous_p_bulk_transport_out_of_domain"
     )
-    assert refusal["computed_thermo_margin_kj_per_mol_o2"] < 0.0
-    assert refusal["configured_thermo_margin_kj_per_mol_o2"] == pytest.approx(1.0)
-    assert refusal["thermo_margin_source"] == "builtin_janaf_ellingham_al_ca"
+    assert refusal["r_transport"] == 0.0
+    assert refusal["transport_ca_mol"] == 0.0
+    assert refusal["c7_overhead_pressure_pa"] == pytest.approx(5.0)
 
     # Al credit was imported but stays undrawn because the reduction refused.
     assert report["diagnostic"]["c7_al_credit_input_kg"] == pytest.approx(20.0)
