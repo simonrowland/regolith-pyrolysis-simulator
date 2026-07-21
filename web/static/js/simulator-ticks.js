@@ -27,6 +27,16 @@ socket.on('simulation_tick', (data) => {
     if (data.backend_fallback_active && data.backend_message) {
         setEl('status-text', data.backend_message);
     }
+    // Recover sticky labels (decision_applied / Ready after reconnect) and
+    // merge backend badge from tick fields. See simulator-socket.js —
+    // noteLiveSimulationTick / updateBackendBadge. Live ticks are the
+    // authority that the run is advancing; status must not assert a prior
+    // gate event over advancing hour/temp.
+    const liveNote = (typeof globalThis !== 'undefined' && globalThis.noteLiveSimulationTick)
+        || (typeof noteLiveSimulationTick === 'function' ? noteLiveSimulationTick : null);
+    if (typeof liveNote === 'function') {
+        liveNote(data);
+    }
     const atmosphereLabel = data.atmosphere === 'CO2_BACKPRESSURE'
         ? 'Mars CO₂: ' + (data.p_total_mbar || 0).toFixed(1) + ' mbar'
         : data.atmosphere === 'HARD_VACUUM'

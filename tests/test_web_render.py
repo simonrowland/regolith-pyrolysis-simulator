@@ -31,6 +31,13 @@ _SOCKET_HARNESS = (
     / "web_render"
     / "render_simulator_socket_dom.mjs"
 )
+_STATUS_STRIP_HARNESS = (
+    _REPO_ROOT
+    / "tests"
+    / "fixtures"
+    / "web_render"
+    / "render_simulator_status_strip_dom.mjs"
+)
 _SIMULATOR_CHARTS_JS = _REPO_ROOT / "web" / "static" / "js" / "simulator-charts.js"
 _SIMULATOR_TICKS_JS = _REPO_ROOT / "web" / "static" / "js" / "simulator-ticks.js"
 _SIMULATOR_ADVISORY_JS = (
@@ -486,6 +493,183 @@ def test_disconnect_reconnect_resets_controls_and_decision_modal():
     }
 
 
+def _minimal_tick_payload(**overrides):
+    """Bare tick with the numeric fields the tick DOM path always reads."""
+    payload = {
+        "hour": 70,
+        "temperature_C": 1459.0,
+        "campaign": "C3_NA",
+        "melt_mass_kg": 949.0,
+        "atmosphere": "HARD_VACUUM",
+        "composition_wt_pct": {},
+        "pot_composition": {},
+        "evap_species": {},
+        "condensation": {},
+        "energy_electrical_plus_evaporation_cumulative_kWh": 1.0,
+        "energy_electrical_plus_evaporation_kWh": 0.1,
+        "energy_electrical_kWh": 0.1,
+        "energy_evaporation_thermal_kWh": 0.0,
+        "energy_scope": "electrical_plus_known_evaporation_enthalpy",
+        "furnace_heat_status": "partial",
+        "oxygen_kg": 0.0,
+        "mass_balance_error_pct": 0.0,
+        "mass_balance_error_breached": False,
+        "backend_status": "ok",
+        "backend_authoritative": False,
+        "backend_message": "Internal analytical backend",
+        "backend_fallback_active": False,
+        "O2_stored_kg": 0.0,
+        "O2_vented_cumulative_kg": 0.0,
+        "O2_vented_kg_hr": 0.0,
+        "turbine_shaft_power_kW": 0.0,
+        "actual_ramp_rate": 50.0,
+        "nominal_ramp_rate": 50.0,
+        "transport_saturation_pct": 0.0,
+        "turbine_utilization_pct": 0.0,
+        "ramp_throttled": False,
+    }
+    payload.update(overrides)
+    return payload
+
+
+def _decision_gate_status_sequence():
+    """Reproduce F1: started (full backend) → decision_applied (no backend) → tick."""
+    return [
+        {
+            "event": "simulation_status",
+            "payload": {
+                "status": "started",
+                "backend_active": "InternalAnalyticalBackend",
+                "backend_status": "ok",
+                "backend_authoritative": False,
+                "backend_message": "Internal analytical backend",
+            },
+        },
+        {
+            "event": "simulation_tick",
+            "payload": _minimal_tick_payload(hour=70, temperature_C=1459.0),
+        },
+        {
+            "event": "simulation_status",
+            "payload": {
+                "status": "decision_applied",
+                "choice": "A",
+            },
+        },
+        {
+            "event": "simulation_tick",
+            "payload": _minimal_tick_payload(
+                hour=71,
+                temperature_C=1509.0,
+                campaign="C4",
+                melt_mass_kg=949.0,
+                # Tick carries status/auth but not always backend_active —
+                # the pre-fix path invented "unknown" for the missing half.
+                backend_status="ok",
+                backend_authoritative=False,
+                backend_message="Internal analytical backend",
+            ),
+        },
+    ]
+
+
+def test_decision_applied_does_not_stick_or_clobber_backend_badge():
+    """b-088: after a decision gate, live ticks must re-assert Running and
+    the badge must keep the backend it already knows (never unknown/unknown).
+    """
+    rendered = _render_status_strip(sequence=_decision_gate_status_sequence())
+    final = rendered["final"]
+
+    after_decision = [
+        step for step in rendered["steps"] if step["event"] == "simulation_status"
+    ][-1]
+    assert after_decision["statusText"] == "decision_applied"
+    # decision_applied has no backend fields — badge must keep prior knowledge
+    assert after_decision["backendText"] == (
+        "Backend: InternalAnalyticalBackend / ok"
+    )
+    assert "unknown" not in after_decision["backendText"].lower()
+    assert "backend-badge-internal-analytical" in after_decision["backendClass"]
+
+    assert final["statusText"] == "Running"
+    assert final["hourText"] == "Hour: 71"
+    assert final["backendText"] == "Backend: InternalAnalyticalBackend / ok"
+    assert "unknown / unknown" not in final["backendText"]
+    assert "backend-badge-internal-analytical" in final["backendClass"]
+    assert final["backendTitle"] == "Internal analytical backend"
+
+
+def test_status_strip_mutations_reproduce_b088_failure_mode():
+    """Falsifiable proof: named mutations restore the F1 failure symptoms.
+
+    Mutations
+    ---------
+    * ``mutate_badge_clobber`` — pre-fix ``updateBackendBadge`` that defaults
+      missing fields to ``'unknown'`` (the decision_applied clobber).
+    * ``mutate_no_tick_recovery`` — drop ``noteLiveSimulationTick`` so sticky
+      ``decision_applied`` is never cleared by live ticks.
+
+    Apply → observe failure → (mutations are harness-local; source stays fixed).
+    """
+    sequence = _decision_gate_status_sequence()
+
+    clobbered = _render_status_strip(
+        sequence=sequence,
+        mutate_badge_clobber=True,
+        mutate_no_tick_recovery=True,
+    )
+    final = clobbered["final"]
+    after_decision = [
+        step
+        for step in clobbered["steps"]
+        if step["event"] == "simulation_status"
+        and step["statusText"] == "decision_applied"
+    ][-1]
+
+    assert after_decision["backendText"] == "Backend: unknown / unknown", (
+        "badge-clobber mutation must invent unknown/unknown on decision_applied"
+    )
+    assert final["statusText"] == "decision_applied", (
+        "no-tick-recovery mutation must leave status stuck on decision_applied"
+    )
+    assert final["hourText"] == "Hour: 71", (
+        "telemetry still advances under the stuck status (F1 signature)"
+    )
+
+    # Control: same sequence without mutations stays fixed.
+    fixed = _render_status_strip(sequence=sequence)
+    assert fixed["final"]["statusText"] == "Running"
+    assert "unknown" not in fixed["final"]["backendText"].lower()
+
+
+def test_mid_run_reconnect_does_not_claim_ready_over_live_telemetry():
+    """Shared failure class with reconnect P0: status strip must not assert
+    Ready while last-tick readouts are still on the strip.
+    """
+    sequence = [
+        {
+            "event": "simulation_status",
+            "payload": {
+                "status": "started",
+                "backend_active": "InternalAnalyticalBackend",
+                "backend_status": "ok",
+                "backend_authoritative": False,
+            },
+        },
+        {
+            "event": "simulation_tick",
+            "payload": _minimal_tick_payload(hour=42),
+        },
+        {"event": "disconnect", "payload": "transport close"},
+        {"event": "connect", "payload": {}},
+    ]
+    rendered = _render_status_strip(sequence=sequence)
+    final = rendered["final"]
+    assert final["statusText"] == "Connection restored"
+    assert final["hourText"] == "Hour: 42"
+    assert final["statusText"] != "Ready"
+
+
 def test_refusal_status_renders_structured_knudsen_diagnostic():
     html = app_module.create_app().test_client().get("/").get_data(as_text=True)
     payload = {
@@ -676,6 +860,32 @@ def _render_socket_lifecycle():
             {
                 "socket_script_path": str(_SIMULATOR_SOCKET_JS),
                 "decisions_script_path": str(_SIMULATOR_DECISIONS_JS),
+            }
+        ),
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stderr
+    return json.loads(completed.stdout)
+
+
+def _render_status_strip(
+    *,
+    sequence,
+    mutate_badge_clobber=False,
+    mutate_no_tick_recovery=False,
+):
+    completed = subprocess.run(
+        ["node", str(_STATUS_STRIP_HARNESS)],
+        input=json.dumps(
+            {
+                "socket_script_path": str(_SIMULATOR_SOCKET_JS),
+                "ticks_script_path": str(_SIMULATOR_TICKS_JS),
+                "sequence": sequence,
+                "mutate_badge_clobber": mutate_badge_clobber,
+                "mutate_no_tick_recovery": mutate_no_tick_recovery,
             }
         ),
         text=True,

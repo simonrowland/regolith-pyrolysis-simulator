@@ -855,6 +855,11 @@ document.getElementById('btn-start').addEventListener('click', () => {
     document.getElementById('btn-start').disabled = true;
     document.getElementById('btn-pause').disabled = false;
     document.getElementById('status-text').textContent = 'Running';
+    // Fresh run: clear merge-cache so a prior session's backend badge cannot
+    // outlive a new Start (reconnect / re-run hygiene).
+    if (typeof markFreshRunStarted === 'function') {
+        markFreshRunStarted();
+    }
 });
 
 document.getElementById('btn-pause').addEventListener('click', () => {
