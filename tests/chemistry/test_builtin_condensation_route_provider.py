@@ -2161,10 +2161,11 @@ def test_provider_skips_below_numerical_floor(
 # ---------------------------------------------------------------------------
 
 
-# A_staged+MAGEMin composition wall-clock: mass-balance class measured
-# 1027 s on compose-0.6.3 (docs-private/research/2026-07-20-pool-diagnosis/report.md);
-# raise per-test ceiling to measured × 1.5 headroom (not global --timeout).
-@pytest.mark.timeout(1541)
+# t-385 (2026-07-21): mass-balance class measured 889.9-953.9 s at -n0
+# (compose-vapor-work/n0-loop t1/t4/t5); ceiling >= 1.2x headroom over
+# measured n0 (family serialized on one gateway). xdist_group pins the MAGEMin full-run family to one gateway.
+@pytest.mark.xdist_group("magemin_fullrun")
+@pytest.mark.timeout(1800)
 @pytest.mark.parametrize(
     "feedstock_key, additives_kg",
     [

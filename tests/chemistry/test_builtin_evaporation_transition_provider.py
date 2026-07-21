@@ -66,13 +66,18 @@ def _dispatch_bound_proposal(kernel, proposal):
 
 
 # mass-balance smoke parity runs clip/fail under xdist coscheduling.
-pytestmark = [pytest.mark.serial, pytest.mark.xdist_group("serial")]
+# xdist_group("serial") lives on the cheap tests below, NOT module pytestmark:
+# pytest-xdist 3.8 UNIONS xdist_group marks (no function-level override), so a
+# module-level group would fuse with magemin_fullrun into a separate
+# "magemin_fullrun_serial" scope that co-runs against the real group.
+pytestmark = [pytest.mark.serial]
 
 # ---------------------------------------------------------------------------
 # 1. Capability profile
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.xdist_group("serial")
 def test_provider_declares_only_evaporation_transition_intent():
     provider = BuiltinEvaporationTransitionProvider()
     profile = provider.capability_profile()
@@ -90,6 +95,7 @@ def test_provider_declares_only_evaporation_transition_intent():
             assert not profile.is_authoritative(intent)
 
 
+@pytest.mark.xdist_group("serial")
 def test_provider_declares_four_evaporation_accounts():
     provider = BuiltinEvaporationTransitionProvider()
     profile = provider.capability_profile()
@@ -106,6 +112,7 @@ def test_provider_declares_four_evaporation_accounts():
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.xdist_group("serial")
 def test_kernel_filters_provider_to_declared_accounts_only(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
@@ -171,6 +178,7 @@ def test_kernel_filters_provider_to_declared_accounts_only(
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.xdist_group("serial")
 def test_kernel_commit_rejects_atom_unbalanced_proposal(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
@@ -213,6 +221,7 @@ def test_kernel_commit_rejects_atom_unbalanced_proposal(
     assert sim.atom_ledger.transitions == before_transitions
 
 
+@pytest.mark.xdist_group("serial")
 def test_kernel_commit_accepts_balanced_proposal(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
@@ -267,6 +276,7 @@ def test_kernel_commit_accepts_balanced_proposal(
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.xdist_group("serial")
 def test_provider_emits_expected_proposal_for_known_inputs(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
@@ -377,10 +387,13 @@ def test_provider_emits_expected_proposal_for_known_inputs(
 # ---------------------------------------------------------------------------
 
 
-# A_staged+MAGEMin composition wall-clock: mass-balance class measured
-# 1027 s on compose-0.6.3 (docs-private/research/2026-07-20-pool-diagnosis/report.md);
-# raise per-test ceiling to measured × 1.5 headroom (not global --timeout).
-@pytest.mark.timeout(1541)
+# t-385 (2026-07-21): mass-balance class measured 1134.6-1504.0 s standalone
+# (subset-junit-3); ceiling 1800 s = 1.2x headroom over the 1504.0 s worst
+# case — valid only because magemin_fullrun serializes the family on one
+# gateway (no MAGEMin-lock co-running). Module pytestmark deliberately has no
+# xdist_group: xdist 3.8 unions group marks (see module comment).
+@pytest.mark.xdist_group("magemin_fullrun")
+@pytest.mark.timeout(1800)
 @pytest.mark.parametrize(
     "feedstock_key, additives_kg",
     [
@@ -484,6 +497,7 @@ def test_full_run_mass_balance_holds_with_kernel_committed_transitions(
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.xdist_group("serial")
 def test_provider_matches_legacy_credit_evaporation_transition_pattern(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
@@ -586,6 +600,7 @@ def test_provider_matches_legacy_credit_evaporation_transition_pattern(
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.xdist_group("serial")
 @pytest.mark.parametrize("remaining_kg_hr", [float("nan"), float("inf")])
 def test_evaporation_transition_refuses_nonfinite_condensation_route(
     vapor_pressure_data,
@@ -627,6 +642,7 @@ def test_evaporation_transition_refuses_nonfinite_condensation_route(
     assert result.transition is None
 
 
+@pytest.mark.xdist_group("serial")
 def test_evaporation_transition_does_not_apply_per_species_scale(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
