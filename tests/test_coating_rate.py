@@ -255,10 +255,12 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
         )
         + "\n"
     ).encode("utf-8")
-    # Captured from pristine base 3eb628a using the same production JSON
-    # serializer. This stays independent of the already-stale runner fixture.
+    # Captured from the composed B1 tree (compose-0.6.3 @ 5d402c8, vapor
+    # package + fixes) using the same production JSON serializer; double-run
+    # byte-stable under the quiesced 2026-07-21 regen gate. Stays independent
+    # of the runner fixture.
     assert hashlib.sha256(actual_bytes).hexdigest() == (
-        "6e4143bb97feb99a0df6103fdb88761fc6794dd8c7daf6829ec3543d5ba45e74"
+        "b32ee338fd39f0caf3f3f94567ab4e3462738c318c66019d5669bbf5b70fcd42"
     )
 
 

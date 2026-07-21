@@ -199,9 +199,13 @@ def test_sio_wall_sweep_keeps_bulk_gas_temperature_distinct_from_liner():
 # moves the coupled evolved-SiO and routing pins through the grounded Cr path.
 # 2026-07-17 t-159/t-160/t-260 composition: executable CLI regeneration after
 # the transport and capture corrections moved both coupled SiO baselines.
+# 2026-07-21 B1 vapor-package regen (quiesced gate): the JANAF-refit P_sat /
+# suppression-fit corrections shift both coupled evolved-SiO baselines down
+# ~5.8x (declared class — red-partition + zero-red-survey attribution); values
+# below are fresh double-run byte-stable CLI executions on compose-0.6.3.
 BASELINE_SIO_EVOLVED_KG = {
-    "lunar_mare_low_ti": 7.61698230755e-06,
-    "mars_basalt": 7.65772411303e-06,
+    "lunar_mare_low_ti": 1.31808242466e-06,
+    "mars_basalt": 1.32752006974e-06,
 }
 
 # 0.5.3 Phase A1 (2026-05-28): finite-headspace default-on flip +
@@ -209,9 +213,11 @@ BASELINE_SIO_EVOLVED_KG = {
 # Stage 4 SiO carryover ABOVE Stage 3 SiO zone product — documented
 # "Known limitation" in CHANGELOG 0.5.3 as a routing trade-off.
 # 2026-07-12 wave-10 wall-flux closeout: the restored area-integrated
-# wall budget moves default C2A routing again. Stage 3 is now a pinned
-# zero for these fixtures; the regression catch is wall-dominant routing
-# plus a retained Stage 4 runaway ceiling, not stale Stage 4 > Stage 3.
+# wall budget moved default C2A routing; stage 3 was then a pinned zero.
+# 2026-07-21 B1: that pinned zero was the SIGNATURE OF THE FAIL-OPEN DEFECT
+# (silent reactive_product_backstop=False on authorized SiO baffle stages,
+# fixed in 07fa3fe). Stage 3 is the DESIGNATED SiO capture (North Star);
+# it is now pinned NONZERO from double-run byte-stable CLI executions.
 # Predecessor history (for legacy reviewers): pre-Phase-A1 values were
 # 1.65257779038 / 1.69466902181 kg, sat above the legacy stage_3 ~1 kg
 # magnitude; the post-flip regime is ~1.94 mg total SiO evolved
@@ -219,6 +225,14 @@ BASELINE_SIO_EVOLVED_KG = {
 BASELINE_STAGE4_SIO2_KG = {
     "lunar_mare_low_ti": 0.01,  # absolute ceiling; live ~5.07e-4 kg
     "mars_basalt": 0.01,        # absolute ceiling; live ~5.49e-4 kg
+}
+
+# 2026-07-21 B1: measured stage-3 SiO-zone product on compose-0.6.3 after the
+# 07fa3fe baffle fix (double-run byte-stable CLI). Nonzero is load-bearing:
+# a zero here means the designated-condenser capture failed open again.
+BASELINE_STAGE3_SIO2_KG = {
+    "lunar_mare_low_ti": 4.29910903346e-07,
+    "mars_basalt": 4.32989146849e-07,
 }
 
 
@@ -326,7 +340,10 @@ def test_sio_yield_cli_matches_golden(tmp_path, feedstock, golden_name):
     wall_total = sum(float(value) for value in actual["wall_deposit_kg"].values())
     routed_total = sum(float(value) for value in placement.values())
     assert all(float(value) >= 0.0 for value in placement.values())
-    assert stage_3 == pytest.approx(0.0)
+    assert stage_3 > 0.0
+    assert stage_3 == pytest.approx(
+        BASELINE_STAGE3_SIO2_KG[feedstock], rel=1e-8
+    )
     assert stage_4 < BASELINE_STAGE4_SIO2_KG[feedstock]
     assert wall_total > routed_total
     assert 0.0 <= actual["sio_yield_pct_of_feedstock"] <= 30.0

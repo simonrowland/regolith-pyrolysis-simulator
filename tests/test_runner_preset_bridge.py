@@ -363,9 +363,15 @@ def test_preset_bridge_records_exposed_area_result_scope(tmp_path: Path):
 
     returncode, payload = _run_preset_cli(tmp_path, preset_path)
 
-    assert returncode == 1, payload
-    assert payload["status"] == "failed"
-    assert payload["reason"] == "mass_balance_closure_breach"
+    # 2026-07-21 B1 re-baseline: on pre-vapor-package physics this
+    # lab-geometry run breached mass-balance closure, and that rc=1 breach
+    # was the test vehicle. On compose-0.6.3 the run closes exactly (worst
+    # per-hour mass_balance_pct 0.0 <= the 5e-12 % runner limit, verified
+    # from the executable), so the subject under test — the exposed-area
+    # result scope — is asserted on the success path. The runner still
+    # enforces the closure gate itself: a breach would surface as rc=1.
+    assert returncode == 0, payload
+    assert payload["status"] == "ok"
     metadata = payload["run_metadata"]
     assert metadata["effective_exposed_area_m2"] == pytest.approx(0.000123)
     assert metadata["area_basis"] == "gram_lab_exposed_melt"

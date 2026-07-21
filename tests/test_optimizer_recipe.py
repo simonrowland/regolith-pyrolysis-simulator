@@ -74,16 +74,16 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # Canonical lunar full-yield expands the catalog-grounded C2A envelope and
     # aligns the staged-path default metadata; resolved/schema identity moves.
     assert hashlib.sha256(resolved).hexdigest() == (
-        "37d3fb4dec0ce84948aa76b9fea3a46695a4f44e4b244e7988ec448c6b5a3af6"
+        "ce47537245c92b424883a61f350c3493754c0c36fffb4a639a9484e92d31dc23"
     )
     assert schema.bounds_digest == (
-        "9b0c68b2cb8a85067492ebacd9d448438fcd406007cd733a48103c76b8af6b8a"
+        "5a5aba76747df5b17a0dc98ce81eb47bccf045687394656f55474ca60ecd9184"
     )
     assert schema.bounds_digest != (
         "32e9d2e945bd870a2af90d5fc46259dd7b724404d9066c4505d98921b8fd4252"
     )
     assert empty.recipe_id(schema) == (
-        "b358010cde41d9ffac5b30397d71cf44983d2c220e1265f4eb27a2ad5284c175"
+        "3c6729031ecaf686b0e6b6a2e795d7cd8859d0b2b6cb9d3f5f5ade577fd0a53e"
     )
     assert empty.recipe_id(schema) != (
         "defd94f2daff77987fe73577ffa5b87df51072d418794d41530accd88caf5907"
@@ -95,7 +95,7 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
         canonical_json_dumps(dict(identity)).encode()
     ).hexdigest()
     assert identity_digest == (
-        "a57bdefe05dbc2416e5312c4cf82ad0c20dc8776f89acac5a5e2a2c221baaffb"
+        "af510d5baa724a244755b8711cc4f038e200dd1df5ab1ec5785bfe51a4d1ea9f"
     )
     assert identity_digest != (
         "a8ffba282e43fecbd31cd1816c92fb843c40504666580a2ff81ee05a1c02855d"
@@ -1569,9 +1569,12 @@ def test_recipe_id_is_stable_and_schema_versioned() -> None:
 
     assert first.recipe_id() == second.recipe_id()
     # Recomputed after the catalog-grounded C2A full-yield envelope expansion.
+    # 2026-07-21 B1: recomputed again after the hot-wall offset window
+    # re-derivation (OVERHEAD_HEADSPACE_OFFSET_MIN_K -200 -> -443 for the
+    # 1843 C melt ceiling) moved the schema bounds digest.
     assert (
         first.recipe_id()
-                == "8f04efbf5ea156f18d0067851df71fdbe4a3e5b5b4fe2cd255cf6d77dd35f0b3"
+                == "a50572d57d8785fd02a8d9e8638d7c997f693c72c8ef1ff22ad4aff7240abf64"
     )
     assert first.recipe_id(recipe_schema_version="recipe-schema-v2") != first.recipe_id()
     assert RecipePatch({PO2_DEFAULT: 8.0}).validated().recipe_id() != first.recipe_id()

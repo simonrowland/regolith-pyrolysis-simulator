@@ -74,7 +74,7 @@ def test_t155_conditional_sobol_subspaces_are_fixed_dimensional_and_index_equal(
     ]
     assert hashlib.sha256(
         doe_module.canonical_json_dumps(payload).encode()
-    ).hexdigest() == "9d98f401d27b41b2a464d7447f3a63719e7c6fd4cc35a75b36fb1aeb8fcbf613"
+    ).hexdigest() == "85eb0ad69e593c8b1f6089ad0cc27ad403e81d5e68500109c12daf028a9b3757"
 
 
 def test_t155_conditional_lhc_stream_is_exactly_pinned():
@@ -98,7 +98,7 @@ def test_t155_conditional_lhc_stream_is_exactly_pinned():
     ]
     assert hashlib.sha256(
         doe_module.canonical_json_dumps(payload).encode()
-    ).hexdigest() == "8d93c9a7266efa667b43a9cd912601173aad43462a8042a1e51161b7f1bbde79"
+    ).hexdigest() == "1983fce535aade41fcf064c3d7ca6fa1552ded02de6bacefac124478d7051cd7"
 
 
 def test_t155_conditional_batch_refuses_duplicate_zero_dimensional_subspace():
@@ -578,8 +578,29 @@ def test_sampler_varies_every_allowlisted_knob_across_samples() -> None:
             if spec.kind == "int" and all(
                 spec.path in patch.values for patch in patches
             ):
-                assert min(values) == spec.low
-                assert max(values) == spec.high
+                # Linear int knobs use equal unit-space buckets, so any
+                # sample landing in an extreme stratum reaches the exact
+                # bound — assert endpoint equality. Log-scale int knobs
+                # cannot make that promise once the range is wide: the top
+                # int of max_hold_hr (18..160) owns log(160.5/159.5)/
+                # log(160/18) ~= 0.28% of unit space while 128 LHC strata
+                # are each ~0.78% wide, so no measure-preserving log
+                # mapping puts the endpoint at a stratum midpoint (the old
+                # equality only held because the pre-widening 18..30 range
+                # round-saturated). The u->bound limits stay pinned by
+                # test_int_mapping_reaches_declared_bounds; here we assert
+                # the sampled extremes reach the outermost strata.
+                if getattr(spec, "scale", "linear") == "log":
+                    n = 128
+                    assert min(values) <= doe_module._map_unit_value(
+                        spec, 1.0 / n
+                    )
+                    assert max(values) >= doe_module._map_unit_value(
+                        spec, 1.0 - 1.0 / n
+                    )
+                else:
+                    assert min(values) == spec.low
+                    assert max(values) == spec.high
 
 
 def test_int_mapping_reaches_declared_bounds() -> None:

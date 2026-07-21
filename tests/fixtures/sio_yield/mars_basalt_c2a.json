@@ -3,37 +3,37 @@
   "campaign": "C2A_continuous",
   "alpha_SiO": 0.0320984652281,
   "alpha_provenance": "Wetzel & Gail 2013 A&A 553 A92 DOI 10.1051/0004-6361/201220803; alpha_s_SiO(T)=0.52*exp(-3685/T), reaction-rate-limited",
-  "sio_evolved_kg": 7.65772411303e-06,
+  "sio_evolved_kg": 1.32752006974e-06,
   "sio_to_silica_fume_kg": {
     "stage_1_fe_condenser_impurity": 0.0,
-    "stage_3_sio_zone_product": 0.0,
-    "stage_4_alkali_mg_carryover": 6.25466150443e-12,
+    "stage_3_sio_zone_product": 4.32989146849e-07,
+    "stage_4_alkali_mg_carryover": 0.0,
     "stage_5_dust_filter_carryover": 0.0,
-    "terminal_offgas_escape": 3.27369384616e-07
+    "terminal_offgas_escape": 5.6751776191e-08
   },
   "wall_deposit_kg": {
     "Fe": 0.0,
     "K": 0.0,
     "Mg": 0.0,
     "Na": 0.0,
-    "Si": 2.3350046729699998e-06,
-    "SiO": 0.0,
-    "SiO2": 4.995338642199999e-06
+    "Si": 2.02393152046e-07,
+    "SiO": 5.87470084644e-12,
+    "SiO2": 4.32985143472e-07
   },
   "fouling_rate": {
     "liner_material": "hot_wall_refractory_liner",
     "dominant_species": "SiO2",
-    "dominant_species_wall_deposit_kg": 4.9953386422e-06,
-    "wall_deposit_kg_per_campaign": 7.33034331517e-06,
+    "dominant_species_wall_deposit_kg": 4.32985143472e-07,
+    "wall_deposit_kg_per_campaign": 6.35384170219e-07,
     "wall_deposit_basis": "total_wall_load_by_species",
     "resinter_threshold_kg": null,
     "resinter_threshold_basis": "fail_closed_no_qualified_positive_deposition",
-    "campaigns_to_resinter": "resinter_threshold_kg / 3.8778524162e-06",
+    "campaigns_to_resinter": "resinter_threshold_kg / 3.1769208511e-07",
     "campaigns_to_resinter_by_segment": {
-      "stage_0_to_stage_1": "resinter_threshold_kg / 3.45249089898e-06",
-      "stage_1_to_stage_2": "resinter_threshold_kg / 3.8778524162e-06"
+      "stage_0_to_stage_1": "resinter_threshold_kg / 3.1769208511e-07",
+      "stage_1_to_stage_2": "resinter_threshold_kg / 3.1769208511e-07"
     },
-    "aggregate_campaigns_to_resinter": "resinter_threshold_kg / 7.33034331517e-06",
+    "aggregate_campaigns_to_resinter": "resinter_threshold_kg / 6.35384170219e-07",
     "fast_fouling_campaign_threshold": 10,
     "output_status": "status_bearing",
     "authoritative": false,
@@ -51,6 +51,7 @@
       "output_status": "status_bearing",
       "deposited_species": [
         "Si",
+        "SiO",
         "SiO2"
       ],
       "uncertified_alpha_species": [
@@ -58,7 +59,555 @@
         "SiO2"
       ],
       "status_bearing_alpha_count": 2,
-      "alpha_s_provenance_by_species": {},
+      "alpha_s_provenance_by_species": {
+        "SiO": {
+          "stage_0_to_stage_1": {
+            "species": "SiO",
+            "alpha_s": 0.06507929431606507,
+            "source": "Wetzel & Gail 2013 A&A 553 A92 Arrhenius compilation alpha_s_SiO(T)=0.52*exp(-3685/T), reaction-rate-limited SiO evaporation coefficient. Cold-wall condensation below the valid_range_K floor uses the cited high-supersaturation condensation limit in cold_wall_condensation, not this evaporation Arrhenius.",
+            "source_class": "cited_hkl_accommodation",
+            "status": "sourced",
+            "output_status": "sourced_with_surface_proxy",
+            "alpha_s_form": "arrhenius",
+            "alpha_s_temperature_K": 1773.15,
+            "alpha_s_A": 0.52,
+            "alpha_s_B": 3685.0,
+            "alpha_s_valid_range_K": [
+              1000.0,
+              1800.0
+            ],
+            "alpha_s_extrapolated": false,
+            "alpha_s_uncertainty_envelope": [
+              0.003,
+              0.067
+            ],
+            "alpha_s_cite": "Wetzel&Gail 2013 DOI 10.1051/0004-6361/201220803",
+            "alpha_s_status": "CITED",
+            "source_url": "https://doi.org/10.1051/0004-6361/201220803",
+            "citation_status": "CITED",
+            "temperature_range_K": [
+              1000,
+              1800
+            ],
+            "envelope": [
+              0.003,
+              0.067
+            ],
+            "uncertainty_flag": "high_T_evaporation_alpha_for_hot_source_only_cold_wall_subfloor_uses_pound_1972_unity_condensation_gate",
+            "value_ref": "data/literature/vacuum_pyrolysis_sticking.yaml::species.SiO.value",
+            "material_source": "data/materials.yaml::liner_materials.fe_condenser_liner.alpha_s_by_species.SiO",
+            "liner_material": "fe_condenser_liner",
+            "segment": "stage_0_to_stage_1",
+            "alpha_s_coefficient_spec": {
+              "form": "arrhenius",
+              "A": 0.52,
+              "B": 3685.0,
+              "valid_range_K": [
+                1000,
+                1800
+              ],
+              "uncertainty_envelope": [
+                0.003,
+                0.067
+              ],
+              "cite": "Wetzel&Gail 2013 DOI 10.1051/0004-6361/201220803",
+              "status": "CITED",
+              "prior_scalar": {
+                "value": 0.04,
+                "source": "REF-018 REF-016 Schaefer & Fegley 2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa & Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check."
+              }
+            }
+          },
+          "stage_1_to_stage_2": {
+            "species": "SiO",
+            "alpha_s": 0.06507929431606507,
+            "source": "Wetzel & Gail 2013 A&A 553 A92 Arrhenius compilation alpha_s_SiO(T)=0.52*exp(-3685/T), reaction-rate-limited SiO evaporation coefficient. Cold-wall condensation below the valid_range_K floor uses the cited high-supersaturation condensation limit in cold_wall_condensation, not this evaporation Arrhenius.",
+            "source_class": "cited_hkl_accommodation",
+            "status": "sourced",
+            "output_status": "sourced_with_surface_proxy",
+            "alpha_s_form": "arrhenius",
+            "alpha_s_temperature_K": 1773.15,
+            "alpha_s_A": 0.52,
+            "alpha_s_B": 3685.0,
+            "alpha_s_valid_range_K": [
+              1000.0,
+              1800.0
+            ],
+            "alpha_s_extrapolated": false,
+            "alpha_s_uncertainty_envelope": [
+              0.003,
+              0.067
+            ],
+            "alpha_s_cite": "Wetzel&Gail 2013 DOI 10.1051/0004-6361/201220803",
+            "alpha_s_status": "CITED",
+            "source_url": "https://doi.org/10.1051/0004-6361/201220803",
+            "citation_status": "CITED",
+            "temperature_range_K": [
+              1000,
+              1800
+            ],
+            "envelope": [
+              0.003,
+              0.067
+            ],
+            "uncertainty_flag": "high_T_evaporation_alpha_for_hot_source_only_cold_wall_subfloor_uses_pound_1972_unity_condensation_gate",
+            "value_ref": "data/literature/vacuum_pyrolysis_sticking.yaml::species.SiO.value",
+            "material_source": "data/materials.yaml::liner_materials.cr_oxide_cartridge_liner.alpha_s_by_species.SiO",
+            "liner_material": "cr_oxide_cartridge_liner",
+            "segment": "stage_1_to_stage_2",
+            "alpha_s_coefficient_spec": {
+              "form": "arrhenius",
+              "A": 0.52,
+              "B": 3685.0,
+              "valid_range_K": [
+                1000,
+                1800
+              ],
+              "uncertainty_envelope": [
+                0.003,
+                0.067
+              ],
+              "cite": "Wetzel&Gail 2013 DOI 10.1051/0004-6361/201220803",
+              "status": "CITED",
+              "prior_scalar": {
+                "value": 0.04,
+                "source": "REF-018 REF-016 Schaefer & Fegley 2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa & Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check."
+              }
+            }
+          },
+          "stage_2_to_stage_3": {
+            "species": "SiO",
+            "alpha_s": 0.0,
+            "source": "data/wall_materials.yaml::materials.fused_silica.stickiness.SiO",
+            "source_class": "fail_closed_no_direct_sticking_coefficient",
+            "status": "UNCERTIFIED",
+            "output_status": "status_bearing",
+            "alpha_s_form": "scalar",
+            "alpha_s_temperature_K": 1773.15,
+            "alpha_s_extrapolated": false,
+            "liner_material": "fused_silica_baffles",
+            "segment": "stage_2_to_stage_3",
+            "basis": "Fused-silica SiO retention has cited chemistry/fouling proxies but no direct differentiated alpha_s; fail closed instead of applying the legacy 0.7.",
+            "citation_status": "UNCERTIFIED",
+            "certification_status_reason": "materials.yaml liner alpha_s override lacks CITED/UNCERTIFIED certification status"
+          },
+          "stage_0": {
+            "species": "SiO",
+            "alpha_s": 0.06507929431606507,
+            "source": "Wetzel & Gail 2013 A&A 553 A92 Arrhenius compilation alpha_s_SiO(T)=0.52*exp(-3685/T), reaction-rate-limited SiO evaporation coefficient. Cold-wall condensation below the valid_range_K floor uses the cited high-supersaturation condensation limit in cold_wall_condensation, not this evaporation Arrhenius.",
+            "source_class": "cited_hkl_accommodation",
+            "status": "sourced",
+            "output_status": "sourced_with_surface_proxy",
+            "alpha_s_form": "arrhenius",
+            "alpha_s_temperature_K": 1773.15,
+            "alpha_s_A": 0.52,
+            "alpha_s_B": 3685.0,
+            "alpha_s_valid_range_K": [
+              1000.0,
+              1800.0
+            ],
+            "alpha_s_extrapolated": false,
+            "alpha_s_uncertainty_envelope": [
+              0.003,
+              0.067
+            ],
+            "alpha_s_cite": "Wetzel&Gail 2013 DOI 10.1051/0004-6361/201220803",
+            "alpha_s_status": "CITED",
+            "source_url": "https://doi.org/10.1051/0004-6361/201220803",
+            "citation_status": "CITED",
+            "temperature_range_K": [
+              1000,
+              1800
+            ],
+            "envelope": [
+              0.003,
+              0.067
+            ],
+            "uncertainty_flag": "high_T_evaporation_alpha_for_hot_source_only_cold_wall_subfloor_uses_pound_1972_unity_condensation_gate",
+            "value_ref": "data/literature/vacuum_pyrolysis_sticking.yaml::species.SiO.value",
+            "material_source": "data/materials.yaml::stages.0.alpha_s_by_species.SiO",
+            "alpha_s_coefficient_spec": {
+              "form": "arrhenius",
+              "A": 0.52,
+              "B": 3685.0,
+              "valid_range_K": [
+                1000,
+                1800
+              ],
+              "uncertainty_envelope": [
+                0.003,
+                0.067
+              ],
+              "cite": "Wetzel&Gail 2013 DOI 10.1051/0004-6361/201220803",
+              "status": "CITED",
+              "prior_scalar": {
+                "value": 0.04,
+                "source": "REF-018 REF-016 Schaefer & Fegley 2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa & Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check."
+              }
+            },
+            "stage_number": 0
+          },
+          "stage_1": {
+            "species": "SiO",
+            "alpha_s": 0.04627030737718148,
+            "source": "Wetzel & Gail 2013 A&A 553 A92 Arrhenius compilation alpha_s_SiO(T)=0.52*exp(-3685/T), reaction-rate-limited SiO evaporation coefficient. Cold-wall condensation below the valid_range_K floor uses the cited high-supersaturation condensation limit in cold_wall_condensation, not this evaporation Arrhenius.",
+            "source_class": "cited_hkl_accommodation",
+            "status": "sourced",
+            "output_status": "sourced_with_surface_proxy",
+            "alpha_s_form": "arrhenius",
+            "alpha_s_temperature_K": 1523.15,
+            "alpha_s_A": 0.52,
+            "alpha_s_B": 3685.0,
+            "alpha_s_valid_range_K": [
+              1000.0,
+              1800.0
+            ],
+            "alpha_s_extrapolated": false,
+            "alpha_s_uncertainty_envelope": [
+              0.003,
+              0.067
+            ],
+            "alpha_s_cite": "Wetzel&Gail 2013 DOI 10.1051/0004-6361/201220803",
+            "alpha_s_status": "CITED",
+            "source_url": "https://doi.org/10.1051/0004-6361/201220803",
+            "citation_status": "CITED",
+            "temperature_range_K": [
+              1000,
+              1800
+            ],
+            "envelope": [
+              0.003,
+              0.067
+            ],
+            "uncertainty_flag": "high_T_evaporation_alpha_for_hot_source_only_cold_wall_subfloor_uses_pound_1972_unity_condensation_gate",
+            "value_ref": "data/literature/vacuum_pyrolysis_sticking.yaml::species.SiO.value",
+            "material_source": "data/materials.yaml::stages.1.alpha_s_by_species.SiO",
+            "alpha_s_coefficient_spec": {
+              "form": "arrhenius",
+              "A": 0.52,
+              "B": 3685.0,
+              "valid_range_K": [
+                1000,
+                1800
+              ],
+              "uncertainty_envelope": [
+                0.003,
+                0.067
+              ],
+              "cite": "Wetzel&Gail 2013 DOI 10.1051/0004-6361/201220803",
+              "status": "CITED",
+              "prior_scalar": {
+                "value": 0.04,
+                "source": "REF-018 REF-016 Schaefer & Fegley 2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa & Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check."
+              }
+            },
+            "stage_number": 1
+          },
+          "stage_3": {
+            "species": "SiO",
+            "alpha_s": 0.03209846522805303,
+            "source": "Wetzel & Gail 2013 A&A 553 A92 Arrhenius compilation alpha_s_SiO(T)=0.52*exp(-3685/T), reaction-rate-limited SiO evaporation coefficient. Cold-wall condensation below the valid_range_K floor uses the cited high-supersaturation condensation limit in cold_wall_condensation, not this evaporation Arrhenius.",
+            "source_class": "cited_hkl_accommodation",
+            "status": "sourced",
+            "output_status": "sourced_with_surface_proxy",
+            "alpha_s_form": "arrhenius",
+            "alpha_s_temperature_K": 1323.15,
+            "alpha_s_A": 0.52,
+            "alpha_s_B": 3685.0,
+            "alpha_s_valid_range_K": [
+              1000.0,
+              1800.0
+            ],
+            "alpha_s_extrapolated": false,
+            "alpha_s_uncertainty_envelope": [
+              0.003,
+              0.067
+            ],
+            "alpha_s_cite": "Wetzel&Gail 2013 DOI 10.1051/0004-6361/201220803",
+            "alpha_s_status": "CITED",
+            "source_url": "https://doi.org/10.1051/0004-6361/201220803",
+            "citation_status": "CITED",
+            "temperature_range_K": [
+              1000,
+              1800
+            ],
+            "envelope": [
+              0.003,
+              0.067
+            ],
+            "uncertainty_flag": "high_T_evaporation_alpha_for_hot_source_only_cold_wall_subfloor_uses_pound_1972_unity_condensation_gate",
+            "value_ref": "data/literature/vacuum_pyrolysis_sticking.yaml::species.SiO.value",
+            "material_source": "data/materials.yaml::stages.3.alpha_s_by_species.SiO",
+            "alpha_s_coefficient_spec": {
+              "form": "arrhenius",
+              "A": 0.52,
+              "B": 3685.0,
+              "valid_range_K": [
+                1000,
+                1800
+              ],
+              "uncertainty_envelope": [
+                0.003,
+                0.067
+              ],
+              "cite": "Wetzel&Gail 2013 DOI 10.1051/0004-6361/201220803",
+              "status": "CITED",
+              "prior_scalar": {
+                "value": 0.04,
+                "source": "REF-018 REF-016 Schaefer & Fegley 2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa & Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check."
+              }
+            },
+            "stage_number": 3
+          },
+          "capture_budget": {
+            "species": "SiO",
+            "alpha_s": 0.03209846522805303,
+            "source": "Wetzel & Gail 2013 A&A 553 A92 Arrhenius compilation alpha_s_SiO(T)=0.52*exp(-3685/T), reaction-rate-limited SiO evaporation coefficient. Cold-wall condensation below the valid_range_K floor uses the cited high-supersaturation condensation limit in cold_wall_condensation, not this evaporation Arrhenius.",
+            "source_class": "cited_hkl_accommodation",
+            "status": "sourced",
+            "output_status": "sourced_with_surface_proxy",
+            "alpha_s_form": "arrhenius",
+            "alpha_s_temperature_K": 1323.15,
+            "alpha_s_A": 0.52,
+            "alpha_s_B": 3685.0,
+            "alpha_s_valid_range_K": [
+              1000.0,
+              1800.0
+            ],
+            "alpha_s_extrapolated": false,
+            "alpha_s_uncertainty_envelope": [
+              0.003,
+              0.067
+            ],
+            "alpha_s_cite": "Wetzel&Gail 2013 DOI 10.1051/0004-6361/201220803",
+            "alpha_s_status": "CITED",
+            "source_url": "https://doi.org/10.1051/0004-6361/201220803",
+            "citation_status": "CITED",
+            "temperature_range_K": [
+              1000,
+              1800
+            ],
+            "envelope": [
+              0.003,
+              0.067
+            ],
+            "uncertainty_flag": "high_T_evaporation_alpha_for_hot_source_only_cold_wall_subfloor_uses_pound_1972_unity_condensation_gate",
+            "value_ref": "data/literature/vacuum_pyrolysis_sticking.yaml::species.SiO.value",
+            "material_source": "data/literature/vacuum_pyrolysis_sticking.yaml::species.SiO",
+            "alpha_s_coefficient_spec": {
+              "form": "arrhenius",
+              "A": 0.52,
+              "B": 3685.0,
+              "valid_range_K": [
+                1000,
+                1800
+              ],
+              "uncertainty_envelope": [
+                0.003,
+                0.067
+              ],
+              "cite": "Wetzel&Gail 2013 DOI 10.1051/0004-6361/201220803",
+              "status": "CITED",
+              "prior_scalar": {
+                "value": 0.04,
+                "source": "REF-018 REF-016 Schaefer & Fegley 2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa & Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check."
+              }
+            },
+            "alpha_s_stage_evaluations": {
+              "0": {
+                "species": "SiO",
+                "alpha_s": 0.06507929431606507,
+                "alpha_s_form": "arrhenius",
+                "alpha_s_temperature_K": 1773.15,
+                "alpha_s_A": 0.52,
+                "alpha_s_B": 3685.0,
+                "alpha_s_valid_range_K": [
+                  1000.0,
+                  1800.0
+                ],
+                "alpha_s_extrapolated": false,
+                "alpha_s_uncertainty_envelope": [
+                  0.003,
+                  0.067
+                ],
+                "alpha_s_cite": "Wetzel&Gail 2013 DOI 10.1051/0004-6361/201220803",
+                "alpha_s_status": "CITED"
+              },
+              "1": {
+                "species": "SiO",
+                "alpha_s": 0.04627030737718148,
+                "alpha_s_form": "arrhenius",
+                "alpha_s_temperature_K": 1523.15,
+                "alpha_s_A": 0.52,
+                "alpha_s_B": 3685.0,
+                "alpha_s_valid_range_K": [
+                  1000.0,
+                  1800.0
+                ],
+                "alpha_s_extrapolated": false,
+                "alpha_s_uncertainty_envelope": [
+                  0.003,
+                  0.067
+                ],
+                "alpha_s_cite": "Wetzel&Gail 2013 DOI 10.1051/0004-6361/201220803",
+                "alpha_s_status": "CITED"
+              },
+              "3": {
+                "species": "SiO",
+                "alpha_s": 0.03209846522805303,
+                "alpha_s_form": "arrhenius",
+                "alpha_s_temperature_K": 1323.15,
+                "alpha_s_A": 0.52,
+                "alpha_s_B": 3685.0,
+                "alpha_s_valid_range_K": [
+                  1000.0,
+                  1800.0
+                ],
+                "alpha_s_extrapolated": false,
+                "alpha_s_uncertainty_envelope": [
+                  0.003,
+                  0.067
+                ],
+                "alpha_s_cite": "Wetzel&Gail 2013 DOI 10.1051/0004-6361/201220803",
+                "alpha_s_status": "CITED"
+              },
+              "4": {
+                "species": "SiO",
+                "alpha_s": 1.0,
+                "alpha_s_form": "cold_wall_condensation",
+                "alpha_s_temperature_K": 798.15,
+                "alpha_s_A": 0.52,
+                "alpha_s_B": 3685.0,
+                "alpha_s_valid_range_K": [
+                  1000.0,
+                  1800.0
+                ],
+                "alpha_s_extrapolated": true,
+                "alpha_s_uncertainty_envelope": [
+                  0.003,
+                  0.067
+                ],
+                "alpha_s_cite": "Wetzel&Gail 2013 DOI 10.1051/0004-6361/201220803",
+                "alpha_s_status": "CITED",
+                "alpha_s_raw_arrhenius": 0.005139224377254836,
+                "alpha_s_temperature_below_valid_range": true,
+                "alpha_s_condensation_regime": "cold_wall_high_supersaturation",
+                "alpha_s_cold_wall_condensation": true,
+                "alpha_s_cold_wall_validity_floor_K": 1000.0,
+                "alpha_s_cold_wall_source": "REF-040 Pound 1972 JPCRD 1:135 DOI 10.1063/1.3253096: high-supersaturation condensation coefficient for growth -> unity; evaporation alpha_e != condensation alpha_c off-equilibrium.",
+                "alpha_s_cold_wall_source_url": "https://doi.org/10.1063/1.3253096",
+                "alpha_s_cold_wall_source_class": "cited_high_supersaturation_condensation_limit",
+                "alpha_s_cold_wall_uncertainty_envelope": [
+                  0.016,
+                  1.0
+                ],
+                "alpha_s_cold_wall_uncertainty_flag": "no_direct_cold_wall_SiO_measurement; rarely active - SiO does not evolve from melt below ~1000C, guard for cold-spot faults + initial-fouled-wall Story-2",
+                "alpha_s_cold_wall_status": "CITED"
+              },
+              "5": {
+                "species": "SiO",
+                "alpha_s": 1.0,
+                "alpha_s_form": "cold_wall_condensation",
+                "alpha_s_temperature_K": 548.15,
+                "alpha_s_A": 0.52,
+                "alpha_s_B": 3685.0,
+                "alpha_s_valid_range_K": [
+                  1000.0,
+                  1800.0
+                ],
+                "alpha_s_extrapolated": true,
+                "alpha_s_uncertainty_envelope": [
+                  0.003,
+                  0.067
+                ],
+                "alpha_s_cite": "Wetzel&Gail 2013 DOI 10.1051/0004-6361/201220803",
+                "alpha_s_status": "CITED",
+                "alpha_s_raw_arrhenius": 0.0006257629760864247,
+                "alpha_s_temperature_below_valid_range": true,
+                "alpha_s_condensation_regime": "cold_wall_high_supersaturation",
+                "alpha_s_cold_wall_condensation": true,
+                "alpha_s_cold_wall_validity_floor_K": 1000.0,
+                "alpha_s_cold_wall_source": "REF-040 Pound 1972 JPCRD 1:135 DOI 10.1063/1.3253096: high-supersaturation condensation coefficient for growth -> unity; evaporation alpha_e != condensation alpha_c off-equilibrium.",
+                "alpha_s_cold_wall_source_url": "https://doi.org/10.1063/1.3253096",
+                "alpha_s_cold_wall_source_class": "cited_high_supersaturation_condensation_limit",
+                "alpha_s_cold_wall_uncertainty_envelope": [
+                  0.016,
+                  1.0
+                ],
+                "alpha_s_cold_wall_uncertainty_flag": "no_direct_cold_wall_SiO_measurement; rarely active - SiO does not evolve from melt below ~1000C, guard for cold-spot faults + initial-fouled-wall Story-2",
+                "alpha_s_cold_wall_status": "CITED"
+              },
+              "6": {
+                "species": "SiO",
+                "alpha_s": 1.0,
+                "alpha_s_form": "cold_wall_condensation",
+                "alpha_s_temperature_K": 398.15,
+                "alpha_s_A": 0.52,
+                "alpha_s_B": 3685.0,
+                "alpha_s_valid_range_K": [
+                  1000.0,
+                  1800.0
+                ],
+                "alpha_s_extrapolated": true,
+                "alpha_s_uncertainty_envelope": [
+                  0.003,
+                  0.067
+                ],
+                "alpha_s_cite": "Wetzel&Gail 2013 DOI 10.1051/0004-6361/201220803",
+                "alpha_s_status": "CITED",
+                "alpha_s_raw_arrhenius": 4.9713588255741275e-05,
+                "alpha_s_temperature_below_valid_range": true,
+                "alpha_s_condensation_regime": "cold_wall_high_supersaturation",
+                "alpha_s_cold_wall_condensation": true,
+                "alpha_s_cold_wall_validity_floor_K": 1000.0,
+                "alpha_s_cold_wall_source": "REF-040 Pound 1972 JPCRD 1:135 DOI 10.1063/1.3253096: high-supersaturation condensation coefficient for growth -> unity; evaporation alpha_e != condensation alpha_c off-equilibrium.",
+                "alpha_s_cold_wall_source_url": "https://doi.org/10.1063/1.3253096",
+                "alpha_s_cold_wall_source_class": "cited_high_supersaturation_condensation_limit",
+                "alpha_s_cold_wall_uncertainty_envelope": [
+                  0.016,
+                  1.0
+                ],
+                "alpha_s_cold_wall_uncertainty_flag": "no_direct_cold_wall_SiO_measurement; rarely active - SiO does not evolve from melt below ~1000C, guard for cold-spot faults + initial-fouled-wall Story-2",
+                "alpha_s_cold_wall_status": "CITED"
+              },
+              "7": {
+                "species": "SiO",
+                "alpha_s": 1.0,
+                "alpha_s_form": "cold_wall_condensation",
+                "alpha_s_temperature_K": 308.15,
+                "alpha_s_A": 0.52,
+                "alpha_s_B": 3685.0,
+                "alpha_s_valid_range_K": [
+                  1000.0,
+                  1800.0
+                ],
+                "alpha_s_extrapolated": true,
+                "alpha_s_uncertainty_envelope": [
+                  0.003,
+                  0.067
+                ],
+                "alpha_s_cite": "Wetzel&Gail 2013 DOI 10.1051/0004-6361/201220803",
+                "alpha_s_status": "CITED",
+                "alpha_s_raw_arrhenius": 3.330499532385497e-06,
+                "alpha_s_temperature_below_valid_range": true,
+                "alpha_s_condensation_regime": "cold_wall_high_supersaturation",
+                "alpha_s_cold_wall_condensation": true,
+                "alpha_s_cold_wall_validity_floor_K": 1000.0,
+                "alpha_s_cold_wall_source": "REF-040 Pound 1972 JPCRD 1:135 DOI 10.1063/1.3253096: high-supersaturation condensation coefficient for growth -> unity; evaporation alpha_e != condensation alpha_c off-equilibrium.",
+                "alpha_s_cold_wall_source_url": "https://doi.org/10.1063/1.3253096",
+                "alpha_s_cold_wall_source_class": "cited_high_supersaturation_condensation_limit",
+                "alpha_s_cold_wall_uncertainty_envelope": [
+                  0.016,
+                  1.0
+                ],
+                "alpha_s_cold_wall_uncertainty_flag": "no_direct_cold_wall_SiO_measurement; rarely active - SiO does not evolve from melt below ~1000C, guard for cold-spot faults + initial-fouled-wall Story-2",
+                "alpha_s_cold_wall_status": "CITED"
+              }
+            },
+            "alpha_s_stage_extrapolated": true
+          }
+        }
+      },
       "grounding_target": "data/literature/vacuum_pyrolysis_sticking.yaml",
       "message": "Wall-deposit sticking alpha authority missing; provenance is missing, so coating and fouling readouts are non-authoritative until the coefficient status travels with the deposit.",
       "surface_geometry_provenance": {
@@ -135,7 +684,7 @@
     "nominal_verdict": "threshold-parametric: fast-fouling if campaigns_to_resinter < 10, else slow-fouling",
     "verdict": "non-authoritative"
   },
-  "sio_yield_pct_of_feedstock": 7.65772411303e-07,
+  "sio_yield_pct_of_feedstock": 1.32752006974e-07,
   "industrial_benchmark_pct": [
     8,
     15

@@ -136,7 +136,7 @@ def test_overhead_temperature_bounds_are_hot_wall_grounded() -> None:
     )
     assert offset_spec.low == OVERHEAD_HEADSPACE_OFFSET_MIN_K
     assert offset_spec.high == OVERHEAD_HEADSPACE_OFFSET_MAX_K
-    assert "C2A_continuous peak SiO window" in offset_spec.bounds_source
+    assert "C2A_continuous melt ceiling 1843 C" in offset_spec.bounds_source
 
     default_train = CondensationTrain.create_default()
     stage_ranges = {
