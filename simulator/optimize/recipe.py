@@ -39,7 +39,16 @@ _RECIPE_ENVELOPE_KEYS = frozenset({"metadata", "cost_parameters"})
 # (W:S7/W:S8) plus magnesia 1600-1800 C (W:S6).
 OVERHEAD_HOT_WALL_MIN_C = 1400.0
 OVERHEAD_HOT_WALL_MAX_C = 1750.0
-OVERHEAD_HEADSPACE_OFFSET_MIN_K = -200.0
+# Offset window derivation: the offset knob is liner-relative-to-melt (K).
+# Requirement: at the C2A melt ceiling the liner must still be able to sit
+# at the hot-wall floor. C2A_continuous.temp_range_C max is 1843 C
+# (dense-alumina ceiling, recipe-family closure 22e604f; was 1600 C), so
+# offset_min = HOT_WALL_MIN - melt_max = 1400 - 1843 = -443 K. Units: a C
+# difference equals a K difference. Sanity: melt 1843 C + offset -443 K ->
+# liner 1400 C (the floor); the old 1600 C ceiling with -200 K gave the
+# same floor. offset_max = 0 (gas never hotter than melt without an
+# explicit wall-heat model).
+OVERHEAD_HEADSPACE_OFFSET_MIN_K = -443.0
 OVERHEAD_HEADSPACE_OFFSET_MAX_K = 0.0
 OVERHEAD_HOT_WALL_BOUNDS_SOURCE = (
     "hot_wall_invariant: docs/concepts.md Hot walls section; "
@@ -48,9 +57,10 @@ OVERHEAD_HOT_WALL_BOUNDS_SOURCE = (
     "data/wall_materials.yaml doloma W:S7/W:S8 direct service 1700 C"
 )
 OVERHEAD_HEADSPACE_OFFSET_BOUNDS_SOURCE = (
-    "hot_wall_invariant: C2A_continuous peak SiO window 1600 C minus "
-    "Stage 0 hot-wall floor 1400 C => offset >= -200 K; gas not hotter "
-    "than melt without an explicit wall-heat model"
+    "hot_wall_invariant: C2A_continuous melt ceiling 1843 C (dense-alumina "
+    "furnace ceiling, data/wall_materials.yaml) minus Stage 0 hot-wall "
+    "floor 1400 C => offset >= -443 K; gas not hotter than melt without an "
+    "explicit wall-heat model"
 )
 DOWNSTREAM_CONDENSATION_STAGE_PAIRS: tuple[tuple[str, int, int], ...] = (
     ("stage_4_to_stage_5", 4, 5),

@@ -610,7 +610,10 @@ def canonical_evalspec_json(spec: EvalSpec) -> bytes:
         "campaign": spec.campaign,
         "chemistry_kernel": _chemistry_kernel_key_payload(spec.chemistry_kernel),
         "corpus_version": spec.data_digests.get("corpus_version", ""),
-        "cost_parameters": cost_parameter_values(spec.cost_parameters),
+        # _cost_parameters_key_payload (not raw cost_parameter_values): the
+        # identity-transparency contract — owner-ratified default cost
+        # controls serialize away so defaults share one cache identity.
+        "cost_parameters": _cost_parameters_key_payload(spec.cost_parameters),
         "data_digests": optimizer_data_digests,
         "feedstock_id": spec.feedstock_id,
         "fidelity": spec.fidelity,
