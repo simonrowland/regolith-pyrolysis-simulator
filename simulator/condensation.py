@@ -3983,9 +3983,25 @@ def _antoine_psat_pa(
         vapor_pressure_data=vapor_pressure_data,
     )
     from engines.builtin.vapor_pressure import (
+        reconstructed_vapor_pressure_authority_limit,
         require_antoine_source_certified_temperature,
         wall_condensation_antoine_coefficients,
     )
+
+    reconstructed_limit = reconstructed_vapor_pressure_authority_limit(
+        species,
+        data,
+        T_K,
+        consumer="wall_condensation",
+    )
+    if reconstructed_limit is not None:
+        authority_limits, _ = _resolve_antoine_telemetry(
+            antoine_extrapolations,
+            antoine_extrapolation_warnings,
+        )
+        if authority_limits is not None:
+            authority_limits[species] = dict(reconstructed_limit)
+        return float(reconstructed_limit["pressure_Pa"])
 
     antoine, coefficient_block = wall_condensation_antoine_coefficients(
         data,

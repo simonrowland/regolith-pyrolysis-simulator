@@ -396,9 +396,68 @@ def test_runtime_loader_refuses_over_cap_stored_thermal_window_profile() -> None
 
     with pytest.raises(
         ProfileValidationError,
-        match=r"thermal_window_campaign_max_hold refusal.*FORCE_PROFILES=1",
+        match=r"thermal_window_campaign_max_hold_hr refusal.*FORCE_PROFILES=1",
     ):
         validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
+
+
+def test_default_c2a_profile_still_refuses_over_campaign_cap() -> None:
+    profile = _profile_copy("lunar_mare_low_ti")
+    profile["run"].update({"campaign": "C2A_continuous", "hours": 29})
+    profile["fidelities"] = {"stub": {"backend_name": "stub"}}
+    profile["seed_recipes"] = [
+        {
+            "id": "default-c2a-window",
+            "source_campaign": "C2A_continuous",
+            "patch": {
+                "campaigns": {
+                    "C2A_continuous": {
+                        "temp_range_C": [1050.0, 1600.0],
+                        "duration_h": 29,
+                    }
+                }
+            },
+        }
+    ]
+
+    with pytest.raises(
+        ProfileValidationError,
+        match=(
+            r"thermal_window_campaign_max_hold_hr refusal.*"
+            r"requested 31 h.*campaign_max_hold_hr 30 h"
+        ),
+    ):
+        validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
+
+
+def test_canonical_c2a_profile_accepts_148_hours_under_recipe_local_cap() -> None:
+    profile = _profile_copy("lunar_mare_low_ti")
+    profile["run"].update({"campaign": "C2A_continuous", "hours": 24})
+    profile["fidelities"] = {"stub": {"backend_name": "stub"}}
+
+    validated = validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
+
+    canonical = next(
+        seed
+        for seed in validated["seed_recipes"]
+        if seed["id"] == "canonical-lunar-full-yield"
+    )
+    assert canonical["patch"]["campaigns"]["C2A_continuous"]["max_hold_hr"] == 160
+
+    below_schedule = copy.deepcopy(profile)
+    below_schedule_canonical = next(
+        seed
+        for seed in below_schedule["seed_recipes"]
+        if seed["id"] == "canonical-lunar-full-yield"
+    )
+    below_schedule_canonical["patch"]["campaigns"]["C2A_continuous"][
+        "max_hold_hr"
+    ] = 147
+    with pytest.raises(
+        ProfileValidationError,
+        match=r"thermal_window_recipe_local_max_hold_hr refusal.*requested 148 h",
+    ):
+        validate_profile(below_schedule, expected_feedstock="lunar_mare_low_ti")
 
 
 def test_unknown_constraint_key_raises_named_error() -> None:

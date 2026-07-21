@@ -9,6 +9,7 @@ import simulator.reduced_real_determinism as reduced_real_determinism
 
 from engines.builtin.metallothermic_step import _time_integrated_inventory_fraction
 from engines.builtin.overhead_bleed import BuiltinOverheadBleedProvider
+from engines.builtin.vapor_pressure import VaporPressureRangeError
 from simulator.accounting.queries import AccountingQueries
 from simulator.accounting.exceptions import AccountingError
 from simulator.accounting.ledger_api import LedgerAPI
@@ -29,7 +30,6 @@ from simulator.core import (
     RefusalStateSnapshotError,
     _deepcopy_refusal_state,
 )
-from simulator.chemistry.kernel import ProviderUnavailableError
 from simulator.equilibrium import EquilibriumMixin
 from simulator.evaporation import EvaporationFluxRefusal, EvaporationMixin
 from simulator.extraction import ExtractionMixin
@@ -62,7 +62,17 @@ def test_authority_opt_ins_reject_truthy_strings() -> None:
             normalize_chemistry_kernel_config({key: "false"})
 
 
-def test_evaporation_typed_refusal_rolls_back_entire_hour() -> None:
+@pytest.mark.parametrize(
+    "refusal",
+    (
+        EvaporationFluxRefusal("missing_alpha", {"missing_alpha": ["CrO2"]}),
+        VaporPressureRangeError(
+            "metal_vapor_pressure_out_of_source_certified_range: species=Mg"
+        ),
+    ),
+    ids=("evaporation-flux", "vapor-pressure-range"),
+)
+def test_typed_refusal_rolls_back_entire_hour(refusal: Exception) -> None:
     class SlottedScheduleHolder:
         __slots__ = ("schedule",)
 
@@ -121,13 +131,13 @@ def test_evaporation_typed_refusal_rolls_back_entire_hour() -> None:
         sim.runtime_state["slotted_holder"].schedule["points"][0][
             "temperature_C"
         ] = 675.0
-        raise EvaporationFluxRefusal("missing_alpha", {"missing_alpha": ["CrO2"]})
+        raise refusal
 
     sim._step_one_hour = refuse_after_commit
-    with pytest.raises(ProviderUnavailableError) as refusal:
+    with pytest.raises(type(refusal)) as raised:
         sim.step()
     assert sim._poisoned_hour is None
-    assert isinstance(refusal.value, EvaporationFluxRefusal)
+    assert raised.value is refusal
     assert sim.atom_ledger.transitions == []
     assert sim.melt.hour == 4
     assert sim.overhead.pressure_mbar == pytest.approx(2.0)

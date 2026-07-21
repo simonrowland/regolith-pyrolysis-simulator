@@ -2403,6 +2403,45 @@ def test_c2a_profile_window_schedules_measured_temperature_window() -> None:
     assert temperatures[-1] == pytest.approx(1600.0)
 
 
+def test_c2a_window_schedules_148_hours_under_recipe_local_cap() -> None:
+    profile = _c2a_window_profile(1050.0, 1600.0, 146)
+    profile["seed_recipes"][0]["patch"]["campaigns"]["C2A_continuous"][
+        "max_hold_hr"
+    ] = 160
+
+    spec, run_config = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "internal-analytical",
+        profile,
+        RecipeSchema(),
+    )
+
+    assert spec.hours == 148
+    assert run_config.hours == 148
+    assert run_config.runtime_campaign_overrides["C2A_continuous"][
+        "max_hours"
+    ] == pytest.approx(148.0)
+
+
+def test_evaluate_names_recipe_local_bound_when_it_refuses_window() -> None:
+    profile = _c2a_window_profile(1050.0, 1600.0, 29)
+    profile["seed_recipes"][0]["patch"]["campaigns"]["C2A_continuous"][
+        "max_hold_hr"
+    ] = 30
+
+    with pytest.raises(
+        EvaluationInputError,
+        match=r"thermal_window_recipe_local_max_hold_hr refusal.*31 h",
+    ):
+        evaluate_module._profile_thermal_window_schedule(
+            profile["run"],
+            profile=profile,
+            constraints=None,
+            setpoints=load_config_bundle(evaluate_module.DEFAULT_DATA_DIR).setpoints,
+        )
+
+
 def test_c2b_profile_window_schedules_measured_temperature_window() -> None:
     spec, run_config = _build_eval_inputs(
         RecipePatch({}),
@@ -2600,7 +2639,10 @@ def test_c2a_profile_window_above_furnace_ceiling_fails_loud() -> None:
         )
     )
 
-    with pytest.raises(EvaluationInputError, match="exceeds furnace_T_max_C"):
+    with pytest.raises(
+        EvaluationInputError,
+        match="exceeds profile_default_furnace_max_T_C",
+    ):
         _build_eval_inputs(
             RecipePatch({}),
             "lunar_mare_low_ti",
@@ -2623,7 +2665,10 @@ def test_c2a_profile_window_uses_setpoints_furnace_ceiling_when_constraint_unset
         lambda *args, **kwargs: replace(bundle, setpoints=setpoints),
     )
 
-    with pytest.raises(EvaluationInputError, match="furnace_T_max_C 1400 C"):
+    with pytest.raises(
+        EvaluationInputError,
+        match="profile_default_furnace_max_T_C 1400 C",
+    ):
         evaluate_module._build_eval_inputs(
             RecipePatch({}),
             "lunar_mare_low_ti",
@@ -2653,13 +2698,111 @@ def test_lab_schedule_uses_setpoints_furnace_ceiling_when_constraint_unset(
 
     with pytest.raises(
         EvaluationInputError,
-        match="lab_schedule_temperature_exceeds_furnace_T_max_C",
+        match="lab_schedule_temperature_exceeds_profile_default_furnace_max_T_C",
     ):
         evaluate_module._build_eval_inputs(
             RecipePatch({}),
             "lunar_mare_low_ti",
             "internal-analytical",
             _lab_schedule_profile(schedule),
+            RecipeSchema(),
+        )
+
+
+def test_default_profile_without_local_furnace_field_refuses_1843_c() -> None:
+    with pytest.raises(
+        EvaluationInputError,
+        match=(
+            r"1843 C exceeds profile_default_furnace_max_T_C 1800 C"
+        ),
+    ):
+        _build_eval_inputs(
+            RecipePatch({}),
+            "lunar_mare_low_ti",
+            "internal-analytical",
+            _c2a_window_profile(1050.0, 1843.0, 18),
+            RecipeSchema(),
+        )
+
+
+def test_canonical_seed_local_furnace_field_admits_1843_c() -> None:
+    profile = _c2a_window_profile(1050.0, 1843.0, 18)
+    profile["seed_recipes"][0]["patch"]["furnace_max_T_C"] = 1843.0
+
+    spec, run_config = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "internal-analytical",
+        profile,
+        RecipeSchema(),
+    )
+    constraints = evaluate_module._composition_target_constraints(
+        profile,
+        None,
+        recipe_patch=RecipePatch({}),
+        campaign="C2A_continuous",
+    )
+
+    assert spec.runtime_campaign_overrides["C2A_continuous"][
+        "thermal_window_high_C"
+    ] == pytest.approx(1843.0)
+    assert run_config.runtime_campaign_overrides["C2A_continuous"][
+        "thermal_window_high_C"
+    ] == pytest.approx(1843.0)
+    assert constraints is not None
+    assert constraints.furnace_T_max_C.value == pytest.approx(1843.0)
+    assert constraints.furnace_T_max_C.id == "recipe_local_furnace_max_T_C"
+    assert constraints.furnace_T_max_C.source == "profile"
+    assert "recipe_local_furnace_max_T_C" in constraints.furnace_T_max_C.source_ref
+
+
+def test_recipe_local_1820_c_furnace_field_refuses_1843_c_ramp() -> None:
+    profile = _c2a_window_profile(1050.0, 1843.0, 18)
+    profile["seed_recipes"][0]["patch"]["furnace_max_T_C"] = 1820.0
+
+    with pytest.raises(
+        EvaluationInputError,
+        match=r"1843 C exceeds recipe_local_furnace_max_T_C 1820 C",
+    ):
+        _build_eval_inputs(
+            RecipePatch({}),
+            "lunar_mare_low_ti",
+            "internal-analytical",
+            profile,
+            RecipeSchema(),
+        )
+
+
+def test_recipe_patch_furnace_field_precedes_profile_default() -> None:
+    spec, _ = _build_eval_inputs(
+        RecipePatch({FURNACE_MAX_T_C_PATH: 1843.0}),
+        "lunar_mare_low_ti",
+        "internal-analytical",
+        _c2a_window_profile(1050.0, 1843.0, 18),
+        RecipeSchema(),
+    )
+
+    assert spec.runtime_campaign_overrides["C2A_continuous"][
+        "thermal_window_high_C"
+    ] == pytest.approx(1843.0)
+
+
+@pytest.mark.parametrize("local_ceiling_C", (0.0, -1.0, math.nan, math.inf))
+def test_invalid_recipe_local_furnace_field_is_rejected(
+    local_ceiling_C: float,
+) -> None:
+    profile = _c2a_window_profile(1050.0, 1600.0, 18)
+    profile["seed_recipes"][0]["patch"]["furnace_max_T_C"] = local_ceiling_C
+
+    with pytest.raises(
+        ProfileValidationError,
+        match=r"furnace_max_T_C|NaN or infinite",
+    ):
+        _build_eval_inputs(
+            RecipePatch({}),
+            "lunar_mare_low_ti",
+            "internal-analytical",
+            profile,
             RecipeSchema(),
         )
 

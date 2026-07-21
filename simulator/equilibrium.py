@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import math
+from collections.abc import Mapping
+from typing import Any
 
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_METAL_PHASE_GAS,
@@ -235,6 +237,8 @@ class EquilibriumMixin:
             COEFF_BLOCK_ANTOINE,
             FIT_TARGET_PSEUDO_VAPOROCK,
             FIT_TARGET_STANDARD_REACTION,
+            GAS_RAIL_STANDARD_REACTION_KEY,
+            RECONSTRUCTED_VAPOR_PRESSURE_SEGMENT_KEY,
             _gas_rail_standard_reaction_block,
             _is_noncertifying_pseudo_vapor_pressure_runtime,
             _liquid_oxide_standard_reaction_block,
@@ -245,6 +249,7 @@ class EquilibriumMixin:
             _standard_reaction_pressure_Pa,
             reject_noncertifying_vapor_pressure_row,
             require_antoine_source_certified_temperature,
+            vapor_pressure_authority_diagnostic,
             vapor_pressure_source_label,
             vapor_pressure_antoine_coefficients,
             vapor_pressure_valid_range_K,
@@ -269,6 +274,7 @@ class EquilibriumMixin:
         activities = {}
         metal_extrapolations = {}
         ellingham_extrapolations = {}
+        vapor_pressure_authority_limits = {}
         warnings = []
         pseudo_warning_seen = getattr(
             self,
@@ -389,9 +395,11 @@ class EquilibriumMixin:
                 fit_target != FIT_TARGET_STANDARD_REACTION
                 and metal_phase_kind == ELLINGHAM_METAL_PHASE_GAS
             )
+            gas_rail_rxn_early = _gas_rail_standard_reaction_block(sp_data)
             liquid_rxn_early = _liquid_oxide_standard_reaction_block(sp_data)
             coefficient_block: str | None = None
             P_reference_Pa: float | None = None
+            reconstructed_vapor_limit: dict[str, Any] | None = None
             if not gas_standard_rail and liquid_rxn_early is None:
                 antoine, coefficient_block = vapor_pressure_antoine_coefficients(
                     sp_data,
@@ -422,6 +430,31 @@ class EquilibriumMixin:
                 C = antoine.get('C', 0)
                 if not (A > 0 and T_K > 300):
                     continue
+                reconstructed_segment = sp_data.get(
+                    RECONSTRUCTED_VAPOR_PRESSURE_SEGMENT_KEY
+                )
+                reconstructed_bounds = (
+                    _range_tuple(reconstructed_segment.get("range_K"))
+                    if isinstance(reconstructed_segment, Mapping)
+                    else None
+                )
+                if (
+                    reconstructed_bounds is not None
+                    and T_K >= reconstructed_bounds[0]
+                ):
+                    reconstructed_vapor_limit = (
+                        require_antoine_source_certified_temperature(
+                            species,
+                            sp_data,
+                            coefficient_block,
+                            T_K,
+                            consumer="legacy_condensed_rail",
+                        )
+                    )
+                    if reconstructed_vapor_limit is not None:
+                        vapor_pressure_authority_limits[species] = (
+                            reconstructed_vapor_limit
+                        )
                 certified_range = (
                     antoine.get("source_certified_range_K")
                     or sp_data.get("source_certified_range_K")
@@ -442,37 +475,42 @@ class EquilibriumMixin:
                         f"{float(certified_range[1]):g}]"
                     )
                     continue
-                require_antoine_source_certified_temperature(
-                    species,
-                    sp_data,
-                    coefficient_block,
-                    T_K,
-                    consumer="legacy_condensed_rail",
-                )
-                valid_range = vapor_pressure_valid_range_K(
-                    sp_data,
-                    coefficient_block,
-                    temperature_K=T_K,
-                )
-                if valid_range and len(valid_range) == 2:
-                    valid_low = float(valid_range[0])
-                    valid_high = float(valid_range[1])
-                    if T_K < valid_low or T_K > valid_high:
-                        metal_extrapolations[species] = {
-                            'temperature_K': T_K,
-                            'valid_range_K': (valid_low, valid_high),
-                        }
-                        warnings.append(
-                            f"{species} metal Antoine fit extrapolated beyond "
-                            f"valid_range_K [{valid_low:g}, {valid_high:g}] at "
-                            f"{T_K:.3f} K"
-                        )
-                log_P = A - B / (T_K + C)
-                P_reference_Pa = _pow10_pressure_or_raise(
-                    log_P,
-                    species=species,
-                    field="P_reference_Pa",
-                )
+                if reconstructed_vapor_limit is None:
+                    require_antoine_source_certified_temperature(
+                        species,
+                        sp_data,
+                        coefficient_block,
+                        T_K,
+                        consumer="legacy_condensed_rail",
+                    )
+                    valid_range = vapor_pressure_valid_range_K(
+                        sp_data,
+                        coefficient_block,
+                        temperature_K=T_K,
+                    )
+                    if valid_range and len(valid_range) == 2:
+                        valid_low = float(valid_range[0])
+                        valid_high = float(valid_range[1])
+                        if T_K < valid_low or T_K > valid_high:
+                            metal_extrapolations[species] = {
+                                'temperature_K': T_K,
+                                'valid_range_K': (valid_low, valid_high),
+                            }
+                            warnings.append(
+                                f"{species} metal Antoine fit extrapolated beyond "
+                                f"valid_range_K [{valid_low:g}, {valid_high:g}] at "
+                                f"{T_K:.3f} K"
+                            )
+                    log_P = A - B / (T_K + C)
+                    P_reference_Pa = _pow10_pressure_or_raise(
+                        log_P,
+                        species=species,
+                        field="P_reference_Pa",
+                    )
+                else:
+                    P_reference_Pa = float(
+                        reconstructed_vapor_limit["pressure_Pa"]
+                    )
             if fit_target == FIT_TARGET_STANDARD_REACTION:
                 assert P_reference_Pa is not None
                 oxide_activity = melt_oxide_activity(
@@ -600,7 +638,7 @@ class EquilibriumMixin:
                 continue
 
             # Ca/Mg gas rail: liquid-oxide standard reaction (pairing fix).
-            gas_rail_rxn = _gas_rail_standard_reaction_block(sp_data)
+            gas_rail_rxn = gas_rail_rxn_early
             if gas_standard_rail and gas_rail_rxn is not None:
                 antoine_gas = gas_rail_rxn.get("antoine", {}) or {}
                 A_g = float(antoine_gas.get("A", 0.0) or 0.0)
@@ -608,26 +646,6 @@ class EquilibriumMixin:
                 C_g = float(antoine_gas.get("C", 0.0) or 0.0)
                 if not (A_g > 0.0 and T_K > 300.0):
                     continue
-                valid_gas = _range_tuple(gas_rail_rxn.get("valid_range_K"))
-                if valid_gas is not None:
-                    vlo, vhi = valid_gas
-                    if T_K < vlo or T_K > vhi:
-                        metal_extrapolations[species] = {
-                            "temperature_K": T_K,
-                            "valid_range_K": (vlo, vhi),
-                            "rail": "gas_rail_standard_reaction",
-                        }
-                        warnings.append(
-                            f"{species} gas-rail liquid-oxide standard reaction "
-                            f"extrapolated beyond valid_range_K "
-                            f"[{vlo:g}, {vhi:g}] at {T_K:.3f} K"
-                        )
-                log_P_gas = A_g - B_g / (T_K + C_g)
-                P_reference_Pa = _pow10_pressure_or_raise(
-                    log_P_gas,
-                    species=species,
-                    field="P_reference_gas_rail_standard_reaction_Pa",
-                )
                 oxide_activity = melt_oxide_activity(
                     parent_oxide,
                     melt_account_mol,
@@ -635,6 +653,48 @@ class EquilibriumMixin:
                 if oxide_activity is None or oxide_activity.activity <= 1e-10:
                     continue
                 activities[species] = oxide_activity.activity
+                if isinstance(
+                    sp_data.get(RECONSTRUCTED_VAPOR_PRESSURE_SEGMENT_KEY),
+                    Mapping,
+                ):
+                    reconstructed_vapor_limit = (
+                        require_antoine_source_certified_temperature(
+                            species,
+                            sp_data,
+                            GAS_RAIL_STANDARD_REACTION_KEY,
+                            T_K,
+                            consumer="legacy_gas_rail",
+                        )
+                    )
+                    if reconstructed_vapor_limit is not None:
+                        vapor_pressure_authority_limits[species] = (
+                            reconstructed_vapor_limit
+                        )
+                if reconstructed_vapor_limit is None:
+                    valid_gas = _range_tuple(gas_rail_rxn.get("valid_range_K"))
+                    if valid_gas is not None:
+                        vlo, vhi = valid_gas
+                        if T_K < vlo or T_K > vhi:
+                            metal_extrapolations[species] = {
+                                "temperature_K": T_K,
+                                "valid_range_K": (vlo, vhi),
+                                "rail": "gas_rail_standard_reaction",
+                            }
+                            warnings.append(
+                                f"{species} gas-rail liquid-oxide standard reaction "
+                                f"extrapolated beyond valid_range_K "
+                                f"[{vlo:g}, {vhi:g}] at {T_K:.3f} K"
+                            )
+                    log_P_gas = A_g - B_g / (T_K + C_g)
+                    P_reference_Pa = _pow10_pressure_or_raise(
+                        log_P_gas,
+                        species=species,
+                        field="P_reference_gas_rail_standard_reaction_Pa",
+                    )
+                else:
+                    P_reference_Pa = float(
+                        reconstructed_vapor_limit["pressure_Pa"]
+                    )
                 activity_exponent = float(
                     gas_rail_rxn.get("oxide_activity_exponent", 1.0) or 1.0
                 )
@@ -663,8 +723,14 @@ class EquilibriumMixin:
                 if P_effective_Pa > 1e-15:
                     vapor_pressures[species] = P_effective_Pa
                     source_label = (
-                        "builtin_authoritative:"
-                        "gas_rail_liquid_oxide_standard_reaction"
+                        "builtin_authority_limited:"
+                        "gas_rail_liquid_oxide_standard_reaction:"
+                        "reconstructed_vapor_pressure_segment"
+                        if reconstructed_vapor_limit is not None
+                        else (
+                            "builtin_authoritative:"
+                            "gas_rail_liquid_oxide_standard_reaction"
+                        )
                     )
                     if species in metal_extrapolations:
                         source_label = (
@@ -824,6 +890,15 @@ class EquilibriumMixin:
                     )
                 elif reconstructed_limited:
                     source_label = f'{source_label}:reconstructed_ellingham_segment'
+                if reconstructed_vapor_limit is not None:
+                    source_label = source_label.replace(
+                        'builtin_authoritative',
+                        'builtin_authority_limited',
+                        1,
+                    )
+                    source_label = (
+                        f'{source_label}:reconstructed_vapor_pressure_segment'
+                    )
                 vapor_pressure_sources[species] = source_label
                 if coefficient_block == COEFF_BLOCK_ANTOINE:
                     warn_pseudo_vapor_pressure_fallback(
@@ -958,6 +1033,10 @@ class EquilibriumMixin:
                 'a_FeO_calphad': feo_activity_diagnostic,
                 'ellingham_authority': ellingham_authority_diagnostic(
                     ellingham_extrapolations,
+                    consumer='legacy-equilibrium-fallback',
+                ),
+                'vapor_pressure_authority': vapor_pressure_authority_diagnostic(
+                    vapor_pressure_authority_limits,
                     consumer='legacy-equilibrium-fallback',
                 ),
             },

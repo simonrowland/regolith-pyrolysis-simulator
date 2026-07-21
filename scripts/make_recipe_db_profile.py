@@ -58,7 +58,19 @@ MENU_TARGET_IDS = (
     "pc-ceramic-ca-al-ratio-seed",
     "pc-ceramic-ca-ree-after-al",
 )
-FURNACE_SURVIVABLE_T_MAX_C = 1800.0
+# 15eaee9's dense-alumina furnace ceiling = the MAX-OPERATING rating, not
+# continuous
+# service. data/wall_materials.yaml:602-615 rates dense alumina at
+# continuous_C: 1700 and max_operating_C: 1843 (formulation-dependent);
+# data/furnace_materials.yaml keys the furnace entry to the 1843 max-operating
+# limit, and the canonical-recipe setpoints ramp C2A_continuous to [1050, 1843]
+# against it. This guard must track the same ceiling the recipes are validated
+# against — the older 1800.0 here was a placeholder matching neither rating.
+# Running near max-operating is a furnace-LIFETIME trade, priced by the
+# furnace-lifetime amortization model (b-076), not forbidden by this guard.
+# (B1 regen alignment 2026-07-21; 27x make_recipe_db class in
+# research/2026-07-20-red-partition.)
+FURNACE_SURVIVABLE_T_MAX_C = 1843.0
 DEFAULT_THERMAL_PREHEAT_RAMP_C_PER_HR = 600.0
 DEFAULT_COLD_START_TEMPERATURE_C = 25.0
 MIN_THERMAL_WINDOW_HOLD_HR = 1.0

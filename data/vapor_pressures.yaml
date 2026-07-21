@@ -229,6 +229,7 @@ metals:
     # Liquid-oxide pairing rail / high-T path: uncertified (matrix).
     authority_class: uncertified
     extrapolation_policy: "refuse"
+    total_source_certified_range_K: [701, 2273.15]
     source: "REF-033 CRC.b/Stull magnesium pressure-level table fit (1-100000 Pa); runtime pure-component source is pure_component_antoine"
     pure_component_antoine:
       source: "REF-033 CRC.b/Stull magnesium pressure-level table fit (1-100000 Pa); cross-checked against REF-034 Kaye-Laby/NPL Ambrose pressure-level table; not an Alcock liquid equation"
@@ -246,6 +247,29 @@ metals:
       B: 5613.103906
       C: -110.759803
       valid_range_K: [701, 1361]
+    reconstructed_vapor_pressure_segment:
+      range_K: [1361, 1366]
+      authority_status: "reconstructed_limited"
+      authority_flag: "authority_limited_by_reconstructed_vapor_pressure_segment"
+      interpolation: "log10_pressure_linear_in_reciprocal_temperature"
+      anchors:
+        - temperature_K: 1361
+          pressure_Pa: 100000.0
+          source: "REF-033 CRC.b/Stull magnesium pressure-level table final certified point"
+        - temperature_K: 1366
+          pressure_rail: "gas_rail_standard_reaction"
+          source: "gas_rail_standard_reaction Antoine value at its certified lower bound"
+      provenance: >
+        DECLARED RECONSTRUCTION, not a fit extrapolation. log10(P/Pa) is linear
+        in 1/T from REF-033 CRC.b/Stull's certified 1361 K, 100000 Pa endpoint
+        to the unchanged gas_rail_standard_reaction evaluated at its certified
+        1366 K lower bound: 1.776479712477316e-13 Pa
+        (log10(P/Pa)=-12.750439747819721). The 5 K authority gap brackets NIST
+        Chemistry WebBook SRD 69 T_boiling=1363.15 +/- 1.5 K; the rail bounds
+        disagree by less than their mutual temperature uncertainty. Across the
+        closed bridge, maximum deviation from naive extension is bounded by
+        17.77514 dex versus the condensed fit and 17.85520 dex versus the gas
+        fit. Neither source rail's coefficients or certified range is changed.
     evaporation_alpha:
       value: 0.20
       source: "REF-015 REF-018 Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; SF2004 Table 10 Mg2SiO4(l), Hashimoto 1990, alpha_s=0.20-0.21"
@@ -276,6 +300,8 @@ metals:
           reaction. Algebra: delG0=G_M(g)+n*G_O2-mu0_oxide(l);
           log10(P_ref/Pa)=5-delG0/(RT ln10); P=P_ref*a*fO2^n. Unit Pa.
           Sanity: max residual 0.006291 dex vs TE+JANAF grid.
+      source_certified_range_K: [1366, 2273.15]
+      extrapolation_policy: "refuse"
       valid_range_K: [1366, 2273.15]
       fit_residual_dex:
         max_abs: 0.006291

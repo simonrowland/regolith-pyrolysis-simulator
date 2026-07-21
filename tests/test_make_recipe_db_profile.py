@@ -17,7 +17,11 @@ from simulator.optimize.evaluate import (
 )
 from simulator.optimize.objective import ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC
 from simulator.optimize.product_pools import MELT_PRODUCT_POOLS, STREAM_PRODUCT_POOLS
-from simulator.optimize.profiles import ProfileValidationError, validate_profile
+from simulator.optimize.profiles import (
+    ProfileValidationError,
+    _thermal_window_max_hold_bound,
+    validate_profile,
+)
 from simulator.optimize.recipe import RecipePatch, RecipeSchema
 from simulator.state import CampaignPhase
 
@@ -389,7 +393,16 @@ def test_target_menu_windowed_campaigns_emit_runtime_schedule(
         expected_temp_range[1]
     )
     assert overrides["thermal_window_preheat_hours"] >= 0.0
-    max_hold_hr = cfg.get("max_hold_hr")
+    campaign_max_hold_hr = cfg.get("max_hold_hr")
+    max_hold_hr, _ = _thermal_window_max_hold_bound(
+        profile,
+        campaign,
+        campaign_max_hold_hr=(
+            float(campaign_max_hold_hr)
+            if isinstance(campaign_max_hold_hr, (int, float))
+            else None
+        ),
+    )
     if isinstance(max_hold_hr, (int, float)):
         assert overrides["max_hours"] <= float(max_hold_hr)
     else:
@@ -449,7 +462,7 @@ def test_runtime_loader_refuses_stale_window_profile_over_campaign_cap(
 
     with pytest.raises(
         ProfileValidationError,
-        match=r"thermal_window_campaign_max_hold refusal.*FORCE_PROFILES=1",
+        match=r"thermal_window_campaign_max_hold_hr refusal.*FORCE_PROFILES=1",
     ):
         validate_profile(
             profile,
@@ -525,7 +538,10 @@ def test_target_menu_generation_refuses_explicit_declared_window_over_cap(
     monkeypatch.setattr(generator, "_runtime_engine_identity", lambda: ("stub-engine", "test"))
     monkeypatch.setattr(generator, "_load_base_profile", load_with_explicit_over_cap_window)
 
-    with pytest.raises(SystemExit, match=r"thermal_window_campaign_max_hold refusal"):
+    with pytest.raises(
+        SystemExit,
+        match=r"thermal_window_campaign_max_hold_hr refusal",
+    ):
         generator.main(
             [
                 "lunar_mare_low_ti",
@@ -610,13 +626,16 @@ def test_target_menu_generated_profiles_internal_analytical_eval_no_campaign_voc
         candidate_id=f"smoke-{target_id}",
     )
 
-    assert result.failure_category is FailureCategory.PHYSICS_REFUSED
-    assert result.run_reference.status == "refused"
+    # The reconstructed Mg segment clears the former hour-8 source-range
+    # refusal. A completed run now reaches ordinary post-run feasibility
+    # scoring; that downstream gate result is the positive traversal oracle.
+    assert result.failure_category is FailureCategory.INFEASIBLE_RECIPE
+    assert result.run_reference.status == "ok"
+    assert result.failing_gates
     message = result.run_reference.error_message
-    assert "missing evaporation_alpha for sampled species: CrO2" in message
+    assert "metal_vapor_pressure_out_of_source_certified_range" not in message
+    assert "species=Mg" not in message
     assert "PoisonedHourError" not in message
-    assert "sampled species: Mn" not in message
-    assert "sampled species: Cr," not in message
     assert "unknown campaign" not in message
     assert "valid options:" not in message
 

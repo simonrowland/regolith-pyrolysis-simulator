@@ -29,9 +29,13 @@ from engines.builtin import vapor_pressure as vapor_pressure_module
 from engines.builtin._common import composition_wt_pct_from_account_view
 from engines.builtin.vapor_pressure import (
     BuiltinVaporPressureProvider,
+    VAPOR_PRESSURE_RECONSTRUCTED_AUTHORITY_FLAG,
+    VAPOR_PRESSURE_RECONSTRUCTED_AUTHORITY_STATUS,
     VaporPressureComputationError,
     VaporPressureRangeError,
     _ELLINGHAM_THERMO,
+    reconstructed_vapor_pressure_authority_limit,
+    require_antoine_source_certified_temperature,
 )
 from simulator.equilibrium import EquilibriumMixin
 from simulator.accounting.exceptions import AccountingError
@@ -1250,41 +1254,142 @@ def test_metal_antoine_range_extrapolation_is_diagnostic(
     )
 
 
-def test_mg_condensed_rail_refuses_outside_source_certified_range(
+def test_mg_reconstructed_bridge_derivation_and_declared_bounds(
     vapor_pressure_data,
 ):
     mg_data = vapor_pressure_data["metals"]["Mg"]
     mg_coeff = mg_data["pure_component_antoine"]
     assert mg_coeff["source_certified_range_K"] == [701, 1361]
     assert mg_coeff["valid_range_K"] == [701, 1361]
+    gas_rail = mg_data["gas_rail_standard_reaction"]
+    assert gas_rail["source_certified_range_K"] == [1366, 2273.15]
+    segment = mg_data["reconstructed_vapor_pressure_segment"]
+    assert segment["authority_status"] == (
+        VAPOR_PRESSURE_RECONSTRUCTED_AUTHORITY_STATUS
+    )
+    assert segment["authority_flag"] == (
+        VAPOR_PRESSURE_RECONSTRUCTED_AUTHORITY_FLAG
+    )
+
+    lower = reconstructed_vapor_pressure_authority_limit(
+        "Mg", mg_data, 1361.0, consumer="test"
+    )
+    upper = reconstructed_vapor_pressure_authority_limit(
+        "Mg", mg_data, 1366.0, consumer="test"
+    )
+    assert lower is not None
+    assert upper is not None
+    assert lower["pressure_Pa"] == pytest.approx(100000.0)
+    gas_antoine = gas_rail["antoine"]
+    expected_upper = 10.0 ** (
+        float(gas_antoine["A"])
+        - float(gas_antoine["B"])
+        / (1366.0 + float(gas_antoine["C"]))
+    )
+    assert upper["pressure_Pa"] == pytest.approx(expected_upper, rel=1e-14)
+    assert expected_upper == pytest.approx(1.776479712477316e-13, rel=1e-14)
+    assert "17.77514 dex" in segment["provenance"]
+    assert "17.85520 dex" in segment["provenance"]
+
+
+@pytest.mark.parametrize("temperature_K", [1361.0, 1361.171, 1363.15, 1366.0])
+def test_mg_reconstructed_bridge_emits_typed_provider_diagnostic(
+    vapor_pressure_data,
+    temperature_K,
+):
     provider = BuiltinVaporPressureProvider(vapor_pressure_data)
 
-    below_range = provider.dispatch(_mg_vapor_request_at_T_K(700.0))
-    at_boundary = provider.dispatch(_mg_vapor_request_at_T_K(1361.0))
+    result = provider.dispatch(_mg_vapor_request_at_T_K(temperature_K))
 
-    assert "Mg" not in below_range.diagnostic["vapor_pressures_Pa"]
-    assert any(
-        "species=Mg consumer=builtin_condensed_rail" in warning
-        and "temperature_K=700.000" in warning
-        for warning in below_range.warnings
+    assert result.status == "ok"
+    assert result.diagnostic["vapor_pressures_Pa"]["Mg"] > 0.0
+    assert "Mg" not in result.diagnostic["extrapolated_beyond_valid_range_K"]
+    assert "reconstructed_vapor_pressure_segment" in (
+        result.diagnostic["vapor_pressures_source"]["Mg"]
     )
-    assert at_boundary.status == "ok"
-    assert at_boundary.diagnostic["vapor_pressures_Pa"]["Mg"] > 0.0
-    assert "Mg" not in at_boundary.diagnostic["extrapolated_beyond_valid_range_K"]
-    assert at_boundary.diagnostic["vapor_pressures_source"]["Mg"].startswith(
-        "builtin_authoritative:pure_component_"
+    authority = result.diagnostic["vapor_pressure_authority"]
+    assert authority["status"] == "authority_limited"
+    assert authority[VAPOR_PRESSURE_RECONSTRUCTED_AUTHORITY_FLAG] is True
+    limit = authority["authority_limits"]["Mg"]
+    assert limit["authority_status"] == (
+        VAPOR_PRESSURE_RECONSTRUCTED_AUTHORITY_STATUS
     )
+    assert limit[VAPOR_PRESSURE_RECONSTRUCTED_AUTHORITY_FLAG] is True
+    assert tuple(limit["segment_range_K"]) == (1361.0, 1366.0)
+    provenance = result.diagnostic["vapor_pressure_numerator_provenance"]["Mg"]
+    assert provenance[VAPOR_PRESSURE_RECONSTRUCTED_AUTHORITY_FLAG] is True
+    assert provenance["P_reference_Antoine_Pa"] == pytest.approx(
+        limit["pressure_Pa"]
+    )
+
+
+@pytest.mark.parametrize("temperature_K", [1360.999, 1366.001])
+def test_mg_reconstructed_bridge_flag_absent_outside_segment(
+    vapor_pressure_data,
+    temperature_K,
+):
+    result = BuiltinVaporPressureProvider(vapor_pressure_data).dispatch(
+        _mg_vapor_request_at_T_K(temperature_K)
+    )
+
+    authority = result.diagnostic["vapor_pressure_authority"]
+    assert authority["status"] == "authoritative"
+    assert authority[VAPOR_PRESSURE_RECONSTRUCTED_AUTHORITY_FLAG] is False
+    assert authority["authority_limits"] == {}
+    assert "reconstructed_vapor_pressure_segment" not in (
+        result.diagnostic["vapor_pressures_source"]["Mg"]
+    )
+
+
+@pytest.mark.parametrize("temperature_K", [2273.151])
+def test_mg_provider_refuses_outside_total_certified_envelope(
+    vapor_pressure_data,
+    temperature_K,
+):
     with pytest.raises(
         VaporPressureRangeError,
         match=(
-            r"species=Mg consumer=builtin_condensed_rail .*"
-            r"source_certified_range_K=\[701, 1361\]"
+            r"species=Mg consumer=builtin_(?:condensed|gas)_rail .*"
+            r"source_certified_range_K=\[701, 2273\.15\]"
         ),
     ):
-        provider.dispatch(_mg_vapor_request_at_T_K(1361.001))
+        BuiltinVaporPressureProvider(vapor_pressure_data).dispatch(
+            _mg_vapor_request_at_T_K(temperature_K)
+        )
 
 
-@pytest.mark.parametrize("temperature_K", [1363.15, 1873.0])
+def test_mg_source_range_guard_refuses_below_total_certified_envelope(
+    vapor_pressure_data,
+):
+    with pytest.raises(
+        VaporPressureRangeError,
+        match=r"source_certified_range_K=\[701, 2273\.15\]",
+    ):
+        require_antoine_source_certified_temperature(
+            "Mg",
+            vapor_pressure_data["metals"]["Mg"],
+            "pure_component_antoine",
+            700.0,
+            consumer="test",
+        )
+
+
+@pytest.mark.parametrize("temperature_K", [701.0, 2273.15])
+def test_mg_provider_accepts_total_certified_envelope_endpoints(
+    vapor_pressure_data,
+    temperature_K,
+):
+    result = BuiltinVaporPressureProvider(vapor_pressure_data).dispatch(
+        _mg_vapor_request_at_T_K(temperature_K)
+    )
+
+    assert result.status == "ok"
+    assert result.diagnostic["vapor_pressure_authority"][
+        VAPOR_PRESSURE_RECONSTRUCTED_AUTHORITY_FLAG
+    ] is False
+
+
+@pytest.mark.parametrize("temperature_K", [1366.001, 1873.0])
 def test_mg_gas_rail_is_independent_of_antoine_coefficients(
     vapor_pressure_data,
     temperature_K,
@@ -1330,9 +1435,30 @@ def test_mg_gas_rail_is_independent_of_antoine_coefficients(
     assert graph_pressure == pytest.approx(baseline_graph_pressure)
 
 
-def test_legacy_mg_rails_refuse_condensed_extrapolation_but_ignore_gas_antoine(
+def test_legacy_mg_rails_use_reconstructed_bridge_and_ignore_gas_antoine(
     vapor_pressure_data,
 ):
+    for temperature_K in (1361.0, 1361.171, 1363.15, 1366.0):
+        result = _LegacyInternalAnalyticalModel(
+            vapor_pressure_data,
+            melt=_MgOnlyMelt(temperature_K),
+        )._internal_analytical_equilibrium()
+        assert result.vapor_pressures_Pa["Mg"] > 0.0
+        authority = result.diagnostics["vapor_pressure_authority"]
+        assert authority[VAPOR_PRESSURE_RECONSTRUCTED_AUTHORITY_FLAG] is True
+        assert authority["authority_limits"]["Mg"]["authority_status"] == (
+            VAPOR_PRESSURE_RECONSTRUCTED_AUTHORITY_STATUS
+        )
+
+    for temperature_K in (1360.999, 1366.001):
+        result = _LegacyInternalAnalyticalModel(
+            vapor_pressure_data,
+            melt=_MgOnlyMelt(temperature_K),
+        )._internal_analytical_equilibrium()
+        assert result.diagnostics["vapor_pressure_authority"][
+            VAPOR_PRESSURE_RECONSTRUCTED_AUTHORITY_FLAG
+        ] is False
+
     below_range = _LegacyInternalAnalyticalModel(
         vapor_pressure_data,
         melt=_MgOnlyMelt(700.0),
@@ -1345,11 +1471,14 @@ def test_legacy_mg_rails_refuse_condensed_extrapolation_but_ignore_gas_antoine(
 
     with pytest.raises(
         VaporPressureRangeError,
-        match=r"species=Mg consumer=legacy_condensed_rail",
+        match=(
+            r"species=Mg consumer=legacy_gas_rail .*"
+            r"source_certified_range_K=\[701, 2273\.15\]"
+        ),
     ):
         _LegacyInternalAnalyticalModel(
             vapor_pressure_data,
-            melt=_MgOnlyMelt(1361.001),
+            melt=_MgOnlyMelt(2273.151),
         )._internal_analytical_equilibrium()
 
     baseline = _LegacyInternalAnalyticalModel(

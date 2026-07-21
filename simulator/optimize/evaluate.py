@@ -95,6 +95,7 @@ from simulator.optimize.physics import (
 )
 from simulator.optimize.profiles import (
     ProfileValidationError,
+    _thermal_window_max_hold_bound,
     physics_constraints_from_profile,
     seed_source_campaigns,
     validate_profile,
@@ -106,6 +107,7 @@ from simulator.optimize.recipe import (
     C5_GUARD,
     C4_HOLD_TEMP_C_PATH,
     ConditionalExecutionContext,
+    FURNACE_MAX_T_C_PATH,
     O2_BUBBLER_GUARD,
     O2_BUBBLER_RATE_PATHS,
     RecipePatch,
@@ -670,7 +672,12 @@ def evaluate(
         )
 
     try:
-        active_constraints = _composition_target_constraints(profile, constraints)
+        active_constraints = _composition_target_constraints(
+            profile,
+            constraints,
+            recipe_patch=validated_patch,
+            campaign=str(_run_options(profile, fidelity)["campaign"]),
+        )
         spec, run_config = _build_eval_inputs(
             validated_patch,
             feedstock_id,
@@ -2345,6 +2352,7 @@ def _build_eval_inputs_impl(
     run_options = _thermal_scheduled_run_options(
         _run_options(profile, fidelity),
         profile=profile,
+        recipe_patch=patch,
         constraints=constraints,
         setpoints=bundle.setpoints,
     )
@@ -3051,11 +3059,14 @@ def _thermal_scheduled_run_options(
     run_options: Mapping[str, Any],
     *,
     profile: Mapping[str, Any],
+    recipe_patch: RecipePatch,
     constraints: PhysicsConstraintSet | None,
     setpoints: Mapping[str, Any],
 ) -> Mapping[str, Any]:
     lab_schedule = _profile_lab_schedule(
         run_options,
+        profile=profile,
+        recipe_patch=recipe_patch,
         constraints=constraints,
         setpoints=setpoints,
     )
@@ -3063,6 +3074,7 @@ def _thermal_scheduled_run_options(
         if _profile_thermal_window_schedule(
             run_options,
             profile=profile,
+            recipe_patch=recipe_patch,
             constraints=constraints,
             setpoints=setpoints,
         ) is not None:
@@ -3075,6 +3087,7 @@ def _thermal_scheduled_run_options(
     schedule = _profile_thermal_window_schedule(
         run_options,
         profile=profile,
+        recipe_patch=recipe_patch,
         constraints=constraints,
         setpoints=setpoints,
     )
@@ -3105,6 +3118,8 @@ def _thermal_scheduled_run_options(
 def _profile_lab_schedule(
     run_options: Mapping[str, Any],
     *,
+    profile: Mapping[str, Any],
+    recipe_patch: RecipePatch | None = None,
     constraints: PhysicsConstraintSet | None,
     setpoints: Mapping[str, Any],
 ) -> Mapping[str, Any] | None:
@@ -3115,14 +3130,20 @@ def _profile_lab_schedule(
         schedule = normalize_lab_schedule(raw)
     except LabScheduleValidationError as exc:
         raise EvaluationInputError(str(exc)) from exc
-    ceiling_C = _furnace_ceiling_C(constraints, setpoints)
+    ceiling_C, ceiling_bound = _furnace_ceiling_C(
+        constraints,
+        setpoints,
+        profile=profile,
+        campaign=str(run_options.get("campaign", "") or ""),
+        recipe_patch=recipe_patch,
+    )
     scheduled_peak = max(
         float(point["value"])
         for point in schedule["melt_temperature_C"]
     )
     if scheduled_peak > ceiling_C:
         raise EvaluationInputError(
-            "lab_schedule_temperature_exceeds_furnace_T_max_C: "
+            f"lab_schedule_temperature_exceeds_{ceiling_bound}: "
             f"{scheduled_peak:g} C > {ceiling_C:g} C"
         )
     return schedule
@@ -3190,6 +3211,7 @@ def _profile_thermal_window_schedule(
     run_options: Mapping[str, Any],
     *,
     profile: Mapping[str, Any],
+    recipe_patch: RecipePatch | None = None,
     constraints: PhysicsConstraintSet | None,
     setpoints: Mapping[str, Any],
 ) -> Mapping[str, Any] | None:
@@ -3203,11 +3225,17 @@ def _profile_thermal_window_schedule(
         raise EvaluationInputError(
             f"{campaign}.temp_range_C must be ascending; got {temp_range!r}"
         )
-    ceiling_C = _furnace_ceiling_C(constraints, setpoints)
+    ceiling_C, ceiling_bound = _furnace_ceiling_C(
+        constraints,
+        setpoints,
+        profile=profile,
+        campaign=campaign,
+        recipe_patch=recipe_patch,
+    )
     if high_C > ceiling_C:
         raise EvaluationInputError(
             f"{campaign}.temp_range_C high {high_C:g} C exceeds "
-            f"furnace_T_max_C {ceiling_C:g} C"
+            f"{ceiling_bound} {ceiling_C:g} C"
         )
     duration_h = _thermal_window_duration_h(
         _profile_campaign_setting(profile, campaign, "duration_h"),
@@ -3223,12 +3251,17 @@ def _profile_thermal_window_schedule(
     ))
     total_hours = int(math.ceil(preheat_hours + duration_h))
     window_ramp = (high_C - low_C) / duration_h if duration_h > 0.0 else 0.0
-    max_hold_hr = _campaign_max_hold_hr(setpoints, campaign)
+    max_hold_hr, max_hold_bound = _thermal_window_max_hold_bound(
+        profile,
+        campaign,
+        campaign_max_hold_hr=_campaign_max_hold_hr(setpoints, campaign),
+    )
     if max_hold_hr is not None and float(total_hours) > max_hold_hr:
         raise EvaluationInputError(
-            f"{campaign} thermal window requires {total_hours:g} h "
+            f"{campaign} thermal_window_{max_hold_bound} refusal: "
+            f"requires {total_hours:g} h "
             f"(preheat {preheat_hours:g} h + hold {duration_h:g} h) but "
-            f"campaign max_hold_hr is {max_hold_hr:g}; regenerate with "
+            f"{max_hold_bound} is {max_hold_hr:g} h; regenerate with "
             "FORCE_PROFILES=1"
         )
     return MappingProxyType({
@@ -3300,15 +3333,80 @@ def _thermal_preheat_ramp_C_per_hr(profile: Mapping[str, Any], campaign: str) ->
 def _furnace_ceiling_C(
     constraints: PhysicsConstraintSet | None,
     setpoints: Mapping[str, Any],
-) -> float:
+    *,
+    profile: Mapping[str, Any],
+    campaign: str,
+    recipe_patch: RecipePatch | None = None,
+) -> tuple[float, str]:
+    local_ceiling = _recipe_local_furnace_ceiling_C(
+        profile,
+        campaign,
+        recipe_patch=recipe_patch,
+    )
+    if local_ceiling is not None:
+        return local_ceiling[0], "recipe_local_furnace_max_T_C"
     hardware_ceiling_C = float(setpoints.get("furnace_max_T_C", 1800.0))
     if constraints is None:
-        return hardware_ceiling_C
+        return hardware_ceiling_C, "profile_default_furnace_max_T_C"
     threshold = getattr(constraints, "furnace_T_max_C", None)
     value = getattr(threshold, "value", None)
     if value is None:
-        return hardware_ceiling_C
-    return float(value)
+        return hardware_ceiling_C, "profile_default_furnace_max_T_C"
+    return float(value), "profile_default_furnace_max_T_C"
+
+
+def _recipe_local_furnace_ceiling_C(
+    profile: Mapping[str, Any],
+    campaign: str,
+    *,
+    recipe_patch: RecipePatch | None = None,
+) -> tuple[float, str] | None:
+    if recipe_patch is not None and FURNACE_MAX_T_C_PATH in recipe_patch.values:
+        return (
+            _positive_finite_recipe_local_furnace_ceiling_C(
+                recipe_patch.values[FURNACE_MAX_T_C_PATH],
+                source="recipe_patch.furnace_max_T_C",
+            ),
+            "recipe_patch.furnace_max_T_C",
+        )
+    for index, seed in enumerate(profile.get("seed_recipes", ()) or ()):
+        if not isinstance(seed, MappingABC):
+            continue
+        if campaign not in seed_source_campaigns(seed):
+            continue
+        seed_patch = seed.get("patch")
+        if not isinstance(seed_patch, MappingABC) or "furnace_max_T_C" not in seed_patch:
+            continue
+        source = f"seed_recipes[{index}].patch.furnace_max_T_C"
+        # 15eaee9 made 1843 C an explicit canonical-recipe field. The bound is
+        # dense-alumina max_operating_C=1843, not continuous_C=1700
+        # (data/wall_materials.yaml:602-615). This guard prices no furnace
+        # lifetime; b-076 furnace-lifetime amortization prices that trade.
+        return (
+            _positive_finite_recipe_local_furnace_ceiling_C(
+                seed_patch["furnace_max_T_C"],
+                source=source,
+            ),
+            source,
+        )
+    return None
+
+
+def _positive_finite_recipe_local_furnace_ceiling_C(
+    raw: Any,
+    *,
+    source: str,
+) -> float:
+    if isinstance(raw, bool) or not isinstance(raw, (int, float)):
+        raise EvaluationInputError(
+            f"{source} recipe_local_furnace_max_T_C must be positive finite"
+        )
+    value = float(raw)
+    if not math.isfinite(value) or value <= 0.0:
+        raise EvaluationInputError(
+            f"{source} recipe_local_furnace_max_T_C must be positive finite"
+        )
+    return value
 
 
 def _numeric_interval(value: Any) -> tuple[float, float] | None:
@@ -3503,8 +3601,17 @@ def _add_lab_schedule_window_metadata(
 def _composition_target_constraints(
     profile: Mapping[str, Any],
     constraints: PhysicsConstraintSet | None,
+    *,
+    recipe_patch: RecipePatch | None = None,
+    campaign: str | None = None,
 ) -> PhysicsConstraintSet | None:
     active = constraints or physics_constraints_from_profile(profile)
+    active = _with_recipe_local_furnace_ceiling(
+        profile,
+        active,
+        campaign=campaign,
+        recipe_patch=recipe_patch,
+    )
     active = _with_composition_target_extraction_thresholds(profile, active)
     try:
         requires_coating = composition_targets_require_coating(profile)
@@ -3517,6 +3624,42 @@ def _composition_target_constraints(
     if "coating" in active.active_gates:
         return active
     return replace(active, active_gates=(*active.active_gates, "coating"))
+
+
+def _with_recipe_local_furnace_ceiling(
+    profile: Mapping[str, Any],
+    constraints: PhysicsConstraintSet | None,
+    *,
+    campaign: str | None,
+    recipe_patch: RecipePatch | None,
+) -> PhysicsConstraintSet | None:
+    if constraints is None or not isinstance(constraints, PhysicsConstraintSet):
+        return constraints
+    resolved_campaign = campaign
+    if resolved_campaign is None:
+        run_options = profile.get("run")
+        if isinstance(run_options, MappingABC):
+            resolved_campaign = str(run_options.get("campaign", "") or "")
+    local_ceiling = _recipe_local_furnace_ceiling_C(
+        profile,
+        str(resolved_campaign or ""),
+        recipe_patch=recipe_patch,
+    )
+    if local_ceiling is None:
+        return constraints
+    value, source_ref = local_ceiling
+    threshold = constraints.furnace_T_max_C
+    return replace(
+        constraints,
+        furnace_T_max_C=ThresholdSpec(
+            id="recipe_local_furnace_max_T_C",
+            value=value,
+            units=threshold.units,
+            source="profile",
+            source_ref=f"recipe_local_furnace_max_T_C:{source_ref}",
+            tolerance=threshold.tolerance,
+        ),
+    )
 
 
 def _with_composition_target_extraction_thresholds(

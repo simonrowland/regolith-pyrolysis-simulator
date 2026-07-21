@@ -1073,14 +1073,18 @@ def _validate_run_thermal_window_caps(
         )
     )
     total_hours = int(math.ceil(preheat_hours + duration_h))
-    max_hold_hr = _campaign_max_hold_hr_for_profile(source, campaign)
+    max_hold_hr, max_hold_bound = _thermal_window_max_hold_bound(
+        profile,
+        campaign,
+        campaign_max_hold_hr=_campaign_max_hold_hr_for_profile(source, campaign),
+    )
     if max_hold_hr is None or float(total_hours) <= max_hold_hr:
         return
     raise ProfileValidationError(
-        f"{source}: thermal_window_campaign_max_hold refusal for {where} "
+        f"{source}: thermal_window_{max_hold_bound} refusal for {where} "
         f"{campaign}: requested {total_hours:g} h "
         f"(preheat {preheat_hours:g} h + hold {duration_h:g} h) exceeds "
-        f"{_setpoint_campaign_key(campaign)}.max_hold_hr {max_hold_hr:g}; "
+        f"{max_hold_bound} {max_hold_hr:g} h; "
         "regenerate with FORCE_PROFILES=1"
     )
 
@@ -1127,6 +1131,28 @@ def seed_source_campaigns(seed: Mapping[str, Any]) -> frozenset[str]:
     if isinstance(source_campaigns, list):
         campaigns.update(str(campaign) for campaign in source_campaigns)
     return frozenset(campaigns)
+
+
+def _thermal_window_max_hold_bound(
+    profile: Mapping[str, Any],
+    campaign: str,
+    *,
+    campaign_max_hold_hr: float | None,
+) -> tuple[float | None, str]:
+    for seed in profile.get("seed_recipes", ()) or ():
+        if not isinstance(seed, Mapping):
+            continue
+        if campaign not in seed_source_campaigns(seed):
+            continue
+        value = _campaign_setting(seed.get("patch"), campaign, "max_hold_hr")
+        amount = _finite_float_or_none(value)
+        if amount is not None and amount > 0.0:
+            # 15eaee9 declares the canonical recipe cap from the arithmetic
+            # 132 h slow-band ramp + 28 h extraction window = 160 h. Only
+            # that explicit recipe/profile-seed field takes precedence over
+            # the campaign cap.
+            return amount, "recipe_local_max_hold_hr"
+    return campaign_max_hold_hr, "campaign_max_hold_hr"
 
 
 def _thermal_window_duration_h(value: Any, *, run_hours: int) -> float:
