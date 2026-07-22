@@ -230,9 +230,15 @@ BASELINE_STAGE4_SIO2_KG = {
 # 2026-07-21 B1: measured stage-3 SiO-zone product on compose-0.6.3 after the
 # 07fa3fe baffle fix (double-run byte-stable CLI). Nonzero is load-bearing:
 # a zero here means the designated-condenser capture failed open again.
+# 2026-07-21 B1 wall-gate fix (same gate as the stage site, queries.py): hot
+# walls above T_cond no longer engage the SiO disproportionation backstop, so
+# the mass that phantom-deposited on the >1050 C hot train now reaches the
+# designated stage-3 baffle — stage-3 capture DOUBLES and wall deposit goes
+# to zero for this recipe. North-Star-coherent: designated-condenser capture,
+# no hot-wall coating.
 BASELINE_STAGE3_SIO2_KG = {
-    "lunar_mare_low_ti": 4.29910903346e-07,
-    "mars_basalt": 4.32989146849e-07,
+    "lunar_mare_low_ti": 8.59821806693e-07,
+    "mars_basalt": 8.65978293698e-07,
 }
 
 
@@ -345,7 +351,11 @@ def test_sio_yield_cli_matches_golden(tmp_path, feedstock, golden_name):
         BASELINE_STAGE3_SIO2_KG[feedstock], rel=1e-8
     )
     assert stage_4 < BASELINE_STAGE4_SIO2_KG[feedstock]
-    assert wall_total > routed_total
+    # 2026-07-21 B1 wall-gate fix: wall-dominant routing was an artifact of
+    # the hot-wall backstop defect; the honest contract is zero hot-train
+    # wall deposit with routing through the designated stages.
+    assert wall_total == pytest.approx(0.0)
+    assert routed_total > 0.0
     assert 0.0 <= actual["sio_yield_pct_of_feedstock"] <= 30.0
     assert actual["alpha_SiO"] == pytest.approx(0.0320984652281)
     assert actual["alpha_provenance"] == (
@@ -703,8 +713,16 @@ def test_cached_condensation_model_uses_updated_liner_temperature():
     hot_route = model.route(flux, melt)
 
     assert cold_route.wall_deposit_by_species["SiO"] > 0.0
-    assert hot_route.wall_deposit_by_species.get("SiO", 0.0) > (
-        cold_route.wall_deposit_by_species["SiO"]
+    # 2026-07-21 B1 wall-gate fix: the old expectation (hotter liner deposits
+    # MORE SiO) was an artifact of the unguarded hot-wall reactive backstop —
+    # physically backwards, and the exact failure mode the hot-walls design
+    # invariant exists to prevent. The subject under test is that the cached
+    # model REFRESHES its operating conditions: the 1650 C (> T_cond) liner
+    # must show ZERO wall SiO, and the routing must visibly differ from the
+    # 900 C route — proving the reconfiguration took effect.
+    assert hot_route.wall_deposit_by_species.get("SiO", 0.0) == 0.0
+    assert hot_route.condensed_by_stage_species != (
+        cold_route.condensed_by_stage_species
     )
 
 
