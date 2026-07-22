@@ -2572,6 +2572,16 @@ def wall_deposit_candidate_for_surface_kg(
         overhead_pressure_pa=overhead_pressure_pa,
         carrier_gas=str(getattr(model, "carrier_gas", "N2") or "N2"),
         vapor_pressure_data=vapor_pressure_data,
+        # Same eligibility gate as the stage band-sampling site in
+        # condensation.py: the SiO disproportionation backstop may
+        # materialize product only at/below the declared condensation
+        # temperature. Without this the helper's True default let a HOT
+        # wall (above T_cond) mass-deposit reactive products — the inverse
+        # of the 07fa3fe stage fix (wall-path residual tracked as t-404).
+        reactive_product_backstop=(
+            species == 'SiO'
+            and float(wall_temperature_C) <= float(T_cond_C)
+        ),
         diagnostic_out=rate_diagnostic,
     )
     if flux <= 0.0:
