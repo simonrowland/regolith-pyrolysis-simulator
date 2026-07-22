@@ -1743,8 +1743,16 @@ def test_magemin_subprocess_runs_in_fresh_temp_cwd(monkeypatch, tmp_path):
 def test_magemin_subprocess_launches_are_serialized_across_callers(
     monkeypatch, tmp_path
 ):
-    """Concurrent adapters must not launch multiple MAGEMin executables."""
+    """With REGOLITH_MAGEMIN_SLOTS=1 launches stay strictly serialized.
+
+    2026-07-22 t-385: the machine-wide launch gate became a bounded K-slot
+    semaphore (each call runs in a private tmpdir; the exclusive lock was a
+    CPU bound, not correctness). K=1 must reproduce the old serialization
+    exactly; the bounded-K contract is pinned by the companion test below.
+    """
     import simulator.melt_backend.magemin as magemin_module
+
+    monkeypatch.setenv('REGOLITH_MAGEMIN_SLOTS', '1')
 
     first_entered = threading.Event()
     release_first = threading.Event()
@@ -1810,6 +1818,42 @@ def test_magemin_subprocess_launches_are_serialized_across_callers(
     assert not second.is_alive()
     assert errors == []
     assert state == {'active': 0, 'calls': 2, 'max_active': 1}
+
+
+def test_magemin_subprocess_slots_bound_concurrency(monkeypatch):
+    """K slots admit K concurrent launches; the K+1th blocks until release."""
+    import simulator.melt_backend.magemin as magemin_module
+
+    monkeypatch.setenv('REGOLITH_MAGEMIN_SLOTS', '3')
+    held = []
+    waited = []
+    barrier = threading.Barrier(3, timeout=5.0)
+
+    def hold(index):
+        with magemin_module._magemin_subprocess_slot(5.0):
+            held.append(index)
+            barrier.wait()
+            time.sleep(0.6)
+
+    def fourth():
+        started = time.monotonic()
+        with magemin_module._magemin_subprocess_slot(5.0):
+            waited.append(time.monotonic() - started)
+
+    holders = [
+        threading.Thread(target=hold, args=(index,)) for index in range(3)
+    ]
+    for thread in holders:
+        thread.start()
+    barrier.wait()
+    late = threading.Thread(target=fourth)
+    late.start()
+    for thread in holders:
+        thread.join(timeout=5.0)
+    late.join(timeout=5.0)
+
+    assert sorted(held) == [0, 1, 2]
+    assert waited and waited[0] > 0.3
 
 
 @pytest.mark.skipif(

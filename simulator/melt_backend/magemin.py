@@ -136,40 +136,81 @@ from simulator.state import OXIDE_SPECIES
 
 MAGEMIN_WARM_CALL_TIMEOUT_S = 2.0
 MAGEMIN_WARM_LIQUIDUS_BUDGET_S = 15.0
-_MAGEMIN_SUBPROCESS_LOCK = Path(
+_MAGEMIN_SUBPROCESS_LOCK_DIR = Path(
     tempfile.gettempdir(),
     'regolith-pyrolysis-simulator',
-    f'magemin-subprocess-{os.getuid()}.lock',
 )
+_MAGEMIN_SUBPROCESS_LOCK = _MAGEMIN_SUBPROCESS_LOCK_DIR / (
+    f'magemin-subprocess-{os.getuid()}.lock'
+)
+
+
+def _magemin_subprocess_slot_count() -> int:
+    """Bounded machine-wide MAGEMin binary concurrency (K slots).
+
+    Each MAGEMin CLI call runs in a private TemporaryDirectory — there is
+    no shared mutable state between invocations, so the old exclusive lock
+    (K=1) was a CPU-contention bound, not a correctness requirement (t-385
+    lock audit, 2026-07-22). K>1 lets independent heavy tests overlap
+    instead of paying each other's wall-clock. Determinism under bounded K
+    is verified by the split_path concurrent A/B against sequential pins
+    (rel=1e-12). Override with REGOLITH_MAGEMIN_SLOTS; K=1 restores strict
+    serialization.
+    """
+    raw = os.environ.get('REGOLITH_MAGEMIN_SLOTS', '')
+    try:
+        value = int(raw)
+    except (TypeError, ValueError):
+        value = 0
+    if value >= 1:
+        return value
+    cores = os.cpu_count() or 4
+    return max(1, min(3, cores // 6))
 
 
 @contextmanager
 def _magemin_subprocess_slot(timeout_s: float) -> Iterator[None]:
-    """Serialize MAGEMin executable launches across simulator processes."""
+    """Acquire one of K machine-wide MAGEMin launch slots (see above)."""
     deadline = time.monotonic() + max(0.001, float(timeout_s))
-    _MAGEMIN_SUBPROCESS_LOCK.parent.mkdir(parents=True, exist_ok=True)
-    lock_file = _MAGEMIN_SUBPROCESS_LOCK.open('a+b')
-    acquired = False
+    _MAGEMIN_SUBPROCESS_LOCK_DIR.mkdir(parents=True, exist_ok=True)
+    slots = _magemin_subprocess_slot_count()
+    lock_files = []
+    acquired_index = -1
     try:
+        for index in range(slots):
+            path = (
+                _MAGEMIN_SUBPROCESS_LOCK if index == 0
+                else _MAGEMIN_SUBPROCESS_LOCK.with_suffix(f'.slot{index}')
+            )
+            lock_files.append(path.open('a+b'))
         while True:
-            try:
-                fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
-                acquired = True
-                break
-            except BlockingIOError:
-                remaining = deadline - time.monotonic()
-                if remaining <= 0.0:
-                    raise RuntimeError(
-                        f'MAGEMin subprocess slot timed out after {timeout_s:g}s'
+            for index, lock_file in enumerate(lock_files):
+                try:
+                    fcntl.flock(
+                        lock_file.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB
                     )
-                time.sleep(min(0.01, remaining))
+                    acquired_index = index
+                    break
+                except BlockingIOError:
+                    continue
+            if acquired_index >= 0:
+                break
+            remaining = deadline - time.monotonic()
+            if remaining <= 0.0:
+                raise RuntimeError(
+                    f'MAGEMin subprocess slot timed out after {timeout_s:g}s'
+                )
+            time.sleep(min(0.01, remaining))
         yield
     finally:
         try:
-            if acquired:
-                fcntl.flock(lock_file.fileno(), fcntl.LOCK_UN)
+            if lock_files and acquired_index >= 0:
+                fcntl.flock(
+                    lock_files[acquired_index].fileno(), fcntl.LOCK_UN
+                )
         finally:
-            lock_file.close()
+            for lock_file in lock_files:
+                lock_file.close()
 
 
 @dataclass(frozen=True)
