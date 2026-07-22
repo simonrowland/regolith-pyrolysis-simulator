@@ -145,39 +145,78 @@ from tests.chemistry.conftest import _build_sim
 # an active wall Si lot, changing these pins only by the explicitly conserved
 # sub-floor components.
 EXPECTED_C4B_WALL_SEGMENT_DEPOSITS_KG = {
-    # 2026-07-17 t-160/t-159/t-260: executable full-path rebaseline after
-    # corrected residual capture and transport composition.
-    # 2026-07-14 t-194 Cr grounding: executable C0->C6 reruns use alpha=0.9
-    # for Cr instead of the prototype-unity fallback; coupled trace wall pins
-    # move slightly.
+    # 2026-07-22 B1 regen (quiesced gate; values verified reproducible at
+    # rel=1e-12 across independent runs). MAGNITUDE NOTE (t-413): these are
+    # multi-kg METAL wall deposits, not the historical microgram Si/SiO2 —
+    # the canonical C2A now ramps to 1843 C while the liner/segment schedule
+    # holds 1650 C from hour 6 (data/setpoints.yaml), so for the ~100 h
+    # super-hot tail every metal's melt-side P_sat exceeds the wall-side
+    # P_sat and the ducts genuinely condense metal (driving pressure
+    # correctly subtracts wall P_sat; mass closure 3.7e-12 %%). Fe exhausts
+    # its stream on the first segment; Na/K feed all four at equal
+    # rate-limited takes. This is the model HONESTLY reporting Mandate
+    # failure-mode-2 for the default 1843 trajectory — the recipe/wall
+    # resolution is owner decision t-413; do NOT re-tune these values or
+    # the wall model to make the recipe look clean.
     "lunar_mare_low_ti": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Si": 3.488847972097408e-06,
-            "SiO2": 7.463786815293877e-06,
+            "Cr": 0.039542673337507835,
+            "Fe": 5.591799146491936,
+            "K": 0.037985903823263334,
+            "Na": 0.37270389930145387,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "Si": 3.5901506661581253e-06,
-            "SiO2": 7.68050640821715e-06,
+            "Cr": 0.039542673337507835,
+            "K": 0.037985903823263334,
+            "Na": 0.37270389930145387,
+        },
+        "process.wall_deposit_segment_stage_2_to_stage_3": {
+            "K": 0.037985903823263334,
+            "Na": 0.37270389930145387,
+        },
+        "process.wall_deposit_segment_stage_3_to_stage_4": {
+            "K": 0.037985903823263334,
+            "Na": 0.3727038993014538,
         },
     },
     "mars_basalt": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Si": 2.4917739566143708e-06,
-            "SiO2": 5.330719410192673e-06,
+            "Fe": 5.442102884016342,
+            "K": 0.13962697501636284,
+            "Na": 2.7356549508010857,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "Si": 2.5938217138608916e-06,
-            "SiO2": 5.5490329369380074e-06,
+            "K": 0.13962697501636284,
+            "Na": 2.7356549508010857,
+        },
+        "process.wall_deposit_segment_stage_2_to_stage_3": {
+            "K": 0.13962697501636284,
+            "Na": 2.7356549508010857,
+        },
+        "process.wall_deposit_segment_stage_3_to_stage_4": {
+            "K": 0.13962697501636287,
+            "Na": 2.735654950801086,
         },
     },
     "s_type_asteroid_silicate": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Si": 2.820757660060282e-06,
-            "SiO2": 6.034523143649702e-06,
+            "Cr": 0.01944925741609746,
+            "Fe": 3.6558227286921334,
+            "K": 0.02399978626301914,
+            "Na": 0.6454197211217509,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "Si": 2.9512809690021463e-06,
-            "SiO2": 6.313755188198538e-06,
+            "Cr": 0.01944925741609746,
+            "K": 0.02399978626301914,
+            "Na": 0.6454197211217509,
+        },
+        "process.wall_deposit_segment_stage_2_to_stage_3": {
+            "K": 0.02399978626301914,
+            "Na": 0.6454197211217509,
+        },
+        "process.wall_deposit_segment_stage_3_to_stage_4": {
+            "K": 0.02399978626301913,
+            "Na": 0.645419721121751,
         },
     },
 }

@@ -54,7 +54,12 @@ METAL_PHASE_FE_ACCOUNTS = (
 # native-Fe metallic tap fold (shared condensation-train competition).
 # 2026-07-18 a91db36 repaired staged trajectory rebaseline on corrected tip
 # 0990232.
-STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 0.11520510426394359
+# 2026-07-21 B1 wall-gate fix: the staged C2A pipework is all hot-wall
+# (above SiO T_cond), so the honest segment wall load is ZERO — the old
+# nonzero pin was the unguarded backstop's phantom deposit. The genuinely
+# cold-segment scenario (nonzero wall coverage) lives in
+# test_intentional_pipe_cold_spot_flags_and_changes_wall_deposit.
+STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 0.0
 
 
 def _run_script(lines: list[str]):
@@ -258,15 +263,21 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
     # The repaired 510 -> 860 C continuous trajectory no longer dwells in the
     # staged high-temperature Na recovery window.
     assert staged_products.get("Na", 0.0) > continuous_products.get("Na", 0.0) > 0.0
-    # The repaired a91db36 trajectory sends Si-bearing material to the wall and
-    # terminal product instead of the Stage 3 hot trap. Stage 3 remains an
-    # Fe-only capture on this 30-hour staged probe; the continuous probe never
-    # reaches the hot capture window.
-    assert staged_silica == pytest.approx(0.0, abs=1.0e-15)
+    # 2026-07-21 B1 wall-gate fix: "Stage 3 remains Fe-only / Si goes to the
+    # wall" was the unguarded hot-wall backstop artifact. With hot walls
+    # honest (zero deposit above T_cond), the staged probe's Si-bearing
+    # material reaches the DESIGNATED Stage 3 trap as disproportionation
+    # products; the continuous probe still never reaches the hot capture
+    # window. Values pinned from the executable under the quiesced gate.
+    assert staged_silica == pytest.approx(0.10262754045817979, rel=1e-9)
     assert continuous_silica == pytest.approx(0.0, abs=1.0e-15)
-    assert staged_sio_stage == {"Fe": pytest.approx(0.013957432420411931)}
+    assert set(staged_sio_stage) == {"Si", "SiO2", "Fe"}
+    assert staged_sio_stage["Fe"] > 0.0
+    assert staged_sio_stage["Si"] + staged_sio_stage["SiO2"] == pytest.approx(
+        staged_silica, rel=1e-12
+    )
     assert continuous_sio_stage == {}
-    assert staged_products["SiO"] == pytest.approx(0.005144993061043032)
+    assert staged_products["SiO"] == pytest.approx(0.011456288948428558)
 
 
 def test_c2a_staged_respeciates_evaporative_metal_loss_internal_o():
@@ -311,6 +322,6 @@ def test_c2a_staged_pipework_has_no_upstream_cold_spot():
     # 2026-07-01 C4b stores the wall deposit as Si/SiO2/FeSi products, not SiO.
     assert segment_wall_sio_kg == pytest.approx(
         STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG,
-        rel=1e-9,
+        abs=1e-15,
     )
     assert _max_mass_balance_pct(sim) < MASS_BALANCE_MAX_PCT

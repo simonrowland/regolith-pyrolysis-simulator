@@ -405,8 +405,8 @@ def test_grounded_sio_alpha_drives_wall_deposit_direction(monkeypatch):
 
     # Explicit stage area makes baffle capture compete with wall capture; the
     # grounded lower-alpha case leaves more vapor for the wall sink.
-    assert grounded == pytest.approx(0.9572497805330464, rel=1e-12)
-    assert legacy == pytest.approx(0.8899330724166838, rel=1e-12)
+    assert grounded == pytest.approx(0.9381389451502856, rel=1e-12)
+    assert legacy == pytest.approx(0.8690501976781391, rel=1e-12)
     assert grounded > legacy
 
 
