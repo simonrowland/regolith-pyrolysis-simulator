@@ -148,7 +148,11 @@ def test_debug_batches_auto_apply_branching_decisions():
 
     assert manager.get_next_campaign(CampaignPhase.C4, record) == CampaignPhase.C2A
     assert record.path == "A_post_mg_boiloff"
-    assert manager.get_next_campaign(CampaignPhase.C2A, record) == CampaignPhase.COMPLETE
+    # 2026-07-22 B1 C6-continue routing fix: noninteractive branch-two
+    # batches auto-proceed into C6 after the final C2A bake-out (Mandate
+    # section 2 — thermite needs no electrolysis; C5 stays skipped).
+    assert manager.get_next_campaign(CampaignPhase.C2A, record) == CampaignPhase.C6
+    assert manager.get_next_campaign(CampaignPhase.C6, record) == CampaignPhase.COMPLETE
 
     record.path = "A_staged"
     assert manager.get_next_campaign(CampaignPhase.C5, record) == CampaignPhase.C6
@@ -248,7 +252,11 @@ def test_debug_batches_skip_c5_by_default_after_c4():
 
     assert manager.c5_enabled is False
     assert manager.get_next_campaign(CampaignPhase.C4, record) == CampaignPhase.C2A
-    assert manager.get_next_campaign(CampaignPhase.C2A, record) == CampaignPhase.COMPLETE
+    # 2026-07-22 B1 C6-continue routing fix: noninteractive branch-two
+    # batches auto-proceed into C6 after the final C2A bake-out (Mandate
+    # section 2 — thermite needs no electrolysis; C5 stays skipped).
+    assert manager.get_next_campaign(CampaignPhase.C2A, record) == CampaignPhase.C6
+    assert manager.get_next_campaign(CampaignPhase.C6, record) == CampaignPhase.COMPLETE
 
 
 def test_c5_enabled_routes_c4_to_c5():
@@ -296,7 +304,10 @@ def test_normal_batches_still_pause_for_branching_decisions():
     assert manager.get_next_campaign(CampaignPhase.C3_NA, record) is None
     record.branch = "two"
     assert manager.get_next_campaign(CampaignPhase.C4, record) == CampaignPhase.C2A
-    assert manager.get_next_campaign(CampaignPhase.C2A, record) == CampaignPhase.COMPLETE
+    # 2026-07-22 B1 C6-continue routing fix: INTERACTIVE branch-two batches
+    # pause for the C6_PROCEED decision after the final C2A bake-out —
+    # exactly this test's subject (normal batches still pause).
+    assert manager.get_next_campaign(CampaignPhase.C2A, record) is None
 
 
 def test_low_voltage_debug_feedstock_exercises_mre_electrolysis(monkeypatch):

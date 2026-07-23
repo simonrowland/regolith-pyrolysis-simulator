@@ -2360,8 +2360,16 @@ class CampaignManager:
             return None  # Triggers PATH_AB decision
 
         elif current == CampaignPhase.C2A:
-            if record.path == 'A_post_mg_boiloff':
-                return CampaignPhase.COMPLETE
+            if record.path in ('A_post_mg_boiloff', 'B'):
+                # Final no-MRE C2A bake-out complete (path B only ever
+                # reaches C2A as this final pass; its first extraction leg
+                # is C2B). The pass is NOT the batch terminal: C6 (Al via
+                # Mg thermite) needs no electrolysis, so skipping C5 must
+                # not skip C6 (Mandate section 2; C6 reachability is a B1
+                # regen gate criterion). Route through the after-C5 logic:
+                # branch 'two' offers/auto-decides C6_PROCEED, everything
+                # else completes as before.
+                return self._get_next_after_c5(record)
             # After Path A C2A → C3 (K phase)
             return CampaignPhase.C3_K
 
@@ -2407,7 +2415,11 @@ class CampaignManager:
                 'min_hold_hr': 82.0,
                 'max_hours': 160.0,
             }
-            record.path = 'A_post_mg_boiloff'
+            # Mark A-family paths for the final-pass C2A successor above;
+            # path 'B' keeps its operator-chosen record (the marker used to
+            # clobber it, corrupting the reported path).
+            if record.path != 'B':
+                record.path = 'A_post_mg_boiloff'
             return CampaignPhase.C2A
 
         elif current == CampaignPhase.C5:
@@ -2474,7 +2486,15 @@ class CampaignManager:
                 ),
             )
 
-        elif current == CampaignPhase.C5:
+        elif current == CampaignPhase.C5 or (
+            current == CampaignPhase.C2A
+            and record.path in ('A_post_mg_boiloff', 'B')
+            and record.branch == 'two'
+        ):
+            # The final no-MRE C2A bake-out pauses here on branch two (the
+            # C6-continue routing, 2026-07-22): without this case the
+            # decision surface fell through to ROOT_BRANCH mid-run and web/
+            # interactive sessions parked forever (web-terminal-triage).
             return DecisionPoint(
                 decision_type=DecisionType.C6_PROCEED,
                 options=['yes', 'no'],

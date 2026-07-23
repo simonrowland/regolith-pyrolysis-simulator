@@ -8,7 +8,7 @@ import yaml
 from simulator.campaigns import CampaignManager
 from simulator.recipe_io import load_recipe_patch
 from simulator.runner import PyrolysisRun
-from simulator.state import BatchRecord, CampaignPhase, MeltState
+from simulator.state import BatchRecord, CampaignPhase, MeltState, DecisionType
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -74,11 +74,18 @@ def test_canonical_sequence_recovers_mg_before_final_boiloff_and_skips_mre() -> 
     )
     assert manager._campaign_overrides(CampaignPhase.C2A)["min_hold_hr"] == 82.0
     assert manager._campaign_overrides(CampaignPhase.C2A)["max_hours"] == 160.0
-    assert manager.get_next_campaign(CampaignPhase.C2A, record) == CampaignPhase.COMPLETE
+    # 2026-07-22 B1 C6-continue routing fix: noninteractive branch-two
+    # batches auto-proceed into C6 after the final C2A bake-out (Mandate
+    # section 2 — thermite needs no electrolysis; C5 stays skipped).
+    assert manager.get_next_campaign(CampaignPhase.C2A, record) == CampaignPhase.C6
+    assert manager.get_next_campaign(CampaignPhase.C6, record) == CampaignPhase.COMPLETE
+    # 2026-07-22 B1 routing fix: the final C2A bake-out is not the batch
+    # terminal on branch two — C6 (Al thermite, no electrolysis needed)
+    # follows per Mandate section 2; the old COMPLETE pin captured an
+    # unintended side effect of the final-pass feature. Non-'two' records
+    # (the canonical generator context) still complete here.
     operator_record = BatchRecord(path="A_post_mg_boiloff", branch="two")
-    assert manager.get_next_campaign(CampaignPhase.C2A, operator_record) is (
-        CampaignPhase.COMPLETE
-    )
+    assert manager.get_next_campaign(CampaignPhase.C2A, operator_record) is None
 
 
 def test_canonical_demo_yields_are_kg_scale_and_beat_legacy_floor() -> None:
