@@ -55,7 +55,7 @@ Vapor pressure is the driving quantity for the whole extraction sequence: it set
 leave the melt at a given temperature and pressure. The authoritative provider is analytic — an
 Antoine reference for the pure component, coupled to an Ellingham/activity correction that converts the
 pure-component pressure into the effective pressure over the actual melt.
-<!-- impl: §2 -> engines/builtin/vapor_pressure.py BuiltinVaporPressureProvider.dispatch:848 — Antoine Ellingham path -->
+<!-- impl: §2 -> engines/builtin/vapor_pressure.py BuiltinVaporPressureProvider.dispatch:1010 — Antoine Ellingham path -->
 
 ### §2.1 Pure-component reference
 
@@ -75,7 +75,7 @@ via the WebBook Antoine table; potassium traces to Fiock & Rodebush 1926
 1947 compilation ([doi:10.1021/ie50448a022](https://doi.org/10.1021/ie50448a022)). These are the
 `pure_component_psat` species (Ca, Al, Ti, Cr, Mn, and the alkalis' pure references) and their fits are
 CITED — traceable to a primary measurement on the basis the reference used.
-<!-- impl: §2.1 -> engines/builtin/vapor_pressure.py vapor_pressure_antoine_coefficients:335 — Antoine row selection -->
+<!-- impl: §2.1 -> engines/builtin/vapor_pressure.py vapor_pressure_antoine_coefficients:474 — Antoine row selection -->
 <!-- impl: §2.1 -> data/vapor_pressures.yaml metals.Na.pure_component_antoine:93 — pure Antoine data -->
 
 Iron is a documented exception. The WebBook carries no simple high-temperature elemental Antoine row
@@ -98,8 +98,8 @@ magnesium uses a `pure_component_psat` row. Where a usable `pure_component_antoi
 runtime selector prefers it over any inactive pseudo fallback. The VapoRock target itself comes from
 Wolf et al. 2023 (*ApJ* 947:64,
 [doi:10.3847/1538-4357/acbcc7](https://doi.org/10.3847/1538-4357/acbcc7)).
-<!-- impl: §2.1 -> engines/builtin/vapor_pressure.py _is_noncertifying_pseudo_vapor_pressure_runtime:689 — pseudo guard -->
-<!-- impl: §2.1 -> data/vapor_pressures.yaml oxide_vapors.SiO.reaction:800 — SiO standard reaction term (replaces pseudo backsolve; 3a85f59) -->
+<!-- impl: §2.1 -> engines/builtin/vapor_pressure.py _is_noncertifying_pseudo_vapor_pressure_runtime:828 — pseudo guard -->
+<!-- impl: §2.1 -> data/vapor_pressures.yaml oxide_vapors.SiO.reaction:826 — SiO standard reaction term (replaces pseudo backsolve; 3a85f59) -->
 
 ### §2.2 From pure component to effective pressure over the melt
 
@@ -119,7 +119,7 @@ Ellingham free energies use piecewise multiphase segments re-grounded from NIST-
 (Chase 1998, Monograph 9), on a per-mole-O₂ basis. Segment boundaries follow in-band metal and oxide
 phase transitions; each segment carries its own linear `dH - T*dS` representation rather than one
 condensed-phase fit across the full temperature range.
-<!-- impl: §2.2 -> engines/builtin/vapor_pressure.py BuiltinVaporPressureProvider.dispatch:848 — activity times Psat -->
+<!-- impl: §2.2 -> engines/builtin/vapor_pressure.py BuiltinVaporPressureProvider.dispatch:1010 — activity times Psat -->
 <!-- impl: §2.2 -> simulator/chemistry/ellingham_thermo.py ELLINGHAM_THERMO:48 — JANAF Ellingham table -->
 
 ### §2.3 The oxygen-pressure dissociation lever
@@ -146,8 +146,8 @@ separately subtracts the species' overhead partial pressure and applies gas-side
 Pure-MgO congruent vaporization is a third boundary condition: co-evolved Mg and O₂ are solved
 self-consistently. Its agreement validates the JANAF reaction basis, but does not justify substituting
 far-field overhead O₂ for a buffered melt's oxygen chemical potential.
-<!-- impl: §2.3 -> engines/builtin/vapor_pressure.py BuiltinVaporPressureProvider.dispatch:948 — SiO pO2 suppression -->
-<!-- impl: §2.3 -> data/vapor_pressures.yaml oxide_vapors.SiO.suppression_equation:888 — SiO equation metadata -->
+<!-- impl: §2.3 -> engines/builtin/vapor_pressure.py BuiltinVaporPressureProvider.dispatch:1010 — SiO pO2 suppression -->
+<!-- impl: §2.3 -> data/vapor_pressures.yaml oxide_vapors.SiO.suppression_equation:914 — SiO equation metadata -->
 
 ### §2.4 Metal vapor versus oxide vapor
 
@@ -158,7 +158,7 @@ its own oxygen-pressure exponent, and is charged the reaction enthalpy once rath
 heat plus a separate dissociation. When the melt temperature exceeds a row's measured Antoine range,
 the provider switches to a bounded fallback fit and guards against numerical blow-up rather than
 extrapolating the pure-component curve unphysically.
-<!-- impl: §2.4 -> engines/builtin/vapor_pressure.py BuiltinVaporPressureProvider.dispatch:927 — oxide vapor scaling -->
+<!-- impl: §2.4 -> engines/builtin/vapor_pressure.py BuiltinVaporPressureProvider.dispatch:1010 — oxide vapor scaling -->
 
 ---
 
@@ -177,7 +177,7 @@ returns activity 1. Iron oxide is the exception in interactive and batch simulat
 pass intrinsic oxygen fugacity into the vapor-pressure provider, so FeO uses the redox-resolved ferrous
 activity from the Kress & Carmichael / CALPHAD treatment of §7. The builtin single-cation-gamma,
 Kress-for-iron activity surface is what the vapor pressures of §2 are built on.
-<!-- impl: §3 -> engines/builtin/vapor_pressure.py BuiltinVaporPressureProvider.dispatch:848 — FeO Kress activity -->
+<!-- impl: §3 -> engines/builtin/vapor_pressure.py BuiltinVaporPressureProvider.dispatch:1010 — FeO Kress activity -->
 <!-- impl: §3 -> simulator/fe_redox.py kress91_ferrous_feo_activity:718 — FeO activity path -->
 
 The silicate-equilibrium engines compute activities too, on the MELTS convention
@@ -379,7 +379,7 @@ uses the Pound 1972 high-supersaturation unity condensation coefficient (α_c = 
 Ref. Data* 1:135, [doi:10.1063/1.3253096](https://doi.org/10.1063/1.3253096)). The model does not
 extrapolate the hot-source Arrhenius onto cold walls: the evaporation and condensation coefficients are
 deliberately different off-equilibrium at high supersaturation.
-<!-- impl: §4.2 -> data/vapor_pressures.yaml oxide_vapors.SiO.evaporation_alpha:834 — SiO alpha split -->
+<!-- impl: §4.2 -> data/vapor_pressures.yaml oxide_vapors.SiO.evaporation_alpha:860 — SiO alpha split -->
 
 ### §4.3 The one-hour reservoir model
 
@@ -467,7 +467,7 @@ threshold approximately tracks a pure-component saturation crossing it does so b
 condenser stage-band alignment, not the pure-substance vapor-pressure crossing. They are documented as
 such in the recipe data and are an engineering approximation pending physical validation of the real
 condenser geometry.
-<!-- impl: §5 -> data/vapor_pressures.yaml condensation_reference_at_1mbar:1052 — routing thresholds -->
+<!-- impl: §5 -> data/vapor_pressures.yaml condensation_reference_at_1mbar:1078 — routing thresholds -->
 
 The simulator reports the outcome of routing as a per-stage purity account (designated mass versus
 impurity mass per stage) and pins the routing against per-pipe-segment wall temperatures with a
@@ -616,8 +616,8 @@ heating energy and exposure to thermochemistry-refit movement. CI carbonaceous c
 promoted by this rule; the MAGEMin sample curve leaves its staged residual below the workability
 threshold through the Mg/Al₂O₃ window, so static C6 is a typed refusal with Al left in the rump.
 <!-- impl: §7.2 -> engines/builtin/metallothermic_step.py BuiltinMetallothermicStepProvider.dispatch:257 — metallothermic refusal behavior -->
-<!-- impl: §7.2 -> engines/builtin/metallothermic_step.py BuiltinMetallothermicStepProvider._reduction_margin_kj_per_mol_o2:1503 — Ellingham margin gate -->
-<!-- impl: §7.2 -> engines/builtin/metallothermic_step.py BuiltinMetallothermicStepProvider._crossover_temperature_C:1742 — crossover temperatures -->
+<!-- impl: §7.2 -> engines/builtin/metallothermic_step.py BuiltinMetallothermicStepProvider._reduction_margin_kj_per_mol_o2:1586 — Ellingham margin gate -->
+<!-- impl: §7.2 -> engines/builtin/metallothermic_step.py BuiltinMetallothermicStepProvider._crossover_temperature_C:1825 — crossover temperatures -->
 
 ### §7.3 Molten regolith electrolysis
 

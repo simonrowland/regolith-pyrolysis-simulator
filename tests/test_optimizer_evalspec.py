@@ -104,27 +104,7 @@ STAGE_SIO_GAS_MODE = (
 # reviewed electricity and solar-heat defaults landed.
 # Regenerated from canonical_evalspec_json(_base_spec()) for b-042.
 PINNED_EVALSPEC_JSON = (
-    b'{"additives_kg":{"CaO":"1.500000000"},"allow_fallback_vapor":false,'
-    b'"backend_name":"internal-analytical","c5_enabled":false,"campaign":"C0",'
-    b'"chemistry_kernel":{"allow_builtin_fallback":false,"engine":"builtin",'
-    b'"pressure_Pa":"0.001000000"},"corpus_version":"corpus-version-digest",'
-    b'"cost_parameters":{"parameters":{"depreciation_expense_per_run":'
-    b'"50.000000000","electricity_cost_per_kWh":"10.000000000",'
-    b'"furnace_lifetime_cost_multiplier":"500.000000000",'
-    b'"furnace_resinter_cost_usd":"5000.000000000",'
-    b'"generic_reagent_cost_per_kg":"10.000000000",'
-    b'"min_fouling_penalty":"1.000000000",'
-    b'"shuttle_reagent_replacement_cost_per_kg":{"Ca":"0.500000000",'
-    b'"K":"1.000000000","Mg":"0.750000000","Na":"0.500000000"},'
-    b'"solar_heat_cost_per_kWh":"0.050000000"},"schema_version":'
-    b'"optimize-costs-v1"},"data_digests":{"profile":"profile-digest"},'
-    b'"feedstock_id":"lunar_mare_low_ti","fidelity":"fast",'
-    b'"force_builtin_vapor_pressure":false,"hours":24,"mass_kg":'
-    b'"1000.000000000","mre_max_voltage_V":"0.000000000",'
-    b'"mre_target_species":"","profile_id":"oxygen-yield-v1",'
-    b'"recipe_id":"recipe-id","runtime_campaign_overrides":{"C0":'
-    b'{"hold_time_h":"1.000000000"}},"track":"pyrolysis",'
-    b'"vapor_pressure_provider_id":"builtin-vapor-pressure"}'
+    b'{"additives_kg":{"CaO":"1.500000000"},"allow_fallback_vapor":false,"backend_name":"internal-analytical","c5_enabled":false,"campaign":"C0","chemistry_kernel":{"allow_builtin_fallback":false,"engine":"builtin","pressure_Pa":"0.001000000"},"corpus_version":"corpus-version-digest","cost_parameters":{"parameters":{"depreciation_expense_per_run":"50.000000000","electricity_cost_per_kWh":"10.000000000","furnace_resinter_cost_usd":"5000.000000000","generic_reagent_cost_per_kg":"10.000000000","shuttle_reagent_replacement_cost_per_kg":{"Ca":"0.500000000","K":"1.000000000","Mg":"0.750000000","Na":"0.500000000"},"solar_heat_cost_per_kWh":"0.050000000"},"schema_version":"optimize-costs-v1"},"data_digests":{"profile":"profile-digest"},"feedstock_id":"lunar_mare_low_ti","fidelity":"fast","force_builtin_vapor_pressure":false,"hours":24,"mass_kg":"1000.000000000","mre_max_voltage_V":"0.000000000","mre_target_species":"","profile_id":"oxygen-yield-v1","recipe_id":"recipe-id","runtime_campaign_overrides":{"C0":{"hold_time_h":"1.000000000"}},"track":"pyrolysis","vapor_pressure_provider_id":"builtin-vapor-pressure"}'
 )
 PINNED_FEEDSTOCK_JSON = (
     b'[["Al2O3","13.500000000"],["FeO","16.500000000"],["SiO2","44.500000000"]]'
@@ -3112,7 +3092,7 @@ def test_lab_schedule_profile_bridges_experiment_windows_to_window_semantics() -
     ("mutation", "expected"),
     [
         ("above_declared_ceiling", "lab_schedule_temperature_exceeds_furnace_ceiling"),
-        ("above_constraint_ceiling", "lab_schedule_temperature_exceeds_furnace_T_max_C"),
+        ("above_constraint_ceiling", "lab_schedule_temperature_exceeds_profile_default_furnace_max_T_C"),
         (
             "nonmonotonic_pressure",
             "lab_schedule_chamber_pressure_mbar_time_arrays_must_be_monotonic",

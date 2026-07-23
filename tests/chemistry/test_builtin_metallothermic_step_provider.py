@@ -51,6 +51,7 @@ from engines.builtin.metallothermic_step import (
     REACTION_FAMILY_C3_NA,
     REACTION_FAMILY_C6_MG,
     SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+    C6_AL_PRODUCT_ACCOUNT,
 )
 from simulator.chemistry.melt_activity import (
     MELT_OXIDE_ACTIVITY_COEFFICIENTS,
@@ -320,6 +321,8 @@ def test_kernel_filters_provider_to_declared_accounts_only(
         "process.metal_phase",
         "process.reagent_inventory",
         SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+        # b3de842: fresh C6 thermite Al routes to the terminal product tap.
+        C6_AL_PRODUCT_ACCOUNT,
     })
     for accounts in seen_accounts:
         assert accounts == expected, (

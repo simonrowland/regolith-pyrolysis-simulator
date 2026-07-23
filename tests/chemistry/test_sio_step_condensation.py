@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import pytest
+
 from functools import lru_cache
 from typing import Any
 
@@ -49,13 +51,16 @@ def _captured_sio_equivalent_mol(liner_temperature_c: float) -> float:
 
 
 def test_subfloor_sio_does_not_create_unmaterialized_stage3_product():
-    # At this wall temperature the Stage-3 Si and SiO2 product components are
-    # each at or below MaterialLot's 1e-12 kg per-species floor.  Reporting a
-    # positive collection would project material that the ledger refused to
-    # retain; the parcel must enter the typed condensation holdup lifecycle,
-    # then either drain on a later tick or remain separately reported from
-    # terminal escape inventory.
-    assert _stage3_silica_kg(1400.0) == 0.0
+    # 2026-07-23 B1 premise shift: pre-wall-gate, the unconditional hot-wall
+    # backstop stole the SiO stream before Stage 3, leaving sub-floor crumbs
+    # there (the old ==0.0 pin). With hot walls honest (2b9f8d4), Stage-3
+    # capture is INVARIANT to liner temperature (probed 1400-1650 C: same
+    # value) — the hot-walls design doing its job. The 1e-12 kg
+    # materialization floor remains enforced at the MaterialLot layer; this
+    # scenario can no longer reach it via liner temperature.
+    assert _stage3_silica_kg(1400.0) == pytest.approx(
+        8.5982326069e-07, rel=1e-9
+    )
     retained_mol = _retained_holdup_sio_mol(1400.0)
     assert retained_mol >= 0.0
     assert retained_mol + _terminal_escape_sio_mol(1400.0) > 0.0

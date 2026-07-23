@@ -1753,6 +1753,13 @@ def test_magemin_subprocess_launches_are_serialized_across_callers(
     import simulator.melt_backend.magemin as magemin_module
 
     monkeypatch.setenv('REGOLITH_MAGEMIN_SLOTS', '1')
+    monkeypatch.setattr(
+        magemin_module, '_MAGEMIN_SUBPROCESS_LOCK',
+        tmp_path / 'isolated-magemin.lock',
+    )
+    monkeypatch.setattr(
+        magemin_module, '_MAGEMIN_SUBPROCESS_LOCK_DIR', tmp_path,
+    )
 
     first_entered = threading.Event()
     release_first = threading.Event()
@@ -1820,14 +1827,28 @@ def test_magemin_subprocess_launches_are_serialized_across_callers(
     assert state == {'active': 0, 'calls': 2, 'max_active': 1}
 
 
-def test_magemin_subprocess_slots_bound_concurrency(monkeypatch):
-    """K slots admit K concurrent launches; the K+1th blocks until release."""
+def test_magemin_subprocess_slots_bound_concurrency(monkeypatch, tmp_path):
+    """K slots admit K concurrent launches; the K+1th blocks until release.
+
+    Uses an ISOLATED lock namespace (tmp_path): the production slot files
+    are contended by real engine calls when the suite runs the split
+    chains, which broke the barrier under load (gate-1 flake).
+    """
     import simulator.melt_backend.magemin as magemin_module
 
     monkeypatch.setenv('REGOLITH_MAGEMIN_SLOTS', '3')
+    monkeypatch.setattr(
+        magemin_module, '_MAGEMIN_SUBPROCESS_LOCK',
+        tmp_path / 'isolated-magemin.lock',
+    )
+    monkeypatch.setattr(
+        magemin_module, '_MAGEMIN_SUBPROCESS_LOCK_DIR', tmp_path,
+    )
     held = []
     waited = []
-    barrier = threading.Barrier(3, timeout=5.0)
+    # 4 parties: the 3 slot holders + the main thread (a 3-party barrier
+    # left main waiting on an unfillable second cycle — gate-1 self-bug).
+    barrier = threading.Barrier(4, timeout=20.0)
 
     def hold(index):
         with magemin_module._magemin_subprocess_slot(5.0):

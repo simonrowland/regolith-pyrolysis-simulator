@@ -25,9 +25,9 @@ def test_optimizer_recipe_vocabulary_manifest_is_generated_and_self_pinned(tmp_p
     payload = json.loads(MANIFEST.read_text(encoding="utf-8"))
     digest = payload.pop("payload_digest")
     assert hashlib.sha256(MANIFEST.read_bytes()).hexdigest() == (
-        "1098ed3c68210dd6cdd89b0acc7499673aa044ca141411d15b246e202f58a87c"
+        "94c400549dc648e7e9a988496eb1aa1ae0918c60c7674e84910337a3a103619b"
     )
-    assert digest == "5449df4e9006f39299db373ec7b14902651fe9b8fc4f739adab4f26f87c1f4ca"
+    assert digest == "77ff7776160e3ffdf3dcbf6b7aa1f98f196161d0199f12562fbca4ce7d4ab6a0"
     assert hashlib.sha256(canonical_json_dumps(payload).encode()).hexdigest() == digest
     paths = {row["path"] for row in payload["allowlist"]}
     forbidden_future_prefixes = (

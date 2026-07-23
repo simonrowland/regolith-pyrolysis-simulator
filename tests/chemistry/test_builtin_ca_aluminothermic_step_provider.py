@@ -9,6 +9,7 @@ from engines.builtin.ca_aluminothermic_step import (
 from engines.builtin.metallothermic_step import (
     BuiltinMetallothermicStepProvider,
     SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+    C6_AL_PRODUCT_ACCOUNT,
 )
 from simulator.account_ids import C7_AL_CREDIT_ACCOUNT
 from simulator.accounting.exceptions import AccountingError
@@ -174,6 +175,9 @@ def test_c3_c6_metallothermic_provider_does_not_gain_c7_write_scope():
             "process.metal_phase",
             "process.reagent_inventory",
             SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+            # b3de842: fresh C6 thermite Al routes to the terminal product
+            # tap on every path (Al projection-drift fix).
+            C6_AL_PRODUCT_ACCOUNT,
         }
     )
     assert C7_AL_CREDIT_ACCOUNT not in profile.declared_accounts

@@ -654,6 +654,15 @@ def _is_out_of_engine_range(anchor: CorpusAnchor, engine: str) -> bool:
         if anchor.species in ("SiO2", "O2", "FeO", "NaO",
                               "Na_plus", "K_plus", "O"):
             return True
+        # B1 vapor package: evaluation beyond the source-certified range
+        # raises the typed VaporPressureRangeError instead of the old
+        # unbounded fail-open extrapolation. The gas-rail certified edge is
+        # 2273.15 K (data/vapor_pressures.yaml total_source_certified_range);
+        # anchors above it (Visscher-Fegley 2013 debris-disk points at
+        # 2500-4000 K) are out of the builtin engine's documented validity
+        # until t-406 lands the flagged conservative extension policy.
+        if anchor.T_K > 2273.15:
+            return True
     return False
 
 

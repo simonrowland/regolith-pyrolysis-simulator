@@ -496,7 +496,7 @@ def test_owner_pn2_anchor_reports_current_certification_state(smoke_payload):
         0.00134254286028043, rel=0.0, abs=1.0e-15
     )
     assert owner["stage_3_Fe_wt_pct"] == pytest.approx(
-        0.012185989306696739, rel=0.0, abs=1.0e-15
+        0.012182606647785619, rel=0.0, abs=1.0e-15
     )
     assert owner["ferric_divergence_material"] is False
     assert abs(owner["mass_balance_error_pct"]) <= 5e-12

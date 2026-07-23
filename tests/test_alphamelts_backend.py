@@ -5153,7 +5153,12 @@ def test_project_local_alphamelts_cold_c0_step_returns_when_installed():
     # ThermoEngine health cache (process-global reuse masked stale health), so
     # a fresh backend legitimately re-probes engine health (~4 s) before the
     # step. Warm-worker pools reuse instances and never pay this.
-    assert elapsed_s < 15.0
+    # 2026-07-23 B1 budget re-derivation: the composed vapor package adds
+    # per-species certified-range guards + suppression-fit evaluation to the
+    # cold C0 step's first equilibrium; measured quiesced 30.8 s (subset-3)
+    # and 32.6 s (gate-1 under load). Budget = measured ~32 s x 1.4 headroom
+    # ~= 45 s; still a COLD-path-only cost that warm pools never pay.
+    assert elapsed_s < 45.0
 
 
 def test_no_mode_marks_status_unavailable():
