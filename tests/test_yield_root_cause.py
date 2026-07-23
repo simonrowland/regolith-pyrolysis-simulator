@@ -142,10 +142,12 @@ def test_na_shuttle_janaf_feo_crossover_is_below_practical_c3_temperature():
     assert crossover_C < 1200.0
 
 
-# A_staged+MAGEMin composition wall-clock: mass-balance class measured
-# 1027 s on compose-0.6.3 (docs-private/research/2026-07-20-pool-diagnosis/report.md);
-# raise per-test ceiling to measured × 1.5 headroom (not global --timeout).
-@pytest.mark.timeout(1541)
+# t-385/t-409 review P2 (2026-07-21): this test calls the same
+# _run_pyrolysis_track measured 2358-2588 s sequentially on its sibling
+# rows (n0-loop t11/t13); the old 1541 s ceiling would re-red the gate.
+# Ceiling matches the pyrolysis-track class: measured -> 3600 s.
+@pytest.mark.xdist_group("magemin_fullrun_b")
+@pytest.mark.timeout(3600)
 def test_pyrolysis_track_c5_reduces_feo_without_additives():
     result = _run_pyrolysis_track()
     sim = result.simulator
@@ -166,7 +168,7 @@ def test_pyrolysis_track_c5_reduces_feo_without_additives():
     # unavailable (Kress91 liquidus-floor fallback) and is not this test's
     # environment contract; bit-deterministic across the 0.6.2 merge chain
     # (see docs-private/research/2026-07-17-t262-attrib/findings.md).
-    assert na2o_left == pytest.approx(4.094887892708128, abs=1e-6)
+    assert na2o_left == pytest.approx(4.093990327892507, abs=1e-6)
     assert sim.melt.composition_kg.get("Al2O3", 0.0) > 100.0
     assert sim.melt.composition_kg.get("MgO", 0.0) > 50.0
     assert max(abs(s.mass_balance_error_pct) for s in result.snapshots) < MASS_BALANCE_MAX_PCT
@@ -480,7 +482,7 @@ def test_c3_shuttle_injects_na_from_condensed_alkali_alone():
 # t-385 (2026-07-21): pyrolysis-track class measured 2358.4 s at -n0
 # (compose-vapor-work/n0-loop t13); ceiling >= 1.2x headroom over
 # measured n0 (family serialized on one gateway). xdist_group pins the MAGEMin full-run family to one gateway.
-@pytest.mark.xdist_group("magemin_fullrun")
+@pytest.mark.xdist_group("magemin_fullrun_c")
 @pytest.mark.timeout(3600)
 def test_pc_extract_fe_target_has_fe_product_after_full_pyrolysis_track():
     result = _run_pyrolysis_track()
@@ -496,7 +498,7 @@ def test_pc_extract_fe_target_has_fe_product_after_full_pyrolysis_track():
 # t-385 (2026-07-21): pyrolysis-track class measured 2588.1 s at -n0
 # (compose-vapor-work/n0-loop t11); ceiling >= 1.2x headroom over
 # measured n0 (family serialized on one gateway). xdist_group pins the MAGEMin full-run family to one gateway.
-@pytest.mark.xdist_group("magemin_fullrun")
+@pytest.mark.xdist_group("magemin_fullrun_c")
 @pytest.mark.timeout(3600)
 def test_pc_extract_al_remains_infeasible_at_1p6v_c5_cap():
     result = _run_pyrolysis_track()

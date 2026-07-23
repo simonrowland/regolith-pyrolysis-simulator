@@ -376,9 +376,12 @@ def test_c2a_staged_freeze_gate_on_closes_mass_balance(
         assert liquid_fractions == []
 
 
+# xdist 3.8 UNIONS group marks: keep exactly ONE xdist_group here — the
+# magemin_fullrun_b scope replaces the old per-test "serial" group (the
+# pytest.mark.serial selector mark stays for the two-pass helper).
+@pytest.mark.xdist_group("magemin_fullrun_b")
 @pytest.mark.timeout(1800)
 @pytest.mark.serial
-@pytest.mark.xdist_group("serial")
 def test_cumulative_transition_mass_closure_bounded():
     # DEFAULT_MASS_TOLERANCE_KG (20 g) bounds a single transition only.
     # A full no-MRE batch through final C2A commits hundreds of

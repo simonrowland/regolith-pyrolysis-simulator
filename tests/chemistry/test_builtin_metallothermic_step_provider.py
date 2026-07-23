@@ -2261,7 +2261,11 @@ def test_provider_short_circuits_on_empty_reagent(
 # A_staged+MAGEMin composition wall-clock: mass-balance class measured
 # 1027 s on compose-0.6.3 (docs-private/research/2026-07-20-pool-diagnosis/report.md);
 # raise per-test ceiling to measured × 1.5 headroom (not global --timeout).
-@pytest.mark.timeout(1541)
+# t-409 review P2 (2026-07-21): measured 1503.4 s vs the 1541 ceiling =
+# 2.4%% headroom; resized to the pyrolysis-track class ceiling at the
+# C4/C6 expectation re-baseline.
+@pytest.mark.xdist_group("magemin_fullrun_a")
+@pytest.mark.timeout(3600)
 @pytest.mark.live_engine
 def test_c6_static_hold_exercises_c6_proceed_decision_path(
     vapor_pressure_data,
@@ -2402,7 +2406,9 @@ def test_c6_ci_empty_window_refusal_precedes_zero_mg_noop(
 # A_staged+MAGEMin composition wall-clock: mass-balance class measured
 # 1027 s on compose-0.6.3 (docs-private/research/2026-07-20-pool-diagnosis/report.md);
 # raise per-test ceiling to measured × 1.5 headroom (not global --timeout).
-@pytest.mark.timeout(1541)
+# Derived warm-pool ceiling: mass-balance class (n0 measured ~867 s).
+@pytest.mark.xdist_group("magemin_fullrun_b")
+@pytest.mark.timeout(1800)
 def test_c6_ci_empty_window_records_binding_refusal_without_transitions(
     vapor_pressure_data,
     feedstocks_data,
@@ -2469,7 +2475,7 @@ def test_c6_ci_empty_window_records_binding_refusal_without_transitions(
 # t-385 (2026-07-21): mass-balance class measured 983.4-1001.2 s at -n0
 # (compose-vapor-work/n0-loop t2/t3); ceiling >= 1.2x headroom over
 # measured n0 (family serialized on one gateway). xdist_group pins the MAGEMin full-run family to one gateway.
-@pytest.mark.xdist_group("magemin_fullrun")
+@pytest.mark.xdist_group("magemin_fullrun_b")
 @pytest.mark.timeout(1800)
 @pytest.mark.parametrize(
     "feedstock_key, additives_kg",

@@ -392,7 +392,7 @@ def test_provider_emits_expected_proposal_for_known_inputs(
 # case — valid only because magemin_fullrun serializes the family on one
 # gateway (no MAGEMin-lock co-running). Module pytestmark deliberately has no
 # xdist_group: xdist 3.8 unions group marks (see module comment).
-@pytest.mark.xdist_group("magemin_fullrun")
+@pytest.mark.xdist_group("magemin_fullrun_a")
 @pytest.mark.timeout(1800)
 @pytest.mark.parametrize(
     "feedstock_key, additives_kg",
