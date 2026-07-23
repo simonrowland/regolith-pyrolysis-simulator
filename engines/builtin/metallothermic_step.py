@@ -25,6 +25,9 @@ kinetic / accessibility constants flow through verbatim:
   applied to 30 % of freshly produced Al when ``SiO2 > 0.1 kg`` (legacy
   ``BACK_REDUCTION_FRACTION`` constant). Re-credits Al2O3 to the melt
   and credits Si to metal phase.
+* C6 product routing: after the back-reduction cascade, freshly produced
+  net Al moves from ``process.metal_phase`` to
+  ``terminal.drain_tap_material`` as a conserved terminal metal product.
 
 Per binding spec §2 the intent is a single METALLOTHERMIC_STEP that
 covers the two reaction families.  The provider receives a
@@ -52,9 +55,9 @@ The provider:
   via the filtered :class:`ProviderAccountView`.  Reagent inventory is
   a normal process account (debiting is permitted); only terminal
   accounts have the special "credit-only via canonical commit path"
-  rule.  This provider touches no terminal accounts -- alkali-shuttle
-  bakeout vapor goes through the EVAPORATION_TRANSITION /
-  CONDENSATION_ROUTE intents (already kernel-authoritative).
+  rule.  Net C6 Al is credited to ``terminal.drain_tap_material``;
+  alkali-shuttle bakeout vapor still goes through the
+  EVAPORATION_TRANSITION / CONDENSATION_ROUTE intents.
 - reads T from ``request.temperature_C`` (currently informational only
   -- the solubility limits + rate factor are functions of melt
   composition + reagent inventory, not T; the legacy did not consult T
@@ -83,6 +86,9 @@ The provider:
     in the matched primary thermite call.  The back-reduction consumes
     ``BACK_REDUCTION_FRACTION = 0.30`` of this Al; passed in to keep the
     provider stateless across the two dispatches.
+  * ``product_routing`` / ``mol_Al_product`` (C6 only) -- move only the
+    matched tick's net thermite Al from metal-phase staging to the
+    terminal drain-tap product after back-reduction.
   * ``liquid_fraction`` (C3 K/Na shuttle + C6 primary) -- optional freeze-gate
     signal.  Exact ``0.0`` means no liquid phase, so the step is refused with
     zero yield; ``None`` means unknown and preserves legacy behavior.
@@ -105,7 +111,8 @@ reduced + credit K2O / MgO / regenerated Al2O3 coproducts),
 ``process.spent_reductant_residue`` (credit melt-resident Na2O from the
 spent Na shuttle), ``process.metal_phase`` (credit Fe/Cr/Ti/Al/Si metals
 + debit Al on back-reduction), ``process.reagent_inventory`` (debit
-K/Na/Mg consumed).
+K/Na/Mg consumed), and ``terminal.drain_tap_material`` (credit net C6
+Al product).
 Every account named in the legacy ``_record_atom_transition`` calls
 inside ``_shuttle_inject_K``, ``_shuttle_inject_Na``, and
 ``_step_thermite`` lands in this set.  The hardened kernel account-
@@ -167,6 +174,7 @@ from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 REACTION_FAMILY_C3_K = "c3_k_shuttle"
 REACTION_FAMILY_C3_NA = "c3_na_shuttle"
 REACTION_FAMILY_C6_MG = "c6_mg_thermite"
+C6_AL_PRODUCT_ACCOUNT = "terminal.drain_tap_material"
 VALID_REACTION_FAMILIES = frozenset({
     REACTION_FAMILY_C3_K,
     REACTION_FAMILY_C3_NA,
@@ -231,6 +239,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         "process.metal_phase",
         "process.reagent_inventory",
         SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+        C6_AL_PRODUCT_ACCOUNT,
     })
 
     # Legacy constants reproduced verbatim from simulator/extraction.py
@@ -363,8 +372,17 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             )
         else:
             # reaction_family == REACTION_FAMILY_C6_MG
+            product_routing = bool(controls.get("product_routing") or False)
             back_reduction = bool(controls.get("back_reduction") or False)
-            if back_reduction:
+            if product_routing:
+                result = self._dispatch_c6_al_product_routing(
+                    metal_mol,
+                    controls,
+                    registry,
+                    resolve_species_formula,
+                    control_audit,
+                )
+            elif back_reduction:
                 result = self._dispatch_c6_back_reduction(
                     composition_kg,
                     true_available_mol,
@@ -1190,6 +1208,71 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                 "mol_Al_produced": mol_Al_produced,
                 **support_diagnostic,
             },
+        )
+
+    # ------------------------------------------------------------------
+    # C6 product routing. Move only the matched tick's net thermite Al
+    # from process staging to the terminal drain-tap product.
+    # ------------------------------------------------------------------
+
+    def _dispatch_c6_al_product_routing(
+        self,
+        metal_mol: Mapping[str, float],
+        controls: Mapping[str, Any],
+        registry: Mapping[str, Any],
+        resolve_species_formula,
+        control_audit,
+    ) -> IntentResult:
+        mol_Al_requested = float(controls.get("mol_Al_product") or 0.0)
+        if not math.isfinite(mol_Al_requested):
+            mol_Al_requested = 0.0
+        mol_Al_available = max(
+            0.0,
+            float(metal_mol.get("Al", 0.0) or 0.0),
+        )
+        mol_Al_product = min(
+            max(0.0, mol_Al_requested),
+            mol_Al_available,
+        )
+        diagnostic = {
+            "reaction_family": REACTION_FAMILY_C6_MG,
+            "product_routing": True,
+            "mol_Al_requested": mol_Al_requested,
+            "mol_Al_available": mol_Al_available,
+            "mol_Al_product": mol_Al_product,
+            "product_account": C6_AL_PRODUCT_ACCOUNT,
+        }
+        if mol_Al_product <= 0.0:
+            return self._empty_result(
+                "c6_al_product_tap skipped: no fresh Al available",
+                control_audit=control_audit,
+                diagnostic=diagnostic,
+            )
+
+        debits = {
+            "process.metal_phase": {"Al": mol_Al_product},
+        }
+        credits = {
+            C6_AL_PRODUCT_ACCOUNT: {"Al": mol_Al_product},
+        }
+        atom_proof = build_atom_balance_proof(
+            debits,
+            credits,
+            registry,
+            resolve_species_formula,
+        )
+        proposal = LedgerTransitionProposal(
+            debits=debits,
+            credits=credits,
+            reason="c6_al_product_tap",
+            atom_balance_proof=atom_proof,
+        )
+        return IntentResult(
+            intent=ChemistryIntent.METALLOTHERMIC_STEP,
+            status="ok",
+            transition=proposal,
+            control_audit=control_audit,
+            diagnostic=diagnostic,
         )
 
     # ------------------------------------------------------------------

@@ -977,8 +977,11 @@ def test_mg_thermite_debits_process_reagent_inventory():
         sim.atom_ledger.kg_by_account("process.reagent_inventory")["Mg"]
     )
     assert sim.atom_ledger.kg_by_account("process.cleaned_melt")["MgO"] > 0.0
-    _assert_product_matches_account(sim, "process.metal_phase", "Al")
+    _assert_product_matches_account(sim, "terminal.drain_tap_material", "Al")
     _assert_product_matches_account(sim, "process.metal_phase", "Si")
+    assert sim.inventory.metal_alloy_kg["Al"] == pytest.approx(
+        sim.atom_ledger.kg_by_account("terminal.drain_tap_material")["Al"]
+    )
     assert sim.train.total_by_species().get("Al", 0.0) == pytest.approx(0.0)
     assert sim.train.total_by_species().get("Si", 0.0) == pytest.approx(0.0)
 
@@ -994,11 +997,23 @@ def test_mg_thermite_counters_are_net_after_committed_back_reduction():
     )
     sim.load_batch("oxide", mass_kg=1000.0, additives_kg={"Mg": 12.0})
     sim._init_thermite_inventory()
+    preexisting_al_kg = 2.0
+    sim.atom_ledger.load_external(
+        "process.metal_phase",
+        {"Al": preexisting_al_kg},
+        source="pre-existing metal-phase Al isolation test",
+    )
 
     sim._step_thermite()
 
-    ledger_al_kg = sim.atom_ledger.kg_by_account("process.metal_phase")["Al"]
-    assert sim._thermite_Al_produced_this_hr == pytest.approx(ledger_al_kg)
+    assert sim.atom_ledger.kg_by_account("process.metal_phase")["Al"] == (
+        pytest.approx(preexisting_al_kg)
+    )
+    product_al_kg = sim.atom_ledger.kg_by_account(
+        "terminal.drain_tap_material"
+    )["Al"]
+    assert sim._thermite_Al_produced_this_hr == pytest.approx(product_al_kg)
+    assert sim.inventory.metal_alloy_kg["Al"] == pytest.approx(product_al_kg)
 
 
 def test_c2a_staged_payload_exposes_terminal_rump_composition():

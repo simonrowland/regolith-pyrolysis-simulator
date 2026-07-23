@@ -6,14 +6,13 @@ CONDENSATION_ROUTE, ELECTROLYSIS_STEP).
 Covers:
 
 * Capability profile: the provider is authoritative for
-  ``METALLOTHERMIC_STEP`` and declares the three accounts the C3/C6
-  reductions touch (``process.cleaned_melt``,
-  ``process.metal_phase``, ``process.reagent_inventory``).
+  ``METALLOTHERMIC_STEP`` and declares the accounts the C3/C6
+  reductions and C6 product tap touch.
 * Wrong-intent rejection: the provider returns an ``unsupported``
   ``IntentResult`` if dispatched against an intent it does not serve.
 * Account filter: the kernel filter scopes the provider's view to the
-  three declared accounts only -- any other ledger account (overhead
-  gas, condensation_train, terminal O2 bins) is invisible.
+  declared accounts only -- any other ledger account (overhead gas,
+  condensation_train, terminal O2 bins) is invisible.
 * Per-family ground-truth proposals: deterministic per-reaction inputs
   yield the exact stoichiometric debit/credit dicts the legacy
   ``_record_atom_transition`` calls would have produced (within
@@ -26,9 +25,9 @@ Covers:
   :class:`AtomBalanceError`.  Companion accepts-balanced test pins
   that the rejection isn't a false negative.
 * Smoke parity: full C0 -> C6 run on lunar + Mars feedstocks closes
-  mass balance to the existing 5e-12 % tolerance and the kernel-
-  committed shuttle / thermite transitions land in
-  process.cleaned_melt / metal_phase / reagent_inventory only.
+  mass balance to the existing 5e-12 % tolerance and kernel-committed
+  shuttle / thermite / Al-product transitions stay within the declared
+  process and terminal-product accounts.
 """
 
 from __future__ import annotations
@@ -134,6 +133,7 @@ def test_provider_declares_metallothermic_accounts():
         "process.metal_phase",
         "process.reagent_inventory",
         SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+        "terminal.drain_tap_material",
     })
     assert "process.overhead_gas" not in profile.declared_accounts
     assert "process.condensation_train" not in profile.declared_accounts
@@ -2211,6 +2211,54 @@ def test_c6_back_reduction_caps_control_to_actual_metal_al_inventory(
     )
 
 
+def test_c6_al_product_tap_routes_only_fresh_al_to_terminal_product(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    provider = BuiltinMetallothermicStepProvider()
+    view = ProviderAccountView(
+        accounts={
+            "process.cleaned_melt": {},
+            "process.metal_phase": {"Al": 10.0},
+            "process.reagent_inventory": {},
+            "terminal.drain_tap_material": {},
+        },
+        species_formula_registry=sim.species_formula_registry,
+    )
+
+    result = provider.dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.METALLOTHERMIC_STEP,
+            account_view=view,
+            temperature_C=1400.0,
+            pressure_bar=2e-4,
+            control_inputs={
+                "reaction_family": REACTION_FAMILY_C6_MG,
+                "product_routing": True,
+                "mol_Al_product": 3.5,
+                "dt_hr": 1.0,
+            },
+        )
+    )
+
+    assert result.status == "ok"
+    assert result.transition is not None
+    assert result.transition.reason == "c6_al_product_tap"
+    assert result.transition.debits == {
+        "process.metal_phase": {"Al": pytest.approx(3.5)}
+    }
+    assert result.transition.credits == {
+        "terminal.drain_tap_material": {"Al": pytest.approx(3.5)}
+    }
+    assert result.diagnostic["mol_Al_product"] == pytest.approx(3.5)
+    _atom_check(result.transition, sim.species_formula_registry, tol=1e-12)
+
+
 def test_provider_short_circuits_on_empty_reagent(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
@@ -2335,6 +2383,19 @@ def test_c6_static_hold_exercises_c6_proceed_decision_path(
     assert any(
         transition.name == "c6_mg_thermite_primary"
         for transition in sim.atom_ledger.transitions
+    )
+    assert any(
+        transition.name == "c6_al_product_tap"
+        for transition in sim.atom_ledger.transitions
+    )
+    assert sim.atom_ledger.mol_by_account(
+        "terminal.drain_tap_material"
+    ).get("Al", 0.0) > 0.0
+    drain_tap_kg = sim.atom_ledger.project_account_kg(
+        "terminal.drain_tap_material"
+    )
+    assert sim.inventory.metal_alloy_kg.get("Al", 0.0) == pytest.approx(
+        drain_tap_kg.get("Al", 0.0)
     )
     assert sim.melt.temperature_C == pytest.approx(1400.0)
     assert abs(sim._make_snapshot().mass_balance_error_pct) < 5e-12
@@ -2546,6 +2607,7 @@ def test_full_run_mass_balance_holds_with_kernel_committed_metallothermic(
         "c3_na_shuttle_reduction",
         "c6_mg_thermite_primary",
         "c6_al_si_back_reduction",
+        "c6_al_product_tap",
     }
     metallothermic_transitions = [
         t for t in transitions
@@ -2563,6 +2625,7 @@ def test_full_run_mass_balance_holds_with_kernel_committed_metallothermic(
         "process.metal_phase",
         "process.reagent_inventory",
         SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+        "terminal.drain_tap_material",
     }
     cumulative_imbalance_kg = 0.0
     for trans in metallothermic_transitions:

@@ -2627,8 +2627,8 @@ class ExtractionMixin:
             decreasing as MgO accumulates (slag viscosity rises).
 
         Products:
-            - Al metal → collected in condenser Stage 1 (liquid metal sump)
-            - Si metal → collected in condenser Stage 2 (if back-reduction occurs)
+            - Al metal → terminal drain-tap product after back-reduction
+            - Si metal → metal-phase product (if back-reduction occurs)
             - MgO remains in the melt/slag
 
         METALLOTHERMIC_STEP intent -- kernel-authoritative since
@@ -2681,6 +2681,14 @@ class ExtractionMixin:
         # short-circuit BEFORE the back-reduction pass (no primary
         # means nothing for the cascade to consume).
         # ------------------------------------------------------------------
+        al_before_primary_mol = max(
+            0.0,
+            float(
+                self.atom_ledger.mol_by_account(
+                    'process.metal_phase'
+                ).get('Al', 0.0)
+            ),
+        )
         primary_result = self._dispatch_only(
             ChemistryIntent.METALLOTHERMIC_STEP,
             control_inputs={
@@ -2811,9 +2819,42 @@ class ExtractionMixin:
         Al_produced_kg -= Al_lost_to_back_kg
         Al2O3_removed_kg -= Al2O3_regenerated_kg
 
-        # Al product remains in the metal-phase product account.
-        self._project_extraction_product(
-            'C6', 'Al', source_account='process.metal_phase')
+        # Route only this tick's net thermite Al after back-reduction.
+        # The terminal drain-tap account is the honest product surface;
+        # no condenser-stage projection is minted for liquid Al.
+        al_after_back_mol = max(
+            0.0,
+            float(
+                self.atom_ledger.mol_by_account(
+                    'process.metal_phase'
+                ).get('Al', 0.0)
+            ),
+        )
+        mol_Al_product = max(0.0, al_after_back_mol - al_before_primary_mol)
+        product_result = self._dispatch_only(
+            ChemistryIntent.METALLOTHERMIC_STEP,
+            control_inputs={
+                'reaction_family': REACTION_FAMILY_C6_MG,
+                'product_routing': True,
+                'mol_Al_product': mol_Al_product,
+                'dt_hr': 1.0,
+            },
+        )
+        product_proposal = product_result.transition
+        if product_proposal is not None:
+            self._commit_proposal(
+                ChemistryIntent.METALLOTHERMIC_STEP,
+                product_proposal,
+                diagnostic=product_result.diagnostic,
+                control_inputs={
+                    'reaction_family': REACTION_FAMILY_C6_MG,
+                    'product_routing': True,
+                    'dt_hr': 1.0,
+                },
+            )
+            self._project_drain_tap_from_atom_ledger()
+        else:
+            self._chem_no_op_dispatch_count += 1
 
         # Deduct Mg from thermite inventory.
         self.thermite_Mg_inventory_kg = self._sync_reagent_counter_from_ledger('Mg')
