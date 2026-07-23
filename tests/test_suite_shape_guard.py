@@ -67,6 +67,16 @@ HEAVY_ROSTER = frozenset({
      "test_pc_extract_fe_target_has_fe_product_after_full_pyrolysis_track"),
     ("tests/test_yield_root_cause.py",
      "test_pc_extract_al_remains_infeasible_at_1p6v_c5_cap"),
+    # gate-2 amendments (2026-07-23): C6-continue lengthened these past the
+    # default ceiling; each carries its measured justification at the mark.
+    ("tests/test_make_recipe_db_profile.py",
+     "test_target_menu_generated_profiles_internal_analytical_eval"),
+    ("tests/test_cross_surface_parity.py",
+     "test_batch_cli_web_mol_ledger_parity"),
+    ("tests/chemistry/test_builtin_evaporation_flux_provider.py",
+     "test_shadow_parity_across_short_simulation_run"),
+    ("tests/test_staged_bakeout.py",
+     "test_c2a_staged_k_shuttle_and_conservation_remain_visible"),
 })
 
 

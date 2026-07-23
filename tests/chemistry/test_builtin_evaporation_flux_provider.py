@@ -53,7 +53,7 @@ from tests.chemistry.conftest import _build_sim
 
 
 # shadow-parity simulation runs clip/fail under xdist coscheduling.
-pytestmark = [pytest.mark.serial, pytest.mark.xdist_group("serial")]
+pytestmark = [pytest.mark.serial]
 
 _FLUX_TOLERANCE_REL = 1e-9
 _FLUX_TOLERANCE_ABS_KG_HR = 1e-9
@@ -160,6 +160,7 @@ def _series_resistance_reference_flux(
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.xdist_group("serial")
 def test_provider_declares_only_evaporation_flux_intent():
     provider = BuiltinEvaporationFluxProvider()
     profile = provider.capability_profile()
@@ -175,6 +176,7 @@ def test_provider_declares_only_evaporation_flux_intent():
             assert not profile.is_authoritative(intent)
 
 
+@pytest.mark.xdist_group("serial")
 def test_provider_declares_only_cleaned_melt_account():
     provider = BuiltinEvaporationFluxProvider()
     profile = provider.capability_profile()
@@ -186,6 +188,7 @@ def test_provider_declares_only_cleaned_melt_account():
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.xdist_group("serial")
 def test_kernel_filters_provider_to_cleaned_melt_only(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
@@ -243,6 +246,7 @@ def test_kernel_filters_provider_to_cleaned_melt_only(
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.xdist_group("serial")
 def test_provider_emits_no_ledger_transition():
     """EVAPORATION_FLUX owns no ledger mutation -- the atom-conserving
     debit/credit step belongs to EVAPORATION_TRANSITION (not yet
@@ -282,6 +286,7 @@ def test_provider_emits_no_ledger_transition():
     assert result.transition is None
 
 
+@pytest.mark.xdist_group("serial")
 def test_evaporation_caller_counts_cro2_mn_alpha_fallback_engagement(
     vapor_pressure_data,
     feedstocks_data,
@@ -315,6 +320,7 @@ def test_evaporation_caller_counts_cro2_mn_alpha_fallback_engagement(
     assert summary["unmeasured_alpha_evaporation_fallback"]["total_count"] == 2
 
 
+@pytest.mark.xdist_group("serial")
 def test_unmeasured_alpha_fallback_allowlist_is_scoped_and_loud():
     allowed = _w3_result_with_controls(
         1.0,
@@ -350,6 +356,7 @@ def test_unmeasured_alpha_fallback_allowlist_is_scoped_and_loud():
     assert "unmeasured_alpha_fallback_species" not in refused.diagnostic
 
 
+@pytest.mark.xdist_group("serial")
 def test_provider_attaches_numerator_provenance_and_resistance_shares():
     provider = BuiltinEvaporationFluxProvider()
     view = ProviderAccountView(
@@ -421,6 +428,7 @@ def test_provider_attaches_numerator_provenance_and_resistance_shares():
     assert diagnostic['Kn'] == diagnostic['knudsen_number']
 
 
+@pytest.mark.xdist_group("serial")
 def test_gas_rail_provenance_does_not_fabricate_antoine_reference():
     diagnostic = _series_pressure_provenance_diagnostic(
         species="K",
@@ -443,6 +451,7 @@ def test_gas_rail_provenance_does_not_fabricate_antoine_reference():
     assert "P_reference_Antoine_Pa" not in diagnostic
 
 
+@pytest.mark.xdist_group("serial")
 def test_evaporation_aux_fails_loud_without_molar_mass_metadata(
     feedstocks_data, setpoints_data
 ):
@@ -467,6 +476,7 @@ def test_evaporation_aux_fails_loud_without_molar_mass_metadata(
         sim._build_evaporation_aux_maps({"Mystery": 1.0})
 
 
+@pytest.mark.xdist_group("serial")
 def test_evaporation_aux_uses_atom_ledger_for_parent_oxide_availability(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
@@ -484,6 +494,7 @@ def test_evaporation_aux_uses_atom_ledger_for_parent_oxide_availability(
     )
 
 
+@pytest.mark.xdist_group("serial")
 def test_evaporation_aux_includes_spent_reductant_residue_projection_domain(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
@@ -527,6 +538,7 @@ def test_evaporation_aux_includes_spent_reductant_residue_projection_domain(
     )
 
 
+@pytest.mark.xdist_group("serial")
 def test_evaporation_aux_rejects_stale_melt_projection(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
@@ -547,6 +559,7 @@ def test_evaporation_aux_rejects_stale_melt_projection(
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.xdist_group("serial")
 def test_provider_matches_safarian_engh_pure_si_hkl_mass_flux():
     """Pure Si branch cited to Safarian & Engh 2013 must project molar HKL
     flux to mass flux with M in the numerator."""
@@ -599,6 +612,7 @@ def test_provider_matches_safarian_engh_pure_si_hkl_mass_flux():
     assert flux_kg_hr == pytest.approx(expected_kg_hr, rel=1e-12)
 
 
+@pytest.mark.xdist_group("serial")
 def test_provider_skips_species_without_grounded_molar_mass():
     provider = BuiltinEvaporationFluxProvider()
     view = ProviderAccountView(
@@ -676,6 +690,7 @@ def test_provider_skips_species_without_grounded_molar_mass():
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.xdist_group("serial")
 def test_provider_short_circuits_below_400_k():
     provider = BuiltinEvaporationFluxProvider()
     view = ProviderAccountView(
@@ -716,6 +731,7 @@ def test_provider_short_circuits_below_400_k():
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.xdist_group("serial")
 def test_provider_matches_legacy_loop_for_known_lunar_composition(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
@@ -814,6 +830,9 @@ def test_provider_matches_legacy_loop_for_known_lunar_composition(
         ("s_type_asteroid_silicate", None),
     ],
 )
+# gate-2: short-run shadow parity exceeded 300 s under 3-chain slot contention.
+@pytest.mark.xdist_group("magemin_fullrun_a")
+@pytest.mark.timeout(900)
 def test_shadow_parity_across_short_simulation_run(
     feedstock_key,
     additives_kg,
@@ -957,6 +976,7 @@ def _w3_dispatch_with_stir(stir_control) -> dict:
 
 
 @pytest.mark.parametrize("area", [-1.0, float("nan"), float("inf"), "invalid"])
+@pytest.mark.xdist_group("serial")
 def test_provider_refuses_invalid_melt_surface_area(area):
     result = _w3_result_with_controls(1.0, melt_surface_area_m2=area)
 
@@ -965,6 +985,7 @@ def test_provider_refuses_invalid_melt_surface_area(area):
     assert result.diagnostic["reason"] == "invalid_melt_surface_area_m2"
 
 
+@pytest.mark.xdist_group("serial")
 def test_provider_accepts_zero_melt_surface_area_as_valid_halt():
     result = _w3_result_with_controls(1.0, melt_surface_area_m2=0.0)
 
@@ -972,6 +993,7 @@ def test_provider_accepts_zero_melt_surface_area_as_valid_halt():
     assert result.diagnostic["evaporation_flux_kg_hr"] == {}
 
 
+@pytest.mark.xdist_group("serial")
 def test_provider_zero_axial_stir_keeps_hkl_upper_bound_without_x6_multiplier():
     result = _w3_result_with_controls({"axial": 0.0})
 
@@ -990,6 +1012,7 @@ def test_provider_zero_axial_stir_keeps_hkl_upper_bound_without_x6_multiplier():
     )
 
 
+@pytest.mark.xdist_group("serial")
 def test_provider_refuses_universal_melt_renewal_model():
     result = _w3_result_with_controls(
         1.0,
@@ -1004,6 +1027,7 @@ def test_provider_refuses_universal_melt_renewal_model():
     assert result.diagnostic["reason"] == "uncertified_melt_resistance_model"
 
 
+@pytest.mark.xdist_group("serial")
 def test_provider_suppresses_ledger_yields_at_transitional_kn_domain():
     # Kn≈0.1 at T=2023 K, D=0.12 m, P≈3.63 Pa — transitional. Viscous
     # Poiseuille P_bulk is out of domain: ledger yields suppressed (empty
@@ -1048,6 +1072,7 @@ def test_provider_suppresses_ledger_yields_at_transitional_kn_domain():
     assert ei.value.reason == "viscous_p_bulk_transport_out_of_domain"
 
 
+@pytest.mark.xdist_group("serial")
 def test_provider_refuses_missing_species_transport_parameters():
     result = _w3_result_with_controls(
         1.0,
@@ -1078,6 +1103,7 @@ def test_provider_refuses_missing_species_transport_parameters():
     )
 
 
+@pytest.mark.xdist_group("serial")
 def test_provider_keeps_nonempty_computable_transport_set_when_flux_is_zero():
     # Free-molecular / vacuum path (overhead_pressure_pa default 0): continuum
     # gas film is off, so Chapman-Enskog parameters are not required. Si is
@@ -1113,6 +1139,7 @@ def test_provider_keeps_nonempty_computable_transport_set_when_flux_is_zero():
     assert result.warnings == ()
 
 
+@pytest.mark.xdist_group("serial")
 def test_provider_refuses_dict_axial_nan():
     result = _w3_result_with_controls({"axial": float("nan")})
 
@@ -1120,6 +1147,7 @@ def test_provider_refuses_dict_axial_nan():
     assert result.diagnostic["reason"] == "invalid_stir_factor"
 
 
+@pytest.mark.xdist_group("serial")
 def test_provider_refuses_dict_axial_negative():
     result = _w3_result_with_controls({"axial": -5.0})
 
@@ -1127,6 +1155,7 @@ def test_provider_refuses_dict_axial_negative():
     assert result.diagnostic["reason"] == "invalid_stir_factor"
 
 
+@pytest.mark.xdist_group("serial")
 def test_provider_clamps_dict_axial_over_max_to_ceiling():
     """``{"axial": 1000}`` saturates at the operator ceiling."""
 
@@ -1139,6 +1168,7 @@ def test_provider_clamps_dict_axial_over_max_to_ceiling():
     )
 
 
+@pytest.mark.xdist_group("serial")
 def test_provider_validates_scalar_legacy_input_too():
     assert _w3_dispatch_with_stir(500.0)["axial_stir_applied"] == pytest.approx(10.0)
     for invalid in (float("nan"), float("inf"), -3.0):
@@ -1147,6 +1177,7 @@ def test_provider_validates_scalar_legacy_input_too():
         assert result.diagnostic["reason"] == "invalid_stir_factor"
 
 
+@pytest.mark.xdist_group("serial")
 def test_provider_refuses_bool_input():
     for invalid in (True, False):
         result = _w3_result_with_controls(invalid)
@@ -1155,6 +1186,7 @@ def test_provider_refuses_bool_input():
 
 
 @pytest.mark.parametrize("axis", ["axial", "radial"])
+@pytest.mark.xdist_group("serial")
 def test_provider_refuses_invalid_stir_on_both_axes(axis):
     result = _w3_result_with_controls({axis: -1.0})
 
@@ -1162,6 +1194,7 @@ def test_provider_refuses_invalid_stir_on_both_axes(axis):
     assert result.diagnostic["reason"] == "invalid_stir_factor"
 
 
+@pytest.mark.xdist_group("serial")
 def test_provider_canonical_path_is_idempotent_under_clamp():
     """An already-sanitised scalar (e.g., 6.0) must pass through the
     clamp untouched — the canonical sim path through

@@ -599,6 +599,9 @@ def test_no_declared_campaign_window_is_target_visible(
 
 
 @pytest.mark.parametrize("target_id", RUNNABLE_TARGET_IDS)
+# gate-2: C6-continue lengthened profile evals past the 300 s default (3x timeout observed); measured class + slot-wait allowance.
+@pytest.mark.xdist_group("magemin_fullrun_d")
+@pytest.mark.timeout(900)
 def test_target_menu_generated_profiles_internal_analytical_eval_no_campaign_vocabulary_abort(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,

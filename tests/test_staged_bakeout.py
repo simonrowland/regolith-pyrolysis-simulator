@@ -174,6 +174,9 @@ def staged_ceiling_case():
     return _run_staged(complete=True)
 
 
+# gate-2: module fixture now completes the full staged path (C6-continue), ~1700 s; ceiling covers fixture setup.
+@pytest.mark.xdist_group("magemin_fullrun_b")
+@pytest.mark.timeout(3600)
 def test_c2a_staged_k_shuttle_and_conservation_remain_visible(
     staged_ceiling_case,
 ):

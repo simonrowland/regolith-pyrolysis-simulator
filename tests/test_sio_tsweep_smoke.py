@@ -70,7 +70,7 @@ def _read_index(output_dir: Path):
 # ceiling >= 1.2x headroom over measured n0 (family serialized on one gateway). xdist_group pins the MAGEMin
 # full-run family to one gateway.
 @pytest.mark.xdist_group("magemin_fullrun_c")
-@pytest.mark.timeout(600)
+@pytest.mark.timeout(1200)
 @pytest.mark.parametrize("feedstock", FEEDSTOCKS)
 def test_sio_tsweep_cli_smoke_2x2x2_grid(tmp_path, feedstock):
     output_dir = _run_tsweep(
@@ -97,7 +97,7 @@ def test_sio_tsweep_cli_smoke_2x2x2_grid(tmp_path, feedstock):
 # ceiling >= 1.2x headroom over measured n0 (family serialized on one gateway). xdist_group pins the MAGEMin
 # full-run family to one gateway.
 @pytest.mark.xdist_group("magemin_fullrun_c")
-@pytest.mark.timeout(600)
+@pytest.mark.timeout(1200)
 @pytest.mark.parametrize("feedstock", FEEDSTOCKS)
 def test_sio_tsweep_single_cell_deterministic(tmp_path, feedstock):
     metrics = []
@@ -128,7 +128,7 @@ def test_sio_tsweep_single_cell_deterministic(tmp_path, feedstock):
 # ceiling >= 1.2x headroom over measured n0 (family serialized on one gateway). xdist_group pins the MAGEMin
 # full-run family to one gateway.
 @pytest.mark.xdist_group("magemin_fullrun_c")
-@pytest.mark.timeout(600)
+@pytest.mark.timeout(1200)
 def test_sio_wall_sweep_cli_smoke(tmp_path):
     output_dir = tmp_path / "wall-sweep"
     summary_path = tmp_path / "wall-summary.json"
