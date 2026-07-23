@@ -81,7 +81,12 @@ def test_batch_cli_web_mol_ledger_parity(monkeypatch):
     ]
 
     campaigns = _campaigns(batch.summaries)
-    assert campaigns == ["C0", "C0B", "C2A_STAGED", "C3_NA", "C4", "C2A"]
+    # 2026-07-22 B1 re-baseline: composed physics lengthened the early
+    # campaigns (C4's no-signal window alone is 20 h), so the 20 h parity
+    # budget now ends inside C4. The subject here is CROSS-SURFACE LEDGER
+    # PARITY on a multi-campaign drive — the deep tail (final C2A, C6) is
+    # covered by the canonical-recipe and C6 tests at full length.
+    assert campaigns == ["C0", "C0B", "C2A_STAGED", "C3_NA", "C4"]
     assert _campaign_transition_exercised(batch.summaries)
     assert web.campaign_event_count >= 1
 

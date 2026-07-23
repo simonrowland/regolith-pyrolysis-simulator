@@ -70,14 +70,18 @@ def _run_script(lines: list[str]):
 
 
 def _complete_recommended_path(runner: SessionScriptRunner) -> None:
+    # 2026-07-22 B1: advance regardless of a pending decision — the composed
+    # canonical path (C4 window + 160 h final C2A + C6-continue) leaves the
+    # sim mid-campaign between decisions, and the old early-return on
+    # decision-is-None abandoned the run incomplete. 30 + 8x96 h covers the
+    # full staged path with headroom.
     for _ in range(8):
         sim = runner.session._sim
         if sim.is_complete():
             return
         decision = sim.pending_decision
-        if decision is None:
-            return
-        sim.apply_decision(decision.decision_type, decision.recommendation)
+        if decision is not None:
+            sim.apply_decision(decision.decision_type, decision.recommendation)
         runner.execute(shlex.split("advance 96"), "advance 96")
 
 

@@ -1,4 +1,8 @@
 """Regression tests for pause/resume idempotency at the decision gate.
+# 2026-07-22 B1: completion-wait deadlines scaled 4x — the composed
+# canonical path (C4 window + 160 h final C2A + C6-continue) runs
+# roughly 3-4x more sim-hours per web drive than the pre-compose path.
+
 
 Background. The simulator parks every run at engine-owned decision gates
 (``sim.paused_for_decision`` / ``sim.pending_decision``). That gate is
@@ -155,7 +159,7 @@ def client():
             _clear_simulation_state(sid)
 
 
-def _start_and_get_sid(client, *, timeout=10.0):
+def _start_and_get_sid(client, *, timeout=40.0):
     """Emit ``start_simulation`` and return the sid the run registered under."""
     before = set(_simulations)
     client.emit('start_simulation', START_PARAMS)
@@ -169,7 +173,7 @@ def _start_and_get_sid(client, *, timeout=10.0):
     raise AssertionError('simulation state never registered after start')
 
 
-def _wait_for_event(client, name, *, timeout=20.0):
+def _wait_for_event(client, name, *, timeout=80.0):
     """Poll until one queued event matches ``name``.
 
     Returns ``(matching_payload, drained_events)`` where ``drained_events`` is
@@ -187,7 +191,7 @@ def _wait_for_event(client, name, *, timeout=20.0):
         f'timed out waiting for {name!r}; saw {[m["name"] for m in drained]}')
 
 
-def _wait_loop_settled(sid, *, timeout=10.0):
+def _wait_loop_settled(sid, *, timeout=40.0):
     """Block until the run's background loop thread has exited.
 
     The loop stores its thread in ``state['thread']`` and ``break``s out of the
@@ -212,7 +216,7 @@ def _wait_loop_settled(sid, *, timeout=10.0):
     raise AssertionError('background loop thread never settled at the gate')
 
 
-def _drive_to_completion(client, *, sid=None, perturb_each_gate=False, timeout=60.0):
+def _drive_to_completion(client, *, sid=None, perturb_each_gate=False, timeout=240.0):
     """Answer every gate with its recommendation.
 
     Returns ``(decisions, counts, completion, status_counts)`` where
@@ -230,12 +234,21 @@ def _drive_to_completion(client, *, sid=None, perturb_each_gate=False, timeout=6
     status_counts = Counter()
     decisions = []
     completion = None
+    terminal_status = None
     deadline = time.time() + timeout
     while time.time() < deadline:
         for msg in client.get_received():
             counts[msg['name']] += 1
             if msg['name'] == 'simulation_status':
-                status_counts[msg['args'][0].get('status')] += 1
+                status_payload = msg['args'][0]
+                status_counts[status_payload.get('status')] += 1
+                if (
+                    status_payload.get('run_id')
+                    and status_payload.get('status') in {
+                        'cancelled', 'error', 'refused'
+                    }
+                ):
+                    terminal_status = status_payload
             if msg['name'] == 'decision_required':
                 d = msg['args'][0]
                 decisions.append(d['type'])
@@ -248,8 +261,13 @@ def _drive_to_completion(client, *, sid=None, perturb_each_gate=False, timeout=6
                 completion = msg['args'][0]
         if completion is not None:
             break
+        if terminal_status is not None:
+            break
         time.sleep(0.02)
-    assert completion is not None, 'run did not reach simulation_complete'
+    assert completion is not None, (
+        'run terminated before simulation_complete: '
+        f'{terminal_status or "no terminal event received"}'
+    )
     return decisions, counts, completion, status_counts
 
 

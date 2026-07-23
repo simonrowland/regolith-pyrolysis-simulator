@@ -132,15 +132,27 @@ def _drive(
     state = _simulations[sid]
     decisions = []
     completion = None
+    terminal_status = None
     rejected = False
 
-    for _ in range(20):
+    # 2026-07-22 B1: 20 -> 60 rounds — the composed canonical path adds the
+    # 160 h final C2A + C6 leg to every full drive.
+    for _ in range(60):
         assert driver["tasks"], "run stopped without a terminal event"
         target, args, kwargs = driver["tasks"].pop(0)
         target(*args, **kwargs)
         received = list(client.get_received())
         events.extend(received)
         for event in received:
+            if event["name"] == "simulation_status":
+                status_payload = event["args"][0]
+                if (
+                    status_payload.get("run_id")
+                    and status_payload.get("status") in {
+                        "cancelled", "error", "refused"
+                    }
+                ):
+                    terminal_status = status_payload
             if event["name"] == "decision_required":
                 decision = event["args"][0]
                 if perturb_every_gate:
@@ -168,8 +180,13 @@ def _drive(
                 completion = event["args"][0]
         if completion is not None:
             break
+        if terminal_status is not None:
+            break
 
-    assert completion is not None
+    assert completion is not None, (
+        "run terminated before simulation_complete: "
+        f"{terminal_status or 'no terminal event received'}"
+    )
     return sid, state, events, decisions, completion
 
 
