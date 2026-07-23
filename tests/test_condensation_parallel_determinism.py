@@ -146,12 +146,19 @@ def test_cold_wall_segment_attribution_matches_configured_geometry_values():
 
     # Premise: the configured 0.06 m throat radius and downstream area ratios
     # give A1 = pi*(0.06 m)^2*4.0 and A2 = pi*(0.06 m)^2*4.5; the configured
-    # operating point gives SiO wall flux J = 0.062743751473665094 mol/m^2/s.
+    # operating point gives SiO wall flux J = 0.062461400479484286 mol/m^2/s.
+    # 2026-07-23 re-pin (stale-pin correction): 07fa3fe gated the SiO
+    # reactive-product backstop at the wall deposition site (T_surface <=
+    # T_cond), moving J from the 37cf443-ratified 0.062743751473665094 to the
+    # value below; re-derived from the executable cold-wall path on
+    # compose-0.6.3 @ 32a3a5c and verified byte-identical across repeated
+    # in-process runs and fresh processes. The area-proportional attribution
+    # (A2/A1 = 4.5/4.0) and the disproportionation split are unchanged.
     # Algebra: m_i = J*A_i*M_SiO*3600, so A2/A1 = m2/m1 = 4.5/4.0.
     # Unit check: (mol/m^2/s)*(m^2)*(kg/mol)*(s/h) = kg/h.
     # Sanity: the attributed total is conserved and the larger area deposits
     # more mass.
-    sio_flux_mol_m2_s = 0.062743751473665094
+    sio_flux_mol_m2_s = 0.062461400479484286
     segment_areas_m2 = {
         "process.wall_deposit_segment_stage_0_to_stage_1": (
             math.pi * 0.06**2 * 4.0

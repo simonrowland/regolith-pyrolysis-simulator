@@ -5,6 +5,8 @@ import json
 import shlex
 from typing import Any
 
+import pytest
+
 import app as app_module
 import simulator.runner as runner_module
 import simulator.session_cli as session_cli_module

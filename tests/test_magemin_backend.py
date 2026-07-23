@@ -205,8 +205,10 @@ def test_magemin_runtime_pool_uses_right_sized_warm_timeout(monkeypatch):
         'MgO': 40.0,
     })
     assert backend._call_magemin(projection, 1200.0, 1.0, -8.0)
-    assert submitted['timeout_s'] == pytest.approx(2.0)
-    assert submitted['request']['call_timeout_s'] == pytest.approx(2.5)
+    assert submitted['timeout_s'] == pytest.approx(MAGEMIN_WARM_CALL_TIMEOUT_S)
+    assert submitted['request']['call_timeout_s'] == pytest.approx(
+        MAGEMIN_WARM_CALL_TIMEOUT_S + 0.5
+    )
 
 
 def test_magemin_equilibrate_surfaces_typed_hang_without_disabling_backend(

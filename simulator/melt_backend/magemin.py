@@ -134,8 +134,31 @@ from simulator.melt_backend.liquidus import (
 from simulator.state import OXIDE_SPECIES
 
 
-MAGEMIN_WARM_CALL_TIMEOUT_S = 2.0
-MAGEMIN_WARM_LIQUIDUS_BUDGET_S = 15.0
+# 2026-07-23 B1 gate-2 warm-gateway residue: per-call hard wall raised
+# 2.0 -> 15.0 s. The 2.0 s wall was calibrated for an uncontended slot-free
+# machine; measured under 6-way concurrent MAGEMin load on top of a full
+# xdist gate (18 workers, M5 MacBook Pro): p50 = 0.16 s, p90 = 0.41 s,
+# p99 = 1.73 s, max = 1.98 s, with 10/767 calls crossing the 2.0 s wall.
+# Every crossing surfaced as EngineWorkerTimeout -> provider
+# 'not_converged'/'unavailable' -> the freeze-gate curve silently fell back
+# from the MAGEMin gate dispatch to the backend/kernel liquidus source,
+# shifting wall-deposit/redox values ~0.1-0.5 % on warm xdist gateways
+# (the coating-SHA / split_path[lunar] drift class). The timeout value does
+# NOT touch physics: warm and cold subprocess results are byte-identical
+# (tests/test_engine_worker_live_determinism.py A/B), so this only moves
+# when the hard wall fires. 15.0 s gives ~8x headroom over the measured p99
+# while staying well inside the 60.0 s finder aggregate budget below.
+MAGEMIN_WARM_CALL_TIMEOUT_S = 15.0
+# 2026-07-23 B1 gate-2 (same drift class as the call wall above): the warm
+# liquidus-finder aggregate budget raised 15.0 -> 60.0 s. Measured full
+# freeze-gate curve scans under the same 6-way + full-gate load: p50 =
+# 12.7 s, p90 = max = 14.8 s completing, with 3/15 scans exhausting the
+# 15.0 s budget at ~15.3 s -> 'not_converged' -> silent freeze-gate curve
+# source fallback. 60.0 s is ~4x the measured scan max while still far
+# below the cold/diagnostic DEFAULT_LIQUIDUS_FINDER_BUDGET_S (300 s) that
+# bounds the spinel-hang class; like the call wall it moves only when the
+# budget fires, never the physics of a completed scan.
+MAGEMIN_WARM_LIQUIDUS_BUDGET_S = 60.0
 _MAGEMIN_SUBPROCESS_LOCK_DIR = Path(
     tempfile.gettempdir(),
     'regolith-pyrolysis-simulator',
