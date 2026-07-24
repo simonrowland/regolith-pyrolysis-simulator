@@ -336,6 +336,16 @@ class ThermoEngineTransport:
                 return ok, message
 
         target_fO2_log = -9.0
+        # SC-92 boundary note (2026-07-24 sweep, lens B): this generated
+        # program constructs a spawn-capable transport at module level
+        # WITHOUT a __main__ guard. That is safe ONLY because (a) it runs
+        # via `python -c` — a -c program has no importable __main__ file
+        # for multiprocessing spawn-prepare to re-execute — and (b) it
+        # uses _initialize_in_process(), never initialize(), so no
+        # WarmEngineWorker spawns inside the probe. If you ever switch
+        # this probe to initialize()/the warm pool, or materialize it as
+        # a script file, add the guard or you re-open the recursive-spawn
+        # class (sweep-corpus SC-92; f1fb933).
         code = f"""
 from engines.alphamelts.thermoengine import ThermoEngineTransport
 
