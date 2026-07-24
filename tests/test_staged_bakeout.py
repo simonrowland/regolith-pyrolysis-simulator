@@ -205,25 +205,16 @@ def test_c2a_staged_k_shuttle_and_conservation_remain_visible(
     assert _cumulative_transition_imbalance_kg(sim) < 1e-6
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "Premise (thermal Fe plateaus at an ~86% ceiling that the Na/K shuttle then "
-        "breaks) is an artifact of the OLD forward-Euler evaporation integrator. "
-        "Re-enabling this one acceptance requires liquid-fraction-gated evaporation "
-        "to establish a physical freezing-floor residual; do not retune the ceiling."
-    ),
-)
-def test_c2a_staged_thermal_fe_ceiling_pending_liquid_fraction_gate(
-    staged_ceiling_case,
-):
-    sim = staged_ceiling_case
-    products = sim.product_ledger()
-    initial_fe = _fe_element_kg(sim.record.snapshots[0].inventory.raw_components_kg)
-    shuttle_fe = _metal_phase_fe_kg(sim)
-    thermal_fe = products.get("Fe", 0.0) - shuttle_fe
-
-    assert 0.84 <= thermal_fe / initial_fe <= 0.90
+# Deleted 2026-07-24 (CI-audit finding 2): a strict-xfail test
+# (`test_c2a_staged_thermal_fe_ceiling_pending_liquid_fraction_gate`)
+# asserted that thermal Fe plateaus at an ~86% ceiling the Na/K shuttle
+# then breaks — a premise the OLD forward-Euler evaporation integrator
+# produced, retired with it. As an ungrouped test it independently
+# rebuilt the ~1700 s `staged_ceiling_case` module fixture on a second
+# xdist worker while never enforcing anything (expected-fail). If a
+# liquid-fraction-gated freezing-floor residual lands (the re-enabling
+# condition its reason named), write a NEW acceptance against that
+# physics rather than resurrecting the old ceiling; do not retune.
 
 
 def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():

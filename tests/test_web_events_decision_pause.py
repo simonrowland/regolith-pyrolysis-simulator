@@ -309,15 +309,16 @@ def test_resume_while_parked_at_decision_does_not_re_emit(client):
     ticks = [m for m in during if m['name'] == 'simulation_tick']
     assert ticks == [], f'loop stepped past an unanswered gate: {len(ticks)} ticks'
 
-    # The original gate is still answerable and routes the run to completion.
+    # The original gate is still answerable and provably advances the run:
+    # the NEXT gate arriving is the routing proof. CI-audit 2026-07-24
+    # finding 1: this test's unique contract (no re-emit / no step-past on
+    # pacing churn) is fully established above; driving on to terminal
+    # completion re-proved what test_pause_resume_around_every_gate_is_
+    # ledger_identical already proves byte-for-byte, at ~79 s per test on
+    # the serialized web chain.
     client.emit('make_decision', {'choice': first['recommendation']})
-    decisions, counts, completion, _ = _drive_to_completion(client)
-
-    assert [first['type'], *decisions] == EXPECTED_DECISIONS
-    # First gate was drained + answered above; the remainder come through here.
-    assert counts['decision_required'] == len(EXPECTED_DECISIONS) - 1
-    assert completion['mass_balance_error_pct'] == pytest.approx(0.0, abs=1e-3)
-
+    second, _ = _wait_for_event(client, 'decision_required')
+    assert second['type'] == EXPECTED_DECISIONS[1]
 
 
 def test_null_make_decision_while_parked_at_path_ab_is_rejected(client):
@@ -350,12 +351,15 @@ def test_null_make_decision_while_parked_at_path_ab_is_rejected(client):
     assert pending.decision_type.name == 'PATH_AB'
     assert session.simulator.record.decisions == []
 
+    # A VALID answer after the rejected null must advance to the next gate
+    # — asserted explicitly so the null-rejection contract includes "the
+    # gate is still routable", not just "the null was refused". Terminal
+    # completion under decision churn stays proven by
+    # test_pause_resume_around_every_gate_is_ledger_identical
+    # (CI-audit 2026-07-24 finding 1; ~78 s saved on the serial chain).
     client.emit('make_decision', {'choice': first['recommendation']})
-    decisions, counts, completion, _ = _drive_to_completion(client)
-
-    assert [first['type'], *decisions] == EXPECTED_DECISIONS
-    assert counts['decision_required'] == len(EXPECTED_DECISIONS) - 1
-    assert completion['mass_balance_error_pct'] == pytest.approx(0.0, abs=1e-3)
+    second, _ = _wait_for_event(client, 'decision_required')
+    assert second['type'] == EXPECTED_DECISIONS[1]
 
 
 def test_pause_resume_around_every_gate_is_ledger_identical(client):

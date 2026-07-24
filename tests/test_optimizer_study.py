@@ -6194,17 +6194,22 @@ def test_two_phase_certification_filters_exact_infeasible_before_objective(tmp_p
 
 def test_two_phase_certification_all_infeasible_completes_no_winner(tmp_path) -> None:
     out = tmp_path / "two-phase-exact-all-infeasible"
+    # budget 1 / top_k 1 (was 5/3): every candidate has the SAME outcome
+    # here, so one proves the no-winner contract; multi-candidate pool
+    # size, ordering, disagreement, and top-k behavior are exercised by
+    # the mixed/ordering/Pareto/tie tests (CI-audit 2026-07-24 finding 5;
+    # 13.7 s -> 1.3 s).
     result = study.run(
         PROFILE,
         FEEDSTOCK,
         "random",
         "stub",
         1,
-        5,
+        1,
         out,
         seed=7,
         evaluator=_two_phase_exact_all_infeasible_evaluate_patch,
-        two_phase_certify={"enabled": True, "top_k": 3},
+        two_phase_certify={"enabled": True, "top_k": 1},
     )
 
     pareto_payload = json.loads((out / "pareto.json").read_text())
@@ -6237,17 +6242,20 @@ def test_two_phase_certification_all_degraded_completes_no_winner(tmp_path) -> N
         encoding="utf-8",
     )
 
+    # budget 1 / top_k 1 (was 5/3): homogeneous all-degraded outcome —
+    # same rationale as the all-infeasible test above (CI-audit
+    # 2026-07-24 finding 5; 14.1 s -> 0.5 s).
     result = study.run(
         PROFILE,
         FEEDSTOCK,
         "random",
         "stub",
         1,
-        5,
+        1,
         out,
         seed=7,
         evaluator=_two_phase_exact_all_degraded_evaluate_patch,
-        two_phase_certify={"enabled": True, "top_k": 3},
+        two_phase_certify={"enabled": True, "top_k": 1},
     )
 
     assert result.status == study.COMPLETED_NO_FEASIBLE_WINNER_STATUS

@@ -10,7 +10,9 @@ import subprocess
 import sys
 import tempfile
 
-from simulator.session_cli import SessionScriptRunner
+import io
+
+from simulator.session_cli import SessionScriptRunner, run_script
 from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
 
 
@@ -95,6 +97,36 @@ def _run_session(script: str, *, strict: bool = False) -> subprocess.CompletedPr
         env=env,
         check=False,
     )
+
+
+class _InProcessResult:
+    """Shape-compatible stand-in for subprocess.CompletedProcess."""
+
+    def __init__(self, returncode: int, stdout: str, stderr: str) -> None:
+        self.returncode = returncode
+        self.stdout = stdout
+        self.stderr = stderr
+
+
+def _run_session_inprocess(script: str, *, strict: bool = False) -> _InProcessResult:
+    """Drive ``run_script`` in-process — no CLI subprocess.
+
+    CI-audit 2026-07-24 finding 4: state/parser contract tests each paid
+    ~13 s of subprocess startup to assert behavior that lives entirely in
+    ``session_cli.run_script`` (same frame, returncode, and stderr
+    semantics as the CLI loop). The OS transport boundary — real
+    stdin/stdout plumbing, exit status, alias parity, byte determinism —
+    stays covered by the retained subprocess tests
+    (``test_session_script_exercises_every_verb_as_ndjson``,
+    ``test_session_strict_exits_nonzero_on_first_error``,
+    ``test_session_script_is_byte_deterministic``,
+    ``test_run_subcommand_matches_runner_byte_for_byte``).
+    """
+    out, err = io.StringIO(), io.StringIO()
+    rc = run_script(
+        script.strip().splitlines(), strict=strict, stdout=out, stderr=err
+    )
+    return _InProcessResult(rc, out.getvalue(), err.getvalue())
 
 
 def _frames(stdout: str) -> list[dict]:
@@ -216,7 +248,7 @@ def test_session_script_exercises_every_verb_as_ndjson():
 
 
 def test_invalid_path_ab_choice_is_typed_refusal_and_stays_pending():
-    result = _run_session(
+    result = _run_session_inprocess(
         """
         start --feedstock=lunar_mare_low_ti --campaign=C0 --backend=stub --setpoint=C0.max_hours=1 --setpoint=C0B.max_hours=1
         advance 10
@@ -277,7 +309,7 @@ def test_session_script_is_byte_deterministic():
 
 
 def test_session_bad_out_of_state_verb_emits_error_and_continues():
-    result = _run_session(
+    result = _run_session_inprocess(
         """
         decide A
         start --feedstock=lunar_mare_low_ti --backend=stub
@@ -311,7 +343,7 @@ def test_session_strict_exits_nonzero_on_first_error():
 
 
 def test_advance_n_stops_on_first_control_frame():
-    result = _run_session(
+    result = _run_session_inprocess(
         """
         start --feedstock=lunar_mare_low_ti --backend=stub --setpoint=C0.max_hours=1 --setpoint=C0B.max_hours=1
         advance 10
@@ -332,7 +364,7 @@ def test_advance_n_stops_on_first_control_frame():
 
 
 def test_adjust_variadic_campaign_override_and_scalar_forms_parse():
-    result = _run_session(
+    result = _run_session_inprocess(
         """
         start feedstock=lunar_mare_low_ti campaign=C2A backend=stub
         adjust campaign_override C2A stir_factor 1.5

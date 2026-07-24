@@ -14,6 +14,12 @@ GOLDEN_TRACE = (
     / "web_trace"
     / "lunar_mare_low_ti_short_operator_decision.json"
 )
+# CI-audit 2026-07-24 finding 8: this dynamic xfail means the committed
+# golden is NOT enforced (the required-event + determinism checks above
+# it still are). Rebaselining is an owner-gated behavior-change review —
+# when it happens, replace the xfail with a hard byte assertion; the
+# current mismatch must become a failure, never a silently blessed
+# new baseline.
 GOLDEN_DRIFT_REASON = (
     "Golden trace drift from V1b convention metadata + F4 by-species rump "
     "payload + S1b shuttle gate post-2026-05-26 stack. Awaiting the "

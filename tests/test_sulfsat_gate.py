@@ -126,32 +126,29 @@ def _published_kress91_morb_anchor() -> tuple[Dict[str, float], Dict[str, float]
     }
 
 
-def _probe_live_pysulfsat() -> bool:
+def _pysulfsat_installed() -> bool:
     """
-    Return True only if a fresh ``SulfSatGate`` can deliver an
-    ``in_range`` result for ``_MORB_COMP_WT`` at MORB-style conditions.
+    Cheap collection-time availability check: module spec only, no
+    library execution.
 
-    The probe runs the full gate pipeline, including the upstream
-    PySulfSat call, so a missing optional column or an upstream API
-    change cleanly downgrades to ``unavailable`` and the skip fires.
+    2026-07-24 CI-audit finding 6: the previous import-time probe ran a
+    full end-to-end gate computation (~10.4 s) during COLLECTION on any
+    box with PySulfSat installed. Collection now checks only that the
+    module is importable-in-principle; the end-to-end drive lives inside
+    the live test body, which skips itself at execution when the adapter
+    cannot drive the installed library (the correct isolation boundary —
+    an upstream API break now surfaces at the live test instead of as a
+    10-second collection stall for every unrelated test run).
     """
-    gate = SulfSatGate()
-    if not gate.initialize({}):
+    from importlib.util import find_spec
+
+    try:
+        return find_spec('PySulfSat') is not None
+    except (ImportError, ValueError):
         return False
-    result = gate.compute_sulfur_saturation(
-        liquid_comp_wt=_MORB_COMP_WT,
-        T_K=1400.0,
-        P_bar=1.0,
-        fO2_log=-9.0,
-        S_input_ppm=1000.0,
-    )
-    return (
-        result.calibration_status == 'in_range'
-        and result.SCSS_ppm > 0.0
-    )
 
 
-SULFSAT_AVAILABLE = _probe_live_pysulfsat()
+SULFSAT_AVAILABLE = _pysulfsat_installed()
 
 
 # ---------------------------------------------------------------------------
@@ -632,14 +629,25 @@ def test_invalid_operator_fe3fet_returns_unavailable(monkeypatch):
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.live_engine
 @pytest.mark.skipif(
     not SULFSAT_AVAILABLE,
-    reason='PySulfSat not installed / adapter unable to drive it end-to-end',
+    reason='PySulfSat not installed',
 )
 def test_live_pysulfsat_morb_basalt():
-    """One MORB-basalt composition, one call, one assertion path."""
+    """One MORB-basalt composition, one call, one assertion path.
+
+    The end-to-end drive happens here, not at collection (CI-audit
+    finding 6). ``unavailable`` means the installed library cannot be
+    driven by the adapter (missing optional column, upstream API shift)
+    — an environment condition, so skip. Any other non-``in_range``
+    status for this deliberately in-window composition is a real
+    calibration/adapter regression and FAILS (the old import-time probe
+    silently converted that case into a skip).
+    """
     gate = SulfSatGate()
-    assert gate.initialize({}) is True
+    if not gate.initialize({}):
+        pytest.skip('adapter cannot initialize installed PySulfSat')
 
     result = gate.compute_sulfur_saturation(
         liquid_comp_wt=_MORB_COMP_WT,
@@ -649,5 +657,7 @@ def test_live_pysulfsat_morb_basalt():
         S_input_ppm=1000.0,
     )
 
+    if result.calibration_status == 'unavailable':
+        pytest.skip('adapter cannot drive installed PySulfSat end-to-end')
     assert result.calibration_status == 'in_range'
     assert result.SCSS_ppm > 0.0

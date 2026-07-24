@@ -2083,7 +2083,13 @@ def test_one_topology_vs_all_topologies_study(tmp_path) -> None:
         FEEDSTOCK,
         "staged",
         "stub",
-        parallel=len(topologies),
+        # parallel=1 (was len(topologies)=32): this is a shape/identity
+        # test — topology coverage, unique candidate ids, no duplicate
+        # store keys — and 32 nested workers made it 31.4 s vs 8.3 s
+        # serial (CI-audit 2026-07-24 finding 3). Process-pool behavior
+        # is covered by test_optimizer_pool.py and the smaller
+        # multi-topology tests.
+        parallel=1,
         budget=len(topologies),
         out_dir=tmp_path / "all",
         seed=59,

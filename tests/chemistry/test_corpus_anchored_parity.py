@@ -918,6 +918,9 @@ def _grid_25_v3_status_label(anchor_id: str, entry: dict) -> str:
     return status
 
 
+# CI-audit 2026-07-24 finding 7: pin each fixture pair to one xdist
+# worker so the module-scoped report builds once, not once per worker.
+@pytest.mark.xdist_group("corpus_grid25")
 def test_grid_25_cohort_passes_acceptance_gate(
     grid_25_vaporock_report: dict[str, dict],
 ):
@@ -1012,6 +1015,9 @@ def test_grid_25_cohort_passes_acceptance_gate(
     )
 
 
+# CI-audit 2026-07-24 finding 7: pin each fixture pair to one xdist
+# worker so the module-scoped report builds once, not once per worker.
+@pytest.mark.xdist_group("corpus_grid25")
 def test_grid_25_residual_report(
     grid_25_vaporock_report: dict[str, dict],
     request: pytest.FixtureRequest,
@@ -1172,6 +1178,9 @@ def grid_25_sio_vaporock_report(
     )
 
 
+# CI-audit 2026-07-24 finding 7: pin each fixture pair to one xdist
+# worker so the module-scoped report builds once, not once per worker.
+@pytest.mark.xdist_group("corpus_grid25_sio")
 def test_grid_25_sio_cohort_passes_acceptance_gate(
     grid_25_sio_vaporock_report: dict[str, dict],
 ):
@@ -1218,6 +1227,9 @@ def test_grid_25_sio_cohort_passes_acceptance_gate(
     )
 
 
+# CI-audit 2026-07-24 finding 7: pin each fixture pair to one xdist
+# worker so the module-scoped report builds once, not once per worker.
+@pytest.mark.xdist_group("corpus_grid25_sio")
 def test_grid_25_sio_residual_report(
     grid_25_sio_vaporock_report: dict[str, dict],
     request: pytest.FixtureRequest,
