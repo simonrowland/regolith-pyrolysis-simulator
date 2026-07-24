@@ -70,7 +70,8 @@ HEAVY_ROSTER = frozenset({
     # gate-2 amendments (2026-07-23): C6-continue lengthened these past the
     # default ceiling; each carries its measured justification at the mark.
     ("tests/test_make_recipe_db_profile.py",
-     "test_target_menu_generated_profiles_internal_analytical_eval"),
+     "test_target_menu_generated_profiles_internal_analytical_eval"
+     "_no_campaign_vocabulary_abort"),
     ("tests/test_cross_surface_parity.py",
      "test_batch_cli_web_mol_ledger_parity"),
     ("tests/chemistry/test_builtin_evaporation_flux_provider.py",
@@ -81,10 +82,11 @@ HEAVY_ROSTER = frozenset({
 
 
 def _item_key(item) -> tuple[str, str]:
-    path = str(getattr(item, "fspath", "") or "")
-    marker = path.find("tests/")
-    rel = path[marker:] if marker >= 0 else path
-    name = item.name.split("[", 1)[0]
+    # nodeid, not fspath: fspath is deprecated and empty in collect-only
+    # harnesses. Strip the "[param]" id and the "@group" suffix xdist
+    # appends to nodeids under --dist loadgroup.
+    rel = item.nodeid.split("::", 1)[0]
+    name = item.nodeid.rsplit("::", 1)[-1].split("[", 1)[0].split("@", 1)[0]
     return (rel, name)
 
 
@@ -132,5 +134,19 @@ def test_suite_shape_heavy_tests_are_grouped_and_rostered(request) -> None:
                 f"{item.nodeid}: timeout {ceiling:g}s but not in the "
                 "shrink-only heavy roster — reduce its cost or demote a "
                 "roster entry (see module docstring)"
+            )
+    # Phantom-roster check (2026-07-23 gate-3 catch): a roster row whose
+    # name matches no collected test silently un-rosters the real heavy
+    # test it was meant to cover (a truncated name survived exactly this
+    # way). Only enforceable when the whole suite is collected — under -k
+    # or single-file runs most roster rows are legitimately absent, so
+    # gate on a full-collection heuristic rather than skipping silently.
+    if len(request.session.items) > 1000:
+        collected = {_item_key(item) for item in request.session.items}
+        for entry in sorted(HEAVY_ROSTER - collected):
+            violations.append(
+                f"roster entry {entry} matches no collected test — "
+                "phantom row (typo or removed test); fix the name or "
+                "delete the entry"
             )
     assert not violations, "\n".join(violations)
