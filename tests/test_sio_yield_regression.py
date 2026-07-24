@@ -203,9 +203,16 @@ def test_sio_wall_sweep_keeps_bulk_gas_temperature_distinct_from_liner():
 # suppression-fit corrections shift both coupled evolved-SiO baselines down
 # ~5.8x (declared class — red-partition + zero-red-survey attribution); values
 # below are fresh double-run byte-stable CLI executions on compose-0.6.3.
+# 2026-07-24 re-pin (SC-92 churn-era correction, f1fb933): the 07-21 values
+# above were captured through the recursive-spawn CLI context, where every
+# MAGEMin call died and the freeze-gate curve silently fell back to the
+# kernel liquidus source. With the __main__ guard landed the CLI gets
+# honest MAGEMin answers for the first time; the SiO family moves
+# +1.7e-6 (lunar) / +1.5e-5 (mars) relative. Fresh double-run
+# byte-stable CLI executions on compose-0.6.3 @ cd88e34.
 BASELINE_SIO_EVOLVED_KG = {
-    "lunar_mare_low_ti": 1.31808242466e-06,
-    "mars_basalt": 1.32752006974e-06,
+    "lunar_mare_low_ti": 1.31808462984e-06,
+    "mars_basalt": 1.32754051777e-06,
 }
 
 # 0.5.3 Phase A1 (2026-05-28): finite-headspace default-on flip +
@@ -236,9 +243,12 @@ BASELINE_STAGE4_SIO2_KG = {
 # designated stage-3 baffle — stage-3 capture DOUBLES and wall deposit goes
 # to zero for this recipe. North-Star-coherent: designated-condenser capture,
 # no hot-wall coating.
+# 2026-07-24 re-pin (SC-92 churn-era correction, f1fb933; same class as
+# BASELINE_SIO_EVOLVED_KG above): honest-MAGEMin CLI values, fresh
+# double-run byte-stable on compose-0.6.3 @ cd88e34.
 BASELINE_STAGE3_SIO2_KG = {
-    "lunar_mare_low_ti": 8.59821806693e-07,
-    "mars_basalt": 8.65978293698e-07,
+    "lunar_mare_low_ti": 8.5982326069e-07,
+    "mars_basalt": 8.65991612762e-07,
 }
 
 
