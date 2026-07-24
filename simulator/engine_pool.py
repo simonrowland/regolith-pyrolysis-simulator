@@ -12,12 +12,25 @@ import multiprocessing
 import os
 import signal
 import queue
+import sys
 import threading
 import time
 import traceback
 from concurrent.futures import Future
 from pathlib import Path
 from typing import Any, Callable, Optional
+
+# Env-gated lifecycle trace (2026-07-24): the recursive-spawn churn class
+# was invisible because every failure path was silently absorbed into
+# engine fallbacks. REGOLITH_ENGINE_POOL_DEBUG=1 prints starts, ready
+# latencies, and every discard with its reason to stderr.
+_POOL_DEBUG = os.environ.get('REGOLITH_ENGINE_POOL_DEBUG') == '1'
+
+
+def _pool_debug(msg: str) -> None:
+    if _POOL_DEBUG:
+        print(f'[engine-pool {os.getpid()} {time.monotonic():.2f}] {msg}',
+              file=sys.stderr, flush=True)
 
 
 WorkerBootstrap = Callable[..., tuple[Any, Any]]
@@ -246,11 +259,31 @@ class WarmEngineWorker:
             raise RuntimeError(f'{self.name} worker is disabled')
         timeout = self.call_timeout_s if timeout_s is None else max(
             0.001, float(timeout_s))
-        started_at = time.monotonic()
         if self.process is not None and not self.process.is_alive():
+            _pool_debug(f'{self.name}: worker pid found dead at call entry')
             self._discard_current(diagnostic=False)
         if self.process is None:
-            self.start(timeout_s=timeout)
+            # Cold (re)start is bounded by startup_timeout_s, NOT the
+            # per-call wall. 2026-07-24 (B1 gate-3 churn class): the old
+            # `self.start(timeout_s=timeout)` clamped the startup wall to
+            # min(startup_timeout_s, call wall) — for ThermoEngine that
+            # meant min(30, 3.0) = 3.0 s against a measured bootstrap of
+            # ~2.2 s bare (import thermoengine + MELTS model build) that
+            # grows past 3 s under any sim/xdist parent (heavier __main__
+            # re-import in the spawn child, sibling load). Once one worker
+            # died, EVERY cold restart was killed at the wall mid-import
+            # and retried forever: ~10 s of hot spawn churn per call while
+            # the sim limped on fallback curves (~2x runtime, the gate-3
+            # timeout class). Warm-call walls measure CALLS; startup has
+            # its own budget — never let the tighter one strangle the
+            # other. The call wall below still bounds the job itself.
+            t_start = time.monotonic()
+            self.start()
+            _pool_debug(
+                f'{self.name}: cold start ok in '
+                f'{time.monotonic() - t_start:.2f}s pid={self.process.pid}'
+            )
+        started_at = time.monotonic()
         process = self.process
         connection = self.connection
         if process is None or connection is None:
@@ -269,6 +302,10 @@ class WarmEngineWorker:
         try:
             connection.send(request)
             if not connection.poll(remaining):
+                _pool_debug(
+                    f'{self.name}: job poll timeout after {remaining:.2f}s '
+                    f'(wall {timeout:.2f}s) — discarding worker'
+                )
                 self._discard_current(diagnostic=True)
                 raise EngineWorkerTimeout(
                     self.name,
@@ -279,6 +316,9 @@ class WarmEngineWorker:
         except TimeoutError:
             raise
         except (BrokenPipeError, EOFError, OSError) as exc:
+            _pool_debug(
+                f'{self.name}: worker died mid-call ({type(exc).__name__})'
+            )
             self._discard_current(diagnostic=False)
             raise RuntimeError(
                 f'{self.name} worker exited without a result'
@@ -287,6 +327,10 @@ class WarmEngineWorker:
             return message[1]
         if message[0] == 'timeout':
             _tag, worker_name, timeout_s, phase = message
+            _pool_debug(
+                f'{self.name}: worker-side timeout phase={phase} '
+                f'wall={timeout_s}'
+            )
             self._discard_current(diagnostic=False)
             raise EngineWorkerTimeout(
                 worker_name,
@@ -294,6 +338,9 @@ class WarmEngineWorker:
                 phase=phase,
             )
         _tag, exc_name, detail, remote_traceback = message
+        _pool_debug(
+            f'{self.name}: remote error {exc_name}: {str(detail)[:120]}'
+        )
         self._discard_current(diagnostic=False)
         raise EngineWorkerRemoteError(exc_name, detail, remote_traceback)
 
@@ -446,8 +493,19 @@ class EngineWorkerPool:
         ready: queue.Queue[tuple[int, Optional[BaseException]]],
     ) -> None:
         try:
+            t0 = time.monotonic()
+            _pool_debug(f'pool[{worker.name}#{index}]: starting worker')
             worker.start()
+            _pool_debug(
+                f'pool[{worker.name}#{index}]: ready in '
+                f'{time.monotonic() - t0:.2f}s pid='
+                f'{getattr(worker.process, "pid", None)}'
+            )
         except BaseException as exc:
+            _pool_debug(
+                f'pool[{worker.name}#{index}]: start FAILED '
+                f'{type(exc).__name__}: {str(exc)[:120]}'
+            )
             ready.put((index, exc))
             return
         ready.put((index, None))
@@ -473,6 +531,7 @@ class EngineWorkerPool:
                 self._queue.task_done()
 
     def close(self, *, cancel_pending: bool = False) -> None:
+        _pool_debug(f'pool: close(cancel_pending={cancel_pending}) called')
         owns_close = False
         with self._lifecycle_lock:
             if not self._closed:

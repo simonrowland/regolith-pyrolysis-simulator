@@ -5093,9 +5093,24 @@ class _SiOYieldModuleLoader(importlib.abc.Loader):
         self._main_name = main_name
 
     def get_code(self, fullname: str):
+        # The __main__ guard is load-bearing (2026-07-24): multiprocessing
+        # 'spawn' children re-import the parent's __main__ module, and for
+        # `python -m simulator.runner.sio_*` that is THIS generated code.
+        # Unguarded, every engine-pool worker spawn re-executed the whole
+        # CLI recursively inside the child (__name__ == '__mp_main__'),
+        # which then tried to build its own MAGEMin pool, failed on the
+        # daemonic-children guard, and thrashed in a retry loop until the
+        # parent's startup wall killed it — ~10 s of hot import CPU per
+        # worker spawn, every spawn doomed, sim limping on fallback curves
+        # (the B1 gate-3 slowdown class, second face of the 54df34f drift
+        # class: the old 2.0 s wall killed the doomed child fast and fell
+        # back silently; the honest 15 s wall let it burn). With the
+        # guard, a spawn child importing this module is a no-op and the
+        # worker proceeds to its real bootstrap.
         source = (
             f"from simulator.runner import {self._main_name}\n"
-            f"raise SystemExit({self._main_name}())\n"
+            f"if __name__ == '__main__':\n"
+            f"    raise SystemExit({self._main_name}())\n"
         )
         return compile(source, f"<{fullname}>", "exec")
 
