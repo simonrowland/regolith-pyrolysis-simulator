@@ -1,5 +1,6 @@
 import csv
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -66,11 +67,25 @@ def _read_index(output_dir: Path):
         return list(csv.DictReader(f))
 
 
-# t-385 (2026-07-21): sio_tsweep native CLI family measured 293.7 s at -n0;
-# ceiling >= 1.2x headroom over measured n0 (family serialized on one gateway). xdist_group pins the MAGEMin
-# full-run family to one gateway.
+# 2026-07-23 re-measure (post contention-robust MAGEMin walls, 54df34f): the
+# grid params now pay for honest MAGEMin answers instead of fail-fasting into
+# drifted fallback curves — measured 4448 s (mars) / 4011 s (lunar) at -n0.
+# That volume cannot live in the default gate (CI-duration mandate), so the
+# grid pair is DEMOTED to the gate-window/nightly lane: opt in with
+# REGOLITH_RUN_TSWEEP_GRID=1 (same pattern as REGOLITH_RUN_ENGINE_DETERMINISM).
+# In-gate SiO tsweep coverage continues via the single-cell + wall-sweep tests
+# below. Ceiling = 4448 s measured x ~1.2 headroom = 5400 s for the opt-in
+# window run. Long-term fix is a call-volume cut (t-414), not a bigger ceiling.
+@pytest.mark.skipif(
+    os.environ.get("REGOLITH_RUN_TSWEEP_GRID") != "1",
+    reason=(
+        "gate-window/nightly lane: honest grid runtime ~4000-4450 s per "
+        "feedstock (2026-07-23 measurement); opt in with "
+        "REGOLITH_RUN_TSWEEP_GRID=1"
+    ),
+)
 @pytest.mark.xdist_group("magemin_fullrun_c")
-@pytest.mark.timeout(1200)
+@pytest.mark.timeout(5400)
 @pytest.mark.parametrize("feedstock", FEEDSTOCKS)
 def test_sio_tsweep_cli_smoke_2x2x2_grid(tmp_path, feedstock):
     output_dir = _run_tsweep(
@@ -96,8 +111,11 @@ def test_sio_tsweep_cli_smoke_2x2x2_grid(tmp_path, feedstock):
 # t-385 (2026-07-21): sio_tsweep native CLI family measured 293.7 s at -n0;
 # ceiling >= 1.2x headroom over measured n0 (family serialized on one gateway). xdist_group pins the MAGEMin
 # full-run family to one gateway.
+# 2026-07-23 re-measure (post 54df34f honest walls): 343 s (mars) / 329 s
+# (lunar) at -n0. Ceiling = 343 x ~1.75 = 600 s, absorbing cross-chain
+# MAGEMin K-slot waits without hiding a 2x regression.
 @pytest.mark.xdist_group("magemin_fullrun_c")
-@pytest.mark.timeout(1200)
+@pytest.mark.timeout(600)
 @pytest.mark.parametrize("feedstock", FEEDSTOCKS)
 def test_sio_tsweep_single_cell_deterministic(tmp_path, feedstock):
     metrics = []
@@ -127,8 +145,11 @@ def test_sio_tsweep_single_cell_deterministic(tmp_path, feedstock):
 # t-385 (2026-07-21): sio_tsweep native CLI family measured 293.7 s at -n0;
 # ceiling >= 1.2x headroom over measured n0 (family serialized on one gateway). xdist_group pins the MAGEMin
 # full-run family to one gateway.
+# 2026-07-23 re-measure (post 54df34f honest walls): 1098 s at -n0 — the old
+# 1200 s ceiling left only 9 % headroom (it red under in-gate chain load).
+# Ceiling = 1098 x ~1.35 = 1500 s.
 @pytest.mark.xdist_group("magemin_fullrun_c")
-@pytest.mark.timeout(1200)
+@pytest.mark.timeout(1500)
 def test_sio_wall_sweep_cli_smoke(tmp_path):
     output_dir = tmp_path / "wall-sweep"
     summary_path = tmp_path / "wall-summary.json"
