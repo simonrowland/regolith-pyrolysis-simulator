@@ -1,7 +1,10 @@
 # Deliberate analytical-model corpus release tag.
 # Bump only when the operator decides cached-real rows are no longer reusable.
-corpus_version: "analytical-corpus-2026-06-30-redox-v3-regrind-v1"
+# 2026-07-24 B1 landing bump: vapor package + JANAF refit + hot-wall backstop
+# gate + C6-continue routing + honest-MAGEMin values (SC-92 recursive-spawn
+# fix retired the silent fallback curves the prior corpus was ground under).
+# Prior corpora are NOT interoperable: their cached rows embed the fallback-era
+# freeze-gate source and pre-refit P_sat.
+corpus_version: "analytical-corpus-2026-07-24-b1-vapor-v1"
 interoperable_versions:
-  - "analytical-corpus-2026-06-30-redox-v3-regrind-v1"
-  - "analytical-corpus-2026-06-28-c7-ca-v1"
-  - "analytical-corpus-2026-06-28-alpha-series-v1"
+  - "analytical-corpus-2026-07-24-b1-vapor-v1"
