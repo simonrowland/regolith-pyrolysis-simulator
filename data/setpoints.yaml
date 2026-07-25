@@ -122,7 +122,7 @@ campaigns:
       early_ramp_1050_1320C: [10, 20]    # Na/K and early Fe regime
       peak_SiO_window_1400_1600C: [5, 10]
     atmosphere: "recirculating_inert_sweep"
-    carrier_gas: "pN2"                   # optimal; pHe or pAr fallback
+    carrier_gas: "pN2"                   # optimal; pKr preferred fallback (condenses ~30 K above LOX -> clean cryo separation); pAr legacy (3 K from LOX, avoid)
     p_total_mbar: [5, 15]               # optimal 8-12 mbar viscous-flow regime
     pO2_mbar: null                       # <1e-5 mbar; maintained by Fe-granule sorbent
     pO2_mbar_default: 0.0

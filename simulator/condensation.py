@@ -222,6 +222,7 @@ _LENNARD_JONES_PARAMS: dict[str, tuple[float, float, float]] = {
     # N2 sigma derives from N2_COLLISION_DIAMETER_M (one grounded source, BUG-013)
     'N2':  _carrier_lennard_jones_params('N2'),  # BSL Table E.1
     'Ar':  _carrier_lennard_jones_params('Ar'),  # BSL Table E.1
+    'Kr':  _carrier_lennard_jones_params('Kr'),  # BSL Table E.1 (t-395)
     'CO2': _carrier_lennard_jones_params('CO2'),  # BSL Table E.1
     'O2':  _carrier_lennard_jones_params('O2'),  # BSL Table E.1
     'He':  _carrier_lennard_jones_params('He'),  # BSL Table E.1
@@ -243,6 +244,10 @@ _LENNARD_JONES_PROVENANCE: dict[str, dict[str, str]] = {
         'source': 'Bird/Stewart/Lightfoot Table E.1',
     },
     'Ar': {
+        'status': 'sourced',
+        'source': 'Bird/Stewart/Lightfoot Table E.1',
+    },
+    'Kr': {
         'status': 'sourced',
         'source': 'Bird/Stewart/Lightfoot Table E.1',
     },
@@ -314,7 +319,9 @@ STAGE_AREA_KEY_BY_STAGE_NUMBER = {
     4: 'alkali_stage4',
     7: 'terminal',
 }
-SUPPORTED_CARRIER_GAS_LABELS = 'He/pHe, N2/pN2, Ar/pAr, CO2/pCO2'
+SUPPORTED_CARRIER_GAS_LABELS = (
+    'He/pHe, N2/pN2, Kr/pKr, Ar/pAr (legacy), CO2/pCO2'
+)
 STICKING_DATA_PATH = DATA_DIR / 'literature' / 'vacuum_pyrolysis_sticking.yaml'
 WALL_REACTIVITY_MATRIX_PATH = (
     DATA_DIR / 'literature' / 'wall_reactivity_matrix.yaml'
@@ -1531,6 +1538,9 @@ def _canonical_carrier_gas_key(carrier_gas: str | None) -> str:
         return 'He'
     if upper in {'AR', 'PAR'}:
         return 'Ar'
+    # Kr (t-395): recommended fallback buffer replacing Ar (legacy kept).
+    if upper in {'KR', 'PKR'}:
+        return 'Kr'
     if upper in {'O2', 'PO2', 'O2BACKPRESSURE', 'CONTROLLEDO2'}:
         return 'O2'
     if upper in {'CO2', 'PCO2', 'CO2BACKPRESSURE'}:

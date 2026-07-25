@@ -2957,6 +2957,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return 'He'
         if upper in {'AR', 'PAR'}:
             return 'Ar'
+        # Kr (t-395, owner-directed 2026-07-24): recommended fallback buffer
+        # replacing Ar (bp 119.7 K condenses ~30 K above LOX -> clean cryo
+        # first-cut; Ar's 87.3 K is a 3 K knife-edge from O2). Ar remains
+        # accepted as a legacy option.
+        if upper in {'KR', 'PKR'}:
+            return 'Kr'
         if upper in {'O2', 'PO2', 'O2BACKPRESSURE', 'CONTROLLEDO2'}:
             return 'O2'
         if upper in {'CO2', 'PCO2', 'CO2BACKPRESSURE'}:
@@ -2970,7 +2976,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 return 'CO2'
         raise ValueError(
             f'Unsupported condensation carrier_gas {value!r}; supported '
-            'carrier gases: He/pHe, N2/pN2, Ar/pAr, O2/pO2, CO2/pCO2'
+            'carrier gases: He/pHe, N2/pN2, Kr/pKr, Ar/pAr (legacy), '
+            'O2/pO2, CO2/pCO2'
         )
 
     def _resolve_condensation_carrier_gas(self) -> str:

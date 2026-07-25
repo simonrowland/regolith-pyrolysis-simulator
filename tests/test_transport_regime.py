@@ -247,6 +247,38 @@ def test_single_carrier_mean_free_path_fixture_m1():
     assert result.collision_diameter_source == tr.COLLISION_DIAMETER_SOURCE
 
 
+def test_kr_carrier_mean_free_path_direction_vs_n2_and_ar():
+    """Kr transport honesty, asserted directionally (t-395).
+
+    Premise: lambda = k_B T / (sqrt(2) pi sigma^2 P); molar mass does
+    NOT enter. Algebra: lambda ratios go as (sigma_b/sigma_a)^2, so with
+    sigma(Ar)=3.542 A < sigma(Kr)=3.655 A < sigma(N2)=3.798 A: lambda_Kr
+    = lambda_Ar*(3.542/3.655)^2 ~= 0.94*lambda_Ar (6% shorter) and
+    lambda_Kr = lambda_N2*(3.798/3.655)^2 ~= 1.08*lambda_N2 (8% longer).
+    Kr is transport-COMPARABLE to N2, better than Ar; the decisive Kr
+    advantage is downstream cryo separation, not the sweep (writing this
+    derivation caught the initial 'Kr superior sweep' overstatement).
+    Units: J/K * K / (m^2 * Pa) = m. Sanity: the m1 fixture's N2 lambda
+    at this operating point is ~3.1e-5 m; all three carriers land the
+    same order of magnitude and the SAME viscous regime.
+    """
+    kr = tr.single_species_mean_free_path(
+        "Kr", 1300.0, HOT_TEMPERATURE_K, DIAMETER_M,
+    )
+    n2 = tr.single_species_mean_free_path(
+        "N2", 1300.0, HOT_TEMPERATURE_K, DIAMETER_M,
+    )
+    ar = tr.single_species_mean_free_path(
+        "Ar", 1300.0, HOT_TEMPERATURE_K, DIAMETER_M,
+    )
+
+    assert kr.lambda_m < ar.lambda_m
+    assert kr.knudsen_number < ar.knudsen_number
+    assert kr.lambda_m == pytest.approx(n2.lambda_m, rel=0.09)
+    assert kr.regime is tr.KnudsenRegime.VISCOUS
+    assert kr.collision_diameter_source == tr.COLLISION_DIAMETER_SOURCE
+
+
 def test_single_carrier_mean_free_path_fixture_m2():
     result = tr.single_species_mean_free_path(
         "Ar",

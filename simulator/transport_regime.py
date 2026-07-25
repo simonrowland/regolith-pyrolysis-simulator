@@ -43,6 +43,8 @@ MOLAR_MASSES_KG_PER_MOL: Mapping[str, float] = MappingProxyType(
         "He": CARRIER_GAS_PROPERTIES["He"].molar_mass_kg_mol,
         "N2": CARRIER_GAS_PROPERTIES["N2"].molar_mass_kg_mol,
         "Ar": CARRIER_GAS_PROPERTIES["Ar"].molar_mass_kg_mol,
+        # Kr (t-395): sourced from the same single-source properties table.
+        "Kr": CARRIER_GAS_PROPERTIES["Kr"].molar_mass_kg_mol,
         "O2": CARRIER_GAS_PROPERTIES["O2"].molar_mass_kg_mol,
         "CO": 0.0280101,
         "CO2": CARRIER_GAS_PROPERTIES["CO2"].molar_mass_kg_mol,

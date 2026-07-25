@@ -38,6 +38,16 @@ COLLISION_DIAMETERS_M: Mapping[str, float] = MappingProxyType(
         "He": 2.551e-10,
         "N2": 3.798e-10,
         "Ar": 3.542e-10,
+        # Kr: same BSL Table E.1 / Poling L-J source as the rows above.
+        # sigma = 3.655 A. Added 2026-07-25 (t-395, owner-directed Ar->Kr+N2
+        # buffer switch). Transport honesty (lambda = kT/(sqrt2 pi sigma^2 P),
+        # mass does NOT enter): sigma(Kr) 3.655 A sits between Ar (3.542) and
+        # N2 (3.798), so Kr's mean free path is ~6% shorter than Ar's and ~8%
+        # LONGER than N2's — transport-comparable, not superior (direction
+        # pinned in tests/test_transport_regime.py). The decisive Kr
+        # advantage is downstream cryo separation: bp 119.7 K condenses
+        # ~30 K above LOX for a clean first-cut, vs Ar's 3 K knife-edge.
+        "Kr": 3.655e-10,
         "O2": 3.467e-10,
         "CO": 3.690e-10,
         "CO2": 3.941e-10,
@@ -66,6 +76,13 @@ CARRIER_GAS_PROPERTIES: Mapping[str, CarrierGasProperties] = MappingProxyType(
         ),
         "Ar": CarrierGasProperties(
             COLLISION_DIAMETERS_M["Ar"], 93.3, 0.039948, 39.948,
+        ),
+        # Kr (t-395): eps/k = 178.9 K from the same BSL Table E.1 / Poling
+        # L-J source as the entries above; M = 83.798 g/mol (IUPAC 2021).
+        # Recommended fallback buffer replacing Ar (Ar retained as legacy):
+        # bp 119.7 K condenses ~30 K above LOX in the downstream cryo train.
+        "Kr": CarrierGasProperties(
+            COLLISION_DIAMETERS_M["Kr"], 178.9, 0.083798, 83.798,
         ),
         "CO2": CarrierGasProperties(
             COLLISION_DIAMETERS_M["CO2"], 195.2, 0.0440095, 44.010,

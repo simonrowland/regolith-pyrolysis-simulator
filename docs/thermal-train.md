@@ -99,6 +99,30 @@ or cache identity. Compressor capex uses gross compressor shaft rating; cold-box
 capex uses `Q_c` lift rating. Net plant shaft work is an energy ledger field and
 is not priced again as a second machine.
 
+## Buffer-gas recovery in the cryo train (Kr + N₂ lineup)
+
+The sweep gas always ends up mixed with product O₂ by the time the stream
+reaches the cold side, so the buffer choice is a *separation* decision as
+much as a transport one. As of 2026-07-25 the recommended lineup is
+**Kr + N₂**, with Ar demoted to a legacy option:
+
+- **Kr** (bp 119.7 K) condenses ~30 K *above* LOX (90.2 K): in a mixed
+  buffer/O₂ stream it drops out first at a warmer stage, and the train
+  never has to liquefy O₂ while lighter gases remain to compress. On
+  transport Kr is comparable to N₂ (mean free path ~8% longer; σ 3.655 Å
+  vs 3.798 Å — molar mass does not enter the MFP) and ~6% better than
+  Ar; the case for Kr is the separation, not the sweep.
+- **N₂** (bp 77.4 K) boils *below* O₂ — the standard clean cut of air
+  separation; it stays gas through the LOX stage.
+- **Ar** (bp 87.3 K) sits 3 K from LOX — the classic hard cut of cryo air
+  processing — which is why it is demoted; accepted for legacy recipes
+  only.
+
+Recovered buffer is recirculated, not vented (the inert inventory is
+bought once and cycled); losses are what the ledger should eventually
+charge. Separation-stage capex/energy for the Kr first-cut is not yet
+modeled — the current train prices the O₂ path only.
+
 ## Known limitations
 
 - The Claude-cycle report is first-order ideal-gas machinery. The 77 K LOX load
