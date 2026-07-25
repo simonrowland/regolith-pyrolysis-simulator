@@ -418,7 +418,10 @@ class CampaignManager:
             Path(__file__).resolve(),
             Path(__file__).with_name('lab_schedule.py').resolve(),
             root / 'simulator' / 'core.py',
-            root / 'simulator' / 'runner.py',
+            # t-421: runner.py became the runner package __init__. NOTE:
+            # a wrong path here is SILENT (the except OSError below skips
+            # the file) — the ledger-purity tests are the loud guard.
+            root / 'simulator' / 'runner' / '__init__.py',
             root / 'web' / 'routes.py',
         )
         constants = {

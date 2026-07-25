@@ -4159,7 +4159,9 @@ def test_per_tick_backend_resolution_never_promotes_selection_authority(
 def test_web_mass_balance_threshold_matches_kernel_abort_invariant():
     from simulator.optimize.evaluate import MASS_BALANCE_ABORT_PCT
 
-    runner_source = (_REPO_ROOT / "simulator/runner.py").read_text()
+    runner_source = (
+        _REPO_ROOT / "simulator/runner/__init__.py"  # t-421 package move
+    ).read_text()
     state_source = (_REPO_ROOT / "simulator/state.py").read_text()
 
     assert _MASS_BALANCE_ERROR_BREACH_PCT == pytest.approx(

@@ -2295,7 +2295,12 @@ def test_runner_does_not_apply_ledger_transitions_directly():
     directly to assemble the final_state document.
     """
 
-    runner_py = Path(__file__).resolve().parent.parent / "simulator" / "runner.py"
+    # t-421: runner.py became the runner package __init__ (review catch:
+    # this guard reads the SOURCE file, so the path must follow the move).
+    runner_py = (
+        Path(__file__).resolve().parent.parent
+        / "simulator" / "runner" / "__init__.py"
+    )
     source = runner_py.read_text()
     forbidden_writes = (
         "atom_ledger.apply(",

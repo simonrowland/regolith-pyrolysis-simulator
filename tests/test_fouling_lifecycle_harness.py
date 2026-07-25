@@ -517,7 +517,7 @@ def test_import_isolation_from_runner_core_and_optimizer_boundaries() -> None:
         "simulator.optimize.fouling_lifecycle",
     }
     scanned = (
-        Path("simulator/runner.py"),
+        Path("simulator/runner/__init__.py"),  # t-421 package move
         Path("simulator/core.py"),
         Path("simulator/optimize/evaluate.py"),
         Path("simulator/optimize/objective.py"),
