@@ -82,7 +82,12 @@ PROTOCOL = {
     # showed a phantom 12% "regression" while the same stage measured
     # ABOVE ratchet solo. Contamination only ever LOWERS a trial rate,
     # so the max trial is the robust estimator of intrinsic code speed —
-    # and a real slowdown still lowers the max.
+    # and a real slowdown still lowers the max. RESIDUAL: when a heavy
+    # co-tenant saturates performance cores across ALL trials (e.g. a
+    # long sim drive inside the same pytest invocation), even the max
+    # can read low — a spurious red here under that condition is
+    # resolved by rerunning the gate, which runs stages in isolated
+    # processes and takes ~30 s solo; do not widen margins for it.
     "aggregation": "max_trial_rate",
     "isolation": "one_process_per_stage",
     "in_process_timer": "time.process_time",

@@ -3284,7 +3284,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         composition: Dict[str, float] = {}
         if pN2_mbar > 0.0:
-            composition['N2'] = pN2_mbar
+            # Kr audit follow-through (NOT-FIXED lens, 2026-07-25): this
+            # write is a dead transient today (_reset_gas wipes it before
+            # the honest overhead write, no intra-step reader), but a
+            # literal 'N2' here is a re-divergence trap — key it off the
+            # stamped carrier like every other sweep write.
+            _sweep_key = (
+                getattr(self.melt, 'background_gas_species', '') or 'N2'
+            )
+            composition[_sweep_key] = pN2_mbar
         if pO2_mbar > 0.0:
             composition['O2'] = pO2_mbar
         self.overhead.composition = composition

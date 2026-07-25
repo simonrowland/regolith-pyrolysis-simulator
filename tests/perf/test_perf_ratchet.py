@@ -99,6 +99,19 @@ def test_perf_ratchet_guards_call_volume_and_cpu_cost() -> None:
             f"threshold={threshold:.6g}, ratchet={ratchet:.6g}, "
             f"margin_frac={margin:.3g}. {RESPONSE_POLICY}"
         )
+        # Softened-baseline detector (NOT-FIXED lens residual, 2026-07-25):
+        # the machine_class pin closed the skip-forever tamper, but a
+        # down-edited ratchet_rate would silently loosen the bar. Excess
+        # headroom means either a real speedup (rebless — the ratchet
+        # exists to be raised) or a softened baseline; both deserve red.
+        stale_ceiling = ratchet * 1.5
+        assert observed <= stale_ceiling, (
+            f"STALE/SOFTENED RATCHET in {stage}: observed={observed:.6g} "
+            f"exceeds ratchet={ratchet:.6g} by >1.5x. If the code really "
+            "got this much faster, run benchmarks/engine_throughput_bench.py "
+            "--rebless-ratchet and commit the raised bar; if not, the "
+            "baselines JSON has been softened. Never widen this ceiling."
+        )
 
 
 def test_rebless_ratchet_is_monotonic_up_only() -> None:

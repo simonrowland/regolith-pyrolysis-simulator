@@ -19,7 +19,7 @@ from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.state import CampaignPhase
 
 
-def _build_c2a_sim(carrier_gas: str | None):
+def _build_c2a_sim(carrier_gas: str | None, *, finite_headspace: bool = True):
     """Config-level carrier selection: the runtime-override surface
     deliberately refuses carrier_gas (fail-closed; operator wiring is a
     separate chunk), so a Kr recipe arrives the way a real one would —
@@ -28,9 +28,12 @@ def _build_c2a_sim(carrier_gas: str | None):
 
     bundle = load_config_bundle()
     setpoints = bundle.setpoints
-    if carrier_gas is not None:
+    if carrier_gas is not None or not finite_headspace:
         setpoints = copy.deepcopy(setpoints)
+    if carrier_gas is not None:
         setpoints["campaigns"]["C2A_continuous"]["carrier_gas"] = carrier_gas
+    if not finite_headspace:
+        setpoints.setdefault("overhead_headspace", {})["enabled"] = False
     backend = InternalAnalyticalBackend()
     assert backend.initialize({})
     sim = build_simulator(
@@ -47,8 +50,12 @@ def _build_c2a_sim(carrier_gas: str | None):
     return sim
 
 
-def test_kr_carrier_reaches_overhead_without_phantom_n2():
-    sim = _build_c2a_sim("pKr")
+# Both overhead sweep branches carry the phantom-N2 fix; NOT-FIXED lens
+# 2026-07-25 verified the legacy branch clean by probe but flagged it
+# unguarded — parametrize so a revert of EITHER branch goes red.
+@pytest.mark.parametrize("finite_headspace", [True, False])
+def test_kr_carrier_reaches_overhead_without_phantom_n2(finite_headspace):
+    sim = _build_c2a_sim("pKr", finite_headspace=finite_headspace)
     sim.step()
 
     assert sim.melt.background_gas_species == "Kr"
