@@ -1,11 +1,9 @@
 {
   "collapse_factor": 10.0,
-  "machine_class": "M5 MacBook Pro",
+  "machine_class": "M5 Max MacBook Pro",
   "margin_frac": 0.1,
   "protocol": {
-    "aggregation": "median_trial_rate",
-    "in_process_timer": "time.process_time",
-    "isolation": "one_process_per_stage",
+    "aggregation": "max_trial_rate",
     "hot_path_calls_per_trial": {
       "condensation_route_hour": 164,
       "internal_analytical_equilibrium": 500,
@@ -13,6 +11,8 @@
       "sim_step_c2a_hour": 1,
       "vapor_pressure_eval": 36000
     },
+    "in_process_timer": "time.process_time",
+    "isolation": "one_process_per_stage",
     "stage_work_units_per_trial": {
       "condensation_route_hour": 4,
       "internal_analytical_equilibrium": 500,
@@ -29,27 +29,27 @@
   "stages": {
     "condensation_route_hour": {
       "hot_path": "CondensationModel.route -> _condensation_efficiency",
-      "ratchet_rate": 29.031579100166315,
+      "ratchet_rate": 39.91657435958829,
       "rate_unit": "work_units_per_cpu_second"
     },
     "internal_analytical_equilibrium": {
       "hot_path": "PyrolysisSimulator._internal_analytical_equilibrium",
-      "ratchet_rate": 4348.355451968065,
+      "ratchet_rate": 6103.068622903584,
       "rate_unit": "work_units_per_cpu_second"
     },
     "runner_fixture_replay": {
       "hot_path": "simulator.runner.main -> PyrolysisSimulator.step",
-      "ratchet_rate": 0.11016691940794092,
+      "ratchet_rate": 0.1202237363733909,
       "rate_unit": "work_units_per_cpu_second"
     },
     "sim_step_c2a_hour": {
       "hot_path": "PyrolysisSimulator.step -> _internal_analytical_equilibrium",
-      "ratchet_rate": 6.944492670087987,
+      "ratchet_rate": 9.605225242531985,
       "rate_unit": "work_units_per_cpu_second"
     },
     "vapor_pressure_eval": {
       "hot_path": "effective_equilibrium_pressure_Pa",
-      "ratchet_rate": 556612.0877591679,
+      "ratchet_rate": 676412.0100710248,
       "rate_unit": "work_units_per_cpu_second"
     }
   }

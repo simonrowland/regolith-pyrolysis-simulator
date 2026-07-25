@@ -46,7 +46,11 @@ from simulator.state import (
 
 
 BASELINE_PATH = REPO_ROOT / "tests" / "perf" / "perf_ratchet_baselines.json"
-MACHINE_CLASS = "M5 MacBook Pro"
+# Corrected 2026-07-25 (milestone review F1 follow-through): the loose
+# substring match had classified this M5 MAX box as plain "M5", so the
+# baselines were seeded under a wrong label. The canonical class is
+# what the seeds were actually measured on.
+MACHINE_CLASS = "M5 Max MacBook Pro"
 STAGE_NAMES = (
     "internal_analytical_equilibrium",
     "vapor_pressure_eval",
@@ -72,7 +76,14 @@ BUILTIN_LIQUIDUS_FIXTURE = {
 PROTOCOL = {
     "warmups": 1,
     "trials": 3,
-    "aggregation": "median_trial_rate",
+    # max, not median (2026-07-25 gate-red attribution): on asymmetric
+    # Apple Silicon a trial scheduled onto efficiency cores does ~2-3x
+    # less work per CPU-second, so median-of-3 under co-tenant load
+    # showed a phantom 12% "regression" while the same stage measured
+    # ABOVE ratchet solo. Contamination only ever LOWERS a trial rate,
+    # so the max trial is the robust estimator of intrinsic code speed —
+    # and a real slowdown still lowers the max.
+    "aggregation": "max_trial_rate",
     "isolation": "one_process_per_stage",
     "in_process_timer": "time.process_time",
     "subprocess_timer": "resource.getrusage(RUSAGE_CHILDREN)",
@@ -116,13 +127,27 @@ def detect_machine_class() -> str:
             text=True,
             timeout=10,
         )
-    except (OSError, subprocess.SubprocessError):
-        return f"macOS {platform.machine()} (hardware unknown)"
+    except (OSError, subprocess.SubprocessError) as exc:
+        # Milestone review F2: a transient profiler failure previously
+        # fail-opened the gate as a green cross-class skip. The canonical
+        # class is Darwin-only, so on Darwin a detection failure is an
+        # anomaly the gate must surface, not silently skip around.
+        raise RuntimeError(
+            "machine-class detection failed on Darwin (system_profiler "
+            f"error: {exc}); refusing to classify — the perf gate must "
+            "not skip on a detection failure"
+        ) from exc
     hardware = result.stdout
-    if "Model Name: MacBook Pro" in hardware and "Chip: Apple M5" in hardware:
+    model_name = _hardware_value(hardware, "Model Name")
+    chip = _hardware_value(hardware, "Chip")
+    # Milestone review F1: the old substring test ("Chip: Apple M5" in
+    # hardware) also matched "Apple M5 Pro"/"Apple M5 Max", silently
+    # classifying different silicon as the canonical class — a wrong-class
+    # comparison AND a cross-machine rebless that the up-only ratchet then
+    # amplifies. Exact equality on the parsed Chip value closes it.
+    if model_name == "MacBook Pro" and chip == "Apple M5 Max":
         return MACHINE_CLASS
     model = _hardware_value(hardware, "Model Identifier")
-    chip = _hardware_value(hardware, "Chip")
     return f"macOS {model or 'unknown-model'} {chip or platform.machine()}"
 
 
@@ -544,7 +569,7 @@ def _measure_stage(
         for observation in observations
     ]
     return {
-        "rate": statistics.median(rates),
+        "rate": max(rates),
         "rate_unit": "work_units_per_cpu_second",
         "work_units": sum(item.work_units for item in observations),
         "hot_path_calls": sum(item.hot_path_calls for item in observations),
