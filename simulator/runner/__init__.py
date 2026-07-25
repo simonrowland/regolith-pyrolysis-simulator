@@ -29,8 +29,6 @@ import argparse
 import hashlib
 import copy
 import csv
-import importlib.abc
-import importlib.machinery
 import itertools
 import json
 import math
@@ -121,7 +119,10 @@ O2_SOURCE_SIDE_POTENTIAL_LABEL = (
     "source-side O2 potential (emitted; not recovered)"
 )
 
-DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+# parents[2]: this file moved one level deeper in the t-421 package
+# conversion (simulator/runner.py -> simulator/runner/__init__.py);
+# repo root is now three levels up, and DATA_DIR is load-bearing.
+DATA_DIR = Path(__file__).resolve().parents[2] / "data"
 
 SIO_YIELD_FEEDSTOCKS: tuple[str, ...] = (
     "lunar_mare_low_ti",
@@ -547,7 +548,7 @@ def _resolve_kernel_commit_sha() -> str:
     purely for failure to read git metadata.
     """
 
-    repo_root = Path(__file__).resolve().parent.parent
+    repo_root = Path(__file__).resolve().parents[2]  # t-421: package depth
     try:
         result = subprocess.run(
             ["git", "rev-parse", "HEAD"],
@@ -5088,70 +5089,13 @@ def main_sio_wall_sweep(argv: Optional[list[str]] = None) -> int:
     return 0
 
 
-class _SiOYieldModuleLoader(importlib.abc.Loader):
-    def __init__(self, main_name: str = "main_sio_yield") -> None:
-        self._main_name = main_name
-
-    def get_code(self, fullname: str):
-        # The __main__ guard is load-bearing (2026-07-24): multiprocessing
-        # 'spawn' children re-import the parent's __main__ module, and for
-        # `python -m simulator.runner.sio_*` that is THIS generated code.
-        # Unguarded, every engine-pool worker spawn re-executed the whole
-        # CLI recursively inside the child (__name__ == '__mp_main__'),
-        # which then tried to build its own MAGEMin pool, failed on the
-        # daemonic-children guard, and thrashed in a retry loop until the
-        # parent's startup wall killed it — ~10 s of hot import CPU per
-        # worker spawn, every spawn doomed, sim limping on fallback curves
-        # (the B1 gate-3 slowdown class, second face of the 54df34f drift
-        # class: the old 2.0 s wall killed the doomed child fast and fell
-        # back silently; the honest 15 s wall let it burn). With the
-        # guard, a spawn child importing this module is a no-op and the
-        # worker proceeds to its real bootstrap.
-        source = (
-            f"from simulator.runner import {self._main_name}\n"
-            f"if __name__ == '__main__':\n"
-            f"    raise SystemExit({self._main_name}())\n"
-        )
-        return compile(source, f"<{fullname}>", "exec")
-
-    def create_module(self, spec):  # noqa: D401
-        return None
-
-    def exec_module(self, module) -> None:
-        return None
-
-
-class _SiOYieldModuleFinder(importlib.abc.MetaPathFinder):
-    _sio_yield_finder = True
-    _ENTRYPOINTS = {
-        "simulator.runner.sio_yield": "main_sio_yield",
-        "simulator.runner.sio_tsweep": "main_sio_tsweep",
-        "simulator.runner.sio_wall_sweep": "main_sio_wall_sweep",
-    }
-
-    def find_spec(self, fullname: str, path=None, target=None):
-        main_name = self._ENTRYPOINTS.get(fullname)
-        if main_name is None:
-            return None
-        return importlib.machinery.ModuleSpec(
-            fullname,
-            _SiOYieldModuleLoader(main_name),
-            is_package=False,
-        )
-
-
-def _install_sio_yield_entrypoint() -> None:
-    if __name__ != "simulator.runner":
-        return
-    globals()["__path__"] = []
-    if not any(
-        getattr(finder, "_sio_yield_finder", False)
-        for finder in sys.meta_path
-    ):
-        sys.meta_path.insert(0, _SiOYieldModuleFinder())
-
-
-_install_sio_yield_entrypoint()
+# The former meta-path finder/loader that synthesized virtual
+# simulator.runner.sio_* modules from source strings was removed in the
+# t-421 de-clevering (owner-motivated after the generated, file-less
+# entry code hosted the SC-92 recursive-spawn bug): the runner is now a
+# real package and the sio_* entrypoints are real, guarded 4-line files
+# in this directory — greppable, auditable, and import-safe by ordinary
+# inspection instead of by generated-string discipline.
 
 
 if __name__ == "__main__":  # pragma: no cover
