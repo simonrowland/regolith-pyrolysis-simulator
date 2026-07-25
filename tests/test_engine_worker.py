@@ -1,5 +1,6 @@
 import json
 import threading
+import os
 import time
 
 import pytest
@@ -203,9 +204,18 @@ def test_canceling_close_fails_in_flight_request_without_orphan():
     while not future.running() and time.monotonic() < deadline:
         time.sleep(0.01)
     assert future.running()
+    # Milestone review: the test's name promises "without_orphan" but the
+    # orphan property was never asserted — a close() that abandoned the
+    # worker (pipe-close without kill) passed identically. Capture the
+    # live worker pid while in flight so the kill can be proven below.
+    worker_pid = pool._workers[0].process.pid
 
     pool.close(cancel_pending=True)
 
     assert future.done()
     with pytest.raises(RuntimeError, match='worker exited without a result'):
         future.result(timeout=0.1)
+    # The orphan assertion itself: after close() the worker process must
+    # be gone (close joins/reaps, so a live pid here is a real orphan).
+    with pytest.raises(ProcessLookupError):
+        os.kill(worker_pid, 0)

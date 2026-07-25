@@ -40,6 +40,7 @@ from simulator.optimize.recipe import (
     c2a_staged_stage_order,
     validate_c2a_staged_stage_order,
 )
+from simulator.condensation import _canonical_carrier_gas_key
 from simulator.state import StirState, clamp_stir_factor, clamp_stir_state
 from simulator.core import (
     Atmosphere, BatchRecord, CampaignPhase, CondensationTrain,
@@ -1110,7 +1111,16 @@ class CampaignManager:
         melt.p_total_mbar = float(diagnostic['p_total_mbar'])
         pN2_mbar = float(diagnostic['pN2_mbar'])
         if pN2_mbar > 0.0:
-            melt.background_gas_species = 'N2'
+            # Kr audit 2026-07-25: hard-coded 'N2' here silently overwrote a
+            # configured campaigns.C2A_staged.carrier_gas (e.g. pKr) every
+            # hour — accepted at the input gate, discarded downstream. Stamp
+            # the CONFIGURED carrier, canonically resolved (raises on an
+            # unknown carrier, so a typo fails loudly instead of running
+            # mislabelled). Default remains pN2 -> 'N2' (golden-neutral).
+            melt.background_gas_species = _canonical_carrier_gas_key(
+                str(cfg.get('carrier_gas', 'pN2') or 'pN2')
+                if isinstance(cfg, Mapping) else 'pN2'
+            )
             melt.background_gas_mole_fraction = 1.0
         else:
             melt.background_gas_species = ''
@@ -1288,6 +1298,16 @@ class CampaignManager:
         elif campaign in (CampaignPhase.C2A, CampaignPhase.C2A_STAGED):
             cfg = self._campaign_config(campaign)
             melt.atmosphere = Atmosphere.PN2_SWEEP
+            # Kr audit 2026-07-25: overhead's sweep branch keys the buffer
+            # partial off melt.background_gas_species; continuous mode left
+            # it empty and overhead hard-wrote a phantom 'N2' partial even
+            # for a Kr carrier (double-counted buffer). Stamp the configured
+            # carrier; the condensation resolver reads the same config, so
+            # its answer is unchanged (golden-neutral for the pN2 default).
+            melt.background_gas_species = _canonical_carrier_gas_key(
+                str(cfg.get('carrier_gas', 'pN2') or 'pN2')
+                if isinstance(cfg, Mapping) else 'pN2'
+            )
             melt.pO2_mbar = self._pressure_config_float(
                 cfg, 'pO2_mbar', 'pO2_mbar_default', 0.0)
             melt.p_total_mbar = self._pressure_config_float(

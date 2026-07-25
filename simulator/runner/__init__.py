@@ -205,9 +205,16 @@ _METAL_PRODUCT_SPECIES: tuple[str, ...] = (
     "K",
     "Si",
 )
+# Kr/He added 2026-07-25 (Kr carrier-coverage audit): a configured Kr/He
+# carrier previously fell through to the PN2_SWEEP elif below and was
+# relabelled N2 in every hourly artifact (carrier_identity + p_carrier_bar
+# read from the N2 partial) — the accepted-at-the-gate, silently-relabelled
+# downstream class.
 _CARRIER_TOKENS: dict[str, str] = {
     "N2": "N2",
     "AR": "Ar",
+    "KR": "Kr",
+    "HE": "He",
     "CO2": "CO2",
 }
 

@@ -1035,9 +1035,17 @@ class OverheadGasModel:
             gas.composition['CO2'] = max(  # mbar — CO2 partial pressure
                 gas.composition.get('CO2', 0.0), melt.p_total_mbar * 0.96)  # mbar — CO2 partial pressure; 0.96 mole fraction
         elif atmosphere_name == 'PN2_SWEEP' and melt.p_total_mbar > 0:
-            gas.composition['N2'] = max(
-                gas.composition.get('N2', 0.0),
-                max(0.0, melt.p_total_mbar - melt.pO2_mbar))  # mbar — N2 balance partial pressure
+            # Kr audit 2026-07-25: key the sweep balance partial off the
+            # STAMPED carrier, not literal 'N2' — a Kr carrier previously
+            # got a phantom full-magnitude N2 partial alongside its real
+            # Kr partial (double-counted buffer in flue partials and the
+            # thermal-train Kn mixture).
+            _sweep_key = (
+                getattr(melt, 'background_gas_species', '') or 'N2'
+            )
+            gas.composition[_sweep_key] = max(
+                gas.composition.get(_sweep_key, 0.0),
+                max(0.0, melt.p_total_mbar - melt.pO2_mbar))  # mbar — sweep balance partial pressure
         elif atmosphere_name in {
             'CONTROLLED_O2',
             'CONTROLLED_O2_FLOW',
@@ -1128,10 +1136,15 @@ class OverheadGasModel:
             gas.composition['CO2'] = max(  # mbar — CO2 partial pressure
                 gas.composition.get('CO2', 0.0), melt.p_total_mbar * 0.96)  # mbar — CO2 partial pressure; 0.96 mole fraction
         elif atmosphere_name == 'PN2_SWEEP' and melt.p_total_mbar > 0:
-            gas.pressure_mbar = max(gas.pressure_mbar, melt.p_total_mbar)  # mbar — N2 total pressure floor
-            gas.composition['N2'] = max(
-                gas.composition.get('N2', 0.0),
-                max(0.0, melt.p_total_mbar - melt.pO2_mbar))  # mbar — N2 balance partial pressure
+            gas.pressure_mbar = max(gas.pressure_mbar, melt.p_total_mbar)  # mbar — sweep total pressure floor
+            # Kr audit 2026-07-25: same stamped-carrier fix as the
+            # no-headspace branch above.
+            _sweep_key = (
+                getattr(melt, 'background_gas_species', '') or 'N2'
+            )
+            gas.composition[_sweep_key] = max(
+                gas.composition.get(_sweep_key, 0.0),
+                max(0.0, melt.p_total_mbar - melt.pO2_mbar))  # mbar — sweep balance partial pressure
 
         # 0.5.3 Phase A1 (2026-05-28): commanded-pO2 floor mirror. The legacy
         # no-headspace branch (above) writes `gas.composition['O2'] = max(...,

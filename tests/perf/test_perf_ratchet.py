@@ -15,6 +15,7 @@ import pytest
 
 from benchmarks.engine_throughput_bench import (
     BASELINE_PATH,
+    MACHINE_CLASS,
     STAGE_NAMES,
     detect_machine_class,
     load_baselines,
@@ -39,6 +40,17 @@ def test_perf_ratchet_guards_call_volume_and_cpu_cost() -> None:
     """
 
     baseline = load_baselines(BASELINE_PATH)
+    # Milestone review F1 (HIGH): without this pin, a one-line edit to the
+    # baselines JSON machine_class field made the gate skip green forever
+    # on every box (metadata-softened gate, SC-12 shape). The baseline must
+    # claim the canonical class the bench compiles in; the runtime skip
+    # below remains the legitimate cross-class escape.
+    assert baseline["machine_class"] == MACHINE_CLASS, (
+        "perf_ratchet_baselines.json machine_class "
+        f"{baseline['machine_class']!r} != benchmark canonical "
+        f"{MACHINE_CLASS!r} — baseline tampering or an unratified "
+        "cross-class rebless. FIX THE BASELINE, DO NOT WEAKEN THIS PIN."
+    )
     assert baseline["schema_version"] == 1
     assert baseline["margin_frac"] == pytest.approx(0.1)
     assert baseline["collapse_factor"] == pytest.approx(10.0)

@@ -319,6 +319,9 @@ def test_mixture_mean_free_path_fixture_m3():
         ("He", 2.551e-10, 0.004002602),
         ("N2", 3.798e-10, 0.0280134),
         ("Ar", 3.542e-10, 0.039948),
+        # Kr exact anchors (milestone review F2: the direction test's 9%
+        # band alone would accept a neighbor-row copy-paste).
+        ("Kr", 3.655e-10, 0.083798),
         ("CO2", 3.941e-10, 0.0440095),
     ],
 )
@@ -434,3 +437,25 @@ def test_transport_formula_refusals_are_named(call, expected_category):
 
     assert exc_info.value.category == expected_category
     assert exc_info.value.reason == expected_category
+
+
+def test_kr_epsilon_over_k_exact_anchor():
+    """Milestone review F2: eps/k was asserted by no test for any carrier;
+    pin Kr's (BSL Table E.1) so a silent edit cannot drift it."""
+    assert tr.CARRIER_GAS_PROPERTIES[
+        "Kr"
+    ].lennard_jones_epsilon_over_k_K == pytest.approx(178.9)
+
+
+def test_kr_carrier_key_normalizers_accept_kr_aliases():
+    """Milestone review F3: the Kr normalizer branches shipped with zero
+    coverage. Pin both acceptance sites and that Ar stays accepted."""
+    from simulator.condensation import _canonical_carrier_gas_key
+    from simulator.core import PyrolysisSimulator
+
+    normalize = PyrolysisSimulator._normalize_condensation_carrier_gas
+    for alias in ("Kr", "pKr", "kr", "p_kr", "P-KR"):
+        assert normalize(alias) == "Kr", alias
+        assert _canonical_carrier_gas_key(alias) == "Kr", alias
+    assert normalize("pAr") == "Ar"
+    assert _canonical_carrier_gas_key("pAr") == "Ar"
