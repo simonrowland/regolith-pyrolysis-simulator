@@ -188,9 +188,18 @@ def test_default_close_drains_request_longer_than_old_join_cutoff():
 
 
 def test_canceling_close_fails_in_flight_request_without_orphan():
-    pool = EngineWorkerPool(lambda _index: _test_worker(timeout_s=2.0), size=1)
-    future = pool.submit({**_points()[0], 'delay': 0.5}, timeout_s=2.0)
-    deadline = time.monotonic() + 1.0
+    # 2026-07-25 t-419 load-robustness: every window here is deliberately
+    # huge so the ONLY reachable outcome is close() killing the in-flight
+    # request. The old 0.5 s delay / 2.0 s wall / 1.0 s running-deadline
+    # trio raced real cold-start and scheduling latency on a loaded box:
+    # the request could finish before close() (no error raised) or the
+    # call wall could fire first (wrong error). delay=30 s can never
+    # complete and the 30 s wall can never fire before the kill (which
+    # lands in milliseconds), so healthy runtime is unchanged and the
+    # outcome is deterministic under any load.
+    pool = EngineWorkerPool(lambda _index: _test_worker(timeout_s=30.0), size=1)
+    future = pool.submit({**_points()[0], 'delay': 30.0}, timeout_s=30.0)
+    deadline = time.monotonic() + 30.0
     while not future.running() and time.monotonic() < deadline:
         time.sleep(0.01)
     assert future.running()

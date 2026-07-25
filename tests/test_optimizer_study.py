@@ -2120,7 +2120,12 @@ def _slow_first_then_ok_evaluator(
     **kwargs: Any,
 ) -> ScoredResult:
     if _sequence(candidate_id) == 0:
-        time.sleep(20.0)
+        # 30 s against the caller's 10 s eval wall: the margin is deliberately
+        # huge in BOTH directions so exactly one candidate times out even on a
+        # heavily loaded box (2026-07-25 t-419: the old 20 s/2.0 s pairing let
+        # the OK candidate's ~1-2 s real eval also cross the 2.0 s wall under
+        # load, making BOTH time out and the winner assertions deref None).
+        time.sleep(30.0)
     return _evaluator()(patch, feedstock, fidelity, profile=profile, candidate_id=candidate_id, **kwargs)
 
 
@@ -4635,7 +4640,9 @@ def test_parallel_one_timeout_records_failure_and_continues(tmp_path) -> None:
         tmp_path,
         seed=7,
         evaluator=_slow_first_then_ok_evaluator,
-        per_eval_timeout_seconds=2.0,
+        # 10 s wall vs the ok-candidate's ~1-2 s real eval: load-robust
+        # margin in both directions (see _slow_first_then_ok_evaluator).
+        per_eval_timeout_seconds=10.0,
     )
 
     provenance = _read_provenance(tmp_path)
@@ -4647,6 +4654,52 @@ def test_parallel_one_timeout_records_failure_and_continues(tmp_path) -> None:
     assert provenance[0]["failure_category"] == "timeout"
     assert provenance[0]["status"] == "timeout"
     assert provenance[1]["status"] == "ok"
+
+
+def _all_slow_evaluator(
+    patch: RecipePatch,
+    feedstock: str,
+    fidelity: str,
+    *,
+    profile: Mapping[str, Any],
+    candidate_id: str | None = None,
+    **kwargs: Any,
+) -> ScoredResult:
+    time.sleep(30.0)
+    return _evaluator()(patch, feedstock, fidelity, profile=profile, candidate_id=candidate_id, **kwargs)
+
+
+@pytest.mark.timeout(25)
+def test_parallel_all_timeouts_is_a_designed_no_winner_outcome(tmp_path) -> None:
+    """Every candidate timing out is a DESIGNED outcome, not a crash.
+
+    2026-07-25 t-419: under co-tenant load the one-timeout test above used
+    to degenerate into this all-timeout case and crash on winner=None —
+    proving the path was never asserted in its own right. Pin it: winner
+    is None, every provenance row records the timeout, and the study
+    completes with its no-feasible-winner status instead of raising.
+    """
+    result = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "stub",
+        1,
+        2,
+        tmp_path,
+        seed=7,
+        evaluator=_all_slow_evaluator,
+        per_eval_timeout_seconds=2.0,
+    )
+
+    provenance = _read_provenance(tmp_path)
+    assert result.winner is None
+    assert [row["status"] for row in provenance] == ["timeout", "timeout"]
+    assert [row["failure_category"] for row in provenance] == [
+        "timeout",
+        "timeout",
+    ]
+    assert result.status == "completed-no-feasible-winner"
 
 
 def test_all_infeasible_completes_with_no_feasible_winner(tmp_path) -> None:

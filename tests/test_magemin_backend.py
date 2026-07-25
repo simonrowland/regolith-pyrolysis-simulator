@@ -667,8 +667,25 @@ def test_magemin_liquidus_finder_rejects_none_budget(monkeypatch):
     assert result.diagnostics.get("reason") == "invalid_liquidus_finder_budget"
 
 
-def test_magemin_subprocess_timeout_clamped_to_remaining_budget(monkeypatch):
+def test_magemin_subprocess_timeout_clamped_to_remaining_budget(
+    monkeypatch, tmp_path
+):
     """Per-call subprocess timeout must be min(configured, remaining)."""
+    import simulator.melt_backend.magemin as magemin_module
+
+    # 2026-07-25 t-419 load-robustness: isolate the machine-wide K-slot
+    # flock into a private namespace. With the shared lock dir, ANY
+    # concurrent test's MAGEMin slot traffic could eat into the 1.5 s
+    # budget during acquisition, surfacing 'cancelled while waiting for
+    # subprocess slot' instead of the clamped-timeout message this test
+    # pins — a flake that blamed the box instead of the shared lock.
+    monkeypatch.setattr(
+        magemin_module, '_MAGEMIN_SUBPROCESS_LOCK_DIR', tmp_path,
+    )
+    monkeypatch.setattr(
+        magemin_module, '_MAGEMIN_SUBPROCESS_LOCK',
+        tmp_path / 'magemin-subprocess.lock',
+    )
     seen_timeouts: list[float] = []
 
     def fake_run(*args, **kwargs):
