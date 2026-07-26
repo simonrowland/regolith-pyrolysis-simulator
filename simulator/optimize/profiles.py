@@ -1133,17 +1133,51 @@ def seed_source_campaigns(seed: Mapping[str, Any]) -> frozenset[str]:
     return frozenset(campaigns)
 
 
-def _thermal_window_max_hold_bound(
+def active_thermal_window_seed(
     profile: Mapping[str, Any],
     campaign: str,
-    *,
-    campaign_max_hold_hr: float | None,
-) -> tuple[float | None, str]:
+) -> Mapping[str, Any] | None:
+    """Return the exact seed supplying this profile's thermal window.
+
+    A run-level window is already explicit and therefore has no seed carrier.
+    Otherwise this mirrors ``_profile_campaign_setting`` selection, but only
+    seeds that actually provide ``temp_range_C`` qualify.  Bounds from sibling
+    seeds for the same campaign must never be borrowed.
+    """
+
+    if _campaign_setting(profile.get("run"), campaign, "temp_range_C") is not None:
+        return None
     for seed in profile.get("seed_recipes", ()) or ():
         if not isinstance(seed, Mapping):
             continue
         if campaign not in seed_source_campaigns(seed):
             continue
+        if _campaign_setting(seed.get("patch"), campaign, "temp_range_C") is not None:
+            return seed
+    return None
+
+
+def _thermal_window_max_hold_bound(
+    profile: Mapping[str, Any],
+    campaign: str,
+    *,
+    campaign_max_hold_hr: float | None,
+    recipe_patch: RecipePatch | None = None,
+) -> tuple[float | None, str]:
+    """Resolve the validated profile cap with optional runtime tightening.
+
+    Catalog validation runs without a candidate ``recipe_patch`` before runtime
+    scheduling. A candidate cap can therefore tighten, but cannot elevate, the
+    profile's admitted max hold end to end.
+    """
+
+    if recipe_patch is not None:
+        value = recipe_patch.values.get(("campaigns", campaign, "max_hold_hr"))
+        amount = _finite_float_or_none(value)
+        if amount is not None and amount > 0.0:
+            return amount, "recipe_local_max_hold_hr"
+    seed = active_thermal_window_seed(profile, campaign)
+    if seed is not None:
         value = _campaign_setting(seed.get("patch"), campaign, "max_hold_hr")
         amount = _finite_float_or_none(value)
         if amount is not None and amount > 0.0:

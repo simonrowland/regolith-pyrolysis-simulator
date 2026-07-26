@@ -35,6 +35,7 @@ from simulator.optimize.evalspec import (
 )
 import simulator.optimize.evalspec as evalspec_module
 import simulator.optimize.evaluate as evaluate_module
+import simulator.optimize.profiles as profiles_module
 import simulator.melt_backend.vaporock as vaporock_module
 from simulator.optimize.evaluate import (
     EvaluationInputError,
@@ -2383,7 +2384,7 @@ def test_c2a_profile_window_schedules_measured_temperature_window() -> None:
     assert temperatures[-1] == pytest.approx(1600.0)
 
 
-def test_c2a_window_schedules_148_hours_under_recipe_local_cap() -> None:
+def test_c2a_window_schedules_148_hours_under_carrier_seed_cap() -> None:
     profile = _c2a_window_profile(1050.0, 1600.0, 146)
     profile["seed_recipes"][0]["patch"]["campaigns"]["C2A_continuous"][
         "max_hold_hr"
@@ -2402,6 +2403,167 @@ def test_c2a_window_schedules_148_hours_under_recipe_local_cap() -> None:
     assert run_config.runtime_campaign_overrides["C2A_continuous"][
         "max_hours"
     ] == pytest.approx(148.0)
+
+
+def test_active_recipe_patch_max_hold_tightens_carrier_seed_cap() -> None:
+    profile = _c2a_window_profile(1050.0, 1600.0, 146)
+    profile["seed_recipes"][0]["patch"]["campaigns"]["C2A_continuous"][
+        "max_hold_hr"
+    ] = 160
+
+    with pytest.raises(
+        EvaluationInputError,
+        match=r"thermal_window_recipe_local_max_hold_hr refusal.*148 h.*147 h",
+    ):
+        _build_eval_inputs(
+            RecipePatch({
+                ("campaigns", "C2A_continuous", "max_hold_hr"): 147,
+            }),
+            "lunar_mare_low_ti",
+            "internal-analytical",
+            profile,
+            RecipeSchema(),
+        )
+
+
+def test_recipe_patch_max_hold_cannot_elevate_catalog_validated_cap() -> None:
+    profile = _c2a_window_profile(1050.0, 1600.0, 146)
+
+    with pytest.raises(
+        ProfileValidationError,
+        match=r"thermal_window_campaign_max_hold_hr refusal.*148 h.*30 h",
+    ):
+        _build_eval_inputs(
+            RecipePatch({
+                ("campaigns", "C2A_continuous", "max_hold_hr"): 160,
+            }),
+            "lunar_mare_low_ti",
+            "internal-analytical",
+            profile,
+            RecipeSchema(),
+        )
+
+
+@pytest.mark.parametrize(
+    (
+        "run_window",
+        "seed_specs",
+        "expected_seed_id",
+        "expected_max_hold_hr",
+        "expected_bound",
+        "expected_furnace_C",
+    ),
+    (
+        pytest.param(
+            None,
+            ((True, 111.0, 1711.0), (True, 122.0, 1722.0)),
+            "seed-0",
+            111.0,
+            "recipe_local_max_hold_hr",
+            1711.0,
+            id="first-of-two-carriers-wins",
+        ),
+        pytest.param(
+            None,
+            ((False, 133.0, 1733.0), (False, 144.0, 1744.0)),
+            None,
+            30.0,
+            "campaign_max_hold_hr",
+            None,
+            id="no-carrier-donates-nothing",
+        ),
+        pytest.param(
+            (1050.0, 1600.0),
+            ((True, 155.0, 1755.0),),
+            None,
+            30.0,
+            "campaign_max_hold_hr",
+            None,
+            id="run-level-window-has-no-seed-carrier",
+        ),
+        pytest.param(
+            None,
+            ((False, 166.0, 1766.0), (True, 177.0, 1777.0)),
+            "seed-1",
+            177.0,
+            "recipe_local_max_hold_hr",
+            1777.0,
+            id="catalog-bound-uses-exact-later-carrier",
+        ),
+    ),
+)
+def test_active_thermal_window_seed_boundary_contract(
+    run_window: tuple[float, float] | None,
+    seed_specs: tuple[tuple[bool, float, float], ...],
+    expected_seed_id: str | None,
+    expected_max_hold_hr: float,
+    expected_bound: str,
+    expected_furnace_C: float | None,
+) -> None:
+    campaign = "C2A_continuous"
+    profile: dict[str, object] = {"run": {}, "seed_recipes": []}
+    if run_window is not None:
+        profile["run"] = {
+            "campaigns": {campaign: {"temp_range_C": list(run_window)}}
+        }
+    seeds = profile["seed_recipes"]
+    assert isinstance(seeds, list)
+    for index, (provides_window, max_hold_hr, furnace_C) in enumerate(seed_specs):
+        campaign_patch: dict[str, object] = {"max_hold_hr": max_hold_hr}
+        if provides_window:
+            campaign_patch["temp_range_C"] = [1050.0, 1600.0]
+        seeds.append({
+            "id": f"seed-{index}",
+            "source_campaign": campaign,
+            "patch": {
+                "furnace_max_T_C": furnace_C,
+                "campaigns": {campaign: campaign_patch},
+            },
+        })
+
+    carrier = profiles_module.active_thermal_window_seed(profile, campaign)
+    max_hold_hr, max_hold_bound = profiles_module._thermal_window_max_hold_bound(
+        profile,
+        campaign,
+        campaign_max_hold_hr=30.0,
+        recipe_patch=None,
+    )
+    local_furnace = evaluate_module._recipe_local_furnace_ceiling_C(
+        profile,
+        campaign,
+    )
+
+    assert (carrier or {}).get("id") == expected_seed_id
+    assert max_hold_hr == pytest.approx(expected_max_hold_hr)
+    assert max_hold_bound == expected_bound
+    if expected_furnace_C is None:
+        assert local_furnace is None
+    else:
+        assert local_furnace is not None
+        assert local_furnace[0] == pytest.approx(expected_furnace_C)
+
+
+def test_recipe_without_local_max_hold_does_not_borrow_other_seed_cap() -> None:
+    profile = _c2a_window_profile(1050.0, 1600.0, 29)
+    profile["seed_recipes"].append({
+        "id": "other-seed",
+        "source_campaign": "C2A_continuous",
+        "patch": {
+            "campaigns": {"C2A_continuous": {"max_hold_hr": 160}}
+        },
+    })
+
+    with pytest.raises(
+        ProfileValidationError,
+        match=r"thermal_window_campaign_max_hold_hr refusal.*31 h.*30 h",
+    ):
+        _build_eval_inputs(
+            RecipePatch({}),
+            "lunar_mare_low_ti",
+            "internal-analytical",
+            profile,
+            RecipeSchema(),
+        )
 
 
 def test_evaluate_names_recipe_local_bound_when_it_refuses_window() -> None:
@@ -2621,7 +2783,7 @@ def test_c2a_profile_window_above_furnace_ceiling_fails_loud() -> None:
 
     with pytest.raises(
         EvaluationInputError,
-        match="exceeds profile_default_furnace_max_T_C",
+        match="exceeds furnace_T_max_C",
     ):
         _build_eval_inputs(
             RecipePatch({}),
@@ -2705,21 +2867,30 @@ def test_default_profile_without_local_furnace_field_refuses_1843_c() -> None:
         )
 
 
-def test_canonical_seed_local_furnace_field_admits_1843_c() -> None:
+def test_active_recipe_local_furnace_field_admits_1843_c_after_default_ref_rename() -> None:
     profile = _c2a_window_profile(1050.0, 1843.0, 18)
-    profile["seed_recipes"][0]["patch"]["furnace_max_T_C"] = 1843.0
+    active_patch = RecipePatch({FURNACE_MAX_T_C_PATH: 1843.0})
+    default_constraints = PhysicsConstraintSet()
+    renamed_default = replace(
+        default_constraints,
+        furnace_T_max_C=replace(
+            default_constraints.furnace_T_max_C,
+            source_ref="renamed.default.furnace_T_max_C",
+        ),
+    )
 
     spec, run_config = _build_eval_inputs(
-        RecipePatch({}),
+        active_patch,
         "lunar_mare_low_ti",
         "internal-analytical",
         profile,
         RecipeSchema(),
+        constraints=renamed_default,
     )
     constraints = evaluate_module._composition_target_constraints(
         profile,
-        None,
-        recipe_patch=RecipePatch({}),
+        renamed_default,
+        recipe_patch=active_patch,
         campaign="C2A_continuous",
     )
 
@@ -2736,6 +2907,63 @@ def test_canonical_seed_local_furnace_field_admits_1843_c() -> None:
     assert "recipe_local_furnace_max_T_C" in constraints.furnace_T_max_C.source_ref
 
 
+def test_explicit_furnace_constraint_stays_stricter_than_active_recipe_field() -> None:
+    profile = _c2a_window_profile(1050.0, 1843.0, 18)
+    active_patch = RecipePatch({FURNACE_MAX_T_C_PATH: 1843.0})
+    explicit = replace(
+        PhysicsConstraintSet(),
+        furnace_T_max_C=ThresholdSpec(
+            id="operator_furnace_limit",
+            value=1700.0,
+            units="degC",
+            source="operator",
+            source_ref="test.operator_limit",
+        ),
+    )
+
+    composed = evaluate_module._composition_target_constraints(
+        profile,
+        explicit,
+        recipe_patch=active_patch,
+        campaign="C2A_continuous",
+    )
+    assert composed is not None
+    assert composed.furnace_T_max_C == explicit.furnace_T_max_C
+    with pytest.raises(
+        EvaluationInputError,
+        match=r"1843 C exceeds operator_furnace_limit 1700 C",
+    ):
+        evaluate_module._build_eval_inputs(
+            active_patch,
+            "lunar_mare_low_ti",
+            "internal-analytical",
+            profile,
+            RecipeSchema(),
+            constraints=explicit,
+        )
+
+
+def test_recipe_without_local_furnace_field_does_not_borrow_other_seed() -> None:
+    profile = _c2a_window_profile(1050.0, 1843.0, 18)
+    profile["seed_recipes"].append({
+        "id": "other-seed",
+        "source_campaign": "C2A_continuous",
+        "patch": {"furnace_max_T_C": 1843.0},
+    })
+
+    with pytest.raises(
+        EvaluationInputError,
+        match=r"1843 C exceeds profile_default_furnace_max_T_C 1800 C",
+    ):
+        _build_eval_inputs(
+            RecipePatch({}),
+            "lunar_mare_low_ti",
+            "internal-analytical",
+            profile,
+            RecipeSchema(),
+        )
+
+
 def test_recipe_local_1820_c_furnace_field_refuses_1843_c_ramp() -> None:
     profile = _c2a_window_profile(1050.0, 1843.0, 18)
     profile["seed_recipes"][0]["patch"]["furnace_max_T_C"] = 1820.0
@@ -2745,7 +2973,7 @@ def test_recipe_local_1820_c_furnace_field_refuses_1843_c_ramp() -> None:
         match=r"1843 C exceeds recipe_local_furnace_max_T_C 1820 C",
     ):
         _build_eval_inputs(
-            RecipePatch({}),
+            RecipePatch({FURNACE_MAX_T_C_PATH: 1820.0}),
             "lunar_mare_low_ti",
             "internal-analytical",
             profile,
@@ -3092,7 +3320,7 @@ def test_lab_schedule_profile_bridges_experiment_windows_to_window_semantics() -
     ("mutation", "expected"),
     [
         ("above_declared_ceiling", "lab_schedule_temperature_exceeds_furnace_ceiling"),
-        ("above_constraint_ceiling", "lab_schedule_temperature_exceeds_profile_default_furnace_max_T_C"),
+        ("above_constraint_ceiling", "lab_schedule_temperature_exceeds_furnace_T_max_C"),
         (
             "nonmonotonic_pressure",
             "lab_schedule_chamber_pressure_mbar_time_arrays_must_be_monotonic",

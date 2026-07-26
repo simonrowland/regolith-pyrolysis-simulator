@@ -96,6 +96,7 @@ from simulator.optimize.physics import (
 from simulator.optimize.profiles import (
     ProfileValidationError,
     _thermal_window_max_hold_bound,
+    active_thermal_window_seed,
     physics_constraints_from_profile,
     seed_source_campaigns,
     validate_profile,
@@ -3255,6 +3256,7 @@ def _profile_thermal_window_schedule(
         profile,
         campaign,
         campaign_max_hold_hr=_campaign_max_hold_hr(setpoints, campaign),
+        recipe_patch=recipe_patch,
     )
     if max_hold_hr is not None and float(total_hours) > max_hold_hr:
         raise EvaluationInputError(
@@ -3343,16 +3345,28 @@ def _furnace_ceiling_C(
         campaign,
         recipe_patch=recipe_patch,
     )
-    if local_ceiling is not None:
-        return local_ceiling[0], "recipe_local_furnace_max_T_C"
     hardware_ceiling_C = float(setpoints.get("furnace_max_T_C", 1800.0))
     if constraints is None:
+        if local_ceiling is not None:
+            return local_ceiling[0], "recipe_local_furnace_max_T_C"
         return hardware_ceiling_C, "profile_default_furnace_max_T_C"
     threshold = getattr(constraints, "furnace_T_max_C", None)
     value = getattr(threshold, "value", None)
+    if local_ceiling is not None:
+        if value is None or _is_default_furnace_threshold(threshold):
+            return local_ceiling[0], "recipe_local_furnace_max_T_C"
+        if float(value) <= local_ceiling[0]:
+            return float(value), str(
+                getattr(threshold, "id", None) or "furnace_T_max_C"
+            )
+        return local_ceiling[0], "recipe_local_furnace_max_T_C"
     if value is None:
         return hardware_ceiling_C, "profile_default_furnace_max_T_C"
-    return float(value), "profile_default_furnace_max_T_C"
+    if _is_default_furnace_threshold(threshold):
+        return float(value), "profile_default_furnace_max_T_C"
+    return float(value), str(
+        getattr(threshold, "id", None) or "furnace_T_max_C"
+    )
 
 
 def _recipe_local_furnace_ceiling_C(
@@ -3369,15 +3383,15 @@ def _recipe_local_furnace_ceiling_C(
             ),
             "recipe_patch.furnace_max_T_C",
         )
-    for index, seed in enumerate(profile.get("seed_recipes", ()) or ()):
-        if not isinstance(seed, MappingABC):
-            continue
-        if campaign not in seed_source_campaigns(seed):
-            continue
+    seed = active_thermal_window_seed(profile, campaign)
+    if seed is not None:
         seed_patch = seed.get("patch")
         if not isinstance(seed_patch, MappingABC) or "furnace_max_T_C" not in seed_patch:
-            continue
-        source = f"seed_recipes[{index}].patch.furnace_max_T_C"
+            return None
+        source = (
+            f"seed_recipes[{seed.get('id', '<unnamed>')!r}]"
+            ".patch.furnace_max_T_C"
+        )
         # 15eaee9 made 1843 C an explicit canonical-recipe field. The bound is
         # dense-alumina max_operating_C=1843, not continuous_C=1700
         # (data/wall_materials.yaml:602-615). This guard prices no furnace
@@ -3649,6 +3663,11 @@ def _with_recipe_local_furnace_ceiling(
         return constraints
     value, source_ref = local_ceiling
     threshold = constraints.furnace_T_max_C
+    if (
+        not _is_default_furnace_threshold(threshold)
+        and float(threshold.value) <= value
+    ):
+        return constraints
     return replace(
         constraints,
         furnace_T_max_C=ThresholdSpec(
@@ -3660,6 +3679,12 @@ def _with_recipe_local_furnace_ceiling(
             tolerance=threshold.tolerance,
         ),
     )
+
+
+def _is_default_furnace_threshold(threshold: Any) -> bool:
+    """Recognize a replaceable default by provenance, not its rename-prone citation."""
+
+    return getattr(threshold, "source", None) == "code_default"
 
 
 def _with_composition_target_extraction_thresholds(
