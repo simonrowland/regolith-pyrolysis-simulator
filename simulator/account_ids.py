@@ -16,11 +16,16 @@ CHROMIUM_CONDENSED_OXIDE_ACCOUNT = "terminal.chromium_condensed_oxide_stored"
 # Writer sweep (2026-07-12): evaporation._project_condensed_stage_collection
 # projects condensation-train credits; extraction._project_condensed_species
 # projects condensation-train, dedicated terminal chromium-product, or
-# metal-phase balances. Other mutations clear.  The dedicated chromium account
-# still backs the same stage-collection UI projection, so excluding it makes a
-# correctly routed Cr2O3 product appear as projection-only mass.
-STAGE_COLLECTION_BACKING_ACCOUNTS = (
+# stage-routed metal-phase balances. Other mutations clear.
+STAGE_COLLECTION_SOURCE_ACCOUNTS = (
     *METAL_PHASE_ACCOUNTS,
+    "process.condensation_train",
+    CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
+)
+# Only these ledger accounts always back the condenser-train UI projection.
+# Metal-phase accounts also hold intentionally unprojected products. Their
+# stage-routed ledger credits are classified independently at commit time.
+STAGE_COLLECTION_BACKING_ACCOUNTS = (
     "process.condensation_train",
     CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
 )

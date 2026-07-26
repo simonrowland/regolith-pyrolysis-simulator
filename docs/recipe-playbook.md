@@ -183,7 +183,7 @@ python -m simulator.runner --feedstock lunar_mare_low_ti --campaign C0 --hours 4
   --recipe data/recipes/canonical_lunar_full_yield.yaml --output canonical-lunar.json
 ```
 
-Pinned 2026-07-19 demo outputs for a `lunar_mare_low_ti` 1-tonne batch are Fe 85.566 kg, SiO 53.474 kg, Na 1.121 kg, K 0.854 kg, and Mg 19.366 kg. Source: `docs-private/research/2026-07-19-canonical-recipe/report.md`.
+Pinned 2026-07-25 outputs for a `lunar_mare_low_ti` 1-tonne, 400-hour request that completed 276 process hours with `status=partial` are Fe 86.950 kg, SiO 8.967 kg, Na 1.121 kg, K 0.853 kg, and Mg 5.367 kg. That artifact auto-proceeded through 20 C6 hours (global hours 257–276), so these are post-C6 yields rather than the pyrolysis-only pre-C6 state. Source: `docs-private/research/2026-07-25-b092-fix/report.md`.
 
 ### Industrial-glass mode
 

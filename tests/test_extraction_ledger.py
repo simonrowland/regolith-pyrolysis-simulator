@@ -927,10 +927,14 @@ def test_stage_projection_combines_condensation_and_metal_phase_sources():
         {"K": 2.0},
         source="test recovered K condensate",
     )
-    sim.atom_ledger.load_external(
+    metal_credit = sim.atom_ledger.load_external(
         METAL_PHASE_ACCOUNT,
         {"K": 1.0},
         source="test extracted K metal",
+    )
+    sim._record_stage_routed_metal_credits(
+        "MRE",
+        SimpleNamespace(credits=(metal_credit,)),
     )
     sim.train.stages[2].collected_kg["K"] = 2.0
     sim._record_stage_collection_source(

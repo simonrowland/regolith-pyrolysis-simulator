@@ -865,6 +865,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._stage_collection_kg_by_source: Dict[
             Tuple[str, int, str], float
         ] = {}
+        self._stage_routed_metal_ledger_kg: Dict[
+            Tuple[str, int], float
+        ] = {}
         self._last_wall_deposit_by_segment_species_delta: Dict[
             Tuple[str, str], float] = {}
         self._last_impurity_delta: Dict[Tuple[int, str], float] = {}
@@ -12776,10 +12779,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 getattr(self, '_last_o2_bubbler_diagnostic', {}) or {}
             ),
             # 0.5.4 W8 (M2 historical-audit closure): per-species drift
-            # between aggregate metal-phase ledger accounts and the
-            # ``train.stages[*].collected_kg`` UI projection. Empty dict
-            # means all metals in sync. Diagnostic only — the global
-            # ``mass_balance_error_pct`` ≤5e-12 % gate remains hard.
+            # for condenser-train backing and stage-routed metal products
+            # against their separate shares of the stage UI. Intentionally
+            # unprojected metal products are excluded. Diagnostic only —
+            # the global ``mass_balance_error_pct`` ≤5e-12 % gate remains hard.
             metal_projection_drift_kg=self._audit_metal_projection_drift(),
             oxygen_reservoir=oxygen_reservoir_snapshot,
             # 0.5.4.1 E3: Knudsen-regime warning sticker from the

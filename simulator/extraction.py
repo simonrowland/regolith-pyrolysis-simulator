@@ -14,11 +14,15 @@ from simulator.account_ids import (
     METAL_PHASE_ACCOUNT,
     METAL_PHASE_ACCOUNTS,
     STAGE_COLLECTION_BACKING_ACCOUNTS,
+    STAGE_COLLECTION_SOURCE_ACCOUNTS,
 )
 from simulator.accounting.queries import AccountingQueries
 from simulator.accounting.queries import REE_ENRICHMENT_SOURCE_IDS
 from simulator.chemistry.melt_activity import melt_oxide_activity
-from simulator.condensation_routing import product_stage_number
+from simulator.condensation_routing import (
+    PRODUCT_DESTINATIONS,
+    product_stage_number,
+)
 from simulator.state import (
     FARADAY,
     GAS_CONSTANT,
@@ -27,7 +31,6 @@ from simulator.state import (
     CampaignPhase,
     EvaporationFlux,
 )
-
 
 class ExtractionMixin:
     _LEDGER_KG_TOL = 1e-9
@@ -412,7 +415,7 @@ class ExtractionMixin:
     def _stage_collection_backing_kg(self, species: str) -> float:
         return sum(
             self._ledger_account_species_kg(account, species)
-            for account in STAGE_COLLECTION_BACKING_ACCOUNTS
+            for account in STAGE_COLLECTION_SOURCE_ACCOUNTS
         )
 
     def _record_stage_collection_source(
@@ -428,6 +431,30 @@ class ExtractionMixin:
             self._stage_collection_kg_by_source.get(key, 0.0)
             + float(delta_kg),
         )
+
+    def _record_stage_routed_metal_credits(
+        self,
+        recipe: str,
+        transition,
+    ) -> None:
+        destinations = PRODUCT_DESTINATIONS.get(recipe, {})
+        for credit in transition.credits:
+            if credit.account not in METAL_PHASE_ACCOUNTS:
+                continue
+            for species, raw_kg in credit.species_kg.items():
+                if species not in destinations:
+                    continue
+                stage_idx = product_stage_number(recipe, species)
+                if stage_idx is None:
+                    continue
+                credit_kg = max(0.0, float(raw_kg))
+                if credit_kg <= self._LEDGER_KG_TOL:
+                    continue
+                key = (species, int(stage_idx))
+                self._stage_routed_metal_ledger_kg[key] = (
+                    self._stage_routed_metal_ledger_kg.get(key, 0.0)
+                    + credit_kg
+                )
 
     def _remove_stage_collection_source_projection(
         self, source_account: str, species: str, remove_kg: float
@@ -497,20 +524,22 @@ class ExtractionMixin:
 
     def _audit_metal_projection_drift(self) -> Dict[str, float]:
         """0.5.4 W8 (M2 historical-audit closure, 2026-05-28):
-        per-species drift between aggregate mol-native stage-collection backing
-        accounts (metal-phase staging + diagnostic pools + condensation train)
-        and the UI projection
-        sum across ``train.stages[*].collected_kg``.
+        per-species drift across two like-for-like stage-collection domains:
+        condenser-train backing accounts versus their UI share, and
+        stage-routed metal-phase ledger credits versus their separately tracked
+        UI projection. Metal products with no stage destination are excluded.
 
         Returns a dict ``{species: drift_kg}`` for species
         where the absolute drift exceeds ``_LEDGER_KG_TOL``. Sign
         convention: ``ledger_kg - projection_kg`` — positive when
-        the combined backing accounts exceed the UI projection
+        a ledger domain exceeds its UI projection
         (some stage-collected mass has been credited but not yet
         projected), zero when in sync. Negative values identify
         projection mass without matching
         backing-account mass. Both signs remain visible so one-sided
-        ledger or projection mutations cannot pass silently.
+        ledger or projection mutations cannot pass silently. When both
+        domains drift for one species, the larger absolute residual is
+        reported so opposite-sign domain failures cannot cancel.
 
         Diagnostic only — does NOT raise on drift. The runner-strict
         result consumer remaps a nonempty audit to failed status. The
@@ -521,7 +550,7 @@ class ExtractionMixin:
         ``HourSnapshot.metal_projection_drift_kg`` so external tools
         + tests can read it without touching simulator internals.
         """
-        ledger_metals: Dict[str, float] = {}
+        train_ledger: Dict[str, float] = {}
         for account in STAGE_COLLECTION_BACKING_ACCOUNTS:
             for species, kg in self.atom_ledger.project_account_kg(account).items():
                 try:
@@ -534,7 +563,9 @@ class ExtractionMixin:
                         stacklevel=2,
                     )
                     continue
-                ledger_metals[species] = ledger_metals.get(species, 0.0) + ledger_kg
+                train_ledger[species] = (
+                    train_ledger.get(species, 0.0) + ledger_kg
+                )
         # 0.5.4 milestone-review P2 (codex /challenge 2026-05-28):
         # iterate the UNION of species across both ledger and
         # projection, not just ledger keys. Pre-fix, an empty ledger
@@ -556,24 +587,89 @@ class ExtractionMixin:
                         projection_species.add(species)
                 except (TypeError, ValueError):
                     continue
-        union_species = set(ledger_metals.keys()) | projection_species
+        # Projection-side provenance remains separate from the routed-ledger
+        # tally. It records only stage UI mass that the projection writer minted.
+        metal_projection_by_route: Dict[tuple[str, int], float] = {}
+        for (
+            source_account,
+            stage_idx,
+            species,
+        ), value in self._stage_collection_kg_by_source.items():
+            if source_account not in METAL_PHASE_ACCOUNTS:
+                continue
+            try:
+                projected_kg = max(0.0, float(value))
+            except (TypeError, ValueError):
+                continue
+            key = (species, int(stage_idx))
+            metal_projection_by_route[key] = (
+                metal_projection_by_route.get(key, 0.0) + projected_kg
+            )
+        metal_projection_by_species: Dict[str, float] = {}
+        for (species, _stage_idx), projected_kg in metal_projection_by_route.items():
+            metal_projection_by_species[species] = (
+                metal_projection_by_species.get(species, 0.0)
+                + projected_kg
+            )
+        union_species = (
+            set(train_ledger)
+            | {
+                species
+                for species, _stage_idx in self._stage_routed_metal_ledger_kg
+            }
+            | projection_species
+            | set(metal_projection_by_species)
+        )
         if not union_species:
             return {}
         drift: Dict[str, float] = {}
         for species in union_species:
-            raw = ledger_metals.get(species, 0.0)
-            try:
-                ledger_kg = float(raw)
-            except (TypeError, ValueError):
-                continue
-            if not (ledger_kg == ledger_kg):  # NaN guard
-                continue
-            if ledger_kg < 0.0:
-                ledger_kg = 0.0
-            projected_kg = self._condensed_species_projected_kg(species)
-            delta = ledger_kg - projected_kg
-            if abs(delta) > self._LEDGER_KG_TOL:
-                drift[species] = delta
+            total_projected_kg = self._condensed_species_projected_kg(species)
+            tracked_metal_kg = metal_projection_by_species.get(species, 0.0)
+            projected_train_kg = max(
+                0.0,
+                total_projected_kg - tracked_metal_kg,
+            )
+            domain_residuals: list[float] = []
+            for raw_ledger_kg, projected_kg in (
+                (train_ledger.get(species, 0.0), projected_train_kg),
+            ):
+                try:
+                    ledger_kg = float(raw_ledger_kg)
+                except (TypeError, ValueError):
+                    continue
+                if not (ledger_kg == ledger_kg):  # NaN guard
+                    continue
+                delta = max(0.0, ledger_kg) - projected_kg
+                if abs(delta) > self._LEDGER_KG_TOL:
+                    domain_residuals.append(delta)
+            route_keys = {
+                key
+                for key in self._stage_routed_metal_ledger_kg
+                if key[0] == species
+            } | {
+                key
+                for key in metal_projection_by_route
+                if key[0] == species
+            }
+            for key in route_keys:
+                raw_ledger_kg = self._stage_routed_metal_ledger_kg.get(
+                    key, 0.0
+                )
+                try:
+                    ledger_kg = float(raw_ledger_kg)
+                except (TypeError, ValueError):
+                    continue
+                if not (ledger_kg == ledger_kg):
+                    continue
+                delta = (
+                    max(0.0, ledger_kg)
+                    - metal_projection_by_route.get(key, 0.0)
+                )
+                if abs(delta) > self._LEDGER_KG_TOL:
+                    domain_residuals.append(delta)
+            if domain_residuals:
+                drift[species] = max(domain_residuals, key=abs)
         return drift
 
     def _ensure_metal_phase_stratification_provider(self) -> None:
@@ -833,7 +929,7 @@ class ExtractionMixin:
         *,
         source_account: str = 'process.condensation_train',
     ) -> None:
-        if source_account not in STAGE_COLLECTION_BACKING_ACCOUNTS:
+        if source_account not in STAGE_COLLECTION_SOURCE_ACCOUNTS:
             raise ValueError(
                 f'unsupported stage-collection source account: {source_account}'
             )
@@ -1705,6 +1801,7 @@ class ExtractionMixin:
                 diagnostic=diagnostic,
                 control_inputs=electrolysis_controls,
             )
+            self._record_stage_routed_metal_credits('MRE', transition)
             self._apply_mre_anode_o2_redox_source_terms(
                 transition,
                 label='redox_source:mre_electrolysis_reduction',
@@ -2382,6 +2479,7 @@ class ExtractionMixin:
                 'dt_hr': 1.0,
             },
         )
+        self._record_stage_routed_metal_credits('C3', transition)
         self._apply_transition_redox_source_terms(
             transition,
             label='redox_source:c3_k_shuttle_reduction',
@@ -2390,8 +2488,17 @@ class ExtractionMixin:
         )
 
         # Fe produced goes to its canonical product destination.
+        fe_delta_kg = sum(
+            max(0.0, float(credit.species_kg.get('Fe', 0.0)))
+            for credit in transition.credits
+            if credit.account in METAL_PHASE_ACCOUNTS
+        )
         self._project_extraction_product(
-            'C3', 'Fe', source_account='process.metal_phase')
+            'C3',
+            'Fe',
+            delta_kg=fe_delta_kg,
+            source_account='process.metal_phase',
+        )
 
         # Deduct K from shuttle inventory
         # (K comes from additives, not from a condenser stage)
@@ -2490,6 +2597,7 @@ class ExtractionMixin:
                 'dt_hr': 1.0,
             },
         )
+        self._record_stage_routed_metal_credits('C3', transition)
         self._apply_transition_redox_source_terms(
             transition,
             label='redox_source:c3_na_shuttle_reduction',
@@ -2501,8 +2609,17 @@ class ExtractionMixin:
         # to the dedicated Cr stage; Ti stays as a metal-phase product unless a
         # future accepted physical condenser is added.
         for metal in ('Fe', 'Cr', 'Ti'):
+            delta_kg = sum(
+                max(0.0, float(credit.species_kg.get(metal, 0.0)))
+                for credit in transition.credits
+                if credit.account in METAL_PHASE_ACCOUNTS
+            )
             self._project_extraction_product(
-                'C3', metal, source_account='process.metal_phase')
+                'C3',
+                metal,
+                delta_kg=delta_kg,
+                source_account='process.metal_phase',
+            )
 
         # Deduct Na from shuttle inventory (drawn from the ledger so
         # the counter stays in sync with the kernel-committed debit).
