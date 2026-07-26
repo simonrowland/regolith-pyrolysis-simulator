@@ -7,6 +7,7 @@ load heavyweight native dependencies inside the killable child only.
 
 from __future__ import annotations
 
+import atexit
 import faulthandler
 import multiprocessing
 import os
@@ -16,9 +17,14 @@ import sys
 import threading
 import time
 import traceback
+import weakref
 from concurrent.futures import Future
 from pathlib import Path
 from typing import Any, Callable, Optional
+
+ENGINE_WORKER_CANCEL_POLL_S = 0.05
+ENGINE_POOL_AUTOMATIC_PER_POOL_BUDGET_S = 3.0
+ENGINE_POOL_AUTOMATIC_TOTAL_BUDGET_S = 5.0
 
 # Env-gated lifecycle trace (2026-07-24): the recursive-spawn churn class
 # was invisible because every failure path was silently absorbed into
@@ -36,6 +42,24 @@ def _pool_debug(msg: str) -> None:
 WorkerBootstrap = Callable[..., tuple[Any, Any]]
 WorkerHandler = Callable[[Any, Any, Any], Any]
 INHERIT_PROCESS_GROUP_ENV = 'REGOLITH_ENGINE_WORKER_INHERIT_PROCESS_GROUP'
+_LIVE_ENGINE_POOLS: weakref.WeakSet[Any] = weakref.WeakSet()
+_ENGINE_POOL_REGISTRY_LOCK = threading.Lock()
+_ENGINE_POOL_ATEXIT_REGISTERED = False
+
+
+def _register_engine_pool(pool: 'EngineWorkerPool') -> None:
+    global _ENGINE_POOL_ATEXIT_REGISTERED
+
+    with _ENGINE_POOL_REGISTRY_LOCK:
+        _LIVE_ENGINE_POOLS.add(pool)
+        if not _ENGINE_POOL_ATEXIT_REGISTERED:
+            atexit.register(close_all_engine_pools)
+            _ENGINE_POOL_ATEXIT_REGISTERED = True
+
+
+def _discard_engine_pool(pool: 'EngineWorkerPool') -> None:
+    with _ENGINE_POOL_REGISTRY_LOCK:
+        _LIVE_ENGINE_POOLS.discard(pool)
 
 
 class EngineWorkerRemoteError(RuntimeError):
@@ -178,10 +202,15 @@ class WarmEngineWorker:
         self.ready_payload = None
         self.start_count = 0
         self.disabled = False
+        self._state_lock = threading.Lock()
+        self._pending_reap: list[Any] = []
 
     def start(self, *, timeout_s: Optional[float] = None) -> Any:
         """Start a fresh worker and wait for its bootstrap acknowledgement."""
         self.close()
+        with self._state_lock:
+            if self.disabled:
+                raise RuntimeError(f'{self.name} worker is disabled')
         context = multiprocessing.get_context('spawn')
         parent, child = context.Pipe(duplex=True)
         process = context.Process(
@@ -203,6 +232,22 @@ class WarmEngineWorker:
             parent.close()
             raise
         child.close()
+        with self._state_lock:
+            if self.disabled:
+                cancelled = True
+            else:
+                self.process = process
+                self.connection = parent
+                self.ready_payload = None
+                cancelled = False
+        if cancelled:
+            self._stop_pair(
+                process,
+                parent,
+                diagnostic=False,
+                cleanup_group=True,
+            )
+            raise RuntimeError(f'{self.name} worker is disabled')
         try:
             startup_timeout = self.startup_timeout_s
             if timeout_s is not None:
@@ -210,27 +255,38 @@ class WarmEngineWorker:
                     startup_timeout,
                     max(0.001, float(timeout_s)),
                 )
-            if not parent.poll(startup_timeout):
-                raise EngineWorkerTimeout(
-                    self.name,
-                    startup_timeout,
-                    phase='initialization',
-                )
+            deadline = time.monotonic() + startup_timeout
+            while True:
+                with self._state_lock:
+                    current = (
+                        not self.disabled
+                        and self.process is process
+                        and self.connection is parent
+                    )
+                if not current:
+                    raise RuntimeError(f'{self.name} worker is disabled')
+                remaining = deadline - time.monotonic()
+                if remaining <= 0.0:
+                    raise EngineWorkerTimeout(
+                        self.name,
+                        startup_timeout,
+                        phase='initialization',
+                    )
+                if parent.poll(min(ENGINE_WORKER_CANCEL_POLL_S, remaining)):
+                    break
             message = parent.recv()
         except (EOFError, OSError, TimeoutError):
-            self._stop_pair(
-                process,
-                parent,
+            self._discard_current(
                 diagnostic=False,
-                cleanup_group=True,
+                expected_process=process,
+                expected_connection=parent,
             )
             raise
         if message[0] == 'timeout':
-            self._stop_pair(
-                process,
-                parent,
+            self._discard_current(
                 diagnostic=False,
-                cleanup_group=True,
+                expected_process=process,
+                expected_connection=parent,
             )
             _tag, worker_name, timeout_s, phase = message
             raise EngineWorkerTimeout(
@@ -239,30 +295,43 @@ class WarmEngineWorker:
                 phase=phase,
             )
         if message[0] != 'ready':
-            self._stop_pair(
-                process,
-                parent,
+            self._discard_current(
                 diagnostic=False,
-                cleanup_group=True,
+                expected_process=process,
+                expected_connection=parent,
             )
             _tag, exc_name, detail, remote_traceback = message
             raise EngineWorkerRemoteError(exc_name, detail, remote_traceback)
-        self.process = process
-        self.connection = parent
-        self.ready_payload = message[1]
-        self.start_count += 1
-        return self.ready_payload
+        with self._state_lock:
+            if (
+                self.disabled
+                or self.process is not process
+                or self.connection is not parent
+            ):
+                raise RuntimeError(f'{self.name} worker is disabled')
+            self.ready_payload = message[1]
+            self.start_count += 1
+            return self.ready_payload
 
     def call(self, request: Any, *, timeout_s: Optional[float] = None) -> Any:
         """Run one request; replace a dead or timed-out worker before return."""
-        if self.disabled:
-            raise RuntimeError(f'{self.name} worker is disabled')
+        with self._state_lock:
+            if self.disabled:
+                raise RuntimeError(f'{self.name} worker is disabled')
+            process = self.process
+            connection = self.connection
         timeout = self.call_timeout_s if timeout_s is None else max(
             0.001, float(timeout_s))
-        if self.process is not None and not self.process.is_alive():
+        if process is not None and not process.is_alive():
             _pool_debug(f'{self.name}: worker pid found dead at call entry')
-            self._discard_current(diagnostic=False)
-        if self.process is None:
+            self._discard_current(
+                diagnostic=False,
+                expected_process=process,
+                expected_connection=connection,
+            )
+            process = None
+            connection = None
+        if process is None:
             # Cold (re)start is bounded by startup_timeout_s, NOT the
             # per-call wall. 2026-07-24 (B1 gate-3 churn class): the old
             # `self.start(timeout_s=timeout)` clamped the startup wall to
@@ -281,19 +350,30 @@ class WarmEngineWorker:
             self.start()
             _pool_debug(
                 f'{self.name}: cold start ok in '
-                f'{time.monotonic() - t_start:.2f}s pid={self.process.pid}'
+                f'{time.monotonic() - t_start:.2f}s pid='
+                f'{getattr(self.process, "pid", None)}'
             )
         started_at = time.monotonic()
-        process = self.process
-        connection = self.connection
+        with self._state_lock:
+            process = self.process
+            connection = self.connection
+            disabled = self.disabled
         if process is None or connection is None:
             raise RuntimeError(f'{self.name} worker is unavailable')
-        if self.disabled:
-            self._discard_current(diagnostic=False)
+        if disabled:
+            self._discard_current(
+                diagnostic=False,
+                expected_process=process,
+                expected_connection=connection,
+            )
             raise RuntimeError(f'{self.name} worker is disabled')
         remaining = timeout - max(0.0, time.monotonic() - started_at)
         if remaining <= 0.0:
-            self._discard_current(diagnostic=True)
+            self._discard_current(
+                diagnostic=True,
+                expected_process=process,
+                expected_connection=connection,
+            )
             raise EngineWorkerTimeout(
                 self.name,
                 timeout,
@@ -301,17 +381,38 @@ class WarmEngineWorker:
             )
         try:
             connection.send(request)
-            if not connection.poll(remaining):
-                _pool_debug(
-                    f'{self.name}: job poll timeout after {remaining:.2f}s '
-                    f'(wall {timeout:.2f}s) — discarding worker'
-                )
-                self._discard_current(diagnostic=True)
-                raise EngineWorkerTimeout(
-                    self.name,
-                    timeout,
-                    phase='job',
-                )
+            deadline = time.monotonic() + remaining
+            while True:
+                with self._state_lock:
+                    current = (
+                        not self.disabled
+                        and self.process is process
+                        and self.connection is connection
+                    )
+                if not current:
+                    raise RuntimeError(
+                        f'{self.name} worker exited without a result'
+                    )
+                poll_remaining = deadline - time.monotonic()
+                if poll_remaining <= 0.0:
+                    _pool_debug(
+                        f'{self.name}: job poll timeout after {remaining:.2f}s '
+                        f'(wall {timeout:.2f}s) — discarding worker'
+                    )
+                    self._discard_current(
+                        diagnostic=True,
+                        expected_process=process,
+                        expected_connection=connection,
+                    )
+                    raise EngineWorkerTimeout(
+                        self.name,
+                        timeout,
+                        phase='job',
+                    )
+                if connection.poll(
+                    min(ENGINE_WORKER_CANCEL_POLL_S, poll_remaining)
+                ):
+                    break
             message = connection.recv()
         except TimeoutError:
             raise
@@ -319,10 +420,22 @@ class WarmEngineWorker:
             _pool_debug(
                 f'{self.name}: worker died mid-call ({type(exc).__name__})'
             )
-            self._discard_current(diagnostic=False)
+            self._discard_current(
+                diagnostic=False,
+                expected_process=process,
+                expected_connection=connection,
+            )
             raise RuntimeError(
                 f'{self.name} worker exited without a result'
             ) from exc
+        with self._state_lock:
+            current = (
+                not self.disabled
+                and self.process is process
+                and self.connection is connection
+            )
+        if not current:
+            raise RuntimeError(f'{self.name} worker exited without a result')
         if message[0] == 'ok':
             return message[1]
         if message[0] == 'timeout':
@@ -331,7 +444,11 @@ class WarmEngineWorker:
                 f'{self.name}: worker-side timeout phase={phase} '
                 f'wall={timeout_s}'
             )
-            self._discard_current(diagnostic=False)
+            self._discard_current(
+                diagnostic=False,
+                expected_process=process,
+                expected_connection=connection,
+            )
             raise EngineWorkerTimeout(
                 worker_name,
                 timeout_s,
@@ -341,14 +458,33 @@ class WarmEngineWorker:
         _pool_debug(
             f'{self.name}: remote error {exc_name}: {str(detail)[:120]}'
         )
-        self._discard_current(diagnostic=False)
+        self._discard_current(
+            diagnostic=False,
+            expected_process=process,
+            expected_connection=connection,
+        )
         raise EngineWorkerRemoteError(exc_name, detail, remote_traceback)
 
-    def _discard_current(self, *, diagnostic: bool) -> None:
-        process, connection = self.process, self.connection
-        self.process = None
-        self.connection = None
-        self.ready_payload = None
+    def _discard_current(
+        self,
+        *,
+        diagnostic: bool,
+        expected_process: Any = None,
+        expected_connection: Any = None,
+    ) -> None:
+        with self._state_lock:
+            if (
+                expected_process is not None
+                and (
+                    self.process is not expected_process
+                    or self.connection is not expected_connection
+                )
+            ):
+                return
+            process, connection = self.process, self.connection
+            self.process = None
+            self.connection = None
+            self.ready_payload = None
         self._stop_pair(
             process,
             connection,
@@ -395,10 +531,11 @@ class WarmEngineWorker:
 
     def close(self) -> None:
         """Idempotently stop the worker and release its pipe."""
-        process, connection = self.process, self.connection
-        self.process = None
-        self.connection = None
-        self.ready_payload = None
+        with self._state_lock:
+            process, connection = self.process, self.connection
+            self.process = None
+            self.connection = None
+            self.ready_payload = None
         try:
             if connection is not None:
                 try:
@@ -429,11 +566,57 @@ class WarmEngineWorker:
                         os.killpg(process_pid, signal.SIGKILL)
                     except (AttributeError, OSError):
                         pass
+        self._reap_pending(timeout_s=1.0)
+
+    def request_disable(self) -> None:
+        """Reject calls and synchronously signal the active process group."""
+        with self._state_lock:
+            self.disabled = True
+            process, connection = self.process, self.connection
+            self.process = None
+            self.connection = None
+            self.ready_payload = None
+            if process is not None:
+                self._pending_reap.append(process)
+        if connection is not None:
+            connection.close()
+        if process is None:
+            return
+        try:
+            os.killpg(process.pid, signal.SIGKILL)
+        except (AttributeError, OSError):
+            try:
+                process.kill()
+            except OSError:
+                pass
+
+    def _reap_pending(self, *, timeout_s: float) -> bool:
+        deadline = time.monotonic() + max(0.0, float(timeout_s))
+        with self._state_lock:
+            processes = tuple(self._pending_reap)
+            self._pending_reap.clear()
+        remaining_processes = []
+        for process in processes:
+            remaining = max(0.0, deadline - time.monotonic())
+            process.join(timeout=remaining)
+            if process.is_alive():
+                try:
+                    process.kill()
+                except OSError:
+                    pass
+                process.join(timeout=max(0.0, deadline - time.monotonic()))
+            if process.is_alive():
+                remaining_processes.append(process)
+        if remaining_processes:
+            with self._state_lock:
+                self._pending_reap.extend(remaining_processes)
+            return False
+        return True
 
     def disable(self) -> None:
         """Permanently reject new calls and kill any active request."""
-        self.disabled = True
-        self._discard_current(diagnostic=False)
+        self.request_disable()
+        self._reap_pending(timeout_s=1.0)
 
 
 EngineWorkerTransport = WarmEngineWorker
@@ -455,6 +638,7 @@ class EngineWorkerPool:
         self._lifecycle_lock = threading.Lock()
         self._close_complete = threading.Event()
         self._cancel_pending = threading.Event()
+        _register_engine_pool(self)
         ready: queue.Queue[tuple[int, Optional[BaseException]]] = queue.Queue()
         for index, worker in enumerate(self._workers):
             thread = threading.Thread(
@@ -530,47 +714,169 @@ class EngineWorkerPool:
             finally:
                 self._queue.task_done()
 
-    def close(self, *, cancel_pending: bool = False) -> None:
+    def _request_cancel_pending(self) -> None:
+        self._cancel_pending.set()
+        sentinels = 0
+        while True:
+            try:
+                item = self._queue.get_nowait()
+            except queue.Empty:
+                break
+            try:
+                if item is None:
+                    sentinels += 1
+                else:
+                    future, _request, _timeout_s = item
+                    future.cancel()
+            finally:
+                self._queue.task_done()
+        for _sentinel in range(sentinels):
+            self._queue.put(None)
+        for worker in self._workers:
+            worker.request_disable()
+
+    def close(
+        self,
+        *,
+        cancel_pending: bool = False,
+        timeout_s: Optional[float] = None,
+    ) -> None:
         _pool_debug(f'pool: close(cancel_pending={cancel_pending}) called')
+        if cancel_pending and timeout_s is None:
+            timeout_s = ENGINE_POOL_AUTOMATIC_PER_POOL_BUDGET_S
+        deadline = (
+            None
+            if timeout_s is None
+            else time.monotonic() + max(0.001, float(timeout_s))
+        )
         owns_close = False
         with self._lifecycle_lock:
+            if cancel_pending:
+                self._cancel_pending.set()
             if not self._closed:
                 self._closed = True
                 owns_close = True
-                if cancel_pending:
-                    self._cancel_pending.set()
+        if cancel_pending:
+            self._request_cancel_pending()
         if not owns_close:
-            self._close_complete.wait()
+            wait_timeout = (
+                None if deadline is None else max(0.0, deadline - time.monotonic())
+            )
+            if not self._close_complete.wait(timeout=wait_timeout):
+                raise EngineWorkerTimeout(
+                    'engine worker pool cleanup',
+                    max(0.001, float(timeout_s)),
+                    phase='shutdown',
+                )
+            _discard_engine_pool(self)
             return
+        close_timeout: EngineWorkerTimeout | None = None
         try:
-            if cancel_pending:
-                while True:
-                    try:
-                        item = self._queue.get_nowait()
-                    except queue.Empty:
-                        break
-                    try:
-                        if item is not None:
-                            future, _request, _timeout_s = item
-                            future.cancel()
-                    finally:
-                        self._queue.task_done()
-                for worker in self._workers:
-                    worker.disable()
             live_threads = [
                 thread for thread in self._threads if thread.is_alive()
             ]
             for _thread in live_threads:
                 self._queue.put(None)
             for thread in live_threads:
-                thread.join()
-            for worker in self._workers:
-                worker.close()
+                join_timeout = (
+                    None
+                    if deadline is None
+                    else max(0.0, deadline - time.monotonic())
+                )
+                thread.join(timeout=join_timeout)
+            if any(thread.is_alive() for thread in live_threads):
+                self._request_cancel_pending()
+                close_timeout = EngineWorkerTimeout(
+                    'engine worker pool cleanup',
+                    max(0.001, float(timeout_s)),
+                    phase='shutdown',
+                )
+            if cancel_pending:
+                for worker in self._workers:
+                    reap_timeout = max(
+                        0.0,
+                        (deadline or time.monotonic()) - time.monotonic(),
+                    )
+                    if not worker._reap_pending(timeout_s=reap_timeout):
+                        close_timeout = close_timeout or EngineWorkerTimeout(
+                            'engine worker pool cleanup',
+                            max(0.001, float(timeout_s)),
+                            phase='shutdown',
+                        )
+            else:
+                for worker in self._workers:
+                    worker.close()
         finally:
             self._close_complete.set()
+            _discard_engine_pool(self)
+        if close_timeout is not None:
+            raise close_timeout
 
     def __enter__(self) -> 'EngineWorkerPool':
         return self
 
     def __exit__(self, _exc_type, _exc, _tb) -> None:
         self.close()
+
+
+def close_all_engine_pools(
+    *,
+    cancel_pending: bool = True,
+    per_pool_timeout_s: float = ENGINE_POOL_AUTOMATIC_PER_POOL_BUDGET_S,
+    total_timeout_s: float = ENGINE_POOL_AUTOMATIC_TOTAL_BUDGET_S,
+) -> int:
+    """Close live pools within 3 s per pool and a 5 s process-wide wait budget."""
+    with _ENGINE_POOL_REGISTRY_LOCK:
+        pools = tuple(_LIVE_ENGINE_POOLS)
+
+    outcomes: dict[EngineWorkerPool, BaseException | None] = {}
+    outcomes_lock = threading.Lock()
+
+    def close_pool(pool: EngineWorkerPool) -> None:
+        error: BaseException | None = None
+        try:
+            pool.close(
+                cancel_pending=cancel_pending,
+                timeout_s=max(0.001, float(per_pool_timeout_s)),
+            )
+        except BaseException as exc:
+            error = exc
+        with outcomes_lock:
+            outcomes[pool] = error
+
+    threads = [
+        threading.Thread(
+            target=close_pool,
+            args=(pool,),
+            name='engine-pool-automatic-cleanup',
+            daemon=True,
+        )
+        for pool in pools
+    ]
+    for thread in threads:
+        thread.start()
+    deadline = time.monotonic() + max(0.001, float(total_timeout_s))
+    for thread in threads:
+        thread.join(timeout=max(0.0, deadline - time.monotonic()))
+
+    first_error: BaseException | None = None
+    for pool, thread in zip(pools, threads):
+        if thread.is_alive():
+            pool._request_cancel_pending()
+            error: BaseException | None = EngineWorkerTimeout(
+                'all engine pool cleanup',
+                max(0.001, float(total_timeout_s)),
+                phase='shutdown',
+            )
+        else:
+            error = outcomes.get(pool)
+        if first_error is None and error is not None:
+            first_error = error
+    closed = sum(
+        1
+        for pool, thread in zip(pools, threads)
+        if not thread.is_alive() and outcomes.get(pool) is None
+    )
+    if first_error is not None:
+        raise first_error
+    return closed

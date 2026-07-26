@@ -124,6 +124,11 @@ def pytest_sessionfinish(
     exitstatus: int | pytest.ExitCode,
 ) -> None:
     del session, exitstatus
+    # t-420: close warm engine pools before the b-093 watchdog disarms, so the
+    # bounded-cleanup path still runs under session-safety supervision.
+    from simulator.engine_pool import close_all_engine_pools
+
+    close_all_engine_pools(cancel_pending=True)
     global _SESSION_WATCHDOG
     if _SESSION_WATCHDOG is not None:
         _SESSION_WATCHDOG.stop()
