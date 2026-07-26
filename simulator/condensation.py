@@ -320,7 +320,7 @@ STAGE_AREA_KEY_BY_STAGE_NUMBER = {
     7: 'terminal',
 }
 SUPPORTED_CARRIER_GAS_LABELS = (
-    'He/pHe, N2/pN2, Kr/pKr, Ar/pAr (legacy), CO2/pCO2'
+    'He/pHe, N2/pN2, Kr/pKr, Ar/pAr (legacy), O2/pO2, CO2/pCO2'
 )
 STICKING_DATA_PATH = DATA_DIR / 'literature' / 'vacuum_pyrolysis_sticking.yaml'
 WALL_REACTIVITY_MATRIX_PATH = (
@@ -1523,11 +1523,17 @@ def _unsupported_carrier_gas_error(carrier_gas: Any) -> ValueError:
     )
 
 
-def _canonical_carrier_gas_key(carrier_gas: str | None) -> str:
+def _canonical_carrier_gas_key(
+    carrier_gas: Any,
+    *,
+    allow_unset: bool = False,
+) -> str:
     if carrier_gas is None:
-        return DEFAULT_CARRIER_GAS
+        return '' if allow_unset else DEFAULT_CARRIER_GAS
     text = str(carrier_gas).strip()
     if not text:
+        if allow_unset:
+            return ''
         raise ValueError(
             'condensation carrier_gas must be non-empty when provided'
         )

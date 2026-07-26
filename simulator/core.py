@@ -246,7 +246,6 @@ from simulator.state import (
     clamp_stir_factor,
     EnergyRecord,
     EvaporationFlux,
-    GAS_SPECIES,
     HourSnapshot,
     METAL_SPECIES,
     MOLAR_MASS,
@@ -2944,44 +2943,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         *,
         allow_unset: bool = True,
     ) -> str:
-        if value is None:
-            return '' if allow_unset else 'N2'
-        text = str(value).strip()
-        if not text:
-            if allow_unset:
-                return ''
-            raise ValueError(
-                'condensation carrier_gas must be non-empty when provided'
-            )
-        upper = text.upper().replace(' ', '').replace('_', '').replace('-', '')
-        if upper in {'N2', 'PN2', 'N2SWEEP', 'PN2SWEEP'}:
-            return 'N2'
-        if upper in {'HE', 'PHE'}:
-            return 'He'
-        if upper in {'AR', 'PAR'}:
-            return 'Ar'
-        # Kr (t-395, owner-directed 2026-07-24): recommended fallback buffer
-        # replacing Ar (bp 119.7 K condenses ~30 K above LOX -> clean cryo
-        # first-cut; Ar's 87.3 K is a 3 K knife-edge from O2). Ar remains
-        # accepted as a legacy option.
-        if upper in {'KR', 'PKR'}:
-            return 'Kr'
-        if upper in {'O2', 'PO2', 'O2BACKPRESSURE', 'CONTROLLEDO2'}:
-            return 'O2'
-        if upper in {'CO2', 'PCO2', 'CO2BACKPRESSURE'}:
-            return 'CO2'
-        if upper.endswith('%CO2'):
-            try:
-                co2_percent = float(upper[:-4])
-            except ValueError:
-                co2_percent = 0.0
-            if 0.0 < co2_percent <= 100.0:
-                return 'CO2'
-        raise ValueError(
-            f'Unsupported condensation carrier_gas {value!r}; supported '
-            'carrier gases: He/pHe, N2/pN2, Kr/pKr, Ar/pAr (legacy), '
-            'O2/pO2, CO2/pCO2'
-        )
+        from simulator.condensation import _canonical_carrier_gas_key
+
+        return _canonical_carrier_gas_key(value, allow_unset=allow_unset)
 
     def _resolve_condensation_carrier_gas(self) -> str:
         background = self._normalize_condensation_carrier_gas(

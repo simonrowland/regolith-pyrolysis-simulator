@@ -2402,6 +2402,78 @@ def test_best_tap_digest_changes_when_enabled() -> None:
     )
 
 
+@pytest.mark.parametrize("carrier", ("N2", "Kr", "Ar", "He", "CO2"))
+def test_operator_instruction_preserves_pn2_schema_for_stamped_carrier(
+    carrier: str,
+) -> None:
+    composition = {"O2": 0.25, carrier: 10.0}
+    if carrier != "N2":
+        composition["N2"] = 1.0
+    snapshot = SimpleNamespace(
+        campaign=SimpleNamespace(name="C2A"),
+        temperature_C=1200.0,
+        overhead=SimpleNamespace(composition=composition),
+    )
+
+    instruction = objective_module._operator_instruction(
+        snapshot,
+        tap_hour=1,
+        configured_hours=1,
+        profile={"run": {"campaign": "C2A"}},
+        stamped_carrier=carrier,
+    )
+
+    assert instruction["pN2_mbar"] == pytest.approx(10.0)
+
+
+def test_operator_instruction_does_not_substitute_for_missing_stamped_carrier() -> None:
+    snapshot = SimpleNamespace(
+        campaign=SimpleNamespace(name="C2A"),
+        temperature_C=1200.0,
+        overhead=SimpleNamespace(composition={"O2": 0.25, "N2": 1.0}),
+    )
+
+    instruction = objective_module._operator_instruction(
+        snapshot,
+        tap_hour=1,
+        configured_hours=1,
+        profile={"run": {"campaign": "C2A"}},
+        stamped_carrier="Kr",
+    )
+
+    assert "pN2_mbar" not in instruction
+
+
+@pytest.mark.parametrize(
+    ("composition", "expected_pressure"),
+    [
+        ({"O2": 0.25, "N2": 10.0}, 10.0),
+        ({"O2": 0.25, "N2": 1.0, "Kr": 10.0}, None),
+    ],
+)
+def test_operator_instruction_unstamped_carrier_requires_unambiguous_composition(
+    composition: dict[str, float],
+    expected_pressure: float | None,
+) -> None:
+    snapshot = SimpleNamespace(
+        campaign=SimpleNamespace(name="C2A"),
+        temperature_C=1200.0,
+        overhead=SimpleNamespace(composition=composition),
+    )
+
+    instruction = objective_module._operator_instruction(
+        snapshot,
+        tap_hour=1,
+        configured_hours=1,
+        profile={"run": {"campaign": "C2A"}},
+    )
+
+    if expected_pressure is None:
+        assert "pN2_mbar" not in instruction
+    else:
+        assert instruction["pN2_mbar"] == pytest.approx(expected_pressure)
+
+
 def test_best_tap_selects_single_intermediate_hour_with_grade_report() -> None:
     snapshots = (
         _tap_snapshot(1, {"SiO2": 80.0, "CaO": 20.0}, stage_delta={(1, "Fe"): 1.0}),

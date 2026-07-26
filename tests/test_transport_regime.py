@@ -459,3 +459,71 @@ def test_kr_carrier_key_normalizers_accept_kr_aliases():
         assert _canonical_carrier_gas_key(alias) == "Kr", alias
     assert normalize("pAr") == "Ar"
     assert _canonical_carrier_gas_key("pAr") == "Ar"
+
+
+def test_core_carrier_normalizer_delegates_without_changing_unset_semantics(monkeypatch):
+    import simulator.condensation as condensation
+    from simulator.core import PyrolysisSimulator
+
+    normalize = PyrolysisSimulator._normalize_condensation_carrier_gas
+    assert normalize(None) == ""
+    assert normalize(None, allow_unset=False) == "N2"
+    assert normalize("   ") == ""
+    with pytest.raises(ValueError, match="must be non-empty"):
+        normalize("   ", allow_unset=False)
+
+    calls = []
+
+    def canonical(value, *, allow_unset=False):
+        calls.append((value, allow_unset))
+        return "Kr"
+
+    monkeypatch.setattr(condensation, "_canonical_carrier_gas_key", canonical)
+
+    raw_value = object()
+    assert normalize(raw_value) == "Kr"
+    assert calls == [(raw_value, True)]
+
+
+@pytest.mark.parametrize(
+    ("value", "expected", "error_message"),
+    [
+        (None, "N2", None),
+        ("", None, "condensation carrier_gas must be non-empty when provided"),
+        ("   ", None, "condensation carrier_gas must be non-empty when provided"),
+        ("pKr", "Kr", None),
+        ("pAr", "Ar", None),
+        (
+            "bogus",
+            None,
+            "Unsupported condensation carrier_gas 'bogus'; supported carrier "
+            "gases: He/pHe, N2/pN2, Kr/pKr, Ar/pAr (legacy), O2/pO2, CO2/pCO2",
+        ),
+        (
+            " bogus ",
+            None,
+            "Unsupported condensation carrier_gas ' bogus '; supported carrier "
+            "gases: He/pHe, N2/pN2, Kr/pKr, Ar/pAr (legacy), O2/pO2, CO2/pCO2",
+        ),
+        (
+            123,
+            None,
+            "Unsupported condensation carrier_gas 123; supported carrier gases: "
+            "He/pHe, N2/pN2, Kr/pKr, Ar/pAr (legacy), O2/pO2, CO2/pCO2",
+        ),
+    ],
+)
+def test_core_carrier_normalizer_preserves_legacy_edge_behavior(
+    value, expected, error_message
+):
+    from simulator.core import PyrolysisSimulator
+
+    normalize = PyrolysisSimulator._normalize_condensation_carrier_gas
+    if error_message is None:
+        assert normalize(value, allow_unset=False) == expected
+        return
+
+    with pytest.raises(ValueError) as exc_info:
+        normalize(value, allow_unset=False)
+    assert type(exc_info.value) is ValueError
+    assert str(exc_info.value) == error_message

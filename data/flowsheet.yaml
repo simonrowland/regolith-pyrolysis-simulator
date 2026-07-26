@@ -278,9 +278,9 @@ blocks:
       - id: lox_cistern
         title: O₂ PUMP → FROST CISTERN
         kind: storage
-        operating_conditions: "Selective O₂ extraction → frost cistern (buffer never liquefied)"
+        operating_conditions: "Kr first-cut (~119.7 K) → selective O₂ extraction → frost cistern; N₂ recirculates warm"
         annotations:
-          - "selective O₂ extraction (YSZ electrochemical pump ~0.5–1 kWh/kg, or zeolite VSA); buffer gas NEVER liquefied — N₂/Ar recirculate warm to the sweep loop (N₂ freezes 63 K / Ar 84 K vs O₂ 54 K — buffer reaching the frost cavern fouls it); distillation fallback only (Ar/O₂ 87/90 K hard cut — Ar dome circuits stay plumbing-separate from N₂)"
+          - "selective O₂ extraction (YSZ electrochemical pump ~0.5–1 kWh/kg, or zeolite VSA); Kr buffer condenses first at 119.7 K (~30 K above LOX) and recirculates after recovery; N₂ stays gaseous through LOX and recirculates warm; Ar is legacy-only because its 87.3 K boiling point sits ~3 K from LOX"
           - "O₂ split: cistern / vented / gettered (future); cistern→lance is a plant fact"
         admission:
           all_of:
@@ -430,8 +430,8 @@ edges:
   - {id: e_nak_shuttle, from: alkali_cyclone, to: early_bake_cleanup, class: reagent_return, label: "Na/K shuttle ↺"}
   - {id: e_mgo_return, from: c6_magnesiothermic, to: early_bake_cleanup, class: reagent_return, label: "MgO → re-bake"}
   - {id: e_cao_return, from: calciothermic, to: early_bake_cleanup, class: reagent_return, label: "CaO → re-bake"}
-  # v8: warm N₂/Ar buffer recirculation (never liquefied) back to Bernoulli sweep inlet
-  - {id: e_buffer_recirc, from: lox_cistern, to: bernoulli_overhead, class: reagent_return, label: "buffer gas ↺ (N₂/Ar warm)"}
+  # v8: recovered Kr first-cut + warm N₂ recirculation back to Bernoulli sweep inlet
+  - {id: e_buffer_recirc, from: lox_cistern, to: bernoulli_overhead, class: reagent_return, label: "buffer gas ↺ (Kr first-cut / N₂ warm)"}
 
 legend:
   - {key: chip_reviewed, label: "Species chip — reviewed default home (solid)", style: chip_reviewed}
@@ -484,7 +484,7 @@ aggregates:
 
 notes:
   - "v7 REVIEWED SPECIES MAP is authoritative; v3–v6 species lists are design history."
-  - "v8 delta: cryo carbon as CO-CH4-organics gases (not elemental C); gas conditioning sub-box; O2 pump→frost cistern; buffer-gas recirculation."
+  - "v8 delta: cryo carbon as CO-CH4-organics gases (not elemental C); gas conditioning sub-box; O2 pump→frost cistern; Kr-first/N2-warm buffer-gas recirculation."
   - "Each species symbol appears as exactly one chip (primary home). Dual-path conditionality is condition_note text."
   - "Impurity vectors on Mg crown / C6 are annotations, not second chips (avoids false double homes)."
   - "PFD mode (equipment tags, numbered streams, stream table) is a registered follow-up; edge id/stream_tag seams exist."

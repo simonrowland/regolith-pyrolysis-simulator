@@ -22,6 +22,14 @@ def client(tmp_path):
     return app.test_client()
 
 
+def test_inert_carriers_are_not_wall_deposit_candidates() -> None:
+    active = advisory.active_wall_species_from_flue(
+        {"Kr": 1.0, "Ar": 1.0, "He": 1.0, "SiO": 0.25}
+    )
+
+    assert active == ["SiO"]
+
+
 def test_dashboard_renders_advisory_panels(client) -> None:
     response = client.get("/")
 

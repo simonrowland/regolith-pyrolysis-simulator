@@ -1598,6 +1598,10 @@ def _best_tap_score(
 ) -> float:
     snapshots = _tap_snapshots(run_execution, best_tap)
     configured_hours = _configured_run_hours(run_execution, profile)
+    melt = getattr(getattr(run_execution, "simulator", None), "melt", None)
+    stamped_carrier = str(
+        getattr(melt, "background_gas_species", "") or ""
+    ).strip()
     per_hour_summary = _per_hour_summary_by_hour(run_execution)
     curve: list[dict[str, Any]] = []
     candidates: list[dict[str, Any]] = []
@@ -1614,6 +1618,7 @@ def _best_tap_score(
                 tap_hour=hour,
                 configured_hours=configured_hours,
                 profile=profile,
+                stamped_carrier=stamped_carrier,
             )
             exclusion = {
                 "hour": hour,
@@ -1721,6 +1726,7 @@ def _best_tap_score(
         tap_hour=tap_hour,
         configured_hours=configured_hours,
         profile=profile,
+        stamped_carrier=stamped_carrier,
     )
     tap_coating_summary = (
         _tap_coating_product_summary(
@@ -2299,6 +2305,7 @@ def _operator_instruction(
     tap_hour: int,
     configured_hours: int,
     profile: Mapping[str, Any],
+    stamped_carrier: str = "",
 ) -> Mapping[str, Any]:
     campaign = getattr(snapshot, "campaign", "")
     phase_at_tap = getattr(campaign, "name", str(campaign))
@@ -2317,8 +2324,29 @@ def _operator_instruction(
         "pO2_mbar": pO2_mbar,
         "provenance": "tap_truncated" if tap_hour < configured_hours else "completed_run",
     }
-    if isinstance(composition, Mapping) and composition.get("N2") is not None:
-        payload["pN2_mbar"] = _finite_float(composition.get("N2", 0.0), "snapshot.pN2_mbar")
+    if isinstance(composition, Mapping):
+        carrier_species = ("N2", "Kr", "Ar", "He", "CO2")
+        available_carriers = tuple(
+            species
+            for species in carrier_species
+            if composition.get(species) is not None
+        )
+        buffer_species = (
+            (
+                stamped_carrier
+                if composition.get(stamped_carrier) is not None
+                else None
+            )
+            if stamped_carrier in carrier_species
+            else available_carriers[0]
+            if len(available_carriers) == 1
+            else None
+        )
+        if buffer_species is not None:
+            payload["pN2_mbar"] = _finite_float(
+                composition.get(buffer_species, 0.0),
+                "snapshot.pN2_mbar",
+            )
     for attr, key in (
         ("pN2_mbar", "pN2_mbar"),
         ("pn2_mbar", "pN2_mbar"),

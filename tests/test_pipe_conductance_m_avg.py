@@ -114,6 +114,13 @@ def test_pure_sio_returns_sio_molar_mass():
     assert M_avg == pytest.approx(MOLAR_MASS["SiO"] / 1000.0)
 
 
+def test_pure_kr_returns_kr_molar_mass_without_fallback():
+    M_avg = _mean_molar_mass_kg_mol({"Kr": 1.0})
+
+    assert M_avg == pytest.approx(0.083798)
+    assert M_avg != DEFAULT_PIPE_M_AVG_KG_MOL
+
+
 # ---------------------------------------------------------------------------
 # 2. Mixture math: mole-weighted, not mass-weighted
 # ---------------------------------------------------------------------------

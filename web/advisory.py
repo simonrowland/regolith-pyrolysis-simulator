@@ -33,7 +33,7 @@ WALL_ZONE_LABELS = {
     "hot": "Hot",
     "rest": "Rest",
 }
-_NON_DEPOSIT_FLUE_SPECIES = {"O2", "N2", "CO2"}
+_NON_DEPOSIT_FLUE_SPECIES = {"O2", "N2", "Kr", "Ar", "He", "CO2"}
 _VAPOR_PRESSURE_FACET_PANEL_STATUSES = {"fallback", "not_attempted"}
 
 

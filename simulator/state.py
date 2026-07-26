@@ -44,7 +44,7 @@ METAL_SPECIES = [
 # --- Volatile / gas species ---
 # Tracked in the overhead gas and condensation train.
 GAS_SPECIES = [
-    'O2', 'SiO', 'CrO2', 'N2', 'H2O', 'CO2', 'S2',
+    'O2', 'SiO', 'CrO2', 'N2', 'Kr', 'Ar', 'He', 'H2O', 'CO2', 'S2',
 ]
 
 # --- Molar masses (g/mol) ---
@@ -74,7 +74,8 @@ MOLAR_MASS = {
     # Gases
     'O2': 2 * _AW['O'], 'O': _AW['O'], 'SiO': _AW['Si'] + _AW['O'],
     'CrO2': _AW['Cr'] + 2 * _AW['O'],
-    'N2': 2 * _AW['N'], 'H2O': 2 * _AW['H'] + _AW['O'],
+    'N2': 2 * _AW['N'], 'Kr': _AW['Kr'], 'Ar': _AW['Ar'], 'He': _AW['He'],
+    'H2O': 2 * _AW['H'] + _AW['O'],
     'CO2': _AW['C'] + 2 * _AW['O'], 'S2': 2 * _AW['S'],
 }
 
