@@ -16,11 +16,13 @@ from simulator.chemistry.ellingham_thermo import (
     ellingham_metal_phase_kind,
     ellingham_stoichiometry,
 )
-from simulator.chemistry.melt_activity import melt_oxide_activity
+from simulator.chemistry.melt_activity import (
+    melt_oxide_activity,
+    single_cation_mole_fractions,
+)
 from simulator.fe_redox import (
     calphad_ferrous_feo_activity_diagnostic,
     kress91_furnace_activity_pressure_bar,
-    kress91_ferrous_feo_activity,
 )
 from simulator.environment import vacuum_floor_bar_for_environment
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
@@ -293,6 +295,7 @@ class EquilibriumMixin:
         # coupled but distinct channels: Fe redox reads the melt reservoir;
         # SiO suppression reads the headspace reservoir.
         pO2_bar = self._headspace_transport_pO2_bar()
+        vacuum_floor_bar = self._vacuum_floor_bar()
         reservoir = getattr(self.melt, "oxygen_reservoir", None)
         intrinsic_fO2_value = getattr(
             reservoir, "melt_intrinsic_fO2_log", None
@@ -316,7 +319,7 @@ class EquilibriumMixin:
             1e300,
         )
         feo_activity_pressure_bar = kress91_furnace_activity_pressure_bar(
-            floor_bar=self._vacuum_floor_bar(),
+            floor_bar=vacuum_floor_bar,
         )
 
         # --- Melt composition for oxide activities ---
@@ -340,12 +343,13 @@ class EquilibriumMixin:
                 for oxide, wt_pct in comp_wt.items()
                 if oxide in MOLAR_MASS and float(wt_pct) > 0.0
             }
+        cation_mol_fraction = single_cation_mole_fractions(melt_account_mol)
         feo_activity_diagnostic = calphad_ferrous_feo_activity_diagnostic(
             comp_wt=comp_wt,
             fO2_log=intrinsic_fO2_log,
             T_K=T_K,
             pressure_bar=feo_activity_pressure_bar,
-            floor_bar=self._vacuum_floor_bar(),
+            floor_bar=vacuum_floor_bar,
         )
 
         # ================================================================
@@ -516,6 +520,7 @@ class EquilibriumMixin:
                 oxide_activity = melt_oxide_activity(
                     parent_oxide,
                     melt_account_mol,
+                    cation_mol_fraction=cation_mol_fraction,
                 )
                 if oxide_activity is None or oxide_activity.activity <= 1e-10:
                     continue
@@ -598,6 +603,7 @@ class EquilibriumMixin:
                 oxide_activity = melt_oxide_activity(
                     parent_oxide,
                     melt_account_mol,
+                    cation_mol_fraction=cation_mol_fraction,
                 )
                 if oxide_activity is None or oxide_activity.activity <= 1e-10:
                     continue
@@ -649,6 +655,7 @@ class EquilibriumMixin:
                 oxide_activity = melt_oxide_activity(
                     parent_oxide,
                     melt_account_mol,
+                    cation_mol_fraction=cation_mol_fraction,
                 )
                 if oxide_activity is None or oxide_activity.activity <= 1e-10:
                     continue
@@ -741,17 +748,22 @@ class EquilibriumMixin:
 
             # --- Oxide activity ---                              [ELLI-5]
             if parent_oxide == 'FeO':
-                a_oxide = kress91_ferrous_feo_activity(
-                    comp_wt=comp_wt,
-                    fO2_log=intrinsic_fO2_log,
-                    T_K=T_K,
-                    pressure_bar=feo_activity_pressure_bar,
+                a_oxide = max(
+                    0.0,
+                    float(
+                        feo_activity_diagnostic.get(
+                            'a_FeO_authoritative',
+                            0.0,
+                        )
+                        or 0.0
+                    ),
                 )
                 oxide_activity = None
             else:
                 oxide_activity = melt_oxide_activity(
                     parent_oxide,
                     melt_account_mol,
+                    cation_mol_fraction=cation_mol_fraction,
                 )
                 if oxide_activity is None:
                     continue
@@ -945,6 +957,7 @@ class EquilibriumMixin:
                 oxide_activity = melt_oxide_activity(
                     parent_oxide,
                     melt_account_mol,
+                    cation_mol_fraction=cation_mol_fraction,
                 )
                 if oxide_activity is None or oxide_activity.activity <= 1e-10:
                     continue
@@ -975,7 +988,6 @@ class EquilibriumMixin:
             # P = P_ref * sqrt(p_ref / pO2). Unit check: bar/bar is
             # dimensionless. Sanity: changing lunar/asteroid environmental
             # floors must not retune the SiO fit itself.
-            vacuum_floor_bar = self._vacuum_floor_bar()
             sio_reference_bar = vacuum_floor_bar
             if name == 'SiO':
                 sio_reference_bar = max(

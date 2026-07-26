@@ -627,17 +627,30 @@ ELLINGHAM_FIT_SEGMENTS: dict[str, tuple[EllinghamFitSegment, ...]] = {
     ),
 }
 
+_ELLINGHAM_FIT_RANGES_K = {
+    species: (
+        min(segment.range_K[0] for segment in segments),
+        max(segment.range_K[1] for segment in segments),
+    )
+    for species, segments in ELLINGHAM_FIT_SEGMENTS.items()
+}
+_ELLINGHAM_STOICHIOMETRY = {
+    species: (segments[0].n_M, segments[0].n_ox)
+    for species, segments in ELLINGHAM_FIT_SEGMENTS.items()
+}
+_MG_GAS_FIT_SEGMENTS = tuple(
+    segment
+    for segment in ELLINGHAM_FIT_SEGMENTS["Mg"]
+    if "Mg(g)" in segment.phase_basis
+)
+
 
 def ellingham_fit_segments(species: str) -> tuple[EllinghamFitSegment, ...]:
     return ELLINGHAM_FIT_SEGMENTS[str(species)]
 
 
 def ellingham_fit_range_K(species: str) -> tuple[float, float]:
-    segments = ellingham_fit_segments(species)
-    return (
-        min(segment.range_K[0] for segment in segments),
-        max(segment.range_K[1] for segment in segments),
-    )
+    return _ELLINGHAM_FIT_RANGES_K[str(species)]
 
 
 def _finite_temperature_K(temperature_K: float) -> float:
@@ -651,13 +664,12 @@ def ellingham_segment_for_temperature(
     species: str,
     temperature_K: float,
 ) -> EllinghamFitSegment:
-    segments = ellingham_fit_segments(species)
+    key = str(species)
+    segments = ELLINGHAM_FIT_SEGMENTS[key]
     T_K = _finite_temperature_K(temperature_K)
     selectable_segments = segments
-    if str(species) == "Mg" and T_K >= MG_NORMAL_BOILING_POINT_K:
-        selectable_segments = tuple(
-            segment for segment in segments if "Mg(g)" in segment.phase_basis
-        )
+    if key == "Mg" and T_K >= MG_NORMAL_BOILING_POINT_K:
+        selectable_segments = _MG_GAS_FIT_SEGMENTS
     for index, segment in enumerate(selectable_segments):
         low, high = segment.range_K
         if low <= T_K and (
@@ -689,11 +701,7 @@ def ellingham_delta_g_kj_per_mol_o2(
 
 
 def ellingham_stoichiometry(species: str) -> tuple[float, float]:
-    segment = ellingham_segment_for_temperature(
-        species,
-        ellingham_fit_range_K(species)[0],
-    )
-    return segment.n_M, segment.n_ox
+    return _ELLINGHAM_STOICHIOMETRY[str(species)]
 
 
 def _ellingham_segment_is_reconstructed(segment: EllinghamFitSegment) -> bool:

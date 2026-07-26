@@ -281,6 +281,11 @@ BAN_YA_ALPHA_J: dict[frozenset[str], float] = {
     frozenset(('Ti', 'Fe3')): 1260.0,
     frozenset(('Ti', 'Si')): 104600.0,
 }
+_BAN_YA_ALPHA_J_BY_CATION: dict[str, dict[str, float]] = {}
+for _pair, _value in BAN_YA_ALPHA_J.items():
+    _cation_a, _cation_b = tuple(_pair)
+    _BAN_YA_ALPHA_J_BY_CATION.setdefault(_cation_a, {})[_cation_b] = _value
+    _BAN_YA_ALPHA_J_BY_CATION.setdefault(_cation_b, {})[_cation_a] = _value
 
 FEO_ACTIVITY_DIAGNOSTIC_SOURCES = {
     'holzheid_gamma': (
@@ -454,7 +459,8 @@ def feo_iw_log10_fO2_bar(T_K: float, *, a_feo: float = 1.0) -> float:
 def _alpha_j(cation_a: str, cation_b: str) -> float | None:
     if cation_a == cation_b:
         return 0.0
-    return BAN_YA_ALPHA_J.get(frozenset((cation_a, cation_b)))
+    row = _BAN_YA_ALPHA_J_BY_CATION.get(cation_a)
+    return None if row is None else row.get(cation_b)
 
 
 def _melt_cation_fractions(
@@ -758,14 +764,23 @@ def _calphad_feo_activity_components(
     pressure_bar: float,
     floor_bar: float = DEFAULT_VACUUM_FLOOR_BAR,
 ) -> dict[str, object]:
-    kress91_activity = _kress91_ferrous_feo_activity_raw(
-        comp_wt=comp_wt,
-        fO2_log=fO2_log,
-        T_K=T_K,
-        pressure_bar=pressure_bar,
-        floor_bar=floor_bar,
-    )
+    feot = feot_equivalent_wt_pct(comp_wt)
     mol_fractions = melt_mol_fractions_for_kress91(comp_wt)
+    split = None
+    if feot <= 0.0 or not mol_fractions:
+        kress91_activity = 0.0
+    else:
+        pressure_control = floor_vacuum_pressure_bar(
+            pressure_bar,
+            floor_bar=floor_bar,
+        )
+        split = kress91_split(
+            fO2_log=fO2_log,
+            mol_fractions=mol_fractions,
+            T_K=T_K,
+            pressure_bar=pressure_control,
+        )
+        kress91_activity = max(0.0, float(split['x_feo']))
     if not mol_fractions or mol_fractions.get('FeOt', 0.0) <= 0.0:
         return {
             'status': 'unavailable',
@@ -783,12 +798,13 @@ def _calphad_feo_activity_components(
         pressure_bar,
         floor_bar=floor_bar,
     )
-    split = kress91_split(
-        fO2_log=fO2_log,
-        mol_fractions=mol_fractions,
-        T_K=T_K,
-        pressure_bar=pressure_control,
-    )
+    if split is None:
+        split = kress91_split(
+            fO2_log=fO2_log,
+            mol_fractions=mol_fractions,
+            T_K=T_K,
+            pressure_bar=pressure_control,
+        )
     x_feo_ferrous = max(0.0, float(split.get('x_feo', 0.0) or 0.0))
     cation_fractions = _melt_cation_fractions(
         comp_wt,

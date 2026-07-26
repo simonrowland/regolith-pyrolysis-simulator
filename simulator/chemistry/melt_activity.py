@@ -204,11 +204,14 @@ def single_cation_mole_fractions(
 def melt_oxide_activity(
     parent_oxide: str,
     account_mol: Mapping[str, float],
+    *,
+    cation_mol_fraction: Mapping[str, float] | None = None,
 ) -> MeltOxideActivity | None:
     """Return a_MOx = gamma_MOx * X_MOx for a parent oxide."""
 
     parent = str(parent_oxide)
-    cation_mol_fraction = single_cation_mole_fractions(account_mol)
+    if cation_mol_fraction is None:
+        cation_mol_fraction = single_cation_mole_fractions(account_mol)
     if not cation_mol_fraction:
         return None
     x_single_cation = cation_mol_fraction.get(parent, 0.0)

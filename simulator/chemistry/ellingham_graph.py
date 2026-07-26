@@ -18,9 +18,11 @@ from typing import Any
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_METAL_PHASE_GAS,
     ELLINGHAM_THERMO,
+    EllinghamFitSegment,
     ellingham_delta_g_kj_per_mol_o2,
     ellingham_fit_segments,
     ellingham_metal_phase_kind,
+    ellingham_segment_for_temperature,
     ellingham_stoichiometry,
 )
 
@@ -97,8 +99,32 @@ def metal_activity_factor(
 ) -> float:
     """Ellingham metal activity ``a_M`` at ``(T, pO2)`` with ``a_oxide``."""
 
-    n_M, n_ox = ellingham_stoichiometry(_require_species(species))
-    K = dissociation_equilibrium_constant(species, temperature_K)
+    key = _require_species(species)
+    T_K = float(temperature_K)
+    segment = ellingham_segment_for_temperature(key, T_K)
+    return _metal_activity_factor_from_segment(
+        segment,
+        T_K,
+        pO2_bar,
+        a_oxide=a_oxide,
+        clamp=clamp,
+    )
+
+
+def _metal_activity_factor_from_segment(
+    segment: EllinghamFitSegment,
+    temperature_K: float,
+    pO2_bar: float,
+    *,
+    a_oxide: float,
+    clamp: bool,
+) -> float:
+    T_K = float(temperature_K)
+    n_M, n_ox = segment.n_M, segment.n_ox
+    dG_kJ = segment.delta_g_kJ_per_mol_O2(T_K)
+    # Same operation order as dissociation_equilibrium_constant; hoisting the
+    # already-selected segment removes lookup/validation only.
+    K = math.exp(dG_kJ * 1000.0 / (GAS_CONSTANT_J_PER_MOL_K * T_K))
     pO2 = max(float(pO2_bar), 1e-30)
     numerator = K * (max(float(a_oxide), 0.0) ** n_ox) / pO2
     if numerator <= 0.0:
@@ -169,7 +195,8 @@ def effective_equilibrium_pressure_Pa(
         if species not in ELLINGHAM_THERMO:
             return 0.0
         fit_target = str(sp_data.get("fit_target", "") or "")
-        metal_phase_kind = ellingham_metal_phase_kind(species, T_K)
+        if not math.isfinite(T_K):
+            ellingham_metal_phase_kind(species, T_K)
         liquid_rxn = sp_data.get("liquid_oxide_standard_reaction")
         if (
             fit_target != "standard_reaction_term"
@@ -192,6 +219,17 @@ def effective_equilibrium_pressure_Pa(
                 )
                 P_eq_Pa *= (pO2 / pO2_reference_bar) ** pO2_exponent
             return max(P_eq_Pa, 0.0)
+        metal_segment = (
+            ellingham_segment_for_temperature(species, T_K)
+            if fit_target != "standard_reaction_term"
+            else None
+        )
+        metal_phase_kind = (
+            ELLINGHAM_METAL_PHASE_GAS
+            if metal_segment is not None
+            and f"{species}(g)" in str(metal_segment.phase_basis)
+            else None
+        )
         gas_rail_rxn = sp_data.get("gas_rail_standard_reaction")
         if (
             fit_target != "standard_reaction_term"
@@ -223,8 +261,13 @@ def effective_equilibrium_pressure_Pa(
         ):
             # Gas-standard Ellingham roots are already fugacity ratios.
             # This rail must not depend on a condensed-phase Antoine block.
-            a_M = metal_activity_factor(
-                species, T_K, pO2, a_oxide=a_ox, clamp=False
+            assert metal_segment is not None
+            a_M = _metal_activity_factor_from_segment(
+                metal_segment,
+                T_K,
+                pO2,
+                a_oxide=a_ox,
+                clamp=False,
             )
             return a_M * ELLINGHAM_STANDARD_PRESSURE_PA
         antoine, _ = vapor_pressure_antoine_coefficients(sp_data, temperature_K=T_K)
@@ -244,7 +287,14 @@ def effective_equilibrium_pressure_Pa(
                 )
                 P_eq_Pa *= (pO2 / pO2_reference_bar) ** pO2_exponent
             return max(P_eq_Pa, 0.0)
-        a_M = metal_activity_factor(species, T_K, pO2, a_oxide=a_ox)
+        assert metal_segment is not None
+        a_M = _metal_activity_factor_from_segment(
+            metal_segment,
+            T_K,
+            pO2,
+            a_oxide=a_ox,
+            clamp=True,
+        )
         return a_M * P_reference_Pa
 
     oxide_vapors = data.get("oxide_vapors", {}) or {}
