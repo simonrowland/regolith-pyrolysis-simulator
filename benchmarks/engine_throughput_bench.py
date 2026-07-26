@@ -14,6 +14,7 @@ import argparse
 import json
 import os
 import platform
+import re
 import resource
 import statistics
 import subprocess
@@ -46,6 +47,8 @@ from simulator.state import (
 
 
 BASELINE_PATH = REPO_ROOT / "tests" / "perf" / "perf_ratchet_baselines.json"
+POWER_SOC_MIN_PERCENT = 20
+MEASUREMENT_INVALID_EXIT_CODE = 75
 # Corrected 2026-07-25 (milestone review F1 follow-through): the loose
 # substring match had classified this M5 MAX box as plain "M5", so the
 # baselines were seeded under a wrong label. The canonical class is
@@ -73,6 +76,26 @@ BUILTIN_LIQUIDUS_FIXTURE = {
     "liquidus_T_C": 1400.0,
     "path": ((1100.0, 0.0), (1400.0, 1.0)),
 }
+# POWER (2026-07-25): this gate measured 3619.7 work/CPU-s against a
+# 5492.8 threshold while the canonical MacBook was at 7% battery. CPU-time
+# accounting cannot reveal frequency capping, so battery-only, battery SoC
+# below 20% even on AC, and explicit elevated thermal signals invalidate the
+# measurement instead of reporting a code regression. `pmset -g batt` exposes
+# AC/battery source and SoC. `pmset -g therm` sometimes exposes CPU/scheduler
+# limits or warning levels; when it emits only errors, thermal pressure is
+# recorded as unavailable, never guessed nominal. This point-in-time probe
+# cannot detect charger wattage/delivery, clock frequency, performance-core
+# residency, a state change after the probe, or macOS ProcessInfo thermalState
+# when pmset omits it. Thus AC at 25% on an underpowered charger can still
+# produce a power-limited red. Probe status vocabulary:
+#   ok                 all requested signals parsed
+#   signal_unsupported platform/probe exposes no supported current signal
+#   parse_failed       an exposed signal or probe command could not be read
+# Both non-ok cases fail toward measuring and retain provenance warnings: only
+# explicit, successfully parsed power-limit evidence may refuse. Reference-kernel
+# calibration is a separate future design, not part of this refusal gate.
+# Pytest deliberately lets the typed MeasurementInvalid escape as a red,
+# nonzero outcome; xfail/skip would let an unmeasured gate leave CI green.
 PROTOCOL = {
     "warmups": 1,
     "trials": 3,
@@ -117,8 +140,204 @@ class TrialObservation:
     details: Mapping[str, Any]
 
 
+@dataclass(frozen=True)
+class PowerState:
+    platform: str
+    power_source: str
+    battery_percent: int | None
+    thermal_pressure: str
+    thermal_signals: tuple[str, ...]
+    probe_errors: tuple[str, ...]
+    probe_status: str = "ok"
+
+    @property
+    def refusal_reasons(self) -> tuple[str, ...]:
+        reasons = []
+        if self.power_source == "battery":
+            reasons.append("battery-only power")
+        if (
+            self.battery_percent is not None
+            and self.battery_percent < POWER_SOC_MIN_PERCENT
+        ):
+            reasons.append(
+                f"battery SoC {self.battery_percent}% below "
+                f"{POWER_SOC_MIN_PERCENT}% minimum"
+            )
+        if self.thermal_pressure == "elevated":
+            signals = ", ".join(self.thermal_signals) or "unspecified signal"
+            reasons.append(f"thermal pressure elevated ({signals})")
+        return tuple(reasons)
+
+    def as_dict(self) -> dict[str, Any]:
+        reasons = self.refusal_reasons
+        return {
+            "platform": self.platform,
+            "power_source": self.power_source,
+            "battery_percent": self.battery_percent,
+            "soc_refusal_threshold_percent": POWER_SOC_MIN_PERCENT,
+            "thermal_pressure": self.thermal_pressure,
+            "thermal_signals": list(self.thermal_signals),
+            "probe_errors": list(self.probe_errors),
+            "probe_status": self.probe_status,
+            "measurement_valid": not reasons,
+            "refusal_reasons": list(reasons),
+        }
+
+
+class MeasurementInvalid(RuntimeError):
+    outcome = "REFUSED-MEASUREMENT"
+
+    def __init__(self, power_state: PowerState):
+        self.power_state = power_state
+        reasons = "; ".join(power_state.refusal_reasons)
+        super().__init__(
+            f"{self.outcome}: {reasons}; detected "
+            f"power_source={power_state.power_source}, "
+            f"battery_percent={power_state.battery_percent}, "
+            f"thermal_pressure={power_state.thermal_pressure}"
+        )
+
+
 def protocol_metadata() -> dict[str, Any]:
     return json.loads(json.dumps(PROTOCOL))
+
+
+def parse_pmset_battery(output: str) -> tuple[str, int | None]:
+    source_match = re.search(r"Now drawing from '([^']+)'", output)
+    source_name = source_match.group(1) if source_match else ""
+    power_source = {
+        "AC Power": "ac",
+        "Battery Power": "battery",
+    }.get(source_name, "unknown")
+    percent_match = re.search(r"\b(\d{1,3})%;", output)
+    battery_percent = int(percent_match.group(1)) if percent_match else None
+    if battery_percent is not None and not 0 <= battery_percent <= 100:
+        battery_percent = None
+    return power_source, battery_percent
+
+
+def parse_pmset_thermal(output: str) -> tuple[str, tuple[str, ...]]:
+    signals = []
+    elevated = False
+    for field in ("CPU_Speed_Limit", "Scheduler_Limit"):
+        match = re.search(rf"\b{field}\s*=\s*(\d+)", output)
+        if match:
+            value = int(match.group(1))
+            signals.append(f"{field}={value}")
+            elevated = elevated or value < 100
+    for field in (
+        "Thermal_Level",
+        "Thermal Warning",
+        "Performance Warning",
+    ):
+        match = re.search(rf"\b{re.escape(field)}\s*[:=]\s*(\d+)", output)
+        if match:
+            value = int(match.group(1))
+            signals.append(f"{field}={value}")
+            elevated = elevated or value > 0
+    if elevated:
+        return "elevated", tuple(signals)
+    if signals:
+        return "nominal", tuple(signals)
+    return "unavailable", ()
+
+
+def _pmset_thermal_signal_exposed(output: str) -> bool:
+    return any(
+        re.search(rf"\b{re.escape(field)}\b", output)
+        for field in (
+            "CPU_Speed_Limit",
+            "Scheduler_Limit",
+            "Thermal_Level",
+            "Thermal Warning",
+            "Performance Warning",
+        )
+    )
+
+
+def _pmset_output(mode: str) -> tuple[str, str | None]:
+    try:
+        result = subprocess.run(
+            ["/usr/bin/pmset", "-g", mode],
+            capture_output=True,
+            check=False,
+            text=True,
+            timeout=5,
+        )
+    except (OSError, subprocess.SubprocessError) as exc:
+        return "", f"pmset -g {mode} failed: {exc}"
+    output = "\n".join(part for part in (result.stdout, result.stderr) if part)
+    if result.returncode:
+        return output, f"pmset -g {mode} exited {result.returncode}"
+    return output, None
+
+
+def probe_power_state() -> PowerState:
+    platform_name = platform.system()
+    if platform_name != "Darwin":
+        return PowerState(
+            platform=platform_name,
+            power_source="unsupported",
+            battery_percent=None,
+            thermal_pressure="unsupported",
+            thermal_signals=(),
+            probe_errors=(),
+            probe_status="signal_unsupported",
+        )
+
+    errors = []
+    parse_failed = False
+    signal_unsupported = False
+    battery_output, battery_error = _pmset_output("batt")
+    if battery_error:
+        errors.append(battery_error)
+        parse_failed = True
+    power_source, battery_percent = parse_pmset_battery(battery_output)
+    if power_source == "unknown":
+        errors.append("pmset batt did not expose AC/battery source")
+        parse_failed = True
+    if battery_percent is None:
+        errors.append("pmset batt did not expose battery SoC")
+        parse_failed = True
+
+    thermal_output, thermal_error = _pmset_output("therm")
+    if thermal_error:
+        errors.append(thermal_error)
+        parse_failed = True
+    thermal_pressure, thermal_signals = parse_pmset_thermal(thermal_output)
+    if thermal_pressure == "unavailable":
+        if _pmset_thermal_signal_exposed(thermal_output):
+            errors.append("pmset therm current-pressure signal could not be parsed")
+            parse_failed = True
+        elif not thermal_error:
+            errors.append("pmset therm exposed no supported current-pressure signal")
+            signal_unsupported = True
+
+    if parse_failed:
+        probe_status = "parse_failed"
+    elif signal_unsupported:
+        probe_status = "signal_unsupported"
+    else:
+        probe_status = "ok"
+
+    return PowerState(
+        platform=platform_name,
+        power_source=power_source,
+        battery_percent=battery_percent,
+        thermal_pressure=thermal_pressure,
+        thermal_signals=thermal_signals,
+        probe_errors=tuple(errors),
+        probe_status=probe_status,
+    )
+
+
+def require_measurement_power_state(
+    power_state: PowerState | None = None,
+) -> PowerState:
+    state = power_state if power_state is not None else probe_power_state()
+    if state.refusal_reasons:
+        raise MeasurementInvalid(state)
+    return state
 
 
 def detect_machine_class() -> str:
@@ -684,6 +903,26 @@ def main(argv: list[str] | None = None) -> int:
     if args.stage_worker:
         print(json.dumps(_measure_one(args.stage_worker), sort_keys=True))
         return 0
+    power_state = probe_power_state()
+    try:
+        require_measurement_power_state(power_state)
+    except MeasurementInvalid as exc:
+        print(str(exc), file=sys.stderr)
+        print(
+            json.dumps(
+                {
+                    "machine_class": None,
+                    "protocol": protocol_metadata(),
+                    "power_state": power_state.as_dict(),
+                    "measurements": {},
+                    "reblessed": False,
+                    "outcome": exc.outcome,
+                },
+                indent=2,
+                sort_keys=True,
+            )
+        )
+        return MEASUREMENT_INVALID_EXIT_CODE
     machine_class = detect_machine_class()
     measurements = measure_all()
     if args.rebless_ratchet:
@@ -699,8 +938,10 @@ def main(argv: list[str] | None = None) -> int:
             {
                 "machine_class": machine_class,
                 "protocol": protocol_metadata(),
+                "power_state": power_state.as_dict(),
                 "measurements": measurements,
                 "reblessed": bool(args.rebless_ratchet),
+                "outcome": "MEASURED",
             },
             indent=2,
             sort_keys=True,
