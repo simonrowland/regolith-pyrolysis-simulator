@@ -11,7 +11,7 @@ from simulator.backends import BackendUnavailableError
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from web import events as web_events
 from web import routes as web_routes
-from web.run_store import RunArtifactStore
+from web.run_store import RunArtifactStore, persist_run_artifact
 
 
 def _runner_document(status: str = "ok") -> dict[str, object]:
@@ -52,9 +52,63 @@ class _CompleteSession(_PartialSession):
         return True
 
 
+class _DecisionThenCompleteSession(_PartialSession):
+    def __init__(self):
+        self.complete = False
+        self.auto_applied = False
+
+    def is_complete(self):
+        return self.complete
+
+    def pending_decision(self):
+        return SimpleNamespace(
+            decision_type=SimpleNamespace(name="PATH_AB"),
+            options=("recommended",),
+            recommendation="recommended",
+            context={},
+        )
+
+    def resume(self):
+        pass
+
+
 class _Socket:
     def emit(self, *_args, **_kwargs):
         pass
+
+    def sleep(self, _seconds):
+        pass
+
+    def start_background_task(self, _target, *_args, **_kwargs):
+        return object()
+
+
+def _single_run_body(
+    config=None,
+    *,
+    target_or_recipe=None,
+    name="Command run",
+    seed=0,
+    fidelity=None,
+):
+    overrides = dict(config or {})
+    feedstock = overrides.pop("feedstock", "lunar_mare_low_ti")
+    configured_backend = overrides.pop("backend", None)
+    if fidelity is None:
+        fidelity = configured_backend or "internal-analytical"
+    elif configured_backend is not None:
+        raise ValueError("backend and fidelity cannot both be supplied")
+    return {
+        "single_run": {
+            "target_or_recipe": (
+                feedstock if target_or_recipe is None else target_or_recipe
+            ),
+            "l2_overrides": overrides,
+            "name": name,
+            "seed": seed,
+            "fidelity": fidelity,
+        },
+    }
 
 
 def _identified_socket_client(app):
@@ -78,7 +132,7 @@ def _clean_command_state():
     web_events._socket_client_ids.clear()
 
 
-def test_cancel_route_persists_cancelled_partial_and_terminal_is_409(tmp_path):
+def test_cancel_route_persists_cancelled_partial_and_terminal_is_idempotent(tmp_path):
     app = app_module.create_app()
     store = RunArtifactStore(tmp_path / "runs")
     sid = "cancel-route"
@@ -106,11 +160,9 @@ def test_cancel_route_persists_cancelled_partial_and_terminal_is_409(tmp_path):
     assert artifact["execution_status"] == "partial"
 
     duplicate = client.post(f"/api/runs/{state['run_id']}/cancel")
-    assert duplicate.status_code == 409
-    assert duplicate.get_json() == {
-        "error": "run is already terminal",
-        "error_type": "run_not_active",
-    }
+    assert duplicate.status_code == 200
+    assert duplicate.get_json() == {"status": "cancelled"}
+    assert store.load(state["run_id"]) == artifact
 
 
 def test_cancel_by_run_id_cannot_cancel_sid_replacement(tmp_path, monkeypatch):
@@ -196,44 +248,233 @@ def test_cancel_is_scoped_to_owning_browser_session(tmp_path):
     assert store.load(state["run_id"]) is None
 
 
-def test_disconnect_persists_orphaned_run_as_cancelled_partial(tmp_path, monkeypatch):
+@pytest.mark.parametrize("owner_mode", ["disconnected_socket", "http"])
+def test_viewerless_run_auto_applies_decision_persists_and_reclaims(
+    tmp_path,
+    monkeypatch,
+    owner_mode,
+):
     captured_tasks = []
+    policies = []
+
+    def capture_task(target, *args, **kwargs):
+        captured_tasks.append((target, args, kwargs))
+        return object()
+
+    monkeypatch.setattr(web_events, "_tick_payload", lambda **_kwargs: {})
+    monkeypatch.setattr(
+        web_events,
+        "_record_last_recipe_capture",
+        lambda *_args, **_kwargs: None,
+    )
+    monkeypatch.setattr(web_events, "_completion_payload", lambda _sim: {})
+
+    def drive_decision(session, _hours, policy):
+        policies.append(policy)
+        assert session.pending_decision() is not None
+        if policy is web_events.DecisionPolicy.OPERATOR:
+            return
+        session.auto_applied = True
+        session.complete = True
+        yield SimpleNamespace(
+            per_hour_summary={"hour": 1},
+            snapshot={},
+            backend_error=None,
+            campaign_summary=None,
+            decision_event=None,
+        )
+
+    monkeypatch.setattr(web_events, "drive_session", drive_decision)
+    socket = _Socket()
+    socket.start_background_task = capture_task
+    sid = "viewer-detached-decision"
+    store = RunArtifactStore(tmp_path / "runs")
+    state, lock = web_events._replace_simulation_state(
+        sid,
+        _DecisionThenCompleteSession(),
+        speed=0.0,
+        ledger_client_id="owner",
+        run_store=store,
+        initial_state={
+            "http_owned": owner_mode == "http",
+            "submission_mode": (
+                "http" if owner_mode == "http" else "socket"
+            ),
+            "backend_message": "backend",
+            "backend_status": "ok",
+            "backend_authoritative": True,
+        },
+    )
+    if owner_mode == "disconnected_socket":
+        web_events._socket_client_ids[sid] = "owner"
+    run_id = state["run_id"]
+    web_events._start_background_loop(
+        socket,
+        sid,
+        run_id,
+        lock,
+        "backend",
+        "ok",
+        True,
+    )
+    target, args, kwargs = captured_tasks[0]
+    target(*args, **kwargs)
+    if owner_mode == "disconnected_socket":
+        assert state["paused"] is True
+        assert state["decision_waiting"] is True
+        web_events._disconnect_simulation_client(socket, sid)
+        target, args, kwargs = next(
+            task
+            for task in captured_tasks[1:]
+            if task[0].__name__ == "run_task"
+        )
+        target(*args, **kwargs)
+        assert state["client_disconnected"] is True
+
+    artifact = store.load(run_id)
+    assert artifact["execution_status"] == "ok"
+    assert artifact["lifecycle"] == "complete"
+    assert state["session"].auto_applied is True
+    expected_policies = [web_events.DecisionPolicy.AUTO_APPLY]
+    if owner_mode == "disconnected_socket":
+        expected_policies.insert(0, web_events.DecisionPolicy.OPERATOR)
+    assert policies == expected_policies
+    assert sid not in web_events._simulations
+    assert sid not in web_events._sim_locks
+
+
+def test_http_headless_run_has_no_lifetime_cutoff_and_slots_refuse_typed_429(
+    tmp_path,
+    monkeypatch,
+):
+    captured_tasks = []
+    clock = {"now": 100.0}
+
+    def capture_task(target, *args, **kwargs):
+        captured_tasks.append((target, args, kwargs))
+        return object()
 
     def force_backend(_name):
         backend = InternalAnalyticalBackend()
         backend.initialize({})
         return backend
 
+    monkeypatch.setattr(web_events.time, "monotonic", lambda: clock["now"])
+    monkeypatch.setattr(web_events, "_MAX_ACTIVE_RUNS", 1)
+    monkeypatch.setattr(web_events, "_get_backend", force_backend)
+    monkeypatch.setattr(web_events, "_completion_payload", lambda _sim: {})
+    monkeypatch.setattr(
+        web_events,
+        "_full_runner_payload",
+        lambda *_args, **_kwargs: _runner_document(),
+    )
+    monkeypatch.setattr(
+        app_module.socketio,
+        "start_background_task",
+        capture_task,
+    )
+    app = app_module.create_app()
+    app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
+    first_client = app.test_client()
+    second_client = app.test_client()
+    assert first_client.get("/").status_code == 200
+    assert second_client.get("/").status_code == 200
+    park_input = {
+        "single_run": {
+            "target_or_recipe": "lunar_mare_low_ti",
+            "l2_overrides": {
+                "speed": 3600,
+                "runtime_campaign_overrides": {
+                    "C0": {
+                        "max_hours": 1e308,
+                        "min_hold_hr": 1e308,
+                    },
+                },
+            },
+            "name": "park",
+            "seed": 0,
+            "fidelity": "internal-analytical",
+        },
+    }
+
+    submitted = first_client.post("/api/runs", json=park_input)
+    assert submitted.status_code == 201, submitted.get_json()
+    run_id = submitted.get_json()["run_id"]
+    sid = next(
+        sid
+        for sid, state in web_events._simulations.items()
+        if state.get("run_id") == run_id
+    )
+    state = web_events._simulations[sid]
+    assert state["speed"] == 3600.0
+    assert state["submission_mode"] == "http"
+    assert "viewerless_reclaim_deadline_monotonic" not in state
+    assert "viewerless_reclaim_scheduled" not in state
+    assert [task[0].__name__ for task in captured_tasks] == ["run_task"]
+
+    capacity_blocked = second_client.post("/api/runs", json=park_input)
+    assert capacity_blocked.status_code == 429
+    assert capacity_blocked.get_json()["error_type"] == (
+        "global_run_capacity_exhausted"
+    )
+
+    clock["now"] = 401.0
+    assert state["running"] is True
+    assert RunArtifactStore(tmp_path / "runs").load(run_id) is None
+    monkeypatch.setattr(state["session"], "is_complete", lambda: True)
+    run_task, args, kwargs = captured_tasks[0]
+    run_task(*args, **kwargs)
+
+    artifact = RunArtifactStore(tmp_path / "runs").load(run_id)
+    assert artifact["lifecycle"] == "complete"
+    assert artifact["execution_status"] == "ok"
+    assert sid not in web_events._simulations
+    assert sid not in web_events._sim_locks
+
+    retried = second_client.post("/api/runs", json=park_input)
+    assert retried.status_code == 201, retried.get_json()
+
+
+def test_detached_socket_run_reclaims_at_deadline(tmp_path, monkeypatch):
+    captured_tasks = []
+    clock = {"now": 100.0}
+
     def capture_task(target, *args, **kwargs):
         captured_tasks.append((target, args, kwargs))
         return object()
 
-    monkeypatch.setattr(web_events, "_get_backend", force_backend)
-    monkeypatch.setattr(app_module.socketio, "start_background_task", capture_task)
-    app = app_module.create_app()
-    app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
-    before = set(web_events._simulations)
-    client = _identified_socket_client(app)
-    client.emit(
-        "start_simulation",
-        {
-            "backend": "internal-analytical",
-            "feedstock": "lunar_mare_low_ti",
-            "mass_kg": 1000,
-            "speed": 0,
-        },
+    monkeypatch.setattr(web_events.time, "monotonic", lambda: clock["now"])
+    socket = _Socket()
+    socket.start_background_task = capture_task
+    sid = "detached-socket-reclaim"
+    store = RunArtifactStore(tmp_path / "runs")
+    state, _ = web_events._replace_simulation_state(
+        sid,
+        _PartialSession(),
+        speed=0.0,
+        ledger_client_id="owner",
+        run_store=store,
+        initial_state={"submission_mode": "socket"},
     )
-    sid = (set(web_events._simulations) - before).pop()
-    state = web_events._simulations[sid]
-    state["session"] = _PartialSession()
-    run_id = state["run_id"]
+    web_events._socket_client_ids[sid] = "owner"
 
-    client.disconnect()
+    web_events._disconnect_simulation_client(socket, sid)
 
-    assert sid not in web_events._simulations
-    artifact = RunArtifactStore(tmp_path / "runs").load(run_id)
+    assert state["client_disconnected"] is True
+    assert state["viewerless_reclaim_deadline_monotonic"] == 400.0
+    assert state["viewerless_reclaim_scheduled"] is True
+    assert [task[0].__name__ for task in captured_tasks] == ["reclaim_task"]
+
+    clock["now"] = 401.0
+    reclaim_task, args, kwargs = captured_tasks[0]
+    reclaim_task(*args, **kwargs)
+
+    artifact = store.load(state["run_id"])
     assert artifact["lifecycle"] == "cancelled"
     assert artifact["execution_status"] == "partial"
+    assert artifact["failure"]["reason"] == "viewerless_reclaimed"
+    assert sid not in web_events._simulations
+    assert sid not in web_events._sim_locks
 
 
 def test_start_racing_disconnect_cannot_publish_orphan(tmp_path, monkeypatch):
@@ -284,47 +525,30 @@ def test_start_racing_disconnect_cannot_publish_orphan(tmp_path, monkeypatch):
     assert sid not in web_events._socket_client_ids
 
 
-def test_disconnect_racing_replacement_cannot_delete_successor(
-    tmp_path,
-    monkeypatch,
-):
-    sid = "disconnect-replacement-race"
-    first, _ = web_events._replace_simulation_state(
+def test_disconnect_does_not_invoke_cancel_path(tmp_path, monkeypatch):
+    sid = "disconnect-no-cancel"
+    state, _ = web_events._replace_simulation_state(
         sid,
         _PartialSession(),
         speed=0.0,
         ledger_client_id="owner",
         run_store=RunArtifactStore(tmp_path / "runs"),
     )
+    state["paused"] = True
     web_events._socket_client_ids[sid] = "owner"
-    successor = None
-
-    def replace_before_cancel(_socketio, target_sid, **kwargs):
-        nonlocal successor
-        assert kwargs["run_id"] == first["run_id"]
-        successor, _ = web_events._replace_simulation_state(
-            target_sid,
-            _PartialSession(),
-            speed=0.0,
-            ledger_client_id="owner",
-            run_store=RunArtifactStore(tmp_path / "successor-runs"),
-        )
-        return {
-            "run_id": first["run_id"],
-            "status": "cancelled",
-            "cancelled": True,
-        }
-
     monkeypatch.setattr(
         web_events,
         "_cancel_simulation_state",
-        replace_before_cancel,
+        lambda *_args, **_kwargs: pytest.fail("disconnect must not cancel"),
     )
 
     web_events._disconnect_simulation_client(_Socket(), sid)
 
-    assert web_events._simulations[sid] is successor
-    assert successor["running"] is True
+    assert web_events._simulations[sid] is state
+    assert state["running"] is True
+    assert state["client_disconnected"] is True
+    assert state["paused"] is False
+    assert sid not in web_events._socket_client_ids
 
 
 def test_socket_restart_persists_displaced_run(tmp_path, monkeypatch):
@@ -342,12 +566,12 @@ def test_socket_restart_persists_displaced_run(tmp_path, monkeypatch):
     app = app_module.create_app()
     app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
     client = _identified_socket_client(app)
-    payload = {
+    payload = _single_run_body({
         "backend": "internal-analytical",
         "feedstock": "lunar_mare_low_ti",
         "mass_kg": 1000,
         "speed": 0,
-    }
+    })
     client.emit("start_simulation", payload)
     sid = next(reversed(web_events._simulations))
     first_state = web_events._simulations[sid]
@@ -391,12 +615,12 @@ def test_replacement_launch_failure_reports_persisted_prior_cancellation(
     client = app.test_client()
     with client.session_transaction() as browser_session:
         browser_session["ledger_client_id"] = "replacement-owner"
-    payload = {
+    payload = _single_run_body({
         "backend": "internal-analytical",
         "feedstock": "lunar_mare_low_ti",
         "mass_kg": 1000,
         "speed": 0,
-    }
+    })
 
     first = client.post("/api/runs", json=payload)
     assert first.status_code == 201
@@ -408,7 +632,15 @@ def test_replacement_launch_failure_reports_persisted_prior_cancellation(
     )
     prior_state["session"] = _PartialSession()
 
-    replacement = client.post("/api/runs", json={**payload, "mass_kg": 2000})
+    replacement = client.post(
+        "/api/runs",
+        json=_single_run_body({
+            "backend": "internal-analytical",
+            "feedstock": "lunar_mare_low_ti",
+            "mass_kg": 2000,
+            "speed": 0,
+        }),
+    )
 
     assert replacement.status_code == 500
     body = replacement.get_json()
@@ -427,7 +659,7 @@ def test_replacement_launch_failure_reports_persisted_prior_cancellation(
     )
 
 
-def test_submit_idempotency_is_client_scoped_and_payload_bound(monkeypatch):
+def test_submit_id_header_is_client_scoped_and_payload_bound(monkeypatch):
     app = app_module.create_app()
     calls = []
 
@@ -437,32 +669,199 @@ def test_submit_idempotency_is_client_scoped_and_payload_bound(monkeypatch):
 
     monkeypatch.setattr(web_events, "_registered_start_handler", fake_start)
     client = app.test_client()
-    payload = {
-        "client_token": "retry-token",
+    payload = _single_run_body({
         "feedstock": "lunar_mare_low_ti",
         "mass_kg": 1000,
         "cost_parameters": {"schema_version": "optimize-costs-v1"},
         "cost_parameters_recipe_name": "http-tab-recipe",
-    }
+    })
+    headers = {"Submit-Id": "retry-token"}
 
-    first = client.post("/api/runs", json=payload)
-    replay = client.post("/api/runs", json=payload)
-    conflict = client.post("/api/runs", json={**payload, "mass_kg": 2000})
+    first = client.post("/api/runs", json=payload, headers=headers)
+    replay = client.post("/api/runs", json=payload, headers=headers)
+    conflict = client.post(
+        "/api/runs",
+        json=_single_run_body({
+            "feedstock": "lunar_mare_low_ti",
+            "mass_kg": 2000,
+            "cost_parameters": {"schema_version": "optimize-costs-v1"},
+            "cost_parameters_recipe_name": "http-tab-recipe",
+        }),
+        headers=headers,
+    )
 
     assert first.status_code == 201
     assert first.get_json()["idempotent_replay"] is False
     assert replay.status_code == 200
     assert replay.get_json()["idempotent_replay"] is True
     assert len(calls) == 1
-    assert calls[0][0]["cost_parameters"] == payload["cost_parameters"]
+    assert calls[0][0]["cost_parameters"] == (
+        payload["single_run"]["l2_overrides"]["cost_parameters"]
+    )
     assert calls[0][0]["cost_parameters_recipe_name"] == "http-tab-recipe"
     assert conflict.status_code == 409
     assert conflict.get_json()["error_type"] == "idempotency_conflict"
 
     other_client = app.test_client()
-    other = other_client.post("/api/runs", json=payload)
+    other = other_client.post("/api/runs", json=payload, headers=headers)
     assert other.status_code == 201
     assert len(calls) == 2
+
+
+@pytest.mark.parametrize("submit_id", ["   ", "x" * 257])
+def test_submit_id_header_validation_is_typed_400(submit_id):
+    response = app_module.create_app().test_client().post(
+        "/api/runs",
+        json=_single_run_body(),
+        headers={"Submit-Id": submit_id},
+    )
+
+    assert response.status_code == 400
+    assert response.get_json()["error_type"] == "invalid_submit_id"
+
+
+def test_typed_single_run_maps_through_canonical_command_payload(monkeypatch):
+    calls = []
+    app = app_module.create_app()
+
+    def fake_start(payload, **kwargs):
+        calls.append((payload, kwargs))
+        return {"run_id": "typed-run", "status": "started"}
+
+    monkeypatch.setattr(web_events, "_registered_start_handler", fake_start)
+    request_body = {
+        "single_run": {
+            "target_or_recipe": {
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+            },
+            "l2_overrides": {
+                "setpoints_patch": {
+                    "campaigns": {"C4": {"temp_range_C": [1600, 1650]}}
+                },
+            },
+            "name": "Typed run",
+            "seed": 7,
+            "fidelity": "stub",
+        },
+    }
+
+    client = app.test_client()
+    headers = {"Submit-Id": "typed-token"}
+    first = client.post("/api/runs", json=request_body, headers=headers)
+    replay = client.post("/api/runs", json=request_body, headers=headers)
+
+    assert first.status_code == 201
+    assert replay.status_code == 200
+    assert first.get_json()["run_id"] == replay.get_json()["run_id"] == "typed-run"
+    assert len(calls) == 1
+    command_payload, kwargs = calls[0]
+    assert command_payload == {
+        "backend": "internal-analytical",
+        "feedstock": "lunar_mare_low_ti",
+        "mass_kg": 1000,
+        "setpoints_patch": {
+            "campaigns": {"C4": {"temp_range_C": [1600, 1650]}}
+        },
+    }
+    assert kwargs["single_run_context"] == {
+        "target_or_recipe": {
+            "feedstock": "lunar_mare_low_ti",
+            "mass_kg": 1000,
+        },
+        "l2_overrides": {
+            "setpoints_patch": {
+                "campaigns": {"C4": {"temp_range_C": [1600, 1650]}}
+            },
+        },
+        "name": "Typed run",
+        "seed": 7,
+        "fidelity": "internal-analytical",
+        "parent_run_id": None,
+    }
+
+
+@pytest.mark.parametrize(
+    "single_run",
+    [
+        {},
+        {
+            "target_or_recipe": "lunar_mare_low_ti",
+            "l2_overrides": {},
+            "name": "",
+            "seed": 0,
+            "fidelity": "internal-analytical",
+        },
+        {
+            "target_or_recipe": "lunar_mare_low_ti",
+            "l2_overrides": {},
+            "name": "bad seed",
+            "seed": True,
+            "fidelity": "internal-analytical",
+        },
+    ],
+)
+def test_typed_single_run_validation_is_typed_400(single_run):
+    response = app_module.create_app().test_client().post(
+        "/api/runs",
+        json={"single_run": single_run},
+    )
+
+    assert response.status_code == 400
+    assert response.get_json()["error_type"] == "invalid_single_run"
+
+
+@pytest.mark.parametrize(
+    ("body", "error_type"),
+    [
+        ({"feedstock": "lunar_mare_low_ti"}, "invalid_submission_type"),
+        (
+            {**_single_run_body(), "client_token": "legacy-body-token"},
+            "invalid_single_run",
+        ),
+        (
+            {
+                "single_run": {
+                    **_single_run_body()["single_run"],
+                    "not_a_real_single_run_field": 7,
+                },
+            },
+            "invalid_single_run",
+        ),
+        (
+            _single_run_body(target_or_recipe={}),
+            "invalid_single_run",
+        ),
+        (
+            _single_run_body(
+                target_or_recipe={
+                    "feedstock": "lunar_mare_low_ti",
+                    "not_a_real_target_field": 7,
+                },
+            ),
+            "invalid_single_run",
+        ),
+        (
+            _single_run_body({"not_a_real_override": 7}),
+            "invalid_single_run",
+        ),
+        (
+            _single_run_body(
+                {"mass_kg": 2000},
+                target_or_recipe={
+                    "feedstock": "lunar_mare_low_ti",
+                    "mass_kg": 1000,
+                },
+            ),
+            "invalid_single_run",
+        ),
+    ],
+)
+def test_submit_refuses_flat_ambiguous_or_unknown_typed_fields(body, error_type):
+    response = app_module.create_app().test_client().post("/api/runs", json=body)
+
+    assert response.status_code == 400
+    assert response.get_json()["error_type"] == error_type
 
 
 def test_failed_tokenized_launch_is_not_cached_and_retry_can_start(monkeypatch):
@@ -475,17 +874,28 @@ def test_failed_tokenized_launch_is_not_cached_and_retry_can_start(monkeypatch):
         return {"run_id": "run-retry", "status": "started"}
 
     monkeypatch.setattr(web_events, "_registered_start_handler", fail_then_start)
-    payload = {"client_token": "retry-after-failure", "mass_kg": 1000}
+    payload = _single_run_body({"mass_kg": 1000})
 
     with pytest.raises(RuntimeError, match="launch failed"):
-        web_events.submit_run_command(_Socket(), payload, client_id="same-client")
+        web_events.submit_run_command(
+            _Socket(),
+            payload,
+            client_id="same-client",
+            submit_id="retry-after-failure",
+        )
     assert web_events._run_idempotency == {}
 
     retry = web_events.submit_run_command(
-        _Socket(), payload, client_id="same-client"
+        _Socket(),
+        payload,
+        client_id="same-client",
+        submit_id="retry-after-failure",
     )
     replay = web_events.submit_run_command(
-        _Socket(), payload, client_id="same-client"
+        _Socket(),
+        payload,
+        client_id="same-client",
+        submit_id="retry-after-failure",
     )
 
     assert retry["idempotent_replay"] is False
@@ -508,8 +918,9 @@ def test_concurrent_idempotent_submits_launch_once(monkeypatch):
         barrier.wait()
         results.append(web_events.submit_run_command(
             _Socket(),
-            {"client_token": "same-token", "mass_kg": 1000},
+            _single_run_body({"mass_kg": 1000}),
             client_id="same-client",
+            submit_id="same-token",
         ))
 
     threads = [threading.Thread(target=submit) for _ in range(2)]
@@ -556,13 +967,15 @@ def test_second_http_submit_replaces_prior_run_and_keeps_ledger_unique(
     monkeypatch.setattr(web_events, "_registered_start_handler", fake_start)
     first = web_events.submit_run_command(
         _Socket(),
-        {"client_token": "first", "mass_kg": 1000},
+        _single_run_body({"mass_kg": 1000}),
         client_id="same-client",
+        submit_id="first",
     )
     second = web_events.submit_run_command(
         _Socket(),
-        {"client_token": "second", "mass_kg": 2000},
+        _single_run_body({"mass_kg": 2000}),
         client_id="same-client",
+        submit_id="second",
     )
 
     first_artifact = store.load(first["run_id"])
@@ -629,14 +1042,16 @@ def test_cross_transport_submit_replaces_prior_run_and_keeps_ledger_unique(
             prior_run_id = first["run_id"]
             response = http_client.post(
                 "/api/runs",
-                json={**payload, "client_token": "http-replacement"},
+                json=_single_run_body(payload),
+                headers={"Submit-Id": "http-replacement"},
             )
             assert response.status_code == 201
             replacement_run_id = response.get_json()["run_id"]
         else:
             response = http_client.post(
                 "/api/runs",
-                json={**payload, "client_token": "http-first"},
+                json=_single_run_body(payload),
+                headers={"Submit-Id": "http-first"},
             )
             assert response.status_code == 201
             prior_run_id = response.get_json()["run_id"]
@@ -735,11 +1150,16 @@ def test_replacement_persist_failure_is_typed_and_keeps_honest_state(
         "mass_kg": 1000,
         "speed": 0,
     }
-    tokenized_payload = {**payload, "client_token": "original-run"}
+    typed_payload = _single_run_body(payload)
+    token_headers = {"Submit-Id": "original-run"}
     client = app.test_client()
     with client.session_transaction() as browser_session:
         browser_session["ledger_client_id"] = "owner"
-    initial = client.post("/api/runs", json=tokenized_payload)
+    initial = client.post(
+        "/api/runs",
+        json=typed_payload,
+        headers=token_headers,
+    )
     assert initial.status_code == 201
     prior_run_id = initial.get_json()["run_id"]
     prior_sid, prior = next(
@@ -750,7 +1170,7 @@ def test_replacement_persist_failure_is_typed_and_keeps_honest_state(
     monkeypatch.setattr(store, "save", lambda *_args, **_kwargs: False)
 
     if replacement_transport == "http":
-        response = client.post("/api/runs", json=payload)
+        response = client.post("/api/runs", json=typed_payload)
         assert response.status_code == 500
         assert response.get_json()["error_type"] == "run_replacement_failed"
     else:
@@ -768,7 +1188,11 @@ def test_replacement_persist_failure_is_typed_and_keeps_honest_state(
     assert store.load(prior["run_id"]) is None
     assert "socket-replacement" not in web_events._simulations
 
-    replay = client.post("/api/runs", json=tokenized_payload)
+    replay = client.post(
+        "/api/runs",
+        json=typed_payload,
+        headers=token_headers,
+    )
     assert replay.status_code == 200
     assert replay.get_json() == {
         "idempotent_replay": True,
@@ -777,7 +1201,7 @@ def test_replacement_persist_failure_is_typed_and_keeps_honest_state(
         "run_id": prior_run_id,
         "status": "error",
     }
-    assert len(launched) == 1
+    assert [args[0].__name__ for args, _kwargs in launched] == ["run_task"]
 
     monkeypatch.setattr(web_events, "_MAX_RUN_IDEMPOTENCY_ENTRIES", 1)
     fresh_launches = []
@@ -789,8 +1213,9 @@ def test_replacement_persist_failure_is_typed_and_keeps_honest_state(
     monkeypatch.setattr(web_events, "_registered_start_handler", fake_start)
     fresh = web_events.submit_run_command(
         _Socket(),
-        {"client_token": "fresh-token", "mass_kg": 1000},
+        _single_run_body({"mass_kg": 1000}),
         client_id="fresh-owner",
+        submit_id="fresh-token",
     )
     assert fresh["run_id"] == "fresh-run"
     assert fresh_launches == [True]
@@ -814,8 +1239,9 @@ def test_invalid_http_submit_does_not_destroy_active_run(tmp_path):
     with pytest.raises(web_events.RunCommandError, match="mass_kg must be numeric"):
         web_events.submit_run_command(
             _Socket(),
-            {"client_token": "invalid", "mass_kg": "bad"},
+            _single_run_body({"mass_kg": "bad"}),
             client_id="owner",
+            submit_id="invalid",
         )
 
     assert web_events._simulations["http:owner:active"] is state
@@ -850,7 +1276,10 @@ def test_cancel_already_persisted_http_run_releases_state_and_lock():
     assert sid not in web_events._sim_locks
 
 
-def test_http_terminal_run_releases_session_state(tmp_path, monkeypatch):
+def test_http_natural_completion_with_zero_viewers_persists_and_reclaims_capacity(
+    tmp_path,
+    monkeypatch,
+):
     sid = "http:owner:terminal"
     store = RunArtifactStore(tmp_path / "runs")
     state, lock = web_events._replace_simulation_state(
@@ -869,6 +1298,18 @@ def test_http_terminal_run_releases_session_state(tmp_path, monkeypatch):
 
     socket = CapturingSocket()
     monkeypatch.setattr(web_events, "_completion_payload", lambda _sim: {})
+    release_transitions = []
+    finish_terminal_state = web_events._finish_terminal_state
+
+    def count_release(finish_sid, finish_run_id, **kwargs):
+        before, _ = web_events._current_simulation_state(finish_sid, finish_run_id)
+        was_running = bool(before and before.get("running"))
+        finish_terminal_state(finish_sid, finish_run_id, **kwargs)
+        after, _ = web_events._current_simulation_state(finish_sid, finish_run_id)
+        if was_running and (after is None or not after.get("running")):
+            release_transitions.append(finish_run_id)
+
+    monkeypatch.setattr(web_events, "_finish_terminal_state", count_release)
     web_events._start_background_loop(
         socket,
         sid,
@@ -880,10 +1321,73 @@ def test_http_terminal_run_releases_session_state(tmp_path, monkeypatch):
     )
 
     socket.target()
+    socket.target()
 
-    assert store.load(state["run_id"]) is not None
+    artifact = store.load(state["run_id"])
+    assert artifact["execution_status"] == "ok"
+    assert artifact["lifecycle"] == "complete"
+    assert release_transitions == [state["run_id"]]
     assert sid not in web_events._simulations
     assert sid not in web_events._sim_locks
+    monkeypatch.setattr(web_events, "_MAX_ACTIVE_RUNS", 1)
+    web_events._ensure_global_run_capacity(None)
+
+
+def test_crashed_background_worker_persists_failure_and_releases_capacity(
+    tmp_path,
+    monkeypatch,
+):
+    sid = "http:owner:worker-crash"
+    store = RunArtifactStore(tmp_path / "runs")
+    state, lock = web_events._replace_simulation_state(
+        sid,
+        _PartialSession(),
+        speed=0.0,
+        ledger_client_id="owner",
+        run_store=store,
+    )
+    state["http_owned"] = True
+    state["paused"] = True
+
+    class CrashingSocket(_Socket):
+        def start_background_task(self, target):
+            self.target = target
+            return object()
+
+        def sleep(self, _seconds):
+            raise RuntimeError("synthetic worker crash")
+
+    socket = CrashingSocket()
+    web_events._start_background_loop(
+        socket,
+        sid,
+        state["run_id"],
+        lock,
+        "backend",
+        "ok",
+        True,
+    )
+    monkeypatch.setattr(web_events, "_MAX_ACTIVE_RUNS", 1)
+    with pytest.raises(web_events.RunCommandError) as saturated:
+        web_events._ensure_global_run_capacity(None)
+    assert saturated.value.error_type == "global_run_capacity_exhausted"
+
+    with pytest.raises(RuntimeError, match="synthetic worker crash"):
+        socket.target()
+
+    artifact = store.load(state["run_id"])
+    assert artifact["execution_status"] == "failed"
+    assert artifact["lifecycle"] == "complete"
+    assert artifact["failure"] == {
+        "reason": "background_worker_crash:RuntimeError",
+        "error_message": "synthetic worker crash",
+    }
+    assert artifact["timesteps"] == [
+        {"hour": 1, "summary": {"hour": 1, "campaign": "C0"}}
+    ]
+    assert sid not in web_events._simulations
+    assert sid not in web_events._sim_locks
+    web_events._ensure_global_run_capacity(None)
 
 
 def test_c6_campaign_refusal_does_not_persist_terminal(tmp_path, monkeypatch):
@@ -1075,8 +1579,9 @@ def test_idempotency_entries_evict_oldest_at_fixed_bound(monkeypatch):
     for token in ("oldest", "middle", "newest"):
         web_events.submit_run_command(
             _Socket(),
-            {"client_token": token, "mass_kg": 1000},
+            _single_run_body({"mass_kg": 1000}),
             client_id="owner",
+            submit_id=token,
         )
 
     assert list(web_events._run_idempotency) == [
@@ -1085,8 +1590,9 @@ def test_idempotency_entries_evict_oldest_at_fixed_bound(monkeypatch):
     ]
     replay = web_events.submit_run_command(
         _Socket(),
-        {"client_token": "middle", "mass_kg": 1000},
+        _single_run_body({"mass_kg": 1000}),
         client_id="owner",
+        submit_id="middle",
     )
     assert replay["idempotent_replay"] is True
     assert len(calls) == 3
@@ -1111,15 +1617,17 @@ def test_active_idempotency_tokens_are_never_evicted(monkeypatch):
     for client_id, token in (("client-a", "token-a"), ("client-b", "token-b")):
         web_events.submit_run_command(
             _Socket(),
-            {"client_token": token, "mass_kg": 1000},
+            _single_run_body({"mass_kg": 1000}),
             client_id=client_id,
+            submit_id=token,
         )
 
     with pytest.raises(web_events.RunCommandError) as exc_info:
         web_events.submit_run_command(
             _Socket(),
-            {"client_token": "token-c", "mass_kg": 1000},
+            _single_run_body({"mass_kg": 1000}),
             client_id="client-c",
+            submit_id="token-c",
         )
 
     assert exc_info.value.error_type == "idempotency_capacity_exhausted"
@@ -1130,8 +1638,9 @@ def test_active_idempotency_tokens_are_never_evicted(monkeypatch):
     ]
     replay = web_events.submit_run_command(
         _Socket(),
-        {"client_token": "token-a", "mass_kg": 1000},
+        _single_run_body({"mass_kg": 1000}),
         client_id="client-a",
+        submit_id="token-a",
     )
     assert replay["idempotent_replay"] is True
     assert len(calls) == 2
@@ -1148,11 +1657,7 @@ def test_draft_is_stateless_validate_and_echo(monkeypatch):
     before = dict(web_events._simulations)
     response = app.test_client().post(
         "/api/runs/draft",
-        json={
-            "backend": "internal-analytical",
-            "feedstock": "lunar_mare_low_ti",
-            "mass_kg": 1000,
-        },
+        json=_single_run_body({"mass_kg": 1000}),
     )
 
     assert response.status_code == 200
@@ -1167,6 +1672,252 @@ def test_draft_is_stateless_validate_and_echo(monkeypatch):
     assert web_events._simulations == before
 
 
+@pytest.mark.parametrize(
+    ("body", "error_type"),
+    [
+        (
+            {
+                "backend": "internal-analytical",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "bogus": True,
+            },
+            "invalid_submission_type",
+        ),
+        (
+            {
+                "single_run": {
+                    **_single_run_body({"mass_kg": 1000})["single_run"],
+                    "bogus": True,
+                },
+            },
+            "invalid_single_run",
+        ),
+        (
+            {
+                "backend": "internal-analytical",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "client_token": "legacy-token",
+            },
+            "invalid_submission_type",
+        ),
+    ],
+)
+def test_draft_refuses_fail_open_flat_or_unknown_payloads(body, error_type):
+    app = app_module.create_app()
+
+    response = app.test_client().post("/api/runs/draft", json=body)
+
+    assert response.status_code == 400
+    assert response.get_json()["error_type"] == error_type
+
+
+def test_source_run_draft_is_pure_and_child_persists_lineage(
+    tmp_path,
+    monkeypatch,
+):
+    store = RunArtifactStore(tmp_path / "runs")
+    source_document = _runner_document()
+    source_document["run_metadata"]["seed"] = 11
+    source_document["run_metadata"]["single_run"] = {
+        "target_or_recipe": {
+            "feedstock": "lunar_mare_low_ti",
+            "mass_kg": 1000.0,
+        },
+        "l2_overrides": {
+            "setpoints_patch": {
+                "campaigns": {"C4": {"temp_range_C": [1600.0, 1650.0]}}
+            },
+        },
+        "name": "Source run",
+        "seed": 11,
+        "fidelity": "stub",
+        "parent_run_id": None,
+    }
+    persist_run_artifact(
+        source_document,
+        "source-run",
+        name="Source run",
+        store=store,
+    )
+    source_path = tmp_path / "runs" / "source-run.json"
+    source_before = source_path.read_bytes()
+    app = app_module.create_app()
+    app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
+    client = app.test_client()
+
+    draft_response = client.post(
+        "/api/runs/draft",
+        json={"source_run_id": "source-run"},
+    )
+
+    assert draft_response.status_code == 200
+    draft = draft_response.get_json()["draft"]
+    single_run = draft["single_run"]
+    assert single_run["target_or_recipe"] == {
+        "feedstock": "lunar_mare_low_ti",
+        "mass_kg": 1000.0,
+    }
+    assert single_run["l2_overrides"]["setpoints_patch"] == {
+        "campaigns": {"C4": {"temp_range_C": [1600.0, 1650.0]}}
+    }
+    assert single_run["name"] == "Source run"
+    assert single_run["seed"] == 11
+    assert single_run["fidelity"] == "internal-analytical"
+    assert single_run["parent_run_id"] == "source-run"
+    single_run["name"] = "Derived run"
+    command_payload, context = web_events._typed_single_run_payload(draft)
+    assert command_payload["setpoints_patch"] == {
+        "campaigns": {"C4": {"temp_range_C": [1600.0, 1650.0]}}
+    }
+    assert context["parent_run_id"] == "source-run"
+
+    def fake_start(
+        _payload,
+        *,
+        sid,
+        ledger_client_id,
+        single_run_context,
+        **_kwargs,
+    ):
+        state, _ = web_events._replace_simulation_state(
+            sid,
+            _PartialSession(),
+            speed=0.0,
+            ledger_client_id=ledger_client_id,
+            run_store=store,
+            initial_state={
+                "http_owned": True,
+                "single_run": single_run_context,
+            },
+        )
+        return {"run_id": state["run_id"], "status": "started"}
+
+    monkeypatch.setattr(web_events, "_registered_start_handler", fake_start)
+    submission = client.post("/api/runs", json=draft)
+    assert submission.status_code == 201, submission.get_json()
+    child_run_id = submission.get_json()["run_id"]
+    cancelled = client.post(f"/api/runs/{child_run_id}/cancel")
+    assert cancelled.status_code == 200
+
+    child = store.load(child_run_id)
+    assert child["header"]["name"] == "Derived run"
+    assert child["header"]["seed"] == 11
+    assert child["terminal"]["run_metadata"]["single_run"]["parent_run_id"] == (
+        "source-run"
+    )
+    assert next(
+        row for row in store.list_runs() if row["run_id"] == child_run_id
+    )["parent_run_id"] == "source-run"
+    assert source_path.read_bytes() == source_before
+
+
+def test_alias_fidelity_is_canonical_in_persisted_typed_provenance(
+    tmp_path,
+    monkeypatch,
+):
+    store = RunArtifactStore(tmp_path / "runs")
+    command_payloads = []
+
+    def fake_start(
+        payload,
+        *,
+        sid,
+        ledger_client_id,
+        single_run_context,
+        **_kwargs,
+    ):
+        command_payloads.append(payload)
+        state, _ = web_events._replace_simulation_state(
+            sid,
+            _PartialSession(),
+            speed=0.0,
+            ledger_client_id=ledger_client_id,
+            run_store=store,
+            initial_state={
+                "http_owned": True,
+                "single_run": single_run_context,
+            },
+        )
+        return {"run_id": state["run_id"], "status": "started"}
+
+    app = app_module.create_app()
+    app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
+    monkeypatch.setattr(web_events, "_registered_start_handler", fake_start)
+    client = app.test_client()
+
+    submission = client.post(
+        "/api/runs",
+        json=_single_run_body({"mass_kg": 1000}, fidelity="stub"),
+    )
+    assert submission.status_code == 201
+    run_id = submission.get_json()["run_id"]
+    assert client.post(f"/api/runs/{run_id}/cancel").status_code == 200
+
+    artifact = store.load(run_id)
+    assert command_payloads[0]["backend"] == "internal-analytical"
+    assert artifact["header"]["engine_identity"]["name"] == "internal-analytical"
+    assert artifact["header"]["engine_identity"]["backend_wire_token"] == (
+        "internal-analytical"
+    )
+    assert artifact["terminal"]["run_metadata"]["backend"] == "internal-analytical"
+    assert (
+        artifact["terminal"]["run_metadata"]["single_run"]["fidelity"]
+        == "internal-analytical"
+    )
+
+    def strings(value):
+        if isinstance(value, dict):
+            for item in value.values():
+                yield from strings(item)
+        elif isinstance(value, list):
+            for item in value:
+                yield from strings(item)
+        elif isinstance(value, str):
+            yield value
+
+    assert "stub" not in set(strings(artifact))
+
+
+def test_source_run_draft_unknown_is_typed_404(tmp_path):
+    app = app_module.create_app()
+    app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
+
+    response = app.test_client().post(
+        "/api/runs/draft",
+        json={"source_run_id": "missing"},
+    )
+
+    assert response.status_code == 404
+    assert response.get_json() == {
+        "error": "source run not found",
+        "error_type": "run_not_found",
+    }
+
+
+def test_typed_child_submit_unknown_parent_is_typed_404(tmp_path):
+    app = app_module.create_app()
+    app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
+
+    response = app.test_client().post(
+        "/api/runs",
+        json={
+            "single_run": {
+                "target_or_recipe": "lunar_mare_low_ti",
+                "l2_overrides": {},
+                "name": "Orphan child",
+                "seed": 0,
+                "fidelity": "internal-analytical",
+                "parent_run_id": "missing",
+            },
+        },
+    )
+
+    assert response.status_code == 404
+    assert response.get_json()["error_type"] == "run_not_found"
+
+
 def test_draft_validation_returns_typed_503_when_capacity_is_saturated(
     monkeypatch,
 ):
@@ -1176,7 +1927,7 @@ def test_draft_validation_returns_typed_503_when_capacity_is_saturated(
     try:
         response = app_module.create_app().test_client().post(
             "/api/runs/draft",
-            json={"mass_kg": 1000},
+            json=_single_run_body({"mass_kg": 1000}),
         )
     finally:
         slots.release()
@@ -1308,9 +2059,9 @@ def test_global_active_run_cap_is_shared_by_http_and_socket(
     if transport == "http":
         response = app.test_client().post(
             "/api/runs",
-            json=payload,
+            json=_single_run_body(payload),
         )
-        assert response.status_code == 503
+        assert response.status_code == 429
         assert response.get_json()["error_type"] == "global_run_capacity_exhausted"
     else:
         result = web_events._registered_start_handler(
@@ -1325,11 +2076,20 @@ def test_global_active_run_cap_is_shared_by_http_and_socket(
     assert active["running"] is True
 
 
-@pytest.mark.parametrize("path", ["/api/runs", "/api/runs/draft"])
-def test_command_routes_share_socket_input_validation(path):
+@pytest.mark.parametrize(
+    ("path", "body"),
+    [
+        ("/api/runs", _single_run_body({"mass_kg": "not-a-number"})),
+        (
+            "/api/runs/draft",
+            _single_run_body({"mass_kg": "not-a-number"}),
+        ),
+    ],
+)
+def test_command_routes_share_socket_input_validation(path, body):
     response = app_module.create_app().test_client().post(
         path,
-        json={"mass_kg": "not-a-number"},
+        json=body,
     )
 
     assert response.status_code == 400
@@ -1339,7 +2099,7 @@ def test_command_routes_share_socket_input_validation(path):
 def test_submit_rejects_compound_c5_enabled_with_typed_400():
     response = app_module.create_app().test_client().post(
         "/api/runs",
-        json={"c5_enabled": {"unexpected": True}},
+        json=_single_run_body({"c5_enabled": {"unexpected": True}}),
     )
 
     assert response.status_code == 400
@@ -1358,7 +2118,7 @@ def test_http_command_error_preserves_structured_socket_diagnostics(monkeypatch)
     monkeypatch.setattr(web_events, "_get_backend", unavailable)
     response = app_module.create_app().test_client().post(
         "/api/runs",
-        json={"backend": "missing"},
+        json=_single_run_body({"backend": "missing"}),
     )
 
     assert response.status_code == 400

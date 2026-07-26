@@ -3402,7 +3402,12 @@ def submit_run_api():
     from web.events import RunCommandError, submit_run_command
 
     try:
-        result = submit_run_command(socketio, payload, client_id=client_id)
+        result = submit_run_command(
+            socketio,
+            payload,
+            client_id=client_id,
+            submit_id=request.headers.get('Submit-Id'),
+        )
     except RunCommandError as exc:
         return jsonify(exc.response_payload()), exc.status_code
     except RuntimeError as exc:
@@ -3460,18 +3465,10 @@ def cancel_run_api(run_id: str):
         except RunStoreCorruptionError as exc:
             return _typed_json_error(str(exc), 'run_store_corruption', 500)
         if artifact is not None:
-            return _typed_json_error(
-                'run is already terminal',
-                'run_not_active',
-                409,
-            )
+            return jsonify({'status': 'cancelled'})
         return _typed_json_error('run not found', 'run_not_found', 404)
     if result['status'] == 'terminal':
-        return _typed_json_error(
-            'run is already terminal',
-            'run_not_active',
-            409,
-        )
+        return jsonify({'status': 'cancelled'})
     return jsonify(result)
 
 

@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 import json
 import math
 import threading
+import time
 import uuid
 from pathlib import Path
 
@@ -50,11 +51,15 @@ from simulator.accounting.queries import (
     TERMINAL_RUMP_UNEXTRACTED_METALS,
 )
 from simulator.accounting.run_artifact import build_run_artifact
-from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+from simulator.backend_names import (
+    ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    canonical_backend_name,
+)
 from simulator.campaigns import CampaignManager
 from simulator.condensation import KnudsenRegimeRefusal, stage_purity_report
 from simulator.condensation_routing import accepted_species_for_stage_number
 from simulator.cost_parameters import (
+    default_cost_parameters_block,
     normalize_cost_parameters,
 )
 from simulator.core import PoisonedHourError
@@ -114,6 +119,17 @@ _socket_client_ids: dict[str, str] = {}
 _run_idempotency: dict[tuple[str, str], tuple[str, dict[str, object]]] = {}
 _MAX_RUN_IDEMPOTENCY_ENTRIES = 1024
 _MAX_ACTIVE_RUNS = 4
+_DETACHED_SOCKET_RECLAIM_SECONDS = 300.0
+_BACKEND_WIRE_TOKEN_FIELDS = frozenset({
+    'active_backend',
+    'backend',
+    'backend_active',
+    'backend_name',
+    'backend_requested',
+    'backend_wire_token',
+    'fidelity',
+    'requested_backend',
+})
 _draft_validation_slots = threading.BoundedSemaphore(1)
 _registered_start_handler = None
 _registered_socketio = None
@@ -124,6 +140,22 @@ _MAX_C4_TEMP_C = 5000.0
 _MAX_MRE_VOLTAGE_V = 100.0
 _MAX_ADDITIVE_KG = 1_000_000_000.0
 _MASS_BALANCE_ERROR_BREACH_PCT = 5e-12
+_SINGLE_RUN_CONFIG_FIELDS = frozenset({
+    'additives',
+    'c4_max_temp_C',
+    'c5_enabled',
+    'cost_parameters',
+    'cost_parameters_recipe_name',
+    'feedstock',
+    'furnace_material_id',
+    'mass_kg',
+    'mre_max_voltage_V',
+    'mre_target_species',
+    'runtime_campaign_overrides',
+    'setpoints_patch',
+    'speed',
+    'track',
+})
 
 
 class InputValidationError(ValueError):
@@ -498,7 +530,10 @@ def _finish_terminal_state(
                 state['idempotency_terminal_result'] = terminal_result
             if (
                 not defer_cleanup
-                and state.get('http_owned')
+                and (
+                    state.get('http_owned')
+                    or state.get('client_disconnected')
+                )
                 and state.get('artifact_persisted')
             ):
                 _simulations.pop(sid, None)
@@ -556,22 +591,52 @@ def _persist_terminal(
         per_hour_ledger = state.get('per_hour_ledger') if state is not None else None
         if per_hour_ledger:
             runner_payload['per_hour_ledger'] = copy.deepcopy(per_hour_ledger)
+        single_run = state.get('single_run') if state is not None else None
+        if isinstance(single_run, Mapping):
+            run_metadata = runner_payload.setdefault('run_metadata', {})
+            if isinstance(run_metadata, dict):
+                run_metadata['seed'] = single_run['seed']
+                run_metadata['single_run'] = copy.deepcopy(dict(single_run))
+        _canonicalize_runner_backend_tokens(runner_payload)
         run_store = state.get('run_store') if state is not None else None
         if run_store is None:
             raise RuntimeError('run artifact store is unavailable')
+        run_name = (
+            str(single_run['name'])
+            if isinstance(single_run, Mapping)
+            else None
+        )
+        parent_run_id = (
+            str(single_run['parent_run_id'])
+            if (
+                isinstance(single_run, Mapping)
+                and single_run.get('parent_run_id') is not None
+            )
+            else None
+        )
         if lifecycle == 'complete':
+            persist_kwargs: dict[str, object] = {'store': run_store}
+            if run_name is not None:
+                persist_kwargs['name'] = run_name
+            if parent_run_id is not None:
+                persist_kwargs['parent_run_id'] = parent_run_id
             artifact = persist_run_artifact(
                 runner_payload,
                 run_id,
-                store=run_store,
+                **persist_kwargs,
             )
         else:
             artifact = build_run_artifact(
                 runner_payload,
                 run_id=run_id,
+                name=run_name,
                 lifecycle=lifecycle,
             )
-            if not run_store.save(run_id, artifact):
+            if not run_store.save(
+                run_id,
+                artifact,
+                parent_run_id=parent_run_id,
+            ):
                 raise RuntimeError(f'run artifact {run_id!r} already exists')
     except Exception as exc:  # noqa: BLE001 -- durability is client-visible
         _safe_log(f'Run artifact persistence failed: {exc}')
@@ -679,28 +744,134 @@ def cancel_run_command(
     )
 
 
-def _disconnect_simulation_client(socketio, sid: str) -> None:
-    """Cancel only the run observed by this disconnect under client arbitration."""
-    with _run_command_lock:
-        client_id = _socket_client_ids.get(sid)
-        state, _ = _current_simulation_state(sid)
-        run_id = str(state['run_id']) if state is not None else None
-        try:
-            if run_id is not None:
+def _canonicalize_runner_backend_tokens(value) -> None:
+    if isinstance(value, dict):
+        for key, item in value.items():
+            if key in _BACKEND_WIRE_TOKEN_FIELDS and isinstance(item, str):
+                value[key] = canonical_backend_name(item)
+            else:
+                _canonicalize_runner_backend_tokens(item)
+    elif isinstance(value, list):
+        for item in value:
+            _canonicalize_runner_backend_tokens(item)
+
+
+def _schedule_viewerless_reclaim(socketio, sid: str, run_id: str) -> None:
+    with _simulations_guard:
+        state = _simulations.get(sid)
+        if (
+            state is None
+            or state.get('run_id') != run_id
+            or not state.get('running')
+            or state.get('artifact_persisted')
+            or state.get('submission_mode') != 'socket'
+            or not state.get('client_disconnected')
+        ):
+            return
+        deadline = state.get('viewerless_reclaim_deadline_monotonic')
+        if not isinstance(deadline, (int, float)) or not math.isfinite(deadline):
+            deadline = time.monotonic() + _DETACHED_SOCKET_RECLAIM_SECONDS
+            state['viewerless_reclaim_deadline_monotonic'] = deadline
+        if state.get('viewerless_reclaim_scheduled'):
+            return
+        state['viewerless_reclaim_scheduled'] = True
+
+    def reclaim_task():
+        while True:
+            with _simulations_guard:
+                current = _simulations.get(sid)
+                if (
+                    current is None
+                    or current.get('run_id') != run_id
+                    or not current.get('running')
+                    or current.get('artifact_persisted')
+                    or not current.get('viewerless_reclaim_scheduled')
+                ):
+                    return
+                remaining = deadline - time.monotonic()
+            if remaining > 0:
+                try:
+                    socketio.sleep(remaining)
+                except Exception as exc:  # noqa: BLE001 -- reclaim must fail closed
+                    _safe_log(f'Viewerless reclaim sleep failed: {exc}')
+                else:
+                    continue
+            try:
                 _cancel_simulation_state(
                     socketio,
                     sid,
-                    reason='client_disconnected',
+                    reason='viewerless_reclaimed',
                     run_id=run_id,
                 )
-        except RuntimeError as exc:
-            _safe_log(f'Disconnected run retained after persistence failure: {exc}')
-        else:
-            if run_id is not None:
-                _clear_simulation_state(sid, run_id=run_id)
-        finally:
-            if _socket_client_ids.get(sid) == client_id:
-                _socket_client_ids.pop(sid, None)
+            except RuntimeError as exc:
+                _safe_log(f'Viewerless reclaim persistence failed: {exc}')
+            return
+
+    try:
+        task = socketio.start_background_task(reclaim_task)
+    except Exception:
+        with _simulations_guard:
+            current = _simulations.get(sid)
+            if current is not None and current.get('run_id') == run_id:
+                current.pop('viewerless_reclaim_scheduled', None)
+        _cancel_simulation_state(
+            socketio,
+            sid,
+            reason='viewerless_reclaimed',
+            run_id=run_id,
+        )
+        raise
+    with _simulations_guard:
+        current = _simulations.get(sid)
+        if current is not None and current.get('run_id') == run_id:
+            current['viewerless_reclaim_task'] = task
+
+
+def _disconnect_simulation_client(socketio, sid: str) -> None:
+    """Detach the viewer without implicitly cancelling durable work."""
+    restart_loop = False
+    restart_args = None
+    reclaim_run_id = None
+    with _run_command_lock:
+        client_id = _socket_client_ids.get(sid)
+        state, run_lock = _current_simulation_state(sid)
+        if state is not None and run_lock is not None:
+            with run_lock:
+                current, _ = _current_simulation_state(sid, state.get('run_id'))
+                if current is state:
+                    current['submission_mode'] = 'socket'
+                    current['client_disconnected'] = True
+                    current['paused'] = False
+                    resume = getattr(current.get('session'), 'resume', None)
+                    if callable(resume):
+                        resume()
+                    if current.get('artifact_persisted'):
+                        _clear_simulation_state(sid, run_id=state.get('run_id'))
+                    else:
+                        reclaim_run_id = str(current['run_id'])
+                        current.setdefault(
+                            'viewerless_reclaim_deadline_monotonic',
+                            time.monotonic() + _DETACHED_SOCKET_RECLAIM_SECONDS,
+                        )
+                        if (
+                            current.get('decision_waiting')
+                            and current.get('loop_exited', False)
+                        ):
+                            current.pop('decision_waiting', None)
+                            restart_loop = True
+                            restart_args = (
+                                str(current['run_id']),
+                                run_lock,
+                                str(current.get('backend_message', '')),
+                                str(current.get('backend_status', 'unavailable')),
+                                bool(current.get('backend_authoritative', False)),
+                            )
+        if _socket_client_ids.get(sid) == client_id:
+            _socket_client_ids.pop(sid, None)
+    if reclaim_run_id is not None:
+        _schedule_viewerless_reclaim(socketio, sid, reclaim_run_id)
+    if restart_loop and restart_args is not None:
+        _start_background_loop(socketio, sid, *restart_args)
 
 
 def _ensure_global_run_capacity(replacement_sid: str | None) -> None:
@@ -715,7 +886,7 @@ def _ensure_global_run_capacity(replacement_sid: str | None) -> None:
         raise RunCommandError(
             'global active-run capacity is exhausted',
             error_type='global_run_capacity_exhausted',
-            status_code=503,
+            status_code=429,
         )
 
 
@@ -757,11 +928,157 @@ def _make_idempotency_capacity() -> None:
             _run_idempotency.pop(terminal_key)
 
 
+def _typed_single_run_payload(
+    payload: Mapping[str, object],
+) -> tuple[dict[str, object], dict[str, object]]:
+    if 'single_run' not in payload:
+        if 'optimizer_study' in payload:
+            raise RunCommandError(
+                'optimizer_study submissions use the optimizer jobs endpoint',
+                error_type='invalid_submission_type',
+            )
+        raise RunCommandError(
+            'run submission must contain the single_run discriminator',
+            error_type='invalid_submission_type',
+        )
+    unknown_outer = set(payload) - {'single_run'}
+    if unknown_outer:
+        raise RunCommandError(
+            'single_run must be the only run submission discriminator',
+            error_type='invalid_single_run',
+        )
+    single_run = payload['single_run']
+    if not isinstance(single_run, Mapping):
+        raise RunCommandError(
+            'single_run must be an object',
+            error_type='invalid_single_run',
+        )
+    required = {
+        'target_or_recipe',
+        'l2_overrides',
+        'name',
+        'seed',
+        'fidelity',
+    }
+    allowed = required | {'parent_run_id'}
+    missing = required - set(single_run)
+    unknown = set(single_run) - allowed
+    if missing:
+        raise RunCommandError(
+            f"single_run is missing required fields: {', '.join(sorted(missing))}",
+            error_type='invalid_single_run',
+        )
+    if unknown:
+        raise RunCommandError(
+            f"single_run has unknown fields: {', '.join(sorted(unknown))}",
+            error_type='invalid_single_run',
+        )
+    target = single_run['target_or_recipe']
+    if isinstance(target, str):
+        if not target.strip():
+            raise RunCommandError(
+                'target_or_recipe must not be empty',
+                error_type='invalid_single_run',
+            )
+        canonical_target: object = target.strip()
+        command_payload: dict[str, object] = {'feedstock': canonical_target}
+    elif isinstance(target, Mapping):
+        command_payload = copy.deepcopy(dict(target))
+        unknown_target = set(command_payload) - _SINGLE_RUN_CONFIG_FIELDS
+        if unknown_target:
+            raise RunCommandError(
+                'target_or_recipe has unknown fields: '
+                f"{', '.join(sorted(unknown_target))}",
+                error_type='invalid_single_run',
+            )
+        feedstock = command_payload.get('feedstock')
+        if not isinstance(feedstock, str) or not feedstock.strip():
+            raise RunCommandError(
+                'target_or_recipe object must identify a non-empty feedstock',
+                error_type='invalid_single_run',
+            )
+        command_payload['feedstock'] = feedstock.strip()
+        canonical_target = copy.deepcopy(command_payload)
+    else:
+        raise RunCommandError(
+            'target_or_recipe must be a string or object',
+            error_type='invalid_single_run',
+        )
+    l2_overrides = single_run['l2_overrides']
+    if not isinstance(l2_overrides, Mapping):
+        raise RunCommandError(
+            'l2_overrides must be an object',
+            error_type='invalid_single_run',
+        )
+    canonical_l2_overrides = copy.deepcopy(dict(l2_overrides))
+    unknown_overrides = set(canonical_l2_overrides) - _SINGLE_RUN_CONFIG_FIELDS
+    if unknown_overrides:
+        raise RunCommandError(
+            'l2_overrides has unknown fields: '
+            f"{', '.join(sorted(unknown_overrides))}",
+            error_type='invalid_single_run',
+        )
+    overlapping_fields = set(command_payload) & set(canonical_l2_overrides)
+    if overlapping_fields:
+        raise RunCommandError(
+            'target_or_recipe and l2_overrides overlap: '
+            f"{', '.join(sorted(overlapping_fields))}",
+            error_type='invalid_single_run',
+        )
+    command_payload.update(canonical_l2_overrides)
+    name = single_run['name']
+    if not isinstance(name, str) or not name.strip():
+        raise RunCommandError(
+            'name must be a non-empty string',
+            error_type='invalid_single_run',
+        )
+    seed = single_run['seed']
+    if isinstance(seed, bool) or not isinstance(seed, int) or seed < 0:
+        raise RunCommandError(
+            'seed must be a non-negative integer',
+            error_type='invalid_single_run',
+        )
+    fidelity = single_run['fidelity']
+    if not isinstance(fidelity, str) or not fidelity.strip():
+        raise RunCommandError(
+            'fidelity must be a non-empty string',
+            error_type='invalid_single_run',
+        )
+    canonical_fidelity = canonical_backend_name(fidelity.strip())
+    command_payload['backend'] = canonical_fidelity
+    parent_run_id = single_run.get('parent_run_id')
+    if (
+        parent_run_id is not None
+        and (
+            not isinstance(parent_run_id, str)
+            or not parent_run_id.strip()
+        )
+    ):
+        raise RunCommandError(
+            'parent_run_id must be a non-empty string',
+            error_type='invalid_single_run',
+        )
+    context = {
+        'target_or_recipe': canonical_target,
+        'l2_overrides': canonical_l2_overrides,
+        'name': name.strip(),
+        'seed': seed,
+        'fidelity': canonical_fidelity,
+        'parent_run_id': (
+            parent_run_id.strip()
+            if isinstance(parent_run_id, str)
+            else None
+        ),
+    }
+    return command_payload, context
+
+
 def submit_run_command(
     socketio,
     payload: Mapping[str, object],
     *,
     client_id: str,
+    submit_id: str | None = None,
 ) -> dict[str, object]:
     if not isinstance(payload, Mapping):
         raise RunCommandError(
@@ -769,24 +1086,26 @@ def submit_run_command(
             error_type='invalid_run_request',
         )
     request_payload = dict(payload)
-    raw_token = request_payload.pop('client_token', None)
     token = ''
-    if raw_token is not None:
-        if not isinstance(raw_token, str) or not raw_token.strip():
+    if submit_id is not None:
+        if not isinstance(submit_id, str) or not submit_id.strip():
             raise RunCommandError(
-                'client_token must be a non-empty string',
-                error_type='invalid_client_token',
+                'submit_id must be a non-empty string',
+                error_type='invalid_submit_id',
             )
-        token = raw_token.strip()
+        token = submit_id.strip()
         if len(token) > 256:
             raise RunCommandError(
-                'client_token must be at most 256 characters',
-                error_type='invalid_client_token',
+                'submit_id must be at most 256 characters',
+                error_type='invalid_submit_id',
             )
     canonical_payload = json.dumps(
         request_payload,
         sort_keys=True,
         separators=(',', ':'),
+    )
+    command_payload, single_run_context = _typed_single_run_payload(
+        request_payload
     )
     token_key = (client_id, token)
     with _run_command_lock:
@@ -799,7 +1118,7 @@ def submit_run_command(
                 existing_payload, existing_result = existing
                 if existing_payload != canonical_payload:
                     raise RunCommandError(
-                        'client_token was already used with a different request',
+                        'submit_id was already used with a different request',
                         error_type='idempotency_conflict',
                         status_code=409,
                     )
@@ -821,11 +1140,12 @@ def submit_run_command(
             )
         sid = f'http:{client_id}:{uuid.uuid4().hex}'
         result = handler(
-            request_payload,
+            command_payload,
             sid=sid,
             ledger_client_id=client_id,
             command_mode=True,
             replace_sid=previous_sid,
+            single_run_context=single_run_context,
         )
         response_result = dict(result)
         if token:
@@ -865,7 +1185,114 @@ def validate_run_draft(
             error_type='invalid_run_request',
         )
     request_payload = dict(payload)
-    request_payload.pop('client_token', None)
+    if 'source_run_id' in request_payload:
+        if set(request_payload) != {'source_run_id'}:
+            raise RunCommandError(
+                'source_run_id must be the only draft request field',
+                error_type='invalid_run_draft',
+            )
+        source_run_id = request_payload['source_run_id']
+        if not isinstance(source_run_id, str) or not source_run_id.strip():
+            raise RunCommandError(
+                'source_run_id must be a non-empty string',
+                error_type='invalid_run_draft',
+            )
+        source_run_id = source_run_id.strip()
+        try:
+            artifact = get_run_store().load(source_run_id)
+        except ValueError as exc:
+            raise RunCommandError(
+                str(exc),
+                error_type='invalid_source_run_id',
+            ) from exc
+        if artifact is None:
+            raise RunCommandError(
+                'source run not found',
+                error_type='run_not_found',
+                status_code=404,
+            )
+        header = artifact.get('header', {})
+        terminal = artifact.get('terminal', {})
+        run_metadata = (
+            terminal.get('run_metadata', {})
+            if isinstance(terminal, Mapping)
+            else {}
+        )
+        stored_single_run = (
+            run_metadata.get('single_run')
+            if isinstance(run_metadata, Mapping)
+            else None
+        )
+        if isinstance(stored_single_run, Mapping):
+            draft_single_run = copy.deepcopy(dict(stored_single_run))
+            draft_single_run['parent_run_id'] = source_run_id
+            stored_fidelity = draft_single_run.get('fidelity')
+            if stored_fidelity:
+                draft_single_run['fidelity'] = canonical_backend_name(
+                    str(stored_fidelity)
+                )
+            return {'draft': {'single_run': draft_single_run}}
+        recipe_snapshot = header.get('recipe_snapshot', {})
+        setpoints_patch = (
+            copy.deepcopy(recipe_snapshot.get('setpoints_patch', {}))
+            if isinstance(recipe_snapshot, Mapping)
+            else {}
+        )
+        l2_overrides: dict[str, object] = {
+            'setpoints_patch': setpoints_patch,
+        }
+        cost_block = header.get('cost_block')
+        if isinstance(cost_block, Mapping):
+            cost_parameters = default_cost_parameters_block()
+            parameters = cost_parameters['parameters']
+            if cost_block.get('electrical_cost_per_kWh') is not None:
+                parameters['electricity_cost_per_kWh']['value'] = copy.deepcopy(
+                    cost_block['electrical_cost_per_kWh']
+                )
+            if cost_block.get('solar_heat_cost_per_kWh') is not None:
+                parameters['solar_heat_cost_per_kWh']['value'] = copy.deepcopy(
+                    cost_block['solar_heat_cost_per_kWh']
+                )
+            cost_parameters['provenance'] = {
+                'source': f'run-draft:{source_run_id}',
+                'defaults_applied': True,
+            }
+            l2_overrides['cost_parameters'] = cost_parameters
+        engine_identity = header.get('engine_identity', {})
+        fidelity = (
+            engine_identity.get('backend_wire_token')
+            if isinstance(engine_identity, Mapping)
+            else None
+        )
+        if fidelity:
+            fidelity = canonical_backend_name(str(fidelity))
+        target_or_recipe: dict[str, object] = {
+            'feedstock': header.get('feedstock_id'),
+            'mass_kg': header.get('charge_mass_kg'),
+        }
+        if isinstance(run_metadata, Mapping):
+            if run_metadata.get('track') is not None:
+                target_or_recipe['track'] = copy.deepcopy(
+                    run_metadata['track']
+                )
+            if isinstance(run_metadata.get('additives_kg'), Mapping):
+                target_or_recipe['additives'] = copy.deepcopy(
+                    dict(run_metadata['additives_kg'])
+                )
+        draft = {
+            'single_run': {
+                'target_or_recipe': target_or_recipe,
+                'l2_overrides': l2_overrides,
+                'name': header.get('name') or source_run_id,
+                'seed': header.get('seed', 0),
+                'fidelity': fidelity or 'auto',
+                'parent_run_id': source_run_id,
+            },
+        }
+        return {'draft': draft}
+    command_payload, single_run_context = _typed_single_run_payload(
+        request_payload
+    )
     handler = _registered_start_handler
     if handler is None:
         raise RuntimeError('run command handler is unavailable')
@@ -877,11 +1304,12 @@ def validate_run_draft(
         )
     try:
         return handler(
-            request_payload,
+            command_payload,
             sid=f'draft:{client_id}:{uuid.uuid4().hex}',
             ledger_client_id=client_id,
             command_mode=True,
             draft_mode=True,
+            single_run_context=single_run_context,
         )
     finally:
         _draft_validation_slots.release()
@@ -1932,6 +2360,14 @@ def _start_background_loop(
     backend_status: str,
     backend_authoritative: bool,
 ):
+    with _simulations_guard:
+        current = _simulations.get(sid)
+        if current is None or current.get('run_id') != run_id:
+            return
+        loop_generation = int(current.get('loop_generation', 0)) + 1
+        current['loop_generation'] = loop_generation
+        current['loop_exited'] = False
+
     def persist_terminal(
         session,
         *,
@@ -2032,6 +2468,52 @@ def _start_background_loop(
                 return
             stop_with_status(error_payload)
 
+    def reconcile_worker_crash(exc: BaseException) -> None:
+        crash_reason = f'background_worker_crash:{type(exc).__name__}'
+        message = str(exc) or crash_reason
+        _safe_log(f'Simulation background worker crashed: {message}')
+        with run_lock:
+            current, _ = _current_simulation_state(sid, run_id)
+            if (
+                current is None
+                or current.get('loop_generation') != loop_generation
+                or not current.get('running')
+            ):
+                return
+            try:
+                if not current.get('artifact_persisted'):
+                    artifact = persist_terminal(
+                        current['session'],
+                        status='failed',
+                        reason=crash_reason,
+                        error_message=message,
+                    )
+                    if artifact is None:
+                        stop_with_status({
+                            'status': 'error',
+                            'reason': 'persistence_failed',
+                            'message': (
+                                'Run worker crashed but its report was not saved'
+                            ),
+                            'original_failure_reason': crash_reason,
+                        })
+                    else:
+                        stop_with_status({
+                            'status': 'error',
+                            'reason': crash_reason,
+                            'message': message,
+                            'backend_status': backend_status,
+                            'backend_authoritative': backend_authoritative,
+                            'backend_message': backend_message,
+                        })
+            except BaseException as reconciliation_exc:  # noqa: BLE001
+                _safe_log(
+                    'Simulation worker crash reconciliation failed: '
+                    f'{reconciliation_exc}'
+                )
+            finally:
+                _finish_terminal_state(sid, run_id)
+
     def run_loop():
         while True:
             state, _ = _current_simulation_state(sid, run_id)
@@ -2111,11 +2593,19 @@ def _start_background_loop(
                     _finish_terminal_state(sid, run_id)
                     break
 
+                decision_policy = (
+                    DecisionPolicy.AUTO_APPLY
+                    if (
+                        state.get('http_owned')
+                        or state.get('client_disconnected')
+                    )
+                    else DecisionPolicy.OPERATOR
+                )
                 try:
                     for step_result in drive_session(
                         session,
                         1,
-                        DecisionPolicy.OPERATOR,
+                        decision_policy,
                     ):
                         break
                     if step_result is None:
@@ -2195,7 +2685,15 @@ def _start_background_loop(
                     break
 
             if step_result is None:
+                if session.is_complete():
+                    continue
                 if decision_payload is None:
+                    if decision_policy is DecisionPolicy.AUTO_APPLY:
+                        stop_for_failure(
+                            RuntimeError('AUTO_APPLY made no simulation progress'),
+                            session,
+                            sim,
+                        )
                     break
                 with _simulations_guard:
                     current = _simulations.get(sid)
@@ -2205,7 +2703,17 @@ def _start_background_loop(
                         or not current['running']
                     ):
                         break
-                    current['paused'] = True
+                    viewerless = bool(
+                        current.get('http_owned')
+                        or current.get('client_disconnected')
+                    )
+                    if viewerless:
+                        current['paused'] = False
+                    else:
+                        current['paused'] = True
+                        current['decision_waiting'] = True
+                if viewerless:
+                    continue
                 _emit_if_current(
                     socketio, sid, run_id, 'decision_required', decision_payload
                 )
@@ -2347,24 +2855,99 @@ def _start_background_loop(
                         or not current['running']
                     ):
                         break
-                    current['paused'] = True
-                _emit_if_current(
+                    viewerless = bool(
+                        current.get('http_owned')
+                        or current.get('client_disconnected')
+                    )
+                    if viewerless:
+                        current['paused'] = False
+                    else:
+                        current['paused'] = True
+                        current['decision_waiting'] = True
+                if not viewerless:
+                    _emit_if_current(
+                        socketio,
+                        sid,
+                        run_id,
+                        'decision_required',
+                        step_result.decision_event,
+                    )
+                    break
+
+            viewerless = bool(
+                state.get('http_owned')
+                or state.get('client_disconnected')
+            )
+            if viewerless:
+                socketio.sleep(0)
+            else:
+                spd = state.get('speed', 1.0)
+                if spd > 0:
+                    socketio.sleep(spd)
+
+    def run_task():
+        try:
+            run_loop()
+        except BaseException as exc:  # noqa: BLE001 -- worker liveness boundary
+            reconcile_worker_crash(exc)
+            raise
+        finally:
+            restart = False
+            resume = None
+            with _simulations_guard:
+                current = _simulations.get(sid)
+                if (
+                    current is not None
+                    and current.get('run_id') == run_id
+                    and current.get('loop_generation') == loop_generation
+                ):
+                    current['loop_exited'] = True
+                    if (
+                        current.get('running')
+                        and current.get('decision_waiting')
+                        and (
+                            current.get('http_owned')
+                            or current.get('client_disconnected')
+                        )
+                    ):
+                        current.pop('decision_waiting', None)
+                        current['paused'] = False
+                        resume = getattr(current.get('session'), 'resume', None)
+                        restart = True
+                    if not current.get('running'):
+                        restart = False
+            if callable(resume):
+                resume()
+            if restart:
+                _start_background_loop(
                     socketio,
                     sid,
                     run_id,
-                    'decision_required',
-                    step_result.decision_event,
+                    run_lock,
+                    backend_message,
+                    backend_status,
+                    backend_authoritative,
                 )
-                break
 
-            spd = state.get('speed', 1.0)
-            if spd > 0:
-                socketio.sleep(spd)
-
-    thread = socketio.start_background_task(run_loop)
+    try:
+        thread = socketio.start_background_task(run_task)
+    except Exception:
+        with _simulations_guard:
+            current = _simulations.get(sid)
+            if (
+                current is not None
+                and current.get('run_id') == run_id
+                and current.get('loop_generation') == loop_generation
+            ):
+                current['loop_exited'] = True
+        raise
     with _simulations_guard:
         current = _simulations.get(sid)
-        if current is not None and current.get('run_id') == run_id:
+        if (
+            current is not None
+            and current.get('run_id') == run_id
+            and current.get('loop_generation') == loop_generation
+        ):
             current['thread'] = thread
 
 
@@ -2403,7 +2986,7 @@ def register_events(socketio):
             return {"error": str(exc)}
 
     @socketio.on('disconnect')
-    def handle_disconnect():
+    def handle_disconnect(_reason=None):
         sid = request.sid
         _safe_log(f"Client disconnected: {sid}")
         _disconnect_simulation_client(socketio, sid)
@@ -2417,6 +3000,7 @@ def register_events(socketio):
         command_mode: bool = False,
         draft_mode: bool = False,
         replace_sid: str | None = None,
+        single_run_context: Mapping[str, object] | None = None,
     ):
         """
         Start a new simulation run.
@@ -2553,6 +3137,26 @@ def register_events(socketio):
                 'status': 'error',
                 'message': str(exc),
             }, 'invalid_run_input')
+        run_store = get_run_store()
+        parent_run_id = (
+            single_run_context.get('parent_run_id')
+            if isinstance(single_run_context, Mapping)
+            else None
+        )
+        if parent_run_id is not None:
+            try:
+                parent_artifact = run_store.load(str(parent_run_id))
+            except ValueError as exc:
+                return reject({
+                    'status': 'error',
+                    'message': str(exc),
+                }, 'invalid_parent_run_id')
+            if parent_artifact is None:
+                return reject({
+                    'status': 'error',
+                    'message': 'parent run not found',
+                }, 'run_not_found', 404)
+
         # Default is 'auto' (AlphaMELTS-preferred autodetect per
         # \goal BACKEND-DEFAULT-SWITCH). Explicit UI choices are still honoured.
         backend_name = data.get('backend', 'auto')
@@ -2693,7 +3297,6 @@ def register_events(socketio):
                 'validated_inputs': validated_inputs,
             }
 
-        run_store = get_run_store()
         runner_projector = PyrolysisRun(
             feedstock_id=session._config.feedstock_id,
             campaign=session._config.campaign,
@@ -2718,6 +3321,7 @@ def register_events(socketio):
 
         initial_state = {
             'http_owned': command_mode,
+            'submission_mode': 'http' if command_mode else 'socket',
             'backend_message': backend_message,
             'backend_status': resolution_status.backend_status,
             'backend_authoritative': resolution_status.authoritative,
@@ -2741,6 +3345,10 @@ def register_events(socketio):
                 runtime_campaign_overrides=runtime_campaign_overrides,
             ),
         }
+        if isinstance(single_run_context, Mapping):
+            initial_state['single_run'] = copy.deepcopy(
+                dict(single_run_context)
+            )
         if isinstance(cost_parameters, Mapping):
             initial_state['cost_parameters'] = copy.deepcopy(cost_parameters)
         if effective_config:
@@ -2986,6 +3594,7 @@ def register_events(socketio):
                 resume_loop = True
                 session.resume()
                 state['paused'] = False
+                state.pop('decision_waiting', None)
                 _emit_if_current(
                     socketio,
                     sid,

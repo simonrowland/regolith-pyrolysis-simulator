@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, replace
 import json
 import shlex
+import threading
 from typing import Any
 
 import pytest
@@ -64,8 +65,79 @@ class SurfaceResult:
     final_hour: int | None = None
 
 
-class StopAfterStep(Exception):
-    pass
+class StepwiseWebDriver:
+    def __init__(self) -> None:
+        self._condition = threading.Condition()
+        self._captured_tasks: list[tuple[object, tuple, dict]] = []
+        self._thread: threading.Thread | None = None
+        self._pause_count = 0
+        self._permits = 0
+        self._stopping = False
+        self._error: BaseException | None = None
+
+    def capture_background_task(self, target, *args, **kwargs):
+        with self._condition:
+            self._captured_tasks.append((target, args, kwargs))
+            capture_number = len(self._captured_tasks)
+        return {"captured_task": capture_number}
+
+    def sleep(self, seconds=0) -> None:
+        if not seconds or seconds <= 0:
+            return
+        with self._condition:
+            self._pause_count += 1
+            self._condition.notify_all()
+            self._condition.wait_for(
+                lambda: self._permits > 0 or self._stopping
+            )
+            if self._stopping:
+                return
+            self._permits -= 1
+
+    def step(self) -> None:
+        with self._condition:
+            pause_count = self._pause_count
+            if self._thread is None or not self._thread.is_alive():
+                assert self._captured_tasks
+                target, args, kwargs = self._captured_tasks[-1]
+                self._thread = threading.Thread(
+                    target=self._run_task,
+                    args=(target, args, kwargs),
+                    daemon=True,
+                )
+                self._thread.start()
+            else:
+                self._permits += 1
+                self._condition.notify_all()
+            self._condition.wait_for(
+                lambda: (
+                    self._pause_count > pause_count
+                    or self._error is not None
+                    or not self._thread.is_alive()
+                )
+            )
+            error = self._error
+        if error is not None:
+            raise error
+
+    def stop(self) -> None:
+        with self._condition:
+            self._stopping = True
+            self._condition.notify_all()
+            thread = self._thread
+        if thread is not None:
+            thread.join(timeout=30)
+            assert not thread.is_alive()
+
+    def _run_task(self, target, args, kwargs) -> None:
+        try:
+            target(*args, **kwargs)
+        except BaseException as exc:
+            with self._condition:
+                self._error = exc
+        finally:
+            with self._condition:
+                self._condition.notify_all()
 
 
 # gate-2: 3-surface drive at 301 s under load; ceiling includes slot-wait allowance.
@@ -252,7 +324,7 @@ def _run_cli_session() -> SurfaceResult:
 
 
 def _run_web_session(monkeypatch) -> SurfaceResult:
-    captured_tasks = _install_stepwise_web(monkeypatch)
+    stepwise_driver = _install_stepwise_web(monkeypatch)
     app = app_module.create_app()
     http_client = app.test_client()
     assert http_client.get("/").status_code == 200
@@ -311,10 +383,7 @@ def _run_web_session(monkeypatch) -> SurfaceResult:
         guard = 0
         while session_of().simulator.melt.hour < HOURS and guard < 1000:
             guard += 1
-            try:
-                captured_tasks[-1]()
-            except StopAfterStep:
-                pass
+            stepwise_driver.step()
             drain()
 
             if session_of().simulator.melt.hour >= HOURS:
@@ -339,36 +408,29 @@ def _run_web_session(monkeypatch) -> SurfaceResult:
             final_hour=session.simulator.melt.hour,
         )
     finally:
-        client.disconnect()
         for sid in list(web_events._simulations):
             web_events._clear_simulation_state(sid)
+        stepwise_driver.stop()
+        client.disconnect()
 
 
-def _install_stepwise_web(monkeypatch) -> list:
-    captured_tasks = []
+def _install_stepwise_web(monkeypatch) -> StepwiseWebDriver:
+    stepwise_driver = StepwiseWebDriver()
 
     def force_internal_analytical_backend(_backend_name):
         backend = InternalAnalyticalBackend()
         backend.initialize({})
         return backend
 
-    def capture_background_task(target, *args, **kwargs):
-        captured_tasks.append(target)
-        return {"captured_task": len(captured_tasks)}
-
-    def stop_after_step(seconds=0):
-        if seconds and seconds > 0:
-            raise StopAfterStep()
-
     monkeypatch.setattr(web_events, "_safe_log", lambda _message: None)
     monkeypatch.setattr(web_events, "_get_backend", force_internal_analytical_backend)
-    monkeypatch.setattr(app_module.socketio, "sleep", stop_after_step)
+    monkeypatch.setattr(app_module.socketio, "sleep", stepwise_driver.sleep)
     monkeypatch.setattr(
         app_module.socketio,
         "start_background_task",
-        capture_background_task,
+        stepwise_driver.capture_background_task,
     )
-    return captured_tasks
+    return stepwise_driver
 
 
 def _ledger_from_simulator(sim) -> dict[str, dict[str, float]]:

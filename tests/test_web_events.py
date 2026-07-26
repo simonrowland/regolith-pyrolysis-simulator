@@ -4356,9 +4356,9 @@ def test_simulation_tick_exposes_live_pot_and_flue_composition(monkeypatch):
         )
         assert tick["flue_composition_units"] == "kg/hr"
     finally:
-        client.disconnect()
         for sid in list(_simulations):
             _clear_simulation_state(sid)
+        client.disconnect()
 
 
 def test_web_failure_status_and_cleanup_survive_poison_enrichment_failure(
@@ -4648,9 +4648,9 @@ def test_optional_native_fe_nested_redox_payloads_reach_socket_and_recipe_captur
             pytest.approx(redox["native_fe_partition"]["native_fe_vapor_mol"])
         )
     finally:
-        client.disconnect()
         for sid in list(_simulations):
             _clear_simulation_state(sid)
+        client.disconnect()
 
 
 def test_simulation_tick_exposes_mass_balance_category_when_pct_none(
@@ -4726,9 +4726,9 @@ def test_simulation_tick_exposes_mass_balance_category_when_pct_none(
         assert tick["mass_balance_error_pct"] is None
         assert tick["mass_balance_error_category"] == "zero_input_basis_breach"
     finally:
-        client.disconnect()
         for sid in list(_simulations):
             _clear_simulation_state(sid)
+        client.disconnect()
 
 def test_socketio_c4_refusal_is_terminal_before_next_decision(
     monkeypatch,
