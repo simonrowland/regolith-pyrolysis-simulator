@@ -9,6 +9,14 @@ from types import SimpleNamespace
 
 import pytest
 
+from _pytest_session_safety import (
+    CHILD_HANDSHAKE_TIMEOUT_SECONDS,
+    SessionWatchdog,
+    gateway_child_label,
+    install_bounded_execnet_bootstrap,
+    install_bounded_gateway_rinfo,
+)
+
 
 def _safe_worker_id(worker_id: str) -> str:
     return re.sub(r"[^A-Za-z0-9_.-]", "_", worker_id) or "master"
@@ -57,6 +65,69 @@ def _configure_worker_cache_isolation() -> None:
 
 
 _configure_worker_cache_isolation()
+
+
+_SESSION_WATCHDOG: SessionWatchdog | None = None
+
+
+@pytest.hookimpl(tryfirst=True)
+def pytest_sessionstart(session: pytest.Session) -> None:
+    del session
+    if os.environ.get("PYTEST_XDIST_WORKER"):
+        return
+    global _SESSION_WATCHDOG
+    _SESSION_WATCHDOG = SessionWatchdog()
+    _SESSION_WATCHDOG.start()
+
+
+@pytest.hookimpl(optionalhook=True, tryfirst=True)
+def pytest_xdist_newgateway(gateway: object) -> None:
+    install_bounded_gateway_rinfo(gateway)
+
+
+@pytest.hookimpl(optionalhook=True)
+def pytest_xdist_setupnodes(config: pytest.Config, specs: list[object]) -> None:
+    del config, specs
+    install_bounded_execnet_bootstrap()
+
+
+@pytest.hookimpl(optionalhook=True)
+def pytest_configure_node(node: object) -> None:
+    if _SESSION_WATCHDOG is None:
+        return
+    gateway = node.gateway
+    _SESSION_WATCHDOG.arm_child_handshake(
+        key=gateway.id,
+        child=gateway_child_label(gateway),
+        phase="worker-ready",
+        process=gateway._io.popen,
+        timeout_seconds=CHILD_HANDSHAKE_TIMEOUT_SECONDS,
+    )
+
+
+@pytest.hookimpl(optionalhook=True)
+def pytest_testnodeready(node: object) -> None:
+    if _SESSION_WATCHDOG is not None:
+        _SESSION_WATCHDOG.disarm_child_handshake(node.gateway.id)
+
+
+@pytest.hookimpl(optionalhook=True)
+def pytest_testnodedown(node: object, error: object | None) -> None:
+    del error
+    if _SESSION_WATCHDOG is not None:
+        _SESSION_WATCHDOG.disarm_child_handshake(node.gateway.id)
+
+
+@pytest.hookimpl(trylast=True)
+def pytest_sessionfinish(
+    session: pytest.Session,
+    exitstatus: int | pytest.ExitCode,
+) -> None:
+    del session, exitstatus
+    global _SESSION_WATCHDOG
+    if _SESSION_WATCHDOG is not None:
+        _SESSION_WATCHDOG.stop()
+        _SESSION_WATCHDOG = None
 
 
 @pytest.fixture
