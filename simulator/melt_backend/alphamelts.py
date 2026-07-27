@@ -121,12 +121,50 @@ ALPHAMELTS_REASON_FO2_CONSTRAINT_UNAPPLIED = 'fo2_constraint_unapplied'
 ALPHAMELTS_REASON_SYSTEM_OUTPUT_MISSING = 'system_output_missing'
 ALPHAMELTS_REASON_PHASE_MASS_INCOMPLETE = 'phase_mass_incomplete'
 ALPHAMELTS_REASON_VAPOR_PROJECTION_EMPTY = 'vapor_projection_empty'
-ALPHAMELTS_EXECUTED_T_TOLERANCE_C = 0.01
+# MELTS-file temperature channel precision. Empirically (b-102 probe,
+# alphamelts2 2.3.1, 2026-07-27): the binary accepts full-precision
+# "Initial Temperature: 952.377371" and executes at float32(T) = 952.377380.
+# The previous :.1f channel quantized the request to 0.1 C and made the
+# isothermal guard unable to distinguish engine disobedience from our own
+# serialization (owner repro: 952.377371 → written 952.4 → executed
+# 952.400024 → typed executed_temperature_mismatch refusal).
+ALPHAMELTS_MELTS_FILE_TEMPERATURE_DECIMALS = 6
+# Isothermal guard residual: executed vs AS-SERIALIZED contract T.
+# IEEE-754 binary32 unit in the last place:
+#   ulp(T) = 2^(floor(log2(|T|)) - 23)
+# Furnace domain is |T| < 2^12 = 4096 C, so the coarsest ulp is
+#   ulp_max = 2^(11 - 23) = 2^-12 ≈ 2.44140625e-4 C.
+# Bound = 2 * ulp_max ≈ 4.8828125e-4 C. Checks:
+#   - observed residual at 952.377371 was 9.37e-6 (one stored float32 ulp)
+#   - a genuine 0.5 C engine mismatch still fails by ~1000x margin
+#   - this is NOT the old 0.01 hand-wave; it is the representation bound of
+#     the chosen (full-precision) channel after float32 engine storage.
+# The guard can now distinguish: channel-quantized residuals (float32 only)
+# pass; engine-disobedient T (wrong setpoint) refuse.
+ALPHAMELTS_EXECUTED_T_TOLERANCE_C = 2.0 * (2.0 ** (11 - 23))
+# System_main_tbl.txt prints Temperature to 2 decimal places (observed:
+# executed 952.377380 → table cell "952.38"). Table-vs-stdout consistency
+# uses that print quantum, not the float32 residual bound above.
+ALPHAMELTS_SYSTEM_TABLE_T_TOLERANCE_C = 0.01
 ALPHAMELTS_FO2_ECHO_TOLERANCE_LOG10 = 1.0e-6
 ALPHAMELTS_PHASE_MASS_DISPLAY_RESOLUTION_G = 0.001
 # alphaMELTS input serialization emits an oxide only above this wt% value.
 # Values at/below it are native zero-component cells, regardless of Python sign.
 ALPHAMELTS_MIN_EMITTED_COMPONENT_WT_PCT = 0.001
+
+
+def serialize_melts_file_temperature_C(temperature_C: float) -> float:
+    """Round a request once to the MELTS-file channel precision.
+
+    The returned value is the isothermal contract temperature: it is what
+    ``_write_melts_file`` emits, what the isothermal guard compares against,
+    and what any cache key for this channel must use. Double-serializing is
+    idempotent at ``ALPHAMELTS_MELTS_FILE_TEMPERATURE_DECIMALS``.
+    """
+    value = float(temperature_C)
+    return float(
+        f'{value:.{ALPHAMELTS_MELTS_FILE_TEMPERATURE_DECIMALS}f}'
+    )
 
 ALPHAMELTS_BACKEND_FAILURE_REASON_CODE_KEY = 'backend_failure_reason_code'
 ALPHAMELTS_BACKEND_FAILURE_CATEGORY_KEY = 'backend_failure_category'
@@ -2242,11 +2280,19 @@ class _MELTSBackendSupport(MeltBackend):
         with tempfile.TemporaryDirectory() as tmpdir:
             # Write .melts file
             melts_path = Path(tmpdir) / 'input.melts'
-            calculation_temperature_C = requested_temperature_C
+            # Single contract T for this channel: serialize once, then write /
+            # env / isothermal guard / result diagnostics all use this value.
+            # Cache keys that name this equilibrium must use the same contract
+            # (keyed T == executed-contract T); do not re-quantize elsewhere.
+            calculation_temperature_C = serialize_melts_file_temperature_C(
+                requested_temperature_C
+            )
             if run_mode is AlphaMELTSSubprocessRunMode.LIQUIDUS_FINDER:
-                calculation_temperature_C = max(
-                    calculation_temperature_C,
-                    ALPHAMELTS_LIQUIDUS_SEED_TEMPERATURE_C,
+                calculation_temperature_C = serialize_melts_file_temperature_C(
+                    max(
+                        calculation_temperature_C,
+                        ALPHAMELTS_LIQUIDUS_SEED_TEMPERATURE_C,
+                    )
                 )
             calculation_pressure_bar = requested_pressure_bar
             result_warnings = list(warnings or [])
@@ -2278,8 +2324,10 @@ class _MELTSBackendSupport(MeltBackend):
             env.setdefault('ALPHAMELTS_CALC_MODE', 'MELTS')
             env['ALPHAMELTS_RUN_MODE'] = 'isobaric'
             env['ALPHAMELTS_DELTAT'] = '0'
-            env['ALPHAMELTS_MINT'] = f'{calculation_temperature_C:.12g}'
-            env['ALPHAMELTS_MAXT'] = f'{calculation_temperature_C:.12g}'
+            # Same contract value as the .melts file (not a second quantization).
+            _t_fmt = f'.{ALPHAMELTS_MELTS_FILE_TEMPERATURE_DECIMALS}f'
+            env['ALPHAMELTS_MINT'] = format(calculation_temperature_C, _t_fmt)
+            env['ALPHAMELTS_MAXT'] = format(calculation_temperature_C, _t_fmt)
             env['ALPHAMELTS_CELSIUS_OUTPUT'] = 'true'
 
             # Run alphaMELTS directly. The alphaMELTS 2 app runner only
@@ -2340,7 +2388,10 @@ class _MELTSBackendSupport(MeltBackend):
                 )
             eq = self._parse_single_point_stdout(
                 f'{result.stdout}\n{result.stderr}',
-                requested_temperature_C=requested_temperature_C,
+                # Guard compares executed vs the as-serialized contract T
+                # (channel precision + float32 residual), not the raw caller
+                # float before serialization.
+                requested_temperature_C=calculation_temperature_C,
                 pressure_bar=calculation_pressure_bar,
                 fO2_log=fO2_log,
                 total_input_kg=total_input_kg,
@@ -2388,14 +2439,26 @@ class _MELTSBackendSupport(MeltBackend):
     def _write_melts_file(self, path: Path, comp_wt: dict,
                            T_C: float, P_bar: float, *,
                            fO2_path: str, fO2_offset: float):
-        """Write a .melts input file for alphaMELTS."""
+        """Write a .melts input file for alphaMELTS.
+
+        Temperature is always emitted at
+        ``ALPHAMELTS_MELTS_FILE_TEMPERATURE_DECIMALS`` (full channel precision;
+        see ``serialize_melts_file_temperature_C``). Callers that own the
+        isothermal contract must pass the already-serialized contract T so
+        write / guard / cache key share one value; this helper re-serializes
+        idempotently as a safety net.
+        """
         lines = ['Title: regolith_pyrolysis_simulator']
         for oxide, wt in sorted(comp_wt.items()):
             if wt > ALPHAMELTS_MIN_EMITTED_COMPONENT_WT_PCT:
                 # Map our oxide names to MELTS format
                 melts_name = oxide.replace('2O3', '2O3').replace('2O', '2O')
                 lines.append(f'Initial Composition: {melts_name} {wt:.4f}')
-        lines.append(f'Initial Temperature: {T_C:.1f}')
+        contract_T_C = serialize_melts_file_temperature_C(T_C)
+        lines.append(
+            f'Initial Temperature: '
+            f'{contract_T_C:.{ALPHAMELTS_MELTS_FILE_TEMPERATURE_DECIMALS}f}'
+        )
         lines.append(f'Initial Pressure: {P_bar:.6g}')
         lines.append(f'Log fO2 Path: {fO2_path}')
         lines.append(f'Log fO2 Offset: {fO2_offset:.12g}')
@@ -3082,6 +3145,11 @@ class _MELTSBackendSupport(MeltBackend):
             )
         executed_temperature_C = executed_temperatures_C[-1]
         if run_mode is AlphaMELTSSubprocessRunMode.ISOTHERMAL:
+            # Compare executed vs the as-serialized contract request (channel
+            # precision ALPHAMELTS_MELTS_FILE_TEMPERATURE_DECIMALS). Tolerance
+            # is the float32 representation bound of that channel — not a
+            # hand-widened window. Distinguishes: (pass) engine stored the
+            # contract T in binary32; (refuse) engine ran a different T.
             mismatches = [
                 value for value in executed_temperatures_C
                 if not math.isclose(
@@ -3110,13 +3178,14 @@ class _MELTSBackendSupport(MeltBackend):
                 float(table_temperature_C),
                 executed_temperature_C,
                 rel_tol=0.0,
-                abs_tol=ALPHAMELTS_EXECUTED_T_TOLERANCE_C,
+                abs_tol=ALPHAMELTS_SYSTEM_TABLE_T_TOLERANCE_C,
             )
         ):
             raise _alphamelts_backend_failure_error(
                 ALPHAMELTS_REASON_EXECUTED_T_MISMATCH,
                 f'stdout={executed_temperature_C:.9g} C; '
-                f'system_table={float(table_temperature_C):.9g} C',
+                f'system_table={float(table_temperature_C):.9g} C; '
+                f'table_tolerance={ALPHAMELTS_SYSTEM_TABLE_T_TOLERANCE_C:g} C',
             )
         property_diagnostics = {
             key: system_values[key]

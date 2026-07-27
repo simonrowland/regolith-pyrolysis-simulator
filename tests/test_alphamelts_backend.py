@@ -28,6 +28,9 @@ from simulator.accounting.formulas import resolve_species_formula
 from simulator.core import CampaignPhase, PyrolysisSimulator
 from simulator.backends import BackendSelectionPolicy, resolve_backend
 from simulator.melt_backend.alphamelts import (
+    ALPHAMELTS_EXECUTED_T_TOLERANCE_C,
+    ALPHAMELTS_MELTS_FILE_TEMPERATURE_DECIMALS,
+    ALPHAMELTS_REASON_EXECUTED_T_MISMATCH,
     ALPHAMELTS_REASON_MISSING_BINARY,
     ALPHAMELTS_REASON_NONZERO_EXIT,
     ALPHAMELTS_REASON_NO_CONVERGENCE,
@@ -41,6 +44,7 @@ from simulator.melt_backend.alphamelts import (
     AlphaMELTSSubprocessContractError,
     AlphaMELTSSubprocessRunMode,
     activity_from_chem_potential,
+    serialize_melts_file_temperature_C,
 )
 from simulator.melt_backend.base import (
     EquilibriumResult,
@@ -886,6 +890,347 @@ def test_alphamelts_subprocess_isothermal_rejects_executed_temperature_mismatch(
             system_output=_system_main_fixture(temperature_C=1300.0),
             fO2_constraint={'path': 'Absolute', 'offset': -9.0},
         )
+
+
+def test_alphamelts_isothermal_guard_rejects_half_degree_genuine_mismatch():
+    """Guard still catches engine disobedience (0.5 C off contract)."""
+    backend = AlphaMELTSBackend()
+    contract_T = serialize_melts_file_temperature_C(952.377371)
+    executed_T = contract_T + 0.5
+    output = (
+        '<> Stable liquid assemblage achieved.\n'
+        'Initial alphaMELTS calculation at: P 1.000000 (bars), '
+        f'T {executed_T:.6f} (C)\n'
+        'liquid: SiO2\n100.0 g 100.0\nMelt fraction = 1.0\n'
+    )
+
+    with pytest.raises(
+        AlphaMELTSSubprocessContractError,
+        match='other than the isothermal request',
+    ) as excinfo:
+        backend._parse_single_point_stdout(
+            output,
+            requested_temperature_C=contract_T,
+            pressure_bar=1.0,
+            fO2_log=-9.0,
+            total_input_kg=100.0,
+            run_mode=AlphaMELTSSubprocessRunMode.ISOTHERMAL,
+            system_output=_system_main_fixture(temperature_C=executed_T),
+            fO2_constraint={'path': 'Absolute', 'offset': -9.0},
+        )
+
+    assert excinfo.value.backend_failure_reason_code == (
+        ALPHAMELTS_REASON_EXECUTED_T_MISMATCH
+    )
+
+
+def test_alphamelts_isothermal_guard_accepts_float32_residual_of_contract_T():
+    """Executed float32(contract T) is channel noise, not a mismatch."""
+    import struct
+
+    backend = AlphaMELTSBackend()
+    contract_T = serialize_melts_file_temperature_C(952.377371)
+    executed_T = struct.unpack('f', struct.pack('f', contract_T))[0]
+    assert abs(executed_T - contract_T) <= ALPHAMELTS_EXECUTED_T_TOLERANCE_C
+    assert abs(executed_T - contract_T) > 0.0  # genuinely non-identical
+    output = (
+        '<> Stable liquid assemblage achieved.\n'
+        'Initial alphaMELTS calculation at: P 1.000000 (bars), '
+        f'T {executed_T:.9f} (C)\n'
+        'liquid: SiO2\n100.0 g 100.0\nMelt fraction = 1.0\n'
+    )
+
+    result = backend._parse_single_point_stdout(
+        output,
+        requested_temperature_C=contract_T,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        total_input_kg=0.1,
+        run_mode=AlphaMELTSSubprocessRunMode.ISOTHERMAL,
+        system_output=_system_main_fixture(temperature_C=executed_T),
+        fO2_constraint={'path': 'Absolute', 'offset': -9.0},
+    )
+
+    assert result.status == 'ok'
+    assert result.temperature_C == pytest.approx(executed_T)
+    assert result.diagnostics['executed_temperature_C'] == pytest.approx(
+        executed_T
+    )
+    assert result.diagnostics['requested_temperature_C'] == pytest.approx(
+        contract_T
+    )
+
+
+def test_alphamelts_melts_file_serializes_full_precision_contract_T(tmp_path):
+    """Channel writes .6f contract T (not the legacy 0.1 C quantization)."""
+    backend = AlphaMELTSBackend()
+    raw_T = 952.377371
+    contract_T = serialize_melts_file_temperature_C(raw_T)
+    assert ALPHAMELTS_MELTS_FILE_TEMPERATURE_DECIMALS == 6
+    assert contract_T == pytest.approx(952.377371)
+    path = tmp_path / 'input.melts'
+    backend._write_melts_file(
+        path,
+        _melts_domain_composition(),
+        raw_T,
+        1.0,
+        fO2_path='Absolute',
+        fO2_offset=-9.0,
+    )
+    text = path.read_text()
+    assert f'Initial Temperature: {contract_T:.6f}' in text
+    assert 'Initial Temperature: 952.4' not in text
+    assert 'Initial Temperature: 952.377371' in text
+
+
+def test_alphamelts_temperature_contract_matches_cache_key_value(monkeypatch):
+    """Production path: raw >6-decimal T shares one identity across the channel.
+
+    b-102 P1: a raw grid float (e.g. 952.377371490) must not key cache-v2 at a
+    different identity than the adapter's 6-decimal MELTS serialization
+    (952.377371). Feed the raw value through real grid input/key construction
+    and assert:
+
+      queued request T
+        == cache-v2 canonical / key T
+        == .melts serialized T
+        == ALPHAMELTS_MINT / MAXT
+        == isothermal guard T
+    """
+    import json
+    import struct
+    from types import SimpleNamespace
+
+    from scripts.grid_pregrind import GridPoint, point_inputs
+    from scripts.grid_pregrind_writer import (
+        cache_v2_key_hash,
+        canonical_input_vector,
+    )
+
+    # Reviewer repro: raw vs serialized delta ~4.9e-7 C.
+    raw_T = 952.377371490
+    contract_T = serialize_melts_file_temperature_C(raw_T)
+    assert contract_T != raw_T
+    assert abs(raw_T - contract_T) == pytest.approx(4.9e-7, abs=1e-10)
+    assert serialize_melts_file_temperature_C(contract_T) == contract_T
+
+    point = GridPoint(
+        ordinal=0,
+        temperature_C=raw_T,
+        intended_fO2_log=-9.0,
+        pressure_bar=1.0,
+        composition_wt_pct={
+            'SiO2': 50.0,
+            'FeO': 25.0,
+            'MgO': 25.0,
+        },
+    )
+    args = SimpleNamespace(
+        backend='subprocess',
+        model='MELTSv1.0.2',
+        timeout_s=20.0,
+        thermoengine_health_timeout_s=8.0,
+    )
+    inputs = point_inputs(point, args)
+
+    # 1) Queued request T is the contract (not the raw grid float).
+    queued_T = inputs['temperature_C']
+    assert queued_T == contract_T
+    assert inputs['kress91_partition_provenance']['requested_temperature_C'] == (
+        contract_T
+    )
+
+    # 2) cache-v2 canonical vector + key hash identity use the same contract T.
+    canonical = json.loads(canonical_input_vector(inputs))
+    assert canonical['temperature_C'] == contract_T
+    contract_inputs = dict(inputs)
+    contract_inputs['temperature_C'] = contract_T
+    assert cache_v2_key_hash(inputs) == cache_v2_key_hash(contract_inputs)
+    # Distinct from a key built on the raw float (the bug class).
+    raw_keyed = dict(inputs)
+    raw_keyed['temperature_C'] = raw_T
+    assert cache_v2_key_hash(raw_keyed) != cache_v2_key_hash(inputs)
+
+    # 3) Adapter melts file + MINT/MAXT + guard request share that contract T.
+    backend = AlphaMELTSBackend()
+    backend._mode = 'subprocess'
+    backend._binary_path = Path('/tmp/fake-alphamelts')
+    seen: dict = {}
+    executed_T = struct.unpack('f', struct.pack('f', contract_T))[0]
+    assert abs(executed_T - contract_T) <= ALPHAMELTS_EXECUTED_T_TOLERANCE_C
+
+    def fake_run(*args, **kwargs):
+        if args[0][-1] == '--version':
+            return types.SimpleNamespace(
+                returncode=0, stdout='alphaMELTS fake\n', stderr='',
+            )
+        seen['env'] = dict(kwargs['env'])
+        seen['input_melts'] = (
+            Path(kwargs['cwd']) / 'input.melts'
+        ).read_text()
+        (Path(kwargs['cwd']) / 'System_main_tbl.txt').write_text(
+            _system_main_fixture(temperature_C=executed_T)
+        )
+        (Path(kwargs['cwd']) / 'Phase_main_tbl.txt').write_text(
+            f'index 1 Pressure 1.00 Temperature {executed_T:.6f} SiO2 Al2O3 '
+            f'FeO MgO CaO Na2O\n'
+            f'liquid1 100.0 -1059377.1 268.91 34.56 143.47 1.409 '
+            f'50 15 10 10 10 5\n'
+        )
+        (Path(kwargs['cwd']) / 'Solid_comp_tbl.txt').write_text(
+            f'index Pressure Temperature mass SiO2 Al2O3 FeO MgO CaO Na2O\n'
+            f'1 1.00 {executed_T:.6f} 0.0 ---\n'
+        )
+        (Path(kwargs['cwd']) / 'Bulk_comp_tbl.txt').write_text(
+            f'index Pressure Temperature mass SiO2 Al2O3 FeO MgO CaO Na2O\n'
+            f'1 1.00 {executed_T:.6f} 100.0 50 15 10 10 10 5\n'
+        )
+        (Path(kwargs['cwd']) / 'Liquid_comp_tbl.txt').write_text(
+            f'index Pressure Temperature mass SiO2 Al2O3 FeO MgO CaO Na2O\n'
+            f'1 1.00 {executed_T:.6f} 100.0 50 15 10 10 10 5\n'
+        )
+        return types.SimpleNamespace(
+            returncode=0,
+            stdout=(
+                '<> Stable liquid assemblage achieved.\n'
+                'Initial alphaMELTS calculation at: P 1.000000 (bars), '
+                f'T {executed_T:.9f} (C)\n'
+                'liquid: SiO2 Al2O3 FeO MgO CaO Na2O\n'
+                '100.0 g 50 15 10 10 10 5\n'
+                'Melt fraction = 1.0\n'
+            ),
+            stderr='',
+        )
+
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts.subprocess.run',
+        fake_run,
+    )
+    monkeypatch.setattr(
+        backend,
+        '_builtin_vapor_projection_for_subprocess',
+        lambda _eq: (
+            {'Na': 1.0},
+            {'Na': 'builtin_authoritative:test'},
+            {'vapor_pressures_Pa': {'Na': 1.0}},
+        ),
+    )
+
+    # Drive the adapter with the queued (contract) T from grid construction —
+    # the production worker path passes job.inputs["temperature_C"].
+    result = backend.equilibrate(
+        temperature_C=queued_T,
+        composition_kg=_melts_domain_composition(),
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        subprocess_run_mode='isothermal',
+    )
+
+    assert f'Initial Temperature: {contract_T:.6f}' in seen['input_melts']
+    assert seen['env']['ALPHAMELTS_MINT'] == f'{contract_T:.6f}'
+    assert seen['env']['ALPHAMELTS_MAXT'] == f'{contract_T:.6f}'
+    assert result.status == 'ok'
+    guard_T = result.diagnostics['requested_temperature_C']
+    assert guard_T == pytest.approx(contract_T)
+    assert result.diagnostics['executed_temperature_C'] == pytest.approx(
+        executed_T
+    )
+
+    # Single identity across the full channel.
+    assert queued_T == contract_T
+    assert canonical['temperature_C'] == contract_T
+    assert seen['env']['ALPHAMELTS_MINT'] == f'{queued_T:.6f}'
+    assert guard_T == pytest.approx(queued_T)
+
+
+def test_alphamelts_subprocess_emits_contract_T_to_melts_and_env(monkeypatch):
+    """Boundary serializes once; melts file + MINT/MAXT share that value."""
+    backend = AlphaMELTSBackend()
+    backend._mode = 'subprocess'
+    backend._binary_path = Path('/tmp/fake-alphamelts')
+    seen = {}
+    raw_T = 952.377371
+    contract_T = serialize_melts_file_temperature_C(raw_T)
+    # Engine float32 residual of the contract (the b-102 owner residual shape).
+    import struct
+    executed_T = struct.unpack('f', struct.pack('f', contract_T))[0]
+
+    def fake_run(*args, **kwargs):
+        if args[0][-1] == '--version':
+            return types.SimpleNamespace(
+                returncode=0, stdout='alphaMELTS fake\n', stderr='',
+            )
+        seen['env'] = dict(kwargs['env'])
+        seen['input_melts'] = (
+            Path(kwargs['cwd']) / 'input.melts'
+        ).read_text()
+        (Path(kwargs['cwd']) / 'System_main_tbl.txt').write_text(
+            _system_main_fixture(temperature_C=executed_T)
+        )
+        (Path(kwargs['cwd']) / 'Phase_main_tbl.txt').write_text(
+            f'index 1 Pressure 1.00 Temperature {executed_T:.6f} SiO2 Al2O3 '
+            f'FeO MgO CaO Na2O\n'
+            f'liquid1 100.0 -1059377.1 268.91 34.56 143.47 1.409 '
+            f'50 15 10 10 10 5\n'
+        )
+        (Path(kwargs['cwd']) / 'Solid_comp_tbl.txt').write_text(
+            f'index Pressure Temperature mass SiO2 Al2O3 FeO MgO CaO Na2O\n'
+            f'1 1.00 {executed_T:.6f} 0.0 ---\n'
+        )
+        (Path(kwargs['cwd']) / 'Bulk_comp_tbl.txt').write_text(
+            f'index Pressure Temperature mass SiO2 Al2O3 FeO MgO CaO Na2O\n'
+            f'1 1.00 {executed_T:.6f} 100.0 50 15 10 10 10 5\n'
+        )
+        (Path(kwargs['cwd']) / 'Liquid_comp_tbl.txt').write_text(
+            f'index Pressure Temperature mass SiO2 Al2O3 FeO MgO CaO Na2O\n'
+            f'1 1.00 {executed_T:.6f} 100.0 50 15 10 10 10 5\n'
+        )
+        return types.SimpleNamespace(
+            returncode=0,
+            stdout=(
+                '<> Stable liquid assemblage achieved.\n'
+                'Initial alphaMELTS calculation at: P 1.000000 (bars), '
+                f'T {executed_T:.9f} (C)\n'
+                'liquid: SiO2 Al2O3 FeO MgO CaO Na2O\n'
+                '100.0 g 50 15 10 10 10 5\n'
+                'Melt fraction = 1.0\n'
+            ),
+            stderr='',
+        )
+
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts.subprocess.run',
+        fake_run,
+    )
+    monkeypatch.setattr(
+        backend,
+        '_builtin_vapor_projection_for_subprocess',
+        lambda _eq: (
+            {'Na': 1.0},
+            {'Na': 'builtin_authoritative:test'},
+            {'vapor_pressures_Pa': {'Na': 1.0}},
+        ),
+    )
+
+    result = backend.equilibrate(
+        temperature_C=raw_T,
+        composition_kg=_melts_domain_composition(),
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        subprocess_run_mode='isothermal',
+    )
+
+    assert f'Initial Temperature: {contract_T:.6f}' in seen['input_melts']
+    assert seen['env']['ALPHAMELTS_MINT'] == f'{contract_T:.6f}'
+    assert seen['env']['ALPHAMELTS_MAXT'] == f'{contract_T:.6f}'
+    assert result.status == 'ok'
+    assert result.temperature_C == pytest.approx(executed_T)
+    assert result.diagnostics['requested_temperature_C'] == pytest.approx(
+        contract_T
+    )
+    assert result.diagnostics['executed_temperature_C'] == pytest.approx(
+        executed_T
+    )
 
 
 def test_alphamelts_subprocess_no_phase_still_rejects_temperature_mismatch():
@@ -5159,6 +5504,55 @@ def test_project_local_alphamelts_cold_c0_step_returns_when_installed():
     # and 32.6 s (gate-1 under load). Budget = measured ~32 s x 1.4 headroom
     # ~= 45 s; still a COLD-path-only cost that warm pools never pay.
     assert elapsed_s < 45.0
+
+
+@pytest.mark.live_engine
+def test_live_alphamelts_non_tenth_T_roundtrips_without_isothermal_refusal():
+    """b-102 regression: non-0.1-representable T through a real subprocess.
+
+    Owner repro: 952.377371 was written as 952.4 under the old :.1f channel
+    and the guard refused the float32 echo 952.400024. Full-precision
+    serialization must round-trip without executed_temperature_mismatch.
+    """
+    backend = AlphaMELTSBackend()
+    try:
+        available = backend.initialize({'mode': 'subprocess'})
+    except ImportError as exc:
+        pytest.skip(f"project-local alphaMELTS app is not installed: {exc}")
+    if not available:
+        pytest.skip("project-local alphaMELTS app is not installed")
+
+    raw_T = 952.377371
+    contract_T = serialize_melts_file_temperature_C(raw_T)
+    try:
+        result = backend.equilibrate(
+            temperature_C=raw_T,
+            composition_kg=_melts_domain_composition(),
+            fO2_log=-8.0,
+            pressure_bar=1.0,
+            subprocess_run_mode='isothermal',
+        )
+    except AlphaMELTSSubprocessContractError as exc:
+        if getattr(exc, 'backend_failure_reason_code', None) == (
+            ALPHAMELTS_REASON_EXECUTED_T_MISMATCH
+        ):
+            raise AssertionError(
+                'isothermal guard refused a non-0.1-representable T that the '
+                f'full-precision channel should accept: {exc}'
+            ) from exc
+        if getattr(exc, 'backend_status_reason', None) == 'timeout':
+            pytest.skip('AlphaMELTS live subprocess timed out')
+        # Other contract failures (parse, pressure, ...) are orthogonal.
+        raise
+
+    executed = result.diagnostics.get('executed_temperature_C')
+    if executed is not None:
+        assert abs(float(executed) - contract_T) <= (
+            ALPHAMELTS_EXECUTED_T_TOLERANCE_C
+        )
+    # Chemistry status may be ok or out_of_domain; the bug was the typed
+    # isothermal refusal, not melt fraction at this T.
+    assert result.status in {'ok', 'out_of_domain'}
 
 
 def test_no_mode_marks_status_unavailable():

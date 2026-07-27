@@ -465,8 +465,9 @@ def build_grid_points(
         if not has_iron:
             eligible_kress91_iron_free += 1
             continue
+        # Same contract T as domain filter / queue inputs (AlphaMELTS channel).
         record = kress91_partition_authority_record(
-            temperature_C=candidate.temperature_C
+            temperature_C=alphamelts_grid_temperature_C(candidate.temperature_C)
         )
         eligible_kress91_computed += 1
         eligible_kress91_floor_adjusted += int(bool(record["adjusted"]))
@@ -635,13 +636,30 @@ def kress91_partition_authority_record(
     }
 
 
+def alphamelts_grid_temperature_C(temperature_C: float) -> float:
+    """Normalize subprocess-grid T to the AlphaMELTS MELTS-file contract.
+
+    The adapter serializes request T to
+    ``ALPHAMELTS_MELTS_FILE_TEMPERATURE_DECIMALS`` before writing `.melts`,
+    setting ``ALPHAMELTS_MINT``/``MAXT``, and running the isothermal guard.
+    Queue inputs, cache-v2 keys, and temperature-dependent Kress91 partitioning
+    must use that same contract identity so one executed setpoint cannot split
+    into distinct cache keys (b-102 P1).
+    """
+    from simulator.melt_backend.alphamelts import serialize_melts_file_temperature_C
+
+    return serialize_melts_file_temperature_C(temperature_C)
+
+
 def alphamelts_queue_domain_reason(point: GridPoint) -> str | None:
     """Return the canonical AlphaMELTS domain reason for a generated point."""
     from simulator.accounting.formulas import resolve_species_formula
 
+    # Domain filter composition is Kress91-partitioned at the same contract T
+    # the queue will later key and execute (not the raw grid float).
     composition_mol = kress91_partitioned_composition_mol(
         point.composition_wt_pct,
-        temperature_C=point.temperature_C,
+        temperature_C=alphamelts_grid_temperature_C(point.temperature_C),
         intended_fO2_log=point.intended_fO2_log,
         pressure_bar=point.pressure_bar,
     )
@@ -686,12 +704,21 @@ def point_inputs(point: GridPoint, args: argparse.Namespace) -> dict[str, Any]:
         effective_vapor_pressure_provider_selection,
     )
 
+    backend_name = str(getattr(args, "backend", "subprocess"))
+    # Subprocess AlphaMELTS re-serializes T at the MELTS-file channel; normalize
+    # once here so queue input, cache-v2 key identity, and Kress91 partition T
+    # name the same executed setpoint (b-102 P1). ThermoEngine has no MELTS
+    # channel, so its grid T is left as provided.
+    temperature_C = float(point.temperature_C)
+    if backend_name == "subprocess":
+        temperature_C = alphamelts_grid_temperature_C(temperature_C)
+
     partition_provenance = kress91_partition_authority_record(
-        temperature_C=point.temperature_C,
+        temperature_C=temperature_C,
     )
     composition_mol = kress91_partitioned_composition_mol(
         point.composition_wt_pct,
-        temperature_C=point.temperature_C,
+        temperature_C=temperature_C,
         intended_fO2_log=point.intended_fO2_log,
         pressure_bar=point.pressure_bar,
     )
@@ -704,7 +731,7 @@ def point_inputs(point: GridPoint, args: argparse.Namespace) -> dict[str, Any]:
         else 2.0 * composition_mol.get("Fe2O3", 0.0) / total_fe_mol
     )
     values: dict[str, Any] = {
-        "temperature_C": point.temperature_C,
+        "temperature_C": temperature_C,
         "kress91_partition_provenance": partition_provenance,
         "kress91_fixed_ferric_fraction": fixed_ferric_fraction,
         "composition_kg": None,
@@ -722,7 +749,7 @@ def point_inputs(point: GridPoint, args: argparse.Namespace) -> dict[str, Any]:
         "species_formula_registry": None,
         "mode": (
             "subprocess"
-            if str(getattr(args, "backend", "subprocess")) == "subprocess"
+            if backend_name == "subprocess"
             else "thermoengine"
         ),
         # cache_v2 keeps the historical field name, but the value describes
