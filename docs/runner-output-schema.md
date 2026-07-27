@@ -86,6 +86,7 @@ the in-process P6a trace harness used by the CLI-boundary parity test.
   "run_metadata": {...},        // see "Run metadata"
   "final_state": {...},         // see "Final state"
   "final": {...},               // see "Final summary"
+  "yield_disposition": {...} | null, // see "Yield disposition"
   "product_classification": {   // see "Product classification"
     "classification": {...},
     "markdown": "# Three-Product-Class Report\n..."
@@ -167,6 +168,29 @@ Statuses are `match`, `mismatch`, `unsupported-observable`,
 values live only in the independent sidecar. Qualitative or spatial
 observations carry `observed` plus `represented`/`not-representable`; they
 cannot carry numeric scores or residuals.
+
+## Yield disposition
+
+`yield_disposition` is the origin-first, mol-atom terminal partition
+(`schema_version: "5.0"`). `fraction_table.rows` assigns every feedstock
+element across the twelve declared `destination_bins`; `nodes` and `links`
+carry the same partition for charting. `terminal_species_streams` preserves
+the account, species, destination, material origin, and attribution method
+behind those element totals. `reagent_cycle` reports reagent atoms separately
+so they cannot inflate feedstock yield.
+
+`melt_retained_subdispositions` partitions retained melt into exactly
+`oxide_unextracted`, `refractory_rump`, `residual_reductant`, and
+`stage0_slag`. Its `refractory_rump` membership is the same canonical oxide
+set used by `terminal_product_taxonomy.physical_composition.class_kg`
+`refractory_oxides`; SiO2 remains the separate `silicate_residual` taxonomy
+class and therefore routes to `oxide_unextracted` here.
+
+Every fraction row closes to one within `5.0e-14`, and
+`closure.maximum_residual_fraction` has the same ceiling. Attribution methods
+are `tracked` or `pool_ratio`; terminal species streams may additionally use
+`origin_unattributed` for a typed, bounded unresolved-origin amount. A producer
+refusal emits `yield_disposition: null` without masking the primary run status.
 
 ## Product classification
 

@@ -12,6 +12,7 @@ from typing import Any, Callable
 from simulator.accounting.exceptions import OriginUnresolvedError
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.accounting.lots import allocate_pool_withdrawal
+from simulator.accounting.queries import TERMINAL_RUMP_REFRACTORY_OXIDES
 
 
 YIELD_DISPOSITION_SCHEMA_VERSION = "5.0"
@@ -74,9 +75,6 @@ _CONDENSATION_ACCOUNT = "process.condensation_train"
 _CLEANUP_CAMPAIGNS = frozenset({"C0", "C0B"})
 _CONDENSATION_AMALGAMATED_ELEMENTS = frozenset({"Na", "K"})
 _WALL_PREFIX = "process.wall_deposit_segment_"
-_REFRACTORY_RUMP_SPECIES = frozenset(
-    {"Al2O3", "CaO", "Cr2O3", "MgO", "REE_oxides", "SiO2", "TiO2"}
-)
 _CLOSURE_LIMIT_FRACTION = 5.0e-14
 _ATOM_EPS = 1.0e-18
 _ORIGIN_UNATTRIBUTED = "origin_unattributed"
@@ -677,12 +675,12 @@ def _account_portions(
         "refractory_rump": {
             species: amount
             for species, amount in species_mol.items()
-            if species in _REFRACTORY_RUMP_SPECIES
+            if species in TERMINAL_RUMP_REFRACTORY_OXIDES
         },
         "oxide_unextracted": {
             species: amount
             for species, amount in species_mol.items()
-            if species not in _REFRACTORY_RUMP_SPECIES
+            if species not in TERMINAL_RUMP_REFRACTORY_OXIDES
         },
     }
     group_atoms = {

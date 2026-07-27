@@ -1,0 +1,36 @@
+# Analog source: data/optimize_profiles/lunar_mare_high_ti.yaml.
+# Simulant-specific adjustment: MLS-1A uses the same Ti-rich mare objective mix;
+# only ids/text/feedstock are changed for the Hill et al. 2007 composition.
+# H1 scope note: internal-analytical/fast/high/auto share the existing physics constraint posture;
+# the H1/G3 backend-honesty gate is deferred and not closed by this profile.
+profile_id: lunar-mls-1a-objectives-v1
+profile_schema_version: profile-schema-v1
+feedstock: lunar_mls_1a
+description: MLS-1A Ti-rich mare simulant; bias toward metal recovery while keeping O2 and glass useful.
+north_star_rationale: MLS-1A is a source-captured high-Ti mare simulant, so reuse the high-Ti mare search shape while preserving its paper-simulant and unreported-balance caveats.
+objective_emphasis: Metal-heavy mare profile for source-captured MLS-1A.
+objectives:
+  - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.36, rationale: Fe/Ti-bearing metal proxy}
+  - {metric: oxygen_kg, sense: maximize, units: kg, weight: 0.26, rationale: oxidizer output}
+  - {metric: pure_silica_glass_kg, sense: maximize, units: kg, weight: 0.16, rationale: glass co-product}
+  - {metric: energy_electrical_plus_evaporation_kWh, sense: minimize, units: kWh, weight: 0.14, rationale: MRE backpressure cost}
+  - {metric: duration_h, sense: minimize, units: h, weight: 0.08, rationale: campaign time}
+constraints:
+  gates: [delivered_stream_purity, coating, extraction_completeness, knudsen_viscous, furnace_temperature]
+run: {campaign: C0, hours: 1, mass_kg: 1000.0, backend_name: internal-analytical}
+fidelities:
+  internal-analytical: {backend_name: internal-analytical, hours: 1}
+  fast: {backend_name: internal-analytical, hours: 1}
+  high: {backend_name: internal-analytical, hours: 1}
+  auto: {backend_name: internal-analytical, hours: 1}
+seed_recipes:
+  - id: mls1a-mare-high-ti-mre-seed
+    source_campaign: C5
+    rationale: Use the high-Ti mare limited-MRE backpressure window for the Ti-rich MLS-1A analog.
+    patch:
+      campaigns:
+        C5:
+          temp_range_C: [1500, 1650]
+          pO2_bar: [0.01, 0.1]
+          pO2_mbar_default: 50.0
+          p_total_mbar_default: 50.0

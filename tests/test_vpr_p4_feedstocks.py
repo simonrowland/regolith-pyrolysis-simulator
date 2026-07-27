@@ -61,6 +61,18 @@ SOURCE_SPOTS = {
         "K2O": 1.3,
         "P2O5": 0.6,
     },
+    "lunar_mls_1a": {
+        "SiO2": 42.8,
+        "TiO2": 6.77,
+        "Al2O3": 12.1,
+        "FeO": 16.3,
+        "MgO": 6.19,
+        "MnO": 0.22,
+        "CaO": 11.1,
+        "Na2O": 2.22,
+        "K2O": 0.20,
+        "P2O5": 0.04,
+    },
 }
 
 ROBINOT_EAC1_ELEMENTAL_WT_PCT = {

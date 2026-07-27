@@ -13,8 +13,8 @@ from scripts.generate_xdist_loadgroup_hints import build_duration_hints
 REPO_ROOT = Path(__file__).resolve().parents[1]
 FLAGGED_GROUPS = (
     "magemin_fullrun_c",
-    "magemin_fullrun_a",
     "magemin_fullrun_b",
+    "magemin_fullrun_a",
     "serial",
 )
 
@@ -82,8 +82,8 @@ def test_a(): pass
 
     expected = [
         "test_c",
-        "test_a",
         "test_b",
+        "test_a",
         "test_serial",
         "test_unknown",
         "test_unknown_2",

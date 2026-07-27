@@ -1283,14 +1283,14 @@
           "element": "O",
           "melt_retained_mol_atoms": 26618.123442409684,
           "subdisposition_mol_atoms": {
-            "oxide_unextracted": 2506.6253257883395,
-            "refractory_rump": 24111.498116621344,
+            "oxide_unextracted": 17754.018256906777,
+            "refractory_rump": 8864.105185502909,
             "residual_reductant": 0.0,
             "stage0_slag": 0.0
           },
           "subdisposition_fractions": {
-            "oxide_unextracted": 0.09416987381592141,
-            "refractory_rump": 0.9058301261840785,
+            "oxide_unextracted": 0.6669898535604485,
+            "refractory_rump": 0.33301014643955157,
             "residual_reductant": 0.0,
             "stage0_slag": 0.0
           },
@@ -1317,14 +1317,14 @@
           "element": "Si",
           "melt_retained_mol_atoms": 7623.696465559218,
           "subdisposition_mol_atoms": {
-            "oxide_unextracted": 0.0,
-            "refractory_rump": 7623.696465559218,
+            "oxide_unextracted": 7623.696465559218,
+            "refractory_rump": 0.0,
             "residual_reductant": 0.0,
             "stage0_slag": 0.0
           },
           "subdisposition_fractions": {
-            "oxide_unextracted": 0.0,
-            "refractory_rump": 1.0,
+            "oxide_unextracted": 1.0,
+            "refractory_rump": 0.0,
             "residual_reductant": 0.0,
             "stage0_slag": 0.0
           },
@@ -1919,17 +1919,6 @@
         "account": "process.cleaned_melt",
         "campaign_scope": "terminal",
         "subdisposition": "refractory_rump",
-        "species": "SiO2",
-        "terminal_mol": 7623.696465559218,
-        "terminal_kg": 458.0545547401945,
-        "origin_scope": "typed_material_origin",
-        "attribution_method": "tracked"
-      },
-      {
-        "destination": "melt_retained",
-        "account": "process.cleaned_melt",
-        "campaign_scope": "terminal",
-        "subdisposition": "refractory_rump",
         "species": "TiO2",
         "terminal_mol": 193.32675356467954,
         "terminal_kg": 15.440041173443129,
@@ -1988,6 +1977,17 @@
         "species": "P2O5",
         "terminal_mol": 7.251780856444043,
         "terminal_kg": 1.029336078229542,
+        "origin_scope": "typed_material_origin",
+        "attribution_method": "tracked"
+      },
+      {
+        "destination": "melt_retained",
+        "account": "process.cleaned_melt",
+        "campaign_scope": "terminal",
+        "subdisposition": "oxide_unextracted",
+        "species": "SiO2",
+        "terminal_mol": 7623.696465559218,
+        "terminal_kg": 458.0545547401945,
         "origin_scope": "typed_material_origin",
         "attribution_method": "tracked"
       },

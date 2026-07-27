@@ -24,7 +24,9 @@ wall of unattributed multi-hour timeouts (research/2026-07-21-ci-catch-mining).
 
 from __future__ import annotations
 
+import json
 import re
+from pathlib import Path
 
 import pytest
 
@@ -32,6 +34,7 @@ import pytest
 GLOBAL_TIMEOUT_CEILING_S = 300.0
 
 HEAVY_GROUP_PATTERN = re.compile(r"^magemin_fullrun_[a-z]$")
+DURATION_HINTS_PATH = Path(__file__).with_name("xdist_loadgroup_durations.json")
 
 # Shrink-only debt roster: (file, test-function name), parameters stripped.
 HEAVY_ROSTER = frozenset({
@@ -148,5 +151,22 @@ def test_suite_shape_heavy_tests_are_grouped_and_rostered(request) -> None:
                 f"roster entry {entry} matches no collected test — "
                 "phantom row (typo or removed test); fix the name or "
                 "delete the entry"
+            )
+        collected_groups = {
+            group
+            for item in request.session.items
+            for group in _group_names(item)
+        }
+        hint_groups = set(
+            json.loads(DURATION_HINTS_PATH.read_text(encoding="utf-8"))[
+                "durations_seconds"
+            ]
+        )
+        missing_hints = sorted(collected_groups - hint_groups)
+        stale_hints = sorted(hint_groups - collected_groups)
+        if missing_hints or stale_hints:
+            violations.append(
+                "xdist duration-hint keys must match collected groups: "
+                f"missing={missing_hints}, stale={stale_hints}"
             )
     assert not violations, "\n".join(violations)

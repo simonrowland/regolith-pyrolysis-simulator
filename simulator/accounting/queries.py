@@ -84,6 +84,8 @@ TERMINAL_RUMP_ACCOUNTS = (
 PROCESS_INVENTORY_SPENT_REDUCTANT_ACCOUNTS = (
     SPENT_REDUCTANT_RESIDUE_ACCOUNT,
 )
+# SiO2 remains the separate silicate_residual class in the terminal-product
+# overlay; yield disposition imports this set so both projections agree.
 TERMINAL_RUMP_REFRACTORY_OXIDES = frozenset({
     "CaO",
     "MgO",

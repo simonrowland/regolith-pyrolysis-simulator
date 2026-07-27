@@ -233,6 +233,33 @@ def test_completed_run_preserves_success_when_terminal_taxonomy_raises(
     assert payload["terminal_product_taxonomy"] is None
 
 
+def test_completed_run_preserves_success_when_yield_disposition_raises(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=1,
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+    )
+    session = run._start_session()
+
+    def raise_disposition_error(*args: object, **kwargs: object) -> None:
+        raise OriginUnresolvedError("injected yield-disposition refusal")
+
+    monkeypatch.setattr(
+        "simulator.runner.build_yield_disposition",
+        raise_disposition_error,
+    )
+
+    payload = run._run_session(session)
+
+    assert payload["status"] == "ok"
+    assert payload["yield_disposition"] is None
+    assert payload["terminal_product_taxonomy"] is not None
+
+
 def test_per_hour_summary_sanitizes_nonfinite_numeric_telemetry():
     sim = SimpleNamespace(
         product_ledger=lambda: {},

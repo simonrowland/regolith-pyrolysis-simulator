@@ -117,6 +117,13 @@ def test_clean_feedstock_closes_on_element_basis_with_chart_payload() -> None:
     assert {
         stream["species"] for stream in payload["terminal_species_streams"]
     } == {"FeO", "SiO2"}
+    si = next(
+        row
+        for row in payload["melt_retained_subdispositions"]["rows"]
+        if row["element"] == "Si"
+    )
+    assert si["subdisposition_fractions"]["oxide_unextracted"] == pytest.approx(1.0)
+    assert si["subdisposition_fractions"]["refractory_rump"] == pytest.approx(0.0)
 
 
 def test_origin_split_excludes_reagent_atoms_without_scaling_feedstock() -> None:

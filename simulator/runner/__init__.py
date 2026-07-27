@@ -1369,9 +1369,14 @@ class PyrolysisRun:
             "run_metadata": run_metadata,
             "final_state": final_state,
             "final": final_summary,
-            "yield_disposition": build_yield_disposition(
-                sim,
-                ledger_snapshots_from_sim(sim),
+            "yield_disposition": _json_safe(
+                _safe_failure_value(
+                    lambda: build_yield_disposition(
+                        sim,
+                        ledger_snapshots_from_sim(sim),
+                    ),
+                    None,
+                ),
             ),
             "product_classification": _json_safe(
                 _safe_failure_value(
