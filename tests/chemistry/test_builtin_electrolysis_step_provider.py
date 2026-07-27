@@ -127,6 +127,82 @@ def _force_fast_redox_liquidus_floor(sim) -> None:
     sim._melt_redox_liquidus_gate_curve = floor_authority
 
 
+def _simulator_ledger_fingerprint(sim) -> tuple:
+    sim.atom_ledger.assert_balanced()
+    return (
+        tuple(sorted(sim.atom_ledger.total_mol_by_account().items())),
+        tuple(sorted(sim.atom_ledger.mol_by_species().items())),
+        tuple(sorted(sim.melt.composition_kg.items())),
+        tuple(sorted(sim.product_ledger().items())),
+    )
+
+
+@pytest.fixture(
+    scope="module",
+    params=[
+        pytest.param(
+            ("lunar_mare_low_ti", None),
+            id="lunar_mare_low_ti-None",
+        ),
+        pytest.param(
+            ("mars_basalt", {"C": 60.0}),
+            id="mars_basalt-additives_kg1",
+        ),
+    ],
+)
+def full_electrolysis_run(
+    request,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    feedstock_key, additives_kg = request.param
+    sim = _build_sim(
+        feedstock_key,
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        additives_kg=additives_kg,
+    )
+    _force_fast_redox_liquidus_floor(sim)
+    _enable_c5_mre(sim, target_species="SiO2", max_voltage_V=1.60)
+    sim.start_campaign(CampaignPhase.C0)
+    decision_choice = {
+        DecisionType.ROOT_BRANCH: "pyrolysis",
+        DecisionType.PATH_AB: "A",
+        DecisionType.BRANCH_ONE_TWO: "two",
+        DecisionType.C6_PROCEED: "yes",
+    }
+    steps = 0
+    while not sim.is_complete() and steps < 5000:
+        if sim.paused_for_decision:
+            decision = sim.pending_decision
+            choice = decision_choice.get(decision.decision_type)
+            if choice not in (decision.options or []):
+                choice = (decision.options or [None])[0]
+            sim.apply_decision(decision.decision_type, choice)
+            continue
+        sim.step()
+        steps += 1
+    return feedstock_key, additives_kg, sim
+
+
+@pytest.fixture(scope="module")
+def _full_electrolysis_run_fingerprint(full_electrolysis_run):
+    return _simulator_ledger_fingerprint(full_electrolysis_run[2])
+
+
+@pytest.fixture(autouse=True)
+def _guard_full_electrolysis_run(request):
+    if "full_electrolysis_run" not in request.fixturenames:
+        yield
+        return
+    _, _, sim = request.getfixturevalue("full_electrolysis_run")
+    expected = request.getfixturevalue("_full_electrolysis_run_fingerprint")
+    yield
+    assert _simulator_ledger_fingerprint(sim) == expected
+
+
 def test_ce_low_feo_colson_haskin_anchor():
     # Colson/Haskin NASA NTRS 19910015058: FeO <2 wt%, ~1450 C, >=85% CE.
     assert current_efficiency(0.0, feo_fraction=0.019) >= 0.85
@@ -1916,19 +1992,8 @@ def test_provider_short_circuits_below_voltage(
 # pins the MAGEMin full-run family to one gateway.
 @pytest.mark.xdist_group("magemin_fullrun_a")
 @pytest.mark.timeout(1800)
-@pytest.mark.parametrize(
-    "feedstock_key, additives_kg",
-    [
-        ("lunar_mare_low_ti", None),
-        ("mars_basalt", {"C": 60.0}),
-    ],
-)
 def test_full_run_mass_balance_holds_with_kernel_committed_electrolysis(
-    feedstock_key,
-    additives_kg,
-    vapor_pressure_data,
-    feedstocks_data,
-    setpoints_data,
+    full_electrolysis_run,
 ):
     """Drive C0 -> C6 (with C5 active to exercise MRE) on each
     feedstock and verify:
@@ -1956,33 +2021,7 @@ def test_full_run_mass_balance_holds_with_kernel_committed_electrolysis(
     guard against future intent flips that touch the same call site.
     """
 
-    sim = _build_sim(
-        feedstock_key,
-        vapor_pressure_data,
-        feedstocks_data,
-        setpoints_data,
-        additives_kg=additives_kg,
-    )
-    _force_fast_redox_liquidus_floor(sim)
-    _enable_c5_mre(sim, target_species="SiO2", max_voltage_V=1.60)
-    sim.start_campaign(CampaignPhase.C0)
-    decision_choice = {
-        DecisionType.ROOT_BRANCH: "pyrolysis",
-        DecisionType.PATH_AB: "A",
-        DecisionType.BRANCH_ONE_TWO: "two",
-        DecisionType.C6_PROCEED: "yes",
-    }
-    steps = 0
-    while not sim.is_complete() and steps < 5000:
-        if sim.paused_for_decision:
-            decision = sim.pending_decision
-            choice = decision_choice.get(decision.decision_type)
-            if choice not in (decision.options or []):
-                choice = (decision.options or [None])[0]
-            sim.apply_decision(decision.decision_type, choice)
-            continue
-        sim.step()
-        steps += 1
+    feedstock_key, additives_kg, sim = full_electrolysis_run
 
     assert sim.is_complete(), (
         f"smoke run for {feedstock_key} did not complete in 5000 steps"
@@ -2053,21 +2092,10 @@ def test_full_run_mass_balance_holds_with_kernel_committed_electrolysis(
 # t-385 (2026-07-21): mass-balance class measured 960.6-963.0 s standalone
 # (subset-junit-3); ceiling >= 1.2x headroom over measured n0 (family serialized on one gateway). xdist_group
 # pins the MAGEMin full-run family to one gateway.
-@pytest.mark.xdist_group("magemin_fullrun_c")
+@pytest.mark.xdist_group("magemin_fullrun_a")
 @pytest.mark.timeout(1800)
-@pytest.mark.parametrize(
-    "feedstock_key, additives_kg",
-    [
-        ("lunar_mare_low_ti", None),
-        ("mars_basalt", {"C": 60.0}),
-    ],
-)
 def test_full_run_o2_yields_split_across_distinct_bins(
-    feedstock_key,
-    additives_kg,
-    vapor_pressure_data,
-    feedstocks_data,
-    setpoints_data,
+    full_electrolysis_run,
 ):
     """The MRE anode O2 must accumulate in
     ``terminal.oxygen_mre_anode_stored`` -- distinct from the
@@ -2076,33 +2104,7 @@ def test_full_run_o2_yields_split_across_distinct_bins(
     full campaign runs.
     """
 
-    sim = _build_sim(
-        feedstock_key,
-        vapor_pressure_data,
-        feedstocks_data,
-        setpoints_data,
-        additives_kg=additives_kg,
-    )
-    _force_fast_redox_liquidus_floor(sim)
-    _enable_c5_mre(sim, target_species="SiO2", max_voltage_V=1.60)
-    sim.start_campaign(CampaignPhase.C0)
-    decision_choice = {
-        DecisionType.ROOT_BRANCH: "pyrolysis",
-        DecisionType.PATH_AB: "A",
-        DecisionType.BRANCH_ONE_TWO: "two",
-        DecisionType.C6_PROCEED: "yes",
-    }
-    steps = 0
-    while not sim.is_complete() and steps < 5000:
-        if sim.paused_for_decision:
-            decision = sim.pending_decision
-            choice = decision_choice.get(decision.decision_type)
-            if choice not in (decision.options or []):
-                choice = (decision.options or [None])[0]
-            sim.apply_decision(decision.decision_type, choice)
-            continue
-        sim.step()
-        steps += 1
+    feedstock_key, additives_kg, sim = full_electrolysis_run
     assert sim.is_complete()
 
     anode_o2_kg = sim.atom_ledger.kg_by_account(

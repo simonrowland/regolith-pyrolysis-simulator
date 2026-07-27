@@ -68,6 +68,37 @@ def _run_pyrolysis_track(
     )
 
 
+def _simulator_ledger_fingerprint(sim) -> tuple:
+    sim.atom_ledger.assert_balanced()
+    return (
+        tuple(sorted(sim.atom_ledger.total_mol_by_account().items())),
+        tuple(sorted(sim.atom_ledger.mol_by_species().items())),
+        tuple(sorted(sim.melt.composition_kg.items())),
+        tuple(sorted(sim.product_ledger().items())),
+    )
+
+
+@pytest.fixture(scope="module")
+def full_pyrolysis_track_result():
+    return _run_pyrolysis_track()
+
+
+@pytest.fixture(scope="module")
+def _full_pyrolysis_track_fingerprint(full_pyrolysis_track_result):
+    return _simulator_ledger_fingerprint(full_pyrolysis_track_result.simulator)
+
+
+@pytest.fixture(autouse=True)
+def _guard_full_pyrolysis_track_result(request):
+    if "full_pyrolysis_track_result" not in request.fixturenames:
+        yield
+        return
+    result = request.getfixturevalue("full_pyrolysis_track_result")
+    expected = request.getfixturevalue("_full_pyrolysis_track_fingerprint")
+    yield
+    assert _simulator_ledger_fingerprint(result.simulator) == expected
+
+
 def _initial_feo_kg(sim) -> float:
     if sim.record.snapshots:
         for snapshot in sim.record.snapshots:
@@ -148,8 +179,10 @@ def test_na_shuttle_janaf_feo_crossover_is_below_practical_c3_temperature():
 # Ceiling matches the pyrolysis-track class: measured -> 3600 s.
 @pytest.mark.xdist_group("magemin_fullrun_b")
 @pytest.mark.timeout(3600)
-def test_pyrolysis_track_c5_reduces_feo_without_additives():
-    result = _run_pyrolysis_track()
+def test_pyrolysis_track_c5_reduces_feo_without_additives(
+    full_pyrolysis_track_result,
+):
+    result = full_pyrolysis_track_result
     sim = result.simulator
     feo_initial = _initial_feo_kg(sim)
     feo_left = sim.melt.composition_kg.get("FeO", 0.0)
@@ -484,10 +517,12 @@ def test_c3_shuttle_injects_na_from_condensed_alkali_alone():
 # t-385 (2026-07-21): pyrolysis-track class measured 2358.4 s at -n0
 # (compose-vapor-work/n0-loop t13); ceiling >= 1.2x headroom over
 # measured n0 (family serialized on one gateway). xdist_group pins the MAGEMin full-run family to one gateway.
-@pytest.mark.xdist_group("magemin_fullrun_c")
+@pytest.mark.xdist_group("magemin_fullrun_b")
 @pytest.mark.timeout(3600)
-def test_pc_extract_fe_target_has_fe_product_after_full_pyrolysis_track():
-    result = _run_pyrolysis_track()
+def test_pc_extract_fe_target_has_fe_product_after_full_pyrolysis_track(
+    full_pyrolysis_track_result,
+):
+    result = full_pyrolysis_track_result
     products = result.simulator.product_ledger()
     feo_initial = _initial_feo_kg(result.simulator)
     feo_left = result.simulator.melt.composition_kg.get("FeO", 0.0)
@@ -500,10 +535,12 @@ def test_pc_extract_fe_target_has_fe_product_after_full_pyrolysis_track():
 # t-385 (2026-07-21): pyrolysis-track class measured 2588.1 s at -n0
 # (compose-vapor-work/n0-loop t11); ceiling >= 1.2x headroom over
 # measured n0 (family serialized on one gateway). xdist_group pins the MAGEMin full-run family to one gateway.
-@pytest.mark.xdist_group("magemin_fullrun_c")
+@pytest.mark.xdist_group("magemin_fullrun_b")
 @pytest.mark.timeout(3600)
-def test_pc_extract_al_remains_infeasible_at_1p6v_c5_cap():
-    result = _run_pyrolysis_track()
+def test_pc_extract_al_remains_infeasible_at_1p6v_c5_cap(
+    full_pyrolysis_track_result,
+):
+    result = full_pyrolysis_track_result
     al_left = result.simulator.melt.composition_kg.get("Al2O3", 0.0)
     al_product = result.simulator.product_ledger().get("Al", 0.0)
     assert al_left > 100.0

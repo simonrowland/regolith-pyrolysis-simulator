@@ -18,6 +18,9 @@ from _pytest_session_safety import (
 )
 
 
+pytest_plugins = ("_pytest_loadgroup_order",)
+
+
 def _safe_worker_id(worker_id: str) -> str:
     return re.sub(r"[^A-Za-z0-9_.-]", "_", worker_id) or "master"
 

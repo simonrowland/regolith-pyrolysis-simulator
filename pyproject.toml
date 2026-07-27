@@ -103,10 +103,12 @@ norecursedirs = ["_attic", ".git", ".venv", "engines", "*.egg-info"]
 # routinely exceeded the 1500s sandbox tool window of in-flight codex-acp
 # workers (which silently invoke `pytest` on top of their chunk subset).
 # `-n auto` uses all available cores; `--dist loadgroup` keeps
-# @pytest.mark.xdist_group families on one worker; `--timeout=300` kills any
-# test that silently hangs past 5 min. Workers can still override with `-n0`
-# for debugging serial behavior.
-addopts = "-n auto --dist loadgroup --timeout=300"
+# @pytest.mark.xdist_group families on one worker. The collection hook orders
+# those families by checked-in duration hints; `--no-loadscope-reorder` keeps
+# xdist's group-size heuristic from overriding that order. `--timeout=300`
+# kills any test that silently hangs past 5 min. Workers can still override
+# with `-n0` for debugging serial behavior.
+addopts = "-n auto --dist loadgroup --no-loadscope-reorder --timeout=300"
 # Deterministic gate: `python -m pytest tests/` is the canonical default. Tests
 # marked both serial and xdist_group("serial") still run exactly once in that
 # default xdist pass, but loadgroup keeps them on one worker. The optional
