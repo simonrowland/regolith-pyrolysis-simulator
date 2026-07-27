@@ -1,7 +1,7 @@
 {
-  "schema_version": "1.7.0",
+  "schema_version": "1.8.0",
   "run_metadata": {
-    "schema_version": "1.7.0",
+    "schema_version": "1.8.0",
     "feedstock_id": "lunar_mare_low_ti",
     "campaign": "C0",
     "hours_requested": 24,
@@ -2452,6 +2452,166 @@
       }
     },
     "markdown": "# Three-Product-Class Report\n**Feedstock**: `lunar_mare_low_ti` \u2022 **Campaign**: `C0`\n\n**Class totals**: Metals + O\u2082 potential: 1.493e-03 kg | Silica glass: 3.444e-08 kg | Mixed glass: \u2014 kg | Rump: 999.998 kg\n\n## 1. Metals + source-side O\u2082 potential (alkali / Fe / Mg / Si / Ti / Al / Ca / Cr / Mn / Ni / Co + emitted O\u2082 potential)\n**Class total**: 1.493e-03 kg\n\n- Metals subtotal: 1.493e-03 kg\n- Source-side O\u2082 potential subtotal (emitted; not recovered/captured): 1.916e-08 kg\n\nPer-species:\n  - **Cr**: \u2014 kg\n  - **Fe**: 1.610e-06 kg\n  - **K**: 1.260e-04 kg\n  - **Mg**: 1.408e-09 kg\n  - **Mn**: 7.633e-09 kg\n  - **Na**: 1.365e-03 kg\n  - **Si**: 1.610e-08 kg\n\n## 2. Pure silica glass (Stage 3 fused-silica baffle capture)\n**Class total**: 3.444e-08 kg\n\n- Stage 3 capture: 3.444e-08 kg\n\nPer-species on Stage 3 baffles:\n  - **SiO2**: 3.444e-08 kg\n\n## 3. Industrial mixed glass (early-tap residual melt option)\n**Class total**: \u2014 kg\n\n- Mixed melt residual: \u2014 kg\n  - *present only when operator declared early-tap via early_tap_mode=True; zero by default \u2014 mid-run cleaned_melt is NOT a product class*\n\n## 4. Refractory ceramic rump (Ca / REE / refractory oxides \u2014 by physics)\n**Class total**: 999.998 kg\n\n- Rump total: 999.998 kg\n- Refractory oxides floor (by physics): 363.870 kg\n- Silicate residual: 458.055 kg\n- Unextracted metals residue (failure-mode 1): \u2014 kg\n- Other / unclassified rump: 178.073 kg\n\nPer-species:\n  - **Al2O3**: 138.960 kg\n  - **CaO**: 113.227 kg\n  - **Cr2O3**: 3.603 kg\n  - **FeO**: 169.840 kg\n  - **K2O**: 1.029 kg\n  - **MgO**: 92.640 kg\n  - **MnO**: 2.059 kg\n  - **Na2O**: 4.116 kg\n  - **P2O5**: 1.029 kg\n  - **SiO2**: 458.055 kg\n  - **TiO2**: 15.440 kg\n"
+  },
+  "terminal_product_taxonomy": {
+    "grade": {
+      "basis": "oxide_wt_pct_normalized_volatiles_free",
+      "residue_mass_kg": 999.998006,
+      "value_buckets": {
+        "titania": {
+          "label": "Titania",
+          "species_wt_pct": {
+            "TiO2": 1.544007
+          },
+          "wt_pct_of_residue": 1.544007,
+          "mass_kg": 15.440041
+        },
+        "chromia": {
+          "label": "Chromia",
+          "species_wt_pct": {
+            "Cr2O3": 0.360268
+          },
+          "wt_pct_of_residue": 0.360268,
+          "mass_kg": 3.602676
+        }
+      },
+      "coverage": {
+        "reported_species": [
+          "Cr2O3",
+          "TiO2"
+        ],
+        "omitted_value_buckets": [
+          {
+            "bucket": "rare_earth_oxides",
+            "label": "Rare-earth oxides",
+            "tracked_species": [
+              "REE_oxides"
+            ],
+            "reason": "source_species_absent",
+            "coverage_note": "Current ledger data carries rare-earth oxides as the lumped REE_oxides species when present; individual rare-earth elements are omitted unless the input composition carries explicit species.\n"
+          },
+          {
+            "bucket": "zirconia",
+            "label": "Zirconia",
+            "tracked_species": [
+              "ZrO2"
+            ],
+            "reason": "source_species_absent",
+            "coverage_note": "ZrO2 grade is reported only when ZrO2 is present in the input residue composition."
+          },
+          {
+            "bucket": "metallic_pgm",
+            "label": "Metallic / PGM",
+            "status": "future_out_of_domain_today",
+            "reason": "future_out_of_domain_today",
+            "coverage_note": "Current terminal-product classifier receives oxide residue composition, not a metal/PGM product ledger; metallic and PGM grades are future scope and omitted rather than zero-filled.\n"
+          }
+        ],
+        "note": "Value buckets are reported only when the normalized input residue composition contains tracked species; omitted buckets are not zero grades."
+      }
+    },
+    "product_class": "unclassified_concentrate",
+    "match_status": "no_match",
+    "user_label_term": "terminal product",
+    "display_name": "terminal product",
+    "composition_only": true,
+    "oxide_wt_pct": {
+      "Al2O3": 13.896065,
+      "CaO": 11.322719,
+      "Cr2O3": 0.360268,
+      "FeO": 16.984079,
+      "K2O": 0.102919,
+      "MgO": 9.264043,
+      "MnO": 0.205868,
+      "Na2O": 0.411551,
+      "P2O5": 0.102934,
+      "SiO2": 45.805547,
+      "TiO2": 1.544007
+    },
+    "evidence_tiers": {},
+    "properties_panel": {
+      "show": false,
+      "property_basis": null,
+      "status": "not_classified",
+      "strength": {
+        "status": "not_classified",
+        "text": null,
+        "source_ids": []
+      }
+    },
+    "provenance": {
+      "taxonomy_version": "2026-07-27",
+      "furnace_ceiling_c": null,
+      "temperature_profile_id": null,
+      "basis": "oxide_wt_pct_normalized_volatiles_free",
+      "classifier_policy_id": "terminal_product_taxonomy.v1.fail_closed",
+      "run_id": null,
+      "feedstock_id": "lunar_mare_low_ti",
+      "terminal_product_account_or_artifact": "runner.terminal_product_taxonomy",
+      "ignored_oxides": {
+        "Cr2O3": 0.360268,
+        "FeO": 16.984079,
+        "K2O": 0.102919,
+        "MnO": 0.205868,
+        "Na2O": 0.411551,
+        "P2O5": 0.102934
+      },
+      "residual_wt_pct": null
+    },
+    "physical_composition": {
+      "mass_kg": 999.998006,
+      "species_kg": {
+        "Al2O3": 138.96037056098817,
+        "CaO": 113.22696860524962,
+        "Cr2O3": 3.602676273696573,
+        "FeO": 169.8404508363386,
+        "K2O": 1.0291842918741891,
+        "MgO": 92.64024703832423,
+        "MnO": 2.0586721466029205,
+        "Na2O": 4.115504164268491,
+        "P2O5": 1.029336078229542,
+        "SiO2": 458.0545547401945,
+        "TiO2": 15.440041173443129
+      },
+      "species_mol": {
+        "Al2O3": 1362.8900119503458,
+        "CaO": 2019.133844628807,
+        "Cr2O3": 23.703501786288587,
+        "FeO": 2364.0171877448165,
+        "K2O": 10.92603361382261,
+        "MgO": 2298.537292534841,
+        "MnO": 29.02111549225142,
+        "Na2O": 66.40208465522893,
+        "P2O5": 7.251780856444043,
+        "SiO2": 7623.696465559218,
+        "TiO2": 193.32675356467954
+      },
+      "class_kg": {
+        "other": 178.07314751731374,
+        "refractory_oxides": 363.87030365170176,
+        "silicate_residual": 458.0545547401945,
+        "unextracted_metals": 0.0
+      },
+      "oxide_wt_pct": {
+        "Al2O3": 13.896065,
+        "CaO": 11.322719,
+        "Cr2O3": 0.360268,
+        "FeO": 16.984079,
+        "K2O": 0.102919,
+        "MgO": 9.264043,
+        "MnO": 0.205868,
+        "Na2O": 0.411551,
+        "P2O5": 0.102934,
+        "SiO2": 45.805547,
+        "TiO2": 1.544007
+      },
+      "basis": {
+        "species_kg": "kg_projected_from_mol_ledger",
+        "species_mol": "mol_atom_ledger",
+        "class_kg": "kg_reporting_projection",
+        "oxide_wt_pct": "oxide_wt_pct_normalized_volatiles_free"
+      }
+    }
   },
   "thermal_train_report": {
     "capacity": {

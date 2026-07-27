@@ -1,7 +1,7 @@
 {
-  "schema_version": "1.7.0",
+  "schema_version": "1.8.0",
   "run_metadata": {
-    "schema_version": "1.7.0",
+    "schema_version": "1.8.0",
     "feedstock_id": "ci_carbonaceous_chondrite",
     "campaign": "C2B",
     "hours_requested": 12,
@@ -1777,6 +1777,145 @@
       }
     },
     "markdown": "# Three-Product-Class Report\n**Feedstock**: `ci_carbonaceous_chondrite` \u2022 **Campaign**: `C2B`\n\n**Class totals**: Metals + O\u2082 potential: \u2014 kg | Silica glass: \u2014 kg | Mixed glass: \u2014 kg | Rump: 759.231 kg\n\n## 1. Metals + source-side O\u2082 potential (alkali / Fe / Mg / Si / Ti / Al / Ca / Cr / Mn / Ni / Co + emitted O\u2082 potential)\n**Class total**: \u2014 kg\n\n- Metals subtotal: \u2014 kg\n- Source-side O\u2082 potential subtotal (emitted; not recovered/captured): \u2014 kg\n\nPer-species:\n  (no species in this class)\n\n## 2. Pure silica glass (Stage 3 fused-silica baffle capture)\n**Class total**: \u2014 kg\n\n- Stage 3 capture: \u2014 kg\n\nPer-species on Stage 3 baffles:\n  (no species in this class)\n\n## 3. Industrial mixed glass (early-tap residual melt option)\n**Class total**: \u2014 kg\n\n- Mixed melt residual: \u2014 kg\n  - *present only when operator declared early-tap via early_tap_mode=True; zero by default \u2014 mid-run cleaned_melt is NOT a product class*\n\n## 4. Refractory ceramic rump (Ca / REE / refractory oxides \u2014 by physics)\n**Class total**: 759.231 kg\n\n- Rump total: 759.231 kg\n- Refractory oxides floor (by physics): 229.844 kg\n- Silicate residual: 277.446 kg\n- Unextracted metals residue (failure-mode 1): \u2014 kg\n- Other / unclassified rump: 251.941 kg\n\nPer-species:\n  - **Al2O3**: 19.267 kg\n  - **CaO**: 22.152 kg\n  - **FeO**: 231.205 kg\n  - **MgO**: 188.425 kg\n  - **Na2O**: 5.323 kg\n  - **NiO**: 15.414 kg\n  - **SiO2**: 277.446 kg\n\n## \u26a0\ufe0f Unclassified species (mapping gap)\n**Total**: 39.908 kg \u2014 these species were in `product_ledger()` but did not map to any of the four north-star product classes. The mapping in `simulator/three_product_report.py` may need to be extended.\n\n  - **CaCO3**: 7.531e-03 kg\n  - **Na2CO3**: \u2014 kg\n  - **S**: 39.900 kg\n"
+  },
+  "terminal_product_taxonomy": {
+    "grade": {
+      "basis": "oxide_wt_pct_normalized_volatiles_free",
+      "residue_mass_kg": 759.231204,
+      "value_buckets": {},
+      "coverage": {
+        "reported_species": [],
+        "omitted_value_buckets": [
+          {
+            "bucket": "rare_earth_oxides",
+            "label": "Rare-earth oxides",
+            "tracked_species": [
+              "REE_oxides"
+            ],
+            "reason": "source_species_absent",
+            "coverage_note": "Current ledger data carries rare-earth oxides as the lumped REE_oxides species when present; individual rare-earth elements are omitted unless the input composition carries explicit species.\n"
+          },
+          {
+            "bucket": "titania",
+            "label": "Titania",
+            "tracked_species": [
+              "TiO2"
+            ],
+            "reason": "source_species_absent",
+            "coverage_note": "TiO2 grade is reported only when TiO2 is present in the input residue composition."
+          },
+          {
+            "bucket": "chromia",
+            "label": "Chromia",
+            "tracked_species": [
+              "Cr2O3"
+            ],
+            "reason": "source_species_absent",
+            "coverage_note": "Cr2O3 grade is reported only when Cr2O3 is present in the input residue composition."
+          },
+          {
+            "bucket": "zirconia",
+            "label": "Zirconia",
+            "tracked_species": [
+              "ZrO2"
+            ],
+            "reason": "source_species_absent",
+            "coverage_note": "ZrO2 grade is reported only when ZrO2 is present in the input residue composition."
+          },
+          {
+            "bucket": "metallic_pgm",
+            "label": "Metallic / PGM",
+            "status": "future_out_of_domain_today",
+            "reason": "future_out_of_domain_today",
+            "coverage_note": "Current terminal-product classifier receives oxide residue composition, not a metal/PGM product ledger; metallic and PGM grades are future scope and omitted rather than zero-filled.\n"
+          }
+        ],
+        "note": "Value buckets are reported only when the normalized input residue composition contains tracked species; omitted buckets are not zero grades."
+      }
+    },
+    "product_class": "unclassified_concentrate",
+    "match_status": "no_match",
+    "user_label_term": "terminal product",
+    "display_name": "terminal product",
+    "composition_only": true,
+    "oxide_wt_pct": {
+      "Al2O3": 2.537709,
+      "CaO": 2.917675,
+      "FeO": 30.452507,
+      "MgO": 24.817888,
+      "Na2O": 0.701046,
+      "NiO": 2.030167,
+      "SiO2": 36.543008
+    },
+    "evidence_tiers": {},
+    "properties_panel": {
+      "show": false,
+      "property_basis": null,
+      "status": "not_classified",
+      "strength": {
+        "status": "not_classified",
+        "text": null,
+        "source_ids": []
+      }
+    },
+    "provenance": {
+      "taxonomy_version": "2026-07-27",
+      "furnace_ceiling_c": null,
+      "temperature_profile_id": null,
+      "basis": "oxide_wt_pct_normalized_volatiles_free",
+      "classifier_policy_id": "terminal_product_taxonomy.v1.fail_closed",
+      "run_id": null,
+      "feedstock_id": "ci_carbonaceous_chondrite",
+      "terminal_product_account_or_artifact": "runner.terminal_product_taxonomy",
+      "ignored_oxides": {
+        "FeO": 30.452507,
+        "Na2O": 0.701046,
+        "NiO": 2.030167
+      },
+      "residual_wt_pct": null
+    },
+    "physical_composition": {
+      "mass_kg": 759.231204,
+      "species_kg": {
+        "Al2O3": 19.267077783577232,
+        "CaO": 22.151900185217183,
+        "FeO": 231.20493340292677,
+        "MgO": 188.42515152467027,
+        "Na2O": 5.322558934708119,
+        "NiO": 15.413662226861785,
+        "SiO2": 277.4459200835121
+      },
+      "species_mol": {
+        "Al2O3": 188.9668814547603,
+        "CaO": 395.026484748064,
+        "FeO": 3218.152293899655,
+        "MgO": 4675.098042990033,
+        "Na2O": 85.87745142708506,
+        "NiO": 206.36185511326167,
+        "SiO2": 4617.710834737149
+      },
+      "class_kg": {
+        "other": 251.94115456449668,
+        "refractory_oxides": 229.8441294934647,
+        "silicate_residual": 277.4459200835121,
+        "unextracted_metals": 0.0
+      },
+      "oxide_wt_pct": {
+        "Al2O3": 2.537709,
+        "CaO": 2.917675,
+        "FeO": 30.452507,
+        "MgO": 24.817888,
+        "Na2O": 0.701046,
+        "NiO": 2.030167,
+        "SiO2": 36.543008
+      },
+      "basis": {
+        "species_kg": "kg_projected_from_mol_ledger",
+        "species_mol": "mol_atom_ledger",
+        "class_kg": "kg_reporting_projection",
+        "oxide_wt_pct": "oxide_wt_pct_normalized_volatiles_free"
+      }
+    }
   },
   "thermal_train_report": {
     "capacity": {
