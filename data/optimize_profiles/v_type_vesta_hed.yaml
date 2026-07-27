@@ -5,9 +5,10 @@ description: Vesta HED basalt; highland-like ceramics with more Fe.
 north_star_rationale: V-type material should search between highland ceramics and mare Fe/O2 yield.
 objective_emphasis: Glass/ceramic plus Fe/O2 balance.
 objectives:
-  - {metric: pure_silica_glass_kg, sense: maximize, units: kg, weight: 0.30, rationale: CMAS glass and ceramic precursor}
-  - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.30, rationale: higher Fe than highland}
-  - {metric: oxygen_kg, sense: maximize, units: kg, weight: 0.24, rationale: oxidizer product}
+  - {metric: pure_silica_glass_kg, sense: maximize, units: kg, weight: 0.21, rationale: CMAS glass and ceramic precursor}
+  - {metric: refractory_ceramic_rump_kg, sense: maximize, units: kg, weight: 0.21, rationale: terminal refractory ceramic-rump product mass}
+  - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.21, rationale: higher Fe than highland}
+  - {metric: oxygen_kg, sense: maximize, units: kg, weight: 0.21, rationale: oxidizer product}
   - {metric: energy_electrical_plus_evaporation_kWh, sense: minimize, units: kWh, weight: 0.10, rationale: process energy}
   - {metric: duration_h, sense: minimize, units: h, weight: 0.06, rationale: throughput}
 constraints:

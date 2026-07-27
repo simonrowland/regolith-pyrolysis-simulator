@@ -12,7 +12,10 @@ from simulator.feedstock_guard import is_blocked_feedstock
 from simulator.optimize.objective import composition_target_eval_metadata
 from simulator.optimize import study
 from simulator.optimize.physics import GATE_ORDER, PhysicsConstraintSet
-from simulator.optimize.sso2_evidence import SSO2_OWNER_RECIPE_ID
+from simulator.optimize.sso2_evidence import (
+    SSO2_OWNER_RECIPE_ID,
+    sso2_owner_recipe_patch,
+)
 from simulator.backends import CACHE_TIER_CEILINGS
 from simulator.optimize.profiles import (
     constrained_max_profile,
@@ -22,7 +25,7 @@ from simulator.optimize.profiles import (
     validate_profile,
     validate_profile_catalog,
 )
-from simulator.optimize.recipe import RecipePatch, RecipeSchema
+from simulator.optimize.recipe import RecipePatch, RecipeSchema, RecipeValidationError
 
 
 def test_reduced_real_cache_accepts_cache_tier_ceiling() -> None:
@@ -323,8 +326,8 @@ def test_constraint_target_species_must_be_non_empty_list() -> None:
         validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
 
 
-def test_sso2_objective_metric_is_explicit_and_does_not_infect_generic_profiles() -> None:
-    generic = _profile_copy("lunar_mare_low_ti")
+def test_stock_sso2_objective_is_explicit_reachable_and_profile_owned() -> None:
+    generic = _profile_copy("lunar_mare_lms1")
     assert all(
         objective["metric"] != SSO2_OWNER_RECIPE_ID
         for objective in generic["objectives"]
@@ -335,28 +338,95 @@ def test_sso2_objective_metric_is_explicit_and_does_not_infect_generic_profiles(
     )
     assert generic_constraints.stream_purity_min.source != "profile"
 
-    sso2 = _profile_copy("lunar_mare_low_ti")
-    sso2["profile_id"] = "sso2-pn2-fe-drain-silica-objectives-test"
-    sso2["objectives"] = [
-        {
-            "metric": SSO2_OWNER_RECIPE_ID,
-            "sense": "maximize",
-            "units": "score_0_1",
-            "weight": 1.0,
-            "rationale": "profile-owned SSO-2 Fe-free Stage 3 silica reader",
-        }
-    ]
-    sso2["constraints"]["stream_purity_min"] = 0.95
-
-    validated = validate_profile(sso2, expected_feedstock="lunar_mare_low_ti")
+    validated = validate_profile(
+        _profile_copy("lunar_mare_low_ti"),
+        expected_feedstock="lunar_mare_low_ti",
+    )
     constraints = physics_constraints_from_profile(
         validated,
         source="sso2-profile.yaml",
     )
+    owner_seed = next(
+        seed
+        for seed in validated["seed_recipes"]
+        if seed["id"] == "sso2-pn2-fe-drain-silica-owner"
+    )
+    stock_patch = RecipePatch.from_nested(owner_seed["patch"]).validated(RecipeSchema())
 
-    assert validated["objectives"][0]["metric"] == SSO2_OWNER_RECIPE_ID
+    assert SSO2_OWNER_RECIPE_ID in {
+        objective["metric"] for objective in validated["objectives"]
+    }
     assert constraints.stream_purity_min.value == pytest.approx(0.95)
     assert constraints.stream_purity_min.source == "profile"
+    assert owner_seed["source_campaign"] == "C2A_staged"
+    assert stock_patch.canonical_json() == sso2_owner_recipe_patch().canonical_json()
+
+
+def test_stock_product_class_objectives_are_minimal_reachable_and_noncommercial() -> None:
+    profiles = validate_profile_catalog()
+    expected_profiles = {
+        "industrial_mixed_glass_kg": {"lunar_mare_low_ti"},
+        "refractory_ceramic_rump_kg": {"v_type_vesta_hed"},
+    }
+
+    for metric, expected_feedstocks in expected_profiles.items():
+        found = {
+            feedstock
+            for feedstock, profile in profiles.items()
+            if metric in {
+                objective["metric"]
+                for objective in profile["objectives"]
+            }
+        }
+        assert found == expected_feedstocks
+
+    lunar = profiles["lunar_mare_low_ti"]
+    vesta = profiles["v_type_vesta_hed"]
+    assert sum(row["weight"] for row in lunar["objectives"]) == pytest.approx(1.0)
+    assert sum(row["weight"] for row in vesta["objectives"]) == pytest.approx(1.0)
+    assert lunar["early_tap_mode"] is True
+    assert not vesta.get("early_tap_mode", False)
+    assert "C2B" in {
+        campaign
+        for seed in vesta["seed_recipes"]
+        for campaign in seed.get("source_campaigns", [seed.get("source_campaign")])
+    }
+    assert lunar["run"].get("c5_enabled", False) is False
+    assert vesta["run"].get("c5_enabled", False) is False
+
+    for profile, metric in (
+        (lunar, "industrial_mixed_glass_kg"),
+        (vesta, "refractory_ceramic_rump_kg"),
+    ):
+        objective = next(
+            row for row in profile["objectives"] if row["metric"] == metric
+        )
+        silica = next(
+            row
+            for row in profile["objectives"]
+            if row["metric"] == "pure_silica_glass_kg"
+        )
+        assert objective["sense"] == "maximize"
+        assert objective["units"] == "kg"
+        assert objective["weight"] == silica["weight"]
+        assert not any(
+            token in f"{objective['metric']} {objective['rationale']}".lower()
+            for token in ("usd", "dollar", "$", "commercial")
+        )
+
+
+def test_product_class_metric_vocabulary_is_not_recipe_knob_vocabulary() -> None:
+    metrics = {
+        "industrial_mixed_glass_kg",
+        "refractory_ceramic_rump_kg",
+    }
+    knob_paths = {".".join(spec.path) for spec in RecipeSchema.ALLOWLIST}
+
+    assert metrics.issubset(KNOWN_OBJECTIVE_METRICS)
+    assert metrics.isdisjoint(knob_paths)
+    for metric in metrics:
+        with pytest.raises(RecipeValidationError, match="unknown recipe path"):
+            RecipePatch.from_nested({metric: 1.0}).validated(RecipeSchema())
 
 
 def test_runtime_loader_refuses_stale_melt_pool_stream_purity_gate() -> None:

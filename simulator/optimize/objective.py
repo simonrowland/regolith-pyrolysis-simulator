@@ -72,6 +72,8 @@ FURNACE_LIFESPAN_COST_METRICS = frozenset({
 _MASS_OBJECTIVE_METRICS = frozenset(
     {
         "pure_silica_glass_kg",
+        "industrial_mixed_glass_kg",
+        "refractory_ceramic_rump_kg",
         "metals_plus_o2_kg",
         "metals_total_kg",
         "O2_kg",
@@ -79,6 +81,18 @@ _MASS_OBJECTIVE_METRICS = frozenset(
         "oxygen_kg",
         "oxygen_stored_kg",
         "oxygen_vented_kg",
+    }
+)
+PRODUCT_CLASS_MASS_METRIC_PATHS = MappingProxyType(
+    {
+        "industrial_mixed_glass_kg": (
+            "industrial_mixed_glass",
+            "class_total_kg",
+        ),
+        "refractory_ceramic_rump_kg": (
+            "refractory_ceramic_rump",
+            "class_total_kg",
+        ),
     }
 )
 SUPPORTED_COMPOSITION_POOLS = COMPOSITION_PRODUCT_POOLS
@@ -1444,6 +1458,13 @@ def compute_objectives(
                 run_execution=run_execution,
                 cost_parameters=active_cost_parameters,
             )
+            if definition.metric in PRODUCT_CLASS_MASS_METRIC_PATHS:
+                source_path = PRODUCT_CLASS_MASS_METRIC_PATHS[definition.metric]
+                evidence[definition.metric] = {
+                    "metric": definition.metric,
+                    "source": "classify_products",
+                    "source_class_path": ".".join(source_path),
+                }
             if definition.metric in THROUGHPUT_OWNER_COST_METRICS:
                 evidence[definition.metric] = _plain_payload(
                     _marginal_extraction_cost_summary(
@@ -4342,6 +4363,8 @@ def _metric_value(
 ) -> float | None:
     if metric == "pure_silica_glass_kg":
         return _nested_float(product_classes, ("pure_silica_glass", "class_total_kg"))
+    if metric in PRODUCT_CLASS_MASS_METRIC_PATHS:
+        return _product_class_mass_value(metric, product_classes)
     if metric == "metals_plus_o2_kg":
         return _nested_float(product_classes, ("metals_plus_O2", "class_total_kg"))
     if metric == "metals_total_kg":
@@ -4408,6 +4431,27 @@ def _metric_value(
     raise ObjectiveComputationError(
         f"objective metric {metric!r} is not available from run outputs"
     )
+
+
+def _product_class_mass_value(
+    metric: str,
+    product_classes: Mapping[str, Any],
+) -> float:
+    path = PRODUCT_CLASS_MASS_METRIC_PATHS[metric]
+    node: Any = product_classes
+    for key in path:
+        if not isinstance(node, Mapping) or key not in node:
+            raise ObjectiveComputationError(
+                f"objective source missing {'.'.join(path)}"
+            )
+        node = node[key]
+    label = ".".join(path)
+    if isinstance(node, bool):
+        raise ObjectiveComputationError(f"{label} is not numeric")
+    value = _finite_float(node, label)
+    if value < 0.0:
+        raise ObjectiveComputationError(f"{label} is negative")
+    return value
 
 
 def _marginal_extraction_cost_summary(

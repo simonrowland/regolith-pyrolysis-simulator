@@ -16,6 +16,7 @@ from simulator.optimize.objective import (
     ObjectiveComputationError,
     ObjectiveDefinition,
     ObjectiveProfileError,
+    PRODUCT_CLASS_MASS_METRIC_PATHS,
     composition_targets_require_coating,
     composition_target_eval_metadata,
     cost_adjusted_objective_scores,
@@ -23,6 +24,7 @@ from simulator.optimize.objective import (
     dominates,
     furnace_amortization_cost_per_run,
     objective_definitions,
+    objective_metric_aliases,
     objective_scores,
     objective_importance_evidence,
     pareto_front,
@@ -217,6 +219,117 @@ def test_energy_alias_set_is_derived_from_canonical_alias_mapping() -> None:
     )
     assert objective_module.ENERGY_ELECTRICAL_PLUS_EVAPORATION_ALIASES == expected
     assert set(objective_module.objective_metric_aliases(LEGACY_ENERGY_KWH_METRIC)) == expected
+
+
+@pytest.mark.parametrize(
+    ("metric", "class_name", "expected"),
+    [
+        ("industrial_mixed_glass_kg", "industrial_mixed_glass", 12.5),
+        ("refractory_ceramic_rump_kg", "refractory_ceramic_rump", 34.75),
+    ],
+)
+def test_product_class_mass_metrics_read_exact_class_total_path(
+    metric: str,
+    class_name: str,
+    expected: float,
+) -> None:
+    product_classes = {
+        class_name: {
+            "class_total_kg": expected,
+            "mixed_melt_residual_kg": 999.0,
+            "rump_total_kg": 888.0,
+        }
+    }
+
+    assert _metric_value(
+        metric,
+        SimpleNamespace(),
+        {metric.removesuffix("_kg"): 777.0},
+        product_classes,
+    ) == pytest.approx(expected)
+    assert objective_metric_aliases(metric) == (metric,)
+
+
+@pytest.mark.parametrize(
+    ("metric", "class_name"),
+    [
+        ("industrial_mixed_glass_kg", "industrial_mixed_glass"),
+        ("refractory_ceramic_rump_kg", "refractory_ceramic_rump"),
+    ],
+)
+@pytest.mark.parametrize(
+    "class_payload",
+    [
+        None,
+        {},
+        {"class_total_kg": "not-a-number"},
+        {"class_total_kg": False},
+        {"class_total_kg": -1.0},
+        {"class_total_kg": math.inf},
+    ],
+)
+def test_product_class_mass_metrics_fail_closed_on_missing_or_malformed_class_data(
+    metric: str,
+    class_name: str,
+    class_payload: object,
+) -> None:
+    with pytest.raises(
+        ObjectiveComputationError,
+        match="objective source missing|not numeric|negative|non-finite",
+    ):
+        _metric_value(
+            metric,
+            SimpleNamespace(),
+            {},
+            {class_name: class_payload},
+        )
+
+
+def test_product_class_mass_evidence_serializes_metric_and_source_path(
+    monkeypatch,
+) -> None:
+    product_classes = {
+        "industrial_mixed_glass": {"class_total_kg": 12.5},
+        "refractory_ceramic_rump": {"class_total_kg": 34.75},
+    }
+    monkeypatch.setattr(
+        objective_module,
+        "classify_products",
+        lambda sim, *, early_tap_mode=False: product_classes,
+    )
+    profile = {
+        "objectives": [
+            {
+                "metric": metric,
+                "sense": "maximize",
+                "units": "kg",
+                "weight": 1.0,
+                "rationale": "product class mass",
+            }
+            for metric in (
+                "industrial_mixed_glass_kg",
+                "refractory_ceramic_rump_kg",
+            )
+        ]
+    }
+
+    objectives = compute_objectives(
+        profile,
+        SimpleNamespace(product_ledger=lambda: {}),
+    )
+
+    from simulator.optimize.results_store import _serialize_objectives
+
+    serialized = {
+        row["metric"]: row
+        for row in _serialize_objectives(objectives)
+    }
+    for metric, path in PRODUCT_CLASS_MASS_METRIC_PATHS.items():
+        assert serialized[metric]["evidence"] == {
+            "metric": metric,
+            "source": "classify_products",
+            "source_class_path": ".".join(path),
+        }
 
 
 def test_energy_component_and_per_product_metrics_read_scoped_energy() -> None:

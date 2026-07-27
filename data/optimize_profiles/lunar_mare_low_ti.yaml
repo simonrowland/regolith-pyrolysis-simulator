@@ -5,13 +5,17 @@ description: Canonical lunar happy path; full-yield continuous pyrolysis ramp wi
 north_star_rationale: Clean mare basalt is the baseline pot-of-dirt case, so demonstrate pressure plus a catalog-limited thermal ramp extracting multiple products before any MRE electrolysis load.
 objective_emphasis: Pyrolysis-only Fe/SiO/alkali/Mg yield under the alumina furnace ceiling.
 objectives:
-  - {metric: oxygen_kg, sense: maximize, units: kg, weight: 0.34, rationale: main stored oxidizer product}
-  - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.28, rationale: Fe/Mg ingot proxy}
-  - {metric: pure_silica_glass_kg, sense: maximize, units: kg, weight: 0.22, rationale: Stage 3 glass product}
+  - {metric: oxygen_kg, sense: maximize, units: kg, weight: 0.168, rationale: main stored oxidizer product}
+  - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.168, rationale: Fe/Mg ingot proxy}
+  - {metric: pure_silica_glass_kg, sense: maximize, units: kg, weight: 0.168, rationale: Stage 3 glass product}
+  - {metric: industrial_mixed_glass_kg, sense: maximize, units: kg, weight: 0.168, rationale: early-tap bulk silicate product mass}
+  - {metric: sso2_pn2_fe_drain_silica, sense: maximize, units: score_0_1, weight: 0.168, rationale: owner SSO-2 Fe-drain and Stage 3 silica certification score}
   - {metric: energy_electrical_plus_evaporation_kWh, sense: minimize, units: kWh, weight: 0.10, rationale: throughput cost}
   - {metric: duration_h, sense: minimize, units: h, weight: 0.06, rationale: furnace occupancy}
 constraints:
   gates: [delivered_stream_purity, coating, extraction_completeness, knudsen_viscous, furnace_temperature]
+  stream_purity_min: 0.95
+early_tap_mode: true
 run: {campaign: C0, hours: 1, mass_kg: 1000.0, backend_name: internal-analytical}
 fidelities:
   internal-analytical: {backend_name: internal-analytical, hours: 1}
@@ -41,3 +45,26 @@ seed_recipes:
           temp_range_C: [1580, 1670]
         C5:
           allow_mre_voltage_cap_V: 0.0
+  - id: sso2-pn2-fe-drain-silica-owner
+    source_campaign: C2A_staged
+    rationale: Owner SSO-2 recipe with Fe-first drain, PN2 sweep, and Stage 3 silica capture; no MRE or reducing gas.
+    patch:
+      furnace_max_T_C: 1700.0
+      campaigns:
+        C2A_staged:
+          order: fe_then_sio
+          default_hold_T_C: 1670.0
+          stages:
+            fe_hot_hold:
+              duration_hr: 1
+              ramp_rate_C_per_hr: 150.0
+              gas_cover_mode: pn2_sweep
+              pO2_mbar: 1.0e-06
+              p_total_mbar: 10.000001
+            sio_window:
+              target_C: 1650.0
+              duration_hr: 3
+              ramp_rate_C_per_hr: 175.0
+              gas_cover_mode: pn2_sweep
+              pO2_mbar: 1.0e-06
+              p_total_mbar: 10.000001

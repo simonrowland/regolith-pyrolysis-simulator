@@ -60,6 +60,8 @@ _SETPOINT_CAMPAIGN_ALIASES = {
 KNOWN_OBJECTIVE_METRICS = frozenset(
     {
         "pure_silica_glass_kg",
+        "industrial_mixed_glass_kg",
+        "refractory_ceramic_rump_kg",
         "metals_plus_o2_kg",
         "metals_total_kg",
         "O2_kg",
