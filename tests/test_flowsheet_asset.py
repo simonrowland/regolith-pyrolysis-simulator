@@ -8,8 +8,10 @@ from __future__ import annotations
 
 import hashlib
 import importlib.util
+import math
 import re
 import sys
+from copy import deepcopy
 from pathlib import Path
 
 import pytest
@@ -17,6 +19,9 @@ import yaml
 
 REPO = Path(__file__).resolve().parents[1]
 YAML_PATH = REPO / "data" / "flowsheet.yaml"
+TRACE_PATH = REPO / "data" / "trace_elements.yaml"
+FEEDSTOCK_PATH = REPO / "data" / "feedstocks.yaml"
+SPECIES_CATALOG_PATH = REPO / "data" / "species_catalog.yaml"
 RENDERER_PATH = REPO / "scripts" / "render_flowsheet.py"
 
 # v7 REVIEWED SPECIES MAP — every symbol_or_group that must appear exactly once.
@@ -160,6 +165,12 @@ def flowsheet():
         return yaml.safe_load(fh)
 
 
+@pytest.fixture(scope="module")
+def trace_doc():
+    with TRACE_PATH.open("r", encoding="utf-8") as fh:
+        return yaml.safe_load(fh)
+
+
 def test_yaml_loads_and_schema_valid(renderer, flowsheet):
     assert flowsheet["schema_version"] == 1
     errs = renderer.validate_schema(flowsheet)
@@ -260,22 +271,23 @@ def test_demo_fill_changes_only_fill_level(renderer, flowsheet):
     assert re.search(r'class="fill-level"[^>]*height="[1-9]', demo)
 
 
-def test_lint_passes_gracefully_without_trace_elements(renderer, flowsheet):
-    result = renderer.lint_against_trace_elements(flowsheet)
+def test_lint_passes_gracefully_without_trace_elements(
+    renderer, flowsheet, tmp_path
+):
+    result = renderer.lint_against_trace_elements(
+        flowsheet, trace_path=tmp_path / "intentionally-absent.yaml"
+    )
     assert result.ok
-    # On this base, trace_elements.yaml is absent → routing skip; admission still runs
-    if not (REPO / "data" / "trace_elements.yaml").is_file():
-        assert result.skipped
-        report = result.report_text()
-        assert any(
-            "skip" in m.lower() or "SKIPPED" in report
-            for m in result.messages + [report]
-        )
-        # Admission gate is active even without trace_elements
-        assert result.admission_results
-        assert any(r.outcome == "PASS" for r in result.admission_results)
-        assert any(r.outcome == "UNKNOWN" for r in result.admission_results)
-        assert all(r.outcome != "FAIL" for r in result.admission_results)
+    assert result.skipped
+    report = result.report_text()
+    assert any(
+        "skip" in m.lower() or "SKIPPED" in report
+        for m in result.messages + [report]
+    )
+    assert result.admission_results
+    assert any(r.outcome == "PASS" for r in result.admission_results)
+    assert any(r.outcome == "UNKNOWN" for r in result.admission_results)
+    assert all(r.outcome != "FAIL" for r in result.admission_results)
 
 
 def test_write_svg_roundtrip(renderer, flowsheet, tmp_path):
@@ -671,3 +683,327 @@ def test_deliberate_admission_contradiction_fails(renderer, flowsheet):
     lint = renderer.lint_against_trace_elements(mutated, fact_table=fact_table)
     assert not lint.ok
     assert any("admission FAIL" in e for e in lint.errors)
+
+
+MUST_ADD_TRACE_ELEMENTS = {
+    "Zr",
+    "Ru",
+    "Rh",
+    "Pd",
+    "Re",
+    "Os",
+    "Pt",
+    "Te",
+    "I",
+    "Br",
+    "Hg",
+    "H",
+    "He",
+    "C",
+    "N",
+}
+MUST_ADD_MOLECULAR_FORMS = {
+    "ClO4-",
+    "ClO3-",
+    "NO3-",
+    "SO4-",
+    "Cl-",
+    "CO3-",
+    "organic_C",
+    "structural_H2O",
+    "oldhamite_CaS",
+    "niningerite_MgS",
+    "daubreelite_FeCr2S4",
+    "alabandite_MnS",
+    "troilite_FeS",
+    "kamacite_taenite",
+    "surface_correlated_volatile_coatings",
+}
+
+
+def test_trace_production_contract_counts_and_authority(trace_doc):
+    assert trace_doc["schema_version"] == 1
+    assert trace_doc["authority"] == "estimated"
+    assert trace_doc["basis"] == "passenger_sidecar"
+    assert trace_doc["units"] == {
+        "abundance": "ppm_mass",
+        "condensation_temperature": "K",
+        "boiling_point": "C",
+    }
+    assert len(trace_doc["elements"]) == 70
+    assert len(trace_doc["plant_bins"]) == 11
+    assert MUST_ADD_TRACE_ELEMENTS <= set(trace_doc["elements"])
+    assert MUST_ADD_MOLECULAR_FORMS <= set(
+        trace_doc["molecular_forms_by_feedstock_class"]["required_forms"]
+    )
+    assert all(
+        rec["phosphate_affinity"] in {"host_phase_supported", "unknown"}
+        for rec in trace_doc["elements"].values()
+    )
+
+
+def test_trace_routes_sources_and_abundance_triples_resolve(trace_doc):
+    plant_bins = trace_doc["plant_bins"]
+    references = trace_doc["references"]
+    route_count = 0
+    unresolved_count = 0
+    for symbol, element in trace_doc["elements"].items():
+        assert element["routes"], symbol
+        for route in element["routes"]:
+            route_count += 1
+            assert route["plant_bin"] in plant_bins, (symbol, route)
+            assert route["status"] in {"conditional", "estimated"}
+            if route["status"] == "conditional":
+                assert route["fraction"] is None
+                assert isinstance(route["condition"], str) and route["condition"]
+            else:
+                assert route["condition"] is None
+                assert math.isfinite(route["fraction"])
+                assert 0.0 <= route["fraction"] <= 1.0
+
+        for source_id in element["source_ids"]:
+            assert source_id in references, (symbol, source_id)
+        for class_name, abundance in element[
+            "abundance_by_feedstock_class"
+        ].items():
+            for source_id in abundance["source_ids"]:
+                assert source_id in references, (symbol, class_name, source_id)
+            triple = [
+                abundance["min_ppm_mass"],
+                abundance["typical_ppm_mass"],
+                abundance["max_ppm_mass"],
+            ]
+            if abundance["distribution"] == "unresolved":
+                unresolved_count += 1
+                assert triple == [None, None, None]
+            else:
+                assert abundance["distribution"] == "triangular"
+                assert all(
+                    isinstance(value, (int, float))
+                    and not isinstance(value, bool)
+                    and math.isfinite(value)
+                    and value >= 0.0
+                    for value in triple
+                )
+                assert triple == sorted(triple)
+
+    assert route_count == 150
+    assert unresolved_count > 0
+    assert (
+        trace_doc["elements"]["Hg"]["abundance_by_feedstock_class"]["mars"][
+            "distribution"
+        ]
+        == "unresolved"
+    )
+
+
+def test_comet_trace_basis_and_volatile_ice_pointer(trace_doc):
+    comet = trace_doc["molecular_forms_by_feedstock_class"][
+        "comet_dry_refractory_dust"
+    ]
+    assert comet["basis"] == "dry_refractory_dust"
+    pointer = comet["volatile_ice_species_pointer_only"]
+    assert pointer["ownership"] == "sibling_worker"
+    assert {"H2O", "CO", "CO2", "NH3", "HCl", "Ar", "Kr", "Xe"} <= set(
+        pointer["species"]
+    )
+    assert (
+        trace_doc["elements"]["H"]["abundance_by_feedstock_class"][
+            "comet_dry_refractory_dust"
+        ]["distribution"]
+        == "unresolved"
+    )
+
+
+def test_special_trace_flowsheet_memberships(trace_doc):
+    memberships = {
+        symbol: trace_doc["elements"][symbol]["flowsheet_membership"]
+        for symbol in ("Be", "Sc", "Zr", "Hf", "C", "B")
+    }
+    assert memberships["Be"] == {
+        "chip": "BeO",
+        "plant_bin": "rump",
+        "status": "placed",
+        "reason": None,
+    }
+    assert memberships["Sc"]["chip"] == "Sc2O3"
+    assert memberships["Zr"]["chip"] == "ZrO2"
+    assert memberships["Hf"]["chip"] == "HfO2"
+    assert memberships["C"] == {
+        "chip": "CO-CH4-organics",
+        "plant_bin": "cryo-train",
+        "status": "placed",
+        "reason": None,
+    }
+    assert memberships["B"]["status"] == "unplaced"
+    assert memberships["B"]["chip"] is None
+    assert memberships["B"]["plant_bin"] is None
+    assert memberships["B"]["reason"]
+
+
+def test_production_trace_lint_checks_nonzero_mapping_rows(
+    renderer, flowsheet
+):
+    result = renderer.lint_against_trace_elements(flowsheet, TRACE_PATH)
+    assert result.ok, result.report_text()
+    assert not result.skipped
+    assert any(
+        "routed species checked: 70; route alternatives checked: 150; "
+        "static memberships checked: 69" in message
+        for message in result.messages
+    )
+
+
+def test_trace_fact_export_keeps_estimated_authority_and_evidence_visible(
+    renderer,
+):
+    facts = renderer.load_trace_element_facts(TRACE_PATH)
+    assert facts
+    assert all(fact["trace_authority"] == "estimated" for fact in facts.values())
+    assert (
+        facts["B"]["evidence_status_by_feedstock_class"]["lunar"]
+        == "UNSOURCED_NUMERIC_RANGE"
+    )
+
+
+def test_trace_extract_order_is_canonical(renderer, trace_doc):
+    reordered = deepcopy(trace_doc)
+    reordered["elements"] = dict(reversed(list(reordered["elements"].items())))
+    extracted_symbols = [
+        record["symbol"] for record in renderer._extract_routed_species(reordered)
+    ]
+    assert extracted_symbols == sorted(trace_doc["elements"])
+
+
+@pytest.mark.parametrize(
+    ("case", "error_fragment"),
+    [
+        ("wrong_route_target", "route targets unknown plant bin"),
+        ("wrong_membership", "not declared plant bin"),
+        ("unknown_route_status", "route has unknown status"),
+        ("unknown_condition", "route condition must be"),
+        ("unexplained_unplaced", "requires an uncertainty reason"),
+        ("unknown_evidence_status", "unknown evidence_status"),
+        ("unsourced_numeric", "may not carry a numeric ppm range"),
+        ("inverted_abundance", "min <= typical <= max"),
+        ("empty_elements", "routing cross-check empty"),
+    ],
+)
+def test_trace_lint_rejects_malformed_contract(
+    renderer, flowsheet, trace_doc, tmp_path, case, error_fragment
+):
+    malformed = deepcopy(trace_doc)
+    if case == "wrong_route_target":
+        malformed["elements"]["Li"]["routes"][0]["plant_bin"] = "not-a-bin"
+    elif case == "wrong_membership":
+        malformed["elements"]["Li"]["flowsheet_membership"]["plant_bin"] = "rump"
+    elif case == "unknown_route_status":
+        malformed["elements"]["Li"]["routes"][0]["status"] = "invented"
+    elif case == "unknown_condition":
+        malformed["elements"]["Li"]["routes"][0]["condition"] = {"mode": "invalid"}
+    elif case == "unexplained_unplaced":
+        malformed["elements"]["B"]["flowsheet_membership"]["reason"] = ""
+    elif case == "unknown_evidence_status":
+        malformed["elements"]["Li"]["abundance_by_feedstock_class"]["lunar"][
+            "evidence_status"
+        ] = "INVENTED"
+    elif case == "unsourced_numeric":
+        malformed["elements"]["Li"]["abundance_by_feedstock_class"]["lunar"][
+            "evidence_status"
+        ] = "UNSOURCED_NUMERIC_RANGE"
+    elif case == "inverted_abundance":
+        malformed["elements"]["Li"]["abundance_by_feedstock_class"]["lunar"][
+            "min_ppm_mass"
+        ] = 100.0
+    elif case == "empty_elements":
+        malformed["elements"] = {}
+    else:  # pragma: no cover
+        raise AssertionError(case)
+
+    path = tmp_path / f"{case}.yaml"
+    path.write_text(
+        yaml.safe_dump(malformed, sort_keys=False, allow_unicode=True),
+        encoding="utf-8",
+    )
+    result = renderer.lint_against_trace_elements(flowsheet, path)
+    assert not result.ok
+    assert any(error_fragment in error for error in result.errors), result.report_text()
+
+
+def test_trace_phase_one_preserves_locked_flowsheet_and_default_svg(
+    renderer, flowsheet
+):
+    assert hashlib.sha256(YAML_PATH.read_bytes()).hexdigest() == (
+        "5c9adb746ca59f67389fb439ad2f88ace38bfe2dbe6a22c919f615ebeed0ee0d"
+    )
+    svg = renderer.render_svg(flowsheet, demo_fill=0.0)
+    assert hashlib.sha256(svg.encode()).hexdigest() == (
+        "f30255591a7f0316060b47d9186da0d92116d5d9de6a6711185c1099d40e4ab9"
+    )
+
+
+def test_trace_major_overlap_rule_is_behaviorally_formula_resolved_per_feedstock(
+    renderer,
+):
+    owns_chromium = {
+        "composition_wt_pct": {"Cr2O3": 100.0},
+        "trace_ppm": {"elements": {"Cr": 1.0}},
+    }
+    does_not_own_chromium = {
+        "composition_wt_pct": {"SiO2": 100.0},
+        "trace_ppm": {"elements": {"Cr": 1.0}},
+    }
+    errors = renderer.validate_feedstock_trace_major_exclusion(
+        "synthetic_chromite", owns_chromium, SPECIES_CATALOG_PATH
+    )
+    assert len(errors) == 1
+    assert "synthetic_chromite" in errors[0]
+    assert "'Cr'" in errors[0]
+    assert "Cr2O3" in errors[0]
+    assert (
+        renderer.validate_feedstock_trace_major_exclusion(
+            "synthetic_silica", does_not_own_chromium, SPECIES_CATALOG_PATH
+        )
+        == []
+    )
+
+
+@pytest.mark.parametrize(
+    ("passenger_declaration", "error_fragment"),
+    [
+        ({"trace_ppm": {"elements": {"cr": 1.0}}}, "already owned"),
+        ({"trace_ppm": {"elements": {"CR": 1.0}}}, "already owned"),
+        ({"trace_ppm": {"Cr": 1.0}}, "only allows the 'elements' key"),
+        (
+            {"trace_elements": {"Cr_ppm": 1.0}},
+            "only legal passenger declaration is trace_ppm.elements",
+        ),
+    ],
+)
+def test_trace_major_exclusion_rejects_case_and_schema_bypasses(
+    renderer, passenger_declaration, error_fragment
+):
+    feedstock = {
+        "composition_wt_pct": {"Cr2O3": 100.0},
+        **deepcopy(passenger_declaration),
+    }
+    errors = renderer.validate_feedstock_trace_major_exclusion(
+        "synthetic_chromite", feedstock, SPECIES_CATALOG_PATH
+    )
+    assert any(error_fragment in error for error in errors), errors
+
+
+def test_trace_major_exclusion_explicitly_rejects_legacy_production_alias(
+    renderer,
+):
+    feedstocks = yaml.safe_load(FEEDSTOCK_PATH.read_text(encoding="utf-8"))
+    targeted = feedstocks["targeted_super_kreep_ore"]
+    assert targeted["composition_wt_pct"]["ZrO2"] > 0.0
+    assert "Zr_ppm" in targeted["trace_elements"]
+    errors = renderer.validate_feedstock_trace_major_exclusion(
+        "targeted_super_kreep_ore", targeted, SPECIES_CATALOG_PATH
+    )
+    assert any(
+        "only legal passenger declaration is trace_ppm.elements" in error
+        for error in errors
+    ), errors

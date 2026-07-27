@@ -72,6 +72,45 @@ DEFAULT_OUT = (
     / "flowsheet.svg"
 )
 TRACE_ELEMENTS_YAML = REPO_ROOT / "data" / "trace_elements.yaml"
+SPECIES_CATALOG_YAML = REPO_ROOT / "data" / "species_catalog.yaml"
+TRACE_EVIDENCE_STATUS_VOCABULARY = frozenset(
+    {
+        "BODY_SWEEP_ESTIMATED",
+        "BODY_SWEEP_LITERATURE",
+        "CITED_NO_NUMERIC_RANGE",
+        "COSIMA_INORGANIC_FACTOR3_CI_ENVELOPE",
+        "DETECTED_NOT_QUANTIFIED_CI_PROXY_RANGE",
+        "DETECTED_SOLID_CI_PROXY_RANGE",
+        "DIRECT_COSIMA_MASS_ESTIMATE",
+        "DISPUTED_ELEMENT_VS_NITRATE_AND_MAX",
+        "DISPUTED_LOCAL_ENRICHMENTS_EXCEED_RANGE",
+        "DISPUTED_LOCAL_VALUES_EXCEED_RANGE",
+        "DISPUTED_MAX_EXCEEDS_SOURCEBOOK_TABLE",
+        "NO_REPORTED_VALUE",
+        "PARTIAL_CI_TYPICAL_BUT_CARBONACEOUS_GROUP_SPAN_GT3",
+        "PARTIAL_DIRECT_APXS_RANGE",
+        "PARTIAL_DIRECT_SURFACE_DATA",
+        "PARTIAL_LOCAL_CHEMCAM_RANGE",
+        "PARTIAL_LOCAL_VEIN_UPPER_LIMIT",
+        "PARTIAL_REGOLITH_METEORITIC_NOT_INDIGENOUS",
+        "PARTIAL_SOURCE_TABLE",
+        "TYPICAL_SUPPORTED_RANGE_IS_RESEARCH_ENVELOPE",
+        "UNCERTAIN_BULK_MARS_PROXY",
+        "UNCERTAIN_CI_PROXY_NOT_DIRECTLY_MEASURED",
+        "UNCERTAIN_METEORITIC_CI_MIX_PROXY",
+        "UNCERTAIN_METEORITIC_PROXY_NOT_DIRECT_SOIL",
+        "UNCERTAIN_MIXED_CARRIERS_NO_RANGE_SOURCE",
+        "UNCERTAIN_REE_INTERPOLATION_NOT_TABLED",
+        "UNSOURCED_DIRECT_MARS_RANGE",
+        "UNSOURCED_LUNAR_RANGE_CI_ONLY",
+        "UNSOURCED_NUMERIC_RANGE",
+        "UPDATED_HALOGEN_SOURCE_WITHIN_OR_NEAR_ENVELOPE",
+        "VOLATILE_TRACE_CI_PROXY_GROUP_SPAN_GT3_NOT_COSIMA_MEASURED",
+        "VOLATILE_TRACE_CI_PROXY_NOT_COSIMA_MEASURED",
+        "WILD2_ENRICHED_OVER_CI_NO_DEFENSIBLE_RANGE",
+        "WILD2_MEAN_WITHIN_35_PERCENT_OF_CI",
+    }
+)
 
 # ---------------------------------------------------------------------------
 # Layout constants (deterministic, content-driven heights)
@@ -280,6 +319,150 @@ def aggregate_members_by_chip(data: dict[str, Any]) -> dict[str, tuple[str, ...]
     return out
 
 
+def _formula_registry_for_feedstock(
+    feedstock: dict[str, Any],
+    species_catalog_path: Path = SPECIES_CATALOG_YAML,
+) -> dict[str, Any]:
+    from simulator.accounting.formulas import (
+        coerce_species_formula,
+        load_species_formulas,
+    )
+
+    registry = dict(load_species_formulas(species_catalog_path))
+    for section_name in (
+        "species_formulas",
+        "formula_inventory",
+        "stage0_formula_inventory",
+    ):
+        section = feedstock.get(section_name) or {}
+        if not isinstance(section, dict):
+            raise ValueError(f"{section_name} must be a mapping")
+        for species, raw_entry in section.items():
+            if not isinstance(raw_entry, dict):
+                raise ValueError(f"{section_name}.{species} must be a mapping")
+            entry = dict(raw_entry)
+            template = (
+                entry.pop("template_formula", None)
+                or entry.pop("template", None)
+                or entry.pop("generic_formula", None)
+            )
+            has_formula = any(
+                key in entry
+                for key in (
+                    "atoms",
+                    "elements",
+                    "formula",
+                    "atom_mass_fractions",
+                    "element_mass_fractions",
+                )
+            )
+            if template:
+                template_formula = registry.get(str(template))
+                if template_formula is None:
+                    raise ValueError(
+                        f"{species} formula template {template!r} is not declared "
+                        "in data/species_catalog.yaml"
+                    )
+                if not has_formula:
+                    entry["atoms"] = dict(template_formula.elements)
+                entry.setdefault("estimated", bool(template_formula.estimated))
+                entry.setdefault("source", template_formula.source)
+                entry.setdefault(
+                    "requires_feedstock_metadata",
+                    bool(template_formula.requires_feedstock_metadata),
+                )
+            registry[str(species)] = coerce_species_formula(str(species), entry)
+    return registry
+
+
+def formula_resolved_major_element_owners(
+    feedstock: dict[str, Any],
+    species_catalog_path: Path = SPECIES_CATALOG_YAML,
+) -> dict[str, tuple[str, ...]]:
+    """Map each major-owned element to its normalized feedstock components."""
+    from simulator.feedstock_composition import (
+        normalized_feedstock_component_masses_kg,
+    )
+
+    registry = _formula_registry_for_feedstock(feedstock, species_catalog_path)
+    components = normalized_feedstock_component_masses_kg(feedstock, 1.0)
+    owners: dict[str, list[str]] = {}
+    for component, mass_kg in components.items():
+        if mass_kg <= 0.0:
+            continue
+        formula = registry.get(component)
+        if formula is None:
+            raise ValueError(
+                f"major component {component!r} has no formula in "
+                "data/species_catalog.yaml or feedstock-local formula inventory"
+            )
+        for element, count in formula.elements.items():
+            if count > 0.0:
+                owners.setdefault(str(element), []).append(str(component))
+    return {
+        element: tuple(sorted(set(components)))
+        for element, components in owners.items()
+    }
+
+
+def validate_feedstock_trace_major_exclusion(
+    feedstock_name: str,
+    feedstock: dict[str, Any],
+    species_catalog_path: Path = SPECIES_CATALOG_YAML,
+) -> list[str]:
+    """Reject trace passengers already owned by normalized major input."""
+    errors = []
+    if "trace_elements" in feedstock:
+        errors.append(
+            f"feedstock {feedstock_name!r} uses legacy trace_elements; "
+            "the only legal passenger declaration is trace_ppm.elements"
+        )
+    trace_ppm = feedstock.get("trace_ppm")
+    if trace_ppm is None:
+        return errors
+    if not isinstance(trace_ppm, dict):
+        return [
+            *errors,
+            f"feedstock {feedstock_name!r} trace_ppm must be a mapping",
+        ]
+    unexpected_keys = sorted(set(trace_ppm) - {"elements"}, key=str)
+    if unexpected_keys:
+        errors.append(
+            f"feedstock {feedstock_name!r} trace_ppm only allows the "
+            f"'elements' key; found {unexpected_keys!r}"
+        )
+    trace_elements = trace_ppm.get("elements")
+    if not isinstance(trace_elements, dict):
+        return [
+            *errors,
+            f"feedstock {feedstock_name!r} trace_ppm.elements must be a mapping"
+        ]
+    owners = formula_resolved_major_element_owners(
+        feedstock, species_catalog_path
+    )
+    owners_by_casefold = {
+        element.casefold(): (element, components)
+        for element, components in owners.items()
+    }
+    for element in trace_elements:
+        if not isinstance(element, str) or not element.strip():
+            errors.append(
+                f"feedstock {feedstock_name!r} trace_ppm element keys must "
+                "be non-empty element symbols"
+            )
+            continue
+        owned = owners_by_casefold.get(element.strip().casefold())
+        if owned:
+            canonical_element, element_owners = owned
+            errors.append(
+                f"feedstock {feedstock_name!r} trace_ppm element {element!r} "
+                f"resolves to {canonical_element!r} and is already owned by "
+                "normalized major component(s): "
+                + ", ".join(element_owners)
+            )
+    return errors
+
+
 def membership_rows(data: dict[str, Any]) -> list[tuple[str, str, str, str, list[str]]]:
     """Canonical membership set: sorted (bin, chip, status, condition_note, members).
 
@@ -453,30 +636,44 @@ def load_trace_element_facts(
 ) -> dict[str, dict[str, Any]]:
     """Map element id → fact fields from data/trace_elements.yaml (when present).
 
-    Field vocabulary aligns with the t-380 draft (family, reductant_class,
-    host_phase, volatile_as_oxide, destination_bins) plus normalized
+    Field vocabulary aligns with the t-380 production table (family,
+    reductant_class, host_phases, volatile_as_oxide, routes) plus normalized
     ``reducibility`` / ``volatile_as`` / ``goldschmidt_class`` projections.
     """
     if not trace_path.is_file():
         return {}
-    with trace_path.open("r", encoding="utf-8") as fh:
-        doc = yaml.safe_load(fh)
+    try:
+        with trace_path.open("r", encoding="utf-8") as fh:
+            doc = yaml.safe_load(fh)
+    except (OSError, yaml.YAMLError):
+        return {}
     if not isinstance(doc, dict):
         return {}
     elements = doc.get("elements") or doc.get("species") or {}
     if not isinstance(elements, dict):
         return {}
+    trace_authority = doc.get("authority")
     out: dict[str, dict[str, Any]] = {}
     for sym, rec in elements.items():
         if not isinstance(rec, dict):
             continue
-        facts: dict[str, Any] = {"element": str(sym)}
+        facts: dict[str, Any] = {
+            "element": str(sym),
+            "trace_authority": trace_authority,
+        }
+        abundance = rec.get("abundance_by_feedstock_class")
+        if isinstance(abundance, dict):
+            facts["evidence_status_by_feedstock_class"] = {
+                str(class_name): class_rec.get("evidence_status")
+                for class_name, class_rec in abundance.items()
+                if isinstance(class_rec, dict)
+            }
         if rec.get("family") is not None:
             facts["family"] = rec["family"]
         if rec.get("reductant_class") is not None:
             facts["reductant_class"] = rec["reductant_class"]
             facts["reducibility"] = _reductant_to_reducibility(str(rec["reductant_class"]))
-        host = rec.get("host_phase")
+        host = rec.get("host_phases", rec.get("host_phase"))
         if isinstance(host, list) and host:
             # Prefer metal > sulfide > first
             prefer = ("metal", "native", "alloy", "sulfide", "schreibersite")
@@ -816,21 +1013,41 @@ def evaluate_all_admissions(
 
 
 def _extract_routed_species(trace_doc: Any) -> list[dict[str, Any]]:
-    """Best-effort parse of trace_elements.yaml into routed species records."""
+    """Normalize production or legacy trace routing into element records."""
     if not isinstance(trace_doc, dict):
         return []
     records: list[dict[str, Any]] = []
 
-    def push(sym: str, route: str | None, classification: str | None) -> None:
-        if not sym:
-            return
-        records.append(
-            {
-                "symbol": str(sym),
-                "route": route,
-                "classification": (classification or "").lower() or None,
-            }
-        )
+    elements = trace_doc.get("elements")
+    if isinstance(elements, dict):
+        for symbol in sorted(elements, key=str):
+            item = elements[symbol]
+            if not isinstance(item, dict):
+                records.append(
+                    {
+                        "symbol": str(symbol),
+                        "routes": [],
+                        "flowsheet_membership": None,
+                        "source_ids": None,
+                        "abundance_by_feedstock_class": None,
+                        "legacy": False,
+                    }
+                )
+                continue
+            routes = item.get("routes")
+            records.append(
+                {
+                    "symbol": str(symbol),
+                    "routes": routes if isinstance(routes, list) else [],
+                    "flowsheet_membership": item.get("flowsheet_membership"),
+                    "source_ids": item.get("source_ids"),
+                    "abundance_by_feedstock_class": item.get(
+                        "abundance_by_feedstock_class"
+                    ),
+                    "legacy": False,
+                }
+            )
+        return records
 
     for key in ("species", "elements", "routing", "routes"):
         items = trace_doc.get(key)
@@ -859,7 +1076,32 @@ def _extract_routed_species(trace_doc: Any) -> list[dict[str, Any]]:
             if route is None and item.get("routing"):
                 route = item["routing"] if isinstance(item["routing"], str) else None
             if sym and route:
-                push(str(sym), str(route), str(classification) if classification else None)
+                records.append(
+                    {
+                        "symbol": str(sym),
+                        "routes": [
+                            {
+                                "plant_bin": str(route),
+                                "fraction": None,
+                                "condition": None,
+                                "status": (
+                                    str(classification).lower()
+                                    if classification
+                                    else "legacy"
+                                ),
+                            }
+                        ],
+                        "flowsheet_membership": {
+                            "chip": str(sym),
+                            "plant_bin": str(route),
+                            "status": "placed",
+                            "reason": "legacy list-shaped trace row",
+                        },
+                        "source_ids": [],
+                        "abundance_by_feedstock_class": {},
+                        "legacy": True,
+                    }
+                )
     return records
 
 
@@ -869,7 +1111,7 @@ def lint_against_trace_elements(
     *,
     fact_table: dict[str, dict[str, Any]] | None = None,
 ) -> LintResult:
-    """Drift lint (trace_elements routing) + bin-admission evaluation.
+    """Trace schema/static-membership lint + bin-admission evaluation.
 
     Admission outcomes:
       PASS    — facts support the chip's bin predicate
@@ -907,10 +1149,15 @@ def lint_against_trace_elements(
                 f"admission UNKNOWN: {r.symbol} @ {r.bin_id} — {r.detail or 'incomplete facts'}"
             )
 
-    # --- Optional trace_elements routing drift ---
+    # --- Optional trace schema + static-membership cross-check ---
     if trace_skipped:
+        try:
+            missing_label = str(trace_path.relative_to(REPO_ROOT))
+        except ValueError:
+            missing_label = str(trace_path)
         messages.append(
-            f"Missing {trace_path.relative_to(REPO_ROOT)} — routing drift lint skipped (graceful)."
+            f"Missing {missing_label} — trace schema/static-membership lint "
+            "skipped (graceful)."
         )
         messages.append(
             "When trace_elements.yaml lands, re-run: scripts/render_flowsheet.py --lint"
@@ -924,16 +1171,27 @@ def lint_against_trace_elements(
             admission_results=admission_results,
         )
 
-    with trace_path.open("r", encoding="utf-8") as fh:
-        trace_doc = yaml.safe_load(fh)
+    try:
+        with trace_path.open("r", encoding="utf-8") as fh:
+            trace_doc = yaml.safe_load(fh)
+    except (OSError, yaml.YAMLError) as exc:
+        errors.append(f"{trace_path.name} could not be parsed: {exc}")
+        return LintResult(
+            ok=False,
+            skipped=False,
+            messages=messages,
+            errors=errors,
+            warnings=warnings,
+            admission_results=admission_results,
+        )
     routed = _extract_routed_species(trace_doc)
     if not routed:
-        messages.append(
+        errors.append(
             f"{trace_path.name} present but no routed species entries found — "
             "routing cross-check empty."
         )
         return LintResult(
-            ok=not errors,
+            ok=False,
             skipped=False,
             messages=messages,
             errors=errors,
@@ -941,55 +1199,264 @@ def lint_against_trace_elements(
             admission_results=admission_results,
         )
 
-    agg_map = aggregate_membership(data)
+    if not isinstance(trace_doc, dict):
+        errors.append(f"{trace_path.name} root must be a mapping")
+        return LintResult(
+            ok=False,
+            skipped=False,
+            messages=messages,
+            errors=errors,
+            warnings=warnings,
+            admission_results=admission_results,
+        )
+
+    if trace_doc.get("schema_version") != 1:
+        errors.append("trace schema_version must equal 1")
+    if trace_doc.get("authority") != "estimated":
+        errors.append("trace authority must equal 'estimated'")
+    if trace_doc.get("basis") != "passenger_sidecar":
+        errors.append("trace basis must equal 'passenger_sidecar'")
+    if not isinstance(trace_doc.get("elements"), dict):
+        errors.append("trace elements must be a mapping")
+
+    plant_bins = trace_doc.get("plant_bins")
+    if not isinstance(plant_bins, dict) or not plant_bins:
+        errors.append("trace plant_bins must be a non-empty mapping")
+        plant_bins = {}
+
+    block_ids = {str(block.get("id")) for block in data.get("blocks") or []}
+    sub_box_ids = {
+        str(sub.get("id"))
+        for block in data.get("blocks") or []
+        for sub in block.get("sub_boxes") or []
+    }
+    for token, target in plant_bins.items():
+        if not isinstance(target, dict):
+            errors.append(f"plant bin {token!r} target must be a mapping")
+            continue
+        kind = target.get("flowsheet_node_kind")
+        node_id = target.get("flowsheet_node_id")
+        if kind not in {"block", "sub_box"}:
+            errors.append(
+                f"plant bin {token!r} has unknown flowsheet_node_kind {kind!r}"
+            )
+        elif not isinstance(node_id, str) or not node_id:
+            errors.append(
+                f"plant bin {token!r} flowsheet_node_id must be a non-empty string"
+            )
+        elif kind == "block" and node_id not in block_ids:
+            errors.append(
+                f"plant bin {token!r} targets missing block {node_id!r}"
+            )
+        elif kind == "sub_box" and node_id not in sub_box_ids:
+            errors.append(
+                f"plant bin {token!r} targets missing sub_box {node_id!r}"
+            )
+        if not isinstance(target.get("terminal"), bool):
+            errors.append(f"plant bin {token!r} terminal must be boolean")
+        if not isinstance(target.get("status"), str) or not target["status"].strip():
+            errors.append(f"plant bin {token!r} status must be non-empty")
+
+    references = trace_doc.get("references")
+    if not isinstance(references, dict):
+        errors.append("trace references must be a mapping")
+        references = {}
+
     covered_chips: set[str] = set()
+    checked_routes = 0
+    checked_memberships = 0
+    allowed_route_statuses = {"conditional", "estimated"}
+    allowed_membership_statuses = {"placed", "unplaced"}
 
     for rec in routed:
         sym = rec["symbol"]
-        chip_sym = sym if sym in chips else agg_map.get(sym)
-        if chip_sym is None:
+        routes = rec.get("routes")
+        if not isinstance(routes, list) or not routes:
             errors.append(
-                f"orphan (trace→flowsheet): routed species {sym!r} has no chip "
-                f"and is not in any aggregate membership"
+                f"trace element {sym!r} must declare at least one route"
+            )
+        else:
+            for route in routes:
+                checked_routes += 1
+                if not isinstance(route, dict):
+                    errors.append(f"trace element {sym!r} route must be a mapping")
+                    continue
+                token = route.get("plant_bin")
+                if token not in plant_bins:
+                    errors.append(
+                        f"trace element {sym!r} route targets unknown plant bin {token!r}"
+                    )
+                status = route.get("status")
+                if not rec.get("legacy") and status not in allowed_route_statuses:
+                    errors.append(
+                        f"trace element {sym!r} route has unknown status {status!r}"
+                    )
+                condition = route.get("condition")
+                fraction = route.get("fraction")
+                if condition is not None and (
+                    not isinstance(condition, str) or not condition.strip()
+                ):
+                    errors.append(
+                        f"trace element {sym!r} route condition must be a non-empty string or null"
+                    )
+                if not rec.get("legacy") and status == "conditional":
+                    if fraction is not None or not isinstance(condition, str) or not condition.strip():
+                        errors.append(
+                            f"trace element {sym!r} conditional route requires null fraction "
+                            "and a non-empty condition"
+                        )
+                elif not rec.get("legacy") and status == "estimated":
+                    if (
+                        isinstance(fraction, bool)
+                        or not isinstance(fraction, (int, float))
+                        or not math.isfinite(float(fraction))
+                        or not 0.0 <= float(fraction) <= 1.0
+                        or condition is not None
+                    ):
+                        errors.append(
+                            f"trace element {sym!r} estimated route requires a finite "
+                            "0..1 fraction and null condition"
+                        )
+
+        source_ids = rec.get("source_ids")
+        if not isinstance(source_ids, list):
+            errors.append(f"trace element {sym!r} source_ids must be a list")
+            source_ids = []
+        abundance = rec.get("abundance_by_feedstock_class")
+        if isinstance(abundance, dict):
+            for class_name, class_rec in abundance.items():
+                if not isinstance(class_rec, dict):
+                    errors.append(
+                        f"trace element {sym!r} abundance class {class_name!r} must be a mapping"
+                    )
+                    continue
+                distribution = class_rec.get("distribution")
+                evidence_status = class_rec.get("evidence_status")
+                triple = [
+                    class_rec.get("min_ppm_mass"),
+                    class_rec.get("typical_ppm_mass"),
+                    class_rec.get("max_ppm_mass"),
+                ]
+                if evidence_status not in TRACE_EVIDENCE_STATUS_VOCABULARY:
+                    errors.append(
+                        f"trace element {sym!r} abundance class {class_name!r} "
+                        f"has unknown evidence_status {evidence_status!r}"
+                    )
+                if distribution == "unresolved":
+                    if triple != [None, None, None]:
+                        errors.append(
+                            f"trace element {sym!r} abundance class {class_name!r} "
+                            "unresolved distribution requires an all-null ppm triple"
+                        )
+                elif distribution == "triangular":
+                    valid_triple = all(
+                        not isinstance(value, bool)
+                        and isinstance(value, (int, float))
+                        and math.isfinite(float(value))
+                        and float(value) >= 0.0
+                        for value in triple
+                    )
+                    if not valid_triple or triple != sorted(triple):
+                        errors.append(
+                            f"trace element {sym!r} abundance class {class_name!r} "
+                            "triangular distribution requires finite ordered "
+                            "min <= typical <= max ppm"
+                        )
+                else:
+                    errors.append(
+                        f"trace element {sym!r} abundance class {class_name!r} "
+                        f"has unknown distribution {distribution!r}"
+                    )
+                if (
+                    isinstance(evidence_status, str)
+                    and evidence_status.startswith("UNSOURCED_")
+                    and distribution != "unresolved"
+                ):
+                    errors.append(
+                        f"trace element {sym!r} abundance class {class_name!r} "
+                        f"{evidence_status} may not carry a numeric ppm range"
+                    )
+                class_sources = class_rec.get("source_ids")
+                if not isinstance(class_sources, list):
+                    errors.append(
+                        f"trace element {sym!r} abundance class {class_name!r} "
+                        "source_ids must be a list"
+                    )
+                    continue
+                source_ids = [*source_ids, *class_sources]
+        for source_id in source_ids:
+            if not isinstance(source_id, str) or source_id not in references:
+                errors.append(
+                    f"trace element {sym!r} cites unknown source_id {source_id!r}"
+                )
+
+        membership = rec.get("flowsheet_membership")
+        if not isinstance(membership, dict):
+            errors.append(
+                f"trace element {sym!r} flowsheet_membership must be a mapping"
             )
             continue
-        if chip_sym not in chips:
+        status = membership.get("status")
+        if status not in allowed_membership_statuses:
             errors.append(
-                f"aggregate {chip_sym!r} claims member {sym!r} but chip is missing on flowsheet"
+                f"trace element {sym!r} has unknown membership status {status!r}"
+            )
+            continue
+        if status == "unplaced":
+            if sym != "B":
+                errors.append(
+                    f"trace element {sym!r} may not use the B-only unplaced exception"
+                )
+            if membership.get("chip") is not None or membership.get("plant_bin") is not None:
+                errors.append(
+                    f"trace element {sym!r} unplaced membership must have null chip and plant_bin"
+                )
+            reason = membership.get("reason")
+            if not isinstance(reason, str) or not reason.strip():
+                errors.append(
+                    f"trace element {sym!r} unplaced membership requires an uncertainty reason"
+                )
+            continue
+
+        checked_memberships += 1
+        chip_sym = membership.get("chip")
+        token = membership.get("plant_bin")
+        if not isinstance(chip_sym, str) or chip_sym not in chips:
+            errors.append(
+                f"trace element {sym!r} membership chip {chip_sym!r} is absent from flowsheet"
+            )
+            continue
+        target = plant_bins.get(token)
+        if not isinstance(target, dict):
+            errors.append(
+                f"trace element {sym!r} membership targets unknown plant bin {token!r}"
+            )
+            continue
+        if target.get("flowsheet_node_kind") != "sub_box":
+            errors.append(
+                f"trace element {sym!r} membership plant bin {token!r} is not a sub_box"
+            )
+            continue
+        actual_bin = chips[chip_sym]["bin"]
+        declared_bin = target.get("flowsheet_node_id")
+        if actual_bin != declared_bin:
+            errors.append(
+                f"trace element {sym!r} membership chip {chip_sym!r} is in "
+                f"{actual_bin!r}, not declared plant bin {token!r} ({declared_bin!r})"
             )
             continue
         covered_chips.add(chip_sym)
-        cls = rec.get("classification")
-        chip_status = chips[chip_sym]["status"]
-        if cls:
-            wants_conditional = cls in (
-                "conditional",
-                "uncertain",
-                "mode_dependent",
-                "host_dependent",
-            )
-            wants_reviewed = cls in ("reviewed", "confirmed", "default", "primary")
-            if wants_conditional and chip_status != "conditional":
-                errors.append(
-                    f"conditionality mismatch: {sym} classified {cls!r} in trace_elements "
-                    f"but chip {chip_sym!r} is {chip_status!r}"
-                )
-            if wants_reviewed and chip_status != "reviewed":
-                errors.append(
-                    f"conditionality mismatch: {sym} classified {cls!r} in trace_elements "
-                    f"but chip {chip_sym!r} is {chip_status!r}"
-                )
 
     aggregate_chips = {a["chip"] for a in (data.get("aggregates") or [])}
     major_process_chips = {
         "H2O", "CO2", "S", "SO2", "F", "Cl", "Br", "I", "O2",
         "Mg", "Al", "Ti", "V", "Nb", "Ta", "Ca", "Sr", "Ba",
         "Eu", "Yb", "Y", "Th", "U", "Be", "Zr", "Hf", "Sc",
-        "BeO", "ZrO2", "HfO2", "Sc2O3",
+        "BeO", "ZrO2", "HfO2", "Sc2O3", "MoO3", "WO3", "Re2O7",
         "Na", "K", "Rb", "Cs", "Fe", "Ni", "Co", "Ru", "Rh", "Pd",
         "Re", "Os", "Ir", "Pt", "Au", "Mo", "W", "Zn", "Cd", "Pb",
         "Tl", "Bi", "glass", "salts", "organics", "REE", "unreduced-residuals",
-        "CO-CH4-organics", "CO2-CO", "P2-PO",
+        "CO-CH4-organics", "CO2-CO", "P2-PO", "Fe⁰", "Si⁰",
     }
     for sym, info in chips.items():
         if sym in covered_chips:
@@ -1006,7 +1473,10 @@ def lint_against_trace_elements(
         )
 
     messages.insert(
-        0, f"routed species checked: {len(routed)}; flowsheet chips: {len(chips)}"
+        0,
+        f"routed species checked: {len(routed)}; route alternatives checked: "
+        f"{checked_routes}; static memberships checked: {checked_memberships}; "
+        f"flowsheet chips: {len(chips)}",
     )
     return LintResult(
         ok=not errors,
