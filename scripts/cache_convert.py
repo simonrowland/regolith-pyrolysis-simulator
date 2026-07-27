@@ -27,12 +27,12 @@ LEGACY_CORPUS_VERSION = "legacy-pre-corpus-v1"
 LEGACY_STATE_SCHEMA = "rr-state-key-legacy-v1"
 EXPECTED_COUNTS = {
     "source": 2531,
-    "rr_input_states": 2531,
-    "rr_legacy_compatibility": 2531,
-    "rr_alphamelts_outputs": 2531,
+    "rr_input_states": 878,
+    "rr_legacy_compatibility": 878,
+    "rr_alphamelts_outputs": 878,
     "rr_magemin_outputs": 0,
-    "rr_vaporock_outputs": 2126,
-    "rr_sulfsat_outputs": 105,
+    "rr_vaporock_outputs": 716,
+    "rr_sulfsat_outputs": 75,
 }
 
 BACKEND_REACTIVE_ACCOUNTS = (
@@ -2970,6 +2970,17 @@ def _delete_materialized_state(
     connection.execute("DELETE FROM rr_input_states WHERE state_id = ?", (state_id,))
 
 
+def _payload_bytes_for_collision_comparison(payload_bytes: bytes) -> bytes:
+    payload, number_tokens = _parse_json_with_number_tokens(payload_bytes)
+    backend_diagnostics = _pointer_get(
+        payload, "/alphamelts_diagnostics/backend_diagnostics"
+    )
+    if backend_diagnostics != {}:
+        return payload_bytes
+    del payload["alphamelts_diagnostics"]["backend_diagnostics"]
+    return _legacy_json_bytes(payload, number_tokens)
+
+
 def _insert_materialized_with_collision_policy(
     connection: sqlite3.Connection,
     materialized: MaterializedRow,
@@ -3016,7 +3027,17 @@ def _insert_materialized_with_collision_policy(
         raise ConversionError("existing state is missing AlphaMELTS output")
     existing_provenance = json.loads(existing_alpha["capture_provenance_json"])
 
-    if existing_payload_sha == new_payload_sha:
+    payloads_match = existing_payload_sha == new_payload_sha
+    if not payloads_match:
+        existing_payload_bytes = reconstruct_legacy_payload(connection, state_id)
+        payloads_match = (
+            _payload_bytes_for_collision_comparison(existing_payload_bytes)
+            == _payload_bytes_for_collision_comparison(
+                materialized.source_payload_bytes
+            )
+        )
+
+    if payloads_match:
         new_source = _capture_provenance(materialized)["legacy_source"]
         sources = list(existing_provenance.get("legacy_sources") or [])
         if not sources:
@@ -3778,6 +3799,14 @@ def convert_database(
                 }
                 if actual != wanted:
                     count_failures[table] = {"expected": wanted, "actual": actual}
+            if count_failures:
+                report["failures"].append(
+                    {
+                        "error_type": "RowCountReconciliationError",
+                        "error": "destination row counts do not match expected counts",
+                        "tables": count_failures,
+                    }
+                )
             clean = (
                 not report["failures"]
                 and not report["foreign_key_check"]

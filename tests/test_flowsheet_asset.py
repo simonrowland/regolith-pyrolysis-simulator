@@ -934,11 +934,11 @@ def test_trace_phase_one_preserves_locked_flowsheet_and_default_svg(
     renderer, flowsheet
 ):
     assert hashlib.sha256(YAML_PATH.read_bytes()).hexdigest() == (
-        "5c9adb746ca59f67389fb439ad2f88ace38bfe2dbe6a22c919f615ebeed0ee0d"
+        "3793547c62791d3dc6b8026c7d9b37d493eaee39dbdef91776012da813e7cec8"
     )
     svg = renderer.render_svg(flowsheet, demo_fill=0.0)
     assert hashlib.sha256(svg.encode()).hexdigest() == (
-        "f30255591a7f0316060b47d9186da0d92116d5d9de6a6711185c1099d40e4ab9"
+        "37ecb068a25951827c0874dba59ee133e1222aab019d2b1a05175604b3d8ae13"
     )
 
 

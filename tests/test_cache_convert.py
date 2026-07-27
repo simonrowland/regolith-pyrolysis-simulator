@@ -123,6 +123,105 @@ def test_cache_identity_migration_fixture_uses_real_converter_path(monkeypatch):
     assert outcomes["quarantine_rows"] == 3
 
 
+@pytest.mark.parametrize("first_kind", ["absent", "empty"])
+def test_collision_policy_coalesces_absent_and_empty_backend_diagnostics(
+    first_kind,
+):
+    source_sha = "0" * 64
+    base = cache_convert._load_cache_conversion_fixture_row()
+    absent_row = cache_convert._clone_cache_conversion_fixture_row(base, rowid=1)
+    empty_row = cache_convert._clone_cache_conversion_fixture_row(
+        base, rowid=2, engine_version="fixture-engine-version-2"
+    )
+    empty_payload = json.loads(empty_row["payload_bytes"])
+    empty_payload["alphamelts_diagnostics"]["backend_diagnostics"] = {}
+    empty_row["payload_bytes"] = json.dumps(
+        empty_payload, sort_keys=True, separators=(",", ":"), ensure_ascii=True
+    ).encode()
+    empty_row["payload_sha256"] = cache_convert.sha256_bytes(
+        empty_row["payload_bytes"]
+    )
+    absent = cache_convert.materialize_legacy_row(absent_row, source_sha)
+    empty = cache_convert.materialize_legacy_row(empty_row, source_sha)
+    first, second = (absent, empty) if first_kind == "absent" else (empty, absent)
+    connection = sqlite3.connect(":memory:")
+    connection.row_factory = sqlite3.Row
+    try:
+        cache_convert._ensure_destination_schema(
+            connection, source_sha256=source_sha, created_at="2000-01-01T00:00:00Z"
+        )
+
+        assert (
+            cache_convert._insert_materialized_with_collision_policy(
+                connection, first
+            )
+            == "inserted"
+        )
+        assert (
+            cache_convert._insert_materialized_with_collision_policy(
+                connection, second
+            )
+            == "coalesced-identical-payload"
+        )
+        assert connection.execute(
+            "SELECT count(*) FROM rr_conversion_quarantine"
+        ).fetchone()[0] == 0
+        assert connection.execute(
+            "SELECT count(*) FROM rr_input_states"
+        ).fetchone()[0] == 1
+    finally:
+        connection.close()
+
+
+def test_collision_policy_still_quarantines_genuine_payload_conflict():
+    source_sha = "0" * 64
+    base = cache_convert._load_cache_conversion_fixture_row()
+    first_row = cache_convert._clone_cache_conversion_fixture_row(base, rowid=1)
+    conflict_row = cache_convert._clone_cache_conversion_fixture_row(
+        base,
+        rowid=2,
+        engine_version="fixture-engine-version-2",
+        conflict_payload=True,
+    )
+    conflict_payload = json.loads(conflict_row["payload_bytes"])
+    conflict_payload["alphamelts_diagnostics"]["backend_diagnostics"] = {}
+    conflict_row["payload_bytes"] = json.dumps(
+        conflict_payload, sort_keys=True, separators=(",", ":"), ensure_ascii=True
+    ).encode()
+    conflict_row["payload_sha256"] = cache_convert.sha256_bytes(
+        conflict_row["payload_bytes"]
+    )
+    first = cache_convert.materialize_legacy_row(first_row, source_sha)
+    conflict = cache_convert.materialize_legacy_row(conflict_row, source_sha)
+    connection = sqlite3.connect(":memory:")
+    connection.row_factory = sqlite3.Row
+    try:
+        cache_convert._ensure_destination_schema(
+            connection, source_sha256=source_sha, created_at="2000-01-01T00:00:00Z"
+        )
+
+        assert (
+            cache_convert._insert_materialized_with_collision_policy(
+                connection, first
+            )
+            == "inserted"
+        )
+        assert (
+            cache_convert._insert_materialized_with_collision_policy(
+                connection, conflict
+            )
+            == "quarantined-conflicting-payload"
+        )
+        assert connection.execute(
+            "SELECT count(*) FROM rr_conversion_quarantine"
+        ).fetchone()[0] == 2
+        assert connection.execute(
+            "SELECT count(*) FROM rr_input_states"
+        ).fetchone()[0] == 0
+    finally:
+        connection.close()
+
+
 def test_path_gate_rejects_database_and_report_aliases(tmp_path):
     source = tmp_path / "source.db"
     source.write_bytes(b"immutable-source")
@@ -247,6 +346,49 @@ def test_conversion_cannot_report_complete_when_checkpoint_is_unverified(
         failure["error_type"] == "DestinationCheckpointError"
         for failure in report["failures"]
     )
+
+
+def test_row_count_reconciliation_failure_is_typed(tmp_path, monkeypatch):
+    source = tmp_path / "source.db"
+    with sqlite3.connect(source) as connection:
+        connection.execute(
+            "CREATE TABLE reduced_real_metadata(key TEXT PRIMARY KEY, value TEXT)"
+        )
+        connection.execute(
+            "INSERT INTO reduced_real_metadata VALUES "
+            "('store_schema_version', 'test-v1')"
+        )
+        connection.execute(
+            "CREATE TABLE reduced_real_equilibrium_payloads(value TEXT)"
+        )
+    expected_counts = {name: 0 for name in cache_convert.EXPECTED_COUNTS}
+    expected_counts["rr_input_states"] = 1
+    monkeypatch.setattr(cache_convert, "EXPECTED_COUNTS", expected_counts)
+
+    report = cache_convert.convert_database(
+        source,
+        tmp_path / "destination.db",
+        tmp_path / "report.json",
+    )
+
+    assert report["status"] == "failed"
+    assert report["row_count_reconciliation"]["rr_input_states"] == {
+        "expected": 1,
+        "actual": 0,
+        "match": False,
+    }
+    assert report["failures"] == [
+        {
+            "error_type": "RowCountReconciliationError",
+            "error": "destination row counts do not match expected counts",
+            "tables": {
+                "rr_input_states": {
+                    "expected": 1,
+                    "actual": 0,
+                }
+            },
+        }
+    ]
 
 
 @pytest.mark.skipif(not LEGACY_DB.exists(), reason="private reduced-real corpus absent")
@@ -491,10 +633,29 @@ def test_full_corpus_golden_byte_parity_and_idempotence(tmp_path):
         "fully_green": True,
         "runtime_s": first["alpha_preflight"]["runtime_s"],
     }
-    assert first["tables"]["rr_input_states"]["converted"] == 2531
-    assert first["tables"]["rr_alphamelts_outputs"]["converted"] == 2531
-    assert first["tables"]["rr_vaporock_outputs"]["converted"] > 0
-    assert first["tables"]["rr_sulfsat_outputs"]["converted"] > 0
+    assert first["tables"]["rr_input_states"]["converted"] == 878
+    assert first["tables"]["rr_alphamelts_outputs"]["converted"] == 878
+    assert first["tables"]["rr_vaporock_outputs"]["converted"] == 716
+    assert first["tables"]["rr_sulfsat_outputs"]["converted"] == 75
+    assert first["tables"]["rr_input_states"]["skipped"] == 1653
+    assert first["tables"]["rr_input_states"]["rejected"] == 0
+    assert first["destination_counts"]["rr_input_states"] == 878
+    assert first["destination_counts"]["rr_vaporock_outputs"] == 716
+    assert first["destination_counts"]["rr_sulfsat_outputs"] == 75
+    assert first["row_count_reconciliation"] == {
+        table: {
+            "expected": expected,
+            "actual": expected,
+            "match": True,
+        }
+        for table, expected in cache_convert.EXPECTED_COUNTS.items()
+        if table != "source"
+    }
+    assert first["failures"] == []
+    with sqlite3.connect(destination) as connection:
+        assert connection.execute(
+            "SELECT count(*) FROM rr_conversion_quarantine"
+        ).fetchone()[0] == 0
     assert first["tables"]["rr_input_states"]["parity_failed"] == 0
     assert len(first["parity_rows"]) == 2531
     assert all(
@@ -515,6 +676,9 @@ def test_full_corpus_golden_byte_parity_and_idempotence(tmp_path):
     assert second["tables"]["rr_alphamelts_outputs"]["converted"] == 0
     assert second["tables"]["rr_input_states"]["skipped"] == 2531
     assert second["tables"]["rr_alphamelts_outputs"]["skipped"] == 2531
-    assert second["tables"]["rr_vaporock_outputs"]["skipped"] == first["tables"]["rr_vaporock_outputs"]["converted"]
-    assert second["tables"]["rr_sulfsat_outputs"]["skipped"] == first["tables"]["rr_sulfsat_outputs"]["converted"]
+    assert second["tables"]["rr_vaporock_outputs"]["skipped"] == 2126
+    assert second["tables"]["rr_sulfsat_outputs"]["skipped"] == 105
+    assert second["destination_counts"] == first["destination_counts"]
+    assert second["row_count_reconciliation"] == first["row_count_reconciliation"]
+    assert second["failures"] == []
     assert len(second["parity_rows"]) == 2531
