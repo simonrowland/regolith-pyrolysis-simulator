@@ -1,0 +1,84 @@
+schema_version: 1
+case_id: halwax_2024_mgo
+source_id: halwax_sergeev_mueller_schenk_2024
+oxide:
+  formula: MgO
+  identity: ROTI METIC pure magnesium oxide powder
+  purity_fraction: 0.99999
+  purity_source: Halwax et al. 2024, Experimental section, published page 825
+samples:
+  - measurement_id: first
+    initial_mass_mg: 53.67
+    post_mass_mg: 49.25
+  - measurement_id: second
+    initial_mass_mg: 51.58
+    post_mass_mg: 48.28
+cell:
+  material: iridium
+  orifice_diameter_m: 0.0003
+  orifice_area_m2: 7.068583470577034e-8
+  transmission_factor:
+    status: not_reported
+    value: null
+    derivation: null
+    source_locator: Halwax et al. 2024 reports diameter only, published page 825
+temperature_program:
+  mode: polythermal
+  start_K: 1675.0
+  end_K: 2075.0
+  step_K: 10.0
+  hold_s: 250.0
+  temperature_uncertainty_K: 5.0
+  repeat_count: 2
+  range_status: approximate_bounds_reported_by_source
+  isothermal_hold:
+    temperature_K: 1926.0
+    temperature_uncertainty_K: 5.0
+    duration_h: 15.0
+exterior_chamber_pressure:
+  operator: less_than
+  value_pa: 0.001
+  source_locator: Halwax et al. 2024, Experimental section, published page 825
+provider_inputs:
+  pO2_bar: 1.0e-8
+  status: assumed
+  rationale: >-
+    Diagnostic boundary input only: the paper reports exterior total pressure
+    below 1e-5 mbar but does not report equilibrium cell pO2. The exterior
+    ceiling is supplied as pO2 and every numeric comparison remains typed
+    assumed-input.
+calibration:
+  standard: pure nickel
+  method: >-
+    Optical-pyrometer calibration and Eq. 1 instrument sensitivity from Ni
+    vapor pressure near its melting point using FactPS
+  sensitivity_factor: 7.6414e-9
+  sensitivity_factor_units: paper_defined_equation_1
+  source_locator: Halwax et al. 2024, Calibration section, published page 826
+measurement_selectors:
+  - observable_id: mgo_p_mg_isothermal
+    observable: partial_pressure_pa
+    species: Mg
+    evidence_scope: species-resolved-clean-oxide-kems
+  - observable_id: mgo_p_o_isothermal
+    observable: partial_pressure_pa
+    species: O
+    evidence_scope: species-resolved-clean-oxide-kems
+  - observable_id: mgo_p_o2_isothermal
+    observable: partial_pressure_pa
+    species: O2
+    evidence_scope: species-resolved-clean-oxide-kems
+citations:
+  - source_id: halwax_sergeev_mueller_schenk_2024
+    citation: >-
+      A. Halwax, D. Sergeev, M. Mueller, and J. Schenk, Metallurgical and
+      Materials Transactions B 55 (2024) 821-835
+    doi: 10.1007/s11663-024-02995-6
+    url: https://doi.org/10.1007/s11663-024-02995-6
+    locators:
+      - Table I, published page 825
+      - Figure 7, published page 826
+      - Figures 11-13, published pages 827-828
+assumptions:
+  - Cell pO2 is not reported; provider pO2 is an explicit assumed boundary input.
+  - Clausing/transmission factor is not reported; apparatus effusion is unavailable.

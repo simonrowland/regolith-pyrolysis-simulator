@@ -1,0 +1,150 @@
+schema_version: 1
+sources:
+  halwax_sergeev_mueller_schenk_2024:
+    citation: >-
+      A. Halwax, D. Sergeev, M. Mueller, and J. Schenk, Enthalpy of Formation
+      of Calcium and Magnesium Oxide Obtained by Knudsen Effusion Mass
+      Spectrometry, Metallurgical and Materials Transactions B 55 (2024)
+      821-835
+    doi: 10.1007/s11663-024-02995-6
+    url: https://doi.org/10.1007/s11663-024-02995-6
+    extraction_note: >-
+      The final article gives pressure series as Figures 7-13, not numeric
+      point tables. It reports systematic temperature uncertainty of 5 K but
+      no pointwise pressure uncertainty. Values remain absent until a
+      reproducible figure-digitization artifact is archived.
+cases:
+  halwax_2024_cao:
+    case_id: halwax_2024_cao
+    source_id: halwax_sergeev_mueller_schenk_2024
+    points:
+      - observable_id: cao_p_ca_isothermal
+        species: Ca
+        allow_total_pressure_fallback: false
+        coordinate:
+          temperature_K: 2077.0
+        partial_pressure_pa: null
+        uncertainty:
+          temperature_K: 5.0
+          observable_pa: null
+          observable_status: not_reported
+        status: absent
+        source_locator:
+          figure: 7
+          published_page: 826
+          pdf_page_index: 5
+          polythermal_figure: 8
+          polythermal_published_page: 827
+        extraction_method: absent_not_digitized_source_figure_only
+        note: >-
+          Article reports a 19 h isothermal series and a plotted polythermal
+          series; no numeric point table or pressure error bars are published.
+      - observable_id: cao_p_o_isothermal
+        species: O
+        allow_total_pressure_fallback: false
+        coordinate:
+          temperature_K: 2077.0
+        partial_pressure_pa: null
+        uncertainty:
+          temperature_K: 5.0
+          observable_pa: null
+          observable_status: not_reported
+        status: absent
+        source_locator:
+          figure: 7
+          published_page: 826
+          pdf_page_index: 5
+          polythermal_figure: 9
+          polythermal_published_page: 827
+        extraction_method: absent_not_digitized_source_figure_only
+        note: >-
+          O intensity may include residual-gas and O2-fragmentation error; no
+          numeric point table or pressure uncertainty is published.
+      - observable_id: cao_p_o2_isothermal
+        species: O2
+        allow_total_pressure_fallback: false
+        coordinate:
+          temperature_K: 2077.0
+        partial_pressure_pa: null
+        uncertainty:
+          temperature_K: 5.0
+          observable_pa: null
+          observable_status: not_reported
+        status: absent
+        source_locator:
+          figure: 7
+          published_page: 826
+          pdf_page_index: 5
+          polythermal_figure: 10
+          polythermal_published_page: 827
+        extraction_method: absent_not_digitized_source_figure_only
+        note: >-
+          O2 intensity may include residual-gas measurement error; no numeric
+          point table or pressure uncertainty is published.
+  halwax_2024_mgo:
+    case_id: halwax_2024_mgo
+    source_id: halwax_sergeev_mueller_schenk_2024
+    points:
+      - observable_id: mgo_p_mg_isothermal
+        species: Mg
+        allow_total_pressure_fallback: false
+        coordinate:
+          temperature_K: 1926.0
+        partial_pressure_pa: null
+        uncertainty:
+          temperature_K: 5.0
+          observable_pa: null
+          observable_status: not_reported
+        status: absent
+        source_locator:
+          figure: 7
+          published_page: 826
+          pdf_page_index: 5
+          polythermal_figure: 11
+          polythermal_published_page: 827
+        extraction_method: absent_not_digitized_source_figure_only
+        note: >-
+          Article reports a 15 h isothermal series and a plotted polythermal
+          series; no numeric point table or pressure error bars are published.
+      - observable_id: mgo_p_o_isothermal
+        species: O
+        allow_total_pressure_fallback: false
+        coordinate:
+          temperature_K: 1926.0
+        partial_pressure_pa: null
+        uncertainty:
+          temperature_K: 5.0
+          observable_pa: null
+          observable_status: not_reported
+        status: absent
+        source_locator:
+          figure: 7
+          published_page: 826
+          pdf_page_index: 5
+          polythermal_figure: 12
+          polythermal_published_page: 827
+        extraction_method: absent_not_digitized_source_figure_only
+        note: >-
+          O intensity may include residual-gas and O2-fragmentation error; no
+          numeric point table or pressure uncertainty is published.
+      - observable_id: mgo_p_o2_isothermal
+        species: O2
+        allow_total_pressure_fallback: false
+        coordinate:
+          temperature_K: 1926.0
+        partial_pressure_pa: null
+        uncertainty:
+          temperature_K: 5.0
+          observable_pa: null
+          observable_status: not_reported
+        status: absent
+        source_locator:
+          figure: 7
+          published_page: 826
+          pdf_page_index: 5
+          polythermal_figure: 13
+          polythermal_published_page: 828
+        extraction_method: absent_not_digitized_source_figure_only
+        note: >-
+          O2 intensity may include residual-gas measurement error; no numeric
+          point table or pressure uncertainty is published.
