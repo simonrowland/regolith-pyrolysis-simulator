@@ -1,15 +1,18 @@
 from __future__ import annotations
 
-from textwrap import dedent
+from pathlib import Path
 
 import pytest
+import yaml
 
 from simulator.ceramic_classifier import (
+    DEFAULT_CERAMIC_TYPES_PATH,
     classify_ceramic_rump,
     classify_industrial_glass,
     load_ceramic_types,
     load_glass_types,
 )
+from simulator.terminal_product_taxonomy import DEFAULT_TAXONOMY_PATH
 
 
 CERAMIC_LEAF_WITNESSES = {
@@ -61,6 +64,111 @@ CERAMIC_LEAF_WITNESSES = {
         "SiO2": 30.0,
     },
 }
+
+
+def _write_canonical_hierarchy(
+    path: Path,
+    entries: dict[str, dict],
+) -> None:
+    normalized_entries = {}
+    for entry_id, source in entries.items():
+        entry = dict(source)
+        parent = entry.get("parent")
+        normalized_entries[entry_id] = {
+            "canonical_node_id": None,
+            "parent": parent,
+            "level": "parent" if parent is None else "subtype",
+            "label": entry["label"],
+            "composition": entry["composition"],
+            "service_temp": entry.get(
+                "service_temp",
+                {
+                    "value_C": None,
+                    "kind": "uncharacterized",
+                    "citations": [],
+                    "note": "",
+                },
+            ),
+            "liner_suitability": entry.get(
+                "liner_suitability",
+                {"verdict": "not-assessed", "citations": [], "note": ""},
+            ),
+            "strength": {
+                "status": "sourced_qualitative_text",
+                "text": "Fixture qualitative strength text.",
+                "source_ids": ["fixture_source"],
+            },
+            "datasheet": {},
+        }
+    path.write_text(
+        yaml.safe_dump(
+            {
+                "version": "fixture",
+                "taxonomy_name": "terminal_product_taxonomy",
+                "product_classes": {
+                    "oxide_ceramic": {"label": "Oxide ceramic"},
+                },
+                "match_policy": {"policy_id": "fixture"},
+                "ceramic_hierarchy": {
+                    "schema_version": 1,
+                    "policy_id": "fixture",
+                    "source_ids": ["fixture_source"],
+                    "ignored_identity_oxides": [],
+                    "analytical_tolerance_wt_pct": 0.5,
+                    "entries": normalized_entries,
+                },
+                "nodes": [
+                    {
+                        "id": "fixture_node",
+                        "product_class": "oxide_ceramic",
+                        "label": "Fixture node",
+                        "match": {"oxide_only_match_allowed": False},
+                        "properties": {},
+                        "evidence_tier": "C",
+                        "sources": ["fixture_source"],
+                    }
+                ],
+                "sources": {
+                    "fixture_source": {
+                        "title": "Fixture source",
+                        "path": "fixture",
+                    }
+                },
+            },
+            sort_keys=False,
+        )
+    )
+
+
+def test_ceramic_loader_delegates_to_the_only_canonical_taxonomy() -> None:
+    assert DEFAULT_CERAMIC_TYPES_PATH == DEFAULT_TAXONOMY_PATH
+    assert not DEFAULT_TAXONOMY_PATH.with_name("ceramic_types.yaml").exists()
+    assert len(load_ceramic_types()["ceramics"]) == 35
+
+
+def test_ceramic_loader_projects_canonical_strength_without_new_authority() -> None:
+    canonical_entries = yaml.safe_load(DEFAULT_TAXONOMY_PATH.read_text())[
+        "ceramic_hierarchy"
+    ]["entries"]
+    projected_entries = load_ceramic_types()["ceramics"]
+
+    assert projected_entries.keys() == canonical_entries.keys()
+    for ceramic_id, canonical in canonical_entries.items():
+        projected = projected_entries[ceramic_id]
+        assert "mechanical_properties" not in canonical["datasheet"]
+        assert projected["datasheet"] == {
+            **canonical["datasheet"],
+            "mechanical_properties": canonical["strength"]["text"],
+        }
+        assert {
+            key: value
+            for key, value in projected.items()
+            if key != "datasheet"
+        } == {
+            key: value
+            for key, value in canonical.items()
+            if key != "datasheet"
+        }
 
 
 def test_forsterite_point_anchor_classifies_with_explicit_tolerance():
@@ -172,27 +280,30 @@ def test_extra_magnesia_falls_back_from_mullite_to_parent():
 
 
 def test_overlapping_source_windows_return_ambiguous(tmp_path):
-    data_path = tmp_path / "ceramic_types.yaml"
-    data_path.write_text(
-        dedent(
-            """
-            ceramics:
-              alpha_window:
-                label: "Alpha window"
-                composition:
-                  kind: window
-                  defining_oxides: ["CaO", "Al2O3"]
-                  wt_pct_window:
-                    CaO: [20.0, 30.0]
-                    Al2O3: [70.0, 80.0]
-              beta_anchor:
-                label: "Beta anchor"
-                composition:
-                  kind: point-anchor
-                  defining_oxides: ["CaO", "Al2O3"]
-                  wt_pct: {CaO: 25.0, Al2O3: 75.0}
-            """
-        )
+    data_path = tmp_path / "ceramics_taxonomy.yaml"
+    _write_canonical_hierarchy(
+        data_path,
+        {
+            "alpha_window": {
+                "label": "Alpha window",
+                "composition": {
+                    "kind": "window",
+                    "defining_oxides": ["CaO", "Al2O3"],
+                    "wt_pct_window": {
+                        "CaO": [20.0, 30.0],
+                        "Al2O3": [70.0, 80.0],
+                    },
+                },
+            },
+            "beta_anchor": {
+                "label": "Beta anchor",
+                "composition": {
+                    "kind": "point-anchor",
+                    "defining_oxides": ["CaO", "Al2O3"],
+                    "wt_pct": {"CaO": 25.0, "Al2O3": 75.0},
+                },
+            },
+        },
     )
 
     result = classify_ceramic_rump(
@@ -207,35 +318,42 @@ def test_overlapping_source_windows_return_ambiguous(tmp_path):
 
 
 def test_equal_specificity_sibling_collision_falls_back_to_parent(tmp_path):
-    data_path = tmp_path / "ceramic_types.yaml"
-    data_path.write_text(
-        dedent(
-            """
-            ceramics:
-              parent:
-                label: "Parent"
-                composition:
-                  kind: window
-                  defining_oxides: ["CaO", "Al2O3"]
-                  wt_pct_window: {CaO: [20, 30], Al2O3: [70, 80]}
-                service_temp: {value_C: null, kind: uncharacterized}
-                liner_suitability: {}
-              alpha:
-                parent: parent
-                label: "Alpha"
-                composition:
-                  kind: window
-                  defining_oxides: ["CaO", "Al2O3"]
-                  wt_pct_window: {CaO: [24, 26], Al2O3: [74, 76]}
-              beta:
-                parent: parent
-                label: "Beta"
-                composition:
-                  kind: window
-                  defining_oxides: ["CaO", "Al2O3"]
-                  wt_pct_window: {CaO: [24, 26], Al2O3: [74, 76]}
-            """
-        )
+    data_path = tmp_path / "ceramics_taxonomy.yaml"
+    _write_canonical_hierarchy(
+        data_path,
+        {
+            "parent": {
+                "label": "Parent",
+                "composition": {
+                    "kind": "window",
+                    "defining_oxides": ["CaO", "Al2O3"],
+                    "wt_pct_window": {"CaO": [20, 30], "Al2O3": [70, 80]},
+                },
+                "service_temp": {
+                    "value_C": None,
+                    "kind": "uncharacterized",
+                },
+                "liner_suitability": {},
+            },
+            "alpha": {
+                "parent": "parent",
+                "label": "Alpha",
+                "composition": {
+                    "kind": "window",
+                    "defining_oxides": ["CaO", "Al2O3"],
+                    "wt_pct_window": {"CaO": [24, 26], "Al2O3": [74, 76]},
+                },
+            },
+            "beta": {
+                "parent": "parent",
+                "label": "Beta",
+                "composition": {
+                    "kind": "window",
+                    "defining_oxides": ["CaO", "Al2O3"],
+                    "wt_pct_window": {"CaO": [24, 26], "Al2O3": [74, 76]},
+                },
+            },
+        },
     )
 
     result = classify_ceramic_rump(

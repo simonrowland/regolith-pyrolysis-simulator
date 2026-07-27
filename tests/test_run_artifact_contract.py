@@ -41,7 +41,11 @@ TERMINAL_KEYS = {
 }
 # W-A8: confidence is OPTIONAL — present only when the artifact carries the
 # evidence to grade honestly (finite mass-balance residual); never fabricated.
-OPTIONAL_TERMINAL_KEYS = {"confidence", "cost_totals"}
+OPTIONAL_TERMINAL_KEYS = {
+    "confidence",
+    "cost_totals",
+    "terminal_product_taxonomy",
+}
 
 
 def _runner_payload(
@@ -164,13 +168,22 @@ def test_terminal_preserves_precomputed_producer_blocks_without_reprojection(
         "classification": {"metals_and_oxygen": {"Fe": 1.0}},
         "markdown": "producer markdown",
     }
+    terminal_product_taxonomy = {
+        "match_status": "no_match",
+        "physical_composition": {"mass_kg": 1.0},
+    }
     payload["thermal_train_report"] = thermal_train_report
     payload["product_classification"] = product_classification
+    payload["terminal_product_taxonomy"] = terminal_product_taxonomy
 
     artifact = build_run_artifact(payload, run_id="run-producer-blocks")
 
     assert artifact["terminal"]["thermal_train_report"] is thermal_train_report
     assert artifact["terminal"]["product_classification"] is product_classification
+    assert (
+        artifact["terminal"]["terminal_product_taxonomy"]
+        is terminal_product_taxonomy
+    )
 
 
 def test_legacy_payload_omits_new_terminal_blocks() -> None:
@@ -178,6 +191,17 @@ def test_legacy_payload_omits_new_terminal_blocks() -> None:
 
     assert "thermal_train_report" not in artifact["terminal"]
     assert "product_classification" not in artifact["terminal"]
+    assert "terminal_product_taxonomy" not in artifact["terminal"]
+
+
+def test_terminal_product_taxonomy_preserves_explicit_nullability() -> None:
+    payload = _runner_payload()
+    payload["terminal_product_taxonomy"] = None
+
+    artifact = build_run_artifact(payload, run_id="run-taxonomy-null")
+
+    assert "terminal_product_taxonomy" in artifact["terminal"]
+    assert artifact["terminal"]["terminal_product_taxonomy"] is None
 
 
 def test_header_and_terminal_key_contract_omits_unavailable_optional_fields(

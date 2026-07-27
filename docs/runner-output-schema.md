@@ -6,8 +6,14 @@ It is the single source of truth for both the CLI and the SocketIO
 stream's `per_hour_summary` frames; the schema is asserted in
 `tests/test_runner_smoke.py::test_runner_schema_shape_contract`.
 
-**Schema version:** `1.7.0`
+**Schema version:** `1.8.0`
 **Owning goal:** `#18 JSON-RUNNER-HARNESS`
+
+Schema 1.8.0 adds the unconditional top-level
+`terminal_product_taxonomy` field. Successful and handled-failure runs with a
+simulator emit the backend-owned classifier entity, including the independently
+visible mol/kg physical rump composition. If classification cannot be produced,
+the field is `null`; clients must not infer a product type or suitability.
 
 Schema 1.7.0 adds the unconditional top-level `thermal_train_report` field and
 the shuttle plus direct MRE voltage/current fields to each per-hour row. Schema
@@ -76,7 +82,7 @@ the in-process P6a trace harness used by the CLI-boundary parity test.
 
 ```jsonc
 {
-  "schema_version": "1.7.0",
+  "schema_version": "1.8.0",
   "run_metadata": {...},        // see "Run metadata"
   "final_state": {...},         // see "Final state"
   "final": {...},               // see "Final summary"
@@ -84,6 +90,7 @@ the in-process P6a trace harness used by the CLI-boundary parity test.
     "classification": {...},
     "markdown": "# Three-Product-Class Report\n..."
   },
+  "terminal_product_taxonomy": {...} | null, // see "Terminal product taxonomy"
   "thermal_train_report": {...}, // canonical named thermal-train view data
   "stage_purity_report": {...}, // see "Stage purity report"
   "vapor_pressure_source_report": {...}, // see "Vapor pressure source report"
@@ -179,6 +186,22 @@ Early failure envelopes that have no simulator expose the stable empty shape
 reporting attempts the same projection but falls back to that empty shape so
 classification cannot mask the primary runner error.
 
+## Terminal product taxonomy
+
+`terminal_product_taxonomy` is produced by the same backend boundary as the
+live `terminal_ceramic` ledger view. It combines the fail-closed normative
+classification with matched-node density, use class, evidence tier, sourced
+qualitative strength, service-temperature evidence, and liner-suitability
+verdicts. It also carries `physical_composition` with `species_mol`,
+`species_kg`, `class_kg`, total `mass_kg`, normalized oxide wt%, and explicit
+basis labels. Taxonomy claims are advisory; the physical rump composition
+remains the independent floor.
+
+Missing or ungrounded properties use typed `not_classified` records with null
+values. The producer does not extract numeric strength from prose or infer
+commercial/furnace suitability. A producer failure emits
+`terminal_product_taxonomy: null` without masking the primary run status.
+
 ## Thermal-train report
 
 `thermal_train_report` is the canonical `AccountingQueries.thermal_train_report()`
@@ -197,7 +220,7 @@ it does not introduce a new schema version.
 
 ```jsonc
 "run_metadata": {
-  "schema_version": "1.7.0",
+  "schema_version": "1.8.0",
   "feedstock_id":   "lunar_mare_low_ti",
   "campaign":       "C0",                    // starting campaign phase
   "hours_requested": 24,

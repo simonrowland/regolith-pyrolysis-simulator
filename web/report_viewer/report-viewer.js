@@ -13,6 +13,8 @@ const $ = (selector, root = document) => root.querySelector(selector);
 const esc = (value) => String(value ?? "—").replace(/[&<>'"]/g, (c) => ({
   "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
 }[c]));
+const isRecord = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
+const isFiniteNumber = (value) => typeof value === "number" && Number.isFinite(value);
 const hasNumber = (value) => value !== null && value !== "" && Number.isFinite(Number(value));
 const n = (value) => hasNumber(value) ? Number(value) : null;
 const sum = (values) => values.reduce((total, value) => total + (n(value) ?? 0), 0);
@@ -318,11 +320,125 @@ function wallAndOxygenSection(artifact, rows) {
   return section(6, "Wall risk, oxygen & pumping", "Observed deposits and terminal diagnostics only; wall lifetime remains unassessed.", `<div class="cards">${wall}${oxygen}</div>${pending("W-D4", "terminal.wall_lifetime is absent. Wall lifetime is not assessed; this viewer does not issue a CLEAR verdict.")}`);
 }
 
+function taxonomyFieldValue(value) {
+  if (value === null) return "emitted null";
+  if (Array.isArray(value)) {
+    return value.length ? value.map(esc).join(" · ") : "captured, empty";
+  }
+  return esc(value);
+}
+
+function taxonomyFields(record, prefix = "") {
+  if (!isRecord(record)) return "";
+  return Object.entries(record).map(([key, value]) => {
+    const field = prefix ? `${prefix}.${key}` : key;
+    if (isRecord(value)) return taxonomyFields(value, field);
+    return `<div class="kv"><span class="mono">${esc(field)}</span><b>${taxonomyFieldValue(value)}</b></div>`;
+  }).join("");
+}
+
+function taxonomyMatchedNodes(entity) {
+  if (!Object.prototype.hasOwnProperty.call(entity, "matched_nodes")) {
+    return `<div class="note">No matched_nodes field emitted for this classification verdict.</div>`;
+  }
+  if (!Array.isArray(entity.matched_nodes)) {
+    return `<div class="pending"><strong>Matched nodes unavailable</strong><p>terminal.terminal_product_taxonomy.matched_nodes was emitted with a malformed type.</p></div>`;
+  }
+  if (!entity.matched_nodes.length) {
+    return `<div class="note">matched_nodes captured, empty.</div>`;
+  }
+  return `<div class="cards">${entity.matched_nodes.map((node) => {
+    if (!isRecord(node)) {
+      return `<div class="card"><div class="ct">Malformed matched node</div></div>`;
+    }
+    const properties = isRecord(node.properties)
+      ? taxonomyFields(node.properties, "properties")
+      : `<div class="note">properties not emitted as an object.</div>`;
+    const nodeFields = Object.fromEntries(
+      Object.entries(node).filter(([key]) => key !== "properties")
+    );
+    return `<div class="card"><div class="ct">Matched taxonomy node</div>` +
+      `<div class="cbig">${esc(node.label ?? node.id ?? "node label not emitted")}</div>` +
+      `${taxonomyFields(nodeFields)}${properties}</div>`;
+  }).join("")}</div>`;
+}
+
+function taxonomyPhysicalComposition(entity) {
+  const physical = entity.physical_composition;
+  if (!isRecord(physical)) {
+    return `<div class="pending"><strong>Physical composition unavailable</strong><p>terminal.terminal_product_taxonomy.physical_composition was not emitted as an object.</p></div>`;
+  }
+  const speciesKg = isRecord(physical.species_kg) ? physical.species_kg : {};
+  const speciesMol = isRecord(physical.species_mol) ? physical.species_mol : {};
+  const oxideWtPct = isRecord(physical.oxide_wt_pct) ? physical.oxide_wt_pct : {};
+  const species = [...new Set([
+    ...Object.keys(speciesKg),
+    ...Object.keys(speciesMol),
+    ...Object.keys(oxideWtPct),
+  ])].sort();
+  const speciesRows = species.map((name) => {
+    const mass = speciesKg[name];
+    const amount = speciesMol[name];
+    const wtPct = oxideWtPct[name];
+    return `<tr><td class="mono">${esc(name)}</td>` +
+      `<td class="num">${isFiniteNumber(mass) ? exactKg(mass) : "not emitted"}</td>` +
+      `<td class="num">${isFiniteNumber(amount) ? exactMol(amount) : "not emitted"}</td>` +
+      `<td class="num">${isFiniteNumber(wtPct) ? `${Number(wtPct).toLocaleString(undefined, { maximumFractionDigits: 6 })}%` : "not emitted"}</td></tr>`;
+  }).join("");
+  const classKg = isRecord(physical.class_kg) ? physical.class_kg : {};
+  const classRows = Object.entries(classKg).sort(([left], [right]) => left.localeCompare(right)).map(([name, value]) =>
+    `<tr><td class="mono">${esc(name)}</td><td class="num">${isFiniteNumber(value) ? exactKg(value) : "not emitted"}</td></tr>`
+  ).join("");
+  const mass = Object.prototype.hasOwnProperty.call(physical, "mass_kg")
+    ? `<div class="card"><div class="ct">Physical terminal-rump mass</div><div class="cbig">${isFiniteNumber(physical.mass_kg) ? exactKg(physical.mass_kg) : "not emitted"}</div></div>`
+    : "";
+  const hasSpeciesMaps = ["species_kg", "species_mol", "oxide_wt_pct"].some(
+    (key) => Object.prototype.hasOwnProperty.call(physical, key)
+  );
+  const speciesTable = speciesRows
+    ? `<div class="table-wrap"><table><thead><tr><th>Physical species</th><th class="num">Mass · kg</th><th class="num">Amount · mol</th><th class="num">Oxide · wt%</th></tr></thead><tbody>${speciesRows}</tbody></table></div>`
+    : `<div class="note">${hasSpeciesMaps ? "Physical species maps captured, empty." : "Physical species maps not emitted."}</div>`;
+  const classTable = classRows
+    ? `<div class="table-wrap"><table><thead><tr><th>Reporting class</th><th class="num">Mass · kg</th></tr></thead><tbody>${classRows}</tbody></table></div>`
+    : "";
+  const basis = isRecord(physical.basis)
+    ? `<div class="note"><b>Physical composition basis</b>${taxonomyFields(physical.basis, "basis")}</div>`
+    : "";
+  return `${mass}${speciesTable}${classTable}${basis}`;
+}
+
+function taxonomyEntity(entity) {
+  const verdict = {};
+  for (const key of ["display_name", "match_status", "product_class", "assemblage"]) {
+    if (Object.prototype.hasOwnProperty.call(entity, key)) verdict[key] = entity[key];
+  }
+  if (isRecord(entity.properties_panel)) {
+    verdict.properties_panel = entity.properties_panel;
+  }
+  return `<div class="card"><div class="ct">Terminal product taxonomy · classification verdict</div>` +
+    `<div class="cbig">${esc(entity.display_name ?? "display_name not emitted")}</div>${taxonomyFields(verdict)}</div>` +
+    `${taxonomyMatchedNodes(entity)}${taxonomyPhysicalComposition(entity)}`;
+}
+
 function ceramicSection(terminal) {
   const melt = terminal.final_state?.["process.cleaned_melt"] || {};
   const total = sumObject(melt);
   const rows = Object.entries(melt).sort((a, b) => (n(b[1]) ?? -Infinity) - (n(a[1]) ?? -Infinity)).map(([species, value]) => `<tr><td class="mono">${esc(species)}</td><td class="num">${exactMol(value)}</td><td class="num">${hasNumber(value) && hasNumber(total) && total !== 0 ? `${(Number(value) / total * 100).toFixed(4)}%` : "not emitted"}</td></tr>`).join("");
-  return section(7, "Terminal ceramic — cleaned melt", "Composition binds directly to process.cleaned_melt; taxonomy is a separate backend-owned result.", `<div class="table-wrap"><table><thead><tr><th>Oxide / species</th><th class="num">Amount · mol</th><th class="num">mol%</th></tr></thead><tbody>${rows}</tbody></table></div><div class="note">mol-native ledger; kg conversion is a backend (W-A0) step.</div>${terminal.terminal_product_taxonomy ? "" : pending("W-D7", "terminal.terminal_product_taxonomy is absent. No density, value-grade, use-class, or product label is fabricated.")}`);
+  const hasTaxonomy = Object.prototype.hasOwnProperty.call(
+    terminal,
+    "terminal_product_taxonomy",
+  );
+  let taxonomy;
+  if (!hasTaxonomy) {
+    taxonomy = pending("W-D7", "terminal.terminal_product_taxonomy is absent. No density, value-grade, use-class, or product label is fabricated.");
+  } else if (terminal.terminal_product_taxonomy === null) {
+    taxonomy = `<div class="pending"><strong>Terminal taxonomy attempted but unavailable</strong><p>terminal.terminal_product_taxonomy is explicitly null; the producer attempted classification but could not provide the entity.</p></div>`;
+  } else if (!isRecord(terminal.terminal_product_taxonomy)) {
+    taxonomy = `<div class="pending"><strong>Terminal taxonomy captured but malformed</strong><p>terminal.terminal_product_taxonomy must be an object or explicit null.</p></div>`;
+  } else {
+    taxonomy = taxonomyEntity(terminal.terminal_product_taxonomy);
+  }
+  return section(7, "Terminal ceramic — cleaned melt", "Cleaned-melt ledger context plus the backend-owned terminal-product taxonomy entity.", `<div class="table-wrap"><table><thead><tr><th>Oxide / species</th><th class="num">Amount · mol</th><th class="num">mol%</th></tr></thead><tbody>${rows}</tbody></table></div><div class="note">mol-native ledger; kg conversion is a backend (W-A0) step.</div>${taxonomy}`);
 }
 
 function costSection(artifact, energy) {

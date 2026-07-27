@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import copy
+import math
 from dataclasses import dataclass
 from itertools import combinations
 from pathlib import Path
@@ -47,6 +49,52 @@ def taxonomy_nodes_by_id(
 ) -> dict[str, dict[str, Any]]:
     data = load_terminal_product_taxonomy(path)
     return {node["id"]: node for node in data["nodes"]}
+
+
+def build_terminal_product_taxonomy_entity(
+    species_kg: Mapping[str, float],
+    *,
+    species_mol: Mapping[str, float] | None = None,
+    class_kg: Mapping[str, float] | None = None,
+    furnace_ceiling_c: float | int | None = None,
+    temperature_profile_id: str | None = None,
+    run_id: str | None = None,
+    feedstock_id: str | None = None,
+    terminal_product_account_or_artifact: str | None = None,
+    taxonomy_path: Path | str = DEFAULT_TAXONOMY_PATH,
+) -> dict[str, Any]:
+    projected_kg = _positive_finite_values(species_kg)
+    projected_mol = _positive_finite_values(species_mol or {})
+    projected_class_kg = _nonnegative_finite_values(class_kg or {})
+    result = classify_terminal_product(
+        projected_kg,
+        basis=WT_BASIS,
+        residue_mass_kg=sum(projected_kg.values()),
+        furnace_ceiling_c=furnace_ceiling_c,
+        temperature_profile_id=temperature_profile_id,
+        run_id=run_id,
+        feedstock_id=feedstock_id,
+        terminal_product_account_or_artifact=terminal_product_account_or_artifact,
+        taxonomy_path=taxonomy_path,
+    )
+    oxide_wt_pct = _normalize_to_wt_pct(projected_kg, WT_BASIS)
+    result["physical_composition"] = {
+        "mass_kg": round(sum(projected_kg.values()), 6),
+        "species_kg": projected_kg,
+        "species_mol": projected_mol,
+        "class_kg": projected_class_kg,
+        "oxide_wt_pct": {
+            oxide: round(value, 6)
+            for oxide, value in sorted(oxide_wt_pct.items())
+        },
+        "basis": {
+            "species_kg": "kg_projected_from_mol_ledger",
+            "species_mol": "mol_atom_ledger",
+            "class_kg": "kg_reporting_projection",
+            "oxide_wt_pct": NORMALIZED_WT_BASIS,
+        },
+    }
+    return result
 
 
 def classify_terminal_product(
@@ -136,6 +184,7 @@ def classify_terminal_product(
             "normative_fraction_wt_pct": round(fraction, 6),
             "product_class": node["product_class"],
             "evidence_tier": node["evidence_tier"],
+            "properties": _resolved_node_properties(node, taxonomy),
         }
         for node, fraction in zip(best.nodes, best.fractions)
         if fraction > EPSILON
@@ -162,6 +211,7 @@ def classify_terminal_product(
         "properties_panel": {
             "show": True,
             "property_basis": "matched_nodes",
+            "status": "classified",
         },
         "provenance": provenance,
     }
@@ -170,7 +220,15 @@ def classify_terminal_product(
 def _validate_taxonomy(data: Any, path: Path | str) -> None:
     if not isinstance(data, dict):
         raise ValueError(f"terminal-product taxonomy is malformed: {path}")
-    for key in ("version", "taxonomy_name", "product_classes", "match_policy", "nodes", "sources"):
+    for key in (
+        "version",
+        "taxonomy_name",
+        "product_classes",
+        "match_policy",
+        "ceramic_hierarchy",
+        "nodes",
+        "sources",
+    ):
         if key not in data:
             raise ValueError(f"terminal-product taxonomy missing {key!r}: {path}")
     if data["taxonomy_name"] != "terminal_product_taxonomy":
@@ -199,6 +257,71 @@ def _validate_taxonomy(data: Any, path: Path | str) -> None:
             total = sum(float(value) for value in signature.values())
             if abs(total - 100.0) > 0.2:
                 raise ValueError(f"oxide signature does not close to 100 wt%: {node['id']!r}")
+    hierarchy = data["ceramic_hierarchy"]
+    if not isinstance(hierarchy, dict):
+        raise ValueError(f"terminal-product ceramic hierarchy is malformed: {path}")
+    for key in (
+        "schema_version",
+        "policy_id",
+        "source_ids",
+        "ignored_identity_oxides",
+        "analytical_tolerance_wt_pct",
+        "entries",
+    ):
+        if key not in hierarchy:
+            raise ValueError(f"terminal-product ceramic hierarchy missing {key!r}: {path}")
+    source_ids = set(data["sources"])
+    if not set(hierarchy["source_ids"]).issubset(source_ids):
+        raise ValueError(f"terminal-product ceramic hierarchy has unknown sources: {path}")
+    entries = hierarchy["entries"]
+    if not isinstance(entries, dict) or not entries:
+        raise ValueError(f"terminal-product ceramic hierarchy has no entries: {path}")
+    canonical_assignments: set[str] = set()
+    for entry_id, entry in entries.items():
+        if not isinstance(entry, dict):
+            raise ValueError(f"terminal-product hierarchy entry is malformed: {entry_id!r}")
+        for key in (
+            "canonical_node_id",
+            "parent",
+            "level",
+            "label",
+            "composition",
+            "service_temp",
+            "liner_suitability",
+            "strength",
+            "datasheet",
+        ):
+            if key not in entry:
+                raise ValueError(
+                    f"terminal-product hierarchy entry missing {key!r}: {entry_id!r}"
+                )
+        parent = entry["parent"]
+        if parent is not None and parent not in entries:
+            raise ValueError(f"unknown hierarchy parent {parent!r} for {entry_id!r}")
+        canonical_node_id = entry["canonical_node_id"]
+        if canonical_node_id is not None:
+            if canonical_node_id not in ids:
+                raise ValueError(
+                    f"unknown canonical node {canonical_node_id!r} for {entry_id!r}"
+                )
+            if canonical_node_id in canonical_assignments:
+                raise ValueError(
+                    f"duplicate hierarchy assignment for canonical node {canonical_node_id!r}"
+                )
+            canonical_assignments.add(canonical_node_id)
+        strength = entry["strength"]
+        if not isinstance(strength, dict):
+            raise ValueError(f"strength is malformed for hierarchy entry {entry_id!r}")
+        if strength.get("status") != "sourced_qualitative_text":
+            raise ValueError(f"strength status is not sourced for hierarchy entry {entry_id!r}")
+        if not isinstance(strength.get("text"), str) or not strength["text"].strip():
+            raise ValueError(f"strength text is missing for hierarchy entry {entry_id!r}")
+        if not set(strength.get("source_ids") or ()).issubset(source_ids):
+            raise ValueError(f"strength has unknown sources for hierarchy entry {entry_id!r}")
+        if "mechanical_properties" in entry["datasheet"]:
+            raise ValueError(
+                f"duplicate mechanical-properties authority for hierarchy entry {entry_id!r}"
+            )
 
 
 def _classifiable_nodes(taxonomy: Mapping[str, Any]) -> list[dict[str, Any]]:
@@ -214,6 +337,60 @@ def _classifiable_nodes(taxonomy: Mapping[str, Any]) -> list[dict[str, Any]]:
     return nodes
 
 
+def _resolved_node_properties(
+    node: Mapping[str, Any],
+    taxonomy: Mapping[str, Any],
+) -> dict[str, Any]:
+    properties = copy.deepcopy(dict(node["properties"]))
+    entry_id = None
+    entry = None
+    for candidate_id, candidate in taxonomy["ceramic_hierarchy"]["entries"].items():
+        if candidate.get("canonical_node_id") == node["id"]:
+            entry_id = str(candidate_id)
+            entry = candidate
+            break
+    if entry is None:
+        properties.update(
+            {
+                "catalog_entry_id": None,
+                "hierarchy": [],
+                "service_temperature": {
+                    "status": "not_classified",
+                    "value_C": None,
+                    "kind": None,
+                    "citations": [],
+                    "note": None,
+                },
+                "liner_suitability": {
+                    "status": "not_classified",
+                    "verdict": None,
+                    "citations": [],
+                    "note": None,
+                },
+                "strength": {
+                    "status": "not_classified",
+                    "text": None,
+                    "source_ids": [],
+                },
+                "datasheet": None,
+            }
+        )
+        return properties
+    parent = entry.get("parent")
+    hierarchy = [str(parent), entry_id] if parent is not None else [entry_id]
+    properties.update(
+        {
+            "catalog_entry_id": entry_id,
+            "hierarchy": hierarchy,
+            "service_temperature": copy.deepcopy(entry["service_temp"]),
+            "liner_suitability": copy.deepcopy(entry["liner_suitability"]),
+            "strength": copy.deepcopy(entry["strength"]),
+            "datasheet": copy.deepcopy(entry["datasheet"]),
+        }
+    )
+    return properties
+
+
 def _active_oxide_set(nodes: Sequence[Mapping[str, Any]]) -> set[str]:
     oxides: set[str] = set()
     for node in nodes:
@@ -226,7 +403,7 @@ def _normalize_to_wt_pct(composition: Mapping[str, float], basis: str) -> dict[s
         raise ValueError(f"unsupported terminal-product composition basis: {basis}")
     positive = {oxide: float(value) for oxide, value in composition.items() if float(value) > 0.0}
     if not positive:
-        raise ValueError("terminal-product composition must contain positive oxide values")
+        return {}
     if basis == MOL_BASIS:
         weighted: dict[str, float] = {}
         for oxide, mol in positive.items():
@@ -242,6 +419,24 @@ def _normalize_values(values: Mapping[str, float]) -> dict[str, float]:
     if total <= 0.0:
         raise ValueError("cannot normalize zero terminal-product composition")
     return {key: float(value) / total * 100.0 for key, value in values.items()}
+
+
+def _positive_finite_values(values: Mapping[str, float]) -> dict[str, float]:
+    projected: dict[str, float] = {}
+    for species, value in values.items():
+        amount = float(value)
+        if amount > 0.0 and math.isfinite(amount):
+            projected[str(species)] = amount
+    return {species: projected[species] for species in sorted(projected)}
+
+
+def _nonnegative_finite_values(values: Mapping[str, float]) -> dict[str, float]:
+    projected: dict[str, float] = {}
+    for key, value in values.items():
+        amount = float(value)
+        if amount >= 0.0 and math.isfinite(amount):
+            projected[str(key)] = amount
+    return {key: projected[key] for key in sorted(projected)}
 
 
 def _grade_block(
@@ -538,5 +733,15 @@ def _unclassified_result(
             if value > EPSILON
         },
         "evidence_tiers": {},
+        "properties_panel": {
+            "show": False,
+            "property_basis": None,
+            "status": "not_classified",
+            "strength": {
+                "status": "not_classified",
+                "text": None,
+                "source_ids": [],
+            },
+        },
         "provenance": dict(provenance),
     }

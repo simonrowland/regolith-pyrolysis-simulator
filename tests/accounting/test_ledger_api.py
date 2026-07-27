@@ -22,14 +22,15 @@ def _api() -> LedgerAPI:
         "reservoir.fo2_buffer",
         AccountPolicy.reservoir("reservoir.fo2_buffer"),
     )
+    terminal_rump_kg = ledger.project_account_kg("process.cleaned_melt")
     sim = SimpleNamespace(
         atom_ledger=ledger,
         train=SimpleNamespace(stages=[]),
         _unspent_additive_reagents_kg=lambda: {},
-        _terminal_rump_by_species=lambda: {"SiO2": 1.0},
+        _terminal_rump_by_species=lambda: dict(terminal_rump_kg),
         _terminal_rump_by_class=lambda: {
             "refractory_oxides": 0.0,
-            "silicate_residual": 1.0,
+            "silicate_residual": sum(terminal_rump_kg.values()),
             "unextracted_metals": 0.0,
             "other": 0.0,
         },
@@ -77,12 +78,28 @@ def test_signed_accounts_omit_wt_pct_instead_of_renormalizing_mass():
 
 def test_named_views_preserve_tap_and_oxygen_account_distinctions():
     api = _api()
+    assert LEDGER_SCHEMA_VERSION == "3.0.0"
     assert api.view("melt_pot_upper_tap")["data"]["account"] == "process.metal_phase_float_layer"
     assert api.view("melt_pot_bottom_tap")["data"]["account"] == "process.metal_phase_bottom_pool"
     oxygen = api.view("oxygen_partition")["data"]
     assert oxygen["melt_offgas_stored"] != oxygen["melt_offgas_captured"]
     assert oxygen["melt_offgas_captured"] != oxygen["melt_offgas_vented"]
-    assert api.view("terminal_ceramic")["data"]["classifier"] == "terminal_rump"
+    terminal_ceramic = api.view("terminal_ceramic")["data"]
+    assert "classifier" not in terminal_ceramic
+    assert terminal_ceramic["match_status"] == "no_match"
+    physical = terminal_ceramic["physical_composition"]
+    assert physical["species_mol"] == {"CaO": 1.0, "SiO2": 2.0}
+    assert physical["species_kg"] == api.queries.terminal_rump_by_species()
+    assert physical["class_kg"] == api.queries.terminal_rump_by_class()
+    assert physical["mass_kg"] == pytest.approx(
+        sum(physical["species_kg"].values())
+    )
+    assert physical["basis"] == {
+        "species_kg": "kg_projected_from_mol_ledger",
+        "species_mol": "mol_atom_ledger",
+        "class_kg": "kg_reporting_projection",
+        "oxide_wt_pct": "oxide_wt_pct_normalized_volatiles_free",
+    }
     assert api.view("condensation_train")["view"] == "condensation_train"
     assert api.view("offgas")["data"] == {"terminal": {}, "near_melt": {}}
     assert api.view("wall_deposits")["data"]["segments_kg"] == {}

@@ -13,10 +13,14 @@ from simulator.fe_redox import (
     melt_mol_fractions_for_kress91,
 )
 from simulator.state import MOLAR_MASS
+from simulator.terminal_product_taxonomy import (
+    DEFAULT_TAXONOMY_PATH,
+    load_terminal_product_taxonomy,
+)
 
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
-DEFAULT_CERAMIC_TYPES_PATH = DATA_DIR / "ceramic_types.yaml"
+DEFAULT_CERAMIC_TYPES_PATH = DEFAULT_TAXONOMY_PATH
 DEFAULT_GLASS_TYPES_PATH = DATA_DIR / "glass_types.yaml"
 DEFAULT_ANALYTICAL_TOLERANCE_WT_PCT = 0.5
 
@@ -80,7 +84,30 @@ class GlassClassification:
 
 
 def load_ceramic_types(path: Path | str = DEFAULT_CERAMIC_TYPES_PATH) -> dict[str, Any]:
-    return _load_types(path, "ceramics", "ceramic")
+    taxonomy = load_terminal_product_taxonomy(path)
+    hierarchy = taxonomy["ceramic_hierarchy"]
+    source_documents = {
+        source_id: taxonomy["sources"][source_id].get("path")
+        for source_id in hierarchy["source_ids"]
+    }
+    ceramics = {}
+    for ceramic_id, canonical_entry in hierarchy["entries"].items():
+        entry = dict(canonical_entry)
+        entry["datasheet"] = dict(canonical_entry.get("datasheet") or {})
+        strength_text = (canonical_entry.get("strength") or {}).get("text")
+        if isinstance(strength_text, str):
+            entry["datasheet"]["mechanical_properties"] = strength_text
+        ceramics[ceramic_id] = entry
+    return {
+        "schema_version": hierarchy["schema_version"],
+        "policy_id": hierarchy["policy_id"],
+        "source_documents": source_documents,
+        "ignored_identity_oxides": list(hierarchy["ignored_identity_oxides"]),
+        "analytical_tolerance_wt_pct": hierarchy[
+            "analytical_tolerance_wt_pct"
+        ],
+        "ceramics": ceramics,
+    }
 
 
 def load_glass_types(path: Path | str = DEFAULT_GLASS_TYPES_PATH) -> dict[str, Any]:

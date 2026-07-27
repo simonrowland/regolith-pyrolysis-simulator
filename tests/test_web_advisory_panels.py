@@ -6,6 +6,7 @@ from flask import Flask
 import pytest
 
 from simulator.ceramic_classifier import CeramicClassification
+from simulator.terminal_product_taxonomy import load_terminal_product_taxonomy
 from web import advisory
 from web import routes as web_routes
 
@@ -319,6 +320,18 @@ def test_ceramic_rump_panel_renders_match_and_service_rating(client) -> None:
     assert "Match level: subtype" in html
     assert "Terrestrial applications:" in html
     assert "Everyday analog:" in html
+
+
+def test_ceramic_rump_payload_restores_exact_canonical_strength_text() -> None:
+    canonical = load_terminal_product_taxonomy()["ceramic_hierarchy"]["entries"][
+        "forsterite"
+    ]
+    payload = advisory.ceramic_rump_payload({"MgO": 57.3, "SiO2": 42.7})
+
+    assert payload["match"]["datasheet"]["mechanical_properties"] == canonical[
+        "strength"
+    ]["text"]
+    assert "mechanical_properties" not in canonical["datasheet"]
 
 
 def test_ceramic_rump_panel_renders_no_match(client) -> None:

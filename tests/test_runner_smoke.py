@@ -31,6 +31,7 @@ from types import SimpleNamespace
 import pytest
 
 from simulator.accounting import AccountingQueries
+from simulator.accounting.ledger_api import LedgerAPI
 from simulator.accounting.run_artifact import build_run_artifact
 from simulator.chemistry.kernel import ProviderUnavailableError
 from simulator.campaigns import CampaignManager
@@ -128,6 +129,15 @@ def test_completed_run_artifact_preserves_computed_views_and_hourly_controls() -
     assert artifact["terminal"]["product_classification"] is payload[
         "product_classification"
     ]
+    assert artifact["terminal"]["terminal_product_taxonomy"] is payload[
+        "terminal_product_taxonomy"
+    ]
+    assert payload["terminal_product_taxonomy"] == LedgerAPI(
+        session.simulator
+    ).terminal_product_taxonomy(
+        feedstock_id="lunar_mare_low_ti",
+        terminal_product_account_or_artifact="runner.terminal_product_taxonomy",
+    )
     assert summary["shuttle_phase"] == snapshot.shuttle_phase
     assert summary["shuttle_injected_kg_hr"] == snapshot.shuttle_injected_kg_hr
     assert summary["shuttle_reduced_kg_hr"] == snapshot.shuttle_reduced_kg_hr
@@ -168,6 +178,32 @@ def test_completed_run_preserves_success_when_product_classification_raises(
         "classification": {},
         "markdown": "",
     }
+
+
+def test_completed_run_preserves_success_when_terminal_taxonomy_raises(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=1,
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+    )
+    session = run._start_session()
+
+    def raise_taxonomy_error(*args: object, **kwargs: object) -> None:
+        raise RuntimeError("injected terminal-taxonomy failure")
+
+    monkeypatch.setattr(
+        "simulator.runner._terminal_product_taxonomy_report",
+        raise_taxonomy_error,
+    )
+
+    payload = run._run_session(session)
+
+    assert payload["status"] == "ok"
+    assert payload["terminal_product_taxonomy"] is None
 
 
 def test_per_hour_summary_sanitizes_nonfinite_numeric_telemetry():
@@ -331,6 +367,7 @@ TOP_LEVEL_KEYS = frozenset({
     "final_state",
     "final",
     "product_classification",
+    "terminal_product_taxonomy",
     "thermal_train_report",
     "stage_purity_report",
     "vapor_pressure_source_report",
@@ -868,7 +905,7 @@ def _assert_schema_shape(payload: dict) -> None:
       this without picking a specific scenario.
     """
 
-    assert RUNNER_SCHEMA_VERSION == "1.7.0"
+    assert RUNNER_SCHEMA_VERSION == "1.8.0"
     assert set(payload) == TOP_LEVEL_KEYS, (
         f"top-level keys drift: {set(payload) - TOP_LEVEL_KEYS} extra, "
         f"{TOP_LEVEL_KEYS - set(payload)} missing"

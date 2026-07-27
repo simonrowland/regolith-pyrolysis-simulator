@@ -426,6 +426,7 @@ def build_run_artifact(
         ("final", "final"),
         ("thermal_train_report", "thermal_train_report"),
         ("product_classification", "product_classification"),
+        ("terminal_product_taxonomy", "terminal_product_taxonomy"),
         ("stage_purity_report", "stage_purity"),
         ("vapor_pressure_source_report", "vapor_pressure_source_report"),
         ("yield_disposition", "yield_disposition"),

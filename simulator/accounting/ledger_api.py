@@ -8,15 +8,20 @@ from collections.abc import Mapping
 from typing import Any
 
 from simulator.accounting import ledger as ledger_module
-from simulator.accounting.queries import AccountingQueries
+from simulator.accounting.queries import AccountingQueries, TERMINAL_RUMP_ACCOUNTS
+from simulator.terminal_product_taxonomy import (
+    build_terminal_product_taxonomy_entity,
+)
 from simulator.three_product_report import classify_products
 
+# 3.0.0: terminal_ceramic now emits terminal_product_taxonomy and its physical
+# composition instead of the transitional terminal_rump classifier label.
 # 2.0.0: industrial_glass view — removed the fabricated `early_tap_mode: true`
 # flag (it asserted operator intent no run state supports) in favor of
 # `projection_basis: "hypothetical_early_tap"` + an explicit what-if `note`.
 # Field removal is a breaking change for schema-stable clients, hence the
 # major bump.
-LEDGER_SCHEMA_VERSION = "2.0.0"
+LEDGER_SCHEMA_VERSION = "3.0.0"
 _OXIDE_FORMULA_RE = re.compile(r"^(?:[A-Z][a-z]?\d*)*O\d*$")
 
 _ACCOUNT_BASIS = {
@@ -32,7 +37,7 @@ _ACCOUNT_BASIS = {
 # ``thermal_train`` has live consumers in the simulator advisory and thermal-
 # train page. Every other named view is a deprecated compatibility projection:
 # no current report/library/settings reader consumes it, and removing it would
-# break the schema-2.0.0 wire surface. Frozen-run replacements are:
+# break the schema-3.0.0 wire surface. Frozen-run replacements are:
 #
 # - taps, ceramic, condensation, offgas, wall, oxygen, and industrial glass:
 #   ``timesteps[].ledger`` (plus the matching ``summary``/``terminal`` fields);
@@ -155,11 +160,37 @@ class LedgerAPI:
             **report,
         }
 
+    def terminal_product_taxonomy(
+        self,
+        *,
+        furnace_ceiling_c: float | int | None = None,
+        temperature_profile_id: str | None = None,
+        run_id: str | None = None,
+        feedstock_id: str | None = None,
+        terminal_product_account_or_artifact: str = "terminal_rump_accounts",
+    ) -> dict[str, Any]:
+        species_mol: dict[str, float] = {}
+        for account in TERMINAL_RUMP_ACCOUNTS:
+            for species, amount in self.ledger.project_account_mol(account).items():
+                species_mol[species] = species_mol.get(species, 0.0) + float(amount)
+        return build_terminal_product_taxonomy_entity(
+            self.queries.terminal_rump_by_species(),
+            species_mol=species_mol,
+            class_kg=self.queries.terminal_rump_by_class(),
+            furnace_ceiling_c=furnace_ceiling_c,
+            temperature_profile_id=temperature_profile_id,
+            run_id=run_id,
+            feedstock_id=feedstock_id,
+            terminal_product_account_or_artifact=(
+                terminal_product_account_or_artifact
+            ),
+        )
+
     def view(self, name: str) -> dict[str, Any]:
         """Return a named compatibility projection or the live thermal-train view.
 
         Stored-run consumers must use the frozen artifact seam described above;
-        the non-thermal named views remain behavior-stable only for schema-2.0.0
+        the non-thermal named views remain behavior-stable only for schema-3.0.0
         compatibility until a coordinated major-version removal.
         """
         view_name = str(name)
@@ -168,7 +199,7 @@ class LedgerAPI:
         elif view_name == "melt_pot_bottom_tap":
             payload = self.account("process.metal_phase_bottom_pool")
         elif view_name == "terminal_ceramic":
-            payload = {"species_kg": self.queries.terminal_rump_by_species(), "class_kg": self.queries.terminal_rump_by_class(), "classifier": "terminal_rump"}
+            payload = self.terminal_product_taxonomy()
         elif view_name == "condensation_train":
             payload = {"species_kg": self.queries.condensation_totals_with_terminal_oxygen()}
         elif view_name == "offgas":

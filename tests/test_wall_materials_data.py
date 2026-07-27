@@ -380,19 +380,24 @@ def test_wall_equilibrium_phase_windows_are_provenanced():
     assert thresholds["basis"]
 
 
-def test_ceramic_types_schema_is_fail_closed():
-    data = _load_yaml("ceramic_types.yaml")
-    assert data["schema_version"] == 2
-    assert CERAMIC_ANCHORS < set(data["ceramics"])
-    assert len(data["ceramics"]) == 35
+def test_canonical_ceramic_hierarchy_schema_is_fail_closed():
+    data = _load_yaml("ceramics_taxonomy.yaml")
+    hierarchy = data["ceramic_hierarchy"]
+    assert hierarchy["schema_version"] == 2
+    assert CERAMIC_ANCHORS < set(hierarchy["entries"])
+    assert len(hierarchy["entries"]) == 35
 
-    for entry in data["ceramics"].values():
+    for entry in hierarchy["entries"].values():
         assert {
             "label", "parent", "level", "composition", "service_temp",
-            "liner_suitability", "datasheet",
+            "liner_suitability", "strength", "datasheet",
         } <= set(entry)
         assert entry["level"] in {"parent", "subtype"}
-        assert len(entry["datasheet"]) == 11
+        assert len(entry["datasheet"]) == 10
+        assert "mechanical_properties" not in entry["datasheet"]
+        assert entry["strength"]["status"] == "sourced_qualitative_text"
+        assert entry["strength"]["text"]
+        assert entry["strength"]["source_ids"] == ["ceramic_datasheets"]
 
         composition = entry["composition"]
         assert composition["kind"] in COMPOSITION_KINDS
@@ -435,7 +440,7 @@ def test_ceramic_types_schema_is_fail_closed():
 
 
 def test_ceramic_phase_diagram_windows_are_provenanced():
-    ceramics = _load_yaml("ceramic_types.yaml")["ceramics"]
+    ceramics = _load_yaml("ceramics_taxonomy.yaml")["ceramic_hierarchy"]["entries"]
     phase_diagram_windows = {
         ceramic_id: entry["composition"]["window"]
         for ceramic_id, entry in ceramics.items()
@@ -453,7 +458,7 @@ def test_ceramic_phase_diagram_windows_are_provenanced():
 
 
 def test_direct_and_service_cells_have_citations():
-    for file_name in ("wall_materials.yaml", "ceramic_types.yaml"):
+    for file_name in ("wall_materials.yaml", "ceramics_taxonomy.yaml"):
         data = _load_yaml(file_name)
         for cell in _walk_dicts(data):
             if cell.get("evidence") == "direct":
@@ -484,7 +489,7 @@ def test_wall_audit_must_fixes_are_encoded():
 
 
 def test_ceramic_audit_must_fixes_are_encoded():
-    ceramics = _load_yaml("ceramic_types.yaml")["ceramics"]
+    ceramics = _load_yaml("ceramics_taxonomy.yaml")["ceramic_hierarchy"]["entries"]
 
     assert ceramics["forsterite"]["service_temp"]["kind"] != "service"
     assert ceramics["forsterite"]["service_temp"]["kind"] in {"melting-only", "uncharacterized"}

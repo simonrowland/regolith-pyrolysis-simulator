@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 from pathlib import Path
 
 import pytest
@@ -17,6 +18,45 @@ from simulator.terminal_product_taxonomy import (
 
 
 DATA_PATH = Path(__file__).resolve().parents[1] / "data" / "ceramics_taxonomy.yaml"
+REPO_ROOT = DATA_PATH.parents[1]
+
+HIERARCHY_TO_CANONICAL = {
+    "calcium_aluminate_refractory": None,
+    "monocalcium_aluminate_CA": "calcium_aluminate_ca",
+    "calcium_dialuminate_CA2": "calcium_aluminate_ca2_grossite",
+    "calcium_hexaluminate_CA6": "hibonite_ca6",
+    "tricalcium_aluminate_C3A": "tricalcium_aluminate_c3a",
+    "mayenite_C12A7": "mayenite_c12a7",
+    "aluminosilicate_ceramic": None,
+    "mullite": "mullite",
+    "anorthite": "anorthite_plagioclase",
+    "cordierite_mullite": None,
+    "sillimanite_group": None,
+    "cordierite_pure": "cordierite",
+    "basic_mgo_refractory": None,
+    "doloma": "dolime_cao_mgo",
+    "magnesium_aluminate_spinel": "spinel_mgal2o4",
+    "forsterite": "forsterite_olivine",
+    "periclase_mgo": "periclase_mgo",
+    "enstatite": None,
+    "ca_mg_silicate": None,
+    "wollastonite": "wollastonite",
+    "diopside": "diopside_pyroxene",
+    "akermanite_melilite": "akermanite_melilite_mg",
+    "merwinite": "merwinite",
+    "monticellite": "monticellite",
+    "alkaline_earth_silicate_cement": None,
+    "dicalcium_silicate_C2S": None,
+    "tricalcium_silicate_C3S": None,
+    "ree_ti_cr_rump_phase": None,
+    "perovskite_catito3": "perovskite_catito3",
+    "ree_aluminate_silicate_family": None,
+    "cr_spinel_chromite": None,
+    "ree_titanate_pyrochlore_family": "ree_titanate_pyrochlore_family",
+    "cas_cmas_glass_ceramic": None,
+    "cmas_glass_ceramic": None,
+    "gehlenite_anorthite_path": None,
+}
 
 
 def test_terminal_product_taxonomy_schema_and_node_coverage() -> None:
@@ -29,6 +69,12 @@ def test_terminal_product_taxonomy_schema_and_node_coverage() -> None:
         "unclassified_concentrate",
     }
     assert len(data["nodes"]) == 23
+    entries = data["ceramic_hierarchy"]["entries"]
+    assert len(entries) == 35
+    assert {
+        entry_id: entry["canonical_node_id"]
+        for entry_id, entry in entries.items()
+    } == HIERARCHY_TO_CANONICAL
     source_ids = set(data["sources"])
     for node in data["nodes"]:
         assert node["id"]
@@ -44,8 +90,95 @@ def test_terminal_product_taxonomy_schema_and_node_coverage() -> None:
 
 def test_terminal_product_taxonomy_yaml_loads_directly() -> None:
     raw = yaml.safe_load(DATA_PATH.read_text())
-    assert raw["version"] == "2026-06-10"
+    assert raw["version"] == "2026-07-27"
     assert [node["id"] for node in raw["nodes"]]
+
+
+def test_hierarchy_strength_is_sourced_text_and_not_duplicated_in_datasheet() -> None:
+    data = load_terminal_product_taxonomy(DATA_PATH)
+    for entry in data["ceramic_hierarchy"]["entries"].values():
+        strength = entry["strength"]
+        assert strength["status"] == "sourced_qualitative_text"
+        assert strength["text"].strip()
+        assert strength["source_ids"] == ["ceramic_datasheets"]
+        assert "mechanical_properties" not in entry["datasheet"]
+
+
+def test_classifier_emits_grounded_strength_and_typed_null_when_unmapped() -> None:
+    forsterite = classify_terminal_product(
+        {"MgO": 57.3, "SiO2": 42.7},
+        taxonomy_path=DATA_PATH,
+    )
+    properties = forsterite["matched_nodes"][0]["properties"]
+    assert properties["catalog_entry_id"] == "forsterite"
+    assert properties["strength"]["status"] == "sourced_qualitative_text"
+    assert properties["strength"]["source_ids"] == ["ceramic_datasheets"]
+    assert properties["strength"]["text"].startswith("Mohs **7**")
+
+    gehlenite = classify_terminal_product(
+        {"CaO": 40.9, "Al2O3": 37.2, "SiO2": 21.9},
+        taxonomy_path=DATA_PATH,
+    )
+    unmapped = gehlenite["matched_nodes"][0]["properties"]
+    assert unmapped["catalog_entry_id"] is None
+    assert unmapped["strength"] == {
+        "status": "not_classified",
+        "text": None,
+        "source_ids": [],
+    }
+    assert unmapped["liner_suitability"]["verdict"] is None
+
+
+def test_empty_composition_emits_typed_not_classified_properties() -> None:
+    result = classify_terminal_product({}, taxonomy_path=DATA_PATH)
+
+    assert result["match_status"] == "no_match"
+    assert result["properties_panel"] == {
+        "show": False,
+        "property_basis": None,
+        "status": "not_classified",
+        "strength": {
+            "status": "not_classified",
+            "text": None,
+            "source_ids": [],
+        },
+    }
+
+
+def test_classify_terminal_product_has_one_runtime_producer_and_no_web_caller() -> None:
+    callers = []
+    for path in (REPO_ROOT / "simulator").rglob("*.py"):
+        tree = ast.parse(path.read_text())
+        for function in (
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+        ):
+            if any(
+                isinstance(node, ast.Call)
+                and (
+                    (
+                        isinstance(node.func, ast.Name)
+                        and node.func.id == "classify_terminal_product"
+                    )
+                    or (
+                        isinstance(node.func, ast.Attribute)
+                        and node.func.attr == "classify_terminal_product"
+                    )
+                )
+                for node in ast.walk(function)
+            ):
+                callers.append(
+                    (path.relative_to(REPO_ROOT).as_posix(), function.name)
+                )
+    assert callers == [
+        (
+            "simulator/terminal_product_taxonomy.py",
+            "build_terminal_product_taxonomy_entity",
+        ),
+    ]
+    for path in (REPO_ROOT / "web").rglob("*.py"):
+        assert "classify_terminal_product" not in path.read_text()
 
 
 def test_terminal_product_classifier_matches_cmas_assemblage() -> None:

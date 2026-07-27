@@ -55,6 +55,7 @@ from simulator.config import ConfigBundle, load_config_bundle
 from simulator.fidelity_vocabulary import canonicalize_fidelity_emission
 from simulator.campaigns import CampaignManager, CampaignPressureSetpointRefusal
 from simulator.accounting import AccountingQueries
+from simulator.accounting.ledger_api import LedgerAPI
 from simulator.accounting.formulas import (
     ATOMIC_WEIGHTS_G_PER_MOL,
     resolve_species_formula,
@@ -117,7 +118,7 @@ from simulator.state import (
 )
 
 # Public schema version pinned by docs/runner-output-schema.md.
-RUNNER_SCHEMA_VERSION = "1.7.0"
+RUNNER_SCHEMA_VERSION = "1.8.0"
 ZERO_INPUT_BASIS_BREACH = "zero_input_basis_breach"
 RUNNER_MASS_BALANCE_LIMIT_PCT = 5.0e-12
 O2_SOURCE_SIDE_POTENTIAL_LABEL = (
@@ -1371,6 +1372,15 @@ class PyrolysisRun:
                         campaign=self.campaign,
                     ),
                     {"classification": {}, "markdown": ""},
+                ),
+            ),
+            "terminal_product_taxonomy": _json_safe(
+                _safe_failure_value(
+                    lambda: _terminal_product_taxonomy_report(
+                        sim,
+                        feedstock_id=self.feedstock_id,
+                    ),
+                    None,
                 ),
             ),
             "thermal_train_report": _json_safe(
@@ -2889,6 +2899,17 @@ def _product_classification_report(
             campaign=campaign,
         ),
     }
+
+
+def _terminal_product_taxonomy_report(
+    sim: PyrolysisSimulator,
+    *,
+    feedstock_id: str,
+) -> dict[str, Any]:
+    return LedgerAPI(sim).terminal_product_taxonomy(
+        feedstock_id=feedstock_id,
+        terminal_product_account_or_artifact="runner.terminal_product_taxonomy",
+    )
 
 
 def _thermal_train_report(sim: PyrolysisSimulator) -> dict[str, Any]:
@@ -4485,6 +4506,17 @@ def _runner_failure_result(
             )
             if sim is not None
             else {"classification": {}, "markdown": ""}
+        ),
+        "terminal_product_taxonomy": _json_safe(
+            _safe_failure_value(
+                lambda: _terminal_product_taxonomy_report(
+                    sim,
+                    feedstock_id=feedstock_id,
+                ),
+                None,
+            )
+            if sim is not None
+            else None
         ),
         "thermal_train_report": _json_safe(
             _safe_failure_value(
