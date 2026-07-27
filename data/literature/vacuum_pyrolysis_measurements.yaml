@@ -12,7 +12,7 @@ measurements:
       source_location: mineru_markdown_methods_results_conclusion_and_fig4_caption
       digitized: false
       extractor: VPR-P5-schema
-      extraction_date: 2026-06-12
+      extraction_date: "2026-06-12"
       extraction_status: full_text_numeric_pass_no_fig4c_table
     figure_extraction:
       fig4c_per_location_mass_table:
@@ -437,11 +437,229 @@ measurements:
               citation_id: robinot_2026
               source_location: conclusion
               digest: "Robinot conclusion passage reports 1.3 g."
+    comparison_points:
+      - observable_id: robinot_o2_final_mass_kg
+        coordinate: {time_h: 1.0}
+        expected_value: 0.000035
+        units: kg
+        status: reported
+        uncertainty:
+          kind: absolute
+          value: 0.0
+          reported_status: not_reported
+        source_locator:
+          citation_id: robinot_2026
+          source_location: results_section_and_fig4c
+          extraction_method: text_and_figure_label
+      - observable_id: robinot_o2_mass_yield_fraction
+        coordinate: {start_h: 0.0, end_h: 1.0}
+        expected_value: 0.0105
+        units: mass_fraction
+        status: reported
+        uncertainty:
+          kind: absolute
+          value: 0.0
+          reported_status: not_reported
+        source_locator:
+          citation_id: robinot_2026
+          source_location: results_section
+          extraction_method: text
+      - observable_id: robinot_feed_oxygen_extraction_fraction
+        coordinate: {start_h: 0.0, end_h: 1.0}
+        expected_value: 0.0247
+        units: mass_fraction
+        status: reported
+        uncertainty:
+          kind: absolute
+          value: 0.0
+          reported_status: not_reported
+        source_locator:
+          citation_id: robinot_2026
+          source_location: results_section
+          extraction_method: text
+    qualitative_comparison_observations:
+      - observation_id: robinot_holder_deposit_composition
+        status: observed
+        representation_status: not-representable
+        coordinate: {surface: holder, sampling_basis: post_run_cooldown}
+        observed: "Na and Fe present on the holder."
+        reason: runtime_surface_deposit_mass_does_not_represent_post_run_qualitative_edx
+        source_locator: {citation_id: robinot_2026, source_location: results_section}
+      - observation_id: robinot_window_deposit_composition
+        status: observed
+        representation_status: not-representable
+        coordinate: {surface: window, sampling_basis: post_run_cooldown}
+        observed: "Si and Fe present on the window."
+        reason: runtime_surface_deposit_mass_does_not_represent_post_run_qualitative_edx
+        source_locator: {citation_id: robinot_2026, source_location: results_section}
+      - observation_id: robinot_condenser_deposit_composition
+        status: observed
+        representation_status: not-representable
+        coordinate: {surface: condenser, sampling_basis: post_run_cooldown}
+        observed: "Approximately one-third Si with Fe and Mg present."
+        reason: runtime_surface_deposit_mass_does_not_represent_post_run_qualitative_edx
+        source_locator: {citation_id: robinot_2026, source_location: results_section}
+      - observation_id: robinot_filter_deposit_composition
+        status: observed
+        representation_status: not-representable
+        coordinate: {surface: filter, sampling_basis: post_run_cooldown}
+        observed: "Mostly Si, moderate Na and Fe, trace Mg, P, and K."
+        reason: runtime_surface_deposit_mass_does_not_represent_post_run_qualitative_edx
+        source_locator: {citation_id: robinot_2026, source_location: results_section}
     named_missing_fields:
       - condenser_temperature_C
       - per_location_surface_temperature_C
       - view_factor_from_melt
       - full_feedstock_composition
+    measured_time_series: []
+
+  pomeroy_cardiff_2006_measurements:
+    evidence_class: experiment-grade
+    paper_citation:
+      citation_id: pomeroy_cardiff_2006
+      label: "Pomeroy and Cardiff 2006, A Proof of Concept of Vacuum Pyrolysis"
+      bibliography_status: primary_lpi_paper_extracted
+      publication: "Space Resources Roundtable VIII, LPI Contribution 1332, p. 47"
+      public_url: https://www.lpi.usra.edu/lpi/contribution_docs/LPI-001332.pdf
+    extraction:
+      source_location: LPI_Contribution_1332_p47_experiment_results_and_figure_2
+      digitized: false
+      extractor: t429-a-primary-source-pass
+      extraction_date: "2026-07-27"
+      extraction_status: text_numeric_pass_rga_signal_not_calibrated
+    figure_extraction:
+      rga_time_series:
+        extraction_status: qualitative_windows_only
+        reason: "The plotted RGA signals are analyzer channels without a published conversion to kg/h; no fake mass-rate values are created."
+        source:
+          citation_id: pomeroy_cardiff_2006
+          source_location: LPI_Contribution_1332_p47_figure_2
+          digest: "RGA plot spans the outgas/ramp/hold sequence and labels AMU 18 H2O, 28 Si, 32 O2, and 44 SiO."
+    conditions_reported:
+      feedstock:
+        species: MLS-1A
+        source:
+          citation_id: pomeroy_cardiff_2006
+          source_location: LPI_Contribution_1332_p47_experiment
+          digest: "The vacuum-pyrolysis experiment used MLS-1A lunar regolith simulant."
+      outgas_temperature_C:
+        reported_value: 200
+        reported_unit: C
+        source:
+          citation_id: pomeroy_cardiff_2006
+          source_location: LPI_Contribution_1332_p47_experiment
+          digest: "Samples were outgassed at 200 C."
+      outgas_duration_h:
+        reported_value: 2.0
+        reported_unit: h
+        source:
+          citation_id: pomeroy_cardiff_2006
+          source_location: LPI_Contribution_1332_p47_experiment
+          digest: "Samples were outgassed for two hours."
+      ramp_rate_ceiling_C_min:
+        reported_value: 12
+        reported_unit: C_min
+        qualifier: upper_bound
+        source:
+          citation_id: pomeroy_cardiff_2006
+          source_location: LPI_Contribution_1332_p47_experiment
+          digest: "Temperature was increased at a rate no greater than 12 C/min."
+      peak_hold_temperature_C:
+        reported_value: 1400
+        reported_unit: C
+        source:
+          citation_id: pomeroy_cardiff_2006
+          source_location: LPI_Contribution_1332_p47_experiment
+          digest: "The experiment held the sample at 1400 C."
+      peak_hold_duration_min:
+        reported_value: 20
+        reported_unit: min
+        source:
+          citation_id: pomeroy_cardiff_2006
+          source_location: LPI_Contribution_1332_p47_experiment
+          digest: "The 1400 C hold lasted 20 minutes."
+      rga_instrument:
+        reported_value: MKS_PPT_residual_gas_analyzer
+        reported_unit: instrument
+        source:
+          citation_id: pomeroy_cardiff_2006
+          source_location: LPI_Contribution_1332_p47_experiment
+          digest: "Gas evolved during pyrolysis was monitored with an MKS PPT residual gas analyzer."
+      achieved_pressure_mbar:
+        reported_status: not_reported
+        source:
+          citation_id: pomeroy_cardiff_2006
+          source_location: LPI_Contribution_1332_p47_experiment
+          digest: "The paper describes vacuum operation but does not publish achieved pressure for this run."
+      sample_mass_g:
+        reported_status: not_reported
+        source:
+          citation_id: pomeroy_cardiff_2006
+          source_location: LPI_Contribution_1332_p47_experiment
+          digest: "The 2006 paper does not state sample mass; the preset's 10 g value is a cross-paper follow-up assumption."
+    material_context:
+      feedstock_id: lunar_mls_1a
+      feedstock_label_reported: MLS-1A
+      feedstock_alias_note: "Runtime major oxides use the Weiblen/Hill MLS-1A literature table; run-specific batch analysis is not reported."
+    quantitative_measurements:
+      - observable: non_condensed_mass_loss_fraction
+        reported_value: 0.0117
+        reported_unit: mass_fraction
+        source:
+          citation_id: pomeroy_cardiff_2006
+          source_location: LPI_Contribution_1332_p47_results
+          digest: "The MLS-1A experiment reported 1.17% non-condensed mass loss."
+    comparison_points:
+      - observable_id: pomeroy_non_condensed_mass_loss_fraction
+        coordinate: {start_h: 0.0, end_h: 4.0}
+        expected_value: 0.0117
+        units: mass_fraction
+        status: reported
+        uncertainty:
+          kind: absolute
+          value: 0.0
+          reported_status: not_reported
+        source_locator:
+          citation_id: pomeroy_cardiff_2006
+          source_location: LPI_Contribution_1332_p47_results
+          extraction_method: text
+    qualitative_comparison_observations:
+      - observation_id: pomeroy_rga_si_window
+        status: observed
+        representation_status: not-representable
+        coordinate: {start_h: 2.0, end_h: 4.0, analyzer_channel_amu: 28}
+        observed: "Si signal rose toward peak temperature."
+        reason: runtime_does_not_expose_si_vapor_and_rga_signal_has_no_mass_rate_calibration
+        source_locator: {citation_id: pomeroy_cardiff_2006, source_location: LPI_Contribution_1332_p47_figure_2_and_conclusion}
+      - observation_id: pomeroy_rga_sio_window
+        status: observed
+        representation_status: not-representable
+        coordinate: {start_h: 2.0, end_h: 4.0, analyzer_channel_amu: 44}
+        observed: "SiO signal decreased as the Si signal rose."
+        reason: runtime_exposes_source_side_sio_kg_hr_but_paper_reports_uncalibrated_rga_signal
+        source_locator: {citation_id: pomeroy_cardiff_2006, source_location: LPI_Contribution_1332_p47_figure_2_and_conclusion}
+      - observation_id: pomeroy_rga_o2_window
+        status: observed
+        representation_status: not-representable
+        coordinate: {start_h: 0.0, end_h: 4.0, analyzer_channel_amu: 32}
+        observed: "O2 was monitored; the authors believed oxygen reacted within the furnace."
+        reason: runtime_exposes_cumulative_source_side_o2_potential_not_analyzer_signal
+        source_locator: {citation_id: pomeroy_cardiff_2006, source_location: LPI_Contribution_1332_p47_figure_2_and_conclusion}
+      - observation_id: pomeroy_rga_h2o_window
+        status: observed
+        representation_status: not-representable
+        coordinate: {start_h: 0.0, end_h: 2.0, analyzer_channel_amu: 18}
+        observed: "H2O was monitored during the outgas period."
+        reason: runtime_vapor_species_time_series_does_not_expose_analyzer_h2o_signal
+        source_locator: {citation_id: pomeroy_cardiff_2006, source_location: LPI_Contribution_1332_p47_figure_2}
+    observed_locations: []
+    conflicting_reported_values: []
+    named_missing_fields:
+      - achieved_pressure_mbar
+      - sample_mass_g
+      - exposed_melt_area_m2
+      - pump_speed
+      - rga_signal_to_mass_rate_calibration
     measured_time_series: []
 
   sesko_2024_vapor_phase_pyrolysis_measurements:
@@ -455,7 +673,7 @@ measurements:
       source_location: mineru_markdown_methods_results_conclusion
       digitized: false
       extractor: Sesko-preset-authoring
-      extraction_date: 2026-06-12
+      extraction_date: "2026-06-12"
       extraction_status: full_text_numeric_pass_no_figure_digitization
       source_paths:
         - docs-private/research/2026-06-12-vpr-sources/sesko_2024_vapor_phase_pyrolysis.md

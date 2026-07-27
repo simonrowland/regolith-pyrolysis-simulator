@@ -1,0 +1,228 @@
+schema_version: vacuum_pyrolysis_preset.v1
+paper_id: pomeroy_cardiff_2006_vacuum_pyrolysis
+paper_citation_id: pomeroy_cardiff_2006
+measurement_id: pomeroy_cardiff_2006_measurements
+preset_kind: faithful_reproduction
+extraction_status: published_thermal_recipe_runtime_pressure_assumed
+
+source_notes:
+  - citation_id: pomeroy_cardiff_2006
+    digest: "LPI paper reports MLS-1A outgas for 2 h at 200 C, ramp no faster than 12 C/min to 1400 C, hold for 20 min, MKS PPT RGA monitoring, and 1.17% non-condensed mass loss."
+  - citation_id: pomeroy_cardiff_2007
+    digest: "The approximately 10 g sample mass is a cross-paper follow-up scale, not a reported value for the 2006 run; it is an assumption and cannot support certification."
+  - citation_id: pomeroy_cardiff_2006
+    digest: "The 2006 paper does not report achieved chamber pressure or pump speed. Runtime uses the explicit schedule floor as an assumption; no nominal pump speed is converted into pressure."
+
+lab_schedule:
+  id: pomeroy_cardiff_2006_schedule
+  duration_h: 4.0
+  duration_qualifier: reconstructed_from_reported_segments
+  duration_source_class: literature_sidecar
+  duration_source_ref: pomeroy_cardiff_2006_experimental
+  duration_citation_id: pomeroy_cardiff_2006
+  interpolation: piecewise_linear
+  interpolation_source_class: literature_sidecar
+  interpolation_citation_id: pomeroy_cardiff_2006
+  interpolation_extraction_note: "Reported <=12 C/min ceiling is represented at the maximum stated rate, so the ramp lasts 100 min; slower unreported operation remains a sensitivity."
+  furnace_ceiling_C: 1400
+  furnace_ceiling_qualifier: reported_hold_temperature
+  furnace_ceiling_source_class: literature_sidecar
+  furnace_ceiling_source_ref: pomeroy_cardiff_2006_experimental
+  furnace_ceiling_citation_id: pomeroy_cardiff_2006
+  experiment_windows:
+    outgas: {start_h: 0.0, end_h: 2.0}
+    ramp: {start_h: 2.0, end_h: 3.6666666666666665}
+    peak_hold: {start_h: 3.6666666666666665, end_h: 4.0}
+    rga_observation: {start_h: 0.0, end_h: 4.0}
+    measured: {start_h: 0.0, end_h: 4.0}
+    cooldown: {reported: true, deposit_sampling: cooldown_or_post_run}
+  window_semantics:
+    preheat_h: 0.0
+    measured_window_start_h: 0.0
+    measured_window_end_h: 4.0
+    cooldown_h: 0.0
+    deposit_sample_basis: after_cooldown
+  melt_temperature_C:
+    - {t_h: 0.0, value: 200, unit: C, source_class: literature_sidecar, source_ref: pomeroy_cardiff_2006_experimental, citation_id: pomeroy_cardiff_2006}
+    - {t_h: 2.0, value: 200, unit: C, source_class: literature_sidecar, source_ref: pomeroy_cardiff_2006_experimental, citation_id: pomeroy_cardiff_2006}
+    - {t_h: 3.6666666666666665, value: 1400, unit: C, source_class: literature_sidecar, source_ref: pomeroy_cardiff_2006_experimental, citation_id: pomeroy_cardiff_2006}
+    - {t_h: 4.0, value: 1400, unit: C, source_class: literature_sidecar, source_ref: pomeroy_cardiff_2006_experimental, citation_id: pomeroy_cardiff_2006}
+  chamber_pressure_mbar:
+    - {t_h: 0.0, value: 0.001, unit: mbar, source_class: assumption_with_sensitivity_marker, citation_id: pomeroy_cardiff_2006, extraction_note: achieved_pressure_not_reported_runtime_schedule_floor}
+    - {t_h: 4.0, value: 0.001, unit: mbar, source_class: assumption_with_sensitivity_marker, citation_id: pomeroy_cardiff_2006, extraction_note: achieved_pressure_not_reported_runtime_schedule_floor}
+  gas_boundary:
+    background_gas:
+      reported_status: not_reported
+      source_class: not_reported
+      citation_id: pomeroy_cardiff_2006
+      extraction_note: "Paper describes vacuum operation but does not report a carrier gas."
+      digest: pomeroy_cardiff_2006_background_gas_not_reported
+    imposed_flow:
+      reported_status: not_reported
+      source_class: not_reported
+      citation_id: pomeroy_cardiff_2006
+      extraction_note: "Paper does not report imposed gas flow."
+      digest: pomeroy_cardiff_2006_imposed_flow_not_reported
+    pressure_control:
+      mode: achieved_pressure_not_reported_runtime_floor_assumption
+      source_class: assumption_with_sensitivity_marker
+      source_ref: pomeroy_cardiff_2006_experimental
+      citation_id: pomeroy_cardiff_2006
+      extraction_note: "Runtime pressure is an explicit schedule assumption. Pump speed is not reported and is never used to infer pressure."
+      digest: pomeroy_cardiff_2006_pressure_unreported_runtime_floor_assumption
+  surface_temperature_C:
+    crucible_wall:
+      - {t_h: 0.0, value: 200, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: pomeroy_cardiff_2006, extraction_note: crucible_wall_temperature_not_reported}
+      - {t_h: 4.0, value: 1200, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: pomeroy_cardiff_2006, extraction_note: crucible_wall_temperature_not_reported}
+    cold_trap:
+      - {t_h: 0.0, value: 25, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: pomeroy_cardiff_2006, extraction_note: cold_trap_temperature_not_reported}
+      - {t_h: 4.0, value: 25, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: pomeroy_cardiff_2006, extraction_note: cold_trap_temperature_not_reported}
+    rga_line:
+      - {t_h: 0.0, value: 25, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: pomeroy_cardiff_2006, extraction_note: rga_line_temperature_not_reported}
+      - {t_h: 4.0, value: 25, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: pomeroy_cardiff_2006, extraction_note: rga_line_temperature_not_reported}
+
+lab_geometry:
+  id: pomeroy_cardiff_2006_geometry
+  scale: gram_lab
+  equipment_sizing: lab_fixed_geometry
+  geometry_status: assumed_dimensions_reported_apparatus_roles
+  sample:
+    mass_g: 10.0
+    mass_qualifier: cross_paper_followup_scale_assumption
+    mass_source_class: assumption_with_sensitivity_marker
+    mass_source_ref: pomeroy_cardiff_2007_followup
+    mass_citation_id: pomeroy_cardiff_2007
+    mass_digest: "Follow-up NTRS record reports approximately 10 g experiments; 2006 run mass is not reported."
+    crucible_material: alumina
+    exposed_melt_area_m2: 0.000314
+    exposed_melt_area_basis: assumed_20_mm_opening
+    exposed_melt_area_digest: "No 2006 exposed area is reported; 20 mm opening is a sensitivity-marked runtime bridge, not a fitted value."
+    crucible_opening_area_m2: 0.000314
+    named_missing_fields: []
+  chamber:
+    volume_m3: null
+    wall_area_m2: null
+    wall_temperature_profile: rga_line
+    named_missing_fields:
+      - chamber_volume_m3
+      - chamber_wall_area_m2
+  surfaces:
+    - id: crucible_wall
+      role: sample_holder
+      area_m2: 0.001
+      equivalent_diameter_m: 0.0357
+      view_factor_from_melt: 0.2
+      line_of_sight_to_melt: true
+      temperature_profile: crucible_wall
+      source_class: assumption_with_sensitivity_marker
+      sensitivity_marker: pomeroy_crucible_area_view_factor_sweep
+      citation_id: pomeroy_cardiff_2006
+      extraction_note: "Alumina crucible is reported; dimensions and view factor are not."
+    - id: cold_trap
+      role: collector
+      area_m2: 0.005
+      equivalent_diameter_m: 0.08
+      view_factor_from_melt: 0.3
+      line_of_sight_to_melt: true
+      temperature_profile: cold_trap
+      source_class: assumption_with_sensitivity_marker
+      sensitivity_marker: pomeroy_cold_trap_area_view_factor_sweep
+      citation_id: pomeroy_cardiff_2006
+      extraction_note: "Cold-trap dimensions and view factor are not reported."
+    - id: rga_line
+      role: downstream_filter
+      area_m2: 0.001
+      equivalent_diameter_m: 0.0357
+      view_factor_from_melt: 0.05
+      line_of_sight_to_melt: false
+      temperature_profile: rga_line
+      source_class: assumption_with_sensitivity_marker
+      sensitivity_marker: pomeroy_rga_line_area_view_factor_sweep
+      citation_id: pomeroy_cardiff_2006
+      extraction_note: "RGA is reported, but line geometry and view factor are not."
+  pump:
+    pumping_speed_m3_s: null
+    port_area_m2: null
+    conductance_path: null
+    named_missing_fields:
+      - pumping_speed_m3_s
+      - port_area_m2
+      - conductance_path
+
+pair:
+  faithful:
+    feedstock_id: lunar_mls_1a
+    schedule_id: pomeroy_cardiff_2006_schedule
+    geometry_id: pomeroy_cardiff_2006_geometry
+    duration_h: 4.0
+    transport_model: auto_named_regime
+    mitigation: none
+    kinetics_caveat: blocked_missing_gram_scale_kinetics_model
+    status: runnable_out_of_domain_or_assumed_input
+
+sticking_provenance:
+  status: assumption_with_sensitivity_marker
+  digest: pomeroy_cardiff_2006_no_published_sticking_coefficients
+  species_surface_pairs: []
+
+measurement_selectors:
+  - observable_id: pomeroy_non_condensed_mass_loss_fraction
+    kind: non_condensed_mass_loss_fraction
+    units: mass_fraction
+    evidence_scope: pump_outlet_non_condensed_mass_divided_by_initial_feed_mass
+    certification:
+      status: assumed-input
+      blocked_by:
+        - achieved_pressure_not_reported
+        - sample_mass_cross_paper_assumption
+        - runtime_pump_outlet_not_implemented
+  - observable_id: pomeroy_sio_source_flux_series
+    kind: species_time_series_kg_hr
+    species: SiO
+    aggregation: point
+    units: kg_hr
+    evidence_scope: source_side_sio_mass_rate_not_rga_signal
+    certification:
+      status: out-of-domain
+      blocked_by:
+        - rga_signal_not_calibrated_to_mass_rate
+        - achieved_pressure_not_reported
+  - observable_id: pomeroy_si_source_flux_series
+    kind: species_time_series_kg_hr
+    species: Si
+    aggregation: point
+    units: kg_hr
+    evidence_scope: source_side_si_mass_rate_not_rga_signal
+    certification:
+      status: out-of-domain
+      blocked_by:
+        - runtime_vapor_selector_does_not_expose_si
+        - rga_signal_not_calibrated_to_mass_rate
+
+comparison_contract:
+  observation_sidecar_path: data/literature/vacuum_pyrolysis_measurements.yaml
+  model_evidence_class: builtin_process_model
+  fidelity_tier_allowed:
+    - real
+    - cached-real
+  provider_id: builtin
+  cache_state_allowed:
+    - fresh
+    - cached-real
+    - not_cached
+  internal_analytical_used: false
+  internal_analytical_blocker: internal_analytical_cannot_certify_experiment_grade
+  fast_tier_policy: cached_real_only_no_internal_analytical
+  pressure_policy: achieved_pressure_not_reported_no_pump_speed_inference
+  degraded_fallback_state:
+    status: comparison_complete_but_noncertifiable
+    reason: achieved_pressure_sample_mass_geometry_and_pump_outlet_are_unavailable_or_assumed
+
+digests:
+  feedstock_digest: lunar_mls_1a_weiblen1990_hill2007_sha256_03a8a3ea22a08e85
+  schedule_digest: pomeroy_cardiff_2006_reported_outgas_ramp_hold_v1
+  gas_boundary_digest: pomeroy_cardiff_2006_pressure_not_reported_runtime_floor_v1
+  geometry_digest: pomeroy_cardiff_2006_assumed_geometry_v1
+  transport_formula_digest: runtime_builtin_open_surface_only
+  sticking_provenance_digest: pomeroy_cardiff_2006_sticking_not_reported_v1
+  measurement_sidecar_digest: pomeroy_cardiff_2006_measurements_v1

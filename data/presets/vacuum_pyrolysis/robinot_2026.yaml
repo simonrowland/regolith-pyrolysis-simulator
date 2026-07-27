@@ -3,18 +3,18 @@ paper_id: robinot_2026_vacuum_pyrolysis
 paper_citation_id: robinot_2026
 measurement_id: robinot_2026_deposit_measurements
 preset_kind: faithful_with_remediation_twin
-extraction_status: skeleton_not_full_paper_data
+extraction_status: comparison_ready_assumed_inputs_named
 
 source_notes:
   - citation_id: robinot_2026
-    digest: "Worked example skeleton only; full bibliographic extraction and per-dimension apparatus values remain pending lit sweep."
+    digest: "Comparison package covers the reported 3.38 g feed, approximately 1 h heat to approximately 1800 C, 13 mbar/0.3 NL min-1 Ar boundary, and the cited O2 observables; unreported schedule shape and apparatus dimensions remain explicit assumptions."
   - citation_id: robinot_2026
     digest: "Feedstock linked to registered loadable lunar_eac_1a alias: Engelschiøn et al. 2020 supplies primary EAC-1A XRF oxides; Robinot Fig. 5 elementals remain extraction-suspect cross-check data."
   - citation_id: design_vacuum_pyrolysis_reproduction_2026_06_11
     digest: "Rev 2 requires Robinot Ar carrier gas near 13 mbar and 0.3 NL/min, explicit gas boundary digest, pO2 achieved-vs-setpoint fields, and C3 trust tags."
 
 lab_schedule:
-  id: robinot_2026_schedule_skeleton
+  id: robinot_2026_schedule
   duration_h: 1.0
   duration_qualifier: approximate
   duration_source_class: literature_sidecar
@@ -40,7 +40,7 @@ lab_schedule:
     cooldown_h: 0.0
     deposit_sample_basis: after_cooldown
   melt_temperature_C:
-    - {t_h: 0.0, value: 25, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: TODO_initial_temperature_not_named_in_anchor}
+    - {t_h: 0.0, value: 25, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: initial_temperature_not_reported_room_temperature_assumption}
     - {t_h: 1.0, value: 1800, unit: C, qualifier: approximate_peak, source_class: literature_sidecar, source_ref: robinot_2026_methods, citation_id: robinot_2026}
   chamber_pressure_mbar:
     - {t_h: 0.0, value: 13.0, unit: mbar, qualifier: approximate, source_class: literature_sidecar, source_ref: robinot_2026_methods, citation_id: robinot_2026}
@@ -66,24 +66,24 @@ lab_schedule:
       pump_throughput_source: assumption_with_sensitivity_marker
       source_ref: robinot_2026_methods
       citation_id: robinot_2026
-      extraction_note: TODO_confirm_pressure_control_mode_from_paper_methods
-      digest: "Pressure-control mode is inferred from the reported 13 mbar chamber pressure and 0.3 NL/min Ar flow; full paper extraction must confirm pump/control details."
+      extraction_note: pressure_control_mode_not_reported_flow_through_runtime_assumption
+      digest: "The reported achieved chamber pressure drives runtime. Flow-through control topology is assumed only to express the boundary; no pump speed is inferred or used to generate pressure."
   surface_temperature_C:
     holder:
-      - {t_h: 0.0, value: 25, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: skeleton_pending_surface_temperature_extraction}
-      - {t_h: 1.0, value: 1500, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: skeleton_pending_surface_temperature_extraction}
+      - {t_h: 0.0, value: 25, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: holder_temperature_not_reported}
+      - {t_h: 1.0, value: 1500, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: holder_temperature_not_reported}
     window:
-      - {t_h: 0.0, value: 25, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: skeleton_pending_surface_temperature_extraction}
-      - {t_h: 1.0, value: 80, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: skeleton_pending_surface_temperature_extraction}
+      - {t_h: 0.0, value: 25, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: window_temperature_not_reported}
+      - {t_h: 1.0, value: 80, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: window_temperature_not_reported}
     condenser:
-      - {t_h: 0.0, value: 25, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: skeleton_pending_surface_temperature_extraction}
-      - {t_h: 1.0, value: 25, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: skeleton_pending_surface_temperature_extraction}
+      - {t_h: 0.0, value: 25, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: condenser_temperature_not_reported}
+      - {t_h: 1.0, value: 25, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: condenser_temperature_not_reported}
     filter:
-      - {t_h: 0.0, value: 25, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: skeleton_pending_surface_temperature_extraction}
-      - {t_h: 1.0, value: 80, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: skeleton_pending_surface_temperature_extraction}
+      - {t_h: 0.0, value: 25, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: filter_temperature_not_reported}
+      - {t_h: 1.0, value: 80, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: filter_temperature_not_reported}
 
 lab_geometry:
-  id: robinot_2026_geometry_skeleton
+  id: robinot_2026_geometry
   scale: gram_lab
   equipment_sizing: lab_fixed_geometry
   geometry_status: populated_with_assumption_geometry
@@ -170,17 +170,17 @@ lab_geometry:
 pair:
   faithful:
     feedstock_id: lunar_eac_1a
-    schedule_id: robinot_2026_schedule_skeleton
-    geometry_id: robinot_2026_geometry_skeleton
+    schedule_id: robinot_2026_schedule
+    geometry_id: robinot_2026_geometry
     duration_h: 1.0
     transport_model: auto_named_regime
     mitigation: none
     kinetics_caveat: none
-    status: skeleton_not_claim_grade
+    status: comparison_ready_assumed_input
   remediation:
     feedstock_id: lunar_eac_1a
-    schedule_id: robinot_2026_schedule_skeleton
-    geometry_id: robinot_2026_geometry_skeleton
+    schedule_id: robinot_2026_schedule
+    geometry_id: robinot_2026_geometry
     duration_h: 1.0
     transport_model: auto_named_regime
     mitigation:
@@ -222,7 +222,43 @@ sticking_provenance:
       extraction_note: no_robinot_specific_sticking_coefficient_extracted
       digest: "Window-fouling sticking remains sensitivity-bearing until literature sidecar value exists."
 
+measurement_selectors:
+  - observable_id: robinot_o2_final_mass_kg
+    kind: final_o2_mass_kg
+    species: O2
+    units: kg
+    evidence_scope: source_side_o2_potential_vs_analyzer_visible_o2
+    certification:
+      status: assumed-input
+      blocked_by:
+        - unreported_temperature_time_profile
+        - assumed_exposed_melt_area
+        - analyzer_recovery_not_modeled
+  - observable_id: robinot_o2_mass_yield_fraction
+    kind: o2_mass_yield_fraction
+    species: O2
+    units: mass_fraction
+    evidence_scope: source_side_o2_potential_vs_analyzer_visible_o2_divided_by_reported_initial_feed_mass
+    certification:
+      status: assumed-input
+      blocked_by:
+        - unreported_temperature_time_profile
+        - assumed_exposed_melt_area
+        - analyzer_recovery_not_modeled
+  - observable_id: robinot_feed_oxygen_extraction_fraction
+    kind: feed_oxygen_extraction_fraction
+    species: O2
+    units: mass_fraction
+    evidence_scope: source_side_o2_potential_vs_analyzer_visible_o2_divided_by_feed_oxide_oxygen_mass
+    certification:
+      status: assumed-input
+      blocked_by:
+        - unreported_temperature_time_profile
+        - assumed_exposed_melt_area
+        - analyzer_recovery_not_modeled
+
 comparison_contract:
+  observation_sidecar_path: data/literature/vacuum_pyrolysis_measurements.yaml
   model_evidence_class: builtin_process_model
   fidelity_tier_allowed:
     - real
@@ -236,14 +272,14 @@ comparison_contract:
   internal_analytical_blocker: internal_analytical_cannot_certify_experiment_grade
   fast_tier_policy: cached_real_only_no_internal_analytical
   degraded_fallback_state:
-    status: blocked_for_claim_grade
-    reason: skeleton_missing_geometry_and_full_measurement_extraction
+    status: comparison_complete_but_residual_not_certifiable
+    reason: recipe_contains_named_schedule_geometry_and_recovery_assumptions
 
 digests:
   feedstock_digest: lunar_eac_1a_engelschion2020_xrf_sha256_1b7cce46216cb29f_robinot_elementals_suspect
-  schedule_digest: robinot_2026_schedule_skeleton_v1
-  gas_boundary_digest: robinot_2026_argon_13mbar_0p3NLmin_v1
-  geometry_digest: robinot_2026_geometry_skeleton_v1
+  schedule_digest: robinot_2026_schedule_comparison_v2
+  gas_boundary_digest: robinot_2026_argon_achieved_13mbar_0p3NLmin_v2
+  geometry_digest: robinot_2026_geometry_assumptions_named_v2
   transport_formula_digest: not_applicable_until_p0
   sticking_provenance_digest: robinot_2026_sticking_skeleton_v1
-  measurement_sidecar_digest: robinot_2026_measurements_skeleton_v1
+  measurement_sidecar_digest: robinot_2026_comparison_observations_v2

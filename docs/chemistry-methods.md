@@ -47,6 +47,16 @@ that a diagnostic engine may never be silently promoted into an authoritative sl
 §9.
 <!-- impl: §1 -> simulator/chemistry/kernel/planner.py Planner.dispatch:171 — shadows never apply -->
 
+Literature reproduction is a diagnostic projection over those same outputs,
+not a second chemistry path. Vacuum-pyrolysis selectors read runner boundary
+projections such as cumulative source-side O2 potential and per-species vapor
+rates, then pass values to the shared reproduction comparator. They do not read
+or mutate kg-keyed internal state. Evidence scope remains explicit: source-side
+O2 potential is not analyzer-visible recovered O2, and gross vapor generation
+is not non-condensed pump-outlet loss. If the matching projection is absent,
+the comparison emits a typed unsupported status rather than changing chemistry
+or substituting a proxy.
+
 ---
 
 ## 2. Vapor pressure over the melt

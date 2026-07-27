@@ -673,21 +673,42 @@ lunar_eac_1a:
   process_notes: "Loadable major-oxide table populated from primary XRF; explicit 1.6 wt% unreported/LOI residual closes the 98.4 wt% oxide table without renormalizing stated oxides."
 
 # buy: not_available (legacy_or_paper_stock)
-# source: Matchett/Cardiff 2006-2007 reproduction anchors identify MLS-1A; citable composition not captured in this chunk.
+# source: Hill et al. 2007 JGR Planets Table 1, DOI 10.1029/2006JE002767.
 lunar_mls_1a:
   name: "MLS-1A lunar simulant"
-  label: "MLS-1A Lunar Simulant (reproduction-required, blocked)"
+  label: "MLS-1A Lunar Simulant (Weiblen/Hill major oxides)"
   class: lunar_simulant
-  status: blocked_missing_citable_composition
-  blocked_reason: "Reproduction research identifies MLS-1A for Matchett/Cardiff anchors, but captured inputs do not include a citable oxide table."
-  source: "Matchett/Cardiff 2006-2007 vacuum-pyrolysis reproduction anchors"
-  confidence: "Blocked"
-  note: "Required for faithful reproduction presets once source composition is captured."
-  composition_wt_pct: {}
-  sum_check: null
+  source: "Hill et al. 2007 JGR Planets Table 1, DOI 10.1029/2006JE002767"
+  confidence: "High for published major-oxide table; exact Pomeroy/Cardiff batch variation not reported"
+  note: "Load the published MLS-1 major oxides without renormalization; the 2.06 wt% unreported balance is an accounting surrogate only."
+  composition_wt_pct:
+    SiO2: 42.8
+    TiO2: 6.77
+    Al2O3: 12.1
+    FeO: 16.3
+    MgO: 6.19
+    MnO: 0.22
+    CaO: 11.1
+    Na2O: 2.22
+    K2O: 0.20
+    P2O5: 0.04
+  sum_check: 97.94
+  composition_status: "primary_literature_loadable"
+  composition_basis:
+    source: "Hill E. et al. 2007, JGR Planets 112:E02006, Table 1, MLS-1A column, DOI 10.1029/2006JE002767"
+    method: "Published bulk major-oxide wt%; values retained as stated without renormalization."
+    fe_reporting_convention: "Total Fe reported as FeO in the source table."
+    pomeroy_batch_note: "Pomeroy/Cardiff identifies MLS-1A but does not publish a run-specific batch analysis."
+  non_oxide_components:
+    unreported_loi_residual_wt_pct: 2.06
+  formula_inventory:
+    unreported_loi_residual:
+      formula: O
+      estimated: true
+      source: "ACCOUNTING SURROGATE only: explicit 2.06 wt% residual closes the published 97.94 wt% major-oxide table without renormalizing stated oxides; not chemistry evidence."
   glass_fraction:
     value: "not_reported"
-    note: "not_reported in captured reproduction research; faithful comparison blocks if required."
+    note: "not_reported in the cited major-oxide table."
   stage0_buckets:
     h2o_wt_pct: "not_reported"
     organics_wt_pct: "not_reported"
@@ -700,16 +721,16 @@ lunar_mls_1a:
     sulfides_wt_pct: "not_reported"
     refractory_trace_wt_pct: "not_reported"
   provenance:
-    composition_citation: "Matchett/Cardiff 2006-2007 feedstock identity captured; MLS-1A oxide composition TODO."
-    composition_digest: "sha256:2a48ad48e744954d"
-    lot_or_batch: "blocked: paper/source composition required"
+    composition_citation: "Hill E. et al. 2007, Apollo sample 70051 and high- and low-Ti lunar soil simulants MLS-1A and JSC-1A, JGR Planets 112:E02006, Table 1 MLS-1A column, DOI 10.1029/2006JE002767."
+    composition_digest: "sha256:03a8a3ea22a08e85"
+    lot_or_batch: "Pomeroy/Cardiff run-specific lot not reported"
     buy_url: "not_available"
     buy_url_reason: "legacy_or_paper_stock"
     buy_url_checked: "2026-06-11"
   simulant_vs_real_caveat:
     report_placement: "measurement_sidecar"
     text: "MLS-1A is a paper simulant feedstock, not real regolith; comparison sidecars must keep that caveat explicit."
-  process_notes: "Blocked for quantitative runs until citable composition is captured."
+  process_notes: "Loadable published major oxides; explicit 2.06 wt% unreported residual closes accounting without renormalizing the source values."
 
 # buy: not_available (legacy_not_currently_stocked)
 # source: USGS/NASA NU-LHT lineage noted in 2022 LSIC assessment and captured catalog; NU-LHT-2M exact composition not captured in this chunk.

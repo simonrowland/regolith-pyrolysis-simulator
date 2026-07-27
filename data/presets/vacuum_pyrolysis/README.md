@@ -12,10 +12,11 @@ Required top-level fields:
 - `paper_citation_id`
 - `measurement_id`
 - `preset_kind`: `faithful_reproduction` or `faithful_with_remediation_twin`
-- `extraction_status`: `skeleton_not_full_paper_data`, `partial`, or `complete`
+- `extraction_status`: a named package-completeness and certification disposition
 - `lab_schedule`
 - `lab_geometry`
 - `pair`
+- `measurement_selectors` for comparison-ready packages
 - `comparison_contract`
 - `digests`
 
@@ -30,6 +31,12 @@ boundary row may use `reported_status: not_reported` only with
 `source_class: not_reported`, a paper `citation_id`, an `extraction_note` or
 `reason`, and a digest; silent absence still fails validation.
 
+Published achieved pressure is the v1 runtime boundary. Pump capacity may be
+stored when published, but nominal pump speed never generates an inferred
+pressure. If achieved pressure is absent, a numeric runtime pressure must be
+marked `assumption_with_sensitivity_marker`; every dependent residual then
+emits `assumed-input` and cannot certify a claim.
+
 `lab_schedule.interpolation` is the consumer-facing schedule-shape field. If
 the paper reports only duration/peak anchors rather than a T(t) profile, the
 schedule also carries `interpolation_source_class:
@@ -37,7 +44,7 @@ assumption_with_sensitivity_marker` plus citation and extraction note.
 
 `lab_geometry.surfaces` records named lab surfaces rather than industrial pipe
 segments. Each surface carries `id`, `role`, `temperature_profile`,
-`source_class`, and `extraction_note`. Robinot-style skeletons include holder,
+`source_class`, and `extraction_note`. Robinot-style packages include holder,
 window, condenser, and filter roles even when dimensions remain unresolved.
 
 `pair.*.mitigation.pO2_cover` must report achieved-vs-setpoint behavior. If
@@ -59,6 +66,23 @@ presented as real-engine evidence.
 Validation placement is intentionally test-local for this chunk. The design
 names the schema paths but does not place a runtime loader/validator module, and
 layout freeze R11.7 bars speculative simulator modules before review.
+
+Comparison-ready presets declare
+`comparison_contract.observation_sidecar_path`. Run one with:
+
+```bash
+./.venv/bin/python -m simulator.runner \
+  --preset data/presets/vacuum_pyrolysis/robinot_2026.yaml \
+  --compare --backend alphamelts \
+  --allow-fallback-vapor --allow-unmeasured-alpha-fallback \
+  --output runs/robinot.json
+```
+
+The run JSON envelope stays unchanged. The runner writes the versioned sibling
+artifact `runs/robinot.comparison.json` and the residual report
+`runs/robinot.comparison.md`. `--observations PATH` overrides the declared
+sidecar for controlled tests. Recipes never contain expected values; comparison
+points remain in `data/literature/vacuum_pyrolysis_measurements.yaml`.
 
 Named validation failures tested for this schema:
 

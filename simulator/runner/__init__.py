@@ -78,6 +78,11 @@ from simulator.diagnostics import (
     pressure_coating_pareto_diagnostic,
     wall_deposit_sticking_authority_status,
 )
+from simulator.diagnostic_helpers.vacuum_pyrolysis import (
+    VacuumPyrolysisComparisonError,
+    evaluate_vacuum_pyrolysis_comparison,
+    load_vacuum_pyrolysis_observations,
+)
 from simulator.trace import wall_deposit_by_segment_species_kg
 from simulator.three_product_report import classify_products
 from simulator.three_product_report_markdown import (
@@ -265,6 +270,7 @@ class PresetRunSpec:
     lab_schedule: Mapping[str, Any]
     lab_geometry: Mapping[str, Any]
     provenance: dict[str, Any]
+    document: Mapping[str, Any]
 
 
 def _load_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
@@ -447,6 +453,57 @@ def _load_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
         lab_schedule=schedule,
         lab_geometry=geometry,
         provenance=provenance,
+        document=copy.deepcopy(dict(preset)),
+    )
+
+
+def _preset_comparison_sidecar_path(
+    *,
+    preset_path: Path,
+    preset: PresetRunSpec,
+    override: str | None,
+) -> Path:
+    raw_path = str(override or "").strip()
+    if not raw_path:
+        contract = preset.document.get("comparison_contract")
+        if isinstance(contract, Mapping):
+            raw_path = str(contract.get("observation_sidecar_path") or "").strip()
+    if not raw_path:
+        raise VacuumPyrolysisComparisonError(
+            "comparison requires --observations or "
+            "comparison_contract.observation_sidecar_path"
+        )
+    sidecar_path = Path(raw_path)
+    if not sidecar_path.is_absolute():
+        sidecar_path = DATA_DIR.parent / sidecar_path
+    if sidecar_path.resolve() == preset_path.resolve():
+        raise VacuumPyrolysisComparisonError(
+            "expected observations must be independent from the recipe preset"
+        )
+    return sidecar_path
+
+
+def _vacuum_comparison_markdown(
+    comparison: Any,
+    *,
+    measurement_id: str,
+    comparison_artifact_path: Path,
+) -> str:
+    return "\n".join(
+        [
+            f"# Vacuum-pyrolysis comparison: {measurement_id}",
+            "",
+            f"Versioned comparison artifact: `{comparison_artifact_path}`",
+            "",
+            comparison.markdown(),
+            "",
+            "## Content digests",
+            "",
+            f"- Recipe: `sha256:{comparison.recipe_digest}`",
+            f"- Source: `sha256:{comparison.source_digest}`",
+            f"- Result: `sha256:{comparison.result_digest}`",
+            "",
+        ]
     )
 
 
@@ -4524,6 +4581,22 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--leg", default="faithful",
                         help="Preset leg to run when --preset is supplied "
                              "(default: faithful)")
+    parser.add_argument(
+        "--compare",
+        action="store_true",
+        help=(
+            "Compare preset-selected runtime observables against an "
+            "independent literature sidecar"
+        ),
+    )
+    parser.add_argument(
+        "--observations",
+        default=None,
+        help=(
+            "Override the comparison observation sidecar path declared by "
+            "the preset"
+        ),
+    )
     parser.add_argument("--campaign", default="C0",
                         help="Starting campaign phase (default: C0)")
     parser.add_argument("--hours", type=int, default=None,
@@ -4620,8 +4693,15 @@ def main(argv: Optional[list[str]] = None) -> int:
     campaign = str(args.campaign)
     hours = int(args.hours) if args.hours is not None else 24
     mass_kg = float(args.mass_kg) if args.mass_kg is not None else 1000.0
+    loaded_preset: PresetRunSpec | None = None
+    comparison_artifact: dict[str, Any] | None = None
+    comparison_artifact_path: Path | None = None
+    comparison_markdown: str | None = None
+    comparison_markdown_path: Path | None = None
 
     try:
+        if args.compare and not args.preset:
+            raise RunnerError("--compare requires --preset")
         additives = _parse_kv_pairs(args.additive)
         engine_overrides = _parse_engine_pairs(args.engine)
         if args.engines:
@@ -4646,6 +4726,7 @@ def main(argv: Optional[list[str]] = None) -> int:
         lab_schedule: Mapping[str, Any] | None = None
         if args.preset:
             preset = _load_preset_run_spec(Path(args.preset), str(args.leg))
+            loaded_preset = preset
             _assert_cli_matches_preset(
                 flag_name="--feedstock",
                 cli_value=args.feedstock,
@@ -4711,6 +4792,39 @@ def main(argv: Optional[list[str]] = None) -> int:
             run_metadata_overrides=metadata_overrides,
         )
         result = run.run()
+        if args.compare:
+            if loaded_preset is None:
+                raise RunnerError("--compare requires a successfully loaded preset")
+            preset_path = Path(args.preset)
+            sidecar_path = _preset_comparison_sidecar_path(
+                preset_path=preset_path,
+                preset=loaded_preset,
+                override=args.observations,
+            )
+            observations = load_vacuum_pyrolysis_observations(sidecar_path)
+            comparison_artifact_path = Path(args.output).with_suffix(
+                ".comparison.json"
+            )
+            comparison_markdown_path = Path(args.output).with_suffix(
+                ".comparison.md"
+            )
+            comparison = evaluate_vacuum_pyrolysis_comparison(
+                loaded_preset.document,
+                observations,
+                result,
+                feedstocks=_load_yaml(DATA_DIR / "feedstocks.yaml"),
+            )
+            measurement_id = str(loaded_preset.document["measurement_id"])
+            comparison_markdown = _vacuum_comparison_markdown(
+                comparison,
+                measurement_id=measurement_id,
+                comparison_artifact_path=comparison_artifact_path,
+            )
+            comparison_artifact = comparison.as_payload(
+                measurement_id=measurement_id,
+                sidecar_path=str(sidecar_path),
+                markdown_path=str(comparison_markdown_path),
+            )
     except (RunnerError, json.JSONDecodeError, TypeError, ValueError) as exc:
         if isinstance(exc, PresetRunnerError) and exc.provenance:
             metadata_overrides.setdefault(
@@ -4744,6 +4858,23 @@ def main(argv: Optional[list[str]] = None) -> int:
             allow_nan=False,
         )
         f.write("\n")
+    if comparison_artifact_path is not None and comparison_artifact is not None:
+        comparison_artifact_path.parent.mkdir(parents=True, exist_ok=True)
+        with comparison_artifact_path.open("w") as f:
+            json.dump(
+                _json_safe(comparison_artifact),
+                f,
+                indent=2,
+                sort_keys=False,
+                allow_nan=False,
+            )
+            f.write("\n")
+    if comparison_markdown_path is not None and comparison_markdown is not None:
+        comparison_markdown_path.parent.mkdir(parents=True, exist_ok=True)
+        comparison_markdown_path.write_text(
+            comparison_markdown,
+            encoding="utf-8",
+        )
 
     return 0 if result["status"] not in {"failed", "refused"} else 1
 

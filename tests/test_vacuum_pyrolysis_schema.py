@@ -13,6 +13,7 @@ from simulator.lab_schedule import normalize_lab_schedule
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PRESET_DIR = REPO_ROOT / "data" / "presets" / "vacuum_pyrolysis"
 PRESET_PATH = PRESET_DIR / "robinot_2026.yaml"
+POMEROY_PRESET_PATH = PRESET_DIR / "pomeroy_cardiff_2006.yaml"
 SESKO_PRESET_PATH = PRESET_DIR / "sesko_2024.yaml"
 MEASUREMENTS_PATH = REPO_ROOT / "data" / "literature" / "vacuum_pyrolysis_measurements.yaml"
 FEEDSTOCKS_PATH = REPO_ROOT / "data" / "feedstocks.yaml"
@@ -78,6 +79,23 @@ SESKO_TEMP_EMISSIVITY = pytest.approx(0.98)
 SESKO_TRACKING_INTERVAL_MIN = pytest.approx(5)
 SESKO_FIXED_MIRROR_ANGLE_DEG = pytest.approx(45)
 SESKO_PRESSURE_RUNTIME_DELTA_ID = "pressure_floor_delta_reported_uhv_min_to_runtime_floor"
+POMEROY_DURATION_H = pytest.approx(4.0)
+POMEROY_OUTGAS_END_H = pytest.approx(2.0)
+POMEROY_RAMP_END_H = pytest.approx(3.6666666666666665)
+POMEROY_HOLD_TEMPERATURE_C = pytest.approx(1400.0)
+POMEROY_MASS_LOSS_FRACTION = pytest.approx(0.0117)
+MLS_1A_MAJOR_OXIDES = {
+    "SiO2": 42.8,
+    "TiO2": 6.77,
+    "Al2O3": 12.1,
+    "FeO": 16.3,
+    "MgO": 6.19,
+    "MnO": 0.22,
+    "CaO": 11.1,
+    "Na2O": 2.22,
+    "K2O": 0.20,
+    "P2O5": 0.04,
+}
 
 
 class SchemaValidationError(AssertionError):
@@ -347,7 +365,7 @@ def require_value_citation(value: dict, measurement_id: str) -> None:
     )
 
 
-def test_robinot_preset_skeleton_carries_required_external_anchors() -> None:
+def test_robinot_preset_carries_required_external_anchors() -> None:
     preset = load_yaml(PRESET_PATH)
 
     schedule = preset["lab_schedule"]
@@ -392,6 +410,49 @@ def test_robinot_preset_skeleton_carries_required_external_anchors() -> None:
     assert preset["comparison_contract"]["model_evidence_class"] == "builtin_process_model"
     assert "cached-real" in preset["comparison_contract"]["fidelity_tier_allowed"]
     assert preset["comparison_contract"]["internal_analytical_used"] is False
+
+
+def test_pomeroy_preset_captures_recipe_and_keeps_pressure_assumed() -> None:
+    preset = load_yaml(POMEROY_PRESET_PATH)
+    measurements = load_yaml(MEASUREMENTS_PATH)
+    feedstocks = load_yaml(FEEDSTOCKS_PATH)
+
+    schedule = preset["lab_schedule"]
+    assert schedule["duration_h"] == POMEROY_DURATION_H
+    assert schedule["experiment_windows"]["outgas"]["end_h"] == POMEROY_OUTGAS_END_H
+    assert schedule["experiment_windows"]["ramp"]["end_h"] == POMEROY_RAMP_END_H
+    assert schedule["experiment_windows"]["peak_hold"]["end_h"] == POMEROY_DURATION_H
+    assert schedule["melt_temperature_C"][-1]["value"] == POMEROY_HOLD_TEMPERATURE_C
+    assert schedule["chamber_pressure_mbar"][0]["source_class"] == (
+        "assumption_with_sensitivity_marker"
+    )
+    assert "pump speed is not reported" in schedule["gas_boundary"][
+        "pressure_control"
+    ]["extraction_note"].lower()
+
+    faithful = preset["pair"]["faithful"]
+    assert faithful["feedstock_id"] == "lunar_mls_1a"
+    assert faithful["duration_h"] == POMEROY_DURATION_H
+    assert feedstocks["lunar_mls_1a"]["composition_wt_pct"] == MLS_1A_MAJOR_OXIDES
+    assert feedstocks["lunar_mls_1a"]["sum_check"] == pytest.approx(97.94)
+    assert "status" not in feedstocks["lunar_mls_1a"]
+
+    measurement = measurements["measurements"][preset["measurement_id"]]
+    comparison = measurement["comparison_points"][0]
+    assert comparison["expected_value"] == POMEROY_MASS_LOSS_FRACTION
+    assert comparison["observable_id"] == (
+        "pomeroy_non_condensed_mass_loss_fraction"
+    )
+    assert {
+        row["representation_status"]
+        for row in measurement["qualitative_comparison_observations"]
+    } == {"not-representable"}
+    assert all(
+        not {"expected_value", "actual_value", "residual", "score"}.intersection(
+            row
+        )
+        for row in measurement["qualitative_comparison_observations"]
+    )
 
 
 def test_robinot_preset_references_registered_loadable_eac1_feedstock() -> None:
@@ -566,6 +627,16 @@ def test_sesko_preset_captures_uhv_conditions_and_geometry_sources() -> None:
     )
     assert schedule["optical_train"]["fixed_mirror_angle_deg"]["value"] == SESKO_FIXED_MIRROR_ANGLE_DEG
     assert preset["pair"]["faithful"]["transport_model"] == "molecular_transitional_regime_p0b_blocked"
+    certification_block = preset["comparison_contract"][
+        "pressure_sensitive_certification_block"
+    ]
+    assert certification_block["status"] == "blocked"
+    assert certification_block["code"] == (
+        "reported_dynamic_pressure_crosses_runtime_floor"
+    )
+    assert "molecular_flow_transport_reproduction" in certification_block[
+        "blocked_observables"
+    ]
 
     geometry = preset["lab_geometry"]
     assert geometry["sample"]["mass_g"] == SESKO_SAMPLE_MASS_G

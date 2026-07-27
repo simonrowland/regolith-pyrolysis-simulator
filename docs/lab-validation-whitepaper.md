@@ -53,6 +53,7 @@ meaningful validation target for the present corpus.
 |---|---|---|---|---|---|
 | Robinot et al. 2026 (exp. 1) | PROMES 1.5 kW solar furnace, flow-through Ar at 13 mbar | 3.38 g pellet (EAC-1A) | viscous/transitional | O2 time series, per-surface deposit masses (Fig. 4c), 60 min | primary anchor |
 | Robinot et al. 2026 (exp. 2, supplement) | same rig, lower heating rate | 3.35 g pellet | viscous/transitional | full 1 s instrument record (O2, power, energy), 95 min | reproducibility floor; secondary anchor |
+| Pomeroy/Cardiff 2006 | vacuum furnace, alumina crucible, MKS PPT RGA | MLS-1A; 2006 mass not reported | achieved pressure not reported; runtime pressure assumed | 2 h at 200 C, ramp <=12 C/min, 1400 C for 20 min; 1.17% non-condensed mass loss; qualitative RGA channels | executable recipe; residual blocked by missing pump-outlet observable |
 | Šeško et al. 2024 | purpose-built high-vacuum solar furnace | 10 g EAC-1A simulant sample placed in an alumina ceramic crucible. | reported pressure 1e-7..1e-2 mbar; surface temperature 1750 K to 1900 K; transport_model: molecular_transitional_regime_p0b_blocked | Deposits were inspected after the run by SEM/EDX and polished cross-section microscopy. | regime discriminator (pending P0b+ transport wiring) |
 | Sauerborn 2005 (3 selected of 8) | DLR Cologne high-flux solar furnace, modified 34 L polished stainless vacuum chamber, 295 mm diameter x 300 mm high, glass dome top, approximate inner area 0.74 m2. | 0.991 g powder; 7.856 g powder/granulate; 0.6072 g powder | target before each pyrolysis run was below 1e-4 mbar; JSC-1 plotted chamber about 1e-3 mbar and QMS about 1e-5 mbar | mass loss, O2 onset/rise, RFA/EDX volatile depletion, cold-trap/cone/glass deposits | independent cross-validation (pending presets) |
 
@@ -134,10 +135,25 @@ Shallow-pot verdict: shallow pots are a credible throughput lever, but "maximize
 ## 3. Reproduction Method
 
 ### 3.1 Faithful-run protocol
-<!-- Prose: preset schema (conditions captured verbatim with units; provenance classes; assumption-with-sensitivity marking), runner --preset/--leg, digest-scoped artifacts, mass balance closing exactly. The Šeško idealized-schedule catch as an example of the fidelity standard. -->
+
+Distribution recipes capture reported conditions with units and source class,
+while independent sidecars carry expected observations. `runner --preset
+... --leg faithful --compare` executes the same session path as a normal run,
+resolves declared selectors over exported projections, and emits shared
+comparison records plus recipe/source/result digests. No expected value enters
+the recipe or runtime. Numeric records with an assumed pressure, duration,
+schedule shape, sample mass, or area are forced to `assumed-input`.
 
 ### 3.2 What "faithful" cannot capture
-<!-- Prose: the four assumption-marked geometry surfaces (paper states no numeric geometry); sensitivity treatment. -->
+
+Robinot does not state enough geometry or temperature-time detail to certify
+its three O2 residuals; its holder/window/condenser/filter observations remain
+qualitative. Pomeroy reports the thermal sequence but not achieved pressure or
+the 2006 sample mass. Its 1.17% non-condensed mass loss stays
+`unsupported-observable` because the current final summary explicitly marks
+pump-outlet mass unavailable. The RGA traces are uncalibrated analyzer signals,
+so spatial and qualitative windows are `observed/not-representable`, never
+numeric similarity scores.
 
 ## 4. Results: Model–Experiment Daylight
 

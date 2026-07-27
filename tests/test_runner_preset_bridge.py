@@ -12,7 +12,11 @@ from pathlib import Path
 import pytest
 
 from simulator import runner as runner_module
+from simulator.diagnostic_helpers.vacuum_pyrolysis import (
+    COMPARISON_SCHEMA_VERSION,
+)
 from simulator.runner import PyrolysisRun
+from tests.test_runner_smoke import _assert_schema_shape
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -24,6 +28,7 @@ def _write_bridge_preset(
     feedstock_id: str,
     scale: str = "gram_lab",
     exposed_melt_area_m2: float | None = None,
+    comparison_sidecar_path: Path | None = None,
 ) -> Path:
     preset_path = tmp_path / "bridge_preset.yaml"
     exposed_area_line = (
@@ -31,9 +36,29 @@ def _write_bridge_preset(
         if exposed_melt_area_m2 is None
         else f"\n                exposed_melt_area_m2: {exposed_melt_area_m2}"
     )
-    preset_path.write_text(
-        textwrap.dedent(
+    comparison_block = ""
+    if comparison_sidecar_path is not None:
+        comparison_block = textwrap.dedent(
             f"""
+            paper_id: bridge_comparison_paper
+            paper_citation_id: bridge_comparison_source
+            measurement_id: bridge_comparison_measurement
+            measurement_selectors:
+              - observable_id: bridge_final_o2_mass
+                kind: final_o2_mass_kg
+                species: O2
+                units: kg
+                evidence_scope: source_side_bridge_test
+                certification:
+                  status: assumed-input
+                  blocked_by:
+                    - synthetic_bridge_recipe
+            comparison_contract:
+              observation_sidecar_path: {json.dumps(str(comparison_sidecar_path))}
+            """
+        )
+    preset_text = textwrap.dedent(
+        f"""
             schema_version: vacuum_pyrolysis_preset.v1
             preset_kind: faithful_with_remediation_twin
             lab_schedule:
@@ -113,9 +138,18 @@ def _write_bridge_preset(
               schedule_digest: bridge_schedule_digest
               gas_boundary_digest: bridge_gas_boundary_digest
               geometry_digest: bridge_geometry_digest
-            """
-        ).strip()
-        + "\n",
+        """
+    ).strip()
+    if comparison_block:
+        preset_text = preset_text.replace(
+            "preset_kind: faithful_with_remediation_twin\n",
+            "preset_kind: faithful_with_remediation_twin\n"
+            + comparison_block.strip()
+            + "\n",
+            1,
+        )
+    preset_path.write_text(
+        preset_text + "\n",
         encoding="utf-8",
     )
     return preset_path
@@ -275,6 +309,84 @@ def test_preset_bridge_cli_maps_leg_and_records_provenance(tmp_path: Path):
     assert row["P_total_bar"] == pytest.approx(13.0e-3)
     assert row["pO2_bar"] == pytest.approx(
         enforcement[0]["achieved_mbar"] * 1.0e-3)
+
+
+def test_preset_bridge_compare_mode_writes_json_and_markdown(tmp_path: Path):
+    sidecar_path = tmp_path / "observations.yaml"
+    sidecar_path.write_text(
+        textwrap.dedent(
+            """
+            schema_version: vacuum_pyrolysis_measurements.v1
+            measurements:
+              bridge_comparison_measurement:
+                paper_citation:
+                  citation_id: bridge_comparison_source
+                comparison_points:
+                  - observable_id: bridge_final_o2_mass
+                    coordinate: {time_h: 1.0}
+                    expected_value: 0.0
+                    uncertainty: {kind: absolute, value: 0.0}
+                    units: kg
+                    status: reported
+                    source_locator: {table: synthetic_bridge}
+                qualitative_comparison_observations: []
+            """
+        ).strip()
+        + "\n",
+        encoding="utf-8",
+    )
+    preset_path = _write_bridge_preset(
+        tmp_path,
+        feedstock_id="lunar_mare_low_ti",
+        comparison_sidecar_path=sidecar_path,
+    )
+
+    returncode, payload = _run_preset_cli(
+        tmp_path,
+        preset_path,
+        "--compare",
+    )
+
+    assert returncode == 0, payload
+    _assert_schema_shape(payload)
+    assert "comparison" not in payload
+
+    comparison_path = tmp_path / "runner-output.comparison.json"
+    comparison = json.loads(comparison_path.read_text(encoding="utf-8"))
+    assert comparison["schema_version"] == COMPARISON_SCHEMA_VERSION == 1
+    assert set(comparison) == {
+        "schema_version",
+        "measurement_id",
+        "sidecar_path",
+        "markdown_path",
+        "digests",
+        "records",
+        "qualitative_observations",
+    }
+    assert json.loads(json.dumps(comparison, allow_nan=False)) == comparison
+    assert comparison["measurement_id"] == "bridge_comparison_measurement"
+    assert comparison["sidecar_path"] == str(sidecar_path)
+    assert comparison["markdown_path"] == str(
+        tmp_path / "runner-output.comparison.md"
+    )
+    assert set(comparison["digests"]) == {
+        "recipe_sha256",
+        "source_sha256",
+        "result_sha256",
+    }
+    assert all(len(value) == 64 for value in comparison["digests"].values())
+    assert len(comparison["records"]) == 1
+    record = comparison["records"][0]
+    assert record["status"] == "assumed-input"
+    assert record["recipe_digest"] == comparison["digests"]["recipe_sha256"]
+    assert record["observation_digest"] == comparison["digests"]["source_sha256"]
+    assert record["runtime_digest"] == comparison["digests"]["result_sha256"]
+
+    markdown = (tmp_path / "runner-output.comparison.md").read_text()
+    assert "| case | observable | species |" in markdown
+    assert "bridge_final_o2_mass" in markdown
+    assert "## Content digests" in markdown
+    assert f"Versioned comparison artifact: `{comparison_path}`" in markdown
 
 
 def test_preset_fast_tier_policy_rejects_internal_analytical_backend() -> None:

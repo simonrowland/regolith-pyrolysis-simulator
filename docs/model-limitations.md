@@ -49,6 +49,29 @@ The builtin vapor tier also carries only the monatomic `Na(g)` source term. Vapo
 
 No quantitative Richter, gas-mixing, FeO-SiO2, or Sesko reproduction residual is claimed here. The reviewed campaign material supports literature ranges and qualitative species-order/deposit checks, but not matched-observable residuals with a defensible engine/input/extrapolation split. Those remain thin or ungrounded validation gaps, not zero-error results.
 
+### Distribution paper comparison error budget
+
+The distribution presets expose matched observables without retuning. The
+2026-07-27 deterministic AlphaMELTS-backed runs below use the preset-declared
+schedule and geometry; all Robinot records remain `assumed-input` because the
+paper does not supply the full temperature-time profile, exposed melt area, or
+analyzer recovery model.
+
+| Paper | Observable | Published | Runtime | Residual | Status / dominant error budget |
+|---|---|---:|---:|---:|---|
+| Robinot 2026 | final O2 mass, kg | 0.000035 | 0.000344816 | +0.000309816 | `assumed-input`; source-side potential versus analyzer-visible O2, assumed schedule/area |
+| Robinot 2026 | O2/feed mass fraction | 0.0105 | 0.102016 | +0.0915165 | `assumed-input`; same scope mismatch and assumptions |
+| Robinot 2026 | feed-oxygen extraction fraction | 0.0247 | 0.242920 | +0.218220 | `assumed-input`; feed oxide oxygen denominator is represented, gas recovery is not |
+| Pomeroy/Cardiff 2006 | non-condensed MLS-1A mass-loss fraction | 0.0117 | — | — | `unsupported-observable`; runner exports no pump-outlet mass and gross source vapor is not a substitute |
+| Pomeroy/Cardiff 2006 | RGA Si/SiO/O2/H2O windows | qualitative signal | — | — | `observed/not-representable`; uncalibrated analyzer channels are not kg/h time series |
+
+Dynamic chamber pressure and spatial post-run deposit composition remain
+unsupported. Pomeroy achieved pressure is not reported, so its runtime pressure
+is explicitly assumed and cannot certify any pressure-sensitive residual.
+Šeško is blocked by the named dynamic-pressure certification gate. Paper-scale
+MRE electrical controls and hollow-anode observables are not part of this
+vacuum-pyrolysis chunk.
+
 ## DeMaria 1971 K Validation Rows
 
 The K validation rows are held out from the Lamoreaux & Hildenbrand standard-term fit. Citation: DeMaria, G., Balducci, G., Guido, M. & Piacente, V. (1971), Apollo 12022 Knudsen-effusion mass-spectrometry vaporization study, Proceedings of the Second Lunar Science Conference, vol. 2, pp. 1367-1380, ADS bibcode 1971LPSC....2.1367D.

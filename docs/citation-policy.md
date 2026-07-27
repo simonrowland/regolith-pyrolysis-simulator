@@ -60,6 +60,23 @@ of the citation, not decoration:
   **denied from certification gates** so no downstream result can present it as ground truth. Firming
   it up (closing the scatter) is tracked as follow-on work, not silently promoted.
 
+### Published recipes and independent observations
+
+Literature reproduction keeps runtime recipes and expected results in separate
+files. A preset may contain a published achieved pressure, temperature, sample
+mass, or duration only with its source locus; an absent field is
+`not_reported`, never zero. A runtime-only replacement is `ASSUMED` with a
+sensitivity marker and forces every dependent comparison record to
+`assumed-input`.
+
+Pump speed and achieved pressure are distinct evidence. Store both when a paper
+publishes both, but never infer achieved pressure from nominal speed. Expected
+measurements, uncertainties, table/figure/page locators, and qualitative
+observations live in an independent literature sidecar. Conflicting published
+values remain separate rows; they are not averaged. Qualitative or spatial
+observations are `observed` and `represented`/`not-representable`, never
+converted into invented numeric scores.
+
 ## 4. A right value on the wrong basis is still wrong
 
 This is the rule that a naive "we cited it" misses, and it is worth stating on its own because it has

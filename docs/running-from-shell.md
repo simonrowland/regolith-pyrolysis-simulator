@@ -31,6 +31,8 @@ stdout. Convention is to drop outputs under `runs/`.
 | flag | default | meaning |
 |---|---|---|
 | `--feedstock` | *(required)* | key from `data/feedstocks.yaml` |
+| `--preset` / `--leg` | *(none)* / `faithful` | load a vacuum-pyrolysis distribution recipe and select its leg |
+| `--compare` / `--observations` | off / preset sidecar | compare selected preset observables against an independent literature sidecar |
 | `--output` | *(required)* | path for the JSON result document |
 | `--campaign` | `C0` | campaign / recipe phase (see §4) |
 | `--hours` | `24` | simulated hours to advance |
@@ -50,6 +52,24 @@ Top-level keys (schema pinned by [`docs/runner-output-schema.md`](runner-output-
 
 **Check the exit code, not just the file:** a failed or refused run still writes a full
 JSON envelope (`status: "failed"` / `"refused"`) and exits non-zero.
+
+### Literature preset comparison
+
+```bash
+./.venv/bin/python -m simulator.runner \
+  --preset data/presets/vacuum_pyrolysis/pomeroy_cardiff_2006.yaml \
+  --compare --backend alphamelts \
+  --allow-fallback-vapor --allow-unmeasured-alpha-fallback \
+  --output runs/pomeroy-2006.json
+```
+
+`--compare` requires `--preset`. The recipe declares its independent observation
+sidecar; `--observations PATH` is an explicit override. The run JSON envelope
+stays unchanged. Residual records and recipe/source/result digests are written
+to `runs/pomeroy-2006.comparison.json`, with a concise Markdown report at
+`runs/pomeroy-2006.comparison.md`. Assumed recipe fields force
+`assumed-input`; absent pump-outlet or species surfaces produce typed
+unsupported statuses rather than substituted values.
 
 ---
 

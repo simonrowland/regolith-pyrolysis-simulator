@@ -43,6 +43,10 @@ python -m simulator.runner \
     [--engines=config/engines.yaml] \
     [--engine=vapor_pressure:builtin-vapor-pressure] \
     [--backend=internal-analytical|alphamelts] \
+    [--preset=data/presets/vacuum_pyrolysis/CASE.yaml] \
+    [--leg=faithful] \
+    [--compare] \
+    [--observations=data/literature/OBSERVATIONS.yaml] \
     [--track=pyrolysis|mre_baseline] \
     [--allow-fallback-vapor] \
     [--allow-unmeasured-alpha-fallback] \
@@ -100,6 +104,62 @@ the in-process P6a trace harness used by the CLI-boundary parity test.
 All top-level keys are required.  Tests assert the **exact** set --
 adding a new key requires bumping `RUNNER_SCHEMA_VERSION` and the
 schema-shape assertion.
+
+`--preset ... --compare` leaves this envelope unchanged. It writes a versioned
+comparison artifact next to the run output (for `case.json`,
+`case.comparison.json`) and a Markdown residual report (`case.comparison.md`).
+
+## Literature comparison sibling artifact
+
+The comparison is a diagnostic report about the run, not part of the run
+envelope. Keeping it in a sibling artifact avoids coupling its schema to
+concurrent `RUNNER_SCHEMA_VERSION` bumps. The Markdown residual report links to
+the JSON sibling, whose `result_sha256` digest binds it to the evaluated run.
+
+The sibling reuses
+`simulator.diagnostic_helpers.reproduction_compare.ComparisonRecord`; vacuum
+pyrolysis adds selectors, not comparison semantics.
+
+```jsonc
+{
+  "schema_version": 1,
+  "measurement_id": "paper_measurement_id",
+  "sidecar_path": "data/literature/vacuum_pyrolysis_measurements.yaml",
+  "markdown_path": "runs/case.comparison.md",
+  "digests": {
+    "recipe_sha256": "...",
+    "source_sha256": "...",
+    "result_sha256": "..."
+  },
+  "records": [
+    {
+      "case_id": "...",
+      "source_id": "...",
+      "observable_id": "...",
+      "species": "O2",
+      "temperature/time/window": {"start_h": 0.0, "end_h": 1.0},
+      "expected_value": 0.0105,
+      "expected_uncertainty": {"kind": "absolute", "value": 0.0},
+      "actual_value": 0.102,
+      "units": "mass_fraction",
+      "residual": 0.0915,
+      "status": "assumed-input",
+      "evidence_scope": "...",
+      "source_locator": {...},
+      "recipe_digest": "...",
+      "observation_digest": "...",
+      "runtime_digest": "..."
+    }
+  ],
+  "qualitative_observations": [...]
+}
+```
+
+Statuses are `match`, `mismatch`, `unsupported-observable`,
+`unsupported-speciation`, `assumed-input`, and `out-of-domain`. Expected
+values live only in the independent sidecar. Qualitative or spatial
+observations carry `observed` plus `represented`/`not-representable`; they
+cannot carry numeric scores or residuals.
 
 ## Product classification
 

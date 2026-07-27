@@ -292,6 +292,22 @@ comparison_contract:
   fidelity_tier_allowed:
     - cached-real
   internal_analytical_used: false
+  pressure_sensitive_certification_block:
+    status: blocked
+    code: reported_dynamic_pressure_crosses_runtime_floor
+    blocked_observables:
+      - molecular_flow_transport_reproduction
+      - transitional_flow_transport_reproduction
+      - pressure_sensitive_deposit_mass
+    reasons:
+      - reported_pressure_oscillates_from_1e-7_to_1e-2_mbar
+      - runtime_schedule_clamps_values_below_1e-3_mbar
+      - exposure_duration_is_assumed
+      - pump_throughput_and_pressure_trace_are_not_reported
+    required_evidence:
+      - molecular_transitional_transport_model
+      - unclamped_time_resolved_pressure_trace
+      - reported_exposure_duration
   blocked_claims:
     - molecular_flow_transport_reproduction
     - transitional_flow_transport_reproduction
