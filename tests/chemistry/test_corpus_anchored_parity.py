@@ -1076,6 +1076,63 @@ GRID_25_SIO_ALLOWED_STATUSES = {
     "out-of-engine-T-range",
 }
 
+# Runtime drift tripwire while t-430/t-450 own the KEMS error-bar program.
+# These values record current provider behavior; they are not literature agreement
+# and may be regenerated only with a reviewed provider change.
+GRID_25_SIO_RUNTIME_DRIFT_TRIPWIRE = {
+    "grid-25-sio:cj2015@1700K:SiO": (
+        "model-spread-within-envelope", 1.1478173030187133,
+    ),
+    "grid-25-sio:cj2015@1800K:SiO": (
+        "model-spread-within-envelope", 0.4163100520193938,
+    ),
+    "grid-25-sio:cj2015@1900K:SiO": (
+        "model-spread-within-envelope", 0.25049547025978586,
+    ),
+    "grid-25-sio:cj2015@2000K:SiO": (
+        "model-spread-within-envelope", 0.8630312227800293,
+    ),
+    "grid-25-sio:sf2004@1700K:SiO": (
+        "model-spread-within-envelope", 0.9269341194554767,
+    ),
+    "grid-25-sio:sf2004@1900K:SiO": (
+        "model-spread-within-envelope", 1.8389253800391663,
+    ),
+    "grid-25-sio:sof2018-mineru@1673K:SiO": (
+        "model-spread-within-envelope", 1.3838136652001243,
+    ),
+    "grid-25-sio:sof2018-mineru@1773K:SiO": (
+        "model-spread-within-envelope", 0.545068148962061,
+    ),
+    "grid-25-sio:sof2018-mineru@1873K:SiO": (
+        "pass", 0.13230855453336143,
+    ),
+    "grid-25-sio:sof2018-mineru@1973K:SiO": (
+        "model-spread-within-envelope", 0.6890827879473371,
+    ),
+    "grid-25-sio:vf2013-bse@2000K:SiO": (
+        "body-composition-spread", 1.6648366606130383,
+    ),
+    "grid-25-sio:vf2013-bse@2500K:SiO": ("out-of-engine-T-range", None),
+    "grid-25-sio:vf2013-bse@3000K:SiO": ("out-of-engine-T-range", None),
+    "grid-25-sio:vf2013-bse@3500K:SiO": ("out-of-engine-T-range", None),
+    "grid-25-sio:vf2013-bse@4000K:SiO": ("out-of-engine-T-range", None),
+    "grid-25-sio:vf2013-mars@2000K:SiO": (
+        "body-composition-spread", 1.4834772616216307,
+    ),
+    "grid-25-sio:vf2013-mars@2500K:SiO": ("out-of-engine-T-range", None),
+    "grid-25-sio:vf2013-mars@3000K:SiO": ("out-of-engine-T-range", None),
+    "grid-25-sio:vf2013-mars@3500K:SiO": ("out-of-engine-T-range", None),
+    "grid-25-sio:vf2013-mars@4000K:SiO": ("out-of-engine-T-range", None),
+    "grid-25-sio:vf2013-moon@2000K:SiO": (
+        "body-composition-spread", 3.0897489690376014,
+    ),
+    "grid-25-sio:vf2013-moon@2500K:SiO": ("out-of-engine-T-range", None),
+    "grid-25-sio:vf2013-moon@3000K:SiO": ("out-of-engine-T-range", None),
+    "grid-25-sio:vf2013-moon@3500K:SiO": ("out-of-engine-T-range", None),
+    "grid-25-sio:vf2013-moon@4000K:SiO": ("out-of-engine-T-range", None),
+}
+
 
 def test_grid_alpha_kinetic_envelope():
     """Alpha surface sanity only: value inside literature envelope."""
@@ -1228,6 +1285,28 @@ def test_grid_25_sio_cohort_passes_acceptance_gate(
     )
 
 
+@pytest.mark.xdist_group("corpus_grid25_sio")
+def test_grid_25_sio_runtime_drift_tripwire(
+    grid_25_sio_vaporock_report: dict[str, dict],
+):
+    """Pin current status and log error without claiming literature agreement."""
+
+    assert set(grid_25_sio_vaporock_report) == set(
+        GRID_25_SIO_RUNTIME_DRIFT_TRIPWIRE
+    )
+    for anchor_id, (expected_status, expected_error) in (
+        GRID_25_SIO_RUNTIME_DRIFT_TRIPWIRE.items()
+    ):
+        entry = grid_25_sio_vaporock_report[anchor_id]
+        assert entry["status"] == expected_status, anchor_id
+        if expected_error is None:
+            assert entry["error_decades"] is None, anchor_id
+        else:
+            assert entry["error_decades"] == pytest.approx(
+                expected_error, rel=0.0, abs=1e-9,
+            ), anchor_id
+
+
 # CI-audit 2026-07-24 finding 7: pin each fixture pair to one xdist
 # worker so the module-scoped report builds once, not once per worker.
 @pytest.mark.xdist_group("corpus_grid25_sio")
@@ -1359,9 +1438,58 @@ _CJ_OLIVINE_ALLOWED_STATUSES = {
 
 _CJ_PRESSURE_MODEL_SPREAD_ENVELOPE_DECADES = 2.7
 
+# Runtime drift tripwires while t-430/t-450 own the KEMS error-bar program.
+# These values pin current provider behavior, not literature agreement.
+_CJ_PRESSURE_RUNTIME_DRIFT_TRIPWIRE = {
+    ("Ir", 1700, "Fe"): ("pass", 0.139027752255191),
+    ("Ir", 1700, "Mg"): ("model-spread-within-envelope", 0.8169983177173599),
+    ("Ir", 1700, "SiO"): ("model-spread-within-envelope", 1.1482159091449784),
+    ("Ir", 1800, "Fe"): ("model-spread-within-envelope", 0.5366212419896286),
+    ("Ir", 1800, "Mg"): ("model-spread-within-envelope", 0.9075506426761047),
+    ("Ir", 1800, "SiO"): ("model-spread-within-envelope", 0.41598308349814067),
+    ("Ir", 1900, "Fe"): ("model-spread-within-envelope", 0.9023568639218107),
+    ("Ir", 1900, "Mg"): ("model-spread-within-envelope", 0.9959124657587983),
+    ("Ir", 1900, "SiO"): ("model-spread-within-envelope", 0.2510644934192934),
+    ("Ir", 2000, "Fe"): ("model-spread-within-envelope", 1.2413524450894502),
+    ("Ir", 2000, "Mg"): ("model-spread-within-envelope", 1.0828523376671315),
+    ("Ir", 2000, "SiO"): ("model-spread-within-envelope", 0.8629284388131637),
+    ("Mo", 1700, "Fe"): ("model-spread-within-envelope", 1.2403840124506909),
+    ("Mo", 1700, "Mg"): ("model-spread-within-envelope", 1.0130016822826402),
+    ("Mo", 1700, "SiO"): ("model-spread-within-envelope", 2.274686497380271),
+    ("Mo", 1800, "Fe"): ("model-spread-within-envelope", 0.585600980232595),
+    ("Mo", 1800, "Mg"): ("model-spread-within-envelope", 0.6057826906572288),
+    ("Mo", 1800, "SiO"): ("model-spread-within-envelope", 1.4382053057203628),
+    ("Mo", 1900, "Fe"): ("pass", 0.010251600763916128),
+    ("Mo", 1900, "Mg"): ("model-spread-within-envelope", 0.23408753424120385),
+    ("Mo", 1900, "SiO"): ("model-spread-within-envelope", 0.6778828750017594),
+    ("Mo", 2000, "Fe"): ("model-spread-within-envelope", 0.5563524450894497),
+    ("Mo", 2000, "Mg"): ("pass", 0.10785233766713012),
+    ("Mo", 2000, "SiO"): ("pass", 0.017928438813163063),
+    ("Re", 1700, "Fe"): ("model-spread-within-envelope", 1.9056781300977503),
+    ("Re", 1700, "Mg"): ("model-spread-within-envelope", 1.4159428587532297),
+    ("Re", 1700, "SiO"): ("model-spread-within-envelope", 2.604686497380273),
+    ("Re", 1800, "Fe"): ("model-spread-within-envelope", 1.3489343135659269),
+    ("Re", 1800, "Mg"): ("model-spread-within-envelope", 0.9668938017683414),
+    ("Re", 1800, "SiO"): ("model-spread-within-envelope", 1.9237608612759178),
+    ("Re", 1900, "Fe"): ("model-spread-within-envelope", 0.8408010308150304),
+    ("Re", 1900, "Mg"): ("pass", 0.5577717447675202),
+    ("Re", 1900, "SiO"): ("model-spread-within-envelope", 1.3026197171070235),
+    ("Re", 2000, "Fe"): ("pass", 0.3736475549105501),
+    ("Re", 2000, "Mg"): ("pass", 0.18214766233286903),
+    ("Re", 2000, "SiO"): ("model-spread-within-envelope", 0.7320715611868368),
+}
 
-def _cj_olivine_kems_test_cases():
+_CJ_FLUX_RUNTIME_DRIFT_TRIPWIRE = {
+    ("Ir", 1700, "Fe"): 2.326708450553986e-10,
+    ("Mo", 1753, "SiO"): 1.1438705843000896e-08,
+    ("Re", 1800, "Fe"): 1.0190742607988518e-07,
+}
+
+
+def _cj_olivine_kems_test_cases(intent: str):
     for anchor in load_all_cj_olivine_kems_anchors():
+        if anchor.intent != intent:
+            continue
         yield pytest.param(
             anchor,
             id=f"cohort_3|{anchor.anchor_id}|{anchor.intent}",
@@ -1443,12 +1571,13 @@ def _evaluate_cj_vapor_pressure_anchor(
     return entry
 
 
-def _cj_flux_alpha_ratio(
+def _cj_flux_values(
     anchor: CJOlivineKEMSAnchor,
     vapor_pressure_data: dict,
     setpoints_data_root: dict,
     feedstocks_data_root: dict,
-) -> float | None:
+    *alphas: float,
+) -> tuple[float | None, ...]:
     corpus_anchor = _cj_anchor_as_corpus_anchor(anchor)
     sim = _build_sim_for_anchor(
         corpus_anchor,
@@ -1492,8 +1621,23 @@ def _cj_flux_alpha_ratio(
         value = flux.get(anchor.species)
         return float(value) if value is not None and value > 0.0 else None
 
-    unit_flux = flux_for(1.0)
-    lit_flux = flux_for(float(anchor.expected_alpha or 0.0))
+    return tuple(flux_for(alpha) for alpha in alphas)
+
+
+def _cj_flux_alpha_ratio(
+    anchor: CJOlivineKEMSAnchor,
+    vapor_pressure_data: dict,
+    setpoints_data_root: dict,
+    feedstocks_data_root: dict,
+) -> float | None:
+    unit_flux, lit_flux = _cj_flux_values(
+        anchor,
+        vapor_pressure_data,
+        setpoints_data_root,
+        feedstocks_data_root,
+        1.0,
+        float(anchor.expected_alpha or 0.0),
+    )
     if unit_flux is None or lit_flux is None or unit_flux <= 0.0:
         return None
     return lit_flux / unit_flux
@@ -1587,19 +1731,48 @@ def _evaluate_cj_olivine_kems_anchor(
     }
 
 
-@pytest.mark.parametrize("anchor", list(_cj_olivine_kems_test_cases()))
-def test_cj_olivine_kems_cohort(
+@pytest.mark.parametrize(
+    "anchor", list(_cj_olivine_kems_test_cases("VAPOR_PRESSURE")),
+)
+def test_cj_olivine_kems_pressure_runtime_drift_tripwire(
     anchor: CJOlivineKEMSAnchor,
     vapor_pressure_data: dict,
     setpoints_data_root: dict,
     feedstocks_data_root: dict,
     vaporock_available: bool,
 ):
-    """CJ2015 olivine pressure + alpha anchors through kernel intents."""
+    """Pin current CJ pressure status/error without claiming literature agreement."""
 
-    if anchor.intent == "VAPOR_PRESSURE" and not vaporock_available:
+    if not vaporock_available:
         pytest.skip("VapoRock optional dependency unavailable")
-    entry = _evaluate_cj_olivine_kems_anchor(
+    entry = _evaluate_cj_vapor_pressure_anchor(
+        anchor,
+        vapor_pressure_data,
+        setpoints_data_root,
+        feedstocks_data_root,
+    )
+    key = (anchor.cell_label, int(anchor.T_K), anchor.species)
+    expected_status, expected_error = _CJ_PRESSURE_RUNTIME_DRIFT_TRIPWIRE[key]
+    status = entry["status"]
+    assert status in _CJ_OLIVINE_ALLOWED_STATUSES
+    assert status == expected_status, anchor.anchor_id
+    assert entry["error_decades"] == pytest.approx(
+        expected_error, rel=0.0, abs=1e-9,
+    ), anchor.anchor_id
+
+
+@pytest.mark.parametrize(
+    "anchor", list(_cj_olivine_kems_test_cases("EVAPORATION_FLUX")),
+)
+def test_cj_olivine_kems_alpha_linearity_wiring(
+    anchor: CJOlivineKEMSAnchor,
+    vapor_pressure_data: dict,
+    setpoints_data_root: dict,
+    feedstocks_data_root: dict,
+):
+    """Check alpha-linearity wiring; this does not anchor absolute flux."""
+
+    entry = _evaluate_cj_alpha_anchor(
         anchor,
         vapor_pressure_data,
         setpoints_data_root,
@@ -1609,14 +1782,38 @@ def test_cj_olivine_kems_cohort(
     assert status in _CJ_OLIVINE_ALLOWED_STATUSES
     assert status != "bug-suspected", (
         f"{anchor.anchor_id}: status={status!r}, "
-        f"expected_Pa={entry['expected_Pa']}, "
-        f"observed_Pa={entry['observed_Pa']}, "
         f"expected_alpha={entry['expected_alpha']}, "
         f"observed_alpha={entry['observed_alpha']}, "
-        f"error_decades={entry['error_decades']}, "
         f"alpha_abs_error={entry['alpha_abs_error']}, "
         f"source={anchor.source!r}"
     )
+
+
+def test_cj_olivine_kems_absolute_flux_runtime_drift_tripwire(
+    vapor_pressure_data: dict,
+    setpoints_data_root: dict,
+    feedstocks_data_root: dict,
+):
+    """Pin production-path magnitudes; this is not literature agreement."""
+
+    anchors = {
+        (anchor.cell_label, int(anchor.T_K), anchor.species): anchor
+        for anchor in load_all_cj_olivine_kems_anchors()
+        if anchor.intent == "EVAPORATION_FLUX"
+    }
+    assert set(_CJ_FLUX_RUNTIME_DRIFT_TRIPWIRE) <= set(anchors)
+    for key, expected_flux_kg_hr in _CJ_FLUX_RUNTIME_DRIFT_TRIPWIRE.items():
+        anchor = anchors[key]
+        observed_flux, = _cj_flux_values(
+            anchor,
+            vapor_pressure_data,
+            setpoints_data_root,
+            feedstocks_data_root,
+            float(anchor.expected_alpha),
+        )
+        assert observed_flux == pytest.approx(
+            expected_flux_kg_hr, rel=1e-9, abs=0.0,
+        ), anchor.anchor_id
 
 
 def test_cj_olivine_kems_cohort_3_status_report(

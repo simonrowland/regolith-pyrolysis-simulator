@@ -284,6 +284,19 @@ def test_sulfate_decomp_diagnostic_matches_helper(
         "pO2_bar": 0.01,
         "foulant_registry": foulant_registry,
     })
+    # Premise: REF-012 gives CaSO4 dG=28 kJ/mol at 1673.15 K and zero
+    # at 1773.15 K; the thermal path produces 1/2 O2.
+    # Algebra: slope=-280 J/mol/K, width=R*1773.15/280=52.652819 K,
+    # onset=1773.15 + 0.5*width*ln(0.01/0.2)=1694.283125 K, and the
+    # logistic at 1723.15 K is 1/(1+exp(-(1723.15-onset)/width)).
+    # Unit check: (J/mol)/(J/mol/K)=K and the logistic exponent is unitless.
+    # Sanity: 1723.15 K is above onset, so extent=0.633729 is above one-half.
+    expected_extent = 0.6337293360956355
+    assert result.diagnostic["extent"] == pytest.approx(
+        expected_extent, rel=0.0, abs=1e-12,
+    )
+
+    # Secondary wiring check: provider and pure helper consume the same controls.
     expected = chi_decomp("CaSO4", 1450.0, 0.01, 0.0, foulant_registry)
     assert result.diagnostic["extent"] == pytest.approx(expected.extent, abs=1e-9)
     assert result.diagnostic["fiat_extent"] == 1.0
@@ -329,6 +342,27 @@ def test_carbonate_decomposition_diagnostic_extent(
         "T_C": STAGE0_FOULANT_PHASE1_TEMP_C,
         "foulant_registry": foulant_registry,
     })
+    # Premise: REF-012 brackets CaCO3 dG from +20 kJ/mol at 873.15 K
+    # to -8 kJ/mol at 1173.15 K.
+    # Algebra: onset=873.15+20/(20+8)*300=1087.435714 K; the adjacent
+    # -8/-35 kJ/mol points give width=R*1087.435714/270=33.486828 K.
+    # At 1323.15 K the logistic extent is 0.9991237784702218.
+    # Unit check: kg*dimensionless extent remains kg; the exponent is unitless.
+    # Sanity: 1323.15 K is seven widths above onset, so decomposition is near 1.
+    expected_extent = 0.9991237784702218
+    expected_decomposed_kg = 7.992990227761775
+    expected_undecomposed_kg = 0.007009772238225409
+    assert result.diagnostic["extent"] == pytest.approx(
+        expected_extent, rel=0.0, abs=1e-12,
+    )
+    assert result.diagnostic["decomposed_carbonate_kg"] == pytest.approx(
+        expected_decomposed_kg, rel=0.0, abs=1e-12,
+    )
+    assert result.diagnostic["undecomposed_carbonate_kg"] == pytest.approx(
+        expected_undecomposed_kg, rel=0.0, abs=1e-12,
+    )
+
+    # Secondary wiring check: provider and pure helper consume the same controls.
     expected = chi_decomp("CaCO3", STAGE0_FOULANT_PHASE1_TEMP_C, 0.0, 0.0, foulant_registry)
     assert result.diagnostic["extent"] == pytest.approx(expected.extent, abs=1e-9)
     assert result.diagnostic["fiat_extent"] == 1.0
@@ -371,6 +405,27 @@ def test_partition_carbon_diagnostic_sephton_anchors(
         ),
         "foulant_registry": foulant_registry,
     })
+    # Premise: the fixed CI surrogate is 1 g/mol with 0.061610190658563
+    # C atoms per surrogate molecule; Sephton fixes the refractory floor at 0.39.
+    # Algebra: 100 kg / 0.001 kg/mol * 0.061610190658563
+    # = 6161.019065856299 mol C; refractory=0.39*total and labile=0.61*total.
+    # Unit check: kg/(kg/mol)*atoms-per-molecule gives mol C.
+    # Sanity: 2402.797435683957 + 3758.221630172342 = declared carbon.
+    expected_declared_c_mol = 6161.019065856299
+    expected_refractory_mol = 2402.797435683957
+    expected_labile_mol = 3758.221630172342
+    assert result.diagnostic["declared_c_mol"] == pytest.approx(
+        expected_declared_c_mol, rel=0.0, abs=1e-9,
+    )
+    assert result.diagnostic["refractory_mol"] == pytest.approx(
+        expected_refractory_mol, rel=0.0, abs=1e-9,
+    )
+    assert result.diagnostic["labile_mol"] == pytest.approx(
+        expected_labile_mol, rel=0.0, abs=1e-9,
+    )
+    assert result.diagnostic["carbonate_mol"] == "not_speciated"
+
+    # Secondary wiring check: provider and pure helper consume the same inputs.
     expected = partition_carbon("carbonaceous_organic", declared_c_mol, row)
     assert result.diagnostic["refractory_mol"] == pytest.approx(
         expected.refractory_mol, abs=1e-6,

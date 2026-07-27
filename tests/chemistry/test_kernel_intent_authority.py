@@ -22,6 +22,7 @@ from simulator.chemistry.kernel import (
     ChemistryProvider,
     IntentRequest,
     IntentResult,
+    KernelError,
     LedgerTransitionProposal,
     ProviderRegistry,
     UnauthorizedIntentError,
@@ -153,7 +154,7 @@ def test_kernel_rejects_diagnostic_provider_emitting_transition_at_registration(
     registry = ProviderRegistry()
     provider = _DiagnosticOnlyProvider()
     # Diagnostic providers cannot be registered as authoritative.
-    with pytest.raises(Exception):
+    with pytest.raises(KernelError, match="cannot be authoritative"):
         registry.register(provider, [ChemistryIntent.SILICATE_LIQUIDUS])
 
 

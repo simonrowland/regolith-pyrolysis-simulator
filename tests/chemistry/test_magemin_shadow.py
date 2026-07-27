@@ -38,6 +38,7 @@ from simulator.chemistry.kernel import (
     ControlAudit,
     IntentRequest,
     IntentResult,
+    KernelError,
     ProviderAccountView,
     ProviderRegistry,
 )
@@ -281,13 +282,12 @@ def test_registry_rejects_promoting_magemin_to_authoritative():
     """
     registry = ProviderRegistry()
     shadow = MAGEMinShadowProvider()
-    with pytest.raises(Exception) as exc_info:
+    with pytest.raises(KernelError, match="cannot be authoritative"):
         registry.register(
             shadow,
             [ChemistryIntent.SILICATE_LIQUIDUS],
             shadow=False,
         )
-    assert 'authoritative' in str(exc_info.value).lower()
 
 
 # ---------------------------------------------------------------------------

@@ -83,7 +83,9 @@ def test_json_safe_nonfinite_numbers_export_null():
     ) == {"nan": None, "inf": [None, None]}
 
 
-def test_completed_run_emits_legible_product_classification() -> None:
+def test_completed_run_wires_product_classification_and_markdown() -> None:
+    """Wiring-only: runner attaches the shared classifier and formatter output."""
+
     run = PyrolysisRun(
         feedstock_id="lunar_mare_low_ti",
         campaign="C0",
@@ -107,6 +109,30 @@ def test_completed_run_emits_legible_product_classification() -> None:
     assert "Silica glass" in report["markdown"]
     assert "Industrial mixed glass" in report["markdown"]
     assert "Refractory ceramic rump" in report["markdown"]
+
+
+def test_product_classifier_fixed_composition_anchor() -> None:
+    """Hand-specified products land in classes knowable from their species."""
+
+    sim = SimpleNamespace(
+        product_ledger=lambda: {
+            "Fe": 5.0,
+            "O2": 2.0,
+            "unmapped_oxide": 0.5,
+        },
+        train=SimpleNamespace(stages=[]),
+        atom_ledger=None,
+    )
+
+    classification = classify_products(sim)
+
+    assert classification["metals_plus_O2"]["metals_kg"] == {"Fe": 5.0}
+    assert classification["metals_plus_O2"]["O2_kg"] == 2.0
+    assert classification["metals_plus_O2"]["class_total_kg"] == 7.0
+    assert classification["unclassified"] == {
+        "kg_by_species": {"unmapped_oxide": 0.5},
+        "total_kg": 0.5,
+    }
 
 
 def test_completed_run_artifact_preserves_computed_views_and_hourly_controls() -> None:

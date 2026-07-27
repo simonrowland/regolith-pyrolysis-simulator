@@ -729,17 +729,19 @@ def test_provider_short_circuits_below_400_k():
 
 
 # ---------------------------------------------------------------------------
-# 5. Provider math matches the series-resistance reference on a known case
+# 5. Caller wiring matches the shared series-resistance helper on a known case
 # ---------------------------------------------------------------------------
 
 
 @pytest.mark.xdist_group("serial")
-def test_provider_matches_legacy_loop_for_known_lunar_composition(
+def test_evaporation_caller_wiring_matches_shared_helper_for_lunar_case(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
-    """Drive a simulator past the 400 K floor, then assert the kernel
-    dispatch reproduces the standalone series-resistance flux reference
-    species-by-species within tolerance."""
+    """Wiring-only parity between the caller and the shared production helper.
+
+    Independent flux math is pinned in
+    ``tests/chemistry/test_evaporation_series_resistance_flux.py``.
+    """
 
     setpoints_data = dict(setpoints_data)
     kernel_config = dict(setpoints_data.get("chemistry_kernel", {}) or {})
@@ -835,20 +837,19 @@ def test_provider_matches_legacy_loop_for_known_lunar_composition(
 # gate-2: short-run shadow parity exceeded 300 s under 3-chain slot contention.
 @pytest.mark.xdist_group("magemin_fullrun_a")
 @pytest.mark.timeout(900)
-def test_shadow_parity_across_short_simulation_run(
+def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
     feedstock_key,
     additives_kg,
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
 ):
-    """Drive the simulator through C0 -> C2A handoff and assert the
-    kernel dispatch and the standalone series-resistance reference agree
-    at every evaporation tick.
+    """Wiring-only parity across each evaporation tick in a short run.
 
     This is the parity gate that justified flipping the EVAPORATION_FLUX
     intent. Stays in the suite as a regression guard against future
-    intent flips that touch the same call site.
+    intent flips that touch the same call site. Independent flux math is
+    pinned in ``tests/chemistry/test_evaporation_series_resistance_flux.py``.
     """
 
     setpoints_data = dict(setpoints_data)

@@ -67,7 +67,9 @@ def test_atom_ledger_stores_moles_and_projects_kg():
 
 
 @pytest.mark.parametrize("element", ["O", "Si", "Fe"])
-def test_transition_atom_tolerance_is_binding_for_common_elements(element):
+def test_transition_atom_tolerance_defaults_to_configured_mol_shape(element):
+    """Default mass tolerance leaves the configured-mol branch selected."""
+
     ledger_module = importlib.import_module("simulator.accounting.ledger")
 
     assert ledger_module._atom_tolerance_for_element(
@@ -75,6 +77,33 @@ def test_transition_atom_tolerance_is_binding_for_common_elements(element):
         ledger_module.DEFAULT_ATOM_TOLERANCE_MOL,
         ledger_module.DEFAULT_MASS_TOLERANCE_KG,
     ) == pytest.approx(ledger_module.DEFAULT_ATOM_TOLERANCE_MOL)
+
+
+@pytest.mark.parametrize(
+    ("element", "expected_mass_limited_mol"),
+    [
+        ("O", 6.250390649415589e-11),
+        ("Si", 3.560619547801317e-11),
+        ("Fe", 1.7906706061420003e-11),
+    ],
+)
+def test_transition_atom_tolerance_tight_mass_limit_binds(
+    element, expected_mass_limited_mol
+):
+    """A 1e-12 kg ceiling selects the mass-limited side of ``min``."""
+
+    ledger_module = importlib.import_module("simulator.accounting.ledger")
+    # Hand derivation from the pinned NIST/IUPAC weights used by the project:
+    # mol_limit = 1e-12 kg / (atomic_weight_g_mol / 1000).
+    observed = ledger_module._atom_tolerance_for_element(
+        element,
+        ledger_module.DEFAULT_ATOM_TOLERANCE_MOL,
+        1e-12,
+    )
+    assert observed == pytest.approx(
+        expected_mass_limited_mol, rel=1e-12, abs=0.0,
+    )
+    assert observed < ledger_module.DEFAULT_ATOM_TOLERANCE_MOL
 
 
 @pytest.mark.parametrize("oxide", ["FeO", "Fe2O3"])

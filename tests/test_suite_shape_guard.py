@@ -75,7 +75,7 @@ HEAVY_ROSTER = frozenset({
     ("tests/test_cross_surface_parity.py",
      "test_batch_cli_web_mol_ledger_parity"),
     ("tests/chemistry/test_builtin_evaporation_flux_provider.py",
-     "test_shadow_parity_across_short_simulation_run"),
+     "test_evaporation_caller_wiring_matches_shared_helper_across_short_run"),
     ("tests/test_staged_bakeout.py",
      "test_c2a_staged_k_shuttle_and_conservation_remain_visible"),
 })

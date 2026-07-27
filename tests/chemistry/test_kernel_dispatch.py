@@ -353,7 +353,7 @@ def test_registry_rejects_double_authoritative_registration():
 
     registry = ProviderRegistry()
     registry.register(_AuthoritativeProvider(), [ChemistryIntent.VAPOR_PRESSURE])
-    with pytest.raises(Exception):
+    with pytest.raises(KernelError, match="conflicting authoritative registration"):
         registry.register(
             _AuthoritativeProvider(),
             [ChemistryIntent.VAPOR_PRESSURE],

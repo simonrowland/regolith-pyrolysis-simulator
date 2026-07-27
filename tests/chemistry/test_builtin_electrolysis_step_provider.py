@@ -576,9 +576,16 @@ def test_kernel_filters_provider_to_declared_accounts_only(
         assert "terminal.oxygen_melt_offgas_stored" not in accounts
 
 
-def test_provider_reports_fresh_kress91_redox_split_from_account_view(
+def test_provider_wires_fresh_kress91_redox_split_from_account_view(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
+    """Wiring-only check for the shared split and fresh account-view inputs.
+
+    Independent Kress91 arithmetic is pinned by
+    ``tests/test_fe_redox_kress91.py::
+    test_kress91_shared_function_matches_inline_formula_pins``.
+    """
+
     sim = _build_sim(
         "lunar_mare_low_ti",
         vapor_pressure_data,

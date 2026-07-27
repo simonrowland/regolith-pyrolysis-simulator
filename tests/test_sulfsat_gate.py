@@ -574,10 +574,12 @@ def test_kress_carmichael_shared_split_matches_published_anchor():
     assert split['x_feo'] == pytest.approx(expected['x_feo'], rel=0, abs=1.0e-15)
 
 
-def test_kress_carmichael_fe3fet_uses_shared_split(monkeypatch):
-    """
-    Without an operator ratio the gate derives Fe3Fet_Liq from the shared
-    simulator.fe_redox Kress-Carmichael 1991 split and forwards it to SCSS.
+def test_sulfsat_gate_wires_shared_kress91_split_into_scss(monkeypatch):
+    """Wiring-only check that the gate forwards the shared split to SCSS.
+
+    Independent Kress91 arithmetic is pinned by
+    ``tests/test_fe_redox_kress91.py::
+    test_kress91_shared_function_matches_inline_formula_pins``.
     """
     captured: Dict[str, Any] = {}
     fake = _make_fake_pysulfsat()
