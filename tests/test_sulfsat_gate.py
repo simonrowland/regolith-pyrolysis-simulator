@@ -282,6 +282,38 @@ def test_gate_populates_every_field_with_fake_pysulfsat(monkeypatch):
     assert result.warnings == []
 
 
+def test_jugo_delta_qfm_uses_frost_1991_buffer(monkeypatch):
+    """The Jugo path must use Frost QFM, not the distinct O'Neill buffer."""
+    captured_delta_qfm = []
+    fake = _make_fake_pysulfsat()
+
+    def _capture_s6(deltaQFM=None):
+        captured_delta_qfm.append(deltaQFM)
+        return 0.40
+
+    fake.calculate_S6St_Jugo2010_eq10 = _capture_s6
+    monkeypatch.setitem(sys.modules, 'PySulfSat', fake)
+
+    gate = SulfSatGate()
+    assert gate.initialize({}) is True
+
+    T_K = 1200.0
+    P_bar = 1.0
+    fO2_log = -10.0
+    gate.compute_sulfur_saturation(
+        liquid_comp_wt=_MORB_COMP_WT,
+        T_K=T_K,
+        P_bar=P_bar,
+        fO2_log=fO2_log,
+        S_input_ppm=1000.0,
+    )
+
+    frost_logfo2 = 8.735 - 25096.3 / T_K + 0.110 * (P_bar - 1.0) / T_K
+    oneill_logfo2 = 8.58 - 25050.0 / T_K
+    assert captured_delta_qfm == pytest.approx([fO2_log - frost_logfo2])
+    assert abs(frost_logfo2 - oneill_logfo2) > 0.1
+
+
 def test_gate_guards_nonfinite_scss_as_no_modeled_sulfide_saturation(monkeypatch):
     fake = _make_fake_pysulfsat(scss_ppm=float("inf"))
     monkeypatch.setitem(sys.modules, 'PySulfSat', fake)

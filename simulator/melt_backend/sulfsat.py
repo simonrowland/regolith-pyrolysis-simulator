@@ -22,9 +22,9 @@ The underlying PySulfSat (`Wieser & Gleeson 2023`) calls are:
   SCAS (sulfate capacity at saturation).
 * :func:`PySulfSat.calculate_S6St_Jugo2010_eq10` — Jugo et al. (2010)
   eq. 10 S6+/S_total partitioning vs ΔlogfO2 (relative to QFM).
-* :func:`PySulfSat.calculate_fo2_QFM_buffers` — computes the absolute
-  logfO2 of QFM at given T, P; subtract the simulator's absolute
-  ``fO2_log`` from QFM (O'Neill 1987 formulation) to obtain ΔQFM.
+* :func:`PySulfSat.calculate_fo2_QFM_buffers` — supplies the Frost (1991)
+  QFM reference required to translate the simulator's absolute ``fO2_log``
+  into the ΔQFM consumed by the Jugo relation.
 
 Smythe 2017 SCSS requires ``Fe3Fet_Liq``. The adapter accepts an
 operator-set value, otherwise it derives the ratio through
@@ -157,11 +157,28 @@ def _qfm_logfo2_oneill(T_K: float) -> float:
     O'Neill (1987) formulation that PySulfSat exposes via
     ``calculate_fo2_QFM_buffers``.
 
-    Used to translate the simulator's *absolute* ``fO2_log`` into the
-    ΔQFM offset that the Jugo (2010) S6+ correction expects.
+    Retained for consumers and explicit buffer comparisons; Jugo (2010)
+    requires the Frost (1991) QFM reference instead.
     """
     # logfo2_QFM_Oneill = 8.58 - 25050 / T_K  (PySulfSat src/.../s6_corrections.py:640).
     return 8.58 - 25050.0 / float(T_K)
+
+
+def _qfm_logfo2_frost(T_K: float, P_bar: float) -> float:
+    """Return absolute log10(fO2) of the Frost (1991) QFM buffer."""
+    T_K = float(T_K)
+    P_bar = float(P_bar)
+    # Jugo et al. (2010) defines deltaQFM against Frost (1991), not O'Neill.
+    # Frost's log10(fO2) = A + B/T + C(P-1)/T, as reproduced by PySulfSat
+    # 1.0.12 (s6_corrections.py:643-653): beta quartz uses A=8.735,
+    # B=-25096.3 K, C=0.110 K/bar; alpha quartz uses A=10.344,
+    # B=-26455.3 K, C=0.092 K/bar. Thus every term is dimensionless
+    # (log10 units). At 1200 K and 1 bar the beta branch gives -12.1786,
+    # the published Frost QFM value and PySulfSat's result at that point.
+    quartz_transition_K = 573.0 + 273.15 + 0.025 * P_bar
+    if T_K < quartz_transition_K:
+        return 10.344 - 26455.3 / T_K + 0.092 * (P_bar - 1.0) / T_K
+    return 8.735 - 25096.3 / T_K + 0.110 * (P_bar - 1.0) / T_K
 
 
 class SulfSatGate:
@@ -464,7 +481,7 @@ class SulfSatGate:
         """
         df = self._build_dataframe(liquid_comp_wt)
         P_kbar = max(P_bar, 1e-9) / 1000.0
-        delta_qfm = float(fO2_log) - _qfm_logfo2_oneill(T_K)
+        delta_qfm = float(fO2_log) - _qfm_logfo2_frost(T_K, P_bar)
 
         ss = self._module
 

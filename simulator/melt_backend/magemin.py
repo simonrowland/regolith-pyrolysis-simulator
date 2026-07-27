@@ -1603,9 +1603,10 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         Absolute log10(fO2) of the QFM buffer at ``temperature_C``.
 
         O'Neill (1987) formulation: ``logfO2_QFM = 8.58 - 25050 / T_K``.
-        Same fit PySulfSat uses (see
-        ``simulator/melt_backend/sulfsat.py::_qfm_logfo2_oneill``); keep
-        the two in sync.
+        Kept in sync with ``sulfsat.py::_qfm_logfo2_oneill`` for engine-aligned
+        buffer reporting only. NOTE (b-094): the Jugo-2010 S6+/ST path no
+        longer uses this fit — Jugo deltaQFM is referenced to Frost (1991)
+        per PySulfSat's own requirement.
         """
         T_K = float(temperature_C) + 273.15
         return 8.58 - 25050.0 / T_K

@@ -583,7 +583,9 @@ still carries ungrounded composition offset terms, though the Kress & Carmichael
 fugacity to the split is itself grounded. This is stated as a current limitation in
 [`docs/model-limitations.md`](model-limitations.md), and the oxygen-fugacity buffer groundings (IW,
 QFM, CCO) are the O'Neill 1987, Frost 1991, and Jakobsson & Oskarsson 1994 entries in the reference
-registry.
+registry. The Jugo 2010 S6+/ST diagnostic is the exception on QFM: its deltaQFM is referenced to
+the Frost (1991) QFM formulation (PySulfSat's stated requirement), not the O'Neill fit used for
+engine-aligned buffer reporting.
 
 ### §7.2 The metallothermic shuttle
 
