@@ -149,6 +149,22 @@ def producer_backed_operator_tick(monkeypatch):
             web_events._clear_simulation_state(sid)
 
 
+@pytest.fixture()
+def producer_backed_submillimbar_pressure_tick(monkeypatch, request):
+    original_tick_payload = web_events._tick_payload
+
+    def tick_payload_with_submillimbar_pressure(**kwargs):
+        kwargs["snapshot"].overhead.pressure_mbar = 0.0004
+        return original_tick_payload(**kwargs)
+
+    monkeypatch.setattr(
+        web_events,
+        "_tick_payload",
+        tick_payload_with_submillimbar_pressure,
+    )
+    return request.getfixturevalue("producer_backed_operator_tick")
+
+
 def test_simulation_tick_payload_renders_operator_dom_readouts(
     producer_backed_operator_tick,
 ):
@@ -505,3 +521,27 @@ def _plotly_targets(rendered):
         for call in rendered["plotlyCalls"]
         if isinstance(call.get("target"), str)
     }
+
+
+def test_submillimbar_pressure_survives_socket_emitter_and_dom(
+    producer_backed_submillimbar_pressure_tick,
+):
+    payload = producer_backed_submillimbar_pressure_tick["payload"]
+    rendered = _render_tick_dom(
+        html=producer_backed_submillimbar_pressure_tick["html"],
+        payload=payload,
+    )
+    pressure_calls = [
+        call
+        for call in rendered["plotlyCalls"]
+        if call["method"] == "extendTraces" and call["target"] == "chart-pressure"
+    ]
+
+    assert type(payload["pressure_mbar"]) is float
+    assert payload["pressure_mbar"] == 0.0004
+    assert pressure_calls
+    # This chunk (b-090) owns only the producer/socket boundary: the client
+    # must RECEIVE the un-destroyed sub-0.0005 value (payload asserts above)
+    # and consume it without error (pressure_calls non-empty). The chart-level
+    # contract (un-floored y, hover text) belongs to the b-086 zero/floor
+    # renderer fix — assert it there when fix/zerofloor integrates, not here.

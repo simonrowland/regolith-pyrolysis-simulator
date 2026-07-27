@@ -4082,6 +4082,26 @@ def test_web_payloads_preserve_full_precision_mass_balance_error(
     assert completion_payload["mass_balance_error_breached"] is True
 
 
+@pytest.mark.parametrize("pressure_mbar", [0.0004, 0.0])
+def test_tick_payload_preserves_overhead_pressure_value(pressure_mbar):
+    sim, snapshot = _sim_with_mass_balance_snapshot(0.0)
+    snapshot.overhead.pressure_mbar = pressure_mbar
+
+    payload = _tick_payload(
+        sim=sim,
+        snapshot=snapshot,
+        backend_message="",
+        backend_status="internal-analytical",
+        backend_authoritative=False,
+    )
+    serialized = json.loads(json.dumps({"pressure_mbar": payload["pressure_mbar"]}))
+
+    assert type(payload["pressure_mbar"]) is float
+    assert payload["pressure_mbar"] == pressure_mbar
+    assert type(serialized["pressure_mbar"]) is float
+    assert serialized["pressure_mbar"] == pressure_mbar
+
+
 def test_tick_payload_exposes_non_authoritative_backend_domain_gate():
     sim, snapshot = _sim_with_mass_balance_snapshot(0.0)
 

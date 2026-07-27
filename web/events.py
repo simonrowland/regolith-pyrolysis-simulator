@@ -1739,7 +1739,7 @@ def _tick_payload(
         'overlap_evaporation': (
             getattr(sim, '_last_overlap_evaporation_diagnostic', {}) or {}
         ),
-        'pressure_mbar': round(snapshot.overhead.pressure_mbar, 3),
+        'pressure_mbar': snapshot.overhead.pressure_mbar,
         'atmosphere': sim.melt.atmosphere.name,
         'p_total_mbar': round(sim.melt.p_total_mbar, 3),
         'pO2_mbar': round(sim.melt.pO2_mbar, 6),
