@@ -1045,6 +1045,15 @@ def resolve_eval_timeout_seconds(value: float | int | str | None = None) -> floa
     raw = value if value is not None else os.environ.get(EVAL_TIMEOUT_ENV)
     if raw is None:
         return float(DEFAULT_EVAL_TIMEOUT_SECONDS)
+    if isinstance(raw, bool):
+        raise ValueError("per-eval timeout seconds must not be bool")
+    if not isinstance(raw, (int, float, str)):
+        # numpy.bool_ is not a builtin-bool subclass yet float-coerces to 0/1;
+        # enforcing the declared scalar types closes every bool-like leak.
+        raise ValueError(
+            "per-eval timeout seconds must be int, float, or str, "
+            f"not {type(raw).__name__}"
+        )
     seconds = float(raw)
     if not math.isfinite(seconds) or seconds <= 0.0:
         raise ValueError("per-eval timeout seconds must be finite and positive")

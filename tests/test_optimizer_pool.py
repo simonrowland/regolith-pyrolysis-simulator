@@ -54,6 +54,24 @@ def test_eval_timeout_rejects_nonfinite_values(value: str) -> None:
         resolve_eval_timeout_seconds(value)
 
 
+@pytest.mark.parametrize("value", [True, False])
+def test_eval_timeout_rejects_bool_before_numeric_conversion(value: bool) -> None:
+    with pytest.raises(ValueError, match="must not be bool"):
+        resolve_eval_timeout_seconds(value)
+
+
+@pytest.mark.parametrize("value", [1, 1.0, "1.0"])
+def test_eval_timeout_accepts_positive_numeric_values(value: int | float | str) -> None:
+    assert resolve_eval_timeout_seconds(value) == 1.0
+
+
+def test_eval_timeout_rejects_numpy_bool_scalars() -> None:
+    np = pytest.importorskip("numpy")
+    for value in (np.True_, np.False_):
+        with pytest.raises(ValueError, match="must be int, float, or str"):
+            resolve_eval_timeout_seconds(value)
+
+
 @pytest.fixture(autouse=True)
 def _restore_thread_env() -> object:
     snapshot = {name: os.environ.get(name) for name in THREAD_ENV_VARS}
