@@ -203,7 +203,8 @@ def test_kernel_filters_provider_to_cleaned_melt_only(
         setpoints_data,
     )
     sim.atom_ledger.load_external(
-        "process.metal_phase", {"Fe": 0.5}, source="test seed"
+        "process.metal_phase", {"Fe": 0.5}, source="test seed",
+        material_origin="feedstock",
     )
 
     seen_accounts: list[frozenset[str]] = []
@@ -508,6 +509,7 @@ def test_evaporation_aux_includes_spent_reductant_residue_projection_domain(
         "process.raw_feedstock",
         {"Na2O": 0.375},
         source="evaporation parity regression seed",
+        material_origin="feedstock",
     )
     sim.atom_ledger.move(
         "evaporation_parity_cleaned_melt_seed",

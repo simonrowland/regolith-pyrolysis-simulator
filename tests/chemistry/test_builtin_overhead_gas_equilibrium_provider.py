@@ -38,6 +38,7 @@ def test_dispatch_reports_ideal_gas_partial_pressures(
         "process.overhead_gas",
         {"O2": 2.0, "SiO": 1.0},
         source="test overhead gas",
+        material_origin="feedstock",
     )
 
     result = sim._chem_kernel.dispatch(

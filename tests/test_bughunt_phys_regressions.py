@@ -262,7 +262,7 @@ def test_negative_ledger_dust_never_projects_as_product_mass() -> None:
         allowed_accounts=KNOWN_LEDGER_ACCOUNTS,
         allowed_account_prefixes=KNOWN_LEDGER_ACCOUNT_PREFIXES,
     )
-    ledger.load_external("process.overhead_gas", {"Cr": 1.0})
+    ledger.load_external("process.overhead_gas", {"Cr": 1.0}, material_origin="feedstock")
     moved_kg = 1.0 + 4.0e-13
     ledger.apply(
         LedgerTransition(
@@ -303,7 +303,7 @@ def _signed_dust_ledger(account: str = "process.cleaned_melt") -> AtomLedger:
         allowed_accounts=KNOWN_LEDGER_ACCOUNTS,
         allowed_account_prefixes=KNOWN_LEDGER_ACCOUNT_PREFIXES,
     )
-    ledger.load_external(account, {"FeO": 1.0})
+    ledger.load_external(account, {"FeO": 1.0}, material_origin="feedstock")
     ledger.move(
         "outward_mol_projection_dust_probe",
         account,
@@ -495,7 +495,7 @@ def test_in_loop_mol_consumers_use_canonical_raw() -> None:
 
 def test_runtime_melt_and_c7_report_use_ledger_projection_policy() -> None:
     ledger = AtomLedger()
-    ledger.load_external("process.cleaned_melt", {"Cr": 1.0})
+    ledger.load_external("process.cleaned_melt", {"Cr": 1.0}, material_origin="feedstock")
     ledger.move(
         "cleaned_melt_dust_probe",
         "process.cleaned_melt",

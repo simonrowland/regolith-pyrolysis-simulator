@@ -4,12 +4,13 @@ from __future__ import annotations
 
 import dataclasses
 import math
-from copy import copy, deepcopy
+from copy import deepcopy
 from dataclasses import dataclass, field
 from typing import Any, Mapping
 
 from engines.builtin.melt_effect_adjustment import CertifiedPointRefusedError
 from engines.builtin.vapor_pressure import VaporPressureRangeError
+from simulator.accounting.ledger import snapshot_atom_ledger
 from simulator.backends import requires_stage0_subprocess
 from simulator.campaigns import (
     CampaignHoldTargetRefusal,
@@ -66,16 +67,8 @@ def _typed_refusal_reason(exc: BaseException) -> str:
 
 
 def _snapshot_atom_ledger(ledger: Any) -> Any:
-    """Copy mutable ledger state without copying its immutable registries."""
-    snapshot = copy(ledger)
-    snapshot._balances = deepcopy(ledger._balances)
-    snapshot._policies = dict(ledger._policies)
-    snapshot._transitions = list(ledger._transitions)
-    snapshot._terminal_debit_authorized_transition_ids = set(
-        ledger._terminal_debit_authorized_transition_ids
-    )
-    snapshot._external_loads = list(ledger._external_loads)
-    return snapshot
+    """Copy all mutable ledger state through its authoritative owner."""
+    return snapshot_atom_ledger(ledger)
 
 
 @dataclass(frozen=True)

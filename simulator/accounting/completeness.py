@@ -1212,12 +1212,8 @@ def _strict_non_feedstock_reagent_element_mol(
     accounts: tuple[str, ...],
     gross_product_target_equiv_mol: float,
 ) -> float:
-    # Backend-equilibrium transitions can lag this provenance map because
-    # commit_validated_transition (core.py ~5734-5754) bypasses
-    # _observe_reagent_provenance_transition. The normal _commit_proposal path
-    # is exact; backend runs may under-exclude reagent-tagged element moved into
-    # a product account. This E1b metric is reporting-only while observer
-    # coverage of that commit path is backlogged.
+    # Both kernel-proposal and backend-equilibrium commit paths update this
+    # provenance map immediately after their validated ledger commit.
     helper = getattr(queries, "non_feedstock_reagent_element_kg_by_account", None)
     if not callable(helper):
         if _target_element_has_reagent_signal(element, queries):

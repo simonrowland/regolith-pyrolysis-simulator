@@ -190,6 +190,8 @@ from simulator.accounting import (
     AccountingError,
     AtomLedger,
     LedgerTransition,
+    MATERIAL_ORIGINS,
+    MaterialOriginError,
     coerce_species_formula,
     load_species_formulas,
     resolve_species_formula,
@@ -197,6 +199,7 @@ from simulator.accounting import (
 from simulator.accounting.ledger import (
     KNOWN_LEDGER_ACCOUNTS,
     KNOWN_LEDGER_ACCOUNT_PREFIXES,
+    snapshot_atom_ledger,
 )
 from simulator.condensation_routing import (
     designated_stage_number,
@@ -1096,6 +1099,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         self._activated_additive_reagents = set()
         self.atom_ledger = self._new_atom_ledger()
+        self._yield_disposition_ledger_snapshots = {}
+        self._feedstock_recovered_reagent_kg_by_species = {}
+        self._non_feedstock_reagent_element_kg_by_account = {}
         self.inventory = inventory
         self._stage0_carbon_cleanup_specs = []
         self._stage0_carbonate_decomposition_specs = []
@@ -1175,8 +1181,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._c6_campaign_refused = False
         self._last_c3_na_hold_adjustment = {}
         self._c3_alkali_credit_drawn_kg_by_species = {}
-        self._feedstock_recovered_reagent_kg_by_species = {}
-        self._non_feedstock_reagent_element_kg_by_account = {}
         self._equipment = None
         self._configure_overhead_headspace()
         self._configure_freeze_gate()
@@ -2027,90 +2031,34 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     def _observe_reagent_provenance_transition(
         self,
-        transition: LedgerTransition,
-        balances_before: Mapping[str, Mapping[str, float]],
+        _transition: LedgerTransition,
+        _balances_before: Mapping[str, Mapping[str, float]],
     ) -> None:
-        non_feedstock_source_kg: Dict[str, float] = {}
-        for lot in transition.debits:
-            account = str(lot.account)
-            account_before = balances_before.get(account, {}) or {}
-            if account == 'process.reagent_inventory':
-                for species, kg in lot.species_kg.items():
-                    reagent = str(species)
-                    debited_kg = max(0.0, float(kg))
-                    if debited_kg <= 1.0e-12:
-                        continue
-                    total_before_kg = max(
-                        0.0,
-                        float(account_before.get(reagent, 0.0) or 0.0),
-                    )
-                    feedstock_kg = self._consume_feedstock_recovered_reagent(
-                        reagent,
-                        debited_kg,
-                        total_before_kg,
-                    )
-                    non_feedstock_kg = max(0.0, debited_kg - feedstock_kg)
-                    if non_feedstock_kg > 1.0e-12:
-                        non_feedstock_source_kg[reagent] = (
-                            non_feedstock_source_kg.get(reagent, 0.0)
-                            + non_feedstock_kg
-                        )
-                continue
-            tracked = getattr(
-                self,
-                '_non_feedstock_reagent_element_kg_by_account',
-                {},
-            )
-            account_tracked = tracked.get(account, {}) if isinstance(tracked, dict) else {}
-            for element in tuple(account_tracked):
-                debited_element_kg = self._transition_lot_element_kg(
-                    lot,
-                    element,
+        feedstock_recovered_kg: Dict[str, float] = {}
+        non_feedstock_kg: Dict[str, Dict[str, float]] = {}
+        for account, element_origins in (
+            self.atom_ledger.origin_atom_moles_by_account().items()
+        ):
+            for element, origins in element_origins.items():
+                molar_mass_kg = resolve_species_formula(
+                    str(element),
+                    self.species_formula_registry,
+                ).molar_mass_kg_per_mol()
+                feedstock_kg = (
+                    float(origins.get('feedstock', 0.0)) * molar_mass_kg
                 )
-                if debited_element_kg <= 1.0e-12:
-                    continue
-                total_element_kg = self._account_element_kg(
-                    account_before,
-                    element,
-                )
-                moved_kg = self._consume_non_feedstock_reagent_element(
-                    account,
-                    element,
-                    debited_element_kg,
-                    total_element_kg,
-                )
-                if moved_kg > 1.0e-12:
-                    non_feedstock_source_kg[element] = (
-                        non_feedstock_source_kg.get(element, 0.0) + moved_kg
-                    )
-        for element, source_kg in non_feedstock_source_kg.items():
-            self._credit_non_feedstock_reagent_element(
-                transition,
-                element,
-                source_kg,
-            )
-
-    def _consume_feedstock_recovered_reagent(
-        self,
-        species: str,
-        debited_kg: float,
-        total_before_kg: float,
-    ) -> float:
-        balances = getattr(self, '_feedstock_recovered_reagent_kg_by_species', None)
-        if not isinstance(balances, dict):
-            balances = {}
-            self._feedstock_recovered_reagent_kg_by_species = balances
-        live_kg = max(0.0, float(balances.get(species, 0.0) or 0.0))
-        if live_kg <= 1.0e-12 or debited_kg <= 1.0e-12 or total_before_kg <= 1.0e-12:
-            return 0.0
-        live_kg = min(live_kg, total_before_kg)
-        consumed_kg = min(live_kg, debited_kg * live_kg / total_before_kg)
-        remaining_kg = max(0.0, float(balances.get(species, 0.0) or 0.0) - consumed_kg)
-        if remaining_kg <= 1.0e-12:
-            balances.pop(species, None)
-        else:
-            balances[species] = remaining_kg
-        return consumed_kg
+                reagent_kg = float(origins.get('reagent', 0.0)) * molar_mass_kg
+                if (
+                    account == 'process.reagent_inventory'
+                    and feedstock_kg > 1.0e-12
+                ):
+                    feedstock_recovered_kg[str(element)] = feedstock_kg
+                if reagent_kg > 1.0e-12:
+                    non_feedstock_kg.setdefault(str(account), {})[
+                        str(element)
+                    ] = reagent_kg
+        self._feedstock_recovered_reagent_kg_by_species = feedstock_recovered_kg
+        self._non_feedstock_reagent_element_kg_by_account = non_feedstock_kg
 
     def _consume_non_feedstock_reagent_element(
         self,
@@ -2192,13 +2140,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     def _transition_lot_element_kg(self, lot: Any, element: str) -> float:
         return self._species_mapping_element_kg(lot.species_kg, element)
-
-    def _account_element_kg(
-        self,
-        species_kg: Mapping[str, float],
-        element: str,
-    ) -> float:
-        return self._species_mapping_element_kg(species_kg, element)
 
     def _species_mapping_element_kg(
         self,
@@ -4966,6 +4907,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 FO2_BUFFER_ACCOUNT,
                 {OXYGEN_SPECIES: actual_injected_mol},
                 source='external O2 bubbler injection',
+                material_origin='reagent',
             )
             # t-325: O2-lance solid char FIRST (before Fe-redox absorption).
             # Dose O2 available this hour is the injected buffer load; char
@@ -7214,6 +7156,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 account,
                 {species: kg},
                 source=f'batch additive {species}',
+                material_origin='reagent',
             )
             self.cost_ledger.seed_external_material(
                 account=account,
@@ -7243,7 +7186,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     ) -> None:
         payload = self._ledger_species_kg(species_kg)
         if payload:
-            self.atom_ledger.load_external(account, payload, source=source)
+            self.atom_ledger.load_external(
+                account,
+                payload,
+                source=source,
+                material_origin='feedstock',
+            )
 
     def _ledger_species_kg(self, values: Mapping[str, float]) -> Dict[str, float]:
         payload: Dict[str, float] = {}
@@ -7381,12 +7329,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 feed_account,
                 {species: feed_kg},
                 source=f'{label} Stage 0 {species} feed',
+                material_origin='feedstock',
             )
             if oxidant_kg > 1e-12:
                 self.atom_ledger.load_external(
                     oxidant_account,
                     {'O2': oxidant_kg},
                     source=f'{label} Stage 0 controlled O2 oxidant',
+                    material_origin='reagent',
                 )
 
             # F-B1: dispatch + commit through the shared helper.  The
@@ -7428,6 +7378,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 feed_account,
                 {species: feed_kg},
                 source=f'{label} Stage 0 {species} carbonate feed',
+                material_origin='feedstock',
             )
             self._dispatch_and_commit(
                 ChemistryIntent.STAGE0_PRETREATMENT,
@@ -7497,7 +7448,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     f'unsupported Stage 0 carbon cleanup spec {name!r}'
                 )
             debits_payload: list[tuple[str, dict[str, float]]] = []
-            for account, species_kg in spec['debits']:
+            for debit in spec['debits']:
+                if not isinstance(debit, (tuple, list)) or len(debit) != 3:
+                    raise MaterialOriginError(
+                        f"{name} debit requires account, species, and "
+                        "material_origin"
+                    )
+                account, species_kg, material_origin = debit
+                material_origin = str(material_origin).strip()
+                if material_origin not in MATERIAL_ORIGINS:
+                    raise MaterialOriginError(
+                        f"{name} debit material_origin must be one of "
+                        f"{sorted(MATERIAL_ORIGINS)}, got {material_origin!r}"
+                    )
                 payload = self._ledger_species_kg(species_kg)
                 if not payload:
                     continue
@@ -7509,6 +7472,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     account_name,
                     payload,
                     source=f"{label} {name} feed",
+                    material_origin=material_origin,
                 )
                 debits_payload.append((account_name, dict(payload)))
             if not debits_payload:
@@ -7566,6 +7530,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     account,
                     payload,
                     source=f"{label} {spec['name']} feed",
+                    material_origin='feedstock',
                 )
                 debits_payload.append((str(account), dict(payload)))
             if not debits_payload:
@@ -8574,8 +8539,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         specs.append({
             'name': 'stage0_sulfate_carbon_cleanup',
             'debits': (
-                ('process.stage0_salt_feed', {'SO3': so3_consumed_kg}),
-                ('process.reagent_inventory', {'C': c_consumed_kg}),
+                (
+                    'process.stage0_salt_feed',
+                    {'SO3': so3_consumed_kg},
+                    'feedstock',
+                ),
+                ('process.reagent_inventory', {'C': c_consumed_kg}, 'reagent'),
             ),
             'products_kg': products_kg,
         })
@@ -8692,9 +8661,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             specs.append({
                 'name': 'stage0_cation_sulfate_carbon_cleanup',
                 'debits': (
-                    ('process.stage0_salt_feed', {species: consumed_kg}),
+                    (
+                        'process.stage0_salt_feed',
+                        {species: consumed_kg},
+                        'feedstock',
+                    ),
                     ('process.reagent_inventory', {
-                        'C': c_consumed_kg}),
+                        'C': c_consumed_kg}, 'reagent'),
                 ),
                 'products_kg': products_kg,
                 'oxide_products_kg': oxide_products_kg,
@@ -8726,8 +8699,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         specs.append({
             'name': 'stage0_boudouard_carbon_cleanup',
             'debits': (
-                ('process.reagent_inventory', {'C': c_consumed_kg}),
-                ('reservoir.stage0_process_gas', {'CO2': co2_input_kg}),
+                ('process.reagent_inventory', {'C': c_consumed_kg}, 'reagent'),
+                (
+                    'reservoir.stage0_process_gas',
+                    {'CO2': co2_input_kg},
+                    'reagent',
+                ),
             ),
             'products_kg': products_kg,
         })
@@ -11505,17 +11482,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if name not in preserved_names
         }
         state = _deepcopy_refusal_state(state_source, memo)
-        ledger = copy.copy(self.atom_ledger)
-        ledger._balances = copy.deepcopy(self.atom_ledger._balances)
-        ledger._movement_scale_kg = copy.deepcopy(
-            getattr(self.atom_ledger, '_movement_scale_kg', {})
-        )
-        ledger._policies = dict(self.atom_ledger._policies)
-        ledger._transitions = list(self.atom_ledger._transitions)
-        ledger._terminal_debit_authorized_transition_ids = set(
-            self.atom_ledger._terminal_debit_authorized_transition_ids
-        )
-        ledger._external_loads = list(self.atom_ledger._external_loads)
+        ledger = snapshot_atom_ledger(self.atom_ledger)
         cost_state = None
         if hasattr(self, 'cost_ledger'):
             cost_state = {

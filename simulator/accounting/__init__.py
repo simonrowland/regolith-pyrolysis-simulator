@@ -2,7 +2,10 @@
 
 from simulator.accounting.exceptions import (
     AccountingError,
+    MaterialOriginError,
+    OriginUnresolvedError,
     OverdraftError,
+    PoolWithdrawalError,
     UnbalancedTransitionError,
     UnknownSpeciesError,
 )
@@ -19,7 +22,11 @@ from simulator.accounting.ledger import (
     AtomLedger,
     LedgerTransition,
 )
-from simulator.accounting.lots import MaterialLot
+from simulator.accounting.lots import (
+    ATTRIBUTION_METHODS,
+    MATERIAL_ORIGINS,
+    MaterialLot,
+)
 from simulator.accounting.queries import (
     AccountingQueries,
     condensation_stage_purity_pct,
@@ -34,10 +41,15 @@ __all__ = [
     "AccountPolicy",
     "AccountingQueries",
     "AccountingError",
+    "ATTRIBUTION_METHODS",
     "AtomLedger",
     "LedgerTransition",
     "MaterialLot",
+    "MATERIAL_ORIGINS",
+    "MaterialOriginError",
+    "OriginUnresolvedError",
     "OverdraftError",
+    "PoolWithdrawalError",
     "SpeciesFormula",
     "UnbalancedTransitionError",
     "UnknownSpeciesError",

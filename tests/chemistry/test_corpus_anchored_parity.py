@@ -564,6 +564,7 @@ def _evaluate_overhead_gas_equilibrium_anchor(
             "process.overhead_gas",
             holdup,
             source="SF2004 Table 8 atomic-ratio test holdup",
+            material_origin="feedstock",
         )
     partials = _dispatch_overhead_gas_equilibrium(sim, anchor)
     observed = _atomic_ratio_from_partials(partials, anchor)

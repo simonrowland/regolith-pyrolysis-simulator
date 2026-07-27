@@ -503,6 +503,7 @@ def test_al_si_film_threshold_and_runner_telemetry_are_emitted_end_to_end():
     sim.atom_ledger.load_external_mol(
         METAL_PHASE_ACCOUNT,
         {"Al": 10.0, "Si": 10.0},
+        material_origin="feedstock",
     )
     sim._step_metal_phase_stratification(
         SimpleNamespace(liquid_density_kg_m3=2638.918)
@@ -689,6 +690,7 @@ def test_condensed_species_projection_does_not_double_count_across_stages():
         "process.condensation_train",
         {"Fe": 2.0},
         source="test condensed Fe",
+        material_origin="feedstock",
     )
     sim.train.stages[2].collected_kg["Fe"] = 1.0
 
@@ -713,6 +715,7 @@ def test_condensed_species_projection_delta_cannot_exceed_ledger_total():
         "process.condensation_train",
         {"Fe": 2.0},
         source="test condensed Fe",
+        material_origin="feedstock",
     )
     sim.train.stages[2].collected_kg["Fe"] = 1.0
 
@@ -899,6 +902,7 @@ def test_recovered_condensate_transfers_once_to_reagent_inventory():
         "process.condensation_train",
         {"K": 2.0},
         source="test recovered K condensate",
+        material_origin="feedstock",
     )
     sim.train.stages[4].collected_kg["K"] = 2.0
     assert sim._audit_metal_projection_drift() == {}
@@ -926,11 +930,13 @@ def test_stage_projection_combines_condensation_and_metal_phase_sources():
         "process.condensation_train",
         {"K": 2.0},
         source="test recovered K condensate",
+        material_origin="feedstock",
     )
     metal_credit = sim.atom_ledger.load_external(
         METAL_PHASE_ACCOUNT,
         {"K": 1.0},
         source="test extracted K metal",
+        material_origin="feedstock",
     )
     sim._record_stage_routed_metal_credits(
         "MRE",
@@ -1006,6 +1012,7 @@ def test_mg_thermite_counters_are_net_after_committed_back_reduction():
         "process.metal_phase",
         {"Al": preexisting_al_kg},
         source="pre-existing metal-phase Al isolation test",
+        material_origin="feedstock",
     )
 
     sim._step_thermite()

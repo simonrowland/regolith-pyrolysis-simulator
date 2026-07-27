@@ -126,7 +126,7 @@ class _BalancedProvider(ChemistryProvider):
 
 def test_balanced_provider_proposal_commits_via_kernel():
     ledger = AtomLedger()
-    ledger.load_external_mol("process.cleaned_melt", {"SiO2": 5.0})
+    ledger.load_external_mol("process.cleaned_melt", {"SiO2": 5.0}, material_origin="feedstock")
     registry = ProviderRegistry()
     registry.register(
         _BalancedProvider(), [ChemistryIntent.EVAPORATION_TRANSITION]
@@ -183,7 +183,7 @@ class _UnbalancedProvider(ChemistryProvider):
 
 def test_unbalanced_provider_proposal_rejected_by_kernel():
     ledger = AtomLedger()
-    ledger.load_external_mol("process.cleaned_melt", {"SiO2": 5.0})
+    ledger.load_external_mol("process.cleaned_melt", {"SiO2": 5.0}, material_origin="feedstock")
     registry = ProviderRegistry()
     registry.register(
         _UnbalancedProvider(), [ChemistryIntent.EVAPORATION_TRANSITION]

@@ -144,6 +144,7 @@ def _configure_tick_authority_retry_sim(
         'process.overhead_gas',
         {'O2': 10_000.0},
         source='test hour authority retry oxygen',
+        material_origin="feedstock",
     )
     return sim
 
@@ -1010,6 +1011,7 @@ def test_redox_liquid_gate_rebuilds_stale_cache_on_key_mismatch(
         _CLEANED_MELT_ACCOUNT,
         {'Fe2O3': 1_000.0},
         source='test ferric oxide cache-key perturbation',
+        material_origin="feedstock",
     )
     rebuilt_curve = sim._melt_redox_liquidus_gate_curve()
 
@@ -1211,6 +1213,7 @@ def test_passive_exchange_refuses_zero_liquid_capacity(
         'process.overhead_gas',
         {'O2': 10_000.0},
         source='test frozen passive exchange oxygen',
+        material_origin="feedstock",
     )
     before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
     before_reference_T_K = sim.melt.oxygen_reservoir.reference_T_K
@@ -1741,6 +1744,7 @@ def test_freeze_gate_cache_rebuilds_after_integrated_fe2o3_respeciation(
         'process.overhead_gas',
         {'O2': 10_000.0},
         source='test explicit oxygen for integrated Fe redox respeciation',
+        material_origin="feedstock",
     )
     gate_calls = 0
     original_dispatch = sim._dispatch_only
@@ -1818,6 +1822,7 @@ def test_redox_operation_holds_failed_authority_until_recovery_next_operation(
         'process.overhead_gas',
         {'O2': 10_000.0},
         source='test redox authority snapshot recovery oxygen',
+        material_origin="feedstock",
     )
     curve_calls = 0
 
@@ -2363,6 +2368,7 @@ def test_aborted_respeciation_preserves_fo2_reference_state(
         'process.overhead_gas',
         {'O2': 10_000.0},
         source='test aborted respeciation oxygen',
+        material_origin="feedstock",
     )
     monkeypatch.setattr(
         sim,
@@ -2548,6 +2554,7 @@ def test_fallback_authorized_redox_transition_is_balanced_and_provenanced(
         'process.overhead_gas',
         {'O2': 10_000.0},
         source='test fallback transition oxygen provenance',
+        material_origin="feedstock",
     )
 
     def unavailable_curve():

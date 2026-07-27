@@ -457,6 +457,7 @@ def test_s1c_step_shuttle_recycles_condensed_na_into_reagent_inventory():
         "process.condensation_train",
         {"Na": seeded_kg},
         source="s1c test seed",
+        material_origin="feedstock",
     )
     # Park the sim at the start of a C3_NA tick.  The cool-window
     # Na/Fe margin is positive at 1150 °C (post-V1c-JANAF), so the

@@ -374,6 +374,7 @@ def test_c3_k_entry_transfers_condensed_na_without_native_melt_banking():
         "process.condensation_train",
         {"Na": condensed_na_kg},
         source="test recovered Na",
+        material_origin="feedstock",
     )
     sim._init_shuttle_inventory(CampaignPhase.C3_K)
 
@@ -464,6 +465,7 @@ def test_c3_shuttle_injects_na_from_condensed_alkali_alone():
         "process.condensation_train",
         {"Na": condensed_na_kg},
         source="test recovered Na",
+        material_origin="feedstock",
     )
     sim._init_shuttle_inventory(CampaignPhase.C3_K)
     assert sim.shuttle_Na_inventory_kg == pytest.approx(condensed_na_kg)

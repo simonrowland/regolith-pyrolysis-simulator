@@ -96,7 +96,7 @@ def test_non_ok_provider_result_cannot_carry_committable_transition():
     registry = ProviderRegistry()
     registry.register(_RefusingProvider(), [ChemistryIntent.VAPOR_PRESSURE])
     ledger = AtomLedger()
-    ledger.load_external("process.cleaned_melt", {"SiO2": 1.0})
+    ledger.load_external("process.cleaned_melt", {"SiO2": 1.0}, material_origin="feedstock")
     before_mol = ledger.mol_by_account("process.cleaned_melt")["SiO2"]
     kernel = ChemistryKernel(
         ledger,
@@ -312,7 +312,7 @@ def test_kernel_dispatch_does_not_commit_shadow_transitions():
     """Even though the shadow returns a transition, the ledger is untouched."""
 
     ledger = AtomLedger()
-    ledger.load_external("process.cleaned_melt", {"SiO2": 5.0})
+    ledger.load_external("process.cleaned_melt", {"SiO2": 5.0}, material_origin="feedstock")
     before_mol = ledger.mol_by_account()
     registry = ProviderRegistry()
     registry.register(_AuthoritativeProvider(), [ChemistryIntent.VAPOR_PRESSURE])
@@ -418,7 +418,7 @@ def test_chemistry_kernel_clear_shadow_trace_passthrough():
     """``ChemistryKernel.clear_shadow_trace`` clears the underlying planner."""
 
     ledger = AtomLedger()
-    ledger.load_external("process.cleaned_melt", {"SiO2": 1.0})
+    ledger.load_external("process.cleaned_melt", {"SiO2": 1.0}, material_origin="feedstock")
     registry = ProviderRegistry()
     registry.register(_AuthoritativeProvider(), [ChemistryIntent.VAPOR_PRESSURE])
     registry.register(_ShadowProvider(), [ChemistryIntent.VAPOR_PRESSURE], shadow=True)

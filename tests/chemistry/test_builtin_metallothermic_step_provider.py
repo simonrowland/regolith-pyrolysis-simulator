@@ -287,10 +287,12 @@ def test_kernel_filters_provider_to_declared_accounts_only(
     )
     # Seed unrelated accounts so the filter has something to filter.
     sim.atom_ledger.load_external(
-        "process.overhead_gas", {"Na": 0.5}, source="test seed"
+        "process.overhead_gas", {"Na": 0.5}, source="test seed",
+        material_origin="feedstock",
     )
     sim.atom_ledger.load_external(
-        "process.condensation_train", {"Fe": 0.5}, source="test seed"
+        "process.condensation_train", {"Fe": 0.5}, source="test seed",
+        material_origin="feedstock",
     )
 
     seen_accounts: list[frozenset[str]] = []
@@ -449,7 +451,8 @@ def test_kernel_commit_accepts_balanced_thermite_proposal(
     # underflow.  We use small mol values relative to the load_batch
     # seed.
     sim.atom_ledger.load_external_mol(
-        "process.reagent_inventory", {"Mg": 5.0}, source="test seed"
+        "process.reagent_inventory", {"Mg": 5.0}, source="test seed",
+        material_origin="feedstock",
     )
 
     balanced_proposal = LedgerTransitionProposal(
@@ -703,6 +706,7 @@ def test_shuttle_refuses_K_FeO_above_crossover_via_kernel(
         "process.cleaned_melt",
         {"FeO": 100.0 / (MOLAR_MASS["FeO"] / 1000.0)},
         source="test seed",
+        material_origin="feedstock",
     )
 
     result = sim._chem_kernel.dispatch(
@@ -744,6 +748,7 @@ def test_extraction_records_shuttle_refusal_diagnostic(
         "process.cleaned_melt",
         {"FeO": 100.0 / (MOLAR_MASS["FeO"] / 1000.0)},
         source="refusal recording test seed",
+        material_origin="feedstock",
     )
     # Seed reagent inventory so the shuttle gate (which requires
     # ``shuttle_K_inventory_kg > 0.01``) actually fires the kernel
@@ -753,6 +758,7 @@ def test_extraction_records_shuttle_refusal_diagnostic(
         "process.reagent_inventory",
         {"K": 30.0 / (MOLAR_MASS["K"] / 1000.0)},
         source="refusal recording test seed",
+        material_origin="feedstock",
     )
     sim.shuttle_K_inventory_kg = sim._sync_reagent_counter_from_ledger("K")
     # Park the melt above the K/FeO crossover (JANAF-4th multiphase
@@ -1718,11 +1724,13 @@ def test_c3_na_shuttle_inject_no_liquid_no_reagent_leak(
         "process.cleaned_melt",
         {"FeO": feo_mol},
         source="no-liquid shuttle leak test",
+        material_origin="feedstock",
     )
     sim.atom_ledger.load_external(
         "process.reagent_inventory",
         {"Na": 12.0 / (MOLAR_MASS["Na"] / 1000.0)},
         source="no-liquid shuttle leak test",
+        material_origin="feedstock",
     )
     sim.shuttle_Na_inventory_kg = sim._sync_reagent_counter_from_ledger("Na")
     na_mol_before = sim.atom_ledger.mol_by_account("process.reagent_inventory").get(

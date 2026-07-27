@@ -283,8 +283,8 @@ def test_c7_can_commit_narrow_terminal_slag_cao_rework(formula_registry):
     registry = ProviderRegistry()
     registry.register(provider, [ChemistryIntent.CA_ALUMINOTHERMIC_STEP])
     ledger = AtomLedger(registry=formula_registry)
-    ledger.load_external_mol("terminal.slag", {"CaO": 6.0})
-    ledger.load_external_mol(C7_AL_CREDIT_ACCOUNT, {"Al": 2.0})
+    ledger.load_external_mol("terminal.slag", {"CaO": 6.0}, material_origin="feedstock")
+    ledger.load_external_mol(C7_AL_CREDIT_ACCOUNT, {"Al": 2.0}, material_origin="reagent")
     kernel = ChemistryKernel(ledger, registry, formula_registry)
 
     result = kernel.dispatch(
@@ -308,8 +308,8 @@ def test_c7_can_commit_narrow_terminal_slag_cao_rework(formula_registry):
 
 def test_spoofed_c7_transition_cannot_reopen_terminal_slag(formula_registry):
     ledger = AtomLedger(registry=formula_registry)
-    ledger.load_external_mol("terminal.slag", {"CaO": 6.0})
-    ledger.load_external_mol(C7_AL_CREDIT_ACCOUNT, {"Al": 2.0})
+    ledger.load_external_mol("terminal.slag", {"CaO": 6.0}, material_origin="feedstock")
+    ledger.load_external_mol(C7_AL_CREDIT_ACCOUNT, {"Al": 2.0}, material_origin="reagent")
     # Balanced C3A reaction: 6 CaO + 2 Al -> Ca3Al2O6 + 3 Ca.
     spoofed = LedgerTransition(
         name="ca_aluminothermic_c3a_credit_al",
@@ -334,8 +334,8 @@ def test_dispatch_bound_malformed_c7_terminal_slag_rework_is_rejected(
     registry = ProviderRegistry()
     registry.register(provider, [ChemistryIntent.CA_ALUMINOTHERMIC_STEP])
     ledger = AtomLedger(registry=formula_registry)
-    ledger.load_external_mol("terminal.slag", {"CaO": 6.0})
-    ledger.load_external_mol(C7_AL_CREDIT_ACCOUNT, {"Al": 2.0})
+    ledger.load_external_mol("terminal.slag", {"CaO": 6.0}, material_origin="feedstock")
+    ledger.load_external_mol(C7_AL_CREDIT_ACCOUNT, {"Al": 2.0}, material_origin="reagent")
     kernel = ChemistryKernel(ledger, registry, formula_registry)
 
     result = kernel.dispatch(
@@ -361,8 +361,8 @@ def test_dispatch_bound_malformed_c7_terminal_slag_rework_is_rejected(
 def test_off_path_c7_terminal_slag_rework_proposal_is_rejected(formula_registry):
     registry = ProviderRegistry()
     ledger = AtomLedger(registry=formula_registry)
-    ledger.load_external_mol("terminal.slag", {"CaO": 6.0})
-    ledger.load_external_mol(C7_AL_CREDIT_ACCOUNT, {"Al": 2.0})
+    ledger.load_external_mol("terminal.slag", {"CaO": 6.0}, material_origin="feedstock")
+    ledger.load_external_mol(C7_AL_CREDIT_ACCOUNT, {"Al": 2.0}, material_origin="reagent")
     kernel = ChemistryKernel(ledger, registry, formula_registry)
     proposal = LedgerTransitionProposal(
         debits={

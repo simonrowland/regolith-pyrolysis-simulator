@@ -56,6 +56,7 @@ from simulator.account_ids import (
     OXYGEN_STORED_ACCOUNTS,
     OXYGEN_VENTED_ACCOUNTS,
 )
+from simulator.accounting import MaterialOriginError
 from simulator.accounting.formulas import (
     ATOMIC_WEIGHTS_G_PER_MOL,
     resolve_species_formula,
@@ -395,6 +396,7 @@ def test_kernel_commit_accepts_balanced_perchlorate_proposal(
     sim.atom_ledger.load_external(
         "process.stage0_perchlorate_feed", {"ClO4": 0.5},
         source="test seed",
+        material_origin="feedstock",
     )
 
     balanced_proposal = LedgerTransitionProposal(
@@ -643,11 +645,13 @@ def test_o2_shuttle_redox_annotation_stays_kress91_order(
         "reservoir.stage0_oxidant",
         {"O2": redox_o2_kg},
         source="test Kress91 redox oxidant",
+        material_origin="reagent",
     )
     sim.atom_ledger.load_external(
         "process.cleaned_melt",
         {"FeO": feo_kg},
         source="test Kress91 redox FeO",
+        material_origin="feedstock",
     )
     sim.atom_ledger.transfer(
         "stage0_redox_annotation_test",
@@ -977,6 +981,52 @@ def test_boudouard_matches_legacy_stoich(
         c_consumed_kg)
     assert proposal.debits["process.reagent_inventory"]["C"] == pytest.approx(
         extent_mol)
+
+
+def test_boudouard_source_origin_is_typed_and_not_inferred_from_account(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_sim(
+        "mars_basalt",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        additives_kg={"C": 50.0},
+    )
+    specs = []
+    sim._apply_stage0_boudouard_reaction(1.0, specs)
+    spec = specs[0]
+    assert [debit[2] for debit in spec["debits"]] == ["reagent", "reagent"]
+
+    carbon_debit, process_gas_debit = spec["debits"]
+    spec["debits"] = (
+        carbon_debit,
+        (
+            process_gas_debit[0],
+            process_gas_debit[1],
+            "feedstock",
+        ),
+    )
+    with (
+        patch.object(sim, "_activate_stage0_carbon_reagent"),
+        patch.object(sim.atom_ledger, "load_external") as load_external,
+        patch.object(sim, "_dispatch_and_commit"),
+    ):
+        sim._record_stage0_carbon_cleanup_transitions("Mars", specs)
+
+    assert load_external.call_args.kwargs["material_origin"] == "feedstock"
+
+    spec["debits"] = ((process_gas_debit[0], process_gas_debit[1]),)
+    with (
+        patch.object(sim, "_activate_stage0_carbon_reagent"),
+        patch.object(sim.atom_ledger, "load_external") as load_external,
+        patch.object(sim, "_dispatch_and_commit"),
+        pytest.raises(MaterialOriginError, match="debit requires"),
+    ):
+        sim._record_stage0_carbon_cleanup_transitions("Mars", specs)
+    load_external.assert_not_called()
 
 
 def test_complete_oxidation_matches_legacy_stoich(

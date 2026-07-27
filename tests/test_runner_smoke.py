@@ -30,8 +30,9 @@ from types import SimpleNamespace
 
 import pytest
 
-from simulator.accounting import AccountingQueries
+from simulator.accounting import AccountingQueries, AtomLedger
 from simulator.accounting.ledger_api import LedgerAPI
+from simulator.accounting.yield_disposition import OriginUnresolvedError
 from simulator.accounting.run_artifact import build_run_artifact
 from simulator.chemistry.kernel import ProviderUnavailableError
 from simulator.campaigns import CampaignManager
@@ -366,6 +367,7 @@ TOP_LEVEL_KEYS = frozenset({
     "run_metadata",
     "final_state",
     "final",
+    "yield_disposition",
     "product_classification",
     "terminal_product_taxonomy",
     "thermal_train_report",
@@ -911,6 +913,28 @@ def _assert_schema_shape(payload: dict) -> None:
         f"{TOP_LEVEL_KEYS - set(payload)} missing"
     )
     assert payload["schema_version"] == RUNNER_SCHEMA_VERSION
+    yield_disposition = payload["yield_disposition"]
+    assert yield_disposition["schema_version"] == "5.0"
+    assert len(yield_disposition["destination_bins"]) == 12
+    assert "metal_phase_retained" in yield_disposition["destination_bins"]
+    assert yield_disposition["closure"]["maximum_residual_fraction"] <= 5.0e-14
+    for row in yield_disposition["fraction_table"]["rows"]:
+        assert abs(sum(row["destination_fractions"].values()) - 1.0) <= 5.0e-14
+        assert row["attribution_method"] in {"tracked", "pool_ratio"}
+    for row in yield_disposition["melt_retained_subdispositions"]["rows"]:
+        assert row["attribution_method"] in {"tracked", "pool_ratio"}
+    for row in yield_disposition["links"]:
+        assert row["attribution_method"] in {"tracked", "pool_ratio"}
+    for row in yield_disposition["terminal_species_streams"]:
+        assert row["attribution_method"] in {
+            "tracked",
+            "pool_ratio",
+            "origin_unattributed",
+        }
+    for row in yield_disposition["reagent_cycle"]["rows"]:
+        assert row["attribution_method"] in {"tracked", "pool_ratio"}
+    assert isinstance(yield_disposition["nodes"], list)
+    assert isinstance(yield_disposition["links"], list)
 
     degraded_paths = payload["degraded_path_engagement"]
     assert set(degraded_paths) == DEGRADED_PATH_KEYS
@@ -1391,6 +1415,45 @@ def test_runner_schema_shape_contract():
 
     payload = _run_scenario(SCENARIOS[0])
     _assert_schema_shape(payload)
+
+
+@pytest.mark.parametrize(
+    ("scenario", "reagent_elements"),
+    (
+        (SCENARIOS[1], {"C", "O"}),
+        (SCENARIOS[2], {"O"}),
+    ),
+    ids=("mars_stage0_process_gas", "ci_stage0_oxidant"),
+)
+def test_stage0_yield_disposition_closes_from_typed_origin(
+    scenario,
+    reagent_elements,
+):
+    payload = _run_scenario(scenario)
+    disposition = payload["yield_disposition"]
+
+    assert payload["status"] == "ok"
+    assert disposition["closure"]["maximum_residual_fraction"] <= 5.0e-14
+    assert disposition["reagent_cycle"]["closure_residual_fraction"] <= 5.0e-14
+    assert {
+        row["element"] for row in disposition["reagent_cycle"]["rows"]
+    } == reagent_elements
+    assert {
+        row["attribution_method"]
+        for row in disposition["fraction_table"]["rows"]
+    } == {"tracked"}
+    assert {
+        row["attribution_method"]
+        for row in disposition["links"]
+    } == {"tracked"}
+    assert {
+        row["attribution_method"]
+        for row in disposition["terminal_species_streams"]
+    } == {"tracked"}
+    assert {
+        row["attribution_method"]
+        for row in disposition["reagent_cycle"]["rows"]
+    } == {"tracked"}
 
 
 def test_c7_schema_fields_have_success_failure_parity(tmp_path, monkeypatch):
@@ -2071,9 +2134,148 @@ def test_runner_preserves_primary_failure_when_poison_enrichment_fails(
             "envelope detail unavailable: AttributeError: "
             "'RaisingPoisonSim' object has no attribute 'record'"
         ),
+        (
+            "yield disposition unavailable: AttributeError: "
+            "'RaisingPoisonSim' object has no attribute 'atom_ledger'"
+        ),
     ]
     assert payload["per_hour_summary"] == []
     assert payload["shadow_trace"] == []
+
+
+def test_runner_failure_preserves_primary_when_yield_disposition_raises(
+    monkeypatch,
+):
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=1,
+    )
+    execution = SimpleNamespace(
+        status="failed",
+        reason="primary_failure",
+        error_message="primary execution failure",
+        envelope_detail_unavailable="",
+        per_hour=(),
+        shadow_trace=(),
+        simulator=SimpleNamespace(atom_ledger=AtomLedger()),
+        refusal_diagnostic={},
+        backend_status="unavailable",
+        backend_authoritative=False,
+        reduced_real_cache={},
+        campaigns_elapsed=0.0,
+    )
+
+    def raise_disposition(*_args, **_kwargs):
+        raise OriginUnresolvedError("secondary disposition failure")
+
+    monkeypatch.setattr(
+        "simulator.runner.build_yield_disposition",
+        raise_disposition,
+    )
+    monkeypatch.setattr(
+        run,
+        "_build_output_detail",
+        lambda _execution: raise_disposition(),
+    )
+
+    payload = run._build_output(execution)
+
+    assert payload["status"] == "failed"
+    assert payload["reason"] == "primary_failure"
+    assert payload["yield_disposition"] is None
+    assert "primary execution failure" in payload["error_message"]
+    assert payload["error_message"].splitlines()[-1] == (
+        "yield disposition unavailable: OriginUnresolvedError: "
+        "secondary disposition failure"
+    )
+
+
+def test_runner_failure_preserves_primary_when_yield_disposition_serialization_raises(
+    monkeypatch,
+):
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=1,
+    )
+    execution = SimpleNamespace(
+        status="failed",
+        reason="primary_failure",
+        error_message="primary execution failure",
+        envelope_detail_unavailable="",
+        per_hour=(),
+        shadow_trace=(),
+        simulator=SimpleNamespace(atom_ledger=AtomLedger()),
+        refusal_diagnostic={},
+        backend_status="unavailable",
+        backend_authoritative=False,
+        reduced_real_cache={},
+        campaigns_elapsed=0.0,
+    )
+
+    class SerializationPoison(dict):
+        def items(self):
+            raise LookupError("disposition serialization unavailable")
+
+    monkeypatch.setattr(
+        "simulator.runner.build_yield_disposition",
+        lambda *_args, **_kwargs: SerializationPoison(),
+    )
+
+    payload = run._minimal_failure_output(execution)
+
+    assert payload["status"] == "failed"
+    assert payload["reason"] == "primary_failure"
+    assert payload["yield_disposition"] is None
+    assert payload["error_message"].splitlines() == [
+        "primary execution failure",
+        (
+            "yield disposition unavailable: LookupError: "
+            "disposition serialization unavailable"
+        ),
+    ]
+
+
+def test_runner_failure_preserves_primary_when_atom_ledger_lookup_raises() -> None:
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=1,
+    )
+
+    class RaisingLedgerSim:
+        @property
+        def atom_ledger(self):
+            raise LookupError("ledger unavailable")
+
+    execution = SimpleNamespace(
+        status="failed",
+        reason="primary_failure",
+        error_message="primary execution failure",
+        envelope_detail_unavailable=(
+            "envelope detail unavailable: RuntimeError: primary detail failure"
+        ),
+        per_hour=(),
+        shadow_trace=(),
+        simulator=RaisingLedgerSim(),
+        refusal_diagnostic={},
+        backend_status="unavailable",
+        backend_authoritative=False,
+        reduced_real_cache={},
+        campaigns_elapsed=0.0,
+    )
+
+    payload = run._build_output(execution)
+
+    assert payload["status"] == "failed"
+    assert payload["reason"] == "primary_failure"
+    assert payload["yield_disposition"] is None
+    assert payload["error_message"].splitlines() == [
+        "primary execution failure",
+        "envelope detail unavailable: RuntimeError: primary detail failure",
+        "yield disposition unavailable: LookupError: ledger unavailable",
+    ]
 
 
 def test_runner_detail_fallback_preserves_refused_status_and_live_rows(monkeypatch):

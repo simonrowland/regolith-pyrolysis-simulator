@@ -525,7 +525,8 @@ def test_kernel_filters_provider_to_declared_accounts_only(
         setpoints_data,
     )
     sim.atom_ledger.load_external(
-        "process.metal_phase", {"Fe": 0.5}, source="test seed"
+        "process.metal_phase", {"Fe": 0.5}, source="test seed",
+        material_origin="feedstock",
     )
 
     seen_accounts: list[frozenset[str]] = []
@@ -644,7 +645,8 @@ def test_kernel_commit_accepts_balanced_proposal(
     # stock; without this AtomLedger.apply may reject the negative
     # balance.
     sim.atom_ledger.load_external_mol(
-        "process.overhead_gas", {"SiO": 1.0}, source="test seed"
+        "process.overhead_gas", {"SiO": 1.0}, source="test seed",
+        material_origin="feedstock",
     )
 
     # 1 mol SiO -> 0.5 mol Si + 0.5 mol SiO2 (canonical disproportionation).
@@ -778,6 +780,7 @@ def test_subfloor_holdup_persists_one_tick_then_accumulates_and_drains(
         "process.overhead_gas",
         {"SiO": parcel_kg},
         source="two-tick retained-condensation-holdup tick-1 seed",
+        material_origin="feedstock",
     )
     route_result = CondensationRouteResult()
     seen_diagnostics = []
@@ -832,6 +835,7 @@ def test_subfloor_holdup_persists_one_tick_then_accumulates_and_drains(
         "process.overhead_gas",
         {"SiO": parcel_kg},
         source="two-tick retained-condensation-holdup tick-2 seed",
+        material_origin="feedstock",
     )
     second_credit_kg = sim._dispatch_condensation_route(
         "SiO",
@@ -1303,7 +1307,8 @@ def test_provider_folds_only_same_species_subfloor_baffle_product_into_wall(
     # Exercise the mol -> MaterialLot -> ledger boundary that caused the leak.
     # Proposal-level atom balance alone cannot catch per-product kg zeroing.
     sim.atom_ledger.load_external_mol(
-        "process.overhead_gas", {"SiO": input_sio_mol}, source="test seed"
+        "process.overhead_gas", {"SiO": input_sio_mol}, source="test seed",
+        material_origin="feedstock",
     )
     kernel_result = sim._chem_kernel.dispatch(
         ChemistryIntent.CONDENSATION_ROUTE,
@@ -1338,7 +1343,8 @@ def test_provider_rolls_back_near_floor_wall_chemistry_to_unchanged_species(
         "SiO", sim.species_formula_registry
     ).molar_mass_kg_per_mol()
     sim.atom_ledger.load_external_mol(
-        "process.overhead_gas", {"SiO": input_sio_mol}, source="test seed"
+        "process.overhead_gas", {"SiO": input_sio_mol}, source="test seed",
+        material_origin="feedstock",
     )
     affected_accounts = (
         "process.overhead_gas",

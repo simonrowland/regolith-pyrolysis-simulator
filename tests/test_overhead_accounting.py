@@ -415,6 +415,7 @@ def test_vent_mirror_excludes_co_present_external_bubbler_oxygen():
         "process.overhead_gas",
         {"O2": external_o2_mol * MOLAR_MASS["O2"] / 1000.0},
         source="test external bubbler passthrough",
+        material_origin="feedstock",
     )
     sim._o2_bubbler_external_o2_in_overhead_mol = external_o2_mol
 
@@ -772,7 +773,8 @@ def test_explicit_vapor_stoich_must_conserve_atoms_not_just_mass():
 def test_cro2_condenses_to_terminal_chromium_oxide_account():
     sim = _cro2_train_sim()
     sim.atom_ledger.load_external(
-        "process.overhead_gas", {"O2": 1.0}, source="test pO2 buffer"
+        "process.overhead_gas", {"O2": 1.0}, source="test pO2 buffer",
+        material_origin="feedstock",
     )
     flux = EvaporationFlux(species_kg_hr={"CrO2": 1.0}, total_kg_hr=1.0)
 
@@ -931,11 +933,13 @@ def test_fe_redox_and_sio_use_coupled_oxygen_reservoirs():
         "process.cleaned_melt",
         {"FeO": feo_kg / (MOLAR_MASS["FeO"] / 1000.0)},
         source="test FeO redox capacity",
+        material_origin="feedstock",
     )
     sim.atom_ledger.load_external_mol(
         "process.overhead_gas",
         {"O2": headspace_o2_mol},
         source="test finite headspace O2 holdup",
+        material_origin="feedstock",
     )
 
     before_fO2 = sim._compute_intrinsic_melt_fO2()
@@ -1388,6 +1392,7 @@ def test_condensation_residual_ignores_prior_holdup_drain_credit(monkeypatch):
         "process.condensation_retained_holdup",
         {"Fe": prior_holdup_kg},
         source="residual-regression prior retained holdup",
+        material_origin="feedstock",
     )
     monkeypatch.setattr(
         sim.condensation_model,

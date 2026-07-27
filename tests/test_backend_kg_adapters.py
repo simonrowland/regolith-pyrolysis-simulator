@@ -277,22 +277,29 @@ def test_backend_validated_transition_observes_reagent_provenance():
     backend = AtomDeltaBackend(MaterialLot, LedgerTransition)
     sim = _sim(backend)
     sim.load_batch("oxide", mass_kg=1000.0)
-    cleaned_melt_fe_kg = sim._account_element_kg(
-        sim.atom_ledger.kg_by_account("process.cleaned_melt"),
-        "Fe",
+    sim.atom_ledger.load_external(
+        "process.cleaned_melt",
+        {"FeO": MOLAR_MASS["FeO"]},
+        source="backend adapter reagent-origin FeO",
+        material_origin="reagent",
     )
-    sim._non_feedstock_reagent_element_kg_by_account = {
-        "process.cleaned_melt": {"Fe": cleaned_melt_fe_kg},
-    }
+    sim.atom_ledger.mark_amalgamated_pool(
+        "process.cleaned_melt",
+        ("Fe", "O"),
+    )
+    before = sim.atom_ledger.origin_atom_moles_by_account()[
+        "process.cleaned_melt"
+    ]["Fe"]
+    reagent_fraction = before["reagent"] / sum(before.values())
 
     sim.step()
 
     provenance = sim._non_feedstock_reagent_element_kg_by_account
     assert provenance["process.metal_phase"]["Fe"] == pytest.approx(
-        MOLAR_MASS["Fe"]
+        MOLAR_MASS["Fe"] * reagent_fraction
     )
     assert provenance["process.cleaned_melt"]["Fe"] == pytest.approx(
-        cleaned_melt_fe_kg - MOLAR_MASS["Fe"]
+        MOLAR_MASS["Fe"] * (1.0 - reagent_fraction)
     )
 
 
@@ -348,6 +355,7 @@ def test_backend_composition_mol_preserves_noncanonical_ledger_species():
         "process.cleaned_melt",
         {"SO3": 1.0},
         source="backend adapter noncanonical species",
+        material_origin="feedstock",
     )
 
     composition = sim._backend_composition_mol()
@@ -366,6 +374,7 @@ def test_backend_composition_mol_includes_spent_reductant_residue():
         SPENT_REDUCTANT_RESIDUE_ACCOUNT,
         {"Na2O": 1.0},
         source="backend adapter spent reductant residue",
+        material_origin="feedstock",
     )
 
     composition = sim._backend_composition_mol()

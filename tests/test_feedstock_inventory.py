@@ -1396,6 +1396,7 @@ def test_recovered_reagent_transfer_debits_condenser_product():
         "process.condensation_train",
         {"K": 2.0},
         source="test recovered K condensate",
+        material_origin="feedstock",
     )
     sim.train.stages[4].collected_kg["K"] = 2.0
     assert sim._transfer_condensed_species("K") == pytest.approx(2.0)
@@ -1496,6 +1497,7 @@ def test_c3_recovered_condensate_reduces_credit_top_up_need():
         "process.condensation_train",
         {"Na": 8.0},
         source="test recovered Na condensate",
+        material_origin="feedstock",
     )
 
     sim._init_shuttle_inventory(CampaignPhase.C3_NA)
@@ -1543,6 +1545,7 @@ def test_feedstock_recovered_reagent_balance_decrements_on_k_consumption():
         "process.condensation_train",
         {"K": 8.0},
         source="test recovered K condensate",
+        material_origin="feedstock",
     )
     sim._init_shuttle_inventory(CampaignPhase.C3_K)
 
@@ -1718,6 +1721,7 @@ def test_oxygen_is_not_duplicated_in_product_ledger():
         "process.overhead_gas",
         {"O2": 5.0},
         source="test stored oxygen",
+        material_origin="feedstock",
     )
     sim.train.stages[1].collected_kg["O2"] = 1.5
     sim.train.stages[4].collected_kg["O2"] = 3.5
@@ -1771,6 +1775,7 @@ def test_mre_anode_o2_snapshot_bin_is_separate_from_melt_offgas():
         "terminal.oxygen_mre_anode_stored",
         {"O2": 4.0},
         source="test MRE anode oxygen",
+        material_origin="feedstock",
     )
 
     snapshot = sim._make_snapshot()

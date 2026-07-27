@@ -166,7 +166,8 @@ def test_lunar_mare_c2a_hot_cro2_trace_closes_chromium_atoms():
     # finite pO2 buffer explicit in both the ledger and the run mass input.
     sim.record.additives_kg["O2"] = 1.0
     sim.atom_ledger.load_external(
-        "process.overhead_gas", {"O2": 1.0}, source="IW pO2 buffer"
+        "process.overhead_gas", {"O2": 1.0}, source="IW pO2 buffer",
+        material_origin="feedstock",
     )
     sim.melt.temperature_C = 1500.0
     sim.start_campaign(CampaignPhase.C2A)

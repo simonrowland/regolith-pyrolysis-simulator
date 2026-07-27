@@ -233,7 +233,7 @@ def test_multi_hour_ode_preserves_prior_partition_across_staging_restore():
 
 def test_pool_move_lands_only_through_kernel_commit_batch():
     ledger = AtomLedger()
-    ledger.load_external_mol(METAL_PHASE_ACCOUNT, {"Fe": 1.0, "Si": 2.0})
+    ledger.load_external_mol(METAL_PHASE_ACCOUNT, {"Fe": 1.0, "Si": 2.0}, material_origin="feedstock")
     provider = BuiltinMetalPhaseStratificationProvider()
     registry = ProviderRegistry()
     registry.register(provider, [ChemistryIntent.METAL_PHASE_STRATIFICATION])

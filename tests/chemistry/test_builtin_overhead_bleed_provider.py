@@ -49,6 +49,7 @@ def test_force_drain_bleed_commits_pure_move_o2_partition(
         "process.overhead_gas",
         {"O2": 5.0},
         source="test overhead oxygen",
+        material_origin="feedstock",
     )
     monkeypatch.setattr(
         sim,
@@ -90,6 +91,7 @@ def test_explicit_no_cold_train_uses_provider_storage_partition(
         "process.overhead_gas",
         {"O2": 5.0},
         source="explicit NoColdTrain legacy partition fixture",
+        material_origin="feedstock",
     )
 
     result = sim._dispatch_and_commit(
@@ -123,6 +125,7 @@ def test_bleed_conductance_caps_partial_drain(
         "process.overhead_gas",
         {"O2": 1.0},
         source="test overhead oxygen",
+        material_origin="feedstock",
     )
 
     result = sim._dispatch_and_commit(
@@ -178,6 +181,7 @@ def test_bleed_conductance_requires_positive_pressure_delta(
         "process.overhead_gas",
         {"O2": 1.0},
         source="test overhead oxygen",
+        material_origin="feedstock",
     )
 
     result = sim._dispatch_and_commit(
@@ -268,7 +272,8 @@ def test_destructive_bleed_controls_fail_closed_without_ledger_mutation(
         setpoints_data,
     )
     sim.atom_ledger.load_external(
-        "process.overhead_gas", {"O2": 1.0}, source="test overhead oxygen"
+        "process.overhead_gas", {"O2": 1.0}, source="test overhead oxygen",
+        material_origin="feedstock",
     )
     controls = {
         "force_drain_all": False,
@@ -316,7 +321,8 @@ def test_core_passes_raw_destructive_bleed_controls_to_provider_guard(
         setpoints_data,
     )
     sim.atom_ledger.load_external(
-        "process.overhead_gas", {"O2": 1.0}, source="test overhead oxygen"
+        "process.overhead_gas", {"O2": 1.0}, source="test overhead oxygen",
+        material_origin="feedstock",
     )
     sim._overhead_headspace_config = {
         "conductance_kg_s": 0.01,
@@ -369,7 +375,8 @@ def test_core_passes_raw_invalid_bleed_conductance_to_provider_guard(
         setpoints_data,
     )
     sim.atom_ledger.load_external(
-        "process.overhead_gas", {"O2": 1.0}, source="test overhead oxygen"
+        "process.overhead_gas", {"O2": 1.0}, source="test overhead oxygen",
+        material_origin="feedstock",
     )
     sim._overhead_headspace_config = {"conductance_kg_s": -0.01}
     before = sim.atom_ledger.kg_by_account("process.overhead_gas")["O2"]
@@ -393,7 +400,8 @@ def test_zero_duration_bleed_is_a_zero_transition(
         setpoints_data,
     )
     sim.atom_ledger.load_external(
-        "process.overhead_gas", {"O2": 1.0}, source="test overhead oxygen"
+        "process.overhead_gas", {"O2": 1.0}, source="test overhead oxygen",
+        material_origin="feedstock",
     )
 
     result = sim._dispatch_and_commit(
@@ -429,6 +437,7 @@ def test_live_headspace_bleed_conductance_uses_headspace_species_m_avg(
         "process.overhead_gas",
         {"Na": 1.0},
         source="test sodium headspace",
+        material_origin="feedstock",
     )
 
     expected = sim.overhead_model._pipe_conductance(
@@ -472,6 +481,7 @@ def test_pn2_transport_projection_does_not_bleed_against_downstream_pressure(
         "process.overhead_gas",
         {"O2": o2_molar_mass},
         source="test overhead oxygen",
+        material_origin="feedstock",
     )
 
     ledger_pO2 = sim._headspace_ledger_pO2_bar_from_o2_mol(1.0)
@@ -529,6 +539,7 @@ def test_pn2_transport_projection_tends_to_equal_pressure_value_as_dp_closes(
         "process.overhead_gas",
         {"O2": o2_molar_mass},
         source="test overhead oxygen",
+        material_origin="feedstock",
     )
     sim._overhead_headspace_config["conductance_kg_s"] = 1.0e-6
     p_upstream_bar = sim._headspace_ledger_pO2_bar_from_o2_mol(1.0)
@@ -567,6 +578,7 @@ def test_bleed_conductance_is_kg_s_not_per_bar(
         "process.overhead_gas",
         {"O2": 1.0},
         source="test overhead oxygen",
+        material_origin="feedstock",
     )
 
     result = sim._dispatch_and_commit(
@@ -597,6 +609,7 @@ def test_legacy_bleed_conductance_alias_remains_kg_s(
         "process.overhead_gas",
         {"O2": 1.0},
         source="test overhead oxygen",
+        material_origin="feedstock",
     )
 
     result = sim._dispatch_and_commit(
@@ -632,6 +645,7 @@ def test_external_o2_bleed_is_not_stored_as_melt_offgas_product(
         "process.overhead_gas",
         {"O2": 10.0 * o2_molar_mass},
         source="test mixed overhead oxygen",
+        material_origin="feedstock",
     )
 
     result = sim._dispatch_and_commit(
@@ -672,6 +686,7 @@ def test_finite_capacity_commits_admission_and_continuous_relief_once(
         "process.overhead_gas",
         {"O2": 12.0 * o2_molar_mass},
         source="test finite-capacity overhead oxygen",
+        material_origin="feedstock",
     )
     before_transitions = len(sim.atom_ledger.transitions)
     mre_before = sim.atom_ledger.mol_by_account(
@@ -739,6 +754,7 @@ def test_finite_capacity_relief_flows_with_zero_ordinary_conductance(
         "process.overhead_gas",
         {"O2": 12.0 * o2_molar_mass},
         source="zero-conductance relief fixture",
+        material_origin="feedstock",
     )
 
     result = sim._dispatch_and_commit(
@@ -792,6 +808,7 @@ def test_finite_capacity_accumulator_commits_atom_balanced_cistern_inventory(
         "process.overhead_gas",
         {"O2": 10.0 * o2_molar_mass},
         source="accumulator surge fixture",
+        material_origin="feedstock",
     )
     total_kg_before = sum(sim.atom_ledger.total_kg_by_account().values())
 
@@ -854,6 +871,7 @@ def test_finite_capacity_accumulator_off_is_p2_3_provider_parity(
             "process.overhead_gas",
             {"O2": 10.0 * o2_molar_mass},
             source="accumulator-off parity fixture",
+            material_origin="feedstock",
         )
         controls = {
             "bleed_conductance_kg_s": 1.0,
@@ -900,11 +918,13 @@ def test_full_cistern_resumes_relief_through_provider_and_ledger(
         cistern_account,
         {"O2": 5.0 * o2_molar_mass},
         source="full cistern fixture",
+        material_origin="feedstock",
     )
     sim.atom_ledger.load_external(
         "process.overhead_gas",
         {"O2": 10.0 * o2_molar_mass},
         source="full cistern surge fixture",
+        material_origin="feedstock",
     )
     transitions_before = len(sim.atom_ledger.transitions)
     total_kg_before = sum(sim.atom_ledger.total_kg_by_account().values())

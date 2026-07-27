@@ -395,7 +395,7 @@ def test_kernel_dispatch_does_not_commit_shadow_transitions():
     silicate dispatch.
     """
     ledger = AtomLedger()
-    ledger.load_external('process.cleaned_melt', {'SiO2': 5.0})
+    ledger.load_external('process.cleaned_melt', {'SiO2': 5.0}, material_origin="feedstock")
     before_mol = ledger.mol_by_account()
 
     auth = _StubAuthoritativeProvider()

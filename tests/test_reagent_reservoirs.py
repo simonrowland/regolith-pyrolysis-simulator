@@ -25,7 +25,8 @@ def test_unspent_additive_is_reservoir_balance_not_product():
     ledger = _ledger()
 
     ledger.load_external(
-        "reservoir.reagent.K", {"K": 10.0}, source="operator inventory"
+        "reservoir.reagent.K", {"K": 10.0}, source="operator inventory",
+        material_origin="reagent",
     )
 
     assert ledger.kg_by_account("reservoir.reagent.K")["K"] == pytest.approx(
@@ -99,7 +100,8 @@ def test_recovered_reagent_transfer_is_zero_sum_debit_credit():
     ledger = _ledger()
     MaterialLot = _material_lot()
     ledger.load_external(
-        "process.condensation_train", {"K": 2.0}, source="stage 3 recovery"
+        "process.condensation_train", {"K": 2.0}, source="stage 3 recovery",
+        material_origin="feedstock",
     )
     before_total_k = ledger.kg_by_species()["K"]
 
@@ -136,7 +138,8 @@ def test_recovered_credit_cannot_be_spent_twice():
     ledger = _ledger()
     MaterialLot = _material_lot()
     ledger.load_external(
-        "process.condensation_train", {"Na": 4.0}, source="stage 3 recovery"
+        "process.condensation_train", {"Na": 4.0}, source="stage 3 recovery",
+        material_origin="feedstock",
     )
 
     ledger.transfer(
@@ -183,7 +186,8 @@ def test_terminal_accounts_cannot_flow_back_to_process():
     ledger = _ledger()
 
     ledger.load_external(
-        "terminal.offgas", {"H2O": 1.0}, source="Stage 0 offgas"
+        "terminal.offgas", {"H2O": 1.0}, source="Stage 0 offgas",
+        material_origin="feedstock",
     )
 
     with pytest.raises(Exception, match="terminal account|cannot be debited"):
@@ -200,7 +204,8 @@ def test_stored_oxygen_can_move_to_vented_terminal_account():
     ledger = _ledger()
 
     ledger.load_external(
-        "terminal.oxygen_melt_offgas_stored", {"O2": 2.0}, source="oxygen storage"
+        "terminal.oxygen_melt_offgas_stored", {"O2": 2.0}, source="oxygen storage",
+        material_origin="feedstock",
     )
 
     ledger.move(
@@ -224,5 +229,6 @@ def test_oxygen_terminal_accounts_reject_non_o2_species():
 
     with pytest.raises(Exception, match="only accepts species|got 'N2'"):
         ledger.load_external(
-            "terminal.oxygen_melt_offgas_stored", {"N2": 1.0}, source="bad oxygen storage"
+            "terminal.oxygen_melt_offgas_stored", {"N2": 1.0}, source="bad oxygen storage",
+            material_origin="feedstock",
         )

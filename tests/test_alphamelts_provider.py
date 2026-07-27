@@ -1166,11 +1166,13 @@ def test_kernel_filter_blocks_undeclared_accounts_for_provider():
         'process.cleaned_melt',
         _basalt_species_mol(),
         source='test seed cleaned melt',
+        material_origin="feedstock",
     )
     ledger.load_external(
         'process.metal_phase',
         {'Fe': 0.5},
         source='test seed metal phase',
+        material_origin="feedstock",
     )
     kernel = ChemistryKernel(
         ledger=ledger,

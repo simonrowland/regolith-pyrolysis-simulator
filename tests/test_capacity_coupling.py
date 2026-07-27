@@ -399,6 +399,7 @@ def test_real_finite_capacity_result_drives_live_short_session_once(monkeypatch)
         "process.overhead_gas",
         {"O2": 1.0e-4},
         source="binding capacity integration fixture",
+        material_origin="feedstock",
     )
 
     capacity = capacity_from_hardware(
@@ -558,6 +559,7 @@ def test_live_overhead_bleed_routes_binding_capacity_surge_to_accumulator(
         "process.overhead_gas",
         {"O2": 10.0 * o2_molar_mass},
         source="live accumulator surge fixture",
+        material_origin="feedstock",
     )
 
     result = sim._dispatch_overhead_bleed(
@@ -828,6 +830,7 @@ def test_live_capacity_refusal_precedes_overhead_bleed_commit(monkeypatch):
         "process.overhead_gas",
         {"O2": 1.0e-4},
         source="binding capacity refusal fixture",
+        material_origin="feedstock",
     )
     before_bleeds = sum(
         transition.reason == "overhead_bleed"

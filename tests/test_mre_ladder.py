@@ -47,6 +47,7 @@ def _seed_cleaned_melt_kg(
             for species, kg in species_kg.items()
         },
         source="test cleaned melt seed",
+        material_origin="feedstock",
     )
     sim._chem_kernel = sim._build_chemistry_kernel()
 
@@ -983,7 +984,8 @@ def test_c5_kress91_live_ferric_inventory_becomes_ferrous_behavior():
     sim.atom_ledger = sim._new_atom_ledger()
     fe2o3_mol = 10.0 / (MOLAR_MASS["Fe2O3"] / 1000.0)
     sim.atom_ledger.load_external_mol(
-        "process.cleaned_melt", {"Fe2O3": fe2o3_mol}, source="test seed"
+        "process.cleaned_melt", {"Fe2O3": fe2o3_mol}, source="test seed",
+        material_origin="feedstock",
     )
     sim._chem_kernel = sim._build_chemistry_kernel()
     sim._mre_voltage_sequence = sim._build_mre_voltage_sequence()

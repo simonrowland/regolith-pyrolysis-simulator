@@ -386,6 +386,1304 @@
     "deposit_by_surface_species_kg": {},
     "pump_outlet_by_species_kg": "not_applicable_until_p0"
   },
+  "yield_disposition": {
+    "schema_version": "5.0",
+    "basis": "feedstock_element_atom_fraction",
+    "destination_bins": [
+      "product_condensed",
+      "product_tapped",
+      "product_oxygen",
+      "cleanup_volatile_product",
+      "melt_retained",
+      "metal_phase_retained",
+      "wall_deposit",
+      "charge_unprocessed",
+      "redox_buffer_retained",
+      "cleanup_sequestered",
+      "offgas_vented",
+      "overhead_terminal_inventory"
+    ],
+    "fraction_table": {
+      "basis": "feedstock_element_atom_fraction",
+      "rows": [
+        {
+          "element": "Al",
+          "feedstock_input_mol_atoms": 377.9337629095206,
+          "destination_mol_atoms": {
+            "product_condensed": 0.0,
+            "product_tapped": 0.0,
+            "product_oxygen": 0.0,
+            "cleanup_volatile_product": 0.0,
+            "melt_retained": 377.9337629095206,
+            "metal_phase_retained": 0.0,
+            "wall_deposit": 0.0,
+            "charge_unprocessed": 0.0,
+            "redox_buffer_retained": 0.0,
+            "cleanup_sequestered": 0.0,
+            "offgas_vented": 0.0,
+            "overhead_terminal_inventory": 0.0
+          },
+          "destination_fractions": {
+            "product_condensed": 0.0,
+            "product_tapped": 0.0,
+            "product_oxygen": 0.0,
+            "cleanup_volatile_product": 0.0,
+            "melt_retained": 1.0,
+            "metal_phase_retained": 0.0,
+            "wall_deposit": 0.0,
+            "charge_unprocessed": 0.0,
+            "redox_buffer_retained": 0.0,
+            "cleanup_sequestered": 0.0,
+            "offgas_vented": 0.0,
+            "overhead_terminal_inventory": 0.0
+          },
+          "attribution_method": "tracked",
+          "attribution_method_by_destination": {
+            "melt_retained": "tracked"
+          },
+          "closure_residual_fraction": 0.0,
+          "closure_residual_mol_atoms": 0.0,
+          "origin_attribution_residual_fraction": 0.0,
+          "origin_attribution_residual_mol_atoms": 0.0
+        },
+        {
+          "element": "C",
+          "feedstock_input_mol_atoms": 2715.894325696101,
+          "destination_mol_atoms": {
+            "product_condensed": 0.0,
+            "product_tapped": 0.0,
+            "product_oxygen": 0.0,
+            "cleanup_volatile_product": 0.0,
+            "melt_retained": 958.7221688514541,
+            "metal_phase_retained": 0.0,
+            "wall_deposit": 0.0,
+            "charge_unprocessed": 0.0,
+            "redox_buffer_retained": 0.0,
+            "cleanup_sequestered": 0.07524767215021438,
+            "offgas_vented": 1757.096909172497,
+            "overhead_terminal_inventory": 0.0
+          },
+          "destination_fractions": {
+            "product_condensed": 0.0,
+            "product_tapped": 0.0,
+            "product_oxygen": 0.0,
+            "cleanup_volatile_product": 0.0,
+            "melt_retained": 0.35300422397904874,
+            "metal_phase_retained": 0.0,
+            "wall_deposit": 0.0,
+            "charge_unprocessed": 0.0,
+            "redox_buffer_retained": 0.0,
+            "cleanup_sequestered": 2.770640648211816e-05,
+            "offgas_vented": 0.6469680696144692,
+            "overhead_terminal_inventory": 0.0
+          },
+          "attribution_method": "tracked",
+          "attribution_method_by_destination": {
+            "melt_retained": "tracked",
+            "cleanup_sequestered": "tracked",
+            "offgas_vented": "tracked"
+          },
+          "closure_residual_fraction": 0.0,
+          "closure_residual_mol_atoms": 0.0,
+          "origin_attribution_residual_fraction": 0.0,
+          "origin_attribution_residual_mol_atoms": 0.0
+        },
+        {
+          "element": "Ca",
+          "feedstock_input_mol_atoms": 395.10173241992715,
+          "destination_mol_atoms": {
+            "product_condensed": 0.0,
+            "product_tapped": 0.0,
+            "product_oxygen": 0.0,
+            "cleanup_volatile_product": 0.0,
+            "melt_retained": 395.026484748064,
+            "metal_phase_retained": 0.0,
+            "wall_deposit": 0.0,
+            "charge_unprocessed": 0.0,
+            "redox_buffer_retained": 0.0,
+            "cleanup_sequestered": 0.07524767186314818,
+            "offgas_vented": 0.0,
+            "overhead_terminal_inventory": 0.0
+          },
+          "destination_fractions": {
+            "product_condensed": 0.0,
+            "product_tapped": 0.0,
+            "product_oxygen": 0.0,
+            "cleanup_volatile_product": 0.0,
+            "melt_retained": 0.9998095486157393,
+            "metal_phase_retained": 0.0,
+            "wall_deposit": 0.0,
+            "charge_unprocessed": 0.0,
+            "redox_buffer_retained": 0.0,
+            "cleanup_sequestered": 0.00019045138426063005,
+            "offgas_vented": 0.0,
+            "overhead_terminal_inventory": 0.0
+          },
+          "attribution_method": "tracked",
+          "attribution_method_by_destination": {
+            "melt_retained": "tracked",
+            "cleanup_sequestered": "tracked"
+          },
+          "closure_residual_fraction": 0.0,
+          "closure_residual_mol_atoms": 0.0,
+          "origin_attribution_residual_fraction": 0.0,
+          "origin_attribution_residual_mol_atoms": 0.0
+        },
+        {
+          "element": "Fe",
+          "feedstock_input_mol_atoms": 3218.152293899655,
+          "destination_mol_atoms": {
+            "product_condensed": 0.0,
+            "product_tapped": 0.0,
+            "product_oxygen": 0.0,
+            "cleanup_volatile_product": 0.0,
+            "melt_retained": 3218.152293899655,
+            "metal_phase_retained": 0.0,
+            "wall_deposit": 0.0,
+            "charge_unprocessed": 0.0,
+            "redox_buffer_retained": 0.0,
+            "cleanup_sequestered": 0.0,
+            "offgas_vented": 0.0,
+            "overhead_terminal_inventory": 0.0
+          },
+          "destination_fractions": {
+            "product_condensed": 0.0,
+            "product_tapped": 0.0,
+            "product_oxygen": 0.0,
+            "cleanup_volatile_product": 0.0,
+            "melt_retained": 1.0,
+            "metal_phase_retained": 0.0,
+            "wall_deposit": 0.0,
+            "charge_unprocessed": 0.0,
+            "redox_buffer_retained": 0.0,
+            "cleanup_sequestered": 0.0,
+            "offgas_vented": 0.0,
+            "overhead_terminal_inventory": 0.0
+          },
+          "attribution_method": "tracked",
+          "attribution_method_by_destination": {
+            "melt_retained": "tracked"
+          },
+          "closure_residual_fraction": 0.0,
+          "closure_residual_mol_atoms": 0.0,
+          "origin_attribution_residual_fraction": 0.0,
+          "origin_attribution_residual_mol_atoms": 0.0
+        },
+        {
+          "element": "H",
+          "feedstock_input_mol_atoms": 20173.78345500588,
+          "destination_mol_atoms": {
+            "product_condensed": 0.0,
+            "product_tapped": 0.0,
+            "product_oxygen": 0.0,
+            "cleanup_volatile_product": 0.0,
+            "melt_retained": 0.0,
+            "metal_phase_retained": 0.0,
+            "wall_deposit": 0.0,
+            "charge_unprocessed": 0.0,
+            "redox_buffer_retained": 0.0,
+            "cleanup_sequestered": 0.0,
+            "offgas_vented": 20173.78345500588,
+            "overhead_terminal_inventory": 0.0
+          },
+          "destination_fractions": {
+            "product_condensed": 0.0,
+            "product_tapped": 0.0,
+            "product_oxygen": 0.0,
+            "cleanup_volatile_product": 0.0,
+            "melt_retained": 0.0,
+            "metal_phase_retained": 0.0,
+            "wall_deposit": 0.0,
+            "charge_unprocessed": 0.0,
+            "redox_buffer_retained": 0.0,
+            "cleanup_sequestered": 0.0,
+            "offgas_vented": 1.0,
+            "overhead_terminal_inventory": 0.0
+          },
+          "attribution_method": "tracked",
+          "attribution_method_by_destination": {
+            "offgas_vented": "tracked"
+          },
+          "closure_residual_fraction": 0.0,
+          "closure_residual_mol_atoms": 0.0,
+          "origin_attribution_residual_fraction": 0.0,
+          "origin_attribution_residual_mol_atoms": 0.0
+        },
+        {
+          "element": "Mg",
+          "feedstock_input_mol_atoms": 4675.098042990033,
+          "destination_mol_atoms": {
+            "product_condensed": 0.0,
+            "product_tapped": 0.0,
+            "product_oxygen": 0.0,
+            "cleanup_volatile_product": 0.0,
+            "melt_retained": 4675.098042990033,
+            "metal_phase_retained": 0.0,
+            "wall_deposit": 0.0,
+            "charge_unprocessed": 0.0,
+            "redox_buffer_retained": 0.0,
+            "cleanup_sequestered": 0.0,
+            "offgas_vented": 0.0,
+            "overhead_terminal_inventory": 0.0
+          },
+          "destination_fractions": {
+            "product_condensed": 0.0,
+            "product_tapped": 0.0,
+            "product_oxygen": 0.0,
+            "cleanup_volatile_product": 0.0,
+            "melt_retained": 1.0,
+            "metal_phase_retained": 0.0,
+            "wall_deposit": 0.0,
+            "charge_unprocessed": 0.0,
+            "redox_buffer_retained": 0.0,
+            "cleanup_sequestered": 0.0,
+            "offgas_vented": 0.0,
+            "overhead_terminal_inventory": 0.0
+          },
+          "attribution_method": "tracked",
+          "attribution_method_by_destination": {
+            "melt_retained": "tracked"
+          },
+          "closure_residual_fraction": 0.0,
+          "closure_residual_mol_atoms": 0.0,
+          "origin_attribution_residual_fraction": 0.0,
+          "origin_attribution_residual_mol_atoms": 0.0
+        },
+        {
+          "element": "N",
+          "feedstock_input_mol_atoms": 142.4296757926701,
+          "destination_mol_atoms": {
+            "product_condensed": 0.0,
+            "product_tapped": 0.0,
+            "product_oxygen": 0.0,
+            "cleanup_volatile_product": 0.0,
+            "melt_retained": 0.0,
+            "metal_phase_retained": 0.0,
+            "wall_deposit": 0.0,
+            "charge_unprocessed": 0.0,
+            "redox_buffer_retained": 0.0,
+            "cleanup_sequestered": 0.0,
+            "offgas_vented": 142.4296757926701,
+            "overhead_terminal_inventory": 0.0
+          },
+          "destination_fractions": {
+            "product_condensed": 0.0,
+            "product_tapped": 0.0,
+            "product_oxygen": 0.0,
+            "cleanup_volatile_product": 0.0,
+            "melt_retained": 0.0,
+            "metal_phase_retained": 0.0,
+            "wall_deposit": 0.0,
+            "charge_unprocessed": 0.0,
+            "redox_buffer_retained": 0.0,
+            "cleanup_sequestered": 0.0,
+            "offgas_vented": 1.0,
+            "overhead_terminal_inventory": 0.0
+          },
+          "attribution_method": "tracked",
+          "attribution_method_by_destination": {
+            "offgas_vented": "tracked"
+          },
+          "closure_residual_fraction": 0.0,
+          "closure_residual_mol_atoms": 0.0,
+          "origin_attribution_residual_fraction": 0.0,
+          "origin_attribution_residual_mol_atoms": 0.0
+        },
+        {
+          "element": "Na",
+          "feedstock_input_mol_atoms": 171.75490285474424,
+          "destination_mol_atoms": {
+            "product_condensed": 0.0,
+            "product_tapped": 0.0,
+            "product_oxygen": 0.0,
+            "cleanup_volatile_product": 0.0,
+            "melt_retained": 171.75490285417013,
+            "metal_phase_retained": 0.0,
+            "wall_deposit": 0.0,
+            "charge_unprocessed": 0.0,
+            "redox_buffer_retained": 0.0,
+            "cleanup_sequestered": 5.741324000655703e-10,
+            "offgas_vented": 0.0,
+            "overhead_terminal_inventory": 0.0
+          },
+          "destination_fractions": {
+            "product_condensed": 0.0,
+            "product_tapped": 0.0,
+            "product_oxygen": 0.0,
+            "cleanup_volatile_product": 0.0,
+            "melt_retained": 0.9999999999966573,
+            "metal_phase_retained": 0.0,
+            "wall_deposit": 0.0,
+            "charge_unprocessed": 0.0,
+            "redox_buffer_retained": 0.0,
+            "cleanup_sequestered": 3.3427424226202314e-12,
+            "offgas_vented": 0.0,
+            "overhead_terminal_inventory": 0.0
+          },
+          "attribution_method": "tracked",
+          "attribution_method_by_destination": {
+            "melt_retained": "tracked",
+            "cleanup_sequestered": "tracked"
+          },
+          "closure_residual_fraction": 0.0,
+          "closure_residual_mol_atoms": 0.0,
+          "origin_attribution_residual_fraction": 0.0,
+          "origin_attribution_residual_mol_atoms": 0.0
+        },
+        {
+          "element": "Ni",
+          "feedstock_input_mol_atoms": 206.36185511326167,
+          "destination_mol_atoms": {
+            "product_condensed": 0.0,
+            "product_tapped": 0.0,
+            "product_oxygen": 0.0,
+            "cleanup_volatile_product": 0.0,
+            "melt_retained": 206.36185511326167,
+            "metal_phase_retained": 0.0,
+            "wall_deposit": 0.0,
+            "charge_unprocessed": 0.0,
+            "redox_buffer_retained": 0.0,
+            "cleanup_sequestered": 0.0,
+            "offgas_vented": 0.0,
+            "overhead_terminal_inventory": 0.0
+          },
+          "destination_fractions": {
+            "product_condensed": 0.0,
+            "product_tapped": 0.0,
+            "product_oxygen": 0.0,
+            "cleanup_volatile_product": 0.0,
+            "melt_retained": 1.0,
+            "metal_phase_retained": 0.0,
+            "wall_deposit": 0.0,
+            "charge_unprocessed": 0.0,
+            "redox_buffer_retained": 0.0,
+            "cleanup_sequestered": 0.0,
+            "offgas_vented": 0.0,
+            "overhead_terminal_inventory": 0.0
+          },
+          "attribution_method": "tracked",
+          "attribution_method_by_destination": {
+            "melt_retained": "tracked"
+          },
+          "closure_residual_fraction": 0.0,
+          "closure_residual_mol_atoms": 0.0,
+          "origin_attribution_residual_fraction": 0.0,
+          "origin_attribution_residual_mol_atoms": 0.0
+        },
+        {
+          "element": "O",
+          "feedstock_input_mol_atoms": 27503.079567609027,
+          "destination_mol_atoms": {
+            "product_condensed": 0.0,
+            "product_tapped": 0.0,
+            "product_oxygen": 0.0,
+            "cleanup_volatile_product": 0.0,
+            "melt_retained": 18382.838442016677,
+            "metal_phase_retained": 0.0,
+            "wall_deposit": 0.0,
+            "charge_unprocessed": 0.0,
+            "redox_buffer_retained": 0.0,
+            "cleanup_sequestered": 0.22574301645064315,
+            "offgas_vented": 9120.015382575903,
+            "overhead_terminal_inventory": 0.0
+          },
+          "destination_fractions": {
+            "product_condensed": 0.0,
+            "product_tapped": 0.0,
+            "product_oxygen": 0.0,
+            "cleanup_volatile_product": 0.0,
+            "melt_retained": 0.6683920030419628,
+            "metal_phase_retained": 0.0,
+            "wall_deposit": 0.0,
+            "charge_unprocessed": 0.0,
+            "redox_buffer_retained": 0.0,
+            "cleanup_sequestered": 8.20791780410313e-06,
+            "offgas_vented": 0.33159978904023324,
+            "overhead_terminal_inventory": 0.0
+          },
+          "attribution_method": "tracked",
+          "attribution_method_by_destination": {
+            "melt_retained": "tracked",
+            "cleanup_sequestered": "tracked",
+            "offgas_vented": "tracked"
+          },
+          "closure_residual_fraction": 2.220446049250313e-16,
+          "closure_residual_mol_atoms": 3.637978807091713e-12,
+          "origin_attribution_residual_fraction": 2.220446049250313e-16,
+          "origin_attribution_residual_mol_atoms": 3.637978807091713e-12
+        },
+        {
+          "element": "S",
+          "feedstock_input_mol_atoms": 1244.5492631490517,
+          "destination_mol_atoms": {
+            "product_condensed": 0.0,
+            "product_tapped": 0.0,
+            "product_oxygen": 0.0,
+            "cleanup_volatile_product": 0.0,
+            "melt_retained": 0.0,
+            "metal_phase_retained": 0.0,
+            "wall_deposit": 0.0,
+            "charge_unprocessed": 0.0,
+            "redox_buffer_retained": 0.0,
+            "cleanup_sequestered": 1244.5492631490517,
+            "offgas_vented": 0.0,
+            "overhead_terminal_inventory": 0.0
+          },
+          "destination_fractions": {
+            "product_condensed": 0.0,
+            "product_tapped": 0.0,
+            "product_oxygen": 0.0,
+            "cleanup_volatile_product": 0.0,
+            "melt_retained": 0.0,
+            "metal_phase_retained": 0.0,
+            "wall_deposit": 0.0,
+            "charge_unprocessed": 0.0,
+            "redox_buffer_retained": 0.0,
+            "cleanup_sequestered": 1.0,
+            "offgas_vented": 0.0,
+            "overhead_terminal_inventory": 0.0
+          },
+          "attribution_method": "tracked",
+          "attribution_method_by_destination": {
+            "cleanup_sequestered": "tracked"
+          },
+          "closure_residual_fraction": 0.0,
+          "closure_residual_mol_atoms": 0.0,
+          "origin_attribution_residual_fraction": 0.0,
+          "origin_attribution_residual_mol_atoms": 0.0
+        },
+        {
+          "element": "Si",
+          "feedstock_input_mol_atoms": 4617.710834737149,
+          "destination_mol_atoms": {
+            "product_condensed": 0.0,
+            "product_tapped": 0.0,
+            "product_oxygen": 0.0,
+            "cleanup_volatile_product": 0.0,
+            "melt_retained": 4617.710834737149,
+            "metal_phase_retained": 0.0,
+            "wall_deposit": 0.0,
+            "charge_unprocessed": 0.0,
+            "redox_buffer_retained": 0.0,
+            "cleanup_sequestered": 0.0,
+            "offgas_vented": 0.0,
+            "overhead_terminal_inventory": 0.0
+          },
+          "destination_fractions": {
+            "product_condensed": 0.0,
+            "product_tapped": 0.0,
+            "product_oxygen": 0.0,
+            "cleanup_volatile_product": 0.0,
+            "melt_retained": 1.0,
+            "metal_phase_retained": 0.0,
+            "wall_deposit": 0.0,
+            "charge_unprocessed": 0.0,
+            "redox_buffer_retained": 0.0,
+            "cleanup_sequestered": 0.0,
+            "offgas_vented": 0.0,
+            "overhead_terminal_inventory": 0.0
+          },
+          "attribution_method": "tracked",
+          "attribution_method_by_destination": {
+            "melt_retained": "tracked"
+          },
+          "closure_residual_fraction": 0.0,
+          "closure_residual_mol_atoms": 0.0,
+          "origin_attribution_residual_fraction": 0.0,
+          "origin_attribution_residual_mol_atoms": 0.0
+        }
+      ]
+    },
+    "melt_retained_subdispositions": {
+      "basis": "feedstock_element_mol_atoms",
+      "subdispositions": [
+        "oxide_unextracted",
+        "refractory_rump",
+        "residual_reductant",
+        "stage0_slag"
+      ],
+      "rows": [
+        {
+          "element": "Al",
+          "melt_retained_mol_atoms": 377.9337629095206,
+          "subdisposition_mol_atoms": {
+            "oxide_unextracted": 0.0,
+            "refractory_rump": 377.9337629095206,
+            "residual_reductant": 0.0,
+            "stage0_slag": 0.0
+          },
+          "subdisposition_fractions": {
+            "oxide_unextracted": 0.0,
+            "refractory_rump": 1.0,
+            "residual_reductant": 0.0,
+            "stage0_slag": 0.0
+          },
+          "attribution_method": "tracked"
+        },
+        {
+          "element": "C",
+          "melt_retained_mol_atoms": 958.7221688514541,
+          "subdisposition_mol_atoms": {
+            "oxide_unextracted": 0.0,
+            "refractory_rump": 0.0,
+            "residual_reductant": 958.7221688514541,
+            "stage0_slag": 0.0
+          },
+          "subdisposition_fractions": {
+            "oxide_unextracted": 0.0,
+            "refractory_rump": 0.0,
+            "residual_reductant": 1.0,
+            "stage0_slag": 0.0
+          },
+          "attribution_method": "tracked"
+        },
+        {
+          "element": "Ca",
+          "melt_retained_mol_atoms": 395.026484748064,
+          "subdisposition_mol_atoms": {
+            "oxide_unextracted": 0.0,
+            "refractory_rump": 395.026484748064,
+            "residual_reductant": 0.0,
+            "stage0_slag": 0.0
+          },
+          "subdisposition_fractions": {
+            "oxide_unextracted": 0.0,
+            "refractory_rump": 1.0,
+            "residual_reductant": 0.0,
+            "stage0_slag": 0.0
+          },
+          "attribution_method": "tracked"
+        },
+        {
+          "element": "Fe",
+          "melt_retained_mol_atoms": 3218.152293899655,
+          "subdisposition_mol_atoms": {
+            "oxide_unextracted": 3218.152293899655,
+            "refractory_rump": 0.0,
+            "residual_reductant": 0.0,
+            "stage0_slag": 0.0
+          },
+          "subdisposition_fractions": {
+            "oxide_unextracted": 1.0,
+            "refractory_rump": 0.0,
+            "residual_reductant": 0.0,
+            "stage0_slag": 0.0
+          },
+          "attribution_method": "tracked"
+        },
+        {
+          "element": "Mg",
+          "melt_retained_mol_atoms": 4675.098042990033,
+          "subdisposition_mol_atoms": {
+            "oxide_unextracted": 0.0,
+            "refractory_rump": 4675.098042990033,
+            "residual_reductant": 0.0,
+            "stage0_slag": 0.0
+          },
+          "subdisposition_fractions": {
+            "oxide_unextracted": 0.0,
+            "refractory_rump": 1.0,
+            "residual_reductant": 0.0,
+            "stage0_slag": 0.0
+          },
+          "attribution_method": "tracked"
+        },
+        {
+          "element": "Na",
+          "melt_retained_mol_atoms": 171.75490285417013,
+          "subdisposition_mol_atoms": {
+            "oxide_unextracted": 171.75490285417013,
+            "refractory_rump": 0.0,
+            "residual_reductant": 0.0,
+            "stage0_slag": 0.0
+          },
+          "subdisposition_fractions": {
+            "oxide_unextracted": 1.0,
+            "refractory_rump": 0.0,
+            "residual_reductant": 0.0,
+            "stage0_slag": 0.0
+          },
+          "attribution_method": "tracked"
+        },
+        {
+          "element": "Ni",
+          "melt_retained_mol_atoms": 206.36185511326167,
+          "subdisposition_mol_atoms": {
+            "oxide_unextracted": 206.36185511326167,
+            "refractory_rump": 0.0,
+            "residual_reductant": 0.0,
+            "stage0_slag": 0.0
+          },
+          "subdisposition_fractions": {
+            "oxide_unextracted": 1.0,
+            "refractory_rump": 0.0,
+            "residual_reductant": 0.0,
+            "stage0_slag": 0.0
+          },
+          "attribution_method": "tracked"
+        },
+        {
+          "element": "O",
+          "melt_retained_mol_atoms": 18382.838442016677,
+          "subdisposition_mol_atoms": {
+            "oxide_unextracted": 3510.3916004400016,
+            "refractory_rump": 14872.446841576675,
+            "residual_reductant": 0.0,
+            "stage0_slag": 0.0
+          },
+          "subdisposition_fractions": {
+            "oxide_unextracted": 0.1909602595656004,
+            "refractory_rump": 0.8090397404343996,
+            "residual_reductant": 0.0,
+            "stage0_slag": 0.0
+          },
+          "attribution_method": "tracked"
+        },
+        {
+          "element": "Si",
+          "melt_retained_mol_atoms": 4617.710834737149,
+          "subdisposition_mol_atoms": {
+            "oxide_unextracted": 0.0,
+            "refractory_rump": 4617.710834737149,
+            "residual_reductant": 0.0,
+            "stage0_slag": 0.0
+          },
+          "subdisposition_fractions": {
+            "oxide_unextracted": 0.0,
+            "refractory_rump": 1.0,
+            "residual_reductant": 0.0,
+            "stage0_slag": 0.0
+          },
+          "attribution_method": "tracked"
+        }
+      ]
+    },
+    "nodes": [
+      {
+        "id": "feedstock_element:Al",
+        "kind": "feedstock_element",
+        "element": "Al",
+        "mol_atoms": 377.9337629095206
+      },
+      {
+        "id": "feedstock_element:C",
+        "kind": "feedstock_element",
+        "element": "C",
+        "mol_atoms": 2715.894325696101
+      },
+      {
+        "id": "feedstock_element:Ca",
+        "kind": "feedstock_element",
+        "element": "Ca",
+        "mol_atoms": 395.10173241992715
+      },
+      {
+        "id": "feedstock_element:Fe",
+        "kind": "feedstock_element",
+        "element": "Fe",
+        "mol_atoms": 3218.152293899655
+      },
+      {
+        "id": "feedstock_element:H",
+        "kind": "feedstock_element",
+        "element": "H",
+        "mol_atoms": 20173.78345500588
+      },
+      {
+        "id": "feedstock_element:Mg",
+        "kind": "feedstock_element",
+        "element": "Mg",
+        "mol_atoms": 4675.098042990033
+      },
+      {
+        "id": "feedstock_element:N",
+        "kind": "feedstock_element",
+        "element": "N",
+        "mol_atoms": 142.4296757926701
+      },
+      {
+        "id": "feedstock_element:Na",
+        "kind": "feedstock_element",
+        "element": "Na",
+        "mol_atoms": 171.75490285474424
+      },
+      {
+        "id": "feedstock_element:Ni",
+        "kind": "feedstock_element",
+        "element": "Ni",
+        "mol_atoms": 206.36185511326167
+      },
+      {
+        "id": "feedstock_element:O",
+        "kind": "feedstock_element",
+        "element": "O",
+        "mol_atoms": 27503.079567609027
+      },
+      {
+        "id": "feedstock_element:S",
+        "kind": "feedstock_element",
+        "element": "S",
+        "mol_atoms": 1244.5492631490517
+      },
+      {
+        "id": "feedstock_element:Si",
+        "kind": "feedstock_element",
+        "element": "Si",
+        "mol_atoms": 4617.710834737149
+      },
+      {
+        "id": "destination:product_condensed",
+        "kind": "destination",
+        "destination": "product_condensed"
+      },
+      {
+        "id": "destination:product_tapped",
+        "kind": "destination",
+        "destination": "product_tapped"
+      },
+      {
+        "id": "destination:product_oxygen",
+        "kind": "destination",
+        "destination": "product_oxygen"
+      },
+      {
+        "id": "destination:cleanup_volatile_product",
+        "kind": "destination",
+        "destination": "cleanup_volatile_product"
+      },
+      {
+        "id": "destination:melt_retained",
+        "kind": "destination",
+        "destination": "melt_retained"
+      },
+      {
+        "id": "destination:metal_phase_retained",
+        "kind": "destination",
+        "destination": "metal_phase_retained"
+      },
+      {
+        "id": "destination:wall_deposit",
+        "kind": "destination",
+        "destination": "wall_deposit"
+      },
+      {
+        "id": "destination:charge_unprocessed",
+        "kind": "destination",
+        "destination": "charge_unprocessed"
+      },
+      {
+        "id": "destination:redox_buffer_retained",
+        "kind": "destination",
+        "destination": "redox_buffer_retained"
+      },
+      {
+        "id": "destination:cleanup_sequestered",
+        "kind": "destination",
+        "destination": "cleanup_sequestered"
+      },
+      {
+        "id": "destination:offgas_vented",
+        "kind": "destination",
+        "destination": "offgas_vented"
+      },
+      {
+        "id": "destination:overhead_terminal_inventory",
+        "kind": "destination",
+        "destination": "overhead_terminal_inventory"
+      }
+    ],
+    "links": [
+      {
+        "source": "feedstock_element:Al",
+        "target": "destination:melt_retained",
+        "element": "Al",
+        "destination": "melt_retained",
+        "mol_atoms": 377.9337629095206,
+        "fraction_of_feedstock_element": 1.0,
+        "source_accounts": [
+          "process.cleaned_melt"
+        ],
+        "attribution_method": "tracked"
+      },
+      {
+        "source": "feedstock_element:C",
+        "target": "destination:melt_retained",
+        "element": "C",
+        "destination": "melt_retained",
+        "mol_atoms": 958.7221688514541,
+        "fraction_of_feedstock_element": 0.35300422397904874,
+        "source_accounts": [
+          "process.solid_char_carbon"
+        ],
+        "attribution_method": "tracked"
+      },
+      {
+        "source": "feedstock_element:C",
+        "target": "destination:cleanup_sequestered",
+        "element": "C",
+        "destination": "cleanup_sequestered",
+        "mol_atoms": 0.07524767215021438,
+        "fraction_of_feedstock_element": 2.770640648211816e-05,
+        "source_accounts": [
+          "terminal.stage0_salt_phase"
+        ],
+        "attribution_method": "tracked"
+      },
+      {
+        "source": "feedstock_element:C",
+        "target": "destination:offgas_vented",
+        "element": "C",
+        "destination": "offgas_vented",
+        "mol_atoms": 1757.096909172497,
+        "fraction_of_feedstock_element": 0.6469680696144692,
+        "source_accounts": [
+          "terminal.offgas"
+        ],
+        "attribution_method": "tracked"
+      },
+      {
+        "source": "feedstock_element:Ca",
+        "target": "destination:melt_retained",
+        "element": "Ca",
+        "destination": "melt_retained",
+        "mol_atoms": 395.026484748064,
+        "fraction_of_feedstock_element": 0.9998095486157393,
+        "source_accounts": [
+          "process.cleaned_melt"
+        ],
+        "attribution_method": "tracked"
+      },
+      {
+        "source": "feedstock_element:Ca",
+        "target": "destination:cleanup_sequestered",
+        "element": "Ca",
+        "destination": "cleanup_sequestered",
+        "mol_atoms": 0.07524767186314818,
+        "fraction_of_feedstock_element": 0.00019045138426063005,
+        "source_accounts": [
+          "terminal.stage0_salt_phase"
+        ],
+        "attribution_method": "tracked"
+      },
+      {
+        "source": "feedstock_element:Fe",
+        "target": "destination:melt_retained",
+        "element": "Fe",
+        "destination": "melt_retained",
+        "mol_atoms": 3218.152293899655,
+        "fraction_of_feedstock_element": 1.0,
+        "source_accounts": [
+          "process.cleaned_melt"
+        ],
+        "attribution_method": "tracked"
+      },
+      {
+        "source": "feedstock_element:H",
+        "target": "destination:offgas_vented",
+        "element": "H",
+        "destination": "offgas_vented",
+        "mol_atoms": 20173.78345500588,
+        "fraction_of_feedstock_element": 1.0,
+        "source_accounts": [
+          "terminal.offgas"
+        ],
+        "attribution_method": "tracked"
+      },
+      {
+        "source": "feedstock_element:Mg",
+        "target": "destination:melt_retained",
+        "element": "Mg",
+        "destination": "melt_retained",
+        "mol_atoms": 4675.098042990033,
+        "fraction_of_feedstock_element": 1.0,
+        "source_accounts": [
+          "process.cleaned_melt"
+        ],
+        "attribution_method": "tracked"
+      },
+      {
+        "source": "feedstock_element:N",
+        "target": "destination:offgas_vented",
+        "element": "N",
+        "destination": "offgas_vented",
+        "mol_atoms": 142.4296757926701,
+        "fraction_of_feedstock_element": 1.0,
+        "source_accounts": [
+          "terminal.offgas"
+        ],
+        "attribution_method": "tracked"
+      },
+      {
+        "source": "feedstock_element:Na",
+        "target": "destination:melt_retained",
+        "element": "Na",
+        "destination": "melt_retained",
+        "mol_atoms": 171.75490285417013,
+        "fraction_of_feedstock_element": 0.9999999999966573,
+        "source_accounts": [
+          "process.cleaned_melt"
+        ],
+        "attribution_method": "tracked"
+      },
+      {
+        "source": "feedstock_element:Na",
+        "target": "destination:cleanup_sequestered",
+        "element": "Na",
+        "destination": "cleanup_sequestered",
+        "mol_atoms": 5.741324000655703e-10,
+        "fraction_of_feedstock_element": 3.3427424226202314e-12,
+        "source_accounts": [
+          "terminal.stage0_salt_phase"
+        ],
+        "attribution_method": "tracked"
+      },
+      {
+        "source": "feedstock_element:Ni",
+        "target": "destination:melt_retained",
+        "element": "Ni",
+        "destination": "melt_retained",
+        "mol_atoms": 206.36185511326167,
+        "fraction_of_feedstock_element": 1.0,
+        "source_accounts": [
+          "process.cleaned_melt"
+        ],
+        "attribution_method": "tracked"
+      },
+      {
+        "source": "feedstock_element:O",
+        "target": "destination:melt_retained",
+        "element": "O",
+        "destination": "melt_retained",
+        "mol_atoms": 18382.838442016677,
+        "fraction_of_feedstock_element": 0.6683920030419628,
+        "source_accounts": [
+          "process.cleaned_melt"
+        ],
+        "attribution_method": "tracked"
+      },
+      {
+        "source": "feedstock_element:O",
+        "target": "destination:cleanup_sequestered",
+        "element": "O",
+        "destination": "cleanup_sequestered",
+        "mol_atoms": 0.22574301645064315,
+        "fraction_of_feedstock_element": 8.20791780410313e-06,
+        "source_accounts": [
+          "terminal.stage0_salt_phase"
+        ],
+        "attribution_method": "tracked"
+      },
+      {
+        "source": "feedstock_element:O",
+        "target": "destination:offgas_vented",
+        "element": "O",
+        "destination": "offgas_vented",
+        "mol_atoms": 9120.015382575903,
+        "fraction_of_feedstock_element": 0.33159978904023324,
+        "source_accounts": [
+          "terminal.offgas"
+        ],
+        "attribution_method": "tracked"
+      },
+      {
+        "source": "feedstock_element:S",
+        "target": "destination:cleanup_sequestered",
+        "element": "S",
+        "destination": "cleanup_sequestered",
+        "mol_atoms": 1244.5492631490517,
+        "fraction_of_feedstock_element": 1.0,
+        "source_accounts": [
+          "terminal.stage0_sulfide_matte"
+        ],
+        "attribution_method": "tracked"
+      },
+      {
+        "source": "feedstock_element:Si",
+        "target": "destination:melt_retained",
+        "element": "Si",
+        "destination": "melt_retained",
+        "mol_atoms": 4617.710834737149,
+        "fraction_of_feedstock_element": 1.0,
+        "source_accounts": [
+          "process.cleaned_melt"
+        ],
+        "attribution_method": "tracked"
+      }
+    ],
+    "terminal_species_streams": [
+      {
+        "destination": "melt_retained",
+        "account": "process.cleaned_melt",
+        "campaign_scope": "terminal",
+        "subdisposition": "refractory_rump",
+        "species": "Al2O3",
+        "terminal_mol": 188.9668814547603,
+        "terminal_kg": 19.267077783577232,
+        "origin_scope": "typed_material_origin",
+        "attribution_method": "tracked"
+      },
+      {
+        "destination": "melt_retained",
+        "account": "process.cleaned_melt",
+        "campaign_scope": "terminal",
+        "subdisposition": "refractory_rump",
+        "species": "CaO",
+        "terminal_mol": 395.026484748064,
+        "terminal_kg": 22.151900185217183,
+        "origin_scope": "typed_material_origin",
+        "attribution_method": "tracked"
+      },
+      {
+        "destination": "melt_retained",
+        "account": "process.cleaned_melt",
+        "campaign_scope": "terminal",
+        "subdisposition": "refractory_rump",
+        "species": "MgO",
+        "terminal_mol": 4675.098042990033,
+        "terminal_kg": 188.42515152467027,
+        "origin_scope": "typed_material_origin",
+        "attribution_method": "tracked"
+      },
+      {
+        "destination": "melt_retained",
+        "account": "process.cleaned_melt",
+        "campaign_scope": "terminal",
+        "subdisposition": "refractory_rump",
+        "species": "SiO2",
+        "terminal_mol": 4617.710834737149,
+        "terminal_kg": 277.4459200835121,
+        "origin_scope": "typed_material_origin",
+        "attribution_method": "tracked"
+      },
+      {
+        "destination": "melt_retained",
+        "account": "process.cleaned_melt",
+        "campaign_scope": "terminal",
+        "subdisposition": "oxide_unextracted",
+        "species": "FeO",
+        "terminal_mol": 3218.152293899655,
+        "terminal_kg": 231.20493340292677,
+        "origin_scope": "typed_material_origin",
+        "attribution_method": "tracked"
+      },
+      {
+        "destination": "melt_retained",
+        "account": "process.cleaned_melt",
+        "campaign_scope": "terminal",
+        "subdisposition": "oxide_unextracted",
+        "species": "Na2O",
+        "terminal_mol": 85.87745142708506,
+        "terminal_kg": 5.322558934708119,
+        "origin_scope": "typed_material_origin",
+        "attribution_method": "tracked"
+      },
+      {
+        "destination": "melt_retained",
+        "account": "process.cleaned_melt",
+        "campaign_scope": "terminal",
+        "subdisposition": "oxide_unextracted",
+        "species": "NiO",
+        "terminal_mol": 206.36185511326167,
+        "terminal_kg": 15.413662226861785,
+        "origin_scope": "typed_material_origin",
+        "attribution_method": "tracked"
+      },
+      {
+        "destination": "offgas_vented",
+        "account": "terminal.offgas",
+        "campaign_scope": "terminal",
+        "subdisposition": null,
+        "species": "CO2",
+        "terminal_mol": 1757.096909172497,
+        "terminal_kg": 77.32807787577242,
+        "origin_scope": "typed_material_origin",
+        "attribution_method": "tracked"
+      },
+      {
+        "destination": "offgas_vented",
+        "account": "terminal.offgas",
+        "campaign_scope": "terminal",
+        "subdisposition": null,
+        "species": "H2O",
+        "terminal_mol": 10086.89172750294,
+        "terminal_kg": 181.71535447096545,
+        "origin_scope": "typed_material_origin",
+        "attribution_method": "tracked"
+      },
+      {
+        "destination": "offgas_vented",
+        "account": "terminal.offgas",
+        "campaign_scope": "terminal",
+        "subdisposition": null,
+        "species": "N2",
+        "terminal_mol": 71.21483789633506,
+        "terminal_kg": 1.9950124688279303,
+        "origin_scope": "typed_material_origin",
+        "attribution_method": "tracked"
+      },
+      {
+        "destination": "cleanup_sequestered",
+        "account": "terminal.stage0_salt_phase",
+        "campaign_scope": "terminal",
+        "subdisposition": null,
+        "species": "CaCO3",
+        "terminal_mol": 0.07524767186314818,
+        "terminal_kg": 0.007531238486095049,
+        "origin_scope": "typed_material_origin",
+        "attribution_method": "tracked"
+      },
+      {
+        "destination": "cleanup_sequestered",
+        "account": "terminal.stage0_salt_phase",
+        "campaign_scope": "terminal",
+        "subdisposition": null,
+        "species": "Na2CO3",
+        "terminal_mol": 2.8706620003278515e-10,
+        "terminal_kg": 3.042543994524749e-11,
+        "origin_scope": "typed_material_origin",
+        "attribution_method": "tracked"
+      },
+      {
+        "destination": "cleanup_sequestered",
+        "account": "terminal.stage0_sulfide_matte",
+        "campaign_scope": "terminal",
+        "subdisposition": null,
+        "species": "S",
+        "terminal_mol": 1244.5492631490517,
+        "terminal_kg": 39.900249376558605,
+        "origin_scope": "typed_material_origin",
+        "attribution_method": "tracked"
+      },
+      {
+        "destination": "melt_retained",
+        "account": "process.solid_char_carbon",
+        "campaign_scope": "terminal",
+        "subdisposition": "residual_reductant",
+        "species": "C",
+        "terminal_mol": 958.7221688514541,
+        "terminal_kg": 11.515211970074814,
+        "origin_scope": "typed_material_origin",
+        "attribution_method": "tracked"
+      }
+    ],
+    "reagent_cycle": {
+      "basis": "excluded_from_feedstock_atom_denominator",
+      "rows": [
+        {
+          "element": "O",
+          "input_mol_atoms": 4481.070163272031,
+          "terminal_excluded_mol_atoms": 4481.070163272031,
+          "attribution_method": "tracked",
+          "closure_residual_fraction": 0.0
+        }
+      ],
+      "closure_residual_fraction": 0.0
+    },
+    "origin_unattributed": {
+      "basis": "element_mol_atoms",
+      "limit_mol_atoms": 6.992291987544906e-05,
+      "input_mol_atoms_by_element": {},
+      "terminal_mol_atoms_by_element": {},
+      "cumulative_mol_atoms_by_element": {
+        "C": 2.2737367544323206e-13
+      },
+      "terminal_mol_atoms_by_account": {}
+    },
+    "closure": {
+      "limit_fraction": 5e-14,
+      "rows": [
+        {
+          "element": "Al",
+          "input_mol_atoms": 377.9337629095206,
+          "terminal_mol_atoms": 377.9337629095206,
+          "residual_fraction": 0.0,
+          "residual_mol_atoms": 0.0
+        },
+        {
+          "element": "C",
+          "input_mol_atoms": 2715.894325696101,
+          "terminal_mol_atoms": 2715.894325696101,
+          "residual_fraction": 0.0,
+          "residual_mol_atoms": 0.0
+        },
+        {
+          "element": "Ca",
+          "input_mol_atoms": 395.10173241992715,
+          "terminal_mol_atoms": 395.10173241992715,
+          "residual_fraction": 0.0,
+          "residual_mol_atoms": 0.0
+        },
+        {
+          "element": "Fe",
+          "input_mol_atoms": 3218.152293899655,
+          "terminal_mol_atoms": 3218.152293899655,
+          "residual_fraction": 0.0,
+          "residual_mol_atoms": 0.0
+        },
+        {
+          "element": "H",
+          "input_mol_atoms": 20173.78345500588,
+          "terminal_mol_atoms": 20173.78345500588,
+          "residual_fraction": 0.0,
+          "residual_mol_atoms": 0.0
+        },
+        {
+          "element": "Mg",
+          "input_mol_atoms": 4675.098042990033,
+          "terminal_mol_atoms": 4675.098042990033,
+          "residual_fraction": 0.0,
+          "residual_mol_atoms": 0.0
+        },
+        {
+          "element": "N",
+          "input_mol_atoms": 142.4296757926701,
+          "terminal_mol_atoms": 142.4296757926701,
+          "residual_fraction": 0.0,
+          "residual_mol_atoms": 0.0
+        },
+        {
+          "element": "Na",
+          "input_mol_atoms": 171.75490285474424,
+          "terminal_mol_atoms": 171.75490285474424,
+          "residual_fraction": 0.0,
+          "residual_mol_atoms": 0.0
+        },
+        {
+          "element": "Ni",
+          "input_mol_atoms": 206.36185511326167,
+          "terminal_mol_atoms": 206.36185511326167,
+          "residual_fraction": 0.0,
+          "residual_mol_atoms": 0.0
+        },
+        {
+          "element": "O",
+          "input_mol_atoms": 31984.149730881058,
+          "terminal_mol_atoms": 31984.14973088106,
+          "residual_fraction": 1.1374317709559755e-16,
+          "residual_mol_atoms": 3.637978807091713e-12
+        },
+        {
+          "element": "S",
+          "input_mol_atoms": 1244.5492631490517,
+          "terminal_mol_atoms": 1244.5492631490517,
+          "residual_fraction": 0.0,
+          "residual_mol_atoms": 0.0
+        },
+        {
+          "element": "Si",
+          "input_mol_atoms": 4617.710834737149,
+          "terminal_mol_atoms": 4617.710834737149,
+          "residual_fraction": 0.0,
+          "residual_mol_atoms": 0.0
+        }
+      ],
+      "maximum_residual_fraction": 1.1374317709559755e-16,
+      "origin_dust_limit_mol_atoms": 6.992291987544906e-05,
+      "maximum_residual_mol_atoms": 3.637978807091713e-12,
+      "maximum_feedstock_origin_attribution_residual_fraction": 2.220446049250313e-16,
+      "maximum_feedstock_origin_attribution_residual_mol_atoms": 3.637978807091713e-12
+    }
+  },
   "product_classification": {
     "classification": {
       "metals_plus_O2": {

@@ -347,7 +347,8 @@ def test_electrolysis_step_provider_populates_control_audit(
     # against (else it short-circuits via _empty_result).  The kg amount
     # passes the 1e-6 kg gate inside the provider.
     sim.atom_ledger.load_external_mol(
-        "process.cleaned_melt", {"FeO": 5.0}, source="test seed"
+        "process.cleaned_melt", {"FeO": 5.0}, source="test seed",
+        material_origin="feedstock",
     )
     result = sim._chem_kernel.dispatch(
         ChemistryIntent.ELECTROLYSIS_STEP,

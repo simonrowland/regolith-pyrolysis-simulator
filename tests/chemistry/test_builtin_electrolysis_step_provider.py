@@ -455,10 +455,12 @@ def test_kernel_filters_provider_to_declared_accounts_only(
     )
     # Seed an unrelated account so the filter has something to filter.
     sim.atom_ledger.load_external(
-        "process.overhead_gas", {"Na": 0.5}, source="test seed"
+        "process.overhead_gas", {"Na": 0.5}, source="test seed",
+        material_origin="feedstock",
     )
     sim.atom_ledger.load_external(
-        "process.condensation_train", {"Fe": 0.5}, source="test seed"
+        "process.condensation_train", {"Fe": 0.5}, source="test seed",
+        material_origin="feedstock",
     )
 
     seen_accounts: list[frozenset[str]] = []
@@ -658,7 +660,8 @@ def test_kress91_diagnostic_is_golden_neutral_for_provider_transition(
     }
     sim.atom_ledger = sim._new_atom_ledger()
     sim.atom_ledger.load_external_mol(
-        "process.cleaned_melt", melt_mol, source="test seed"
+        "process.cleaned_melt", melt_mol, source="test seed",
+        material_origin="feedstock",
     )
     sim._chem_kernel = sim._build_chemistry_kernel()
     sim._project_extraction_melt()
@@ -785,6 +788,7 @@ def test_mre_current_partition_refuses_uncertified_multi_oxide_yield(
             "SiO2": 10.0 / (MOLAR_MASS["SiO2"] / 1000.0),
         },
         source="test seed",
+        material_origin="feedstock",
     )
     sim._project_extraction_melt()
     legacy = sim.electrolysis_model.step_hour(
@@ -880,6 +884,7 @@ def test_non_authoritative_feo_fallback_cannot_erase_negative_raw_margin(
         "process.cleaned_melt",
         {"FeO": feo_mol},
         source="negative raw MRE margin test seed",
+        material_origin="feedstock",
     )
     sim._project_extraction_melt()
     legacy = sim.electrolysis_model.step_hour(
@@ -1207,7 +1212,8 @@ def _dispatch_provider_and_legacy_for_pure_oxide(
     sim.atom_ledger = sim._new_atom_ledger()
     oxide_mol = oxide_kg / (MOLAR_MASS[oxide] / 1000.0)
     sim.atom_ledger.load_external_mol(
-        "process.cleaned_melt", {oxide: oxide_mol}, source="test seed"
+        "process.cleaned_melt", {oxide: oxide_mol}, source="test seed",
+        material_origin="feedstock",
     )
     sim._chem_kernel = sim._build_chemistry_kernel()
     sim._project_extraction_melt()
@@ -1526,7 +1532,8 @@ def test_provider_matches_legacy_step_hour_pure_feo(
     sim.atom_ledger = sim._new_atom_ledger()
     feo_mol = 1000.0 / (MOLAR_MASS["FeO"] / 1000.0)
     sim.atom_ledger.load_external_mol(
-        "process.cleaned_melt", {"FeO": feo_mol}, source="test seed"
+        "process.cleaned_melt", {"FeO": feo_mol}, source="test seed",
+        material_origin="feedstock",
     )
     sim._chem_kernel = sim._build_chemistry_kernel()
     sim._project_extraction_melt()
@@ -1644,7 +1651,8 @@ def test_provider_reduces_nio_to_nickel_and_anode_oxygen(
     sim.atom_ledger = sim._new_atom_ledger()
     nio_initial_mol = 10.0 / (MOLAR_MASS["NiO"] / 1000.0)
     sim.atom_ledger.load_external_mol(
-        "process.cleaned_melt", {"NiO": nio_initial_mol}, source="test seed"
+        "process.cleaned_melt", {"NiO": nio_initial_mol}, source="test seed",
+        material_origin="feedstock",
     )
     sim._chem_kernel = sim._build_chemistry_kernel()
     sim._project_extraction_melt()
@@ -1738,6 +1746,7 @@ def test_provider_matches_legacy_feo_partition_with_ferric_present(
             "Fe2O3": 10.0 / (MOLAR_MASS["Fe2O3"] / 1000.0),
         },
         source="test seed",
+        material_origin="feedstock",
     )
     sim._chem_kernel = sim._build_chemistry_kernel()
     sim._project_extraction_melt()
@@ -1809,7 +1818,8 @@ def test_low_po2_backpressure_can_cross_c5_mre_decomposition_gate(
     sim.atom_ledger = sim._new_atom_ledger()
     sio2_mol = 1000.0 / (MOLAR_MASS["SiO2"] / 1000.0)
     sim.atom_ledger.load_external_mol(
-        "process.cleaned_melt", {"SiO2": sio2_mol}, source="test seed"
+        "process.cleaned_melt", {"SiO2": sio2_mol}, source="test seed",
+        material_origin="feedstock",
     )
     sim._chem_kernel = sim._build_chemistry_kernel()
     view = ProviderAccountView(
@@ -1866,6 +1876,7 @@ def test_provider_short_circuits_below_voltage(
         # CaO has E0=2.5V; at V=0.1V nothing reduces.
         {"CaO": 1.0 / (MOLAR_MASS["CaO"] / 1000.0)},
         source="test seed",
+        material_origin="feedstock",
     )
     sim._chem_kernel = sim._build_chemistry_kernel()
     provider = BuiltinElectrolysisStepProvider()

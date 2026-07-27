@@ -22,9 +22,9 @@ from simulator.chemistry.kernel.account_filters import build_provider_account_vi
 
 def _ledger_with_accounts() -> AtomLedger:
     ledger = AtomLedger()
-    ledger.load_external("process.cleaned_melt", {"SiO2": 10.0, "FeO": 2.0})
-    ledger.load_external("process.metal_phase", {"Fe": 0.5})
-    ledger.load_external("process.overhead_gas", {"O2": 0.001})
+    ledger.load_external("process.cleaned_melt", {"SiO2": 10.0, "FeO": 2.0}, material_origin="feedstock")
+    ledger.load_external("process.metal_phase", {"Fe": 0.5}, material_origin="feedstock")
+    ledger.load_external("process.overhead_gas", {"O2": 0.001}, material_origin="feedstock")
     return ledger
 
 
@@ -108,7 +108,7 @@ def test_filter_declared_but_empty_account_appears_as_empty_dict():
 
 def test_filter_projects_signed_closure_dust_before_provider_dispatch():
     ledger = AtomLedger()
-    ledger.load_external("process.cleaned_melt", {"FeO": 1.0})
+    ledger.load_external("process.cleaned_melt", {"FeO": 1.0}, material_origin="feedstock")
     ledger.move(
         "provider_view_dust_probe",
         "process.cleaned_melt",

@@ -12,12 +12,12 @@ from simulator.accounting.ledger_api import LEDGER_SCHEMA_VERSION, LedgerAPI
 
 def _api() -> LedgerAPI:
     ledger = AtomLedger()
-    ledger.load_external_mol("process.cleaned_melt", {"SiO2": 2.0, "CaO": 1.0})
-    ledger.load_external_mol("process.metal_phase_float_layer", {"Al": 4.0})
-    ledger.load_external_mol("process.metal_phase_bottom_pool", {"Fe": 5.0})
-    ledger.load_external_mol("terminal.oxygen_melt_offgas_stored", {"O2": 6.0})
-    ledger.load_external_mol("terminal.oxygen_melt_offgas_captured", {"O2": 7.0})
-    ledger.load_external_mol("terminal.oxygen_melt_offgas_vented_to_vacuum", {"O2": 8.0})
+    ledger.load_external_mol("process.cleaned_melt", {"SiO2": 2.0, "CaO": 1.0}, material_origin="feedstock")
+    ledger.load_external_mol("process.metal_phase_float_layer", {"Al": 4.0}, material_origin="feedstock")
+    ledger.load_external_mol("process.metal_phase_bottom_pool", {"Fe": 5.0}, material_origin="feedstock")
+    ledger.load_external_mol("terminal.oxygen_melt_offgas_stored", {"O2": 6.0}, material_origin="feedstock")
+    ledger.load_external_mol("terminal.oxygen_melt_offgas_captured", {"O2": 7.0}, material_origin="feedstock")
+    ledger.load_external_mol("terminal.oxygen_melt_offgas_vented_to_vacuum", {"O2": 8.0}, material_origin="feedstock")
     ledger.set_account_policy(
         "reservoir.fo2_buffer",
         AccountPolicy.reservoir("reservoir.fo2_buffer"),

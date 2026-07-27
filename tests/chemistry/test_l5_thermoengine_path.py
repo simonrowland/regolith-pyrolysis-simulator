@@ -160,6 +160,7 @@ def test_l5_thermoengine_excludes_overhead_metal_products_from_backend_inputs(
         "process.overhead_gas",
         {"Fe": 1.0},
         source="test post-native-vapor overhead product",
+        material_origin="feedstock",
     )
 
     overhead = sim.atom_ledger.mol_by_account("process.overhead_gas")

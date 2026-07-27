@@ -127,7 +127,8 @@ def test_kernel_filters_provider_to_declared_accounts_only(
         setpoints_data,
     )
     sim.atom_ledger.load_external(
-        "process.metal_phase", {"Fe": 0.5}, source="test seed"
+        "process.metal_phase", {"Fe": 0.5}, source="test seed",
+        material_origin="feedstock",
     )
 
     seen_accounts: list[frozenset[str]] = []
@@ -241,7 +242,8 @@ def test_kernel_commit_accepts_balanced_proposal(
     # stock; without this the AtomLedger.apply may reject the negative
     # balance.
     sim.atom_ledger.load_external_mol(
-        "process.cleaned_melt", {"Na2O": 1.0}, source="test seed"
+        "process.cleaned_melt", {"Na2O": 1.0}, source="test seed",
+        material_origin="feedstock",
     )
 
     balanced_proposal = LedgerTransitionProposal(

@@ -80,12 +80,14 @@ def test_cistern_liquid_inventory_accepts_only_o2() -> None:
     ledger.load_external_mol(
         OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT,
         {"O2": 1.0},
+        material_origin="feedstock",
     )
 
     with pytest.raises(AccountingError, match="only accepts species: O2"):
         ledger.load_external_mol(
             OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT,
             {"N2": 1.0},
+            material_origin="feedstock",
         )
 
 
@@ -127,7 +129,7 @@ def _commit(ledger: AtomLedger, proposal: LedgerTransitionProposal) -> None:
 
 def _assert_valid_kernel_control() -> None:
     ledger = AtomLedger()
-    ledger.load_external_mol("process.cleaned_melt", {"SiO2": 1.0})
+    ledger.load_external_mol("process.cleaned_melt", {"SiO2": 1.0}, material_origin="feedstock")
     _commit(
         ledger,
         LedgerTransitionProposal(
@@ -141,7 +143,7 @@ def _assert_valid_kernel_control() -> None:
 def _direct_overdraft_normal() -> tuple[Action, Action, type[BaseException]]:
     def valid() -> None:
         ledger = AtomLedger()
-        ledger.load_external("process.cleaned_melt", {"SiO2": 1.0})
+        ledger.load_external("process.cleaned_melt", {"SiO2": 1.0}, material_origin="feedstock")
         ledger.move(
             "valid_normal_debit",
             "process.cleaned_melt",
@@ -151,7 +153,7 @@ def _direct_overdraft_normal() -> tuple[Action, Action, type[BaseException]]:
 
     def invalid() -> None:
         ledger = AtomLedger()
-        ledger.load_external("process.cleaned_melt", {"SiO2": 1.0})
+        ledger.load_external("process.cleaned_melt", {"SiO2": 1.0}, material_origin="feedstock")
         ledger.move(
             "normal_overdraft",
             "process.cleaned_melt",
@@ -231,7 +233,7 @@ def _direct_reservoir_no_limit() -> tuple[Action, Action, type[BaseException]]:
 def _direct_terminal_disallowed_species() -> tuple[Action, Action, type[BaseException]]:
     def valid() -> None:
         ledger = AtomLedger()
-        ledger.load_external("process.cleaned_melt", {"O2": 1.0})
+        ledger.load_external("process.cleaned_melt", {"O2": 1.0}, material_origin="feedstock")
         ledger.transfer(
             "valid_oxygen_storage",
             debits=(MaterialLot("process.cleaned_melt", {"O2": 1.0}),),
@@ -242,7 +244,7 @@ def _direct_terminal_disallowed_species() -> tuple[Action, Action, type[BaseExce
 
     def invalid() -> None:
         ledger = AtomLedger()
-        ledger.load_external("process.cleaned_melt", {"N2": 1.0})
+        ledger.load_external("process.cleaned_melt", {"N2": 1.0}, material_origin="feedstock")
         ledger.transfer(
             "bad_oxygen_storage_species",
             debits=(MaterialLot("process.cleaned_melt", {"N2": 1.0}),),
@@ -260,6 +262,7 @@ def _direct_terminal_debit_forbidden() -> tuple[Action, Action, type[BaseExcepti
         ledger.load_external(
             "terminal.oxygen_melt_offgas_stored",
             {"O2": 1.0},
+            material_origin="feedstock",
         )
         ledger.move(
             "valid_terminal_oxygen_vent",
@@ -270,7 +273,7 @@ def _direct_terminal_debit_forbidden() -> tuple[Action, Action, type[BaseExcepti
 
     def invalid() -> None:
         ledger = AtomLedger()
-        ledger.load_external("terminal.offgas", {"H2O": 1.0})
+        ledger.load_external("terminal.offgas", {"H2O": 1.0}, material_origin="feedstock")
         ledger.move(
             "bad_terminal_reversal",
             "terminal.offgas",
@@ -284,7 +287,7 @@ def _direct_terminal_debit_forbidden() -> tuple[Action, Action, type[BaseExcepti
 def _direct_atom_imbalance() -> tuple[Action, Action, type[BaseException]]:
     def valid() -> None:
         ledger = AtomLedger()
-        ledger.load_external("process.cleaned_melt", {"SiO2": 1.0})
+        ledger.load_external("process.cleaned_melt", {"SiO2": 1.0}, material_origin="feedstock")
         ledger.apply(
             LedgerTransition(
                 "valid_atom_balance",
@@ -295,7 +298,7 @@ def _direct_atom_imbalance() -> tuple[Action, Action, type[BaseException]]:
 
     def invalid() -> None:
         ledger = AtomLedger()
-        ledger.load_external("process.cleaned_melt", {"H2O": 1.0})
+        ledger.load_external("process.cleaned_melt", {"H2O": 1.0}, material_origin="feedstock")
         ledger.apply(
             LedgerTransition(
                 "atom_imbalance",
@@ -310,7 +313,7 @@ def _direct_atom_imbalance() -> tuple[Action, Action, type[BaseException]]:
 def _direct_mass_imbalance() -> tuple[Action, Action, type[BaseException]]:
     def valid() -> None:
         ledger = AtomLedger()
-        ledger.load_external("process.cleaned_melt", {"SiO2": 2.0})
+        ledger.load_external("process.cleaned_melt", {"SiO2": 2.0}, material_origin="feedstock")
         ledger.apply(
             LedgerTransition(
                 "valid_mass_balance",
@@ -321,7 +324,7 @@ def _direct_mass_imbalance() -> tuple[Action, Action, type[BaseException]]:
 
     def invalid() -> None:
         ledger = AtomLedger()
-        ledger.load_external("process.cleaned_melt", {"SiO2": 2.0})
+        ledger.load_external("process.cleaned_melt", {"SiO2": 2.0}, material_origin="feedstock")
         ledger.apply(
             LedgerTransition(
                 "mass_imbalance",
@@ -335,20 +338,20 @@ def _direct_mass_imbalance() -> tuple[Action, Action, type[BaseException]]:
 
 def _direct_nonfinite_load() -> tuple[Action, Action, type[BaseException]]:
     def valid() -> None:
-        AtomLedger().load_external("process.cleaned_melt", {"SiO2": 1.0})
+        AtomLedger().load_external("process.cleaned_melt", {"SiO2": 1.0}, material_origin="feedstock")
 
     def invalid() -> None:
-        AtomLedger().load_external("process.cleaned_melt", {"SiO2": math.inf})
+        AtomLedger().load_external("process.cleaned_melt", {"SiO2": math.inf}, material_origin="feedstock")
 
     return valid, invalid, AccountingError
 
 
 def _direct_negative_load() -> tuple[Action, Action, type[BaseException]]:
     def valid() -> None:
-        AtomLedger().load_external("process.cleaned_melt", {"SiO2": 1.0})
+        AtomLedger().load_external("process.cleaned_melt", {"SiO2": 1.0}, material_origin="feedstock")
 
     def invalid() -> None:
-        AtomLedger().load_external("process.cleaned_melt", {"SiO2": -1.0})
+        AtomLedger().load_external("process.cleaned_melt", {"SiO2": -1.0}, material_origin="feedstock")
 
     return valid, invalid, AccountingError
 
@@ -356,7 +359,7 @@ def _direct_negative_load() -> tuple[Action, Action, type[BaseException]]:
 def _direct_unknown_species() -> tuple[Action, Action, type[BaseException]]:
     def valid() -> None:
         ledger = AtomLedger()
-        ledger.load_external("process.cleaned_melt", {"SiO2": 1.0})
+        ledger.load_external("process.cleaned_melt", {"SiO2": 1.0}, material_origin="feedstock")
         ledger.transfer(
             "valid_known_species",
             debits=(MaterialLot("process.cleaned_melt", {"SiO2": 1.0}),),
@@ -377,7 +380,7 @@ def _direct_unknown_species() -> tuple[Action, Action, type[BaseException]]:
 def _direct_unknown_account_strict() -> tuple[Action, Action, type[BaseException]]:
     def valid() -> None:
         ledger = _strict_ledger()
-        ledger.load_external("process.cleaned_melt", {"SiO2": 1.0})
+        ledger.load_external("process.cleaned_melt", {"SiO2": 1.0}, material_origin="feedstock")
         ledger.transfer(
             "valid_known_account",
             debits=(MaterialLot("process.cleaned_melt", {"SiO2": 0.5}),),
@@ -386,7 +389,7 @@ def _direct_unknown_account_strict() -> tuple[Action, Action, type[BaseException
 
     def invalid() -> None:
         ledger = _strict_ledger()
-        ledger.load_external("process.cleaned_melt", {"SiO2": 1.0})
+        ledger.load_external("process.cleaned_melt", {"SiO2": 1.0}, material_origin="feedstock")
         ledger.transfer(
             "unknown_account",
             debits=(MaterialLot("process.cleaned_melt", {"SiO2": 0.5}),),
@@ -430,7 +433,7 @@ def _kernel_overdraft_normal() -> tuple[Action, Action, type[BaseException]]:
 
     def invalid() -> None:
         ledger = AtomLedger()
-        ledger.load_external_mol("process.cleaned_melt", {"SiO2": 1.0})
+        ledger.load_external_mol("process.cleaned_melt", {"SiO2": 1.0}, material_origin="feedstock")
         _commit(
             ledger,
             LedgerTransitionProposal(
@@ -520,7 +523,7 @@ def _kernel_reservoir_no_limit() -> tuple[Action, Action, type[BaseException]]:
 def _kernel_terminal_disallowed_species() -> tuple[Action, Action, type[BaseException]]:
     def valid() -> None:
         ledger = AtomLedger()
-        ledger.load_external_mol("process.cleaned_melt", {"O2": 1.0})
+        ledger.load_external_mol("process.cleaned_melt", {"O2": 1.0}, material_origin="feedstock")
         _commit(
             ledger,
             LedgerTransitionProposal(
@@ -532,7 +535,7 @@ def _kernel_terminal_disallowed_species() -> tuple[Action, Action, type[BaseExce
 
     def invalid() -> None:
         ledger = AtomLedger()
-        ledger.load_external_mol("process.cleaned_melt", {"N2": 1.0})
+        ledger.load_external_mol("process.cleaned_melt", {"N2": 1.0}, material_origin="feedstock")
         _commit(
             ledger,
             LedgerTransitionProposal(
@@ -548,7 +551,7 @@ def _kernel_terminal_disallowed_species() -> tuple[Action, Action, type[BaseExce
 def _kernel_terminal_debit_forbidden() -> tuple[Action, Action, type[BaseException]]:
     def valid() -> None:
         ledger = AtomLedger()
-        ledger.load_external_mol("terminal.oxygen_melt_offgas_stored", {"O2": 1.0})
+        ledger.load_external_mol("terminal.oxygen_melt_offgas_stored", {"O2": 1.0}, material_origin="feedstock")
         _commit(
             ledger,
             LedgerTransitionProposal(
@@ -562,7 +565,7 @@ def _kernel_terminal_debit_forbidden() -> tuple[Action, Action, type[BaseExcepti
 
     def invalid() -> None:
         ledger = AtomLedger()
-        ledger.load_external_mol("terminal.offgas", {"H2O": 1.0})
+        ledger.load_external_mol("terminal.offgas", {"H2O": 1.0}, material_origin="feedstock")
         _commit(
             ledger,
             LedgerTransitionProposal(
@@ -581,7 +584,7 @@ def _kernel_atom_imbalance() -> tuple[Action, Action, type[BaseException]]:
 
     def invalid() -> None:
         ledger = AtomLedger()
-        ledger.load_external_mol("process.cleaned_melt", {"H2O": 1.0})
+        ledger.load_external_mol("process.cleaned_melt", {"H2O": 1.0}, material_origin="feedstock")
         _commit(
             ledger,
             LedgerTransitionProposal(
@@ -600,7 +603,7 @@ def _kernel_mass_imbalance() -> tuple[Action, Action, type[BaseException]]:
 
     def invalid() -> None:
         ledger = AtomLedger()
-        ledger.load_external_mol("process.cleaned_melt", {"SiO2": 2.0})
+        ledger.load_external_mol("process.cleaned_melt", {"SiO2": 2.0}, material_origin="feedstock")
         _commit(
             ledger,
             LedgerTransitionProposal(
@@ -652,7 +655,7 @@ def _kernel_unknown_species() -> tuple[Action, Action, type[BaseException]]:
 def _kernel_unknown_account_strict() -> tuple[Action, Action, type[BaseException]]:
     def valid() -> None:
         ledger = _strict_ledger()
-        ledger.load_external_mol("process.cleaned_melt", {"SiO2": 1.0})
+        ledger.load_external_mol("process.cleaned_melt", {"SiO2": 1.0}, material_origin="feedstock")
         _commit(
             ledger,
             LedgerTransitionProposal(
@@ -664,7 +667,7 @@ def _kernel_unknown_account_strict() -> tuple[Action, Action, type[BaseException
 
     def invalid() -> None:
         ledger = _strict_ledger()
-        ledger.load_external_mol("process.cleaned_melt", {"SiO2": 1.0})
+        ledger.load_external_mol("process.cleaned_melt", {"SiO2": 1.0}, material_origin="feedstock")
         _commit(
             ledger,
             LedgerTransitionProposal(
@@ -738,9 +741,9 @@ def test_ledger_transition_proposal_rejects_nonfinite_construction(
 def test_strict_allowlist_accepts_known_accounts_and_dynamic_prefixes() -> None:
     ledger = _strict_ledger()
 
-    ledger.load_external("process.cleaned_melt", {"SiO2": 1.0})
-    ledger.load_external("process.wall_deposit_segment_001", {"SiO2": 0.25})
-    ledger.load_external("reservoir.reagent.K", {"K": 0.25})
+    ledger.load_external("process.cleaned_melt", {"SiO2": 1.0}, material_origin="feedstock")
+    ledger.load_external("process.wall_deposit_segment_001", {"SiO2": 0.25}, material_origin="feedstock")
+    ledger.load_external("reservoir.reagent.K", {"K": 0.25}, material_origin="reagent")
     ledger.set_account_policy(
         "reservoir.reagent.C",
         AccountPolicy.reservoir(
@@ -750,7 +753,7 @@ def test_strict_allowlist_accepts_known_accounts_and_dynamic_prefixes() -> None:
     )
 
     with pytest.raises(AccountingError, match="unknown ledger account"):
-        ledger.load_external("process.typo_account", {"SiO2": 0.25})
+        ledger.load_external("process.typo_account", {"SiO2": 0.25}, material_origin="feedstock")
     with pytest.raises(AccountingError, match="unknown ledger account"):
         ledger.set_account_policy("process.typo_account", "normal")
 
@@ -763,7 +766,7 @@ def test_overdraft_tolerance_boundary_apply_and_kernel_commit_batch() -> None:
     beyond_extra_mol = relative_tolerance * 2.0
 
     ledger = AtomLedger()
-    ledger.load_external("process.cleaned_melt", {"SiO2": 1.0})
+    ledger.load_external("process.cleaned_melt", {"SiO2": 1.0}, material_origin="feedstock")
     ledger.transfer(
         "within_apply_overdraft_tolerance",
         debits=(
@@ -781,7 +784,7 @@ def test_overdraft_tolerance_boundary_apply_and_kernel_commit_batch() -> None:
     )
 
     ledger = AtomLedger()
-    ledger.load_external("process.cleaned_melt", {"SiO2": 1.0})
+    ledger.load_external("process.cleaned_melt", {"SiO2": 1.0}, material_origin="feedstock")
     with pytest.raises(OverdraftError):
         ledger.transfer(
             "beyond_apply_overdraft_tolerance",
@@ -800,7 +803,7 @@ def test_overdraft_tolerance_boundary_apply_and_kernel_commit_batch() -> None:
         )
 
     ledger = AtomLedger()
-    ledger.load_external_mol("process.cleaned_melt", {"SiO2": 1.0})
+    ledger.load_external_mol("process.cleaned_melt", {"SiO2": 1.0}, material_origin="feedstock")
     _commit(
         ledger,
         LedgerTransitionProposal(
@@ -811,7 +814,7 @@ def test_overdraft_tolerance_boundary_apply_and_kernel_commit_batch() -> None:
     )
 
     ledger = AtomLedger()
-    ledger.load_external_mol("process.cleaned_melt", {"SiO2": 1.0})
+    ledger.load_external_mol("process.cleaned_melt", {"SiO2": 1.0}, material_origin="feedstock")
     with pytest.raises(ProposalRejected):
         _commit(
             ledger,
@@ -825,7 +828,7 @@ def test_overdraft_tolerance_boundary_apply_and_kernel_commit_batch() -> None:
 
 def test_mass_tolerance_boundary_on_apply() -> None:
     ledger = AtomLedger(atom_tolerance_mol=1e9)
-    ledger.load_external("process.cleaned_melt", {"H2O": 2.0})
+    ledger.load_external("process.cleaned_melt", {"H2O": 2.0}, material_origin="feedstock")
     ledger.apply(
         LedgerTransition(
             "within_mass_tolerance",
@@ -840,7 +843,7 @@ def test_mass_tolerance_boundary_on_apply() -> None:
     )
 
     ledger = AtomLedger(atom_tolerance_mol=1e9)
-    ledger.load_external("process.cleaned_melt", {"H2O": 2.0})
+    ledger.load_external("process.cleaned_melt", {"H2O": 2.0}, material_origin="feedstock")
     with pytest.raises(UnbalancedTransitionError, match="does not conserve mass"):
         ledger.apply(
             LedgerTransition(
@@ -858,7 +861,7 @@ def test_mass_tolerance_boundary_on_apply() -> None:
 
 def test_element_atom_drift_reports_accepted_sub_tolerance_residual() -> None:
     ledger = AtomLedger()
-    ledger.load_external_mol("process.cleaned_melt", {"Si": 2.0})
+    ledger.load_external_mol("process.cleaned_melt", {"Si": 2.0}, material_origin="feedstock")
     residual_mol_atoms = 0.5e-6
 
     ledger.apply(
@@ -887,7 +890,7 @@ def test_element_atom_drift_reports_accepted_sub_tolerance_residual() -> None:
 
 def test_element_atom_drift_boundary_catches_pretransition_discard() -> None:
     ledger = AtomLedger()
-    ledger.load_external_mol("process.cleaned_melt", {"Si": 2.0})
+    ledger.load_external_mol("process.cleaned_melt", {"Si": 2.0}, material_origin="feedstock")
     residual_mol_atoms = 0.5e-6
 
     # Deliberate corruption models material discarded before a transition exists.
@@ -905,7 +908,7 @@ def test_balanced_transition_retains_sub_tolerance_remainder_without_mass_loss()
     initial_kg = 1.0e-8
     remainder_kg = 8.854e-15
     moved_kg = initial_kg - remainder_kg
-    ledger.load_external("process.overhead_gas", {"Cr": initial_kg})
+    ledger.load_external("process.overhead_gas", {"Cr": initial_kg}, material_origin="feedstock")
 
     ledger.move(
         "synthetic_condense_Cr",
@@ -927,7 +930,7 @@ def test_balanced_transition_retains_sub_tolerance_remainder_without_mass_loss()
 
 def test_small_account_relative_overdraft_is_not_hidden_by_display_floor() -> None:
     ledger = AtomLedger()
-    ledger.load_external("process.cleaned_melt", {"SiO2": 1.1e-12})
+    ledger.load_external("process.cleaned_melt", {"SiO2": 1.1e-12}, material_origin="feedstock")
 
     with pytest.raises(OverdraftError):
         ledger.move(
@@ -946,7 +949,7 @@ def test_small_account_relative_overdraft_is_not_hidden_by_display_floor() -> No
 
 def test_projection_clamp_boundary_uses_relative_scale_with_absolute_floor() -> None:
     ledger = AtomLedger()
-    ledger.load_external("process.cleaned_melt", {"SiO2": 1.0})
+    ledger.load_external("process.cleaned_melt", {"SiO2": 1.0}, material_origin="feedstock")
     tolerance_kg = ledger._projection_tolerance_kg(
         "process.cleaned_melt",
         "SiO2",
@@ -1002,7 +1005,7 @@ def test_ledger_rejects_nonfinite_or_negative_tolerances(
 
 def test_default_tolerances_cannot_admit_hydrogen_to_oxygen_conversion() -> None:
     ledger = AtomLedger()
-    ledger.load_external("process.cleaned_melt", {"H2": 1.0})
+    ledger.load_external("process.cleaned_melt", {"H2": 1.0}, material_origin="feedstock")
 
     # Equal mass does not conserve elements: H2 contributes only H atoms,
     # while O2 contributes only O atoms, so neither elemental total cancels.
@@ -1036,7 +1039,7 @@ def test_failed_policy_replacement_restores_previous_reservoir_policy() -> None:
 
 def test_explicit_empty_move_credit_is_not_replaced_by_debit_species() -> None:
     ledger = AtomLedger()
-    ledger.load_external("process.cleaned_melt", {"SiO2": 1.0})
+    ledger.load_external("process.cleaned_melt", {"SiO2": 1.0}, material_origin="feedstock")
 
     with pytest.raises(UnbalancedTransitionError):
         ledger.move(

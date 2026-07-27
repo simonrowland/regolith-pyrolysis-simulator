@@ -163,6 +163,7 @@ def test_ci_lance_first_oxidizes_char_to_co2_and_clears_inventory() -> None:
         "reservoir.fo2_buffer",
         {"O2": char_before},
         source="test lance dose",
+        material_origin="reagent",
     )
     diag = sim._apply_char_lance_oxidation(o2_available_mol=char_before)
     assert diag["extent_mol"] == pytest.approx(char_before)
@@ -188,6 +189,7 @@ def test_unlanced_char_warns_when_susceptible_oxide_is_present() -> None:
         "process.cleaned_melt",
         {"P2O5": 0.1},
         source="test susceptible oxide",
+        material_origin="feedstock",
     )
     sim.melt.temperature_C = FEO_CHAR_REDUCTION_MIN_T_C - 50.0
     diag = sim._apply_char_feo_reduction()
@@ -282,7 +284,8 @@ def test_co_basis_lance_uses_half_mole_o2_per_mole_char(monkeypatch) -> None:
     )
     o2_mol = 0.5 * half_char
     sim.atom_ledger.load_external_mol(
-        "reservoir.fo2_buffer", {"O2": o2_mol}, source="test CO-basis lance"
+        "reservoir.fo2_buffer", {"O2": o2_mol}, source="test CO-basis lance",
+        material_origin="reagent",
     )
 
     diagnostic = sim._apply_char_lance_oxidation(o2_available_mol=o2_mol)
@@ -386,6 +389,7 @@ def test_partial_lance_leaves_unlanced_char_for_feo_reduction() -> None:
         "reservoir.fo2_buffer",
         {"O2": half},
         source="test half lance",
+        material_origin="reagent",
     )
     lance = sim._apply_char_lance_oxidation(o2_available_mol=half)
     assert lance["extent_mol"] == pytest.approx(half)

@@ -272,7 +272,7 @@ def _dispatch_commit_proposal(kernel: ChemistryKernel) -> LedgerTransitionPropos
 
 def test_commit_batch_is_sole_writer_and_applies_transition():
     ledger = AtomLedger()
-    ledger.load_external_mol("process.cleaned_melt", {"SiO2": 1.0})
+    ledger.load_external_mol("process.cleaned_melt", {"SiO2": 1.0}, material_origin="feedstock")
     registry = ProviderRegistry()
     registry.register(_CommitProvider(), [ChemistryIntent.EVAPORATION_TRANSITION])
     kernel = ChemistryKernel(ledger, registry, species_formula_registry={})
@@ -306,7 +306,7 @@ def test_commit_batch_is_sole_writer_and_applies_transition():
 
 def test_fallback_proposal_commits_against_its_bound_provider_profile():
     ledger = AtomLedger()
-    ledger.load_external_mol("process.cleaned_melt", {"SiO2": 0.25})
+    ledger.load_external_mol("process.cleaned_melt", {"SiO2": 0.25}, material_origin="feedstock")
     registry = ProviderRegistry()
     registry.register(
         _UnavailableCommitProvider(),
@@ -348,7 +348,7 @@ def test_fallback_proposal_commits_against_its_bound_provider_profile():
 
 def test_off_path_proposal_cannot_borrow_fallback_account_authority():
     ledger = AtomLedger()
-    ledger.load_external_mol("process.cleaned_melt", {"SiO2": 1.0})
+    ledger.load_external_mol("process.cleaned_melt", {"SiO2": 1.0}, material_origin="feedstock")
     registry = ProviderRegistry()
     registry.register(
         _UnavailableCommitProvider(),
@@ -379,7 +379,7 @@ def test_off_path_proposal_cannot_borrow_fallback_account_authority():
 
 def test_shadow_trace_proposal_cannot_borrow_authoritative_commit_slot():
     ledger = AtomLedger()
-    ledger.load_external_mol("process.cleaned_melt", {"SiO2": 1.0})
+    ledger.load_external_mol("process.cleaned_melt", {"SiO2": 1.0}, material_origin="feedstock")
     registry = ProviderRegistry()
     registry.register(_CommitProvider(), [ChemistryIntent.EVAPORATION_TRANSITION])
     registry.register(
@@ -411,7 +411,7 @@ def test_shadow_trace_proposal_cannot_borrow_authoritative_commit_slot():
 
 def test_commit_materialization_retains_exact_mol_provenance():
     ledger = AtomLedger()
-    ledger.load_external_mol("process.cleaned_melt", {"SiO2": 1.0})
+    ledger.load_external_mol("process.cleaned_melt", {"SiO2": 1.0}, material_origin="feedstock")
     registry = ProviderRegistry()
     registry.register(_CommitProvider(), [ChemistryIntent.EVAPORATION_TRANSITION])
     kernel = ChemistryKernel(ledger, registry, species_formula_registry={})
@@ -434,7 +434,7 @@ def test_commit_materialization_retains_exact_mol_provenance():
 
 def test_committed_nested_metadata_is_detached_and_immutable():
     ledger = AtomLedger()
-    ledger.load_external_mol("process.cleaned_melt", {"SiO2": 1.0})
+    ledger.load_external_mol("process.cleaned_melt", {"SiO2": 1.0}, material_origin="feedstock")
     registry = ProviderRegistry()
     registry.register(_CommitProvider(), [ChemistryIntent.EVAPORATION_TRANSITION])
     kernel = ChemistryKernel(ledger, registry, species_formula_registry={})
@@ -503,7 +503,7 @@ def test_runtime_capability_drift_rejects_before_provider_invocation():
 
 def test_commit_validated_transition_preserves_original_transition_identity():
     ledger = AtomLedger()
-    ledger.load_external_mol("process.cleaned_melt", {"FeO": 1.0})
+    ledger.load_external_mol("process.cleaned_melt", {"FeO": 1.0}, material_origin="feedstock")
     registry = ProviderRegistry()
     registry.register(
         _BackendEquilibriumProvider(),
@@ -546,6 +546,7 @@ def test_commit_validated_transition_aggregates_duplicate_account_lots():
     ledger.load_external_mol(
         "process.cleaned_melt",
         {"FeO": 1.0, "SiO2": 1.0},
+        material_origin="feedstock",
     )
     registry = ProviderRegistry()
     registry.register(
@@ -587,7 +588,7 @@ def test_commit_validated_transition_aggregates_duplicate_account_lots():
 
 def test_commit_batch_rejects_unbound_unbalanced_proposal_before_mutation():
     ledger = AtomLedger()
-    ledger.load_external_mol("process.cleaned_melt", {"SiO2": 1.0})
+    ledger.load_external_mol("process.cleaned_melt", {"SiO2": 1.0}, material_origin="feedstock")
     registry = ProviderRegistry()
     registry.register(_CommitProvider(), [ChemistryIntent.EVAPORATION_TRANSITION])
     kernel = ChemistryKernel(ledger, registry, species_formula_registry={})
@@ -609,7 +610,7 @@ def test_commit_batch_propagates_overdraft_as_proposal_rejected():
     """Pulling more material than the account holds raises ProposalRejected."""
 
     ledger = AtomLedger()
-    ledger.load_external_mol("process.cleaned_melt", {"SiO2": 0.1})
+    ledger.load_external_mol("process.cleaned_melt", {"SiO2": 0.1}, material_origin="feedstock")
     registry = ProviderRegistry()
     registry.register(_CommitProvider(), [ChemistryIntent.EVAPORATION_TRANSITION])
     kernel = ChemistryKernel(ledger, registry, species_formula_registry={})
@@ -634,7 +635,7 @@ def test_commit_batch_rechecks_account_filter_against_current_profile():
     """Commit-time account filtering still catches post-dispatch drift."""
 
     ledger = AtomLedger()
-    ledger.load_external_mol("process.cleaned_melt", {"SiO2": 1.0})
+    ledger.load_external_mol("process.cleaned_melt", {"SiO2": 1.0}, material_origin="feedstock")
     registry = ProviderRegistry()
     provider = _AccountDriftProvider()
     registry.register(provider, [ChemistryIntent.EVAPORATION_TRANSITION])
@@ -679,7 +680,7 @@ def test_commit_batch_rejects_dispatch_proposal_after_provider_unregistered():
     """A live proposal cannot outlive the registry slot that produced it."""
 
     ledger = AtomLedger()
-    ledger.load_external_mol("process.cleaned_melt", {"SiO2": 1.0})
+    ledger.load_external_mol("process.cleaned_melt", {"SiO2": 1.0}, material_origin="feedstock")
     registry = ProviderRegistry()
     registry.register(_CommitProvider(), [ChemistryIntent.EVAPORATION_TRANSITION])
     kernel = ChemistryKernel(ledger, registry, species_formula_registry={})
@@ -697,7 +698,7 @@ def test_commit_batch_rejects_dispatch_proposal_after_provider_unregistered():
 
 def test_commit_batch_requires_same_provider_object_after_registry_replacement():
     ledger = AtomLedger()
-    ledger.load_external_mol("process.cleaned_melt", {"SiO2": 1.0})
+    ledger.load_external_mol("process.cleaned_melt", {"SiO2": 1.0}, material_origin="feedstock")
     registry = ProviderRegistry()
     original = _CommitProvider()
     registry.register(original, [ChemistryIntent.EVAPORATION_TRANSITION])
@@ -727,7 +728,7 @@ def test_commit_batch_rejects_unauthoritative_intent_with_drifting_profile(monke
     """
 
     ledger = AtomLedger()
-    ledger.load_external_mol("process.cleaned_melt", {"SiO2": 1.0})
+    ledger.load_external_mol("process.cleaned_melt", {"SiO2": 1.0}, material_origin="feedstock")
     registry = ProviderRegistry()
     provider = _CommitProvider()
     registry.register(provider, [ChemistryIntent.EVAPORATION_TRANSITION])

@@ -121,6 +121,7 @@ def test_pn2_sweep_sio_provider_uses_transport_floor_not_holdup_reservoir():
         "process.overhead_gas",
         {OXYGEN_SPECIES: holdup_o2_mol},
         source="test PN2 holdup O2 must not drive SiO transport pO2",
+        material_origin="feedstock",
     )
 
     sim._apply_oxygen_reservoir_exchange()

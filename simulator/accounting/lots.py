@@ -10,10 +10,98 @@ from dataclasses import dataclass, field
 from types import MappingProxyType
 from typing import Any
 
-from simulator.accounting.exceptions import AccountingError
+from simulator.accounting.exceptions import AccountingError, PoolWithdrawalError
 from simulator.accounting.formulas import resolve_species_formula
 
 EMPTY_KG_TOLERANCE = 1e-12
+MATERIAL_ORIGINS = frozenset({"feedstock", "reagent"})
+ATTRIBUTION_METHODS = frozenset({"tracked", "pool_ratio"})
+POOL_WITHDRAWAL_ABSOLUTE_TOLERANCE = 1.0e-18
+POOL_WITHDRAWAL_RELATIVE_TOLERANCE = 5.0e-14
+
+
+def allocate_pool_withdrawal(
+    balances: Mapping[str, float],
+    withdrawal: float,
+    *,
+    absolute_tolerance: float = POOL_WITHDRAWAL_ABSOLUTE_TOLERANCE,
+) -> dict[str, float]:
+    """Allocate one withdrawal over a declared well-mixed pool."""
+
+    available_by_origin: dict[str, float] = {}
+    for origin, raw_amount in balances.items():
+        amount = _pool_number(raw_amount, f"pool balance {origin}")
+        if amount < 0.0:
+            raise PoolWithdrawalError(
+                f"invalid pool balance {origin}={raw_amount!r}"
+            )
+        if amount > 0.0:
+            available_by_origin[str(origin)] = amount
+    try:
+        available = math.fsum(available_by_origin.values())
+    except OverflowError as exc:
+        raise PoolWithdrawalError("pool available balance is non-finite") from exc
+    if not math.isfinite(available):
+        raise PoolWithdrawalError("pool available balance is non-finite")
+    amount = _pool_number(withdrawal, "pool withdrawal")
+    absolute = _pool_number(absolute_tolerance, "pool absolute tolerance")
+    if absolute < 0.0:
+        raise PoolWithdrawalError(
+            f"pool absolute tolerance must be non-negative, got {absolute:.12g}"
+        )
+    tolerance = max(
+        absolute,
+        available * POOL_WITHDRAWAL_RELATIVE_TOLERANCE,
+    )
+    if amount < -tolerance:
+        raise PoolWithdrawalError(
+            f"pool withdrawal must be non-negative, got {amount:.12g}"
+        )
+    if amount > available and amount - available > tolerance:
+        raise PoolWithdrawalError(
+            f"pool withdrawal exceeds available balance: "
+            f"withdrawal={amount:.12g}, available={available:.12g}"
+        )
+    amount = min(max(0.0, amount), available)
+    if amount <= 0.0 or available <= 0.0:
+        return {}
+    result: dict[str, float] = {}
+    ordered = sorted(available_by_origin)
+    for origin in ordered[:-1]:
+        share = amount * (available_by_origin[origin] / available)
+        if not math.isfinite(share):
+            raise PoolWithdrawalError(
+                f"pool withdrawal share for {origin} is non-finite"
+            )
+        result[origin] = share
+    # Pool closure: sum_i(W * I_i / sum(I)) = W; the last share absorbs float dust.
+    try:
+        allocated = math.fsum(result.values())
+    except OverflowError as exc:
+        raise PoolWithdrawalError("pool allocated total is non-finite") from exc
+    final_share = amount - allocated
+    if not math.isfinite(final_share):
+        raise PoolWithdrawalError(
+            f"pool withdrawal share for {ordered[-1]} is non-finite"
+        )
+    result[ordered[-1]] = final_share
+    try:
+        allocated_total = math.fsum(result.values())
+    except OverflowError as exc:
+        raise PoolWithdrawalError("pool allocated total is non-finite") from exc
+    if not math.isfinite(allocated_total):
+        raise PoolWithdrawalError("pool allocated total is non-finite")
+    return result
+
+
+def _pool_number(value: Any, label: str) -> float:
+    try:
+        amount = float(value)
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise PoolWithdrawalError(f"invalid {label}") from exc
+    if not math.isfinite(amount):
+        raise PoolWithdrawalError(f"invalid {label}")
+    return amount
 
 
 class _FrozenMapping(Mapping[Any, Any]):
@@ -80,6 +168,9 @@ class MaterialLot:
     species_kg: Mapping[str, float]
     source: str = ""
     meta: Mapping[str, Any] = field(default_factory=dict)
+    material_origin: str | None = None
+    origin_atom_moles: Mapping[str, Mapping[str, float]] = field(default_factory=dict)
+    attribution_method_by_element: Mapping[str, str] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         account = str(self.account).strip()
@@ -104,16 +195,81 @@ class MaterialLot:
         object.__setattr__(self, "species_kg", MappingProxyType(dict(sorted(normalized.items()))))
         object.__setattr__(self, "source", str(self.source or ""))
         object.__setattr__(self, "meta", _freeze_meta(dict(self.meta or {})))
+        origin = None if self.material_origin is None else str(self.material_origin).strip()
+        if origin not in MATERIAL_ORIGINS | {None}:
+            raise AccountingError(
+                f"material_origin must be one of {sorted(MATERIAL_ORIGINS)}, got {origin!r}"
+            )
+        origin_atoms: dict[str, dict[str, float]] = {}
+        for raw_origin, raw_elements in dict(self.origin_atom_moles or {}).items():
+            typed_origin = str(raw_origin).strip()
+            if typed_origin not in MATERIAL_ORIGINS:
+                raise AccountingError(f"unsupported material origin {typed_origin!r}")
+            if not isinstance(raw_elements, Mapping):
+                raise AccountingError(
+                    f"origin atom allocation for {typed_origin!r} must be a mapping"
+                )
+            elements: dict[str, float] = {}
+            for raw_element, raw_amount in raw_elements.items():
+                element = str(raw_element).strip()
+                amount = float(raw_amount)
+                if not element:
+                    raise AccountingError("origin atom allocation requires an element")
+                if not math.isfinite(amount) or amount < 0.0:
+                    raise AccountingError(
+                        f"origin atom allocation {typed_origin}.{element} "
+                        "must be finite and non-negative"
+                    )
+                if amount > 0.0:
+                    elements[element] = amount
+            if elements:
+                origin_atoms[typed_origin] = dict(sorted(elements.items()))
+        methods: dict[str, str] = {}
+        for raw_element, raw_method in dict(
+            self.attribution_method_by_element or {}
+        ).items():
+            element = str(raw_element).strip()
+            method = str(raw_method).strip()
+            if not element:
+                raise AccountingError("origin attribution requires an element")
+            if method not in ATTRIBUTION_METHODS:
+                raise AccountingError(
+                    f"unsupported origin attribution method {method!r}"
+                )
+            methods[element] = method
+        object.__setattr__(self, "material_origin", origin)
+        object.__setattr__(self, "origin_atom_moles", _freeze_meta(origin_atoms))
+        object.__setattr__(
+            self,
+            "attribution_method_by_element",
+            _freeze_meta(dict(sorted(methods.items()))),
+        )
 
     def without_empty(self, tolerance_kg: float = EMPTY_KG_TOLERANCE) -> "MaterialLot":
         kept = {species: kg for species, kg in self.species_kg.items() if abs(kg) > tolerance_kg}
-        return MaterialLot(self.account, kept, source=self.source, meta=self.meta)
+        return MaterialLot(
+            self.account,
+            kept,
+            source=self.source,
+            meta=self.meta,
+            material_origin=self.material_origin,
+            origin_atom_moles=self.origin_atom_moles,
+            attribution_method_by_element=self.attribution_method_by_element,
+        )
 
     def __reduce__(self) -> tuple[Any, tuple[Any, ...]]:
         """Rebuild immutable views after crossing a pickle boundary."""
         return (
             type(self),
-            (self.account, dict(self.species_kg), self.source, _thaw_meta(self.meta)),
+            (
+                self.account,
+                dict(self.species_kg),
+                self.source,
+                _thaw_meta(self.meta),
+                self.material_origin,
+                _thaw_meta(self.origin_atom_moles),
+                _thaw_meta(self.attribution_method_by_element),
+            ),
         )
 
     def total_mass_kg(self, registry: Mapping[str, Any] | None = None) -> float:

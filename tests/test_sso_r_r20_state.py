@@ -1194,6 +1194,7 @@ def test_c3_na_source_terms_preserve_same_hour_exchange_observables() -> None:
         "process.overhead_gas",
         {"O2": 0.05},
         source="test finite headspace O2 holdup",
+        material_origin="feedstock",
     )
 
     exchange = sim._apply_oxygen_reservoir_exchange()
@@ -1600,6 +1601,7 @@ def test_c7_in_situ_al_route_does_not_double_count_prior_reducing_power(
         "process.metal_phase",
         {"Al": 1000.0},
         source="test in-situ Al inventory",
+        material_origin="feedstock",
     )
     sim.start_campaign(CampaignPhase.C7_CA_ALUMINOTHERMIC)
     sim.melt.temperature_C = 1200.0
@@ -1655,6 +1657,7 @@ def test_c7_mixed_in_situ_and_external_al_counts_only_external_credit_sink(
         "process.metal_phase",
         {"Al": 2.0},
         source="test limited in-situ Al inventory",
+        material_origin="feedstock",
     )
     sim.start_campaign(CampaignPhase.C7_CA_ALUMINOTHERMIC)
     sim.melt.temperature_C = 1200.0
@@ -1782,6 +1785,7 @@ def test_c7_transport_refusal_preserves_preexisting_overhead_ca(monkeypatch) -> 
         "process.overhead_gas",
         {"Ca": 0.25},
         source="test pre-existing C7 overhead calcium",
+        material_origin="feedstock",
     )
     capture_operations: list[str] = []
     dispatch_and_commit = sim._dispatch_and_commit
@@ -1830,6 +1834,7 @@ def test_sio_evaporative_o_loss_source_term_from_committed_transition() -> None:
         "process.overhead_gas",
         {"O2": 0.05},
         source="test finite headspace O2 holdup",
+        material_origin="feedstock",
     )
 
     exchange = sim._apply_oxygen_reservoir_exchange()
@@ -2080,6 +2085,7 @@ def test_headspace_exchange_cannot_instantly_erase_reductant_dose() -> None:
         "process.overhead_gas",
         {"O2": 0.05},
         source="test finite headspace O2 holdup",
+        material_origin="feedstock",
     )
 
     reservoir = sim._apply_oxygen_reservoir_exchange()
@@ -2128,6 +2134,7 @@ def test_fe_redox_respeciation_closes_scalar_ledger_divergence_with_real_o2() ->
         "process.overhead_gas",
         {"O2": 10_000.0},
         source="test explicit headspace oxygen for Fe redox re-speciation",
+        material_origin="feedstock",
     )
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -3.0
     sim._sync_oxygen_reservoir_mirror()
@@ -2190,6 +2197,7 @@ def test_fe_redox_respeciation_uses_evaporative_internal_o_without_overhead_draw
         "reservoir.fo2_buffer",
         {"O2": 10_000.0},
         source="test evaporative internal O carrier",
+        material_origin="reagent",
     )
     sim._redox_source_terms_this_hr = {
         "redox_source:evaporative_metal_loss": 10_000.0,
@@ -2243,6 +2251,7 @@ def test_fe_redox_respeciation_skips_below_liquid_calibration_band() -> None:
         "reservoir.fo2_buffer",
         {"O2": 1_000.0},
         source="test sub-liquid internal O carrier",
+        material_origin="reagent",
     )
     before_melt = dict(sim.atom_ledger.mol_by_account("process.cleaned_melt"))
     before_buffer_o2 = sim.atom_ledger.mol_by_account("reservoir.fo2_buffer")[
@@ -2275,6 +2284,7 @@ def test_full_c2a_step_reports_closed_ferric_divergence_after_respeciation() -> 
         "process.overhead_gas",
         {"O2": 10_000.0},
         source="test explicit headspace oxygen for full-step Fe redox re-speciation",
+        material_origin="feedstock",
     )
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -3.0
     sim._sync_oxygen_reservoir_mirror()
@@ -2321,6 +2331,7 @@ def test_pn2_sweep_transport_prediction_matches_authoritative_bleed_residual() -
         "process.overhead_gas",
         {"O2": 0.001, "N2": 0.099},
         source="test PN2 predictor/bleed parity holdup",
+        material_origin="feedstock",
     )
     head_o2_mol = sim.atom_ledger.mol_by_account("process.overhead_gas")["O2"]
 

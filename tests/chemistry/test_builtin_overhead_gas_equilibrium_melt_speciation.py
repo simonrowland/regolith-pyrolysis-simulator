@@ -158,6 +158,7 @@ def test_melt_composition_and_speciation_fill_missing_al_surface(
         "process.overhead_gas",
         {"Na": 1.0},
         source="test sodium reference gas",
+        material_origin="feedstock",
     )
 
     result = sim._chem_kernel.dispatch(
@@ -225,6 +226,7 @@ def test_empty_melt_callers_preserve_ideal_gas_from_holdup(
         "process.overhead_gas",
         {"O2": 2.0, "SiO": 1.0},
         source="test overhead gas",
+        material_origin="feedstock",
     )
 
     result = sim._chem_kernel.dispatch(
@@ -264,6 +266,7 @@ def test_materialized_al_o_surface_moves_only_through_commit_batch(
         "process.overhead_gas",
         {"AlO": 0.25},
         source="test materialized alumina vapor",
+        material_origin="feedstock",
     )
 
     oge_result = sim._chem_kernel.dispatch(

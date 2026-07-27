@@ -60,6 +60,11 @@ from simulator.accounting.formulas import (
     ATOMIC_WEIGHTS_G_PER_MOL,
     resolve_species_formula,
 )
+from simulator.accounting.yield_disposition import (
+    build_yield_disposition,
+    capture_ledger_snapshot,
+    ledger_snapshots_from_sim,
+)
 from simulator.chemistry.kernel import (
     OXYGEN_SINK_CHANNEL_MODE_KEY,
     normalize_chemistry_kernel_config,
@@ -1364,6 +1369,10 @@ class PyrolysisRun:
             "run_metadata": run_metadata,
             "final_state": final_state,
             "final": final_summary,
+            "yield_disposition": build_yield_disposition(
+                sim,
+                ledger_snapshots_from_sim(sim),
+            ),
             "product_classification": _json_safe(
                 _safe_failure_value(
                     lambda: _product_classification_report(
@@ -2325,6 +2334,7 @@ def build_per_hour_summary(
     enforcement = getattr(sim.campaign_mgr, "last_pO2_enforcement", None)
     if isinstance(enforcement, Mapping) and int(enforcement.get("hour", -1)) == int(snapshot.hour):
         summary["pO2_enforcement"] = _json_safe(dict(enforcement))
+    capture_ledger_snapshot(sim, snapshot)
     return _json_safe(summary)
 
 
@@ -4490,11 +4500,17 @@ def _runner_failure_result(
         if sim is not None
         else _empty_melt_redox_gate_floor_fallback_engagement()
     )
-    return {
+    error_message = (
+        error_message_override
+        if error_message_override is not None
+        else f"RunnerError: {error}"
+    )
+    payload = {
         "schema_version": RUNNER_SCHEMA_VERSION,
         "run_metadata": run_metadata,
         "final_state": _json_safe(final_state),
         "final": _json_safe(final),
+        "yield_disposition": None,
         "product_classification": _json_safe(
             _safe_failure_value(
                 lambda: _product_classification_report(
@@ -4555,12 +4571,22 @@ def _runner_failure_result(
         "shadow_trace": _execution_shadow_trace(execution),
         "status": status,
         "reason": reason,
-        "error_message": (
-            error_message_override
-            if error_message_override is not None
-            else f"RunnerError: {error}"
-        ),
+        "error_message": error_message,
     }
+    if sim is not None:
+        try:
+            payload["yield_disposition"] = _json_safe(
+                build_yield_disposition(
+                    sim,
+                    ledger_snapshots_from_sim(sim),
+                )
+            )
+        except Exception as exc:  # noqa: BLE001 -- failure envelope must survive
+            payload["error_message"] = (
+                f"{payload['error_message']}\n"
+                f"yield disposition unavailable: {_safe_exception_text(exc)}"
+            )
+    return payload
 
 
 def _assert_cli_matches_preset(

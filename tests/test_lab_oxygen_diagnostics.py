@@ -22,31 +22,37 @@ def _diagnostic_sim():
         "process.cleaned_melt",
         {"SiO2": 10.0},
         source="test residual oxygen",
+        material_origin="feedstock",
     )
     ledger.load_external_mol(
         "process.overhead_gas",
         {"O2": 1.0, "SiO": 2.0},
         source="test overhead oxygen",
+        material_origin="feedstock",
     )
     ledger.load_external_mol(
         "terminal.offgas",
         {"O": 0.25, "CO": 0.5},
         source="test terminal offgas oxygen",
+        material_origin="feedstock",
     )
     ledger.load_external_mol(
         "process.condensation_train",
         {"SiO2": 3.0, "O2": 0.1},
         source="test condensation oxygen",
+        material_origin="feedstock",
     )
     ledger.load_external_mol(
         "process.wall_deposit_segment_holder",
         {"FeO": 4.0, "MgO": 5.0},
         source="test holder oxygen",
+        material_origin="feedstock",
     )
     ledger.load_external_mol(
         "process.wall_deposit_segment_window",
         {"SiO2": 1.5},
         source="test window oxygen",
+        material_origin="feedstock",
     )
     return SimpleNamespace(atom_ledger=ledger)
 
@@ -57,16 +63,19 @@ def _terminal_oxygen_sim():
         "terminal.oxygen_melt_offgas_captured",
         {"O2": 2.0},
         source="test captured terminal oxygen",
+        material_origin="feedstock",
     )
     ledger.load_external_mol(
         "terminal.oxygen_melt_offgas_vented_to_vacuum",
         {"O2": 1.0},
         source="test vented terminal oxygen",
+        material_origin="feedstock",
     )
     ledger.load_external_mol(
         "terminal.oxygen_melt_offgas_stored",
         {"O2": 0.5},
         source="test stored terminal oxygen",
+        material_origin="feedstock",
     )
     return SimpleNamespace(atom_ledger=ledger)
 
@@ -257,18 +266,21 @@ def _plume_diagnostic_sim(
             "process.overhead_gas",
             overhead,
             source="test plume overhead",
+            material_origin="feedstock",
         )
     if terminal_offgas:
         ledger.load_external_mol(
             "terminal.offgas",
             terminal_offgas,
             source="test plume terminal escape",
+            material_origin="feedstock",
         )
     if condensation:
         ledger.load_external_mol(
             "process.condensation_train",
             condensation,
             source="test plume condensation",
+            material_origin="feedstock",
         )
     return SimpleNamespace(atom_ledger=ledger)
 

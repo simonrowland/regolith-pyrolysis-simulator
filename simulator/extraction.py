@@ -214,6 +214,8 @@ class ExtractionMixin:
         kg: float,
         *,
         reason: str,
+        material_origin: str | None = None,
+        amalgamated_pool: bool = False,
     ) -> float:
         kg = max(0.0, float(kg))
         if kg <= self._LEDGER_KG_TOL:
@@ -226,6 +228,8 @@ class ExtractionMixin:
             credit_account,
             {species: kg},
             reason=reason,
+            material_origin=material_origin,
+            amalgamated_pool=amalgamated_pool,
         )
         return kg
 
@@ -266,6 +270,7 @@ class ExtractionMixin:
                 if allow_credit
                 else f'{species} reagent draw from reservoir'
             ),
+            material_origin='reagent' if allow_credit else None,
         )
         if not allow_credit:
             self._move_cost_inventory_lots_best_effort(
@@ -2673,6 +2678,7 @@ class ExtractionMixin:
             species,
             recovered_kg,
             reason=f'recovered {species} condensate transfer',
+            amalgamated_pool=species in {'Na', 'K', 'Mg'},
         )
         self._remove_stage_collection_source_projection(
             source_account, species, moved_kg
@@ -3053,6 +3059,7 @@ class ExtractionMixin:
             C7_AL_CREDIT_ACCOUNT,
             {'Al': credit_kg},
             source='C7 imported Al credit line',
+            material_origin='reagent',
         )
         self._add_non_feedstock_reagent_element(
             C7_AL_CREDIT_ACCOUNT,

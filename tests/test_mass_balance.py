@@ -81,6 +81,7 @@ def test_flow_mass_out_includes_dynamic_wall_deposit_segment_accounts():
         "process.wall_deposit_segment_condenser",
         {"SiO": 1.0e-6},
         source="test dynamic lab surface deposit",
+        material_origin="feedstock",
     )
 
     assert sim._flow_mass_out_kg() - before == pytest.approx(1.0e-6)
@@ -102,6 +103,7 @@ def test_flow_mass_out_includes_captured_melt_offgas_oxygen():
         OXYGEN_MELT_OFFGAS_CAPTURED_ACCOUNT,
         {"O2": 2.0},
         source="test captured melt offgas oxygen",
+        material_origin="feedstock",
     )
 
     assert sim._flow_mass_out_kg() - before == pytest.approx(2.0)
@@ -121,6 +123,7 @@ def test_oxygen_terminal_partition_exposes_cistern_liquid_stored():
         OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT,
         {"O2": 2.0},
         source="test cistern liquid oxygen",
+        material_origin="feedstock",
     )
 
     partition = sim._oxygen_terminal_partition_kg()

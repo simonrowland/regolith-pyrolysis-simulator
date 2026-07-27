@@ -201,7 +201,7 @@ def test_kernel_dispatch_rejects_transition_when_provider_authority_drifts(monke
     """Register with valid authority, then mutate profile to simulate drift."""
 
     ledger = AtomLedger()
-    ledger.load_external("process.cleaned_melt", {"SiO2": 5.0})
+    ledger.load_external("process.cleaned_melt", {"SiO2": 5.0}, material_origin="feedstock")
     registry = ProviderRegistry()
     provider = _MisalignedAuthorityProvider(mismatch=False)
     registry.register(provider, [ChemistryIntent.SILICATE_LIQUIDUS])

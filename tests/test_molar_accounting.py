@@ -57,6 +57,7 @@ def test_atom_ledger_stores_moles_and_projects_kg():
         "process.cleaned_melt",
         {"FeO": 1000.0},
         source="mol-native feed",
+        material_origin="feedstock",
     )
 
     assert ledger.mol_by_account("process.cleaned_melt")["FeO"] == pytest.approx(1000.0)
@@ -91,7 +92,8 @@ def test_reducible_oxide_transitions_conserve_elements(oxide):
 
     ledger = AtomLedger()
     ledger.load_external(
-        "process.cleaned_melt", {oxide: oxide_kg}, source="unit-test feed"
+        "process.cleaned_melt", {oxide: oxide_kg}, source="unit-test feed",
+        material_origin="feedstock",
     )
     transition = LedgerTransition(
         name=f"reduce_{oxide}",
@@ -145,7 +147,8 @@ def test_atom_tolerance_is_tighter_than_mass_tolerance():
 
     ledger = AtomLedger()
     ledger.load_external(
-        "process.cleaned_melt", {"FeO": MOLAR_MASS["FeO"]}, source="unit-test feed"
+        "process.cleaned_melt", {"FeO": MOLAR_MASS["FeO"]}, source="unit-test feed",
+        material_origin="feedstock",
     )
     transition = LedgerTransition(
         name="bad_atom_drift_under_mass_tolerance",

@@ -2269,7 +2269,8 @@ def test_kernel_filters_provider_to_cleaned_melt_only(
     )
     # Seed an unrelated account so the filter has something to drop.
     sim.atom_ledger.load_external(
-        "process.metal_phase", {"Fe": 0.5}, source="test seed"
+        "process.metal_phase", {"Fe": 0.5}, source="test seed",
+        material_origin="feedstock",
     )
 
     seen_accounts: list[frozenset[str]] = []

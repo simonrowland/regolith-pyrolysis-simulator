@@ -110,6 +110,7 @@ def test_o2_consuming_vapors_share_overhead_o2_reactant(
     sim.atom_ledger.load_external(
         "process.overhead_gas", {"O2": available_o2_kg},
         source="test O2 reactant",
+        material_origin="feedstock",
     )
     stoich = sim._evaporation_stoich("CrO2", _species_data(sim, "CrO2"))
     available_cr2o3_kg = sim.atom_ledger.kg_by_account(

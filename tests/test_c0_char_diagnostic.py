@@ -82,6 +82,7 @@ def test_ci_c0_sufficient_lance_clears_warning_on_both_oxidation_bases() -> None
         "reservoir.fo2_buffer",
         {"O2": char_mol},
         source="test sufficient lance",
+        material_origin="reagent",
     )
     execution.simulator._apply_char_lance_oxidation(
         o2_available_mol=char_mol
