@@ -1,0 +1,49 @@
+schema_version: volatile-property-literature-anchors-v1
+
+# Independent expected values. Runtime registry code must never import this file.
+pressure_anchors:
+  - anchor_id: h2o-ice-iapws-230K
+    row_id: fixture:H2O:sublimation_pressure:solid_Ih:feistel-wagner-2007
+    species: H2O
+    property_kind: sublimation_pressure
+    phase_branch: solid_Ih
+    pressure_kind: saturation
+    T_K: 230.0
+    # IAPWS Table 3: 8.94735e-6 MPa * 1e6 Pa/MPa = 8.94735 Pa.
+    expected_P_Pa: 8.94735
+    relative_tolerance: 5.0e-4
+    source:
+      reference_id: iapws-r14-08-2011
+      citation: IAPWS R14-08(2011), Revised Release on the Pressure along the Melting and Sublimation Curves of Ordinary Water Substance
+      doi: null
+      url: https://iapws.org/documents/release/MeltSub
+      locator: Table 3, equation 6 verification value at 230 K
+  - anchor_id: co2-solid-triple-point
+    row_id: fixture:CO2:sublimation_pressure:solid:fray-schmitt-2009:seg-2
+    species: CO2
+    property_kind: sublimation_pressure
+    phase_branch: solid
+    pressure_kind: saturation
+    T_K: 216.58
+    expected_P_Pa: 518500.0
+    relative_tolerance: 0.004
+    source:
+      reference_id: nist-webbook-srd69-co2
+      citation: NIST Chemistry WebBook SRD 69, carbon dioxide phase-change data
+      doi: null
+      url: https://webbook.nist.gov/cgi/cbook.cgi?ID=C124389&Mask=4
+      locator: triple-point pressure 5.185 bar at 216.58 K
+
+molar_mass_anchors:
+  - species: H2O
+    expected_g_mol: 18.015
+    absolute_tolerance_g_mol: 1.0e-12
+    source:
+      citation: CIAAW standard atomic weights using H 1.008 and O 15.999
+      locator: stoichiometric H2O molar mass
+  - species: CO2
+    expected_g_mol: 44.009
+    absolute_tolerance_g_mol: 1.0e-12
+    source:
+      citation: CIAAW standard atomic weights using C 12.011 and O 15.999
+      locator: stoichiometric CO2 molar mass

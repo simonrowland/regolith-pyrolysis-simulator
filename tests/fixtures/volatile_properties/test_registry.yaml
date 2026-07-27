@@ -1,0 +1,147 @@
+schema_version: volatile-properties-v1
+units:
+  temperature: K
+  pressure: Pa
+  molar_mass: g/mol
+
+# TEST FIXTURE ONLY. These rows exercise machinery and are never runtime input.
+species:
+  H2O:
+    formula: H2O
+    static_properties:
+      - row_kind: static
+        row_id: fixture:H2O:triple_point_temperature:feistel-wagner-2007
+        property_kind: triple_point_temperature
+        value: 273.16
+        units: K
+        phase_branch: solid_Ih__liquid__vapor
+        pressure_kind: not_applicable
+        source:
+          reference_id: feistel-wagner-2007
+          citation: Feistel and Wagner (2007), Geochimica et Cosmochimica Acta 71, 36-45
+          doi: 10.1016/j.gca.2006.08.034
+          url: https://doi.org/10.1016/j.gca.2006.08.034
+          locator: equation 7 and triple-point constants
+        authority_class: certified
+      - row_kind: static
+        row_id: fixture:H2O:triple_point_pressure:feistel-wagner-2007
+        property_kind: triple_point_pressure
+        value: 611.6577
+        units: Pa
+        phase_branch: solid_Ih__liquid__vapor
+        pressure_kind: saturation
+        source:
+          reference_id: feistel-wagner-2007
+          citation: Feistel and Wagner (2007), Geochimica et Cosmochimica Acta 71, 36-45
+          doi: 10.1016/j.gca.2006.08.034
+          url: https://doi.org/10.1016/j.gca.2006.08.034
+          locator: equation 7 and triple-point constants
+        authority_class: certified
+    correlations:
+      - row_kind: correlation
+        row_id: fixture:H2O:sublimation_pressure:solid_Ih:feistel-wagner-2007
+        property_kind: sublimation_pressure
+        correlation_family: feistel_wagner_ice
+        coefficients:
+          T_triple_K: 273.16
+          P_triple_Pa: 611.6577
+          e:
+            - 20.9969665107897
+            - 3.72437478271362
+            - -13.9205483215524
+            - 29.6988765013566
+            - -40.1972392635944
+            - 29.7880481050215
+            - -9.13050963547721
+        phase_branch: solid_Ih
+        pressure_kind: saturation
+        valid_range_K: [20.0, 273.16]
+        valid_range_inclusive: [true, true]
+        output_units: Pa
+        source:
+          reference_id: feistel-wagner-2007
+          citation: Feistel and Wagner (2007), Sublimation Pressure and Sublimation Enthalpy of H2O Ice Ih Between 0 and 273.16 K
+          doi: 10.1016/j.gca.2006.08.034
+          url: https://doi.org/10.1016/j.gca.2006.08.034
+          locator: equation 7; coefficients reproduced in NASA NTRS 20210019502 supplement
+        evaluation_tolerance:
+          relative: 1.0e-10
+          absolute_Pa: 1.0e-12
+        authority_class: certified
+
+  CO2:
+    formula: CO2
+    correlations:
+      - row_kind: correlation
+        row_id: fixture:CO2:sublimation_pressure:solid:fray-schmitt-2009:seg-1
+        property_kind: sublimation_pressure
+        correlation_family: fray_schmitt_polynomial
+        coefficients:
+          A: [14.76, -2571.0, -77810.0, 4325000.0, -120700000.0, 1350000000.0, 0.0]
+        phase_branch: solid
+        pressure_kind: saturation
+        valid_range_K: [40.0, 194.7]
+        valid_range_inclusive: [true, false]
+        output_units: Pa
+        source:
+          reference_id: fray-schmitt-2009
+          citation: Fray and Schmitt (2009), Planetary and Space Science 57, 2053-2080
+          doi: 10.1016/j.pss.2009.09.011
+          url: https://doi.org/10.1016/j.pss.2009.09.011
+          locator: CO2-1 coefficients reproduced in NASA NTRS 20210019502 supplement, table 2
+        evaluation_tolerance:
+          relative: 1.0e-10
+          absolute_Pa: 1.0e-9
+        authority_class: certified
+      - row_kind: correlation
+        row_id: fixture:CO2:sublimation_pressure:solid:fray-schmitt-2009:seg-2
+        property_kind: sublimation_pressure
+        correlation_family: fray_schmitt_polynomial
+        coefficients:
+          A: [18.61, -4154.0, 104100.0, 0.0, 0.0, 0.0, 0.0]
+        phase_branch: solid
+        pressure_kind: saturation
+        valid_range_K: [194.7, 216.58]
+        valid_range_inclusive: [true, true]
+        output_units: Pa
+        source:
+          reference_id: fray-schmitt-2009
+          citation: Fray and Schmitt (2009), Planetary and Space Science 57, 2053-2080
+          doi: 10.1016/j.pss.2009.09.011
+          url: https://doi.org/10.1016/j.pss.2009.09.011
+          locator: CO2-2 coefficients reproduced in NASA NTRS 20210019502 supplement, table 2
+        evaluation_tolerance:
+          relative: 1.0e-10
+          absolute_Pa: 1.0e-9
+        authority_class: certified
+
+equilibrium_routes:
+  - route_id: fixture:equilibrium:H2O:C0_cryo_train
+    species: H2O
+    process_context: C0_cryo_train
+    segments:
+      - temperature_range_K: [20.0, 273.16]
+        range_inclusive: [true, true]
+        property_kind: sublimation_pressure
+        phase_branch: solid_Ih
+        pressure_kind: saturation
+        promoted_row_id: fixture:H2O:sublimation_pressure:solid_Ih:feistel-wagner-2007
+  - route_id: fixture:equilibrium:CO2:C0_cryo_train
+    species: CO2
+    process_context: C0_cryo_train
+    segments:
+      - temperature_range_K: [40.0, 194.7]
+        range_inclusive: [true, false]
+        property_kind: sublimation_pressure
+        phase_branch: solid
+        pressure_kind: saturation
+        promoted_row_id: fixture:CO2:sublimation_pressure:solid:fray-schmitt-2009:seg-1
+      - temperature_range_K: [194.7, 216.58]
+        range_inclusive: [true, true]
+        property_kind: sublimation_pressure
+        phase_branch: solid
+        pressure_kind: saturation
+        promoted_row_id: fixture:CO2:sublimation_pressure:solid:fray-schmitt-2009:seg-2
+
+legacy_adapter_rows: []
+nonvolatile_by_physics: []

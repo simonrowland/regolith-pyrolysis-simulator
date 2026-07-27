@@ -377,3 +377,87 @@ def test_data_yaml_survives_latin1_misdecode():
         "C1-range UTF-8 bytes in data yamls (break ISO8859-1 profile "
         f"generation): {offenders}"
     )
+
+
+def test_volatiles_lane_import_boundaries_remain_detached():
+    repo = Path(__file__).parent.parent
+    test_signed_source_module = "tests.test_volatile_properties"
+    runtime_paths = [
+        repo / "app.py",
+        repo / "regolith-pyrolysis-run.py",
+        *(repo / "simulator").rglob("*.py"),
+        *(repo / "engines").rglob("*.py"),
+        *(repo / "web").rglob("*.py"),
+    ]
+    test_source_imports = []
+    for path in runtime_paths:
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                if any(
+                    alias.name == test_signed_source_module
+                    or alias.name.startswith(f"{test_signed_source_module}.")
+                    for alias in node.names
+                ):
+                    test_source_imports.append(
+                        f"{path.relative_to(repo)}:{node.lineno}"
+                    )
+            elif isinstance(node, ast.ImportFrom):
+                if node.module == test_signed_source_module or (
+                    node.module == "tests"
+                    and any(
+                        alias.name == "test_volatile_properties"
+                        for alias in node.names
+                    )
+                ):
+                    test_source_imports.append(
+                        f"{path.relative_to(repo)}:{node.lineno}"
+                    )
+    assert not test_source_imports, (
+        "runtime import graph reaches test-only signed-source injection: "
+        f"{test_source_imports}"
+    )
+
+    for path in (
+        repo / "simulator" / "condensation.py",
+        repo / "simulator" / "thermal_train.py",
+    ):
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        imports = {
+            node.module
+            for node in ast.walk(tree)
+            if isinstance(node, ast.ImportFrom) and node.module is not None
+        } | {
+            alias.name
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Import)
+            for alias in node.names
+        }
+        assert not any(
+            module == "simulator.volatile_properties"
+            or module.startswith("simulator.volatile_properties.")
+            for module in imports
+        )
+
+    properties_source = (repo / "simulator" / "volatile_properties.py").read_text(
+        encoding="utf-8"
+    )
+    tree = ast.parse(properties_source)
+    imports = {
+        node.module
+        for node in ast.walk(tree)
+        if isinstance(node, ast.ImportFrom) and node.module is not None
+    } | {
+        alias.name
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Import)
+        for alias in node.names
+    }
+    assert not any(
+        token in module
+        for module in imports
+        for token in ("flammability", "thermal_train", "condensation")
+    )
+    assert "tests/fixtures/literature" not in properties_source
+    assert '"test-fixture"' not in properties_source
+    assert "_load_test_fixture" not in properties_source
