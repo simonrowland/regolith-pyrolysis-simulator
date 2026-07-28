@@ -105,10 +105,12 @@ def test_sessionfinish_interrupts_in_flight_job_within_automatic_budget():
 
 
 def test_registry_cancel_escalates_concurrent_graceful_close():
+    registry_before = set(engine_pool._LIVE_ENGINE_POOLS)
     pool = EngineWorkerPool(
         lambda index: _cleanup_worker(index, call_timeout_s=30.0),
         size=1,
     )
+    assert set(engine_pool._LIVE_ENGINE_POOLS) - registry_before == {pool}
     future = pool.submit({"delay": 30.0}, timeout_s=30.0)
     _wait_until_running(future)
     worker_pid = pool.workers[0].process.pid
@@ -118,10 +120,11 @@ def test_registry_cancel_escalates_concurrent_graceful_close():
     time.sleep(0.05)
     assert graceful_close.is_alive()
 
-    assert close_all_engine_pools(cancel_pending=True) == 1
+    close_all_engine_pools(cancel_pending=True)
     graceful_close.join(timeout=ENGINE_POOL_AUTOMATIC_TOTAL_BUDGET_S)
 
     assert not graceful_close.is_alive()
+    assert pool not in engine_pool._LIVE_ENGINE_POOLS
     with pytest.raises(RuntimeError, match="worker exited without a result"):
         future.result(timeout=0.1)
     with pytest.raises(ProcessLookupError):

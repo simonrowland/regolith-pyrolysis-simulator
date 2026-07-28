@@ -173,12 +173,11 @@ def test_na_shuttle_janaf_feo_crossover_is_below_practical_c3_temperature():
     assert crossover_C < 1200.0
 
 
-# t-385/t-409 review P2 (2026-07-21): this test calls the same
-# _run_pyrolysis_track measured 2358-2588 s sequentially on its sibling
-# rows (n0-loop t11/t13); the old 1541 s ceiling would re-red the gate.
-# Ceiling matches the pyrolysis-track class: measured -> 3600 s.
+# Studio train gate (2026-07-27): the shared full track measured 2051 s on a
+# quiet box, while co-tenancy inflates it 1.3-2x; 7200 s is the >=3x-clean
+# contention-robust hang backstop.
 @pytest.mark.xdist_group("magemin_fullrun_b")
-@pytest.mark.timeout(3600)
+@pytest.mark.timeout(7200)
 def test_pyrolysis_track_c5_reduces_feo_without_additives(
     full_pyrolysis_track_result,
 ):
@@ -375,6 +374,8 @@ def test_c5_declared_ladder_hold_scopes_shared_voltage_species_before_refusal():
     assert sim.melt.mre_c5_on_final_rung is False
 
 
+# Historical duration is about 340 s; 1020 s is the 3x fullrun hang backstop.
+@pytest.mark.timeout(1020)
 def test_c5_targeted_feo_full_track_reduces_target_after_low_temperature_hours():
     result = _run_pyrolysis_track(mre_target_species="FeO")
     sim = result.simulator
@@ -514,11 +515,10 @@ def test_c3_shuttle_injects_na_from_condensed_alkali_alone():
     sim.atom_ledger.assert_balanced()
 
 
-# t-385 (2026-07-21): pyrolysis-track class measured 2358.4 s at -n0
-# (compose-vapor-work/n0-loop t13); ceiling >= 1.2x headroom over
-# measured n0 (family serialized on one gateway). xdist_group pins the MAGEMin full-run family to one gateway.
+# This can be the first consumer to construct the shared full-track fixture
+# under selection, so it uses the same 7200 s calibrated hang backstop.
 @pytest.mark.xdist_group("magemin_fullrun_b")
-@pytest.mark.timeout(3600)
+@pytest.mark.timeout(7200)
 def test_pc_extract_fe_target_has_fe_product_after_full_pyrolysis_track(
     full_pyrolysis_track_result,
 ):
@@ -532,11 +532,10 @@ def test_pc_extract_fe_target_has_fe_product_after_full_pyrolysis_track(
     assert fe_product > 80.0
 
 
-# t-385 (2026-07-21): pyrolysis-track class measured 2588.1 s at -n0
-# (compose-vapor-work/n0-loop t11); ceiling >= 1.2x headroom over
-# measured n0 (family serialized on one gateway). xdist_group pins the MAGEMin full-run family to one gateway.
+# This can also construct the shared fixture when selected alone; keep the
+# studio-contention backstop aligned with its sibling consumers.
 @pytest.mark.xdist_group("magemin_fullrun_b")
-@pytest.mark.timeout(3600)
+@pytest.mark.timeout(7200)
 def test_pc_extract_al_remains_infeasible_at_1p6v_c5_cap(
     full_pyrolysis_track_result,
 ):

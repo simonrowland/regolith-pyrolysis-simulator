@@ -255,13 +255,11 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
         )
         + "\n"
     ).encode("utf-8")
-    # Captured from the composed B1 tree (compose-0.6.3, vapor package +
-    # fixes + the SiO hot-wall backstop gate) with the production JSON
-    # serializer; double-run
-    # byte-stable under the quiesced 2026-07-21 regen gate. Stays independent
-    # of the runner fixture.
+    # Regenerated from the executable path at the a76c2f1 train tip. The
+    # pre/post-F2 payload diff is confined to yield_disposition paths and the
+    # executable bytes match the independently regenerated runner fixture.
     assert hashlib.sha256(actual_bytes).hexdigest() == (
-        "c589e51a428b38026e88383ed8d8568d3a4e57a6940ab5c75cafb5baba7c2002"
+        "2157d9db5b02a4521f04b2877d7601ee77d64e50913e64df66fdc4310ac00fdc"
     )
 
 
