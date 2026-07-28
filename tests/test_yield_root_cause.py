@@ -375,7 +375,10 @@ def test_c5_declared_ladder_hold_scopes_shared_voltage_species_before_refusal():
 
 
 # Historical duration is about 340 s; 1020 s is the 3x fullrun hang backstop.
+# fullrun_d is the lightest chain (1659 s hinted), so adding ~340 s here keeps
+# the chains balanced rather than stacking onto the fullrun_b critical path.
 @pytest.mark.timeout(1020)
+@pytest.mark.xdist_group("magemin_fullrun_d")
 def test_c5_targeted_feo_full_track_reduces_target_after_low_temperature_hours():
     result = _run_pyrolysis_track(mre_target_species="FeO")
     sim = result.simulator
