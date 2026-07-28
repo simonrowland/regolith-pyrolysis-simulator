@@ -1437,13 +1437,102 @@ def test_optimizer_leaderboard_keeps_gui_version_rows_but_excludes_stale_digest(
 def test_optimizer_leaderboard_filters_by_interoperable_corpus_and_labels_legacy(
     client,
 ) -> None:
+    """Filter accepts current + unversioned/legacy; rejects foreign corpora.
+
+    Post-B1 the interoperable set is often a singleton (current only). The
+    seed must not require a second accepted corpus via ``next(...)`` — that
+    StopIteration-crashed this test (and would be the wrong fixture shape for
+    a singleton production config). Multi-corpus coverage lives in
+    ``test_optimizer_leaderboard_multi_corpus_interoperable_filter``.
+    """
     runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
     run_dir = runs_dir / "run-corpus-scope"
     current_corpus = current_corpus_version()
     accepted_corpus_versions = list(interoperable_corpus_versions())
+    assert current_corpus in accepted_corpus_versions
     legacy_compatible_corpus = next(
-        version for version in accepted_corpus_versions if version != current_corpus
+        (version for version in accepted_corpus_versions if version != current_corpus),
+        None,
     )
+
+    seed_rows: list[dict[str, object]] = [
+        {
+            "candidate_id": "candidate-accepted",
+            "oxygen": 8.0,
+            "corpus_version": current_corpus,
+        },
+        {
+            "candidate_id": "candidate-legacy",
+            "oxygen": 11.0,
+            "corpus_version": None,
+        },
+        {
+            "candidate_id": "candidate-incompatible",
+            "oxygen": 99.0,
+            "corpus_version": "future-incompatible-corpus",
+        },
+    ]
+    if legacy_compatible_corpus is not None:
+        seed_rows.insert(
+            1,
+            {
+                "candidate_id": "candidate-alpha-series",
+                "oxygen": 9.0,
+                "corpus_version": legacy_compatible_corpus,
+            },
+        )
+    _seed_leaderboard_fixture(run_dir, seed_rows)
+
+    response = client.get(
+        "/api/optimizer/leaderboard"
+        "?feedstock_id=lunar_mare_low_ti&profile_id=oxygen-yield-v1"
+        "&objective=oxygen_kg&limit=5"
+    )
+
+    assert response.status_code == 200
+    payload = response.get_json()
+    assert payload["gui_version"] == current_code_version()
+    assert payload["current_corpus_version"] == current_corpus
+    assert payload["accepted_corpus_versions"] == accepted_corpus_versions
+    # Oxygen sort is descending; unversioned/legacy (11) before current (8).
+    # Incompatible corpus never appears. Optional second accepted corpus (9)
+    # sits between them when the interoperable set is multi-valued.
+    expected_ids = ["candidate-legacy"]
+    if legacy_compatible_corpus is not None:
+        expected_ids.append("candidate-alpha-series")
+    expected_ids.append("candidate-accepted")
+    assert [entry["candidate_id"] for entry in payload["entries"]] == expected_ids
+    entries = {entry["candidate_id"]: entry for entry in payload["entries"]}
+    assert entries["candidate-accepted"]["corpus_version"] == current_corpus
+    assert entries["candidate-accepted"]["corpus_version_badge"]["status"] == "accepted"
+    if legacy_compatible_corpus is not None:
+        assert entries["candidate-alpha-series"]["corpus_version"] == legacy_compatible_corpus
+        assert entries["candidate-alpha-series"]["corpus_version_badge"]["status"] == "accepted"
+    assert "candidate-incompatible" not in entries
+    assert entries["candidate-legacy"]["corpus_version"] is None
+    assert entries["candidate-legacy"]["corpus_version_label"] == "unversioned/legacy"
+    assert entries["candidate-legacy"]["corpus_version_badge"]["status"] == "legacy"
+
+
+def test_optimizer_leaderboard_multi_corpus_interoperable_filter(
+    client,
+    monkeypatch,
+) -> None:
+    """Production filter must accept every interoperable corpus, not only current.
+
+    Forces a two-value accepted set so the multi-corpus path is exercised even
+    when the live corpus_version.yaml is a post-B1 singleton.
+    """
+    import web.routes as routes_mod
+
+    current_corpus = "test-corpus-current"
+    legacy_compatible_corpus = "test-corpus-legacy"
+    accepted = (current_corpus, legacy_compatible_corpus)
+    monkeypatch.setattr(routes_mod, "current_corpus_version", lambda: current_corpus)
+    monkeypatch.setattr(routes_mod, "interoperable_corpus_versions", lambda: accepted)
+
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-corpus-multi"
     _seed_leaderboard_fixture(
         run_dir,
         [
@@ -1478,22 +1567,45 @@ def test_optimizer_leaderboard_filters_by_interoperable_corpus_and_labels_legacy
 
     assert response.status_code == 200
     payload = response.get_json()
-    assert payload["gui_version"] == current_code_version()
     assert payload["current_corpus_version"] == current_corpus
-    assert payload["accepted_corpus_versions"] == accepted_corpus_versions
+    assert payload["accepted_corpus_versions"] == list(accepted)
     assert [entry["candidate_id"] for entry in payload["entries"]] == [
         "candidate-legacy",
         "candidate-alpha-series",
         "candidate-accepted",
     ]
     entries = {entry["candidate_id"]: entry for entry in payload["entries"]}
-    assert entries["candidate-accepted"]["corpus_version"] == current_corpus
-    assert entries["candidate-accepted"]["corpus_version_badge"]["status"] == "accepted"
     assert entries["candidate-alpha-series"]["corpus_version"] == legacy_compatible_corpus
     assert entries["candidate-alpha-series"]["corpus_version_badge"]["status"] == "accepted"
-    assert entries["candidate-legacy"]["corpus_version"] is None
-    assert entries["candidate-legacy"]["corpus_version_label"] == "unversioned/legacy"
-    assert entries["candidate-legacy"]["corpus_version_badge"]["status"] == "legacy"
+    assert "candidate-incompatible" not in entries
+
+
+def test_corpus_filter_clause_singleton_and_empty_accepted() -> None:
+    """_corpus_filter_clause must not assume multi-valued accepted sets."""
+    import web.routes as routes_mod
+
+    # In-memory sqlite with the results.corpus_version column the clause expects.
+    conn = sqlite3.connect(":memory:")
+    conn.row_factory = sqlite3.Row
+    conn.execute("CREATE TABLE results (corpus_version TEXT)")
+    conn.execute("INSERT INTO results VALUES (?)", ("only-one",))
+    conn.execute("INSERT INTO results VALUES (?)", (None,))
+    conn.execute("INSERT INTO results VALUES (?)", ("foreign",))
+
+    where, params = routes_mod._corpus_filter_clause(conn, ("only-one",))
+    rows = conn.execute(
+        f"SELECT corpus_version FROM results WHERE {where}",
+        params,
+    ).fetchall()
+    assert {r["corpus_version"] for r in rows} == {"only-one", None}
+
+    where_empty, params_empty = routes_mod._corpus_filter_clause(conn, ())
+    rows_empty = conn.execute(
+        f"SELECT corpus_version FROM results WHERE {where_empty}",
+        params_empty,
+    ).fetchall()
+    assert [r["corpus_version"] for r in rows_empty] == [None]
+    conn.close()
 
 
 def test_optimizer_result_detail_and_yaml_filter_incompatible_corpus(

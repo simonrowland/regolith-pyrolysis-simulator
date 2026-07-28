@@ -113,8 +113,8 @@ V7_SPECIES_PRIMARY = {
     "U",
     # RUMP
     "BeO",  # v8: rump chips are oxides
-    "Fe⁰",  # v9: furnace melt taps (owner 2026-07-20)
-    "Si⁰",  # v9: furnace melt taps
+    "Fe0",  # v9: furnace melt taps (owner 2026-07-20); ASCII form (latin1 data-yaml contract)
+    "Si0",  # v9: furnace melt taps; ASCII form (latin1 data-yaml contract)
     "ZrO2",
     "HfO2",
     "Sc2O3",
@@ -485,7 +485,7 @@ def test_one_marker_end_per_edge_path(renderer, flowsheet):
 # Canonical sha256 of sorted (bin_id, chip, status, condition_note, members).
 # Computed from data/flowsheet.yaml membership set only — see membership_lock_hash().
 MEMBERSHIP_LOCK_HASH = (
-    "41a411d42f1669c9af2e238c18df155787b70f68d4e5b5528978e620a98b9673"
+    "97d61d0d85cc15643f339489008c05a4c27eb1e99bb0d4f41637996ead868cdd"
 )
 
 
@@ -933,12 +933,15 @@ def test_trace_lint_rejects_malformed_contract(
 def test_trace_phase_one_preserves_locked_flowsheet_and_default_svg(
     renderer, flowsheet
 ):
+    # Pin: content-only ASCII-normalize of C1-range UTF-8 punctuation in
+    # data/flowsheet.yaml (latin1-misdecode guard / bae4828 contract). No
+    # chemical membership change beyond Fe⁰/Si⁰ → Fe0/Si0 chip string form.
     assert hashlib.sha256(YAML_PATH.read_bytes()).hexdigest() == (
-        "3793547c62791d3dc6b8026c7d9b37d493eaee39dbdef91776012da813e7cec8"
+        "b76a32f5035815778e114c92146e559139dfe35b12c8a4453f0782c10ac0a2a4"
     )
     svg = renderer.render_svg(flowsheet, demo_fill=0.0)
     assert hashlib.sha256(svg.encode()).hexdigest() == (
-        "37ecb068a25951827c0874dba59ee133e1222aab019d2b1a05175604b3d8ae13"
+        "75a9fc59b03108482e3d6407a678aadcdfd7ce7097059ce7e74954b05ee4059d"
     )
 
 

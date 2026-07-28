@@ -1456,7 +1456,7 @@ def lint_against_trace_elements(
         "Na", "K", "Rb", "Cs", "Fe", "Ni", "Co", "Ru", "Rh", "Pd",
         "Re", "Os", "Ir", "Pt", "Au", "Mo", "W", "Zn", "Cd", "Pb",
         "Tl", "Bi", "glass", "salts", "organics", "REE", "unreduced-residuals",
-        "CO-CH4-organics", "CO2-CO", "P2-PO", "Fe⁰", "Si⁰",
+        "CO-CH4-organics", "CO2-CO", "P2-PO", "Fe0", "Si0",
     }
     for sym, info in chips.items():
         if sym in covered_chips:

@@ -158,24 +158,24 @@ ceramic_hierarchy:
         terrestrial_applications: Calcium aluminate cement (CAC) binders and refractory castables; specialty
           mortars for high-temperature and chemically aggressive service; not a single pure-phase product
           at parent level.
-        density_g_cm3: 'Family span ~2.9–3.8 (phase-dependent: CA ~2.94; CA6 theoretical ~3.79). Bulk
+        density_g_cm3: 'Family span ~2.9-3.8 (phase-dependent: CA ~2.94; CA6 theoretical ~3.79). Bulk
           castables much lower (porous).'
-        colour: Pure phases white–off-white; Fe/Ti impurities → grey, beige, or pinkish; fired CAC products
-          often grey–buff.
-        melting_point_C: 'Phase-dependent (see subtypes): CA incongruent ~1390 °C; CA2 ~1750–1765 °C class;
-          CA6 ~1830–1875 °C; C3A decomposes ~1540 °C class. Parent has no single T.'
-        softening_working_temp_C: 'CAC castable systems **formulation-dependent** ~700–1900 °C product
+        colour: Pure phases white-off-white; Fe/Ti impurities -> grey, beige, or pinkish; fired CAC products
+          often grey-buff.
+        melting_point_C: 'Phase-dependent (see subtypes): CA incongruent ~1390 °C; CA2 ~1750-1765 °C class;
+          CA6 ~1830-1875 °C; C3A decomposes ~1540 °C class. Parent has no single T.'
+        softening_working_temp_C: 'CAC castable systems **formulation-dependent** ~700-1900 °C product
           range (tax: CAC literature). Parent alone: **uncharacterized**.'
-        creep_limit_C: '**Uncharacterized at parent** — gated by binder/aggregate system and porosity;
+        creep_limit_C: '**Uncharacterized at parent**  --  gated by binder/aggregate system and porosity;
           do not use family melting points as RUL.'
         water_stability: '**Hydraulic phases hydrate** (CA, C3A, C12A7): designed to set with water as
           cements. High-alumina refractories (CA6-rich) are comparatively water-stable once fired. Free
           lime if present slakes.'
         materials_compatibility: Good resistance to many weak acids and sulfates vs Portland in CAC use;
-          basic slag service depends on Al₂O₃ grade. Attacked by strong alkali in some systems; CA6 subtype
+          basic slag service depends on Al2O3 grade. Attacked by strong alkali in some systems; CA6 subtype
           preferred for alkali. Reducing atmospheres generally acceptable for aluminates.
         appearance_texture: 'Fired bodies: matte to slightly vitreous ceramic; castables granular/porous;
-          dense aggregates dull white–grey.'
+          dense aggregates dull white-grey.'
         everyday_analog: High-temperature refractory cement / furnace castable lining (not ordinary Portland
           concrete).
     monocalcium_aluminate_CA:
@@ -228,25 +228,25 @@ ceramic_hierarchy:
       datasheet:
         terrestrial_applications: Principal hydraulic phase in calcium aluminate cements; rapid-hardening
           specialty cements; refractory castable binders. **Not** a standalone hot-face liner phase.
-        density_g_cm3: ~2.94–2.98 theoretical (2945 kg·m⁻³). [web:12][web:8]
-        colour: Colourless–white pure phase; commercial CAC clinker grey from Fe/impurities.
+        density_g_cm3: ~2.94-2.98 theoretical (2945 kg·m-³). [web:12][web:8]
+        colour: Colourless-white pure phase; commercial CAC clinker grey from Fe/impurities.
         melting_point_C: '**Incongruent** melt ~**1390 °C** (peritectic-style decomposition to liquid
-          + CA2/corundum path — Wikipedia MCA). [web:12] Alternate literature quotes ~1600 °C for related
-          CA systems — prefer incongruent **1390 °C** for pure CA. [web:12][web:9]'
+          + CA2/corundum path  --  Wikipedia MCA). [web:12] Alternate literature quotes ~1600 °C for related
+          CA systems  --  prefer incongruent **1390 °C** for pure CA. [web:12][web:9]'
         softening_working_temp_C: 'Standalone liner: **uncharacterized**. As CAC binder in formulated
-          castables: service often **~1480–1650 °C** class depending on aggregate (tax).'
+          castables: service often **~1480-1650 °C** class depending on aggregate (tax).'
         creep_limit_C: '**Uncharacterized as pure CA body.** Castable RUL is aggregate+matrix limited,
           not pure-CA melting.'
         water_stability: '**Hydrates and sets** (designed hydraulic behaviour): rapid reaction with water
-          → CAH₁₀ metastable hydrate and/or C₂AH₈ + C₃AH₆ + Al(OH)₃ gel. [web:12] Wet storage of unfired
+          -> CAH10 metastable hydrate and/or C2AH8 + C3AH6 + Al(OH)3 gel. [web:12] Wet storage of unfired
           powder fails by hydration. Fired dense ceramic is more stable but residual free Ca-aluminates
           can still hydrate if porous.'
         materials_compatibility: 'Good chemical resistance in many CAC applications (sewage, sulfate soils).
           High-T: intermediate between lime-rich and alumina-rich aluminates. Attacked if free lime present;
           basic slag service limited vs magnesia.'
-        appearance_texture: 'Clinker: grey granular; pure synthetic: white powder/ceramic, dull–matte.'
-        everyday_analog: Rapid-set specialty cement (Fondu/CAC) — not Portland grey cement exactly, but
-          the same “hydraulic cement powder” feel.
+        appearance_texture: 'Clinker: grey granular; pure synthetic: white powder/ceramic, dull-matte.'
+        everyday_analog: Rapid-set specialty cement (Fondu/CAC)  --  not Portland grey cement exactly, but
+          the same "hydraulic cement powder" feel.
     calcium_dialuminate_CA2:
       canonical_node_id: calcium_aluminate_ca2_grossite
       label: Calcium dialuminate, CA2, CaO.2Al2O3
@@ -295,23 +295,23 @@ ceramic_hierarchy:
         source_ids:
         - ceramic_datasheets
       datasheet:
-        terrestrial_applications: High-alumina CAC phase; intermediate in CaO–Al₂O₃ phase diagram; refractory
+        terrestrial_applications: High-alumina CAC phase; intermediate in CaO-Al2O3 phase diagram; refractory
           CAC formulations; rare terrestrial/meteoritic mineral (grossite). Not standalone commercial
           liner.
         density_g_cm3: ~**2.88** g/cm³ (grossite calculated/measured class). [web:64][web:69]
-        colour: Colourless–white pure; V impurities can give light violet (specialty). [web:66] Fe → grey/buff.
-        melting_point_C: ~**1750–1765 °C** class (literature with CA pair). [web:9] Congruency details
+        colour: Colourless-white pure; V impurities can give light violet (specialty). [web:66] Fe -> grey/buff.
+        melting_point_C: ~**1750-1765 °C** class (literature with CA pair). [web:9] Congruency details
           phase-diagram dependent; treat as high-T aluminate solid before CA6 field.
         softening_working_temp_C: 'Standalone: **uncharacterized**. High-alumina CAC product service uses
           aggregate, not pure CA2.'
         creep_limit_C: '**Uncharacterized** pure phase.'
         water_stability: Hydraulically **much less reactive** than CA at ambient T; elevated-T hydration
           possible in CAC systems. [web:11] Not free-lime slaking. Generally more water-tolerant than
-          C₃S/CaO once fired, but unfired powder can still hydrate slowly.
+          C3S/CaO once fired, but unfired powder can still hydrate slowly.
         materials_compatibility: High-alumina character (leans acid/high-Al refractory family); better
           alkali/slag options than lime-rich aluminates but inferior to CA6 for many alkali environments.
-        appearance_texture: White–grey crystalline ceramic; matte to weakly vitreous.
-        everyday_analog: 'High-alumina refractory grain / white cement clinker phase — closest everyday:
+        appearance_texture: White-grey crystalline ceramic; matte to weakly vitreous.
+        everyday_analog: 'High-alumina refractory grain / white cement clinker phase  --  closest everyday:
           pale high-alumina furnace cement aggregate.'
     calcium_hexaluminate_CA6:
       canonical_node_id: hibonite_ca6
@@ -354,7 +354,7 @@ ceramic_hierarchy:
       level: subtype
       strength:
         status: sourced_qualitative_text
-        text: Intrinsically difficult to densify (plate-like grains) → porous bodies lower strength; dense
+        text: Intrinsically difficult to densify (plate-like grains) -> porous bodies lower strength; dense
           CA6 aggregate used for hot strength. Hardness **uncharacterized** as a single standard Mohs
           in product sheets consulted; brittle refractory ceramic.
         source_ids:
@@ -363,27 +363,27 @@ ceramic_hierarchy:
         terrestrial_applications: High-alumina **hot-face / insulating refractory** (porous CA6); cement-kiln
           linings; alkali- and reducing-atmosphere service; synthetic dense aggregate (e.g. Bonite-class
           CA6). [web:0][web:3][web:5]
-        density_g_cm3: 'Theoretical ~**3.79** g/cm³; mineral hibonite measured ~3.83–3.85. [web:2][web:71]
+        density_g_cm3: 'Theoretical ~**3.79** g/cm³; mineral hibonite measured ~3.83-3.85. [web:2][web:71]
           Porous insulating products: bulk density much lower (product-specific).'
-        colour: 'Pure: white–colourless; hibonite mineral often brown/black from Fe/Ti/REE; V can purple.
-          Fe/Cr/Ti impurities tint grey–brown–pink.'
-        melting_point_C: ~**1830–1875 °C** (product literature 1830 °C; formation papers 1875 °C). [web:3][web:2]
-          Incongruent melting of CaAl₁₂O₁₉ reported near ~**1852 °C** in experimental work. [web:70]
+        colour: 'Pure: white-colourless; hibonite mineral often brown/black from Fe/Ti/REE; V can purple.
+          Fe/Cr/Ti impurities tint grey-brown-pink.'
+        melting_point_C: ~**1830-1875 °C** (product literature 1830 °C; formation papers 1875 °C). [web:3][web:2]
+          Incongruent melting of CaAl12O19 reported near ~**1852 °C** in experimental work. [web:70]
         softening_working_temp_C: '**Long-term service ~1500 °C** (porous CA6 insulating); melting far
           higher. [tax: CA6 service 1500 °C]'
         creep_limit_C: Structural use gated well below melting; porous CA6 insulation ~**1500 °C** continuous
           class is the practical furnace ceiling cited for product grades. Dense CA6 aggregate can run
-          higher in formulated bricks — **product-row only**; no single RUL universal.
+          higher in formulated bricks  --  **product-row only**; no single RUL universal.
         water_stability: '**Water-stable** as fired ceramic (non-hydraulic hexaluminate). Unlike free
-          CaO/C₃S, does not slake. Residual unreacted CaO in imperfect synthesis can hydrate — purity
+          CaO/C3S, does not slake. Residual unreacted CaO in imperfect synthesis can hydrate  --  purity
           gate.'
         materials_compatibility: '**Strong alkali resistance** and good behaviour in reducing atmospheres
           relative to many aluminosilicates; resists CO attack in dense forms. [web:5][web:0] High-alumina
           / near-neutral-to-acid family; attacked by strongly basic FeO-rich slags less favorably than
           magnesia; CMAS infiltration still a risk at very high T.'
-        appearance_texture: 'Porous grades: chalky–matte white insulating brick feel; dense aggregate:
+        appearance_texture: 'Porous grades: chalky-matte white insulating brick feel; dense aggregate:
           hard dull-white ceramic grain.'
-        everyday_analog: Lightweight insulating firebrick / kiln hot-face block — pale, matte, refractory.
+        everyday_analog: Lightweight insulating firebrick / kiln hot-face block  --  pale, matte, refractory.
     tricalcium_aluminate_C3A:
       canonical_node_id: tricalcium_aluminate_c3a
       parent: calcium_aluminate_refractory
@@ -418,10 +418,10 @@ ceramic_hierarchy:
         terrestrial_applications: Portland cement **clinker interstitial** phase; controls early set with
           gypsum; **not** a refractory liner product.
         density_g_cm3: ~**3.04** g/cm³ class (cement mineral data; confirm product row if coding).
-        colour: Pure colourless–white; clinker grey from Fe/ferrite association.
-        melting_point_C: Decomposes / incongruent path ~**1540–1542 °C** class (tax note ~1542 °C). Not
+        colour: Pure colourless-white; clinker grey from Fe/ferrite association.
+        melting_point_C: Decomposes / incongruent path ~**1540-1542 °C** class (tax note ~1542 °C). Not
           a congruent liner solid.
-        softening_working_temp_C: '**Not applicable as liner** — cement phase.'
+        softening_working_temp_C: '**Not applicable as liner**  --  cement phase.'
         creep_limit_C: '**not-recommended** as structural hot-face; no RUL product class as pure C3A.'
         water_stability: '**Hydrates vigorously** (flash set without gypsum); forms calcium aluminate
           hydrates. **Hydrates-and-fails** as a dry ceramic residue if water contacts free C3A.'
@@ -462,10 +462,10 @@ ceramic_hierarchy:
       datasheet:
         terrestrial_applications: Cement/clinker cage phase; specialty electride/oxide research material;
           **not** terminal liner.
-        density_g_cm3: '~**2.68–2.85** class (literature scatter; **prefer blank if coding strict** —
+        density_g_cm3: '~**2.68-2.85** class (literature scatter; **prefer blank if coding strict**  --
           mineral mayenite ~2.85). Mark: **approximate / source-dependent**.'
-        colour: Colourless–white pure; may tint with transition metals.
-        melting_point_C: ~**1400–1450 °C** class in CaO–Al₂O₃ diagrams (phase-diagram context); treat
+        colour: Colourless-white pure; may tint with transition metals.
+        melting_point_C: ~**1400-1450 °C** class in CaO-Al2O3 diagrams (phase-diagram context); treat
           as **uncharacterized product T** without a cited pure-phase RUL.
         softening_working_temp_C: '**Uncharacterized** as liner.'
         creep_limit_C: '**Uncharacterized / not-recommended** liner.'
@@ -473,7 +473,7 @@ ceramic_hierarchy:
           phase.'
         materials_compatibility: Cement curiosity; not slag-resistant refractory design phase.
         appearance_texture: White crystalline / chalky powder when pure.
-        everyday_analog: 'Specialty cement phase powder — closest: white calcium-aluminate cement flour.'
+        everyday_analog: 'Specialty cement phase powder  --  closest: white calcium-aluminate cement flour.'
     aluminosilicate_ceramic:
       canonical_node_id: null
       parent: null
@@ -517,20 +517,20 @@ ceramic_hierarchy:
       datasheet:
         terrestrial_applications: Fireclay and high-alumina bricks, kiln furniture, crucibles, furnace
           linings (acid/high-Al service), porcelain/stoneware bodies at lower Al end.
-        density_g_cm3: Family ~2.5–3.2+ (fireclay lower bulk; mullite ~3.0–3.2 theoretical).
-        colour: White–buff–grey pure; Fe → cream, tan, brown; Ti → cream/blue-grey under redox.
-        melting_point_C: 'Wide: fireclay eutectics lower; mullite ~1830–1850 °C; pure alumina end higher.
+        density_g_cm3: Family ~2.5-3.2+ (fireclay lower bulk; mullite ~3.0-3.2 theoretical).
+        colour: White-buff-grey pure; Fe -> cream, tan, brown; Ti -> cream/blue-grey under redox.
+        melting_point_C: 'Wide: fireclay eutectics lower; mullite ~1830-1850 °C; pure alumina end higher.
           **No single parent T.**'
         softening_working_temp_C: Fireclay lower (often <1400 °C class products); high-alumina/mullite
-          higher — **subtype-gated**.
+          higher  --  **subtype-gated**.
         creep_limit_C: Product RUL/PCE gated; parent **uncharacterized single number**.
         water_stability: '**Water-stable** fired aluminosilicates (no free-lime hydration). Green clay
           bodies soften with water; fired ceramics do not.'
         materials_compatibility: '**Acid / high-alumina family** (ASTM language): resists acidic slags
-          better than basic; **attacked by basic FeO–CaO-rich slag**. Alkali vapour can form low-melting
+          better than basic; **attacked by basic FeO-CaO-rich slag**. Alkali vapour can form low-melting
           alkali-aluminosilicates (glazing/corrosion). CMAS attack at turbine/hot-section analogs.'
         appearance_texture: Matte to semi-vitreous ceramic; porcelain-like when dense and fine-grained.
-        everyday_analog: Fired brick / bathroom-tile ceramic / kiln shelf — dense, hard, earthy-to-porcelain.
+        everyday_analog: Fired brick / bathroom-tile ceramic / kiln shelf  --  dense, hard, earthy-to-porcelain.
     mullite:
       canonical_node_id: mullite
       label: Mullite, aluminosilicate solid solution
@@ -582,20 +582,20 @@ ceramic_hierarchy:
       level: subtype
       strength:
         status: sourced_qualitative_text
-        text: Flexural/MOR ~**160–190 MPa** dense; compressive ~550–1320 MPa; fracture toughness ~**2–4
-          MPa·m⁰·⁵**; Knoop ~1450 class; brittle. [web:0][web:5]
+        text: Flexural/MOR ~**160-190 MPa** dense; compressive ~550-1320 MPa; fracture toughness ~**2-4
+          MPa·m0·5**; Knoop ~1450 class; brittle. [web:0][web:5]
         source_ids:
         - ceramic_datasheets
       datasheet:
         terrestrial_applications: Kiln furniture, high-alumina refractories, glass-furnace regenerators,
           advanced structural ceramics, spark-plug bodies historically, aerospace thermal protection composites.
-        density_g_cm3: Theoretical ~**3.16–3.22**; dense ceramics often ~**3.0–3.2** g/cm³. [web:0][web:5]
-        colour: Off-white to cream pure; Fe → grey/buff; natural mullite rare (Isle of Mull history).
-        melting_point_C: ~**1830–1850+ °C** (incongruent/ss complexity on Al₂O₃–SiO₂ join; industrial
+        density_g_cm3: Theoretical ~**3.16-3.22**; dense ceramics often ~**3.0-3.2** g/cm³. [web:0][web:5]
+        colour: Off-white to cream pure; Fe -> grey/buff; natural mullite rare (Isle of Mull history).
+        melting_point_C: ~**1830-1850+ °C** (incongruent/ss complexity on Al2O3-SiO2 join; industrial
           cite ~1850 °C). [web:1]
         softening_working_temp_C: '**Continuous service ~1600 °C** default product; air product rows sometimes
-          ~1725–1800 °C. [tax]'
-        creep_limit_C: Excellent **creep resistance** among oxides — structural use commonly limited ~**1600
+          ~1725-1800 °C. [tax]'
+        creep_limit_C: Excellent **creep resistance** among oxides  --  structural use commonly limited ~**1600
           °C** under load for mullite refractories; above that pyroplastic risk rises despite higher melting.
           [web:5][web:0]
         water_stability: '**Water-stable** (fired). No hydraulic phases.'
@@ -604,7 +604,7 @@ ceramic_hierarchy:
           vs dense alumina in many grades.'
         appearance_texture: 'Dense: porcelain-like, matte to slightly glassy fracture; porous: chalky
           refractory.'
-        everyday_analog: High-quality porcelain / dense kiln shelf — harder, whiter “super-ceramic.”
+        everyday_analog: High-quality porcelain / dense kiln shelf  --  harder, whiter "super-ceramic."
     anorthite:
       canonical_node_id: anorthite_plagioclase
       label: Anorthite / Ca-rich plagioclase ceramic, CaAl2Si2O8
@@ -641,26 +641,26 @@ ceramic_hierarchy:
       level: subtype
       strength:
         status: sourced_qualitative_text
-        text: 'Mohs **6–6.5**; brittle feldspar. [web:18] Engineering flexural set: **uncharacterized**
+        text: 'Mohs **6-6.5**; brittle feldspar. [web:18] Engineering flexural set: **uncharacterized**
           as bulk product ceramic.'
         source_ids:
         - ceramic_datasheets
       datasheet:
         terrestrial_applications: Glass-ceramic seals (SOFC/CMAS paths), petrologic plagioclase endmember,
-          filler/marker phase — **not** hot-face liner alone.
-        density_g_cm3: ~**2.74–2.76** g/cm³. [web:18][web:20]
-        colour: Colourless, white, grey; Fe/impurities → reddish/grey tints. [web:18]
-        melting_point_C: Congruent melt ~**1550–1553 °C** class (standard mineral data ~1550 °C).
+          filler/marker phase  --  **not** hot-face liner alone.
+        density_g_cm3: ~**2.74-2.76** g/cm³. [web:18][web:20]
+        colour: Colourless, white, grey; Fe/impurities -> reddish/grey tints. [web:18]
+        melting_point_C: Congruent melt ~**1550-1553 °C** class (standard mineral data ~1550 °C).
         softening_working_temp_C: 'Liner service: **uncharacterized / not-recommended**. Glass-ceramic
-          seals operate far lower (e.g. 750–950 °C SOFC scope in tax).'
+          seals operate far lower (e.g. 750-950 °C SOFC scope in tax).'
         creep_limit_C: '**Uncharacterized as structural hot-face.** Soft relative to mullite/spinel at
           high T.'
         water_stability: '**Water-stable** silicate (does not slake). Weathering over geologic time, not
           hydraulic failure.'
         materials_compatibility: Intermediate CAS phase; CMAS glass-ceramic corrosion contexts; not basic-slag
           brick chemistry.
-        appearance_texture: Vitreous–pearly mineral luster; ceramic bodies matte white–grey.
-        everyday_analog: 'White feldspar / porcelain body component — closest: unglazed porcelain shard.'
+        appearance_texture: Vitreous-pearly mineral luster; ceramic bodies matte white-grey.
+        everyday_analog: 'White feldspar / porcelain body component  --  closest: unglazed porcelain shard.'
     cordierite_mullite:
       canonical_node_id: null
       label: Cordierite / cordierite-mullite kiln furniture
@@ -730,13 +730,13 @@ ceramic_hierarchy:
       datasheet:
         terrestrial_applications: '**Kiln furniture** (batts, props), thermal-shock ware, catalytic-converter
           substrates (cordierite-rich), heat-exchanger ceramics.'
-        density_g_cm3: Product bulk often ~**1.8–2.5** (porous); theoretical cordierite ~2.51; mullite
-          phase denser — body-averaged.
-        colour: Buff, cream, grey; Fe → tan/brown.
-        melting_point_C: Cordierite incongruent decomposition ~**1460 °C** class; mullite higher — body
+        density_g_cm3: Product bulk often ~**1.8-2.5** (porous); theoretical cordierite ~2.51; mullite
+          phase denser  --  body-averaged.
+        colour: Buff, cream, grey; Fe -> tan/brown.
+        melting_point_C: Cordierite incongruent decomposition ~**1460 °C** class; mullite higher  --  body
           melts/softens as multi-phase. [web:19 product context ~1460 cordierite]
-        softening_working_temp_C: Product grades **~1150–1350 °C**; typical **~1300 °C**. [tax][web:14][web:16]
-        creep_limit_C: Load-bearing life diminishes **beyond ~1300 °C**; practical ceiling **~1300–1350
+        softening_working_temp_C: Product grades **~1150-1350 °C**; typical **~1300 °C**. [tax][web:14][web:16]
+        creep_limit_C: Load-bearing life diminishes **beyond ~1300 °C**; practical ceiling **~1300-1350
           °C** for kiln furniture under load. [web:16]
         water_stability: '**Water-stable** fired body.'
         materials_compatibility: Excellent thermal-shock chemistry (low CTE); not designed as basic-slag
@@ -770,14 +770,14 @@ ceramic_hierarchy:
         note: Taxonomy family classification.
       strength:
         status: sourced_qualitative_text
-        text: Mohs ~**6.5–7.5** (polymorph-dependent); brittle.
+        text: Mohs ~**6.5-7.5** (polymorph-dependent); brittle.
         source_ids:
         - ceramic_datasheets
       datasheet:
         terrestrial_applications: Natural refractory **raw materials**; convert toward mullite + silica
           on firing for high-alumina bricks and shapes.
         density_g_cm3: Andalusite ~3.15; sillimanite ~3.24; kyanite ~3.6 (polymorph-dependent).
-        colour: Grey, white, yellow, green, blue (kyanite); Fe → brown.
+        colour: Grey, white, yellow, green, blue (kyanite); Fe -> brown.
         melting_point_C: Polymorphs **decompose/transform** rather than simple congruent melt at 1 atm;
           industrial value is **mullitization on firing**, not pure-phase melt T.
         softening_working_temp_C: 'Pure-phase liner: **uncharacterized**. After conversion: use **mullite
@@ -824,12 +824,12 @@ ceramic_hierarchy:
       datasheet:
         terrestrial_applications: Low-expansion technical ceramics, catalytic substrates, thermal-shock
           components; prefer product `cordierite_mullite` for kiln furniture windows.
-        density_g_cm3: ~**2.51–2.53** theoretical.
-        colour: Colourless–blue–grey mineral; ceramics cream–grey.
+        density_g_cm3: ~**2.51-2.53** theoretical.
+        colour: Colourless-blue-grey mineral; ceramics cream-grey.
         melting_point_C: '**Incongruent** decomposition ~**1460 °C** class.'
-        softening_working_temp_C: Continuous use often cited **~1200–1300 °C** for technical cordierite;
+        softening_working_temp_C: Continuous use often cited **~1200-1300 °C** for technical cordierite;
           product grades vary. [web:15]
-        creep_limit_C: 'Similar to cordierite-mullite furniture: load limits **≲1300 °C** class.'
+        creep_limit_C: 'Similar to cordierite-mullite furniture: load limits **<=~1300 °C** class.'
         water_stability: '**Water-stable**.'
         materials_compatibility: Low CTE thermal-shock champion; not basic-slag brick.
         appearance_texture: 'Matte technical ceramic; natural: vitreous mineral.'
@@ -870,18 +870,18 @@ ceramic_hierarchy:
       datasheet:
         terrestrial_applications: Steelmaking BOF/EAF linings, cement rotary kilns, non-ferrous basic
           furnaces, magnesia and doloma bricks.
-        density_g_cm3: Dense magnesia ~3.5 true; doloma ~3.2–3.4 true; bulk brick lower.
-        colour: White–buff pure MgO/CaO; Fe → brown; chrome-spinel grades dark.
-        melting_point_C: MgO ~2800 °C; CaO–MgO eutectic ~2370 °C; spinel ~2135 °C — family high.
-        softening_working_temp_C: Product bricks commonly **≥1600–1800 °C** service class (subtype).
-        creep_limit_C: RUL-limited below melting; doloma/forsterite product RUL often **~1600–1700 °C**
+        density_g_cm3: Dense magnesia ~3.5 true; doloma ~3.2-3.4 true; bulk brick lower.
+        colour: White-buff pure MgO/CaO; Fe -> brown; chrome-spinel grades dark.
+        melting_point_C: MgO ~2800 °C; CaO-MgO eutectic ~2370 °C; spinel ~2135 °C  --  family high.
+        softening_working_temp_C: Product bricks commonly **>=1600-1800 °C** service class (subtype).
+        creep_limit_C: RUL-limited below melting; doloma/forsterite product RUL often **~1600-1700 °C**
           class.
         water_stability: '**Critical gate:** free **CaO and MgO hydrate/slake** (volume expansion, dusting).
           Spinel/forsterite much more water-stable.'
-        materials_compatibility: '**Basic family:** resists basic slag; **attacked by acidic SiO₂-rich
-          slag**. Carbon-bonded grades for steel. Hydration and CO₂ can carbonate free lime.'
+        materials_compatibility: '**Basic family:** resists basic slag; **attacked by acidic SiO2-rich
+          slag**. Carbon-bonded grades for steel. Hydration and CO2 can carbonate free lime.'
         appearance_texture: 'Dense brick: dull, granular, stony; hydrated: chalky powder.'
-        everyday_analog: Steel-mill furnace brick / agricultural lime (when hydrated) — contrast is the
+        everyday_analog: Steel-mill furnace brick / agricultural lime (when hydrated)  --  contrast is the
           point.
     doloma:
       canonical_node_id: dolime_cao_mgo
@@ -934,20 +934,20 @@ ceramic_hierarchy:
       datasheet:
         terrestrial_applications: Basic steelmaking and cement-kiln refractories; doloma bricks; tar/carbon-bonded
           grades.
-        density_g_cm3: True density ~**3.2–3.4** class for CaO–MgO; bulk brick lower (product).
-        colour: Grey–buff–brown; carbon-bonded black.
-        melting_point_C: CaO–MgO eutectic ~**2370 °C**; pure endmembers higher. [tax][web:64 taxonomy]
+        density_g_cm3: True density ~**3.2-3.4** class for CaO-MgO; bulk brick lower (product).
+        colour: Grey-buff-brown; carbon-bonded black.
+        melting_point_C: CaO-MgO eutectic ~**2370 °C**; pure endmembers higher. [tax][web:64 taxonomy]
         softening_working_temp_C: Product max common **~1650 °C**; broader guidance sometimes ~1800 °C.
           [tax]
-        creep_limit_C: '**RUL-class ~1650–1700 °C** product grades — **this is the furnace structural
+        creep_limit_C: '**RUL-class ~1650-1700 °C** product grades  --  **this is the furnace structural
           ceiling**, not 2370 °C. [tax]'
-        water_stability: '**Hydrates-and-fails:** free CaO (and MgO) **slake** with moisture → Ca(OH)₂
-          / Mg(OH)₂, expansion, strength loss. Must store dry; CO₂ carbonation also degrades free lime.'
+        water_stability: '**Hydrates-and-fails:** free CaO (and MgO) **slake** with moisture -> Ca(OH)2
+          / Mg(OH)2, expansion, strength loss. Must store dry; CO2 carbonation also degrades free lime.'
         materials_compatibility: Excellent vs **basic slag**; poor vs acidic slag; steelmaking workhorse
           with carbon bond.
         appearance_texture: 'Dense stony brick; hydrated: chalky/dusty lime.'
         everyday_analog: 'When fresh: grey furnace brick; when wet-damaged: powdered agricultural lime
-          / builder’s lime.'
+          / builder''s lime.'
     magnesium_aluminate_spinel:
       canonical_node_id: spinel_mgal2o4
       label: Magnesium aluminate spinel, MgAl2O4
@@ -995,7 +995,7 @@ ceramic_hierarchy:
         terrestrial_applications: Structural refractories (steel ladles, cement kilns, glass tanks), transparent
           armor/IR windows (specialty dense), kiln furniture aggregates. [web:10]
         density_g_cm3: Theoretical ~**3.58** g/cm³.
-        colour: Colourless–white pure; natural spinel gem red/blue/etc. from Cr/Fe/Co; refractories white–grey–pink.
+        colour: Colourless-white pure; natural spinel gem red/blue/etc. from Cr/Fe/Co; refractories white-grey-pink.
         melting_point_C: Congruent ~**2135 °C**. [tax]
         softening_working_temp_C: Typical max use **~1700 °C** (inert) for refractory products. [tax]
         creep_limit_C: Structural service commonly limited near **~1700 °C** product class (below melting);
@@ -1005,8 +1005,8 @@ ceramic_hierarchy:
         materials_compatibility: '**Neutral/basic-leaning specialty:** good slag resistance in many steel/cement
           contexts; resists both moderately acid and basic slags better than pure silica or pure lime
           extremes; CMAS still relevant at extreme T.'
-        appearance_texture: 'Dense: vitreous–porcelain, can be translucent; brick: matte white–grey grain.'
-        everyday_analog: Hard white technical ceramic — between porcelain and sapphire window; gem spinel
+        appearance_texture: 'Dense: vitreous-porcelain, can be translucent; brick: matte white-grey grain.'
+        everyday_analog: Hard white technical ceramic  --  between porcelain and sapphire window; gem spinel
           for pure crystals.
     forsterite:
       canonical_node_id: forsterite_olivine
@@ -1063,18 +1063,18 @@ ceramic_hierarchy:
       datasheet:
         terrestrial_applications: Magnesia-forsterite refractories; electrical ceramics; gem peridot (Fe-bearing
           olivine); biomedical research ceramics.
-        density_g_cm3: ~**3.21–3.33** (pure forsterite ~3.27). [web:34][web:27]
-        colour: Pure colourless–white; Fe → olive green (peridot); ceramics cream–tan.
+        density_g_cm3: ~**3.21-3.33** (pure forsterite ~3.27). [web:34][web:27]
+        colour: Pure colourless-white; Fe -> olive green (peridot); ceramics cream-tan.
         melting_point_C: Congruent ~**1890 °C**. [web:34][tax melting-only]
         softening_working_temp_C: 'Pure-phase service: do **not** use 1890 as service. Product brick service
           lower.'
-        creep_limit_C: Product **RUL ~1600–1650 °C** class typical for forsterite/magnesia-forsterite
+        creep_limit_C: Product **RUL ~1600-1650 °C** class typical for forsterite/magnesia-forsterite
           bricks. [tax]
         water_stability: '**Water-stable** relative to free MgO (bound silicate); does not slake like
           periclase. Surface weathering possible over long geologic time.'
         materials_compatibility: Basic-family silicate refractory; good vs basic slag vs acid silica brick;
           silica activity can form lower-melting silicates with fluxes.
-        appearance_texture: 'Vitreous mineral; ceramic: matte granular olive–cream.'
+        appearance_texture: 'Vitreous mineral; ceramic: matte granular olive-cream.'
         everyday_analog: 'Peridot gem (green) or pale olivine sand; industrial: greenish-grey furnace
           brick grain.'
     periclase_mgo:
@@ -1104,20 +1104,20 @@ ceramic_hierarchy:
         note: Taxonomy family classification.
       strength:
         status: sourced_qualitative_text
-        text: Mohs ~**5.5–6** (periclase); dense magnesia high compressive strength; brittle.
+        text: Mohs ~**5.5-6** (periclase); dense magnesia high compressive strength; brittle.
         source_ids:
         - ceramic_datasheets
       datasheet:
         terrestrial_applications: Magnesia bricks, EAF/BOF linings, cement kilns, electrical insulators,
           dead-burned magnesia aggregate.
         density_g_cm3: Theoretical ~**3.58** g/cm³ (periclase).
-        colour: White pure; Fe → brown/yellow.
+        colour: White pure; Fe -> brown/yellow.
         melting_point_C: ~**2800 °C**.
-        softening_working_temp_C: Magnesia brick product service commonly **≥1600–1800 °C** (purity/load
-          dependent) — leave null without product row. [tax]
+        softening_working_temp_C: Magnesia brick product service commonly **>=1600-1800 °C** (purity/load
+          dependent)  --  leave null without product row. [tax]
         creep_limit_C: High pure MgO creep resistance among oxides, but **product RUL** and impurity silicate
           films dominate; **product-sourced only**.
-        water_stability: '**Hydrates-and-fails:** MgO + H₂O → Mg(OH)₂ (brucite), expansion/dusting. Critical
+        water_stability: '**Hydrates-and-fails:** MgO + H2O -> Mg(OH)2 (brucite), expansion/dusting. Critical
           storage/handling gate.'
         materials_compatibility: '**Basic:** excellent vs basic slag; attacked by acid slag; hydration
           and thermal cycling cracking risks.'
@@ -1150,7 +1150,7 @@ ceramic_hierarchy:
         note: Taxonomy family classification.
       strength:
         status: sourced_qualitative_text
-        text: Mohs ~**5–6**; brittle.
+        text: Mohs ~**5-6**; brittle.
         source_ids:
         - ceramic_datasheets
       datasheet:
@@ -1158,7 +1158,7 @@ ceramic_hierarchy:
           as premium refractory vs forsterite.
         density_g_cm3: ~**3.2** g/cm³ class.
         colour: Colourless, grey, green, brown with Fe.
-        melting_point_C: ~**1557 °C** class (incongruent/polymorph path in MgO–SiO₂; lower than forsterite
+        melting_point_C: ~**1557 °C** class (incongruent/polymorph path in MgO-SiO2; lower than forsterite
           1890 °C).
         softening_working_temp_C: 'Liner: **uncharacterized** (limited-scope).'
         creep_limit_C: '**Uncharacterized**; expect lower than forsterite product bricks.'
@@ -1211,21 +1211,21 @@ ceramic_hierarchy:
         note: Taxonomy family classification.
       strength:
         status: sourced_qualitative_text
-        text: Brittle silicates; Mohs mostly 4.5–6.5.
+        text: Brittle silicates; Mohs mostly 4.5-6.5.
         source_ids:
         - ceramic_datasheets
       datasheet:
-        terrestrial_applications: Ceramic additives, glass-ceramics, slag phases, fillers — generally
+        terrestrial_applications: Ceramic additives, glass-ceramics, slag phases, fillers  --  generally
           **limited-scope** as hot-face.
-        density_g_cm3: ~2.8–3.3 family span.
-        colour: White–green–grey; Fe tints olive/brown.
-        melting_point_C: Typically **1300–1550 °C** class phases — lower than premium refractories.
+        density_g_cm3: ~2.8-3.3 family span.
+        colour: White-green-grey; Fe tints olive/brown.
+        melting_point_C: Typically **1300-1550 °C** class phases  --  lower than premium refractories.
         softening_working_temp_C: '**Uncharacterized** liner parent.'
-        creep_limit_C: '**Uncharacterized** — not furnace structural family.'
+        creep_limit_C: '**Uncharacterized**  --  not furnace structural family.'
         water_stability: Most **water-stable** silicates (unlike free CaO).
         materials_compatibility: Intermediate; glass-ceramic and slag chemistry more than ASTM basic brick.
         appearance_texture: Vitreous minerals to matte ceramic powders.
-        everyday_analog: 'Ceramic glaze crystals / rock-forming silicate — closest: white mineral filler
+        everyday_analog: 'Ceramic glaze crystals / rock-forming silicate  --  closest: white mineral filler
           powder.'
     wollastonite:
       canonical_node_id: wollastonite
@@ -1267,21 +1267,21 @@ ceramic_hierarchy:
       level: subtype
       strength:
         status: sourced_qualitative_text
-        text: Mohs **4.5–5**; acicular particles reinforce plastics; brittle ceramic. [web:22]
+        text: Mohs **4.5-5**; acicular particles reinforce plastics; brittle ceramic. [web:22]
         source_ids:
         - ceramic_datasheets
       datasheet:
         terrestrial_applications: Ceramics (shrinkage control), paints, plastics, friction (brake), metallurgical
-          flux, glazes — **not** hot-face liner.
-        density_g_cm3: ~**2.86–3.09**. [web:22]
+          flux, glazes  --  **not** hot-face liner.
+        density_g_cm3: ~**2.86-3.09**. [web:22]
         colour: White, colourless, grey. [web:22]
-        melting_point_C: Congruent ~**1540–1544 °C**. [web:22][web:23]
+        melting_point_C: Congruent ~**1540-1544 °C**. [web:22][web:23]
         softening_working_temp_C: 'Liner: **uncharacterized**.'
         creep_limit_C: '**Uncharacterized** as structural refractory.'
         water_stability: '**Water-stable** (very low solubility silicate).'
         materials_compatibility: Used as ceramic additive; not slag-resistant brick design.
-        appearance_texture: Silky–vitreous acicular crystals; powder chalky-white.
-        everyday_analog: White mineral filler / “ceramic talc-like” powder; brake-pad mineral.
+        appearance_texture: Silky-vitreous acicular crystals; powder chalky-white.
+        everyday_analog: White mineral filler / "ceramic talc-like" powder; brake-pad mineral.
     diopside:
       canonical_node_id: diopside_pyroxene
       parent: ca_mg_silicate
@@ -1311,19 +1311,19 @@ ceramic_hierarchy:
         note: Taxonomy family classification.
       strength:
         status: sourced_qualitative_text
-        text: Mohs **5.5–6.5**; brittle. [web:25]
+        text: Mohs **5.5-6.5**; brittle. [web:25]
         source_ids:
         - ceramic_datasheets
       datasheet:
         terrestrial_applications: Pyroxene glass-ceramics, petrologic mineral, ceramic research.
-        density_g_cm3: ~**3.22–3.38**.
+        density_g_cm3: ~**3.22-3.38**.
         colour: Colourless, green, brown (Fe/Cr).
         melting_point_C: ~**1391 °C**. [tax]
         softening_working_temp_C: 'Liner: **uncharacterized**.'
         creep_limit_C: '**Uncharacterized**.'
         water_stability: '**Water-stable**.'
         materials_compatibility: Glass-ceramic path phase; CMAS-related.
-        appearance_texture: Vitreous pyroxene; ceramic matte–glassy.
+        appearance_texture: Vitreous pyroxene; ceramic matte-glassy.
         everyday_analog: Green pyroxene crystal / glass-ceramic cookware crystal phase.
     akermanite_melilite:
       canonical_node_id: akermanite_melilite_mg
@@ -1370,21 +1370,21 @@ ceramic_hierarchy:
         note: Taxonomy family classification.
       strength:
         status: sourced_qualitative_text
-        text: Mohs ~**5–6**; brittle.
+        text: Mohs ~**5-6**; brittle.
         source_ids:
         - ceramic_datasheets
       datasheet:
         terrestrial_applications: Blast-furnace slag mineralogy, CMAS primary crystallizing phase, glass-ceramics.
-        density_g_cm3: Åkermanite ~**2.94**; gehlenite ~**3.04**.
-        colour: Colourless–yellow–grey–brown; Fe tints.
-        melting_point_C: Åkermanite ~**1454 °C**; gehlenite ~**1590 °C** class (ss path between).
+        density_g_cm3: Akermanite ~**2.94**; gehlenite ~**3.04**.
+        colour: Colourless-yellow-grey-brown; Fe tints.
+        melting_point_C: Akermanite ~**1454 °C**; gehlenite ~**1590 °C** class (ss path between).
         softening_working_temp_C: 'Liner: **uncharacterized**.'
         creep_limit_C: '**Uncharacterized**.'
         water_stability: '**Water-stable** silicates (slag minerals weather slowly, not hydraulic lime).'
         materials_compatibility: Central **CMAS** crystallizing phases; relevant to turbine CMAS attack
           literature as deposit phases.
-        appearance_texture: 'Vitreous–resinous slag crystals; ceramic: grey-yellow matte.'
-        everyday_analog: Blast-furnace slag mineral / “glassy rock” crystals.
+        appearance_texture: 'Vitreous-resinous slag crystals; ceramic: grey-yellow matte.'
+        everyday_analog: Blast-furnace slag mineral / "glassy rock" crystals.
     merwinite:
       canonical_node_id: merwinite
       parent: ca_mg_silicate
@@ -1420,12 +1420,12 @@ ceramic_hierarchy:
       datasheet:
         terrestrial_applications: Cement/slag phase marker; Ca-rich CMAS residue; limited specialty ceramic.
         density_g_cm3: ~**3.15** class.
-        colour: Colourless–grey.
+        colour: Colourless-grey.
         melting_point_C: ~**1575 °C** class (phase-diagram context).
         softening_working_temp_C: '**Uncharacterized** liner.'
         creep_limit_C: '**Uncharacterized**.'
-        water_stability: Generally **water-stable** silicate; less hydraulic than free C₂S/C₃S but Ca-rich
-          — treat as non-slaking vs CaO.
+        water_stability: Generally **water-stable** silicate; less hydraulic than free C2S/C3S but Ca-rich
+           --  treat as non-slaking vs CaO.
         materials_compatibility: Ca-rich basic-leaning silicate marker.
         appearance_texture: Granular colourless mineral.
         everyday_analog: Pale slag/clinker mineral grain.
@@ -1458,13 +1458,13 @@ ceramic_hierarchy:
         note: Taxonomy family classification.
       strength:
         status: sourced_qualitative_text
-        text: Mohs ~**5–5.5**; brittle.
+        text: Mohs ~**5-5.5**; brittle.
         source_ids:
         - ceramic_datasheets
       datasheet:
         terrestrial_applications: Marker phase in CMAS/slags; limited ceramic use.
-        density_g_cm3: ~**3.05–3.2**.
-        colour: Colourless–grey–yellow.
+        density_g_cm3: ~**3.05-3.2**.
+        colour: Colourless-grey-yellow.
         melting_point_C: ~**1503 °C**. [tax]
         softening_working_temp_C: '**Uncharacterized**.'
         creep_limit_C: '**Uncharacterized**.'
@@ -1514,11 +1514,11 @@ ceramic_hierarchy:
         source_ids:
         - ceramic_datasheets
       datasheet:
-        terrestrial_applications: Portland cement clinker only — **explicitly not** hot-face refractories.
-        density_g_cm3: Clinker ~3.1–3.2.
+        terrestrial_applications: Portland cement clinker only  --  **explicitly not** hot-face refractories.
+        density_g_cm3: Clinker ~3.1-3.2.
         colour: Dark grey clinker.
         melting_point_C: Clinker forms ~1450 °C kiln; phases melt/decompose near that range.
-        softening_working_temp_C: '**N/A liner** — cement.'
+        softening_working_temp_C: '**N/A liner**  --  cement.'
         creep_limit_C: '**not-recommended** furnace liner.'
         water_stability: '**Hydrates-and-fails** as free clinker phases (designed hydraulic).'
         materials_compatibility: Hydraulic binders; not slag-resistant hot-face design.
@@ -1562,13 +1562,13 @@ ceramic_hierarchy:
         - ceramic_datasheets
       datasheet:
         terrestrial_applications: Portland cement belite; contributes late strength; **not** liner.
-        density_g_cm3: β-C₂S ~**3.28–3.30**.
-        colour: Colourless–amber pure; clinker grey.
-        melting_point_C: ~**2130 °C** (α) class for pure C₂S — **irrelevant** to liner use; hydraulic
+        density_g_cm3: β-C2S ~**3.28-3.30**.
+        colour: Colourless-amber pure; clinker grey.
+        melting_point_C: ~**2130 °C** (α) class for pure C2S  --  **irrelevant** to liner use; hydraulic
           phase.
         softening_working_temp_C: '**not-recommended** liner.'
         creep_limit_C: '**not-recommended**.'
-        water_stability: '**Hydrates** (slowly vs C₃S) to C–S–H + CH; free phase **fails as dry ceramic
+        water_stability: '**Hydrates** (slowly vs C3S) to C-S-H + CH; free phase **fails as dry ceramic
           in water** by design.'
         materials_compatibility: Cement only.
         appearance_texture: Clinker crystal; dusty powder when ground.
@@ -1612,12 +1612,12 @@ ceramic_hierarchy:
         - ceramic_datasheets
       datasheet:
         terrestrial_applications: Dominant Portland cement strength phase (alite); **not** liner.
-        density_g_cm3: ~**3.13–3.15**.
-        colour: Colourless–brown pure; clinker grey.
-        melting_point_C: Incongruent ~**1900–2070 °C** class in pure system — **not** a service rating.
+        density_g_cm3: ~**3.13-3.15**.
+        colour: Colourless-brown pure; clinker grey.
+        melting_point_C: Incongruent ~**1900-2070 °C** class in pure system  --  **not** a service rating.
         softening_working_temp_C: '**not-recommended** liner.'
         creep_limit_C: '**not-recommended**.'
-        water_stability: '**Hydrates rapidly** → C–S–H + Ca(OH)₂. **Hydrates-and-fails** as free ceramic
+        water_stability: '**Hydrates rapidly** -> C-S-H + Ca(OH)2. **Hydrates-and-fails** as free ceramic
           residue.'
         materials_compatibility: Cement only; free lime association worsens water damage.
         appearance_texture: Dark clinker nodules when bulk.
@@ -1664,15 +1664,15 @@ ceramic_hierarchy:
         source_ids:
         - ceramic_datasheets
       datasheet:
-        terrestrial_applications: Accessories, concentrates, value-grade markers — **not** bulk liners.
-        density_g_cm3: 'High: chromite ~4.5–5.1; perovskite ~4.0; REE phases often >5.'
+        terrestrial_applications: Accessories, concentrates, value-grade markers  --  **not** bulk liners.
+        density_g_cm3: 'High: chromite ~4.5-5.1; perovskite ~4.0; REE phases often >5.'
         colour: 'Dark: black, brown, red (Cr/Fe/Ti chromophores).'
         melting_point_C: Often high (perovskite ~1975 °C; chromite ~ partial melt paths).
         softening_working_temp_C: '**Uncharacterized** as bulk liner family.'
         creep_limit_C: '**Uncharacterized**.'
         water_stability: Generally **water-stable** oxides/spinels (not free lime).
         materials_compatibility: Specialty; chromia resists many slags; REE phases process-specific.
-        appearance_texture: Opaque metallic–submetallic grains.
+        appearance_texture: Opaque metallic-submetallic grains.
         everyday_analog: Black sand / chrome ore grit.
     perovskite_catito3:
       canonical_node_id: perovskite_catito3
@@ -1707,15 +1707,15 @@ ceramic_hierarchy:
       datasheet:
         terrestrial_applications: Dielectric ceramics, Ti sink in CMAS/CAS systems, mineral perovskite;
           rare bulk structural product.
-        density_g_cm3: ~**4.0–4.1**. [web:36]
+        density_g_cm3: ~**4.0-4.1**. [web:36]
         colour: Pure white powder; mineral black/brown/red/yellow from Fe/Nb/REE. [web:36][web:38]
         melting_point_C: ~**1975 °C**. [web:36][tax]
         softening_working_temp_C: 'Liner: **uncharacterized**.'
         creep_limit_C: '**Uncharacterized** as structural hot-face product.'
         water_stability: '**Water-stable**.'
-        materials_compatibility: Titanate; reducing atmospheres can reduce Ti⁴⁺; specialty dielectric
+        materials_compatibility: Titanate; reducing atmospheres can reduce Ti4+; specialty dielectric
           not slag brick.
-        appearance_texture: 'Pure: white powder; mineral: dark, submetallic–adamantine.'
+        appearance_texture: 'Pure: white powder; mineral: dark, submetallic-adamantine.'
         everyday_analog: White ceramic powder / dark metallic-looking mineral grain.
     ree_aluminate_silicate_family:
       canonical_node_id: null
@@ -1763,14 +1763,14 @@ ceramic_hierarchy:
         - ceramic_datasheets
       datasheet:
         terrestrial_applications: REE concentrates, phosphors, specialty ceramics (YAG-like aluminates
-          etc. when named); KREEP-style residue flags — **family flag, not single leaf**.
-        density_g_cm3: '**Uncharacterized** without named REE phase (often 5–7+).'
+          etc. when named); KREEP-style residue flags  --  **family flag, not single leaf**.
+        density_g_cm3: '**Uncharacterized** without named REE phase (often 5-7+).'
         colour: Often coloured by 4f ions (Nd purple, Er pink, etc.) or white if La/Y.
         melting_point_C: '**Uncharacterized** without named phase.'
         softening_working_temp_C: '**Uncharacterized**.'
         creep_limit_C: '**Uncharacterized**.'
         water_stability: Generally **water-stable** oxide/silicate families; some REE oxides carbonate/hydrate
-          slowly — phase-specific.
+          slowly  --  phase-specific.
         materials_compatibility: Value concentrate; not bulk liner.
         appearance_texture: Dense ceramic powders / glassy REE residues.
         everyday_analog: Rare-earth magnet precursor oxides / ceramic phosphor powder.
@@ -1815,8 +1815,8 @@ ceramic_hierarchy:
       datasheet:
         terrestrial_applications: Chromite ore, refractory chrome/chrome-magnesia bricks (with product
           window), foundry sand.
-        density_g_cm3: ~**4.5–5.1**.
-        colour: Black–dark brown.
+        density_g_cm3: ~**4.5-5.1**.
+        colour: Black-dark brown.
         melting_point_C: Chromite ~**~2180 °C** class (varies with solid solution); product chrome refractories
           high.
         softening_working_temp_C: 'Without product chromia brick row: **uncharacterized**.'
@@ -1824,7 +1824,7 @@ ceramic_hierarchy:
         water_stability: '**Water-stable**.'
         materials_compatibility: Chromia/spinel resists many slags; hexavalent Cr environmental issue
           in oxidizing alkali; reducing preferred in some chrome bricks.
-        appearance_texture: Black metallic–submetallic granular.
+        appearance_texture: Black metallic-submetallic granular.
         everyday_analog: Black sand / chrome ore / dark sandpaper grit.
     ree_titanate_pyrochlore_family:
       canonical_node_id: ree_titanate_pyrochlore_family
@@ -1870,8 +1870,8 @@ ceramic_hierarchy:
         - ceramic_datasheets
       datasheet:
         terrestrial_applications: Specialty electroceramics, nuclear waste form research (pyrochlore),
-          REE-titanate residues — **family flag**.
-        density_g_cm3: '**Uncharacterized** without named Ln (often ~5–7).'
+          REE-titanate residues  --  **family flag**.
+        density_g_cm3: '**Uncharacterized** without named Ln (often ~5-7).'
         colour: Variable with Ln and defects.
         melting_point_C: '**Uncharacterized** family (many high-melting).'
         softening_working_temp_C: '**Uncharacterized**.'
@@ -1925,15 +1925,15 @@ ceramic_hierarchy:
         - ceramic_datasheets
       datasheet:
         terrestrial_applications: SOFC seals, cast glass-ceramics, partially crystallized slag-ceramics
-          — **not** furnace hot-face.
-        density_g_cm3: ~2.5–3.0 typical silicate glass-ceramics.
-        colour: White–grey–green depending on Fe.
+           --  **not** furnace hot-face.
+        density_g_cm3: ~2.5-3.0 typical silicate glass-ceramics.
+        colour: White-grey-green depending on Fe.
         melting_point_C: Softening of residual glass + crystal melt-out **composition-dependent**.
-        softening_working_temp_C: Seal operation often **750–950 °C** class (SOFC analogs). [tax]
+        softening_working_temp_C: Seal operation often **750-950 °C** class (SOFC analogs). [tax]
         creep_limit_C: Viscous flow of residual glass sets ceiling **well below** refractory brick RUL.
         water_stability: '**Water-stable** solid; high-alkali residual glass may leach alkali.'
         materials_compatibility: Designed for metal/ceramic seal CTE match; CMAS chemistry is the material.
-        appearance_texture: Opaque–translucent glassy ceramic.
+        appearance_texture: Opaque-translucent glassy ceramic.
         everyday_analog: Glass-ceramic cookware (Pyroceram-like) but CAS/CMAS not lithium cookware chemistry.
     cmas_glass_ceramic:
       canonical_node_id: null
@@ -1993,11 +1993,11 @@ ceramic_hierarchy:
         - ceramic_datasheets
       datasheet:
         terrestrial_applications: Solid-oxide fuel-cell seals; experimental CMAS castables.
-        density_g_cm3: ~**2.6–2.9** typical (composition-specific; **approx**).
+        density_g_cm3: ~**2.6-2.9** typical (composition-specific; **approx**).
         colour: Off-white to green-grey with Fe.
-        melting_point_C: Multi-phase; residual glass softens first — **no single congruent T**.
-        softening_working_temp_C: Seal service **~750–950 °C** scoped. [tax]
-        creep_limit_C: Viscous seal design intentional above Tg — **not** structural liner creep rating.
+        melting_point_C: Multi-phase; residual glass softens first  --  **no single congruent T**.
+        softening_working_temp_C: Seal service **~750-950 °C** scoped. [tax]
+        creep_limit_C: Viscous seal design intentional above Tg  --  **not** structural liner creep rating.
         water_stability: '**Water-stable** body; leach depends on residual glass alkalis (usually low
           in CAS).'
         materials_compatibility: Compatible with selected interconnects/electrolytes in SOFC literature;
@@ -2048,9 +2048,9 @@ ceramic_hierarchy:
         - ceramic_datasheets
       datasheet:
         terrestrial_applications: Crystallization-path **marker label**, not a product SKU.
-        density_g_cm3: Path between gehlenite ~3.04 and anorthite ~2.75 — **not a single density**.
-        colour: White–buff–grey.
-        melting_point_C: Path region on CAS liquidus — **not a single T**.
+        density_g_cm3: Path between gehlenite ~3.04 and anorthite ~2.75  --  **not a single density**.
+        colour: White-buff-grey.
+        melting_point_C: Path region on CAS liquidus  --  **not a single T**.
         softening_working_temp_C: '**Uncharacterized** product.'
         creep_limit_C: '**Uncharacterized**.'
         water_stability: Phases **water-stable**.
