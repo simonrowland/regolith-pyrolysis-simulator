@@ -1885,6 +1885,9 @@ def test_pool_nonpicklable_request_payload_preflight(tmp_path: Path) -> None:
 
 
 def test_pool_large_batch_bounded_inflight(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    popen_type = subprocess.Popen
+    assert isinstance(popen_type, type)
+
     class FakeExecutor:
         def __init__(self, *, max_workers: int | None, initializer: object) -> None:
             self.max_workers = max_workers
@@ -1940,6 +1943,7 @@ def test_pool_large_batch_bounded_inflight(monkeypatch: pytest.MonkeyPatch, tmp_
 
     assert len(results) == len(requests)
     assert fake_executor.max_active <= 4
+    assert subprocess.Popen is popen_type
 
 
 def test_cross_process_float_drift_sentinel_serial_vs_pool(tmp_path: Path) -> None:

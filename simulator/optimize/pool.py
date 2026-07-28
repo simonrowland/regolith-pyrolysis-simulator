@@ -73,10 +73,6 @@ _DESCENDANT_PGREP_MAX_SECONDS = 0.05
 _DESCENDANT_MAX_PROCESSES = 4096
 _LOGGER = logging.getLogger(__name__)
 _POOL_UNAVAILABLE_ERRNOS = {errno.EACCES, errno.EPERM, errno.ENOSYS}
-_ORIGINAL_POPEN = subprocess.Popen
-_CHILD_PID_TRACKING_INSTALLED = False
-
-
 @dataclass(frozen=True)
 class PoolEvaluationRequest:
     patch: RecipePatch | Mapping[str, Any]
@@ -669,7 +665,7 @@ def _evaluate_pool_task(
     previous_pid_log = os.environ.get(_CHILD_PID_LOG_ENV)
     os.environ[_WORKER_OUTPUT_ENV] = str(output_dir)
     os.environ[_CHILD_PID_LOG_ENV] = child_pid_log
-    _install_child_pid_tracking()
+    restore_child_pid_tracking = _install_child_pid_tracking()
     try:
         evaluator_kwargs = dict(task.evaluator_kwargs or {})
         result = _call_evaluate_fn(
@@ -699,6 +695,7 @@ def _evaluate_pool_task(
             "result": _stale_profile_result(task.candidate_id, str(exc)),
         }
     finally:
+        restore_child_pid_tracking()
         if previous_output is None:
             os.environ.pop(_WORKER_OUTPUT_ENV, None)
         else:
@@ -1462,20 +1459,25 @@ def _append_child_pid(path: str, pid: int) -> None:
         return
 
 
-def _install_child_pid_tracking() -> None:
-    global _CHILD_PID_TRACKING_INSTALLED
-    if _CHILD_PID_TRACKING_INSTALLED:
-        return
+def _install_child_pid_tracking() -> Callable[[], None]:
+    previous_popen = subprocess.Popen
 
-    def _tracked_popen(*args: Any, **kwargs: Any) -> subprocess.Popen[Any]:
-        process = _ORIGINAL_POPEN(*args, **kwargs)
+    def _tracked_popen(*args: Any, **kwargs: Any) -> Any:
+        process = previous_popen(*args, **kwargs)
         log_path = os.environ.get(_CHILD_PID_LOG_ENV)
         if log_path:
             _append_child_pid(log_path, int(process.pid))
         return process
 
+    # subprocess is shared process-wide, and in-process executor doubles can
+    # invoke this worker path. Restore the class after each evaluation instead
+    # of leaking this callable into unrelated consumers of subprocess.Popen.
     subprocess.Popen = _tracked_popen  # type: ignore[assignment]
-    _CHILD_PID_TRACKING_INSTALLED = True
+
+    def _restore() -> None:
+        subprocess.Popen = previous_popen
+
+    return _restore
 
 
 def _task_label(task: _PoolTask) -> str:
