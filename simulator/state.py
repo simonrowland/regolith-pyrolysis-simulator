@@ -376,6 +376,7 @@ class Atmosphere(Enum):
     O2_BACKPRESSURE = auto()  # O₂ at 0.01-0.1 bar (C5 MRE)
     CONTROLLED_O2_FLOW = auto()  # O₂ flow/sweep (C0b P-cleanup)
     CO2_BACKPRESSURE = auto()    # Mars surface CO₂ pressure floor during C0
+    ARGON_FLOW = auto()          # Literature-scale inert Ar flow boundary
 
 
 # ============================================================================

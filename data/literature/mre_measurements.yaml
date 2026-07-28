@@ -1,0 +1,215 @@
+schema_version: mre_measurements.v1
+
+measurements:
+  yu_2025_hollow_anode_measurements:
+    evidence_class: experiment-grade
+    paper_citation:
+      citation_id: yu_2025_acta_astronautica_235_723_735
+      title: "Improving Molten Regolith Electrolysis with Zirconia-Based Hollow Anode Technology"
+      doi: "10.1016/j.actaastro.2025.06.028"
+      ntrs_record: "https://ntrs.nasa.gov/citations/20250004626"
+    extraction:
+      extractor: t-429b
+      extraction_date: "2026-07-28"
+      text_tables_status: transcribed_and_cross_checked
+      figure_status: blocked_pending_authoritative_figure_pixels
+      no_curve_fit: true
+      disagreement_policy: preserve_never_average
+
+    control_trajectories:
+      yu_figure_2b_cell_potential:
+        observable_id: cell_potential_V
+        role: published_measured_response_replay
+        interpolation: linear
+        source_locator: {figure: "2(b)"}
+        digitization_method:
+          status: transcription_required
+          required: manual_axis_calibration_and_independent_point_check
+        cases:
+          one_hour:
+            points: []
+          three_hour:
+            points: []
+          twelve_hour:
+            points: []
+
+    figure_observations:
+      figure_2a_outlet_o2_volume_fraction:
+        status: transcription_required
+        source_locator: {figure: "2(a)"}
+        cases:
+          one_hour: {points: []}
+          three_hour: {points: []}
+          twelve_hour: {points: []}
+      supplement_figure_s2_thermal_profiles:
+        status: transcription_required
+        source_locator: {supplement_figure: S2}
+        cases:
+          one_hour: {points: []}
+          three_hour: {points: []}
+          twelve_hour: {points: []}
+      supplement_figures_s4_s6_eds:
+        status: transcription_required
+        preservation_rule: retain_every_region_without_averaging
+        source_locator: {supplement_figures: [S4, S5, S6]}
+        regions: []
+
+    cases:
+      one_hour:
+        comparison_points:
+          - observable_id: mre_applied_charge_C
+            selector_kind: mre_applied_charge_C
+            coordinate: {window_start_h: 0.0, window_end_h: 1.0}
+            expected_value: 1800.0
+            uncertainty: {kind: absolute, value: 1.0e-9}
+            units: C
+            status: derived_from_published_control
+            disposition: compare
+            evidence_scope: non_predictive_execution_audit
+            source_locator: {section: "2.2.2", derivation: "0.5 A times 3600 s"}
+          - observable_id: mre_anode_o2_mass_kg
+            selector_kind: collected_rga_o2_mass_kg
+            species: O2
+            coordinate: {time_h: 1.0}
+            expected_value: 0.000070
+            uncertainty: {kind: absolute, value: 5.0e-7}
+            units: kg
+            status: reported
+            disposition: out-of-domain
+            evidence_scope: exterior_rga_collected_lower_bound_vs_source_side_ledger
+            source_locator: {table: 2, row: "1 h", column: "O2 Produced"}
+          - observable_id: mre_faradaic_efficiency_fraction
+            selector_kind: mre_faradaic_efficiency_fraction
+            coordinate: {window_start_h: 0.0, window_end_h: 1.0}
+            expected_value: 0.47
+            uncertainty: {kind: absolute, value: 0.005}
+            units: fraction
+            status: reported_whole_percent
+            disposition: out-of-domain
+            evidence_scope: exterior_rga_collected_o2_basis
+            source_locator: {table: 2, row: "1 h", column: "Faradaic Efficiency"}
+          - observable_id: mre_extraction_efficiency_fraction
+            selector_kind: mre_extraction_efficiency_fraction
+            coordinate: {time_h: 1.0}
+            expected_value: 0.004
+            uncertainty: {kind: absolute, value: 0.0005}
+            units: fraction
+            status: reported_tenth_percent
+            disposition: unsupported-observable
+            evidence_scope: paper_extraction_metric_without_runtime_denominator_equivalence
+            source_locator: {table: 2, row: "1 h", column: "Extraction Efficiency"}
+        qualitative_observations:
+          - {observable_id: "cathodic_element_presence:Fe", element: Fe, observed: true, source_locator: {table: 2, row: "1 h"}}
+          - {observable_id: "cathodic_element_presence:Si", element: Si, observed: false, source_locator: {table: 2, row: "1 h"}}
+          - {observable_id: "cathodic_element_presence:P", element: P, observed: false, source_locator: {table: 2, row: "1 h"}}
+          - {observable_id: "cathodic_element_presence:Ti", element: Ti, observed: false, source_locator: {table: 2, row: "1 h"}}
+          - {observable_id: "cathodic_element_presence:Mn", element: Mn, observed: false, source_locator: {table: 2, row: "1 h"}}
+
+      three_hour:
+        comparison_points:
+          - observable_id: mre_applied_charge_C
+            selector_kind: mre_applied_charge_C
+            coordinate: {window_start_h: 0.0, window_end_h: 3.0}
+            expected_value: 5400.0
+            uncertainty: {kind: absolute, value: 1.0e-9}
+            units: C
+            status: derived_from_published_control
+            disposition: compare
+            evidence_scope: non_predictive_execution_audit
+            source_locator: {section: "2.2.2", derivation: "0.5 A times 10800 s"}
+          - observable_id: mre_anode_o2_mass_kg
+            selector_kind: collected_rga_o2_mass_kg
+            species: O2
+            coordinate: {time_h: 3.0}
+            expected_value: 0.000237
+            uncertainty: {kind: absolute, value: 5.0e-7}
+            units: kg
+            status: reported
+            disposition: out-of-domain
+            evidence_scope: exterior_rga_collected_lower_bound_vs_source_side_ledger
+            source_locator: {table: 2, row: "3 h", column: "O2 Produced"}
+          - observable_id: mre_faradaic_efficiency_fraction
+            selector_kind: mre_faradaic_efficiency_fraction
+            coordinate: {window_start_h: 0.0, window_end_h: 3.0}
+            expected_value: 0.53
+            uncertainty: {kind: absolute, value: 0.005}
+            units: fraction
+            status: reported_whole_percent
+            disposition: out-of-domain
+            evidence_scope: exterior_rga_collected_o2_basis
+            source_locator: {table: 2, row: "3 h", column: "Faradaic Efficiency"}
+          - observable_id: mre_extraction_efficiency_fraction
+            selector_kind: mre_extraction_efficiency_fraction
+            coordinate: {time_h: 3.0}
+            expected_value: 0.012
+            uncertainty: {kind: absolute, value: 0.0005}
+            units: fraction
+            status: reported_tenth_percent
+            disposition: unsupported-observable
+            evidence_scope: paper_extraction_metric_without_runtime_denominator_equivalence
+            source_locator: {table: 2, row: "3 h", column: "Extraction Efficiency"}
+        qualitative_observations:
+          - {observable_id: "cathodic_element_presence:Fe", element: Fe, observed: true, source_locator: {table: 2, row: "3 h"}}
+          - {observable_id: "cathodic_element_presence:P", element: P, observed: true, source_locator: {table: 2, row: "3 h"}}
+          - {observable_id: "cathodic_element_presence:Si", element: Si, observed: true, source_locator: {table: 2, row: "3 h"}}
+          - {observable_id: "cathodic_element_presence:Ti", element: Ti, observed: false, source_locator: {table: 2, row: "3 h"}}
+          - {observable_id: "cathodic_element_presence:Mn", element: Mn, observed: false, source_locator: {table: 2, row: "3 h"}}
+
+      twelve_hour:
+        comparison_points:
+          - observable_id: mre_applied_charge_C
+            selector_kind: mre_applied_charge_C
+            coordinate: {window_start_h: 0.0, window_end_h: 12.0}
+            expected_value: 21600.0
+            uncertainty: {kind: absolute, value: 1.0e-9}
+            units: C
+            status: derived_from_published_control
+            disposition: compare
+            evidence_scope: non_predictive_execution_audit
+            source_locator: {section: "2.2.2", derivation: "0.5 A times 43200 s"}
+          - observable_id: mre_anode_o2_mass_kg
+            selector_kind: collected_rga_o2_mass_kg
+            species: O2
+            coordinate: {time_h: 12.0}
+            expected_value: 0.000749
+            uncertainty: {kind: absolute, value: 5.0e-7}
+            units: kg
+            status: reported
+            disposition: out-of-domain
+            evidence_scope: exterior_rga_collected_lower_bound_vs_source_side_ledger
+            source_locator: {table: 2, row: "12 h", column: "O2 Produced"}
+          - observable_id: mre_faradaic_efficiency_fraction
+            selector_kind: mre_faradaic_efficiency_fraction
+            coordinate: {window_start_h: 0.0, window_end_h: 12.0}
+            expected_value: 0.42
+            uncertainty: {kind: absolute, value: 0.005}
+            units: fraction
+            status: reported_whole_percent
+            disposition: out-of-domain
+            evidence_scope: exterior_rga_collected_o2_basis
+            source_locator: {table: 2, row: "12 h", column: "Faradaic Efficiency"}
+          - observable_id: mre_extraction_efficiency_fraction
+            selector_kind: mre_extraction_efficiency_fraction
+            coordinate: {time_h: 12.0}
+            expected_value: 0.037
+            uncertainty: {kind: absolute, value: 0.0005}
+            units: fraction
+            status: reported_tenth_percent
+            disposition: unsupported-observable
+            evidence_scope: paper_extraction_metric_without_runtime_denominator_equivalence
+            source_locator: {table: 2, row: "12 h", column: "Extraction Efficiency"}
+        qualitative_observations:
+          - {observable_id: "cathodic_element_presence:Fe", element: Fe, observed: true, source_locator: {table: 2, row: "12 h"}}
+          - {observable_id: "cathodic_element_presence:P", element: P, observed: true, source_locator: {table: 2, row: "12 h"}}
+          - {observable_id: "cathodic_element_presence:Si", element: Si, observed: true, source_locator: {table: 2, row: "12 h"}}
+          - {observable_id: "cathodic_element_presence:Ti", element: Ti, observed: true, source_locator: {table: 2, row: "12 h"}}
+          - {observable_id: "cathodic_element_presence:Mn", element: Mn, observed: true, source_locator: {table: 2, row: "12 h"}}
+
+    unsupported_observables:
+      - {observable_id: outlet_o2_volume_fraction, reason: "No hollow-anode gas-volume, residence-time, collection, or RGA response model."}
+      - {observable_id: cell_potential_V, reason: "Figure 2(b) is injected as a measured-response replay and is not a prediction."}
+      - {observable_id: mre_extraction_efficiency_fraction, reason: "The paper's extraction-efficiency denominator is not equated to the runtime bulk-metal projection without a source-verified metric definition."}
+      - {observable_id: "cathodic_element_presence:P", reason: "P2O5 electrolysis and cathodic P speciation are absent."}
+      - {observable_id: cathodic_eds_atomic_fraction, reason: "Runtime has bulk metal inventory but no Mo-alloy spatial EDS regions."}
+      - {observable_id: hollow_anode_transport_efficiency, reason: "Hollow-anode collection and leakage are outside the builtin intent."}
+      - {observable_id: ysz_degradation_or_electronic_leakage, reason: "YSZ degradation and electronic leakage are not modeled."}

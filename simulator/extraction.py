@@ -1350,9 +1350,9 @@ class ExtractionMixin:
             }
         return route_diagnostic
 
-    def _step_mre(self, *, sample_time_h: float | None = None) -> float:
+    def _select_plant_mre_interval_control(self):
         """
-        Perform one hour of molten regolith electrolysis (C5 or MRE baseline).
+        Select one hour of plant MRE control without dispatching chemistry.
 
         Voltage strategy:
             C5 (limited MRE):    Stepped holds at the selected EvalSpec
@@ -1388,14 +1388,9 @@ class ExtractionMixin:
         the ledger) and routes to :class:`EnergyTracker` via the
         existing ``_mre_energy_this_hr`` counter, same as pre-flip.
 
-        Returns O₂ produced this hour (kg).
+        Returns a typed plant control, or ``None`` for a policy no-op.
         """
-        from simulator.chemistry.kernel.capabilities import ChemistryIntent
-        from simulator.electrolysis import (
-            ELECTRONS_PER_OXIDE,
-            MRECurrentPartitionRefusal,
-            MRE_MULTI_OXIDE_PARTITION_REFUSAL,
-        )
+        from simulator.mre_reproduction import PlantMREIntervalControl
 
         mre_diagnostic_state_before_step = {
             'uncertified_yield': dict(
@@ -1429,7 +1424,7 @@ class ExtractionMixin:
             self.melt.mre_voltage_V = 0.0
             self.melt.mre_declared_rung_V = 0.0
             self.melt.mre_current_A = 0.0
-            return 0.0
+            return None
 
         # --- Voltage and current selection (stepped holds) ---         [Step 9]
         c5_step_info: Mapping[str, Any] | None = None
@@ -1527,7 +1522,7 @@ class ExtractionMixin:
                 self.melt.mre_voltage_V = 0.0
                 self.melt.mre_declared_rung_V = 0.0
                 self.melt.mre_current_A = 0.0
-                return 0.0
+                return None
 
             sequence_completion_key = (
                 target,
@@ -1547,7 +1542,7 @@ class ExtractionMixin:
                 self.melt.mre_declared_rung_V = 0.0
                 self.melt.mre_current_A = 0.0
                 self.melt.mre_c5_ladder_complete = True
-                return 0.0
+                return None
 
             else:
                 idx = min(self._mre_voltage_step_idx, len(seq) - 1)
@@ -1642,7 +1637,121 @@ class ExtractionMixin:
             # Nernst remains the physical reducibility gate inside the engine.
             c5_allowed_oxides = sorted(rung_allowed_oxides)
 
-        pO2_bar = float(self._commanded_pO2_bar())
+        return PlantMREIntervalControl(
+            dt_h=1.0,
+            applied_current_A=float(current_A),
+            applied_voltage_V=float(voltage_V),
+            temperature_C=float(self.melt.temperature_C),
+            pO2_bar=float(self._commanded_pO2_bar()),
+            allowed_oxides=(
+                tuple(c5_allowed_oxides)
+                if c5_allowed_oxides is not None
+                else None
+            ),
+            c5_step_info=c5_step_info,
+            c5_rung_advanced=bool(c5_rung_advanced),
+            replay_state_before_dispatch=mre_replay_state_before_dispatch,
+            diagnostic_state_before_dispatch=mre_diagnostic_state_before_step,
+        )
+
+    def _step_mre(self, *, sample_time_h: float | None = None) -> float:
+        """Select plant MRE controls and execute one authoritative interval."""
+
+        control = self._select_plant_mre_interval_control()
+        if control is None:
+            return 0.0
+        result = self._execute_mre_interval(
+            control,
+            execution_origin='plant',
+            sample_time_h=sample_time_h,
+        )
+        return float(result['mre_anode_o2_delta_kg'])
+
+    def _execute_mre_interval(
+        self,
+        control,
+        *,
+        execution_origin: str,
+        sample_time_h: float | None = None,
+    ) -> dict[str, Any]:
+        """Execute and commit one typed plant or literature MRE interval."""
+
+        from simulator.chemistry.kernel.capabilities import ChemistryIntent
+        from simulator.electrolysis import (
+            ELECTRONS_PER_OXIDE,
+            MRECurrentPartitionRefusal,
+            MRE_MULTI_OXIDE_PARTITION_REFUSAL,
+        )
+        from simulator.mre_reproduction import (
+            MREReproductionInterval,
+            PlantMREIntervalControl,
+        )
+
+        if execution_origin == 'plant':
+            if not isinstance(control, PlantMREIntervalControl):
+                raise TypeError(
+                    'plant MRE execution requires PlantMREIntervalControl')
+            is_plant = True
+        elif execution_origin == 'literature-reproduction':
+            if not isinstance(control, MREReproductionInterval):
+                raise TypeError(
+                    'literature reproduction requires MREReproductionInterval')
+            is_plant = False
+        else:
+            raise ValueError(f'unsupported MRE execution origin: {execution_origin!r}')
+
+        voltage_V = float(control.applied_voltage_V)
+        current_A = float(control.applied_current_A)
+        dt_hr = float(control.dt_h)
+        if not math.isfinite(dt_hr) or dt_hr <= 0.0:
+            raise ValueError('MRE interval dt_h must be finite and positive')
+        if not math.isclose(
+            float(self.melt.temperature_C),
+            float(control.temperature_C),
+            rel_tol=0.0,
+            abs_tol=1e-9,
+        ):
+            raise ValueError(
+                'MRE interval temperature does not match live melt temperature')
+        pO2_bar = control.pO2_bar
+        if pO2_bar is None:
+            raise ValueError('MRE interval requires a numerical pO2_bar')
+        pO2_bar = float(pO2_bar)
+        c5_allowed_oxides = (
+            list(control.allowed_oxides)
+            if is_plant and control.allowed_oxides is not None
+            else None
+        )
+        c5_step_info = control.c5_step_info if is_plant else None
+        c5_rung_advanced = bool(control.c5_rung_advanced) if is_plant else False
+        mre_replay_state_before_dispatch = (
+            dict(control.replay_state_before_dispatch) if is_plant else {}
+        )
+        if is_plant:
+            mre_diagnostic_state_before_step = dict(
+                control.diagnostic_state_before_dispatch)
+        else:
+            mre_diagnostic_state_before_step = {
+                'uncertified_yield': dict(
+                    getattr(self, '_mre_uncertified_yield', {}) or {}),
+                'ellingham_ladder_diagnostic': dict(
+                    getattr(self, '_mre_ellingham_ladder_diagnostic', {}) or {}),
+                'effective_voltage_margin_by_oxide': dict(
+                    getattr(
+                        self,
+                        '_mre_effective_voltage_margin_V_by_oxide',
+                        {},
+                    ) or {}
+                ),
+                'effective_voltage_margin_temperature_C': getattr(
+                    self,
+                    '_mre_effective_voltage_margin_temperature_C',
+                    None,
+                ),
+            }
+            self._mre_uncertified_yield = {}
+            self._mre_ellingham_ladder_diagnostic = {}
+
         # F-B1: dispatch + commit split via the _dispatch_only /
         # _commit_proposal helper pair so the per-account balance
         # snapshot can sit between them.  We need the pre-commit metal
@@ -1654,12 +1763,14 @@ class ExtractionMixin:
         electrolysis_controls = {
             'voltage_V': float(voltage_V),
             'current_A': float(current_A),
-            'dt_hr': 1.0,
+            'dt_hr': dt_hr,
             'pO2_bar': pO2_bar,
         }
+        if not is_plant:
+            electrolysis_controls['commit_empty_transition'] = True
         melt_fO2_log = self._current_melt_redox_fO2_log()
         electrolysis_controls['melt_fO2_log'] = float(melt_fO2_log)
-        if c5_allowed_oxides is not None:
+        if is_plant and c5_allowed_oxides is not None:
             electrolysis_controls['allowed_oxides'] = c5_allowed_oxides
             from engines.builtin.metallothermic_step import (
                 SPENT_REDUCTANT_RESIDUE_ACCOUNT,
@@ -1680,7 +1791,11 @@ class ExtractionMixin:
                     ),
                 )
         c5_ellingham_ladder_diagnostic = {}
-        if self.melt.campaign == CampaignPhase.C5 and c5_step_info is not None:
+        if (
+            is_plant
+            and self.melt.campaign == CampaignPhase.C5
+            and c5_step_info is not None
+        ):
             try:
                 c5_ellingham_ladder_diagnostic = (
                     self._build_c5_ellingham_ladder_diagnostic(
@@ -1702,6 +1817,7 @@ class ExtractionMixin:
                         for oxide in c5_step_info.get('species', ()) or ()
                     ],
                 }
+        ledger_before_mol_by_account = self.atom_ledger.mol_by_account()
         kernel_result = self._dispatch_only(
             ChemistryIntent.ELECTROLYSIS_STEP,
             control_inputs=electrolysis_controls,
@@ -1744,6 +1860,11 @@ class ExtractionMixin:
         }
         o2_before_kg = self._ledger_account_species_kg(
             'terminal.oxygen_mre_anode_stored', 'O2')
+        o2_before_mol = float(
+            self.atom_ledger.mol_by_account(
+                'terminal.oxygen_mre_anode_stored'
+            ).get('O2', 0.0)
+        )
 
         proposal = kernel_result.transition
         if proposal is None and getattr(kernel_result, 'status', '') == 'refused':
@@ -1768,37 +1889,42 @@ class ExtractionMixin:
             self._mre_effective_current_A = 0.0
             self._mre_energy_this_hr = 0.0
             self.melt.mre_voltage_V = 0.0
-            self.melt.mre_declared_rung_V = float(
-                mre_replay_state_before_dispatch['melt_declared_rung_V'])
+            if is_plant:
+                self.melt.mre_declared_rung_V = float(
+                    mre_replay_state_before_dispatch['melt_declared_rung_V'])
             self.melt.mre_current_A = 0.0
-            self._mre_hold_hours = int(
-                mre_replay_state_before_dispatch['hold_hours'])
-            self._mre_voltage_step_idx = int(
-                mre_replay_state_before_dispatch['voltage_step_idx'])
-            self._mre_rung_ever_effective = bool(
-                mre_replay_state_before_dispatch['rung_ever_effective'])
-            self._mre_c5_sequence_complete_key = (
-                mre_replay_state_before_dispatch['sequence_complete_key'])
-            self.melt.mre_c5_on_final_rung = bool(
-                mre_replay_state_before_dispatch['melt_c5_on_final_rung'])
-            self.melt.mre_c5_ladder_complete = bool(
-                mre_replay_state_before_dispatch['melt_c5_ladder_complete'])
+            if is_plant:
+                self._mre_hold_hours = int(
+                    mre_replay_state_before_dispatch['hold_hours'])
+                self._mre_voltage_step_idx = int(
+                    mre_replay_state_before_dispatch['voltage_step_idx'])
+                self._mre_rung_ever_effective = bool(
+                    mre_replay_state_before_dispatch['rung_ever_effective'])
+                self._mre_c5_sequence_complete_key = (
+                    mre_replay_state_before_dispatch['sequence_complete_key'])
+                self.melt.mre_c5_on_final_rung = bool(
+                    mre_replay_state_before_dispatch['melt_c5_on_final_rung'])
+                self.melt.mre_c5_ladder_complete = bool(
+                    mre_replay_state_before_dispatch['melt_c5_ladder_complete'])
+            restore_state = (
+                mre_replay_state_before_dispatch
+                if is_plant
+                else mre_diagnostic_state_before_step
+            )
             self._mre_uncertified_yield = dict(
-                mre_replay_state_before_dispatch['uncertified_yield'])
+                restore_state['uncertified_yield'])
             self._mre_ellingham_ladder_diagnostic = dict(
-                mre_replay_state_before_dispatch[
-                    'ellingham_ladder_diagnostic'])
+                restore_state['ellingham_ladder_diagnostic'])
             self._mre_effective_voltage_margin_V_by_oxide = dict(
-                mre_replay_state_before_dispatch[
-                    'effective_voltage_margin_by_oxide'])
+                restore_state['effective_voltage_margin_by_oxide'])
             self._mre_effective_voltage_margin_temperature_C = (
-                mre_replay_state_before_dispatch[
-                    'effective_voltage_margin_temperature_C']
+                restore_state['effective_voltage_margin_temperature_C']
             )
             reason = diagnostic.get('reason_refused', 'electrolysis_step_refused')
             if reason == MRE_MULTI_OXIDE_PARTITION_REFUSAL:
                 raise MRECurrentPartitionRefusal(reason, refusal_record)
             raise RuntimeError(f'MRE electrolysis refused: {reason}')
+        transition = None
         if proposal is not None:
             transition = self._commit_proposal(
                 ChemistryIntent.ELECTROLYSIS_STEP,
@@ -1861,6 +1987,35 @@ class ExtractionMixin:
                         )
 
         self._mre_metals_this_hr = dict(sorted(mre_metal_deltas_kg.items()))
+        trace_species = set(produced_metals) | set(produced_gases)
+        for route in gas_route_diagnostic.values():
+            trace_species.update(
+                str(species)
+                for species in (route.get('product_projection_kg') or {})
+            )
+        ledger_after_mol_by_account = self.atom_ledger.mol_by_account()
+        mre_metal_deltas_mol = {}
+        for species in trace_species:
+            before_mol = sum(
+                float(account.get(species, 0.0))
+                for account in ledger_before_mol_by_account.values()
+            )
+            after_mol = sum(
+                float(account.get(species, 0.0))
+                for account in ledger_after_mol_by_account.values()
+            )
+            delta_mol = max(0.0, after_mol - before_mol)
+            if delta_mol > 1e-12:
+                mre_metal_deltas_mol[species] = delta_mol
+        mre_metal_deltas_mol = {
+            metal: amount
+            for metal, amount in sorted(mre_metal_deltas_mol.items())
+            if amount > 1e-12
+        }
+        trace_metal_deltas_kg = {
+            species: mol * MOLAR_MASS[species] / 1000.0
+            for species, mol in mre_metal_deltas_mol.items()
+        }
 
         self._project_extraction_melt()
 
@@ -1870,6 +2025,15 @@ class ExtractionMixin:
             self._ledger_account_species_kg(
                 'terminal.oxygen_mre_anode_stored', 'O2')
             - o2_before_kg,
+        )
+        O2_mol = max(
+            0.0,
+            float(
+                self.atom_ledger.mol_by_account(
+                    'terminal.oxygen_mre_anode_stored'
+                ).get('O2', 0.0)
+            )
+            - o2_before_mol,
         )
         self._sync_oxygen_kg_counters()
 
@@ -1883,13 +2047,22 @@ class ExtractionMixin:
         # Calculate effective current from actual Faradaic reduction.   [Step 8]
         total_charge_C = 0.0
         charge_electrons = result.get('oxide_charge_electrons', {}) or {}
-        for oxide, kg_removed in result.get('oxides_reduced_kg', {}).items():
-            n_e = charge_electrons.get(oxide, ELECTRONS_PER_OXIDE.get(oxide, 2))
-            M_ox = MOLAR_MASS.get(oxide, 100.0)
-            moles_ox = kg_removed * 1000.0 / M_ox
-            total_charge_C += moles_ox * n_e * FARADAY
-        self._mre_effective_current_A = total_charge_C / 3600.0
+        if transition is not None:
+            for lot in transition.debits:
+                if lot.account != 'process.cleaned_melt':
+                    continue
+                for oxide, moles_ox in lot.species_moles_for(
+                    self.species_formula_registry
+                ).items():
+                    n_e = charge_electrons.get(
+                        oxide,
+                        ELECTRONS_PER_OXIDE.get(oxide, 2),
+                    )
+                    total_charge_C += moles_ox * n_e * FARADAY
+        self._mre_effective_current_A = total_charge_C / (dt_hr * 3600.0)
         if (
+            is_plant
+            and
             self.melt.campaign == CampaignPhase.C5
             and not c5_rung_advanced
             and self._mre_effective_current_A
@@ -1901,7 +2074,50 @@ class ExtractionMixin:
         self.melt.mre_voltage_V = voltage_V
         self.melt.mre_current_A = self._mre_effective_current_A
 
-        return O2_kg
+        if self.record is None:
+            mass_balance_error_pct = 0.0
+        else:
+            mass_in = (
+                self.record.batch_mass_kg
+                + sum(self.record.additives_kg.values())
+                + sum(self.inventory.stage0_external_inputs_kg.values())
+                + float(getattr(self, '_c7_al_credit_input_kg', 0.0) or 0.0)
+                + float(
+                    getattr(
+                        self,
+                        '_o2_bubbler_injected_cumulative_kg',
+                        0.0,
+                    )
+                    or 0.0
+                )
+            )
+            mass_out = self._flow_mass_out_kg()
+            mass_balance_error_pct = (
+                abs(mass_in - mass_out) / mass_in * 100.0
+                if mass_in > 0.0
+                else 0.0
+            )
+        return {
+            'execution_origin': execution_origin,
+            'mre_anode_o2_delta_kg': O2_kg,
+            'mre_anode_o2_delta_mol': O2_mol,
+            'metals_delta_kg_by_species': dict(
+                sorted(trace_metal_deltas_kg.items())),
+            'metals_delta_mol_by_species': mre_metal_deltas_mol,
+            'kernel_commit_disposition': (
+                'committed-empty-transition'
+                if transition is not None
+                and not transition.debits
+                and not transition.credits
+                else 'committed-transition'
+                if transition is not None
+                else 'not-committed'
+            ),
+            'committed_electron_charge_C': total_charge_C,
+            'effective_current_A': self._mre_effective_current_A,
+            'mass_balance_error_pct': mass_balance_error_pct,
+            'diagnostic': result,
+        }
 
     # ------------------------------------------------------------------
     # Alkali Shuttle (C3) — Metallothermic Reduction            [THERMO-5]

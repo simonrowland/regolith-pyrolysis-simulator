@@ -85,9 +85,17 @@ from simulator.diagnostics import (
     wall_deposit_sticking_authority_status,
 )
 from simulator.diagnostic_helpers.vacuum_pyrolysis import (
-    VacuumPyrolysisComparisonError,
     evaluate_vacuum_pyrolysis_comparison,
     load_vacuum_pyrolysis_observations,
+)
+from simulator.diagnostic_helpers.mre import (
+    evaluate_mre_comparison,
+    load_mre_observations,
+)
+from simulator.mre_reproduction import (
+    MREReproductionProgram,
+    load_mre_reproduction_program,
+    run_mre_reproduction,
 )
 from simulator.trace import wall_deposit_by_segment_species_kg
 from simulator.three_product_report import classify_products
@@ -279,7 +287,121 @@ class PresetRunSpec:
     document: Mapping[str, Any]
 
 
-def _load_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
+@dataclass(frozen=True)
+class MREPresetRunSpec:
+    feedstock_id: str
+    hours: int
+    mass_kg: float
+    provenance: dict[str, Any]
+    document: Mapping[str, Any]
+    observations: Mapping[str, Any]
+    observation_sidecar_path: Path
+    program: MREReproductionProgram
+
+
+def _load_preset_run_spec(
+    path: Path,
+    leg: str | None,
+    *,
+    observations_override: str | None = None,
+) -> PresetRunSpec | MREPresetRunSpec:
+    try:
+        raw_bytes = path.read_bytes()
+        document = yaml.safe_load(raw_bytes.decode("utf-8")) or {}
+    except (OSError, UnicodeDecodeError, yaml.YAMLError) as exc:
+        raise PresetRunnerError(
+            f"malformed_preset: could not read preset file {path}: {exc}",
+            provenance={"path": str(path), "leg": str(leg or "")},
+        ) from exc
+    if not isinstance(document, Mapping):
+        raise PresetRunnerError(
+            "malformed_preset: preset root must be a mapping",
+            provenance={"path": str(path), "leg": str(leg or "")},
+        )
+    preset_kind = str(document.get("preset_kind") or "").strip()
+    if preset_kind == "mre_reproduction":
+        resolved_leg = str(
+            leg or document.get("default_case") or "one_hour"
+        ).strip()
+        return _load_mre_preset_run_spec(
+            path,
+            document,
+            raw_bytes,
+            resolved_leg,
+            observations_override=observations_override,
+        )
+    if preset_kind != "faithful_with_remediation_twin":
+        raise PresetRunnerError(
+            f"unknown_preset_kind: {preset_kind!r}",
+            provenance={
+                "path": str(path),
+                "leg": str(leg or ""),
+                "preset_kind": preset_kind,
+            },
+        )
+    return _load_vacuum_preset_run_spec(path, str(leg or "faithful"))
+
+
+def _load_mre_preset_run_spec(
+    path: Path,
+    document: Mapping[str, Any],
+    raw_bytes: bytes,
+    case_id: str,
+    *,
+    observations_override: str | None,
+) -> MREPresetRunSpec:
+    digest = hashlib.sha256(raw_bytes).hexdigest()
+    sidecar_path = _preset_comparison_sidecar_path(
+        preset_path=path,
+        preset=document,
+        override=observations_override,
+    )
+    observations = load_mre_observations(sidecar_path)
+    try:
+        program = load_mre_reproduction_program(
+            document,
+            observations,
+            case_id,
+        )
+    except ValueError as exc:
+        raise PresetRunnerError(
+            f"malformed_preset: {exc}",
+            provenance={
+                "path": str(path),
+                "leg": case_id,
+                "digest": f"sha256:{digest}",
+                "preset_kind": "mre_reproduction",
+            },
+        ) from exc
+    provenance = {
+        "path": str(path),
+        "leg": case_id,
+        "digest": f"sha256:{digest}",
+        "schema_version": document.get("schema_version"),
+        "preset_kind": "mre_reproduction",
+        "execution_scope": document.get("execution_scope"),
+        "paper_id": program.paper_id,
+        "paper_citation_id": program.paper_citation_id,
+        "measurement_id": program.measurement_id,
+        "feedstock_id": program.feedstock_id,
+        "duration_h": program.duration_h,
+        "sample_mass_g": program.mass_kg * 1000.0,
+        "mass_kg": program.mass_kg,
+        "controls_digest": program.controls_digest,
+    }
+    return MREPresetRunSpec(
+        feedstock_id=program.feedstock_id,
+        hours=int(program.duration_h),
+        mass_kg=program.mass_kg,
+        provenance=provenance,
+        document=copy.deepcopy(dict(document)),
+        observations=copy.deepcopy(dict(observations)),
+        observation_sidecar_path=sidecar_path,
+        program=program,
+    )
+
+
+def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
     requested_leg = str(leg or "faithful").strip()
     base_provenance = {
         "path": str(path),
@@ -466,16 +588,17 @@ def _load_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
 def _preset_comparison_sidecar_path(
     *,
     preset_path: Path,
-    preset: PresetRunSpec,
+    preset: Any,
     override: str | None,
 ) -> Path:
+    document = preset if isinstance(preset, Mapping) else preset.document
     raw_path = str(override or "").strip()
     if not raw_path:
-        contract = preset.document.get("comparison_contract")
+        contract = document.get("comparison_contract")
         if isinstance(contract, Mapping):
             raw_path = str(contract.get("observation_sidecar_path") or "").strip()
     if not raw_path:
-        raise VacuumPyrolysisComparisonError(
+        raise RunnerError(
             "comparison requires --observations or "
             "comparison_contract.observation_sidecar_path"
         )
@@ -483,7 +606,7 @@ def _preset_comparison_sidecar_path(
     if not sidecar_path.is_absolute():
         sidecar_path = DATA_DIR.parent / sidecar_path
     if sidecar_path.resolve() == preset_path.resolve():
-        raise VacuumPyrolysisComparisonError(
+        raise RunnerError(
             "expected observations must be independent from the recipe preset"
         )
     return sidecar_path
@@ -4640,10 +4763,10 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--feedstock",
                         help="Feedstock ID from data/feedstocks.yaml")
     parser.add_argument("--preset",
-                        help="Path to a vacuum-pyrolysis preset YAML")
-    parser.add_argument("--leg", default="faithful",
-                        help="Preset leg to run when --preset is supplied "
-                             "(default: faithful)")
+                        help="Path to a literature-reproduction preset YAML")
+    parser.add_argument("--leg", default=None,
+                        help="Preset leg or published case to run; defaults to "
+                             "the preset domain's declared default")
     parser.add_argument(
         "--compare",
         action="store_true",
@@ -4756,7 +4879,7 @@ def main(argv: Optional[list[str]] = None) -> int:
     campaign = str(args.campaign)
     hours = int(args.hours) if args.hours is not None else 24
     mass_kg = float(args.mass_kg) if args.mass_kg is not None else 1000.0
-    loaded_preset: PresetRunSpec | None = None
+    loaded_preset: PresetRunSpec | MREPresetRunSpec | None = None
     comparison_artifact: dict[str, Any] | None = None
     comparison_artifact_path: Path | None = None
     comparison_markdown: str | None = None
@@ -4788,7 +4911,11 @@ def main(argv: Optional[list[str]] = None) -> int:
         setpoints_patch: Mapping[str, Any] = {}
         lab_schedule: Mapping[str, Any] | None = None
         if args.preset:
-            preset = _load_preset_run_spec(Path(args.preset), str(args.leg))
+            preset = _load_preset_run_spec(
+                Path(args.preset),
+                args.leg,
+                observations_override=args.observations,
+            )
             loaded_preset = preset
             _assert_cli_matches_preset(
                 flag_name="--feedstock",
@@ -4811,10 +4938,11 @@ def main(argv: Optional[list[str]] = None) -> int:
             feedstock_id = preset.feedstock_id
             hours = preset.hours
             mass_kg = preset.mass_kg
-            setpoints_patch = {
-                "lab_geometry": copy.deepcopy(preset.lab_geometry),
-            }
-            lab_schedule = copy.deepcopy(preset.lab_schedule)
+            if isinstance(preset, PresetRunSpec):
+                setpoints_patch = {
+                    "lab_geometry": copy.deepcopy(preset.lab_geometry),
+                }
+                lab_schedule = copy.deepcopy(preset.lab_schedule)
             metadata_overrides[PRESET_PROVENANCE_METADATA_KEY] = dict(
                 preset.provenance
             )
@@ -4827,68 +4955,141 @@ def main(argv: Optional[list[str]] = None) -> int:
                 raise RunnerError(str(exc)) from exc
             setpoints_patch = _deep_merge_setpoints(setpoints_patch, recipe_patch)
 
-        run = PyrolysisRun(
-            feedstock_id=feedstock_id,
-            campaign=campaign,
-            hours=hours,
-            engines=merged,
-            additives_kg=additives,
-            mass_kg=mass_kg,
-            backend_name=args.backend,
-            setpoints_patch=setpoints_patch,
-            runtime_campaign_overrides=runtime_campaign_overrides,
-            lab_schedule=lab_schedule,
-            track=args.track,
-            allow_fallback_vapor=bool(args.allow_fallback_vapor),
-            allow_unmeasured_alpha_fallback=bool(
-                args.allow_unmeasured_alpha_fallback
-            ),
-            force_builtin_vapor_pressure=bool(args.force_builtin_vapor_pressure),
-            sio_start_temperature_c=args.sio_start_temperature_c,
-            sio_hold_temperature_c=args.sio_hold_temperature_c,
-            sio_ramp_c_per_hr=args.sio_ramp_c_per_hr,
-            sio_liner_temperature_c=args.sio_liner_temperature_c,
-            sio_pO2_mbar=args.sio_po2_mbar,
-            include_wall_deposit_rate_diagnostics=bool(
-                args.include_wall_deposit_rate_diagnostics
-            ),
-            run_metadata_overrides=metadata_overrides,
-        )
-        result = run.run()
+        if isinstance(loaded_preset, MREPresetRunSpec):
+            if campaign.upper() in {"C5", "MRE_BASELINE"} or args.track == "mre_baseline":
+                raise PresetRunnerError(
+                    "mre_reproduction_campaign_conflict",
+                    provenance=loaded_preset.provenance,
+                )
+            conflict_fields = {
+                "--additive": bool(additives),
+                "--runtime-campaign-overrides": bool(runtime_campaign_overrides),
+                "--recipe": bool(args.recipe),
+                "--sio-start-temperature-c": args.sio_start_temperature_c is not None,
+                "--sio-hold-temperature-c": args.sio_hold_temperature_c is not None,
+                "--sio-ramp-c-per-hr": args.sio_ramp_c_per_hr is not None,
+                "--sio-liner-temperature-c": args.sio_liner_temperature_c is not None,
+                "--sio-po2-mbar": args.sio_po2_mbar is not None,
+            }
+            conflicts = sorted(
+                field for field, supplied in conflict_fields.items() if supplied
+            )
+            if conflicts:
+                raise PresetRunnerError(
+                    "preset_cli_conflict: MRE reproduction forbids "
+                    + ", ".join(conflicts),
+                    provenance=loaded_preset.provenance,
+                )
+            bundle = load_config_bundle()
+            result = run_mre_reproduction(
+                loaded_preset.program,
+                feedstocks=bundle.feedstocks,
+                setpoints=bundle.setpoints,
+                vapor_pressures=bundle.vapor_pressures,
+                materials=bundle.materials,
+                backend_name=args.backend,
+            )
+            result["run_metadata"].update(metadata_overrides)
+        else:
+            run = PyrolysisRun(
+                feedstock_id=feedstock_id,
+                campaign=campaign,
+                hours=hours,
+                engines=merged,
+                additives_kg=additives,
+                mass_kg=mass_kg,
+                backend_name=args.backend,
+                setpoints_patch=setpoints_patch,
+                runtime_campaign_overrides=runtime_campaign_overrides,
+                lab_schedule=lab_schedule,
+                track=args.track,
+                allow_fallback_vapor=bool(args.allow_fallback_vapor),
+                allow_unmeasured_alpha_fallback=bool(
+                    args.allow_unmeasured_alpha_fallback
+                ),
+                force_builtin_vapor_pressure=bool(args.force_builtin_vapor_pressure),
+                sio_start_temperature_c=args.sio_start_temperature_c,
+                sio_hold_temperature_c=args.sio_hold_temperature_c,
+                sio_ramp_c_per_hr=args.sio_ramp_c_per_hr,
+                sio_liner_temperature_c=args.sio_liner_temperature_c,
+                sio_pO2_mbar=args.sio_po2_mbar,
+                include_wall_deposit_rate_diagnostics=bool(
+                    args.include_wall_deposit_rate_diagnostics
+                ),
+                run_metadata_overrides=metadata_overrides,
+            )
+            result = run.run()
         if args.compare:
             if loaded_preset is None:
                 raise RunnerError("--compare requires a successfully loaded preset")
             preset_path = Path(args.preset)
-            sidecar_path = _preset_comparison_sidecar_path(
-                preset_path=preset_path,
-                preset=loaded_preset,
-                override=args.observations,
+            sidecar_path = (
+                loaded_preset.observation_sidecar_path
+                if isinstance(loaded_preset, MREPresetRunSpec)
+                else _preset_comparison_sidecar_path(
+                    preset_path=preset_path,
+                    preset=loaded_preset,
+                    override=args.observations,
+                )
             )
-            observations = load_vacuum_pyrolysis_observations(sidecar_path)
             comparison_artifact_path = Path(args.output).with_suffix(
                 ".comparison.json"
             )
             comparison_markdown_path = Path(args.output).with_suffix(
                 ".comparison.md"
             )
-            comparison = evaluate_vacuum_pyrolysis_comparison(
-                loaded_preset.document,
-                observations,
-                result,
-                feedstocks=_load_yaml(DATA_DIR / "feedstocks.yaml"),
-            )
             measurement_id = str(loaded_preset.document["measurement_id"])
-            comparison_markdown = _vacuum_comparison_markdown(
-                comparison,
-                measurement_id=measurement_id,
-                comparison_artifact_path=comparison_artifact_path,
-            )
-            comparison_artifact = comparison.as_payload(
-                measurement_id=measurement_id,
-                sidecar_path=str(sidecar_path),
-                markdown_path=str(comparison_markdown_path),
-            )
-    except (RunnerError, json.JSONDecodeError, TypeError, ValueError) as exc:
+            if isinstance(loaded_preset, MREPresetRunSpec):
+                comparison = evaluate_mre_comparison(
+                    loaded_preset.document,
+                    loaded_preset.observations,
+                    result,
+                )
+                comparison_markdown = comparison.markdown(
+                    comparison_artifact_path=comparison_artifact_path,
+                )
+                comparison_artifact = comparison.as_payload(
+                    sidecar_path=str(sidecar_path),
+                    markdown_path=str(comparison_markdown_path),
+                )
+            else:
+                observations = load_vacuum_pyrolysis_observations(sidecar_path)
+                comparison = evaluate_vacuum_pyrolysis_comparison(
+                    loaded_preset.document,
+                    observations,
+                    result,
+                    feedstocks=_load_yaml(DATA_DIR / "feedstocks.yaml"),
+                )
+                comparison_markdown = _vacuum_comparison_markdown(
+                    comparison,
+                    measurement_id=measurement_id,
+                    comparison_artifact_path=comparison_artifact_path,
+                )
+                comparison_artifact = comparison.as_payload(
+                    paper_id=str(
+                        loaded_preset.document.get("paper_id")
+                        or measurement_id
+                    ),
+                    case_id=str(loaded_preset.provenance.get("leg") or "faithful"),
+                    preset_kind=str(
+                        loaded_preset.document.get("preset_kind")
+                        or "faithful_with_remediation_twin"
+                    ),
+                    execution_scope=str(
+                        loaded_preset.document.get("execution_scope")
+                        or "vacuum_pyrolysis"
+                    ),
+                    measurement_id=measurement_id,
+                    sidecar_path=str(sidecar_path),
+                    markdown_path=str(comparison_markdown_path),
+                )
+    except (
+        RunnerError,
+        json.JSONDecodeError,
+        RuntimeError,
+        TypeError,
+        ValueError,
+    ) as exc:
         if isinstance(exc, PresetRunnerError) and exc.provenance:
             metadata_overrides.setdefault(
                 PRESET_PROVENANCE_METADATA_KEY,

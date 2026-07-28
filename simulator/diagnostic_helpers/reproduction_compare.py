@@ -19,6 +19,8 @@ COMPARISON_STATUSES = frozenset(
         "out-of-domain",
     }
 )
+COMPARISON_ARTIFACT_SCHEMA_VERSION = 2
+COMPARISON_ARTIFACT_DOMAINS = frozenset({"mre", "vacuum_pyrolysis"})
 
 
 def _jsonable(value: Any) -> Any:
@@ -47,6 +49,61 @@ def content_digest(value: Any) -> str:
         sort_keys=True,
     )
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+def normalize_comparison_artifact(value: Mapping[str, Any]) -> dict[str, Any]:
+    """Validate schema-v2 artifacts and upgrade chunk-A schema-v1 payloads."""
+
+    if not isinstance(value, Mapping):
+        raise ValueError("comparison artifact must be a mapping")
+    artifact = _jsonable(value)
+    try:
+        schema_version = int(artifact.get("schema_version"))
+    except (TypeError, ValueError) as exc:
+        raise ValueError("comparison artifact schema_version must be 1 or 2") from exc
+    if schema_version == 1:
+        measurement_id = str(artifact.get("measurement_id") or "").strip()
+        if not measurement_id:
+            raise ValueError("legacy comparison artifact requires measurement_id")
+        upgraded = {
+            "schema_version": COMPARISON_ARTIFACT_SCHEMA_VERSION,
+            "domain": "vacuum_pyrolysis",
+            "preset_kind": "faithful_with_remediation_twin",
+            "execution_scope": "vacuum_pyrolysis",
+            "paper_id": measurement_id,
+            "case_id": "legacy_unspecified",
+            **artifact,
+            "schema_version": COMPARISON_ARTIFACT_SCHEMA_VERSION,
+            "unsupported_observables": list(
+                artifact.get("unsupported_observables") or []
+            ),
+        }
+        return upgraded
+    if schema_version != COMPARISON_ARTIFACT_SCHEMA_VERSION:
+        raise ValueError(
+            f"unsupported comparison artifact schema_version: {schema_version}"
+        )
+    required_text_fields = (
+        "domain",
+        "preset_kind",
+        "execution_scope",
+        "paper_id",
+        "case_id",
+        "measurement_id",
+        "sidecar_path",
+        "markdown_path",
+    )
+    for field in required_text_fields:
+        if not str(artifact.get(field) or "").strip():
+            raise ValueError(f"comparison artifact requires {field}")
+    if artifact["domain"] not in COMPARISON_ARTIFACT_DOMAINS:
+        raise ValueError(f"unsupported comparison artifact domain: {artifact['domain']!r}")
+    if not isinstance(artifact.get("digests"), Mapping):
+        raise ValueError("comparison artifact requires digests")
+    for field in ("records", "qualitative_observations", "unsupported_observables"):
+        if not isinstance(artifact.get(field), list):
+            raise ValueError(f"comparison artifact {field} must be a list")
+    return artifact
 
 
 @dataclass(frozen=True)

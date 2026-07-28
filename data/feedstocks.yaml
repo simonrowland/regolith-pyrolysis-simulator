@@ -387,6 +387,67 @@ lunar_highlands_lhs1:
   preferred_for: "Highland ISRU trials; Al/Ca extraction; low-Fe melt behavior; ceramic feedstock tests"
   process_notes: "Standard C0-C6 flowsheet applicable; lower Fe yield than mare material."
 
+lunar_highlands_lhs1_yu_2025_reference:
+  name: "LHS-1 composition reported by Yu et al. 2025"
+  label: "LHS-1 Yu 2025 Hollow-Anode Reference"
+  class: lunar_simulant
+  source: "Yu et al. 2025, Improving Molten Regolith Electrolysis with Zirconia-Based Hollow Anode Technology, Table 1"
+  confidence: "Published experiment-specific table"
+  note: >
+    Literature-reproduction feed only. Table 1 rows sum to 99.1 wt%; the
+    unreported 0.9 wt% balance is retained explicitly and is not attributed to
+    any oxide. Runtime load_batch normalizes the reported rows to the requested
+    batch mass as an execution assumption; those normalized runtime fractions
+    are not published composition values.
+  composition_wt_pct:
+    SiO2:  51.2
+    FeO:    2.7
+    MgO:    1.6
+    CaO:   12.8
+    Al2O3: 26.6
+    TiO2:   0.6
+    Na2O:   2.9
+    K2O:    0.5
+    MnO:    0.1
+    P2O5:   0.1
+  sum_check: 99.1
+  source_total_wt_pct: 99.1
+  source_reported_subtotal_wt_pct: 99.1
+  source_unreported_balance_wt_pct:
+    value: 0.9
+    status: not_reported
+    allocation: none
+    source_locator: {table: 1, note: "difference from 100 wt%"}
+  runtime_composition_basis:
+    status: assumed
+    method: normalize_reported_rows_to_batch_mass
+    certification: execution_only_not_published_composition
+  glass_fraction:
+    value: "not_reported"
+    note: "Yu et al. Table 1 reports oxide composition, not glass fraction."
+  stage0_buckets:
+    h2o_wt_pct: 0.0
+    organics_wt_pct: 0.0
+    carbon_wt_pct: 0.0
+    sulfur_wt_pct: 0.0
+    halides_wt_pct: 0.0
+    perchlorates_wt_pct: 0.0
+    salts_wt_pct: 0.0
+    native_metals_wt_pct: 0.0
+    sulfides_wt_pct: 0.0
+    refractory_trace_wt_pct: "not_reported"
+  provenance:
+    composition_citation: "Yu K. et al. 2025, Acta Astronautica 235, 723-735, Table 1."
+    doi: "10.1016/j.actaastro.2025.06.028"
+    ntrs_record: "https://ntrs.nasa.gov/citations/20250004626"
+    lot_or_batch: "not_reported"
+  simulant_vs_real_caveat:
+    report_placement: "measurement_sidecar"
+    text: "LHS-1 is a terrestrial simulant; the run does not certify lunar-regolith behavior."
+  key_feature: "Experiment-specific high-Al LHS-1 table with explicit 0.9 wt% unreported balance"
+  preferred_for: "Yu 2025 hollow-anode literature reproduction only"
+  process_notes: "Do not substitute the canonical LHS-1 catalog composition."
+
 # buy: https://spaceresourcetech.com/products/lms-1-lunar-mare-simulant
 # source: Long-Fox et al. 2023 Frontiers in Space Technologies Table 2 XRF; SRT/Exolith LMS-1, with vendor factsheet minors captured in catalog.
 lunar_mare_lms1:

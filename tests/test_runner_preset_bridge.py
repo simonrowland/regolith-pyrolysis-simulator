@@ -10,6 +10,7 @@ import textwrap
 from pathlib import Path
 
 import pytest
+import yaml
 
 from simulator import runner as runner_module
 from simulator.diagnostic_helpers.vacuum_pyrolysis import (
@@ -17,6 +18,7 @@ from simulator.diagnostic_helpers.vacuum_pyrolysis import (
 )
 from simulator.runner import PyrolysisRun
 from tests.test_runner_smoke import _assert_schema_shape
+from tests.mre_reproduction_fixtures import synthetic_voltage_documents
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -210,6 +212,23 @@ def _run_preset_cli(tmp_path: Path, preset_path: Path, *extra_args: str) -> tupl
     return completed.returncode, json.loads(output_path.read_text())
 
 
+def _write_mre_bridge_preset(tmp_path: Path) -> tuple[Path, Path]:
+    preset, observations = synthetic_voltage_documents()
+    preset["sampling"]["max_interval_min"]["value"] = 60.0
+    sidecar_path = tmp_path / "mre-observations.yaml"
+    preset_path = tmp_path / "mre-preset.yaml"
+    preset["comparison_contract"]["observation_sidecar_path"] = str(sidecar_path)
+    sidecar_path.write_text(
+        yaml.safe_dump(observations, sort_keys=False),
+        encoding="utf-8",
+    )
+    preset_path.write_text(
+        yaml.safe_dump(preset, sort_keys=False),
+        encoding="utf-8",
+    )
+    return preset_path, sidecar_path
+
+
 def test_gram_lab_exposed_area_sets_runtime_melt_area() -> None:
     run = PyrolysisRun(
         feedstock_id="lunar_mare_low_ti",
@@ -353,16 +372,27 @@ def test_preset_bridge_compare_mode_writes_json_and_markdown(tmp_path: Path):
 
     comparison_path = tmp_path / "runner-output.comparison.json"
     comparison = json.loads(comparison_path.read_text(encoding="utf-8"))
-    assert comparison["schema_version"] == COMPARISON_SCHEMA_VERSION == 1
+    assert comparison["schema_version"] == COMPARISON_SCHEMA_VERSION == 2
     assert set(comparison) == {
         "schema_version",
+        "domain",
+        "preset_kind",
+        "execution_scope",
+        "paper_id",
+        "case_id",
         "measurement_id",
         "sidecar_path",
         "markdown_path",
         "digests",
         "records",
         "qualitative_observations",
+        "unsupported_observables",
     }
+    assert comparison["domain"] == "vacuum_pyrolysis"
+    assert comparison["preset_kind"] == "faithful_with_remediation_twin"
+    assert comparison["execution_scope"] == "vacuum_pyrolysis"
+    assert comparison["paper_id"] == "bridge_comparison_paper"
+    assert comparison["case_id"] == "faithful"
     assert json.loads(json.dumps(comparison, allow_nan=False)) == comparison
     assert comparison["measurement_id"] == "bridge_comparison_measurement"
     assert comparison["sidecar_path"] == str(sidecar_path)
@@ -387,6 +417,84 @@ def test_preset_bridge_compare_mode_writes_json_and_markdown(tmp_path: Path):
     assert "bridge_final_o2_mass" in markdown
     assert "## Content digests" in markdown
     assert f"Versioned comparison artifact: `{comparison_path}`" in markdown
+
+
+def test_mre_preset_bridge_exact_shape_and_domain_artifacts(tmp_path: Path):
+    preset_path, sidecar_path = _write_mre_bridge_preset(tmp_path)
+
+    returncode, payload = _run_preset_cli(
+        tmp_path,
+        preset_path,
+        "--leg",
+        "one_hour",
+        "--compare",
+    )
+
+    assert returncode == 0, payload
+    assert set(payload) == {
+        "status",
+        "reason",
+        "error_message",
+        "run_metadata",
+        "mre_reproduction",
+    }
+    reproduction = payload["mre_reproduction"]
+    assert set(reproduction) == {
+        "schema_version",
+        "execution_origin",
+        "case_id",
+        "controls_digest",
+        "temperature_C",
+        "gas_boundary",
+        "intervals",
+        "cumulative",
+    }
+    assert reproduction["case_id"] == "one_hour"
+    assert {row["applied_current_A"] for row in reproduction["intervals"]} == {0.5}
+
+    comparison_path = tmp_path / "runner-output.comparison.json"
+    comparison = json.loads(comparison_path.read_text(encoding="utf-8"))
+    assert comparison["schema_version"] == 2
+    assert comparison["domain"] == "mre"
+    assert comparison["case_id"] == "one_hour"
+    assert comparison["sidecar_path"] == str(sidecar_path)
+    assert set(comparison["digests"]) == {
+        "recipe_sha256",
+        "source_sha256",
+        "result_sha256",
+        "controls_sha256",
+    }
+    markdown = (tmp_path / "runner-output.comparison.md").read_text(
+        encoding="utf-8"
+    )
+    assert "# MRE literature comparison: yu_2025_hollow_anode / one_hour" in markdown
+    assert "exterior-RGA collected O2" in markdown
+
+
+@pytest.mark.parametrize(
+    ("args", "reason"),
+    (
+        (("--campaign", "C5"), "mre_reproduction_campaign_conflict"),
+        (("--track", "mre_baseline"), "mre_reproduction_campaign_conflict"),
+    ),
+)
+def test_mre_preset_bridge_refuses_plant_campaign_surfaces(
+    tmp_path: Path,
+    args: tuple[str, ...],
+    reason: str,
+):
+    preset_path, _ = _write_mre_bridge_preset(tmp_path)
+
+    returncode, payload = _run_preset_cli(
+        tmp_path,
+        preset_path,
+        "--leg",
+        "one_hour",
+        *args,
+    )
+
+    assert returncode == 1
+    assert reason in payload["reason"] or reason in payload["error_message"]
 
 
 def test_preset_fast_tier_policy_rejects_internal_analytical_backend() -> None:

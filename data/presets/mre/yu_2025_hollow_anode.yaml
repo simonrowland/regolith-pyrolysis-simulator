@@ -1,0 +1,173 @@
+schema_version: mre_reproduction_preset.v1
+preset_kind: mre_reproduction
+execution_scope: literature_reproduction_only
+paper_id: yu_2025_hollow_anode
+paper_citation_id: yu_2025_acta_astronautica_235_723_735
+measurement_id: yu_2025_hollow_anode_measurements
+default_case: one_hour
+
+sources:
+  paper:
+    title: "Improving Molten Regolith Electrolysis with Zirconia-Based Hollow Anode Technology"
+    authors:
+      - Kevin Yu
+      - William West
+      - Jamesa Stokes
+      - Bryan Harder
+      - Lorlyn Reidy
+      - Jesus Dominguez
+      - Katherine T. Faber
+    year:
+      value: 2025
+      unit: year
+      status: published
+      source_locator: {bibliography: "Acta Astronautica 235 (2025)"}
+    doi: "10.1016/j.actaastro.2025.06.028"
+    ntrs_url: "https://ntrs.nasa.gov/citations/20250004626"
+  supplement:
+    ntrs_url: "https://ntrs.nasa.gov/api/citations/20250004626/downloads/MRE_paper_revision_supplementary%20material_clean.pdf"
+    digest:
+      algorithm: md5
+      value: e425f1d6686ebff035e18b6cf1466575
+      status: repository_reported_file_digest
+      source_locator: {caltech_authors_record: n61bx-tbb53, file: "1-s2.0-S0094576525003807-mmc1.docx"}
+  figure_digitization:
+    figures: ["2(a)", "2(b)", "S2", "S4", "S5", "S6"]
+    status: transcription_required
+    method: manual_axis_calibration_and_independent_point_check
+    operator: not_completed
+    date: not_completed
+    image_digest: not_completed
+
+digests:
+  recipe_digest:
+    status: computed_by_runner
+  source_digest:
+    status: computed_by_comparator
+  figure_digest:
+    status: blocked_pending_source_figure_transcription
+
+comparison_contract:
+  observation_sidecar_path: data/literature/mre_measurements.yaml
+
+feed:
+  feedstock_id: lunar_highlands_lhs1_yu_2025_reference
+  material: "LHS-1 lunar highlands simulant, Space Resource Technologies"
+  sample_mass:
+    value: 20.0
+    unit: g
+    status: published_approximate
+    source_locator: {section: "2.2.1", phrase: "approximately 20 g"}
+  quoted_composition_subtotal:
+    value: 99.1
+    unit: wt_pct
+    status: derived_from_published_rows
+    source_locator: {table: 1}
+  unreported_balance:
+    value: 0.9
+    unit: wt_pct
+    status: not_reported
+    source_locator: {table: 1, role: "difference from 100 wt%"}
+
+cases:
+  one_hour:
+    electrolysis_duration:
+      value: 1.0
+      unit: h
+      status: published
+      source_locator: {table: 2, row: "1 h"}
+  three_hour:
+    electrolysis_duration:
+      value: 3.0
+      unit: h
+      status: published
+      source_locator: {table: 2, row: "3 h"}
+  twelve_hour:
+    electrolysis_duration:
+      value: 12.0
+      unit: h
+      status: published
+      source_locator: {table: 2, row: "12 h"}
+
+thermal_program:
+  operational_temperature:
+    value: 1600.0
+    unit: degC
+    status: published
+    source_locator: {section: "2.2.2"}
+  pre_electrolysis_stabilization:
+    value: 1.0
+    unit: h
+    status: published
+    source_locator: {section: "2.2.2"}
+  post_electrolysis_characterization:
+    value: 1.0
+    unit: h
+    status: published
+    source_locator: {section: "2.2.2"}
+  full_profile:
+    status: transcription_required
+    source_locator: {supplement_figure: S2}
+
+electrical_program:
+  control_mode: constant_current
+  applied_current:
+    value: 0.5
+    unit: A
+    status: published
+    source_locator: {section: "2.2.2"}
+  voltage_response_replay:
+    trajectory_id: yu_figure_2b_cell_potential
+    role: published_measured_response_replay
+    interpolation: linear
+    source_locator: {figure: "2(b)"}
+  potentiostat:
+    model: "VersaStat 4"
+    manufacturer: "Princeton Applied Research"
+    status: published
+    source_locator: {section: "2.2"}
+
+sampling:
+  max_interval_min:
+    value: 5.0
+    unit: min
+    status: assumed
+    role: numerical_subcycle_only
+    source_locator: {contract: "t-429b design checkpoint section 1.3"}
+  observation_times_h: []
+  observation_times_status: published_digitized
+  observation_times_source_locator: {figure: "2"}
+
+cell:
+  configuration: inverted_hollow_anode
+  solid_electrolyte: "10.5 wt% YSZ tube"
+  outer_vessel: alumina_tube
+  cathode: "alumina-sheathed Mo rod"
+  anode: "Pt wire mesh with Pt ink outside YSZ"
+  source_locator: {figure: "1(b)", section: "2.2"}
+
+gas_boundary:
+  carrier_gas: Ar
+  carrier_flow:
+    value: 100.0
+    unit: sccm
+    status: published
+    source_locator: {section: "2.2.2"}
+  total_pressure:
+    status: not_reported
+    source_locator: {section: "2.2"}
+  runtime_total_pressure:
+    value: 1.01325
+    unit: bar
+    status: assumed
+    source_locator: {contract: "t-429b design checkpoint section 2.7"}
+  inlet_background_o2:
+    value: 0.005
+    unit: vol_pct
+    status: published_approximate
+    source_locator: {section: "3.1"}
+  runtime_inlet_pO2:
+    value: 5.07e-5
+    unit: bar
+    status: assumed_derived
+    source_locator: {derivation: "0.005 vol% times assumed 1.01325 bar"}

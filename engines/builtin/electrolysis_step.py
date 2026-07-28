@@ -327,6 +327,15 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 reason=MRE_INVALID_CONTROL_REFUSAL,
                 invalid=invalid_controls,
             )
+        empty_transition = (
+            LedgerTransitionProposal(
+                debits={},
+                credits={},
+                reason="mre_electrolysis_no_transition",
+            )
+            if controls.get("commit_empty_transition") is True
+            else None
+        )
         voltage_V = validated["voltage_V"]
         current_A = validated["current_A"]
         dt_hr = validated["dt_hr"]
@@ -384,6 +393,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 applied_anode_fO2_log=math.log10(pO2_bar),
                 melt_fO2_log=melt_fO2_log,
                 pressure_bar=request.pressure_bar,
+                transition=empty_transition,
             )
 
         registry = request.account_view.species_formula_registry
@@ -465,7 +475,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             return IntentResult(
                 intent=ChemistryIntent.ELECTROLYSIS_STEP,
                 status="ok",
-                transition=None,
+                transition=empty_transition,
                 control_audit=control_audit,
                 diagnostic=diagnostic,
             )
@@ -697,7 +707,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             return IntentResult(
                 intent=ChemistryIntent.ELECTROLYSIS_STEP,
                 status=status,
-                transition=None,
+                transition=empty_transition if status == "ok" else None,
                 control_audit=control_audit,
                 diagnostic=diagnostic,
             )
@@ -728,7 +738,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             return IntentResult(
                 intent=ChemistryIntent.ELECTROLYSIS_STEP,
                 status="ok",
-                transition=None,
+                transition=empty_transition,
                 control_audit=control_audit,
                 diagnostic=diagnostic,
             )
@@ -919,7 +929,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             return IntentResult(
                 intent=ChemistryIntent.ELECTROLYSIS_STEP,
                 status="ok",
-                transition=None,
+                transition=empty_transition,
                 control_audit=control_audit,
                 diagnostic=diagnostic,
             )
@@ -1324,6 +1334,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         applied_anode_fO2_log: float = 0.0,
         melt_fO2_log: float | None = None,
         pressure_bar: float | None = None,
+        transition: LedgerTransitionProposal | None = None,
     ) -> IntentResult:
         fe_redox_policy = (
             str(request.fe_redox_policy) if request is not None else "intrinsic"
@@ -1367,7 +1378,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         return IntentResult(
             intent=ChemistryIntent.ELECTROLYSIS_STEP,
             status="ok",
-            transition=None,
+            transition=transition,
             control_audit=(
                 cls._build_control_audit(
                     request,

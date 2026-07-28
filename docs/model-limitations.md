@@ -69,8 +69,27 @@ Dynamic chamber pressure and spatial post-run deposit composition remain
 unsupported. Pomeroy achieved pressure is not reported, so its runtime pressure
 is explicitly assumed and cannot certify any pressure-sensitive residual.
 Šeško is blocked by the named dynamic-pressure certification gate. Paper-scale
-MRE electrical controls and hollow-anode observables are not part of this
-vacuum-pyrolysis chunk.
+MRE now has a separate intent-isolated reproduction surface; it does not run
+through these vacuum-pyrolysis schedules.
+
+### Yu 2025 hollow-anode MRE comparison error budget
+
+The Yu reproduction replays the paper's measured cell-potential response
+because the builtin electrolysis intent does not solve galvanostatic voltage.
+That voltage is an input, not a predicted observable. The checked-in package
+refuses execution until Figure 2(b) is digitized from authoritative pixels and
+independently checked; no approximate voltage is supplied to make the case run.
+
+| Observable | Runtime quantity | Published quantity | Disposition / dominant error budget |
+|---|---|---|---|
+| Applied current and charge | Executed 0.5 A intervals; 1800/5400/21600 C nominal | 0.5 A for 1/3/12 h | Execution audit only; tautological, not chemistry validation |
+| Cell potential | Figure 2(b) measured-response replay | Figure 2(b) measured potential | `unsupported-observable` as a prediction; replay points cannot earn a voltage match |
+| Faradaic efficiency | Committed source-side electron charge / applied charge | Exterior-RGA collected O2 basis, 47/53/42% | `out-of-domain`; hollow-anode collection, YSZ electronic leakage, Mo oxidation, gas residence, and RGA response are absent |
+| O2 mass and time series | `terminal.oxygen_mre_anode_stored` source-side ledger O2 | Exterior-RGA collected O2; Table 2 reports 0.070/0.237/0.749 g | `out-of-domain`; Yu states exterior collection is a lower bound on total production |
+| Cathodic Fe/Si/Ti/Mn presence | Bulk committed metal mol by species | Table 2 qualitative cathodic elements | Qualitative represented/not-represented only; Mn decomposition authority remains diagnostic |
+| Cathodic P presence | No P2O5-to-P electrolysis mapping | P reported at 3 h and 12 h | `unsupported-speciation`; P is not dropped or remapped |
+| Cathodic EDS fractions | No spatial Mo-alloy or cathode-region state | Supplement Figures S4-S6 local EDS regions | `unsupported-observable`; every source region must remain independent and must not be averaged |
+| Outlet O2 volume fraction | No gas-volume, collection, or analyzer transport model | Figure 2(a) exterior RGA signal | `unsupported-observable`; no source-kg-to-outlet-vol% conversion is fabricated |
 
 ## DeMaria 1971 K Validation Rows
 

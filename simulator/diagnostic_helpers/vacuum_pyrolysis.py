@@ -12,6 +12,7 @@ import yaml
 
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL, parse_formula
 from simulator.diagnostic_helpers.reproduction_compare import (
+    COMPARISON_ARTIFACT_SCHEMA_VERSION,
     ComparisonRecord,
     compare_values,
     content_digest,
@@ -19,7 +20,7 @@ from simulator.diagnostic_helpers.reproduction_compare import (
 )
 
 
-COMPARISON_SCHEMA_VERSION = 1
+COMPARISON_SCHEMA_VERSION = COMPARISON_ARTIFACT_SCHEMA_VERSION
 SUPPORTED_SELECTOR_KINDS = frozenset(
     {
         "final_o2_mass_kg",
@@ -53,12 +54,21 @@ class VacuumPyrolysisComparisonRun:
     def as_payload(
         self,
         *,
+        paper_id: str,
+        case_id: str,
+        preset_kind: str,
+        execution_scope: str,
         measurement_id: str,
         sidecar_path: str,
         markdown_path: str,
     ) -> dict[str, Any]:
         return {
             "schema_version": COMPARISON_SCHEMA_VERSION,
+            "domain": "vacuum_pyrolysis",
+            "preset_kind": str(preset_kind),
+            "execution_scope": str(execution_scope),
+            "paper_id": str(paper_id),
+            "case_id": str(case_id),
             "measurement_id": str(measurement_id),
             "sidecar_path": str(sidecar_path),
             "markdown_path": str(markdown_path),
@@ -72,6 +82,7 @@ class VacuumPyrolysisComparisonRun:
                 dict(observation)
                 for observation in self.qualitative_observations
             ],
+            "unsupported_observables": [],
         }
 
     def markdown(self) -> str:
