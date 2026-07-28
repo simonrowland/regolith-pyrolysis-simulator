@@ -6,11 +6,14 @@
     "magemin_fullrun_a": 12321.211,
     "magemin_fullrun_b": 16709.486,
     "magemin_fullrun_c": 5112.176,
-    "magemin_fullrun_d": 1659.277,
+    "magemin_fullrun_d": 1999.277,
     "serial": 2136.098
   },
   "schema": 1,
   "source_files": [
     "ci-train-tip2.xml"
+  ],
+  "adjustments": [
+    "magemin_fullrun_d 1659.277 -> 1999.277 (+340s, 2026-07-28): test_c5_targeted_feo_full_track_reduces_target_after_low_temperature_hours joined this chain AFTER ci-train-tip2.xml was measured, so the measured total undercounts it and --dist loadgroup would start the chain too late. +340s is that test's historical duration cited at its own timeout mark. Supersede with a measured total at the next hint regeneration."
   ]
 }
