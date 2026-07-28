@@ -488,6 +488,10 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
     assert sid in _simulations
 
 
+@pytest.mark.timeout(1200)
+# Hang-backstop, not a perf bar: measured 268s serial on Studio 1 pre-train and
+# slower with the disposition machinery; the 300s global default was always
+# marginal there. 1200s ~= 3x measured per the contention-robust ceiling policy.
 def test_alternate_path_b_completes_with_gate_pause_resume(web_driver):
     _sid, state, events, decisions, completion = _drive(
         web_driver,

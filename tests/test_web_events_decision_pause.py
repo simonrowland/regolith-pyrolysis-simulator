@@ -362,8 +362,14 @@ def test_null_make_decision_while_parked_at_path_ab_is_rejected(client):
     assert second['type'] == EXPECTED_DECISIONS[1]
 
 
+@pytest.mark.timeout(1200)
 def test_pause_resume_around_every_gate_is_ledger_identical(client):
-    """(b) pause/resume churn at every gate -> one gate each, correct routing, identical ledger."""
+    """(b) pause/resume churn at every gate -> one gate each, correct routing, identical ledger.
+
+    Timeout is a hang-backstop, not a perf bar: measured 372s serial on
+    Studio 1 (ci-ydisp-final junit), so the 300s global default failed
+    deterministically there; 1200s ~= 3x measured per the contention-robust
+    ceiling policy."""
     base_decisions, base_counts, base_completion, _ = _drive_to_completion(
         _started(client))
     assert base_decisions == EXPECTED_DECISIONS
