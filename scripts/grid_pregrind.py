@@ -637,14 +637,13 @@ def kress91_partition_authority_record(
 
 
 def alphamelts_grid_temperature_C(temperature_C: float) -> float:
-    """Normalize subprocess-grid T to the AlphaMELTS MELTS-file contract.
+    """Normalize subprocess-grid T to the AlphaMELTS binary32 contract.
 
-    The adapter serializes request T to
-    ``ALPHAMELTS_MELTS_FILE_TEMPERATURE_DECIMALS`` before writing `.melts`,
-    setting ``ALPHAMELTS_MINT``/``MAXT``, and running the isothermal guard.
-    Queue inputs, cache-v2 keys, and temperature-dependent Kress91 partitioning
-    must use that same contract identity so one executed setpoint cannot split
-    into distinct cache keys (b-102 P1).
+    Delegates to ``serialize_melts_file_temperature_C`` (binary32 quantize;
+    melts-file string is the :.6f rendering of that value). Queue inputs,
+    cache-v2 keys, and temperature-dependent Kress91 partitioning must use
+    that same binary32 identity so one executed setpoint cannot split into
+    distinct cache keys (b-102 / milestone quality-cx P1).
     """
     from simulator.melt_backend.alphamelts import serialize_melts_file_temperature_C
 

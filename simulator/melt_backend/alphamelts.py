@@ -30,6 +30,7 @@ import multiprocessing
 import os
 import re
 import signal
+import struct
 import subprocess
 import tempfile
 import traceback
@@ -121,26 +122,38 @@ ALPHAMELTS_REASON_FO2_CONSTRAINT_UNAPPLIED = 'fo2_constraint_unapplied'
 ALPHAMELTS_REASON_SYSTEM_OUTPUT_MISSING = 'system_output_missing'
 ALPHAMELTS_REASON_PHASE_MASS_INCOMPLETE = 'phase_mass_incomplete'
 ALPHAMELTS_REASON_VAPOR_PROJECTION_EMPTY = 'vapor_projection_empty'
-# MELTS-file temperature channel precision. Empirically (b-102 probe,
+# MELTS-file temperature *string* precision. Empirically (b-102 probe,
 # alphamelts2 2.3.1, 2026-07-27): the binary accepts full-precision
-# "Initial Temperature: 952.377371" and executes at float32(T) = 952.377380.
+# "Initial Temperature: 952.377371" and executes at binary32(T).
 # The previous :.1f channel quantized the request to 0.1 C and made the
 # isothermal guard unable to distinguish engine disobedience from our own
 # serialization (owner repro: 952.377371 → written 952.4 → executed
 # 952.400024 → typed executed_temperature_mismatch refusal).
+#
+# Determinant (b-102 closure-2 / milestone quality-cx P1): the engine's
+# IEEE-754 binary32 representation is the true contract identity — not the
+# six-decimal string alone. Distinct six-decimal inputs that collapse to one
+# binary32 bucket (952.377371 / 952.377372 / 952.377380 → 952.3773803710938)
+# execute as one setpoint and MUST share one contract T, one cache key, and
+# one melts-file string. ``serialize_melts_file_temperature_C`` quantizes to
+# binary32 first; the :.6f rendering of that binary32 value is the melts-file
+# / MINT/MAXT string and round-trips to the same binary32 when the engine
+# parses (asserted in tests).
 ALPHAMELTS_MELTS_FILE_TEMPERATURE_DECIMALS = 6
-# Isothermal guard residual: executed vs AS-SERIALIZED contract T.
+# Isothermal guard residual: executed vs binary32-contract T.
 # IEEE-754 binary32 unit in the last place:
 #   ulp(T) = 2^(floor(log2(|T|)) - 23)
 # Furnace domain is |T| < 2^12 = 4096 C, so the coarsest ulp is
 #   ulp_max = 2^(11 - 23) = 2^-12 ≈ 2.44140625e-4 C.
 # Bound = 2 * ulp_max ≈ 4.8828125e-4 C. Checks:
-#   - observed residual at 952.377371 was 9.37e-6 (one stored float32 ulp)
+#   - after binary32 quantization the contract IS the engine storage form,
+#     so residual of a matching execution is 0; the bound remains for
+#     parser / print-path noise around that identity
 #   - a genuine 0.5 C engine mismatch still fails by ~1000x margin
 #   - this is NOT the old 0.01 hand-wave; it is the representation bound of
-#     the chosen (full-precision) channel after float32 engine storage.
-# The guard can now distinguish: channel-quantized residuals (float32 only)
-# pass; engine-disobedient T (wrong setpoint) refuse.
+#     the binary32 determinant after channel string round-trip
+# The guard can now distinguish: binary32-identical residuals pass;
+# engine-disobedient T (wrong setpoint) refuse.
 ALPHAMELTS_EXECUTED_T_TOLERANCE_C = 2.0 * (2.0 ** (11 - 23))
 # System_main_tbl.txt prints Temperature to 2 decimal places (observed:
 # executed 952.377380 → table cell "952.38"). Table-vs-stdout consistency
@@ -154,17 +167,22 @@ ALPHAMELTS_MIN_EMITTED_COMPONENT_WT_PCT = 0.001
 
 
 def serialize_melts_file_temperature_C(temperature_C: float) -> float:
-    """Round a request once to the MELTS-file channel precision.
+    """Quantize request T to the AlphaMELTS binary32 determinant.
 
-    The returned value is the isothermal contract temperature: it is what
-    ``_write_melts_file`` emits, what the isothermal guard compares against,
-    and what any cache key for this channel must use. Double-serializing is
-    idempotent at ``ALPHAMELTS_MELTS_FILE_TEMPERATURE_DECIMALS``.
+    AlphaMELTS stores and executes temperature as IEEE-754 binary32. That
+    representation is the isothermal contract identity: melts-file string,
+    ``ALPHAMELTS_MINT``/``MAXT``, isothermal guard, and every cache key for
+    this channel must all derive from it. Distinct six-decimal inputs that
+    land in one binary32 bucket therefore share one contract T / key / string.
+
+    Returns the binary32 value as a Python float (``struct`` pack/unpack of
+    ``'f'``). Callers emit the melts-file / env string with
+    ``f'{contract:.{ALPHAMELTS_MELTS_FILE_TEMPERATURE_DECIMALS}f}'``; that
+    rendering round-trips to the same binary32 when the engine parses.
+    Double-serializing is idempotent (``binary32(binary32(T)) == binary32(T)``).
     """
     value = float(temperature_C)
-    return float(
-        f'{value:.{ALPHAMELTS_MELTS_FILE_TEMPERATURE_DECIMALS}f}'
-    )
+    return struct.unpack('f', struct.pack('f', value))[0]
 
 ALPHAMELTS_BACKEND_FAILURE_REASON_CODE_KEY = 'backend_failure_reason_code'
 ALPHAMELTS_BACKEND_FAILURE_CATEGORY_KEY = 'backend_failure_category'
@@ -2280,10 +2298,11 @@ class _MELTSBackendSupport(MeltBackend):
         with tempfile.TemporaryDirectory() as tmpdir:
             # Write .melts file
             melts_path = Path(tmpdir) / 'input.melts'
-            # Single contract T for this channel: serialize once, then write /
-            # env / isothermal guard / result diagnostics all use this value.
-            # Cache keys that name this equilibrium must use the same contract
-            # (keyed T == executed-contract T); do not re-quantize elsewhere.
+            # Single contract T for this channel: binary32-quantize once, then
+            # write / env / isothermal guard / result diagnostics all use that
+            # value. Cache keys that name this equilibrium must use the same
+            # binary32 determinant (keyed T == executed-contract T); do not
+            # re-quantize elsewhere.
             calculation_temperature_C = serialize_melts_file_temperature_C(
                 requested_temperature_C
             )
@@ -2441,10 +2460,10 @@ class _MELTSBackendSupport(MeltBackend):
                            fO2_path: str, fO2_offset: float):
         """Write a .melts input file for alphaMELTS.
 
-        Temperature is always emitted at
-        ``ALPHAMELTS_MELTS_FILE_TEMPERATURE_DECIMALS`` (full channel precision;
-        see ``serialize_melts_file_temperature_C``). Callers that own the
-        isothermal contract must pass the already-serialized contract T so
+        Temperature is quantized to the binary32 determinant
+        (``serialize_melts_file_temperature_C``) and emitted at
+        ``ALPHAMELTS_MELTS_FILE_TEMPERATURE_DECIMALS``. Callers that own the
+        isothermal contract must pass the already-quantized contract T so
         write / guard / cache key share one value; this helper re-serializes
         idempotently as a safety net.
         """
@@ -3145,9 +3164,9 @@ class _MELTSBackendSupport(MeltBackend):
             )
         executed_temperature_C = executed_temperatures_C[-1]
         if run_mode is AlphaMELTSSubprocessRunMode.ISOTHERMAL:
-            # Compare executed vs the as-serialized contract request (channel
-            # precision ALPHAMELTS_MELTS_FILE_TEMPERATURE_DECIMALS). Tolerance
-            # is the float32 representation bound of that channel — not a
+            # Compare executed vs the binary32-contract request (the engine
+            # determinant; string form is ALPHAMELTS_MELTS_FILE_TEMPERATURE_DECIMALS).
+            # Tolerance is the float32 representation bound — not a
             # hand-widened window. Distinguishes: (pass) engine stored the
             # contract T in binary32; (refuse) engine ran a different T.
             mismatches = [

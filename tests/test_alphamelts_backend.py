@@ -925,14 +925,22 @@ def test_alphamelts_isothermal_guard_rejects_half_degree_genuine_mismatch():
 
 
 def test_alphamelts_isothermal_guard_accepts_float32_residual_of_contract_T():
-    """Executed float32(contract T) is channel noise, not a mismatch."""
+    """Executed binary32(contract T) matches the contract (not a mismatch).
+
+    After binary32 quantization the contract IS the engine storage form, so a
+    faithful execution has residual 0. The raw pre-contract request still
+    differs from that binary32 value by one ULP — that is channel noise the
+    guard must not refuse once the boundary has quantized.
+    """
     import struct
 
     backend = AlphaMELTSBackend()
-    contract_T = serialize_melts_file_temperature_C(952.377371)
+    raw_T = 952.377371
+    contract_T = serialize_melts_file_temperature_C(raw_T)
     executed_T = struct.unpack('f', struct.pack('f', contract_T))[0]
-    assert abs(executed_T - contract_T) <= ALPHAMELTS_EXECUTED_T_TOLERANCE_C
-    assert abs(executed_T - contract_T) > 0.0  # genuinely non-identical
+    assert executed_T == contract_T  # contract is already binary32
+    assert abs(contract_T - raw_T) > 0.0  # quantize moved the raw request
+    assert abs(contract_T - raw_T) <= ALPHAMELTS_EXECUTED_T_TOLERANCE_C
     output = (
         '<> Stable liquid assemblage achieved.\n'
         'Initial alphaMELTS calculation at: P 1.000000 (bars), '
@@ -961,13 +969,17 @@ def test_alphamelts_isothermal_guard_accepts_float32_residual_of_contract_T():
     )
 
 
-def test_alphamelts_melts_file_serializes_full_precision_contract_T(tmp_path):
-    """Channel writes .6f contract T (not the legacy 0.1 C quantization)."""
+def test_alphamelts_melts_file_serializes_binary32_contract_T(tmp_path):
+    """Channel writes .6f of the binary32 contract (not legacy 0.1 C)."""
+    import struct
+
     backend = AlphaMELTSBackend()
     raw_T = 952.377371
     contract_T = serialize_melts_file_temperature_C(raw_T)
     assert ALPHAMELTS_MELTS_FILE_TEMPERATURE_DECIMALS == 6
-    assert contract_T == pytest.approx(952.377371)
+    # Binary32 of the audit raw input (milestone quality-cx P1 table).
+    assert contract_T == pytest.approx(952.3773803710938)
+    assert contract_T == struct.unpack('f', struct.pack('f', raw_T))[0]
     path = tmp_path / 'input.melts'
     backend._write_melts_file(
         path,
@@ -980,22 +992,57 @@ def test_alphamelts_melts_file_serializes_full_precision_contract_T(tmp_path):
     text = path.read_text()
     assert f'Initial Temperature: {contract_T:.6f}' in text
     assert 'Initial Temperature: 952.4' not in text
-    assert 'Initial Temperature: 952.377371' in text
+    # .6f rendering of binary32(952.377371) is 952.377380, not the raw six
+    # decimals — that is the melts-file form of the binary32 determinant.
+    assert 'Initial Temperature: 952.377380' in text
+    assert 'Initial Temperature: 952.377371' not in text
 
 
-def test_alphamelts_temperature_contract_matches_cache_key_value(monkeypatch):
-    """Production path: raw >6-decimal T shares one identity across the channel.
+def test_alphamelts_binary32_channel_string_round_trips_to_same_binary32():
+    """Audit row-3 claim: .6f of a binary32 value re-parses to that binary32.
 
-    b-102 P1: a raw grid float (e.g. 952.377371490) must not key cache-v2 at a
-    different identity than the adapter's 6-decimal MELTS serialization
-    (952.377371). Feed the raw value through real grid input/key construction
-    and assert:
+    Do not assume this — it is the reason the melts-file string form is a
+    faithful carrier of the binary32 determinant.
+    """
+    import struct
 
-      queued request T
-        == cache-v2 canonical / key T
-        == .melts serialized T
-        == ALPHAMELTS_MINT / MAXT
-        == isothermal guard T
+    def binary32(t: float) -> float:
+        return struct.unpack('f', struct.pack('f', float(t)))[0]
+
+    # Audit collapse-table inputs + a few furnace-domain anchors.
+    samples = (
+        952.377371,
+        952.377372,
+        952.377380,
+        952.377371490,
+        952.4,
+        1100.0,
+        1400.0,
+        700.0,
+        2000.0,
+    )
+    for raw in samples:
+        contract = serialize_melts_file_temperature_C(raw)
+        assert contract == binary32(raw)
+        channel_str = (
+            f'{contract:.{ALPHAMELTS_MELTS_FILE_TEMPERATURE_DECIMALS}f}'
+        )
+        reparsed = float(channel_str)
+        assert binary32(reparsed) == contract, (
+            f'.6f of binary32({raw}) = {channel_str!r} re-parses to '
+            f'{binary32(reparsed)!r}, not {contract!r}'
+        )
+        # Engine-side path: contract string → float → binary32 storage.
+        assert serialize_melts_file_temperature_C(reparsed) == contract
+
+
+def test_alphamelts_binary32_collapse_trio_shares_one_contract_key_and_string(
+    monkeypatch,
+):
+    """Quality-cx P1: three 6-decimal inputs → one binary32 → one identity.
+
+    952.377371 / 952.377372 / 952.377380 all execute at 952.3773803710938 and
+    must yield ONE contract T, ONE cache-v2 key, ONE melts-file string.
     """
     import json
     import struct
@@ -1007,11 +1054,216 @@ def test_alphamelts_temperature_contract_matches_cache_key_value(monkeypatch):
         canonical_input_vector,
     )
 
-    # Reviewer repro: raw vs serialized delta ~4.9e-7 C.
+    trio = (952.377371, 952.377372, 952.377380)
+    expected_binary32 = 952.3773803710938
+    for raw in trio:
+        assert struct.unpack('f', struct.pack('f', raw))[0] == expected_binary32
+
+    contracts = [serialize_melts_file_temperature_C(raw) for raw in trio]
+    assert len(set(contracts)) == 1
+    contract_T = contracts[0]
+    assert contract_T == expected_binary32
+    serialized_strings = [
+        f'{c:.{ALPHAMELTS_MELTS_FILE_TEMPERATURE_DECIMALS}f}' for c in contracts
+    ]
+    assert len(set(serialized_strings)) == 1
+    assert serialized_strings[0] == '952.377380'
+
+    args = SimpleNamespace(
+        backend='subprocess',
+        model='MELTSv1.0.2',
+        timeout_s=20.0,
+        thermoengine_health_timeout_s=8.0,
+    )
+    keys = []
+    for raw in trio:
+        point = GridPoint(
+            ordinal=0,
+            temperature_C=raw,
+            intended_fO2_log=-9.0,
+            pressure_bar=1.0,
+            composition_wt_pct={
+                'SiO2': 50.0,
+                'FeO': 25.0,
+                'MgO': 25.0,
+            },
+        )
+        inputs = point_inputs(point, args)
+        assert inputs['temperature_C'] == contract_T
+        keys.append(cache_v2_key_hash(inputs))
+        canonical = json.loads(canonical_input_vector(inputs))
+        assert canonical['temperature_C'] == contract_T
+    assert len(set(keys)) == 1
+
+    # Adapter path: melts + MINT/MAXT + guard share that single contract.
+    backend = AlphaMELTSBackend()
+    backend._mode = 'subprocess'
+    backend._binary_path = Path('/tmp/fake-alphamelts')
+    seen: dict = {}
+    executed_T = contract_T
+
+    def fake_run(*args, **kwargs):
+        if args[0][-1] == '--version':
+            return types.SimpleNamespace(
+                returncode=0, stdout='alphaMELTS fake\n', stderr='',
+            )
+        seen['env'] = dict(kwargs['env'])
+        seen['input_melts'] = (
+            Path(kwargs['cwd']) / 'input.melts'
+        ).read_text()
+        (Path(kwargs['cwd']) / 'System_main_tbl.txt').write_text(
+            _system_main_fixture(temperature_C=executed_T)
+        )
+        (Path(kwargs['cwd']) / 'Phase_main_tbl.txt').write_text(
+            f'index 1 Pressure 1.00 Temperature {executed_T:.6f} SiO2 Al2O3 '
+            f'FeO MgO CaO Na2O\n'
+            f'liquid1 100.0 -1059377.1 268.91 34.56 143.47 1.409 '
+            f'50 15 10 10 10 5\n'
+        )
+        (Path(kwargs['cwd']) / 'Solid_comp_tbl.txt').write_text(
+            f'index Pressure Temperature mass SiO2 Al2O3 FeO MgO CaO Na2O\n'
+            f'1 1.00 {executed_T:.6f} 0.0 ---\n'
+        )
+        (Path(kwargs['cwd']) / 'Bulk_comp_tbl.txt').write_text(
+            f'index Pressure Temperature mass SiO2 Al2O3 FeO MgO CaO Na2O\n'
+            f'1 1.00 {executed_T:.6f} 100.0 50 15 10 10 10 5\n'
+        )
+        (Path(kwargs['cwd']) / 'Liquid_comp_tbl.txt').write_text(
+            f'index Pressure Temperature mass SiO2 Al2O3 FeO MgO CaO Na2O\n'
+            f'1 1.00 {executed_T:.6f} 100.0 50 15 10 10 10 5\n'
+        )
+        return types.SimpleNamespace(
+            returncode=0,
+            stdout=(
+                '<> Stable liquid assemblage achieved.\n'
+                'Initial alphaMELTS calculation at: P 1.000000 (bars), '
+                f'T {executed_T:.9f} (C)\n'
+                'liquid: SiO2 Al2O3 FeO MgO CaO Na2O\n'
+                '100.0 g 50 15 10 10 10 5\n'
+                'Melt fraction = 1.0\n'
+            ),
+            stderr='',
+        )
+
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts.subprocess.run',
+        fake_run,
+    )
+    monkeypatch.setattr(
+        backend,
+        '_builtin_vapor_projection_for_subprocess',
+        lambda _eq: (
+            {'Na': 1.0},
+            {'Na': 'builtin_authoritative:test'},
+            {'vapor_pressures_Pa': {'Na': 1.0}},
+        ),
+    )
+
+    melt_strings = []
+    for raw in trio:
+        result = backend.equilibrate(
+            temperature_C=raw,
+            composition_kg=_melts_domain_composition(),
+            fO2_log=-9.0,
+            pressure_bar=1.0,
+            subprocess_run_mode='isothermal',
+        )
+        assert result.status == 'ok'
+        melt_strings.append(
+            [
+                line
+                for line in seen['input_melts'].splitlines()
+                if line.startswith('Initial Temperature:')
+            ][0]
+        )
+        assert seen['env']['ALPHAMELTS_MINT'] == f'{contract_T:.6f}'
+        assert seen['env']['ALPHAMELTS_MAXT'] == f'{contract_T:.6f}'
+        assert result.diagnostics['requested_temperature_C'] == pytest.approx(
+            contract_T
+        )
+    assert len(set(melt_strings)) == 1
+    assert melt_strings[0] == f'Initial Temperature: {contract_T:.6f}'
+
+
+def test_alphamelts_distinct_binary32_buckets_yield_distinct_cache_keys():
+    """Inputs in different binary32 buckets keep distinct contract keys."""
+    import struct
+    from types import SimpleNamespace
+
+    from scripts.grid_pregrind import GridPoint, point_inputs
+    from scripts.grid_pregrind_writer import cache_v2_key_hash
+
+    # Neighboring tenths-of-a-milliC that land in different binary32 bins.
+    a, b = 952.377, 952.378
+    f32_a = struct.unpack('f', struct.pack('f', a))[0]
+    f32_b = struct.unpack('f', struct.pack('f', b))[0]
+    assert f32_a != f32_b
+
+    contract_a = serialize_melts_file_temperature_C(a)
+    contract_b = serialize_melts_file_temperature_C(b)
+    assert contract_a == f32_a
+    assert contract_b == f32_b
+    assert contract_a != contract_b
+    assert (
+        f'{contract_a:.{ALPHAMELTS_MELTS_FILE_TEMPERATURE_DECIMALS}f}'
+        != f'{contract_b:.{ALPHAMELTS_MELTS_FILE_TEMPERATURE_DECIMALS}f}'
+    )
+
+    args = SimpleNamespace(
+        backend='subprocess',
+        model='MELTSv1.0.2',
+        timeout_s=20.0,
+        thermoengine_health_timeout_s=8.0,
+    )
+    keys = []
+    for raw in (a, b):
+        point = GridPoint(
+            ordinal=0,
+            temperature_C=raw,
+            intended_fO2_log=-9.0,
+            pressure_bar=1.0,
+            composition_wt_pct={
+                'SiO2': 50.0,
+                'FeO': 25.0,
+                'MgO': 25.0,
+            },
+        )
+        inputs = point_inputs(point, args)
+        keys.append(cache_v2_key_hash(inputs))
+    assert keys[0] != keys[1]
+
+
+def test_alphamelts_temperature_contract_matches_cache_key_value(monkeypatch):
+    """Production path: raw grid T shares one binary32 identity across the channel.
+
+    b-102: a raw grid float must not key cache-v2 at a different identity than
+    the adapter's binary32 MELTS contract. Feed the raw value through real
+    grid input/key construction and assert:
+
+      queued request T
+        == cache-v2 canonical / key T
+        == .melts serialized T
+        == ALPHAMELTS_MINT / MAXT
+        == isothermal guard T
+        == binary32(raw)
+    """
+    import json
+    import struct
+    from types import SimpleNamespace
+
+    from scripts.grid_pregrind import GridPoint, point_inputs
+    from scripts.grid_pregrind_writer import (
+        cache_v2_key_hash,
+        canonical_input_vector,
+    )
+
+    # Reviewer-style raw with more than six decimals; binary32 is the
+    # determinant (not a six-decimal round alone).
     raw_T = 952.377371490
     contract_T = serialize_melts_file_temperature_C(raw_T)
+    expected = struct.unpack('f', struct.pack('f', raw_T))[0]
+    assert contract_T == expected
     assert contract_T != raw_T
-    assert abs(raw_T - contract_T) == pytest.approx(4.9e-7, abs=1e-10)
     assert serialize_melts_file_temperature_C(contract_T) == contract_T
 
     point = GridPoint(
@@ -1033,7 +1285,7 @@ def test_alphamelts_temperature_contract_matches_cache_key_value(monkeypatch):
     )
     inputs = point_inputs(point, args)
 
-    # 1) Queued request T is the contract (not the raw grid float).
+    # 1) Queued request T is the binary32 contract (not the raw grid float).
     queued_T = inputs['temperature_C']
     assert queued_T == contract_T
     assert inputs['kress91_partition_provenance']['requested_temperature_C'] == (
@@ -1057,7 +1309,7 @@ def test_alphamelts_temperature_contract_matches_cache_key_value(monkeypatch):
     backend._binary_path = Path('/tmp/fake-alphamelts')
     seen: dict = {}
     executed_T = struct.unpack('f', struct.pack('f', contract_T))[0]
-    assert abs(executed_T - contract_T) <= ALPHAMELTS_EXECUTED_T_TOLERANCE_C
+    assert executed_T == contract_T
 
     def fake_run(*args, **kwargs):
         if args[0][-1] == '--version':
