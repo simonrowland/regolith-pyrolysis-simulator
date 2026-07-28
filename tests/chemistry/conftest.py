@@ -1,9 +1,10 @@
 """Shared fixtures for the builtin chemistry provider tests.
 
-Scoped to ``tests/chemistry/``. The fixtures are module-scoped so they
-are constructed once per test module; pytest only injects them where a
-test explicitly requests them as an argument, so the kernel test files
-(which do not request them) are unaffected.
+Scoped to ``tests/chemistry/``. The YAML fixtures are module-scoped so they
+are constructed once per test module. The canonical provider full-run fixture
+is package-scoped so byte-identical consumers in separate provider modules can
+share it. Pytest only injects these fixtures where a test explicitly requests
+them, so the kernel test files (which do not request them) are unaffected.
 """
 
 from __future__ import annotations
@@ -16,6 +17,7 @@ import yaml
 
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
+from simulator.state import CampaignPhase, DecisionType
 
 
 DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
@@ -146,6 +148,81 @@ def _force_vaporock_unavailable_for_sim(sim: PyrolysisSimulator) -> None:
     # Replace ``_ensure_backend`` outright so the provider never
     # constructs a fresh adapter when the patched one is missing.
     provider._ensure_backend = lambda: backend  # type: ignore[method-assign]
+
+
+def _simulator_ledger_fingerprint(sim: PyrolysisSimulator) -> tuple:
+    sim.atom_ledger.assert_balanced()
+    return (
+        tuple(sorted(sim.atom_ledger.total_mol_by_account().items())),
+        tuple(sorted(sim.atom_ledger.mol_by_species().items())),
+        tuple(sorted(sim.melt.composition_kg.items())),
+        tuple(sorted(sim.product_ledger().items())),
+    )
+
+
+@pytest.fixture(
+    scope="package",
+    params=[
+        pytest.param(
+            ("lunar_mare_low_ti", None),
+            id="lunar_mare_low_ti-None",
+        ),
+        pytest.param(
+            ("mars_basalt", {"C": 60.0}),
+            id="mars_basalt-additives_kg1",
+        ),
+        pytest.param(
+            ("s_type_asteroid_silicate", None),
+            id="s_type_asteroid_silicate-None",
+        ),
+    ],
+)
+def full_builtin_provider_run(request):
+    """Run one canonical C0 -> C6 input for all provider-family consumers."""
+
+    feedstock_key, additives_kg = request.param
+    sim = _build_sim(
+        feedstock_key,
+        _load_yaml("vapor_pressures.yaml"),
+        _load_yaml("feedstocks.yaml"),
+        _load_yaml("setpoints.yaml"),
+        additives_kg=additives_kg,
+    )
+    sim.start_campaign(CampaignPhase.C0)
+    decision_choice = {
+        DecisionType.ROOT_BRANCH: "pyrolysis",
+        DecisionType.PATH_AB: "A",
+        DecisionType.BRANCH_ONE_TWO: "two",
+        DecisionType.C6_PROCEED: "yes",
+    }
+    steps = 0
+    while not sim.is_complete() and steps < 5000:
+        if sim.paused_for_decision:
+            decision = sim.pending_decision
+            choice = decision_choice.get(decision.decision_type)
+            if choice not in (decision.options or []):
+                choice = (decision.options or [None])[0]
+            sim.apply_decision(decision.decision_type, choice)
+            continue
+        sim.step()
+        steps += 1
+    return feedstock_key, additives_kg, sim
+
+
+@pytest.fixture(scope="package")
+def _full_builtin_provider_run_fingerprint(full_builtin_provider_run):
+    return _simulator_ledger_fingerprint(full_builtin_provider_run[2])
+
+
+@pytest.fixture(autouse=True)
+def _guard_full_builtin_provider_run(request):
+    if "full_builtin_provider_run" not in request.fixturenames:
+        yield
+        return
+    _, _, sim = request.getfixturevalue("full_builtin_provider_run")
+    expected = request.getfixturevalue("_full_builtin_provider_run_fingerprint")
+    yield
+    assert _simulator_ledger_fingerprint(sim) == expected
 
 
 def _atom_check(proposal, registry, *, tol: float) -> dict:

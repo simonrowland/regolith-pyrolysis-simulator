@@ -2206,25 +2206,13 @@ def test_provider_skips_below_numerical_floor(
 # ---------------------------------------------------------------------------
 
 
-# t-385 (2026-07-21): mass-balance class measured 889.9-953.9 s at -n0
-# (compose-vapor-work/n0-loop t1/t4/t5); ceiling >= 1.2x headroom over
-# measured n0 (family serialized on one gateway). xdist_group pins the MAGEMin full-run family to one gateway.
+# ci-train-tip2: matching provider runs measured up to 1728.787 s. The shared
+# fixture ceiling is >=3x that maximum, and xdist_group pins every consumer to
+# one gateway.
 @pytest.mark.xdist_group("magemin_fullrun_c")
-@pytest.mark.timeout(1800)
-@pytest.mark.parametrize(
-    "feedstock_key, additives_kg",
-    [
-        ("lunar_mare_low_ti", None),
-        ("mars_basalt", {"C": 60.0}),
-        ("s_type_asteroid_silicate", None),
-    ],
-)
+@pytest.mark.timeout(5400)
 def test_full_run_mass_balance_holds_with_kernel_committed_condensation(
-    feedstock_key,
-    additives_kg,
-    vapor_pressure_data,
-    feedstocks_data,
-    setpoints_data,
+    full_builtin_provider_run,
 ):
     """Drive C0 -> C6 to completion on each feedstock and verify:
 
@@ -2248,31 +2236,7 @@ def test_full_run_mass_balance_holds_with_kernel_committed_condensation(
     guard against future intent flips that touch the same call site.
     """
 
-    sim = _build_sim(
-        feedstock_key,
-        vapor_pressure_data,
-        feedstocks_data,
-        setpoints_data,
-        additives_kg=additives_kg,
-    )
-    sim.start_campaign(CampaignPhase.C0)
-    decision_choice = {
-        DecisionType.ROOT_BRANCH: "pyrolysis",
-        DecisionType.PATH_AB: "A",
-        DecisionType.BRANCH_ONE_TWO: "two",
-        DecisionType.C6_PROCEED: "yes",
-    }
-    steps = 0
-    while not sim.is_complete() and steps < 5000:
-        if sim.paused_for_decision:
-            decision = sim.pending_decision
-            choice = decision_choice.get(decision.decision_type)
-            if choice not in (decision.options or []):
-                choice = (decision.options or [None])[0]
-            sim.apply_decision(decision.decision_type, choice)
-            continue
-        sim.step()
-        steps += 1
+    feedstock_key, additives_kg, sim = full_builtin_provider_run
 
     assert sim.is_complete(), (
         f"smoke run for {feedstock_key} did not complete in 5000 steps"
@@ -2357,27 +2321,13 @@ def test_full_run_mass_balance_holds_with_kernel_committed_condensation(
 # ---------------------------------------------------------------------------
 
 
-# A_staged+MAGEMin composition wall-clock: mass-balance class measured
-# 1027 s on compose-0.6.3 (docs-private/research/2026-07-20-pool-diagnosis/report.md);
-# raise per-test ceiling to measured × 1.5 headroom (not global --timeout).
-# Derived warm-pool ceiling: ~300 warm calls x 3 s + cold-start + margin
-# (mass-balance class, n0 measured ~950 s sequential).
-@pytest.mark.xdist_group("magemin_fullrun_b")
-@pytest.mark.timeout(1800)
-@pytest.mark.parametrize(
-    "feedstock_key, additives_kg",
-    [
-        ("lunar_mare_low_ti", None),
-        ("mars_basalt", {"C": 60.0}),
-        ("s_type_asteroid_silicate", None),
-    ],
-)
+# ci-train-tip2: matching provider runs measured up to 1728.787 s. The shared
+# fixture ceiling is >=3x that maximum, and xdist_group pins every consumer to
+# one gateway.
+@pytest.mark.xdist_group("magemin_fullrun_c")
+@pytest.mark.timeout(5400)
 def test_split_path_end_state_matches_pre_flip_account_balances(
-    feedstock_key,
-    additives_kg,
-    vapor_pressure_data,
-    feedstocks_data,
-    setpoints_data,
+    full_builtin_provider_run,
 ):
     """End-of-batch account balances must match what the pre-flip
     single-step EVAPORATION_TRANSITION path produced.
@@ -2397,31 +2347,8 @@ def test_split_path_end_state_matches_pre_flip_account_balances(
     This is the end-state parity check that justifies the split.
     """
 
-    sim = _build_sim(
-        feedstock_key,
-        vapor_pressure_data,
-        feedstocks_data,
-        setpoints_data,
-        additives_kg=additives_kg,
-    )
-    sim.start_campaign(CampaignPhase.C0)
-    decision_choice = {
-        DecisionType.ROOT_BRANCH: "pyrolysis",
-        DecisionType.PATH_AB: "A",
-        DecisionType.BRANCH_ONE_TWO: "two",
-        DecisionType.C6_PROCEED: "yes",
-    }
-    steps = 0
-    while not sim.is_complete() and steps < 5000:
-        if sim.paused_for_decision:
-            decision = sim.pending_decision
-            choice = decision_choice.get(decision.decision_type)
-            if choice not in (decision.options or []):
-                choice = (decision.options or [None])[0]
-            sim.apply_decision(decision.decision_type, choice)
-            continue
-        sim.step()
-        steps += 1
+    feedstock_key, additives_kg, sim = full_builtin_provider_run
+
     assert sim.is_complete()
 
     registry = sim.atom_ledger.registry

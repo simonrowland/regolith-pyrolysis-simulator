@@ -389,27 +389,14 @@ def test_provider_emits_expected_proposal_for_known_inputs(
 # ---------------------------------------------------------------------------
 
 
-# t-385 (2026-07-21): mass-balance class measured 1134.6-1504.0 s standalone
-# (subset-junit-3); ceiling 1800 s = 1.2x headroom over the 1504.0 s worst
-# case — valid only because magemin_fullrun serializes the family on one
-# gateway (no MAGEMin-lock co-running). Module pytestmark deliberately has no
-# xdist_group: xdist 3.8 unions group marks (see module comment).
-@pytest.mark.xdist_group("magemin_fullrun_a")
-@pytest.mark.timeout(1800)
-@pytest.mark.parametrize(
-    "feedstock_key, additives_kg",
-    [
-        ("lunar_mare_low_ti", None),
-        ("mars_basalt", {"C": 60.0}),
-        ("s_type_asteroid_silicate", None),
-    ],
-)
+# ci-train-tip2: matching provider runs measured up to 1728.787 s. The shared
+# fixture ceiling is >=3x that maximum, and xdist_group pins every consumer to
+# one gateway. Module pytestmark deliberately has no xdist_group: xdist 3.8
+# unions group marks (see module comment).
+@pytest.mark.xdist_group("magemin_fullrun_c")
+@pytest.mark.timeout(5400)
 def test_full_run_mass_balance_holds_with_kernel_committed_transitions(
-    feedstock_key,
-    additives_kg,
-    vapor_pressure_data,
-    feedstocks_data,
-    setpoints_data,
+    full_builtin_provider_run,
 ):
     """Drive C0 -> C6 to completion on each feedstock and verify:
 
@@ -429,31 +416,7 @@ def test_full_run_mass_balance_holds_with_kernel_committed_transitions(
     call site.
     """
 
-    sim = _build_sim(
-        feedstock_key,
-        vapor_pressure_data,
-        feedstocks_data,
-        setpoints_data,
-        additives_kg=additives_kg,
-    )
-    sim.start_campaign(CampaignPhase.C0)
-    decision_choice = {
-        DecisionType.ROOT_BRANCH: "pyrolysis",
-        DecisionType.PATH_AB: "A",
-        DecisionType.BRANCH_ONE_TWO: "two",
-        DecisionType.C6_PROCEED: "yes",
-    }
-    steps = 0
-    while not sim.is_complete() and steps < 5000:
-        if sim.paused_for_decision:
-            decision = sim.pending_decision
-            choice = decision_choice.get(decision.decision_type)
-            if choice not in (decision.options or []):
-                choice = (decision.options or [None])[0]
-            sim.apply_decision(decision.decision_type, choice)
-            continue
-        sim.step()
-        steps += 1
+    feedstock_key, additives_kg, sim = full_builtin_provider_run
 
     assert sim.is_complete(), (
         f"smoke run for {feedstock_key} did not complete in 5000 steps"
