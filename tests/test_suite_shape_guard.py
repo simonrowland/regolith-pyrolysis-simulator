@@ -4,9 +4,11 @@ The full suite must never drift back to multi-hour wall-clock. Three
 structural invariants enforce that:
 
 1. Every test with a timeout ceiling above the 300 s global default MUST
-   carry exactly one ``xdist_group("magemin_fullrun_<x>")`` mark — heavy
-   native tests run inside one of the balanced serialized chains while the
-   rest of the suite parallelizes around them (``--dist loadgroup``).
+   carry exactly one recognized serialized-chain ``xdist_group`` mark —
+   ``magemin_fullrun_<x>`` for heavy native tests, or ``serial`` for the
+   socket/pool-contended web pair — so heavy tests run inside a
+   duration-hinted serialized chain while the rest of the suite
+   parallelizes around them (``--dist loadgroup``).
 2. The heavy roster is SHRINK-ONLY. Membership below is a debt list, not a
    category: adding an entry requires demoting another or an owner-ratified
    justification comment, and every entry's long-term fate is demotion to
@@ -147,7 +149,8 @@ def test_suite_shape_heavy_tests_are_grouped_and_rostered(request) -> None:
             violations.append(
                 f"{item.nodeid}: timeout {ceiling:g}s > "
                 f"{GLOBAL_TIMEOUT_CEILING_S:g}s without exactly one "
-                f"magemin_fullrun_<x> group (got {groups})"
+                f"recognized serialized-chain group "
+                f"(magemin_fullrun_<x> or serial; got {groups})"
             )
         if _item_key(item) not in HEAVY_ROSTER:
             violations.append(
