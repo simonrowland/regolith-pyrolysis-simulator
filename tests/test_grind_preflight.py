@@ -14,6 +14,7 @@ from simulator.backends import (
 )
 from simulator.config import load_config_bundle
 from simulator.grind_preflight import (
+    GRIND_STAGE0_NOT_APPLICABLE_FEEDSTOCK_IDS,
     GrindSourceGateError,
     STAGE0_INPROCESS_SAFE_FEEDSTOCK_IDS,
     assert_grind_feedstock_stage0_route_coverage,
@@ -101,12 +102,30 @@ def test_stage0_inprocess_safe_feedstock_ids_are_grounded() -> None:
 
 def test_full_catalog_feedstocks_have_stage0_route_coverage() -> None:
     feedstocks = load_config_bundle().feedstocks
+    not_applicable = set(GRIND_STAGE0_NOT_APPLICABLE_FEEDSTOCK_IDS)
 
     assert grind_feedstock_stage0_route_coverage_violations(
-        sorted(feedstocks),
+        sorted(set(feedstocks) - not_applicable),
         feedstocks,
         backend_name="alphamelts",
     ) == []
+    assert not_applicable == {"lunar_highlands_lhs1_yu_2025_reference"}
+    assert not_applicable <= set(feedstocks)
+
+
+def test_stage0_runtime_gate_rejects_catalog_not_applicable_feedstock() -> None:
+    feedstocks = load_config_bundle().feedstocks
+
+    with pytest.raises(
+        GrindSourceGateError,
+        match="lunar_highlands_lhs1_yu_2025_reference.*neither subprocess-routed",
+    ):
+        assert_grind_feedstock_stage0_route_coverage(
+            ["lunar_highlands_lhs1_yu_2025_reference"],
+            feedstocks,
+            backend_name="alphamelts",
+            context="test-grind",
+        )
 
 
 def test_stage0_route_coverage_accepts_super_kreep_as_explicit_ood() -> None:

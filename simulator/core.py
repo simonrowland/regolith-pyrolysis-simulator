@@ -2922,6 +2922,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             or self._normalize_condensation_carrier_gas(ambient_atmosphere) == 'CO2'
         ):
             return 'CO2'
+        if atmosphere_name == 'ARGON_FLOW':
+            return 'Ar'
         if atmosphere_name in {
             'CONTROLLED_O2',
             'O2_BACKPRESSURE',
@@ -3381,11 +3383,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         )
 
-    def _pn2_sweep_transport_pO2_bar(self, head_o2_mol: float) -> float:
-        """PN2 sweep transport pO2 for vapor dispatch.
+    def _inert_sweep_transport_pO2_bar(self, head_o2_mol: float) -> float:
+        """Inert-sweep transport pO2 for vapor dispatch.
 
         Formula follows docs-private/research/2026-07-03-live-po2-probe/
-        findings.md "Design answer": PN2_SWEEP requested pO2 is incoming
+        findings.md "Design answer": inert-sweep requested pO2 is incoming
         sweep-gas composition, while O2 made this tick is a ledger product
         drained by the sweep. Transport therefore uses
         max(vacuum_floor, incoming_sweep_pO2, post_sweep_residual_pO2),
@@ -3454,18 +3456,24 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._vacuum_floor_bar(),
         )
 
+    def _pn2_sweep_transport_pO2_bar(self, head_o2_mol: float) -> float:
+        return self._inert_sweep_transport_pO2_bar(head_o2_mol)
+
     def _headspace_transport_pO2_bar_from_ledger(
         self,
         ledger_pO2_bar: float,
         *,
         head_o2_mol: Optional[float] = None,
     ) -> float:
-        if str(getattr(self.melt.atmosphere, 'name', '') or '') == 'PN2_SWEEP':
+        if str(getattr(self.melt.atmosphere, 'name', '') or '') in {
+            'PN2_SWEEP',
+            'ARGON_FLOW',
+        }:
             if head_o2_mol is None:
                 head_o2_mol = self._headspace_o2_mol_for_pO2_bar(
                     ledger_pO2_bar
                 )
-            return self._pn2_sweep_transport_pO2_bar(head_o2_mol)
+            return self._inert_sweep_transport_pO2_bar(head_o2_mol)
         return max(
             float(ledger_pO2_bar),
             self._headspace_control_floor_pO2_bar(),

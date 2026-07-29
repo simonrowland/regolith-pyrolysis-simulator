@@ -62,6 +62,9 @@ _PUMPING_BODY_BY_FEEDSTOCK = {
             "lunar_spa_kreep_influenced",
             "targeted_super_kreep_ore",
             "lunar_highlands_lhs1",
+            # Yu et al. 2025 Table 1 identifies this reproduction-only LHS-1
+            # feed as a lunar simulant, so the lunar ambient remains grounded.
+            "lunar_highlands_lhs1_yu_2025_reference",
             "lunar_mare_lms1",
             "lunar_mare_oprl2n",
             "lunar_highlands_nuw_lht_5m",

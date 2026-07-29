@@ -42,6 +42,14 @@ from simulator.mre_ladder import max_voltage_for_target, parse_ladder_from_setpo
 PROFILE_SCHEMA_VERSION = "profile-schema-v1"
 SSO2_OWNER_RECIPE_ID = "sso2_pn2_fe_drain_silica"
 PROFILE_DIRNAME = "optimize_profiles"
+OPTIMIZER_PROFILE_NOT_APPLICABLE = MappingProxyType(
+    {
+        "lunar_highlands_lhs1_yu_2025_reference": (
+            "Yu et al. 2025 Table 1 literature-reproduction feed; "
+            "lunar_highlands_lhs1 is the process feedstock"
+        ),
+    }
+)
 VALID_FIDELITIES = (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     "fast",
@@ -272,7 +280,9 @@ def validate_profile_catalog(
     schema: RecipeSchema | None = None,
 ) -> Mapping[str, Mapping[str, Any]]:
     data_root = Path(data_dir)
-    expected = set(_feedstock_ids(data_root, include_blocked=False))
+    loadable_feedstocks = set(_feedstock_ids(data_root, include_blocked=False))
+    not_applicable = set(OPTIMIZER_PROFILE_NOT_APPLICABLE) & loadable_feedstocks
+    expected = loadable_feedstocks - not_applicable
     found = {path.stem for path in _profile_paths(data_root)}
     missing = sorted(expected - found)
     extras = sorted(found - expected)

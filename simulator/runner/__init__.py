@@ -2481,6 +2481,8 @@ def _carrier_pressure_observables(
     )
     if carrier is None and atmosphere_name == "PN2_SWEEP":
         carrier = "N2"
+    elif carrier is None and atmosphere_name == "ARGON_FLOW":
+        carrier = "Ar"
     elif carrier is None and atmosphere_name == "CO2_BACKPRESSURE":
         carrier = "CO2"
     if carrier is None:

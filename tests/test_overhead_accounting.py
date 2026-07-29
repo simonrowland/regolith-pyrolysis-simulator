@@ -1091,6 +1091,8 @@ _O2_FLOORED = (
 _O2_NOT_FLOORED = (
     Atmosphere.HARD_VACUUM,
     Atmosphere.PN2_SWEEP,
+    # Like the PN2 sweep, inert Ar flow supplies no commanded oxygen boundary.
+    Atmosphere.ARGON_FLOW,
     Atmosphere.CO2_BACKPRESSURE,
 )
 
@@ -1604,7 +1606,10 @@ def test_overhead_writer_raises_p_total_to_setpoint_in_o2_modes(atmosphere):
 
 
 @pytest.mark.parametrize("atmosphere", _O2_NOT_FLOORED)
-def test_overhead_writer_leaves_o2_alone_outside_o2_modes(atmosphere):
+@pytest.mark.parametrize("headspace_enabled", [False, True])
+def test_overhead_writer_leaves_o2_alone_outside_o2_modes(
+    atmosphere, headspace_enabled
+):
     """Decision matrix complement — under non-O₂-controlled
     atmospheres, the Phase A commanded-pO2 floor block in
     ``simulator/overhead.py`` (lines 507-514) does NOT fire on
@@ -1627,7 +1632,9 @@ def test_overhead_writer_leaves_o2_alone_outside_o2_modes(atmosphere):
     train = CondensationTrain.create_default()
     flux = EvaporationFlux()
 
-    model = OverheadGasModel({"enabled": True, "volume_m3": 1.0})
+    model = OverheadGasModel(
+        {"enabled": headspace_enabled, "volume_m3": 1.0}
+    )
     gas = model.update(flux, melt, train)
 
     # The Phase A P1 commanded-pO2 floor block (overhead.py:507-514)
@@ -1639,3 +1646,38 @@ def test_overhead_writer_leaves_o2_alone_outside_o2_modes(atmosphere):
         f"O2 floor leaked into non-O2-controlled atmosphere {atmosphere}: "
         f"got {gas.composition.get('O2', 0.0)} expected < 1.5"
     )
+
+
+@pytest.mark.parametrize("headspace_enabled", [False, True])
+def test_argon_flow_writes_inert_carrier_boundary(headspace_enabled):
+    from simulator.state import CondensationTrain, EvaporationFlux, MeltState
+    from simulator.overhead import OverheadGasModel
+
+    melt = MeltState(
+        atmosphere=Atmosphere.ARGON_FLOW,
+        pO2_mbar=1.5,
+        p_total_mbar=10.0,
+        temperature_C=1500.0,
+    )
+    gas = OverheadGasModel(
+        {"enabled": headspace_enabled, "volume_m3": 1.0}
+    ).update(
+        EvaporationFlux(),
+        melt,
+        CondensationTrain.create_default(),
+    )
+
+    assert gas.pressure_mbar >= 10.0
+    assert gas.composition["Ar"] == pytest.approx(8.5)
+    assert gas.composition.get("O2", 0.0) < 1.5
+
+
+def test_argon_flow_uses_inert_sweep_transport_po2():
+    sim = _sio_o2_train_sim()
+    sim.melt.atmosphere = Atmosphere.ARGON_FLOW
+    sim.melt.pO2_mbar = 1.5
+
+    assert sim._headspace_transport_pO2_bar_from_ledger(
+        0.0,
+        head_o2_mol=0.0,
+    ) == pytest.approx(0.0015)

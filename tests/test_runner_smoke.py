@@ -407,6 +407,30 @@ def test_per_hour_summary_omits_carrier_pair_without_physical_carrier() -> None:
     assert "p_carrier_bar" not in summary
 
 
+def test_per_hour_summary_infers_argon_carrier_from_argon_flow() -> None:
+    snapshot = HourSnapshot(hour=1, campaign=CampaignPhase.C0)
+    snapshot.overhead.pressure_mbar = 10.0
+    snapshot.overhead.composition = {"Ar": 9.0, "O2": 1.0}
+    sim = SimpleNamespace(
+        product_ledger=lambda: {},
+        campaign_mgr=SimpleNamespace(last_pO2_enforcement=None),
+        record=SimpleNamespace(snapshots=(snapshot,)),
+        melt=SimpleNamespace(
+            background_gas_species="",
+            atmosphere=SimpleNamespace(name="ARGON_FLOW"),
+        ),
+    )
+
+    summary = build_per_hour_summary(
+        sim,
+        snapshot,
+        include_fe_redox_split=False,
+    )
+
+    assert summary["carrier_identity"] == "Ar"
+    assert summary["p_carrier_bar"] == pytest.approx(0.009)
+
+
 VPR_P6A_TRACE_CONTROLS = {
     "sio_start_temperature_c": 1050.0,
     "sio_hold_temperature_c": 1600.0,

@@ -20,6 +20,7 @@ from simulator.backends import CACHE_TIER_CEILINGS
 from simulator.optimize.profiles import (
     constrained_max_profile,
     KNOWN_OBJECTIVE_METRICS,
+    OPTIMIZER_PROFILE_NOT_APPLICABLE,
     ProfileValidationError,
     physics_constraints_from_profile,
     validate_profile,
@@ -162,10 +163,12 @@ def test_profile_catalog_matches_feedstocks_and_validates_seeds() -> None:
         if is_blocked_feedstock(entry)
     }
     loadable_feedstocks = set(feedstocks) - blocked_feedstocks
+    not_applicable = set(OPTIMIZER_PROFILE_NOT_APPLICABLE)
     profiles = validate_profile_catalog()
 
     assert blocked_feedstocks
-    assert set(profiles) == loadable_feedstocks
+    assert set(profiles) | not_applicable == loadable_feedstocks
+    assert not_applicable.isdisjoint(profiles)
     assert blocked_feedstocks.isdisjoint(profiles)
     for feedstock, profile in profiles.items():
         assert profile["feedstock"] == feedstock

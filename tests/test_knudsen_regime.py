@@ -311,6 +311,14 @@ def test_controlled_o2_atmosphere_uses_o2_transport_properties():
     assert sim._resolve_condensation_carrier_gas() == "O2"
 
 
+def test_argon_flow_atmosphere_uses_argon_transport_properties():
+    sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    sim.melt = MeltState(atmosphere=Atmosphere.ARGON_FLOW)
+    sim.setpoints = {"campaigns": {}}
+
+    assert sim._resolve_condensation_carrier_gas() == "Ar"
+
+
 def test_explicit_campaign_pn2_carrier_precedes_controlled_o2_inference():
     sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
     sim.melt = MeltState(

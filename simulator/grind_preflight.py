@@ -25,6 +25,13 @@ STAGE0_INPROCESS_SAFE_FEEDSTOCK_IDS = frozenset(
         "mars_global_mgs1",
     }
 )
+GRIND_STAGE0_NOT_APPLICABLE_FEEDSTOCK_IDS = frozenset(
+    {
+        # Yu et al. 2025 Table 1 is retained only to reproduce that experiment;
+        # the canonical lunar_highlands_lhs1 entry is the process feedstock.
+        "lunar_highlands_lhs1_yu_2025_reference",
+    }
+)
 # Grounding: 2026-06-30/2026-07-01 C6 grind manifest/catalog sweep. These IDs
 # are present in the catalog/manifests, are not spinel-routed, are not
 # real-backend OOD, and are the known fast in-process class that fix2
