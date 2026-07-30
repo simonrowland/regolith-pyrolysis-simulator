@@ -1798,6 +1798,12 @@ class CondensationModel:
         )
         self.wall_temperature_C = float(wall_temperature_C)
         self.overhead_pressure_mbar = 0.0
+        self.species_partial_pressures_mbar: dict[str, float] = {}
+        self._species_partial_pressures_configured = False
+        self.wall_species_partial_pressures_pa: dict[str, float] = {}
+        self.wall_species_partial_pressures_pa_by_segment: dict[
+            str, dict[str, float]
+        ] = {}
         self.pipe_diameter_m = DEFAULT_PIPE_DIAMETER_M
         self.stage_area_m2_by_stage: dict[str, float] = {}
         self.stage_area_geometry_provenance_notice: dict[str, Any] = {}
@@ -1866,6 +1872,7 @@ class CondensationModel:
         self.last_wall_deposition_rate_shadow_candidate: dict[
             str, dict[str, Any]
         ] = {}
+        self.last_wall_capture_fixed_point_iterations = 0
         self.wall_alkali_binding_diagnostic_state_by_account: dict[
             str, dict[str, Any]
         ] = {}
@@ -1894,6 +1901,7 @@ class CondensationModel:
         *,
         wall_temperature_C: float | None = None,
         overhead_pressure_mbar: float | None = None,
+        species_partial_pressures_mbar: Mapping[str, float] | None = None,
         pipe_diameter_m: float | None = None,
         gas_temperature_C: float | None = None,
         stage_area_m2_by_stage: Mapping[str, float] | None = None,
@@ -1955,6 +1963,17 @@ class CondensationModel:
                     'overhead_pressure_mbar must be finite and non-negative'
                 )
             _campaign_requires_viscous_flow(campaign_name)
+        candidate_total_pressure_mbar = (
+            float(overhead_pressure_mbar)
+            if overhead_pressure_mbar is not None
+            else self.overhead_pressure_mbar
+        )
+        if species_partial_pressures_mbar is not None:
+            _flowing_species_partial_pressures_pa(
+                {},
+                candidate_total_pressure_mbar * 100.0,
+                reported_partial_pressures_mbar=species_partial_pressures_mbar,
+            )
         if carrier_gas is not None:
             _canonical_carrier_gas_key(carrier_gas)
         if campaign_hour is not None:
@@ -2092,6 +2111,12 @@ class CondensationModel:
             self._knudsen_policy_configured = True
             self._viscous_flow_required = _campaign_requires_viscous_flow(
                 campaign_name)
+        if species_partial_pressures_mbar is not None:
+            self.species_partial_pressures_mbar = {
+                str(species): float(partial_pressure)
+                for species, partial_pressure in species_partial_pressures_mbar.items()
+            }
+            self._species_partial_pressures_configured = True
         pressure_pa = self.overhead_pressure_mbar * 100.0
         gas_temperature_K = max(
             self.gas_temperature_C + CELSIUS_TO_KELVIN_OFFSET,
@@ -2124,6 +2149,7 @@ class CondensationModel:
             x is not None
             for x in (
                 overhead_pressure_mbar,
+                species_partial_pressures_mbar,
                 stir_factor,
                 radial_stir_factor,
                 wall_temperature_C,
@@ -2151,6 +2177,9 @@ class CondensationModel:
                 "stage_area_geometry_provenance_notice": dict(
                     self.stage_area_geometry_provenance_notice),
                 "overhead_pressure_mbar": float(self.overhead_pressure_mbar),
+                "species_partial_pressures_mbar": dict(
+                    self.species_partial_pressures_mbar
+                ),
                 "stir_factor": float(self.stir_factor),
                 "stir_factor_clamped": bool(_stir_factor_clamped),
                 # 0.5.3 Phase B: radial axis carried in the snapshot
@@ -2449,6 +2478,15 @@ class CondensationModel:
         transport_parameter_notice_by_species: dict[str, Any] = {}
         condensation_refusals_by_species: dict[str, dict[str, Any]] = {}
         used_capture_budget_regularizer = False
+        self.wall_species_partial_pressures_pa = (
+            _flowing_species_partial_pressures_pa(
+                evap_flux.species_kg_hr,
+                self.overhead_pressure_mbar * 100.0,
+                reported_partial_pressures_mbar=self.species_partial_pressures_mbar,
+            )
+            if self._species_partial_pressures_configured
+            else {}
+        )
         knudsen_diagnostic = self._enforce_knudsen_regime()
         diagnostic = cold_spot_diagnostic(
             self.pipe_segments,
@@ -2466,8 +2504,115 @@ class CondensationModel:
                 cold_spot_warnings)
             self.operating_history[-1]['cold_spot_warnings'] = cold_spot_warnings
 
+        stage_route_by_species: dict[str, dict[str, Any]] = {}
         for species, rate_kg_hr in evap_flux.species_kg_hr.items():
-            remaining_kg = rate_kg_hr  # Mass still in vapor phase
+            if not _species_has_antoine_data(
+                species,
+                vapor_pressure_data=self.vapor_pressure_data,
+            ):
+                continue
+            T_cond = _species_condensation_temperature_C(
+                species,
+                temps=self.condensation_temperatures_C,
+                vapor_pressure_data=self.vapor_pressure_data,
+            )
+            remaining_kg = rate_kg_hr
+            hkl_condensed_by_stage: Dict[int, float] = {}
+            remaining_after_stage: Dict[int, float] = {}
+            stage_alpha_records_by_stage: Dict[int, dict[str, Any]] = {}
+            for stage in self.train.stages:
+                if remaining_kg <= 1e-15:
+                    break
+                if _cr_stage_isolation_blocks(stage, species):
+                    continue
+                stage_alpha_record = _stage_alpha_record(
+                    stage,
+                    species,
+                    self.materials,
+                )
+                # Every evaluated stage controls how much vapor reaches the
+                # wall, so its alpha provenance influences wall-deposit
+                # authority even when that stage condenses nearly zero mass.
+                stage_alpha_records_by_stage[stage.stage_number] = dict(
+                    stage_alpha_record
+                )
+                eta = self._condensation_efficiency(
+                    stage=stage,
+                    species=species,
+                    T_cond_C=T_cond,
+                    residence_s=self.residence_time_s.get(
+                        stage.stage_number, 1.0
+                    ),
+                    available_kg=remaining_kg,
+                    alpha_s_value=float(stage_alpha_record.get('alpha_s', 0.0)),
+                    alpha_record=stage_alpha_record,
+                    antoine_extrapolations=antoine_extrapolations,
+                    antoine_extrapolation_warnings=(
+                        antoine_extrapolation_warnings
+                    ),
+                )
+                condensed_kg = remaining_kg * eta
+                if condensed_kg > 1e-15:
+                    hkl_condensed_by_stage[stage.stage_number] = (
+                        hkl_condensed_by_stage.get(stage.stage_number, 0.0)
+                        + condensed_kg
+                    )
+                remaining_kg -= condensed_kg
+                remaining_after_stage[stage.stage_number] = max(
+                    0.0, remaining_kg
+                )
+            segment_supply = self._segment_supply_by_name(
+                rate_kg_hr,
+                remaining_after_stage,
+            )
+            capture_budget_alpha_record: dict[str, Any] = {}
+            capture_budget_kg = _pressure_isolated_capture_budget_kg(
+                species,
+                rate_kg_hr,
+                self.train.stages,
+                self.residence_time_s,
+                temps=self.condensation_temperatures_C,
+                vapor_pressure_data=self.vapor_pressure_data,
+                alpha_record_out=capture_budget_alpha_record,
+            )
+            stage_route_by_species[species] = {
+                'T_cond_C': T_cond,
+                'hkl_condensed_by_stage': hkl_condensed_by_stage,
+                'remaining_after_stage': remaining_after_stage,
+                'stage_alpha_records_by_stage': stage_alpha_records_by_stage,
+                'segment_supply': segment_supply,
+                'capture_budget_kg': capture_budget_kg,
+                'capture_budget_alpha_record': capture_budget_alpha_record,
+            }
+
+        positive_wall_species = {
+            species
+            for species, rate_kg_hr in evap_flux.species_kg_hr.items()
+            if float(rate_kg_hr) > 0.0 and species in stage_route_by_species
+        }
+        missing_partial_species = sorted(
+            positive_wall_species
+            - set(self.wall_species_partial_pressures_pa)
+        )
+        if missing_partial_species:
+            raise ValueError(
+                'wall species partial pressures are required for every '
+                'positive condensable vapor species; missing '
+                + ', '.join(missing_partial_species)
+            )
+        wall_hkl_by_species = (
+            self._resolve_wall_deposit_candidates_by_species_segment_kg(
+                evap_flux=evap_flux,
+                melt=melt,
+                stage_route_by_species=stage_route_by_species,
+                antoine_extrapolations=antoine_extrapolations,
+                antoine_extrapolation_warnings=(
+                    antoine_extrapolation_warnings
+                ),
+            )
+        )
+
+        for species, rate_kg_hr in evap_flux.species_kg_hr.items():
             wall_deposit_fraction_by_species[species] = 0.0
             wall_deposit_account_fractions_by_species[species] = {}
 
@@ -2482,76 +2627,17 @@ class CondensationModel:
                 }
                 continue
 
-            T_cond = _species_condensation_temperature_C(
-                species,
-                temps=self.condensation_temperatures_C,
-                vapor_pressure_data=self.vapor_pressure_data,
+            stage_route = stage_route_by_species[species]
+            T_cond = float(stage_route['T_cond_C'])
+            hkl_condensed_by_stage = dict(
+                stage_route['hkl_condensed_by_stage']
             )
-            hkl_condensed_by_stage: Dict[int, float] = {}
-            remaining_after_stage: Dict[int, float] = {}
-            stage_alpha_records_by_stage: Dict[int, dict[str, Any]] = {}
-
-            for stage in self.train.stages:
-                if remaining_kg <= 1e-15:
-                    break
-                if _cr_stage_isolation_blocks(stage, species):
-                    continue
-                stage_alpha_record = _stage_alpha_record(
-                    stage,
-                    species,
-                    self.materials,
-                )
-                # Every EVALUATED stage's alpha influences the final wall
-                # deposit: it sets how much vapor this stage removes versus
-                # passes downstream to the wall sink (the wall_hkl / hkl_sink
-                # split), so its provenance must enter deposit authority even
-                # when this stage itself condenses ~0 -- otherwise an uncertified
-                # low/zero stage alpha drives a positive wall deposit while it
-                # stays authoritative (an F0 fail-open; BUG-096 sibling caught by
-                # the codex repro 2026-06-27). Only stages reached before full
-                # capture (remaining_kg>1e-15) are evaluated, so this never
-                # demotes on a non-influencing stage.
-                stage_alpha_records_by_stage[stage.stage_number] = dict(
-                    stage_alpha_record)
-                # Calculate band-aware H-K-L deposition efficiency [COND-2]
-                eta = self._condensation_efficiency(
-                    stage=stage,
-                    species=species,
-                    T_cond_C=T_cond,
-                    residence_s=self.residence_time_s.get(
-                        stage.stage_number, 1.0),
-                    available_kg=remaining_kg,
-                    alpha_s_value=float(stage_alpha_record.get('alpha_s', 0.0)),
-                    alpha_record=stage_alpha_record,
-                    antoine_extrapolations=antoine_extrapolations,
-                    antoine_extrapolation_warnings=(
-                        antoine_extrapolation_warnings),
-                )
-
-                condensed_kg = remaining_kg * eta
-                if condensed_kg > 1e-15:
-                    hkl_condensed_by_stage[stage.stage_number] = (
-                        hkl_condensed_by_stage.get(stage.stage_number, 0.0)
-                        + condensed_kg)
-
-                remaining_kg -= condensed_kg
-                remaining_after_stage[stage.stage_number] = max(
-                    0.0, remaining_kg)
-
+            stage_alpha_records_by_stage = dict(
+                stage_route['stage_alpha_records_by_stage']
+            )
             hkl_condensed_total_kg = sum(hkl_condensed_by_stage.values())
-            segment_supply = self._segment_supply_by_name(
-                rate_kg_hr,
-                remaining_after_stage,
-            )
-            wall_hkl_by_segment = self._wall_deposit_candidates_by_segment_kg(
-                species=species,
-                rate_kg_hr=rate_kg_hr,
-                T_cond_C=T_cond,
-                melt_temperature_C=float(getattr(melt, 'temperature_C', T_cond)),
-                supply_by_segment_kg=segment_supply,
-                antoine_extrapolations=antoine_extrapolations,
-                antoine_extrapolation_warnings=(
-                    antoine_extrapolation_warnings),
+            wall_hkl_by_segment = dict(
+                wall_hkl_by_species.get(species, {})
             )
             candidate_segments = self._mixed_temperature_wall_candidate_segments(
                 species)
@@ -2582,16 +2668,10 @@ class CondensationModel:
                         transport_notice)
             wall_hkl_kg = sum(wall_hkl_by_segment.values())
             hkl_sink_total_kg = hkl_condensed_total_kg + wall_hkl_kg
-            capture_budget_alpha_record: dict[str, Any] = {}
-            capture_budget_kg = _pressure_isolated_capture_budget_kg(
-                species,
-                rate_kg_hr,
-                self.train.stages,
-                self.residence_time_s,
-                temps=self.condensation_temperatures_C,
-                vapor_pressure_data=self.vapor_pressure_data,
-                alpha_record_out=capture_budget_alpha_record,
+            capture_budget_alpha_record = dict(
+                stage_route['capture_budget_alpha_record']
             )
+            capture_budget_kg = float(stage_route['capture_budget_kg'])
             if hkl_sink_total_kg <= 1e-15:
                 capture_budget_kg = 0.0
             elif capture_budget_kg > 0.0:
@@ -2910,15 +2990,6 @@ class CondensationModel:
             antoine_extrapolations is not None
             or antoine_extrapolation_warnings is not None
         ):
-            _local_wall_species_pressure_pa(
-                species,
-                melt_temperature_C,
-                T_cond_C,
-                vapor_pressure_data=self.vapor_pressure_data,
-                antoine_extrapolations=antoine_extrapolations,
-                antoine_extrapolation_warnings=(
-                    antoine_extrapolation_warnings),
-            )
             _record_wall_surface_antoine_telemetry(
                 species,
                 self.wall_temperature_C,
@@ -2957,15 +3028,6 @@ class CondensationModel:
             antoine_extrapolations is not None
             or antoine_extrapolation_warnings is not None
         ):
-            _local_wall_species_pressure_pa(
-                species,
-                melt_temperature_C,
-                T_cond_C,
-                vapor_pressure_data=self.vapor_pressure_data,
-                antoine_extrapolations=antoine_extrapolations,
-                antoine_extrapolation_warnings=(
-                    antoine_extrapolation_warnings),
-            )
             for segment in self._mixed_temperature_wall_candidate_segments(
                 species,
             ):
@@ -2992,6 +3054,288 @@ class CondensationModel:
             )
         finally:
             _reset_antoine_telemetry_context(token)
+
+    def _resolve_wall_deposit_candidates_by_species_segment_kg(
+        self,
+        *,
+        evap_flux: EvaporationFlux,
+        melt: MeltState,
+        stage_route_by_species: Mapping[str, Mapping[str, Any]],
+        antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
+        antoine_extrapolation_warnings: list[str] | None = None,
+    ) -> Dict[str, Dict[str, float]]:
+        self.last_wall_capture_fixed_point_iterations = 0
+        if not self.pipe_segments or not stage_route_by_species:
+            self.wall_species_partial_pressures_pa_by_segment = {}
+            return {}
+
+        inlet_rates = {
+            str(species): max(0.0, float(rate_kg_hr))
+            for species, rate_kg_hr in evap_flux.species_kg_hr.items()
+        }
+        segment_names = [segment.name for segment in self.pipe_segments]
+        total_pressure_pa = self.overhead_pressure_mbar * 100.0
+
+        def segment_rates_from_capture(
+            stage_capture_by_species: Mapping[str, Mapping[int, float]],
+            wall_capture_by_species: Mapping[str, Mapping[str, float]],
+        ) -> dict[str, dict[str, float]]:
+            by_segment: dict[str, dict[str, float]] = {}
+            prior_segments: list[str] = []
+            for segment in self.pipe_segments:
+                upstream_number = _segment_stage_number(segment.upstream_stage)
+                rates: dict[str, float] = {}
+                for species, inlet_rate in inlet_rates.items():
+                    stage_removed = (
+                        sum(
+                            float(value)
+                            for stage_number, value
+                            in stage_capture_by_species.get(species, {}).items()
+                            if (
+                                upstream_number is not None
+                                and int(stage_number) <= upstream_number
+                            )
+                        )
+                    )
+                    wall_removed = sum(
+                        float(
+                            wall_capture_by_species.get(species, {}).get(
+                                prior_segment,
+                                0.0,
+                            )
+                        )
+                        for prior_segment in prior_segments
+                    )
+                    remaining = inlet_rate - stage_removed - wall_removed
+                    tolerance = 1.0e-12 * max(1.0, inlet_rate)
+                    if remaining < -tolerance:
+                        raise ValueError(
+                            'resolved wall routing removes more '
+                            f'{species} than enters the train'
+                        )
+                    rates[species] = max(0.0, remaining)
+                by_segment[segment.name] = rates
+                prior_segments.append(segment.name)
+            return by_segment
+
+        def wall_candidates(
+            species_rates_by_segment: Mapping[str, Mapping[str, float]],
+            *,
+            record_telemetry: bool,
+        ) -> dict[str, dict[str, float]]:
+            candidates: dict[str, dict[str, float]] = {}
+            for species, stage_route in stage_route_by_species.items():
+                rate_kg_hr = inlet_rates.get(species, 0.0)
+                if rate_kg_hr <= 0.0:
+                    continue
+                species_candidates = self._wall_deposit_candidates_by_segment_kg(
+                    species=species,
+                    rate_kg_hr=rate_kg_hr,
+                    T_cond_C=float(stage_route['T_cond_C']),
+                    melt_temperature_C=float(
+                        getattr(melt, 'temperature_C', stage_route['T_cond_C'])
+                    ),
+                    supply_by_segment_kg={
+                        segment_name: float(
+                            species_rates_by_segment.get(
+                                segment_name,
+                                {},
+                            ).get(species, 0.0)
+                        )
+                        for segment_name in segment_names
+                    },
+                    antoine_extrapolations=(
+                        antoine_extrapolations if record_telemetry else None
+                    ),
+                    antoine_extrapolation_warnings=(
+                        antoine_extrapolation_warnings
+                        if record_telemetry else None
+                    ),
+                )
+                candidates[species] = species_candidates
+            return candidates
+
+        def resolved_capture(
+            candidates_by_species: Mapping[str, Mapping[str, float]],
+        ) -> tuple[
+            dict[str, dict[int, float]],
+            dict[str, dict[str, float]],
+        ]:
+            stage_capture: dict[str, dict[int, float]] = {}
+            wall_capture: dict[str, dict[str, float]] = {}
+            for species, stage_route in stage_route_by_species.items():
+                stages, walls = _regularized_capture_allocations(
+                    float(stage_route['capture_budget_kg']),
+                    stage_route['hkl_condensed_by_stage'],
+                    candidates_by_species.get(species, {}),
+                )
+                stage_capture[species] = {
+                    int(stage_number): float(value)
+                    for stage_number, value in stages.items()
+                }
+                wall_capture[species] = {
+                    str(segment_name): float(value)
+                    for segment_name, value in walls.items()
+                }
+            return stage_capture, wall_capture
+
+        def capture_delta(
+            previous_stage: Mapping[str, Mapping[int, float]],
+            previous_wall: Mapping[str, Mapping[str, float]],
+            current_stage: Mapping[str, Mapping[int, float]],
+            current_wall: Mapping[str, Mapping[str, float]],
+        ) -> float:
+            delta = 0.0
+            for species, inlet_rate in inlet_rates.items():
+                scale = max(1.0e-30, inlet_rate)
+                for stage_number in (
+                    set(previous_stage.get(species, {}))
+                    | set(current_stage.get(species, {}))
+                ):
+                    delta = max(
+                        delta,
+                        abs(
+                            float(
+                                previous_stage.get(species, {}).get(
+                                    stage_number,
+                                    0.0,
+                                )
+                            )
+                            - float(
+                                current_stage.get(species, {}).get(
+                                    stage_number,
+                                    0.0,
+                                )
+                            )
+                        )
+                        / scale,
+                    )
+                for segment_name in (
+                    set(previous_wall.get(species, {}))
+                    | set(current_wall.get(species, {}))
+                ):
+                    delta = max(
+                        delta,
+                        abs(
+                            float(
+                                previous_wall.get(species, {}).get(
+                                    segment_name,
+                                    0.0,
+                                )
+                            )
+                            - float(
+                                current_wall.get(species, {}).get(
+                                    segment_name,
+                                    0.0,
+                                )
+                            )
+                        )
+                        / scale,
+                    )
+            return delta
+
+        def relax_capture(
+            previous: Mapping[str, Mapping[Any, float]],
+            current: Mapping[str, Mapping[Any, float]],
+            factor: float,
+        ) -> dict[str, dict[Any, float]]:
+            relaxed: dict[str, dict[Any, float]] = {}
+            for species in set(previous) | set(current):
+                values: dict[Any, float] = {}
+                for location in (
+                    set(previous.get(species, {}))
+                    | set(current.get(species, {}))
+                ):
+                    old_value = float(
+                        previous.get(species, {}).get(location, 0.0)
+                    )
+                    new_value = float(
+                        current.get(species, {}).get(location, 0.0)
+                    )
+                    value = old_value + factor * (new_value - old_value)
+                    if value > 0.0:
+                        values[location] = value
+                relaxed[species] = values
+            return relaxed
+
+        stage_capture: dict[str, dict[int, float]] = {}
+        wall_capture: dict[str, dict[str, float]] = {}
+        converged = False
+        previous_delta: float | None = None
+        relaxation = 1.0
+        for iteration in range(1024):
+            species_rates_by_segment = segment_rates_from_capture(
+                stage_capture,
+                wall_capture,
+            )
+            self.wall_species_partial_pressures_pa_by_segment = (
+                _segment_species_partial_pressures_pa(
+                    self.wall_species_partial_pressures_pa,
+                    total_pressure_pa,
+                    inlet_rates,
+                    species_rates_by_segment,
+                )
+            )
+            self.last_wall_deposition_rate_shadow_candidate = {}
+            candidates_by_species = wall_candidates(
+                species_rates_by_segment,
+                record_telemetry=False,
+            )
+            next_stage_capture, next_wall_capture = resolved_capture(
+                candidates_by_species
+            )
+            delta = capture_delta(
+                stage_capture,
+                wall_capture,
+                next_stage_capture,
+                next_wall_capture,
+            )
+            if delta <= 1.0e-7:
+                stage_capture = next_stage_capture
+                wall_capture = next_wall_capture
+                self.last_wall_capture_fixed_point_iterations = iteration + 1
+                converged = True
+                break
+            if (
+                previous_delta is not None
+                and delta >= 0.95 * previous_delta
+            ):
+                relaxation = 0.8
+            stage_capture = relax_capture(
+                stage_capture,
+                next_stage_capture,
+                relaxation,
+            )
+            wall_capture = relax_capture(
+                wall_capture,
+                next_wall_capture,
+                relaxation,
+            )
+            previous_delta = delta
+        if not converged:
+            self.last_wall_capture_fixed_point_iterations = 1024
+            raise RuntimeError(
+                'wall/stage capture fixed-point did not converge in 1024 '
+                f'iterations (relative delta={delta:.12g})'
+            )
+        if (
+            antoine_extrapolations is not None
+            or antoine_extrapolation_warnings is not None
+        ):
+            for species in stage_route_by_species:
+                for segment in self._mixed_temperature_wall_candidate_segments(
+                    species
+                ):
+                    _record_wall_surface_antoine_telemetry(
+                        species,
+                        segment.wall_temperature_C,
+                        vapor_pressure_data=self.vapor_pressure_data,
+                        antoine_extrapolations=antoine_extrapolations,
+                        antoine_extrapolation_warnings=(
+                            antoine_extrapolation_warnings
+                        ),
+                    )
+        return candidates_by_species
 
     def _mixed_temperature_wall_candidate_segments(
         self,
@@ -3027,15 +3371,6 @@ class CondensationModel:
             antoine_extrapolations is not None
             or antoine_extrapolation_warnings is not None
         ):
-            _local_wall_species_pressure_pa(
-                species,
-                melt_temperature_C,
-                T_cond_C,
-                vapor_pressure_data=self.vapor_pressure_data,
-                antoine_extrapolations=antoine_extrapolations,
-                antoine_extrapolation_warnings=(
-                    antoine_extrapolation_warnings),
-            )
             _record_wall_surface_antoine_telemetry(
                 species,
                 wall_temperature_C,
@@ -4130,33 +4465,218 @@ def _record_wall_surface_antoine_telemetry(
     )
 
 
-def _local_wall_species_pressure_pa(
-    species: str,
-    melt_temperature_C: float,
-    fallback_T_cond_C: float,
+def _flowing_species_partial_pressures_pa(
+    species_kg_hr: Mapping[str, float],
+    total_pressure_pa: float,
     *,
-    vapor_pressure_data: Mapping[str, Any] | None = None,
-    antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
-    antoine_extrapolation_warnings: list[str] | None = None,
-) -> float:
-    P_source_pa, refused = _try_antoine_psat_pa(
-        species,
-        melt_temperature_C + CELSIUS_TO_KELVIN_OFFSET,
-        vapor_pressure_data=vapor_pressure_data,
-        antoine_extrapolations=antoine_extrapolations,
-        antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+    reported_partial_pressures_mbar: Mapping[str, float] | None = None,
+) -> dict[str, float]:
+    try:
+        pressure_pa = float(total_pressure_pa)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(
+            'wall total pressure must be finite and non-negative'
+        ) from exc
+    if not math.isfinite(pressure_pa) or pressure_pa < 0.0:
+        raise ValueError('wall total pressure must be finite and non-negative')
+
+    # Premise: the flowing vapor is an ideal-gas mixture, so Dalton's law uses
+    # its actual molar-flow composition rather than pure-component P_sat(T_melt).
+    # Algebra: n_dot_i=m_dot_i/M_i, y_i,v=n_dot_i/sum_j(n_dot_j), then
+    # p_i=y_i,v*P_vapor. Equivalently p_i=y_i,total*P_total only when carrier
+    # gas is included in y_i,total; production supplies the P_vapor projection.
+    # Unit check: (kg/hr)/(kg/mol)=mol/hr, y_i is dimensionless, and
+    # y_i*pressure is Pa. Invariant: 0 <= p_i <= P_total. Sanity anchor: even
+    # single-species Na or K at 10 mbar has p_i<=1000 Pa, below P_sat at a
+    # 1500 C wall, so that wall cannot collect either alkali by condensation.
+    if reported_partial_pressures_mbar is not None:
+        partial_pressures_pa = {
+            str(species): float(partial_pressure_mbar) * 100.0
+            for species, partial_pressure_mbar
+            in reported_partial_pressures_mbar.items()
+        }
+    else:
+        molar_flow_by_species: dict[str, float] = {}
+        for species, raw_rate_kg_hr in species_kg_hr.items():
+            molar_mass_g_mol = MOLAR_MASS.get(species)
+            if molar_mass_g_mol is None or molar_mass_g_mol <= 0.0:
+                continue
+            try:
+                rate_kg_hr = float(raw_rate_kg_hr)
+            except (TypeError, ValueError):
+                continue
+            if not math.isfinite(rate_kg_hr) or rate_kg_hr <= 0.0:
+                continue
+            molar_flow_by_species[str(species)] = (
+                rate_kg_hr / (molar_mass_g_mol / 1000.0)
+            )
+        total_molar_flow = sum(molar_flow_by_species.values())
+        if total_molar_flow <= 0.0:
+            return {}
+        partial_pressures_pa = {
+            species: molar_flow / total_molar_flow * pressure_pa
+            for species, molar_flow in molar_flow_by_species.items()
+        }
+
+    for species, partial_pressure_pa in partial_pressures_pa.items():
+        if not math.isfinite(partial_pressure_pa) or partial_pressure_pa < 0.0:
+            raise ValueError(
+                f'wall partial pressure for {species} must be finite and '
+                'non-negative'
+            )
+        if partial_pressure_pa > pressure_pa:
+            raise ValueError(
+                'wall partial pressure invariant violated: '
+                f'p_{species}={partial_pressure_pa:.12g} Pa exceeds '
+                f'P_total={pressure_pa:.12g} Pa'
+            )
+    partial_pressure_sum_pa = sum(partial_pressures_pa.values())
+    if partial_pressure_sum_pa > pressure_pa:
+        roundoff_pa = max(
+            math.ulp(pressure_pa),
+            math.ulp(partial_pressure_sum_pa),
+        ) * max(1, len(partial_pressures_pa))
+        if (
+            pressure_pa > 0.0
+            and partial_pressure_sum_pa - pressure_pa <= roundoff_pa
+        ):
+            scale = pressure_pa / partial_pressure_sum_pa
+            partial_pressures_pa = {
+                species: partial_pressure_pa * scale
+                for species, partial_pressure_pa in partial_pressures_pa.items()
+            }
+            normalized_sum_pa = sum(partial_pressures_pa.values())
+            if normalized_sum_pa > pressure_pa:
+                correction_species = max(
+                    partial_pressures_pa,
+                    key=lambda species: (
+                        partial_pressures_pa[species],
+                        species,
+                    ),
+                )
+                correction_pa = normalized_sum_pa - pressure_pa
+                partial_pressures_pa[correction_species] = max(
+                    0.0,
+                    partial_pressures_pa[correction_species] - correction_pa,
+                )
+                for _ in range(2 * len(partial_pressures_pa) + 4):
+                    if sum(partial_pressures_pa.values()) <= pressure_pa:
+                        break
+                    partial_pressures_pa[correction_species] = math.nextafter(
+                        partial_pressures_pa[correction_species],
+                        -math.inf,
+                    )
+                if sum(partial_pressures_pa.values()) > pressure_pa:
+                    raise ValueError(
+                        'wall partial pressure invariant violated after '
+                        'roundoff normalization'
+                    )
+        else:
+            raise ValueError(
+                'wall partial pressure invariant violated: '
+                f'sum(p_i)={partial_pressure_sum_pa:.12g} Pa exceeds '
+                f'P_total={pressure_pa:.12g} Pa'
+            )
+    return partial_pressures_pa
+
+
+def _segment_species_partial_pressures_pa(
+    inlet_partial_pressures_pa: Mapping[str, float],
+    total_pressure_pa: float,
+    inlet_species_kg_hr: Mapping[str, float],
+    species_kg_hr_by_segment: Mapping[str, Mapping[str, float]],
+) -> dict[str, dict[str, float]]:
+    # Premise: carrier molar flow persists while upstream capture reduces each
+    # vapor flow. On a unit inlet-total-molar-flow basis, y_c=1-sum_i(y_i,0)
+    # and n_i,s=y_i,0*(m_i,s/m_i,0). Algebra: y_i,s=n_i,s/(y_c+sum_j n_j,s)
+    # and p_i,s=y_i,s*P_total. The same-species mass ratio equals its molar-flow
+    # ratio, so units cancel before the final Pa multiplication. This preserves
+    # p_i<=P_total and makes upstream capture reduce downstream supersaturation;
+    # Na/K remain non-depositing on a 1500 C wall even at the 10 mbar ceiling.
+    inlet_partials = _flowing_species_partial_pressures_pa(
+        {},
+        total_pressure_pa,
+        reported_partial_pressures_mbar={
+            species: float(partial_pressure_pa) / 100.0
+            for species, partial_pressure_pa in inlet_partial_pressures_pa.items()
+        },
     )
-    if refused:
-        return 0.0
-    if P_source_pa is not None and P_source_pa > 0.0:
-        return P_source_pa
-    return _local_species_pressure_pa(
-        species,
-        fallback_T_cond_C,
-        vapor_pressure_data=vapor_pressure_data,
-        antoine_extrapolations=antoine_extrapolations,
-        antoine_extrapolation_warnings=antoine_extrapolation_warnings,
-    )
+    pressure_pa = float(total_pressure_pa)
+    if pressure_pa == 0.0:
+        return {
+            str(segment): {
+                species: 0.0 for species in inlet_partials
+            }
+            for segment in species_kg_hr_by_segment
+        }
+
+    inlet_mole_fraction = {
+        species: partial_pressure_pa / pressure_pa
+        for species, partial_pressure_pa in inlet_partials.items()
+    }
+    carrier_mole_fraction = 1.0 - sum(inlet_mole_fraction.values())
+    if carrier_mole_fraction < 0.0:
+        raise ValueError(
+            'wall partial pressure invariant violated: vapor mole fractions '
+            'exceed total gas composition'
+        )
+
+    by_segment: dict[str, dict[str, float]] = {}
+    for raw_segment, segment_rates in species_kg_hr_by_segment.items():
+        segment = str(raw_segment)
+        local_molar_basis: dict[str, float] = {}
+        for species, inlet_fraction in inlet_mole_fraction.items():
+            inlet_rate = float(inlet_species_kg_hr.get(species, 0.0))
+            local_rate = float(segment_rates.get(species, 0.0))
+            if (
+                not math.isfinite(inlet_rate)
+                or not math.isfinite(local_rate)
+                or inlet_rate < 0.0
+                or local_rate < 0.0
+            ):
+                raise ValueError(
+                    f'wall flowing mass rate for {species} must be finite '
+                    'and non-negative'
+                )
+            if inlet_rate <= 0.0:
+                if local_rate > 0.0:
+                    raise ValueError(
+                        f'wall segment {segment} has {species} flow without '
+                        'positive inlet flow'
+                    )
+                depletion_fraction = 0.0
+            else:
+                if local_rate > inlet_rate:
+                    raise ValueError(
+                        f'wall segment {segment} {species} flow exceeds inlet '
+                        'flow'
+                    )
+                depletion_fraction = local_rate / inlet_rate
+            local_molar_basis[species] = (
+                inlet_fraction * depletion_fraction
+            )
+
+        local_total_basis = (
+            carrier_mole_fraction + sum(local_molar_basis.values())
+        )
+        if local_total_basis <= 0.0:
+            by_segment[segment] = {
+                species: 0.0 for species in inlet_partials
+            }
+            continue
+        local_partials = {
+            species: local_basis / local_total_basis * pressure_pa
+            for species, local_basis in local_molar_basis.items()
+        }
+        by_segment[segment] = _flowing_species_partial_pressures_pa(
+            {},
+            pressure_pa,
+            reported_partial_pressures_mbar={
+                species: partial_pressure_pa / 100.0
+                for species, partial_pressure_pa in local_partials.items()
+            },
+        )
+    return by_segment
 
 
 def _molecular_mass_kg_per_molecule(
@@ -5052,6 +5572,29 @@ def _allocate_total_by_weights(
     last_name = positive[-1][0]
     allocated[last_name] = max(0.0, float(total) - running)
     return allocated
+
+
+def _regularized_capture_allocations(
+    capture_budget_kg: float,
+    stage_hkl_by_stage: Mapping[int, float],
+    wall_hkl_by_segment: Mapping[str, float],
+) -> tuple[Dict[str, float], Dict[str, float]]:
+    stage_hkl_kg = sum(
+        max(0.0, float(value)) for value in stage_hkl_by_stage.values()
+    )
+    wall_hkl_kg = sum(
+        max(0.0, float(value)) for value in wall_hkl_by_segment.values()
+    )
+    hkl_sink_kg = stage_hkl_kg + wall_hkl_kg
+    budget_kg = max(0.0, float(capture_budget_kg))
+    if budget_kg <= 0.0 or hkl_sink_kg <= 1.0e-15:
+        return {}, {}
+    wall_deposit_kg = budget_kg * wall_hkl_kg / hkl_sink_kg
+    stage_deposit_kg = max(0.0, budget_kg - wall_deposit_kg)
+    return (
+        _allocate_total_by_weights(stage_deposit_kg, stage_hkl_by_stage),
+        _allocate_total_by_weights(wall_deposit_kg, wall_hkl_by_segment),
+    )
 
 
 def _wall_segment_account_fractions(

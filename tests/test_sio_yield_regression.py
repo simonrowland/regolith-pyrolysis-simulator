@@ -361,10 +361,18 @@ def test_sio_yield_cli_matches_golden(tmp_path, feedstock, golden_name):
         BASELINE_STAGE3_SIO2_KG[feedstock], rel=1e-8
     )
     assert stage_4 < BASELINE_STAGE4_SIO2_KG[feedstock]
-    # 2026-07-21 B1 wall-gate fix: wall-dominant routing was an artifact of
-    # the hot-wall backstop defect; the honest contract is zero hot-train
-    # wall deposit with routing through the designated stages.
-    assert wall_total == pytest.approx(0.0)
+    # 2026-07-29 t-475: bounded flowing-gas partial pressures keep Na/K/SiO
+    # off the hot train. Lunar Cr now has a tiny admissible deposit instead of
+    # being erased by an out-of-range melt-P_sat refusal.
+    non_cr_wall_total = sum(
+        float(value)
+        for species, value in actual["wall_deposit_kg"].items()
+        if species != "Cr"
+    )
+    assert non_cr_wall_total == pytest.approx(0.0)
+    assert wall_total == pytest.approx(
+        float(actual["wall_deposit_kg"].get("Cr", 0.0))
+    )
     assert routed_total > 0.0
     assert 0.0 <= actual["sio_yield_pct_of_feedstock"] <= 30.0
     assert actual["alpha_SiO"] == pytest.approx(0.0320984652281)
@@ -582,7 +590,8 @@ def test_wall_deposit_sticking_alpha_notice_tracks_cold_wall_gate():
     # This direct-route pin isolates the free-molecular wall budget and
     # sticking-alpha notice from production's provisional condenser geometry.
     model.configure_operating_conditions(
-        overhead_pressure_mbar=0.0,
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={"SiO": 1.0},
         campaign_name="C0",
     )
     melt = MeltState()
@@ -763,12 +772,14 @@ def test_low_pressure_free_molecular_regime_routes_continuously():
     viscous = CondensationModel(train, wall_temperature_C=1100.0)
     viscous.configure_operating_conditions(
         overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={"SiO": 1.0},
         pipe_diameter_m=0.12,
         gas_temperature_C=1100.0,
     )
     ballistic = CondensationModel(train, wall_temperature_C=1100.0)
     ballistic.configure_operating_conditions(
         overhead_pressure_mbar=1.0e-6,
+        species_partial_pressures_mbar={"SiO": 1.0e-7},
         pipe_diameter_m=0.12,
         gas_temperature_C=1100.0,
     )

@@ -245,6 +245,7 @@ def test_sio_high_side_arrhenius_warning_reaches_alpha_provenance_report():
     model.configure_operating_conditions(
         wall_temperature_C=1626.85,
         overhead_pressure_mbar=1.0,
+        species_partial_pressures_mbar={"SiO": 1.0},
         stage_area_m2_by_stage={
             str(stage.stage_number): 1.0 for stage in model.train.stages
         },

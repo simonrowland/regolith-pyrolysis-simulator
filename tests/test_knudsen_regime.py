@@ -158,6 +158,7 @@ def test_true_vacuum_mean_free_path_is_infinite_and_routes_continuously():
     model = CondensationModel(CondensationTrain.create_default())
     model.configure_operating_conditions(
         overhead_pressure_mbar=0.0,
+        species_partial_pressures_mbar={"SiO": 0.0},
         pipe_diameter_m=0.12,
         gas_temperature_C=1500.0,
     )
@@ -438,6 +439,10 @@ def test_c2a_recipe_free_molecular_transport_is_continuous(monkeypatch):
     def low_pressure_transport(evap_flux, melt, **kwargs):
         state = dict(original_estimate(evap_flux, melt, **kwargs))
         state["pressure_mbar"] = 1.0e-6
+        state["vapor_pressure_mbar"] = min(
+            float(state["vapor_pressure_mbar"]),
+            state["pressure_mbar"],
+        )
         return state
 
     monkeypatch.setattr(

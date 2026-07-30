@@ -783,6 +783,7 @@ def test_wall_allocation_uses_view_factor_and_line_of_sight() -> None:
     model.configure_lab_geometry(parse_lab_geometry(raw))
     model.configure_operating_conditions(
         overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={"SiO": 10.0},
         gas_temperature_C=1700.0,
     )
 

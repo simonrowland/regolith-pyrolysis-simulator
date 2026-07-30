@@ -53,6 +53,7 @@ def _restore_condensation_temps():
 def _configure_knudsen_policy(model: CondensationModel) -> CondensationModel:
     model.configure_operating_conditions(
         overhead_pressure_mbar=1.0,
+        species_partial_pressures_mbar={"SiO": 1.0},
         stage_area_m2_by_stage={
             str(stage.stage_number): 1.0 for stage in model.train.stages
         },
@@ -294,6 +295,7 @@ def test_stage0_hot_wall_diagnostic_is_sibling_and_route_neutral():
         model.configure_operating_conditions(
             wall_temperature_C=1500.0,
             overhead_pressure_mbar=1.0,
+            species_partial_pressures_mbar={"SiO": 1.0},
             stage_area_m2_by_stage={
                 str(stage.stage_number): 1.0 for stage in model.train.stages
             },
@@ -575,6 +577,7 @@ def test_new_simulator_uses_reloaded_materials_without_module_reload(tmp_path):
     sim.condensation_model.configure_operating_conditions(
         wall_temperature_C=900.0,
         overhead_pressure_mbar=1.0,
+        species_partial_pressures_mbar={"SiO": 1.0},
         stage_area_m2_by_stage={
             str(stage.stage_number): 1.0
             for stage in sim.condensation_model.train.stages
@@ -642,6 +645,7 @@ def test_custom_vapor_pressure_bundle_reaches_condensation_route_with_fallback()
         model.configure_operating_conditions(
             wall_temperature_C=900.0,
             overhead_pressure_mbar=1.0,
+            species_partial_pressures_mbar={"Ca": 1.0},
             stage_area_m2_by_stage={
                 str(stage.stage_number): 1.0 for stage in model.train.stages
             },

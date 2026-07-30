@@ -12,6 +12,7 @@
     "terminal_offgas_escape": 5.63484068939e-08
   },
   "wall_deposit_kg": {
+    "Cr": 3.12553875129e-09,
     "Fe": 0.0,
     "K": 0.0,
     "Mg": 0.0,
@@ -20,36 +21,145 @@
   },
   "fouling_rate": {
     "liner_material": "hot_wall_refractory_liner",
-    "dominant_species": "none",
-    "dominant_species_wall_deposit_kg": 0.0,
-    "wall_deposit_kg_per_campaign": 0.0,
+    "dominant_species": "Cr",
+    "dominant_species_wall_deposit_kg": 3.12553875129e-09,
+    "wall_deposit_kg_per_campaign": 3.12553875129e-09,
     "wall_deposit_basis": "total_wall_load_by_species",
     "resinter_threshold_kg": null,
     "resinter_threshold_basis": "fail_closed_no_qualified_positive_deposition",
-    "campaigns_to_resinter": "infinite",
-    "campaigns_to_resinter_by_segment": {},
-    "aggregate_campaigns_to_resinter": "infinite",
+    "campaigns_to_resinter": "resinter_threshold_kg / 1.8308976574e-09",
+    "campaigns_to_resinter_by_segment": {
+      "stage_0_to_stage_1": "resinter_threshold_kg / 1.8308976574e-09",
+      "stage_1_to_stage_2": "resinter_threshold_kg / 1.29464109389e-09"
+    },
+    "aggregate_campaigns_to_resinter": "resinter_threshold_kg / 3.12553875129e-09",
     "fast_fouling_campaign_threshold": 10,
-    "output_status": "sourced_with_surface_proxy",
-    "authoritative": true,
-    "authoritative_for_resinter": true,
-    "verdict_authoritative": true,
-    "status": "available",
-    "status_reason": "",
+    "output_status": "status_bearing",
+    "authoritative": false,
+    "authoritative_for_resinter": false,
+    "verdict_authoritative": false,
+    "status": "warning",
+    "status_reason": "Deposited wall species include UNCERTIFIED or status-bearing sticking alpha_s; coating and fouling readouts are non-authoritative.",
     "sticking_alpha_authority": {
-      "authoritative": true,
-      "authoritative_for_deposit_mass": true,
-      "authoritative_for_coating": true,
-      "authoritative_for_resinter": true,
-      "severity": "info",
-      "code": "wall_deposit_sticking_alpha_provenance",
-      "output_status": "sourced_with_surface_proxy",
-      "deposited_species": [],
-      "uncertified_alpha_species": [],
-      "status_bearing_alpha_count": 0,
-      "alpha_s_provenance_by_species": {},
+      "authoritative": false,
+      "authoritative_for_deposit_mass": false,
+      "authoritative_for_coating": false,
+      "authoritative_for_resinter": false,
+      "severity": "warning",
+      "code": "wall_deposit_sticking_alpha_uncertified",
+      "output_status": "status_bearing",
+      "deposited_species": [
+        "Cr"
+      ],
+      "uncertified_alpha_species": [
+        "Cr"
+      ],
+      "status_bearing_alpha_count": 1,
+      "alpha_s_provenance_by_species": {
+        "Cr": {
+          "stage_0_to_stage_1": {
+            "species": "Cr",
+            "alpha_s": 0.9,
+            "source": "REF-014 discusses Cr volatility but no isolated Hertz-Knudsen/sticking alpha was adopted; retain conservative high-capture default.",
+            "source_class": "uncertified_conservative_default",
+            "status": "UNCERTIFIED",
+            "output_status": "status_bearing",
+            "alpha_s_form": "scalar",
+            "alpha_s_temperature_K": 1773.15,
+            "alpha_s_extrapolated": false,
+            "source_url": "https://doi.org/10.1016/j.gca.2005.08.014",
+            "citation_status": "UNCERTIFIED",
+            "temperature_range_K": "not_applicable_uncertified",
+            "envelope": [
+              0.0,
+              1.0
+            ],
+            "uncertainty_flag": "no_direct_cr_sticking_coefficient",
+            "value_ref": "data/literature/vacuum_pyrolysis_sticking.yaml::species.Cr.value",
+            "material_source": "data/materials.yaml::liner_materials.fe_condenser_liner.alpha_s_by_species.Cr",
+            "liner_material": "fe_condenser_liner",
+            "segment": "stage_0_to_stage_1"
+          },
+          "stage_1_to_stage_2": {
+            "species": "Cr",
+            "alpha_s": 0.9,
+            "source": "REF-014 discusses Cr volatility but no isolated Hertz-Knudsen/sticking alpha was adopted; retain conservative high-capture default.",
+            "source_class": "uncertified_conservative_default",
+            "status": "UNCERTIFIED",
+            "output_status": "status_bearing",
+            "alpha_s_form": "scalar",
+            "alpha_s_temperature_K": 1773.15,
+            "alpha_s_extrapolated": false,
+            "source_url": "https://doi.org/10.1016/j.gca.2005.08.014",
+            "citation_status": "UNCERTIFIED",
+            "temperature_range_K": "not_applicable_uncertified",
+            "envelope": [
+              0.0,
+              1.0
+            ],
+            "uncertainty_flag": "no_direct_cr_sticking_coefficient",
+            "value_ref": "data/literature/vacuum_pyrolysis_sticking.yaml::species.Cr.value",
+            "material_source": "data/materials.yaml::liner_materials.cr_oxide_cartridge_liner.alpha_s_by_species.Cr",
+            "liner_material": "cr_oxide_cartridge_liner",
+            "segment": "stage_1_to_stage_2"
+          },
+          "stage_2": {
+            "species": "Cr",
+            "alpha_s": 0.9,
+            "source": "REF-014 discusses Cr volatility but no isolated Hertz-Knudsen/sticking alpha was adopted; retain conservative high-capture default.",
+            "source_class": "uncertified_conservative_default",
+            "status": "UNCERTIFIED",
+            "output_status": "status_bearing",
+            "alpha_s_form": "scalar",
+            "alpha_s_temperature_K": 1473.15,
+            "alpha_s_extrapolated": false,
+            "source_url": "https://doi.org/10.1016/j.gca.2005.08.014",
+            "citation_status": "UNCERTIFIED",
+            "temperature_range_K": "not_applicable_uncertified",
+            "envelope": [
+              0.0,
+              1.0
+            ],
+            "uncertainty_flag": "no_direct_cr_sticking_coefficient",
+            "value_ref": "data/literature/vacuum_pyrolysis_sticking.yaml::species.Cr.value",
+            "material_source": "data/materials.yaml::stages.2.alpha_s_by_species.Cr",
+            "stage_number": 2
+          },
+          "capture_budget": {
+            "species": "Cr",
+            "alpha_s": 0.9,
+            "source": "REF-014 discusses Cr volatility but no isolated Hertz-Knudsen/sticking alpha was adopted; retain conservative high-capture default.",
+            "source_class": "uncertified_conservative_default",
+            "status": "UNCERTIFIED",
+            "output_status": "status_bearing",
+            "alpha_s_form": "scalar",
+            "alpha_s_temperature_K": 1553.15,
+            "alpha_s_extrapolated": false,
+            "source_url": "https://doi.org/10.1016/j.gca.2005.08.014",
+            "citation_status": "UNCERTIFIED",
+            "temperature_range_K": "not_applicable_uncertified",
+            "envelope": [
+              0.0,
+              1.0
+            ],
+            "uncertainty_flag": "no_direct_cr_sticking_coefficient",
+            "value_ref": "data/literature/vacuum_pyrolysis_sticking.yaml::species.Cr.value",
+            "material_source": "data/literature/vacuum_pyrolysis_sticking.yaml::species.Cr",
+            "alpha_s_stage_evaluations": {
+              "2": {
+                "species": "Cr",
+                "alpha_s": 0.9,
+                "alpha_s_form": "scalar",
+                "alpha_s_temperature_K": 1473.15,
+                "alpha_s_extrapolated": false
+              }
+            },
+            "alpha_s_stage_extrapolated": false
+          }
+        }
+      },
       "grounding_target": "data/literature/vacuum_pyrolysis_sticking.yaml",
-      "message": "Deposited wall species use cited/sourced sticking alpha_s provenance for coating and fouling readouts.",
+      "message": "Deposited wall species include UNCERTIFIED or status-bearing sticking alpha_s; coating and fouling readouts are non-authoritative.",
       "surface_geometry_provenance": {
         "severity": "warning",
         "code": "wall_deposit_surface_geometry_provenance",
@@ -118,11 +228,11 @@
         },
         "message": "Condenser stage-area ratios include provisional/default geometry; wall-deposit and coating readouts are status-bearing until stage surface areas are certified."
       },
-      "surface_geometry_status_bearing": false,
+      "surface_geometry_status_bearing": true,
       "surface_geometry_code": "wall_deposit_surface_geometry_provenance"
     },
-    "nominal_verdict": "slow-fouling",
-    "verdict": "slow-fouling"
+    "nominal_verdict": "threshold-parametric: fast-fouling if campaigns_to_resinter < 10, else slow-fouling",
+    "verdict": "non-authoritative"
   },
   "sio_yield_pct_of_feedstock": 1.31808462984e-07,
   "industrial_benchmark_pct": [

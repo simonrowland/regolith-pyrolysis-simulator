@@ -2018,6 +2018,12 @@ class EvaporationMixin:
             )
             self.condensation_model.configure_operating_conditions(
                 overhead_pressure_mbar=transport['pressure_mbar'],
+                species_partial_pressures_mbar=(
+                    self.overhead_model.species_partial_pressures(
+                        evap_flux,
+                        transport['vapor_pressure_mbar'],
+                    )
+                ),
                 pipe_diameter_m=self.overhead_model.pipe_diameter_m,
                 # Chapman-Enskog diffusion uses bulk-gas temperature; the
                 # separate pipe temperature is a wall/liner condition.

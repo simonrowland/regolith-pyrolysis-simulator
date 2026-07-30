@@ -255,11 +255,10 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
         )
         + "\n"
     ).encode("utf-8")
-    # Regenerated from the executable path at the a76c2f1 train tip. The
-    # pre/post-F2 payload diff is confined to yield_disposition paths and the
-    # executable bytes match the independently regenerated runner fixture.
+    # Regenerated from the executable t-475 path after wall deposition began
+    # consuming bounded flowing-gas partial pressures.
     assert hashlib.sha256(actual_bytes).hexdigest() == (
-        "2157d9db5b02a4521f04b2877d7601ee77d64e50913e64df66fdc4310ac00fdc"
+        "36fc5b12bdef2ee258374749527f34e0723082987ad0825922e7a9af413505cd"
     )
 
 
@@ -362,7 +361,15 @@ def test_shadow_rate_shares_species_supply_across_segments() -> None:
         for species, record in segment.items():
             records_by_species.setdefault(species, []).append(record)
 
-    assert len(records_by_species["Na"]) > 1
+    assert records_by_species["Na"]
+    assert all(
+        float(record["mol_s"]) == 0.0
+        and float(record["species_partial_pressure_pa"])
+        <= float(record["total_pressure_pa"])
+        and record["supersaturated"] is False
+        for record in records_by_species["Na"]
+    )
+    assert len(records_by_species["SiO"]) > 1
     for species, records in records_by_species.items():
         available_supply_mol_s = max(
             float(record["available_supply_mol_s"])

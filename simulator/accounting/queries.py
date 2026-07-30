@@ -2522,10 +2522,11 @@ def wall_deposit_candidate_for_surface_kg(
         return 0.0
 
     from simulator.condensation import (
+        _flowing_species_partial_pressures_pa,
         _knudsen_number,
-        _local_wall_species_pressure_pa,
         _series_resistance_deposition_flux_mol_m2_s,
         _transport_parameter_notice,
+        _try_antoine_psat_pa,
         _wall_alpha_record,
         _wall_alpha_s,
         classify_knudsen_regime,
@@ -2541,18 +2542,47 @@ def wall_deposit_candidate_for_surface_kg(
         return 0.0
 
     vapor_pressure_data = getattr(model, "vapor_pressure_data", None)
-    P_local_pa = _local_wall_species_pressure_pa(
-        species,
-        melt_temperature_C,
-        T_cond_C,
-        vapor_pressure_data=vapor_pressure_data,
+    overhead_pressure_pa = float(model.overhead_pressure_mbar) * 100.0
+    partial_pressures_pa = getattr(
+        model,
+        "wall_species_partial_pressures_pa",
+        {},
     )
+    if (
+        not partial_pressures_pa
+        and bool(getattr(model, "_species_partial_pressures_configured", False))
+    ):
+        partial_pressures_pa = _flowing_species_partial_pressures_pa(
+            {},
+            overhead_pressure_pa,
+            reported_partial_pressures_mbar=getattr(
+                model,
+                "species_partial_pressures_mbar",
+                {},
+            ),
+        )
+    segment_name = str(getattr(segment, "name", "")) if segment is not None else ""
+    segment_partial_pressures = getattr(
+        model,
+        "wall_species_partial_pressures_pa_by_segment",
+        {},
+    ).get(segment_name, {})
+    pressure_source = (
+        segment_partial_pressures
+        if segment_name and segment_partial_pressures
+        else partial_pressures_pa
+    )
+    if species not in pressure_source:
+        raise ValueError(
+            'wall species partial pressure is unconfigured for '
+            f'{species}'
+        )
+    P_local_pa = float(pressure_source[species])
     if P_local_pa <= 0.0:
         return 0.0
 
     T_wall_K = max(float(wall_temperature_C) + CELSIUS_TO_KELVIN_OFFSET, 1.0)
     T_gas_K = max(float(model.gas_temperature_C) + CELSIUS_TO_KELVIN_OFFSET, 1.0)
-    overhead_pressure_pa = float(model.overhead_pressure_mbar) * 100.0
     applied_pipe_diameter_m = (
         float(pipe_diameter_m)
         if pipe_diameter_m is not None
@@ -2586,8 +2616,23 @@ def wall_deposit_candidate_for_surface_kg(
         ),
         diagnostic_out=rate_diagnostic,
     )
-    if flux <= 0.0:
-        return 0.0
+    rate_diagnostic["species_partial_pressure_pa"] = P_local_pa
+    rate_diagnostic["total_pressure_pa"] = overhead_pressure_pa
+    wall_saturation_pressure_pa, saturation_pressure_refused = (
+        _try_antoine_psat_pa(
+            species,
+            T_wall_K,
+            vapor_pressure_data=vapor_pressure_data,
+        )
+    )
+    rate_diagnostic["wall_saturation_pressure_pa"] = wall_saturation_pressure_pa
+    rate_diagnostic["wall_saturation_pressure_refused"] = (
+        saturation_pressure_refused
+    )
+    rate_diagnostic["supersaturated"] = (
+        wall_saturation_pressure_pa is not None
+        and P_local_pa > wall_saturation_pressure_pa
+    )
 
     budget_kg_hr = _wall_deposition_flux_budget_kg_hr(
         species=species,

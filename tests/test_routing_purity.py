@@ -70,6 +70,7 @@ def test_route_result_records_scaled_stage_impurity_without_changing_capture():
     model = CondensationModel(train)
     model.configure_operating_conditions(
         overhead_pressure_mbar=1.0,
+        species_partial_pressures_mbar={"K": 1.0},
         stage_area_m2_by_stage={
             str(stage.stage_number): 1.0 for stage in train.stages
         },

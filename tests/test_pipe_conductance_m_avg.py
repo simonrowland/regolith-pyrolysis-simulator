@@ -52,7 +52,11 @@ def test_condensation_operating_conditions_keep_gas_and_wall_temperatures_distin
             "pipe_temperature_C": 900.0,
             "conductance_temperature_C": 1450.0,
             "pressure_mbar": 2.0,
+            "vapor_pressure_mbar": 1.0,
             "stage_area_m2_by_stage": {},
+        },
+        species_partial_pressures=lambda _flux, vapor_pressure_mbar: {
+            "SiO": vapor_pressure_mbar
         },
         resolve_pipe_segment_temperatures_C=lambda names, _melt: {
             name: 850.0 + index * 25.0
@@ -579,6 +583,7 @@ def test_default_stage_geometry_provenance_reaches_coating_authority():
     condensation.configure_operating_conditions(
         wall_temperature_C=900.0,
         overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={"Fe": 10.0},
         pipe_diameter_m=overhead.pipe_diameter_m,
         gas_temperature_C=1500.0,
         stage_area_m2_by_stage=overhead.stage_area_m2_by_stage(),

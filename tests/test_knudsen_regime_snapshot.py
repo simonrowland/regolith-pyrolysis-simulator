@@ -94,6 +94,7 @@ def test_snapshot_knudsen_summary_carries_canonical_fields_after_route():
     model = sim.condensation_model
     model.configure_operating_conditions(
         overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={"SiO": 10.0},
         gas_temperature_C=1500.0,
         campaign_name="C2A",
     )

@@ -175,6 +175,12 @@ def production_configured_condensation_route(monkeypatch):
             model.configure_operating_conditions(
                 wall_temperature_C=transport["pipe_temperature_C"],
                 overhead_pressure_mbar=transport["pressure_mbar"],
+                species_partial_pressures_mbar=(
+                    overhead_model.species_partial_pressures(
+                        evap_flux,
+                        transport["vapor_pressure_mbar"],
+                    )
+                ),
                 pipe_diameter_m=overhead_model.pipe_diameter_m,
                 gas_temperature_C=transport["conductance_temperature_C"],
                 stage_area_m2_by_stage=transport["stage_area_m2_by_stage"],

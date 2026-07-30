@@ -205,7 +205,8 @@ def _route_wall_deposit_authority(
     # These tests isolate sticking-alpha authority. Configure the direct route
     # without importing production's independently status-bearing geometry.
     model.configure_operating_conditions(
-        overhead_pressure_mbar=0.0,
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={species: 1.0},
         campaign_name="C0",
     )
     melt = MeltState()

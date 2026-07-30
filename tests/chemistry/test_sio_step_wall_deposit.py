@@ -9,13 +9,19 @@ import pytest
 
 from simulator import condensation as condensation_module
 from simulator.condensation import (
+    CondensationModel,
+    CondensationTrain,
     _antoine_psat_pa,
+    _flowing_species_partial_pressures_pa,
     _hkl_impingement_flux_mol_m2_s,
     _hkl_surface_deposition_flux_mol_m2_s,
+    _segment_species_partial_pressures_pa,
     _series_resistance_deposition_flux_mol_m2_s,
     _sticking_reactivity_class,
+    _wall_deposition_driving_pressure_pa,
 )
 from simulator.runner import build_sio_yield_report
+from simulator.state import EvaporationFlux, MeltState, PipeSegment
 
 
 @lru_cache(maxsize=None)
@@ -187,8 +193,10 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
     # docs-private/research/2026-07-12-pin-final/reconcile_run{1,2}.json.
     # 2026-07-17 t-159/t-160/t-260: executable recompute after corrected
     # transport composition and wall-capture accounting.
+    # 2026-07-29 t-475: executable recompute after segment-local partial
+    # pressure includes upstream baffle and wall capture.
     assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
-        5.29582470641e-07, rel=1e-9
+        5.133902074307e-07, rel=1e-9
     )
     assert _sio_wall_product_deposit_kg(1400.0) == pytest.approx(
         0.0, rel=1e-9
@@ -273,6 +281,276 @@ def test_hot_wall_na_physisorber_reevaporates_against_own_psat():
         alpha_s=1.0,
         regime_factor=1.0,
     ) == 0.0
+
+
+def test_flowing_species_partial_pressure_limits() -> None:
+    one_mol_per_hour = {
+        species: condensation_module.MOLAR_MASS[species] / 1000.0
+        for species in ("Na", "Fe")
+    }
+    equal_mix = _flowing_species_partial_pressures_pa(
+        one_mol_per_hour,
+        1000.0,
+    )
+    assert equal_mix == {
+        "Na": pytest.approx(500.0),
+        "Fe": pytest.approx(500.0),
+    }
+
+    dilute_mix = _flowing_species_partial_pressures_pa(
+        {
+            "Na": one_mol_per_hour["Na"],
+            "Fe": one_mol_per_hour["Fe"] * 999.0,
+        },
+        1000.0,
+    )
+    assert dilute_mix["Na"] == pytest.approx(1.0)
+    assert dilute_mix["Fe"] == pytest.approx(999.0)
+
+    single_species = _flowing_species_partial_pressures_pa(
+        {"Na": one_mol_per_hour["Na"]},
+        1000.0,
+    )
+    assert single_species["Na"] == pytest.approx(1000.0)
+
+
+def test_flowing_species_partial_pressure_above_total_fails_loudly() -> None:
+    with pytest.raises(
+        ValueError,
+        match=r"p_Na=1000\.1 Pa exceeds P_total=1000 Pa",
+    ):
+        _flowing_species_partial_pressures_pa(
+            {},
+            1000.0,
+            reported_partial_pressures_mbar={"Na": 10.001},
+        )
+    with pytest.raises(
+        ValueError,
+        match=r"sum\(p_i\)=1200 Pa exceeds P_total=1000 Pa",
+    ):
+        _flowing_species_partial_pressures_pa(
+            {},
+            1000.0,
+            reported_partial_pressures_mbar={"Na": 6.0, "K": 6.0},
+        )
+    with pytest.raises(
+        ValueError,
+        match=r"p_Na=1e-10 Pa exceeds P_total=0 Pa",
+    ):
+        _flowing_species_partial_pressures_pa(
+            {},
+            0.0,
+            reported_partial_pressures_mbar={"Na": 1.0e-12},
+        )
+
+
+def test_flowing_species_partial_pressure_roundoff_stays_within_total() -> None:
+    total_pressure_pa = 0.029629045024421676
+    partial_pressures_pa = [
+        0.00039119067308153113,
+        0.0018034853466675504,
+        0.002556861681469684,
+        0.003504972337988251,
+        0.003651082803815543,
+        0.0037592379978351777,
+        0.002594799892332383,
+        0.001988376834895455,
+        0.003539334888945295,
+        0.0007071838835010514,
+        0.0019804836598604214,
+        0.003152035024029352,
+    ]
+    normalized = _flowing_species_partial_pressures_pa(
+        {},
+        total_pressure_pa,
+        reported_partial_pressures_mbar={
+            f"species_{index}": partial_pressure_pa / 100.0
+            for index, partial_pressure_pa in enumerate(partial_pressures_pa)
+        },
+    )
+    assert sum(normalized.values()) <= total_pressure_pa
+
+
+def test_segment_partial_pressure_tracks_upstream_capture_and_carrier() -> None:
+    by_segment = _segment_species_partial_pressures_pa(
+        {"Na": 100.0, "Fe": 100.0},
+        1000.0,
+        {"Na": 1.0, "Fe": 1.0},
+        {
+            "inlet": {"Na": 1.0, "Fe": 1.0},
+            "after_na_capture": {"Na": 0.1, "Fe": 1.0},
+        },
+    )
+    assert by_segment["inlet"] == {
+        "Na": pytest.approx(100.0),
+        "Fe": pytest.approx(100.0),
+    }
+    assert by_segment["after_na_capture"]["Na"] == pytest.approx(
+        10.0 / 0.91
+    )
+    assert by_segment["after_na_capture"]["Fe"] == pytest.approx(
+        100.0 / 0.91
+    )
+    assert (
+        by_segment["after_na_capture"]["Na"]
+        < by_segment["inlet"]["Na"]
+    )
+
+
+def test_wall_route_refuses_missing_species_partial_pressure() -> None:
+    model = CondensationModel(CondensationTrain.create_default())
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        pipe_diameter_m=0.12,
+        gas_temperature_C=1500.0,
+        campaign_name="C2A",
+        carrier_gas="N2",
+    )
+    with pytest.raises(
+        ValueError,
+        match="partial pressures are required.*missing Na",
+    ):
+        model.route(
+            EvaporationFlux(
+                species_kg_hr={"Na": 1.0},
+                total_kg_hr=1.0,
+            ),
+            MeltState(temperature_C=1650.0),
+        )
+
+
+def test_wall_route_uses_segment_local_partial_pressure_after_capture() -> None:
+    model = CondensationModel(CondensationTrain.create_default())
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={"Na": 1.0, "Fe": 1.0},
+        pipe_diameter_m=0.12,
+        gas_temperature_C=1500.0,
+        campaign_name="C2A",
+        carrier_gas="N2",
+        stage_area_m2_by_stage={
+            str(stage.stage_number): 1.0 for stage in model.train.stages
+        },
+    )
+    model.route(
+        EvaporationFlux(
+            species_kg_hr={"Na": 1.0, "Fe": 1.0},
+            total_kg_hr=2.0,
+        ),
+        MeltState(temperature_C=1650.0),
+    )
+    sodium_by_segment = [
+        partials["Na"]
+        for partials in model.wall_species_partial_pressures_pa_by_segment.values()
+        if "Na" in partials
+    ]
+    assert sodium_by_segment
+    assert max(sodium_by_segment) <= 1000.0
+    assert min(sodium_by_segment) < 100.0
+    for segment_name, species_records in (
+        model.last_wall_deposition_rate_shadow_candidate.items()
+    ):
+        sodium_record = species_records.get("Na")
+        if sodium_record is None:
+            continue
+        assert sodium_record["species_partial_pressure_pa"] == pytest.approx(
+            model.wall_species_partial_pressures_pa_by_segment[
+                segment_name
+            ]["Na"]
+        )
+
+
+@pytest.mark.parametrize("rate_kg_hr", [1.0, 2.0, 3.5, 1.0e-9])
+@pytest.mark.parametrize("wall_count", [2, 7])
+@pytest.mark.parametrize("partial_pressure_mbar", [1.0, 10.0])
+@pytest.mark.parametrize("declared_area_m2", [0.5, 1.0])
+def test_wall_route_depletes_partial_pressure_after_upstream_wall_capture(
+    rate_kg_hr: float,
+    wall_count: int,
+    partial_pressure_mbar: float,
+    declared_area_m2: float,
+) -> None:
+    model = CondensationModel(CondensationTrain.create_default())
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={"Cr": partial_pressure_mbar},
+        pipe_diameter_m=0.12,
+        gas_temperature_C=500.0,
+        campaign_name="C2A",
+        carrier_gas="N2",
+        stage_area_m2_by_stage={
+            str(stage.stage_number): 1.0 for stage in model.train.stages
+        },
+    )
+    liner_material = model.pipe_segments[0].liner_material
+    model.pipe_segments = [
+        PipeSegment(
+            name=name,
+            upstream_stage="",
+            downstream_stage="",
+            wall_temperature_C=500.0,
+            length_m=1.0,
+            inner_diameter_m=0.12,
+            declared_area_m2=declared_area_m2,
+            liner_material=liner_material,
+        )
+        for name in (
+            f"wall_{index}" for index in range(1, wall_count + 1)
+        )
+    ]
+    model.lab_geometry = object()
+
+    result = model.route(
+        EvaporationFlux(
+            species_kg_hr={"Cr": rate_kg_hr},
+            total_kg_hr=rate_kg_hr,
+        ),
+        MeltState(temperature_C=1650.0),
+    )
+
+    first_wall_deposit_kg = result.wall_deposit_by_segment_species[
+        "wall_1"
+    ]["Cr"]
+    assert first_wall_deposit_kg > 0.0
+    remaining_ratio = 1.0 - first_wall_deposit_kg / rate_kg_hr
+    inlet_mole_fraction = partial_pressure_mbar / 10.0
+    carrier_mole_fraction = 1.0 - inlet_mole_fraction
+    expected_second_partial_pa = (
+        1000.0
+        * (inlet_mole_fraction * remaining_ratio)
+        / (
+            carrier_mole_fraction
+            + inlet_mole_fraction * remaining_ratio
+        )
+    )
+    assert model.wall_species_partial_pressures_pa_by_segment["wall_1"][
+        "Cr"
+    ] == pytest.approx(partial_pressure_mbar * 100.0)
+    assert model.wall_species_partial_pressures_pa_by_segment["wall_2"][
+        "Cr"
+    ] == pytest.approx(expected_second_partial_pa, rel=1.0e-6)
+
+
+def test_wall_deposition_saturation_and_hot_alkali_limits() -> None:
+    saturated_wall_T_K = 1000.0
+    saturated_pressure_pa = _antoine_psat_pa("Na", saturated_wall_T_K)
+    assert saturated_pressure_pa is not None
+    assert _wall_deposition_driving_pressure_pa(
+        "Na",
+        saturated_pressure_pa,
+        saturated_wall_T_K,
+    ) == pytest.approx(0.0)
+
+    hot_wall_T_K = 1500.0 + 273.15
+    for species in ("Na", "K"):
+        assert _antoine_psat_pa(species, hot_wall_T_K) > 1000.0
+        assert _series_resistance_deposition_flux_mol_m2_s(
+            species,
+            P_local_pa=1000.0,
+            T_surface_K=hot_wall_T_K,
+            alpha_s=1.0,
+            regime_factor=1.0,
+        ) == pytest.approx(0.0)
 
 
 def test_wall_deposition_reactivity_class_fails_loud(monkeypatch):
