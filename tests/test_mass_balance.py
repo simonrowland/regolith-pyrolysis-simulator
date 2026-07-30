@@ -344,9 +344,12 @@ def test_c2a_staged_freeze_gate_on_closes_mass_balance(
     # C5 is default-off. With the C4 non-resumable acquisition ceiling this
     # C2A_STAGED→C4 path saturates transport and refuses at
     # c4_target_window_not_acquired (T stuck ~1300 C) rather than fail-opening
-    # into C6 / final boiloff. Live semantic duration pin (not a golden);
-    # both freeze_gate modes refuse at the same acquisition ceiling hour.
-    assert steps == 72
+    # into C6 / final boiloff. Fail-closed C3 flux evaluation adds the exact
+    # 29 h from the former 6 h soft completion to the 35 h loud truncation
+    # cap, expanding the live path to 244 steps. This is a semantic duration
+    # pin, not a physics golden. Both freeze-gate modes refuse at the same
+    # acquisition ceiling hour.
+    assert steps == 244
     transition_names = {
         getattr(transition, "name", "")
         for transition in sim.atom_ledger.transitions

@@ -63,6 +63,15 @@ def _flux(total_kg_hr: float = 0.0, **species_kg_hr: float) -> EvaporationFlux:
     )
 
 
+def _authorized_c3_transport_state() -> dict:
+    return {
+        "evaporation_flux_diagnostic": {
+            "ledger_yields_authorized": True,
+            "p_bulk_transport_domain": "in_domain",
+        },
+    }
+
+
 def test_t155_delta_materializes_once_at_phase_entry_and_defaults_stay_equal():
     defaults = _setpoints()
     manager = CampaignManager(copy.deepcopy(defaults))
@@ -150,12 +159,9 @@ def test_c2a_staged_endpoint_prevalidates_all_species_before_yield_mutation():
         (CampaignPhase.C2B, 8, 25.0, _flux(Fe=0.049), BatchRecord(), None, 0.0, 100.0, 0, True),
         (CampaignPhase.C2B, 20, 25.0, _flux(Fe=9.0), BatchRecord(), None, 0.0, 100.0, 0, True),
         (CampaignPhase.C3_K, 2, 25.0, _flux(), BatchRecord(path="A_staged"), None, 0.0, 100.0, 0, True),
-        (CampaignPhase.C3_K, 3, 25.0, _flux(), BatchRecord(path="A_staged"), None, 0.0, 100.0, 0, True),
-        (CampaignPhase.C3_K, 12, 25.0, _flux(), BatchRecord(path="A"), None, 0.0, 100.0, 0, True),
-        (CampaignPhase.C3_K, 25, 25.0, _flux(), BatchRecord(path="B"), None, 0.0, 100.0, 0, True),
-        (CampaignPhase.C3_NA, 3, 25.0, _flux(), BatchRecord(path="A_staged"), None, 0.0, 100.0, 0, True),
-        (CampaignPhase.C3_NA, 18, 25.0, _flux(), BatchRecord(path="A"), None, 0.0, 100.0, 0, True),
-        (CampaignPhase.C3_NA, 35, 25.0, _flux(), BatchRecord(path="B"), None, 0.0, 100.0, 0, True),
+        (CampaignPhase.C3_K, 5, 25.0, _flux(), BatchRecord(path="A_staged"), None, 0.0, 100.0, 0, True),
+        (CampaignPhase.C3_NA, 2, 25.0, _flux(), BatchRecord(path="A_staged"), None, 0.0, 100.0, 0, True),
+        (CampaignPhase.C3_NA, 5, 25.0, _flux(), BatchRecord(path="A_staged"), None, 0.0, 100.0, 0, True),
         (CampaignPhase.C4, 6, 25.0, _flux(Mg=0.02), BatchRecord(), None, 0.0, 100.0, 0, False),
         (CampaignPhase.C4, 6, 25.0, _flux(Mg=0.019), BatchRecord(), None, 0.0, 100.0, 0, False),
         (CampaignPhase.C4, 20, 25.0, _flux(Mg=9.0), BatchRecord(), None, 0.0, 100.0, 0, False),
@@ -232,6 +238,354 @@ def _c4_snapshot(*, temperature_C: float, mg_rate: float) -> HourSnapshot:
         temperature_C=temperature_C,
         evap_flux=_flux(Mg=mg_rate),
     )
+
+
+def _c3_snapshot(
+    campaign: CampaignPhase,
+    *,
+    na_rate: float = 0.0,
+    k_rate: float = 0.0,
+) -> HourSnapshot:
+    return HourSnapshot(
+        campaign=campaign,
+        temperature_C=1600.0,
+        evap_flux=_flux(Na=na_rate, K=k_rate),
+    )
+
+
+def test_c3_rate_gate_stays_open_while_alkali_rate_is_high() -> None:
+    manager = CampaignManager(_setpoints())
+
+    assert manager.check_endpoint(
+        _melt(CampaignPhase.C3_NA, 5, temperature_C=1600.0),
+        _flux(Na=0.02),
+        CondensationTrain(),
+        BatchRecord(path="A_staged", additives_kg={"Na": 1.0}),
+        transport_state=_authorized_c3_transport_state(),
+    ) is False
+    assert manager.last_c3_termination is None
+
+
+def test_c3_rise_then_decay_ends_after_minimum_hold() -> None:
+    manager = CampaignManager(_setpoints())
+    record = BatchRecord(
+        path="A_staged",
+        additives_kg={"Na": 1.0},
+    )
+    melt = _melt(
+        CampaignPhase.C3_NA,
+        3,
+        temperature_C=1600.0,
+        composition_kg={"Na2O": 0.1},
+    )
+
+    assert manager.check_endpoint(
+        melt,
+        _flux(Na=0.02),
+        CondensationTrain(),
+        record,
+        transport_state=_authorized_c3_transport_state(),
+    ) is False
+    assert manager.last_c3_termination is None
+
+    melt.campaign_hour = 4
+    assert manager.check_endpoint(
+        melt,
+        _flux(Na=0.018),
+        CondensationTrain(),
+        record,
+        transport_state=_authorized_c3_transport_state(),
+    ) is False
+
+    melt.campaign_hour = 5
+    assert manager.check_endpoint(
+        melt,
+        _flux(Na=0.017),
+        CondensationTrain(),
+        record,
+        transport_state=_authorized_c3_transport_state(),
+    ) is True
+    assert manager.last_c3_termination["outcome"] == "alkali_rate_depleted"
+    assert manager.last_c3_termination["status"] == "complete"
+    assert manager.last_c3_termination["decay_sample_count_by_species"]["Na"] == 2
+
+
+def test_c3_zero_dose_is_distinctly_not_applicable() -> None:
+    manager = CampaignManager(_setpoints())
+
+    assert manager.check_endpoint(
+        _melt(CampaignPhase.C3_NA, 5, temperature_C=1600.0),
+        _flux(Na=0.0, K=0.0),
+        CondensationTrain(),
+        BatchRecord(path="A_staged"),
+        transport_state=_authorized_c3_transport_state(),
+    ) is True
+    assert manager.last_c3_termination["outcome"] == "zero_alkali_dose_not_applicable"
+    assert manager.last_c3_termination["status"] == "not_applicable"
+    assert manager.last_c3_termination["applicable_species"] == []
+    assert manager.last_c3_termination["melt_clearance_incomplete"] is False
+
+
+def test_c3_positive_dose_without_monitor_refuses_instead_of_becoming_not_applicable():
+    setpoints = _setpoints()
+    setpoints["campaigns"]["C3"]["alkali_dosing"]["K_kg"] = 1.0
+    setpoints["campaigns"]["C3"]["soft_endpoint"]["species_monitored"] = ["Na"]
+    manager = CampaignManager(setpoints)
+
+    with pytest.raises(
+        ValueError,
+        match="species_monitored must include every positive-dose species: K",
+    ):
+        manager.check_endpoint(
+            _melt(CampaignPhase.C3_K, 5, temperature_C=1600.0),
+            _flux(Na=0.0),
+            CondensationTrain(),
+            BatchRecord(path="A_staged"),
+            transport_state=_authorized_c3_transport_state(),
+        )
+    assert manager.last_c3_termination is None
+
+
+def test_c3_positive_dose_requires_positive_then_two_low_samples() -> None:
+    setpoints = _setpoints()
+    setpoints["campaigns"]["C3"]["alkali_dosing"]["Na_kg"] = 1.0
+    manager = CampaignManager(setpoints)
+    record = BatchRecord(path="A_staged")
+
+    for campaign_hour in (3, 4, 5):
+        assert manager.check_endpoint(
+            _melt(CampaignPhase.C3_NA, campaign_hour, temperature_C=1600.0),
+            _flux(Na=0.0),
+            CondensationTrain(),
+            record,
+            transport_state=_authorized_c3_transport_state(),
+        ) is False
+    assert manager.last_c3_termination is None
+    assert manager._c3_authorized_positive_observed_by_species == {}
+    assert manager._c3_decay_sample_count_by_species["Na"] == 0
+
+
+def test_c3_signal_arm_does_not_leak_from_an_earlier_campaign() -> None:
+    manager = CampaignManager(_setpoints())
+    record = BatchRecord(
+        path="A_staged",
+        additives_kg={"Na": 1.0},
+        snapshots=[
+            _c3_snapshot(CampaignPhase.C3_NA, na_rate=1.0),
+            HourSnapshot(campaign=CampaignPhase.C4),
+            *[
+                _c3_snapshot(CampaignPhase.C3_NA, na_rate=0.0)
+                for _ in range(5)
+            ],
+        ],
+    )
+
+    assert manager.check_endpoint(
+        _melt(CampaignPhase.C3_NA, 5, temperature_C=1600.0),
+        _flux(Na=0.0, K=0.0),
+        CondensationTrain(),
+        record,
+        transport_state=_authorized_c3_transport_state(),
+    ) is False
+    assert manager.last_c3_termination is None
+    assert manager._c3_authorized_positive_observed_by_species == {}
+
+
+def test_c3_no_signal_with_significant_residual_waits_then_truncates_loudly() -> None:
+    manager = CampaignManager(_setpoints())
+    record = BatchRecord(path="A_staged", additives_kg={"Na": 1.0})
+    melt = _melt(
+        CampaignPhase.C3_NA,
+        5,
+        temperature_C=1600.0,
+        composition_kg={"Na2O": 10.0},
+    )
+
+    assert manager.check_endpoint(
+        melt,
+        _flux(),
+        CondensationTrain(),
+        record,
+    ) is False
+
+    melt.campaign_hour = 34
+    assert manager.check_endpoint(
+        melt,
+        _flux(),
+        CondensationTrain(),
+        record,
+    ) is True
+    assert manager.last_c3_termination["outcome"] == (
+        "max_hold_no_signal_with_significant_residual"
+    )
+    assert manager.last_c3_termination["status"] == "truncated"
+    assert manager.last_c3_termination["severity"] == "warning"
+    assert manager.last_c3_termination["melt_clearance_incomplete"] is True
+
+
+def test_c3_high_rate_at_cap_truncates_loudly() -> None:
+    manager = CampaignManager(_setpoints())
+
+    assert manager.check_endpoint(
+        _melt(
+            CampaignPhase.C3_NA,
+            34,
+            temperature_C=1600.0,
+            composition_kg={"Na2O": 10.0},
+        ),
+        _flux(Na=1.0),
+        CondensationTrain(),
+        BatchRecord(path="A_staged", additives_kg={"Na": 1.0}),
+        transport_state=_authorized_c3_transport_state(),
+    ) is True
+    assert manager.last_c3_termination["outcome"] == (
+        "max_hold_rate_not_depleted"
+    )
+    assert manager.last_c3_termination["status"] == "truncated"
+    assert manager.last_c3_termination["max_hold_hr"] == 35.0
+
+
+def test_c3_rate_decay_with_significant_residual_is_recorded_incomplete() -> None:
+    manager = CampaignManager(_setpoints())
+    record = BatchRecord(
+        path="A_staged",
+        additives_kg={"Na": 1.0},
+    )
+    melt = _melt(
+        CampaignPhase.C3_NA,
+        3,
+        temperature_C=1600.0,
+        composition_kg={"Na2O": 10.0},
+    )
+
+    assert manager.check_endpoint(
+        melt,
+        _flux(Na=0.02),
+        CondensationTrain(),
+        record,
+        transport_state=_authorized_c3_transport_state(),
+    ) is False
+    assert manager.last_c3_termination is None
+
+    melt.campaign_hour = 4
+    assert manager.check_endpoint(
+        melt,
+        _flux(Na=0.018),
+        CondensationTrain(),
+        record,
+        transport_state=_authorized_c3_transport_state(),
+    ) is False
+
+    melt.campaign_hour = 5
+    assert manager.check_endpoint(
+        melt,
+        _flux(Na=0.017),
+        CondensationTrain(),
+        record,
+        transport_state=_authorized_c3_transport_state(),
+    ) is True
+    assert manager.last_c3_termination["outcome"] == (
+        "alkali_rate_depleted_with_significant_residual"
+    )
+    assert manager.last_c3_termination["status"] == (
+        "incomplete_melt_clearance"
+    )
+    assert manager.last_c3_termination["melt_clearance_incomplete"] is True
+
+
+@pytest.mark.parametrize(
+    ("transport_state", "flux"),
+    (
+        (None, _flux(Na=0.0)),
+        ({}, _flux(Na=0.0)),
+        ({"evaporation_flux_diagnostic": {}}, _flux(Na=0.0)),
+        (
+            {
+                "evaporation_flux_diagnostic": {
+                    "ledger_yields_authorized": True,
+                },
+            },
+            _flux(Na=0.0),
+        ),
+        (
+            {
+                "evaporation_flux_diagnostic": {
+                    "p_bulk_transport_domain": "in_domain",
+                },
+            },
+            _flux(Na=0.0),
+        ),
+        (
+            {
+                "evaporation_flux_diagnostic": {
+                    "ledger_yields_authorized": False,
+                    "authority_class": "diagnostic-limited",
+                    "p_bulk_transport_domain": (
+                        "out_of_domain_transitional"
+                    ),
+                },
+            },
+            _flux(Na=0.0),
+        ),
+        (_authorized_c3_transport_state(), _flux()),
+        (_authorized_c3_transport_state(), _flux(Na=float("nan"))),
+        (_authorized_c3_transport_state(), _flux(Na=-1.0)),
+    ),
+)
+def test_c3_unevaluable_transport_zero_never_counts_as_decay(
+    transport_state,
+    flux,
+) -> None:
+    manager = CampaignManager(_setpoints())
+    record = BatchRecord(
+        path="A_staged",
+        additives_kg={"Na": 1.0},
+        snapshots=[
+            *[
+                _c3_snapshot(CampaignPhase.C3_NA, na_rate=0.0)
+                for _ in range(3)
+            ],
+            _c3_snapshot(CampaignPhase.C3_NA, na_rate=0.02),
+        ],
+    )
+    melt = _melt(
+        CampaignPhase.C3_NA,
+        4,
+        temperature_C=1600.0,
+        composition_kg={"Na2O": 10.0},
+    )
+    for campaign_hour in (4, 5):
+        melt.campaign_hour = campaign_hour
+        assert manager.check_endpoint(
+            melt,
+            flux,
+            CondensationTrain(),
+            record,
+            transport_state=transport_state,
+        ) is False
+
+    assert manager.last_c3_termination is None
+    assert manager._c3_decay_sample_count_by_species["Na"] == 0
+
+
+def test_c3_operator_cap_uses_same_loud_truncation_path() -> None:
+    manager = CampaignManager(_setpoints())
+    manager.overrides["C3_NA"] = {"max_hours": 8.0}
+
+    assert manager.check_endpoint(
+        _melt(
+            CampaignPhase.C3_NA,
+            7,
+            temperature_C=1600.0,
+            composition_kg={"Na2O": 10.0},
+        ),
+        _flux(Na=1.0),
+        CondensationTrain(),
+        BatchRecord(path="A_staged", additives_kg={"Na": 1.0}),
+        transport_state=_authorized_c3_transport_state(),
+    ) is True
+    assert manager.last_c3_termination["status"] == "truncated"
+    assert manager.last_c3_termination["max_hold_hr"] == 8.0
 
 
 def test_c4_acquired_low_rate_is_ineligible_until_signal_arms() -> None:
@@ -762,12 +1116,12 @@ def test_campaign_endpoint_caps_and_classes_are_materialized():
     assert campaigns["C2A_staged"]["max_hold_hr"] == 9
     assert campaigns["C2B"]["max_hold_hr"] == 20
     assert campaigns["C3"]["max_hold_hr"]["C3_K"] == {
-        "A_staged": 3,
+        "A_staged": 25,
         "A": 12,
         "default": 25,
     }
     assert campaigns["C3"]["max_hold_hr"]["C3_NA"] == {
-        "A_staged": 3,
+        "A_staged": 35,
         "A": 18,
         "default": 35,
     }
@@ -800,7 +1154,7 @@ def test_campaign_endpoint_caps_and_classes_are_materialized():
         "C2A_continuous": "C",
         "C2A_staged": "A",
         "C2B": "C",
-        "C3": "A",
+        "C3": "C",
         "C4": "C",
         "C5": "A",
         "mre_baseline": "C",

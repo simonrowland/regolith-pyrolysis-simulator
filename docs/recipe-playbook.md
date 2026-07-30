@@ -94,6 +94,34 @@ Source: `data/setpoints.yaml` campaign key `campaigns.C2B`.
 
 The shuttle architecture is one tier per injection: inject Na → reduce FeO at 1050–1150 °C → tap Fe metal → pO₂ bakeout → recover Na. The shuttle does not chemically reduce Cr, Ti, or Mn at C3 temperatures — those targets are refused by the executable thermodynamic gate (S1b). Si conditioning is a melt-activity side effect of Na₂O accumulation, not a separate cycle.
 
+The bakeout endpoint is the Na/K evaporation rate, not pO₂ returning to its
+setpoint. After a minimum six-hour campaign interval, C3 ends only after two
+authorized, in-domain bakeout samples with Na below 0.01891773 kg/h and K
+below 0.03217305 kg/h. These are the Na/K mass
+projections of C4's 0.00082287595 kmol-metal/h endpoint floor; the live
+evaporation calculation supplies the C3 temperature and melt-activity
+dependence. If a rate never decays, the finite path cap ends the campaign with
+`status="truncated"` and an incomplete melt-clearance record. A decayed rate with
+more than one threshold-rate-day left in the melt is likewise reported as
+incomplete melt clearance rather than silently treated as cleared. Disposition
+is reported on a separate axis: overhead, terminal offgas, and the condenser
+path remain recoverable credit for restocking between charges, while wall
+deposits and irrecoverable vents are losses. Both axes use absolute
+reagent-origin kilograms against the alkali credit line; there is no blended
+recovery percentage.
+
+Duration alone does not improve either axis in the current executable model.
+With every other input and physics path fixed, 3 h and 6 h C3_NA caps both
+leave 60.882 kg reagent-origin Na melt-bound and 17.132 kg in recoverable
+overhead/offgas disposition. The extra time only moves 6.411 kg from overhead
+to terminal offgas while drawing more gross credit to replenish inventory.
+The earlier recovery percentages blended these axes and are not valid evidence
+that truncation removed a Na₂O floor.
+
+Wall-loss magnitudes are provisional pending t-475: wall local pressure
+currently uses pure-component `P_sat(T_melt)` instead of species partial
+pressure.
+
 Cycles after Path A: 1 Na. Cycles after Path B: 2 Na (Path B preserved more FeO and SiO₂ in the melt, so the post-C2B shuttle has more work). Na₂O solubility cap in the melt is 8–12 wt%.
 
 Honest limit: the Na/Fe crossover is 1181.5 °C (2026-07-09 multiphase re-ground), leaving a positive (~31 °C) margin at the 1150 °C inject T. Running the inject T above the crossover causes the engine to refuse the step and record the refusal verbatim. K added via `--additive=K=<kg>` is ignored by the C3 shuttle gate — operators wanting K product should expect it from C2A_continuous evaporation, not C3.

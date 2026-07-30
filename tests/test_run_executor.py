@@ -119,7 +119,7 @@ def test_campaign_count_includes_partial_campaign_hours():
 def test_campaign_count_resolves_structured_c3_duration():
     campaign_mgr = SimpleNamespace(
         _configured_max_hold_hr=lambda _campaign, phase, path: {
-            ("C3_NA", "A_staged"): 3.0,
+            ("C3_NA", "A_staged"): 35.0,
         }[(phase, path)],
         _campaign_overrides=lambda _campaign: {},
     )
@@ -135,7 +135,7 @@ def test_campaign_count_resolves_structured_c3_duration():
     assert _campaigns_elapsed_from_session_history(
         session,
         fallback=99.0,
-    ) == pytest.approx(1.0 / 3.0)
+    ) == pytest.approx(1.0 / 35.0)
 
 
 def test_campaign_count_resolves_structured_c5_branch_max_hold():
@@ -503,6 +503,120 @@ def test_run_executor_final_budget_pending_decision_is_partial(monkeypatch):
 
     assert execution.status == "partial"
     assert execution.reason == "pending_decision"
+
+
+@pytest.mark.parametrize(
+    ("campaign_summary", "expected_reason"),
+    (
+        (
+            {
+                "campaign": "C3_NA",
+                "c3_termination": {
+                    "status": "truncated",
+                    "outcome": "max_hold_rate_not_depleted",
+                },
+                "c3_alkali_accounting": {
+                    "melt_clearance_incomplete": False,
+                    "disposition_loss_detected": False,
+                },
+            },
+            "c3_alkali_burnout_truncated",
+        ),
+        (
+            {
+                "campaign": "C3_NA",
+                "c3_termination": {
+                    "status": "complete",
+                    "outcome": "alkali_rate_depleted_with_significant_residual",
+                },
+                "c3_alkali_accounting": {
+                    "melt_clearance_incomplete": True,
+                    "disposition_loss_detected": False,
+                },
+            },
+            "c3_alkali_melt_clearance_incomplete",
+        ),
+        (
+            {
+                "campaign": "C3_NA",
+                "c3_termination": {
+                    "status": "complete",
+                    "outcome": "alkali_rate_depleted",
+                },
+                "c3_alkali_accounting": {
+                    "melt_clearance_incomplete": False,
+                    "disposition_loss_detected": True,
+                },
+            },
+            "c3_alkali_disposition_loss",
+        ),
+        (
+            {
+                "campaign": "C3_NA",
+                "c3_termination": {
+                    "status": "complete",
+                    "outcome": "alkali_rate_depleted",
+                },
+                "c3_alkali_accounting": {
+                    "melt_clearance_incomplete": False,
+                    "disposition_status": "unclassified",
+                    "disposition_loss_detected": False,
+                    "disposition_unclassified": True,
+                },
+            },
+            "c3_alkali_disposition_unclassified",
+        ),
+    ),
+)
+def test_run_executor_surfaces_c3_incomplete_campaign_as_partial(
+    monkeypatch,
+    campaign_summary,
+    expected_reason,
+):
+    snapshot = SimpleNamespace()
+    simulator = SimpleNamespace(
+        atom_ledger=AtomLedger(),
+        record=SimpleNamespace(snapshots=(snapshot,)),
+        cost_ledger=SimpleNamespace(),
+        product_ledger=lambda: {},
+        melt=SimpleNamespace(hour=1, campaign=CampaignPhase.C3_NA),
+    )
+    BareSession = type("BareSession", (), {"simulator": simulator})
+
+    def one_step(*_args, **_kwargs):
+        yield StepResult(
+            snapshot=snapshot,
+            per_hour_summary={"hour": 1},
+            campaign_summary=campaign_summary,
+        )
+
+    monkeypatch.setattr("simulator.run_executor.drive_session", one_step)
+    monkeypatch.setattr(
+        "simulator.run_executor.build_cost_rollup_diagnostic",
+        lambda *_args, **_kwargs: {},
+    )
+    monkeypatch.setattr(
+        "simulator.run_executor.pumping_context_from_sim",
+        lambda *_args, **_kwargs: {},
+    )
+    monkeypatch.setattr(
+        PhysicsTrace,
+        "from_simulator",
+        classmethod(lambda cls, _sim: cls(snapshots=(snapshot,))),
+    )
+
+    execution = RunExecutor().execute_session(BareSession(), hours=1)
+
+    assert execution.status == "partial"
+    assert execution.reason == expected_reason
+    assert execution.error_message == expected_reason
+    assert execution.refusal_diagnostic["status"] == "warning"
+    assert execution.refusal_diagnostic["c3_termination"] == (
+        campaign_summary["c3_termination"]
+    )
+    assert execution.refusal_diagnostic["c3_alkali_accounting"] == (
+        campaign_summary["c3_alkali_accounting"]
+    )
 
 
 @pytest.mark.parametrize(

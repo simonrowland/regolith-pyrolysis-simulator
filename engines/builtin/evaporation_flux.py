@@ -1126,6 +1126,8 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
 
         diagnostic = {
             "evaporation_flux_kg_hr": flux_kg_hr,
+            "ledger_yields_authorized": True,
+            "p_bulk_transport_domain": "in_domain",
             "alpha_used_by_species": alpha_used_by_species,
             "alpha_s_evaluation_by_species": alpha_evaluations_by_species,
             "flux_uncertainty_pct": flux_uncertainty_pct,

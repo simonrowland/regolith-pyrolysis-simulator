@@ -1826,13 +1826,21 @@ class EvaporationMixin:
 
         phase_scalar = self._record_phase_context_diagnostic(
             'evaporation_depletion', scalar_liquid_fraction=1.0)
+        melt_parent_inventory_kg = dict(
+            self.atom_ledger.kg_by_account('process.cleaned_melt')
+        )
+        for species, kg in self.atom_ledger.kg_by_account(
+            SPENT_REDUCTANT_RESIDUE_ACCOUNT
+        ).items():
+            melt_parent_inventory_kg[species] = (
+                float(melt_parent_inventory_kg.get(species, 0.0))
+                + float(kg)
+            )
         effective_rates = self._analytic_evaporation_depletion_rates(
             evap_flux.species_kg_hr,
             dt_hr=dt_hr,
             phase_scalar=phase_scalar,
-            cleaned_melt_kg=self.atom_ledger.kg_by_account(
-                'process.cleaned_melt'
-            ),
+            cleaned_melt_kg=melt_parent_inventory_kg,
             available_o2_kg=float(
                 self.atom_ledger.kg_by_account('process.overhead_gas').get(
                     'O2', 0.0
@@ -2130,8 +2138,18 @@ class EvaporationMixin:
         stoich = self._evaporation_stoich(species, sp_data)
         if stoich is None:
             return {}
-        available_kg = self.atom_ledger.kg_by_account(
-            'process.cleaned_melt').get(stoich['parent_oxide'], 0.0)
+        available_kg = sum(
+            float(
+                self.atom_ledger.kg_by_account(account).get(
+                    stoich['parent_oxide'],
+                    0.0,
+                )
+            )
+            for account in (
+                'process.cleaned_melt',
+                SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+            )
+        )
         if available_kg <= 1e-12:
             return {}
         remaining_kg_hr = route_result.remaining_by_species.get(
@@ -2458,8 +2476,9 @@ class EvaporationMixin:
         \\goal BUILTIN-ENGINE-EXTRACTION (#7), third flip and the FIRST
         authoritative intent in the migration. The
         BuiltinEvaporationTransitionProvider builds a
-        :class:`LedgerTransitionProposal` (debit cleaned_melt, credit
-        overhead_gas + condensation_train); the kernel's commit_batch
+        :class:`LedgerTransitionProposal` (debit the native/spent
+        melt-resident parent-oxide pools, credit overhead_gas +
+        condensation_train); the kernel's commit_batch
         applies it to the AtomLedger after re-validating atom balance
         and the account-filter. This method:
 
@@ -2493,8 +2512,27 @@ class EvaporationMixin:
         if oxide_removed <= 1e-12:
             return (0.0, None) if return_transition else 0.0
 
-        available_kg = self.atom_ledger.kg_by_account(
-            'process.cleaned_melt').get(parent_oxide, 0.0)
+        parent_oxide_source_kg_by_account = {
+            account: max(
+                0.0,
+                float(
+                    self.atom_ledger.kg_by_account(account).get(
+                        parent_oxide,
+                        0.0,
+                    )
+                ),
+            )
+            for account in (
+                'process.cleaned_melt',
+                SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+            )
+        }
+        parent_oxide_source_kg_by_account = {
+            account: kg
+            for account, kg in parent_oxide_source_kg_by_account.items()
+            if kg > 1.0e-12
+        }
+        available_kg = sum(parent_oxide_source_kg_by_account.values())
         if available_kg <= 1e-12:
             return (0.0, None) if return_transition else 0.0
 
@@ -2525,6 +2563,9 @@ class EvaporationMixin:
                 'remaining_kg_hr': float(remaining_kg_hr),
                 'dt_hr': 1.0,
                 'available_kg': float(available_kg),
+                'parent_oxide_source_kg_by_account': dict(
+                    parent_oxide_source_kg_by_account
+                ),
             },
         )
         proposal = kernel_result.transition
@@ -2541,6 +2582,9 @@ class EvaporationMixin:
             'remaining_kg_hr': float(remaining_kg_hr),
             'dt_hr': 1.0,
             'available_kg': float(available_kg),
+            'parent_oxide_source_kg_by_account': dict(
+                parent_oxide_source_kg_by_account
+            ),
         }
         transition = self._commit_proposal(
             ChemistryIntent.EVAPORATION_TRANSITION,

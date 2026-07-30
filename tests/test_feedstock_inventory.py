@@ -1466,6 +1466,115 @@ def test_c3_na_dose_draws_reagent_inventory_and_commits_balanced_transition():
     sim.atom_ledger.assert_balanced()
 
 
+def test_c3_summary_separates_melt_clearance_from_disposition():
+    data_path = Path(__file__).parent.parent / "data" / "feedstocks.yaml"
+    feedstocks = yaml.safe_load(data_path.read_text())
+    sim = _sim_with_data(feedstocks)
+    sim.setpoints["campaigns"]["C3"]["alkali_dosing"]["Na_kg"] = 12.0
+    sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
+    sim.record.path = "B"
+    sim.start_campaign(CampaignPhase.C3_NA)
+    sim.melt.temperature_C = 1150.0
+    sim._shuttle_inject_Na(target_stage="feo_cleanup", liquid_fraction=1.0)
+    sim.campaign_mgr.last_c3_termination = {
+        "status": "incomplete_melt_clearance",
+        "outcome": "alkali_rate_depleted_with_significant_residual",
+        "significant_melt_remaining_limit_kg_by_species": {
+            "Na": 0.4540254784776795,
+            "K": 0.7721532195021601,
+        },
+    }
+
+    summary = sim._capture_campaign_summary("C3_NA")
+    accounting = summary["c3_alkali_accounting"]
+    sodium = accounting["by_species"]["Na"]
+    credit_line = sodium["credit_line"]
+    melt_clearance = sodium["melt_clearance"]
+    disposition = sodium["disposition"]
+
+    assert summary["c3_termination"]["status"] == "incomplete_melt_clearance"
+    assert summary["c3_termination"]["melt_clearance_status"] == "incomplete"
+    assert summary["c3_termination"]["melt_clearance_incomplete"] is True
+    assert summary["c3_termination"]["severity"] == "warning"
+    assert accounting["melt_clearance_status"] == "incomplete"
+    assert accounting["melt_clearance_incomplete"] is True
+    assert accounting["disposition_status"] == (
+        "no_irrecoverable_loss_detected"
+    )
+    assert accounting["disposition_loss_detected"] is False
+    assert credit_line["requested_inventory_kg"] == pytest.approx(12.0)
+    assert credit_line["gross_drawn_kg"] == pytest.approx(12.0)
+    assert credit_line["net_outstanding_kg"] == pytest.approx(12.0)
+    assert credit_line["reagent_origin_total_kg"] == pytest.approx(12.0)
+    assert credit_line["available_reagent_inventory_kg"] == pytest.approx(8.0)
+    assert melt_clearance["reagent_origin_remaining_in_melt_kg"] == (
+        pytest.approx(4.0)
+    )
+    assert melt_clearance["reagent_origin_outside_melt_kg"] == pytest.approx(
+        8.0
+    )
+    assert melt_clearance[
+        "reagent_origin_remaining_in_melt_kg_by_account"
+    ] == {
+        "process.spent_reductant_residue": pytest.approx(4.0),
+    }
+    assert melt_clearance["oxide_equivalent_remaining_in_melt_kg"] > 4.0
+    assert melt_clearance["significant_remaining"] is True
+    assert disposition["recoverable_credit_kg"] == pytest.approx(0.0)
+    assert disposition["irrecoverable_loss_kg"] == pytest.approx(0.0)
+    assert disposition["wall_loss_provisional_pending_t475"] is True
+    assert "t-475" in disposition["wall_loss_caveat"]
+    assert accounting["by_species"]["K"]["credit_line"][
+        "reagent_origin_total_kg"
+    ] == pytest.approx(0.0)
+
+
+def test_c3_disposition_detects_subthreshold_loss_and_propagates_unclassified(
+    monkeypatch,
+):
+    sim = _sim(
+        {
+            "oxide": {
+                "label": "Oxide",
+                "composition_wt_pct": {"SiO2": 100.0},
+            }
+        }
+    )
+    sim.load_batch("oxide", mass_kg=1000.0)
+    sim.campaign_mgr.last_c3_termination = {
+        "significant_melt_remaining_limit_kg_by_species": {
+            "Na": 0.4540254784776795,
+            "K": 0.7721532195021601,
+        },
+    }
+    monkeypatch.setattr(
+        sim.atom_ledger,
+        "origin_atom_moles_by_account",
+        lambda: {
+            "process.wall_deposit": {
+                "Na": {"reagent": _mol("Na", 0.1)},
+            },
+            "process.unclassified_alkali": {
+                "K": {"reagent": _mol("K", 0.2)},
+            },
+        },
+    )
+
+    accounting = sim._c3_alkali_accounting_diagnostic()
+    sodium = accounting["by_species"]["Na"]["disposition"]
+    potassium = accounting["by_species"]["K"]["disposition"]
+
+    assert sodium["irrecoverable_loss_kg"] == pytest.approx(0.1)
+    assert sodium["status"] == "irrecoverable_loss_detected"
+    assert sodium["irrecoverable_loss_detected"] is True
+    assert sodium["significant_irrecoverable_loss"] is False
+    assert potassium["status"] == "unclassified"
+    assert potassium["unclassified"] is True
+    assert accounting["disposition_loss_detected"] is True
+    assert accounting["disposition_unclassified"] is True
+    assert accounting["disposition_status"] == "unclassified"
+
+
 def test_c3_recovered_condensate_reduces_credit_top_up_need():
     # S2b scope acceptance: recovered Stage-4 condensate is transferred once
     # and REDUCES the credit top-up need without becoming a second supply.

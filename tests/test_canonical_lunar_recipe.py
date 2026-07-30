@@ -61,6 +61,9 @@ def test_canonical_sequence_recovers_mg_before_final_boiloff_and_skips_mre() -> 
     c3_melt = MeltState(campaign=CampaignPhase.C3_NA)
     manager.configure_campaign(c3_melt, CampaignPhase.C3_NA)
     assert manager.get_temp_target(CampaignPhase.C3_NA, 0, c3_melt) == (1150.0, 600.0)
+    assert manager.get_temp_target(CampaignPhase.C3_NA, 2, c3_melt) == (1150.0, 600.0)
+    assert manager.get_temp_target(CampaignPhase.C3_NA, 3, c3_melt) == (1600.0, 600.0)
+    assert manager.get_temp_target(CampaignPhase.C3_NA, 20, c3_melt) == (1600.0, 600.0)
 
     assert manager.get_next_campaign(CampaignPhase.C3_NA, record) == CampaignPhase.C4
     assert manager.c5_enabled is False

@@ -1003,6 +1003,8 @@ def test_provider_zero_axial_stir_keeps_hkl_upper_bound_without_x6_multiplier():
     assert result.status == "ok"
     assert result.diagnostic["evaporation_flux_kg_hr"]["Na"] > 0.0
     assert result.diagnostic["authority_class"] == "upper-bound"
+    assert result.diagnostic["ledger_yields_authorized"] is True
+    assert result.diagnostic["p_bulk_transport_domain"] == "in_domain"
     assert result.diagnostic["authority_reason"] == (
         "missing-species-state-dependent-melt-transfer-inputs"
     )
