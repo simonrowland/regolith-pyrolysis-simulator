@@ -25,9 +25,10 @@ from scripts.grid_pregrind_writer import (  # noqa: E402
 )
 
 
+# tests/fixtures, not docs-private: this golden is a shipped test dependency.
 GOLDEN = (
     ROOT
-    / "docs-private/research/2026-07-19-cache-reissue"
+    / "tests/fixtures/cache_identity"
     / "b-043-cache-contract.golden.json"
 )
 

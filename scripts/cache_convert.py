@@ -241,9 +241,10 @@ def execute_cache_identity_migration_fixture() -> dict[str, Any]:
 
 
 def _load_cache_conversion_fixture_row() -> dict[str, Any]:
+    # tests/fixtures, not docs-private: tests/test_cache_convert.py consumes this
+    # via execute_cache_identity_migration_fixture(), so it must ship with the repo.
     fixture = pathlib.Path(__file__).resolve().parents[1] / (
-        "docs-private/research/2026-07-19-cache-reissue/"
-        "cache-convert-legacy-row.fixture.json"
+        "tests/fixtures/cache_identity/cache-convert-legacy-row.fixture.json"
     )
     raw = json.loads(fixture.read_text(encoding="utf-8"))
     return {
