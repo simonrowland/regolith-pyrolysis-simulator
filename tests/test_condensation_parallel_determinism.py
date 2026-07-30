@@ -158,7 +158,17 @@ def test_cold_wall_segment_attribution_matches_configured_geometry_values():
     # Unit check: (mol/m^2/s)*(m^2)*(kg/mol)*(s/h) = kg/h.
     # Sanity: the attributed total is conserved and the larger area deposits
     # more mass.
-    sio_flux_mol_m2_s = 0.062461400479484286
+    # 2026-07-30 re-pin (t-475): wall deposition now takes its driving force
+    # from the species PARTIAL pressure in the flowing gas against saturation
+    # at the wall temperature, replacing the pure-component P_sat(T_melt) that
+    # was not an admissible partial pressure. J moves 0.062461400479484286 ->
+    # the value below, -0.409 %. Re-derived from the executable cold-wall path
+    # by inverting this test's own algebra, J = Si_kg/(0.5*A1*M_Si/1000*3600),
+    # and cross-checked against the SiO2 leg (J = SiO2_kg/(0.5*A1*M_SiO2/1000
+    # *3600)) — both legs agree to 1e-12 relative, which is the check that the
+    # disproportionation split itself is unchanged. Area ratio A2/A1 = 4.5/4.0
+    # unchanged.
+    sio_flux_mol_m2_s = 0.062205888833975716
     segment_areas_m2 = {
         "process.wall_deposit_segment_stage_0_to_stage_1": (
             math.pi * 0.06**2 * 4.0
