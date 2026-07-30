@@ -979,25 +979,9 @@ socket.on('campaign_complete_summary', (summary) => {
     if (!container) return;
     container.style.display = 'block';
 
-    const c3Termination = summary.c3_termination || {};
-    const c3Accounting = summary.c3_alkali_accounting || {};
-    const c3NotApplicable = c3Termination.status === 'not_applicable';
-    const c3Incomplete = c3Termination.status === 'truncated'
-        || c3Termination.status === 'incomplete_melt_clearance'
-        || c3Accounting.melt_clearance_incomplete === true
-        || c3Accounting.disposition_loss_detected === true
-        || c3Accounting.disposition_unclassified === true
-        || c3Accounting.disposition_status === 'unclassified';
-    const completionLabel = c3NotApplicable
-        ? 'Not applicable'
-        : c3Incomplete
-        ? 'WARNING — Incomplete'
-        : 'Complete';
     const details = document.createElement('details');
-    details.open = c3Incomplete;
-    if (c3Incomplete) details.classList.add('campaign-summary-warning');
     const summaryEl = document.createElement('summary');
-    summaryEl.textContent = summary.campaign + ' ' + completionLabel + ' — '
+    summaryEl.textContent = summary.campaign + ' Complete — '
         + summary.duration_h + ' hrs, '
         + summary.mass_lost_kg.toFixed(1) + ' kg extracted';
     details.appendChild(summaryEl);
@@ -1026,29 +1010,6 @@ socket.on('campaign_complete_summary', (summary) => {
         ],
         ['O\u2082 Produced', summary.O2_kg.toFixed(2) + ' kg'],
     ];
-    if (summary.c3_termination) {
-        rows.push([
-            'C3 burn-out status',
-            (c3Termination.status || 'unknown')
-                + (c3Termination.outcome ? ': ' + c3Termination.outcome : ''),
-        ]);
-    }
-    if (summary.c3_alkali_accounting) {
-        rows.push([
-            'C3 melt-clearance status',
-            c3Accounting.melt_clearance_status || 'unknown',
-        ]);
-        rows.push([
-            'C3 disposition status',
-            c3Accounting.disposition_status || 'unknown',
-        ]);
-    }
-    if (c3Incomplete) {
-        rows.push([
-            'Operator warning',
-            'C3 burn-out, melt-clearance, or disposition needs review; inspect both accounting axes.',
-        ]);
-    }
 
     for (const [label, value] of rows) {
         const tr = document.createElement('tr');

@@ -141,6 +141,14 @@ def _campaigns_elapsed_from_session_history(
                     campaign_duration_h = float(
                         configured_duration(campaign, campaign_name, duration_path)
                     )
+                if record_path == "A_staged":
+                    overrides = getattr(campaign_mgr, "_campaign_overrides", None)
+                    if callable(overrides):
+                        staged_duration = overrides(campaign).get(
+                            "staged_duration_h"
+                        )
+                        if staged_duration is not None:
+                            campaign_duration_h = float(staged_duration)
             elif campaign_name == "C5":
                 # C5 max_hold_hr is per-branch (setpoints.yaml):
                 #   {branch_two: H2, branch_one: H1}
@@ -291,66 +299,6 @@ class RunExecutor:
                     failure_exc = RuntimeError(reason)
                     break
                 campaign_summary = result.campaign_summary
-                c3_termination = (
-                    campaign_summary.get("c3_termination")
-                    if isinstance(campaign_summary, Mapping)
-                    else None
-                )
-                c3_accounting = (
-                    campaign_summary.get("c3_alkali_accounting")
-                    if isinstance(campaign_summary, Mapping)
-                    else None
-                )
-                c3_termination_status = (
-                    str(c3_termination.get("status") or "")
-                    if isinstance(c3_termination, Mapping)
-                    else ""
-                )
-                c3_melt_clearance_incomplete = (
-                    bool(
-                        c3_accounting.get("melt_clearance_incomplete")
-                    )
-                    if isinstance(c3_accounting, Mapping)
-                    else False
-                )
-                c3_disposition_loss_detected = (
-                    bool(
-                        c3_accounting.get("disposition_loss_detected")
-                    )
-                    if isinstance(c3_accounting, Mapping)
-                    else False
-                )
-                c3_disposition_unclassified = (
-                    bool(c3_accounting.get("disposition_unclassified"))
-                    or c3_accounting.get("disposition_status") == "unclassified"
-                    if isinstance(c3_accounting, Mapping)
-                    else False
-                )
-                if (
-                    c3_termination_status
-                    in {"truncated", "incomplete_melt_clearance"}
-                    or c3_melt_clearance_incomplete
-                    or c3_disposition_loss_detected
-                    or c3_disposition_unclassified
-                ):
-                    reason = (
-                        "c3_alkali_burnout_truncated"
-                        if c3_termination_status == "truncated"
-                        else "c3_alkali_melt_clearance_incomplete"
-                        if c3_melt_clearance_incomplete
-                        else "c3_alkali_disposition_unclassified"
-                        if c3_disposition_unclassified
-                        else "c3_alkali_disposition_loss"
-                    )
-                    status = "partial"
-                    error_message = reason
-                    refusal_diagnostic = {
-                        "status": "warning",
-                        "reason": reason,
-                        "campaign": str(campaign_summary.get("campaign") or "C3"),
-                        "c3_termination": dict(c3_termination or {}),
-                        "c3_alkali_accounting": dict(c3_accounting or {}),
-                    }
                 c4_refusal = (
                     campaign_summary.get("c4_refusal_diagnostic")
                     if isinstance(campaign_summary, Mapping)

@@ -5,15 +5,16 @@ Covers:
 
 * Unit: the provider returns the same vapor pressures as the legacy
   :meth:`EquilibriumMixin._internal_analytical_equilibrium` for a known composition + T.
-* Unit: the kernel filter scopes the provider's account view to the two
-  melt-resident oxide accounts (cleaned melt + spent reductant residue).
+* Unit: the kernel filter actually scopes the provider's account view to
+  the single declared account (``process.cleaned_melt``).
 * Unit: capability profile declares ``VAPOR_PRESSURE`` only and is
   authoritative for it.
 * Shadow parity: across a multi-step simulation run on lunar + Mars +
-  asteroid feedstocks, the legacy ``_internal_analytical_equilibrium`` and
-  kernel dispatch agree species-by-species until spent reductant residue
-  becomes populated. The legacy path has no authority over that second
-  melt-resident account; merged-account behavior is pinned separately.
+  asteroid feedstocks, the legacy ``_internal_analytical_equilibrium`` and the kernel
+  dispatch agree species-by-species within 1e-9 Pa (relative + absolute
+  floor). This is the parity gate that justified the flip; it stays in
+  the suite as a regression guard against future intent flips that touch
+  the same call site.
 """
 
 from __future__ import annotations
@@ -182,67 +183,10 @@ def test_provider_declares_only_vapor_pressure_intent(vapor_pressure_data):
             assert not profile.is_authoritative(intent)
 
 
-def test_provider_declares_only_melt_resident_accounts(vapor_pressure_data):
+def test_provider_declares_only_cleaned_melt_account(vapor_pressure_data):
     provider = BuiltinVaporPressureProvider(vapor_pressure_data)
     profile = provider.capability_profile()
-    assert profile.declared_accounts == frozenset(
-        {
-            "process.cleaned_melt",
-            "process.spent_reductant_residue",
-        }
-    )
-
-
-def test_provider_merges_spent_reductant_residue_into_melt_activity(
-    vapor_pressure_data,
-):
-    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
-
-    def _request(accounts: dict[str, dict[str, float]]) -> IntentRequest:
-        return IntentRequest(
-            intent=ChemistryIntent.VAPOR_PRESSURE,
-            account_view=ProviderAccountView(
-                accounts=accounts,
-                species_formula_registry={},
-            ),
-            temperature_C=1600.0,
-            pressure_bar=1e-6,
-            control_inputs={
-                "pO2_bar": 1e-9,
-                "intrinsic_fO2_log": -9.0,
-            },
-        )
-
-    split = provider.dispatch(
-        _request(
-            {
-                "process.cleaned_melt": {"SiO2": 10.0},
-                "process.spent_reductant_residue": {"Na2O": 1.0},
-            }
-        )
-    )
-    merged = provider.dispatch(
-        _request(
-            {
-                "process.cleaned_melt": {"SiO2": 10.0, "Na2O": 1.0},
-                "process.spent_reductant_residue": {},
-            }
-        )
-    )
-
-    split_diagnostic = split.diagnostic or {}
-    merged_diagnostic = merged.diagnostic or {}
-    assert split_diagnostic["vapor_pressures_Pa"]["Na"] > 0.0
-    assert split_diagnostic["vapor_pressures_Pa"]["Na"] == pytest.approx(
-        merged_diagnostic["vapor_pressures_Pa"]["Na"]
-    )
-    assert split_diagnostic["vapor_pressure_numerator_provenance"]["Na"][
-        "melt_oxide_activity"
-    ] == pytest.approx(
-        merged_diagnostic["vapor_pressure_numerator_provenance"]["Na"][
-            "melt_oxide_activity"
-        ]
-    )
+    assert profile.declared_accounts == frozenset({"process.cleaned_melt"})
 
 
 def _ca_range_extrapolation_request() -> IntentRequest:
@@ -2311,11 +2255,11 @@ def test_kress91_ferrous_feo_activity_no_iron_guards() -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_kernel_filters_provider_to_melt_resident_accounts_only(
+def test_kernel_filters_provider_to_cleaned_melt_only(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
     """Even when other accounts hold material, the provider must see only
-    the two melt-resident oxide pools — the kernel filter is the enforcer."""
+    ``process.cleaned_melt`` — the kernel account filter is the enforcer."""
 
     sim = _build_sim(
         "lunar_mare_low_ti",
@@ -2349,12 +2293,7 @@ def test_kernel_filters_provider_to_melt_resident_accounts_only(
 
     assert seen_accounts, "provider was never dispatched"
     for accounts in seen_accounts:
-        assert accounts == frozenset(
-            {
-                "process.cleaned_melt",
-                "process.spent_reductant_residue",
-            }
-        ), (
+        assert accounts == frozenset({"process.cleaned_melt"}), (
             "kernel filter leaked an undeclared account into the provider"
         )
 
@@ -2454,16 +2393,12 @@ def test_shadow_parity_across_short_simulation_run(
     setpoints_data,
 ):
     """For each feedstock, drive the simulator through the C0-into-C2A
-    handoff and assert the legacy stub and kernel dispatch agree while
-    both consume the same cleaned-melt account.
+    handoff and assert the legacy stub and the kernel dispatch agree at
+    every step within tolerance.
 
     This is the parity gate that justified flipping the VAPOR_PRESSURE
     intent. Keeping it in the suite catches future regressions if a
-    later intent flip changes the kernel call shape. Once spent reductant
-    residue is populated, the authoritative provider intentionally has a
-    wider account view than the legacy stub; the exact merged-account
-    behavior is covered by
-    ``test_provider_merges_spent_reductant_residue_into_melt_activity``.
+    later intent flip changes the kernel call shape.
     """
 
     sim = _build_sim(
@@ -2481,8 +2416,6 @@ def test_shadow_parity_across_short_simulation_run(
         DecisionType.C6_PROCEED: "yes",
     }
     steps = 0
-    parity_steps = 0
-    spent_residue_steps = 0
     worst_delta_pa = 0.0
     while not sim.is_complete() and steps < 60:
         if sim.paused_for_decision:
@@ -2499,13 +2432,6 @@ def test_shadow_parity_across_short_simulation_run(
         T_C = sim.melt.temperature_C
         if T_C + 273.15 < 400:
             continue
-        spent_residue_mol = sim.atom_ledger.project_account_mol(
-            "process.spent_reductant_residue"
-        )
-        if any(abs(float(mol)) > 1.0e-12 for mol in spent_residue_mol.values()):
-            spent_residue_steps += 1
-            continue
-        parity_steps += 1
         legacy_result = sim._internal_analytical_equilibrium()
         kernel_result = sim._chem_kernel.dispatch(
             ChemistryIntent.VAPOR_PRESSURE,
@@ -2537,12 +2463,6 @@ def test_shadow_parity_across_short_simulation_run(
             )
 
     assert steps > 0, f"smoke run for {feedstock_key} executed zero steps"
-    assert parity_steps > 0, (
-        f"smoke run for {feedstock_key} never exercised equal-account parity"
-    )
-    assert spent_residue_steps > 0, (
-        f"smoke run for {feedstock_key} never exercised the authority split"
-    )
     # Sanity: the worst-case observed delta must be at most the largest
     # tolerance band the loop allowed. This is implied by the per-tick
     # assertion but pinned explicitly so the test is self-documenting

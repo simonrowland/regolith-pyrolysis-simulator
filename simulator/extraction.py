@@ -2575,10 +2575,16 @@ class ExtractionMixin:
             self._transfer_condensed_species('Na')
             self._top_up_c3_alkali_credit('Na')
 
-        is_injection = self.campaign_mgr._c3_is_injection_phase(
-            campaign,
-            self.melt.campaign_hour,
-        )
+        cycle_period = 6  # hours per inject-bakeout cycle
+        # Staged C2A enters the cool Na cleanup at the end of the cooldown
+        # tick, so the first real shuttle tick starts with campaign_hour == 1.
+        if (
+            campaign in (CampaignPhase.C3_K, CampaignPhase.C3_NA)
+            and self.record.path == 'A_staged'
+        ):
+            is_injection = self.melt.campaign_hour <= 3
+        else:
+            is_injection = (self.melt.campaign_hour % cycle_period) < 3
 
         if is_injection:
             self._shuttle_phase = 'inject'
@@ -2608,14 +2614,7 @@ class ExtractionMixin:
             self._shuttle_phase = 'bakeout'
             # Bakeout is handled by normal evaporation (K/Na have high
             # vapor pressure at 1520-1680°C).  Track cycle transitions.
-            prior_was_injection = (
-                self.melt.campaign_hour > 0
-                and self.campaign_mgr._c3_is_injection_phase(
-                    campaign,
-                    self.melt.campaign_hour - 1,
-                )
-            )
-            if prior_was_injection:
+            if self.melt.campaign_hour % cycle_period == 3:
                 # Just entered bakeout. Defer the diagnostic counter until the
                 # hour snapshots successfully; zero-transition aborts must be
                 # replayable without mutating state.

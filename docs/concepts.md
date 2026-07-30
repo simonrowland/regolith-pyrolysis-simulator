@@ -118,33 +118,6 @@ Na and K sit low on the Ellingham diagram at low temperature, but the JANAF-4th 
 
 This is the surviving alkali shuttle: alkalis evolved during C2 (or dosed externally) are condensed in Stage 4, then Na can be looped back into the melt as the cool FeO reductant. The alkali is consumed as a reducing agent, the target oxide is stripped to metal, and the alkali oxide dissolves into the melt — where, at bakeout temperature, it re-evaporates and is recovered again. The same alkali inventory recycles across multiple cycles before final product recovery.
 
-Melt clearance is operationally complete only when the live Na/K evaporation rate
-has risen and then remained below its configured species floor for two
-authorized, in-domain bakeout samples after the minimum hold. Oxygen
-fugacity returning to its setpoint proves that
-the reduction transient ended; it does not prove that the resulting Na₂O or
-K₂O left the melt. Because alkali-oxide activity falls with concentration, the
-rate endpoint deliberately stops at the measurable tail instead of requiring
-mathematical 100% recovery. Any significant oxide still melt-bound is emitted
-as incomplete melt clearance, and a hard-cap exit is explicitly marked
-truncated. Disposition is a separate axis: overhead, terminal offgas, and the
-condenser path are recoverable credit for restocking between charges; wall
-deposits and irrecoverable vents are losses. The accounting reports absolute
-reagent-origin kilograms against the alkali credit line, never one blended
-recovery percentage.
-
-The isolated current-model result is not complete burnout: changing only the
-C3_NA cap from 3 h to 6 h leaves 60.882 kg of reagent-origin Na melt-bound
-and 17.132 kg in recoverable overhead/offgas disposition in both cases. The
-extra time only moves 6.411 kg from overhead to terminal offgas while drawing
-more gross credit to replenish reagent inventory; neither melt clearance nor
-disposition improves. The earlier recovery percentages blended these axes and
-must not be used.
-
-Wall-loss magnitudes in this accounting remain provisional pending t-475:
-wall local pressure currently uses pure-component `P_sat(T_melt)` instead of
-the species partial pressure.
-
 The shuttle serves two distinct roles:
 
 1. **Oxygen reductant**: Na chemically frees Fe from FeO only below the Na/Fe crossover. The executable gate can also reduce Cr₂O₃ when its in-band margin is positive; TiO₂ is currently refused, and MnO is not a supported C3 target.

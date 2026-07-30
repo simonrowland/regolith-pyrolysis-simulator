@@ -41,15 +41,10 @@ from simulator.optimize.recipe import (
     validate_c2a_staged_stage_order,
 )
 from simulator.condensation import _canonical_carrier_gas_key
-from simulator.state import (
-    STOICH_RATIOS,
-    StirState,
-    clamp_stir_factor,
-    clamp_stir_state,
-)
+from simulator.state import StirState, clamp_stir_factor, clamp_stir_state
 from simulator.core import (
     Atmosphere, BatchRecord, CampaignPhase, CondensationTrain,
-    DecisionPoint, DecisionType, EvaporationFlux, HourSnapshot, MeltState,
+    DecisionPoint, DecisionType, EvaporationFlux, MeltState,
 )
 
 C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR = 0.01
@@ -263,10 +258,6 @@ class CampaignManager:
         self._pending_post_mg_c2a_overrides: dict | None = None
         self._active_post_mg_c2a_overrides: dict | None = None
         self._materialized_target_T_C_by_phase: dict[CampaignPhase, float] = {}
-        self.last_c3_termination: dict[str, object] | None = None
-        self._c3_authorized_positive_observed_by_species: dict[str, bool] = {}
-        self._c3_decay_sample_count_by_species: dict[str, int] = {}
-        self._c3_decay_last_campaign_hour_by_species: dict[str, int] = {}
         self.last_c4_termination: dict[str, object] | None = None
 
     _CONFIG_KEY_BY_PHASE = {
@@ -929,437 +920,12 @@ class CampaignManager:
         if not isinstance(na_stage, dict):
             return {}
         target = self._float(na_stage.get('target_C'), 1150.0)
-        c3_cfg = self._campaign_config(CampaignPhase.C3_NA)
-        na_phase = c3_cfg.get('Na_phase', {})
-        if not isinstance(na_phase, Mapping):
-            na_phase = {}
-        bakeout_band = na_phase.get('T_bakeout_C', ())
-        default_bakeout_target_C = (
-            sum(float(value) for value in bakeout_band) / len(bakeout_band)
-            if isinstance(bakeout_band, (list, tuple)) and bakeout_band
-            else 1600.0
-        )
         return {
             'inject_target_C': target,
-            'bakeout_target_C': self._float(
-                na_stage.get('bakeout_target_C'),
-                default_bakeout_target_C,
-            ),
+            'bakeout_target_C': target,
             'ramp_rate': self._float(na_stage.get('ramp_rate_C_per_hr'), 600.0),
             'staged_duration_h': self._float(na_stage.get('duration_h'), 3.0),
         }
-
-    def _c3_is_injection_phase(
-        self,
-        campaign: CampaignPhase,
-        campaign_hour: int,
-    ) -> bool:
-        ovr = self._campaign_overrides(campaign)
-        if campaign == CampaignPhase.C3_NA and 'staged_duration_h' in ovr:
-            injection_duration_h = max(
-                1,
-                int(self._float(ovr.get('staged_duration_h'), 3.0)),
-            )
-            return int(campaign_hour) < injection_duration_h
-        return int(campaign_hour) % 6 < 3
-
-    def _c3_soft_endpoint_config(
-        self,
-        campaign: CampaignPhase,
-    ) -> tuple[float, float, int, dict[str, float]]:
-        soft = self._configured_endpoint(campaign, 'soft_endpoint')
-        endpoint_type = str(soft.get('type', ''))
-        if endpoint_type != 'species_evaporation_rate_below_after_min_hold':
-            raise ValueError(
-                'C3.soft_endpoint.type must be '
-                'species_evaporation_rate_below_after_min_hold'
-            )
-        min_hold_hr = self._endpoint_float(
-            campaign,
-            soft,
-            'min_hold_hr',
-        )
-        tail_budget_hr = self._endpoint_float(
-            campaign,
-            soft,
-            'tail_budget_hr',
-        )
-        sustained_decay_samples_raw = self._required_float(
-            soft.get('sustained_decay_samples'),
-            'C3.soft_endpoint.sustained_decay_samples',
-        )
-        if not sustained_decay_samples_raw.is_integer():
-            raise ValueError(
-                'C3.soft_endpoint.sustained_decay_samples must be an integer'
-            )
-        sustained_decay_samples = int(sustained_decay_samples_raw)
-        raw_species = soft.get('species_monitored', ())
-        if isinstance(raw_species, str):
-            species = (raw_species,)
-        else:
-            try:
-                species = tuple(str(item) for item in raw_species)
-            except TypeError as exc:
-                raise ValueError(
-                    'C3.soft_endpoint.species_monitored must be a sequence'
-                ) from exc
-        if not species:
-            raise ValueError(
-                'C3.soft_endpoint.species_monitored must not be empty'
-            )
-        raw_thresholds = soft.get('threshold_kg_hr_by_species', {})
-        if not isinstance(raw_thresholds, Mapping):
-            raise ValueError(
-                'C3.soft_endpoint.threshold_kg_hr_by_species must be a mapping'
-            )
-        thresholds: dict[str, float] = {}
-        for species_name in species:
-            threshold = self._required_float(
-                raw_thresholds.get(species_name),
-                (
-                    'C3.soft_endpoint.threshold_kg_hr_by_species.'
-                    f'{species_name}'
-                ),
-            )
-            if not math.isfinite(threshold) or threshold <= 0.0:
-                raise ValueError(
-                    'C3 soft-endpoint thresholds must be finite and positive'
-                )
-            if species_name not in {'Na', 'K'}:
-                raise ValueError(
-                    'C3.soft_endpoint.species_monitored supports only Na and K'
-                )
-            thresholds[species_name] = threshold
-        if not math.isfinite(min_hold_hr) or min_hold_hr <= 0.0:
-            raise ValueError(
-                'C3.soft_endpoint.min_hold_hr must be finite and positive'
-            )
-        if not math.isfinite(tail_budget_hr) or tail_budget_hr <= 0.0:
-            raise ValueError(
-                'C3.soft_endpoint.tail_budget_hr must be finite and positive'
-            )
-        if sustained_decay_samples < 2:
-            raise ValueError(
-                'C3.soft_endpoint.sustained_decay_samples must be at least 2'
-            )
-        return (
-            min_hold_hr,
-            tail_budget_hr,
-            sustained_decay_samples,
-            thresholds,
-        )
-
-    @staticmethod
-    def _c3_flux_signal_authorized(
-        transport_state: Mapping[str, object] | None,
-    ) -> bool:
-        if not isinstance(transport_state, Mapping):
-            return False
-        diagnostic = transport_state.get('evaporation_flux_diagnostic')
-        if not isinstance(diagnostic, Mapping):
-            return False
-        return (
-            diagnostic.get('ledger_yields_authorized') is True
-            and diagnostic.get('p_bulk_transport_domain') == 'in_domain'
-        )
-
-    @staticmethod
-    def _c3_flux_signal_evaluable(
-        evap_flux: EvaporationFlux,
-        species: str,
-    ) -> bool:
-        if species not in evap_flux.species_kg_hr:
-            return False
-        raw_rate = evap_flux.species_kg_hr[species]
-        if isinstance(raw_rate, bool):
-            return False
-        try:
-            rate = float(raw_rate)
-        except (TypeError, ValueError):
-            return False
-        return math.isfinite(rate) and rate >= 0.0
-
-    @staticmethod
-    def _c3_melt_alkali_element_kg(
-        melt: MeltState,
-        species: str,
-    ) -> float:
-        oxide = {'Na': 'Na2O', 'K': 'K2O'}[species]
-        return max(
-            0.0,
-            float(melt.composition_kg.get(oxide, 0.0)),
-        ) * STOICH_RATIOS[oxide][0]
-
-    def _c3_max_hold_hr(
-        self,
-        campaign: CampaignPhase,
-        record: BatchRecord,
-    ) -> float:
-        ovr = self._campaign_overrides(campaign)
-        if 'max_hours' in ovr:
-            override = self._float(ovr.get('max_hours'), 0.0)
-            if override > 0.0:
-                return override
-        path_key = (
-            'A_staged'
-            if record.path == 'A_staged'
-            else 'A'
-            if record.path == 'A'
-            else 'default'
-        )
-        return self._configured_max_hold_hr(
-            campaign,
-            campaign.name,
-            path_key,
-        )
-
-    def _c3_effective_dose_kg_by_species(
-        self,
-        campaign: CampaignPhase,
-        record: BatchRecord,
-        species_names: tuple[str, ...],
-    ) -> dict[str, float]:
-        config = self._campaign_config(campaign)
-        raw_dosing = config.get('alkali_dosing', {})
-        if raw_dosing in (None, {}):
-            dosing: Mapping[str, object] = {}
-        elif isinstance(raw_dosing, Mapping):
-            dosing = raw_dosing
-        else:
-            raise ValueError('campaigns.C3.alkali_dosing must be a mapping')
-
-        dose_kg_by_species: dict[str, float] = {}
-        for species in species_names:
-            dosing_key = f'{species}_kg'
-            configured_dose_kg = (
-                self._required_float(
-                    dosing[dosing_key],
-                    f'campaigns.C3.alkali_dosing.{dosing_key}',
-                )
-                if dosing.get(dosing_key) is not None
-                else 0.0
-            )
-            explicit_additive_kg = self._required_float(
-                record.additives_kg.get(species, 0.0),
-                f'additives_kg.{species}',
-            )
-            if (
-                not math.isfinite(configured_dose_kg)
-                or configured_dose_kg < 0.0
-                or not math.isfinite(explicit_additive_kg)
-                or explicit_additive_kg < 0.0
-            ):
-                raise ValueError('C3 alkali doses must be finite and non-negative')
-            dose_kg_by_species[species] = max(
-                configured_dose_kg,
-                explicit_additive_kg,
-            )
-        return dose_kg_by_species
-
-    def _check_c3_soft_endpoint(
-        self,
-        melt: MeltState,
-        evap_flux: EvaporationFlux,
-        record: BatchRecord,
-        completed_campaign_hour: float,
-        transport_state: Mapping[str, object] | None,
-    ) -> bool:
-        campaign = melt.campaign
-        min_hold_hr, tail_budget_hr, sustained_decay_samples, thresholds = (
-            self._c3_soft_endpoint_config(campaign)
-        )
-        current_rates = {
-            species: max(
-                0.0,
-                self._float(
-                    evap_flux.species_kg_hr.get(species, 0.0),
-                    0.0,
-                ),
-            )
-            for species in thresholds
-        }
-        current_is_bakeout = not self._c3_is_injection_phase(
-            campaign,
-            melt.campaign_hour,
-        )
-        signal_authorized = self._c3_flux_signal_authorized(transport_state)
-        signal_evaluable = {
-            species: self._c3_flux_signal_evaluable(evap_flux, species)
-            for species in thresholds
-        }
-        dose_kg_by_species = self._c3_effective_dose_kg_by_species(
-            campaign,
-            record,
-            ('Na', 'K'),
-        )
-        unmonitored_dosed_species = tuple(
-            species
-            for species, dose_kg in dose_kg_by_species.items()
-            if dose_kg > 0.0 and species not in thresholds
-        )
-        if unmonitored_dosed_species:
-            raise ValueError(
-                'C3.soft_endpoint.species_monitored must include every '
-                'positive-dose species: '
-                + ', '.join(unmonitored_dosed_species)
-            )
-        applicable_species = tuple(
-            species
-            for species in thresholds
-            if dose_kg_by_species[species] > 0.0
-        )
-        for species, threshold in thresholds.items():
-            authorized_positive_sample = (
-                species in applicable_species
-                and current_is_bakeout
-                and signal_authorized
-                and signal_evaluable[species]
-                and current_rates[species] > threshold
-            )
-            if authorized_positive_sample:
-                self._c3_authorized_positive_observed_by_species[species] = True
-        signal_armed = {
-            species: bool(
-                species in applicable_species
-                and self._c3_authorized_positive_observed_by_species.get(
-                    species,
-                    False,
-                )
-            )
-            for species in thresholds
-        }
-        melt_remaining = {
-            species: self._c3_melt_alkali_element_kg(melt, species)
-            for species in thresholds
-        }
-        significant_limits = {
-            species: threshold * tail_budget_hr
-            for species, threshold in thresholds.items()
-        }
-        significant_remaining = {
-            species: melt_remaining[species] > significant_limits[species]
-            for species in thresholds
-        }
-        decay_sample_count: dict[str, int] = {}
-        for species, threshold in thresholds.items():
-            below_threshold_sample = (
-                species in applicable_species
-                and
-                current_is_bakeout
-                and signal_authorized
-                and signal_evaluable[species]
-                and signal_armed[species]
-                and current_rates[species] < threshold
-            )
-            if not below_threshold_sample:
-                self._c3_decay_sample_count_by_species[species] = 0
-                self._c3_decay_last_campaign_hour_by_species.pop(species, None)
-            elif (
-                self._c3_decay_last_campaign_hour_by_species.get(species)
-                != int(melt.campaign_hour)
-            ):
-                self._c3_decay_sample_count_by_species[species] = (
-                    self._c3_decay_sample_count_by_species.get(species, 0) + 1
-                )
-                self._c3_decay_last_campaign_hour_by_species[species] = int(
-                    melt.campaign_hour
-                )
-            decay_sample_count[species] = (
-                self._c3_decay_sample_count_by_species.get(species, 0)
-            )
-        authorized_decay_observed = {
-            species: (
-                signal_armed[species]
-                and decay_sample_count[species] >= sustained_decay_samples
-            )
-            for species in thresholds
-        }
-        base_diagnostic: dict[str, object] = {
-            'status': 'not_complete',
-            'species_monitored': list(thresholds),
-            'dose_kg_by_species': dose_kg_by_species,
-            'applicable_species': list(applicable_species),
-            'rate_kg_hr_by_species': current_rates,
-            'threshold_kg_hr_by_species': dict(thresholds),
-            'signal_armed_by_species': signal_armed,
-            'authorized_positive_sample_observed_by_species': dict(
-                signal_armed
-            ),
-            'melt_remaining_element_kg_by_species': melt_remaining,
-            'significant_melt_remaining_limit_kg_by_species': (
-                significant_limits
-            ),
-            'significant_melt_remaining_by_species': significant_remaining,
-            'min_hold_hr': min_hold_hr,
-            'tail_budget_hr': tail_budget_hr,
-            'completed_campaign_hour': completed_campaign_hour,
-            'current_is_bakeout': current_is_bakeout,
-            'flux_signal_authorized': signal_authorized,
-            'flux_signal_evaluable_by_species': signal_evaluable,
-            'sustained_decay_samples_required': sustained_decay_samples,
-            'decay_sample_count_by_species': decay_sample_count,
-        }
-        if not applicable_species:
-            base_diagnostic.update({
-                'outcome': 'zero_alkali_dose_not_applicable',
-                'status': 'not_applicable',
-                'melt_clearance_incomplete': False,
-            })
-            self.last_c3_termination = base_diagnostic
-            return True
-        if (
-            completed_campaign_hour >= min_hold_hr
-            and current_is_bakeout
-            and signal_authorized
-            and all(signal_evaluable[species] for species in applicable_species)
-            and all(
-                authorized_decay_observed[species]
-                for species in applicable_species
-            )
-        ):
-            any_significant = any(significant_remaining.values())
-            base_diagnostic.update({
-                'outcome': (
-                    'alkali_rate_depleted_with_significant_residual'
-                    if any_significant
-                    else 'alkali_rate_depleted'
-                ),
-                'status': (
-                    'incomplete_melt_clearance'
-                    if any_significant
-                    else 'complete'
-                ),
-                'melt_clearance_incomplete': any_significant,
-            })
-            self.last_c3_termination = base_diagnostic
-            return True
-
-        max_hold_hr = self._c3_max_hold_hr(campaign, record)
-        if (
-            not math.isfinite(max_hold_hr)
-            or max_hold_hr <= 0.0
-        ):
-            raise ValueError('C3 max_hold_hr must be finite and positive')
-        if completed_campaign_hour >= max_hold_hr:
-            base_diagnostic.update({
-                'outcome': (
-                    'max_hold_rate_not_depleted'
-                    if any(
-                        signal_armed[species]
-                        for species in applicable_species
-                    )
-                    else 'max_hold_no_signal_with_significant_residual'
-                ),
-                'status': 'truncated',
-                'severity': 'warning',
-                'melt_clearance_incomplete': any(
-                    significant_remaining.values()
-                ),
-                'max_hold_hr': max_hold_hr,
-            })
-            self.last_c3_termination = base_diagnostic
-            return True
-        return False
 
     def _c2a_staged_stage_by_hour(
         self,
@@ -1707,11 +1273,6 @@ class CampaignManager:
             self._c2a_staged_cumulative_yield_mol_by_species = {}
             self._c2a_staged_last_log_slope_by_species = {}
             self.last_c2a_staged_termination = None
-        elif campaign in (CampaignPhase.C3_K, CampaignPhase.C3_NA):
-            self.last_c3_termination = None
-            self._c3_authorized_positive_observed_by_species = {}
-            self._c3_decay_sample_count_by_species = {}
-            self._c3_decay_last_campaign_hour_by_species = {}
         elif campaign == CampaignPhase.C4:
             self.last_c4_termination = None
 
@@ -2012,7 +1573,8 @@ class CampaignManager:
             inject_target = self._float(ovr.get('inject_target_C'), default_inject)
             bakeout_target = self._float(ovr.get('bakeout_target_C'), default_bakeout)
             ramp_rate = self._float(ovr.get('ramp_rate'), 50.0)
-            if self._c3_is_injection_phase(campaign, campaign_hour):
+            cycle_period = 6  # hours per inject-bakeout cycle
+            if campaign_hour % cycle_period < 3:
                 return (inject_target, ramp_rate)  # injection phase
             else:
                 return (bakeout_target, ramp_rate)  # bakeout phase
@@ -2219,13 +1781,13 @@ class CampaignManager:
         - C0b:  P-species IR decay < 5% of peak
         - C2A:  Na/K/Fe/SiO all decay to < 5% peak
         - C2B:  Fe signal decays to < 5% peak
-        - C3:   Na/K bakeout rate decays below the species floor
+        - C3:   pO₂ returns to setpoint, holds 30 min
         - C4:   Mg signal decays to background
         - C5:   Current decays to < 10 A at target voltage
         - C6:   Self-terminating (liquidus > 1700°C)
 
-        The finite duration limits are explicit backstops; C3 records a
-        structured truncation when its rate endpoint has not completed.
+        For the simulator, we approximate these with simpler checks
+        based on evaporation rate thresholds and duration limits.
 
         Returns True if the campaign should end.
         """
@@ -2236,15 +1798,7 @@ class CampaignManager:
         # hold-acquisition refusal below so the wall clock cannot claim a
         # successful reaction without provider dispatch.
         ovr = self._campaign_overrides(campaign)
-        if (
-            campaign not in (
-                CampaignPhase.C3_K,
-                CampaignPhase.C3_NA,
-                CampaignPhase.C4,
-                CampaignPhase.C6,
-            )
-            and 'max_hours' in ovr
-        ):
+        if campaign not in (CampaignPhase.C4, CampaignPhase.C6) and 'max_hours' in ovr:
             max_h = float(ovr['max_hours'])
             if max_h > 0 and completed_campaign_hour >= max_h:
                 return True
@@ -2434,14 +1988,45 @@ class CampaignManager:
             if completed_campaign_hour >= max_hold_hr:
                 return True
 
-        elif campaign in (CampaignPhase.C3_K, CampaignPhase.C3_NA):
-            return self._check_c3_soft_endpoint(
-                melt,
-                evap_flux,
-                record,
-                completed_campaign_hour,
-                transport_state,
-            )
+        elif campaign == CampaignPhase.C3_K:
+            if record.path == 'A_staged':
+                staged_hours = int(self._float(
+                    self._campaign_overrides(campaign).get('staged_duration_h'),
+                    self._configured_max_hold_hr(campaign, 'C3_K', 'A_staged'),
+                ))
+                if completed_campaign_hour >= max(1, staged_hours):
+                    return True
+            path_key = 'A' if record.path == 'A' else 'default'
+            max_hold_hr = self._configured_max_hold_hr(
+                campaign, 'C3_K', path_key)
+            if completed_campaign_hour >= max_hold_hr:
+                return True
+
+        elif campaign == CampaignPhase.C3_NA:
+            # Autoreview r6 P2 (2026-05-27): the V1c-recipe-retune
+            # migration retargeted ``C2A_STAGED -> C3_NA`` (was
+            # ``C2A_STAGED -> C3_K`` pre-V1c) and the
+            # ``na_shuttle_stage`` override now sets
+            # ``staged_duration_h`` as the cool cleanup endpoint.  The
+            # C3_K branch above honors the override via the
+            # ``record.path == 'A_staged'`` check; this branch did not,
+            # so staged runs (``record.path == 'A_staged'``) fell into
+            # the ``else`` arm of the ternary and ran C3_NA for the
+            # default 35 hours instead of the intended ~3-hour cool
+            # cleanup.  Mirror the C3_K handling so the staged endpoint
+            # is honored at its configured value.
+            if record.path == 'A_staged':
+                staged_hours = int(self._float(
+                    self._campaign_overrides(campaign).get('staged_duration_h'),
+                    self._configured_max_hold_hr(campaign, 'C3_NA', 'A_staged'),
+                ))
+                if completed_campaign_hour >= max(1, staged_hours):
+                    return True
+            path_key = 'A' if record.path == 'A' else 'default'
+            max_hold_hr = self._configured_max_hold_hr(
+                campaign, 'C3_NA', path_key)
+            if completed_campaign_hour >= max_hold_hr:
+                return True
 
         elif campaign == CampaignPhase.C4:
             soft = self._configured_endpoint(campaign, 'soft_endpoint')

@@ -186,7 +186,7 @@ def test_c2a_staged_c3_na_cool_cleanup_does_not_poison_reused_manager():
     ) == (1150.0, 600.0)
     assert manager.get_temp_target(
         CampaignPhase.C3_NA, 3, staged_melt
-    ) == (1600.0, 600.0)
+    ) == (1150.0, 600.0)
     assert "C3_NA" not in manager.overrides
 
     default_melt = MeltState(campaign=CampaignPhase.C3_NA)

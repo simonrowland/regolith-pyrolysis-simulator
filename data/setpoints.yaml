@@ -266,7 +266,6 @@ campaigns:
     na_shuttle_stage:
       campaign: "C3_NA"
       target_C: 1150
-      bakeout_target_C: 1600
       ramp_rate_C_per_hr: 600
       duration_h: 3
       additive: "Na"
@@ -380,29 +379,19 @@ campaigns:
     Na2O_activity_gamma: [1.0e-3, 1.0e-2]   # provenance: docs/chemistry-provenance.yaml::gamma_alkali_melt_activity; NaO0.5 value/range from REF-013/REF-019/REF-050; DOI 10.1016/j.gca.2019.06.021 / 10.2138/rmg.2018.84.11
     delta_G_shift_kJ_per_mol: [50, 80]       # due to low activity coefficient
     slag_solubility_limit_wt_pct: [8, 12]    # Na2O/K2O oxide equivalent
-    soft_endpoint:
-      type: "species_evaporation_rate_below_after_min_hold"
+    endpoint:
+      type: "pO2_return_to_setpoint"
       species_monitored: ["Na", "K"]
-      min_hold_hr: 6
-      # C4's Mg floor is 0.020 kg/h / 24.305 kg/kmol =
-      # 0.000822876 kmol/h. Preserve that metal-atom molar signal
-      # floor: multiply by 22.98976928 kg/kmol Na and 39.0983 kg/kmol K.
-      threshold_kg_hr_by_species:
-        Na: 0.018917728269903313
-        K: 0.032173050812590004
-      sustained_decay_samples: 2
-      # A residual larger than one extra day at the endpoint rate is loud.
-      tail_budget_hr: 24
     max_hold_hr:
       C3_K:
-        A_staged: 25
+        A_staged: 3
         A: 12
         default: 25
       C3_NA:
-        A_staged: 35
+        A_staged: 3
         A: 18
         default: 35
-    termination_class: "C"
+    termination_class: "A"
     duration_after_pathA_h: [10, 18]
     duration_after_pathB_h_per_phase: [20, 35]
     notes: >
@@ -1278,10 +1267,7 @@ endpoint_criteria:
     C2B:
       criterion: "Fe signal decays to <5% peak"
     C3:
-      criterion: >
-        After the reduction hold, keep the 1520-1680 C bakeout active until
-        Na/K evaporation falls below the molar-equivalent signal floor after
-        the minimum hold; any max-hold exit is a recorded truncation.
+      criterion: "Alkali bakeout pO2 returns to setpoint and holds for 30 min"
     C4:
       criterion: "Mg vapor signal decays to background"
     C5:

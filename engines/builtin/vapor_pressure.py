@@ -6,9 +6,8 @@ pressure dict consumed by evaporation comes from this builtin provider.
 
 The provider:
 
-- reads the two melt-resident oxide accounts,
-  ``process.cleaned_melt`` and ``process.spent_reductant_residue``,
-  and merges them before computing composition and activity,
+- reads ``process.cleaned_melt`` from the account view (the only
+  account it declares),
 - looks up Antoine coefficients from the ``vapor_pressures.yaml``
   payload passed at construction time,
 - combines Ellingham oxide-decomposition equilibrium with phase-correct
@@ -35,9 +34,10 @@ profile says "I CAN be authoritative"; the kernel wiring decides
 whether this build session actually uses this provider as the
 authority or as fallback.
 
-Account declaration: the cleaned-melt and spent-reductant-residue pools
-only. The provider must not see gas / metal / sulfide / salt accounts;
-the kernel filter enforces this.
+Account declaration: ``process.cleaned_melt`` only.  The provider must
+not see gas / metal / sulfide / salt accounts -- the kernel filter
+enforces this.  Mirrors the same constraint AlphaMELTS has (binding
+spec §7).
 """
 
 from __future__ import annotations
@@ -55,11 +55,7 @@ from engines.builtin._common import (
     resolve_transport_pO2_bar,
 )
 from simulator.chemistry.kernel.capabilities import CapabilityProfile, ChemistryIntent
-from simulator.chemistry.kernel.dto import (
-    IntentRequest,
-    IntentResult,
-    ProviderAccountView,
-)
+from simulator.chemistry.kernel.dto import IntentRequest, IntentResult
 from simulator.chemistry.kernel.provider import ChemistryProvider
 
 
@@ -995,10 +991,6 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
     name = "builtin-vapor-pressure"
 
     DECLARED_ACCOUNT = "process.cleaned_melt"
-    DECLARED_ACCOUNTS = frozenset({
-        DECLARED_ACCOUNT,
-        "process.spent_reductant_residue",
-    })
 
     def __init__(
         self,
@@ -1012,7 +1004,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             provider_id="builtin-vapor-pressure",
             intents=frozenset({ChemistryIntent.VAPOR_PRESSURE}),
             is_authoritative_for=frozenset({ChemistryIntent.VAPOR_PRESSURE}),
-            declared_accounts=self.DECLARED_ACCOUNTS,
+            declared_accounts=frozenset({self.DECLARED_ACCOUNT}),
         )
 
     def dispatch(self, request: IntentRequest) -> IntentResult:
@@ -1068,32 +1060,19 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 max(melt_dissociation_pO2_bar, 1e-30),
                 1e300,
             )
-        melt_account_mol: dict[str, float] = {}
-        for account in self.DECLARED_ACCOUNTS:
-            for species, raw_mol in (
-                request.account_view.accounts.get(account, {}) or {}
-            ).items():
-                melt_account_mol[str(species)] = (
-                    melt_account_mol.get(str(species), 0.0)
-                    + float(raw_mol)
-                )
-        merged_melt_view = ProviderAccountView(
-            accounts={self.DECLARED_ACCOUNT: melt_account_mol},
-            species_formula_registry=(
-                request.account_view.species_formula_registry
-            ),
-        )
         comp_wt = composition_wt_pct_from_account_view(
-            merged_melt_view,
-            self.DECLARED_ACCOUNT,
+            request.account_view, self.DECLARED_ACCOUNT
         )
         from simulator.chemistry.structural_activity import (
             structural_activity_diagnostic,
         )
 
         structural_activity_reference = structural_activity_diagnostic(
-            melt_account_mol,
+            request.account_view.accounts.get(self.DECLARED_ACCOUNT, {}),
             temperature_K=T_K,
+        )
+        melt_account_mol = dict(
+            request.account_view.accounts.get(self.DECLARED_ACCOUNT, {}) or {}
         )
         feo_activity_diagnostic = None
         if intrinsic_fO2_log is not None:

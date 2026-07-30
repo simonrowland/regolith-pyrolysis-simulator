@@ -7,7 +7,6 @@ import math
 import pytest
 
 import simulator.chemistry.phase_context as phase_context_module
-from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
 from simulator.state import CampaignPhase, EvaporationFlux
 from tests.chemistry.conftest import _build_sim
 
@@ -96,108 +95,6 @@ def test_depletion_output_ignores_tier_one_phase_context_fields(
 
     assert actual.species_kg_hr == expected.species_kg_hr
     assert actual.total_kg_hr == expected.total_kg_hr
-
-
-def test_analytic_depletion_includes_melt_resident_spent_reductant_oxide(
-    vapor_pressure_data, feedstocks_data, setpoints_data,
-):
-    sim = _build_sim(
-        "lunar_mare_low_ti",
-        vapor_pressure_data,
-        feedstocks_data,
-        setpoints_data,
-    )
-    spent_na2o_kg = 10.0
-    sim.atom_ledger.load_external(
-        "process.raw_feedstock",
-        {"Na2O": spent_na2o_kg},
-        source="spent reductant depletion regression seed",
-        material_origin="reagent",
-    )
-    sim.atom_ledger.move(
-        "spent_reductant_depletion_regression_seed",
-        "process.raw_feedstock",
-        SPENT_REDUCTANT_RESIDUE_ACCOUNT,
-        {"Na2O": spent_na2o_kg},
-        reason="spent reductant depletion regression seed",
-    )
-    cleaned_na2o_kg = sim.atom_ledger.kg_by_account(
-        "process.cleaned_melt"
-    )["Na2O"]
-    total_na2o_kg = cleaned_na2o_kg + spent_na2o_kg
-    stoich = sim._evaporation_stoich("Na", _species_data(sim, "Na"))
-    raw_rate = total_na2o_kg / stoich["oxide_per_product_kg"]
-
-    smoothed = sim._apply_analytic_evaporation_depletion(
-        _flux({"Na": raw_rate})
-    )
-
-    expected_parent_draw_kg = total_na2o_kg * (-math.expm1(-1.0))
-    actual_parent_draw_kg = (
-        smoothed.species_kg_hr["Na"] * stoich["oxide_per_product_kg"]
-    )
-    cleaned_only_draw_kg = cleaned_na2o_kg * (
-        -math.expm1(-(total_na2o_kg / cleaned_na2o_kg))
-    )
-    assert actual_parent_draw_kg == pytest.approx(
-        expected_parent_draw_kg,
-        rel=1e-12,
-    )
-    assert actual_parent_draw_kg > cleaned_only_draw_kg
-
-
-def test_condensation_route_depletes_spent_only_parent_oxide_pool(
-    vapor_pressure_data, feedstocks_data, setpoints_data,
-):
-    sim = _build_sim(
-        "lunar_mare_low_ti",
-        vapor_pressure_data,
-        feedstocks_data,
-        setpoints_data,
-    )
-    cleaned_na2o_kg = sim.atom_ledger.kg_by_account(
-        "process.cleaned_melt"
-    ).get("Na2O", 0.0)
-    if cleaned_na2o_kg > 1e-12:
-        sim.atom_ledger.move(
-            "spent_only_route_remove_native_na2o",
-            "process.cleaned_melt",
-            "terminal.slag",
-            {"Na2O": cleaned_na2o_kg},
-            reason="spent-only evaporation route regression setup",
-        )
-    sim.atom_ledger.load_external(
-        SPENT_REDUCTANT_RESIDUE_ACCOUNT,
-        {"Na2O": 10.0},
-        source="spent-only evaporation route regression seed",
-        material_origin="reagent",
-    )
-    sim._project_cleaned_melt_from_atom_ledger()
-    smoothed = sim._apply_analytic_evaporation_depletion(
-        _flux({"Na": 1.0})
-    )
-    before_kg = sim.atom_ledger.kg_by_account(
-        SPENT_REDUCTANT_RESIDUE_ACCOUNT
-    )["Na2O"]
-    transition_count_before = len(sim.atom_ledger.transitions)
-
-    sim._configure_condensation_operating_conditions(smoothed)
-    sim._route_to_condensation(smoothed)
-
-    after_kg = sim.atom_ledger.kg_by_account(
-        SPENT_REDUCTANT_RESIDUE_ACCOUNT
-    ).get("Na2O", 0.0)
-    assert after_kg < before_kg
-    assert any(
-        any(
-            lot.account == SPENT_REDUCTANT_RESIDUE_ACCOUNT
-            and lot.species_kg.get("Na2O", 0.0) > 0.0
-            for lot in transition.debits
-        )
-        for transition in sim.atom_ledger.transitions[
-            transition_count_before:
-        ]
-    )
 
 
 def test_o2_consuming_vapors_share_overhead_o2_reactant(

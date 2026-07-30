@@ -617,48 +617,6 @@ metallothermy fix and dual review IDs `codex-36227` and `grok-36559`. Inside the
 treated as temperature-independent; it does not interpolate yields across the crossover band. The
 physics and the crossover values are developed in `docs/concepts.md`.
 
-C3 termination is based on the measured alkali evaporation-rate tail, not on
-the oxygen-fugacity recovery that only says the reduction reaction has ended.
-After the three-hour cool injection leg, the staged recipe targets 1600 °C
-(inside the declared 1520–1680 °C bakeout band) until every monitored alkali
-rate remains below its species threshold for two authorized, in-domain
-bakeout samples after at least six campaign hours. The
-thresholds preserve the existing C4 endpoint's metal-molar signal floor:
-
-`0.020 kg Mg/h ÷ 24.305 kg Mg/kmol = 0.00082287595 kmol metal/h`;
-therefore Na uses `0.00082287595 × 22.98976928 = 0.01891773 kg/h`
-and K uses `0.00082287595 × 39.0983 = 0.03217305 kg/h`. The units reduce
-to kg/h. This is deliberately an equal metal-atom molar-rate floor, not
-an equal oxygen-equivalent floor: MgO releases 0.5 mol O₂ per mol Mg,
-whereas Na₂O/K₂O release 0.25 mol O₂ per mol alkali atom. Temperature and
-falling Na₂O/K₂O activity remain in the live
-Hertz–Knudsen evaporation rate rather than being folded into the endpoint
-threshold a second time. As a sanity bound, one additional day at the
-threshold represents 0.454 kg Na or 0.772 kg K (0.32% and 1.38% of the
-canonical 140 kg Na and 56 kg K inventories). A residual above that bound
-is reported as incomplete melt clearance. The disposition axis is independent:
-reagent-origin alkali in overhead, terminal offgas, or the condenser path is
-recoverable credit for restocking between charges; wall deposits and
-irrecoverable vents are losses. Both axes are emitted as absolute kilograms
-against the alkali credit line, with no blended recovery fraction. The finite
-campaign cap remains a hang backstop, but reaching it emits a structured
-`truncated` diagnostic rather than claiming successful melt clearance.
-
-The duration-only 2026-07-29 isolation holds the current temperature,
-vapor-pressure, spent-residue, and ledger model fixed and changes only the
-C3_NA cap from 3 h to 6 h. Both cases retain 60.882 kg of reagent-origin Na
-in spent Na₂O, hold 17.132 kg in recoverable overhead/offgas disposition, and
-terminate as truncated. The extra time only moves 6.411 kg Na from overhead
-to terminal offgas while drawing more gross credit to replenish inventory;
-neither melt clearance nor disposition improves. The earlier percentage
-comparison blended those axes. The prior zero-melt-bound result depended on
-the separately reviewed redox candidate-capacity refusal and cannot be
-attributed to this C3 endpoint change.
-
-Irrecoverable-loss output explicitly marks wall-deposit mass as provisional
-pending t-475 because the wall local-pressure path currently uses
-pure-component `P_sat(T_melt)` rather than species partial pressure.
-
 C6 uses the same Ellingham-margin gate for Mg/Al₂O₃. The JANAF-4th multiphase fit puts the
 Mg/Al₂O₃ crossover at 1471.4 °C; the local slope near 1430-1440 °C is -0.194210
 kJ/mol-O₂/°C, so each degree below the crossover buys about +0.194210 kJ/mol-O₂ of standard-state
@@ -719,12 +677,6 @@ regime, so it leaves the system without re-equilibrating with the melt — apply
 tiny term does not change the physics (the oxygen escapes ballistically either way), so the floor is
 moot precisely where it fires. Graded range/saturation refusals still apply *above* the floor, where a
 real capacity meets an out-of-range or non-finite demand.
-The same refusal is evaluated at the proposed post-source state: if a finite
-Euler step would land where `C_m <= 1e-15`, the source is recorded as
-`redox_candidate_no_melt_redox_capacity` and the reservoir remains at its
-last supported state. This closes the one-step loophole where a barely
-nonzero starting capacity could produce a finite but enormous fO₂ jump and
-only become capacity-free after the corrupting update.
 <!-- impl: §7.4 -> simulator/core.py PyrolysisSimulator._melt_redox_source_capacity_mol_per_ln_fO2:4274 — C_m liquid_fraction -->
 <!-- impl: §7.4 -> simulator/core.py PyrolysisSimulator._apply_oxygen_reservoir_redox_source_terms:4489 — negligible-mol redox floor -->
 

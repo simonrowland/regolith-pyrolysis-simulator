@@ -6,8 +6,7 @@ Covers:
 
 * Capability profile: provider is authoritative for
   ``EVAPORATION_TRANSITION`` and declares the accounts the
-  melt projection touches (``process.cleaned_melt``,
-  ``process.spent_reductant_residue``,
+  legacy transition touches (``process.cleaned_melt``,
   ``process.overhead_gas``, ``process.condensation_train``,
   ``reservoir.fo2_buffer``).
 * Account filter: the kernel filter scopes the provider's view to those
@@ -97,12 +96,11 @@ def test_provider_declares_only_evaporation_transition_intent():
 
 
 @pytest.mark.xdist_group("serial")
-def test_provider_declares_melt_projection_and_evaporation_accounts():
+def test_provider_declares_four_evaporation_accounts():
     provider = BuiltinEvaporationTransitionProvider()
     profile = provider.capability_profile()
     assert profile.declared_accounts == frozenset({
         "process.cleaned_melt",
-        "process.spent_reductant_residue",
         "process.overhead_gas",
         "process.condensation_train",
         "reservoir.fo2_buffer",
@@ -119,7 +117,7 @@ def test_kernel_filters_provider_to_declared_accounts_only(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
     """When other accounts hold material, the provider must see ONLY the
-    declared evaporation accounts. The kernel account filter is the
+    three declared evaporation accounts. The kernel account filter is the
     enforcer (binding spec §7)."""
 
     sim = _build_sim(
@@ -166,7 +164,6 @@ def test_kernel_filters_provider_to_declared_accounts_only(
     assert seen_accounts, "provider was never dispatched"
     expected = frozenset({
         "process.cleaned_melt",
-        "process.spent_reductant_residue",
         "process.overhead_gas",
         "process.condensation_train",
         "reservoir.fo2_buffer",
@@ -387,61 +384,6 @@ def test_provider_emits_expected_proposal_for_known_inputs(
         )
 
 
-@pytest.mark.xdist_group("serial")
-def test_provider_debits_native_and_spent_oxide_in_pool_ratio(
-    vapor_pressure_data, feedstocks_data, setpoints_data
-):
-    sim = _build_sim(
-        "lunar_mare_low_ti",
-        vapor_pressure_data,
-        feedstocks_data,
-        setpoints_data,
-    )
-    canonical_stoich = sim._evaporation_stoich(
-        "Na",
-        sim.vapor_pressures.get("metals", {}).get("Na", {}),
-    )
-    request = IntentRequest(
-        intent=ChemistryIntent.EVAPORATION_TRANSITION,
-        account_view=ProviderAccountView(
-            accounts={
-                "process.cleaned_melt": {"Na2O": 8.0},
-                "process.spent_reductant_residue": {"Na2O": 2.0},
-            },
-            species_formula_registry=sim.species_formula_registry,
-        ),
-        temperature_C=1600.0,
-        pressure_bar=0.001,
-        control_inputs={
-            "species": "Na",
-            "stoich": canonical_stoich,
-            "sp_data": {},
-            "rate_kg_hr": 1.0,
-            "remaining_kg_hr": 0.0,
-            "dt_hr": 1.0,
-            "available_kg": 10.0,
-            "parent_oxide_source_kg_by_account": {
-                "process.cleaned_melt": 8.0,
-                "process.spent_reductant_residue": 2.0,
-            },
-        },
-    )
-
-    result = BuiltinEvaporationTransitionProvider().dispatch(request)
-
-    assert result.status == "ok"
-    assert result.transition is not None
-    debits = result.transition.debits
-    cleaned_mol = debits["process.cleaned_melt"]["Na2O"]
-    spent_mol = debits["process.spent_reductant_residue"]["Na2O"]
-    assert cleaned_mol / spent_mol == pytest.approx(4.0)
-    assert result.diagnostic["parent_oxide_source_kg_by_account"] == {
-        "process.cleaned_melt": 8.0,
-        "process.spent_reductant_residue": 2.0,
-    }
-    assert max(abs(value) for value in result.transition.atom_balance_proof.values()) < 1e-9
-
-
 # ---------------------------------------------------------------------------
 # 5. Smoke parity: full C0 -> C6 run keeps mass balance + non-zero count
 # ---------------------------------------------------------------------------
@@ -588,14 +530,9 @@ def test_provider_matches_legacy_credit_evaporation_transition_pattern(
 
     legal_accounts = {
         "process.cleaned_melt",
-        "process.spent_reductant_residue",
         "process.overhead_gas",
         "process.condensation_train",
         "reservoir.fo2_buffer",
-    }
-    legal_credit_accounts = legal_accounts - {
-        "process.cleaned_melt",
-        "process.spent_reductant_residue",
     }
     for trans in evap_transitions:
         for lot in trans.debits:
@@ -604,21 +541,15 @@ def test_provider_matches_legacy_credit_evaporation_transition_pattern(
                 and lot.account == "process.overhead_gas"
                 and set(lot.species_kg) == {"O2"}
             )
-            assert (
-                lot.account in {
-                    "process.cleaned_melt",
-                    "process.spent_reductant_residue",
-                }
-                or is_cro2_o2_reactant
-            ), (
+            assert lot.account == "process.cleaned_melt" or is_cro2_o2_reactant, (
                 f"evap transition {trans.name} debits unexpected account "
-                f"{lot.account!r}; expected a melt-resident source"
+                f"{lot.account!r}; expected process.cleaned_melt"
             )
         for lot in trans.credits:
-            assert lot.account in legal_credit_accounts, (
+            assert lot.account in legal_accounts - {"process.cleaned_melt"}, (
                 f"evap transition {trans.name} credits unexpected account "
                 f"{lot.account!r}; legal credits are "
-                f"{sorted(legal_credit_accounts)}"
+                f"{sorted(legal_accounts - {'process.cleaned_melt'})}"
             )
         # Per-transition mass closure: tight (1 mg) bound.
         debit_kg = trans.debit_mass_kg(sim.atom_ledger.registry)

@@ -7,8 +7,7 @@ exactly -- this is a refactor of where the LedgerTransition is built, not
 a re-derivation of the stoich math (which still routes through
 ``_evaporation_stoich`` at the caller). The provider:
 
-- reads ``process.cleaned_melt``, ``process.spent_reductant_residue``,
-  ``process.overhead_gas``,
+- reads ``process.cleaned_melt``, ``process.overhead_gas``,
   ``process.condensation_train``, and ``reservoir.fo2_buffer`` from the
   account view -- the accounts the evaporation transition touches (see
   "Account declaration" below for the rationale),
@@ -34,12 +33,9 @@ a re-derivation of the stoich math (which still routes through
   * ``dt_hr`` -- the tick duration in hours (always 1.0 in the current
     simulator; passed through explicitly so the provider stays unit-
     correct if the simulator's tick step ever changes),
-  * ``available_kg`` -- the parent-oxide kg currently held across the
-    melt-resident source accounts. Grouped analytic depletion already
-    applied before dispatch; this only preserves the no-stock short-circuit.
-  * ``parent_oxide_source_kg_by_account`` -- that availability split between
-    native ``process.cleaned_melt`` and melt-resident
-    ``process.spent_reductant_residue``.
+  * ``available_kg`` -- the parent-oxide kg currently held in
+    ``process.cleaned_melt``. Grouped analytic depletion already applied
+    before dispatch; this only preserves the no-stock short-circuit.
 
 Returns an :class:`IntentResult` with ``transition`` populated by a
 :class:`LedgerTransitionProposal` (per-species debit/credit pair) and a
@@ -52,15 +48,13 @@ where ``ChemistryKernel.commit_batch`` actually engages -- atom-balance
 validation runs both at dispatch time (in ``validate_atom_balance``) and
 again at commit time (re-validated by ``commit_batch``).
 
-Account declaration: ``process.cleaned_melt``,
-``process.spent_reductant_residue``, ``process.overhead_gas``,
+Account declaration: ``process.cleaned_melt``, ``process.overhead_gas``,
 ``process.condensation_train``, ``reservoir.fo2_buffer``. The legacy
 :meth:`_credit_evaporation_transition` builds a single
 :class:`LedgerTransition` with these accounts on its debit/credit
 sides; the provider must declare every account the proposal touches
 (``validate_proposal_accounts`` enforces this with
-:class:`AccountFilterViolation`). The melt-resident source accounts are
-debits in their available pool ratio; the
+:class:`AccountFilterViolation`). The cleaned-melt is the debit; the
 condensation_train is credited with the condensed fraction (in mol if
 the species disproportionates, in kg otherwise -- the kernel's
 proposal layer is mol-native, so the provider converts); the overhead_gas
@@ -105,7 +99,6 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
 
     DECLARED_ACCOUNTS = frozenset({
         "process.cleaned_melt",
-        "process.spent_reductant_residue",
         "process.overhead_gas",
         "process.condensation_train",
         "reservoir.fo2_buffer",
@@ -172,59 +165,6 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         dt_hr = float(controls.get("dt_hr", 1.0))
         sp_data = dict(controls.get("sp_data") or {})
         available_kg = float(controls.get("available_kg") or 0.0)
-        raw_source_kg_by_account = controls.get(
-            "parent_oxide_source_kg_by_account"
-        )
-        if raw_source_kg_by_account is None:
-            source_kg_by_account = {
-                "process.cleaned_melt": available_kg,
-            }
-        elif isinstance(raw_source_kg_by_account, Mapping):
-            source_kg_by_account = {}
-            for account, raw_kg in raw_source_kg_by_account.items():
-                account_name = str(account)
-                if account_name not in {
-                    "process.cleaned_melt",
-                    "process.spent_reductant_residue",
-                }:
-                    return IntentResult(
-                        intent=ChemistryIntent.EVAPORATION_TRANSITION,
-                        status="unsupported",
-                        control_audit=control_audit,
-                        diagnostic={
-                            "reason": (
-                                "parent-oxide source account is outside "
-                                f"the melt projection domain: {account_name}"
-                            ),
-                        },
-                    )
-                source_kg = float(raw_kg)
-                if not math.isfinite(source_kg) or source_kg < 0.0:
-                    return IntentResult(
-                        intent=ChemistryIntent.EVAPORATION_TRANSITION,
-                        status="unsupported",
-                        control_audit=control_audit,
-                        diagnostic={
-                            "reason": (
-                                "parent-oxide source inventory must be "
-                                "finite and non-negative"
-                            ),
-                        },
-                    )
-                if source_kg > 1e-12:
-                    source_kg_by_account[account_name] = source_kg
-        else:
-            return IntentResult(
-                intent=ChemistryIntent.EVAPORATION_TRANSITION,
-                status="unsupported",
-                control_audit=control_audit,
-                diagnostic={
-                    "reason": (
-                        "parent_oxide_source_kg_by_account must be a mapping"
-                    ),
-                },
-            )
-        source_total_kg = sum(source_kg_by_account.values())
 
         # Negative dt_hr or species the caller flagged should never reach
         # here; if they do, surface as 'ok' with no transition (matches
@@ -233,7 +173,7 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         product_kg = rate_kg_hr * dt_hr
         O2_kg = rate_kg_hr * dt_hr * O2_per_product_kg
 
-        if oxide_removed <= 1e-12 or source_total_kg <= 1e-12:
+        if oxide_removed <= 1e-12 or available_kg <= 1e-12:
             return IntentResult(
                 intent=ChemistryIntent.EVAPORATION_TRANSITION,
                 status="ok",
@@ -302,7 +242,7 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
 
         # ------------------------------------------------------------------
         # Build the mol-native proposal. Per-account species_mol dicts:
-        #   debits:  melt-resident source accounts -> {parent_oxide: mol}
+        #   debits:  process.cleaned_melt -> {parent_oxide: mol}
         #   credits: process.condensation_train -> {product: mol, ...}
         #            process.overhead_gas        -> {species: mol, O2: mol}
         #            reservoir.fo2_buffer        -> {O2: mol}
@@ -313,12 +253,7 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         parent_oxide_formula = resolve_species_formula(parent_oxide, registry)
         oxide_mol = oxide_removed / parent_oxide_formula.molar_mass_kg_per_mol()
         if oxide_mol > 0.0:
-            for account, source_kg in source_kg_by_account.items():
-                account_oxide_mol = oxide_mol * source_kg / source_total_kg
-                if account_oxide_mol > 0.0:
-                    debits[account] = {
-                        parent_oxide: account_oxide_mol,
-                    }
+            debits["process.cleaned_melt"] = {parent_oxide: oxide_mol}
 
         if condensed_kg > 1e-12 and condensed_product_mol:
             credits["process.condensation_train"] = dict(condensed_product_mol)
@@ -378,9 +313,6 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
             diagnostic={
                 "credited_condensed_kg": float(condensed_kg),
                 "applied_scale": float(scale),
-                "parent_oxide_source_kg_by_account": dict(
-                    source_kg_by_account
-                ),
             },
         )
 
