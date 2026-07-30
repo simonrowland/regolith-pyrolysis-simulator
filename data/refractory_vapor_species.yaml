@@ -1,0 +1,319 @@
+schema_version: 1
+standard_pressure_pa: 100000.0
+interpolation: linear_in_log10_kf
+out_of_range_policy: frozen_dlog10_kf_d_inverse_temperature_with_t406_input_diagnostics
+extension_policy:
+  maximum_delta_temperature_K: 300.0
+  governing_maximum_delta_log10_pressure: 1.5
+  coefficient_projection_diagnostic_maximum_delta_log10_kf: 1.5
+  maximum_delta_inverse_temperature_K_inv: 2.0e-4
+  outside_policy: return_raw_model_limited_result_without_claiming_an_upper_loss_envelope
+  note: resultant carrier-pressure extrapolation and its upper-loss envelope are not inferred from coefficient distances
+kinetic_model:
+  evaporation_coefficient: 1.0
+  classification: included_carrier_equilibrium_effusion_sum
+  note: >
+    alpha=1 is a kinetic ceiling only for carriers listed in each material's
+    gas_species. It is NOT an absolute upper bound on total recession: omitted
+    carriers in unmodeled_species can both increase mass loss and shift the
+    self-buffered surface pO2 of the included set. Downstream lifespan/liner
+    ceilings must not treat this classification as a proven total bound.
+provenance:
+  database: NIST-JANAF Thermochemical Tables, Fourth Edition, SRD 13
+  doi: 10.18434/T42S31
+  note: >
+    Values are the published dimensionless log10(Kf) at p° = 0.1 MPa.
+    The stored 1500-2300 K grid is the runtime interpolation range; requests
+    outside it retain the terminal slope and are marked as extrapolations.
+
+gas_species:
+  O:
+    formula: O
+    source: NIST-JANAF O-001, Oxygen atom (g), accessed 2026-07-29
+    source_url: https://janaf.nist.gov/tables/O-001.html
+    valid_temperature_K: [1500.0, 2300.0]
+    log10_kf: {1500: -5.392, 1600: -4.839, 1700: -4.350, 1800: -3.915, 1900: -3.525, 2000: -3.175, 2100: -2.857, 2200: -2.568, 2300: -2.304}
+  O2:
+    formula: O2
+    source: NIST-JANAF O-029, Oxygen (O2, ref), accessed 2026-07-29
+    source_url: https://janaf.nist.gov/tables/O-029.html
+    valid_temperature_K: [1500.0, 2300.0]
+    log10_kf: {1500: 0.0, 1600: 0.0, 1700: 0.0, 1800: 0.0, 1900: 0.0, 2000: 0.0, 2100: 0.0, 2200: 0.0, 2300: 0.0}
+  Al:
+    formula: Al
+    source: NIST-JANAF Al-005, Aluminum (g), accessed 2026-07-29
+    source_url: https://janaf.nist.gov/tables/Al-005.html
+    valid_temperature_K: [1500.0, 2300.0]
+    log10_kf: {1500: -4.872, 1600: -4.203, 1700: -3.614, 1800: -3.093, 1900: -2.628, 2000: -2.211, 2100: -1.836, 2200: -1.495, 2300: -1.186}
+  Al2:
+    formula: Al2
+    source: NIST-JANAF Al-080, Aluminum dimer (g), accessed 2026-07-29
+    source_url: https://janaf.nist.gov/tables/Al-080.html
+    valid_temperature_K: [1500.0, 2300.0]
+    log10_kf: {1500: -8.755, 1600: -7.792, 1700: -6.947, 1800: -6.200, 1900: -5.535, 2000: -4.939, 2100: -4.403, 2200: -3.919, 2300: -3.479}
+  AlO:
+    formula: AlO
+    source: NIST-JANAF Al-074, Aluminum oxide (AlO, g), accessed 2026-07-29
+    source_url: https://janaf.nist.gov/tables/Al-074.html
+    valid_temperature_K: [1500.0, 2300.0]
+    log10_kf: {1500: 1.614, 1600: 1.708, 1700: 1.790, 1800: 1.862, 1900: 1.925, 2000: 1.981, 2100: 2.031, 2200: 2.076, 2300: 2.116}
+  AlO2:
+    formula: AlO2
+    source: NIST-JANAF Al-077, Aluminum oxide (AlO2, g), accessed 2026-07-29
+    source_url: https://janaf.nist.gov/tables/Al-077.html
+    valid_temperature_K: [1500.0, 2300.0]
+    log10_kf: {1500: 3.593, 1600: 3.369, 1700: 3.170, 1800: 2.991, 1900: 2.830, 2000: 2.685, 2100: 2.552, 2200: 2.430, 2300: 2.319}
+  Al2O:
+    formula: Al2O
+    source: NIST-JANAF Al-092, Aluminum oxide (Al2O, g), accessed 2026-07-29
+    source_url: https://janaf.nist.gov/tables/Al-092.html
+    valid_temperature_K: [1500.0, 2300.0]
+    log10_kf: {1500: 8.868, 1600: 8.458, 1700: 8.092, 1800: 7.764, 1900: 7.466, 2000: 7.196, 2100: 6.949, 2200: 6.722, 2300: 6.513}
+  Al2O2:
+    formula: Al2O2
+    source: NIST-JANAF Al-094, Aluminum oxide ((AlO)2, g), accessed 2026-07-29
+    source_url: https://janaf.nist.gov/tables/Al-094.html
+    valid_temperature_K: [1500.0, 2300.0]
+    log10_kf: {1500: 13.820, 1600: 12.876, 1700: 12.039, 1800: 11.292, 1900: 10.621, 2000: 10.014, 2100: 9.463, 2200: 8.960, 2300: 8.498}
+  Ca:
+    formula: Ca
+    source: NIST-JANAF Ca-006, Calcium (g), accessed 2026-07-29
+    source_url: https://janaf.nist.gov/tables/Ca-006.html
+    valid_temperature_K: [1500.0, 2300.0]
+    log10_kf: {1500: -0.812, 1600: -0.480, 1700: -0.191, 1800: 0.0, 1900: 0.0, 2000: 0.0, 2100: 0.0, 2200: 0.0, 2300: 0.0}
+  CaO:
+    formula: CaO
+    source: NIST-JANAF Ca-030, Calcium oxide (g), accessed 2026-07-29
+    source_url: https://janaf.nist.gov/tables/Ca-030.html
+    valid_temperature_K: [1500.0, 2300.0]
+    log10_kf: {1500: 1.817, 1600: 1.855, 1700: 1.886, 1800: 1.848, 1900: 1.644, 2000: 1.461, 2100: 1.297, 2200: 1.149, 2300: 1.015}
+  Ca2:
+    formula: Ca2
+    source: NIST-JANAF Ca-033, Calcium dimer (g), accessed 2026-07-29
+    source_url: https://janaf.nist.gov/tables/Ca-033.html
+    valid_temperature_K: [1500.0, 2300.0]
+    log10_kf: {1500: -4.437, 1600: -3.850, 1700: -3.341, 1800: -3.026, 1900: -3.089, 2000: -3.148, 2100: -3.204, 2200: -3.257, 2300: -3.308}
+  Mg:
+    formula: Mg
+    source: NIST-JANAF Mg-005, Magnesium (g), accessed 2026-07-29
+    source_url: https://janaf.nist.gov/tables/Mg-005.html
+    valid_temperature_K: [1500.0, 2300.0]
+    log10_kf: {1500: 0.0, 1600: 0.0, 1700: 0.0, 1800: 0.0, 1900: 0.0, 2000: 0.0, 2100: 0.0, 2200: 0.0, 2300: 0.0}
+  MgO:
+    formula: MgO
+    source: NIST-JANAF Mg-011, Magnesium oxide (g), accessed 2026-07-29
+    source_url: https://janaf.nist.gov/tables/Mg-011.html
+    valid_temperature_K: [1500.0, 2300.0]
+    log10_kf: {1500: 1.327, 1600: 1.161, 1700: 1.017, 1800: 0.891, 1900: 0.779, 2000: 0.679, 2100: 0.589, 2200: 0.507, 2300: 0.434}
+  Mg2:
+    formula: Mg2
+    source: NIST-JANAF Mg-027, Magnesium dimer (g), accessed 2026-07-29
+    source_url: https://janaf.nist.gov/tables/Mg-027.html
+    valid_temperature_K: [1500.0, 2300.0]
+    log10_kf: {1500: -3.579, 1600: -3.649, 1700: -3.713, 1800: -3.775, 1900: -3.833, 2000: -3.888, 2100: -3.940, 2200: -3.990, 2300: -4.037}
+  Si:
+    formula: Si
+    source: NIST-JANAF Si-005, Silicon (g), accessed 2026-07-29
+    source_url: https://janaf.nist.gov/tables/Si-005.html
+    valid_temperature_K: [1500.0, 2300.0]
+    log10_kf: {1500: -7.970, 1600: -7.003, 1700: -6.165, 1800: -5.494, 1900: -4.895, 2000: -4.356, 2100: -3.870, 2200: -3.428, 2300: -3.025}
+  Si2:
+    formula: Si2
+    source: NIST-JANAF Si-008, Silicon dimer (g), accessed 2026-07-29
+    source_url: https://janaf.nist.gov/tables/Si-008.html
+    valid_temperature_K: [1500.0, 2300.0]
+    log10_kf: {1500: -10.855, 1600: -9.597, 1700: -8.518, 1800: -7.707, 1900: -6.983, 2000: -6.334, 2100: -5.748, 2200: -5.216, 2300: -4.732}
+  Si3:
+    formula: Si3
+    source: NIST-JANAF Si-009, Silicon trimer (g), accessed 2026-07-29
+    source_url: https://janaf.nist.gov/tables/Si-009.html
+    valid_temperature_K: [1500.0, 2300.0]
+    log10_kf: {1500: -11.590, 1600: -10.250, 1700: -9.113, 1800: -8.327, 1900: -7.626, 2000: -6.999, 2100: -6.433, 2200: -5.921, 2300: -5.455}
+  SiO:
+    formula: SiO
+    source: NIST-JANAF O-012, Silicon oxide (SiO, g), accessed 2026-07-29
+    source_url: https://janaf.nist.gov/tables/O-012.html
+    valid_temperature_K: [1500.0, 2300.0]
+    log10_kf: {1500: 7.926, 1600: 7.686, 1700: 7.458, 1800: 7.181, 1900: 6.932, 2000: 6.706, 2100: 6.501, 2200: 6.313, 2300: 6.141}
+  SiO2:
+    formula: SiO2
+    source: NIST-JANAF O-040, Silicon oxide (SiO2, g), accessed 2026-07-29
+    source_url: https://janaf.nist.gov/tables/O-040.html
+    valid_temperature_K: [1500.0, 2300.0]
+    log10_kf: {1500: 10.745, 1600: 10.070, 1700: 9.461, 1800: 8.845, 1900: 8.293, 2000: 7.796, 2100: 7.346, 2200: 6.937, 2300: 6.562}
+  Ti:
+    formula: Ti
+    source: NIST-JANAF Ti-006, Titanium (g), accessed 2026-07-29
+    source_url: https://janaf.nist.gov/tables/Ti-006.html
+    valid_temperature_K: [1500.0, 2300.0]
+    log10_kf: {1500: -8.969, 1600: -7.969, 1700: -7.089, 1800: -6.309, 1900: -5.612, 2000: -4.999, 2100: -4.455, 2200: -3.962, 2300: -3.514}
+  TiO:
+    formula: TiO
+    source: NIST-JANAF O-022, Titanium oxide (TiO, g), accessed 2026-07-29
+    source_url: https://janaf.nist.gov/tables/O-022.html
+    valid_temperature_K: [1500.0, 2300.0]
+    log10_kf: {1500: 2.925, 1600: 3.007, 1700: 3.077, 1800: 3.137, 1900: 3.188, 2000: 3.219, 2100: 3.237, 2200: 3.251, 2300: 3.260}
+  TiO2:
+    formula: TiO2
+    source: NIST-JANAF O-046, Titanium oxide (TiO2, g), accessed 2026-07-29
+    source_url: https://janaf.nist.gov/tables/O-046.html
+    valid_temperature_K: [1500.0, 2300.0]
+    log10_kf: {1500: 11.465, 1600: 10.764, 1700: 10.143, 1800: 9.589, 1900: 9.091, 2000: 8.628, 2100: 8.199, 2200: 7.806, 2300: 7.444}
+
+condensed_phases:
+  Al2O3:
+    formula: Al2O3
+    source: NIST-JANAF Al-096, alpha-Al2O3 (cr), accessed 2026-07-29
+    source_url: https://janaf.nist.gov/tables/Al-096.html
+    valid_temperature_K: [1500.0, 2300.0]
+    log10_kf: {1500: 41.670, 1600: 37.999, 1700: 34.762, 1800: 31.888, 1900: 29.318, 2000: 27.008, 2100: 24.920, 2200: 23.023, 2300: 21.293}
+  CaO:
+    formula: CaO
+    source: NIST-JANAF Ca-027, Calcium oxide (cr), accessed 2026-07-29
+    source_url: https://janaf.nist.gov/tables/Ca-027.html
+    valid_temperature_K: [1500.0, 2300.0]
+    log10_kf: {1500: 16.570, 1600: 15.172, 1700: 13.939, 1800: 12.779, 1900: 11.574, 2000: 10.492, 2100: 9.515, 2200: 8.629, 2300: 7.822}
+  MgO:
+    formula: MgO
+    source: NIST-JANAF Mg-008, Magnesium oxide (cr), accessed 2026-07-29
+    source_url: https://janaf.nist.gov/tables/Mg-008.html
+    valid_temperature_K: [1500.0, 2300.0]
+    log10_kf: {1500: 14.722, 1600: 13.125, 1700: 11.719, 1800: 10.472, 1900: 9.358, 2000: 8.358, 2100: 7.455, 2200: 6.636, 2300: 5.890}
+  SiO2:
+    formula: SiO2
+    source: NIST-JANAF O-039, combined SiO2 (cr,l) table, accessed 2026-07-29
+    source_url: https://janaf.nist.gov/tables/O-039.html
+    valid_temperature_K: [1500.0, 2300.0]
+    phase_transitions_K: [1696.0]
+    source_conflict: NIST-JANAF O-039 reports melting at 1696 K, while NBS Special Publication 302 reports about 1983 K; phase identity is unresolved
+    log10_kf: {1500: 22.415, 1600: 20.455, 1700: 18.714, 1800: 17.109, 1900: 15.675, 2000: 14.388, 2100: 13.226, 2200: 12.172, 2300: 11.212}
+  TiO2:
+    formula: TiO2
+    source: NIST-JANAF O-045, phase-correct TiO2 (cr,l), accessed 2026-07-29
+    source_url: https://janaf.nist.gov/tables/O-045.html
+    valid_temperature_K: [1500.0, 2300.0]
+    phase_transitions_K: [2130.0]
+    log10_kf: {1500: 23.464, 1600: 21.421, 1700: 19.621, 1800: 18.021, 1900: 16.591, 2000: 15.293, 2100: 14.110, 2200: 13.087, 2300: 12.176}
+  MgAl2O4:
+    formula: MgAl2O4
+    source: NIST-JANAF Al-089, Magnesium aluminate spinel (cr), accessed 2026-07-29
+    source_url: https://janaf.nist.gov/tables/Al-089.html
+    valid_temperature_K: [1500.0, 2300.0]
+    log10_kf: {1500: 57.718, 1600: 52.410, 1700: 47.735, 1800: 43.588, 1900: 39.885, 2000: 36.560, 2100: 33.558, 2200: 30.836, 2300: 28.358}
+
+materials:
+  Al2O3:
+    formula: Al2O3
+    execution_model: pure_oxide
+    certification_status: provisional_incomplete_species
+    gas_species: [Al, Al2, AlO, AlO2, Al2O, Al2O2, O, O2]
+    unmodeled_species:
+      Al2O3:
+        reason: NASA identifies Al2O3(g), but no NIST-JANAF log10(Kf) table exists
+        evidence: NASA/TM-2005-213625 Figure 8
+    screening_candidates:
+      O3_O4:
+        status: missing_quantitative_oxygen_closure_screen
+        evidence: no evidence found that they carry condensed mass at 1500-2300 K
+  CaO:
+    formula: CaO
+    execution_model: pure_oxide
+    certification_status: provisional_boundary_mismatch
+    gas_species: [Ca, Ca2, CaO, O, O2]
+    screening_candidates:
+      O3_O4:
+        status: missing_quantitative_oxygen_closure_screen
+        evidence: no evidence found that they carry condensed mass at 1500-2300 K
+  MgO:
+    formula: MgO
+    execution_model: pure_oxide
+    certification_status: provisional_species_screen
+    gas_species: [Mg, Mg2, MgO, O, O2]
+    screening_candidates:
+      O3_O4:
+        status: missing_quantitative_oxygen_closure_screen
+        evidence: no evidence found that they carry condensed mass at 1500-2300 K
+  SiO2:
+    formula: SiO2
+    execution_model: pure_oxide
+    certification_status: provisional_incomplete_species_and_source_conflict
+    gas_species: [Si, Si2, Si3, SiO, SiO2, O, O2]
+    unmodeled_species:
+      Si2O2:
+        reason: no NIST-JANAF or redistributable primary coefficient set found
+        evidence: species-gap review 2026-07-29
+    screening_candidates:
+      O3_O4:
+        status: missing_quantitative_oxygen_closure_screen
+        evidence: no evidence found that they carry condensed mass at 1500-2300 K
+  TiO2:
+    formula: TiO2
+    execution_model: pure_oxide
+    certification_status: provisional_condensed_phase_stability
+    gas_species: [Ti, TiO, TiO2, O, O2]
+    screening_candidates:
+      Ti_clusters:
+        status: missing_quantitative_screen
+        evidence: no load-bearing neutral titanium cluster source identified
+      condensed_suboxides:
+        status: outside_phase_authority
+        evidence: reducing pO2 may stabilize Magneli or Ti2O3 phases instead of rutile
+      O3_O4:
+        status: missing_quantitative_oxygen_closure_screen
+        evidence: no evidence found that they carry condensed mass at 1500-2300 K
+  MgAl2O4:
+    formula: MgAl2O4
+    execution_model: refused_noncongruent
+    certification_status: refused_noncongruent
+    refusal_reason: >
+      Shornikov 2017 KEMS finds preferential Mg loss and an Al-rich residual;
+      a forced 1:2 Mg:Al vapor flux is experimentally false.
+    gas_species: [Mg, Mg2, MgO, Al, Al2, AlO, AlO2, Al2O, Al2O2, O, O2]
+    unmodeled_species:
+      MgAlO:
+        reason: observed as a trace spinel vapor but no sourced coefficient set was found
+        evidence: Shornikov 2017, DOI 10.1134/S0036024417010241
+      Al2O3:
+        reason: NASA identifies Al2O3(g), but no NIST-JANAF log10(Kf) table exists
+        evidence: NASA/TM-2005-213625 Figure 8
+  CaAl2O4:
+    formula: CaAl2O4
+    execution_model: refused_missing_phase_model
+    certification_status: refused_missing_phase_model
+    refusal_reason: no sourced high-temperature solid activity model
+    gas_species: [Ca, Ca2, CaO, Al, Al2, AlO, AlO2, Al2O, Al2O2, O, O2]
+    unmodeled_species: &caalo_gap
+      CaAlO:
+        reason: observed over CaO-Al2O3 melts but no sourced coefficient set was found
+        evidence: Shornikov et al. 1997, Russian Journal of Physical Chemistry 71, 19-22
+      Al2O3:
+        reason: NASA identifies Al2O3(g), but no NIST-JANAF log10(Kf) table exists
+        evidence: NASA/TM-2005-213625 Figure 8
+  CaAl4O7:
+    formula: CaAl4O7
+    execution_model: refused_missing_phase_model
+    certification_status: refused_missing_phase_model
+    refusal_reason: solid EMF data end at 1200 K; no sourced high-temperature activity model
+    gas_species: [Ca, Ca2, CaO, Al, Al2, AlO, AlO2, Al2O, Al2O2, O, O2]
+    unmodeled_species: *caalo_gap
+  CaAl12O19:
+    formula: CaAl12O19
+    execution_model: refused_missing_phase_model
+    certification_status: refused_missing_phase_model
+    refusal_reason: solid EMF data end at 1200 K; no sourced high-temperature activity model
+    gas_species: [Ca, Ca2, CaO, Al, Al2, AlO, AlO2, Al2O, Al2O2, O, O2]
+    unmodeled_species: *caalo_gap
+  Ca3Al2O6:
+    formula: Ca3Al2O6
+    execution_model: refused_missing_phase_model
+    certification_status: refused_missing_phase_model
+    refusal_reason: solid EMF data end at 1200 K; no sourced high-temperature activity model
+    gas_species: [Ca, Ca2, CaO, Al, Al2, AlO, AlO2, Al2O, Al2O2, O, O2]
+    unmodeled_species: *caalo_gap
+  Ca12Al14O33:
+    formula: Ca12Al14O33
+    execution_model: refused_missing_phase_model
+    certification_status: refused_missing_phase_model
+    refusal_reason: no sourced high-temperature solid thermodynamics or activity model
+    gas_species: [Ca, Ca2, CaO, Al, Al2, AlO, AlO2, Al2O, Al2O2, O, O2]
+    unmodeled_species: *caalo_gap

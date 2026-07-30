@@ -1,0 +1,62 @@
+schema_version: 1
+purpose: held-out external anchors; runtime refractory thermodynamics must never load this file
+standard_pressure:
+  nist_janaf_pa: 100000.0
+  atmosphere_pa: 101325.0
+
+nist_janaf_named_nodes:
+  temperature_K: 1800.0
+  source: NIST-JANAF Thermochemical Tables, Fourth Edition, SRD 13
+  doi: 10.18434/T42S31
+  log10_kf:
+    O: {value: -3.915, table: O-001, url: https://janaf.nist.gov/tables/O-001.html}
+    Al: {value: -3.093, table: Al-005, url: https://janaf.nist.gov/tables/Al-005.html}
+    AlO: {value: 1.862, table: Al-074, url: https://janaf.nist.gov/tables/Al-074.html}
+    Al2O: {value: 7.764, table: Al-092, url: https://janaf.nist.gov/tables/Al-092.html}
+    CaO: {value: 1.848, table: Ca-030, url: https://janaf.nist.gov/tables/Ca-030.html}
+    MgO: {value: 0.891, table: Mg-011, url: https://janaf.nist.gov/tables/Mg-011.html}
+    SiO: {value: 7.181, table: O-012, url: https://janaf.nist.gov/tables/O-012.html}
+    TiO2: {value: 9.589, table: O-046, url: https://janaf.nist.gov/tables/O-046.html}
+  condensed_log10_kf:
+    Al2O3: {value: 31.888, table: Al-096, url: https://janaf.nist.gov/tables/Al-096.html}
+
+alumina_vacuum_screen:
+  source: NASA/TM-2005-213625, Jacobson and Biering (2005), Figure 8
+  url: https://ntrs.nasa.gov/api/citations/20050180629/downloads/20050180629.pdf
+  aggregate: total_Al_bearing_vapor
+  pressure_bar: 1.0e-10
+  crossing_temperature_K: 1800.0
+  plotted_temperature_tolerance_K: 50.0
+  known_missing_species: Al2O3
+
+cao_reducing_cell_kems:
+  source: S. I. Shornikov, Thermodynamic Study of Calcium Oxide Evaporation under Various Redox Conditions (2025)
+  doi: 10.1007/978-3-031-80664-3_20
+  pressure_uncertainty_relative_max: 0.10
+  raw_pCa:
+    - {temperature_K: 1812.0, pressure_atm: 6.59e-8}
+    - {temperature_K: 1913.0, pressure_atm: 4.09e-7}
+    - {temperature_K: 2000.0, pressure_atm: 1.76e-6}
+    - {temperature_K: 2100.0, pressure_atm: 7.85e-6}
+  fitted_log10_pCa_atm:
+    intercept: 7.76965
+    inverse_temperature_coefficient_K: -27058.1
+    validity_temperature_K: [1812.0, 2100.0]
+  recession_screen:
+    evaporation_coefficient: 1.0
+    classification: reducing_cell_alpha_1_derived_screen_uncited_density
+    # Density multiplies every derived recession point linearly. No recoverable
+    # title/edition/page was found in the 2026-07-29 evidence trail; common
+    # handbook tables list ~3.34 g/cm3 for crystalline CaO, but that is not a
+    # citable primary for this screen. Points below therefore depend on an
+    # uncited density and are evidence-class-downgraded accordingly.
+    density_kg_m3: 3340.0
+    density_citation_status: uncited
+    density_provenance: >
+      uncited common-handbook projection (~3.34 g/cm3 crystalline CaO);
+      no recoverable title/edition/page in the evidence trail — do not invent
+    evidence_class: derived_screen_uncited_density
+    points:
+      - {temperature_K: 1873.15, recession_mm_per_1000h: 20.6}
+      - {temperature_K: 1973.15, recession_mm_per_1000h: 108.5}
+  boundary_warning: reducing molybdenum Knudsen cell is not equivalent to an open-vacuum self-buffered free surface
