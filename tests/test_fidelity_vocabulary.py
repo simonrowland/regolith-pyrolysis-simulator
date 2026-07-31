@@ -3,19 +3,30 @@ from __future__ import annotations
 import pytest
 
 import simulator.backend_names as backend_names
+from simulator.backend_names import (
+    RATIFIED_VAPOUR_ANALYTICAL_EVIDENCE_CLASSES,
+    VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+    VAPOUR_ANALYTICAL_VAPOROCK_CALIBRATED,
+    canonical_backend_name,
+)
 from simulator.fidelity_vocabulary import (
     CANONICAL_DIMENSIONS,
+    CERTIFICATION_CEILING_NEVER,
     CERTIFICATION_DENYLIST,
     DESIGN_LEGACY_MAPPING_ROW_COUNT,
     LEGACY_INTERNAL_ANALYTICAL_VOCABULARY_TOKEN,
     LEGACY_VOCABULARY_TOKENS,
+    STATUS_BEARING_NON_AUTHORITATIVE,
     EvidenceClass,
     FidelityVocabularyTranslationError,
     UnknownFidelityVocabularyTokenError,
+    backend_name_denies_authority,
     canonicalize_fidelity_emission,
+    is_ratified_vapour_analytical_evidence_class,
     legacy_backend_alias_for_evidence_class,
     may_certify,
     translate_legacy_token,
+    vapour_analytical_flux_verdict,
 )
 
 
@@ -254,12 +265,75 @@ def test_cached_real_is_cache_state_and_cannot_certify_analytical_rows() -> None
     assert inherited.evidence_class == "melts"
     assert inherited.requires_inherited_evidence_class is False
 
-    with pytest.raises(FidelityVocabularyTranslationError):
+    with pytest.raises(FidelityVocabularyTranslationError, match="never-certify"):
         translate_legacy_token(
             "backend/status alias",
             "cached-real",
             inherited_evidence_class=EvidenceClass.INTERNAL_ANALYTICAL,
         )
+
+
+@pytest.mark.parametrize(
+    "denied_class",
+    sorted(CERTIFICATION_DENYLIST),
+)
+def test_cached_real_refuses_every_never_certify_evidence_class(
+    denied_class: str,
+) -> None:
+    """O1 ceiling: cached-real must not dress any denylisted class as real.
+
+    Null-hypothesis: a name-only guard for internal-analytical would leave
+    both ratified vapour classes green here — denylist membership is required.
+    """
+
+    with pytest.raises(
+        FidelityVocabularyTranslationError,
+        match="never-certify",
+    ):
+        translate_legacy_token(
+            "backend/status alias",
+            "cached-real",
+            inherited_evidence_class=denied_class,
+        )
+    # Enum form must refuse the same way (not only string tokens).
+    enum_member = EvidenceClass(denied_class)
+    with pytest.raises(
+        FidelityVocabularyTranslationError,
+        match="never-certify",
+    ):
+        translate_legacy_token(
+            "backend/status alias",
+            "cached-real",
+            inherited_evidence_class=enum_member,
+        )
+
+
+@pytest.mark.parametrize(
+    "real_class",
+    [
+        EvidenceClass.MELTS,
+        EvidenceClass.MAGEMIN,
+        EvidenceClass.INTERNAL_DATATABLES,
+        "melts",
+        "magemin",
+        "internal-datatables",
+    ],
+)
+def test_cached_real_still_dresses_genuinely_real_evidence_classes(
+    real_class: str | EvidenceClass,
+) -> None:
+    mapping = translate_legacy_token(
+        "backend/status alias",
+        "cached-real",
+        inherited_evidence_class=real_class,
+    )
+    expected = (
+        real_class.value if isinstance(real_class, EvidenceClass) else real_class
+    )
+    assert mapping.cache_state == "cached_real"
+    assert mapping.evidence_class == expected
+    assert mapping.requires_inherited_evidence_class is False
+    assert expected not in CERTIFICATION_DENYLIST
 
 
 def test_mixed_suffix_decomposes_contributors() -> None:
@@ -354,15 +428,29 @@ def test_certification_denylist_ignores_hostile_ordering_inputs() -> None:
     hostile_ordering = {
         "internal-analytical": 999,
         "melts": -1,
+        VAPOUR_ANALYTICAL_VAPOROCK_CALIBRATED: 999,
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED: 999,
     }
 
     assert CERTIFICATION_DENYLIST == frozenset(
-        {"internal-analytical"}
+        {
+            "internal-analytical",
+            VAPOUR_ANALYTICAL_VAPOROCK_CALIBRATED,
+            VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        }
     )
     assert not may_certify(
         EvidenceClass.INTERNAL_ANALYTICAL,
         hostile_ordering,
         ordering={"internal-analytical": "first"},
+    )
+    assert not may_certify(
+        EvidenceClass.ANALYTICAL_VAPOROCK_CALIBRATED,
+        hostile_ordering,
+    )
+    assert not may_certify(
+        EvidenceClass.ANALYTICAL_EXTERNAL_GROUNDED,
+        hostile_ordering,
     )
     assert may_certify(EvidenceClass.MELTS, hostile_ordering)
 
@@ -374,6 +462,8 @@ def test_certification_denylist_ignores_hostile_ordering_inputs() -> None:
         ("magemin", True),
         ("internal-datatables", True),
         ("internal-analytical", False),
+        (VAPOUR_ANALYTICAL_VAPOROCK_CALIBRATED, False),
+        (VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED, False),
     ],
 )
 def test_may_certify_registered_canonical_classes(
@@ -385,6 +475,79 @@ def test_may_certify_registered_canonical_classes(
 def test_may_certify_accepts_evidence_class_enum() -> None:
     assert may_certify(EvidenceClass.MELTS) is True
     assert may_certify(EvidenceClass.INTERNAL_ANALYTICAL) is False
+    assert may_certify(EvidenceClass.ANALYTICAL_VAPOROCK_CALIBRATED) is False
+    assert may_certify(EvidenceClass.ANALYTICAL_EXTERNAL_GROUNDED) is False
+
+
+@pytest.mark.parametrize(
+    "token",
+    sorted(RATIFIED_VAPOUR_ANALYTICAL_EVIDENCE_CLASSES),
+)
+def test_ratified_vapour_analytical_tokens_canonicalize_to_self(token: str) -> None:
+    assert canonical_backend_name(token) == token
+    assert canonical_backend_name(token.upper()) == token
+    assert canonical_backend_name(f"  {token}  ") == token
+    # Never fold into the melt-backend analytical identity.
+    assert canonical_backend_name(token) != "internal-analytical"
+    assert is_ratified_vapour_analytical_evidence_class(token)
+    assert backend_name_denies_authority(token) is True
+
+
+def test_legacy_stub_aliases_still_fold_to_internal_analytical() -> None:
+    for alias in ("stub", "diagnostic_stub", "internal_analytical", "internal-analytical"):
+        assert canonical_backend_name(alias) == "internal-analytical"
+
+
+@pytest.mark.parametrize(
+    "token",
+    sorted(RATIFIED_VAPOUR_ANALYTICAL_EVIDENCE_CLASSES),
+)
+def test_ratified_vapour_classes_flux_verdict_is_status_bearing_only(
+    token: str,
+) -> None:
+    verdict = vapour_analytical_flux_verdict(token)
+    assert verdict["evidence_class"] == token
+    assert verdict["verdict_status"] == STATUS_BEARING_NON_AUTHORITATIVE
+    assert verdict["certification_ceiling"] == CERTIFICATION_CEILING_NEVER
+    assert verdict["certification_allowed"] is False
+    assert verdict["authoritative"] is False
+    # Only one allowed flux status; never authoritative / certifying.
+    assert verdict["verdict_status"] != "authoritative"
+    assert may_certify(token) is False
+
+    with pytest.raises(
+        FidelityVocabularyTranslationError,
+        match="certification emission refused for denylisted",
+    ):
+        canonicalize_fidelity_emission(
+            evidence_class=token,
+            backend_status="ok",
+            certification_shape=True,
+        )
+
+
+def test_vapour_analytical_flux_verdict_rejects_non_ratified_classes() -> None:
+    with pytest.raises(FidelityVocabularyTranslationError, match="ratified O1"):
+        vapour_analytical_flux_verdict("internal-analytical")
+    with pytest.raises(FidelityVocabularyTranslationError, match="ratified O1"):
+        vapour_analytical_flux_verdict("melts")
+
+
+@pytest.mark.parametrize(
+    "token",
+    sorted(RATIFIED_VAPOUR_ANALYTICAL_EVIDENCE_CLASSES),
+)
+def test_vapour_analytical_flux_verdict_accepts_evidence_class_enum(
+    token: str,
+) -> None:
+    """Enum input must unwrap to the token value (not str(Enum) name form)."""
+
+    member = EvidenceClass(token)
+    verdict = vapour_analytical_flux_verdict(member)
+    assert verdict["evidence_class"] == token
+    assert verdict["verdict_status"] == STATUS_BEARING_NON_AUTHORITATIVE
+    assert verdict["certification_allowed"] is False
+    assert verdict["authoritative"] is False
 
 
 @pytest.mark.parametrize(

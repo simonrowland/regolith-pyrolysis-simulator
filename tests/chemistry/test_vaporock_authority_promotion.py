@@ -426,3 +426,109 @@ def test_vaporock_diagnostics_payload_round_trips():
     assert payload["vapor_pressures_Pa"] == {}
     assert payload["vaporock_full_speciation_Pa"] == {"Na": 100.0}
     assert payload["backend_warnings"] == ("hello",)
+
+
+# ---------------------------------------------------------------------------
+# VR-2 / O1 governance: ratified vapour analytical evidence classes
+# (status_bearing_non_authoritative flux only; never certify). Raw VapoRock
+# remains calibration/diagnostic-only — no source-selection flip in this chunk.
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "evidence_class",
+    [
+        "analytical:vaporock_calibrated",
+        "analytical:external_grounded",
+    ],
+)
+def test_o1_ratified_vapour_classes_never_certify_or_authorise(
+    evidence_class: str,
+):
+    from simulator.backend_names import (
+        RATIFIED_VAPOUR_ANALYTICAL_EVIDENCE_CLASSES,
+        canonical_backend_name,
+    )
+    from simulator.fidelity_vocabulary import (
+        CERTIFICATION_CEILING_NEVER,
+        CERTIFICATION_DENYLIST,
+        STATUS_BEARING_NON_AUTHORITATIVE,
+        FidelityVocabularyTranslationError,
+        backend_name_denies_authority,
+        canonicalize_fidelity_emission,
+        may_certify,
+        vapour_analytical_flux_verdict,
+    )
+
+    assert evidence_class in RATIFIED_VAPOUR_ANALYTICAL_EVIDENCE_CLASSES
+    assert canonical_backend_name(evidence_class) == evidence_class
+    assert evidence_class in CERTIFICATION_DENYLIST
+    assert may_certify(evidence_class) is False
+    assert backend_name_denies_authority(evidence_class) is True
+
+    verdict = vapour_analytical_flux_verdict(evidence_class)
+    assert verdict["verdict_status"] == STATUS_BEARING_NON_AUTHORITATIVE
+    assert verdict["certification_ceiling"] == CERTIFICATION_CEILING_NEVER
+    assert verdict["certification_allowed"] is False
+    assert verdict["authoritative"] is False
+
+    with pytest.raises(
+        FidelityVocabularyTranslationError,
+        match="certification emission refused for denylisted",
+    ):
+        canonicalize_fidelity_emission(
+            evidence_class=evidence_class,
+            certification_shape=True,
+        )
+
+
+def test_raw_vaporock_provider_cannot_be_authoritative_for_vapor_pressure(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    """Raw VapoRock stays calibration/diagnostic-only (no direct flux drive)."""
+    sim = _build_sim(vapor_pressure_data, feedstocks_data, setpoints_data)
+    provider = _vaporock_shadow(sim)
+    profile = provider.capability_profile()
+    assert profile.is_authoritative_for == frozenset()
+    assert ChemistryIntent.VAPOR_PRESSURE not in profile.is_authoritative_for
+
+    _force_vaporock_available(sim)
+    result = _dispatch_vapor(sim)
+    assert result.status == "ok"
+    sources = dict((result.diagnostic or {}).get("vapor_pressures_source") or {})
+    assert sources
+    assert not any(
+        str(src) == "vaporock" or str(src).startswith("vaporock")
+        for src in sources.values()
+    )
+    assert any(
+        str(src).startswith("builtin_authoritative") for src in sources.values()
+    )
+
+    shadow = _shadow_result(sim)
+    assert shadow.status == "non_authoritative"
+    assert dict(shadow.diagnostic or {}).get("vapor_pressures_Pa") == {}
+
+
+def test_o1_tokens_do_not_alias_to_internal_analytical_or_vaporock():
+    from simulator.backend_names import (
+        ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        VAPOUR_ANALYTICAL_VAPOROCK_CALIBRATED,
+        canonical_backend_name,
+    )
+
+    for token in (
+        VAPOUR_ANALYTICAL_VAPOROCK_CALIBRATED,
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+    ):
+        assert canonical_backend_name(token) == token
+        assert canonical_backend_name(token) != ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+        assert canonical_backend_name(token) != "vaporock"
+        assert canonical_backend_name(token) != "builtin"
+    # Legacy melt-backend aliases still fold.
+    assert canonical_backend_name("stub") == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+    assert (
+        canonical_backend_name("diagnostic_stub")
+        == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+    )

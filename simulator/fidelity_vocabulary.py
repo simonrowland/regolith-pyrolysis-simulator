@@ -11,6 +11,9 @@ from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     LEGACY_ANALYTICAL_BACKEND_DIAGNOSTIC_TOKEN,
     LEGACY_ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    RATIFIED_VAPOUR_ANALYTICAL_EVIDENCE_CLASSES,
+    VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+    VAPOUR_ANALYTICAL_VAPOROCK_CALIBRATED,
     canonical_backend_name,
 )
 
@@ -36,11 +39,20 @@ class EvidenceClass(str, Enum):
     MAGEMIN = "magemin"
     INTERNAL_DATATABLES = "internal-datatables"
     INTERNAL_ANALYTICAL = "internal-analytical"
+    # O1-ratified vapour-pressure analytical classes (version 1). Future
+    # classes registered in design-fidelity-surface; may drive HKL flux only
+    # with status_bearing_non_authoritative verdicts; may never certify.
+    ANALYTICAL_VAPOROCK_CALIBRATED = VAPOUR_ANALYTICAL_VAPOROCK_CALIBRATED
+    ANALYTICAL_EXTERNAL_GROUNDED = VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED
 
 
 CANONICAL_EVIDENCE_CLASSES: frozenset[str] = frozenset(
     item.value for item in EvidenceClass
 )
+
+# Flux-only ceiling for O1-ratified vapour analytical classes (never certify).
+STATUS_BEARING_NON_AUTHORITATIVE = "status_bearing_non_authoritative"
+CERTIFICATION_CEILING_NEVER = "never"
 
 
 class CacheState(str, Enum):
@@ -91,7 +103,11 @@ class DegradationReason(str, Enum):
 
 
 CERTIFICATION_DENYLIST: frozenset[str] = frozenset(
-    {EvidenceClass.INTERNAL_ANALYTICAL.value}
+    {
+        EvidenceClass.INTERNAL_ANALYTICAL.value,
+        EvidenceClass.ANALYTICAL_VAPOROCK_CALIBRATED.value,
+        EvidenceClass.ANALYTICAL_EXTERNAL_GROUNDED.value,
+    }
 )
 
 LEGACY_EVIDENCE_CLASS_SERIALIZATION_ALIASES: Mapping[str, str] = MappingProxyType(
@@ -381,6 +397,62 @@ def may_certify(
     return _evidence_class_value(evidence_class) not in CERTIFICATION_DENYLIST
 
 
+def is_ratified_vapour_analytical_evidence_class(
+    evidence_class: str | EvidenceClass | None,
+) -> bool:
+    """True for O1-ratified vapour analytical evidence classes (version 1)."""
+
+    if evidence_class is None:
+        return False
+    try:
+        value = _evidence_class_value(evidence_class)
+    except (UnknownFidelityVocabularyTokenError, FidelityVocabularyTranslationError):
+        # Fold case/alias through the name-keyed boundary first.
+        normalized = canonical_backend_name(str(evidence_class).strip())
+        return (
+            normalized is not None
+            and normalized in RATIFIED_VAPOUR_ANALYTICAL_EVIDENCE_CLASSES
+        )
+    return value in RATIFIED_VAPOUR_ANALYTICAL_EVIDENCE_CLASSES
+
+
+def vapour_analytical_flux_verdict(
+    evidence_class: str | EvidenceClass,
+) -> dict[str, Any]:
+    """Return the only allowed flux verdict for an O1-ratified vapour class.
+
+    Ceiling (owner O1, 2026-07-31): may drive HKL flux only with
+    ``status_bearing_non_authoritative`` verdicts; may never certify, earn a
+    certification vote, satisfy an authority gate, or be serialized as
+    authoritative. Validation status is orthogonal and never lifts this.
+    """
+
+    # Unwrap EvidenceClass first: str(Enum member) is "EvidenceClass.NAME",
+    # not the token value, so the advertised enum input would always fail.
+    try:
+        raw = _evidence_class_value(evidence_class)
+    except (UnknownFidelityVocabularyTokenError, FidelityVocabularyTranslationError):
+        raw = str(evidence_class).strip()
+    normalized = canonical_backend_name(raw)
+    if normalized not in RATIFIED_VAPOUR_ANALYTICAL_EVIDENCE_CLASSES:
+        raise FidelityVocabularyTranslationError(
+            "vapour_analytical_flux_verdict requires a ratified O1 vapour "
+            f"analytical evidence class; got {evidence_class!r}"
+        )
+    value = _evidence_class_value(normalized)
+    return {
+        "evidence_class": value,
+        "verdict_status": STATUS_BEARING_NON_AUTHORITATIVE,
+        "certification_ceiling": CERTIFICATION_CEILING_NEVER,
+        "certification_allowed": False,
+        "authoritative": False,
+        # Typed fields remain distinct from provider/backend and label_source.
+        "provider_field_note": (
+            "provider remains builtin|vaporock; this token is evidence_class only"
+        ),
+    }
+
+
 def backend_name_denies_authority(backend_name: str | None) -> bool:
     """Return True when backend identity independently forbids authoritative admission."""
 
@@ -389,6 +461,10 @@ def backend_name_denies_authority(backend_name: str | None) -> bool:
     normalized = canonical_backend_name(str(backend_name).strip())
     if not normalized:
         return False
+    # O1 vapour analytical tokens share the name-keyed boundary but are
+    # evidence-class identities, not melt backends. They always deny authority.
+    if normalized in RATIFIED_VAPOUR_ANALYTICAL_EVIDENCE_CLASSES:
+        return True
     if normalized.startswith("mixed:"):
         suffix = normalized[len("mixed:") :]
         for delimiter in ("+", "|"):
@@ -610,9 +686,16 @@ def _translate_cached_real(
         if inherited_evidence_class is None
         else _evidence_class_value(inherited_evidence_class)
     )
-    if evidence_class == EvidenceClass.INTERNAL_ANALYTICAL.value:
+    # Refuse every never-certify class via CERTIFICATION_DENYLIST, not a
+    # single-name check. Failure prevented: a newly ratified denylisted
+    # class (e.g. O1 vapour analytical tokens) would otherwise pass the
+    # cached-real earn/dress path and be serialized with real standing —
+    # an O1 ceiling bypass that name-enumeration would reintroduce on
+    # every future class addition.
+    if evidence_class is not None and evidence_class in CERTIFICATION_DENYLIST:
         raise FidelityVocabularyTranslationError(
-            "cached-real cannot dress internal-analytical output as real"
+            f"cached-real cannot dress never-certify evidence_class "
+            f"{evidence_class!r} as real"
         )
     return CanonicalFidelityMapping(
         cache_state=CacheState.CACHED_REAL.value,
