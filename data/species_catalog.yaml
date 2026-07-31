@@ -137,7 +137,19 @@ species:
   basis: perchlorate_anion_equivalent
   category: oxyanion_equivalent
   estimated: false
-  source: Perchlorate anion-equivalent formula; counter-cation not specified by current feedstock keys.
+  source: 'Perchlorate anion-equivalent formula; counter-cation not specified by current feedstock keys.
+    VR-7: charge aliases ClO4-/ClO4_minus/ClO4_anion/perchlorate canonicalize to ClO4.'
+  canonical_id: ClO4
+  charge_aliases:
+  - ClO4-
+  - ClO4_minus
+  - ClO4_anion
+  - perchlorate
+  aliases:
+  - ClO4-
+  - ClO4_anion
+  - ClO4_minus
+  - perchlorate
 - id: MgCO3
   formula: MgCO3
   basis: mineral_formula
@@ -520,7 +532,7 @@ species:
   atoms:
     C: 2
     H: 8
-    N: 2
+    'N': 2
   basis: estimated_group_formula
   category: gas_group
   estimated: true
@@ -545,7 +557,7 @@ species:
   atoms:
     C: 1
     H: 4
-    N: 2
+    'N': 2
   basis: estimated_group_formula
   category: gas_group
   estimated: true
@@ -660,7 +672,7 @@ species:
     C: 0.74
     H: 0.09
     O: 0.12
-    N: 0.05
+    'N': 0.05
   basis: generic_template
   category: organic_group
   estimated: true
@@ -1009,6 +1021,14 @@ species:
     collision_only_suffix: true
     request_rule: pending_family_compilation
   source: VR-1 U0 collision_gas membership set
+  not_substitutable_for:
+  - PO
+  - PO2
+  - P4O6
+  - P4O10
+  - P2
+  - P4
+  notes: 'VR-7: cannot substitute for true P carriers (PO/PO2/P4On/P2/P4).'
 - id: SiO2_gas
   formula: SiO2
   atoms:
@@ -1065,3 +1085,614 @@ species:
     collision_only_suffix: true
     request_rule: pending_family_compilation
   source: VR-1 U0 collision_gas membership set
+- id: 'NO'
+  formula: 'NO'
+  atoms:
+    'N': 1.0
+    O: 1.0
+  basis: molecular_formula
+  category: volatile_gas
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  source: VR-7 dormant transcription (volatile_gas)
+  code_metadata:
+    formula_id: 'NO'
+    canonical_aliases: []
+    request_rule: dormant_pending_validation
+    yaml_quote_species_id: true
+- id: NO2
+  formula: NO2
+  atoms:
+    'N': 1.0
+    O: 2.0
+  basis: molecular_formula
+  category: volatile_gas
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  source: VR-7 dormant transcription (volatile_gas)
+  code_metadata:
+    formula_id: NO2
+    canonical_aliases: []
+    request_rule: dormant_pending_validation
+    yaml_quote_species_id: false
+- id: N2O
+  formula: N2O
+  atoms:
+    'N': 2.0
+    O: 1.0
+  basis: molecular_formula
+  category: volatile_gas
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  source: VR-7 dormant transcription (volatile_gas)
+  code_metadata:
+    formula_id: N2O
+    canonical_aliases: []
+    request_rule: dormant_pending_validation
+    yaml_quote_species_id: false
+- id: H2S
+  formula: H2S
+  atoms:
+    H: 2.0
+    S: 1.0
+  basis: molecular_formula
+  category: volatile_gas
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  source: VR-7 dormant transcription (volatile_gas)
+  code_metadata:
+    formula_id: H2S
+    canonical_aliases: []
+    request_rule: dormant_pending_validation
+    yaml_quote_species_id: false
+- id: COS
+  formula: COS
+  atoms:
+    C: 1.0
+    O: 1.0
+    S: 1.0
+  basis: molecular_formula
+  category: volatile_gas
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  source: VR-7 dormant transcription (volatile_gas)
+  code_metadata:
+    formula_id: COS
+    canonical_aliases: []
+    request_rule: dormant_pending_validation
+    yaml_quote_species_id: false
+- id: HCl
+  formula: HCl
+  atoms:
+    H: 1.0
+    Cl: 1.0
+  basis: molecular_formula
+  category: volatile_gas
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  source: VR-7 dormant transcription (volatile_gas)
+  code_metadata:
+    formula_id: HCl
+    canonical_aliases: []
+    request_rule: dormant_pending_validation
+    yaml_quote_species_id: false
+- id: HF
+  formula: HF
+  atoms:
+    H: 1.0
+    F: 1.0
+  basis: molecular_formula
+  category: volatile_gas
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  source: VR-7 dormant transcription (volatile_gas)
+  code_metadata:
+    formula_id: HF
+    canonical_aliases: []
+    request_rule: dormant_pending_validation
+    yaml_quote_species_id: false
+- id: HBr
+  formula: HBr
+  atoms:
+    H: 1.0
+    Br: 1.0
+  basis: molecular_formula
+  category: volatile_gas
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  source: VR-7 dormant transcription (volatile_gas)
+  code_metadata:
+    formula_id: HBr
+    canonical_aliases: []
+    request_rule: dormant_pending_validation
+    yaml_quote_species_id: false
+- id: HI
+  formula: HI
+  atoms:
+    H: 1.0
+    I: 1.0
+  basis: molecular_formula
+  category: volatile_gas
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  source: VR-7 dormant transcription (volatile_gas)
+  code_metadata:
+    formula_id: HI
+    canonical_aliases: []
+    request_rule: dormant_pending_validation
+    yaml_quote_species_id: false
+- id: Cl2
+  formula: Cl2
+  atoms:
+    Cl: 2.0
+  basis: molecular_formula
+  category: volatile_gas
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  source: VR-7 dormant transcription (volatile_gas)
+  code_metadata:
+    formula_id: Cl2
+    canonical_aliases: []
+    request_rule: dormant_pending_validation
+    yaml_quote_species_id: false
+- id: Br2
+  formula: Br2
+  atoms:
+    Br: 2.0
+  basis: molecular_formula
+  category: volatile_gas
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  source: VR-7 dormant transcription (volatile_gas)
+  code_metadata:
+    formula_id: Br2
+    canonical_aliases: []
+    request_rule: dormant_pending_validation
+    yaml_quote_species_id: false
+- id: I2
+  formula: I2
+  atoms:
+    I: 2.0
+  basis: molecular_formula
+  category: volatile_gas
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  source: VR-7 dormant transcription (volatile_gas)
+  code_metadata:
+    formula_id: I2
+    canonical_aliases: []
+    request_rule: dormant_pending_validation
+    yaml_quote_species_id: false
+- id: MgCl2
+  formula: MgCl2
+  atoms:
+    Mg: 1.0
+    Cl: 2.0
+  basis: molecular_formula
+  category: salt_vapor
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  source: VR-7 dormant transcription (salt_vapor)
+  code_metadata:
+    formula_id: MgCl2
+    canonical_aliases: []
+    request_rule: dormant_pending_validation
+    yaml_quote_species_id: false
+- id: CaCl2
+  formula: CaCl2
+  atoms:
+    Ca: 1.0
+    Cl: 2.0
+  basis: molecular_formula
+  category: salt_vapor
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  source: VR-7 dormant transcription (salt_vapor)
+  code_metadata:
+    formula_id: CaCl2
+    canonical_aliases: []
+    request_rule: dormant_pending_validation
+    yaml_quote_species_id: false
+- id: Na2Cl2
+  formula: Na2Cl2
+  atoms:
+    Na: 2.0
+    Cl: 2.0
+  basis: molecular_formula
+  category: association_dimer
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  source: VR-7 dormant transcription (association_dimer)
+  code_metadata:
+    formula_id: Na2Cl2
+    canonical_aliases: []
+    request_rule: dormant_pending_validation
+    yaml_quote_species_id: false
+  association_polymer: true
+- id: K2Cl2
+  formula: K2Cl2
+  atoms:
+    K: 2.0
+    Cl: 2.0
+  basis: molecular_formula
+  category: association_dimer
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  source: VR-7 dormant transcription (association_dimer)
+  code_metadata:
+    formula_id: K2Cl2
+    canonical_aliases: []
+    request_rule: dormant_pending_validation
+    yaml_quote_species_id: false
+  association_polymer: true
+- id: Mg2Cl4
+  formula: Mg2Cl4
+  atoms:
+    Mg: 2.0
+    Cl: 4.0
+  basis: molecular_formula
+  category: association_dimer
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  source: VR-7 dormant transcription (association_dimer)
+  code_metadata:
+    formula_id: Mg2Cl4
+    canonical_aliases: []
+    request_rule: dormant_pending_validation
+    yaml_quote_species_id: false
+  association_polymer: true
+- id: PO
+  formula: PO
+  atoms:
+    P: 1.0
+    O: 1.0
+  basis: molecular_formula
+  category: phosphorus_carrier
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  source: VR-7 dormant transcription (phosphorus_carrier)
+  code_metadata:
+    formula_id: PO
+    canonical_aliases: []
+    request_rule: dormant_pending_validation
+    yaml_quote_species_id: false
+  not_substitutable_by:
+  - P2O5_gas
+- id: PO2
+  formula: PO2
+  atoms:
+    P: 1.0
+    O: 2.0
+  basis: molecular_formula
+  category: phosphorus_carrier
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  source: VR-7 dormant transcription (phosphorus_carrier)
+  code_metadata:
+    formula_id: PO2
+    canonical_aliases: []
+    request_rule: dormant_pending_validation
+    yaml_quote_species_id: false
+  not_substitutable_by:
+  - P2O5_gas
+- id: P4O6
+  formula: P4O6
+  atoms:
+    P: 4.0
+    O: 6.0
+  basis: molecular_formula
+  category: phosphorus_carrier
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  source: VR-7 dormant transcription (phosphorus_carrier)
+  code_metadata:
+    formula_id: P4O6
+    canonical_aliases: []
+    request_rule: dormant_pending_validation
+    yaml_quote_species_id: false
+  not_substitutable_by:
+  - P2O5_gas
+- id: P4O10
+  formula: P4O10
+  atoms:
+    P: 4.0
+    O: 10.0
+  basis: molecular_formula
+  category: phosphorus_carrier
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  source: VR-7 dormant transcription (phosphorus_carrier)
+  code_metadata:
+    formula_id: P4O10
+    canonical_aliases: []
+    request_rule: dormant_pending_validation
+    yaml_quote_species_id: false
+  not_substitutable_by:
+  - P2O5_gas
+- id: P2
+  formula: P2
+  atoms:
+    P: 2.0
+  basis: molecular_formula
+  category: phosphorus_carrier
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  source: VR-7 dormant transcription (phosphorus_carrier)
+  code_metadata:
+    formula_id: P2
+    canonical_aliases: []
+    request_rule: dormant_pending_validation
+    yaml_quote_species_id: false
+  not_substitutable_by:
+  - P2O5_gas
+- id: P4
+  formula: P4
+  atoms:
+    P: 4.0
+  basis: molecular_formula
+  category: phosphorus_carrier
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  source: VR-7 dormant transcription (phosphorus_carrier)
+  code_metadata:
+    formula_id: P4
+    canonical_aliases: []
+    request_rule: dormant_pending_validation
+    yaml_quote_species_id: false
+  not_substitutable_by:
+  - P2O5_gas
+- id: HCHO
+  formula: HCHO
+  atoms:
+    H: 2.0
+    C: 1.0
+    O: 1.0
+  basis: molecular_formula
+  category: volatile_gas
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  source: VR-7 dormant transcription (volatile_gas)
+  code_metadata:
+    formula_id: HCHO
+    canonical_aliases: []
+    request_rule: dormant_pending_validation
+    yaml_quote_species_id: false
+- id: C2H6
+  formula: C2H6
+  atoms:
+    C: 2.0
+    H: 6.0
+  basis: molecular_formula
+  category: volatile_gas
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  source: VR-7 dormant transcription (volatile_gas)
+  code_metadata:
+    formula_id: C2H6
+    canonical_aliases: []
+    request_rule: dormant_pending_validation
+    yaml_quote_species_id: false
+- id: C2H5OH
+  formula: C2H5OH
+  atoms:
+    C: 2.0
+    H: 6.0
+    O: 1.0
+  basis: molecular_formula
+  category: volatile_gas
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  source: VR-7 dormant transcription (volatile_gas)
+  code_metadata:
+    formula_id: C2H5OH
+    canonical_aliases: []
+    request_rule: dormant_pending_validation
+    yaml_quote_species_id: false
+- id: CS2
+  formula: CS2
+  atoms:
+    C: 1.0
+    S: 2.0
+  basis: molecular_formula
+  category: volatile_gas
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  source: VR-7 dormant transcription (volatile_gas)
+  code_metadata:
+    formula_id: CS2
+    canonical_aliases: []
+    request_rule: dormant_pending_validation
+    yaml_quote_species_id: false
+- id: HNCO
+  formula: HNCO
+  atoms:
+    H: 1.0
+    'N': 1.0
+    C: 1.0
+    O: 1.0
+  basis: molecular_formula
+  category: volatile_gas
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  source: VR-7 dormant transcription (volatile_gas)
+  code_metadata:
+    formula_id: HNCO
+    canonical_aliases: []
+    request_rule: dormant_pending_validation
+    yaml_quote_species_id: false
+- id: NH4CN
+  formula: NH4CN
+  atoms:
+    'N': 2.0
+    H: 4.0
+    C: 1.0
+  basis: molecular_formula
+  category: volatile_gas
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  source: VR-7 dormant transcription (volatile_gas)
+  code_metadata:
+    formula_id: NH4CN
+    canonical_aliases: []
+    request_rule: dormant_pending_validation
+    yaml_quote_species_id: false
+- id: CH3COOH
+  formula: CH3COOH
+  atoms:
+    C: 2.0
+    H: 4.0
+    O: 2.0
+  basis: molecular_formula
+  category: volatile_gas
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  source: VR-7 dormant transcription (volatile_gas)
+  code_metadata:
+    formula_id: CH3COOH
+    canonical_aliases: []
+    request_rule: dormant_pending_validation
+    yaml_quote_species_id: false
+- id: S_total
+  formula: null
+  atoms:
+    S: 1.0
+  basis: total_mixture_observable
+  category: volatile_total_mixture
+  estimated: true
+  phase: gas
+  catalog_role: total_mixture_observable
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  source: VR-7 Rau total liquid-S vapour observable; speciation children S2-S8
+  components:
+  - id: S2
+    moles: 1
+  notes: Total mixture observable over S(l); not a pure molecular formula. Atom map is S-equivalent only.
+  code_metadata:
+    formula_id: S_total
+    canonical_aliases:
+    - S(l)_total_vapour
+    - sulfur_total
+    request_rule: dormant_pending_validation

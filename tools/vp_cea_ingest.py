@@ -40,6 +40,7 @@ from simulator.vapour_rail.nasa_cea import (  # noqa: E402
     NASA9_DEFAULT_EXPONENTS,
     Nasa9Segment,
     NasaCeaConventionError,
+    NasaCeaError,
     NasaCeaPolynomial,
     NasaCeaSegmentError,
     StandardState,
@@ -147,12 +148,32 @@ class CeaSpeciesRecord:
         )
 
 
+def _normalize_element_symbol(token: str) -> str:
+    """CEA header tokens are uppercase (NA, FE, SIO→SI+O split already).
+
+    Element symbols are case-sensitive in chemical formulas and atom maps.
+    Normalize to IUPAC form: first letter upper, remainder lower (Na, Fe, Si).
+    Single-letter elements (H, C, O, N, …) stay single uppercase.
+    """
+    raw = str(token).strip()
+    if not raw:
+        return raw
+    # Only alphabetic element tokens are normalized; leave counts/digits alone.
+    if not raw.isalpha():
+        return raw
+    return raw[0].upper() + raw[1:].lower()
+
+
 def _formula_from_tokens(tokens: Sequence[str]) -> str:
-    """Join CEA element/count tokens like ['H', '2.00', 'O', '1.00'] → 'H2O'."""
+    """Join CEA element/count tokens like ['H', '2.00', 'O', '1.00'] → 'H2O'.
+
+    Element symbols are normalized to IUPAC case (NA→Na, FE→Fe, SIO→SiO)
+    so case-sensitive atom maps do not break on naive transcription.
+    """
     parts: list[str] = []
     i = 0
     while i < len(tokens):
-        el = tokens[i]
+        el = _normalize_element_symbol(tokens[i])
         if i + 1 < len(tokens):
             try:
                 count = float(tokens[i + 1])
@@ -670,6 +691,10 @@ def resolve_trial_cea_names(
     return wanted
 
 
+class CeaIngestSelectionError(NasaCeaError):
+    """Explicit --species request unmatched or empty selection (CLI fail-loud)."""
+
+
 def ingest(
     thermo_path: Path,
     *,
@@ -681,7 +706,18 @@ def ingest(
     by_name = {r.name: r for r in records}
     species_filter: set[str] | None = None
     if species:
-        species_filter = set(species)
+        requested = list(species)
+        missing = sorted({name for name in requested if name not in by_name})
+        if missing:
+            raise CeaIngestSelectionError(
+                "explicit --species not present in thermo parse: "
+                + ", ".join(missing)
+            )
+        species_filter = set(requested)
+        if not species_filter:
+            raise CeaIngestSelectionError(
+                "explicit --species selection is empty after validation"
+            )
     if volatile_draft is not None:
         keys = load_volatile_draft_species(volatile_draft)
         trial = resolve_trial_cea_names(keys, by_name)
@@ -689,13 +725,29 @@ def ingest(
             species_filter = trial
         else:
             species_filter |= trial
+    if species_filter is not None and not species_filter:
+        raise CeaIngestSelectionError(
+            "CEA ingest selection is empty (no matching species after filters)"
+        )
     draft = build_four_strata_draft(
         records,
-        source_thermo_path=str(thermo_path),
-        trial_volatile_path=str(volatile_draft) if volatile_draft else None,
+        source_thermo_path=_portable_path_str(thermo_path),
+        trial_volatile_path=(
+            _portable_path_str(volatile_draft) if volatile_draft else None
+        ),
         species_filter=species_filter,
     )
     return IngestResult(records=records, draft_document=draft)
+
+
+def _portable_path_str(path: Path) -> str:
+    """Prefer repo-relative provenance paths over absolute author-machine paths."""
+
+    resolved = path.expanduser()
+    try:
+        return str(resolved.resolve().relative_to(Path.cwd().resolve()))
+    except ValueError:
+        return str(resolved)
 
 
 def _yaml_dump(doc: dict[str, Any]) -> str:
@@ -754,7 +806,12 @@ def main(argv: list[str] | None = None) -> int:
             volatile_draft=args.volatile_draft,
             species=args.species,
         )
-    except (NasaCeaSegmentError, NasaCeaConventionError, NasaCeaError) as exc:
+    except (
+        CeaIngestSelectionError,
+        NasaCeaSegmentError,
+        NasaCeaConventionError,
+        NasaCeaError,
+    ) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
 
@@ -790,9 +847,6 @@ def main(argv: list[str] | None = None) -> int:
     print(f"wrote DRAFT four-strata rows for {n} CEA records → {args.output}")
     return 0
 
-
-# Re-export for tests
-from simulator.vapour_rail.nasa_cea import NasaCeaError  # noqa: E402
 
 if __name__ == "__main__":
     raise SystemExit(main())

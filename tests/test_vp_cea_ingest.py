@@ -243,3 +243,53 @@ def test_pure_psat_ratio_finite_for_na_pair(ingest_mod) -> None:
     ratio = gas.pure_psat_over_Pstd(cond, T)
     assert math.isfinite(ratio)
     assert ratio > 0.0
+
+
+def test_formula_normalizes_cea_uppercase_element_symbols(ingest_mod) -> None:
+    """P2-1: CEA tokens NA/FE/SIO must not emit formula NA/FE/SIO."""
+    assert ingest_mod._formula_from_tokens(["NA", "1.00"]) == "Na"
+    assert ingest_mod._formula_from_tokens(["FE", "1.00"]) == "Fe"
+    assert ingest_mod._formula_from_tokens(["SI", "1.00", "O", "2.00"]) == "SiO2"
+    assert ingest_mod._formula_from_tokens(["H", "2.00", "O", "1.00"]) == "H2O"
+    result = ingest_mod.ingest(THERMO, species=["Na", "Fe(L)", "SiO2"])
+    formulas = {}
+    for fam in result.draft_document["families"].values():
+        for sp_id, sp in fam["physical_properties"]["species"].items():
+            formulas[sp_id] = sp["formula"]
+    assert formulas.get("Na") == "Na"
+    # Condensed Fe(L) canonical id may include phase; formula must still be Fe.
+    assert any(f == "Fe" for f in formulas.values())
+    assert any(f == "SiO2" for f in formulas.values())
+    assert "NA" not in formulas.values()
+    assert "FE" not in formulas.values()
+    assert "SIO2" not in formulas.values()
+
+
+def test_cli_unmatched_species_fails_loudly(tmp_path: Path) -> None:
+    """P2-2: typo'd --species must not write an empty success draft (rc 0)."""
+    out = tmp_path / "empty-should-not-exist.yaml"
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(INGEST_PATH),
+            "--thermo",
+            str(THERMO),
+            "--species",
+            "O3",
+            "NOTASPECIES",
+            "--output",
+            str(out),
+        ],
+        cwd=str(ROOT),
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert proc.returncode != 0, proc.stdout
+    assert "not present" in proc.stderr.lower() or "error:" in proc.stderr.lower()
+    assert not out.is_file()
+
+
+def test_ingest_api_unmatched_species_raises(ingest_mod) -> None:
+    with pytest.raises(ingest_mod.CeaIngestSelectionError, match="not present"):
+        ingest_mod.ingest(THERMO, species=["NOTASPECIES"])

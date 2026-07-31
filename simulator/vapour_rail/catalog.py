@@ -9,6 +9,7 @@ during the U1--U5 shadow period.
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
+from collections import OrderedDict
 from copy import deepcopy
 from dataclasses import dataclass
 from enum import Enum
@@ -27,6 +28,80 @@ FOUR_STRATA = (
 )
 DEFAULT_EXTRAPOLATION_POLICY = "conservative_slope_continuation"
 OUT_OF_RANGE_STATUS = "out_of_range_conservative_continuation"
+
+# Identity-keyed memo for schema-v2 compile + legacy projection. Payloads are
+# treated as immutable after first compile (production loaders deepcopy once and
+# never mutate). Keyed by id(payload) with a strong identity check to survive
+# allocator reuse. Bounded LRU so long-lived processes cannot grow without limit.
+# Restores the pre-VR-7 hot-path cost profile when vapor_pressure_legacy_view is
+# called per species on the condensation deposition-flux path (P1-1).
+_CATALOG_COMPILE_CACHE_MAX = 8
+_catalog_compile_cache: OrderedDict[int, tuple[Any, "VapourRailCatalog"]] = OrderedDict()
+_legacy_view_cache: OrderedDict[int, tuple[Any, dict[str, Any]]] = OrderedDict()
+
+# Charge / state aliases that must fold before ledger or cache payloads (VR-7 / REV5).
+# Keys are accepted input spellings; values are canonical species catalog IDs.
+# Only attested spellings with existing catalog targets are mapped — unmapped
+# inputs pass through via canonicalize_charge_alias (P2-1).
+CHARGE_ALIAS_CANONICAL: Mapping[str, str] = MappingProxyType(
+    {
+        "ClO4": "ClO4",
+        "ClO4-": "ClO4",
+        "ClO4_minus": "ClO4",
+        "ClO4_anion": "ClO4",
+        "perchlorate": "ClO4",
+        # Attested trace-table / feedstock spellings for ClO4 only (NO3/SO4/CO3
+        # catalog rows do not exist yet; do not invent canonical keys).
+    }
+)
+
+
+def _cache_put(
+    cache: OrderedDict[int, tuple[Any, Any]],
+    payload: Any,
+    value: Any,
+    *,
+    maxsize: int = _CATALOG_COMPILE_CACHE_MAX,
+) -> None:
+    key = id(payload)
+    cache[key] = (payload, value)
+    cache.move_to_end(key)
+    while len(cache) > maxsize:
+        cache.popitem(last=False)
+
+
+def _cache_get(
+    cache: OrderedDict[int, tuple[Any, Any]], payload: Any
+) -> Any | None:
+    key = id(payload)
+    hit = cache.get(key)
+    if hit is None:
+        return None
+    cached_payload, value = hit
+    if cached_payload is not payload:
+        del cache[key]
+        return None
+    cache.move_to_end(key)
+    return value
+
+
+def clear_vapor_pressure_view_caches() -> None:
+    """Drop compile/legacy-view memos (tests that mutate payloads in place)."""
+
+    _catalog_compile_cache.clear()
+    _legacy_view_cache.clear()
+
+
+def canonicalize_charge_alias(species_id: str) -> str:
+    """Fold charge/state spellings to the canonical catalog species id.
+
+    Bare chemical IDs pass through unchanged. Unknown aliases also pass through
+    so callers can layer collision-gas canonicalization separately.
+    """
+    raw = str(species_id).strip()
+    if not raw:
+        raise ValueError("species_id is required")
+    return CHARGE_ALIAS_CANONICAL.get(raw, raw)
 _LEGACY_CONDENSATION_REFERENCE_ORDER = (
     "Fe", "SiO", "Mg", "Na", "K", "Ca", "Mn", "Cr", "CrO2", "NaCl", "KCl"
 )
@@ -368,10 +443,18 @@ class VaporPressureCompatibilityView(dict[str, Any]):
 
 
 def compile_vapour_rail_catalog(payload: Mapping[str, Any]) -> VapourRailCatalog:
-    """Validate and compile one schema-v2 YAML payload."""
+    """Validate and compile one schema-v2 YAML payload.
+
+    Schema-v2 payloads are memoized by object identity (see module cache). Treat
+    payloads as immutable after the first compile; call
+    ``clear_vapor_pressure_view_caches`` if a test mutates a cached payload.
+    """
 
     if not isinstance(payload, Mapping):
         raise CatalogCompileError("vapour catalog root must be a mapping")
+    cached = _cache_get(_catalog_compile_cache, payload)
+    if cached is not None:
+        return cached
     if payload.get("schema_version") != SCHEMA_VERSION:
         raise CatalogCompileError("vapour catalog schema_version must be 2")
     families = _mapping(payload.get("families"), "families")
@@ -480,16 +563,29 @@ def compile_vapour_rail_catalog(payload: Mapping[str, Any]) -> VapourRailCatalog
             for species_id in _LEGACY_CONDENSATION_REFERENCE_ORDER
             if species_id in condensation_reference
         }
-    return VapourRailCatalog(species=compiled, legacy_projection=legacy)
+    catalog = VapourRailCatalog(species=compiled, legacy_projection=legacy)
+    _cache_put(_catalog_compile_cache, payload, catalog)
+    return catalog
 
 
 def vapor_pressure_legacy_view(payload: Mapping[str, Any] | None) -> dict[str, Any]:
-    """Return the schema-v1 compatibility view without duplicating YAML authority."""
+    """Return the schema-v1 compatibility view without duplicating YAML authority.
+
+    For schema-v2 payloads the compiled legacy projection is memoized by payload
+    identity so hot-path callers (condensation deposition flux) never recompile
+    or re-deepcopy the full catalog per species lookup. The cached dict is
+    shared across callers for a given payload object — treat it as read-only.
+    """
 
     if not isinstance(payload, Mapping):
         return {}
     if payload.get("schema_version") == SCHEMA_VERSION and "families" in payload:
-        return compile_vapour_rail_catalog(payload).legacy_view()
+        cached = _cache_get(_legacy_view_cache, payload)
+        if cached is not None:
+            return cached
+        view = compile_vapour_rail_catalog(payload).legacy_view()
+        _cache_put(_legacy_view_cache, payload, view)
+        return view
     return deepcopy(dict(payload))
 
 

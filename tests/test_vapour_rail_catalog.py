@@ -158,11 +158,26 @@ def test_production_schema_compiles_exact_four_strata_and_legacy_projection() ->
         }
 
     catalog = compile_vapour_rail_catalog(payload)
-    assert len(catalog.species) == 15
+    # VR-7 adds dormant acquisition families; pre-VR-7 core remains 15.
+    assert len(catalog.species) >= 15
     legacy = catalog.legacy_view()
     assert len(legacy["metals"]) == 10
     assert len(legacy["oxide_vapors"]) == 2
     assert len(legacy["foulant_vapor"]) == 3
+    assert set(legacy["metals"]) == {
+        "Na",
+        "K",
+        "Mg",
+        "Fe",
+        "Ca",
+        "Al",
+        "Si",
+        "Ti",
+        "Cr",
+        "Mn",
+    }
+    assert set(legacy["oxide_vapors"]) == {"SiO", "CrO2"}
+    assert set(legacy["foulant_vapor"]) == {"NaCl", "KCl", "NaF"}
     assert legacy["metals"]["K"]["antoine"]["A"] == pytest.approx(10.641294)
     sodium = catalog.species["Na"]
     assert sodium.fiat_routing.process_or_terminal_destination == (
