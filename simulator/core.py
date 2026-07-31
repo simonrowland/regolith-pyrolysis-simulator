@@ -724,6 +724,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if retained_catalog_payload is not None
             else vapor_pressures
         )
+        # VR-6: compile request rules with the U0 manifest. Evaporation still
+        # consumes the legacy pressure map until VR-11; resolve_batch is the
+        # exact-key surface for later cutover and is not flux-authoritative yet.
         self.vapour_rail_catalog = (
             compile_vapour_rail_catalog(self.vapor_pressure_catalog_data)
             if self.vapor_pressure_catalog_data.get("schema_version") == 2
@@ -1692,6 +1695,35 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             vaporock_provider,
             [ChemistryIntent.VAPOR_PRESSURE],
             shadow=True,
+        )
+
+    def build_vapour_batch(
+        self,
+        *,
+        temperature_K: float | None = None,
+        process_phase: str | None = None,
+        stage: str | None = None,
+        provider_candidates_by_species: dict | None = None,
+    ):
+        """Exact-key vapour batch via VR-6 request builder + refusal closure.
+
+        Golden-neutral: not consumed by evaporation until VR-11. Request keys
+        derive only from the compiler-emitted rules and the current atom-ledger
+        inventory; callers cannot narrow the set.
+        """
+
+        if self.vapour_rail_catalog is None:
+            return None
+        ledger_snapshot = self.atom_ledger.mol_by_account()
+        state = {
+            "temperature_K": temperature_K,
+            "process_phase": process_phase,
+            "stage": stage,
+        }
+        return self.vapour_rail_catalog.resolve_batch(
+            ledger_snapshot,
+            state,
+            provider_candidates_by_species=provider_candidates_by_species,
         )
 
     def _register_alphamelts_provider_if_available(self) -> None:

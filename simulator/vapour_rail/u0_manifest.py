@@ -999,14 +999,43 @@ def build_u0_manifest(
     }
 
 
-def load_u0_manifest(path: Path | None = None) -> dict[str, Any]:
-    """Load a checked-in or generated U0 manifest fixture."""
+# Process-wide memo: path + (mtime_ns, size) → parsed mapping.
+# Invalidates when the fixture file changes on disk. Callers must not mutate
+# the returned mapping (a shallow copy of the top-level dict is returned so
+# top-level rebinding is safe; nested rows are shared read-only).
+_U0_MANIFEST_CACHE: dict[str, tuple[int, int, dict[str, Any]]] = {}
 
-    path = path or DEFAULT_FIXTURE_PATH
+
+def clear_u0_manifest_cache() -> None:
+    """Drop the process-wide U0 manifest memo (tests / hot-reload)."""
+
+    _U0_MANIFEST_CACHE.clear()
+
+
+def load_u0_manifest(path: Path | None = None) -> dict[str, Any]:
+    """Load a checked-in or generated U0 manifest fixture.
+
+    Cached by resolved path + ``(st_mtime_ns, st_size)`` so repeated
+    ``compile_vapour_rail_catalog`` calls with default U0 rule emission do
+    not re-parse the YAML on every compile (~150 ms → ~1 ms after warm).
+    """
+
+    path = Path(path or DEFAULT_FIXTURE_PATH)
+    key = str(path.resolve())
+    stat = path.stat()
+    fingerprint = (stat.st_mtime_ns, stat.st_size)
+    cached = _U0_MANIFEST_CACHE.get(key)
+    if cached is not None and cached[0] == fingerprint[0] and cached[1] == fingerprint[1]:
+        # Shallow top-level copy: callers may rebind keys without poisoning
+        # the cache; nested species rows stay shared (treat as immutable).
+        return dict(cached[2])
+
     payload = yaml.safe_load(path.read_text(encoding="utf-8"))
     if not isinstance(payload, Mapping):
         raise ValueError(f"U0 manifest at {path} is not a mapping")
-    return dict(payload)
+    stored = dict(payload)
+    _U0_MANIFEST_CACHE[key] = (fingerprint[0], fingerprint[1], stored)
+    return dict(stored)
 
 
 def write_u0_manifest(path: Path, document: Mapping[str, Any]) -> None:

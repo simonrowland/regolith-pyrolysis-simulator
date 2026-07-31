@@ -65,6 +65,20 @@ from simulator.vapour_rail.kinetics_anchors import (
     load_langmuir_anchors,
     regimes_remain_distinct,
 )
+from simulator.vapour_rail.batch import (
+    IncompleteVapourBatchError,
+    VapourAnswer,
+    VapourBatch,
+    VapourRequestConstructionError,
+)
+from simulator.vapour_rail.request import (
+    ProviderDomainCandidate,
+    RequestRule,
+    VapourResolveState,
+    build_request,
+    emit_request_rules,
+    resolve_vapour_batch,
+)
 
 __all__ = [
     "ASSOCIATION_POLYMER_IDS",
@@ -114,4 +128,14 @@ __all__ = [
     "prove_pressure_monotone_nondecreasing_in_activity",
     "regimes_remain_distinct",
     "validation_row_may_certify",
+    "IncompleteVapourBatchError",
+    "ProviderDomainCandidate",
+    "RequestRule",
+    "VapourAnswer",
+    "VapourBatch",
+    "VapourRequestConstructionError",
+    "VapourResolveState",
+    "build_request",
+    "emit_request_rules",
+    "resolve_vapour_batch",
 ]

@@ -25,6 +25,7 @@ from simulator.vapour_rail.activity import (
     SourceReactionActivity,
 )
 
+
 SCHEMA_VERSION = 2
 FOUR_STRATA = (
     "physical_properties",
@@ -34,32 +35,23 @@ FOUR_STRATA = (
 )
 DEFAULT_EXTRAPOLATION_POLICY = "conservative_slope_continuation"
 OUT_OF_RANGE_STATUS = "out_of_range_conservative_continuation"
-
-# Identity-keyed memo for schema-v2 compile + legacy projection. Payloads are
-# treated as immutable after first compile (production loaders deepcopy once and
-# never mutate). Keyed by id(payload) with a strong identity check to survive
-# allocator reuse. Bounded LRU so long-lived processes cannot grow without limit.
-# Restores the pre-VR-7 hot-path cost profile when vapor_pressure_legacy_view is
-# called per species on the condensation deposition-flux path (P1-1).
-_CATALOG_COMPILE_CACHE_MAX = 8
-_catalog_compile_cache: OrderedDict[int, tuple[Any, "VapourRailCatalog"]] = OrderedDict()
+# Two distinct memo layers — do not collapse into one (different consumers):
+# 1. _COMPILE_CACHE (VR-6 / NV-1): multi-key strong-ref compile memo keyed by
+#    (id(payload), emit_u0_request_rules, id(u0_manifest)|0) → (payload pin,
+#    catalog). Capability probes and full request-rule compiles share this.
+#    Strong-ref pin + ``cached_payload is payload`` prevents stale-catalog on
+#    id recycle (NV-1 regression must stay red under reversion).
+# 2. _legacy_view_cache (VR-7 / P1-1): payload-identity memo of the schema-v1
+#    projection dict. ``legacy_view()`` deepcopies every call; condensation
+#    hits vapor_pressure_legacy_view per species, so the projection must be
+#    cached separately. Compile memo alone does not serve that consumer
+#    (deepcopy cost + dict-identity stability for the warm A/B budget).
+_COMPILE_CACHE_MAX = 8
+# value: (payload strong-ref pin, compiled catalog)
+_COMPILE_CACHE: dict[tuple[int, bool, int], tuple[Mapping[str, Any], "VapourRailCatalog"]] = {}
+_COMPILE_CACHE_ORDER: list[tuple[int, bool, int]] = []
 _legacy_view_cache: OrderedDict[int, tuple[Any, dict[str, Any]]] = OrderedDict()
-
-# Charge / state aliases that must fold before ledger or cache payloads (VR-7 / REV5).
-# Keys are accepted input spellings; values are canonical species catalog IDs.
-# Only attested spellings with existing catalog targets are mapped — unmapped
-# inputs pass through via canonicalize_charge_alias (P2-1).
-CHARGE_ALIAS_CANONICAL: Mapping[str, str] = MappingProxyType(
-    {
-        "ClO4": "ClO4",
-        "ClO4-": "ClO4",
-        "ClO4_minus": "ClO4",
-        "ClO4_anion": "ClO4",
-        "perchlorate": "ClO4",
-        # Attested trace-table / feedstock spellings for ClO4 only (NO3/SO4/CO3
-        # catalog rows do not exist yet; do not invent canonical keys).
-    }
-)
+_CATALOG_COMPILE_CACHE_MAX = _COMPILE_CACHE_MAX  # shared LRU bound for legacy helpers
 
 
 def _cache_put(
@@ -92,10 +84,27 @@ def _cache_get(
 
 
 def clear_vapor_pressure_view_caches() -> None:
-    """Drop compile/legacy-view memos (tests that mutate payloads in place)."""
+    """Drop compile + legacy-view memos (tests that mutate payloads in place)."""
 
-    _catalog_compile_cache.clear()
+    clear_vapour_rail_compile_cache()
     _legacy_view_cache.clear()
+
+
+# Charge / state aliases that must fold before ledger or cache payloads (VR-7 / REV5).
+# Keys are accepted input spellings; values are canonical species catalog IDs.
+# Only attested spellings with existing catalog targets are mapped — unmapped
+# inputs pass through via canonicalize_charge_alias (P2-1).
+CHARGE_ALIAS_CANONICAL: Mapping[str, str] = MappingProxyType(
+    {
+        "ClO4": "ClO4",
+        "ClO4-": "ClO4",
+        "ClO4_minus": "ClO4",
+        "ClO4_anion": "ClO4",
+        "perchlorate": "ClO4",
+        # Attested trace-table / feedstock spellings for ClO4 only (NO3/SO4/CO3
+        # catalog rows do not exist yet; do not invent canonical keys).
+    }
+)
 
 
 def canonicalize_charge_alias(species_id: str) -> str:
@@ -108,6 +117,8 @@ def canonicalize_charge_alias(species_id: str) -> str:
     if not raw:
         raise ValueError("species_id is required")
     return CHARGE_ALIAS_CANONICAL.get(raw, raw)
+
+
 _LEGACY_CONDENSATION_REFERENCE_ORDER = (
     "Fe", "SiO", "Mg", "Na", "K", "Ca", "Mn", "Cr", "CrO2", "NaCl", "KCl"
 )
@@ -230,10 +241,6 @@ class PressureObservable(str, Enum):
 class ValidationStatus(str, Enum):
     PENDING = "pending_validation"
     VALIDATED = "validated"
-
-
-# Catalog-facing activity types (VR-9 / U2-A). CondensedPhaseActivityProvider
-# owns resolution; bound / pending_validation rows never certify.
 
 
 @dataclass(frozen=True)
@@ -401,6 +408,7 @@ class CompiledSpecies:
     fiat_routing: CompiledFiatRouting
     vaporisation_coefficients: CompiledVaporisationCoefficients
     code_metadata: CompiledCodeMetadata
+    validation_anchor_refs: tuple[str, ...] = ()
 
 
 class VapourRailCatalog:
@@ -411,13 +419,25 @@ class VapourRailCatalog:
         *,
         species: Mapping[str, CompiledSpecies],
         legacy_projection: Mapping[str, Any],
+        request_rules: tuple[Any, ...] = (),
+        catalog_payload: Mapping[str, Any] | None = None,
     ) -> None:
         self._species = MappingProxyType(dict(species))
         self._legacy_projection = deepcopy(dict(legacy_projection))
+        self._request_rules = tuple(request_rules)
+        self._catalog_payload = (
+            deepcopy(dict(catalog_payload)) if catalog_payload is not None else None
+        )
 
     @property
     def species(self) -> Mapping[str, CompiledSpecies]:
         return self._species
+
+    @property
+    def request_rules(self) -> tuple[Any, ...]:
+        """Compiler-emitted request rules (U0 V + eligible C edges + catalog)."""
+
+        return self._request_rules
 
     def evaluator_for(self, species_id: str) -> CompiledPressureEvaluator:
         try:
@@ -464,6 +484,84 @@ class VapourRailCatalog:
             raise CatalogCompileError(f"unknown vapour species {species_id!r}") from exc
         return validation_row_may_certify(validation_status=status)
 
+    def build_request(
+        self,
+        ledger_snapshot: Mapping[str, Any] | Any,
+        state: Any | None = None,
+        *,
+        caller_species_filter: Sequence[str] | None = None,
+    ) -> frozenset[str]:
+        """Manifest + inventory request set only (DESIGN-REV5 §1.2).
+
+        ``state`` is accepted for API symmetry with resolve_batch but is not
+        an input to the request projection.
+        """
+
+        del state  # request keys derive only from manifest + ledger inventory
+        from simulator.vapour_rail.request import build_request
+
+        return build_request(
+            self._request_rules,
+            ledger_snapshot,
+            caller_species_filter=caller_species_filter,
+        )
+
+    def resolve_batch(
+        self,
+        ledger_snapshot: Mapping[str, Any] | Any,
+        state: Any | None = None,
+        *,
+        provider_candidates_by_species: Mapping[str, Sequence[Any]] | None = None,
+        caller_species_filter: Sequence[str] | None = None,
+    ) -> Any:
+        """Request → refusal closure → solve bundles → exact-key VapourBatch."""
+
+        from simulator.vapour_rail.request import (
+            VapourResolveState,
+            resolve_vapour_batch,
+        )
+
+        resolve_state: VapourResolveState | None
+        if state is None:
+            resolve_state = None
+        elif isinstance(state, VapourResolveState):
+            resolve_state = state
+        elif isinstance(state, Mapping):
+            resolve_state = VapourResolveState(
+                temperature_K=state.get("temperature_K"),
+                process_phase=state.get("process_phase"),
+                stage=state.get("stage"),
+                total_pressure_Pa=state.get("total_pressure_Pa"),
+                fO2_bar=state.get("fO2_bar"),
+                extras={
+                    key: value
+                    for key, value in state.items()
+                    if key
+                    not in {
+                        "temperature_K",
+                        "process_phase",
+                        "stage",
+                        "total_pressure_Pa",
+                        "fO2_bar",
+                    }
+                },
+            )
+        else:
+            resolve_state = VapourResolveState(
+                temperature_K=getattr(state, "temperature_K", None),
+                process_phase=getattr(state, "process_phase", None),
+                stage=getattr(state, "stage", None),
+            )
+
+        return resolve_vapour_batch(
+            rules=self._request_rules,
+            ledger_snapshot=ledger_snapshot,
+            state=resolve_state,
+            provider_candidates_by_species=provider_candidates_by_species,
+            catalog_species=self._species,
+            caller_species_filter=caller_species_filter,
+        )
+
 
 class VaporPressureCompatibilityView(dict[str, Any]):
     """Legacy mapping facade retaining its authoritative schema-v2 payload."""
@@ -477,19 +575,70 @@ class VaporPressureCompatibilityView(dict[str, Any]):
         self.catalog_payload = deepcopy(dict(catalog_payload))
 
 
-def compile_vapour_rail_catalog(payload: Mapping[str, Any]) -> VapourRailCatalog:
+def clear_vapour_rail_compile_cache() -> None:
+    """Drop the process-wide catalog compile memo (tests / hot-reload)."""
+
+    _COMPILE_CACHE.clear()
+    _COMPILE_CACHE_ORDER.clear()
+
+
+def compiled_catalog_for(
+    payload: Mapping[str, Any],
+    *,
+    emit_u0_request_rules: bool = False,
+    u0_manifest: Mapping[str, Any] | None = None,
+) -> "VapourRailCatalog":
+    """Return a cached compile of ``payload`` (hot capability-probe entrypoint).
+
+    Defaults ``emit_u0_request_rules=False`` because Antoine / Psat probes only
+    need evaluators. Full request-rule emission stays default-on at
+    :func:`compile_vapour_rail_catalog` for core / VR-6 surfaces; that path is
+    also cached and the U0 manifest parse is process-memoized, so default-on
+    remains cheap after first warm.
+    """
+
+    return compile_vapour_rail_catalog(
+        payload,
+        u0_manifest=u0_manifest,
+        emit_u0_request_rules=emit_u0_request_rules,
+    )
+
+
+def compile_vapour_rail_catalog(
+    payload: Mapping[str, Any],
+    *,
+    u0_manifest: Mapping[str, Any] | None = None,
+    emit_u0_request_rules: bool = True,
+) -> VapourRailCatalog:
     """Validate and compile one schema-v2 YAML payload.
 
-    Schema-v2 payloads are memoized by object identity (see module cache). Treat
-    payloads as immutable after the first compile; call
-    ``clear_vapor_pressure_view_caches`` if a test mutates a cached payload.
+    When ``emit_u0_request_rules`` is true (default), the compiler also emits
+    one request rule per executable U0 ``V`` row and eligible ``C`` edge so a
+    physically eligible manifest species cannot be unrequested by construction.
+
+    Results are memoized by ``id(payload)`` + emit flag (and ``id(u0_manifest)``
+    when supplied) so repeated hot-path compiles of the same config object
+    reuse the catalog. Cache entries pin the payload by strong reference and
+    only hit when ``cached_payload is payload``, so a recycled ``id()`` after
+    the original payload is freed cannot serve a stale catalog (NV-1). The U0
+    manifest YAML load is separately memoized in ``load_u0_manifest``.
     """
 
     if not isinstance(payload, Mapping):
         raise CatalogCompileError("vapour catalog root must be a mapping")
-    cached = _cache_get(_catalog_compile_cache, payload)
+
+    cache_key = (
+        id(payload),
+        bool(emit_u0_request_rules),
+        id(u0_manifest) if u0_manifest is not None else 0,
+    )
+    cached = _COMPILE_CACHE.get(cache_key)
     if cached is not None:
-        return cached
+        cached_payload, cached_catalog = cached
+        # Strong-ref identity: id reuse of a different object cannot hit.
+        if cached_payload is payload:
+            return cached_catalog
+        # Stale id collision (should not occur while pin lives); recompile.
     if payload.get("schema_version") != SCHEMA_VERSION:
         raise CatalogCompileError("vapour catalog schema_version must be 2")
     families = _mapping(payload.get("families"), "families")
@@ -543,6 +692,12 @@ def compile_vapour_rail_catalog(payload: Mapping[str, Any]) -> VapourRailCatalog
                 )
             validation = _mapping(row.get("validation"), f"{species_id}.validation")
             status = _validation_status(validation, species_id)
+            raw_anchors = validation.get("anchor_refs") or []
+            if not isinstance(raw_anchors, list):
+                raise CatalogCompileError(
+                    f"{species_id}: validation.anchor_refs must be a list"
+                )
+            anchor_refs = tuple(str(a) for a in raw_anchors)
             pressure_models = row.get("pressure_models")
             if not isinstance(pressure_models, Sequence) or isinstance(
                 pressure_models, (str, bytes)
@@ -577,6 +732,7 @@ def compile_vapour_rail_catalog(payload: Mapping[str, Any]) -> VapourRailCatalog
                 fiat_routing=compiled_routing,
                 vaporisation_coefficients=compiled_kinetics,
                 code_metadata=compiled_code,
+                validation_anchor_refs=anchor_refs,
             )
             legacy_group[str(species_id)] = _legacy_species_row(
                 species_id=str(species_id),
@@ -598,9 +754,41 @@ def compile_vapour_rail_catalog(payload: Mapping[str, Any]) -> VapourRailCatalog
             for species_id in _LEGACY_CONDENSATION_REFERENCE_ORDER
             if species_id in condensation_reference
         }
-    catalog = VapourRailCatalog(species=compiled, legacy_projection=legacy)
-    _cache_put(_catalog_compile_cache, payload, catalog)
-    return catalog
+
+    request_rules: tuple[Any, ...] = ()
+    if emit_u0_request_rules:
+        from simulator.vapour_rail.request import (
+            VapourRequestConstructionError,
+            emit_request_rules,
+        )
+
+        try:
+            request_rules = emit_request_rules(
+                catalog_species=compiled,
+                u0_manifest=u0_manifest,
+                catalog_payload=payload,
+            )
+        except VapourRequestConstructionError as exc:
+            raise CatalogCompileError(str(exc)) from exc
+
+    result = VapourRailCatalog(
+        species=compiled,
+        legacy_projection=legacy,
+        request_rules=request_rules,
+        catalog_payload=payload,
+    )
+    # Insert / refresh LRU entry (payload pin prevents id-recycle while cached).
+    if cache_key in _COMPILE_CACHE:
+        try:
+            _COMPILE_CACHE_ORDER.remove(cache_key)
+        except ValueError:
+            pass
+    _COMPILE_CACHE[cache_key] = (payload, result)
+    _COMPILE_CACHE_ORDER.append(cache_key)
+    while len(_COMPILE_CACHE_ORDER) > _COMPILE_CACHE_MAX:
+        evicted = _COMPILE_CACHE_ORDER.pop(0)
+        _COMPILE_CACHE.pop(evicted, None)
+    return result
 
 
 def vapor_pressure_legacy_view(payload: Mapping[str, Any] | None) -> dict[str, Any]:
@@ -610,6 +798,11 @@ def vapor_pressure_legacy_view(payload: Mapping[str, Any] | None) -> dict[str, A
     identity so hot-path callers (condensation deposition flux) never recompile
     or re-deepcopy the full catalog per species lookup. The cached dict is
     shared across callers for a given payload object — treat it as read-only.
+
+    Compile uses the VR-6 hot entrypoint (emit_u0_request_rules=False) so this
+    path reuses the strong-ref compile memo without paying for U0 rule emission;
+    the separate _legacy_view_cache then pins the projection dict so warm hits
+    are pure dict returns (VR-7 P1-1 budget).
     """
 
     if not isinstance(payload, Mapping):
@@ -618,7 +811,11 @@ def vapor_pressure_legacy_view(payload: Mapping[str, Any] | None) -> dict[str, A
         cached = _cache_get(_legacy_view_cache, payload)
         if cached is not None:
             return cached
-        view = compile_vapour_rail_catalog(payload).legacy_view()
+        # Evaluator/legacy projection only — skip U0 rule emission on this
+        # hot path; request rules are built by core's dedicated compile.
+        view = compiled_catalog_for(
+            payload, emit_u0_request_rules=False
+        ).legacy_view()
         _cache_put(_legacy_view_cache, payload, view)
         return view
     return deepcopy(dict(payload))

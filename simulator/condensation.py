@@ -3769,10 +3769,13 @@ def _species_has_antoine_data(
     if isinstance(vapor_pressure_data, Mapping) and vapor_pressure_data.get(
         "schema_version"
     ) == 2:
-        from simulator.vapour_rail.catalog import compile_vapour_rail_catalog
+        from simulator.vapour_rail.catalog import compiled_catalog_for
 
         try:
-            compile_vapour_rail_catalog(vapor_pressure_data).evaluator_for(species)
+            # Reuse process-memoized compile; evaluator-only (no U0 rules).
+            compiled_catalog_for(
+                vapor_pressure_data, emit_u0_request_rules=False
+            ).evaluator_for(species)
         except ValueError:
             pass
         else:
@@ -4439,11 +4442,12 @@ def _antoine_psat_pa(
         and isinstance(vapor_pressure_data, Mapping)
         and vapor_pressure_data.get("schema_version") == 2
     ):
-        from simulator.vapour_rail.catalog import compile_vapour_rail_catalog
+        from simulator.vapour_rail.catalog import compiled_catalog_for
 
-        evaluator = compile_vapour_rail_catalog(vapor_pressure_data).evaluator_for(
-            species
-        )
+        # Hot Psat path: reuse memoized compile; no U0 rule emission.
+        evaluator = compiled_catalog_for(
+            vapor_pressure_data, emit_u0_request_rules=False
+        ).evaluator_for(species)
         evaluation = evaluator.evaluate(T_K)
         if evaluation.out_of_range:
             if antoine_extrapolations is not None:
