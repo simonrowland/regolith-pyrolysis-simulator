@@ -27,6 +27,9 @@ WALL_STICKING_ALPHA_MISSING_CODE = (
 WALL_SURFACE_GEOMETRY_PROVENANCE_CODE = (
     "wall_deposit_surface_geometry_provenance"
 )
+WALL_SATURATION_PRESSURE_REFUSED_CODE = (
+    "wall_deposit_saturation_pressure_refused"
+)
 _WALL_DEPOSIT_AUTHORITY_PAYLOAD_KEYS = frozenset({
     "authoritative",
     "authoritative_for_deposit_mass",
@@ -226,9 +229,13 @@ def wall_deposit_sticking_authority_status(
         payload_species = _payload_deposited_species(notice)
         if payload_species == deposited_species:
             notice = _plain_mapping(notice)
+    saturation_pressure_refusals = (
+        _wall_saturation_pressure_refusals_by_species(notice)
+    )
+    refused_species = tuple(sorted(saturation_pressure_refusals))
     geometry_notice = _surface_geometry_provenance_notice(notice)
     geometry_status_bearing = _surface_geometry_status_bearing(geometry_notice)
-    if not deposited_species:
+    if not deposited_species and not refused_species:
         return _wall_deposit_authority_payload(
             authoritative=True,
             code=WALL_STICKING_ALPHA_NOTICE_CODE,
@@ -263,6 +270,51 @@ def wall_deposit_sticking_authority_status(
     if str(notice.get("code", "")) == WALL_STICKING_ALPHA_MISSING_CODE:
         missing_species = deposited_species
         missing_pairs = deposit_pairs
+    uncertified_species = tuple(
+        species for species in deposited_species if species in status_bearing_species
+    )
+    if refused_species:
+        alpha_status_species = tuple(sorted(
+            set(missing_species) | set(uncertified_species)
+        ))
+        codes = [WALL_SATURATION_PRESSURE_REFUSED_CODE]
+        if missing_species:
+            codes.append(WALL_STICKING_ALPHA_MISSING_CODE)
+        if uncertified_species:
+            codes.append(WALL_STICKING_ALPHA_UNCERTIFIED_CODE)
+        message = (
+            "Wall saturation pressure was refused outside its source-certified "
+            "Antoine domain for "
+            + ", ".join(refused_species)
+            + "; the resulting zero is not physical evidence of zero "
+            "deposition, so coating and fouling readouts are non-authoritative."
+        )
+        if alpha_status_species:
+            message += (
+                " Concurrent sticking alpha authority is missing or uncertified "
+                "for "
+                + ", ".join(alpha_status_species)
+                + "."
+            )
+        payload = _wall_deposit_authority_payload(
+            authoritative=False,
+            code=WALL_SATURATION_PRESSURE_REFUSED_CODE,
+            deposited_species=deposited_species,
+            uncertified_species=alpha_status_species,
+            provenance=_provenance_subset(provenance, deposited_species),
+            surface_geometry_provenance=geometry_notice,
+            geometry_status_bearing=geometry_status_bearing,
+            message=message,
+        )
+        payload["codes"] = codes
+        payload["status_bearing_refusal_count"] = len(refused_species)
+        payload["wall_saturation_pressure_refused_species"] = list(
+            refused_species
+        )
+        payload["wall_saturation_pressure_refusals_by_species"] = (
+            saturation_pressure_refusals
+        )
+        return payload
     if missing_species:
         payload = _wall_deposit_authority_payload(
             authoritative=False,
@@ -285,9 +337,6 @@ def wall_deposit_sticking_authority_status(
             ]
         return payload
 
-    uncertified_species = tuple(
-        species for species in deposited_species if species in status_bearing_species
-    )
     if uncertified_species:
         return _wall_deposit_authority_payload(
             authoritative=False,
@@ -334,10 +383,14 @@ def coating_summary_with_grounded_authority(
     result = dict(summary)
     wall_deposit = _coating_wall_deposit_payload(result)
     total_kg = _sum_wall_deposit_kg(wall_deposit)
-    if total_kg is None or total_kg <= _EPS:
+    authority_input = result.get("wall_deposit_sticking_authority")
+    has_pressure_refusal = (
+        isinstance(authority_input, Mapping)
+        and bool(_wall_saturation_pressure_refusals_by_species(authority_input))
+    )
+    if total_kg is None or (total_kg <= _EPS and not has_pressure_refusal):
         return result
 
-    authority_input = result.get("wall_deposit_sticking_authority")
     if isinstance(wall_deposit, Mapping):
         authority = wall_deposit_sticking_authority_status(
             wall_deposit,
@@ -543,6 +596,31 @@ def _alpha_provenance_by_species(
         for species, by_segment in raw.items()
         if isinstance(by_segment, Mapping)
     }
+
+
+def _wall_saturation_pressure_refusals_by_species(
+    alpha_notice: Mapping[str, Any],
+) -> dict[str, dict[str, Any]]:
+    raw = alpha_notice.get("wall_saturation_pressure_refusals_by_species")
+    if not isinstance(raw, Mapping):
+        return {}
+    refusals: dict[str, dict[str, Any]] = {}
+    for species, by_segment in raw.items():
+        if not isinstance(by_segment, Mapping):
+            continue
+        segment_refusals = {
+            str(segment): _plain_mapping(record)
+            for segment, record in by_segment.items()
+            if (
+                isinstance(record, Mapping)
+                and str(record.get("status", "")).lower() == "refused"
+                and str(record.get("output_status", "")).lower()
+                == "status_bearing"
+            )
+        }
+        if segment_refusals:
+            refusals[str(species)] = segment_refusals
+    return refusals
 
 
 def _status_bearing_alpha_species(

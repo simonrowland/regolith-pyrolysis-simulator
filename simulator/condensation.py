@@ -1896,6 +1896,11 @@ class CondensationModel:
     def wall_deposit_accounts(self) -> tuple[str, ...]:
         return tuple(segment.wall_deposit_account for segment in self.pipe_segments)
 
+    def reset_run_sticking_authority(self) -> None:
+        """Reset route-accumulated sticking authority at a run boundary."""
+
+        self.last_sticking_alpha_provenance_notice = {}
+
     def configure_operating_conditions(
         self,
         *,
@@ -2611,6 +2616,43 @@ class CondensationModel:
                 ),
             )
         )
+        wall_saturation_pressure_refusals_by_species: dict[
+            str, dict[str, dict[str, Any]]
+        ] = {}
+        for segment_name, by_species in sorted(
+            self.last_wall_deposition_rate_shadow_candidate.items()
+        ):
+            if not isinstance(by_species, Mapping):
+                continue
+            for species, rate_diagnostic in sorted(by_species.items()):
+                if (
+                    not isinstance(rate_diagnostic, Mapping)
+                    or not bool(
+                        rate_diagnostic.get(
+                            'wall_saturation_pressure_refused',
+                            False,
+                        )
+                    )
+                ):
+                    continue
+                surface = rate_diagnostic.get('surface')
+                wall_temperature_K = (
+                    surface.get('wall_temperature_K')
+                    if isinstance(surface, Mapping)
+                    else None
+                )
+                wall_saturation_pressure_refusals_by_species.setdefault(
+                    str(species),
+                    {},
+                )[str(segment_name)] = {
+                    'status': 'refused',
+                    'reason': 'wall_saturation_pressure_out_of_domain',
+                    'output_status': 'status_bearing',
+                    'wall_temperature_K': wall_temperature_K,
+                    'wall_saturation_pressure_pa': rate_diagnostic.get(
+                        'wall_saturation_pressure_pa'
+                    ),
+                }
 
         for species, rate_kg_hr in evap_flux.species_kg_hr.items():
             wall_deposit_fraction_by_species[species] = 0.0
@@ -2751,6 +2793,29 @@ class CondensationModel:
             wall_sticking_alpha_by_species,
             wall_sticking_alpha_provenance_by_species,
         )
+        prior_refusals = self.last_sticking_alpha_provenance_notice.get(
+            'wall_saturation_pressure_refusals_by_species',
+            {},
+        )
+        if isinstance(prior_refusals, Mapping):
+            accumulated_refusals = copy.deepcopy(dict(prior_refusals))
+            for species, by_segment in (
+                wall_saturation_pressure_refusals_by_species.items()
+            ):
+                if not isinstance(by_segment, Mapping):
+                    continue
+                accumulated_refusals.setdefault(str(species), {}).update(
+                    copy.deepcopy(dict(by_segment))
+                )
+            wall_saturation_pressure_refusals_by_species = accumulated_refusals
+        if wall_saturation_pressure_refusals_by_species:
+            sticking_notice = dict(sticking_notice)
+            sticking_notice['severity'] = 'warning'
+            sticking_notice['authoritative_for_deposit_mass'] = False
+            sticking_notice['deposit_output_status'] = 'status_bearing'
+            sticking_notice[
+                'wall_saturation_pressure_refusals_by_species'
+            ] = wall_saturation_pressure_refusals_by_species
         geometry_notice = dict(self.stage_area_geometry_provenance_notice)
         if geometry_notice:
             sticking_notice = dict(sticking_notice)
@@ -3009,6 +3074,7 @@ class CondensationModel:
                 rate_kg_hr=rate_kg_hr,
                 T_cond_C=T_cond_C,
                 melt_temperature_C=melt_temperature_C,
+                antoine_extrapolation_warnings=antoine_extrapolation_warnings,
             )
         finally:
             _reset_antoine_telemetry_context(token)
@@ -3051,6 +3117,7 @@ class CondensationModel:
                 T_cond_C=T_cond_C,
                 melt_temperature_C=melt_temperature_C,
                 supply_by_segment_kg=supply_by_segment_kg,
+                antoine_extrapolation_warnings=antoine_extrapolation_warnings,
             )
         finally:
             _reset_antoine_telemetry_context(token)
@@ -3392,6 +3459,7 @@ class CondensationModel:
                 melt_temperature_C=melt_temperature_C,
                 wall_temperature_C=wall_temperature_C,
                 surface_area_m2=surface_area_m2,
+                antoine_extrapolation_warnings=antoine_extrapolation_warnings,
             )
         finally:
             _reset_antoine_telemetry_context(token)

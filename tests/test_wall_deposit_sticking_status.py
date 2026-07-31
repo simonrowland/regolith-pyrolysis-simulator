@@ -84,6 +84,26 @@ def _sourced_missing_output_notice(species: str) -> dict[str, object]:
     }
 
 
+def _wall_pressure_refusal_notice(
+    species: str = "Mg",
+    *,
+    segment: str = "hot_wall",
+) -> dict[str, object]:
+    return {
+        "wall_saturation_pressure_refusals_by_species": {
+            species: {
+                segment: {
+                    "status": "refused",
+                    "reason": "wall_saturation_pressure_out_of_domain",
+                    "output_status": "status_bearing",
+                    "wall_temperature_K": 1800.0,
+                    "wall_saturation_pressure_pa": None,
+                }
+            }
+        }
+    }
+
+
 def _fake_sim(
     wall: dict[tuple[str, str], float],
     notice: dict[str, object],
@@ -621,6 +641,191 @@ def test_zero_deposit_stage_alpha_status_stays_authoritative() -> None:
     assert route.wall_deposit_by_species.get("Fe", 0.0) == pytest.approx(0.0)
     assert authority["authoritative_for_deposit_mass"] is True
     assert authority["deposited_species"] == []
+
+
+def test_out_of_domain_wall_psat_refusal_is_status_bearing() -> None:
+    magnesium_vapor = condensation_module._species_vapor_data(
+        "Mg",
+        vapor_pressure_data=condensation_module.VAPOR_PRESSURE_DATA,
+    )
+    certified_range_K = magnesium_vapor["pure_component_antoine"][
+        "source_certified_range_K"
+    ]
+    # The midpoint stays inside Mg's total certified data rail while exceeding
+    # the pure-component range required by the wall-saturation consumer.
+    wall_temperature_K = (
+        float(certified_range_K[1])
+        + float(magnesium_vapor["total_source_certified_range_K"][1])
+    ) / 2.0
+    assert wall_temperature_K > float(certified_range_K[1])
+    assert wall_temperature_K <= float(
+        magnesium_vapor["total_source_certified_range_K"][1]
+    )
+
+    route, authority = _route_wall_deposit_authority(
+        "Mg",
+        wall_temperature_C=(
+            wall_temperature_K - condensation_module.CELSIUS_TO_KELVIN_OFFSET
+        ),
+    )
+
+    assert route.wall_deposit_by_species.get("Mg", 0.0) == pytest.approx(0.0)
+    refusal = route.sticking_alpha_provenance_notice[
+        "wall_saturation_pressure_refusals_by_species"
+    ]["Mg"]["stage_0_to_stage_1"]
+    assert refusal["status"] == "refused"
+    assert refusal["output_status"] == "status_bearing"
+    assert refusal["reason"] == "wall_saturation_pressure_out_of_domain"
+    assert refusal["wall_temperature_K"] == pytest.approx(wall_temperature_K)
+    assert refusal["wall_saturation_pressure_pa"] is None
+    assert any(
+        "metal_vapor_pressure_out_of_source_certified_range: species=Mg"
+        in warning
+        for warning in route.antoine_extrapolation_warnings
+    )
+
+    assert authority["authoritative_for_deposit_mass"] is False
+    assert authority["output_status"] == "status_bearing"
+    assert authority["code"] == "wall_deposit_saturation_pressure_refused"
+    assert authority["status_bearing_alpha_count"] == 0
+    assert authority["status_bearing_refusal_count"] == 1
+    assert authority["wall_saturation_pressure_refused_species"] == ["Mg"]
+    fouling = _wall_fouling_report(
+        route.wall_deposit_by_species,
+        alpha_notice=route.sticking_alpha_provenance_notice,
+    )
+    assert fouling["output_status"] == "status_bearing"
+    assert fouling["verdict_authoritative"] is False
+    assert fouling["verdict"] == "non-authoritative"
+
+
+def test_wall_psat_refusal_survives_a_later_non_refusing_route() -> None:
+    magnesium_vapor = condensation_module._species_vapor_data(
+        "Mg",
+        vapor_pressure_data=condensation_module.VAPOR_PRESSURE_DATA,
+    )
+    pure_range_K = magnesium_vapor["pure_component_antoine"][
+        "source_certified_range_K"
+    ]
+    wall_temperature_K = (
+        float(pure_range_K[1])
+        + float(magnesium_vapor["total_source_certified_range_K"][1])
+    ) / 2.0
+    model = CondensationModel(
+        CondensationTrain.create_default(),
+        wall_temperature_C=(
+            wall_temperature_K - condensation_module.CELSIUS_TO_KELVIN_OFFSET
+        ),
+    )
+    melt = MeltState()
+    melt.temperature_C = 1700.0
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={"Mg": 1.0},
+        campaign_name="C0",
+    )
+
+    first = model.route(
+        EvaporationFlux(species_kg_hr={"Mg": 1.0}, total_kg_hr=1.0),
+        melt,
+    )
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={"Fe": 1.0},
+        campaign_name="C0",
+    )
+    second = model.route(
+        EvaporationFlux(species_kg_hr={"Fe": 1.0}, total_kg_hr=1.0),
+        melt,
+    )
+
+    assert "Mg" in first.sticking_alpha_provenance_notice[
+        "wall_saturation_pressure_refusals_by_species"
+    ]
+    assert not any(
+        bool(rate_diagnostic.get("wall_saturation_pressure_refused", False))
+        for by_species in model.last_wall_deposition_rate_shadow_candidate.values()
+        for rate_diagnostic in by_species.values()
+    )
+    final_notice = model.last_sticking_alpha_provenance_notice
+    assert "Mg" in final_notice[
+        "wall_saturation_pressure_refusals_by_species"
+    ]
+    assert "Mg" in second.sticking_alpha_provenance_notice[
+        "wall_saturation_pressure_refusals_by_species"
+    ]
+
+    final_wall = {
+        (segment, species): kg
+        for segment, by_species in second.wall_deposit_by_segment_species.items()
+        for species, kg in by_species.items()
+    }
+    trace = PhysicsTrace.from_simulator(_fake_sim(final_wall, final_notice))
+    assert trace.wall_deposit_sticking_authority[
+        "authoritative_for_deposit_mass"
+    ] is False
+    fouling = _wall_fouling_report(
+        second.wall_deposit_by_species,
+        wall_deposit_by_segment_species=second.wall_deposit_by_segment_species,
+        alpha_notice=final_notice,
+    )
+    assert fouling["output_status"] == "status_bearing"
+    assert fouling["verdict_authoritative"] is False
+
+    model.reset_run_sticking_authority()
+    assert model.last_sticking_alpha_provenance_notice == {}
+
+
+@pytest.mark.parametrize(
+    ("alpha_notice", "alpha_code"),
+    (
+        (
+            _alpha_notice("Fe", cited=False),
+            "wall_deposit_sticking_alpha_uncertified",
+        ),
+        (
+            _missing_record_notice("Fe"),
+            "wall_deposit_sticking_alpha_provenance_missing",
+        ),
+    ),
+)
+def test_wall_psat_refusal_reports_concurrent_alpha_authority_codes(
+    alpha_notice: dict[str, object],
+    alpha_code: str,
+) -> None:
+    notice = copy.deepcopy(alpha_notice)
+    notice.update(_wall_pressure_refusal_notice())
+
+    authority = wall_deposit_sticking_authority_status(
+        {("hot_wall", "Fe"): 0.05},
+        notice,
+    )
+
+    assert authority["code"] == "wall_deposit_saturation_pressure_refused"
+    assert set(authority["codes"]) == {
+        "wall_deposit_saturation_pressure_refused",
+        alpha_code,
+    }
+    assert authority["uncertified_alpha_species"] == ["Fe"]
+    assert authority["status_bearing_alpha_count"] == 1
+    assert authority["status_bearing_refusal_count"] == 1
+
+
+def test_zero_deposit_refusal_reaches_product_web_and_leaderboard_surfaces() -> None:
+    surfaces = _coating_surfaces(
+        "Mg",
+        _wall_pressure_refusal_notice(),
+        kg=0.0,
+    )
+
+    trace_authority = surfaces["trace"].wall_deposit_sticking_authority
+    assert trace_authority["authoritative_for_coating"] is False
+    assert surfaces["product_summary"]["coating_authoritative"] is False
+    assert surfaces["product_summary"]["coating_status"] == "warning"
+    assert surfaces["readout"]["authoritative"] is False
+    assert surfaces["readout"]["output_status"] == "status_bearing"
+    assert surfaces["leaderboard_row"]["coating_authoritative"] is False
+    assert surfaces["leaderboard_row"]["coating_output_status"] == "status_bearing"
 
 
 def test_missing_output_status_is_status_bearing_for_deposited_alpha() -> None:

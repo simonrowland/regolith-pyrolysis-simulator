@@ -5,6 +5,7 @@ import math
 import pytest
 
 from simulator import condensation
+from simulator.accounting.queries import wall_deposit_candidate_for_surface_kg
 from simulator.state import (
     CondensationStage,
     CondensationTrain,
@@ -121,6 +122,59 @@ def test_wall_antoine_applied_path_reports_extrapolation_without_value_change():
     assert sio_pressure == 0.0
     assert sio_extrap == {}
     assert sio_warns == []
+
+
+def test_wall_deposit_query_reports_out_of_domain_antoine_refusal():
+    magnesium_vapor = condensation._species_vapor_data(
+        "Mg",
+        vapor_pressure_data=condensation.VAPOR_PRESSURE_DATA,
+    )
+    pure_range_K = magnesium_vapor["pure_component_antoine"][
+        "source_certified_range_K"
+    ]
+    # The midpoint stays inside Mg's total certified data rail while exceeding
+    # the pure-component range required by the wall-saturation consumer.
+    wall_temperature_K = (
+        float(pure_range_K[1])
+        + float(magnesium_vapor["total_source_certified_range_K"][1])
+    ) / 2.0
+    assert wall_temperature_K > float(pure_range_K[1])
+    assert wall_temperature_K <= float(
+        magnesium_vapor["total_source_certified_range_K"][1]
+    )
+
+    model = condensation.CondensationModel(
+        CondensationTrain.create_default(),
+        wall_temperature_C=(
+            wall_temperature_K - condensation.CELSIUS_TO_KELVIN_OFFSET
+        ),
+    )
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={"Mg": 1.0},
+        campaign_name="C0",
+    )
+    warnings: list[str] = []
+
+    candidate_kg = wall_deposit_candidate_for_surface_kg(
+        model,
+        species="Mg",
+        rate_kg_hr=1.0,
+        T_cond_C=model.condensation_temperatures_C["Mg"],
+        melt_temperature_C=1700.0,
+        wall_temperature_C=(
+            wall_temperature_K - condensation.CELSIUS_TO_KELVIN_OFFSET
+        ),
+        surface_area_m2=model.wall_surface_area_m2,
+        antoine_extrapolation_warnings=warnings,
+    )
+
+    assert candidate_kg == pytest.approx(0.0)
+    assert any(
+        "metal_vapor_pressure_out_of_source_certified_range: species=Mg"
+        in warning
+        for warning in warnings
+    )
 
 
 def test_antoine_extrapolation_records_count_same_species_stage_and_wall():

@@ -227,18 +227,22 @@ def _merged_wall_deposit_sticking_authority(
     for authority in (carried_authority, run_authority):
         if not isinstance(authority, Mapping):
             continue
-        raw = authority.get("alpha_s_provenance_by_species")
-        if not isinstance(raw, Mapping):
-            continue
-        provenance = merged.setdefault("alpha_s_provenance_by_species", {})
-        if not isinstance(provenance, dict):
-            continue
-        for species, by_segment in raw.items():
-            if not isinstance(by_segment, Mapping):
+        for key in (
+            "alpha_s_provenance_by_species",
+            "wall_saturation_pressure_refusals_by_species",
+        ):
+            raw = authority.get(key)
+            if not isinstance(raw, Mapping):
                 continue
-            current = provenance.setdefault(str(species), {})
-            if isinstance(current, dict):
-                current.update(_plain_authority_mapping(by_segment))
+            by_species = merged.setdefault(key, {})
+            if not isinstance(by_species, dict):
+                continue
+            for species, by_segment in raw.items():
+                if not isinstance(by_segment, Mapping):
+                    continue
+                current = by_species.setdefault(str(species), {})
+                if isinstance(current, dict):
+                    current.update(_plain_authority_mapping(by_segment))
     return merged
 
 

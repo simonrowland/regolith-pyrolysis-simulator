@@ -1900,6 +1900,25 @@ def _wall_sticking_status_payload(species: str, *, cited: bool) -> dict[str, obj
     )
 
 
+def _wall_pressure_refusal_status_payload() -> dict[str, object]:
+    return wall_deposit_sticking_authority_status(
+        {},
+        {
+            "wall_saturation_pressure_refusals_by_species": {
+                "Mg": {
+                    "hot_wall": {
+                        "status": "refused",
+                        "reason": "wall_saturation_pressure_out_of_domain",
+                        "output_status": "status_bearing",
+                        "wall_temperature_K": 1800.0,
+                        "wall_saturation_pressure_pa": None,
+                    }
+                }
+            }
+        },
+    )
+
+
 def test_cached_coating_margin_authority_rederives_stale_false_from_status_payload() -> None:
     margin = _cached_coating_margin(
         False,
@@ -2000,6 +2019,18 @@ def test_cached_coating_margin_zero_deposit_keeps_cached_authority() -> None:
     assert margin.output_status == "status_bearing"
 
 
+def test_cached_coating_margin_zero_deposit_refusal_rederives_stale_true() -> None:
+    margin = _cached_coating_margin(
+        True,
+        _wall_pressure_refusal_status_payload(),
+    )
+
+    assert margin.authoritative is False
+    assert margin.status == "warning"
+    assert margin.output_status == "status_bearing"
+    assert "not physical evidence of zero deposition" in margin.status_reason
+
+
 def test_cached_product_summary_provenance_overrides_stale_true_bool(tmp_path) -> None:
     spec = _base_spec(recipe_id="cached-stale-coating-authority")
     wall = {"hot_wall": {"K": 0.05}}
@@ -2041,6 +2072,38 @@ def test_cached_product_summary_provenance_overrides_stale_true_bool(tmp_path) -
     assert loaded.run_reference.product_summary["coating_status"] == "warning"
     assert loaded.run_reference.product_summary["coating_authoritative"] is False
     assert loaded.run_reference.product_summary["coating_output_status"] == "status_bearing"
+
+
+def test_cached_zero_deposit_refusal_overrides_stale_true_summary(tmp_path) -> None:
+    spec = _base_spec(recipe_id="cached-zero-deposit-refusal")
+    summary = {
+        "wall_deposit_kg_by_segment_species": {
+            "hot_wall": {"Mg": 0.0},
+        },
+        "campaigns_to_resinter": "infinite",
+        "coating_status": "available",
+        "coating_authoritative": True,
+        "coating_output_status": "authoritative",
+        "wall_deposit_sticking_authority": _wall_pressure_refusal_status_payload(),
+    }
+    store = ResultStore(
+        tmp_path / "results.sqlite",
+        current_code_version=spec.code_version,
+        current_data_digests=spec.data_digests,
+    )
+
+    store.store(spec, _scored(spec, product_summary=summary), created_at="t1")
+    loaded = store.lookup(spec)
+
+    assert loaded is not None
+    assert loaded.run_reference is not None
+    loaded_summary = loaded.run_reference.product_summary
+    assert loaded_summary["coating_status"] == "warning"
+    assert loaded_summary["coating_authoritative"] is False
+    assert loaded_summary["coating_output_status"] == "status_bearing"
+    assert loaded_summary["wall_deposit_sticking_authority"][
+        "wall_saturation_pressure_refused_species"
+    ] == ["Mg"]
 
 
 def test_best_defaults_to_profile_primary_and_honors_direction(tmp_path) -> None:

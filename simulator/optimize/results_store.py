@@ -1567,6 +1567,14 @@ def _coating_margin_grounded_authority(
 ) -> dict[str, Any] | None:
     deposited_species = _coating_margin_deposited_species(status_payload)
     if not deposited_species:
+        zero_deposit_authority = wall_deposit_sticking_authority_status(
+            {},
+            status_payload,
+        )
+        if zero_deposit_authority.get(
+            "wall_saturation_pressure_refused_species"
+        ):
+            return zero_deposit_authority
         return None
     wall_deposit = {species: 1.0 for species in deposited_species}
     return wall_deposit_sticking_authority_status(wall_deposit, status_payload)

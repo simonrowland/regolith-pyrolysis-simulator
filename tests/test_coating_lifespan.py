@@ -48,6 +48,26 @@ def _alpha_notice(species: str, *, cited: bool = True) -> dict[str, object]:
     }
 
 
+def _wall_pressure_refusal_notice(
+    species: str = "Mg",
+    *,
+    segment: str = "hot_wall",
+) -> dict[str, object]:
+    return {
+        "wall_saturation_pressure_refusals_by_species": {
+            species: {
+                segment: {
+                    "status": "refused",
+                    "reason": "wall_saturation_pressure_out_of_domain",
+                    "output_status": "status_bearing",
+                    "wall_temperature_K": 1800.0,
+                    "wall_saturation_pressure_pa": None,
+                }
+            }
+        }
+    }
+
+
 def test_snapshot_is_frozen_and_deep_copied_after_export() -> None:
     deposit = {("duct_a", "SiO"): 0.25}
     authority = {"deposited_species": ["SiO"], "authoritative_for_resinter": True}
@@ -139,6 +159,44 @@ def test_merge_run_snapshot_rederives_authority_for_cumulative_species() -> None
     assert authority is not None
     assert authority["authoritative_for_resinter"] is False
     assert authority["deposited_species"] == ("Na", "SiO")
+
+
+def test_merge_run_snapshot_preserves_refusal_without_deposit() -> None:
+    run_export = FoulingTerminalSnapshot.from_trace(
+        _trace({}, _wall_pressure_refusal_notice())
+    )
+
+    post_merge, per_run_net = merge_run_snapshot(None, run_export)
+
+    assert dict(per_run_net) == {}
+    authority = post_merge.wall_deposit_sticking_authority
+    assert authority["authoritative_for_resinter"] is False
+    assert authority["deposited_species"] == ()
+    assert authority["wall_saturation_pressure_refused_species"] == ("Mg",)
+    assert authority["status_bearing_refusal_count"] == 1
+
+
+def test_merge_run_snapshot_preserves_carried_positive_and_new_refusal() -> None:
+    carried = FoulingTerminalSnapshot.from_trace(
+        _trace(
+            {("hot_wall", "SiO"): 1.0},
+            _alpha_notice("SiO", cited=True),
+        )
+    )
+    run_export = FoulingTerminalSnapshot.from_trace(
+        _trace({}, _wall_pressure_refusal_notice())
+    )
+
+    post_merge, _per_run_net = merge_run_snapshot(carried, run_export)
+
+    assert post_merge.wall_deposit_by_segment_species_kg["hot_wall"][
+        "SiO"
+    ] == pytest.approx(1.0)
+    authority = post_merge.wall_deposit_sticking_authority
+    assert authority["authoritative_for_resinter"] is False
+    assert authority["deposited_species"] == ("SiO",)
+    assert authority["wall_saturation_pressure_refused_species"] == ("Mg",)
+    assert "Mg" in authority["wall_saturation_pressure_refusals_by_species"]
 
 
 def test_limiter_stack_provisional_verdict_and_threshold_parametric_motion() -> None:

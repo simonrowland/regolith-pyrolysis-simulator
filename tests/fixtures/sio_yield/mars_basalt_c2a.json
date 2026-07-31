@@ -30,26 +30,26 @@
     "campaigns_to_resinter_by_segment": {},
     "aggregate_campaigns_to_resinter": "infinite",
     "fast_fouling_campaign_threshold": 10,
-    "output_status": "sourced_with_surface_proxy",
-    "authoritative": true,
-    "authoritative_for_resinter": true,
-    "verdict_authoritative": true,
-    "status": "available",
-    "status_reason": "",
+    "output_status": "status_bearing",
+    "authoritative": false,
+    "authoritative_for_resinter": false,
+    "verdict_authoritative": false,
+    "status": "warning",
+    "status_reason": "Wall saturation pressure was refused outside its source-certified Antoine domain for Mg; the resulting zero is not physical evidence of zero deposition, so coating and fouling readouts are non-authoritative.",
     "sticking_alpha_authority": {
-      "authoritative": true,
-      "authoritative_for_deposit_mass": true,
-      "authoritative_for_coating": true,
-      "authoritative_for_resinter": true,
-      "severity": "info",
-      "code": "wall_deposit_sticking_alpha_provenance",
-      "output_status": "sourced_with_surface_proxy",
+      "authoritative": false,
+      "authoritative_for_deposit_mass": false,
+      "authoritative_for_coating": false,
+      "authoritative_for_resinter": false,
+      "severity": "warning",
+      "code": "wall_deposit_saturation_pressure_refused",
+      "output_status": "status_bearing",
       "deposited_species": [],
       "uncertified_alpha_species": [],
       "status_bearing_alpha_count": 0,
       "alpha_s_provenance_by_species": {},
       "grounding_target": "data/literature/vacuum_pyrolysis_sticking.yaml",
-      "message": "Deposited wall species use cited/sourced sticking alpha_s provenance for coating and fouling readouts.",
+      "message": "Wall saturation pressure was refused outside its source-certified Antoine domain for Mg; the resulting zero is not physical evidence of zero deposition, so coating and fouling readouts are non-authoritative.",
       "surface_geometry_provenance": {
         "severity": "warning",
         "code": "wall_deposit_surface_geometry_provenance",
@@ -118,11 +118,50 @@
         },
         "message": "Condenser stage-area ratios include provisional/default geometry; wall-deposit and coating readouts are status-bearing until stage surface areas are certified."
       },
-      "surface_geometry_status_bearing": false,
-      "surface_geometry_code": "wall_deposit_surface_geometry_provenance"
+      "surface_geometry_status_bearing": true,
+      "surface_geometry_code": "wall_deposit_surface_geometry_provenance",
+      "codes": [
+        "wall_deposit_saturation_pressure_refused"
+      ],
+      "status_bearing_refusal_count": 1,
+      "wall_saturation_pressure_refused_species": [
+        "Mg"
+      ],
+      "wall_saturation_pressure_refusals_by_species": {
+        "Mg": {
+          "stage_0_to_stage_1": {
+            "status": "refused",
+            "reason": "wall_saturation_pressure_out_of_domain",
+            "output_status": "status_bearing",
+            "wall_temperature_K": 1773.15,
+            "wall_saturation_pressure_pa": null
+          },
+          "stage_1_to_stage_2": {
+            "status": "refused",
+            "reason": "wall_saturation_pressure_out_of_domain",
+            "output_status": "status_bearing",
+            "wall_temperature_K": 1773.15,
+            "wall_saturation_pressure_pa": null
+          },
+          "stage_2_to_stage_3": {
+            "status": "refused",
+            "reason": "wall_saturation_pressure_out_of_domain",
+            "output_status": "status_bearing",
+            "wall_temperature_K": 1773.15,
+            "wall_saturation_pressure_pa": null
+          },
+          "stage_3_to_stage_4": {
+            "status": "refused",
+            "reason": "wall_saturation_pressure_out_of_domain",
+            "output_status": "status_bearing",
+            "wall_temperature_K": 1773.15,
+            "wall_saturation_pressure_pa": null
+          }
+        }
+      }
     },
     "nominal_verdict": "slow-fouling",
-    "verdict": "slow-fouling"
+    "verdict": "non-authoritative"
   },
   "sio_yield_pct_of_feedstock": 1.32754051777e-07,
   "industrial_benchmark_pct": [

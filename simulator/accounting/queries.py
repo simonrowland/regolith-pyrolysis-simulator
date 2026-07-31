@@ -2419,6 +2419,7 @@ def wall_deposit_candidate_kg(
     rate_kg_hr: float,
     T_cond_C: float,
     melt_temperature_C: float,
+    antoine_extrapolation_warnings: list[str] | None = None,
 ) -> float:
     return wall_deposit_candidate_for_surface_kg(
         model,
@@ -2428,6 +2429,7 @@ def wall_deposit_candidate_kg(
         melt_temperature_C=melt_temperature_C,
         wall_temperature_C=model.wall_temperature_C,
         surface_area_m2=model.wall_surface_area_m2,
+        antoine_extrapolation_warnings=antoine_extrapolation_warnings,
     )
 
 
@@ -2439,6 +2441,7 @@ def wall_deposit_candidates_by_segment_kg(
     T_cond_C: float,
     melt_temperature_C: float,
     supply_by_segment_kg: Mapping[str, float],
+    antoine_extrapolation_warnings: list[str] | None = None,
 ) -> dict[str, float]:
     if rate_kg_hr <= 0.0 or not model.pipe_segments:
         return {}
@@ -2465,6 +2468,7 @@ def wall_deposit_candidates_by_segment_kg(
             ),
             regime_factor=_segment_wall_regime_factor(model, segment),
             segment=segment,
+            antoine_extrapolation_warnings=antoine_extrapolation_warnings,
         )
         if candidate > 0.0:
             candidates[segment.name] = min(candidate, supply_kg)
@@ -2517,6 +2521,7 @@ def wall_deposit_candidate_for_surface_kg(
     pipe_diameter_m: float | None = None,
     regime_factor: float | None = None,
     segment: Any | None = None,
+    antoine_extrapolation_warnings: list[str] | None = None,
 ) -> float:
     if rate_kg_hr <= 0.0 or surface_area_m2 <= 0.0:
         return 0.0
@@ -2614,6 +2619,7 @@ def wall_deposit_candidate_for_surface_kg(
             species == 'SiO'
             and float(wall_temperature_C) <= float(T_cond_C)
         ),
+        antoine_extrapolation_warnings=antoine_extrapolation_warnings,
         diagnostic_out=rate_diagnostic,
     )
     rate_diagnostic["species_partial_pressure_pa"] = P_local_pa
@@ -2623,6 +2629,7 @@ def wall_deposit_candidate_for_surface_kg(
             species,
             T_wall_K,
             vapor_pressure_data=vapor_pressure_data,
+            antoine_extrapolation_warnings=antoine_extrapolation_warnings,
         )
     )
     rate_diagnostic["wall_saturation_pressure_pa"] = wall_saturation_pressure_pa

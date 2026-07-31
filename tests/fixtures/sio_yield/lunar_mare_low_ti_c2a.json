@@ -39,14 +39,14 @@
     "authoritative_for_resinter": false,
     "verdict_authoritative": false,
     "status": "warning",
-    "status_reason": "Deposited wall species include UNCERTIFIED or status-bearing sticking alpha_s; coating and fouling readouts are non-authoritative.",
+    "status_reason": "Wall saturation pressure was refused outside its source-certified Antoine domain for Mg; the resulting zero is not physical evidence of zero deposition, so coating and fouling readouts are non-authoritative. Concurrent sticking alpha authority is missing or uncertified for Cr.",
     "sticking_alpha_authority": {
       "authoritative": false,
       "authoritative_for_deposit_mass": false,
       "authoritative_for_coating": false,
       "authoritative_for_resinter": false,
       "severity": "warning",
-      "code": "wall_deposit_sticking_alpha_uncertified",
+      "code": "wall_deposit_saturation_pressure_refused",
       "output_status": "status_bearing",
       "deposited_species": [
         "Cr"
@@ -159,7 +159,7 @@
         }
       },
       "grounding_target": "data/literature/vacuum_pyrolysis_sticking.yaml",
-      "message": "Deposited wall species include UNCERTIFIED or status-bearing sticking alpha_s; coating and fouling readouts are non-authoritative.",
+      "message": "Wall saturation pressure was refused outside its source-certified Antoine domain for Mg; the resulting zero is not physical evidence of zero deposition, so coating and fouling readouts are non-authoritative. Concurrent sticking alpha authority is missing or uncertified for Cr.",
       "surface_geometry_provenance": {
         "severity": "warning",
         "code": "wall_deposit_surface_geometry_provenance",
@@ -229,7 +229,47 @@
         "message": "Condenser stage-area ratios include provisional/default geometry; wall-deposit and coating readouts are status-bearing until stage surface areas are certified."
       },
       "surface_geometry_status_bearing": true,
-      "surface_geometry_code": "wall_deposit_surface_geometry_provenance"
+      "surface_geometry_code": "wall_deposit_surface_geometry_provenance",
+      "codes": [
+        "wall_deposit_saturation_pressure_refused",
+        "wall_deposit_sticking_alpha_uncertified"
+      ],
+      "status_bearing_refusal_count": 1,
+      "wall_saturation_pressure_refused_species": [
+        "Mg"
+      ],
+      "wall_saturation_pressure_refusals_by_species": {
+        "Mg": {
+          "stage_0_to_stage_1": {
+            "status": "refused",
+            "reason": "wall_saturation_pressure_out_of_domain",
+            "output_status": "status_bearing",
+            "wall_temperature_K": 1773.15,
+            "wall_saturation_pressure_pa": null
+          },
+          "stage_1_to_stage_2": {
+            "status": "refused",
+            "reason": "wall_saturation_pressure_out_of_domain",
+            "output_status": "status_bearing",
+            "wall_temperature_K": 1773.15,
+            "wall_saturation_pressure_pa": null
+          },
+          "stage_2_to_stage_3": {
+            "status": "refused",
+            "reason": "wall_saturation_pressure_out_of_domain",
+            "output_status": "status_bearing",
+            "wall_temperature_K": 1773.15,
+            "wall_saturation_pressure_pa": null
+          },
+          "stage_3_to_stage_4": {
+            "status": "refused",
+            "reason": "wall_saturation_pressure_out_of_domain",
+            "output_status": "status_bearing",
+            "wall_temperature_K": 1773.15,
+            "wall_saturation_pressure_pa": null
+          }
+        }
+      }
     },
     "nominal_verdict": "threshold-parametric: fast-fouling if campaigns_to_resinter < 10, else slow-fouling",
     "verdict": "non-authoritative"
