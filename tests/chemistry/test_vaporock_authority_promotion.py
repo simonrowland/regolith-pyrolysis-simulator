@@ -54,7 +54,7 @@ def _build_sim(
     allow_fallback_vapor: bool = False,
 ) -> PyrolysisSimulator:
     backend = InternalAnalyticalBackend()
-    backend.initialize({})
+    backend.initialize({'warm_worker': False})
     setpoints = dict(setpoints_data)
     kernel_cfg = dict(setpoints.get("chemistry_kernel", {}) or {})
     kernel_cfg["allow_fallback_vapor"] = bool(allow_fallback_vapor)

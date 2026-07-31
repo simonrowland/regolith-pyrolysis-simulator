@@ -69,7 +69,7 @@ def _available_backend_or_skip() -> VapoRockBackend:
     backend = VapoRockBackend()
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
-        available = backend.initialize({})
+        available = backend.initialize({'warm_worker': False})
     if not available:
         pytest.skip("VapoRock optional dependency unavailable")
     return backend

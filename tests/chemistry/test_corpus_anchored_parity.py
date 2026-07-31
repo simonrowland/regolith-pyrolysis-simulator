@@ -642,12 +642,19 @@ def _grid_25_test_cases():
 # fail toward "not passing" (so out-of-range builtin Antoine anchors
 # for SiO / O2 / SiO2 do not pull the count below the gate).
 
-VAPOROCK_MAX_VALID_T_K = 2400.0
+# VR-5 external domain (DESIGN-REV5 §4.2.1): 1350–1950 K inclusive.
+# Was 2400 K historically; the 2026-07-31 probe proved silent fabrication
+# outside the admitted envelope, so the corpus gate must match the adapter.
+VAPOROCK_MIN_VALID_T_K = 1350.0
+VAPOROCK_MAX_VALID_T_K = 1950.0
 
 
 def _is_out_of_engine_range(anchor: CorpusAnchor, engine: str) -> bool:
     if engine == "vaporock":
-        return anchor.T_K > VAPOROCK_MAX_VALID_T_K
+        return (
+            anchor.T_K < VAPOROCK_MIN_VALID_T_K
+            or anchor.T_K > VAPOROCK_MAX_VALID_T_K
+        )
     if engine == "builtin-antoine":
         # Builtin Antoine has no honest path to SiO2 / O2 over silicate
         # melts — those are structural. SiO is covered by the VapoRock-
@@ -824,7 +831,8 @@ def vaporock_available() -> bool:
     probe = VapoRockBackend()
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
-        return probe.initialize({})
+        # Availability probe: no warm pool (spawn is wasteful for import check).
+        return probe.initialize({"warm_worker": False})
 
 
 @pytest.fixture(scope="module")
@@ -885,7 +893,13 @@ KNOWN_NONCONVERGED_ANCHOR_MAX_ERROR = {
     "grid-25:lunar_mare_basalt_12022_proxy@1900K:Na": 3.2,
 }
 
-GRID_25_V3_PASS_BASELINE = 21
+# VR-5 (2026-07-31): external domain gate tightened VapoRock to 1350–1950 K
+# (was 2400 K corpus ceiling). The single 2000 K Na anchor
+# (grid-25:vf2013_mars_2000_na@2000K:Na) moves from pass → out_of_range,
+# so the in-domain pass baseline drops 21 → 20. Not an engine residual
+# regression — the cell is correctly refused as outside the admitted
+# envelope (probe: silent fabrication beyond it).
+GRID_25_V3_PASS_BASELINE = 20
 GRID_25_V3_ORIGINAL_ACCEPTANCE_TARGET = 18
 
 GRID_25_V3_RESIDUAL_CLASSIFICATION = {
@@ -1089,9 +1103,8 @@ GRID_25_SIO_RUNTIME_DRIFT_TRIPWIRE = {
     "grid-25-sio:cj2015@1900K:SiO": (
         "model-spread-within-envelope", 0.25049547025978586,
     ),
-    "grid-25-sio:cj2015@2000K:SiO": (
-        "model-spread-within-envelope", 0.8630312227800293,
-    ),
+    # VR-5: T ceiling 1950 K — 2000 K is out-of-engine-T-range (was live).
+    "grid-25-sio:cj2015@2000K:SiO": ("out-of-engine-T-range", None),
     "grid-25-sio:sf2004@1700K:SiO": (
         "model-spread-within-envelope", 0.9269341194554767,
     ),
@@ -1107,26 +1120,19 @@ GRID_25_SIO_RUNTIME_DRIFT_TRIPWIRE = {
     "grid-25-sio:sof2018-mineru@1873K:SiO": (
         "pass", 0.13230855453336143,
     ),
-    "grid-25-sio:sof2018-mineru@1973K:SiO": (
-        "model-spread-within-envelope", 0.6890827879473371,
-    ),
-    "grid-25-sio:vf2013-bse@2000K:SiO": (
-        "body-composition-spread", 1.6648366606130383,
-    ),
+    # VR-5: 1973 K is above the 1950 K external domain ceiling.
+    "grid-25-sio:sof2018-mineru@1973K:SiO": ("out-of-engine-T-range", None),
+    "grid-25-sio:vf2013-bse@2000K:SiO": ("out-of-engine-T-range", None),
     "grid-25-sio:vf2013-bse@2500K:SiO": ("out-of-engine-T-range", None),
     "grid-25-sio:vf2013-bse@3000K:SiO": ("out-of-engine-T-range", None),
     "grid-25-sio:vf2013-bse@3500K:SiO": ("out-of-engine-T-range", None),
     "grid-25-sio:vf2013-bse@4000K:SiO": ("out-of-engine-T-range", None),
-    "grid-25-sio:vf2013-mars@2000K:SiO": (
-        "body-composition-spread", 1.4834772616216307,
-    ),
+    "grid-25-sio:vf2013-mars@2000K:SiO": ("out-of-engine-T-range", None),
     "grid-25-sio:vf2013-mars@2500K:SiO": ("out-of-engine-T-range", None),
     "grid-25-sio:vf2013-mars@3000K:SiO": ("out-of-engine-T-range", None),
     "grid-25-sio:vf2013-mars@3500K:SiO": ("out-of-engine-T-range", None),
     "grid-25-sio:vf2013-mars@4000K:SiO": ("out-of-engine-T-range", None),
-    "grid-25-sio:vf2013-moon@2000K:SiO": (
-        "body-composition-spread", 3.0897489690376014,
-    ),
+    "grid-25-sio:vf2013-moon@2000K:SiO": ("out-of-engine-T-range", None),
     "grid-25-sio:vf2013-moon@2500K:SiO": ("out-of-engine-T-range", None),
     "grid-25-sio:vf2013-moon@3000K:SiO": ("out-of-engine-T-range", None),
     "grid-25-sio:vf2013-moon@3500K:SiO": ("out-of-engine-T-range", None),
@@ -1450,9 +1456,10 @@ _CJ_PRESSURE_RUNTIME_DRIFT_TRIPWIRE = {
     ("Ir", 1900, "Fe"): ("model-spread-within-envelope", 0.9023568639218107),
     ("Ir", 1900, "Mg"): ("model-spread-within-envelope", 0.9959124657587983),
     ("Ir", 1900, "SiO"): ("model-spread-within-envelope", 0.2510644934192934),
-    ("Ir", 2000, "Fe"): ("model-spread-within-envelope", 1.2413524450894502),
-    ("Ir", 2000, "Mg"): ("model-spread-within-envelope", 1.0828523376671315),
-    ("Ir", 2000, "SiO"): ("model-spread-within-envelope", 0.8629284388131637),
+    # VR-5: 2000 K is above the 1950 K external domain ceiling.
+    ("Ir", 2000, "Fe"): ("out-of-engine-range", None),
+    ("Ir", 2000, "Mg"): ("out-of-engine-range", None),
+    ("Ir", 2000, "SiO"): ("out-of-engine-range", None),
     ("Mo", 1700, "Fe"): ("model-spread-within-envelope", 1.2403840124506909),
     ("Mo", 1700, "Mg"): ("model-spread-within-envelope", 1.0130016822826402),
     ("Mo", 1700, "SiO"): ("model-spread-within-envelope", 2.274686497380271),
@@ -1462,9 +1469,9 @@ _CJ_PRESSURE_RUNTIME_DRIFT_TRIPWIRE = {
     ("Mo", 1900, "Fe"): ("pass", 0.010251600763916128),
     ("Mo", 1900, "Mg"): ("model-spread-within-envelope", 0.23408753424120385),
     ("Mo", 1900, "SiO"): ("model-spread-within-envelope", 0.6778828750017594),
-    ("Mo", 2000, "Fe"): ("model-spread-within-envelope", 0.5563524450894497),
-    ("Mo", 2000, "Mg"): ("pass", 0.10785233766713012),
-    ("Mo", 2000, "SiO"): ("pass", 0.017928438813163063),
+    ("Mo", 2000, "Fe"): ("out-of-engine-range", None),
+    ("Mo", 2000, "Mg"): ("out-of-engine-range", None),
+    ("Mo", 2000, "SiO"): ("out-of-engine-range", None),
     ("Re", 1700, "Fe"): ("model-spread-within-envelope", 1.9056781300977503),
     ("Re", 1700, "Mg"): ("model-spread-within-envelope", 1.4159428587532297),
     ("Re", 1700, "SiO"): ("model-spread-within-envelope", 2.604686497380273),
@@ -1474,9 +1481,9 @@ _CJ_PRESSURE_RUNTIME_DRIFT_TRIPWIRE = {
     ("Re", 1900, "Fe"): ("model-spread-within-envelope", 0.8408010308150304),
     ("Re", 1900, "Mg"): ("pass", 0.5577717447675202),
     ("Re", 1900, "SiO"): ("model-spread-within-envelope", 1.3026197171070235),
-    ("Re", 2000, "Fe"): ("pass", 0.3736475549105501),
-    ("Re", 2000, "Mg"): ("pass", 0.18214766233286903),
-    ("Re", 2000, "SiO"): ("model-spread-within-envelope", 0.7320715611868368),
+    ("Re", 2000, "Fe"): ("out-of-engine-range", None),
+    ("Re", 2000, "Mg"): ("out-of-engine-range", None),
+    ("Re", 2000, "SiO"): ("out-of-engine-range", None),
 }
 
 _CJ_FLUX_RUNTIME_DRIFT_TRIPWIRE = {
@@ -1536,7 +1543,10 @@ def _evaluate_cj_vapor_pressure_anchor(
     if anchor.expected_Pa is None or anchor.expected_Pa <= 0.0:
         entry["status"] = "out-of-engine-range"
         return entry
-    if anchor.T_K > VAPOROCK_MAX_VALID_T_K:
+    if (
+        anchor.T_K < VAPOROCK_MIN_VALID_T_K
+        or anchor.T_K > VAPOROCK_MAX_VALID_T_K
+    ):
         entry["status"] = "out-of-engine-range"
         return entry
 
@@ -1756,9 +1766,13 @@ def test_cj_olivine_kems_pressure_runtime_drift_tripwire(
     status = entry["status"]
     assert status in _CJ_OLIVINE_ALLOWED_STATUSES
     assert status == expected_status, anchor.anchor_id
-    assert entry["error_decades"] == pytest.approx(
-        expected_error, rel=0.0, abs=1e-9,
-    ), anchor.anchor_id
+    # VR-5 OOR re-pins use error_decades=None (same shape as SiO tripwire).
+    if expected_error is None:
+        assert entry["error_decades"] is None, anchor.anchor_id
+    else:
+        assert entry["error_decades"] == pytest.approx(
+            expected_error, rel=0.0, abs=1e-9,
+        ), anchor.anchor_id
 
 
 @pytest.mark.parametrize(

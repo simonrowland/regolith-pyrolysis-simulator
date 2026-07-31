@@ -93,10 +93,17 @@ from __future__ import annotations
 import importlib
 import math
 import re
+import tempfile
 import warnings
+from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional
 
 from engines.domain_reason import OutOfDomainReason
+from simulator.engine_pool import (
+    EngineWorkerPool,
+    EngineWorkerRemoteError,
+    WarmEngineWorker,
+)
 from simulator.melt_backend.base import (
     CLEANED_MELT_ACCOUNT,
     DEFAULT_BACKEND_CAPABILITIES,
@@ -107,6 +114,38 @@ from simulator.melt_backend.base import (
     split_cleaned_melt_account,
 )
 from simulator.state import OXIDE_SPECIES
+
+
+# ---------------------------------------------------------------------------
+# External validation domain (DESIGN-REV5 §4.2.1; VR-5)
+# ---------------------------------------------------------------------------
+# Load-bearing gate: the 2026-07-31 probe
+# (docs-private/research/2026-07-31-vaporock-probe/findings.md) found zero
+# typed refusals from 1200 K through 10000 K. At 10000 K the engine returned
+# smooth finite fabrications with total finite partial pressure ~8.3e5 bar.
+# A finite provider return is therefore no evidence of domain validity.
+VAPOROCK_T_MIN_K = 1350.0
+VAPOROCK_T_MAX_K = 1950.0
+# In-domain mare totals are ≪ 1 bar even at 1950 K / reducing fO2. Ten bar
+# is a conservative sum-pressure sanity ceiling well below the probe's
+# 10000 K garbage (~8.3e5 bar) and well above any admitted-grid total.
+VAPOROCK_MAX_SUM_PRESSURE_BAR = 10.0
+# First-order liquid gate (DESIGN-REV5 §5.2): when a caller supplies a
+# liquid_fraction from the melt backend, refuse sub-liquid cells rather
+# than fabricating vapor over a mostly-solid assemblage.
+VAPOROCK_MIN_LIQUID_FRACTION = 0.95
+# Probe fixture (findings.md / raw_results.json range_behaviour T=10000):
+# sum_P_bar_finite ≈ 8.323e5 bar. Used only as a regression anchor.
+VAPOROCK_PROBE_10000K_SUM_P_BAR = 8.323344495585738e5
+
+VAPOROCK_WARM_CALL_TIMEOUT_S = 60.0
+VAPOROCK_WORKER_STARTUP_TIMEOUT_S = 60.0
+# DESIGN-REV5 §5.5: while reuse_system is admitted, the warm worker
+# compares reused-System output against a fresh System for the first N
+# reuse hits. Any mismatch latches fresh-per-request for the rest of the
+# worker lifetime. Absolute tolerance is on log10(bar) values (decades).
+VAPOROCK_REUSE_EQUIVALENCE_PROBE_LIMIT = 20
+VAPOROCK_REUSE_EQUIVALENCE_ATOL_LOG10 = 1e-6
 
 
 # VapoRock gas-species names carry a "(g)" phase suffix.  This pattern
@@ -153,6 +192,69 @@ _IMPORT_CANDIDATES = (
 _VAPOROCK_MELT_BASIS = tuple(dict.fromkeys((*OXIDE_SPECIES, 'H2O', 'CO2')))
 
 
+def temperature_C_to_K(temperature_C: float) -> float:
+    """Convert the adapter's Celsius melt temperature to Kelvin."""
+    return float(temperature_C) + 273.15
+
+
+def vaporock_temperature_in_domain(temperature_K: float) -> bool:
+    """True iff *temperature_K* lies in the admitted VapoRock envelope."""
+    try:
+        t = float(temperature_K)
+    except (TypeError, ValueError):
+        return False
+    if not math.isfinite(t):
+        return False
+    return VAPOROCK_T_MIN_K <= t <= VAPOROCK_T_MAX_K
+
+
+def vaporock_liquid_fraction_admitted(
+    liquid_fraction: Optional[float],
+) -> bool:
+    """True when liquid gate is not applicable or the fraction passes.
+
+    ``None`` means the caller did not supply a melt-assemblage liquid
+    fraction; the gate does not invent one. When supplied, the fraction
+    must be finite and at least ``VAPOROCK_MIN_LIQUID_FRACTION``.
+    """
+    if liquid_fraction is None:
+        return True
+    try:
+        value = float(liquid_fraction)
+    except (TypeError, ValueError):
+        return False
+    if not math.isfinite(value):
+        return False
+    return value >= VAPOROCK_MIN_LIQUID_FRACTION
+
+
+def vaporock_sum_pressure_bar(
+    pressures_Pa: Mapping[str, float],
+) -> float:
+    """Sum finite positive partial pressures and return the total in bar."""
+    total_pa = 0.0
+    for value in pressures_Pa.values():
+        try:
+            pressure = float(value)
+        except (TypeError, ValueError):
+            continue
+        if math.isfinite(pressure) and pressure > 0.0:
+            total_pa += pressure
+    return total_pa / 1e5
+
+
+def vaporock_sum_pressure_sane(
+    pressures_Pa: Mapping[str, float],
+    *,
+    max_sum_bar: float = VAPOROCK_MAX_SUM_PRESSURE_BAR,
+) -> tuple[bool, float]:
+    """Return ``(admitted, sum_bar)`` for the sum-pressure sanity gate."""
+    sum_bar = vaporock_sum_pressure_bar(pressures_Pa)
+    if not math.isfinite(sum_bar):
+        return False, sum_bar
+    return sum_bar <= float(max_sum_bar), sum_bar
+
+
 def _dropped_account_species(
     composition_mol_by_account: Mapping[str, Mapping[str, float]],
 ) -> Dict[str, tuple[str, ...]]:
@@ -171,6 +273,273 @@ def _dropped_account_species(
     return result
 
 
+def _serialize_log10_bar_pressures(raw: Any) -> Dict[str, float]:
+    """Flatten upstream log10(bar) output to a plain ``species → float`` dict.
+
+    Used inside the warm worker so the pipe only carries pickle-safe
+    primitives (pandas DataFrames do not need to cross the process
+    boundary).
+    """
+    if raw is None:
+        return {}
+    if hasattr(raw, 'iloc') and hasattr(raw, 'index'):
+        try:
+            if len(getattr(raw, 'shape', ())) == 2:
+                series = raw.iloc[:, 0]
+            else:
+                series = raw
+            items = series.items()
+        except Exception:  # noqa: BLE001
+            # P3 disposition (review-vr5-km P3-2): empty return keeps the
+            # pre-existing in-process shape (silent empty speciation →
+            # non_authoritative). A typed worker error tag is deferred;
+            # output remains diagnostic-only for SC-50 consumers.
+            return {}
+    elif isinstance(raw, dict):
+        items = raw.items()
+    else:
+        return {}
+    out: Dict[str, float] = {}
+    for species, log10_bar in items:
+        try:
+            value = float(log10_bar)
+        except (TypeError, ValueError):
+            continue
+        if math.isfinite(value):
+            out[str(species)] = value
+    return out
+
+
+def _log10_bar_maps_equivalent(
+    left: Mapping[str, float],
+    right: Mapping[str, float],
+    *,
+    atol: float = VAPOROCK_REUSE_EQUIVALENCE_ATOL_LOG10,
+) -> bool:
+    """True iff two log10(bar) maps match species-for-species within *atol*.
+
+    Used by the warm-worker reuse probe (DESIGN-REV5 §5.5). Missing keys,
+    extra keys, non-finite values, or any |Δlog10| > atol are mismatches.
+    """
+    left_keys = set(left)
+    right_keys = set(right)
+    if left_keys != right_keys:
+        return False
+    for species in left_keys:
+        try:
+            a = float(left[species])
+            b = float(right[species])
+        except (TypeError, ValueError):
+            return False
+        if not (math.isfinite(a) and math.isfinite(b)):
+            return False
+        if abs(a - b) > float(atol):
+            return False
+    return True
+
+
+def _eval_system_log10_bar(
+    system: Any,
+    *,
+    composition_wt_pct: Mapping[str, float],
+    temperature_K: float,
+    fO2_log: float,
+) -> Dict[str, float]:
+    """Run set_melt_comp + eval_gas_abundances on *system*; return log10 map."""
+    set_melt_comp = getattr(system, 'set_melt_comp')
+    eval_gas_abundances = getattr(system, 'eval_gas_abundances')
+    set_melt_comp(dict(composition_wt_pct))
+    # Upstream accepts optional P but our adapter never passes total
+    # pressure (diagnostic-only; vaporock.py historically ignored it).
+    logP = eval_gas_abundances(float(temperature_K), float(fO2_log))
+    return _serialize_log10_bar_pressures(logP)
+
+
+def _construct_system(resource: dict[str, Any]) -> Any:
+    """Construct a new System and bump the worker construct counter."""
+    system_cls = resource['system_cls']
+    system = system_cls()
+    resource['system_construct_count'] = (
+        int(resource.get('system_construct_count') or 0) + 1
+    )
+    return system
+
+
+def _latch_reuse_fresh(
+    resource: dict[str, Any],
+    *,
+    reason: str,
+    detail: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Permanently disable System reuse for this worker (DESIGN-REV5 §5.5).
+
+    Clears the stored System so subsequent requests cannot accidentally
+    re-use a residue-carrying instance. Returns the status-bearing
+    diagnostic payload fragment.
+    """
+    resource['reuse_latched_fresh'] = True
+    resource['system'] = None
+    diagnostic: dict[str, Any] = {
+        'reuse_latched_fresh': True,
+        'reason': str(reason),
+    }
+    if detail:
+        diagnostic['detail'] = dict(detail)
+    resource['reuse_mismatch_diagnostic'] = diagnostic
+    return diagnostic
+
+
+def _bootstrap_vaporock_worker(
+    temperature_units: str,
+    vapor_pressure_units: str,
+    reuse_system: bool,
+) -> tuple[dict[str, Any], str]:
+    """Import VapoRock inside the killable child; own the System lifecycle.
+
+    Fresh ``System`` per request is the default (``reuse_system=False``).
+    Reuse is only enabled after equivalence against fresh-System evaluation
+    over the admitted grid has been proven (DESIGN-REV5 §5.5). Even when
+    the bootstrap flag is True, the handler re-probes reused-vs-fresh on
+    the first N reuse hits and latches fresh-per-request on any mismatch.
+    """
+    module = None
+    errors: list[str] = []
+    for module_name in _IMPORT_CANDIDATES:
+        try:
+            module = importlib.import_module(module_name)
+            break
+        except Exception as exc:  # noqa: BLE001
+            errors.append(f'{module_name}: {exc}')
+    if module is None:
+        raise RuntimeError(
+            'VapoRock import failed in warm worker: ' + '; '.join(errors)
+        )
+    system_cls = getattr(module, 'System', None)
+    resource: dict[str, Any] = {
+        'module': module,
+        'system_cls': system_cls if callable(system_cls) else None,
+        'system': None,
+        'temperature_units': str(temperature_units),
+        'vapor_pressure_units': str(vapor_pressure_units),
+        # Bootstrap intent; may be overridden by reuse_latched_fresh.
+        'reuse_system': bool(reuse_system),
+        'system_construct_count': 0,
+        # §5.5 in-worker equivalence probe state.
+        'reuse_equivalence_checks_done': 0,
+        'reuse_latched_fresh': False,
+        'reuse_mismatch_diagnostic': None,
+    }
+    return resource, 'vaporock-ready'
+
+
+def _handle_vaporock_request(
+    resource: dict[str, Any],
+    request: Mapping[str, Any],
+    _errlog: Any,
+) -> dict[str, Any]:
+    """Evaluate one VapoRock request inside the warm worker.
+
+    Default: construct a fresh ``System`` every call. When
+    ``reuse_system`` is True and reuse has not been latched off, the
+    worker keeps a single mutable System and re-calls ``set_melt_comp``.
+
+    DESIGN-REV5 §5.5 hard condition: while reuse is active, the first
+    ``VAPOROCK_REUSE_EQUIVALENCE_PROBE_LIMIT`` reuse hits also evaluate a
+    fresh System on the same inputs; any mismatch beyond tolerance latches
+    fresh-per-request for the remainder of the worker lifetime and emits a
+    status-bearing diagnostic on the response.
+    """
+    composition_wt_pct = dict(request['composition_wt_pct'])
+    temperature_K = float(request['temperature_K'])
+    fO2_log = float(request['fO2_log'])
+    system_cls = resource.get('system_cls')
+    if system_cls is None:
+        raise RuntimeError(
+            'VapoRock warm worker has no System entry point'
+        )
+
+    latched = bool(resource.get('reuse_latched_fresh'))
+    want_reuse = bool(resource.get('reuse_system')) and not latched
+    stored = resource.get('system') if want_reuse else None
+    reuse_mismatch: dict[str, Any] | None = None
+    reuse_mode: str
+
+    if stored is not None:
+        # Actual reuse path — optionally probe against a fresh System.
+        checks_done = int(resource.get('reuse_equivalence_checks_done') or 0)
+        probe = checks_done < int(VAPOROCK_REUSE_EQUIVALENCE_PROBE_LIMIT)
+        reused_log = _eval_system_log10_bar(
+            stored,
+            composition_wt_pct=composition_wt_pct,
+            temperature_K=temperature_K,
+            fO2_log=fO2_log,
+        )
+        if probe:
+            fresh_system = _construct_system(resource)
+            fresh_log = _eval_system_log10_bar(
+                fresh_system,
+                composition_wt_pct=composition_wt_pct,
+                temperature_K=temperature_K,
+                fO2_log=fO2_log,
+            )
+            resource['reuse_equivalence_checks_done'] = checks_done + 1
+            if not _log10_bar_maps_equivalent(reused_log, fresh_log):
+                # Null hypothesis: if latch is absent, residue-carrying
+                # reuse continues silently. Latch + return the fresh map.
+                reuse_mismatch = _latch_reuse_fresh(
+                    resource,
+                    reason='reused_vs_fresh_mismatch',
+                    detail={
+                        'probe_index': checks_done + 1,
+                        'temperature_K': temperature_K,
+                        'fO2_log': fO2_log,
+                        'atol_log10': VAPOROCK_REUSE_EQUIVALENCE_ATOL_LOG10,
+                        'reused_species': sorted(reused_log),
+                        'fresh_species': sorted(fresh_log),
+                    },
+                )
+                log10_bar = fresh_log
+                reuse_mode = 'fresh_latched'
+            else:
+                # Probe passed: keep the stored System as the reuse target.
+                # (fresh_system is discarded — construct count still rose.)
+                log10_bar = reused_log
+                reuse_mode = 'reused_probed'
+        else:
+            log10_bar = reused_log
+            reuse_mode = 'reused'
+    else:
+        system = _construct_system(resource)
+        if want_reuse:
+            resource['system'] = system
+        log10_bar = _eval_system_log10_bar(
+            system,
+            composition_wt_pct=composition_wt_pct,
+            temperature_K=temperature_K,
+            fO2_log=fO2_log,
+        )
+        reuse_mode = 'fresh_latched' if latched else (
+            'fresh_seed' if want_reuse else 'fresh'
+        )
+
+    payload: dict[str, Any] = {
+        'log10_bar': log10_bar,
+        'path': 'system',
+        'system_construct_count': int(
+            resource.get('system_construct_count') or 0
+        ),
+        'reuse_mode': reuse_mode,
+        'reuse_latched_fresh': bool(resource.get('reuse_latched_fresh')),
+    }
+    if reuse_mismatch is not None:
+        payload['reuse_mismatch'] = reuse_mismatch
+    elif resource.get('reuse_mismatch_diagnostic') is not None:
+        # Surface the latched diagnostic on later calls too so the parent
+        # can keep status-bearing provenance without re-probing.
+        payload['reuse_mismatch'] = dict(resource['reuse_mismatch_diagnostic'])
+    return payload
+
+
 _VAPOROCK_RUNTIME_AVAILABLE_CACHE: bool | None = None
 
 
@@ -181,6 +550,10 @@ def vaporock_runtime_available() -> bool:
     equilibrium solve. Force-builtin optimizer runs short-circuit before this
     probe, while live VapoRock runs initialise the adapter during execution
     anyway, so the probe adds no net cost on the VapoRock path.
+
+    Availability probes always disable the warm pool: spawning an isolated
+    worker just to check importability is wasteful, and unit tests that
+    monkeypatch the import only affect the parent process.
     """
     global _VAPOROCK_RUNTIME_AVAILABLE_CACHE
     if _VAPOROCK_RUNTIME_AVAILABLE_CACHE is True:
@@ -189,7 +562,7 @@ def vaporock_runtime_available() -> bool:
     try:
         with warnings.catch_warnings():
             warnings.simplefilter('ignore', UserWarning)
-            initialized = backend.initialize({})
+            initialized = backend.initialize({'warm_worker': False})
     except Exception:  # noqa: BLE001 - mirrors provider boundary catch
         return False
     if not initialized:
@@ -197,6 +570,10 @@ def vaporock_runtime_available() -> bool:
     available = backend.is_available()
     if available:
         _VAPOROCK_RUNTIME_AVAILABLE_CACHE = True
+    try:
+        backend.close()
+    except Exception:  # noqa: BLE001
+        pass
     return available
 
 
@@ -259,6 +636,20 @@ class VapoRockBackend(MeltBackend):
         self._warnings: List[str] = []
         self._last_error: Optional[str] = None
         self._last_pressure_authority_warning: Optional[str] = None
+        # Warm pool (DESIGN-REV5 §5.5 / VR-5). Opt-in: calibration runners
+        # and live warm-path tests pass warm_worker=True. Default off so
+        # the diagnostic shadow and corpus harnesses do not spawn a pool
+        # per simulator instance. Spawn children do not see parent
+        # monkeypatches — fake-import unit tests must also keep the
+        # in-process path (warm_worker=False).
+        self._warm_worker_enabled: bool = False
+        self._reuse_system: bool = False
+        self._warm_pool: Optional[EngineWorkerPool] = None
+        self._warm_pool_size: int = 1
+        self._warm_call_timeout_s: float = VAPOROCK_WARM_CALL_TIMEOUT_S
+        self._worker_startup_timeout_s: float = (
+            VAPOROCK_WORKER_STARTUP_TIMEOUT_S
+        )
 
     # ------------------------------------------------------------------
     # MeltBackend interface
@@ -271,7 +662,13 @@ class VapoRockBackend(MeltBackend):
         Returns True only if the upstream library imports cleanly.
         Never raises — a missing library is a normal "not available"
         outcome.
+
+        When ``warm_worker`` is True the import is owned by an isolated
+        warm worker and the parent keeps only a thin transport. Default
+        is False (in-process import) so diagnostic shadows and unit tests
+        stay lightweight; calibration runners opt in explicitly.
         """
+        self.close()
         self._available = False
         self._warnings = []
         self._last_error = None
@@ -315,16 +712,118 @@ class VapoRockBackend(MeltBackend):
             return False
         self._vapor_pressure_units = vapor_pressure_units
 
+        self._warm_worker_enabled = bool(
+            self._config.get('warm_worker', False)
+        )
+        self._reuse_system = bool(self._config.get('reuse_system', False))
+        pool_size = int(self._config.get('warm_pool_size', 1))
+        if pool_size <= 0:
+            self._last_error = 'VapoRock warm_pool_size must be positive'
+            self._warnings.append(self._last_error)
+            return False
+        self._warm_pool_size = pool_size
+        warm_timeout = float(
+            self._config.get(
+                'warm_call_timeout_s', VAPOROCK_WARM_CALL_TIMEOUT_S
+            )
+        )
+        if not math.isfinite(warm_timeout) or warm_timeout <= 0.0:
+            self._last_error = (
+                'VapoRock warm_call_timeout_s must be finite and positive'
+            )
+            self._warnings.append(self._last_error)
+            return False
+        self._warm_call_timeout_s = warm_timeout
+        startup_timeout = float(
+            self._config.get(
+                'worker_startup_timeout_s',
+                VAPOROCK_WORKER_STARTUP_TIMEOUT_S,
+            )
+        )
+        if not math.isfinite(startup_timeout) or startup_timeout <= 0.0:
+            self._last_error = (
+                'VapoRock worker_startup_timeout_s must be finite and positive'
+            )
+            self._warnings.append(self._last_error)
+            return False
+        self._worker_startup_timeout_s = startup_timeout
+
+        if self._warm_worker_enabled:
+            return self._initialize_warm_pool()
+
         module = self._import_vaporock()
         if module is None:
             return False
-
         self._vaporock = module
         self._available = True
         return True
 
+    def _initialize_warm_pool(self) -> bool:
+        """Start the isolated warm pool that owns the VapoRock import."""
+        diagnostic_path = Path(
+            tempfile.gettempdir(),
+            'regolith-pyrolysis-simulator',
+            'vaporock-diagnostics.log',
+        )
+
+        def worker_factory(index: int) -> WarmEngineWorker:
+            return WarmEngineWorker(
+                name=f'VapoRock warm pool slot {index}',
+                bootstrap=_bootstrap_vaporock_worker,
+                handler=_handle_vaporock_request,
+                bootstrap_args=(
+                    self._temperature_units,
+                    self._vapor_pressure_units,
+                    self._reuse_system,
+                ),
+                startup_timeout_s=self._worker_startup_timeout_s,
+                call_timeout_s=self._warm_call_timeout_s,
+                diagnostic_log_path=diagnostic_path.with_name(
+                    f'{diagnostic_path.stem}-{index}{diagnostic_path.suffix}'
+                ),
+            )
+
+        try:
+            self._warm_pool = EngineWorkerPool(
+                worker_factory,
+                size=self._warm_pool_size,
+            )
+        except EngineWorkerRemoteError as exc:
+            self._last_error = (
+                f'VapoRock warm pool failed to initialize: {exc.detail}'
+            )
+            self._warnings.append(self._last_error)
+            self._warm_pool = None
+            return False
+        except Exception as exc:  # noqa: BLE001
+            self._last_error = (
+                f'VapoRock warm pool failed to initialize: {exc}'
+            )
+            self._warnings.append(self._last_error)
+            self._warm_pool = None
+            return False
+        self._vaporock = None  # import lives in the child only
+        self._available = True
+        return True
+
+    def close(self) -> None:
+        """Shut down any warm pool; safe to call repeatedly."""
+        if self._warm_pool is not None:
+            try:
+                self._warm_pool.close(cancel_pending=True)
+            except Exception:  # noqa: BLE001
+                pass
+            self._warm_pool = None
+        self._available = False
+        self._vaporock = None
+
     def is_available(self) -> bool:
         return self._available
+
+    @property
+    def uses_warm_pool(self) -> bool:
+        """True when equilibrate dispatches through an isolated warm worker."""
+        return self._warm_pool is not None
 
     def get_vapor_species(self) -> List[str]:
         # Reflect the VapoRock vapor model in the SAME vocabulary
@@ -393,6 +892,7 @@ class VapoRockBackend(MeltBackend):
             Mapping[str, Mapping[str, float]]
         ] = None,
         species_formula_registry: Optional[Mapping[str, Any]] = None,
+        liquid_fraction: Optional[float] = None,
     ) -> EquilibriumResult:
         """
         Call VapoRock for vapor-melt equilibrium.
@@ -403,6 +903,16 @@ class VapoRockBackend(MeltBackend):
         sulfide and halide accounts are filtered out before the library
         is called (binding spec §7).  The melt composition is then
             projected to VapoRock's MELTS-compatible oxide/volatile wt% basis.
+
+        External domain gate (DESIGN-REV5 §4.2.1 / VR-5; load-bearing):
+        refuse outside 1350–1950 K, on liquid-fraction failure when a
+        fraction is supplied, on projection/non-basis failure, and on
+        sum-pressure sanity failure after the engine returns. Upstream
+        fabricates smooth finite garbage at extreme T (probe: ~8.3e5 bar
+        total at 10000 K) and never self-refuses.
+
+        ``pressure_bar`` remains diagnostic-only: the System path does not
+        pass total pressure through to the engine.
 
         ``EquilibriumResult.ledger_transition`` is left ``None`` and no
         phase assemblage is reported: VapoRock holds no ``AtomLedger``
@@ -415,7 +925,9 @@ class VapoRockBackend(MeltBackend):
         ``EquilibriumResult`` and appends a one-line warning rather
         than raising.
         """
-        if not self._available or self._vaporock is None:
+        if not self._available or (
+            self._warm_pool is None and self._vaporock is None
+        ):
             return EquilibriumResult(
                 temperature_C=temperature_C,
                 pressure_bar=pressure_bar,
@@ -425,6 +937,84 @@ class VapoRockBackend(MeltBackend):
             )
 
         prior_warnings: List[str] = []
+        temperature_K = temperature_C_to_K(temperature_C)
+
+        # --- HARD external temperature gate (before any engine call) ---
+        if not vaporock_temperature_in_domain(temperature_K):
+            diagnostics = {
+                'backend_status_reason': (
+                    OutOfDomainReason.TEMPERATURE_RANGE.value
+                ),
+                'temperature_K': float(temperature_K),
+                'vaporock_t_min_K': VAPOROCK_T_MIN_K,
+                'vaporock_t_max_K': VAPOROCK_T_MAX_K,
+                'requested_pressure_bar': float(pressure_bar),
+                'pressure_control_authoritative': False,
+            }
+            return EquilibriumResult(
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+                liquid_fraction=liquid_fraction,
+                phase_assemblage_available=False,
+                status='out_of_domain',
+                warnings=[
+                    f'VapoRock refused T={temperature_K:g} K outside '
+                    f'admitted domain '
+                    f'[{VAPOROCK_T_MIN_K:g}, {VAPOROCK_T_MAX_K:g}] K '
+                    '(external domain gate; upstream fabricates finite '
+                    'garbage outside this envelope)'
+                ],
+                diagnostics=diagnostics,
+            )
+
+        # --- Liquid-state gate when the melt backend supplied a fraction ---
+        if not vaporock_liquid_fraction_admitted(liquid_fraction):
+            # Diagnostics must not re-raise on non-floatable values: the
+            # admit helper already refused them (review-vr5-km P3-1). Only
+            # format a float after a successful coercion.
+            liquid_diag: Any
+            if liquid_fraction is None:
+                liquid_diag = None
+            else:
+                try:
+                    coerced = float(liquid_fraction)
+                except (TypeError, ValueError):
+                    liquid_diag = repr(liquid_fraction)
+                else:
+                    liquid_diag = (
+                        coerced if math.isfinite(coerced) else repr(liquid_fraction)
+                    )
+            diagnostics = {
+                'backend_status_reason': (
+                    OutOfDomainReason.LIQUID_STATE.value
+                ),
+                'liquid_fraction': liquid_diag,
+                'vaporock_min_liquid_fraction': VAPOROCK_MIN_LIQUID_FRACTION,
+                'temperature_K': float(temperature_K),
+                'requested_pressure_bar': float(pressure_bar),
+                'pressure_control_authoritative': False,
+            }
+            return EquilibriumResult(
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+                # EquilibriumResult may require float|None; keep caller
+                # value only when coercible so the typed field stays sane.
+                liquid_fraction=(
+                    liquid_diag if isinstance(liquid_diag, float) else None
+                ),
+                phase_assemblage_available=False,
+                status='out_of_domain',
+                warnings=[
+                    'VapoRock refused liquid_fraction='
+                    f'{liquid_fraction!r} below admitted minimum '
+                    f'{VAPOROCK_MIN_LIQUID_FRACTION:g} '
+                    '(external liquid-state domain gate)'
+                ],
+                diagnostics=diagnostics,
+            )
+
         dropped_accounts: List[str] = []
         dropped_account_species: Dict[str, tuple[str, ...]] = {}
         if composition_mol_by_account is not None:
@@ -469,11 +1059,12 @@ class VapoRockBackend(MeltBackend):
             diagnostics['backend_status_reason'] = (
                 OutOfDomainReason.FORBIDDEN_SPECIES.value
             )
+            diagnostics['temperature_K'] = float(temperature_K)
             return EquilibriumResult(
                 temperature_C=temperature_C,
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
-                liquid_fraction=None,
+                liquid_fraction=liquid_fraction,
                 phase_assemblage_available=False,
                 status='out_of_domain',
                 warnings=[
@@ -485,17 +1076,23 @@ class VapoRockBackend(MeltBackend):
         if not comp_wt:
             # No oxide species in VapoRock's basis after the account
             # split; the vapor-melt solver has nothing valid to consume.
+            diagnostics = dict(projection_diagnostics)
+            diagnostics['backend_status_reason'] = (
+                OutOfDomainReason.FORBIDDEN_SPECIES.value
+            )
+            diagnostics['temperature_K'] = float(temperature_K)
             return EquilibriumResult(
                 temperature_C=temperature_C,
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
+                liquid_fraction=liquid_fraction,
                 status='out_of_domain',
                 warnings=[
                     *prior_warnings,
                     'VapoRock received empty melt composition; returning empty '
                     'equilibrium result',
                 ],
-                diagnostics=projection_diagnostics,
+                diagnostics=diagnostics,
             )
 
         temperature_value = (
@@ -524,9 +1121,44 @@ class VapoRockBackend(MeltBackend):
                 temperature_C=temperature_C,
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
+                liquid_fraction=liquid_fraction,
                 status='not_converged',
                 warnings=[*prior_warnings, message],
                 diagnostics=projection_diagnostics,
+            )
+
+        # --- Sum-pressure sanity (defense against silent fabrication) ---
+        sum_ok, sum_bar = vaporock_sum_pressure_sane(
+            vaporock_full_speciation_Pa
+        )
+        if not sum_ok:
+            diagnostics = dict(projection_diagnostics)
+            diagnostics.update({
+                'backend_status_reason': (
+                    OutOfDomainReason.SUM_PRESSURE_SANITY.value
+                ),
+                'sum_pressure_bar': float(sum_bar),
+                'vaporock_max_sum_pressure_bar': VAPOROCK_MAX_SUM_PRESSURE_BAR,
+                'temperature_K': float(temperature_K),
+                'requested_pressure_bar': float(pressure_bar),
+                'pressure_control_authoritative': False,
+            })
+            return EquilibriumResult(
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+                liquid_fraction=liquid_fraction,
+                phase_assemblage_available=False,
+                status='out_of_domain',
+                warnings=[
+                    *prior_warnings,
+                    f'VapoRock refused sum partial pressure '
+                    f'{sum_bar:g} bar above sanity ceiling '
+                    f'{VAPOROCK_MAX_SUM_PRESSURE_BAR:g} bar '
+                    '(external sum-pressure domain gate; probe anchor '
+                    f'~{VAPOROCK_PROBE_10000K_SUM_P_BAR:.3g} bar at 10000 K)',
+                ],
+                diagnostics=diagnostics,
             )
 
         pressure_authority_warning = self._last_pressure_authority_warning
@@ -537,10 +1169,14 @@ class VapoRockBackend(MeltBackend):
                 'pressure_control_authoritative': False,
                 'pressure_control_reason': pressure_authority_warning,
                 'requested_pressure_bar': float(pressure_bar),
+                'temperature_K': float(temperature_K),
+                'sum_pressure_bar': float(sum_bar),
             })
         else:
             projection_diagnostics = dict(projection_diagnostics)
             projection_diagnostics['pressure_control_authoritative'] = True
+            projection_diagnostics['temperature_K'] = float(temperature_K)
+            projection_diagnostics['sum_pressure_bar'] = float(sum_bar)
 
         # _call_vaporock already returns a finished species -> Pa dict
         # (declared-unit dict path or unambiguous log10(bar) path); do not
@@ -554,7 +1190,7 @@ class VapoRockBackend(MeltBackend):
             temperature_C=temperature_C,
             pressure_bar=pressure_bar,
             fO2_log=fO2_log,
-            liquid_fraction=None,
+            liquid_fraction=liquid_fraction,
             phase_assemblage_available=False,
             status=(
                 'non_authoritative'
@@ -615,10 +1251,11 @@ class VapoRockBackend(MeltBackend):
         """
         Invoke the upstream VapoRock equilibrium entry point.
 
-        The exact symbol exposed by the upstream library has varied
-        across releases — the function probes the common names in
-        order of preference.  Add new candidates here rather than
-        changing the call shape in ``equilibrate``.
+        When a warm pool is active the isolated worker owns the import and
+        ``System`` lifecycle (fresh System per request unless
+        ``reuse_system`` was admitted).  The in-process path remains for
+        availability probes, fake-import unit tests, and historical
+        top-level candidate functions.
 
         Returns a finished ``species → Pa`` dict regardless of which
         entry point answered: the loosely-typed candidate-function
@@ -638,7 +1275,22 @@ class VapoRockBackend(MeltBackend):
         class — it is a no-op on the current build but harmless.
         """
         self._last_pressure_authority_warning = None
+        temperature_K = (
+            float(temperature)
+            if self._temperature_units == 'K'
+            else float(temperature) + 273.15
+        )
+
+        if self._warm_pool is not None:
+            return self._call_vaporock_via_pool(
+                composition_wt_pct=composition_wt_pct,
+                temperature_K=temperature_K,
+                fO2_log=fO2_log,
+            )
+
         module = self._vaporock
+        if module is None:
+            raise RuntimeError('VapoRock module is not loaded')
         candidate_names = (
             'calc_vapor_pressures',
             'calc_vapor',
@@ -690,6 +1342,8 @@ class VapoRockBackend(MeltBackend):
         system_cls = getattr(module, 'System', None)
         if callable(system_cls):
             try:
+                # Fresh System per request (in-process path). Reuse is only
+                # admitted inside the warm worker after grid equivalence.
                 system = system_cls()
                 set_melt_comp = getattr(system, 'set_melt_comp')
                 eval_gas_abundances = getattr(system, 'eval_gas_abundances')
@@ -698,11 +1352,6 @@ class VapoRockBackend(MeltBackend):
                 # absolute temperature in Kelvin (verified against the
                 # installed vaporock build, 2026-05-14).
                 set_melt_comp(composition_wt_pct)
-                temperature_K = (
-                    temperature
-                    if self._temperature_units == 'K'
-                    else temperature + 273.15
-                )
                 logP = eval_gas_abundances(temperature_K, fO2_log)
                 self._last_pressure_authority_warning = (
                     'VapoRock System.eval_gas_abundances ignores total '
@@ -722,6 +1371,42 @@ class VapoRockBackend(MeltBackend):
             f'{", ".join(candidate_names)}, System.eval_gas_abundances)'
             + (f'; last error: {last_attr_error}' if last_attr_error else '')
         )
+
+    def _call_vaporock_via_pool(
+        self,
+        *,
+        composition_wt_pct: Dict[str, float],
+        temperature_K: float,
+        fO2_log: float,
+    ) -> Dict[str, float]:
+        """Dispatch one request through the warm pool (fresh System default)."""
+        pool = self._warm_pool
+        if pool is None:
+            raise RuntimeError('VapoRock warm pool is not initialised')
+        # pressure_bar is intentionally NOT sent: diagnostic-only; worker
+        # never passes total P to eval_gas_abundances.
+        request = {
+            'composition_wt_pct': dict(composition_wt_pct),
+            'temperature_K': float(temperature_K),
+            'fO2_log': float(fO2_log),
+        }
+        future = pool.submit(
+            request, timeout_s=self._warm_call_timeout_s
+        )
+        payload = future.result()
+        if not isinstance(payload, dict):
+            raise RuntimeError(
+                f'VapoRock warm worker returned non-dict payload: '
+                f'{type(payload)!r}'
+            )
+        log10_bar = payload.get('log10_bar') or {}
+        self._last_pressure_authority_warning = (
+            'VapoRock System.eval_gas_abundances ignores total '
+            'pressure; requested pressure_bar is diagnostic-only '
+            'and this vapor result is non-authoritative for '
+            'pressure-sensitive transport.'
+        )
+        return self._log10_bar_pressures_to_pa(log10_bar)
 
     # ------------------------------------------------------------------
     # Composition / result projection

@@ -83,7 +83,7 @@ def test_missing_vaporock_import_marks_backend_unavailable(monkeypatch):
     backend = VapoRockBackend()
 
     with pytest.warns(UserWarning, match="VapoRock not available"):
-        assert backend.initialize({}) is False
+        assert backend.initialize({'warm_worker': False}) is False
 
     assert backend.is_available() is False
     assert backend._last_error is not None
@@ -122,7 +122,7 @@ def test_runtime_probe_uses_backend_initialize_without_equilibrating(monkeypatch
     finally:
         vaporock_module.vaporock_runtime_available.cache_clear()
 
-    assert init_calls == [{}]
+    assert init_calls == [{"warm_worker": False}]
     assert equilibrate_calls == []
 
 
@@ -150,7 +150,10 @@ def test_runtime_probe_does_not_cache_negative_availability(monkeypatch):
     finally:
         vaporock_module.vaporock_runtime_available.cache_clear()
 
-    assert init_calls == [{}, {}]
+    assert init_calls == [
+        {"warm_worker": False},
+        {"warm_worker": False},
+    ]
 
 
 def test_unavailable_equilibrate_returns_empty_result_with_warning():
@@ -180,7 +183,7 @@ def test_empty_melt_composition_marks_status_out_of_domain(monkeypatch):
     _install_fake_import(monkeypatch, fake_module)
 
     backend = VapoRockBackend()
-    assert backend.initialize({}) is True
+    assert backend.initialize({'warm_worker': False}) is True
     result = backend.equilibrate(
         1600.0,
         composition_mol={"Fe": 1.0, "FeS": 0.5, "NaCl": 0.2},
@@ -208,7 +211,7 @@ def test_library_exception_marks_status_not_converged(monkeypatch):
     _install_fake_import(monkeypatch, fake_module)
 
     backend = VapoRockBackend()
-    assert backend.initialize({}) is True
+    assert backend.initialize({'warm_worker': False}) is True
     result = backend.equilibrate(
         1600.0,
         composition_mol={"SiO2": 1.0, "Na2O": 0.1},
@@ -246,7 +249,7 @@ def test_fake_vaporock_receives_oxide_wt_pct_basis(monkeypatch):
     import_calls = _install_fake_import(monkeypatch, fake_module)
 
     backend = VapoRockBackend()
-    assert backend.initialize({}) is True
+    assert backend.initialize({'warm_worker': False}) is True
     result = backend.equilibrate(
         1550.0,
         composition_mol={"SiO2": 1.0, "Na2O": 0.25},
@@ -284,7 +287,7 @@ def test_vaporock_non_basis_projection_is_out_of_domain(monkeypatch):
     _install_fake_import(monkeypatch, fake_module)
 
     backend = VapoRockBackend()
-    assert backend.initialize({}) is True
+    assert backend.initialize({'warm_worker': False}) is True
     result = backend.equilibrate(
         1550.0,
         composition_mol={
@@ -328,6 +331,7 @@ def test_fake_vaporock_receives_fo2_temperature_and_pressure(monkeypatch):
         "temperature_units": "K",
         "pressure_units": "Pa",
         "vapor_pressure_units": "Pa",
+        "warm_worker": False,
     })
     result = backend.equilibrate(
         1400.0,
@@ -406,7 +410,7 @@ def test_passthrough_pa_values_when_unit_declared_pa(monkeypatch):
     _install_fake_import(monkeypatch, fake_module)
 
     backend = VapoRockBackend()
-    assert backend.initialize({"vapor_pressure_units": "Pa"})
+    assert backend.initialize({"vapor_pressure_units": "Pa", 'warm_worker': False})
     result = backend.equilibrate(
         1500.0,
         composition_mol={"Na2O": 1.0},
@@ -443,7 +447,7 @@ def test_canonical_system_entrypoint_converts_log10_bar_to_pa(monkeypatch):
     _install_fake_import(monkeypatch, fake_module)
 
     backend = VapoRockBackend()
-    assert backend.initialize({})
+    assert backend.initialize({'warm_worker': False})
     result = backend.equilibrate(
         1600.0,
         composition_mol={"SiO2": 1.0, "Na2O": 0.1},
@@ -476,7 +480,7 @@ def test_system_entrypoint_marks_pressure_non_authoritative(monkeypatch):
     _install_fake_import(monkeypatch, fake_module)
 
     backend = VapoRockBackend()
-    assert backend.initialize({})
+    assert backend.initialize({'warm_worker': False})
     result = backend.equilibrate(
         1600.0,
         composition_mol={"Na2O": 1.0},
@@ -504,7 +508,7 @@ def test_core_does_not_consume_non_authoritative_vaporock_pressures(monkeypatch)
     _install_fake_import(monkeypatch, fake_module)
 
     backend = VapoRockBackend()
-    assert backend.initialize({})
+    assert backend.initialize({'warm_worker': False})
     provider = VapoRockProvider(backend=backend, vapor_pressure_data={})
 
     sim = object.__new__(PyrolysisSimulator)
@@ -587,7 +591,7 @@ def test_vaporock_shadow_parity_with_builtin_antoine_for_basalt():
     backend = VapoRockBackend()
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
-        available = backend.initialize({})
+        available = backend.initialize({'warm_worker': False})
     if not available:
         pytest.skip("VapoRock optional dependency unavailable")
 
@@ -777,7 +781,7 @@ def test_vaporock_iw_literature_grid_residuals_are_explicit():
     backend = VapoRockBackend()
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
-        available = backend.initialize({})
+        available = backend.initialize({'warm_worker': False})
     if not available:
         pytest.skip("VapoRock optional dependency unavailable")
 
@@ -903,7 +907,7 @@ def test_vaporock_gas_oxide_names_do_not_collide_with_melt_oxides(monkeypatch):
     _install_fake_import(monkeypatch, fake_module)
 
     backend = VapoRockBackend()
-    assert backend.initialize({}) is True
+    assert backend.initialize({'warm_worker': False}) is True
     result = backend.equilibrate(
         1600.0,
         composition_mol={"SiO2": 1.0, "FeO": 0.2},
@@ -960,14 +964,14 @@ def test_normalize_vapor_pressures_honors_declared_pa_unit(monkeypatch):
     _install_fake_import(monkeypatch, fake_module)
 
     backend = VapoRockBackend()
-    assert backend.initialize({"vapor_pressure_units": "Pa"}) is True
+    assert backend.initialize({"vapor_pressure_units": "Pa", 'warm_worker': False}) is True
     assert backend._normalize_vapor_pressures({"Na": 200.0}) == {
         "Na": pytest.approx(200.0)
     }
 
     # The documented default ('bar') still scales bar -> Pa.
     backend_bar = VapoRockBackend()
-    assert backend_bar.initialize({}) is True
+    assert backend_bar.initialize({'warm_worker': False}) is True
     assert backend_bar._vapor_pressure_units == "bar"
     assert backend_bar._normalize_vapor_pressures({"Na": 2.0e-3}) == {
         "Na": pytest.approx(200.0)
@@ -980,7 +984,768 @@ def test_unsupported_vapor_pressure_units_fails_closed(monkeypatch):
     _install_fake_import(monkeypatch, fake_module)
 
     backend = VapoRockBackend()
-    assert backend.initialize({"vapor_pressure_units": "atm"}) is False
+    assert backend.initialize({"vapor_pressure_units": "atm", 'warm_worker': False}) is False
     assert backend.is_available() is False
     assert backend._last_error is not None
     assert "vapor_pressure_units" in backend._last_error
+
+
+# ---------------------------------------------------------------------------
+# VR-5: external domain gate + warm pool (DESIGN-REV5 §4.2.1 / §5.5)
+# ---------------------------------------------------------------------------
+
+_MARE_PROBE_WT_PCT = {
+    "SiO2": 45.0,
+    "TiO2": 2.5,
+    "Al2O3": 10.0,
+    "FeO": 18.0,
+    "MgO": 10.0,
+    "CaO": 11.0,
+    "Na2O": 0.4,
+    "K2O": 0.1,
+    "Cr2O3": 0.4,
+    "MnO": 0.3,
+}
+
+
+def _fake_system_module(log10_bar_by_species, *, track=None):
+    """Build a vaporock-like module with a System class for in-process tests."""
+
+    class FakeSystem:
+        instances = []
+
+        def __init__(self):
+            self.melt_compositions = []
+            self.eval_calls = []
+            FakeSystem.instances.append(self)
+            if track is not None:
+                track["constructs"] = track.get("constructs", 0) + 1
+
+        def set_melt_comp(self, composition):
+            self.melt_compositions.append(dict(composition))
+
+        def eval_gas_abundances(self, temperature, log_fO2, P=1e-10, **_kw):
+            self.eval_calls.append((float(temperature), float(log_fO2), float(P)))
+            return dict(log10_bar_by_species)
+
+    return types.SimpleNamespace(System=FakeSystem), FakeSystem
+
+
+def test_domain_helpers_admit_only_1350_to_1950_K():
+    from simulator.melt_backend.vaporock import (
+        VAPOROCK_T_MAX_K,
+        VAPOROCK_T_MIN_K,
+        temperature_C_to_K,
+        vaporock_liquid_fraction_admitted,
+        vaporock_sum_pressure_sane,
+        vaporock_temperature_in_domain,
+    )
+
+    assert VAPOROCK_T_MIN_K == 1350.0
+    assert VAPOROCK_T_MAX_K == 1950.0
+    assert vaporock_temperature_in_domain(1350.0) is True
+    assert vaporock_temperature_in_domain(1950.0) is True
+    assert vaporock_temperature_in_domain(1650.0) is True
+    assert vaporock_temperature_in_domain(1349.999) is False
+    assert vaporock_temperature_in_domain(1950.001) is False
+    assert vaporock_temperature_in_domain(10000.0) is False
+    assert vaporock_temperature_in_domain(float("nan")) is False
+    # Adapter input is always Celsius; 1600 C -> 1873.15 K is admitted.
+    assert vaporock_temperature_in_domain(temperature_C_to_K(1600.0)) is True
+    # 10000 K as Celsius input would be absurd; domain is on Kelvin.
+    assert vaporock_temperature_in_domain(temperature_C_to_K(10000.0 - 273.15)) is False
+
+    assert vaporock_liquid_fraction_admitted(None) is True
+    assert vaporock_liquid_fraction_admitted(1.0) is True
+    assert vaporock_liquid_fraction_admitted(0.95) is True
+    assert vaporock_liquid_fraction_admitted(0.94) is False
+    assert vaporock_liquid_fraction_admitted(float("nan")) is False
+
+    ok, sum_bar = vaporock_sum_pressure_sane({"Na": 100.0, "SiO": 50.0})  # Pa
+    assert ok is True
+    assert sum_bar == pytest.approx(0.0015)
+    # Probe anchor ~8.3e5 bar total at 10000 K must fail the sanity gate.
+    from simulator.melt_backend.vaporock import VAPOROCK_PROBE_10000K_SUM_P_BAR
+
+    garbage_pa = {"SiO": VAPOROCK_PROBE_10000K_SUM_P_BAR * 1e5}
+    ok, sum_bar = vaporock_sum_pressure_sane(garbage_pa)
+    assert ok is False
+    assert sum_bar == pytest.approx(VAPOROCK_PROBE_10000K_SUM_P_BAR)
+
+
+def test_temperature_domain_gate_refuses_outside_envelope(monkeypatch):
+    calls = {"n": 0}
+
+    def calc_vapor_pressures(**_):
+        calls["n"] += 1
+        return {"Na": 1.0}
+
+    fake_module = types.SimpleNamespace(calc_vapor_pressures=calc_vapor_pressures)
+    _install_fake_import(monkeypatch, fake_module)
+    backend = VapoRockBackend()
+    assert backend.initialize({"warm_worker": False}) is True
+
+    # 10000 K (probe fabrication point): refuse before any engine call.
+    t_c_10000k = 10000.0 - 273.15
+    result = backend.equilibrate(
+        t_c_10000k,
+        composition_mol={"SiO2": 1.0, "Na2O": 0.1},
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+    )
+    assert result.status == "out_of_domain"
+    assert result.diagnostics["backend_status_reason"] == (
+        OutOfDomainReason.TEMPERATURE_RANGE.value
+    )
+    assert result.diagnostics["temperature_K"] == pytest.approx(10000.0)
+    assert result.vapor_pressures_Pa == {}
+    assert getattr(result, "vaporock_full_speciation_Pa", {}) in ({}, None) or not getattr(
+        result, "vaporock_full_speciation_Pa", {}
+    )
+    assert calls["n"] == 0
+    assert any("outside admitted domain" in w for w in result.warnings)
+
+    # Below floor.
+    result_lo = backend.equilibrate(
+        1350.0 - 273.15 - 1.0,
+        composition_mol={"SiO2": 1.0},
+        fO2_log=-8.0,
+    )
+    assert result_lo.status == "out_of_domain"
+    assert result_lo.diagnostics["backend_status_reason"] == (
+        OutOfDomainReason.TEMPERATURE_RANGE.value
+    )
+    assert calls["n"] == 0
+
+
+def test_temperature_domain_gate_admits_envelope_edges(monkeypatch):
+    seen_T = []
+
+    class FakeSystem:
+        def set_melt_comp(self, composition):
+            self.composition = dict(composition)
+
+        def eval_gas_abundances(self, temperature, log_fO2):
+            seen_T.append(float(temperature))
+            return {"Na(g)": -4.0}  # 1e-4 bar = 10 Pa
+
+    fake_module = types.SimpleNamespace(System=FakeSystem)
+    _install_fake_import(monkeypatch, fake_module)
+    backend = VapoRockBackend()
+    assert backend.initialize({"warm_worker": False}) is True
+
+    for t_k in (1350.0, 1950.0):
+        result = backend.equilibrate(
+            t_k - 273.15,
+            composition_mol={"SiO2": 1.0, "Na2O": 0.1},
+            fO2_log=-8.0,
+            pressure_bar=1e-6,
+        )
+        assert result.status == "non_authoritative", result.warnings
+        assert result.diagnostics["backend_status_reason"] not in {
+            OutOfDomainReason.TEMPERATURE_RANGE.value,
+            OutOfDomainReason.SUM_PRESSURE_SANITY.value,
+        } if "backend_status_reason" in result.diagnostics else True
+
+    assert seen_T == pytest.approx([1350.0, 1950.0])
+
+
+def test_liquid_fraction_gate_refuses_subliquid(monkeypatch):
+    calls = {"n": 0}
+
+    def calc_vapor_pressures(**_):
+        calls["n"] += 1
+        return {"Na": 1.0}
+
+    fake_module = types.SimpleNamespace(calc_vapor_pressures=calc_vapor_pressures)
+    _install_fake_import(monkeypatch, fake_module)
+    backend = VapoRockBackend()
+    assert backend.initialize({"warm_worker": False}) is True
+
+    result = backend.equilibrate(
+        1600.0,
+        composition_mol={"SiO2": 1.0},
+        fO2_log=-8.0,
+        liquid_fraction=0.5,
+    )
+    assert result.status == "out_of_domain"
+    assert result.diagnostics["backend_status_reason"] == (
+        OutOfDomainReason.LIQUID_STATE.value
+    )
+    assert calls["n"] == 0
+
+    # None / passing liquid fractions still reach the engine.
+    result_ok = backend.equilibrate(
+        1600.0,
+        composition_mol={"SiO2": 1.0, "Na2O": 0.1},
+        fO2_log=-8.0,
+        liquid_fraction=0.99,
+    )
+    assert result_ok.status == "non_authoritative"
+    assert calls["n"] == 1
+
+
+def test_sum_pressure_sanity_refuses_probe_scale_garbage(monkeypatch):
+    """Defense-in-depth: even in-domain T, absurd totals are refused.
+
+    Fixture source: docs-private/research/2026-07-31-vaporock-probe/findings.md
+    (10000 K sum_P_bar_finite ≈ 8.3e5 bar). The T gate would catch 10000 K
+    first; this test injects the probe-scale total at an admitted T to pin
+    the sum-pressure gate itself.
+    """
+    from simulator.melt_backend.vaporock import VAPOROCK_PROBE_10000K_SUM_P_BAR
+
+    # log10(bar) such that 10**log10 * 1e5 Pa sums to the probe total.
+    log10_bar = math.log10(VAPOROCK_PROBE_10000K_SUM_P_BAR)
+
+    class FakeSystem:
+        def set_melt_comp(self, composition):
+            pass
+
+        def eval_gas_abundances(self, temperature, log_fO2):
+            return {"SiO(g)": log10_bar}
+
+    fake_module = types.SimpleNamespace(System=FakeSystem)
+    _install_fake_import(monkeypatch, fake_module)
+    backend = VapoRockBackend()
+    assert backend.initialize({"warm_worker": False}) is True
+
+    result = backend.equilibrate(
+        1600.0,
+        composition_mol={"SiO2": 1.0, "FeO": 0.2},
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+    )
+    assert result.status == "out_of_domain"
+    assert result.diagnostics["backend_status_reason"] == (
+        OutOfDomainReason.SUM_PRESSURE_SANITY.value
+    )
+    assert result.diagnostics["sum_pressure_bar"] == pytest.approx(
+        VAPOROCK_PROBE_10000K_SUM_P_BAR, rel=1e-9
+    )
+    assert result.vapor_pressures_Pa == {}
+    full = getattr(result, "vaporock_full_speciation_Pa", None)
+    assert not full
+    assert any("sum partial pressure" in w for w in result.warnings)
+    assert any("10000 K" in w for w in result.warnings)
+
+
+def test_10000K_finite_fabrication_regression_refuses_before_engine(monkeypatch):
+    """HI-8 regression: 10000 K fabricates ~8.3e5 bar total; we refuse.
+
+    The probe (findings.md) measured zero typed refusals from upstream at
+    10000 K with sum_P_bar ≈ 8.3e5. Our external T gate must refuse before
+    the engine is invoked so the fabrication never enters diagnostics as a
+    successful speciation.
+    """
+    from simulator.melt_backend.vaporock import VAPOROCK_PROBE_10000K_SUM_P_BAR
+
+    engine_calls = {"n": 0}
+
+    class FakeSystem:
+        def set_melt_comp(self, composition):
+            engine_calls["n"] += 1
+
+        def eval_gas_abundances(self, temperature, log_fO2):
+            engine_calls["n"] += 1
+            # Would return probe-scale garbage if reached.
+            return {"SiO(g)": math.log10(VAPOROCK_PROBE_10000K_SUM_P_BAR)}
+
+    fake_module = types.SimpleNamespace(System=FakeSystem)
+    _install_fake_import(monkeypatch, fake_module)
+    backend = VapoRockBackend()
+    assert backend.initialize({"warm_worker": False}) is True
+
+    result = backend.equilibrate(
+        10000.0 - 273.15,
+        composition_mol={"SiO2": 1.0, "Na2O": 0.1, "FeO": 0.2},
+        fO2_log=3.025,  # probe IW-at-10000K-ish
+        pressure_bar=1e-6,
+    )
+    assert engine_calls["n"] == 0
+    assert result.status == "out_of_domain"
+    assert result.diagnostics["backend_status_reason"] == (
+        OutOfDomainReason.TEMPERATURE_RANGE.value
+    )
+    assert result.diagnostics["temperature_K"] == pytest.approx(10000.0)
+    # Fixture anchor remains documented for the sum-pressure gate.
+    assert VAPOROCK_PROBE_10000K_SUM_P_BAR == pytest.approx(8.323344495585738e5)
+
+
+def test_pressure_bar_remains_diagnostic_only(monkeypatch):
+    pressures = []
+
+    class FakeSystem:
+        def set_melt_comp(self, composition):
+            pass
+
+        def eval_gas_abundances(self, temperature, log_fO2, P=1e-10, **_kw):
+            pressures.append(float(P))
+            return {"Na(g)": -3.0}
+
+    fake_module = types.SimpleNamespace(System=FakeSystem)
+    _install_fake_import(monkeypatch, fake_module)
+    backend = VapoRockBackend()
+    assert backend.initialize({"warm_worker": False}) is True
+
+    for p_bar in (1e-6, 100.0):
+        result = backend.equilibrate(
+            1600.0,
+            composition_mol={"Na2O": 1.0},
+            fO2_log=-8.0,
+            pressure_bar=p_bar,
+        )
+        assert result.status == "non_authoritative"
+        assert result.pressure_bar == pytest.approx(p_bar)
+        assert result.diagnostics["pressure_control_authoritative"] is False
+
+    # Upstream default P only; adapter never passes requested total pressure.
+    assert pressures == pytest.approx([1e-10, 1e-10])
+
+
+def test_provider_remains_non_selected():
+    provider = VapoRockProvider(backend=None, vapor_pressure_data={})
+    profile = provider.capability_profile()
+    assert profile.provider_id == "vaporock"
+    assert profile.is_authoritative_for == frozenset()
+    assert ChemistryIntent.VAPOR_PRESSURE in profile.intents
+
+
+def test_provider_forwards_liquid_fraction_and_domain_refuses():
+    seen = {}
+
+    class FakeBackend:
+        def is_available(self):
+            return True
+
+        def get_engine_version(self):
+            return "fake"
+
+        def equilibrate(self, **kwargs):
+            seen.update(kwargs)
+            return types.SimpleNamespace(
+                vapor_pressures_Pa={},
+                vaporock_full_speciation_Pa={},
+                warnings=("liquid refused",),
+                status="out_of_domain",
+            )
+
+    provider = VapoRockProvider(backend=FakeBackend(), vapor_pressure_data={})
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {"SiO2": 1.0}},
+            species_formula_registry={},
+        ),
+        temperature_C=1600.0,
+        pressure_bar=1e-6,
+        fO2_log=-8.0,
+        control_inputs={"pO2_bar": 1e-6, "liquid_fraction": 0.4},
+    )
+    result = provider.dispatch(request)
+    assert seen["liquid_fraction"] == pytest.approx(0.4)
+    # Provider stays diagnostic/non-authoritative regardless of backend status.
+    assert result.status == "non_authoritative"
+    assert result.transition is None
+    assert provider.capability_profile().is_authoritative_for == frozenset()
+
+
+def test_fresh_system_per_request_in_process(monkeypatch):
+    track = {"constructs": 0}
+    fake_module, FakeSystem = _fake_system_module(
+        {"Na(g)": -4.0}, track=track
+    )
+    _install_fake_import(monkeypatch, fake_module)
+    backend = VapoRockBackend()
+    assert backend.initialize({"warm_worker": False, "reuse_system": False})
+    for _ in range(3):
+        result = backend.equilibrate(
+            1600.0,
+            composition_mol={"Na2O": 1.0},
+            fO2_log=-8.0,
+        )
+        assert result.status == "non_authoritative"
+    assert track["constructs"] == 3
+    assert len(FakeSystem.instances) == 3
+
+
+def test_system_reuse_equivalence_across_admitted_grid(monkeypatch):
+    """Prove fresh-vs-reused System agreement on a small admitted grid.
+
+    DESIGN-REV5 §5.5: reuse is only admitted after equivalence against
+    fresh-System evaluation. This test drives the pure-function case
+    (no carryover) so the probe passes and reuse stays admitted. The
+    production default remains fresh-per-request (reuse_system=False)
+    until a reviewed flip. The residue/mismatch latch is covered by
+    ``test_reuse_mismatch_latches_fresh_per_request``.
+    """
+    # Deterministic fake: output depends only on (T, fO2, melt), not on
+    # prior System state — so reuse matches fresh under the §5.5 probe.
+    class PureFunctionSystem:
+        instances = []
+
+        def __init__(self):
+            self._melt = None
+            PureFunctionSystem.instances.append(self)
+
+        def set_melt_comp(self, composition):
+            self._melt = dict(composition)
+
+        def eval_gas_abundances(self, temperature, log_fO2):
+            sio2 = float(self._melt.get("SiO2", 0.0))
+            # Pure function of inputs — equivalence holds.
+            log_na = (
+                -5.0
+                + 0.001 * float(temperature)
+                + 0.01 * float(log_fO2)
+                + 1e-4 * sio2
+            )
+            return {"Na(g)": log_na}
+
+    fake_module = types.SimpleNamespace(System=PureFunctionSystem)
+    _install_fake_import(monkeypatch, fake_module)
+
+    grid_T_C = [t_k - 273.15 for t_k in (1350.0, 1500.0, 1650.0, 1800.0, 1950.0)]
+    melts = [
+        {"SiO2": 1.0, "Na2O": 0.1},
+        {"SiO2": 0.8, "MgO": 0.2, "Na2O": 0.05},
+    ]
+    fO2s = [-10.0, -8.0]
+
+    def run_grid(reuse: bool):
+        backend = VapoRockBackend()
+        assert backend.initialize(
+            {"warm_worker": False, "reuse_system": reuse}
+        )
+        # In-process path always constructs fresh System today; the
+        # reuse flag only affects the warm worker. Equivalence is
+        # therefore checked by calling the worker handler directly with
+        # reuse on/off below. Here we still pin the in-process grid is
+        # deterministic for the admitted domain.
+        out = []
+        for t_c in grid_T_C:
+            for melt in melts:
+                for fO2 in fO2s:
+                    result = backend.equilibrate(
+                        t_c,
+                        composition_mol=melt,
+                        fO2_log=fO2,
+                        pressure_bar=1e-6,
+                    )
+                    assert result.status == "non_authoritative"
+                    full = dict(
+                        getattr(result, "vaporock_full_speciation_Pa", {}) or {}
+                    )
+                    out.append((t_c, tuple(sorted(melt.items())), fO2, full))
+        backend.close()
+        return out
+
+    fresh = run_grid(False)
+    from simulator.melt_backend.base import project_melt_to_oxide_projection
+    from simulator.melt_backend.vaporock import (
+        _VAPOROCK_MELT_BASIS,
+        _handle_vaporock_request,
+    )
+
+    # Drive the warm-worker handler with hand-built resources so
+    # fresh-vs-reuse equivalence is tested without a live spawn.
+    def make_resource(reuse: bool):
+        return {
+            "module": fake_module,
+            "system_cls": PureFunctionSystem,
+            "system": None,
+            "temperature_units": "C",
+            "vapor_pressure_units": "bar",
+            "reuse_system": reuse,
+            "system_construct_count": 0,
+            "reuse_equivalence_checks_done": 0,
+            "reuse_latched_fresh": False,
+            "reuse_mismatch_diagnostic": None,
+        }
+
+    requests = []
+    for t_c in grid_T_C:
+        for melt in melts:
+            projection = project_melt_to_oxide_projection(
+                composition_kg=None,
+                composition_mol=melt,
+                oxide_basis=_VAPOROCK_MELT_BASIS,
+            )
+            for fO2 in fO2s:
+                requests.append({
+                    "composition_wt_pct": dict(projection.oxide_wt_pct),
+                    "temperature_K": t_c + 273.15,
+                    "fO2_log": fO2,
+                })
+
+    fresh_resource = make_resource(False)
+    reuse_resource = make_resource(True)
+    fresh_payloads = [
+        _handle_vaporock_request(fresh_resource, req, None) for req in requests
+    ]
+    reuse_payloads = [
+        _handle_vaporock_request(reuse_resource, req, None) for req in requests
+    ]
+    assert [p["log10_bar"] for p in fresh_payloads] == [
+        p["log10_bar"] for p in reuse_payloads
+    ]
+    # Fresh path constructs one System per request.
+    assert fresh_resource["system_construct_count"] == len(requests)
+    # Pure-function reuse: seed System once, then each subsequent request
+    # probes with one fresh System (construct count = 1 + (N-1) probes).
+    # No latch — outputs matched.
+    assert reuse_resource["reuse_latched_fresh"] is False
+    assert reuse_resource["system"] is not None
+    assert reuse_resource["system_construct_count"] == len(requests)
+    assert all(p.get("reuse_mismatch") is None for p in reuse_payloads) or all(
+        "reuse_mismatch" not in p for p in reuse_payloads
+    )
+    # Grid itself was evaluated without out-of-domain refusals.
+    assert len(fresh) == len(grid_T_C) * len(melts) * len(fO2s)
+
+
+def test_reuse_mismatch_latches_fresh_per_request():
+    """Residue-carrying System must latch fresh-per-request on mismatch.
+
+    Null hypothesis (review-vr5-km P1-1): a bootstrap ``reuse_system``
+    flag alone is not §5.5 — without an in-worker reused-vs-fresh
+    comparison and latch, a stateful System whose ``set_melt_comp``
+    leaves residue would silently diverge. This test:
+
+    1. Uses a STATEFUL fake that carries prior-melt SiO2 into the next
+       evaluation (cannot be pure-function-equivalent).
+    2. Asserts the second (reuse) request latches ``reuse_latched_fresh``
+       and returns a status-bearing ``reuse_mismatch`` diagnostic.
+    3. Asserts subsequent requests construct a fresh System each time.
+    4. Proves the latch is load-bearing by momentary in-memory mutation:
+       clearing the latch + skipping further probes without clearing the
+       stored System would re-admit residue reuse; we assert outputs then
+       diverge from a true-fresh control, so removing the latch would
+       fail the post-latch construct-count / mode assertions above.
+    """
+    from simulator.melt_backend.vaporock import _handle_vaporock_request
+
+    class ResidueSystem:
+        """set_melt_comp leaves prior SiO2 residue in the next eval."""
+
+        instances: list = []
+
+        def __init__(self):
+            self._melt: dict = {}
+            self._prior_sio2 = 0.0
+            ResidueSystem.instances.append(self)
+
+        def set_melt_comp(self, composition):
+            # Residue: previous melt's SiO2 bleeds into the next solve.
+            self._prior_sio2 = float(self._melt.get("SiO2", 0.0)) if self._melt else 0.0
+            self._melt = dict(composition)
+
+        def eval_gas_abundances(self, temperature, log_fO2):
+            sio2 = float(self._melt.get("SiO2", 0.0))
+            # Pure part + large residue term so reused ≠ fresh after melt change.
+            log_na = (
+                -5.0
+                + 0.001 * float(temperature)
+                + 0.01 * float(log_fO2)
+                + 1e-4 * sio2
+                + 0.5 * self._prior_sio2
+            )
+            return {"Na(g)": log_na}
+
+    def make_resource(*, reuse: bool):
+        return {
+            "module": types.SimpleNamespace(System=ResidueSystem),
+            "system_cls": ResidueSystem,
+            "system": None,
+            "temperature_units": "C",
+            "vapor_pressure_units": "bar",
+            "reuse_system": reuse,
+            "system_construct_count": 0,
+            "reuse_equivalence_checks_done": 0,
+            "reuse_latched_fresh": False,
+            "reuse_mismatch_diagnostic": None,
+        }
+
+    melt_a = {"SiO2": 1.0, "Na2O": 0.1}
+    melt_b = {"SiO2": 0.5, "Na2O": 0.2, "MgO": 0.3}
+    req_a = {
+        "composition_wt_pct": dict(melt_a),
+        "temperature_K": 1650.0,
+        "fO2_log": -8.0,
+    }
+    req_b = {
+        "composition_wt_pct": dict(melt_b),
+        "temperature_K": 1650.0,
+        "fO2_log": -8.0,
+    }
+
+    resource = make_resource(reuse=True)
+    ResidueSystem.instances.clear()
+
+    # Seed: first call stores a System (no prior residue → no probe needed).
+    p0 = _handle_vaporock_request(resource, req_a, None)
+    assert p0["reuse_mode"] == "fresh_seed"
+    assert resource["reuse_latched_fresh"] is False
+    assert resource["system"] is not None
+    assert resource["system_construct_count"] == 1
+
+    # Second call: reuse + probe against fresh. Residue from melt A makes
+    # reused eval diverge from a brand-new System on melt B → latch.
+    p1 = _handle_vaporock_request(resource, req_b, None)
+    assert resource["reuse_latched_fresh"] is True, (
+        "§5.5 mismatch must latch fresh-per-request for the worker lifetime"
+    )
+    assert resource["system"] is None, (
+        "latched worker must drop the residue-carrying stored System"
+    )
+    assert p1["reuse_mode"] == "fresh_latched"
+    assert p1.get("reuse_mismatch") is not None
+    assert p1["reuse_mismatch"]["reason"] == "reused_vs_fresh_mismatch"
+    assert p1["reuse_mismatch"]["reuse_latched_fresh"] is True
+    # Probe constructed one fresh System for comparison (count 1→2); latch
+    # returns that fresh map, so construct_count is 2 after the mismatch.
+    assert resource["system_construct_count"] == 2
+
+    # Post-latch: every request constructs a new System (fresh-per-request).
+    constructs_after_latch = resource["system_construct_count"]
+    for _ in range(3):
+        payload = _handle_vaporock_request(resource, req_b, None)
+        assert payload["reuse_mode"] == "fresh_latched"
+        assert payload["reuse_latched_fresh"] is True
+        assert payload.get("reuse_mismatch", {}).get("reason") == (
+            "reused_vs_fresh_mismatch"
+        )
+        constructs_after_latch += 1
+        assert resource["system_construct_count"] == constructs_after_latch
+        assert resource["system"] is None
+
+    # --- Prove the latch is load-bearing (momentary in-memory mutation) ---
+    # If the latch flag were cleared and probes skipped while a residue
+    # System were re-stored, reuse would silently diverge from fresh.
+    # Mutate resource state to that defective configuration and show the
+    # outputs diverge — so a code change that removes the latch would
+    # fail the post-latch construct-count assertions above AND would
+    # re-introduce this silent divergence.
+    control = make_resource(reuse=False)
+    control_payloads = [
+        _handle_vaporock_request(control, req_a, None),
+        _handle_vaporock_request(control, req_b, None),
+    ]
+
+    # Build a residue-carrying stored System by hand, then clear the latch
+    # and skip probes (simulating "latch removed / always reuse").
+    defective = make_resource(reuse=True)
+    _handle_vaporock_request(defective, req_a, None)
+    # Momentary mutation: force past the probe window and clear the latch
+    # without dropping the stored System — the pre-fix failure mode.
+    assert defective["system"] is not None
+    defective["reuse_latched_fresh"] = False
+    defective["reuse_equivalence_checks_done"] = 10_000  # skip probes
+    defective_p = _handle_vaporock_request(defective, req_b, None)
+    # Residue path (no probe) ≠ true fresh control on the same inputs.
+    assert defective_p["log10_bar"] != control_payloads[1]["log10_bar"], (
+        "residue-carrying reuse without latch/probe must diverge from "
+        "fresh; if this equality holds the fake is not stateful enough"
+    )
+    # And the production latch path (p1) returned the fresh map, matching control.
+    assert p1["log10_bar"] == control_payloads[1]["log10_bar"], (
+        "on mismatch the handler must return the fresh-System result, "
+        "not the residue-contaminated reused map"
+    )
+
+
+def test_malformed_liquid_fraction_is_typed_out_of_domain(monkeypatch):
+    """Non-floatable liquid_fraction must not become provider 'unavailable'.
+
+    review-vr5-km P3-1: diagnostics used to call float() after the admit
+    helper already refused, raising into the provider's broad except.
+    """
+    calls = {"n": 0}
+
+    def calc_vapor_pressures(**_):
+        calls["n"] += 1
+        return {"Na": 1.0}
+
+    fake_module = types.SimpleNamespace(calc_vapor_pressures=calc_vapor_pressures)
+    _install_fake_import(monkeypatch, fake_module)
+    backend = VapoRockBackend()
+    assert backend.initialize({"warm_worker": False}) is True
+
+    result = backend.equilibrate(
+        1600.0,
+        composition_mol={"SiO2": 1.0},
+        fO2_log=-8.0,
+        liquid_fraction="not-a-number",  # type: ignore[arg-type]
+    )
+    assert result.status == "out_of_domain"
+    assert result.diagnostics["backend_status_reason"] == (
+        OutOfDomainReason.LIQUID_STATE.value
+    )
+    assert result.diagnostics["liquid_fraction"] == repr("not-a-number")
+    assert calls["n"] == 0
+
+
+def test_warm_pool_owns_system_lifecycle_live():
+    """Live warm-pool smoke: import lives in the child; domain gate holds.
+
+    Skips when the real vaporock package is not importable in a spawn child.
+    """
+    pytest.importorskip("vaporock")
+    backend = VapoRockBackend()
+    try:
+        ok = backend.initialize({
+            "warm_worker": True,
+            "warm_pool_size": 1,
+            "reuse_system": False,
+            "worker_startup_timeout_s": 90.0,
+            "warm_call_timeout_s": 60.0,
+        })
+    except Exception as exc:  # noqa: BLE001
+        pytest.skip(f"warm pool failed to start: {exc}")
+    if not ok:
+        pytest.skip(
+            f"warm pool unavailable: {backend._last_error}"
+        )
+    try:
+        assert backend.uses_warm_pool is True
+        # In-domain live solve.
+        result = backend.equilibrate(
+            1650.0 - 273.15,
+            composition_kg=_MARE_PROBE_WT_PCT,
+            fO2_log=-9.94,
+            pressure_bar=1e-6,
+        )
+        assert result.status == "non_authoritative"
+        full = dict(getattr(result, "vaporock_full_speciation_Pa", {}) or {})
+        assert full  # real speciation present
+        assert result.diagnostics.get("pressure_control_authoritative") is False
+        sum_bar = float(result.diagnostics.get("sum_pressure_bar") or 0.0)
+        assert sum_bar < 10.0
+
+        # 10000 K still refused by the parent-side domain gate (no worker call).
+        refused = backend.equilibrate(
+            10000.0 - 273.15,
+            composition_kg=_MARE_PROBE_WT_PCT,
+            fO2_log=3.0,
+            pressure_bar=1e-6,
+        )
+        assert refused.status == "out_of_domain"
+        assert refused.diagnostics["backend_status_reason"] == (
+            OutOfDomainReason.TEMPERATURE_RANGE.value
+        )
+    finally:
+        backend.close()
+
+
+def test_no_result_cache_on_backend():
+    """Owner ruling: warm pool only — no result/calibration cache surface."""
+    backend = VapoRockBackend()
+    # No cache attributes or methods introduced by VR-5.
+    for name in (
+        "_result_cache",
+        "_calibration_cache",
+        "result_cache",
+        "cache_get",
+        "cache_put",
+    ):
+        assert not hasattr(backend, name)

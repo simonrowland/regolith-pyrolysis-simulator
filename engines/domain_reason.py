@@ -11,6 +11,13 @@ class OutOfDomainReason(str, Enum):
     MAJOR_SUM = "major_sum"
     NOT_CONVERGED = "not_converged"
     BACKEND_UNAVAILABLE = "backend_unavailable"
+    # VapoRock external domain gate (VR-5 / DESIGN-REV5 §4.2.1).
+    # Load-bearing: upstream fabricates smooth finite garbage outside the
+    # admitted envelope (probe: ~8.3e5 bar total at 10000 K) and never
+    # self-refuses.
+    TEMPERATURE_RANGE = "temperature_range"
+    LIQUID_STATE = "liquid_state"
+    SUM_PRESSURE_SANITY = "sum_pressure_sanity"
 
 
 def reason_value(reason: OutOfDomainReason | str | None) -> str | None:

@@ -89,7 +89,7 @@ def test_adapter_attaches_unfiltered_full_speciation(monkeypatch):
     _install_fake_vaporock(monkeypatch, types.SimpleNamespace(System=FakeSystem))
 
     backend = VapoRockBackend()
-    assert backend.initialize({})
+    assert backend.initialize({'warm_worker': False})
     result = backend.equilibrate(
         1600.0,
         composition_mol={"SiO2": 1.0, "Na2O": 0.1, "Al2O3": 0.1},
@@ -220,7 +220,7 @@ def test_installed_vaporock_full_speciation_has_structural_tail():
     backend = VapoRockBackend()
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
-        available = backend.initialize({})
+        available = backend.initialize({'warm_worker': False})
     if not available:
         pytest.skip("VapoRock optional dependency unavailable")
 

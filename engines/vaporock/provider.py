@@ -343,12 +343,20 @@ class VapoRockProvider(ChemistryProvider):
         :class:`EquilibriumResult` or ``None`` on catastrophic failure.
         """
         try:
+            controls = request.control_inputs or {}
+            liquid_fraction = None
+            if controls.get('liquid_fraction') is not None:
+                try:
+                    liquid_fraction = float(controls['liquid_fraction'])
+                except (TypeError, ValueError):
+                    liquid_fraction = controls['liquid_fraction']
             return backend.equilibrate(
                 temperature_C=float(request.temperature_C),
                 pressure_bar=float(request.pressure_bar),
                 fO2_log=fO2_log_resolved,
                 composition_mol_by_account=composition_mol_by_account,
                 species_formula_registry=species_formula_registry,
+                liquid_fraction=liquid_fraction,
             )
         except Exception:  # noqa: BLE001 - library-boundary catch
             return None
