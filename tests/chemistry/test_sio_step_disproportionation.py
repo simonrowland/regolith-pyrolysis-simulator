@@ -21,6 +21,9 @@ def _sio_sp_data() -> dict:
     vapor_pressures = yaml.safe_load(
         (REPO_ROOT / "data" / "vapor_pressures.yaml").read_text()
     )
+    from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+
+    vapor_pressures = vapor_pressure_legacy_view(vapor_pressures)
     return dict(vapor_pressures["oxide_vapors"]["SiO"])
 
 

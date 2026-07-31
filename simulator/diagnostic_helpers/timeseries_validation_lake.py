@@ -572,7 +572,10 @@ def _vapor_pressure_row(model_species: str) -> Mapping[str, Any]:
 
 @lru_cache(maxsize=1)
 def _vapor_pressure_data() -> dict[str, Any]:
-    return yaml.safe_load(VAPOR_PRESSURES_PATH.read_text()) or {}
+    payload = yaml.safe_load(VAPOR_PRESSURES_PATH.read_text()) or {}
+    from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+
+    return vapor_pressure_legacy_view(payload)
 
 
 def _flux_kg_m2_s_to_molecules_cm2_s(

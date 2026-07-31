@@ -700,7 +700,7 @@ def test_store_rejects_feasible_out_of_domain_backend_status_reason_from_cache_w
     assert store.lookup(spec) is None
 
 
-def test_lookup_deserializes_legacy_evalspec_digest_scope(tmp_path) -> None:
+def test_lookup_deserializes_sparse_legacy_evalspec_digest_metadata(tmp_path) -> None:
     spec = _base_spec()
     store = ResultStore(
         tmp_path / "results.sqlite",
@@ -732,15 +732,9 @@ def test_lookup_deserializes_legacy_evalspec_digest_scope(tmp_path) -> None:
 
     assert loaded is not None
     assert loaded.eval_spec is not None
-    assert loaded.eval_spec.data_digests["materials"] == (
-        "legacy-missing-materials-digest"
-    )
-    assert loaded.eval_spec.data_digests["species_catalog"] == (
-        "legacy-missing-species-catalog-digest"
-    )
-    assert loaded.eval_spec.data_digests["foulant_thermo"] == (
-        "legacy-missing-foulant-thermo-digest"
-    )
+    assert "materials" not in loaded.eval_spec.data_digests
+    assert "species_catalog" not in loaded.eval_spec.data_digests
+    assert "foulant_thermo" not in loaded.eval_spec.data_digests
 
 
 def test_deserialize_coating_margin_rederives_feasible_from_grounded_authority() -> None:
@@ -1433,24 +1427,16 @@ def test_lab_overlay_result_scope_selector_isolates_non_empty_scopes(tmp_path) -
         }
     assert scopes["industrial"] == {}
     assert scopes["lab"]["effective_exposed_area_m2"] == "0.000314000"
-    assert scopes["lab"]["sink_channel_evidence_digests"] == {
-        "deposit_gettering_diagnostic": "deposit-evidence-v1",
-        "plume_oxidation_diagnostic": "plume-evidence-v1",
-    }
+    assert "sink_channel_evidence_digests" not in scopes["lab"]
     assert scopes["sink-mode"] == {
         "oxygen_sink_channel_mode": "deposit_gettering_diagnostic"
     }
 
 
 def test_empty_result_scope_selector_matches_base_selector_byte_for_byte() -> None:
-    expected_where = (
-        "feedstock_id = ? AND code_version = ? AND data_digests = ? "
-        "AND profile_id = ? AND fidelity = ?"
-    )
+    expected_where = "feedstock_id = ? AND profile_id = ? AND fidelity = ?"
     expected_params = (
         "lunar_mare_low_ti",
-        "code-version",
-        "data-digests-json",
         "oxygen-yield-v1",
         "fast",
     )
@@ -1480,18 +1466,15 @@ def test_empty_result_scope_selector_matches_base_selector_byte_for_byte() -> No
 
     scoped_where, scoped_params = selector_where(
         "lunar_mare_low_ti",
-        result_scope={"lab_alpha_digest": "robinot-alpha-v1"},
+        result_scope={"effective_exposed_area_m2": "0.000314000"},
         **base_kwargs,
     )
     assert scoped_where == (
-        "feedstock_id = ? AND code_version = ? AND data_digests = ? "
-        "AND result_scope = ? AND profile_id = ? AND fidelity = ?"
+        "feedstock_id = ? AND result_scope = ? AND profile_id = ? AND fidelity = ?"
     )
     assert scoped_params == (
         "lunar_mare_low_ti",
-        "code-version",
-        "data-digests-json",
-        '{"lab_alpha_digest":"robinot-alpha-v1"}',
+        '{"effective_exposed_area_m2":"0.000314000"}',
         "oxygen-yield-v1",
         "fast",
     )
@@ -1683,7 +1666,7 @@ def test_lookup_fetch_and_selectors_miss_stale_corpus_rows(tmp_path) -> None:
     ) is None
 
 
-def test_query_exact_selector_and_version_scoped(tmp_path) -> None:
+def test_query_selector_is_code_and_data_fingerprint_neutral(tmp_path) -> None:
     current = _base_spec(recipe_id="current-recipe")
     wrong_profile = replace(current, recipe_id="wrong-profile", profile_id="other")
     wrong_fidelity = replace(current, recipe_id="wrong-fidelity", fidelity="full")
@@ -1714,20 +1697,24 @@ def test_query_exact_selector_and_version_scoped(tmp_path) -> None:
         fidelity=current.fidelity,
     )
 
-    assert [result.candidate_id for result in results] == ["candidate-0"]
+    assert [result.candidate_id for result in results] == [
+        "candidate-4",
+        "candidate-3",
+        "candidate-0",
+    ]
     assert store.lookup(stale_code) is not None
 
 
-def test_selector_reads_require_explicit_scope_and_never_infer_current(tmp_path) -> None:
+def test_selector_reads_need_no_fingerprint_scope(tmp_path) -> None:
     stale = _base_spec(code_version="v1")
     current = replace(stale, recipe_id="current-recipe", code_version="v2")
     unscoped = ResultStore(tmp_path / "results.sqlite")
     unscoped.store(stale, _scored(stale, candidate_id="stale"), created_at="t1")
 
-    with pytest.raises(ValueError, match="current code_version"):
-        unscoped.query(stale.feedstock_id)
-    with pytest.raises(ValueError, match="current code_version"):
-        unscoped.best(stale.feedstock_id)
+    assert [row.candidate_id for row in unscoped.query(stale.feedstock_id)] == [
+        "stale"
+    ]
+    assert unscoped.best(stale.feedstock_id) is not None
 
     scoped = ResultStore(
         tmp_path / "results.sqlite",
@@ -1735,8 +1722,10 @@ def test_selector_reads_require_explicit_scope_and_never_infer_current(tmp_path)
         current_data_digests=current.data_digests,
     )
 
-    assert scoped.query(current.feedstock_id) == []
-    assert scoped.best(current.feedstock_id) is None
+    assert [row.candidate_id for row in scoped.query(current.feedstock_id)] == [
+        "stale"
+    ]
+    assert scoped.best(current.feedstock_id) is not None
     assert scoped.lookup(stale) is not None
 
 
@@ -2369,9 +2358,8 @@ def test_v2_store_migrates_result_scope_column_before_selector_index(tmp_path) -
         "feedstock_id",
         "profile_id",
         "fidelity",
-        "code_version",
-        "data_digests",
         "result_scope",
+        "corpus_version",
     ]
 
 

@@ -230,6 +230,9 @@ _FREEZE_GATE_COMPOSITION_SPECIES = frozenset((
 def _load_evaporation_alpha_by_species(vapor_pressure_data: dict) -> dict[str, Any]:
     """Load per-species Hertz-Knudsen alpha specs from vapor pressure data."""
 
+    from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+
+    vapor_pressure_data = vapor_pressure_legacy_view(vapor_pressure_data)
     alpha_by_species: dict[str, Any] = {}
     for group_name in _EVAPORATION_ALPHA_GROUPS:
         group = vapor_pressure_data.get(group_name, {}) or {}
@@ -251,6 +254,9 @@ def _load_evaporation_alpha_envelope_by_species(
 ) -> dict[str, tuple[float, float]]:
     """Load per-species alpha envelopes for flux uncertainty diagnostics."""
 
+    from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+
+    vapor_pressure_data = vapor_pressure_legacy_view(vapor_pressure_data)
     envelope_by_species: dict[str, tuple[float, float]] = {}
     for group_name in _EVAPORATION_ALPHA_GROUPS:
         group = vapor_pressure_data.get(group_name, {}) or {}

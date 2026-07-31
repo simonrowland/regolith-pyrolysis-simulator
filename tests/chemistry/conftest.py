@@ -18,13 +18,17 @@ import yaml
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.state import CampaignPhase, DecisionType
+from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
 
 
 DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
 
 
 def _load_yaml(name: str) -> dict:
-    return yaml.safe_load((DATA_DIR / name).read_text())
+    payload = yaml.safe_load((DATA_DIR / name).read_text())
+    if name == "vapor_pressures.yaml":
+        return vapor_pressure_legacy_view(payload)
+    return payload
 
 
 @pytest.fixture(scope="module")

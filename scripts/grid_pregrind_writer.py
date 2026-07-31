@@ -568,12 +568,30 @@ def _cache_v2_species_dictionary() -> tuple[str, ...]:
     catalog_path = root / "data" / "species_catalog.yaml"
     vapor_path = root / "data" / "vapor_pressures.yaml"
     try:
-        formula_species = tuple(load_species_formulas(catalog_path))
+        species_payload = yaml.safe_load(catalog_path.read_text(encoding="utf-8"))
         vapor_payload = yaml.safe_load(vapor_path.read_text(encoding="utf-8"))
     except (OSError, yaml.YAMLError, ValueError) as exc:
         raise ValueError(f"cannot enumerate cache_v2 species registries: {exc}") from exc
+    if not isinstance(species_payload, Mapping) or not isinstance(
+        species_payload.get("species"), Sequence
+    ):
+        raise ValueError(f"cache_v2 formula species registry must be a mapping: {catalog_path}")
+    runtime_species_payload = dict(species_payload)
+    runtime_species_payload["species"] = [
+        row
+        for row in species_payload["species"]
+        if not (
+            isinstance(row, Mapping)
+            and str(row.get("id", "")).endswith("_gas")
+            and row.get("direct_vapour_flux") is False
+        )
+    ]
+    formula_species = tuple(load_species_formulas(runtime_species_payload))
     if not isinstance(vapor_payload, Mapping):
         raise ValueError(f"cache_v2 vapor species registry must be a mapping: {vapor_path}")
+    from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+
+    vapor_payload = vapor_pressure_legacy_view(vapor_payload)
     vapor_species: list[str] = []
     for section in ("metals", "oxide_vapors", "foulant_vapor"):
         entries = vapor_payload.get(section)

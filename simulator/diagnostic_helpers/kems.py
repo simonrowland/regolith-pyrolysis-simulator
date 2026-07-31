@@ -542,8 +542,10 @@ class KEMSAdapter:
     """Run strict KEMS selectors against the builtin vapor-pressure provider."""
 
     def __init__(self, vapor_pressure_data: Mapping[str, Any]) -> None:
-        self._vapor_pressure_data = dict(vapor_pressure_data)
-        self._provider = BuiltinVaporPressureProvider(self._vapor_pressure_data)
+        from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+
+        self._vapor_pressure_data = vapor_pressure_legacy_view(vapor_pressure_data)
+        self._provider = BuiltinVaporPressureProvider(vapor_pressure_data)
 
     def _molar_mass_kg_mol(self, species: str) -> float | None:
         for group in ("metals", "oxide_vapors"):

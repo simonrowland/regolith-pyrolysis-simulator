@@ -20,7 +20,6 @@ from simulator.stage0_harness import (
     run_stage0_harness,
     run_stage0_harness_from_config,
 )
-from simulator.optimize.evalspec import REQUIRED_DATA_DIGEST_KEYS
 from simulator.state import CampaignPhase
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
@@ -318,7 +317,6 @@ def test_carbon_burned_mass_uses_declared_c_basis_not_carrier_kg():
     ledger = session.simulator.atom_ledger.kg_by_account("process.cleaned_melt")
     for species, kg in result.cleaned_melt_kg.items():
         assert ledger[species] == pytest.approx(kg, rel=0.0, abs=1e-12)
-    assert "stage0_carbon_partition" not in REQUIRED_DATA_DIGEST_KEYS
 
 
 def test_cleaned_melt_matches_ledger_projection():

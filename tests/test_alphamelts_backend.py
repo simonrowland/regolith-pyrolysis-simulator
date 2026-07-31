@@ -4874,7 +4874,9 @@ def test_activities_times_antoine_computes_activity_times_ppure_from_yaml():
         {'SiO2': 100.0},
         pO2_bar=1e-9,
     )
-    table = _load_data('vapor_pressures.yaml')['metals']
+    from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+
+    table = vapor_pressure_legacy_view(_load_data('vapor_pressures.yaml'))['metals']
     T_K = 1600.0 + 273.15
     expected_na = 2.0 * 10.0 ** (
         table['Na']['pure_component_antoine']['A']

@@ -103,9 +103,10 @@ STAGE_SIO_GAS_MODE = (
 # EvalSpec identity so cost-sensitive optimizer cache entries are reproducible.
 # 2026-07-17 W-A5a/t-227: re-pinned from the executable serializer after the
 # reviewed electricity and solar-heat defaults landed.
-# Regenerated from canonical_evalspec_json(_base_spec()) for b-042.
+# Regenerated from canonical_evalspec_json(_base_spec()) for VR-3's
+# fingerprint-neutral optimizer identity.
 PINNED_EVALSPEC_JSON = (
-    b'{"additives_kg":{"CaO":"1.500000000"},"allow_fallback_vapor":false,"backend_name":"internal-analytical","c5_enabled":false,"campaign":"C0","chemistry_kernel":{"allow_builtin_fallback":false,"engine":"builtin","pressure_Pa":"0.001000000"},"corpus_version":"corpus-version-digest","cost_parameters":{"parameters":{"depreciation_expense_per_run":"50.000000000","electricity_cost_per_kWh":"10.000000000","furnace_resinter_cost_usd":"5000.000000000","generic_reagent_cost_per_kg":"10.000000000","shuttle_reagent_replacement_cost_per_kg":{"Ca":"0.500000000","K":"1.000000000","Mg":"0.750000000","Na":"0.500000000"},"solar_heat_cost_per_kWh":"0.050000000"},"schema_version":"optimize-costs-v1"},"data_digests":{"profile":"profile-digest"},"feedstock_id":"lunar_mare_low_ti","fidelity":"fast","force_builtin_vapor_pressure":false,"hours":24,"mass_kg":"1000.000000000","mre_max_voltage_V":"0.000000000","mre_target_species":"","profile_id":"oxygen-yield-v1","recipe_id":"recipe-id","runtime_campaign_overrides":{"C0":{"hold_time_h":"1.000000000"}},"track":"pyrolysis","vapor_pressure_provider_id":"builtin-vapor-pressure"}'
+    b'{"additives_kg":{"CaO":"1.500000000"},"allow_fallback_vapor":false,"backend_name":"internal-analytical","c5_enabled":false,"campaign":"C0","chemistry_kernel":{"allow_builtin_fallback":false,"engine":"builtin","pressure_Pa":"0.001000000"},"corpus_version":"corpus-version-digest","cost_parameters":{"parameters":{"depreciation_expense_per_run":"50.000000000","electricity_cost_per_kWh":"10.000000000","furnace_resinter_cost_usd":"5000.000000000","generic_reagent_cost_per_kg":"10.000000000","shuttle_reagent_replacement_cost_per_kg":{"Ca":"0.500000000","K":"1.000000000","Mg":"0.750000000","Na":"0.500000000"},"solar_heat_cost_per_kWh":"0.050000000"}},"feedstock_id":"lunar_mare_low_ti","fidelity":"fast","force_builtin_vapor_pressure":false,"hours":24,"mass_kg":"1000.000000000","mre_max_voltage_V":"0.000000000","mre_target_species":"","profile_id":"oxygen-yield-v1","recipe_id":"recipe-id","runtime_campaign_overrides":{"C0":{"hold_time_h":"1.000000000"}},"track":"pyrolysis","vapor_pressure_provider_id":"builtin-vapor-pressure"}'
 )
 PINNED_FEEDSTOCK_JSON = (
     b'[["Al2O3","13.500000000"],["FeO","16.500000000"],["SiO2","44.500000000"]]'
@@ -579,7 +580,7 @@ def test_data_corpus_digests_change_evalspec_cache_key() -> None:
     assert cache_key(species_catalog_changed) == cache_key(spec)
 
 
-def test_evalspec_reduce_rebuild_tolerates_legacy_digest_scope() -> None:
+def test_evalspec_reduce_rebuild_preserves_sparse_digest_metadata() -> None:
     spec = _base_spec()
     rebuild, args = spec.__reduce__()
     legacy_args = list(args)
@@ -591,19 +592,14 @@ def test_evalspec_reduce_rebuild_tolerates_legacy_digest_scope() -> None:
 
     restored = rebuild(*legacy_args)
 
-    assert (
-        restored.data_digests["foulant_thermo"]
-        == "legacy-missing-foulant-thermo-digest"
-    )
-    assert restored.data_digests["materials"] == "legacy-missing-materials-digest"
-    assert (
-        restored.data_digests["species_catalog"]
-        == "legacy-missing-species-catalog-digest"
+    assert restored.data_digests == legacy_args[6]
+    assert not any(
+        str(value).startswith("legacy-missing")
+        for value in restored.data_digests.values()
     )
 
-    # A full current payload must round-trip UNCHANGED: fresh specs never acquire
-    # sentinels — the legacy scope only patches a 4-key legacy map. Without this
-    # the determinant could be silently defeated for live specs.
+    # Provenance metadata remains lossless even though only corpus_version is
+    # optimizer identity.
     restored_full = rebuild(*args)
     assert restored_full.data_digests == spec.data_digests
     assert not any(
@@ -633,22 +629,12 @@ def test_evalspec_reduce_rebuild_tolerates_legacy_digest_scope() -> None:
         ("stage0_carbon_reductant_kg", 7.25),
         ("o2_bubbler_settings", {"kg_per_hr": {"C3": 0.25}}),
         ("runtime_campaign_overrides", {"C2A": {"hold_time_h": 2.0}}),
-        ("lab_alpha_digest", "robinot-lab-alpha-v1"),
-        ("geometry_digest", "robinot-geometry-v1"),
         ("effective_exposed_area_m2", 0.000314),
         ("area_basis", "gram_lab_exposed_melt"),
-        ("oxide_vapor_ceiling_digest", "oxide-vapor-ceiling-v1"),
-        (
-            "sink_channel_evidence_digests",
-            {
-                "plume_oxidation_diagnostic": "plume-evidence-v1",
-                "deposit_gettering_diagnostic": "deposit-evidence-v1",
-            },
-        ),
         (
             "data_digests",
             {
-                "corpus_version": "corpus-version-digest",
+                "corpus_version": "changed-corpus-version",
                 "feedstocks": "feedstock-digest",
                 "foulant_thermo": "foulant-thermo-digest",
                 "materials": "materials-digest",
@@ -681,6 +667,16 @@ def test_each_determinant_changes_cache_key(field: str, value: object) -> None:
         ("bounds_digest", "bounds-neutral"),
         ("resolved_engine_identity", "thermoengine adapter-v2"),
         ("vapor_pressure_provider_code_fingerprint", "source-sha256:changed"),
+        ("lab_alpha_digest", "robinot-lab-alpha-v1"),
+        ("geometry_digest", "robinot-geometry-v1"),
+        ("oxide_vapor_ceiling_digest", "oxide-vapor-ceiling-v1"),
+        (
+            "sink_channel_evidence_digests",
+            {
+                "plume_oxidation_diagnostic": "plume-evidence-v1",
+                "deposit_gettering_diagnostic": "deposit-evidence-v1",
+            },
+        ),
     ),
 )
 def test_forbidden_version_and_fingerprint_fields_are_key_neutral(
@@ -898,21 +894,18 @@ def test_lab_overlay_scope_serializes_deterministically_and_only_when_non_empty(
 
     payload = json.loads(canonical_evalspec_json(first).decode("utf-8"))
 
-    assert payload["lab_alpha_digest"] == "robinot-alpha-v1"
-    assert payload["geometry_digest"] == "robinot-geometry-v1"
+    assert "lab_alpha_digest" not in payload
+    assert "geometry_digest" not in payload
     assert payload["effective_exposed_area_m2"] == "0.000314000"
     assert payload["area_basis"] == "gram_lab_exposed_melt"
-    assert payload["oxide_vapor_ceiling_digest"] == "oxide-ceiling-v1"
-    assert payload["sink_channel_evidence_digests"] == {
-        "deposit_gettering_diagnostic": "deposit-evidence-v1",
-        "plume_oxidation_diagnostic": "plume-evidence-v1",
-    }
+    assert "oxide_vapor_ceiling_digest" not in payload
+    assert "sink_channel_evidence_digests" not in payload
     assert canonical_evalspec_json(first) == canonical_evalspec_json(second)
     assert cache_key(first) == cache_key(second)
     assert cache_key(first) != cache_key(_base_spec())
 
 
-def test_target_spec_fields_split_cache_key_only_when_digest_present() -> None:
+def test_target_spec_run_inputs_split_key_while_fingerprints_are_neutral() -> None:
     legacy = _base_spec()
     explicit_empty = _base_spec(
         target_spec_id="",
@@ -944,7 +937,9 @@ def test_target_spec_fields_split_cache_key_only_when_digest_present() -> None:
 
     assert canonical_evalspec_json(legacy) == canonical_evalspec_json(explicit_empty)
     assert b"target_spec_digest" not in canonical_evalspec_json(legacy)
-    assert b"target_spec_digest" in canonical_evalspec_json(targeted)
+    assert b"target_spec_digest" not in canonical_evalspec_json(targeted)
+    assert b"target_spec_id" in canonical_evalspec_json(targeted)
+    assert b"target_maturity" in canonical_evalspec_json(targeted)
     assert cache_key(targeted) != cache_key(legacy)
     assert canonical_evalspec_json(targeted_with_provenance) == canonical_evalspec_json(targeted)
     assert cache_key(targeted_with_provenance) == cache_key(targeted)
@@ -3699,41 +3694,7 @@ def test_non_string_mapping_keys_raise() -> None:
         feedstock_recipe_digest({1: 45.0})
 
 
-def test_missing_required_data_digest_raises() -> None:
-    with pytest.raises(ValueError, match="data_digests missing required keys: setpoints"):
-        _base_spec(
-            data_digests={
-                "feedstocks": "feedstock-digest",
-                "foulant_thermo": "foulant-thermo-digest",
-                "materials": "materials-digest",
-                "vapor_pressures": "vapor-digest",
-                "species_catalog": "species-catalog-digest",
-                "profile": "profile-digest",
-            }
-        )
-
-
-@pytest.mark.parametrize("missing_key", ("foulant_thermo", "materials", "species_catalog"))
-def test_missing_new_required_data_digest_raises(missing_key: str) -> None:
-    # Each newly-required cache-determinant key must be enforced on direct
-    # construction (the legacy sentinel scope applies ONLY at deserialize/reduce).
-    digests = {
-        "setpoints": "setpoint-digest",
-        "feedstocks": "feedstock-digest",
-        "foulant_thermo": "foulant-thermo-digest",
-        "materials": "materials-digest",
-        "vapor_pressures": "vapor-digest",
-        "species_catalog": "species-catalog-digest",
-        "profile": "profile-digest",
-    }
-    del digests[missing_key]
-    with pytest.raises(
-        ValueError, match=f"data_digests missing required keys: {missing_key}"
-    ):
-        _base_spec(data_digests=digests)
-
-
-def test_empty_required_data_digest_raises() -> None:
+def test_empty_data_digest_metadata_value_raises() -> None:
     with pytest.raises(ValueError, match=r"data_digests\['setpoints'\] must be non-empty"):
         _base_spec(
             data_digests={

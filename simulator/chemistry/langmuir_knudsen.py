@@ -290,7 +290,10 @@ def series_flux(
 
 
 def _vapor_pressure_data() -> dict[str, Any]:
-    return yaml.safe_load(_VAPOR_PRESSURES_PATH.read_text()) or {}
+    payload = yaml.safe_load(_VAPOR_PRESSURES_PATH.read_text()) or {}
+    from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+
+    return vapor_pressure_legacy_view(payload)
 
 
 def _species_row(species: str) -> dict[str, Any]:

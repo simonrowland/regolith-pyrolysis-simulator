@@ -282,6 +282,9 @@ def main() -> int:
     species = tuple(args.species)
     temps = temperature_grid(args.t_min, args.t_max, args.t_step)
     vapor_pressure_data = load_yaml(REPO_ROOT / "data" / "vapor_pressures.yaml")
+    from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+
+    vapor_pressure_data = vapor_pressure_legacy_view(vapor_pressure_data)
     feedstocks = load_yaml(REPO_ROOT / "data" / "feedstocks.yaml")
 
     samples_by_species: dict[str, list[dict[str, Any]]] = {name: [] for name in species}

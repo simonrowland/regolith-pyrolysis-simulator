@@ -92,7 +92,11 @@ def foulant_registry():
 
 
 def test_nacl_escape_fraction_anchored_to_stull_source_row(foulant_registry):
-    row = _load_yaml(VAPOR_PRESSURES)["foulant_vapor"]["NaCl"]
+    from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+
+    row = vapor_pressure_legacy_view(_load_yaml(VAPOR_PRESSURES))["foulant_vapor"][
+        "NaCl"
+    ]
     coeff = row["pure_component_antoine"]
     assert coeff["source"] == (
         "REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 NaCl "

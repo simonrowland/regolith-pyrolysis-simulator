@@ -785,6 +785,9 @@ def build_live_major_facts() -> dict[str, dict[str, Any]]:
         try:
             with vp_path.open("r", encoding="utf-8") as fh:
                 vp = yaml.safe_load(fh) or {}
+            from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+
+            vp = vapor_pressure_legacy_view(vp)
             metals = vp.get("metals") or {}
             for el in ("Na", "K"):
                 if el in metals:

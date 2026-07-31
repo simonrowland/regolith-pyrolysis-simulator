@@ -1692,7 +1692,9 @@ CONDENSATION_TEMPS_C = {
 }
 
 _CONFIG_BUNDLE = load_config_bundle(DATA_DIR)
-VAPOR_PRESSURE_DATA = _CONFIG_BUNDLE.vapor_pressures
+from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+
+VAPOR_PRESSURE_DATA = vapor_pressure_legacy_view(_CONFIG_BUNDLE.vapor_pressures)
 MATERIALS_DATA = _CONFIG_BUNDLE.materials
 _ANTOINE_COEFFICIENT_BLOCKS = ('antoine', 'pure_component_antoine')
 _ANTOINE_REQUIRED_KEYS = frozenset(('A', 'B', 'C'))
@@ -3677,6 +3679,14 @@ def _species_vapor_data(
     *,
     vapor_pressure_data: Mapping[str, Any] | None = None,
 ) -> Mapping[str, Any]:
+    from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+
+    catalog_authoritative = (
+        isinstance(vapor_pressure_data, Mapping)
+        and vapor_pressure_data.get("schema_version") == 2
+    )
+    if vapor_pressure_data is not None:
+        vapor_pressure_data = vapor_pressure_legacy_view(vapor_pressure_data)
     global_data: Mapping[str, Any] = {}
     for family in ('metals', 'oxide_vapors'):
         data = (VAPOR_PRESSURE_DATA.get(family, {}) or {}).get(species, {})
@@ -3690,6 +3700,8 @@ def _species_vapor_data(
                 continue
             data = group.get(species)
             if data and isinstance(data, Mapping):
+                if catalog_authoritative:
+                    return data
                 merged = dict(global_data)
                 for key, value in data.items():
                     if key in _ANTOINE_COEFFICIENT_BLOCKS:
@@ -3712,6 +3724,8 @@ def _species_vapor_data(
                             continue
                     merged[key] = value
                 return merged
+        if catalog_authoritative:
+            return {}
     return global_data
 
 
@@ -3745,12 +3759,25 @@ def _species_has_antoine_data(
         species,
         vapor_pressure_data=vapor_pressure_data,
     )
-    return any(
+    if any(
         isinstance(block, Mapping)
         and not _missing_required_antoine_keys(block)
         for block_name in _ANTOINE_COEFFICIENT_BLOCKS
         if (block := data.get(block_name)) is not None
-    )
+    ):
+        return True
+    if isinstance(vapor_pressure_data, Mapping) and vapor_pressure_data.get(
+        "schema_version"
+    ) == 2:
+        from simulator.vapour_rail.catalog import compile_vapour_rail_catalog
+
+        try:
+            compile_vapour_rail_catalog(vapor_pressure_data).evaluator_for(species)
+        except ValueError:
+            pass
+        else:
+            return True
+    return False
 
 
 def apply_setpoints_condensation_temperature_overrides(
@@ -4401,6 +4428,37 @@ def _antoine_psat_pa(
         species,
         vapor_pressure_data=vapor_pressure_data,
     )
+    has_legacy_antoine = any(
+        isinstance(block, Mapping)
+        and not _missing_required_antoine_keys(block)
+        for block_name in _ANTOINE_COEFFICIENT_BLOCKS
+        if (block := data.get(block_name)) is not None
+    )
+    if (
+        not has_legacy_antoine
+        and isinstance(vapor_pressure_data, Mapping)
+        and vapor_pressure_data.get("schema_version") == 2
+    ):
+        from simulator.vapour_rail.catalog import compile_vapour_rail_catalog
+
+        evaluator = compile_vapour_rail_catalog(vapor_pressure_data).evaluator_for(
+            species
+        )
+        evaluation = evaluator.evaluate(T_K)
+        if evaluation.out_of_range:
+            if antoine_extrapolations is not None:
+                antoine_extrapolations[species] = {
+                    "temperature_K": float(T_K),
+                    "valid_range_K": evaluator.valid_temperature_K,
+                    "status": evaluation.status,
+                    "acquisition_flag": evaluation.acquisition_flag,
+                }
+            if (
+                antoine_extrapolation_warnings is not None
+                and evaluation.status not in antoine_extrapolation_warnings
+            ):
+                antoine_extrapolation_warnings.append(str(evaluation.status))
+        return evaluation.pressure_pa
     from engines.builtin.vapor_pressure import (
         reconstructed_vapor_pressure_authority_limit,
         require_antoine_source_certified_temperature,

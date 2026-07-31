@@ -142,9 +142,11 @@ def _load_default_vapor_pressure_data() -> dict[str, Any]:
 def _resolve_vapor_pressure_data(
     vapor_pressure_data: Mapping[str, Any] | None,
 ) -> Mapping[str, Any]:
+    from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+
     if vapor_pressure_data is None:
-        return _load_default_vapor_pressure_data()
-    return vapor_pressure_data
+        vapor_pressure_data = _load_default_vapor_pressure_data()
+    return vapor_pressure_legacy_view(vapor_pressure_data)
 
 
 def _antoine_reference_pressure_Pa(

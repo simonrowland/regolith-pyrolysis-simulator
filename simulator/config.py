@@ -191,6 +191,17 @@ def load_config_bundle(
             path,
             functional_digest=name in _FUNCTIONAL_DATA_DIGEST_CONFIGS,
         )
+    from simulator.vapour_rail.catalog import (
+        validate_species_catalog,
+        vapor_pressure_compatibility_view,
+    )
+
+    if "species" in loaded["species_catalog"]:
+        validate_species_catalog(loaded["species_catalog"])
+    if loaded["vapor_pressures"].get("schema_version") == 2:
+        loaded["vapor_pressures"] = vapor_pressure_compatibility_view(
+            loaded["vapor_pressures"]
+        )
     return ConfigBundle(
         setpoints=loaded["setpoints"],
         feedstocks=loaded["feedstocks"],

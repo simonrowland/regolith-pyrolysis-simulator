@@ -61,6 +61,8 @@ from typing import Any, Mapping
 
 import yaml
 
+from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+
 
 # ---------------------------------------------------------------------
 # fO2 anchors
@@ -341,7 +343,9 @@ def alpha_envelope_anchors(
 ) -> list[AlphaEnvelopeAnchor]:
     """Return every YAML evaporation-alpha value with source and envelope."""
 
-    data = yaml.safe_load(_vapor_pressure_path(repo_root).read_text()) or {}
+    data = vapor_pressure_legacy_view(
+        yaml.safe_load(_vapor_pressure_path(repo_root).read_text()) or {}
+    )
     anchors: list[AlphaEnvelopeAnchor] = []
     for group_name in _ALPHA_DATA_GROUPS:
         group = data.get(group_name, {}) or {}

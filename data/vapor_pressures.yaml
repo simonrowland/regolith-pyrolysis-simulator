@@ -1,1089 +1,1995 @@
-# Vapor-pressure reference data for effective P_eq calculations
-# Antoine equation: log10(P_Pa) = A - B / (T_K + C)
-# Runtime Antoine rows can be pure references, pseudo VapoRock refits, or
-# reaction terms that are activity/pO2-scaled by the builtin Antoine/Ellingham
-# provider into the effective P_eq consumed by evaporation. Only
-# pure_component_antoine sidecars are pure-component references.
-# Sources: legacy constants plus diagnostic refits against VapoRock over Kress91
-# IW operating conditions. K is not a VapoRock pseudo-refit: it is a
-# Lamoreaux & Hildenbrand 1984 liquid-KO0.5 standard-reaction term whose
-# activity and pO2 scaling are applied by the builtin provider. The builtin
-# provider is authoritative; VapoRock is diagnostic-only when available.
-#
-# Dense fallback refit (2026-06-14, scripts/vaporock_pseudo_antoine_refit.py):
-#   current VapoRock import; 7 feedstocks; 31 T points from 1350-1950 K;
-#   Kress91/IW via vaporock.redox_buffer(T, "IW"); 217 samples/species.
-#   Na max 0.379 dex (low); Mg max 0.282 dex (moderate);
-#   SiO max 0.270 dex (moderate). K is intentionally excluded from this
-#   VapoRock-refit note; its L&H standard term remains +1.15..+1.28 dex high
-#   against held-out DeMaria 1971 Apollo 12022 rows with runtime gamma_KO0.5.
-#   Fe 0.023 dex did not re-confirm against current VapoRock; dense-grid
-#   refit lowers current residual to 0.418 dex but remains low confidence.
-#
-# VapoRock structural-species note (2026-05-20): K and O2 are
-# structurally limited in the builtin surface. Antoine entries here are
-# diagnostic curve-fit approximations and intentionally narrower
-# than VapoRock's full JANAF gas speciation. O2 is not listed as an
-# evaporating species because it has no single parent oxide; VapoRock may
-# expose it through the read-only vaporock_full_speciation_Pa diagnostic.
-#
-# Evaporation alpha policy:
-# - evaporation_alpha blocks carry HKL alpha value, citation, temperature
-#   context, uncertainty envelope, and confidence tier.
-# - tier 2 values are proxy or conditional proxies, not direct regolith-melt
-#   measurements.
-# - tier 3 species intentionally carry no alpha value. Runtime evaporation
-#   refuses nonzero flux for those species unless the operator explicitly opts
-#   into unmeasured alpha=1.0 fallback for prototyping.
+# Schema-v2 hot-vapour authority. Generated once from schema v1 by VR-3.
+# Runtime legacy maps are compiled projections; do not add duplicate rows.
+schema_version: 2
+description: Composite hot-vapour authority grouped by co-evolving family into physical properties, fiat
+  routing, vaporisation coefficients, and code metadata. Legacy runtime shapes are compiler projections
+  only.
+families:
+  metals_na_family:
+    physical_properties:
+      species:
+        Na:
+          formula: Na
+          molar_mass_g_mol: 22.98976928
+          electrons_per_atom: 1
+          parent_oxide: Na2O
+          authority_class: uncertified
+          declared_compensation: true
+          declared_compensation_note: 'Compensating-errors surface: Chase/JANAF gas-standard fugacity
+            (active high-T rail) paired with fixed gamma_NaO0.5=1e-3 (Sossi 2019 magnitude) is NOT an
+            intentional DeMaria fit and is NOT a coherent pure-system standard-plus-activity pair. The
+            two coherent shadow candidates at the investigation 1429 K input bracket ~1.86 dex (L&H+gamma
+            0.1459 Pa vs full-VapoRock 0.002032 Pa). Pending t-383 paired re-ground; DeMaria 12022/12065
+            held-out validation only.
 
-metals:
-  Na:
-    formula: "Na"
-    molar_mass_g_mol: 22.98976928
-    electrons_per_atom: 1
-    parent_oxide: "Na2O"
-    fit_target: "pseudo_psat_backsolved_from_vaporock"
-    # INTERIM Alternative B (2026-07-20 Na investigation / t-383): keep the
-    # active Chase/JANAF gas-standard + gamma_NaO0.5=1e-3 pair, demote
-    # authority, declare compensating-errors bracket. Labels only -- runtime
-    # pressure path is unchanged (golden-neutral for B1).
-    authority_class: uncertified
-    declared_compensation: true
-    declared_compensation_note: >
-      Compensating-errors surface: Chase/JANAF gas-standard fugacity
-      (active high-T rail) paired with fixed gamma_NaO0.5=1e-3 (Sossi 2019
-      magnitude) is NOT an intentional DeMaria fit and is NOT a coherent
-      pure-system standard-plus-activity pair. The two coherent shadow
-      candidates at the investigation 1429 K input bracket ~1.86 dex
-      (L&H+gamma 0.1459 Pa vs full-VapoRock 0.002032 Pa). Pending t-383
-      paired re-ground; DeMaria 12022/12065 held-out validation only.
-    pressure_bracket:
-      T_K: 1429.0
-      condition: "investigation 2026-07-20-na-investigation stated DeMaria-class input"
-      reference: "docs-private/research/2026-07-20-na-investigation/report.md"
-      candidates:
-        lamoreaux_hildenbrand_plus_constant_gamma_Pa: 0.1459
-        full_vaporock_Pa: 0.002032
-      spread_dex: 1.86
-      active_rail: chase_janaf_gas_standard_fugacity_plus_gamma_1e-3
-      interim_treatment: alternative_B_declared_compensation
-    residual_dex: 0.379
-    confidence_tier: "low"
-    # Stale VapoRock-backsolved Antoine no longer drives the active high-T
-    # rail (gas_standard_fugacity). Kept for provenance only -- do not retune
-    # as if it were the live Na pressure surface (t-383 / Alternative B).
-    pseudo_antoine_status: inactive_provenance_only
-    backsolve:
-      feedstock_grid: "dense seven-feedstock lunar/mars grid"
-      fO2_convention: "Kress91 IW"
-      activity_formula: "(K_decomp * a_oxide**n_ox / pO2_bar)**(1/n_M), clamped at 1"
-      target: "VapoRock Na(g) partial pressure on the dense grid"
-      residual_dex: 0.379
-      old_metadata_residual_dex: 0.121
-      old_dense_residual_dex: 1.413
-      provenance:
-        generated_by: "scripts/vaporock_pseudo_antoine_refit.py"
-        temperature_K: {min: 1350, max: 1950, step: 20, count: 31}
-        feedstocks: ["lunar_mare_low_ti", "lunar_mare_high_ti", "lunar_highland", "lunar_pkt_kreep_average", "lunar_spa_kreep_influenced", "mars_basalt", "mars_sulfate_rich"]
-        n_samples: 217
-        composition_basis: "VapoRock-supported silicate oxides; unsupported Stage 0 foulants removed, remaining oxides renormalized to 100 wt%"
-        fit_objective: "bounded minimax absolute log10 residual; |C| <= 1000 K"
-        status: inactive_provenance_only
-        note: "Does not drive runtime high-T Na rail; active path is Ellingham gas_standard_fugacity + melt gamma"
-    pure_component_antoine:
-      source: "REF-041 NIST Chemistry WebBook SRD 69 Rodebush and Walters 1930 sodium (C7440235); log10(P/bar)=2.46077-1873.728/(T-416.372), converted to Pa by A+5"
-      source_certification: "source_equation_fit"
-      A: 7.460770
-      B: 1873.728
-      C: -416.372
-      valid_range_K: [924, 1118]
-    evaporation_alpha:
-      value: 1.0
-      source: "OWNER-RATIFY source_class=open_furnace_apparent_not_intrinsic: REF-013 Sossi et al. 2019 GCA 260:204, Na alpha_e~1 near-ideal open-furnace evaporation from ferrobasalt FCMAS melt; retained pending owner ratification against competing Fedkin intrinsic 0.13"
-      T_band_K: [1700, 2273]
-      envelope: [0.9, 1.0]
-      tier: 2
-      # V1e-followon (2026-05-27, post-0.5.0): Na/K alpha reconciliation.
-      # Sossi 2019 (open furnace, mass-loss method) reports alpha_e ~ 1
-      # (near-ideal). Fedkin et al. 2006 LPSC (KEMS / Knudsen effusion
-      # mass spec, sealed equilibrium chamber) reports alpha_e ~ 0.13 for
-      # Na -- about 8x lower. The disagreement is methodological:
-      # KEMS measures evaporation flux against an equilibrium reservoir
-      # (HKL denominator dominated by re-condensation); open-furnace
-      # measures net loss to a swept volume (no back-flux). The
-      # simulator recipes run at ~mbar overhead with continuous sweep
-      # gas, which is closer to the open-furnace regime than the KEMS
-      # chamber. Pin to Sossi 2019. Operators wanting Fedkin's
-      # conservative value can override via setpoints (see
-      # data/setpoints.yaml chemistry_kernel block).
-      competing_sources:
-        - source: "REF-014 Fedkin et al. 2006 LPSC 37:#2249, KEMS sealed-chamber"
+            '
+          pressure_bracket:
+            T_K: 1429.0
+            condition: investigation 2026-07-20-na-investigation stated DeMaria-class input
+            reference: docs-private/research/2026-07-20-na-investigation/report.md
+            candidates:
+              lamoreaux_hildenbrand_plus_constant_gamma_Pa: 0.1459
+              full_vaporock_Pa: 0.002032
+            spread_dex: 1.86
+            active_rail: chase_janaf_gas_standard_fugacity_plus_gamma_1e-3
+            interim_treatment: alternative_B_declared_compensation
+          residual_dex: 0.379
+          confidence_tier: low
+          pseudo_antoine_status: inactive_provenance_only
+          backsolve:
+            feedstock_grid: dense seven-feedstock lunar/mars grid
+            fO2_convention: Kress91 IW
+            activity_formula: (K_decomp * a_oxide**n_ox / pO2_bar)**(1/n_M), clamped at 1
+            target: VapoRock Na(g) partial pressure on the dense grid
+            residual_dex: 0.379
+            old_metadata_residual_dex: 0.121
+            old_dense_residual_dex: 1.413
+            provenance:
+              generated_by: scripts/vaporock_pseudo_antoine_refit.py
+              temperature_K:
+                min: 1350
+                max: 1950
+                step: 20
+                count: 31
+              feedstocks:
+              - lunar_mare_low_ti
+              - lunar_mare_high_ti
+              - lunar_highland
+              - lunar_pkt_kreep_average
+              - lunar_spa_kreep_influenced
+              - mars_basalt
+              - mars_sulfate_rich
+              n_samples: 217
+              composition_basis: VapoRock-supported silicate oxides; unsupported Stage 0 foulants removed,
+                remaining oxides renormalized to 100 wt%
+              fit_objective: bounded minimax absolute log10 residual; |C| <= 1000 K
+              status: inactive_provenance_only
+              note: Does not drive runtime high-T Na rail; active path is Ellingham gas_standard_fugacity
+                + melt gamma
+          pure_component_antoine:
+            source: REF-041 NIST Chemistry WebBook SRD 69 Rodebush and Walters 1930 sodium (C7440235);
+              log10(P/bar)=2.46077-1873.728/(T-416.372), converted to Pa by A+5
+            source_certification: source_equation_fit
+            A: 7.46077
+            B: 1873.728
+            C: -416.372
+            valid_range_K:
+            - 924
+            - 1118
+          boiling_point_C: 883
+          notes: 'INTERIM uncertified (Alternative B, 2026-07-20): active high-T rail is Chase/JANAF gas_standard_fugacity
+            + fixed gamma_NaO0.5=1e-3 with declared compensating-errors bracket (L&H+gamma 0.1459 Pa vs
+            full VapoRock 0.002032 Pa at 1429 K, ~1.86 dex). Stale YAML pseudo Antoine is inactive/provenance-only.
+            DeMaria 12022/12065 held-out pending t-383 paired re-ground. Do not certify or retune to DeMaria
+            residual.
+
+            '
+          validation:
+            status: pending_validation
+            anchor_refs: []
+          source_reactions: []
+          pressure_models:
+          - fit_target: pseudo_psat_backsolved_from_vaporock
+            pressure_kind: pure_component_saturation_pressure
+            species_basis: monomer
+            valid_domain:
+              temperature_K:
+              - 1400
+              - 1900
+            provenance:
+            - source: schema_v1_in_place_migration
+            evaluator_family: antoine
+            coefficients:
+              A: 5.18586
+              B: 11127.434869
+              C: 1000.0
+    fiat_routing:
+      plant_bin: null
+      engineering_capture_policy: temperature_threshold
+      products_and_coproducts: []
+      process_or_terminal_destination: process.condensation_train
+      condensation_reference_at_1mbar_C: 480
+    vaporisation_coefficients:
+      evaporation_alpha:
+        value: 1.0
+        source: 'OWNER-RATIFY source_class=open_furnace_apparent_not_intrinsic: REF-013 Sossi et al. 2019
+          GCA 260:204, Na alpha_e~1 near-ideal open-furnace evaporation from ferrobasalt FCMAS melt; retained
+          pending owner ratification against competing Fedkin intrinsic 0.13'
+        T_band_K:
+        - 1700
+        - 2273
+        envelope:
+        - 0.9
+        - 1.0
+        tier: 2
+        competing_sources:
+        - source: REF-014 Fedkin et al. 2006 LPSC 37:#2249, KEMS sealed-chamber
           value: 0.13
-          regime: "sealed equilibrium chamber; not representative of mbar-sweep pyrolysis"
-    antoine:
-      # PROVENANCE-ONLY (inactive): bounded-minimax fallback fit to a past
-      # VapoRock dense IW grid. Does NOT drive the active high-T Na rail.
-      # Active rail: Chase/JANAF gas_standard_fugacity + gamma_NaO0.5=1e-3.
-      A: 5.185860
-      B: 11127.434869
-      C: 1000.0
-    valid_range_K: [1400, 1900]
-    boiling_point_C: 883
-    condensation_T_C_at_1mbar: 480
-    notes: >
-      INTERIM uncertified (Alternative B, 2026-07-20): active high-T rail is
-      Chase/JANAF gas_standard_fugacity + fixed gamma_NaO0.5=1e-3 with
-      declared compensating-errors bracket (L&H+gamma 0.1459 Pa vs full
-      VapoRock 0.002032 Pa at 1429 K, ~1.86 dex). Stale YAML pseudo Antoine is
-      inactive/provenance-only. DeMaria 12022/12065 held-out pending t-383
-      paired re-ground. Do not certify or retune to DeMaria residual.
-
-  K:
-    formula: "K"
-    molar_mass_g_mol: 39.0983
-    electrons_per_atom: 1
-    parent_oxide: "K2O"
-    fit_target: "standard_reaction_term"
-    residual_dex: 0.000223
-    confidence_tier: "uncertified_liquid_ko0_5_lamoreaux_hildenbrand"
-    gamma_domain_K: [1500.0, 1500.0]
-    gamma_authority: >-
-      Fixed gamma_KO0.5=3.5e-5 certified only at the 1500 K DeMaria/Sossi anchor.
-      Coefficient residual 0.000223 dex is good; gamma temperature extrapolation
-      dominates uncertainty and is UNCERTIFIED outside (1500,1500) K. Certifying
-      callers must treat out-of-domain gamma as authority-limited (DRIFT-HIGH).
-    reaction:
-      formula: "KO0.5(l) -> K(g) + 0.25 O2(g)"
-      exponent_oxide: 1.0
-      exponent_pO2: -0.25
-      basis: "Lamoreaux & Hildenbrand 1984 Tables 2/4 liquid K2O Gibbs-energy-function/enthalpy assembly, DOI 10.1063/1.555706; halved to liquid KO0.5 Raoultian standard reaction; DeMaria 1971 retained only as held-out validation"
-      activity_basis: "single-cation KO0.5 Raoultian activity"
-      fit_form: "log10(P_K_Pa)=A-B/T_K+log10(a_KO0.5)-0.25*log10(pO2_bar/1bar)"
-      pressure_standard_Pa: 100000
-      source: "Lamoreaux & Hildenbrand 1984 J. Phys. Chem. Ref. Data 13:151-173 Tables 2/4, DOI 10.1063/1.555706; verified extraction docs-private/research/2026-07-07-t141-kmox/lamoreaux-hildenbrand-1984-verified-data.md"
-      source_urls:
-        - "https://doi.org/10.1063/1.555706"
-      source_table_values:
-        - {T_K: 1190.000000, log10_K_r_KO0_5_atm: -3.705290, log10_P_K_ref_Pa: 1.301855, fit_log10_P_K_ref_Pa: 1.301633, residual_dex: -0.000223}
-        - {T_K: 1300.000000, log10_K_r_KO0_5_atm: -2.832657, log10_P_K_ref_Pa: 2.174488, fit_log10_P_K_ref_Pa: 2.174499, residual_dex: 0.000011}
-        - {T_K: 1400.000000, log10_K_r_KO0_5_atm: -2.169771, log10_P_K_ref_Pa: 2.837375, fit_log10_P_K_ref_Pa: 2.837522, residual_dex: 0.000147}
-        - {T_K: 1428.571429, log10_K_r_KO0_5_atm: -1.998894, log10_P_K_ref_Pa: 3.008252, fit_log10_P_K_ref_Pa: 3.008301, residual_dex: 0.000049}
-        - {T_K: 1450.000000, log10_K_r_KO0_5_atm: -1.875574, log10_P_K_ref_Pa: 3.131572, fit_log10_P_K_ref_Pa: 3.131560, residual_dex: -0.000012}
-        - {T_K: 1475.000000, log10_K_r_KO0_5_atm: -1.736660, log10_P_K_ref_Pa: 3.270486, fit_log10_P_K_ref_Pa: 3.270424, residual_dex: -0.000062}
-        - {T_K: 1600.000000, log10_K_r_KO0_5_atm: -1.113140, log10_P_K_ref_Pa: 3.894006, fit_log10_P_K_ref_Pa: 3.894228, residual_dex: 0.000223}
-      fit_residual_dex: {max_abs: 0.000223, rms: 0.000083}
-      comparison_anchor:
-        T_K: 1428.571429
-        measured_log10_pO2_bar: -7.858279
-        measured_log10_pK_Pa: -3.794
-        predicted_log10_pK_Pa_with_runtime_gamma: -2.553
-        residual_dex_model_minus_demaria: 1.241
-      heldout_demaria_comparison:
-        - {T_K: 1470.588235, log10_pK_atm: -8.600000, log10_pO2_bar: -7.351965, X_KO0_5: 8.516800e-4, gamma_runtime: 3.5e-5, measured_log10_pK_Pa: -3.594283, predicted_log10_pK_Pa: -2.441372, residual_dex_model_minus_demaria: 1.152912}
-        - {T_K: 1449.275362, log10_pK_atm: -8.700000, log10_pO2_bar: -7.608791, X_KO0_5: 8.516800e-4, gamma_runtime: 3.5e-5, measured_log10_pK_Pa: -3.694283, predicted_log10_pK_Pa: -2.496001, residual_dex_model_minus_demaria: 1.198283}
-        - {T_K: 1428.571429, log10_pK_atm: -8.800000, log10_pO2_bar: -7.858279, X_KO0_5: 8.516800e-4, gamma_runtime: 3.5e-5, measured_log10_pK_Pa: -3.794283, predicted_log10_pK_Pa: -2.552784, residual_dex_model_minus_demaria: 1.241499}
-        - {T_K: 1408.450704, log10_pK_atm: -8.900000, log10_pO2_bar: -8.100739, X_KO0_5: 8.516800e-4, gamma_runtime: 3.5e-5, measured_log10_pK_Pa: -3.894283, predicted_log10_pK_Pa: -2.611646, residual_dex_model_minus_demaria: 1.282637}
-    pure_component_antoine:
-      source: "REF-042 NIST Chemistry WebBook SRD 69 Fiock and Rodebush 1926 potassium (C7440097); log10(P/bar)=4.45718-4691.58/(T+24.195), converted to Pa by A+5"
-      source_certification: "source_equation_fit"
-      A: 9.457180
-      B: 4691.58
-      C: 24.195
-      valid_range_K: [679.4, 1033]
-    evaporation_alpha:
-      value: 0.13
-      source: "REF-014 Fedkin et al. 2006 LPSC 37:#2249 KEMS sealed-chamber intrinsic K alpha_e~0.13; replaces prior Na open-furnace analogy for series-resistance intrinsic-alpha model"
-      T_band_K: [1700, 2273]
-      envelope: [0.10, 0.16]
-      tier: 2
-    oxide_activity_exponent: 1.0
-    pO2_exponent: -0.25
-    pO2_reference_bar: 1.0
-    antoine:
-      # provenance: k_mox_liquid_standard_reaction
-      # Lamoreaux & Hildenbrand 1984 Tables 2/4 (DOI 10.1063/1.555706):
-      # K2O(l)=2K(g)+0.5O2(g), DeltaH298/R=65.04 kK, fef(T) table fits,
-      # halved to KO0.5(l)=K(g)+0.25O2(g), 1 atm -> Pa/bar pO2 basis.
-      # A=10.641293604542, B=9965.408778631245, C=-123.001.
-      A: 10.641294
-      B: 9965.408779
-      C: -123.001
-    valid_range_K: [1190, 1600]
-    boiling_point_C: 759
-    condensation_T_C_at_1mbar: 420
-    notes: |
-      Direct liquid-KO0.5 standard-reaction term for KO0.5(l) = K(g) + 0.25 O2.
-      The coefficient is not a VapoRock fit, not a DeMaria back-solve, and not a
-      JANAF K2O(cr) surrogate: it is fitted only to the Lamoreaux & Hildenbrand
-      1984 Tables 2/4 liquid-K2O thermodynamic assembly (DOI 10.1063/1.555706),
-      halved to the single-cation KO0.5 Raoultian basis consumed by melt
-      activity. DeMaria 1971 Apollo 12022 KEMS rows are held-out validation and
-      remain +1.15 to +1.28 dex high with the runtime constant gamma.
-
-  Mg:
-    formula: "Mg"
-    molar_mass_g_mol: 24.305
-    electrons_per_atom: 2
-    parent_oxide: "MgO"
-    fit_target: "pure_component_psat"
-    # Liquid-oxide pairing rail / high-T path: uncertified (matrix).
-    authority_class: uncertified
-    extrapolation_policy: "refuse"
-    total_source_certified_range_K: [701, 2273.15]
-    source: "REF-033 CRC.b/Stull magnesium pressure-level table fit (1-100000 Pa); runtime pure-component source is pure_component_antoine"
-    pure_component_antoine:
-      source: "REF-033 CRC.b/Stull magnesium pressure-level table fit (1-100000 Pa); cross-checked against REF-034 Kaye-Laby/NPL Ambrose pressure-level table; not an Alcock liquid equation"
-      provenance_class: "source_tabulated_fit"
-      source_basis: "crc_stull_mg_pressure_level_table"
-      source_certified_range_K: [701, 1361]
-      fit_range_K: [701, 1361]
-      max_table_residual_fraction: 0.0681
-      source_validation_points_Pa_K: [[1, 701], [10, 773], [100, 861], [1000, 971], [10000, 1132], [100000, 1361]]
-      # REF-033 CRC.b/Stull Mg table: 1,10,100,1000,10000,100000 Pa at
-      # 701,773,861,971,1132,1361 K. REF-034 Kaye-Laby/NPL alternative:
-      # 200,1000,2000,5000,10000,20000,50000,101325 Pa at
-      # 891,979,1025,1085,1140,1205,1295,1375 K.
-      A: 9.4964271591
-      B: 5613.103906
-      C: -110.759803
-      valid_range_K: [701, 1361]
-    reconstructed_vapor_pressure_segment:
-      range_K: [1361, 1366]
-      authority_status: "reconstructed_limited"
-      authority_flag: "authority_limited_by_reconstructed_vapor_pressure_segment"
-      interpolation: "log10_pressure_linear_in_reciprocal_temperature"
-      anchors:
-        - temperature_K: 1361
-          pressure_Pa: 100000.0
-          source: "REF-033 CRC.b/Stull magnesium pressure-level table final certified point"
-        - temperature_K: 1366
-          pressure_rail: "gas_rail_standard_reaction"
-          source: "gas_rail_standard_reaction Antoine value at its certified lower bound"
-      provenance: >
-        DECLARED RECONSTRUCTION, not a fit extrapolation. log10(P/Pa) is linear
-        in 1/T from REF-033 CRC.b/Stull's certified 1361 K, 100000 Pa endpoint
-        to the unchanged gas_rail_standard_reaction evaluated at its certified
-        1366 K lower bound: 1.776479712477316e-13 Pa
-        (log10(P/Pa)=-12.750439747819721). The 5 K authority gap brackets NIST
-        Chemistry WebBook SRD 69 T_boiling=1363.15 +/- 1.5 K; the rail bounds
-        disagree by less than their mutual temperature uncertainty. Across the
-        closed bridge, maximum deviation from naive extension is bounded by
-        17.77514 dex versus the condensed fit and 17.85520 dex versus the gas
-        fit. Neither source rail's coefficients or certified range is changed.
-    evaporation_alpha:
-      value: 0.20
-      source: "REF-015 REF-018 Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; SF2004 Table 10 Mg2SiO4(l), Hashimoto 1990, alpha_s=0.20-0.21"
-      T_band_K: [1873, 2373]
-      envelope: [0.10, 0.21]
-      tier: 2
-    boiling_point_C: 1090  # NIST WebBook SRD 69: 1363 K (Honig and Kramer 1969; TRC +/-1.5 K)
-    condensation_T_C_at_1mbar: 580
-    notes: "Runtime reference is the CRC/Stull pure-component Mg sidecar, multiplied by the builtin Ellingham MgO activity path. The 2026-06-14 VapoRock dense-grid pseudo-fit was removed on 2026-06-29 because its negative-B Antoine row was non-monotonic for T > 1000 K and non-certifying outside its fit intent."
-
-    gas_rail_standard_reaction:
-      formula: "MgO(l) -> Mg(g) + 0.5 O2(g)"
-      basis: >
-        VapoRock JANAF metal(g)/O2(g) + ThermoEngine v1.0 pure-liquid oxide
-        mu0; minimax refit over 1366-2273.15 K.
-        Closes solid-oxide Ellingham vs liquid-oxide activity pairing
-        (2026-07-20 vaporock-fit-audit).
-      standard_pressure_Pa: 100000.0
-      oxide_activity_exponent: 1.0
-      pO2_exponent: -0.5
-      pO2_reference_bar: 1.0
-      antoine:
-        A: 13.4693238
-        B: 32944.8707002
-        C: -109.5100000
-        derivation: >
-          Premise: liquid-oxide activity pairs with liquid-oxide standard
-          reaction. Algebra: delG0=G_M(g)+n*G_O2-mu0_oxide(l);
-          log10(P_ref/Pa)=5-delG0/(RT ln10); P=P_ref*a*fO2^n. Unit Pa.
-          Sanity: max residual 0.006291 dex vs TE+JANAF grid.
-      source_certified_range_K: [1366, 2273.15]
-      extrapolation_policy: "refuse"
-      valid_range_K: [1366, 2273.15]
-      fit_residual_dex:
-        max_abs: 0.006291
-        rms: 0.002643
-        grid_K: [1366, 2273.15, 10]
-        method: minimax |log10P_fit-log10P_source| on 10 K grid
-      rail_scope: gas_only_two_rail_preserved
-  Fe:
-    formula: "Fe"
-    molar_mass_g_mol: 55.845
-    electrons_per_atom: 2
-    parent_oxide: "FeO"
-    fit_target: "pseudo_psat_backsolved_from_vaporock"
-    # Absolute Fe pressure residual / degraded activity path: uncertified (matrix).
-    authority_class: uncertified
-    pseudo_antoine_status: inactive_dormant
-    residual_dex: 0.418
-    confidence_tier: "low"
-    backsolve:
-      feedstock_grid: "dense seven-feedstock lunar/mars grid"
-      fO2_convention: "Kress91 IW"
-      activity_formula: "(K_decomp * a_oxide**n_ox / pO2_bar)**(1/n_M), clamped at 1"
-      target: "VapoRock Fe(g) partial pressure on the dense grid"
-      residual_dex: 0.418
-      old_metadata_residual_dex: 0.023
-      old_dense_residual_dex: 1.693
-      provenance:
-        generated_by: "scripts/vaporock_pseudo_antoine_refit.py"
-        temperature_K: {min: 1350, max: 1950, step: 20, count: 31}
-        feedstocks: ["lunar_mare_low_ti", "lunar_mare_high_ti", "lunar_highland", "lunar_pkt_kreep_average", "lunar_spa_kreep_influenced", "mars_basalt", "mars_sulfate_rich"]
-        n_samples: 217
-        composition_basis: "VapoRock-supported silicate oxides; unsupported Stage 0 foulants removed, remaining oxides renormalized to 100 wt%"
-        fit_objective: "bounded minimax absolute log10 residual; |C| <= 1000 K"
-    pure_component_antoine:
-      source: "REF-012 CRC/NIST normal boiling point; CRC/NIST dH_vap~340 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
-      provenance_class: "derived_from_evaluation"
-      construction_support_range_K: [1809.0, 3134.0]
-      construction: >-
-        Clausius-Clapeyron from CRC/NIST Tb + dH_vap; construction support band
-        declared for metadata honesty (audit 2026-07-20). Not a VapoRock fit.
-        Runtime selects this pure-component sidecar; the residual pseudo Antoine
-        block is dormant/inactive and must not be retuned (t-373 tail).
-      A: 10.670336
-      B: 17759.430841
-      C: 0
-    evaporation_alpha:
-      value: 0.02
-      source: "REF-016 Costa & Jacobson 2015 KEMS Fo93Fa7 olivine, Fe+ alpha=0.011-0.020 at 1700-1800 K; Ebel 2005 calculated Fe/FeO alpha~0.2 noted as non-measured high-side proxy"
-      T_band_K: [1873, 2373]
-      envelope: [0.011, 0.020]
-      tier: 2
-    antoine:
-      # Bounded-minimax fallback fit to current VapoRock dense IW grid.
-      A: 9.408547
-      B: 23312.312336
-      C: 1000.0
-    valid_range_K: [1400, 1900]
-    boiling_point_C: 2862
-    condensation_T_C_at_1mbar: 1250
-    notes: |
-      Prior 0.023 dex basalt-grid residual did not re-confirm against the
-      current VapoRock install. Dense-grid refit lowers current residual from
-      1.693 dex to 0.418 dex, but Fe remains structurally activity-dependent
-      and low confidence; VapoRock is diagnostic-only when available.
-
-  Ca:
-    formula: "Ca"
-    molar_mass_g_mol: 40.08
-    electrons_per_atom: 2
-    parent_oxide: "CaO"
-    fit_target: "pure_component_psat"
-    # Liquid-oxide pairing rail / high-T path: uncertified (matrix).
-    authority_class: uncertified
-    source: "REF-043 NIST Chemistry WebBook SRD 69 Hartmann and Schneider 1929 calcium (C7440702); runtime pure-component source is pure_component_antoine"
-    pure_component_antoine:
-      source: "REF-043 NIST Chemistry WebBook SRD 69 Hartmann and Schneider 1929 calcium (C7440702); log10(P/bar)=2.78473-3121.368/(T-594.591), converted to Pa by A+5"
-      source_certification: "source_equation_fit"
-      A: 7.784730
-      B: 3121.368
-      C: -594.591
-      valid_range_K: [1254, 1712]
-    evaporation_alpha:
-      value: 0.90
-      source: "OWNER-RATIFY proxy_not_intrinsic: Zhang et al. 2014 GCA 140:365-380 CaTiO3 melt at 2005 C; Ca activity proxy"
-      T_band_K: [2278, 2278]
-      envelope: [0.48, 1.20]
-      tier: 2
-      tag: "proxy"
-    antoine:
-      A: 11.238
-      B: 9520
-      C: 0
-    valid_range_K: [1115, 1757]
-    boiling_point_C: 1484
-    condensation_T_C_at_1mbar: 780
-    notes: "dH_vap ~ 182.3 kJ/mol. Significant above ~1500°C."
-
-    gas_rail_standard_reaction:
-      formula: "CaO(l) -> Ca(g) + 0.5 O2(g)"
-      basis: >
-        VapoRock JANAF metal(g)/O2(g) + ThermoEngine v1.0 pure-liquid oxide
-        mu0; minimax refit over 1757-2273.15 K.
-        Closes solid-oxide Ellingham vs liquid-oxide activity pairing
-        (2026-07-20 vaporock-fit-audit).
-      standard_pressure_Pa: 100000.0
-      oxide_activity_exponent: 1.0
-      pO2_exponent: -0.5
-      pO2_reference_bar: 1.0
-      antoine:
-        A: 12.2168914
-        B: 37873.6892331
-        C: -116.8900000
-        derivation: >
-          Premise: liquid-oxide activity pairs with liquid-oxide standard
-          reaction. Algebra: delG0=G_M(g)+n*G_O2-mu0_oxide(l);
-          log10(P_ref/Pa)=5-delG0/(RT ln10); P=P_ref*a*fO2^n. Unit Pa.
-          Sanity: max residual 0.000736 dex vs TE+JANAF grid.
-      valid_range_K: [1757, 2273.15]
-      fit_residual_dex:
-        max_abs: 0.000736
-        rms: 0.000323
-        grid_K: [1757, 2273.15, 10]
-        method: minimax |log10P_fit-log10P_source| on 10 K grid
-      rail_scope: gas_only_two_rail_preserved
-  Al:
-    formula: "Al"
-    molar_mass_g_mol: 26.9815385
-    electrons_per_atom: 3
-    parent_oxide: "Al2O3"
-    fit_target: "pure_component_psat"
-    # Liquid-oxide pairing rail / high-T path: uncertified (matrix).
-    authority_class: uncertified
-    source: "REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 aluminum (C7429905); runtime pure-component source is pure_component_antoine"
-    pure_component_antoine:
-      source: "REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 aluminum (C7429905); log10(P/bar)=5.73623-13204.109/(T-24.306), converted to Pa by A+5"
-      source_certification: "source_equation_fit"
-      A: 10.736230
-      B: 13204.109
-      C: -24.306
-      valid_range_K: [1557, 2329]
-    evaporation_alpha:
-      value: 0.30
-      source: "OWNER-RATIFY proxy_not_intrinsic: REF-018 Schaefer & Fegley 2004 Icarus 169:216-241 Table 10 plus Shahar & Young 2007 CAI modeling; conflicting Al proxy coverage"
-      T_band_K: [1700, 2273]
-      envelope: [0.03, 1.00]
-      tier: 2
-      tag: "broad_proxy"
-    antoine:
-      A: 11.553
-      B: 17340
-      C: 0
-    valid_range_K: [933, 2792]
-    boiling_point_C: 2519
-    condensation_T_C_at_1mbar: 1180
-    notes: "dH_vap ~ 332.0 kJ/mol. Negligible below 2500°C  --  not pyrolysable."
-
-    liquid_oxide_standard_reaction:
-      formula: "AlO1.5(l) -> Al(g) + 0.75 O2(g)"
-      basis: >
-        VapoRock JANAF metal(g)/O2(g) + ThermoEngine v1.0 pure-liquid oxide
-        mu0; minimax refit over 1400-2273.15 K.
-        Closes solid-oxide Ellingham vs liquid-oxide activity pairing
-        (2026-07-20 vaporock-fit-audit).
-      standard_pressure_Pa: 100000.0
-      oxide_activity_exponent: 1.0
-      pO2_exponent: -0.75
-      pO2_reference_bar: 1.0
-      antoine:
-        A: 17.2874548
-        B: 54230.9684109
-        C: -49.8900000
-        derivation: >
-          Premise: liquid-oxide activity pairs with liquid-oxide standard
-          reaction. Algebra: delG0=G_M(g)+n*G_O2-mu0_oxide(l);
-          log10(P_ref/Pa)=5-delG0/(RT ln10); P=P_ref*a*fO2^n. Unit Pa.
-          Sanity: max residual 0.003354 dex vs TE+JANAF grid.
-      valid_range_K: [1400, 2273.15]
-      fit_residual_dex:
-        max_abs: 0.003354
-        rms: 0.001434
-        grid_K: [1400, 2273.15, 10]
-        method: minimax |log10P_fit-log10P_source| on 10 K grid
-  Si:
-    formula: "Si"
-    molar_mass_g_mol: 28.085
-    electrons_per_atom: 4
-    parent_oxide: "SiO2"
-    fit_target: "pure_component_psat"
-    consumer_status: "inactive"
-    source: "REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 silicon (C7440213); runtime pure-component source is pure_component_antoine"
-    pure_component_antoine:
-      source: "REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 silicon (C7440213); log10(P/bar)=9.56436-23308.848/(T-123.133), converted to Pa by A+5"
-      source_certification: "source_equation_fit"
-      A: 14.564360
-      B: 23308.848
-      C: -123.133
-      valid_range_K: [1997, 2560]
-    evaporation_alpha:
-      value: 1.0
-      source: "REF-017 Safarian & Engh 2013 Metall. Mater. Trans. A 44:747-753 pure-Si vacuum evaporation; pure elemental Si branch only"
-      T_band_K: [1687, 3538]
-      envelope: [0.84, 1.00]
-      tier: 2
-      tag: "pure_elemental_only"
-    antoine:
-      A: 11.619
-      B: 21590
-      C: 0
-    valid_range_K: [1687, 3538]
-    boiling_point_C: 3265
-    condensation_T_C_at_1mbar: 1400
-    notes: "dH_vap ~ 413.5 kJ/mol. Negligible at process T. Extracted by MRE only."
-
-  Ti:
-    formula: "Ti"
-    molar_mass_g_mol: 47.87
-    electrons_per_atom: 4
-    parent_oxide: "TiO2"
-    fit_target: "pure_component_psat"
-    # Liquid-oxide pairing rail / high-T path: uncertified (matrix).
-    authority_class: uncertified
-    source: "REF-032 CRC Handbook 84th ed. / Alcock-Itkin-Horrigan 1984 vapor-pressure equation for titanium; runtime pure-component source is pure_component_antoine"
-    pure_component_antoine:
-      source: "REF-032 Alcock-Itkin-Horrigan 1984 titanium liquid equation, CRC/CR2 Pa-converted form; dense 10 K minimax refit from 1941-2400 K plus exact 3560.15 K normal-boiling anchor to log10(P/Pa)=A-B/(T+C)"
-      source_certification: "source_equation_fit"
-      source_equation:
-        original_form: "log10(P/atm)=A+B/T+C*log10(T)+D*T*1e-3; CRC/CR2 mirror stores Pa-converted A"
-        solid:
-          range_K: [298, 1941]
-          A_log10_P_atm: 11.925283
-          A_log10_P_Pa: 16.931
-          B: -24991
-          C: -1.3376
-          D: 0
-        liquid:
-          range_K: [1941, 2400]
-          A_log10_P_atm: 6.358283
-          A_log10_P_Pa: 11.364
-          B: -22747
-          C: 0
-          D: 0
-      fit_source_phase: "liquid"
-      fit_range_K: [1941, 2400]
-      source_equation_range_K: [1941, 2400]
-      anchored_extrapolation_range_K: [2400, 3560.15]
-      dense_sample_step_K: 10
-      normal_boiling_anchor_K: 3560.15
-      max_abs_log10_residual_vs_source: 0.001133
-      source_validation_points_Pa_K: [[0.771274, 1982], [7.697327, 2171], [76.927804, 2400], [101325, 3560.15]]
-      A: 11.569399015
-      B: 23642.266967112
-      C: 41.832167668
-      valid_range_K: [1941, 3560.15]
-    evaporation_alpha:
-      value: 0.80
-      source: "OWNER-RATIFY proxy_not_intrinsic: Zhang et al. 2014 GCA 140:365-380 CaTiO3 melt at 2005 C; Ti activity proxy"
-      T_band_K: [2278, 2278]
-      envelope: [0.39, 1.00]
-      tier: 2
-      tag: "proxy"
-    antoine:
-      A: 11.650
-      B: 23200
-      C: 0
-    valid_range_K: [1941, 3560]
-    boiling_point_C: 3287
-    condensation_T_C_at_1mbar: 1500
-    notes: "dH_vap ~ 444.3 kJ/mol. Not pyrolysable  --  extracted by Na shuttle or MRE."
-
-    liquid_oxide_standard_reaction:
-      formula: "TiO2(l) -> Ti(g) + O2(g)"
-      basis: >
-        VapoRock JANAF metal(g)/O2(g) + ThermoEngine v1.0 pure-liquid oxide
-        mu0; minimax refit over 1941-2273.15 K.
-        Closes solid-oxide Ellingham vs liquid-oxide activity pairing
-        (2026-07-20 vaporock-fit-audit).
-      standard_pressure_Pa: 100000.0
-      oxide_activity_exponent: 1.0
-      pO2_exponent: -1.0
-      pO2_reference_bar: 1.0
-      antoine:
-        A: 17.7414184
-        B: 63882.5899238
-        C: -74.4400000
-        derivation: >
-          Premise: liquid-oxide activity pairs with liquid-oxide standard
-          reaction. Algebra: delG0=G_M(g)+n*G_O2-mu0_oxide(l);
-          log10(P_ref/Pa)=5-delG0/(RT ln10); P=P_ref*a*fO2^n. Unit Pa.
-          Sanity: max residual 0.000120 dex vs TE+JANAF grid.
-      valid_range_K: [1941, 2273.15]
-      fit_residual_dex:
-        max_abs: 0.000120
-        rms: 0.000060
-        grid_K: [1941, 2273.15, 10]
-        method: minimax |log10P_fit-log10P_source| on 10 K grid
-  Cr:
-    formula: "Cr"
-    molar_mass_g_mol: 52.00
-    electrons_per_atom: 3
-    parent_oxide: "Cr2O3"
-    fit_target: "pure_component_psat"
-    # Liquid-oxide pairing rail / high-T path: uncertified (matrix).
-    authority_class: uncertified
-    source: "REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 chromium (C7440473); runtime pure-component source is pure_component_antoine"
-    pure_component_antoine:
-      source: "REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 chromium (C7440473); log10(P/bar)=6.02371-16064.989/(T-83.86), converted to Pa by A+5"
-      source_certification: "source_equation_fit"
-      A: 11.023710
-      B: 16064.989
-      C: -83.86
-      valid_range_K: [1889, 2755]
-    evaporation_alpha:
-      value: 0.9
-      source: "REF-040 Pound 1972 J. Phys. Chem. Ref. Data 1:135-146 Table 1, DOI 10.1063/1.3253096, selected McCabe, Hudson & Paxton 1958 Trans. Met. Soc. AIME 212:102 Langmuir-vs-Knudsen result for 99.9% polycrystalline solid Cr and monoatomic Cr(g)"
-      T_band_K: [1318, 1563]
-      envelope: [0.8, 1.0]
-      tier: 1
-      # DERIVATION (owner-ratified 2026-07-14): premise = clean 99.9%
-      # polycrystalline SOLID Cr evaporating as monoatomic Cr(g); basis = alpha
-      # is the measured Langmuir free-evaporation flux / Knudsen equilibrium-flux
-      # ratio selected by Pound from McCabe et al.; valid only at 1318-1563 K;
-      # sanity check = 0.9 +/- 0.1 stays <= 1 and matches the near-unity
-      # monoatomic-vapor-metal class. REGIME CAVEAT: this is pure-SOLID-Cr free
-      # evaporation, NOT Cr dissolved in silicate melt (liquid pure Cr was not
-      # separately measured; T_m approximately 2180 K). Melt activity belongs
-      # in P_sat, never in alpha; O-contaminated surfaces can sharply reduce alpha.
-    antoine:
-      A: 11.420
-      B: 20730
-      C: 0
-    valid_range_K: [2180, 2944]
-    boiling_point_C: 2671
-    condensation_T_C_at_1mbar: 1280
-    notes: "dH_vap ~ 396.9 kJ/mol. Trace amounts, extracted by Na shuttle."
-
-    liquid_oxide_standard_reaction:
-      formula: "CrO1.5(l) -> Cr(g) + 0.75 O2(g)"
-      basis: >
-        VapoRock JANAF metal(g)/O2(g) + ThermoEngine v1.0 pure-liquid oxide
-        mu0; minimax refit over 1400-2273.15 K.
-        Closes solid-oxide Ellingham vs liquid-oxide activity pairing
-        (2026-07-20 vaporock-fit-audit).
-      standard_pressure_Pa: 100000.0
-      oxide_activity_exponent: 1.0
-      pO2_exponent: -0.75
-      pO2_reference_bar: 1.0
-      antoine:
-        A: 17.1792790
-        B: 43230.1153980
-        C: -108.5000000
-        derivation: >
-          Premise: liquid-oxide activity pairs with liquid-oxide standard
-          reaction. Algebra: delG0=G_M(g)+n*G_O2-mu0_oxide(l);
-          log10(P_ref/Pa)=5-delG0/(RT ln10); P=P_ref*a*fO2^n. Unit Pa.
-          Sanity: max residual 0.006066 dex vs TE+JANAF grid.
-      valid_range_K: [1400, 2273.15]
-      fit_residual_dex:
-        max_abs: 0.006066
-        rms: 0.002591
-        grid_K: [1400, 2273.15, 10]
-        method: minimax |log10P_fit-log10P_source| on 10 K grid
-  Mn:
-    formula: "Mn"
-    molar_mass_g_mol: 54.94
-    electrons_per_atom: 2
-    parent_oxide: "MnO"
-    fit_target: "pure_component_psat"
-    # Liquid-oxide pairing rail / high-T path: uncertified (matrix).
-    authority_class: uncertified
-    source: "REF-020 NIST-JANAF/Chase 1998 solid/liquid Mn->Mn(g) evaluation; REF-032 Alcock solid, REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as comparators; runtime pure-component source is pure_component_antoine"
-    pure_component_antoine:
-      source: "REF-020 NIST-JANAF/Chase 1998 Mn(s/l)->Mn(g) thermodynamic evaluation fit; REF-032 Alcock solid, REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as documented comparators"
-      default_segment: "liquid_nist_janaf_chase_1998"
-      # Mn adjudication (2026-06-15/16): before the solid refit, the Alcock
-      # solid fit gave 146.555679 Pa at 1519 K while the NIST/JANAF liquid fit
-      # gave 135.857038 Pa (-7.300052%, -0.032920511 dex). The discontinuity
-      # was a mixed-source artifact, so runtime now uses REF-020 NIST/JANAF
-      # solid and liquid evaluation-derived fits on both sides of melting.
-      # Liquid-source spread at the Kaye-Laby anchors: REF-034 Kaye-Laby/NPL
-      # Pa=[200,1000,2000,5000,10000,20000,50000,101325] at
-      # T_K=[1560,1710,1780,1890,1980,2080,2240,2390]; REF-020 NIST/JANAF
-      # Pa=[227,1202,2348,6022,11935,23627,61195,131242]; REF-033 CRC/Stull
-      # Pa=[248,1320,2570,6513,12749,24858,62813,131877]. That is roughly a
-      # 25-32% high-vs-low CRC/Kaye-Laby spread, while NIST/JANAF is +13.5% to
-      # +29.5% vs Kaye-Laby. NIST/JANAF was chosen because both adjudication
-      # lenses ranked it #1; Barin agrees with NIST/JANAF at about 1-4%, and
-      # Kaye-Laby/NPL is the 13-30% low outlier in-band.
-      segments:
-        - name: "solid_nist_janaf_chase_1998"
-          phase: "solid"
-          source: "REF-020 NIST-JANAF/Chase 1998 Mn(s) and Mn(g) Shomate thermodynamic evaluation; derived Antoine fit to DeltaG_sub, standard pressure 1 bar, constrained to the stored liquid fit at 1519 K for C0 runtime continuity"
-          provenance_class: "derived_from_evaluation"
-          source_basis: "nist_janaf_chase_1998_mn_solid_gas_delta_g"
-          fit_source_phase: "solid"
-          fit_range_K: [1228, 1519]
-          source_certified_range_K: [1228, 1519]
-          dense_sample_step_K: 1
-          join_anchor_K: 1519
-          join_anchor_Pa: 135.857037585870
-          previous_mixed_source_join:
-            solid_alcock_fit_Pa_at_1519: 146.555678795071
-            liquid_nist_fit_Pa_at_1519: 135.857037585870
-            liquid_minus_solid_pct: -7.300052306
-            dex_log10_liquid_over_solid: -0.032920510906
-          nist_janaf_shomate:
-            solid_valid_ranges_K: [[298, 980], [980, 1361], [1361, 1412], [1412, 1519]]
-            gas_valid_range_K: [2334.526, 6000]
+          regime: sealed equilibrium chamber; not representative of mbar-sweep pyrolysis
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 1700
+        - 2273
+        envelope:
+        - 0.9
+        - 1.0
+      extrapolation_policy: conservative_slope_continuation
+      out_of_range_status: out_of_range_conservative_continuation
+      acquisition_flag: vapour_pressure_out_of_range:Na
+    code_metadata:
+      formula_id: Na
+      source_account: process.cleaned_melt
+      request_rule: source_inventory_present
+      solve_group_id: metals_na_family
+      compatibility_projection: metals
+      canonical_aliases: []
+      hot_train_applicability: applicable
+      compatibility_condensation_reference_table: true
+  metals_k_family:
+    physical_properties:
+      species:
+        K:
+          formula: K
+          molar_mass_g_mol: 39.0983
+          electrons_per_atom: 1
+          parent_oxide: K2O
+          residual_dex: 0.000223
+          confidence_tier: uncertified_liquid_ko0_5_lamoreaux_hildenbrand
+          gamma_domain_K:
+          - 1500.0
+          - 1500.0
+          gamma_authority: Fixed gamma_KO0.5=3.5e-5 certified only at the 1500 K DeMaria/Sossi anchor.
+            Coefficient residual 0.000223 dex is good; gamma temperature extrapolation dominates uncertainty
+            and is UNCERTIFIED outside (1500,1500) K. Certifying callers must treat out-of-domain gamma
+            as authority-limited (DRIFT-HIGH).
+          reaction:
+            formula: KO0.5(l) -> K(g) + 0.25 O2(g)
+            exponent_oxide: 1.0
+            exponent_pO2: -0.25
+            basis: Lamoreaux & Hildenbrand 1984 Tables 2/4 liquid K2O Gibbs-energy-function/enthalpy assembly,
+              DOI 10.1063/1.555706; halved to liquid KO0.5 Raoultian standard reaction; DeMaria 1971 retained
+              only as held-out validation
+            activity_basis: single-cation KO0.5 Raoultian activity
+            fit_form: log10(P_K_Pa)=A-B/T_K+log10(a_KO0.5)-0.25*log10(pO2_bar/1bar)
             pressure_standard_Pa: 100000
-            solid_segments:
-              - range_K: [298, 980]
-                coeffs: {A: 27.24190, B: 5.237640, C: 7.783160, D: -2.118501, E: -0.282113, F: -9.366891, G: 61.49640, H: 0.000000}
-              - range_K: [980, 1361]
-                coeffs: {A: 52.29870, B: -28.67560, C: 21.48670, D: -4.979850, E: -2.432060, F: -21.24330, G: 90.70820, H: 0.000000}
-              - range_K: [1361, 1412]
-                coeffs: {A: 19.06450, B: 31.41340, C: -14.99350, D: 3.214741, E: 1.867090, F: -2.757881, G: 48.78900, H: 0.000000}
-              - range_K: [1412, 1519]
-                coeffs: {A: -534.1720, B: 679.0530, C: -296.3700, D: 46.42660, E: 161.3420, F: 468.7150, G: -393.5390, H: 0.000000}
-            gas: {A: 187.6779, B: -97.75372, C: 20.1924, D: -1.274577, E: -177.4957, F: 1.5487, G: 219.6751, H: 283.2572}
-          max_abs_log10_residual_vs_source: 0.001821246382
-          rms_log10_residual_vs_source: 0.000822869366
-          source_validation_points_Pa_K: [[0.819334481954, 1228], [9.049304759415, 1347], [94.125208869261, 1493], [135.288503868270, 1519]]
-          A: 10.009757269940
-          B: 10422.298996403371
-          C: -195.814921905335
-          valid_range_K: [1228, 1519]
-        - name: "liquid_nist_janaf_chase_1998"
-          phase: "liquid"
-          source: "REF-020 NIST-JANAF/Chase 1998 Mn(l) and Mn(g) Shomate thermodynamic evaluation; derived Antoine fit to DeltaG_vap, standard pressure 1 bar, with exact 101325 Pa anchor at 2334.526 K"
-          provenance_class: "derived_from_evaluation"
-          source_basis: "nist_janaf_chase_1998_mn_liquid_gas_delta_g"
-          fit_source_phase: "liquid"
-          fit_range_K: [1519, 2334.526]
-          source_certified_range_K: [1519, 2334.526]
-          dense_sample_step_K: 1
-          normal_boiling_anchor_K: 2334.526
-          max_abs_log10_residual_vs_source: 0.004586423
-          rms_log10_residual_vs_source: 0.002724018
-          nist_janaf_shomate:
-            liquid_valid_range_K: [1519, 2334.526]
-            gas_valid_range_K: [2334.526, 6000]
-            pressure_standard_Pa: 100000
-            liquid: {A: 46.024, B: 0.0000001953485, C: -0.00000007567225, D: 0.00000001005938, E: 0.00000005623757, F: -7.80404, G: 80.69053, H: 16.28902}
-            gas: {A: 187.6779, B: -97.75372, C: 20.1924, D: -1.274577, E: -177.4957, F: 1.5487, G: 219.6751, H: 283.2572}
-          source_validation_points_Pa_K: [[227.443448, 1560], [1201.584972, 1710], [2348.349189, 1780], [6021.823769, 1890], [11935.014410, 1980], [23627.443367, 2080], [61195.177777, 2240], [101325, 2334.526]]
-          A: 9.790868189660
-          B: 10402.946653439165
-          C: -160.520331526149
-          valid_range_K: [1519, 2334.526]
-      A: 9.790868189660
-      B: 10402.946653439165
-      C: -160.520331526149
-      valid_range_K: [1228, 2334.526]
-    evaporation_alpha:
-      value: 1.0
-      source: "REF-040 Pound 1972 and REF-017 Safarian & Engh 2013 class basis: owner-ratified monoatomic-class PROXY, no Mn-specific measurement exists; Safarian & Engh 2013 full text read = zero Mn"
-      T_band_K: [1519, 2334.526]
-      envelope: [0.5, 1.0]
-      tier: 2
-      tag: "proxy"
-      # DERIVATION (owner-ratified 2026-07-14): premise = clean LIQUID Mn
-      # evaporating as monoatomic Mn(g); basis = measured clean-surface Fe/Cr
-      # monoatomic-metal alpha values cluster at approximately 0.9-1.0, while
-      # two independent literature sweeps found no Mn-specific measurement.
-      # Safarian & Engh 2013 full text was read and contains zero Mn number;
-      # Mn is absent from Pound's selected monatomic-metal alpha tables, and
-      # steelmaking Mn-loss studies report overall mass-transfer k, not HKL alpha.
-      # Confidence is medium-high for regolith-relevant liquid Mn; clean solid
-      # alpha-Mn may differ for crystallographic reasons and remains unmeasured.
-      # The [0.5, 1.0] envelope is therefore wider than Cr's [0.8, 1.0] and
-      # admits a material sub-unity solid-Mn case without pretending calibration.
-      # T_band_K follows the liquid pure-component Antoine process range, not a
-      # temperature-calibrated alpha measurement. Sanity check: alpha <= 1 and
-      # class-consistent. REGIME CAVEAT: melt activity belongs in P_sat, never
-      # in alpha; this class proxy is not a silicate-melt activity correction.
-    antoine:
-      A: 11.183
-      B: 14740
-      C: 0
-    valid_range_K: [1519, 2334]
-    boiling_point_C: 2061
-    condensation_T_C_at_1mbar: 1000
-    notes: "dH_vap ~ 282.3 kJ/mol. Moderate volatility, trace amounts."
-    liquid_oxide_standard_reaction:
-      formula: "MnO(l) -> Mn(g) + 0.5 O2(g)"
-      basis: >
-        VapoRock JANAF metal(g)/O2(g) + ThermoEngine v1.0 pure-liquid oxide
-        mu0; minimax refit over 1519-2273.15 K.
-        Closes solid-oxide Ellingham vs liquid-oxide activity pairing
-        (2026-07-20 vaporock-fit-audit).
-      standard_pressure_Pa: 100000.0
-      oxide_activity_exponent: 1.0
-      pO2_exponent: -0.5
-      pO2_reference_bar: 1.0
-      antoine:
-        A: 12.5780234
-        B: 28619.0370835
-        C: -118.4900000
-        derivation: >
-          Premise: liquid-oxide activity pairs with liquid-oxide standard
-          reaction. Algebra: delG0=G_M(g)+n*G_O2-mu0_oxide(l);
-          log10(P_ref/Pa)=5-delG0/(RT ln10); P=P_ref*a*fO2^n. Unit Pa.
-          Sanity: max residual 0.001677 dex vs TE+JANAF grid.
-      valid_range_K: [1519, 2273.15]
-      fit_residual_dex:
-        max_abs: 0.001677
-        rms: 0.000716
-        grid_K: [1519, 2273.15, 10]
-        method: minimax |log10P_fit-log10P_source| on 10 K grid
-      authority_note: >
-        Mn(g) Shomate declared support starts at 2334.526 K; process-band
-        use is metastable extrapolation (diagnostic/authority-limited).
+            source: Lamoreaux & Hildenbrand 1984 J. Phys. Chem. Ref. Data 13:151-173 Tables 2/4, DOI 10.1063/1.555706;
+              verified extraction docs-private/research/2026-07-07-t141-kmox/lamoreaux-hildenbrand-1984-verified-data.md
+            source_urls:
+            - https://doi.org/10.1063/1.555706
+            source_table_values:
+            - T_K: 1190.0
+              log10_K_r_KO0_5_atm: -3.70529
+              log10_P_K_ref_Pa: 1.301855
+              fit_log10_P_K_ref_Pa: 1.301633
+              residual_dex: -0.000223
+            - T_K: 1300.0
+              log10_K_r_KO0_5_atm: -2.832657
+              log10_P_K_ref_Pa: 2.174488
+              fit_log10_P_K_ref_Pa: 2.174499
+              residual_dex: 1.1e-05
+            - T_K: 1400.0
+              log10_K_r_KO0_5_atm: -2.169771
+              log10_P_K_ref_Pa: 2.837375
+              fit_log10_P_K_ref_Pa: 2.837522
+              residual_dex: 0.000147
+            - T_K: 1428.571429
+              log10_K_r_KO0_5_atm: -1.998894
+              log10_P_K_ref_Pa: 3.008252
+              fit_log10_P_K_ref_Pa: 3.008301
+              residual_dex: 4.9e-05
+            - T_K: 1450.0
+              log10_K_r_KO0_5_atm: -1.875574
+              log10_P_K_ref_Pa: 3.131572
+              fit_log10_P_K_ref_Pa: 3.13156
+              residual_dex: -1.2e-05
+            - T_K: 1475.0
+              log10_K_r_KO0_5_atm: -1.73666
+              log10_P_K_ref_Pa: 3.270486
+              fit_log10_P_K_ref_Pa: 3.270424
+              residual_dex: -6.2e-05
+            - T_K: 1600.0
+              log10_K_r_KO0_5_atm: -1.11314
+              log10_P_K_ref_Pa: 3.894006
+              fit_log10_P_K_ref_Pa: 3.894228
+              residual_dex: 0.000223
+            fit_residual_dex:
+              max_abs: 0.000223
+              rms: 8.3e-05
+            comparison_anchor:
+              T_K: 1428.571429
+              measured_log10_pO2_bar: -7.858279
+              measured_log10_pK_Pa: -3.794
+              predicted_log10_pK_Pa_with_runtime_gamma: -2.553
+              residual_dex_model_minus_demaria: 1.241
+            heldout_demaria_comparison:
+            - T_K: 1470.588235
+              log10_pK_atm: -8.6
+              log10_pO2_bar: -7.351965
+              X_KO0_5: 0.00085168
+              gamma_runtime: 3.5e-05
+              measured_log10_pK_Pa: -3.594283
+              predicted_log10_pK_Pa: -2.441372
+              residual_dex_model_minus_demaria: 1.152912
+            - T_K: 1449.275362
+              log10_pK_atm: -8.7
+              log10_pO2_bar: -7.608791
+              X_KO0_5: 0.00085168
+              gamma_runtime: 3.5e-05
+              measured_log10_pK_Pa: -3.694283
+              predicted_log10_pK_Pa: -2.496001
+              residual_dex_model_minus_demaria: 1.198283
+            - T_K: 1428.571429
+              log10_pK_atm: -8.8
+              log10_pO2_bar: -7.858279
+              X_KO0_5: 0.00085168
+              gamma_runtime: 3.5e-05
+              measured_log10_pK_Pa: -3.794283
+              predicted_log10_pK_Pa: -2.552784
+              residual_dex_model_minus_demaria: 1.241499
+            - T_K: 1408.450704
+              log10_pK_atm: -8.9
+              log10_pO2_bar: -8.100739
+              X_KO0_5: 0.00085168
+              gamma_runtime: 3.5e-05
+              measured_log10_pK_Pa: -3.894283
+              predicted_log10_pK_Pa: -2.611646
+              residual_dex_model_minus_demaria: 1.282637
+          pure_component_antoine:
+            source: REF-042 NIST Chemistry WebBook SRD 69 Fiock and Rodebush 1926 potassium (C7440097);
+              log10(P/bar)=4.45718-4691.58/(T+24.195), converted to Pa by A+5
+            source_certification: source_equation_fit
+            A: 9.45718
+            B: 4691.58
+            C: 24.195
+            valid_range_K:
+            - 679.4
+            - 1033
+          oxide_activity_exponent: 1.0
+          pO2_exponent: -0.25
+          pO2_reference_bar: 1.0
+          boiling_point_C: 759
+          notes: 'Direct liquid-KO0.5 standard-reaction term for KO0.5(l) = K(g) + 0.25 O2.
 
-oxide_vapors:
-  SiO:
-    formula: "SiO"
-    molar_mass_g_mol: 44.084
-    parent_oxide: "SiO2"
-    fit_target: "standard_reaction_term"
-    # Source-supported standard-reaction term; not dual-lab GT (matrix uncertified).
-    authority_class: uncertified
-    confidence_tier: "moderate"
-    reaction:
-      formula: "SiO2(l) -> SiO(g) + 0.5 O2(g)"
-      basis: "VapoRock JANAF SiO(g)/O2(g) multi-interval Shomate (SiO 1100-6000 K; O2 700-2000 and 2000-6000 K) plus ThermoEngine v1.0 pure-liquid SiO2 mu0 (Berman liq_mod); composition-independent p0*Kp(T) minimax refit over 1400-2273.15 K"
-      standard_pressure_Pa: 100000.0
-      pO2_reference_bar: 1.0e-9
-      # Source grid regenerated 2026-07-19 (Bug A fix3 branch a): same
-      # thermochemical sources as the prior 1400-1900 K table, extended to the
-      # process-envelope ceiling because both JANAF gas intervals and the
-      # ThermoEngine liquid-SiO2 standard state are defined through 2273.15 K.
-      source_table_log10_P_ref_Pa:
-        - [1400.0, -6.904421868]
-        - [1500.0, -4.953131396]
-        - [1600.0, -3.250905047]
-        - [1700.0, -1.753948057]
-        - [1800.0, -0.427731189]
-        - [1900.0, 0.754969595]
-        - [2000.0, 1.815905539]
-        - [2100.0, 2.772661024]
-        - [2200.0, 3.639609037]
-        - [2273.15, 4.223822537]
-      fit_residual_dex:
-        max_abs: 0.001630
-        rms: 0.001162
-        grid_K: [1400, 2273.15, 20]
-        method: "minimax |log10P_fit - log10P_source| on 20 K dense grid"
-      heldout_2023_15_K:
-        # Was held-out above the old 1900 K fit band; now an in-domain sanity
-        # check on the extended source-validated domain.
-        source_log10_P_ref_Pa: 2.046088932
-        fit_log10_P_ref_Pa: 2.044520449
-        fit_P_ref_Pa: 110.795073
-        lunar_mare_activity_scaled_P_Pa: 48.36
-    stoich_oxide_per_vapor: 1.362920787587333  # kg SiO2 consumed per kg SiO evaporated
-    stoich_O2_per_vapor: 0.36292078758733326   # kg O2 freed per kg SiO evaporated
-    evaporation_alpha:
-      value:
-        form: arrhenius
-        # alpha_s_SiO(T)=0.52*exp(-3685/T): Wetzel & Gail 2013 A&A 553 A92 DOI 10.1051/0004-6361/201220803 -- Arrhenius compilation of the SiO evaporation coeff (reaction-rate-limited; cross-checks Gunther 1958, Rocabois 1996, Ferguson&Nuth 2008/2012). Mid-range ~0.04 was the prior fixed pin.
-        A: 0.52
-        B: 3685.0
-        valid_range_K: [1000, 1800]
-        uncertainty_envelope: [0.003, 0.067]
-        cite: "Wetzel&Gail 2013 DOI 10.1051/0004-6361/201220803"
-        status: CITED
-        prior_scalar:
-          value: 0.04
-          source: "REF-018 REF-016 SF2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa & Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check."
-      source: "Wetzel & Gail 2013 A&A 553 A92 Arrhenius compilation alpha_s_SiO(T)=0.52*exp(-3685/T), reaction-rate-limited SiO evaporation coefficient. HOT evaporation interface uses alpha_s(T) at source T; microscopic reversibility applies there. COLD-WALL condensation below valid_range_K floor uses the grounded Pound 1972 JPCRD 1:135 DOI 10.1063/1.3253096 unity condensation coefficient; alpha_e != alpha_c off-equilibrium at high supersaturation."
-      T_band_K: [1000, 1800]
-      envelope: [0.003, 0.067]
-      tier: 2
-    antoine:
-      # SiO vapor from SiO2 decomposition: SiO2(melt) -> SiO(g) + 1/2 O2(g)
-      # Premise: composition-independent standard term p0*Kp(T) from
-      #   JANAF SiO(g)/O2(g) multi-interval Shomate + ThermoEngine v1.0
-      #   pure-liquid SiO2 mu0 (Berman). Both sources are defined well above
-      #   the prior 1900 K pin (JANAF SiO to 6000 K; O2 second interval
-      #   2000-6000 K; ThermoEngine liquid G smooth through >=2500 K), so the
-      #   process envelope to 2273.15 K is source-supported, not a process-only
-      #   extrapolation band.
-      # Algebra at pO2_ref=1e-9 bar, a_SiO2=1:
-      #   delG0 = G_SiO + 0.5 G_O2 - mu0_SiO2(l)
-      #   Kp = exp(-delG0/(R T));  R=8.314 J/mol/K (VapoRock)
-      #   P_ref/Pa = 1e5 * Kp / sqrt(pO2_ref/1 bar)
-      #   log10(P_ref/Pa) ~= A - B/(T+C)  (minimax refit)
-      # Runtime multiplies once by a_SiO2 * sqrt(pO2_ref/pO2) over the full
-      # legal transport-pO2 domain (no silent clip below pO2_ref).
-      # Unit check: Kp, activities, and fugacity ratios dimensionless; p0
-      # supplies Pa. Residual max |fit-source|=0.001630 dex on the 20 K grid
-      # 1400-2273.15 K (~2x the prior 0.000837 dex over the narrower 1400-1900
-      # band; still within the ~0.002 dex matrix acceptance).
-      # Sanity: B>0 => dlog10(P_ref)/dT = B/(T+C)^2 > 0; at 2023.15 K the
-      # in-domain fit gives P_ref~=110.80 Pa; lunar-mare a_SiO2~=0.43638 scales
-      # to ~=48.36 Pa (VapoRock hard-vacuum anchor ~48.17 Pa).
-      A: 21.4441302
-      B: 38290.4646
-      C: -49.3750070
-    # Source-validated domain = process envelope. Beyond 2273.15 K the
-    # provider fail-louds (typed oxide_vapor_pressure_out_of_validated_range);
-    # there is no diagnostic-only process-envelope extrapolation band left
-    # inside the furnace bound.
-    valid_range_K: [1400, 2273.15]
-    condensation_T_C: [900, 1200]
-    condensation_product: "amorphous SiO2 (disproportionation: 2SiO -> Si + SiO2)"
-    condensation_products_mol_per_mol_vapor:
-      Si: 0.5
-      SiO2: 0.5
-    # Descriptive equation note only; not a runtime suppression coefficient.
-    suppression_equation: "p(SiO) = K(T) * a(SiO2) / sqrt pO2"
-    pO2_reference_bar: 1.0e-9  # calibrated SiO mass-action reference; not body-dependent
-    suppression_factor_at_1mbar_O2: ">300*"
-    notes: |
-      THE problem species. At hard vacuum (pO2 ~1e-9 bar and below to the
-      legal body floor), SiO dominates offgas above ~1400°C. At pO2 = 1 mbar,
-      suppressed >300*. Condenses as adhesive, corrosive amorphous silica
-      below ~1200°C. See [THERMO-1] in context-thermo.md.
-      Composition-independent standard-reaction term from JANAF gas species
-      plus the ThermoEngine liquid-SiO2 standard state, source-validated over
-      1400-2273.15 K (authority class remains uncertified -- honest label, not
-      dual-lab certified ground truth). Runtime applies a(SiO2) and the
-      mass-action pO2 factor exactly once over the full legal pO2 domain.
-      T>2273.15 K is typed refusal.
+            The coefficient is not a VapoRock fit, not a DeMaria back-solve, and not a
 
-  CrO2:
-    formula: "CrO2"
-    molar_mass_g_mol: 83.9941
-    parent_oxide: "Cr2O3"
-    fit_target: "standard_reaction_term"
-    # Source-supported standard-reaction term; not dual-lab GT (matrix uncertified).
-    authority_class: uncertified
-    reaction:
-      formula: "CrO1.5(l) + 0.25 O2(g) -> CrO2(g)"
-      exponent_oxide: 1.0
-      exponent_pO2: 0.25
-      basis: >-
-        JANAF CrO2(g)/O2 + ThermoEngine v1.0 pure-liquid CrO1.5 mu0;
-        composition-independent p0*Kp(T) minimax refit over 1500-2273.15 K.
-        Replaces stale fallback (+0.390 dex @1500 K) and extends process envelope.
-    stoich_oxide_per_vapor: 0.904761167748687  # kg Cr2O3 consumed per kg CrO2 evaporated
-    stoich_O2_per_vapor: -0.0952388322513129  # kg O2 consumed per kg CrO2 evaporated
-    evaporation_alpha_policy:
-      tier: 3
-      policy: "fail_loud_missing_alpha"
-      source: "REF-014 Fedkin et al. 2006 plus chromia-boiler literature; no isolated CrO2 HK alpha adopted"
-    antoine:
-      # 2026-07-20 liquid-CrO1.5 standard-reaction refit (TE + JANAF):
-      # log10(P_ref_Pa) = A - B/(T_K+C) at a=1, fO2=1 bar; runtime multiplies
-      # a_CrO1.5 * fO2^0.25. Max residual 0.005059 dex on 10 K grid.
-      A: 11.1773865
-      B: 18397.4295704
-      C: -228.62
-      derivation: >-
-        Premise: liquid CrO1.5 standard matching single-cation activity.
-        Algebra: delG0=G_CrO2-mu0_CrO1.5-0.25 G_O2;
-        log10(P_ref/Pa)=5-delG0/(RT ln10); P=P_ref*a*fO2^0.25. Unit Pa.
-        Sanity: max residual 0.005059 dex (audit before +0.390 @1500 K).
-    oxide_activity_exponent: 1.0
-    pO2_exponent: 0.25
-    pO2_reference_bar: 1.0
-    residual_dex: 0.005059
-    valid_range_K: [1500, 2273.15]
-    vaporock_janaf0_shomate:
-      source_file: "../VapoRock/src/vaporock/data/JANAF0-vapor-data.csv"
-      source_row: 34
-      species_name: "CrO2(g)"
-      valid_range_K: [1100, 6000]
-      A: 57.85928
-      B: 0.190282
-      C: -0.038347
-      D: 0.002643
-      E: -2.578022
-      F: -99.71476
-      G: 328.5921
-      H: -75.312
-    source: "REF-020 JANAF coefficients shipped by VapoRock."
-    condensation_T_C: [1100, 1300]
-    condensation_setpoint_C: 1250
-    condensation_product: "Cr2O3(s) harvest with O2 coproduct: CrO2 -> 0.5 Cr2O3 + 0.25 O2"
-    condensation_products_mol_per_mol_vapor:
-      Cr2O3: 0.5
-      O2: 0.25
-    condensation_product_accounts:
-      Cr2O3: "terminal.chromium_condensed_oxide_stored"
-      O2: "process.overhead_gas"
-    notes: |
-      Option A engineering path: CrO2(g) is collected as stable Cr2O3 in a
-      dedicated high-temperature Cr oxide stage between Fe and SiO. Sossi-Moon
-      fixture records CrO2(g) as significant above 1500 K; VapoRock JANAF0
-      supplies CrO2(g) thermochemistry over 1100-6000 K.
+            JANAF K2O(cr) surrogate: it is fitted only to the Lamoreaux & Hildenbrand
 
-foulant_vapor:
-  NaCl:
-    formula: "NaCl"
-    molar_mass_g_mol: 58.44
-    fit_target: pure_component_psat
-    carrier_is_own_vapor: true
-    pure_component_antoine:
-      source: "REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 NaCl (C7647145); CRC normal bp 1465 C"
-      source_certification: "source_equation_fit"
-      A: 10.07184
-      B: 8388.497
-      C: -82.638
-    antoine:
-      A: 11.1773865
-      B: 18397.4295704
-      C: -228.6200000
-      derivation: >
-        Premise: liquid CrO1.5 standard with single-cation activity.
-        Algebra: delG0=G_CrO2-mu0_CrO1.5-0.25 G_O2;
-        log10(P_ref/Pa)=5-delG0/(RT ln10); P=P_ref*a*fO2^0.25.
-        Sanity: max residual 0.005059 dex (audit before +0.390 @1500 K).
-    valid_range_K: [1138, 1738]
-    boiling_point_C: 1465
-    condensation_T_C_at_1mbar: 900
-    evaporation_alpha:
-      value: 1.0
-      source: "OWNER-RATIFY salt_proxy_not_intrinsic: REF-013 Salt analogy - Sossi et al. 2019 GCA near-ideal alkali evaporation; no isolated regolith-NaCl HK measurement"
-      tier: 2
-    notes: "Pure-component chloride; no parent_oxide. Volatilizes as NaCl(g)."
+            1984 Tables 2/4 liquid-K2O thermodynamic assembly (DOI 10.1063/1.555706),
 
-  KCl:
-    formula: "KCl"
-    molar_mass_g_mol: 74.55
-    fit_target: pure_component_psat
-    carrier_is_own_vapor: true
-    source_drift_dex: 0.04427
-    source_drift_note: >-
-      DRIFT-LOW: ~0.044 dex mid-range Stull equation vs NBP-anchored
-      pure_component_antoine near 1550 K. Runtime ground-truth uses
-      pure_component_antoine; no coefficient retune in pairing wave.
-    pure_component_antoine:
-      source: "REF-002 NIST WebBook SRD 69 Stull 1947 KCl (C7447407); CRC bp 1420 C; Clausius-Clapeyron anchored at 1 atm (Stull raw overshoots bp)"
-      provenance_class: "derived_from_evaluation"
-      A: 10.185900
-      B: 8774.500
-      C: 0
-    antoine:
-      source: "REF-002 NIST Stull 1947 mid-range faithful runtime row; bp overshoots - tests use pure_component_antoine"
-      A: 9.78236
-      B: 7440.691
-      C: -122.709
-    valid_range_K: [1094, 1680]
-    boiling_point_C: 1420
-    condensation_T_C_at_1mbar: 880
-    evaporation_alpha:
-      value: 1.0
-      source: "OWNER-RATIFY salt_proxy_not_intrinsic: REF-013 Salt analogy - Sossi et al. 2019 GCA near-ideal alkali evaporation; no isolated regolith-KCl HK measurement"
-      tier: 2
-    notes: "Pure-component chloride; no parent_oxide. More volatile than NaCl at a given T."
+            halved to the single-cation KO0.5 Raoultian basis consumed by melt
 
-  NaF:
-    formula: "NaF"
-    molar_mass_g_mol: 41.98817
-    fit_target: pure_component_psat
-    carrier_is_own_vapor: true
-    confidence: partly_grounded
-    interval_required: true
-    certified_point: null
-    valid_range_K: [1200, 2000]
-    boiling_point_C: 1704
-    condensation_T_C_at_1mbar: 1050
-    notes: |
-      Interval-only identity row. Runtime Antoine coefficients and
-      evaporation_alpha are intentionally absent because no named
-      certified vapor-pressure source or regolith-NaF HK measurement has
-      landed. Stage-0 foulant volatilization must fail loud until a
-      certified row replaces this placeholder.
-      CaF2/MgF2 deliberately absent - refractory rump (b129999).
+            activity. DeMaria 1971 Apollo 12022 KEMS rows are held-out validation and
 
-# Condensation temperature reference (at ~1 mbar partial pressure)
-# Used by condensation train model for species routing
-# provenance: condensation routing temps -- chemistry-provenance condensation_reference_at_1mbar_routing_temps; ASSUMED routing reference consumed by condensation overrides.
-condensation_reference_at_1mbar:
-  Fe: 1250    # Stage 1
-  SiO: 1050   # Stage 2 (as amorphous SiO2)
-  Mg: 580     # Stage 3
-  Na: 480     # Stage 3
-  K: 420      # Stage 3
-  Ca: 780     # would condense in Stage 3 if present
-  Mn: 1000    # between Stage 1 and 2
-  Cr: 1280    # Stage 1 (co-deposits with Fe)
-  CrO2: 1250  # Dedicated Cr oxide stage; condenses as Cr2O3 + O2
-  NaCl: 900   # Stage-0 foulant volatilization
-  KCl: 880    # Stage-0 foulant volatilization (more volatile than NaCl)
+            remain +1.15 to +1.28 dex high with the runtime constant gamma.
+
+            '
+          validation:
+            status: pending_validation
+            anchor_refs: []
+          source_reactions:
+          - id: liquid_ko0_5_to_k_gas
+            reactants:
+            - formula: KO0.5
+              stoichiometry: 1.0
+            products:
+            - formula: K
+              stoichiometry: 1.0
+            - formula: O2
+              stoichiometry: 0.25
+          pressure_models:
+          - fit_target: standard_reaction_term
+            pressure_kind: equilibrium_partial_pressure
+            species_basis: monomer
+            valid_domain:
+              temperature_K:
+              - 1190
+              - 1600
+            provenance:
+            - source: schema_v1_in_place_migration
+            evaluator_family: standard_reaction_term
+            source_reaction_id: liquid_ko0_5_to_k_gas
+            reference_pressure_model:
+              evaluator_family: antoine
+              coefficients:
+                A: 10.641294
+                B: 9965.408779
+                C: -123.001
+            activity_exponent: 1.0
+            pO2_exponent: -0.25
+            pO2_reference_bar: 1.0
+    fiat_routing:
+      plant_bin: null
+      engineering_capture_policy: temperature_threshold
+      products_and_coproducts: []
+      process_or_terminal_destination: process.condensation_train
+      condensation_reference_at_1mbar_C: 420
+    vaporisation_coefficients:
+      evaporation_alpha:
+        value: 0.13
+        source: REF-014 Fedkin et al. 2006 LPSC 37:#2249 KEMS sealed-chamber intrinsic K alpha_e~0.13;
+          replaces prior Na open-furnace analogy for series-resistance intrinsic-alpha model
+        T_band_K:
+        - 1700
+        - 2273
+        envelope:
+        - 0.1
+        - 0.16
+        tier: 2
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 1700
+        - 2273
+        envelope:
+        - 0.1
+        - 0.16
+      extrapolation_policy: conservative_slope_continuation
+      out_of_range_status: out_of_range_conservative_continuation
+      acquisition_flag: vapour_pressure_out_of_range:K
+    code_metadata:
+      formula_id: K
+      source_account: process.cleaned_melt
+      request_rule: source_inventory_present
+      solve_group_id: metals_k_family
+      compatibility_projection: metals
+      canonical_aliases: []
+      hot_train_applicability: applicable
+      compatibility_condensation_reference_table: true
+  metals_mg_family:
+    physical_properties:
+      species:
+        Mg:
+          formula: Mg
+          molar_mass_g_mol: 24.305
+          electrons_per_atom: 2
+          parent_oxide: MgO
+          authority_class: uncertified
+          total_source_certified_range_K:
+          - 701
+          - 2273.15
+          source: REF-033 CRC.b/Stull magnesium pressure-level table fit (1-100000 Pa); runtime pure-component
+            source is pure_component_antoine
+          pure_component_antoine:
+            source: REF-033 CRC.b/Stull magnesium pressure-level table fit (1-100000 Pa); cross-checked
+              against REF-034 Kaye-Laby/NPL Ambrose pressure-level table; not an Alcock liquid equation
+            provenance_class: source_tabulated_fit
+            source_basis: crc_stull_mg_pressure_level_table
+            source_certified_range_K:
+            - 701
+            - 1361
+            fit_range_K:
+            - 701
+            - 1361
+            max_table_residual_fraction: 0.0681
+            source_validation_points_Pa_K:
+            - - 1
+              - 701
+            - - 10
+              - 773
+            - - 100
+              - 861
+            - - 1000
+              - 971
+            - - 10000
+              - 1132
+            - - 100000
+              - 1361
+            A: 9.4964271591
+            B: 5613.103906
+            C: -110.759803
+            valid_range_K: &id001
+            - 701
+            - 1361
+          reconstructed_vapor_pressure_segment:
+            range_K:
+            - 1361
+            - 1366
+            authority_status: reconstructed_limited
+            authority_flag: authority_limited_by_reconstructed_vapor_pressure_segment
+            interpolation: log10_pressure_linear_in_reciprocal_temperature
+            anchors:
+            - temperature_K: 1361
+              pressure_Pa: 100000.0
+              source: REF-033 CRC.b/Stull magnesium pressure-level table final certified point
+            - temperature_K: 1366
+              pressure_rail: gas_rail_standard_reaction
+              source: gas_rail_standard_reaction Antoine value at its certified lower bound
+            provenance: 'DECLARED RECONSTRUCTION, not a fit extrapolation. log10(P/Pa) is linear in 1/T
+              from REF-033 CRC.b/Stull''s certified 1361 K, 100000 Pa endpoint to the unchanged gas_rail_standard_reaction
+              evaluated at its certified 1366 K lower bound: 1.776479712477316e-13 Pa (log10(P/Pa)=-12.750439747819721).
+              The 5 K authority gap brackets NIST Chemistry WebBook SRD 69 T_boiling=1363.15 +/- 1.5 K;
+              the rail bounds disagree by less than their mutual temperature uncertainty. Across the closed
+              bridge, maximum deviation from naive extension is bounded by 17.77514 dex versus the condensed
+              fit and 17.85520 dex versus the gas fit. Neither source rail''s coefficients or certified
+              range is changed.
+
+              '
+          boiling_point_C: 1090
+          notes: Runtime reference is the CRC/Stull pure-component Mg sidecar, multiplied by the builtin
+            Ellingham MgO activity path. The 2026-06-14 VapoRock dense-grid pseudo-fit was removed on
+            2026-06-29 because its negative-B Antoine row was non-monotonic for T > 1000 K and non-certifying
+            outside its fit intent.
+          gas_rail_standard_reaction:
+            formula: MgO(l) -> Mg(g) + 0.5 O2(g)
+            basis: 'VapoRock JANAF metal(g)/O2(g) + ThermoEngine v1.0 pure-liquid oxide mu0; minimax refit
+              over 1366-2273.15 K. Closes solid-oxide Ellingham vs liquid-oxide activity pairing (2026-07-20
+              vaporock-fit-audit).
+
+              '
+            standard_pressure_Pa: 100000.0
+            oxide_activity_exponent: 1.0
+            pO2_exponent: -0.5
+            pO2_reference_bar: 1.0
+            antoine:
+              A: 13.4693238
+              B: 32944.8707002
+              C: -109.51
+              derivation: 'Premise: liquid-oxide activity pairs with liquid-oxide standard reaction. Algebra:
+                delG0=G_M(g)+n*G_O2-mu0_oxide(l); log10(P_ref/Pa)=5-delG0/(RT ln10); P=P_ref*a*fO2^n.
+                Unit Pa. Sanity: max residual 0.006291 dex vs TE+JANAF grid.
+
+                '
+            source_certified_range_K:
+            - 1366
+            - 2273.15
+            extrapolation_policy: refuse
+            valid_range_K:
+            - 1366
+            - 2273.15
+            fit_residual_dex:
+              max_abs: 0.006291
+              rms: 0.002643
+              grid_K:
+              - 1366
+              - 2273.15
+              - 10
+              method: minimax |log10P_fit-log10P_source| on 10 K grid
+            rail_scope: gas_only_two_rail_preserved
+          validation:
+            status: pending_validation
+            anchor_refs: []
+          source_reactions: []
+          pressure_models:
+          - fit_target: pure_component_psat
+            pressure_kind: pure_component_saturation_pressure
+            species_basis: monomer
+            valid_domain:
+              temperature_K: *id001
+            provenance:
+            - source: schema_v1_in_place_migration
+            legacy_extrapolation_policy: refuse
+            evaluator_family: antoine
+            coefficients:
+              A: 9.4964271591
+              B: 5613.103906
+              C: -110.759803
+            compatibility_omit_antoine: true
+            compatibility_omit_valid_range_K: true
+    fiat_routing:
+      plant_bin: null
+      engineering_capture_policy: temperature_threshold
+      products_and_coproducts: []
+      process_or_terminal_destination: process.condensation_train
+      condensation_reference_at_1mbar_C: 580
+    vaporisation_coefficients:
+      evaporation_alpha:
+        value: 0.2
+        source: REF-015 REF-018 Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; SF2004 Table
+          10 Mg2SiO4(l), Hashimoto 1990, alpha_s=0.20-0.21
+        T_band_K:
+        - 1873
+        - 2373
+        envelope:
+        - 0.1
+        - 0.21
+        tier: 2
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 1873
+        - 2373
+        envelope:
+        - 0.1
+        - 0.21
+      extrapolation_policy: conservative_slope_continuation
+      out_of_range_status: out_of_range_conservative_continuation
+      acquisition_flag: vapour_pressure_out_of_range:Mg
+    code_metadata:
+      formula_id: Mg
+      source_account: process.cleaned_melt
+      request_rule: source_inventory_present
+      solve_group_id: metals_mg_family
+      compatibility_projection: metals
+      canonical_aliases: []
+      hot_train_applicability: applicable
+      compatibility_condensation_reference_table: true
+  metals_fe_family:
+    physical_properties:
+      species:
+        Fe:
+          formula: Fe
+          molar_mass_g_mol: 55.845
+          electrons_per_atom: 2
+          parent_oxide: FeO
+          authority_class: uncertified
+          pseudo_antoine_status: inactive_dormant
+          residual_dex: 0.418
+          confidence_tier: low
+          backsolve:
+            feedstock_grid: dense seven-feedstock lunar/mars grid
+            fO2_convention: Kress91 IW
+            activity_formula: (K_decomp * a_oxide**n_ox / pO2_bar)**(1/n_M), clamped at 1
+            target: VapoRock Fe(g) partial pressure on the dense grid
+            residual_dex: 0.418
+            old_metadata_residual_dex: 0.023
+            old_dense_residual_dex: 1.693
+            provenance:
+              generated_by: scripts/vaporock_pseudo_antoine_refit.py
+              temperature_K:
+                min: 1350
+                max: 1950
+                step: 20
+                count: 31
+              feedstocks:
+              - lunar_mare_low_ti
+              - lunar_mare_high_ti
+              - lunar_highland
+              - lunar_pkt_kreep_average
+              - lunar_spa_kreep_influenced
+              - mars_basalt
+              - mars_sulfate_rich
+              n_samples: 217
+              composition_basis: VapoRock-supported silicate oxides; unsupported Stage 0 foulants removed,
+                remaining oxides renormalized to 100 wt%
+              fit_objective: bounded minimax absolute log10 residual; |C| <= 1000 K
+          pure_component_antoine:
+            source: REF-012 CRC/NIST normal boiling point; CRC/NIST dH_vap~340 kJ/mol; Clausius-Clapeyron
+              anchored at 1 atm
+            provenance_class: derived_from_evaluation
+            construction_support_range_K:
+            - 1809.0
+            - 3134.0
+            construction: Clausius-Clapeyron from CRC/NIST Tb + dH_vap; construction support band declared
+              for metadata honesty (audit 2026-07-20). Not a VapoRock fit. Runtime selects this pure-component
+              sidecar; the residual pseudo Antoine block is dormant/inactive and must not be retuned (t-373
+              tail).
+            A: 10.670336
+            B: 17759.430841
+            C: 0
+          boiling_point_C: 2862
+          notes: 'Prior 0.023 dex basalt-grid residual did not re-confirm against the
+
+            current VapoRock install. Dense-grid refit lowers current residual from
+
+            1.693 dex to 0.418 dex, but Fe remains structurally activity-dependent
+
+            and low confidence; VapoRock is diagnostic-only when available.
+
+            '
+          validation:
+            status: pending_validation
+            anchor_refs: []
+          source_reactions: []
+          pressure_models:
+          - fit_target: pseudo_psat_backsolved_from_vaporock
+            pressure_kind: pure_component_saturation_pressure
+            species_basis: monomer
+            valid_domain:
+              temperature_K:
+              - 1400
+              - 1900
+            provenance:
+            - source: schema_v1_in_place_migration
+            evaluator_family: antoine
+            coefficients:
+              A: 9.408547
+              B: 23312.312336
+              C: 1000.0
+    fiat_routing:
+      plant_bin: null
+      engineering_capture_policy: temperature_threshold
+      products_and_coproducts: []
+      process_or_terminal_destination: process.condensation_train
+      condensation_reference_at_1mbar_C: 1250
+    vaporisation_coefficients:
+      evaporation_alpha:
+        value: 0.02
+        source: REF-016 Costa & Jacobson 2015 KEMS Fo93Fa7 olivine, Fe+ alpha=0.011-0.020 at 1700-1800
+          K; Ebel 2005 calculated Fe/FeO alpha~0.2 noted as non-measured high-side proxy
+        T_band_K:
+        - 1873
+        - 2373
+        envelope:
+        - 0.011
+        - 0.02
+        tier: 2
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 1873
+        - 2373
+        envelope:
+        - 0.011
+        - 0.02
+      extrapolation_policy: conservative_slope_continuation
+      out_of_range_status: out_of_range_conservative_continuation
+      acquisition_flag: vapour_pressure_out_of_range:Fe
+    code_metadata:
+      formula_id: Fe
+      source_account: process.cleaned_melt
+      request_rule: source_inventory_present
+      solve_group_id: metals_fe_family
+      compatibility_projection: metals
+      canonical_aliases: []
+      hot_train_applicability: applicable
+      compatibility_condensation_reference_table: true
+  metals_ca_family:
+    physical_properties:
+      species:
+        Ca:
+          formula: Ca
+          molar_mass_g_mol: 40.08
+          electrons_per_atom: 2
+          parent_oxide: CaO
+          authority_class: uncertified
+          source: REF-043 NIST Chemistry WebBook SRD 69 Hartmann and Schneider 1929 calcium (C7440702);
+            runtime pure-component source is pure_component_antoine
+          pure_component_antoine:
+            source: REF-043 NIST Chemistry WebBook SRD 69 Hartmann and Schneider 1929 calcium (C7440702);
+              log10(P/bar)=2.78473-3121.368/(T-594.591), converted to Pa by A+5
+            source_certification: source_equation_fit
+            A: 7.78473
+            B: 3121.368
+            C: -594.591
+            valid_range_K:
+            - 1254
+            - 1712
+          boiling_point_C: 1484
+          notes: "dH_vap ~ 182.3 kJ/mol. Significant above ~1500\xB0C."
+          gas_rail_standard_reaction:
+            formula: CaO(l) -> Ca(g) + 0.5 O2(g)
+            basis: 'VapoRock JANAF metal(g)/O2(g) + ThermoEngine v1.0 pure-liquid oxide mu0; minimax refit
+              over 1757-2273.15 K. Closes solid-oxide Ellingham vs liquid-oxide activity pairing (2026-07-20
+              vaporock-fit-audit).
+
+              '
+            standard_pressure_Pa: 100000.0
+            oxide_activity_exponent: 1.0
+            pO2_exponent: -0.5
+            pO2_reference_bar: 1.0
+            antoine:
+              A: 12.2168914
+              B: 37873.6892331
+              C: -116.89
+              derivation: 'Premise: liquid-oxide activity pairs with liquid-oxide standard reaction. Algebra:
+                delG0=G_M(g)+n*G_O2-mu0_oxide(l); log10(P_ref/Pa)=5-delG0/(RT ln10); P=P_ref*a*fO2^n.
+                Unit Pa. Sanity: max residual 0.000736 dex vs TE+JANAF grid.
+
+                '
+            valid_range_K:
+            - 1757
+            - 2273.15
+            fit_residual_dex:
+              max_abs: 0.000736
+              rms: 0.000323
+              grid_K:
+              - 1757
+              - 2273.15
+              - 10
+              method: minimax |log10P_fit-log10P_source| on 10 K grid
+            rail_scope: gas_only_two_rail_preserved
+          validation:
+            status: pending_validation
+            anchor_refs: []
+          source_reactions: []
+          pressure_models:
+          - fit_target: pure_component_psat
+            pressure_kind: pure_component_saturation_pressure
+            species_basis: monomer
+            valid_domain:
+              temperature_K:
+              - 1115
+              - 1757
+            provenance:
+            - source: schema_v1_in_place_migration
+            evaluator_family: antoine
+            coefficients:
+              A: 11.238
+              B: 9520
+              C: 0
+    fiat_routing:
+      plant_bin: null
+      engineering_capture_policy: temperature_threshold
+      products_and_coproducts: []
+      process_or_terminal_destination: process.condensation_train
+      condensation_reference_at_1mbar_C: 780
+    vaporisation_coefficients:
+      evaporation_alpha:
+        value: 0.9
+        source: 'OWNER-RATIFY proxy_not_intrinsic: Zhang et al. 2014 GCA 140:365-380 CaTiO3 melt at 2005
+          C; Ca activity proxy'
+        T_band_K:
+        - 2278
+        - 2278
+        envelope:
+        - 0.48
+        - 1.2
+        tier: 2
+        tag: proxy
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 2278
+        - 2278
+        envelope:
+        - 0.48
+        - 1.2
+      extrapolation_policy: conservative_slope_continuation
+      out_of_range_status: out_of_range_conservative_continuation
+      acquisition_flag: vapour_pressure_out_of_range:Ca
+    code_metadata:
+      formula_id: Ca
+      source_account: process.cleaned_melt
+      request_rule: source_inventory_present
+      solve_group_id: metals_ca_family
+      compatibility_projection: metals
+      canonical_aliases: []
+      hot_train_applicability: applicable
+      compatibility_condensation_reference_table: true
+  metals_al_family:
+    physical_properties:
+      species:
+        Al:
+          formula: Al
+          molar_mass_g_mol: 26.9815385
+          electrons_per_atom: 3
+          parent_oxide: Al2O3
+          authority_class: uncertified
+          source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 aluminum (C7429905); runtime pure-component
+            source is pure_component_antoine
+          pure_component_antoine:
+            source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 aluminum (C7429905); log10(P/bar)=5.73623-13204.109/(T-24.306),
+              converted to Pa by A+5
+            source_certification: source_equation_fit
+            A: 10.73623
+            B: 13204.109
+            C: -24.306
+            valid_range_K:
+            - 1557
+            - 2329
+          boiling_point_C: 2519
+          notes: "dH_vap ~ 332.0 kJ/mol. Negligible below 2500\xB0C  --  not pyrolysable."
+          liquid_oxide_standard_reaction:
+            formula: AlO1.5(l) -> Al(g) + 0.75 O2(g)
+            basis: 'VapoRock JANAF metal(g)/O2(g) + ThermoEngine v1.0 pure-liquid oxide mu0; minimax refit
+              over 1400-2273.15 K. Closes solid-oxide Ellingham vs liquid-oxide activity pairing (2026-07-20
+              vaporock-fit-audit).
+
+              '
+            standard_pressure_Pa: 100000.0
+            oxide_activity_exponent: 1.0
+            pO2_exponent: -0.75
+            pO2_reference_bar: 1.0
+            antoine:
+              A: 17.2874548
+              B: 54230.9684109
+              C: -49.89
+              derivation: 'Premise: liquid-oxide activity pairs with liquid-oxide standard reaction. Algebra:
+                delG0=G_M(g)+n*G_O2-mu0_oxide(l); log10(P_ref/Pa)=5-delG0/(RT ln10); P=P_ref*a*fO2^n.
+                Unit Pa. Sanity: max residual 0.003354 dex vs TE+JANAF grid.
+
+                '
+            valid_range_K:
+            - 1400
+            - 2273.15
+            fit_residual_dex:
+              max_abs: 0.003354
+              rms: 0.001434
+              grid_K:
+              - 1400
+              - 2273.15
+              - 10
+              method: minimax |log10P_fit-log10P_source| on 10 K grid
+          validation:
+            status: pending_validation
+            anchor_refs: []
+          source_reactions: []
+          pressure_models:
+          - fit_target: pure_component_psat
+            pressure_kind: pure_component_saturation_pressure
+            species_basis: monomer
+            valid_domain:
+              temperature_K:
+              - 933
+              - 2792
+            provenance:
+            - source: schema_v1_in_place_migration
+            evaluator_family: antoine
+            coefficients:
+              A: 11.553
+              B: 17340
+              C: 0
+    fiat_routing:
+      plant_bin: null
+      engineering_capture_policy: temperature_threshold
+      products_and_coproducts: []
+      process_or_terminal_destination: process.condensation_train
+      condensation_reference_at_1mbar_C: 1180
+    vaporisation_coefficients:
+      evaporation_alpha:
+        value: 0.3
+        source: 'OWNER-RATIFY proxy_not_intrinsic: REF-018 Schaefer & Fegley 2004 Icarus 169:216-241 Table
+          10 plus Shahar & Young 2007 CAI modeling; conflicting Al proxy coverage'
+        T_band_K:
+        - 1700
+        - 2273
+        envelope:
+        - 0.03
+        - 1.0
+        tier: 2
+        tag: broad_proxy
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 1700
+        - 2273
+        envelope:
+        - 0.03
+        - 1.0
+      extrapolation_policy: conservative_slope_continuation
+      out_of_range_status: out_of_range_conservative_continuation
+      acquisition_flag: vapour_pressure_out_of_range:Al
+    code_metadata:
+      formula_id: Al
+      source_account: process.cleaned_melt
+      request_rule: source_inventory_present
+      solve_group_id: metals_al_family
+      compatibility_projection: metals
+      canonical_aliases: []
+      hot_train_applicability: applicable
+  metals_si_family:
+    physical_properties:
+      species:
+        Si:
+          formula: Si
+          molar_mass_g_mol: 28.085
+          electrons_per_atom: 4
+          parent_oxide: SiO2
+          consumer_status: inactive
+          source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 silicon (C7440213); runtime pure-component
+            source is pure_component_antoine
+          pure_component_antoine:
+            source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 silicon (C7440213); log10(P/bar)=9.56436-23308.848/(T-123.133),
+              converted to Pa by A+5
+            source_certification: source_equation_fit
+            A: 14.56436
+            B: 23308.848
+            C: -123.133
+            valid_range_K:
+            - 1997
+            - 2560
+          boiling_point_C: 3265
+          notes: dH_vap ~ 413.5 kJ/mol. Negligible at process T. Extracted by MRE only.
+          validation:
+            status: pending_validation
+            anchor_refs: []
+          source_reactions: []
+          pressure_models:
+          - fit_target: pure_component_psat
+            pressure_kind: pure_component_saturation_pressure
+            species_basis: monomer
+            valid_domain:
+              temperature_K:
+              - 1687
+              - 3538
+            provenance:
+            - source: schema_v1_in_place_migration
+            evaluator_family: antoine
+            coefficients:
+              A: 11.619
+              B: 21590
+              C: 0
+    fiat_routing:
+      plant_bin: null
+      engineering_capture_policy: temperature_threshold
+      products_and_coproducts: []
+      process_or_terminal_destination: process.condensation_train
+      condensation_reference_at_1mbar_C: 1400
+    vaporisation_coefficients:
+      evaporation_alpha:
+        value: 1.0
+        source: REF-017 Safarian & Engh 2013 Metall. Mater. Trans. A 44:747-753 pure-Si vacuum evaporation;
+          pure elemental Si branch only
+        T_band_K:
+        - 1687
+        - 3538
+        envelope:
+        - 0.84
+        - 1.0
+        tier: 2
+        tag: pure_elemental_only
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 1687
+        - 3538
+        envelope:
+        - 0.84
+        - 1.0
+      extrapolation_policy: conservative_slope_continuation
+      out_of_range_status: out_of_range_conservative_continuation
+      acquisition_flag: vapour_pressure_out_of_range:Si
+    code_metadata:
+      formula_id: Si
+      source_account: process.cleaned_melt
+      request_rule: source_inventory_present
+      solve_group_id: metals_si_family
+      compatibility_projection: metals
+      canonical_aliases: []
+      hot_train_applicability: applicable
+  metals_ti_family:
+    physical_properties:
+      species:
+        Ti:
+          formula: Ti
+          molar_mass_g_mol: 47.87
+          electrons_per_atom: 4
+          parent_oxide: TiO2
+          authority_class: uncertified
+          source: REF-032 CRC Handbook 84th ed. / Alcock-Itkin-Horrigan 1984 vapor-pressure equation for
+            titanium; runtime pure-component source is pure_component_antoine
+          pure_component_antoine:
+            source: REF-032 Alcock-Itkin-Horrigan 1984 titanium liquid equation, CRC/CR2 Pa-converted
+              form; dense 10 K minimax refit from 1941-2400 K plus exact 3560.15 K normal-boiling anchor
+              to log10(P/Pa)=A-B/(T+C)
+            source_certification: source_equation_fit
+            source_equation:
+              original_form: log10(P/atm)=A+B/T+C*log10(T)+D*T*1e-3; CRC/CR2 mirror stores Pa-converted
+                A
+              solid:
+                range_K:
+                - 298
+                - 1941
+                A_log10_P_atm: 11.925283
+                A_log10_P_Pa: 16.931
+                B: -24991
+                C: -1.3376
+                D: 0
+              liquid:
+                range_K:
+                - 1941
+                - 2400
+                A_log10_P_atm: 6.358283
+                A_log10_P_Pa: 11.364
+                B: -22747
+                C: 0
+                D: 0
+            fit_source_phase: liquid
+            fit_range_K:
+            - 1941
+            - 2400
+            source_equation_range_K:
+            - 1941
+            - 2400
+            anchored_extrapolation_range_K:
+            - 2400
+            - 3560.15
+            dense_sample_step_K: 10
+            normal_boiling_anchor_K: 3560.15
+            max_abs_log10_residual_vs_source: 0.001133
+            source_validation_points_Pa_K:
+            - - 0.771274
+              - 1982
+            - - 7.697327
+              - 2171
+            - - 76.927804
+              - 2400
+            - - 101325
+              - 3560.15
+            A: 11.569399015
+            B: 23642.266967112
+            C: 41.832167668
+            valid_range_K:
+            - 1941
+            - 3560.15
+          boiling_point_C: 3287
+          notes: dH_vap ~ 444.3 kJ/mol. Not pyrolysable  --  extracted by Na shuttle or MRE.
+          liquid_oxide_standard_reaction:
+            formula: TiO2(l) -> Ti(g) + O2(g)
+            basis: 'VapoRock JANAF metal(g)/O2(g) + ThermoEngine v1.0 pure-liquid oxide mu0; minimax refit
+              over 1941-2273.15 K. Closes solid-oxide Ellingham vs liquid-oxide activity pairing (2026-07-20
+              vaporock-fit-audit).
+
+              '
+            standard_pressure_Pa: 100000.0
+            oxide_activity_exponent: 1.0
+            pO2_exponent: -1.0
+            pO2_reference_bar: 1.0
+            antoine:
+              A: 17.7414184
+              B: 63882.5899238
+              C: -74.44
+              derivation: 'Premise: liquid-oxide activity pairs with liquid-oxide standard reaction. Algebra:
+                delG0=G_M(g)+n*G_O2-mu0_oxide(l); log10(P_ref/Pa)=5-delG0/(RT ln10); P=P_ref*a*fO2^n.
+                Unit Pa. Sanity: max residual 0.000120 dex vs TE+JANAF grid.
+
+                '
+            valid_range_K:
+            - 1941
+            - 2273.15
+            fit_residual_dex:
+              max_abs: 0.00012
+              rms: 6.0e-05
+              grid_K:
+              - 1941
+              - 2273.15
+              - 10
+              method: minimax |log10P_fit-log10P_source| on 10 K grid
+          validation:
+            status: pending_validation
+            anchor_refs: []
+          source_reactions: []
+          pressure_models:
+          - fit_target: pure_component_psat
+            pressure_kind: pure_component_saturation_pressure
+            species_basis: monomer
+            valid_domain:
+              temperature_K:
+              - 1941
+              - 3560
+            provenance:
+            - source: schema_v1_in_place_migration
+            evaluator_family: antoine
+            coefficients:
+              A: 11.65
+              B: 23200
+              C: 0
+    fiat_routing:
+      plant_bin: null
+      engineering_capture_policy: temperature_threshold
+      products_and_coproducts: []
+      process_or_terminal_destination: process.condensation_train
+      condensation_reference_at_1mbar_C: 1500
+    vaporisation_coefficients:
+      evaporation_alpha:
+        value: 0.8
+        source: 'OWNER-RATIFY proxy_not_intrinsic: Zhang et al. 2014 GCA 140:365-380 CaTiO3 melt at 2005
+          C; Ti activity proxy'
+        T_band_K:
+        - 2278
+        - 2278
+        envelope:
+        - 0.39
+        - 1.0
+        tier: 2
+        tag: proxy
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 2278
+        - 2278
+        envelope:
+        - 0.39
+        - 1.0
+      extrapolation_policy: conservative_slope_continuation
+      out_of_range_status: out_of_range_conservative_continuation
+      acquisition_flag: vapour_pressure_out_of_range:Ti
+    code_metadata:
+      formula_id: Ti
+      source_account: process.cleaned_melt
+      request_rule: source_inventory_present
+      solve_group_id: metals_ti_family
+      compatibility_projection: metals
+      canonical_aliases: []
+      hot_train_applicability: applicable
+  metals_cr_family:
+    physical_properties:
+      species:
+        Cr:
+          formula: Cr
+          molar_mass_g_mol: 52.0
+          electrons_per_atom: 3
+          parent_oxide: Cr2O3
+          authority_class: uncertified
+          source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 chromium (C7440473); runtime pure-component
+            source is pure_component_antoine
+          pure_component_antoine:
+            source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 chromium (C7440473); log10(P/bar)=6.02371-16064.989/(T-83.86),
+              converted to Pa by A+5
+            source_certification: source_equation_fit
+            A: 11.02371
+            B: 16064.989
+            C: -83.86
+            valid_range_K:
+            - 1889
+            - 2755
+          boiling_point_C: 2671
+          notes: dH_vap ~ 396.9 kJ/mol. Trace amounts, extracted by Na shuttle.
+          liquid_oxide_standard_reaction:
+            formula: CrO1.5(l) -> Cr(g) + 0.75 O2(g)
+            basis: 'VapoRock JANAF metal(g)/O2(g) + ThermoEngine v1.0 pure-liquid oxide mu0; minimax refit
+              over 1400-2273.15 K. Closes solid-oxide Ellingham vs liquid-oxide activity pairing (2026-07-20
+              vaporock-fit-audit).
+
+              '
+            standard_pressure_Pa: 100000.0
+            oxide_activity_exponent: 1.0
+            pO2_exponent: -0.75
+            pO2_reference_bar: 1.0
+            antoine:
+              A: 17.179279
+              B: 43230.115398
+              C: -108.5
+              derivation: 'Premise: liquid-oxide activity pairs with liquid-oxide standard reaction. Algebra:
+                delG0=G_M(g)+n*G_O2-mu0_oxide(l); log10(P_ref/Pa)=5-delG0/(RT ln10); P=P_ref*a*fO2^n.
+                Unit Pa. Sanity: max residual 0.006066 dex vs TE+JANAF grid.
+
+                '
+            valid_range_K:
+            - 1400
+            - 2273.15
+            fit_residual_dex:
+              max_abs: 0.006066
+              rms: 0.002591
+              grid_K:
+              - 1400
+              - 2273.15
+              - 10
+              method: minimax |log10P_fit-log10P_source| on 10 K grid
+          validation:
+            status: pending_validation
+            anchor_refs: []
+          source_reactions: []
+          pressure_models:
+          - fit_target: pure_component_psat
+            pressure_kind: pure_component_saturation_pressure
+            species_basis: monomer
+            valid_domain:
+              temperature_K:
+              - 2180
+              - 2944
+            provenance:
+            - source: schema_v1_in_place_migration
+            evaluator_family: antoine
+            coefficients:
+              A: 11.42
+              B: 20730
+              C: 0
+    fiat_routing:
+      plant_bin: null
+      engineering_capture_policy: temperature_threshold
+      products_and_coproducts: []
+      process_or_terminal_destination: process.condensation_train
+      condensation_reference_at_1mbar_C: 1280
+    vaporisation_coefficients:
+      evaporation_alpha:
+        value: 0.9
+        source: REF-040 Pound 1972 J. Phys. Chem. Ref. Data 1:135-146 Table 1, DOI 10.1063/1.3253096,
+          selected McCabe, Hudson & Paxton 1958 Trans. Met. Soc. AIME 212:102 Langmuir-vs-Knudsen result
+          for 99.9% polycrystalline solid Cr and monoatomic Cr(g)
+        T_band_K:
+        - 1318
+        - 1563
+        envelope:
+        - 0.8
+        - 1.0
+        tier: 1
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 1318
+        - 1563
+        envelope:
+        - 0.8
+        - 1.0
+      extrapolation_policy: conservative_slope_continuation
+      out_of_range_status: out_of_range_conservative_continuation
+      acquisition_flag: vapour_pressure_out_of_range:Cr
+    code_metadata:
+      formula_id: Cr
+      source_account: process.cleaned_melt
+      request_rule: source_inventory_present
+      solve_group_id: metals_cr_family
+      compatibility_projection: metals
+      canonical_aliases: []
+      hot_train_applicability: applicable
+      compatibility_condensation_reference_table: true
+  metals_mn_family:
+    physical_properties:
+      species:
+        Mn:
+          formula: Mn
+          molar_mass_g_mol: 54.94
+          electrons_per_atom: 2
+          parent_oxide: MnO
+          authority_class: uncertified
+          # Mn adjudication (2026-06-15/16): before the solid refit, the Alcock
+          # solid fit gave 146.555679 Pa at 1519 K while the NIST/JANAF liquid fit
+          # gave 135.857038 Pa (-7.300052%, -0.032920511 dex). The discontinuity
+          # was a mixed-source artifact, so runtime now uses REF-020 NIST/JANAF
+          # solid and liquid evaluation-derived fits on both sides of melting.
+          # Liquid-source spread at the Kaye-Laby anchors: REF-034 Kaye-Laby/NPL
+          # Pa=[200,1000,2000,5000,10000,20000,50000,101325] at
+          # T_K=[1560,1710,1780,1890,1980,2080,2240,2390]; REF-020 NIST/JANAF
+          # Pa=[227,1202,2348,6022,11935,23627,61195,131242]; REF-033 CRC/Stull
+          # Pa=[248,1320,2570,6513,12749,24858,62813,131877]. That is roughly a
+          # 25-32% high-vs-low CRC/Kaye-Laby spread, while NIST/JANAF is +13.5% to
+          # +29.5% vs Kaye-Laby. NIST/JANAF was chosen because both adjudication
+          # lenses ranked it #1; Barin agrees with NIST/JANAF at about 1-4%, and
+          # Kaye-Laby/NPL is the 13-30% low outlier in-band.
+          source: REF-020 NIST-JANAF/Chase 1998 solid/liquid Mn->Mn(g) evaluation; REF-032 Alcock solid,
+            REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as comparators; runtime pure-component
+            source is pure_component_antoine
+          pure_component_antoine:
+            source: REF-020 NIST-JANAF/Chase 1998 Mn(s/l)->Mn(g) thermodynamic evaluation fit; REF-032
+              Alcock solid, REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as documented comparators
+            default_segment: liquid_nist_janaf_chase_1998
+            segments:
+            - name: solid_nist_janaf_chase_1998
+              phase: solid
+              source: REF-020 NIST-JANAF/Chase 1998 Mn(s) and Mn(g) Shomate thermodynamic evaluation;
+                derived Antoine fit to DeltaG_sub, standard pressure 1 bar, constrained to the stored
+                liquid fit at 1519 K for C0 runtime continuity
+              provenance_class: derived_from_evaluation
+              source_basis: nist_janaf_chase_1998_mn_solid_gas_delta_g
+              fit_source_phase: solid
+              fit_range_K:
+              - 1228
+              - 1519
+              source_certified_range_K:
+              - 1228
+              - 1519
+              dense_sample_step_K: 1
+              join_anchor_K: 1519
+              join_anchor_Pa: 135.85703758587
+              previous_mixed_source_join:
+                solid_alcock_fit_Pa_at_1519: 146.555678795071
+                liquid_nist_fit_Pa_at_1519: 135.85703758587
+                liquid_minus_solid_pct: -7.300052306
+                dex_log10_liquid_over_solid: -0.032920510906
+              nist_janaf_shomate:
+                solid_valid_ranges_K:
+                - - 298
+                  - 980
+                - - 980
+                  - 1361
+                - - 1361
+                  - 1412
+                - - 1412
+                  - 1519
+                gas_valid_range_K:
+                - 2334.526
+                - 6000
+                pressure_standard_Pa: 100000
+                solid_segments:
+                - range_K:
+                  - 298
+                  - 980
+                  coeffs:
+                    A: 27.2419
+                    B: 5.23764
+                    C: 7.78316
+                    D: -2.118501
+                    E: -0.282113
+                    F: -9.366891
+                    G: 61.4964
+                    H: 0.0
+                - range_K:
+                  - 980
+                  - 1361
+                  coeffs:
+                    A: 52.2987
+                    B: -28.6756
+                    C: 21.4867
+                    D: -4.97985
+                    E: -2.43206
+                    F: -21.2433
+                    G: 90.7082
+                    H: 0.0
+                - range_K:
+                  - 1361
+                  - 1412
+                  coeffs:
+                    A: 19.0645
+                    B: 31.4134
+                    C: -14.9935
+                    D: 3.214741
+                    E: 1.86709
+                    F: -2.757881
+                    G: 48.789
+                    H: 0.0
+                - range_K:
+                  - 1412
+                  - 1519
+                  coeffs:
+                    A: -534.172
+                    B: 679.053
+                    C: -296.37
+                    D: 46.4266
+                    E: 161.342
+                    F: 468.715
+                    G: -393.539
+                    H: 0.0
+                gas:
+                  A: 187.6779
+                  B: -97.75372
+                  C: 20.1924
+                  D: -1.274577
+                  E: -177.4957
+                  F: 1.5487
+                  G: 219.6751
+                  H: 283.2572
+              max_abs_log10_residual_vs_source: 0.001821246382
+              rms_log10_residual_vs_source: 0.000822869366
+              source_validation_points_Pa_K:
+              - - 0.819334481954
+                - 1228
+              - - 9.049304759415
+                - 1347
+              - - 94.125208869261
+                - 1493
+              - - 135.28850386827
+                - 1519
+              A: 10.00975726994
+              B: 10422.298996403371
+              C: -195.814921905335
+              valid_range_K:
+              - 1228
+              - 1519
+            - name: liquid_nist_janaf_chase_1998
+              phase: liquid
+              source: REF-020 NIST-JANAF/Chase 1998 Mn(l) and Mn(g) Shomate thermodynamic evaluation;
+                derived Antoine fit to DeltaG_vap, standard pressure 1 bar, with exact 101325 Pa anchor
+                at 2334.526 K
+              provenance_class: derived_from_evaluation
+              source_basis: nist_janaf_chase_1998_mn_liquid_gas_delta_g
+              fit_source_phase: liquid
+              fit_range_K:
+              - 1519
+              - 2334.526
+              source_certified_range_K:
+              - 1519
+              - 2334.526
+              dense_sample_step_K: 1
+              normal_boiling_anchor_K: 2334.526
+              max_abs_log10_residual_vs_source: 0.004586423
+              rms_log10_residual_vs_source: 0.002724018
+              nist_janaf_shomate:
+                liquid_valid_range_K:
+                - 1519
+                - 2334.526
+                gas_valid_range_K:
+                - 2334.526
+                - 6000
+                pressure_standard_Pa: 100000
+                liquid:
+                  A: 46.024
+                  B: 1.953485e-07
+                  C: -7.567225e-08
+                  D: 1.005938e-08
+                  E: 5.623757e-08
+                  F: -7.80404
+                  G: 80.69053
+                  H: 16.28902
+                gas:
+                  A: 187.6779
+                  B: -97.75372
+                  C: 20.1924
+                  D: -1.274577
+                  E: -177.4957
+                  F: 1.5487
+                  G: 219.6751
+                  H: 283.2572
+              source_validation_points_Pa_K:
+              - - 227.443448
+                - 1560
+              - - 1201.584972
+                - 1710
+              - - 2348.349189
+                - 1780
+              - - 6021.823769
+                - 1890
+              - - 11935.01441
+                - 1980
+              - - 23627.443367
+                - 2080
+              - - 61195.177777
+                - 2240
+              - - 101325
+                - 2334.526
+              A: 9.79086818966
+              B: 10402.946653439165
+              C: -160.520331526149
+              valid_range_K:
+              - 1519
+              - 2334.526
+            A: 9.79086818966
+            B: 10402.946653439165
+            C: -160.520331526149
+            valid_range_K:
+            - 1228
+            - 2334.526
+          boiling_point_C: 2061
+          notes: dH_vap ~ 282.3 kJ/mol. Moderate volatility, trace amounts.
+          liquid_oxide_standard_reaction:
+            formula: MnO(l) -> Mn(g) + 0.5 O2(g)
+            basis: 'VapoRock JANAF metal(g)/O2(g) + ThermoEngine v1.0 pure-liquid oxide mu0; minimax refit
+              over 1519-2273.15 K. Closes solid-oxide Ellingham vs liquid-oxide activity pairing (2026-07-20
+              vaporock-fit-audit).
+
+              '
+            standard_pressure_Pa: 100000.0
+            oxide_activity_exponent: 1.0
+            pO2_exponent: -0.5
+            pO2_reference_bar: 1.0
+            antoine:
+              A: 12.5780234
+              B: 28619.0370835
+              C: -118.49
+              derivation: 'Premise: liquid-oxide activity pairs with liquid-oxide standard reaction. Algebra:
+                delG0=G_M(g)+n*G_O2-mu0_oxide(l); log10(P_ref/Pa)=5-delG0/(RT ln10); P=P_ref*a*fO2^n.
+                Unit Pa. Sanity: max residual 0.001677 dex vs TE+JANAF grid.
+
+                '
+            valid_range_K:
+            - 1519
+            - 2273.15
+            fit_residual_dex:
+              max_abs: 0.001677
+              rms: 0.000716
+              grid_K:
+              - 1519
+              - 2273.15
+              - 10
+              method: minimax |log10P_fit-log10P_source| on 10 K grid
+            authority_note: 'Mn(g) Shomate declared support starts at 2334.526 K; process-band use is
+              metastable extrapolation (diagnostic/authority-limited).
+
+              '
+          validation:
+            status: pending_validation
+            anchor_refs: []
+          source_reactions: []
+          pressure_models:
+          - fit_target: pure_component_psat
+            pressure_kind: pure_component_saturation_pressure
+            species_basis: monomer
+            valid_domain:
+              temperature_K:
+              - 1519
+              - 2334
+            provenance:
+            - source: schema_v1_in_place_migration
+            evaluator_family: antoine
+            coefficients:
+              A: 11.183
+              B: 14740
+              C: 0
+    fiat_routing:
+      plant_bin: null
+      engineering_capture_policy: temperature_threshold
+      products_and_coproducts: []
+      process_or_terminal_destination: process.condensation_train
+      condensation_reference_at_1mbar_C: 1000
+    vaporisation_coefficients:
+      evaporation_alpha:
+        value: 1.0
+        source: 'REF-040 Pound 1972 and REF-017 Safarian & Engh 2013 class basis: owner-ratified monoatomic-class
+          PROXY, no Mn-specific measurement exists; Safarian & Engh 2013 full text read = zero Mn'
+        T_band_K:
+        - 1519
+        - 2334.526
+        envelope:
+        - 0.5
+        - 1.0
+        tier: 2
+        tag: proxy
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 1519
+        - 2334.526
+        envelope:
+        - 0.5
+        - 1.0
+      extrapolation_policy: conservative_slope_continuation
+      out_of_range_status: out_of_range_conservative_continuation
+      acquisition_flag: vapour_pressure_out_of_range:Mn
+    code_metadata:
+      formula_id: Mn
+      source_account: process.cleaned_melt
+      request_rule: source_inventory_present
+      solve_group_id: metals_mn_family
+      compatibility_projection: metals
+      canonical_aliases: []
+      hot_train_applicability: applicable
+      compatibility_condensation_reference_table: true
+  oxide_vapors_sio_family:
+    physical_properties:
+      species:
+        SiO:
+          formula: SiO
+          molar_mass_g_mol: 44.084
+          parent_oxide: SiO2
+          authority_class: uncertified
+          confidence_tier: moderate
+          reaction:
+            formula: SiO2(l) -> SiO(g) + 0.5 O2(g)
+            basis: VapoRock JANAF SiO(g)/O2(g) multi-interval Shomate (SiO 1100-6000 K; O2 700-2000 and
+              2000-6000 K) plus ThermoEngine v1.0 pure-liquid SiO2 mu0 (Berman liq_mod); composition-independent
+              p0*Kp(T) minimax refit over 1400-2273.15 K
+            standard_pressure_Pa: 100000.0
+            pO2_reference_bar: 1.0e-09
+            source_table_log10_P_ref_Pa:
+            - - 1400.0
+              - -6.904421868
+            - - 1500.0
+              - -4.953131396
+            - - 1600.0
+              - -3.250905047
+            - - 1700.0
+              - -1.753948057
+            - - 1800.0
+              - -0.427731189
+            - - 1900.0
+              - 0.754969595
+            - - 2000.0
+              - 1.815905539
+            - - 2100.0
+              - 2.772661024
+            - - 2200.0
+              - 3.639609037
+            - - 2273.15
+              - 4.223822537
+            fit_residual_dex:
+              max_abs: 0.00163
+              rms: 0.001162
+              grid_K:
+              - 1400
+              - 2273.15
+              - 20
+              method: minimax |log10P_fit - log10P_source| on 20 K dense grid
+            heldout_2023_15_K:
+              source_log10_P_ref_Pa: 2.046088932
+              fit_log10_P_ref_Pa: 2.044520449
+              fit_P_ref_Pa: 110.795073
+              lunar_mare_activity_scaled_P_Pa: 48.36
+          stoich_oxide_per_vapor: 1.362920787587333
+          stoich_O2_per_vapor: 0.36292078758733326
+          suppression_equation: p(SiO) = K(T) * a(SiO2) / sqrt pO2
+          pO2_reference_bar: 1.0e-09
+          suppression_factor_at_1mbar_O2: '>300*'
+          notes: "THE problem species. At hard vacuum (pO2 ~1e-9 bar and below to the\nlegal body floor),\
+            \ SiO dominates offgas above ~1400\xB0C. At pO2 = 1 mbar,\nsuppressed >300*. Condenses as\
+            \ adhesive, corrosive amorphous silica\nbelow ~1200\xB0C. See [THERMO-1] in context-thermo.md.\n\
+            Composition-independent standard-reaction term from JANAF gas species\nplus the ThermoEngine\
+            \ liquid-SiO2 standard state, source-validated over\n1400-2273.15 K (authority class remains\
+            \ uncertified -- honest label, not\ndual-lab certified ground truth). Runtime applies a(SiO2)\
+            \ and the\nmass-action pO2 factor exactly once over the full legal pO2 domain.\nT>2273.15\
+            \ K is typed refusal.\n"
+          validation:
+            status: pending_validation
+            anchor_refs: []
+          source_reactions:
+          - id: liquid_sio2_to_sio_gas
+            reactants:
+            - formula: SiO2
+              stoichiometry: 1.0
+            products:
+            - formula: SiO
+              stoichiometry: 1.0
+            - formula: O2
+              stoichiometry: 0.5
+          pressure_models:
+          - fit_target: standard_reaction_term
+            pressure_kind: equilibrium_partial_pressure
+            species_basis: monomer
+            valid_domain:
+              temperature_K:
+              - 1400
+              - 2273.15
+            provenance:
+            - source: schema_v1_in_place_migration
+            evaluator_family: standard_reaction_term
+            source_reaction_id: liquid_sio2_to_sio_gas
+            reference_pressure_model:
+              evaluator_family: antoine
+              coefficients:
+                A: 21.4441302
+                B: 38290.4646
+                C: -49.375007
+            activity_exponent: 1.0
+            pO2_exponent: -0.5
+            pO2_reference_bar: 1.0e-09
+    fiat_routing:
+      plant_bin: null
+      engineering_capture_policy: temperature_threshold
+      products_and_coproducts: []
+      process_or_terminal_destination: process.condensation_train
+      condensation_temperature_C:
+      - 900
+      - 1200
+      condensation_reference_at_1mbar_C: 1050
+      compatibility_fields:
+        condensation_product: 'amorphous SiO2 (disproportionation: 2SiO -> Si + SiO2)'
+        condensation_products_mol_per_mol_vapor:
+          Si: 0.5
+          SiO2: 0.5
+    vaporisation_coefficients:
+      evaporation_alpha:
+        value:
+          form: arrhenius
+          A: 0.52
+          B: 3685.0
+          valid_range_K:
+          - 1000
+          - 1800
+          uncertainty_envelope:
+          - 0.003
+          - 0.067
+          cite: Wetzel&Gail 2013 DOI 10.1051/0004-6361/201220803
+          status: CITED
+          prior_scalar:
+            value: 0.04
+            source: REF-018 REF-016 SF2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa
+              & Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check.
+        source: Wetzel & Gail 2013 A&A 553 A92 Arrhenius compilation alpha_s_SiO(T)=0.52*exp(-3685/T),
+          reaction-rate-limited SiO evaporation coefficient. HOT evaporation interface uses alpha_s(T)
+          at source T; microscopic reversibility applies there. COLD-WALL condensation below valid_range_K
+          floor uses the grounded Pound 1972 JPCRD 1:135 DOI 10.1063/1.3253096 unity condensation coefficient;
+          alpha_e != alpha_c off-equilibrium at high supersaturation.
+        T_band_K:
+        - 1000
+        - 1800
+        envelope:
+        - 0.003
+        - 0.067
+        tier: 2
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 1000
+        - 1800
+        envelope:
+        - 0.003
+        - 0.067
+      extrapolation_policy: conservative_slope_continuation
+      out_of_range_status: out_of_range_conservative_continuation
+      acquisition_flag: vapour_pressure_out_of_range:SiO
+    code_metadata:
+      formula_id: SiO
+      source_account: process.cleaned_melt
+      request_rule: source_inventory_present
+      solve_group_id: oxide_vapors_sio_family
+      compatibility_projection: oxide_vapors
+      canonical_aliases: []
+      hot_train_applicability: applicable
+      compatibility_condensation_reference_table: true
+      compatibility_condensation_reference_top_level_only: true
+  oxide_vapors_cro2_family:
+    physical_properties:
+      species:
+        CrO2:
+          formula: CrO2
+          molar_mass_g_mol: 83.9941
+          parent_oxide: Cr2O3
+          authority_class: uncertified
+          reaction:
+            formula: CrO1.5(l) + 0.25 O2(g) -> CrO2(g)
+            exponent_oxide: 1.0
+            exponent_pO2: 0.25
+            basis: JANAF CrO2(g)/O2 + ThermoEngine v1.0 pure-liquid CrO1.5 mu0; composition-independent
+              p0*Kp(T) minimax refit over 1500-2273.15 K. Replaces stale fallback (+0.390 dex @1500 K)
+              and extends process envelope.
+          stoich_oxide_per_vapor: 0.904761167748687
+          stoich_O2_per_vapor: -0.0952388322513129
+          oxide_activity_exponent: 1.0
+          pO2_exponent: 0.25
+          pO2_reference_bar: 1.0
+          residual_dex: 0.005059
+          vaporock_janaf0_shomate:
+            source_file: ../VapoRock/src/vaporock/data/JANAF0-vapor-data.csv
+            source_row: 34
+            species_name: CrO2(g)
+            valid_range_K:
+            - 1100
+            - 6000
+            A: 57.85928
+            B: 0.190282
+            C: -0.038347
+            D: 0.002643
+            E: -2.578022
+            F: -99.71476
+            G: 328.5921
+            H: -75.312
+          source: REF-020 JANAF coefficients shipped by VapoRock.
+          notes: 'Option A engineering path: CrO2(g) is collected as stable Cr2O3 in a
+
+            dedicated high-temperature Cr oxide stage between Fe and SiO. Sossi-Moon
+
+            fixture records CrO2(g) as significant above 1500 K; VapoRock JANAF0
+
+            supplies CrO2(g) thermochemistry over 1100-6000 K.
+
+            '
+          validation:
+            status: pending_validation
+            anchor_refs: []
+          source_reactions:
+          - id: liquid_cro1_5_to_cro2_gas
+            reactants:
+            - formula: CrO1.5
+              stoichiometry: 1.0
+            - formula: O2
+              stoichiometry: 0.25
+            products:
+            - formula: CrO2
+              stoichiometry: 1.0
+          pressure_models:
+          - fit_target: standard_reaction_term
+            pressure_kind: equilibrium_partial_pressure
+            species_basis: monomer
+            valid_domain:
+              temperature_K:
+              - 1500
+              - 2273.15
+            provenance:
+            - source: schema_v1_in_place_migration
+            evaluator_family: standard_reaction_term
+            source_reaction_id: liquid_cro1_5_to_cro2_gas
+            reference_pressure_model:
+              evaluator_family: antoine
+              coefficients:
+                A: 11.1773865
+                B: 18397.4295704
+                C: -228.62
+                derivation: 'Premise: liquid CrO1.5 standard matching single-cation activity. Algebra:
+                  delG0=G_CrO2-mu0_CrO1.5-0.25 G_O2; log10(P_ref/Pa)=5-delG0/(RT ln10); P=P_ref*a*fO2^0.25.
+                  Unit Pa. Sanity: max residual 0.005059 dex (audit before +0.390 @1500 K).'
+            activity_exponent: 1.0
+            pO2_exponent: 0.25
+            pO2_reference_bar: 1.0
+    fiat_routing:
+      plant_bin: null
+      engineering_capture_policy: temperature_threshold
+      products_and_coproducts: []
+      process_or_terminal_destination: process.condensation_train
+      condensation_temperature_C:
+      - 1100
+      - 1300
+      condensation_reference_at_1mbar_C: 1250
+      compatibility_fields:
+        condensation_setpoint_C: 1250
+        condensation_product: 'Cr2O3(s) harvest with O2 coproduct: CrO2 -> 0.5 Cr2O3 + 0.25 O2'
+        condensation_products_mol_per_mol_vapor:
+          Cr2O3: 0.5
+          O2: 0.25
+        condensation_product_accounts:
+          Cr2O3: terminal.chromium_condensed_oxide_stored
+          O2: process.overhead_gas
+    vaporisation_coefficients:
+      evaporation_alpha:
+        status: no_data
+        policy: &id002
+          tier: 3
+          policy: fail_loud_missing_alpha
+          source: REF-014 Fedkin et al. 2006 plus chromia-boiler literature; no isolated CrO2 HK alpha
+            adopted
+        compatibility_policy_field: *id002
+      alpha_domain_and_uncertainty: {}
+      extrapolation_policy: conservative_slope_continuation
+      out_of_range_status: out_of_range_conservative_continuation
+      acquisition_flag: vapour_pressure_out_of_range:CrO2
+    code_metadata:
+      formula_id: CrO2
+      source_account: process.cleaned_melt
+      request_rule: source_inventory_present
+      solve_group_id: oxide_vapors_cro2_family
+      compatibility_projection: oxide_vapors
+      canonical_aliases: []
+      hot_train_applicability: applicable
+      compatibility_condensation_reference_table: true
+      compatibility_condensation_reference_top_level_only: true
+  foulant_vapor_nacl_family:
+    physical_properties:
+      species:
+        NaCl:
+          formula: NaCl
+          molar_mass_g_mol: 58.44
+          carrier_is_own_vapor: true
+          pure_component_antoine:
+            source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 NaCl (C7647145); CRC normal bp 1465
+              C
+            source_certification: source_equation_fit
+            A: 10.07184
+            B: 8388.497
+            C: -82.638
+          boiling_point_C: 1465
+          notes: Pure-component chloride; no parent_oxide. Volatilizes as NaCl(g).
+          validation:
+            status: pending_validation
+            anchor_refs: []
+          source_reactions: []
+          pressure_models:
+          - fit_target: pure_component_psat
+            pressure_kind: pure_component_saturation_pressure
+            species_basis: monomer
+            valid_domain:
+              temperature_K:
+              - 1138
+              - 1738
+            provenance:
+            - source: schema_v1_in_place_migration
+            evaluator_family: antoine
+            coefficients:
+              A: 11.1773865
+              B: 18397.4295704
+              C: -228.62
+              derivation: 'Premise: liquid CrO1.5 standard with single-cation activity. Algebra: delG0=G_CrO2-mu0_CrO1.5-0.25
+                G_O2; log10(P_ref/Pa)=5-delG0/(RT ln10); P=P_ref*a*fO2^0.25. Sanity: max residual 0.005059
+                dex (audit before +0.390 @1500 K).
+
+                '
+    fiat_routing:
+      plant_bin: null
+      engineering_capture_policy: temperature_threshold
+      products_and_coproducts: []
+      process_or_terminal_destination: process.condensation_train
+      condensation_reference_at_1mbar_C: 900
+    vaporisation_coefficients:
+      evaporation_alpha:
+        value: 1.0
+        source: 'OWNER-RATIFY salt_proxy_not_intrinsic: REF-013 Salt analogy - Sossi et al. 2019 GCA near-ideal
+          alkali evaporation; no isolated regolith-NaCl HK measurement'
+        tier: 2
+      alpha_domain_and_uncertainty: {}
+      extrapolation_policy: conservative_slope_continuation
+      out_of_range_status: out_of_range_conservative_continuation
+      acquisition_flag: vapour_pressure_out_of_range:NaCl
+    code_metadata:
+      formula_id: NaCl
+      source_account: process.stage0_foulant
+      request_rule: stage0_only
+      solve_group_id: foulant_vapor_nacl_family
+      compatibility_projection: foulant_vapor
+      canonical_aliases: []
+      hot_train_applicability: not_applicable
+      compatibility_condensation_reference_table: true
+  foulant_vapor_kcl_family:
+    physical_properties:
+      species:
+        KCl:
+          formula: KCl
+          molar_mass_g_mol: 74.55
+          carrier_is_own_vapor: true
+          source_drift_dex: 0.04427
+          source_drift_note: 'DRIFT-LOW: ~0.044 dex mid-range Stull equation vs NBP-anchored pure_component_antoine
+            near 1550 K. Runtime ground-truth uses pure_component_antoine; no coefficient retune in pairing
+            wave.'
+          pure_component_antoine:
+            source: REF-002 NIST WebBook SRD 69 Stull 1947 KCl (C7447407); CRC bp 1420 C; Clausius-Clapeyron
+              anchored at 1 atm (Stull raw overshoots bp)
+            provenance_class: derived_from_evaluation
+            A: 10.1859
+            B: 8774.5
+            C: 0
+          boiling_point_C: 1420
+          notes: Pure-component chloride; no parent_oxide. More volatile than NaCl at a given T.
+          validation:
+            status: pending_validation
+            anchor_refs: []
+          source_reactions: []
+          pressure_models:
+          - fit_target: pure_component_psat
+            pressure_kind: pure_component_saturation_pressure
+            species_basis: monomer
+            valid_domain:
+              temperature_K:
+              - 1094
+              - 1680
+            provenance:
+            - source: schema_v1_in_place_migration
+            evaluator_family: antoine
+            coefficients:
+              source: REF-002 NIST Stull 1947 mid-range faithful runtime row; bp overshoots - tests use
+                pure_component_antoine
+              A: 9.78236
+              B: 7440.691
+              C: -122.709
+    fiat_routing:
+      plant_bin: null
+      engineering_capture_policy: temperature_threshold
+      products_and_coproducts: []
+      process_or_terminal_destination: process.condensation_train
+      condensation_reference_at_1mbar_C: 880
+    vaporisation_coefficients:
+      evaporation_alpha:
+        value: 1.0
+        source: 'OWNER-RATIFY salt_proxy_not_intrinsic: REF-013 Salt analogy - Sossi et al. 2019 GCA near-ideal
+          alkali evaporation; no isolated regolith-KCl HK measurement'
+        tier: 2
+      alpha_domain_and_uncertainty: {}
+      extrapolation_policy: conservative_slope_continuation
+      out_of_range_status: out_of_range_conservative_continuation
+      acquisition_flag: vapour_pressure_out_of_range:KCl
+    code_metadata:
+      formula_id: KCl
+      source_account: process.stage0_foulant
+      request_rule: stage0_only
+      solve_group_id: foulant_vapor_kcl_family
+      compatibility_projection: foulant_vapor
+      canonical_aliases: []
+      hot_train_applicability: not_applicable
+      compatibility_condensation_reference_table: true
+  foulant_vapor_naf_family:
+    physical_properties:
+      species:
+        NaF:
+          formula: NaF
+          molar_mass_g_mol: 41.98817
+          carrier_is_own_vapor: true
+          confidence: partly_grounded
+          interval_required: true
+          certified_point: null
+          boiling_point_C: 1704
+          notes: 'Interval-only identity row. Runtime Antoine coefficients and
+
+            evaporation_alpha are intentionally absent because no named
+
+            certified vapor-pressure source or regolith-NaF HK measurement has
+
+            landed. Stage-0 foulant volatilization must fail loud until a
+
+            certified row replaces this placeholder.
+
+            CaF2/MgF2 deliberately absent - refractory rump (b129999).
+
+            '
+          validation:
+            status: pending_validation
+            anchor_refs: []
+          source_reactions: []
+          pressure_models:
+          - fit_target: pure_component_psat
+            pressure_kind: pure_component_saturation_pressure
+            species_basis: monomer
+            valid_domain:
+              temperature_K:
+              - 1200
+              - 2000
+            provenance:
+            - source: schema_v1_in_place_migration
+            evaluator_family: tabulated_equilibrium
+            availability: unavailable_pending_acquisition
+    fiat_routing:
+      plant_bin: null
+      engineering_capture_policy: temperature_threshold
+      products_and_coproducts: []
+      process_or_terminal_destination: process.condensation_train
+      condensation_reference_at_1mbar_C: 1050
+    vaporisation_coefficients:
+      evaporation_alpha:
+        status: no_data
+        policy: refuse_nonzero_flux
+      alpha_domain_and_uncertainty: {}
+      extrapolation_policy: conservative_slope_continuation
+      out_of_range_status: out_of_range_conservative_continuation
+      acquisition_flag: vapour_pressure_out_of_range:NaF
+    code_metadata:
+      formula_id: NaF
+      source_account: process.stage0_foulant
+      request_rule: stage0_only
+      solve_group_id: foulant_vapor_naf_family
+      compatibility_projection: foulant_vapor
+      canonical_aliases: []
+      hot_train_applicability: not_applicable

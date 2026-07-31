@@ -8,6 +8,8 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 VAPOR_PRESSURES_PATH = REPO_ROOT / "data" / "vapor_pressures.yaml"
@@ -154,7 +156,9 @@ EXPECTED_MISSING_ALPHA_POLICY = {
 
 
 def _vapor_pressure_data() -> dict:
-    return yaml.safe_load(VAPOR_PRESSURES_PATH.read_text())
+    return vapor_pressure_legacy_view(
+        yaml.safe_load(VAPOR_PRESSURES_PATH.read_text())
+    )
 
 
 def test_calibrated_evaporation_alpha_values_sources_and_envelopes():

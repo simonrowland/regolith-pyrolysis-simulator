@@ -1101,6 +1101,9 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
         vapor_path = repo_root / "data" / "vapor_pressures.yaml"
         with vapor_path.open(encoding="utf-8") as handle:
             payload = yaml.safe_load(handle) or {}
+        from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+
+        payload = vapor_pressure_legacy_view(payload)
         entry = (payload.get("foulant_vapor") or {}).get(carrier)
         if entry is None:
             raise KeyError(f"foulant_vapor row missing for carrier {carrier!r}")

@@ -138,7 +138,10 @@ def _temperature_range_warning(
 def _load_vapor_pressures(path: Path | None = None) -> Mapping[str, Any]:
     yaml_path = path or _DEFAULT_VAPOR_PRESSURES_PATH
     with yaml_path.open(encoding="utf-8") as handle:
-        return yaml.safe_load(handle) or {}
+        payload = yaml.safe_load(handle) or {}
+    from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+
+    return vapor_pressure_legacy_view(payload)
 
 
 def chi_escape_salt(

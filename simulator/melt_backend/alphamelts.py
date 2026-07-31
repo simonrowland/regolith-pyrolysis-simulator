@@ -4511,6 +4511,9 @@ class _MELTSBackendSupport(MeltBackend):
         )
         with open(path) as f:
             data = yaml.safe_load(f) or {}
+        from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+
+        data = vapor_pressure_legacy_view(data)
         table = {}
         for group in ('metals', 'oxide_vapors'):
             for species, spec in (data.get(group) or {}).items():

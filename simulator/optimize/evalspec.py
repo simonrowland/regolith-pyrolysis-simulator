@@ -37,6 +37,7 @@ from simulator.optimize.canonical import (
     normalize_canonical_value,
 )
 from simulator.chemistry.kernel.config import normalize_chemistry_kernel_config
+from simulator.corpus_version import current_corpus_version
 from simulator.optimize.recipe import (
     allowlist_version as DEFAULT_ALLOWLIST_VERSION,
     default_bounds_digest,
@@ -44,27 +45,6 @@ from simulator.optimize.recipe import (
 
 
 _VERSION_PATH = Path(__file__).resolve().parents[2] / "VERSION"
-REQUIRED_DATA_DIGEST_KEYS = frozenset(
-    (
-        "feedstocks",
-        "foulant_thermo",
-        "materials",
-        "profile",
-        "setpoints",
-        "species_catalog",
-        "vapor_pressures",
-    )
-)
-_LEGACY_DATA_DIGEST_KEYS = frozenset(
-    ("feedstocks", "profile", "setpoints", "vapor_pressures")
-)
-_LEGACY_DATA_DIGEST_SENTINELS = MappingProxyType(
-    {
-        "foulant_thermo": "legacy-missing-foulant-thermo-digest",
-        "materials": "legacy-missing-materials-digest",
-        "species_catalog": "legacy-missing-species-catalog-digest",
-    }
-)
 DEFAULT_VAPOR_PRESSURE_PROVIDER_ID = "builtin-vapor-pressure"
 DEFAULT_VAPOR_PRESSURE_FALLBACK_PROVIDER_ID = "builtin-vapor-pressure"
 VAPOROCK_DIAGNOSTIC_PROVIDER_ID = "vaporock"
@@ -378,7 +358,6 @@ _PREFIX_EVALSPEC_REDUCE_ARG_COUNT = 41
 # with the redox defaults in the wrong slots (silent cache corruption).
 _REDOX_REDUCE_INSERT_INDEX = 16
 _BUBBLER_REDUCE_INSERT_INDEX = 18
-_DATA_DIGESTS_REDUCE_INDEX = 6
 
 
 def _with_default_redox_reduce_args(args: tuple[Any, ...]) -> tuple[Any, ...]:
@@ -399,35 +378,10 @@ def _with_default_redox_and_bubbler_reduce_args(
     return _with_default_bubbler_reduce_args(_with_default_redox_reduce_args(args))
 
 
-def _with_legacy_data_digest_scope(value: Any) -> Any:
-    if not isinstance(value, Mapping):
-        return value
-    if _LEGACY_DATA_DIGEST_KEYS.difference(value):
-        return value
-    missing = REQUIRED_DATA_DIGEST_KEYS.difference(value)
-    tolerated = missing.intersection(_LEGACY_DATA_DIGEST_SENTINELS)
-    if missing.difference(tolerated) or not tolerated:
-        return value
-    patched = dict(value)
-    for key in tolerated:
-        patched[key] = _LEGACY_DATA_DIGEST_SENTINELS[key]
-    return patched
-
-
-def _with_legacy_data_digest_args(args: tuple[Any, ...]) -> tuple[Any, ...]:
-    if len(args) <= _DATA_DIGESTS_REDUCE_INDEX:
-        return args
-    patched = list(args)
-    patched[_DATA_DIGESTS_REDUCE_INDEX] = _with_legacy_data_digest_scope(
-        patched[_DATA_DIGESTS_REDUCE_INDEX]
-    )
-    return tuple(patched)
-
-
 def _rebuild_eval_spec(*args: Any) -> EvalSpec:
     if len(args) == _EVALSPEC_REDUCE_ARG_COUNT + 6:
         return EvalSpec(
-            *_with_legacy_data_digest_args(args[:-6]),
+            *args[:-6],
             allowlist_version=args[-6],
             bounds_digest=args[-5],
             stop_at_stage0_exit=args[-4],
@@ -437,7 +391,7 @@ def _rebuild_eval_spec(*args: Any) -> EvalSpec:
         )
     if len(args) == _EVALSPEC_REDUCE_ARG_COUNT + 5:
         return EvalSpec(
-            *_with_legacy_data_digest_args(args[:-5]),
+            *args[:-5],
             allowlist_version=args[-5],
             bounds_digest=args[-4],
             stop_at_stage0_exit=args[-3],
@@ -446,41 +400,35 @@ def _rebuild_eval_spec(*args: Any) -> EvalSpec:
         )
     if len(args) == _OLD_EVALSPEC_REDUCE_ARG_COUNT:
         return EvalSpec(
-            *_with_legacy_data_digest_args(
-                _with_default_redox_and_bubbler_reduce_args(args)
-            )
+            *_with_default_redox_and_bubbler_reduce_args(args)
         )
     if len(args) == _PRE_BUBBLER_EVALSPEC_REDUCE_ARG_COUNT:
         return EvalSpec(
-            *_with_legacy_data_digest_args(_with_default_bubbler_reduce_args(args))
+            *_with_default_bubbler_reduce_args(args)
         )
     if len(args) == _PRE_BUBBLER_EVALSPEC_REDUCE_ARG_COUNT + 1 and isinstance(args[-1], bool):
         return EvalSpec(
-            *_with_legacy_data_digest_args(
-                _with_default_bubbler_reduce_args(args[:-1])
-            ),
+            *_with_default_bubbler_reduce_args(args[:-1]),
             stop_at_stage0_exit=args[-1],
         )
     if len(args) == _EVALSPEC_REDUCE_ARG_COUNT:
-        return EvalSpec(*_with_legacy_data_digest_args(args))
+        return EvalSpec(*args)
     if len(args) == _PRE_BUBBLER_EVALSPEC_REDUCE_ARG_COUNT + 2:
         return EvalSpec(
-            *_with_legacy_data_digest_args(
-                _with_default_bubbler_reduce_args(args[:-2])
-            ),
+            *_with_default_bubbler_reduce_args(args[:-2]),
             allowlist_version=args[-2],
             stop_at_stage0_exit=args[-1],
         )
     if len(args) == _EVALSPEC_REDUCE_ARG_COUNT + 3:
         return EvalSpec(
-            *_with_legacy_data_digest_args(args[:-3]),
+            *args[:-3],
             allowlist_version=args[-3],
             bounds_digest=args[-2],
             stop_at_stage0_exit=args[-1],
         )
     if len(args) == _EVALSPEC_REDUCE_ARG_COUNT + 4:
         return EvalSpec(
-            *_with_legacy_data_digest_args(args[:-4]),
+            *args[:-4],
             allowlist_version=args[-4],
             bounds_digest=args[-3],
             stop_at_stage0_exit=args[-2],
@@ -488,20 +436,18 @@ def _rebuild_eval_spec(*args: Any) -> EvalSpec:
         )
     if len(args) == _EVALSPEC_REDUCE_ARG_COUNT + 2:
         return EvalSpec(
-            *_with_legacy_data_digest_args(args[:-2]),
+            *args[:-2],
             allowlist_version=args[-2],
             stop_at_stage0_exit=args[-1],
         )
     if len(args) == _OLD_EVALSPEC_REDUCE_ARG_COUNT + 1:
         return EvalSpec(
-            *_with_legacy_data_digest_args(
-                _with_default_redox_and_bubbler_reduce_args(args[:-1])
-            ),
+            *_with_default_redox_and_bubbler_reduce_args(args[:-1]),
             stop_at_stage0_exit=args[-1],
         )
     if len(args) == _EVALSPEC_REDUCE_ARG_COUNT + 1:
         return EvalSpec(
-            *_with_legacy_data_digest_args(args[:-1]),
+            *args[:-1],
             stop_at_stage0_exit=args[-1],
         )
     raise TypeError(f"unexpected EvalSpec reduce arity {len(args)}")
@@ -510,7 +456,7 @@ def _rebuild_eval_spec(*args: Any) -> EvalSpec:
 def _rebuild_prefix_eval_spec(*args: Any) -> PrefixEvalSpec:
     if len(args) == _PREFIX_EVALSPEC_REDUCE_ARG_COUNT + 6:
         return PrefixEvalSpec(
-            *_with_legacy_data_digest_args(args[:-6]),
+            *args[:-6],
             allowlist_version=args[-6],
             bounds_digest=args[-5],
             stop_at_stage0_exit=args[-4],
@@ -520,7 +466,7 @@ def _rebuild_prefix_eval_spec(*args: Any) -> PrefixEvalSpec:
         )
     if len(args) == _PREFIX_EVALSPEC_REDUCE_ARG_COUNT + 5:
         return PrefixEvalSpec(
-            *_with_legacy_data_digest_args(args[:-5]),
+            *args[:-5],
             allowlist_version=args[-5],
             bounds_digest=args[-4],
             stop_at_stage0_exit=args[-3],
@@ -529,44 +475,38 @@ def _rebuild_prefix_eval_spec(*args: Any) -> PrefixEvalSpec:
         )
     if len(args) == _OLD_PREFIX_EVALSPEC_REDUCE_ARG_COUNT:
         return PrefixEvalSpec(
-            *_with_legacy_data_digest_args(
-                _with_default_redox_and_bubbler_reduce_args(args)
-            )
+            *_with_default_redox_and_bubbler_reduce_args(args)
         )
     if len(args) == _PRE_BUBBLER_PREFIX_EVALSPEC_REDUCE_ARG_COUNT:
         return PrefixEvalSpec(
-            *_with_legacy_data_digest_args(_with_default_bubbler_reduce_args(args))
+            *_with_default_bubbler_reduce_args(args)
         )
     if (
         len(args) == _PRE_BUBBLER_PREFIX_EVALSPEC_REDUCE_ARG_COUNT + 1
         and isinstance(args[-1], bool)
     ):
         return PrefixEvalSpec(
-            *_with_legacy_data_digest_args(
-                _with_default_bubbler_reduce_args(args[:-1])
-            ),
+            *_with_default_bubbler_reduce_args(args[:-1]),
             stop_at_stage0_exit=args[-1],
         )
     if len(args) == _PREFIX_EVALSPEC_REDUCE_ARG_COUNT:
-        return PrefixEvalSpec(*_with_legacy_data_digest_args(args))
+        return PrefixEvalSpec(*args)
     if len(args) == _PRE_BUBBLER_PREFIX_EVALSPEC_REDUCE_ARG_COUNT + 2:
         return PrefixEvalSpec(
-            *_with_legacy_data_digest_args(
-                _with_default_bubbler_reduce_args(args[:-2])
-            ),
+            *_with_default_bubbler_reduce_args(args[:-2]),
             allowlist_version=args[-2],
             stop_at_stage0_exit=args[-1],
         )
     if len(args) == _PREFIX_EVALSPEC_REDUCE_ARG_COUNT + 3:
         return PrefixEvalSpec(
-            *_with_legacy_data_digest_args(args[:-3]),
+            *args[:-3],
             allowlist_version=args[-3],
             bounds_digest=args[-2],
             stop_at_stage0_exit=args[-1],
         )
     if len(args) == _PREFIX_EVALSPEC_REDUCE_ARG_COUNT + 4:
         return PrefixEvalSpec(
-            *_with_legacy_data_digest_args(args[:-4]),
+            *args[:-4],
             allowlist_version=args[-4],
             bounds_digest=args[-3],
             stop_at_stage0_exit=args[-2],
@@ -574,20 +514,18 @@ def _rebuild_prefix_eval_spec(*args: Any) -> PrefixEvalSpec:
         )
     if len(args) == _PREFIX_EVALSPEC_REDUCE_ARG_COUNT + 2:
         return PrefixEvalSpec(
-            *_with_legacy_data_digest_args(args[:-2]),
+            *args[:-2],
             allowlist_version=args[-2],
             stop_at_stage0_exit=args[-1],
         )
     if len(args) == _OLD_PREFIX_EVALSPEC_REDUCE_ARG_COUNT + 1:
         return PrefixEvalSpec(
-            *_with_legacy_data_digest_args(
-                _with_default_redox_and_bubbler_reduce_args(args[:-1])
-            ),
+            *_with_default_redox_and_bubbler_reduce_args(args[:-1]),
             stop_at_stage0_exit=args[-1],
         )
     if len(args) == _PREFIX_EVALSPEC_REDUCE_ARG_COUNT + 1:
         return PrefixEvalSpec(
-            *_with_legacy_data_digest_args(args[:-1]),
+            *args[:-1],
             stop_at_stage0_exit=args[-1],
         )
     raise TypeError(f"unexpected PrefixEvalSpec reduce arity {len(args)}")
@@ -598,23 +536,19 @@ def current_code_version() -> str:
 
 
 def canonical_evalspec_json(spec: EvalSpec) -> bytes:
-    optimizer_data_digests = {
-        key: spec.data_digests[key]
-        for key in ("profile", "physics_constraints")
-        if key in spec.data_digests
-    }
     payload = {
         "additives_kg": spec.additives_kg,
         "backend_name": spec.backend_name,
         "c5_enabled": spec.c5_enabled,
         "campaign": spec.campaign,
         "chemistry_kernel": _chemistry_kernel_key_payload(spec.chemistry_kernel),
-        "corpus_version": spec.data_digests.get("corpus_version", ""),
+        "corpus_version": (
+            spec.data_digests.get("corpus_version") or current_corpus_version()
+        ),
         # _cost_parameters_key_payload (not raw cost_parameter_values): the
         # identity-transparency contract — owner-ratified default cost
         # controls serialize away so defaults share one cache identity.
         "cost_parameters": _cost_parameters_key_payload(spec.cost_parameters),
-        "data_digests": optimizer_data_digests,
         "feedstock_id": spec.feedstock_id,
         "fidelity": spec.fidelity,
         "hours": spec.hours,
@@ -644,11 +578,10 @@ def canonical_evalspec_json(spec: EvalSpec) -> bytes:
     if spec.lab_schedule:
         payload["lab_schedule"] = spec.lab_schedule
     payload.update(lab_overlay_scope_payload(spec))
-    if spec.target_spec_digest:
+    if spec.target_spec_id or spec.target_maturity:
         payload.update(
             {
                 "target_maturity": spec.target_maturity,
-                "target_spec_digest": spec.target_spec_digest,
                 "target_spec_id": spec.target_spec_id,
             }
         )
@@ -681,7 +614,7 @@ def _cost_parameters_key_payload(
         parameters.pop("furnace_lifetime_cost_multiplier")
     if parameters.get("min_fouling_penalty") == DEFAULT_MIN_FOULING_PENALTY:
         parameters.pop("min_fouling_penalty")
-    return {**payload, "parameters": parameters}
+    return {"parameters": parameters}
 
 
 def _chemistry_kernel_key_payload(kernel: Mapping[str, Any]) -> Mapping[str, Any]:
@@ -695,18 +628,10 @@ def _chemistry_kernel_key_payload(kernel: Mapping[str, Any]) -> Mapping[str, Any
 
 def lab_overlay_scope_payload(spec: EvalSpec) -> dict[str, Any]:
     payload: dict[str, Any] = {}
-    if spec.lab_alpha_digest:
-        payload["lab_alpha_digest"] = spec.lab_alpha_digest
-    if spec.geometry_digest:
-        payload["geometry_digest"] = spec.geometry_digest
     if spec.effective_exposed_area_m2 is not None:
         payload["effective_exposed_area_m2"] = spec.effective_exposed_area_m2
     if spec.area_basis:
         payload["area_basis"] = spec.area_basis
-    if spec.oxide_vapor_ceiling_digest:
-        payload["oxide_vapor_ceiling_digest"] = spec.oxide_vapor_ceiling_digest
-    if spec.sink_channel_evidence_digests:
-        payload["sink_channel_evidence_digests"] = spec.sink_channel_evidence_digests
     return payload
 
 
@@ -763,10 +688,6 @@ def _freeze_digest_map(value: Mapping[str, str]) -> Mapping[str, str]:
     keys = list(value)
     if not all(isinstance(key, str) for key in keys):
         raise CanonicalizationError("data_digests keys must be strings")
-    missing = REQUIRED_DATA_DIGEST_KEYS.difference(keys)
-    if missing:
-        joined = ", ".join(sorted(missing))
-        raise CanonicalizationError(f"data_digests missing required keys: {joined}")
     for key in sorted(keys):
         digest = value[key]
         if not isinstance(digest, str):

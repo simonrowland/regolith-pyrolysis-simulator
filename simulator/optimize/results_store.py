@@ -33,7 +33,6 @@ from simulator.optimize.canonical import canonical_json_dumps, normalize_canonic
 from simulator.optimize.evalspec import (
     EvalSpec,
     PrefixEvalSpec,
-    _with_legacy_data_digest_scope,
     cache_key,
 )
 from simulator.optimize.evaluate import (
@@ -723,7 +722,7 @@ class ResultStore:
         conn.execute(
             """
             CREATE INDEX IF NOT EXISTS idx_results_current_selector
-                ON results(feedstock_id, profile_id, fidelity, code_version, data_digests, result_scope)
+                ON results(feedstock_id, profile_id, fidelity, result_scope, corpus_version)
             """
         )
 
@@ -1240,13 +1239,6 @@ def _eval_spec_kwargs(eval_spec_cls: type[EvalSpec], payload: Mapping[str, Any])
             values[field.name] = field.default_factory()
         else:
             raise KeyError(field.name)
-    # Legacy rows (pre materials/species_catalog cache scope) get sentinel
-    # digests so they deserialize, but their stored cache_key was computed
-    # without those keys — so cache_key(deserialized_legacy_spec) != the stored
-    # key, and lookup() by re-derived key self-misses a legacy row (it recomputes
-    # instead). That is the SAFE direction (cache-miss -> recompute, never
-    # stale-reuse); legacy rows remain reachable by their stored key via fetch().
-    values["data_digests"] = _with_legacy_data_digest_scope(values["data_digests"])
     return values
 
 

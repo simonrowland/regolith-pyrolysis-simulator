@@ -766,6 +766,9 @@ def _vapor_pressure_entry(species: str) -> Mapping[str, Any] | None:
     loaded = yaml.safe_load(src.read_text())
     if not isinstance(loaded, Mapping):
         raise SystemExit(f"invalid vapor-pressure sidecar: {src}")
+    from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+
+    loaded = vapor_pressure_legacy_view(loaded)
     for section in ("species", "metals", "oxide_vapors"):
         species_data = loaded.get(section)
         if not isinstance(species_data, Mapping):

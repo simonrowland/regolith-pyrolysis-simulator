@@ -18,7 +18,7 @@ from engines.builtin.foulant_disposition import (
     _interpolate_onset_K,
     _parse_dg_points,
 )
-from simulator.optimize.evalspec import REQUIRED_DATA_DIGEST_KEYS
+import simulator.optimize.evalspec as evalspec_module
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 FOULANT_THERMO = REPO_ROOT / "data" / "foulant_thermo.yaml"
@@ -52,9 +52,8 @@ def _load_carbon_partition() -> dict:
         return yaml.safe_load(handle) or {}
 
 
-def test_foulant_thermo_in_digest_but_carbon_partition_excluded() -> None:
-    assert "foulant_thermo" in REQUIRED_DATA_DIGEST_KEYS
-    assert "stage0_carbon_partition" not in REQUIRED_DATA_DIGEST_KEYS
+def test_foulant_data_is_not_a_required_optimizer_identity_digest() -> None:
+    assert not hasattr(evalspec_module, "REQUIRED_DATA_DIGEST_KEYS")
 
 
 def test_load_foulant_registry_parses_all_carrier_blocks() -> None:

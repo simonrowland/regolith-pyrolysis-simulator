@@ -24,7 +24,10 @@ DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 
 
 def _load_vapor_pressures() -> dict:
-    return yaml.safe_load((DATA_DIR / "vapor_pressures.yaml").read_text())
+    payload = yaml.safe_load((DATA_DIR / "vapor_pressures.yaml").read_text())
+    from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+
+    return vapor_pressure_legacy_view(payload)
 
 
 def _key(

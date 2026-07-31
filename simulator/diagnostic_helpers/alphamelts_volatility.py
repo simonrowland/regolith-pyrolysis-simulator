@@ -877,7 +877,10 @@ def _diagnostic_source_label(
 def _load_default_vapor_pressure_data() -> dict[str, Any]:
     root = Path(__file__).resolve().parents[2]
     with (root / "data" / "vapor_pressures.yaml").open() as handle:
-        return yaml.safe_load(handle) or {}
+        payload = yaml.safe_load(handle) or {}
+    from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+
+    return vapor_pressure_legacy_view(payload)
 
 
 __all__ = (

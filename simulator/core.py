@@ -714,7 +714,26 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_sulfur_saturation_result: SulfurSaturationResult | None = None
         self.setpoints = copy.deepcopy(setpoints)
         self.feedstocks = copy.deepcopy(feedstocks)
-        self.vapor_pressures = copy.deepcopy(vapor_pressures)
+        from simulator.vapour_rail.catalog import compile_vapour_rail_catalog
+
+        retained_catalog_payload = getattr(
+            vapor_pressures, "catalog_payload", None
+        )
+        self.vapor_pressure_catalog_data = copy.deepcopy(
+            retained_catalog_payload
+            if retained_catalog_payload is not None
+            else vapor_pressures
+        )
+        self.vapour_rail_catalog = (
+            compile_vapour_rail_catalog(self.vapor_pressure_catalog_data)
+            if self.vapor_pressure_catalog_data.get("schema_version") == 2
+            else None
+        )
+        self.vapor_pressures = (
+            self.vapour_rail_catalog.legacy_view()
+            if self.vapour_rail_catalog is not None
+            else copy.deepcopy(dict(vapor_pressures))
+        )
         self.materials = copy.deepcopy(materials) if materials is not None else None
         self.lab_geometry = parse_lab_geometry(
             self.setpoints.get("lab_geometry"),
@@ -996,7 +1015,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # module-mutation call.
             self._condensation_model = CondensationModel(
                 self.train,
-                vapor_pressure_data=self.vapor_pressures,
+                vapor_pressure_data=self.vapor_pressure_catalog_data,
                 wall_temperature_C=self.overhead_model.pipe_temperature_C,
                 materials=self.materials,
             )
@@ -1244,7 +1263,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     @staticmethod
     def _load_species_formula_registry() -> dict:
         catalog = Path(__file__).resolve().parents[1] / 'data' / 'species_catalog.yaml'
-        return load_species_formulas(catalog)
+        import yaml
+
+        payload = yaml.safe_load(catalog.read_text(encoding='utf-8')) or {}
+        # VR-3 collision-only gas IDs close the catalog namespace but remain
+        # dormant until manifest request rules land. Do not let those metadata
+        # rows perturb the live formula-registry identity or physical outputs.
+        payload['species'] = [
+            row
+            for row in payload.get('species', [])
+            if not (
+                isinstance(row, Mapping)
+                and str(row.get('id', '')).endswith('_gas')
+                and row.get('direct_vapour_flux') is False
+            )
+        ]
+        return load_species_formulas(payload)
 
     def _registry_for_feedstock(self, feedstock: Mapping[str, Any]) -> dict:
         registry = dict(self._base_species_formula_registry)
@@ -1638,7 +1672,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         from engines.vaporock import VapoRockProvider
 
-        builtin_provider = BuiltinVaporPressureProvider(self.vapor_pressures)
+        builtin_provider = BuiltinVaporPressureProvider(
+            self.vapor_pressure_catalog_data
+        )
         self._chem_registry.register_idempotent(
             builtin_provider,
             [ChemistryIntent.VAPOR_PRESSURE],

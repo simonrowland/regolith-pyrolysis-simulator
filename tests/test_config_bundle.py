@@ -62,7 +62,7 @@ def test_load_config_bundle_digests_are_stable_and_scoped() -> None:
     for name, path in first.source_paths.items():
         if name in FUNCTIONAL_DATA_CONFIGS:
             assert first.digests[name] == functional_data_yaml_digest(
-                getattr(first, name)
+                yaml.safe_load(path.read_text())
             )
         else:
             assert first.digests[name] == sha256(path.read_bytes()).hexdigest()

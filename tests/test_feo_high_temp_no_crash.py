@@ -31,6 +31,9 @@ def _force_builtin_vapor_pressure_fallback(sim: PyrolysisSimulator) -> None:
 
 def test_high_temp_fallback_routes_fe_as_metallic_fe_without_accountingerror():
     vapor_pressures = _load_yaml("vapor_pressures.yaml")
+    from simulator.vapour_rail.catalog import vapor_pressure_compatibility_view
+
+    vapor_pressures = vapor_pressure_compatibility_view(vapor_pressures)
     assert "FeO_vapor" not in (vapor_pressures.get("oxide_vapors") or {})
 
     feedstocks = {

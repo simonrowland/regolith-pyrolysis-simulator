@@ -81,7 +81,10 @@ ALKALI_EXTERNAL_ANCHORS = {
 
 def _vapor_pressure_data() -> dict:
     with (DATA_DIR / "vapor_pressures.yaml").open() as handle:
-        return yaml.safe_load(handle)
+        payload = yaml.safe_load(handle)
+    from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+
+    return vapor_pressure_legacy_view(payload)
 
 
 def _antoine_coefficients(species: str) -> dict:

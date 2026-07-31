@@ -1,55 +1,72 @@
-# Vapor Pressure YAML Schema
+# Vapour-Pressure Catalog Schema v2
 
-`data/vapor_pressures.yaml` stores fallback Antoine coefficients used by the
-builtin `VAPOR_PRESSURE` path. Every `metals` and `oxide_vapors` row must
-declare `fit_target` so consumers can tell whether the raw Antoine term is a
-pure-component vapor pressure, a back-solved pseudo-standard term, or an
-explicit reaction term.
+`data/vapor_pressures.yaml` is the single hot-vapour authority. Its root is:
 
-## `fit_target` Values
+```yaml
+schema_version: 2
+families:
+  <co_evolving_family_id>:
+    physical_properties: {...}
+    fiat_routing: {...}
+    vaporisation_coefficients: {...}
+    code_metadata: {...}
+```
 
-`pure_component_psat`
+Every family contains exactly those four strata. The typed compiler is
+`simulator.vapour_rail.catalog.compile_vapour_rail_catalog`; runtime code must
+not infer capability from field presence. During the U1--U5 shadow period,
+`vapor_pressure_legacy_view` generates the old `metals`, `oxide_vapors`, and
+`foulant_vapor` maps. Those maps are not duplicated in YAML.
 
-: `antoine` evaluates a pure-species saturation pressure. The builtin metal
-  loop multiplies the result by the Ellingham liquid-metal activity `a_M`; this
-  is single-counted when the coefficients are genuinely pure-component or
-  legacy approximations to that basis. Rows with this target must include a
-  `source` field. If an entry is present but not emitted by the active consumer,
-  add `consumer_status: inactive`.
+## Physical properties
 
-`pseudo_psat_backsolved_from_vaporock`
+`physical_properties.species` maps canonical gas IDs to rows. Every row has:
 
-: `antoine` evaluates a pseudo-standard term fitted so the final consumer
-  chain matches VapoRock partial pressures after the existing activity and
-  pO2 factors are applied. Rows with this target must include a `backsolve`
-  block containing:
+- an atom-explicit `formula`;
+- `validation.status` (`pending_validation` or `validated`) and `anchor_refs`;
+- zero or more balanced `source_reactions`;
+- one typed `pressure_models` entry with `pressure_kind`, `species_basis`,
+  `valid_domain.temperature_K`, provenance, and evaluator family.
 
-  - `feedstock_grid`: calibration composition set.
-  - `fO2_convention`: oxygen-fugacity convention used by the fit.
-  - `activity_formula`: consumer-side activity/pO2 expression included in the
-    final fitted chain.
-  - `target`: VapoRock partial-pressure target.
-  - `residual_dex`: maximum reported residual in log10 pressure units.
+VR-3 supports `antoine`, `standard_reaction_term`, and
+`tabulated_equilibrium`. NASA CEA evaluators belong to VR-4. An unavailable
+Stage-0 identity row declares `availability: unavailable_pending_acquisition`;
+it compiles metadata but no executable pressure evaluator.
 
-`standard_reaction_term`
+`standard_reaction_term` requires `source_reaction_id`, an atom-balanced
+reaction, and a typed `reference_pressure_model`. The reference may be Antoine
+or tabulated; an `antoine` sibling is not required. Activity and pO2 exponents
+are applied exactly once by the compiled evaluator.
 
-: `antoine` evaluates a standard-reaction ΔG-equivalent term for either a
-  metal or oxide-vapor row. The consumer applies explicit oxide-activity and
-  pO2 exponents from the YAML reaction metadata. The row must state its
-  pressure basis explicitly (`pressure_standard_Pa`, `pO2_reference_bar`) when
-  the source thermodynamics use a different standard state, such as 1 atm
-  Lamoreaux-Hildenbrand data converted to the runtime Pa/bar convention. Rows
-  with this target must include a `reaction` block containing:
+## Fiat routing
 
-  - `formula`: reaction represented by the standard term.
-  - `exponent_oxide`: oxide activity exponent used by the consumer.
-  - `exponent_pO2`: pO2 exponent used by the consumer.
-  - `basis`: source/provenance of the standard-reaction fit.
+This stratum contains engineering choices only: plant bin, capture policy,
+products/coproducts, and process or terminal destination. It contains no
+physical coefficient.
 
-## Convention Guardrail
+## Vaporisation coefficients
 
-No consumer may infer vapor-pressure convention from comments or species names.
-Schema validation requires the metadata above, and consumer code must preserve
-the existing math: pure-component rows use `a_M * P_sat`; pseudo-backsolved rows
-use the same expression by construction against their calibration grid; standard
-reaction rows apply the declared oxide and pO2 exponents exactly once.
+This stratum owns HKL alpha and uncertainty plus the anti-cliff contract:
+
+```yaml
+extrapolation_policy: conservative_slope_continuation
+out_of_range_status: out_of_range_conservative_continuation
+acquisition_flag: <stable row-specific identifier>
+```
+
+Outside a finite domain, the evaluator continues the endpoint slope in the
+same direction while keeping pressure below straight extrapolation. It never
+flatlines or returns zero solely because temperature crossed the endpoint.
+
+## Code metadata
+
+This stratum owns formula/catalog IDs, source ledger account, request rule,
+solve-group identity, canonical aliases, applicability, and the temporary
+compatibility projection name. Physical values are forbidden here.
+
+## Catalog closure
+
+Collision-only gas names use `_gas`; their catalog row stores the unsuffixed
+chemical formula and atom map. Aggregate/generic rows marked `carrier_only`
+retain `formula: null`, have no pressure models or direct vapour flux, and can
+produce gas only through a balanced decomposition edge.

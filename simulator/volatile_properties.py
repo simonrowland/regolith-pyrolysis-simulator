@@ -883,6 +883,19 @@ def _catalog() -> tuple[
     entries = raw.get("species")
     if not isinstance(entries, Sequence):
         raise _fail("invalid_species_catalog", "species catalog must contain a list")
+    # Collision-only VR catalog rows close the typed species namespace but are
+    # not live volatile-property identities until their request rules compile.
+    # Keeping them out of this legacy registry preserves runtime iteration and
+    # floating-point reduction order while leaving them available to VR users.
+    entries = [
+        entry
+        for entry in entries
+        if not (
+            isinstance(entry, Mapping)
+            and str(entry.get("id", "")).endswith("_gas")
+            and entry.get("direct_vapour_flux") is False
+        )
+    ]
     canonical_specs: dict[str, Mapping[str, Any]] = {}
     aliases: dict[str, str] = {}
     formula_texts: dict[str, str] = {}
@@ -910,7 +923,9 @@ def _catalog() -> tuple[
                     f"catalog alias {alias!r} is duplicated",
                 )
             aliases[alias] = species
-    formulas = load_species_formulas(_SPECIES_CATALOG_PATH)
+    runtime_catalog = dict(raw)
+    runtime_catalog["species"] = entries
+    formulas = load_species_formulas(runtime_catalog)
     return (
         MappingProxyType(formulas),
         MappingProxyType(aliases),
@@ -1271,6 +1286,9 @@ class VolatilePropertyRegistry:
                 )
             with source_file.open("r", encoding="utf-8") as handle:
                 legacy_root = yaml.safe_load(handle) or {}
+            from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+
+            legacy_root = vapor_pressure_legacy_view(legacy_root)
             selector = _required_text(adapter, "source_selector", label)
             if not selector.endswith(".pure_component_antoine"):
                 raise _fail(

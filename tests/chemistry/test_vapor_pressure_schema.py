@@ -7,6 +7,8 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.vapour_rail.catalog import compile_vapour_rail_catalog
+
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 VAPOR_PRESSURES_PATH = REPO_ROOT / "data" / "vapor_pressures.yaml"
@@ -33,6 +35,7 @@ REACTION_FIELDS = {
 
 def _species_rows() -> tuple[tuple[str, str, dict], ...]:
     data = yaml.safe_load(VAPOR_PRESSURES_PATH.read_text()) or {}
+    data = compile_vapour_rail_catalog(data).legacy_view()
     rows: list[tuple[str, str, dict]] = []
     for section in ("metals", "oxide_vapors"):
         for species, row in (data.get(section) or {}).items():
@@ -41,6 +44,24 @@ def _species_rows() -> tuple[tuple[str, str, dict], ...]:
 
 
 SPECIES_ROWS = _species_rows()
+
+
+def test_vapor_pressure_catalog_compiles_exact_four_strata() -> None:
+    data = yaml.safe_load(VAPOR_PRESSURES_PATH.read_text()) or {}
+
+    assert data["schema_version"] == 2
+    assert data["families"]
+    assert all(
+        set(family)
+        == {
+            "physical_properties",
+            "fiat_routing",
+            "vaporisation_coefficients",
+            "code_metadata",
+        }
+        for family in data["families"].values()
+    )
+    assert compile_vapour_rail_catalog(data).species
 
 
 @pytest.mark.parametrize(

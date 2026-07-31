@@ -1,616 +1,1067 @@
 schema_version: 1
-description: >
-  Formula catalog for molar atoms-in/atoms-out accounting. Feedstock keys stay
-  ergonomic: oxide wt% keys remain oxide-equivalent, elemental wt% keys remain
-  elemental-equivalent, and mixture keys use explicit estimated group formulas.
+description: 'Formula catalog for molar atoms-in/atoms-out accounting. Feedstock keys stay ergonomic:
+  oxide wt% keys remain oxide-equivalent, elemental wt% keys remain elemental-equivalent, and mixture
+  keys use explicit estimated group formulas.
 
+  '
 species:
-  # Oxide-equivalent feedstock species.
-  - id: SiO2
-    formula: SiO2
-    basis: oxide_equivalent
-    category: oxide
-    estimated: false
-    source: Stoichiometric oxide formula from species id.
-  - id: TiO2
-    formula: TiO2
-    basis: oxide_equivalent
-    category: oxide
-    estimated: false
-    source: Stoichiometric oxide formula from species id.
-  - id: Al2O3
-    formula: Al2O3
-    basis: oxide_equivalent
-    category: oxide
-    estimated: false
-    source: Stoichiometric oxide formula from species id.
-  - id: FeO
-    formula: FeO
-    basis: oxide_equivalent
-    category: oxide
-    estimated: false
-    source: Stoichiometric oxide formula from species id.
-  - id: Fe2O3
-    formula: Fe2O3
-    basis: oxide_equivalent
-    category: oxide
-    estimated: false
-    source: Stoichiometric oxide formula from species id.
-  - id: MgO
-    formula: MgO
-    basis: oxide_equivalent
-    category: oxide
-    estimated: false
-    source: Stoichiometric oxide formula from species id.
-  - id: CaO
-    formula: CaO
-    basis: oxide_equivalent
-    category: oxide
-    estimated: false
-    source: Stoichiometric oxide formula from species id.
-  - id: Na2O
-    formula: Na2O
-    basis: oxide_equivalent
-    category: oxide
-    estimated: false
-    source: Stoichiometric oxide formula from species id.
-  - id: K2O
-    formula: K2O
-    basis: oxide_equivalent
-    category: oxide
-    estimated: false
-    source: Stoichiometric oxide formula from species id.
-  - id: Cr2O3
-    formula: Cr2O3
-    basis: oxide_equivalent
-    category: oxide
-    estimated: false
-    source: Stoichiometric oxide formula from species id.
-  - id: MnO
-    formula: MnO
-    basis: oxide_equivalent
-    category: oxide
-    estimated: false
-    source: Stoichiometric oxide formula from species id.
-  - id: P2O5
-    formula: P2O5
-    basis: oxide_equivalent
-    category: oxide
-    estimated: false
-    source: Stoichiometric oxide formula from species id.
-  - id: NiO
-    formula: NiO
-    basis: oxide_equivalent
-    category: oxide
-    estimated: false
-    source: Stoichiometric oxide formula from species id.
-  - id: CoO
-    formula: CoO
-    basis: oxide_equivalent
-    category: oxide
-    estimated: false
-    source: Stoichiometric oxide formula from species id.
-  - id: ZrO2
-    formula: ZrO2
-    basis: oxide_equivalent
-    category: oxide
-    estimated: false
-    source: Stoichiometric oxide formula from species id.
-  - id: SO3
-    formula: SO3
-    basis: sulfate_oxide_equivalent
-    category: oxide_equivalent
-    estimated: false
-    source: Stoichiometric SO3 equivalent used for sulfate-style feedstock accounting.
-  - id: CaSO4
-    formula: CaSO4
-    basis: mineral_formula
-    category: salt
-    estimated: false
-    source: Stoichiometric calcium sulfate formula for cation-bearing sulfate Stage 0 routing.
-  - id: MgSO4
-    formula: MgSO4
-    basis: mineral_formula
-    category: salt
-    estimated: false
-    source: Stoichiometric magnesium sulfate formula for cation-bearing sulfate Stage 0 routing.
-  - id: FeSO4
-    formula: FeSO4
-    basis: mineral_formula
-    category: salt
-    estimated: false
-    source: Stoichiometric iron sulfate formula for cation-bearing sulfate Stage 0 routing; NIST WebBook REF-012 and Kanari 2018 per foulant_thermo.yaml.
-  - id: CaS
-    formula: CaS
-    basis: mineral_formula
-    category: sulfide
-    estimated: false
-    source: Calcium sulfide product for low-pO2 cation-sulfate carbothermal reduction branch.
-  - id: MgS
-    formula: MgS
-    basis: mineral_formula
-    category: sulfide
-    estimated: false
-    source: Magnesium sulfide product for low-pO2 cation-sulfate carbothermal reduction branch.
-  - id: ClO4
-    formula: ClO4
-    basis: perchlorate_anion_equivalent
-    category: oxyanion_equivalent
-    estimated: false
-    source: Perchlorate anion-equivalent formula; counter-cation not specified by current feedstock keys.
+- id: SiO2
+  formula: SiO2
+  basis: oxide_equivalent
+  category: oxide
+  estimated: false
+  source: Stoichiometric oxide formula from species id.
+- id: TiO2
+  formula: TiO2
+  basis: oxide_equivalent
+  category: oxide
+  estimated: false
+  source: Stoichiometric oxide formula from species id.
+- id: Al2O3
+  formula: Al2O3
+  basis: oxide_equivalent
+  category: oxide
+  estimated: false
+  source: Stoichiometric oxide formula from species id.
+- id: FeO
+  formula: FeO
+  basis: oxide_equivalent
+  category: oxide
+  estimated: false
+  source: Stoichiometric oxide formula from species id.
+- id: Fe2O3
+  formula: Fe2O3
+  basis: oxide_equivalent
+  category: oxide
+  estimated: false
+  source: Stoichiometric oxide formula from species id.
+- id: MgO
+  formula: MgO
+  basis: oxide_equivalent
+  category: oxide
+  estimated: false
+  source: Stoichiometric oxide formula from species id.
+- id: CaO
+  formula: CaO
+  basis: oxide_equivalent
+  category: oxide
+  estimated: false
+  source: Stoichiometric oxide formula from species id.
+- id: Na2O
+  formula: Na2O
+  basis: oxide_equivalent
+  category: oxide
+  estimated: false
+  source: Stoichiometric oxide formula from species id.
+- id: K2O
+  formula: K2O
+  basis: oxide_equivalent
+  category: oxide
+  estimated: false
+  source: Stoichiometric oxide formula from species id.
+- id: Cr2O3
+  formula: Cr2O3
+  basis: oxide_equivalent
+  category: oxide
+  estimated: false
+  source: Stoichiometric oxide formula from species id.
+- id: MnO
+  formula: MnO
+  basis: oxide_equivalent
+  category: oxide
+  estimated: false
+  source: Stoichiometric oxide formula from species id.
+- id: P2O5
+  formula: P2O5
+  basis: oxide_equivalent
+  category: oxide
+  estimated: false
+  source: Stoichiometric oxide formula from species id.
+- id: NiO
+  formula: NiO
+  basis: oxide_equivalent
+  category: oxide
+  estimated: false
+  source: Stoichiometric oxide formula from species id.
+- id: CoO
+  formula: CoO
+  basis: oxide_equivalent
+  category: oxide
+  estimated: false
+  source: Stoichiometric oxide formula from species id.
+- id: ZrO2
+  formula: ZrO2
+  basis: oxide_equivalent
+  category: oxide
+  estimated: false
+  source: Stoichiometric oxide formula from species id.
+- id: SO3
+  formula: SO3
+  basis: sulfate_oxide_equivalent
+  category: oxide_equivalent
+  estimated: false
+  source: Stoichiometric SO3 equivalent used for sulfate-style feedstock accounting.
+- id: CaSO4
+  formula: CaSO4
+  basis: mineral_formula
+  category: salt
+  estimated: false
+  source: Stoichiometric calcium sulfate formula for cation-bearing sulfate Stage 0 routing.
+- id: MgSO4
+  formula: MgSO4
+  basis: mineral_formula
+  category: salt
+  estimated: false
+  source: Stoichiometric magnesium sulfate formula for cation-bearing sulfate Stage 0 routing.
+- id: FeSO4
+  formula: FeSO4
+  basis: mineral_formula
+  category: salt
+  estimated: false
+  source: Stoichiometric iron sulfate formula for cation-bearing sulfate Stage 0 routing; NIST WebBook
+    REF-012 and Kanari 2018 per foulant_thermo.yaml.
+- id: CaS
+  formula: CaS
+  basis: mineral_formula
+  category: sulfide
+  estimated: false
+  source: Calcium sulfide product for low-pO2 cation-sulfate carbothermal reduction branch.
+- id: MgS
+  formula: MgS
+  basis: mineral_formula
+  category: sulfide
+  estimated: false
+  source: Magnesium sulfide product for low-pO2 cation-sulfate carbothermal reduction branch.
+- id: ClO4
+  formula: ClO4
+  basis: perchlorate_anion_equivalent
+  category: oxyanion_equivalent
+  estimated: false
+  source: Perchlorate anion-equivalent formula; counter-cation not specified by current feedstock keys.
+- id: MgCO3
+  formula: MgCO3
+  basis: mineral_formula
+  category: salt
+  estimated: false
+  source: Magnesium carbonate formula for Stage 0 carbonate decomposition and carbonate_salts surrogate
+    expansion.
+- id: CaCO3
+  formula: CaCO3
+  basis: mineral_formula
+  category: salt
+  estimated: false
+  source: Calcium carbonate formula for Stage 0 carbonate decomposition and carbonate_salts surrogate
+    expansion.
+- id: FeCO3
+  formula: FeCO3
+  basis: mineral_formula
+  category: salt
+  estimated: false
+  source: Iron carbonate formula for the Stage 0 carbonate stoichiometry table.
+- id: Na2CO3
+  formula: Na2CO3
+  basis: mineral_formula
+  category: salt
+  estimated: false
+  source: Sodium carbonate formula for the carbonate_salts surrogate component and Na2CO3 silicate-displacement
+    gate; NIST WebBook REF-012 per foulant_thermo.yaml.
+- id: K2CO3
+  formula: K2CO3
+  basis: mineral_formula
+  category: salt
+  estimated: false
+  source: Potassium carbonate formula for the Stage 0 carbonate stoichiometry table.
+- id: Na
+  formula: Na
+  basis: elemental_equivalent
+  category: metal
+  estimated: false
+  source: Elemental formula from species id.
+- id: K
+  formula: K
+  basis: elemental_equivalent
+  category: metal
+  estimated: false
+  source: Elemental formula from species id.
+- id: Fe
+  formula: Fe
+  basis: elemental_equivalent
+  category: metal
+  estimated: false
+  source: Elemental formula from species id.
+- id: FeSi
+  formula: FeSi
+  basis: molecular_formula
+  category: alloy
+  estimated: false
+  source: Stoichiometric iron monosilicide wall product for C4b Fe + Si capture; owner-confirmed FeSi-only
+    first product.
+- id: Mg
+  formula: Mg
+  basis: elemental_equivalent
+  category: metal
+  estimated: false
+  source: Elemental formula from species id.
+- id: Si
+  formula: Si
+  basis: elemental_equivalent
+  category: metalloid
+  estimated: false
+  source: Elemental formula from species id.
+- id: Ti
+  formula: Ti
+  basis: elemental_equivalent
+  category: metal
+  estimated: false
+  source: Elemental formula from species id.
+- id: Al
+  formula: Al
+  basis: elemental_equivalent
+  category: metal
+  estimated: false
+  source: Elemental formula from species id.
+- id: Ca
+  formula: Ca
+  basis: elemental_equivalent
+  category: metal
+  estimated: false
+  source: Elemental formula from species id.
+- id: Cr
+  formula: Cr
+  basis: elemental_equivalent
+  category: metal
+  estimated: false
+  source: Elemental formula from species id.
+- id: Mn
+  formula: Mn
+  basis: elemental_equivalent
+  category: metal
+  estimated: false
+  source: Elemental formula from species id.
+- id: Ni
+  formula: Ni
+  basis: elemental_equivalent
+  category: metal
+  estimated: false
+  source: Elemental formula from species id.
+- id: Co
+  formula: Co
+  basis: elemental_equivalent
+  category: metal
+  estimated: false
+  source: Elemental formula from species id.
+- id: C
+  formula: C
+  basis: elemental_equivalent
+  category: nonmetal
+  estimated: false
+  source: Elemental formula from species id.
+- id: S
+  formula: S
+  basis: elemental_equivalent
+  category: nonmetal
+  estimated: false
+  aliases:
+  - S_kg_per_tonne
+  source: Elemental formula from species id.
+- id: Cl
+  formula: Cl
+  basis: elemental_equivalent
+  category: halogen
+  estimated: false
+  source: Elemental formula from species id.
+- id: P
+  formula: P
+  basis: elemental_equivalent
+  category: nonmetal
+  estimated: false
+  source: Elemental formula from species id.
+- id: O2
+  formula: O2
+  basis: molecular_formula
+  category: gas
+  estimated: false
+  source: Stoichiometric molecular formula from species id.
+- id: O2_extra
+  formula: O2
+  basis: molecular_formula
+  category: gas
+  estimated: false
+  aliases:
+  - O2_extra_kg_per_tonne
+  source: Extra oxygen product key mapped to O2.
+- id: N2
+  formula: N2
+  basis: molecular_formula
+  category: gas
+  estimated: false
+  source: Stoichiometric molecular formula from species id.
+- id: S2
+  formula: S2
+  basis: molecular_formula
+  category: gas
+  estimated: false
+  source: Stoichiometric molecular formula from species id.
+- id: SO2
+  formula: SO2
+  basis: molecular_formula
+  category: gas
+  estimated: false
+  source: Stoichiometric molecular formula from species id.
+- id: H2O
+  formula: H2O
+  basis: molecular_formula
+  category: volatile
+  estimated: false
+  aliases:
+  - H2O_kg_per_tonne
+  source: Stoichiometric molecular formula from species id.
+- id: H2O_ice_structural
+  formula: H2O
+  basis: molecular_formula
+  category: volatile
+  estimated: false
+  aliases:
+  - H2O_ice_structural_kg_per_tonne
+  source: Ice and structural water accounting key mapped to H2O.
+- id: CO2
+  formula: CO2
+  basis: molecular_formula
+  category: gas
+  estimated: false
+  source: Stoichiometric molecular formula from species id.
+- id: CO
+  formula: CO
+  basis: molecular_formula
+  category: gas
+  estimated: false
+  source: Stoichiometric molecular formula from species id.
+- id: CH4
+  formula: CH4
+  basis: molecular_formula
+  category: gas
+  estimated: false
+  source: Stoichiometric molecular formula from species id.
+- id: NH3
+  formula: NH3
+  basis: molecular_formula
+  category: gas
+  estimated: false
+  aliases:
+  - NH3_kg_per_tonne
+  source: Stoichiometric molecular formula from species id.
+- id: HCN
+  formula: HCN
+  basis: molecular_formula
+  category: gas
+  estimated: false
+  source: Stoichiometric molecular formula from species id.
+- id: SiO
+  formula: SiO
+  basis: molecular_formula
+  category: vapor
+  estimated: false
+  source: Stoichiometric vapor formula from species id.
+- id: CrO2
+  atoms:
+    Cr: 1
+    O: 2
+  basis: molecular_formula
+  category: vapor
+  estimated: false
+  source: CrO2(g) chromium-bearing vapor species; atoms explicit for Cr2O3/O2 condensation accounting.
+- id: NaCl
+  formula: NaCl
+  basis: molecular_formula
+  category: salt
+  estimated: false
+  source: Stoichiometric salt formula from species id.
+- id: KCl
+  formula: KCl
+  basis: molecular_formula
+  category: salt
+  estimated: false
+  source: Stoichiometric salt formula from species id.
+- id: CaF2
+  formula: CaF2
+  basis: mineral_formula
+  category: refractory_salt
+  estimated: false
+  aliases:
+  - fluorite
+  source: Calcium fluoride (fluorite); refractory at furnace-survivable T (b.p. ~2530 C).
+- id: NaF
+  formula: NaF
+  basis: molecular_formula
+  category: salt
+  estimated: false
+  source: Sodium fluoride; volatile under mbar vacuum at Stage-0 T (b.p. ~1695 C).
+- id: MgF2
+  formula: MgF2
+  basis: mineral_formula
+  category: refractory_salt
+  estimated: false
+  source: Magnesium fluoride; refractory at furnace-survivable T (b.p. ~2260 C).
+- id: Ca3Al2O6
+  formula: Ca3Al2O6
+  basis: mineral_formula
+  category: calcium_aluminate
+  estimated: false
+  aliases:
+  - C3A
+  - tricalcium_aluminate
+  source: Tricalcium aluminate C3A; C7 calcium-aluminate accounting product.
+- id: Ca12Al14O33
+  formula: Ca12Al14O33
+  basis: mineral_formula
+  category: calcium_aluminate
+  estimated: false
+  aliases:
+  - C12A7
+  - mayenite
+  source: Mayenite dodecacalcium hepta-aluminate; C7 calcium-aluminate accounting product.
+- id: sulfuric_acid_feedstock
+  formula: H2SO4
+  basis: molecular_formula
+  category: feedstock_additive
+  estimated: false
+  aliases:
+  - sulfuric_acid_feedstock_kg_per_tonne
+  source: Feedstock additive key interpreted as sulfuric acid, H2SO4.
+- id: REE_oxides
+  atoms:
+    La: 2
+    O: 3
+  basis: estimated_oxide_equivalent
+  category: estimated_group
+  estimated: true
+  uncertainty: high
+  aliases:
+  - rare_earth_oxides
+  source: Representative trivalent light rare-earth sesquioxide, La2O3; actual REE distribution unavailable
+    in current feedstock keys.
+  formula: null
+  catalog_role: carrier_only
+  direct_vapour_flux: false
+  requires_balanced_decomposition: true
+  pressure_models: []
+- id: carbonate_salts
+  atoms:
+    Mg: 1
+    Ca: 1
+    Na: 2
+    C: 3
+    O: 9
+  basis: estimated_group_formula
+  category: salt_group
+  estimated: true
+  uncertainty: high
+  aliases:
+  - carbonate_salts_kg_per_tonne
+  components:
   - id: MgCO3
-    formula: MgCO3
-    basis: mineral_formula
-    category: salt
-    estimated: false
-    source: Magnesium carbonate formula for Stage 0 carbonate decomposition and carbonate_salts surrogate expansion.
+    moles: 1
   - id: CaCO3
-    formula: CaCO3
-    basis: mineral_formula
-    category: salt
-    estimated: false
-    source: Calcium carbonate formula for Stage 0 carbonate decomposition and carbonate_salts surrogate expansion.
-  - id: FeCO3
-    formula: FeCO3
-    basis: mineral_formula
-    category: salt
-    estimated: false
-    source: Iron carbonate formula for the Stage 0 carbonate stoichiometry table.
+    moles: 1
   - id: Na2CO3
-    formula: Na2CO3
-    basis: mineral_formula
-    category: salt
-    estimated: false
-    source: Sodium carbonate formula for the carbonate_salts surrogate component and Na2CO3 silicate-displacement gate; NIST WebBook REF-012 per foulant_thermo.yaml.
-  - id: K2CO3
-    formula: K2CO3
-    basis: mineral_formula
-    category: salt
-    estimated: false
-    source: Potassium carbonate formula for the Stage 0 carbonate stoichiometry table.
-
-  # Elemental-equivalent feedstock species and recovered metals.
-  - id: Na
-    formula: Na
-    basis: elemental_equivalent
-    category: metal
-    estimated: false
-    source: Elemental formula from species id.
-  - id: K
-    formula: K
-    basis: elemental_equivalent
-    category: metal
-    estimated: false
-    source: Elemental formula from species id.
-  - id: Fe
-    formula: Fe
-    basis: elemental_equivalent
-    category: metal
-    estimated: false
-    source: Elemental formula from species id.
-  - id: FeSi
-    formula: FeSi
-    basis: molecular_formula
-    category: alloy
-    estimated: false
-    source: Stoichiometric iron monosilicide wall product for C4b Fe + Si capture; owner-confirmed FeSi-only first product.
-  - id: Mg
-    formula: Mg
-    basis: elemental_equivalent
-    category: metal
-    estimated: false
-    source: Elemental formula from species id.
-  - id: Si
-    formula: Si
-    basis: elemental_equivalent
-    category: metalloid
-    estimated: false
-    source: Elemental formula from species id.
-  - id: Ti
-    formula: Ti
-    basis: elemental_equivalent
-    category: metal
-    estimated: false
-    source: Elemental formula from species id.
-  - id: Al
-    formula: Al
-    basis: elemental_equivalent
-    category: metal
-    estimated: false
-    source: Elemental formula from species id.
-  - id: Ca
-    formula: Ca
-    basis: elemental_equivalent
-    category: metal
-    estimated: false
-    source: Elemental formula from species id.
-  - id: Cr
-    formula: Cr
-    basis: elemental_equivalent
-    category: metal
-    estimated: false
-    source: Elemental formula from species id.
-  - id: Mn
-    formula: Mn
-    basis: elemental_equivalent
-    category: metal
-    estimated: false
-    source: Elemental formula from species id.
-  - id: Ni
-    formula: Ni
-    basis: elemental_equivalent
-    category: metal
-    estimated: false
-    source: Elemental formula from species id.
-  - id: Co
-    formula: Co
-    basis: elemental_equivalent
-    category: metal
-    estimated: false
-    source: Elemental formula from species id.
-  - id: C
-    formula: C
-    basis: elemental_equivalent
-    category: nonmetal
-    estimated: false
-    source: Elemental formula from species id.
-  - id: S
-    formula: S
-    basis: elemental_equivalent
-    category: nonmetal
-    estimated: false
-    aliases:
-      - S_kg_per_tonne
-    source: Elemental formula from species id.
-  - id: Cl
-    formula: Cl
-    basis: elemental_equivalent
-    category: halogen
-    estimated: false
-    source: Elemental formula from species id.
-  - id: P
-    formula: P
-    basis: elemental_equivalent
-    category: nonmetal
-    estimated: false
-    source: Elemental formula from species id.
-
-  # Exact molecular, gas, vapor, salt, and additive species.
-  - id: O2
-    formula: O2
-    basis: molecular_formula
-    category: gas
-    estimated: false
-    source: Stoichiometric molecular formula from species id.
-  - id: O2_extra
-    formula: O2
-    basis: molecular_formula
-    category: gas
-    estimated: false
-    aliases:
-      - O2_extra_kg_per_tonne
-    source: Extra oxygen product key mapped to O2.
-  - id: N2
-    formula: N2
-    basis: molecular_formula
-    category: gas
-    estimated: false
-    source: Stoichiometric molecular formula from species id.
-  - id: S2
-    formula: S2
-    basis: molecular_formula
-    category: gas
-    estimated: false
-    source: Stoichiometric molecular formula from species id.
-  - id: SO2
-    formula: SO2
-    basis: molecular_formula
-    category: gas
-    estimated: false
-    source: Stoichiometric molecular formula from species id.
-  - id: H2O
-    formula: H2O
-    basis: molecular_formula
-    category: volatile
-    estimated: false
-    aliases:
-      - H2O_kg_per_tonne
-    source: Stoichiometric molecular formula from species id.
-  - id: H2O_ice_structural
-    formula: H2O
-    basis: molecular_formula
-    category: volatile
-    estimated: false
-    aliases:
-      - H2O_ice_structural_kg_per_tonne
-    source: Ice and structural water accounting key mapped to H2O.
-  - id: CO2
-    formula: CO2
-    basis: molecular_formula
-    category: gas
-    estimated: false
-    source: Stoichiometric molecular formula from species id.
-  - id: CO
-    formula: CO
-    basis: molecular_formula
-    category: gas
-    estimated: false
-    source: Stoichiometric molecular formula from species id.
-  - id: CH4
-    formula: CH4
-    basis: molecular_formula
-    category: gas
-    estimated: false
-    source: Stoichiometric molecular formula from species id.
-  - id: NH3
-    formula: NH3
-    basis: molecular_formula
-    category: gas
-    estimated: false
-    aliases:
-      - NH3_kg_per_tonne
-    source: Stoichiometric molecular formula from species id.
-  - id: HCN
-    formula: HCN
-    basis: molecular_formula
-    category: gas
-    estimated: false
-    source: Stoichiometric molecular formula from species id.
-  - id: SiO
-    formula: SiO
-    basis: molecular_formula
-    category: vapor
-    estimated: false
-    source: Stoichiometric vapor formula from species id.
-  - id: CrO2
-    atoms:
-      Cr: 1
-      O: 2
-    basis: molecular_formula
-    category: vapor
-    estimated: false
-    source: CrO2(g) chromium-bearing vapor species; atoms explicit for Cr2O3/O2 condensation accounting.
+    moles: 1
+  source: Equal-molar MgCO3/CaCO3/Na2CO3 surrogate from feedstock note naming Mg/Ca/Na carbonates; actual
+    salt distribution unavailable.
+  formula: null
+  catalog_role: carrier_only
+  direct_vapour_flux: false
+  requires_balanced_decomposition: true
+  pressure_models: []
+- id: NaCl_KCl_salts
+  atoms:
+    Na: 1
+    K: 1
+    Cl: 2
+  basis: estimated_group_formula
+  category: salt_group
+  estimated: true
+  uncertainty: medium
+  aliases:
+  - NaCl_KCl_salts_kg_per_tonne
+  components:
   - id: NaCl
-    formula: NaCl
-    basis: molecular_formula
-    category: salt
-    estimated: false
-    source: Stoichiometric salt formula from species id.
+    moles: 1
   - id: KCl
-    formula: KCl
-    basis: molecular_formula
-    category: salt
-    estimated: false
-    source: Stoichiometric salt formula from species id.
-  - id: CaF2
-    formula: CaF2
-    basis: mineral_formula
-    category: refractory_salt
-    estimated: false
-    aliases:
-      - fluorite
-    source: Calcium fluoride (fluorite); refractory at furnace-survivable T (b.p. ~2530 C).
-  - id: NaF
-    formula: NaF
-    basis: molecular_formula
-    category: salt
-    estimated: false
-    source: Sodium fluoride; volatile under mbar vacuum at Stage-0 T (b.p. ~1695 C).
-  - id: MgF2
-    formula: MgF2
-    basis: mineral_formula
-    category: refractory_salt
-    estimated: false
-    source: Magnesium fluoride; refractory at furnace-survivable T (b.p. ~2260 C).
-  - id: Ca3Al2O6
-    formula: Ca3Al2O6
-    basis: mineral_formula
-    category: calcium_aluminate
-    estimated: false
-    aliases:
-      - C3A
-      - tricalcium_aluminate
-    source: Tricalcium aluminate C3A; C7 calcium-aluminate accounting product.
-  - id: Ca12Al14O33
-    formula: Ca12Al14O33
-    basis: mineral_formula
-    category: calcium_aluminate
-    estimated: false
-    aliases:
-      - C12A7
-      - mayenite
-    source: Mayenite dodecacalcium hepta-aluminate; C7 calcium-aluminate accounting product.
-  - id: sulfuric_acid_feedstock
-    formula: H2SO4
-    basis: molecular_formula
-    category: feedstock_additive
-    estimated: false
-    aliases:
-      - sulfuric_acid_feedstock_kg_per_tonne
-    source: Feedstock additive key interpreted as sulfuric acid, H2SO4.
-
-  # Estimated groups. Atoms describe accounting surrogates, not real molecules.
-  - id: REE_oxides
-    atoms:
-      La: 2
-      O: 3
-    basis: estimated_oxide_equivalent
-    category: estimated_group
-    estimated: true
-    uncertainty: high
-    aliases:
-      - rare_earth_oxides
-    source: Representative trivalent light rare-earth sesquioxide, La2O3; actual REE distribution unavailable in current feedstock keys.
-  - id: carbonate_salts
-    atoms:
-      Mg: 1
-      Ca: 1
-      Na: 2
-      C: 3
-      O: 9
-    basis: estimated_group_formula
-    category: salt_group
-    estimated: true
-    uncertainty: high
-    aliases:
-      - carbonate_salts_kg_per_tonne
-    components:
-      - id: MgCO3
-        moles: 1
-      - id: CaCO3
-        moles: 1
-      - id: Na2CO3
-        moles: 1
-    source: Equal-molar MgCO3/CaCO3/Na2CO3 surrogate from feedstock note naming Mg/Ca/Na carbonates; actual salt distribution unavailable.
-  - id: NaCl_KCl_salts
-    atoms:
-      Na: 1
-      K: 1
-      Cl: 2
-    basis: estimated_group_formula
-    category: salt_group
-    estimated: true
-    uncertainty: medium
-    aliases:
-      - NaCl_KCl_salts_kg_per_tonne
-    components:
-      - id: NaCl
-        moles: 1
-      - id: KCl
-        moles: 1
-    source: Equal-molar NaCl/KCl surrogate; actual Na:K salt split unavailable.
-  - id: CO_CO2
-    atoms:
-      C: 2
-      O: 3
-    basis: estimated_group_formula
-    category: gas_group
-    estimated: true
-    requires_feedstock_metadata: true
-    uncertainty: high
-    aliases:
-      - CO_CO2_kg_per_tonne
-    components:
-      - id: CO
-        moles: 1
-      - id: CO2
-        moles: 1
-    source: Equal-molar CO/CO2 surrogate; current feedstock keys do not specify split.
-  - id: CH4_NH3_HCN
-    atoms:
-      C: 2
-      H: 8
-      N: 2
-    basis: estimated_group_formula
-    category: gas_group
-    estimated: true
-    requires_feedstock_metadata: true
-    uncertainty: high
-    aliases:
-      - CH4_NH3_HCN_kg_per_tonne
-    components:
-      - id: CH4
-        moles: 1
-      - id: NH3
-        moles: 1
-      - id: HCN
-        moles: 1
-    source: Equal-molar CH4/NH3/HCN surrogate; current feedstock keys do not specify split.
-  - id: NH3_HCN
-    atoms:
-      C: 1
-      H: 4
-      N: 2
-    basis: estimated_group_formula
-    category: gas_group
-    estimated: true
-    requires_feedstock_metadata: true
-    uncertainty: high
-    aliases:
-      - NH3_HCN_kg_per_tonne
-    components:
-      - id: NH3
-        moles: 1
-      - id: HCN
-        moles: 1
-    source: Equal-molar NH3/HCN surrogate; current feedstock keys do not specify split.
-  - id: CO_CH4_propellant
-    atoms:
-      C: 2
-      H: 4
-      O: 1
-    basis: estimated_group_formula
-    category: gas_group
-    estimated: true
-    requires_feedstock_metadata: true
-    uncertainty: high
-    aliases:
-      - CO_CH4_propellant_kg_per_tonne
-    components:
-      - id: CO
-        moles: 1
-      - id: CH4
-        moles: 1
-    source: Equal-molar CO/CH4 propellant surrogate; current feedstock keys do not specify split.
-  - id: Fe_Ni_alloy
-    atoms:
-      Fe: 19
-      Ni: 1
-    basis: estimated_group_formula
-    category: alloy
-    estimated: true
-    uncertainty: medium
-    aliases:
-      - Fe_Ni_alloy_kg_per_tonne
-    components:
-      - id: Fe
-        moles: 19
-      - id: Ni
-        moles: 1
-    source: Representative Fe-Ni alloy at about 5 mol% Ni, matching current 3-8% Ni note only as an accounting surrogate.
-  - id: metallic_FeNi
-    atoms:
-      Fe: 19
-      Ni: 1
-    basis: estimated_group_formula
-    category: alloy
-    estimated: true
-    uncertainty: medium
-    aliases:
-      - metallic_FeNi_wt_pct
-    components:
-      - id: Fe
-        moles: 19
-      - id: Ni
-        moles: 1
-    source: Representative separated metallic Fe-Ni phase for ordinary-chondrite magnetic metal; exact subtype split unavailable.
-  - id: FeS_troilite
-    formula: FeS
-    basis: mineral_formula
-    category: sulfide
-    estimated: false
-    aliases:
-      - FeS_troilite_wt_pct
-    source: Troilite formula FeS.
-  - id: generic_carbonaceous_hydrocarbon
-    atom_mass_fractions:
-      C: 0.856
-      H: 0.144
-    basis: generic_template
-    category: organic_group
-    estimated: true
-    requires_feedstock_metadata: true
-    uncertainty: medium
-    source: Generic tar-avoidance hydrocarbon template; feedstocks must opt in through stage0_formula_inventory.template_formula with decomposition and offgas metadata.
-  - id: generic_carbonaceous_organic
-    atom_mass_fractions:
-      C: 0.74
-      H: 0.09
-      O: 0.12
-      N: 0.05
-    basis: generic_template
-    category: organic_group
-    estimated: true
-    requires_feedstock_metadata: true
-    uncertainty: high
-    source: Generic carbonaceous-organic template; feedstocks must opt in through stage0_formula_inventory.template_formula with decomposition and offgas metadata.
+    moles: 1
+  source: Equal-molar NaCl/KCl surrogate; actual Na:K salt split unavailable.
+  formula: null
+  catalog_role: carrier_only
+  direct_vapour_flux: false
+  requires_balanced_decomposition: true
+  pressure_models: []
+- id: CO_CO2
+  atoms:
+    C: 2
+    O: 3
+  basis: estimated_group_formula
+  category: gas_group
+  estimated: true
+  requires_feedstock_metadata: true
+  uncertainty: high
+  aliases:
+  - CO_CO2_kg_per_tonne
+  components:
+  - id: CO
+    moles: 1
+  - id: CO2
+    moles: 1
+  source: Equal-molar CO/CO2 surrogate; current feedstock keys do not specify split.
+  formula: null
+  catalog_role: carrier_only
+  direct_vapour_flux: false
+  requires_balanced_decomposition: true
+  pressure_models: []
+- id: CH4_NH3_HCN
+  atoms:
+    C: 2
+    H: 8
+    N: 2
+  basis: estimated_group_formula
+  category: gas_group
+  estimated: true
+  requires_feedstock_metadata: true
+  uncertainty: high
+  aliases:
+  - CH4_NH3_HCN_kg_per_tonne
+  components:
+  - id: CH4
+    moles: 1
+  - id: NH3
+    moles: 1
+  - id: HCN
+    moles: 1
+  source: Equal-molar CH4/NH3/HCN surrogate; current feedstock keys do not specify split.
+  formula: null
+  catalog_role: carrier_only
+  direct_vapour_flux: false
+  requires_balanced_decomposition: true
+  pressure_models: []
+- id: NH3_HCN
+  atoms:
+    C: 1
+    H: 4
+    N: 2
+  basis: estimated_group_formula
+  category: gas_group
+  estimated: true
+  requires_feedstock_metadata: true
+  uncertainty: high
+  aliases:
+  - NH3_HCN_kg_per_tonne
+  components:
+  - id: NH3
+    moles: 1
+  - id: HCN
+    moles: 1
+  source: Equal-molar NH3/HCN surrogate; current feedstock keys do not specify split.
+  formula: null
+  catalog_role: carrier_only
+  direct_vapour_flux: false
+  requires_balanced_decomposition: true
+  pressure_models: []
+- id: CO_CH4_propellant
+  atoms:
+    C: 2
+    H: 4
+    O: 1
+  basis: estimated_group_formula
+  category: gas_group
+  estimated: true
+  requires_feedstock_metadata: true
+  uncertainty: high
+  aliases:
+  - CO_CH4_propellant_kg_per_tonne
+  components:
+  - id: CO
+    moles: 1
+  - id: CH4
+    moles: 1
+  source: Equal-molar CO/CH4 propellant surrogate; current feedstock keys do not specify split.
+  formula: null
+  catalog_role: carrier_only
+  direct_vapour_flux: false
+  requires_balanced_decomposition: true
+  pressure_models: []
+- id: Fe_Ni_alloy
+  atoms:
+    Fe: 19
+    Ni: 1
+  basis: estimated_group_formula
+  category: alloy
+  estimated: true
+  uncertainty: medium
+  aliases:
+  - Fe_Ni_alloy_kg_per_tonne
+  components:
+  - id: Fe
+    moles: 19
+  - id: Ni
+    moles: 1
+  source: Representative Fe-Ni alloy at about 5 mol% Ni, matching current 3-8% Ni note only as an accounting
+    surrogate.
+  formula: null
+  catalog_role: carrier_only
+  direct_vapour_flux: false
+  requires_balanced_decomposition: true
+  pressure_models: []
+- id: metallic_FeNi
+  atoms:
+    Fe: 19
+    Ni: 1
+  basis: estimated_group_formula
+  category: alloy
+  estimated: true
+  uncertainty: medium
+  aliases:
+  - metallic_FeNi_wt_pct
+  components:
+  - id: Fe
+    moles: 19
+  - id: Ni
+    moles: 1
+  source: Representative separated metallic Fe-Ni phase for ordinary-chondrite magnetic metal; exact subtype
+    split unavailable.
+  formula: null
+  catalog_role: carrier_only
+  direct_vapour_flux: false
+  requires_balanced_decomposition: true
+  pressure_models: []
+- id: FeS_troilite
+  formula: FeS
+  basis: mineral_formula
+  category: sulfide
+  estimated: false
+  aliases:
+  - FeS_troilite_wt_pct
+  source: Troilite formula FeS.
+- id: generic_carbonaceous_hydrocarbon
+  atom_mass_fractions:
+    C: 0.856
+    H: 0.144
+  basis: generic_template
+  category: organic_group
+  estimated: true
+  requires_feedstock_metadata: true
+  uncertainty: medium
+  source: Generic tar-avoidance hydrocarbon template; feedstocks must opt in through stage0_formula_inventory.template_formula
+    with decomposition and offgas metadata.
+  formula: null
+  catalog_role: carrier_only
+  direct_vapour_flux: false
+  requires_balanced_decomposition: true
+  pressure_models: []
+- id: generic_carbonaceous_organic
+  atom_mass_fractions:
+    C: 0.74
+    H: 0.09
+    O: 0.12
+    N: 0.05
+  basis: generic_template
+  category: organic_group
+  estimated: true
+  requires_feedstock_metadata: true
+  uncertainty: high
+  source: Generic carbonaceous-organic template; feedstocks must opt in through stage0_formula_inventory.template_formula
+    with decomposition and offgas metadata.
+  formula: null
+  catalog_role: carrier_only
+  direct_vapour_flux: false
+  requires_balanced_decomposition: true
+  pressure_models: []
+- id: Al2O3_gas
+  formula: Al2O3
+  atoms:
+    Al: 2
+    O: 3
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: gas
+  direct_vapour_flux: false
+  formula_alias: Al2O3
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Al2O3_gas
+  code_metadata:
+    formula_id: Al2O3
+    canonical_aliases:
+    - Al2O3
+    collision_only_suffix: true
+    request_rule: pending_family_compilation
+  source: VR-1 U0 collision_gas membership set
+- id: CaO_gas
+  formula: CaO
+  atoms:
+    Ca: 1
+    O: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: gas
+  direct_vapour_flux: false
+  formula_alias: CaO
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:CaO_gas
+  code_metadata:
+    formula_id: CaO
+    canonical_aliases:
+    - CaO
+    collision_only_suffix: true
+    request_rule: pending_family_compilation
+  source: VR-1 U0 collision_gas membership set
+- id: CoO_gas
+  formula: CoO
+  atoms:
+    Co: 1
+    O: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: gas
+  direct_vapour_flux: false
+  formula_alias: CoO
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:CoO_gas
+  code_metadata:
+    formula_id: CoO
+    canonical_aliases:
+    - CoO
+    collision_only_suffix: true
+    request_rule: pending_family_compilation
+  source: VR-1 U0 collision_gas membership set
+- id: Cr2O3_gas
+  formula: Cr2O3
+  atoms:
+    Cr: 2
+    O: 3
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: gas
+  direct_vapour_flux: false
+  formula_alias: Cr2O3
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Cr2O3_gas
+  code_metadata:
+    formula_id: Cr2O3
+    canonical_aliases:
+    - Cr2O3
+    collision_only_suffix: true
+    request_rule: pending_family_compilation
+  source: VR-1 U0 collision_gas membership set
+- id: Fe2O3_gas
+  formula: Fe2O3
+  atoms:
+    Fe: 2
+    O: 3
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: gas
+  direct_vapour_flux: false
+  formula_alias: Fe2O3
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Fe2O3_gas
+  code_metadata:
+    formula_id: Fe2O3
+    canonical_aliases:
+    - Fe2O3
+    collision_only_suffix: true
+    request_rule: pending_family_compilation
+  source: VR-1 U0 collision_gas membership set
+- id: FeO_gas
+  formula: FeO
+  atoms:
+    Fe: 1
+    O: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: gas
+  direct_vapour_flux: false
+  formula_alias: FeO
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:FeO_gas
+  code_metadata:
+    formula_id: FeO
+    canonical_aliases:
+    - FeO
+    collision_only_suffix: true
+    request_rule: pending_family_compilation
+  source: VR-1 U0 collision_gas membership set
+- id: K2O_gas
+  formula: K2O
+  atoms:
+    K: 2
+    O: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: gas
+  direct_vapour_flux: false
+  formula_alias: K2O
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:K2O_gas
+  code_metadata:
+    formula_id: K2O
+    canonical_aliases:
+    - K2O
+    collision_only_suffix: true
+    request_rule: pending_family_compilation
+  source: VR-1 U0 collision_gas membership set
+- id: MgO_gas
+  formula: MgO
+  atoms:
+    Mg: 1
+    O: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: gas
+  direct_vapour_flux: false
+  formula_alias: MgO
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:MgO_gas
+  code_metadata:
+    formula_id: MgO
+    canonical_aliases:
+    - MgO
+    collision_only_suffix: true
+    request_rule: pending_family_compilation
+  source: VR-1 U0 collision_gas membership set
+- id: MnO_gas
+  formula: MnO
+  atoms:
+    Mn: 1
+    O: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: gas
+  direct_vapour_flux: false
+  formula_alias: MnO
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:MnO_gas
+  code_metadata:
+    formula_id: MnO
+    canonical_aliases:
+    - MnO
+    collision_only_suffix: true
+    request_rule: pending_family_compilation
+  source: VR-1 U0 collision_gas membership set
+- id: Na2O_gas
+  formula: Na2O
+  atoms:
+    Na: 2
+    O: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: gas
+  direct_vapour_flux: false
+  formula_alias: Na2O
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Na2O_gas
+  code_metadata:
+    formula_id: Na2O
+    canonical_aliases:
+    - Na2O
+    collision_only_suffix: true
+    request_rule: pending_family_compilation
+  source: VR-1 U0 collision_gas membership set
+- id: NiO_gas
+  formula: NiO
+  atoms:
+    Ni: 1
+    O: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: gas
+  direct_vapour_flux: false
+  formula_alias: NiO
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:NiO_gas
+  code_metadata:
+    formula_id: NiO
+    canonical_aliases:
+    - NiO
+    collision_only_suffix: true
+    request_rule: pending_family_compilation
+  source: VR-1 U0 collision_gas membership set
+- id: P2O5_gas
+  formula: P2O5
+  atoms:
+    P: 2
+    O: 5
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: gas
+  direct_vapour_flux: false
+  formula_alias: P2O5
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:P2O5_gas
+  code_metadata:
+    formula_id: P2O5
+    canonical_aliases:
+    - P2O5
+    collision_only_suffix: true
+    request_rule: pending_family_compilation
+  source: VR-1 U0 collision_gas membership set
+- id: SiO2_gas
+  formula: SiO2
+  atoms:
+    Si: 1
+    O: 2
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: gas
+  direct_vapour_flux: false
+  formula_alias: SiO2
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:SiO2_gas
+  code_metadata:
+    formula_id: SiO2
+    canonical_aliases:
+    - SiO2
+    collision_only_suffix: true
+    request_rule: pending_family_compilation
+  source: VR-1 U0 collision_gas membership set
+- id: TiO2_gas
+  formula: TiO2
+  atoms:
+    Ti: 1
+    O: 2
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: gas
+  direct_vapour_flux: false
+  formula_alias: TiO2
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:TiO2_gas
+  code_metadata:
+    formula_id: TiO2
+    canonical_aliases:
+    - TiO2
+    collision_only_suffix: true
+    request_rule: pending_family_compilation
+  source: VR-1 U0 collision_gas membership set

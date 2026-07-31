@@ -996,7 +996,17 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         self,
         vapor_pressure_data: Mapping[str, Any],
     ) -> None:
-        self._vapor_pressure_data = dict(vapor_pressure_data or {})
+        from simulator.vapour_rail.catalog import (
+            compile_vapour_rail_catalog,
+            vapor_pressure_legacy_view,
+        )
+
+        self._vapour_rail_catalog = (
+            compile_vapour_rail_catalog(vapor_pressure_data)
+            if vapor_pressure_data.get("schema_version") == 2
+            else None
+        )
+        self._vapor_pressure_data = vapor_pressure_legacy_view(vapor_pressure_data)
         self._pseudo_vapor_pressure_warning_seen: set[str] = set()
 
     def capability_profile(self) -> CapabilityProfile:
@@ -1136,10 +1146,19 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             P_reference_Pa: float | None = None
             reconstructed_vapor_limit: dict[str, Any] | None = None
             if not gas_standard_rail and liquid_rxn_early is None:
+                compiled_reference_Pa: float | None = None
                 antoine, coefficient_block = vapor_pressure_antoine_coefficients(
                     sp_data,
                     temperature_K=T_K,
                 )
+                if (
+                    fit_target == FIT_TARGET_STANDARD_REACTION
+                    and self._vapour_rail_catalog is not None
+                    and not antoine
+                ):
+                    evaluator = self._vapour_rail_catalog.evaluator_for(species)
+                    compiled_reference_Pa = evaluator.evaluate(T_K).pressure_pa
+                    coefficient_block = "compiled_reference_pressure_model"
                 if _is_noncertifying_pseudo_vapor_pressure_runtime(
                     species,
                     sp_data,
@@ -1163,7 +1182,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 A = antoine.get('A', 0)
                 B = antoine.get('B', 0)
                 C = antoine.get('C', 0)
-                if not (A > 0 and T_K > 300):
+                if compiled_reference_Pa is None and not (A > 0 and T_K > 300):
                     continue
                 reconstructed_segment = sp_data.get(
                     RECONSTRUCTED_VAPOR_PRESSURE_SEGMENT_KEY
@@ -1234,12 +1253,15 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                                 f"valid_range_K [{valid_low:g}, {valid_high:g}] at "
                                 f"{T_K:.3f} K"
                             )
-                    log_P = A - B / (T_K + C)
-                    P_reference_Pa = _pow10_pressure_or_raise(
-                        log_P,
-                        species=species,
-                        field="P_reference_Pa",
-                    )
+                    if compiled_reference_Pa is not None:
+                        P_reference_Pa = compiled_reference_Pa
+                    else:
+                        log_P = A - B / (T_K + C)
+                        P_reference_Pa = _pow10_pressure_or_raise(
+                            log_P,
+                            species=species,
+                            field="P_reference_Pa",
+                        )
                 else:
                     P_reference_Pa = float(
                         reconstructed_vapor_limit["pressure_Pa"]
@@ -1840,8 +1862,21 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             B = antoine.get('B', 0)
             C = antoine.get('C', 0)
             valid = data.get('valid_range_K', [0, 9999])
-            if not A > 0:
+            compiled_evaluator = None
+            if not A > 0 and self._vapour_rail_catalog is not None:
+                try:
+                    compiled_evaluator = self._vapour_rail_catalog.evaluator_for(
+                        name
+                    )
+                except ValueError:
+                    pass
+            if not A > 0 and compiled_evaluator is None:
                 continue
+            coefficient_block = (
+                "compiled_reference_pressure_model"
+                if compiled_evaluator is not None
+                else COEFF_BLOCK_ANTOINE
+            )
 
             parent_oxide = data.get('parent_oxide', '')
             activity_factor = 1.0
@@ -1865,7 +1900,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 activity_factor = max(a_ox, 0.0) ** activity_exponent
 
             valid_range = _range_tuple(valid)
-            if valid_range is not None:
+            if compiled_evaluator is None and valid_range is not None:
                 valid_low, valid_high = valid_range
                 if T_K < valid_low:
                     continue
@@ -1902,24 +1937,43 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         f"valid_range_K [{valid_low:g}, {valid_high:g}] at "
                         f"{T_K:.2f} K"
                     )
-            log_P = A - B / (T_K + C)
-            P_reference_Pa = _pow10_pressure_or_raise(
-                log_P,
-                species=name,
-                field="P_reference_Antoine_Pa",
-            )
-            P_eq_Pa = P_reference_Pa
-            pO2_scaled = False
-
-            if parent_oxide:
-                P_eq_Pa = _require_finite_vapor_value(
-                    P_eq_Pa * activity_factor,
-                    species=name,
-                    field="P_eq_activity",
+            if compiled_evaluator is not None:
+                reference_evaluation = compiled_evaluator.evaluate(T_K)
+                evaluation = compiled_evaluator.evaluate(
+                    T_K,
+                    source_activity=max(a_ox, 1.0e-300) if parent_oxide else 1.0,
+                    pO2_bar=transport_pO2_bar,
                 )
+                P_reference_Pa = reference_evaluation.pressure_pa
+                P_eq_Pa = evaluation.pressure_pa
+                pO2_exponent = compiled_evaluator.pO2_exponent
+                pO2_scaled = bool(pO2_exponent)
+                if evaluation.out_of_range:
+                    oxide_vapor_extrapolations[name] = {
+                        "temperature_K": T_K,
+                        "valid_range_K": compiled_evaluator.valid_temperature_K,
+                        "status": evaluation.status,
+                        "acquisition_flag": evaluation.acquisition_flag,
+                    }
+                    warnings.append(str(evaluation.status))
+            else:
+                log_P = A - B / (T_K + C)
+                P_reference_Pa = _pow10_pressure_or_raise(
+                    log_P,
+                    species=name,
+                    field="P_reference_Antoine_Pa",
+                )
+                P_eq_Pa = P_reference_Pa
+                pO2_scaled = False
+                if parent_oxide:
+                    P_eq_Pa = _require_finite_vapor_value(
+                        P_eq_Pa * activity_factor,
+                        species=name,
+                        field="P_eq_activity",
+                    )
 
-            pO2_exponent = float(data.get('pO2_exponent', 0.0) or 0.0)
-            if pO2_exponent:
+                pO2_exponent = float(data.get('pO2_exponent', 0.0) or 0.0)
+            if compiled_evaluator is None and pO2_exponent:
                 pO2_reference_bar = max(
                     1e-30, float(data.get('pO2_reference_bar', 1.0) or 1.0)
                 )
@@ -1977,7 +2031,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         else "builtin_authoritative"
                     ),
                     data,
-                    coefficient_block=COEFF_BLOCK_ANTOINE,
+                    coefficient_block=coefficient_block,
                     temperature_K=T_K,
                     authority_limited_by_ellingham_fit_range=(
                         name in ellingham_extrapolations
@@ -1992,7 +2046,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 vapor_pressure_provenance[name] = {
                     "pressure_kind": _runtime_pressure_kind(
                         data,
-                        COEFF_BLOCK_ANTOINE,
+                        coefficient_block,
                         effective_scaled=(
                             activity_factor != 1.0 or pO2_scaled
                         ),
@@ -2003,6 +2057,10 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     "activity_factor": activity_factor,
                     "source_label": source_label,
                 }
+                if compiled_evaluator is not None:
+                    vapor_pressure_provenance[name][
+                        "P_reference_model_Pa"
+                    ] = P_reference_Pa
                 if oxide_activity is not None:
                     vapor_pressure_provenance[name].update(
                         oxide_activity.provenance()
