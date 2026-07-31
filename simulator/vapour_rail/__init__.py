@@ -8,7 +8,6 @@ and runtime cutovers under this package.
 """
 
 from __future__ import annotations
-
 from simulator.vapour_rail.catalog import (
     CHARGE_ALIAS_CANONICAL,
     canonicalize_charge_alias,
@@ -35,6 +34,37 @@ from simulator.vapour_rail.u0_manifest import (
     canonicalize_gas_id,
     load_u0_manifest,
 )
+from simulator.vapour_rail.activity import (
+    BOUND_NOT_POINT,
+    REASON_HENRIAN_GAMMA_UNMEASURED,
+    ActivityInputDeclaration,
+    ActivityRefusalCode,
+    ActivityVerdictKind,
+    AssemblageIdentity,
+    BoundDirection,
+    CondensedPhaseActivityProvider,
+    MageminAssemblageEvidence,
+    PhaseEndmemberMap,
+    SourceReactionActivity,
+    StandardStateIdentity,
+    StateFingerprint,
+    ThermoEnginePotentialEvidence,
+    activity_from_chemical_potentials,
+    composition_fingerprint,
+    henrian_unknown_gamma_upper_bound,
+    prove_pressure_monotone_nondecreasing_in_activity,
+    validation_row_may_certify,
+)
+from simulator.vapour_rail.kinetics_anchors import (
+    AlphaProvenance,
+    KineticsAnchorRecord,
+    KineticsExperimentalRegime,
+    alpha_provenance_from_mapping,
+    assert_alpha_source_not_vaporock,
+    load_kems_anchors,
+    load_langmuir_anchors,
+    regimes_remain_distinct,
+)
 
 __all__ = [
     "ASSOCIATION_POLYMER_IDS",
@@ -57,4 +87,31 @@ __all__ = [
     "list_pending_validation",
     "load_trace_acquisition",
     "load_u0_manifest",
+    "BOUND_NOT_POINT",
+    "REASON_HENRIAN_GAMMA_UNMEASURED",
+    "ActivityInputDeclaration",
+    "ActivityRefusalCode",
+    "ActivityVerdictKind",
+    "AlphaProvenance",
+    "AssemblageIdentity",
+    "BoundDirection",
+    "CondensedPhaseActivityProvider",
+    "KineticsAnchorRecord",
+    "KineticsExperimentalRegime",
+    "MageminAssemblageEvidence",
+    "PhaseEndmemberMap",
+    "SourceReactionActivity",
+    "StandardStateIdentity",
+    "StateFingerprint",
+    "ThermoEnginePotentialEvidence",
+    "activity_from_chemical_potentials",
+    "alpha_provenance_from_mapping",
+    "assert_alpha_source_not_vaporock",
+    "composition_fingerprint",
+    "henrian_unknown_gamma_upper_bound",
+    "load_kems_anchors",
+    "load_langmuir_anchors",
+    "prove_pressure_monotone_nondecreasing_in_activity",
+    "regimes_remain_distinct",
+    "validation_row_may_certify",
 ]

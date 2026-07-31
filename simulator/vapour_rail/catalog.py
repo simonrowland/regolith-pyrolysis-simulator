@@ -18,6 +18,12 @@ import re
 from types import MappingProxyType
 from typing import Any
 
+from simulator.vapour_rail.activity import (
+    ActivityInputDeclaration,
+    ActivityVerdictKind,
+    BoundDirection,
+    SourceReactionActivity,
+)
 
 SCHEMA_VERSION = 2
 FOUR_STRATA = (
@@ -226,6 +232,10 @@ class ValidationStatus(str, Enum):
     VALIDATED = "validated"
 
 
+# Catalog-facing activity types (VR-9 / U2-A). CondensedPhaseActivityProvider
+# owns resolution; bound / pending_validation rows never certify.
+
+
 @dataclass(frozen=True)
 class PressureEvaluation:
     pressure_pa: float
@@ -428,6 +438,31 @@ class VapourRailCatalog:
 
     def legacy_view(self) -> dict[str, Any]:
         return deepcopy(self._legacy_projection)
+
+    def resolve_source_reaction_activity(self, *args: Any, **kwargs: Any):
+        """Delegate to :class:`CondensedPhaseActivityProvider` (DESIGN-REV5 §9.1).
+
+        Kept on the catalog so runtime callers have one named seam. Diagnostic
+        only: does not write the catalog, ledger, or promote authority.
+        """
+
+        from simulator.vapour_rail.activity import CondensedPhaseActivityProvider
+
+        provider = kwargs.pop("provider", None) or CondensedPhaseActivityProvider(
+            kwargs.pop("phase_endmember_map", None)
+        )
+        return provider.resolve_source_reaction_activity(*args, **kwargs)
+
+    def validation_may_certify(self, species_id: str) -> bool:
+        """Pending-validation rows never certify (progressive ladder ceiling)."""
+
+        from simulator.vapour_rail.activity import validation_row_may_certify
+
+        try:
+            status = self._species[species_id].validation_status.value
+        except KeyError as exc:
+            raise CatalogCompileError(f"unknown vapour species {species_id!r}") from exc
+        return validation_row_may_certify(validation_status=status)
 
 
 class VaporPressureCompatibilityView(dict[str, Any]):

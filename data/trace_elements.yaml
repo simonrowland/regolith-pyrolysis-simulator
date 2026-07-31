@@ -5,6 +5,19 @@ units:
   abundance: ppm_mass
   condensation_temperature: K
   boiling_point: C
+# VR-9 diagnostic bridge (golden-neutral): activity + kinetics policy for the
+# vapour-rail seam. Does not change plant_bins routing or runtime flux.
+# Source: docs-private/research/2026-07-30-vp-acquire-5/henrian-correlations.md
+# and DESIGN-REV5 §9.1–§9.2.
+vapour_rail_activity_policy:
+  unmeasured_henrian_gamma: upper_bound_a_eq_1
+  bound_report_label: bound-not-point
+  certifies: false
+  pending_validation_certifies: false
+  alpha_fit_from_vaporock: forbidden
+  kems_and_langmuir_regimes: distinct
+  adapter_seam: CondensedPhaseActivityProvider
+  standard_state_basis: raoultian_pure_endmember
 plant_bins:
   C0-cleanup:
     flowsheet_node_kind: block

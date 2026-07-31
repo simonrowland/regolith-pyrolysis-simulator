@@ -1,0 +1,53 @@
+# Vapour-rail KEMS kinetics anchors (VR-9).
+#
+# Experimental regime: Knudsen effusion mass spectrometry / sealed effusion
+# cells. These records ground equilibrium/effusion kinetics and must remain
+# distinct from Langmuir free-evaporation anchors
+# (data/literature/vapour_rail_langmuir_anchors.yaml).
+#
+# Diagnostic only: no row certifies; alpha is never fit from VapoRock.
+# Source package: docs-private/research/2026-07-30-vp-acquire-5/ and
+# owner feedback round-1 kinetics-grounding ruling.
+#
+# Note (P0-1 fix): Fedkin et al. (2006) α_K = 0.13 is NOT a KEMS measurement —
+# it models Yu et al. (2003) vacuum free-evaporation (Langmuir-class). That
+# record lives only in vapour_rail_langmuir_anchors.yaml.
+schema_version: 1
+experimental_regime: kems_effusion
+authority: diagnostic_only
+certifies: false
+records:
+  - record_id: costa_jacobson_2015_fe_olivine_kems
+    species: Fe
+    regime: kems_effusion
+    material: Fo93Fa7_olivine
+    temperature_range_K: [1700.0, 1800.0]
+    alpha_value: 0.02
+    alpha_range: [0.011, 0.020]
+    citation: >-
+      Costa & Jacobson (2015) NASA NTRS 20150002321; KEMS Fo93Fa7 olivine
+      Fe+ vaporization-coefficient range 0.011-0.020 at 1700-1800 K
+    doi_or_url: https://ntrs.nasa.gov/citations/20150002321
+    extraction_note: >-
+      KEMS campaign Fe+ coefficient; runtime adopts the measured high-side
+      bound as the conservative literature pin (still diagnostic for rail
+      certification).
+    certifies: false
+
+  - record_id: halwax_2024_cao_kems_series
+    species: Ca
+    regime: kems_effusion
+    material: pure_CaO
+    temperature_range_K: [2077.0, 2077.0]
+    alpha_value: null
+    alpha_range: null
+    citation: >-
+      Halwax, Sergeev, Mueller & Schenk (2024) Metall. Mater. Trans. B 55:821-835;
+      KEMS enthalpy-of-formation campaign for CaO/MgO (figure series only;
+      numeric pressures absent until digitization)
+    doi_or_url: https://doi.org/10.1007/s11663-024-02995-6
+    extraction_note: >-
+      Cross-link to data/literature/kems_measurements.yaml
+      (halwax_2024_cao). Present as a regime-tagged KEMS anchor; not an
+      alpha pin and not a certification row.
+    certifies: false

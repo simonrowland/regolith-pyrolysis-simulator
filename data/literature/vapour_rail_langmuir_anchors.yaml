@@ -1,0 +1,101 @@
+# Vapour-rail Langmuir free-evaporation kinetics anchors (VR-9).
+#
+# Experimental regime: free evaporation / low-backpressure Langmuir mass loss
+# (and direct Langmuir-to-Knudsen flux ratios). These records must remain
+# distinct from KEMS effusion anchors
+# (data/literature/vapour_rail_kems_anchors.yaml).
+#
+# Diagnostic only: no row certifies; alpha is never fit from VapoRock.
+#
+# Scope note (P2-4 disposition): the Langmuir sidecar currently also holds
+# 1-bar open-furnace *apparent* alphas (Sossi Na) that are not low-backpressure
+# free evaporation. Extraction notes disclose this; a third regime tag
+# (open_furnace_apparent) is deferred rather than inventing loader vocabulary
+# mid-chunk. Do not treat every row here as intrinsic vacuum Langmuir alpha.
+schema_version: 1
+experimental_regime: langmuir_free_evaporation
+authority: diagnostic_only
+certifies: false
+records:
+  - record_id: pound_1972_cr_langmuir_knudsen
+    species: Cr
+    regime: langmuir_free_evaporation
+    material: 99.9_percent_polycrystalline_solid_chromium
+    temperature_range_K: [1318.0, 1563.0]
+    alpha_value: 0.90
+    alpha_range: [0.80, 1.00]
+    citation: >-
+      Pound (1972) J. Phys. Chem. Ref. Data 1:135-146 Table 1; primary
+      McCabe, Hudson & Paxton (1958) Trans. Met. Soc. AIME 212:102 —
+      direct free-evaporation Langmuir mass loss divided by equilibrium
+      Knudsen-effusion flux (alpha_v = J_Langmuir / J_Knudsen)
+    doi_or_url: https://doi.org/10.1063/1.3253096
+    extraction_note: >-
+      Direct solid-Cr free-evaporation comparison. Melt activity belongs in
+      P_sat, not in this kinetic coefficient. Cross-link:
+      data/literature/langmuir_knudsen_flux_validation.yaml
+      chromium_solid_langmuir_knudsen.
+    certifies: false
+
+  - record_id: fedkin_2006_k_silicate_vacuum_langmuir
+    species: K
+    regime: langmuir_free_evaporation
+    material: Yu_et_al_2003_C1_silicate_melt
+    temperature_range_K: [1723.15, 1723.15]
+    alpha_value: 0.13
+    alpha_range: [0.11, 0.15]
+    citation: >-
+      Fedkin et al. (2006) Geochim. Cosmochim. Acta 70:206-223 models Yu et al.
+      (2003) vacuum free-evaporation C1 residue; alpha_K = 0.13 ± 0.02 at
+      1723 K (Langmuir-class vacuum evaporation; NOT a KEMS effusion measurement)
+    doi_or_url: https://doi.org/10.1016/j.gca.2005.08.014
+    extraction_note: >-
+      Primary experiment is Yu et al. (2003) continuously evacuated vacuum free
+      evaporation of C1 silicate melt (1450 °C = 1723.15 K). Fedkin et al.
+      (2006) is a MELTS + Hertz–Knudsen model paper, not a KEMS campaign — no
+      Knudsen cell or mass spectrometer. Cross-link:
+      data/literature/langmuir_knudsen_flux_validation.yaml
+      potassium_silicate_vacuum (t-114, regime
+      vacuum_langmuir_flux_against_equilibrium_reference). Runtime
+      data/vapor_pressures.yaml REF-014 still carries a known-wrong
+      "KEMS sealed-chamber" provenance string (owning-epoch repair; not
+      rewritten here).
+    certifies: false
+
+  - record_id: sossi_2019_na_open_furnace_langmuir
+    species: Na
+    regime: langmuir_free_evaporation
+    material: ferrobasalt_FCMAS_open_furnace
+    temperature_range_K: [1573.15, 1823.15]
+    alpha_value: 1.0
+    alpha_range: [0.9, 1.0]
+    citation: >-
+      Sossi et al. (2019) Geochim. Cosmochim. Acta 260:204-231; open-furnace
+      mass-loss Na alpha_e~1 near-ideal (1-bar gas-mixing open-furnace apparent
+      alpha, source_class=open_furnace_apparent_not_intrinsic; NOT a KEMS
+      sealed-chamber intrinsic coefficient and not low-backpressure vacuum
+      Langmuir — filed here as non-KEMS pending open_furnace_apparent regime)
+    doi_or_url: https://doi.org/10.1016/j.gca.2019.06.021
+    extraction_note: >-
+      1-bar open-furnace / free-evaporation *apparent* alpha (vp-acquire-5
+      henrian-correlations.md §5.1/5.3). Not low-backpressure Langmuir; third
+      regime tag deferred (P2-4 disposition). Distinct from KEMS Fe pins and
+      from the vacuum-Langmuir Fedkin/Yu K record in this same sidecar.
+    certifies: false
+
+  - record_id: safarian_engh_2013_si_pure_langmuir
+    species: Si
+    regime: langmuir_free_evaporation
+    material: pure_elemental_silicon
+    temperature_range_K: [1687.0, 2000.0]
+    alpha_value: 1.0
+    alpha_range: [0.84, 1.00]
+    citation: >-
+      Safarian & Engh (2013) Metall. Mater. Trans. A 44:747-753; Vacuum
+      Evaporation of Pure Metals — pure-element free-evaporation (Langmuir)
+      Hertz–Knudsen form (not melt-dissolved SiO)
+    doi_or_url: https://doi.org/10.1007/s11661-012-1464-2
+    extraction_note: >-
+      Pure elemental Si branch only; not a melt-dissolved SiO path. Title is
+      "Vacuum Evaporation of Pure Metals" (P3-9 cosmetic correction).
+    certifies: false
