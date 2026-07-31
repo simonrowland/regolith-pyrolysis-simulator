@@ -70,3 +70,21 @@ Collision-only gas names use `_gas`; their catalog row stores the unsuffixed
 chemical formula and atom map. Aggregate/generic rows marked `carrier_only`
 retain `formula: null`, have no pressure models or direct vapour flux, and can
 produce gas only through a balanced decomposition edge.
+
+
+## VR-8 acquisition dormancy
+
+Group-A/B oxide and trace acquisition rows live primarily in
+`data/vapour_rail_trace_acquisition.yaml` (loader:
+`simulator.vapour_rail.trace_acquisition`). They are dormant to flux until the
+matching R-family epoch. Monatomic `O(g)` is also declared as the
+`monatomic_oxygen_family` in this file with:
+
+- formula `O` and atom-balanced `0.5 O2 -> O` source reaction;
+- `pO2_exponent: +0.5` (from half-O2 recombination: p_O ~ fO2^(+1/2));
+- `availability: unavailable_pending_acquisition` and
+  `hot_train_applicability: not_applicable` so legacy metals/oxide/foulant
+  maps are unchanged.
+
+`list_pending_validation()` returns the complete remaining pending set across
+acquisition, vapor_pressures, and species_catalog surfaces.

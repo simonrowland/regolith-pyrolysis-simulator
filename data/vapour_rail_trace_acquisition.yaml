@@ -1,0 +1,6747 @@
+schema_version: 1
+kind: vapour_rail_trace_acquisition
+description: VR-8 oxide + trace acquisition transcription for every U0 Group-A and Group-B row plus monatomic
+  O(g). Rows are dormant to flux until their R-family activation epoch. Group-B carries separate millibar
+  and hard-vacuum/open-to-sky dominance/applicability records.
+chunk: VR-8
+dormant_to_flux: true
+provenance:
+  u0_manifest: data/vapour_rail_u0_manifest.yaml
+  dominant_missing_12: docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  gas_closure: docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  owner_rulings:
+  - docs-private/design/2026-07-30-vapour-rail-unification/OWNER-FEEDBACK-ROUND-1.md
+  - docs-private/design/2026-07-30-vapour-rail-unification/OWNER-FEEDBACK-ROUND-2.md
+counts:
+  group_a: 44
+  group_b: 65
+  monatomic_oxygen: 1
+  total: 110
+rows:
+- id: As
+  group: A
+  formula: As
+  atoms:
+    As: 1.0
+  u0_disposition: C
+  feedstock_presence: false
+  element: As
+  is_element_row: true
+  candidate_vapor_form: As4O6
+  candidate_forms_for_element:
+  - As4O6
+  - As
+  phase_system: As2O3(arsenolite) -> As4O6(g), 369–730 K Antoine windows
+  volatility:
+    dominance_window_K:
+    - 367.0
+    - 1700.0
+    dominance_note: As4O6 ≫ As4O5, As4O4, As2O3, AsO (SF18-T1 p.402; BR72)
+    literature_phase: gas
+    values:
+      kind: pure_component_antoine
+      gas_species: As4O6
+      condensed_reservoir: As2O3(arsenolite)
+      pressure_unit: bar_in_source_converted_to_Pa_at_promotion
+      citation: NIST WebBook / Behrens & Rosenblatt 1972
+      domains_K:
+        solid:
+        - 369.0
+        - 422.0
+        high_T:
+        - 486.0
+        - 730.0
+      note: NIST lists As2O3 formula; vapor molecule is As4O6
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REVIEWABLE_ANTOINE_PRIMARY
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: volatile-metal-trap
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - NIST-WB-As
+  - BR72
+  - Stull47
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: As4O6
+  group: A
+  formula: As4O6
+  atoms:
+    As: 4.0
+    O: 6.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: As
+  is_element_row: false
+  candidate_vapor_form: As4O6
+  candidate_forms_for_element:
+  - As4O6
+  - As
+  phase_system: As2O3(arsenolite) -> As4O6(g), 369–730 K Antoine windows
+  volatility:
+    dominance_window_K:
+    - 367.0
+    - 1700.0
+    dominance_note: As4O6 ≫ As4O5, As4O4, As2O3, AsO (SF18-T1 p.402; BR72)
+    literature_phase: gas
+    values:
+      kind: pure_component_antoine
+      gas_species: As4O6
+      condensed_reservoir: As2O3(arsenolite)
+      pressure_unit: bar_in_source_converted_to_Pa_at_promotion
+      citation: NIST WebBook / Behrens & Rosenblatt 1972
+      domains_K:
+        solid:
+        - 369.0
+        - 422.0
+        high_T:
+        - 486.0
+        - 730.0
+      note: NIST lists As2O3 formula; vapor molecule is As4O6
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REVIEWABLE_ANTOINE_PRIMARY
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: volatile-metal-trap
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - NIST-WB-As
+  - BR72
+  - Stull47
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: Ba
+  group: A
+  formula: Ba
+  atoms:
+    Ba: 1.0
+  u0_disposition: R
+  feedstock_presence: false
+  element: Ba
+  is_element_row: true
+  candidate_vapor_form: BaO
+  candidate_forms_for_element:
+  - BaO
+  - Ba
+  phase_system: BaO(s), 1150–1758 K
+  volatility:
+    dominance_window_K:
+    - 1150.0
+    - 1758.0
+    dominance_note: BaO most abundant Ba gas under oxidizing/neutral (LH87)
+    literature_phase: gas
+    values:
+      kind: thermochemical_deltaf
+      gas_species: BaO
+      citation: LH87 Table 3 p.424 — BaO(g)
+      reaction: BaO(s) = BaO(g)
+      standard_state: 1 bar
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REVIEWABLE_THERMOCHEMICAL_ANCHOR
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: Ca-crown
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - LH87
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: BaO
+  group: A
+  formula: BaO
+  atoms:
+    Ba: 1.0
+    O: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Ba
+  is_element_row: false
+  candidate_vapor_form: BaO
+  candidate_forms_for_element:
+  - BaO
+  - Ba
+  phase_system: BaO(s), 1150–1758 K
+  volatility:
+    dominance_window_K:
+    - 1150.0
+    - 1758.0
+    dominance_note: BaO most abundant Ba gas under oxidizing/neutral (LH87)
+    literature_phase: gas
+    values:
+      kind: thermochemical_deltaf
+      gas_species: BaO
+      citation: LH87 Table 3 p.424 — BaO(g)
+      reaction: BaO(s) = BaO(g)
+      standard_state: 1 bar
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REVIEWABLE_THERMOCHEMICAL_ANCHOR
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: Ca-crown
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - LH87
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: Cs
+  group: A
+  formula: Cs
+  atoms:
+    Cs: 1.0
+  u0_disposition: R
+  feedstock_presence: false
+  element: Cs
+  is_element_row: true
+  candidate_vapor_form: Cs2O
+  candidate_forms_for_element:
+  - Cs2O
+  - Cs
+  - CsO
+  - Cs2O2
+  phase_system: Cs2O associative, 1070–1170 K dominance
+  volatility:
+    dominance_window_K:
+    - 1070.0
+    - 1170.0
+    dominance_note: Cs2O(g) dominant associative carrier (LH84)
+    literature_phase: gas
+    values:
+      kind: thermochemical_deltaf
+      gas_species: Cs2O
+      citation: LH84 Table 4 p.157–158
+      deltafH298_over_R_kK: -19.1
+      deltafH298_over_R_uncertainty_kK: 3.0
+      S298_over_R: 38.23
+      S298_over_R_uncertainty: 1.0
+      H298_minus_H0_over_R_kK: 1.66
+      standard_state: 1 bar
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REVIEWABLE_THERMOCHEMICAL_ANCHOR
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: alkali-cyclone
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - LH84
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: Cs2O
+  group: A
+  formula: Cs2O
+  atoms:
+    Cs: 2.0
+    O: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Cs
+  is_element_row: false
+  candidate_vapor_form: Cs2O
+  candidate_forms_for_element:
+  - Cs2O
+  - Cs
+  - CsO
+  - Cs2O2
+  phase_system: Cs2O associative, 1070–1170 K dominance
+  volatility:
+    dominance_window_K:
+    - 1070.0
+    - 1170.0
+    dominance_note: Cs2O(g) dominant associative carrier (LH84)
+    literature_phase: gas
+    values:
+      kind: thermochemical_deltaf
+      gas_species: Cs2O
+      citation: LH84 Table 4 p.157–158
+      deltafH298_over_R_kK: -19.1
+      deltafH298_over_R_uncertainty_kK: 3.0
+      S298_over_R: 38.23
+      S298_over_R_uncertainty: 1.0
+      H298_minus_H0_over_R_kK: 1.66
+      standard_state: 1 bar
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REVIEWABLE_THERMOCHEMICAL_ANCHOR
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: alkali-cyclone
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - LH84
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: Cs2O2
+  group: A
+  formula: Cs2O2
+  atoms:
+    Cs: 2.0
+    O: 2.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Cs
+  is_element_row: false
+  candidate_vapor_form: Cs2O2
+  candidate_forms_for_element:
+  - Cs2O
+  - Cs
+  - CsO
+  - Cs2O2
+  phase_system: Cs2O associative, 1070–1170 K dominance
+  volatility:
+    dominance_window_K:
+    - 1070.0
+    - 1170.0
+    dominance_note: Cs2O(g) dominant associative carrier (LH84)
+    literature_phase: gas
+    values:
+      kind: thermochemical_deltaf
+      gas_species: Cs2O
+      citation: LH84 Table 4 p.157–158
+      deltafH298_over_R_kK: -19.1
+      deltafH298_over_R_uncertainty_kK: 3.0
+      S298_over_R: 38.23
+      S298_over_R_uncertainty: 1.0
+      H298_minus_H0_over_R_kK: 1.66
+      standard_state: 1 bar
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REVIEWABLE_THERMOCHEMICAL_ANCHOR
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: alkali-cyclone
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - LH84
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: CsO
+  group: A
+  formula: CsO
+  atoms:
+    Cs: 1.0
+    O: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Cs
+  is_element_row: false
+  candidate_vapor_form: CsO
+  candidate_forms_for_element:
+  - Cs2O
+  - Cs
+  - CsO
+  - Cs2O2
+  phase_system: Cs2O associative, 1070–1170 K dominance
+  volatility:
+    dominance_window_K:
+    - 1070.0
+    - 1170.0
+    dominance_note: Cs2O(g) dominant associative carrier (LH84)
+    literature_phase: gas
+    values:
+      kind: thermochemical_deltaf
+      gas_species: Cs2O
+      citation: LH84 Table 4 p.157–158
+      deltafH298_over_R_kK: -19.1
+      deltafH298_over_R_uncertainty_kK: 3.0
+      S298_over_R: 38.23
+      S298_over_R_uncertainty: 1.0
+      H298_minus_H0_over_R_kK: 1.66
+      standard_state: 1 bar
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REVIEWABLE_THERMOCHEMICAL_ANCHOR
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: alkali-cyclone
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - LH84
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: Eu
+  group: A
+  formula: Eu
+  atoms:
+    Eu: 1.0
+  u0_disposition: R
+  feedstock_presence: false
+  element: Eu
+  is_element_row: true
+  candidate_vapor_form: Eu
+  candidate_forms_for_element:
+  - Eu
+  - EuO
+  phase_system: Eu metal; Eu2O3 for EuO, 1950–2350 K
+  volatility:
+    dominance_window_K:
+    - 700.0
+    - 2350.0
+    dominance_note: Eu(g) first — anomalously volatile REE; EuO secondary (Hab64; Ames67)
+    literature_phase: gas
+    values:
+      kind: metal_sublimation_plus_oxide_open
+      gas_species_order:
+      - Eu
+      - EuO
+      metal_citation: Habermann & Daane 1964 / Hanak Eu reanalysis
+      oxide_note: EuO over Eu2O3 open — Ames D0 not fully transcribed
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: PARTIAL_METAL_ANCHORED_OXIDE_OPEN
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: Ca-crown
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - Hab64
+  - Hanak59
+  - Ames67
+  - Panish61a
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: Ga
+  group: A
+  formula: Ga
+  atoms:
+    Ga: 1.0
+  u0_disposition: R
+  feedstock_presence: false
+  element: Ga
+  is_element_row: true
+  candidate_vapor_form: Ga2O
+  candidate_forms_for_element:
+  - Ga2O
+  - Ga
+  - GaO
+  phase_system: Ga2O3(s), 1013–1841 K
+  volatility:
+    dominance_window_K:
+    - 1013.0
+    - 1841.0
+    dominance_note: Ga2O most abundant (SF18-T1 p.404; LH87; FT62)
+    literature_phase: gas
+    values:
+      kind: thermochemical_deltaf
+      gas_species: Ga2O
+      citation: LH87 Table 3 p.424
+      deltafH298_over_R_kK: -11.46
+      deltafH298_over_R_uncertainty_kK: 1.0
+      S298_over_R: 34.21
+      S298_over_R_uncertainty: 0.4
+      H298_minus_H0_over_R_kK: 1.4712
+      reaction_note: Ga2O3 + 4 Ga(l) = 3 Ga2O(g) under reducing (FT62)
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REVIEWABLE_THERMOCHEMICAL_ANCHOR
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: volatile-metal-trap
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - LH87
+  - FT62
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: Ga2O
+  group: A
+  formula: Ga2O
+  atoms:
+    Ga: 2.0
+    O: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Ga
+  is_element_row: false
+  candidate_vapor_form: Ga2O
+  candidate_forms_for_element:
+  - Ga2O
+  - Ga
+  - GaO
+  phase_system: Ga2O3(s), 1013–1841 K
+  volatility:
+    dominance_window_K:
+    - 1013.0
+    - 1841.0
+    dominance_note: Ga2O most abundant (SF18-T1 p.404; LH87; FT62)
+    literature_phase: gas
+    values:
+      kind: thermochemical_deltaf
+      gas_species: Ga2O
+      citation: LH87 Table 3 p.424
+      deltafH298_over_R_kK: -11.46
+      deltafH298_over_R_uncertainty_kK: 1.0
+      S298_over_R: 34.21
+      S298_over_R_uncertainty: 0.4
+      H298_minus_H0_over_R_kK: 1.4712
+      reaction_note: Ga2O3 + 4 Ga(l) = 3 Ga2O(g) under reducing (FT62)
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REVIEWABLE_THERMOCHEMICAL_ANCHOR
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: volatile-metal-trap
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - LH87
+  - FT62
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: Li
+  group: A
+  formula: Li
+  atoms:
+    Li: 1.0
+  u0_disposition: R
+  feedstock_presence: false
+  element: Li
+  is_element_row: true
+  candidate_vapor_form: Li2O
+  candidate_forms_for_element:
+  - Li2O
+  - Li
+  - LiO
+  - Li3O
+  - Li2O2
+  phase_system: Li2O(s), 1000–1700 K
+  volatility:
+    dominance_window_K:
+    - 1000.0
+    - 1700.0
+    dominance_note: Li ~ Li2O > LiO > Li3O, Li2O2 (SF18-T1 p.404; LH84)
+    literature_phase: gas
+    values:
+      kind: thermochemical_deltaf
+      gas_species: Li2O
+      citation: LH84 Table 4 p.157
+      deltafH298_over_R_kK: -20.78
+      deltafH298_over_R_uncertainty_kK: 0.45
+      S298_over_R: 27.56
+      S298_over_R_uncertainty: 0.75
+      H298_minus_H0_over_R_kK: 1.5
+      standard_state: 1 bar; elements Li(s), O2(g)
+      GEF_domain_K:
+      - 298.0
+      - 3000.0
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REVIEWABLE_THERMOCHEMICAL_ANCHOR
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: alkali-cyclone
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - LH84
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: Li2O
+  group: A
+  formula: Li2O
+  atoms:
+    Li: 2.0
+    O: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Li
+  is_element_row: false
+  candidate_vapor_form: Li2O
+  candidate_forms_for_element:
+  - Li2O
+  - Li
+  - LiO
+  - Li3O
+  - Li2O2
+  phase_system: Li2O(s), 1000–1700 K
+  volatility:
+    dominance_window_K:
+    - 1000.0
+    - 1700.0
+    dominance_note: Li ~ Li2O > LiO > Li3O, Li2O2 (SF18-T1 p.404; LH84)
+    literature_phase: gas
+    values:
+      kind: thermochemical_deltaf
+      gas_species: Li2O
+      citation: LH84 Table 4 p.157
+      deltafH298_over_R_kK: -20.78
+      deltafH298_over_R_uncertainty_kK: 0.45
+      S298_over_R: 27.56
+      S298_over_R_uncertainty: 0.75
+      H298_minus_H0_over_R_kK: 1.5
+      standard_state: 1 bar; elements Li(s), O2(g)
+      GEF_domain_K:
+      - 298.0
+      - 3000.0
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REVIEWABLE_THERMOCHEMICAL_ANCHOR
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: alkali-cyclone
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - LH84
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: Li2O2
+  group: A
+  formula: Li2O2
+  atoms:
+    Li: 2.0
+    O: 2.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Li
+  is_element_row: false
+  candidate_vapor_form: Li2O2
+  candidate_forms_for_element:
+  - Li2O
+  - Li
+  - LiO
+  - Li3O
+  - Li2O2
+  phase_system: Li2O(s), 1000–1700 K
+  volatility:
+    dominance_window_K:
+    - 1000.0
+    - 1700.0
+    dominance_note: Li ~ Li2O > LiO > Li3O, Li2O2 (SF18-T1 p.404; LH84)
+    literature_phase: gas
+    values:
+      kind: thermochemical_deltaf
+      gas_species: Li2O
+      citation: LH84 Table 4 p.157
+      deltafH298_over_R_kK: -20.78
+      deltafH298_over_R_uncertainty_kK: 0.45
+      S298_over_R: 27.56
+      S298_over_R_uncertainty: 0.75
+      H298_minus_H0_over_R_kK: 1.5
+      standard_state: 1 bar; elements Li(s), O2(g)
+      GEF_domain_K:
+      - 298.0
+      - 3000.0
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REVIEWABLE_THERMOCHEMICAL_ANCHOR
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: alkali-cyclone
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - LH84
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: Li3O
+  group: A
+  formula: Li3O
+  atoms:
+    Li: 3.0
+    O: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Li
+  is_element_row: false
+  candidate_vapor_form: Li3O
+  candidate_forms_for_element:
+  - Li2O
+  - Li
+  - LiO
+  - Li3O
+  - Li2O2
+  phase_system: Li2O(s), 1000–1700 K
+  volatility:
+    dominance_window_K:
+    - 1000.0
+    - 1700.0
+    dominance_note: Li ~ Li2O > LiO > Li3O, Li2O2 (SF18-T1 p.404; LH84)
+    literature_phase: gas
+    values:
+      kind: thermochemical_deltaf
+      gas_species: Li2O
+      citation: LH84 Table 4 p.157
+      deltafH298_over_R_kK: -20.78
+      deltafH298_over_R_uncertainty_kK: 0.45
+      S298_over_R: 27.56
+      S298_over_R_uncertainty: 0.75
+      H298_minus_H0_over_R_kK: 1.5
+      standard_state: 1 bar; elements Li(s), O2(g)
+      GEF_domain_K:
+      - 298.0
+      - 3000.0
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REVIEWABLE_THERMOCHEMICAL_ANCHOR
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: alkali-cyclone
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - LH84
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: LiO
+  group: A
+  formula: LiO
+  atoms:
+    Li: 1.0
+    O: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Li
+  is_element_row: false
+  candidate_vapor_form: LiO
+  candidate_forms_for_element:
+  - Li2O
+  - Li
+  - LiO
+  - Li3O
+  - Li2O2
+  phase_system: Li2O(s), 1000–1700 K
+  volatility:
+    dominance_window_K:
+    - 1000.0
+    - 1700.0
+    dominance_note: Li ~ Li2O > LiO > Li3O, Li2O2 (SF18-T1 p.404; LH84)
+    literature_phase: gas
+    values:
+      kind: thermochemical_deltaf
+      gas_species: Li2O
+      citation: LH84 Table 4 p.157
+      deltafH298_over_R_kK: -20.78
+      deltafH298_over_R_uncertainty_kK: 0.45
+      S298_over_R: 27.56
+      S298_over_R_uncertainty: 0.75
+      H298_minus_H0_over_R_kK: 1.5
+      standard_state: 1 bar; elements Li(s), O2(g)
+      GEF_domain_K:
+      - 298.0
+      - 3000.0
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REVIEWABLE_THERMOCHEMICAL_ANCHOR
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: alkali-cyclone
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - LH84
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: P
+  group: A
+  formula: P
+  atoms:
+    P: 1.0
+  u0_disposition: R
+  feedstock_presence: true
+  element: P
+  is_element_row: true
+  candidate_vapor_form: PO
+  candidate_forms_for_element:
+  - PO
+  - P4O6
+  - P4O7
+  - P4O8
+  - P4O9
+  - P4O10
+  - P
+  phase_system: P-oxide ladder over phosphate/melt (rail Stage-0 / R3 family)
+  volatility:
+    dominance_window_K:
+    - 1000.0
+    - 2000.0
+    dominance_note: PO and P4On ladder; P2O5_gas is NOT a literature molecule substitute
+    literature_phase: gas
+    values:
+      kind: cross_family_reference
+      note: P-carrier numeric rows land via VR-7 P-carriers evidence; VR-8 records Group-A membership
+        + candidate forms
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: CROSS_FAMILY_VR7_P_CARRIERS
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: C0-cleanup
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - SF18-T1
+  - gas-closure §2.4/§6.1
+  - vp-acquire-5/P-carriers.md
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: P4O10
+  group: A
+  formula: P4O10
+  atoms:
+    O: 10.0
+    P: 4.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: P
+  is_element_row: false
+  candidate_vapor_form: P4O10
+  candidate_forms_for_element:
+  - PO
+  - P4O6
+  - P4O7
+  - P4O8
+  - P4O9
+  - P4O10
+  - P
+  phase_system: P-oxide ladder over phosphate/melt (rail Stage-0 / R3 family)
+  volatility:
+    dominance_window_K:
+    - 1000.0
+    - 2000.0
+    dominance_note: PO and P4On ladder; P2O5_gas is NOT a literature molecule substitute
+    literature_phase: gas
+    values:
+      kind: cross_family_reference
+      note: P-carrier numeric rows land via VR-7 P-carriers evidence; VR-8 records Group-A membership
+        + candidate forms
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: CROSS_FAMILY_VR7_P_CARRIERS
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: C0-cleanup
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - SF18-T1
+  - gas-closure §2.4/§6.1
+  - vp-acquire-5/P-carriers.md
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: P4O6
+  group: A
+  formula: P4O6
+  atoms:
+    O: 6.0
+    P: 4.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: P
+  is_element_row: false
+  candidate_vapor_form: P4O6
+  candidate_forms_for_element:
+  - PO
+  - P4O6
+  - P4O7
+  - P4O8
+  - P4O9
+  - P4O10
+  - P
+  phase_system: P-oxide ladder over phosphate/melt (rail Stage-0 / R3 family)
+  volatility:
+    dominance_window_K:
+    - 1000.0
+    - 2000.0
+    dominance_note: PO and P4On ladder; P2O5_gas is NOT a literature molecule substitute
+    literature_phase: gas
+    values:
+      kind: cross_family_reference
+      note: P-carrier numeric rows land via VR-7 P-carriers evidence; VR-8 records Group-A membership
+        + candidate forms
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: CROSS_FAMILY_VR7_P_CARRIERS
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: C0-cleanup
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - SF18-T1
+  - gas-closure §2.4/§6.1
+  - vp-acquire-5/P-carriers.md
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: P4O7
+  group: A
+  formula: P4O7
+  atoms:
+    O: 7.0
+    P: 4.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: P
+  is_element_row: false
+  candidate_vapor_form: P4O7
+  candidate_forms_for_element:
+  - PO
+  - P4O6
+  - P4O7
+  - P4O8
+  - P4O9
+  - P4O10
+  - P
+  phase_system: P-oxide ladder over phosphate/melt (rail Stage-0 / R3 family)
+  volatility:
+    dominance_window_K:
+    - 1000.0
+    - 2000.0
+    dominance_note: PO and P4On ladder; P2O5_gas is NOT a literature molecule substitute
+    literature_phase: gas
+    values:
+      kind: cross_family_reference
+      note: P-carrier numeric rows land via VR-7 P-carriers evidence; VR-8 records Group-A membership
+        + candidate forms
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: CROSS_FAMILY_VR7_P_CARRIERS
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: C0-cleanup
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - SF18-T1
+  - gas-closure §2.4/§6.1
+  - vp-acquire-5/P-carriers.md
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: P4O8
+  group: A
+  formula: P4O8
+  atoms:
+    O: 8.0
+    P: 4.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: P
+  is_element_row: false
+  candidate_vapor_form: P4O8
+  candidate_forms_for_element:
+  - PO
+  - P4O6
+  - P4O7
+  - P4O8
+  - P4O9
+  - P4O10
+  - P
+  phase_system: P-oxide ladder over phosphate/melt (rail Stage-0 / R3 family)
+  volatility:
+    dominance_window_K:
+    - 1000.0
+    - 2000.0
+    dominance_note: PO and P4On ladder; P2O5_gas is NOT a literature molecule substitute
+    literature_phase: gas
+    values:
+      kind: cross_family_reference
+      note: P-carrier numeric rows land via VR-7 P-carriers evidence; VR-8 records Group-A membership
+        + candidate forms
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: CROSS_FAMILY_VR7_P_CARRIERS
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: C0-cleanup
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - SF18-T1
+  - gas-closure §2.4/§6.1
+  - vp-acquire-5/P-carriers.md
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: P4O9
+  group: A
+  formula: P4O9
+  atoms:
+    O: 9.0
+    P: 4.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: P
+  is_element_row: false
+  candidate_vapor_form: P4O9
+  candidate_forms_for_element:
+  - PO
+  - P4O6
+  - P4O7
+  - P4O8
+  - P4O9
+  - P4O10
+  - P
+  phase_system: P-oxide ladder over phosphate/melt (rail Stage-0 / R3 family)
+  volatility:
+    dominance_window_K:
+    - 1000.0
+    - 2000.0
+    dominance_note: PO and P4On ladder; P2O5_gas is NOT a literature molecule substitute
+    literature_phase: gas
+    values:
+      kind: cross_family_reference
+      note: P-carrier numeric rows land via VR-7 P-carriers evidence; VR-8 records Group-A membership
+        + candidate forms
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: CROSS_FAMILY_VR7_P_CARRIERS
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: C0-cleanup
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - SF18-T1
+  - gas-closure §2.4/§6.1
+  - vp-acquire-5/P-carriers.md
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: PO
+  group: A
+  formula: PO
+  atoms:
+    O: 1.0
+    P: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: P
+  is_element_row: false
+  candidate_vapor_form: PO
+  candidate_forms_for_element:
+  - PO
+  - P4O6
+  - P4O7
+  - P4O8
+  - P4O9
+  - P4O10
+  - P
+  phase_system: P-oxide ladder over phosphate/melt (rail Stage-0 / R3 family)
+  volatility:
+    dominance_window_K:
+    - 1000.0
+    - 2000.0
+    dominance_note: PO and P4On ladder; P2O5_gas is NOT a literature molecule substitute
+    literature_phase: gas
+    values:
+      kind: cross_family_reference
+      note: P-carrier numeric rows land via VR-7 P-carriers evidence; VR-8 records Group-A membership
+        + candidate forms
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: CROSS_FAMILY_VR7_P_CARRIERS
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: C0-cleanup
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - SF18-T1
+  - gas-closure §2.4/§6.1
+  - vp-acquire-5/P-carriers.md
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: Rb
+  group: A
+  formula: Rb
+  atoms:
+    Rb: 1.0
+  u0_disposition: R
+  feedstock_presence: false
+  element: Rb
+  is_element_row: true
+  candidate_vapor_form: Rb2O
+  candidate_forms_for_element:
+  - Rb2O
+  - Rb
+  - RbO
+  - Rb2
+  - Rb2O2
+  phase_system: Rb2O(s/l), ~1020–1135 K measured
+  volatility:
+    dominance_window_K:
+    - 1000.0
+    - 1700.0
+    dominance_note: Rb2O co-dominant alkali oxide carrier (LH84; SF18-T1)
+    literature_phase: gas
+    values:
+      kind: thermochemical_deltaf
+      gas_species: Rb2O
+      citation: LH84 Table 4 p.157
+      deltafH298_over_R_kK: -8.05
+      deltafH298_over_R_uncertainty_kK: 2.5
+      S298_over_R: 36.31
+      S298_over_R_uncertainty: 0.75
+      H298_minus_H0_over_R_kK: 1.66
+      standard_state: 1 bar
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REVIEWABLE_THERMOCHEMICAL_ANCHOR
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: alkali-cyclone
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - LH84
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: Rb2
+  group: A
+  formula: Rb2
+  atoms:
+    Rb: 2.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Rb
+  is_element_row: false
+  candidate_vapor_form: Rb2
+  candidate_forms_for_element:
+  - Rb2O
+  - Rb
+  - RbO
+  - Rb2
+  - Rb2O2
+  phase_system: Rb2O(s/l), ~1020–1135 K measured
+  volatility:
+    dominance_window_K:
+    - 1000.0
+    - 1700.0
+    dominance_note: Rb2O co-dominant alkali oxide carrier (LH84; SF18-T1)
+    literature_phase: gas
+    values:
+      kind: thermochemical_deltaf
+      gas_species: Rb2O
+      citation: LH84 Table 4 p.157
+      deltafH298_over_R_kK: -8.05
+      deltafH298_over_R_uncertainty_kK: 2.5
+      S298_over_R: 36.31
+      S298_over_R_uncertainty: 0.75
+      H298_minus_H0_over_R_kK: 1.66
+      standard_state: 1 bar
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REVIEWABLE_THERMOCHEMICAL_ANCHOR
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: alkali-cyclone
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - LH84
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: Rb2O
+  group: A
+  formula: Rb2O
+  atoms:
+    O: 1.0
+    Rb: 2.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Rb
+  is_element_row: false
+  candidate_vapor_form: Rb2O
+  candidate_forms_for_element:
+  - Rb2O
+  - Rb
+  - RbO
+  - Rb2
+  - Rb2O2
+  phase_system: Rb2O(s/l), ~1020–1135 K measured
+  volatility:
+    dominance_window_K:
+    - 1000.0
+    - 1700.0
+    dominance_note: Rb2O co-dominant alkali oxide carrier (LH84; SF18-T1)
+    literature_phase: gas
+    values:
+      kind: thermochemical_deltaf
+      gas_species: Rb2O
+      citation: LH84 Table 4 p.157
+      deltafH298_over_R_kK: -8.05
+      deltafH298_over_R_uncertainty_kK: 2.5
+      S298_over_R: 36.31
+      S298_over_R_uncertainty: 0.75
+      H298_minus_H0_over_R_kK: 1.66
+      standard_state: 1 bar
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REVIEWABLE_THERMOCHEMICAL_ANCHOR
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: alkali-cyclone
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - LH84
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: Rb2O2
+  group: A
+  formula: Rb2O2
+  atoms:
+    O: 2.0
+    Rb: 2.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Rb
+  is_element_row: false
+  candidate_vapor_form: Rb2O2
+  candidate_forms_for_element:
+  - Rb2O
+  - Rb
+  - RbO
+  - Rb2
+  - Rb2O2
+  phase_system: Rb2O(s/l), ~1020–1135 K measured
+  volatility:
+    dominance_window_K:
+    - 1000.0
+    - 1700.0
+    dominance_note: Rb2O co-dominant alkali oxide carrier (LH84; SF18-T1)
+    literature_phase: gas
+    values:
+      kind: thermochemical_deltaf
+      gas_species: Rb2O
+      citation: LH84 Table 4 p.157
+      deltafH298_over_R_kK: -8.05
+      deltafH298_over_R_uncertainty_kK: 2.5
+      S298_over_R: 36.31
+      S298_over_R_uncertainty: 0.75
+      H298_minus_H0_over_R_kK: 1.66
+      standard_state: 1 bar
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REVIEWABLE_THERMOCHEMICAL_ANCHOR
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: alkali-cyclone
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - LH84
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: RbO
+  group: A
+  formula: RbO
+  atoms:
+    O: 1.0
+    Rb: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Rb
+  is_element_row: false
+  candidate_vapor_form: RbO
+  candidate_forms_for_element:
+  - Rb2O
+  - Rb
+  - RbO
+  - Rb2
+  - Rb2O2
+  phase_system: Rb2O(s/l), ~1020–1135 K measured
+  volatility:
+    dominance_window_K:
+    - 1000.0
+    - 1700.0
+    dominance_note: Rb2O co-dominant alkali oxide carrier (LH84; SF18-T1)
+    literature_phase: gas
+    values:
+      kind: thermochemical_deltaf
+      gas_species: Rb2O
+      citation: LH84 Table 4 p.157
+      deltafH298_over_R_kK: -8.05
+      deltafH298_over_R_uncertainty_kK: 2.5
+      S298_over_R: 36.31
+      S298_over_R_uncertainty: 0.75
+      H298_minus_H0_over_R_kK: 1.66
+      standard_state: 1 bar
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REVIEWABLE_THERMOCHEMICAL_ANCHOR
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: alkali-cyclone
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - LH84
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: Sb
+  group: A
+  formula: Sb
+  atoms:
+    Sb: 1.0
+  u0_disposition: C
+  feedstock_presence: false
+  element: Sb
+  is_element_row: true
+  candidate_vapor_form: Sb4O6
+  candidate_forms_for_element:
+  - Sb4O6
+  - Sb
+  phase_system: Sb2O3(valentinite) -> Sb4O6(g), 580–1073 K
+  volatility:
+    dominance_window_K:
+    - 580.0
+    - 1073.0
+    dominance_note: Sb4O6 dominant over Sb2O3 (SF18-T1 p.405; BR73; Hincke30)
+    literature_phase: gas
+    values:
+      kind: primary_identified_coefficients_missing
+      gas_species: Sb4O6
+      condensed_reservoir: Sb2O3(valentinite)
+      citation: Behrens & Rosenblatt 1973; Hincke 1930
+      note: Coefficients not recovered with page-transcribable locator in vp-acquire-5
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: PRIMARY_IDENTIFIED_COEFFICIENTS_MISSING
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: volatile-metal-trap
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - BR73
+  - Hincke30
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: Sb4O6
+  group: A
+  formula: Sb4O6
+  atoms:
+    O: 6.0
+    Sb: 4.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Sb
+  is_element_row: false
+  candidate_vapor_form: Sb4O6
+  candidate_forms_for_element:
+  - Sb4O6
+  - Sb
+  phase_system: Sb2O3(valentinite) -> Sb4O6(g), 580–1073 K
+  volatility:
+    dominance_window_K:
+    - 580.0
+    - 1073.0
+    dominance_note: Sb4O6 dominant over Sb2O3 (SF18-T1 p.405; BR73; Hincke30)
+    literature_phase: gas
+    values:
+      kind: primary_identified_coefficients_missing
+      gas_species: Sb4O6
+      condensed_reservoir: Sb2O3(valentinite)
+      citation: Behrens & Rosenblatt 1973; Hincke 1930
+      note: Coefficients not recovered with page-transcribable locator in vp-acquire-5
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: PRIMARY_IDENTIFIED_COEFFICIENTS_MISSING
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: volatile-metal-trap
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - BR73
+  - Hincke30
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: Se
+  group: A
+  formula: Se
+  atoms:
+    Se: 1.0
+  u0_disposition: C
+  feedstock_presence: false
+  element: Se
+  is_element_row: true
+  candidate_vapor_form: Se6
+  candidate_forms_for_element:
+  - Se6
+  - Se5
+  - Se2
+  - Se3
+  - Se4
+  - Se7
+  - Se8
+  - Se
+  phase_system: Se(s/l) allotrope ladder, 629–953 K total-P; Se5/6 low-T
+  volatility:
+    dominance_window_K:
+    - 629.0
+    - 1200.0
+    dominance_note: Se6 ≳ Se5 over Se(l) low-T; Se2 dominates ≳800 K (NEA05, Rau74, KEMS14)
+    literature_phase: gas
+    values:
+      kind: allotrope_ladder_total_pressure
+      gas_basis: TOTAL_PRESSURE_not_species
+      note: Do not promote single Se2 Antoine as plant carrier below ~800 K
+      ladder_order_low_T:
+      - Se6
+      - Se5
+      - Se2
+      citation: NEA05 §V.1.5; Rau74; Stull47 total-P Antoine
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REVIEWABLE_SPECIATION_PLUS_DELTAF
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: cryo-train
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - NEA05
+  - Rau74
+  - Stull47
+  - KEMS14
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: Se2
+  group: A
+  formula: Se2
+  atoms:
+    Se: 2.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Se
+  is_element_row: false
+  candidate_vapor_form: Se2
+  candidate_forms_for_element:
+  - Se6
+  - Se5
+  - Se2
+  - Se3
+  - Se4
+  - Se7
+  - Se8
+  - Se
+  phase_system: Se(s/l) allotrope ladder, 629–953 K total-P; Se5/6 low-T
+  volatility:
+    dominance_window_K:
+    - 629.0
+    - 1200.0
+    dominance_note: Se6 ≳ Se5 over Se(l) low-T; Se2 dominates ≳800 K (NEA05, Rau74, KEMS14)
+    literature_phase: gas
+    values:
+      kind: allotrope_ladder_total_pressure
+      gas_basis: TOTAL_PRESSURE_not_species
+      note: Do not promote single Se2 Antoine as plant carrier below ~800 K
+      ladder_order_low_T:
+      - Se6
+      - Se5
+      - Se2
+      citation: NEA05 §V.1.5; Rau74; Stull47 total-P Antoine
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REVIEWABLE_SPECIATION_PLUS_DELTAF
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: cryo-train
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - NEA05
+  - Rau74
+  - Stull47
+  - KEMS14
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: Se3
+  group: A
+  formula: Se3
+  atoms:
+    Se: 3.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Se
+  is_element_row: false
+  candidate_vapor_form: Se3
+  candidate_forms_for_element:
+  - Se6
+  - Se5
+  - Se2
+  - Se3
+  - Se4
+  - Se7
+  - Se8
+  - Se
+  phase_system: Se(s/l) allotrope ladder, 629–953 K total-P; Se5/6 low-T
+  volatility:
+    dominance_window_K:
+    - 629.0
+    - 1200.0
+    dominance_note: Se6 ≳ Se5 over Se(l) low-T; Se2 dominates ≳800 K (NEA05, Rau74, KEMS14)
+    literature_phase: gas
+    values:
+      kind: allotrope_ladder_total_pressure
+      gas_basis: TOTAL_PRESSURE_not_species
+      note: Do not promote single Se2 Antoine as plant carrier below ~800 K
+      ladder_order_low_T:
+      - Se6
+      - Se5
+      - Se2
+      citation: NEA05 §V.1.5; Rau74; Stull47 total-P Antoine
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REVIEWABLE_SPECIATION_PLUS_DELTAF
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: cryo-train
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - NEA05
+  - Rau74
+  - Stull47
+  - KEMS14
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: Se4
+  group: A
+  formula: Se4
+  atoms:
+    Se: 4.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Se
+  is_element_row: false
+  candidate_vapor_form: Se4
+  candidate_forms_for_element:
+  - Se6
+  - Se5
+  - Se2
+  - Se3
+  - Se4
+  - Se7
+  - Se8
+  - Se
+  phase_system: Se(s/l) allotrope ladder, 629–953 K total-P; Se5/6 low-T
+  volatility:
+    dominance_window_K:
+    - 629.0
+    - 1200.0
+    dominance_note: Se6 ≳ Se5 over Se(l) low-T; Se2 dominates ≳800 K (NEA05, Rau74, KEMS14)
+    literature_phase: gas
+    values:
+      kind: allotrope_ladder_total_pressure
+      gas_basis: TOTAL_PRESSURE_not_species
+      note: Do not promote single Se2 Antoine as plant carrier below ~800 K
+      ladder_order_low_T:
+      - Se6
+      - Se5
+      - Se2
+      citation: NEA05 §V.1.5; Rau74; Stull47 total-P Antoine
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REVIEWABLE_SPECIATION_PLUS_DELTAF
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: cryo-train
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - NEA05
+  - Rau74
+  - Stull47
+  - KEMS14
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: Se5
+  group: A
+  formula: Se5
+  atoms:
+    Se: 5.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Se
+  is_element_row: false
+  candidate_vapor_form: Se5
+  candidate_forms_for_element:
+  - Se6
+  - Se5
+  - Se2
+  - Se3
+  - Se4
+  - Se7
+  - Se8
+  - Se
+  phase_system: Se(s/l) allotrope ladder, 629–953 K total-P; Se5/6 low-T
+  volatility:
+    dominance_window_K:
+    - 629.0
+    - 1200.0
+    dominance_note: Se6 ≳ Se5 over Se(l) low-T; Se2 dominates ≳800 K (NEA05, Rau74, KEMS14)
+    literature_phase: gas
+    values:
+      kind: allotrope_ladder_total_pressure
+      gas_basis: TOTAL_PRESSURE_not_species
+      note: Do not promote single Se2 Antoine as plant carrier below ~800 K
+      ladder_order_low_T:
+      - Se6
+      - Se5
+      - Se2
+      citation: NEA05 §V.1.5; Rau74; Stull47 total-P Antoine
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REVIEWABLE_SPECIATION_PLUS_DELTAF
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: cryo-train
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - NEA05
+  - Rau74
+  - Stull47
+  - KEMS14
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: Se6
+  group: A
+  formula: Se6
+  atoms:
+    Se: 6.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Se
+  is_element_row: false
+  candidate_vapor_form: Se6
+  candidate_forms_for_element:
+  - Se6
+  - Se5
+  - Se2
+  - Se3
+  - Se4
+  - Se7
+  - Se8
+  - Se
+  phase_system: Se(s/l) allotrope ladder, 629–953 K total-P; Se5/6 low-T
+  volatility:
+    dominance_window_K:
+    - 629.0
+    - 1200.0
+    dominance_note: Se6 ≳ Se5 over Se(l) low-T; Se2 dominates ≳800 K (NEA05, Rau74, KEMS14)
+    literature_phase: gas
+    values:
+      kind: allotrope_ladder_total_pressure
+      gas_basis: TOTAL_PRESSURE_not_species
+      note: Do not promote single Se2 Antoine as plant carrier below ~800 K
+      ladder_order_low_T:
+      - Se6
+      - Se5
+      - Se2
+      citation: NEA05 §V.1.5; Rau74; Stull47 total-P Antoine
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REVIEWABLE_SPECIATION_PLUS_DELTAF
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: cryo-train
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - NEA05
+  - Rau74
+  - Stull47
+  - KEMS14
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: Se7
+  group: A
+  formula: Se7
+  atoms:
+    Se: 7.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Se
+  is_element_row: false
+  candidate_vapor_form: Se7
+  candidate_forms_for_element:
+  - Se6
+  - Se5
+  - Se2
+  - Se3
+  - Se4
+  - Se7
+  - Se8
+  - Se
+  phase_system: Se(s/l) allotrope ladder, 629–953 K total-P; Se5/6 low-T
+  volatility:
+    dominance_window_K:
+    - 629.0
+    - 1200.0
+    dominance_note: Se6 ≳ Se5 over Se(l) low-T; Se2 dominates ≳800 K (NEA05, Rau74, KEMS14)
+    literature_phase: gas
+    values:
+      kind: allotrope_ladder_total_pressure
+      gas_basis: TOTAL_PRESSURE_not_species
+      note: Do not promote single Se2 Antoine as plant carrier below ~800 K
+      ladder_order_low_T:
+      - Se6
+      - Se5
+      - Se2
+      citation: NEA05 §V.1.5; Rau74; Stull47 total-P Antoine
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REVIEWABLE_SPECIATION_PLUS_DELTAF
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: cryo-train
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - NEA05
+  - Rau74
+  - Stull47
+  - KEMS14
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: Se8
+  group: A
+  formula: Se8
+  atoms:
+    Se: 8.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Se
+  is_element_row: false
+  candidate_vapor_form: Se8
+  candidate_forms_for_element:
+  - Se6
+  - Se5
+  - Se2
+  - Se3
+  - Se4
+  - Se7
+  - Se8
+  - Se
+  phase_system: Se(s/l) allotrope ladder, 629–953 K total-P; Se5/6 low-T
+  volatility:
+    dominance_window_K:
+    - 629.0
+    - 1200.0
+    dominance_note: Se6 ≳ Se5 over Se(l) low-T; Se2 dominates ≳800 K (NEA05, Rau74, KEMS14)
+    literature_phase: gas
+    values:
+      kind: allotrope_ladder_total_pressure
+      gas_basis: TOTAL_PRESSURE_not_species
+      note: Do not promote single Se2 Antoine as plant carrier below ~800 K
+      ladder_order_low_T:
+      - Se6
+      - Se5
+      - Se2
+      citation: NEA05 §V.1.5; Rau74; Stull47 total-P Antoine
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REVIEWABLE_SPECIATION_PLUS_DELTAF
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: cryo-train
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - NEA05
+  - Rau74
+  - Stull47
+  - KEMS14
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: Sr
+  group: A
+  formula: Sr
+  atoms:
+    Sr: 1.0
+  u0_disposition: R
+  feedstock_presence: false
+  element: Sr
+  is_element_row: true
+  candidate_vapor_form: Sr
+  candidate_forms_for_element:
+  - Sr
+  - SrO
+  phase_system: SrO(s), 1575–2102 K
+  volatility:
+    dominance_window_K:
+    - 1575.0
+    - 2102.0
+    dominance_note: Sr(g) ≈ SrO(g) under neutral/reducing; SrO under oxidizing (LH87)
+    literature_phase: gas
+    values:
+      kind: thermochemical_deltaf
+      gas_species: SrO
+      citation: LH87 Table 3 p.424 — SrO(g)
+      reaction: SrO(s) = SrO(g)
+      standard_state: 1 bar
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REVIEWABLE_THERMOCHEMICAL_ANCHOR
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: Ca-crown
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - LH87
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: SrO
+  group: A
+  formula: SrO
+  atoms:
+    O: 1.0
+    Sr: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Sr
+  is_element_row: false
+  candidate_vapor_form: SrO
+  candidate_forms_for_element:
+  - Sr
+  - SrO
+  phase_system: SrO(s), 1575–2102 K
+  volatility:
+    dominance_window_K:
+    - 1575.0
+    - 2102.0
+    dominance_note: Sr(g) ≈ SrO(g) under neutral/reducing; SrO under oxidizing (LH87)
+    literature_phase: gas
+    values:
+      kind: thermochemical_deltaf
+      gas_species: SrO
+      citation: LH87 Table 3 p.424 — SrO(g)
+      reaction: SrO(s) = SrO(g)
+      standard_state: 1 bar
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REVIEWABLE_THERMOCHEMICAL_ANCHOR
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: Ca-crown
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - LH87
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: V
+  group: A
+  formula: V
+  atoms:
+    V: 1.0
+  u0_disposition: R
+  feedstock_presence: false
+  element: V
+  is_element_row: true
+  candidate_vapor_form: VO
+  candidate_forms_for_element:
+  - VO
+  - VO2
+  - V
+  phase_system: VO(s)/V2O3, ~1680–1950 K partial pressures
+  volatility:
+    dominance_window_K:
+    - 1003.0
+    - 2270.0
+    dominance_note: 'Over VO(s): VO > V > VO2 (Ban86; BIC57); VO2 over V2O4'
+    literature_phase: gas
+    values:
+      kind: partial_pressure_points_and_id
+      gas_species:
+      - VO
+      - VO2
+      citation: Berkowitz et al. 1957; Banchornheavakul 1986
+      note: Incongruent; Ban86 Table 1 coefficients not OCR-recovered; two absolute BIC57 points
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: PARTIAL_ANCHORS
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: ferroalloy-tap
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - BIC57
+  - Ban86
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: VO
+  group: A
+  formula: VO
+  atoms:
+    O: 1.0
+    V: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: V
+  is_element_row: false
+  candidate_vapor_form: VO
+  candidate_forms_for_element:
+  - VO
+  - VO2
+  - V
+  phase_system: VO(s)/V2O3, ~1680–1950 K partial pressures
+  volatility:
+    dominance_window_K:
+    - 1003.0
+    - 2270.0
+    dominance_note: 'Over VO(s): VO > V > VO2 (Ban86; BIC57); VO2 over V2O4'
+    literature_phase: gas
+    values:
+      kind: partial_pressure_points_and_id
+      gas_species:
+      - VO
+      - VO2
+      citation: Berkowitz et al. 1957; Banchornheavakul 1986
+      note: Incongruent; Ban86 Table 1 coefficients not OCR-recovered; two absolute BIC57 points
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: PARTIAL_ANCHORS
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: ferroalloy-tap
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - BIC57
+  - Ban86
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: VO2
+  group: A
+  formula: VO2
+  atoms:
+    O: 2.0
+    V: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: V
+  is_element_row: false
+  candidate_vapor_form: VO2
+  candidate_forms_for_element:
+  - VO
+  - VO2
+  - V
+  phase_system: VO(s)/V2O3, ~1680–1950 K partial pressures
+  volatility:
+    dominance_window_K:
+    - 1003.0
+    - 2270.0
+    dominance_note: 'Over VO(s): VO > V > VO2 (Ban86; BIC57); VO2 over V2O4'
+    literature_phase: gas
+    values:
+      kind: partial_pressure_points_and_id
+      gas_species:
+      - VO
+      - VO2
+      citation: Berkowitz et al. 1957; Banchornheavakul 1986
+      note: Incongruent; Ban86 Table 1 coefficients not OCR-recovered; two absolute BIC57 points
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: PARTIAL_ANCHORS
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: ferroalloy-tap
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - BIC57
+  - Ban86
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: Yb
+  group: A
+  formula: Yb
+  atoms:
+    Yb: 1.0
+  u0_disposition: R
+  feedstock_presence: false
+  element: Yb
+  is_element_row: true
+  candidate_vapor_form: Yb
+  candidate_forms_for_element:
+  - Yb
+  - YbO
+  phase_system: Yb metal 623–931 K; Yb2O3 oxide 2000–2626 K
+  volatility:
+    dominance_window_K:
+    - 623.0
+    - 2626.0
+    dominance_note: Yb(g) first — anomalously volatile REE (Hab64; Ames67)
+    literature_phase: gas
+    values:
+      kind: metal_antoine_oxide_open
+      gas_species_order:
+      - Yb
+      - YbO
+      metal_citation: Habermann & Daane 1964 pure-component Antoine
+      metal_domain_K:
+      - 623.0
+      - 931.0
+      oxide_note: YbO over Yb2O3 still open
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REVIEWABLE_METAL_ANTOINE_OXIDE_OPEN
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: calciothermic
+    typed_outcome: evolve
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-A
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  literature_sources:
+  - Hab64
+  - Ames67
+  - Panish61b
+  - Stol14
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+- id: Be
+  group: B
+  formula: Be
+  atoms:
+    Be: 1.0
+  u0_disposition: R
+  feedstock_presence: false
+  element: Be
+  is_element_row: true
+  candidate_vapor_form: Be
+  candidate_forms_for_element:
+  - Be
+  - Be3O3
+  - Be4O4
+  - BeO
+  - Be2O2
+  - Be5O5
+  - Be6O6
+  - Be2O
+  phase_system: BeO(s), 1900–2500 K
+  volatility:
+    dominance_window_K:
+    - 1900.0
+    - 2500.0
+    dominance_note: Be(g) first, then BeO polymer ladder (SF18-T1; LH87 §2.2.a)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: Be
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: rump
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  - LH87
+  - Chupka1959
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: Be2O
+  group: B
+  formula: Be2O
+  atoms:
+    Be: 2.0
+    O: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Be
+  is_element_row: false
+  candidate_vapor_form: Be2O
+  candidate_forms_for_element:
+  - Be
+  - Be3O3
+  - Be4O4
+  - BeO
+  - Be2O2
+  - Be5O5
+  - Be6O6
+  - Be2O
+  phase_system: BeO(s), 1900–2500 K
+  volatility:
+    dominance_window_K:
+    - 1900.0
+    - 2500.0
+    dominance_note: Be(g) first, then BeO polymer ladder (SF18-T1; LH87 §2.2.a)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: Be
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: rump
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  - LH87
+  - Chupka1959
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: Be2O2
+  group: B
+  formula: Be2O2
+  atoms:
+    Be: 2.0
+    O: 2.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Be
+  is_element_row: false
+  candidate_vapor_form: Be2O2
+  candidate_forms_for_element:
+  - Be
+  - Be3O3
+  - Be4O4
+  - BeO
+  - Be2O2
+  - Be5O5
+  - Be6O6
+  - Be2O
+  phase_system: BeO(s), 1900–2500 K
+  volatility:
+    dominance_window_K:
+    - 1900.0
+    - 2500.0
+    dominance_note: Be(g) first, then BeO polymer ladder (SF18-T1; LH87 §2.2.a)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: Be
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: rump
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  - LH87
+  - Chupka1959
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: Be3O3
+  group: B
+  formula: Be3O3
+  atoms:
+    Be: 3.0
+    O: 3.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Be
+  is_element_row: false
+  candidate_vapor_form: Be3O3
+  candidate_forms_for_element:
+  - Be
+  - Be3O3
+  - Be4O4
+  - BeO
+  - Be2O2
+  - Be5O5
+  - Be6O6
+  - Be2O
+  phase_system: BeO(s), 1900–2500 K
+  volatility:
+    dominance_window_K:
+    - 1900.0
+    - 2500.0
+    dominance_note: Be(g) first, then BeO polymer ladder (SF18-T1; LH87 §2.2.a)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: Be
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: rump
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  - LH87
+  - Chupka1959
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: Be4O4
+  group: B
+  formula: Be4O4
+  atoms:
+    Be: 4.0
+    O: 4.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Be
+  is_element_row: false
+  candidate_vapor_form: Be4O4
+  candidate_forms_for_element:
+  - Be
+  - Be3O3
+  - Be4O4
+  - BeO
+  - Be2O2
+  - Be5O5
+  - Be6O6
+  - Be2O
+  phase_system: BeO(s), 1900–2500 K
+  volatility:
+    dominance_window_K:
+    - 1900.0
+    - 2500.0
+    dominance_note: Be(g) first, then BeO polymer ladder (SF18-T1; LH87 §2.2.a)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: Be
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: rump
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  - LH87
+  - Chupka1959
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: Be5O5
+  group: B
+  formula: Be5O5
+  atoms:
+    Be: 5.0
+    O: 5.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Be
+  is_element_row: false
+  candidate_vapor_form: Be5O5
+  candidate_forms_for_element:
+  - Be
+  - Be3O3
+  - Be4O4
+  - BeO
+  - Be2O2
+  - Be5O5
+  - Be6O6
+  - Be2O
+  phase_system: BeO(s), 1900–2500 K
+  volatility:
+    dominance_window_K:
+    - 1900.0
+    - 2500.0
+    dominance_note: Be(g) first, then BeO polymer ladder (SF18-T1; LH87 §2.2.a)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: Be
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: rump
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  - LH87
+  - Chupka1959
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: Be6O6
+  group: B
+  formula: Be6O6
+  atoms:
+    Be: 6.0
+    O: 6.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Be
+  is_element_row: false
+  candidate_vapor_form: Be6O6
+  candidate_forms_for_element:
+  - Be
+  - Be3O3
+  - Be4O4
+  - BeO
+  - Be2O2
+  - Be5O5
+  - Be6O6
+  - Be2O
+  phase_system: BeO(s), 1900–2500 K
+  volatility:
+    dominance_window_K:
+    - 1900.0
+    - 2500.0
+    dominance_note: Be(g) first, then BeO polymer ladder (SF18-T1; LH87 §2.2.a)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: Be
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: rump
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  - LH87
+  - Chupka1959
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: BeO
+  group: B
+  formula: BeO
+  atoms:
+    Be: 1.0
+    O: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Be
+  is_element_row: false
+  candidate_vapor_form: BeO
+  candidate_forms_for_element:
+  - Be
+  - Be3O3
+  - Be4O4
+  - BeO
+  - Be2O2
+  - Be5O5
+  - Be6O6
+  - Be2O
+  phase_system: BeO(s), 1900–2500 K
+  volatility:
+    dominance_window_K:
+    - 1900.0
+    - 2500.0
+    dominance_note: Be(g) first, then BeO polymer ladder (SF18-T1; LH87 §2.2.a)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: Be
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: rump
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  - LH87
+  - Chupka1959
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: Ce
+  group: B
+  formula: Ce
+  atoms:
+    Ce: 1.0
+  u0_disposition: R
+  feedstock_presence: false
+  element: Ce
+  is_element_row: true
+  candidate_vapor_form: Ce
+  candidate_forms_for_element:
+  - CeO
+  - CeO2
+  - Ce
+  phase_system: Ce2O3/CeO2(s), 1700–2320 K
+  volatility:
+    dominance_window_K:
+    - 1700.0
+    - 2320.0
+    dominance_note: CeO, CeO2 ≫ Ce (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: CeO
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: calciothermic
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: CeO
+  group: B
+  formula: CeO
+  atoms:
+    Ce: 1.0
+    O: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Ce
+  is_element_row: false
+  candidate_vapor_form: CeO
+  candidate_forms_for_element:
+  - CeO
+  - CeO2
+  - Ce
+  phase_system: Ce2O3/CeO2(s), 1700–2320 K
+  volatility:
+    dominance_window_K:
+    - 1700.0
+    - 2320.0
+    dominance_note: CeO, CeO2 ≫ Ce (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: CeO
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: calciothermic
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: CeO2
+  group: B
+  formula: CeO2
+  atoms:
+    Ce: 1.0
+    O: 2.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Ce
+  is_element_row: false
+  candidate_vapor_form: CeO2
+  candidate_forms_for_element:
+  - CeO
+  - CeO2
+  - Ce
+  phase_system: Ce2O3/CeO2(s), 1700–2320 K
+  volatility:
+    dominance_window_K:
+    - 1700.0
+    - 2320.0
+    dominance_note: CeO, CeO2 ≫ Ce (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: CeO
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: calciothermic
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: Dy
+  group: B
+  formula: Dy
+  atoms:
+    Dy: 1.0
+  u0_disposition: R
+  feedstock_presence: false
+  element: Dy
+  is_element_row: true
+  candidate_vapor_form: Dy
+  candidate_forms_for_element:
+  - DyO
+  - Dy
+  phase_system: Dy2O3(s), 2000–2637 K
+  volatility:
+    dominance_window_K:
+    - 2000.0
+    - 2637.0
+    dominance_note: DyO dominant (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: DyO
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: calciothermic
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  - Ames67
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: DyO
+  group: B
+  formula: DyO
+  atoms:
+    Dy: 1.0
+    O: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Dy
+  is_element_row: false
+  candidate_vapor_form: DyO
+  candidate_forms_for_element:
+  - DyO
+  - Dy
+  phase_system: Dy2O3(s), 2000–2637 K
+  volatility:
+    dominance_window_K:
+    - 2000.0
+    - 2637.0
+    dominance_note: DyO dominant (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: DyO
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: calciothermic
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  - Ames67
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: Er
+  group: B
+  formula: Er
+  atoms:
+    Er: 1.0
+  u0_disposition: R
+  feedstock_presence: false
+  element: Er
+  is_element_row: true
+  candidate_vapor_form: Er
+  candidate_forms_for_element:
+  - ErO
+  - Er
+  phase_system: Er2O3(s), 2000–2687 K
+  volatility:
+    dominance_window_K:
+    - 2000.0
+    - 2687.0
+    dominance_note: ErO dominant (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: ErO
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: calciothermic
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: ErO
+  group: B
+  formula: ErO
+  atoms:
+    Er: 1.0
+    O: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Er
+  is_element_row: false
+  candidate_vapor_form: ErO
+  candidate_forms_for_element:
+  - ErO
+  - Er
+  phase_system: Er2O3(s), 2000–2687 K
+  volatility:
+    dominance_window_K:
+    - 2000.0
+    - 2687.0
+    dominance_note: ErO dominant (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: ErO
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: calciothermic
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: Gd
+  group: B
+  formula: Gd
+  atoms:
+    Gd: 1.0
+  u0_disposition: R
+  feedstock_presence: false
+  element: Gd
+  is_element_row: true
+  candidate_vapor_form: Gd
+  candidate_forms_for_element:
+  - GdO
+  - Gd
+  phase_system: Gd2O3(s), 2000–2590 K
+  volatility:
+    dominance_window_K:
+    - 2000.0
+    - 2590.0
+    dominance_note: GdO ≫ Gd (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: GdO
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: calciothermic
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: GdO
+  group: B
+  formula: GdO
+  atoms:
+    Gd: 1.0
+    O: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Gd
+  is_element_row: false
+  candidate_vapor_form: GdO
+  candidate_forms_for_element:
+  - GdO
+  - Gd
+  phase_system: Gd2O3(s), 2000–2590 K
+  volatility:
+    dominance_window_K:
+    - 2000.0
+    - 2590.0
+    dominance_note: GdO ≫ Gd (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: GdO
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: calciothermic
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: Hf
+  group: B
+  formula: Hf
+  atoms:
+    Hf: 1.0
+  u0_disposition: R
+  feedstock_presence: false
+  element: Hf
+  is_element_row: true
+  candidate_vapor_form: Hf
+  candidate_forms_for_element:
+  - HfO
+  - Hf
+  phase_system: HfO2(s), 2150–2900 K
+  volatility:
+    dominance_window_K:
+    - 2150.0
+    - 2900.0
+    dominance_note: HfO > HfO2 ≫ Hf (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: HfO
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: rump
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: HfO
+  group: B
+  formula: HfO
+  atoms:
+    Hf: 1.0
+    O: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Hf
+  is_element_row: false
+  candidate_vapor_form: HfO
+  candidate_forms_for_element:
+  - HfO
+  - Hf
+  phase_system: HfO2(s), 2150–2900 K
+  volatility:
+    dominance_window_K:
+    - 2150.0
+    - 2900.0
+    dominance_note: HfO > HfO2 ≫ Hf (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: HfO
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: rump
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: Ho
+  group: B
+  formula: Ho
+  atoms:
+    Ho: 1.0
+  u0_disposition: R
+  feedstock_presence: false
+  element: Ho
+  is_element_row: true
+  candidate_vapor_form: Ho
+  candidate_forms_for_element:
+  - HoO
+  - Ho
+  phase_system: Ho2O3(s), 2000–2711 K
+  volatility:
+    dominance_window_K:
+    - 2000.0
+    - 2711.0
+    dominance_note: HoO dominant (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: HoO
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: calciothermic
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: HoO
+  group: B
+  formula: HoO
+  atoms:
+    Ho: 1.0
+    O: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Ho
+  is_element_row: false
+  candidate_vapor_form: HoO
+  candidate_forms_for_element:
+  - HoO
+  - Ho
+  phase_system: Ho2O3(s), 2000–2711 K
+  volatility:
+    dominance_window_K:
+    - 2000.0
+    - 2711.0
+    dominance_note: HoO dominant (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: HoO
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: calciothermic
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: Ir
+  group: B
+  formula: Ir
+  atoms:
+    Ir: 1.0
+  u0_disposition: R
+  feedstock_presence: false
+  element: Ir
+  is_element_row: true
+  candidate_vapor_form: Ir
+  candidate_forms_for_element:
+  - IrO3
+  - Ir
+  phase_system: Ir metal + O2, 1473–2073 K; oxidizing only
+  volatility:
+    dominance_window_K:
+    - 1473.0
+    - 2073.0
+    dominance_note: IrO3 dominant under oxidizing conditions (A61)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: IrO3
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: ferroalloy-tap
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+      po2_gate: oxidizing_only_negligible_at_recipe_pO2
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+      po2_gate: oxidizing_channel_remains_explicit
+  literature_sources:
+  - A61
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: IrO3
+  group: B
+  formula: IrO3
+  atoms:
+    Ir: 1.0
+    O: 3.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Ir
+  is_element_row: false
+  candidate_vapor_form: IrO3
+  candidate_forms_for_element:
+  - IrO3
+  - Ir
+  phase_system: Ir metal + O2, 1473–2073 K; oxidizing only
+  volatility:
+    dominance_window_K:
+    - 1473.0
+    - 2073.0
+    dominance_note: IrO3 dominant under oxidizing conditions (A61)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: IrO3
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: ferroalloy-tap
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+      po2_gate: oxidizing_only_negligible_at_recipe_pO2
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+      po2_gate: oxidizing_channel_remains_explicit
+  literature_sources:
+  - A61
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: La
+  group: B
+  formula: La
+  atoms:
+    La: 1.0
+  u0_disposition: R
+  feedstock_presence: false
+  element: La
+  is_element_row: true
+  candidate_vapor_form: La
+  candidate_forms_for_element:
+  - LaO
+  - La
+  phase_system: La2O3(s), 1778–2441 K
+  volatility:
+    dominance_window_K:
+    - 1778.0
+    - 2441.0
+    dominance_note: LaO ≫ La (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: LaO
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: calciothermic
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: LaO
+  group: B
+  formula: LaO
+  atoms:
+    La: 1.0
+    O: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: La
+  is_element_row: false
+  candidate_vapor_form: LaO
+  candidate_forms_for_element:
+  - LaO
+  - La
+  phase_system: La2O3(s), 1778–2441 K
+  volatility:
+    dominance_window_K:
+    - 1778.0
+    - 2441.0
+    dominance_note: LaO ≫ La (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: LaO
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: calciothermic
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: Lu
+  group: B
+  formula: Lu
+  atoms:
+    Lu: 1.0
+  u0_disposition: R
+  feedstock_presence: false
+  element: Lu
+  is_element_row: true
+  candidate_vapor_form: Lu
+  candidate_forms_for_element:
+  - LuO
+  - Lu
+  phase_system: Lu2O3(s), 2000–2700 K
+  volatility:
+    dominance_window_K:
+    - 2000.0
+    - 2700.0
+    dominance_note: LuO ≫ Lu (LuO/Lu ≈ 4) (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: LuO
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: calciothermic
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: LuO
+  group: B
+  formula: LuO
+  atoms:
+    Lu: 1.0
+    O: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Lu
+  is_element_row: false
+  candidate_vapor_form: LuO
+  candidate_forms_for_element:
+  - LuO
+  - Lu
+  phase_system: Lu2O3(s), 2000–2700 K
+  volatility:
+    dominance_window_K:
+    - 2000.0
+    - 2700.0
+    dominance_note: LuO ≫ Lu (LuO/Lu ≈ 4) (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: LuO
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: calciothermic
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: Nb
+  group: B
+  formula: Nb
+  atoms:
+    Nb: 1.0
+  u0_disposition: R
+  feedstock_presence: false
+  element: Nb
+  is_element_row: true
+  candidate_vapor_form: Nb
+  candidate_forms_for_element:
+  - NbO2
+  - NbO
+  - Nb
+  phase_system: NbO/NbO2/Nb2O5, 1726–2473 K
+  volatility:
+    dominance_window_K:
+    - 1726.0
+    - 2473.0
+    dominance_note: NbO2 ≈ NbO (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: NbO2
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: rump
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: NbO
+  group: B
+  formula: NbO
+  atoms:
+    Nb: 1.0
+    O: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Nb
+  is_element_row: false
+  candidate_vapor_form: NbO
+  candidate_forms_for_element:
+  - NbO2
+  - NbO
+  - Nb
+  phase_system: NbO/NbO2/Nb2O5, 1726–2473 K
+  volatility:
+    dominance_window_K:
+    - 1726.0
+    - 2473.0
+    dominance_note: NbO2 ≈ NbO (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: NbO2
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: rump
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: NbO2
+  group: B
+  formula: NbO2
+  atoms:
+    Nb: 1.0
+    O: 2.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Nb
+  is_element_row: false
+  candidate_vapor_form: NbO2
+  candidate_forms_for_element:
+  - NbO2
+  - NbO
+  - Nb
+  phase_system: NbO/NbO2/Nb2O5, 1726–2473 K
+  volatility:
+    dominance_window_K:
+    - 1726.0
+    - 2473.0
+    dominance_note: NbO2 ≈ NbO (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: NbO2
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: rump
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: Nd
+  group: B
+  formula: Nd
+  atoms:
+    Nd: 1.0
+  u0_disposition: R
+  feedstock_presence: false
+  element: Nd
+  is_element_row: true
+  candidate_vapor_form: Nd
+  candidate_forms_for_element:
+  - NdO
+  - Nd
+  phase_system: Nd2O3(s), 1950–2485 K
+  volatility:
+    dominance_window_K:
+    - 1950.0
+    - 2485.0
+    dominance_note: NdO ≫ Nd (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: NdO
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: calciothermic
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: NdO
+  group: B
+  formula: NdO
+  atoms:
+    Nd: 1.0
+    O: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Nd
+  is_element_row: false
+  candidate_vapor_form: NdO
+  candidate_forms_for_element:
+  - NdO
+  - Nd
+  phase_system: Nd2O3(s), 1950–2485 K
+  volatility:
+    dominance_window_K:
+    - 1950.0
+    - 2485.0
+    dominance_note: NdO ≫ Nd (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: NdO
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: calciothermic
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: Os
+  group: B
+  formula: Os
+  atoms:
+    Os: 1.0
+  u0_disposition: R
+  feedstock_presence: false
+  element: Os
+  is_element_row: true
+  candidate_vapor_form: Os
+  candidate_forms_for_element:
+  - OsO4
+  - OsO3
+  - Os
+  phase_system: OsO4(l)/Os+O2, 1100–1750 K; oxidizing
+  volatility:
+    dominance_window_K:
+    - 1100.0
+    - 1750.0
+    dominance_note: OsO4, OsO3 ≫ OsO2 under oxidizing conditions (SF18-T1; A61)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: OsO4
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: ferroalloy-tap
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+      po2_gate: oxidizing_only_negligible_at_recipe_pO2
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+      po2_gate: oxidizing_channel_remains_explicit
+  literature_sources:
+  - SF18-T1
+  - A61
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: OsO3
+  group: B
+  formula: OsO3
+  atoms:
+    O: 3.0
+    Os: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Os
+  is_element_row: false
+  candidate_vapor_form: OsO3
+  candidate_forms_for_element:
+  - OsO4
+  - OsO3
+  - Os
+  phase_system: OsO4(l)/Os+O2, 1100–1750 K; oxidizing
+  volatility:
+    dominance_window_K:
+    - 1100.0
+    - 1750.0
+    dominance_note: OsO4, OsO3 ≫ OsO2 under oxidizing conditions (SF18-T1; A61)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: OsO4
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: ferroalloy-tap
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+      po2_gate: oxidizing_only_negligible_at_recipe_pO2
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+      po2_gate: oxidizing_channel_remains_explicit
+  literature_sources:
+  - SF18-T1
+  - A61
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: OsO4
+  group: B
+  formula: OsO4
+  atoms:
+    O: 4.0
+    Os: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Os
+  is_element_row: false
+  candidate_vapor_form: OsO4
+  candidate_forms_for_element:
+  - OsO4
+  - OsO3
+  - Os
+  phase_system: OsO4(l)/Os+O2, 1100–1750 K; oxidizing
+  volatility:
+    dominance_window_K:
+    - 1100.0
+    - 1750.0
+    dominance_note: OsO4, OsO3 ≫ OsO2 under oxidizing conditions (SF18-T1; A61)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: OsO4
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: ferroalloy-tap
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+      po2_gate: oxidizing_only_negligible_at_recipe_pO2
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+      po2_gate: oxidizing_channel_remains_explicit
+  literature_sources:
+  - SF18-T1
+  - A61
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: Pr
+  group: B
+  formula: Pr
+  atoms:
+    Pr: 1.0
+  u0_disposition: R
+  feedstock_presence: false
+  element: Pr
+  is_element_row: true
+  candidate_vapor_form: Pr
+  candidate_forms_for_element:
+  - PrO
+  - Pr
+  phase_system: Pr2O3(s), 1950–2350 K
+  volatility:
+    dominance_window_K:
+    - 1950.0
+    - 2350.0
+    dominance_note: PrO ≫ Pr (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: PrO
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: calciothermic
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: PrO
+  group: B
+  formula: PrO
+  atoms:
+    O: 1.0
+    Pr: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Pr
+  is_element_row: false
+  candidate_vapor_form: PrO
+  candidate_forms_for_element:
+  - PrO
+  - Pr
+  phase_system: Pr2O3(s), 1950–2350 K
+  volatility:
+    dominance_window_K:
+    - 1950.0
+    - 2350.0
+    dominance_note: PrO ≫ Pr (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: PrO
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: calciothermic
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: Pt
+  group: B
+  formula: Pt
+  atoms:
+    Pt: 1.0
+  u0_disposition: R
+  feedstock_presence: false
+  element: Pt
+  is_element_row: true
+  candidate_vapor_form: Pt
+  candidate_forms_for_element:
+  - PtO2
+  - Pt
+  phase_system: Pt metal + O2, 1473–2073 K; oxidizing only
+  volatility:
+    dominance_window_K:
+    - 1473.0
+    - 2073.0
+    dominance_note: PtO2 dominant volatile oxide under oxidizing conditions (A61)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: PtO2
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: ferroalloy-tap
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+      po2_gate: oxidizing_only_negligible_at_recipe_pO2
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+      po2_gate: oxidizing_channel_remains_explicit
+  literature_sources:
+  - A61
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: PtO2
+  group: B
+  formula: PtO2
+  atoms:
+    O: 2.0
+    Pt: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Pt
+  is_element_row: false
+  candidate_vapor_form: PtO2
+  candidate_forms_for_element:
+  - PtO2
+  - Pt
+  phase_system: Pt metal + O2, 1473–2073 K; oxidizing only
+  volatility:
+    dominance_window_K:
+    - 1473.0
+    - 2073.0
+    dominance_note: PtO2 dominant volatile oxide under oxidizing conditions (A61)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: PtO2
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: ferroalloy-tap
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+      po2_gate: oxidizing_only_negligible_at_recipe_pO2
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+      po2_gate: oxidizing_channel_remains_explicit
+  literature_sources:
+  - A61
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: Rh
+  group: B
+  formula: Rh
+  atoms:
+    Rh: 1.0
+  u0_disposition: R
+  feedstock_presence: false
+  element: Rh
+  is_element_row: true
+  candidate_vapor_form: Rh
+  candidate_forms_for_element:
+  - RhO2
+  - Rh
+  phase_system: Rh metal + O2, 1473–2073 K; oxidizing only
+  volatility:
+    dominance_window_K:
+    - 1473.0
+    - 2073.0
+    dominance_note: RhO2 dominant under oxidizing conditions (A61)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: RhO2
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: ferroalloy-tap
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+      po2_gate: oxidizing_only_negligible_at_recipe_pO2
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+      po2_gate: oxidizing_channel_remains_explicit
+  literature_sources:
+  - A61
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: RhO2
+  group: B
+  formula: RhO2
+  atoms:
+    O: 2.0
+    Rh: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Rh
+  is_element_row: false
+  candidate_vapor_form: RhO2
+  candidate_forms_for_element:
+  - RhO2
+  - Rh
+  phase_system: Rh metal + O2, 1473–2073 K; oxidizing only
+  volatility:
+    dominance_window_K:
+    - 1473.0
+    - 2073.0
+    dominance_note: RhO2 dominant under oxidizing conditions (A61)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: RhO2
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: ferroalloy-tap
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+      po2_gate: oxidizing_only_negligible_at_recipe_pO2
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+      po2_gate: oxidizing_channel_remains_explicit
+  literature_sources:
+  - A61
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: Ru
+  group: B
+  formula: Ru
+  atoms:
+    Ru: 1.0
+  u0_disposition: R
+  feedstock_presence: false
+  element: Ru
+  is_element_row: true
+  candidate_vapor_form: Ru
+  candidate_forms_for_element:
+  - RuO3
+  - Ru
+  phase_system: Ru metal + O2, 1473–2073 K; oxidizing only
+  volatility:
+    dominance_window_K:
+    - 1473.0
+    - 2073.0
+    dominance_note: RuO3 (RuO4 lower T) under oxidizing conditions (A61)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: RuO3
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: ferroalloy-tap
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+      po2_gate: oxidizing_only_negligible_at_recipe_pO2
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+      po2_gate: oxidizing_channel_remains_explicit
+  literature_sources:
+  - A61
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: RuO3
+  group: B
+  formula: RuO3
+  atoms:
+    O: 3.0
+    Ru: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Ru
+  is_element_row: false
+  candidate_vapor_form: RuO3
+  candidate_forms_for_element:
+  - RuO3
+  - Ru
+  phase_system: Ru metal + O2, 1473–2073 K; oxidizing only
+  volatility:
+    dominance_window_K:
+    - 1473.0
+    - 2073.0
+    dominance_note: RuO3 (RuO4 lower T) under oxidizing conditions (A61)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: RuO3
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: ferroalloy-tap
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+      po2_gate: oxidizing_only_negligible_at_recipe_pO2
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+      po2_gate: oxidizing_channel_remains_explicit
+  literature_sources:
+  - A61
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: Sc
+  group: B
+  formula: Sc
+  atoms:
+    Sc: 1.0
+  u0_disposition: R
+  feedstock_presence: false
+  element: Sc
+  is_element_row: true
+  candidate_vapor_form: Sc
+  candidate_forms_for_element:
+  - ScO
+  - Sc
+  phase_system: Sc2O3(s), 2481–2768 K
+  volatility:
+    dominance_window_K:
+    - 2481.0
+    - 2768.0
+    dominance_note: ScO dominant (SF18-T1; Ames67)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: ScO
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: rump
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  - Ames67
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: ScO
+  group: B
+  formula: ScO
+  atoms:
+    O: 1.0
+    Sc: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Sc
+  is_element_row: false
+  candidate_vapor_form: ScO
+  candidate_forms_for_element:
+  - ScO
+  - Sc
+  phase_system: Sc2O3(s), 2481–2768 K
+  volatility:
+    dominance_window_K:
+    - 2481.0
+    - 2768.0
+    dominance_note: ScO dominant (SF18-T1; Ames67)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: ScO
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: rump
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  - Ames67
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: Sm
+  group: B
+  formula: Sm
+  atoms:
+    Sm: 1.0
+  u0_disposition: R
+  feedstock_presence: false
+  element: Sm
+  is_element_row: true
+  candidate_vapor_form: Sm
+  candidate_forms_for_element:
+  - SmO
+  - Sm
+  phase_system: Sm2O3(s), 1950–2499 K
+  volatility:
+    dominance_window_K:
+    - 1950.0
+    - 2499.0
+    dominance_note: SmO dominant (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: SmO
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: calciothermic
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: SmO
+  group: B
+  formula: SmO
+  atoms:
+    O: 1.0
+    Sm: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Sm
+  is_element_row: false
+  candidate_vapor_form: SmO
+  candidate_forms_for_element:
+  - SmO
+  - Sm
+  phase_system: Sm2O3(s), 1950–2499 K
+  volatility:
+    dominance_window_K:
+    - 1950.0
+    - 2499.0
+    dominance_note: SmO dominant (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: SmO
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: calciothermic
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: Ta
+  group: B
+  formula: Ta
+  atoms:
+    Ta: 1.0
+  u0_disposition: R
+  feedstock_presence: false
+  element: Ta
+  is_element_row: true
+  candidate_vapor_form: Ta
+  candidate_forms_for_element:
+  - TaO2
+  - TaO
+  - Ta
+  phase_system: Ta2O5(s,l), 1573–2525 K
+  volatility:
+    dominance_window_K:
+    - 1573.0
+    - 2525.0
+    dominance_note: TaO2, TaO ≫ Ta (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: TaO2
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: rump
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: TaO
+  group: B
+  formula: TaO
+  atoms:
+    O: 1.0
+    Ta: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Ta
+  is_element_row: false
+  candidate_vapor_form: TaO
+  candidate_forms_for_element:
+  - TaO2
+  - TaO
+  - Ta
+  phase_system: Ta2O5(s,l), 1573–2525 K
+  volatility:
+    dominance_window_K:
+    - 1573.0
+    - 2525.0
+    dominance_note: TaO2, TaO ≫ Ta (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: TaO2
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: rump
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: TaO2
+  group: B
+  formula: TaO2
+  atoms:
+    O: 2.0
+    Ta: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Ta
+  is_element_row: false
+  candidate_vapor_form: TaO2
+  candidate_forms_for_element:
+  - TaO2
+  - TaO
+  - Ta
+  phase_system: Ta2O5(s,l), 1573–2525 K
+  volatility:
+    dominance_window_K:
+    - 1573.0
+    - 2525.0
+    dominance_note: TaO2, TaO ≫ Ta (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: TaO2
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: rump
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: Tb
+  group: B
+  formula: Tb
+  atoms:
+    Tb: 1.0
+  u0_disposition: R
+  feedstock_presence: false
+  element: Tb
+  is_element_row: true
+  candidate_vapor_form: Tb
+  candidate_forms_for_element:
+  - TbO
+  - Tb
+  phase_system: Tb2O3(s), 2000–2500 K
+  volatility:
+    dominance_window_K:
+    - 2000.0
+    - 2500.0
+    dominance_note: TbO ≫ Tb (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: TbO
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: calciothermic
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: TbO
+  group: B
+  formula: TbO
+  atoms:
+    O: 1.0
+    Tb: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Tb
+  is_element_row: false
+  candidate_vapor_form: TbO
+  candidate_forms_for_element:
+  - TbO
+  - Tb
+  phase_system: Tb2O3(s), 2000–2500 K
+  volatility:
+    dominance_window_K:
+    - 2000.0
+    - 2500.0
+    dominance_note: TbO ≫ Tb (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: TbO
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: calciothermic
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: Th
+  group: B
+  formula: Th
+  atoms:
+    Th: 1.0
+  u0_disposition: R
+  feedstock_presence: true
+  element: Th
+  is_element_row: true
+  candidate_vapor_form: Th
+  candidate_forms_for_element:
+  - ThO2
+  - ThO
+  - Th
+  phase_system: ThO2(s,l), 1782–2950 K
+  volatility:
+    dominance_window_K:
+    - 1782.0
+    - 2950.0
+    dominance_note: ThO2, ThO ≫ Th (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: ThO2
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: rump
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: ThO
+  group: B
+  formula: ThO
+  atoms:
+    O: 1.0
+    Th: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Th
+  is_element_row: false
+  candidate_vapor_form: ThO
+  candidate_forms_for_element:
+  - ThO2
+  - ThO
+  - Th
+  phase_system: ThO2(s,l), 1782–2950 K
+  volatility:
+    dominance_window_K:
+    - 1782.0
+    - 2950.0
+    dominance_note: ThO2, ThO ≫ Th (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: ThO2
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: rump
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: ThO2
+  group: B
+  formula: ThO2
+  atoms:
+    O: 2.0
+    Th: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Th
+  is_element_row: false
+  candidate_vapor_form: ThO2
+  candidate_forms_for_element:
+  - ThO2
+  - ThO
+  - Th
+  phase_system: ThO2(s,l), 1782–2950 K
+  volatility:
+    dominance_window_K:
+    - 1782.0
+    - 2950.0
+    dominance_note: ThO2, ThO ≫ Th (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: ThO2
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: rump
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: Tm
+  group: B
+  formula: Tm
+  atoms:
+    Tm: 1.0
+  u0_disposition: R
+  feedstock_presence: false
+  element: Tm
+  is_element_row: true
+  candidate_vapor_form: Tm
+  candidate_forms_for_element:
+  - Tm
+  - TmO
+  phase_system: Tm2O3(s), 2000–2641 K
+  volatility:
+    dominance_window_K:
+    - 2000.0
+    - 2641.0
+    dominance_note: Tm(g) first (SF18-T1; Ames67)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: Tm
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: calciothermic
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  - Ames67
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: TmO
+  group: B
+  formula: TmO
+  atoms:
+    O: 1.0
+    Tm: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Tm
+  is_element_row: false
+  candidate_vapor_form: TmO
+  candidate_forms_for_element:
+  - Tm
+  - TmO
+  phase_system: Tm2O3(s), 2000–2641 K
+  volatility:
+    dominance_window_K:
+    - 2000.0
+    - 2641.0
+    dominance_note: Tm(g) first (SF18-T1; Ames67)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: Tm
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: calciothermic
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  - Ames67
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: U
+  group: B
+  formula: U
+  atoms:
+    U: 1.0
+  u0_disposition: R
+  feedstock_presence: false
+  element: U
+  is_element_row: true
+  candidate_vapor_form: U
+  candidate_forms_for_element:
+  - UO2
+  - UO3
+  - UO
+  - U
+  phase_system: UO2(s,l), 1600–3400 K; U3O8 -> UO3
+  volatility:
+    dominance_window_K:
+    - 1600.0
+    - 3400.0
+    dominance_note: UO2 over UO2; UO3 over U3O8 (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: UO2
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: rump
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: UO
+  group: B
+  formula: UO
+  atoms:
+    O: 1.0
+    U: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: U
+  is_element_row: false
+  candidate_vapor_form: UO
+  candidate_forms_for_element:
+  - UO2
+  - UO3
+  - UO
+  - U
+  phase_system: UO2(s,l), 1600–3400 K; U3O8 -> UO3
+  volatility:
+    dominance_window_K:
+    - 1600.0
+    - 3400.0
+    dominance_note: UO2 over UO2; UO3 over U3O8 (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: UO2
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: rump
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: UO2
+  group: B
+  formula: UO2
+  atoms:
+    O: 2.0
+    U: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: U
+  is_element_row: false
+  candidate_vapor_form: UO2
+  candidate_forms_for_element:
+  - UO2
+  - UO3
+  - UO
+  - U
+  phase_system: UO2(s,l), 1600–3400 K; U3O8 -> UO3
+  volatility:
+    dominance_window_K:
+    - 1600.0
+    - 3400.0
+    dominance_note: UO2 over UO2; UO3 over U3O8 (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: UO2
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: rump
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: UO3
+  group: B
+  formula: UO3
+  atoms:
+    O: 3.0
+    U: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: U
+  is_element_row: false
+  candidate_vapor_form: UO3
+  candidate_forms_for_element:
+  - UO2
+  - UO3
+  - UO
+  - U
+  phase_system: UO2(s,l), 1600–3400 K; U3O8 -> UO3
+  volatility:
+    dominance_window_K:
+    - 1600.0
+    - 3400.0
+    dominance_note: UO2 over UO2; UO3 over U3O8 (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: UO2
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: rump
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: Y
+  group: B
+  formula: Y
+  atoms:
+    Y: 1.0
+  u0_disposition: R
+  feedstock_presence: false
+  element: Y
+  is_element_row: true
+  candidate_vapor_form: Y
+  candidate_forms_for_element:
+  - YO
+  - Y
+  phase_system: Y2O3(s,l), 1400–2700 K
+  volatility:
+    dominance_window_K:
+    - 1400.0
+    - 2700.0
+    dominance_note: YO ≫ Y (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: YO
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: calciothermic
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: YO
+  group: B
+  formula: YO
+  atoms:
+    O: 1.0
+    Y: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Y
+  is_element_row: false
+  candidate_vapor_form: YO
+  candidate_forms_for_element:
+  - YO
+  - Y
+  phase_system: Y2O3(s,l), 1400–2700 K
+  volatility:
+    dominance_window_K:
+    - 1400.0
+    - 2700.0
+    dominance_note: YO ≫ Y (SF18-T1)
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: YO
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: calciothermic
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: Zr
+  group: B
+  formula: Zr
+  atoms:
+    Zr: 1.0
+  u0_disposition: R
+  feedstock_presence: true
+  element: Zr
+  is_element_row: true
+  candidate_vapor_form: Zr
+  candidate_forms_for_element:
+  - ZrO
+  - Zr
+  phase_system: ZrO2(s), 1700–2875 K
+  volatility:
+    dominance_window_K:
+    - 1700.0
+    - 2875.0
+    dominance_note: ZrO ~ ZrO2 ≫ Zr (SF18-T1); ZrO2 condensed also present in inventory
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: ZrO
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: rump
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: ZrO
+  group: B
+  formula: ZrO
+  atoms:
+    O: 1.0
+    Zr: 1.0
+  u0_disposition: V
+  feedstock_presence: false
+  element: Zr
+  is_element_row: false
+  candidate_vapor_form: ZrO
+  candidate_forms_for_element:
+  - ZrO
+  - Zr
+  phase_system: ZrO2(s), 1700–2875 K
+  volatility:
+    dominance_window_K:
+    - 1700.0
+    - 2875.0
+    dominance_note: ZrO ~ ZrO2 ≫ Zr (SF18-T1); ZrO2 condensed also present in inventory
+    literature_phase: gas
+    millibar_flux_tier: NEGL
+    hard_vacuum_flux_tier: regime_open_not_inferred_zero
+    values:
+      kind: gas_closure_dominance_record
+      primary_carrier: ZrO
+      citation: gas-closure §3 Tier-2; SF18-T1
+      note: Numeric pressure coefficients deferred to R4-B; VR-8 lands regime-aware dominance/applicability
+        and candidate form
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: rump
+    typed_outcome_by_regime:
+      millibar: retain_rump
+      hard_vacuum: evolve_or_compute
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R4-B
+    never_drop: true
+    never_declare_hard_vacuum_zero_from_millibar_negligible: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+      note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+      note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+        from literature carrier under hard-vacuum transport'
+  literature_sources:
+  - SF18-T1
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+- id: O
+  group: monatomic_oxygen
+  formula: O
+  atoms:
+    O: 1.0
+  u0_disposition: U
+  feedstock_presence: false
+  element: O
+  is_element_row: false
+  candidate_vapor_form: O
+  candidate_forms_for_element:
+  - O
+  phase_system: O(g) mass-transport; ½ O2(g) ⇌ O(g) equilibrium relation
+  volatility:
+    dominance_window_K:
+    - 1500.0
+    - 2500.0
+    dominance_note: 'Present in every oxide vaporization equilibrium at high T (gas-closure §6.2 #7)'
+    literature_phase: gas
+    values:
+      kind: atom_explicit_mass_transport
+      pO2_exponent: 0.5
+      pO2_exponent_note: '+1/2: p_O ∝ fO2^(1/2) from ½ O2 ⇌ O; VapoRock in-regime response'
+      source_reaction:
+        id: half_o2_to_atomic_o
+        reactants:
+        - formula: O2
+          stoichiometry: 0.5
+        products:
+        - formula: O
+          stoichiometry: 1.0
+      source_account_requirement: named oxygen-bearing source; VapoRock partial alone cannot mint oxygen
+      o2_outlet_policy: O2 from melt evaporation uses terminal.oxygen_melt_offgas_* only; never MRE anode
+        bin
+      citation: DESIGN-REV5 §6.3; OWNER-FEEDBACK-ROUND-1 O(g); gas-closure §6.2
+  validation:
+    status: pending_validation
+    anchor_refs: []
+    acquisition_status: ATOM_EXPLICIT_ROW_LANDED_DORMANT
+  source_account: process.cleaned_melt
+  route:
+    plant_bin: null
+    typed_outcome: mass_transport_track
+    refusal_code: null
+    dormant_to_flux: true
+    activation_epoch: R2
+    process_or_terminal_destination: terminal.oxygen_melt_offgas_stored
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  literature_sources:
+  - gas-closure
+  - DESIGN-REV5
+  - VapoRock
+  evidence_packages:
+  - docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  - docs-private/design/2026-07-30-vapour-rail-unification/DESIGN-REV5.md
+  vapor_pressures_family: monatomic_oxygen_family

@@ -127,7 +127,7 @@ references:
     doi: 10.1016/j.chemer.2023.125957
     url: https://doi.org/10.1016/j.chemer.2023.125957
   FISCHERGOEDDE2010:
-    author_year: "Fischer-G\xF6dde, Becker & Wombacher 2010"
+    author_year: Fischer-Gödde, Becker & Wombacher 2010
     title: Rhodium, gold and other highly siderophile element abundances in chondritic meteorites
     doi: 10.1016/j.gca.2009.09.024
     url: https://doi.org/10.1016/j.gca.2009.09.024
@@ -411,6 +411,46 @@ elements:
       - REVIEW thermo T5/T34 (2026-07-20)
       - REVIEW speciation F8 (2026-07-20)
       - REVIEW consistency F17 (2026-07-20)
+    vapour_rail_acquisition:
+      chunk: VR-8
+      group: A
+      u0_row_ids:
+      - Li
+      - Li2O
+      - Li2O2
+      - Li3O
+      - LiO
+      candidate_vapor_form: Li2O
+      candidate_forms:
+      - Li2O
+      - Li
+      - LiO
+      - Li3O
+      - Li2O2
+      phase_system: Li2O(s), 1000–1700 K
+      dominance_window_K:
+      - 1000.0
+      - 1700.0
+      dominance_note: Li ~ Li2O > LiO > Li3O, Li2O2 (SF18-T1 p.404; LH84)
+      validation_status: pending_validation
+      acquisition_status: REVIEWABLE_THERMOCHEMICAL_ANCHOR
+      source_account: process.cleaned_melt
+      plant_bin: alkali-cyclone
+      typed_route: evolve
+      dormant_to_flux: true
+      literature_sources:
+      - LH84
+      - SF18-T1
+      regime:
+        millibar:
+          applicable: true
+          dominance: plant_relevant
+          outcome: evolve
+        hard_vacuum:
+          applicable: true
+          dominance: plant_relevant
+          outcome: evolve
+      activation_epoch: R4-A
   Be:
     atomic_number: 4
     family: refractory-lithophile
@@ -427,8 +467,10 @@ elements:
       P_sat: null
     volatile_as_oxide:
       value: false
-      species: null
+      species: Be
       onset_C: null
+      vr8_candidate: Be
+      note: VR-8 candidate vapor form from gas-closure / dominant-missing-12; dormant to flux
     routes:
     - plant_bin: rump
       fraction: 1.0
@@ -537,6 +579,59 @@ elements:
       status: reviewed
       conflict: null
       finding_ids: []
+    vapour_rail_acquisition:
+      chunk: VR-8
+      group: B
+      u0_row_ids:
+      - Be
+      - Be2O
+      - Be2O2
+      - Be3O3
+      - Be4O4
+      - Be5O5
+      - Be6O6
+      - BeO
+      candidate_vapor_form: Be
+      candidate_forms:
+      - Be
+      - Be3O3
+      - Be4O4
+      - BeO
+      - Be2O2
+      - Be5O5
+      - Be6O6
+      - Be2O
+      phase_system: BeO(s), 1900–2500 K
+      dominance_window_K:
+      - 1900.0
+      - 2500.0
+      dominance_note: Be(g) first, then BeO polymer ladder (SF18-T1; LH87 §2.2.a)
+      validation_status: pending_validation
+      acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+      source_account: process.cleaned_melt
+      plant_bin: rump
+      typed_route:
+        millibar: retain_rump
+        hard_vacuum: evolve_or_compute
+      dormant_to_flux: true
+      literature_sources:
+      - SF18-T1
+      - LH87
+      - Chupka1959
+      regime:
+        millibar:
+          applicable: true
+          dominance: negligible
+          outcome: retain_rump
+          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+        hard_vacuum:
+          applicable: true
+          dominance: regime_open
+          outcome: evolve_or_compute
+          note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+            from literature carrier under hard-vacuum transport'
+      never_declare_hard_vacuum_zero_from_millibar_negligible: true
+      activation_epoch: R4-B
   B:
     atomic_number: 5
     family: volatile-lithophile
@@ -945,7 +1040,7 @@ elements:
         - schreibersite
         kg_per_t_typical: 2
         confidence: literature
-      source: "BODY-SWEEP \xA75.1-\xA75.2 (2026-07-20)"
+      source: BODY-SWEEP §5.1-§5.2 (2026-07-20)
     flags:
       radiological: false
       toxic: false
@@ -973,6 +1068,51 @@ elements:
       - REVIEW thermo T6 (2026-07-20)
       - REVIEW speciation F7/F13 (2026-07-20)
       - REVIEW consistency F3/F5 (2026-07-20)
+    vapour_rail_acquisition:
+      chunk: VR-8
+      group: A
+      u0_row_ids:
+      - P
+      - P4O10
+      - P4O6
+      - P4O7
+      - P4O8
+      - P4O9
+      - PO
+      candidate_vapor_form: PO
+      candidate_forms:
+      - PO
+      - P4O6
+      - P4O7
+      - P4O8
+      - P4O9
+      - P4O10
+      - P
+      phase_system: P-oxide ladder over phosphate/melt (rail Stage-0 / R3 family)
+      dominance_window_K:
+      - 1000.0
+      - 2000.0
+      dominance_note: PO and P4On ladder; P2O5_gas is NOT a literature molecule substitute
+      validation_status: pending_validation
+      acquisition_status: CROSS_FAMILY_VR7_P_CARRIERS
+      source_account: process.cleaned_melt
+      plant_bin: C0-cleanup
+      typed_route: evolve
+      dormant_to_flux: true
+      literature_sources:
+      - SF18-T1
+      - gas-closure §2.4/§6.1
+      - vp-acquire-5/P-carriers.md
+      regime:
+        millibar:
+          applicable: true
+          dominance: plant_relevant
+          outcome: evolve
+        hard_vacuum:
+          applicable: true
+          dominance: plant_relevant
+          outcome: evolve
+      activation_epoch: R4-A
   S:
     atomic_number: 16
     family: chalcophile
@@ -1103,7 +1243,7 @@ elements:
         - troilite-inclusions
         kg_per_t_typical: 5
         confidence: literature
-      source: "BODY-SWEEP \xA75.1-\xA75.2 (2026-07-20)"
+      source: BODY-SWEEP §5.1-§5.2 (2026-07-20)
     flags:
       radiological: false
       toxic: false
@@ -1286,8 +1426,10 @@ elements:
       P_sat: null
     volatile_as_oxide:
       value: false
-      species: null
+      species: Sc
       onset_C: null
+      vr8_candidate: Sc
+      note: VR-8 candidate vapor form from gas-closure / dominant-missing-12; dormant to flux
     routes:
     - plant_bin: rump
       fraction: 1.0
@@ -1396,6 +1538,46 @@ elements:
       status: UNCERTAIN
       conflict: speciation F20 + consistency F11 say rump; thermo T15 says activity/flux-gated Ca candidate
       finding_ids: []
+    vapour_rail_acquisition:
+      chunk: VR-8
+      group: B
+      u0_row_ids:
+      - Sc
+      - ScO
+      candidate_vapor_form: Sc
+      candidate_forms:
+      - ScO
+      - Sc
+      phase_system: Sc2O3(s), 2481–2768 K
+      dominance_window_K:
+      - 2481.0
+      - 2768.0
+      dominance_note: ScO dominant (SF18-T1; Ames67)
+      validation_status: pending_validation
+      acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+      source_account: process.cleaned_melt
+      plant_bin: rump
+      typed_route:
+        millibar: retain_rump
+        hard_vacuum: evolve_or_compute
+      dormant_to_flux: true
+      literature_sources:
+      - SF18-T1
+      - Ames67
+      regime:
+        millibar:
+          applicable: true
+          dominance: negligible
+          outcome: retain_rump
+          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+        hard_vacuum:
+          applicable: true
+          dominance: regime_open
+          outcome: evolve_or_compute
+          note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+            from literature carrier under hard-vacuum transport'
+      never_declare_hard_vacuum_zero_from_millibar_negligible: true
+      activation_epoch: R4-B
   V:
     atomic_number: 23
     family: refractory-lithophile
@@ -1542,6 +1724,43 @@ elements:
       - REVIEW thermo T13/T14 (2026-07-20)
       - REVIEW speciation F1 (2026-07-20)
       - REVIEW consistency F1 (2026-07-20)
+    vapour_rail_acquisition:
+      chunk: VR-8
+      group: A
+      u0_row_ids:
+      - V
+      - VO
+      - VO2
+      candidate_vapor_form: VO
+      candidate_forms:
+      - VO
+      - VO2
+      - V
+      phase_system: VO(s)/V2O3, ~1680–1950 K partial pressures
+      dominance_window_K:
+      - 1003.0
+      - 2270.0
+      dominance_note: 'Over VO(s): VO > V > VO2 (Ban86; BIC57); VO2 over V2O4'
+      validation_status: pending_validation
+      acquisition_status: PARTIAL_ANCHORS
+      source_account: process.cleaned_melt
+      plant_bin: ferroalloy-tap
+      typed_route: evolve
+      dormant_to_flux: true
+      literature_sources:
+      - BIC57
+      - Ban86
+      - SF18-T1
+      regime:
+        millibar:
+          applicable: true
+          dominance: plant_relevant
+          outcome: evolve
+        hard_vacuum:
+          applicable: true
+          dominance: plant_relevant
+          outcome: evolve
+      activation_epoch: R4-A
   Cr:
     atomic_number: 24
     family: siderophile
@@ -2253,7 +2472,7 @@ elements:
         - 400
         g_per_t_typical: 150
         confidence: literature
-      source: "BODY-SWEEP \xA75.1-\xA75.2 (2026-07-20)"
+      source: BODY-SWEEP §5.1-§5.2 (2026-07-20)
     flags:
       radiological: false
       toxic: false
@@ -2549,7 +2768,7 @@ elements:
         g_per_t_typical: 20
         confidence: literature
         note: group-taxonomic
-      source: "BODY-SWEEP \xA75.1-\xA75.2 (2026-07-20)"
+      source: BODY-SWEEP §5.1-§5.2 (2026-07-20)
     flags:
       radiological: false
       toxic: false
@@ -2573,6 +2792,42 @@ elements:
       status: reviewed
       conflict: null
       finding_ids: []
+    vapour_rail_acquisition:
+      chunk: VR-8
+      group: A
+      u0_row_ids:
+      - Ga
+      - Ga2O
+      candidate_vapor_form: Ga2O
+      candidate_forms:
+      - Ga2O
+      - Ga
+      - GaO
+      phase_system: Ga2O3(s), 1013–1841 K
+      dominance_window_K:
+      - 1013.0
+      - 1841.0
+      dominance_note: Ga2O most abundant (SF18-T1 p.404; LH87; FT62)
+      validation_status: pending_validation
+      acquisition_status: REVIEWABLE_THERMOCHEMICAL_ANCHOR
+      source_account: process.cleaned_melt
+      plant_bin: volatile-metal-trap
+      typed_route: evolve
+      dormant_to_flux: true
+      literature_sources:
+      - LH87
+      - FT62
+      - SF18-T1
+      regime:
+        millibar:
+          applicable: true
+          dominance: plant_relevant
+          outcome: evolve
+        hard_vacuum:
+          applicable: true
+          dominance: plant_relevant
+          outcome: evolve
+      activation_epoch: R4-A
   Ge:
     atomic_number: 32
     family: siderophile
@@ -2695,7 +2950,7 @@ elements:
         g_per_t_typical: 30
         confidence: literature
         note: group-taxonomic-wide-range
-      source: "BODY-SWEEP \xA75.1-\xA75.2 (2026-07-20)"
+      source: BODY-SWEEP §5.1-§5.2 (2026-07-20)
     flags:
       radiological: false
       toxic: false
@@ -2841,7 +3096,7 @@ elements:
         - 50
         g_per_t_typical: 10
         confidence: literature
-      source: "BODY-SWEEP \xA75.1-\xA75.2 (2026-07-20)"
+      source: BODY-SWEEP §5.1-§5.2 (2026-07-20)
     flags:
       radiological: false
       toxic: true
@@ -2865,6 +3120,42 @@ elements:
       status: reviewed
       conflict: null
       finding_ids: []
+    vapour_rail_acquisition:
+      chunk: VR-8
+      group: A
+      u0_row_ids:
+      - As
+      - As4O6
+      candidate_vapor_form: As4O6
+      candidate_forms:
+      - As4O6
+      - As
+      phase_system: As2O3(arsenolite) -> As4O6(g), 369–730 K Antoine windows
+      dominance_window_K:
+      - 367.0
+      - 1700.0
+      dominance_note: As4O6 ≫ As4O5, As4O4, As2O3, AsO (SF18-T1 p.402; BR72)
+      validation_status: pending_validation
+      acquisition_status: REVIEWABLE_ANTOINE_PRIMARY
+      source_account: process.cleaned_melt
+      plant_bin: volatile-metal-trap
+      typed_route: evolve
+      dormant_to_flux: true
+      literature_sources:
+      - NIST-WB-As
+      - BR72
+      - Stull47
+      - SF18-T1
+      regime:
+        millibar:
+          applicable: true
+          dominance: plant_relevant
+          outcome: evolve
+        hard_vacuum:
+          applicable: true
+          dominance: plant_relevant
+          outcome: evolve
+      activation_epoch: R4-A
   Se:
     atomic_number: 34
     family: chalcophile
@@ -3002,6 +3293,55 @@ elements:
       status: reviewed
       conflict: null
       finding_ids: []
+    vapour_rail_acquisition:
+      chunk: VR-8
+      group: A
+      u0_row_ids:
+      - Se
+      - Se2
+      - Se3
+      - Se4
+      - Se5
+      - Se6
+      - Se7
+      - Se8
+      candidate_vapor_form: Se6
+      candidate_forms:
+      - Se6
+      - Se5
+      - Se2
+      - Se3
+      - Se4
+      - Se7
+      - Se8
+      - Se
+      phase_system: Se(s/l) allotrope ladder, 629–953 K total-P; Se5/6 low-T
+      dominance_window_K:
+      - 629.0
+      - 1200.0
+      dominance_note: Se6 ≳ Se5 over Se(l) low-T; Se2 dominates ≳800 K (NEA05, Rau74, KEMS14)
+      validation_status: pending_validation
+      acquisition_status: REVIEWABLE_SPECIATION_PLUS_DELTAF
+      source_account: process.cleaned_melt
+      plant_bin: cryo-train
+      typed_route: evolve
+      dormant_to_flux: true
+      literature_sources:
+      - NEA05
+      - Rau74
+      - Stull47
+      - KEMS14
+      - SF18-T1
+      regime:
+        millibar:
+          applicable: true
+          dominance: plant_relevant
+          outcome: evolve
+        hard_vacuum:
+          applicable: true
+          dominance: plant_relevant
+          outcome: evolve
+      activation_epoch: R4-A
   Br:
     atomic_number: 35
     family: halogen
@@ -3266,6 +3606,46 @@ elements:
       status: reviewed
       conflict: null
       finding_ids: []
+    vapour_rail_acquisition:
+      chunk: VR-8
+      group: A
+      u0_row_ids:
+      - Rb
+      - Rb2
+      - Rb2O
+      - Rb2O2
+      - RbO
+      candidate_vapor_form: Rb2O
+      candidate_forms:
+      - Rb2O
+      - Rb
+      - RbO
+      - Rb2
+      - Rb2O2
+      phase_system: Rb2O(s/l), ~1020–1135 K measured
+      dominance_window_K:
+      - 1000.0
+      - 1700.0
+      dominance_note: Rb2O co-dominant alkali oxide carrier (LH84; SF18-T1)
+      validation_status: pending_validation
+      acquisition_status: REVIEWABLE_THERMOCHEMICAL_ANCHOR
+      source_account: process.cleaned_melt
+      plant_bin: alkali-cyclone
+      typed_route: evolve
+      dormant_to_flux: true
+      literature_sources:
+      - LH84
+      - SF18-T1
+      regime:
+        millibar:
+          applicable: true
+          dominance: plant_relevant
+          outcome: evolve
+        hard_vacuum:
+          applicable: true
+          dominance: plant_relevant
+          outcome: evolve
+      activation_epoch: R4-A
   Sr:
     atomic_number: 38
     family: alkaline-earth
@@ -3407,6 +3787,40 @@ elements:
       - REVIEW thermo T19 (2026-07-20)
       - REVIEW speciation F11 (2026-07-20)
       - REVIEW consistency F8 (2026-07-20)
+    vapour_rail_acquisition:
+      chunk: VR-8
+      group: A
+      u0_row_ids:
+      - Sr
+      - SrO
+      candidate_vapor_form: Sr
+      candidate_forms:
+      - Sr
+      - SrO
+      phase_system: SrO(s), 1575–2102 K
+      dominance_window_K:
+      - 1575.0
+      - 2102.0
+      dominance_note: Sr(g) ≈ SrO(g) under neutral/reducing; SrO under oxidizing (LH87)
+      validation_status: pending_validation
+      acquisition_status: REVIEWABLE_THERMOCHEMICAL_ANCHOR
+      source_account: process.cleaned_melt
+      plant_bin: Ca-crown
+      typed_route: evolve
+      dormant_to_flux: true
+      literature_sources:
+      - LH87
+      - SF18-T1
+      regime:
+        millibar:
+          applicable: true
+          dominance: plant_relevant
+          outcome: evolve
+        hard_vacuum:
+          applicable: true
+          dominance: plant_relevant
+          outcome: evolve
+      activation_epoch: R4-A
   Y:
     atomic_number: 39
     family: REE
@@ -3426,8 +3840,10 @@ elements:
       P_sat: null
     volatile_as_oxide:
       value: false
-      species: null
+      species: Y
       onset_C: null
+      vr8_candidate: Y
+      note: VR-8 candidate vapor form from gas-closure / dominant-missing-12; dormant to flux
     routes:
     - plant_bin: calciothermic
       fraction: 0.85
@@ -3546,6 +3962,45 @@ elements:
       finding_ids:
       - speciation F2/F24
       - consistency F3/F16
+    vapour_rail_acquisition:
+      chunk: VR-8
+      group: B
+      u0_row_ids:
+      - Y
+      - YO
+      candidate_vapor_form: Y
+      candidate_forms:
+      - YO
+      - Y
+      phase_system: Y2O3(s,l), 1400–2700 K
+      dominance_window_K:
+      - 1400.0
+      - 2700.0
+      dominance_note: YO ≫ Y (SF18-T1)
+      validation_status: pending_validation
+      acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+      source_account: process.cleaned_melt
+      plant_bin: calciothermic
+      typed_route:
+        millibar: retain_rump
+        hard_vacuum: evolve_or_compute
+      dormant_to_flux: true
+      literature_sources:
+      - SF18-T1
+      regime:
+        millibar:
+          applicable: true
+          dominance: negligible
+          outcome: retain_rump
+          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+        hard_vacuum:
+          applicable: true
+          dominance: regime_open
+          outcome: evolve_or_compute
+          note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+            from literature carrier under hard-vacuum transport'
+      never_declare_hard_vacuum_zero_from_millibar_negligible: true
+      activation_epoch: R4-B
   Zr:
     atomic_number: 40
     family: refractory-lithophile
@@ -3563,8 +4018,10 @@ elements:
       P_sat: null
     volatile_as_oxide:
       value: false
-      species: null
+      species: Zr
       onset_C: null
+      vr8_candidate: Zr
+      note: VR-8 candidate vapor form from gas-closure / dominant-missing-12; dormant to flux
     routes:
     - plant_bin: rump
       fraction: 1.0
@@ -3673,7 +4130,46 @@ elements:
       status: UNCERTAIN
       conflict: speciation F20 + consistency freeze say rump; thermo T11 says activity/salt-gated Ca candidate
       finding_ids:
-      - "BODY-SWEEP DIFF-A/\xA71/\xA73/\xA75/\xA76 (2026-07-20)"
+      - BODY-SWEEP DIFF-A/§1/§3/§5/§6 (2026-07-20)
+    vapour_rail_acquisition:
+      chunk: VR-8
+      group: B
+      u0_row_ids:
+      - Zr
+      - ZrO
+      candidate_vapor_form: Zr
+      candidate_forms:
+      - ZrO
+      - Zr
+      phase_system: ZrO2(s), 1700–2875 K
+      dominance_window_K:
+      - 1700.0
+      - 2875.0
+      dominance_note: ZrO ~ ZrO2 ≫ Zr (SF18-T1); ZrO2 condensed also present in inventory
+      validation_status: pending_validation
+      acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+      source_account: process.cleaned_melt
+      plant_bin: rump
+      typed_route:
+        millibar: retain_rump
+        hard_vacuum: evolve_or_compute
+      dormant_to_flux: true
+      literature_sources:
+      - SF18-T1
+      regime:
+        millibar:
+          applicable: true
+          dominance: negligible
+          outcome: retain_rump
+          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+        hard_vacuum:
+          applicable: true
+          dominance: regime_open
+          outcome: evolve_or_compute
+          note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+            from literature carrier under hard-vacuum transport'
+      never_declare_hard_vacuum_zero_from_millibar_negligible: true
+      activation_epoch: R4-B
   Nb:
     atomic_number: 41
     family: refractory-lithophile
@@ -3693,8 +4189,10 @@ elements:
       P_sat: null
     volatile_as_oxide:
       value: false
-      species: null
+      species: Nb
       onset_C: null
+      vr8_candidate: Nb
+      note: VR-8 candidate vapor form from gas-closure / dominant-missing-12; dormant to flux
     routes:
     - plant_bin: C6-tap
       fraction: null
@@ -3813,6 +4311,47 @@ elements:
       finding_ids:
       - REVIEW thermo T12 (2026-07-20)
       - REVIEW speciation F12/F13 (2026-07-20)
+    vapour_rail_acquisition:
+      chunk: VR-8
+      group: B
+      u0_row_ids:
+      - Nb
+      - NbO
+      - NbO2
+      candidate_vapor_form: Nb
+      candidate_forms:
+      - NbO2
+      - NbO
+      - Nb
+      phase_system: NbO/NbO2/Nb2O5, 1726–2473 K
+      dominance_window_K:
+      - 1726.0
+      - 2473.0
+      dominance_note: NbO2 ≈ NbO (SF18-T1)
+      validation_status: pending_validation
+      acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+      source_account: process.cleaned_melt
+      plant_bin: rump
+      typed_route:
+        millibar: retain_rump
+        hard_vacuum: evolve_or_compute
+      dormant_to_flux: true
+      literature_sources:
+      - SF18-T1
+      regime:
+        millibar:
+          applicable: true
+          dominance: negligible
+          outcome: retain_rump
+          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+        hard_vacuum:
+          applicable: true
+          dominance: regime_open
+          outcome: evolve_or_compute
+          note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+            from literature carrier under hard-vacuum transport'
+      never_declare_hard_vacuum_zero_from_millibar_negligible: true
+      activation_epoch: R4-B
   Mo:
     atomic_number: 42
     family: siderophile
@@ -3933,7 +4472,7 @@ elements:
         - 30
         g_per_t_typical: 10
         confidence: literature
-      source: "BODY-SWEEP \xA75.1-\xA75.2 (2026-07-20)"
+      source: BODY-SWEEP §5.1-§5.2 (2026-07-20)
     flags:
       radiological: false
       toxic: false
@@ -4643,6 +5182,41 @@ elements:
       status: reviewed
       conflict: null
       finding_ids: []
+    vapour_rail_acquisition:
+      chunk: VR-8
+      group: A
+      u0_row_ids:
+      - Sb
+      - Sb4O6
+      candidate_vapor_form: Sb4O6
+      candidate_forms:
+      - Sb4O6
+      - Sb
+      phase_system: Sb2O3(valentinite) -> Sb4O6(g), 580–1073 K
+      dominance_window_K:
+      - 580.0
+      - 1073.0
+      dominance_note: Sb4O6 dominant over Sb2O3 (SF18-T1 p.405; BR73; Hincke30)
+      validation_status: pending_validation
+      acquisition_status: PRIMARY_IDENTIFIED_COEFFICIENTS_MISSING
+      source_account: process.cleaned_melt
+      plant_bin: volatile-metal-trap
+      typed_route: evolve
+      dormant_to_flux: true
+      literature_sources:
+      - BR73
+      - Hincke30
+      - SF18-T1
+      regime:
+        millibar:
+          applicable: true
+          dominance: plant_relevant
+          outcome: evolve
+        hard_vacuum:
+          applicable: true
+          dominance: plant_relevant
+          outcome: evolve
+      activation_epoch: R4-A
   Te:
     atomic_number: 52
     family: chalcophile
@@ -4778,7 +5352,7 @@ elements:
       status: reviewed
       conflict: null
       finding_ids:
-      - "BODY-SWEEP DIFF-A/\xA71/\xA73/\xA76 (2026-07-20)"
+      - BODY-SWEEP DIFF-A/§1/§3/§6 (2026-07-20)
   I:
     atomic_number: 53
     family: halogen
@@ -5041,6 +5615,44 @@ elements:
       status: reviewed
       conflict: null
       finding_ids: []
+    vapour_rail_acquisition:
+      chunk: VR-8
+      group: A
+      u0_row_ids:
+      - Cs
+      - Cs2O
+      - Cs2O2
+      - CsO
+      candidate_vapor_form: Cs2O
+      candidate_forms:
+      - Cs2O
+      - Cs
+      - CsO
+      - Cs2O2
+      phase_system: Cs2O associative, 1070–1170 K dominance
+      dominance_window_K:
+      - 1070.0
+      - 1170.0
+      dominance_note: Cs2O(g) dominant associative carrier (LH84)
+      validation_status: pending_validation
+      acquisition_status: REVIEWABLE_THERMOCHEMICAL_ANCHOR
+      source_account: process.cleaned_melt
+      plant_bin: alkali-cyclone
+      typed_route: evolve
+      dormant_to_flux: true
+      literature_sources:
+      - LH84
+      - SF18-T1
+      regime:
+        millibar:
+          applicable: true
+          dominance: plant_relevant
+          outcome: evolve
+        hard_vacuum:
+          applicable: true
+          dominance: plant_relevant
+          outcome: evolve
+      activation_epoch: R4-A
   Ba:
     atomic_number: 56
     family: alkaline-earth
@@ -5182,6 +5794,40 @@ elements:
       - REVIEW thermo T19 (2026-07-20)
       - REVIEW speciation F11 (2026-07-20)
       - REVIEW consistency F8 (2026-07-20)
+    vapour_rail_acquisition:
+      chunk: VR-8
+      group: A
+      u0_row_ids:
+      - Ba
+      - BaO
+      candidate_vapor_form: BaO
+      candidate_forms:
+      - BaO
+      - Ba
+      phase_system: BaO(s), 1150–1758 K
+      dominance_window_K:
+      - 1150.0
+      - 1758.0
+      dominance_note: BaO most abundant Ba gas under oxidizing/neutral (LH87)
+      validation_status: pending_validation
+      acquisition_status: REVIEWABLE_THERMOCHEMICAL_ANCHOR
+      source_account: process.cleaned_melt
+      plant_bin: Ca-crown
+      typed_route: evolve
+      dormant_to_flux: true
+      literature_sources:
+      - LH87
+      - SF18-T1
+      regime:
+        millibar:
+          applicable: true
+          dominance: plant_relevant
+          outcome: evolve
+        hard_vacuum:
+          applicable: true
+          dominance: plant_relevant
+          outcome: evolve
+      activation_epoch: R4-A
   La:
     atomic_number: 57
     family: REE
@@ -5201,8 +5847,10 @@ elements:
       P_sat: null
     volatile_as_oxide:
       value: false
-      species: null
+      species: La
       onset_C: null
+      vr8_candidate: La
+      note: VR-8 candidate vapor form from gas-closure / dominant-missing-12; dormant to flux
     routes:
     - plant_bin: calciothermic
       fraction: 0.85
@@ -5320,6 +5968,45 @@ elements:
       finding_ids:
       - speciation F2/F24
       - consistency F3/F16
+    vapour_rail_acquisition:
+      chunk: VR-8
+      group: B
+      u0_row_ids:
+      - La
+      - LaO
+      candidate_vapor_form: La
+      candidate_forms:
+      - LaO
+      - La
+      phase_system: La2O3(s), 1778–2441 K
+      dominance_window_K:
+      - 1778.0
+      - 2441.0
+      dominance_note: LaO ≫ La (SF18-T1)
+      validation_status: pending_validation
+      acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+      source_account: process.cleaned_melt
+      plant_bin: calciothermic
+      typed_route:
+        millibar: retain_rump
+        hard_vacuum: evolve_or_compute
+      dormant_to_flux: true
+      literature_sources:
+      - SF18-T1
+      regime:
+        millibar:
+          applicable: true
+          dominance: negligible
+          outcome: retain_rump
+          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+        hard_vacuum:
+          applicable: true
+          dominance: regime_open
+          outcome: evolve_or_compute
+          note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+            from literature carrier under hard-vacuum transport'
+      never_declare_hard_vacuum_zero_from_millibar_negligible: true
+      activation_epoch: R4-B
   Ce:
     atomic_number: 58
     family: REE
@@ -5339,8 +6026,10 @@ elements:
       P_sat: null
     volatile_as_oxide:
       value: false
-      species: null
+      species: Ce
       onset_C: null
+      vr8_candidate: Ce
+      note: VR-8 candidate vapor form from gas-closure / dominant-missing-12; dormant to flux
     routes:
     - plant_bin: calciothermic
       fraction: 0.85
@@ -5458,6 +6147,47 @@ elements:
       finding_ids:
       - speciation F2/F24
       - consistency F3/F16
+    vapour_rail_acquisition:
+      chunk: VR-8
+      group: B
+      u0_row_ids:
+      - Ce
+      - CeO
+      - CeO2
+      candidate_vapor_form: Ce
+      candidate_forms:
+      - CeO
+      - CeO2
+      - Ce
+      phase_system: Ce2O3/CeO2(s), 1700–2320 K
+      dominance_window_K:
+      - 1700.0
+      - 2320.0
+      dominance_note: CeO, CeO2 ≫ Ce (SF18-T1)
+      validation_status: pending_validation
+      acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+      source_account: process.cleaned_melt
+      plant_bin: calciothermic
+      typed_route:
+        millibar: retain_rump
+        hard_vacuum: evolve_or_compute
+      dormant_to_flux: true
+      literature_sources:
+      - SF18-T1
+      regime:
+        millibar:
+          applicable: true
+          dominance: negligible
+          outcome: retain_rump
+          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+        hard_vacuum:
+          applicable: true
+          dominance: regime_open
+          outcome: evolve_or_compute
+          note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+            from literature carrier under hard-vacuum transport'
+      never_declare_hard_vacuum_zero_from_millibar_negligible: true
+      activation_epoch: R4-B
   Pr:
     atomic_number: 59
     family: REE
@@ -5477,8 +6207,10 @@ elements:
       P_sat: null
     volatile_as_oxide:
       value: false
-      species: null
+      species: Pr
       onset_C: null
+      vr8_candidate: Pr
+      note: VR-8 candidate vapor form from gas-closure / dominant-missing-12; dormant to flux
     routes:
     - plant_bin: calciothermic
       fraction: 0.85
@@ -5593,6 +6325,45 @@ elements:
       finding_ids:
       - speciation F2/F24
       - consistency F3/F16
+    vapour_rail_acquisition:
+      chunk: VR-8
+      group: B
+      u0_row_ids:
+      - Pr
+      - PrO
+      candidate_vapor_form: Pr
+      candidate_forms:
+      - PrO
+      - Pr
+      phase_system: Pr2O3(s), 1950–2350 K
+      dominance_window_K:
+      - 1950.0
+      - 2350.0
+      dominance_note: PrO ≫ Pr (SF18-T1)
+      validation_status: pending_validation
+      acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+      source_account: process.cleaned_melt
+      plant_bin: calciothermic
+      typed_route:
+        millibar: retain_rump
+        hard_vacuum: evolve_or_compute
+      dormant_to_flux: true
+      literature_sources:
+      - SF18-T1
+      regime:
+        millibar:
+          applicable: true
+          dominance: negligible
+          outcome: retain_rump
+          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+        hard_vacuum:
+          applicable: true
+          dominance: regime_open
+          outcome: evolve_or_compute
+          note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+            from literature carrier under hard-vacuum transport'
+      never_declare_hard_vacuum_zero_from_millibar_negligible: true
+      activation_epoch: R4-B
   Nd:
     atomic_number: 60
     family: REE
@@ -5612,8 +6383,10 @@ elements:
       P_sat: null
     volatile_as_oxide:
       value: false
-      species: null
+      species: Nd
       onset_C: null
+      vr8_candidate: Nd
+      note: VR-8 candidate vapor form from gas-closure / dominant-missing-12; dormant to flux
     routes:
     - plant_bin: calciothermic
       fraction: 0.85
@@ -5731,6 +6504,45 @@ elements:
       finding_ids:
       - speciation F2/F24
       - consistency F3/F16
+    vapour_rail_acquisition:
+      chunk: VR-8
+      group: B
+      u0_row_ids:
+      - Nd
+      - NdO
+      candidate_vapor_form: Nd
+      candidate_forms:
+      - NdO
+      - Nd
+      phase_system: Nd2O3(s), 1950–2485 K
+      dominance_window_K:
+      - 1950.0
+      - 2485.0
+      dominance_note: NdO ≫ Nd (SF18-T1)
+      validation_status: pending_validation
+      acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+      source_account: process.cleaned_melt
+      plant_bin: calciothermic
+      typed_route:
+        millibar: retain_rump
+        hard_vacuum: evolve_or_compute
+      dormant_to_flux: true
+      literature_sources:
+      - SF18-T1
+      regime:
+        millibar:
+          applicable: true
+          dominance: negligible
+          outcome: retain_rump
+          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+        hard_vacuum:
+          applicable: true
+          dominance: regime_open
+          outcome: evolve_or_compute
+          note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+            from literature carrier under hard-vacuum transport'
+      never_declare_hard_vacuum_zero_from_millibar_negligible: true
+      activation_epoch: R4-B
   Sm:
     atomic_number: 62
     family: REE
@@ -5750,8 +6562,10 @@ elements:
       P_sat: null
     volatile_as_oxide:
       value: false
-      species: null
+      species: Sm
       onset_C: null
+      vr8_candidate: Sm
+      note: VR-8 candidate vapor form from gas-closure / dominant-missing-12; dormant to flux
     routes:
     - plant_bin: calciothermic
       fraction: 0.85
@@ -5869,6 +6683,45 @@ elements:
       finding_ids:
       - speciation F2/F24
       - consistency F3/F16
+    vapour_rail_acquisition:
+      chunk: VR-8
+      group: B
+      u0_row_ids:
+      - Sm
+      - SmO
+      candidate_vapor_form: Sm
+      candidate_forms:
+      - SmO
+      - Sm
+      phase_system: Sm2O3(s), 1950–2499 K
+      dominance_window_K:
+      - 1950.0
+      - 2499.0
+      dominance_note: SmO dominant (SF18-T1)
+      validation_status: pending_validation
+      acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+      source_account: process.cleaned_melt
+      plant_bin: calciothermic
+      typed_route:
+        millibar: retain_rump
+        hard_vacuum: evolve_or_compute
+      dormant_to_flux: true
+      literature_sources:
+      - SF18-T1
+      regime:
+        millibar:
+          applicable: true
+          dominance: negligible
+          outcome: retain_rump
+          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+        hard_vacuum:
+          applicable: true
+          dominance: regime_open
+          outcome: evolve_or_compute
+          note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+            from literature carrier under hard-vacuum transport'
+      never_declare_hard_vacuum_zero_from_millibar_negligible: true
+      activation_epoch: R4-B
   Eu:
     atomic_number: 63
     family: REE
@@ -6019,6 +6872,42 @@ elements:
       - REVIEW thermo T20 (2026-07-20)
       - REVIEW speciation F4/F24/F25 (2026-07-20)
       - REVIEW consistency F7 (2026-07-20)
+    vapour_rail_acquisition:
+      chunk: VR-8
+      group: A
+      u0_row_ids:
+      - Eu
+      candidate_vapor_form: Eu
+      candidate_forms:
+      - Eu
+      - EuO
+      phase_system: Eu metal; Eu2O3 for EuO, 1950–2350 K
+      dominance_window_K:
+      - 700.0
+      - 2350.0
+      dominance_note: Eu(g) first — anomalously volatile REE; EuO secondary (Hab64; Ames67)
+      validation_status: pending_validation
+      acquisition_status: PARTIAL_METAL_ANCHORED_OXIDE_OPEN
+      source_account: process.cleaned_melt
+      plant_bin: Ca-crown
+      typed_route: evolve
+      dormant_to_flux: true
+      literature_sources:
+      - Hab64
+      - Hanak59
+      - Ames67
+      - Panish61a
+      - SF18-T1
+      regime:
+        millibar:
+          applicable: true
+          dominance: plant_relevant
+          outcome: evolve
+        hard_vacuum:
+          applicable: true
+          dominance: plant_relevant
+          outcome: evolve
+      activation_epoch: R4-A
   Gd:
     atomic_number: 64
     family: REE
@@ -6038,8 +6927,10 @@ elements:
       P_sat: null
     volatile_as_oxide:
       value: false
-      species: null
+      species: Gd
       onset_C: null
+      vr8_candidate: Gd
+      note: VR-8 candidate vapor form from gas-closure / dominant-missing-12; dormant to flux
     routes:
     - plant_bin: calciothermic
       fraction: 0.85
@@ -6157,6 +7048,45 @@ elements:
       finding_ids:
       - speciation F2/F24
       - consistency F3/F16
+    vapour_rail_acquisition:
+      chunk: VR-8
+      group: B
+      u0_row_ids:
+      - Gd
+      - GdO
+      candidate_vapor_form: Gd
+      candidate_forms:
+      - GdO
+      - Gd
+      phase_system: Gd2O3(s), 2000–2590 K
+      dominance_window_K:
+      - 2000.0
+      - 2590.0
+      dominance_note: GdO ≫ Gd (SF18-T1)
+      validation_status: pending_validation
+      acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+      source_account: process.cleaned_melt
+      plant_bin: calciothermic
+      typed_route:
+        millibar: retain_rump
+        hard_vacuum: evolve_or_compute
+      dormant_to_flux: true
+      literature_sources:
+      - SF18-T1
+      regime:
+        millibar:
+          applicable: true
+          dominance: negligible
+          outcome: retain_rump
+          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+        hard_vacuum:
+          applicable: true
+          dominance: regime_open
+          outcome: evolve_or_compute
+          note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+            from literature carrier under hard-vacuum transport'
+      never_declare_hard_vacuum_zero_from_millibar_negligible: true
+      activation_epoch: R4-B
   Tb:
     atomic_number: 65
     family: REE
@@ -6176,8 +7106,10 @@ elements:
       P_sat: null
     volatile_as_oxide:
       value: false
-      species: null
+      species: Tb
       onset_C: null
+      vr8_candidate: Tb
+      note: VR-8 candidate vapor form from gas-closure / dominant-missing-12; dormant to flux
     routes:
     - plant_bin: calciothermic
       fraction: 0.85
@@ -6293,6 +7225,45 @@ elements:
       finding_ids:
       - speciation F2/F24
       - consistency F3/F16
+    vapour_rail_acquisition:
+      chunk: VR-8
+      group: B
+      u0_row_ids:
+      - Tb
+      - TbO
+      candidate_vapor_form: Tb
+      candidate_forms:
+      - TbO
+      - Tb
+      phase_system: Tb2O3(s), 2000–2500 K
+      dominance_window_K:
+      - 2000.0
+      - 2500.0
+      dominance_note: TbO ≫ Tb (SF18-T1)
+      validation_status: pending_validation
+      acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+      source_account: process.cleaned_melt
+      plant_bin: calciothermic
+      typed_route:
+        millibar: retain_rump
+        hard_vacuum: evolve_or_compute
+      dormant_to_flux: true
+      literature_sources:
+      - SF18-T1
+      regime:
+        millibar:
+          applicable: true
+          dominance: negligible
+          outcome: retain_rump
+          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+        hard_vacuum:
+          applicable: true
+          dominance: regime_open
+          outcome: evolve_or_compute
+          note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+            from literature carrier under hard-vacuum transport'
+      never_declare_hard_vacuum_zero_from_millibar_negligible: true
+      activation_epoch: R4-B
   Dy:
     atomic_number: 66
     family: REE
@@ -6312,8 +7283,10 @@ elements:
       P_sat: null
     volatile_as_oxide:
       value: false
-      species: null
+      species: Dy
       onset_C: null
+      vr8_candidate: Dy
+      note: VR-8 candidate vapor form from gas-closure / dominant-missing-12; dormant to flux
     routes:
     - plant_bin: calciothermic
       fraction: 0.85
@@ -6431,6 +7404,46 @@ elements:
       finding_ids:
       - speciation F2/F24
       - consistency F3/F16
+    vapour_rail_acquisition:
+      chunk: VR-8
+      group: B
+      u0_row_ids:
+      - Dy
+      - DyO
+      candidate_vapor_form: Dy
+      candidate_forms:
+      - DyO
+      - Dy
+      phase_system: Dy2O3(s), 2000–2637 K
+      dominance_window_K:
+      - 2000.0
+      - 2637.0
+      dominance_note: DyO dominant (SF18-T1)
+      validation_status: pending_validation
+      acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+      source_account: process.cleaned_melt
+      plant_bin: calciothermic
+      typed_route:
+        millibar: retain_rump
+        hard_vacuum: evolve_or_compute
+      dormant_to_flux: true
+      literature_sources:
+      - SF18-T1
+      - Ames67
+      regime:
+        millibar:
+          applicable: true
+          dominance: negligible
+          outcome: retain_rump
+          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+        hard_vacuum:
+          applicable: true
+          dominance: regime_open
+          outcome: evolve_or_compute
+          note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+            from literature carrier under hard-vacuum transport'
+      never_declare_hard_vacuum_zero_from_millibar_negligible: true
+      activation_epoch: R4-B
   Ho:
     atomic_number: 67
     family: REE
@@ -6450,8 +7463,10 @@ elements:
       P_sat: null
     volatile_as_oxide:
       value: false
-      species: null
+      species: Ho
       onset_C: null
+      vr8_candidate: Ho
+      note: VR-8 candidate vapor form from gas-closure / dominant-missing-12; dormant to flux
     routes:
     - plant_bin: calciothermic
       fraction: 0.85
@@ -6566,6 +7581,45 @@ elements:
       finding_ids:
       - speciation F2/F24
       - consistency F3/F16
+    vapour_rail_acquisition:
+      chunk: VR-8
+      group: B
+      u0_row_ids:
+      - Ho
+      - HoO
+      candidate_vapor_form: Ho
+      candidate_forms:
+      - HoO
+      - Ho
+      phase_system: Ho2O3(s), 2000–2711 K
+      dominance_window_K:
+      - 2000.0
+      - 2711.0
+      dominance_note: HoO dominant (SF18-T1)
+      validation_status: pending_validation
+      acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+      source_account: process.cleaned_melt
+      plant_bin: calciothermic
+      typed_route:
+        millibar: retain_rump
+        hard_vacuum: evolve_or_compute
+      dormant_to_flux: true
+      literature_sources:
+      - SF18-T1
+      regime:
+        millibar:
+          applicable: true
+          dominance: negligible
+          outcome: retain_rump
+          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+        hard_vacuum:
+          applicable: true
+          dominance: regime_open
+          outcome: evolve_or_compute
+          note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+            from literature carrier under hard-vacuum transport'
+      never_declare_hard_vacuum_zero_from_millibar_negligible: true
+      activation_epoch: R4-B
   Er:
     atomic_number: 68
     family: REE
@@ -6585,8 +7639,10 @@ elements:
       P_sat: null
     volatile_as_oxide:
       value: false
-      species: null
+      species: Er
       onset_C: null
+      vr8_candidate: Er
+      note: VR-8 candidate vapor form from gas-closure / dominant-missing-12; dormant to flux
     routes:
     - plant_bin: calciothermic
       fraction: 0.85
@@ -6701,6 +7757,45 @@ elements:
       finding_ids:
       - speciation F2/F24
       - consistency F3/F16
+    vapour_rail_acquisition:
+      chunk: VR-8
+      group: B
+      u0_row_ids:
+      - Er
+      - ErO
+      candidate_vapor_form: Er
+      candidate_forms:
+      - ErO
+      - Er
+      phase_system: Er2O3(s), 2000–2687 K
+      dominance_window_K:
+      - 2000.0
+      - 2687.0
+      dominance_note: ErO dominant (SF18-T1)
+      validation_status: pending_validation
+      acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+      source_account: process.cleaned_melt
+      plant_bin: calciothermic
+      typed_route:
+        millibar: retain_rump
+        hard_vacuum: evolve_or_compute
+      dormant_to_flux: true
+      literature_sources:
+      - SF18-T1
+      regime:
+        millibar:
+          applicable: true
+          dominance: negligible
+          outcome: retain_rump
+          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+        hard_vacuum:
+          applicable: true
+          dominance: regime_open
+          outcome: evolve_or_compute
+          note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+            from literature carrier under hard-vacuum transport'
+      never_declare_hard_vacuum_zero_from_millibar_negligible: true
+      activation_epoch: R4-B
   Tm:
     atomic_number: 69
     family: REE
@@ -6720,8 +7815,10 @@ elements:
       P_sat: null
     volatile_as_oxide:
       value: false
-      species: null
+      species: Tm
       onset_C: null
+      vr8_candidate: Tm
+      note: VR-8 candidate vapor form from gas-closure / dominant-missing-12; dormant to flux
     routes:
     - plant_bin: calciothermic
       fraction: 0.85
@@ -6836,6 +7933,46 @@ elements:
       finding_ids:
       - speciation F2/F24
       - consistency F3/F16
+    vapour_rail_acquisition:
+      chunk: VR-8
+      group: B
+      u0_row_ids:
+      - Tm
+      - TmO
+      candidate_vapor_form: Tm
+      candidate_forms:
+      - Tm
+      - TmO
+      phase_system: Tm2O3(s), 2000–2641 K
+      dominance_window_K:
+      - 2000.0
+      - 2641.0
+      dominance_note: Tm(g) first (SF18-T1; Ames67)
+      validation_status: pending_validation
+      acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+      source_account: process.cleaned_melt
+      plant_bin: calciothermic
+      typed_route:
+        millibar: retain_rump
+        hard_vacuum: evolve_or_compute
+      dormant_to_flux: true
+      literature_sources:
+      - SF18-T1
+      - Ames67
+      regime:
+        millibar:
+          applicable: true
+          dominance: negligible
+          outcome: retain_rump
+          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+        hard_vacuum:
+          applicable: true
+          dominance: regime_open
+          outcome: evolve_or_compute
+          note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+            from literature carrier under hard-vacuum transport'
+      never_declare_hard_vacuum_zero_from_millibar_negligible: true
+      activation_epoch: R4-B
   Yb:
     atomic_number: 70
     family: REE
@@ -6982,6 +8119,42 @@ elements:
       - REVIEW thermo T20 (2026-07-20)
       - REVIEW speciation F4/F24/F25 (2026-07-20)
       - REVIEW consistency F7 (2026-07-20)
+    vapour_rail_acquisition:
+      chunk: VR-8
+      group: A
+      u0_row_ids:
+      - Yb
+      candidate_vapor_form: Yb
+      candidate_forms:
+      - Yb
+      - YbO
+      phase_system: Yb metal 623–931 K; Yb2O3 oxide 2000–2626 K
+      dominance_window_K:
+      - 623.0
+      - 2626.0
+      dominance_note: Yb(g) first — anomalously volatile REE (Hab64; Ames67)
+      validation_status: pending_validation
+      acquisition_status: REVIEWABLE_METAL_ANTOINE_OXIDE_OPEN
+      source_account: process.cleaned_melt
+      plant_bin: calciothermic
+      typed_route: evolve
+      dormant_to_flux: true
+      literature_sources:
+      - Hab64
+      - Ames67
+      - Panish61b
+      - Stol14
+      - SF18-T1
+      regime:
+        millibar:
+          applicable: true
+          dominance: plant_relevant
+          outcome: evolve
+        hard_vacuum:
+          applicable: true
+          dominance: plant_relevant
+          outcome: evolve
+      activation_epoch: R4-A
   Lu:
     atomic_number: 71
     family: REE
@@ -7001,8 +8174,10 @@ elements:
       P_sat: null
     volatile_as_oxide:
       value: false
-      species: null
+      species: Lu
       onset_C: null
+      vr8_candidate: Lu
+      note: VR-8 candidate vapor form from gas-closure / dominant-missing-12; dormant to flux
     routes:
     - plant_bin: calciothermic
       fraction: 0.85
@@ -7118,6 +8293,45 @@ elements:
       finding_ids:
       - speciation F2/F24
       - consistency F3/F16
+    vapour_rail_acquisition:
+      chunk: VR-8
+      group: B
+      u0_row_ids:
+      - Lu
+      - LuO
+      candidate_vapor_form: Lu
+      candidate_forms:
+      - LuO
+      - Lu
+      phase_system: Lu2O3(s), 2000–2700 K
+      dominance_window_K:
+      - 2000.0
+      - 2700.0
+      dominance_note: LuO ≫ Lu (LuO/Lu ≈ 4) (SF18-T1)
+      validation_status: pending_validation
+      acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+      source_account: process.cleaned_melt
+      plant_bin: calciothermic
+      typed_route:
+        millibar: retain_rump
+        hard_vacuum: evolve_or_compute
+      dormant_to_flux: true
+      literature_sources:
+      - SF18-T1
+      regime:
+        millibar:
+          applicable: true
+          dominance: negligible
+          outcome: retain_rump
+          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+        hard_vacuum:
+          applicable: true
+          dominance: regime_open
+          outcome: evolve_or_compute
+          note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+            from literature carrier under hard-vacuum transport'
+      never_declare_hard_vacuum_zero_from_millibar_negligible: true
+      activation_epoch: R4-B
   Hf:
     atomic_number: 72
     family: refractory-lithophile
@@ -7135,8 +8349,10 @@ elements:
       P_sat: null
     volatile_as_oxide:
       value: false
-      species: null
+      species: Hf
       onset_C: null
+      vr8_candidate: Hf
+      note: VR-8 candidate vapor form from gas-closure / dominant-missing-12; dormant to flux
     routes:
     - plant_bin: rump
       fraction: 1.0
@@ -7245,6 +8461,45 @@ elements:
       status: UNCERTAIN
       conflict: speciation F20 + consistency freeze say rump; thermo T11 says activity/salt-gated Ca candidate
       finding_ids: []
+    vapour_rail_acquisition:
+      chunk: VR-8
+      group: B
+      u0_row_ids:
+      - Hf
+      - HfO
+      candidate_vapor_form: Hf
+      candidate_forms:
+      - HfO
+      - Hf
+      phase_system: HfO2(s), 2150–2900 K
+      dominance_window_K:
+      - 2150.0
+      - 2900.0
+      dominance_note: HfO > HfO2 ≫ Hf (SF18-T1)
+      validation_status: pending_validation
+      acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+      source_account: process.cleaned_melt
+      plant_bin: rump
+      typed_route:
+        millibar: retain_rump
+        hard_vacuum: evolve_or_compute
+      dormant_to_flux: true
+      literature_sources:
+      - SF18-T1
+      regime:
+        millibar:
+          applicable: true
+          dominance: negligible
+          outcome: retain_rump
+          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+        hard_vacuum:
+          applicable: true
+          dominance: regime_open
+          outcome: evolve_or_compute
+          note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+            from literature carrier under hard-vacuum transport'
+      never_declare_hard_vacuum_zero_from_millibar_negligible: true
+      activation_epoch: R4-B
   Ta:
     atomic_number: 73
     family: refractory-lithophile
@@ -7264,8 +8519,10 @@ elements:
       P_sat: null
     volatile_as_oxide:
       value: false
-      species: null
+      species: Ta
       onset_C: null
+      vr8_candidate: Ta
+      note: VR-8 candidate vapor form from gas-closure / dominant-missing-12; dormant to flux
     routes:
     - plant_bin: C6-tap
       fraction: null
@@ -7384,6 +8641,47 @@ elements:
       finding_ids:
       - REVIEW thermo T12 (2026-07-20)
       - REVIEW speciation F12/F13 (2026-07-20)
+    vapour_rail_acquisition:
+      chunk: VR-8
+      group: B
+      u0_row_ids:
+      - Ta
+      - TaO
+      - TaO2
+      candidate_vapor_form: Ta
+      candidate_forms:
+      - TaO2
+      - TaO
+      - Ta
+      phase_system: Ta2O5(s,l), 1573–2525 K
+      dominance_window_K:
+      - 1573.0
+      - 2525.0
+      dominance_note: TaO2, TaO ≫ Ta (SF18-T1)
+      validation_status: pending_validation
+      acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+      source_account: process.cleaned_melt
+      plant_bin: rump
+      typed_route:
+        millibar: retain_rump
+        hard_vacuum: evolve_or_compute
+      dormant_to_flux: true
+      literature_sources:
+      - SF18-T1
+      regime:
+        millibar:
+          applicable: true
+          dominance: negligible
+          outcome: retain_rump
+          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+        hard_vacuum:
+          applicable: true
+          dominance: regime_open
+          outcome: evolve_or_compute
+          note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+            from literature carrier under hard-vacuum transport'
+      never_declare_hard_vacuum_zero_from_millibar_negligible: true
+      activation_epoch: R4-B
   W:
     atomic_number: 74
     family: siderophile
@@ -7505,14 +8803,14 @@ elements:
         - 5
         g_per_t_typical: 1
         confidence: literature
-      source: "BODY-SWEEP \xA75.1-\xA75.2 (2026-07-20)"
+      source: BODY-SWEEP §5.1-§5.2 (2026-07-20)
     flags:
       radiological: false
       toxic: false
       phosphine_former: false
       cryo_choke_risk: false
       salience_unit: g_per_t
-      salience_note: "~0.2 g W per 1-t lunar soil \u2014 high-value trace"
+      salience_note: ~0.2 g W per 1-t lunar soil — high-value trace
     source_ids:
     - LODDERS2003
     - LSB1991_CH8
@@ -7701,8 +8999,10 @@ elements:
       P_sat: null
     volatile_as_oxide:
       value: false
-      species: null
+      species: Ir
       onset_C: null
+      vr8_candidate: Ir
+      note: VR-8 candidate vapor form from gas-closure / dominant-missing-12; dormant to flux
     routes:
     - plant_bin: ferroalloy-tap
       fraction: 1.0
@@ -7824,6 +9124,48 @@ elements:
       finding_ids:
       - REVIEW speciation F21 (2026-07-20)
       - BODY-SWEEP DIFF-C/M-type (2026-07-20)
+    vapour_rail_acquisition:
+      chunk: VR-8
+      group: B
+      u0_row_ids:
+      - Ir
+      - IrO3
+      candidate_vapor_form: Ir
+      candidate_forms:
+      - IrO3
+      - Ir
+      phase_system: Ir metal + O2, 1473–2073 K; oxidizing only
+      dominance_window_K:
+      - 1473.0
+      - 2073.0
+      dominance_note: IrO3 dominant under oxidizing conditions (A61)
+      validation_status: pending_validation
+      acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+      source_account: process.cleaned_melt
+      plant_bin: ferroalloy-tap
+      typed_route:
+        millibar: retain_rump
+        hard_vacuum: evolve_or_compute
+      dormant_to_flux: true
+      literature_sources:
+      - A61
+      - SF18-T1
+      regime:
+        millibar:
+          applicable: true
+          dominance: negligible
+          outcome: retain_rump
+          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+          po2_gate: oxidizing_only_negligible_at_recipe_pO2
+        hard_vacuum:
+          applicable: true
+          dominance: regime_open
+          outcome: evolve_or_compute
+          note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+            from literature carrier under hard-vacuum transport'
+          po2_gate: oxidizing_channel_remains_explicit
+      never_declare_hard_vacuum_zero_from_millibar_negligible: true
+      activation_epoch: R4-B
   Pt:
     atomic_number: 78
     family: siderophile
@@ -7842,8 +9184,10 @@ elements:
       P_sat: null
     volatile_as_oxide:
       value: false
-      species: null
+      species: Pt
       onset_C: null
+      vr8_candidate: Pt
+      note: VR-8 candidate vapor form from gas-closure / dominant-missing-12; dormant to flux
     routes:
     - plant_bin: ferroalloy-tap
       fraction: 1.0
@@ -7966,6 +9310,48 @@ elements:
       finding_ids:
       - REVIEW speciation F21 (2026-07-20)
       - BODY-SWEEP DIFF-A/DIFF-C (2026-07-20)
+    vapour_rail_acquisition:
+      chunk: VR-8
+      group: B
+      u0_row_ids:
+      - Pt
+      - PtO2
+      candidate_vapor_form: Pt
+      candidate_forms:
+      - PtO2
+      - Pt
+      phase_system: Pt metal + O2, 1473–2073 K; oxidizing only
+      dominance_window_K:
+      - 1473.0
+      - 2073.0
+      dominance_note: PtO2 dominant volatile oxide under oxidizing conditions (A61)
+      validation_status: pending_validation
+      acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+      source_account: process.cleaned_melt
+      plant_bin: ferroalloy-tap
+      typed_route:
+        millibar: retain_rump
+        hard_vacuum: evolve_or_compute
+      dormant_to_flux: true
+      literature_sources:
+      - A61
+      - SF18-T1
+      regime:
+        millibar:
+          applicable: true
+          dominance: negligible
+          outcome: retain_rump
+          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+          po2_gate: oxidizing_only_negligible_at_recipe_pO2
+        hard_vacuum:
+          applicable: true
+          dominance: regime_open
+          outcome: evolve_or_compute
+          note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+            from literature carrier under hard-vacuum transport'
+          po2_gate: oxidizing_channel_remains_explicit
+      never_declare_hard_vacuum_zero_from_millibar_negligible: true
+      activation_epoch: R4-B
   Au:
     atomic_number: 79
     family: siderophile
@@ -8536,8 +9922,10 @@ elements:
       P_sat: null
     volatile_as_oxide:
       value: false
-      species: null
+      species: Th
       onset_C: null
+      vr8_candidate: Th
+      note: VR-8 candidate vapor form from gas-closure / dominant-missing-12; dormant to flux
     routes:
     - plant_bin: calciothermic
       fraction: 0.7
@@ -8652,6 +10040,47 @@ elements:
       status: reviewed
       conflict: null
       finding_ids: []
+    vapour_rail_acquisition:
+      chunk: VR-8
+      group: B
+      u0_row_ids:
+      - Th
+      - ThO
+      - ThO2
+      candidate_vapor_form: Th
+      candidate_forms:
+      - ThO2
+      - ThO
+      - Th
+      phase_system: ThO2(s,l), 1782–2950 K
+      dominance_window_K:
+      - 1782.0
+      - 2950.0
+      dominance_note: ThO2, ThO ≫ Th (SF18-T1)
+      validation_status: pending_validation
+      acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+      source_account: process.cleaned_melt
+      plant_bin: rump
+      typed_route:
+        millibar: retain_rump
+        hard_vacuum: evolve_or_compute
+      dormant_to_flux: true
+      literature_sources:
+      - SF18-T1
+      regime:
+        millibar:
+          applicable: true
+          dominance: negligible
+          outcome: retain_rump
+          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+        hard_vacuum:
+          applicable: true
+          dominance: regime_open
+          outcome: evolve_or_compute
+          note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+            from literature carrier under hard-vacuum transport'
+      never_declare_hard_vacuum_zero_from_millibar_negligible: true
+      activation_epoch: R4-B
   U:
     atomic_number: 92
     family: actinide
@@ -8668,8 +10097,10 @@ elements:
       P_sat: null
     volatile_as_oxide:
       value: false
-      species: null
+      species: U
       onset_C: null
+      vr8_candidate: U
+      note: VR-8 candidate vapor form from gas-closure / dominant-missing-12; dormant to flux
     routes:
     - plant_bin: calciothermic
       fraction: 0.7
@@ -8784,6 +10215,49 @@ elements:
       status: reviewed
       conflict: null
       finding_ids: []
+    vapour_rail_acquisition:
+      chunk: VR-8
+      group: B
+      u0_row_ids:
+      - U
+      - UO
+      - UO2
+      - UO3
+      candidate_vapor_form: U
+      candidate_forms:
+      - UO2
+      - UO3
+      - UO
+      - U
+      phase_system: UO2(s,l), 1600–3400 K; U3O8 -> UO3
+      dominance_window_K:
+      - 1600.0
+      - 3400.0
+      dominance_note: UO2 over UO2; UO3 over U3O8 (SF18-T1)
+      validation_status: pending_validation
+      acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+      source_account: process.cleaned_melt
+      plant_bin: rump
+      typed_route:
+        millibar: retain_rump
+        hard_vacuum: evolve_or_compute
+      dormant_to_flux: true
+      literature_sources:
+      - SF18-T1
+      regime:
+        millibar:
+          applicable: true
+          dominance: negligible
+          outcome: retain_rump
+          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+        hard_vacuum:
+          applicable: true
+          dominance: regime_open
+          outcome: evolve_or_compute
+          note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+            from literature carrier under hard-vacuum transport'
+      never_declare_hard_vacuum_zero_from_millibar_negligible: true
+      activation_epoch: R4-B
   H:
     atomic_number: 1
     family: volatile-lithophile
@@ -8916,7 +10390,7 @@ elements:
       status: reviewed
       conflict: null
       finding_ids:
-      - "BODY-SWEEP DIFF-A/DIFF-B/\xA71/\xA73 (2026-07-20)"
+      - BODY-SWEEP DIFF-A/DIFF-B/§1/§3 (2026-07-20)
   He:
     atomic_number: 2
     family: noble-gas
@@ -9037,7 +10511,7 @@ elements:
       status: reviewed
       conflict: null
       finding_ids:
-      - "BODY-SWEEP DIFF-A/\xA71 (2026-07-20)"
+      - BODY-SWEEP DIFF-A/§1 (2026-07-20)
   C:
     atomic_number: 6
     family: volatile-lithophile
@@ -9182,7 +10656,7 @@ elements:
       status: reviewed
       conflict: null
       finding_ids:
-      - "BODY-SWEEP DIFF-A/DIFF-B/\xA71/\xA73/\xA75 (2026-07-20)"
+      - BODY-SWEEP DIFF-A/DIFF-B/§1/§3/§5 (2026-07-20)
   N:
     atomic_number: 7
     family: volatile-lithophile
@@ -9318,7 +10792,7 @@ elements:
       status: reviewed
       conflict: null
       finding_ids:
-      - "BODY-SWEEP DIFF-A/DIFF-B/\xA71/\xA72/\xA73/\xA76 (2026-07-20)"
+      - BODY-SWEEP DIFF-A/DIFF-B/§1/§2/§3/§6 (2026-07-20)
   Ru:
     atomic_number: 44
     family: siderophile
@@ -9338,8 +10812,10 @@ elements:
       P_sat: null
     volatile_as_oxide:
       value: false
-      species: null
+      species: Ru
       onset_C: null
+      vr8_candidate: Ru
+      note: VR-8 candidate vapor form from gas-closure / dominant-missing-12; dormant to flux
     routes:
     - plant_bin: ferroalloy-tap
       fraction: null
@@ -9453,6 +10929,48 @@ elements:
       - REVIEW speciation F21 (2026-07-20)
       - REVIEW consistency F14 (2026-07-20)
       - BODY-SWEEP DIFF-A/DIFF-C (2026-07-20)
+    vapour_rail_acquisition:
+      chunk: VR-8
+      group: B
+      u0_row_ids:
+      - Ru
+      - RuO3
+      candidate_vapor_form: Ru
+      candidate_forms:
+      - RuO3
+      - Ru
+      phase_system: Ru metal + O2, 1473–2073 K; oxidizing only
+      dominance_window_K:
+      - 1473.0
+      - 2073.0
+      dominance_note: RuO3 (RuO4 lower T) under oxidizing conditions (A61)
+      validation_status: pending_validation
+      acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+      source_account: process.cleaned_melt
+      plant_bin: ferroalloy-tap
+      typed_route:
+        millibar: retain_rump
+        hard_vacuum: evolve_or_compute
+      dormant_to_flux: true
+      literature_sources:
+      - A61
+      - SF18-T1
+      regime:
+        millibar:
+          applicable: true
+          dominance: negligible
+          outcome: retain_rump
+          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+          po2_gate: oxidizing_only_negligible_at_recipe_pO2
+        hard_vacuum:
+          applicable: true
+          dominance: regime_open
+          outcome: evolve_or_compute
+          note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+            from literature carrier under hard-vacuum transport'
+          po2_gate: oxidizing_channel_remains_explicit
+      never_declare_hard_vacuum_zero_from_millibar_negligible: true
+      activation_epoch: R4-B
   Rh:
     atomic_number: 45
     family: siderophile
@@ -9471,8 +10989,10 @@ elements:
       P_sat: null
     volatile_as_oxide:
       value: false
-      species: null
+      species: Rh
       onset_C: null
+      vr8_candidate: Rh
+      note: VR-8 candidate vapor form from gas-closure / dominant-missing-12; dormant to flux
     routes:
     - plant_bin: ferroalloy-tap
       fraction: null
@@ -9587,6 +11107,48 @@ elements:
       - REVIEW speciation F21 (2026-07-20)
       - REVIEW consistency F14 (2026-07-20)
       - BODY-SWEEP DIFF-A/DIFF-C (2026-07-20)
+    vapour_rail_acquisition:
+      chunk: VR-8
+      group: B
+      u0_row_ids:
+      - Rh
+      - RhO2
+      candidate_vapor_form: Rh
+      candidate_forms:
+      - RhO2
+      - Rh
+      phase_system: Rh metal + O2, 1473–2073 K; oxidizing only
+      dominance_window_K:
+      - 1473.0
+      - 2073.0
+      dominance_note: RhO2 dominant under oxidizing conditions (A61)
+      validation_status: pending_validation
+      acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+      source_account: process.cleaned_melt
+      plant_bin: ferroalloy-tap
+      typed_route:
+        millibar: retain_rump
+        hard_vacuum: evolve_or_compute
+      dormant_to_flux: true
+      literature_sources:
+      - A61
+      - SF18-T1
+      regime:
+        millibar:
+          applicable: true
+          dominance: negligible
+          outcome: retain_rump
+          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+          po2_gate: oxidizing_only_negligible_at_recipe_pO2
+        hard_vacuum:
+          applicable: true
+          dominance: regime_open
+          outcome: evolve_or_compute
+          note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+            from literature carrier under hard-vacuum transport'
+          po2_gate: oxidizing_channel_remains_explicit
+      never_declare_hard_vacuum_zero_from_millibar_negligible: true
+      activation_epoch: R4-B
   Pd:
     atomic_number: 46
     family: siderophile
@@ -9740,8 +11302,10 @@ elements:
       P_sat: null
     volatile_as_oxide:
       value: false
-      species: null
+      species: Os
       onset_C: null
+      vr8_candidate: Os
+      note: VR-8 candidate vapor form from gas-closure / dominant-missing-12; dormant to flux
     routes:
     - plant_bin: ferroalloy-tap
       fraction: null
@@ -9855,6 +11419,50 @@ elements:
       - REVIEW speciation F21 (2026-07-20)
       - REVIEW consistency F14 (2026-07-20)
       - BODY-SWEEP DIFF-A/DIFF-C (2026-07-20)
+    vapour_rail_acquisition:
+      chunk: VR-8
+      group: B
+      u0_row_ids:
+      - Os
+      - OsO3
+      - OsO4
+      candidate_vapor_form: Os
+      candidate_forms:
+      - OsO4
+      - OsO3
+      - Os
+      phase_system: OsO4(l)/Os+O2, 1100–1750 K; oxidizing
+      dominance_window_K:
+      - 1100.0
+      - 1750.0
+      dominance_note: OsO4, OsO3 ≫ OsO2 under oxidizing conditions (SF18-T1; A61)
+      validation_status: pending_validation
+      acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
+      source_account: process.cleaned_melt
+      plant_bin: ferroalloy-tap
+      typed_route:
+        millibar: retain_rump
+        hard_vacuum: evolve_or_compute
+      dormant_to_flux: true
+      literature_sources:
+      - SF18-T1
+      - A61
+      regime:
+        millibar:
+          applicable: true
+          dominance: negligible
+          outcome: retain_rump
+          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+          po2_gate: oxidizing_only_negligible_at_recipe_pO2
+        hard_vacuum:
+          applicable: true
+          dominance: regime_open
+          outcome: evolve_or_compute
+          note: 'v0.7 open-to-sky hard-vacuum: millibar-negligible is NOT zero evolution; compute evolve/retain
+            from literature carrier under hard-vacuum transport'
+          po2_gate: oxidizing_channel_remains_explicit
+      never_declare_hard_vacuum_zero_from_millibar_negligible: true
+      activation_epoch: R4-B
   Hg:
     atomic_number: 80
     family: chalcophile
@@ -9980,9 +11588,9 @@ elements:
       status: reviewed
       conflict: null
       finding_ids:
-      - "BODY-SWEEP DIFF-A/\xA73 (2026-07-20)"
+      - BODY-SWEEP DIFF-A/§3 (2026-07-20)
 molecular_forms_by_feedstock_class:
-  source: "BODY-SWEEP DIFF-B/\xA71-\xA77 (2026-07-20)"
+  source: BODY-SWEEP DIFF-B/§1-§7 (2026-07-20)
   lunar:
     hosts:
     - solar-wind-implanted-H-He-C-N
@@ -10198,3 +11806,14 @@ molecular_forms_by_feedstock_class:
       - Xe
       citation_pointer: RUBIN2019
       note: Do not merge these species or their abundances from this dust fragment.
+vapour_rail_monatomic_oxygen:
+  chunk: VR-8
+  id: O
+  formula: O
+  pO2_exponent: 0.5
+  source_account: process.cleaned_melt
+  dormant_to_flux: true
+  activation_epoch: R2
+  source_reaction: 0.5 O2 -> O
+  validation_status: pending_validation
+  note: Mass-transport row; see data/vapour_rail_trace_acquisition.yaml and monatomic_oxygen_family

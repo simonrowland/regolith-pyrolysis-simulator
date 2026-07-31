@@ -288,6 +288,16 @@ species:
   category: nonmetal
   estimated: false
   source: Elemental formula from species id.
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  code_metadata:
+    request_rule: dormant_pending_r_family
+    dormant_to_flux: true
+    chunk: VR-8
+    source_account: process.cleaned_melt
+  vr8_note: Pre-existing formula row; VR-8 marks direct_vapour_flux false until R-family activation.
 - id: O2
   formula: O2
   basis: molecular_formula
@@ -532,7 +542,7 @@ species:
   atoms:
     C: 2
     H: 8
-    'N': 2
+    N: 2
   basis: estimated_group_formula
   category: gas_group
   estimated: true
@@ -557,7 +567,7 @@ species:
   atoms:
     C: 1
     H: 4
-    'N': 2
+    N: 2
   basis: estimated_group_formula
   category: gas_group
   estimated: true
@@ -672,7 +682,7 @@ species:
     C: 0.74
     H: 0.09
     O: 0.12
-    'N': 0.05
+    N: 0.05
   basis: generic_template
   category: organic_group
   estimated: true
@@ -1088,7 +1098,7 @@ species:
 - id: 'NO'
   formula: 'NO'
   atoms:
-    'N': 1.0
+    N: 1.0
     O: 1.0
   basis: molecular_formula
   category: volatile_gas
@@ -1107,7 +1117,7 @@ species:
 - id: NO2
   formula: NO2
   atoms:
-    'N': 1.0
+    N: 1.0
     O: 2.0
   basis: molecular_formula
   category: volatile_gas
@@ -1126,7 +1136,7 @@ species:
 - id: N2O
   formula: N2O
   atoms:
-    'N': 2.0
+    N: 2.0
     O: 1.0
   basis: molecular_formula
   category: volatile_gas
@@ -1428,8 +1438,21 @@ species:
     canonical_aliases: []
     request_rule: dormant_pending_validation
     yaml_quote_species_id: false
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
   not_substitutable_by:
   - P2O5_gas
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:PO
+  note: P family owned by VR-7 transcription (RG-3); VR-8 acquisition fields grafted at merge
 - id: PO2
   formula: PO2
   atoms:
@@ -1470,8 +1493,21 @@ species:
     canonical_aliases: []
     request_rule: dormant_pending_validation
     yaml_quote_species_id: false
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
   not_substitutable_by:
   - P2O5_gas
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:P4O6
+  note: P family owned by VR-7 transcription (RG-3); VR-8 acquisition fields grafted at merge
 - id: P4O10
   formula: P4O10
   atoms:
@@ -1491,8 +1527,21 @@ species:
     canonical_aliases: []
     request_rule: dormant_pending_validation
     yaml_quote_species_id: false
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
   not_substitutable_by:
   - P2O5_gas
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:P4O10
+  note: P family owned by VR-7 transcription (RG-3); VR-8 acquisition fields grafted at merge
 - id: P2
   formula: P2
   atoms:
@@ -1615,7 +1664,7 @@ species:
   formula: HNCO
   atoms:
     H: 1.0
-    'N': 1.0
+    N: 1.0
     C: 1.0
     O: 1.0
   basis: molecular_formula
@@ -1635,7 +1684,7 @@ species:
 - id: NH4CN
   formula: NH4CN
   atoms:
-    'N': 2.0
+    N: 2.0
     H: 4.0
     C: 1.0
   basis: molecular_formula
@@ -1696,3 +1745,3144 @@ species:
     - S(l)_total_vapour
     - sulfur_total
     request_rule: dormant_pending_validation
+- id: As
+  formula: As
+  atoms:
+    As: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:As
+  code_metadata:
+    formula_id: As
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: As4O6
+  formula: As4O6
+  atoms:
+    As: 4
+    O: 6
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:As4O6
+  code_metadata:
+    formula_id: As4O6
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Ba
+  formula: Ba
+  atoms:
+    Ba: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Ba
+  code_metadata:
+    formula_id: Ba
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: BaO
+  formula: BaO
+  atoms:
+    Ba: 1
+    O: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:BaO
+  code_metadata:
+    formula_id: BaO
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Cs
+  formula: Cs
+  atoms:
+    Cs: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Cs
+  code_metadata:
+    formula_id: Cs
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Cs2O
+  formula: Cs2O
+  atoms:
+    Cs: 2
+    O: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Cs2O
+  code_metadata:
+    formula_id: Cs2O
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Cs2O2
+  formula: Cs2O2
+  atoms:
+    Cs: 2
+    O: 2
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Cs2O2
+  code_metadata:
+    formula_id: Cs2O2
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: CsO
+  formula: CsO
+  atoms:
+    Cs: 1
+    O: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:CsO
+  code_metadata:
+    formula_id: CsO
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Eu
+  formula: Eu
+  atoms:
+    Eu: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Eu
+  code_metadata:
+    formula_id: Eu
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Ga
+  formula: Ga
+  atoms:
+    Ga: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Ga
+  code_metadata:
+    formula_id: Ga
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Ga2O
+  formula: Ga2O
+  atoms:
+    Ga: 2
+    O: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Ga2O
+  code_metadata:
+    formula_id: Ga2O
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Li
+  formula: Li
+  atoms:
+    Li: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Li
+  code_metadata:
+    formula_id: Li
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Li2O
+  formula: Li2O
+  atoms:
+    Li: 2
+    O: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Li2O
+  code_metadata:
+    formula_id: Li2O
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Li2O2
+  formula: Li2O2
+  atoms:
+    Li: 2
+    O: 2
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Li2O2
+  code_metadata:
+    formula_id: Li2O2
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Li3O
+  formula: Li3O
+  atoms:
+    Li: 3
+    O: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Li3O
+  code_metadata:
+    formula_id: Li3O
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: LiO
+  formula: LiO
+  atoms:
+    Li: 1
+    O: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:LiO
+  code_metadata:
+    formula_id: LiO
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: P4O7
+  formula: P4O7
+  atoms:
+    O: 7
+    P: 4
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:P4O7
+  code_metadata:
+    formula_id: P4O7
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: P4O8
+  formula: P4O8
+  atoms:
+    O: 8
+    P: 4
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:P4O8
+  code_metadata:
+    formula_id: P4O8
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: P4O9
+  formula: P4O9
+  atoms:
+    O: 9
+    P: 4
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:P4O9
+  code_metadata:
+    formula_id: P4O9
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Rb
+  formula: Rb
+  atoms:
+    Rb: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Rb
+  code_metadata:
+    formula_id: Rb
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Rb2
+  formula: Rb2
+  atoms:
+    Rb: 2
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Rb2
+  code_metadata:
+    formula_id: Rb2
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Rb2O
+  formula: Rb2O
+  atoms:
+    O: 1
+    Rb: 2
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Rb2O
+  code_metadata:
+    formula_id: Rb2O
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Rb2O2
+  formula: Rb2O2
+  atoms:
+    O: 2
+    Rb: 2
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Rb2O2
+  code_metadata:
+    formula_id: Rb2O2
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: RbO
+  formula: RbO
+  atoms:
+    O: 1
+    Rb: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:RbO
+  code_metadata:
+    formula_id: RbO
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Sb
+  formula: Sb
+  atoms:
+    Sb: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Sb
+  code_metadata:
+    formula_id: Sb
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Sb4O6
+  formula: Sb4O6
+  atoms:
+    O: 6
+    Sb: 4
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Sb4O6
+  code_metadata:
+    formula_id: Sb4O6
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Se
+  formula: Se
+  atoms:
+    Se: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Se
+  code_metadata:
+    formula_id: Se
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Se2
+  formula: Se2
+  atoms:
+    Se: 2
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Se2
+  code_metadata:
+    formula_id: Se2
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Se3
+  formula: Se3
+  atoms:
+    Se: 3
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Se3
+  code_metadata:
+    formula_id: Se3
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Se4
+  formula: Se4
+  atoms:
+    Se: 4
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Se4
+  code_metadata:
+    formula_id: Se4
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Se5
+  formula: Se5
+  atoms:
+    Se: 5
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Se5
+  code_metadata:
+    formula_id: Se5
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Se6
+  formula: Se6
+  atoms:
+    Se: 6
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Se6
+  code_metadata:
+    formula_id: Se6
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Se7
+  formula: Se7
+  atoms:
+    Se: 7
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Se7
+  code_metadata:
+    formula_id: Se7
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Se8
+  formula: Se8
+  atoms:
+    Se: 8
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Se8
+  code_metadata:
+    formula_id: Se8
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Sr
+  formula: Sr
+  atoms:
+    Sr: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Sr
+  code_metadata:
+    formula_id: Sr
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: SrO
+  formula: SrO
+  atoms:
+    O: 1
+    Sr: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:SrO
+  code_metadata:
+    formula_id: SrO
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: V
+  formula: V
+  atoms:
+    V: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:V
+  code_metadata:
+    formula_id: V
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: VO
+  formula: VO
+  atoms:
+    O: 1
+    V: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:VO
+  code_metadata:
+    formula_id: VO
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: VO2
+  formula: VO2
+  atoms:
+    O: 2
+    V: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:VO2
+  code_metadata:
+    formula_id: VO2
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Yb
+  formula: Yb
+  atoms:
+    Yb: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Yb
+  code_metadata:
+    formula_id: Yb
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: A
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Be
+  formula: Be
+  atoms:
+    Be: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Be
+  code_metadata:
+    formula_id: Be
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Be2O
+  formula: Be2O
+  atoms:
+    Be: 2
+    O: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Be2O
+  code_metadata:
+    formula_id: Be2O
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Be2O2
+  formula: Be2O2
+  atoms:
+    Be: 2
+    O: 2
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Be2O2
+  code_metadata:
+    formula_id: Be2O2
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Be3O3
+  formula: Be3O3
+  atoms:
+    Be: 3
+    O: 3
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Be3O3
+  code_metadata:
+    formula_id: Be3O3
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Be4O4
+  formula: Be4O4
+  atoms:
+    Be: 4
+    O: 4
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Be4O4
+  code_metadata:
+    formula_id: Be4O4
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Be5O5
+  formula: Be5O5
+  atoms:
+    Be: 5
+    O: 5
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Be5O5
+  code_metadata:
+    formula_id: Be5O5
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Be6O6
+  formula: Be6O6
+  atoms:
+    Be: 6
+    O: 6
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Be6O6
+  code_metadata:
+    formula_id: Be6O6
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: BeO
+  formula: BeO
+  atoms:
+    Be: 1
+    O: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:BeO
+  code_metadata:
+    formula_id: BeO
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Ce
+  formula: Ce
+  atoms:
+    Ce: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Ce
+  code_metadata:
+    formula_id: Ce
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: CeO
+  formula: CeO
+  atoms:
+    Ce: 1
+    O: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:CeO
+  code_metadata:
+    formula_id: CeO
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: CeO2
+  formula: CeO2
+  atoms:
+    Ce: 1
+    O: 2
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:CeO2
+  code_metadata:
+    formula_id: CeO2
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Dy
+  formula: Dy
+  atoms:
+    Dy: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Dy
+  code_metadata:
+    formula_id: Dy
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: DyO
+  formula: DyO
+  atoms:
+    Dy: 1
+    O: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:DyO
+  code_metadata:
+    formula_id: DyO
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Er
+  formula: Er
+  atoms:
+    Er: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Er
+  code_metadata:
+    formula_id: Er
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: ErO
+  formula: ErO
+  atoms:
+    Er: 1
+    O: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:ErO
+  code_metadata:
+    formula_id: ErO
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Gd
+  formula: Gd
+  atoms:
+    Gd: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Gd
+  code_metadata:
+    formula_id: Gd
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: GdO
+  formula: GdO
+  atoms:
+    Gd: 1
+    O: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:GdO
+  code_metadata:
+    formula_id: GdO
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Hf
+  formula: Hf
+  atoms:
+    Hf: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Hf
+  code_metadata:
+    formula_id: Hf
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: HfO
+  formula: HfO
+  atoms:
+    Hf: 1
+    O: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:HfO
+  code_metadata:
+    formula_id: HfO
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Ho
+  formula: Ho
+  atoms:
+    Ho: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Ho
+  code_metadata:
+    formula_id: Ho
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: HoO
+  formula: HoO
+  atoms:
+    Ho: 1
+    O: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:HoO
+  code_metadata:
+    formula_id: HoO
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Ir
+  formula: Ir
+  atoms:
+    Ir: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Ir
+  code_metadata:
+    formula_id: Ir
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: IrO3
+  formula: IrO3
+  atoms:
+    Ir: 1
+    O: 3
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:IrO3
+  code_metadata:
+    formula_id: IrO3
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: La
+  formula: La
+  atoms:
+    La: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:La
+  code_metadata:
+    formula_id: La
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: LaO
+  formula: LaO
+  atoms:
+    La: 1
+    O: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:LaO
+  code_metadata:
+    formula_id: LaO
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Lu
+  formula: Lu
+  atoms:
+    Lu: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Lu
+  code_metadata:
+    formula_id: Lu
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: LuO
+  formula: LuO
+  atoms:
+    Lu: 1
+    O: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:LuO
+  code_metadata:
+    formula_id: LuO
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Nb
+  formula: Nb
+  atoms:
+    Nb: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Nb
+  code_metadata:
+    formula_id: Nb
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: NbO
+  formula: NbO
+  atoms:
+    Nb: 1
+    O: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:NbO
+  code_metadata:
+    formula_id: NbO
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: NbO2
+  formula: NbO2
+  atoms:
+    Nb: 1
+    O: 2
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:NbO2
+  code_metadata:
+    formula_id: NbO2
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Nd
+  formula: Nd
+  atoms:
+    Nd: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Nd
+  code_metadata:
+    formula_id: Nd
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: NdO
+  formula: NdO
+  atoms:
+    Nd: 1
+    O: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:NdO
+  code_metadata:
+    formula_id: NdO
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Os
+  formula: Os
+  atoms:
+    Os: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Os
+  code_metadata:
+    formula_id: Os
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: OsO3
+  formula: OsO3
+  atoms:
+    O: 3
+    Os: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:OsO3
+  code_metadata:
+    formula_id: OsO3
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: OsO4
+  formula: OsO4
+  atoms:
+    O: 4
+    Os: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:OsO4
+  code_metadata:
+    formula_id: OsO4
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Pr
+  formula: Pr
+  atoms:
+    Pr: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Pr
+  code_metadata:
+    formula_id: Pr
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: PrO
+  formula: PrO
+  atoms:
+    O: 1
+    Pr: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:PrO
+  code_metadata:
+    formula_id: PrO
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Pt
+  formula: Pt
+  atoms:
+    Pt: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Pt
+  code_metadata:
+    formula_id: Pt
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: PtO2
+  formula: PtO2
+  atoms:
+    O: 2
+    Pt: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:PtO2
+  code_metadata:
+    formula_id: PtO2
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Rh
+  formula: Rh
+  atoms:
+    Rh: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Rh
+  code_metadata:
+    formula_id: Rh
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: RhO2
+  formula: RhO2
+  atoms:
+    O: 2
+    Rh: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:RhO2
+  code_metadata:
+    formula_id: RhO2
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Ru
+  formula: Ru
+  atoms:
+    Ru: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Ru
+  code_metadata:
+    formula_id: Ru
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: RuO3
+  formula: RuO3
+  atoms:
+    O: 3
+    Ru: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:RuO3
+  code_metadata:
+    formula_id: RuO3
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Sc
+  formula: Sc
+  atoms:
+    Sc: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Sc
+  code_metadata:
+    formula_id: Sc
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: ScO
+  formula: ScO
+  atoms:
+    O: 1
+    Sc: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:ScO
+  code_metadata:
+    formula_id: ScO
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Sm
+  formula: Sm
+  atoms:
+    Sm: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Sm
+  code_metadata:
+    formula_id: Sm
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: SmO
+  formula: SmO
+  atoms:
+    O: 1
+    Sm: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:SmO
+  code_metadata:
+    formula_id: SmO
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Ta
+  formula: Ta
+  atoms:
+    Ta: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Ta
+  code_metadata:
+    formula_id: Ta
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: TaO
+  formula: TaO
+  atoms:
+    O: 1
+    Ta: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:TaO
+  code_metadata:
+    formula_id: TaO
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: TaO2
+  formula: TaO2
+  atoms:
+    O: 2
+    Ta: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:TaO2
+  code_metadata:
+    formula_id: TaO2
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Tb
+  formula: Tb
+  atoms:
+    Tb: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Tb
+  code_metadata:
+    formula_id: Tb
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: TbO
+  formula: TbO
+  atoms:
+    O: 1
+    Tb: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:TbO
+  code_metadata:
+    formula_id: TbO
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Th
+  formula: Th
+  atoms:
+    Th: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Th
+  code_metadata:
+    formula_id: Th
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: ThO
+  formula: ThO
+  atoms:
+    O: 1
+    Th: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:ThO
+  code_metadata:
+    formula_id: ThO
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: ThO2
+  formula: ThO2
+  atoms:
+    O: 2
+    Th: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:ThO2
+  code_metadata:
+    formula_id: ThO2
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Tm
+  formula: Tm
+  atoms:
+    Tm: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Tm
+  code_metadata:
+    formula_id: Tm
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: TmO
+  formula: TmO
+  atoms:
+    O: 1
+    Tm: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:TmO
+  code_metadata:
+    formula_id: TmO
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: U
+  formula: U
+  atoms:
+    U: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:U
+  code_metadata:
+    formula_id: U
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: UO
+  formula: UO
+  atoms:
+    O: 1
+    U: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:UO
+  code_metadata:
+    formula_id: UO
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: UO2
+  formula: UO2
+  atoms:
+    O: 2
+    U: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:UO2
+  code_metadata:
+    formula_id: UO2
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: UO3
+  formula: UO3
+  atoms:
+    O: 3
+    U: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:UO3
+  code_metadata:
+    formula_id: UO3
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Y
+  formula: Y
+  atoms:
+    Y: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Y
+  code_metadata:
+    formula_id: Y
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: YO
+  formula: YO
+  atoms:
+    O: 1
+    Y: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:YO
+  code_metadata:
+    formula_id: YO
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: Zr
+  formula: Zr
+  atoms:
+    Zr: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:Zr
+  code_metadata:
+    formula_id: Zr
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: ZrO
+  formula: ZrO
+  atoms:
+    O: 1
+    Zr: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:ZrO
+  code_metadata:
+    formula_id: ZrO
+    canonical_aliases: []
+    request_rule: dormant_pending_r_family
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    group: B
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 Group-A/B acquisition transcription; dormant to flux
+- id: O
+  formula: O
+  atoms:
+    O: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: acquisition_gas
+  direct_vapour_flux: false
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: pending_acquisition
+    temperature_K: null
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_pending_acquisition:O
+  code_metadata:
+    formula_id: O
+    canonical_aliases: []
+    request_rule: dormant_pending_r2_epoch
+    source_account: process.cleaned_melt
+    hot_train_applicability: not_applicable
+    pO2_exponent: 0.5
+    dormant_to_flux: true
+    chunk: VR-8
+  source: VR-8 monatomic O(g) mass-transport row; dormant to flux
+  source_reaction:
+    id: half_o2_to_atomic_o
+    reactants:
+    - formula: O2
+      stoichiometry: 0.5
+    products:
+    - formula: O
+      stoichiometry: 1.0

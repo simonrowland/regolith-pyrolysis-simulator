@@ -1,5 +1,3 @@
-# Schema-v2 hot-vapour authority. Generated once from schema v1 by VR-3.
-# Runtime legacy maps are compiled projections; do not add duplicate rows.
 schema_version: 2
 description: Composite hot-vapour authority grouped by co-evolving family into physical properties, fiat
   routing, vaporisation coefficients, and code metadata. Legacy runtime shapes are compiler projections
@@ -662,7 +660,7 @@ families:
             - 1254
             - 1712
           boiling_point_C: 1484
-          notes: "dH_vap ~ 182.3 kJ/mol. Significant above ~1500\xB0C."
+          notes: dH_vap ~ 182.3 kJ/mol. Significant above ~1500°C.
           gas_rail_standard_reaction:
             formula: CaO(l) -> Ca(g) + 0.5 O2(g)
             basis: 'VapoRock JANAF metal(g)/O2(g) + ThermoEngine v1.0 pure-liquid oxide mu0; minimax refit
@@ -774,7 +772,7 @@ families:
             - 1557
             - 2329
           boiling_point_C: 2519
-          notes: "dH_vap ~ 332.0 kJ/mol. Negligible below 2500\xB0C  --  not pyrolysable."
+          notes: dH_vap ~ 332.0 kJ/mol. Negligible below 2500°C  --  not pyrolysable.
           liquid_oxide_standard_reaction:
             formula: AlO1.5(l) -> Al(g) + 0.75 O2(g)
             basis: 'VapoRock JANAF metal(g)/O2(g) + ThermoEngine v1.0 pure-liquid oxide mu0; minimax refit
@@ -1215,20 +1213,6 @@ families:
           electrons_per_atom: 2
           parent_oxide: MnO
           authority_class: uncertified
-          # Mn adjudication (2026-06-15/16): before the solid refit, the Alcock
-          # solid fit gave 146.555679 Pa at 1519 K while the NIST/JANAF liquid fit
-          # gave 135.857038 Pa (-7.300052%, -0.032920511 dex). The discontinuity
-          # was a mixed-source artifact, so runtime now uses REF-020 NIST/JANAF
-          # solid and liquid evaluation-derived fits on both sides of melting.
-          # Liquid-source spread at the Kaye-Laby anchors: REF-034 Kaye-Laby/NPL
-          # Pa=[200,1000,2000,5000,10000,20000,50000,101325] at
-          # T_K=[1560,1710,1780,1890,1980,2080,2240,2390]; REF-020 NIST/JANAF
-          # Pa=[227,1202,2348,6022,11935,23627,61195,131242]; REF-033 CRC/Stull
-          # Pa=[248,1320,2570,6513,12749,24858,62813,131877]. That is roughly a
-          # 25-32% high-vs-low CRC/Kaye-Laby spread, while NIST/JANAF is +13.5% to
-          # +29.5% vs Kaye-Laby. NIST/JANAF was chosen because both adjudication
-          # lenses ranked it #1; Barin agrees with NIST/JANAF at about 1-4%, and
-          # Kaye-Laby/NPL is the 13-30% low outlier in-band.
           source: REF-020 NIST-JANAF/Chase 1998 solid/liquid Mn->Mn(g) evaluation; REF-032 Alcock solid,
             REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as comparators; runtime pure-component
             source is pure_component_antoine
@@ -1570,14 +1554,27 @@ families:
           suppression_equation: p(SiO) = K(T) * a(SiO2) / sqrt pO2
           pO2_reference_bar: 1.0e-09
           suppression_factor_at_1mbar_O2: '>300*'
-          notes: "THE problem species. At hard vacuum (pO2 ~1e-9 bar and below to the\nlegal body floor),\
-            \ SiO dominates offgas above ~1400\xB0C. At pO2 = 1 mbar,\nsuppressed >300*. Condenses as\
-            \ adhesive, corrosive amorphous silica\nbelow ~1200\xB0C. See [THERMO-1] in context-thermo.md.\n\
-            Composition-independent standard-reaction term from JANAF gas species\nplus the ThermoEngine\
-            \ liquid-SiO2 standard state, source-validated over\n1400-2273.15 K (authority class remains\
-            \ uncertified -- honest label, not\ndual-lab certified ground truth). Runtime applies a(SiO2)\
-            \ and the\nmass-action pO2 factor exactly once over the full legal pO2 domain.\nT>2273.15\
-            \ K is typed refusal.\n"
+          notes: 'THE problem species. At hard vacuum (pO2 ~1e-9 bar and below to the
+
+            legal body floor), SiO dominates offgas above ~1400°C. At pO2 = 1 mbar,
+
+            suppressed >300*. Condenses as adhesive, corrosive amorphous silica
+
+            below ~1200°C. See [THERMO-1] in context-thermo.md.
+
+            Composition-independent standard-reaction term from JANAF gas species
+
+            plus the ThermoEngine liquid-SiO2 standard state, source-validated over
+
+            1400-2273.15 K (authority class remains uncertified -- honest label, not
+
+            dual-lab certified ground truth). Runtime applies a(SiO2) and the
+
+            mass-action pO2 factor exactly once over the full legal pO2 domain.
+
+            T>2273.15 K is typed refusal.
+
+            '
           validation:
             status: pending_validation
             anchor_refs: []
@@ -1808,7 +1805,9 @@ families:
           association_relation:
             dimer_species_id: Na2Cl2
             equilibrium: Na2Cl2 = 2 NaCl
-            note: 'Runtime NaCl pure_component_antoine is TOTAL saturated vapour (Stull). Near liquid window, Datz K implies large dimer mass fraction; species-resolved monomer partial requires Na2Cl2 association row. VR-7 dormant dimer family: halide_association_Na2Cl2_family.'
+            note: 'Runtime NaCl pure_component_antoine is TOTAL saturated vapour (Stull). Near liquid
+              window, Datz K implies large dimer mass fraction; species-resolved monomer partial requires
+              Na2Cl2 association row. VR-7 dormant dimer family: halide_association_Na2Cl2_family.'
             source: docs-private/research/2026-07-30-vp-acquire-5/chloride-dimers-and-gates.md
           species_basis_runtime_note: Legacy total pure-component row; monomer partial is a distinct observable
           molar_mass_g_mol: 58.44
@@ -1879,7 +1878,8 @@ families:
           association_relation:
             dimer_species_id: K2Cl2
             equilibrium: K2Cl2 = 2 KCl
-            note: 'Runtime KCl pure_component_antoine is TOTAL saturated vapour. Datz K near mp implies large dimer fraction. VR-7 dormant dimer: halide_association_K2Cl2_family.'
+            note: 'Runtime KCl pure_component_antoine is TOTAL saturated vapour. Datz K near mp implies
+              large dimer fraction. VR-7 dormant dimer: halide_association_K2Cl2_family.'
             source: docs-private/research/2026-07-30-vp-acquire-5/chloride-dimers-and-gates.md
           molar_mass_g_mol: 74.55
           carrier_is_own_vapor: true
@@ -2014,8 +2014,6 @@ families:
       compatibility_projection: foulant_vapor
       canonical_aliases: []
       hot_train_applicability: not_applicable
-
-  # --- VR-7 dormant acquisition families (compatibility_projection: dormant_acquisition) ---
   volatile_water_H2O_family:
     physical_properties:
       species:
@@ -2025,8 +2023,8 @@ families:
           acquisition_status: t425_grounded
           runtime_disposition: dormant_pending_owner_physics_review
           flux_dormant: true
-          notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::H2O_ice. review_status=grounded; phase_branch=solid_Ih_sublimation.
-            DRAFT/owner/physics gates survive; dormant to flux.
+          notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::H2O_ice. review_status=grounded;
+            phase_branch=solid_Ih_sublimation. DRAFT/owner/physics gates survive; dormant to flux.
           validation:
             status: pending_validation
             anchor_refs: []
@@ -2062,8 +2060,8 @@ families:
             valid_range_K:
             - 20.0
             - 273.16
-            source: Feistel and Wagner 2007, Sublimation Pressure and Sublimation Enthalpy of H2O Ice Ih
-              Between 0 and 273.16 K; form and coefficients reproduced in NASA NTRS supplementary table
+            source: Feistel and Wagner 2007, Sublimation Pressure and Sublimation Enthalpy of H2O Ice
+              Ih Between 0 and 273.16 K; form and coefficients reproduced in NASA NTRS supplementary table
             source_urls:
             - https://doi.org/10.1016/j.gca.2006.08.034
             - https://ntrs.nasa.gov/api/citations/20210019502/downloads/Supplementary%20Online%20Material%2020210019502.pdf?attachment=true
@@ -2097,8 +2095,8 @@ families:
       canonical_aliases:
       - H2O_ice
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: volatile_water
   volatile_carbon_oxide_CO2_family:
@@ -2197,8 +2195,8 @@ families:
       canonical_aliases:
       - CO2_frost
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: volatile_carbon_oxide
   volatile_carbon_oxide_CO_family:
@@ -2284,8 +2282,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: volatile_carbon_oxide
   volatile_hydrocarbon_CH4_family:
@@ -2370,8 +2368,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: volatile_hydrocarbon
   volatile_nitrogen_NH3_family:
@@ -2452,8 +2450,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: volatile_nitrogen
   volatile_nitrogen_HCN_family:
@@ -2466,7 +2464,8 @@ families:
           runtime_disposition: dormant_pending_owner_physics_review
           flux_dormant: true
           notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::HCN. review_status=grounded_supersedes_fray_low_T;
-            phase_branch=crystalline_solid_sublimation. DRAFT/owner/physics gates survive; dormant to flux.
+            phase_branch=crystalline_solid_sublimation. DRAFT/owner/physics gates survive; dormant to
+            flux.
           validation:
             status: pending_validation
             anchor_refs: []
@@ -2535,8 +2534,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: volatile_nitrogen
   volatile_sulfur_H2S_family:
@@ -2638,8 +2637,8 @@ families:
               - 187.61
               source_certification: primary_static_vapor_pressure_fit
               source:
-                citation: Giauque and Blue, Hydrogen Sulfide. The Heat Capacity and Vapor Pressure of Solid
-                  and Liquid, JACS 58 (1936) 831-837
+                citation: Giauque and Blue, Hydrogen Sulfide. The Heat Capacity and Vapor Pressure of
+                  Solid and Liquid, JACS 58 (1936) 831-837
                 doi: 10.1021/ja01296a045
                 locator: equation (1) and Table I, p. 832
                 url: https://doi.org/10.1021/ja01296a045
@@ -2676,8 +2675,8 @@ families:
               - 213.17
               source_certification: primary_static_vapor_pressure_fit
               source:
-                citation: Giauque and Blue, Hydrogen Sulfide. The Heat Capacity and Vapor Pressure of Solid
-                  and Liquid, JACS 58 (1936) 831-837
+                citation: Giauque and Blue, Hydrogen Sulfide. The Heat Capacity and Vapor Pressure of
+                  Solid and Liquid, JACS 58 (1936) 831-837
                 doi: 10.1021/ja01296a045
                 locator: equation (2) and Table I, p. 832
                 url: https://doi.org/10.1021/ja01296a045
@@ -2780,8 +2779,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: volatile_sulfur
   volatile_sulfur_SO2_family:
@@ -2828,8 +2827,8 @@ families:
             valid_range_K:
             - 15.0
             - 197.64
-            source: Fray and Schmitt 2009 SO2-1; NASA reproduction has a typographical OCR artifact in A1,
-              resolved as -3508 from the original relation
+            source: Fray and Schmitt 2009 SO2-1; NASA reproduction has a typographical OCR artifact in
+              A1, resolved as -3508 from the original relation
             source_urls:
             - https://doi.org/10.1016/j.pss.2009.09.011
             - https://ntrs.nasa.gov/api/citations/20210019502/downloads/Supplementary%20Online%20Material%2020210019502.pdf?attachment=true
@@ -2862,8 +2861,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: volatile_sulfur
   volatile_sulfur_COS_family:
@@ -2947,8 +2946,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: volatile_sulfur
   volatile_nitrogen_N2_family:
@@ -3034,8 +3033,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: volatile_nitrogen
   volatile_oxygen_O2_family:
@@ -3151,8 +3150,8 @@ families:
       canonical_aliases:
       - O2_ice
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: volatile_oxygen
   volatile_organic_HCHO_family:
@@ -3227,8 +3226,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: volatile_organic
   volatile_hydrocarbon_C2H6_family:
@@ -3309,8 +3308,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: volatile_hydrocarbon
   volatile_organic_C2H5OH_family:
@@ -3395,8 +3394,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: volatile_organic
   volatile_sulfur_CS2_family:
@@ -3481,8 +3480,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: volatile_sulfur
   volatile_nitrogen_HNCO_family:
@@ -3523,8 +3522,8 @@ families:
             valid_range_K:
             - 119.0
             - 137.0
-            source: Hudson, Yarnall, and Gerakines 2024, Eq. 3 and Table 4; crystalline isocyanic-acid QCM
-              measurement
+            source: Hudson, Yarnall, and Gerakines 2024, Eq. 3 and Table 4; crystalline isocyanic-acid
+              QCM measurement
             source_urls:
             - https://doi.org/10.3847/1538-4357/ad8c43
             - https://science.gsfc.nasa.gov/691/cosmicice/reprints/Hudson-2024-3018.pdf
@@ -3557,8 +3556,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: volatile_nitrogen
   volatile_nitrogen_NH4CN_family:
@@ -3634,8 +3633,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: volatile_nitrogen
   volatile_organic_CH3COOH_family:
@@ -3720,8 +3719,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: volatile_organic
   halide_hydrogen_HCl_family:
@@ -3734,8 +3733,8 @@ families:
           runtime_disposition: dormant_pending_owner_physics_review
           flux_dormant: true
           notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::HCl. review_status=uncertain_for_frost_use;
-            phase_branch=source_unlabeled_crosses_condensed_phases. DRAFT/owner/physics gates survive; dormant
-            to flux.
+            phase_branch=source_unlabeled_crosses_condensed_phases. DRAFT/owner/physics gates survive;
+            dormant to flux.
           validation:
             status: pending_validation
             anchor_refs: []
@@ -3830,8 +3829,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: halide_hydrogen
   halide_elemental_Cl2_family:
@@ -3844,8 +3843,8 @@ families:
           runtime_disposition: dormant_pending_owner_physics_review
           flux_dormant: true
           notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::Cl2. review_status=uncertain_for_frost_use;
-            phase_branch=source_unlabeled_crosses_condensed_phases. DRAFT/owner/physics gates survive; dormant
-            to flux.
+            phase_branch=source_unlabeled_crosses_condensed_phases. DRAFT/owner/physics gates survive;
+            dormant to flux.
           validation:
             status: pending_validation
             anchor_refs: []
@@ -3944,8 +3943,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: halide_elemental
   halide_salt_MgCl2_family:
@@ -3958,8 +3957,8 @@ families:
           runtime_disposition: dormant_pending_owner_physics_review
           flux_dormant: true
           notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::MgCl2. review_status=grounded_fit_but_not_total_saturated_vapor;
-            phase_branch=liquid_to_monomer_gas_equilibrium. DRAFT/owner/physics gates survive; dormant to
-            flux. Antoine is JANAF monomer partial over pure liquid — NOT total saturated vapour (dimer
+            phase_branch=liquid_to_monomer_gas_equilibrium. DRAFT/owner/physics gates survive; dormant
+            to flux. Antoine is JANAF monomer partial over pure liquid — NOT total saturated vapour (dimer
             Mg2Cl4 contributes; see chloride-dimers-and-gates.md).
           validation:
             status: pending_validation
@@ -4038,8 +4037,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: halide_salt
   halide_salt_CaCl2_family:
@@ -4052,8 +4051,8 @@ families:
           runtime_disposition: dormant_pending_owner_physics_review
           flux_dormant: true
           notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::CaCl2. review_status=grounded_fit_but_not_total_saturated_vapor;
-            phase_branch=liquid_to_monomer_gas_equilibrium. DRAFT/owner/physics gates survive; dormant to
-            flux. Monomer-basis fit; total mixture may include polymers if present.
+            phase_branch=liquid_to_monomer_gas_equilibrium. DRAFT/owner/physics gates survive; dormant
+            to flux. Monomer-basis fit; total mixture may include polymers if present.
           validation:
             status: pending_validation
             anchor_refs: []
@@ -4131,8 +4130,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: halide_salt
   volatile_sulfur_SO3_family:
@@ -4216,8 +4215,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: volatile_sulfur
   volatile_nitrogen_N2O_family:
@@ -4298,8 +4297,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: volatile_nitrogen
   volatile_nitrogen_NO2_family:
@@ -4385,8 +4384,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: volatile_nitrogen
   halide_hydrogen_HF_family:
@@ -4470,8 +4469,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: halide_hydrogen
   halide_hydrogen_HBr_family:
@@ -4484,8 +4483,8 @@ families:
           runtime_disposition: dormant_pending_owner_physics_review
           flux_dormant: true
           notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::HBr. review_status=uncertain_for_frost_use;
-            phase_branch=source_unlabeled_crosses_condensed_phases. DRAFT/owner/physics gates survive; dormant
-            to flux.
+            phase_branch=source_unlabeled_crosses_condensed_phases. DRAFT/owner/physics gates survive;
+            dormant to flux.
           validation:
             status: pending_validation
             anchor_refs: []
@@ -4580,8 +4579,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: halide_hydrogen
   halide_elemental_Br2_family:
@@ -4594,8 +4593,8 @@ families:
           runtime_disposition: dormant_pending_owner_physics_review
           flux_dormant: true
           notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::Br2. review_status=uncertain_for_frost_use;
-            phase_branch=source_unlabeled_crosses_condensed_phases. DRAFT/owner/physics gates survive; dormant
-            to flux.
+            phase_branch=source_unlabeled_crosses_condensed_phases. DRAFT/owner/physics gates survive;
+            dormant to flux.
           validation:
             status: pending_validation
             anchor_refs: []
@@ -4688,8 +4687,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: halide_elemental
   halide_hydrogen_HI_family:
@@ -4702,8 +4701,8 @@ families:
           runtime_disposition: dormant_pending_owner_physics_review
           flux_dormant: true
           notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::HI. review_status=uncertain_for_frost_use;
-            phase_branch=source_unlabeled_crosses_condensed_phases. DRAFT/owner/physics gates survive; dormant
-            to flux.
+            phase_branch=source_unlabeled_crosses_condensed_phases. DRAFT/owner/physics gates survive;
+            dormant to flux.
           validation:
             status: pending_validation
             anchor_refs: []
@@ -4798,8 +4797,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: halide_hydrogen
   halide_elemental_I2_family:
@@ -4812,8 +4811,8 @@ families:
           runtime_disposition: dormant_pending_owner_physics_review
           flux_dormant: true
           notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::I2. review_status=uncertain_for_solid_branch;
-            phase_branch=source_unlabeled_crosses_condensed_phases. DRAFT/owner/physics gates survive; dormant
-            to flux.
+            phase_branch=source_unlabeled_crosses_condensed_phases. DRAFT/owner/physics gates survive;
+            dormant to flux.
           validation:
             status: pending_validation
             anchor_refs: []
@@ -4889,8 +4888,8 @@ families:
               valid_range_interpretation: authors recommend 0-100 C or higher; 0-100 C retained conservatively
               source_certification: primary_static_diaphragm_plus_corrected_gas_stream_correlation
               source:
-                citation: Gillespie and Fraser, The Normal Vapor Pressure of Crystalline Iodine, JACS 58
-                  (1936) 2260-2263
+                citation: Gillespie and Fraser, The Normal Vapor Pressure of Crystalline Iodine, JACS
+                  58 (1936) 2260-2263
                 doi: 10.1021/ja01302a050
                 locator: equation (1), Table III, Summary, pp. 2260-2263
                 url: https://doi.org/10.1021/ja01302a050
@@ -5008,8 +5007,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: halide_elemental
   volatile_nitrogen_NO_family:
@@ -5021,9 +5020,9 @@ families:
           acquisition_status: identity_only_pending_literature_row
           runtime_disposition: dormant_pending_owner_physics_review
           flux_dormant: true
-          notes: Nitric oxide gas identity from U0. YAML species key MUST remain quoted ('NO') because YAML
-            1.1 treats bare NO as boolean false. No pure condensed NO reservoir for Stage-0 frost; literature
-            pure-component Antoine not adopted. Dormant.
+          notes: Nitric oxide gas identity from U0. YAML species key MUST remain quoted ('NO') because
+            YAML 1.1 treats bare NO as boolean false. No pure condensed NO reservoir for Stage-0 frost;
+            literature pure-component Antoine not adopted. Dormant.
           validation:
             status: pending_validation
             anchor_refs: []
@@ -5070,8 +5069,8 @@ families:
       canonical_aliases:
       - nitric_oxide
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: true
       chemical_family: volatile_nitrogen
   oxide_trace_CrO3_family:
@@ -5230,8 +5229,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: oxide_trace
   oxide_trace_GeO_family:
@@ -5277,8 +5276,8 @@ families:
             - 1313.15
             - 1373.15
             source:
-              citation: Shimazaki, Matsumoto and Niwa, The Vapor Pressure of Germanium Dioxide, Bull. Chem.
-                Soc. Jpn. 30 (1957) 969-971
+              citation: Shimazaki, Matsumoto and Niwa, The Vapor Pressure of Germanium Dioxide, Bull.
+                Chem. Soc. Jpn. 30 (1957) 969-971
               doi: 10.1246/bcsj.30.969
               url: https://doi.org/10.1246/bcsj.30.969
           t431_checked_anchors:
@@ -5328,8 +5327,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: oxide_trace
   oxide_trace_SnO_family:
@@ -5341,8 +5340,8 @@ families:
           acquisition_status: UNCERTAIN
           runtime_disposition: dormant_pending_owner_physics_review
           flux_dormant: true
-          notes: 't-431 t14 row SnO. status=UNCERTAIN. Disposition preserved: SnO2-reservoir reaction recovered;
-            melt a_SnO2 and a measured alpha are missing. DRAFT; dormant to flux.'
+          notes: 't-431 t14 row SnO. status=UNCERTAIN. Disposition preserved: SnO2-reservoir reaction
+            recovered; melt a_SnO2 and a measured alpha are missing. DRAFT; dormant to flux.'
           validation:
             status: pending_validation
             anchor_refs: []
@@ -5422,8 +5421,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: oxide_trace
   oxide_trace_PbO_family:
@@ -5471,8 +5470,8 @@ families:
             - 810
             - 1040
             source:
-              citation: Kobertz, Vaporization and caloric studies on yellow lead oxide PbO, Calphad 65 (2019)
-                155-164
+              citation: Kobertz, Vaporization and caloric studies on yellow lead oxide PbO, Calphad 65
+                (2019) 155-164
               doi: 10.1016/j.calphad.2019.02.012
               url: https://doi.org/10.1016/j.calphad.2019.02.012
           - id: Kobertz2019_Pb_from_PbO
@@ -5504,7 +5503,8 @@ families:
           - comparator: Drowart et al. 1965 monomer fit DeltaG_J_mol=278805-153.97*T
             source_doi: 10.1039/TF9656101376
             comparison: 'at 1000 K: Kobertz 0.0206109 Pa; Drowart 0.0301589 Pa; Drowart is 46.3% higher'
-            treatment: greater_than_10_percent; recorded_not_averaged; use modern row only inside its range
+            treatment: greater_than_10_percent; recorded_not_averaged; use modern row only inside its
+              range
           t431_uncertainty: No certified 1200-2000 K PbO curve, no melt activity, and unresolved polymer
             contribution.
           t431_evaporation_alpha: null
@@ -5534,8 +5534,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: oxide_trace
   metal_trace_Pb_family:
@@ -5547,8 +5547,9 @@ families:
           acquisition_status: REVIEWABLE_PURE_COMPONENT_ONLY
           runtime_disposition: dormant_pending_owner_physics_review
           flux_dormant: true
-          notes: 't-431 t14 row Pb. status=REVIEWABLE_PURE_COMPONENT_ONLY. Disposition preserved: Pure solid/liquid
-            Pb curves recovered; alloy/melt activity remains outside this row. DRAFT; dormant to flux.'
+          notes: 't-431 t14 row Pb. status=REVIEWABLE_PURE_COMPONENT_ONLY. Disposition preserved: Pure
+            solid/liquid Pb curves recovered; alloy/melt activity remains outside this row. DRAFT; dormant
+            to flux.'
           validation:
             status: pending_validation
             anchor_refs: []
@@ -5660,8 +5661,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: metal_trace
   oxide_trace_WO3_family:
@@ -5706,7 +5707,8 @@ families:
             valid_range_K: null
             source_certification: derived_from_reported_DeltaH_DeltaS_not_a_source_published_fit
             source:
-              citation: WADC Technical Report 59-575, Part II, corrected multispecies analysis of WO3 vaporization
+              citation: WADC Technical Report 59-575, Part II, corrected multispecies analysis of WO3
+                vaporization
               doi: null
               url: https://digital.library.unt.edu/ark:/67531/metadc1052275/
             related_peer_reviewed_source:
@@ -5717,7 +5719,8 @@ families:
           t431_checked_anchors:
           - gas_species: W3O9
             T_K: 1460.0
-            arithmetic: log10(p_atm)=13.809585-26504.789/1460=-4.344376; p=10^-4.344376*101325=4.58497 Pa
+            arithmetic: log10(p_atm)=13.809585-26504.789/1460=-4.344376; p=10^-4.344376*101325=4.58497
+              Pa
             result_Pa: 4.58497
             comparator: Marushkin et al. report p_W3O9=2.9 Pa at 1460 K
             check: CHECKED_ARITHMETIC_ONLY
@@ -5733,8 +5736,8 @@ families:
             source_doi: 10.1016/0021-9614(85)90018-7
             comparison: derived Blackburn-era line 4.58497 Pa versus 2.9 Pa; 58.1% high
             treatment: greater_than_10_percent; recorded_not_averaged
-          t431_uncertainty: Exact correlation range, total W-bearing pressure, polymer fractions, and oxygen-fugacity
-            dependence.
+          t431_uncertainty: Exact correlation range, total W-bearing pressure, polymer fractions, and
+            oxygen-fugacity dependence.
           t431_evaporation_alpha: null
     fiat_routing:
       plant_bin: null
@@ -5762,8 +5765,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: oxide_trace
   oxide_trace_Re2O7_family:
@@ -5776,9 +5779,9 @@ families:
           runtime_disposition: dormant_pending_owner_physics_review
           flux_dormant: true
           notes: "t-431 t14 row Re2O7. status=UNCERTAIN. Disposition preserved: Pure Re2O7 solid/liquid\
-            \ low-temperature branches and oxide-reservoir\nKnudsen curves are grounded, but no branch covers\
-            \ furnace temperatures\nabove 1087 K. Reservoir identity changes the curve.\n DRAFT; dormant\
-            \ to flux."
+            \ low-temperature branches and oxide-reservoir\nKnudsen curves are grounded, but no branch\
+            \ covers furnace temperatures\nabove 1087 K. Reservoir identity changes the curve.\n DRAFT;\
+            \ dormant to flux."
           validation:
             status: pending_validation
             anchor_refs: []
@@ -5803,8 +5806,8 @@ families:
             B: 7320.0
             C: 0.0
             source:
-              citation: Smith, Line and Bell, Vapor Pressures of Rhenium Heptoxide, J. Am. Chem. Soc. 74
-                (1952) 4964
+              citation: Smith, Line and Bell, Vapor Pressures of Rhenium Heptoxide, J. Am. Chem. Soc.
+                74 (1952) 4964
               doi: 10.1021/ja01139a522
               url: https://doi.org/10.1021/ja01139a522
           literature_values:
@@ -5831,8 +5834,8 @@ families:
             - 503.15
             - 573.45
             source:
-              citation: Smith, Line and Bell, Vapor Pressures of Rhenium Heptoxide, J. Am. Chem. Soc. 74
-                (1952) 4964
+              citation: Smith, Line and Bell, Vapor Pressures of Rhenium Heptoxide, J. Am. Chem. Soc.
+                74 (1952) 4964
               doi: 10.1021/ja01139a522
               url: https://doi.org/10.1021/ja01139a522
           - id: Smith1952_Re2O7_liquid
@@ -5889,8 +5892,8 @@ families:
             arithmetic: log10(P_atm)=14.442-20447/1000=-6.005; P=10^-6.005*101325=0.100165 Pa
             result_Pa: 0.100165
             check: CHECKED
-          t431_speciation_note: Battles finds primarily Re2O7(g), with less than 5% ReO3(g), over both two-phase
-            oxide reservoirs.
+          t431_speciation_note: Battles finds primarily Re2O7(g), with less than 5% ReO3(g), over both
+            two-phase oxide reservoirs.
           t431_disagreements:
           - comparator: 'Ogawa pure-Re2O7 equations: solid 14.84-7218/T; liquid 9.047-3920/T'
             source_doi: 10.1246/bcsj.7.265
@@ -5901,8 +5904,8 @@ families:
             source_doi: 10.1016/S0040-6031(99)00487-6
             comparison: 'at 1000 K: Jacob 0.0952667 Pa vs Battles 0.100165 Pa (5.14%)'
             treatment: within_10_percent; separate_correlations_not_averaged
-          t431_uncertainty: No certified furnace-range curve above 1087 K; pure Re2O7 and lower-oxide reservoirs
-            are not interchangeable.
+          t431_uncertainty: No certified furnace-range curve above 1087 K; pure Re2O7 and lower-oxide
+            reservoirs are not interchangeable.
           t431_evaporation_alpha: null
     fiat_routing:
       plant_bin: null
@@ -5930,8 +5933,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: oxide_trace
   oxide_trace_MoO3_cross_check_family:
@@ -5991,8 +5994,8 @@ families:
       canonical_aliases:
       - MoO3
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: oxide_trace
   oxide_trace_In2O_family:
@@ -6006,8 +6009,8 @@ families:
           flux_dormant: true
           notes: "t-431 t5 row In2O. status=REVIEWABLE_CONDITIONAL_REACTION_ROW. Disposition preserved:\
             \ Admit only when the condensed reservoir is explicitly In(l)+In2O3(s).\nDo not use as pure\
-            \ In2O3 saturation pressure or dilute silicate-melt\npressure. Outside that reservoir the runtime\
-            \ row remains UNCERTAIN.\n DRAFT; dormant to flux."
+            \ In2O3 saturation pressure or dilute silicate-melt\npressure. Outside that reservoir the\
+            \ runtime row remains UNCERTAIN.\n DRAFT; dormant to flux."
           validation:
             status: pending_validation
             anchor_refs: []
@@ -6116,8 +6119,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: oxide_trace
   oxide_trace_TeO2_family:
@@ -6302,8 +6305,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: oxide_trace
   metal_trace_Bi_family:
@@ -6315,9 +6318,9 @@ families:
           acquisition_status: REVIEWABLE_PURE_COMPONENT_ONLY
           runtime_disposition: dormant_pending_owner_physics_review
           flux_dormant: true
-          notes: "t-431 t5 row Bi. status=REVIEWABLE_PURE_COMPONENT_ONLY. Disposition preserved: Keep the\
-            \ two source ranges separate. Do not interpolate silently across\n1050-1073 K and do not use\
-            \ this row for Bi2O3 or non-unit Bi activity.\n DRAFT; dormant to flux."
+          notes: "t-431 t5 row Bi. status=REVIEWABLE_PURE_COMPONENT_ONLY. Disposition preserved: Keep\
+            \ the two source ranges separate. Do not interpolate silently across\n1050-1073 K and do not\
+            \ use this row for Bi2O3 or non-unit Bi activity.\n DRAFT; dormant to flux."
           validation:
             status: pending_validation
             anchor_refs: []
@@ -6398,8 +6401,8 @@ families:
               Prasad_min_K: 1073.0
               boundary_difference_percent: about 24.7
             treatment: no averaging; no automatic splice
-          t431_uncertainty: 23 K correlation gap; source-scale disagreement; no pure-Bi HKL alpha; no nonideal
-            activity.
+          t431_uncertainty: 23 K correlation gap; source-scale disagreement; no pure-Bi HKL alpha; no
+            nonideal activity.
           t431_evaporation_alpha: null
     fiat_routing:
       plant_bin: null
@@ -6427,8 +6430,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: metal_trace
   oxide_trace_Bi2O3_family:
@@ -6442,8 +6445,8 @@ families:
           flux_dormant: true
           notes: "t-431 t5 row Bi2O3. status=UNCERTAIN. Disposition preserved: DO_NOT_PROMOTE as a pure-component\
             \ Antoine row. Retain the 1163 K\nspecies vector as a review datum only. Vacuum vaporization\
-            \ changes\ncondensed O/Bi and requires a Bi-O phase/speciation model.\n DRAFT; dormant to flux.\
-            \ Polymeric/total vapour — monomer partials must not masquerade as totals."
+            \ changes\ncondensed O/Bi and requires a Bi-O phase/speciation model.\n DRAFT; dormant to\
+            \ flux. Polymeric/total vapour — monomer partials must not masquerade as totals."
           validation:
             status: pending_validation
             anchor_refs: []
@@ -6510,8 +6513,8 @@ families:
               congruent_effusing_O_per_Bi: 1.23
             treatment: reject fixed-stoichiometry pure-component curve
             source:
-              citation: Oniyama and Wahlbeck, Phase Equilibria in the Bismuth-Oxygen System, J. Phys. Chem.
-                B 102 (1998) 4418-4425
+              citation: Oniyama and Wahlbeck, Phase Equilibria in the Bismuth-Oxygen System, J. Phys.
+                Chem. B 102 (1998) 4418-4425
               doi: 10.1021/jp980166a
               locator: abstract; vaporization/solid-composition Results; Bi-O phase diagram
               url: https://doi.org/10.1021/jp980166a
@@ -6544,8 +6547,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: oxide_trace
   phosphorus_PO_family:
@@ -6559,9 +6562,9 @@ families:
           flux_dormant: true
           notes: "P-carrier from vp-acquire-5/P-carriers.md. tier=P_DOMINANT_REDUCED; status=REVIEWABLE_JANAF_GAS_PLUS_REACTION_TEMPLATE.\
             \ ADOPT gas identity + JANAF thermo. Partial pressure requires melt\na(P2O5) and fO2 via the\
-            \ standard_reaction below. Do not invent Antoine\nfor pure PO(s/l) (no such reservoir).\n P2O5_gas\
-            \ cannot substitute for this carrier. DRAFT dormant. P2O5_gas is a VapoRock collision-gas placeholder\
-            \ and MUST NOT substitute for this carrier."
+            \ standard_reaction below. Do not invent Antoine\nfor pure PO(s/l) (no such reservoir).\n\
+            \ P2O5_gas cannot substitute for this carrier. DRAFT dormant. P2O5_gas is a VapoRock collision-gas\
+            \ placeholder and MUST NOT substitute for this carrier."
           validation:
             status: pending_validation
             anchor_refs: []
@@ -6634,7 +6637,8 @@ families:
           - id: SF18_Mk86_PO_from_silicate_melt
             kind: standard_reaction
             gas_species: PO
-            condensed_reservoir: P2O5 in silicate melt, activity a_P2O5 (Raoultian pure-oxide standard state)
+            condensed_reservoir: P2O5 in silicate melt, activity a_P2O5 (Raoultian pure-oxide standard
+              state)
             reaction: P2O5(melt) = 2 PO(g) + 1.5 O2(g)
             monomeric_form: PO2.5(melt) = PO(g) + 0.75 O2(g)
             pressure_form: p_PO/p0 = a_P2O5^0.5 * K_PO(T)^0.5 * (p_O2/p0)^(-0.75)
@@ -6643,11 +6647,11 @@ families:
             valid_range_K: null
             valid_range_note: Markova et al. 1986 T/composition window UNKNOWN-NO-SOURCE this pass; SF18
               applies claim to silicate liquids generally
-            dominance_window: reduced melts / solar-nebula column; SF18 Table 5 log fO2=-18.06 @ 1500 K,
-              1e-4 bar
+            dominance_window: reduced melts / solar-nebula column; SF18 Table 5 log fO2=-18.06 @ 1500
+              K, 1e-4 bar
             source:
-              citation: Sossi & Fegley (2018) Rev. Mineral. Geochem. 84:393-459, Table 5 p.431 (PO in solar-nebula
-                column) and text citing Markova et al. 1986 for PO/PO2 from silicate liquids
+              citation: Sossi & Fegley (2018) Rev. Mineral. Geochem. 84:393-459, Table 5 p.431 (PO in
+                solar-nebula column) and text citing Markova et al. 1986 for PO/PO2 from silicate liquids
               doi: 10.2138/rmg.2018.84.11
             melt_activity_warning:
               citation: 'Turkdogan (2000) ISIJ Int. 40:964-970, via SF18 Table 2: gamma(PO2.5)=1e-6..1e-10
@@ -6692,8 +6696,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: phosphorus_carrier
   phosphorus_PO2_family:
@@ -6707,9 +6711,9 @@ families:
           flux_dormant: true
           notes: "P-carrier from vp-acquire-5/P-carriers.md. tier=P_SECONDARY_INTERMEDIATE; status=REVIEWABLE_JANAF_GAS_PLUS_REACTION_TEMPLATE.\
             \ ADOPT gas identity + JANAF thermo. Secondary to PO under reduced lunar\nconditions; rises\
-            \ relative to PO as fO2 increases (weaker negative exponent).\n P2O5_gas cannot substitute for\
-            \ this carrier. DRAFT dormant. P2O5_gas is a VapoRock collision-gas placeholder and MUST NOT\
-            \ substitute for this carrier."
+            \ relative to PO as fO2 increases (weaker negative exponent).\n P2O5_gas cannot substitute\
+            \ for this carrier. DRAFT dormant. P2O5_gas is a VapoRock collision-gas placeholder and MUST\
+            \ NOT substitute for this carrier."
           validation:
             status: pending_validation
             anchor_refs: []
@@ -6828,8 +6832,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: phosphorus_carrier
   phosphorus_P4O6_family:
@@ -6843,9 +6847,9 @@ families:
           flux_dormant: true
           notes: "P-carrier from vp-acquire-5/P-carriers.md. tier=P_POLYMER_MODERATE_OXIDIZED; status=UNCERTAIN_THERMO_BUT_SPECIES_REAL.\
             \ ADOPT species identity and reaction template. DO NOT promote JANAF\nnumerical K as authoritative\
-            \ until owner picks a thermo branch\n(JANAF vs Bains2023/Smoes-Drowart family). B23: JANAF over-stabilizes\
-            \ P4O6.\n P2O5_gas cannot substitute for this carrier. DRAFT dormant. P2O5_gas is a VapoRock\
-            \ collision-gas placeholder and MUST NOT substitute for this carrier."
+            \ until owner picks a thermo branch\n(JANAF vs Bains2023/Smoes-Drowart family). B23: JANAF\
+            \ over-stabilizes P4O6.\n P2O5_gas cannot substitute for this carrier. DRAFT dormant. P2O5_gas\
+            \ is a VapoRock collision-gas placeholder and MUST NOT substitute for this carrier."
           validation:
             status: pending_validation
             anchor_refs: []
@@ -6955,8 +6959,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: phosphorus_carrier
   phosphorus_P4O10_family:
@@ -7140,8 +7144,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: phosphorus_carrier
   phosphorus_P2_family:
@@ -7154,10 +7158,10 @@ families:
           runtime_disposition: dormant_pending_owner_physics_review
           flux_dormant: true
           notes: "P-carrier from vp-acquire-5/P-carriers.md. tier=P_ELEMENTAL_EXTREME_REDUCED; status=REVIEWABLE_JANAF_GAS.\
-            \ ADOPT for elemental ladder completeness. Not a normal phosphate-melt\ncarrier at recipe fO2.\
-            \ Note Δf≡0 for T>=1200 K (reference transition).\n P2O5_gas cannot substitute for this carrier.\
-            \ DRAFT dormant. P2O5_gas is a VapoRock collision-gas placeholder and MUST NOT substitute for\
-            \ this carrier."
+            \ ADOPT for elemental ladder completeness. Not a normal phosphate-melt\ncarrier at recipe\
+            \ fO2. Note Δf≡0 for T>=1200 K (reference transition).\n P2O5_gas cannot substitute for this\
+            \ carrier. DRAFT dormant. P2O5_gas is a VapoRock collision-gas placeholder and MUST NOT substitute\
+            \ for this carrier."
           validation:
             status: pending_validation
             anchor_refs: []
@@ -7258,8 +7262,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: phosphorus_carrier
   phosphorus_P4_family:
@@ -7272,8 +7276,8 @@ families:
           runtime_disposition: dormant_pending_owner_physics_review
           flux_dormant: true
           notes: "P-carrier from vp-acquire-5/P-carriers.md. tier=P_ELEMENTAL_EXTREME_REDUCED; status=REVIEWABLE_JANAF_GAS.\
-            \ ADOPT for elemental ladder. Dominant elemental vapour near white-P\nboiling; loses to P2 at\
-            \ high T in equilibrium elemental gas.\n P2O5_gas cannot substitute for this carrier. DRAFT\
+            \ ADOPT for elemental ladder. Dominant elemental vapour near white-P\nboiling; loses to P2\
+            \ at high T in equilibrium elemental gas.\n P2O5_gas cannot substitute for this carrier. DRAFT\
             \ dormant. P2O5_gas is a VapoRock collision-gas placeholder and MUST NOT substitute for this\
             \ carrier."
           validation:
@@ -7379,8 +7383,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: phosphorus_carrier
   phosphorus_P2O5_gas_family:
@@ -7393,8 +7397,8 @@ families:
           runtime_disposition: dormant_pending_owner_physics_review
           flux_dormant: true
           notes: 'VapoRock collision-gas / oxide-equivalent placeholder. NOT a reported high-T molecular
-            carrier over phosphate melts. MUST NOT substitute for PO, PO2, P4O6, P4O10, P2, or P4. se5 ban:
-            pure P4O10 unit-activity Psat is NOT a silicate-melt P2O5 proxy.'
+            carrier over phosphate melts. MUST NOT substitute for PO, PO2, P4O6, P4O10, P2, or P4. se5
+            ban: pure P4O10 unit-activity Psat is NOT a silicate-melt P2O5 proxy.'
           validation:
             status: pending_validation
             anchor_refs: []
@@ -7482,8 +7486,8 @@ families:
       canonical_aliases:
       - P2O5
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: phosphorus_carrier
   halide_association_Na2Cl2_family:
@@ -7497,8 +7501,8 @@ families:
           flux_dormant: true
           notes: Na2Cl2 ⇌ 2 NaCl(g). Primary K from Datz, Smith & Taylor 1961 (JCP 34:558). K_p = p(monomer)^2
             / p(dimer) in atm; P° = 1 atm. Certified use range 1277–1406 K; outside = flagged extrapolation.
-            Monomer foulant_vapor NaCl row is pure-component TOTAL (Stull) — do not treat NaCl monomer Antoine
-            as dimer-free total without the split. DRAFT dormant.
+            Monomer foulant_vapor NaCl row is pure-component TOTAL (Stull) — do not treat NaCl monomer
+            Antoine as dimer-free total without the split. DRAFT dormant.
           validation:
             status: pending_validation
             anchor_refs: []
@@ -7570,8 +7574,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: halide_association
   halide_association_K2Cl2_family:
@@ -7584,8 +7588,8 @@ families:
           runtime_disposition: dormant_pending_owner_physics_review
           flux_dormant: true
           notes: K2Cl2 ⇌ 2 KCl(g). Primary K Datz 1961. K_p(1300 K)=3.37e-2 atm. JANAF comparator ~1.5×
-            higher — do not average. Near-mp saturated vapour ~39 mol% / ~56 mass% dimer under Datz K. DRAFT
-            dormant.
+            higher — do not average. Near-mp saturated vapour ~39 mol% / ~56 mass% dimer under Datz K.
+            DRAFT dormant.
           validation:
             status: pending_validation
             anchor_refs: []
@@ -7653,8 +7657,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: halide_association
   halide_association_Mg2Cl4_family:
@@ -7667,8 +7671,8 @@ families:
           runtime_disposition: dormant_pending_owner_physics_review
           flux_dormant: true
           notes: Mg2Cl4 ⇌ 2 MgCl2(g). Primary Berkowitz & Marquart 1962 Knudsen. K_p(919 K)=1.604e-3 atm;
-            van't Hoff with ΔH_diss. MgCl2 t-425 Antoine is MONOMER partial — not total. Total liquid P_sat
-            authority remains Maier 1925 (vp4) when adopted. DRAFT dormant.
+            van't Hoff with ΔH_diss. MgCl2 t-425 Antoine is MONOMER partial — not total. Total liquid
+            P_sat authority remains Maier 1925 (vp4) when adopted. DRAFT dormant.
           validation:
             status: pending_validation
             anchor_refs: []
@@ -7736,8 +7740,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: halide_association
   volatile_sulfur_S_total_family:
@@ -7750,8 +7754,9 @@ families:
           runtime_disposition: dormant_pending_owner_physics_review
           flux_dormant: true
           notes: Rau 1973 liquid sulfur total vapour pressure (eq.1) with critical/upper endpoint Tc=1313
-            K page-fixed in chloride-dimers-and-gates.md §5. TOTAL mixture observable over S(l) — must pair
-            with S2–S8 speciation; S2 monomer/partial is NOT P_sat(S2). DRAFT dormant pending owner wiring.
+            K page-fixed in chloride-dimers-and-gates.md §5. TOTAL mixture observable over S(l) — must
+            pair with S2–S8 speciation; S2 monomer/partial is NOT P_sat(S2). DRAFT dormant pending owner
+            wiring.
           validation:
             status: pending_validation
             anchor_refs: []
@@ -7810,8 +7815,8 @@ families:
       - S(l)_total_vapour
       - sulfur_total
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: volatile_sulfur
   volatile_sulfur_S2_family:
@@ -7824,8 +7829,8 @@ families:
           runtime_disposition: dormant_pending_owner_physics_review
           flux_dormant: true
           notes: S2 is an equilibrium partial over elemental sulfur / sulfide systems, NOT a pure-component
-            saturation pressure. See t-425 uncertain_queue. Must not masquerade as total S vapour (use S_total).
-            DRAFT dormant.
+            saturation pressure. See t-425 uncertain_queue. Must not masquerade as total S vapour (use
+            S_total). DRAFT dormant.
           validation:
             status: pending_validation
             anchor_refs: []
@@ -7874,8 +7879,8 @@ families:
       compatibility_projection: dormant_acquisition
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3 /
-        VR-16
+      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
+        / VR-16
       yaml_quote_species_id: false
       chemical_family: volatile_sulfur
   oxyanion_perchlorate_ClO4_family:
@@ -7967,5 +7972,73 @@ families:
       hot_train_applicability: not_applicable
       hot_train_not_applicable_reason: Stage-0 oxyanion; not hot-train vapour
       chemical_family: oxyanion_perchlorate
+  monatomic_oxygen_family:
+    physical_properties:
+      species:
+        O:
+          formula: O
+          molar_mass_g_mol: 15.999
+          parent_oxide: null
+          notes: 'VR-8 monatomic O(g) mass-transport row (DESIGN-REV5 §6.3). Atom-explicit source reaction
+            0.5 O2(g) -> O(g) with in-regime pO2_exponent = +1/2 (p_O proportional to fO2^(1/2)). Dormant
+            to flux until R2; VapoRock partial pressure alone cannot mint oxygen — a named oxygen-bearing
+            source account must be debited. O2 outlet policy remains terminal.oxygen_melt_offgas_* only
+            (never MRE anode).
 
-# VR-7 transcription: dormant_acquisition projection; legacy metals/oxide_vapors/foulant runtime outputs identical.
+            '
+          validation:
+            status: pending_validation
+            anchor_refs: []
+          source_reactions:
+          - id: half_o2_to_atomic_o
+            reactants:
+            - formula: O2
+              stoichiometry: 0.5
+            products:
+            - formula: O
+              stoichiometry: 1.0
+          pressure_models:
+          - fit_target: standard_reaction_term
+            pressure_kind: equilibrium_partial_pressure
+            species_basis: monomer
+            evaluator_family: tabulated_equilibrium
+            availability: unavailable_pending_acquisition
+            activity_exponent: 0.0
+            pO2_exponent: 0.5
+            pO2_reference_bar: 1.0
+            valid_domain:
+              temperature_K:
+              - 1500.0
+              - 2500.0
+            provenance:
+            - source: vr8_monatomic_oxygen_transcription
+            - citation: DESIGN-REV5 §6.3; gas-closure §6.2
+            pO2_exponent_derivation: '½ O2(g) ⇌ O(g): K = p_O / p_O2^(1/2) ⇒ p_O = K · p_O2^(1/2). Exponent
+              on pO2 is therefore +1/2 (not −1/2 oxide-suppression).
+
+              '
+    fiat_routing:
+      plant_bin: null
+      engineering_capture_policy: mass_transport_track
+      products_and_coproducts: []
+      process_or_terminal_destination: terminal.oxygen_melt_offgas_stored
+      condensation_reference_at_1mbar_C: null
+    vaporisation_coefficients:
+      evaporation_alpha:
+        status: no_data
+        policy: refuse_nonzero_flux
+      alpha_domain_and_uncertainty: {}
+      extrapolation_policy: conservative_slope_continuation
+      out_of_range_status: out_of_range_conservative_continuation
+      acquisition_flag: vapour_pressure_pending_acquisition:O
+    code_metadata:
+      formula_id: O
+      source_account: process.cleaned_melt
+      request_rule: dormant_pending_r2_epoch
+      solve_group_id: monatomic_oxygen_family
+      compatibility_projection: rail_gap_dormant
+      canonical_aliases: []
+      hot_train_applicability: not_applicable
+      compatibility_condensation_reference_table: false
+      dormant_to_flux: true
+      chunk: VR-8

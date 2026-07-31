@@ -158,8 +158,14 @@ def test_production_schema_compiles_exact_four_strata_and_legacy_projection() ->
         }
 
     catalog = compile_vapour_rail_catalog(payload)
-    # VR-7 adds dormant acquisition families; pre-VR-7 core remains 15.
-    assert len(catalog.species) >= 15
+    # VR-7 adds dormant acquisition families; VR-8 adds monatomic O (dormant).
+    # Combined catalog is larger than either chunk alone.
+    assert len(catalog.species) >= 16
+    assert "O" in catalog.species
+    assert catalog.species["O"].evaluator is None
+    assert catalog.species["O"].code_metadata.hot_train_applicability == (
+        "not_applicable"
+    )
     legacy = catalog.legacy_view()
     assert len(legacy["metals"]) == 10
     assert len(legacy["oxide_vapors"]) == 2
