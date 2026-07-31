@@ -4155,6 +4155,21 @@ def test_tick_payload_exposes_non_authoritative_backend_domain_gate():
             {},
             ("ok", "", False),
         ),
+        # SC-109: status ok + missing authority flag must not default true.
+        (
+            "ok",
+            True,
+            "ok",
+            {},
+            ("ok", "", False),
+        ),
+        (
+            "ok",
+            True,
+            "ok",
+            {"authoritative_for_requested_conditions": True},
+            ("ok", "", True),
+        ),
     ],
 )
 def test_per_tick_backend_resolution_never_promotes_selection_authority(

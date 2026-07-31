@@ -4294,12 +4294,13 @@ def _trace_has_unearned_rump_terminal(run_execution: Any) -> bool:
 
 
 def _terminal_rump_completed_run_problem(run_execution: Any) -> str | None:
+    # SC-109: only an earned rump_terminal is positive proof. Backend "ok"
+    # alone is absence of contrary evidence and must not unlock composition
+    # targets that require terminal_rump_earned.
     if _trace_has_earned_rump_terminal(run_execution):
         return None
     backend_status = _latest_backend_status(run_execution)
-    if backend_status == "ok":
-        return None
-    if backend_status is None:
+    if backend_status is None or backend_status == "ok":
         return "rump_terminal_completion_unknown"
     return f"rump_terminal_completion_not_completed: backend_status={backend_status}"
 

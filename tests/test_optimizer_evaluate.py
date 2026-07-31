@@ -1748,10 +1748,15 @@ def _lab_schedule_best_tap_window() -> dict:
 
 def _best_tap_execution(*hours: int) -> SimpleNamespace:
     snapshots = tuple(_best_tap_snapshot(hour) for hour in hours)
+    # SC-109: terminal_rump_earned composition targets require affirmative
+    # earned proof; best-tap fixtures carry an earned payload so they test
+    # tap selection rather than the completed_run fail-open path.
+    trace = _trace(snapshots=snapshots)
+    trace.rump_terminal = {"status": "earned", "reason": "test_fixture_earned"}
     return _execution(
         backend_status="ok",
         snapshots=snapshots,
-        trace=_trace(snapshots=snapshots),
+        trace=trace,
     )
 
 
@@ -2456,6 +2461,7 @@ def test_composition_target_terminal_rump_unearned_is_infeasible() -> None:
 
 
 def test_composition_target_terminal_rump_completed_run_scores_with_trace() -> None:
+    # SC-109: missing rump_terminal + backend ok is unevaluable, not completed_run.
     result = evaluate(
         _valid_patch(),
         "lunar_mare_low_ti",
@@ -2468,16 +2474,11 @@ def test_composition_target_terminal_rump_completed_run_scores_with_trace() -> N
         executor=FakeExecutor(_execution(backend_status="ok")),
     )
 
-    assert result.feasible
-    assert result.objectives is not None
-    assert result.objectives.as_mapping()["composition_target:pc-ceramic-test"] == (
-        pytest.approx(1.0)
-    )
-    assert result.run_reference is not None
-    payload = result.run_reference.trace["composition_target"]
-    assert payload["terminal_rump_source"] == "completed_run"
-    assert payload["certification_tier"] == "certified"
-    assert payload["certified_envelope"]
+    assert not result.feasible
+    assert result.failure_category is FailureCategory.INFEASIBLE_RECIPE
+    assert result.objectives is None
+    assert result.failing_gates == ("rump_terminal",)
+    assert "rump_terminal_completion_unknown" in result.notes
 
 
 def test_warm_start_terminal_best_tap_uses_extended_configured_hours() -> None:
@@ -2614,7 +2615,7 @@ def test_terminal_rump_completed_best_tap_uses_terminal_slag_not_cleaned_melt() 
     ]
     assert payload["tap_hour"] == 24
     assert payload["tap_provenance"] == "completed_run"
-    assert payload["terminal_rump_source"] == "completed_run"
+    assert payload["terminal_rump_source"] == "earned_crash"
     assert payload["resolved_composition"]["oxide_wt_pct"]["CaO"] == pytest.approx(0.0)
 
 

@@ -260,6 +260,54 @@ def test_c5_targeted_feo_rung_survives_pre_reducible_low_current_hours():
     assert sim.melt.mre_c5_on_final_rung is True
 
 
+def test_sc109_mre_baseline_ladder_refuses_unarmed_low_current_advance():
+    """SC-109: MRE_BASELINE must not advance rungs on continuous zero current."""
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend,
+        _load("setpoints.yaml"),
+        _load("feedstocks.yaml"),
+        _load("vapor_pressures.yaml"),
+    )
+    sim.load_batch(FEEDSTOCK, mass_kg=1000.0)
+    sim._mre_voltage_sequence = [
+        {"voltage": 0.75, "species": ["FeO"], "min_hold_hours": 2},
+        {"voltage": 1.5, "species": ["SiO2"], "min_hold_hours": 2},
+    ]
+    sim.melt.campaign = CampaignPhase.MRE_BASELINE
+    sim._mre_voltage_step_idx = 0
+    sim._mre_hold_hours = 1  # next tick reaches min_hold
+    sim._mre_effective_current_A = 0.0
+    sim._mre_rung_ever_effective = False
+    # Keep FeO present so species-absent is not affirmative evidence.
+    sim.melt.composition_kg["FeO"] = 50.0
+
+    def fake_dispatch(_intent, *, control_inputs, **_kwargs):
+        return SimpleNamespace(
+            status="ok",
+            diagnostic={
+                "energy_kWh": 0.0,
+                "metals_produced_kg": {},
+                "metals_produced_mol": {},
+                "oxides_reduced_kg": {},
+            },
+            transition=None,
+        )
+
+    sim._dispatch_only = fake_dispatch
+    sim._ledger_account_species_kg = lambda _account, _species: 0.0
+    sim._project_extraction_melt = lambda: None
+    sim._sync_oxygen_kg_counters = lambda: None
+
+    sim._step_mre()
+
+    # OLD fail-open: target_current_low alone advanced the step.
+    assert sim._mre_voltage_step_idx == 0
+    assert sim._mre_hold_hours >= 2
+    assert sim._mre_rung_ever_effective is False
+
+
 def test_c5_present_rung_unreachable_at_cap_advances_after_minimum_hold():
     backend = InternalAnalyticalBackend()
     backend.initialize({})

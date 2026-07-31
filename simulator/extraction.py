@@ -1454,6 +1454,7 @@ class ExtractionMixin:
                     'effective_voltage_margin_temperature_C']
             ),
         }
+        c5_rung_advanced = False
         if self.melt.campaign == CampaignPhase.MRE_BASELINE:
             seq = self._mre_voltage_sequence
             if not seq:
@@ -1472,20 +1473,37 @@ class ExtractionMixin:
 
                 self._mre_hold_hours += 1
 
-                # Advance to next voltage step when target species depleted
+                # Advance only after affirmative effective current (or
+                # explicit species-absent evidence). Continuous near-zero
+                # current is not depletion (SC-109; mirror C5 ladder).
                 if self._mre_hold_hours >= step_info.get('min_hold_hours', 3):
+                    baseline_current_A = 3000.0
                     target_current_low = (
-                        self._mre_effective_current_A < 3000.0 * 0.05)
-                    if target_current_low:
+                        self._mre_effective_current_A
+                        < baseline_current_A * 0.05)
+                    rung_ever_effective = bool(
+                        getattr(self, '_mre_rung_ever_effective', False)
+                    )
+                    rung_species = step_info.get('species') or ()
+                    rung_species_absent = (
+                        bool(rung_species)
+                        and all(
+                            self.melt.composition_kg.get(oxide, 0.0) < 1e-6
+                            for oxide in rung_species
+                        )
+                    )
+                    if target_current_low and (
+                        rung_ever_effective or rung_species_absent
+                    ):
                         self._mre_voltage_step_idx += 1
                         self._mre_hold_hours = 0
+                        self._mre_rung_ever_effective = False
+                        c5_rung_advanced = True
 
             current_A = 3000.0  # Full-scale MRE: ~60 kA/m² at 0.05 m²
             c5_allowed_oxides = None
-            c5_rung_advanced = False
         else:
             # C5 limited MRE: EvalSpec/session fields are behavior determinants.
-            c5_rung_advanced = False
             target = str(getattr(self.melt, 'mre_target_species', '') or '')
             configured_max = (
                 mre_ladder.coerce_mre_decomposition_voltage(
@@ -1679,8 +1697,10 @@ class ExtractionMixin:
         from simulator.chemistry.kernel.capabilities import ChemistryIntent
         from simulator.electrolysis import (
             ELECTRONS_PER_OXIDE,
+            MREElectrolysisRefusal,
             MRECurrentPartitionRefusal,
             MRE_MULTI_OXIDE_PARTITION_REFUSAL,
+            MRE_TERMINAL_PHYSICS_REFUSAL_REASONS,
         )
         from simulator.mre_reproduction import (
             MREReproductionInterval,
@@ -1920,10 +1940,19 @@ class ExtractionMixin:
             self._mre_effective_voltage_margin_temperature_C = (
                 restore_state['effective_voltage_margin_temperature_C']
             )
-            reason = diagnostic.get('reason_refused', 'electrolysis_step_refused')
-            if reason == MRE_MULTI_OXIDE_PARTITION_REFUSAL:
-                raise MRECurrentPartitionRefusal(reason, refusal_record)
-            raise RuntimeError(f'MRE electrolysis refused: {reason}')
+            reason = str(
+                diagnostic.get('reason_refused', 'electrolysis_step_refused')
+            )
+            if reason not in MRE_TERMINAL_PHYSICS_REFUSAL_REASONS:
+                raise RuntimeError(
+                    f'unclassified ELECTROLYSIS_STEP refusal: {reason}'
+                )
+            refusal_type = (
+                MRECurrentPartitionRefusal
+                if reason == MRE_MULTI_OXIDE_PARTITION_REFUSAL
+                else MREElectrolysisRefusal
+            )
+            raise refusal_type(reason, refusal_record)
         transition = None
         if proposal is not None:
             transition = self._commit_proposal(
@@ -2060,15 +2089,18 @@ class ExtractionMixin:
                     )
                     total_charge_C += moles_ox * n_e * FARADAY
         self._mre_effective_current_A = total_charge_C / (dt_hr * 3600.0)
-        if (
-            is_plant
-            and
-            self.melt.campaign == CampaignPhase.C5
-            and not c5_rung_advanced
-            and self._mre_effective_current_A
-            >= mre_ladder.C5_LIMITED_MRE_CURRENT_A * 0.05
-        ):
-            self._mre_rung_ever_effective = True
+        if is_plant and not c5_rung_advanced:
+            if (
+                self.melt.campaign == CampaignPhase.C5
+                and self._mre_effective_current_A
+                >= mre_ladder.C5_LIMITED_MRE_CURRENT_A * 0.05
+            ):
+                self._mre_rung_ever_effective = True
+            elif (
+                self.melt.campaign == CampaignPhase.MRE_BASELINE
+                and self._mre_effective_current_A >= 3000.0 * 0.05
+            ):
+                self._mre_rung_ever_effective = True
 
         # Store effective current on melt state for endpoint detection
         self.melt.mre_voltage_V = voltage_V
@@ -2676,18 +2708,20 @@ class ExtractionMixin:
         proposal = kernel_result.transition
         if proposal is None:
             if getattr(kernel_result, 'status', '') == 'refused':
-                if diagnostic.get('reason_refused') != 'no_liquid_phase':
-                    refusal_record = {
-                        'reaction_family': REACTION_FAMILY_C3_K,
-                        'reagent': 'K',
-                        'hour': int(self.melt.hour),
-                        'campaign_hour': int(self.melt.campaign_hour),
-                        'campaign': self.melt.campaign.name,
-                        'temperature_C': float(self.melt.temperature_C),
-                        'diagnostic': diagnostic,
-                    }
-                    self._last_shuttle_refusal_diagnostic = refusal_record
-                    self._shuttle_refusal_history.append(refusal_record)
+                # SC-109 shape C: no_liquid_phase is a first-class refusal
+                # record, not a silent no-op. Dropping it made shuttle history
+                # look clean while metallothermy was refused every hour.
+                refusal_record = {
+                    'reaction_family': REACTION_FAMILY_C3_K,
+                    'reagent': 'K',
+                    'hour': int(self.melt.hour),
+                    'campaign_hour': int(self.melt.campaign_hour),
+                    'campaign': self.melt.campaign.name,
+                    'temperature_C': float(self.melt.temperature_C),
+                    'diagnostic': diagnostic,
+                }
+                self._last_shuttle_refusal_diagnostic = refusal_record
+                self._shuttle_refusal_history.append(refusal_record)
             self._chem_no_op_dispatch_count += 1
             return
 
@@ -2793,19 +2827,20 @@ class ExtractionMixin:
         proposal = kernel_result.transition
         if proposal is None:
             if getattr(kernel_result, 'status', '') == 'refused':
-                if diagnostic.get('reason_refused') != 'no_liquid_phase':
-                    refusal_record = {
-                        'reaction_family': REACTION_FAMILY_C3_NA,
-                        'reagent': 'Na',
-                        'target_stage': target_stage,
-                        'hour': int(self.melt.hour),
-                        'campaign_hour': int(self.melt.campaign_hour),
-                        'campaign': self.melt.campaign.name,
-                        'temperature_C': float(self.melt.temperature_C),
-                        'diagnostic': diagnostic,
-                    }
-                    self._last_shuttle_refusal_diagnostic = refusal_record
-                    self._shuttle_refusal_history.append(refusal_record)
+                # SC-109 shape C: preserve no_liquid_phase on the operator
+                # shuttle history (same rule as the K twin).
+                refusal_record = {
+                    'reaction_family': REACTION_FAMILY_C3_NA,
+                    'reagent': 'Na',
+                    'target_stage': target_stage,
+                    'hour': int(self.melt.hour),
+                    'campaign_hour': int(self.melt.campaign_hour),
+                    'campaign': self.melt.campaign.name,
+                    'temperature_C': float(self.melt.temperature_C),
+                    'diagnostic': diagnostic,
+                }
+                self._last_shuttle_refusal_diagnostic = refusal_record
+                self._shuttle_refusal_history.append(refusal_record)
             self._chem_no_op_dispatch_count += 1
             return
 

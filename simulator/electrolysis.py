@@ -83,6 +83,12 @@ MRE_CURRENT_PARTITION_SOURCE = (
 MRE_CURRENT_PARTITION_CERTIFICATION = "uncertified_current_partition"
 MRE_MULTI_OXIDE_PARTITION_REFUSAL = "uncertified_multi_oxide_current_partition"
 MRE_RAW_MARGIN_REFUSAL = "non_authoritative_fallback_raw_margin_nonpositive"
+MRE_PRODUCT_PHASE_MISMATCH_REFUSAL = "mre_product_phase_mismatch_refused"
+MRE_TERMINAL_PHYSICS_REFUSAL_REASONS = frozenset({
+    MRE_MULTI_OXIDE_PARTITION_REFUSAL,
+    MRE_RAW_MARGIN_REFUSAL,
+    MRE_PRODUCT_PHASE_MISMATCH_REFUSAL,
+})
 MRE_ACTIVITY_FLOOR = 1.0e-30
 MRE_SELECTIVITY_EXPONENT_CAP = 3.0
 # C1-01 validates the fallback/raw acceptance split for FeO.  Other fallback
@@ -95,8 +101,8 @@ MRE_FIXED_REDUCIBLE_OXIDES = tuple(
 )
 
 
-class MRECurrentPartitionRefusal(RuntimeError):
-    """Typed terminal refusal for an uncertified MRE current partition.
+class MREElectrolysisRefusal(RuntimeError):
+    """Typed terminal refusal for a classified MRE physics limitation.
 
     The refusal is terminal for the requested run, but not a simulator fault.
     ``core.step`` uses ``terminal_refusal`` to restore the whole attempted hour
@@ -110,6 +116,10 @@ class MRECurrentPartitionRefusal(RuntimeError):
         self.reason = str(reason)
         self.diagnostic = dict(diagnostic)
         super().__init__(self.reason)
+
+
+class MRECurrentPartitionRefusal(MREElectrolysisRefusal):
+    """Typed terminal refusal for an uncertified MRE current partition."""
 
 
 def min_decomposition_voltage(*, temperature_K: float | None = None) -> float:
@@ -680,7 +690,7 @@ class ElectrolysisModel:
             if result['mre_raw_margin_refused_targets']:
                 result['reason_refused'] = MRE_RAW_MARGIN_REFUSAL
             if result['mre_phase_refused_targets']:
-                result['reason_refused'] = 'mre_product_phase_mismatch_refused'
+                result['reason_refused'] = MRE_PRODUCT_PHASE_MISMATCH_REFUSAL
             return result
 
         refused_targets = uncertified_multi_oxide_partition_targets(reducible)

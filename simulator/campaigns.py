@@ -1766,6 +1766,85 @@ class CampaignManager:
         # campaign_hour, so hard duration caps must include the current hour.
         return float(melt.campaign_hour) + 1.0
 
+    @staticmethod
+    def _evap_total_signal_armed(
+        record: BatchRecord,
+        campaign: CampaignPhase,
+        threshold_kg_hr: float,
+        *,
+        current_rate: float,
+    ) -> bool:
+        """True only after an authorized sample exceeds the soft threshold."""
+        if float(current_rate) > float(threshold_kg_hr):
+            return True
+        for snapshot in record.snapshots:
+            if snapshot.campaign != campaign:
+                continue
+            flux = getattr(snapshot, 'evap_flux', None)
+            if flux is None:
+                continue
+            if float(getattr(flux, 'total_kg_hr', 0.0) or 0.0) > float(
+                    threshold_kg_hr):
+                return True
+        return False
+
+    @staticmethod
+    def _evap_species_signal_armed(
+        record: BatchRecord,
+        campaign: CampaignPhase,
+        species: str,
+        threshold_kg_hr: float,
+        *,
+        current_rate: float,
+    ) -> bool:
+        """True only after an authorized species sample exceeds threshold."""
+        if float(current_rate) > float(threshold_kg_hr):
+            return True
+        for snapshot in record.snapshots:
+            if snapshot.campaign != campaign:
+                continue
+            flux = getattr(snapshot, 'evap_flux', None)
+            if flux is None:
+                continue
+            species_rates = getattr(flux, 'species_kg_hr', None) or {}
+            if float(species_rates.get(species, 0.0) or 0.0) > float(
+                    threshold_kg_hr):
+                return True
+        return False
+
+    @staticmethod
+    def _mre_current_signal_armed(
+        record: BatchRecord,
+        campaign: CampaignPhase,
+        threshold_A: float,
+        *,
+        declared_rung_V: float | None = None,
+        min_voltage_V: float | None = None,
+    ) -> bool:
+        """True only after high effective current in the active voltage regime."""
+        if (declared_rung_V is None) == (min_voltage_V is None):
+            raise ValueError(
+                'MRE arming requires exactly one voltage-regime selector'
+            )
+        for snapshot in record.snapshots:
+            if snapshot.campaign != campaign:
+                continue
+            if declared_rung_V is not None and not math.isclose(
+                float(getattr(snapshot, 'mre_declared_rung_V', 0.0) or 0.0),
+                float(declared_rung_V),
+                rel_tol=0.0,
+                abs_tol=1e-9,
+            ):
+                continue
+            if min_voltage_V is not None and float(
+                getattr(snapshot, 'mre_voltage_V', 0.0) or 0.0
+            ) < float(min_voltage_V):
+                continue
+            if float(getattr(snapshot, 'mre_current_A', 0.0) or 0.0) >= float(
+                    threshold_A):
+                return True
+        return False
+
     def check_endpoint(self, melt: MeltState,
                        evap_flux: EvaporationFlux,
                        train: CondensationTrain,
@@ -1834,9 +1913,21 @@ class CampaignManager:
                 self._endpoint_float(campaign, soft, 'threshold_kg_hr'),
             )
             max_hold_hr = self._max_hold_hr(campaign)
-            total_rate = evap_flux.total_kg_hr
-            if (melt.campaign_hour >= min_hold_hr
-                    and total_rate < threshold_kg_hr):
+            total_rate = float(evap_flux.total_kg_hr)
+            # SC-109: soft depletion requires affirmative high-flux arming
+            # (C4 signal_armed pattern). Continuous sub-threshold / never-
+            # armed flux must not complete as if depletion occurred.
+            signal_armed = self._evap_total_signal_armed(
+                record,
+                CampaignPhase.C2A,
+                threshold_kg_hr,
+                current_rate=total_rate,
+            )
+            if (
+                signal_armed
+                and melt.campaign_hour >= min_hold_hr
+                and total_rate < threshold_kg_hr
+            ):
                 return True
             if completed_campaign_hour >= max_hold_hr:
                 return True
@@ -1982,8 +2073,22 @@ class CampaignManager:
             species = str(soft.get('species', ''))
             if not species:
                 raise ValueError('C2B.soft_endpoint.species is required')
-            rate = evap_flux.species_kg_hr.get(species, 0.0)
-            if melt.campaign_hour >= min_hold_hr and rate < threshold_kg_hr:
+            rate = float(evap_flux.species_kg_hr.get(species, 0.0))
+            # SC-109: missing species key / never-above-threshold rate is not
+            # depletion. Require a prior authorized high sample before low-rate
+            # soft completion (C4 signal_armed pattern).
+            signal_armed = self._evap_species_signal_armed(
+                record,
+                CampaignPhase.C2B,
+                species,
+                threshold_kg_hr,
+                current_rate=rate,
+            )
+            if (
+                signal_armed
+                and melt.campaign_hour >= min_hold_hr
+                and rate < threshold_kg_hr
+            ):
                 return True
             if completed_campaign_hour >= max_hold_hr:
                 return True
@@ -2220,7 +2325,17 @@ class CampaignManager:
                 melt.mre_voltage_V >= (voltage_cap_V - at_cap_margin_V)
                 and getattr(melt, 'mre_c5_on_final_rung', None) is not False
             )
-            if at_cap and melt.mre_current_A < threshold_A:
+            # SC-109: consecutive low current is decay only after a prior
+            # high-current sample; continuous-zero must not soft-complete.
+            signal_armed = self._mre_current_signal_armed(
+                record,
+                CampaignPhase.C5,
+                threshold_A,
+                declared_rung_V=float(
+                    getattr(melt, 'mre_declared_rung_V', 0.0) or 0.0
+                ),
+            )
+            if at_cap and melt.mre_current_A < threshold_A and signal_armed:
                 melt.mre_low_current_hours += 1
             else:
                 melt.mre_low_current_hours = 0
@@ -2297,8 +2412,18 @@ class CampaignManager:
             consecutive_hours = int(self._endpoint_float(
                 campaign, soft, 'consecutive_hours'))
             max_hold_hr = self._configured_max_hold_hr(campaign)
-            if (melt.mre_voltage_V >= min_voltage_V
-                    and melt.mre_current_A < threshold_A):
+            # SC-109: low-current consecutive hours require prior peak arming.
+            signal_armed = self._mre_current_signal_armed(
+                record,
+                CampaignPhase.MRE_BASELINE,
+                threshold_A,
+                min_voltage_V=min_voltage_V,
+            )
+            if (
+                melt.mre_voltage_V >= min_voltage_V
+                and melt.mre_current_A < threshold_A
+                and signal_armed
+            ):
                 melt.mre_low_current_hours += 1
             else:
                 melt.mre_low_current_hours = 0

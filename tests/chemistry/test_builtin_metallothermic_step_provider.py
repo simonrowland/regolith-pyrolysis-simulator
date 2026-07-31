@@ -1755,6 +1755,65 @@ def test_c3_na_shuttle_inject_no_liquid_no_reagent_leak(
     assert sim.atom_ledger.mol_by_account("process.cleaned_melt").get(
         "FeO", 0.0
     ) == pytest.approx(feo_mol_before)
+    # SC-109 shape C: no_liquid_phase must appear on shuttle history (was
+    # silently dropped, so operator surfaces looked clean).
+    assert len(sim._shuttle_refusal_history) == 1
+    assert sim._shuttle_refusal_history[0]["diagnostic"]["reason_refused"] == (
+        "no_liquid_phase"
+    )
+    assert sim._last_shuttle_refusal_diagnostic == sim._shuttle_refusal_history[0]
+
+
+def test_sc109_c3_k_no_liquid_phase_records_shuttle_refusal(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    """SC-109 shape C: K twin must record no_liquid_phase, not drop it."""
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    sim.atom_ledger.load_external(
+        "process.cleaned_melt",
+        {"FeO": 10.0 / (MOLAR_MASS["FeO"] / 1000.0)},
+        source="sc109 no_liquid_phase K seed",
+        material_origin="feedstock",
+    )
+    sim.atom_ledger.load_external(
+        "process.reagent_inventory",
+        {"K": 30.0 / (MOLAR_MASS["K"] / 1000.0)},
+        source="sc109 no_liquid_phase K seed",
+        material_origin="feedstock",
+    )
+    sim.shuttle_K_inventory_kg = sim._sync_reagent_counter_from_ledger("K")
+    sim.melt.temperature_C = 1150.0
+    sim.melt.campaign = CampaignPhase.C3_K
+    sim.melt.hour = 10
+    sim.melt.campaign_hour = 2
+
+    # Monkeypatch dispatch to force no_liquid_phase regardless of Ellingham.
+    from types import SimpleNamespace
+
+    def _refuse_no_liquid(intent, control_inputs=None, **kwargs):
+        return SimpleNamespace(
+            status="refused",
+            transition=None,
+            diagnostic={
+                "reason_refused": "no_liquid_phase",
+                "reason": "no_liquid_phase",
+                "liquid_fraction": 0.0,
+            },
+        )
+
+    sim._dispatch_only = _refuse_no_liquid  # type: ignore[method-assign]
+    assert sim._shuttle_refusal_history == []
+    sim._shuttle_inject_K(liquid_fraction=0.0)
+    assert len(sim._shuttle_refusal_history) == 1
+    assert sim._shuttle_refusal_history[0]["reagent"] == "K"
+    assert sim._shuttle_refusal_history[0]["diagnostic"]["reason_refused"] == (
+        "no_liquid_phase"
+    )
 
 
 @pytest.mark.parametrize("liquid_fraction", [None, 0.25])

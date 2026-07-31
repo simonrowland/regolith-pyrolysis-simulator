@@ -142,12 +142,14 @@ def test_c2a_staged_endpoint_prevalidates_all_species_before_yield_mutation():
         (CampaignPhase.C0B, 3, 1199.9, _flux(), BatchRecord(), None, 0.0, 100.0, 0, True),
         (CampaignPhase.C0B, 3, 1200.0, _flux(), BatchRecord(), None, 0.0, 100.0, 0, True),
         (CampaignPhase.C2A, 18, 25.0, _flux(0.1), BatchRecord(), None, 0.0, 100.0, 0, False),
-        (CampaignPhase.C2A, 18, 25.0, _flux(0.099), BatchRecord(), None, 0.0, 100.0, 0, True),
+        # SC-109: unarmed sub-threshold flux must NOT soft-complete (was True).
+        (CampaignPhase.C2A, 18, 25.0, _flux(0.099), BatchRecord(), None, 0.0, 100.0, 0, False),
         (CampaignPhase.C2A, 30, 25.0, _flux(99.0), BatchRecord(), None, 0.0, 100.0, 0, True),
         (CampaignPhase.C2A_STAGED, 7, 25.0, _flux(), BatchRecord(), None, 0.0, 100.0, 0, False),
         (CampaignPhase.C2A_STAGED, 8, 25.0, _flux(), BatchRecord(), None, 0.0, 100.0, 0, True),
         (CampaignPhase.C2B, 8, 25.0, _flux(Fe=0.05), BatchRecord(), None, 0.0, 100.0, 0, False),
-        (CampaignPhase.C2B, 8, 25.0, _flux(Fe=0.049), BatchRecord(), None, 0.0, 100.0, 0, True),
+        # SC-109: unarmed / missing-species zero rate must NOT soft-complete.
+        (CampaignPhase.C2B, 8, 25.0, _flux(Fe=0.049), BatchRecord(), None, 0.0, 100.0, 0, False),
         (CampaignPhase.C2B, 20, 25.0, _flux(Fe=9.0), BatchRecord(), None, 0.0, 100.0, 0, True),
         (CampaignPhase.C3_K, 2, 25.0, _flux(), BatchRecord(path="A_staged"), None, 0.0, 100.0, 0, True),
         (CampaignPhase.C3_K, 3, 25.0, _flux(), BatchRecord(path="A_staged"), None, 0.0, 100.0, 0, True),
@@ -162,7 +164,8 @@ def test_c2a_staged_endpoint_prevalidates_all_species_before_yield_mutation():
         (CampaignPhase.C5, 14, 25.0, _flux(), BatchRecord(branch="two"), None, 0.0, 100.0, 0, False),
         (CampaignPhase.C5, 15, 25.0, _flux(), BatchRecord(branch="two"), None, 0.0, 100.0, 0, False),
         (CampaignPhase.C5, 10, 25.0, _flux(), BatchRecord(branch="two"), None, 1.6, 4.0, 1, False),
-        (CampaignPhase.C5, 10, 25.0, _flux(), BatchRecord(branch="two"), None, 1.6, 4.0, 3, True),
+        # SC-109: unarmed low-current consecutive hours must NOT soft-complete.
+        (CampaignPhase.C5, 10, 25.0, _flux(), BatchRecord(branch="two"), None, 1.6, 4.0, 3, False),
         (CampaignPhase.C5, 800, 25.0, _flux(), BatchRecord(branch="two"), None, 0.0, 100.0, 0, True),
         (CampaignPhase.C5, 799, 25.0, _flux(), BatchRecord(branch="one"), None, 0.0, 100.0, 0, True),
         (CampaignPhase.C5, 800, 25.0, _flux(), BatchRecord(branch="one"), None, 0.0, 100.0, 0, True),
@@ -196,7 +199,8 @@ def test_c2a_staged_endpoint_prevalidates_all_species_before_yield_mutation():
         ),
         (CampaignPhase.C6, 20, 25.0, _flux(), BatchRecord(), None, 0.0, 100.0, 0, False),
         (CampaignPhase.MRE_BASELINE, 0, 25.0, _flux(), BatchRecord(), None, 2.44, 9.0, 2, False),
-        (CampaignPhase.MRE_BASELINE, 0, 25.0, _flux(), BatchRecord(), None, 2.45, 9.0, 2, True),
+        # SC-109: unarmed low current at min voltage must NOT soft-complete.
+        (CampaignPhase.MRE_BASELINE, 0, 25.0, _flux(), BatchRecord(), None, 2.45, 9.0, 2, False),
         (CampaignPhase.MRE_BASELINE, 120, 25.0, _flux(), BatchRecord(), None, 0.0, 100.0, 0, True),
     ],
 )
@@ -722,10 +726,20 @@ def test_c5_low_current_endpoint_is_gated_on_final_rung():
     # (2026-07-06 rung fix), so at-cap + low-current no longer means "ladder
     # done" by itself. The endpoint's low-current signal must only count on
     # the FINAL declared rung; earlier rungs' depletion belongs to the
-    # ladder-advance logic. Tri-state contract: None (no ladder bookkeeping,
-    # legacy states) keeps the legacy trip; explicit False blocks it.
+    # ladder-advance logic. SC-109: also requires a prior high-current arm.
     manager = CampaignManager(_setpoints())
-    record = BatchRecord(branch="two")
+    armed_record = BatchRecord(
+        branch="two",
+        snapshots=[
+            HourSnapshot(
+                campaign=CampaignPhase.C5,
+                mre_voltage_V=1.6,
+                mre_declared_rung_V=1.45,
+                mre_current_A=20.0,
+            )
+        ],
+    )
+    unarmed_record = BatchRecord(branch="two")
 
     def melt_at_cap(low_hours: int) -> MeltState:
         return _melt(
@@ -738,19 +752,58 @@ def test_c5_low_current_endpoint_is_gated_on_final_rung():
 
     early_rung = melt_at_cap(3)
     early_rung.mre_c5_on_final_rung = False
-    assert manager.check_endpoint(early_rung, _flux(), CondensationTrain(), record) is False
+    assert manager.check_endpoint(
+        early_rung, _flux(), CondensationTrain(), armed_record
+    ) is False
 
     final_rung = melt_at_cap(3)
     final_rung.mre_c5_on_final_rung = True
-    assert manager.check_endpoint(final_rung, _flux(), CondensationTrain(), record) is True
+    final_rung.mre_declared_rung_V = 1.45
+    assert manager.check_endpoint(
+        final_rung, _flux(), CondensationTrain(), armed_record
+    ) is True
+
+    # Unarmed continuous low current on final rung still refuses soft complete.
+    unarmed_final = melt_at_cap(3)
+    unarmed_final.mre_c5_on_final_rung = True
+    unarmed_final.mre_declared_rung_V = 1.45
+    assert manager.check_endpoint(
+        unarmed_final, _flux(), CondensationTrain(), unarmed_record
+    ) is False
+
+    earlier_rung_only = BatchRecord(
+        branch="two",
+        snapshots=[
+            HourSnapshot(
+                campaign=CampaignPhase.C5,
+                mre_voltage_V=1.6,
+                mre_declared_rung_V=0.75,
+                mre_current_A=20.0,
+            )
+        ],
+    )
+    earlier_armed_final = melt_at_cap(3)
+    earlier_armed_final.mre_c5_on_final_rung = True
+    earlier_armed_final.mre_declared_rung_V = 1.45
+    assert manager.check_endpoint(
+        earlier_armed_final,
+        _flux(),
+        CondensationTrain(),
+        earlier_rung_only,
+    ) is False
 
     legacy = melt_at_cap(3)
     assert legacy.mre_c5_on_final_rung is None
-    assert manager.check_endpoint(legacy, _flux(), CondensationTrain(), record) is True
+    legacy.mre_declared_rung_V = 1.45
+    assert manager.check_endpoint(
+        legacy, _flux(), CondensationTrain(), armed_record
+    ) is True
 
     complete = _melt(CampaignPhase.C5, 10, voltage_V=0.0, current_A=0.0)
     complete.mre_c5_ladder_complete = True
-    assert manager.check_endpoint(complete, _flux(), CondensationTrain(), record) is True
+    assert manager.check_endpoint(
+        complete, _flux(), CondensationTrain(), unarmed_record
+    ) is True
 
 
 def test_campaign_endpoint_caps_and_classes_are_materialized():
@@ -806,3 +859,127 @@ def test_campaign_endpoint_caps_and_classes_are_materialized():
         "mre_baseline": "C",
         "C6": "A",
     }
+
+
+# ---------------------------------------------------------------------------
+# SC-109 regressions: soft completion requires affirmative signal arming
+# ---------------------------------------------------------------------------
+
+
+def test_sc109_c2a_soft_endpoint_refuses_unarmed_subthreshold_flux() -> None:
+    """Fail-open input: continuous rate always below threshold after min_hold."""
+    manager = CampaignManager(_setpoints())
+    melt = _melt(CampaignPhase.C2A, 18)
+    # OLD behaviour completed on absence of high flux; must stay incomplete.
+    assert manager.check_endpoint(
+        melt, _flux(0.0), CondensationTrain(), BatchRecord()
+    ) is False
+    assert manager.check_endpoint(
+        melt, _flux(0.099), CondensationTrain(), BatchRecord()
+    ) is False
+
+
+def test_sc109_c2a_soft_endpoint_completes_only_after_flux_arm_then_decay() -> None:
+    manager = CampaignManager(_setpoints())
+    record = BatchRecord(
+        snapshots=[
+            HourSnapshot(
+                campaign=CampaignPhase.C2A,
+                evap_flux=_flux(0.5),
+            )
+        ]
+    )
+    melt = _melt(CampaignPhase.C2A, 18)
+    assert manager.check_endpoint(
+        melt, _flux(0.05), CondensationTrain(), record
+    ) is True
+
+
+def test_sc109_c2b_soft_endpoint_refuses_missing_species_zero_rate() -> None:
+    """Fail-open input: Fe key absent → rate defaults 0.0 after min_hold."""
+    manager = CampaignManager(_setpoints())
+    melt = _melt(CampaignPhase.C2B, 8)
+    # species_kg_hr has no Fe → .get defaults 0.0 (the old fail-open path).
+    assert manager.check_endpoint(
+        melt, _flux(total_kg_hr=1.0, SiO=1.0), CondensationTrain(), BatchRecord()
+    ) is False
+
+
+def test_sc109_c2b_soft_endpoint_completes_only_after_fe_arm_then_decay() -> None:
+    manager = CampaignManager(_setpoints())
+    record = BatchRecord(
+        snapshots=[
+            HourSnapshot(
+                campaign=CampaignPhase.C2B,
+                evap_flux=_flux(Fe=0.2),
+            )
+        ]
+    )
+    melt = _melt(CampaignPhase.C2B, 8)
+    assert manager.check_endpoint(
+        melt, _flux(Fe=0.01), CondensationTrain(), record
+    ) is True
+
+
+def test_sc109_mre_baseline_soft_endpoint_refuses_unarmed_low_current() -> None:
+    manager = CampaignManager(_setpoints())
+    melt = _melt(
+        CampaignPhase.MRE_BASELINE,
+        0,
+        voltage_V=2.45,
+        current_A=0.0,
+        low_current_hours=10,
+    )
+    assert manager.check_endpoint(
+        melt, _flux(), CondensationTrain(), BatchRecord()
+    ) is False
+
+
+def test_sc109_mre_baseline_soft_endpoint_completes_after_peak_then_decay() -> None:
+    manager = CampaignManager(_setpoints())
+    record = BatchRecord(
+        snapshots=[
+            HourSnapshot(
+                campaign=CampaignPhase.MRE_BASELINE,
+                mre_voltage_V=2.45,
+                mre_current_A=50.0,
+            )
+        ]
+    )
+    melt = _melt(
+        CampaignPhase.MRE_BASELINE,
+        0,
+        voltage_V=2.45,
+        current_A=1.0,
+        low_current_hours=2,
+    )
+    assert manager.check_endpoint(
+        melt, _flux(), CondensationTrain(), record
+    ) is True
+
+
+def test_sc109_mre_baseline_earlier_rung_arm_does_not_authorize_terminal_decay() -> None:
+    manager = CampaignManager(_setpoints())
+    earlier_rung_only = BatchRecord(
+        snapshots=[
+            HourSnapshot(
+                campaign=CampaignPhase.MRE_BASELINE,
+                mre_voltage_V=1.5,
+                mre_current_A=50.0,
+            )
+        ]
+    )
+    melt = _melt(
+        CampaignPhase.MRE_BASELINE,
+        0,
+        voltage_V=2.45,
+        current_A=1.0,
+        low_current_hours=2,
+    )
+
+    assert manager.check_endpoint(
+        melt,
+        _flux(),
+        CondensationTrain(),
+        earlier_rung_only,
+    ) is False

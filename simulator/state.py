@@ -1027,7 +1027,7 @@ class HourSnapshot:
     # Declared C5 ladder rung (audit: the cell dispatches at the stage cap;
     # this is the accounting rung, 0.0 outside C5 holds).
     mre_declared_rung_V: float = 0.0
-    mre_current_A: float = 0.0
+    mre_current_A: float = 0.0  # Effective Faradaic current, never nominal dispatch
     mre_metals_kg_hr: Dict[str, float] = field(default_factory=dict)
     mre_uncertified_yield: Dict[str, Any] = field(default_factory=dict)
     mre_ellingham_ladder_diagnostic: Dict[str, Any] = field(default_factory=dict)

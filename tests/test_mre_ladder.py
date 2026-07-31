@@ -625,6 +625,11 @@ def test_c5_ellingham_ladder_diagnostic_emits_and_flags_synthetic_reordering(
     assert diagnostic["reordering"]["other_species_below_declared_rung"] == ["SiO2"]
 
     snapshot = sim._make_snapshot()
+    assert sim._mre_current_A == pytest.approx(
+        mre_ladder.C5_LIMITED_MRE_CURRENT_A
+    )
+    assert sim._mre_effective_current_A == pytest.approx(0.0)
+    assert snapshot.mre_current_A == pytest.approx(0.0)
     assert snapshot.mre_ellingham_ladder_diagnostic == diagnostic
     summary = build_per_hour_summary(sim, snapshot)
     assert summary["mre_ellingham_ladder_diagnostic"]["schema"] == (
@@ -920,6 +925,34 @@ def test_c5_safety_max_hold_advances_without_low_current():
 
     assert sim._mre_voltage_step_idx == 1
     assert sim._mre_hold_hours == 0
+
+
+def test_mre_baseline_rung_advance_blocks_old_rung_rearming():
+    setpoints = {
+        "campaigns": {},
+        "mre_voltage_sequence": {
+            "sequence": [
+                {"species": "FeO", "decomposition_V": 0.75, "min_hold_hours": 3},
+                {"species": "SiO2", "decomposition_V": 1.45, "min_hold_hours": 3},
+            ],
+        },
+    }
+    sim = _sim(setpoints)
+    sim._mre_voltage_sequence = sim._build_mre_voltage_sequence()
+    sim.melt.campaign = CampaignPhase.MRE_BASELINE
+    sim.melt.composition_kg = {"FeO": 10.0}
+    sim._mre_voltage_step_idx = 0
+    sim._mre_hold_hours = 2
+    sim._mre_effective_current_A = 0.0
+    sim._mre_rung_ever_effective = True
+
+    control = sim._select_plant_mre_interval_control()
+
+    assert sim._mre_voltage_step_idx == 1
+    assert sim._mre_hold_hours == 0
+    assert sim._mre_rung_ever_effective is False
+    assert control is not None
+    assert control.c5_rung_advanced is True
 
 
 def test_c5_safety_max_hold_stops_after_terminal_rung():

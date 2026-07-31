@@ -2894,22 +2894,9 @@ def _pool_species_mol(
             if fallback:
                 return MappingProxyType(fallback)
         else:
-            completion_problem = _terminal_rump_completed_run_problem(run_execution)
-            if completion_problem is not None:
-                raise ObjectiveComputationError(completion_problem)
-            ledger_values = _ledger_mol_by_accounts(
-                sim,
-                _POOL_LEDGER_ACCOUNTS["terminal_rump_earned"],
+            raise ObjectiveComputationError(
+                _terminal_rump_missing_completion_evidence_problem(run_execution)
             )
-            if not ledger_values and tap_provenance is None:
-                ledger_values = _ledger_mol_by_accounts(
-                    sim,
-                    _POOL_LEDGER_ACCOUNTS["residual_rump_at_stop"],
-                )
-            if ledger_values:
-                if pool_provenance is not None:
-                    pool_provenance[pool] = "completed_run"
-                return MappingProxyType(ledger_values)
     raise ObjectiveComputationError(f"composition target pool {pool!r} unavailable")
 
 
@@ -3110,18 +3097,25 @@ def _require_earned_terminal_rump(run_execution: Any) -> None:
         raise ObjectiveComputationError("composition target terminal rump is not earned")
 
 
-def _terminal_rump_completed_run_problem(run_execution: Any) -> str | None:
+def _terminal_rump_missing_completion_evidence_problem(
+    run_execution: Any,
+) -> str:
+    """Explain why missing ``rump_terminal`` cannot earn the terminal pool.
+
+    SC-109: ``backend_status == "ok"`` is absence of a backend failure, not
+    affirmative evidence that a terminal rump was earned or certified. Missing
+    ``rump_terminal`` must stay unevaluable rather than scoring residual melt
+    as a completed terminal pool.
+    """
     backend_status = _latest_backend_status(run_execution)
-    if backend_status == "ok":
-        return None
-    if backend_status is None:
+    if backend_status is not None and backend_status != "ok":
         return (
-            "composition target terminal rump completed_run lacks positive "
-            "completion evidence"
+            "composition target terminal rump cannot use completed_run because "
+            f"backend_status={backend_status!r}"
         )
     return (
-        "composition target terminal rump cannot use completed_run because "
-        f"backend_status={backend_status!r}"
+        "composition target terminal rump completed_run lacks positive "
+        "completion evidence"
     )
 
 

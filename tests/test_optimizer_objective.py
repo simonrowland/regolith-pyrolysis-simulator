@@ -2254,7 +2254,9 @@ def test_composition_target_ratio_zero_denominator_fails_loud() -> None:
         compute_objectives(profile, run)
 
 
-def test_terminal_rump_pool_scores_completed_run_residue_with_provenance() -> None:
+def test_terminal_rump_pool_refuses_completed_run_without_positive_evidence() -> None:
+    # SC-109: backend_status=="ok" alone is not positive terminal proof.
+    # Missing rump_terminal must refuse rather than score residual as completed.
     run = SimpleNamespace(
         simulator=_CompositionSim(
             cleaned_melt={"CaO": 1.0},
@@ -2268,11 +2270,33 @@ def test_terminal_rump_pool_scores_completed_run_residue_with_provenance() -> No
         oxides={"CaO": {"min": 0.0, "max": 100.0, "strict": True, "weight": 1.0}},
     )
 
+    with pytest.raises(ObjectiveComputationError, match="positive completion evidence"):
+        compute_objectives(profile, run)
+
+
+def test_sc109_terminal_rump_pool_scores_with_earned_rump_terminal() -> None:
+    """Positive control: earned rump_terminal still unlocks the pool."""
+    run = SimpleNamespace(
+        simulator=_CompositionSim(
+            cleaned_melt={"CaO": 1.0},
+            stage3_kg={},
+            extra_accounts={"terminal.slag": {"CaO": 2.0}},
+        ),
+        trace=SimpleNamespace(
+            rump_terminal={"status": "earned", "reason": "test_fixture"},
+            backend_status="ok",
+        ),
+        backend_status="ok",
+    )
+    profile = _composition_score_profile(
+        "terminal_rump_earned",
+        oxides={"CaO": {"min": 0.0, "max": 100.0, "strict": True, "weight": 1.0}},
+    )
+
     objectives = compute_objectives(profile, run)
     evidence = objectives.evidence["composition_target:pool-test"]["composition_target"]
-
     assert objectives.as_mapping()["composition_target:pool-test"] == pytest.approx(1.0)
-    assert evidence["terminal_rump_source"] == "completed_run"
+    assert evidence["terminal_rump_source"] == "earned_crash"
 
 
 def test_terminal_rump_pool_rejects_trace_only_out_of_domain_as_completed_run() -> None:

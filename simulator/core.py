@@ -12688,7 +12688,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ),
             # MRE electrolysis
             mre_voltage_V=self._mre_voltage_V,
-            mre_current_A=self._mre_current_A,
+            mre_current_A=self._mre_effective_current_A,
             mre_declared_rung_V=float(
                 getattr(self.melt, 'mre_declared_rung_V', 0.0)
             ),

@@ -291,6 +291,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             FERRIC_TO_FERROUS_REFERENCE_V,
             FERRIC_TO_FERROUS_REFERENCE_STATUS,
             MRE_MULTI_OXIDE_PARTITION_REFUSAL,
+            MRE_PRODUCT_PHASE_MISMATCH_REFUSAL,
             MRE_RAW_MARGIN_REFUSAL,
             MRE_RAW_MARGIN_GUARDED_OXIDES,
             MRE_CERTIFICATION_DENYLIST_REASON,
@@ -703,7 +704,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 diagnostic["reason_refused"] = MRE_RAW_MARGIN_REFUSAL
             if diagnostic["mre_phase_refused_targets"]:
                 status = "refused"
-                diagnostic["reason_refused"] = "mre_product_phase_mismatch_refused"
+                diagnostic["reason_refused"] = MRE_PRODUCT_PHASE_MISMATCH_REFUSAL
             return IntentResult(
                 intent=ChemistryIntent.ELECTROLYSIS_STEP,
                 status=status,

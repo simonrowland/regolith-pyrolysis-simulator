@@ -63,7 +63,7 @@ from simulator.cost_parameters import (
     normalize_cost_parameters,
 )
 from simulator.core import PoisonedHourError
-from simulator.electrolysis import MRECurrentPartitionRefusal
+from simulator.electrolysis import MREElectrolysisRefusal
 from simulator.evaporation import EvaporationFluxRefusal
 from simulator.furnace_materials import resolve_furnace_max_T_C
 from simulator.melt_backend.base import InternalAnalyticalBackend
@@ -1826,12 +1826,11 @@ def _per_tick_backend_resolution(
         getattr(sim, '_last_backend_diagnostics', {}) or {}
     )
     reason = str(diagnostics.get('backend_status_reason', '') or '')
+    # SC-109: missing authority metadata is unknown/false, never inferred
+    # from status=='ok' (absence of an explicit false is not affirmative).
     authoritative = bool(
         fallback_authoritative
-        and diagnostics.get(
-            'authoritative_for_requested_conditions',
-            status == 'ok',
-        )
+        and diagnostics.get('authoritative_for_requested_conditions', False)
     )
     return status, reason, authoritative
 
@@ -2648,7 +2647,7 @@ def _start_background_loop(
                 except (
                     KnudsenRegimeRefusal,
                     EvaporationFluxRefusal,
-                    MRECurrentPartitionRefusal,
+                    MREElectrolysisRefusal,
                 ) as exc:
                     _safe_log(f'Simulation refused: {exc.reason}')
                     error_payload = {
