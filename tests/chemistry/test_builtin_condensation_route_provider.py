@@ -150,23 +150,38 @@ EXPECTED_C4B_WALL_SEGMENT_DEPOSITS_KG = {
     # remain dew-point undersaturated on the hot walls, while Cr follows its
     # real partial-pressure route; segment-local depletion leaves only a small
     # first-segment Fe deposit.
-    # Regenerated from the corrected executable split path at rel=1e-12.
+    #
+    # 2026-07-31 integrated-tip follow-up (causal 228927d SC-109, not 4fce2f0):
+    # Premise: 0c56d99-era pins assumed soft endpoints could complete on
+    # continuous sub-threshold flux without a prior high-flux arming sample.
+    # SC-109 requires affirmative high-flux arming before soft depletion
+    # completion, so never-armed C2A legs (including post-Mg C2A with
+    # max_hours=160) run out to max_hold rather than soft-stopping early.
+    # That lengthens the residual Fe vapor/wall-capture sequence and moves
+    # first-segment Fe slightly vs the 0c56d99-computed pins. 4fce2f0 only
+    # surfaces wall Antoine range refusals as status-bearing authority
+    # metadata; lunar Fe at 228927d equals tip (byte-identical), so S-03
+    # is not the mass mover. Regenerated at fb73ec6 from the executable
+    # split path at rel=1e-12.
     "lunar_mare_low_ti": {
         # Partial-pressure caps remove Cr/Na/K capture; Fe depletes locally.
+        # 0c56d99 pin 0.024262339673022347 -> SC-109 residual-path Fe below.
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Fe": 0.024262339673022347,
+            "Fe": 0.024088657058388228,
         },
     },
     "mars_basalt": {
         # Na/K stay undersaturated; the limited Fe supply depletes locally.
+        # 0c56d99 pin 0.02795693349498251 -> SC-109 residual-path Fe below.
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Fe": 0.02795693349498251,
+            "Fe": 0.02744112814751388,
         },
     },
     "s_type_asteroid_silicate": {
         # Partial-pressure caps remove Cr/Na/K capture; Fe depletes locally.
+        # 0c56d99 pin 0.04468148521030869 -> SC-109 residual-path Fe below.
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Fe": 0.04468148521030869,
+            "Fe": 0.04196132187240494,
         },
     },
 }
