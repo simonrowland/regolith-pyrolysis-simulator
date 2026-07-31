@@ -337,17 +337,19 @@ def test_low_voltage_debug_feedstock_exercises_mre_electrolysis(monkeypatch):
     assert sim.atom_ledger.kg_by_account("process.overhead_gas")[
         "Na"
     ] == pytest.approx(0.8571653495845415)
+    # 2026-07-30 7d42b4f rebaseline: bounded flowing p_Na stays below the
+    # 1500 C wall saturation pressure, so dew-point-undersaturated Na reaches
+    # the condensation train instead of depositing on the hot pipe walls.
     assert sim.atom_ledger.kg_by_account("process.condensation_train")[
         "Na"
-    ] == pytest.approx(9.389045452223855e-07)
+    ] == pytest.approx(1.4777109062199472)
     wall_na_kg = sum(
         sim.atom_ledger.kg_by_account(account).get("Na", 0.0)
         for account in PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS
     )
-    assert wall_na_kg == pytest.approx(1.4777099673154022)
-    assert wall_na_kg > sim.atom_ledger.kg_by_account(
-        "process.condensation_train"
-    )["Na"]
+    # The same partial-pressure cap makes every hot wall segment
+    # undersaturated; the former wall inventory is therefore exactly zero.
+    assert wall_na_kg == pytest.approx(0.0)
     mre_oxygen = sim.atom_ledger.kg_by_account(
         "terminal.oxygen_mre_anode_stored"
     )["O2"]

@@ -787,7 +787,40 @@ def test_cro2_condenses_to_terminal_chromium_oxide_account():
     train = sim.atom_ledger.kg_by_account("process.condensation_train")
     stage_totals = sim.train.total_by_species()
 
-    assert chromium["Cr2O3"] > 0.9
+    wall_cro2_by_account_kg = {}
+    for account in PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS:
+        cro2_kg = sim.atom_ledger.kg_by_account(account).get("CrO2", 0.0)
+        if cro2_kg > 0.0:
+            wall_cro2_by_account_kg[account] = cro2_kg
+    # 2026-07-30 7d42b4f rebaseline: real flowing CrO2 partial pressure is
+    # supersaturated on the first two walls; segment-local depletion then
+    # leaves 0.913341865141524 kg for terminal conversion.
+    assert wall_cro2_by_account_kg == pytest.approx(
+        {
+            "process.wall_deposit_segment_stage_0_to_stage_1": (
+                0.04078029875692986
+            ),
+            "process.wall_deposit_segment_stage_1_to_stage_2": (
+                0.045877836101546096
+            ),
+        },
+        rel=1e-12,
+        abs=0.0,
+    )
+    remaining_cro2_kg = flux.species_kg_hr["CrO2"] - sum(
+        wall_cro2_by_account_kg.values()
+    )
+    # The terminal account receives only that segment-locally depleted
+    # remainder, converted by the fixture's exact CrO2 -> Cr2O3 stoichiometry.
+    expected_cr2o3_kg = (
+        remaining_cro2_kg
+        * 0.5
+        * MOLAR_MASS["Cr2O3"]
+        / MOLAR_MASS["CrO2"]
+    )
+    assert chromium["Cr2O3"] == pytest.approx(
+        expected_cr2o3_kg, rel=1e-12, abs=0.0
+    )
     assert "Cr2O3" not in train
     assert stage_totals["Cr2O3"] == pytest.approx(chromium["Cr2O3"])
     assert stage_totals.get("O2", 0.0) == pytest.approx(0.0)
