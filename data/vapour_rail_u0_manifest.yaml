@@ -1,0 +1,7982 @@
+schema_version: 1
+kind: u0_vapour_rail_manifest
+description: 'U0 frozen canonical vapour-rail species manifest: de-duplicated union of species-inventory.md,
+  species-inventory-gas-closure.md (binding coverage delta), and refractory_vapor_species.yaml gas IDs
+  after collision-only _gas canonicalization.'
+validation_status_default: pending_validation
+row_count: 320
+provenance:
+  inventory: docs-private/research/2026-07-30-rail-seams/species-inventory.md
+  gas_closure: docs-private/research/2026-07-30-rail-seams/species-inventory-gas-closure.md
+  gas_closure_path_present: true
+  refractory_registry: data/refractory_vapor_species.yaml
+  input_counts:
+    inventory: 242
+    gas_closure: 137
+    refractory_registry: 22
+    union_before_dedup_sum: 401
+membership_sets:
+  vaporock_42:
+  - Al
+  - Al2O
+  - Al2O3_gas
+  - AlO
+  - Ca
+  - Ca2
+  - CaO_gas
+  - CoO_gas
+  - Cr
+  - Cr2O3_gas
+  - CrO
+  - CrO2
+  - Fe
+  - Fe2O3_gas
+  - FeO_gas
+  - K
+  - K2
+  - K2O_gas
+  - KO
+  - KOH
+  - Mg
+  - Mg2
+  - MgO_gas
+  - Mn
+  - MnO_gas
+  - Na
+  - Na2
+  - Na2O_gas
+  - NaO
+  - NaOH
+  - NiO_gas
+  - O
+  - O2
+  - P2O5_gas
+  - Si
+  - Si2
+  - SiO
+  - SiO2_gas
+  - Ti
+  - Ti2O3
+  - TiO
+  - TiO2_gas
+  collision_gas:
+  - Al2O3_gas
+  - CaO_gas
+  - CoO_gas
+  - Cr2O3_gas
+  - Fe2O3_gas
+  - FeO_gas
+  - K2O_gas
+  - MgO_gas
+  - MnO_gas
+  - Na2O_gas
+  - NiO_gas
+  - P2O5_gas
+  - SiO2_gas
+  - TiO2_gas
+  carrier_only:
+  - CH4_NH3_HCN
+  - CO_CH4_propellant
+  - CO_CO2
+  - Fe_Ni_alloy
+  - NH3_HCN
+  - NaCl_KCl_salts
+  - REE_oxides
+  - carbonate_salts
+  - generic_carbonaceous_hydrocarbon
+  - generic_carbonaceous_organic
+  - metallic_FeNi
+  feedstock_delta:
+  - Ar
+  - C
+  - CH4_NH3_HCN
+  - CO_CH4_propellant
+  - CO_CO2
+  - CO_propellant
+  - ClO4
+  - Co
+  - FeS_troilite
+  - Fe_Ni_alloy
+  - H
+  - He3
+  - He4
+  - MgSO4
+  - NH3
+  - NH3_HCN
+  - Ne
+  - Ni
+  - P
+  - REE_oxides
+  - SO3
+  - Th
+  - Zr
+  - ZrO2
+  - carbonaceous_organic
+  - carbonate_salts
+  - generic_carbonaceous_hydrocarbon
+  - generic_carbonaceous_organic
+  - hydrocarbons
+  - metallic_FeNi
+  - organics
+  - sulfuric_acid_feedstock
+  - unreported_loi_residual
+  refractory_raw:
+  - Al
+  - Al2
+  - Al2O
+  - Al2O2
+  - AlO
+  - AlO2
+  - Ca
+  - Ca2
+  - CaO
+  - Mg
+  - Mg2
+  - MgO
+  - O
+  - O2
+  - Si
+  - Si2
+  - Si3
+  - SiO
+  - SiO2
+  - Ti
+  - TiO
+  - TiO2
+  refractory_canonical:
+  - Al
+  - Al2
+  - Al2O
+  - Al2O2
+  - AlO
+  - AlO2
+  - Ca
+  - Ca2
+  - CaO_gas
+  - Mg
+  - Mg2
+  - MgO_gas
+  - O
+  - O2
+  - Si
+  - Si2
+  - Si3
+  - SiO
+  - SiO2_gas
+  - Ti
+  - TiO
+  - TiO2_gas
+  group_a_gas:
+  - As4O6
+  - BaO
+  - Cs2O
+  - Cs2O2
+  - CsO
+  - Ga2O
+  - Li2O
+  - Li2O2
+  - Li3O
+  - LiO
+  - P4O10
+  - P4O6
+  - P4O7
+  - P4O8
+  - P4O9
+  - PO
+  - Rb2
+  - Rb2O
+  - Rb2O2
+  - RbO
+  - Sb4O6
+  - Se2
+  - Se3
+  - Se4
+  - Se5
+  - Se6
+  - Se7
+  - Se8
+  - SrO
+  - VO
+  - VO2
+  group_a_elements:
+  - As
+  - Ba
+  - Cs
+  - Eu
+  - Ga
+  - Li
+  - P
+  - Rb
+  - Sb
+  - Se
+  - Sr
+  - V
+  - Yb
+  group_b_gas:
+  - Be2O
+  - Be2O2
+  - Be3O3
+  - Be4O4
+  - Be5O5
+  - Be6O6
+  - BeO
+  - CeO
+  - CeO2
+  - DyO
+  - ErO
+  - GdO
+  - HfO
+  - HoO
+  - IrO3
+  - LaO
+  - LuO
+  - NbO
+  - NbO2
+  - NdO
+  - OsO3
+  - OsO4
+  - PrO
+  - PtO2
+  - RhO2
+  - RuO3
+  - ScO
+  - SmO
+  - TaO
+  - TaO2
+  - TbO
+  - ThO
+  - ThO2
+  - TmO
+  - UO
+  - UO2
+  - UO3
+  - YO
+  - ZrO
+  group_b_elements:
+  - Be
+  - Ce
+  - Dy
+  - Er
+  - Gd
+  - Hf
+  - Ho
+  - Ir
+  - La
+  - Lu
+  - Nb
+  - Nd
+  - Os
+  - Pr
+  - Pt
+  - Rh
+  - Ru
+  - Sc
+  - Sm
+  - Ta
+  - Tb
+  - Th
+  - Tm
+  - U
+  - Y
+  - Zr
+  association_polymer:
+  - Al2
+  - Ca2
+  - K2Cl2
+  - Mg2
+  - Na2Cl2
+  - Si2
+  - Si3
+  unknown_no_source:
+  - PdO
+  - TiOH4
+  monatomic_oxygen:
+  - O
+species:
+- id: Ag
+  formula: Ag
+  atoms:
+    Ag: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Al
+  formula: Al
+  atoms:
+    Al: 1.0
+  disposition: U
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - refractory_registry
+  - vaporock_42
+  notes: refractory_registry
+- id: Al2
+  formula: Al2
+  atoms:
+    Al: 2.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - association_polymer
+  - gas_closure_delta
+  - refractory_registry
+  notes: refractory_registry
+- id: Al2O
+  formula: Al2O
+  atoms:
+    Al: 2.0
+    O: 1.0
+  disposition: U
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - gas_closure_delta
+  - rail_gap_dominant
+  - refractory_registry
+  - vaporock_42
+  notes: refractory_registry
+- id: Al2O2
+  formula: Al2O2
+  atoms:
+    Al: 2.0
+    O: 2.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: false
+    refractory_registry: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - refractory_registry
+  notes: refractory_registry
+- id: Al2O3
+  formula: Al2O3
+  atoms:
+    Al: 2.0
+    O: 3.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Al2O3_gas
+  formula: Al2O3
+  atoms:
+    Al: 2.0
+    O: 3.0
+  disposition: U
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - collision_gas
+  - vaporock_42
+- id: AlO
+  formula: AlO
+  atoms:
+    Al: 1.0
+    O: 1.0
+  disposition: U
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - refractory_registry
+  - vaporock_42
+  notes: refractory_registry
+- id: AlO2
+  formula: AlO2
+  atoms:
+    Al: 1.0
+    O: 2.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: false
+    refractory_registry: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - refractory_registry
+  notes: refractory_registry
+- id: Ar
+  formula: Ar
+  atoms:
+    Ar: 1.0
+  disposition: U
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - feedstock_delta
+- id: As
+  formula: As
+  atoms:
+    As: 1.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+  - group_a_element
+- id: As2O3
+  formula: As2O3
+  atoms:
+    As: 2.0
+    O: 3.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: As4O6
+  formula: As4O6
+  atoms:
+    As: 4.0
+    O: 6.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+- id: Au
+  formula: Au
+  atoms:
+    Au: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: B
+  formula: B
+  atoms:
+    B: 1.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: B2O3
+  formula: B2O3
+  atoms:
+    B: 2.0
+    O: 3.0
+  disposition: U
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Ba
+  formula: Ba
+  atoms:
+    Ba: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+  - group_a_element
+- id: BaO
+  formula: BaO
+  atoms:
+    Ba: 1.0
+    O: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+- id: Be
+  formula: Be
+  atoms:
+    Be: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+  - group_b_element
+- id: Be2O
+  formula: Be2O
+  atoms:
+    Be: 2.0
+    O: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+- id: Be2O2
+  formula: Be2O2
+  atoms:
+    Be: 2.0
+    O: 2.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+- id: Be3O3
+  formula: Be3O3
+  atoms:
+    Be: 3.0
+    O: 3.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+- id: Be4O4
+  formula: Be4O4
+  atoms:
+    Be: 4.0
+    O: 4.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+- id: Be5O5
+  formula: Be5O5
+  atoms:
+    Be: 5.0
+    O: 5.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+- id: Be6O6
+  formula: Be6O6
+  atoms:
+    Be: 6.0
+    O: 6.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+- id: BeO
+  formula: BeO
+  atoms:
+    Be: 1.0
+    O: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+- id: Bi
+  formula: Bi
+  atoms:
+    Bi: 1.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Bi14O16
+  formula: Bi14O16
+  atoms:
+    Bi: 14.0
+    O: 16.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Bi2O3
+  formula: Bi2O3
+  atoms:
+    Bi: 2.0
+    O: 3.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Bi4O6
+  formula: Bi4O6
+  atoms:
+    Bi: 4.0
+    O: 6.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: BiO
+  formula: BiO
+  atoms:
+    Bi: 1.0
+    O: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Br
+  formula: Br
+  atoms:
+    Br: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Br2
+  formula: Br2
+  atoms:
+    Br: 2.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: C
+  formula: C
+  atoms:
+    C: 1.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - feedstock_delta
+- id: CH3OH
+  formula: CH3OH
+  atoms:
+    C: 1.0
+    H: 4.0
+    O: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: CH4
+  formula: CH4
+  atoms:
+    C: 1.0
+    H: 4.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: CH4_NH3_HCN
+  formula: null
+  atoms: null
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - carrier_only
+  - feedstock_delta
+- id: CO
+  formula: CO
+  atoms:
+    C: 1.0
+    O: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: CO2
+  formula: CO2
+  atoms:
+    C: 1.0
+    O: 2.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: CO_CH4_propellant
+  formula: null
+  atoms: null
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - carrier_only
+  - feedstock_delta
+- id: CO_CO2
+  formula: null
+  atoms: null
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - carrier_only
+  - feedstock_delta
+- id: CO_propellant
+  formula: null
+  atoms: null
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - feedstock_delta
+- id: Ca
+  formula: Ca
+  atoms:
+    Ca: 1.0
+  disposition: U
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - refractory_registry
+  - vaporock_42
+  notes: refractory_registry
+- id: Ca12Al14O33
+  formula: Ca12Al14O33
+  atoms:
+    Al: 14.0
+    Ca: 12.0
+    O: 33.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Ca2
+  formula: Ca2
+  atoms:
+    Ca: 2.0
+  disposition: U
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - association_polymer
+  - gas_closure_delta
+  - refractory_registry
+  - vaporock_42
+  notes: refractory_registry
+- id: Ca2Cl4
+  formula: Ca2Cl4
+  atoms:
+    Ca: 2.0
+    Cl: 4.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Ca3Al2O6
+  formula: Ca3Al2O6
+  atoms:
+    Al: 2.0
+    Ca: 3.0
+    O: 6.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: CaCO3
+  formula: CaCO3
+  atoms:
+    C: 1.0
+    Ca: 1.0
+    O: 3.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: CaCl2
+  formula: CaCl2
+  atoms:
+    Ca: 1.0
+    Cl: 2.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: CaF2
+  formula: CaF2
+  atoms:
+    Ca: 1.0
+    F: 2.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: CaO
+  formula: CaO
+  atoms:
+    Ca: 1.0
+    O: 1.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: CaO_gas
+  formula: CaO
+  atoms:
+    Ca: 1.0
+    O: 1.0
+  disposition: U
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - collision_gas
+  - gas_closure_delta
+  - rail_gap_dominant
+  - refractory_registry
+  - vaporock_42
+  notes: refractory raw_id=CaO
+- id: CaS
+  formula: CaS
+  atoms:
+    Ca: 1.0
+    S: 1.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: CaSO4
+  formula: CaSO4
+  atoms:
+    Ca: 1.0
+    O: 4.0
+    S: 1.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Cd
+  formula: Cd
+  atoms:
+    Cd: 1.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: CdO
+  formula: CdO
+  atoms:
+    Cd: 1.0
+    O: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Ce
+  formula: Ce
+  atoms:
+    Ce: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+  - group_b_element
+- id: CeO
+  formula: CeO
+  atoms:
+    Ce: 1.0
+    O: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+- id: CeO2
+  formula: CeO2
+  atoms:
+    Ce: 1.0
+    O: 2.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+- id: Cl
+  formula: Cl
+  atoms:
+    Cl: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Cl2
+  formula: Cl2
+  atoms:
+    Cl: 2.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: ClO4
+  formula: ClO4
+  atoms:
+    Cl: 1.0
+    O: 4.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - feedstock_delta
+- id: Co
+  formula: Co
+  atoms:
+    Co: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - feedstock_delta
+  - gas_closure_delta
+  - rail_gap_dominant
+- id: CoO
+  formula: CoO
+  atoms:
+    Co: 1.0
+    O: 1.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: CoO_gas
+  formula: CoO
+  atoms:
+    Co: 1.0
+    O: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - collision_gas
+  - vaporock_42
+- id: Cr
+  formula: Cr
+  atoms:
+    Cr: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - vaporock_42
+- id: Cr2O3
+  formula: Cr2O3
+  atoms:
+    Cr: 2.0
+    O: 3.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Cr2O3_gas
+  formula: Cr2O3
+  atoms:
+    Cr: 2.0
+    O: 3.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - collision_gas
+  - gas_closure_delta
+  - rail_gap_dominant
+  - vaporock_42
+- id: CrO
+  formula: CrO
+  atoms:
+    Cr: 1.0
+    O: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - gas_closure_delta
+  - rail_gap_dominant
+  - vaporock_42
+- id: CrO2
+  formula: CrO2
+  atoms:
+    Cr: 1.0
+    O: 2.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - vaporock_42
+- id: CrO2(OH)2
+  formula: CrO2(OH)2
+  atoms:
+    Cr: 1.0
+    H: 2.0
+    O: 4.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: CrO2OH
+  formula: CrO2OH
+  atoms:
+    Cr: 1.0
+    H: 1.0
+    O: 3.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: CrO3
+  formula: CrO3
+  atoms:
+    Cr: 1.0
+    O: 3.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Cs
+  formula: Cs
+  atoms:
+    Cs: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+  - group_a_element
+- id: Cs2O
+  formula: Cs2O
+  atoms:
+    Cs: 2.0
+    O: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+- id: Cs2O2
+  formula: Cs2O2
+  atoms:
+    Cs: 2.0
+    O: 2.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+- id: CsO
+  formula: CsO
+  atoms:
+    Cs: 1.0
+    O: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+- id: Cu
+  formula: Cu
+  atoms:
+    Cu: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Dy
+  formula: Dy
+  atoms:
+    Dy: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+  - group_b_element
+- id: DyO
+  formula: DyO
+  atoms:
+    Dy: 1.0
+    O: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+- id: Er
+  formula: Er
+  atoms:
+    Er: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+  - group_b_element
+- id: ErO
+  formula: ErO
+  atoms:
+    Er: 1.0
+    O: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+- id: Eu
+  formula: Eu
+  atoms:
+    Eu: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+  - group_a_element
+- id: F
+  formula: F
+  atoms:
+    F: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Fe
+  formula: Fe
+  atoms:
+    Fe: 1.0
+  disposition: U
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - vaporock_42
+- id: Fe2O3
+  formula: Fe2O3
+  atoms:
+    Fe: 2.0
+    O: 3.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Fe2O3_gas
+  formula: Fe2O3
+  atoms:
+    Fe: 2.0
+    O: 3.0
+  disposition: U
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - collision_gas
+  - vaporock_42
+- id: FeCO3
+  formula: FeCO3
+  atoms:
+    C: 1.0
+    Fe: 1.0
+    O: 3.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: FeO
+  formula: FeO
+  atoms:
+    Fe: 1.0
+    O: 1.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: FeO_gas
+  formula: FeO
+  atoms:
+    Fe: 1.0
+    O: 1.0
+  disposition: U
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - collision_gas
+  - gas_closure_delta
+  - rail_gap_dominant
+  - vaporock_42
+- id: FeSO4
+  formula: FeSO4
+  atoms:
+    Fe: 1.0
+    O: 4.0
+    S: 1.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: FeS_troilite
+  formula: null
+  atoms: null
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - feedstock_delta
+- id: FeSi
+  formula: FeSi
+  atoms:
+    Fe: 1.0
+    Si: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Fe_Ni_alloy
+  formula: null
+  atoms: null
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - carrier_only
+  - feedstock_delta
+- id: Ga
+  formula: Ga
+  atoms:
+    Ga: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+  - group_a_element
+- id: Ga2O
+  formula: Ga2O
+  atoms:
+    Ga: 2.0
+    O: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+- id: Gd
+  formula: Gd
+  atoms:
+    Gd: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+  - group_b_element
+- id: GdO
+  formula: GdO
+  atoms:
+    Gd: 1.0
+    O: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+- id: Ge
+  formula: Ge
+  atoms:
+    Ge: 1.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: GeO
+  formula: GeO
+  atoms:
+    Ge: 1.0
+    O: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: H
+  formula: H
+  atoms:
+    H: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - feedstock_delta
+- id: H2
+  formula: H2
+  atoms:
+    H: 2.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: H2O
+  formula: H2O
+  atoms:
+    H: 2.0
+    O: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: H2O_ice_structural
+  formula: H2O_ice_structural
+  atoms: null
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: H2S
+  formula: H2S
+  atoms:
+    H: 2.0
+    S: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: HBr
+  formula: HBr
+  atoms:
+    Br: 1.0
+    H: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: HCN
+  formula: HCN
+  atoms:
+    C: 1.0
+    H: 1.0
+    N: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: HCl
+  formula: HCl
+  atoms:
+    Cl: 1.0
+    H: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: HF
+  formula: HF
+  atoms:
+    F: 1.0
+    H: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: HI
+  formula: HI
+  atoms:
+    H: 1.0
+    I: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: He
+  formula: He
+  atoms:
+    He: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: He3
+  formula: He3
+  atoms:
+    He: 3.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - feedstock_delta
+- id: He4
+  formula: He4
+  atoms:
+    He: 4.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - feedstock_delta
+- id: Hf
+  formula: Hf
+  atoms:
+    Hf: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+  - group_b_element
+- id: HfO
+  formula: HfO
+  atoms:
+    Hf: 1.0
+    O: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+- id: Hg
+  formula: Hg
+  atoms:
+    Hg: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Ho
+  formula: Ho
+  atoms:
+    Ho: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+  - group_b_element
+- id: HoO
+  formula: HoO
+  atoms:
+    Ho: 1.0
+    O: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+- id: I
+  formula: I
+  atoms:
+    I: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: I2
+  formula: I2
+  atoms:
+    I: 2.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: In
+  formula: In
+  atoms:
+    In: 1.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: In2O
+  formula: In2O
+  atoms:
+    In: 2.0
+    O: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: In2O3
+  formula: In2O3
+  atoms:
+    In: 2.0
+    O: 3.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: InO
+  formula: InO
+  atoms:
+    In: 1.0
+    O: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Ir
+  formula: Ir
+  atoms:
+    Ir: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+  - group_b_element
+- id: IrO3
+  formula: IrO3
+  atoms:
+    Ir: 1.0
+    O: 3.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+- id: K
+  formula: K
+  atoms:
+    K: 1.0
+  disposition: U
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - vaporock_42
+- id: K2
+  formula: K2
+  atoms:
+    K: 2.0
+  disposition: U
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - vaporock_42
+- id: K2CO3
+  formula: K2CO3
+  atoms:
+    C: 1.0
+    K: 2.0
+    O: 3.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: K2Cl2
+  formula: K2Cl2
+  atoms:
+    Cl: 2.0
+    K: 2.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - association_polymer
+  - gas_closure_delta
+- id: K2O
+  formula: K2O
+  atoms:
+    K: 2.0
+    O: 1.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: K2O_gas
+  formula: K2O
+  atoms:
+    K: 2.0
+    O: 1.0
+  disposition: U
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - collision_gas
+  - gas_closure_delta
+  - rail_gap_dominant
+  - vaporock_42
+- id: KCl
+  formula: KCl
+  atoms:
+    Cl: 1.0
+    K: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: KO
+  formula: KO
+  atoms:
+    K: 1.0
+    O: 1.0
+  disposition: U
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - gas_closure_delta
+  - rail_gap_dominant
+  - vaporock_42
+- id: KOH
+  formula: KOH
+  atoms:
+    H: 1.0
+    K: 1.0
+    O: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - gas_closure_delta
+  - rail_gap_dominant
+  - vaporock_42
+- id: Kr
+  formula: Kr
+  atoms:
+    Kr: 1.0
+  disposition: U
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: La
+  formula: La
+  atoms:
+    La: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+  - group_b_element
+- id: LaO
+  formula: LaO
+  atoms:
+    La: 1.0
+    O: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+- id: Li
+  formula: Li
+  atoms:
+    Li: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+  - group_a_element
+- id: Li2O
+  formula: Li2O
+  atoms:
+    Li: 2.0
+    O: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+- id: Li2O2
+  formula: Li2O2
+  atoms:
+    Li: 2.0
+    O: 2.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+- id: Li3O
+  formula: Li3O
+  atoms:
+    Li: 3.0
+    O: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+- id: LiO
+  formula: LiO
+  atoms:
+    Li: 1.0
+    O: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+- id: Lu
+  formula: Lu
+  atoms:
+    Lu: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+  - group_b_element
+- id: LuO
+  formula: LuO
+  atoms:
+    Lu: 1.0
+    O: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+- id: Mg
+  formula: Mg
+  atoms:
+    Mg: 1.0
+  disposition: U
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - refractory_registry
+  - vaporock_42
+  notes: refractory_registry
+- id: Mg2
+  formula: Mg2
+  atoms:
+    Mg: 2.0
+  disposition: U
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - association_polymer
+  - gas_closure_delta
+  - refractory_registry
+  - vaporock_42
+  notes: refractory_registry
+- id: Mg2Cl4
+  formula: Mg2Cl4
+  atoms:
+    Cl: 4.0
+    Mg: 2.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: MgCO3
+  formula: MgCO3
+  atoms:
+    C: 1.0
+    Mg: 1.0
+    O: 3.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: MgCl2
+  formula: MgCl2
+  atoms:
+    Cl: 2.0
+    Mg: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: MgF2
+  formula: MgF2
+  atoms:
+    F: 2.0
+    Mg: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: MgO
+  formula: MgO
+  atoms:
+    Mg: 1.0
+    O: 1.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: MgO_gas
+  formula: MgO
+  atoms:
+    Mg: 1.0
+    O: 1.0
+  disposition: U
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - collision_gas
+  - gas_closure_delta
+  - rail_gap_dominant
+  - refractory_registry
+  - vaporock_42
+  notes: refractory raw_id=MgO
+- id: MgS
+  formula: MgS
+  atoms:
+    Mg: 1.0
+    S: 1.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: MgSO4
+  formula: MgSO4
+  atoms:
+    Mg: 1.0
+    O: 4.0
+    S: 1.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - feedstock_delta
+- id: Mn
+  formula: Mn
+  atoms:
+    Mn: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - vaporock_42
+- id: MnO
+  formula: MnO
+  atoms:
+    Mn: 1.0
+    O: 1.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: MnO_gas
+  formula: MnO
+  atoms:
+    Mn: 1.0
+    O: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - collision_gas
+  - gas_closure_delta
+  - rail_gap_dominant
+  - vaporock_42
+- id: Mo
+  formula: Mo
+  atoms:
+    Mo: 1.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: MoO3
+  formula: MoO3
+  atoms:
+    Mo: 1.0
+    O: 3.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: N
+  formula: N
+  atoms:
+    N: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: N2
+  formula: N2
+  atoms:
+    N: 2.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: N2O4
+  formula: N2O4
+  atoms:
+    N: 2.0
+    O: 4.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: NH3
+  formula: NH3
+  atoms:
+    H: 3.0
+    N: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - feedstock_delta
+- id: NH3_HCN
+  formula: null
+  atoms: null
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - carrier_only
+  - feedstock_delta
+- id: NH4SH
+  formula: NH4SH
+  atoms:
+    H: 5.0
+    N: 1.0
+    S: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: 'NO'
+  formula: 'NO'
+  atoms:
+    N: 1.0
+    O: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: NO2
+  formula: NO2
+  atoms:
+    N: 1.0
+    O: 2.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Na
+  formula: Na
+  atoms:
+    Na: 1.0
+  disposition: U
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - vaporock_42
+- id: Na2
+  formula: Na2
+  atoms:
+    Na: 2.0
+  disposition: U
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - vaporock_42
+- id: Na2CO3
+  formula: Na2CO3
+  atoms:
+    C: 1.0
+    Na: 2.0
+    O: 3.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Na2Cl2
+  formula: Na2Cl2
+  atoms:
+    Cl: 2.0
+    Na: 2.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - association_polymer
+  - gas_closure_delta
+- id: Na2F2
+  formula: Na2F2
+  atoms:
+    F: 2.0
+    Na: 2.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Na2O
+  formula: Na2O
+  atoms:
+    Na: 2.0
+    O: 1.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Na2O_gas
+  formula: Na2O
+  atoms:
+    Na: 2.0
+    O: 1.0
+  disposition: U
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - collision_gas
+  - gas_closure_delta
+  - rail_gap_dominant
+  - vaporock_42
+- id: NaCl
+  formula: NaCl
+  atoms:
+    Cl: 1.0
+    Na: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: NaCl_KCl_salts
+  formula: null
+  atoms: null
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - carrier_only
+- id: NaF
+  formula: NaF
+  atoms:
+    F: 1.0
+    Na: 1.0
+  disposition: U
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - diagnostic_only
+  - tranche_2_do_not_promote
+  notes: diagnostic_only; tranche_2_do_not_promote
+- id: NaO
+  formula: NaO
+  atoms:
+    Na: 1.0
+    O: 1.0
+  disposition: U
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - gas_closure_delta
+  - rail_gap_dominant
+  - vaporock_42
+- id: NaOH
+  formula: NaOH
+  atoms:
+    H: 1.0
+    Na: 1.0
+    O: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - gas_closure_delta
+  - rail_gap_dominant
+  - vaporock_42
+- id: Nb
+  formula: Nb
+  atoms:
+    Nb: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+  - group_b_element
+- id: NbO
+  formula: NbO
+  atoms:
+    Nb: 1.0
+    O: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+- id: NbO2
+  formula: NbO2
+  atoms:
+    Nb: 1.0
+    O: 2.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+- id: Nd
+  formula: Nd
+  atoms:
+    Nd: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+  - group_b_element
+- id: NdO
+  formula: NdO
+  atoms:
+    Nd: 1.0
+    O: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+- id: Ne
+  formula: Ne
+  atoms:
+    Ne: 1.0
+  disposition: U
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - feedstock_delta
+- id: Ni
+  formula: Ni
+  atoms:
+    Ni: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - feedstock_delta
+  - gas_closure_delta
+  - rail_gap_dominant
+- id: NiO
+  formula: NiO
+  atoms:
+    Ni: 1.0
+    O: 1.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: NiO_gas
+  formula: NiO
+  atoms:
+    Ni: 1.0
+    O: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - collision_gas
+  - vaporock_42
+- id: O
+  formula: O
+  atoms:
+    O: 1.0
+  disposition: U
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - gas_closure_delta
+  - monatomic_oxygen
+  - rail_gap_dominant
+  - refractory_registry
+  - vaporock_42
+  notes: refractory_registry
+- id: O2
+  formula: O2
+  atoms:
+    O: 2.0
+  disposition: U
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - refractory_registry
+  - vaporock_42
+  notes: refractory_registry
+- id: O2_extra
+  formula: O2_extra
+  atoms: null
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: OCS
+  formula: OCS
+  atoms:
+    C: 1.0
+    O: 1.0
+    S: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Os
+  formula: Os
+  atoms:
+    Os: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+  - group_b_element
+- id: OsO3
+  formula: OsO3
+  atoms:
+    O: 3.0
+    Os: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+- id: OsO4
+  formula: OsO4
+  atoms:
+    O: 4.0
+    Os: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+- id: P
+  formula: P
+  atoms:
+    P: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - feedstock_delta
+  - gas_closure_delta
+  - group_a
+  - group_a_element
+- id: P2O5
+  formula: P2O5
+  atoms:
+    O: 5.0
+    P: 2.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: P2O5_gas
+  formula: P2O5
+  atoms:
+    O: 5.0
+    P: 2.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - collision_gas
+  - not_a_reported_literature_molecule
+  - vaporock_42
+  notes: not_a_reported_literature_molecule
+- id: P4O10
+  formula: P4O10
+  atoms:
+    O: 10.0
+    P: 4.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+- id: P4O6
+  formula: P4O6
+  atoms:
+    O: 6.0
+    P: 4.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+- id: P4O7
+  formula: P4O7
+  atoms:
+    O: 7.0
+    P: 4.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+- id: P4O8
+  formula: P4O8
+  atoms:
+    O: 8.0
+    P: 4.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+- id: P4O9
+  formula: P4O9
+  atoms:
+    O: 9.0
+    P: 4.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+- id: PO
+  formula: PO
+  atoms:
+    O: 1.0
+    P: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+- id: Pb
+  formula: Pb
+  atoms:
+    Pb: 1.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: PbO
+  formula: PbO
+  atoms:
+    O: 1.0
+    Pb: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Pd
+  formula: Pd
+  atoms:
+    Pd: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: PdO
+  formula: PdO
+  atoms:
+    O: 1.0
+    Pd: 1.0
+  disposition: U
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: false
+      dominance: unknown_no_source
+      outcome: refuse
+    hard_vacuum:
+      applicable: false
+      dominance: unknown_no_source
+      outcome: refuse
+  flags:
+  - gas_closure_delta
+  - unknown_no_source
+  notes: UNKNOWN-NO-SOURCE refusal from gas-closure §6.1
+- id: Pr
+  formula: Pr
+  atoms:
+    Pr: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+  - group_b_element
+- id: PrO
+  formula: PrO
+  atoms:
+    O: 1.0
+    Pr: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+- id: Pt
+  formula: Pt
+  atoms:
+    Pt: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+  - group_b_element
+- id: PtO2
+  formula: PtO2
+  atoms:
+    O: 2.0
+    Pt: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+- id: REE_oxides
+  formula: null
+  atoms: null
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - carrier_only
+  - feedstock_delta
+- id: Rb
+  formula: Rb
+  atoms:
+    Rb: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+  - group_a_element
+- id: Rb2
+  formula: Rb2
+  atoms:
+    Rb: 2.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+- id: Rb2O
+  formula: Rb2O
+  atoms:
+    O: 1.0
+    Rb: 2.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+- id: Rb2O2
+  formula: Rb2O2
+  atoms:
+    O: 2.0
+    Rb: 2.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+- id: RbO
+  formula: RbO
+  atoms:
+    O: 1.0
+    Rb: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+- id: Re
+  formula: Re
+  atoms:
+    Re: 1.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Re2O7
+  formula: Re2O7
+  atoms:
+    O: 7.0
+    Re: 2.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: ReO3
+  formula: ReO3
+  atoms:
+    O: 3.0
+    Re: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Rh
+  formula: Rh
+  atoms:
+    Rh: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+  - group_b_element
+- id: RhO2
+  formula: RhO2
+  atoms:
+    O: 2.0
+    Rh: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+- id: Ru
+  formula: Ru
+  atoms:
+    Ru: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+  - group_b_element
+- id: RuO3
+  formula: RuO3
+  atoms:
+    O: 3.0
+    Ru: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+- id: S
+  formula: S
+  atoms:
+    S: 1.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: S1
+  formula: S1
+  atoms:
+    S: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: S2
+  formula: S2
+  atoms:
+    S: 2.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: S3
+  formula: S3
+  atoms:
+    S: 3.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: S4
+  formula: S4
+  atoms:
+    S: 4.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: S5
+  formula: S5
+  atoms:
+    S: 5.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: S6
+  formula: S6
+  atoms:
+    S: 6.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: S7
+  formula: S7
+  atoms:
+    S: 7.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: S8
+  formula: S8
+  atoms:
+    S: 8.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: SO2
+  formula: SO2
+  atoms:
+    O: 2.0
+    S: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: SO3
+  formula: SO3
+  atoms:
+    O: 3.0
+    S: 1.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - feedstock_delta
+- id: S_total
+  formula: S_total
+  atoms: null
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Sb
+  formula: Sb
+  atoms:
+    Sb: 1.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+  - group_a_element
+- id: Sb2O3
+  formula: Sb2O3
+  atoms:
+    O: 3.0
+    Sb: 2.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Sb4O6
+  formula: Sb4O6
+  atoms:
+    O: 6.0
+    Sb: 4.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+- id: Sc
+  formula: Sc
+  atoms:
+    Sc: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+  - group_b_element
+- id: ScO
+  formula: ScO
+  atoms:
+    O: 1.0
+    Sc: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+- id: Se
+  formula: Se
+  atoms:
+    Se: 1.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+  - group_a_element
+- id: Se2
+  formula: Se2
+  atoms:
+    Se: 2.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+- id: Se3
+  formula: Se3
+  atoms:
+    Se: 3.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+- id: Se4
+  formula: Se4
+  atoms:
+    Se: 4.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+- id: Se5
+  formula: Se5
+  atoms:
+    Se: 5.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+- id: Se6
+  formula: Se6
+  atoms:
+    Se: 6.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+- id: Se7
+  formula: Se7
+  atoms:
+    Se: 7.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+- id: Se8
+  formula: Se8
+  atoms:
+    Se: 8.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+- id: SeO2
+  formula: SeO2
+  atoms:
+    O: 2.0
+    Se: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Si
+  formula: Si
+  atoms:
+    Si: 1.0
+  disposition: U
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - refractory_registry
+  - vaporock_42
+  notes: refractory_registry
+- id: Si2
+  formula: Si2
+  atoms:
+    Si: 2.0
+  disposition: U
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - association_polymer
+  - gas_closure_delta
+  - refractory_registry
+  - vaporock_42
+  notes: refractory_registry
+- id: Si3
+  formula: Si3
+  atoms:
+    Si: 3.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - association_polymer
+  - gas_closure_delta
+  - refractory_registry
+  notes: refractory_registry
+- id: SiO
+  formula: SiO
+  atoms:
+    O: 1.0
+    Si: 1.0
+  disposition: U
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - refractory_registry
+  - vaporock_42
+  notes: refractory_registry
+- id: SiO2
+  formula: SiO2
+  atoms:
+    O: 2.0
+    Si: 1.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: SiO2_gas
+  formula: SiO2
+  atoms:
+    O: 2.0
+    Si: 1.0
+  disposition: U
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - collision_gas
+  - gas_closure_delta
+  - rail_gap_dominant
+  - refractory_registry
+  - vaporock_42
+  notes: refractory raw_id=SiO2
+- id: Sm
+  formula: Sm
+  atoms:
+    Sm: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+  - group_b_element
+- id: SmO
+  formula: SmO
+  atoms:
+    O: 1.0
+    Sm: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+- id: Sn
+  formula: Sn
+  atoms:
+    Sn: 1.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Sn2O2
+  formula: Sn2O2
+  atoms:
+    O: 2.0
+    Sn: 2.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Sn3O3
+  formula: Sn3O3
+  atoms:
+    O: 3.0
+    Sn: 3.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Sn4O4
+  formula: Sn4O4
+  atoms:
+    O: 4.0
+    Sn: 4.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: SnO
+  formula: SnO
+  atoms:
+    O: 1.0
+    Sn: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Sr
+  formula: Sr
+  atoms:
+    Sr: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+  - group_a_element
+- id: SrO
+  formula: SrO
+  atoms:
+    O: 1.0
+    Sr: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+- id: Ta
+  formula: Ta
+  atoms:
+    Ta: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+  - group_b_element
+- id: TaO
+  formula: TaO
+  atoms:
+    O: 1.0
+    Ta: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+- id: TaO2
+  formula: TaO2
+  atoms:
+    O: 2.0
+    Ta: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+- id: Tb
+  formula: Tb
+  atoms:
+    Tb: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+  - group_b_element
+- id: TbO
+  formula: TbO
+  atoms:
+    O: 1.0
+    Tb: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+- id: Te
+  formula: Te
+  atoms:
+    Te: 1.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Te2
+  formula: Te2
+  atoms:
+    Te: 2.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: TeO
+  formula: TeO
+  atoms:
+    O: 1.0
+    Te: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: TeO2
+  formula: TeO2
+  atoms:
+    O: 2.0
+    Te: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Th
+  formula: Th
+  atoms:
+    Th: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - feedstock_delta
+  - gas_closure_delta
+  - group_b
+  - group_b_element
+- id: ThO
+  formula: ThO
+  atoms:
+    O: 1.0
+    Th: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+- id: ThO2
+  formula: ThO2
+  atoms:
+    O: 2.0
+    Th: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+- id: Ti
+  formula: Ti
+  atoms:
+    Ti: 1.0
+  disposition: U
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - refractory_registry
+  - vaporock_42
+  notes: refractory_registry
+- id: Ti2O3
+  formula: Ti2O3
+  atoms:
+    O: 3.0
+    Ti: 2.0
+  disposition: U
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - vaporock_42
+- id: TiO
+  formula: TiO
+  atoms:
+    O: 1.0
+    Ti: 1.0
+  disposition: U
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - gas_closure_delta
+  - rail_gap_dominant
+  - refractory_registry
+  - vaporock_42
+  notes: refractory_registry
+- id: TiO2
+  formula: TiO2
+  atoms:
+    O: 2.0
+    Ti: 1.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: TiO2_gas
+  formula: TiO2
+  atoms:
+    O: 2.0
+    Ti: 1.0
+  disposition: U
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: true
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - collision_gas
+  - gas_closure_delta
+  - rail_gap_dominant
+  - refractory_registry
+  - vaporock_42
+  notes: refractory raw_id=TiO2
+- id: TiOH4
+  formula: Ti(OH)4
+  atoms:
+    H: 4.0
+    O: 4.0
+    Ti: 1.0
+  disposition: U
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: false
+      dominance: unknown_no_source
+      outcome: refuse
+    hard_vacuum:
+      applicable: false
+      dominance: unknown_no_source
+      outcome: refuse
+  flags:
+  - gas_closure_delta
+  - unknown_no_source
+  notes: UNKNOWN-NO-SOURCE refusal from gas-closure §6.1
+- id: Tl
+  formula: Tl
+  atoms:
+    Tl: 1.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Tl2O
+  formula: Tl2O
+  atoms:
+    O: 1.0
+    Tl: 2.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Tm
+  formula: Tm
+  atoms:
+    Tm: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+  - group_b_element
+- id: TmO
+  formula: TmO
+  atoms:
+    O: 1.0
+    Tm: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+- id: U
+  formula: U
+  atoms:
+    U: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+  - group_b_element
+- id: UO
+  formula: UO
+  atoms:
+    O: 1.0
+    U: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+- id: UO2
+  formula: UO2
+  atoms:
+    O: 2.0
+    U: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+- id: UO3
+  formula: UO3
+  atoms:
+    O: 3.0
+    U: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+- id: V
+  formula: V
+  atoms:
+    V: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+  - group_a_element
+- id: VO
+  formula: VO
+  atoms:
+    O: 1.0
+    V: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+- id: VO2
+  formula: VO2
+  atoms:
+    O: 2.0
+    V: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+- id: W
+  formula: W
+  atoms:
+    W: 1.0
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: W2O6
+  formula: W2O6
+  atoms:
+    O: 6.0
+    W: 2.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: W3O8
+  formula: W3O8
+  atoms:
+    O: 8.0
+    W: 3.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: W3O9
+  formula: W3O9
+  atoms:
+    O: 9.0
+    W: 3.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: W4O12
+  formula: W4O12
+  atoms:
+    O: 12.0
+    W: 4.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: W5O15
+  formula: W5O15
+  atoms:
+    O: 15.0
+    W: 5.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: WO3
+  formula: WO3
+  atoms:
+    O: 3.0
+    W: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Xe
+  formula: Xe
+  atoms:
+    Xe: 1.0
+  disposition: U
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Y
+  formula: Y
+  atoms:
+    Y: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+  - group_b_element
+- id: YO
+  formula: YO
+  atoms:
+    O: 1.0
+    Y: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+- id: Yb
+  formula: Yb
+  atoms:
+    Yb: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+    hard_vacuum:
+      applicable: true
+      dominance: plant_relevant
+      outcome: evolve
+  flags:
+  - gas_closure_delta
+  - group_a
+  - group_a_element
+- id: Zn
+  formula: Zn
+  atoms:
+    Zn: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags: []
+- id: Zr
+  formula: Zr
+  atoms:
+    Zr: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - feedstock_delta
+  - gas_closure_delta
+  - group_b
+  - group_b_element
+- id: ZrO
+  formula: ZrO
+  atoms:
+    O: 1.0
+    Zr: 1.0
+  disposition: V
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: false
+  sources:
+    inventory: false
+    gas_closure: true
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: negligible
+      outcome: retain_rump
+    hard_vacuum:
+      applicable: true
+      dominance: regime_open
+      outcome: evolve_or_compute
+  flags:
+  - gas_closure_delta
+  - group_b
+- id: ZrO2
+  formula: ZrO2
+  atoms:
+    O: 2.0
+    Zr: 1.0
+  disposition: R
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - feedstock_delta
+- id: carbonaceous_organic
+  formula: null
+  atoms: null
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - feedstock_delta
+- id: carbonate_salts
+  formula: null
+  atoms: null
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - carrier_only
+  - feedstock_delta
+- id: generic_carbonaceous_hydrocarbon
+  formula: null
+  atoms: null
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - carrier_only
+  - feedstock_delta
+- id: generic_carbonaceous_organic
+  formula: null
+  atoms: null
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - carrier_only
+  - feedstock_delta
+- id: hydrocarbons
+  formula: null
+  atoms: null
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - feedstock_delta
+- id: metallic_FeNi
+  formula: null
+  atoms: null
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - carrier_only
+  - feedstock_delta
+- id: organics
+  formula: null
+  atoms: null
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - feedstock_delta
+- id: sulfuric_acid_feedstock
+  formula: null
+  atoms: null
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - feedstock_delta
+- id: unreported_loi_residual
+  formula: null
+  atoms: null
+  disposition: C
+  validation_status: pending_validation
+  validation_anchor_refs: []
+  feedstock_presence: true
+  sources:
+    inventory: true
+    gas_closure: false
+    refractory_registry: false
+  regime:
+    millibar:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+    hard_vacuum:
+      applicable: true
+      dominance: unspecified
+      outcome: as_disposition
+  flags:
+  - feedstock_delta
