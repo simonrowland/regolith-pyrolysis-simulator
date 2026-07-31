@@ -1,0 +1,23 @@
+# Synthetic NASA-7 (Chemkin-style) segments for unit tests only.
+# Not a production thermo authority. Coefficients chosen so Cp/R = a1 = 3.5
+# (constant heat capacity), enabling closed-form hand checks.
+species: TEST_MONATOMIC
+standard_state: gas
+reference_pressure_Pa: 100000.0
+convention: nasa_cea_7
+segments:
+  - T_min_K: 300.0
+    T_max_K: 1000.0
+    # a1..a5 for Cp/R poly; a6 = H integration; a7 = S integration
+    # Cp/R = 3.5  => a1=3.5, a2..a5=0
+    # H/RT = 3.5 + a6/T; choose a6 so H/RT(300)=10 => a6 = (10-3.5)*300 = 1950
+    # S/R = 3.5*ln(T) + a7; choose a7 so S/R(300)=20 => a7 = 20 - 3.5*ln(300)
+    # a7 = 20 - 3.5*ln(300) so S/R(300)=20 exactly
+    coefficients: [3.5, 0.0, 0.0, 0.0, 0.0, 1950.0, 0.036761338703296786]
+  - T_min_K: 1000.0
+    T_max_K: 3000.0
+    # Continuity at 1000 K with same constant Cp:
+    # H/RT(1000)=3.5+1950/1000=5.45 from low segment
+    # so a6_high = (5.45-3.5)*1000 = 1950 (same)
+    # S/R(1000)=3.5*ln(1000)+a7_low; a7 must match
+    coefficients: [3.5, 0.0, 0.0, 0.0, 0.0, 1950.0, 0.036761338703296786]

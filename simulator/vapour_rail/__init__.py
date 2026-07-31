@@ -1,7 +1,8 @@
 """Vapour-rail unification package.
 
-U0 freezes the canonical manifest union. Later VR chunks add the compiler,
-request builder, and runtime cutovers under this package.
+U0 freezes the canonical manifest union. VR-4 adds typed NASA CEA polynomial
+evaluators (``nasa_cea``). Later VR chunks add the compiler, request builder,
+and runtime cutovers under this package.
 """
 
 from __future__ import annotations
