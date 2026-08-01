@@ -1,0 +1,294 @@
+# VR-10 reviewed vapour-rail calibration sidecar (runtime-safe).
+#
+# DESIGN-REV5 §5.3 / DECOMPOSITION VR-10:
+#   - Only this reviewed YAML may enter runtime data under data/.
+#   - The SQLite research store is offline-only and must never be opened
+#     by runtime code (raw_store.runtime_readable: false).
+#   - Warm pool only; no VapoRock result/calibration cache.
+#   - Diagnostic authority: may never certify (O1 ceiling).
+#   - This scaffold records frozen families, parameter caps, validation
+#     splits, independent anchors, and the progressive-validation ladder.
+#     No catalog row is flipped to validated here (golden-neutral).
+schema_version: 1
+kind: vapour_rail_calibration
+calibration_id: vr10-scaffold-2026-07-31
+authority: diagnostic_only
+certifies: false
+approval: scaffold_unpromoted
+domain:
+  temperature_K:
+  - 1350.0
+  - 1950.0
+  temperature_step_K: 50.0
+  user_story_slice_K: 1573.15
+  fo2_deltas_dex:
+  - -1.0
+  - 0.0
+  - 1.0
+  fo2_buffer: Kress91/Holzheid pure-FeO IW
+  p_floor_Pa: 1.0e-30
+frozen_families:
+  SiO:
+    family_id: oxide_reduction_half_o2
+    pO2_exponent: -0.5
+    max_parameters: 3
+    coefficient_names: [A, B, C]
+    parent_oxide: SiO2
+    activity_exponent: 1.0
+    notes: "SiO2(l) -> SiO(g) + 1/2 O2(g); d log10 P / d log10 fO2 = -1/2"
+  Fe:
+    family_id: oxide_reduction_half_o2
+    pO2_exponent: -0.5
+    max_parameters: 3
+    coefficient_names: [A, B, C]
+    parent_oxide: FeO
+    activity_exponent: 1.0
+    notes: "FeO(l) -> Fe(g) + 1/2 O2(g); d log10 P / d log10 fO2 = -1/2"
+  Mg:
+    family_id: oxide_reduction_half_o2
+    pO2_exponent: -0.5
+    max_parameters: 3
+    coefficient_names: [A, B, C]
+    parent_oxide: MgO
+    activity_exponent: 1.0
+    notes: "MgO(l) -> Mg(g) + 1/2 O2(g); d log10 P / d log10 fO2 = -1/2"
+  Na:
+    family_id: alkali_quarter_o2
+    pO2_exponent: -0.25
+    max_parameters: 3
+    coefficient_names: [A, B, C]
+    parent_oxide: Na2O
+    activity_exponent: 0.5
+    notes: "1/2 Na2O -> Na(g) + 1/4 O2; d log10 P / d log10 fO2 = -1/4"
+  K:
+    family_id: alkali_quarter_o2
+    pO2_exponent: -0.25
+    max_parameters: 3
+    coefficient_names: [A, B, C]
+    parent_oxide: K2O
+    activity_exponent: 0.5
+    notes: "1/2 K2O -> K(g) + 1/4 O2; d log10 P / d log10 fO2 = -1/4"
+  O:
+    family_id: monatomic_oxygen_half
+    pO2_exponent: 0.5
+    max_parameters: 3
+    coefficient_names: [A, B, C]
+    parent_oxide: null
+    activity_exponent: 0.0
+    notes: "1/2 O2(g) ⇌ O(g); d log10 P / d log10 fO2 = +1/2"
+  O2:
+    family_id: molecular_oxygen_unit
+    pO2_exponent: 1.0
+    max_parameters: 3
+    coefficient_names: [A, B, C]
+    parent_oxide: null
+    activity_exponent: 0.0
+    notes: "O2(g) partial tracks fO2; d log10 P / d log10 fO2 = +1"
+parameter_caps:
+  SiO:
+    max_parameters: 3
+    coefficient_names: [A, B, C]
+  Fe:
+    max_parameters: 3
+    coefficient_names: [A, B, C]
+  Mg:
+    max_parameters: 3
+    coefficient_names: [A, B, C]
+  Na:
+    max_parameters: 3
+    coefficient_names: [A, B, C]
+  K:
+    max_parameters: 3
+    coefficient_names: [A, B, C]
+  O:
+    max_parameters: 3
+    coefficient_names: [A, B, C]
+  O2:
+    max_parameters: 3
+    coefficient_names: [A, B, C]
+validation_splits:
+  held_out_formulation_family: SiO2-Na2O
+  held_out_temperatures_K:
+  - 1650.0
+  held_out_fo2_labels:
+  - IW+1
+independent_anchors:
+- anchor_id: sio_soffiatti_wolfe_class
+  species: SiO
+  kind: paper_wolfe
+  citation: "Sossi et al. / Wolfe-class vacuum evaporation envelopes; corpus §25 SiO residual tests"
+  temperature_K: 1873.0
+  notes: Independent of VapoRock; used as holdout residual envelope
+  may_certify: false
+- anchor_id: na_nist_webbook_pure
+  species: Na
+  kind: pure_component
+  citation: NIST Chemistry WebBook SRD 69 Rodebush & Walters 1930 sodium
+  temperature_K: null
+  notes: Pure-component Antoine; activity path is separate
+  may_certify: false
+- anchor_id: fe_kems_regime
+  species: Fe
+  kind: kems
+  citation: data/literature/vapour_rail_kems_anchors.yaml (Fe rows)
+  temperature_K: null
+  notes: KEMS regime only; not averaged with Langmuir
+  may_certify: false
+- anchor_id: mg_langmuir_regime
+  species: Mg
+  kind: langmuir
+  citation: data/literature/vapour_rail_langmuir_anchors.yaml (Mg rows)
+  temperature_K: null
+  notes: Langmuir free-evaporation regime; distinct from KEMS
+  may_certify: false
+- anchor_id: k_nist_webbook_pure
+  species: K
+  kind: pure_component
+  citation: NIST Chemistry WebBook potassium pure-component rail
+  temperature_K: null
+  notes: Independent pure-component anchor
+  may_certify: false
+- anchor_id: o_janaf_half_o2
+  species: O
+  kind: janaf_nist
+  citation: JANAF / NASA CEA 1/2 O2 ⇌ O equilibrium constant
+  temperature_K: null
+  notes: Thermodynamic K(T); not a VapoRock fit
+  may_certify: false
+- anchor_id: o2_buffer_identity
+  species: O2
+  kind: janaf_nist
+  citation: fO2 identity / buffer definition
+  temperature_K: null
+  notes: O2 partial tracks the imposed fO2 buffer by definition
+  may_certify: false
+error_budget:
+  epsilon_J: 0.3
+  log10_pressure_threshold_dex: 0.11394335230683678
+  algebra: "HKL at fixed alpha,T: J ∝ P ⇒ |Δlog10 J| = |Δlog10 P|; pointwise threshold = log10(1 + ε_J)"
+  units: "ε_J dimensionless relative flux; threshold in log10 dex"
+  limiting_check: "ε_J→0 ⇒ threshold→0; ε_J=1 ⇒ threshold=log10(2)≈0.3010 dex"
+boundary_statistics_summary:
+  n_faces: 0
+  note: >
+    Full dual-source boundary Δlog10(P) lives in the research store;
+    sidecar carries reviewed summary only.
+per_row_state:
+- species: SiO
+  family_id: oxide_reduction_half_o2
+  validation_status: pending_validation
+  parameter_cap: 3
+  coefficient_names: [A, B, C]
+  independent_anchor_ids: [sio_soffiatti_wolfe_class]
+  may_flip_validated: false
+  flip_blockers:
+  - holdout_validation_incomplete
+  - boundary_statistics_incomplete
+  - error_budget_incomplete
+  surface: calibration_candidate
+- species: Fe
+  family_id: oxide_reduction_half_o2
+  validation_status: pending_validation
+  parameter_cap: 3
+  coefficient_names: [A, B, C]
+  independent_anchor_ids: [fe_kems_regime]
+  may_flip_validated: false
+  flip_blockers:
+  - holdout_validation_incomplete
+  - boundary_statistics_incomplete
+  - error_budget_incomplete
+  surface: calibration_candidate
+- species: Mg
+  family_id: oxide_reduction_half_o2
+  validation_status: pending_validation
+  parameter_cap: 3
+  coefficient_names: [A, B, C]
+  independent_anchor_ids: [mg_langmuir_regime]
+  may_flip_validated: false
+  flip_blockers:
+  - holdout_validation_incomplete
+  - boundary_statistics_incomplete
+  - error_budget_incomplete
+  surface: calibration_candidate
+- species: Na
+  family_id: alkali_quarter_o2
+  validation_status: pending_validation
+  parameter_cap: 3
+  coefficient_names: [A, B, C]
+  independent_anchor_ids: [na_nist_webbook_pure]
+  may_flip_validated: false
+  flip_blockers:
+  - holdout_validation_incomplete
+  - boundary_statistics_incomplete
+  - error_budget_incomplete
+  surface: calibration_candidate
+- species: K
+  family_id: alkali_quarter_o2
+  validation_status: pending_validation
+  parameter_cap: 3
+  coefficient_names: [A, B, C]
+  independent_anchor_ids: [k_nist_webbook_pure]
+  may_flip_validated: false
+  flip_blockers:
+  - holdout_validation_incomplete
+  - boundary_statistics_incomplete
+  - error_budget_incomplete
+  surface: calibration_candidate
+- species: O
+  family_id: monatomic_oxygen_half
+  validation_status: pending_validation
+  parameter_cap: 3
+  coefficient_names: [A, B, C]
+  independent_anchor_ids: [o_janaf_half_o2]
+  may_flip_validated: false
+  flip_blockers:
+  - holdout_validation_incomplete
+  - boundary_statistics_incomplete
+  - error_budget_incomplete
+  surface: calibration_candidate
+- species: O2
+  family_id: molecular_oxygen_unit
+  validation_status: pending_validation
+  parameter_cap: 3
+  coefficient_names: [A, B, C]
+  independent_anchor_ids: [o2_buffer_identity]
+  may_flip_validated: false
+  flip_blockers:
+  - holdout_validation_incomplete
+  - boundary_statistics_incomplete
+  - error_budget_incomplete
+  surface: calibration_candidate
+remaining_pending_species:
+- SiO
+- Fe
+- Mg
+- Na
+- K
+- O
+- O2
+source_selection_fractions:
+  n_cells: 0
+  n_ok: 0
+  n_refused: 0
+  fraction_selectable: 0.0
+  fraction_refused: 0.0
+  fraction_vaporock_covered: 1.0
+  fraction_literature_rail: 1.0
+  fraction_pending_validation: 1.0
+raw_store:
+  digest: null
+  path: null
+  runtime_readable: false
+  note: >
+    Runtime must never open the SQLite research store; only this reviewed
+    sidecar is admitted under data/.
+performance:
+  execution: vaporock_warm_pool_only
+  cache_layer: null
+  note: >
+    Owner ruling: warm pool only; no VapoRock result/calibration cache
+    until measured need.
+notes:
+- "VR-10 scaffold: progressive-validation infrastructure landed; no catalog row flipped to validated in this chunk."
+- "Golden-neutral / offline; R1+ epochs own any flux cutover."
+- "Runner: scripts/vapour_rail_calibration_runner.py (warm_worker=True only)."

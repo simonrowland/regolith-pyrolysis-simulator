@@ -3,14 +3,22 @@
 U0 freezes the canonical manifest union. VR-4 adds typed NASA CEA polynomial
 evaluators (``nasa_cea``). VR-7 adds charge-alias canonicalization for
 ledger/cache-safe oxyanion names. VR-8 adds Group-A/B + monatomic-O acquisition
-transcription (``trace_acquisition``). Later VR chunks add the request builder
-and runtime cutovers under this package.
+transcription (``trace_acquisition``). VR-10 adds the warm calibration runner
+library and progressive-validation reports (``calibration``). Later VR chunks
+add runtime cutovers under this package.
 """
 
 from __future__ import annotations
 from simulator.vapour_rail.catalog import (
     CHARGE_ALIAS_CANONICAL,
     canonicalize_charge_alias,
+)
+from simulator.vapour_rail.calibration import (
+    DEFAULT_SIDECAR_PATH as VAPOUR_RAIL_CALIBRATION_SIDECAR,
+    FROZEN_ANALYTICAL_FAMILIES,
+    ProgressiveValidationReport,
+    build_progressive_validation_report,
+    load_vapour_rail_calibration_sidecar,
 )
 from simulator.vapour_rail.trace_acquisition import (
     GROUP_A_IDS,
@@ -95,12 +103,17 @@ __all__ = [
     "PO2_EXPONENT_ATOMIC_O",
     "REFRACTORY_GAS_IDS_RAW",
     "VAPOROCK_42_IDS",
+    "VAPOUR_RAIL_CALIBRATION_SIDECAR",
+    "FROZEN_ANALYTICAL_FAMILIES",
+    "ProgressiveValidationReport",
+    "build_progressive_validation_report",
     "build_u0_manifest",
     "canonicalize_charge_alias",
     "canonicalize_gas_id",
     "list_pending_validation",
     "load_trace_acquisition",
     "load_u0_manifest",
+    "load_vapour_rail_calibration_sidecar",
     "BOUND_NOT_POINT",
     "REASON_HENRIAN_GAMMA_UNMEASURED",
     "ActivityInputDeclaration",
