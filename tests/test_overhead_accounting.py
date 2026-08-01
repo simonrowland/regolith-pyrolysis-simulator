@@ -661,6 +661,17 @@ def test_sio_vapor_requires_explicit_stoich_metadata():
 
 
 def test_vapor_species_without_parent_oxide_fails_before_flux():
+    # DESIGN-REV5 §1.2 / VR-11: batch resolve runs before parent_oxide aux maps.
+    # Supply a complete VapourBatch so the accounting gate still fires (cutover
+    # reorders the empty-batch path ahead of parent_oxide; pin the tighter
+    # non-empty-batch order).
+    from simulator.vapour_rail.batch import (
+        FluxEligible,
+        PressureValue,
+        VapourAnswer,
+        VapourBatch,
+    )
+
     backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
@@ -677,8 +688,37 @@ def test_vapor_species_without_parent_oxide_fails_before_flux():
         },
     )
     sim.load_batch("oxide", mass_kg=1000.0)
-    sim.melt.temperature_C = 1000.0
-    equilibrium = types.SimpleNamespace(vapor_pressures_Pa={"Fe": 1.0e5})
+    sim.melt.temperature_C = 1600.0
+    equilibrium = types.SimpleNamespace(
+        vapor_pressures_Pa={"Fe": 1.0e5},
+        vapor_pressures_source={},
+        activity_coefficients={},
+        diagnostics={},
+        liquid_fraction=1.0,
+    )
+
+    def _toy_fe_batch(_self, _equilibrium, *, temperature_K):
+        return VapourBatch(
+            requested_species_ids=frozenset({"Fe"}),
+            channels_by_species={
+                "Fe": VapourAnswer(
+                    species_id="Fe",
+                    pressure=PressureValue(pa=1.0e5),
+                    flux=FluxEligible(alpha_ref="alpha:Fe"),
+                    source_label="test",
+                    formula_id="Fe",
+                    source_account="process.cleaned_melt",
+                    solve_group_id="g1",
+                    state_fingerprint="state:test",
+                    validation_status="pending_validation",
+                )
+            },
+            flux_active_species_ids=frozenset({"Fe"}),
+        )
+
+    sim._resolve_evaporation_vapour_batch = types.MethodType(
+        _toy_fe_batch, sim
+    )
 
     with pytest.raises(AccountingError, match="parent_oxide"):
         sim._calculate_evaporation(equilibrium)
@@ -1033,7 +1073,19 @@ def test_fe_redox_and_sio_use_coupled_oxygen_reservoirs():
 
 
 def test_evaporation_flux_does_not_reapply_commanded_po2():
-    """EVAPORATION_FLUX consumes P_eq; pO2 is owned by VAPOR_PRESSURE."""
+    """EVAPORATION_FLUX consumes P_eq; pO2 is owned by VAPOR_PRESSURE.
+
+    DESIGN-REV5 §1.2 rule 5 / a9a46cf: harnesses without schema-v2 catalog
+    must supply a complete VapourBatch; empty batch is typed refuse, not
+    silent zero. Batch pressures embed the upstream pO2-once map.
+    """
+    from simulator.vapour_rail.batch import (
+        FluxEligible,
+        PressureValue,
+        VapourAnswer,
+        VapourBatch,
+    )
+
     sim = _sio_o2_train_sim()
     sim.melt.temperature_C = 1600.0
     sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
@@ -1050,12 +1102,42 @@ def test_evaporation_flux_does_not_reapply_commanded_po2():
 
     sim._commanded_pO2_bar = _spy_commanded
     equilibrium = sim._internal_analytical_equilibrium()
+    live = dict(equilibrium.vapor_pressures_Pa or {})
+    assert live, "fixture must emit vapor pressures for pO2-once pin"
+
+    def _toy_batch_from_live(_self, _eq, *, temperature_K):
+        channels = {
+            sid: VapourAnswer(
+                species_id=sid,
+                pressure=PressureValue(pa=float(pa)),
+                flux=FluxEligible(alpha_ref=f"alpha:{sid}"),
+                source_label="test",
+                formula_id=sid,
+                source_account="process.cleaned_melt",
+                solve_group_id="g1",
+                state_fingerprint="state:test",
+                validation_status="pending_validation",
+            )
+            for sid, pa in live.items()
+        }
+        return VapourBatch(
+            requested_species_ids=frozenset(live),
+            channels_by_species=channels,
+            flux_active_species_ids=frozenset(live),
+        )
+
+    sim._resolve_evaporation_vapour_batch = types.MethodType(
+        _toy_batch_from_live, sim
+    )
     calls.clear()
     flux = sim._calculate_evaporation(equilibrium)
     sim._commanded_pO2_bar = real_commanded
 
     assert flux is not None
     assert not calls, "_calculate_evaporation must not reapply gas pO2"
+    assert sim._last_vapour_batch_flux_overlay["selection_source"] == (
+        "vapour_batch_channel_unions"
+    )
 
 
 def test_equilibrium_does_not_emit_o2_vapor_species():
@@ -1578,12 +1660,44 @@ def test_next_tick_p_bulk_uses_upstream_headspace_after_near_total_capture(
         diagnostics={},
         liquid_fraction=1.0,
     )
+    # DESIGN-REV5 §1.2 / a9a46cf: complete VapourBatch required; empty batch
+    # is typed refuse. Supply Fe-active batch so headspace P_bulk pin runs.
+    from simulator.vapour_rail.batch import (
+        FluxEligible,
+        PressureValue,
+        VapourAnswer,
+        VapourBatch,
+    )
+
+    def _toy_fe_batch(_self, _eq, *, temperature_K):
+        return VapourBatch(
+            requested_species_ids=frozenset({"Fe"}),
+            channels_by_species={
+                "Fe": VapourAnswer(
+                    species_id="Fe",
+                    pressure=PressureValue(pa=100.0),
+                    flux=FluxEligible(alpha_ref="alpha:Fe"),
+                    source_label="test",
+                    formula_id="Fe",
+                    source_account="process.cleaned_melt",
+                    solve_group_id="g1",
+                    state_fingerprint="state:test",
+                    validation_status="pending_validation",
+                )
+            },
+            flux_active_species_ids=frozenset({"Fe"}),
+        )
+
+    sim._resolve_evaporation_vapour_batch = types.MethodType(
+        _toy_fe_batch, sim
+    )
     evaporation_module.EvaporationMixin._calculate_evaporation(sim, equilibrium)
 
     assert seen["overhead_partials_Pa"]["Fe"] == pytest.approx(
         upstream_transport["vapor_pressure_mbar"] * 100.0
     )
     assert seen["overhead_partials_Pa"]["Fe"] > 0.0
+    assert seen["vapour_batch_flux_pressures_Pa"] == {"Fe": 100.0}
 
 
 def test_commanded_po2_numerical_floor_when_all_inputs_zero():

@@ -94,8 +94,12 @@ def test_evaporation_flux_diagnostic_traces_alpha_by_species():
         temperature_C=1500.0,
         pressure_bar=1e-6,
         fO2_log=None,
+        # DESIGN-REV5 §1.2 / U4 cutover: batch key is required flux input.
         control_inputs={
             "overhead_pressure_pa": 0.0,
+            "vapour_batch_flux_pressures_Pa": {
+                name: 100.0 for name in species
+            },
             "vapor_pressures_Pa": {name: 100.0 for name in species},
             "overhead_partials_Pa": {},
             "molar_mass_kg_mol": {name: 0.05 for name in species},
@@ -118,6 +122,7 @@ def test_evaporation_flux_diagnostic_traces_alpha_by_species():
     )
 
     result = BuiltinEvaporationFluxProvider().dispatch(request)
+    assert result.status == "ok"
     alpha_used = result.diagnostic["alpha_used_by_species"]
     uncertainty = result.diagnostic["flux_uncertainty_pct"]
 
@@ -135,6 +140,8 @@ def test_evaporation_flux_diagnostic_traces_alpha_by_species():
 
 
 def test_new_proxy_species_flux_scales_with_yaml_alpha():
+    # DESIGN-REV5 §1.2 / U4: supply vapour_batch_flux_pressures_Pa so alpha
+    # scaling is exercised (missing key is typed refuse, not silent ok).
     alpha_by_species = _load_evaporation_alpha_by_species(
         _vapor_pressure_data()
     )
@@ -149,6 +156,7 @@ def test_new_proxy_species_flux_scales_with_yaml_alpha():
         fO2_log=None,
         control_inputs={
             "overhead_pressure_pa": 0.0,
+            "vapour_batch_flux_pressures_Pa": {"Ca": 100.0, "Ti": 100.0},
             "vapor_pressures_Pa": {"Ca": 100.0, "Ti": 100.0},
             "overhead_partials_Pa": {},
             "molar_mass_kg_mol": {"Ca": 0.05, "Ti": 0.05},
@@ -179,6 +187,7 @@ def test_new_proxy_species_flux_scales_with_yaml_alpha():
 
 
 def test_cro2_missing_alpha_refuses_only_cro2_and_retains_parent_oxide():
+    # DESIGN-REV5 §1.2 / U4: batch key required before per-species alpha refuse.
     request = IntentRequest(
         intent=ChemistryIntent.EVAPORATION_FLUX,
         account_view=ProviderAccountView(
@@ -192,6 +201,7 @@ def test_cro2_missing_alpha_refuses_only_cro2_and_retains_parent_oxide():
         fO2_log=None,
         control_inputs={
             "overhead_pressure_pa": 0.0,
+            "vapour_batch_flux_pressures_Pa": {"CrO2": 100.0, "Na": 100.0},
             "vapor_pressures_Pa": {"CrO2": 100.0, "Na": 100.0},
             "overhead_partials_Pa": {},
             "molar_mass_kg_mol": {"CrO2": 0.084, "Na": 0.023},
@@ -236,6 +246,7 @@ def test_cro2_missing_alpha_refuses_only_cro2_and_retains_parent_oxide():
 
 
 def test_grounded_cr_ignores_unmeasured_fallback_opt_in():
+    # DESIGN-REV5 §1.2 / U4: batch key required for grounded-Cr alpha path.
     alpha_by_species = _load_evaporation_alpha_by_species(
         _vapor_pressure_data()
     )
@@ -250,6 +261,7 @@ def test_grounded_cr_ignores_unmeasured_fallback_opt_in():
         fO2_log=None,
         control_inputs={
             "overhead_pressure_pa": 0.0,
+            "vapour_batch_flux_pressures_Pa": {"Cr": 100.0},
             "vapor_pressures_Pa": {"Cr": 100.0},
             "overhead_partials_Pa": {},
             "molar_mass_kg_mol": {"Cr": 0.052},

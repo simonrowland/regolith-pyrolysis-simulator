@@ -576,6 +576,13 @@ def test_live_overhead_bleed_routes_binding_capacity_surge_to_accumulator(
 
 
 def test_live_and_picard_share_evaporation_control_construction(monkeypatch):
+    # DESIGN-REV5 U4 control surface / VR-11: live and Picard packs both
+    # include vapour_batch_flux_pressures_Pa + overlay/shadow fields.
+    from simulator.vapour_rail.instrumentation import (
+        flux_pressures_from_batch_and_live,
+        serialize_vapour_batch,
+    )
+
     sim = _real_capacity_sim()
     sim.melt.temperature_C = 1600.0
     sim.melt.p_total_mbar = 5.0
@@ -588,12 +595,28 @@ def test_live_and_picard_share_evaporation_control_construction(monkeypatch):
         diagnostics={},
     )
     partials = {"Fe": 100.0, "N2": 200.0}
+    temperature_K = float(sim.melt.temperature_C) + 273.15
+    vapour_batch = sim._resolve_evaporation_vapour_batch(
+        equilibrium, temperature_K=temperature_K
+    )
+    resolve_error = dict(
+        getattr(sim, "_last_vapour_batch_resolve_error", {}) or {}
+    )
+    batch_pressures, flux_overlay = flux_pressures_from_batch_and_live(
+        vapour_batch,
+        dict(equilibrium.vapor_pressures_Pa or {}),
+        resolution_error=resolve_error or None,
+    )
+    batch_report = serialize_vapour_batch(vapour_batch)
     expected, _ = sim._evaporation_flux_control_inputs(
         equilibrium,
         overhead_partials_Pa=partials,
         overhead_pressure_pa=sim._evaporation_overhead_total_pressure_Pa(
             partials
         ),
+        vapour_batch_flux_pressures_Pa=batch_pressures,
+        vapour_batch_report=batch_report,
+        vapour_batch_flux_overlay=flux_overlay,
     )
     captured = []
 
@@ -611,6 +634,8 @@ def test_live_and_picard_share_evaporation_control_construction(monkeypatch):
     )
 
     assert captured == [expected]
+    assert "vapour_batch_flux_pressures_Pa" in captured[0]
+    assert captured[0]["vapour_batch_flux_pressures_Pa"] == batch_pressures
     assert captured[0]["overhead_pressure_pa"] == pytest.approx(500.0)
 
 

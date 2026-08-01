@@ -3573,6 +3573,16 @@ def test_equilibrium_emission_keeps_endmember_activities_diagnostic_only():
 
 
 def test_endmember_activity_labels_do_not_reach_evaporation_flux_as_oxide_keys():
+    # DESIGN-REV5 §1.2 / §7.3 U4 / VR-11: flux path requires a VapourBatch;
+    # harness supplies a complete batch so activity labels still reach the
+    # EVAPORATION_FLUX control pack (endmember keys, never oxide remaps).
+    from simulator.vapour_rail.batch import (
+        FluxEligible,
+        PressureValue,
+        VapourAnswer,
+        VapourBatch,
+    )
+
     backend = AlphaMELTSBackend()
     result = backend._emit_equilibrium_result(
         temperature_C=1600.0,
@@ -3603,9 +3613,32 @@ def test_endmember_activity_labels_do_not_reach_evaporation_flux_as_oxide_keys()
             diagnostic={'evaporation_flux_kg_hr': {}},
         )
 
+    def _resolve_evaporation_vapour_batch(_self, equilibrium, *, temperature_K):
+        live = dict(getattr(equilibrium, 'vapor_pressures_Pa', {}) or {})
+        channels = {
+            sid: VapourAnswer(
+                species_id=sid,
+                pressure=PressureValue(pa=float(pa)),
+                flux=FluxEligible(alpha_ref=f'alpha:{sid}'),
+                source_label='test',
+                formula_id=sid,
+                source_account='process.cleaned_melt',
+                solve_group_id='g1',
+                state_fingerprint='state:test',
+                validation_status='pending_validation',
+            )
+            for sid, pa in live.items()
+        }
+        return VapourBatch(
+            requested_species_ids=frozenset(live),
+            channels_by_species=channels,
+            flux_active_species_ids=frozenset(live),
+        )
+
     sim = types.SimpleNamespace(
         melt=types.SimpleNamespace(
             temperature_C=1600.0,
+            p_total_mbar=0.0,
             melt_surface_area_m2=1.0,
             stir_state=types.SimpleNamespace(axial=0.0, radial=0.0),
         ),
@@ -3625,6 +3658,10 @@ def test_endmember_activity_labels_do_not_reach_evaporation_flux_as_oxide_keys()
         _build_partial_melt_offgassing_diagnostic=lambda *a, **k: {},
         _dispatch_only=_dispatch_only,
     )
+    sim._resolve_evaporation_vapour_batch = types.MethodType(
+        _resolve_evaporation_vapour_batch,
+        sim,
+    )
     # Bind the production helper (simulator/evaporation.py:138) so this
     # stand-in follows the real backpressure path without copying its logic.
     sim._evaporation_bulk_partial_pressure_pa = types.MethodType(
@@ -3636,6 +3673,10 @@ def test_endmember_activity_labels_do_not_reach_evaporation_flux_as_oxide_keys()
 
     assert captured['vapor_pressure_activities'] == {'Na2SiO3': 0.08}
     assert 'Na2O' not in captured['vapor_pressure_activities']
+    # VR-11 control pack: batch key is the flux authority; live map is
+    # reporting-only.
+    assert captured['vapour_batch_flux_pressures_Pa'] == {'Na': 1.0}
+    assert captured['vapor_pressures_Pa'] == {'Na': 1.0}
 
 
 def test_petthermotools_activity_extractor_selects_liquid_row_not_spinel_first():

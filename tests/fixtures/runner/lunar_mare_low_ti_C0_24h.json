@@ -3632,6 +3632,978 @@
     "vapor_pressure_fallback_source": "",
     "authoritative_for_requested_vapor_pressure": null
   },
+  "vapour_rail_instrumentation": {
+    "schema": "vapour_rail_instrumentation.v1",
+    "vapour_batch": {
+      "schema": "vapour_batch.v1",
+      "n_requested": 15,
+      "n_flux_active": 12,
+      "n_refused": 3,
+      "requested_species_ids": [
+        "Al",
+        "Ca",
+        "Cr",
+        "Cr2O3_gas",
+        "CrO2",
+        "Fe",
+        "K",
+        "Mg",
+        "Mn",
+        "MnO_gas",
+        "Na",
+        "P2O5_gas",
+        "Si",
+        "SiO",
+        "Ti"
+      ],
+      "flux_active_species_ids": [
+        "Al",
+        "Ca",
+        "Cr",
+        "CrO2",
+        "Fe",
+        "K",
+        "Mg",
+        "Mn",
+        "Na",
+        "Si",
+        "SiO",
+        "Ti"
+      ],
+      "solve_bundle_ids": {
+        "bundle:2:Cr+CrO2": [
+          "Cr",
+          "CrO2"
+        ],
+        "bundle:8:Si+SiO": [
+          "Si",
+          "SiO"
+        ],
+        "metals_al_family": [
+          "Al"
+        ],
+        "metals_ca_family": [
+          "Ca"
+        ],
+        "metals_fe_family": [
+          "Fe"
+        ],
+        "metals_k_family": [
+          "K"
+        ],
+        "metals_mg_family": [
+          "Mg"
+        ],
+        "metals_mn_family": [
+          "Mn"
+        ],
+        "metals_na_family": [
+          "Na"
+        ],
+        "metals_ti_family": [
+          "Ti"
+        ]
+      },
+      "channels_by_species": {
+        "Al": {
+          "species_id": "Al",
+          "pressure": {
+            "kind": "value",
+            "pa": 1.4746798010261961
+          },
+          "flux": {
+            "kind": "eligible",
+            "alpha_ref": "alpha:Al",
+            "reaction_id": null
+          },
+          "source_label": "catalog",
+          "formula_id": "Al",
+          "source_account": "process.cleaned_melt",
+          "solve_group_id": "metals_al_family",
+          "state_fingerprint": "state:T=1523.15|phase=hot_train|stage=evaporation|fO2=1e-09|P=1000",
+          "validation_status": "pending_validation",
+          "validation_anchor_refs": [],
+          "verdict_status": "status_bearing_non_authoritative",
+          "certification_ceiling": "never",
+          "refusal_code": null,
+          "is_refused": false,
+          "is_flux_active": true,
+          "extra": {
+            "origin": "catalog",
+            "out_of_range": false,
+            "acquisition_flag": null,
+            "status": null
+          },
+          "out_of_range": false,
+          "acquisition_flag": null,
+          "activity_bound": null,
+          "source_boundary": null
+        },
+        "Ca": {
+          "species_id": "Ca",
+          "pressure": {
+            "kind": "value",
+            "pa": 97228.7792607309
+          },
+          "flux": {
+            "kind": "eligible",
+            "alpha_ref": "alpha:Ca",
+            "reaction_id": null
+          },
+          "source_label": "catalog",
+          "formula_id": "Ca",
+          "source_account": "process.cleaned_melt",
+          "solve_group_id": "metals_ca_family",
+          "state_fingerprint": "state:T=1523.15|phase=hot_train|stage=evaporation|fO2=1e-09|P=1000",
+          "validation_status": "pending_validation",
+          "validation_anchor_refs": [],
+          "verdict_status": "status_bearing_non_authoritative",
+          "certification_ceiling": "never",
+          "refusal_code": null,
+          "is_refused": false,
+          "is_flux_active": true,
+          "extra": {
+            "origin": "catalog",
+            "out_of_range": false,
+            "acquisition_flag": null,
+            "status": null
+          },
+          "out_of_range": false,
+          "acquisition_flag": null,
+          "activity_bound": null,
+          "source_boundary": null
+        },
+        "Cr": {
+          "species_id": "Cr",
+          "pressure": {
+            "kind": "value",
+            "pa": 0.004103933205258257
+          },
+          "flux": {
+            "kind": "eligible",
+            "alpha_ref": "alpha:Cr",
+            "reaction_id": null
+          },
+          "source_label": "catalog",
+          "formula_id": "Cr",
+          "source_account": "process.cleaned_melt",
+          "solve_group_id": "metals_cr_family",
+          "state_fingerprint": "state:T=1523.15|phase=hot_train|stage=evaporation|fO2=1e-09|P=1000",
+          "validation_status": "pending_validation",
+          "validation_anchor_refs": [],
+          "verdict_status": "status_bearing_non_authoritative",
+          "certification_ceiling": "never",
+          "refusal_code": null,
+          "is_refused": false,
+          "is_flux_active": true,
+          "extra": {
+            "origin": "catalog",
+            "out_of_range": true,
+            "acquisition_flag": "vapour_pressure_out_of_range:Cr",
+            "status": "out_of_range_conservative_continuation"
+          },
+          "out_of_range": true,
+          "acquisition_flag": "vapour_pressure_out_of_range:Cr",
+          "activity_bound": null,
+          "source_boundary": null
+        },
+        "Cr2O3_gas": {
+          "species_id": "Cr2O3_gas",
+          "pressure": {
+            "kind": "refusal",
+            "code": "missing_channel_contract",
+            "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route"
+          },
+          "flux": {
+            "kind": "refusal",
+            "code": "missing_channel_contract",
+            "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route"
+          },
+          "source_label": "refusal_closure",
+          "formula_id": "Cr2O3",
+          "source_account": "process.cleaned_melt",
+          "solve_group_id": "u0_v:Cr2O3_gas",
+          "state_fingerprint": "state:T=1523.15|phase=hot_train|stage=evaporation|fO2=1e-09|P=1000",
+          "validation_status": "pending_validation",
+          "validation_anchor_refs": [],
+          "verdict_status": "status_bearing_non_authoritative",
+          "certification_ceiling": "never",
+          "refusal_code": "missing_channel_contract",
+          "is_refused": true,
+          "is_flux_active": false,
+          "extra": {
+            "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route",
+            "origin": "u0_v"
+          },
+          "out_of_range": false,
+          "acquisition_flag": null,
+          "activity_bound": null,
+          "source_boundary": null
+        },
+        "CrO2": {
+          "species_id": "CrO2",
+          "pressure": {
+            "kind": "value",
+            "pa": 5.1965998546644855e-06
+          },
+          "flux": {
+            "kind": "eligible",
+            "alpha_ref": "alpha:CrO2",
+            "reaction_id": "liquid_cro1_5_to_cro2_gas"
+          },
+          "source_label": "catalog",
+          "formula_id": "CrO2",
+          "source_account": "process.cleaned_melt",
+          "solve_group_id": "oxide_vapors_cro2_family",
+          "state_fingerprint": "state:T=1523.15|phase=hot_train|stage=evaporation|fO2=1e-09|P=1000",
+          "validation_status": "pending_validation",
+          "validation_anchor_refs": [],
+          "verdict_status": "status_bearing_non_authoritative",
+          "certification_ceiling": "never",
+          "refusal_code": null,
+          "is_refused": false,
+          "is_flux_active": true,
+          "extra": {
+            "origin": "catalog",
+            "out_of_range": false,
+            "acquisition_flag": null,
+            "status": null
+          },
+          "out_of_range": false,
+          "acquisition_flag": null,
+          "activity_bound": null,
+          "source_boundary": null
+        },
+        "Fe": {
+          "species_id": "Fe",
+          "pressure": {
+            "kind": "value",
+            "pa": 1.476313587343108
+          },
+          "flux": {
+            "kind": "eligible",
+            "alpha_ref": "alpha:Fe",
+            "reaction_id": null
+          },
+          "source_label": "catalog",
+          "formula_id": "Fe",
+          "source_account": "process.cleaned_melt",
+          "solve_group_id": "metals_fe_family",
+          "state_fingerprint": "state:T=1523.15|phase=hot_train|stage=evaporation|fO2=1e-09|P=1000",
+          "validation_status": "pending_validation",
+          "validation_anchor_refs": [],
+          "verdict_status": "status_bearing_non_authoritative",
+          "certification_ceiling": "never",
+          "refusal_code": null,
+          "is_refused": false,
+          "is_flux_active": true,
+          "extra": {
+            "origin": "catalog",
+            "out_of_range": false,
+            "acquisition_flag": null,
+            "status": null
+          },
+          "out_of_range": false,
+          "acquisition_flag": null,
+          "activity_bound": null,
+          "source_boundary": null
+        },
+        "K": {
+          "species_id": "K",
+          "pressure": {
+            "kind": "value",
+            "pa": 594158.5704141085
+          },
+          "flux": {
+            "kind": "eligible",
+            "alpha_ref": "alpha:K",
+            "reaction_id": "liquid_ko0_5_to_k_gas"
+          },
+          "source_label": "catalog",
+          "formula_id": "K",
+          "source_account": "process.cleaned_melt",
+          "solve_group_id": "metals_k_family",
+          "state_fingerprint": "state:T=1523.15|phase=hot_train|stage=evaporation|fO2=1e-09|P=1000",
+          "validation_status": "pending_validation",
+          "validation_anchor_refs": [],
+          "verdict_status": "status_bearing_non_authoritative",
+          "certification_ceiling": "never",
+          "refusal_code": null,
+          "is_refused": false,
+          "is_flux_active": true,
+          "extra": {
+            "origin": "catalog",
+            "out_of_range": false,
+            "acquisition_flag": null,
+            "status": null
+          },
+          "out_of_range": false,
+          "acquisition_flag": null,
+          "activity_bound": null,
+          "source_boundary": null
+        },
+        "Mg": {
+          "species_id": "Mg",
+          "pressure": {
+            "kind": "value",
+            "pa": 198592.5507358933
+          },
+          "flux": {
+            "kind": "eligible",
+            "alpha_ref": "alpha:Mg",
+            "reaction_id": null
+          },
+          "source_label": "catalog",
+          "formula_id": "Mg",
+          "source_account": "process.cleaned_melt",
+          "solve_group_id": "metals_mg_family",
+          "state_fingerprint": "state:T=1523.15|phase=hot_train|stage=evaporation|fO2=1e-09|P=1000",
+          "validation_status": "pending_validation",
+          "validation_anchor_refs": [],
+          "verdict_status": "status_bearing_non_authoritative",
+          "certification_ceiling": "never",
+          "refusal_code": null,
+          "is_refused": false,
+          "is_flux_active": true,
+          "extra": {
+            "origin": "catalog",
+            "out_of_range": true,
+            "acquisition_flag": "vapour_pressure_out_of_range:Mg",
+            "status": "out_of_range_conservative_continuation"
+          },
+          "out_of_range": true,
+          "acquisition_flag": "vapour_pressure_out_of_range:Mg",
+          "activity_bound": null,
+          "source_boundary": null
+        },
+        "Mn": {
+          "species_id": "Mn",
+          "pressure": {
+            "kind": "value",
+            "pa": 32.03955959349807
+          },
+          "flux": {
+            "kind": "eligible",
+            "alpha_ref": "alpha:Mn",
+            "reaction_id": null
+          },
+          "source_label": "catalog",
+          "formula_id": "Mn",
+          "source_account": "process.cleaned_melt",
+          "solve_group_id": "metals_mn_family",
+          "state_fingerprint": "state:T=1523.15|phase=hot_train|stage=evaporation|fO2=1e-09|P=1000",
+          "validation_status": "pending_validation",
+          "validation_anchor_refs": [],
+          "verdict_status": "status_bearing_non_authoritative",
+          "certification_ceiling": "never",
+          "refusal_code": null,
+          "is_refused": false,
+          "is_flux_active": true,
+          "extra": {
+            "origin": "catalog",
+            "out_of_range": false,
+            "acquisition_flag": null,
+            "status": null
+          },
+          "out_of_range": false,
+          "acquisition_flag": null,
+          "activity_bound": null,
+          "source_boundary": null
+        },
+        "MnO_gas": {
+          "species_id": "MnO_gas",
+          "pressure": {
+            "kind": "refusal",
+            "code": "missing_channel_contract",
+            "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route"
+          },
+          "flux": {
+            "kind": "refusal",
+            "code": "missing_channel_contract",
+            "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route"
+          },
+          "source_label": "refusal_closure",
+          "formula_id": "MnO",
+          "source_account": "process.cleaned_melt",
+          "solve_group_id": "u0_v:MnO_gas",
+          "state_fingerprint": "state:T=1523.15|phase=hot_train|stage=evaporation|fO2=1e-09|P=1000",
+          "validation_status": "pending_validation",
+          "validation_anchor_refs": [],
+          "verdict_status": "status_bearing_non_authoritative",
+          "certification_ceiling": "never",
+          "refusal_code": "missing_channel_contract",
+          "is_refused": true,
+          "is_flux_active": false,
+          "extra": {
+            "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route",
+            "origin": "u0_v"
+          },
+          "out_of_range": false,
+          "acquisition_flag": null,
+          "activity_bound": null,
+          "source_boundary": null
+        },
+        "Na": {
+          "species_id": "Na",
+          "pressure": {
+            "kind": "value",
+            "pa": 5.966558630304462
+          },
+          "flux": {
+            "kind": "eligible",
+            "alpha_ref": "alpha:Na",
+            "reaction_id": null
+          },
+          "source_label": "catalog",
+          "formula_id": "Na",
+          "source_account": "process.cleaned_melt",
+          "solve_group_id": "metals_na_family",
+          "state_fingerprint": "state:T=1523.15|phase=hot_train|stage=evaporation|fO2=1e-09|P=1000",
+          "validation_status": "pending_validation",
+          "validation_anchor_refs": [],
+          "verdict_status": "status_bearing_non_authoritative",
+          "certification_ceiling": "never",
+          "refusal_code": null,
+          "is_refused": false,
+          "is_flux_active": true,
+          "extra": {
+            "origin": "catalog",
+            "out_of_range": false,
+            "acquisition_flag": null,
+            "status": null
+          },
+          "out_of_range": false,
+          "acquisition_flag": null,
+          "activity_bound": null,
+          "source_boundary": null
+        },
+        "P2O5_gas": {
+          "species_id": "P2O5_gas",
+          "pressure": {
+            "kind": "refusal",
+            "code": "inapplicable_by_declared_predicate",
+            "detail": "declared applicability predicate 'not_applicable' is inactive"
+          },
+          "flux": {
+            "kind": "refusal",
+            "code": "inapplicable_by_declared_predicate",
+            "detail": "declared applicability predicate 'not_applicable' is inactive"
+          },
+          "source_label": "refusal_closure",
+          "formula_id": "P2O5_gas",
+          "source_account": "process.cleaned_melt",
+          "solve_group_id": "phosphorus_P2O5_gas_family",
+          "state_fingerprint": "state:T=1523.15|phase=hot_train|stage=evaporation|fO2=1e-09|P=1000",
+          "validation_status": "pending_validation",
+          "validation_anchor_refs": [],
+          "verdict_status": "status_bearing_non_authoritative",
+          "certification_ceiling": "never",
+          "refusal_code": "inapplicable_by_declared_predicate",
+          "is_refused": true,
+          "is_flux_active": false,
+          "extra": {
+            "detail": "declared applicability predicate 'not_applicable' is inactive",
+            "origin": "catalog"
+          },
+          "out_of_range": false,
+          "acquisition_flag": null,
+          "activity_bound": null,
+          "source_boundary": null
+        },
+        "Si": {
+          "species_id": "Si",
+          "pressure": {
+            "kind": "value",
+            "pa": 0.000905415630071931
+          },
+          "flux": {
+            "kind": "eligible",
+            "alpha_ref": "alpha:Si",
+            "reaction_id": null
+          },
+          "source_label": "catalog",
+          "formula_id": "Si",
+          "source_account": "process.cleaned_melt",
+          "solve_group_id": "metals_si_family",
+          "state_fingerprint": "state:T=1523.15|phase=hot_train|stage=evaporation|fO2=1e-09|P=1000",
+          "validation_status": "pending_validation",
+          "validation_anchor_refs": [],
+          "verdict_status": "status_bearing_non_authoritative",
+          "certification_ceiling": "never",
+          "refusal_code": null,
+          "is_refused": false,
+          "is_flux_active": true,
+          "extra": {
+            "origin": "catalog",
+            "out_of_range": true,
+            "acquisition_flag": "vapour_pressure_out_of_range:Si",
+            "status": "out_of_range_conservative_continuation"
+          },
+          "out_of_range": true,
+          "acquisition_flag": "vapour_pressure_out_of_range:Si",
+          "activity_bound": null,
+          "source_boundary": null
+        },
+        "SiO": {
+          "species_id": "SiO",
+          "pressure": {
+            "kind": "value",
+            "pa": 2.9034572819087435e-05
+          },
+          "flux": {
+            "kind": "eligible",
+            "alpha_ref": "alpha:SiO",
+            "reaction_id": "liquid_sio2_to_sio_gas"
+          },
+          "source_label": "catalog",
+          "formula_id": "SiO",
+          "source_account": "process.cleaned_melt",
+          "solve_group_id": "oxide_vapors_sio_family",
+          "state_fingerprint": "state:T=1523.15|phase=hot_train|stage=evaporation|fO2=1e-09|P=1000",
+          "validation_status": "pending_validation",
+          "validation_anchor_refs": [],
+          "verdict_status": "status_bearing_non_authoritative",
+          "certification_ceiling": "never",
+          "refusal_code": null,
+          "is_refused": false,
+          "is_flux_active": true,
+          "extra": {
+            "origin": "catalog",
+            "out_of_range": false,
+            "acquisition_flag": null,
+            "status": null
+          },
+          "out_of_range": false,
+          "acquisition_flag": null,
+          "activity_bound": null,
+          "source_boundary": null
+        },
+        "Ti": {
+          "species_id": "Ti",
+          "pressure": {
+            "kind": "value",
+            "pa": 6.887543096836633e-05
+          },
+          "flux": {
+            "kind": "eligible",
+            "alpha_ref": "alpha:Ti",
+            "reaction_id": null
+          },
+          "source_label": "catalog",
+          "formula_id": "Ti",
+          "source_account": "process.cleaned_melt",
+          "solve_group_id": "metals_ti_family",
+          "state_fingerprint": "state:T=1523.15|phase=hot_train|stage=evaporation|fO2=1e-09|P=1000",
+          "validation_status": "pending_validation",
+          "validation_anchor_refs": [],
+          "verdict_status": "status_bearing_non_authoritative",
+          "certification_ceiling": "never",
+          "refusal_code": null,
+          "is_refused": false,
+          "is_flux_active": true,
+          "extra": {
+            "origin": "catalog",
+            "out_of_range": true,
+            "acquisition_flag": "vapour_pressure_out_of_range:Ti",
+            "status": "out_of_range_conservative_continuation"
+          },
+          "out_of_range": true,
+          "acquisition_flag": "vapour_pressure_out_of_range:Ti",
+          "activity_bound": null,
+          "source_boundary": null
+        }
+      },
+      "refusals_by_species": {
+        "Cr2O3_gas": {
+          "species_id": "Cr2O3_gas",
+          "pressure": {
+            "kind": "refusal",
+            "code": "missing_channel_contract",
+            "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route"
+          },
+          "flux": {
+            "kind": "refusal",
+            "code": "missing_channel_contract",
+            "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route"
+          },
+          "source_label": "refusal_closure",
+          "formula_id": "Cr2O3",
+          "source_account": "process.cleaned_melt",
+          "solve_group_id": "u0_v:Cr2O3_gas",
+          "state_fingerprint": "state:T=1523.15|phase=hot_train|stage=evaporation|fO2=1e-09|P=1000",
+          "validation_status": "pending_validation",
+          "validation_anchor_refs": [],
+          "verdict_status": "status_bearing_non_authoritative",
+          "certification_ceiling": "never",
+          "refusal_code": "missing_channel_contract",
+          "is_refused": true,
+          "is_flux_active": false,
+          "extra": {
+            "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route",
+            "origin": "u0_v"
+          },
+          "out_of_range": false,
+          "acquisition_flag": null,
+          "activity_bound": null,
+          "source_boundary": null
+        },
+        "MnO_gas": {
+          "species_id": "MnO_gas",
+          "pressure": {
+            "kind": "refusal",
+            "code": "missing_channel_contract",
+            "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route"
+          },
+          "flux": {
+            "kind": "refusal",
+            "code": "missing_channel_contract",
+            "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route"
+          },
+          "source_label": "refusal_closure",
+          "formula_id": "MnO",
+          "source_account": "process.cleaned_melt",
+          "solve_group_id": "u0_v:MnO_gas",
+          "state_fingerprint": "state:T=1523.15|phase=hot_train|stage=evaporation|fO2=1e-09|P=1000",
+          "validation_status": "pending_validation",
+          "validation_anchor_refs": [],
+          "verdict_status": "status_bearing_non_authoritative",
+          "certification_ceiling": "never",
+          "refusal_code": "missing_channel_contract",
+          "is_refused": true,
+          "is_flux_active": false,
+          "extra": {
+            "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route",
+            "origin": "u0_v"
+          },
+          "out_of_range": false,
+          "acquisition_flag": null,
+          "activity_bound": null,
+          "source_boundary": null
+        },
+        "P2O5_gas": {
+          "species_id": "P2O5_gas",
+          "pressure": {
+            "kind": "refusal",
+            "code": "inapplicable_by_declared_predicate",
+            "detail": "declared applicability predicate 'not_applicable' is inactive"
+          },
+          "flux": {
+            "kind": "refusal",
+            "code": "inapplicable_by_declared_predicate",
+            "detail": "declared applicability predicate 'not_applicable' is inactive"
+          },
+          "source_label": "refusal_closure",
+          "formula_id": "P2O5_gas",
+          "source_account": "process.cleaned_melt",
+          "solve_group_id": "phosphorus_P2O5_gas_family",
+          "state_fingerprint": "state:T=1523.15|phase=hot_train|stage=evaporation|fO2=1e-09|P=1000",
+          "validation_status": "pending_validation",
+          "validation_anchor_refs": [],
+          "verdict_status": "status_bearing_non_authoritative",
+          "certification_ceiling": "never",
+          "refusal_code": "inapplicable_by_declared_predicate",
+          "is_refused": true,
+          "is_flux_active": false,
+          "extra": {
+            "detail": "declared applicability predicate 'not_applicable' is inactive",
+            "origin": "catalog"
+          },
+          "out_of_range": false,
+          "acquisition_flag": null,
+          "activity_bound": null,
+          "source_boundary": null
+        }
+      },
+      "metadata": {
+        "refusal_closure_fixed_point": true,
+        "refusal_closure_iterations": 2,
+        "n_requested": 15,
+        "n_refused": 3,
+        "n_flux_active": 12,
+        "n_solve_bundles": 10
+      }
+    },
+    "flux_overlay": {
+      "schema": "vapour_batch_flux_overlay.v1",
+      "batch_present": true,
+      "n_live_pressures": 10,
+      "n_flux_pressures": 10,
+      "live_only_bridge_species": [],
+      "batch_refused_live_species": [],
+      "batch_flux_active_not_in_live": [
+        "Si",
+        "Ti"
+      ],
+      "batch_channel_states": {
+        "Al": "eligible",
+        "Ca": "eligible",
+        "Cr": "eligible",
+        "Cr2O3_gas": "refusal",
+        "CrO2": "eligible",
+        "Fe": "eligible",
+        "K": "eligible",
+        "Mg": "eligible",
+        "Mn": "eligible",
+        "MnO_gas": "refusal",
+        "Na": "eligible",
+        "P2O5_gas": "refusal",
+        "Si": "eligible",
+        "SiO": "eligible",
+        "Ti": "eligible"
+      },
+      "dropped_nonfinite_live_species": [],
+      "note": "Active flux consumes VapourBatch channel unions only. Live equilibrium map is the legacy shadow projection, never a fail-open flux fallback.",
+      "selection_source": "vapour_batch_channel_unions",
+      "batch_pa_by_species": {
+        "Al": 1.4746798010261961,
+        "Ca": 97228.7792607309,
+        "Cr": 0.004103933205258257,
+        "CrO2": 5.1965998546644855e-06,
+        "Fe": 1.476313587343108,
+        "K": 594158.5704141085,
+        "Mg": 198592.5507358933,
+        "Mn": 32.03955959349807,
+        "Na": 5.966558630304462,
+        "Si": 0.000905415630071931,
+        "SiO": 2.9034572819087435e-05,
+        "Ti": 6.887543096836633e-05
+      },
+      "shadow_equal": true,
+      "shadow_outcome": "proved",
+      "detail": "legacy and batch flux paths agree per species",
+      "mismatched_species": [],
+      "missing_in_batch_path": [],
+      "missing_in_legacy_path": [],
+      "catalog_pa_shadow_equal": false,
+      "catalog_pa_shadow_outcome": "mismatch"
+    },
+    "resolve_error": null,
+    "condensation_refusals": {
+      "schema": "condensation_refusals.v1",
+      "n_species": 3,
+      "by_species": {
+        "Fe": {
+          "status": "pass_through",
+          "reason": "zero_residence_or_alpha",
+          "output_status": "status_bearing",
+          "stage_outcomes": [
+            {
+              "status": "pass_through",
+              "reason": "zero_residence_or_alpha",
+              "output_status": "status_bearing",
+              "species": "Fe",
+              "stage_number": 7,
+              "T_cond_C": 1250.0,
+              "eta": 0.0,
+              "residence_s": 0.0,
+              "alpha_s_value": 0.02
+            }
+          ]
+        },
+        "K": {
+          "status": "pass_through",
+          "reason": "zero_residence_or_alpha",
+          "output_status": "status_bearing",
+          "stage_outcomes": [
+            {
+              "status": "pass_through",
+              "reason": "zero_residence_or_alpha",
+              "output_status": "status_bearing",
+              "species": "K",
+              "stage_number": 7,
+              "T_cond_C": 420.0,
+              "eta": 0.0,
+              "residence_s": 0.0,
+              "alpha_s_value": 1.0
+            }
+          ]
+        },
+        "Na": {
+          "status": "pass_through",
+          "reason": "zero_residence_or_alpha",
+          "output_status": "status_bearing",
+          "stage_outcomes": [
+            {
+              "status": "pass_through",
+              "reason": "zero_residence_or_alpha",
+              "output_status": "status_bearing",
+              "species": "Na",
+              "stage_number": 7,
+              "T_cond_C": 480.0,
+              "eta": 0.0,
+              "residence_s": 0.0,
+              "alpha_s_value": 1.0
+            }
+          ]
+        }
+      },
+      "has_refusals": true
+    },
+    "source_vapour_ceiling_table": [
+      {
+        "legacy_key": "SiO",
+        "lookup_gas_id": "SiO",
+        "source_parent_id": "SiO2",
+        "ceiling_mol": 0.013617600827,
+        "status": "frozen_sio_proxy",
+        "evidence": "FROZEN_SIO_SOURCE_VAPOR_CEILING_MOL diagnostic pin",
+        "advisory_only": true
+      },
+      {
+        "legacy_key": "Na2O",
+        "lookup_gas_id": "Na2O_gas",
+        "source_parent_id": "Na2O",
+        "ceiling_mol": 0.0,
+        "status": "unvalidated_legacy",
+        "evidence": "inherited zero; not measured ZeroByPhysics",
+        "advisory_only": true
+      },
+      {
+        "legacy_key": "K2O",
+        "lookup_gas_id": "K2O_gas",
+        "source_parent_id": "K2O",
+        "ceiling_mol": 0.0,
+        "status": "unvalidated_legacy",
+        "evidence": "inherited zero; not measured ZeroByPhysics",
+        "advisory_only": true
+      },
+      {
+        "legacy_key": "FeO",
+        "lookup_gas_id": "FeO_gas",
+        "source_parent_id": "FeO",
+        "ceiling_mol": 0.0,
+        "status": "unvalidated_legacy",
+        "evidence": "inherited zero; not measured ZeroByPhysics",
+        "advisory_only": true
+      },
+      {
+        "legacy_key": "MgO",
+        "lookup_gas_id": "MgO_gas",
+        "source_parent_id": "MgO",
+        "ceiling_mol": 0.0,
+        "status": "unvalidated_legacy",
+        "evidence": "inherited zero; not measured ZeroByPhysics",
+        "advisory_only": true
+      },
+      {
+        "legacy_key": "CaO",
+        "lookup_gas_id": "CaO_gas",
+        "source_parent_id": "CaO",
+        "ceiling_mol": 0.0,
+        "status": "unvalidated_legacy",
+        "evidence": "inherited zero; not measured ZeroByPhysics",
+        "advisory_only": true
+      },
+      {
+        "legacy_key": "Al2O3",
+        "lookup_gas_id": "Al2O3_gas",
+        "source_parent_id": "Al2O3",
+        "ceiling_mol": 0.0,
+        "status": "unvalidated_legacy",
+        "evidence": "inherited zero; not measured ZeroByPhysics",
+        "advisory_only": true
+      },
+      {
+        "legacy_key": "TiO2",
+        "lookup_gas_id": "TiO2_gas",
+        "source_parent_id": "TiO2",
+        "ceiling_mol": 0.0,
+        "status": "unvalidated_legacy",
+        "evidence": "inherited zero; not measured ZeroByPhysics",
+        "advisory_only": true
+      },
+      {
+        "legacy_key": "CrO2",
+        "lookup_gas_id": "CrO2",
+        "source_parent_id": "Cr2O3",
+        "ceiling_mol": 0.0,
+        "status": "unvalidated_legacy",
+        "evidence": "inherited zero; collision-free gas ID retained",
+        "advisory_only": true
+      }
+    ],
+    "setpoints_t_cond_audit": {
+      "schema": "setpoints_t_cond_audit.v1",
+      "operator_override_species": [
+        "Al",
+        "Ca",
+        "Cr",
+        "CrO2",
+        "Fe",
+        "K",
+        "Mg",
+        "Mn",
+        "Na",
+        "SiO",
+        "Ti"
+      ],
+      "al_ti_policy": "Al and Ti overrides are estimated/operator-routing only; no additional Al/Ti/trace T_cond overrides without independent engineering policy approval (DESIGN-REV5 \u00a77.2).",
+      "reaction_fixed_windows": "Reaction-fixed condensation windows remain non-operator settings."
+    },
+    "shadow_equal": true,
+    "shadow_outcome": "proved"
+  },
+  "condensation_refusals_by_species": {
+    "schema": "condensation_refusals.v1",
+    "n_species": 3,
+    "by_species": {
+      "Fe": {
+        "status": "pass_through",
+        "reason": "zero_residence_or_alpha",
+        "output_status": "status_bearing",
+        "stage_outcomes": [
+          {
+            "status": "pass_through",
+            "reason": "zero_residence_or_alpha",
+            "output_status": "status_bearing",
+            "species": "Fe",
+            "stage_number": 7,
+            "T_cond_C": 1250.0,
+            "eta": 0.0,
+            "residence_s": 0.0,
+            "alpha_s_value": 0.02
+          }
+        ]
+      },
+      "K": {
+        "status": "pass_through",
+        "reason": "zero_residence_or_alpha",
+        "output_status": "status_bearing",
+        "stage_outcomes": [
+          {
+            "status": "pass_through",
+            "reason": "zero_residence_or_alpha",
+            "output_status": "status_bearing",
+            "species": "K",
+            "stage_number": 7,
+            "T_cond_C": 420.0,
+            "eta": 0.0,
+            "residence_s": 0.0,
+            "alpha_s_value": 1.0
+          }
+        ]
+      },
+      "Na": {
+        "status": "pass_through",
+        "reason": "zero_residence_or_alpha",
+        "output_status": "status_bearing",
+        "stage_outcomes": [
+          {
+            "status": "pass_through",
+            "reason": "zero_residence_or_alpha",
+            "output_status": "status_bearing",
+            "species": "Na",
+            "stage_number": 7,
+            "T_cond_C": 480.0,
+            "eta": 0.0,
+            "residence_s": 0.0,
+            "alpha_s_value": 1.0
+          }
+        ]
+      }
+    },
+    "has_refusals": true
+  },
   "shuttle_refusal_history": [],
   "c7_product_report": {},
   "c7_refusal_diagnostic": {},
@@ -4482,6 +5454,117 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
+      },
+      "vapour_batch_summary": {
+        "n_requested": 15,
+        "n_flux_active": 12,
+        "n_refused": 3,
+        "solve_bundle_ids": {
+          "bundle:2:Cr+CrO2": [
+            "Cr",
+            "CrO2"
+          ],
+          "bundle:8:Si+SiO": [
+            "Si",
+            "SiO"
+          ],
+          "metals_al_family": [
+            "Al"
+          ],
+          "metals_ca_family": [
+            "Ca"
+          ],
+          "metals_fe_family": [
+            "Fe"
+          ],
+          "metals_k_family": [
+            "K"
+          ],
+          "metals_mg_family": [
+            "Mg"
+          ],
+          "metals_mn_family": [
+            "Mn"
+          ],
+          "metals_na_family": [
+            "Na"
+          ],
+          "metals_ti_family": [
+            "Ti"
+          ]
+        },
+        "metadata": {
+          "refusal_closure_fixed_point": true,
+          "refusal_closure_iterations": 2,
+          "n_requested": 15,
+          "n_refused": 3,
+          "n_flux_active": 12,
+          "n_solve_bundles": 10
+        }
+      },
+      "vapour_batch_flux_overlay": {
+        "schema": "vapour_batch_flux_overlay.v1",
+        "batch_present": true,
+        "n_live_pressures": 0,
+        "n_flux_pressures": 0,
+        "live_only_bridge_species": [],
+        "batch_refused_live_species": [],
+        "batch_flux_active_not_in_live": [
+          "Al",
+          "Ca",
+          "Cr",
+          "CrO2",
+          "Fe",
+          "K",
+          "Mg",
+          "Mn",
+          "Na",
+          "Si",
+          "SiO",
+          "Ti"
+        ],
+        "batch_channel_states": {
+          "Al": "eligible",
+          "Ca": "eligible",
+          "Cr": "eligible",
+          "Cr2O3_gas": "refusal",
+          "CrO2": "eligible",
+          "Fe": "eligible",
+          "K": "eligible",
+          "Mg": "eligible",
+          "Mn": "eligible",
+          "MnO_gas": "refusal",
+          "Na": "eligible",
+          "P2O5_gas": "refusal",
+          "Si": "eligible",
+          "SiO": "eligible",
+          "Ti": "eligible"
+        },
+        "dropped_nonfinite_live_species": [],
+        "note": "Active flux consumes VapourBatch channel unions only. Live equilibrium map is the legacy shadow projection, never a fail-open flux fallback.",
+        "selection_source": "vapour_batch_channel_unions",
+        "batch_pa_by_species": {
+          "Al": 3.044224625579353e-22,
+          "Ca": 1.0982846857353248e-05,
+          "Cr": 3.799366527088006e-10,
+          "CrO2": 3.1645062273562116e-24,
+          "Fe": 8.252846780297311e-07,
+          "K": 6.481266405975712e-07,
+          "Mg": 7.523555835007649e-07,
+          "Mn": 1.6539067862900026e-09,
+          "Na": 0.006183642464365138,
+          "Si": 5.314880908229388e-16,
+          "SiO": 1.3374955873404782e-37,
+          "Ti": 8.112988258626771e-15
+        },
+        "shadow_equal": true,
+        "shadow_outcome": "proved",
+        "detail": "both paths empty",
+        "mismatched_species": [],
+        "missing_in_batch_path": [],
+        "missing_in_legacy_path": [],
+        "catalog_pa_shadow_equal": true,
+        "catalog_pa_shadow_outcome": "proved"
       }
     },
     {
@@ -4672,6 +5755,117 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
+      },
+      "vapour_batch_summary": {
+        "n_requested": 15,
+        "n_flux_active": 12,
+        "n_refused": 3,
+        "solve_bundle_ids": {
+          "bundle:2:Cr+CrO2": [
+            "Cr",
+            "CrO2"
+          ],
+          "bundle:8:Si+SiO": [
+            "Si",
+            "SiO"
+          ],
+          "metals_al_family": [
+            "Al"
+          ],
+          "metals_ca_family": [
+            "Ca"
+          ],
+          "metals_fe_family": [
+            "Fe"
+          ],
+          "metals_k_family": [
+            "K"
+          ],
+          "metals_mg_family": [
+            "Mg"
+          ],
+          "metals_mn_family": [
+            "Mn"
+          ],
+          "metals_na_family": [
+            "Na"
+          ],
+          "metals_ti_family": [
+            "Ti"
+          ]
+        },
+        "metadata": {
+          "refusal_closure_fixed_point": true,
+          "refusal_closure_iterations": 2,
+          "n_requested": 15,
+          "n_refused": 3,
+          "n_flux_active": 12,
+          "n_solve_bundles": 10
+        }
+      },
+      "vapour_batch_flux_overlay": {
+        "schema": "vapour_batch_flux_overlay.v1",
+        "batch_present": true,
+        "n_live_pressures": 0,
+        "n_flux_pressures": 0,
+        "live_only_bridge_species": [],
+        "batch_refused_live_species": [],
+        "batch_flux_active_not_in_live": [
+          "Al",
+          "Ca",
+          "Cr",
+          "CrO2",
+          "Fe",
+          "K",
+          "Mg",
+          "Mn",
+          "Na",
+          "Si",
+          "SiO",
+          "Ti"
+        ],
+        "batch_channel_states": {
+          "Al": "eligible",
+          "Ca": "eligible",
+          "Cr": "eligible",
+          "Cr2O3_gas": "refusal",
+          "CrO2": "eligible",
+          "Fe": "eligible",
+          "K": "eligible",
+          "Mg": "eligible",
+          "Mn": "eligible",
+          "MnO_gas": "refusal",
+          "Na": "eligible",
+          "P2O5_gas": "refusal",
+          "Si": "eligible",
+          "SiO": "eligible",
+          "Ti": "eligible"
+        },
+        "dropped_nonfinite_live_species": [],
+        "note": "Active flux consumes VapourBatch channel unions only. Live equilibrium map is the legacy shadow projection, never a fail-open flux fallback.",
+        "selection_source": "vapour_batch_channel_unions",
+        "batch_pa_by_species": {
+          "Al": 9.487830979647105e-21,
+          "Ca": 4.120924302507094e-05,
+          "Cr": 8.069566775589148e-10,
+          "CrO2": 2.2588120763630428e-23,
+          "Fe": 1.6601341830475573e-06,
+          "K": 2.9384953867130873e-06,
+          "Mg": 1.2152820623553116e-05,
+          "Mn": 4.984299258246042e-09,
+          "Na": 0.008632365638008536,
+          "Si": 1.9696712443420838e-15,
+          "SiO": 5.017320978979436e-36,
+          "Ti": 2.3495753730011363e-14
+        },
+        "shadow_equal": true,
+        "shadow_outcome": "proved",
+        "detail": "both paths empty",
+        "mismatched_species": [],
+        "missing_in_batch_path": [],
+        "missing_in_legacy_path": [],
+        "catalog_pa_shadow_equal": true,
+        "catalog_pa_shadow_outcome": "proved"
       }
     },
     {
@@ -4862,6 +6056,117 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
+      },
+      "vapour_batch_summary": {
+        "n_requested": 15,
+        "n_flux_active": 12,
+        "n_refused": 3,
+        "solve_bundle_ids": {
+          "bundle:2:Cr+CrO2": [
+            "Cr",
+            "CrO2"
+          ],
+          "bundle:8:Si+SiO": [
+            "Si",
+            "SiO"
+          ],
+          "metals_al_family": [
+            "Al"
+          ],
+          "metals_ca_family": [
+            "Ca"
+          ],
+          "metals_fe_family": [
+            "Fe"
+          ],
+          "metals_k_family": [
+            "K"
+          ],
+          "metals_mg_family": [
+            "Mg"
+          ],
+          "metals_mn_family": [
+            "Mn"
+          ],
+          "metals_na_family": [
+            "Na"
+          ],
+          "metals_ti_family": [
+            "Ti"
+          ]
+        },
+        "metadata": {
+          "refusal_closure_fixed_point": true,
+          "refusal_closure_iterations": 2,
+          "n_requested": 15,
+          "n_refused": 3,
+          "n_flux_active": 12,
+          "n_solve_bundles": 10
+        }
+      },
+      "vapour_batch_flux_overlay": {
+        "schema": "vapour_batch_flux_overlay.v1",
+        "batch_present": true,
+        "n_live_pressures": 0,
+        "n_flux_pressures": 0,
+        "live_only_bridge_species": [],
+        "batch_refused_live_species": [],
+        "batch_flux_active_not_in_live": [
+          "Al",
+          "Ca",
+          "Cr",
+          "CrO2",
+          "Fe",
+          "K",
+          "Mg",
+          "Mn",
+          "Na",
+          "Si",
+          "SiO",
+          "Ti"
+        ],
+        "batch_channel_states": {
+          "Al": "eligible",
+          "Ca": "eligible",
+          "Cr": "eligible",
+          "Cr2O3_gas": "refusal",
+          "CrO2": "eligible",
+          "Fe": "eligible",
+          "K": "eligible",
+          "Mg": "eligible",
+          "Mn": "eligible",
+          "MnO_gas": "refusal",
+          "Na": "eligible",
+          "P2O5_gas": "refusal",
+          "Si": "eligible",
+          "SiO": "eligible",
+          "Ti": "eligible"
+        },
+        "dropped_nonfinite_live_species": [],
+        "note": "Active flux consumes VapourBatch channel unions only. Live equilibrium map is the legacy shadow projection, never a fail-open flux fallback.",
+        "selection_source": "vapour_batch_channel_unions",
+        "batch_pa_by_species": {
+          "Al": 2.9570398958723487e-19,
+          "Ca": 0.00015462308932791675,
+          "Cr": 1.71391487189843e-09,
+          "CrO2": 1.6123311599820055e-22,
+          "Fe": 3.33950887383819e-06,
+          "K": 1.3322635727136402e-05,
+          "Mg": 0.00019630484886021688,
+          "Mn": 1.502094271677765e-08,
+          "Na": 0.012050783488485728,
+          "Si": 7.299514095943469e-15,
+          "SiO": 1.882137783808546e-34,
+          "Ti": 6.804526590486979e-14
+        },
+        "shadow_equal": true,
+        "shadow_outcome": "proved",
+        "detail": "both paths empty",
+        "mismatched_species": [],
+        "missing_in_batch_path": [],
+        "missing_in_legacy_path": [],
+        "catalog_pa_shadow_equal": true,
+        "catalog_pa_shadow_outcome": "proved"
       }
     },
     {
@@ -5052,6 +6357,117 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
+      },
+      "vapour_batch_summary": {
+        "n_requested": 15,
+        "n_flux_active": 12,
+        "n_refused": 3,
+        "solve_bundle_ids": {
+          "bundle:2:Cr+CrO2": [
+            "Cr",
+            "CrO2"
+          ],
+          "bundle:8:Si+SiO": [
+            "Si",
+            "SiO"
+          ],
+          "metals_al_family": [
+            "Al"
+          ],
+          "metals_ca_family": [
+            "Ca"
+          ],
+          "metals_fe_family": [
+            "Fe"
+          ],
+          "metals_k_family": [
+            "K"
+          ],
+          "metals_mg_family": [
+            "Mg"
+          ],
+          "metals_mn_family": [
+            "Mn"
+          ],
+          "metals_na_family": [
+            "Na"
+          ],
+          "metals_ti_family": [
+            "Ti"
+          ]
+        },
+        "metadata": {
+          "refusal_closure_fixed_point": true,
+          "refusal_closure_iterations": 2,
+          "n_requested": 15,
+          "n_refused": 3,
+          "n_flux_active": 12,
+          "n_solve_bundles": 10
+        }
+      },
+      "vapour_batch_flux_overlay": {
+        "schema": "vapour_batch_flux_overlay.v1",
+        "batch_present": true,
+        "n_live_pressures": 0,
+        "n_flux_pressures": 0,
+        "live_only_bridge_species": [],
+        "batch_refused_live_species": [],
+        "batch_flux_active_not_in_live": [
+          "Al",
+          "Ca",
+          "Cr",
+          "CrO2",
+          "Fe",
+          "K",
+          "Mg",
+          "Mn",
+          "Na",
+          "Si",
+          "SiO",
+          "Ti"
+        ],
+        "batch_channel_states": {
+          "Al": "eligible",
+          "Ca": "eligible",
+          "Cr": "eligible",
+          "Cr2O3_gas": "refusal",
+          "CrO2": "eligible",
+          "Fe": "eligible",
+          "K": "eligible",
+          "Mg": "eligible",
+          "Mn": "eligible",
+          "MnO_gas": "refusal",
+          "Na": "eligible",
+          "P2O5_gas": "refusal",
+          "Si": "eligible",
+          "SiO": "eligible",
+          "Ti": "eligible"
+        },
+        "dropped_nonfinite_live_species": [],
+        "note": "Active flux consumes VapourBatch channel unions only. Live equilibrium map is the legacy shadow projection, never a fail-open flux fallback.",
+        "selection_source": "vapour_batch_channel_unions",
+        "batch_pa_by_species": {
+          "Al": 9.216105308513737e-18,
+          "Ca": 0.0005801683796706375,
+          "Cr": 3.640225392273489e-09,
+          "CrO2": 1.1508756291203504e-21,
+          "Fe": 6.7177217554615825e-06,
+          "K": 6.040255278961279e-05,
+          "Mg": 0.0031709176725070332,
+          "Mn": 4.5267891916288036e-08,
+          "Na": 0.01682289522665104,
+          "Si": 2.7051674836566512e-14,
+          "SiO": 7.060426574423318e-33,
+          "Ti": 1.970636169100754e-13
+        },
+        "shadow_equal": true,
+        "shadow_outcome": "proved",
+        "detail": "both paths empty",
+        "mismatched_species": [],
+        "missing_in_batch_path": [],
+        "missing_in_legacy_path": [],
+        "catalog_pa_shadow_equal": true,
+        "catalog_pa_shadow_outcome": "proved"
       }
     },
     {
@@ -5242,6 +6658,116 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
+      },
+      "vapour_batch_summary": {
+        "n_requested": 15,
+        "n_flux_active": 12,
+        "n_refused": 3,
+        "solve_bundle_ids": {
+          "bundle:2:Cr+CrO2": [
+            "Cr",
+            "CrO2"
+          ],
+          "bundle:8:Si+SiO": [
+            "Si",
+            "SiO"
+          ],
+          "metals_al_family": [
+            "Al"
+          ],
+          "metals_ca_family": [
+            "Ca"
+          ],
+          "metals_fe_family": [
+            "Fe"
+          ],
+          "metals_k_family": [
+            "K"
+          ],
+          "metals_mg_family": [
+            "Mg"
+          ],
+          "metals_mn_family": [
+            "Mn"
+          ],
+          "metals_na_family": [
+            "Na"
+          ],
+          "metals_ti_family": [
+            "Ti"
+          ]
+        },
+        "metadata": {
+          "refusal_closure_fixed_point": true,
+          "refusal_closure_iterations": 2,
+          "n_requested": 15,
+          "n_refused": 3,
+          "n_flux_active": 12,
+          "n_solve_bundles": 10
+        }
+      },
+      "vapour_batch_flux_overlay": {
+        "schema": "vapour_batch_flux_overlay.v1",
+        "batch_present": true,
+        "n_live_pressures": 1,
+        "n_flux_pressures": 1,
+        "live_only_bridge_species": [],
+        "batch_refused_live_species": [],
+        "batch_flux_active_not_in_live": [
+          "Al",
+          "Ca",
+          "Cr",
+          "CrO2",
+          "Fe",
+          "Mg",
+          "Mn",
+          "Na",
+          "Si",
+          "SiO",
+          "Ti"
+        ],
+        "batch_channel_states": {
+          "Al": "eligible",
+          "Ca": "eligible",
+          "Cr": "eligible",
+          "Cr2O3_gas": "refusal",
+          "CrO2": "eligible",
+          "Fe": "eligible",
+          "K": "eligible",
+          "Mg": "eligible",
+          "Mn": "eligible",
+          "MnO_gas": "refusal",
+          "Na": "eligible",
+          "P2O5_gas": "refusal",
+          "Si": "eligible",
+          "SiO": "eligible",
+          "Ti": "eligible"
+        },
+        "dropped_nonfinite_live_species": [],
+        "note": "Active flux consumes VapourBatch channel unions only. Live equilibrium map is the legacy shadow projection, never a fail-open flux fallback.",
+        "selection_source": "vapour_batch_channel_unions",
+        "batch_pa_by_species": {
+          "Al": 2.872352083452649e-16,
+          "Ca": 0.0021768763658305827,
+          "Cr": 7.731563057081587e-09,
+          "CrO2": 8.214904894090882e-21,
+          "Fe": 1.3513300095512318e-05,
+          "K": 0.0002738548481116629,
+          "Mg": 0.05121992117972145,
+          "Mn": 1.364216665479924e-07,
+          "Na": 0.023484763797913054,
+          "Si": 1.0025230472121417e-13,
+          "SiO": 2.6485639808978704e-31,
+          "Ti": 5.707093446290936e-13
+        },
+        "shadow_equal": true,
+        "shadow_outcome": "proved",
+        "detail": "legacy and batch flux paths agree per species",
+        "mismatched_species": [],
+        "missing_in_batch_path": [],
+        "missing_in_legacy_path": [],
+        "catalog_pa_shadow_equal": false,
+        "catalog_pa_shadow_outcome": "mismatch"
       }
     },
     {
@@ -5432,6 +6958,115 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
+      },
+      "vapour_batch_summary": {
+        "n_requested": 15,
+        "n_flux_active": 12,
+        "n_refused": 3,
+        "solve_bundle_ids": {
+          "bundle:2:Cr+CrO2": [
+            "Cr",
+            "CrO2"
+          ],
+          "bundle:8:Si+SiO": [
+            "Si",
+            "SiO"
+          ],
+          "metals_al_family": [
+            "Al"
+          ],
+          "metals_ca_family": [
+            "Ca"
+          ],
+          "metals_fe_family": [
+            "Fe"
+          ],
+          "metals_k_family": [
+            "K"
+          ],
+          "metals_mg_family": [
+            "Mg"
+          ],
+          "metals_mn_family": [
+            "Mn"
+          ],
+          "metals_na_family": [
+            "Na"
+          ],
+          "metals_ti_family": [
+            "Ti"
+          ]
+        },
+        "metadata": {
+          "refusal_closure_fixed_point": true,
+          "refusal_closure_iterations": 2,
+          "n_requested": 15,
+          "n_refused": 3,
+          "n_flux_active": 12,
+          "n_solve_bundles": 10
+        }
+      },
+      "vapour_batch_flux_overlay": {
+        "schema": "vapour_batch_flux_overlay.v1",
+        "batch_present": true,
+        "n_live_pressures": 2,
+        "n_flux_pressures": 2,
+        "live_only_bridge_species": [],
+        "batch_refused_live_species": [],
+        "batch_flux_active_not_in_live": [
+          "Al",
+          "Ca",
+          "Cr",
+          "CrO2",
+          "Fe",
+          "Mg",
+          "Mn",
+          "Si",
+          "SiO",
+          "Ti"
+        ],
+        "batch_channel_states": {
+          "Al": "eligible",
+          "Ca": "eligible",
+          "Cr": "eligible",
+          "Cr2O3_gas": "refusal",
+          "CrO2": "eligible",
+          "Fe": "eligible",
+          "K": "eligible",
+          "Mg": "eligible",
+          "Mn": "eligible",
+          "MnO_gas": "refusal",
+          "Na": "eligible",
+          "P2O5_gas": "refusal",
+          "Si": "eligible",
+          "SiO": "eligible",
+          "Ti": "eligible"
+        },
+        "dropped_nonfinite_live_species": [],
+        "note": "Active flux consumes VapourBatch channel unions only. Live equilibrium map is the legacy shadow projection, never a fail-open flux fallback.",
+        "selection_source": "vapour_batch_channel_unions",
+        "batch_pa_by_species": {
+          "Al": 8.952161694260522e-15,
+          "Ca": 0.008167957576043655,
+          "Cr": 1.6421254418066535e-08,
+          "CrO2": 5.863766745199e-20,
+          "Fe": 2.718321569703441e-05,
+          "K": 0.0012416110639475982,
+          "Mg": 0.8273568085363324,
+          "Mn": 4.1112740876354194e-07,
+          "Na": 0.032784733139752394,
+          "Si": 3.715305859114366e-13,
+          "SiO": 9.935506143950793e-30,
+          "Ti": 1.6528122296446058e-12
+        },
+        "shadow_equal": true,
+        "shadow_outcome": "proved",
+        "detail": "legacy and batch flux paths agree per species",
+        "mismatched_species": [],
+        "missing_in_batch_path": [],
+        "missing_in_legacy_path": [],
+        "catalog_pa_shadow_equal": false,
+        "catalog_pa_shadow_outcome": "mismatch"
       }
     },
     {
@@ -5637,6 +7272,115 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
+      },
+      "vapour_batch_summary": {
+        "n_requested": 15,
+        "n_flux_active": 12,
+        "n_refused": 3,
+        "solve_bundle_ids": {
+          "bundle:2:Cr+CrO2": [
+            "Cr",
+            "CrO2"
+          ],
+          "bundle:8:Si+SiO": [
+            "Si",
+            "SiO"
+          ],
+          "metals_al_family": [
+            "Al"
+          ],
+          "metals_ca_family": [
+            "Ca"
+          ],
+          "metals_fe_family": [
+            "Fe"
+          ],
+          "metals_k_family": [
+            "K"
+          ],
+          "metals_mg_family": [
+            "Mg"
+          ],
+          "metals_mn_family": [
+            "Mn"
+          ],
+          "metals_na_family": [
+            "Na"
+          ],
+          "metals_ti_family": [
+            "Ti"
+          ]
+        },
+        "metadata": {
+          "refusal_closure_fixed_point": true,
+          "refusal_closure_iterations": 2,
+          "n_requested": 15,
+          "n_refused": 3,
+          "n_flux_active": 12,
+          "n_solve_bundles": 10
+        }
+      },
+      "vapour_batch_flux_overlay": {
+        "schema": "vapour_batch_flux_overlay.v1",
+        "batch_present": true,
+        "n_live_pressures": 2,
+        "n_flux_pressures": 2,
+        "live_only_bridge_species": [],
+        "batch_refused_live_species": [],
+        "batch_flux_active_not_in_live": [
+          "Al",
+          "Ca",
+          "Cr",
+          "CrO2",
+          "Fe",
+          "Mg",
+          "Mn",
+          "Si",
+          "SiO",
+          "Ti"
+        ],
+        "batch_channel_states": {
+          "Al": "eligible",
+          "Ca": "eligible",
+          "Cr": "eligible",
+          "Cr2O3_gas": "refusal",
+          "CrO2": "eligible",
+          "Fe": "eligible",
+          "K": "eligible",
+          "Mg": "eligible",
+          "Mn": "eligible",
+          "MnO_gas": "refusal",
+          "Na": "eligible",
+          "P2O5_gas": "refusal",
+          "Si": "eligible",
+          "SiO": "eligible",
+          "Ti": "eligible"
+        },
+        "dropped_nonfinite_live_species": [],
+        "note": "Active flux consumes VapourBatch channel unions only. Live equilibrium map is the legacy shadow projection, never a fail-open flux fallback.",
+        "selection_source": "vapour_batch_channel_unions",
+        "batch_pa_by_species": {
+          "Al": 2.790089678137684e-13,
+          "Ca": 0.03064736794943975,
+          "Cr": 3.4877500794083504e-08,
+          "CrO2": 4.1855335984272297e-19,
+          "Fe": 5.4681477537592315e-05,
+          "K": 0.005629252301892831,
+          "Mg": 4.898255954227101,
+          "Mn": 1.2389948789927897e-06,
+          "Na": 0.045767491480595245,
+          "Si": 1.3768758399275537e-12,
+          "SiO": 3.7270869440359426e-28,
+          "Ti": 4.786654173742612e-12
+        },
+        "shadow_equal": true,
+        "shadow_outcome": "proved",
+        "detail": "legacy and batch flux paths agree per species",
+        "mismatched_species": [],
+        "missing_in_batch_path": [],
+        "missing_in_legacy_path": [],
+        "catalog_pa_shadow_equal": false,
+        "catalog_pa_shadow_outcome": "mismatch"
       }
     },
     {
@@ -5833,6 +7577,115 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
+      },
+      "vapour_batch_summary": {
+        "n_requested": 15,
+        "n_flux_active": 12,
+        "n_refused": 3,
+        "solve_bundle_ids": {
+          "bundle:2:Cr+CrO2": [
+            "Cr",
+            "CrO2"
+          ],
+          "bundle:8:Si+SiO": [
+            "Si",
+            "SiO"
+          ],
+          "metals_al_family": [
+            "Al"
+          ],
+          "metals_ca_family": [
+            "Ca"
+          ],
+          "metals_fe_family": [
+            "Fe"
+          ],
+          "metals_k_family": [
+            "K"
+          ],
+          "metals_mg_family": [
+            "Mg"
+          ],
+          "metals_mn_family": [
+            "Mn"
+          ],
+          "metals_na_family": [
+            "Na"
+          ],
+          "metals_ti_family": [
+            "Ti"
+          ]
+        },
+        "metadata": {
+          "refusal_closure_fixed_point": true,
+          "refusal_closure_iterations": 2,
+          "n_requested": 15,
+          "n_refused": 3,
+          "n_flux_active": 12,
+          "n_solve_bundles": 10
+        }
+      },
+      "vapour_batch_flux_overlay": {
+        "schema": "vapour_batch_flux_overlay.v1",
+        "batch_present": true,
+        "n_live_pressures": 2,
+        "n_flux_pressures": 2,
+        "live_only_bridge_species": [],
+        "batch_refused_live_species": [],
+        "batch_flux_active_not_in_live": [
+          "Al",
+          "Ca",
+          "Cr",
+          "CrO2",
+          "Fe",
+          "Mg",
+          "Mn",
+          "Si",
+          "SiO",
+          "Ti"
+        ],
+        "batch_channel_states": {
+          "Al": "eligible",
+          "Ca": "eligible",
+          "Cr": "eligible",
+          "Cr2O3_gas": "refusal",
+          "CrO2": "eligible",
+          "Fe": "eligible",
+          "K": "eligible",
+          "Mg": "eligible",
+          "Mn": "eligible",
+          "MnO_gas": "refusal",
+          "Na": "eligible",
+          "P2O5_gas": "refusal",
+          "Si": "eligible",
+          "SiO": "eligible",
+          "Ti": "eligible"
+        },
+        "dropped_nonfinite_live_species": [],
+        "note": "Active flux consumes VapourBatch channel unions only. Live equilibrium map is the legacy shadow projection, never a fail-open flux fallback.",
+        "selection_source": "vapour_batch_channel_unions",
+        "batch_pa_by_species": {
+          "Al": 8.695777263542281e-12,
+          "Ca": 0.11499339381771108,
+          "Cr": 7.407717039588507e-08,
+          "CrO2": 2.9876173908020383e-18,
+          "Fe": 0.00010999669866212355,
+          "K": 0.02552206757695511,
+          "Mg": 21.409582362581645,
+          "Mn": 3.7338992182184357e-06,
+          "Na": 0.06389142371534272,
+          "Si": 5.102640672033719e-12,
+          "SiO": 1.3981348194184136e-26,
+          "Ti": 1.3862468929053307e-11
+        },
+        "shadow_equal": true,
+        "shadow_outcome": "proved",
+        "detail": "legacy and batch flux paths agree per species",
+        "mismatched_species": [],
+        "missing_in_batch_path": [],
+        "missing_in_legacy_path": [],
+        "catalog_pa_shadow_equal": false,
+        "catalog_pa_shadow_outcome": "mismatch"
       }
     },
     {
@@ -6038,6 +7891,115 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
+      },
+      "vapour_batch_summary": {
+        "n_requested": 15,
+        "n_flux_active": 12,
+        "n_refused": 3,
+        "solve_bundle_ids": {
+          "bundle:2:Cr+CrO2": [
+            "Cr",
+            "CrO2"
+          ],
+          "bundle:8:Si+SiO": [
+            "Si",
+            "SiO"
+          ],
+          "metals_al_family": [
+            "Al"
+          ],
+          "metals_ca_family": [
+            "Ca"
+          ],
+          "metals_fe_family": [
+            "Fe"
+          ],
+          "metals_k_family": [
+            "K"
+          ],
+          "metals_mg_family": [
+            "Mg"
+          ],
+          "metals_mn_family": [
+            "Mn"
+          ],
+          "metals_na_family": [
+            "Na"
+          ],
+          "metals_ti_family": [
+            "Ti"
+          ]
+        },
+        "metadata": {
+          "refusal_closure_fixed_point": true,
+          "refusal_closure_iterations": 2,
+          "n_requested": 15,
+          "n_refused": 3,
+          "n_flux_active": 12,
+          "n_solve_bundles": 10
+        }
+      },
+      "vapour_batch_flux_overlay": {
+        "schema": "vapour_batch_flux_overlay.v1",
+        "batch_present": true,
+        "n_live_pressures": 2,
+        "n_flux_pressures": 2,
+        "live_only_bridge_species": [],
+        "batch_refused_live_species": [],
+        "batch_flux_active_not_in_live": [
+          "Al",
+          "Ca",
+          "Cr",
+          "CrO2",
+          "Fe",
+          "Mg",
+          "Mn",
+          "Si",
+          "SiO",
+          "Ti"
+        ],
+        "batch_channel_states": {
+          "Al": "eligible",
+          "Ca": "eligible",
+          "Cr": "eligible",
+          "Cr2O3_gas": "refusal",
+          "CrO2": "eligible",
+          "Fe": "eligible",
+          "K": "eligible",
+          "Mg": "eligible",
+          "Mn": "eligible",
+          "MnO_gas": "refusal",
+          "Na": "eligible",
+          "P2O5_gas": "refusal",
+          "Si": "eligible",
+          "SiO": "eligible",
+          "Ti": "eligible"
+        },
+        "dropped_nonfinite_live_species": [],
+        "note": "Active flux consumes VapourBatch channel unions only. Live equilibrium map is the legacy shadow projection, never a fail-open flux fallback.",
+        "selection_source": "vapour_batch_channel_unions",
+        "batch_pa_by_species": {
+          "Al": 2.7101832177527375e-10,
+          "Ca": 0.43147198296214384,
+          "Cr": 1.573343000193368e-07,
+          "CrO2": 2.132549521804529e-17,
+          "Fe": 0.0002212682294154918,
+          "K": 0.1157126912189808,
+          "Mg": 76.61353086816216,
+          "Mn": 1.1252672313824292e-05,
+          "Na": 0.08919243533598989,
+          "Si": 1.8910159560402035e-11,
+          "SiO": 5.244795741613129e-25,
+          "Ti": 4.0146632247450265e-11
+        },
+        "shadow_equal": true,
+        "shadow_outcome": "proved",
+        "detail": "legacy and batch flux paths agree per species",
+        "mismatched_species": [],
+        "missing_in_batch_path": [],
+        "missing_in_legacy_path": [],
+        "catalog_pa_shadow_equal": false,
+        "catalog_pa_shadow_outcome": "mismatch"
       }
     },
     {
@@ -6234,6 +8196,115 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
+      },
+      "vapour_batch_summary": {
+        "n_requested": 15,
+        "n_flux_active": 12,
+        "n_refused": 3,
+        "solve_bundle_ids": {
+          "bundle:2:Cr+CrO2": [
+            "Cr",
+            "CrO2"
+          ],
+          "bundle:8:Si+SiO": [
+            "Si",
+            "SiO"
+          ],
+          "metals_al_family": [
+            "Al"
+          ],
+          "metals_ca_family": [
+            "Ca"
+          ],
+          "metals_fe_family": [
+            "Fe"
+          ],
+          "metals_k_family": [
+            "K"
+          ],
+          "metals_mg_family": [
+            "Mg"
+          ],
+          "metals_mn_family": [
+            "Mn"
+          ],
+          "metals_na_family": [
+            "Na"
+          ],
+          "metals_ti_family": [
+            "Ti"
+          ]
+        },
+        "metadata": {
+          "refusal_closure_fixed_point": true,
+          "refusal_closure_iterations": 2,
+          "n_requested": 15,
+          "n_refused": 3,
+          "n_flux_active": 12,
+          "n_solve_bundles": 10
+        }
+      },
+      "vapour_batch_flux_overlay": {
+        "schema": "vapour_batch_flux_overlay.v1",
+        "batch_present": true,
+        "n_live_pressures": 2,
+        "n_flux_pressures": 2,
+        "live_only_bridge_species": [],
+        "batch_refused_live_species": [],
+        "batch_flux_active_not_in_live": [
+          "Al",
+          "Ca",
+          "Cr",
+          "CrO2",
+          "Fe",
+          "Mg",
+          "Mn",
+          "Si",
+          "SiO",
+          "Ti"
+        ],
+        "batch_channel_states": {
+          "Al": "eligible",
+          "Ca": "eligible",
+          "Cr": "eligible",
+          "Cr2O3_gas": "refusal",
+          "CrO2": "eligible",
+          "Fe": "eligible",
+          "K": "eligible",
+          "Mg": "eligible",
+          "Mn": "eligible",
+          "MnO_gas": "refusal",
+          "Na": "eligible",
+          "P2O5_gas": "refusal",
+          "Si": "eligible",
+          "SiO": "eligible",
+          "Ti": "eligible"
+        },
+        "dropped_nonfinite_live_species": [],
+        "note": "Active flux consumes VapourBatch channel unions only. Live equilibrium map is the legacy shadow projection, never a fail-open flux fallback.",
+        "selection_source": "vapour_batch_channel_unions",
+        "batch_pa_by_species": {
+          "Al": 8.446735525970084e-09,
+          "Ca": 1.6189458011509794,
+          "Cr": 3.3416613823507705e-07,
+          "CrO2": 1.52220544603533e-16,
+          "Fe": 0.0004451008979738185,
+          "K": 0.5246215600976247,
+          "Mg": 233.17510954736403,
+          "Mn": 3.3911636817750945e-05,
+          "Na": 0.12451265065884533,
+          "Si": 7.008021093073414e-11,
+          "SiO": 1.9674699456155432e-23,
+          "Ti": 1.1626731782489841e-10
+        },
+        "shadow_equal": true,
+        "shadow_outcome": "proved",
+        "detail": "legacy and batch flux paths agree per species",
+        "mismatched_species": [],
+        "missing_in_batch_path": [],
+        "missing_in_legacy_path": [],
+        "catalog_pa_shadow_equal": false,
+        "catalog_pa_shadow_outcome": "mismatch"
       }
     },
     {
@@ -6439,6 +8510,115 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
+      },
+      "vapour_batch_summary": {
+        "n_requested": 15,
+        "n_flux_active": 12,
+        "n_refused": 3,
+        "solve_bundle_ids": {
+          "bundle:2:Cr+CrO2": [
+            "Cr",
+            "CrO2"
+          ],
+          "bundle:8:Si+SiO": [
+            "Si",
+            "SiO"
+          ],
+          "metals_al_family": [
+            "Al"
+          ],
+          "metals_ca_family": [
+            "Ca"
+          ],
+          "metals_fe_family": [
+            "Fe"
+          ],
+          "metals_k_family": [
+            "K"
+          ],
+          "metals_mg_family": [
+            "Mg"
+          ],
+          "metals_mn_family": [
+            "Mn"
+          ],
+          "metals_na_family": [
+            "Na"
+          ],
+          "metals_ti_family": [
+            "Ti"
+          ]
+        },
+        "metadata": {
+          "refusal_closure_fixed_point": true,
+          "refusal_closure_iterations": 2,
+          "n_requested": 15,
+          "n_refused": 3,
+          "n_flux_active": 12,
+          "n_solve_bundles": 10
+        }
+      },
+      "vapour_batch_flux_overlay": {
+        "schema": "vapour_batch_flux_overlay.v1",
+        "batch_present": true,
+        "n_live_pressures": 2,
+        "n_flux_pressures": 2,
+        "live_only_bridge_species": [],
+        "batch_refused_live_species": [],
+        "batch_flux_active_not_in_live": [
+          "Al",
+          "Ca",
+          "Cr",
+          "CrO2",
+          "Fe",
+          "Mg",
+          "Mn",
+          "Si",
+          "SiO",
+          "Ti"
+        ],
+        "batch_channel_states": {
+          "Al": "eligible",
+          "Ca": "eligible",
+          "Cr": "eligible",
+          "Cr2O3_gas": "refusal",
+          "CrO2": "eligible",
+          "Fe": "eligible",
+          "K": "eligible",
+          "Mg": "eligible",
+          "Mn": "eligible",
+          "MnO_gas": "refusal",
+          "Na": "eligible",
+          "P2O5_gas": "refusal",
+          "Si": "eligible",
+          "SiO": "eligible",
+          "Ti": "eligible"
+        },
+        "dropped_nonfinite_live_species": [],
+        "note": "Active flux consumes VapourBatch channel unions only. Live equilibrium map is the legacy shadow projection, never a fail-open flux fallback.",
+        "selection_source": "vapour_batch_channel_unions",
+        "batch_pa_by_species": {
+          "Al": 1.839731605033208e-07,
+          "Ca": 6.074520734975148,
+          "Cr": 7.09743571040901e-07,
+          "CrO2": 1.0865442496167253e-15,
+          "Fe": 0.000895360395391806,
+          "K": 2.378544465778694,
+          "Mg": 621.3477221379508,
+          "Mn": 0.00010219786727871084,
+          "Na": 0.17381967557775513,
+          "Si": 2.597141472238193e-10,
+          "SiO": 7.380531440314627e-22,
+          "Ti": 3.367178873404598e-10
+        },
+        "shadow_equal": true,
+        "shadow_outcome": "proved",
+        "detail": "legacy and batch flux paths agree per species",
+        "mismatched_species": [],
+        "missing_in_batch_path": [],
+        "missing_in_legacy_path": [],
+        "catalog_pa_shadow_equal": false,
+        "catalog_pa_shadow_outcome": "mismatch"
       }
     },
     {
@@ -6635,6 +8815,115 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
+      },
+      "vapour_batch_summary": {
+        "n_requested": 15,
+        "n_flux_active": 12,
+        "n_refused": 3,
+        "solve_bundle_ids": {
+          "bundle:2:Cr+CrO2": [
+            "Cr",
+            "CrO2"
+          ],
+          "bundle:8:Si+SiO": [
+            "Si",
+            "SiO"
+          ],
+          "metals_al_family": [
+            "Al"
+          ],
+          "metals_ca_family": [
+            "Ca"
+          ],
+          "metals_fe_family": [
+            "Fe"
+          ],
+          "metals_k_family": [
+            "K"
+          ],
+          "metals_mg_family": [
+            "Mg"
+          ],
+          "metals_mn_family": [
+            "Mn"
+          ],
+          "metals_na_family": [
+            "Na"
+          ],
+          "metals_ti_family": [
+            "Ti"
+          ]
+        },
+        "metadata": {
+          "refusal_closure_fixed_point": true,
+          "refusal_closure_iterations": 2,
+          "n_requested": 15,
+          "n_refused": 3,
+          "n_flux_active": 12,
+          "n_solve_bundles": 10
+        }
+      },
+      "vapour_batch_flux_overlay": {
+        "schema": "vapour_batch_flux_overlay.v1",
+        "batch_present": true,
+        "n_live_pressures": 2,
+        "n_flux_pressures": 2,
+        "live_only_bridge_species": [],
+        "batch_refused_live_species": [],
+        "batch_flux_active_not_in_live": [
+          "Al",
+          "Ca",
+          "Cr",
+          "CrO2",
+          "Fe",
+          "Mg",
+          "Mn",
+          "Si",
+          "SiO",
+          "Ti"
+        ],
+        "batch_channel_states": {
+          "Al": "eligible",
+          "Ca": "eligible",
+          "Cr": "eligible",
+          "Cr2O3_gas": "refusal",
+          "CrO2": "eligible",
+          "Fe": "eligible",
+          "K": "eligible",
+          "Mg": "eligible",
+          "Mn": "eligible",
+          "MnO_gas": "refusal",
+          "Na": "eligible",
+          "P2O5_gas": "refusal",
+          "Si": "eligible",
+          "SiO": "eligible",
+          "Ti": "eligible"
+        },
+        "dropped_nonfinite_live_species": [],
+        "note": "Active flux consumes VapourBatch channel unions only. Live equilibrium map is the legacy shadow projection, never a fail-open flux fallback.",
+        "selection_source": "vapour_batch_channel_unions",
+        "batch_pa_by_species": {
+          "Al": 1.5165667981893348e-06,
+          "Ca": 22.792487638196008,
+          "Cr": 1.5074415956518183e-06,
+          "CrO2": 7.755710041966153e-15,
+          "Fe": 0.001801097776449165,
+          "K": 10.783913979123712,
+          "Mg": 1482.5878942216211,
+          "Mn": 0.0003079887925330088,
+          "Na": 0.24265228840672573,
+          "Si": 9.624890874666973e-10,
+          "SiO": 2.7686442917647975e-20,
+          "Ti": 9.751574025795892e-10
+        },
+        "shadow_equal": true,
+        "shadow_outcome": "proved",
+        "detail": "legacy and batch flux paths agree per species",
+        "mismatched_species": [],
+        "missing_in_batch_path": [],
+        "missing_in_legacy_path": [],
+        "catalog_pa_shadow_equal": false,
+        "catalog_pa_shadow_outcome": "mismatch"
       }
     },
     {
@@ -6840,6 +9129,114 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
+      },
+      "vapour_batch_summary": {
+        "n_requested": 15,
+        "n_flux_active": 12,
+        "n_refused": 3,
+        "solve_bundle_ids": {
+          "bundle:2:Cr+CrO2": [
+            "Cr",
+            "CrO2"
+          ],
+          "bundle:8:Si+SiO": [
+            "Si",
+            "SiO"
+          ],
+          "metals_al_family": [
+            "Al"
+          ],
+          "metals_ca_family": [
+            "Ca"
+          ],
+          "metals_fe_family": [
+            "Fe"
+          ],
+          "metals_k_family": [
+            "K"
+          ],
+          "metals_mg_family": [
+            "Mg"
+          ],
+          "metals_mn_family": [
+            "Mn"
+          ],
+          "metals_na_family": [
+            "Na"
+          ],
+          "metals_ti_family": [
+            "Ti"
+          ]
+        },
+        "metadata": {
+          "refusal_closure_fixed_point": true,
+          "refusal_closure_iterations": 2,
+          "n_requested": 15,
+          "n_refused": 3,
+          "n_flux_active": 12,
+          "n_solve_bundles": 10
+        }
+      },
+      "vapour_batch_flux_overlay": {
+        "schema": "vapour_batch_flux_overlay.v1",
+        "batch_present": true,
+        "n_live_pressures": 3,
+        "n_flux_pressures": 3,
+        "live_only_bridge_species": [],
+        "batch_refused_live_species": [],
+        "batch_flux_active_not_in_live": [
+          "Al",
+          "Ca",
+          "Cr",
+          "CrO2",
+          "Mg",
+          "Mn",
+          "Si",
+          "SiO",
+          "Ti"
+        ],
+        "batch_channel_states": {
+          "Al": "eligible",
+          "Ca": "eligible",
+          "Cr": "eligible",
+          "Cr2O3_gas": "refusal",
+          "CrO2": "eligible",
+          "Fe": "eligible",
+          "K": "eligible",
+          "Mg": "eligible",
+          "Mn": "eligible",
+          "MnO_gas": "refusal",
+          "Na": "eligible",
+          "P2O5_gas": "refusal",
+          "Si": "eligible",
+          "SiO": "eligible",
+          "Ti": "eligible"
+        },
+        "dropped_nonfinite_live_species": [],
+        "note": "Active flux consumes VapourBatch channel unions only. Live equilibrium map is the legacy shadow projection, never a fail-open flux fallback.",
+        "selection_source": "vapour_batch_channel_unions",
+        "batch_pa_by_species": {
+          "Al": 1.0222716834295493e-05,
+          "Ca": 85.52073742150866,
+          "Cr": 3.2016917898511647e-06,
+          "CrO2": 5.5359952690627136e-14,
+          "Fe": 0.003623069790696504,
+          "K": 48.89242239626061,
+          "Mg": 3224.1481604727373,
+          "Mn": 0.0009281709966339045,
+          "Na": 0.3387426243508428,
+          "Si": 3.566941783475989e-09,
+          "SiO": 1.0385961060271684e-18,
+          "Ti": 2.8241207121980766e-09
+        },
+        "shadow_equal": true,
+        "shadow_outcome": "proved",
+        "detail": "legacy and batch flux paths agree per species",
+        "mismatched_species": [],
+        "missing_in_batch_path": [],
+        "missing_in_legacy_path": [],
+        "catalog_pa_shadow_equal": false,
+        "catalog_pa_shadow_outcome": "mismatch"
       }
     },
     {
@@ -7036,6 +9433,113 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
+      },
+      "vapour_batch_summary": {
+        "n_requested": 15,
+        "n_flux_active": 12,
+        "n_refused": 3,
+        "solve_bundle_ids": {
+          "bundle:2:Cr+CrO2": [
+            "Cr",
+            "CrO2"
+          ],
+          "bundle:8:Si+SiO": [
+            "Si",
+            "SiO"
+          ],
+          "metals_al_family": [
+            "Al"
+          ],
+          "metals_ca_family": [
+            "Ca"
+          ],
+          "metals_fe_family": [
+            "Fe"
+          ],
+          "metals_k_family": [
+            "K"
+          ],
+          "metals_mg_family": [
+            "Mg"
+          ],
+          "metals_mn_family": [
+            "Mn"
+          ],
+          "metals_na_family": [
+            "Na"
+          ],
+          "metals_ti_family": [
+            "Ti"
+          ]
+        },
+        "metadata": {
+          "refusal_closure_fixed_point": true,
+          "refusal_closure_iterations": 2,
+          "n_requested": 15,
+          "n_refused": 3,
+          "n_flux_active": 12,
+          "n_solve_bundles": 10
+        }
+      },
+      "vapour_batch_flux_overlay": {
+        "schema": "vapour_batch_flux_overlay.v1",
+        "batch_present": true,
+        "n_live_pressures": 4,
+        "n_flux_pressures": 4,
+        "live_only_bridge_species": [],
+        "batch_refused_live_species": [],
+        "batch_flux_active_not_in_live": [
+          "Al",
+          "Ca",
+          "Cr",
+          "CrO2",
+          "Mg",
+          "Si",
+          "SiO",
+          "Ti"
+        ],
+        "batch_channel_states": {
+          "Al": "eligible",
+          "Ca": "eligible",
+          "Cr": "eligible",
+          "Cr2O3_gas": "refusal",
+          "CrO2": "eligible",
+          "Fe": "eligible",
+          "K": "eligible",
+          "Mg": "eligible",
+          "Mn": "eligible",
+          "MnO_gas": "refusal",
+          "Na": "eligible",
+          "P2O5_gas": "refusal",
+          "Si": "eligible",
+          "SiO": "eligible",
+          "Ti": "eligible"
+        },
+        "dropped_nonfinite_live_species": [],
+        "note": "Active flux consumes VapourBatch channel unions only. Live equilibrium map is the legacy shadow projection, never a fail-open flux fallback.",
+        "selection_source": "vapour_batch_channel_unions",
+        "batch_pa_by_species": {
+          "Al": 5.7917179406341415e-05,
+          "Ca": 320.88627819905145,
+          "Cr": 6.800150895907773e-06,
+          "CrO2": 3.9515716102397277e-13,
+          "Fe": 0.0072881299837794095,
+          "K": 221.6698846450374,
+          "Mg": 6480.9578476648385,
+          "Mn": 0.002797184247865266,
+          "Na": 0.4728847451039146,
+          "Si": 1.3218927728515256e-08,
+          "SiO": 3.8960652138061824e-17,
+          "Ti": 8.178841462894215e-09
+        },
+        "shadow_equal": true,
+        "shadow_outcome": "proved",
+        "detail": "legacy and batch flux paths agree per species",
+        "mismatched_species": [],
+        "missing_in_batch_path": [],
+        "missing_in_legacy_path": [],
+        "catalog_pa_shadow_equal": false,
+        "catalog_pa_shadow_outcome": "mismatch"
       }
     },
     {
@@ -7241,6 +9745,112 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
+      },
+      "vapour_batch_summary": {
+        "n_requested": 15,
+        "n_flux_active": 12,
+        "n_refused": 3,
+        "solve_bundle_ids": {
+          "bundle:2:Cr+CrO2": [
+            "Cr",
+            "CrO2"
+          ],
+          "bundle:8:Si+SiO": [
+            "Si",
+            "SiO"
+          ],
+          "metals_al_family": [
+            "Al"
+          ],
+          "metals_ca_family": [
+            "Ca"
+          ],
+          "metals_fe_family": [
+            "Fe"
+          ],
+          "metals_k_family": [
+            "K"
+          ],
+          "metals_mg_family": [
+            "Mg"
+          ],
+          "metals_mn_family": [
+            "Mn"
+          ],
+          "metals_na_family": [
+            "Na"
+          ],
+          "metals_ti_family": [
+            "Ti"
+          ]
+        },
+        "metadata": {
+          "refusal_closure_fixed_point": true,
+          "refusal_closure_iterations": 2,
+          "n_requested": 15,
+          "n_refused": 3,
+          "n_flux_active": 12,
+          "n_solve_bundles": 10
+        }
+      },
+      "vapour_batch_flux_overlay": {
+        "schema": "vapour_batch_flux_overlay.v1",
+        "batch_present": true,
+        "n_live_pressures": 5,
+        "n_flux_pressures": 5,
+        "live_only_bridge_species": [],
+        "batch_refused_live_species": [],
+        "batch_flux_active_not_in_live": [
+          "Al",
+          "Ca",
+          "Cr",
+          "CrO2",
+          "Si",
+          "SiO",
+          "Ti"
+        ],
+        "batch_channel_states": {
+          "Al": "eligible",
+          "Ca": "eligible",
+          "Cr": "eligible",
+          "Cr2O3_gas": "refusal",
+          "CrO2": "eligible",
+          "Fe": "eligible",
+          "K": "eligible",
+          "Mg": "eligible",
+          "Mn": "eligible",
+          "MnO_gas": "refusal",
+          "Na": "eligible",
+          "P2O5_gas": "refusal",
+          "Si": "eligible",
+          "SiO": "eligible",
+          "Ti": "eligible"
+        },
+        "dropped_nonfinite_live_species": [],
+        "note": "Active flux consumes VapourBatch channel unions only. Live equilibrium map is the legacy shadow projection, never a fail-open flux fallback.",
+        "selection_source": "vapour_batch_channel_unions",
+        "batch_pa_by_species": {
+          "Al": 0.0002821263912972866,
+          "Ca": 883.8945789578421,
+          "Cr": 1.4443005524046683e-05,
+          "CrO2": 2.8206162454861206e-12,
+          "Fe": 0.014660727429778057,
+          "K": 1005.013360972319,
+          "Mg": 12179.623956347488,
+          "Mn": 0.008429739503691532,
+          "Na": 0.6601471621132229,
+          "Si": 4.898875868992309e-08,
+          "SiO": 1.461523306523316e-15,
+          "Ti": 2.36864689905881e-08
+        },
+        "shadow_equal": true,
+        "shadow_outcome": "proved",
+        "detail": "legacy and batch flux paths agree per species",
+        "mismatched_species": [],
+        "missing_in_batch_path": [],
+        "missing_in_legacy_path": [],
+        "catalog_pa_shadow_equal": false,
+        "catalog_pa_shadow_outcome": "mismatch"
       }
     },
     {
@@ -7437,6 +10047,112 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
+      },
+      "vapour_batch_summary": {
+        "n_requested": 15,
+        "n_flux_active": 12,
+        "n_refused": 3,
+        "solve_bundle_ids": {
+          "bundle:2:Cr+CrO2": [
+            "Cr",
+            "CrO2"
+          ],
+          "bundle:8:Si+SiO": [
+            "Si",
+            "SiO"
+          ],
+          "metals_al_family": [
+            "Al"
+          ],
+          "metals_ca_family": [
+            "Ca"
+          ],
+          "metals_fe_family": [
+            "Fe"
+          ],
+          "metals_k_family": [
+            "K"
+          ],
+          "metals_mg_family": [
+            "Mg"
+          ],
+          "metals_mn_family": [
+            "Mn"
+          ],
+          "metals_na_family": [
+            "Na"
+          ],
+          "metals_ti_family": [
+            "Ti"
+          ]
+        },
+        "metadata": {
+          "refusal_closure_fixed_point": true,
+          "refusal_closure_iterations": 2,
+          "n_requested": 15,
+          "n_refused": 3,
+          "n_flux_active": 12,
+          "n_solve_bundles": 10
+        }
+      },
+      "vapour_batch_flux_overlay": {
+        "schema": "vapour_batch_flux_overlay.v1",
+        "batch_present": true,
+        "n_live_pressures": 5,
+        "n_flux_pressures": 5,
+        "live_only_bridge_species": [],
+        "batch_refused_live_species": [],
+        "batch_flux_active_not_in_live": [
+          "Al",
+          "Ca",
+          "Cr",
+          "CrO2",
+          "Si",
+          "SiO",
+          "Ti"
+        ],
+        "batch_channel_states": {
+          "Al": "eligible",
+          "Ca": "eligible",
+          "Cr": "eligible",
+          "Cr2O3_gas": "refusal",
+          "CrO2": "eligible",
+          "Fe": "eligible",
+          "K": "eligible",
+          "Mg": "eligible",
+          "Mn": "eligible",
+          "MnO_gas": "refusal",
+          "Na": "eligible",
+          "P2O5_gas": "refusal",
+          "Si": "eligible",
+          "SiO": "eligible",
+          "Ti": "eligible"
+        },
+        "dropped_nonfinite_live_species": [],
+        "note": "Active flux consumes VapourBatch channel unions only. Live equilibrium map is the legacy shadow projection, never a fail-open flux fallback.",
+        "selection_source": "vapour_batch_channel_unions",
+        "batch_pa_by_species": {
+          "Al": 0.0012041719868070883,
+          "Ca": 1960.7274391433957,
+          "Cr": 3.06758499569731e-05,
+          "CrO2": 2.0133447622925814e-11,
+          "Fe": 0.029491368739116106,
+          "K": 4192.093940023404,
+          "Mg": 21598.873712350465,
+          "Mn": 0.025404300111560037,
+          "Na": 0.9215655192056945,
+          "Si": 1.815501625599001e-07,
+          "SiO": 5.4825837307381094e-14,
+          "Ti": 6.859758998722023e-08
+        },
+        "shadow_equal": true,
+        "shadow_outcome": "proved",
+        "detail": "legacy and batch flux paths agree per species",
+        "mismatched_species": [],
+        "missing_in_batch_path": [],
+        "missing_in_legacy_path": [],
+        "catalog_pa_shadow_equal": false,
+        "catalog_pa_shadow_outcome": "mismatch"
       }
     },
     {
@@ -7645,6 +10361,112 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
+      },
+      "vapour_batch_summary": {
+        "n_requested": 15,
+        "n_flux_active": 12,
+        "n_refused": 3,
+        "solve_bundle_ids": {
+          "bundle:2:Cr+CrO2": [
+            "Cr",
+            "CrO2"
+          ],
+          "bundle:8:Si+SiO": [
+            "Si",
+            "SiO"
+          ],
+          "metals_al_family": [
+            "Al"
+          ],
+          "metals_ca_family": [
+            "Ca"
+          ],
+          "metals_fe_family": [
+            "Fe"
+          ],
+          "metals_k_family": [
+            "K"
+          ],
+          "metals_mg_family": [
+            "Mg"
+          ],
+          "metals_mn_family": [
+            "Mn"
+          ],
+          "metals_na_family": [
+            "Na"
+          ],
+          "metals_ti_family": [
+            "Ti"
+          ]
+        },
+        "metadata": {
+          "refusal_closure_fixed_point": true,
+          "refusal_closure_iterations": 2,
+          "n_requested": 15,
+          "n_refused": 3,
+          "n_flux_active": 12,
+          "n_solve_bundles": 10
+        }
+      },
+      "vapour_batch_flux_overlay": {
+        "schema": "vapour_batch_flux_overlay.v1",
+        "batch_present": true,
+        "n_live_pressures": 5,
+        "n_flux_pressures": 5,
+        "live_only_bridge_species": [],
+        "batch_refused_live_species": [],
+        "batch_flux_active_not_in_live": [
+          "Al",
+          "Ca",
+          "Cr",
+          "CrO2",
+          "Si",
+          "SiO",
+          "Ti"
+        ],
+        "batch_channel_states": {
+          "Al": "eligible",
+          "Ca": "eligible",
+          "Cr": "eligible",
+          "Cr2O3_gas": "refusal",
+          "CrO2": "eligible",
+          "Fe": "eligible",
+          "K": "eligible",
+          "Mg": "eligible",
+          "Mn": "eligible",
+          "MnO_gas": "refusal",
+          "Na": "eligible",
+          "P2O5_gas": "refusal",
+          "Si": "eligible",
+          "SiO": "eligible",
+          "Ti": "eligible"
+        },
+        "dropped_nonfinite_live_species": [],
+        "note": "Active flux consumes VapourBatch channel unions only. Live equilibrium map is the legacy shadow projection, never a fail-open flux fallback.",
+        "selection_source": "vapour_batch_channel_unions",
+        "batch_pa_by_species": {
+          "Al": 0.0023795154758683703,
+          "Ca": 2849.818714994629,
+          "Cr": 4.47060313797147e-05,
+          "CrO2": 5.379045555645445e-11,
+          "Fe": 0.041827762574896316,
+          "K": 6808.609913648744,
+          "Mg": 28212.558117910456,
+          "Mn": 0.044101542004211326,
+          "Na": 1.0888522308891768,
+          "Si": 3.494996503486439e-07,
+          "SiO": 3.357956275662922e-13,
+          "Ti": 1.1673823561757471e-07
+        },
+        "shadow_equal": true,
+        "shadow_outcome": "proved",
+        "detail": "legacy and batch flux paths agree per species",
+        "mismatched_species": [],
+        "missing_in_batch_path": [],
+        "missing_in_legacy_path": [],
+        "catalog_pa_shadow_equal": false,
+        "catalog_pa_shadow_outcome": "mismatch"
       }
     },
     {
@@ -7844,6 +10666,112 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
+      },
+      "vapour_batch_summary": {
+        "n_requested": 15,
+        "n_flux_active": 12,
+        "n_refused": 3,
+        "solve_bundle_ids": {
+          "bundle:2:Cr+CrO2": [
+            "Cr",
+            "CrO2"
+          ],
+          "bundle:8:Si+SiO": [
+            "Si",
+            "SiO"
+          ],
+          "metals_al_family": [
+            "Al"
+          ],
+          "metals_ca_family": [
+            "Ca"
+          ],
+          "metals_fe_family": [
+            "Fe"
+          ],
+          "metals_k_family": [
+            "K"
+          ],
+          "metals_mg_family": [
+            "Mg"
+          ],
+          "metals_mn_family": [
+            "Mn"
+          ],
+          "metals_na_family": [
+            "Na"
+          ],
+          "metals_ti_family": [
+            "Ti"
+          ]
+        },
+        "metadata": {
+          "refusal_closure_fixed_point": true,
+          "refusal_closure_iterations": 2,
+          "n_requested": 15,
+          "n_refused": 3,
+          "n_flux_active": 12,
+          "n_solve_bundles": 10
+        }
+      },
+      "vapour_batch_flux_overlay": {
+        "schema": "vapour_batch_flux_overlay.v1",
+        "batch_present": true,
+        "n_live_pressures": 5,
+        "n_flux_pressures": 5,
+        "live_only_bridge_species": [],
+        "batch_refused_live_species": [],
+        "batch_flux_active_not_in_live": [
+          "Al",
+          "Ca",
+          "Cr",
+          "CrO2",
+          "Si",
+          "SiO",
+          "Ti"
+        ],
+        "batch_channel_states": {
+          "Al": "eligible",
+          "Ca": "eligible",
+          "Cr": "eligible",
+          "Cr2O3_gas": "refusal",
+          "CrO2": "eligible",
+          "Fe": "eligible",
+          "K": "eligible",
+          "Mg": "eligible",
+          "Mn": "eligible",
+          "MnO_gas": "refusal",
+          "Na": "eligible",
+          "P2O5_gas": "refusal",
+          "Si": "eligible",
+          "SiO": "eligible",
+          "Ti": "eligible"
+        },
+        "dropped_nonfinite_live_species": [],
+        "note": "Active flux consumes VapourBatch channel unions only. Live equilibrium map is the legacy shadow projection, never a fail-open flux fallback.",
+        "selection_source": "vapour_batch_channel_unions",
+        "batch_pa_by_species": {
+          "Al": 0.0025350656177334343,
+          "Ca": 2950.6360352507854,
+          "Cr": 4.633623412512288e-05,
+          "CrO2": 3.2348272736959647e-09,
+          "Fe": 0.04324114141178259,
+          "K": 130.02595237106684,
+          "Mg": 28920.35456922855,
+          "Mn": 0.046476499815572524,
+          "Na": 1.1062616940421608,
+          "Si": 3.719602074888719e-07,
+          "SiO": 1.3298478438073994e-16,
+          "Ti": 1.2279224180442222e-07
+        },
+        "shadow_equal": true,
+        "shadow_outcome": "proved",
+        "detail": "legacy and batch flux paths agree per species",
+        "mismatched_species": [],
+        "missing_in_batch_path": [],
+        "missing_in_legacy_path": [],
+        "catalog_pa_shadow_equal": false,
+        "catalog_pa_shadow_outcome": "mismatch"
       }
     },
     {
@@ -8050,6 +10978,111 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
+      },
+      "vapour_batch_summary": {
+        "n_requested": 15,
+        "n_flux_active": 12,
+        "n_refused": 3,
+        "solve_bundle_ids": {
+          "bundle:2:Cr+CrO2": [
+            "Cr",
+            "CrO2"
+          ],
+          "bundle:8:Si+SiO": [
+            "Si",
+            "SiO"
+          ],
+          "metals_al_family": [
+            "Al"
+          ],
+          "metals_ca_family": [
+            "Ca"
+          ],
+          "metals_fe_family": [
+            "Fe"
+          ],
+          "metals_k_family": [
+            "K"
+          ],
+          "metals_mg_family": [
+            "Mg"
+          ],
+          "metals_mn_family": [
+            "Mn"
+          ],
+          "metals_na_family": [
+            "Na"
+          ],
+          "metals_ti_family": [
+            "Ti"
+          ]
+        },
+        "metadata": {
+          "refusal_closure_fixed_point": true,
+          "refusal_closure_iterations": 2,
+          "n_requested": 15,
+          "n_refused": 3,
+          "n_flux_active": 12,
+          "n_solve_bundles": 10
+        }
+      },
+      "vapour_batch_flux_overlay": {
+        "schema": "vapour_batch_flux_overlay.v1",
+        "batch_present": true,
+        "n_live_pressures": 6,
+        "n_flux_pressures": 6,
+        "live_only_bridge_species": [],
+        "batch_refused_live_species": [],
+        "batch_flux_active_not_in_live": [
+          "Al",
+          "Ca",
+          "CrO2",
+          "Si",
+          "SiO",
+          "Ti"
+        ],
+        "batch_channel_states": {
+          "Al": "eligible",
+          "Ca": "eligible",
+          "Cr": "eligible",
+          "Cr2O3_gas": "refusal",
+          "CrO2": "eligible",
+          "Fe": "eligible",
+          "K": "eligible",
+          "Mg": "eligible",
+          "Mn": "eligible",
+          "MnO_gas": "refusal",
+          "Na": "eligible",
+          "P2O5_gas": "refusal",
+          "Si": "eligible",
+          "SiO": "eligible",
+          "Ti": "eligible"
+        },
+        "dropped_nonfinite_live_species": [],
+        "note": "Active flux consumes VapourBatch channel unions only. Live equilibrium map is the legacy shadow projection, never a fail-open flux fallback.",
+        "selection_source": "vapour_batch_channel_unions",
+        "batch_pa_by_species": {
+          "Al": 0.0055216707111440935,
+          "Ca": 4524.065707000757,
+          "Cr": 7.281219962053426e-05,
+          "CrO2": 1.0519511770365565e-08,
+          "Fe": 0.06576893284622858,
+          "K": 225.66297948915297,
+          "Mg": 39188.41098333167,
+          "Mn": 0.09009262930317413,
+          "Na": 1.351416286233433,
+          "Si": 8.162752065329924e-07,
+          "SiO": 1.170333590218575e-15,
+          "Ti": 2.324106625315551e-07
+        },
+        "shadow_equal": true,
+        "shadow_outcome": "proved",
+        "detail": "legacy and batch flux paths agree per species",
+        "mismatched_species": [],
+        "missing_in_batch_path": [],
+        "missing_in_legacy_path": [],
+        "catalog_pa_shadow_equal": false,
+        "catalog_pa_shadow_outcome": "mismatch"
       }
     },
     {
@@ -8249,6 +11282,111 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
+      },
+      "vapour_batch_summary": {
+        "n_requested": 15,
+        "n_flux_active": 12,
+        "n_refused": 3,
+        "solve_bundle_ids": {
+          "bundle:2:Cr+CrO2": [
+            "Cr",
+            "CrO2"
+          ],
+          "bundle:8:Si+SiO": [
+            "Si",
+            "SiO"
+          ],
+          "metals_al_family": [
+            "Al"
+          ],
+          "metals_ca_family": [
+            "Ca"
+          ],
+          "metals_fe_family": [
+            "Fe"
+          ],
+          "metals_k_family": [
+            "K"
+          ],
+          "metals_mg_family": [
+            "Mg"
+          ],
+          "metals_mn_family": [
+            "Mn"
+          ],
+          "metals_na_family": [
+            "Na"
+          ],
+          "metals_ti_family": [
+            "Ti"
+          ]
+        },
+        "metadata": {
+          "refusal_closure_fixed_point": true,
+          "refusal_closure_iterations": 2,
+          "n_requested": 15,
+          "n_refused": 3,
+          "n_flux_active": 12,
+          "n_solve_bundles": 10
+        }
+      },
+      "vapour_batch_flux_overlay": {
+        "schema": "vapour_batch_flux_overlay.v1",
+        "batch_present": true,
+        "n_live_pressures": 6,
+        "n_flux_pressures": 6,
+        "live_only_bridge_species": [],
+        "batch_refused_live_species": [],
+        "batch_flux_active_not_in_live": [
+          "Al",
+          "Ca",
+          "CrO2",
+          "Si",
+          "SiO",
+          "Ti"
+        ],
+        "batch_channel_states": {
+          "Al": "eligible",
+          "Ca": "eligible",
+          "Cr": "eligible",
+          "Cr2O3_gas": "refusal",
+          "CrO2": "eligible",
+          "Fe": "eligible",
+          "K": "eligible",
+          "Mg": "eligible",
+          "Mn": "eligible",
+          "MnO_gas": "refusal",
+          "Na": "eligible",
+          "P2O5_gas": "refusal",
+          "Si": "eligible",
+          "SiO": "eligible",
+          "Ti": "eligible"
+        },
+        "dropped_nonfinite_live_species": [],
+        "note": "Active flux consumes VapourBatch channel unions only. Live equilibrium map is the legacy shadow projection, never a fail-open flux fallback.",
+        "selection_source": "vapour_batch_channel_unions",
+        "batch_pa_by_species": {
+          "Al": 0.011597713626940976,
+          "Ca": 6799.530938462466,
+          "Cr": 0.00011441621257490314,
+          "CrO2": 3.420897578881363e-08,
+          "Fe": 0.10003326430585556,
+          "K": 380.6564396098091,
+          "Mg": 52284.418592785034,
+          "Mn": 0.17464055785112173,
+          "Na": 1.650898687473997,
+          "Si": 1.7913346626477874e-06,
+          "SiO": 1.029952951965134e-14,
+          "Ti": 4.398870422480668e-07
+        },
+        "shadow_equal": true,
+        "shadow_outcome": "proved",
+        "detail": "legacy and batch flux paths agree per species",
+        "mismatched_species": [],
+        "missing_in_batch_path": [],
+        "missing_in_legacy_path": [],
+        "catalog_pa_shadow_equal": false,
+        "catalog_pa_shadow_outcome": "mismatch"
       }
     },
     {
@@ -8500,6 +11638,163 @@
         "pN2_mbar": 10.0,
         "requested_p_total_mbar": 10.0,
         "pn2_band_action": ""
+      },
+      "condensation_refusals_by_species": {
+        "Fe": {
+          "status": "pass_through",
+          "reason": "zero_residence_or_alpha",
+          "output_status": "status_bearing",
+          "stage_outcomes": [
+            {
+              "status": "pass_through",
+              "reason": "zero_residence_or_alpha",
+              "output_status": "status_bearing",
+              "species": "Fe",
+              "stage_number": 7,
+              "T_cond_C": 1250.0,
+              "eta": 0.0,
+              "residence_s": 0.0,
+              "alpha_s_value": 0.02
+            }
+          ]
+        },
+        "K": {
+          "status": "pass_through",
+          "reason": "zero_residence_or_alpha",
+          "output_status": "status_bearing",
+          "stage_outcomes": [
+            {
+              "status": "pass_through",
+              "reason": "zero_residence_or_alpha",
+              "output_status": "status_bearing",
+              "species": "K",
+              "stage_number": 7,
+              "T_cond_C": 420.0,
+              "eta": 0.0,
+              "residence_s": 0.0,
+              "alpha_s_value": 1.0
+            }
+          ]
+        },
+        "Na": {
+          "status": "pass_through",
+          "reason": "zero_residence_or_alpha",
+          "output_status": "status_bearing",
+          "stage_outcomes": [
+            {
+              "status": "pass_through",
+              "reason": "zero_residence_or_alpha",
+              "output_status": "status_bearing",
+              "species": "Na",
+              "stage_number": 7,
+              "T_cond_C": 480.0,
+              "eta": 0.0,
+              "residence_s": 0.0,
+              "alpha_s_value": 1.0
+            }
+          ]
+        }
+      },
+      "vapour_batch_summary": {
+        "n_requested": 15,
+        "n_flux_active": 12,
+        "n_refused": 3,
+        "solve_bundle_ids": {
+          "bundle:2:Cr+CrO2": [
+            "Cr",
+            "CrO2"
+          ],
+          "bundle:8:Si+SiO": [
+            "Si",
+            "SiO"
+          ],
+          "metals_al_family": [
+            "Al"
+          ],
+          "metals_ca_family": [
+            "Ca"
+          ],
+          "metals_fe_family": [
+            "Fe"
+          ],
+          "metals_k_family": [
+            "K"
+          ],
+          "metals_mg_family": [
+            "Mg"
+          ],
+          "metals_mn_family": [
+            "Mn"
+          ],
+          "metals_na_family": [
+            "Na"
+          ],
+          "metals_ti_family": [
+            "Ti"
+          ]
+        },
+        "metadata": {
+          "refusal_closure_fixed_point": true,
+          "refusal_closure_iterations": 2,
+          "n_requested": 15,
+          "n_refused": 3,
+          "n_flux_active": 12,
+          "n_solve_bundles": 10
+        }
+      },
+      "vapour_batch_flux_overlay": {
+        "schema": "vapour_batch_flux_overlay.v1",
+        "batch_present": true,
+        "n_live_pressures": 10,
+        "n_flux_pressures": 10,
+        "live_only_bridge_species": [],
+        "batch_refused_live_species": [],
+        "batch_flux_active_not_in_live": [
+          "Si",
+          "Ti"
+        ],
+        "batch_channel_states": {
+          "Al": "eligible",
+          "Ca": "eligible",
+          "Cr": "eligible",
+          "Cr2O3_gas": "refusal",
+          "CrO2": "eligible",
+          "Fe": "eligible",
+          "K": "eligible",
+          "Mg": "eligible",
+          "Mn": "eligible",
+          "MnO_gas": "refusal",
+          "Na": "eligible",
+          "P2O5_gas": "refusal",
+          "Si": "eligible",
+          "SiO": "eligible",
+          "Ti": "eligible"
+        },
+        "dropped_nonfinite_live_species": [],
+        "note": "Active flux consumes VapourBatch channel unions only. Live equilibrium map is the legacy shadow projection, never a fail-open flux fallback.",
+        "selection_source": "vapour_batch_channel_unions",
+        "batch_pa_by_species": {
+          "Al": 1.4746798010261961,
+          "Ca": 97228.7792607309,
+          "Cr": 0.004103933205258257,
+          "CrO2": 5.1965998546644855e-06,
+          "Fe": 1.476313587343108,
+          "K": 594158.5704141085,
+          "Mg": 198592.5507358933,
+          "Mn": 32.03955959349807,
+          "Na": 5.966558630304462,
+          "Si": 0.000905415630071931,
+          "SiO": 2.9034572819087435e-05,
+          "Ti": 6.887543096836633e-05
+        },
+        "shadow_equal": true,
+        "shadow_outcome": "proved",
+        "detail": "legacy and batch flux paths agree per species",
+        "mismatched_species": [],
+        "missing_in_batch_path": [],
+        "missing_in_legacy_path": [],
+        "catalog_pa_shadow_equal": false,
+        "catalog_pa_shadow_outcome": "mismatch"
       }
     },
     {
@@ -8719,6 +12014,163 @@
         "pN2_mbar": 10.0,
         "requested_p_total_mbar": 10.0,
         "pn2_band_action": ""
+      },
+      "condensation_refusals_by_species": {
+        "Fe": {
+          "status": "pass_through",
+          "reason": "zero_residence_or_alpha",
+          "output_status": "status_bearing",
+          "stage_outcomes": [
+            {
+              "status": "pass_through",
+              "reason": "zero_residence_or_alpha",
+              "output_status": "status_bearing",
+              "species": "Fe",
+              "stage_number": 7,
+              "T_cond_C": 1250.0,
+              "eta": 0.0,
+              "residence_s": 0.0,
+              "alpha_s_value": 0.02
+            }
+          ]
+        },
+        "K": {
+          "status": "pass_through",
+          "reason": "zero_residence_or_alpha",
+          "output_status": "status_bearing",
+          "stage_outcomes": [
+            {
+              "status": "pass_through",
+              "reason": "zero_residence_or_alpha",
+              "output_status": "status_bearing",
+              "species": "K",
+              "stage_number": 7,
+              "T_cond_C": 420.0,
+              "eta": 0.0,
+              "residence_s": 0.0,
+              "alpha_s_value": 1.0
+            }
+          ]
+        },
+        "Na": {
+          "status": "pass_through",
+          "reason": "zero_residence_or_alpha",
+          "output_status": "status_bearing",
+          "stage_outcomes": [
+            {
+              "status": "pass_through",
+              "reason": "zero_residence_or_alpha",
+              "output_status": "status_bearing",
+              "species": "Na",
+              "stage_number": 7,
+              "T_cond_C": 480.0,
+              "eta": 0.0,
+              "residence_s": 0.0,
+              "alpha_s_value": 1.0
+            }
+          ]
+        }
+      },
+      "vapour_batch_summary": {
+        "n_requested": 15,
+        "n_flux_active": 12,
+        "n_refused": 3,
+        "solve_bundle_ids": {
+          "bundle:2:Cr+CrO2": [
+            "Cr",
+            "CrO2"
+          ],
+          "bundle:8:Si+SiO": [
+            "Si",
+            "SiO"
+          ],
+          "metals_al_family": [
+            "Al"
+          ],
+          "metals_ca_family": [
+            "Ca"
+          ],
+          "metals_fe_family": [
+            "Fe"
+          ],
+          "metals_k_family": [
+            "K"
+          ],
+          "metals_mg_family": [
+            "Mg"
+          ],
+          "metals_mn_family": [
+            "Mn"
+          ],
+          "metals_na_family": [
+            "Na"
+          ],
+          "metals_ti_family": [
+            "Ti"
+          ]
+        },
+        "metadata": {
+          "refusal_closure_fixed_point": true,
+          "refusal_closure_iterations": 2,
+          "n_requested": 15,
+          "n_refused": 3,
+          "n_flux_active": 12,
+          "n_solve_bundles": 10
+        }
+      },
+      "vapour_batch_flux_overlay": {
+        "schema": "vapour_batch_flux_overlay.v1",
+        "batch_present": true,
+        "n_live_pressures": 10,
+        "n_flux_pressures": 10,
+        "live_only_bridge_species": [],
+        "batch_refused_live_species": [],
+        "batch_flux_active_not_in_live": [
+          "Si",
+          "Ti"
+        ],
+        "batch_channel_states": {
+          "Al": "eligible",
+          "Ca": "eligible",
+          "Cr": "eligible",
+          "Cr2O3_gas": "refusal",
+          "CrO2": "eligible",
+          "Fe": "eligible",
+          "K": "eligible",
+          "Mg": "eligible",
+          "Mn": "eligible",
+          "MnO_gas": "refusal",
+          "Na": "eligible",
+          "P2O5_gas": "refusal",
+          "Si": "eligible",
+          "SiO": "eligible",
+          "Ti": "eligible"
+        },
+        "dropped_nonfinite_live_species": [],
+        "note": "Active flux consumes VapourBatch channel unions only. Live equilibrium map is the legacy shadow projection, never a fail-open flux fallback.",
+        "selection_source": "vapour_batch_channel_unions",
+        "batch_pa_by_species": {
+          "Al": 1.4746798010261961,
+          "Ca": 97228.7792607309,
+          "Cr": 0.004103933205258257,
+          "CrO2": 5.1965998546644855e-06,
+          "Fe": 1.476313587343108,
+          "K": 594158.5704141085,
+          "Mg": 198592.5507358933,
+          "Mn": 32.03955959349807,
+          "Na": 5.966558630304462,
+          "Si": 0.000905415630071931,
+          "SiO": 2.9034572819087435e-05,
+          "Ti": 6.887543096836633e-05
+        },
+        "shadow_equal": true,
+        "shadow_outcome": "proved",
+        "detail": "legacy and batch flux paths agree per species",
+        "mismatched_species": [],
+        "missing_in_batch_path": [],
+        "missing_in_legacy_path": [],
+        "catalog_pa_shadow_equal": false,
+        "catalog_pa_shadow_outcome": "mismatch"
       }
     }
   ],

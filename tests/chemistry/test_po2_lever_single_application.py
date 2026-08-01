@@ -248,7 +248,12 @@ def test_evaporation_flux_preserves_vapor_pressure_po2_slope_once(
     for pO2_bar in _PO2_LEVELS:
         pressure_pa = 10.0 * (pO2_bar ** expected_slope)
         species_molar_mass = MOLAR_MASS[species] / 1000.0
+        # DESIGN-REV5 §1.2 / §7.4 / VR-11: flux authority is
+        # vapour_batch_flux_pressures_Pa; vapor_pressures_Pa is reporting-only.
+        # pO2 is applied once upstream in the batch/live pressure map (net-eq
+        # verified: flux layer does not re-apply pO2).
         controls = {
+            "vapour_batch_flux_pressures_Pa": {species: pressure_pa},
             "vapor_pressures_Pa": {species: pressure_pa},
             "overhead_partials_Pa": {species: 0.0},
             "molar_mass_kg_mol": {species: species_molar_mass},
