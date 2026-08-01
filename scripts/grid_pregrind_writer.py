@@ -589,7 +589,7 @@ def _cache_v2_species_dictionary() -> tuple[str, ...]:
     formula_species = tuple(load_species_formulas(runtime_species_payload))
     if not isinstance(vapor_payload, Mapping):
         raise ValueError(f"cache_v2 vapor species registry must be a mapping: {vapor_path}")
-    from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+    from simulator.vapour_rail.catalog import vapor_pressure_legacy_view  # VR-11: schema-v2 compiler projection facade
 
     vapor_payload = vapor_pressure_legacy_view(vapor_payload)
     vapor_species: list[str] = []

@@ -726,7 +726,27 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 diagnostic={"evaporation_flux_kg_hr": {}},
             )
 
-        vapor_pressures = dict(controls.get("vapor_pressures_Pa") or {})
+        # VR-11: sole flux pressure input is the batch-consumer map.
+        # Compatibility vapor_pressures_Pa is reporting-only and must never
+        # drive HKL (DESIGN-REV5 §1.2 / §7.4). Key presence, not truthiness:
+        # an explicit empty batch map is empty flux, not a legacy fallthrough.
+        if "vapour_batch_flux_pressures_Pa" not in controls:
+            return IntentResult(
+                intent=ChemistryIntent.EVAPORATION_FLUX,
+                status="refused",
+                transition=None,
+                control_audit=control_audit,
+                diagnostic={
+                    "evaporation_flux_kg_hr": {},
+                    "reason": "missing_vapour_batch_flux_pressures_Pa",
+                    "detail": (
+                        "EVAPORATION_FLUX requires vapour_batch_flux_pressures_Pa; "
+                        "legacy vapor_pressures_Pa is not a flux input"
+                    ),
+                },
+            )
+        _batch_flux_raw = controls.get("vapour_batch_flux_pressures_Pa")
+        vapor_pressures = dict(_batch_flux_raw or {})
         overhead_partials = dict(controls.get("overhead_partials_Pa") or {})
         vapor_pressure_sources = dict(controls.get("vapor_pressures_source") or {})
         pressure_provenance_by_species = dict(

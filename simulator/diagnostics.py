@@ -1381,9 +1381,60 @@ def _flatten_wall_deposit_species_kg(value: Any) -> dict[str, float]:
     return totals
 
 
+def condensation_refusals_diagnostic(sim: Any) -> dict[str, Any]:
+    """B2 consumer: condensation_refusals_by_species from the condensation model."""
+
+    from simulator.vapour_rail.instrumentation import condensation_refusals_payload
+
+    condensation_model = getattr(sim, "condensation_model", None)
+    if condensation_model is None:
+        condensation_model = getattr(sim, "_condensation_model", None)
+    refusals = {}
+    if condensation_model is not None:
+        refusals = dict(
+            getattr(condensation_model, "last_condensation_refusals_by_species", {})
+            or {}
+        )
+    return condensation_refusals_payload(refusals)
+
+
+def vapour_rail_instrumentation_diagnostic(sim: Any) -> dict[str, Any]:
+    """VR-11: channel answers, refusals, solve groups, ceiling, flux overlay."""
+
+    from simulator.vapour_rail.instrumentation import (
+        SETPOINTS_T_COND_AUDIT,
+        serialize_vapour_batch,
+        source_vapour_ceiling_table,
+    )
+
+    batch = getattr(sim, "_last_vapour_batch", None)
+    report = getattr(sim, "_last_vapour_batch_report", None)
+    if report is None and batch is not None:
+        report = serialize_vapour_batch(batch)
+    overlay = dict(getattr(sim, "_last_vapour_batch_flux_overlay", {}) or {})
+    resolve_error = dict(getattr(sim, "_last_vapour_batch_resolve_error", {}) or {})
+    condensation = condensation_refusals_diagnostic(sim)
+    return {
+        "schema": "vapour_rail_instrumentation.v1",
+        "vapour_batch": report,
+        "flux_overlay": overlay,
+        "resolve_error": resolve_error or None,
+        "condensation_refusals": condensation,
+        "source_vapour_ceiling_table": source_vapour_ceiling_table(),
+        "setpoints_t_cond_audit": dict(SETPOINTS_T_COND_AUDIT),
+        # Never default absent proof to True.
+        "shadow_equal": (
+            overlay["shadow_equal"] if "shadow_equal" in overlay else None
+        ),
+        "shadow_outcome": overlay.get("shadow_outcome"),
+    }
+
+
 __all__ = [
     "coating_summary_with_grounded_authority",
+    "condensation_refusals_diagnostic",
     "pressure_coating_pareto_diagnostic",
+    "vapour_rail_instrumentation_diagnostic",
     "wall_deposit_sticking_authority_status",
     "wall_deposit_remobilization_by_segment_species",
     "wall_sticking_alpha_provenance_notice",

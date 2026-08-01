@@ -29,6 +29,14 @@ from simulator.accounting.formulas import (
     resolve_species_formula,
 )
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+from simulator.vapour_rail.instrumentation import (
+    FROZEN_SIO_SOURCE_VAPOR_CEILING_MOL,
+    MAJOR_METAL_OXIDE_SOURCE_VAPOR_CEILINGS_MOL,
+    PLUME_SOURCE_SIO_SPECIES,
+    SOURCE_VAPOUR_CEILING_ROWS,
+    source_vapour_ceiling_lookup_keys,
+    source_vapour_ceiling_table,
+)
 
 OXYGEN_ACCOUNTING_TOLERANCE_KG = 1e-9
 FREE_ANALYZER_OXYGEN_SPECIES = frozenset({OXYGEN_SPECIES, "O"})
@@ -47,19 +55,6 @@ FREE_ANALYZER_OXYGEN_ACCOUNTS = (
     *OXYGEN_CAPTURED_ACCOUNTS,
 )
 PLUME_PRODUCT_SIO2_SPECIES = "SiO2"
-PLUME_SOURCE_SIO_SPECIES = "SiO"
-FROZEN_SIO_SOURCE_VAPOR_CEILING_MOL = 0.013617600827
-MAJOR_METAL_OXIDE_SOURCE_VAPOR_CEILINGS_MOL = {
-    PLUME_SOURCE_SIO_SPECIES: FROZEN_SIO_SOURCE_VAPOR_CEILING_MOL,
-    "Na2O": 0.0,
-    "K2O": 0.0,
-    "FeO": 0.0,
-    "MgO": 0.0,
-    "CaO": 0.0,
-    "Al2O3": 0.0,
-    "TiO2": 0.0,
-    "CrO2": 0.0,
-}
 PRODUCT_LEDGER_ACCOUNTS = (
     "terminal.offgas",
     "terminal.stage0_salt_phase",
@@ -916,18 +911,40 @@ class AccountingQueries:
             )
         )
 
+        # VR-11: typed nine-row advisory table. Lookup prefers canonical
+        # gas IDs then legacy bare keys so the diagnostic stays non-vacuous
+        # across the _gas rename. Advisory only — never clips flux.
         ceiling_offenders: list[str] = []
-        for species, ceiling_mol in sorted(
-            MAJOR_METAL_OXIDE_SOURCE_VAPOR_CEILINGS_MOL.items()
-        ):
-            if species == PLUME_SOURCE_SIO_SPECIES:
+        ceiling_rows_resolved: list[dict[str, Any]] = []
+        for row in SOURCE_VAPOUR_CEILING_ROWS:
+            legacy_key = str(row["legacy_key"])
+            ceiling_mol = float(row["ceiling_mol"])
+            if legacy_key == PLUME_SOURCE_SIO_SPECIES:
                 source_mol = sio_source_proxy_mol
+                matched_key = PLUME_SOURCE_SIO_SPECIES
             else:
-                source_mol = float(
-                    near_melt_species_mol.get(species, 0.0) or 0.0
-                )
-            if source_mol > ceiling_mol + 1e-15:
-                ceiling_offenders.append(species)
+                source_mol = 0.0
+                matched_key = None
+                for key in source_vapour_ceiling_lookup_keys(row):
+                    if key in near_melt_species_mol:
+                        source_mol = float(
+                            near_melt_species_mol.get(key, 0.0) or 0.0
+                        )
+                        matched_key = key
+                        break
+            breached = source_mol > ceiling_mol + 1e-15
+            if breached:
+                # Keep legacy offender labels for pin compatibility
+                # (tests assert "FeO", "SiO", …).
+                ceiling_offenders.append(legacy_key)
+            ceiling_rows_resolved.append(
+                {
+                    **dict(row),
+                    "source_mol": source_mol,
+                    "matched_key": matched_key,
+                    "breached": breached,
+                }
+            )
 
         return {
             "schema": "rec_w1_02_qms_oes_position_resolved.v1",
@@ -966,6 +983,10 @@ class AccountingQueries:
                 "major_metal_oxide_ceilings_mol": dict(
                     MAJOR_METAL_OXIDE_SOURCE_VAPOR_CEILINGS_MOL
                 ),
+                # VR-11 typed advisory table (schema may evolve independently
+                # of corpus_version; advisory-only, never a flux gate).
+                "source_vapour_ceiling_table": ceiling_rows_resolved,
+                "advisory_only": True,
             },
         }
 

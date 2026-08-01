@@ -56,6 +56,9 @@ TARGET_YIELD_PROVENANCE_RULE = (
 _TARGET_YIELD_DENOMINATOR_ACCOUNT = "process.cleaned_melt"
 
 DEFAULT_RESIDUAL_SPECIES_BY_TARGET: Mapping[str, tuple[str, ...]] = MappingProxyType({
+    # VR-11: residual maps stay product-executable only. Refusal-only vapour
+    # rows keep source/rump coverage via the channel contract, not this table.
+
     "SiO": ("SiO2", "SiO"),
     "Fe": ("FeO", "Fe"),
     "CrO2": ("Cr2O3", "CrO2", "Cr"),

@@ -33,6 +33,13 @@ from simulator.state import (
     EvaporationFlux,
     clamp_stir_factor,
 )
+from simulator.vapour_rail.instrumentation import (
+    CONTROL_BATCH_REPORT_KEY,
+    CONTROL_FLUX_PRESSURES_KEY,
+    CONTROL_SHADOW_EQUAL_KEY,
+    flux_pressures_from_batch_and_live,
+    serialize_vapour_batch,
+)
 
 
 class EvaporationFluxRefusal(ProviderUnavailableError):
@@ -364,7 +371,26 @@ class EvaporationMixin:
         if T_K < 400:  # Below any significant evaporation
             return flux
 
-        vapor_pressures = dict(equilibrium.vapor_pressures_Pa or {})
+        # VR-11: live equilibrium map is the legacy shadow projection only.
+        # Active flux requires a complete VapourBatch and branches on channel
+        # unions — never fail-open to the compatibility map.
+        live_vapor_pressures = dict(equilibrium.vapor_pressures_Pa or {})
+        vapour_batch = self._resolve_evaporation_vapour_batch(
+            equilibrium, temperature_K=T_K
+        )
+        resolve_error = dict(
+            getattr(self, '_last_vapour_batch_resolve_error', {}) or {}
+        )
+        vapor_pressures, flux_overlay_report = flux_pressures_from_batch_and_live(
+            vapour_batch,
+            live_vapor_pressures,
+            resolution_error=resolve_error or None,
+        )
+        batch_report = serialize_vapour_batch(vapour_batch)
+        self._last_vapour_batch = vapour_batch
+        self._last_vapour_batch_report = batch_report
+        self._last_vapour_batch_flux_overlay = flux_overlay_report
+
         if not vapor_pressures:
             if self.melt.temperature_C < 1050.0:
                 return flux
@@ -408,8 +434,8 @@ class EvaporationMixin:
             ):
                 return flux
             raise RuntimeError(
-                'EVAPORATION_FLUX received empty vapor_pressures_Pa at '
-                f'{self.melt.temperature_C:.1f} C; refusing silent-zero '
+                'EVAPORATION_FLUX received empty vapour_batch_flux_pressures_Pa '
+                f'at {self.melt.temperature_C:.1f} C; refusing silent-zero '
                 'evaporation for active pyrolysis melt'
             )
         vapor_pressure_diagnostic = dict(
@@ -458,6 +484,9 @@ class EvaporationMixin:
                         overhead_partials_Pa,
                     )
                 ),
+                vapour_batch_flux_pressures_Pa=vapor_pressures,
+                vapour_batch_report=batch_report,
+                vapour_batch_flux_overlay=flux_overlay_report,
             )
         )
         kernel_result = self._dispatch_only(
@@ -465,6 +494,17 @@ class EvaporationMixin:
             control_inputs=control_inputs,
         )
         diagnostic = dict(kernel_result.diagnostic or {})
+        if batch_report is not None:
+            diagnostic[CONTROL_BATCH_REPORT_KEY] = batch_report
+        diagnostic['vapour_batch_flux_overlay'] = flux_overlay_report
+        # Never default missing proof to True (SC-03 / SC-10).
+        if 'shadow_equal' in flux_overlay_report:
+            diagnostic[CONTROL_SHADOW_EQUAL_KEY] = bool(
+                flux_overlay_report['shadow_equal']
+            )
+        diagnostic['vapour_batch_flux_shadow_outcome'] = (
+            flux_overlay_report.get('shadow_outcome')
+        )
         self._last_evaporation_flux_diagnostic = diagnostic
         unmeasured_alpha_species = tuple(
             diagnostic.get('unmeasured_alpha_fallback_species', ()) or ()
@@ -1704,14 +1744,82 @@ class EvaporationMixin:
         )
         return max(partial_sum_Pa, control_floor_Pa)
 
+    def _resolve_evaporation_vapour_batch(
+        self,
+        equilibrium: Any,
+        *,
+        temperature_K: float,
+    ) -> Any:
+        """Exact-key VapourBatch for VR-11 flux consumer + instrumentation.
+
+        A complete batch is required for active flux. Resolve failures are
+        recorded as typed errors; the caller must not fall back to the
+        compatibility live pressure map (fail-closed).
+        """
+
+        self._last_vapour_batch_resolve_error = {}
+        builder = getattr(self, 'build_vapour_batch', None)
+        if not callable(builder):
+            self._last_vapour_batch_resolve_error = {
+                'status': 'unavailable',
+                'reason': 'vapour_batch_builder_missing',
+                'detail': 'build_vapour_batch is not available on simulator',
+            }
+            return None
+        vapor_pressure_diagnostic = dict(
+            getattr(self, '_last_vapor_pressure_diagnostic', {}) or {}
+        )
+        pO2_bar = vapor_pressure_diagnostic.get('pO2_bar')
+        if pO2_bar is None:
+            pO2_bar = getattr(equilibrium, 'pO2_bar', None)
+        total_pressure_Pa = None
+        try:
+            total_pressure_Pa = float(
+                getattr(self.melt, 'p_total_mbar', 0.0) or 0.0
+            ) * 100.0
+        except (TypeError, ValueError):
+            total_pressure_Pa = None
+        try:
+            batch = builder(
+                temperature_K=float(temperature_K),
+                process_phase='hot_train',
+                stage='evaporation',
+                total_pressure_Pa=total_pressure_Pa,
+                fO2_bar=float(pO2_bar) if pO2_bar is not None else None,
+            )
+        except Exception as exc:  # noqa: BLE001 — typed failure, not live fallback
+            self._last_vapour_batch_resolve_error = {
+                'status': 'unavailable',
+                'reason': 'vapour_batch_resolve_failed',
+                'detail': str(exc),
+            }
+            return None
+        if batch is None and not getattr(self, '_last_vapour_batch_resolve_error', None):
+            self._last_vapour_batch_resolve_error = {
+                'status': 'unavailable',
+                'reason': 'vapour_batch_unavailable',
+                'detail': 'build_vapour_batch returned None without a typed error',
+            }
+        return batch
+
     def _evaporation_flux_control_inputs(
         self,
         equilibrium: Any,
         *,
         overhead_partials_Pa: Mapping[str, float],
         overhead_pressure_pa: float | None = None,
+        vapour_batch_flux_pressures_Pa: Mapping[str, float] | None = None,
+        vapour_batch_report: Mapping[str, Any] | None = None,
+        vapour_batch_flux_overlay: Mapping[str, Any] | None = None,
     ) -> tuple[dict[str, Any], dict[str, float]]:
-        vapor_pressures = dict(equilibrium.vapor_pressures_Pa or {})
+        # VR-11: flux-driving pressures come from the batch channel unions.
+        # Never fall back to equilibrium.vapor_pressures_Pa for flux.
+        if vapour_batch_flux_pressures_Pa is not None:
+            vapor_pressures = dict(vapour_batch_flux_pressures_Pa)
+        else:
+            vapor_pressures = {}
+        # Reporting projection of the post-decision flux map (not a flux input).
+        live_reporting = dict(getattr(equilibrium, 'vapor_pressures_Pa', {}) or {})
         (
             molar_masses_kg_mol,
             stoich_by_species,
@@ -1726,7 +1834,12 @@ class EvaporationMixin:
         carrier_resolver = getattr(self, '_resolve_condensation_carrier_gas', None)
         carrier_gas = carrier_resolver() if callable(carrier_resolver) else 'N2'
         controls: dict[str, Any] = {
-            'vapor_pressures_Pa': vapor_pressures,
+            # Authoritative flux-driving map (VR-11 batch consumer path).
+            CONTROL_FLUX_PRESSURES_KEY: vapor_pressures,
+            # Reporting / shadow projection only — kernel must NOT read this
+            # for flux (source guard). Distinct from the batch flux map so a
+            # missing batch key cannot silently fall through to live values.
+            'vapor_pressures_Pa': live_reporting,
             'vapor_pressures_source': dict(
                 getattr(equilibrium, 'vapor_pressures_source', {}) or {}
             ),
@@ -1772,6 +1885,18 @@ class EvaporationMixin:
                 'allow_unmeasured_alpha_fallback', False
             ),
         }
+        if vapour_batch_report is not None:
+            controls[CONTROL_BATCH_REPORT_KEY] = dict(vapour_batch_report)
+        if vapour_batch_flux_overlay is not None:
+            controls['vapour_batch_flux_overlay'] = dict(vapour_batch_flux_overlay)
+            if 'shadow_equal' in vapour_batch_flux_overlay:
+                controls[CONTROL_SHADOW_EQUAL_KEY] = bool(
+                    vapour_batch_flux_overlay['shadow_equal']
+                )
+            if 'shadow_outcome' in vapour_batch_flux_overlay:
+                controls['vapour_batch_flux_shadow_outcome'] = (
+                    vapour_batch_flux_overlay['shadow_outcome']
+                )
         if 'unmeasured_alpha_fallback_species' in kernel_config:
             controls['unmeasured_alpha_fallback_species'] = tuple(
                 kernel_config['unmeasured_alpha_fallback_species'] or ()

@@ -216,6 +216,69 @@ def vapor_pressure_authority_payload(
     }
 
 
+def vapour_rail_instrumentation_panel_payload(sim: Any) -> dict[str, Any]:
+    """VR-11 UI panel: exact-key batch, refusals, solve groups, ceiling."""
+
+    from simulator.diagnostics import vapour_rail_instrumentation_diagnostic
+
+    payload = vapour_rail_instrumentation_diagnostic(sim)
+    batch = payload.get("vapour_batch") or {}
+    channels = (
+        batch.get("channels_by_species") if isinstance(batch, Mapping) else None
+    ) or {}
+    refusals = (
+        batch.get("refusals_by_species") if isinstance(batch, Mapping) else None
+    ) or {}
+    return {
+        "status": "ok" if batch else "n/a",
+        "diagnostic_only": True,
+        # Never default absent proof to True.
+        "shadow_equal": payload.get("shadow_equal"),
+        "shadow_outcome": payload.get("shadow_outcome"),
+        "n_requested": batch.get("n_requested") if isinstance(batch, Mapping) else 0,
+        "n_flux_active": (
+            batch.get("n_flux_active") if isinstance(batch, Mapping) else 0
+        ),
+        "n_refused": batch.get("n_refused") if isinstance(batch, Mapping) else 0,
+        "solve_bundle_ids": (
+            batch.get("solve_bundle_ids") if isinstance(batch, Mapping) else {}
+        ),
+        # VR-11: expose exact channel/refusal view (not only counts).
+        "channels_by_species": channels,
+        "refusals_by_species": refusals,
+        "flux_overlay": payload.get("flux_overlay") or {},
+        "source_vapour_ceiling_table": payload.get(
+            "source_vapour_ceiling_table"
+        )
+        or [],
+        "setpoints_t_cond_audit": payload.get("setpoints_t_cond_audit") or {},
+        "condensation_refusals": payload.get("condensation_refusals") or {},
+        "message": (
+            "Exact-key vapour channel answers and advisory diagnostics; "
+            "not flux-authoritative until an R-family flip."
+        ),
+    }
+
+
+def condensation_refusals_panel_payload(sim: Any) -> dict[str, Any]:
+    """B2 consumer: condensation_refusals_by_species for the web tick."""
+
+    from simulator.diagnostics import condensation_refusals_diagnostic
+
+    payload = condensation_refusals_diagnostic(sim)
+    return {
+        "status": "ok" if payload.get("has_refusals") else "empty",
+        "diagnostic_only": True,
+        "n_species": payload.get("n_species", 0),
+        "by_species": payload.get("by_species") or {},
+        "has_refusals": bool(payload.get("has_refusals")),
+        "message": (
+            "Per-species condensation refusals / efficiency pass-through "
+            "outcomes (VR-11 B2/B3)."
+        ),
+    }
+
+
 def _wall_material_payload(
     assessment: WallMaterialAssessment,
 ) -> dict[str, Any]:

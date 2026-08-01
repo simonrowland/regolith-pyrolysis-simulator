@@ -1528,6 +1528,12 @@ class PyrolysisRun:
             ),
             "stage_purity_report": stage_purity_report(sim.train),
             "vapor_pressure_source_report": _vapor_pressure_source_report(sim),
+            "vapour_rail_instrumentation": _json_safe(
+                _vapour_rail_instrumentation_report(sim)
+            ),
+            "condensation_refusals_by_species": _json_safe(
+                _condensation_refusals_report(sim)
+            ),
             "shuttle_refusal_history": _json_safe(shuttle_refusal_history),
             "c7_product_report": _json_safe(_c7_product_report(sim)),
             "c7_refusal_diagnostic": _json_safe(_c7_refusal_diagnostic(sim)),
@@ -1635,6 +1641,24 @@ class PyrolysisRun:
 # ----------------------------------------------------------------------
 # Per-hour summary builder (shared with web stream)
 # ----------------------------------------------------------------------
+
+
+def _condensation_refusals_report(sim: PyrolysisSimulator) -> dict[str, object]:
+    """B2 consumer: expose condensation_refusals_by_species on the run payload."""
+
+    from simulator.diagnostics import condensation_refusals_diagnostic
+
+    return condensation_refusals_diagnostic(sim)
+
+
+def _vapour_rail_instrumentation_report(
+    sim: PyrolysisSimulator,
+) -> dict[str, object]:
+    """VR-11 instrumentation block for terminal artifact / UI."""
+
+    from simulator.diagnostics import vapour_rail_instrumentation_diagnostic
+
+    return vapour_rail_instrumentation_diagnostic(sim)
 
 
 def _empty_vapor_pressure_source_report() -> dict[str, object]:
@@ -2462,6 +2486,30 @@ def build_per_hour_summary(
     enforcement = getattr(sim.campaign_mgr, "last_pO2_enforcement", None)
     if isinstance(enforcement, Mapping) and int(enforcement.get("hour", -1)) == int(snapshot.hour):
         summary["pO2_enforcement"] = _json_safe(dict(enforcement))
+    # VR-11: thread condensation refusals + vapour-batch channel summary
+    # into the per-hour UI/runner surface (artifact schema may change;
+    # physical outputs remain shadow-equal).
+    condensation_model = getattr(sim, "condensation_model", None)
+    refusals = dict(
+        getattr(condensation_model, "last_condensation_refusals_by_species", {})
+        or {}
+    ) if condensation_model is not None else {}
+    if refusals:
+        summary["condensation_refusals_by_species"] = _json_safe(refusals)
+    batch_report = getattr(sim, "_last_vapour_batch_report", None)
+    if isinstance(batch_report, Mapping):
+        summary["vapour_batch_summary"] = _json_safe(
+            {
+                "n_requested": batch_report.get("n_requested"),
+                "n_flux_active": batch_report.get("n_flux_active"),
+                "n_refused": batch_report.get("n_refused"),
+                "solve_bundle_ids": batch_report.get("solve_bundle_ids"),
+                "metadata": batch_report.get("metadata"),
+            }
+        )
+    overlay = dict(getattr(sim, "_last_vapour_batch_flux_overlay", {}) or {})
+    if overlay:
+        summary["vapour_batch_flux_overlay"] = _json_safe(overlay)
     capture_ledger_snapshot(sim, snapshot)
     return _json_safe(summary)
 
@@ -4674,6 +4722,22 @@ def _runner_failure_result(
         ),
         "stage_purity_report": _json_safe(stage_report),
         "vapor_pressure_source_report": _json_safe(vapor_report),
+        "vapour_rail_instrumentation": _json_safe(
+            _safe_failure_value(
+                lambda: _vapour_rail_instrumentation_report(sim),
+                {},
+            )
+            if sim is not None
+            else {}
+        ),
+        "condensation_refusals_by_species": _json_safe(
+            _safe_failure_value(
+                lambda: _condensation_refusals_report(sim),
+                {},
+            )
+            if sim is not None
+            else {}
+        ),
         "shuttle_refusal_history": _json_safe(
             _safe_failure_value(
                 lambda: list(getattr(sim, "_shuttle_refusal_history", []) or []),

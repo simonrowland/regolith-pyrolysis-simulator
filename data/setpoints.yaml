@@ -1012,10 +1012,16 @@ condensation_train:
       source-backed 1 mbar condensation-temperature row is declared.
     Al: >-
       Estimated/operator-routing override for completeness; no source-backed
-      1 mbar condensation-temperature row is declared.
+      1 mbar condensation-temperature row is declared. VR-11 audit: Al/Ti
+      overrides are operator-routing only -- do not add further Al/Ti/trace
+      T_cond overrides without independent engineering policy approval
+      (DESIGN-REV5 section 7.2).
     Ti: >-
       Estimated/operator-routing override for completeness; no source-backed
-      1 mbar condensation-temperature row is declared.
+      1 mbar condensation-temperature row is declared. VR-11 audit: Al/Ti
+      overrides are operator-routing only -- do not add further Al/Ti/trace
+      T_cond overrides without independent engineering policy approval
+      (DESIGN-REV5 section 7.2).
 
   condensation_temperature_estimated:
     Fe: true

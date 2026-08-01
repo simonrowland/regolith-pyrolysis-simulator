@@ -90,9 +90,11 @@ from web.feedstock_data import load_visible_feedstocks
 from web.advisory import (
     active_wall_species_from_flue,
     ceramic_rump_payload,
+    condensation_refusals_panel_payload,
     industrial_glass_payload,
     oxide_wt_pct_from_kg,
     vapor_pressure_authority_payload,
+    vapour_rail_instrumentation_panel_payload,
     wall_advisory_payload,
 )
 from web.run_store import get_run_store, persist_run_artifact
@@ -1736,6 +1738,11 @@ def _tick_payload(
         'vapor_pressure_authority_panel': vapor_pressure_authority_payload(
             getattr(sim, '_last_backend_diagnostics', {}) or {}
         ),
+        # VR-11: exact-key batch + condensation refusals + advisory ceiling.
+        'vapour_rail_instrumentation_panel': (
+            vapour_rail_instrumentation_panel_payload(sim)
+        ),
+        'condensation_refusals_panel': condensation_refusals_panel_payload(sim),
         'overlap_evaporation': (
             getattr(sim, '_last_overlap_evaporation_diagnostic', {}) or {}
         ),
@@ -1919,6 +1926,10 @@ def _completion_payload(sim):
         'vapor_pressure_authority_panel': vapor_pressure_authority_payload(
             getattr(sim, '_last_backend_diagnostics', {}) or {}
         ),
+        'vapour_rail_instrumentation_panel': (
+            vapour_rail_instrumentation_panel_payload(sim)
+        ),
+        'condensation_refusals_panel': condensation_refusals_panel_payload(sim),
         'stage_purity_report': stage_purity_report(sim.train),
         'knudsen_regime_diagnostic': _knudsen_regime_diagnostic_from_sim(sim),
     }
@@ -3164,7 +3175,18 @@ def register_events(socketio):
         # Load data files
         feedstocks = load_visible_feedstocks()
         setpoints = dict(_load_yaml('setpoints.yaml'))
+        # VR-11: web receives the compiled compatibility facade (not a raw
+        # parallel YAML authority). config.load path already applies this;
+        # keep the session boundary on the same facade.
         vapor_pressures = _load_yaml('vapor_pressures.yaml')
+        if isinstance(vapor_pressures, dict) and vapor_pressures.get(
+            'schema_version'
+        ) == 2:
+            from simulator.vapour_rail.catalog import (
+                vapor_pressure_compatibility_view,
+            )
+
+            vapor_pressures = vapor_pressure_compatibility_view(vapor_pressures)
         materials = _load_yaml('materials.yaml')
         furnace_material_id = str(data.get('furnace_material_id') or '').strip()
         if setpoints_patch:

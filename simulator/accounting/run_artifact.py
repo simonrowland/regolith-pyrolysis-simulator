@@ -429,6 +429,9 @@ def build_run_artifact(
         ("terminal_product_taxonomy", "terminal_product_taxonomy"),
         ("stage_purity_report", "stage_purity"),
         ("vapor_pressure_source_report", "vapor_pressure_source_report"),
+        # VR-11 instrumentation (schema-bearing diagnostics; not optimizer keys).
+        ("vapour_rail_instrumentation", "vapour_rail_instrumentation"),
+        ("condensation_refusals_by_species", "condensation_refusals_by_species"),
         ("yield_disposition", "yield_disposition"),
     ):
         if payload_key in runner_payload:

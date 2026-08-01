@@ -222,7 +222,7 @@ def test_kernel_filters_provider_to_cleaned_melt_only(
             pressure_bar=1e-6,
             control_inputs={
                 'overhead_pressure_pa': 0.0,
-                'vapor_pressures_Pa': {},
+                'vapour_batch_flux_pressures_Pa': {},
                 'overhead_partials_Pa': {},
                 'molar_mass_kg_mol': {},
                 'stoich_by_species': {},
@@ -267,7 +267,7 @@ def test_provider_emits_no_ledger_transition():
         fO2_log=None,
         control_inputs={
             'overhead_pressure_pa': 0.0,
-            'vapor_pressures_Pa': {'Na': 100.0},
+            'vapour_batch_flux_pressures_Pa': {'Na': 100.0},
             'overhead_partials_Pa': {},
             'molar_mass_kg_mol': {'Na': 0.023},
             'stoich_by_species': {
@@ -372,7 +372,7 @@ def test_provider_attaches_numerator_provenance_and_resistance_shares():
         fO2_log=None,
         control_inputs={
             'overhead_pressure_pa': 0.0,
-            'vapor_pressures_Pa': {'Na': 20.0},
+            'vapour_batch_flux_pressures_Pa': {'Na': 20.0},
             'vapor_pressures_source': {
                 'Na': 'builtin_authoritative:backsolved_vaporock_curve_fit',
             },
@@ -579,7 +579,7 @@ def test_provider_matches_safarian_engh_pure_si_hkl_mass_flux():
         fO2_log=None,
         control_inputs={
             'overhead_pressure_pa': 0.0,
-            'vapor_pressures_Pa': {'Si': 0.27728678068938384},
+            'vapour_batch_flux_pressures_Pa': {'Si': 0.27728678068938384},
             'overhead_partials_Pa': {'Si': 0.0},
             'molar_mass_kg_mol': {'Si': 0.02809},
             'stoich_by_species': {
@@ -651,7 +651,7 @@ def test_provider_skips_species_without_grounded_molar_mass():
         control_inputs={
             'overhead_pressure_pa': 0.0,
             **base_controls,
-            'vapor_pressures_Pa': {'Na': 100.0},
+            'vapour_batch_flux_pressures_Pa': {'Na': 100.0},
         },
     )
     mixed_request = IntentRequest(
@@ -663,7 +663,7 @@ def test_provider_skips_species_without_grounded_molar_mass():
         control_inputs={
             'overhead_pressure_pa': 0.0,
             **base_controls,
-            'vapor_pressures_Pa': {'Na': 100.0, 'Unobtainium': 100.0},
+            'vapour_batch_flux_pressures_Pa': {'Na': 100.0, 'Unobtainium': 100.0},
         },
     )
 
@@ -707,7 +707,7 @@ def test_provider_short_circuits_below_400_k():
         fO2_log=None,
         control_inputs={
             'overhead_pressure_pa': 0.0,
-            'vapor_pressures_Pa': {'Na': 1e6},
+            'vapour_batch_flux_pressures_Pa': {'Na': 1e6},
             'overhead_partials_Pa': {},
             'molar_mass_kg_mol': {'Na': 0.023},
             'stoich_by_species': {
@@ -942,7 +942,7 @@ def _w3_result_with_controls(stir_control, **control_overrides):
     )
 
     controls = {
-        'vapor_pressures_Pa': {'Na': 100.0},
+        'vapour_batch_flux_pressures_Pa': {'Na': 100.0},
         'overhead_partials_Pa': {},
         # True vacuum: Kn domain refusal is for nonzero overhead outside
         # viscous Poiseuille validity; HKL unit tests use P=0 upper-bound path.
@@ -1080,7 +1080,7 @@ def test_provider_refuses_missing_species_transport_parameters():
     result = _w3_result_with_controls(
         1.0,
         overhead_pressure_pa=1000.0,
-        vapor_pressures_Pa={"Si": 100.0},
+        vapour_batch_flux_pressures_Pa={"Si": 100.0},
         molar_mass_kg_mol={"Si": 0.028085},
         stoich_by_species={
             "Si": {
@@ -1116,7 +1116,7 @@ def test_provider_keeps_nonempty_computable_transport_set_when_flux_is_zero():
     result = _w3_result_with_controls(
         1.0,
         melt_surface_area_m2=0.0,
-        vapor_pressures_Pa={"Na": 100.0, "Si": 100.0},
+        vapour_batch_flux_pressures_Pa={"Na": 100.0, "Si": 100.0},
         molar_mass_kg_mol={"Na": 0.023, "Si": 0.028085},
         stoich_by_species={
             "Na": {

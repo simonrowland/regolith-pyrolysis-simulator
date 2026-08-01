@@ -1871,6 +1871,8 @@ class CondensationModel:
         self.last_sticking_alpha_provenance_notice: dict[str, Any] = {}
         self.last_transport_parameter_notice: dict[str, Any] = {}
         self.last_capture_budget_regularizer_notice: dict[str, Any] = {}
+        # VR-11 / B2: consumer-facing condensation refusal channel.
+        self.last_condensation_refusals_by_species: dict[str, dict[str, Any]] = {}
         self.last_wall_deposition_rate_shadow_candidate: dict[
             str, dict[str, Any]
         ] = {}
@@ -1902,6 +1904,7 @@ class CondensationModel:
         """Reset route-accumulated sticking authority at a run boundary."""
 
         self.last_sticking_alpha_provenance_notice = {}
+        self.last_condensation_refusals_by_species = {}
 
     def configure_operating_conditions(
         self,
@@ -2484,6 +2487,9 @@ class CondensationModel:
         wall_sticking_alpha_provenance_by_species: dict[str, Any] = {}
         transport_parameter_notice_by_species: dict[str, Any] = {}
         condensation_refusals_by_species: dict[str, dict[str, Any]] = {}
+        # VR-11 / B3: stage-local efficiency zeros mint typed pass-through
+        # outcomes (no longer silent return 0.0 without a consumer channel).
+        efficiency_outcomes_by_species: dict[str, list[dict[str, Any]]] = {}
         used_capture_budget_regularizer = False
         self.wall_species_partial_pressures_pa = (
             _flowing_species_partial_pressures_pa(
@@ -2556,6 +2562,9 @@ class CondensationModel:
                     antoine_extrapolations=antoine_extrapolations,
                     antoine_extrapolation_warnings=(
                         antoine_extrapolation_warnings
+                    ),
+                    efficiency_outcomes=efficiency_outcomes_by_species.setdefault(
+                        species, []
                     ),
                 )
                 condensed_kg = remaining_kg * eta
@@ -2668,6 +2677,7 @@ class CondensationModel:
                 condensation_refusals_by_species[species] = {
                     'status': 'refused',
                     'reason': 'antoine_data_unavailable',
+                    'output_status': 'status_bearing',
                 }
                 continue
 
@@ -2866,12 +2876,43 @@ class CondensationModel:
                 'capture_budget_regularizer_notice'
             ] = dict(capture_notice)
 
+        # VR-11 / B3: fold stage-local efficiency pass-through outcomes into
+        # condensation_refusals_by_species so B2 consumers can see them.
+        for species, outcomes in efficiency_outcomes_by_species.items():
+            if not outcomes:
+                continue
+            if species in condensation_refusals_by_species:
+                existing = condensation_refusals_by_species[species]
+                if isinstance(existing, dict):
+                    existing = dict(existing)
+                    stage_list = list(existing.get('stage_outcomes') or [])
+                    stage_list.extend(outcomes)
+                    existing['stage_outcomes'] = stage_list
+                    condensation_refusals_by_species[species] = existing
+                continue
+            # Species-level rollup: pass-through (mass continues; not a hard
+            # species refusal). Consumers gate diagnostics, not flux, on this.
+            primary = outcomes[0]
+            condensation_refusals_by_species[species] = {
+                'status': 'pass_through',
+                'reason': str(primary.get('reason') or 'condensation_efficiency_zero'),
+                'output_status': 'status_bearing',
+                'stage_outcomes': list(outcomes),
+            }
+
+        self.last_condensation_refusals_by_species = copy.deepcopy(
+            condensation_refusals_by_species
+        )
         if self.operating_history:
             self.operating_history[-1][
                 'wall_deposition_rate_shadow_candidate'
             ] = copy.deepcopy(
                 self.last_wall_deposition_rate_shadow_candidate
             )
+            if condensation_refusals_by_species:
+                self.operating_history[-1][
+                    'condensation_refusals_by_species'
+                ] = copy.deepcopy(condensation_refusals_by_species)
 
         return CondensationRouteResult(
             remaining_by_species=remaining_by_species,
@@ -3508,6 +3549,7 @@ class CondensationModel:
         alpha_record: MutableMapping[str, Any] | None = None,
         antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
         antoine_extrapolation_warnings: list[str] | None = None,
+        efficiency_outcomes: list[dict[str, Any]] | None = None,
     ) -> float:
         """
         Condensation efficiency for one species in one stage.
@@ -3524,9 +3566,33 @@ class CondensationModel:
         geometry and integrates the H-K-L driving force across the actual
         stage T-band. Chunk C replaces the constant regime factor with
         pressure/Knudsen coupling.
+
+        VR-11 / B3: the three early zero-efficiency exits mint typed
+        pass-through outcomes into ``efficiency_outcomes`` (when provided)
+        rather than returning a silent 0.0 with no consumer channel.
+        Numeric eta is unchanged (golden-neutral).
         """
-        if residence_s <= 0.0 or alpha_s_value <= 0.0:
+        def _mint_zero(reason: str, **detail: Any) -> float:
+            if efficiency_outcomes is not None:
+                record: dict[str, Any] = {
+                    'status': 'pass_through',
+                    'reason': reason,
+                    'output_status': 'status_bearing',
+                    'species': species,
+                    'stage_number': int(getattr(stage, 'stage_number', -1)),
+                    'T_cond_C': float(T_cond_C),
+                    'eta': 0.0,
+                }
+                record.update(detail)
+                efficiency_outcomes.append(record)
             return 0.0
+
+        if residence_s <= 0.0 or alpha_s_value <= 0.0:
+            return _mint_zero(
+                'zero_residence_or_alpha',
+                residence_s=float(residence_s),
+                alpha_s_value=float(alpha_s_value),
+            )
 
         P_local_pa = _local_species_pressure_pa(
             species,
@@ -3536,7 +3602,10 @@ class CondensationModel:
             antoine_extrapolation_warnings=antoine_extrapolation_warnings,
         )
         if P_local_pa <= 0.0:
-            return 0.0
+            return _mint_zero(
+                'nonpositive_local_pressure',
+                P_local_pa=float(P_local_pa),
+            )
 
         T_ref_K = max(T_cond_C + CELSIUS_TO_KELVIN_OFFSET, 1.0)
         reference_flux = _hkl_impingement_flux_mol_m2_s(
@@ -3546,7 +3615,11 @@ class CondensationModel:
             vapor_pressure_data=self.vapor_pressure_data,
         )
         if reference_flux <= 0.0:
-            return 0.0
+            return _mint_zero(
+                'nonpositive_reference_flux',
+                P_local_pa=float(P_local_pa),
+                reference_flux=float(reference_flux),
+            )
 
         lo_C, hi_C = _stage_temp_band_C(stage)
         if hi_C < lo_C:

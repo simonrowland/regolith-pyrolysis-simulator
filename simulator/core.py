@@ -724,9 +724,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if retained_catalog_payload is not None
             else vapor_pressures
         )
-        # VR-6: compile request rules with the U0 manifest. Evaporation still
-        # consumes the legacy pressure map until VR-11; resolve_batch is the
-        # exact-key surface for later cutover and is not flux-authoritative yet.
+        # VR-6/VR-11: compile request rules with the U0 manifest. Evaporation
+        # consumes VapourBatch for channel authority/instrumentation; live
+        # equilibrium pressures overlay the flux map so physical outputs stay
+        # shadow-equal until an R-family source flip.
         self.vapour_rail_catalog = (
             compile_vapour_rail_catalog(self.vapor_pressure_catalog_data)
             if self.vapor_pressure_catalog_data.get("schema_version") == 2
@@ -843,6 +844,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_vapor_pressure_diagnostic: Dict[str, Any] = {}
         self._last_evaporation_flux_diagnostic: Dict[str, Any] = {}
         self._last_partial_melt_offgassing_diagnostic: Dict[str, Any] = {}
+        # VR-11 instrumentation: exact-key batch + flux overlay report.
+        self._last_vapour_batch: Any = None
+        self._last_vapour_batch_report: Dict[str, Any] | None = None
+        self._last_vapour_batch_flux_overlay: Dict[str, Any] = {}
+        self._last_vapour_batch_resolve_error: Dict[str, Any] = {}
         self._last_extraction_completeness_diagnostic: Dict[str, Any] = {}
         self._last_overlap_evaporation_diagnostic: Dict[str, Any] = {}
         self._feedstock_recovered_reagent_kg_by_species: Dict[str, float] = {}
@@ -1188,6 +1194,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._melt_headspace_composition_mbar = {}
         self._last_overhead_gas_equilibrium = {}
         self._last_vapor_pressure_diagnostic = {}
+        self._last_vapour_batch = None
+        self._last_vapour_batch_report = None
+        self._last_vapour_batch_flux_overlay = {}
+        self._last_vapour_batch_resolve_error = {}
         self._last_native_fe_partition_diagnostic = {}
         self._last_native_fe_saturation_event = {}
         self._last_fe_redox_respeciation_diagnostic = {}
@@ -1703,22 +1713,36 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         temperature_K: float | None = None,
         process_phase: str | None = None,
         stage: str | None = None,
+        total_pressure_Pa: float | None = None,
+        fO2_bar: float | None = None,
         provider_candidates_by_species: dict | None = None,
     ):
         """Exact-key vapour batch via VR-6 request builder + refusal closure.
 
-        Golden-neutral: not consumed by evaporation until VR-11. Request keys
-        derive only from the compiler-emitted rules and the current atom-ledger
-        inventory; callers cannot narrow the set.
+        VR-11: evaporation consumes this surface for channel authority and
+        instrumentation. Live equilibrium pressures still overlay the flux
+        map so physical outputs remain shadow-equal until an R-family flip.
+        Request keys derive only from the compiler-emitted rules and the
+        current atom-ledger inventory; callers cannot narrow the set.
         """
 
         if self.vapour_rail_catalog is None:
+            self._last_vapour_batch_resolve_error = {
+                "status": "unavailable",
+                "reason": "vapour_rail_catalog_missing",
+                "detail": (
+                    "schema-v2 vapour rail catalog not compiled; "
+                    "VapourBatch is required for evaporation flux"
+                ),
+            }
             return None
         ledger_snapshot = self.atom_ledger.mol_by_account()
         state = {
             "temperature_K": temperature_K,
             "process_phase": process_phase,
             "stage": stage,
+            "total_pressure_Pa": total_pressure_Pa,
+            "fO2_bar": fO2_bar,
         }
         return self.vapour_rail_catalog.resolve_batch(
             ledger_snapshot,

@@ -360,7 +360,7 @@ def test_grounded_cr_alpha_uses_series_resistance_path_without_fallback():
         pressure_bar=1.0e-6,
         fO2_log=None,
         control_inputs={
-            "vapor_pressures_Pa": {"Cr": 100.0},
+            "vapour_batch_flux_pressures_Pa": {"Cr": 100.0},
             "overhead_partials_Pa": {"Cr": 0.0},
             "overhead_pressure_pa": 0.0,
             "molar_mass_kg_mol": {"Cr": 0.052},

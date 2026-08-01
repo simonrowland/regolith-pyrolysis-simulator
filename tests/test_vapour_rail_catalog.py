@@ -328,7 +328,12 @@ def test_b1_oxide_row_reaches_evaporation_and_condensation_without_antoine() -> 
         EvaporationFlux(species_kg_hr={"K": 1.0}, total_kg_hr=1.0),
         melt,
     )
-    assert "K" not in route.condensation_refusals_by_species
+    # VR-11/B3 may record typed pass_through efficiency outcomes on
+    # zero-residence stages; hard Antoine refusals must still be absent.
+    k_refusal = route.condensation_refusals_by_species.get("K")
+    if k_refusal is not None:
+        assert k_refusal.get("status") != "refused"
+        assert k_refusal.get("reason") != "antoine_data_unavailable"
     assert route.wall_deposit_by_species["K"] > 0.0
     assert route.remaining_by_species["K"] < 1.0
     assert route.wall_deposit_by_species["K"] + route.remaining_by_species[

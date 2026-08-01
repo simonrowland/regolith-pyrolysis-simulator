@@ -778,12 +778,27 @@ def refusal_closure(
                     pO2_bar=state.fO2_bar,
                 )
                 pressure_pa = evaluation.pressure_pa
+                # VR-11: thread real evaluator range/acquisition state — never
+                # synthesize out_of_range=false when the evaluator fired
+                # conservative continuation. getattr: unit mocks may not be
+                # full PressureEvaluation instances.
+                evaluation_extra = {
+                    "out_of_range": bool(
+                        getattr(evaluation, "out_of_range", False)
+                    ),
+                    "acquisition_flag": getattr(
+                        evaluation, "acquisition_flag", None
+                    ),
+                    "status": getattr(evaluation, "status", None),
+                }
             except Exception as exc:  # noqa: BLE001 — typed as contract miss
                 return _make_refusal(
                     rule,
                     REFUSAL_MISSING_CHANNEL_CONTRACT,
                     f"evaluator failed: {exc}",
                 )
+        else:
+            evaluation_extra = {}
         if pressure_pa is not None:
             pressure = PressureValue(pa=float(pressure_pa))
             alpha = (
@@ -825,6 +840,8 @@ def refusal_closure(
             # Still non-authoritative until R1 flip; certification never.
             verdict = VERDICT_STATUS_BEARING_NON_AUTHORITATIVE
 
+        extra_payload: dict[str, Any] = {"origin": rule.origin}
+        extra_payload.update(evaluation_extra)
         return VapourAnswer(
             species_id=rule.species_id,
             pressure=pressure,
@@ -839,7 +856,7 @@ def refusal_closure(
             verdict_status=verdict,
             certification_ceiling=CERTIFICATION_CEILING_NEVER,
             refusal_code=None,
-            extra=MappingProxyType({"origin": rule.origin}),
+            extra=MappingProxyType(extra_payload),
         )
 
     # Channel-local refusal predicates are monotone and independent of the

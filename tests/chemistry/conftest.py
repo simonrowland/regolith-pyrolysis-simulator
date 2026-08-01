@@ -18,7 +18,7 @@ import yaml
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.state import CampaignPhase, DecisionType
-from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+from simulator.vapour_rail.catalog import vapor_pressure_compatibility_view
 
 
 DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
@@ -27,7 +27,10 @@ DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
 def _load_yaml(name: str) -> dict:
     payload = yaml.safe_load((DATA_DIR / name).read_text())
     if name == "vapor_pressures.yaml":
-        return vapor_pressure_legacy_view(payload)
+        # VR-11: retain schema-v2 catalog_payload so sims compile
+        # VapourRailCatalog / VapourBatch (legacy-only view left catalog=None
+        # and made batch-required flux fail closed).
+        return vapor_pressure_compatibility_view(payload)
     return payload
 
 
