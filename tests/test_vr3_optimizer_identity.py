@@ -93,6 +93,49 @@ def test_recipe_run_inputs_and_corpus_version_remain_identity() -> None:
     )
 
 
+def test_physics_constraints_are_first_class_identity_not_data_fingerprint() -> None:
+    """Feasibility thresholds must miss cache; YAML-file fingerprints must not.
+
+    physics_constraints rode under data_digests and was collaterally dropped when
+    VR-3 made digests provenance-only. Restore it as a top-level identity field
+    without resurrecting the nested data_digests blob or other fingerprints.
+    """
+    base = _spec(
+        data_digests={
+            "corpus_version": current_corpus_version(),
+            "physics_constraints": "constraints-loose",
+            "profile": "profile-a",
+            "vapor_pressures": "vapour-a",
+        }
+    )
+    threshold_changed = replace(
+        base,
+        data_digests={
+            **base.data_digests,
+            "physics_constraints": "constraints-tight",
+        },
+    )
+    data_file_comment_changed = replace(
+        base,
+        data_digests={
+            **base.data_digests,
+            "profile": "profile-comment-only",
+            "vapor_pressures": "vapour-comment-only",
+        },
+    )
+
+    assert cache_key(threshold_changed) != cache_key(base)
+    assert cache_key(data_file_comment_changed) == cache_key(base)
+
+    payload = json.loads(canonical_evalspec_json(base))
+    assert payload["physics_constraints"] == "constraints-loose"
+    assert "data_digests" not in payload
+    # Provenance fingerprints must not re-enter under any nested key.
+    assert "profile" not in payload
+    assert "vapor_pressures" not in payload
+    assert payload.get("profile_id") == "profile-a"  # id remains; digest stays out
+
+
 def test_sparse_digest_metadata_defaults_to_current_corpus_version() -> None:
     explicit = _spec(data_digests={"corpus_version": current_corpus_version()})
     provenance_only = _spec(data_digests={"profile": "metadata-only"})

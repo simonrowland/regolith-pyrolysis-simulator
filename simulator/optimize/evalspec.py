@@ -536,6 +536,16 @@ def current_code_version() -> str:
 
 
 def canonical_evalspec_json(spec: EvalSpec) -> bytes:
+    # Identity contract (VR-3 + train9 mechanism-1 repair):
+    # - corpus_version is the sole data-corpus version lever.
+    # - data/provider YAML fingerprints (vapor_pressures, materials, profile
+    #   whole-doc hash, lab_alpha, geometry, …) stay provenance-only and must
+    #   not enter the key — a data-file comment must not miss cache.
+    # - physics_constraints is behavior-bearing: feasibility thresholds and
+    #   active_gates (including require_coating_gate-armed coating) change
+    #   verdicts. VR-3 nested it under data_digests and collaterally dropped
+    #   it with the fingerprints; restore it as a first-class key so a
+    #   threshold change cannot serve wrong results from cache.
     payload = {
         "additives_kg": spec.additives_kg,
         "backend_name": spec.backend_name,
@@ -563,6 +573,9 @@ def canonical_evalspec_json(spec: EvalSpec) -> bytes:
         "allow_fallback_vapor": spec.allow_fallback_vapor,
         "force_builtin_vapor_pressure": spec.force_builtin_vapor_pressure,
     }
+    physics_constraints = spec.data_digests.get("physics_constraints")
+    if physics_constraints:
+        payload["physics_constraints"] = physics_constraints
     if spec.stop_at_stage0_exit:
         payload["stop_at_stage0_exit"] = spec.stop_at_stage0_exit
     if spec.stage0_redox_oxidant_kg:
