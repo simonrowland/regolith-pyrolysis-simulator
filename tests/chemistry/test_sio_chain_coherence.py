@@ -94,7 +94,16 @@ MAX_CHAIN_CLOSURE_ERR_PCT = 6.0e-5
 # the coupled evolved-SiO baseline down ~5.8x (declared class, same shift as
 # the sio_yield CLI goldens); all four wall temperatures still execute to the
 # SAME value — the invariance contract itself is untouched.
-PHASE3BIS_SIO_EVOLVED_KG = 1.31808462984e-06
+# 2026-08-01 REPIN round 4 (SC-109): causal commit 228927d closed the C2A
+# soft-endpoint fail-open (affirmative flux arming with typed refusal).
+# Pre-fix the soft endpoint could complete campaigns BEFORE flux ever
+# armed; post-fix campaigns run their full extraction window and evolve
+# ~8x more SiO. Authority: ~/Repos/rps-adjudicate/m2-bisect.md — values
+# drift exactly at 228927d (1.318e-6 -> 1.032e-5) and are bit-identical
+# across the whole VR range. Old pin encoded the premature-completion bug.
+# Regenerated at tip d13f597 from build_sio_yield_report; wall-T invariance
+# remains bit-identical across 1050/1300/1400/1500 C.
+PHASE3BIS_SIO_EVOLVED_KG = 1.03187282595e-05
 
 
 @lru_cache(maxsize=None)

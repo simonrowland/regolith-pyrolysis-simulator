@@ -58,8 +58,17 @@ def test_subfloor_sio_does_not_create_unmaterialized_stage3_product():
     # value) — the hot-walls design doing its job. The 1e-12 kg
     # materialization floor remains enforced at the MaterialLot layer; this
     # scenario can no longer reach it via liner temperature.
+    # 2026-08-01 REPIN round 4 (SC-109): causal commit 228927d closed the C2A
+    # soft-endpoint fail-open (affirmative flux arming with typed refusal).
+    # Pre-fix the soft endpoint could complete campaigns BEFORE flux ever
+    # armed; post-fix campaigns run their full extraction window and evolve
+    # ~8x more SiO, so Stage-3 product scales with the longer-campaign supply
+    # (8.598e-7 -> 6.731e-6, ~7.83x). Authority:
+    # ~/Repos/rps-adjudicate/m2-bisect.md — drift at 228927d, bit-identical
+    # across the whole VR range. Old pin encoded the premature-completion bug.
+    # Regenerated at tip d13f597 from build_sio_yield_report.
     assert _stage3_silica_kg(1400.0) == pytest.approx(
-        8.5982326069e-07, rel=1e-9
+        6.73119341581e-06, rel=1e-9
     )
     retained_mol = _retained_holdup_sio_mol(1400.0)
     assert retained_mol >= 0.0

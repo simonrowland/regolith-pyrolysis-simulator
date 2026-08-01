@@ -104,7 +104,7 @@
       }
     },
     "kernel_commit_sha": "goal-18-fixture",
-    "campaigns_elapsed": 1.12,
+    "campaigns_elapsed": 0.6,
     "backend_status": "unavailable",
     "backend_authoritative": false,
     "evidence_class": "internal-analytical",
@@ -166,67 +166,67 @@
           "quantity_kg": 77.32807787577242,
           "accumulated_cost": {
             "electrical_kWh": 0.0,
-            "thermal_flux_h": 1181.4038735606853,
+            "thermal_flux_h": 1119.735917221879,
             "furnace_h": 3.0833978169403244,
             "launch_penalty_kg": 0.0,
             "external_reagent_kg": 0.0
           },
-          "owner_ratify_money_projection": 1212.2378517300886
+          "owner_ratify_money_projection": 1150.5698953912822
         },
         "terminal.product:CaCO3": {
           "quantity_kg": 0.007531238486095049,
           "accumulated_cost": {
             "electrical_kWh": 0.0,
-            "thermal_flux_h": 0.11506084936542368,
+            "thermal_flux_h": 0.10905480215856352,
             "furnace_h": 0.00030030236034300843,
             "launch_penalty_kg": 0.0,
             "external_reagent_kg": 0.0
           },
-          "owner_ratify_money_projection": 0.11806387296885376
+          "owner_ratify_money_projection": 0.1120578257619936
         },
         "terminal.product:H2O": {
           "quantity_kg": 181.71535447096545,
           "accumulated_cost": {
             "electrical_kWh": 0.0,
-            "thermal_flux_h": 2776.2131111332396,
+            "thermal_flux_h": 2631.2979024090723,
             "furnace_h": 7.245760436208377,
             "launch_penalty_kg": 0.0,
             "external_reagent_kg": 0.0
           },
-          "owner_ratify_money_projection": 2848.6707154953233
+          "owner_ratify_money_projection": 2703.755506771156
         },
         "terminal.product:N2": {
           "quantity_kg": 1.9950124688279303,
           "accumulated_cost": {
             "electrical_kWh": 0.0,
-            "thermal_flux_h": 30.479426402678314,
+            "thermal_flux_h": 28.888434550783323,
             "furnace_h": 0.07954959259474961,
             "launch_penalty_kg": 0.0,
             "external_reagent_kg": 0.0
           },
-          "owner_ratify_money_projection": 31.27492232862581
+          "owner_ratify_money_projection": 29.68393047673082
         },
         "terminal.product:Na2CO3": {
           "quantity_kg": 3.042543994524749e-11,
           "accumulated_cost": {
             "electrical_kWh": 0.0,
-            "thermal_flux_h": 4.648341662371153e-10,
+            "thermal_flux_h": 4.4057034443170665e-10,
             "furnace_h": 1.21319109027043e-12,
             "launch_penalty_kg": 0.0,
             "external_reagent_kg": 0.0
           },
-          "owner_ratify_money_projection": 4.769660771398196e-10
+          "owner_ratify_money_projection": 4.5270225533441094e-10
         },
         "terminal.product:S": {
           "quantity_kg": 39.900249376558605,
           "accumulated_cost": {
             "electrical_kWh": 0.0,
-            "thermal_flux_h": 609.5885280535663,
+            "thermal_flux_h": 577.7686910156665,
             "furnace_h": 1.5909918518949921,
             "launch_penalty_kg": 0.0,
             "external_reagent_kg": 0.0
           },
-          "owner_ratify_money_projection": 625.4984465725162
+          "owner_ratify_money_projection": 593.6786095346164
         }
       },
       "active_inventory_costs": {},
@@ -336,13 +336,13 @@
         "thermal_proxy": "thermal_flux_h = absolute_temperature_K * duration_h",
         "physical_cost": {
           "electrical_kWh": 0.0,
-          "thermal_flux_h": 4597.8,
+          "thermal_flux_h": 4357.8,
           "furnace_h": 12.0,
           "launch_penalty_kg": 0.0,
           "external_reagent_kg": 0.0
         },
         "allocation_status": "allocated_by_product_mass",
-        "owner_ratify_money_projection": 4717.8
+        "owner_ratify_money_projection": 4477.8
       },
       "price_basis": "legacy_placeholder_awaiting_owner_ratification"
     }
@@ -2740,21 +2740,21 @@
           "count": 1
         },
         {
-          "campaign": "C3_K",
+          "campaign": "C2B",
           "hour": 9,
-          "campaign_hour": 0,
+          "campaign_hour": 9,
           "count": 1
         },
         {
-          "campaign": "C3_K",
+          "campaign": "C2B",
           "hour": 10,
-          "campaign_hour": 1,
+          "campaign_hour": 10,
           "count": 1
         },
         {
-          "campaign": "C3_K",
+          "campaign": "C2B",
           "hour": 11,
-          "campaign_hour": 2,
+          "campaign_hour": 11,
           "count": 1
         }
       ]
@@ -2819,21 +2819,21 @@
         "count": 1
       },
       {
-        "campaign": "C3_K",
+        "campaign": "C2B",
         "hour": 9,
-        "campaign_hour": 0,
+        "campaign_hour": 9,
         "count": 1
       },
       {
-        "campaign": "C3_K",
+        "campaign": "C2B",
         "hour": 10,
-        "campaign_hour": 1,
+        "campaign_hour": 10,
         "count": 1
       },
       {
-        "campaign": "C3_K",
+        "campaign": "C2B",
         "hour": 11,
-        "campaign_hour": 2,
+        "campaign_hour": 11,
         "count": 1
       }
     ]
@@ -4552,10 +4552,10 @@
     },
     {
       "hour": 10,
-      "campaign": "C3_K",
-      "T_C": 165.0,
-      "P_total_bar": 0.001,
-      "pO2_bar": 0.001,
+      "campaign": "C2B",
+      "T_C": 125.0,
+      "P_total_bar": 0.0015,
+      "pO2_bar": 0.0015,
       "mass_balance_pct": 0.0,
       "O2_yield_kg_cumulative": 0.0,
       "O2_source_side_potential_kg_cumulative": 0.0,
@@ -4581,7 +4581,7 @@
         "product_vapor_enthalpy_sink": 0,
         "net_unallocated": 0.0
       },
-      "shuttle_phase": "inject",
+      "shuttle_phase": "",
       "shuttle_injected_kg_hr": 0.0,
       "shuttle_reduced_kg_hr": 0.0,
       "shuttle_metal_produced_kg_hr": 0.0,
@@ -4610,10 +4610,10 @@
         "delta_log10_fO2": 0.0,
         "ferric_divergence": {
           "status": "warning",
-          "implied_ferric_fraction": 0.999999999081483,
+          "implied_ferric_fraction": 0.9999999999749601,
           "ledger_ferric_fraction": 0.0,
-          "delta_abs": 0.999999999081483,
-          "delta_signed": 0.999999999081483,
+          "delta_abs": 0.9999999999749601,
+          "delta_signed": 0.9999999999749601,
           "warning_threshold_abs": 0.05,
           "warning_threshold_ferric_fraction_abs": 0.05,
           "sampling_context": "current_ledger_vs_current_reservoir",
@@ -4631,10 +4631,10 @@
           "residual_attribution": "sub_liquid_respeciation_deferred",
           "ferric_divergence_after": {
             "status": "warning",
-            "implied_ferric_fraction": 0.999999999081483,
+            "implied_ferric_fraction": 0.9999999999749601,
             "ledger_ferric_fraction": 0.0,
-            "delta_abs": 0.999999999081483,
-            "delta_signed": 0.999999999081483,
+            "delta_abs": 0.9999999999749601,
+            "delta_signed": 0.9999999999749601,
             "warning_threshold_abs": 0.05,
             "warning_threshold_ferric_fraction_abs": 0.05,
             "sampling_context": "current_ledger_vs_current_reservoir",
@@ -4654,10 +4654,10 @@
             "residual_attribution": "sub_liquid_respeciation_deferred",
             "ferric_divergence_after": {
               "status": "warning",
-              "implied_ferric_fraction": 0.999999999081483,
+              "implied_ferric_fraction": 0.9999999999749601,
               "ledger_ferric_fraction": 0.0,
-              "delta_abs": 0.999999999081483,
-              "delta_signed": 0.999999999081483,
+              "delta_abs": 0.9999999999749601,
+              "delta_signed": 0.9999999999749601,
               "warning_threshold_abs": 0.05,
               "warning_threshold_ferric_fraction_abs": 0.05,
               "sampling_context": "current_ledger_vs_current_reservoir",
@@ -4676,10 +4676,10 @@
             "residual_attribution": "sub_liquid_respeciation_deferred",
             "ferric_divergence_after": {
               "status": "warning",
-              "implied_ferric_fraction": 0.999999999081483,
+              "implied_ferric_fraction": 0.9999999999749601,
               "ledger_ferric_fraction": 0.0,
-              "delta_abs": 0.999999999081483,
-              "delta_signed": 0.999999999081483,
+              "delta_abs": 0.9999999999749601,
+              "delta_signed": 0.9999999999749601,
               "warning_threshold_abs": 0.05,
               "warning_threshold_ferric_fraction_abs": 0.05,
               "sampling_context": "current_ledger_vs_current_reservoir",
@@ -4690,46 +4690,46 @@
           }
         ],
         "source_context": {
-          "campaign": "C3_K",
+          "campaign": "C2B",
           "hour": 10,
-          "campaign_hour": 1
+          "campaign_hour": 10
         },
         "redox_source_refusal_context": {},
-        "source_campaign": "C3_K",
+        "source_campaign": "C2B",
         "source_hour": 10,
-        "source_campaign_hour": 1
+        "source_campaign_hour": 10
       },
       "fe_redox_split": {
         "authoritative": false,
         "diagnostic_only": true,
         "extrapolation": true,
         "fO2_log": -9.0,
-        "fe2o3_equiv_wt_pct": 33.3886127164278,
-        "fe2o3_over_feo_molar": 544355690.4005052,
-        "fe3_over_sigma_fe": 0.999999999081483,
-        "feo_equiv_wt_pct": 2.759539120457617e-08,
-        "ferric_frac": 0.999999999081483,
-        "ferrous_frac": 9.18517040204847e-10,
+        "fe2o3_equiv_wt_pct": 33.38861274526183,
+        "fe2o3_over_feo_molar": 19968151011.33809,
+        "fe3_over_sigma_fe": 0.9999999999749601,
+        "feo_equiv_wt_pct": 7.522830499078132e-10,
+        "ferric_frac": 0.9999999999749601,
+        "ferrous_frac": 2.5039859075093318e-11,
         "high_uncertainty": true,
-        "iw_log": -55.543431473239764,
-        "native_fe_activity": "2.2425958312588534e-10",
+        "iw_log": -61.783635564485756,
+        "native_fe_activity": "6.113581862976503e-12",
         "native_fe_activity_source": "Holzheid1997 DOI 10.1016/S0009-2541(97)00030-2 FeO(l)=Fe+0.5O2 saturation",
         "native_fe_frac": 0.0,
-        "native_fe_pure_feo_iw_log": "-51.5170636122235",
+        "native_fe_pure_feo_iw_log": "-57.279817919412736",
         "native_fe_saturation": false,
-        "native_fe_saturation_activity": "1.8135594893557154e+21",
+        "native_fe_saturation_activity": "1.380094927706165e+24",
         "native_fe_saturation_event": {
           "native_fe_event": "deferred_not_liquid_for_redox",
           "native_fe_event_reason": "deferred_not_liquid_for_redox",
           "native_fe_event_status": "deferred",
-          "temperature_C": 165.0
+          "temperature_C": 125.0
         },
         "native_fe_threshold": "FeO_activity_saturation",
-        "pressure_bar": 0.001,
+        "pressure_bar": 0.0015,
         "reference": "Kress and Carmichael 1991 Contrib Mineral Petrol 108:82-92 doi:10.1007/BF00307328",
         "source": "simulator.fe_redox:kress91_split",
         "status": "ok",
-        "temperature_K": 438.15,
+        "temperature_K": 398.15,
         "temperature_band_case": "below_1200C_extrapolation",
         "temperature_band_source": "REF-001 Kress91 liquid relation; below 1200 C calibration floor",
         "temperature_band_status": "extrapolation_below_calibration_floor"
@@ -4742,10 +4742,10 @@
     },
     {
       "hour": 11,
-      "campaign": "C3_K",
-      "T_C": 215.0,
-      "P_total_bar": 0.001,
-      "pO2_bar": 0.001,
+      "campaign": "C2B",
+      "T_C": 135.0,
+      "P_total_bar": 0.0015,
+      "pO2_bar": 0.0015,
       "mass_balance_pct": 0.0,
       "O2_yield_kg_cumulative": 0.0,
       "O2_source_side_potential_kg_cumulative": 0.0,
@@ -4771,7 +4771,7 @@
         "product_vapor_enthalpy_sink": 0,
         "net_unallocated": 0.0
       },
-      "shuttle_phase": "inject",
+      "shuttle_phase": "",
       "shuttle_injected_kg_hr": 0.0,
       "shuttle_reduced_kg_hr": 0.0,
       "shuttle_metal_produced_kg_hr": 0.0,
@@ -4800,10 +4800,10 @@
         "delta_log10_fO2": 0.0,
         "ferric_divergence": {
           "status": "warning",
-          "implied_ferric_fraction": 0.9999999650982343,
+          "implied_ferric_fraction": 0.999999999933963,
           "ledger_ferric_fraction": 0.0,
-          "delta_abs": 0.9999999650982343,
-          "delta_signed": 0.9999999650982343,
+          "delta_abs": 0.999999999933963,
+          "delta_signed": 0.999999999933963,
           "warning_threshold_abs": 0.05,
           "warning_threshold_ferric_fraction_abs": 0.05,
           "sampling_context": "current_ledger_vs_current_reservoir",
@@ -4821,10 +4821,10 @@
           "residual_attribution": "sub_liquid_respeciation_deferred",
           "ferric_divergence_after": {
             "status": "warning",
-            "implied_ferric_fraction": 0.9999999650982343,
+            "implied_ferric_fraction": 0.999999999933963,
             "ledger_ferric_fraction": 0.0,
-            "delta_abs": 0.9999999650982343,
-            "delta_signed": 0.9999999650982343,
+            "delta_abs": 0.999999999933963,
+            "delta_signed": 0.999999999933963,
             "warning_threshold_abs": 0.05,
             "warning_threshold_ferric_fraction_abs": 0.05,
             "sampling_context": "current_ledger_vs_current_reservoir",
@@ -4844,10 +4844,10 @@
             "residual_attribution": "sub_liquid_respeciation_deferred",
             "ferric_divergence_after": {
               "status": "warning",
-              "implied_ferric_fraction": 0.9999999650982343,
+              "implied_ferric_fraction": 0.999999999933963,
               "ledger_ferric_fraction": 0.0,
-              "delta_abs": 0.9999999650982343,
-              "delta_signed": 0.9999999650982343,
+              "delta_abs": 0.999999999933963,
+              "delta_signed": 0.999999999933963,
               "warning_threshold_abs": 0.05,
               "warning_threshold_ferric_fraction_abs": 0.05,
               "sampling_context": "current_ledger_vs_current_reservoir",
@@ -4866,10 +4866,10 @@
             "residual_attribution": "sub_liquid_respeciation_deferred",
             "ferric_divergence_after": {
               "status": "warning",
-              "implied_ferric_fraction": 0.9999999650982343,
+              "implied_ferric_fraction": 0.999999999933963,
               "ledger_ferric_fraction": 0.0,
-              "delta_abs": 0.9999999650982343,
-              "delta_signed": 0.9999999650982343,
+              "delta_abs": 0.999999999933963,
+              "delta_signed": 0.999999999933963,
               "warning_threshold_abs": 0.05,
               "warning_threshold_ferric_fraction_abs": 0.05,
               "sampling_context": "current_ledger_vs_current_reservoir",
@@ -4880,46 +4880,46 @@
           }
         ],
         "source_context": {
-          "campaign": "C3_K",
+          "campaign": "C2B",
           "hour": 11,
-          "campaign_hour": 2
+          "campaign_hour": 11
         },
         "redox_source_refusal_context": {},
-        "source_campaign": "C3_K",
+        "source_campaign": "C2B",
         "source_hour": 11,
-        "source_campaign_hour": 2
+        "source_campaign_hour": 11
       },
       "fe_redox_split": {
         "authoritative": false,
         "diagnostic_only": true,
         "extrapolation": true,
         "fO2_log": -9.0,
-        "fe2o3_equiv_wt_pct": 33.38861161973066,
-        "fe2o3_over_feo_molar": 14325922.261619003,
-        "fe3_over_sigma_fe": 0.9999999650982343,
-        "feo_equiv_wt_pct": 1.048568271127172e-06,
-        "ferric_frac": 0.9999999650982343,
-        "ferrous_frac": 3.490176569975745e-08,
+        "fe2o3_equiv_wt_pct": 33.388612743938786,
+        "fe2o3_over_feo_molar": 7571517265.280159,
+        "fe3_over_sigma_fe": 0.999999999933963,
+        "feo_equiv_wt_pct": 1.9839759898712826e-09,
+        "ferric_frac": 0.999999999933963,
+        "ferrous_frac": 6.603695368312401e-11,
         "high_uncertainty": true,
-        "iw_log": -49.18130595103964,
-        "native_fe_activity": "8.521404221140116e-09",
+        "iw_log": -60.10891706480461,
+        "native_fe_activity": "1.612318611954322e-11",
         "native_fe_activity_source": "Holzheid1997 DOI 10.1016/S0009-2541(97)00030-2 FeO(l)=Fe+0.5O2 saturation",
         "native_fe_frac": 0.0,
-        "native_fe_pure_feo_iw_log": "-45.65097474991143",
+        "native_fe_pure_feo_iw_log": "-55.73245066106186",
         "native_fe_saturation": false,
-        "native_fe_saturation_activity": "2.1158621757282437e+18",
+        "native_fe_saturation_activity": "2.323942244129757e+23",
         "native_fe_saturation_event": {
           "native_fe_event": "deferred_not_liquid_for_redox",
           "native_fe_event_reason": "deferred_not_liquid_for_redox",
           "native_fe_event_status": "deferred",
-          "temperature_C": 215.0
+          "temperature_C": 135.0
         },
         "native_fe_threshold": "FeO_activity_saturation",
-        "pressure_bar": 0.001,
+        "pressure_bar": 0.0015,
         "reference": "Kress and Carmichael 1991 Contrib Mineral Petrol 108:82-92 doi:10.1007/BF00307328",
         "source": "simulator.fe_redox:kress91_split",
         "status": "ok",
-        "temperature_K": 488.15,
+        "temperature_K": 408.15,
         "temperature_band_case": "below_1200C_extrapolation",
         "temperature_band_source": "REF-001 Kress91 liquid relation; below 1200 C calibration floor",
         "temperature_band_status": "extrapolation_below_calibration_floor"
@@ -4932,10 +4932,10 @@
     },
     {
       "hour": 12,
-      "campaign": "C3_K",
-      "T_C": 265.0,
-      "P_total_bar": 0.001,
-      "pO2_bar": 0.001,
+      "campaign": "C2B",
+      "T_C": 145.0,
+      "P_total_bar": 0.0015,
+      "pO2_bar": 0.0015,
       "mass_balance_pct": 0.0,
       "O2_yield_kg_cumulative": 0.0,
       "O2_source_side_potential_kg_cumulative": 0.0,
@@ -4961,7 +4961,7 @@
         "product_vapor_enthalpy_sink": 0,
         "net_unallocated": 0.0
       },
-      "shuttle_phase": "inject",
+      "shuttle_phase": "",
       "shuttle_injected_kg_hr": 0.0,
       "shuttle_reduced_kg_hr": 0.0,
       "shuttle_metal_produced_kg_hr": 0.0,
@@ -4990,10 +4990,10 @@
         "delta_log10_fO2": 0.0,
         "ferric_divergence": {
           "status": "warning",
-          "implied_ferric_fraction": 0.9999993466557171,
+          "implied_ferric_fraction": 0.999999999834063,
           "ledger_ferric_fraction": 0.0,
-          "delta_abs": 0.9999993466557171,
-          "delta_signed": 0.9999993466557171,
+          "delta_abs": 0.999999999834063,
+          "delta_signed": 0.999999999834063,
           "warning_threshold_abs": 0.05,
           "warning_threshold_ferric_fraction_abs": 0.05,
           "sampling_context": "current_ledger_vs_current_reservoir",
@@ -5011,10 +5011,10 @@
           "residual_attribution": "sub_liquid_respeciation_deferred",
           "ferric_divergence_after": {
             "status": "warning",
-            "implied_ferric_fraction": 0.9999993466557171,
+            "implied_ferric_fraction": 0.999999999834063,
             "ledger_ferric_fraction": 0.0,
-            "delta_abs": 0.9999993466557171,
-            "delta_signed": 0.9999993466557171,
+            "delta_abs": 0.999999999834063,
+            "delta_signed": 0.999999999834063,
             "warning_threshold_abs": 0.05,
             "warning_threshold_ferric_fraction_abs": 0.05,
             "sampling_context": "current_ledger_vs_current_reservoir",
@@ -5034,10 +5034,10 @@
             "residual_attribution": "sub_liquid_respeciation_deferred",
             "ferric_divergence_after": {
               "status": "warning",
-              "implied_ferric_fraction": 0.9999993466557171,
+              "implied_ferric_fraction": 0.999999999834063,
               "ledger_ferric_fraction": 0.0,
-              "delta_abs": 0.9999993466557171,
-              "delta_signed": 0.9999993466557171,
+              "delta_abs": 0.999999999834063,
+              "delta_signed": 0.999999999834063,
               "warning_threshold_abs": 0.05,
               "warning_threshold_ferric_fraction_abs": 0.05,
               "sampling_context": "current_ledger_vs_current_reservoir",
@@ -5056,10 +5056,10 @@
             "residual_attribution": "sub_liquid_respeciation_deferred",
             "ferric_divergence_after": {
               "status": "warning",
-              "implied_ferric_fraction": 0.9999993466557171,
+              "implied_ferric_fraction": 0.999999999834063,
               "ledger_ferric_fraction": 0.0,
-              "delta_abs": 0.9999993466557171,
-              "delta_signed": 0.9999993466557171,
+              "delta_abs": 0.999999999834063,
+              "delta_signed": 0.999999999834063,
               "warning_threshold_abs": 0.05,
               "warning_threshold_ferric_fraction_abs": 0.05,
               "sampling_context": "current_ledger_vs_current_reservoir",
@@ -5070,46 +5070,46 @@
           }
         ],
         "source_context": {
-          "campaign": "C3_K",
+          "campaign": "C2B",
           "hour": 12,
-          "campaign_hour": 3
+          "campaign_hour": 12
         },
         "redox_source_refusal_context": {},
-        "source_campaign": "C3_K",
+        "source_campaign": "C2B",
         "source_hour": 12,
-        "source_campaign_hour": 3
+        "source_campaign_hour": 12
       },
       "fe_redox_split": {
         "authoritative": false,
         "diagnostic_only": true,
         "extrapolation": true,
         "fO2_log": -9.0,
-        "fe2o3_equiv_wt_pct": 33.38859166154006,
-        "fe2o3_over_feo_molar": 765292.7965200976,
-        "fe3_over_sigma_fe": 0.9999993466557171,
-        "feo_equiv_wt_pct": 1.962869458130482e-05,
-        "ferric_frac": 0.9999993466557171,
-        "ferrous_frac": 6.533442828970948e-07,
+        "fe2o3_equiv_wt_pct": 33.388612740714834,
+        "fe2o3_over_feo_molar": 3013191983.7081356,
+        "fe3_over_sigma_fe": 0.999999999834063,
+        "feo_equiv_wt_pct": 4.985314350647912e-09,
+        "ferric_frac": 0.999999999834063,
+        "ferrous_frac": 1.6593704188494485e-10,
         "high_uncertainty": true,
-        "iw_log": -44.00140202545759,
-        "native_fe_activity": "1.5951659229629378e-07",
+        "iw_log": -58.514299892383114,
+        "native_fe_activity": "4.0514175347894366e-11",
         "native_fe_activity_source": "Holzheid1997 DOI 10.1016/S0009-2541(97)00030-2 FeO(l)=Fe+0.5O2 saturation",
         "native_fe_frac": 0.0,
-        "native_fe_pure_feo_iw_log": "-40.8833725056275",
+        "native_fe_pure_feo_iw_log": "-54.25961230739278",
         "native_fe_saturation": false,
-        "native_fe_saturation_activity": "8743518893279348.0",
+        "native_fe_saturation_activity": "4.263891585399003e+22",
         "native_fe_saturation_event": {
           "native_fe_event": "deferred_not_liquid_for_redox",
           "native_fe_event_reason": "deferred_not_liquid_for_redox",
           "native_fe_event_status": "deferred",
-          "temperature_C": 265.0
+          "temperature_C": 145.0
         },
         "native_fe_threshold": "FeO_activity_saturation",
-        "pressure_bar": 0.001,
+        "pressure_bar": 0.0015,
         "reference": "Kress and Carmichael 1991 Contrib Mineral Petrol 108:82-92 doi:10.1007/BF00307328",
         "source": "simulator.fe_redox:kress91_split",
         "status": "ok",
-        "temperature_K": 538.15,
+        "temperature_K": 418.15,
         "temperature_band_case": "below_1200C_extrapolation",
         "temperature_band_source": "REF-001 Kress91 liquid relation; below 1200 C calibration floor",
         "temperature_band_status": "extrapolation_below_calibration_floor"

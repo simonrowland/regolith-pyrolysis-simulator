@@ -195,8 +195,18 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
     # transport composition and wall-capture accounting.
     # 2026-07-29 t-475: executable recompute after segment-local partial
     # pressure includes upstream baffle and wall capture.
+    # 2026-08-01 REPIN round 4 (SC-109): causal commit 228927d closed the C2A
+    # soft-endpoint fail-open (affirmative flux arming with typed refusal).
+    # Pre-fix the soft endpoint could complete campaigns BEFORE flux ever
+    # armed; post-fix campaigns run their full extraction window and evolve
+    # ~8x more SiO, so the 1050 C cold-liner wall Si+SiO2 deposit scales with
+    # the longer-campaign supply (5.134e-7 -> 4.439e-6, ~8.65x). Authority:
+    # ~/Repos/rps-adjudicate/m2-bisect.md — drift at 228927d, bit-identical
+    # across the whole VR range. Old pin encoded the premature-completion bug.
+    # Regenerated at tip d13f597 from build_sio_yield_report; fouling
+    # threshold structure (deposit at 1050 C, none at 1400/1500 C) holds.
     assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
-        5.133902074307e-07, rel=1e-9
+        4.439481519259e-06, rel=1e-9
     )
     assert _sio_wall_product_deposit_kg(1400.0) == pytest.approx(
         0.0, rel=1e-9
