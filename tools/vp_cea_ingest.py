@@ -298,8 +298,22 @@ def _extract_formula_tokens(header_line: str) -> list[str]:
     return cleaned
 
 
-def parse_thermo_inp(text: str) -> list[CeaSpeciesRecord]:
-    """Parse a NASA CEA ``thermo.inp`` (or subset) into preserved records."""
+def parse_thermo_inp(
+    text: str,
+    *,
+    skip_invalid_segments: bool = False,
+) -> list[CeaSpeciesRecord]:
+    """Parse a NASA CEA ``thermo.inp`` (or subset) into preserved records.
+
+    Parameters
+    ----------
+    skip_invalid_segments:
+        When True (bulk / full-database mode), drop intervals with
+        ``T_min >= T_max`` (Snyder 2021 T-range floor artifact in the public
+        ``thermo.inp``) with a stderr warning, and skip species that retain no
+        valid intervals. Default False keeps fail-loud behaviour for fixtures
+        and unit tests.
+    """
     lines = text.splitlines()
     # Skip to after the ``thermo`` marker when present.
     i = 0
@@ -394,6 +408,20 @@ def parse_thermo_inp(text: str) -> list[CeaSpeciesRecord]:
                     f"got n_poly={n_poly}"
                 )
 
+            if not (float(T_min) < float(T_max)):
+                msg = (
+                    f"{name}: inverted/zero-width segment "
+                    f"T=[{T_min}, {T_max}] K"
+                )
+                if skip_invalid_segments:
+                    print(f"warning: dropping {msg}", file=sys.stderr)
+                    cursor += 3
+                    continue
+                raise NasaCeaSegmentError(
+                    f"NASA-9 segment requires T_min < T_max; got "
+                    f"[{float(T_min)}, {float(T_max)}]"
+                )
+
             intervals.append(
                 {
                     "T_min_K": float(T_min),
@@ -409,12 +437,25 @@ def parse_thermo_inp(text: str) -> list[CeaSpeciesRecord]:
             )
             cursor += 3
 
+        if not intervals:
+            if skip_invalid_segments:
+                print(
+                    f"warning: skipping {name}: no valid T segments after "
+                    "dropping inverted/zero-width intervals",
+                    file=sys.stderr,
+                )
+                i = cursor
+                continue
+            raise NasaCeaSegmentError(
+                f"{name}: no valid temperature segments after parse"
+            )
+
         std = _phase_flag_to_standard_state(int(header["phase_flag"]), name)
         records.append(
             CeaSpeciesRecord(
                 name=name,
                 citation=citation,
-                n_intervals=nint,
+                n_intervals=len(intervals),
                 source_ref_code=str(header["source_ref_code"]),
                 formula_tokens=list(header["formula_tokens"]),
                 phase_flag=int(header["phase_flag"]),
@@ -431,7 +472,19 @@ def parse_thermo_inp(text: str) -> list[CeaSpeciesRecord]:
             )
         )
         # Construction validates segment coverage via to_polynomial.
-        records[-1].to_polynomial()
+        try:
+            records[-1].to_polynomial()
+        except (NasaCeaSegmentError, NasaCeaConventionError, NasaCeaError) as exc:
+            if skip_invalid_segments:
+                print(
+                    f"warning: skipping {name}: post-parse validation failed: "
+                    f"{exc}",
+                    file=sys.stderr,
+                )
+                records.pop()
+                i = cursor
+                continue
+            raise
         i = cursor
 
     return records
@@ -700,9 +753,12 @@ def ingest(
     *,
     volatile_draft: Path | None = None,
     species: Sequence[str] | None = None,
+    skip_invalid_segments: bool = False,
 ) -> IngestResult:
     text = thermo_path.read_text(encoding="utf-8", errors="replace")
-    records = parse_thermo_inp(text)
+    records = parse_thermo_inp(
+        text, skip_invalid_segments=skip_invalid_segments
+    )
     by_name = {r.name: r for r in records}
     species_filter: set[str] | None = None
     if species:
@@ -790,6 +846,24 @@ def main(argv: list[str] | None = None) -> int:
         help="optional explicit CEA species names to include",
     )
     parser.add_argument(
+        "--species-file",
+        type=Path,
+        default=None,
+        help=(
+            "bulk mode: path to a text file with one CEA species name per "
+            "line (# comments and blank lines ignored); merged with --species"
+        ),
+    )
+    parser.add_argument(
+        "--skip-invalid-segments",
+        action="store_true",
+        help=(
+            "bulk / full-database mode: drop inverted/zero-width T segments "
+            "(Snyder 2021 thermo.inp floor artifacts) with warnings instead "
+            "of failing the whole parse"
+        ),
+    )
+    parser.add_argument(
         "--list",
         action="store_true",
         help="list parsed CEA names and exit (no write)",
@@ -800,11 +874,31 @@ def main(argv: list[str] | None = None) -> int:
         print(f"error: thermo file not found: {args.thermo}", file=sys.stderr)
         return 2
 
+    species: list[str] | None = list(args.species) if args.species else None
+    if args.species_file is not None:
+        if not args.species_file.is_file():
+            print(
+                f"error: --species-file not found: {args.species_file}",
+                file=sys.stderr,
+            )
+            return 2
+        from_file: list[str] = []
+        for raw in args.species_file.read_text(encoding="utf-8").splitlines():
+            line = raw.strip()
+            if not line or line.startswith("#"):
+                continue
+            from_file.append(line)
+        if species is None:
+            species = from_file
+        else:
+            species = list(species) + from_file
+
     try:
         result = ingest(
             args.thermo,
             volatile_draft=args.volatile_draft,
-            species=args.species,
+            species=species,
+            skip_invalid_segments=args.skip_invalid_segments,
         )
     except (
         CeaIngestSelectionError,
