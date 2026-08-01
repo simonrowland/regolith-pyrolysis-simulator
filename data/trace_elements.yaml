@@ -8,7 +8,7 @@ units:
 # VR-9 diagnostic bridge (golden-neutral): activity + kinetics policy for the
 # vapour-rail seam. Does not change plant_bins routing or runtime flux.
 # Source: docs-private/research/2026-07-30-vp-acquire-5/henrian-correlations.md
-# and DESIGN-REV5 §9.1–§9.2.
+# and DESIGN-REV5 sect.9.1-sect.9.2.
 vapour_rail_activity_policy:
   unmeasured_henrian_gamma: upper_bound_a_eq_1
   bound_report_label: bound-not-point
@@ -140,7 +140,7 @@ references:
     doi: 10.1016/j.chemer.2023.125957
     url: https://doi.org/10.1016/j.chemer.2023.125957
   FISCHERGOEDDE2010:
-    author_year: Fischer-Gödde, Becker & Wombacher 2010
+    author_year: Fischer-Goedde, Becker & Wombacher 2010
     title: Rhodium, gold and other highly siderophile element abundances in chondritic meteorites
     doi: 10.1016/j.gca.2009.09.024
     url: https://doi.org/10.1016/j.gca.2009.09.024
@@ -440,7 +440,7 @@ elements:
       - LiO
       - Li3O
       - Li2O2
-      phase_system: Li2O(s), 1000–1700 K
+      phase_system: Li2O(s), 1000-1700 K
       dominance_window_K:
       - 1000.0
       - 1700.0
@@ -614,11 +614,11 @@ elements:
       - Be5O5
       - Be6O6
       - Be2O
-      phase_system: BeO(s), 1900–2500 K
+      phase_system: BeO(s), 1900-2500 K
       dominance_window_K:
       - 1900.0
       - 2500.0
-      dominance_note: Be(g) first, then BeO polymer ladder (SF18-T1; LH87 §2.2.a)
+      dominance_note: Be(g) first, then BeO polymer ladder (SF18-T1; LH87 sect.2.2.a)
       validation_status: pending_validation
       acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
       source_account: process.cleaned_melt
@@ -636,7 +636,7 @@ elements:
           applicable: true
           dominance: negligible
           outcome: retain_rump
-          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+          note: '<=2273 K millibar-sweep: plant flux below detection; retain in rump account'
         hard_vacuum:
           applicable: true
           dominance: regime_open
@@ -1053,7 +1053,7 @@ elements:
         - schreibersite
         kg_per_t_typical: 2
         confidence: literature
-      source: BODY-SWEEP §5.1-§5.2 (2026-07-20)
+      source: BODY-SWEEP sect.5.1-sect.5.2 (2026-07-20)
     flags:
       radiological: false
       toxic: false
@@ -1114,7 +1114,7 @@ elements:
       dormant_to_flux: true
       literature_sources:
       - SF18-T1
-      - gas-closure §2.4/§6.1
+      - gas-closure sect.2.4/sect.6.1
       - vp-acquire-5/P-carriers.md
       regime:
         millibar:
@@ -1256,7 +1256,7 @@ elements:
         - troilite-inclusions
         kg_per_t_typical: 5
         confidence: literature
-      source: BODY-SWEEP §5.1-§5.2 (2026-07-20)
+      source: BODY-SWEEP sect.5.1-sect.5.2 (2026-07-20)
     flags:
       radiological: false
       toxic: false
@@ -1561,7 +1561,7 @@ elements:
       candidate_forms:
       - ScO
       - Sc
-      phase_system: Sc2O3(s), 2481–2768 K
+      phase_system: Sc2O3(s), 2481-2768 K
       dominance_window_K:
       - 2481.0
       - 2768.0
@@ -1582,7 +1582,7 @@ elements:
           applicable: true
           dominance: negligible
           outcome: retain_rump
-          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+          note: '<=2273 K millibar-sweep: plant flux below detection; retain in rump account'
         hard_vacuum:
           applicable: true
           dominance: regime_open
@@ -1749,7 +1749,7 @@ elements:
       - VO
       - VO2
       - V
-      phase_system: VO(s)/V2O3, ~1680–1950 K partial pressures
+      phase_system: VO(s)/V2O3, ~1680-1950 K partial pressures
       dominance_window_K:
       - 1003.0
       - 2270.0
@@ -2485,7 +2485,7 @@ elements:
         - 400
         g_per_t_typical: 150
         confidence: literature
-      source: BODY-SWEEP §5.1-§5.2 (2026-07-20)
+      source: BODY-SWEEP sect.5.1-sect.5.2 (2026-07-20)
     flags:
       radiological: false
       toxic: false
@@ -2781,7 +2781,7 @@ elements:
         g_per_t_typical: 20
         confidence: literature
         note: group-taxonomic
-      source: BODY-SWEEP §5.1-§5.2 (2026-07-20)
+      source: BODY-SWEEP sect.5.1-sect.5.2 (2026-07-20)
     flags:
       radiological: false
       toxic: false
@@ -2816,7 +2816,7 @@ elements:
       - Ga2O
       - Ga
       - GaO
-      phase_system: Ga2O3(s), 1013–1841 K
+      phase_system: Ga2O3(s), 1013-1841 K
       dominance_window_K:
       - 1013.0
       - 1841.0
@@ -2963,7 +2963,7 @@ elements:
         g_per_t_typical: 30
         confidence: literature
         note: group-taxonomic-wide-range
-      source: BODY-SWEEP §5.1-§5.2 (2026-07-20)
+      source: BODY-SWEEP sect.5.1-sect.5.2 (2026-07-20)
     flags:
       radiological: false
       toxic: false
@@ -3109,7 +3109,7 @@ elements:
         - 50
         g_per_t_typical: 10
         confidence: literature
-      source: BODY-SWEEP §5.1-§5.2 (2026-07-20)
+      source: BODY-SWEEP sect.5.1-sect.5.2 (2026-07-20)
     flags:
       radiological: false
       toxic: true
@@ -3143,11 +3143,11 @@ elements:
       candidate_forms:
       - As4O6
       - As
-      phase_system: As2O3(arsenolite) -> As4O6(g), 369–730 K Antoine windows
+      phase_system: As2O3(arsenolite) -> As4O6(g), 369-730 K Antoine windows
       dominance_window_K:
       - 367.0
       - 1700.0
-      dominance_note: As4O6 ≫ As4O5, As4O4, As2O3, AsO (SF18-T1 p.402; BR72)
+      dominance_note: As4O6 >> As4O5, As4O4, As2O3, AsO (SF18-T1 p.402; BR72)
       validation_status: pending_validation
       acquisition_status: REVIEWABLE_ANTOINE_PRIMARY
       source_account: process.cleaned_melt
@@ -3328,11 +3328,11 @@ elements:
       - Se7
       - Se8
       - Se
-      phase_system: Se(s/l) allotrope ladder, 629–953 K total-P; Se5/6 low-T
+      phase_system: Se(s/l) allotrope ladder, 629-953 K total-P; Se5/6 low-T
       dominance_window_K:
       - 629.0
       - 1200.0
-      dominance_note: Se6 ≳ Se5 over Se(l) low-T; Se2 dominates ≳800 K (NEA05, Rau74, KEMS14)
+      dominance_note: Se6 >~ Se5 over Se(l) low-T; Se2 dominates >~800 K (NEA05, Rau74, KEMS14)
       validation_status: pending_validation
       acquisition_status: REVIEWABLE_SPECIATION_PLUS_DELTAF
       source_account: process.cleaned_melt
@@ -3635,7 +3635,7 @@ elements:
       - RbO
       - Rb2
       - Rb2O2
-      phase_system: Rb2O(s/l), ~1020–1135 K measured
+      phase_system: Rb2O(s/l), ~1020-1135 K measured
       dominance_window_K:
       - 1000.0
       - 1700.0
@@ -3810,11 +3810,11 @@ elements:
       candidate_forms:
       - Sr
       - SrO
-      phase_system: SrO(s), 1575–2102 K
+      phase_system: SrO(s), 1575-2102 K
       dominance_window_K:
       - 1575.0
       - 2102.0
-      dominance_note: Sr(g) ≈ SrO(g) under neutral/reducing; SrO under oxidizing (LH87)
+      dominance_note: Sr(g) ~ SrO(g) under neutral/reducing; SrO under oxidizing (LH87)
       validation_status: pending_validation
       acquisition_status: REVIEWABLE_THERMOCHEMICAL_ANCHOR
       source_account: process.cleaned_melt
@@ -3985,11 +3985,11 @@ elements:
       candidate_forms:
       - YO
       - Y
-      phase_system: Y2O3(s,l), 1400–2700 K
+      phase_system: Y2O3(s,l), 1400-2700 K
       dominance_window_K:
       - 1400.0
       - 2700.0
-      dominance_note: YO ≫ Y (SF18-T1)
+      dominance_note: YO >> Y (SF18-T1)
       validation_status: pending_validation
       acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
       source_account: process.cleaned_melt
@@ -4005,7 +4005,7 @@ elements:
           applicable: true
           dominance: negligible
           outcome: retain_rump
-          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+          note: '<=2273 K millibar-sweep: plant flux below detection; retain in rump account'
         hard_vacuum:
           applicable: true
           dominance: regime_open
@@ -4143,7 +4143,7 @@ elements:
       status: UNCERTAIN
       conflict: speciation F20 + consistency freeze say rump; thermo T11 says activity/salt-gated Ca candidate
       finding_ids:
-      - BODY-SWEEP DIFF-A/§1/§3/§5/§6 (2026-07-20)
+      - BODY-SWEEP DIFF-A/sect.1/sect.3/sect.5/sect.6 (2026-07-20)
     vapour_rail_acquisition:
       chunk: VR-8
       group: B
@@ -4154,11 +4154,11 @@ elements:
       candidate_forms:
       - ZrO
       - Zr
-      phase_system: ZrO2(s), 1700–2875 K
+      phase_system: ZrO2(s), 1700-2875 K
       dominance_window_K:
       - 1700.0
       - 2875.0
-      dominance_note: ZrO ~ ZrO2 ≫ Zr (SF18-T1); ZrO2 condensed also present in inventory
+      dominance_note: ZrO ~ ZrO2 >> Zr (SF18-T1); ZrO2 condensed also present in inventory
       validation_status: pending_validation
       acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
       source_account: process.cleaned_melt
@@ -4174,7 +4174,7 @@ elements:
           applicable: true
           dominance: negligible
           outcome: retain_rump
-          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+          note: '<=2273 K millibar-sweep: plant flux below detection; retain in rump account'
         hard_vacuum:
           applicable: true
           dominance: regime_open
@@ -4336,11 +4336,11 @@ elements:
       - NbO2
       - NbO
       - Nb
-      phase_system: NbO/NbO2/Nb2O5, 1726–2473 K
+      phase_system: NbO/NbO2/Nb2O5, 1726-2473 K
       dominance_window_K:
       - 1726.0
       - 2473.0
-      dominance_note: NbO2 ≈ NbO (SF18-T1)
+      dominance_note: NbO2 ~ NbO (SF18-T1)
       validation_status: pending_validation
       acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
       source_account: process.cleaned_melt
@@ -4356,7 +4356,7 @@ elements:
           applicable: true
           dominance: negligible
           outcome: retain_rump
-          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+          note: '<=2273 K millibar-sweep: plant flux below detection; retain in rump account'
         hard_vacuum:
           applicable: true
           dominance: regime_open
@@ -4485,7 +4485,7 @@ elements:
         - 30
         g_per_t_typical: 10
         confidence: literature
-      source: BODY-SWEEP §5.1-§5.2 (2026-07-20)
+      source: BODY-SWEEP sect.5.1-sect.5.2 (2026-07-20)
     flags:
       radiological: false
       toxic: false
@@ -5205,7 +5205,7 @@ elements:
       candidate_forms:
       - Sb4O6
       - Sb
-      phase_system: Sb2O3(valentinite) -> Sb4O6(g), 580–1073 K
+      phase_system: Sb2O3(valentinite) -> Sb4O6(g), 580-1073 K
       dominance_window_K:
       - 580.0
       - 1073.0
@@ -5365,7 +5365,7 @@ elements:
       status: reviewed
       conflict: null
       finding_ids:
-      - BODY-SWEEP DIFF-A/§1/§3/§6 (2026-07-20)
+      - BODY-SWEEP DIFF-A/sect.1/sect.3/sect.6 (2026-07-20)
   I:
     atomic_number: 53
     family: halogen
@@ -5642,7 +5642,7 @@ elements:
       - Cs
       - CsO
       - Cs2O2
-      phase_system: Cs2O associative, 1070–1170 K dominance
+      phase_system: Cs2O associative, 1070-1170 K dominance
       dominance_window_K:
       - 1070.0
       - 1170.0
@@ -5817,7 +5817,7 @@ elements:
       candidate_forms:
       - BaO
       - Ba
-      phase_system: BaO(s), 1150–1758 K
+      phase_system: BaO(s), 1150-1758 K
       dominance_window_K:
       - 1150.0
       - 1758.0
@@ -5991,11 +5991,11 @@ elements:
       candidate_forms:
       - LaO
       - La
-      phase_system: La2O3(s), 1778–2441 K
+      phase_system: La2O3(s), 1778-2441 K
       dominance_window_K:
       - 1778.0
       - 2441.0
-      dominance_note: LaO ≫ La (SF18-T1)
+      dominance_note: LaO >> La (SF18-T1)
       validation_status: pending_validation
       acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
       source_account: process.cleaned_melt
@@ -6011,7 +6011,7 @@ elements:
           applicable: true
           dominance: negligible
           outcome: retain_rump
-          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+          note: '<=2273 K millibar-sweep: plant flux below detection; retain in rump account'
         hard_vacuum:
           applicable: true
           dominance: regime_open
@@ -6172,11 +6172,11 @@ elements:
       - CeO
       - CeO2
       - Ce
-      phase_system: Ce2O3/CeO2(s), 1700–2320 K
+      phase_system: Ce2O3/CeO2(s), 1700-2320 K
       dominance_window_K:
       - 1700.0
       - 2320.0
-      dominance_note: CeO, CeO2 ≫ Ce (SF18-T1)
+      dominance_note: CeO, CeO2 >> Ce (SF18-T1)
       validation_status: pending_validation
       acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
       source_account: process.cleaned_melt
@@ -6192,7 +6192,7 @@ elements:
           applicable: true
           dominance: negligible
           outcome: retain_rump
-          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+          note: '<=2273 K millibar-sweep: plant flux below detection; retain in rump account'
         hard_vacuum:
           applicable: true
           dominance: regime_open
@@ -6348,11 +6348,11 @@ elements:
       candidate_forms:
       - PrO
       - Pr
-      phase_system: Pr2O3(s), 1950–2350 K
+      phase_system: Pr2O3(s), 1950-2350 K
       dominance_window_K:
       - 1950.0
       - 2350.0
-      dominance_note: PrO ≫ Pr (SF18-T1)
+      dominance_note: PrO >> Pr (SF18-T1)
       validation_status: pending_validation
       acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
       source_account: process.cleaned_melt
@@ -6368,7 +6368,7 @@ elements:
           applicable: true
           dominance: negligible
           outcome: retain_rump
-          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+          note: '<=2273 K millibar-sweep: plant flux below detection; retain in rump account'
         hard_vacuum:
           applicable: true
           dominance: regime_open
@@ -6527,11 +6527,11 @@ elements:
       candidate_forms:
       - NdO
       - Nd
-      phase_system: Nd2O3(s), 1950–2485 K
+      phase_system: Nd2O3(s), 1950-2485 K
       dominance_window_K:
       - 1950.0
       - 2485.0
-      dominance_note: NdO ≫ Nd (SF18-T1)
+      dominance_note: NdO >> Nd (SF18-T1)
       validation_status: pending_validation
       acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
       source_account: process.cleaned_melt
@@ -6547,7 +6547,7 @@ elements:
           applicable: true
           dominance: negligible
           outcome: retain_rump
-          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+          note: '<=2273 K millibar-sweep: plant flux below detection; retain in rump account'
         hard_vacuum:
           applicable: true
           dominance: regime_open
@@ -6706,7 +6706,7 @@ elements:
       candidate_forms:
       - SmO
       - Sm
-      phase_system: Sm2O3(s), 1950–2499 K
+      phase_system: Sm2O3(s), 1950-2499 K
       dominance_window_K:
       - 1950.0
       - 2499.0
@@ -6726,7 +6726,7 @@ elements:
           applicable: true
           dominance: negligible
           outcome: retain_rump
-          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+          note: '<=2273 K millibar-sweep: plant flux below detection; retain in rump account'
         hard_vacuum:
           applicable: true
           dominance: regime_open
@@ -6894,11 +6894,11 @@ elements:
       candidate_forms:
       - Eu
       - EuO
-      phase_system: Eu metal; Eu2O3 for EuO, 1950–2350 K
+      phase_system: Eu metal; Eu2O3 for EuO, 1950-2350 K
       dominance_window_K:
       - 700.0
       - 2350.0
-      dominance_note: Eu(g) first — anomalously volatile REE; EuO secondary (Hab64; Ames67)
+      dominance_note: Eu(g) first - anomalously volatile REE; EuO secondary (Hab64; Ames67)
       validation_status: pending_validation
       acquisition_status: PARTIAL_METAL_ANCHORED_OXIDE_OPEN
       source_account: process.cleaned_melt
@@ -7071,11 +7071,11 @@ elements:
       candidate_forms:
       - GdO
       - Gd
-      phase_system: Gd2O3(s), 2000–2590 K
+      phase_system: Gd2O3(s), 2000-2590 K
       dominance_window_K:
       - 2000.0
       - 2590.0
-      dominance_note: GdO ≫ Gd (SF18-T1)
+      dominance_note: GdO >> Gd (SF18-T1)
       validation_status: pending_validation
       acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
       source_account: process.cleaned_melt
@@ -7091,7 +7091,7 @@ elements:
           applicable: true
           dominance: negligible
           outcome: retain_rump
-          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+          note: '<=2273 K millibar-sweep: plant flux below detection; retain in rump account'
         hard_vacuum:
           applicable: true
           dominance: regime_open
@@ -7248,11 +7248,11 @@ elements:
       candidate_forms:
       - TbO
       - Tb
-      phase_system: Tb2O3(s), 2000–2500 K
+      phase_system: Tb2O3(s), 2000-2500 K
       dominance_window_K:
       - 2000.0
       - 2500.0
-      dominance_note: TbO ≫ Tb (SF18-T1)
+      dominance_note: TbO >> Tb (SF18-T1)
       validation_status: pending_validation
       acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
       source_account: process.cleaned_melt
@@ -7268,7 +7268,7 @@ elements:
           applicable: true
           dominance: negligible
           outcome: retain_rump
-          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+          note: '<=2273 K millibar-sweep: plant flux below detection; retain in rump account'
         hard_vacuum:
           applicable: true
           dominance: regime_open
@@ -7427,7 +7427,7 @@ elements:
       candidate_forms:
       - DyO
       - Dy
-      phase_system: Dy2O3(s), 2000–2637 K
+      phase_system: Dy2O3(s), 2000-2637 K
       dominance_window_K:
       - 2000.0
       - 2637.0
@@ -7448,7 +7448,7 @@ elements:
           applicable: true
           dominance: negligible
           outcome: retain_rump
-          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+          note: '<=2273 K millibar-sweep: plant flux below detection; retain in rump account'
         hard_vacuum:
           applicable: true
           dominance: regime_open
@@ -7604,7 +7604,7 @@ elements:
       candidate_forms:
       - HoO
       - Ho
-      phase_system: Ho2O3(s), 2000–2711 K
+      phase_system: Ho2O3(s), 2000-2711 K
       dominance_window_K:
       - 2000.0
       - 2711.0
@@ -7624,7 +7624,7 @@ elements:
           applicable: true
           dominance: negligible
           outcome: retain_rump
-          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+          note: '<=2273 K millibar-sweep: plant flux below detection; retain in rump account'
         hard_vacuum:
           applicable: true
           dominance: regime_open
@@ -7780,7 +7780,7 @@ elements:
       candidate_forms:
       - ErO
       - Er
-      phase_system: Er2O3(s), 2000–2687 K
+      phase_system: Er2O3(s), 2000-2687 K
       dominance_window_K:
       - 2000.0
       - 2687.0
@@ -7800,7 +7800,7 @@ elements:
           applicable: true
           dominance: negligible
           outcome: retain_rump
-          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+          note: '<=2273 K millibar-sweep: plant flux below detection; retain in rump account'
         hard_vacuum:
           applicable: true
           dominance: regime_open
@@ -7956,7 +7956,7 @@ elements:
       candidate_forms:
       - Tm
       - TmO
-      phase_system: Tm2O3(s), 2000–2641 K
+      phase_system: Tm2O3(s), 2000-2641 K
       dominance_window_K:
       - 2000.0
       - 2641.0
@@ -7977,7 +7977,7 @@ elements:
           applicable: true
           dominance: negligible
           outcome: retain_rump
-          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+          note: '<=2273 K millibar-sweep: plant flux below detection; retain in rump account'
         hard_vacuum:
           applicable: true
           dominance: regime_open
@@ -8141,11 +8141,11 @@ elements:
       candidate_forms:
       - Yb
       - YbO
-      phase_system: Yb metal 623–931 K; Yb2O3 oxide 2000–2626 K
+      phase_system: Yb metal 623-931 K; Yb2O3 oxide 2000-2626 K
       dominance_window_K:
       - 623.0
       - 2626.0
-      dominance_note: Yb(g) first — anomalously volatile REE (Hab64; Ames67)
+      dominance_note: Yb(g) first - anomalously volatile REE (Hab64; Ames67)
       validation_status: pending_validation
       acquisition_status: REVIEWABLE_METAL_ANTOINE_OXIDE_OPEN
       source_account: process.cleaned_melt
@@ -8316,11 +8316,11 @@ elements:
       candidate_forms:
       - LuO
       - Lu
-      phase_system: Lu2O3(s), 2000–2700 K
+      phase_system: Lu2O3(s), 2000-2700 K
       dominance_window_K:
       - 2000.0
       - 2700.0
-      dominance_note: LuO ≫ Lu (LuO/Lu ≈ 4) (SF18-T1)
+      dominance_note: LuO >> Lu (LuO/Lu ~ 4) (SF18-T1)
       validation_status: pending_validation
       acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
       source_account: process.cleaned_melt
@@ -8336,7 +8336,7 @@ elements:
           applicable: true
           dominance: negligible
           outcome: retain_rump
-          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+          note: '<=2273 K millibar-sweep: plant flux below detection; retain in rump account'
         hard_vacuum:
           applicable: true
           dominance: regime_open
@@ -8484,11 +8484,11 @@ elements:
       candidate_forms:
       - HfO
       - Hf
-      phase_system: HfO2(s), 2150–2900 K
+      phase_system: HfO2(s), 2150-2900 K
       dominance_window_K:
       - 2150.0
       - 2900.0
-      dominance_note: HfO > HfO2 ≫ Hf (SF18-T1)
+      dominance_note: HfO > HfO2 >> Hf (SF18-T1)
       validation_status: pending_validation
       acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
       source_account: process.cleaned_melt
@@ -8504,7 +8504,7 @@ elements:
           applicable: true
           dominance: negligible
           outcome: retain_rump
-          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+          note: '<=2273 K millibar-sweep: plant flux below detection; retain in rump account'
         hard_vacuum:
           applicable: true
           dominance: regime_open
@@ -8666,11 +8666,11 @@ elements:
       - TaO2
       - TaO
       - Ta
-      phase_system: Ta2O5(s,l), 1573–2525 K
+      phase_system: Ta2O5(s,l), 1573-2525 K
       dominance_window_K:
       - 1573.0
       - 2525.0
-      dominance_note: TaO2, TaO ≫ Ta (SF18-T1)
+      dominance_note: TaO2, TaO >> Ta (SF18-T1)
       validation_status: pending_validation
       acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
       source_account: process.cleaned_melt
@@ -8686,7 +8686,7 @@ elements:
           applicable: true
           dominance: negligible
           outcome: retain_rump
-          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+          note: '<=2273 K millibar-sweep: plant flux below detection; retain in rump account'
         hard_vacuum:
           applicable: true
           dominance: regime_open
@@ -8816,14 +8816,14 @@ elements:
         - 5
         g_per_t_typical: 1
         confidence: literature
-      source: BODY-SWEEP §5.1-§5.2 (2026-07-20)
+      source: BODY-SWEEP sect.5.1-sect.5.2 (2026-07-20)
     flags:
       radiological: false
       toxic: false
       phosphine_former: false
       cryo_choke_risk: false
       salience_unit: g_per_t
-      salience_note: ~0.2 g W per 1-t lunar soil — high-value trace
+      salience_note: ~0.2 g W per 1-t lunar soil - high-value trace
     source_ids:
     - LODDERS2003
     - LSB1991_CH8
@@ -9147,7 +9147,7 @@ elements:
       candidate_forms:
       - IrO3
       - Ir
-      phase_system: Ir metal + O2, 1473–2073 K; oxidizing only
+      phase_system: Ir metal + O2, 1473-2073 K; oxidizing only
       dominance_window_K:
       - 1473.0
       - 2073.0
@@ -9168,7 +9168,7 @@ elements:
           applicable: true
           dominance: negligible
           outcome: retain_rump
-          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+          note: '<=2273 K millibar-sweep: plant flux below detection; retain in rump account'
           po2_gate: oxidizing_only_negligible_at_recipe_pO2
         hard_vacuum:
           applicable: true
@@ -9333,7 +9333,7 @@ elements:
       candidate_forms:
       - PtO2
       - Pt
-      phase_system: Pt metal + O2, 1473–2073 K; oxidizing only
+      phase_system: Pt metal + O2, 1473-2073 K; oxidizing only
       dominance_window_K:
       - 1473.0
       - 2073.0
@@ -9354,7 +9354,7 @@ elements:
           applicable: true
           dominance: negligible
           outcome: retain_rump
-          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+          note: '<=2273 K millibar-sweep: plant flux below detection; retain in rump account'
           po2_gate: oxidizing_only_negligible_at_recipe_pO2
         hard_vacuum:
           applicable: true
@@ -10065,11 +10065,11 @@ elements:
       - ThO2
       - ThO
       - Th
-      phase_system: ThO2(s,l), 1782–2950 K
+      phase_system: ThO2(s,l), 1782-2950 K
       dominance_window_K:
       - 1782.0
       - 2950.0
-      dominance_note: ThO2, ThO ≫ Th (SF18-T1)
+      dominance_note: ThO2, ThO >> Th (SF18-T1)
       validation_status: pending_validation
       acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
       source_account: process.cleaned_melt
@@ -10085,7 +10085,7 @@ elements:
           applicable: true
           dominance: negligible
           outcome: retain_rump
-          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+          note: '<=2273 K millibar-sweep: plant flux below detection; retain in rump account'
         hard_vacuum:
           applicable: true
           dominance: regime_open
@@ -10242,7 +10242,7 @@ elements:
       - UO3
       - UO
       - U
-      phase_system: UO2(s,l), 1600–3400 K; U3O8 -> UO3
+      phase_system: UO2(s,l), 1600-3400 K; U3O8 -> UO3
       dominance_window_K:
       - 1600.0
       - 3400.0
@@ -10262,7 +10262,7 @@ elements:
           applicable: true
           dominance: negligible
           outcome: retain_rump
-          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+          note: '<=2273 K millibar-sweep: plant flux below detection; retain in rump account'
         hard_vacuum:
           applicable: true
           dominance: regime_open
@@ -10403,7 +10403,7 @@ elements:
       status: reviewed
       conflict: null
       finding_ids:
-      - BODY-SWEEP DIFF-A/DIFF-B/§1/§3 (2026-07-20)
+      - BODY-SWEEP DIFF-A/DIFF-B/sect.1/sect.3 (2026-07-20)
   He:
     atomic_number: 2
     family: noble-gas
@@ -10524,7 +10524,7 @@ elements:
       status: reviewed
       conflict: null
       finding_ids:
-      - BODY-SWEEP DIFF-A/§1 (2026-07-20)
+      - BODY-SWEEP DIFF-A/sect.1 (2026-07-20)
   C:
     atomic_number: 6
     family: volatile-lithophile
@@ -10669,7 +10669,7 @@ elements:
       status: reviewed
       conflict: null
       finding_ids:
-      - BODY-SWEEP DIFF-A/DIFF-B/§1/§3/§5 (2026-07-20)
+      - BODY-SWEEP DIFF-A/DIFF-B/sect.1/sect.3/sect.5 (2026-07-20)
   N:
     atomic_number: 7
     family: volatile-lithophile
@@ -10805,7 +10805,7 @@ elements:
       status: reviewed
       conflict: null
       finding_ids:
-      - BODY-SWEEP DIFF-A/DIFF-B/§1/§2/§3/§6 (2026-07-20)
+      - BODY-SWEEP DIFF-A/DIFF-B/sect.1/sect.2/sect.3/sect.6 (2026-07-20)
   Ru:
     atomic_number: 44
     family: siderophile
@@ -10952,7 +10952,7 @@ elements:
       candidate_forms:
       - RuO3
       - Ru
-      phase_system: Ru metal + O2, 1473–2073 K; oxidizing only
+      phase_system: Ru metal + O2, 1473-2073 K; oxidizing only
       dominance_window_K:
       - 1473.0
       - 2073.0
@@ -10973,7 +10973,7 @@ elements:
           applicable: true
           dominance: negligible
           outcome: retain_rump
-          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+          note: '<=2273 K millibar-sweep: plant flux below detection; retain in rump account'
           po2_gate: oxidizing_only_negligible_at_recipe_pO2
         hard_vacuum:
           applicable: true
@@ -11130,7 +11130,7 @@ elements:
       candidate_forms:
       - RhO2
       - Rh
-      phase_system: Rh metal + O2, 1473–2073 K; oxidizing only
+      phase_system: Rh metal + O2, 1473-2073 K; oxidizing only
       dominance_window_K:
       - 1473.0
       - 2073.0
@@ -11151,7 +11151,7 @@ elements:
           applicable: true
           dominance: negligible
           outcome: retain_rump
-          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+          note: '<=2273 K millibar-sweep: plant flux below detection; retain in rump account'
           po2_gate: oxidizing_only_negligible_at_recipe_pO2
         hard_vacuum:
           applicable: true
@@ -11444,11 +11444,11 @@ elements:
       - OsO4
       - OsO3
       - Os
-      phase_system: OsO4(l)/Os+O2, 1100–1750 K; oxidizing
+      phase_system: OsO4(l)/Os+O2, 1100-1750 K; oxidizing
       dominance_window_K:
       - 1100.0
       - 1750.0
-      dominance_note: OsO4, OsO3 ≫ OsO2 under oxidizing conditions (SF18-T1; A61)
+      dominance_note: OsO4, OsO3 >> OsO2 under oxidizing conditions (SF18-T1; A61)
       validation_status: pending_validation
       acquisition_status: REGIME_AWARE_RECORD_PENDING_NUMERIC
       source_account: process.cleaned_melt
@@ -11465,7 +11465,7 @@ elements:
           applicable: true
           dominance: negligible
           outcome: retain_rump
-          note: '≤2273 K millibar-sweep: plant flux below detection; retain in rump account'
+          note: '<=2273 K millibar-sweep: plant flux below detection; retain in rump account'
           po2_gate: oxidizing_only_negligible_at_recipe_pO2
         hard_vacuum:
           applicable: true
@@ -11601,9 +11601,9 @@ elements:
       status: reviewed
       conflict: null
       finding_ids:
-      - BODY-SWEEP DIFF-A/§3 (2026-07-20)
+      - BODY-SWEEP DIFF-A/sect.3 (2026-07-20)
 molecular_forms_by_feedstock_class:
-  source: BODY-SWEEP DIFF-B/§1-§7 (2026-07-20)
+  source: BODY-SWEEP DIFF-B/sect.1-sect.7 (2026-07-20)
   lunar:
     hosts:
     - solar-wind-implanted-H-He-C-N

@@ -660,7 +660,7 @@ families:
             - 1254
             - 1712
           boiling_point_C: 1484
-          notes: dH_vap ~ 182.3 kJ/mol. Significant above ~1500°C.
+          notes: dH_vap ~ 182.3 kJ/mol. Significant above ~1500 degC.
           gas_rail_standard_reaction:
             formula: CaO(l) -> Ca(g) + 0.5 O2(g)
             basis: 'VapoRock JANAF metal(g)/O2(g) + ThermoEngine v1.0 pure-liquid oxide mu0; minimax refit
@@ -772,7 +772,7 @@ families:
             - 1557
             - 2329
           boiling_point_C: 2519
-          notes: dH_vap ~ 332.0 kJ/mol. Negligible below 2500°C  --  not pyrolysable.
+          notes: dH_vap ~ 332.0 kJ/mol. Negligible below 2500 degC  --  not pyrolysable.
           liquid_oxide_standard_reaction:
             formula: AlO1.5(l) -> Al(g) + 0.75 O2(g)
             basis: 'VapoRock JANAF metal(g)/O2(g) + ThermoEngine v1.0 pure-liquid oxide mu0; minimax refit
@@ -1556,11 +1556,11 @@ families:
           suppression_factor_at_1mbar_O2: '>300*'
           notes: 'THE problem species. At hard vacuum (pO2 ~1e-9 bar and below to the
 
-            legal body floor), SiO dominates offgas above ~1400°C. At pO2 = 1 mbar,
+            legal body floor), SiO dominates offgas above ~1400 degC. At pO2 = 1 mbar,
 
             suppressed >300*. Condenses as adhesive, corrosive amorphous silica
 
-            below ~1200°C. See [THERMO-1] in context-thermo.md.
+            below ~1200 degC. See [THERMO-1] in context-thermo.md.
 
             Composition-independent standard-reaction term from JANAF gas species
 
@@ -1953,7 +1953,7 @@ families:
               note: solid/liquid source equations recovered; coverage short of 1200-2000 K; alpha absent
             - tranche: t5
               note: DO_NOT_PROMOTE thermochemical monomer+dimer screening; disagrees with NBP anchor
-            gate: DRAFT_owner_physics — keep runtime blocker open
+            gate: DRAFT_owner_physics - keep runtime blocker open
           literature_values:
             status: literature_present_pending_validation
             note: t-431 equations recovered; not promoted to executable evaluator
@@ -2028,7 +2028,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -2073,7 +2073,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -2113,7 +2113,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -2173,7 +2173,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -2213,7 +2213,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -2261,7 +2261,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -2300,7 +2300,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -2347,7 +2347,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -2386,7 +2386,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -2429,7 +2429,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -2469,7 +2469,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -2513,7 +2513,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -2552,7 +2552,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -2752,13 +2752,13 @@ families:
                 percent_vs_primary_at_182.844_K: 0.038
                 percent_vs_primary_at_187.61_K: 0.2132
               treatment: recorded_not_averaged; review fit does not replace phase-mapped primary rows
-            gate: DRAFT_owner_physics — do not promote across fusion without phase split
+            gate: DRAFT_owner_physics - do not promote across fusion without phase split
     fiat_routing:
       plant_bin: null
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -2797,7 +2797,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -2840,7 +2840,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -2879,7 +2879,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -2925,7 +2925,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -2964,7 +2964,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -3012,7 +3012,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -3051,7 +3051,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -3128,7 +3128,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -3168,7 +3168,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -3205,7 +3205,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -3244,7 +3244,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -3287,7 +3287,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -3326,7 +3326,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -3373,7 +3373,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -3412,7 +3412,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -3459,7 +3459,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -3498,7 +3498,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -3535,7 +3535,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -3575,7 +3575,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: equilibrium_partial_pressure
@@ -3612,7 +3612,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -3651,7 +3651,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -3698,7 +3698,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -3738,7 +3738,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -3802,13 +3802,13 @@ families:
                 - 188.3
                 fusion_K: 161.15
               treatment: rejected_as_phase_crossing; no coefficient split or refit
-            gate: DRAFT_owner_physics — do not promote across fusion without phase split
+            gate: DRAFT_owner_physics - do not promote across fusion without phase split
     fiat_routing:
       plant_bin: null
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -3848,7 +3848,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -3916,13 +3916,13 @@ families:
               values:
                 reported_Giauque_Powell_offset: approximately +0.5 percent against the EOS
               treatment: recorded_not_corrected; EOS is diagnostic, not a replacement primary solid fit
-            gate: DRAFT_owner_physics — do not promote across fusion without phase split
+            gate: DRAFT_owner_physics - do not promote across fusion without phase split
     fiat_routing:
       plant_bin: null
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -3958,12 +3958,12 @@ families:
           flux_dormant: true
           notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::MgCl2. review_status=grounded_fit_but_not_total_saturated_vapor;
             phase_branch=liquid_to_monomer_gas_equilibrium. DRAFT/owner/physics gates survive; dormant
-            to flux. Antoine is JANAF monomer partial over pure liquid — NOT total saturated vapour (dimer
+            to flux. Antoine is JANAF monomer partial over pure liquid - NOT total saturated vapour (dimer
             Mg2Cl4 contributes; see chloride-dimers-and-gates.md).
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -4016,7 +4016,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -4056,7 +4056,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -4109,7 +4109,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -4148,7 +4148,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -4194,7 +4194,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -4233,7 +4233,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -4276,7 +4276,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -4312,12 +4312,12 @@ families:
           flux_dormant: true
           notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::NO2. review_status=uncertain_not_species_isolated_partial_pressure;
             phase_branch=associated_condensed_vapor_NO2_N2O4_equilibrium. DRAFT/owner/physics gates survive;
-            dormant to flux. Observable is associated NO2–N2O4 equilibrium total vapour, not a species-isolated
+            dormant to flux. Observable is associated NO2-N2O4 equilibrium total vapour, not a species-isolated
             NO2 partial.
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: total_mixture_pressure
@@ -4363,7 +4363,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -4402,7 +4402,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -4448,7 +4448,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -4488,7 +4488,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -4552,13 +4552,13 @@ families:
                 - 206.7
                 triple_K: 185.15
               treatment: rejected_as_phase_crossing; no coefficient split or refit
-            gate: DRAFT_owner_physics — do not promote across fusion without phase split
+            gate: DRAFT_owner_physics - do not promote across fusion without phase split
     fiat_routing:
       plant_bin: null
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -4598,7 +4598,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -4660,13 +4660,13 @@ families:
                 - 331.4
                 fusion_K: 265.9
               treatment: rejected_as_phase_crossing; no coefficient split or refit
-            gate: DRAFT_owner_physics — do not promote across fusion without phase split
+            gate: DRAFT_owner_physics - do not promote across fusion without phase split
     fiat_routing:
       plant_bin: null
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -4706,7 +4706,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -4770,13 +4770,13 @@ families:
                 - 238.1
                 fusion_K: 222.15
               treatment: rejected_as_phase_crossing; no coefficient split or refit
-            gate: DRAFT_owner_physics — do not promote across fusion without phase split
+            gate: DRAFT_owner_physics - do not promote across fusion without phase split
     fiat_routing:
       plant_bin: null
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -4816,7 +4816,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -4980,13 +4980,13 @@ families:
                 - 456.0
                 modern_triple_K: 386.464
               treatment: reject_unsplit_branch; its solid-range values remain comparison-only
-            gate: DRAFT_owner_physics — do not promote across fusion without phase split
+            gate: DRAFT_owner_physics - do not promote across fusion without phase split
     fiat_routing:
       plant_bin: null
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -5026,7 +5026,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -5047,7 +5047,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -5090,7 +5090,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -5208,7 +5208,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -5247,7 +5247,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -5306,7 +5306,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -5345,7 +5345,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -5400,7 +5400,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -5440,7 +5440,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -5513,7 +5513,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -5553,7 +5553,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -5640,7 +5640,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -5676,11 +5676,11 @@ families:
           flux_dormant: true
           notes: 't-431 t14 row WO3. status=UNCERTAIN. Disposition preserved: Polymeric vapor is established,
             but no reviewable total-pressure curve with a certified range was recovered. DRAFT; dormant
-            to flux. Polymeric/total vapour — monomer partials must not masquerade as totals.'
+            to flux. Polymeric/total vapour - monomer partials must not masquerade as totals.'
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: total_mixture_pressure
@@ -5744,7 +5744,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -5785,7 +5785,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -5912,7 +5912,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -5951,7 +5951,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -5972,7 +5972,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -6014,7 +6014,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -6098,7 +6098,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -6135,11 +6135,11 @@ families:
           notes: "t-431 t5 row TeO2. status=UNCERTAIN. Disposition preserved: DO_NOT_PROMOTE as a furnace-range\
             \ pure-component row. Solid-range\npartial pressures are grounded, but later absolute calibration\
             \ is 1.8x\nhigher, vapor is polymeric, coverage ends at 987 K, and alpha is absent.\n DRAFT;\
-            \ dormant to flux. Polymeric/total vapour — monomer partials must not masquerade as totals."
+            \ dormant to flux. Polymeric/total vapour - monomer partials must not masquerade as totals."
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: total_mixture_pressure
@@ -6284,7 +6284,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -6324,7 +6324,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -6409,7 +6409,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -6446,11 +6446,11 @@ families:
           notes: "t-431 t5 row Bi2O3. status=UNCERTAIN. Disposition preserved: DO_NOT_PROMOTE as a pure-component\
             \ Antoine row. Retain the 1163 K\nspecies vector as a review datum only. Vacuum vaporization\
             \ changes\ncondensed O/Bi and requires a Bi-O phase/speciation model.\n DRAFT; dormant to\
-            \ flux. Polymeric/total vapour — monomer partials must not masquerade as totals."
+            \ flux. Polymeric/total vapour - monomer partials must not masquerade as totals."
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: total_mixture_pressure
@@ -6526,7 +6526,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -6568,7 +6568,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: equilibrium_partial_pressure
@@ -6606,7 +6606,7 @@ families:
             valid_range_K:
             - 298.15
             - 2500.0
-            valid_range_interpretation: JANAF grid points; use for ΔfG(T) interpolation on the published
+            valid_range_interpretation: JANAF grid points; use for DeltafG(T) interpolation on the published
               grid only
             source_certification: reference_thermochemical_table
             tabulated_delta_fG_kJ_mol:
@@ -6675,7 +6675,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -6717,7 +6717,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: equilibrium_partial_pressure
@@ -6811,7 +6811,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -6853,7 +6853,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: equilibrium_partial_pressure
@@ -6938,7 +6938,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -6974,14 +6974,14 @@ families:
           flux_dormant: true
           notes: "P-carrier from vp-acquire-5/P-carriers.md. tier=P_POLYMER_OXIDIZED_PURE_OXIDE; status=REVIEWABLE_JANAF_GAS_PURE_OXIDE_ONLY.\
             \ ADOPT as gas species replacing unphysical P2O5_gas for the oxidized\ntetramer end-member.\
-            \ Pure-component Psat from JANAF ΔG_sub is\nscreening-only and ONLY for pure P4O10(s) at low\
+            \ Pure-component Psat from JANAF DeltaG_sub is\nscreening-only and ONLY for pure P4O10(s) at low\
             \ T. NEVER use as\ndilute-melt P2O5 proxy (se5 ban). Melt path must use a_P2O5^2 reaction.\n\
             \ P2O5_gas cannot substitute for this carrier. DRAFT dormant. P2O5_gas is a VapoRock collision-gas\
             \ placeholder and MUST NOT substitute for this carrier."
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: equilibrium_partial_pressure
@@ -7054,7 +7054,7 @@ families:
             - 298.15
             - 500.0
             valid_range_interpretation: 'Only while crystal is the stable pure condensed phase. At T>=800
-              K JANAF gives negative ΔG_sub (table extrapolated past pure-phase stability) — those points
+              K JANAF gives negative DeltaG_sub (table extrapolated past pure-phase stability) - those points
               are NOT certified Psat.
 
               '
@@ -7110,7 +7110,7 @@ families:
             acquisition_status: REVIEWABLE_JANAF_GAS_PURE_OXIDE_ONLY
             runtime_disposition: 'ADOPT as gas species replacing unphysical P2O5_gas for the oxidized
 
-              tetramer end-member. Pure-component Psat from JANAF ΔG_sub is
+              tetramer end-member. Pure-component Psat from JANAF DeltaG_sub is
 
               screening-only and ONLY for pure P4O10(s) at low T. NEVER use as
 
@@ -7123,7 +7123,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -7159,13 +7159,13 @@ families:
           flux_dormant: true
           notes: "P-carrier from vp-acquire-5/P-carriers.md. tier=P_ELEMENTAL_EXTREME_REDUCED; status=REVIEWABLE_JANAF_GAS.\
             \ ADOPT for elemental ladder completeness. Not a normal phosphate-melt\ncarrier at recipe\
-            \ fO2. Note Δf≡0 for T>=1200 K (reference transition).\n P2O5_gas cannot substitute for this\
+            \ fO2. Note Deltaf==0 for T>=1200 K (reference transition).\n P2O5_gas cannot substitute for this\
             \ carrier. DRAFT dormant. P2O5_gas is a VapoRock collision-gas placeholder and MUST NOT substitute\
             \ for this carrier."
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: equilibrium_partial_pressure
@@ -7203,7 +7203,7 @@ families:
             valid_range_K:
             - 298.15
             - 1100.0
-            valid_range_note: Above ~1200 K ΔfH=ΔfG=0 by elemental-reference definition
+            valid_range_note: Above ~1200 K DeltafH=DeltafG=0 by elemental-reference definition
             tabulated_delta_fG_kJ_mol:
             - T_K: 298.15
               delta_fG: 103.112
@@ -7232,7 +7232,7 @@ families:
             acquisition_status: REVIEWABLE_JANAF_GAS
             runtime_disposition: 'ADOPT for elemental ladder completeness. Not a normal phosphate-melt
 
-              carrier at recipe fO2. Note Δf≡0 for T>=1200 K (reference transition).
+              carrier at recipe fO2. Note Deltaf==0 for T>=1200 K (reference transition).
 
               '
             phase: ideal_gas
@@ -7241,7 +7241,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -7283,7 +7283,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: equilibrium_partial_pressure
@@ -7362,7 +7362,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -7402,7 +7402,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: equilibrium_partial_pressure
@@ -7441,7 +7441,7 @@ families:
               '
             source:
               citation: Sossi & Fegley (2018) Rev. Mineral. Geochem. 84 Table 1 p.405 and Table 5 p.431;
-                species-inventory-gas-closure.md §2.7
+                species-inventory-gas-closure.md sect.2.7
               doi: 10.2138/rmg.2018.84.11
           literature_values:
             status: literature_present_pending_validation
@@ -7464,7 +7464,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -7499,14 +7499,14 @@ families:
           acquisition_status: REVIEWABLE_PRIMARY_K
           runtime_disposition: dormant_pending_owner_physics_review
           flux_dormant: true
-          notes: Na2Cl2 ⇌ 2 NaCl(g). Primary K from Datz, Smith & Taylor 1961 (JCP 34:558). K_p = p(monomer)^2
-            / p(dimer) in atm; P° = 1 atm. Certified use range 1277–1406 K; outside = flagged extrapolation.
-            Monomer foulant_vapor NaCl row is pure-component TOTAL (Stull) — do not treat NaCl monomer
+          notes: Na2Cl2 <-> 2 NaCl(g). Primary K from Datz, Smith & Taylor 1961 (JCP 34:558). K_p = p(monomer)^2
+            / p(dimer) in atm; P deg = 1 atm. Certified use range 1277-1406 K; outside = flagged extrapolation.
+            Monomer foulant_vapor NaCl row is pure-component TOTAL (Stull) - do not treat NaCl monomer
             Antoine as dimer-free total without the split. DRAFT dormant.
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: association_partial_pressure
@@ -7539,11 +7539,11 @@ families:
               extrapolation_policy: flag_outside_window
             comparator:
               source: NIST-JANAF / Chase 1998
-              note: K_p(1300 K) ~8× larger than Datz; do not average
+              note: K_p(1300 K) ~8x larger than Datz; do not average
             total_vs_monomer:
               total_P_authority: Stull / project pure_component NaCl (TOTAL over liquid)
-              split_method: Datz K_p + Stull P_tot → monomer/dimer partials
-              note_at_1300K: x_dimer~0.58 mol; ~74 mass% dimer — monomer partial ≠ total
+              split_method: Datz K_p + Stull P_tot -> monomer/dimer partials
+              note_at_1300K: x_dimer~0.58 mol; ~74 mass% dimer - monomer partial != total
           observable_honesty:
             species_basis: dimer
             pressure_kind: association_partial_pressure
@@ -7553,7 +7553,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -7587,13 +7587,13 @@ families:
           acquisition_status: REVIEWABLE_PRIMARY_K
           runtime_disposition: dormant_pending_owner_physics_review
           flux_dormant: true
-          notes: K2Cl2 ⇌ 2 KCl(g). Primary K Datz 1961. K_p(1300 K)=3.37e-2 atm. JANAF comparator ~1.5×
-            higher — do not average. Near-mp saturated vapour ~39 mol% / ~56 mass% dimer under Datz K.
+          notes: K2Cl2 <-> 2 KCl(g). Primary K Datz 1961. K_p(1300 K)=3.37e-2 atm. JANAF comparator ~1.5x
+            higher - do not average. Near-mp saturated vapour ~39 mol% / ~56 mass% dimer under Datz K.
             DRAFT dormant.
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: association_partial_pressure
@@ -7623,7 +7623,7 @@ families:
               - 1404.0
             comparator:
               source: NIST-JANAF / Chase 1998
-              note: ~1.5× Datz at 1300 K; do not average
+              note: ~1.5x Datz at 1300 K; do not average
             total_vs_monomer:
               total_P_authority: Stull / project pure_component KCl (TOTAL)
               note: monomer partial must not masquerade as total
@@ -7636,7 +7636,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -7670,13 +7670,13 @@ families:
           acquisition_status: REVIEWABLE_PRIMARY_K
           runtime_disposition: dormant_pending_owner_physics_review
           flux_dormant: true
-          notes: Mg2Cl4 ⇌ 2 MgCl2(g). Primary Berkowitz & Marquart 1962 Knudsen. K_p(919 K)=1.604e-3 atm;
-            van't Hoff with ΔH_diss. MgCl2 t-425 Antoine is MONOMER partial — not total. Total liquid
+          notes: Mg2Cl4 <-> 2 MgCl2(g). Primary Berkowitz & Marquart 1962 Knudsen. K_p(919 K)=1.604e-3 atm;
+            van't Hoff with DeltaH_diss. MgCl2 t-425 Antoine is MONOMER partial - not total. Total liquid
             P_sat authority remains Maier 1925 (vp4) when adopted. DRAFT dormant.
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: association_partial_pressure
@@ -7708,7 +7708,7 @@ families:
               note: Knudsen window; higher-T extrapolated
             total_vs_monomer:
               total_P_authority: Maier 1925 Table 10 (when adopted)
-              monomer_fit: JANAF monomer / t-425 Antoine — partial only
+              monomer_fit: JANAF monomer / t-425 Antoine - partial only
               rule: monomer_partial_never_masquerades_as_total
           observable_honesty:
             species_basis: dimer
@@ -7719,7 +7719,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -7754,13 +7754,13 @@ families:
           runtime_disposition: dormant_pending_owner_physics_review
           flux_dormant: true
           notes: Rau 1973 liquid sulfur total vapour pressure (eq.1) with critical/upper endpoint Tc=1313
-            K page-fixed in chloride-dimers-and-gates.md §5. TOTAL mixture observable over S(l) — must
-            pair with S2–S8 speciation; S2 monomer/partial is NOT P_sat(S2). DRAFT dormant pending owner
+            K page-fixed in chloride-dimers-and-gates.md sect.5. TOTAL mixture observable over S(l) - must
+            pair with S2-S8 speciation; S2 monomer/partial is NOT P_sat(S2). DRAFT dormant pending owner
             wiring.
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: total_mixture_pressure
@@ -7792,7 +7792,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -7834,7 +7834,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT — no flux; owner + physics review required before enablement
+            note: DRAFT - no flux; owner + physics review required before enablement
           source_reactions: []
           pressure_models:
           - fit_target: equilibrium_partial_pressure
@@ -7858,7 +7858,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT — no flux; owner + physics review required before enablement
+      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -7901,7 +7901,7 @@ families:
             - data/foulant_thermo.yaml#ClO4_pseudo
             - data/foulant_thermo.yaml#Mg_ClO4_2
             - data/foulant_thermo.yaml#Ca_ClO4_2
-            note: DRAFT — owner/physics review; dormant to vapour flux
+            note: DRAFT - owner/physics review; dormant to vapour flux
           literature_values:
             status: literature_present_pending_validation
             kind: stage0_decomposition_routes
@@ -7979,9 +7979,9 @@ families:
           formula: O
           molar_mass_g_mol: 15.999
           parent_oxide: null
-          notes: 'VR-8 monatomic O(g) mass-transport row (DESIGN-REV5 §6.3). Atom-explicit source reaction
+          notes: 'VR-8 monatomic O(g) mass-transport row (DESIGN-REV5 sect.6.3). Atom-explicit source reaction
             0.5 O2(g) -> O(g) with in-regime pO2_exponent = +1/2 (p_O proportional to fO2^(1/2)). Dormant
-            to flux until R2; VapoRock partial pressure alone cannot mint oxygen — a named oxygen-bearing
+            to flux until R2; VapoRock partial pressure alone cannot mint oxygen - a named oxygen-bearing
             source account must be debited. O2 outlet policy remains terminal.oxygen_melt_offgas_* only
             (never MRE anode).
 
@@ -8012,9 +8012,9 @@ families:
               - 2500.0
             provenance:
             - source: vr8_monatomic_oxygen_transcription
-            - citation: DESIGN-REV5 §6.3; gas-closure §6.2
-            pO2_exponent_derivation: '½ O2(g) ⇌ O(g): K = p_O / p_O2^(1/2) ⇒ p_O = K · p_O2^(1/2). Exponent
-              on pO2 is therefore +1/2 (not −1/2 oxide-suppression).
+            - citation: DESIGN-REV5 sect.6.3; gas-closure sect.6.2
+            pO2_exponent_derivation: '1/2 O2(g) <-> O(g): K = p_O / p_O2^(1/2) => p_O = K * p_O2^(1/2). Exponent
+              on pO2 is therefore +1/2 (not -1/2 oxide-suppression).
 
               '
     fiat_routing:

@@ -1,6 +1,6 @@
 # VR-10 reviewed vapour-rail calibration sidecar (runtime-safe).
 #
-# DESIGN-REV5 §5.3 / DECOMPOSITION VR-10:
+# DESIGN-REV5 sect.5.3 / DECOMPOSITION VR-10:
 #   - Only this reviewed YAML may enter runtime data under data/.
 #   - The SQLite research store is offline-only and must never be opened
 #     by runtime code (raw_store.runtime_readable: false).
@@ -75,7 +75,7 @@ frozen_families:
     coefficient_names: [A, B, C]
     parent_oxide: null
     activity_exponent: 0.0
-    notes: "1/2 O2(g) ⇌ O(g); d log10 P / d log10 fO2 = +1/2"
+    notes: "1/2 O2(g) <-> O(g); d log10 P / d log10 fO2 = +1/2"
   O2:
     family_id: molecular_oxygen_unit
     pO2_exponent: 1.0
@@ -116,7 +116,7 @@ independent_anchors:
 - anchor_id: sio_soffiatti_wolfe_class
   species: SiO
   kind: paper_wolfe
-  citation: "Sossi et al. / Wolfe-class vacuum evaporation envelopes; corpus §25 SiO residual tests"
+  citation: "Sossi et al. / Wolfe-class vacuum evaporation envelopes; corpus sect.25 SiO residual tests"
   temperature_K: 1873.0
   notes: Independent of VapoRock; used as holdout residual envelope
   may_certify: false
@@ -151,7 +151,7 @@ independent_anchors:
 - anchor_id: o_janaf_half_o2
   species: O
   kind: janaf_nist
-  citation: JANAF / NASA CEA 1/2 O2 ⇌ O equilibrium constant
+  citation: JANAF / NASA CEA 1/2 O2 <-> O equilibrium constant
   temperature_K: null
   notes: Thermodynamic K(T); not a VapoRock fit
   may_certify: false
@@ -165,13 +165,13 @@ independent_anchors:
 error_budget:
   epsilon_J: 0.3
   log10_pressure_threshold_dex: 0.11394335230683678
-  algebra: "HKL at fixed alpha,T: J ∝ P ⇒ |Δlog10 J| = |Δlog10 P|; pointwise threshold = log10(1 + ε_J)"
-  units: "ε_J dimensionless relative flux; threshold in log10 dex"
-  limiting_check: "ε_J→0 ⇒ threshold→0; ε_J=1 ⇒ threshold=log10(2)≈0.3010 dex"
+  algebra: "HKL at fixed alpha,T: J propto P => |Deltalog10 J| = |Deltalog10 P|; pointwise threshold = log10(1 + epsilon_J)"
+  units: "epsilon_J dimensionless relative flux; threshold in log10 dex"
+  limiting_check: "epsilon_J->0 => threshold->0; epsilon_J=1 => threshold=log10(2)~0.3010 dex"
 boundary_statistics_summary:
   n_faces: 0
   note: >
-    Full dual-source boundary Δlog10(P) lives in the research store;
+    Full dual-source boundary Deltalog10(P) lives in the research store;
     sidecar carries reviewed summary only.
 per_row_state:
 - species: SiO
