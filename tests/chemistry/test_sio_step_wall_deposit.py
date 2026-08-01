@@ -397,6 +397,107 @@ def test_segment_partial_pressure_tracks_upstream_capture_and_carrier() -> None:
     )
 
 
+def test_segment_partial_pressure_uses_pressure_residual_for_zero_carrier(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # Round-trip-surviving literals (Pa→mbar→Pa inside the segment helper):
+    # post-flowing sum(p_i)==P while sum(p_i/P)>1 by pure float epsilon — the
+    # case the pre-fix `1 - sum(p_i/P)` carrier falsely refused. Verified in
+    # docs-private/reviews/2026-08-01-m3/kimi-review.md criterion (c).
+    partials = {
+        "Na": 619.9382706109708,
+        "Fe": 314.92060129461345,
+        "K": 65.14112809441582,
+    }
+    pressure_pa = 1000.0
+    inlet_rates = {"Na": 1.0, "Fe": 1.0, "K": 1.0}
+    segments = {"inlet": dict(inlet_rates)}
+
+    # Assert on the values the function actually sees after the mbar seam.
+    round_tripped = {
+        species: (float(partial_pa) / 100.0) * 100.0
+        for species, partial_pa in partials.items()
+    }
+    assert sum(round_tripped.values()) == pressure_pa
+    assert sum(value / pressure_pa for value in round_tripped.values()) > 1.0
+
+    # Fixed residual form accepts the zero-carrier / full-vapor case.
+    by_segment = _segment_species_partial_pressures_pa(
+        partials,
+        pressure_pa,
+        inlet_rates,
+        segments,
+    )
+    assert sum(by_segment["inlet"].values()) <= pressure_pa
+    assert by_segment["inlet"] == pytest.approx(partials)
+
+    # Genuine overfill still refuses (guard lives in _flowing, pre-carrier).
+    with pytest.raises(
+        ValueError,
+        match=r"sum\(p_i\)=1100 Pa exceeds P_total=1000 Pa",
+    ):
+        _segment_species_partial_pressures_pa(
+            {"Na": 600.0, "Fe": 500.0},
+            pressure_pa,
+            {"Na": 1.0, "Fe": 1.0},
+            {"inlet": {"Na": 1.0, "Fe": 1.0}},
+        )
+
+    # Prove red-under-reversion by momentary in-memory mutation: reinstall the
+    # pre-fix carrier formula `1 - sum(p_i/P)` for one call. That form raises
+    # on this same inlet; the residual form (above) does not.
+    fixed_fn = condensation_module._segment_species_partial_pressures_pa
+
+    def _reverted_pre_fix_carrier(
+        inlet_partial_pressures_pa,
+        total_pressure_pa,
+        inlet_species_kg_hr,
+        species_kg_hr_by_segment,
+    ):
+        inlet_partials = _flowing_species_partial_pressures_pa(
+            {},
+            total_pressure_pa,
+            reported_partial_pressures_mbar={
+                species: float(partial_pressure_pa) / 100.0
+                for species, partial_pressure_pa in (
+                    inlet_partial_pressures_pa.items()
+                )
+            },
+        )
+        pressure = float(total_pressure_pa)
+        carrier_mole_fraction = 1.0 - sum(
+            partial_pressure_pa / pressure
+            for partial_pressure_pa in inlet_partials.values()
+        )
+        if carrier_mole_fraction < 0.0:
+            raise ValueError(
+                "wall partial pressure invariant violated: vapor mole "
+                "fractions exceed total gas composition"
+            )
+        return fixed_fn(
+            inlet_partial_pressures_pa,
+            total_pressure_pa,
+            inlet_species_kg_hr,
+            species_kg_hr_by_segment,
+        )
+
+    monkeypatch.setattr(
+        condensation_module,
+        "_segment_species_partial_pressures_pa",
+        _reverted_pre_fix_carrier,
+    )
+    with pytest.raises(
+        ValueError,
+        match="vapor mole fractions exceed total gas composition",
+    ):
+        condensation_module._segment_species_partial_pressures_pa(
+            partials,
+            pressure_pa,
+            inlet_rates,
+            segments,
+        )
+
+
 def test_wall_route_refuses_missing_species_partial_pressure() -> None:
     model = CondensationModel(CondensationTrain.create_default())
     model.configure_operating_conditions(

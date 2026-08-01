@@ -4744,12 +4744,15 @@ def _segment_species_partial_pressures_pa(
         species: partial_pressure_pa / pressure_pa
         for species, partial_pressure_pa in inlet_partials.items()
     }
-    carrier_mole_fraction = 1.0 - sum(inlet_mole_fraction.values())
-    if carrier_mole_fraction < 0.0:
-        raise ValueError(
-            'wall partial pressure invariant violated: vapor mole fractions '
-            'exceed total gas composition'
-        )
+    inlet_partial_pressure_sum_pa = sum(inlet_partials.values())
+    # Premise: _flowing_species_partial_pressures_pa already proves
+    # sum(p_i) <= P_total (or refuses a physical overfill). Derive the carrier
+    # on that same pressure basis: y_c=(P_total-sum(p_i))/P_total. Unit check:
+    # Pa/Pa is dimensionless. This avoids independently summing p_i/P_total,
+    # which can round to >1 even when the pressure sum is exactly P_total.
+    carrier_mole_fraction = (
+        pressure_pa - inlet_partial_pressure_sum_pa
+    ) / pressure_pa
 
     by_segment: dict[str, dict[str, float]] = {}
     for raw_segment, segment_rates in species_kg_hr_by_segment.items():
