@@ -202,3 +202,21 @@ accepts the alias `C2A` → `C2A_continuous`.
   `backend_name` + a `vapor_pressure_source_report`, so the fidelity used is never hidden.
 - **Failed/refused runs still produce a JSON file and a non-zero exit** — gate on the exit
   code (or `status` field), not file existence.
+- **Machine-sensitive goldens regenerate on Studio 1 only.** Engine-touched fixtures
+  (runner smoke, sio_yield, coating diagnostic SHA, staged-bakeout / capacity pins) are
+  sensitive to `engines/engines.local.toml` + the Studio engine binaries. Laptop regens
+  have red-on-gate history (train11). Use `scripts/studio-regen.sh` — it rsyncs a tip-pinned
+  worktree to `mac-studio-256-1` with the same config/venv/PATH/ulimit stanzas as
+  `~/Repos/studio-ci.sh`, runs the family regenerator there, and pulls **only** the
+  regenerated outputs back into the local worktree (no commit/push). Examples:
+
+  ```bash
+  scripts/studio-regen.sh --dry-run HEAD coating
+  scripts/studio-regen.sh HEAD coating          # pilot / SHA pin
+  scripts/studio-regen.sh HEAD runner sio_yield # fixture families
+  ```
+
+  Refuses if the local target paths are dirty. Entry points: coating →
+  `scripts/regenerate_coating_diagnostic_golden.py`; runner →
+  `scripts/regenerate_runner_goldens.py`; sio_yield →
+  `python -m simulator.runner.sio_yield` (form in commit `4fce2f0`).
