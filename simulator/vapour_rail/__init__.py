@@ -74,6 +74,9 @@ from simulator.vapour_rail.kinetics_anchors import (
     regimes_remain_distinct,
 )
 from simulator.vapour_rail.batch import (
+    FLUX_ACTIVATION_EPOCH_PRE_RG,
+    FLUX_ACTIVATION_EPOCH_RG_MANIFEST,
+    FluxActivationContext,
     IncompleteVapourBatchError,
     VapourAnswer,
     VapourBatch,
@@ -105,6 +108,9 @@ __all__ = [
     "VAPOROCK_42_IDS",
     "VAPOUR_RAIL_CALIBRATION_SIDECAR",
     "FROZEN_ANALYTICAL_FAMILIES",
+    "FLUX_ACTIVATION_EPOCH_PRE_RG",
+    "FLUX_ACTIVATION_EPOCH_RG_MANIFEST",
+    "FluxActivationContext",
     "ProgressiveValidationReport",
     "build_progressive_validation_report",
     "build_u0_manifest",

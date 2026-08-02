@@ -166,8 +166,11 @@ EXPECTED_C4B_WALL_SEGMENT_DEPOSITS_KG = {
     "lunar_mare_low_ti": {
         # Partial-pressure caps remove Cr/Na/K capture; Fe depletes locally.
         # 0c56d99 pin 0.024262339673022347 -> SC-109 residual-path Fe below.
+        # b-114 restores CrO2's missing-alpha refusal. Removing its two
+        # prototype fallback debits changes the shared redox trajectory by a
+        # sub-ppb fraction; this Fe wall pin records that typed non-debit.
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Fe": 0.024088657058388228,
+            "Fe": 0.024088657043402847,
         },
     },
     "mars_basalt": {
@@ -180,8 +183,11 @@ EXPECTED_C4B_WALL_SEGMENT_DEPOSITS_KG = {
     "s_type_asteroid_silicate": {
         # Partial-pressure caps remove Cr/Na/K capture; Fe depletes locally.
         # 0c56d99 pin 0.04468148521030869 -> SC-109 residual-path Fe below.
+        # b-114 restores CrO2's missing-alpha refusal. Removing its prototype
+        # fallback debits shifts the shared redox trajectory by a sub-ppb
+        # fraction; this Fe wall pin records that typed non-debit.
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Fe": 0.04196132187240494,
+            "Fe": 0.04196132183519873,
         },
     },
 }

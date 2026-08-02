@@ -439,8 +439,6 @@ VPR_P6A_TRACE_CONTROLS = {
 }
 
 # Schema-shape: the top-level keys every runner output must expose.
-# DECOMP VR-11 / DESIGN-REV5 U4: artefact schemas may change — pin the new
-# vapour-rail instrumentation and condensation refusal consumer keys.
 TOP_LEVEL_KEYS = frozenset({
     "schema_version",
     "run_metadata",
@@ -452,6 +450,8 @@ TOP_LEVEL_KEYS = frozenset({
     "thermal_train_report",
     "stage_purity_report",
     "vapor_pressure_source_report",
+    "vapour_rail_instrumentation",
+    "condensation_refusals_by_species",
     "shuttle_refusal_history",
     "c7_product_report",
     "c7_refusal_diagnostic",
@@ -460,8 +460,6 @@ TOP_LEVEL_KEYS = frozenset({
     "pO2_enforcement_by_hour",
     "per_hour_summary",
     "shadow_trace",
-    "vapour_rail_instrumentation",
-    "condensation_refusals_by_species",
     "status",
     "reason",
     "error_message",
@@ -520,6 +518,8 @@ PER_HOUR_KEYS = frozenset({
     "energy_electrical_plus_evaporation_cumulative_kWh",
     "energy_cumulative_breakdown_kWh",
     "energy_evaporation_breakdown_kWh",
+    "vapour_batch_summary",
+    "vapour_batch_flux_overlay",
     "shuttle_phase",
     "shuttle_injected_kg_hr",
     "shuttle_reduced_kg_hr",
@@ -562,10 +562,6 @@ PER_HOUR_OPTIONAL_KEYS = frozenset({
     "reduced_real_cache_state",
     "c2a_staged_gas",
     "metal_phase_stratification",
-    # DECOMP VR-11 / DESIGN-REV5 U4: per-hour vapour-batch instrumentation
-    # (present when a batch was resolved on that hour).
-    "vapour_batch_flux_overlay",
-    "vapour_batch_summary",
     "condensation_refusals_by_species",
 })
 
@@ -1145,12 +1141,6 @@ def _assert_schema_shape(payload: dict) -> None:
 
     assert isinstance(payload["c7_product_report"], dict)
     assert isinstance(payload["c7_refusal_diagnostic"], dict)
-    # DECOMP VR-11 / DESIGN-REV5 U4: new top-level artifact keys are required.
-    assert isinstance(payload["vapour_rail_instrumentation"], dict)
-    assert payload["vapour_rail_instrumentation"].get("schema") == (
-        "vapour_rail_instrumentation.v1"
-    )
-    assert isinstance(payload["condensation_refusals_by_species"], dict)
     assert isinstance(payload["per_hour_summary"], list)
     assert isinstance(payload["pO2_enforcement_by_hour"], list)
     for row in payload["pO2_enforcement_by_hour"]:

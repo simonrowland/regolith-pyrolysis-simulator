@@ -243,6 +243,9 @@ def serialize_vapour_answer(answer: VapourAnswer) -> dict[str, Any]:
     return {
         "species_id": answer.species_id,
         "pressure": _pressure_payload(answer.pressure),
+        "selected_runtime_pressure": _pressure_payload(
+            answer.selected_runtime_pressure
+        ),
         "flux": _flux_payload(answer.flux),
         "source_label": answer.source_label,
         "formula_id": answer.formula_id,
@@ -255,7 +258,8 @@ def serialize_vapour_answer(answer: VapourAnswer) -> dict[str, Any]:
         "certification_ceiling": answer.certification_ceiling,
         "refusal_code": answer.refusal_code,
         "is_refused": bool(answer.is_refused),
-        "is_flux_active": bool(answer.is_flux_active),
+        # A channel answer has no epoch context; this is only union eligibility.
+        "is_union_flux_eligible": bool(answer.is_flux_active),
         "extra": extra,
         # Anti-cliff / acquisition flags ride on extra when the evaluator
         # recorded them; promote common keys for UI consumers.
@@ -271,10 +275,16 @@ def serialize_vapour_batch(batch: VapourBatch | None) -> dict[str, Any] | None:
 
     if batch is None:
         return None
-    channels = {
-        species_id: serialize_vapour_answer(answer)
-        for species_id, answer in sorted(batch.channels_by_species.items())
-    }
+    channels: dict[str, dict[str, Any]] = {}
+    for species_id, answer in sorted(batch.channels_by_species.items()):
+        channel = serialize_vapour_answer(answer)
+        union_eligible = bool(channel["is_union_flux_eligible"])
+        effective_active = species_id in batch.flux_active_species_ids
+        # A channel may be answerable yet dormant under the current epoch.
+        # Batch serialization must expose one unambiguous activation truth.
+        channel["is_flux_active"] = effective_active
+        channel["is_flux_dormant_by_epoch"] = union_eligible and not effective_active
+        channels[species_id] = channel
     refusals = {
         species_id: channel
         for species_id, channel in channels.items()
@@ -331,6 +341,24 @@ def _finite_live_map(
     return live, sorted(dropped)
 
 
+def finite_live_pressure_species_ids(
+    live_pressures_Pa: Mapping[str, float] | None,
+) -> frozenset[str]:
+    """Canonical finite species set used by legacy activation and shadow."""
+
+    live, _ = _finite_live_map(live_pressures_Pa)
+    return frozenset(live)
+
+
+def finite_live_pressure_map(
+    live_pressures_Pa: Mapping[str, float] | None,
+) -> dict[str, float]:
+    """Finite legacy projection used to seed pre-RG runtime selections."""
+
+    live, _ = _finite_live_map(live_pressures_Pa)
+    return live
+
+
 def _pressures_equal(a: float, b: float) -> bool:
     return math.isclose(a, b, rel_tol=_SHADOW_PA_RTOL, abs_tol=_SHADOW_PA_ATOL)
 
@@ -343,7 +371,7 @@ def _channel_flux_pressure_pa(answer: VapourAnswer) -> tuple[float | None, str]:
     never debit; ZeroByPhysics is an explicit zero.
     """
 
-    pressure = answer.pressure
+    pressure = answer.selected_runtime_pressure
     flux = answer.flux
     if isinstance(pressure, PressureRefusal) or isinstance(flux, FluxRefusal):
         return None, "refusal"
@@ -365,6 +393,8 @@ def compare_legacy_vs_batch_flux_paths(
     *,
     legacy_pressures_Pa: Mapping[str, float],
     batch_flux_pressures_Pa: Mapping[str, float],
+    legacy_flux_active_species_ids: Sequence[str] | None = None,
+    batch_flux_active_species_ids: Sequence[str] | None = None,
     refused_live_species: Sequence[str] = (),
     missing_batch_keys: Sequence[str] = (),
     dropped_nonfinite_live_species: Sequence[str] = (),
@@ -429,6 +459,34 @@ def compare_legacy_vs_batch_flux_paths(
             "missing_in_legacy_path": [],
         }
 
+    if (
+        legacy_flux_active_species_ids is None
+        or batch_flux_active_species_ids is None
+    ):
+        return {
+            "shadow_equal": False,
+            "shadow_outcome": SHADOW_MISSING_KEYS,
+            "detail": "both flux-active species sets are required for shadow proof",
+            "mismatched_species": [],
+            "missing_in_batch_path": [],
+            "missing_in_legacy_path": [],
+        }
+    legacy_active = frozenset(str(sid) for sid in legacy_flux_active_species_ids)
+    batch_active = frozenset(str(sid) for sid in batch_flux_active_species_ids)
+    missing_active_in_batch = sorted(legacy_active - batch_active)
+    missing_active_in_legacy = sorted(batch_active - legacy_active)
+    if missing_active_in_batch or missing_active_in_legacy:
+        # DESIGN-REV5 G2: equal Pa on the live intersection cannot prove
+        # shadow parity when the flux-active species sets differ.
+        return {
+            "shadow_equal": False,
+            "shadow_outcome": SHADOW_MISSING_KEYS,
+            "detail": "flux-active species set differs between legacy and batch",
+            "mismatched_species": [],
+            "missing_in_batch_path": missing_active_in_batch,
+            "missing_in_legacy_path": missing_active_in_legacy,
+        }
+
     legacy = {str(k): float(v) for k, v in dict(legacy_pressures_Pa).items()}
     batch_path = {
         str(k): float(v) for k, v in dict(batch_flux_pressures_Pa).items()
@@ -485,70 +543,45 @@ def compare_legacy_vs_batch_flux_paths(
     }
 
 
-def flux_pressures_from_batch_and_live(
+def flux_pressures_from_batch(
     batch: VapourBatch | None,
-    live_pressures_Pa: Mapping[str, float],
     *,
     resolution_error: Mapping[str, Any] | None = None,
 ) -> tuple[dict[str, float], dict[str, Any]]:
-    """Build the flux-driving pressure map from a complete VapourBatch.
+    """Build the flux-driving pressure map only from a complete VapourBatch.
 
     Active path: require batch, iterate ``requested_species_ids``, branch on
-    pressure/flux unions. Refusal/upper-bound/zero are typed non-debit states.
+    selected-runtime-pressure/flux unions. Refusal/upper-bound/zero are typed
+    non-debit states.
     Absent batch or resolve error → empty flux map + typed failure report;
-    never resume the compatibility live map as flux input.
-
-    Live map is retained only as the legacy shadow projection for comparison.
+    this consumer has no compatibility-map input or fallback.
     """
 
-    live, dropped_nonfinite = _finite_live_map(live_pressures_Pa)
     report: dict[str, Any] = {
         "schema": "vapour_batch_flux_overlay.v1",
         "batch_present": batch is not None,
-        "n_live_pressures": len(live),
         "n_flux_pressures": 0,
-        "live_only_bridge_species": [],
-        "batch_refused_live_species": [],
-        "batch_flux_active_not_in_live": [],
         "batch_channel_states": {},
-        "dropped_nonfinite_live_species": dropped_nonfinite,
         "note": (
-            "Active flux consumes VapourBatch channel unions only. "
-            "Live equilibrium map is the legacy shadow projection, never a "
-            "fail-open flux fallback."
+            "Active flux consumes each VapourAnswer selected runtime pressure. "
+            "Compatibility pressure maps are absent from this consumer."
         ),
     }
 
     if resolution_error:
-        comparison = compare_legacy_vs_batch_flux_paths(
-            legacy_pressures_Pa=live,
-            batch_flux_pressures_Pa={},
-            dropped_nonfinite_live_species=dropped_nonfinite,
-            batch_present=False,
-            resolution_error=resolution_error,
-        )
-        report.update(comparison)
+        report["resolution_error"] = dict(resolution_error)
         report["selection_source"] = "typed_failure_resolution_error"
-        report["n_flux_pressures"] = 0
         return {}, report
 
     if batch is None:
-        comparison = compare_legacy_vs_batch_flux_paths(
-            legacy_pressures_Pa=live,
-            batch_flux_pressures_Pa={},
-            dropped_nonfinite_live_species=dropped_nonfinite,
-            batch_present=False,
-        )
-        report.update(comparison)
         report["selection_source"] = "typed_failure_missing_batch"
-        report["n_flux_pressures"] = 0
         return {}, report
 
-    report["selection_source"] = "vapour_batch_channel_unions"
+    report["selection_source"] = "vapour_answer_selected_runtime_pressure"
     flux_pressures: dict[str, float] = {}
     batch_pa_by_species: dict[str, float] = {}
+    selected_runtime_pa_by_species: dict[str, float] = {}
     channel_states: dict[str, str] = {}
-    refused_live: list[str] = []
     missing_channel_keys: list[str] = []
 
     for species_id in sorted(batch.requested_species_ids):
@@ -557,62 +590,117 @@ def flux_pressures_from_batch_and_live(
             missing_channel_keys.append(species_id)
             channel_states[species_id] = "missing_channel"
             continue
-        batch_pa, state = _channel_flux_pressure_pa(answer)
+        selected_pa, state = _channel_flux_pressure_pa(answer)
         channel_states[species_id] = state
-        live_pa = live.get(species_id)
-        if state == "refusal" and live_pa is not None and live_pa > 0.0:
-            refused_live.append(species_id)
-        if state == "eligible" and batch_pa is not None:
-            batch_pa_by_species[species_id] = float(batch_pa)
-            # Golden-neutral: batch unions own selection, but the debiting
-            # multiset is the live map filtered by eligibility. Batch-only
-            # eligible channels are recorded (batch_pa_by_species /
-            # batch_flux_active_not_in_live) and do not expand flux beyond
-            # the pre-cutover live multiset until an R-family flip.
-            if live_pa is not None:
-                flux_pressures[species_id] = float(live_pa)
+        catalog_pressure = answer.pressure
+        if isinstance(catalog_pressure, PressureValue):
+            catalog_pa = float(catalog_pressure.pa)
+            if math.isfinite(catalog_pa):
+                batch_pa_by_species[species_id] = catalog_pa
+        if state == "eligible" and selected_pa is not None:
+            selected_runtime_pa_by_species[species_id] = float(selected_pa)
+            if species_id not in batch.flux_active_species_ids:
+                channel_states[species_id] = "dormant_by_epoch"
+                continue
+            flux_pressures[species_id] = float(selected_pa)
         elif state == "zero_by_physics":
-            batch_pa_by_species[species_id] = 0.0
-            if live_pa is not None:
-                flux_pressures[species_id] = 0.0
-        # refusal / upper_bound / nonfinite / batch-only eligible: no debit
+            selected_runtime_pa_by_species[species_id] = 0.0
+            if species_id not in batch.flux_active_species_ids:
+                channel_states[species_id] = "dormant_by_epoch"
+                continue
+            flux_pressures[species_id] = 0.0
+        # refusal / upper_bound / nonfinite / dormant eligible: no debit
 
     report["batch_channel_states"] = channel_states
     report["batch_pa_by_species"] = batch_pa_by_species
-    report["batch_refused_live_species"] = refused_live
-    report["live_only_bridge_species"] = sorted(set(live) - set(flux_pressures))
-    report["batch_flux_active_not_in_live"] = sorted(
-        set(batch.flux_active_species_ids) - set(live)
-    )
+    report["selected_runtime_pa_by_species"] = selected_runtime_pa_by_species
+    report["missing_batch_keys"] = missing_channel_keys
     report["n_flux_pressures"] = len(flux_pressures)
 
-    # Prove shadow equality against the active flux map (selection from batch
-    # unions + live Pa for shared eligible species), not a hardcoded True.
+    return flux_pressures, report
+
+
+def compare_live_shadow_to_batch_flux(
+    *,
+    batch: VapourBatch | None,
+    live_pressures_Pa: Mapping[str, float],
+    batch_flux_pressures_Pa: Mapping[str, float],
+    resolution_error: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Compare an independently computed legacy map with batch-driven flux.
+
+    This is the only VR-11 surface that accepts the compatibility pressure map.
+    It never selects or returns flux-driving pressures.
+    """
+
+    live, dropped_nonfinite = _finite_live_map(live_pressures_Pa)
+    refused_live: list[str] = []
+    missing_channel_keys: list[str] = []
+    catalog_pa_by_species: dict[str, float] = {}
+
+    if batch is not None:
+        for species_id in sorted(batch.requested_species_ids):
+            answer = batch.channels_by_species.get(species_id)
+            if answer is None:
+                missing_channel_keys.append(species_id)
+                continue
+            if answer.is_refused and live.get(species_id, 0.0) > 0.0:
+                refused_live.append(species_id)
+            if (
+                species_id in batch.flux_active_species_ids
+                and isinstance(answer.pressure, PressureValue)
+            ):
+                catalog_pa = float(answer.pressure.pa)
+                if math.isfinite(catalog_pa):
+                    catalog_pa_by_species[species_id] = catalog_pa
+
     comparison = compare_legacy_vs_batch_flux_paths(
         legacy_pressures_Pa=live,
-        batch_flux_pressures_Pa=flux_pressures,
+        batch_flux_pressures_Pa=batch_flux_pressures_Pa,
+        legacy_flux_active_species_ids=tuple(live) if batch is not None else None,
+        batch_flux_active_species_ids=(
+            tuple(batch.flux_active_species_ids) if batch is not None else None
+        ),
         refused_live_species=refused_live,
         missing_batch_keys=missing_channel_keys,
         dropped_nonfinite_live_species=dropped_nonfinite,
-        batch_present=True,
+        batch_present=batch is not None,
+        resolution_error=resolution_error,
     )
-    report.update(comparison)
-    # Separate catalog-Pa comparison (informational; may mismatch while
-    # golden-neutral live overlay still holds).
-    catalog_vs_live = compare_legacy_vs_batch_flux_paths(
-        legacy_pressures_Pa={
-            sid: live[sid] for sid in batch_pa_by_species if sid in live
-        },
-        batch_flux_pressures_Pa={
-            sid: batch_pa_by_species[sid]
-            for sid in batch_pa_by_species
-            if sid in live
-        },
-        batch_present=True,
+    comparison.update(
+        {
+            "n_live_pressures": len(live),
+            "live_only_bridge_species": sorted(
+                set(live) - set(batch_flux_pressures_Pa)
+            ),
+            "batch_refused_live_species": refused_live,
+            "batch_flux_active_not_in_live": sorted(
+                set(batch.flux_active_species_ids) - set(live)
+            )
+            if batch is not None
+            else [],
+            "live_flux_active_not_in_batch": sorted(
+                set(live) - set(batch.flux_active_species_ids)
+            )
+            if batch is not None
+            else sorted(live),
+            "dropped_nonfinite_live_species": dropped_nonfinite,
+        }
     )
-    report["catalog_pa_shadow_equal"] = catalog_vs_live["shadow_equal"]
-    report["catalog_pa_shadow_outcome"] = catalog_vs_live["shadow_outcome"]
-    return flux_pressures, report
+
+    if batch is not None and not resolution_error:
+        catalog_vs_live = compare_legacy_vs_batch_flux_paths(
+            legacy_pressures_Pa=live,
+            batch_flux_pressures_Pa=catalog_pa_by_species,
+            legacy_flux_active_species_ids=tuple(live),
+            batch_flux_active_species_ids=tuple(batch.flux_active_species_ids),
+            batch_present=True,
+        )
+        comparison["catalog_pa_shadow_equal"] = catalog_vs_live["shadow_equal"]
+        comparison["catalog_pa_shadow_outcome"] = catalog_vs_live[
+            "shadow_outcome"
+        ]
+    return comparison
 
 
 # ---------------------------------------------------------------------------
@@ -648,9 +736,11 @@ _LEGACY_CONTROLS_GET_PATTERN = re.compile(
     r"controls\.get\(\s*[\"']vapor_pressures_Pa[\"']"
 )
 
-_FLUX_CONSUMER_RELPATHS: tuple[str, ...] = (
+FLUX_CONSUMER_RELPATHS: tuple[str, ...] = (
     "engines/builtin/evaporation_flux.py",
     "simulator/evaporation.py",
+    "simulator/vapour_rail/instrumentation.py",
+    "simulator/vapour_rail/request.py",
 )
 
 # Kernel path: any legacy-key read is a fail.
@@ -746,6 +836,103 @@ def _extract_controls_get_vapor_pressures(node: ast.AST) -> ast.Call | None:
     return None
 
 
+def _batch_flux_consumer_live_argument_hits(
+    source_text: str,
+    *,
+    path: str,
+) -> list[str]:
+    """Reject compatibility-pressure parameters on batch flux consumers."""
+
+    try:
+        tree = ast.parse(source_text)
+    except SyntaxError:
+        return []
+    hits: list[str] = []
+    for node in ast.walk(tree):
+        if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            continue
+        if not node.name.startswith("flux_pressures_from_batch"):
+            continue
+        arguments = [*node.args.posonlyargs, *node.args.args, *node.args.kwonlyargs]
+        live_arguments = [
+            argument.arg
+            for argument in arguments
+            if "live" in argument.arg.lower() and "pressure" in argument.arg.lower()
+        ]
+        if live_arguments:
+            hits.append(
+                f"{path}:{node.lineno}: batch flux consumer accepts "
+                f"compatibility pressure argument(s) {live_arguments}"
+            )
+    return hits
+
+
+def _selected_runtime_pressure_live_source_hits(
+    source_text: str,
+    *,
+    path: str,
+) -> list[str]:
+    """Reject live-pressure aliases copied into selected batch answers."""
+
+    try:
+        tree = ast.parse(source_text)
+    except SyntaxError:
+        return []
+
+    def identifiers(node: ast.AST) -> set[str]:
+        names = {
+            child.id
+            for child in ast.walk(node)
+            if isinstance(child, ast.Name)
+        }
+        names.update(
+            child.attr
+            for child in ast.walk(node)
+            if isinstance(child, ast.Attribute)
+        )
+        return names
+
+    tainted_aliases: set[str] = set()
+    assignments = [node for node in ast.walk(tree) if isinstance(node, ast.Assign)]
+    changed = True
+    while changed:
+        changed = False
+        for node in assignments:
+            value_names = identifiers(node.value)
+            live_pressure_source = any(
+                "live" in name.lower() and "pressure" in name.lower()
+                for name in value_names
+            ) or bool(value_names & tainted_aliases)
+            if not live_pressure_source:
+                continue
+            for target in node.targets:
+                if isinstance(target, ast.Name) and target.id not in tainted_aliases:
+                    tainted_aliases.add(target.id)
+                    changed = True
+
+    hits: list[str] = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        for keyword in node.keywords:
+            if keyword.arg not in {
+                "selected_runtime_pressure",
+                "selected_runtime_pressures_Pa",
+            }:
+                continue
+            value_names = identifiers(keyword.value)
+            direct_live_source = any(
+                "live" in name.lower() and "pressure" in name.lower()
+                for name in value_names
+            )
+            if direct_live_source or value_names & tainted_aliases:
+                hits.append(
+                    f"{path}:{node.lineno}: selected runtime pressure "
+                    "depends on a live compatibility-pressure source"
+                )
+    return hits
+
+
 def flux_consumer_compatibility_map_iterations(
     source_text: str,
     *,
@@ -773,6 +960,8 @@ def flux_consumer_compatibility_map_iterations(
                     f"in flux kernel: {stripped}"
                 )
     hits.extend(_alias_then_iterate_hits(source_text, path=path))
+    hits.extend(_batch_flux_consumer_live_argument_hits(source_text, path=path))
+    hits.extend(_selected_runtime_pressure_live_source_hits(source_text, path=path))
     return hits
 
 
@@ -782,6 +971,14 @@ def assert_no_flux_consumer_iterates_compatibility_maps(
     """Hard-fail when a flux consumer iterates a compatibility pressure map."""
 
     all_hits: list[str] = []
+    supplied_production_paths = set(sources) & set(FLUX_CONSUMER_RELPATHS)
+    if supplied_production_paths and supplied_production_paths != set(
+        FLUX_CONSUMER_RELPATHS
+    ):
+        missing = sorted(set(FLUX_CONSUMER_RELPATHS) - set(sources))
+        all_hits.append(
+            "source guard production scan is incomplete; missing " + repr(missing)
+        )
     for path, text in sources.items():
         all_hits.extend(
             flux_consumer_compatibility_map_iterations(text, path=path)

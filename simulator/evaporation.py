@@ -33,11 +33,17 @@ from simulator.state import (
     EvaporationFlux,
     clamp_stir_factor,
 )
+from simulator.vapour_rail.batch import (
+    FLUX_ACTIVATION_EPOCH_PRE_RG,
+    FluxActivationContext,
+)
 from simulator.vapour_rail.instrumentation import (
     CONTROL_BATCH_REPORT_KEY,
     CONTROL_FLUX_PRESSURES_KEY,
     CONTROL_SHADOW_EQUAL_KEY,
-    flux_pressures_from_batch_and_live,
+    compare_live_shadow_to_batch_flux,
+    finite_live_pressure_map,
+    flux_pressures_from_batch,
     serialize_vapour_batch,
 )
 
@@ -256,6 +262,54 @@ def _load_evaporation_alpha_by_species(vapor_pressure_data: dict) -> dict[str, A
     return alpha_by_species
 
 
+def _legacy_evaporation_flux_pressure_map(
+    vapor_pressure_data: dict,
+    live_pressures_Pa: Mapping[str, float] | None,
+) -> dict[str, float]:
+    """Independent pre-RG flux projection after the legacy alpha gate."""
+
+    alpha_by_species = _load_evaporation_alpha_by_species(vapor_pressure_data)
+    return {
+        species_id: pressure_pa
+        for species_id, pressure_pa in finite_live_pressure_map(
+            live_pressures_Pa
+        ).items()
+        if species_id in alpha_by_species
+    }
+
+
+def _evaporation_runtime_and_shadow_pressure_maps(
+    vapor_pressure_data: dict,
+    equilibrium: Any,
+    vapor_pressure_diagnostic: Mapping[str, Any] | None,
+) -> tuple[dict[str, float], dict[str, float]]:
+    """Return typed runtime pressures and an independent legacy shadow.
+
+    ``equilibrium.vapor_pressures_Pa`` is the final authoritative
+    VAPOR_PRESSURE result.  The diagnostic retains the pre-refresh backend
+    projection, computed before the kernel result replaced it; that projection
+    is the independent legacy comparand.  Test/minimal harnesses without the
+    diagnostic fall back to the equilibrium map for shadow construction only.
+    """
+
+    runtime_source = getattr(equilibrium, "vapor_pressures_Pa", {}) or {}
+    diagnostic = dict(vapor_pressure_diagnostic or {})
+    backend_source = diagnostic.get("backend_vapor_pressures_Pa")
+    shadow_source = (
+        backend_source if isinstance(backend_source, Mapping) else runtime_source
+    )
+    return (
+        _legacy_evaporation_flux_pressure_map(
+            vapor_pressure_data,
+            runtime_source,
+        ),
+        _legacy_evaporation_flux_pressure_map(
+            vapor_pressure_data,
+            shadow_source,
+        ),
+    )
+
+
 def _load_evaporation_alpha_envelope_by_species(
     vapor_pressure_data: dict,
 ) -> dict[str, tuple[float, float]]:
@@ -368,28 +422,67 @@ class EvaporationMixin:
                 diagnostic,
             )
 
-        if T_K < 400:  # Below any significant evaporation
+        # Precedence: no liquid = nothing to evaporate = physical zero,
+        # regardless of resolver / vapor-pressure-map state.  Must run
+        # BEFORE batch resolution so a bare or incomplete sim with a
+        # proven-zero liquid fraction never reaches AttributeError or a
+        # typed resolution refusal.  Resolution-error refusal (P1-3)
+        # governs only when liquid exists (or liquid_fraction is unset
+        # and the path cannot prove physical zero).
+        liquid_fraction = getattr(equilibrium, 'liquid_fraction', None)
+        if (
+            liquid_fraction is not None
+            and legacy_raw_liquid_fraction_is_zero(liquid_fraction)
+        ):
             return flux
 
         # VR-11: live equilibrium map is the legacy shadow projection only.
         # Active flux requires a complete VapourBatch and branches on channel
         # unions — never fail-open to the compatibility map.
-        live_vapor_pressures = dict(equilibrium.vapor_pressures_Pa or {})
+        vapor_pressure_diagnostic = dict(
+            getattr(self, '_last_vapor_pressure_diagnostic', {}) or {}
+        )
+        _, live_vapor_pressures = _evaporation_runtime_and_shadow_pressure_maps(
+            self.vapor_pressures,
+            equilibrium,
+            vapor_pressure_diagnostic,
+        )
         vapour_batch = self._resolve_evaporation_vapour_batch(
             equilibrium, temperature_K=T_K
         )
         resolve_error = dict(
             getattr(self, '_last_vapour_batch_resolve_error', {}) or {}
         )
-        vapor_pressures, flux_overlay_report = flux_pressures_from_batch_and_live(
+        vapor_pressures, flux_overlay_report = flux_pressures_from_batch(
             vapour_batch,
-            live_vapor_pressures,
             resolution_error=resolve_error or None,
+        )
+        flux_overlay_report.update(
+            compare_live_shadow_to_batch_flux(
+                batch=vapour_batch,
+                live_pressures_Pa=live_vapor_pressures,
+                batch_flux_pressures_Pa=vapor_pressures,
+                resolution_error=resolve_error or None,
+            )
         )
         batch_report = serialize_vapour_batch(vapour_batch)
         self._last_vapour_batch = vapour_batch
         self._last_vapour_batch_report = batch_report
         self._last_vapour_batch_flux_overlay = flux_overlay_report
+
+        if resolve_error:
+            reason = str(resolve_error.get('reason') or 'vapour_batch_resolution_error')
+            diagnostic = {
+                **resolve_error,
+                'reason': reason,
+                'evaporation_flux_kg_hr': {},
+                'vapour_batch_flux_overlay': flux_overlay_report,
+            }
+            self._last_evaporation_flux_diagnostic = diagnostic
+            raise EvaporationFluxRefusal(reason, diagnostic)
+
+        if T_K < 400:  # Healthy batch; below any significant evaporation
+            return flux
 
         if not vapor_pressures:
             if self.melt.temperature_C < 1050.0:
@@ -438,9 +531,6 @@ class EvaporationMixin:
                 f'at {self.melt.temperature_C:.1f} C; refusing silent-zero '
                 'evaporation for active pyrolysis melt'
             )
-        vapor_pressure_diagnostic = dict(
-            getattr(self, '_last_vapor_pressure_diagnostic', {}) or {}
-        )
         self._last_partial_melt_offgassing_diagnostic = (
             self._build_partial_melt_offgassing_diagnostic(
                 equilibrium,
@@ -1772,6 +1862,13 @@ class EvaporationMixin:
         pO2_bar = vapor_pressure_diagnostic.get('pO2_bar')
         if pO2_bar is None:
             pO2_bar = getattr(equilibrium, 'pO2_bar', None)
+        selected_runtime_pressures, legacy_flux_pressures = (
+            _evaporation_runtime_and_shadow_pressure_maps(
+                self.vapor_pressures,
+                equilibrium,
+                vapor_pressure_diagnostic,
+            )
+        )
         total_pressure_Pa = None
         try:
             total_pressure_Pa = float(
@@ -1786,6 +1883,11 @@ class EvaporationMixin:
                 stage='evaporation',
                 total_pressure_Pa=total_pressure_Pa,
                 fO2_bar=float(pO2_bar) if pO2_bar is not None else None,
+                selected_runtime_pressures_Pa=selected_runtime_pressures,
+                flux_activation_context=FluxActivationContext(
+                    epoch=FLUX_ACTIVATION_EPOCH_PRE_RG,
+                    legacy_live_species_ids=frozenset(legacy_flux_pressures),
+                ),
             )
         except Exception as exc:  # noqa: BLE001 — typed failure, not live fallback
             self._last_vapour_batch_resolve_error = {

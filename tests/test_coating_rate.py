@@ -255,10 +255,9 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
         )
         + "\n"
     ).encode("utf-8")
-    # Regenerated from the executable t-475 path after wall deposition began
-    # consuming bounded flowing-gas partial pressures.
+    # Regenerated from the executable VR-11/b-114 batch instrumentation path.
     assert hashlib.sha256(actual_bytes).hexdigest() == (
-        "36fc5b12bdef2ee258374749527f34e0723082987ad0825922e7a9af413505cd"
+        "c552c73bc3da2dbe5ac6428cf792633da15341e11e04a76c726d2319324af32c"
     )
 
 

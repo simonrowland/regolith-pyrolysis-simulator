@@ -2662,7 +2662,7 @@
     "vapour_batch": {
       "schema": "vapour_batch.v1",
       "n_requested": 8,
-      "n_flux_active": 7,
+      "n_flux_active": 0,
       "n_refused": 1,
       "requested_species_ids": [
         "Al",
@@ -2674,40 +2674,16 @@
         "Si",
         "SiO"
       ],
-      "flux_active_species_ids": [
-        "Al",
-        "Ca",
-        "Fe",
-        "Mg",
-        "Na",
-        "Si",
-        "SiO"
-      ],
-      "solve_bundle_ids": {
-        "bundle:5:Si+SiO": [
-          "Si",
-          "SiO"
-        ],
-        "metals_al_family": [
-          "Al"
-        ],
-        "metals_ca_family": [
-          "Ca"
-        ],
-        "metals_fe_family": [
-          "Fe"
-        ],
-        "metals_mg_family": [
-          "Mg"
-        ],
-        "metals_na_family": [
-          "Na"
-        ]
-      },
+      "flux_active_species_ids": [],
+      "solve_bundle_ids": {},
       "channels_by_species": {
         "Al": {
           "species_id": "Al",
           "pressure": {
+            "kind": "value",
+            "pa": 3.866006216158053e-23
+          },
+          "selected_runtime_pressure": {
             "kind": "value",
             "pa": 3.866006216158053e-23
           },
@@ -2727,7 +2703,7 @@
           "certification_ceiling": "never",
           "refusal_code": null,
           "is_refused": false,
-          "is_flux_active": true,
+          "is_union_flux_eligible": true,
           "extra": {
             "origin": "catalog",
             "out_of_range": true,
@@ -2737,11 +2713,17 @@
           "out_of_range": true,
           "acquisition_flag": "vapour_pressure_out_of_range:Al",
           "activity_bound": null,
-          "source_boundary": null
+          "source_boundary": null,
+          "is_flux_active": false,
+          "is_flux_dormant_by_epoch": true
         },
         "Ca": {
           "species_id": "Ca",
           "pressure": {
+            "kind": "value",
+            "pa": 4.967605536851819e-06
+          },
+          "selected_runtime_pressure": {
             "kind": "value",
             "pa": 4.967605536851819e-06
           },
@@ -2761,7 +2743,7 @@
           "certification_ceiling": "never",
           "refusal_code": null,
           "is_refused": false,
-          "is_flux_active": true,
+          "is_union_flux_eligible": true,
           "extra": {
             "origin": "catalog",
             "out_of_range": true,
@@ -2771,11 +2753,17 @@
           "out_of_range": true,
           "acquisition_flag": "vapour_pressure_out_of_range:Ca",
           "activity_bound": null,
-          "source_boundary": null
+          "source_boundary": null,
+          "is_flux_active": false,
+          "is_flux_dormant_by_epoch": true
         },
         "Fe": {
           "species_id": "Fe",
           "pressure": {
+            "kind": "value",
+            "pa": 5.426004334158431e-07
+          },
+          "selected_runtime_pressure": {
             "kind": "value",
             "pa": 5.426004334158431e-07
           },
@@ -2795,7 +2783,7 @@
           "certification_ceiling": "never",
           "refusal_code": null,
           "is_refused": false,
-          "is_flux_active": true,
+          "is_union_flux_eligible": true,
           "extra": {
             "origin": "catalog",
             "out_of_range": true,
@@ -2805,11 +2793,17 @@
           "out_of_range": true,
           "acquisition_flag": "vapour_pressure_out_of_range:Fe",
           "activity_bound": null,
-          "source_boundary": null
+          "source_boundary": null,
+          "is_flux_active": false,
+          "is_flux_dormant_by_epoch": true
         },
         "Mg": {
           "species_id": "Mg",
           "pressure": {
+            "kind": "value",
+            "pa": 1.4173293636698893e-07
+          },
+          "selected_runtime_pressure": {
             "kind": "value",
             "pa": 1.4173293636698893e-07
           },
@@ -2829,7 +2823,7 @@
           "certification_ceiling": "never",
           "refusal_code": null,
           "is_refused": false,
-          "is_flux_active": true,
+          "is_union_flux_eligible": true,
           "extra": {
             "origin": "catalog",
             "out_of_range": true,
@@ -2839,11 +2833,17 @@
           "out_of_range": true,
           "acquisition_flag": "vapour_pressure_out_of_range:Mg",
           "activity_bound": null,
-          "source_boundary": null
+          "source_boundary": null,
+          "is_flux_active": false,
+          "is_flux_dormant_by_epoch": true
         },
         "Na": {
           "species_id": "Na",
           "pressure": {
+            "kind": "value",
+            "pa": 0.005061894589893974
+          },
+          "selected_runtime_pressure": {
             "kind": "value",
             "pa": 0.005061894589893974
           },
@@ -2863,7 +2863,7 @@
           "certification_ceiling": "never",
           "refusal_code": null,
           "is_refused": false,
-          "is_flux_active": true,
+          "is_union_flux_eligible": true,
           "extra": {
             "origin": "catalog",
             "out_of_range": true,
@@ -2873,11 +2873,18 @@
           "out_of_range": true,
           "acquisition_flag": "vapour_pressure_out_of_range:Na",
           "activity_bound": null,
-          "source_boundary": null
+          "source_boundary": null,
+          "is_flux_active": false,
+          "is_flux_dormant_by_epoch": true
         },
         "NiO_gas": {
           "species_id": "NiO_gas",
           "pressure": {
+            "kind": "refusal",
+            "code": "missing_channel_contract",
+            "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route"
+          },
+          "selected_runtime_pressure": {
             "kind": "refusal",
             "code": "missing_channel_contract",
             "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route"
@@ -2898,7 +2905,7 @@
           "certification_ceiling": "never",
           "refusal_code": "missing_channel_contract",
           "is_refused": true,
-          "is_flux_active": false,
+          "is_union_flux_eligible": false,
           "extra": {
             "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route",
             "origin": "u0_v"
@@ -2906,11 +2913,17 @@
           "out_of_range": false,
           "acquisition_flag": null,
           "activity_bound": null,
-          "source_boundary": null
+          "source_boundary": null,
+          "is_flux_active": false,
+          "is_flux_dormant_by_epoch": false
         },
         "Si": {
           "species_id": "Si",
           "pressure": {
+            "kind": "value",
+            "pa": 2.4218844203296765e-16
+          },
+          "selected_runtime_pressure": {
             "kind": "value",
             "pa": 2.4218844203296765e-16
           },
@@ -2930,7 +2943,7 @@
           "certification_ceiling": "never",
           "refusal_code": null,
           "is_refused": false,
-          "is_flux_active": true,
+          "is_union_flux_eligible": true,
           "extra": {
             "origin": "catalog",
             "out_of_range": true,
@@ -2940,11 +2953,17 @@
           "out_of_range": true,
           "acquisition_flag": "vapour_pressure_out_of_range:Si",
           "activity_bound": null,
-          "source_boundary": null
+          "source_boundary": null,
+          "is_flux_active": false,
+          "is_flux_dormant_by_epoch": true
         },
         "SiO": {
           "species_id": "SiO",
           "pressure": {
+            "kind": "value",
+            "pa": 1.240906363682221e-41
+          },
+          "selected_runtime_pressure": {
             "kind": "value",
             "pa": 1.240906363682221e-41
           },
@@ -2964,7 +2983,7 @@
           "certification_ceiling": "never",
           "refusal_code": null,
           "is_refused": false,
-          "is_flux_active": true,
+          "is_union_flux_eligible": true,
           "extra": {
             "origin": "catalog",
             "out_of_range": true,
@@ -2974,13 +2993,20 @@
           "out_of_range": true,
           "acquisition_flag": "vapour_pressure_out_of_range:SiO",
           "activity_bound": null,
-          "source_boundary": null
+          "source_boundary": null,
+          "is_flux_active": false,
+          "is_flux_dormant_by_epoch": true
         }
       },
       "refusals_by_species": {
         "NiO_gas": {
           "species_id": "NiO_gas",
           "pressure": {
+            "kind": "refusal",
+            "code": "missing_channel_contract",
+            "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route"
+          },
+          "selected_runtime_pressure": {
             "kind": "refusal",
             "code": "missing_channel_contract",
             "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route"
@@ -3001,7 +3027,7 @@
           "certification_ceiling": "never",
           "refusal_code": "missing_channel_contract",
           "is_refused": true,
-          "is_flux_active": false,
+          "is_union_flux_eligible": false,
           "extra": {
             "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route",
             "origin": "u0_v"
@@ -3009,7 +3035,9 @@
           "out_of_range": false,
           "acquisition_flag": null,
           "activity_bound": null,
-          "source_boundary": null
+          "source_boundary": null,
+          "is_flux_active": false,
+          "is_flux_dormant_by_epoch": false
         }
       },
       "metadata": {
@@ -3017,39 +3045,28 @@
         "refusal_closure_iterations": 2,
         "n_requested": 8,
         "n_refused": 1,
-        "n_flux_active": 7,
-        "n_solve_bundles": 6
+        "n_flux_active": 0,
+        "n_flux_dormant_by_epoch": 7,
+        "flux_activation_epoch": "pre_rg_legacy_live",
+        "n_solve_bundles": 0
       }
     },
     "flux_overlay": {
       "schema": "vapour_batch_flux_overlay.v1",
       "batch_present": true,
-      "n_live_pressures": 0,
       "n_flux_pressures": 0,
-      "live_only_bridge_species": [],
-      "batch_refused_live_species": [],
-      "batch_flux_active_not_in_live": [
-        "Al",
-        "Ca",
-        "Fe",
-        "Mg",
-        "Na",
-        "Si",
-        "SiO"
-      ],
       "batch_channel_states": {
-        "Al": "eligible",
-        "Ca": "eligible",
-        "Fe": "eligible",
-        "Mg": "eligible",
-        "Na": "eligible",
+        "Al": "dormant_by_epoch",
+        "Ca": "dormant_by_epoch",
+        "Fe": "dormant_by_epoch",
+        "Mg": "dormant_by_epoch",
+        "Na": "dormant_by_epoch",
         "NiO_gas": "refusal",
-        "Si": "eligible",
-        "SiO": "eligible"
+        "Si": "dormant_by_epoch",
+        "SiO": "dormant_by_epoch"
       },
-      "dropped_nonfinite_live_species": [],
-      "note": "Active flux consumes VapourBatch channel unions only. Live equilibrium map is the legacy shadow projection, never a fail-open flux fallback.",
-      "selection_source": "vapour_batch_channel_unions",
+      "note": "Active flux consumes each VapourAnswer selected runtime pressure. Compatibility pressure maps are absent from this consumer.",
+      "selection_source": "vapour_answer_selected_runtime_pressure",
       "batch_pa_by_species": {
         "Al": 3.866006216158053e-23,
         "Ca": 4.967605536851819e-06,
@@ -3059,12 +3076,28 @@
         "Si": 2.4218844203296765e-16,
         "SiO": 1.240906363682221e-41
       },
+      "selected_runtime_pa_by_species": {
+        "Al": 3.866006216158053e-23,
+        "Ca": 4.967605536851819e-06,
+        "Fe": 5.426004334158431e-07,
+        "Mg": 1.4173293636698893e-07,
+        "Na": 0.005061894589893974,
+        "Si": 2.4218844203296765e-16,
+        "SiO": 1.240906363682221e-41
+      },
+      "missing_batch_keys": [],
       "shadow_equal": true,
       "shadow_outcome": "proved",
       "detail": "both paths empty",
       "mismatched_species": [],
       "missing_in_batch_path": [],
       "missing_in_legacy_path": [],
+      "n_live_pressures": 0,
+      "live_only_bridge_species": [],
+      "batch_refused_live_species": [],
+      "batch_flux_active_not_in_live": [],
+      "live_flux_active_not_in_batch": [],
+      "dropped_nonfinite_live_species": [],
       "catalog_pa_shadow_equal": true,
       "catalog_pa_shadow_outcome": "proved"
     },
@@ -3556,6 +3589,72 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
+      },
+      "vapour_batch_summary": {
+        "n_requested": 8,
+        "n_flux_active": 0,
+        "n_refused": 1,
+        "solve_bundle_ids": {},
+        "metadata": {
+          "refusal_closure_fixed_point": true,
+          "refusal_closure_iterations": 2,
+          "n_requested": 8,
+          "n_refused": 1,
+          "n_flux_active": 0,
+          "n_flux_dormant_by_epoch": 7,
+          "flux_activation_epoch": "pre_rg_legacy_live",
+          "n_solve_bundles": 0
+        }
+      },
+      "vapour_batch_flux_overlay": {
+        "schema": "vapour_batch_flux_overlay.v1",
+        "batch_present": true,
+        "n_flux_pressures": 0,
+        "batch_channel_states": {
+          "Al": "dormant_by_epoch",
+          "Ca": "dormant_by_epoch",
+          "Fe": "dormant_by_epoch",
+          "Mg": "dormant_by_epoch",
+          "Na": "dormant_by_epoch",
+          "NiO_gas": "refusal",
+          "Si": "dormant_by_epoch",
+          "SiO": "dormant_by_epoch"
+        },
+        "note": "Active flux consumes each VapourAnswer selected runtime pressure. Compatibility pressure maps are absent from this consumer.",
+        "selection_source": "vapour_answer_selected_runtime_pressure",
+        "batch_pa_by_species": {
+          "Al": 2.0005251236362083e-26,
+          "Ca": 2.7085181019595305e-07,
+          "Fe": 1.1659862654730149e-07,
+          "Mg": 3.113953464960555e-10,
+          "Na": 0.002429769593662667,
+          "Si": 1.3569784730823506e-17,
+          "SiO": 5.231059746936808e-42
+        },
+        "selected_runtime_pa_by_species": {
+          "Al": 2.0005251236362083e-26,
+          "Ca": 2.7085181019595305e-07,
+          "Fe": 1.1659862654730149e-07,
+          "Mg": 3.113953464960555e-10,
+          "Na": 0.002429769593662667,
+          "Si": 1.3569784730823506e-17,
+          "SiO": 5.231059746936808e-42
+        },
+        "missing_batch_keys": [],
+        "shadow_equal": true,
+        "shadow_outcome": "proved",
+        "detail": "both paths empty",
+        "mismatched_species": [],
+        "missing_in_batch_path": [],
+        "missing_in_legacy_path": [],
+        "n_live_pressures": 0,
+        "live_only_bridge_species": [],
+        "batch_refused_live_species": [],
+        "batch_flux_active_not_in_live": [],
+        "live_flux_active_not_in_batch": [],
+        "dropped_nonfinite_live_species": [],
+        "catalog_pa_shadow_equal": true,
+        "catalog_pa_shadow_outcome": "proved"
       }
     },
     {
@@ -3746,6 +3845,72 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
+      },
+      "vapour_batch_summary": {
+        "n_requested": 8,
+        "n_flux_active": 0,
+        "n_refused": 1,
+        "solve_bundle_ids": {},
+        "metadata": {
+          "refusal_closure_fixed_point": true,
+          "refusal_closure_iterations": 2,
+          "n_requested": 8,
+          "n_refused": 1,
+          "n_flux_active": 0,
+          "n_flux_dormant_by_epoch": 7,
+          "flux_activation_epoch": "pre_rg_legacy_live",
+          "n_solve_bundles": 0
+        }
+      },
+      "vapour_batch_flux_overlay": {
+        "schema": "vapour_batch_flux_overlay.v1",
+        "batch_present": true,
+        "n_flux_pressures": 0,
+        "batch_channel_states": {
+          "Al": "dormant_by_epoch",
+          "Ca": "dormant_by_epoch",
+          "Fe": "dormant_by_epoch",
+          "Mg": "dormant_by_epoch",
+          "Na": "dormant_by_epoch",
+          "NiO_gas": "refusal",
+          "Si": "dormant_by_epoch",
+          "SiO": "dormant_by_epoch"
+        },
+        "note": "Active flux consumes each VapourAnswer selected runtime pressure. Compatibility pressure maps are absent from this consumer.",
+        "selection_source": "vapour_answer_selected_runtime_pressure",
+        "batch_pa_by_species": {
+          "Al": 3.9799907137875326e-26,
+          "Ca": 3.5284801963359383e-07,
+          "Fe": 1.3409152091149249e-07,
+          "Mg": 5.432039333760598e-10,
+          "Na": 0.0025974200238611813,
+          "Si": 1.7634087828807145e-17,
+          "SiO": 1.0800045519093149e-41
+        },
+        "selected_runtime_pa_by_species": {
+          "Al": 3.9799907137875326e-26,
+          "Ca": 3.5284801963359383e-07,
+          "Fe": 1.3409152091149249e-07,
+          "Mg": 5.432039333760598e-10,
+          "Na": 0.0025974200238611813,
+          "Si": 1.7634087828807145e-17,
+          "SiO": 1.0800045519093149e-41
+        },
+        "missing_batch_keys": [],
+        "shadow_equal": true,
+        "shadow_outcome": "proved",
+        "detail": "both paths empty",
+        "mismatched_species": [],
+        "missing_in_batch_path": [],
+        "missing_in_legacy_path": [],
+        "n_live_pressures": 0,
+        "live_only_bridge_species": [],
+        "batch_refused_live_species": [],
+        "batch_flux_active_not_in_live": [],
+        "live_flux_active_not_in_batch": [],
+        "dropped_nonfinite_live_species": [],
+        "catalog_pa_shadow_equal": true,
+        "catalog_pa_shadow_outcome": "proved"
       }
     },
     {
@@ -3936,6 +4101,72 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
+      },
+      "vapour_batch_summary": {
+        "n_requested": 8,
+        "n_flux_active": 0,
+        "n_refused": 1,
+        "solve_bundle_ids": {},
+        "metadata": {
+          "refusal_closure_fixed_point": true,
+          "refusal_closure_iterations": 2,
+          "n_requested": 8,
+          "n_refused": 1,
+          "n_flux_active": 0,
+          "n_flux_dormant_by_epoch": 7,
+          "flux_activation_epoch": "pre_rg_legacy_live",
+          "n_solve_bundles": 0
+        }
+      },
+      "vapour_batch_flux_overlay": {
+        "schema": "vapour_batch_flux_overlay.v1",
+        "batch_present": true,
+        "n_flux_pressures": 0,
+        "batch_channel_states": {
+          "Al": "dormant_by_epoch",
+          "Ca": "dormant_by_epoch",
+          "Fe": "dormant_by_epoch",
+          "Mg": "dormant_by_epoch",
+          "Na": "dormant_by_epoch",
+          "NiO_gas": "refusal",
+          "Si": "dormant_by_epoch",
+          "SiO": "dormant_by_epoch"
+        },
+        "note": "Active flux consumes each VapourAnswer selected runtime pressure. Compatibility pressure maps are absent from this consumer.",
+        "selection_source": "vapour_answer_selected_runtime_pressure",
+        "batch_pa_by_species": {
+          "Al": 7.918084054372345e-26,
+          "Ca": 4.5966731722883923e-07,
+          "Fe": 1.542088145700654e-07,
+          "Mg": 9.475752176629324e-10,
+          "Na": 0.0027766380803972116,
+          "Si": 2.2915695401397355e-17,
+          "SiO": 2.2297773081790967e-41
+        },
+        "selected_runtime_pa_by_species": {
+          "Al": 7.918084054372345e-26,
+          "Ca": 4.5966731722883923e-07,
+          "Fe": 1.542088145700654e-07,
+          "Mg": 9.475752176629324e-10,
+          "Na": 0.0027766380803972116,
+          "Si": 2.2915695401397355e-17,
+          "SiO": 2.2297773081790967e-41
+        },
+        "missing_batch_keys": [],
+        "shadow_equal": true,
+        "shadow_outcome": "proved",
+        "detail": "both paths empty",
+        "mismatched_species": [],
+        "missing_in_batch_path": [],
+        "missing_in_legacy_path": [],
+        "n_live_pressures": 0,
+        "live_only_bridge_species": [],
+        "batch_refused_live_species": [],
+        "batch_flux_active_not_in_live": [],
+        "live_flux_active_not_in_batch": [],
+        "dropped_nonfinite_live_species": [],
+        "catalog_pa_shadow_equal": true,
+        "catalog_pa_shadow_outcome": "proved"
       }
     },
     {
@@ -4126,6 +4357,72 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
+      },
+      "vapour_batch_summary": {
+        "n_requested": 8,
+        "n_flux_active": 0,
+        "n_refused": 1,
+        "solve_bundle_ids": {},
+        "metadata": {
+          "refusal_closure_fixed_point": true,
+          "refusal_closure_iterations": 2,
+          "n_requested": 8,
+          "n_refused": 1,
+          "n_flux_active": 0,
+          "n_flux_dormant_by_epoch": 7,
+          "flux_activation_epoch": "pre_rg_legacy_live",
+          "n_solve_bundles": 0
+        }
+      },
+      "vapour_batch_flux_overlay": {
+        "schema": "vapour_batch_flux_overlay.v1",
+        "batch_present": true,
+        "n_flux_pressures": 0,
+        "batch_channel_states": {
+          "Al": "dormant_by_epoch",
+          "Ca": "dormant_by_epoch",
+          "Fe": "dormant_by_epoch",
+          "Mg": "dormant_by_epoch",
+          "Na": "dormant_by_epoch",
+          "NiO_gas": "refusal",
+          "Si": "dormant_by_epoch",
+          "SiO": "dormant_by_epoch"
+        },
+        "note": "Active flux consumes each VapourAnswer selected runtime pressure. Compatibility pressure maps are absent from this consumer.",
+        "selection_source": "vapour_answer_selected_runtime_pressure",
+        "batch_pa_by_species": {
+          "Al": 1.5752814416102188e-25,
+          "Ca": 5.988245101893222e-07,
+          "Fe": 1.773442372005103e-07,
+          "Mg": 1.6529681358314745e-09,
+          "Na": 0.002968221912007539,
+          "Si": 2.9779203825432355e-17,
+          "SiO": 4.603598045286661e-41
+        },
+        "selected_runtime_pa_by_species": {
+          "Al": 1.5752814416102188e-25,
+          "Ca": 5.988245101893222e-07,
+          "Fe": 1.773442372005103e-07,
+          "Mg": 1.6529681358314745e-09,
+          "Na": 0.002968221912007539,
+          "Si": 2.9779203825432355e-17,
+          "SiO": 4.603598045286661e-41
+        },
+        "missing_batch_keys": [],
+        "shadow_equal": true,
+        "shadow_outcome": "proved",
+        "detail": "both paths empty",
+        "mismatched_species": [],
+        "missing_in_batch_path": [],
+        "missing_in_legacy_path": [],
+        "n_live_pressures": 0,
+        "live_only_bridge_species": [],
+        "batch_refused_live_species": [],
+        "batch_flux_active_not_in_live": [],
+        "live_flux_active_not_in_batch": [],
+        "dropped_nonfinite_live_species": [],
+        "catalog_pa_shadow_equal": true,
+        "catalog_pa_shadow_outcome": "proved"
       }
     },
     {
@@ -4316,6 +4613,72 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
+      },
+      "vapour_batch_summary": {
+        "n_requested": 8,
+        "n_flux_active": 0,
+        "n_refused": 1,
+        "solve_bundle_ids": {},
+        "metadata": {
+          "refusal_closure_fixed_point": true,
+          "refusal_closure_iterations": 2,
+          "n_requested": 8,
+          "n_refused": 1,
+          "n_flux_active": 0,
+          "n_flux_dormant_by_epoch": 7,
+          "flux_activation_epoch": "pre_rg_legacy_live",
+          "n_solve_bundles": 0
+        }
+      },
+      "vapour_batch_flux_overlay": {
+        "schema": "vapour_batch_flux_overlay.v1",
+        "batch_present": true,
+        "n_flux_pressures": 0,
+        "batch_channel_states": {
+          "Al": "dormant_by_epoch",
+          "Ca": "dormant_by_epoch",
+          "Fe": "dormant_by_epoch",
+          "Mg": "dormant_by_epoch",
+          "Na": "dormant_by_epoch",
+          "NiO_gas": "refusal",
+          "Si": "dormant_by_epoch",
+          "SiO": "dormant_by_epoch"
+        },
+        "note": "Active flux consumes each VapourAnswer selected runtime pressure. Compatibility pressure maps are absent from this consumer.",
+        "selection_source": "vapour_answer_selected_runtime_pressure",
+        "batch_pa_by_species": {
+          "Al": 3.1339798911471327e-25,
+          "Ca": 7.801093977385432e-07,
+          "Fe": 2.0395058840129344e-07,
+          "Mg": 2.8834688868426222e-09,
+          "Na": 0.003173024738485665,
+          "Si": 3.869841019193202e-17,
+          "SiO": 9.50458814197612e-41
+        },
+        "selected_runtime_pa_by_species": {
+          "Al": 3.1339798911471327e-25,
+          "Ca": 7.801093977385432e-07,
+          "Fe": 2.0395058840129344e-07,
+          "Mg": 2.8834688868426222e-09,
+          "Na": 0.003173024738485665,
+          "Si": 3.869841019193202e-17,
+          "SiO": 9.50458814197612e-41
+        },
+        "missing_batch_keys": [],
+        "shadow_equal": true,
+        "shadow_outcome": "proved",
+        "detail": "both paths empty",
+        "mismatched_species": [],
+        "missing_in_batch_path": [],
+        "missing_in_legacy_path": [],
+        "n_live_pressures": 0,
+        "live_only_bridge_species": [],
+        "batch_refused_live_species": [],
+        "batch_flux_active_not_in_live": [],
+        "live_flux_active_not_in_batch": [],
+        "dropped_nonfinite_live_species": [],
+        "catalog_pa_shadow_equal": true,
+        "catalog_pa_shadow_outcome": "proved"
       }
     },
     {
@@ -4506,6 +4869,72 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
+      },
+      "vapour_batch_summary": {
+        "n_requested": 8,
+        "n_flux_active": 0,
+        "n_refused": 1,
+        "solve_bundle_ids": {},
+        "metadata": {
+          "refusal_closure_fixed_point": true,
+          "refusal_closure_iterations": 2,
+          "n_requested": 8,
+          "n_refused": 1,
+          "n_flux_active": 0,
+          "n_flux_dormant_by_epoch": 7,
+          "flux_activation_epoch": "pre_rg_legacy_live",
+          "n_solve_bundles": 0
+        }
+      },
+      "vapour_batch_flux_overlay": {
+        "schema": "vapour_batch_flux_overlay.v1",
+        "batch_present": true,
+        "n_flux_pressures": 0,
+        "batch_channel_states": {
+          "Al": "dormant_by_epoch",
+          "Ca": "dormant_by_epoch",
+          "Fe": "dormant_by_epoch",
+          "Mg": "dormant_by_epoch",
+          "Na": "dormant_by_epoch",
+          "NiO_gas": "refusal",
+          "Si": "dormant_by_epoch",
+          "SiO": "dormant_by_epoch"
+        },
+        "note": "Active flux consumes each VapourAnswer selected runtime pressure. Compatibility pressure maps are absent from this consumer.",
+        "selection_source": "vapour_answer_selected_runtime_pressure",
+        "batch_pa_by_species": {
+          "Al": 6.234968367350974e-25,
+          "Ca": 1.0162754898719646e-06,
+          "Fe": 2.3454859975068895e-07,
+          "Mg": 5.029977675405763e-09,
+          "Na": 0.003391958650501475,
+          "Si": 5.0289019147787275e-17,
+          "SiO": 1.962317188858108e-40
+        },
+        "selected_runtime_pa_by_species": {
+          "Al": 6.234968367350974e-25,
+          "Ca": 1.0162754898719646e-06,
+          "Fe": 2.3454859975068895e-07,
+          "Mg": 5.029977675405763e-09,
+          "Na": 0.003391958650501475,
+          "Si": 5.0289019147787275e-17,
+          "SiO": 1.962317188858108e-40
+        },
+        "missing_batch_keys": [],
+        "shadow_equal": true,
+        "shadow_outcome": "proved",
+        "detail": "both paths empty",
+        "mismatched_species": [],
+        "missing_in_batch_path": [],
+        "missing_in_legacy_path": [],
+        "n_live_pressures": 0,
+        "live_only_bridge_species": [],
+        "batch_refused_live_species": [],
+        "batch_flux_active_not_in_live": [],
+        "live_flux_active_not_in_batch": [],
+        "dropped_nonfinite_live_species": [],
+        "catalog_pa_shadow_equal": true,
+        "catalog_pa_shadow_outcome": "proved"
       }
     },
     {
@@ -4696,6 +5125,72 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
+      },
+      "vapour_batch_summary": {
+        "n_requested": 8,
+        "n_flux_active": 0,
+        "n_refused": 1,
+        "solve_bundle_ids": {},
+        "metadata": {
+          "refusal_closure_fixed_point": true,
+          "refusal_closure_iterations": 2,
+          "n_requested": 8,
+          "n_refused": 1,
+          "n_flux_active": 0,
+          "n_flux_dormant_by_epoch": 7,
+          "flux_activation_epoch": "pre_rg_legacy_live",
+          "n_solve_bundles": 0
+        }
+      },
+      "vapour_batch_flux_overlay": {
+        "schema": "vapour_batch_flux_overlay.v1",
+        "batch_present": true,
+        "n_flux_pressures": 0,
+        "batch_channel_states": {
+          "Al": "dormant_by_epoch",
+          "Ca": "dormant_by_epoch",
+          "Fe": "dormant_by_epoch",
+          "Mg": "dormant_by_epoch",
+          "Na": "dormant_by_epoch",
+          "NiO_gas": "refusal",
+          "Si": "dormant_by_epoch",
+          "SiO": "dormant_by_epoch"
+        },
+        "note": "Active flux consumes each VapourAnswer selected runtime pressure. Compatibility pressure maps are absent from this consumer.",
+        "selection_source": "vapour_answer_selected_runtime_pressure",
+        "batch_pa_by_species": {
+          "Al": 1.240430120553111e-24,
+          "Ca": 1.3239372250975676e-06,
+          "Fe": 2.6973712641007616e-07,
+          "Mg": 8.774388213629911e-09,
+          "Na": 0.003625998671602791,
+          "Si": 6.535114580427251e-17,
+          "SiO": 4.051399905148738e-40
+        },
+        "selected_runtime_pa_by_species": {
+          "Al": 1.240430120553111e-24,
+          "Ca": 1.3239372250975676e-06,
+          "Fe": 2.6973712641007616e-07,
+          "Mg": 8.774388213629911e-09,
+          "Na": 0.003625998671602791,
+          "Si": 6.535114580427251e-17,
+          "SiO": 4.051399905148738e-40
+        },
+        "missing_batch_keys": [],
+        "shadow_equal": true,
+        "shadow_outcome": "proved",
+        "detail": "both paths empty",
+        "mismatched_species": [],
+        "missing_in_batch_path": [],
+        "missing_in_legacy_path": [],
+        "n_live_pressures": 0,
+        "live_only_bridge_species": [],
+        "batch_refused_live_species": [],
+        "batch_flux_active_not_in_live": [],
+        "live_flux_active_not_in_batch": [],
+        "dropped_nonfinite_live_species": [],
+        "catalog_pa_shadow_equal": true,
+        "catalog_pa_shadow_outcome": "proved"
       }
     },
     {
@@ -4886,6 +5381,72 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
+      },
+      "vapour_batch_summary": {
+        "n_requested": 8,
+        "n_flux_active": 0,
+        "n_refused": 1,
+        "solve_bundle_ids": {},
+        "metadata": {
+          "refusal_closure_fixed_point": true,
+          "refusal_closure_iterations": 2,
+          "n_requested": 8,
+          "n_refused": 1,
+          "n_flux_active": 0,
+          "n_flux_dormant_by_epoch": 7,
+          "flux_activation_epoch": "pre_rg_legacy_live",
+          "n_solve_bundles": 0
+        }
+      },
+      "vapour_batch_flux_overlay": {
+        "schema": "vapour_batch_flux_overlay.v1",
+        "batch_present": true,
+        "n_flux_pressures": 0,
+        "batch_channel_states": {
+          "Al": "dormant_by_epoch",
+          "Ca": "dormant_by_epoch",
+          "Fe": "dormant_by_epoch",
+          "Mg": "dormant_by_epoch",
+          "Na": "dormant_by_epoch",
+          "NiO_gas": "refusal",
+          "Si": "dormant_by_epoch",
+          "SiO": "dormant_by_epoch"
+        },
+        "note": "Active flux consumes each VapourAnswer selected runtime pressure. Compatibility pressure maps are absent from this consumer.",
+        "selection_source": "vapour_answer_selected_runtime_pressure",
+        "batch_pa_by_species": {
+          "Al": 2.467802229811685e-24,
+          "Ca": 1.7247388070137042e-06,
+          "Fe": 3.102048677387235e-07,
+          "Mg": 1.5306208792920037e-08,
+          "Na": 0.003876187100488788,
+          "Si": 8.492454874453977e-17,
+          "SiO": 8.364519907706688e-40
+        },
+        "selected_runtime_pa_by_species": {
+          "Al": 2.467802229811685e-24,
+          "Ca": 1.7247388070137042e-06,
+          "Fe": 3.102048677387235e-07,
+          "Mg": 1.5306208792920037e-08,
+          "Na": 0.003876187100488788,
+          "Si": 8.492454874453977e-17,
+          "SiO": 8.364519907706688e-40
+        },
+        "missing_batch_keys": [],
+        "shadow_equal": true,
+        "shadow_outcome": "proved",
+        "detail": "both paths empty",
+        "mismatched_species": [],
+        "missing_in_batch_path": [],
+        "missing_in_legacy_path": [],
+        "n_live_pressures": 0,
+        "live_only_bridge_species": [],
+        "batch_refused_live_species": [],
+        "batch_flux_active_not_in_live": [],
+        "live_flux_active_not_in_batch": [],
+        "dropped_nonfinite_live_species": [],
+        "catalog_pa_shadow_equal": true,
+        "catalog_pa_shadow_outcome": "proved"
       }
     },
     {
@@ -5076,6 +5637,72 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
+      },
+      "vapour_batch_summary": {
+        "n_requested": 8,
+        "n_flux_active": 0,
+        "n_refused": 1,
+        "solve_bundle_ids": {},
+        "metadata": {
+          "refusal_closure_fixed_point": true,
+          "refusal_closure_iterations": 2,
+          "n_requested": 8,
+          "n_refused": 1,
+          "n_flux_active": 0,
+          "n_flux_dormant_by_epoch": 7,
+          "flux_activation_epoch": "pre_rg_legacy_live",
+          "n_solve_bundles": 0
+        }
+      },
+      "vapour_batch_flux_overlay": {
+        "schema": "vapour_batch_flux_overlay.v1",
+        "batch_present": true,
+        "n_flux_pressures": 0,
+        "batch_channel_states": {
+          "Al": "dormant_by_epoch",
+          "Ca": "dormant_by_epoch",
+          "Fe": "dormant_by_epoch",
+          "Mg": "dormant_by_epoch",
+          "Na": "dormant_by_epoch",
+          "NiO_gas": "refusal",
+          "Si": "dormant_by_epoch",
+          "SiO": "dormant_by_epoch"
+        },
+        "note": "Active flux consumes each VapourAnswer selected runtime pressure. Compatibility pressure maps are absent from this consumer.",
+        "selection_source": "vapour_answer_selected_runtime_pressure",
+        "batch_pa_by_species": {
+          "Al": 4.9096258987551486e-24,
+          "Ca": 2.2468768881393493e-06,
+          "Fe": 3.567438463124524e-07,
+          "Mg": 2.6700440179810945e-08,
+          "Na": 0.004143638152893841,
+          "Si": 1.1036040593785744e-16,
+          "SiO": 1.7269387106789492e-39
+        },
+        "selected_runtime_pa_by_species": {
+          "Al": 4.9096258987551486e-24,
+          "Ca": 2.2468768881393493e-06,
+          "Fe": 3.567438463124524e-07,
+          "Mg": 2.6700440179810945e-08,
+          "Na": 0.004143638152893841,
+          "Si": 1.1036040593785744e-16,
+          "SiO": 1.7269387106789492e-39
+        },
+        "missing_batch_keys": [],
+        "shadow_equal": true,
+        "shadow_outcome": "proved",
+        "detail": "both paths empty",
+        "mismatched_species": [],
+        "missing_in_batch_path": [],
+        "missing_in_legacy_path": [],
+        "n_live_pressures": 0,
+        "live_only_bridge_species": [],
+        "batch_refused_live_species": [],
+        "batch_flux_active_not_in_live": [],
+        "live_flux_active_not_in_batch": [],
+        "dropped_nonfinite_live_species": [],
+        "catalog_pa_shadow_equal": true,
+        "catalog_pa_shadow_outcome": "proved"
       }
     },
     {
@@ -5266,6 +5893,72 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
+      },
+      "vapour_batch_summary": {
+        "n_requested": 8,
+        "n_flux_active": 0,
+        "n_refused": 1,
+        "solve_bundle_ids": {},
+        "metadata": {
+          "refusal_closure_fixed_point": true,
+          "refusal_closure_iterations": 2,
+          "n_requested": 8,
+          "n_refused": 1,
+          "n_flux_active": 0,
+          "n_flux_dormant_by_epoch": 7,
+          "flux_activation_epoch": "pre_rg_legacy_live",
+          "n_solve_bundles": 0
+        }
+      },
+      "vapour_batch_flux_overlay": {
+        "schema": "vapour_batch_flux_overlay.v1",
+        "batch_present": true,
+        "n_flux_pressures": 0,
+        "batch_channel_states": {
+          "Al": "dormant_by_epoch",
+          "Ca": "dormant_by_epoch",
+          "Fe": "dormant_by_epoch",
+          "Mg": "dormant_by_epoch",
+          "Na": "dormant_by_epoch",
+          "NiO_gas": "refusal",
+          "Si": "dormant_by_epoch",
+          "SiO": "dormant_by_epoch"
+        },
+        "note": "Active flux consumes each VapourAnswer selected runtime pressure. Compatibility pressure maps are absent from this consumer.",
+        "selection_source": "vapour_answer_selected_runtime_pressure",
+        "batch_pa_by_species": {
+          "Al": 9.767568152155724e-24,
+          "Ca": 2.927084222796555e-06,
+          "Fe": 4.102649091535074e-07,
+          "Mg": 4.6576752966118005e-08,
+          "Na": 0.004429542923754211,
+          "Si": 1.4341458834718572e-16,
+          "SiO": 3.565437518647785e-39
+        },
+        "selected_runtime_pa_by_species": {
+          "Al": 9.767568152155724e-24,
+          "Ca": 2.927084222796555e-06,
+          "Fe": 4.102649091535074e-07,
+          "Mg": 4.6576752966118005e-08,
+          "Na": 0.004429542923754211,
+          "Si": 1.4341458834718572e-16,
+          "SiO": 3.565437518647785e-39
+        },
+        "missing_batch_keys": [],
+        "shadow_equal": true,
+        "shadow_outcome": "proved",
+        "detail": "both paths empty",
+        "mismatched_species": [],
+        "missing_in_batch_path": [],
+        "missing_in_legacy_path": [],
+        "n_live_pressures": 0,
+        "live_only_bridge_species": [],
+        "batch_refused_live_species": [],
+        "batch_flux_active_not_in_live": [],
+        "live_flux_active_not_in_batch": [],
+        "dropped_nonfinite_live_species": [],
+        "catalog_pa_shadow_equal": true,
+        "catalog_pa_shadow_outcome": "proved"
       }
     },
     {
@@ -5459,67 +6152,36 @@
       },
       "vapour_batch_summary": {
         "n_requested": 8,
-        "n_flux_active": 7,
+        "n_flux_active": 0,
         "n_refused": 1,
-        "solve_bundle_ids": {
-          "bundle:5:Si+SiO": [
-            "Si",
-            "SiO"
-          ],
-          "metals_al_family": [
-            "Al"
-          ],
-          "metals_ca_family": [
-            "Ca"
-          ],
-          "metals_fe_family": [
-            "Fe"
-          ],
-          "metals_mg_family": [
-            "Mg"
-          ],
-          "metals_na_family": [
-            "Na"
-          ]
-        },
+        "solve_bundle_ids": {},
         "metadata": {
           "refusal_closure_fixed_point": true,
           "refusal_closure_iterations": 2,
           "n_requested": 8,
           "n_refused": 1,
-          "n_flux_active": 7,
-          "n_solve_bundles": 6
+          "n_flux_active": 0,
+          "n_flux_dormant_by_epoch": 7,
+          "flux_activation_epoch": "pre_rg_legacy_live",
+          "n_solve_bundles": 0
         }
       },
       "vapour_batch_flux_overlay": {
         "schema": "vapour_batch_flux_overlay.v1",
         "batch_present": true,
-        "n_live_pressures": 0,
         "n_flux_pressures": 0,
-        "live_only_bridge_species": [],
-        "batch_refused_live_species": [],
-        "batch_flux_active_not_in_live": [
-          "Al",
-          "Ca",
-          "Fe",
-          "Mg",
-          "Na",
-          "Si",
-          "SiO"
-        ],
         "batch_channel_states": {
-          "Al": "eligible",
-          "Ca": "eligible",
-          "Fe": "eligible",
-          "Mg": "eligible",
-          "Na": "eligible",
+          "Al": "dormant_by_epoch",
+          "Ca": "dormant_by_epoch",
+          "Fe": "dormant_by_epoch",
+          "Mg": "dormant_by_epoch",
+          "Na": "dormant_by_epoch",
           "NiO_gas": "refusal",
-          "Si": "eligible",
-          "SiO": "eligible"
+          "Si": "dormant_by_epoch",
+          "SiO": "dormant_by_epoch"
         },
-        "dropped_nonfinite_live_species": [],
-        "note": "Active flux consumes VapourBatch channel unions only. Live equilibrium map is the legacy shadow projection, never a fail-open flux fallback.",
-        "selection_source": "vapour_batch_channel_unions",
+        "note": "Active flux consumes each VapourAnswer selected runtime pressure. Compatibility pressure maps are absent from this consumer.",
+        "selection_source": "vapour_answer_selected_runtime_pressure",
         "batch_pa_by_species": {
           "Al": 1.943231308747926e-23,
           "Ca": 3.8132138403183882e-06,
@@ -5529,12 +6191,28 @@
           "Si": 1.8636887003092632e-16,
           "SiO": 6.010396268515573e-42
         },
+        "selected_runtime_pa_by_species": {
+          "Al": 1.943231308747926e-23,
+          "Ca": 3.8132138403183882e-06,
+          "Fe": 4.7181555455707966e-07,
+          "Mg": 8.12493690087978e-08,
+          "Na": 0.004735174691756847,
+          "Si": 1.8636887003092632e-16,
+          "SiO": 6.010396268515573e-42
+        },
+        "missing_batch_keys": [],
         "shadow_equal": true,
         "shadow_outcome": "proved",
         "detail": "both paths empty",
         "mismatched_species": [],
         "missing_in_batch_path": [],
         "missing_in_legacy_path": [],
+        "n_live_pressures": 0,
+        "live_only_bridge_species": [],
+        "batch_refused_live_species": [],
+        "batch_flux_active_not_in_live": [],
+        "live_flux_active_not_in_batch": [],
+        "dropped_nonfinite_live_species": [],
         "catalog_pa_shadow_equal": true,
         "catalog_pa_shadow_outcome": "proved"
       }
@@ -5730,67 +6408,36 @@
       },
       "vapour_batch_summary": {
         "n_requested": 8,
-        "n_flux_active": 7,
+        "n_flux_active": 0,
         "n_refused": 1,
-        "solve_bundle_ids": {
-          "bundle:5:Si+SiO": [
-            "Si",
-            "SiO"
-          ],
-          "metals_al_family": [
-            "Al"
-          ],
-          "metals_ca_family": [
-            "Ca"
-          ],
-          "metals_fe_family": [
-            "Fe"
-          ],
-          "metals_mg_family": [
-            "Mg"
-          ],
-          "metals_na_family": [
-            "Na"
-          ]
-        },
+        "solve_bundle_ids": {},
         "metadata": {
           "refusal_closure_fixed_point": true,
           "refusal_closure_iterations": 2,
           "n_requested": 8,
           "n_refused": 1,
-          "n_flux_active": 7,
-          "n_solve_bundles": 6
+          "n_flux_active": 0,
+          "n_flux_dormant_by_epoch": 7,
+          "flux_activation_epoch": "pre_rg_legacy_live",
+          "n_solve_bundles": 0
         }
       },
       "vapour_batch_flux_overlay": {
         "schema": "vapour_batch_flux_overlay.v1",
         "batch_present": true,
-        "n_live_pressures": 0,
         "n_flux_pressures": 0,
-        "live_only_bridge_species": [],
-        "batch_refused_live_species": [],
-        "batch_flux_active_not_in_live": [
-          "Al",
-          "Ca",
-          "Fe",
-          "Mg",
-          "Na",
-          "Si",
-          "SiO"
-        ],
         "batch_channel_states": {
-          "Al": "eligible",
-          "Ca": "eligible",
-          "Fe": "eligible",
-          "Mg": "eligible",
-          "Na": "eligible",
+          "Al": "dormant_by_epoch",
+          "Ca": "dormant_by_epoch",
+          "Fe": "dormant_by_epoch",
+          "Mg": "dormant_by_epoch",
+          "Na": "dormant_by_epoch",
           "NiO_gas": "refusal",
-          "Si": "eligible",
-          "SiO": "eligible"
+          "Si": "dormant_by_epoch",
+          "SiO": "dormant_by_epoch"
         },
-        "dropped_nonfinite_live_species": [],
-        "note": "Active flux consumes VapourBatch channel unions only. Live equilibrium map is the legacy shadow projection, never a fail-open flux fallback.",
-        "selection_source": "vapour_batch_channel_unions",
+        "note": "Active flux consumes each VapourAnswer selected runtime pressure. Compatibility pressure maps are absent from this consumer.",
+        "selection_source": "vapour_answer_selected_runtime_pressure",
         "batch_pa_by_species": {
           "Al": 3.866006216158053e-23,
           "Ca": 4.967605536851819e-06,
@@ -5800,12 +6447,28 @@
           "Si": 2.4218844203296765e-16,
           "SiO": 1.240906363682221e-41
         },
+        "selected_runtime_pa_by_species": {
+          "Al": 3.866006216158053e-23,
+          "Ca": 4.967605536851819e-06,
+          "Fe": 5.426004334158431e-07,
+          "Mg": 1.4173293636698893e-07,
+          "Na": 0.005061894589893974,
+          "Si": 2.4218844203296765e-16,
+          "SiO": 1.240906363682221e-41
+        },
+        "missing_batch_keys": [],
         "shadow_equal": true,
         "shadow_outcome": "proved",
         "detail": "both paths empty",
         "mismatched_species": [],
         "missing_in_batch_path": [],
         "missing_in_legacy_path": [],
+        "n_live_pressures": 0,
+        "live_only_bridge_species": [],
+        "batch_refused_live_species": [],
+        "batch_flux_active_not_in_live": [],
+        "live_flux_active_not_in_batch": [],
+        "dropped_nonfinite_live_species": [],
         "catalog_pa_shadow_equal": true,
         "catalog_pa_shadow_outcome": "proved"
       }

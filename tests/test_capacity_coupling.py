@@ -26,6 +26,11 @@ from simulator.capacity_coupling import (
 from simulator.core import PyrolysisSimulator
 from simulator.physical_constants import GAS_CONSTANT
 from simulator.state import CampaignPhase, EvaporationFlux
+from simulator.vapour_rail.instrumentation import (
+    compare_live_shadow_to_batch_flux,
+    flux_pressures_from_batch,
+    serialize_vapour_batch,
+)
 from simulator.thermal_train import (
     FiniteCapacity,
     NoColdTrain,
@@ -467,12 +472,19 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         # hour-1 total evaporation 1.422 -> 2.621 kg/hr; transport saturation
         # and evaporated melt mass follow the same shift. Head-result values
         # recomputed from the executable under the quiesced gate.
+        #
+        # 2026-08-02 VR-11 P1-2 (CrO2 refusal): policy-only alpha no longer
+        # admits CrO2, so the shared Cr2O3 parent-oxide split no longer
+        # debits a CrO2 channel.  Per-species probe shows ONLY Cr moves
+        # (+1.5539e-07 kg/hr); Al/Ca/Fe/K/Mg/Mn/Na/SiO/Ti byte-identical.
+        # Total / transport-saturation / melt-mass followers regenerated
+        # from the executable under the same default-off head-result probe.
         (
             1,
             1550.0,
-                2.621375151443563,
-                1161978.4904357793,
-                997.3707385338129,
+            2.6213753068336443,
+            1161978.521915791,
+            997.3707383784229,
         ),
         rel=1.0e-12,
         abs=1.0e-12,
@@ -576,13 +588,6 @@ def test_live_overhead_bleed_routes_binding_capacity_surge_to_accumulator(
 
 
 def test_live_and_picard_share_evaporation_control_construction(monkeypatch):
-    # DESIGN-REV5 U4 control surface / VR-11: live and Picard packs both
-    # include vapour_batch_flux_pressures_Pa + overlay/shadow fields.
-    from simulator.vapour_rail.instrumentation import (
-        flux_pressures_from_batch_and_live,
-        serialize_vapour_batch,
-    )
-
     sim = _real_capacity_sim()
     sim.melt.temperature_C = 1600.0
     sim.melt.p_total_mbar = 5.0
@@ -595,19 +600,18 @@ def test_live_and_picard_share_evaporation_control_construction(monkeypatch):
         diagnostics={},
     )
     partials = {"Fe": 100.0, "N2": 200.0}
-    temperature_K = float(sim.melt.temperature_C) + 273.15
     vapour_batch = sim._resolve_evaporation_vapour_batch(
-        equilibrium, temperature_K=temperature_K
+        equilibrium,
+        temperature_K=sim.melt.temperature_C + 273.15,
     )
-    resolve_error = dict(
-        getattr(sim, "_last_vapour_batch_resolve_error", {}) or {}
+    batch_pressures, batch_overlay = flux_pressures_from_batch(vapour_batch)
+    batch_overlay.update(
+        compare_live_shadow_to_batch_flux(
+            batch=vapour_batch,
+            live_pressures_Pa=equilibrium.vapor_pressures_Pa,
+            batch_flux_pressures_Pa=batch_pressures,
+        )
     )
-    batch_pressures, flux_overlay = flux_pressures_from_batch_and_live(
-        vapour_batch,
-        dict(equilibrium.vapor_pressures_Pa or {}),
-        resolution_error=resolve_error or None,
-    )
-    batch_report = serialize_vapour_batch(vapour_batch)
     expected, _ = sim._evaporation_flux_control_inputs(
         equilibrium,
         overhead_partials_Pa=partials,
@@ -615,8 +619,8 @@ def test_live_and_picard_share_evaporation_control_construction(monkeypatch):
             partials
         ),
         vapour_batch_flux_pressures_Pa=batch_pressures,
-        vapour_batch_report=batch_report,
-        vapour_batch_flux_overlay=flux_overlay,
+        vapour_batch_report=serialize_vapour_batch(vapour_batch),
+        vapour_batch_flux_overlay=batch_overlay,
     )
     captured = []
 
@@ -634,8 +638,6 @@ def test_live_and_picard_share_evaporation_control_construction(monkeypatch):
     )
 
     assert captured == [expected]
-    assert "vapour_batch_flux_pressures_Pa" in captured[0]
-    assert captured[0]["vapour_batch_flux_pressures_Pa"] == batch_pressures
     assert captured[0]["overhead_pressure_pa"] == pytest.approx(500.0)
 
 

@@ -52,6 +52,12 @@ from simulator.melt_backend.base import (
     MeltBackend,
 )
 from simulator.melt_backend.thermoengine import ThermoEngineBackend
+from simulator.vapour_rail.batch import (
+    FluxEligible,
+    PressureValue,
+    VapourAnswer,
+    VapourBatch,
+)
 from engines.alphamelts.thermoengine import (
     ThermoEngineIsolationError,
     ThermoEnginePayload,
@@ -3604,6 +3610,23 @@ def test_endmember_activity_labels_do_not_reach_evaporation_flux_as_oxide_keys()
     ) == {}
 
     captured: dict[str, object] = {}
+    na_answer = VapourAnswer(
+        species_id='Na',
+        pressure=PressureValue(pa=1.0),
+        selected_runtime_pressure=PressureValue(pa=1.0),
+        flux=FluxEligible(alpha_ref='alpha:Na'),
+        source_label='test',
+        formula_id='Na',
+        source_account='process.cleaned_melt',
+        solve_group_id='test:Na',
+        state_fingerprint='state:test',
+        validation_status='pending_validation',
+    )
+    vapour_batch = VapourBatch(
+        requested_species_ids=frozenset({'Na'}),
+        channels_by_species={'Na': na_answer},
+        flux_active_species_ids=frozenset({'Na'}),
+    )
 
     def _dispatch_only(intent, **kwargs):
         assert intent is ChemistryIntent.EVAPORATION_FLUX
@@ -3657,6 +3680,10 @@ def test_endmember_activity_labels_do_not_reach_evaporation_flux_as_oxide_keys()
         ),
         _build_partial_melt_offgassing_diagnostic=lambda *a, **k: {},
         _dispatch_only=_dispatch_only,
+        _last_vapour_batch_resolve_error={},
+        _resolve_evaporation_vapour_batch=(
+            lambda equilibrium, temperature_K: vapour_batch
+        ),
     )
     sim._resolve_evaporation_vapour_batch = types.MethodType(
         _resolve_evaporation_vapour_batch,

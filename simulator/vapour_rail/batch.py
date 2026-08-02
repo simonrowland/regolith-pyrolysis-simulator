@@ -25,6 +25,38 @@ class VapourRequestConstructionError(ValueError):
     """Raised when a caller tries to narrow or invent a request set."""
 
 
+FLUX_ACTIVATION_EPOCH_PRE_RG = "pre_rg_legacy_live"
+FLUX_ACTIVATION_EPOCH_RG_MANIFEST = "rg_manifest_union"
+_FLUX_ACTIVATION_EPOCHS = frozenset(
+    {FLUX_ACTIVATION_EPOCH_PRE_RG, FLUX_ACTIVATION_EPOCH_RG_MANIFEST}
+)
+
+
+@dataclass(frozen=True)
+class FluxActivationContext:
+    """Epoch authority for the flux-active subset of an exact-key batch.
+
+    Requested channels remain comprehensive.  Before the RG authority flip,
+    the legacy live species set is an allowlist; manifest/catalog additions
+    remain answered and observable but dormant to flux.
+    """
+
+    epoch: str
+    legacy_live_species_ids: frozenset[str] = frozenset()
+
+    def __post_init__(self) -> None:
+        epoch = str(self.epoch)
+        if epoch not in _FLUX_ACTIVATION_EPOCHS:
+            raise ValueError(f"unknown flux activation epoch: {epoch!r}")
+        legacy = frozenset(str(sid) for sid in self.legacy_live_species_ids)
+        if epoch == FLUX_ACTIVATION_EPOCH_RG_MANIFEST and legacy:
+            raise ValueError(
+                "rg_manifest_union activation may not carry legacy species inputs"
+            )
+        object.__setattr__(self, "epoch", epoch)
+        object.__setattr__(self, "legacy_live_species_ids", legacy)
+
+
 # ---------------------------------------------------------------------------
 # Pressure tagged union
 # ---------------------------------------------------------------------------
@@ -113,6 +145,7 @@ class VapourAnswer:
 
     species_id: str
     pressure: PressureOutcome
+    selected_runtime_pressure: PressureOutcome
     flux: FluxOutcome
     source_label: str
     formula_id: str

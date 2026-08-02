@@ -126,7 +126,10 @@ def _run_continuous():
             f"start --feedstock={FEEDSTOCK} --campaign=C2A_continuous "
             f"--additive=Na={NA_DOSE_KG}"
         ),
-        "advance 30",
+        # SC-109 requires an armed depletion signal before the C2A soft exit, so
+        # hour 30 is now the C2A->C3 boundary.  Advance through two complete
+        # three-hour C3 shuttle bursts; otherwise no metallothermic tick runs.
+        "advance 39",
     ])
 
 

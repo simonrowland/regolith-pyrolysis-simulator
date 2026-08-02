@@ -22,6 +22,9 @@ import pytest
 import yaml
 
 from simulator.vapour_rail.batch import (
+    FLUX_ACTIVATION_EPOCH_PRE_RG,
+    FLUX_ACTIVATION_EPOCH_RG_MANIFEST,
+    FluxActivationContext,
     IncompleteVapourBatchError,
     PressureRefusal,
     PressureValue,
@@ -51,6 +54,17 @@ from simulator.vapour_rail.request import (
     resolve_vapour_batch,
 )
 from simulator.vapour_rail.u0_manifest import load_u0_manifest
+
+
+def _rg_activation_context() -> FluxActivationContext:
+    return FluxActivationContext(epoch=FLUX_ACTIVATION_EPOCH_RG_MANIFEST)
+
+
+def _pre_rg_activation_context(*species_ids: str) -> FluxActivationContext:
+    return FluxActivationContext(
+        epoch=FLUX_ACTIVATION_EPOCH_PRE_RG,
+        legacy_live_species_ids=frozenset(species_ids),
+    )
 
 
 def _stub_catalog_species(
@@ -264,6 +278,7 @@ def test_vapour_batch_requires_exact_key_equality() -> None:
     answer = VapourAnswer(
         species_id="K",
         pressure=PressureValue(pa=1.0),
+        selected_runtime_pressure=PressureValue(pa=1.0),
         flux=FluxEligible(alpha_ref="alpha:K"),
         source_label="test",
         formula_id="K",
@@ -405,6 +420,7 @@ def test_caller_narrowing_is_rejected() -> None:
             ledger,
             {"temperature_K": 1500.0},
             caller_species_filter=["K"],
+            flux_activation_context=_rg_activation_context(),
         )
 
 
@@ -435,6 +451,7 @@ def test_inactive_predicate_keeps_id_and_emits_typed_refusal() -> None:
     batch = catalog.resolve_batch(
         ledger,
         VapourResolveState(temperature_K=1200.0, process_phase="hot_train"),
+        flux_activation_context=_rg_activation_context(),
     )
     assert "NaCl" in batch.requested_species_ids
     answer = batch.channel("NaCl")
@@ -463,6 +480,7 @@ def test_stage0_only_active_in_stage0() -> None:
     batch = catalog.resolve_batch(
         ledger,
         VapourResolveState(temperature_K=900.0, process_phase="stage0", stage="stage0"),
+        flux_activation_context=_rg_activation_context(),
     )
     answer = batch.channel("NaCl")
     # May still refuse for other reasons, but not the predicate
@@ -499,6 +517,7 @@ def test_absent_source_atom_refuses_but_keeps_channel() -> None:
         rules=(rule,),
         ledger_snapshot=ledger,
         state=VapourResolveState(temperature_K=1500.0),
+        flux_activation_context=_rg_activation_context(),
     )
     assert "K" in batch.requested_species_ids
     answer = batch.channel("K")
@@ -600,6 +619,7 @@ def test_pending_validation_is_not_refusal() -> None:
     batch = catalog.resolve_batch(
         ledger,
         VapourResolveState(temperature_K=1500.0),
+        flux_activation_context=_pre_rg_activation_context(),
     )
     answer = batch.channel("K")
     assert answer.validation_status == "pending_validation"
@@ -607,6 +627,50 @@ def test_pending_validation_is_not_refusal() -> None:
     assert isinstance(answer.pressure, PressureValue)
     assert answer.pressure.pa > 0.0
     assert isinstance(answer.flux, FluxEligible)
+    # Answerability is not activation authority: this pending row stays
+    # dormant before RG when absent from the legacy live allowlist.
+    assert batch.flux_active_species_ids == frozenset()
+    legacy_live_batch = catalog.resolve_batch(
+        ledger,
+        VapourResolveState(
+            temperature_K=1500.0,
+            selected_runtime_pressures_Pa={"K": 7.5},
+        ),
+        flux_activation_context=_pre_rg_activation_context("K"),
+    )
+    # Pre-RG activation reproduces the exact legacy-live set when its channel
+    # remains answerable; it neither infers nor widens activation from V/U0.
+    assert legacy_live_batch.flux_active_species_ids == frozenset({"K"})
+    legacy_live_answer = legacy_live_batch.channel("K")
+    assert legacy_live_answer.selected_runtime_pressure == PressureValue(pa=7.5)
+    assert legacy_live_answer.selected_runtime_pressure != legacy_live_answer.pressure
+    with pytest.raises(
+        VapourRequestConstructionError,
+        match="require a selected runtime pressure surface",
+    ):
+        catalog.resolve_batch(
+            ledger,
+            VapourResolveState(temperature_K=1500.0),
+            flux_activation_context=_pre_rg_activation_context("K"),
+        )
+    with pytest.raises(
+        VapourRequestConstructionError,
+        match="lack selected runtime pressure",
+    ):
+        catalog.resolve_batch(
+            ledger,
+            VapourResolveState(
+                temperature_K=1500.0,
+                selected_runtime_pressures_Pa={},
+            ),
+            flux_activation_context=_pre_rg_activation_context("K"),
+        )
+    rg_batch = catalog.resolve_batch(
+        ledger,
+        VapourResolveState(temperature_K=1500.0),
+        flux_activation_context=_rg_activation_context(),
+    )
+    assert rg_batch.flux_active_species_ids == frozenset({"K"})
     assert answer.certification_ceiling == "never"
     assert answer.verdict_status == "status_bearing_non_authoritative"
 
@@ -654,6 +718,7 @@ def test_refusal_closure_fixed_point_before_solve_bundles() -> None:
         ledger_snapshot=ledger,
         state=VapourResolveState(temperature_K=1600.0),
         catalog_species=_stub_catalog_species("Na"),
+        flux_activation_context=_rg_activation_context(),
     )
     assert batch.metadata["refusal_closure_fixed_point"] is True
     # Refused channel is in the batch but not in any solve bundle
@@ -732,7 +797,10 @@ def test_simulator_build_vapour_batch_is_available_and_golden_neutral() -> None:
     assert sim.vapour_rail_catalog is not None
     assert sim.vapour_rail_catalog.request_rules
     # Empty ledger → empty request set, still a valid exact-key batch
-    batch = sim.build_vapour_batch(temperature_K=1600.0)
+    batch = sim.build_vapour_batch(
+        temperature_K=1600.0,
+        flux_activation_context=_pre_rg_activation_context(),
+    )
     assert batch is not None
     assert isinstance(batch, VapourBatch)
     assert batch.requested_species_ids == frozenset()
@@ -758,7 +826,11 @@ def test_missing_temperature_is_typed_refusal_not_flux_active_zero() -> None:
     ledger = {"process.cleaned_melt": {"K2O": 1.0, "KO0.5": 1.0}}
 
     # Direct resolve: explicit state=None
-    batch = catalog.resolve_batch(ledger, state=None)
+    batch = catalog.resolve_batch(
+        ledger,
+        state=None,
+        flux_activation_context=_rg_activation_context(),
+    )
     assert "K" in batch.requested_species_ids
     answer = batch.channel("K")
     assert answer.is_refused
@@ -768,6 +840,18 @@ def test_missing_temperature_is_typed_refusal_not_flux_active_zero() -> None:
     assert "K" not in batch.flux_active_species_ids
     assert all("K" not in members for members in batch.solve_bundle_ids.values())
     assert batch.metadata["refusal_closure_fixed_point"] is True
+
+    # Pre-RG may not continue with a strict subset of the legacy live set.
+    # Missing physical state refuses K, so exact legacy activation fails closed.
+    with pytest.raises(
+        VapourRequestConstructionError,
+        match="pre-RG legacy-live channels are not flux-eligible",
+    ):
+        catalog.resolve_batch(
+            ledger,
+            state=None,
+            flux_activation_context=_pre_rg_activation_context("K"),
+        )
 
     # Core public default: temperature_K=None with non-empty inventory.
     from simulator.config import load_config_bundle
@@ -787,7 +871,9 @@ def test_missing_temperature_is_typed_refusal_not_flux_active_zero() -> None:
         source="test_missing_temperature_inventory",
         material_origin="feedstock",
     )
-    core_batch = sim.build_vapour_batch()  # all params default None
+    core_batch = sim.build_vapour_batch(
+        flux_activation_context=_rg_activation_context()
+    )  # all physical-state params default None
     assert core_batch is not None
     assert core_batch.requested_species_ids  # inventory activated something
     missing_state_refusals = [
@@ -836,6 +922,7 @@ def test_absent_source_atom_no_substring_credit_for_f_in_fe2o3() -> None:
         ledger_snapshot=ledger,
         state=VapourResolveState(temperature_K=1500.0),
         catalog_species=_stub_catalog_species("FeF"),
+        flux_activation_context=_rg_activation_context(),
     )
     answer = batch.channel("FeF")
     assert answer.is_refused
@@ -857,10 +944,12 @@ def test_fo2_affects_pressure_and_state_fingerprint() -> None:
     batch_1 = catalog.resolve_batch(
         ledger,
         VapourResolveState(temperature_K=1500.0, fO2_bar=1.0),
+        flux_activation_context=_rg_activation_context(),
     )
     batch_lo = catalog.resolve_batch(
         ledger,
         VapourResolveState(temperature_K=1500.0, fO2_bar=1e-8),
+        flux_activation_context=_rg_activation_context(),
     )
     a1 = batch_1.channel("K")
     a_lo = batch_lo.channel("K")
@@ -890,7 +979,9 @@ def test_validation_anchors_propagate_to_rule_and_answer() -> None:
 
     ledger = {"process.cleaned_melt": {"K2O": 1.0, "KO0.5": 1.0}}
     batch = catalog.resolve_batch(
-        ledger, VapourResolveState(temperature_K=1500.0)
+        ledger,
+        VapourResolveState(temperature_K=1500.0),
+        flux_activation_context=_rg_activation_context(),
     )
     answer = batch.channel("K")
     assert answer.validation_status == "validated"

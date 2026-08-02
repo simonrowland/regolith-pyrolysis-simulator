@@ -262,6 +262,7 @@ from simulator.state import (
     ProcessInventory,
     STOICH_RATIOS,
 )
+from simulator.vapour_rail.batch import FluxActivationContext
 from simulator.equilibrium import EquilibriumMixin
 from simulator.evaporation import EvaporationMixin
 from simulator.extraction import ExtractionMixin
@@ -1715,13 +1716,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         stage: str | None = None,
         total_pressure_Pa: float | None = None,
         fO2_bar: float | None = None,
+        selected_runtime_pressures_Pa: Mapping[str, float] | None = None,
         provider_candidates_by_species: dict | None = None,
+        flux_activation_context: FluxActivationContext | None = None,
     ):
         """Exact-key vapour batch via VR-6 request builder + refusal closure.
 
-        VR-11: evaporation consumes this surface for channel authority and
-        instrumentation. Live equilibrium pressures still overlay the flux
-        map so physical outputs remain shadow-equal until an R-family flip.
+        VR-11: evaporation consumes this surface for channel and pressure
+        authority. Pre-RG selected runtime pressures are carried inside each
+        VapourAnswer so the independently computed live map remains shadow-only.
         Request keys derive only from the compiler-emitted rules and the
         current atom-ledger inventory; callers cannot narrow the set.
         """
@@ -1736,6 +1739,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 ),
             }
             return None
+        if flux_activation_context is None:
+            raise ValueError("build_vapour_batch requires flux activation epoch state")
         ledger_snapshot = self.atom_ledger.mol_by_account()
         state = {
             "temperature_K": temperature_K,
@@ -1743,11 +1748,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             "stage": stage,
             "total_pressure_Pa": total_pressure_Pa,
             "fO2_bar": fO2_bar,
+            "selected_runtime_pressures_Pa": (
+                None
+                if selected_runtime_pressures_Pa is None
+                else dict(selected_runtime_pressures_Pa)
+            ),
         }
         return self.vapour_rail_catalog.resolve_batch(
             ledger_snapshot,
             state,
             provider_candidates_by_species=provider_candidates_by_species,
+            flux_activation_context=flux_activation_context,
         )
 
     def _register_alphamelts_provider_if_available(self) -> None:

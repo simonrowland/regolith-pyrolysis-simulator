@@ -24,6 +24,7 @@ from simulator.vapour_rail.activity import (
     BoundDirection,
     SourceReactionActivity,
 )
+from simulator.vapour_rail.batch import FluxActivationContext
 
 
 SCHEMA_VERSION = 2
@@ -513,6 +514,7 @@ class VapourRailCatalog:
         *,
         provider_candidates_by_species: Mapping[str, Sequence[Any]] | None = None,
         caller_species_filter: Sequence[str] | None = None,
+        flux_activation_context: FluxActivationContext,
     ) -> Any:
         """Request → refusal closure → solve bundles → exact-key VapourBatch."""
 
@@ -533,6 +535,9 @@ class VapourRailCatalog:
                 stage=state.get("stage"),
                 total_pressure_Pa=state.get("total_pressure_Pa"),
                 fO2_bar=state.get("fO2_bar"),
+                selected_runtime_pressures_Pa=state.get(
+                    "selected_runtime_pressures_Pa"
+                ),
                 extras={
                     key: value
                     for key, value in state.items()
@@ -543,6 +548,7 @@ class VapourRailCatalog:
                         "stage",
                         "total_pressure_Pa",
                         "fO2_bar",
+                        "selected_runtime_pressures_Pa",
                     }
                 },
             )
@@ -551,6 +557,9 @@ class VapourRailCatalog:
                 temperature_K=getattr(state, "temperature_K", None),
                 process_phase=getattr(state, "process_phase", None),
                 stage=getattr(state, "stage", None),
+                selected_runtime_pressures_Pa=getattr(
+                    state, "selected_runtime_pressures_Pa", None
+                ),
             )
 
         return resolve_vapour_batch(
@@ -560,6 +569,7 @@ class VapourRailCatalog:
             provider_candidates_by_species=provider_candidates_by_species,
             catalog_species=self._species,
             caller_species_filter=caller_species_filter,
+            flux_activation_context=flux_activation_context,
         )
 
 

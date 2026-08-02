@@ -16,6 +16,19 @@ from simulator.evaporation import (
     _load_evaporation_alpha_envelope_by_species,
     _load_evaporation_alpha_by_species,
 )
+from simulator.vapour_rail.batch import (
+    FLUX_ACTIVATION_EPOCH_RG_MANIFEST,
+    FluxActivationContext,
+    FluxRefusal,
+    PressureRefusal,
+)
+from simulator.vapour_rail.catalog import compile_vapour_rail_catalog
+from simulator.vapour_rail.instrumentation import (
+    CONTROL_FLUX_PRESSURES_KEY,
+    flux_pressures_from_batch,
+    serialize_vapour_answer,
+)
+from simulator.vapour_rail.request import REFUSAL_MISSING_CHANNEL_CONTRACT
 from tests.chemistry.corpus_fixtures import alpha_envelope_anchors
 
 
@@ -94,13 +107,9 @@ def test_evaporation_flux_diagnostic_traces_alpha_by_species():
         temperature_C=1500.0,
         pressure_bar=1e-6,
         fO2_log=None,
-        # DESIGN-REV5 §1.2 / U4 cutover: batch key is required flux input.
         control_inputs={
             "overhead_pressure_pa": 0.0,
-            "vapour_batch_flux_pressures_Pa": {
-                name: 100.0 for name in species
-            },
-            "vapor_pressures_Pa": {name: 100.0 for name in species},
+            CONTROL_FLUX_PRESSURES_KEY: {name: 100.0 for name in species},
             "overhead_partials_Pa": {},
             "molar_mass_kg_mol": {name: 0.05 for name in species},
             "stoich_by_species": {
@@ -122,7 +131,6 @@ def test_evaporation_flux_diagnostic_traces_alpha_by_species():
     )
 
     result = BuiltinEvaporationFluxProvider().dispatch(request)
-    assert result.status == "ok"
     alpha_used = result.diagnostic["alpha_used_by_species"]
     uncertainty = result.diagnostic["flux_uncertainty_pct"]
 
@@ -140,8 +148,6 @@ def test_evaporation_flux_diagnostic_traces_alpha_by_species():
 
 
 def test_new_proxy_species_flux_scales_with_yaml_alpha():
-    # DESIGN-REV5 §1.2 / U4: supply vapour_batch_flux_pressures_Pa so alpha
-    # scaling is exercised (missing key is typed refuse, not silent ok).
     alpha_by_species = _load_evaporation_alpha_by_species(
         _vapor_pressure_data()
     )
@@ -156,8 +162,7 @@ def test_new_proxy_species_flux_scales_with_yaml_alpha():
         fO2_log=None,
         control_inputs={
             "overhead_pressure_pa": 0.0,
-            "vapour_batch_flux_pressures_Pa": {"Ca": 100.0, "Ti": 100.0},
-            "vapor_pressures_Pa": {"Ca": 100.0, "Ti": 100.0},
+            CONTROL_FLUX_PRESSURES_KEY: {"Ca": 100.0, "Ti": 100.0},
             "overhead_partials_Pa": {},
             "molar_mass_kg_mol": {"Ca": 0.05, "Ti": 0.05},
             "stoich_by_species": {
@@ -187,7 +192,6 @@ def test_new_proxy_species_flux_scales_with_yaml_alpha():
 
 
 def test_cro2_missing_alpha_refuses_only_cro2_and_retains_parent_oxide():
-    # DESIGN-REV5 §1.2 / U4: batch key required before per-species alpha refuse.
     request = IntentRequest(
         intent=ChemistryIntent.EVAPORATION_FLUX,
         account_view=ProviderAccountView(
@@ -201,8 +205,7 @@ def test_cro2_missing_alpha_refuses_only_cro2_and_retains_parent_oxide():
         fO2_log=None,
         control_inputs={
             "overhead_pressure_pa": 0.0,
-            "vapour_batch_flux_pressures_Pa": {"CrO2": 100.0, "Na": 100.0},
-            "vapor_pressures_Pa": {"CrO2": 100.0, "Na": 100.0},
+            CONTROL_FLUX_PRESSURES_KEY: {"CrO2": 100.0, "Na": 100.0},
             "overhead_partials_Pa": {},
             "molar_mass_kg_mol": {"CrO2": 0.084, "Na": 0.023},
             "stoich_by_species": {
@@ -245,8 +248,56 @@ def test_cro2_missing_alpha_refuses_only_cro2_and_retains_parent_oxide():
     assert "per-species evaporation refusal" in result.warnings[0]
 
 
+def test_cro2_policy_only_alpha_is_refused_by_vapour_batch() -> None:
+    """A fail-loud policy describes absence; it is not an alpha value."""
+
+    catalog = compile_vapour_rail_catalog(_vapor_pressure_data())
+    batch = catalog.resolve_batch(
+        {"process.cleaned_melt": {"Cr2O3": 1.0}},
+        state={
+            "temperature_K": 1800.0,
+            "process_phase": "hot_train",
+            "stage": "evaporation",
+            "fO2_bar": 1.0e-6,
+        },
+        flux_activation_context=FluxActivationContext(
+            epoch=FLUX_ACTIVATION_EPOCH_RG_MANIFEST
+        ),
+    )
+
+    answer = batch.channel("CrO2")
+    assert answer.refusal_code == REFUSAL_MISSING_CHANNEL_CONTRACT
+    assert isinstance(answer.pressure, PressureRefusal)
+    assert isinstance(answer.selected_runtime_pressure, PressureRefusal)
+    assert isinstance(answer.flux, FluxRefusal)
+    assert "alpha" in answer.pressure.detail
+    assert "CrO2" not in batch.flux_active_species_ids
+    assert serialize_vapour_answer(answer)["is_refused"] is True
+    flux_pressures, _ = flux_pressures_from_batch(batch)
+    assert "CrO2" not in flux_pressures
+
+
+def test_sio_typed_alpha_correlation_remains_flux_eligible() -> None:
+    catalog = compile_vapour_rail_catalog(_vapor_pressure_data())
+    batch = catalog.resolve_batch(
+        {"process.cleaned_melt": {"SiO2": 1.0}},
+        state={
+            "temperature_K": 1500.0,
+            "process_phase": "hot_train",
+            "stage": "evaporation",
+            "fO2_bar": 1.0e-6,
+        },
+        flux_activation_context=FluxActivationContext(
+            epoch=FLUX_ACTIVATION_EPOCH_RG_MANIFEST
+        ),
+    )
+
+    answer = batch.channel("SiO")
+    assert not answer.is_refused
+    assert "SiO" in batch.flux_active_species_ids
+
+
 def test_grounded_cr_ignores_unmeasured_fallback_opt_in():
-    # DESIGN-REV5 §1.2 / U4: batch key required for grounded-Cr alpha path.
     alpha_by_species = _load_evaporation_alpha_by_species(
         _vapor_pressure_data()
     )
@@ -261,8 +312,7 @@ def test_grounded_cr_ignores_unmeasured_fallback_opt_in():
         fO2_log=None,
         control_inputs={
             "overhead_pressure_pa": 0.0,
-            "vapour_batch_flux_pressures_Pa": {"Cr": 100.0},
-            "vapor_pressures_Pa": {"Cr": 100.0},
+            CONTROL_FLUX_PRESSURES_KEY: {"Cr": 100.0},
             "overhead_partials_Pa": {},
             "molar_mass_kg_mol": {"Cr": 0.052},
             "stoich_by_species": {

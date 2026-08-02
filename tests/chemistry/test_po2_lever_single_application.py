@@ -13,6 +13,7 @@ from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
 from simulator.melt_backend.base import EquilibriumResult
 from simulator.state import MOLAR_MASS
+from simulator.vapour_rail.instrumentation import CONTROL_FLUX_PRESSURES_KEY
 
 
 _PO2_LEVELS = (1.0e-4, 1.0e-6, 1.0e-9)
@@ -248,13 +249,8 @@ def test_evaporation_flux_preserves_vapor_pressure_po2_slope_once(
     for pO2_bar in _PO2_LEVELS:
         pressure_pa = 10.0 * (pO2_bar ** expected_slope)
         species_molar_mass = MOLAR_MASS[species] / 1000.0
-        # DESIGN-REV5 §1.2 / §7.4 / VR-11: flux authority is
-        # vapour_batch_flux_pressures_Pa; vapor_pressures_Pa is reporting-only.
-        # pO2 is applied once upstream in the batch/live pressure map (net-eq
-        # verified: flux layer does not re-apply pO2).
         controls = {
-            "vapour_batch_flux_pressures_Pa": {species: pressure_pa},
-            "vapor_pressures_Pa": {species: pressure_pa},
+            CONTROL_FLUX_PRESSURES_KEY: {species: pressure_pa},
             "overhead_partials_Pa": {species: 0.0},
             "molar_mass_kg_mol": {species: species_molar_mass},
             "stoich_by_species": {
@@ -305,7 +301,11 @@ class _PDependentVapoRockBackend:
         composition_mol_by_account,
         species_formula_registry,
         fO2_log,
+        liquid_fraction=None,
     ):
+        # VR-5 backend contract: the provider always forwards the melt gate,
+        # including None.  This pO2-only double deliberately ignores its value.
+        del liquid_fraction
         self.fO2_logs.append(float(fO2_log))
         pO2_bar = 10.0 ** float(fO2_log)
         return EquilibriumResult(

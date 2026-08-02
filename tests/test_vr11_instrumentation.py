@@ -19,7 +19,14 @@ import pytest
 import yaml
 
 from simulator.condensation import CondensationModel, CondensationTrain
+from simulator.evaporation import (
+    EvaporationFluxRefusal,
+    EvaporationMixin,
+    _evaporation_runtime_and_shadow_pressure_maps,
+)
 from simulator.vapour_rail.batch import (
+    FLUX_ACTIVATION_EPOCH_RG_MANIFEST,
+    FluxActivationContext,
     FluxEligible,
     FluxRefusal,
     PressureRefusal,
@@ -30,6 +37,7 @@ from simulator.vapour_rail.batch import (
 from simulator.vapour_rail.instrumentation import (
     AUDITED_OPERATOR_T_COND_SPECIES,
     CONTROL_FLUX_PRESSURES_KEY,
+    FLUX_CONSUMER_RELPATHS,
     SETPOINTS_T_COND_AUDIT,
     SHADOW_MISMATCH,
     SHADOW_MISSING_BATCH,
@@ -39,14 +47,22 @@ from simulator.vapour_rail.instrumentation import (
     SHADOW_RESOLUTION_ERROR,
     SOURCE_VAPOUR_CEILING_ROWS,
     assert_no_flux_consumer_iterates_compatibility_maps,
+    compare_live_shadow_to_batch_flux,
     compare_legacy_vs_batch_flux_paths,
     condensation_refusals_payload,
-    flux_pressures_from_batch_and_live,
+    finite_live_pressure_species_ids,
+    flux_pressures_from_batch,
     serialize_vapour_batch,
     source_vapour_ceiling_table,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def test_legacy_activation_set_uses_only_finite_pressure_keys() -> None:
+    assert finite_live_pressure_species_ids(
+        {"Na": 1.0, "K": float("nan"), "Si": float("inf"), "Ti": "bad"}
+    ) == frozenset({"Na"})
 
 
 # ---------------------------------------------------------------------------
@@ -246,12 +262,16 @@ def _toy_answer(
     sid: str,
     *,
     pa: float = 1.0,
+    selected_runtime_pa: float | None = None,
     refused: bool = False,
 ) -> VapourAnswer:
     if refused:
         return VapourAnswer(
             species_id=sid,
             pressure=PressureRefusal(code="test_refusal", detail="refused"),
+            selected_runtime_pressure=PressureRefusal(
+                code="test_refusal", detail="refused"
+            ),
             flux=FluxRefusal(code="test_refusal", detail="refused"),
             source_label="test",
             formula_id=sid,
@@ -264,6 +284,9 @@ def _toy_answer(
     return VapourAnswer(
         species_id=sid,
         pressure=PressureValue(pa=pa),
+        selected_runtime_pressure=PressureValue(
+            pa=pa if selected_runtime_pa is None else selected_runtime_pa
+        ),
         flux=FluxEligible(alpha_ref=f"alpha:{sid}"),
         source_label="test",
         formula_id=sid,
@@ -278,19 +301,25 @@ def _toy_batch(
     species_ids: set[str],
     *,
     pressures: dict[str, float] | None = None,
+    selected_runtime_pressures: dict[str, float] | None = None,
     refused: set[str] | None = None,
+    flux_active: set[str] | None = None,
 ) -> VapourBatch:
     pressures = pressures or {}
+    selected_runtime_pressures = selected_runtime_pressures or {}
     refused = refused or set()
     channels = {
         sid: _toy_answer(
             sid,
             pa=float(pressures.get(sid, 1.0)),
+            selected_runtime_pa=float(
+                selected_runtime_pressures.get(sid, pressures.get(sid, 1.0))
+            ),
             refused=sid in refused,
         )
         for sid in species_ids
     }
-    active = frozenset(species_ids - refused)
+    active = frozenset(species_ids - refused if flux_active is None else flux_active)
     return VapourBatch(
         requested_species_ids=frozenset(species_ids),
         channels_by_species=channels,
@@ -298,27 +327,49 @@ def _toy_batch(
     )
 
 
+def _flux_with_live_shadow(
+    batch: VapourBatch | None,
+    live: dict[str, float],
+    *,
+    resolution_error: dict[str, Any] | None = None,
+) -> tuple[dict[str, float], dict[str, Any]]:
+    flux, report = flux_pressures_from_batch(
+        batch,
+        resolution_error=resolution_error,
+    )
+    report.update(
+        compare_live_shadow_to_batch_flux(
+            batch=batch,
+            live_pressures_Pa=live,
+            batch_flux_pressures_Pa=flux,
+            resolution_error=resolution_error,
+        )
+    )
+    return flux, report
+
+
 def test_flux_pressures_from_batch_channel_unions() -> None:
-    """Batch owns selection; live Pa used for shared eligible (golden-neutral)."""
+    """Selected runtime Pa lives in answers; catalog Pa remains evidence."""
 
     live = {"Na": 12.5, "SiO": 3.0, "Fe": 0.0}
+    selected = {"Na": 9.0, "SiO": 2.0, "Fe": 0.0}
     batch = _toy_batch(
         {"Na", "SiO", "Fe", "K"},
         pressures={"Na": 1.0, "SiO": 1.0, "Fe": 1.0, "K": 0.5},
+        selected_runtime_pressures=selected,
+        flux_active=set(live),
     )
-    flux, report = flux_pressures_from_batch_and_live(batch, live)
-    # Shared eligible: live Pa (not catalog batch Pa).
-    assert flux["Na"] == 12.5
-    assert flux["SiO"] == 3.0
-    assert flux["Fe"] == 0.0
-    # Batch-only eligible does not expand the debiting multiset this epoch.
+    flux, report = _flux_with_live_shadow(batch, live)
+    assert flux == selected
+    # Batch-only answerable channel is dormant in the pre-RG epoch.
     assert "K" not in flux
     assert report["batch_pa_by_species"]["K"] == 0.5
-    assert "K" in report["batch_flux_active_not_in_live"]
-    assert report["selection_source"] == "vapour_batch_channel_unions"
+    assert report["batch_flux_active_not_in_live"] == []
+    assert report["selection_source"] == "vapour_answer_selected_runtime_pressure"
     assert report["batch_pa_by_species"]["Na"] == 1.0
-    assert report["shadow_equal"] is True
-    assert report["shadow_outcome"] == SHADOW_PROVED
+    assert report["selected_runtime_pa_by_species"]["Na"] == 9.0
+    assert report["shadow_equal"] is False
+    assert report["shadow_outcome"] == SHADOW_MISMATCH
     assert report["catalog_pa_shadow_equal"] is False
 
 
@@ -326,33 +377,74 @@ def test_flux_pressures_proved_when_legacy_and_batch_agree() -> None:
     live = {"Na": 12.5, "SiO": 3.0}
     batch = _toy_batch(
         {"Na", "SiO"},
-        pressures={"Na": 99.0, "SiO": 88.0},  # catalog Pa differ; live overlay
+        pressures=live,
     )
-    flux, report = flux_pressures_from_batch_and_live(batch, live)
+    flux, report = _flux_with_live_shadow(batch, live)
     assert flux == live
     assert report["shadow_equal"] is True
     assert report["shadow_outcome"] == SHADOW_PROVED
-    # Catalog pure-P vs live is a separate measured outcome.
-    assert report["catalog_pa_shadow_equal"] is False
+    assert report["catalog_pa_shadow_equal"] is True
+
+
+def test_runtime_pressure_and_legacy_shadow_are_independent_surfaces() -> None:
+    vapor_pressure_data = {
+        "metals": {
+            "Na": {"evaporation_alpha": {"value": 1.0}},
+        }
+    }
+    equilibrium = SimpleNamespace(vapor_pressures_Pa={"Na": 12.5})
+    diagnostic = {"backend_vapor_pressures_Pa": {"Na": 11.0}}
+
+    selected, shadow = _evaporation_runtime_and_shadow_pressure_maps(
+        vapor_pressure_data,
+        equilibrium,
+        diagnostic,
+    )
+
+    assert selected == {"Na": 12.5}
+    assert shadow == {"Na": 11.0}
+
+    empty_selected, retained_shadow = (
+        _evaporation_runtime_and_shadow_pressure_maps(
+            vapor_pressure_data,
+            SimpleNamespace(vapor_pressures_Pa={}),
+            diagnostic,
+        )
+    )
+    assert empty_selected == {}
+    assert retained_shadow == {"Na": 11.0}
 
 
 def test_flux_pressures_batch_only_eligible_does_not_expand_live() -> None:
     """Batch-only eligible channels are recorded, not added to flux map."""
 
     live: dict[str, float] = {}
-    batch = _toy_batch({"Na"}, pressures={"Na": 1.0})
-    flux, report = flux_pressures_from_batch_and_live(batch, live)
+    batch = _toy_batch({"Na"}, pressures={"Na": 1.0}, flux_active=set())
+    flux, report = _flux_with_live_shadow(batch, live)
     assert flux == {}
     assert report["batch_pa_by_species"]["Na"] == 1.0
-    assert report["shadow_equal"] is True  # empty vs empty
+    assert report["shadow_equal"] is True
     assert report["shadow_outcome"] == SHADOW_PROVED
+
+
+def test_epoch_dormant_channel_cannot_debit_even_with_live_pressure() -> None:
+    batch = _toy_batch(
+        {"Na"},
+        pressures={"Na": 1.0},
+        flux_active=set(),
+    )
+    flux, report = _flux_with_live_shadow(batch, {"Na": 12.5})
+    assert flux == {}
+    assert report["batch_channel_states"]["Na"] == "dormant_by_epoch"
+    assert report["shadow_equal"] is False
+    assert report["missing_in_batch_path"] == ["Na"]
 
 
 def test_flux_pressures_without_batch_is_typed_failure() -> None:
     """Absent batch must not resume the live compatibility map (fail-closed)."""
 
     live = {"Na": 1.0, "K": 2.0}
-    flux, report = flux_pressures_from_batch_and_live(None, live)
+    flux, report = _flux_with_live_shadow(None, live)
     assert flux == {}
     assert report["batch_present"] is False
     assert report["shadow_equal"] is False
@@ -362,7 +454,7 @@ def test_flux_pressures_without_batch_is_typed_failure() -> None:
 
 def test_flux_pressures_resolution_error_is_typed_failure() -> None:
     live = {"Na": 1.0}
-    flux, report = flux_pressures_from_batch_and_live(
+    flux, report = _flux_with_live_shadow(
         None,
         live,
         resolution_error={"reason": "vapour_batch_resolve_failed"},
@@ -370,6 +462,55 @@ def test_flux_pressures_resolution_error_is_typed_failure() -> None:
     assert flux == {}
     assert report["shadow_equal"] is False
     assert report["shadow_outcome"] == SHADOW_RESOLUTION_ERROR
+
+
+def test_evaporation_resolver_failure_at_900c_is_typed_refusal() -> None:
+    """Null: the inherited sub-1050 C shortcut converts resolver failure to zero."""
+
+    model = SimpleNamespace(
+        melt=SimpleNamespace(temperature_C=900.0),
+        setpoints={},
+        vapor_pressures={},
+    )
+
+    def fail_resolution(equilibrium, *, temperature_K):
+        del equilibrium, temperature_K
+        model._last_vapour_batch_resolve_error = {
+            "status": "unavailable",
+            "reason": "vapour_batch_resolve_failed",
+            "detail": "forced resolver failure at 900 C",
+        }
+        return None
+
+    model._resolve_evaporation_vapour_batch = fail_resolution
+    equilibrium = SimpleNamespace(vapor_pressures_Pa={"Na": 1.0})
+
+    with pytest.raises(EvaporationFluxRefusal) as exc_info:
+        EvaporationMixin._calculate_evaporation(model, equilibrium)
+
+    assert exc_info.value.reason == "vapour_batch_resolve_failed"
+    assert exc_info.value.diagnostic["evaporation_flux_kg_hr"] == {}
+    assert (
+        exc_info.value.diagnostic["vapour_batch_flux_overlay"]["shadow_outcome"]
+        == SHADOW_RESOLUTION_ERROR
+    )
+
+
+def test_evaporation_healthy_empty_batch_at_900c_keeps_cheap_zero() -> None:
+    model = SimpleNamespace(
+        melt=SimpleNamespace(temperature_C=900.0),
+        setpoints={},
+        vapor_pressures={},
+        _last_vapour_batch_resolve_error={},
+        _resolve_evaporation_vapour_batch=lambda equilibrium, temperature_K: _toy_batch(
+            set()
+        ),
+    )
+    equilibrium = SimpleNamespace(vapor_pressures_Pa={})
+
+    flux = EvaporationMixin._calculate_evaporation(model, equilibrium)
+
+    assert flux.species_kg_hr == {}
 
 
 def test_batch_refusal_drops_live_positive_species() -> None:
@@ -381,7 +522,7 @@ def test_batch_refusal_drops_live_positive_species() -> None:
         pressures={"Na": 12.5, "SiO": 3.0},
         refused={"Na"},
     )
-    flux, report = flux_pressures_from_batch_and_live(batch, live)
+    flux, report = _flux_with_live_shadow(batch, live)
     assert "Na" not in flux
     assert flux["SiO"] == 3.0
     assert "Na" in report["batch_refused_live_species"]
@@ -395,6 +536,8 @@ def test_compare_legacy_vs_batch_is_not_stubbed() -> None:
     equal = compare_legacy_vs_batch_flux_paths(
         legacy_pressures_Pa={"Na": 1.0},
         batch_flux_pressures_Pa={"Na": 1.0},
+        legacy_flux_active_species_ids=("Na",),
+        batch_flux_active_species_ids=("Na",),
         batch_present=True,
     )
     assert equal["shadow_equal"] is True
@@ -403,6 +546,8 @@ def test_compare_legacy_vs_batch_is_not_stubbed() -> None:
     mismatched = compare_legacy_vs_batch_flux_paths(
         legacy_pressures_Pa={"Na": 1.0},
         batch_flux_pressures_Pa={"Na": 2.0},
+        legacy_flux_active_species_ids=("Na",),
+        batch_flux_active_species_ids=("Na",),
         batch_present=True,
     )
     assert mismatched["shadow_equal"] is False
@@ -424,15 +569,19 @@ def test_compare_legacy_vs_batch_is_not_stubbed() -> None:
     )
     assert refused["shadow_outcome"] == SHADOW_REFUSED_VS_LIVE
 
+    missing_set_evidence = compare_legacy_vs_batch_flux_paths(
+        legacy_pressures_Pa={"Na": 1.0},
+        batch_flux_pressures_Pa={"Na": 1.0},
+        batch_present=True,
+    )
+    assert missing_set_evidence["shadow_equal"] is False
+    assert missing_set_evidence["shadow_outcome"] == SHADOW_MISSING_KEYS
+
 
 def test_source_guard_no_flux_consumer_iterates_compatibility_maps() -> None:
     sources = {
-        "engines/builtin/evaporation_flux.py": (
-            ROOT / "engines/builtin/evaporation_flux.py"
-        ).read_text(encoding="utf-8"),
-        "simulator/evaporation.py": (
-            ROOT / "simulator/evaporation.py"
-        ).read_text(encoding="utf-8"),
+        relpath: (ROOT / relpath).read_text(encoding="utf-8")
+        for relpath in FLUX_CONSUMER_RELPATHS
     }
     assert_no_flux_consumer_iterates_compatibility_maps(sources)
     kernel = sources["engines/builtin/evaporation_flux.py"]
@@ -441,6 +590,46 @@ def test_source_guard_no_flux_consumer_iterates_compatibility_maps() -> None:
     assert 'controls.get("vapor_pressures_Pa")' not in kernel
     assert "controls.get('vapor_pressures_Pa')" not in kernel
     assert CONTROL_FLUX_PRESSURES_KEY == "vapour_batch_flux_pressures_Pa"
+
+
+def test_source_guard_flags_live_map_argument_on_batch_flux_consumer() -> None:
+    """Regression: moving the bypass into instrumentation must still fail."""
+
+    bad = (
+        "def flux_pressures_from_batch_and_live(batch, live_pressures_Pa):\n"
+        "    return {sid: live_pressures_Pa[sid] for sid in batch}\n"
+    )
+    with pytest.raises(AssertionError, match="compatibility pressure argument"):
+        assert_no_flux_consumer_iterates_compatibility_maps(
+            {"simulator/vapour_rail/instrumentation.py": bad}
+        )
+
+
+def test_source_guard_flags_live_pressure_relocated_into_batch_answer() -> None:
+    """Regression: request resolution cannot launder the shadow into answers."""
+
+    bad = (
+        "selected = context.legacy_live_pressures_Pa\n"
+        "answer = replace(answer, selected_runtime_pressure="
+        "PressureValue(pa=selected[species_id]))\n"
+    )
+    with pytest.raises(AssertionError, match="selected runtime pressure"):
+        assert_no_flux_consumer_iterates_compatibility_maps(
+            {"simulator/vapour_rail/request.py": bad}
+        )
+
+
+def test_source_guard_flags_live_pressure_relocated_into_batch_builder() -> None:
+    """Regression: plural builder ingress cannot launder the live shadow."""
+
+    bad = (
+        "batch = builder("
+        "selected_runtime_pressures_Pa=legacy_live_pressures)\n"
+    )
+    with pytest.raises(AssertionError, match="selected runtime pressure"):
+        assert_no_flux_consumer_iterates_compatibility_maps(
+            {"simulator/evaporation.py": bad}
+        )
 
 
 def test_source_guard_flags_banned_controls_iteration() -> None:
@@ -647,6 +836,16 @@ def test_serialize_vapour_batch_channels() -> None:
     assert report["channels_by_species"]["Na"]["is_flux_active"] is True
 
 
+def test_serialize_vapour_batch_distinguishes_epoch_dormancy() -> None:
+    batch = _toy_batch({"Na"}, flux_active=set())
+    report = serialize_vapour_batch(batch)
+    assert report is not None
+    channel = report["channels_by_species"]["Na"]
+    assert channel["is_union_flux_eligible"] is True
+    assert channel["is_flux_active"] is False
+    assert channel["is_flux_dormant_by_epoch"] is True
+
+
 def test_setpoints_t_cond_audit_covers_operator_overrides() -> None:
     setpoints = yaml.safe_load(
         (ROOT / "data" / "setpoints.yaml").read_text(encoding="utf-8")
@@ -780,6 +979,9 @@ def test_serialized_channel_reports_real_out_of_range() -> None:
     batch = catalog.resolve_batch(
         ledger,
         VapourResolveState(temperature_K=1300.0, process_phase="hot_train"),
+        flux_activation_context=FluxActivationContext(
+            epoch=FLUX_ACTIVATION_EPOCH_RG_MANIFEST
+        ),
     )
     assert "K" in batch.channels_by_species
     answer = batch.channels_by_species["K"]
