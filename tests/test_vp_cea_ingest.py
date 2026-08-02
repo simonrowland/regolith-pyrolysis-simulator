@@ -113,6 +113,7 @@ def test_four_strata_draft_emission_shape_and_gates(ingest_mod) -> None:
     assert "families" in doc
     # Every species row carries validation.status + preserved coefficients.
     n_species = 0
+    by_id: dict[str, dict] = {}
     for fam_id, fam in doc["families"].items():
         assert "physical_properties" in fam
         assert "fiat_routing" in fam
@@ -120,6 +121,7 @@ def test_four_strata_draft_emission_shape_and_gates(ingest_mod) -> None:
         assert "code_metadata" in fam
         for sp_id, sp in fam["physical_properties"]["species"].items():
             n_species += 1
+            by_id[sp_id] = sp
             assert sp["validation"]["status"] == "pending_validation"
             pm = sp["pressure_models"][0]
             assert pm["evaluator_family"] == "nasa_cea_9"
@@ -131,6 +133,7 @@ def test_four_strata_draft_emission_shape_and_gates(ingest_mod) -> None:
             assert "a_coefficients" in seg0 and len(seg0["a_coefficients"]) == 7
             assert "b1" in seg0 and "b2" in seg0
             assert "T_min_K" in seg0 and "T_max_K" in seg0
+            assert thermo.get("reference_pressure_convention")
             # No spreadsheet-refit fields on the production draft path.
             assert "antoine" not in pm
             assert "refit" not in pm
@@ -139,6 +142,87 @@ def test_four_strata_draft_emission_shape_and_gates(ingest_mod) -> None:
             ).lower()
     assert n_species == 4
     assert doc["record_count"] == 4
+    # Gas: 1 bar. Condensed with same-formula gas in set: Psat claim + reaction.
+    assert by_id["H2O"]["pressure_models"][0]["pressure_kind"] == (
+        "gas_standard_state_thermo"
+    )
+    assert by_id["H2O"]["pressure_models"][0]["thermo_record"][
+        "reference_pressure_convention"
+    ] == "CEA_JANAF_1_bar"
+    h2o_cr = by_id["H2O_cr"]
+    assert h2o_cr["pressure_models"][0]["pressure_kind"] == (
+        "pure_component_psat_from_delta_g"
+    )
+    assert h2o_cr["pressure_models"][0]["thermo_record"][
+        "reference_pressure_convention"
+    ] == "CEA_condensed_1_atm"
+    assert h2o_cr["source_reactions"]
+    assert h2o_cr["source_reactions"][0]["gas_cea_name"] == "H2O"
+    # Fixture H2O(cr) source ref is glued g11/99 — must not truncate to g11.
+    assert h2o_cr["pressure_models"][0]["thermo_record"]["source_ref_code"] == (
+        "g11/99"
+    )
+
+
+def test_unpaired_condensed_is_thermo_not_psat(ingest_mod) -> None:
+    """Condensed G° alone must not claim pure_component_psat_from_delta_g."""
+    result = ingest_mod.ingest(THERMO, species=["H2O(cr)"])
+    sp = result.draft_document["families"]["cea_H2O"]["physical_properties"][
+        "species"
+    ]["H2O_cr"]
+    pm = sp["pressure_models"][0]
+    assert pm["pressure_kind"] == "condensed_standard_state_thermo"
+    assert sp["source_reactions"] == []
+    assert pm["thermo_record"]["reference_pressure_convention"] == (
+        "CEA_condensed_1_atm"
+    )
+    assert pm["thermo_record"]["reference_pressure_Pa"] == pytest.approx(101325.0)
+
+
+def test_glued_slash_year_source_ref_preserved(ingest_mod) -> None:
+    """Raw g10/97-style tokens must not lose the /YY suffix (review FAIL)."""
+    records = ingest_mod.parse_thermo_inp(THERMO.read_text())
+    by_name = {r.name: r for r in records}
+    # Fixture H2O(cr) header is "g11/99".
+    assert by_name["H2O(cr)"].source_ref_code == "g11/99"
+    # Spaced form still works.
+    assert " " in by_name["H2O"].source_ref_code or by_name[
+        "H2O"
+    ].source_ref_code.startswith("g")
+
+
+def test_same_name_records_merge_without_interval_loss(ingest_mod) -> None:
+    """Duplicate CEA names (e.g. Fe2O3 Curie pair) must keep all intervals."""
+    # Synthetic adjacent same-name condensed branches.
+    raw = """\
+FeX(cr)           below transition synthetic.
+ 1 g 1/01 FE  1.00X   1.00    0.00    0.00    0.00 1   10.0000000          0.000
+    298.150    500.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0            0.000
+ 0.000000000D+00 0.000000000D+00 2.500000000D+00 0.000000000D+00 0.000000000D+00
+ 0.000000000D+00 0.000000000D+00                 0.000000000D+00 0.000000000D+00
+FeX(cr)           above transition synthetic.
+ 1 g 1/01 FE  1.00X   1.00    0.00    0.00    0.00 2   10.0000000          0.000
+    500.000   1000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0            0.000
+ 0.000000000D+00 0.000000000D+00 2.500000000D+00 0.000000000D+00 0.000000000D+00
+ 0.000000000D+00 0.000000000D+00                 0.000000000D+00 0.000000000D+00
+END PRODUCTS
+"""
+    records = ingest_mod.parse_thermo_inp(raw)
+    assert len(records) == 2
+    assert all(r.name == "FeX(cr)" for r in records)
+    doc = ingest_mod.build_four_strata_draft(records, source_thermo_path="synthetic")
+    assert doc["record_count"] == 1
+    sp = doc["families"]["cea_FeX"]["physical_properties"]["species"]["FeX_cr"]
+    segs = sp["pressure_models"][0]["thermo_record"]["segments"]
+    assert len(segs) == 2
+    assert segs[0]["T_min_K"] == pytest.approx(298.15)
+    assert segs[0]["T_max_K"] == pytest.approx(500.0)
+    assert segs[1]["T_min_K"] == pytest.approx(500.0)
+    assert segs[1]["T_max_K"] == pytest.approx(1000.0)
+    assert sp["pressure_models"][0]["pressure_kind"] == (
+        "condensed_standard_state_thermo"
+    )
+    assert doc["enabled_for_merge"] is False
 
 
 def test_draft_missing_validation_status_fails_loudly(ingest_mod) -> None:

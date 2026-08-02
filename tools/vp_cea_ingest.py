@@ -199,20 +199,25 @@ def _parse_header_line(line: str) -> dict[str, Any]:
     s = line.rstrip()
     nint = int(s[0:2].strip() or s.split()[0])
     rest = s[2:].lstrip()
-    # Reference code is the first non-date token: letters (+ optional digits)
-    # Examples: "g 8/89", "tpis89", "j 3/78", "coda89"
-    # Ref codes: "g", "j", "tpis89", "coda89", "srd…", optionally followed by
-    # a month/year date like "8/89" for single-letter GRC/JANAF tags.
+    # Reference tokens must survive byte-faithfully (review: g10/97 must not
+    # become g10). Three source spellings appear in thermo.inp:
+    #   glued month-in-letter:  "g10/97", "g12/97", "g11/99", "j12/66"
+    #   spaced letter + m/yy:   "g 8/89", "j 3/78", "n 4/83"
+    #   bare alphanumeric:      "tpis89", "coda89"
     m = re.match(
-        r"(?P<ref>[A-Za-z]+[0-9]*)\s*(?P<date>\d{1,2}/\d{2})?\s*(?P<body>.*)$",
+        r"(?P<ref>"
+        r"[A-Za-z]+\d+/\d{2}"  # g10/97
+        r"|[A-Za-z]+\s+\d{1,2}/\d{2}"  # g 8/89
+        r"|[A-Za-z]+[0-9]*"  # tpis89 / bare g11
+        r")\s*(?P<body>.*)$",
         rest,
     )
     if not m:
         raise NasaCeaConventionError(f"unparseable CEA header line: {line!r}")
     ref = m.group("ref")
-    date = m.group("date")
-    if date:
-        ref = f"{ref} {date}"
+    # Collapse interior whitespace runs in spaced forms ("g  8/89" → "g 8/89")
+    # without altering glued slash-year tokens.
+    ref = re.sub(r"\s+", " ", ref.strip())
     body = m.group("body")
     # Trailing: phase (int) MW Hf — last three numeric fields after formula block.
     floats = _FLOAT_TOKEN.findall(body)
@@ -256,9 +261,13 @@ def _extract_formula_tokens(header_line: str) -> list[str]:
     s = header_line.rstrip()
     # Drop leading nint
     body = s[2:]
-    # Remove ref code + optional date at start
+    # Remove ref code at start (glued g10/97, spaced g 8/89, or bare tpis89)
     body = re.sub(
-        r"^\s*[A-Za-z]+\s*(?:\d{1,2}/\d{2,2}|\d{2,4})?\s*",
+        r"^\s*(?:"
+        r"[A-Za-z]+\d+/\d{2}"
+        r"|[A-Za-z]+\s+\d{1,2}/\d{2}"
+        r"|[A-Za-z]+[0-9]*"
+        r")\s*",
         "",
         body,
         count=1,
@@ -511,6 +520,14 @@ class IngestResult:
     draft_document: dict[str, Any] = field(default_factory=dict)
 
 
+# NASA/TP-2002-211556 mixed standard-state pressures (report p. 2):
+# ideal gases at 1 bar; pure condensed reference substances at 1 atm.
+_CEA_GAS_REF_PRESSURE_PA = 100_000.0
+_CEA_CONDENSED_REF_PRESSURE_PA = 101_325.0
+_CEA_GAS_REF_CONVENTION = "CEA_JANAF_1_bar"
+_CEA_CONDENSED_REF_CONVENTION = "CEA_condensed_1_atm"
+
+
 def _canonical_gas_id(cea_name: str) -> str:
     """Collision-light ID for draft rows (condensed suffixes preserved)."""
     return cea_name.replace("(", "_").replace(")", "").replace(",", "_")
@@ -523,8 +540,119 @@ def _family_id_for(record: CeaSpeciesRecord) -> str:
     return f"cea_{base}"
 
 
+def _base_chemical_name(cea_name: str) -> str:
+    """Strip phase/allotrope suffix: 'C(gr)' → 'C', 'Fe2O3(cr)' → 'Fe2O3'."""
+    return cea_name.split("(", 1)[0].rstrip("+-")
+
+
+def _is_gas_record(record: CeaSpeciesRecord) -> bool:
+    return int(record.phase_flag) == 0 or record.standard_state == "gas"
+
+
+def _ref_pressure_fields(record: CeaSpeciesRecord) -> tuple[float, str]:
+    """Return (reference_pressure_Pa, convention) for a CEA record.
+
+    Gas: ideal-gas standard state at 1 bar. Condensed: pure crystalline/liquid
+    reference substance at 1 atm (NASA/TP-2002-211556 p. 2). Never stamp
+    condensed rows as 1 bar.
+    """
+    if _is_gas_record(record):
+        return _CEA_GAS_REF_PRESSURE_PA, _CEA_GAS_REF_CONVENTION
+    return _CEA_CONDENSED_REF_PRESSURE_PA, _CEA_CONDENSED_REF_CONVENTION
+
+
+def _merge_same_name_records(
+    records: Sequence[CeaSpeciesRecord],
+) -> list[CeaSpeciesRecord]:
+    """Collapse duplicate CEA names into one record without losing intervals.
+
+    ``thermo.inp`` can emit multiple same-name condensed branches (e.g. two
+    ``Fe2O3(cr)`` Curie-window records). Family/species keying must not silently
+    overwrite the first; merge intervals in T order and preserve provenance.
+    """
+    groups: dict[str, list[CeaSpeciesRecord]] = {}
+    order: list[str] = []
+    for rec in records:
+        if rec.name not in groups:
+            order.append(rec.name)
+            groups[rec.name] = []
+        groups[rec.name].append(rec)
+
+    merged: list[CeaSpeciesRecord] = []
+    for name in order:
+        group = groups[name]
+        if len(group) == 1:
+            merged.append(group[0])
+            continue
+
+        # Stable T-order merge; adjacency is allowed, overlap fails loud.
+        ordered = sorted(
+            group,
+            key=lambda r: (
+                r.intervals[0]["T_min_K"],
+                r.intervals[-1]["T_max_K"],
+            ),
+        )
+        intervals: list[dict[str, Any]] = []
+        citations: list[str] = []
+        refs: list[str] = []
+        phase_flags: list[int] = []
+        for rec in ordered:
+            if rec.citation and rec.citation not in citations:
+                citations.append(rec.citation)
+            if rec.source_ref_code and rec.source_ref_code not in refs:
+                refs.append(rec.source_ref_code)
+            phase_flags.append(int(rec.phase_flag))
+            for iv in rec.intervals:
+                if intervals:
+                    prev_max = float(intervals[-1]["T_max_K"])
+                    cur_min = float(iv["T_min_K"])
+                    if cur_min < prev_max - 1e-9:
+                        raise NasaCeaSegmentError(
+                            f"{name}: cannot merge same-name CEA records — "
+                            f"overlapping intervals ending at {prev_max} K and "
+                            f"starting at {cur_min} K"
+                        )
+                intervals.append(dict(iv))
+
+        head = ordered[0]
+        # Prefer solid/liquid tag from any member; phase_flag keeps first-branch
+        # identity and the full list is recorded in citation/provenance notes.
+        std = head.standard_state
+        for rec in ordered[1:]:
+            if rec.standard_state != "gas" and std == "gas":
+                std = rec.standard_state
+        citation = " | ".join(citations) if citations else head.citation
+        if len(set(phase_flags)) > 1:
+            citation = (
+                f"{citation} [merged {len(ordered)} same-name records; "
+                f"phase_flags={phase_flags}]"
+            ).strip()
+        ref_code = refs[0] if len(refs) == 1 else " | ".join(refs)
+
+        merged_rec = CeaSpeciesRecord(
+            name=name,
+            citation=citation,
+            n_intervals=len(intervals),
+            source_ref_code=ref_code,
+            formula_tokens=list(head.formula_tokens),
+            phase_flag=int(head.phase_flag),
+            standard_state=std,
+            molecular_weight_g_per_mol=float(head.molecular_weight_g_per_mol),
+            delta_f_H_298_15_J_per_mol=float(head.delta_f_H_298_15_J_per_mol),
+            intervals=intervals,
+            raw_header_line=head.raw_header_line,
+            raw_name_line=head.raw_name_line,
+        )
+        # Validate merged segment chain (gaps/overlap) via polynomial builder.
+        merged_rec.to_polynomial()
+        merged.append(merged_rec)
+    return merged
+
+
 def _record_to_thermo_payload(record: CeaSpeciesRecord) -> dict[str, Any]:
     """Serialize a preserved CEA record (coefficients intact — no refit)."""
+    ref_pa, ref_conv = _ref_pressure_fields(record)
     return {
         "cea_name": record.name,
         "evaluator_family": "nasa_cea_9",
@@ -536,8 +664,8 @@ def _record_to_thermo_payload(record: CeaSpeciesRecord) -> dict[str, Any]:
         "delta_f_H_298_15_J_per_mol": record.delta_f_H_298_15_J_per_mol,
         "source_ref_code": record.source_ref_code,
         "citation": record.citation,
-        "reference_pressure_Pa": 100_000.0,
-        "reference_pressure_convention": "CEA_JANAF_1_bar",
+        "reference_pressure_Pa": ref_pa,
+        "reference_pressure_convention": ref_conv,
         "segments": [
             {
                 "T_min_K": iv["T_min_K"],
@@ -556,6 +684,27 @@ def _record_to_thermo_payload(record: CeaSpeciesRecord) -> dict[str, Any]:
     }
 
 
+def _paired_gas_name(
+    condensed: CeaSpeciesRecord,
+    gas_names: Mapping[str, CeaSpeciesRecord],
+) -> str | None:
+    """Return a same-formula gas CEA name already in the emission set, if any.
+
+    Condensed Gibbs alone cannot define P_sat. Only claim
+    ``pure_component_psat_from_delta_g`` when the matching gas record is also
+    emitted (atom-balanced gas-minus-condensed pair).
+    """
+    base = _base_chemical_name(condensed.name)
+    gas = gas_names.get(base)
+    if gas is None:
+        return None
+    cond_formula = _formula_from_tokens(condensed.formula_tokens)
+    gas_formula = _formula_from_tokens(gas.formula_tokens)
+    if cond_formula != gas_formula:
+        return None
+    return gas.name
+
+
 def build_four_strata_draft(
     records: Sequence[CeaSpeciesRecord],
     *,
@@ -564,12 +713,18 @@ def build_four_strata_draft(
     species_filter: set[str] | None = None,
 ) -> dict[str, Any]:
     """Emit a REV5 four-strata DRAFT document (never production-enabled)."""
-    selected = [
+    selected_raw = [
         r
         for r in records
         if species_filter is None or r.name in species_filter
     ]
+    # Merge same-name multi-branch records (Fe2O3(cr) Curie pair, etc.) so
+    # species-key emission cannot silently drop intervals.
+    selected = _merge_same_name_records(selected_raw)
+    gas_by_name = {r.name: r for r in selected if _is_gas_record(r)}
+
     families: dict[str, Any] = {}
+    emitted_species = 0
     for rec in selected:
         # Loud: every CEA draft row must carry validation.status.
         validation_status = "pending_validation"
@@ -605,13 +760,44 @@ def build_four_strata_draft(
                 },
             },
         )
+        if gas_id in fam_block["physical_properties"]["species"]:
+            raise NasaCeaConventionError(
+                f"duplicate draft species identity {fam}/{gas_id} for CEA "
+                f"record {rec.name!r} — merge failed to uniquify emission keys"
+            )
+
+        source_reactions: list[dict[str, Any]] = []
+        if _is_gas_record(rec):
+            pressure_kind = "gas_standard_state_thermo"
+        else:
+            paired = _paired_gas_name(rec, gas_by_name)
+            if paired is not None:
+                pressure_kind = "pure_component_psat_from_delta_g"
+                source_reactions.append(
+                    {
+                        "kind": "gas_minus_condensed_delta_g",
+                        "reaction": f"{rec.name} = {paired}",
+                        "condensed_cea_name": rec.name,
+                        "gas_cea_name": paired,
+                        "gas_standard_pressure_Pa": _CEA_GAS_REF_PRESSURE_PA,
+                        "condensed_standard_pressure_Pa": (
+                            _CEA_CONDENSED_REF_PRESSURE_PA
+                        ),
+                        "note": (
+                            "Executable pure-component P_sat/P° only via "
+                            "gas-minus-condensed ΔG with both records present; "
+                            "gas P° = 1 bar, condensed reference = 1 atm "
+                            "(NASA/TP-2002-211556)."
+                        ),
+                    }
+                )
+            else:
+                # Condensed G° alone is thermochemistry evidence, not P_sat.
+                pressure_kind = "condensed_standard_state_thermo"
+
         pressure_model: dict[str, Any] = {
             "evaluator_family": "nasa_cea_9",
-            "pressure_kind": (
-                "pure_component_psat_from_delta_g"
-                if rec.standard_state != "gas"
-                else "gas_standard_state_thermo"
-            ),
+            "pressure_kind": pressure_kind,
             "species_basis": "monomer",
             "valid_domain": {
                 "T_min_K": rec.intervals[0]["T_min_K"],
@@ -639,7 +825,7 @@ def build_four_strata_draft(
             )
         species_row = {
             "formula": _formula_from_tokens(rec.formula_tokens),
-            "source_reactions": [],
+            "source_reactions": source_reactions,
             "pressure_models": [pressure_model],
             "phase_properties": [
                 {
@@ -658,7 +844,15 @@ def build_four_strata_draft(
                 ),
             },
         }
+        if pressure_kind == "condensed_standard_state_thermo":
+            species_row["validation"]["note"] = (
+                "DRAFT pending_validation — condensed standard-state "
+                "thermochemistry only; no same-formula gas/reaction pair in "
+                "this emission set, so pure_component_psat_from_delta_g is "
+                "not claimed. Owner + physics review required before enablement."
+            )
         fam_block["physical_properties"]["species"][gas_id] = species_row
+        emitted_species += 1
         # Ensure code_metadata aliases accumulate when multiple phases share family.
         aliases = fam_block["code_metadata"]["canonical_aliases"]
         for a in (rec.name, gas_id):
@@ -673,14 +867,25 @@ def build_four_strata_draft(
         "enabled_for_production_yaml": False,
         "conventions": {
             "evaluator_families": ["nasa_cea_7", "nasa_cea_9"],
-            "reference_pressure_Pa": 100_000.0,
+            "reference_pressure_Pa_gas": _CEA_GAS_REF_PRESSURE_PA,
+            "reference_pressure_Pa_condensed": _CEA_CONDENSED_REF_PRESSURE_PA,
+            # Gas default retained for consumers that only read the legacy key;
+            # per-record thermo_record.reference_pressure_* is authoritative.
+            "reference_pressure_Pa": _CEA_GAS_REF_PRESSURE_PA,
             "reference_pressure_note": (
-                "CEA/JANAF standard-state pressure P° = 1 bar = 1e5 Pa"
+                "NASA/TP-2002-211556 mixed standard states: ideal gases at "
+                "1 bar (1e5 Pa); pure condensed (cr/L) reference substances "
+                "at 1 atm (101325 Pa). Per-record "
+                "thermo_record.reference_pressure_convention is authoritative; "
+                "do not rewrite condensed rows as 1 bar."
             ),
             "runtime_policy": (
                 "Evaluate preserved source polynomials over declared segments. "
                 "Never refit spreadsheet rows at runtime. Segment gap/overlap "
-                "and missing standard-state convention fail loudly."
+                "and missing standard-state convention fail loudly. "
+                "pure_component_psat_from_delta_g requires an explicit "
+                "gas-minus-condensed source_reactions bundle; unpaired "
+                "condensed rows are condensed_standard_state_thermo only."
             ),
             "citations": [
                 "McBride, Zehe, Gordon, NASA TP-2002-211556",
@@ -694,15 +899,17 @@ def build_four_strata_draft(
             "chunk": "VR-4",
         },
         "families": families,
-        "record_count": len(selected),
+        "record_count": emitted_species,
         "validation_gate": {
             "default_status": "pending_validation",
             "production_yaml_enabled": False,
         },
     }
     # Loud failure if any emitted species lacks validation.status
+    counted = 0
     for fam_id, fam in families.items():
         for sp_id, sp in fam["physical_properties"]["species"].items():
+            counted += 1
             status = (sp.get("validation") or {}).get("status")
             if not status:
                 raise NasaCeaConventionError(
@@ -713,6 +920,26 @@ def build_four_strata_draft(
                 raise NasaCeaConventionError(
                     f"CEA draft row {fam_id}/{sp_id} missing standard_state"
                 )
+            pm = sp["pressure_models"][0]
+            tr = pm.get("thermo_record") or {}
+            if not tr.get("reference_pressure_convention"):
+                raise NasaCeaConventionError(
+                    f"CEA draft row {fam_id}/{sp_id} missing "
+                    "reference_pressure_convention"
+                )
+            if (
+                pm.get("pressure_kind") == "pure_component_psat_from_delta_g"
+                and not sp.get("source_reactions")
+            ):
+                raise NasaCeaConventionError(
+                    f"CEA draft row {fam_id}/{sp_id} claims "
+                    "pure_component_psat_from_delta_g without source_reactions"
+                )
+    if counted != emitted_species:
+        raise NasaCeaConventionError(
+            f"record_count mismatch: emitted={emitted_species} "
+            f"walked={counted}"
+        )
     return doc
 
 
