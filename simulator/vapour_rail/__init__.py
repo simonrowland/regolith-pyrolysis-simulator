@@ -1,7 +1,9 @@
 """Vapour-rail unification package.
 
 U0 freezes the canonical manifest union. VR-4 adds typed NASA CEA polynomial
-evaluators (``nasa_cea``). VR-7 adds charge-alias canonicalization for
+evaluators (``nasa_cea``). VR-4b registers nasa7/nasa9/shomate as **runtime**
+catalog evaluator families (dormant rows; energetics only — Ellingham keeps
+phase-transition breakpoints). VR-7 adds charge-alias canonicalization for
 ledger/cache-safe oxyanion names. VR-8 adds Group-A/B + monatomic-O acquisition
 transcription (``trace_acquisition``). VR-10 adds the warm calibration runner
 library and progressive-validation reports (``calibration``). Later VR chunks

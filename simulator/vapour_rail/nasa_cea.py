@@ -474,6 +474,50 @@ def continuity_residuals(
     }
 
 
+def reaction_equilibrium_constant(
+    terms: Sequence[tuple[float, ThermoState | float]],
+    *,
+    T_K: float | None = None,
+) -> float:
+    """``K(T) = exp(−ΔG°_rxn / (R T))`` from per-species standard Gibbs terms.
+
+    Derivation
+    ----------
+    Premise: ideal-gas / standard-state equilibrium for a balanced reaction
+    ``0 = Σ ν_i M_i`` (ν > 0 products, ν < 0 reactants). Each species carries
+    a standard molar Gibbs free energy ``G°_i(T)`` from a NASA-7/9, Shomate,
+    or other thermo family that exposes ``G°/(R T)``.
+
+    Algebra::
+
+      ΔG°_rxn(T) = Σ_i ν_i G°_i(T)
+      ΔG°_rxn / (R T) = Σ_i ν_i (G°_i / (R T))
+      K(T) = exp(−ΔG°_rxn / (R T))
+
+    Units: ``G°/(R T)`` dimensionless; ``K`` dimensionless in the standard-
+    state convention of the input polynomials (CEA/JANAF ``P° = 1 bar`` when
+    the records use that reference). Absolute ``G°`` never needed — only the
+    dimensionless ratio form.
+
+    Sanity: for pure vaporization ``M(cond) ⇌ M(g)`` with ν_gas = +1,
+    ν_cond = −1, ``K = P_sat / P°`` recovers the same ratio as
+    :meth:`NasaCeaPolynomial.pure_psat_over_Pstd`. Against JANAF tables for
+    a simple dissociation (e.g. O₂ ⇌ 2 O near 3000 K) ``K`` sits within the
+    table's order of magnitude once both sides use the same segment source.
+    """
+    delta_g_over_RT = 0.0
+    for nu, state in terms:
+        if isinstance(state, ThermoState):
+            g_over_RT = state.g_over_RT
+        else:
+            g_over_RT = float(state)
+        delta_g_over_RT += float(nu) * g_over_RT
+    # T_K is accepted for call-site documentation / future checks; the ratio
+    # form already cancels R T, so evaluation does not re-scale by T.
+    del T_K
+    return math.exp(-delta_g_over_RT)
+
+
 __all__ = [
     "EvaluatorFamily",
     "NASA9_DEFAULT_EXPONENTS",
@@ -488,4 +532,5 @@ __all__ = [
     "StandardState",
     "ThermoState",
     "continuity_residuals",
+    "reaction_equilibrium_constant",
 ]

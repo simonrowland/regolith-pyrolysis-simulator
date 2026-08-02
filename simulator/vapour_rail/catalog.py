@@ -25,6 +25,17 @@ from simulator.vapour_rail.activity import (
     SourceReactionActivity,
 )
 from simulator.vapour_rail.batch import FluxActivationContext
+from simulator.vapour_rail.nasa_cea import (
+    Nasa7Segment,
+    Nasa9Segment,
+    NasaCeaPolynomial,
+    reaction_equilibrium_constant,
+)
+from simulator.vapour_rail.shomate import (
+    ShomatePolynomial,
+    ShomateSegment,
+    coefficients_from_mapping,
+)
 
 
 SCHEMA_VERSION = 2
@@ -36,6 +47,75 @@ FOUR_STRATA = (
 )
 DEFAULT_EXTRAPOLATION_POLICY = "conservative_slope_continuation"
 OUT_OF_RANGE_STATUS = "out_of_range_conservative_continuation"
+# Runtime thermo evaluator families (VR-4b). Short aliases accepted in YAML.
+_THERMO_FAMILY_ALIASES: Mapping[str, str] = MappingProxyType(
+    {
+        "nasa7": "nasa_cea_7",
+        "nasa9": "nasa_cea_9",
+        "nasa_cea_7": "nasa_cea_7",
+        "nasa_cea_9": "nasa_cea_9",
+        "shomate": "shomate",
+    }
+)
+RUNTIME_THERMO_EVALUATOR_FAMILIES = frozenset(
+    {"nasa_cea_7", "nasa_cea_9", "shomate"}
+)
+# CEA / JANAF standard-state pressure P° (Pa).
+_THERMO_REFERENCE_PRESSURE_PA = 100_000.0
+
+
+def _strip_phase_suffix(formula: str) -> str:
+    """``M(g)`` / ``O2(cr)`` → ``M`` / ``O2``; bare formulas unchanged."""
+    return re.sub(r"\([^)]*\)$", "", str(formula).strip())
+
+
+def _is_dioxygen_formula(formula: str) -> bool:
+    """True for O2 with optional phase suffix (``O2``, ``O2(g)``, …)."""
+    return _strip_phase_suffix(formula) == "O2"
+
+
+def _domain_temperature_bounds(
+    domain: Mapping[str, Any], *, field: str
+) -> tuple[float, float]:
+    """Read ``temperature_K: [lo, hi]`` or CEA-ingest ``T_min_K``/``T_max_K``."""
+    bounds = domain.get("temperature_K")
+    if (
+        isinstance(bounds, Sequence)
+        and not isinstance(bounds, (str, bytes))
+        and len(bounds) == 2
+    ):
+        low = _finite_positive(bounds[0], f"{field}.temperature_K[0]")
+        high = _finite_positive(bounds[1], f"{field}.temperature_K[1]")
+    elif "T_min_K" in domain and "T_max_K" in domain:
+        low = _finite_positive(domain.get("T_min_K"), f"{field}.T_min_K")
+        high = _finite_positive(domain.get("T_max_K"), f"{field}.T_max_K")
+    else:
+        raise CatalogCompileError(
+            f"{field} must provide temperature_K [low, high] or T_min_K/T_max_K"
+        )
+    if low >= high:
+        raise CatalogCompileError(f"{field}: invalid temperature domain")
+    return low, high
+
+
+def _require_poly_covers_domain(
+    *,
+    species_id: str,
+    label: str,
+    poly: Any,
+    domain_low: float,
+    domain_high: float,
+) -> None:
+    """Compile-time: model domain must sit inside every polynomial segment cover."""
+    t_min = float(getattr(poly, "T_min_K"))
+    t_max = float(getattr(poly, "T_max_K"))
+    if t_min > domain_low + 1.0e-12 or t_max < domain_high - 1.0e-12:
+        raise CatalogCompileError(
+            f"{species_id}: thermo polynomial {label!r} covers "
+            f"[{t_min}, {t_max}] K but model valid_domain is "
+            f"[{domain_low}, {domain_high}] K — polynomial must cover the "
+            "full declared model domain"
+        )
 # Two distinct memo layers — do not collapse into one (different consumers):
 # 1. _COMPILE_CACHE (VR-6 / NV-1): multi-key strong-ref compile memo keyed by
 #    (id(payload), emit_u0_request_rules, id(u0_manifest)|0) → (payload pin,
@@ -259,6 +339,9 @@ class _ReferencePressureModel:
     evaluator_family: str
     coefficients: Mapping[str, Any]
     points: tuple[tuple[float, float], ...]
+    # Thermo-backed pressure (VR-4b nasa7/nasa9/shomate). Optional callables
+    # avoid freezing large polynomial trees into every Antoine row.
+    thermo_log10_pressure: Any | None = None
 
     def log10_pressure(self, temperature_K: float) -> float:
         if self.evaluator_family == "antoine":
@@ -278,6 +361,14 @@ class _ReferencePressureModel:
 
         if self.evaluator_family == "tabulated_equilibrium":
             return _interpolate_log_pressure(self.points, temperature_K)
+
+        if self.evaluator_family in RUNTIME_THERMO_EVALUATOR_FAMILIES:
+            if self.thermo_log10_pressure is None:
+                raise CatalogCompileError(
+                    f"thermo family {self.evaluator_family!r} missing compiled "
+                    "pressure dispatch"
+                )
+            return float(self.thermo_log10_pressure(temperature_K))
 
         raise CatalogCompileError(
             f"unsupported reference pressure evaluator {self.evaluator_family!r}"
@@ -908,6 +999,35 @@ def validate_species_catalog(payload: Mapping[str, Any]) -> None:
                 )
 
 
+def _normalize_thermo_family(raw: str, *, field: str) -> str:
+    key = raw.strip()
+    # Accept ``evaluator: nasa9`` spelling as an alias of evaluator_family.
+    if key not in _THERMO_FAMILY_ALIASES and key.lower() in _THERMO_FAMILY_ALIASES:
+        key = key.lower()
+    if key not in _THERMO_FAMILY_ALIASES:
+        raise CatalogCompileError(
+            f"{field}: unknown thermo evaluator family {raw!r}; "
+            f"expected one of {sorted(set(_THERMO_FAMILY_ALIASES))}"
+        )
+    return _THERMO_FAMILY_ALIASES[key]
+
+
+def _resolve_model_evaluator_family(
+    model: Mapping[str, Any], species_id: str
+) -> str:
+    """Read ``evaluator_family`` or short ``evaluator`` key from a model row."""
+    raw = model.get("evaluator_family", model.get("evaluator"))
+    if raw is None:
+        raise CatalogCompileError(
+            f"{species_id}: pressure model requires evaluator_family (or evaluator)"
+        )
+    if not isinstance(raw, str) or not raw.strip():
+        raise CatalogCompileError(
+            f"{species_id}.evaluator_family must be a non-empty string"
+        )
+    return raw.strip()
+
+
 def _compile_evaluator(
     *,
     family_id: str,
@@ -917,20 +1037,55 @@ def _compile_evaluator(
     validation_status: ValidationStatus,
     kinetics: Mapping[str, Any],
 ) -> CompiledPressureEvaluator:
-    evaluator_family = _required_string(
-        model.get("evaluator_family"), f"{species_id}.evaluator_family"
-    )
+    raw_family = _resolve_model_evaluator_family(model, species_id)
+    # Thermo families normalize to canonical names; others pass through.
+    if raw_family in _THERMO_FAMILY_ALIASES or raw_family.lower() in _THERMO_FAMILY_ALIASES:
+        evaluator_family = _normalize_thermo_family(
+            raw_family, field=f"{species_id}.evaluator_family"
+        )
+    else:
+        evaluator_family = raw_family
+
     observable, (low, high) = _model_surface(species_id, model)
     species_basis = _required_string(
         model.get("species_basis"), f"{species_id}.species_basis"
     )
     activity_exponent = float(model.get("activity_exponent", 0.0) or 0.0)
-    pO2_exponent = float(model.get("pO2_exponent", 0.0) or 0.0)
+    # Track whether pO2_exponent was explicitly declared (vs omitted default 0).
+    _pO2_raw = model.get("pO2_exponent", None)
+    pO2_exponent_declared = _pO2_raw is not None and _pO2_raw != ""
+    pO2_exponent = float(_pO2_raw if pO2_exponent_declared else 0.0)
     pO2_reference = _finite_positive(
         model.get("pO2_reference_bar", 1.0),
         f"{species_id}.pO2_reference_bar",
     )
-    if evaluator_family == "standard_reaction_term":
+    if evaluator_family in RUNTIME_THERMO_EVALUATOR_FAMILIES:
+        reference_model, derived_pO2_exponent = _compile_thermo_reference_model(
+            species_id=species_id,
+            row=row,
+            model=model,
+            evaluator_family=evaluator_family,
+            pressure_kind=observable.value,
+            domain_low=low,
+            domain_high=high,
+            pO2_exponent=pO2_exponent,
+            pO2_exponent_declared=pO2_exponent_declared,
+            pO2_reference_bar=pO2_reference,
+        )
+        # Outer activity correction uses −ν_O2/ν_v. Prefer stoichiometry when
+        # the declaration was omitted; when declared, require agreement.
+        if abs(derived_pO2_exponent) > 0.0:
+            if not pO2_exponent_declared:
+                pO2_exponent = derived_pO2_exponent
+            elif not math.isclose(
+                pO2_exponent, derived_pO2_exponent, rel_tol=0.0, abs_tol=1.0e-9
+            ):
+                raise CatalogCompileError(
+                    f"{species_id}: pO2_exponent {pO2_exponent} disagrees with "
+                    f"stoichiometry-derived {derived_pO2_exponent} "
+                    f"(−ν_O2/ν_vapor)"
+                )
+    elif evaluator_family == "standard_reaction_term":
         reaction_id = _required_string(
             model.get("source_reaction_id"), f"{species_id}.source_reaction_id"
         )
@@ -953,14 +1108,14 @@ def _compile_evaluator(
             model.get("reference_pressure_model"),
             f"{species_id}.reference_pressure_model",
         )
+        reference_model = _compile_reference_model(species_id, reference)
     elif evaluator_family in {"antoine", "tabulated_equilibrium"}:
-        reference = model
+        reference_model = _compile_reference_model(species_id, model)
     else:
         raise CatalogCompileError(
             f"{species_id}: evaluator family {evaluator_family!r} belongs to a later chunk"
         )
 
-    reference_model = _compile_reference_model(species_id, reference)
     return CompiledPressureEvaluator(
         species_id=species_id,
         evaluator_family=evaluator_family,
@@ -1028,6 +1183,528 @@ def _compile_reference_model(
     )
 
 
+def _compile_thermo_reference_model(
+    *,
+    species_id: str,
+    row: Mapping[str, Any],
+    model: Mapping[str, Any],
+    evaluator_family: str,
+    pressure_kind: str,
+    domain_low: float,
+    domain_high: float,
+    pO2_exponent: float,
+    pO2_exponent_declared: bool,
+    pO2_reference_bar: float,
+) -> tuple[_ReferencePressureModel, float]:
+    """Compile nasa7/nasa9/shomate pressure dispatch onto landed thermo modules.
+
+    Modes
+    -----
+    1. **Pure-component Psat** — gas + condensed polynomials →
+       ``P_sat / P° = exp(−(G_gas − G_cond)/(R T))``.
+    2. **Source-reaction partial** — balanced ``source_reactions`` entry +
+       per-formula thermo → ``K = exp(−ΔG_rxn/(R T))``, then the unit-activity
+       partial pressure of the vapor product at ``pO2_reference_bar``.
+
+    Returns ``(reference_model, derived_pO2_exponent)`` where the derived
+    exponent is ``−ν_O2/ν_vapor`` for the reaction path (else ``0.0``). The
+    outer :class:`CompiledPressureEvaluator` uses that exponent for activity
+    corrections away from ``pO2_reference_bar``.
+
+    Phase-transition **locations** are never read from these polynomials;
+    Ellingham remains the single home for physical breakpoints.
+    """
+    phase_props = row.get("phase_properties")
+    thermo_by_key = _collect_phase_thermo_records(
+        species_id, model, phase_props if isinstance(phase_props, list) else []
+    )
+    raw_source_reaction_id = model.get("source_reaction_id")
+    has_source_reaction = (
+        raw_source_reaction_id is not None
+        and str(raw_source_reaction_id).strip() != ""
+    )
+    # Mode selection is driven by the declared pressure observable, not by
+    # whether a source_reaction_id happens to be present (fail-closed).
+    if pressure_kind == PressureObservable.EQUILIBRIUM_PARTIAL_PRESSURE.value:
+        if not has_source_reaction:
+            raise CatalogCompileError(
+                f"{species_id}: equilibrium_partial_pressure requires a "
+                "non-empty source_reaction_id"
+            )
+    elif pressure_kind == PressureObservable.PURE_COMPONENT_SATURATION_PRESSURE.value:
+        if has_source_reaction:
+            raise CatalogCompileError(
+                f"{species_id}: pure_component_saturation_pressure must not "
+                "declare source_reaction_id (use equilibrium_partial_pressure "
+                "for source-reaction partials)"
+            )
+    elif has_source_reaction:
+        # Other observables: reaction path only when explicitly requested.
+        pass
+    else:
+        # No reaction id and not a pure-psat observable → cannot decide.
+        if pressure_kind not in {
+            PressureObservable.PURE_COMPONENT_SATURATION_PRESSURE.value,
+            PressureObservable.EQUILIBRIUM_PARTIAL_PRESSURE.value,
+        }:
+            raise CatalogCompileError(
+                f"{species_id}: thermo family does not support pressure_kind "
+                f"{pressure_kind!r} without source_reaction_id"
+            )
+
+    Pstd = float(
+        model.get("reference_pressure_Pa", _THERMO_REFERENCE_PRESSURE_PA)
+    )
+    if not math.isfinite(Pstd) or Pstd <= 0.0:
+        raise CatalogCompileError(
+            f"{species_id}: reference_pressure_Pa must be finite and positive"
+        )
+
+    if has_source_reaction:
+        reaction_id = _required_string(
+            raw_source_reaction_id, f"{species_id}.source_reaction_id"
+        )
+        reactions = row.get("source_reactions")
+        if not isinstance(reactions, list):
+            raise CatalogCompileError(
+                f"{species_id}: thermo source-reaction path requires source_reactions"
+            )
+        matched = [
+            _mapping(item, f"{species_id}.source_reactions")
+            for item in reactions
+            if isinstance(item, Mapping) and item.get("id") == reaction_id
+        ]
+        if len(matched) != 1:
+            raise CatalogCompileError(
+                f"{species_id}: source reaction {reaction_id!r} must resolve once"
+            )
+        reaction = matched[0]
+        _validate_balanced_reaction(species_id, reaction)
+        species_thermo_raw = model.get("species_thermo") or thermo_by_key
+        if not isinstance(species_thermo_raw, Mapping):
+            raise CatalogCompileError(
+                f"{species_id}: species_thermo must be a mapping of formula → record"
+            )
+        polys: dict[str, Any] = {}
+        for formula, rec in species_thermo_raw.items():
+            rec_map = _mapping(rec, f"{species_id}.species_thermo[{formula}]")
+            fam = evaluator_family
+            if rec_map.get("evaluator_family") or rec_map.get("evaluator"):
+                fam = _normalize_thermo_family(
+                    str(rec_map.get("evaluator_family") or rec_map.get("evaluator")),
+                    field=f"{species_id}.species_thermo[{formula}].evaluator",
+                )
+            polys[str(formula)] = _polynomial_from_thermo_record(
+                name=f"{species_id}:{formula}",
+                family=fam,
+                record=rec_map,
+            )
+        # Target vapor identity: species_id and optional row formula, bare +
+        # phase-suffixed spellings.
+        target_keys = {str(species_id), _strip_phase_suffix(str(species_id))}
+        row_formula = row.get("formula")
+        if row_formula is not None and str(row_formula).strip():
+            target_keys.add(str(row_formula).strip())
+            target_keys.add(_strip_phase_suffix(str(row_formula)))
+
+        # Stoichiometric (ν, poly, formula) terms: products +, reactants −.
+        terms_builders: list[tuple[float, Any, str]] = []
+        vapor_candidates: list[tuple[float, str]] = []
+        for sign, key in ((-1.0, "reactants"), (1.0, "products")):
+            participants = reaction.get(key)
+            if not isinstance(participants, list):
+                raise CatalogCompileError(
+                    f"{species_id}: reaction requires {key}"
+                )
+            for item in participants:
+                part = _mapping(item, f"{species_id}.reaction.{key}")
+                formula = _required_string(
+                    part.get("formula"), f"{species_id}.reaction.formula"
+                )
+                amount = _finite_positive(
+                    part.get("stoichiometry"),
+                    f"{species_id}.reaction.stoichiometry",
+                )
+                if formula not in polys:
+                    raise CatalogCompileError(
+                        f"{species_id}: missing thermo for reaction species {formula!r}"
+                    )
+                poly = polys[formula]
+                nu = sign * amount
+                terms_builders.append((nu, poly, formula))
+                if sign <= 0.0:
+                    continue
+                # Product matching the target species — must be gas-standard-state.
+                formula_keys = {formula, _strip_phase_suffix(formula)}
+                if formula_keys.isdisjoint(target_keys):
+                    continue
+                std = getattr(poly, "standard_state", None)
+                if std != "gas":
+                    raise CatalogCompileError(
+                        f"{species_id}: target vapor product {formula!r} must "
+                        f"have gas standard_state; got {std!r}"
+                    )
+                vapor_candidates.append((amount, formula))
+        if len(vapor_candidates) == 0:
+            raise CatalogCompileError(
+                f"{species_id}: source reaction has no gas product matching "
+                f"target species {species_id!r} "
+                f"(normalized targets {sorted(target_keys)})"
+            )
+        if len(vapor_candidates) > 1:
+            raise CatalogCompileError(
+                f"{species_id}: source reaction has multiple gas products "
+                f"matching target species: "
+                f"{[f for _, f in vapor_candidates]}"
+            )
+        vapor_nu = float(vapor_candidates[0][0])
+        if vapor_nu <= 0.0:
+            raise CatalogCompileError(
+                f"{species_id}: vapor stoichiometry must be positive; got {vapor_nu}"
+            )
+
+        # ν_O2 from reaction stoich (product positive, reactant negative).
+        # Recognize O2 / O2(g) / … — phase suffix must not silently zero this.
+        nu_o2 = 0.0
+        for nu, _poly, formula in terms_builders:
+            if _is_dioxygen_formula(formula):
+                nu_o2 += nu
+
+        # Outer activity exponent: −ν_O2 / ν_v (0 when no O2 in the reaction).
+        derived_pO2_exponent = (
+            -nu_o2 / vapor_nu if abs(nu_o2) > 0.0 else 0.0
+        )
+        # Validate an explicit declaration against stoichiometry (caller also
+        # re-checks and fills omitted exponents).
+        if pO2_exponent_declared and abs(nu_o2) > 0.0:
+            if not math.isclose(
+                pO2_exponent, derived_pO2_exponent, rel_tol=0.0, abs_tol=1.0e-9
+            ):
+                raise CatalogCompileError(
+                    f"{species_id}: pO2_exponent {pO2_exponent} disagrees with "
+                    f"stoichiometry-derived {derived_pO2_exponent} "
+                    f"(−ν_O2/ν_vapor with ν_O2={nu_o2}, ν_vapor={vapor_nu})"
+                )
+        elif pO2_exponent_declared and abs(nu_o2) == 0.0 and abs(pO2_exponent) > 0.0:
+            raise CatalogCompileError(
+                f"{species_id}: pO2_exponent {pO2_exponent} declared but "
+                "reaction has no O2 participant"
+            )
+
+        for formula, poly in polys.items():
+            _require_poly_covers_domain(
+                species_id=species_id,
+                label=formula,
+                poly=poly,
+                domain_low=domain_low,
+                domain_high=domain_high,
+            )
+
+        def _log10_from_reaction(temperature_K: float) -> float:
+            # K(T) = exp(−ΔG_rxn / RT) from per-species G°/(RT).
+            # Derivation (premise → algebra → units → sanity): see
+            # reaction_equilibrium_constant in nasa_cea.py.
+            states = [
+                (nu, poly.evaluate(temperature_K))
+                for nu, poly, _formula in terms_builders
+            ]
+            K = reaction_equilibrium_constant(states, T_K=temperature_K)
+            # Unit-activity partial of the vapor product at pO2_reference.
+            #
+            # For ν_v vapor + ν_O2 O2 (ν_O2 may be 0; sign follows reaction):
+            #   K = (p_v/P°)^{ν_v} · (p_O2/P°)^{ν_O2} / a_cond...
+            # At a=1, p_O2 = pO2_ref (bar) → p_O2/P° = pO2_ref_bar * 1e5 / P°.
+            #   p_v/P° = [ K / (p_O2/P°)^{ν_O2} ]^{1/ν_v}
+            #
+            # Use stoichiometric ν_O2 in the pre-root division — NOT
+            # −pO2_exponent. The declared outer exponent is already
+            # −ν_O2/ν_v; using its negation here double-applies 1/ν_v.
+            pO2_over_Pstd = (pO2_reference_bar * 1.0e5) / Pstd
+            if abs(nu_o2) > 0.0:
+                K_eff = K / (pO2_over_Pstd**nu_o2)
+            else:
+                K_eff = K
+            ratio = K_eff ** (1.0 / vapor_nu)
+            pressure_pa = ratio * Pstd
+            if not math.isfinite(pressure_pa) or pressure_pa <= 0.0:
+                raise CatalogCompileError(
+                    f"{species_id}: thermo reaction evaluator produced invalid "
+                    f"pressure at T={temperature_K}"
+                )
+            return math.log10(pressure_pa)
+
+        return (
+            _ReferencePressureModel(
+                evaluator_family=evaluator_family,
+                coefficients=MappingProxyType({}),
+                points=(),
+                thermo_log10_pressure=_log10_from_reaction,
+            ),
+            derived_pO2_exponent,
+        )
+
+    # Pure-component saturation from gas + condensed pair.
+    gas_rec = (
+        model.get("gas_thermo_record")
+        or model.get("thermo_record")
+        or thermo_by_key.get("gas")
+    )
+    condensed_rec = (
+        model.get("condensed_thermo_record")
+        or thermo_by_key.get("condensed")
+        or thermo_by_key.get("condensed_solid")
+        or thermo_by_key.get("condensed_liquid")
+    )
+    if gas_rec is None or condensed_rec is None:
+        raise CatalogCompileError(
+            f"{species_id}: thermo pure-psat path requires gas + condensed "
+            "thermo records (thermo_record/gas_thermo_record + "
+            "condensed_thermo_record, or phase_properties entries)"
+        )
+    gas_map = _mapping(gas_rec, f"{species_id}.gas_thermo")
+    cond_map = _mapping(condensed_rec, f"{species_id}.condensed_thermo")
+    gas_poly = _polynomial_from_thermo_record(
+        name=f"{species_id}:gas",
+        family=evaluator_family,
+        record=gas_map,
+        default_standard_state="gas",
+    )
+    cond_poly = _polynomial_from_thermo_record(
+        name=f"{species_id}:condensed",
+        family=evaluator_family,
+        record=cond_map,
+        default_standard_state="condensed",
+    )
+    # Standard-state guard (matches NasaCeaPolynomial.pure_psat_over_Pstd).
+    if gas_poly.standard_state != "gas":
+        raise CatalogCompileError(
+            f"{species_id}: pure-psat gas record requires standard_state 'gas'; "
+            f"got {gas_poly.standard_state!r}"
+        )
+    if cond_poly.standard_state == "gas":
+        raise CatalogCompileError(
+            f"{species_id}: pure-psat condensed record requires condensed "
+            f"standard_state; got {cond_poly.standard_state!r}"
+        )
+    _require_poly_covers_domain(
+        species_id=species_id,
+        label="gas",
+        poly=gas_poly,
+        domain_low=domain_low,
+        domain_high=domain_high,
+    )
+    _require_poly_covers_domain(
+        species_id=species_id,
+        label="condensed",
+        poly=cond_poly,
+        domain_low=domain_low,
+        domain_high=domain_high,
+    )
+
+    def _log10_from_psat(temperature_K: float) -> float:
+        g_gas = gas_poly.evaluate(temperature_K).g_over_RT
+        g_cond = cond_poly.evaluate(temperature_K).g_over_RT
+        # P_sat / P° = exp(−(G_gas − G_cond)/(R T))
+        ratio = math.exp(-(g_gas - g_cond))
+        pressure_pa = ratio * Pstd
+        if not math.isfinite(pressure_pa) or pressure_pa <= 0.0:
+            raise CatalogCompileError(
+                f"{species_id}: thermo pure-psat evaluator produced invalid "
+                f"pressure at T={temperature_K}"
+            )
+        return math.log10(pressure_pa)
+
+    return (
+        _ReferencePressureModel(
+            evaluator_family=evaluator_family,
+            coefficients=MappingProxyType({}),
+            points=(),
+            thermo_log10_pressure=_log10_from_psat,
+        ),
+        0.0,
+    )
+
+
+def _collect_phase_thermo_records(
+    species_id: str,
+    model: Mapping[str, Any],
+    phase_properties: Sequence[Any],
+) -> dict[str, Mapping[str, Any]]:
+    """Gather thermo records from pressure model + phase_properties.
+
+    ``phase_properties`` entries may declare ``evaluator: nasa9`` (or
+    ``evaluator_family``) alongside ``thermo_record`` / inline coefficients.
+    """
+    out: dict[str, Mapping[str, Any]] = {}
+    for index, raw in enumerate(phase_properties):
+        if not isinstance(raw, Mapping):
+            raise CatalogCompileError(
+                f"{species_id}.phase_properties[{index}] must be a mapping"
+            )
+        phase = raw.get("phase") or raw.get("standard_state")
+        record = raw.get("thermo_record")
+        if record is None and (
+            raw.get("segments") is not None or raw.get("coefficients") is not None
+        ):
+            record = raw
+        if record is None:
+            continue
+        if not isinstance(record, Mapping):
+            raise CatalogCompileError(
+                f"{species_id}.phase_properties[{index}].thermo_record must be a mapping"
+            )
+        # Propagate evaluator declaration from the phase row when missing.
+        merged = dict(record)
+        if "evaluator_family" not in merged and "evaluator" not in merged:
+            if raw.get("evaluator_family") is not None:
+                merged["evaluator_family"] = raw["evaluator_family"]
+            elif raw.get("evaluator") is not None:
+                merged["evaluator"] = raw["evaluator"]
+        if "standard_state" not in merged and phase is not None:
+            merged["standard_state"] = phase
+        key = str(phase) if phase is not None else f"phase_{index}"
+        out[key] = merged
+    # Inline model thermo_record defaults to gas when standard_state says so.
+    inline = model.get("thermo_record")
+    if isinstance(inline, Mapping):
+        std = inline.get("standard_state") or model.get("standard_state") or "gas"
+        out.setdefault(str(std), inline)
+        if std == "gas":
+            out.setdefault("gas", inline)
+    return out
+
+
+def _polynomial_from_thermo_record(
+    *,
+    name: str,
+    family: str,
+    record: Mapping[str, Any],
+    default_standard_state: str | None = None,
+) -> NasaCeaPolynomial | ShomatePolynomial:
+    """Build a landed NASA or Shomate polynomial from a catalog thermo record."""
+    fam = family
+    if record.get("evaluator_family") or record.get("evaluator"):
+        fam = _normalize_thermo_family(
+            str(record.get("evaluator_family") or record.get("evaluator")),
+            field=f"{name}.evaluator",
+        )
+    standard_state = (
+        record.get("standard_state")
+        or default_standard_state
+    )
+    if not isinstance(standard_state, str) or not standard_state.strip():
+        raise CatalogCompileError(
+            f"{name}: thermo record requires standard_state convention"
+        )
+    standard_state = standard_state.strip()
+    delta_f = record.get("delta_f_H_298_15_J_per_mol")
+    delta_f_f = float(delta_f) if delta_f is not None else None
+    formula = record.get("formula")
+    formula_s = str(formula) if formula is not None else None
+    citation = record.get("citation")
+    citation_s = str(citation) if citation is not None else None
+    Pstd = float(record.get("reference_pressure_Pa", _THERMO_REFERENCE_PRESSURE_PA))
+
+    if fam in ("nasa_cea_7", "nasa_cea_9"):
+        segments_raw = record.get("segments")
+        if not isinstance(segments_raw, list) or not segments_raw:
+            raise CatalogCompileError(
+                f"{name}: NASA thermo record requires a non-empty segments list"
+            )
+        segs: list[Any] = []
+        for index, seg in enumerate(segments_raw):
+            sm = _mapping(seg, f"{name}.segments[{index}]")
+            t_min = float(sm.get("T_min_K", sm.get("t_min_K")))
+            t_max = float(sm.get("T_max_K", sm.get("t_max_K")))
+            if fam == "nasa_cea_7":
+                coeffs = sm.get("coefficients") or sm.get("a_coefficients")
+                if not isinstance(coeffs, (list, tuple)) or len(coeffs) != 7:
+                    raise CatalogCompileError(
+                        f"{name}: NASA-7 segment needs 7 coefficients"
+                    )
+                segs.append(
+                    Nasa7Segment(
+                        t_min,
+                        t_max,
+                        tuple(float(c) for c in coeffs),  # type: ignore[arg-type]
+                    )
+                )
+            else:
+                coeffs = sm.get("a_coefficients") or sm.get("coefficients")
+                if not isinstance(coeffs, (list, tuple)) or len(coeffs) != 7:
+                    raise CatalogCompileError(
+                        f"{name}: NASA-9 segment needs 7 a-coefficients"
+                    )
+                try:
+                    b1 = float(sm["b1"])
+                    b2 = float(sm["b2"])
+                except (KeyError, TypeError, ValueError) as exc:
+                    raise CatalogCompileError(
+                        f"{name}: NASA-9 segment requires b1 and b2"
+                    ) from exc
+                segs.append(
+                    Nasa9Segment(
+                        t_min,
+                        t_max,
+                        tuple(float(c) for c in coeffs),  # type: ignore[arg-type]
+                        b1,
+                        b2,
+                    )
+                )
+        return NasaCeaPolynomial(
+            name=name,
+            family=fam,  # type: ignore[arg-type]
+            standard_state=standard_state,  # type: ignore[arg-type]
+            segments=tuple(segs),
+            formula=formula_s,
+            delta_f_H_298_15_J_per_mol=delta_f_f,
+            citation=citation_s,
+            reference_pressure_Pa=Pstd,
+        )
+
+    if fam == "shomate":
+        segments_raw = record.get("segments")
+        segs_s: list[ShomateSegment] = []
+        if isinstance(segments_raw, list) and segments_raw:
+            for index, seg in enumerate(segments_raw):
+                sm = _mapping(seg, f"{name}.segments[{index}]")
+                t_min = float(sm.get("T_min_K", sm.get("range_K", [None, None])[0]))
+                t_max = float(sm.get("T_max_K", sm.get("range_K", [None, None])[1]))
+                coeffs_raw = sm.get("coefficients") or sm.get("coeffs")
+                coeffs = coefficients_from_mapping(coeffs_raw)
+                segs_s.append(
+                    ShomateSegment(t_min, t_max, coeffs)  # type: ignore[arg-type]
+                )
+        else:
+            # Single-segment form: coefficients + valid domain on the record.
+            domain = record.get("valid_domain") or record.get("range_K")
+            if isinstance(domain, Mapping) and "temperature_K" in domain:
+                bounds = domain["temperature_K"]
+                t_min, t_max = float(bounds[0]), float(bounds[1])
+            elif isinstance(domain, (list, tuple)) and len(domain) == 2:
+                t_min, t_max = float(domain[0]), float(domain[1])
+            else:
+                raise CatalogCompileError(
+                    f"{name}: Shomate record needs segments or valid temperature bounds"
+                )
+            coeffs_raw = record.get("coefficients") or record.get("coeffs")
+            coeffs = coefficients_from_mapping(coeffs_raw)
+            segs_s.append(
+                ShomateSegment(t_min, t_max, coeffs)  # type: ignore[arg-type]
+            )
+        return ShomatePolynomial(
+            name=name,
+            standard_state=standard_state,  # type: ignore[arg-type]
+            segments=tuple(segs_s),
+            formula=formula_s,
+            delta_f_H_298_15_J_per_mol=delta_f_f,
+            citation=citation_s,
+            reference_pressure_Pa=Pstd,
+        )
+
+    raise CatalogCompileError(f"{name}: unsupported thermo family {fam!r}")
+
+
 def _validate_balanced_reaction(species_id: str, reaction: Mapping[str, Any]) -> None:
     reactants = reaction.get("reactants")
     products = reaction.get("products")
@@ -1084,7 +1761,11 @@ def _legacy_species_row(
     result["fit_target"] = model.get("fit_target", model.get("evaluator_family"))
     domain = _mapping(model.get("valid_domain"), "valid_domain")
     if not model.get("compatibility_omit_valid_range_K"):
-        result["valid_range_K"] = deepcopy(domain["temperature_K"])
+        # Accept both temperature_K:[lo,hi] and CEA-ingest T_min_K/T_max_K.
+        low, high = _domain_temperature_bounds(
+            domain, field=f"{species_id}.valid_domain"
+        )
+        result["valid_range_K"] = [low, high]
     evaluator_family = model.get("evaluator_family")
     reference = (
         _mapping(model.get("reference_pressure_model"), "reference_pressure_model")
@@ -1145,19 +1826,9 @@ def _model_surface(
             f"{species_id}: unknown pressure observable {model.get('pressure_kind')!r}"
         ) from exc
     domain = _mapping(model.get("valid_domain"), f"{species_id}.valid_domain")
-    bounds = domain.get("temperature_K")
-    if (
-        not isinstance(bounds, Sequence)
-        or isinstance(bounds, (str, bytes))
-        or len(bounds) != 2
-    ):
-        raise CatalogCompileError(
-            f"{species_id}.valid_domain.temperature_K must be [low, high]"
-        )
-    low = _finite_positive(bounds[0], f"{species_id}.valid_domain.temperature_K[0]")
-    high = _finite_positive(bounds[1], f"{species_id}.valid_domain.temperature_K[1]")
-    if low >= high:
-        raise CatalogCompileError(f"{species_id}: invalid temperature domain")
+    low, high = _domain_temperature_bounds(
+        domain, field=f"{species_id}.valid_domain"
+    )
     return observable, (low, high)
 
 
