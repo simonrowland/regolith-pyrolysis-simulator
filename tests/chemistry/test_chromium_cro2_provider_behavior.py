@@ -162,8 +162,9 @@ def test_lunar_mare_c2a_hot_cro2_trace_closes_chromium_atoms():
     sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
     initial_cr_mol = _total_chromium_mol(sim)
 
-    # CrO2 vaporization consumes O2. Keep the trace ledger-closed by making the
-    # finite pO2 buffer explicit in both the ledger and the run mass input.
+    # A hypothetical CrO2 vaporization consumes O2. Keep the finite pO2 buffer
+    # explicit so the b-114 refusal, rather than missing reactant inventory,
+    # determines the channel outcome.
     sim.record.additives_kg["O2"] = 1.0
     sim.atom_ledger.load_external(
         "process.overhead_gas", {"O2": 1.0}, source="IW pO2 buffer",
@@ -186,9 +187,15 @@ def test_lunar_mare_c2a_hot_cro2_trace_closes_chromium_atoms():
         stage.collected_kg for stage in sim.train.stages if stage.stage_number != 2
     ]
 
-    assert terminal_chromia["Cr2O3"] > 0.0
+    refusal = sim._last_vapour_batch_report["refusals_by_species"]["CrO2"]
+    assert refusal["refusal_code"] == "missing_channel_contract"
+    assert "missing alpha" in refusal["extra"]["detail"]
+    assert refusal["is_flux_active"] is False
+    assert terminal_chromia.get("Cr2O3", 0.0) == 0.0
     assert "Cr2O3" not in train
-    assert stage_2["Cr2O3"] == pytest.approx(terminal_chromia["Cr2O3"])
+    assert "Cr2O3" not in stage_2
     assert all("Cr2O3" not in stage for stage in later_stages)
+    # HI-2: policy-only alpha is a typed refusal, so chromium remains in its
+    # condensed parent inventory instead of disappearing or reaching a product.
     assert _total_chromium_mol(sim) == pytest.approx(initial_cr_mol, abs=1e-9)
     assert max(closures) <= 5e-12

@@ -62,6 +62,10 @@ PER_HOUR_DIAGNOSTIC_KEYS = {
     "fe_redox_split",
     "redox_source_breakdown",
     "stage_3_capture",
+    # VR-11 exposes the selected vapour batch and its flux overlay on advanced
+    # steps; the pre-advance snapshot remains the compact per-hour surface.
+    "vapour_batch_summary",
+    "vapour_batch_flux_overlay",
 }
 
 

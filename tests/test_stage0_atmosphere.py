@@ -21,11 +21,17 @@ C0_ENDPOINT_SETPOINTS = {
 def _sim(feedstocks):
     backend = InternalAnalyticalBackend()
     backend.initialize({})
+    # Stepping crosses the strict VR-11 vapour boundary even though these tests
+    # assert only Stage-0 atmosphere state. Use the canonical schema-v2 catalog
+    # instead of the retired empty schema-v1 compatibility shape.
+    vapor_pressures = yaml.safe_load(
+        (Path(__file__).parent.parent / "data" / "vapor_pressures.yaml").read_text()
+    )
     return PyrolysisSimulator(
         backend,
         {"campaigns": {"C0": deepcopy(C0_ENDPOINT_SETPOINTS)}},
         feedstocks,
-        {"metals": {}, "oxide_vapors": {}},
+        vapor_pressures,
     )
 
 

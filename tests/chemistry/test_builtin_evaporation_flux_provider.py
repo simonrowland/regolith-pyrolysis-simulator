@@ -737,7 +737,7 @@ def test_provider_short_circuits_below_400_k():
 def test_evaporation_caller_wiring_matches_shared_helper_for_lunar_case(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
-    """Wiring-only parity between the caller and the shared production helper.
+    """Wiring-only parity for batch-eligible species between caller and helper.
 
     Independent flux math is pinned in
     ``tests/chemistry/test_evaporation_series_resistance_flux.py``.
@@ -799,12 +799,22 @@ def test_evaporation_caller_wiring_matches_shared_helper_for_lunar_case(
 
     reference_flux = _series_resistance_reference_flux(sim, vapor_pressures_Pa)
     kernel_flux = dict(sim._calculate_evaporation(equilibrium).species_kg_hr)
+    refusals = sim._last_vapour_batch_report["refusals_by_species"]
+    refused_reference_species = set(reference_flux) & set(refusals)
 
     assert reference_flux, (
         "series-resistance reference returned no flux -- the test "
         "fixture is not exercising the path it claims to cover"
     )
+    # b-114: CrO2's policy-only evaporation-alpha row is not a numeric value.
+    # The catalog refuses that channel and retains parent Cr2O3; it must not be
+    # compared to the helper's deliberate alpha=1 prototype fallback.
+    assert refused_reference_species == {"CrO2"}
+    assert refusals["CrO2"]["refusal_code"] == "missing_channel_contract"
+    assert "missing alpha" in refusals["CrO2"]["extra"]["detail"]
     for species, legacy_value in reference_flux.items():
+        if species in refused_reference_species:
+            continue
         kernel_value = kernel_flux.get(species, 0.0)
         tol = max(
             _FLUX_TOLERANCE_ABS_KG_HR,

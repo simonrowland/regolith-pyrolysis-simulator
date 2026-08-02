@@ -1861,7 +1861,9 @@ def test_build_eval_inputs_vaporock_import_visible_init_failure_keys_builtin(
     finally:
         clear_probe_caches()
 
-    assert init_calls == [{}]
+    # VR-5 availability probes must stay in-process: a warm worker would make
+    # parent-process import failures invisible and spend a process on a probe.
+    assert init_calls == [{"warm_worker": False}]
     assert spec.vapor_pressure_provider_id == (
         DEFAULT_VAPOR_PRESSURE_FALLBACK_PROVIDER_ID
     )

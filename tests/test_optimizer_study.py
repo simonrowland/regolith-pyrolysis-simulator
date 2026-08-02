@@ -1174,7 +1174,12 @@ def test_write_empty_artifacts_synthesizes_aborted_ledgers_from_cache(
     profile["profile_id"] = "aborted-scope-a"
     profile["run"] = {
         **profile["run"],
-        "lab_overlay_scope": {"lab_alpha_digest": "scope-a"},
+        # Data digests are provenance-only under the two-level cache contract.
+        # Use a behavior-bearing geometry input to exercise scope selection.
+        "lab_overlay_scope": {
+            "effective_exposed_area_m2": 1.0,
+            "area_basis": "explicit_test_fixture",
+        },
     }
     config = study.StudyConfig(
         profile=profile,
@@ -1261,7 +1266,7 @@ def test_write_empty_artifacts_synthesizes_aborted_ledgers_from_cache(
     )
     other_scope = replace(
         spec,
-        lab_alpha_digest="scope-b",
+        effective_exposed_area_m2=2.0,
     )
     store_cached_result(
         other_scope,

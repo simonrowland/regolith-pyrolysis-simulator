@@ -1219,6 +1219,15 @@ families:
           pure_component_antoine:
             source: REF-020 NIST-JANAF/Chase 1998 Mn(s/l)->Mn(g) thermodynamic evaluation fit; REF-032
               Alcock solid, REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as documented comparators
+            # Mn adjudication (2026-06-15/16): before the solid refit, the Alcock
+            # solid fit gave 146.555679 Pa at 1519 K while the NIST/JANAF liquid fit
+            # gave 135.857038 Pa (-7.300052%, -0.032920511 dex). The discontinuity
+            # was a mixed-source artifact, so runtime uses REF-020 NIST/JANAF solid
+            # and liquid evaluation-derived fits on both sides of melting.
+            # Liquid-source comparison: 25-32% high-vs-low CRC/Kaye-Laby spread.
+            # NIST/JANAF was chosen because both adjudication
+            # lenses ranked it first; Barin agrees with NIST/JANAF at about 1-4%,
+            # and Kaye-Laby/NPL is the 13-30% low outlier in-band.
             default_segment: liquid_nist_janaf_chase_1998
             segments:
             - name: solid_nist_janaf_chase_1998

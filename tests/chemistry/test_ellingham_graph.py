@@ -12,6 +12,7 @@ from simulator.chemistry.ellingham_thermo import (
     ellingham_stoichiometry,
 )
 from simulator.state import GAS_CONSTANT
+from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
 
 
 @pytest.fixture(scope="module")
@@ -87,7 +88,9 @@ def test_evolves_uses_builtin_pressure_floor(vapor_pressure_data) -> None:
 def test_k_standard_reaction_graph_uses_activity_and_po2_scaling(
     vapor_pressure_data,
 ) -> None:
-    row = vapor_pressure_data["metals"]["K"]
+    # Schema-v2 is canonical; the Ellingham graph consumes its compiler-owned
+    # legacy projection rather than reaching through the four strata directly.
+    row = vapor_pressure_legacy_view(vapor_pressure_data)["metals"]["K"]
     coeff = row["antoine"]
     T_K = 1429.0
     pO2_bar = 10.0**-7.853

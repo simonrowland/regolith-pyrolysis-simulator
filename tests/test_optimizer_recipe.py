@@ -71,10 +71,11 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
             .setpoints
         )
     ).encode()
-    # Canonical lunar full-yield expands the catalog-grounded C2A envelope and
-    # aligns the staged-path default metadata; resolved/schema identity moves.
+    # VR-11 expanded the Al/Ti operator-routing provenance stored in setpoints.
+    # The resolved full-config serialization includes that metadata, so this
+    # pin moves while the empty recipe/setpoints patch bytes remain neutral.
     assert hashlib.sha256(resolved).hexdigest() == (
-        "ce47537245c92b424883a61f350c3493754c0c36fffb4a639a9484e92d31dc23"
+        "9f49a813ecf0fb079e7eaa64fb1ed8274a19f7b1037a8e7b419fbf4a0c79c3c2"
     )
     assert schema.bounds_digest == (
         "5a5aba76747df5b17a0dc98ce81eb47bccf045687394656f55474ca60ecd9184"
