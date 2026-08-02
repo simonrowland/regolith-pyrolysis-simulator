@@ -103,7 +103,9 @@ MAX_CHAIN_CLOSURE_ERR_PCT = 6.0e-5
 # across the whole VR range. Old pin encoded the premature-completion bug.
 # Regenerated at tip d13f597 from build_sio_yield_report; wall-T invariance
 # remains bit-identical across 1050/1300/1400/1500 C.
-PHASE3BIS_SIO_EVOLVED_KG = 1.03187282595e-05
+# regenerated under CI engine config (studio grind overlay) per the 5c6c015
+# doctrine; laptop-config value was 1.03187282595e-05
+PHASE3BIS_SIO_EVOLVED_KG = 1.03186545664e-05
 
 
 @lru_cache(maxsize=None)

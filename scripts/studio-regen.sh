@@ -19,14 +19,21 @@
 #   runner  | tests/fixtures/runner[/...] | tests/test_runner_smoke.py
 #     → scripts/regenerate_runner_goldens.py
 #       writes: tests/fixtures/runner/*.json
+#       (also covers recipe_io + cost_ledger goldens that bind the lunar runner fixture)
 #   sio_yield | tests/fixtures/sio_yield[/...]
 #     → -m simulator.runner.sio_yield (form from S-03 commit 4fce2f0)
 #       writes: tests/fixtures/sio_yield/*.json
+#   cache | cache_identity | cache_convert | tests/fixtures/cache_identity[/...]
+#     → scripts/regenerate_cache_identity_goldens.py
+#       writes: tests/fixtures/cache_identity/b-043-cache-contract.golden.json
+#   pins | capacity | sio_pins | staged_bakeout
+#     → scripts/emit_studio_pin_values.py
+#       writes: studio-pin-report.json (value report; local worker patches code pins)
 #
 # Examples:
 #   scripts/studio-regen.sh --dry-run HEAD coating
 #   scripts/studio-regen.sh HEAD coating
-#   scripts/studio-regen.sh abc1234 runner sio_yield
+#   scripts/studio-regen.sh abc1234 runner sio_yield cache pins
 #   scripts/studio-regen.sh HEAD tests/fixtures/sio_yield/mars_basalt_c2a.json
 set -euo pipefail
 
@@ -132,9 +139,28 @@ _resolve_one() {
       _add_unique REMOTE_CMDS \
         "./.venv/bin/python scripts/regenerate_runner_goldens.py"
       ;;
+    cache|cache_identity|cache_convert|\
+    tests/fixtures/cache_identity|\
+    tests/fixtures/cache_identity/*|\
+    tests/test_cache_convert.py)
+      _add_unique FAMILIES cache
+      _add_unique OUTPUTS "tests/fixtures/cache_identity/b-043-cache-contract.golden.json"
+      _add_unique REMOTE_CMDS \
+        "./.venv/bin/python scripts/regenerate_cache_identity_goldens.py"
+      ;;
+    pins|pin_report|capacity|capacity_coupling|sio_pins|staged_bakeout|\
+    tests/test_capacity_coupling.py|tests/test_staged_bakeout.py|\
+    tests/chemistry/test_sio_chain_coherence.py|\
+    tests/chemistry/test_sio_step_condensation.py|\
+    tests/chemistry/test_sio_step_wall_deposit.py)
+      _add_unique FAMILIES pins
+      _add_unique OUTPUTS "studio-pin-report.json"
+      _add_unique REMOTE_CMDS \
+        "./.venv/bin/python scripts/emit_studio_pin_values.py"
+      ;;
     *)
       echo "ERROR: unknown regen target: $t" >&2
-      echo "Known: coating | runner | sio_yield | explicit fixture/pin paths under those families" >&2
+      echo "Known: coating | runner | sio_yield | cache | pins | explicit fixture/pin paths under those families" >&2
       exit 1
       ;;
   esac
@@ -201,16 +227,25 @@ fi
 rm -rf "$PINNED_WT"
 git worktree add --detach "$PINNED_WT" "$TIP_SHA"
 mkdir -p "$PINNED_WT/scripts"
-# Always overlay the regen harness + coating producer from the invoking tree.
+# Always overlay the regen harness + producers from the invoking tree so tip
+# may predate this worker's harness extensions; physics code stays tip-pinned.
 cp -f "$LOCAL_ROOT/scripts/studio-regen.sh" "$PINNED_WT/scripts/studio-regen.sh"
 cp -f "$LOCAL_ROOT/scripts/regenerate_coating_diagnostic_golden.py" \
   "$PINNED_WT/scripts/regenerate_coating_diagnostic_golden.py"
-# Runner regenerator exists at tip for most recent history; prefer tip copy,
-# fall back to local if absent (tip too old).
-if [ ! -f "$PINNED_WT/scripts/regenerate_runner_goldens.py" ] \
-  && [ -f "$LOCAL_ROOT/scripts/regenerate_runner_goldens.py" ]; then
-  cp -f "$LOCAL_ROOT/scripts/regenerate_runner_goldens.py" \
-    "$PINNED_WT/scripts/regenerate_runner_goldens.py"
+cp -f "$LOCAL_ROOT/scripts/emit_studio_pin_values.py" \
+  "$PINNED_WT/scripts/emit_studio_pin_values.py"
+# Prefer tip copies of longer-lived regenerators; fall back to local if absent.
+for helper in regenerate_runner_goldens.py regenerate_cache_identity_goldens.py; do
+  if [ ! -f "$PINNED_WT/scripts/$helper" ] \
+    && [ -f "$LOCAL_ROOT/scripts/$helper" ]; then
+    cp -f "$LOCAL_ROOT/scripts/$helper" "$PINNED_WT/scripts/$helper"
+  fi
+done
+# Always overlay cache identity regenerator when local is newer/present so
+# studio-regen can target it even if tip path layout drifts.
+if [ -f "$LOCAL_ROOT/scripts/regenerate_cache_identity_goldens.py" ]; then
+  cp -f "$LOCAL_ROOT/scripts/regenerate_cache_identity_goldens.py" \
+    "$PINNED_WT/scripts/regenerate_cache_identity_goldens.py"
 fi
 
 cleanup() {

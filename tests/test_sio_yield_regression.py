@@ -218,9 +218,12 @@ def test_sio_wall_sweep_keeps_bulk_gas_temperature_distinct_from_liner():
 # ~/Repos/rps-adjudicate/m2-bisect.md — drift at 228927d, bit-identical
 # across the whole VR range. Old pins encoded the premature-completion bug.
 # Regenerated at tip d13f597 from the executable sio_yield CLI.
+# regenerated under CI engine config (studio grind overlay) per the 5c6c015
+# doctrine; laptop-config values were lunar 1.03187282595e-05 /
+# mars 1.03956433809e-05
 BASELINE_SIO_EVOLVED_KG = {
-    "lunar_mare_low_ti": 1.03187282595e-05,
-    "mars_basalt": 1.03956433809e-05,
+    "lunar_mare_low_ti": 1.03186545664e-05,
+    "mars_basalt": 1.03950472208e-05,
 }
 
 # 0.5.3 Phase A1 (2026-05-28): finite-headspace default-on flip +
@@ -259,9 +262,12 @@ BASELINE_STAGE4_SIO2_KG = {
 # more SiO to the designated Stage-3 condenser (lunar 8.598e-7 -> 6.731e-6,
 # ~7.83x). Authority: ~/Repos/rps-adjudicate/m2-bisect.md. Regenerated at
 # tip d13f597 from the executable sio_yield CLI.
+# regenerated under CI engine config (studio grind overlay) per the 5c6c015
+# doctrine; laptop-config values were lunar 6.73119341581e-06 /
+# mars 6.78136729408e-06
 BASELINE_STAGE3_SIO2_KG = {
-    "lunar_mare_low_ti": 6.73119341581e-06,
-    "mars_basalt": 6.78136729408e-06,
+    "lunar_mare_low_ti": 6.73114533926e-06,
+    "mars_basalt": 6.78097843708e-06,
 }
 
 

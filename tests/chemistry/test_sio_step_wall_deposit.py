@@ -205,8 +205,10 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
     # across the whole VR range. Old pin encoded the premature-completion bug.
     # Regenerated at tip d13f597 from build_sio_yield_report; fouling
     # threshold structure (deposit at 1050 C, none at 1400/1500 C) holds.
+    # regenerated under CI engine config (studio grind overlay) per the 5c6c015
+    # doctrine; laptop-config value was 4.439481519259e-06
     assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
-        4.439481519259e-06, rel=1e-9
+        4.439448640582e-06, rel=1e-9
     )
     assert _sio_wall_product_deposit_kg(1400.0) == pytest.approx(
         0.0, rel=1e-9

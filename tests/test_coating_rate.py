@@ -256,8 +256,11 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
         + "\n"
     ).encode("utf-8")
     # Regenerated from the executable VR-11/b-114 batch instrumentation path.
+    # regenerated under CI engine config (studio grind overlay) per the 5c6c015
+    # doctrine; laptop-config value was
+    # c552c73bc3da2dbe5ac6428cf792633da15341e11e04a76c726d2319324af32c
     assert hashlib.sha256(actual_bytes).hexdigest() == (
-        "c552c73bc3da2dbe5ac6428cf792633da15341e11e04a76c726d2319324af32c"
+        "2b353706c0064b23b06a342a6eb80037cc859ad322cb3e93eea723d69181a288"
     )
 
 

@@ -270,7 +270,9 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
     # material reaches the DESIGNATED Stage 3 trap as disproportionation
     # products; the continuous probe still never reaches the hot capture
     # window. Values pinned from the executable under the quiesced gate.
-    assert staged_silica == pytest.approx(0.10262754045817979, rel=1e-9)
+    # regenerated under CI engine config (studio grind overlay) per the 5c6c015
+    # doctrine; laptop-config value was 0.10262754045817979
+    assert staged_silica == pytest.approx(0.10246923985526701, rel=1e-9)
     assert continuous_silica == pytest.approx(0.0, abs=1.0e-15)
     assert set(staged_sio_stage) == {"Si", "SiO2", "Fe"}
     assert staged_sio_stage["Fe"] > 0.0
@@ -278,7 +280,9 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
         staged_silica, rel=1e-12
     )
     assert continuous_sio_stage == {}
-    assert staged_products["SiO"] == pytest.approx(0.011456288948428558)
+    # regenerated under CI engine config (studio grind overlay) per the 5c6c015
+    # doctrine; laptop-config value was 0.011456288948428558
+    assert staged_products["SiO"] == pytest.approx(0.01143878479198185)
 
 
 def test_c2a_staged_respeciates_evaporative_metal_loss_internal_o():

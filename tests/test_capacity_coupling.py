@@ -480,6 +480,9 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         # (+1.5539e-07 kg/hr); Al/Ca/Fe/K/Mg/Mn/Na/SiO/Ti byte-identical.
         # Total / transport-saturation / melt-mass followers regenerated
         # from the executable under the same default-off head-result probe.
+        # regenerated under CI engine config (studio grind overlay) per the
+        # 5c6c015 doctrine; laptop-config value was identical (studio emit
+        # 2026-08-02 @ tip 0de9c6d confirmed bit-match for the head-result trio).
         (
             1,
             1550.0,
