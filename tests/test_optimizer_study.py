@@ -1165,6 +1165,8 @@ def test_strategy_manifest_matching_hard_fail_vs_warn_split(tmp_path: Path) -> N
         )
 
 
+@pytest.mark.serial  # red under -n auto trains 11-12, green -n0 serial rerun 2026-08-02, timeout/subprocess-timing class
+@pytest.mark.xdist_group("serial")
 def test_write_empty_artifacts_synthesizes_aborted_ledgers_from_cache(
     tmp_path: Path,
 ) -> None:

@@ -929,6 +929,8 @@ def test_eval_timeout_env_refuses_non_finite_or_non_positive_values(
         pool_module.resolve_eval_timeout_seconds()
 
 
+@pytest.mark.serial  # red under -n auto trains 11-12, green -n0 serial rerun 2026-08-02, timeout/subprocess-timing class
+@pytest.mark.xdist_group("serial")
 def test_process_pool_timeout_abort_includes_requeued_child_pid_logs(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
@@ -1057,6 +1059,8 @@ def test_process_pool_timeout_kills_worker_process_group(
     assert not (tmp_path / "eval-000000" / "grandchild-survived.txt").exists()
 
 
+@pytest.mark.serial  # red under -n auto trains 11-12, green -n0 serial rerun 2026-08-02, timeout/subprocess-timing class
+@pytest.mark.xdist_group("serial")
 @pytest.mark.timeout(10)
 def test_process_pool_timeout_reaps_normal_subprocess_child(
     tmp_path: Path,
@@ -1808,6 +1812,8 @@ def test_pool_duplicate_cache_key_policy(tmp_path: Path) -> None:
     assert persisted.candidate_id == "second"
 
 
+@pytest.mark.serial  # red under -n auto trains 11-12, green -n0 serial rerun 2026-08-02, timeout/subprocess-timing class
+@pytest.mark.xdist_group("serial")
 def test_pool_mixed_feasible_infeasible_abort_no_partial_store_no_hang(
     spawnable_process_pool: None,
     tmp_path: Path,

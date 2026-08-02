@@ -12,6 +12,8 @@ import tempfile
 
 import io
 
+import pytest
+
 from simulator.session_cli import SessionScriptRunner, run_script
 from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
 
@@ -193,6 +195,8 @@ def test_session_start_sanitizes_mre_fields_when_c5_disabled():
     assert sim.melt.mre_max_voltage_V == 0.0
 
 
+@pytest.mark.serial  # red under -n auto trains 11-12, green -n0 serial rerun 2026-08-02, timeout/subprocess-timing class
+@pytest.mark.xdist_group("serial")
 def test_session_script_exercises_every_verb_as_ndjson():
     result = _run_session(
         """
