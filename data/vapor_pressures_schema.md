@@ -32,6 +32,9 @@ VR-3 supports `antoine`, `standard_reaction_term`, and
 `tabulated_equilibrium`. NASA CEA evaluators belong to VR-4. An unavailable
 Stage-0 identity row declares `availability: unavailable_pending_acquisition`;
 it compiles metadata but no executable pressure evaluator.
+`availability` is an optional scalar enum: omission means `available`, and the
+only explicit non-executable value is `unavailable_pending_acquisition`.
+Mappings and unknown strings fail catalog compilation.
 
 `standard_reaction_term` requires `source_reaction_id`, an atom-balanced
 reaction, and a typed `reference_pressure_model`. The reference may be Antoine

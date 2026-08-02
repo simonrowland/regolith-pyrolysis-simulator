@@ -24,6 +24,7 @@ from simulator.capacity_coupling import (
     solve_capacity_shadow,
 )
 from simulator.core import PyrolysisSimulator
+from simulator.evaporation import _pre_rg_effective_pressure_source
 from simulator.physical_constants import GAS_CONSTANT
 from simulator.state import CampaignPhase, EvaporationFlux
 from simulator.vapour_rail.instrumentation import (
@@ -599,28 +600,45 @@ def test_live_and_picard_share_evaporation_control_construction(monkeypatch):
         liquid_fraction=1.0,
         diagnostics={},
     )
+    sim._last_vapor_pressure_diagnostic = {}
     partials = {"Fe": 100.0, "N2": 200.0}
+    effective_pressure_source = _pre_rg_effective_pressure_source(
+        sim.vapor_pressures,
+        equilibrium,
+    )
     vapour_batch = sim._resolve_evaporation_vapour_batch(
         equilibrium,
         temperature_K=sim.melt.temperature_C + 273.15,
+        effective_pressure_source=effective_pressure_source,
     )
-    batch_pressures, batch_overlay = flux_pressures_from_batch(vapour_batch)
+    batch_pressures, batch_overlay = flux_pressures_from_batch(
+        vapour_batch,
+        effective_pressure_source=effective_pressure_source,
+    )
     batch_overlay.update(
         compare_live_shadow_to_batch_flux(
             batch=vapour_batch,
-            live_pressures_Pa=equilibrium.vapor_pressures_Pa,
+            live_pressures_Pa=None,
             batch_flux_pressures_Pa=batch_pressures,
         )
     )
+    expected_partials = dict(partials)
+    for species in batch_pressures:
+        expected_partials.setdefault(species, 0.0)
     expected, _ = sim._evaporation_flux_control_inputs(
         equilibrium,
-        overhead_partials_Pa=partials,
+        overhead_partials_Pa=expected_partials,
         overhead_pressure_pa=sim._evaporation_overhead_total_pressure_Pa(
-            partials
+            expected_partials
         ),
         vapour_batch_flux_pressures_Pa=batch_pressures,
         vapour_batch_report=serialize_vapour_batch(vapour_batch),
         vapour_batch_flux_overlay=batch_overlay,
+    )
+    monkeypatch.setattr(
+        sim,
+        "_resolve_evaporation_vapour_batch",
+        lambda _equilibrium, *, temperature_K, effective_pressure_source: vapour_batch,
     )
     captured = []
 
@@ -638,6 +656,8 @@ def test_live_and_picard_share_evaporation_control_construction(monkeypatch):
     )
 
     assert captured == [expected]
+    assert "vapour_batch_flux_pressures_Pa" in captured[0]
+    assert captured[0]["vapour_batch_flux_pressures_Pa"] == batch_pressures
     assert captured[0]["overhead_pressure_pa"] == pytest.approx(500.0)
 
 

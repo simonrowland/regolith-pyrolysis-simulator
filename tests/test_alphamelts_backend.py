@@ -3636,28 +3636,6 @@ def test_endmember_activity_labels_do_not_reach_evaporation_flux_as_oxide_keys()
             diagnostic={'evaporation_flux_kg_hr': {}},
         )
 
-    def _resolve_evaporation_vapour_batch(_self, equilibrium, *, temperature_K):
-        live = dict(getattr(equilibrium, 'vapor_pressures_Pa', {}) or {})
-        channels = {
-            sid: VapourAnswer(
-                species_id=sid,
-                pressure=PressureValue(pa=float(pa)),
-                flux=FluxEligible(alpha_ref=f'alpha:{sid}'),
-                source_label='test',
-                formula_id=sid,
-                source_account='process.cleaned_melt',
-                solve_group_id='g1',
-                state_fingerprint='state:test',
-                validation_status='pending_validation',
-            )
-            for sid, pa in live.items()
-        }
-        return VapourBatch(
-            requested_species_ids=frozenset(live),
-            channels_by_species=channels,
-            flux_active_species_ids=frozenset(live),
-        )
-
     sim = types.SimpleNamespace(
         melt=types.SimpleNamespace(
             temperature_C=1600.0,
@@ -3672,7 +3650,10 @@ def test_endmember_activity_labels_do_not_reach_evaporation_flux_as_oxide_keys()
         ),
         overhead_model=types.SimpleNamespace(pipe_diameter_m=0.12),
         setpoints={'chemistry_kernel': {'allow_fallback_vapor': True}},
-        vapor_pressures={'metals': {}, 'oxide_vapors': {}},
+        vapor_pressures={
+            'metals': {'Na': {'evaporation_alpha': {'value': 1.0}}},
+            'oxide_vapors': {},
+        },
         _build_evaporation_aux_maps=lambda vapor: (
             {species: 1.0 for species in vapor},
             {species: {} for species in vapor},
@@ -3682,12 +3663,8 @@ def test_endmember_activity_labels_do_not_reach_evaporation_flux_as_oxide_keys()
         _dispatch_only=_dispatch_only,
         _last_vapour_batch_resolve_error={},
         _resolve_evaporation_vapour_batch=(
-            lambda equilibrium, temperature_K: vapour_batch
+            lambda equilibrium, temperature_K, effective_pressure_source: vapour_batch
         ),
-    )
-    sim._resolve_evaporation_vapour_batch = types.MethodType(
-        _resolve_evaporation_vapour_batch,
-        sim,
     )
     # Bind the production helper (simulator/evaporation.py:138) so this
     # stand-in follows the real backpressure path without copying its logic.

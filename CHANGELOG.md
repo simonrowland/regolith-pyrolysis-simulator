@@ -12,6 +12,12 @@ the range, all reviewed by codex / `gstack /review` per chunk-review
 protocol + midflight cumulative review (HOLD-MAJOR → fixed inline) +
 post-batch morning review (HOLD, V2O5 P1 → fixed inline).
 
+### Changed — runner schema 1.9.0
+
+- Bumped the runner output contract from 1.8.0 to 1.9.0 for the unconditional
+  top-level vapour-rail instrumentation/refusal fields and required per-hour
+  vapour-batch summary/flux-overlay fields.
+
 ### Added — defensive guards + structured seams
 
 - **A2** — `simulator/overhead.py::OverheadGasModel._pipe_conductance`

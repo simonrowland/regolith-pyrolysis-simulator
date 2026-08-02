@@ -726,9 +726,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             else vapor_pressures
         )
         # VR-6/VR-11: compile request rules with the U0 manifest. Evaporation
-        # consumes VapourBatch for channel authority/instrumentation; live
-        # equilibrium pressures overlay the flux map so physical outputs stay
-        # shadow-equal until an R-family source flip.
+        # consumes VapourBatch for channel/refusal/set authority; the typed
+        # pre-RG seam supplies equilibrium-backend effective pressure values
+        # until t-499's activity-corrected catalog evaluator lands.
         self.vapour_rail_catalog = (
             compile_vapour_rail_catalog(self.vapor_pressure_catalog_data)
             if self.vapor_pressure_catalog_data.get("schema_version") == 2
@@ -1716,15 +1716,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         stage: str | None = None,
         total_pressure_Pa: float | None = None,
         fO2_bar: float | None = None,
-        selected_runtime_pressures_Pa: Mapping[str, float] | None = None,
         provider_candidates_by_species: dict | None = None,
         flux_activation_context: FluxActivationContext | None = None,
     ):
         """Exact-key vapour batch via VR-6 request builder + refusal closure.
 
-        VR-11: evaporation consumes this surface for channel and pressure
-        authority. Pre-RG selected runtime pressures are carried inside each
-        VapourAnswer so the independently computed live map remains shadow-only.
+        VR-11: evaporation consumes this surface for channel refusal,
+        eligibility, and active-set authority. Before RG-1, effective pressure
+        values cross the named flux seam outside catalog/request state; the
+        value handoff migrates only after t-499's activity-correction gate.
         Request keys derive only from the compiler-emitted rules and the
         current atom-ledger inventory; callers cannot narrow the set.
         """
@@ -1748,11 +1748,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             "stage": stage,
             "total_pressure_Pa": total_pressure_Pa,
             "fO2_bar": fO2_bar,
-            "selected_runtime_pressures_Pa": (
-                None
-                if selected_runtime_pressures_Pa is None
-                else dict(selected_runtime_pressures_Pa)
-            ),
         }
         return self.vapour_rail_catalog.resolve_batch(
             ledger_snapshot,

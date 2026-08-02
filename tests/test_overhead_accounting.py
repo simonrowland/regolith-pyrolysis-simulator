@@ -27,8 +27,11 @@ def _install_passthrough_vapour_batch(sim):
     """Test seam: carry the independently supplied equilibrium Pa in answers."""
 
     sim._last_vapour_batch_resolve_error = {}
+    for group_name in ("metals", "oxide_vapors"):
+        for species_data in sim.vapor_pressures.get(group_name, {}).values():
+            species_data.setdefault("evaporation_alpha", {"value": 1.0})
 
-    def _resolve(equilibrium, *, temperature_K):
+    def _resolve(equilibrium, *, temperature_K, effective_pressure_source):
         del temperature_K
         channels = {
             species_id: VapourAnswer(
@@ -45,11 +48,13 @@ def _install_passthrough_vapour_batch(sim):
             )
             for species_id, pressure_pa in equilibrium.vapor_pressures_Pa.items()
         }
-        return VapourBatch(
+        batch = VapourBatch(
             requested_species_ids=frozenset(channels),
             channels_by_species=channels,
             flux_active_species_ids=frozenset(channels),
         )
+        assert batch.flux_active_species_ids == effective_pressure_source.species_ids
+        return batch
 
     sim._resolve_evaporation_vapour_batch = _resolve
     return sim
@@ -1096,6 +1101,10 @@ def test_evaporation_flux_does_not_reapply_commanded_po2():
 
     assert flux is not None
     assert not calls, "_calculate_evaporation must not reapply gas pO2"
+    assert equilibrium.vapor_pressures_Pa
+    assert sim._last_vapour_batch_flux_overlay["selection_source"] == (
+        evaporation_module.PRE_RG_EFFECTIVE_PRESSURE_SOURCE_ID
+    )
 
 
 def test_equilibrium_does_not_emit_o2_vapor_species():
@@ -1625,6 +1634,7 @@ def test_next_tick_p_bulk_uses_upstream_headspace_after_near_total_capture(
         upstream_transport["vapor_pressure_mbar"] * 100.0
     )
     assert seen["overhead_partials_Pa"]["Fe"] > 0.0
+    assert seen["vapour_batch_flux_pressures_Pa"] == {"Fe": 100.0}
 
 
 def test_commanded_po2_numerical_floor_when_all_inputs_zero():

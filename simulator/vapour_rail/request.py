@@ -18,10 +18,10 @@ import math
 from collections import deque
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field, replace
-from numbers import Real
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Any, Protocol
 
+from simulator.alpha_kinetics import AlphaSpecError, parse_alpha_contract
 from simulator.vapour_rail.batch import (
     CERTIFICATION_CEILING_NEVER,
     FLUX_ACTIVATION_EPOCH_PRE_RG,
@@ -147,37 +147,11 @@ class VapourResolveState:
     stage: str | None = None
     total_pressure_Pa: float | None = None
     fO2_bar: float | None = None
-    selected_runtime_pressures_Pa: Mapping[str, float] | None = None
-    selected_runtime_pressures_supplied: bool = field(init=False, default=False)
     extras: Mapping[str, Any] = field(
         default_factory=lambda: MappingProxyType({})
     )
 
     def __post_init__(self) -> None:
-        selected_runtime_pressures_supplied = (
-            self.selected_runtime_pressures_Pa is not None
-        )
-        selected_runtime_pressures: dict[str, float] = {}
-        for species_id, pressure_pa in dict(
-            self.selected_runtime_pressures_Pa or {}
-        ).items():
-            value = float(pressure_pa)
-            if not math.isfinite(value) or value < 0.0:
-                raise ValueError(
-                    "selected runtime pressure must be finite and nonnegative: "
-                    f"{species_id!r}={pressure_pa!r}"
-                )
-            selected_runtime_pressures[str(species_id)] = value
-        object.__setattr__(
-            self,
-            "selected_runtime_pressures_Pa",
-            MappingProxyType(selected_runtime_pressures),
-        )
-        object.__setattr__(
-            self,
-            "selected_runtime_pressures_supplied",
-            selected_runtime_pressures_supplied,
-        )
         object.__setattr__(self, "extras", MappingProxyType(dict(self.extras)))
 
     def as_mapping(self) -> dict[str, Any]:
@@ -187,9 +161,6 @@ class VapourResolveState:
             "stage": self.stage,
             "total_pressure_Pa": self.total_pressure_Pa,
             "fO2_bar": self.fO2_bar,
-            "selected_runtime_pressures_Pa": dict(
-                self.selected_runtime_pressures_Pa
-            ),
             **dict(self.extras),
         }
 
@@ -242,28 +213,12 @@ def _formula_elements(formula: str | None) -> frozenset[str]:
 
 
 def _alpha_contract_available(alpha: Any) -> bool:
-    """True only for a numeric alpha or an explicitly typed correlation.
+    """True only when the shared parser proves an executable alpha value."""
 
-    Policy metadata describes what to do when alpha is missing; it is never an
-    alpha value.  Correlations must be mappings with a non-empty type identity
-    so an untyped blob cannot silently become kinetic authority.
-    """
-
-    if not isinstance(alpha, Mapping):
+    try:
+        return parse_alpha_contract(alpha) is not None
+    except AlphaSpecError:
         return False
-    value = alpha.get("value")
-    if isinstance(value, Real) and not isinstance(value, bool):
-        return math.isfinite(float(value))
-    correlation = value if isinstance(value, Mapping) else alpha.get("correlation")
-    if not isinstance(correlation, Mapping):
-        return False
-    correlation_type = (
-        correlation.get("form")
-        or correlation.get("kind")
-        or correlation.get("type")
-        or correlation.get("model")
-    )
-    return isinstance(correlation_type, str) and bool(correlation_type.strip())
 
 
 def emit_request_rules(
@@ -901,18 +856,10 @@ def refusal_closure(
 
         extra_payload: dict[str, Any] = {"origin": rule.origin}
         extra_payload.update(evaluation_extra)
-        selected_runtime_pressure = pressure
-        if (
-            state is not None
-            and rule.species_id in state.selected_runtime_pressures_Pa
-        ):
-            selected_runtime_pressure = PressureValue(
-                pa=float(state.selected_runtime_pressures_Pa[rule.species_id])
-            )
         return VapourAnswer(
             species_id=rule.species_id,
             pressure=pressure,
-            selected_runtime_pressure=selected_runtime_pressure,
+            selected_runtime_pressure=pressure,
             flux=flux,
             source_label=source_label,
             formula_id=rule.formula_id,
@@ -1124,7 +1071,7 @@ def resolve_vapour_batch(
     caller_species_filter: Sequence[str] | None = None,
     flux_activation_context: FluxActivationContext,
 ) -> VapourBatch:
-    """Full §4.2 pipeline through solve-bundle formation (no source flip)."""
+    """Full §4.2 channel/refusal/set pipeline (no RG-1 value-source flip)."""
 
     requested = build_request(
         rules,
@@ -1156,38 +1103,21 @@ def resolve_vapour_batch(
         for species_id, answer in answers.items()
         if answer.is_flux_active
     )
-    # DESIGN-REV5 G2 blast-radius closure: channel answerability is not flux
-    # authority.  Pre-RG keeps the exact legacy live species allowlist; only an
-    # explicit RG epoch may activate the full manifest/catalog union.
+    # Answerability is not activation authority. Pre-RG keeps the exact species
+    # set supplied by the typed effective-pressure seam, but only after refusal
+    # closure proves every member catalog-eligible. RG-1 may activate the full
+    # manifest/catalog union after its activity-corrected value path lands.
     if flux_activation_context.epoch == FLUX_ACTIVATION_EPOCH_PRE_RG:
-        missing_legacy_live = (
-            flux_activation_context.legacy_live_species_ids - union_eligible
+        missing_effective = (
+            flux_activation_context.effective_pressure_species_ids
+            - union_eligible
         )
-        if missing_legacy_live:
-            # Do not silently run a strict subset of the legacy flux-active
-            # set.  A refused/missing legacy channel leaves shadow unproved and
-            # must fail the whole pre-RG batch closed.
+        if missing_effective:
             raise VapourRequestConstructionError(
-                "pre-RG legacy-live channels are not flux-eligible: "
-                f"{sorted(missing_legacy_live)}"
+                "pre-RG effective-pressure channels are not flux-eligible: "
+                f"{sorted(missing_effective)}"
             )
-        flux_active = flux_activation_context.legacy_live_species_ids
-        if flux_active and (
-            state is None or not state.selected_runtime_pressures_supplied
-        ):
-            raise VapourRequestConstructionError(
-                "pre-RG flux-active channels require a selected runtime "
-                "pressure surface"
-            )
-        if state is not None and state.selected_runtime_pressures_supplied:
-            missing_runtime_pressures = (
-                flux_active - frozenset(state.selected_runtime_pressures_Pa)
-            )
-            if missing_runtime_pressures:
-                raise VapourRequestConstructionError(
-                    "pre-RG flux-active channels lack selected runtime pressure: "
-                    f"{sorted(missing_runtime_pressures)}"
-                )
+        flux_active = flux_activation_context.effective_pressure_species_ids
     elif flux_activation_context.epoch == FLUX_ACTIVATION_EPOCH_RG_MANIFEST:
         flux_active = union_eligible
     else:  # FluxActivationContext rejects this; retain a fail-closed guard.

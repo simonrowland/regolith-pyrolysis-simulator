@@ -3,8 +3,8 @@
 Acceptance (DECOMPOSITION VR-11 / DESIGN-REV5 U4):
 - condensation_refusals_by_species has real consumers (b-111 / B2)
 - three silent _condensation_efficiency zeros mint typed outcomes (b-112 / B3)
-- evaporation consumes VapourBatch; flux consumers do not iterate compatibility
-  pressure maps
+- evaporation consumes VapourBatch for channel/refusal/set authority; no flux
+  consumer reads a compatibility map outside the named effective-pressure seam
 - nine-row advisory ceiling table is typed and non-vacuous
 - shadow_equal is a measured proved/mismatch/not-fixed outcome, never hardcoded
 """
@@ -22,7 +22,9 @@ from simulator.condensation import CondensationModel, CondensationTrain
 from simulator.evaporation import (
     EvaporationFluxRefusal,
     EvaporationMixin,
-    _evaporation_runtime_and_shadow_pressure_maps,
+    PRE_RG_EFFECTIVE_PRESSURE_SOURCE_ID,
+    _evaporation_legacy_shadow_pressure_map,
+    _pre_rg_effective_pressure_source,
 )
 from simulator.vapour_rail.batch import (
     FLUX_ACTIVATION_EPOCH_RG_MANIFEST,
@@ -36,10 +38,14 @@ from simulator.vapour_rail.batch import (
 )
 from simulator.vapour_rail.instrumentation import (
     AUDITED_OPERATOR_T_COND_SPECIES,
+    CompatibilityPressureMapReadTripwire,
     CONTROL_FLUX_PRESSURES_KEY,
+    EFFECTIVE_PRESSURE_SOURCE_CONTEXT,
+    EffectivePressureSource,
     FLUX_CONSUMER_RELPATHS,
     SETPOINTS_T_COND_AUDIT,
     SHADOW_MISMATCH,
+    SHADOW_ABSENT_COMPARISON,
     SHADOW_MISSING_BATCH,
     SHADOW_MISSING_KEYS,
     SHADOW_PROVED,
@@ -47,6 +53,7 @@ from simulator.vapour_rail.instrumentation import (
     SHADOW_RESOLUTION_ERROR,
     SOURCE_VAPOUR_CEILING_ROWS,
     assert_no_flux_consumer_iterates_compatibility_maps,
+    compatibility_pressure_read_context,
     compare_live_shadow_to_batch_flux,
     compare_legacy_vs_batch_flux_paths,
     condensation_refusals_payload,
@@ -331,10 +338,24 @@ def _flux_with_live_shadow(
     batch: VapourBatch | None,
     live: dict[str, float],
     *,
+    effective: dict[str, float] | None = None,
     resolution_error: dict[str, Any] | None = None,
 ) -> tuple[dict[str, float], dict[str, Any]]:
+    source_values = (
+        {
+            species_id: live[species_id]
+            for species_id in batch.flux_active_species_ids
+            if species_id in live
+        }
+        if effective is None and batch is not None
+        else dict(effective or {})
+    )
     flux, report = flux_pressures_from_batch(
         batch,
+        effective_pressure_source=EffectivePressureSource(
+            "test_effective_pressure_source",
+            source_values,
+        ),
         resolution_error=resolution_error,
     )
     report.update(
@@ -349,28 +370,40 @@ def _flux_with_live_shadow(
 
 
 def test_flux_pressures_from_batch_channel_unions() -> None:
-    """Selected runtime Pa lives in answers; catalog Pa remains evidence."""
+    """Batch gates channels while the typed source supplies effective Pa."""
 
     live = {"Na": 12.5, "SiO": 3.0, "Fe": 0.0}
     selected = {"Na": 9.0, "SiO": 2.0, "Fe": 0.0}
     batch = _toy_batch(
         {"Na", "SiO", "Fe", "K"},
         pressures={"Na": 1.0, "SiO": 1.0, "Fe": 1.0, "K": 0.5},
-        selected_runtime_pressures=selected,
+        selected_runtime_pressures={"Na": 999.0, "SiO": 999.0, "Fe": 999.0},
         flux_active=set(live),
     )
-    flux, report = _flux_with_live_shadow(batch, live)
+    flux, report = _flux_with_live_shadow(batch, live, effective=selected)
     assert flux == selected
     # Batch-only answerable channel is dormant in the pre-RG epoch.
     assert "K" not in flux
     assert report["batch_pa_by_species"]["K"] == 0.5
     assert report["batch_flux_active_not_in_live"] == []
-    assert report["selection_source"] == "vapour_answer_selected_runtime_pressure"
+    assert report["selection_source"] == "test_effective_pressure_source"
     assert report["batch_pa_by_species"]["Na"] == 1.0
     assert report["selected_runtime_pa_by_species"]["Na"] == 9.0
     assert report["shadow_equal"] is False
     assert report["shadow_outcome"] == SHADOW_MISMATCH
     assert report["catalog_pa_shadow_equal"] is False
+
+
+def test_effective_pressure_set_mismatch_fails_closed() -> None:
+    batch = _toy_batch({"Na"}, pressures={"Na": 1.0})
+
+    flux, report = _flux_with_live_shadow(batch, {"Na": 12.5}, effective={})
+
+    assert flux == {}
+    assert report["selection_source"] == (
+        "typed_failure_effective_pressure_species_set_mismatch"
+    )
+    assert report["missing_effective_pressure_species"] == ["Na"]
 
 
 def test_flux_pressures_proved_when_legacy_and_batch_agree() -> None:
@@ -386,33 +419,39 @@ def test_flux_pressures_proved_when_legacy_and_batch_agree() -> None:
     assert report["catalog_pa_shadow_equal"] is True
 
 
-def test_runtime_pressure_and_legacy_shadow_are_independent_surfaces() -> None:
+def test_legacy_shadow_is_independent_or_typed_absent() -> None:
     vapor_pressure_data = {
         "metals": {
             "Na": {"evaporation_alpha": {"value": 1.0}},
         }
     }
-    equilibrium = SimpleNamespace(vapor_pressures_Pa={"Na": 12.5})
     diagnostic = {"backend_vapor_pressures_Pa": {"Na": 11.0}}
 
-    selected, shadow = _evaporation_runtime_and_shadow_pressure_maps(
+    shadow = _evaporation_legacy_shadow_pressure_map(
         vapor_pressure_data,
-        equilibrium,
         diagnostic,
     )
 
-    assert selected == {"Na": 12.5}
     assert shadow == {"Na": 11.0}
+    assert _evaporation_legacy_shadow_pressure_map(vapor_pressure_data, {}) is None
 
-    empty_selected, retained_shadow = (
-        _evaporation_runtime_and_shadow_pressure_maps(
-            vapor_pressure_data,
-            SimpleNamespace(vapor_pressures_Pa={}),
-            diagnostic,
-        )
+    compatibility = CompatibilityPressureMapReadTripwire({"Na": 4.6e-9})
+    source = _pre_rg_effective_pressure_source(
+        vapor_pressure_data,
+        SimpleNamespace(vapor_pressures_Pa=compatibility),
     )
-    assert empty_selected == {}
-    assert retained_shadow == {"Na": 11.0}
+    assert source.source_id == PRE_RG_EFFECTIVE_PRESSURE_SOURCE_ID
+    assert source.species_ids == frozenset({"Na"})
+    assert source.pressure_pa("Na") == pytest.approx(4.6e-9)
+    assert compatibility.read_count(EFFECTIVE_PRESSURE_SOURCE_CONTEXT) > 0
+
+    absent = compare_live_shadow_to_batch_flux(
+        batch=_toy_batch({"Na"}),
+        live_pressures_Pa=None,
+        batch_flux_pressures_Pa={"Na": 1.0},
+    )
+    assert absent["shadow_equal"] is False
+    assert absent["shadow_outcome"] == SHADOW_ABSENT_COMPARISON
 
 
 def test_flux_pressures_batch_only_eligible_does_not_expand_live() -> None:
@@ -473,8 +512,13 @@ def test_evaporation_resolver_failure_at_900c_is_typed_refusal() -> None:
         vapor_pressures={},
     )
 
-    def fail_resolution(equilibrium, *, temperature_K):
-        del equilibrium, temperature_K
+    def fail_resolution(
+        equilibrium,
+        *,
+        temperature_K,
+        effective_pressure_source,
+    ):
+        del equilibrium, temperature_K, effective_pressure_source
         model._last_vapour_batch_resolve_error = {
             "status": "unavailable",
             "reason": "vapour_batch_resolve_failed",
@@ -502,8 +546,10 @@ def test_evaporation_healthy_empty_batch_at_900c_keeps_cheap_zero() -> None:
         setpoints={},
         vapor_pressures={},
         _last_vapour_batch_resolve_error={},
-        _resolve_evaporation_vapour_batch=lambda equilibrium, temperature_K: _toy_batch(
-            set()
+        _resolve_evaporation_vapour_batch=(
+            lambda equilibrium, temperature_K, effective_pressure_source: _toy_batch(
+                set()
+            )
         ),
     )
     equilibrium = SimpleNamespace(vapor_pressures_Pa={})
@@ -605,31 +651,100 @@ def test_source_guard_flags_live_map_argument_on_batch_flux_consumer() -> None:
         )
 
 
-def test_source_guard_flags_live_pressure_relocated_into_batch_answer() -> None:
-    """Regression: request resolution cannot launder the shadow into answers."""
+def test_runtime_tripwire_records_zero_flux_context_compatibility_reads() -> None:
+    """Only the named seam may read compatibility values in the flux route."""
 
-    bad = (
-        "selected = context.legacy_live_pressures_Pa\n"
-        "answer = replace(answer, selected_runtime_pressure="
-        "PressureValue(pa=selected[species_id]))\n"
-    )
-    with pytest.raises(AssertionError, match="selected runtime pressure"):
-        assert_no_flux_consumer_iterates_compatibility_maps(
-            {"simulator/vapour_rail/request.py": bad}
+    compatibility = CompatibilityPressureMapReadTripwire({"Na": 999.0})
+    backend_shadow = CompatibilityPressureMapReadTripwire({"Na": 777.0})
+    captured: dict[str, Any] = {}
+    captured_controls: dict[str, Any] = {}
+    batch = _toy_batch({"Na"}, pressures={"Na": 1.0})
+
+    def _builder(**kwargs):
+        captured.update(kwargs)
+        return batch
+
+    def _dispatch(_intent, *, control_inputs):
+        captured_controls.update(control_inputs)
+        return SimpleNamespace(
+            status="ok",
+            diagnostic={"evaporation_flux_kg_hr": {}},
         )
 
-
-def test_source_guard_flags_live_pressure_relocated_into_batch_builder() -> None:
-    """Regression: plural builder ingress cannot launder the live shadow."""
-
-    bad = (
-        "batch = builder("
-        "selected_runtime_pressures_Pa=legacy_live_pressures)\n"
+    host = SimpleNamespace(
+        vapor_pressures={
+            "metals": {
+                "Na": {"evaporation_alpha": {"value": 1.0}},
+            },
+            "oxide_vapors": {},
+        },
+        setpoints={},
+        melt=SimpleNamespace(
+            temperature_C=1600.0,
+            p_total_mbar=0.0,
+            melt_surface_area_m2=1.0,
+            stir_state=SimpleNamespace(axial=1.0, radial=1.0),
+        ),
+        overhead_model=SimpleNamespace(pipe_diameter_m=0.12),
+        overhead=SimpleNamespace(headspace_temperature_K=1873.15),
+        _last_vapor_pressure_diagnostic={
+            "backend_vapor_pressures_Pa": backend_shadow,
+        },
+        _last_vapour_batch_resolve_error={},
+        build_vapour_batch=_builder,
+        _build_evaporation_aux_maps=lambda _pressures: (
+            {"Na": 0.023},
+            {"Na": {}},
+            {"Na": 1.0},
+        ),
+        _build_partial_melt_offgassing_diagnostic=(
+            lambda _equilibrium, **_kwargs: {}
+        ),
+        _dispatch_only=_dispatch,
     )
-    with pytest.raises(AssertionError, match="selected runtime pressure"):
-        assert_no_flux_consumer_iterates_compatibility_maps(
-            {"simulator/evaporation.py": bad}
+    host._resolve_evaporation_vapour_batch = (
+        lambda equilibrium, *, temperature_K, effective_pressure_source: (
+            EvaporationMixin._resolve_evaporation_vapour_batch(
+                host,
+                equilibrium,
+                temperature_K=temperature_K,
+                effective_pressure_source=effective_pressure_source,
+            )
         )
+    )
+    equilibrium = SimpleNamespace(
+        vapor_pressures_Pa=compatibility,
+        vapor_pressures_source={"Na": "compatibility_poison"},
+        activity_coefficients={},
+        diagnostics={},
+        liquid_fraction=1.0,
+        pO2_bar=None,
+    )
+    with compatibility_pressure_read_context("flux"):
+        flux = EvaporationMixin._calculate_evaporation(
+            host,
+            equilibrium,
+            overhead_partials_override_Pa={},
+        )
+
+    assert flux.species_kg_hr == {}
+    assert compatibility.read_count("flux") == 0
+    assert backend_shadow.read_count("flux") == 0
+    assert compatibility.reads
+    assert {context for context, _operation in compatibility.reads} == {
+        EFFECTIVE_PRESSURE_SOURCE_CONTEXT,
+        "reporting_projection"
+    }
+    assert backend_shadow.reads
+    assert {context for context, _operation in backend_shadow.reads} == {
+        "shadow_comparison"
+    }
+    assert captured_controls[CONTROL_FLUX_PRESSURES_KEY] == {"Na": 999.0}
+    assert (
+        captured["flux_activation_context"].effective_pressure_species_ids
+        == frozenset({"Na"})
+    )
+    assert "selected_runtime_pressures_Pa" not in captured
 
 
 def test_source_guard_flags_banned_controls_iteration() -> None:
@@ -708,7 +823,7 @@ def test_kernel_refuses_legacy_key_only_controls() -> None:
 
 
 def test_evaporation_control_inputs_pack_batch_flux_key() -> None:
-    """_evaporation_flux_control_inputs packs batch key; live is reporting only."""
+    """Control inputs pack batch-gated seam values; live is reporting only."""
 
     from simulator.evaporation import EvaporationMixin
 
@@ -746,7 +861,7 @@ def test_evaporation_control_inputs_pack_batch_flux_key() -> None:
         },
     )
     assert controls[CONTROL_FLUX_PRESSURES_KEY] == {"Na": 5.0}
-    # Reporting projection keeps live; batch key is the flux authority.
+    # Reporting keeps live; the typed seam supplied the already batch-gated key.
     assert controls["vapor_pressures_Pa"] == {"Na": 5.0}
     assert controls["vapour_batch_flux_shadow_equal"] is True
     assert controls["vapour_batch_flux_shadow_outcome"] == SHADOW_PROVED

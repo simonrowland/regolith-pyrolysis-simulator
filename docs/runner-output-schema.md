@@ -6,8 +6,16 @@ It is the single source of truth for both the CLI and the SocketIO
 stream's `per_hour_summary` frames; the schema is asserted in
 `tests/test_runner_smoke.py::test_runner_schema_shape_contract`.
 
-**Schema version:** `1.8.0`
+**Schema version:** `1.9.0`
 **Owning goal:** `#18 JSON-RUNNER-HARNESS`
+
+Schema 1.9.0 adds the unconditional top-level
+`vapour_rail_instrumentation` and `condensation_refusals_by_species` fields,
+plus required per-hour `vapour_batch_summary` and
+`vapour_batch_flux_overlay` fields. These surfaces expose typed vapour-channel
+selection, refusals, the named pre-RG effective-pressure value seam, and
+legacy-shadow comparison. Compatibility values cannot enter flux outside that
+seam.
 
 Schema 1.8.0 adds the unconditional top-level
 `terminal_product_taxonomy` field. Successful and handled-failure runs with a
@@ -82,7 +90,7 @@ the in-process P6a trace harness used by the CLI-boundary parity test.
 
 ```jsonc
 {
-  "schema_version": "1.8.0",
+  "schema_version": "1.9.0",
   "run_metadata": {...},        // see "Run metadata"
   "final_state": {...},         // see "Final state"
   "final": {...},               // see "Final summary"
@@ -95,6 +103,8 @@ the in-process P6a trace harness used by the CLI-boundary parity test.
   "thermal_train_report": {...}, // canonical named thermal-train view data
   "stage_purity_report": {...}, // see "Stage purity report"
   "vapor_pressure_source_report": {...}, // see "Vapor pressure source report"
+  "vapour_rail_instrumentation": {...}, // typed channel/selection diagnostics
+  "condensation_refusals_by_species": {...}, // typed terminal refusal view
   "shuttle_refusal_history": [...], // see "Shuttle refusal history"
   "c7_product_report": {...}, // see "C7 product report and refusal diagnostic"
   "c7_refusal_diagnostic": {...}, // see "C7 product report and refusal diagnostic"
@@ -244,7 +254,7 @@ it does not introduce a new schema version.
 
 ```jsonc
 "run_metadata": {
-  "schema_version": "1.8.0",
+  "schema_version": "1.9.0",
   "feedstock_id":   "lunar_mare_low_ti",
   "campaign":       "C0",                    // starting campaign phase
   "hours_requested": 24,
@@ -641,6 +651,8 @@ mole, energy, pressure, or partition arithmetic.
     "energy_electrical_plus_evaporation_cumulative_kWh": 4.8,
     "energy_cumulative_breakdown_kWh": {},   // cumulative components by named mechanism
     "energy_evaporation_breakdown_kWh": {},  // this-hour evaporation components
+    "vapour_batch_summary": {...} | null,    // exact-key typed vapour batch
+    "vapour_batch_flux_overlay": {...},      // batch gates + typed value seam + shadow
     "shuttle_phase": "inject",
     "shuttle_injected_kg_hr": 0.5,
     "shuttle_reduced_kg_hr": 0.8,

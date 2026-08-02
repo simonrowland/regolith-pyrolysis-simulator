@@ -318,6 +318,27 @@ def test_null_hypothesis_group_a_stripped_values_is_rejected():
     assert any("volatility.values" in e and "LiO" in e for e in errors)
 
 
+def test_group_b_policy_mapping_cannot_satisfy_literal_true_marker():
+    bad = deepcopy(load_trace_acquisition())
+    row = next(row for row in bad["rows"] if row["group"] == "B")
+    row["route"][
+        "never_declare_hard_vacuum_zero_from_millibar_negligible"
+    ] = {"policy": "must_never"}
+
+    errors = validate_trace_acquisition(bad)
+    assert any("never_declare_hard_vacuum_zero" in error for error in errors)
+
+
+@pytest.mark.parametrize("typed_outcome", [{"marker": "evolve"}, "unknown"])
+def test_group_a_typed_outcome_requires_scalar_enum(typed_outcome):
+    bad = deepcopy(load_trace_acquisition())
+    row = next(row for row in bad["rows"] if row["group"] == "A")
+    row["route"]["typed_outcome"] = typed_outcome
+
+    errors = validate_trace_acquisition(bad)
+    assert any("typed_outcome must be one of" in error for error in errors)
+
+
 def test_null_hypothesis_o_wrong_reaction_stoich_is_rejected():
     """P2-1: O(g) O2 reactant stoich must be 0.5 (not merely formula O2)."""
     doc = load_trace_acquisition()

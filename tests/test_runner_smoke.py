@@ -989,7 +989,7 @@ def _assert_schema_shape(payload: dict) -> None:
       this without picking a specific scenario.
     """
 
-    assert RUNNER_SCHEMA_VERSION == "1.8.0"
+    assert RUNNER_SCHEMA_VERSION == "1.9.0"
     assert set(payload) == TOP_LEVEL_KEYS, (
         f"top-level keys drift: {set(payload) - TOP_LEVEL_KEYS} extra, "
         f"{TOP_LEVEL_KEYS - set(payload)} missing"
@@ -1141,6 +1141,11 @@ def _assert_schema_shape(payload: dict) -> None:
 
     assert isinstance(payload["c7_product_report"], dict)
     assert isinstance(payload["c7_refusal_diagnostic"], dict)
+    assert isinstance(payload["vapour_rail_instrumentation"], dict)
+    assert payload["vapour_rail_instrumentation"].get("schema") == (
+        "vapour_rail_instrumentation.v1"
+    )
+    assert isinstance(payload["condensation_refusals_by_species"], dict)
     assert isinstance(payload["per_hour_summary"], list)
     assert isinstance(payload["pO2_enforcement_by_hour"], list)
     for row in payload["pO2_enforcement_by_hour"]:

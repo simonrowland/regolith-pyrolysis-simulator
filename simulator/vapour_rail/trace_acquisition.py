@@ -37,6 +37,7 @@ GROUP_B_IDS: frozenset[str] = frozenset(GROUP_B_GAS_IDS) | frozenset(
 )
 MONATOMIC_OXYGEN_ID = "O"
 PO2_EXPONENT_ATOMIC_O = 0.5  # +1/2 from ½ O2 ⇌ O
+_GROUP_A_TYPED_OUTCOMES = frozenset({"evolve"})
 
 
 class TraceAcquisitionError(ValueError):
@@ -182,7 +183,12 @@ def validate_trace_acquisition(payload: Mapping[str, Any]) -> list[str]:
                             "solely from millibar-negligible pairing"
                         )
             route = raw.get("route") if isinstance(raw.get("route"), Mapping) else {}
-            if not route.get("never_declare_hard_vacuum_zero_from_millibar_negligible"):
+            if (
+                route.get(
+                    "never_declare_hard_vacuum_zero_from_millibar_negligible"
+                )
+                is not True
+            ):
                 errors.append(
                     f"{sid}: Group-B route must pin never_declare_hard_vacuum_zero_..."
                 )
@@ -205,8 +211,15 @@ def validate_trace_acquisition(payload: Mapping[str, Any]) -> list[str]:
             if not isinstance(lit, list) or not lit:
                 errors.append(f"{sid}: Group-A literature_sources required (non-empty)")
             route = raw.get("route") if isinstance(raw.get("route"), Mapping) else {}
-            if not route.get("typed_outcome"):
-                errors.append(f"{sid}: Group-A route.typed_outcome required")
+            typed_outcome = route.get("typed_outcome")
+            if (
+                not isinstance(typed_outcome, str)
+                or typed_outcome not in _GROUP_A_TYPED_OUTCOMES
+            ):
+                errors.append(
+                    f"{sid}: Group-A route.typed_outcome must be one of "
+                    f"{sorted(_GROUP_A_TYPED_OUTCOMES)}"
+                )
 
         if group == "B":
             lit = raw.get("literature_sources")

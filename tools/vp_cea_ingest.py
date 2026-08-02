@@ -203,11 +203,13 @@ def _parse_header_line(line: str) -> dict[str, Any]:
     # become g10). Three source spellings appear in thermo.inp:
     #   glued month-in-letter:  "g10/97", "g12/97", "g11/99", "j12/66"
     #   spaced letter + m/yy:   "g 8/89", "j 3/78", "n 4/83"
+    #   word + yy:              "srd 01", "srd 93", "bar 89"
     #   bare alphanumeric:      "tpis89", "coda89"
     m = re.match(
         r"(?P<ref>"
         r"[A-Za-z]+\d+/\d{2}"  # g10/97
         r"|[A-Za-z]+\s+\d{1,2}/\d{2}"  # g 8/89
+        r"|[A-Za-z]+\s+\d{2}"  # srd 01 / bar 89
         r"|[A-Za-z]+[0-9]*"  # tpis89 / bare g11
         r")\s*(?P<body>.*)$",
         rest,
@@ -261,11 +263,12 @@ def _extract_formula_tokens(header_line: str) -> list[str]:
     s = header_line.rstrip()
     # Drop leading nint
     body = s[2:]
-    # Remove ref code at start (glued g10/97, spaced g 8/89, or bare tpis89)
+    # Remove ref code at start (glued g10/97, spaced g 8/89, word+year, or bare).
     body = re.sub(
         r"^\s*(?:"
         r"[A-Za-z]+\d+/\d{2}"
         r"|[A-Za-z]+\s+\d{1,2}/\d{2}"
+        r"|[A-Za-z]+\s+\d{2}"
         r"|[A-Za-z]+[0-9]*"
         r")\s*",
         "",

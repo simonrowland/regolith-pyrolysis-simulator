@@ -36,25 +36,33 @@ _FLUX_ACTIVATION_EPOCHS = frozenset(
 class FluxActivationContext:
     """Epoch authority for the flux-active subset of an exact-key batch.
 
-    Requested channels remain comprehensive.  Before the RG authority flip,
-    the legacy live species set is an allowlist; manifest/catalog additions
-    remain answered and observable but dormant to flux.
+    Requested channels remain comprehensive. Before RG-1, the typed effective-
+    pressure seam supplies only its finite species set; catalog refusal closure
+    proves those channels eligible and the batch freezes the active set. Pressure
+    values never enter this context.
     """
 
     epoch: str
-    legacy_live_species_ids: frozenset[str] = frozenset()
+    effective_pressure_species_ids: frozenset[str] = frozenset()
 
     def __post_init__(self) -> None:
         epoch = str(self.epoch)
         if epoch not in _FLUX_ACTIVATION_EPOCHS:
             raise ValueError(f"unknown flux activation epoch: {epoch!r}")
-        legacy = frozenset(str(sid) for sid in self.legacy_live_species_ids)
-        if epoch == FLUX_ACTIVATION_EPOCH_RG_MANIFEST and legacy:
+        effective_species = frozenset(
+            str(species_id) for species_id in self.effective_pressure_species_ids
+        )
+        if epoch == FLUX_ACTIVATION_EPOCH_RG_MANIFEST and effective_species:
             raise ValueError(
-                "rg_manifest_union activation may not carry legacy species inputs"
+                "rg_manifest_union activation may not carry pre-RG effective "
+                "pressure species"
             )
         object.__setattr__(self, "epoch", epoch)
-        object.__setattr__(self, "legacy_live_species_ids", legacy)
+        object.__setattr__(
+            self,
+            "effective_pressure_species_ids",
+            effective_species,
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -141,7 +149,11 @@ CERTIFICATION_CEILING_NEVER = "never"
 
 @dataclass(frozen=True)
 class VapourAnswer:
-    """One exact-key channel answer for a requested gas species."""
+    """One exact-key channel answer for a requested gas species.
+
+    ``selected_runtime_pressure`` remains catalog-side serialized metadata;
+    pre-RG flux values come from the separately typed effective-pressure seam.
+    """
 
     species_id: str
     pressure: PressureOutcome

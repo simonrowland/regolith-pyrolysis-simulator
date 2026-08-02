@@ -18,6 +18,7 @@ import re
 from types import MappingProxyType
 from typing import Any
 
+from simulator.alpha_kinetics import AlphaSpecError, parse_alpha_contract
 from simulator.vapour_rail.activity import (
     ActivityInputDeclaration,
     ActivityVerdictKind,
@@ -324,6 +325,11 @@ class ValidationStatus(str, Enum):
     VALIDATED = "validated"
 
 
+class PressureModelAvailability(str, Enum):
+    AVAILABLE = "available"
+    UNAVAILABLE_PENDING_ACQUISITION = "unavailable_pending_acquisition"
+
+
 @dataclass(frozen=True)
 class PressureEvaluation:
     pressure_pa: float
@@ -620,15 +626,17 @@ class VapourRailCatalog:
         elif isinstance(state, VapourResolveState):
             resolve_state = state
         elif isinstance(state, Mapping):
+            if "selected_runtime_pressures_Pa" in state:
+                raise ValueError(
+                    "selected_runtime_pressures_Pa is not catalog resolve state; "
+                    "pre-RG values cross only the typed flux seam"
+                )
             resolve_state = VapourResolveState(
                 temperature_K=state.get("temperature_K"),
                 process_phase=state.get("process_phase"),
                 stage=state.get("stage"),
                 total_pressure_Pa=state.get("total_pressure_Pa"),
                 fO2_bar=state.get("fO2_bar"),
-                selected_runtime_pressures_Pa=state.get(
-                    "selected_runtime_pressures_Pa"
-                ),
                 extras={
                     key: value
                     for key, value in state.items()
@@ -639,7 +647,6 @@ class VapourRailCatalog:
                         "stage",
                         "total_pressure_Pa",
                         "fO2_bar",
-                        "selected_runtime_pressures_Pa",
                     }
                 },
             )
@@ -648,9 +655,6 @@ class VapourRailCatalog:
                 temperature_K=getattr(state, "temperature_K", None),
                 process_phase=getattr(state, "process_phase", None),
                 stage=getattr(state, "stage", None),
-                selected_runtime_pressures_Pa=getattr(
-                    state, "selected_runtime_pressures_Pa", None
-                ),
             )
 
         return resolve_vapour_batch(
@@ -813,7 +817,8 @@ def compile_vapour_rail_catalog(
             model = _mapping(pressure_models[0], f"{species_id}.pressure_models[0]")
             observable, valid_temperature_K = _model_surface(species_id, model)
             evaluator = None
-            if model.get("availability") != "unavailable_pending_acquisition":
+            availability = _pressure_model_availability(model, str(species_id))
+            if availability is PressureModelAvailability.AVAILABLE:
                 evaluator = _compile_evaluator(
                     family_id=family_id,
                     species_id=str(species_id),
@@ -1832,6 +1837,24 @@ def _model_surface(
     return observable, (low, high)
 
 
+def _pressure_model_availability(
+    model: Mapping[str, Any],
+    species_id: str,
+) -> PressureModelAvailability:
+    raw = model.get("availability", PressureModelAvailability.AVAILABLE.value)
+    if not isinstance(raw, str):
+        raise CatalogCompileError(
+            f"{species_id}.pressure_models[0].availability must be a scalar enum"
+        )
+    try:
+        return PressureModelAvailability(raw)
+    except ValueError as exc:
+        allowed = ", ".join(item.value for item in PressureModelAvailability)
+        raise CatalogCompileError(
+            f"{species_id}.pressure_models[0].availability must be one of {allowed}"
+        ) from exc
+
+
 def _compile_fiat_routing(
     family_id: str, routing: Mapping[str, Any]
 ) -> CompiledFiatRouting:
@@ -1934,6 +1957,12 @@ def _validate_kinetics(family_id: str, kinetics: Mapping[str, Any]) -> None:
             f"{family_id}: out_of_range_status must be {OUT_OF_RANGE_STATUS}"
         )
     _required_string(kinetics.get("acquisition_flag"), f"{family_id}.acquisition_flag")
+    try:
+        parse_alpha_contract(kinetics.get("evaporation_alpha"))
+    except AlphaSpecError as exc:
+        raise CatalogCompileError(
+            f"{family_id}.vaporisation_coefficients.evaporation_alpha: {exc}"
+        ) from exc
 
 
 def _validation_status(

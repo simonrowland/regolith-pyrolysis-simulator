@@ -63,7 +63,7 @@ def _rg_activation_context() -> FluxActivationContext:
 def _pre_rg_activation_context(*species_ids: str) -> FluxActivationContext:
     return FluxActivationContext(
         epoch=FLUX_ACTIVATION_EPOCH_PRE_RG,
-        legacy_live_species_ids=frozenset(species_ids),
+        effective_pressure_species_ids=frozenset(species_ids),
     )
 
 
@@ -627,43 +627,25 @@ def test_pending_validation_is_not_refusal() -> None:
     assert isinstance(answer.pressure, PressureValue)
     assert answer.pressure.pa > 0.0
     assert isinstance(answer.flux, FluxEligible)
-    # Answerability is not activation authority: this pending row stays
-    # dormant before RG when absent from the legacy live allowlist.
+    # Answerability is not activation authority: without typed pre-RG source
+    # set evidence, the catalog-complete answer remains dormant.
     assert batch.flux_active_species_ids == frozenset()
-    legacy_live_batch = catalog.resolve_batch(
+    effective_batch = catalog.resolve_batch(
         ledger,
-        VapourResolveState(
-            temperature_K=1500.0,
-            selected_runtime_pressures_Pa={"K": 7.5},
-        ),
+        VapourResolveState(temperature_K=1500.0),
         flux_activation_context=_pre_rg_activation_context("K"),
     )
-    # Pre-RG activation reproduces the exact legacy-live set when its channel
-    # remains answerable; it neither infers nor widens activation from V/U0.
-    assert legacy_live_batch.flux_active_species_ids == frozenset({"K"})
-    legacy_live_answer = legacy_live_batch.channel("K")
-    assert legacy_live_answer.selected_runtime_pressure == PressureValue(pa=7.5)
-    assert legacy_live_answer.selected_runtime_pressure != legacy_live_answer.pressure
-    with pytest.raises(
-        VapourRequestConstructionError,
-        match="require a selected runtime pressure surface",
-    ):
+    assert effective_batch.flux_active_species_ids == frozenset({"K"})
+    catalog_answer = effective_batch.channel("K")
+    assert catalog_answer.selected_runtime_pressure == catalog_answer.pressure
+    with pytest.raises(ValueError, match="not catalog resolve state"):
         catalog.resolve_batch(
             ledger,
-            VapourResolveState(temperature_K=1500.0),
-            flux_activation_context=_pre_rg_activation_context("K"),
-        )
-    with pytest.raises(
-        VapourRequestConstructionError,
-        match="lack selected runtime pressure",
-    ):
-        catalog.resolve_batch(
-            ledger,
-            VapourResolveState(
-                temperature_K=1500.0,
-                selected_runtime_pressures_Pa={},
-            ),
-            flux_activation_context=_pre_rg_activation_context("K"),
+            {
+                "temperature_K": 1500.0,
+                "selected_runtime_pressures_Pa": {"K": 7.5},
+            },
+            flux_activation_context=_pre_rg_activation_context(),
         )
     rg_batch = catalog.resolve_batch(
         ledger,
@@ -841,11 +823,11 @@ def test_missing_temperature_is_typed_refusal_not_flux_active_zero() -> None:
     assert all("K" not in members for members in batch.solve_bundle_ids.values())
     assert batch.metadata["refusal_closure_fixed_point"] is True
 
-    # Pre-RG may not continue with a strict subset of the legacy live set.
-    # Missing physical state refuses K, so exact legacy activation fails closed.
+    # The batch may not silently run a strict subset of the typed source set.
+    # Missing physical state refuses K, so pre-RG activation fails closed.
     with pytest.raises(
         VapourRequestConstructionError,
-        match="pre-RG legacy-live channels are not flux-eligible",
+        match="pre-RG effective-pressure channels are not flux-eligible",
     ):
         catalog.resolve_batch(
             ledger,

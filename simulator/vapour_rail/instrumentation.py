@@ -5,10 +5,10 @@ refusals, solve groups, activity bounds, source-boundary / anti-cliff
 acquisition flags, and the nine-row advisory ceiling table through the
 runner / artifact / UI surfaces.
 
-Active evaporation flux consumes a complete VapourBatch: iterate
-``requested_species_ids``, branch on pressure/flux unions, and never fall
-back to the compatibility live map. Shadow equality is a measured outcome
-(proved / mismatch / not-fixed / typed disagreement), never a hardcoded True.
+Active evaporation flux consumes a complete VapourBatch for channel refusal,
+eligibility, and set authority. Before RG-1, values cross one typed effective-
+pressure seam from the equilibrium backend. Shadow equality is a measured
+outcome (proved / mismatch / not-fixed / typed disagreement), never hardcoded.
 """
 
 from __future__ import annotations
@@ -17,8 +17,10 @@ import ast
 import math
 import re
 from collections.abc import Mapping, Sequence
+from contextlib import contextmanager
+from contextvars import ContextVar
 from types import MappingProxyType
-from typing import Any
+from typing import Any, Iterator
 
 from simulator.vapour_rail.batch import (
     FluxDiagnosticUpperBound,
@@ -315,6 +317,97 @@ CONTROL_FLUX_PRESSURES_KEY = "vapour_batch_flux_pressures_Pa"
 CONTROL_BATCH_REPORT_KEY = "vapour_batch_report"
 CONTROL_SHADOW_EQUAL_KEY = "vapour_batch_flux_shadow_equal"
 CONTROL_SHADOW_OUTCOME_KEY = "vapour_batch_flux_shadow_outcome"
+EFFECTIVE_PRESSURE_SOURCE_CONTEXT = "effective_pressure_source"
+
+_COMPATIBILITY_PRESSURE_READ_CONTEXT: ContextVar[str | None] = ContextVar(
+    "compatibility_pressure_read_context",
+    default=None,
+)
+
+
+@contextmanager
+def compatibility_pressure_read_context(context: str) -> Iterator[None]:
+    """Label compatibility-map reads for the runtime anti-laundering guard."""
+
+    token = _COMPATIBILITY_PRESSURE_READ_CONTEXT.set(str(context))
+    try:
+        yield
+    finally:
+        _COMPATIBILITY_PRESSURE_READ_CONTEXT.reset(token)
+
+
+class CompatibilityPressureMapReadTripwire(Mapping[str, float]):
+    """Prove compatibility reads occur only inside the named pre-RG seam."""
+
+    def __init__(self, source: Mapping[str, float]) -> None:
+        self._source = dict(source)
+        self._reads: list[tuple[str, str]] = []
+
+    def _record(self, operation: str) -> None:
+        context = _COMPATIBILITY_PRESSURE_READ_CONTEXT.get() or "unscoped"
+        self._reads.append((context, operation))
+
+    def __getitem__(self, key: str) -> float:
+        self._record("getitem")
+        return self._source[key]
+
+    def __iter__(self) -> Iterator[str]:
+        self._record("iter")
+        return iter(self._source)
+
+    def __len__(self) -> int:
+        self._record("len")
+        return len(self._source)
+
+    def read_count(self, context: str) -> int:
+        return sum(1 for read_context, _ in self._reads if read_context == context)
+
+    @property
+    def reads(self) -> tuple[tuple[str, str], ...]:
+        return tuple(self._reads)
+
+
+class EffectivePressureSource:
+    """Typed value handoff consumed only after VapourBatch channel gating."""
+
+    __slots__ = (
+        "source_id",
+        "species_ids",
+        "physical_zero_reason",
+        "_pressures_pa",
+    )
+
+    def __init__(
+        self,
+        source_id: str,
+        pressures_pa: Mapping[str, float],
+        *,
+        physical_zero_reason: str | None = None,
+    ) -> None:
+        pressure_by_species: dict[str, float] = {}
+        for species_id, pressure_pa in pressures_pa.items():
+            value = float(pressure_pa)
+            if not math.isfinite(value) or value < 0.0:
+                raise ValueError(
+                    "effective pressure must be finite and nonnegative: "
+                    f"{species_id!r}={pressure_pa!r}"
+                )
+            pressure_by_species[str(species_id)] = value
+        self.source_id = str(source_id)
+        self.species_ids = frozenset(pressure_by_species)
+        if pressure_by_species and physical_zero_reason is not None:
+            raise ValueError(
+                "non-empty effective-pressure source cannot prove physical zero"
+            )
+        self.physical_zero_reason = (
+            str(physical_zero_reason) if physical_zero_reason is not None else None
+        )
+        self._pressures_pa = MappingProxyType(pressure_by_species)
+
+    def pressure_pa(self, species_id: str) -> float | None:
+        """Return one effective Pa value without exposing a map to consumers."""
+
+        return self._pressures_pa.get(species_id)
 
 # Absolute + relative tolerance for per-species pressure comparison.
 _SHADOW_PA_ATOL = 1.0e-12
@@ -344,18 +437,23 @@ def _finite_live_map(
 def finite_live_pressure_species_ids(
     live_pressures_Pa: Mapping[str, float] | None,
 ) -> frozenset[str]:
-    """Canonical finite species set used by legacy activation and shadow."""
+    """Canonical finite species set used by pre-RG projections."""
 
-    live, _ = _finite_live_map(live_pressures_Pa)
-    return frozenset(live)
+    return frozenset(finite_live_pressure_map(live_pressures_Pa))
 
 
 def finite_live_pressure_map(
     live_pressures_Pa: Mapping[str, float] | None,
+    *,
+    read_context: str | None = None,
 ) -> dict[str, float]:
-    """Finite legacy projection used to seed pre-RG runtime selections."""
+    """Read a finite compatibility projection under an explicit purpose label."""
 
-    live, _ = _finite_live_map(live_pressures_Pa)
+    if read_context is None:
+        live, _ = _finite_live_map(live_pressures_Pa)
+        return live
+    with compatibility_pressure_read_context(read_context):
+        live, _ = _finite_live_map(live_pressures_Pa)
     return live
 
 
@@ -363,30 +461,45 @@ def _pressures_equal(a: float, b: float) -> bool:
     return math.isclose(a, b, rel_tol=_SHADOW_PA_RTOL, abs_tol=_SHADOW_PA_ATOL)
 
 
-def _channel_flux_pressure_pa(answer: VapourAnswer) -> tuple[float | None, str]:
-    """Branch on pressure/flux unions → debiting Pa or typed non-debit state.
+def _channel_flux_gate_state(answer: VapourAnswer) -> str:
+    """Return the catalog-owned eligibility/refusal state for one channel."""
 
-    Returns ``(pa_or_None, state)`` where ``pa`` is only set for inventory-
-    debiting HKL (PressureValue + FluxEligible). Upper bounds and refusals
-    never debit; ZeroByPhysics is an explicit zero.
-    """
-
-    pressure = answer.selected_runtime_pressure
+    pressure = answer.pressure
     flux = answer.flux
     if isinstance(pressure, PressureRefusal) or isinstance(flux, FluxRefusal):
-        return None, "refusal"
+        return "refusal"
     if isinstance(flux, FluxDiagnosticUpperBound) or isinstance(
         pressure, PressureUpperBound
     ):
-        return None, "upper_bound"
+        return "upper_bound"
     if isinstance(pressure, ZeroByPhysics):
-        return 0.0, "zero_by_physics"
+        return "zero_by_physics"
     if isinstance(pressure, PressureValue) and isinstance(flux, FluxEligible):
-        pa = float(pressure.pa)
-        if not math.isfinite(pa):
-            return None, "nonfinite_batch_pressure"
-        return pa, "eligible"
-    return None, "incomplete_channel"
+        return "eligible"
+    return "incomplete_channel"
+
+
+def _channel_flux_pressure_pa(
+    answer: VapourAnswer,
+    *,
+    effective_pressure_source: EffectivePressureSource,
+) -> tuple[float | None, str]:
+    """Apply channel authority, then read one value through the typed seam.
+
+    Returns ``(pa_or_None, state)`` where ``pa`` is only set for inventory-
+    debiting HKL (PressureValue + FluxEligible). Batch outcomes decide whether
+    the source may be read; the source never expands eligibility or membership.
+    """
+
+    state = _channel_flux_gate_state(answer)
+    if state == "zero_by_physics":
+        return 0.0, "zero_by_physics"
+    if state != "eligible":
+        return None, state
+    pa = effective_pressure_source.pressure_pa(answer.species_id)
+    if pa is None:
+        return None, "missing_effective_pressure"
+    return pa, "eligible"
 
 
 def compare_legacy_vs_batch_flux_paths(
@@ -546,15 +659,18 @@ def compare_legacy_vs_batch_flux_paths(
 def flux_pressures_from_batch(
     batch: VapourBatch | None,
     *,
+    effective_pressure_source: EffectivePressureSource,
     resolution_error: Mapping[str, Any] | None = None,
 ) -> tuple[dict[str, float], dict[str, Any]]:
-    """Build the flux-driving pressure map only from a complete VapourBatch.
+    """Build flux Pa after batch channel/set gates using one typed value seam.
 
     Active path: require batch, iterate ``requested_species_ids``, branch on
-    selected-runtime-pressure/flux unions. Refusal/upper-bound/zero are typed
-    non-debit states.
+    catalog pressure/flux unions, enforce the batch-active set, then read values
+    from ``effective_pressure_source``. Refusal/upper-bound/zero are typed
+    non-debit states. Before RG-1 the source is the equilibrium backend; the
+    batch remains channel/refusal/set authority.
     Absent batch or resolve error → empty flux map + typed failure report;
-    this consumer has no compatibility-map input or fallback.
+    this consumer accepts no anonymous compatibility mapping.
     """
 
     report: dict[str, Any] = {
@@ -563,8 +679,12 @@ def flux_pressures_from_batch(
         "n_flux_pressures": 0,
         "batch_channel_states": {},
         "note": (
-            "Active flux consumes each VapourAnswer selected runtime pressure. "
-            "Compatibility pressure maps are absent from this consumer."
+            "VapourBatch owns channel refusal, eligibility, and the active set; "
+            "effective values cross one typed source seam before RG-1."
+        ),
+        "effective_pressure_source": effective_pressure_source.source_id,
+        "effective_pressure_zero_reason": (
+            effective_pressure_source.physical_zero_reason
         ),
     }
 
@@ -577,7 +697,19 @@ def flux_pressures_from_batch(
         report["selection_source"] = "typed_failure_missing_batch"
         return {}, report
 
-    report["selection_source"] = "vapour_answer_selected_runtime_pressure"
+    source_species_ids = effective_pressure_source.species_ids
+    batch_active_species_ids = batch.flux_active_species_ids
+    missing_source_species = sorted(batch_active_species_ids - source_species_ids)
+    extra_source_species = sorted(source_species_ids - batch_active_species_ids)
+    report["missing_effective_pressure_species"] = missing_source_species
+    report["effective_pressure_species_not_batch_active"] = extra_source_species
+    if missing_source_species or extra_source_species:
+        report["selection_source"] = (
+            "typed_failure_effective_pressure_species_set_mismatch"
+        )
+        return {}, report
+
+    report["selection_source"] = effective_pressure_source.source_id
     flux_pressures: dict[str, float] = {}
     batch_pa_by_species: dict[str, float] = {}
     selected_runtime_pa_by_species: dict[str, float] = {}
@@ -590,24 +722,28 @@ def flux_pressures_from_batch(
             missing_channel_keys.append(species_id)
             channel_states[species_id] = "missing_channel"
             continue
-        selected_pa, state = _channel_flux_pressure_pa(answer)
-        channel_states[species_id] = state
         catalog_pressure = answer.pressure
         if isinstance(catalog_pressure, PressureValue):
             catalog_pa = float(catalog_pressure.pa)
             if math.isfinite(catalog_pa):
                 batch_pa_by_species[species_id] = catalog_pa
+        gate_state = _channel_flux_gate_state(answer)
+        if (
+            gate_state in {"eligible", "zero_by_physics"}
+            and species_id not in batch_active_species_ids
+        ):
+            channel_states[species_id] = "dormant_by_epoch"
+            continue
+        selected_pa, state = _channel_flux_pressure_pa(
+            answer,
+            effective_pressure_source=effective_pressure_source,
+        )
+        channel_states[species_id] = state
         if state == "eligible" and selected_pa is not None:
             selected_runtime_pa_by_species[species_id] = float(selected_pa)
-            if species_id not in batch.flux_active_species_ids:
-                channel_states[species_id] = "dormant_by_epoch"
-                continue
             flux_pressures[species_id] = float(selected_pa)
         elif state == "zero_by_physics":
             selected_runtime_pa_by_species[species_id] = 0.0
-            if species_id not in batch.flux_active_species_ids:
-                channel_states[species_id] = "dormant_by_epoch"
-                continue
             flux_pressures[species_id] = 0.0
         # refusal / upper_bound / nonfinite / dormant eligible: no debit
 
@@ -623,15 +759,45 @@ def flux_pressures_from_batch(
 def compare_live_shadow_to_batch_flux(
     *,
     batch: VapourBatch | None,
-    live_pressures_Pa: Mapping[str, float],
+    live_pressures_Pa: Mapping[str, float] | None,
     batch_flux_pressures_Pa: Mapping[str, float],
     resolution_error: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Compare an independently computed legacy map with batch-driven flux.
 
-    This is the only VR-11 surface that accepts the compatibility pressure map.
-    It never selects or returns flux-driving pressures.
+    This shadow surface accepts an independently captured compatibility map.
+    It never selects or returns flux-driving pressures; the distinct typed seam
+    supplies pre-RG values only after batch gating.
     """
+
+    if live_pressures_Pa is None:
+        shadow_outcome = (
+            SHADOW_RESOLUTION_ERROR
+            if resolution_error
+            else SHADOW_ABSENT_COMPARISON
+        )
+        return {
+            "shadow_equal": False,
+            "shadow_outcome": shadow_outcome,
+            "detail": (
+                dict(resolution_error)
+                if resolution_error
+                else "independent compatibility comparison evidence is absent"
+            ),
+            "mismatched_species": [],
+            "missing_in_batch_path": [],
+            "missing_in_legacy_path": [],
+            "n_live_pressures": 0,
+            "live_only_bridge_species": [],
+            "batch_refused_live_species": [],
+            "batch_flux_active_not_in_live": (
+                sorted(batch.flux_active_species_ids) if batch is not None else []
+            ),
+            "live_flux_active_not_in_batch": [],
+            "dropped_nonfinite_live_species": [],
+            "catalog_pa_shadow_equal": False,
+            "catalog_pa_shadow_outcome": shadow_outcome,
+        }
 
     live, dropped_nonfinite = _finite_live_map(live_pressures_Pa)
     refused_live: list[str] = []
@@ -704,7 +870,7 @@ def compare_live_shadow_to_batch_flux(
 
 
 # ---------------------------------------------------------------------------
-# Source guard: no flux consumer iterates compatibility pressure maps
+# Source guard: compatibility maps never reach a flux consumer as mappings
 # ---------------------------------------------------------------------------
 
 # Direct one-line banned forms (regex tripwire).
@@ -730,8 +896,8 @@ _FLUX_MAP_ITERATION_PATTERNS: tuple[re.Pattern[str], ...] = (
     ),
 )
 
-# Any controls.get of the compatibility key in a flux consumer kernel is banned
-# (the batch-consumer key is the sole flux pressure input).
+# Any controls.get of the compatibility key in a flux consumer kernel is banned;
+# the kernel reads only the already batch-gated effective-pressure key.
 _LEGACY_CONTROLS_GET_PATTERN = re.compile(
     r"controls\.get\(\s*[\"']vapor_pressures_Pa[\"']"
 )
@@ -867,72 +1033,6 @@ def _batch_flux_consumer_live_argument_hits(
     return hits
 
 
-def _selected_runtime_pressure_live_source_hits(
-    source_text: str,
-    *,
-    path: str,
-) -> list[str]:
-    """Reject live-pressure aliases copied into selected batch answers."""
-
-    try:
-        tree = ast.parse(source_text)
-    except SyntaxError:
-        return []
-
-    def identifiers(node: ast.AST) -> set[str]:
-        names = {
-            child.id
-            for child in ast.walk(node)
-            if isinstance(child, ast.Name)
-        }
-        names.update(
-            child.attr
-            for child in ast.walk(node)
-            if isinstance(child, ast.Attribute)
-        )
-        return names
-
-    tainted_aliases: set[str] = set()
-    assignments = [node for node in ast.walk(tree) if isinstance(node, ast.Assign)]
-    changed = True
-    while changed:
-        changed = False
-        for node in assignments:
-            value_names = identifiers(node.value)
-            live_pressure_source = any(
-                "live" in name.lower() and "pressure" in name.lower()
-                for name in value_names
-            ) or bool(value_names & tainted_aliases)
-            if not live_pressure_source:
-                continue
-            for target in node.targets:
-                if isinstance(target, ast.Name) and target.id not in tainted_aliases:
-                    tainted_aliases.add(target.id)
-                    changed = True
-
-    hits: list[str] = []
-    for node in ast.walk(tree):
-        if not isinstance(node, ast.Call):
-            continue
-        for keyword in node.keywords:
-            if keyword.arg not in {
-                "selected_runtime_pressure",
-                "selected_runtime_pressures_Pa",
-            }:
-                continue
-            value_names = identifiers(keyword.value)
-            direct_live_source = any(
-                "live" in name.lower() and "pressure" in name.lower()
-                for name in value_names
-            )
-            if direct_live_source or value_names & tainted_aliases:
-                hits.append(
-                    f"{path}:{node.lineno}: selected runtime pressure "
-                    "depends on a live compatibility-pressure source"
-                )
-    return hits
-
-
 def flux_consumer_compatibility_map_iterations(
     source_text: str,
     *,
@@ -961,14 +1061,13 @@ def flux_consumer_compatibility_map_iterations(
                 )
     hits.extend(_alias_then_iterate_hits(source_text, path=path))
     hits.extend(_batch_flux_consumer_live_argument_hits(source_text, path=path))
-    hits.extend(_selected_runtime_pressure_live_source_hits(source_text, path=path))
     return hits
 
 
 def assert_no_flux_consumer_iterates_compatibility_maps(
     sources: Mapping[str, str],
 ) -> None:
-    """Hard-fail when a flux consumer iterates a compatibility pressure map."""
+    """Hard-fail when a compatibility mapping bypasses the typed value seam."""
 
     all_hits: list[str] = []
     supplied_production_paths = set(sources) & set(FLUX_CONSUMER_RELPATHS)
@@ -987,6 +1086,8 @@ def assert_no_flux_consumer_iterates_compatibility_maps(
         joined = "\n".join(all_hits)
         raise AssertionError(
             "flux consumers must not iterate compatibility pressure maps "
+            "outside the "
+            "typed effective-pressure seam "
             f"(VR-11 / DESIGN-REV5 §7.4):\n{joined}"
         )
 

@@ -25,6 +25,7 @@ from simulator.vapour_rail.batch import (
 from simulator.vapour_rail.catalog import compile_vapour_rail_catalog
 from simulator.vapour_rail.instrumentation import (
     CONTROL_FLUX_PRESSURES_KEY,
+    EffectivePressureSource,
     flux_pressures_from_batch,
     serialize_vapour_answer,
 )
@@ -131,6 +132,7 @@ def test_evaporation_flux_diagnostic_traces_alpha_by_species():
     )
 
     result = BuiltinEvaporationFluxProvider().dispatch(request)
+    assert result.status == "ok"
     alpha_used = result.diagnostic["alpha_used_by_species"]
     uncertainty = result.diagnostic["flux_uncertainty_pct"]
 
@@ -273,7 +275,10 @@ def test_cro2_policy_only_alpha_is_refused_by_vapour_batch() -> None:
     assert "alpha" in answer.pressure.detail
     assert "CrO2" not in batch.flux_active_species_ids
     assert serialize_vapour_answer(answer)["is_refused"] is True
-    flux_pressures, _ = flux_pressures_from_batch(batch)
+    flux_pressures, _ = flux_pressures_from_batch(
+        batch,
+        effective_pressure_source=EffectivePressureSource("test", {}),
+    )
     assert "CrO2" not in flux_pressures
 
 

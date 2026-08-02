@@ -145,6 +145,84 @@ def _reaction_fixture() -> dict:
     }
 
 
+@pytest.mark.parametrize(
+    "availability",
+    [
+        {"status": "unavailable_pending_acquisition"},
+        "unknown_pending_state",
+    ],
+)
+def test_pressure_model_availability_is_a_fail_closed_scalar_enum(
+    availability,
+) -> None:
+    payload = _reaction_fixture()
+    model = payload["families"]["potassium_test_family"]["physical_properties"][
+        "species"
+    ]["K"]["pressure_models"][0]
+    model["availability"] = availability
+
+    with pytest.raises(CatalogCompileError, match="availability must be"):
+        compile_vapour_rail_catalog(payload)
+
+
+def test_pressure_model_availability_omitted_or_explicitly_unavailable() -> None:
+    available = compile_vapour_rail_catalog(_reaction_fixture())
+    assert available.species["K"].evaluator is not None
+
+    payload = _reaction_fixture()
+    model = payload["families"]["potassium_test_family"]["physical_properties"][
+        "species"
+    ]["K"]["pressure_models"][0]
+    model["availability"] = "unavailable_pending_acquisition"
+    unavailable = compile_vapour_rail_catalog(payload)
+    assert unavailable.species["K"].evaluator is None
+
+
+def test_policy_identity_cannot_compile_as_executable_alpha() -> None:
+    payload = _reaction_fixture()
+    alpha = payload["families"]["potassium_test_family"][
+        "vaporisation_coefficients"
+    ]["evaporation_alpha"]
+    alpha["value"] = {"type": "policy", "status": "no_data"}
+
+    with pytest.raises(CatalogCompileError, match="correlation form"):
+        compile_vapour_rail_catalog(payload)
+
+
+@pytest.mark.parametrize(
+    ("field", "hostile_value"),
+    [
+        ("A", True),
+        ("B", False),
+        ("valid_range_K", [True, 2000.0]),
+        ("valid_range_K", [300.0, False]),
+        ("uncertainty_envelope", [True, 1.0]),
+        ("uncertainty_envelope", [0.0, False]),
+    ],
+)
+def test_arrhenius_alpha_rejects_nested_boolean_values(
+    field,
+    hostile_value,
+) -> None:
+    payload = _reaction_fixture()
+    alpha = payload["families"]["potassium_test_family"][
+        "vaporisation_coefficients"
+    ]["evaporation_alpha"]
+    alpha["value"] = {
+        "form": "arrhenius",
+        "A": 0.5,
+        "B": 1000.0,
+        "valid_range_K": [300.0, 2000.0],
+        "uncertainty_envelope": [0.1, 0.9],
+        "cite": "hostile type regression",
+        "status": "CITED",
+    }
+    alpha["value"][field] = hostile_value
+
+    with pytest.raises(CatalogCompileError, match="not boolean"):
+        compile_vapour_rail_catalog(payload)
+
+
 def test_production_schema_compiles_exact_four_strata_and_legacy_projection() -> None:
     payload = _yaml("vapor_pressures.yaml")
     assert payload["schema_version"] == 2

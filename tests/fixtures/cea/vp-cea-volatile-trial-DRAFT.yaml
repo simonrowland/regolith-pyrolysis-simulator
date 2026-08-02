@@ -11,10 +11,16 @@ conventions:
   evaluator_families:
   - nasa_cea_7
   - nasa_cea_9
+  reference_pressure_Pa_gas: 100000.0
+  reference_pressure_Pa_condensed: 101325.0
   reference_pressure_Pa: 100000.0
-  reference_pressure_note: CEA/JANAF standard-state pressure P° = 1 bar = 1e5 Pa
+  reference_pressure_note: 'NASA/TP-2002-211556 mixed standard states: ideal gases at 1 bar (1e5 Pa);
+    pure condensed (cr/L) reference substances at 1 atm (101325 Pa). Per-record thermo_record.reference_pressure_convention
+    is authoritative; do not rewrite condensed rows as 1 bar.'
   runtime_policy: Evaluate preserved source polynomials over declared segments. Never refit spreadsheet
-    rows at runtime. Segment gap/overlap and missing standard-state convention fail loudly.
+    rows at runtime. Segment gap/overlap and missing standard-state convention fail loudly. pure_component_psat_from_delta_g
+    requires an explicit gas-minus-condensed source_reactions bundle; unpaired condensed rows are condensed_standard_state_thermo
+    only.
   citations:
   - McBride, Zehe, Gordon, NASA TP-2002-211556
   - NASA CEA thermo.inp (Glenn coefficients)
@@ -513,7 +519,15 @@ families:
               before enablement.
         H2O_cr:
           formula: H2O
-          source_reactions: []
+          source_reactions:
+          - kind: gas_minus_condensed_delta_g
+            reaction: H2O(cr) = H2O
+            condensed_cea_name: H2O(cr)
+            gas_cea_name: H2O
+            gas_standard_pressure_Pa: 100000.0
+            condensed_standard_pressure_Pa: 101325.0
+            note: Executable pure-component P_sat/P° only via gas-minus-condensed ΔG with both records
+              present; gas P° = 1 bar, condensed reference = 1 atm (NASA/TP-2002-211556).
           pressure_models:
           - evaluator_family: nasa_cea_9
             pressure_kind: pure_component_psat_from_delta_g
@@ -535,10 +549,10 @@ families:
               - '1.00'
               molecular_weight_g_per_mol: 18.01528
               delta_f_H_298_15_J_per_mol: -299108.0
-              source_ref_code: g11
+              source_ref_code: g11/99
               citation: Ice. Gordon,1982.
-              reference_pressure_Pa: 100000.0
-              reference_pressure_convention: CEA_JANAF_1_bar
+              reference_pressure_Pa: 101325.0
+              reference_pressure_convention: CEA_condensed_1_atm
               segments:
               - T_min_K: 200.0
                 T_max_K: 273.15
@@ -566,7 +580,7 @@ families:
               - 273.15
             provenance:
             - source: NASA_CEA_thermo.inp
-              ref_code: g11
+              ref_code: g11/99
               citation: Ice. Gordon,1982.
               locator: tests/fixtures/cea/thermo_subset.inp
               note: Source coefficients preserved; runtime evaluates polynomials directly — no spreadsheet
@@ -583,7 +597,15 @@ families:
               before enablement.
         H2O_L:
           formula: H2O
-          source_reactions: []
+          source_reactions:
+          - kind: gas_minus_condensed_delta_g
+            reaction: H2O(L) = H2O
+            condensed_cea_name: H2O(L)
+            gas_cea_name: H2O
+            gas_standard_pressure_Pa: 100000.0
+            condensed_standard_pressure_Pa: 101325.0
+            note: Executable pure-component P_sat/P° only via gas-minus-condensed ΔG with both records
+              present; gas P° = 1 bar, condensed reference = 1 atm (NASA/TP-2002-211556).
           pressure_models:
           - evaluator_family: nasa_cea_9
             pressure_kind: pure_component_psat_from_delta_g
@@ -607,8 +629,8 @@ families:
               delta_f_H_298_15_J_per_mol: -285830.0
               source_ref_code: g 8/01
               citation: Liquid. Cox,1989. Haar,1984. Keenan,1984. Stimson,1969.
-              reference_pressure_Pa: 100000.0
-              reference_pressure_convention: CEA_JANAF_1_bar
+              reference_pressure_Pa: 101325.0
+              reference_pressure_convention: CEA_condensed_1_atm
               segments:
               - T_min_K: 273.15
                 T_max_K: 373.15

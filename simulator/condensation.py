@@ -69,6 +69,7 @@ from typing import Any, Dict
 
 import yaml
 
+from simulator.alpha_kinetics import AlphaSpecError, parse_alpha_value
 from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     canonical_backend_name,
@@ -1092,6 +1093,16 @@ def _alpha_s_evaluation(
         raise ValueError(f'alpha_s({species}): T_K must be numeric') from exc
     if not math.isfinite(T_K) or T_K <= 0.0:
         raise ValueError(f'alpha_s({species}): T_K must be finite and > 0')
+
+    try:
+        spec = parse_alpha_value(spec)
+    except AlphaSpecError as exc:
+        detail = str(exc)
+        if detail == 'arrhenius A and B must be finite and positive':
+            detail = 'arrhenius A/B must be finite and > 0'
+        else:
+            detail = f'malformed coefficient spec: {detail}'
+        raise ValueError(f'alpha_s({species}): {detail}') from exc
 
     if isinstance(spec, Mapping):
         form = spec.get('form')

@@ -35,6 +35,9 @@ VOLATILE_DRAFT = (
 )
 INGEST_PATH = ROOT / "tools" / "vp_cea_ingest.py"
 DRAFT_FIXTURE = ROOT / "tests" / "fixtures" / "cea" / "vp-cea-rows-DRAFT.yaml"
+VOLATILE_DRAFT_FIXTURE = (
+    ROOT / "tests" / "fixtures" / "cea" / "vp-cea-volatile-trial-DRAFT.yaml"
+)
 
 
 def _load_ingest():
@@ -191,6 +194,40 @@ def test_glued_slash_year_source_ref_preserved(ingest_mod) -> None:
     ].source_ref_code.startswith("g")
 
 
+@pytest.mark.parametrize(
+    ("header", "source_ref", "formula"),
+    [
+        (
+            " 2 srd 01 C   1.00H   4.00O   2.00    0.00    0.00 "
+            "0   48.0412600    -139000.000",
+            "srd 01",
+            "CH4O2",
+        ),
+        (
+            " 2 srd 93 BA  1.00    0.00    0.00    0.00    0.00 "
+            "1  137.3270000          0.000",
+            "srd 93",
+            "Ba",
+        ),
+        (
+            " 1 bar 89 W   1.00C   1.00    0.00    0.00    0.00 "
+            "1  195.8507000     -40540.000",
+            "bar 89",
+            "WC",
+        ),
+    ],
+)
+def test_word_plus_year_source_refs_preserve_formula_atoms(
+    ingest_mod,
+    header,
+    source_ref,
+    formula,
+) -> None:
+    parsed = ingest_mod._parse_header_line(header)
+    assert parsed["source_ref_code"] == source_ref
+    assert ingest_mod._formula_from_tokens(parsed["formula_tokens"]) == formula
+
+
 def test_same_name_records_merge_without_interval_loss(ingest_mod) -> None:
     """Duplicate CEA names (e.g. Fe2O3 Curie pair) must keep all intervals."""
     # Synthetic adjacent same-name condensed branches.
@@ -297,6 +334,38 @@ def test_checked_in_draft_fixture_is_disabled() -> None:
     assert doc.get("enabled_for_merge") is False
     assert doc.get("enabled_for_production_yaml") is False
     assert doc.get("status") == "literature_draft_not_runtime_authority"
+
+
+@pytest.mark.parametrize("fixture", [DRAFT_FIXTURE, VOLATILE_DRAFT_FIXTURE])
+def test_checked_in_draft_fixtures_match_repaired_condensed_semantics(fixture) -> None:
+    doc = yaml.safe_load(fixture.read_text())
+    species_rows = [
+        row
+        for family in doc["families"].values()
+        for row in family["physical_properties"]["species"].values()
+    ]
+    gas_formulas = {
+        row["formula"]
+        for row in species_rows
+        if row["pressure_models"][0]["thermo_record"]["standard_state"] == "gas"
+    }
+    h2o_cr = None
+    for row in species_rows:
+        model = row["pressure_models"][0]
+        thermo = model["thermo_record"]
+        if not str(thermo["standard_state"]).startswith("condensed"):
+            continue
+        assert thermo["reference_pressure_Pa"] == pytest.approx(101325.0)
+        assert thermo["reference_pressure_convention"] == "CEA_condensed_1_atm"
+        if row["formula"] in gas_formulas:
+            assert model["pressure_kind"] == "pure_component_psat_from_delta_g"
+            assert row["source_reactions"]
+        if row["formula"] == "H2O" and thermo["standard_state"] == "condensed_solid":
+            h2o_cr = row
+    assert h2o_cr is not None
+    assert h2o_cr["pressure_models"][0]["thermo_record"]["source_ref_code"] == (
+        "g11/99"
+    )
 
 
 def test_no_runtime_spreadsheet_refit_in_evaluator_or_ingest() -> None:

@@ -1,7 +1,7 @@
 {
-  "schema_version": "1.8.0",
+  "schema_version": "1.9.0",
   "run_metadata": {
-    "schema_version": "1.8.0",
+    "schema_version": "1.9.0",
     "feedstock_id": "mars_basalt",
     "campaign": "C2A",
     "hours_requested": 12,
@@ -3289,8 +3289,12 @@
         "SiO": "dormant_by_epoch",
         "Ti": "dormant_by_epoch"
       },
-      "note": "Active flux consumes each VapourAnswer selected runtime pressure. Compatibility pressure maps are absent from this consumer.",
-      "selection_source": "vapour_answer_selected_runtime_pressure",
+      "note": "VapourBatch owns channel refusal, eligibility, and the active set; effective values cross one typed source seam before RG-1.",
+      "effective_pressure_source": "equilibrium_backend_effective_pressure_pre_rg",
+      "effective_pressure_zero_reason": "pre_rg_backend_below_effective_pressure_threshold",
+      "missing_effective_pressure_species": [],
+      "effective_pressure_species_not_batch_active": [],
+      "selection_source": "equilibrium_backend_effective_pressure_pre_rg",
       "batch_pa_by_species": {
         "Al": 2.3971258846535062e-21,
         "Ca": 2.4281904872929577e-05,
@@ -3302,17 +3306,7 @@
         "SiO": 1.1770639926385342e-36,
         "Ti": 1.5355570910590422e-14
       },
-      "selected_runtime_pa_by_species": {
-        "Al": 2.3971258846535062e-21,
-        "Ca": 2.4281904872929577e-05,
-        "Fe": 1.255241901490806e-06,
-        "K": 1.6052362448329672e-06,
-        "Mg": 3.993700677724865e-06,
-        "Na": 0.0075539767666123366,
-        "Si": 1.1663628054065351e-15,
-        "SiO": 1.1770639926385342e-36,
-        "Ti": 1.5355570910590422e-14
-      },
+      "selected_runtime_pa_by_species": {},
       "missing_batch_keys": [],
       "shadow_equal": true,
       "shadow_outcome": "proved",
@@ -3779,8 +3773,12 @@
           "SiO": "dormant_by_epoch",
           "Ti": "dormant_by_epoch"
         },
-        "note": "Active flux consumes each VapourAnswer selected runtime pressure. Compatibility pressure maps are absent from this consumer.",
-        "selection_source": "vapour_answer_selected_runtime_pressure",
+        "note": "VapourBatch owns channel refusal, eligibility, and the active set; effective values cross one typed source seam before RG-1.",
+        "effective_pressure_source": "equilibrium_backend_effective_pressure_pre_rg",
+        "effective_pressure_zero_reason": "pre_rg_backend_below_effective_pressure_threshold",
+        "missing_effective_pressure_species": [],
+        "effective_pressure_species_not_batch_active": [],
+        "selection_source": "equilibrium_backend_effective_pressure_pre_rg",
         "batch_pa_by_species": {
           "Al": 2.821714268803765e-26,
           "Ca": 3.09143210893941e-07,
@@ -3792,21 +3790,11 @@
           "SiO": 7.516361046411705e-42,
           "Ti": 4.595130032785834e-16
         },
-        "selected_runtime_pa_by_species": {
-          "Al": 2.821714268803765e-26,
-          "Ca": 3.09143210893941e-07,
-          "Fe": 1.2503954242526154e-07,
-          "K": 6.15465898343653e-11,
-          "Mg": 4.112799254177845e-10,
-          "Na": 0.002512196687353213,
-          "Si": 1.5469026335272294e-17,
-          "SiO": 7.516361046411705e-42,
-          "Ti": 4.595130032785834e-16
-        },
+        "selected_runtime_pa_by_species": {},
         "missing_batch_keys": [],
-        "shadow_equal": true,
-        "shadow_outcome": "proved",
-        "detail": "both paths empty",
+        "shadow_equal": false,
+        "shadow_outcome": "absent_comparison",
+        "detail": "independent compatibility comparison evidence is absent",
         "mismatched_species": [],
         "missing_in_batch_path": [],
         "missing_in_legacy_path": [],
@@ -3816,8 +3804,8 @@
         "batch_flux_active_not_in_live": [],
         "live_flux_active_not_in_batch": [],
         "dropped_nonfinite_live_species": [],
-        "catalog_pa_shadow_equal": true,
-        "catalog_pa_shadow_outcome": "proved"
+        "catalog_pa_shadow_equal": false,
+        "catalog_pa_shadow_outcome": "absent_comparison"
       }
     },
     {
@@ -4043,8 +4031,12 @@
           "SiO": "dormant_by_epoch",
           "Ti": "dormant_by_epoch"
         },
-        "note": "Active flux consumes each VapourAnswer selected runtime pressure. Compatibility pressure maps are absent from this consumer.",
-        "selection_source": "vapour_answer_selected_runtime_pressure",
+        "note": "VapourBatch owns channel refusal, eligibility, and the active set; effective values cross one typed source seam before RG-1.",
+        "effective_pressure_source": "equilibrium_backend_effective_pressure_pre_rg",
+        "effective_pressure_zero_reason": "pre_rg_backend_below_effective_pressure_threshold",
+        "missing_effective_pressure_species": [],
+        "effective_pressure_species_not_batch_active": [],
+        "selection_source": "equilibrium_backend_effective_pressure_pre_rg",
         "batch_pa_by_species": {
           "Al": 7.918084054372345e-26,
           "Ca": 4.5966731722883923e-07,
@@ -4056,21 +4048,11 @@
           "SiO": 2.2297773081790967e-41,
           "Ti": 6.321794375619289e-16
         },
-        "selected_runtime_pa_by_species": {
-          "Al": 7.918084054372345e-26,
-          "Ca": 4.5966731722883923e-07,
-          "Fe": 1.542088145700654e-07,
-          "K": 9.685979301672514e-11,
-          "Mg": 9.475752176629324e-10,
-          "Na": 0.0027766380803972116,
-          "Si": 2.2915695401397355e-17,
-          "SiO": 2.2297773081790967e-41,
-          "Ti": 6.321794375619289e-16
-        },
+        "selected_runtime_pa_by_species": {},
         "missing_batch_keys": [],
-        "shadow_equal": true,
-        "shadow_outcome": "proved",
-        "detail": "both paths empty",
+        "shadow_equal": false,
+        "shadow_outcome": "absent_comparison",
+        "detail": "independent compatibility comparison evidence is absent",
         "mismatched_species": [],
         "missing_in_batch_path": [],
         "missing_in_legacy_path": [],
@@ -4080,8 +4062,8 @@
         "batch_flux_active_not_in_live": [],
         "live_flux_active_not_in_batch": [],
         "dropped_nonfinite_live_species": [],
-        "catalog_pa_shadow_equal": true,
-        "catalog_pa_shadow_outcome": "proved"
+        "catalog_pa_shadow_equal": false,
+        "catalog_pa_shadow_outcome": "absent_comparison"
       }
     },
     {
@@ -4307,8 +4289,12 @@
           "SiO": "dormant_by_epoch",
           "Ti": "dormant_by_epoch"
         },
-        "note": "Active flux consumes each VapourAnswer selected runtime pressure. Compatibility pressure maps are absent from this consumer.",
-        "selection_source": "vapour_answer_selected_runtime_pressure",
+        "note": "VapourBatch owns channel refusal, eligibility, and the active set; effective values cross one typed source seam before RG-1.",
+        "effective_pressure_source": "equilibrium_backend_effective_pressure_pre_rg",
+        "effective_pressure_zero_reason": "pre_rg_backend_below_effective_pressure_threshold",
+        "missing_effective_pressure_species": [],
+        "effective_pressure_species_not_batch_active": [],
+        "selection_source": "equilibrium_backend_effective_pressure_pre_rg",
         "batch_pa_by_species": {
           "Al": 2.221913670893577e-25,
           "Ca": 6.834827196022358e-07,
@@ -4320,21 +4306,11 @@
           "SiO": 6.614779164239318e-41,
           "Ti": 8.697269466253388e-16
         },
-        "selected_runtime_pa_by_species": {
-          "Al": 2.221913670893577e-25,
-          "Ca": 6.834827196022358e-07,
-          "Fe": 1.9018270564544632e-07,
-          "K": 1.5243443265486044e-10,
-          "Mg": 2.1831816668826087e-09,
-          "Na": 0.0030689153712859436,
-          "Si": 3.3947133086988836e-17,
-          "SiO": 6.614779164239318e-41,
-          "Ti": 8.697269466253388e-16
-        },
+        "selected_runtime_pa_by_species": {},
         "missing_batch_keys": [],
-        "shadow_equal": true,
-        "shadow_outcome": "proved",
-        "detail": "both paths empty",
+        "shadow_equal": false,
+        "shadow_outcome": "absent_comparison",
+        "detail": "independent compatibility comparison evidence is absent",
         "mismatched_species": [],
         "missing_in_batch_path": [],
         "missing_in_legacy_path": [],
@@ -4344,8 +4320,8 @@
         "batch_flux_active_not_in_live": [],
         "live_flux_active_not_in_batch": [],
         "dropped_nonfinite_live_species": [],
-        "catalog_pa_shadow_equal": true,
-        "catalog_pa_shadow_outcome": "proved"
+        "catalog_pa_shadow_equal": false,
+        "catalog_pa_shadow_outcome": "absent_comparison"
       }
     },
     {
@@ -4571,8 +4547,12 @@
           "SiO": "dormant_by_epoch",
           "Ti": "dormant_by_epoch"
         },
-        "note": "Active flux consumes each VapourAnswer selected runtime pressure. Compatibility pressure maps are absent from this consumer.",
-        "selection_source": "vapour_answer_selected_runtime_pressure",
+        "note": "VapourBatch owns channel refusal, eligibility, and the active set; effective values cross one typed source seam before RG-1.",
+        "effective_pressure_source": "equilibrium_backend_effective_pressure_pre_rg",
+        "effective_pressure_zero_reason": "pre_rg_backend_below_effective_pressure_threshold",
+        "missing_effective_pressure_species": [],
+        "effective_pressure_species_not_batch_active": [],
+        "selection_source": "equilibrium_backend_effective_pressure_pre_rg",
         "batch_pa_by_species": {
           "Al": 6.234968367350974e-25,
           "Ca": 1.0162754898719646e-06,
@@ -4584,21 +4564,11 @@
           "SiO": 1.962317188858108e-40,
           "Ti": 1.1965352188667615e-15
         },
-        "selected_runtime_pa_by_species": {
-          "Al": 6.234968367350974e-25,
-          "Ca": 1.0162754898719646e-06,
-          "Fe": 2.3454859975068895e-07,
-          "K": 2.3989578683899203e-10,
-          "Mg": 5.029977675405763e-09,
-          "Na": 0.003391958650501475,
-          "Si": 5.0289019147787275e-17,
-          "SiO": 1.962317188858108e-40,
-          "Ti": 1.1965352188667615e-15
-        },
+        "selected_runtime_pa_by_species": {},
         "missing_batch_keys": [],
-        "shadow_equal": true,
-        "shadow_outcome": "proved",
-        "detail": "both paths empty",
+        "shadow_equal": false,
+        "shadow_outcome": "absent_comparison",
+        "detail": "independent compatibility comparison evidence is absent",
         "mismatched_species": [],
         "missing_in_batch_path": [],
         "missing_in_legacy_path": [],
@@ -4608,8 +4578,8 @@
         "batch_flux_active_not_in_live": [],
         "live_flux_active_not_in_batch": [],
         "dropped_nonfinite_live_species": [],
-        "catalog_pa_shadow_equal": true,
-        "catalog_pa_shadow_outcome": "proved"
+        "catalog_pa_shadow_equal": false,
+        "catalog_pa_shadow_outcome": "absent_comparison"
       }
     },
     {
@@ -4835,8 +4805,12 @@
           "SiO": "dormant_by_epoch",
           "Ti": "dormant_by_epoch"
         },
-        "note": "Active flux consumes each VapourAnswer selected runtime pressure. Compatibility pressure maps are absent from this consumer.",
-        "selection_source": "vapour_answer_selected_runtime_pressure",
+        "note": "VapourBatch owns channel refusal, eligibility, and the active set; effective values cross one typed source seam before RG-1.",
+        "effective_pressure_source": "equilibrium_backend_effective_pressure_pre_rg",
+        "effective_pressure_zero_reason": "pre_rg_backend_below_effective_pressure_threshold",
+        "missing_effective_pressure_species": [],
+        "effective_pressure_species_not_batch_active": [],
+        "selection_source": "equilibrium_backend_effective_pressure_pre_rg",
         "batch_pa_by_species": {
           "Al": 1.74961030444682e-24,
           "Ca": 1.5111075111241465e-06,
@@ -4848,21 +4822,11 @@
           "SiO": 5.821341354077812e-40,
           "Ti": 1.6461448452801307e-15
         },
-        "selected_runtime_pa_by_species": {
-          "Al": 1.74961030444682e-24,
-          "Ca": 1.5111075111241465e-06,
-          "Fe": 2.8926418655316003e-07,
-          "K": 3.775392969999295e-10,
-          "Mg": 1.1588900639316747e-08,
-          "Na": 0.003749006438678949,
-          "Si": 7.449776216347992e-17,
-          "SiO": 5.821341354077812e-40,
-          "Ti": 1.6461448452801307e-15
-        },
+        "selected_runtime_pa_by_species": {},
         "missing_batch_keys": [],
-        "shadow_equal": true,
-        "shadow_outcome": "proved",
-        "detail": "both paths empty",
+        "shadow_equal": false,
+        "shadow_outcome": "absent_comparison",
+        "detail": "independent compatibility comparison evidence is absent",
         "mismatched_species": [],
         "missing_in_batch_path": [],
         "missing_in_legacy_path": [],
@@ -4872,8 +4836,8 @@
         "batch_flux_active_not_in_live": [],
         "live_flux_active_not_in_batch": [],
         "dropped_nonfinite_live_species": [],
-        "catalog_pa_shadow_equal": true,
-        "catalog_pa_shadow_outcome": "proved"
+        "catalog_pa_shadow_equal": false,
+        "catalog_pa_shadow_outcome": "absent_comparison"
       }
     },
     {
@@ -5099,8 +5063,12 @@
           "SiO": "dormant_by_epoch",
           "Ti": "dormant_by_epoch"
         },
-        "note": "Active flux consumes each VapourAnswer selected runtime pressure. Compatibility pressure maps are absent from this consumer.",
-        "selection_source": "vapour_answer_selected_runtime_pressure",
+        "note": "VapourBatch owns channel refusal, eligibility, and the active set; effective values cross one typed source seam before RG-1.",
+        "effective_pressure_source": "equilibrium_backend_effective_pressure_pre_rg",
+        "effective_pressure_zero_reason": "pre_rg_backend_below_effective_pressure_threshold",
+        "missing_effective_pressure_species": [],
+        "effective_pressure_species_not_batch_active": [],
+        "selection_source": "equilibrium_backend_effective_pressure_pre_rg",
         "batch_pa_by_species": {
           "Al": 4.9096258987551486e-24,
           "Ca": 2.2468768881393493e-06,
@@ -5112,21 +5080,11 @@
           "SiO": 1.7269387106789492e-39,
           "Ti": 2.2646996167892075e-15
         },
-        "selected_runtime_pa_by_species": {
-          "Al": 4.9096258987551486e-24,
-          "Ca": 2.2468768881393493e-06,
-          "Fe": 3.567438463124524e-07,
-          "K": 5.941576659487751e-10,
-          "Mg": 2.6700440179810945e-08,
-          "Na": 0.004143638152893841,
-          "Si": 1.1036040593785744e-16,
-          "SiO": 1.7269387106789492e-39,
-          "Ti": 2.2646996167892075e-15
-        },
+        "selected_runtime_pa_by_species": {},
         "missing_batch_keys": [],
-        "shadow_equal": true,
-        "shadow_outcome": "proved",
-        "detail": "both paths empty",
+        "shadow_equal": false,
+        "shadow_outcome": "absent_comparison",
+        "detail": "independent compatibility comparison evidence is absent",
         "mismatched_species": [],
         "missing_in_batch_path": [],
         "missing_in_legacy_path": [],
@@ -5136,8 +5094,8 @@
         "batch_flux_active_not_in_live": [],
         "live_flux_active_not_in_batch": [],
         "dropped_nonfinite_live_species": [],
-        "catalog_pa_shadow_equal": true,
-        "catalog_pa_shadow_outcome": "proved"
+        "catalog_pa_shadow_equal": false,
+        "catalog_pa_shadow_outcome": "absent_comparison"
       }
     },
     {
@@ -5363,8 +5321,12 @@
           "SiO": "dormant_by_epoch",
           "Ti": "dormant_by_epoch"
         },
-        "note": "Active flux consumes each VapourAnswer selected runtime pressure. Compatibility pressure maps are absent from this consumer.",
-        "selection_source": "vapour_answer_selected_runtime_pressure",
+        "note": "VapourBatch owns channel refusal, eligibility, and the active set; effective values cross one typed source seam before RG-1.",
+        "effective_pressure_source": "equilibrium_backend_effective_pressure_pre_rg",
+        "effective_pressure_zero_reason": "pre_rg_backend_below_effective_pressure_threshold",
+        "missing_effective_pressure_species": [],
+        "effective_pressure_species_not_batch_active": [],
+        "selection_source": "equilibrium_backend_effective_pressure_pre_rg",
         "batch_pa_by_species": {
           "Al": 1.3777025892259174e-23,
           "Ca": 3.3408977940286377e-06,
@@ -5376,17 +5338,7 @@
           "SiO": 5.123075815425734e-39,
           "Ti": 3.115682297940438e-15
         },
-        "selected_runtime_pa_by_species": {
-          "Al": 1.3777025892259174e-23,
-          "Ca": 3.3408977940286377e-06,
-          "Fe": 4.399651868359259e-07,
-          "K": 1.6628047134632027e-07,
-          "Mg": 6.151692278532582e-08,
-          "Na": 0.004579809990448467,
-          "Si": 1.6348704773227589e-16,
-          "SiO": 5.123075815425734e-39,
-          "Ti": 3.115682297940438e-15
-        },
+        "selected_runtime_pa_by_species": {},
         "missing_batch_keys": [],
         "shadow_equal": true,
         "shadow_outcome": "proved",
@@ -5627,8 +5579,12 @@
           "SiO": "dormant_by_epoch",
           "Ti": "dormant_by_epoch"
         },
-        "note": "Active flux consumes each VapourAnswer selected runtime pressure. Compatibility pressure maps are absent from this consumer.",
-        "selection_source": "vapour_answer_selected_runtime_pressure",
+        "note": "VapourBatch owns channel refusal, eligibility, and the active set; effective values cross one typed source seam before RG-1.",
+        "effective_pressure_source": "equilibrium_backend_effective_pressure_pre_rg",
+        "effective_pressure_zero_reason": "pre_rg_backend_below_effective_pressure_threshold",
+        "missing_effective_pressure_species": [],
+        "effective_pressure_species_not_batch_active": [],
+        "selection_source": "equilibrium_backend_effective_pressure_pre_rg",
         "batch_pa_by_species": {
           "Al": 3.866006216158053e-23,
           "Ca": 4.967605536851819e-06,
@@ -5640,17 +5596,7 @@
           "SiO": 1.5197937047969862e-38,
           "Ti": 4.286429913147708e-15
         },
-        "selected_runtime_pa_by_species": {
-          "Al": 3.866006216158053e-23,
-          "Ca": 4.967605536851819e-06,
-          "Fe": 5.426004334158431e-07,
-          "K": 2.6168618083751497e-07,
-          "Mg": 1.4173293636698893e-07,
-          "Na": 0.005061894589893974,
-          "Si": 2.4218844203296765e-16,
-          "SiO": 1.5197937047969862e-38,
-          "Ti": 4.286429913147708e-15
-        },
+        "selected_runtime_pa_by_species": {},
         "missing_batch_keys": [],
         "shadow_equal": true,
         "shadow_outcome": "proved",
@@ -5891,8 +5837,12 @@
           "SiO": "dormant_by_epoch",
           "Ti": "dormant_by_epoch"
         },
-        "note": "Active flux consumes each VapourAnswer selected runtime pressure. Compatibility pressure maps are absent from this consumer.",
-        "selection_source": "vapour_answer_selected_runtime_pressure",
+        "note": "VapourBatch owns channel refusal, eligibility, and the active set; effective values cross one typed source seam before RG-1.",
+        "effective_pressure_source": "equilibrium_backend_effective_pressure_pre_rg",
+        "effective_pressure_zero_reason": "pre_rg_backend_below_effective_pressure_threshold",
+        "missing_effective_pressure_species": [],
+        "effective_pressure_species_not_batch_active": [],
+        "selection_source": "equilibrium_backend_effective_pressure_pre_rg",
         "batch_pa_by_species": {
           "Al": 1.0848498202917902e-22,
           "Ca": 7.386369260941666e-06,
@@ -5904,17 +5854,7 @@
           "SiO": 4.508566705543725e-38,
           "Ti": 5.897097214460136e-15
         },
-        "selected_runtime_pa_by_species": {
-          "Al": 1.0848498202917902e-22,
-          "Ca": 7.386369260941666e-06,
-          "Fe": 6.691784694611658e-07,
-          "K": 4.118322295268157e-07,
-          "Mg": 3.265479536632609e-07,
-          "Na": 0.005594724866891001,
-          "Si": 3.5877607595195637e-16,
-          "SiO": 4.508566705543725e-38,
-          "Ti": 5.897097214460136e-15
-        },
+        "selected_runtime_pa_by_species": {},
         "missing_batch_keys": [],
         "shadow_equal": true,
         "shadow_outcome": "proved",
@@ -6155,8 +6095,12 @@
           "SiO": "dormant_by_epoch",
           "Ti": "dormant_by_epoch"
         },
-        "note": "Active flux consumes each VapourAnswer selected runtime pressure. Compatibility pressure maps are absent from this consumer.",
-        "selection_source": "vapour_answer_selected_runtime_pressure",
+        "note": "VapourBatch owns channel refusal, eligibility, and the active set; effective values cross one typed source seam before RG-1.",
+        "effective_pressure_source": "equilibrium_backend_effective_pressure_pre_rg",
+        "effective_pressure_zero_reason": "pre_rg_backend_below_effective_pressure_threshold",
+        "missing_effective_pressure_species": [],
+        "effective_pressure_species_not_batch_active": [],
+        "selection_source": "equilibrium_backend_effective_pressure_pre_rg",
         "batch_pa_by_species": {
           "Al": 3.044224625579353e-22,
           "Ca": 1.0982846857353248e-05,
@@ -6168,17 +6112,7 @@
           "SiO": 1.3374955873404782e-37,
           "Ti": 8.112988258626771e-15
         },
-        "selected_runtime_pa_by_species": {
-          "Al": 3.044224625579353e-22,
-          "Ca": 1.0982846857353248e-05,
-          "Fe": 8.252846780297311e-07,
-          "K": 6.481266405975712e-07,
-          "Mg": 7.523555835007649e-07,
-          "Na": 0.006183642464365138,
-          "Si": 5.314880908229388e-16,
-          "SiO": 1.3374955873404782e-37,
-          "Ti": 8.112988258626771e-15
-        },
+        "selected_runtime_pa_by_species": {},
         "missing_batch_keys": [],
         "shadow_equal": true,
         "shadow_outcome": "proved",
@@ -6419,8 +6353,12 @@
           "SiO": "dormant_by_epoch",
           "Ti": "dormant_by_epoch"
         },
-        "note": "Active flux consumes each VapourAnswer selected runtime pressure. Compatibility pressure maps are absent from this consumer.",
-        "selection_source": "vapour_answer_selected_runtime_pressure",
+        "note": "VapourBatch owns channel refusal, eligibility, and the active set; effective values cross one typed source seam before RG-1.",
+        "effective_pressure_source": "equilibrium_backend_effective_pressure_pre_rg",
+        "effective_pressure_zero_reason": "pre_rg_backend_below_effective_pressure_threshold",
+        "missing_effective_pressure_species": [],
+        "effective_pressure_species_not_batch_active": [],
+        "selection_source": "equilibrium_backend_effective_pressure_pre_rg",
         "batch_pa_by_species": {
           "Al": 8.542476016165274e-22,
           "Ca": 1.6330475884805247e-05,
@@ -6432,17 +6370,7 @@
           "SiO": 3.967767503485244e-37,
           "Ti": 1.1161521692947199e-14
         },
-        "selected_runtime_pa_by_species": {
-          "Al": 8.542476016165274e-22,
-          "Ca": 1.6330475884805247e-05,
-          "Fe": 1.0178074024692831e-06,
-          "K": 1.0199982229048475e-06,
-          "Mg": 1.7334021471421716e-06,
-          "Na": 0.006834551302671713,
-          "Si": 7.873423274868443e-16,
-          "SiO": 3.967767503485244e-37,
-          "Ti": 1.1161521692947199e-14
-        },
+        "selected_runtime_pa_by_species": {},
         "missing_batch_keys": [],
         "shadow_equal": true,
         "shadow_outcome": "proved",
@@ -6683,8 +6611,12 @@
           "SiO": "dormant_by_epoch",
           "Ti": "dormant_by_epoch"
         },
-        "note": "Active flux consumes each VapourAnswer selected runtime pressure. Compatibility pressure maps are absent from this consumer.",
-        "selection_source": "vapour_answer_selected_runtime_pressure",
+        "note": "VapourBatch owns channel refusal, eligibility, and the active set; effective values cross one typed source seam before RG-1.",
+        "effective_pressure_source": "equilibrium_backend_effective_pressure_pre_rg",
+        "effective_pressure_zero_reason": "pre_rg_backend_below_effective_pressure_threshold",
+        "missing_effective_pressure_species": [],
+        "effective_pressure_species_not_batch_active": [],
+        "selection_source": "equilibrium_backend_effective_pressure_pre_rg",
         "batch_pa_by_species": {
           "Al": 2.3971258846535062e-21,
           "Ca": 2.4281904872929577e-05,
@@ -6696,17 +6628,7 @@
           "SiO": 1.1770639926385342e-36,
           "Ti": 1.5355570910590422e-14
         },
-        "selected_runtime_pa_by_species": {
-          "Al": 2.3971258846535062e-21,
-          "Ca": 2.4281904872929577e-05,
-          "Fe": 1.255241901490806e-06,
-          "K": 1.6052362448329672e-06,
-          "Mg": 3.993700677724865e-06,
-          "Na": 0.0075539767666123366,
-          "Si": 1.1663628054065351e-15,
-          "SiO": 1.1770639926385342e-36,
-          "Ti": 1.5355570910590422e-14
-        },
+        "selected_runtime_pa_by_species": {},
         "missing_batch_keys": [],
         "shadow_equal": true,
         "shadow_outcome": "proved",
