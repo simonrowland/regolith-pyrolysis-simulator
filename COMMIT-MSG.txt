@@ -1,67 +1,44 @@
-fix(ci): studio-config golden regen for train11 divergent set @ 0de9c6d
+fix(ci): train12 studio-config round 3 — MAGEMin path + condensation schema_v2
 
-Regenerate machine-sensitive goldens and code pins under the CI grind engine
-config on mac-studio-256-1 via scripts/studio-regen.sh (doctrine: 5c6c015).
-CI is the truth surface; laptop-config values for engine-routed paths go red
-on the gate. Honesty gate: finding_count=0 (ppm / sub-percent moves only).
+Serialrerun of 14 pin/fixture nodes under studio grind engines.local.toml
+looked like pin drift; root cause was a broken MAGEMin path in the grind
+engine overlay (laptop Dropbox path missing on Mac-Studio-256-1). That
+left freeze-gate liquidus unavailable, armed the Kress91 floor fallback
+(lf=0 at T<=1200 C), and contaminated C3 capacity, SSO-R native-Fe pool
+(half), and residual wall-Fe trajectories.
 
-Harness extensions
-- scripts/studio-regen.sh: add cache_identity + pins families; overlay
-  emit_studio_pin_values.py and cache regenerator; document recipe_io /
-  cost_ledger as covered by the runner lunar fixture.
-- scripts/emit_studio_pin_values.py: emit studio-pin-report.json with
-  capacity head-result, SiO chain/step, and staged_bakeout pin probes plus
-  honesty-gate rows.
+Host repair (studio grind engines.local.toml, not repo content)
+- magemin_binary_path ->
+  /Users/simonrowland/repos/regolith-grind-0a3d5e9/engines/magemin/bin/MAGEMin
+- backup: engines.local.toml.bak-2026-08-02-studio-regen3
 
-Fixtures regenerated (studio → local pullback)
-- tests/fixtures/sio_yield/lunar_mare_low_ti_c2a.json
-  sio_evolved_kg 1.03187282595e-05 → 1.03186545664e-05 (−7.37e-11);
-  stage_3 product and yield_pct follow.
-- tests/fixtures/sio_yield/mars_basalt_c2a.json
-  sio_evolved_kg 1.03956433809e-05 → 1.03950472208e-05 (−5.96e-10);
-  stage_3 product and yield_pct follow.
-- tests/fixtures/runner/lunar_mare_low_ti_C0_24h.json
-  studio melt-redox gate floor fallback engaged (24 h); micro Fe-redox /
-  alkali / yield_disposition drift from grind engines (905 leaf diffs).
-  Also the golden text for recipe_io + cost_ledger rollup tests.
-- tests/fixtures/runner/mars_basalt_C2A_12h.json
-  melt_redox_gate_floor_fallback_engagement engaged (12 h only structural
-  leaf set).
-- tests/fixtures/runner/ci_carbonaceous_chondrite_C2B_12h.json
-  UNCHANGED under studio (left as-is; still covered by runner family).
-- tests/fixtures/cache_identity/b-043-cache-contract.golden.json
-  evidence_class + species dictionary inventory/sha256 refreshed from
-  executable generators (not melt-engine-routed; local green after regen).
+Harness
+- scripts/studio-regen.sh: fail loud when grind magemin_binary_path does
+  not exist (prevent silent liquidus-unavailable contamination).
 
-Code-embedded pins patched (studio values + doctrine comments)
-- tests/test_coating_rate.py
-  coating diagnostic SHA c552c73… → 2b353706…; laptop-config value retained
-  in comment per 5c6c015 doctrine.
-- tests/chemistry/test_sio_chain_coherence.py
-  PHASE3BIS_SIO_EVOLVED_KG → 1.03186545664e-05 (was 1.03187282595e-05).
-- tests/chemistry/test_sio_step_condensation.py
-  stage-3 silica pin → 6.73114533926e-06 (was 6.73119341581e-06).
-- tests/chemistry/test_sio_step_wall_deposit.py
-  1050 C wall Si+SiO2 deposit → 4.439448640582e-06 (was 4.439481519259e-06).
-- tests/test_staged_bakeout.py
-  staged_silica → 0.10246923985526701 (was 0.10262754045817979);
-  staged product SiO → 0.01143878479198185 (was 0.011456288948428558).
-- tests/test_sio_yield_regression.py
-  BASELINE_SIO_EVOLVED_KG + BASELINE_STAGE3_SIO2_KG lunar/mars aligned to
-  studio fixtures.
-- tests/test_capacity_coupling.py
-  head-result trio confirmed bit-identical on studio; doctrine note only
-  (no numeric change).
+Fixture repair (universal VR-11 break, not engine-divergent)
+- tests/test_condensation_parallel_determinism.py: load schema_version 2
+  production vapor_pressures catalog (legacy metals/oxide_vapors-only
+  fixtures refuse vapour_rail_catalog_missing on advance); restore melt T
+  after the forced cold-wall tick so multi-tick advance does not inherit
+  1700 C pure-SiO2 evaporation. Wall-attribution pin J unchanged
+  (0.062205888833975716 studio == laptop).
+
+Pin/golden disposition after MAGEMin path repair (studio -n0, green)
+
+| File | Nodes | old pin/behavior | new | action |
+|---|---|---|---|---|
+| test_yield_root_cause na2o | 1 | serial 4.106 vs 4.094 | PASSED @ 4.093990 | no repin |
+| condensation_route wall Fe | 3 | serial Fe diverged | PASSED ×3 | no repin |
+| test_sso_r_r20_state | 2 | capacity=0 | PASSED (lf≈0.51) | no repin |
+| test_sso_r_validation_map | 5 | half pool / split_o2=0 | PASSED | no golden regen |
+| condensation_parallel | 3 | vapour_rail_catalog_missing | PASSED after fixture | fixture only |
+
+Studio-green tally: 14/14 under fixed grind MAGEMin path + condensation fix.
+Honesty: half-pool / stage3 Fe wt% 32 under liquidus-unavailable would have
+been FINDING not repin; path repair restores committed anchors.
 
 Docs
-- docs/ci-local-divergence.md: doctrine, honesty table, expected
-  laptop-divergent list (11 nodes after local -n0), open design item for
-  future config-keyed pins (not implemented).
+- docs/ci-local-divergence.md: train12 round 3 root cause + disposition.
 
-Local verification (laptop, -n0, post-regen)
-- 11 expected fails (engine-routed paths listed in docs/ci-local-divergence.md)
-- capacity head-result + cache identity golden: pass
-- ci_carbonaceous runner fixture: pass
-
-No commit of studio-pin-report.json (ephemeral pullback artifact).
-No push.
+No push. Stage explicit paths only.

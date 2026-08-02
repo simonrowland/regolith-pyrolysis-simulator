@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import copy
 import math
+from pathlib import Path
 
 import pytest
+import yaml
 
 from simulator.backends import BackendSelectionPolicy
 from simulator.session import SimSession, SimSessionConfig
@@ -24,6 +26,7 @@ C0_ENDPOINT_SETPOINTS = {
         "temperature_min_C": 940,
     },
 }
+_ROOT = Path(__file__).resolve().parents[1]
 
 
 def _silica_feedstocks() -> dict:
@@ -36,24 +39,14 @@ def _silica_feedstocks() -> dict:
 
 
 def _silica_vapor_pressures() -> dict:
-    return {
-        "metals": {},
-        "oxide_vapors": {
-            "SiO": {
-                "parent_oxide": "SiO2",
-                "stoich_oxide_per_vapor": (
-                    MOLAR_MASS["SiO2"] / MOLAR_MASS["SiO"]
-                ),
-                "stoich_O2_per_vapor": (
-                    0.5 * MOLAR_MASS["O2"] / MOLAR_MASS["SiO"]
-                ),
-                "condensation_products_mol_per_mol_vapor": {
-                    "Si": 0.5,
-                    "SiO2": 0.5,
-                },
-            },
-        },
-    }
+    # schema_version 2 production catalog is required: VR-11 evaporation
+    # refuses vapour_rail_catalog_missing when schema_version != 2 (legacy
+    # metals/oxide_vapors-only fixtures no longer compile a catalog). The
+    # forced SiO EvaporationFlux path under test is independent of melt
+    # evaporation channels; the full catalog only satisfies the advance()
+    # catalog contract. Wall-attribution pin J is unchanged vs the prior
+    # legacy-fixture era (0.062205888833975716).
+    return yaml.safe_load((_ROOT / "data" / "vapor_pressures.yaml").read_text())
 
 
 def _setpoints() -> dict:
@@ -100,11 +93,19 @@ def _route_cold_wall_sio_tick(session: SimSession) -> dict[str, dict[str, float]
             segment.name: 900.0 for segment in model.pipe_segments
         },
     )
+    # Force a cold-wall operating point only for the routed tick. Restore the
+    # pre-route melt temperature so a subsequent session.advance() does not
+    # inherit 1700 C and evaporate pure-SiO2 under the schema-v2 catalogue
+    # (that path trips cleaned_melt projection staleness on multi-tick runs).
+    prior_melt_C = float(sim.melt.temperature_C)
     sim.melt.temperature_C = 1700.0
-    sim._route_to_condensation(
-        EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0)
-    )
-    return _wall_attribution(session)
+    try:
+        sim._route_to_condensation(
+            EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0)
+        )
+        return _wall_attribution(session)
+    finally:
+        sim.melt.temperature_C = prior_melt_C
 
 
 def _multi_tick_trace(

@@ -97,3 +97,70 @@ doctrine comment:
 ```
 
 Then stage explicit paths and commit separately. The harness never commits.
+
+## Train12 round 3 (2026-08-02) — serialrerun 14-node set @ tip `1a6ad25`
+
+Serial rerun (`/tmp/ci-train12-serialrerun.xml` on Mac-Studio-256-1) listed
+14 nodes as persistent studio-divergent. Investigation under the grind
+`engines.local.toml` found a **configuration defect**, not 14 independent
+pin drifts:
+
+### Root cause (infra)
+
+`~/repos/regolith-grind-0a3d5e9/engines/engines.local.toml` pointed
+`magemin_binary_path` at a **laptop Dropbox path that does not exist on the
+studio**. `configured_magemin_binary_path()` returned `None` → freeze-gate
+liquidus unavailable → Kress91 floor fallback (`lf = 0` for T ≤ 1200 °C).
+That zeroed C3 redox capacity at 1150 °C, halved SSO-R `native_fe_pool_mol`
+(788 vs 1576), zeroed `native_split_o2_mol`, and shifted wall-Fe residual
+paths.
+
+**Repair (studio host, not repo content):** rewrite grind
+`magemin_binary_path` to
+`/Users/simonrowland/repos/regolith-grind-0a3d5e9/engines/magemin/bin/MAGEMin`
+(backup: `engines.local.toml.bak-2026-08-02-studio-regen3`).
+`scripts/studio-regen.sh` now fails loud if the toml path is missing.
+
+### Per-node disposition after MAGEMin path repair
+
+| File / nodes | Serialrerun under broken path | After repair | Action |
+|---|---|---|---|
+| `tests/test_yield_root_cause.py` (na2o pin) | 4.106 vs 4.094 | **PASSED** (laptop pin holds) | no pin repin |
+| `tests/test_sso_r_r20_state.py` ×2 | capacity=0 at 1150 | **PASSED** (lf≈0.51 via magemin-shadow) | no pin repin |
+| `tests/test_sso_r_validation_map.py` ×5 | half pool / split_o2=0 / first_T=None | **PASSED** (pool 1576, split_o2≈787, first_T=1600) | no golden regen |
+| `tests/test_condensation_parallel_determinism.py` ×3 | `vapour_rail_catalog_missing` | **PASSED** after schema_v2 fixture fix | fixture repair (not pin) |
+| `tests/chemistry/test_builtin_condensation_route_provider.py` wall Fe ×3 | Fe pins diverged | **PASSED** all 3 under fixed MAGEMin (`--timeout=7200`, 2h35m) | no pin repin |
+
+### Condensation parallel fixture repair (shipped in this change)
+
+Legacy synthetic `metals`/`oxide_vapors`-only vapor_pressures no longer
+compile a VR-11 catalog (`schema_version != 2` →
+`vapour_rail_catalog_missing` on `advance()`). Fix:
+
+1. Load production `data/vapor_pressures.yaml` (schema_version 2).
+2. Restore pre-route melt temperature after the forced cold-wall tick so
+   multi-tick `advance()` does not inherit 1700 °C pure-SiO2 evaporation.
+
+Wall-attribution pin `sio_flux_mol_m2_s = 0.062205888833975716` is
+**unchanged** under studio (matches laptop).
+
+### Honesty gate (train12 round 3)
+
+Under liquidus-unavailable contamination the SSO-R half-pool and stage-3 Fe
+wt% jump (0.012 → 32) would have been **FINDINGs**, not repins. After the
+MAGEMin path repair those values return to the committed anchors — the
+serialrerun divergence was env contamination, not CI-truth physics.
+
+### Operator note
+
+Before any studio gate or studio-regen run, confirm:
+
+```bash
+ssh mac-studio-256-1 'test -x "$(python3 -c "
+from pathlib import Path
+import re
+t=Path.home()/\"repos/regolith-grind-0a3d5e9/engines/engines.local.toml\"
+m=re.search(r\"magemin_binary_path\\s*=\\s*\\\"([^\\\"]+)\\\"\", t.read_text())
+print(m.group(1) if m else \"\")
+")" && echo MAGEMIN_OK || echo MAGEMIN_BROKEN'
+```

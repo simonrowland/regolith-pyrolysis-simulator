@@ -270,6 +270,24 @@ ln -sfn $STUDIO_VENV .venv
 export PATH=/opt/homebrew/bin:/usr/local/bin:\$PATH
 ulimit -n 8192 || true
 hostname
+# Fail loud if grind engines.local.toml points at a missing MAGEMin binary
+# (train12 serialrerun: Dropbox laptop path left liquidus unavailable and
+# contaminated SSO-R / C3 capacity / wall-Fe pins with floor-fallback physics).
+./.venv/bin/python - <<'PY'
+from pathlib import Path
+from simulator.engine_local_config import configured_magemin_binary_path, load_config
+cfg = load_config()
+raw = None if cfg is None else cfg.paths.magemin_binary_path
+resolved = configured_magemin_binary_path()
+print("magemin_toml", raw)
+print("magemin_resolved", resolved)
+if raw is not None and resolved is None:
+    raise SystemExit(
+        f"FATAL: engines.local.toml magemin_binary_path does not exist: {raw}"
+    )
+if resolved is None:
+    print("WARN: no configured MAGEMin binary; liquidus floor-fallback will arm")
+PY
 ./.venv/bin/python -c "import sys; print('python', sys.version.split()[0])"
 EOF
 )
