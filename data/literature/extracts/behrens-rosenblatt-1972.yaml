@@ -25,7 +25,7 @@ species:
       phase: solid_arsenolite
       standard_state: null
       units: log10(P_bar) = A − B/(T_K + C)
-      values: &id001
+      values:
         gas_species: As4O6
         phase_branch: solid_arsenolite
         source_form: log10(P_bar) = A − B/(T_K + C)
@@ -35,7 +35,14 @@ species:
           C: -146.969
 fidelity_samples:
 - path: species.As4O6.observations[NIST_BR72_arsenolite_As4O6].values
-  value: *id001
+  value:
+    gas_species: As4O6
+    phase_branch: solid_arsenolite
+    source_form: log10(P_bar) = A − B/(T_K + C)
+    coefficients:
+      A: 4.23424
+      B: 2406.912
+      C: -146.969
   note: auto fidelity sample from first observation payload (pilot migration)
   locator:
     table: null

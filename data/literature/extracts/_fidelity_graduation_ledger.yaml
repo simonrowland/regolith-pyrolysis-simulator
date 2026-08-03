@@ -1,0 +1,10 @@
+# Canonical append-only history for pre-policy fidelity exemptions.
+#
+# Every id moved from active_pre_policy_source_ids to
+# graduated_pre_policy_source_ids in _fidelity_pre_policy_allowlist.yaml must
+# be appended here in the same change. Never remove an id: the validator uses
+# this history plus its committed Git ancestry to reject tombstone deletion
+# plus reactivation, even when both current policy and ledger are rewritten.
+
+schema_version: literature_extract_fidelity_graduation_ledger.v1
+graduated_pre_policy_source_ids: []

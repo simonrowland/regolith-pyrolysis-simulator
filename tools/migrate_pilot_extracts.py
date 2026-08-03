@@ -13,6 +13,7 @@ of pilot extract files only.
 
 from __future__ import annotations
 
+import copy
 import re
 import sys
 from collections import defaultdict
@@ -158,10 +159,15 @@ def _add_fidelity(
     note: str,
     locator: Mapping[str, Any] | None = None,
 ) -> None:
+    """Append a path-based fidelity sample with an independent value copy.
+
+    Deepcopy so YAML dump does not alias sample.value to the observation
+    ``values`` mapping (t-510: pins must not co-update when the body is edited).
+    """
     samples = doc.setdefault("fidelity_samples", [])
     sample: dict[str, Any] = {
         "path": path,
-        "value": value,
+        "value": copy.deepcopy(value),
         "note": note,
     }
     if locator:

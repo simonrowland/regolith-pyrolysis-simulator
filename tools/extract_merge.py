@@ -47,6 +47,8 @@ if str(TOOLS_DIR) not in sys.path:
 from validate_literature_extracts import (  # noqa: E402
     EXTRACTS_DIR,
     discover_extracts,
+    load_fidelity_policy,
+    pre_policy_source_ids,
     validate_extract_file,
     validate_source_priority_file,
 )
@@ -151,9 +153,17 @@ def load_extracts(
     files = discover_extracts(directory)
     docs: list[dict[str, Any]] = []
     errors: list[str] = []
+    # Honor ENFORCED_FOR_NEW fidelity allowlist (same policy as validate_all).
+    pre_policy: set[str] | None = None
+    if require_valid:
+        policy, policy_errs = load_fidelity_policy()
+        if policy_errs:
+            # Policy file missing/broken is a hard fail when validating.
+            raise SystemExit("fidelity policy invalid:\n" + "\n".join(policy_errs))
+        pre_policy = pre_policy_source_ids(policy)
     for path in files:
         if require_valid:
-            errs = validate_extract_file(path)
+            errs = validate_extract_file(path, pre_policy_ids=pre_policy)
             if errs:
                 errors.extend(errs)
                 continue

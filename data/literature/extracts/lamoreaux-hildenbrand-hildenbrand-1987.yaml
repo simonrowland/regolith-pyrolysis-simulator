@@ -33,7 +33,7 @@ species:
       uncertainty:
         Delta_f_H_298_over_R_uncertainty_kK: 1.0
         S_298_over_R_uncertainty: 0.4
-      values: &id001
+      values:
         Delta_f_H_298_over_R_kK: -11.46
         Delta_f_H_298_over_R_uncertainty_kK: 1.0
         Delta_f_H_298_kJ_mol:
@@ -175,7 +175,23 @@ species:
         S_298_over_R_uncertainty: 0.05
 fidelity_samples:
 - path: species.Ga2O.observations[LH87_Ga2O_g_formation].values
-  value: *id001
+  value:
+    Delta_f_H_298_over_R_kK: -11.46
+    Delta_f_H_298_over_R_uncertainty_kK: 1.0
+    Delta_f_H_298_kJ_mol:
+      value: -95.3
+      arithmetic: (-11.46)*8.314462618 = -95.3 kJ·mol⁻¹
+    S_298_over_R: 34.21
+    S_298_over_R_uncertainty: 0.4
+    S_298_J_molK:
+      value: 284.4
+      arithmetic: 34.21*8.314462618 = 284.4 J·K⁻¹·mol⁻¹
+    H298_minus_H0_over_R_kK: 1.4712
+    gas_species: Ga2O
+    dominance_window_K:
+    - 1013
+    - 1841
+    dominance_window_source: SF18-T1 p.404 Ga2O3(s) row
   note: auto fidelity sample from first observation payload (pilot migration)
   locator:
     table: 'Table 3, p. 424 — Ga2O(g): ΔfH°298/R = −11.46 ± 1 kK; S°298/R = 34.21 ± 0.4; (H°298−H°0)/R

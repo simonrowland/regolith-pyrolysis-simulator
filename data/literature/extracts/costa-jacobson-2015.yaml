@@ -27,16 +27,18 @@ species:
       standard_state: KEMS vaporization coefficient on olivine condensed phase; activity in P_sat separate
       regime: kems_effusion
       units: dimensionless
-      values: &id003
+      values:
         alpha: 0.02
-        alpha_range: &id001
+        alpha_range:
         - 0.011
         - 0.02
         gas_species: Fe(g)
         material: Fo93Fa7_olivine
       uncertainty:
         note: high-side of measured D(Fe+) band adopted as conservative pin
-        alpha_range: *id001
+        alpha_range:
+        - 0.011
+        - 0.02
   SiO:
     observations:
     - observation_id: costa_jacobson_2015_sio_olivine_kems
@@ -54,17 +56,25 @@ species:
       units: dimensionless
       values:
         alpha: null
-        alpha_range: &id002
+        alpha_range:
         - 0.003
         - 0.036
         gas_species: SiO(g)
         material: Fo93Fa7_olivine
       uncertainty:
         note: Range from figure band / prior extract; not a single pin
-        alpha_range: *id002
+        alpha_range:
+        - 0.003
+        - 0.036
 fidelity_samples:
 - path: species.Fe.observations[costa_jacobson_2015_fe_olivine_kems].values
-  value: *id003
+  value:
+    alpha: 0.02
+    alpha_range:
+    - 0.011
+    - 0.02
+    gas_species: Fe(g)
+    material: Fo93Fa7_olivine
   note: auto fidelity sample from first observation payload (pilot migration)
   locator:
     note: Costa, G. C. C. & Jacobson, N. S. (2015), Vaporization Studies of Olivine via Knudsen Effusion

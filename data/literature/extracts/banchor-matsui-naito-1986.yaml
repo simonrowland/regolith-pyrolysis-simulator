@@ -22,7 +22,7 @@ species:
       phase: gas
       standard_state: null
       units: kJ/mol and J/(mol·K) for formation; over_R in kK as published
-      values: &id001
+      values:
         gas_species:
         - VO
         - V
@@ -40,7 +40,22 @@ species:
         valid_range_note: Mass-spectrometric study; typical T ~ 1600–2000 K band (see paper figures)
 fidelity_samples:
 - path: species.VO_VO2.observations[Ban86_equations].values
-  value: *id001
+  value:
+    gas_species:
+    - VO
+    - V
+    note: 'Ban86 Table 1: equations for partial vapor pressures over
+
+      VO1.022(s) and over V(s)+VO(s) two-phase. Table is figure/image
+
+      in the PDF; numeric A,B coefficients were NOT recovered by OCR.
+
+      Paper reports ΔfH and dissociation energy of VO(g) via second/third
+
+      law (Tables 3, 5).
+
+      '
+    valid_range_note: Mass-spectrometric study; typical T ~ 1600–2000 K band (see paper figures)
   note: auto fidelity sample from first observation payload (pilot migration)
   locator:
     table: Table 1 (equations); Figs. 1–4; comparison to Berkowitz points

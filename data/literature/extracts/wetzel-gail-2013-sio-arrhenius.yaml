@@ -31,19 +31,28 @@ species:
         alpha_range: null
         gas_species: SiO(g)
         material: reaction_rate_limited_SiO_source_compilation
-        alpha_form: &id002
+        alpha_form:
           type: arrhenius
           expression: alpha = 0.52 * exp(-3685/T_K)
           A: 0.52
           B_K: 3685.0
-          uncertainty_envelope: &id001
+          uncertainty_envelope:
           - 0.003
           - 0.067
       uncertainty:
-        uncertainty_envelope: *id001
+        uncertainty_envelope:
+        - 0.003
+        - 0.067
 fidelity_samples:
 - path: species.SiO.observations[wetzel_gail_2013_sio_arrhenius].values.alpha_form
-  value: *id002
+  value:
+    type: arrhenius
+    expression: alpha = 0.52 * exp(-3685/T_K)
+    A: 0.52
+    B_K: 3685.0
+    uncertainty_envelope:
+    - 0.003
+    - 0.067
   note: alpha_form retained verbatim from alpha-kinetics DRAFT (P1-F1 fix)
   locator:
     record: wetzel_gail_2013_sio_arrhenius

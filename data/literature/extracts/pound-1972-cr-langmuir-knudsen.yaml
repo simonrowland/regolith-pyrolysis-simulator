@@ -27,18 +27,26 @@ species:
       standard_state: Pure solid Cr; melt activity must live in P_sat for dissolved Cr
       regime: langmuir_free_evaporation
       units: dimensionless
-      values: &id002
+      values:
         alpha: 0.9
-        alpha_range: &id001
+        alpha_range:
         - 0.8
         - 1.0
         gas_species: Cr(g)
         material: 99.9_percent_polycrystalline_solid_chromium
       uncertainty:
-        alpha_range: *id001
+        alpha_range:
+        - 0.8
+        - 1.0
 fidelity_samples:
 - path: species.Cr.observations[pound_1972_cr_langmuir_knudsen].values
-  value: *id002
+  value:
+    alpha: 0.9
+    alpha_range:
+    - 0.8
+    - 1.0
+    gas_species: Cr(g)
+    material: 99.9_percent_polycrystalline_solid_chromium
   note: auto fidelity sample from first observation payload (pilot migration)
   locator:
     note: Pound, G. M. (1972), J. Phys. Chem. Ref. Data 1:135-146 Table 1, DOI 10.1063/1.3253096; primary

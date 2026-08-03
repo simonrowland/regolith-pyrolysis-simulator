@@ -22,7 +22,7 @@ species:
       phase: gas
       standard_state: null
       units: P as published (bar / Pa / mmHg per source_form)
-      values: &id001
+      values:
         gas_species: VO
         condensed_reservoir: VO(s)
         points:
@@ -34,7 +34,16 @@ species:
           note: same; temperature nearly identical — internal scatter
 fidelity_samples:
 - path: species.VO_VO2.observations[BIC57_VO_absolute_points].values
-  value: *id001
+  value:
+    gas_species: VO
+    condensed_reservoir: VO(s)
+    points:
+    - T_K: 1875
+      p_Pa: 0.155
+      note: Berkowitz et al. 1957 as quoted by Ban86 p. 603
+    - T_K: 1876
+      p_Pa: 0.116
+      note: same; temperature nearly identical — internal scatter
   note: auto fidelity sample from first observation payload (pilot migration)
   locator:
     table: null

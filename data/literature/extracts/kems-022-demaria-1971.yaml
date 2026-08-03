@@ -1,0 +1,211 @@
+schema_version: literature_extract.v1
+source_id: kems-022-demaria-1971
+source:
+  citation: >-
+    De Maria, G., Balducci, G., Guido, M. & Piacente, V. (1971),
+    "Mass spectrometric investigation of the vaporization process of Apollo 12
+    lunar samples", Proc. Lunar Sci. Conf. 2, 1367–1380
+  year: 1971
+extraction:
+  method: OCR-artifact transcription (MinerU vlm) + phase-2 geometry extract
+  date: '2026-08-03'
+  worker: ocr-phase2-gk
+  provenance_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/
+review_status: draft
+species:
+  Fe:
+    observations:
+    - observation_id: demaria_1971_fe_lunar_basalt_kems_main_cell
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        paragraph: Fe+ ion peaks first observed ~1300 K; nearly unit activity vs pure Fe
+        line_range: '111-155'
+        figure: '3'
+      T_range_K: [1300.0, 1800.0]
+      phase: lunar_basalt_12022_12065
+      standard_state: pure Fe metal (Hultgren 1967 reference vapor-pressure line on Fig. 3)
+      regime: kems_effusion
+      units: dimensionless
+      values:
+        activity: 1.0
+        activity_note: nearly unit activity; temperature dependence very close to pure iron (Hultgren et al. 1967)
+        gas_species: Fe(g)
+        material: Apollo_12_lunar_basalt_12022_12065
+        first_observed_T_K: 1300.0
+        missing_for_motzfeldt:
+          - clausing_factor
+          - sample_surface_area
+          - orifice_channel_length
+        missing_note: >-
+          Knife-edge orifice diameter stated without channel length; Clausing not
+          reported. Do not invent Clausing ≈ 1 for knife-edge without measured L.
+          Sample free-surface area not stated.
+      uncertainty:
+        note: qualitative "nearly unit activity"; multi-rotating-cell activity points on Fig. 3 (Δ markers for 12065)
+      equipment:
+        orifice_area:
+          value: 4.154756e-06
+          units: m2
+          diameter_m: 0.0023
+          orifice_shape: knife_edge
+          inferred: true
+          inference: >-
+            area = π (d/2)^2 from stated knife-edge effusion-hole diameter 2.3 mm
+            (main Re containers for progressive-depletion / fixed-T vaporization runs)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+            line_range: '32'
+        cell_material:
+          value: Re
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers; passivated Re noted for sample 12065 O2 behavior
+            line_range: '32'
+    - observation_id: demaria_1971_fe_activity_multi_rotating_cell
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        section: ACTIVITY DETERMINATION BY MULTIPLE-ROTATING KNUDSEN CELL
+        line_range: '340-356'
+        figure: '3'
+      phase: lunar_basalt_12065
+      standard_state: pure Fe chips in Fe crucible (multi-rotating cell reference)
+      regime: kems_effusion
+      units: dimensionless
+      values:
+        activity: 1.0
+        activity_note: multi-rotating-cell Fe activity points plotted as Δ on Fig. 3; positive results for iron
+        gas_species: Fe(g)
+        material: Apollo_12_12065_in_Re_crucible
+        method: multiple_rotating_Knudsen_cell
+        multi_cell_materials: [Re, Fe, MgO]
+        multi_cell_loads:
+          Re: 106 mg of 12065 lunar sample
+          MgO: Na2O
+          Fe: iron chips (Ta external cap on lid)
+        missing_for_motzfeldt:
+          - clausing_factor
+          - sample_surface_area
+          - orifice_channel_length
+        missing_note: >-
+          Knife-edge 1 mm orifices; channel length and Clausing not stated. Partial
+          multi-cell geometry only.
+      uncertainty:
+        note: activity values figure-only; text reports positive Fe activity results without tabulated numbers
+      equipment:
+        orifice_area:
+          value: 7.853982e-07
+          units: m2
+          diameter_m: 0.001
+          orifice_shape: knife_edge
+          inferred: true
+          inference: >-
+            area = π (d/2)^2 from stated knife-edge orifice diameter 1 mm on all
+            multi-rotating-cell crucibles
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: effusion holes of all crucibles knife-edge orifice 1 mm diameter
+            line_range: '350-352'
+        multi_orifice_series:
+          value:
+            n_cells: 3
+            materials: [Re, Fe, MgO]
+            orifice_diameter_mm: 1.0
+            orifice_shape: knife_edge
+            note: three cells in graphite block; same orifice diameter on all crucibles (not a Motzfeldt multi-orifice α series)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            section: ACTIVITY DETERMINATION BY MULTIPLE-ROTATING KNUDSEN CELL
+            line_range: '342-352'
+        cell_material:
+          value: Re (sample cell); multi-cell set Re / Fe / MgO; Ta external cap on Fe-cell lid; Pt unsuccessful (foam overflow)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: crucibles Re, Fe, MgO; Ta cap; Pt unsuccessful
+            line_range: '346-356'
+  SiO:
+    observations:
+    - observation_id: demaria_1971_sio_lunar_basalt_kems_main_cell
+      type: rate_series
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        paragraph: SiO first observed ~1650 K; partial pressures ~10× below cristobalite
+        line_range: '202-258'
+        figure: '5'
+      T_range_K: [1650.0, 2200.0]
+      phase: lunar_basalt_12022_12065
+      standard_state: SiO(g) over condensed lunar basalt vs cristobalite SiO2 reference (Porter et al. 1955)
+      regime: kems_effusion
+      units: as published (partial pressure; Fig. 5 lg P scale)
+      values:
+        gas_species: SiO(g)
+        also_observed: SiO2(g)
+        first_observed_T_K: 1650.0
+        material: Apollo_12_lunar_basalt_12022_12065
+        pressure_vs_cristobalite: ~factor of 10 lower than SiO over cristobalite (Porter et al. 1955)
+        semantics: bound_not_point_ordering
+        note: >-
+          Initial-point SiO partial pressures on Fig. 5; fixed-T procedure shifts
+          equilibrium toward SiO2(g). OCR scatter points not transcribed as
+          absolute P series (figure digitization deferred). Same main-cell geometry
+          as Fe vaporization runs.
+        missing_for_motzfeldt:
+          - clausing_factor
+          - sample_surface_area
+          - orifice_channel_length
+          - absolute_psat_series
+        missing_note: >-
+          Knife-edge 2.3 mm orifice without channel length — Clausing not invented.
+          Sample surface area not stated. Absolute P(T) points not tabulated in text.
+      uncertainty:
+        note: initial-points attribution "somewhat questionable" for SiO per authors' conclusions
+      equipment:
+        orifice_area:
+          value: 4.154756e-06
+          units: m2
+          diameter_m: 0.0023
+          orifice_shape: knife_edge
+          inferred: true
+          inference: >-
+            area = π (d/2)^2 from stated knife-edge effusion-hole diameter 2.3 mm
+            (same main Re cells used for SiO observations)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+            line_range: '32'
+        cell_material:
+          value: Re
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers
+            line_range: '32'
+fidelity_samples:
+- species: Fe
+  observable: activity_coefficient
+  observation_id: demaria_1971_fe_lunar_basalt_kems_main_cell
+  field: activity
+  value: 1.0
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    paragraph: Fe vaporizes at nearly unit activity
+    line_range: '111'
+    figure: '3'
+- path: species.Fe.observations[demaria_1971_fe_lunar_basalt_kems_main_cell].equipment.orifice_area.value
+  value: 4.154756e-06
+  note: inferred orifice area from 2.3 mm knife-edge diameter (main Re cell)
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+    line_range: '32'
+- species: SiO
+  observable: rate_series
+  observation_id: demaria_1971_sio_lunar_basalt_kems_main_cell
+  field: first_observed_T_K
+  value: 1650.0
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    paragraph: SiO first observed around 1650 K
+    line_range: '202'
+    figure: '5'

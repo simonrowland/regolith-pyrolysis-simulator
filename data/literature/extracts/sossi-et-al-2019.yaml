@@ -26,19 +26,27 @@ species:
       standard_state: 1-bar gas-mixing furnace apparent alpha; transport-limited
       regime: open_furnace_apparent
       units: dimensionless
-      values: &id002
+      values:
         alpha: 1.0
-        alpha_range: &id001
+        alpha_range:
         - 0.9
         - 1.0
         gas_species: Na(g)
         material: ferrobasalt_FCMAS_open_furnace
       uncertainty:
         note: Retain as regime-tagged apparent alpha; do not treat as intrinsic vacuum alpha
-        alpha_range: *id001
+        alpha_range:
+        - 0.9
+        - 1.0
 fidelity_samples:
 - path: species.Na.observations[sossi_2019_na_open_furnace_apparent].values
-  value: *id002
+  value:
+    alpha: 1.0
+    alpha_range:
+    - 0.9
+    - 1.0
+    gas_species: Na(g)
+    material: ferrobasalt_FCMAS_open_furnace
   note: auto fidelity sample from first observation payload (pilot migration)
   locator:
     note: Sossi, P. A. et al. (2019), Geochim. Cosmochim. Acta 260:204-231, DOI 10.1016/j.gca.2019.06.021

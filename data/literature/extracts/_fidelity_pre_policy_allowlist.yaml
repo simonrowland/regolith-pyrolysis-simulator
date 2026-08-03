@@ -1,0 +1,179 @@
+# Fidelity-sample policy for literature extracts (t-510).
+#
+# Policy: ENFORCED_FOR_NEW (effective 2026-08-03).
+# Extracts that carry observations MUST include reviewer-verified
+# fidelity_samples — except members of the pre-policy allowlist below.
+#
+# Why grandfathering: the pilot corpus (68 extracts) was migrated from
+# DRAFT acquisition blocks, not from OCR/source page review. Instantly
+# requiring OCR-verified samples would invalidate a green corpus without
+# improving evidence quality. New / OCR-produced extracts (t-509) are not
+# exempt.
+#
+# SHRINK-ONLY: closed_set_source_ids is frozen at policy adoption (hash
+# pinned in tests/test_literature_extracts.py). active_pre_policy_source_ids
+# must always be a subset of closed_set_source_ids. Removals from active
+# are allowed (and expected) when an extract gains reviewer-verified
+# samples and graduates — move the id into graduated_pre_policy_source_ids
+# (append-only tombstones), and append the same id to the independent canonical
+# history in _fidelity_graduation_ledger.yaml. The closed set is partitioned:
+#   active ∪ graduated = closed,  active ∩ graduated = ∅
+# Re-adding any id in current or committed canonical graduation history to
+# active is refused, even if both current ledger and policy tombstone are
+# deleted in the same change. Additions to closed are refused.
+
+schema_version: literature_extract_fidelity_policy.v1
+policy: ENFORCED_FOR_NEW
+effective_date: "2026-08-03"
+rationale: >
+  Pilot extracts migrated from DRAFT blocks (vp-acquire-5/-6, CEA sweep)
+  pre-date the reviewer-verified fidelity-sample requirement. New extracts
+  produced by the t-509 OCR campaign must carry fidelity_samples from day one.
+
+# Frozen max set at policy adoption. NEVER add. Hash of sorted joined ids
+# is pinned in tests (CLOSED_SET_SHA256).
+closed_set_source_ids:
+  - ames-walsh-white-1967
+  - banchor-matsui-naito-1986
+  - behrens-rosenblatt-1972
+  - berkowitz-chupka-inghram-1957
+  - costa-jacobson-2015
+  - datz-1961-na2cl2
+  - datz-and-smith-1961
+  - datz-smith-taylor-1961-nacl-vapor
+  - fedkin-grossman-ghiorso-2006
+  - fray-schmitt-2009-ch4-1
+  - fray-schmitt-2009-co-1
+  - fray-schmitt-2009-nh3
+  - giauque-powell-1939-cl2
+  - giauque-ruehrwein-1939-hcn-psat
+  - habermann-daane-1964
+  - iapws-95-psat-liquid
+  - iupac-o2-solid-psat
+  - janaf-4th
+  - lamoreaux-hildenbrand-1984
+  - lamoreaux-hildenbrand-hildenbrand-1987
+  - lh87-al-o-gas-species
+  - lh87-beo-g
+  - lh87-cao-g
+  - lh87-geo-g
+  - lh87-in2o-g
+  - lh87-mgo-g
+  - lh87-pbo-g
+  - lh87-sno-g
+  - nasa-cea-thermo
+  - nist-srd69-p4
+  - nist-webbook
+  - pending-as2o3-second-primary
+  - pending-bi2o3-kems
+  - pending-cacl2-kems-or-transpiration
+  - pending-dual-primary-oso4
+  - pending-kems-cro3
+  - pending-mg2cl4
+  - pending-mgcl2-measured-vp
+  - pending-p4o6-vp
+  - pending-pages-moo3-vp
+  - pending-pages-p4o10-sublimation
+  - pending-pages-wo3-polymer-vp
+  - pending-re2o7-second-series
+  - pending-teo2-vp
+  - pound-1972-cr-langmuir-knudsen
+  - pound-1972-mccabe-cr
+  - rau-1974-se-vp
+  - ref-016-sio-kems-1700-2000k
+  - ref-032-al
+  - ref-032-bi
+  - ref-032-ca
+  - ref-032-fe-liquid-equation
+  - ref-032-k
+  - ref-032-mg
+  - ref-032-mn-if-not-in-fit
+  - ref-032-na
+  - ref-032-pb
+  - ref-032-si
+  - ref-032-th
+  - ref-032-zr
+  - ref-052-k-o-gas
+  - ref-052-na-o-gas
+  - richter-et-al-2007
+  - safarian-engh-2013-si-pure-langmuir
+  - sossi-et-al-2019
+  - sossi-fegley-2018
+  - span-wagner-1996-co2-psat
+  - wetzel-gail-2013-sio-arrhenius
+
+# Working allowlist. Must be ⊆ closed_set_source_ids. Shrink by removing
+# ids when an extract graduates with reviewer-verified samples. Never add.
+active_pre_policy_source_ids:
+  - ames-walsh-white-1967
+  - banchor-matsui-naito-1986
+  - behrens-rosenblatt-1972
+  - berkowitz-chupka-inghram-1957
+  - costa-jacobson-2015
+  - datz-1961-na2cl2
+  - datz-and-smith-1961
+  - datz-smith-taylor-1961-nacl-vapor
+  - fedkin-grossman-ghiorso-2006
+  - fray-schmitt-2009-ch4-1
+  - fray-schmitt-2009-co-1
+  - fray-schmitt-2009-nh3
+  - giauque-powell-1939-cl2
+  - giauque-ruehrwein-1939-hcn-psat
+  - habermann-daane-1964
+  - iapws-95-psat-liquid
+  - iupac-o2-solid-psat
+  - janaf-4th
+  - lamoreaux-hildenbrand-1984
+  - lamoreaux-hildenbrand-hildenbrand-1987
+  - lh87-al-o-gas-species
+  - lh87-beo-g
+  - lh87-cao-g
+  - lh87-geo-g
+  - lh87-in2o-g
+  - lh87-mgo-g
+  - lh87-pbo-g
+  - lh87-sno-g
+  - nasa-cea-thermo
+  - nist-srd69-p4
+  - nist-webbook
+  - pending-as2o3-second-primary
+  - pending-bi2o3-kems
+  - pending-cacl2-kems-or-transpiration
+  - pending-dual-primary-oso4
+  - pending-kems-cro3
+  - pending-mg2cl4
+  - pending-mgcl2-measured-vp
+  - pending-p4o6-vp
+  - pending-pages-moo3-vp
+  - pending-pages-p4o10-sublimation
+  - pending-pages-wo3-polymer-vp
+  - pending-re2o7-second-series
+  - pending-teo2-vp
+  - pound-1972-cr-langmuir-knudsen
+  - pound-1972-mccabe-cr
+  - rau-1974-se-vp
+  - ref-016-sio-kems-1700-2000k
+  - ref-032-al
+  - ref-032-bi
+  - ref-032-ca
+  - ref-032-fe-liquid-equation
+  - ref-032-k
+  - ref-032-mg
+  - ref-032-mn-if-not-in-fit
+  - ref-032-na
+  - ref-032-pb
+  - ref-032-si
+  - ref-032-th
+  - ref-032-zr
+  - ref-052-k-o-gas
+  - ref-052-na-o-gas
+  - richter-et-al-2007
+  - safarian-engh-2013-si-pure-langmuir
+  - sossi-et-al-2019
+  - sossi-fegley-2018
+  - span-wagner-1996-co2-psat
+  - wetzel-gail-2013-sio-arrhenius
+
+# Append-only graduation tombstones. When an active id gains reviewer-verified
+# samples, move it here (do not merely delete from active). Re-activation is refused.
+graduated_pre_policy_source_ids: []

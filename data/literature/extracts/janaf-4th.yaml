@@ -53,8 +53,7 @@ species:
           only
         source_certification: reference_thermochemical_table
         tabulated_delta_fG_kJ_mol:
-        - &id001
-          T_K: 298.15
+        - T_K: 298.15
           delta_fG: -47.139
         - T_K: 500.0
           delta_fG: -62.24
@@ -882,7 +881,7 @@ species:
           SO3 vaporizati'
         record: JANAF-4th#SO3_l_g_deltafG_crosscheck
       units: as published
-      values: &id002
+      values:
         quantity: pure_Psat
         preferred_primary:
           citation: Brandner, J.D. et al. historical SO3 liquid vapor-pressure measurements as cited by
@@ -1074,13 +1073,29 @@ species:
         independence_note: LH87 is acquisition source
 fidelity_samples:
 - path: species.PO.observations[JANAF1998_PO_formation_tabulation].values.tabulated_delta_fG_kJ_mol[0]
-  value: *id001
+  value:
+    T_K: 298.15
+    delta_fG: -47.139
   note: JANAF PO ΔfG grid point 0 retained under species PO (not list-index key)
   locator:
     table: O-004
     record: JANAF1998_PO_formation_tabulation
 - path: species.SO3.observations[anchor_SO3_pure_Psat].values
-  value: *id002
+  value:
+    quantity: pure_Psat
+    preferred_primary:
+      citation: Brandner, J.D. et al. historical SO3 liquid vapor-pressure measurements as cited by NIST
+        WebBook alternative sources for CAS 7446-11-9; recover page-level non-Abercromby primary before
+        certified flip.
+      status: PARTIAL_NEED_PAGE
+    T_range_K:
+    - 333
+    - 483
+    phase: liquid_SO3_to_SO3_g
+    standard_state: pure SO3; log10 P as WebBook
+    independence_note: Abercromby & Tiley is the fit source — cannot self-validate. JANAF ΔfG reconstruction
+      is model-independent of the Antoine coefficients but shares literature pool; hunt a second lab VP
+      series before full validated flip.
   note: auto fidelity sample from first observation payload (pilot migration)
   locator:
     note: 'Schrage, J. (1991), "Vapor-liquid equilibrium of the system H2SO4–SO3. Part I–II", Fluid Phase

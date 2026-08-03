@@ -25,18 +25,26 @@ species:
       standard_state: Pure elemental branch only; melt Si path is SiO(g)
       regime: langmuir_free_evaporation
       units: dimensionless
-      values: &id002
+      values:
         alpha: 1.0
-        alpha_range: &id001
+        alpha_range:
         - 0.84
         - 1.0
         gas_species: Si(g)
         material: pure_elemental_silicon
       uncertainty:
-        alpha_range: *id001
+        alpha_range:
+        - 0.84
+        - 1.0
 fidelity_samples:
 - path: species.Si.observations[safarian_engh_2013_si_pure_langmuir].values
-  value: *id002
+  value:
+    alpha: 1.0
+    alpha_range:
+    - 0.84
+    - 1.0
+    gas_species: Si(g)
+    material: pure_elemental_silicon
   note: auto fidelity sample from first observation payload (pilot migration)
   locator:
     note: Safarian, J. & Engh, T. A. (2013), Metall. Mater. Trans. A 44:747-753, DOI 10.1007/s11661-012-1464-2

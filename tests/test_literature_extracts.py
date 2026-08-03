@@ -2,11 +2,17 @@
 
 Each acceptance claim has a red-under-reversion pin. Null-hypotheses are stated
 in the test docstrings where a prior defect is being locked out.
+
+t-510 fidelity gate:
+* ENFORCED_FOR_NEW sample presence (pre-policy allowlist is shrink-only)
+* parameterized match of every fidelity sample against extract content
+* mutation of a pinned value must go RED
 """
 
 from __future__ import annotations
 
 import copy
+import hashlib
 import math
 import sys
 from pathlib import Path
@@ -17,6 +23,8 @@ import yaml
 REPO_ROOT = Path(__file__).resolve().parents[1]
 TOOLS = REPO_ROOT / "tools"
 EXTRACTS = REPO_ROOT / "data" / "literature" / "extracts"
+FIDELITY_POLICY = EXTRACTS / "_fidelity_pre_policy_allowlist.yaml"
+FIDELITY_GRADUATION_LEDGER = EXTRACTS / "_fidelity_graduation_ledger.yaml"
 
 if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
@@ -24,6 +32,19 @@ if str(TOOLS) not in sys.path:
 import extract_merge as em  # noqa: E402
 import migrate_pilot_extracts as mig  # noqa: E402
 import validate_literature_extracts as vle  # noqa: E402
+
+# Frozen closed-set hash at t-510 policy adoption (sorted source_ids joined by \n).
+# Null-hypothesis: an extract can be ADDED to the allowlist later → closed set
+# grows → this hash drifts and the shrink-only test goes RED.
+CLOSED_SET_SHA256 = (
+    "7784107b6656e0ab1c1e2ef9c33fe95a6108b6585a91e4e8ca1b5021960c8e9b"
+)
+# Canonical append-only graduation history hash (sorted ids joined by \n).
+# Updating this pin is an explicit review event; removing a prior tombstone
+# must never be bundled into a policy rewrite.
+GRADUATION_LEDGER_SHA256 = (
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+)
 
 
 # ---------------------------------------------------------------------------
@@ -288,10 +309,72 @@ def test_duplicate_observation_id_cross_species_refused():
 
 
 def test_refuses_missing_fidelity_samples():
+    """Null-hypothesis (t-510): new extracts without samples used to validate green."""
     doc = _minimal_extract()
     del doc["fidelity_samples"]
+    # pre_policy_ids=None → samples required (non-allowlisted fixture)
     errs = vle.validate_extract_document(doc, expected_source_id="fixture-source")
     assert any("fidelity_samples" in e for e in errs)
+
+
+def test_pre_policy_allowlist_exempts_missing_samples():
+    """Grandfathering: pilot source_ids may omit samples under ENFORCED_FOR_NEW."""
+    doc = _minimal_extract()
+    doc["source_id"] = "costa-jacobson-2015"
+    del doc["fidelity_samples"]
+    errs = vle.validate_extract_document(
+        doc,
+        expected_source_id="costa-jacobson-2015",
+        pre_policy_ids={"costa-jacobson-2015"},
+    )
+    assert errs == [], errs
+
+
+def test_non_allowlisted_still_refuses_missing_samples():
+    """Null-hypothesis: allowlist exemption must not leak to new source_ids."""
+    doc = _minimal_extract()
+    doc["source_id"] = "brand-new-ocr-source-2026"
+    del doc["fidelity_samples"]
+    errs = vle.validate_extract_document(
+        doc,
+        expected_source_id="brand-new-ocr-source-2026",
+        pre_policy_ids={"costa-jacobson-2015"},  # not this one
+    )
+    assert any("fidelity_samples" in e for e in errs)
+
+
+def test_structured_fidelity_sample_accepted():
+    """OCR-style structured samples (species/observable/value/locator) validate."""
+    doc = _minimal_extract()
+    doc["fidelity_samples"] = [
+        {
+            "species": "Fe",
+            "observable": "alpha",
+            "observation_id": "fe_alpha_1",
+            "field": "alpha",
+            "value": 0.24,
+            "locator": {"page": 2, "table": "1"},
+        }
+    ]
+    errs = vle.validate_extract_document(doc, expected_source_id="fixture-source")
+    assert errs == []
+    match_errs = vle.check_all_fidelity_samples_match(doc, label="fixture")
+    assert match_errs == []
+
+
+def test_structured_sample_requires_locator():
+    doc = _minimal_extract()
+    doc["fidelity_samples"] = [
+        {
+            "species": "Fe",
+            "observable": "alpha",
+            "observation_id": "fe_alpha_1",
+            "value": 0.24,
+            # no locator
+        }
+    ]
+    errs = vle.validate_extract_document(doc, expected_source_id="fixture-source")
+    assert any("locator" in e for e in errs)
 
 
 def test_refuses_absolute_provenance_path():
@@ -418,13 +501,20 @@ def test_unlisted_source_cannot_win_lexically(tmp_extracts: Path):
     b["species"]["Fe"]["observations"][0]["values"] = {"alpha": 0.01}
     b["fidelity_samples"] = [
         {
-            "path": "x",
-            "value": 1,
+            "path": "species.Fe.observations[fe_a].values.alpha",
+            "value": 0.01,
             "note": "n",
             "locator": {"page": 1},
         }
     ]
-    a["fidelity_samples"] = b["fidelity_samples"]
+    a["fidelity_samples"] = [
+        {
+            "path": "species.Fe.observations[fe_z].values.alpha",
+            "value": 0.24,
+            "note": "n",
+            "locator": {"page": 1},
+        }
+    ]
     _write_extract(tmp_extracts, a)
     _write_extract(tmp_extracts, b)
     extracts = em.load_extracts(tmp_extracts, require_valid=True)
@@ -463,7 +553,12 @@ def test_regime_difference_not_merged_as_one_conflict(tmp_extracts: Path):
     b["species"]["Fe"]["observations"][0]["regime"] = "kems_effusion"
     b["species"]["Fe"]["observations"][0]["values"] = {"alpha": 0.02}
     b["fidelity_samples"] = [
-        {"path": "x", "value": 1, "note": "n", "locator": {"page": 1}}
+        {
+            "path": "species.Fe.observations[fe_alpha_kems].values.alpha",
+            "value": 0.02,
+            "note": "n",
+            "locator": {"page": 1},
+        }
     ]
     _write_extract(tmp_extracts, a)
     _write_extract(tmp_extracts, b)
@@ -496,7 +591,12 @@ def test_phase_and_property_split_observables(tmp_extracts: Path):
         },
     ]
     a["fidelity_samples"] = [
-        {"path": "x", "value": 1809, "note": "n", "locator": {"page": 1}}
+        {
+            "path": "species.Fe.observations[fe_mp].values.T_K",
+            "value": 1809.0,
+            "note": "n",
+            "locator": {"page": 1},
+        }
     ]
     _write_extract(tmp_extracts, a)
     extracts = em.load_extracts(tmp_extracts, require_valid=True)
@@ -532,7 +632,12 @@ def test_consistency_report_auto_computes_disagreement(tmp_extracts: Path):
     b["species"]["Fe"]["observations"][0]["observation_id"] = "fe_other"
     b["species"]["Fe"]["observations"][0]["values"] = {"alpha": 0.02}
     b["fidelity_samples"] = [
-        {"path": "x", "value": 0.02, "note": "n", "locator": {"page": 1}}
+        {
+            "path": "species.Fe.observations[fe_other].values.alpha",
+            "value": 0.02,
+            "note": "n",
+            "locator": {"page": 1},
+        }
     ]
     _write_extract(tmp_extracts, a)
     _write_extract(tmp_extracts, b)
@@ -685,7 +790,12 @@ def test_merge_cli_writes_and_uses_custom_priority(tmp_path: Path, tmp_extracts:
     b["species"]["Fe"]["observations"][0]["observation_id"] = "fe_other"
     b["species"]["Fe"]["observations"][0]["values"] = {"alpha": 0.02}
     b["fidelity_samples"] = [
-        {"path": "x", "value": 0.02, "note": "n", "locator": {"page": 1}}
+        {
+            "path": "species.Fe.observations[fe_other].values.alpha",
+            "value": 0.02,
+            "note": "n",
+            "locator": {"page": 1},
+        }
     ]
     _write_extract(tmp_extracts, a)
     _write_extract(tmp_extracts, b)
@@ -721,11 +831,17 @@ def test_merge_refuses_invalid_extracts(tmp_extracts: Path):
 
 
 def test_pilot_extract_count_exact_and_merge_smoke():
-    """Pilot tree count is pinned; merge produces species + coverage + consistency."""
+    """Pilot census (68) remains; live corpus may grow with post-policy extracts.
+
+    Merge produces species + coverage + consistency over the full live set.
+    """
     files = vle.discover_extracts()
-    # 63 original + new correctly-attributed sources from F3 routing
-    assert len(files) >= 63
-    assert len(files) == 68  # exact pilot census after F3 re-route
+    policy = _fidelity_policy_doc()
+    closed = set(policy["closed_set_source_ids"])
+    stems = {p.stem for p in files}
+    assert len(closed) == 68  # frozen pilot census
+    assert closed <= stems  # pilot files still present
+    assert len(files) >= 68  # live corpus may include t-509 OCR extracts
     extracts = em.load_extracts(require_valid=True)
     assert len(extracts) == len(files)
     view = em.build_by_species(extracts)
@@ -844,6 +960,12 @@ def test_corr_payload_helper_merges_top_level():
 
 
 def test_every_extract_has_fidelity_sample():
+    """Pilot corpus currently carries path-based pins; keep them as drift fuses.
+
+    ENFORCED_FOR_NEW permits allowlisted extracts to omit samples, but the
+    landed pilot set still has auto-migrated pins — assert they remain so a
+    silent strip does not go unnoticed.
+    """
     for path in vle.discover_extracts():
         doc = yaml.safe_load(path.read_text(encoding="utf-8"))
         n_obs = sum(
@@ -853,6 +975,843 @@ def test_every_extract_has_fidelity_sample():
         )
         if n_obs:
             assert doc.get("fidelity_samples"), f"{path.name} missing fidelity_samples"
+
+
+# ---------------------------------------------------------------------------
+# t-510 fidelity gate: policy + parameterized match + mutation red
+# ---------------------------------------------------------------------------
+
+
+def _fidelity_policy_doc() -> dict:
+    assert FIDELITY_POLICY.is_file(), f"missing {FIDELITY_POLICY}"
+    doc = yaml.safe_load(FIDELITY_POLICY.read_text(encoding="utf-8"))
+    assert isinstance(doc, dict)
+    return doc
+
+
+def test_fidelity_policy_file_valid():
+    """Policy file loads; active ⊆ closed; partition with graduated; fields correct."""
+    policy, errs = vle.load_fidelity_policy()
+    assert errs == [], errs
+    assert policy["policy"] == "ENFORCED_FOR_NEW"
+    assert policy["effective_date"] == "2026-08-03"
+    closed = set(policy["closed_set_source_ids"])
+    active = set(policy["active_pre_policy_source_ids"])
+    graduated = set(policy.get("graduated_pre_policy_source_ids") or [])
+    assert active <= closed
+    assert graduated <= closed
+    assert active & graduated == set()
+    assert active | graduated == closed
+    assert len(closed) == 68
+
+
+def test_fidelity_graduation_ledger_matches_policy_and_hash():
+    """Canonical history mirrors tombstones and is independently hash-pinned."""
+    ledger, ledger_errs = vle.load_fidelity_graduation_ledger(
+        FIDELITY_GRADUATION_LEDGER
+    )
+    assert ledger_errs == [], ledger_errs
+    policy = _fidelity_policy_doc()
+    assert ledger == set(policy.get("graduated_pre_policy_source_ids") or [])
+    payload = "\n".join(sorted(ledger)).encode("utf-8")
+    assert hashlib.sha256(payload).hexdigest() == GRADUATION_LEDGER_SHA256
+
+
+def test_fidelity_closed_set_hash_pinned():
+    """Null-hypothesis: closed set can grow (extract ADDED to allowlist later).
+
+    The closed set is frozen at policy adoption. Any addition changes the
+    SHA-256 of the sorted joined id list and this test goes RED.
+    """
+    policy = _fidelity_policy_doc()
+    closed = policy["closed_set_source_ids"]
+    payload = "\n".join(sorted(closed)).encode("utf-8")
+    digest = hashlib.sha256(payload).hexdigest()
+    assert digest == CLOSED_SET_SHA256, (
+        f"closed_set_source_ids changed (shrink-only violation or hash drift).\n"
+        f"expected={CLOSED_SET_SHA256}\nactual={digest}\n"
+        f"count={len(closed)}"
+    )
+
+
+def test_fidelity_allowlist_rejects_active_not_subset(tmp_path: Path):
+    """Null-hypothesis: active can include ids outside closed (growth via active)."""
+    bad = {
+        "schema_version": "literature_extract_fidelity_policy.v1",
+        "policy": "ENFORCED_FOR_NEW",
+        "effective_date": "2026-08-03",
+        "closed_set_source_ids": ["a", "b"],
+        "active_pre_policy_source_ids": ["a", "sneaky-new-extract"],
+        "graduated_pre_policy_source_ids": ["b"],
+    }
+    p = tmp_path / "_fidelity_pre_policy_allowlist.yaml"
+    p.write_text(yaml.safe_dump(bad), encoding="utf-8")
+    _policy, errs = vle.load_fidelity_policy(p)
+    assert any("shrink-only" in e or "not ⊆" in e for e in errs), errs
+
+
+def test_fidelity_allowlist_rejects_remove_then_readd(tmp_path: Path):
+    """Null-hypothesis (P2): graduated id can return to active after removal.
+
+    Shrink without tombstone, then re-add, must go RED — either because the
+    graduated set still contains the id, or because a silent remove without
+    graduation breaks the closed-set partition.
+    """
+    # Step 1: legal graduation of b.
+    graduated = {
+        "schema_version": "literature_extract_fidelity_policy.v1",
+        "policy": "ENFORCED_FOR_NEW",
+        "effective_date": "2026-08-03",
+        "closed_set_source_ids": ["a", "b"],
+        "active_pre_policy_source_ids": ["a"],
+        "graduated_pre_policy_source_ids": ["b"],
+    }
+    p = tmp_path / "_fidelity_pre_policy_allowlist.yaml"
+    ledger_path = tmp_path / "_fidelity_graduation_ledger.yaml"
+    ledger_path.write_text(
+        yaml.safe_dump(
+            {
+                "schema_version": "literature_extract_fidelity_graduation_ledger.v1",
+                "graduated_pre_policy_source_ids": ["b"],
+            }
+        ),
+        encoding="utf-8",
+    )
+    p.write_text(yaml.safe_dump(graduated), encoding="utf-8")
+    _ok, errs_ok = vle.load_fidelity_policy(p)
+    assert errs_ok == [], errs_ok
+
+    # Step 2: illegal re-activation of b while still tombstoned.
+    reactivated = dict(graduated)
+    reactivated["active_pre_policy_source_ids"] = ["a", "b"]
+    p.write_text(yaml.safe_dump(reactivated), encoding="utf-8")
+    _bad, errs = vle.load_fidelity_policy(p)
+    assert any("re-activation" in e or "∩" in e for e in errs), errs
+
+    # Silent remove without tombstone also refused (partition incomplete).
+    silent = {
+        "schema_version": "literature_extract_fidelity_policy.v1",
+        "policy": "ENFORCED_FOR_NEW",
+        "effective_date": "2026-08-03",
+        "closed_set_source_ids": ["a", "b"],
+        "active_pre_policy_source_ids": ["a"],
+        "graduated_pre_policy_source_ids": [],
+    }
+    p.write_text(yaml.safe_dump(silent), encoding="utf-8")
+    _silent, silent_errs = vle.load_fidelity_policy(p)
+    assert any("graduate" in e or "missing" in e for e in silent_errs), silent_errs
+
+
+def test_fidelity_allowlist_rejects_tombstone_delete_then_reactivate(tmp_path: Path):
+    """Null-hypothesis (P2): deleting a tombstone permits reactivation.
+
+    Committed Git history is independent of both mutable current-state files.
+    Once ``b`` is recorded, no rewrite may make it active again, including
+    deleting it from both the policy tombstones and canonical ledger together.
+    """
+    policy_path = tmp_path / "_fidelity_pre_policy_allowlist.yaml"
+    ledger_path = tmp_path / "_fidelity_graduation_ledger.yaml"
+    graduated = {
+        "schema_version": "literature_extract_fidelity_policy.v1",
+        "policy": "ENFORCED_FOR_NEW",
+        "effective_date": "2026-08-03",
+        "closed_set_source_ids": ["a", "b"],
+        "active_pre_policy_source_ids": ["a"],
+        "graduated_pre_policy_source_ids": ["b"],
+    }
+    ledger = {
+        "schema_version": "literature_extract_fidelity_graduation_ledger.v1",
+        "graduated_pre_policy_source_ids": ["b"],
+    }
+    policy_path.write_text(yaml.safe_dump(graduated), encoding="utf-8")
+    ledger_path.write_text(yaml.safe_dump(ledger), encoding="utf-8")
+    _ok, ok_errs = vle.load_fidelity_policy(
+        policy_path,
+        graduated_ledger_path=ledger_path,
+        prior_graduated_source_ids={"b"},
+    )
+    assert ok_errs == [], ok_errs
+
+    reactivated = dict(graduated)
+    reactivated["active_pre_policy_source_ids"] = ["a", "b"]
+    reactivated["graduated_pre_policy_source_ids"] = []
+    policy_path.write_text(yaml.safe_dump(reactivated), encoding="utf-8")
+    # Delete the mutable ledger entry too. Only external prior history can
+    # distinguish this recreated initial-looking state from a legitimate one.
+    ledger["graduated_pre_policy_source_ids"] = []
+    ledger_path.write_text(yaml.safe_dump(ledger), encoding="utf-8")
+    _bad, errs = vle.load_fidelity_policy(
+        policy_path,
+        graduated_ledger_path=ledger_path,
+        prior_graduated_source_ids={"b"},
+    )
+    assert any("prior Git history" in e or "prior canonical" in e for e in errs), errs
+
+
+def test_default_policy_validation_uses_committed_graduation_history(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    """Null-hypothesis (P2): prior-state checking exists only in a test-only API."""
+    policy_path = tmp_path / "_fidelity_pre_policy_allowlist.yaml"
+    ledger_path = tmp_path / "_fidelity_graduation_ledger.yaml"
+    policy_path.write_text(
+        yaml.safe_dump(
+            {
+                "schema_version": "literature_extract_fidelity_policy.v1",
+                "policy": "ENFORCED_FOR_NEW",
+                "effective_date": "2026-08-03",
+                "closed_set_source_ids": ["a", "b"],
+                "active_pre_policy_source_ids": ["a", "b"],
+                "graduated_pre_policy_source_ids": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+    ledger_path.write_text(
+        yaml.safe_dump(
+            {
+                "schema_version": "literature_extract_fidelity_graduation_ledger.v1",
+                "graduated_pre_policy_source_ids": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(vle, "FIDELITY_POLICY_PATH", policy_path)
+    monkeypatch.setattr(vle, "FIDELITY_GRADUATION_LEDGER_PATH", ledger_path)
+    monkeypatch.setattr(
+        vle,
+        "load_committed_fidelity_graduation_history",
+        lambda _path: ({"b"}, []),
+    )
+    _policy, errs = vle.load_fidelity_policy()
+    assert any("prior Git history" in e or "prior canonical" in e for e in errs), errs
+
+
+def test_fidelity_allowlist_covers_pilot_census():
+    """Frozen pilot census remains present; live corpus may grow past it.
+
+    Null-hypothesis (P1): equating live stems to the closed set blocks the
+    first compliant t-509 extract. Require closed ⊆ stems instead, and allow
+    additional non-allowlisted stems that carry samples.
+    """
+    policy = _fidelity_policy_doc()
+    closed = set(policy["closed_set_source_ids"])
+    active = set(policy["active_pre_policy_source_ids"])
+    stems = {p.stem for p in vle.discover_extracts()}
+    # Frozen pilot set still present in the live corpus.
+    assert closed <= stems, f"missing pilot extracts: {sorted(closed - stems)}"
+    assert active <= closed
+    # New (post-policy) stems are allowed and must not be on the active allowlist.
+    new_stems = stems - closed
+    assert new_stems.isdisjoint(active)
+
+
+def test_new_extract_with_valid_sample_admitted():
+    """Acceptance: a 69th non-allowlisted extract with a valid sample validates.
+
+    Null-hypothesis (P1 census): the suite treated live corpus == closed set,
+    so any new stem made the suite red even with reviewer-verified samples.
+    """
+    doc = _minimal_extract()
+    doc["source_id"] = "brand-new-ocr-source-2026"
+    # Structured observation pin (OCR form) — required for new extracts.
+    doc["fidelity_samples"] = [
+        {
+            "species": "Fe",
+            "observable": "alpha",
+            "observation_id": "fe_alpha_1",
+            "field": "alpha",
+            "value": 0.24,
+            "locator": {"page": 2, "table": "1"},
+        }
+    ]
+    errs = vle.validate_extract_document(
+        doc,
+        expected_source_id="brand-new-ocr-source-2026",
+        pre_policy_ids=set(),  # not allowlisted
+        check_fidelity_match=True,
+    )
+    assert errs == [], errs
+
+
+def test_new_extract_metadata_only_path_sample_refused():
+    """Null-hypothesis (P1): path samples can pin metadata instead of evidence.
+
+    A non-allowlisted extract with only a path pin on source_id used to
+    validate green under ENFORCED_FOR_NEW without checking a publication value.
+    """
+    doc = _minimal_extract()
+    doc["source_id"] = "fixture-source"
+    doc["fidelity_samples"] = [
+        {
+            "path": "source_id",
+            "value": "fixture-source",
+            "note": "not an observation pin",
+        }
+    ]
+    errs = vle.validate_extract_document(
+        doc,
+        expected_source_id="fixture-source",
+        pre_policy_ids=set(),
+        check_fidelity_match=True,
+    )
+    assert any("observation evidence" in e or "metadata" in e for e in errs), errs
+
+
+def test_new_extract_mixed_metadata_path_and_structured_sample_refused():
+    """Null-hypothesis (P1): structured decoration legitimizes a metadata path.
+
+    Addressing mode must be unambiguous and every present path must identify
+    observation evidence, independent of any additional sample fields.
+    """
+    doc = _minimal_extract()
+    doc["source_id"] = "fixture-source"
+    doc["fidelity_samples"] = [
+        {
+            "path": "source_id",
+            "species": "Fe",
+            "observation_id": "fe_alpha_1",
+            "observable": "alpha",
+            "field": "alpha",
+            "value": "fixture-source",
+            "locator": {"page": 2},
+        }
+    ]
+    errs = vle.validate_extract_document(
+        doc,
+        expected_source_id="fixture-source",
+        pre_policy_ids=set(),
+        check_fidelity_match=True,
+    )
+    assert any("addressing mode" in e or "observation evidence" in e for e in errs), errs
+    direct_errs = vle.check_fidelity_sample_matches(
+        doc, doc["fidelity_samples"][0], label="mixed-addressing"
+    )
+    assert any("addressing mode" in e for e in direct_errs), direct_errs
+
+
+@pytest.mark.parametrize(
+    "conflicting_keys",
+    [
+        {"value_key": "bogus"},
+        {"draft_value": 999.0},
+        {"index": 0, "T_K": 1700.0},
+        {"T_K": 1700.0, "T": 1800.0},
+    ],
+    ids=["field-value_key", "value-draft_value", "index-temperature", "T_K-T"],
+)
+def test_fidelity_rejects_conflicting_structured_selectors(conflicting_keys: dict):
+    """Null-hypothesis (P1): precedence silently ignores contradictory selectors."""
+    doc = _minimal_extract()
+    sample = {
+        "species": "Fe",
+        "observation_id": "fe_alpha_1",
+        "observable": "alpha",
+        "field": "alpha",
+        "value": 0.24,
+        "locator": {"page": 2},
+        **conflicting_keys,
+    }
+    doc["fidelity_samples"] = [sample]
+    errs = vle.validate_extract_document(
+        doc,
+        expected_source_id="fixture-source",
+        pre_policy_ids=set(),
+        check_fidelity_match=True,
+    )
+    assert any("exactly one" in e or "not both" in e for e in errs), errs
+    assert vle.check_fidelity_sample_matches(doc, sample), sample
+
+
+def test_fidelity_observation_id_and_observable_must_agree():
+    """Null-hypothesis (P1): observation_id precedence ignores wrong observable."""
+    doc = _minimal_extract()
+    sample = {
+        "species": "Fe",
+        "observation_id": "fe_alpha_1",
+        "observable": "psat_series",
+        "field": "alpha",
+        "value": 0.24,
+        "locator": {"page": 2},
+    }
+    doc["fidelity_samples"] = [sample]
+    errs = vle.validate_extract_document(
+        doc,
+        expected_source_id="fixture-source",
+        pre_policy_ids=set(),
+        check_fidelity_match=True,
+    )
+    assert any("not requested observable" in e for e in errs), errs
+    assert vle.check_fidelity_sample_matches(doc, sample)
+
+
+@pytest.mark.parametrize(
+    "source_locator",
+    [{"page": 999}, None],
+    ids=["contradictory", "null-decoration"],
+)
+def test_fidelity_rejects_locator_alias_decoration(source_locator):
+    """Null-hypothesis (P1): locator precedence ignores source_locator."""
+    doc = _minimal_extract()
+    sample = copy.deepcopy(doc["fidelity_samples"][0])
+    sample["source_locator"] = source_locator
+    doc["fidelity_samples"] = [sample]
+    errs = vle.validate_extract_document(
+        doc,
+        expected_source_id="fixture-source",
+        pre_policy_ids=set(),
+        check_fidelity_match=True,
+    )
+    assert any("exactly one" in e or "source_locator" in e for e in errs), errs
+    assert vle.check_fidelity_sample_matches(doc, sample)
+
+
+@pytest.mark.parametrize(
+    "rel_tol", [True, float("inf"), float("nan"), -0.1, None, "0.1"]
+)
+def test_fidelity_rejects_invalid_relative_tolerance(rel_tol):
+    """Null-hypothesis (P2): invalid tolerance bypasses or crashes exact match."""
+    doc = _minimal_extract()
+    doc["species"]["Fe"]["observations"][0]["values"] = {"alpha": 10.0}
+    sample = {
+        "path": "species.Fe.observations[fe_alpha_1].values.alpha",
+        "value": 20.0,
+        "rel_tol": rel_tol,
+        "note": "invalid tolerance",
+        "locator": {"page": 1},
+    }
+    doc["fidelity_samples"] = [sample]
+    errs = vle.validate_extract_document(
+        doc,
+        expected_source_id="fixture-source",
+        pre_policy_ids=set(),
+        check_fidelity_match=True,
+    )
+    assert any("rel_tol" in e for e in errs), errs
+    direct_errs = vle.check_fidelity_sample_matches(doc, sample)
+    assert any("rel_tol" in e for e in direct_errs), direct_errs
+
+
+def test_fidelity_accepts_bounded_relative_tolerance_without_type_coercion():
+    """A finite explicit tolerance relaxes magnitude only for equal numeric types."""
+    doc = _minimal_extract()
+    doc["species"]["Fe"]["observations"][0]["values"] = {"alpha": 10.0}
+    sample = {
+        "path": "species.Fe.observations[fe_alpha_1].values.alpha",
+        "value": 10.001,
+        "rel_tol": 0.001,
+        "note": "bounded tolerance",
+        "locator": {"page": 1},
+    }
+    assert vle.check_fidelity_sample_matches(doc, sample) == []
+    sample["value"] = 10
+    assert vle.check_fidelity_sample_matches(doc, sample), "rel_tol must not coerce int"
+
+
+def test_new_extract_null_sample_value_refused():
+    """Null-hypothesis (P1): a null pin satisfies the mandatory fidelity gate."""
+    doc = _minimal_extract()
+    # Add a null sibling field and pin it.
+    doc["species"]["Fe"]["observations"][0]["values"]["sibling_null"] = None
+    doc["fidelity_samples"] = [
+        {
+            "species": "Fe",
+            "observation_id": "fe_alpha_1",
+            "observable": "alpha",
+            "field": "sibling_null",
+            "value": None,
+            "locator": {"page": 2, "table": "1"},
+        }
+    ]
+    errs = vle.validate_extract_document(
+        doc,
+        expected_source_id="fixture-source",
+        pre_policy_ids=set(),
+        check_fidelity_match=True,
+    )
+    assert any("null" in e for e in errs), errs
+
+
+@pytest.mark.parametrize("empty_scalar", ["", "   "])
+def test_new_extract_empty_scalar_sample_value_refused(empty_scalar: str):
+    """Null-hypothesis (P1): empty scalar pins satisfy the fidelity gate."""
+    doc = _minimal_extract()
+    doc["species"]["Fe"]["observations"][0]["values"]["empty_scalar"] = empty_scalar
+    doc["fidelity_samples"] = [
+        {
+            "species": "Fe",
+            "observation_id": "fe_alpha_1",
+            "observable": "alpha",
+            "field": "empty_scalar",
+            "value": empty_scalar,
+            "locator": {"page": 2, "table": "1"},
+        }
+    ]
+    errs = vle.validate_extract_document(
+        doc,
+        expected_source_id="fixture-source",
+        pre_policy_ids=set(),
+        check_fidelity_match=True,
+    )
+    assert any("non-null observed pin" in e or "empty" in e for e in errs), errs
+
+
+@pytest.mark.parametrize(
+    "empty_scalar",
+    [
+        yaml.safe_load("!!binary ''"),
+        yaml.safe_load("!!binary ICAg"),
+        yaml.safe_load("!!set {}"),
+    ],
+    ids=["empty-binary", "whitespace-binary", "empty-set"],
+)
+def test_new_extract_serialized_empty_scalar_sample_value_refused(empty_scalar):
+    """Null-hypothesis (P1): alternate YAML empty scalar types stay green."""
+    doc = _minimal_extract()
+    body_value = copy.deepcopy(empty_scalar)
+    doc["species"]["Fe"]["observations"][0]["values"] = {
+        "empty_scalar": body_value
+    }
+    sample = {
+        "species": "Fe",
+        "observation_id": "fe_alpha_1",
+        "observable": "alpha",
+        "field": "empty_scalar",
+        "value": copy.deepcopy(empty_scalar),
+        "locator": {"page": 2},
+    }
+    doc["fidelity_samples"] = [sample]
+    loaded = yaml.safe_load(yaml.safe_dump(doc, sort_keys=False))
+    errs = vle.validate_extract_document(
+        loaded,
+        expected_source_id="fixture-source",
+        pre_policy_ids=set(),
+        check_fidelity_match=True,
+    )
+    assert any("non-null observed pin" in e or "empty" in e for e in errs), errs
+    direct_errs = vle.check_fidelity_sample_matches(
+        loaded, loaded["fidelity_samples"][0]
+    )
+    assert any("non-null observed pin" in e or "empty" in e for e in direct_errs)
+
+
+def test_fidelity_shared_alias_identity_rejected():
+    """Null-hypothesis (P1): YAML-aliased sample co-mutates with body → always green."""
+    doc = _minimal_extract()
+    values = doc["species"]["Fe"]["observations"][0]["values"]
+    doc["fidelity_samples"] = [
+        {
+            "path": "species.Fe.observations[fe_alpha_1].values",
+            "value": values,  # shared object identity (alias)
+            "note": "aliased pin",
+            "locator": {"page": 2},
+        }
+    ]
+    # Match helper must refuse shared identity even though values "equal".
+    match_errs = vle.check_all_fidelity_samples_match(doc, label="alias")
+    assert any("identity" in e or "alias" in e for e in match_errs), match_errs
+    # Shape path on new extracts also refuses.
+    shape_errs = vle.validate_extract_document(
+        doc, expected_source_id="fixture-source", pre_policy_ids=set()
+    )
+    assert any("identity" in e or "alias" in e for e in shape_errs), shape_errs
+
+
+def test_fidelity_nested_serialized_alias_identity_rejected():
+    """Null-hypothesis (P1): nested YAML aliases co-mutate and stay green.
+
+    Alias identity is forbidden between the complete pin and resolved body
+    object graphs, not merely between their roots.
+    """
+    doc = _minimal_extract()
+    values = {"series": [{"T_K": 1700.0, "alpha": 0.02}]}
+    doc["species"]["Fe"]["observations"][0]["values"] = values
+    doc["fidelity_samples"] = [
+        {
+            "path": "species.Fe.observations[fe_alpha_1].values",
+            "value": {"series": values["series"]},
+            "note": "nested aliased pin",
+            "locator": {"page": 2},
+        }
+    ]
+    serialized = yaml.safe_dump(doc, sort_keys=False)
+    assert "&id" in serialized and "*id" in serialized
+    loaded = yaml.safe_load(serialized)
+    expected = loaded["fidelity_samples"][0]["value"]
+    actual = loaded["species"]["Fe"]["observations"][0]["values"]
+    assert expected is not actual
+    assert expected["series"] is actual["series"]
+
+    baseline_errs = vle.check_all_fidelity_samples_match(loaded, label="nested-alias")
+    assert any("identity" in e or "alias" in e for e in baseline_errs), baseline_errs
+    shape_errs = vle.validate_extract_document(
+        loaded,
+        expected_source_id="fixture-source",
+        pre_policy_ids=set(),
+        check_fidelity_match=True,
+    )
+    assert any("identity" in e or "alias" in e for e in shape_errs), shape_errs
+    actual["series"].append({"T_K": 1800.0, "alpha": 0.03})
+    mutation_errs = vle.check_all_fidelity_samples_match(loaded, label="nested-alias")
+    assert any("identity" in e or "alias" in e for e in mutation_errs), mutation_errs
+
+
+def test_fidelity_nested_serialized_mutable_set_alias_rejected():
+    """Null-hypothesis (P1): nested YAML set aliases co-mutate and stay green."""
+    doc = _minimal_extract()
+    labels = {"published", "reviewed"}
+    values = {"labels": labels}
+    doc["species"]["Fe"]["observations"][0]["values"] = values
+    doc["fidelity_samples"] = [
+        {
+            "path": "species.Fe.observations[fe_alpha_1].values",
+            "value": {"labels": labels},
+            "note": "nested set alias",
+            "locator": {"page": 2},
+        }
+    ]
+    loaded = yaml.safe_load(yaml.safe_dump(doc, sort_keys=False))
+    expected = loaded["fidelity_samples"][0]["value"]
+    actual = loaded["species"]["Fe"]["observations"][0]["values"]
+    assert expected is not actual
+    assert expected["labels"] is actual["labels"]
+    baseline_errs = vle.check_all_fidelity_samples_match(loaded, label="set-alias")
+    assert any("identity" in e or "alias" in e for e in baseline_errs), baseline_errs
+    actual["labels"].add("mutated")
+    mutation_errs = vle.check_all_fidelity_samples_match(loaded, label="set-alias")
+    assert any("identity" in e or "alias" in e for e in mutation_errs), mutation_errs
+
+
+def test_migrator_fidelity_deepcopy_isolates_pin():
+    """Null-hypothesis (P1): reverting migrator deepcopy re-introduces aliases.
+
+    ``_add_fidelity`` must copy the value so mutating the observation payload
+    after sampling does not co-update the pin.
+    """
+    doc = mig._base_extract(
+        "mig-fixture",
+        citation="Mig et al.",
+        doi=None,
+        url=None,
+        year=2026,
+        method="test",
+        date="2026-08-03",
+        worker="pytest",
+        provenance_path="docs-private/x.md",
+    )
+    values = {"alpha": 0.02, "material": "olivine"}
+    mig._add_fidelity(
+        doc,
+        path="species.Fe.observations[x].values",
+        value=values,
+        note="pin",
+    )
+    assert doc["fidelity_samples"][0]["value"] is not values
+    values["alpha"] = 99.0
+    assert doc["fidelity_samples"][0]["value"]["alpha"] == 0.02
+
+
+def test_fidelity_exact_match_rejects_bool_int_and_float_drift():
+    """Null-hypothesis (P2): isclose / bool==int let type-drift pins stay green."""
+    doc = _minimal_extract()
+    # False vs 0
+    doc["species"]["Fe"]["observations"][0]["values"] = {"flag": False}
+    sample_bool = {
+        "path": "species.Fe.observations[fe_alpha_1].values.flag",
+        "value": 0,
+        "note": "type drift",
+        "locator": {"page": 1},
+    }
+    assert vle.check_fidelity_sample_matches(doc, sample_bool), "False must not match 0"
+    # True vs 1
+    doc["species"]["Fe"]["observations"][0]["values"] = {"flag": True}
+    sample_true = {
+        "path": "species.Fe.observations[fe_alpha_1].values.flag",
+        "value": 1,
+        "note": "type drift",
+        "locator": {"page": 1},
+    }
+    assert vle.check_fidelity_sample_matches(doc, sample_true), "True must not match 1"
+    # Small float mutation
+    doc["species"]["Fe"]["observations"][0]["values"] = {"alpha": 10.0}
+    sample_float = {
+        "path": "species.Fe.observations[fe_alpha_1].values.alpha",
+        "value": 10.000000005,
+        "note": "float drift",
+        "locator": {"page": 1},
+    }
+    assert vle.check_fidelity_sample_matches(
+        doc, sample_float
+    ), "float isclose drift must go red"
+    # Exact match still green
+    sample_ok = {
+        "path": "species.Fe.observations[fe_alpha_1].values.alpha",
+        "value": 10.0,
+        "note": "exact",
+        "locator": {"page": 1},
+    }
+    assert vle.check_fidelity_sample_matches(doc, sample_ok) == []
+
+
+@pytest.mark.parametrize(("expected", "actual"), [(10, 10.0), (10.0, 10)])
+def test_fidelity_exact_match_rejects_int_float_type_drift(expected, actual):
+    """Null-hypothesis (P2): Python numeric equality hides int/float drift."""
+    doc = _minimal_extract()
+    doc["species"]["Fe"]["observations"][0]["values"] = {"alpha": actual}
+    sample = {
+        "path": "species.Fe.observations[fe_alpha_1].values.alpha",
+        "value": expected,
+        "note": "numeric type drift",
+        "locator": {"page": 1},
+    }
+    assert vle.check_fidelity_sample_matches(doc, sample), (
+        f"{type(expected).__name__} must not match {type(actual).__name__}"
+    )
+
+
+@pytest.mark.parametrize(
+    ("expected", "actual"),
+    [
+        ({10: "x"}, {10.0: "x"}),
+        ({10.0: "x"}, {10: "x"}),
+        ({False: "x"}, {0: "x"}),
+        ({0: "x"}, {False: "x"}),
+    ],
+    ids=["key-int-float", "key-float-int", "key-bool-int", "key-int-bool"],
+)
+def test_fidelity_exact_match_rejects_mapping_key_type_drift(expected, actual):
+    """Null-hypothesis (P2): Python mapping-key equality hides type drift."""
+    doc = _minimal_extract()
+    doc["species"]["Fe"]["observations"][0]["values"] = actual
+    sample = {
+        "path": "species.Fe.observations[fe_alpha_1].values",
+        "value": expected,
+        "note": "mapping key type drift",
+        "locator": {"page": 1},
+    }
+    loaded = yaml.safe_load(yaml.safe_dump({"doc": doc, "sample": sample}))
+    assert vle.check_fidelity_sample_matches(loaded["doc"], loaded["sample"])
+
+
+@pytest.mark.parametrize(("expected", "actual"), [([1], (1,)), ((1,), [1])])
+def test_fidelity_exact_match_rejects_sequence_type_drift(expected, actual):
+    """Null-hypothesis (P2): list and tuple structures compare as one type."""
+    doc = _minimal_extract()
+    doc["species"]["Fe"]["observations"][0]["values"] = {"series": actual}
+    sample = {
+        "path": "species.Fe.observations[fe_alpha_1].values.series",
+        "value": expected,
+        "note": "sequence type drift",
+        "locator": {"page": 1},
+    }
+    assert vle.check_fidelity_sample_matches(doc, sample)
+
+
+def _extract_paths_with_samples() -> list[Path]:
+    paths: list[Path] = []
+    for path in vle.discover_extracts():
+        doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+        samples = doc.get("fidelity_samples") or []
+        if samples:
+            paths.append(path)
+    return paths
+
+
+@pytest.mark.parametrize(
+    "extract_path",
+    _extract_paths_with_samples(),
+    ids=lambda p: p.stem,
+)
+def test_fidelity_sample_matches_extract(extract_path: Path):
+    """Every fidelity sample still matches extract content (extraction-drift fuse).
+
+    Null-hypothesis: a silent rewrite of a pinned field (bad regeneration,
+    migrator regression) leaves samples stale while the file stays
+    schema-valid — this test must go RED.
+    """
+    doc = yaml.safe_load(extract_path.read_text(encoding="utf-8"))
+    errs = vle.check_all_fidelity_samples_match(doc, label=extract_path.stem)
+    assert errs == [], "\n".join(errs)
+
+
+def test_fidelity_sample_mutation_reds():
+    """Prove the gate: mutate one extract value in memory → match test REDS.
+
+    Pins must be independent literals (no YAML alias). Mutate the body without
+    deepcopying samples — a co-mutated alias would keep the match green.
+    """
+    path = EXTRACTS / "costa-jacobson-2015.yaml"
+    assert path.is_file(), "costa-jacobson-2015 extract required for mutation pin"
+    doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+    samples = doc.get("fidelity_samples") or []
+    assert samples, "costa extract must carry at least one fidelity sample"
+    # Baseline green with independent (non-aliased) pins.
+    assert vle.check_all_fidelity_samples_match(doc, label="costa") == []
+    # Prove samples do not share identity with body values.
+    for i, s in enumerate(samples):
+        exp = s.get("value") if "value" in s else s.get("draft_value")
+        act = vle.resolve_fidelity_sample(doc, s)
+        if isinstance(exp, (dict, list)):
+            assert exp is not act, (
+                f"sample[{i}] still shares identity with body — re-dump without aliases"
+            )
+
+    # Mutate the Fe alpha pin in the extract body (samples left untouched).
+    fe_obs = doc["species"]["Fe"]["observations"]
+    target = None
+    for obs in fe_obs:
+        if obs.get("observation_id") == "costa_jacobson_2015_fe_olivine_kems":
+            target = obs
+            break
+    assert target is not None, "expected costa Fe KEMS observation"
+    original = copy.deepcopy(target["values"])
+    # Flip a numeric field the sample pins (whole values dict on the pilot sample).
+    if isinstance(target["values"], dict) and "alpha" in target["values"]:
+        target["values"]["alpha"] = float(target["values"]["alpha"]) + 0.5
+    else:
+        target["values"] = {"__mutated__": True}
+
+    errs = vle.check_all_fidelity_samples_match(doc, label="costa-mutated")
+    assert errs, (
+        "mutation of pinned extract value must turn fidelity match RED; "
+        f"original={original!r}"
+    )
+    assert any("mismatch" in e for e in errs), errs
+
+
+def test_fidelity_resolve_structured_series_index():
+    """Structured sample with index resolves a series point."""
+    doc = _minimal_extract()
+    doc["species"]["Fe"]["observations"][0] = {
+        "observation_id": "fe_psat",
+        "type": "psat_series",
+        "locator": {"table": "2"},
+        "units": "Pa",
+        "values": [
+            {"T_K": 1700.0, "P_Pa": 1.0},
+            {"T_K": 1800.0, "P_Pa": 10.0},
+        ],
+    }
+    sample = {
+        "species": "Fe",
+        "observation_id": "fe_psat",
+        "observable": "psat_series",
+        "index": 1,
+        "field": "P_Pa",
+        "value": 10.0,
+        "locator": {"table": "2"},
+    }
+    assert vle.resolve_fidelity_sample(doc, sample) == pytest.approx(10.0)
+    sample_t = {
+        "species": "Fe",
+        "observation_id": "fe_psat",
+        "T_K": 1700.0,
+        "field": "P_Pa",
+        "value": 1.0,
+        "locator": {"table": "2"},
+    }
+    assert vle.resolve_fidelity_sample(doc, sample_t) == pytest.approx(1.0)
+    assert vle.check_fidelity_sample_matches(doc, sample_t) == []
 
 
 def test_singleton_series_disagreement_is_none():

@@ -30,14 +30,14 @@ species:
         equal to α_Fe within ±0.04 class sensitivity (Fedkin Fig. 3).
       regime: langmuir_free_evaporation
       units: dimensionless
-      values: &id009
+      values:
         alpha: 0.24
-        alpha_range: &id001
+        alpha_range:
         - 0.21
         - 0.27
         gas_species: Fe(g)
         material: Hashimoto_1983_FMSCA_silicate_melt
-        per_temperature: &id002
+        per_temperature:
         - T_K: 1973.0
           alpha: 0.23
           sigma: 0.02
@@ -52,7 +52,9 @@ species:
           sigma: 0.02
       uncertainty:
         note: Distinct from Costa KEMS pin; do not average into one Fe alpha
-        alpha_range: *id001
+        alpha_range:
+        - 0.21
+        - 0.27
     - observation_id: fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series
       type: rate_series
       locator:
@@ -66,7 +68,19 @@ species:
       regime: langmuir_free_evaporation
       units: dimensionless alpha vs T_K
       values:
-        series: *id002
+        series:
+        - T_K: 1973.0
+          alpha: 0.23
+          sigma: 0.02
+        - T_K: 2073.0
+          alpha: 0.25
+          sigma: 0.02
+        - T_K: 2173.0
+          alpha: 0.24
+          sigma: 0.02
+        - T_K: 2273.0
+          alpha: 0.23
+          sigma: 0.02
   Na:
     observations:
     - observation_id: fedkin_2006_yu_na_vacuum_langmuir
@@ -84,7 +98,7 @@ species:
       units: dimensionless
       values:
         alpha: 0.26
-        alpha_range: &id003
+        alpha_range:
         - 0.21
         - 0.31
         gas_species: Na(g)
@@ -96,7 +110,9 @@ species:
       uncertainty:
         note: 'OWNER GATE: flip runtime Na from open-furnace 1.0 to vacuum 0.26 only after series-resistance
           model review'
-        alpha_range: *id003
+        alpha_range:
+        - 0.21
+        - 0.31
   K:
     observations:
     - observation_id: fedkin_2006_yu_k_vacuum_langmuir
@@ -114,7 +130,7 @@ species:
       units: dimensionless
       values:
         alpha: 0.13
-        alpha_range: &id004
+        alpha_range:
         - 0.11
         - 0.15
         gas_species: K(g)
@@ -122,7 +138,9 @@ species:
         draft_runtime_provenance_bug: REF-014 string still says KEMS sealed-chamber — false
         draft_action: keep value; repair regime label to langmuir_free_evaporation
       uncertainty:
-        alpha_range: *id004
+        alpha_range:
+        - 0.11
+        - 0.15
   Mg:
     observations:
     - observation_id: fedkin_2006_table3_mg_hashimoto_langmuir
@@ -140,12 +158,12 @@ species:
       units: dimensionless
       values:
         alpha: 0.27
-        alpha_range: &id005
+        alpha_range:
         - 0.23
         - 0.29
         gas_species: Mg(g)
         material: Hashimoto_1983_FMSCA_silicate_melt
-        per_temperature: &id006
+        per_temperature:
         - T_K: 1973.0
           alpha: 0.24
           sigma: 0.01
@@ -162,7 +180,9 @@ species:
       uncertainty:
         note: Runtime 0.20 [0.1,0.21] is lower-bound conservative vs Table 3; either keep pin or re-center
           on 0.27 with wider envelope
-        alpha_range: *id005
+        alpha_range:
+        - 0.23
+        - 0.29
     - observation_id: fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series
       type: rate_series
       locator:
@@ -176,7 +196,19 @@ species:
       regime: langmuir_free_evaporation
       units: dimensionless alpha vs T_K
       values:
-        series: *id006
+        series:
+        - T_K: 1973.0
+          alpha: 0.24
+          sigma: 0.01
+        - T_K: 2073.0
+          alpha: 0.28
+          sigma: 0.01
+        - T_K: 2173.0
+          alpha: 0.28
+          sigma: 0.01
+        - T_K: 2273.0
+          alpha: 0.27
+          sigma: 0.01
   SiO:
     observations:
     - observation_id: fedkin_2006_table3_sio_hashimoto_langmuir
@@ -193,12 +225,12 @@ species:
       units: dimensionless
       values:
         alpha: 0.17
-        alpha_range: &id007
+        alpha_range:
         - 0.11
         - 0.22
         gas_species: SiO(g)
         material: Hashimoto_1983_FMSCA_silicate_melt
-        per_temperature: &id008
+        per_temperature:
         - T_K: 1973.0
           alpha: 0.12
           sigma: 0.01
@@ -213,7 +245,9 @@ species:
           sigma: 0.01
       uncertainty:
         note: Cross-check only; T band mostly above Wetzel valid_range_K ceiling
-        alpha_range: *id007
+        alpha_range:
+        - 0.11
+        - 0.22
     - observation_id: fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series
       type: rate_series
       locator:
@@ -227,10 +261,41 @@ species:
       regime: langmuir_free_evaporation
       units: dimensionless alpha vs T_K
       values:
-        series: *id008
+        series:
+        - T_K: 1973.0
+          alpha: 0.12
+          sigma: 0.01
+        - T_K: 2073.0
+          alpha: 0.17
+          sigma: 0.01
+        - T_K: 2173.0
+          alpha: 0.2
+          sigma: 0.01
+        - T_K: 2273.0
+          alpha: 0.21
+          sigma: 0.01
 fidelity_samples:
 - path: species.Fe.observations[fedkin_2006_table3_fe_hashimoto_langmuir].values
-  value: *id009
+  value:
+    alpha: 0.24
+    alpha_range:
+    - 0.21
+    - 0.27
+    gas_species: Fe(g)
+    material: Hashimoto_1983_FMSCA_silicate_melt
+    per_temperature:
+    - T_K: 1973.0
+      alpha: 0.23
+      sigma: 0.02
+    - T_K: 2073.0
+      alpha: 0.25
+      sigma: 0.02
+    - T_K: 2173.0
+      alpha: 0.24
+      sigma: 0.02
+    - T_K: 2273.0
+      alpha: 0.23
+      sigma: 0.02
   note: auto fidelity sample from first observation payload (pilot migration)
   locator:
     note: Fedkin, A. V., Grossman, L. & Ghiorso, M. S. (2006), Geochim. Cosmochim. Acta 70:206-223, Table

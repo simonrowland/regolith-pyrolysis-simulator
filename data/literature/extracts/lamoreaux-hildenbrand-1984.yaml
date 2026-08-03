@@ -32,7 +32,7 @@ species:
       uncertainty:
         Delta_f_H_298_over_R_uncertainty_kK: 0.45
         S_298_over_R_uncertainty: 0.75
-      values: &id001
+      values:
         Delta_f_H_298_over_R_kK: -20.78
         Delta_f_H_298_over_R_uncertainty_kK: 0.45
         Delta_f_H_298_kJ_mol:
@@ -319,7 +319,26 @@ species:
         Delta_f_H_rxn_298_kJ_mol: 420.0
 fidelity_samples:
 - path: species.Li2O.observations[LH84_Li2O_g_formation].values
-  value: *id001
+  value:
+    Delta_f_H_298_over_R_kK: -20.78
+    Delta_f_H_298_over_R_uncertainty_kK: 0.45
+    Delta_f_H_298_kJ_mol:
+      value: -172.8
+      arithmetic: (-20.78 kK) * 8.314462618 kJ·mol⁻¹·kK⁻¹ = -172.8 kJ·mol⁻¹
+    S_298_over_R: 27.56
+    S_298_over_R_uncertainty: 0.75
+    S_298_J_molK:
+      value: 229.1
+      arithmetic: 27.56 * 8.314462618 = 229.1 J·K⁻¹·mol⁻¹
+    H298_minus_H0_over_R_kK: 1.5
+    gas_species: Li2O
+    valid_range_note: 'GEF polynomials in LH84 Table 2 cover 298–3000 K for Li2O(g).
+
+      SF18 dominance window for Li-bearing gases over Li2O is 1000–1700 K.
+
+      Recipe melt band 1173–2273 K intersects the upper end.
+
+      '
   note: auto fidelity sample from first observation payload (pilot migration)
   locator:
     table: 'Table 4, p. 157 — Li2O(g) row: ΔfH°298/R = −20.78 ± 0.45 kK; S°298/R = 27.56 ± 0.75; (H°298−H°0)/R

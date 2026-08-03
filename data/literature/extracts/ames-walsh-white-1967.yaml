@@ -22,7 +22,7 @@ species:
       phase: gas
       standard_state: null
       units: kJ/mol and J/(mol·K) for formation; over_R in kK as published
-      values: &id001
+      values:
         gas_species: EuO
         note: 'Ames, Walsh & White (1967) provide dissociation energies of
 
@@ -52,7 +52,18 @@ species:
           this tranche
 fidelity_samples:
 - path: species.Eu_metal_and_EuO.observations[Ames67_EuO_dissociation].values
-  value: *id001
+  value:
+    gas_species: EuO
+    note: 'Ames, Walsh & White (1967) provide dissociation energies of
+
+      gaseous REE monoxides including EuO — the oxide-channel anchor
+
+      for EuO(g) over Eu2O3. Numeric D0 value not transcribed this
+
+      tranche (paywalled ACS PDF).
+
+      '
+    acquisition_status_detail: UNKNOWN-NO-SOURCE_for_numeric_D0
   note: auto fidelity sample from first observation payload (pilot migration)
   locator:
     table: null

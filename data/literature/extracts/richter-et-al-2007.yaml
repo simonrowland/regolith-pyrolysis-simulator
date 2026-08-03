@@ -33,7 +33,7 @@ species:
         alpha_range: null
         gas_species: Mg(g)
         material: Type_B_CAI_like_liquid
-        alpha_form: &id001
+        alpha_form:
           type: arrhenius
           expression: c = c0 * exp(-E/(R*T))
           c0: 143.0
@@ -62,7 +62,7 @@ species:
         alpha_range: null
         gas_species: SiO(g)
         material: Type_B_CAI_like_liquid
-        alpha_form: &id002
+        alpha_form:
           type: arrhenius
           expression: c = c0 * exp(-E/(R*T))
           c0: 25.3
@@ -72,12 +72,23 @@ species:
         E_uncertainty_J_per_mol: 37000.0
 fidelity_samples:
 - path: species.Mg.observations[richter_2007_mg_cai_arrhenius_langmuir].values.alpha_form
-  value: *id001
+  value:
+    type: arrhenius
+    expression: c = c0 * exp(-E/(R*T))
+    c0: 143.0
+    E_J_per_mol: 121000.0
+    E_uncertainty_J_per_mol: 53000.0
+    R_J_per_mol_K: 8.314
   note: alpha_form retained verbatim from alpha-kinetics DRAFT (P1-F1 fix)
   locator:
     record: richter_2007_mg_cai_arrhenius_langmuir
 - path: species.SiO.observations[richter_2007_si_cai_arrhenius_langmuir].values.alpha_form
-  value: *id002
+  value:
+    type: arrhenius
+    expression: c = c0 * exp(-E/(R*T))
+    c0: 25.3
+    E_J_per_mol: 92000.0
+    E_uncertainty_J_per_mol: 37000.0
   note: alpha_form retained verbatim from alpha-kinetics DRAFT (P1-F1 fix)
   locator:
     record: richter_2007_si_cai_arrhenius_langmuir

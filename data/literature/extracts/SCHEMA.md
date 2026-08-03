@@ -17,7 +17,9 @@ Binding policy: `docs-private/design/2026-07-30-vapour-rail-unification/VALUE-PR
 |------|------|
 | `data/literature/extracts/<source-id>.yaml` | One extract per literature source |
 | `data/literature/extracts/_source_priority.yaml` | Per-family `source_priority` lists (DATA, not code) |
+| `data/literature/extracts/_fidelity_pre_policy_allowlist.yaml` | ENFORCED_FOR_NEW fidelity-sample allowlist (shrink-only) |
 | `data/literature/extracts/SCHEMA.md` | This document |
+| `data/literature/extracts/EXTRACTION-WORKER-CONTRACT.md` | t-509 OCR extraction worker contract (fidelity samples day-one) |
 | `tools/validate_literature_extracts.py` | Fail-loud validator CLI |
 | `tools/extract_merge.py` | Derived by-species view + coverage + consistency |
 
@@ -43,12 +45,21 @@ extraction:
 review_status: draft                     # draft | reviewed | rejected
 # Optional store-local overrides (normally use _source_priority.yaml)
 source_priority: {}
-# Required when any observation is present (t-510 / owner fidelity-gate)
+# Fidelity samples (t-510 gate) — required for NEW extracts; see policy below
 fidelity_samples:
-  - path: species.Fe.observations[costa_2015_fe_alpha_kems].values.alpha
+  # Preferred structured form (OCR / reviewer-verified):
+  - species: Fe
+    observable: alpha
+    observation_id: costa_jacobson_2015_fe_olivine_kems
+    # Optional series pin: T_K: 1750.0  OR  index: 0
+    field: alpha                         # optional key inside values
     value: 0.02
-    note: "DRAFT alpha-kinetics Costa Fe KEMS pin"
-    locator: { record: costa_jacobson_2015_fe_olivine_kems }
+    locator: { page: 12, figure: "3" }   # required on structured samples
+  # Path-based form (pilot DRAFT migrations; still accepted):
+  # - path: species.Fe.observations[costa_jacobson_2015_fe_olivine_kems].values.alpha
+  #   value: 0.02
+  #   note: "DRAFT alpha-kinetics Costa Fe KEMS pin"
+  #   locator: { record: costa_jacobson_2015_fe_olivine_kems }
 species: {}                              # map: canonical U0 / manifest id → species block
 ```
 
@@ -58,19 +69,82 @@ species: {}                              # map: canonical U0 / manifest id → s
 - `reviewed` — tranche accepted; append-only thereafter (no silent rewrite of values).
 - `rejected` — retained for audit; merge tool may exclude from operative views.
 
-### `fidelity_samples` (required when observations present)
+### `fidelity_samples` (t-510 gate)
 
-Each sample is a located, source-backed check that a stored field matches the
-DRAFT / publication:
+Each sample is a **reviewer-verified** line item checked against the source /
+OCR artifact: the stored value still matches what the reviewer read at the
+locator. Samples are the extraction-drift fuse — a bad regeneration or silent
+rewrite of a pinned field turns the checked-in match test RED.
+
+#### Sample shapes
+
+**Structured (preferred for OCR / new extracts):**
 
 | Field | Required | Meaning |
 |-------|----------|---------|
-| `path` / `field_path` | yes | Dot path into the extract |
-| `value` / `draft_value` | yes | Expected / stored value |
-| `locator` / `source_locator` or `note` | yes | Where in the source this was checked |
+| `species` | yes | Canonical species id under `species:` |
+| `observable` and/or `observation_id` | yes (≥1) | Observation type and/or id |
+| `value` / `draft_value` | yes | Expected value (scalar or structure) |
+| `locator` / `source_locator` | yes (exactly 1) | Where in the source/OCR this was checked |
+| `T_K` / `T` or `index` | no | Pin a series point by temperature or list index |
+| `field` / `value_key` | no | Key inside `values` (or the series point) |
+| `rel_tol` | no | Finite numeric magnitude tolerance, `0 <= rel_tol < 1`; never changes type matching |
 
-Validator refuses extracts that carry observations but lack a non-empty
-`fidelity_samples` list.
+**Path-based (accepted; pilot DRAFT migrations):**
+
+| Field | Required | Meaning |
+|-------|----------|---------|
+| `path` / `field_path` | yes | Dot path into the extract (supports `[observation_id]`) |
+| `value` / `draft_value` | yes | Expected / stored value |
+| `locator` / `source_locator` or `note` | yes | Where in the source this was checked; locator aliases are mutually exclusive and any supplied locator must be valid |
+
+A sample uses **exactly one** addressing mode. Path keys cannot be combined
+with structured selector keys as decoration; the resolver rejects such mixed
+samples as ambiguous. On new (non-allowlisted) extracts, every present path
+must identify observation evidence under
+`species.*.observations[id].(values|equipment)...`, regardless of any other
+keys in the sample.
+
+Aliases within a mode are also exclusive: use one of `field`/`value_key`, one
+of `T_K`/`T`, one of `value`/`draft_value`, one of
+`locator`/`source_locator`, and either `index` or a temperature selector. When
+both `observation_id` and `observable` are supplied, the selected observation's
+type must equal `observable`; no null or contradictory alias may be decorative.
+
+A parameterized checked-in test
+(`tests/test_literature_extracts.py::test_fidelity_sample_matches_extract`)
+resolves every sample against the extract and asserts equality. Mutating a
+pinned extract value in memory must go RED.
+
+**YAML alias note:** sample `value:` must be an **independent literal**, never a
+YAML alias (`*id`) into the observation body at the root or any nested depth.
+The validator recursively refuses shared mutable mapping/sequence identity — a
+body edit must not silently co-update any part of the pin. Both the stored pin
+and resolved body target must contain a non-null, non-whitespace payload leaf;
+empty scalar strings and whitespace-only strings are refused. Match uses
+the same rule for YAML binary/set values. Mutable set aliases are refused along
+with mapping/list aliases. Match uses type-strict equality at every scalar leaf
+and mapping key, including `int` versus `float`; sequence container types also
+must agree.
+Explicit `rel_tol` relaxes numeric magnitude only after concrete numeric types
+It must be a finite, non-boolean number in `0 <= rel_tol < 1`; null, negative,
+infinite, and nonnumeric tolerances are refused rather than ignored.
+
+#### Policy: `ENFORCED_FOR_NEW` (effective 2026-08-03)
+
+The validator **refuses** an extract that carries observations but lacks a
+non-empty `fidelity_samples` list — **except** source_ids on the pre-policy
+allowlist in `_fidelity_pre_policy_allowlist.yaml`.
+
+| Rule | Detail |
+|------|--------|
+| Why grandfather | The pilot 68 extracts were migrated from DRAFT acquisition blocks, not OCR/source-page review. Instantly requiring reviewer-verified samples would invalidate a green corpus without improving evidence. |
+| Who is exempt | `active_pre_policy_source_ids` only |
+| Who is enforced | Every other extract (all t-509 OCR-produced extracts from day one; live corpus may grow past the frozen 68) |
+| Shrink-only | `active ∪ graduated = closed`, `active ∩ graduated = ∅`. Graduate by moving an id from active → `graduated_pre_policy_source_ids` and appending it to `_fidelity_graduation_ledger.yaml`. The validator unions committed ledger versions from Git ancestry as external prior state, so deleting a tombstone from both current files still fails. The current ledger/closed set are also hash-pinned in tests. |
+
+Worker contract for OCR extraction: `EXTRACTION-WORKER-CONTRACT.md` (and
+`docs-private/research/2026-08-03-ocr-campaign/EXTRACTION-WORKER-CONTRACT.md`).
 
 ## Species block
 

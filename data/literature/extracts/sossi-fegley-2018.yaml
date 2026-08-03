@@ -26,7 +26,7 @@ species:
         section: SF18-T1 / speciation ordering
       phase: gas_over_oxide
       units: dimensionless ordering (not a numeric gamma)
-      values: &id001
+      values:
         speciation_note: 'SF18-T1 p.404 (Kimura et al. 1980; LH84): Li ~ Li2O > LiO > Li3O, Li2O2.
 
           Li is least-volatile alkali in ferrobasalt evaporation (SF18-T3 p.424).
@@ -265,7 +265,7 @@ species:
       phase: ideal_gas
       standard_state: 1 bar
       units: kJ/mol (ΔfG / formation tabulation as published)
-      values: &id002
+      values:
         gas_species: PO
         condensed_reservoir: P2O5 in silicate melt, activity a_P2O5 (Raoultian pure-oxide standard state)
         reaction: P2O5(melt) = 2 PO(g) + 1.5 O2(g)
@@ -378,7 +378,13 @@ species:
         se5_ban: do not set a_P2O5=1 for dilute basalt
 fidelity_samples:
 - path: species.Li2O.observations[sf18_speciation_Li2O].values
-  value: *id001
+  value:
+    speciation_note: 'SF18-T1 p.404 (Kimura et al. 1980; LH84): Li ~ Li2O > LiO > Li3O, Li2O2.
+
+      Li is least-volatile alkali in ferrobasalt evaporation (SF18-T3 p.424).
+
+      '
+    semantics: bound_not_point_ordering
   note: auto fidelity sample from first observation payload (pilot migration)
   locator:
     note: 'SF18-T1 p.404: Li ~ Li2O > LiO > Li3O, Li2O2 over Li2O, 1000–1700 K;
@@ -388,7 +394,22 @@ fidelity_samples:
       '
     section: SF18-T1 / speciation ordering
 - path: species.PO.observations[SF18_Mk86_PO_from_silicate_melt].values
-  value: *id002
+  value:
+    gas_species: PO
+    condensed_reservoir: P2O5 in silicate melt, activity a_P2O5 (Raoultian pure-oxide standard state)
+    reaction: P2O5(melt) = 2 PO(g) + 1.5 O2(g)
+    monomeric_form: PO2.5(melt) = PO(g) + 0.75 O2(g)
+    pressure_form: p_PO/p0 = a_P2O5^0.5 * K_PO(T)^0.5 * (p_O2/p0)^(-0.75)
+    fO2_exponent: -0.75
+    standard_pressure: 1 bar
+    valid_range_note: Markova et al. 1986 T/composition window UNKNOWN-NO-SOURCE this pass; SF18 applies
+      claim to silicate liquids generally
+    dominance_window: reduced melts / solar-nebula column; SF18 Table 5 log fO2=-18.06 @ 1500 K, 1e-4
+      bar
+    melt_activity_warning:
+      citation: 'Turkdogan (2000) ISIJ Int. 40:964-970, via SF18 Table 2: gamma(PO2.5)=1e-6..1e-10 in
+        CMFS, 1823-1923 K'
+      doi: 10.2355/isijinternational.40.964
   note: auto fidelity sample from first observation payload (pilot migration)
   locator:
     table: null

@@ -22,7 +22,7 @@ species:
       phase: gas
       standard_state: 1 atm for -log Patm column in Table 15
       units: kJ/mol and J/(mol·K) for formation; over_R in kK as published
-      values: &id001
+      values:
         Delta_sub_H_298_kcal_mol: 41.923
         Delta_sub_H_298_uncertainty_kcal_mol: 0.027
         Delta_sub_H_298_kJ_mol:
@@ -91,7 +91,29 @@ species:
         n_runs: 8
 fidelity_samples:
 - path: species.Eu_metal_and_EuO.observations[Hab64_Eu_metal_third_law].values
-  value: *id001
+  value:
+    Delta_sub_H_298_kcal_mol: 41.923
+    Delta_sub_H_298_uncertainty_kcal_mol: 0.027
+    Delta_sub_H_298_kJ_mol:
+      value: 175.4
+      arithmetic: 41.923 * 4.184 = 175.40 kJ·mol⁻¹
+    second_law_kcal_mol: 42.177
+    second_law_uncertainty_kcal_mol: 0.025
+    normal_boiling_point_K: 1885
+    normal_boiling_point_note: Habermann third-law NBP; Hanak estimated 1762 K
+    gas_species: Eu
+    condensed_reservoir: Eu(s/l)
+    temperature_points_in_third_law_table_K:
+    - 696
+    - 899
+    temperature_points_source: Habermann thesis Table 15 third-law grid
+    note: 'Habermann did NOT re-measure Eu; data are Hanak’s. Explicit
+
+      log10 P = A − B/T coefficients for Eu were not printed in the
+
+      Habermann Eu section (only third-law table).
+
+      '
   note: auto fidelity sample from first observation payload (pilot migration)
   locator:
     table: null
