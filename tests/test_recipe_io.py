@@ -412,6 +412,9 @@ def test_runner_malformed_recipe_cli_fails_loud(tmp_path: Path) -> None:
 
 
 def test_no_recipe_run_matches_committed_golden_text() -> None:
+    # Fixture regenerated 2026-08-02 under REPAIRED MAGEMin config per the
+    # train13 adjudication; prior value was generated against the
+    # broken-liquidus job tree. docs-private/research/2026-08-02-train13-adjudication.md
     run = PyrolysisRun(
         feedstock_id="lunar_mare_low_ti",
         campaign="C0",

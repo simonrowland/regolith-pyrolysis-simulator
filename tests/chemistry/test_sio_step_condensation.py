@@ -67,10 +67,11 @@ def test_subfloor_sio_does_not_create_unmaterialized_stage3_product():
     # ~/Repos/rps-adjudicate/m2-bisect.md — drift at 228927d, bit-identical
     # across the whole VR range. Old pin encoded the premature-completion bug.
     # Regenerated at tip d13f597 from build_sio_yield_report.
-    # regenerated under CI engine config (studio grind overlay) per the 5c6c015
-    # doctrine; laptop-config value was 6.73119341581e-06
+    # regenerated 2026-08-02 under REPAIRED MAGEMin config per the train13
+    # adjudication; prior value was generated against the broken-liquidus job
+    # tree (6.73114533926e-06). docs-private/research/2026-08-02-train13-adjudication.md
     assert _stage3_silica_kg(1400.0) == pytest.approx(
-        6.73114533926e-06, rel=1e-9
+        6.73119341581e-06, rel=1e-9
     )
     retained_mol = _retained_holdup_sio_mol(1400.0)
     assert retained_mol >= 0.0

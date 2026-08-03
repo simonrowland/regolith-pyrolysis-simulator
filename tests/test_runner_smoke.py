@@ -1470,6 +1470,13 @@ def test_vpr_p6a_p0_gated_fields_are_explicit_sentinels():
 def test_runner_golden_fixture_matches(scenario):
     """A live run must reproduce the committed golden fixture exactly."""
 
+    # lunar_mare_low_ti_C0_24h.json + mars_basalt_C2A_12h.json: regenerated
+    # 2026-08-02 under REPAIRED MAGEMin config per the train13 adjudication;
+    # prior fixtures were generated against the broken-liquidus job tree
+    # (floor_fallback engaged, no_melt_redox_capacity). Mechanism signature
+    # after repair: melt_redox_gate_floor_fallback_engagement = {engaged:
+    # false, total_count: 0}. ci_carbonaceous_chondrite_C2B_12h.json was
+    # unchanged. docs-private/research/2026-08-02-train13-adjudication.md
     fixture_path = FIXTURES_DIR / scenario["fixture"]
     expected = json.loads(fixture_path.read_text())
     actual = _run_scenario(scenario)

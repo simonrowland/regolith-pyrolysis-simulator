@@ -532,6 +532,9 @@ def test_cost_rollup_empty_electrical_breakdown_mapping_means_zero():
 
 
 def test_cost_rollup_metadata_is_golden_neutral_for_runner_fixture():
+    # Fixture regenerated 2026-08-02 under REPAIRED MAGEMin config per the
+    # train13 adjudication; prior value was generated against the
+    # broken-liquidus job tree. docs-private/research/2026-08-02-train13-adjudication.md
     run = PyrolysisRun(
         feedstock_id="lunar_mare_low_ti",
         campaign="C0",
