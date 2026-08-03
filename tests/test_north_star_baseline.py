@@ -319,8 +319,10 @@ def test_snapshots_carry_all_expected_north_star_fields():
         "C2A_STAGED -> C3_NA -> C4 -> C6, C5/MRE disabled). "
         "Corrected-denominator yields: Na=0.211855, K=0.435267, "
         "Fe=0.008236, Mg=0.000975, SiO=0.000205; all below the "
-        ">=0.95 gate. Do not unskip until a fresh grounded run clears "
-        "the threshold without tuning it."
+        ">=0.95 gate. Unmasked 2026-07-29: body raises NotImplementedError "
+        "after a 24h run — not a silent pass. Do not unskip until a fresh "
+        "grounded run clears the threshold without tuning it and the E1b "
+        "assert is implemented."
     )
 )
 def test_e1b_future_target_species_yield_threshold():

@@ -1467,34 +1467,12 @@ def test_magemin_live_liquidus_finder_lunar_mare_low_ti_sane():
     )
 
 
-@pytest.mark.skipif(
-    _LIVE_MAGEMIN_BINARY is None,
-    reason="No compiled MAGEMin binary found (build per pyproject.toml [magemin])",
-)
-@pytest.mark.parametrize(
-    ("name", "composition_kg", "reference_C"),
-    [
-        ("forsterite", {"MgO": 57.276, "SiO2": 42.724}, 1890.0),
-        ("diopside", {"CaO": 25.9, "MgO": 18.6, "SiO2": 55.5}, 1391.5),
-        ("anorthite", {"CaO": 20.16, "Al2O3": 36.65, "SiO2": 43.19}, 1553.0),
-    ],
-)
-def test_magemin_live_pure_endmember_references_documented_xfail(
-    name,
-    composition_kg,
-    reference_C,
-):
-    """Pure endmember melting references for any future calibrated engine.
-
-    Forsterite 2163 K follows Akimoto et al. 1981; diopside 1391.5 C and
-    anorthite 1553 C are standard Di-An calibration values. The MAGEMin `ig`
-    subprocess path here is calibrated for natural igneous systems and the L1
-    probe showed these pure endmembers are not reliable acceptance targets.
-    """
-    pytest.xfail(
-        f"MAGEMin ig subprocess is not accepted for pure {name} "
-        f"endmember liquidus {reference_C:g} C"
-    )
+# Pure-endmember melting references retained for any future calibrated engine
+# (not MAGEMin `ig` acceptance targets). Forsterite 2163 K (Akimoto et al.
+# 1981); diopside 1391.5 C and anorthite 1553 C (standard Di-An calibration).
+# Former collected xfail nodes always xfailed before any engine work (removed
+# 2026-07-29 / re-landed 2026-08-03); suite no longer pays three placeholder
+# xfail nodes.
 
 
 def _run_magemin_gam_o(binary: Path, *, buffer_n: float) -> float:

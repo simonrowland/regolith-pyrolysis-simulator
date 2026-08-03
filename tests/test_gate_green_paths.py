@@ -7,13 +7,18 @@ from simulator.optimize.pool import PoolEvaluationRequest
 from simulator.optimize.recipe import RecipePatch
 
 
-@pytest.mark.skip(
-    reason=(
-        "needs-interface: no input-data-only test seam routes PoolEvaluationRequest "
-        "through epoch journal/adaptive-stop wiring"
-    )
-)
 def test_epoch_dup_rate_adaptive_stop_green_path_accepts_pool_batch_plateau() -> None:
+    """Pure helpers only: duplication_rate_from_merge + adaptive_decision.
+
+    Builds a two-candidate PoolEvaluationRequest batch for remaining_jobs /
+    candidate-id shape, then drives the epoch-grind pure functions with
+    synthetic merge summaries that plateaus under threshold. Does NOT
+    call run_driver() and does NOT route a pool batch through the
+    epoch-journal → adaptive-stop production wiring
+    (scripts/epoch_grind.py run_driver path). That seam remains
+    needs-interface and is covered only by the helpers themselves here
+    and by the unit cases in tests/test_epoch_grind.py.
+    """
     batch = (
         PoolEvaluationRequest(
             RecipePatch({("campaigns", "C0b_p_cleanup", "pO2_mbar_default"): 9.0}),

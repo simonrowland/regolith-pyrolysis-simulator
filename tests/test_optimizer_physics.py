@@ -599,23 +599,6 @@ def test_coating_and_segment_allowable_readout_reports_small_wall_deposit_margin
     assert "Hottest/hot_wall/SiO" in coating.detail
 
 
-@pytest.mark.skip(
-    reason="needs-interface: coating is reported-only; input data cannot make it fail"
-)
-def test_coating_blocking_green_path_needs_interface_poison_pair() -> None:
-    pass
-
-
-@pytest.mark.skip(
-    reason=(
-        "needs-interface: allowable_wall_deposit_kg feeds reported-only coating; "
-        "input data cannot make it fail"
-    )
-)
-def test_allowable_wall_deposit_blocking_green_path_needs_interface_poison_pair() -> None:
-    pass
-
-
 @pytest.mark.parametrize(
     ("trace", "expected_detail"),
     (

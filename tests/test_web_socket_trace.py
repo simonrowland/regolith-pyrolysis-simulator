@@ -1,8 +1,6 @@
 import json
 from pathlib import Path
 
-import pytest
-
 import app as app_module
 import web.events as web_events
 from simulator.melt_backend.base import InternalAnalyticalBackend
@@ -14,26 +12,26 @@ GOLDEN_TRACE = (
     / "web_trace"
     / "lunar_mare_low_ti_short_operator_decision.json"
 )
-# CI-audit 2026-07-24 finding 8 / b-105 rebaseline 2026-08-03:
-# Soft pytest.xfail remains only as a skip-unmask removal target; the
-# golden is current again (byte-equal to the executable capture). First
-# pre-rebaseline diverge was byte 82: golden "StubBackend" vs live
-# "InternalAnalyticalBackend" (test forces InternalAnalyticalBackend;
-# golden predated the stub→internal-analytical rename + post-2026-05-26
-# payload growth). Causal stack locked into the new golden, recomputed
-# from the executable (Hard Invariant 7 / AGENTS golden rule — not
-# hand-edited): backend_active/backend_requested rename; backend_*
-# policy fields; CONTROLLED_O2_FLOW + pO2_mbar=9 default vs HARD_VACUUM;
-# max_hours=1 event sequence (11 events, one tick per C0/C0B) vs stale
-# 13-event 2-tick C0; per-hour redox/shuttle/energy panels; decision
-# recommendation A→A_staged + Na-cleanup context. VOLATILE_KEYS still
-# strip timestamps/run ids; two-pass self-equality proves determinism —
-# rebaseline is honest, not papering over nondeterminism. skip-unmask
-# may now delete the soft xfail and hard-assert only.
-GOLDEN_DRIFT_REASON = (
-    "Stale-golden soft-xfail path retained until skip-unmask lands; "
-    "should be unreachable after b-105 rebaseline."
-)
+# Soft pytest.xfail on byte mismatch removed 2026-08-03 (skip-unmask):
+# the golden is hard-asserted so drift fails CI instead of soft-passing.
+# Regenerated at tip after two parallel-landed causal commits left the
+# golden one generation stale:
+# - 13ab316 (b-105): backend rename/drift rebaseline
+#   (StubBackend→InternalAnalyticalBackend + post-rename payload growth).
+# - 344a8d0 (t-513): activity-corrected catalog evaluation adds vapour-rail
+#   provenance/diagnostic fields (source_reaction_activity, source_fO2 on
+#   state_fingerprint) and routes melt-species missing activity to typed
+#   refusal/refusal_closure instead of pure-component eligible +
+#   vapour_pressure_out_of_range dormant_by_epoch. Confirmed additive
+#   instrumentation only: after stripping VR panels, 0 structural diffs
+#   and all 477 non-VR numeric leaves byte-identical (no physics-value
+#   regression; flux value source still the equilibrium-backend seam).
+# First pre-this-rebaseline diverge was byte 10364 (acquisition_flag on
+# channels_by_species.Al). Nondeterminism ruled out (b-105 precedent):
+# three cross-process recaptures under PYTHONHASHSEED={0,1,42} are
+# byte-identical. VOLATILE_KEYS strip timestamps/run ids; two-pass
+# self-equality still proves determinism of the live path. Do NOT
+# soft-xfail again; rebaseline from the executable only (Hard Invariant 7).
 
 VOLATILE_KEYS = {
     "duration_s",
@@ -229,6 +227,4 @@ def test_pre_refactor_socket_trace_matches_golden(monkeypatch):
     assert _canonical_bytes(first_trace) == _canonical_bytes(second_trace)
     actual = _canonical_bytes(first_trace)
     expected = GOLDEN_TRACE.read_bytes()
-    if actual != expected:
-        pytest.xfail(GOLDEN_DRIFT_REASON)
     assert actual == expected
