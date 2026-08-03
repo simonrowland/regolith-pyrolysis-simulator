@@ -184,3 +184,84 @@ Melt iron redox is not future work: it is live. The Fe vapor-pressure path consu
 - Certify corrosion, fouling, or safety behavior.
 - Treat fallback thermodynamics as final melt chemistry.
 - Compare economics without adding real hardware, operations, and logistics models.
+
+<!-- BEGIN t-512 extract-store reproduction rollup -->
+
+### Extract-store single-species reproduction battery (t-512)
+
+Generated from ADOPTED (priority-winner) extract-store observations of
+type `psat_series` / `rate_series` / `activity_coefficient`. Residuals
+are the deliverable (doctrine: *Headline accuracy is the product*).
+Engine refusals surface as typed skips; mismatches are FINDINGs —
+tolerances are **not** widened to pass. Geometry: tools/motzfeldt.py absent — no Motzfeldt multi-orifice inversion; pure-component / unit-activity oxide melt at reported T; default pO2 boundary unless equipment.cell_material or equipment.chamber_pressure supplies one.
+
+Comparable points: **12** (α/rate=12, psat=0, activity/γ=0). psat currently yields zero scored comparisons when the engine lacks the species; activity/γ is structurally skipped pending melt recipes (`activity_requires_melt_recipe`). Headline residual budget is the α rate_series set. Extrapolated-α FINDINGs marked in-line: **4**.
+
+- Adopted observations evaluated: **26**
+- Species with FINDING (mismatch outside stated/default budget): **3**
+
+| Species | Types | N pts | Match | Mismatch | Skip/gap | Max residual (dex) | Mean residual (dex) | Classification |
+|---|---|---:|---:|---:|---:|---:|---:|---|
+| As4O6 | activity_coefficient,psat_series | 7 | 0 | 0 | 7 | — | — | engine-or-payload-skip |
+| BaO | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
+| Cs2O | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
+| Eu_metal_and_EuO | activity_coefficient | 2 | 0 | 0 | 2 | — | — | engine-or-payload-skip |
+| Fe | rate_series | 4 | 0 | 4 | 0 | 1.1 | 1.07 | FINDING-mismatch |
+| Ga2O | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
+| Li2O | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
+| Mg | rate_series | 4 | 0 | 4 | 0 | 0.146 | 0.125 | FINDING-mismatch |
+| NaF | psat_series | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
+| P4O10 | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
+| Rb2O | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
+| S2 | psat_series | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
+| SO3 | psat_series | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
+| Sb4O6 | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
+| Se_n_ladder | psat_series | 3 | 0 | 0 | 3 | — | — | engine-or-payload-skip |
+| SiO | rate_series | 4 | 0 | 4 | 0 | 0.322 | 0.273 | FINDING-mismatch |
+| SrO | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
+| Ti | psat_series | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
+| VO_VO2 | activity_coefficient,psat_series | 3 | 0 | 0 | 3 | — | — | engine-or-payload-skip |
+| Yb_metal_and_YbO | activity_coefficient,psat_series | 5 | 0 | 0 | 5 | — | — | engine-or-payload-skip |
+
+**Default tolerances** (used only when the extract carries no usable
+numeric uncertainty; each defaulted comparison carries
+`defaulted: true` on the uncertainty dict and still scores
+match/mismatch against that documented budget):
+
+- `psat_series`: `log10_decades` = 0.5 (extract observation has no usable numeric uncertainty; default half-dex high-T vapor-pressure envelope (t-512))
+- `rate_series` (α): `absolute` = 0.05 (extract observation has no usable numeric uncertainty; default absolute α envelope ±0.05 (t-512))
+- `activity_coefficient`: `relative_fraction` = 0.5 (extract observation has no usable numeric uncertainty; default 50% relative activity/γ envelope (t-512))
+
+**FINDINGS (mismatches outside budget — not tuned away):**
+
+- FINDING mismatch Fe α T=1973K expected=0.23 actual=0.02 budget={'kind': 'absolute', 'value': 0.02, 'defaulted': False, 'source': 'point.sigma'}
+- FINDING mismatch Fe α T=2073K expected=0.25 actual=0.02 budget={'kind': 'absolute', 'value': 0.02, 'defaulted': False, 'source': 'point.sigma'}
+- FINDING mismatch Fe α T=2173K expected=0.24 actual=0.02 budget={'kind': 'absolute', 'value': 0.02, 'defaulted': False, 'source': 'point.sigma'}
+- FINDING mismatch Fe α T=2273K expected=0.23 actual=0.02 budget={'kind': 'absolute', 'value': 0.02, 'defaulted': False, 'source': 'point.sigma'}
+- FINDING mismatch Mg α T=1973K expected=0.24 actual=0.2 budget={'kind': 'absolute', 'value': 0.01, 'defaulted': False, 'source': 'point.sigma'}
+- FINDING mismatch Mg α T=2073K expected=0.28 actual=0.2 budget={'kind': 'absolute', 'value': 0.01, 'defaulted': False, 'source': 'point.sigma'}
+- FINDING mismatch Mg α T=2173K expected=0.28 actual=0.2 budget={'kind': 'absolute', 'value': 0.01, 'defaulted': False, 'source': 'point.sigma'}
+- FINDING mismatch Mg α T=2273K expected=0.27 actual=0.2 budget={'kind': 'absolute', 'value': 0.01, 'defaulted': False, 'source': 'point.sigma'}
+- FINDING mismatch SiO α T=1973K expected=0.12 actual=0.08032771227334354 budget={'kind': 'absolute', 'value': 0.01, 'defaulted': False, 'source': 'point.sigma'} extrapolated: true
+- FINDING mismatch SiO α T=2073K expected=0.17 actual=0.08790105714998556 budget={'kind': 'absolute', 'value': 0.01, 'defaulted': False, 'source': 'point.sigma'} extrapolated: true
+- FINDING mismatch SiO α T=2173K expected=0.2 actual=0.09539408461828996 budget={'kind': 'absolute', 'value': 0.01, 'defaulted': False, 'source': 'point.sigma'} extrapolated: true
+- FINDING mismatch SiO α T=2273K expected=0.21 actual=0.10278334807870564 budget={'kind': 'absolute', 'value': 0.01, 'defaulted': False, 'source': 'point.sigma'} extrapolated: true
+
+Comparable point residuals:
+
+| case | observable | species | temperature/time/window | expected | actual | residual | units | status | evidence | source |
+|---|---|---|---|---:|---:|---:|---|---|---|---|
+| fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series | fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series:T=1973 | Fe | {"temperature_K": 1973.0} | 0.23 | 0.02 | -0.21 | alpha | mismatch | extract-store-adopted | {"note": "Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)", "record": "fedkin_2006_table3_fe_hashimoto_langmuir", "table": "3"} |
+| fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series | fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series:T=2073 | Fe | {"temperature_K": 2073.0} | 0.25 | 0.02 | -0.23 | alpha | mismatch | extract-store-adopted | {"note": "Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)", "record": "fedkin_2006_table3_fe_hashimoto_langmuir", "table": "3"} |
+| fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series | fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series:T=2173 | Fe | {"temperature_K": 2173.0} | 0.24 | 0.02 | -0.22 | alpha | mismatch | extract-store-adopted | {"note": "Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)", "record": "fedkin_2006_table3_fe_hashimoto_langmuir", "table": "3"} |
+| fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series | fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series:T=2273 | Fe | {"temperature_K": 2273.0} | 0.23 | 0.02 | -0.21 | alpha | mismatch | extract-store-adopted | {"note": "Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)", "record": "fedkin_2006_table3_fe_hashimoto_langmuir", "table": "3"} |
+| fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series | fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series:T=1973 | Mg | {"temperature_K": 1973.0} | 0.24 | 0.2 | -0.04 | alpha | mismatch | extract-store-adopted | {"note": "Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)", "record": "fedkin_2006_table3_mg_hashimoto_langmuir", "table": "3"} |
+| fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series | fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series:T=2073 | Mg | {"temperature_K": 2073.0} | 0.28 | 0.2 | -0.08 | alpha | mismatch | extract-store-adopted | {"note": "Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)", "record": "fedkin_2006_table3_mg_hashimoto_langmuir", "table": "3"} |
+| fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series | fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series:T=2173 | Mg | {"temperature_K": 2173.0} | 0.28 | 0.2 | -0.08 | alpha | mismatch | extract-store-adopted | {"note": "Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)", "record": "fedkin_2006_table3_mg_hashimoto_langmuir", "table": "3"} |
+| fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series | fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series:T=2273 | Mg | {"temperature_K": 2273.0} | 0.27 | 0.2 | -0.07 | alpha | mismatch | extract-store-adopted | {"note": "Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)", "record": "fedkin_2006_table3_mg_hashimoto_langmuir", "table": "3"} |
+| fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series | fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series:T=1973 | SiO | {"temperature_K": 1973.0} | 0.12 | 0.0803277 | -0.0396723 | alpha | mismatch | extract-store-adopted | {"note": "Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)", "record": "fedkin_2006_table3_sio_hashimoto_langmuir", "table": "3"} |
+| fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series | fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series:T=2073 | SiO | {"temperature_K": 2073.0} | 0.17 | 0.0879011 | -0.0820989 | alpha | mismatch | extract-store-adopted | {"note": "Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)", "record": "fedkin_2006_table3_sio_hashimoto_langmuir", "table": "3"} |
+| fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series | fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series:T=2173 | SiO | {"temperature_K": 2173.0} | 0.2 | 0.0953941 | -0.104606 | alpha | mismatch | extract-store-adopted | {"note": "Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)", "record": "fedkin_2006_table3_sio_hashimoto_langmuir", "table": "3"} |
+| fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series | fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series:T=2273 | SiO | {"temperature_K": 2273.0} | 0.21 | 0.102783 | -0.107217 | alpha | mismatch | extract-store-adopted | {"note": "Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)", "record": "fedkin_2006_table3_sio_hashimoto_langmuir", "table": "3"} |
+
+<!-- END t-512 extract-store reproduction rollup -->
