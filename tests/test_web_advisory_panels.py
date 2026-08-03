@@ -38,6 +38,8 @@ def test_dashboard_renders_advisory_panels(client) -> None:
     html = response.get_data(as_text=True)
     assert 'id="wall-risk-panel"' in html
     assert 'id="vapor-pressure-authority-panel"' in html
+    assert 'id="vapour-rail-instrumentation-panel"' in html
+    assert 'id="condensation-refusals-panel"' in html
     assert 'id="ceramic-rump-panel"' in html
     assert 'id="product-ledger-panel"' in html
     assert 'id="overlap-evaporation-panel"' in html
@@ -49,6 +51,17 @@ def test_dashboard_renders_advisory_panels(client) -> None:
     assert "observed_peak_design_capacity" in html
     assert "display-only" in html
     assert "simulator-advisory.js" in html
+
+
+def test_vr11_socket_panels_have_js_consumers() -> None:
+    """SC-50: VR-11 socket producers are rendered by the active browser."""
+
+    source = Path("web/static/js/simulator-advisory.js").read_text(encoding="utf-8")
+    assert "data.vapour_rail_instrumentation_panel" in source
+    assert "data.condensation_refusals_panel" in source
+    assert "renderVapourRailInstrumentationPanel" in source
+    assert "renderCondensationRefusalsPanel" in source
+    assert "catalog_pa_shadow_equal" in source
 
 
 def test_thermal_train_headline_uses_named_ledger_view() -> None:

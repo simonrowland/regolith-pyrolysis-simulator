@@ -1998,6 +1998,22 @@ def _coating_readout(result: Mapping[str, Any]) -> dict[str, Any]:
             'reason': 'coating artifact missing',
         }
     segment_count = len(wall) if isinstance(wall, Mapping) else None
+    # SC-50 consumer: status_bearing_refusal_count is produced on wall-deposit
+    # authority payloads; surface it on the coating readout AND operator
+    # templates (optimizer detail/table) so absence is visible — not
+    # producer-only forwarding into an unread payload field.
+    refusal_count = authority.get('status_bearing_refusal_count')
+    if refusal_count is None:
+        refused_species = authority.get('wall_saturation_pressure_refused_species')
+        if isinstance(refused_species, (list, tuple)):
+            refusal_count = len(refused_species)
+    if not is_authoritative and refusal_count is not None:
+        refusal_clause = f'status-bearing refusals: {refusal_count}'
+        if warning_reason:
+            if 'status-bearing refusals' not in warning_reason:
+                warning_reason = f'{warning_reason} ({refusal_clause})'
+        else:
+            warning_reason = refusal_clause
     return {
         'status': 'available' if is_authoritative else 'warning',
         'authoritative': is_authoritative,
@@ -2011,6 +2027,7 @@ def _coating_readout(result: Mapping[str, Any]) -> dict[str, Any]:
         'total_label': _format_quantity(total_kg, 'kg'),
         'campaigns_to_resinter': campaigns,
         'segment_count': segment_count,
+        'status_bearing_refusal_count': refusal_count,
     }
 
 

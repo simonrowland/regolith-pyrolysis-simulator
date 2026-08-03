@@ -252,6 +252,42 @@ _FREEZE_GATE_COMPOSITION_SPECIES = frozenset((
 ))
 
 
+def _assert_runtime_alpha_source_not_vaporock(
+    species: str, alpha_data: Mapping[str, Any]
+) -> None:
+    """Production evaporation gate: refuse VapoRock-fit alpha provenance.
+
+    Complements catalog compile denial. Legacy compatibility views still load
+    alphas outside a re-compile; this path is the second SC-50 consumer so a
+    VapoRock source cannot reach HKL flux silently.
+    """
+
+    from simulator.vapour_rail.kinetics_anchors import (
+        KineticsAnchorError,
+        assert_alpha_source_not_vaporock,
+    )
+
+    sources: list[Any] = []
+    # source_note is a supported provenance shape (kinetics_anchors loader);
+    # omitting it lets VapoRock-fit alphas bypass the gate via
+    # {value, source_note} contracts.
+    for key in ("source", "provenance", "citation", "source_note"):
+        if key in alpha_data and alpha_data.get(key) is not None:
+            sources.append(alpha_data.get(key))
+    value = alpha_data.get("value")
+    if isinstance(value, Mapping):
+        for key in ("cite", "source", "provenance", "source_note"):
+            if key in value and value.get(key) is not None:
+                sources.append(value.get(key))
+    for source in sources:
+        try:
+            assert_alpha_source_not_vaporock(str(source))
+        except KineticsAnchorError as exc:
+            raise ValueError(
+                f"evaporation alpha for {species!r} refused VapoRock provenance: {exc}"
+            ) from exc
+
+
 def _load_evaporation_alpha_by_species(vapor_pressure_data: dict) -> dict[str, Any]:
     """Load per-species Hertz-Knudsen alpha specs from vapor pressure data."""
 
@@ -267,6 +303,8 @@ def _load_evaporation_alpha_by_species(vapor_pressure_data: dict) -> dict[str, A
             if "evaporation_alpha" not in species_data:
                 continue
             alpha_data = species_data.get("evaporation_alpha") or {}
+            if isinstance(alpha_data, Mapping):
+                _assert_runtime_alpha_source_not_vaporock(str(species), alpha_data)
             value = parse_alpha_contract(alpha_data)
             if value is None:
                 continue

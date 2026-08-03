@@ -90,11 +90,10 @@ from web.feedstock_data import load_visible_feedstocks
 from web.advisory import (
     active_wall_species_from_flue,
     ceramic_rump_payload,
-    condensation_refusals_panel_payload,
     industrial_glass_payload,
     oxide_wt_pct_from_kg,
+    sc50_vr_socket_panels,
     vapor_pressure_authority_payload,
-    vapour_rail_instrumentation_panel_payload,
     wall_advisory_payload,
 )
 from web.run_store import get_run_store, persist_run_artifact
@@ -1738,11 +1737,8 @@ def _tick_payload(
         'vapor_pressure_authority_panel': vapor_pressure_authority_payload(
             getattr(sim, '_last_backend_diagnostics', {}) or {}
         ),
-        # VR-11: exact-key batch + condensation refusals + advisory ceiling.
-        'vapour_rail_instrumentation_panel': (
-            vapour_rail_instrumentation_panel_payload(sim)
-        ),
-        'condensation_refusals_panel': condensation_refusals_panel_payload(sim),
+        # VR-11 SC-50 surface: owned producer set via sc50_vr_socket_panels.
+        **sc50_vr_socket_panels(sim),
         'overlap_evaporation': (
             getattr(sim, '_last_overlap_evaporation_diagnostic', {}) or {}
         ),
@@ -1926,10 +1922,8 @@ def _completion_payload(sim):
         'vapor_pressure_authority_panel': vapor_pressure_authority_payload(
             getattr(sim, '_last_backend_diagnostics', {}) or {}
         ),
-        'vapour_rail_instrumentation_panel': (
-            vapour_rail_instrumentation_panel_payload(sim)
-        ),
-        'condensation_refusals_panel': condensation_refusals_panel_payload(sim),
+        # VR-11 SC-50 surface: owned producer set via sc50_vr_socket_panels.
+        **sc50_vr_socket_panels(sim),
         'stage_purity_report': stage_purity_report(sim.train),
         'knudsen_regime_diagnostic': _knudsen_regime_diagnostic_from_sim(sim),
     }

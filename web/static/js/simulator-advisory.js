@@ -562,6 +562,143 @@ function renderVaporPressureAuthorityPanel(payload) {
     appendCeramicLine(content, 'Diagnostic only', String(!!payload.diagnostic_only));
 }
 
+/**
+ * VR-11 instrumentation: exact-key batch counts, shadow equality, and
+ * catalog-vs-live mismatch (operator-visible SC-50 consumer).
+ */
+function renderVapourRailInstrumentationPanel(payload) {
+    const content = document.getElementById('vapour-rail-instrumentation-content');
+    if (!content) return;
+    const status = payload && payload.status ? payload.status : 'n/a';
+    updateAdvisoryState('vapour-rail-instrumentation-state', status);
+    advisoryClear(content);
+    if (!payload || status === 'n/a') {
+        content.className = 'advisory-empty';
+        content.textContent = 'n/a';
+        return;
+    }
+
+    content.className = 'advisory-result';
+    const title = document.createElement('div');
+    title.className = 'advisory-result-title';
+    title.textContent = status;
+    content.appendChild(title);
+    appendCeramicLine(content, 'Message', payload.message || 'n/a');
+    // Own-property checks: missing producer fields render absent/n/a, never
+    // silent 0 (schema drift must not look like measured zero activity).
+    appendCeramicLine(
+        content,
+        'Requested channels',
+        Object.prototype.hasOwnProperty.call(payload, 'n_requested')
+            ? String(payload.n_requested)
+            : 'absent'
+    );
+    appendCeramicLine(
+        content,
+        'Flux-active',
+        Object.prototype.hasOwnProperty.call(payload, 'n_flux_active')
+            ? String(payload.n_flux_active)
+            : 'absent'
+    );
+    appendCeramicLine(
+        content,
+        'Refused',
+        Object.prototype.hasOwnProperty.call(payload, 'n_refused')
+            ? String(payload.n_refused)
+            : 'absent'
+    );
+    // Never default absent proof to True — surface explicit null/undefined.
+    const shadowEqual =
+        payload.shadow_equal === null || payload.shadow_equal === undefined
+            ? 'absent'
+            : String(payload.shadow_equal);
+    appendCeramicLine(content, 'Shadow equal (batch vs live)', shadowEqual);
+    appendCeramicLine(
+        content,
+        'Shadow outcome',
+        payload.shadow_outcome || 'absent'
+    );
+    const overlay = advisoryObject(payload.flux_overlay) || {};
+    const catalogEqual =
+        overlay.catalog_pa_shadow_equal === null
+        || overlay.catalog_pa_shadow_equal === undefined
+            ? 'absent'
+            : String(overlay.catalog_pa_shadow_equal);
+    appendCeramicLine(content, 'Catalog Pa vs live equal', catalogEqual);
+    appendCeramicLine(
+        content,
+        'Catalog Pa shadow outcome',
+        overlay.catalog_pa_shadow_outcome || 'absent'
+    );
+    if (Object.prototype.hasOwnProperty.call(payload, 'refusals_by_species')) {
+        const refused = advisoryObject(payload.refusals_by_species) || {};
+        const refusedNames = Object.keys(refused).sort();
+        appendCeramicLine(
+            content,
+            'Refused species',
+            refusedNames.length ? refusedNames.join(', ') : 'none'
+        );
+    } else {
+        appendCeramicLine(content, 'Refused species', 'absent');
+    }
+    appendCeramicLine(content, 'Diagnostic only', String(!!payload.diagnostic_only));
+}
+
+/**
+ * B2 condensation refusals / efficiency pass-through outcomes.
+ */
+function renderCondensationRefusalsPanel(payload) {
+    const content = document.getElementById('condensation-refusals-content');
+    if (!content) return;
+    const status = payload && payload.status ? payload.status : 'n/a';
+    updateAdvisoryState('condensation-refusals-state', status);
+    advisoryClear(content);
+    if (!payload || status === 'n/a') {
+        content.className = 'advisory-empty';
+        content.textContent = 'n/a';
+        return;
+    }
+
+    content.className = 'advisory-result';
+    const title = document.createElement('div');
+    title.className = 'advisory-result-title';
+    title.textContent = status;
+    content.appendChild(title);
+    appendCeramicLine(content, 'Message', payload.message || 'n/a');
+    // Own-property checks: reserve 0/false/none for values the producer
+    // actually emitted; schema-drifted absence must not look measured.
+    appendCeramicLine(
+        content,
+        'Species count',
+        Object.prototype.hasOwnProperty.call(payload, 'n_species')
+            ? String(payload.n_species)
+            : 'absent'
+    );
+    appendCeramicLine(
+        content,
+        'Has refusals',
+        Object.prototype.hasOwnProperty.call(payload, 'has_refusals')
+            ? String(!!payload.has_refusals)
+            : 'absent'
+    );
+    if (Object.prototype.hasOwnProperty.call(payload, 'by_species')) {
+        const bySpecies = advisoryObject(payload.by_species) || {};
+        const names = Object.keys(bySpecies).sort();
+        if (names.length) {
+            for (const name of names) {
+                const entry = bySpecies[name] || {};
+                const code = entry.code || entry.reason || entry.status || 'recorded';
+                appendCeramicLine(content, name, String(code));
+            }
+        } else {
+            appendCeramicLine(content, 'By species', 'none');
+        }
+    } else {
+        appendCeramicLine(content, 'By species', 'absent');
+    }
+    appendCeramicLine(content, 'Diagnostic only', String(!!payload.diagnostic_only));
+}
+
 function thermalTrainHeadlineMetric(value, unit) {
     const number = Number(value);
     if (!Number.isFinite(number)) return 'n/a';
@@ -679,6 +816,8 @@ function refreshThermalTrainHeadline(isRetry) {
 socket.on('simulation_tick', (data) => {
     renderWallRiskPanel(data.wall_risk_panel);
     renderVaporPressureAuthorityPanel(data.vapor_pressure_authority_panel);
+    renderVapourRailInstrumentationPanel(data.vapour_rail_instrumentation_panel);
+    renderCondensationRefusalsPanel(data.condensation_refusals_panel);
     renderOverlapEvaporationPanel(data.overlap_evaporation);
 });
 
@@ -687,6 +826,8 @@ socket.on('simulation_complete', (data) => {
     renderCeramicRumpPanel(data.ceramic_rump_panel);
     renderIndustrialGlassPanel(data.glass_panel);
     renderVaporPressureAuthorityPanel(data.vapor_pressure_authority_panel);
+    renderVapourRailInstrumentationPanel(data.vapour_rail_instrumentation_panel);
+    renderCondensationRefusalsPanel(data.condensation_refusals_panel);
     renderKnudsenRegimePanelFromDiagnostic(
         data.knudsen_regime_diagnostic,
         'Completion diagnostic'
@@ -731,6 +872,8 @@ window.renderWallRiskPanel = renderWallRiskPanel;
 window.renderCeramicRumpPanel = renderCeramicRumpPanel;
 window.renderIndustrialGlassPanel = renderIndustrialGlassPanel;
 window.renderVaporPressureAuthorityPanel = renderVaporPressureAuthorityPanel;
+window.renderVapourRailInstrumentationPanel = renderVapourRailInstrumentationPanel;
+window.renderCondensationRefusalsPanel = renderCondensationRefusalsPanel;
 window.renderProductLedgerPanel = renderProductLedgerPanel;
 window.renderOverlapEvaporationPanel = renderOverlapEvaporationPanel;
 window.renderKnudsenRegimePanelFromDiagnostic = renderKnudsenRegimePanelFromDiagnostic;

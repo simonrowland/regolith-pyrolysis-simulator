@@ -216,6 +216,48 @@ def vapor_pressure_authority_payload(
     }
 
 
+# SC-50 production-owned VR socket panel producer surface.
+# Adding a key here (or to sc50_vr_socket_panels) without a matching entry
+# in the consumer registry fails exact-set equality in the SC-50 guard.
+SC50_VR_SOCKET_PANEL_KEYS = frozenset(
+    {
+        "vapour_rail_instrumentation_panel",
+        "condensation_refusals_panel",
+    }
+)
+
+# Artifact terminal keys written by the runner for the same SC-50 surface.
+SC50_VR_ARTIFACT_TERMINAL_KEYS = frozenset(
+    {
+        "vapour_rail_instrumentation",
+        "condensation_refusals_by_species",
+    }
+)
+
+# Comparison fields inside flux_overlay — operator-visible mismatch surface.
+SC50_VR_COMPARISON_KEYS = frozenset(
+    {
+        "catalog_pa_shadow_equal",
+        "catalog_pa_shadow_outcome",
+    }
+)
+
+# Residual wires on the same SC-50 surface (coating count + alpha safety gate).
+SC50_VR_RESIDUAL_KEYS = frozenset(
+    {
+        "status_bearing_refusal_count",
+        "assert_alpha_source_not_vaporock",
+    }
+)
+
+SC50_VR_PRODUCER_KEYS = (
+    SC50_VR_SOCKET_PANEL_KEYS
+    | SC50_VR_ARTIFACT_TERMINAL_KEYS
+    | SC50_VR_COMPARISON_KEYS
+    | SC50_VR_RESIDUAL_KEYS
+)
+
+
 def vapour_rail_instrumentation_panel_payload(sim: Any) -> dict[str, Any]:
     """VR-11 UI panel: exact-key batch, refusals, solve groups, ceiling."""
 
@@ -277,6 +319,31 @@ def condensation_refusals_panel_payload(sim: Any) -> dict[str, Any]:
             "outcomes (VR-11 B2/B3)."
         ),
     }
+
+
+def sc50_vr_socket_panels(sim: Any) -> dict[str, Any]:
+    """Socket payload fragment for the VR-11 SC-50 instrumentation surface.
+
+    Production-owned producer set: keys of this dict are the socket-panel
+    producers the SC-50 guard exact-set-compares against the consumer
+    registry. Add a key only when a real operator/safety consumer lands.
+    """
+
+    panels = {
+        "vapour_rail_instrumentation_panel": (
+            vapour_rail_instrumentation_panel_payload(sim)
+        ),
+        "condensation_refusals_panel": condensation_refusals_panel_payload(sim),
+    }
+    produced = frozenset(panels)
+    if produced != SC50_VR_SOCKET_PANEL_KEYS:
+        missing = sorted(SC50_VR_SOCKET_PANEL_KEYS - produced)
+        extra = sorted(produced - SC50_VR_SOCKET_PANEL_KEYS)
+        raise RuntimeError(
+            "SC-50 VR socket panel key drift: "
+            f"missing={missing} extra={extra}"
+        )
+    return panels
 
 
 def _wall_material_payload(

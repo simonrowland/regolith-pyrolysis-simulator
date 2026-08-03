@@ -1059,6 +1059,410 @@ def test_run_artifact_forwards_vr11_terminal_keys() -> None:
 
 
 # ---------------------------------------------------------------------------
+# SC-50 — producer-only surface class closed on VR instrumentation
+# ---------------------------------------------------------------------------
+
+# Explicit consumer registry: every production-owned SC-50 producer key must
+# appear here with a real consumer path that would notice its absence.
+# Exact-set equality against the production-owned producer set is the guard
+# against a newly introduced producer-only field (reviewer case: new_vr_signal).
+_SC50_CONSUMER_REGISTRY: dict[str, dict[str, Any]] = {
+    "vapour_rail_instrumentation_panel": {
+        "paths": (
+            "web/static/js/simulator-advisory.js",
+            "web/templates/simulator.html",
+        ),
+        "must_contain": (
+            "data.vapour_rail_instrumentation_panel",
+            "renderVapourRailInstrumentationPanel(",
+            'id="vapour-rail-instrumentation-panel"',
+        ),
+    },
+    "condensation_refusals_panel": {
+        "paths": (
+            "web/static/js/simulator-advisory.js",
+            "web/templates/simulator.html",
+        ),
+        "must_contain": (
+            "data.condensation_refusals_panel",
+            "renderCondensationRefusalsPanel(",
+            'id="condensation-refusals-panel"',
+        ),
+    },
+    "vapour_rail_instrumentation": {
+        "paths": ("web/report_viewer/report-viewer.js",),
+        "must_contain": (
+            "vapourRailSection",
+            "terminal.vapour_rail_instrumentation",
+        ),
+    },
+    "condensation_refusals_by_species": {
+        "paths": ("web/report_viewer/report-viewer.js",),
+        "must_contain": (
+            "vapourRailSection",
+            "terminal.condensation_refusals_by_species",
+            "by_species",
+        ),
+    },
+    "catalog_pa_shadow_equal": {
+        "paths": (
+            "web/static/js/simulator-advisory.js",
+            "web/report_viewer/report-viewer.js",
+        ),
+        "must_contain": ("catalog_pa_shadow_equal",),
+    },
+    "catalog_pa_shadow_outcome": {
+        "paths": (
+            "web/static/js/simulator-advisory.js",
+            "web/report_viewer/report-viewer.js",
+        ),
+        "must_contain": ("catalog_pa_shadow_outcome",),
+    },
+    "status_bearing_refusal_count": {
+        "paths": (
+            "web/routes.py",
+            "web/templates/optimizer_detail.html",
+            "web/templates/partials/optimizer_table.html",
+        ),
+        "must_contain": ("status_bearing_refusal_count",),
+    },
+    "assert_alpha_source_not_vaporock": {
+        "paths": (
+            "simulator/vapour_rail/catalog.py",
+            "simulator/evaporation.py",
+        ),
+        # Call sites, not import/docstring-only mentions.
+        "must_contain": ("assert_alpha_source_not_vaporock(",),
+    },
+}
+
+
+def _sc50_production_producer_keys() -> frozenset[str]:
+    """Discover producer keys from the production-owned SC-50 surface.
+
+    Source of truth is web.advisory.SC50_VR_* (and the socket builder's
+    runtime keys), not a hard-coded test tuple. Adding a key to the
+    production surface without a consumer registry entry fails exact-set.
+    """
+
+    from web.advisory import (
+        SC50_VR_PRODUCER_KEYS,
+        SC50_VR_SOCKET_PANEL_KEYS,
+        sc50_vr_socket_panels,
+    )
+
+    sim = SimpleNamespace(
+        _last_vapour_batch=None,
+        _last_vapour_batch_report=None,
+        _last_vapour_batch_flux_overlay={},
+        _last_vapour_batch_resolve_error={},
+        condensation_model=SimpleNamespace(
+            last_condensation_refusals_by_species={}
+        ),
+    )
+    runtime_socket = frozenset(sc50_vr_socket_panels(sim))
+    assert runtime_socket == SC50_VR_SOCKET_PANEL_KEYS, (
+        "SC-50: sc50_vr_socket_panels runtime keys drifted from "
+        f"SC50_VR_SOCKET_PANEL_KEYS: {sorted(runtime_socket ^ SC50_VR_SOCKET_PANEL_KEYS)}"
+    )
+    return frozenset(SC50_VR_PRODUCER_KEYS)
+
+
+def _sc50_assert_producers_match_consumers(
+    producers: frozenset[str],
+    consumers: frozenset[str],
+) -> None:
+    """Exact-set equality; names producer-only keys in the failure message."""
+
+    producer_only = sorted(producers - consumers)
+    consumer_only = sorted(consumers - producers)
+    assert producers == consumers, (
+        "SC-50 producer/consumer exact-set drift: "
+        f"producer-only={producer_only} consumer-only={consumer_only}"
+    )
+
+
+def test_sc50_vr_instrumentation_surface_fields_have_consumers() -> None:
+    """SC-50 guard: production producers == consumer registry (exact set).
+
+    Null hypothesis: a field written into an artifact nobody reads is still
+    producer-only. Wiring a field merely by adding a test that reads it is
+    NOT a consumer. Every registry entry must appear in a real operator/
+    safety path (UI render, report viewer, coating template, or gate call).
+    """
+
+    root = Path(__file__).resolve().parents[1]
+    producers = _sc50_production_producer_keys()
+    consumers = frozenset(_SC50_CONSUMER_REGISTRY)
+    _sc50_assert_producers_match_consumers(producers, consumers)
+
+    # Each registry entry must be consumed by production source that would
+    # notice its absence (not a test-only assertion).
+    blob_by_path: dict[str, str] = {}
+    for key, spec in _SC50_CONSUMER_REGISTRY.items():
+        combined = []
+        for rel in spec["paths"]:
+            if rel not in blob_by_path:
+                blob_by_path[rel] = (root / rel).read_text(encoding="utf-8")
+            combined.append(blob_by_path[rel])
+        joined = "\n".join(combined)
+        for token in spec["must_contain"]:
+            assert token in joined, (
+                f"SC-50: producer {key!r} missing consumer token {token!r} "
+                f"in {spec['paths']}"
+            )
+
+    # Socket emission must go through the owned builder (no free-standing
+    # panel payload assignments that could bypass the producer set).
+    events_py = (root / "web/events.py").read_text(encoding="utf-8")
+    assert "sc50_vr_socket_panels" in events_py
+    assert "vapour_rail_instrumentation_panel_payload(" not in events_py
+    assert "condensation_refusals_panel_payload(" not in events_py
+
+    # Artifact terminal keys discovered from runner source must match the
+    # production-owned artifact set (catches a free-standing new terminal key
+    # wired next to the VR instrumentation emit).
+    from web.advisory import SC50_VR_ARTIFACT_TERMINAL_KEYS
+
+    runner_py = (root / "simulator/runner/__init__.py").read_text(encoding="utf-8")
+    discovered_terminal: set[str] = set()
+    for pattern in (
+        r'["\']([a-z_]+)["\']\s*:\s*_json_safe\(\s*\n\s*_vapour_rail_instrumentation_report',
+        r'["\']([a-z_]+)["\']\s*:\s*_json_safe\(\s*\n\s*_condensation_refusals_report',
+        r'["\']([a-z_]+)["\']\s*:\s*_json_safe\(\s*_vapour_rail_instrumentation_report',
+        r'["\']([a-z_]+)["\']\s*:\s*_json_safe\(\s*_condensation_refusals_report',
+    ):
+        import re
+
+        discovered_terminal.update(re.findall(pattern, runner_py))
+    assert frozenset(discovered_terminal) == SC50_VR_ARTIFACT_TERMINAL_KEYS, (
+        "SC-50: runner artifact terminal VR keys drifted from "
+        f"SC50_VR_ARTIFACT_TERMINAL_KEYS: "
+        f"{sorted(frozenset(discovered_terminal) ^ SC50_VR_ARTIFACT_TERMINAL_KEYS)}"
+    )
+
+    # Operator-facing panel fields stay projected and referenced.
+    from simulator.diagnostics import vapour_rail_instrumentation_diagnostic
+    from web.advisory import (
+        condensation_refusals_panel_payload,
+        vapour_rail_instrumentation_panel_payload,
+    )
+
+    advisory_js = (root / "web/static/js/simulator-advisory.js").read_text(
+        encoding="utf-8"
+    )
+    sim = SimpleNamespace(
+        _last_vapour_batch=None,
+        _last_vapour_batch_report=None,
+        _last_vapour_batch_flux_overlay={
+            "shadow_equal": False,
+            "shadow_outcome": SHADOW_ABSENT_COMPARISON,
+            "catalog_pa_shadow_equal": False,
+            "catalog_pa_shadow_outcome": SHADOW_ABSENT_COMPARISON,
+        },
+        _last_vapour_batch_resolve_error={},
+        condensation_model=SimpleNamespace(
+            last_condensation_refusals_by_species={}
+        ),
+    )
+    diag = vapour_rail_instrumentation_diagnostic(sim)
+    panel = vapour_rail_instrumentation_panel_payload(sim)
+    refusals_panel = condensation_refusals_panel_payload(sim)
+
+    for key in (
+        "shadow_equal",
+        "shadow_outcome",
+        "flux_overlay",
+        "source_vapour_ceiling_table",
+        "condensation_refusals",
+    ):
+        assert key in diag, f"diagnostic lost producer key {key!r}"
+    for key in (
+        "shadow_equal",
+        "shadow_outcome",
+        "flux_overlay",
+        "n_requested",
+        "n_flux_active",
+        "n_refused",
+        "refusals_by_species",
+    ):
+        assert key in panel, f"panel lost producer key {key!r}"
+        assert key in advisory_js, (
+            f"SC-50: panel field {key!r} has no JS consumer reference"
+        )
+    for key in ("n_species", "by_species", "has_refusals"):
+        assert key in refusals_panel
+        assert key in advisory_js
+
+
+def test_sc50_guard_reds_on_new_vr_signal_producer_only() -> None:
+    """Reviewer-constructed case: unregistered producer key must fail exact-set.
+
+    Mentally adding new_vr_signal to the production producer surface without
+    a consumer registry entry must red the guard — the previous hard-coded
+    tuple check stayed green because it never discovered new producers.
+    """
+
+    producers = _sc50_production_producer_keys() | frozenset({"new_vr_signal"})
+    consumers = frozenset(_SC50_CONSUMER_REGISTRY)
+    with pytest.raises(AssertionError, match="new_vr_signal"):
+        _sc50_assert_producers_match_consumers(producers, consumers)
+
+
+def test_catalog_compile_refuses_vaporock_alpha_source() -> None:
+    """Production catalog gate: VapoRock alpha provenance is a hard refuse."""
+
+    from simulator.vapour_rail.catalog import (
+        CatalogCompileError,
+        compile_vapour_rail_catalog,
+    )
+    from tests.test_vapour_batch_request import _minimal_family, _u0_stub
+
+    payload = _minimal_family(
+        "Na",
+        applicability="applicable",
+        request_rule="source_inventory_present",
+        source_account="process.cleaned_melt",
+        with_reaction=True,
+    )
+    fam = next(iter(payload["families"].values()))
+    fam["vaporisation_coefficients"]["evaporation_alpha"]["source"] = (
+        "vaporock_fit"
+    )
+    with pytest.raises(CatalogCompileError, match="VapoRock"):
+        compile_vapour_rail_catalog(payload, u0_manifest=_u0_stub("Na"))
+
+
+def test_catalog_compile_refuses_vaporock_source_note() -> None:
+    """Supported source_note provenance must not bypass the catalog gate."""
+
+    from simulator.vapour_rail.catalog import (
+        CatalogCompileError,
+        compile_vapour_rail_catalog,
+    )
+    from tests.test_vapour_batch_request import _minimal_family, _u0_stub
+
+    payload = _minimal_family(
+        "Na",
+        applicability="applicable",
+        request_rule="source_inventory_present",
+        source_account="process.cleaned_melt",
+        with_reaction=True,
+    )
+    fam = next(iter(payload["families"].values()))
+    alpha = fam["vaporisation_coefficients"]["evaporation_alpha"]
+    # Strip primary source keys; leave only value + source_note (adversarial).
+    alpha.pop("source", None)
+    alpha.pop("provenance", None)
+    alpha.pop("citation", None)
+    alpha["source_note"] = "vaporock_fit"
+    alpha["value"] = 0.5
+    with pytest.raises(CatalogCompileError, match="VapoRock"):
+        compile_vapour_rail_catalog(payload, u0_manifest=_u0_stub("Na"))
+
+
+def test_runtime_evaporation_refuses_vaporock_source_note() -> None:
+    """Runtime HKL alpha loader must refuse source_note=vaporock_fit."""
+
+    from simulator.evaporation import _assert_runtime_alpha_source_not_vaporock
+
+    with pytest.raises(ValueError, match="VapoRock"):
+        _assert_runtime_alpha_source_not_vaporock(
+            "Na",
+            {"value": 0.5, "source_note": "vaporock_fit"},
+        )
+
+
+def test_coating_readout_consumes_status_bearing_refusal_count() -> None:
+    """SC-50: wall-authority refusal count reaches coating + operator reason."""
+
+    from web.routes import _coating_readout
+
+    # Segment refusals must carry status=refused + output_status=status_bearing
+    # so wall_deposit_sticking_authority_status re-derives the count (the
+    # production producer path), then _coating_readout surfaces it into the
+    # reason string operators already see AND the explicit count field that
+    # optimizer templates render.
+    readout = _coating_readout(
+        {
+            "wall_deposit_kg_by_segment_species": {
+                "hot_wall": {"Mg": 0.01},
+            },
+            "campaigns_to_resinter": 5.0,
+            "wall_deposit_sticking_authority": {
+                "wall_saturation_pressure_refusals_by_species": {
+                    "Mg": {
+                        "hot_wall": {
+                            "status": "refused",
+                            "output_status": "status_bearing",
+                            "reason": "wall_saturation_pressure_out_of_domain",
+                        }
+                    },
+                    "Na": {
+                        "hot_wall": {
+                            "status": "refused",
+                            "output_status": "status_bearing",
+                            "reason": "wall_saturation_pressure_out_of_domain",
+                        }
+                    },
+                },
+            },
+        }
+    )
+    assert readout["status"] == "warning"
+    assert readout["status_bearing_refusal_count"] == 2
+    assert "status-bearing refusals: 2" in str(readout.get("reason") or "")
+
+
+def test_optimizer_templates_render_status_bearing_refusal_count() -> None:
+    """Operator templates must render the count (not readout-payload-only)."""
+
+    root = Path(__file__).resolve().parents[1]
+    detail = (root / "web/templates/optimizer_detail.html").read_text(
+        encoding="utf-8"
+    )
+    table = (
+        root / "web/templates/partials/optimizer_table.html"
+    ).read_text(encoding="utf-8")
+    assert "status_bearing_refusal_count" in detail
+    assert "status_bearing_refusal_count" in table
+    assert "status-bearing refusals" in detail
+    assert "status-bearing refusals" in table
+
+
+def test_report_viewer_consumes_refusals_by_species_envelope() -> None:
+    """Report viewer must read envelope.by_species, not top-level keys as rows."""
+
+    report_js = (
+        Path(__file__).resolve().parents[1]
+        / "web/report_viewer/report-viewer.js"
+    ).read_text(encoding="utf-8")
+    # Must walk by_species, not Object.keys(refusals) on the envelope.
+    assert "refusals.by_species" in report_js or "by_species" in report_js
+    assert "Object.keys(refusals)" not in report_js
+    assert "malformed by_species envelope" in report_js
+
+
+def test_live_panel_absent_counts_render_absent_not_zero() -> None:
+    """Missing VR count fields must render absent/n/a, never silent zero."""
+
+    advisory_js = (
+        Path(__file__).resolve().parents[1]
+        / "web/static/js/simulator-advisory.js"
+    ).read_text(encoding="utf-8")
+    # Own-property checks for counts (not ?? 0 / !! defaults on missing).
+    assert "hasOwnProperty.call(payload, 'n_requested')" in advisory_js
+    assert "hasOwnProperty.call(payload, 'n_flux_active')" in advisory_js
+    assert "hasOwnProperty.call(payload, 'n_refused')" in advisory_js
+    assert "hasOwnProperty.call(payload, 'n_species')" in advisory_js
+    assert "hasOwnProperty.call(payload, 'has_refusals')" in advisory_js
+    assert "hasOwnProperty.call(payload, 'by_species')" in advisory_js
+    # No silent zero defaults on the live VR count lines.
+    assert "String(payload.n_requested ?? 0)" not in advisory_js
+    assert "String(payload.n_species ?? 0)" not in advisory_js
+
+
+# ---------------------------------------------------------------------------
 # km P1-2 — real evaluator out_of_range / acquisition threading
 # ---------------------------------------------------------------------------
 

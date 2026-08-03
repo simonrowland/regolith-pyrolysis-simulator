@@ -320,6 +320,105 @@ function wallAndOxygenSection(artifact, rows) {
   return section(6, "Wall risk, oxygen & pumping", "Observed deposits and terminal diagnostics only; wall lifetime remains unassessed.", `<div class="cards">${wall}${oxygen}</div>${pending("W-D4", "terminal.wall_lifetime is absent. Wall lifetime is not assessed; this viewer does not issue a CLEAR verdict.")}`);
 }
 
+/**
+ * VR-11 terminal instrumentation + condensation refusals (SC-50 consumers).
+ * Surfaces schema-bearing diagnostics already written into the artifact;
+ * never invents shadow-equality when absent.
+ */
+function vapourRailSection(terminal) {
+  const instrumentation = isRecord(terminal.vapour_rail_instrumentation)
+    ? terminal.vapour_rail_instrumentation
+    : null;
+  const refusalsRaw = terminal.condensation_refusals_by_species;
+  const refusals = isRecord(refusalsRaw) ? refusalsRaw : null;
+  if (!instrumentation && !refusals) {
+    return section(
+      6.5,
+      "Vapour rail instrumentation",
+      "Terminal VR-11 diagnostics when emitted by the runner.",
+      pending(
+        "VR-11",
+        "terminal.vapour_rail_instrumentation and terminal.condensation_refusals_by_species were not emitted."
+      )
+    );
+  }
+  const overlay = isRecord(instrumentation?.flux_overlay)
+    ? instrumentation.flux_overlay
+    : {};
+  const batch = isRecord(instrumentation?.vapour_batch)
+    ? instrumentation.vapour_batch
+    : {};
+  const shadowEqual =
+    instrumentation && Object.prototype.hasOwnProperty.call(instrumentation, "shadow_equal")
+      ? instrumentation.shadow_equal
+      : null;
+  const shadowOutcome = instrumentation?.shadow_outcome ?? "not emitted";
+  const catalogEqual = Object.prototype.hasOwnProperty.call(overlay, "catalog_pa_shadow_equal")
+    ? overlay.catalog_pa_shadow_equal
+    : null;
+  const catalogOutcome = overlay.catalog_pa_shadow_outcome ?? "not emitted";
+  const vrCard = instrumentation
+    ? `<div class="card"><div class="ct">Vapour batch · channel authority</div>` +
+      `<div class="cbig">${esc(String(batch.n_flux_active ?? "n/a"))} <small>flux-active</small></div>` +
+      `<div class="kv"><span>Schema</span><b class="mono">${esc(instrumentation.schema || "not emitted")}</b></div>` +
+      `<div class="kv"><span>Requested / refused</span><b>${esc(String(batch.n_requested ?? "n/a"))} / ${esc(String(batch.n_refused ?? "n/a"))}</b></div>` +
+      `<div class="kv"><span>Shadow equal (batch vs live)</span><b>${esc(shadowEqual === null || shadowEqual === undefined ? "absent" : String(shadowEqual))}</b></div>` +
+      `<div class="kv"><span>Shadow outcome</span><b class="mono">${esc(String(shadowOutcome))}</b></div>` +
+      `<div class="kv"><span>Catalog Pa vs live equal</span><b>${esc(catalogEqual === null || catalogEqual === undefined ? "absent" : String(catalogEqual))}</b></div>` +
+      `<div class="kv"><span>Catalog Pa shadow outcome</span><b class="mono">${esc(String(catalogOutcome))}</b></div>` +
+      `</div>`
+    : pending("VR-11", "terminal.vapour_rail_instrumentation was not emitted.");
+  let refusalBody;
+  if (!refusals) {
+    refusalBody = pending(
+      "B2",
+      "terminal.condensation_refusals_by_species was not emitted."
+    );
+  } else {
+    // Normalized envelope is condensation_refusals.v1:
+    // {schema, n_species, by_species, has_refusals}. Never treat envelope
+    // keys (schema/n_species/…) as species rows.
+    const envelopeOk =
+      Object.prototype.hasOwnProperty.call(refusals, "by_species") &&
+      isRecord(refusals.by_species);
+    if (!envelopeOk) {
+      refusalBody = pending(
+        "B2",
+        "terminal.condensation_refusals_by_species missing or malformed by_species envelope."
+      );
+    } else {
+      const bySpecies = refusals.by_species;
+      const names = Object.keys(bySpecies).sort();
+      const declaredCount = Object.prototype.hasOwnProperty.call(refusals, "n_species")
+        ? refusals.n_species
+        : names.length;
+      const hasRefusals = Object.prototype.hasOwnProperty.call(refusals, "has_refusals")
+        ? refusals.has_refusals
+        : names.length > 0;
+      const rows = names.length
+        ? names
+            .map((name) => {
+              const entry = isRecord(bySpecies[name]) ? bySpecies[name] : {};
+              const code = entry.code || entry.reason || entry.status || "recorded";
+              return `<div class="kv"><span class="mono">${esc(name)}</span><b>${esc(String(code))}</b></div>`;
+            })
+            .join("")
+        : `<div class="note">${hasRefusals ? "Envelope reports refusals but by_species is empty." : "No condensation refusals recorded for this run."}</div>`;
+      refusalBody =
+        `<div class="card"><div class="ct">Condensation refusals</div>` +
+        `<div class="cbig">${esc(String(declaredCount))} <small>species</small></div>` +
+        `<div class="kv"><span>Has refusals</span><b>${esc(String(hasRefusals))}</b></div>` +
+        `${rows}</div>`;
+    }
+  }
+  return section(
+    6.5,
+    "Vapour rail instrumentation",
+    "Exact-key batch / shadow comparison and condensation refusals from the frozen artifact.",
+    `<div class="cards">${vrCard}${refusalBody}</div>`
+  );
+}
+
 function taxonomyFieldValue(value) {
   if (value === null) return "emitted null";
   if (Array.isArray(value)) {
@@ -557,7 +656,8 @@ function render(artifact) {
     : section(1, "Per-hour telemetry", "No timestep rows were emitted for this run.", `<div class="pending"><strong>Not emitted</strong><p>This execution has zero timesteps; header, failure, and terminal data remain available below.</p></div>`);
   $("#report").innerHTML = makeHeader(artifact, rows, energy) + timestepSections +
     ledgerSection(artifact.terminal.final_state) +
-    tapsAndPuritySection(artifact.terminal) + wallAndOxygenSection(artifact, rows) + ceramicSection(artifact.terminal) +
+    tapsAndPuritySection(artifact.terminal) + wallAndOxygenSection(artifact, rows) +
+    vapourRailSection(artifact.terminal) + ceramicSection(artifact.terminal) +
     costSection(artifact, energy) + provenanceSection(artifact) +
     `<footer class="footer"><span>Frozen flatfile report · engine-free · artifact-only rendering</span><a href="./settings.html${RUN_QUERY}">Captured settings</a><span class="mono">${esc(artifact.header.run_id)}</span></footer>`;
   if (rows.length) {

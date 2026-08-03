@@ -2616,6 +2616,54 @@ def _compile_code_metadata(
     )
 
 
+def _assert_alpha_provenance_not_vaporock(
+    family_id: str, alpha: Mapping[str, Any]
+) -> None:
+    """Refuse VapoRock-fit alpha provenance at catalog compile (SC-50 wire).
+
+    Null hypothesis refuted by production: ``assert_alpha_source_not_vaporock``
+    lived only behind the kinetics-anchor loaders / unit tests. Catalog compile
+    is the production gate for vaporisation_coefficients; wire the denial here
+    so a VapoRock-sourced alpha cannot enter the compiled rail.
+    """
+
+    from simulator.vapour_rail.kinetics_anchors import (
+        KineticsAnchorError,
+        assert_alpha_source_not_vaporock,
+    )
+
+    def _check(source: Any, *, field: str) -> None:
+        if source is None:
+            return
+        try:
+            assert_alpha_source_not_vaporock(str(source))
+        except KineticsAnchorError as exc:
+            raise CatalogCompileError(
+                f"{family_id}.vaporisation_coefficients.evaporation_alpha"
+                f".{field}: {exc}"
+            ) from exc
+
+    # source_note is a supported provenance shape (kinetics_anchors loader);
+    # omitting it lets VapoRock-fit alphas bypass compile via
+    # {value, source_note} contracts.
+    for key in ("source", "provenance", "citation", "source_note"):
+        if key in alpha:
+            _check(alpha.get(key), field=key)
+    value = alpha.get("value")
+    if isinstance(value, Mapping):
+        for key in ("cite", "source", "provenance", "source_note"):
+            if key in value:
+                _check(value.get(key), field=f"value.{key}")
+    competing = alpha.get("competing_sources")
+    if isinstance(competing, list):
+        for index, item in enumerate(competing):
+            if not isinstance(item, Mapping):
+                continue
+            for key in ("source", "provenance", "citation", "source_note"):
+                if key in item:
+                    _check(item.get(key), field=f"competing_sources[{index}].{key}")
+
+
 def _validate_kinetics(family_id: str, kinetics: Mapping[str, Any]) -> None:
     if kinetics.get("extrapolation_policy") != DEFAULT_EXTRAPOLATION_POLICY:
         raise CatalogCompileError(
@@ -2626,12 +2674,15 @@ def _validate_kinetics(family_id: str, kinetics: Mapping[str, Any]) -> None:
             f"{family_id}: out_of_range_status must be {OUT_OF_RANGE_STATUS}"
         )
     _required_string(kinetics.get("acquisition_flag"), f"{family_id}.acquisition_flag")
+    alpha_contract = kinetics.get("evaporation_alpha")
     try:
-        parse_alpha_contract(kinetics.get("evaporation_alpha"))
+        parse_alpha_contract(alpha_contract)
     except AlphaSpecError as exc:
         raise CatalogCompileError(
             f"{family_id}.vaporisation_coefficients.evaporation_alpha: {exc}"
         ) from exc
+    if isinstance(alpha_contract, Mapping):
+        _assert_alpha_provenance_not_vaporock(family_id, alpha_contract)
 
 
 def _validation_status(

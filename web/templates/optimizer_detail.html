@@ -270,6 +270,9 @@
                         campaigns to resinter
                         {{ result.coating.campaigns_to_resinter if result.coating.campaigns_to_resinter is not none else "not declared" }}
                     </span>
+                    {% if result.coating.status_bearing_refusal_count is not none %}
+                    <br><span class="range">status-bearing refusals: {{ result.coating.status_bearing_refusal_count }}</span>
+                    {% endif %}
                     {% if result.coating.status == "warning" and result.coating.reason %}
                     <br><span class="range">{{ result.coating.reason }}</span>
                     {% endif %}
