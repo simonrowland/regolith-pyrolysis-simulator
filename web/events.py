@@ -3337,6 +3337,11 @@ def register_events(socketio):
                 'started_at_utc': datetime.now(timezone.utc).strftime(
                     '%Y-%m-%dT%H:%M:%SZ'
                 ),
+                **(
+                    {'furnace_material_id': furnace_material_id}
+                    if furnace_material_id
+                    else {}
+                ),
             },
         )
 

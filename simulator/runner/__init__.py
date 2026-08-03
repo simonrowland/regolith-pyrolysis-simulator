@@ -84,6 +84,7 @@ from simulator.diagnostics import (
     pressure_coating_pareto_diagnostic,
     wall_deposit_sticking_authority_status,
 )
+from simulator.liner_life import build_liner_life_run_diagnostic
 from simulator.diagnostic_helpers.vacuum_pyrolysis import (
     evaluate_vacuum_pyrolysis_comparison,
     load_vacuum_pyrolysis_observations,
@@ -1405,6 +1406,63 @@ class PyrolysisRun:
         )
         run_metadata["cost_rollup_diagnostic"] = _json_safe(cost_rollup_diagnostic)
         sim.record.cost_rollup = dict(run_metadata["cost_rollup_diagnostic"])
+
+        # Liner-life temperature-ceiling diagnostic (b-107 / t-478 wire):
+        # instrument-only, info-level, never gates recipes or furnace envelopes.
+        # Surfaces via run_metadata -> build_run_artifact terminal.run_metadata.
+        #
+        # Golden-neutrality (review b107-cx P1 / b107-km F2): attach ONLY when a
+        # furnace material was explicitly selected. Unselected runs omit the key
+        # entirely so committed runner goldens and golden-neutral contract tests
+        # (test_recipe_io, test_cost_ledger, test_runner_smoke scenarios) stay
+        # byte-stable. When material IS selected the key is additive and
+        # diagnostic-only; runner goldens do not exercise material selection, so
+        # regeneration is deferred with the pre-existing physics-drift backlog
+        # rather than silently baking this key into fixtures.
+        furnace_material_id = str(
+            run_metadata.get("furnace_material_id")
+            or metadata_overrides.get("furnace_material_id")
+            or ""
+        ).strip()
+        if furnace_material_id:
+            try:
+                # Melt pO2 is stored in mbar; the liner-life evaluator takes bar.
+                # Premise: 1 mbar = 1e-3 bar. Algebra: bar = mbar * 1e-3.
+                # Unit check: mbar * (bar/1000 mbar) = bar. Sanity: 1 mbar -> 0.001 bar.
+                melt_pO2_mbar = getattr(sim.melt, "pO2_mbar", None)
+                if (
+                    isinstance(melt_pO2_mbar, (int, float))
+                    and not isinstance(melt_pO2_mbar, bool)
+                    and math.isfinite(float(melt_pO2_mbar))
+                    and float(melt_pO2_mbar) >= 0.0
+                ):
+                    diagnostic_pO2_bar = float(melt_pO2_mbar) * 1.0e-3
+                else:
+                    diagnostic_pO2_bar = 0.0
+                hot_hours = float(
+                    run_metadata.get("hours_completed") or self.hours or 10.0
+                )
+                if not math.isfinite(hot_hours) or hot_hours <= 0.0:
+                    hot_hours = 10.0
+                run_metadata["liner_life_diagnostic"] = _json_safe(
+                    build_liner_life_run_diagnostic(
+                        material_id=furnace_material_id,
+                        hot_hours_per_run=hot_hours,
+                        pO2_bar=diagnostic_pO2_bar,
+                    )
+                )
+            except Exception:  # noqa: BLE001 -- instrument-only; never abort the run
+                run_metadata["liner_life_diagnostic"] = {
+                    "status": "failed",
+                    "authority": "diagnostic_only",
+                    "level": "info",
+                    "binding": False,
+                    "gating": False,
+                    "material_id": furnace_material_id,
+                    "refusal": {
+                        "reason": "liner_life_diagnostic_attachment_failed",
+                    },
+                }
 
         # Shuttle refusal log (autoreview r3 P2, 2026-05-27): every
         # ``status='refused'`` returned by the C3 K-shuttle / Na-shuttle

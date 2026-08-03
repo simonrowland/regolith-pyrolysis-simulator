@@ -3,11 +3,11 @@
 The result is diagnostic only: this module does not alter optimizer bounds,
 recipe validation, furnace-envelope guards, or any applied temperature.
 
-Numbers remain model-limited until t-477 supplies multi-species,
-congruent/self-buffered refractory vaporisation and t-475 supplies wall-local
-pressure.  The current proxy underpredicts pure-CaO recession about 23x at
-1700 C and puts the Al2O3 screen about 107 C above the NASA screen.  The
-evaluator boundary lets those physics improve without changing this inversion.
+Recession physics come from ``simulator.refractory_vaporization`` (t-477):
+congruent free-molecular vaporization with alpha=1 on included carriers only.
+That sum is status-bearing, not a proven total-recession upper bound - omitted
+carriers can raise loss and shift self-buffered pO2. Wall-local pressure (t-475)
+remains a pending dependency for process-overhead pO2 fidelity.
 """
 
 from __future__ import annotations
@@ -19,11 +19,23 @@ from dataclasses import asdict, dataclass
 from typing import Any, Protocol
 
 from simulator.furnace_materials import load_furnace_materials
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+from simulator.refractory_vaporization import (
+    CongruentVaporizationError,
+    solve_congruent_vaporization,
+)
 
 
 DIAGNOSTIC_AUTHORITY = "diagnostic_only"
-DIAGNOSTIC_DEPENDENCIES = ("t-477", "t-475")
+DIAGNOSTIC_DEPENDENCIES = ("t-475",)
 TARGET_LIFE_CANONICAL_UNIT = "runs"
+# Free-molecular pO2 boundary: 1 bar = 1e5 Pa matches the JANAF standard
+# pressure used by the refractory congruent-vaporization solver
+# (STANDARD_PRESSURE_PA = 100000).
+_BAR_TO_PA = 100_000.0
+DEFAULT_DIAGNOSTIC_TARGET_LIFE_RUNS = 100.0
+DEFAULT_DIAGNOSTIC_HOT_HOURS_PER_RUN = 10.0
+DEFAULT_DIAGNOSTIC_MATERIAL_ID = "dense_alumina_continuous"
 
 
 class LinerLifeInputRefusal(ValueError):
@@ -122,6 +134,279 @@ class RecessionEvaluator(Protocol):
         upper_temperature_C: float,
         pO2_bar: float,
     ) -> RecessionMonotonicityEvidence: ...
+
+
+@dataclass(frozen=True)
+class _RecessionMaterialInputs:
+    material_id: str
+    refractory_material: str
+    density_kg_m3: float
+    density_citation_status: str
+    density_provenance: str
+    source: str
+
+
+class CongruentVaporizationRecessionEvaluator:
+    """RecessionEvaluator over pure-oxide congruent vaporization (t-477).
+
+    ``alpha=1`` bounds only the included gas_species carriers. Results carry
+    ``flux_classification=included_carrier_equilibrium_effusion_sum`` and must
+    not be treated as a proven total-recession upper bound.
+    """
+
+    def __init__(
+        self,
+        *,
+        catalog: Mapping[str, Any] | None = None,
+        configuration_source: str | None = None,
+    ) -> None:
+        self._catalog = catalog
+        self._configuration_source = configuration_source
+        self._last_status: dict[str, Any] | None = None
+
+    @property
+    def last_status(self) -> dict[str, Any] | None:
+        """Status-bearing fields from the most recent full recession solve."""
+
+        return None if self._last_status is None else dict(self._last_status)
+
+    def analytic_screen_recession_mm_per_1000h(
+        self,
+        *,
+        material_id: str,
+        temperature_C: float,
+        pO2_bar: float,
+    ) -> AnalyticRecessionScreen | None:
+        # Included-carrier alpha=1 is not a conservative total-loss envelope, so
+        # the short-circuit screen stays unavailable until a true bound exists.
+        del material_id, temperature_C, pO2_bar
+        return None
+
+    def recession_mm_per_1000h(
+        self,
+        *,
+        material_id: str,
+        temperature_C: float,
+        pO2_bar: float,
+    ) -> float:
+        inputs = self._resolve_material(material_id)
+        temperature_K = _finite(temperature_C, "temperature_C") + CELSIUS_TO_KELVIN_OFFSET
+        pO2 = _nonnegative(pO2_bar, "pO2_bar")
+        try:
+            if pO2 == 0.0:
+                result = solve_congruent_vaporization(
+                    inputs.refractory_material,
+                    temperature_K,
+                    oxygen_mode="self_buffered",
+                )
+            else:
+                result = solve_congruent_vaporization(
+                    inputs.refractory_material,
+                    temperature_K,
+                    oxygen_mode="imposed",
+                    imposed_pO2_pa=pO2 * _BAR_TO_PA,
+                )
+            rate = result.recession_mm_per_1000h(inputs.density_kg_m3)
+        except (CongruentVaporizationError, ValueError) as exc:
+            self._last_status = {
+                "material_id": inputs.material_id,
+                "refractory_material": inputs.refractory_material,
+                "status": "recession_data_unavailable",
+                "detail": str(exc),
+            }
+            raise RecessionDataUnavailable(str(exc)) from exc
+
+        self._last_status = {
+            "material_id": inputs.material_id,
+            "refractory_material": inputs.refractory_material,
+            "temperature_C": float(temperature_C),
+            "temperature_K": float(temperature_K),
+            "pO2_bar": float(pO2),
+            "oxygen_mode": result.oxygen_mode,
+            "density_kg_m3": inputs.density_kg_m3,
+            "density_citation_status": inputs.density_citation_status,
+            "density_provenance": inputs.density_provenance,
+            "density_source": inputs.source,
+            "recession_mm_per_1000h": float(rate),
+            "flux_classification": result.flux_classification,
+            "certification_status": result.certification_status,
+            "certification_blockers": list(result.certification_blockers),
+            "evaporation_coefficient": float(result.evaporation_coefficient),
+            "unmodeled_species": list(result.unmodeled_species),
+            "transport_applicability": result.transport_applicability,
+            # Status-bearing: alpha=1 is NOT a total recession upper bound.
+            "upper_bound_claim": "included_carriers_only",
+        }
+        return float(rate)
+
+    def monotonicity_evidence(
+        self,
+        *,
+        material_id: str,
+        lower_temperature_C: float,
+        upper_temperature_C: float,
+        pO2_bar: float,
+    ) -> RecessionMonotonicityEvidence:
+        # Resolve so unknown/unconfigured materials refuse before bisection.
+        self._resolve_material(material_id)
+        del lower_temperature_C, upper_temperature_C, pO2_bar
+        return RecessionMonotonicityEvidence(
+            True,
+            basis=(
+                "congruent free-molecular vaporization (included-carrier sum) "
+                "is monotone increasing in temperature at fixed pO2; "
+                "the inversion also samples the bracket empirically"
+            ),
+        )
+
+    def _resolve_material(self, material_id: str) -> _RecessionMaterialInputs:
+        canonical = self._catalog is None
+        raw_catalog = load_furnace_materials() if canonical else self._catalog
+        materials = raw_catalog.get("furnace_materials", raw_catalog)
+        material = materials.get(str(material_id))
+        if not isinstance(material, Mapping):
+            raise RecessionDataUnavailable(
+                f"unknown liner material for recession evaluation: {material_id}"
+            )
+        config = material.get("liner_life_diagnostic")
+        if not isinstance(config, Mapping):
+            raise RecessionDataUnavailable(
+                f"liner_life_diagnostic unavailable for material {material_id}"
+            )
+        refractory = config.get("refractory_material")
+        if refractory is None or not str(refractory).strip():
+            raise RecessionDataUnavailable(
+                f"furnace_materials.{material_id}.liner_life_diagnostic."
+                "refractory_material is required"
+            )
+        density = config.get("density_kg_m3")
+        try:
+            density_kg_m3 = _positive(density, "density_kg_m3")
+        except LinerLifeInputRefusal as exc:
+            raise RecessionDataUnavailable(
+                f"furnace_materials.{material_id}.liner_life_diagnostic."
+                f"density_kg_m3 invalid: {exc.reason}"
+            ) from exc
+        citation = str(config.get("density_citation_status") or "uncited").strip()
+        provenance = str(config.get("density_provenance") or "").strip()
+        if not provenance:
+            provenance = (
+                f"furnace_materials.{material_id}.liner_life_diagnostic.density_kg_m3"
+            )
+        source = self._configuration_source or (
+            f"data/furnace_materials.yaml:furnace_materials.{material_id}."
+            "liner_life_diagnostic"
+            if canonical
+            else f"caller catalog:furnace_materials.{material_id}.liner_life_diagnostic"
+        )
+        return _RecessionMaterialInputs(
+            material_id=str(material_id),
+            refractory_material=str(refractory).strip(),
+            density_kg_m3=density_kg_m3,
+            density_citation_status=citation,
+            density_provenance=provenance,
+            source=source,
+        )
+
+
+def build_liner_life_run_diagnostic(
+    *,
+    material_id: str | None = None,
+    target_life_runs: Any = DEFAULT_DIAGNOSTIC_TARGET_LIFE_RUNS,
+    hot_hours_per_run: Any | None = None,
+    pO2_bar: Any = 0.0,
+    evaluator: RecessionEvaluator | None = None,
+    catalog: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Best-effort, info-level liner-life diagnostic for run artifacts.
+
+    Never raises into the runner: refusals become status-bearing records.
+    Does not gate recipes, optimizer bounds, or furnace envelopes.
+
+    Requires an explicit ``material_id`` — never fabricates a default wall
+    identity (golden-neutral: unselected runs omit the diagnostic entirely).
+    ``DEFAULT_DIAGNOSTIC_MATERIAL_ID`` is the catalogue default for *callers*
+    that intentionally select one, not a silent fallback.
+    """
+
+    selected_material = (
+        str(material_id).strip()
+        if material_id is not None and str(material_id).strip()
+        else ""
+    )
+    hours = (
+        DEFAULT_DIAGNOSTIC_HOT_HOURS_PER_RUN
+        if hot_hours_per_run is None
+        else hot_hours_per_run
+    )
+    envelope: dict[str, Any] = {
+        "status": "computed_diagnostic_not_applied",
+        "authority": DIAGNOSTIC_AUTHORITY,
+        "level": "info",
+        "binding": False,
+        "gating": False,
+        "material_id": selected_material or None,
+        "material_id_source": "explicit" if selected_material else "missing",
+        "pending_dependencies": list(DIAGNOSTIC_DEPENDENCIES),
+        "target_life_runs": None,
+        "hot_hours_per_run": None,
+        "pO2_bar": None,
+        "ceiling": None,
+        "recession_model": None,
+        "refusal": None,
+    }
+    if not selected_material:
+        # Null-hypothesis: fabricating dense_alumina would break golden-neutral
+        # contracts and invent provenance for an unselected wall. Refuse instead.
+        envelope["status"] = "refused"
+        envelope["refusal"] = {
+            "reason": "furnace_material_id_required",
+            "diagnostic": {
+                "detail": (
+                    "liner_life_diagnostic requires an explicit furnace_material_id; "
+                    "no default material is invented"
+                ),
+            },
+        }
+        return envelope
+
+    active_evaluator = evaluator or CongruentVaporizationRecessionEvaluator(
+        catalog=catalog
+    )
+    try:
+        diagnostic = liner_temperature_ceiling_diagnostic(
+            material_id=selected_material,
+            target_life_value=target_life_runs,
+            target_life_unit=TARGET_LIFE_CANONICAL_UNIT,
+            hot_hours_per_run=hours,
+            pO2_bar=pO2_bar,
+            evaluator=active_evaluator,
+            catalog=catalog,
+        )
+    except (LinerLifeInputRefusal, LinerLifeRefusal) as exc:
+        envelope["status"] = "refused"
+        envelope["refusal"] = {
+            "reason": exc.reason,
+            "diagnostic": dict(exc.diagnostic),
+        }
+        if isinstance(active_evaluator, CongruentVaporizationRecessionEvaluator):
+            envelope["recession_model"] = active_evaluator.last_status
+        return envelope
+    except Exception as exc:  # noqa: BLE001 -- instrument-only path must not abort runs
+        envelope["status"] = "failed"
+        envelope["refusal"] = {
+            "reason": "liner_life_diagnostic_failed",
+            "detail": f"{type(exc).__name__}: {exc}",
+        }
+        return envelope
+
+    envelope["target_life_runs"] = diagnostic.target_life_runs
+    envelope["hot_hours_per_run"] = float(hours)
+    envelope["pO2_bar"] = diagnostic.pO2_bar
+    envelope["ceiling"] = diagnostic.as_dict()
+    if isinstance(active_evaluator, CongruentVaporizationRecessionEvaluator):
+        envelope["recession_model"] = active_evaluator.last_status
+    return envelope
 
 
 @dataclass(frozen=True)
@@ -810,8 +1095,12 @@ def _integer(value: Any, field: str, minimum: int) -> int:
 __all__ = (
     "DIAGNOSTIC_AUTHORITY",
     "DIAGNOSTIC_DEPENDENCIES",
+    "DEFAULT_DIAGNOSTIC_HOT_HOURS_PER_RUN",
+    "DEFAULT_DIAGNOSTIC_MATERIAL_ID",
+    "DEFAULT_DIAGNOSTIC_TARGET_LIFE_RUNS",
     "TARGET_LIFE_CANONICAL_UNIT",
     "AnalyticRecessionScreen",
+    "CongruentVaporizationRecessionEvaluator",
     "LinerLifeConfiguration",
     "LinerLifeInputRefusal",
     "LinerLifeRefusal",
@@ -820,6 +1109,7 @@ __all__ = (
     "RecessionDataUnavailable",
     "RecessionEvaluator",
     "RecessionMonotonicityEvidence",
+    "build_liner_life_run_diagnostic",
     "derive_liner_temperature_ceiling",
     "liner_temperature_ceiling_diagnostic",
     "wear_budget_mm_per_1000h",

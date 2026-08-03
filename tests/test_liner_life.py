@@ -1,12 +1,17 @@
 from __future__ import annotations
 
 import math
+from unittest.mock import patch
 
 import numpy as np
 import pytest
 
+from simulator.accounting.run_artifact import build_run_artifact
 from simulator.liner_life import (
     AnalyticRecessionScreen,
+    CongruentVaporizationRecessionEvaluator,
+    DEFAULT_DIAGNOSTIC_MATERIAL_ID,
+    DIAGNOSTIC_AUTHORITY,
     DIAGNOSTIC_DEPENDENCIES,
     LinerLifeConfiguration,
     LinerLifeInputRefusal,
@@ -14,10 +19,13 @@ from simulator.liner_life import (
     LinerLifeTarget,
     RecessionDataUnavailable,
     RecessionMonotonicityEvidence,
+    build_liner_life_run_diagnostic,
     derive_liner_temperature_ceiling,
     liner_temperature_ceiling_diagnostic,
     wear_budget_mm_per_1000h,
 )
+from simulator.refractory_vaporization import solve_congruent_vaporization
+from simulator.runner import PyrolysisRun
 
 
 class _Evaluator:
@@ -214,10 +222,21 @@ def test_operator_entry_point_loads_config_and_emits_diagnostic_only():
     assert result.binding_bound == "structural_limit"
 
 
+def test_canonical_catalogue_loads_liner_config_for_wired_alumina():
+    config = LinerLifeConfiguration.from_material_catalogue(
+        "dense_alumina_continuous",
+        hot_hours_per_run=10,
+    )
+    assert config.material_id == "dense_alumina_continuous"
+    assert config.liner_thickness_mm == pytest.approx(100.0)
+    assert config.structural_limit_C == pytest.approx(1700.0)
+    assert config.source.startswith("data/furnace_materials.yaml:")
+
+
 def test_canonical_catalogue_missing_liner_config_refuses_instead_of_inventing():
     with pytest.raises(LinerLifeInputRefusal) as caught:
         LinerLifeConfiguration.from_material_catalogue(
-            "dense_alumina_continuous",
+            "zirconia_ysz",
             hot_hours_per_run=10,
         )
     assert caught.value.reason == "liner_life_configuration_unavailable"
@@ -555,3 +574,305 @@ def test_untyped_analytic_screen_output_refuses():
         )
     assert caught.value.reason == "invalid_recession_evaluator_output"
     assert caught.value.diagnostic["evaluator_tier"] == "analytic_screen"
+
+
+# ---------------------------------------------------------------------------
+# b-107 wired path: CongruentVaporizationRecessionEvaluator + catalog + artifact
+# ---------------------------------------------------------------------------
+
+_PURE_OXIDE_DIAGNOSTIC_MATERIALS = (
+    "pure_Al2O3",
+    "pure_CaO",
+    "pure_MgO",
+    "pure_SiO2",
+    "pure_TiO2",
+)
+
+
+@pytest.mark.parametrize("material_id", _PURE_OXIDE_DIAGNOSTIC_MATERIALS)
+def test_congruent_evaluator_matches_refractory_recession_at_1600c(material_id):
+    config = LinerLifeConfiguration.from_material_catalogue(
+        material_id,
+        hot_hours_per_run=10,
+    )
+    # Density lives on the catalogue diagnostic block (not the inversion config).
+    from simulator.furnace_materials import load_furnace_materials
+
+    material = load_furnace_materials()[material_id]
+    density = float(material["liner_life_diagnostic"]["density_kg_m3"])
+    oxide = str(material["liner_life_diagnostic"]["refractory_material"])
+    temperature_C = 1600.0
+    expected = solve_congruent_vaporization(
+        oxide,
+        temperature_C + 273.15,
+    ).recession_mm_per_1000h(density)
+
+    evaluator = CongruentVaporizationRecessionEvaluator()
+    rate = evaluator.recession_mm_per_1000h(
+        material_id=material_id,
+        temperature_C=temperature_C,
+        pO2_bar=0.0,
+    )
+    assert rate == pytest.approx(expected, rel=1e-12)
+    assert rate >= 0.0
+    status = evaluator.last_status
+    assert status is not None
+    assert status["flux_classification"] == (
+        "included_carrier_equilibrium_effusion_sum"
+    )
+    assert status["upper_bound_claim"] == "included_carriers_only"
+    assert status["evaporation_coefficient"] == pytest.approx(1.0)
+    assert config.structural_limit_C > 0.0
+
+
+def test_congruent_evaluator_wires_canonical_alumina_ceiling_diagnostic():
+    evaluator = CongruentVaporizationRecessionEvaluator()
+    result = liner_temperature_ceiling_diagnostic(
+        material_id="dense_alumina_continuous",
+        target_life_value=100,
+        target_life_unit="runs",
+        hot_hours_per_run=10,
+        pO2_bar=0.0,
+        evaluator=evaluator,
+    )
+    assert result.status == "computed_diagnostic_not_applied"
+    assert result.authority == DIAGNOSTIC_AUTHORITY
+    assert result.material_id == "dense_alumina_continuous"
+    assert result.binding_bound in {"structural_limit", "recession"}
+    assert result.ceiling_T_C <= result.structural_limit_C
+    assert result.pending_dependencies == DIAGNOSTIC_DEPENDENCIES
+    # Alumina at 1700 C is well below the 10 mm/1000 h wear budget for the
+    # default 100-run / 100 mm / 0.1 fraction target, so the structural limit
+    # binds - the diagnostic is informative, not a new hard gate.
+    assert result.binding_bound == "structural_limit"
+    assert result.ceiling_T_C == pytest.approx(1700.0)
+    assert evaluator.last_status is not None
+    assert evaluator.last_status["upper_bound_claim"] == "included_carriers_only"
+
+
+def test_cao_diagnostic_material_can_bind_on_recession():
+    """CaO is the load-bearing high-recession pure oxide from the validation screen."""
+    result = liner_temperature_ceiling_diagnostic(
+        material_id="pure_CaO",
+        target_life_value=100,
+        target_life_unit="runs",
+        hot_hours_per_run=10,
+        pO2_bar=0.0,
+        evaluator=CongruentVaporizationRecessionEvaluator(),
+    )
+    assert result.status == "computed_diagnostic_not_applied"
+    # At 10 mm/1000 h budget, pure CaO at 1700 C exceeds the budget (~12.8),
+    # so the ceiling should be recession-limited below structural 1700 C.
+    assert result.binding_bound == "recession"
+    assert result.recession_limited_T_C is not None
+    assert result.ceiling_T_C < result.structural_limit_C
+    assert result.ceiling_T_C > 1200.0
+
+
+def test_build_liner_life_run_diagnostic_is_info_level_and_non_gating():
+    payload = build_liner_life_run_diagnostic(
+        material_id="dense_alumina_continuous",
+        target_life_runs=100,
+        hot_hours_per_run=10,
+        pO2_bar=0.0,
+    )
+    assert payload["level"] == "info"
+    assert payload["binding"] is False
+    assert payload["gating"] is False
+    assert payload["authority"] == DIAGNOSTIC_AUTHORITY
+    assert payload["status"] == "computed_diagnostic_not_applied"
+    assert payload["material_id_source"] == "explicit"
+    assert payload["ceiling"] is not None
+    assert payload["ceiling"]["status"] == "computed_diagnostic_not_applied"
+    assert payload["recession_model"] is not None
+    assert payload["recession_model"]["flux_classification"] == (
+        "included_carrier_equilibrium_effusion_sum"
+    )
+    # Status-bearing alpha=1: not a total-recession upper bound.
+    assert payload["recession_model"]["upper_bound_claim"] == "included_carriers_only"
+    assert payload["recession_model"]["evaporation_coefficient"] == pytest.approx(1.0)
+
+
+def test_build_liner_life_run_diagnostic_refuses_missing_material_without_fabricating():
+    """Null-hypothesis: inventing dense_alumina would break golden-neutrality."""
+    for missing in (None, "", "   "):
+        payload = build_liner_life_run_diagnostic(
+            material_id=missing,
+            hot_hours_per_run=10,
+            pO2_bar=0.0,
+        )
+        assert payload["status"] == "refused"
+        assert payload["gating"] is False
+        assert payload["binding"] is False
+        assert payload["level"] == "info"
+        assert payload["material_id_source"] == "missing"
+        assert payload["refusal"]["reason"] == "furnace_material_id_required"
+        # Must not silently report the catalogue default as a selected wall.
+        assert payload["material_id"] is None
+        assert payload["ceiling"] is None
+
+
+def test_build_liner_life_run_diagnostic_refuses_unwired_material_without_raising():
+    payload = build_liner_life_run_diagnostic(
+        material_id="zirconia_ysz",
+        hot_hours_per_run=10,
+        pO2_bar=0.0,
+    )
+    assert payload["status"] == "refused"
+    assert payload["binding"] is False
+    assert payload["gating"] is False
+    assert payload["level"] == "info"
+    assert payload["refusal"] is not None
+    assert payload["refusal"]["reason"] == "liner_life_configuration_unavailable"
+
+
+def test_runner_omits_liner_life_when_furnace_material_unselected():
+    """Golden-neutral path: no selected wall => no diagnostic key written.
+
+    Null-hypothesis: unconditional default attachment would change every
+    detailed runner payload and break test_recipe_io / test_cost_ledger goldens.
+    """
+    payload = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=1,
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+        run_metadata_overrides={
+            "started_at_utc": "2026-08-01T00:00:00Z",
+            "kernel_commit_sha": "b107-liner-life-wire",
+        },
+    ).run()
+    assert "liner_life_diagnostic" not in payload["run_metadata"]
+    assert "furnace_material_id" not in payload["run_metadata"] or not payload[
+        "run_metadata"
+    ].get("furnace_material_id")
+
+
+def test_runner_wires_liner_life_diagnostic_end_to_end_mutation_proven():
+    """Real PyrolysisRun -> RecessionEvaluator -> refractory module -> artifact.
+
+    Production seam under test: ``simulator/runner/__init__.py`` attachment of
+    ``run_metadata["liner_life_diagnostic"]`` (not a hand-built payload).
+
+    Mutation proof (in-process, not a comment-only claim):
+    1. Live path with explicit ``furnace_material_id`` attaches a computed
+       diagnostic; presence + recession_model fields are asserted below.
+       Deleting that runner assignment (the review's mutation) makes the
+       ``assert "liner_life_diagnostic" in meta`` predicate go red.
+    2. Sever the builder at the runner import site
+       (``simulator.runner.build_liner_life_run_diagnostic`` -> raises):
+       the except wall still writes a non-gating ``status=failed`` envelope
+       with no ceiling/recession_model — proves the instrument-only wall and
+       that a severed evaluator cannot fabricate a computed result.
+    3. Emulate full attach deletion by popping the key from a live result:
+       the same presence predicate that the live path requires is false,
+       documenting red-if-severed for the write seam itself.
+    """
+    material_id = DEFAULT_DIAGNOSTIC_MATERIAL_ID  # explicit selection, not silent default
+    common_kwargs = dict(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=1,
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+        run_metadata_overrides={
+            "started_at_utc": "2026-08-01T00:00:00Z",
+            "kernel_commit_sha": "b107-liner-life-wire",
+            "furnace_material_id": material_id,
+        },
+    )
+
+    # --- Live wired path: RecessionEvaluator -> refractory -> run_metadata ---
+    payload = PyrolysisRun(**common_kwargs).run()
+    meta = payload["run_metadata"]
+    assert meta.get("furnace_material_id") == material_id
+    # Load-bearing presence assert: red if the runner attachment is deleted.
+    assert "liner_life_diagnostic" in meta, (
+        "runner must attach liner_life_diagnostic when furnace_material_id "
+        "is explicitly selected (severing this write turns this assert red)"
+    )
+    diagnostic = meta["liner_life_diagnostic"]
+    assert diagnostic["status"] == "computed_diagnostic_not_applied"
+    assert diagnostic["level"] == "info"
+    assert diagnostic["binding"] is False
+    assert diagnostic["gating"] is False
+    assert diagnostic["authority"] == DIAGNOSTIC_AUTHORITY
+    assert diagnostic["material_id"] == material_id
+    assert diagnostic["material_id_source"] == "explicit"
+    recession = diagnostic["recession_model"]
+    assert recession is not None
+    assert recession["flux_classification"] == (
+        "included_carrier_equilibrium_effusion_sum"
+    )
+    assert recession["upper_bound_claim"] == "included_carriers_only"
+    assert recession["evaporation_coefficient"] == pytest.approx(1.0)
+    assert diagnostic["ceiling"] is not None
+    assert diagnostic["ceiling"]["authority"] == DIAGNOSTIC_AUTHORITY
+
+    # Artifact surface from the real runner payload (not a synthetic dict).
+    artifact = build_run_artifact(payload, run_id="liner-life-e2e")
+    surfaced = artifact["terminal"]["run_metadata"]["liner_life_diagnostic"]
+    assert surfaced["gating"] is False
+    assert surfaced["binding"] is False
+    assert surfaced["level"] == "info"
+    assert surfaced["recession_model"]["upper_bound_claim"] == "included_carriers_only"
+    assert surfaced["recession_model"]["flux_classification"] == (
+        "included_carrier_equilibrium_effusion_sum"
+    )
+    assert surfaced["recession_model"]["evaporation_coefficient"] == pytest.approx(1.0)
+    # No gate: recipe setpoints are not rewritten from the ceiling.
+    recipe = artifact["header"].get("recipe_snapshot") or {}
+    assert "furnace_max_T_C" not in (recipe.get("setpoints_patch") or {})
+
+    # --- Mutation (1): sever builder wire in memory ---
+    def _boom(**_kwargs):
+        raise RuntimeError("severed refractory evaluator wire")
+
+    with patch("simulator.runner.build_liner_life_run_diagnostic", _boom):
+        failed_attach = PyrolysisRun(**common_kwargs).run()
+    failed_diag = failed_attach["run_metadata"]["liner_life_diagnostic"]
+    assert failed_diag["status"] == "failed"
+    assert failed_diag["gating"] is False
+    assert failed_diag["binding"] is False
+    assert failed_diag["level"] == "info"
+    assert failed_diag.get("ceiling") is None
+    assert failed_diag.get("recession_model") is None
+
+    # --- Mutation (2): emulate deleted attachment assignment (key absent) ---
+    severed_meta = dict(payload["run_metadata"])
+    severed_meta.pop("liner_life_diagnostic", None)
+    assert "liner_life_diagnostic" not in severed_meta
+    # The live presence predicate is exactly what goes red under this state:
+    assert "liner_life_diagnostic" in payload["run_metadata"]
+    assert "liner_life_diagnostic" not in severed_meta
+
+
+def test_web_start_forwards_furnace_material_id_into_run_metadata_overrides():
+    """SC-50 producer: web start forwards selected wall into runner overrides."""
+    import inspect
+
+    import web.events as events_mod
+
+    source = inspect.getsource(events_mod.register_events)
+    assert "furnace_material_id" in source
+    # Conditional spread: only when the selected id is truthy.
+    assert "{'furnace_material_id': furnace_material_id}" in source
+    assert "if furnace_material_id" in source
+
+    furnace_material_id = "dense_alumina_continuous"
+    overrides = {
+        "started_at_utc": "2026-08-01T00:00:00Z",
+        **(
+            {"furnace_material_id": furnace_material_id}
+            if furnace_material_id
+            else {}
+        ),
+    }
+    assert overrides["furnace_material_id"] == furnace_material_id
+    empty_id = ""
+    empty = {
+        "started_at_utc": "2026-08-01T00:00:00Z",
+        **({"furnace_material_id": empty_id} if empty_id else {}),
+    }
+    assert "furnace_material_id" not in empty

@@ -35,6 +35,16 @@ UNANCHORED_FURNACE_MATERIALS = {
     "graphite_inert",
 }
 
+# Disabled pure-oxide rows for liner-life / congruent-vaporization diagnostics
+# (b-107). Not wall-anchored furnace products; not selectable.
+PURE_OXIDE_DIAGNOSTIC_FURNACE_MATERIALS = {
+    "pure_Al2O3",
+    "pure_CaO",
+    "pure_MgO",
+    "pure_SiO2",
+    "pure_TiO2",
+}
+
 # Enabled furnace materials with a finite service rating -- the set whose resolved
 # applied ceiling must be admissible to CampaignManager (BUG-076 / BUG-108).
 _ENABLED_FINITE_FURNACE_MATERIALS = sorted(
@@ -84,7 +94,39 @@ def test_furnace_material_caps_track_wall_material_temperature_anchors():
         set(FURNACE_WALL_SERVICE_TEMP_ANCHORS)
         | LITERATURE_GROUNDED_FURNACE_MATERIALS
         | UNANCHORED_FURNACE_MATERIALS
+        | PURE_OXIDE_DIAGNOSTIC_FURNACE_MATERIALS
     )
+    for pure_id in PURE_OXIDE_DIAGNOSTIC_FURNACE_MATERIALS:
+        row = furnace_materials[pure_id]
+        assert row["enabled"] is False
+        assert isinstance(row.get("liner_life_diagnostic"), dict)
+        diag = row["liner_life_diagnostic"]
+        assert diag.get("refractory_material")
+        # Static sidecar provenance (held-out; never loaded at runtime).
+        assert (
+            diag.get("validation_sidecar_path")
+            == "data/literature/refractory_vaporization_validation.yaml"
+        )
+        assert diag.get("validation_sidecar_anchor")
+        assert diag.get("density_citation_status") == "uncited"
+        assert "refractory_vaporization_validation.yaml" in str(
+            diag.get("density_provenance") or ""
+        )
+
+    # Every wired liner_life_diagnostic row (enabled walls + pure-oxide diagnostics)
+    # carries static validation-sidecar path/anchor provenance (cx P2).
+    for material_id, row in furnace_materials.items():
+        diag = row.get("liner_life_diagnostic")
+        if not isinstance(diag, dict):
+            continue
+        assert (
+            diag.get("validation_sidecar_path")
+            == "data/literature/refractory_vaporization_validation.yaml"
+        ), f"{material_id} missing validation_sidecar_path"
+        assert diag.get("validation_sidecar_anchor"), (
+            f"{material_id} missing validation_sidecar_anchor"
+        )
+        assert diag.get("density_citation_status") == "uncited"
 
     for furnace_id, (
         wall_id,
