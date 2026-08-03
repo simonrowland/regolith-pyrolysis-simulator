@@ -1153,13 +1153,14 @@ def test_u0_manifest_and_compile_are_cached() -> None:
     """kimi P1-1: default-on emission stays cheap via manifest + compile memo.
 
     Null hypothesis: every compile re-parses U0 YAML (~150 ms).
-    Refutation: second compile of the same payload is much faster, and
-    load_u0_manifest hits the mtime memo.
+    Refutation: second compile of the same *content* is a catalog identity hit,
+    and load_u0_manifest hits the mtime memo.
     """
 
     import time
 
     from simulator.vapour_rail.catalog import (
+        _compile_input_identity,
         clear_vapour_rail_compile_cache,
         compile_vapour_rail_catalog,
         compiled_catalog_for,
@@ -1183,23 +1184,30 @@ def test_u0_manifest_and_compile_are_cached() -> None:
     assert warm_load < max(0.005, cold_load * 0.25)
 
     payload = _minimal_family("K")
-    # Two compiles of the same payload object with default-on emission.
+    # Content-digest identity: same content, distinct objects still hit.
     clear_vapour_rail_compile_cache()
     t0 = time.perf_counter()
     c1 = compile_vapour_rail_catalog(payload, u0_manifest=_u0_stub("K"))
     cold_compile = time.perf_counter() - t0
     t0 = time.perf_counter()
+    # Fresh stub object each call — content identity (not object id) must hit.
     c2 = compile_vapour_rail_catalog(payload, u0_manifest=_u0_stub("K"))
-    # Note: different u0_manifest object ids → different cache keys when stub
-    # is rebuilt each call. Use a single stub for the cache hit probe.
-    clear_vapour_rail_compile_cache()
-    stub = _u0_stub("K")
-    c1 = compile_vapour_rail_catalog(payload, u0_manifest=stub)
-    t0 = time.perf_counter()
-    c2 = compile_vapour_rail_catalog(payload, u0_manifest=stub)
     warm_compile = time.perf_counter() - t0
-    assert c1 is c2  # identity: LRU returned the same catalog
-    assert warm_compile < 0.005
+    assert c1 is c2  # identity: content-digest LRU returned the same catalog
+    # Digest + dict lookup must stay cheap vs cold compile on a mini fixture.
+    assert warm_compile < max(0.05, cold_compile * 0.5)
+
+    # Owner-boundary content_key propagation: warm hits skip the payload walk.
+    key = _compile_input_identity(
+        payload, emit_u0_request_rules=True, u0_manifest=_u0_stub("K")
+    )
+    t0 = time.perf_counter()
+    for _ in range(50):
+        compile_vapour_rail_catalog(
+            payload, u0_manifest=_u0_stub("K"), content_key=key
+        )
+    keyed_warm = (time.perf_counter() - t0) / 50
+    assert keyed_warm < 0.001, f"keyed warm hit too slow: {keyed_warm:.6f}s"
 
     # Hot capability probes use evaluator-only compile reuse.
     clear_vapour_rail_compile_cache()
@@ -1207,67 +1215,412 @@ def test_u0_manifest_and_compile_are_cached() -> None:
     hot2 = compiled_catalog_for(payload, emit_u0_request_rules=False)
     assert hot1 is hot2
     assert hot1.request_rules == ()
-    del cold_compile  # silence unused if timing branches change
 
 
-def test_compile_cache_no_stale_catalog_on_payload_id_reuse() -> None:
-    """NV-1: id-keyed compile memo must not return another payload's catalog.
+def test_compile_resolves_default_manifest_once(monkeypatch: pytest.MonkeyPatch) -> None:
+    """P1: one compile must digest and emit from one manifest resolution.
 
-    Pre-hardening the cache stored only the catalog under ``id(payload)``, so
-    after A was freed CPython could recycle ``id(A)`` onto B and serve A's
-    catalog silently. Hardening stores ``(payload, catalog)`` and hits only
-    when ``cached_payload is payload``. Without that shape / ``is`` check this
-    test goes red (entry is not a pin tuple, or a planted collision returns A).
+    Null hypothesis: the default loader is called once for emission and again
+    for identity, so a state change can cache manifest-A output under the
+    manifest-B digest and return stale rules on the next B compile.
+    Refutation: each compile calls the loader once; A and B produce distinct
+    catalogs whose emitted rules match that compile's resolved object.
     """
 
-    import gc
+    import simulator.vapour_rail.request as request_module
+    import simulator.vapour_rail.u0_manifest as manifest_module
+    from simulator.vapour_rail.catalog import (
+        clear_vapour_rail_compile_cache,
+        compile_vapour_rail_catalog,
+    )
+
+    payload = _minimal_family("K")
+    manifest_a = _u0_stub("K")
+    manifest_b = _u0_stub()
+    calls = 0
+    emitted_manifests: list[dict] = []
+    real_emit_request_rules = request_module.emit_request_rules
+
+    def stateful_loader() -> dict:
+        nonlocal calls
+        calls += 1
+        return manifest_a if calls == 1 else manifest_b
+
+    def recording_emit_request_rules(**kwargs: Any) -> tuple[Any, ...]:
+        emitted_manifests.append(kwargs["u0_manifest"])
+        return real_emit_request_rules(**kwargs)
+
+    monkeypatch.setattr(manifest_module, "load_u0_manifest", stateful_loader)
+    monkeypatch.setattr(
+        request_module, "emit_request_rules", recording_emit_request_rules
+    )
+    clear_vapour_rail_compile_cache()
+
+    catalog_a = compile_vapour_rail_catalog(payload)
+    assert calls == 1
+    assert tuple(rule.species_id for rule in catalog_a.request_rules) == ("K",)
+
+    catalog_b = compile_vapour_rail_catalog(payload)
+    assert calls == 2
+    assert catalog_b is not catalog_a
+    assert emitted_manifests[0] is manifest_a
+    assert emitted_manifests[1] is manifest_b
+
+
+def test_compile_cache_uses_explicit_content_identity() -> None:
+    """Codex P3-2 / NV-1 class: memo keys content, not incidental object id.
+
+    Null hypothesis: cache key is ``id(payload)`` / ``id(u0_manifest)`` so
+    distinct objects with equal content miss, and different content under a
+    recycled id can silently hit.
+    Refutation: same content (different objects) shares one catalog; different
+    content never shares; keys are content-digest strings.
+    """
 
     from simulator.vapour_rail.catalog import (
         _COMPILE_CACHE,
+        _compile_input_identity,
         clear_vapour_rail_compile_cache,
+        compile_vapour_rail_catalog,
         compiled_catalog_for,
     )
 
     clear_vapour_rail_compile_cache()
     payload_a = _minimal_family("K")
-    id_a = id(payload_a)
+    payload_a_copy = _minimal_family("K")  # equal content, distinct object
+    assert payload_a is not payload_a_copy
+    assert payload_a == payload_a_copy
+
+    key_a = _compile_input_identity(
+        payload_a, emit_u0_request_rules=False, u0_manifest=None
+    )
+    key_a_copy = _compile_input_identity(
+        payload_a_copy, emit_u0_request_rules=False, u0_manifest=None
+    )
+    assert isinstance(key_a, str) and len(key_a) == 64  # sha256 hex
+    assert key_a == key_a_copy
+    assert key_a != str(id(payload_a))
+
     cat_a = compiled_catalog_for(payload_a, emit_u0_request_rules=False)
+    assert key_a in _COMPILE_CACHE
+    assert _COMPILE_CACHE[key_a] is cat_a
+    # Equal-content different object hits the same entry (explicit identity).
+    cat_a2 = compiled_catalog_for(payload_a_copy, emit_u0_request_rules=False)
+    assert cat_a2 is cat_a
     assert "K" in cat_a.species
     assert "NaCl" not in cat_a.species
 
-    # Entry must pin the payload by strong reference (not catalog-only).
-    key_a = (id_a, False, 0)
-    assert key_a in _COMPILE_CACHE
-    entry_a = _COMPILE_CACHE[key_a]
-    assert isinstance(entry_a, tuple) and len(entry_a) == 2, (
-        "NV-1: compile cache must store (payload, catalog), not a bare catalog"
-    )
-    cached_payload_a, cached_catalog_a = entry_a
-    assert cached_payload_a is payload_a
-    assert cached_catalog_a is cat_a
-
-    del payload_a
-    gc.collect()
-    # Pin keeps A alive — id(A) cannot be recycled while the entry lives.
-    assert id(cached_payload_a) == id_a
-    assert cached_payload_a.get("schema_version") == 2
-
     payload_b = _minimal_family("NaCl", parent_oxide="Na2O", with_reaction=False)
-    # Live path: B must compile to its own catalog (never A's).
+    key_b = _compile_input_identity(
+        payload_b, emit_u0_request_rules=False, u0_manifest=None
+    )
+    assert key_b != key_a
     cat_b = compiled_catalog_for(payload_b, emit_u0_request_rules=False)
     assert "NaCl" in cat_b.species
     assert "K" not in cat_b.species
     assert cat_b is not cat_a
-    assert compiled_catalog_for(payload_b, emit_u0_request_rules=False) is cat_b
+    assert _COMPILE_CACHE[key_b] is cat_b
 
-    # Plant the post-id-reuse collision: B's key points at A's pin+catalog.
-    # Hardened hit requires ``cached_payload is payload_b`` → miss → recompile.
-    # Pre-hardening (bare-catalog, key-only hit) would return cat_a here.
-    key_b = (id(payload_b), False, 0)
-    _COMPILE_CACHE[key_b] = (cached_payload_a, cat_a)
-    cat_b2 = compiled_catalog_for(payload_b, emit_u0_request_rules=False)
-    assert "NaCl" in cat_b2.species, (
-        f"stale catalog after planted id collision: got {sorted(cat_b2.species)}"
+    # Manifest content is part of the explicit identity when emission is on.
+    stub_k = _u0_stub("K")
+    stub_nacl = _u0_stub("NaCl")
+    key_mk = _compile_input_identity(
+        payload_a, emit_u0_request_rules=True, u0_manifest=stub_k
     )
-    assert "K" not in cat_b2.species
-    assert cat_b2 is not cat_a
+    key_mn = _compile_input_identity(
+        payload_a, emit_u0_request_rules=True, u0_manifest=stub_nacl
+    )
+    assert key_mk != key_mn
+    cat_mk = compile_vapour_rail_catalog(payload_a, u0_manifest=stub_k)
+    cat_mn = compile_vapour_rail_catalog(payload_a, u0_manifest=stub_nacl)
+    assert cat_mk is not cat_mn
+    # Same manifest *content*, different object → same catalog.
+    cat_mk2 = compile_vapour_rail_catalog(payload_a, u0_manifest=_u0_stub("K"))
+    assert cat_mk2 is cat_mk
+
+    # P3: when emission is disabled, manifest is not a key dimension.
+    key_off_k = _compile_input_identity(
+        payload_a, emit_u0_request_rules=False, u0_manifest=stub_k
+    )
+    key_off_n = _compile_input_identity(
+        payload_a, emit_u0_request_rules=False, u0_manifest=stub_nacl
+    )
+    assert key_off_k == key_off_n == key_a
+    clear_vapour_rail_compile_cache()
+    cat_off_k = compiled_catalog_for(
+        payload_a, emit_u0_request_rules=False, u0_manifest=stub_k
+    )
+    cat_off_n = compiled_catalog_for(
+        payload_a, emit_u0_request_rules=False, u0_manifest=stub_nacl
+    )
+    assert cat_off_k is cat_off_n
+
+
+def test_compile_cache_covers_default_manifest_surface() -> None:
+    """P1: effective default manifest is inside the digest when emission is on.
+
+    Null hypothesis: ``u0_manifest=None`` records None in the key while rule
+    emission resolves ``load_u0_manifest()``, so default fixture content sits
+    outside the digest surface.
+    Refutation: identity with None equals identity with the loaded default;
+    a different manifest content yields a different key and catalog.
+    """
+
+    from simulator.vapour_rail.catalog import (
+        _compile_input_identity,
+        clear_vapour_rail_compile_cache,
+        compile_vapour_rail_catalog,
+    )
+    from simulator.vapour_rail.u0_manifest import load_u0_manifest
+
+    clear_vapour_rail_compile_cache()
+    payload = _minimal_family("K")
+    default = load_u0_manifest()
+    key_none = _compile_input_identity(
+        payload, emit_u0_request_rules=True, u0_manifest=None
+    )
+    key_default = _compile_input_identity(
+        payload, emit_u0_request_rules=True, u0_manifest=default
+    )
+    assert key_none == key_default
+
+    stub = _u0_stub("K")
+    key_stub = _compile_input_identity(
+        payload, emit_u0_request_rules=True, u0_manifest=stub
+    )
+    assert key_stub != key_none
+    cat_default = compile_vapour_rail_catalog(payload, u0_manifest=None)
+    cat_stub = compile_vapour_rail_catalog(payload, u0_manifest=stub)
+    assert cat_default is not cat_stub
+
+
+def test_canonical_digest_rejects_type_collisions() -> None:
+    """P1: canonicalization must not collapse distinct accepted types.
+
+    Null hypothesis: ``str(key)`` / ``str(leaf)`` and an untagged sequence
+    branch let ``\"1\"`` vs ``1``, date vs ISO-string, or list vs tuple share a
+    digest and fail-open past validation. Refutation: invalid key/leaf types
+    raise and every accepted value category has a distinct canonical tag.
+    """
+
+    from datetime import date
+
+    from simulator.vapour_rail.catalog import (
+        CatalogCompileError,
+        _canonical_jsonable,
+        _content_digest,
+    )
+
+    with pytest.raises(CatalogCompileError, match="string mapping keys"):
+        _canonical_jsonable({1: "x"})
+
+    with pytest.raises(CatalogCompileError, match="non-JSON leaf"):
+        _canonical_jsonable({"source_account": date(2026, 1, 1)})
+
+    assert _content_digest({"k": "1"}) != _content_digest({"k": 1})
+
+    # Containers with equal elements remain distinct when the compiler's
+    # validation distinguishes their concrete sequence type.
+    assert _content_digest({"k": ["x"]}) != _content_digest({"k": ("x",)})
+
+
+def test_compile_cache_detects_in_place_payload_mutation() -> None:
+    """Kimi P3-1: mutated input must not silently serve a stale cached catalog.
+
+    Null hypothesis: identity memo trusts callers not to mutate; after a warm
+    compile, an in-place nested edit still returns the prior catalog object.
+    Refutation: re-compile with the mutated payload returns a new catalog
+    whose projection carries the new value. Red under reversion to id-keys.
+    """
+
+    from simulator.vapour_rail.catalog import (
+        CatalogCompileError,
+        _compile_input_identity,
+        _content_digest,
+        clear_vapour_rail_compile_cache,
+        compile_vapour_rail_catalog,
+        compiled_catalog_for,
+    )
+
+    clear_vapour_rail_compile_cache()
+    payload = _minimal_family("K")
+    cat = compiled_catalog_for(payload, emit_u0_request_rules=False)
+    assert "K" in cat.species
+    assert compiled_catalog_for(payload, emit_u0_request_rules=False) is cat
+
+    # Nested projected-field mutation (schema stays v2) must miss.
+    family = next(iter(payload["families"].values()))
+    species_row = next(
+        iter(family["physical_properties"]["species"].values())
+    )
+    species_row["molar_mass_g_mol"] = 123.456
+    cat_mut = compiled_catalog_for(payload, emit_u0_request_rules=False)
+    assert cat_mut is not cat
+    assert (
+        cat_mut.legacy_view()["metals"]["K"]["molar_mass_g_mol"] == 123.456
+    )
+
+    # Schema-illegal mutation still digests-misses then raises at the gate.
+    clear_vapour_rail_compile_cache()
+    payload2 = _minimal_family("K")
+    cat2 = compiled_catalog_for(payload2, emit_u0_request_rules=False)
+    assert compiled_catalog_for(payload2, emit_u0_request_rules=False) is cat2
+    payload2["schema_version"] = 999
+    with pytest.raises(CatalogCompileError, match="schema_version"):
+        compiled_catalog_for(payload2, emit_u0_request_rules=False)
+
+    clear_vapour_rail_compile_cache()
+    payload3 = _minimal_family("K")
+    stub = _u0_stub("K")
+    cat3 = compile_vapour_rail_catalog(payload3, u0_manifest=stub)
+    assert compile_vapour_rail_catalog(payload3, u0_manifest=stub) is cat3
+    payload3["schema_version"] = 999
+    with pytest.raises(CatalogCompileError, match="schema_version"):
+        compile_vapour_rail_catalog(payload3, u0_manifest=stub)
+
+    # A list-to-tuple mutation preserves element values but changes a schema
+    # type. It must miss the warm cache and reach the same validation error as
+    # a cold compile.
+    clear_vapour_rail_compile_cache()
+    payload4 = _minimal_family("K", validation_status="validated")
+    family4 = next(iter(payload4["families"].values()))
+    validation4 = family4["physical_properties"]["species"]["K"]["validation"]
+    cat4 = compiled_catalog_for(payload4, emit_u0_request_rules=False)
+    assert "K" in cat4.species
+    before_digest = _content_digest(payload4)
+    validation4["anchor_refs"] = tuple(validation4["anchor_refs"])
+    assert _content_digest(payload4) != before_digest
+    with pytest.raises(CatalogCompileError, match="anchor_refs must be a list"):
+        compiled_catalog_for(payload4, emit_u0_request_rules=False)
+
+    # A caller-provided key is an assertion, not a mutation bypass.
+    clear_vapour_rail_compile_cache()
+    payload5 = _minimal_family("K")
+    key5 = _compile_input_identity(
+        payload5, emit_u0_request_rules=False, u0_manifest=None
+    )
+    compile_vapour_rail_catalog(
+        payload5, emit_u0_request_rules=False, content_key=key5
+    )
+    payload5["schema_version"] = 999
+    with pytest.raises(CatalogCompileError, match="content_key does not match"):
+        compile_vapour_rail_catalog(
+            payload5, emit_u0_request_rules=False, content_key=key5
+        )
+    clear_vapour_rail_compile_cache()
+    with pytest.raises(CatalogCompileError, match="anchor_refs must be a list"):
+        compiled_catalog_for(payload4, emit_u0_request_rules=False)
+
+
+def test_default_compile_production_warm_hit_budget() -> None:
+    """P1: default production warm hits stay out of the ~151 ms/50 class.
+
+    Null hypothesis: omitting the opt-in content_key serializes and hashes the
+    full payload plus default manifest on every hit.
+    Refutation: mutation-checked default identity reuse makes 50 ordinary API
+    calls fast without weakening the content-keyed cache contract.
+    """
+
+    import time
+
+    from simulator.vapour_rail.catalog import (
+        clear_vapour_rail_compile_cache,
+        compile_vapour_rail_catalog,
+    )
+
+    production = _yaml("vapor_pressures.yaml")
+    clear_vapour_rail_compile_cache()
+    cold = compile_vapour_rail_catalog(production)
+    t0 = time.perf_counter()
+    for _ in range(50):
+        warm = compile_vapour_rail_catalog(production)
+        assert warm is cold
+    warm50_s = time.perf_counter() - t0
+    assert warm50_s < 0.075, (
+        "default production warm hits too slow: "
+        f"{warm50_s * 1000:.3f} ms/50"
+    )
+
+
+def test_legacy_view_cache_detects_in_place_payload_mutation() -> None:
+    """Legacy-view memo is content-keyed (valid schema-v2 nested mutation).
+
+    Null hypothesis: id-keyed legacy view returns the prior projection after
+    a nested content mutation that keeps schema_version == 2 (mutating
+    schema_version to 999 bypasses both memos via non-v2 fallthrough and
+    stays green under id-key reversion).
+    Refutation: nested molar-mass mutation forces a miss; new projection
+    carries the new value. Red under reversion to id-keys.
+    """
+
+    from simulator.vapour_rail.catalog import (
+        clear_vapor_pressure_view_caches,
+        vapor_pressure_legacy_view,
+    )
+
+    clear_vapor_pressure_view_caches()
+    payload = _minimal_family("K")
+    view1 = vapor_pressure_legacy_view(payload)
+    assert "K" in view1.get("metals", {}), (
+        f"expected compiled metals projection, got keys={sorted(view1)}"
+    )
+    view2 = vapor_pressure_legacy_view(payload)
+    assert view2 is view1  # content-digest warm hit (shared read-only dict)
+
+    # Keep schema_version == 2; mutate a projected nested field.
+    family = next(iter(payload["families"].values()))
+    species_row = next(
+        iter(family["physical_properties"]["species"].values())
+    )
+    species_row["molar_mass_g_mol"] = 123.456
+    assert payload["schema_version"] == 2
+    view3 = vapor_pressure_legacy_view(payload)
+    assert view3 is not view1
+    assert view3["metals"]["K"]["molar_mass_g_mol"] == 123.456
+
+
+def test_legacy_view_production_warm_hit_budget() -> None:
+    """P1: production-sized repeated hits must not re-enter the ~151 ms class.
+
+    Owner-boundary pattern: digest once, pass content_key; warm hits are
+    pure dict returns. Also cover already-projected schema-v1 re-entry
+    (condensation pass-through) as O(1) identity returns.
+    """
+
+    import time
+
+    import yaml
+
+    from simulator.vapour_rail.catalog import (
+        _content_digest,
+        clear_vapor_pressure_view_caches,
+        vapor_pressure_legacy_view,
+    )
+
+    production = yaml.safe_load(
+        (DATA_DIR / "vapor_pressures.yaml").read_text()
+    )
+    clear_vapor_pressure_view_caches()
+    payload_key = _content_digest(production)
+    t0 = time.perf_counter()
+    cold = vapor_pressure_legacy_view(production, content_key=payload_key)
+    cold_s = time.perf_counter() - t0
+    t0 = time.perf_counter()
+    for _ in range(50):
+        warm = vapor_pressure_legacy_view(production, content_key=payload_key)
+        assert warm is cold
+    warm50_s = time.perf_counter() - t0
+    warm_each = warm50_s / 50
+    assert warm_each < 0.0005, (
+        f"keyed production warm hit too slow: {warm_each*1000:.3f} ms "
+        f"(cold {cold_s*1000:.1f} ms; 50-hit total {warm50_s*1000:.1f} ms)"
+    )
+    # Already-projected view: per-species re-entry must not deepcopy.
+    t0 = time.perf_counter()
+    for _ in range(72):
+        again = vapor_pressure_legacy_view(cold)
+        assert again is cold
+    proj_loop = time.perf_counter() - t0
+    assert proj_loop < 0.005, (
+        f"projected re-entry loop too slow: {proj_loop*1000:.2f} ms"
+    )

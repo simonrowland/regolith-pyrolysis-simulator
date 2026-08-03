@@ -384,21 +384,25 @@ def test_disposition_bidirectional_catalog_closure() -> None:
 
 def test_legacy_view_memoized_per_payload_identity() -> None:
     """P1-1: schema-v2 legacy view must not recompile+deepcopy per call."""
+    from simulator.vapour_rail.catalog import _content_digest
+
     clear_vapor_pressure_view_caches()
     payload = _vp()
-    # Warm + identity stability.
+    # Warm + identity stability (content digest walks current payload).
     first = vapor_pressure_legacy_view(payload)
     second = vapor_pressure_legacy_view(payload)
     assert first is second
     assert "metals" in first and "Na" in first["metals"]
-    # Cold vs warm cost: many warm hits must stay far below a recompile budget.
+    # Owner-boundary pattern: digest once, pass content_key — warm hits are
+    # pure dict returns (no re-serialize of the production payload).
     clear_vapor_pressure_view_caches()
+    content_key = _content_digest(payload)
     t0 = time.perf_counter()
-    vapor_pressure_legacy_view(payload)
+    vapor_pressure_legacy_view(payload, content_key=content_key)
     cold_s = time.perf_counter() - t0
     t1 = time.perf_counter()
     for _ in range(50):
-        vapor_pressure_legacy_view(payload)
+        vapor_pressure_legacy_view(payload, content_key=content_key)
     warm_s = (time.perf_counter() - t1) / 50
     # Warm hits are pure dict returns; allow generous CI slack but require
     # orders-of-magnitude cheaper than a full catalog compile.

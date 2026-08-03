@@ -1703,7 +1703,10 @@ CONDENSATION_TEMPS_C = {
 }
 
 _CONFIG_BUNDLE = load_config_bundle(DATA_DIR)
-from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+from simulator.vapour_rail.catalog import (
+    VaporPressureCompatibilityView,
+    vapor_pressure_legacy_view,
+)
 
 VAPOR_PRESSURE_DATA = vapor_pressure_legacy_view(_CONFIG_BUNDLE.vapor_pressures)
 MATERIALS_DATA = _CONFIG_BUNDLE.materials
@@ -1785,10 +1788,28 @@ class CondensationModel:
         materials: Mapping[str, Any] | None = None,
     ):
         self.train = train
-        self.vapor_pressure_data = copy.deepcopy(vapor_pressure_data)
+        # Owner-boundary projection: schema-v2 → legacy view once so the
+        # per-species hot path never re-digests/recompiles the full catalog
+        # (content-digest identity is correct but ~3 ms/hit on production
+        # payloads; 72 species × 2 loops reintroduced the ~151 ms class).
+        if vapor_pressure_data is None:
+            self.vapor_pressure_data = None
+        else:
+            raw = copy.deepcopy(vapor_pressure_data)
+            if (
+                isinstance(raw, Mapping)
+                and raw.get("schema_version") == 2
+                and "families" in raw
+            ):
+                self.vapor_pressure_data = VaporPressureCompatibilityView(
+                    vapor_pressure_legacy_view(raw), raw
+                )
+            else:
+                self.vapor_pressure_data = raw
         self.materials = copy.deepcopy(
             materials if materials is not None else MATERIALS_DATA
         )
+
         # 0.5.4.1 review-cluster-C (P2 #1, evening-4commits review):
         # per-instance per-species condensation temperatures so each
         # CondensationModel can carry its own setpoints overrides
@@ -3758,6 +3779,23 @@ class CondensationModel:
         return max(0.0, min(1.0, eta))
 
 
+def _authoritative_vapour_catalog_payload(
+    vapor_pressure_data: Mapping[str, Any] | None,
+) -> Mapping[str, Any] | None:
+    if (
+        isinstance(vapor_pressure_data, Mapping)
+        and vapor_pressure_data.get("schema_version") == 2
+    ):
+        return vapor_pressure_data
+    catalog_payload = getattr(vapor_pressure_data, "catalog_payload", None)
+    if (
+        isinstance(catalog_payload, Mapping)
+        and catalog_payload.get("schema_version") == 2
+    ):
+        return catalog_payload
+    return None
+
+
 def _species_vapor_data(
     species: str,
     *,
@@ -3766,8 +3804,7 @@ def _species_vapor_data(
     from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
 
     catalog_authoritative = (
-        isinstance(vapor_pressure_data, Mapping)
-        and vapor_pressure_data.get("schema_version") == 2
+        _authoritative_vapour_catalog_payload(vapor_pressure_data) is not None
     )
     if vapor_pressure_data is not None:
         vapor_pressure_data = vapor_pressure_legacy_view(vapor_pressure_data)
@@ -3850,15 +3887,14 @@ def _species_has_antoine_data(
         if (block := data.get(block_name)) is not None
     ):
         return True
-    if isinstance(vapor_pressure_data, Mapping) and vapor_pressure_data.get(
-        "schema_version"
-    ) == 2:
+    catalog_payload = _authoritative_vapour_catalog_payload(vapor_pressure_data)
+    if catalog_payload is not None:
         from simulator.vapour_rail.catalog import compiled_catalog_for
 
         try:
             # Reuse process-memoized compile; evaluator-only (no U0 rules).
             compiled_catalog_for(
-                vapor_pressure_data, emit_u0_request_rules=False
+                catalog_payload, emit_u0_request_rules=False
             ).evaluator_for(species)
         except ValueError:
             pass
@@ -4521,16 +4557,13 @@ def _antoine_psat_pa(
         for block_name in _ANTOINE_COEFFICIENT_BLOCKS
         if (block := data.get(block_name)) is not None
     )
-    if (
-        not has_legacy_antoine
-        and isinstance(vapor_pressure_data, Mapping)
-        and vapor_pressure_data.get("schema_version") == 2
-    ):
+    catalog_payload = _authoritative_vapour_catalog_payload(vapor_pressure_data)
+    if not has_legacy_antoine and catalog_payload is not None:
         from simulator.vapour_rail.catalog import compiled_catalog_for
 
         # Hot Psat path: reuse memoized compile; no U0 rule emission.
         evaluator = compiled_catalog_for(
-            vapor_pressure_data, emit_u0_request_rules=False
+            catalog_payload, emit_u0_request_rules=False
         ).evaluator_for(species)
         evaluation = evaluator.evaluate(T_K)
         if evaluation.out_of_range:

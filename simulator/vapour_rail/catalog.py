@@ -13,6 +13,9 @@ from collections import OrderedDict
 from copy import deepcopy
 from dataclasses import dataclass
 from enum import Enum
+import hashlib
+import json
+import marshal
 import math
 import re
 from types import MappingProxyType
@@ -120,51 +123,291 @@ def _require_poly_covers_domain(
             "full declared model domain"
         )
 # Two distinct memo layers — do not collapse into one (different consumers):
-# 1. _COMPILE_CACHE (VR-6 / NV-1): multi-key strong-ref compile memo keyed by
-#    (id(payload), emit_u0_request_rules, id(u0_manifest)|0) → (payload pin,
-#    catalog). Capability probes and full request-rule compiles share this.
-#    Strong-ref pin + ``cached_payload is payload`` prevents stale-catalog on
-#    id recycle (NV-1 regression must stay red under reversion).
-# 2. _legacy_view_cache (VR-7 / P1-1): payload-identity memo of the schema-v1
-#    projection dict. ``legacy_view()`` deepcopies every call; condensation
-#    hits vapor_pressure_legacy_view per species, so the projection must be
-#    cached separately. Compile memo alone does not serve that consumer
-#    (deepcopy cost + dict-identity stability for the warm A/B budget).
+# 1. _COMPILE_CACHE (VR-6 / cache-identity hygiene): content-digest memo of the
+#    compile-input vector → compiled catalog. Capability probes and full
+#    request-rule compiles share this.
+# 2. _legacy_view_cache (VR-7 / P1-1): content-digest memo of the schema-v1
+#    projection dict. Condensation must receive an already-projected view at
+#    the owner boundary; re-digesting the full production payload per species
+#    reintroduces the ~151 ms warm-loop class.
+#
+# Explicit identity key choice (AGENTS.md cache doctrine — minimal vector-in /
+# vector-out, NO accreted key dimensions):
+#   Key = SHA-256 of the injective canonical encoding of the full input vector
+#   that determines the catalog:
+#     - payload content (always)
+#     - emit_u0_request_rules (always)
+#     - effective u0_manifest content ONLY when emit_u0_request_rules is true
+#       (resolved via load_u0_manifest() when the caller passed None — the
+#       default-manifest surface that rule emission actually reads)
+#   When emission is disabled, manifest is excluded (not an output determinant).
+# Why content digest rather than object-id / strong-ref pins alone:
+#   - Object id is incidental, not an identity contract (Codex P3-2 / NV-1 class:
+#     recycled id(u0_manifest) or id(payload) can silently hit a stale entry).
+#   - Digesting content both *names* the input and *detects mutation* (Kimi P3-1):
+#     in-place edits change the digest → miss → recompile / raise; a mutated
+#     input cannot silently serve a prior catalog. No caller-trust convention.
+# Forbidden in this key (doctrine): code_version, engine fingerprints, provider
+# identities, policy/bounds digests, schema epochs as separate dimensions — if a
+# dimension changes the output it must already be inside the payload/manifest
+# vector, not bolted on beside it.
+#
+# Perf (warm path): content digest is the identity contract. Serializing the
+# full production payload to canonical JSON on every lookup is the rejected
+# ~3 ms/hit class. Default compile calls first compare a type-faithful binary
+# snapshot and reuse the canonical key only when it is unchanged. A precomputed
+# ``content_key`` seeds that verified hint but never bypasses the snapshot
+# check. Per-species consumers project schema-v2 → legacy once at model init so
+# the hot loop never re-enters digest+lookup. Already-projected schema-v1 views
+# return without deepcopy (shared read-only contract — same as the v2 memo's
+# shared dict).
 _COMPILE_CACHE_MAX = 8
-# value: (payload strong-ref pin, compiled catalog)
-_COMPILE_CACHE: dict[tuple[int, bool, int], tuple[Mapping[str, Any], "VapourRailCatalog"]] = {}
-_COMPILE_CACHE_ORDER: list[tuple[int, bool, int]] = []
-_legacy_view_cache: OrderedDict[int, tuple[Any, dict[str, Any]]] = OrderedDict()
+# key: content-digest identity of the compile-input vector; value: catalog
+_COMPILE_CACHE: dict[str, "VapourRailCatalog"] = {}
+_COMPILE_CACHE_ORDER: list[str] = []
+# Same-owner warm-path accelerator. The semantic cache key remains the
+# canonical SHA-256 below; this bounded hint only avoids recomputing it when a
+# type-faithful serialization of the current input vector is byte-identical to
+# the last validated vector for that payload object. Retaining the owner object
+# prevents id reuse, and a changed fingerprint always falls back to the digest.
+_COMPILE_IDENTITY_HINTS: OrderedDict[
+    tuple[int, bool], tuple[Mapping[str, Any], bytes, str]
+] = OrderedDict()
+# key: content-digest of payload; value: schema-v1 projection dict
+_legacy_view_cache: OrderedDict[str, dict[str, Any]] = OrderedDict()
 _CATALOG_COMPILE_CACHE_MAX = _COMPILE_CACHE_MAX  # shared LRU bound for legacy helpers
 
 
+def _canonical_jsonable(value: Any) -> Any:
+    """Type-faithful JSON-ready form for content digests (sorted, nested).
+
+    Mapping keys must be strings. Only JSON-scalar leaves are accepted
+    (str / int / float / bool / None). Non-string keys and unsupported
+    leaves raise — never collapse types via ``str()`` (that admitted
+    ``\"1\"`` vs ``1`` and ``date`` vs ISO-string collisions). Every accepted
+    value carries a category tag, including list versus tuple, so inputs that
+    validation distinguishes cannot share a canonical form.
+    """
+
+    if isinstance(value, Mapping):
+        items: dict[str, Any] = {}
+        for key in value:
+            if not isinstance(key, str):
+                raise CatalogCompileError(
+                    "compile-input digest requires string mapping keys "
+                    f"(got {type(key).__name__}: {key!r})"
+                )
+            items[key] = _canonical_jsonable(value[key])
+        return ["mapping", {k: items[k] for k in sorted(items)}]
+    if isinstance(value, list):
+        return ["list", [_canonical_jsonable(item) for item in value]]
+    if isinstance(value, tuple):
+        return ["tuple", [_canonical_jsonable(item) for item in value]]
+    # bool is a subclass of int — must precede the int branch.
+    if isinstance(value, bool):
+        return ["bool", value]
+    if value is None:
+        return ["none", None]
+    if isinstance(value, str):
+        return ["str", value]
+    if isinstance(value, int) and not isinstance(value, bool):
+        return ["int", value]
+    if isinstance(value, float):
+        # Reject NaN/Inf so digests stay deterministic and JSON-safe.
+        if not math.isfinite(value):
+            raise CatalogCompileError(
+                "compile-input digest requires finite floats "
+                f"(got {value!r})"
+            )
+        return ["float", value]
+    raise CatalogCompileError(
+        "compile-input digest rejects non-JSON leaf "
+        f"{type(value).__name__}: {value!r}"
+    )
+
+
+def _content_digest(value: Any) -> str:
+    """SHA-256 of injective canonical JSON — content identity for memos."""
+
+    blob = json.dumps(
+        _canonical_jsonable(value),
+        allow_nan=False,
+        ensure_ascii=True,
+        separators=(",", ":"),
+        sort_keys=True,
+    )
+    return hashlib.sha256(blob.encode("utf-8")).hexdigest()
+
+
+def _resolve_effective_u0_manifest(
+    u0_manifest: Mapping[str, Any] | None,
+    *,
+    emit_u0_request_rules: bool,
+) -> Mapping[str, Any] | None:
+    """Manifest content that rule emission will actually read.
+
+    When emission is disabled the manifest is not an output determinant —
+    return None so it is excluded from the identity vector (minimal key).
+    When emission is enabled and the caller passed None, resolve the default
+    fixture via ``load_u0_manifest()`` so the digest covers the effective
+    input (not the absent ``None`` token).
+    """
+
+    if not emit_u0_request_rules:
+        return None
+    if u0_manifest is not None:
+        if not isinstance(u0_manifest, Mapping):
+            raise CatalogCompileError(
+                "u0_manifest must be a mapping when provided"
+            )
+        return u0_manifest
+    from simulator.vapour_rail.u0_manifest import load_u0_manifest
+
+    return load_u0_manifest()
+
+
+def _compile_input_identity(
+    payload: Mapping[str, Any],
+    *,
+    emit_u0_request_rules: bool,
+    u0_manifest: Mapping[str, Any] | None,
+) -> str:
+    """Explicit identity of one compile-input vector (content digest).
+
+    Digests the *effective* input: payload + emit flag + manifest content
+    actually used by rule emission (default fixture when emit and
+    ``u0_manifest is None``). Manifest is omitted when emission is disabled.
+    Always walks current content (oracle for mutation / equal-content tests).
+    """
+
+    effective_manifest = _resolve_effective_u0_manifest(
+        u0_manifest, emit_u0_request_rules=emit_u0_request_rules
+    )
+    input_vector = _compile_input_vector(
+        payload,
+        emit_u0_request_rules=emit_u0_request_rules,
+        effective_u0_manifest=effective_manifest,
+    )
+    content_key = _content_digest(input_vector)
+    fingerprint = _compile_input_fingerprint(input_vector)
+    if fingerprint is not None:
+        _remember_compile_identity_hint(
+            payload,
+            emit_u0_request_rules=emit_u0_request_rules,
+            fingerprint=fingerprint,
+            content_key=content_key,
+        )
+    return content_key
+
+
+def _compile_input_vector(
+    payload: Mapping[str, Any],
+    *,
+    emit_u0_request_rules: bool,
+    effective_u0_manifest: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    """Minimal vector that determines compiled catalog output."""
+
+    vector: dict[str, Any] = {
+        "payload": payload,
+        "emit_u0_request_rules": bool(emit_u0_request_rules),
+    }
+    if bool(emit_u0_request_rules):
+        vector["u0_manifest"] = effective_u0_manifest
+    return vector
+
+
+def _compile_identity_with_hint(
+    payload: Mapping[str, Any],
+    *,
+    emit_u0_request_rules: bool,
+    input_vector: Mapping[str, Any],
+) -> str:
+    """Return canonical identity, reusing it only after an exact warm check.
+
+    ``marshal`` is used only as an in-process, type-tagged equality snapshot;
+    it never becomes cache identity or persisted data. Unsupported containers
+    skip the hint. Any changed bytes recompute the canonical content digest,
+    preserving equal-content sharing and mutation misses.
+    """
+
+    fingerprint = _compile_input_fingerprint(input_vector)
+
+    locator = (id(payload), bool(emit_u0_request_rules))
+    hint = _COMPILE_IDENTITY_HINTS.get(locator)
+    if (
+        fingerprint is not None
+        and hint is not None
+        and hint[0] is payload
+        and hint[1] == fingerprint
+    ):
+        _COMPILE_IDENTITY_HINTS.move_to_end(locator)
+        return hint[2]
+
+    content_key = _content_digest(input_vector)
+    if fingerprint is not None:
+        _remember_compile_identity_hint(
+            payload,
+            emit_u0_request_rules=emit_u0_request_rules,
+            fingerprint=fingerprint,
+            content_key=content_key,
+        )
+    return content_key
+
+
+def _compile_input_fingerprint(input_vector: Mapping[str, Any]) -> bytes | None:
+    try:
+        # Version 2 encodes the supported value tree with concrete container
+        # and scalar tags but without the reference/interning optimizations in
+        # newer marshal formats. That keeps equal snapshots stable when compile
+        # validation interns strings as an implementation detail.
+        return marshal.dumps(input_vector, 2)
+    except (TypeError, ValueError, OverflowError):
+        return None
+
+
+def _remember_compile_identity_hint(
+    payload: Mapping[str, Any],
+    *,
+    emit_u0_request_rules: bool,
+    fingerprint: bytes,
+    content_key: str,
+) -> None:
+    locator = (id(payload), bool(emit_u0_request_rules))
+    _COMPILE_IDENTITY_HINTS[locator] = (payload, fingerprint, content_key)
+    _COMPILE_IDENTITY_HINTS.move_to_end(locator)
+    while len(_COMPILE_IDENTITY_HINTS) > _COMPILE_CACHE_MAX:
+        _COMPILE_IDENTITY_HINTS.popitem(last=False)
+
+
 def _cache_put(
-    cache: OrderedDict[int, tuple[Any, Any]],
+    cache: OrderedDict[str, Any],
     payload: Any,
     value: Any,
     *,
+    content_key: str | None = None,
     maxsize: int = _CATALOG_COMPILE_CACHE_MAX,
 ) -> None:
-    key = id(payload)
-    cache[key] = (payload, value)
+    key = content_key if content_key is not None else _content_digest(payload)
+    cache[key] = value
     cache.move_to_end(key)
     while len(cache) > maxsize:
         cache.popitem(last=False)
 
 
 def _cache_get(
-    cache: OrderedDict[int, tuple[Any, Any]], payload: Any
+    cache: OrderedDict[str, Any],
+    payload: Any,
+    *,
+    content_key: str | None = None,
 ) -> Any | None:
-    key = id(payload)
-    hit = cache.get(key)
-    if hit is None:
-        return None
-    cached_payload, value = hit
-    if cached_payload is not payload:
-        del cache[key]
+    # Prefer a precomputed content_key from the owner boundary (no re-walk).
+    # Otherwise digest current content so in-place mutation misses.
+    key = content_key if content_key is not None else _content_digest(payload)
+    if key not in cache:
         return None
     cache.move_to_end(key)
-    return value
+    return cache[key]
 
 
 def clear_vapor_pressure_view_caches() -> None:
@@ -717,6 +960,7 @@ def clear_vapour_rail_compile_cache() -> None:
 
     _COMPILE_CACHE.clear()
     _COMPILE_CACHE_ORDER.clear()
+    _COMPILE_IDENTITY_HINTS.clear()
 
 
 def compiled_catalog_for(
@@ -724,6 +968,7 @@ def compiled_catalog_for(
     *,
     emit_u0_request_rules: bool = False,
     u0_manifest: Mapping[str, Any] | None = None,
+    content_key: str | None = None,
 ) -> "VapourRailCatalog":
     """Return a cached compile of ``payload`` (hot capability-probe entrypoint).
 
@@ -732,12 +977,18 @@ def compiled_catalog_for(
     :func:`compile_vapour_rail_catalog` for core / VR-6 surfaces; that path is
     also cached and the U0 manifest parse is process-memoized, so default-on
     remains cheap after first warm.
+
+    ``content_key``, when provided, is the precomputed
+    :func:`_compile_input_identity` (or equivalent) from the owner boundary.
+    It seeds the verified identity hint; current input still must match before
+    the key can hit, so stale keys fail closed after mutation.
     """
 
     return compile_vapour_rail_catalog(
         payload,
         u0_manifest=u0_manifest,
         emit_u0_request_rules=emit_u0_request_rules,
+        content_key=content_key,
     )
 
 
@@ -746,6 +997,7 @@ def compile_vapour_rail_catalog(
     *,
     u0_manifest: Mapping[str, Any] | None = None,
     emit_u0_request_rules: bool = True,
+    content_key: str | None = None,
 ) -> VapourRailCatalog:
     """Validate and compile one schema-v2 YAML payload.
 
@@ -753,29 +1005,47 @@ def compile_vapour_rail_catalog(
     one request rule per executable U0 ``V`` row and eligible ``C`` edge so a
     physically eligible manifest species cannot be unrequested by construction.
 
-    Results are memoized by ``id(payload)`` + emit flag (and ``id(u0_manifest)``
-    when supplied) so repeated hot-path compiles of the same config object
-    reuse the catalog. Cache entries pin the payload by strong reference and
-    only hit when ``cached_payload is payload``, so a recycled ``id()`` after
-    the original payload is freed cannot serve a stale catalog (NV-1). The U0
-    manifest YAML load is separately memoized in ``load_u0_manifest``.
+    Results are memoized by an explicit content-digest identity of the full
+    *effective* compile-input vector (payload + emit flag + effective
+    u0_manifest content when emission is on) — not by object ``id()``. Same
+    content reuses the catalog; in-place mutation changes the verified snapshot
+    and canonical digest, forcing recompile (or raise), so a mutated input
+    cannot silently serve a stale entry. Pass ``content_key`` from the owner
+    boundary to seed the verified snapshot hint and skip canonical re-digesting
+    on repeated lookups. The U0 manifest YAML load is separately memoized in
+    ``load_u0_manifest``.
     """
 
     if not isinstance(payload, Mapping):
         raise CatalogCompileError("vapour catalog root must be a mapping")
+    if u0_manifest is not None and not isinstance(u0_manifest, Mapping):
+        raise CatalogCompileError("u0_manifest must be a mapping when provided")
 
-    cache_key = (
-        id(payload),
-        bool(emit_u0_request_rules),
-        id(u0_manifest) if u0_manifest is not None else 0,
+    # Resolve effective manifest before keying so default-on emission digests
+    # the fixture content rule emission will read (not a bare None token).
+    effective_manifest = _resolve_effective_u0_manifest(
+        u0_manifest, emit_u0_request_rules=emit_u0_request_rules
     )
+    # Build identity from the exact manifest object emission will consume.
+    # The same-owner hint is only a verified accelerator; object id never enters
+    # the semantic cache key and changed content always re-digests.
+    input_vector = _compile_input_vector(
+        payload,
+        emit_u0_request_rules=emit_u0_request_rules,
+        effective_u0_manifest=effective_manifest,
+    )
+    cache_key = _compile_identity_with_hint(
+        payload,
+        emit_u0_request_rules=emit_u0_request_rules,
+        input_vector=input_vector,
+    )
+    if content_key is not None and content_key != cache_key:
+        raise CatalogCompileError(
+            "content_key does not match the current compile-input identity"
+        )
     cached = _COMPILE_CACHE.get(cache_key)
     if cached is not None:
-        cached_payload, cached_catalog = cached
-        # Strong-ref identity: id reuse of a different object cannot hit.
-        if cached_payload is payload:
-            return cached_catalog
-        # Stale id collision (should not occur while pin lives); recompile.
+        return cached
     if payload.get("schema_version") != SCHEMA_VERSION:
         raise CatalogCompileError("vapour catalog schema_version must be 2")
     families = _mapping(payload.get("families"), "families")
@@ -912,9 +1182,10 @@ def compile_vapour_rail_catalog(
         )
 
         try:
+            # Pass the same effective manifest that was digested into cache_key.
             request_rules = emit_request_rules(
                 catalog_species=compiled,
-                u0_manifest=u0_manifest,
+                u0_manifest=effective_manifest,
                 catalog_payload=payload,
             )
         except VapourRequestConstructionError as exc:
@@ -926,48 +1197,87 @@ def compile_vapour_rail_catalog(
         request_rules=request_rules,
         catalog_payload=payload,
     )
-    # Insert / refresh LRU entry (payload pin prevents id-recycle while cached).
+    # Insert / refresh LRU under the content-digest identity key.
     if cache_key in _COMPILE_CACHE:
         try:
             _COMPILE_CACHE_ORDER.remove(cache_key)
         except ValueError:
             pass
-    _COMPILE_CACHE[cache_key] = (payload, result)
+    _COMPILE_CACHE[cache_key] = result
     _COMPILE_CACHE_ORDER.append(cache_key)
     while len(_COMPILE_CACHE_ORDER) > _COMPILE_CACHE_MAX:
         evicted = _COMPILE_CACHE_ORDER.pop(0)
         _COMPILE_CACHE.pop(evicted, None)
+    # Compilation may intern strings while validating. Refresh the fast
+    # snapshot after those benign representation changes so the first warm
+    # default call does not pay a needless canonical re-digest.
+    post_compile_fingerprint = _compile_input_fingerprint(input_vector)
+    if post_compile_fingerprint is not None:
+        _remember_compile_identity_hint(
+            payload,
+            emit_u0_request_rules=emit_u0_request_rules,
+            fingerprint=post_compile_fingerprint,
+            content_key=cache_key,
+        )
     return result
 
 
-def vapor_pressure_legacy_view(payload: Mapping[str, Any] | None) -> dict[str, Any]:
+def vapor_pressure_legacy_view(
+    payload: Mapping[str, Any] | None,
+    *,
+    content_key: str | None = None,
+) -> dict[str, Any]:
     """Return the schema-v1 compatibility view without duplicating YAML authority.
 
     For schema-v2 payloads the compiled legacy projection is memoized by payload
-    identity so hot-path callers (condensation deposition flux) never recompile
-    or re-deepcopy the full catalog per species lookup. The cached dict is
-    shared across callers for a given payload object — treat it as read-only.
+    *content digest* so equal content shares one projection. The cached dict is
+    shared across callers for a given payload content — treat it as read-only.
+    In-place mutation of the payload changes the digest (when ``content_key`` is
+    omitted) and forces a fresh projection.
+
+    Owner-boundary perf: compute identity once and pass ``content_key``, or
+    project once and pass the schema-v1 view into per-species consumers so the
+    hot loop never re-enters digest+compile (see CondensationModel init).
 
     Compile uses the VR-6 hot entrypoint (emit_u0_request_rules=False) so this
-    path reuses the strong-ref compile memo without paying for U0 rule emission;
-    the separate _legacy_view_cache then pins the projection dict so warm hits
-    are pure dict returns (VR-7 P1-1 budget).
+    path reuses the content-digest compile memo without paying for U0 rule
+    emission; the separate _legacy_view_cache then holds the projection dict so
+    warm hits with a precomputed key are pure dict returns (VR-7 P1-1 budget).
+
+    Already-projected schema-v1 views are returned as shared read-only mappings
+    (no per-call deepcopy) so owner-projected hot paths stay O(1).
     """
 
     if not isinstance(payload, Mapping):
         return {}
     if payload.get("schema_version") == SCHEMA_VERSION and "families" in payload:
-        cached = _cache_get(_legacy_view_cache, payload)
+        # Payload content key (not full compile identity) keys this memo.
+        # Owner may pass a precomputed key to skip the walk on warm hits.
+        payload_key = (
+            content_key if content_key is not None else _content_digest(payload)
+        )
+        cached = _legacy_view_cache.get(payload_key)
         if cached is not None:
+            _legacy_view_cache.move_to_end(payload_key)
             return cached
         # Evaluator/legacy projection only — skip U0 rule emission on this
         # hot path; request rules are built by core's dedicated compile.
+        # Propagate payload content key into compile identity only when the
+        # owner supplied it — compile identity also includes the emit flag,
+        # so we recompute compile identity rather than reuse payload_key.
         view = compiled_catalog_for(
             payload, emit_u0_request_rules=False
         ).legacy_view()
-        _cache_put(_legacy_view_cache, payload, view)
+        _cache_put(
+            _legacy_view_cache, payload, view, content_key=payload_key
+        )
         return view
-    return deepcopy(dict(payload))
+    # Already a compatibility / schema-v1 view: share read-only (no deepcopy).
+    # Callers that need isolation must copy; condensation projects once at
+    # the owner boundary and re-enters here per species with the projection.
+    if isinstance(payload, dict):
+        return payload
+    return dict(payload)
 
 
 def vapor_pressure_compatibility_view(
