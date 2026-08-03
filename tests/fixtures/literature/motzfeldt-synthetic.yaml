@@ -1,0 +1,130 @@
+# Synthetic Motzfeldt geometry fixture for t-511 (tools/motzfeldt.py).
+# No landed extract currently carries a complete orifice_area / clausing_factor /
+# sample_surface_area + P_eq/P_meas set; this fixture exercises the consumer
+# end-to-end. Arithmetic is hand-worked in tests/test_motzfeldt.py:
+#
+#   a = 1.0e-6 m², f = 1.0, A_s = 1.0e-4 m², α_true = 0.02
+#   f*a/(α*A_s) = 1e-6 / (0.02 * 1e-4) = 0.5
+#   P_eq/P_meas = 1.5 → with P_eq = 1.5 Pa, P_meas = 1.0 Pa
+#   invert: α = (f*a)/(A_s*(R-1)) = 1e-6/(1e-4*0.5) = 0.02
+#
+schema_version: literature_extract.v1
+source_id: motzfeldt-synthetic
+source:
+  citation: >-
+    Synthetic Motzfeldt geometry fixture (t-511); not a literature source.
+    Numbers chosen so α_true = 0.02 matches Costa & Jacobson 2015 Fe band high side.
+  year: 2026
+extraction:
+  method: synthetic_fixture_for_motzfeldt_tool
+  date: '2026-08-03'
+  worker: t511-motzfeldt
+review_status: draft
+species:
+  Fe:
+    observations:
+    - observation_id: synth_fe_kems_single_orifice
+      type: psat_series
+      locator:
+        note: synthetic single-orifice KEMS pressure row for Motzfeldt unit tests
+        record: synth_fe_kems_single_orifice
+      T_range_K: [1750.0, 1750.0]
+      phase: solid_solution_olivine
+      regime: kems_effusion
+      units: Pa
+      values:
+        P_Pa: 1.0
+        P_meas_Pa: 1.0
+        P_eq_Pa: 1.5
+        T_K: 1750.0
+        gas_species: Fe(g)
+        semantics: synthetic_motzfeldt_geometry
+      uncertainty:
+        note: synthetic ±5% relative on P_meas for propagation demo
+        sigma_relative: 0.05
+      equipment:
+        orifice_area:
+          value: 1.0e-6
+          units: m2
+          locator: {note: synthetic orifice area a = 1e-6 m2}
+        clausing_factor:
+          value: 1.0
+          units: dimensionless
+          locator: {note: synthetic ideal orifice Clausing f = 1}
+        sample_surface_area:
+          value: 1.0e-4
+          units: m2
+          locator: {note: synthetic sample free surface A_s = 1e-4 m2}
+        cell_material:
+          value: Mo
+          locator: {note: synthetic Mo Knudsen cell (reducing pO2 boundary)}
+        multi_orifice_series:
+          value: false
+          locator: {note: single-orifice row; multi series is the sibling observation}
+    - observation_id: synth_fe_kems_multi_orifice
+      type: psat_series
+      locator:
+        note: synthetic three-orifice Motzfeldt series for extrapolation unit tests
+        record: synth_fe_kems_multi_orifice
+      T_range_K: [1750.0, 1750.0]
+      phase: solid_solution_olivine
+      regime: kems_effusion
+      units: Pa
+      values:
+        # Representative mid-orifice point (also recoverable from series)
+        P_Pa: 1.0
+        P_eq_Pa: 1.5
+        T_K: 1750.0
+        gas_species: Fe(g)
+        semantics: synthetic_motzfeldt_multi_orifice
+      uncertainty:
+        note: synthetic multi-orifice series; exact Motzfeldt linear points
+      equipment:
+        sample_surface_area:
+          value: 1.0e-4
+          units: m2
+          locator: {note: synthetic A_s = 1e-4 m2 shared across orifices}
+        clausing_factor:
+          value: 1.0
+          units: dimensionless
+          locator: {note: synthetic f = 1 for all orifices}
+        cell_material:
+          value: Mo Knudsen cell
+          locator: {note: synthetic Mo multi-cell Whitman-Motzfeldt series}
+        multi_orifice_series:
+          value:
+            # Series-level unit defaults: every dimensional field on points
+            # must resolve to an explicit unit (never assumed SI).
+            orifice_area_units: m2
+            P_meas_units: Pa
+            points:
+            # x = f*a/A_s; P_meas = P_eq / (1 + x/α) with P_eq=1.5 Pa, α=0.02
+            # a=5e-7 m² → x=0.005 → P_meas = 1.5/1.25 = 1.2 Pa
+            # a=1e-6 m² → x=0.01  → P_meas = 1.5/1.5  = 1.0 Pa
+            # a=2e-6 m² → x=0.02  → P_meas = 1.5/2.0  = 0.75 Pa
+            - {P_meas: 1.2, orifice_area: 5.0e-7, clausing_factor: 1.0}
+            - {P_meas: 1.0, orifice_area: 1.0e-6, clausing_factor: 1.0}
+            - {P_meas: 0.75, orifice_area: 2.0e-6, clausing_factor: 1.0}
+          locator: {note: synthetic three-orifice series hand-worked for α=0.02}
+    - observation_id: synth_fe_oxide_ir_cell
+      type: psat_series
+      locator:
+        note: synthetic Ir-cell oxide row for neutral pO2 boundary annotation
+        record: synth_fe_oxide_ir_cell
+      T_range_K: [1800.0, 1800.0]
+      phase: pure_oxide
+      regime: kems_effusion
+      units: Pa
+      values:
+        P_Pa: 2.0e-3
+        gas_species: Fe(g)
+        semantics: synthetic_ir_cell_pressure
+      equipment:
+        cell_material:
+          value: Ir liner in graphite cell
+          locator: {note: synthetic Ir liner (neutral); Costa-style preferred cell}
+fidelity_samples:
+- path: species.Fe.observations[synth_fe_kems_single_orifice].values.P_eq_Pa
+  value: 1.5
+  note: synthetic P_eq pin for Motzfeldt hand-worked example
+  locator: {record: synth_fe_kems_single_orifice}

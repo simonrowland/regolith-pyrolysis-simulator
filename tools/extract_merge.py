@@ -50,6 +50,7 @@ from validate_literature_extracts import (  # noqa: E402
     validate_extract_file,
     validate_source_priority_file,
 )
+from motzfeldt import effective_po2_boundary_for_observation  # noqa: E402
 
 U0_MANIFEST = ROOT / "data" / "vapour_rail_u0_manifest.yaml"
 PRIORITY_PATH = EXTRACTS_DIR / "_source_priority.yaml"
@@ -425,6 +426,12 @@ def build_by_species(
                     "equipment": obs.get("equipment"),
                     "_payload_present": _payload_present(obs),
                 }
+                # t-511: cell_material → effective-pO₂ boundary (Mo/W reducing
+                # vs Ir/alumina neutral). Annotation only — never mutates the
+                # extract store; oxide/KEMS consumers read this at merge time.
+                po2_ann = effective_po2_boundary_for_observation(obs)
+                if po2_ann is not None:
+                    entry["effective_po2_boundary"] = po2_ann
                 by_species[str(sid)].append(entry)
 
     species_out: dict[str, Any] = {}
