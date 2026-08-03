@@ -1,0 +1,39 @@
+schema_version: literature_extract.v1
+source_id: pending-kems-cro3
+source:
+  citation: Chromia oxidizing vaporization CrO3(g) KEMS under high fO2
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  CrO3:
+    observations:
+    - observation_id: anchor_CrO3_pure_Psat
+      type: psat_series
+      locator:
+        note: Chromia oxidizing vaporization CrO3(g) KEMS under high fO2
+        record: PENDING-KEMS#CrO3
+      units: as published
+      values:
+        quantity: pure_Psat
+        T_range_K:
+        - 573
+        - 1173
+        phase: Cr2O3_oxidizing_to_CrO3_g
+        standard_state: CrO3(g) 1 bar + fO2
+fidelity_samples:
+- path: species.CrO3.observations[anchor_CrO3_pure_Psat].values
+  value:
+    quantity: pure_Psat
+    T_range_K:
+    - 573
+    - 1173
+    phase: Cr2O3_oxidizing_to_CrO3_g
+    standard_state: CrO3(g) 1 bar + fO2
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: Chromia oxidizing vaporization CrO3(g) KEMS under high fO2
+    record: PENDING-KEMS#CrO3

@@ -1,0 +1,47 @@
+schema_version: literature_extract.v1
+source_id: iupac-o2-solid-psat
+source:
+  citation: Wagner, W., Ewers, J. & Schmidt, R. oxygen multiparameter EOS / solid oxygen vapor-pressure
+    evaluations (IUPAC); not FS09. Plant O2 is gas inventory, not frost Psat — validated frost row does
+    not certify melt pO2.
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  O2:
+    observations:
+    - observation_id: anchor_O2_pure_Psat
+      type: psat_series
+      locator:
+        note: Wagner, W., Ewers, J. & Schmidt, R. oxygen multiparameter EOS / solid oxygen vapor-pressure
+          evaluations (IUPAC); not FS09. Plant O2 is gas inventory, not frost Psat — validated frost row
+          does not certify melt pO2.
+        record: IUPAC-O2-solid-Psat
+      units: as published
+      values:
+        quantity: pure_Psat
+        T_range_K:
+        - 23.88
+        - 54.36
+        phase: solid_O2_to_O2_g
+        standard_state: pure O2 solid
+        independence_note: FS09 is fit source
+fidelity_samples:
+- path: species.O2.observations[anchor_O2_pure_Psat].values
+  value:
+    quantity: pure_Psat
+    T_range_K:
+    - 23.88
+    - 54.36
+    phase: solid_O2_to_O2_g
+    standard_state: pure O2 solid
+    independence_note: FS09 is fit source
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: Wagner, W., Ewers, J. & Schmidt, R. oxygen multiparameter EOS / solid oxygen vapor-pressure
+      evaluations (IUPAC); not FS09. Plant O2 is gas inventory, not frost Psat — validated frost row does
+      not certify melt pO2.
+    record: IUPAC-O2-solid-Psat

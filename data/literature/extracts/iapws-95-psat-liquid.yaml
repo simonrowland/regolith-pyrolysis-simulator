@@ -1,0 +1,51 @@
+schema_version: literature_extract.v1
+source_id: iapws-95-psat-liquid
+source:
+  citation: 'Wagner, W. & Pruß, A. (2002), "The IAPWS Formulation 1995 for the Thermodynamic Properties
+    of Ordinary Water Substance for General and Scientific Use", J. Phys. Chem. Ref. Data 31:387–535,
+    DOI 10.1063/1.1461829; saturation pressure of liquid water (and ice via IAPWS ice formulations). Cross-check:
+    NIST Chemistry WebBook SRD 69 water Antoine liquid branch (separate Stull/Bridgeman compilations —
+    not Feistel 2007).'
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  H2O:
+    observations:
+    - observation_id: anchor_H2O_pure_Psat
+      type: psat_series
+      locator:
+        note: 'Wagner, W. & Pruß, A. (2002), "The IAPWS Formulation 1995 for the Thermodynamic Properties
+          of Ordinary Water Substance for General and Scientific Use", J. Phys. Chem. Ref. Data 31:387–535,
+          DOI 10.1063/1.1461829; saturation pressure of liquid water (and ice via IAPWS ice formulations).
+          Cross-check: N'
+        record: IAPWS-95#Psat_liquid
+      units: as published
+      values:
+        quantity: pure_Psat
+        T_range_K:
+        - 273.16
+        - 647.096
+        phase: liquid_H2O_to_H2O_g
+        standard_state: pure H2O; Psat absolute; IAPWS continuum
+        independence_note: Fit is ice Ih sublimation; IAPWS liquid Psat is independent phase branch
+fidelity_samples:
+- path: species.H2O.observations[anchor_H2O_pure_Psat].values
+  value:
+    quantity: pure_Psat
+    T_range_K:
+    - 273.16
+    - 647.096
+    phase: liquid_H2O_to_H2O_g
+    standard_state: pure H2O; Psat absolute; IAPWS continuum
+    independence_note: Fit is ice Ih sublimation; IAPWS liquid Psat is independent phase branch
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: 'Wagner, W. & Pruß, A. (2002), "The IAPWS Formulation 1995 for the Thermodynamic Properties
+      of Ordinary Water Substance for General and Scientific Use", J. Phys. Chem. Ref. Data 31:387–535,
+      DOI 10.1063/1.1461829; saturation pressure of liquid water (and ice via IAPWS ice formulations).
+      Cross-check: N'
+    record: IAPWS-95#Psat_liquid

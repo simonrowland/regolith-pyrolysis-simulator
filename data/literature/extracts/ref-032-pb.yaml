@@ -1,0 +1,42 @@
+schema_version: literature_extract.v1
+source_id: ref-032-pb
+source:
+  citation: Alcock et al. (1984) REF-032 Pb equations; JANAF Pb(g) Chase 1998; classic Hultgren selected
+    values for Pb.
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  Pb:
+    observations:
+    - observation_id: anchor_Pb_pure_Psat
+      type: psat_series
+      locator:
+        note: Alcock et al. (1984) REF-032 Pb equations; JANAF Pb(g) Chase 1998; classic Hultgren selected
+          values for Pb.
+        record: REF-032#Pb
+      units: as published
+      values:
+        quantity: pure_Psat
+        T_range_K:
+        - 800
+        - 1800
+        phase: liquid_Pb_to_Pb_g
+        standard_state: pure liquid Pb
+fidelity_samples:
+- path: species.Pb.observations[anchor_Pb_pure_Psat].values
+  value:
+    quantity: pure_Psat
+    T_range_K:
+    - 800
+    - 1800
+    phase: liquid_Pb_to_Pb_g
+    standard_state: pure liquid Pb
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: Alcock et al. (1984) REF-032 Pb equations; JANAF Pb(g) Chase 1998; classic Hultgren selected
+      values for Pb.
+    record: REF-032#Pb

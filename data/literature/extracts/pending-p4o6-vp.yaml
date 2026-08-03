@@ -1,0 +1,42 @@
+schema_version: literature_extract.v1
+source_id: pending-p4o6-vp
+source:
+  citation: Measured P4O6 vaporization (recover primary); SF18-T5 carrier role is review-only. JANAF if
+    tables exist for P4O6(g).
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  P4O6:
+    observations:
+    - observation_id: anchor_P4O6_pure_Psat
+      type: psat_series
+      locator:
+        note: Measured P4O6 vaporization (recover primary); SF18-T5 carrier role is review-only. JANAF
+          if tables exist for P4O6(g).
+        record: PENDING#P4O6_VP
+      units: as published
+      values:
+        quantity: pure_Psat
+        T_range_K:
+        - 298
+        - 1000
+        phase: condensed_to_P4O6_g
+        standard_state: P4O6(g)
+fidelity_samples:
+- path: species.P4O6.observations[anchor_P4O6_pure_Psat].values
+  value:
+    quantity: pure_Psat
+    T_range_K:
+    - 298
+    - 1000
+    phase: condensed_to_P4O6_g
+    standard_state: P4O6(g)
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: Measured P4O6 vaporization (recover primary); SF18-T5 carrier role is review-only. JANAF if
+      tables exist for P4O6(g).
+    record: PENDING#P4O6_VP

@@ -1,0 +1,1090 @@
+schema_version: literature_extract.v1
+source_id: janaf-4th
+source:
+  citation: Chase, M. W. Jr., NIST-JANAF Thermochemical Tables, 4th Edition, J. Phys. Chem. Ref. Data
+    Monograph 9 (1998)
+  url: https://janaf.nist.gov/
+  year: 1998
+  version: 4th
+extraction:
+  method: manual transcription from vp-acquire-5 P-carriers DRAFT
+  date: '2026-07-30'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-07-30-vp-acquire-5/P-carriers.md
+review_status: draft
+species:
+  PO:
+    observations:
+    - observation_id: janaf_PO_298_anchors
+      type: gibbs_table
+      locator:
+        table: O-004
+        record: JANAF O-004
+        note: Chase, M.W. Jr. (1998) NIST-JANAF Thermochemical Tables, 4th ed., J. Phys. Chem. Ref. Data
+          Monograph 9, table O-004 (Phosphorus Oxide, PO, g), pp. ~1642
+        source_path: https://janaf.nist.gov/tables/O-004.html
+      phase: ideal_gas
+      standard_state: 1 bar (0.1 MPa)
+      units: kJ/mol (ΔfH, ΔfG); J/(mol·K) (S)
+      values:
+        table_id: O-004
+        formula_label: OP
+        standard_pressure: 1 bar (0.1 MPa)
+        delta_fH_298_kJ_mol: -23.548
+        delta_fG_298_kJ_mol: -47.139
+        S_298_J_molK: 222.776
+    - observation_id: JANAF1998_PO_formation_tabulation
+      type: gibbs_table
+      locator:
+        table: O-004
+        note: Chase, M.W. Jr. (1998) NIST-JANAF Thermochemical Tables, 4th ed., J. Phys. Chem. Ref. Data
+          Monograph 9, table O-004 (Phosphorus Oxide, PO, g), pp. ~1642
+        record: JANAF1998_PO_formation_tabulation
+        source_path: https://janaf.nist.gov/tables/O-004.html
+      T_range_K:
+      - 298.15
+      - 2500.0
+      phase: gas
+      standard_state: 1 bar (0.1 MPa)
+      units: kJ/mol (ΔfG / formation tabulation as published)
+      values:
+        phase_branch: gas
+        valid_range_interpretation: JANAF grid points; use for ΔfG(T) interpolation on the published grid
+          only
+        source_certification: reference_thermochemical_table
+        tabulated_delta_fG_kJ_mol:
+        - &id001
+          T_K: 298.15
+          delta_fG: -47.139
+        - T_K: 500.0
+          delta_fG: -62.24
+        - T_K: 800.0
+          delta_fG: -83.354
+        - T_K: 1000.0
+          delta_fG: -96.893
+        - T_K: 1200.0
+          delta_fG: -109.04
+        - T_K: 1400.0
+          delta_fG: -111.354
+        - T_K: 1500.0
+          delta_fG: -112.512
+        - T_K: 1600.0
+          delta_fG: -113.669
+        - T_K: 1800.0
+          delta_fG: -115.982
+        - T_K: 2000.0
+          delta_fG: -118.291
+        - T_K: 2200.0
+          delta_fG: -120.594
+        - T_K: 2500.0
+          delta_fG: -124.032
+    - observation_id: anchor_PO_deltafG
+      type: gibbs_table
+      locator:
+        note: JANAF PO(g) Chase 1998 (REF-020); Sossi & Fegley 2018 Table 5 carrier role
+        record: JANAF-4th#PO_g
+      units: as published
+      values:
+        quantity: deltafG
+        T_range_K:
+        - 1000
+        - 2500
+        phase: phosphate_melt_to_PO_g
+        standard_state: PO(g) 1 bar + fO2
+  PO2:
+    observations:
+    - observation_id: janaf_PO2_298_anchors
+      type: gibbs_table
+      locator:
+        table: O-032
+        record: JANAF O-032
+        note: Chase (1998) NIST-JANAF 4th ed., table O-032 (Phosphorus Oxide, PO2, g), pp. ~1670
+        source_path: https://janaf.nist.gov/tables/O-032.html
+      phase: ideal_gas
+      standard_state: 1 bar (0.1 MPa)
+      units: kJ/mol (ΔfH, ΔfG); J/(mol·K) (S)
+      values:
+        table_id: O-032
+        formula_label: O2P
+        standard_pressure: 1 bar (0.1 MPa)
+        delta_fH_298_kJ_mol: -314.524
+        delta_fG_298_kJ_mol: -316.748
+        S_298_J_molK: 253.685
+    - observation_id: JANAF1998_PO2_formation_tabulation
+      type: gibbs_table
+      locator:
+        table: O-032
+        note: Chase (1998) NIST-JANAF 4th ed., table O-032 (Phosphorus Oxide, PO2, g), pp. ~1670
+        record: JANAF1998_PO2_formation_tabulation
+        source_path: https://janaf.nist.gov/tables/O-032.html
+      T_range_K:
+      - 298.15
+      - 2500.0
+      phase: gas
+      standard_state: 1 bar (0.1 MPa)
+      units: kJ/mol (ΔfG / formation tabulation as published)
+      values:
+        phase_branch: gas
+        source_certification: reference_thermochemical_table
+        tabulated_delta_fG_kJ_mol:
+        - T_K: 298.15
+          delta_fG: -316.748
+        - T_K: 500.0
+          delta_fG: -317.214
+        - T_K: 800.0
+          delta_fG: -316.546
+        - T_K: 1000.0
+          delta_fG: -315.66
+        - T_K: 1200.0
+          delta_fG: -313.451
+        - T_K: 1400.0
+          delta_fG: -301.469
+        - T_K: 1500.0
+          delta_fG: -295.497
+        - T_K: 1600.0
+          delta_fG: -289.535
+        - T_K: 1800.0
+          delta_fG: -277.636
+        - T_K: 2000.0
+          delta_fG: -265.763
+        - T_K: 2200.0
+          delta_fG: -253.906
+        - T_K: 2500.0
+          delta_fG: -236.136
+    - observation_id: anchor_PO2_deltafG
+      type: gibbs_table
+      locator:
+        note: JANAF PO2(g) Chase 1998
+        record: JANAF-4th#PO2_g
+      units: as published
+      values:
+        quantity: deltafG
+        T_range_K:
+        - 1000
+        - 2500
+        phase: phosphate_to_PO2_g
+        standard_state: PO2(g) 1 bar
+  P4O6:
+    observations:
+    - observation_id: janaf_P4O6_298_anchors
+      type: gibbs_table
+      locator:
+        table: O-087
+        record: JANAF O-087
+        note: Chase (1998) NIST-JANAF 4th ed., table O-087 (Phosphorus Oxide, (P2O3)2 = P4O6, g), pp.
+          ~1725
+        source_path: https://janaf.nist.gov/tables/O-087.html
+      phase: ideal_gas
+      standard_state: 1 bar (0.1 MPa)
+      units: kJ/mol (ΔfH, ΔfG); J/(mol·K) (S)
+      uncertainty:
+        uncertainty_flag: Bains_et_al_2023_JANAF_likely_too_stable
+      values:
+        table_id: O-087
+        formula_label: O6P4 / (P2O3)2
+        standard_pressure: 1 bar (0.1 MPa)
+        delta_fH_298_kJ_mol: -2214.307
+        delta_fG_298_kJ_mol: -2084.877
+        S_298_J_molK: 345.641
+        uncertainty_flag: Bains_et_al_2023_JANAF_likely_too_stable
+    - observation_id: JANAF1998_P4O6_formation_tabulation_UNCERTAIN
+      type: gibbs_table
+      locator:
+        table: O-087
+        note: Chase (1998) NIST-JANAF 4th ed., table O-087 (Phosphorus Oxide, (P2O3)2 = P4O6, g), pp.
+          ~1725
+        record: JANAF1998_P4O6_formation_tabulation_UNCERTAIN
+        source_path: https://janaf.nist.gov/tables/O-087.html
+      T_range_K:
+      - 298.15
+      - 2500.0
+      phase: gas
+      standard_state: 1 bar (0.1 MPa)
+      units: kJ/mol (ΔfG / formation tabulation as published)
+      values:
+        phase_branch: gas
+        source_certification: reference_thermochemical_table_WITH_CRITICAL_REVIEW_FLAG
+        tabulated_delta_fG_kJ_mol:
+        - T_K: 298.15
+          delta_fG: -2084.877
+        - T_K: 500.0
+          delta_fG: -1993.955
+        - T_K: 1000.0
+          delta_fG: -1766.085
+        - T_K: 1200.0
+          delta_fG: -1671.22
+        - T_K: 1500.0
+          delta_fG: -1472.52
+        - T_K: 1800.0
+          delta_fG: -1276.387
+        - T_K: 2000.0
+          delta_fG: -1146.82
+  P4O10:
+    observations:
+    - observation_id: JANAF1998_P4O10_gas_formation_tabulation
+      type: gibbs_table
+      locator:
+        table: null
+        note: Chase (1998) NIST-JANAF 4th ed., tables O-094 (cr) and O-095 (g), Phosphorus Oxide (P2O5)2
+          = P4O10
+        record: JANAF1998_P4O10_gas_formation_tabulation
+        source_path: null
+      T_range_K:
+      - 298.15
+      - 2500.0
+      phase: gas
+      standard_state: 1 bar (0.1 MPa)
+      units: kJ/mol (ΔfG / formation tabulation as published)
+      values:
+        phase_branch: gas
+        source_certification: reference_thermochemical_table
+        tabulated_delta_fG_kJ_mol:
+        - T_K: 298.15
+          delta_fG: -2669.711
+        - T_K: 500.0
+          delta_fG: -2507.262
+        - T_K: 800.0
+          delta_fG: -2264.308
+        - T_K: 1000.0
+          delta_fG: -2103.459
+        - T_K: 1200.0
+          delta_fG: -1939.372
+        - T_K: 1500.0
+          delta_fG: -1638.004
+        - T_K: 1800.0
+          delta_fG: -1340.429
+        - T_K: 2000.0
+          delta_fG: -1143.821
+    - observation_id: JANAF1998_P4O10_pure_solid_sublimation_screening
+      type: gibbs_table
+      locator:
+        table: null
+        note: Chase (1998) NIST-JANAF tables O-094 and O-095; screening arithmetic this work
+        record: JANAF1998_P4O10_pure_solid_sublimation_screening
+        source_path: null
+      T_range_K:
+      - 298.15
+      - 500.0
+      phase: solid
+      standard_state: 1 bar
+      units: kJ/mol (ΔfG / formation tabulation as published)
+      values:
+        phase_branch: solid
+        condensed_reservoir: P4O10(cr), unit activity
+        gas_species:
+        - P4O10(g)
+        reaction: P4O10(cr) = P4O10(g)
+        pressure_form: p/p0 = exp(-(delta_fG_gas - delta_fG_cr)/(R*T))
+        standard_pressure: 1 bar
+        valid_range_interpretation: 'Only while crystal is the stable pure condensed phase. At T>=800
+          K JANAF gives negative ΔG_sub (table extrapolated past pure-phase stability) — those points
+          are NOT certified Psat.
+
+          '
+        source_certification: reference_thermochemical_table_derived_screening_only
+        tabulated_points:
+        - T_K: 298.15
+          delta_G_sub_kJ_mol: 53.624
+          p_Pa: 4.03e-05
+        - T_K: 500.0
+          delta_G_sub_kJ_mol: 19.883
+          p_Pa: 8.37e2
+  P2:
+    observations:
+    - observation_id: janaf_P2_298_anchors
+      type: gibbs_table
+      locator:
+        table: P-012
+        record: JANAF P-012
+        note: Chase (1998) NIST-JANAF table P-012 (P2,g); Cox et al. (1984) CODATA Key Values for Thermodynamics
+        source_path: https://janaf.nist.gov/tables/P-012.html
+      phase: ideal_gas
+      standard_state: 1 bar (0.1 MPa)
+      units: kJ/mol (ΔfH, ΔfG); J/(mol·K) (S)
+      uncertainty:
+        CODATA_delta_fH_uncertainty_kJ_mol: 2.0
+      values:
+        table_id: P-012
+        standard_pressure: 1 bar (0.1 MPa)
+        delta_fH_298_kJ_mol: 143.653
+        delta_fG_298_kJ_mol: 103.112
+        CODATA_delta_fH_298_kJ_mol: 144.0
+        CODATA_delta_fH_uncertainty_kJ_mol: 2.0
+    - observation_id: JANAF1998_P2_formation_tabulation
+      type: gibbs_table
+      locator:
+        table: P-012
+        note: Chase (1998) NIST-JANAF table P-012 (P2,g); Cox et al. (1984) CODATA Key Values for Thermodynamics
+        record: JANAF1998_P2_formation_tabulation
+        source_path: https://janaf.nist.gov/tables/P-012.html
+      T_range_K:
+      - 298.15
+      - 1100.0
+      phase: gas
+      standard_state: 1 bar (0.1 MPa)
+      units: kJ/mol (ΔfG / formation tabulation as published)
+      values:
+        phase_branch: gas
+        valid_range_note: Above ~1200 K ΔfH=ΔfG=0 by elemental-reference definition
+        tabulated_delta_fG_kJ_mol:
+        - T_K: 298.15
+          delta_fG: 103.112
+        - T_K: 500.0
+          delta_fG: 77.48
+        - T_K: 800.0
+          delta_fG: 42.135
+        - T_K: 1000.0
+          delta_fG: 19.67
+        - T_K: 1100.0
+          delta_fG: 8.685
+        - T_K: 1200.0
+          delta_fG: 0.0
+          note: elemental reference
+    - observation_id: extreme_reduction_from_phosphate
+      type: gibbs_table
+      locator:
+        table: P-012
+        note: Chase (1998) NIST-JANAF table P-012 (P2,g); Cox et al. (1984) CODATA Key Values for Thermodynamics
+        record: extreme_reduction_from_phosphate
+        source_path: https://janaf.nist.gov/tables/P-012.html
+      T_range_K: null
+      phase: ideal_gas
+      standard_state: 1 bar (0.1 MPa)
+      units: kJ/mol (ΔfG / formation tabulation as published)
+      values:
+        gas_species: P2
+        reaction: P2O5(melt) = P2(g) + 2.5 O2(g)
+        pressure_form: p_P2/p0 = K * a_P2O5 * (p_O2/p0)^(-2.5)
+        fO2_exponent: -2.5
+        dominance_window: metal/phosphide buffers only; not recipe basalt
+    - observation_id: anchor_P2_deltafG
+      type: gibbs_table
+      locator:
+        note: JANAF P2(g) Chase 1998; gas-phase P4 ⇌ 2 P2 equilibrium data
+        record: JANAF-4th#P2_g
+      units: as published
+      values:
+        quantity: deltafG
+        T_range_K:
+        - 298
+        - 2500
+        phase: gas_P4_P2_equilibrium
+        standard_state: P2(g) 1 bar
+  P4:
+    observations:
+    - observation_id: janaf_P4_298_anchors
+      type: gibbs_table
+      locator:
+        table: P-013
+        record: JANAF P-013
+        note: Chase (1998) NIST-JANAF table P-013 (P4,g); Cox et al. (1984) CODATA
+        source_path: https://janaf.nist.gov/tables/P-013.html
+      phase: ideal_gas
+      standard_state: 1 bar (0.1 MPa)
+      units: kJ/mol (ΔfH, ΔfG); J/(mol·K) (S)
+      uncertainty:
+        CODATA_delta_fH_uncertainty_kJ_mol: 0.3
+      values:
+        table_id: P-013
+        standard_pressure: 1 bar (0.1 MPa)
+        delta_fH_298_kJ_mol: 58.907
+        delta_fG_298_kJ_mol: 24.416
+        CODATA_delta_fH_298_kJ_mol: 58.9
+        CODATA_delta_fH_uncertainty_kJ_mol: 0.3
+    - observation_id: JANAF1998_P4_formation_tabulation
+      type: gibbs_table
+      locator:
+        table: P-013
+        note: Chase (1998) NIST-JANAF table P-013 (P4,g); Cox et al. (1984) CODATA
+        record: JANAF1998_P4_formation_tabulation
+        source_path: https://janaf.nist.gov/tables/P-013.html
+      T_range_K:
+      - 298.15
+      - 2500.0
+      phase: gas
+      standard_state: 1 bar (0.1 MPa)
+      units: kJ/mol (ΔfG / formation tabulation as published)
+      values:
+        phase_branch: gas
+        tabulated_delta_fG_kJ_mol:
+        - T_K: 298.15
+          delta_fG: 24.416
+        - T_K: 500.0
+          delta_fG: 4.418
+        - T_K: 800.0
+          delta_fG: -20.791
+        - T_K: 1000.0
+          delta_fG: -35.907
+        - T_K: 1200.0
+          delta_fG: -45.742
+        - T_K: 1500.0
+          delta_fG: -1.956
+        - T_K: 1800.0
+          delta_fG: 41.372
+        - T_K: 2000.0
+          delta_fG: 70.045
+    - observation_id: extreme_reduction_from_phosphate_P4
+      type: gibbs_table
+      locator:
+        table: P-013
+        note: Chase (1998) NIST-JANAF table P-013 (P4,g); Cox et al. (1984) CODATA
+        record: extreme_reduction_from_phosphate_P4
+        source_path: https://janaf.nist.gov/tables/P-013.html
+      T_range_K: null
+      phase: ideal_gas
+      standard_state: 1 bar (0.1 MPa)
+      units: kJ/mol (ΔfG / formation tabulation as published)
+      values:
+        gas_species: P4
+        reaction: P2O5(melt) = 0.5 P4(g) + 2.5 O2(g)
+        pressure_form: 'p_P4/p0 = K * a_P2O5^2 * (p_O2/p0)^(-5)   # check stoich when implementing: 2
+          P2O5 = P4 + 5 O2'
+        reaction_balanced_alternate: 2 P2O5(melt) = P4(g) + 5 O2(g)
+        fO2_exponent: -5.0
+        note: Use the balanced 2 P2O5 form in code; monomeric shorthand is error-prone
+  Na:
+    observations:
+    - observation_id: Na_melting_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Marsh, K.N. (1987) Recommended Reference Materials for the Realization
+          of Physicochemical Properties, Blackwell Sci. Pub., Oxford'', ''webbook'': ''NIST Chemistry
+          WebBook SRD 69, Sodium (CAS 7440-23-5), phase change: Tfus=370.96 K; TRC u=0.01 K; recommended
+          fixed point for thermometry'', ''ur'
+        record: melting_point
+      units: K
+      values:
+        property_kind: melting_point
+        value_K: 370.96
+        phase_from: solid
+        phase_to: liquid
+        pressure_basis: near 1 atm (fixed-point recommendation)
+        standard_state: condensed
+        citation:
+          primary: Marsh, K.N. (1987) Recommended Reference Materials for the Realization of Physicochemical
+            Properties, Blackwell Sci. Pub., Oxford
+          webbook: 'NIST Chemistry WebBook SRD 69, Sodium (CAS 7440-23-5), phase change: Tfus=370.96 K;
+            TRC u=0.01 K; recommended fixed point for thermometry'
+          url: https://webbook.nist.gov/cgi/cbook.cgi?ID=C7440235&Units=SI&Mask=4
+        T_range_note: single-point fixed property; not a fit range
+        acquisition_status: REVIEWABLE_STATIC
+    - observation_id: Na_triple_point_temperature
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Honig, R.E. & Kramer, D.A. (1969) Vapor pressure data for the solid and
+          liquid elements, RCA Rev. 30, 285'', ''webbook'': ''NIST-WB SRD 69 Sodium: Ttriple=370.98 K;
+          TRC u=0.03 K'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7440235&Units=SI&Mask=4''}'
+        record: triple_point_temperature
+      units: K
+      values:
+        property_kind: triple_point_temperature
+        value_K: 370.98
+        phase_system: solid-liquid-vapor (near-atmospheric)
+        citation:
+          primary: Honig, R.E. & Kramer, D.A. (1969) Vapor pressure data for the solid and liquid elements,
+            RCA Rev. 30, 285
+          webbook: 'NIST-WB SRD 69 Sodium: Ttriple=370.98 K; TRC u=0.03 K'
+          url: https://webbook.nist.gov/cgi/cbook.cgi?ID=C7440235&Units=SI&Mask=4
+        acquisition_status: REVIEWABLE_STATIC
+    - observation_id: Na_normal_boiling_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Honig & Kramer (1969) RCA Rev. 30, 285'', ''webbook'': ''NIST-WB SRD 69
+          Sodium: Tboil=1156 K; TRC u=1 K'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7440235&Units=SI&Mask=4''}'
+        record: normal_boiling_point
+      units: K
+      values:
+        property_kind: normal_boiling_point
+        value_K: 1156.0
+        value_C: 882.85
+        phase_from: liquid
+        phase_to: gas
+        pressure_basis_Pa: 101325
+        citation:
+          primary: Honig & Kramer (1969) RCA Rev. 30, 285
+          webbook: 'NIST-WB SRD 69 Sodium: Tboil=1156 K; TRC u=1 K'
+          url: https://webbook.nist.gov/cgi/cbook.cgi?ID=C7440235&Units=SI&Mask=4
+        catalog_crosscheck: vapor_pressures boiling_point_C=883 → 1156.15 K (Δ=0.15 K vs NIST)
+        acquisition_status: REVIEWABLE_STATIC
+  Fe:
+    observations:
+    - observation_id: Fe_melting_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Chase, M.W. Jr. (1998) NIST-JANAF Thermochemical Tables, 4th ed.; Fe condensed
+          — liquid heat-capacity domain starts at 1809 K'', ''webbook'': ''NIST-WB Iron condensed Shomate:
+          liquid T range 1809–3133.345 K (Chase 1998)'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7439896&Mask=2''}'
+        record: melting_point
+      units: K
+      values:
+        property_kind: melting_point
+        value_K: 1809.0
+        phase_from: delta-Fe (bcc solid)
+        phase_to: liquid
+        citation:
+          primary: Chase, M.W. Jr. (1998) NIST-JANAF Thermochemical Tables, 4th ed.; Fe condensed — liquid
+            heat-capacity domain starts at 1809 K
+          webbook: 'NIST-WB Iron condensed Shomate: liquid T range 1809–3133.345 K (Chase 1998)'
+          url: https://webbook.nist.gov/cgi/cbook.cgi?ID=C7439896&Mask=2
+        alternate_literature_K: 1811.0
+        alternate_note: Many handbooks quote 1811 K (1538 C); JANAF/WebBook liquid domain edge is 1809
+          K — adopt 1809 K for thermo-segment consistency
+        acquisition_status: REVIEWABLE_STATIC
+    - observation_id: Fe_normal_boiling_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Chase (1998) NIST-JANAF Fe; boiling point from adopted thermo + ΔsubH (see
+          JANAF Fe text); liquid domain ends 3133.345 K on WebBook Shomate'', ''catalog_crosscheck'':
+          ''catalog boiling_point_C=2862 → 3135.15 K (within ~1 K of 3134 K handbook value)''}'
+        record: normal_boiling_point
+      units: K
+      values:
+        property_kind: normal_boiling_point
+        value_K: 3134.0
+        value_C: 2860.85
+        pressure_basis_Pa: 101325
+        citation:
+          primary: Chase (1998) NIST-JANAF Fe; boiling point from adopted thermo + ΔsubH (see JANAF Fe
+            text); liquid domain ends 3133.345 K on WebBook Shomate
+          catalog_crosscheck: catalog boiling_point_C=2862 → 3135.15 K (within ~1 K of 3134 K handbook
+            value)
+        acquisition_status: REVIEWABLE_STATIC
+  Si:
+    observations:
+    - observation_id: Si_melting_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Chase (1998) NIST-JANAF Si(cr,l) table Si-001: CRYSTAL LIQUID transition
+          at 1685.000 K'', ''url'': ''https://janaf.nist.gov/tables/Si-001.html''}'
+        record: melting_point
+      units: K
+      values:
+        property_kind: melting_point
+        value_K: 1685.0
+        phase_from: crystal
+        phase_to: liquid
+        citation:
+          primary: 'Chase (1998) NIST-JANAF Si(cr,l) table Si-001: CRYSTAL LIQUID transition at 1685.000
+            K'
+          url: https://janaf.nist.gov/tables/Si-001.html
+        catalog_crosscheck: vapor_pressures Si liquidus/activity windows use 1687 K in places — 2 K above
+          JANAF; prefer 1685 K for thermo identity
+        acquisition_status: REVIEWABLE_STATIC
+    - observation_id: Si_normal_boiling_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Chase (1998) NIST-JANAF Si-001: LIQUID IDEAL GAS 3504.616 K'', ''url'':
+          ''https://janaf.nist.gov/tables/Si-001.html''}'
+        record: normal_boiling_point
+      units: K
+      values:
+        property_kind: normal_boiling_point
+        value_K: 3504.616
+        phase_from: liquid
+        phase_to: ideal_gas
+        pressure_basis: JANAF 1 bar thermo (FUGACITY=1 at this T in table construction)
+        citation:
+          primary: 'Chase (1998) NIST-JANAF Si-001: LIQUID IDEAL GAS 3504.616 K'
+          url: https://janaf.nist.gov/tables/Si-001.html
+        catalog_crosscheck: catalog boiling_point_C=3265 → 3538.15 K is ~33 K above JANAF 3504.6 K — do
+          NOT silently average; record disagreement
+        disagreement:
+          catalog_Tb_K: 3538.15
+          janaf_Tb_K: 3504.616
+          delta_K: 33.5
+          treatment: recorded_not_averaged
+        acquisition_status: REVIEWABLE_STATIC_WITH_DISAGREEMENT
+  Ti:
+    observations:
+    - observation_id: Ti_solid_solid_transition
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Chase (1998) NIST-JANAF Ti-001: ALPHA BETA 1166.000 K'', ''url'': ''https://janaf.nist.gov/tables/Ti-001.html''}'
+        record: solid_solid_transition
+      units: K
+      values:
+        property_kind: solid_solid_transition
+        name: alpha_to_beta
+        value_K: 1166.0
+        citation:
+          primary: 'Chase (1998) NIST-JANAF Ti-001: ALPHA BETA 1166.000 K'
+          url: https://janaf.nist.gov/tables/Ti-001.html
+        acquisition_status: REVIEWABLE_STATIC
+    - observation_id: Ti_melting_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Chase (1998) NIST-JANAF Ti-001: BETA LIQUID 1939.000 K'', ''url'': ''https://janaf.nist.gov/tables/Ti-001.html''}'
+        record: melting_point
+      units: K
+      values:
+        property_kind: melting_point
+        value_K: 1939.0
+        phase_from: beta
+        phase_to: liquid
+        citation:
+          primary: 'Chase (1998) NIST-JANAF Ti-001: BETA LIQUID 1939.000 K'
+          url: https://janaf.nist.gov/tables/Ti-001.html
+        catalog_crosscheck: runtime Alcock fit range starts 1941 K (2 K above JANAF); prefer 1939 K for
+          JANAF identity, document 1941 as fit-domain edge
+        acquisition_status: REVIEWABLE_STATIC
+    - observation_id: Ti_normal_boiling_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Chase (1998) NIST-JANAF Ti-001: LIQUID IDEAL GAS 3630.956 K'', ''url'':
+          ''https://janaf.nist.gov/tables/Ti-001.html''}'
+        record: normal_boiling_point
+      units: K
+      values:
+        property_kind: normal_boiling_point
+        value_K: 3630.956
+        citation:
+          primary: 'Chase (1998) NIST-JANAF Ti-001: LIQUID IDEAL GAS 3630.956 K'
+          url: https://janaf.nist.gov/tables/Ti-001.html
+        catalog_crosscheck: catalog 3287 C = 3560.15 K (Alcock anchor) is 71 K below JANAF 3631 K — recorded
+          disagreement; Antoine was forced through 3560.15 K NBP
+        disagreement:
+          catalog_Tb_K: 3560.15
+          janaf_Tb_K: 3630.956
+          delta_K: -70.8
+          treatment: recorded_not_averaged
+        acquisition_status: REVIEWABLE_STATIC_WITH_DISAGREEMENT
+    - observation_id: anchor_Ti_pure_Psat
+      type: psat_series
+      locator:
+        note: 'JANAF Ti(g) Chase 1998 (REF-020) free-energy reconstruction of pure Ti Psat; and/or independent
+          effusion: Edwards, J.W., Johnston, H.L. & Ditmars, W.E. historical Ti vapor-pressure work as
+          cited by Alcock (use primary pages, not Alcock coefficients).'
+        record: JANAF-4th#Ti_g
+      units: as published
+      values:
+        quantity: pure_Psat
+        T_range_K:
+        - 1941
+        - 2500
+        phase: liquid_Ti_to_Ti_g
+        standard_state: pure liquid Ti
+        independence_note: REF-032 is the fit source — cannot self-validate
+  Cr:
+    observations:
+    - observation_id: Cr_melting_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Chase (1998) NIST-JANAF Cr-001: CRYSTAL LIQUID 2130.000 K'', ''url'': ''https://janaf.nist.gov/tables/Cr-001.html''}'
+        record: melting_point
+      units: K
+      values:
+        property_kind: melting_point
+        value_K: 2130.0
+        phase_from: crystal
+        phase_to: liquid
+        citation:
+          primary: 'Chase (1998) NIST-JANAF Cr-001: CRYSTAL LIQUID 2130.000 K'
+          url: https://janaf.nist.gov/tables/Cr-001.html
+        catalog_crosscheck: some Ellingham notes use 2180 K — 50 K above JANAF; prefer 2130 K
+        acquisition_status: REVIEWABLE_STATIC
+    - observation_id: Cr_normal_boiling_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Chase (1998) NIST-JANAF Cr-001: LIQUID IDEAL GAS 2952.078 K'', ''url'':
+          ''https://janaf.nist.gov/tables/Cr-001.html''}'
+        record: normal_boiling_point
+      units: K
+      values:
+        property_kind: normal_boiling_point
+        value_K: 2952.078
+        citation:
+          primary: 'Chase (1998) NIST-JANAF Cr-001: LIQUID IDEAL GAS 2952.078 K'
+          url: https://janaf.nist.gov/tables/Cr-001.html
+        catalog_crosscheck: catalog 2671 C = 2944.15 K within ~8 K of JANAF 2952 K
+        acquisition_status: REVIEWABLE_STATIC
+  Mn:
+    observations:
+    - observation_id: Mn_melting_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Chase (1998) NIST-JANAF Mn-001: DELTA LIQUID 1519.000 K'', ''url'': ''https://janaf.nist.gov/tables/Mn-001.html''}'
+        record: melting_point
+      units: K
+      values:
+        property_kind: melting_point
+        value_K: 1519.0
+        phase_from: delta
+        phase_to: liquid
+        citation:
+          primary: 'Chase (1998) NIST-JANAF Mn-001: DELTA LIQUID 1519.000 K'
+          url: https://janaf.nist.gov/tables/Mn-001.html
+        runtime_crosscheck: vapor_pressures Mn solid/liquid Antoine join at 1519 K; tests/test_physics_ground_truth.py
+          asserts continuity
+        acquisition_status: REVIEWABLE_STATIC
+    - observation_id: Mn_normal_boiling_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Chase (1998) NIST-JANAF Mn-001: LIQUID IDEAL GAS 2334.526 K'', ''url'':
+          ''https://janaf.nist.gov/tables/Mn-001.html''}'
+        record: normal_boiling_point
+      units: K
+      values:
+        property_kind: normal_boiling_point
+        value_K: 2334.526
+        citation:
+          primary: 'Chase (1998) NIST-JANAF Mn-001: LIQUID IDEAL GAS 2334.526 K'
+          url: https://janaf.nist.gov/tables/Mn-001.html
+        catalog_crosscheck: catalog 2061 C = 2334.15 K (match within 0.4 K)
+        acquisition_status: REVIEWABLE_STATIC
+  NaCl:
+    observations:
+    - observation_id: NaCl_normal_boiling_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Stull, D.R. (1947) Vapor Pressure of Pure Substances — Organic Compounds,
+          Ind. Eng. Chem. 39, 517–540 (NaCl entry as compiled on NIST-WB Antoine page for CAS 7647-14-5)'',
+          ''secondary'': ''CRC Handbook normal boiling point 1465 C (as cited in vapor_pressures.yaml
+          pure_component_antoine sour'
+        record: normal_boiling_point
+      units: K
+      values:
+        property_kind: normal_boiling_point
+        value_C: 1465
+        value_K: 1738.15
+        pressure_basis_Pa: 101325
+        citation:
+          primary: Stull, D.R. (1947) Vapor Pressure of Pure Substances — Organic Compounds, Ind. Eng.
+            Chem. 39, 517–540 (NaCl entry as compiled on NIST-WB Antoine page for CAS 7647-14-5)
+          secondary: CRC Handbook normal boiling point 1465 C (as cited in vapor_pressures.yaml pure_component_antoine
+            source line for NaCl)
+          webbook_antoine: NIST-WB SRD 69 NaCl Antoine (Stull 1947)
+          url: https://webbook.nist.gov/cgi/cbook.cgi?ID=C7647145&Units=SI&Mask=4
+        acquisition_status: REVIEWABLE_STATIC
+        note: Existing catalog BP retained; phase page itself has no Tfus/Tboil TRC rows
+    - observation_id: NaCl_melting_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Chase (1998) NIST-JANAF NaCl(cr,l) — melt commonly 1073.8 K in JANAF/CRC
+          alkali-halide assessments'', ''note'': ''WebBook phase page empty; value is standard JANAF/CRC
+          halide melt — CONFIRM against open JANAF NaCl table text before promote (table Cl-067 fetched;
+          explicit CRYSTAL LIQUID labe'
+        record: melting_point
+      units: K
+      values:
+        property_kind: melting_point
+        value_K: 1073.8
+        value_C: 800.65
+        citation:
+          primary: Chase (1998) NIST-JANAF NaCl(cr,l) — melt commonly 1073.8 K in JANAF/CRC alkali-halide
+            assessments
+          note: WebBook phase page empty; value is standard JANAF/CRC halide melt — CONFIRM against open
+            JANAF NaCl table text before promote (table Cl-067 fetched; explicit CRYSTAL LIQUID label
+            not text-scraped cleanly this pass)
+        acquisition_status: UNCERTAIN_NEEDS_JANAF_TEXT_CONFIRM
+  KCl:
+    observations:
+    - observation_id: KCl_normal_boiling_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Stull (1947) via NIST-WB KCl Antoine (CAS 7447-40-7); CRC bp 1420 C as
+          in vapor_pressures.yaml'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7447407&Units=SI&Mask=4''}'
+        record: normal_boiling_point
+      units: K
+      values:
+        property_kind: normal_boiling_point
+        value_C: 1420
+        value_K: 1693.15
+        pressure_basis_Pa: 101325
+        citation:
+          primary: Stull (1947) via NIST-WB KCl Antoine (CAS 7447-40-7); CRC bp 1420 C as in vapor_pressures.yaml
+          url: https://webbook.nist.gov/cgi/cbook.cgi?ID=C7447407&Units=SI&Mask=4
+        acquisition_status: REVIEWABLE_STATIC
+    - observation_id: KCl_melting_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''CRC / JANAF KCl(cr,l) conventional melt ~1045 K''}'
+        record: melting_point
+      units: K
+      values:
+        property_kind: melting_point
+        value_K: 1045.0
+        citation:
+          primary: CRC / JANAF KCl(cr,l) conventional melt ~1045 K
+        acquisition_status: UNCERTAIN_NEEDS_JANAF_TEXT_CONFIRM
+  NaF:
+    observations:
+    - observation_id: NaF_melting_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Chase (1998) NIST-JANAF NaF(cr,l) table F-033: CRYSTAL LIQUID at 1269.000
+          K (row immediately before liquid domain)'', ''url'': ''https://janaf.nist.gov/tables/F-033.html''}'
+        record: melting_point
+      units: K
+      values:
+        property_kind: melting_point
+        value_K: 1269.0
+        phase_from: crystal
+        phase_to: liquid
+        citation:
+          primary: 'Chase (1998) NIST-JANAF NaF(cr,l) table F-033: CRYSTAL LIQUID at 1269.000 K (row immediately
+            before liquid domain)'
+          url: https://janaf.nist.gov/tables/F-033.html
+        acquisition_status: REVIEWABLE_STATIC
+    - observation_id: NaF_normal_boiling_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''CRC normal boiling point 1704 C as retained in vapor_pressures.yaml NaF
+          notes (interval-only identity row)''}'
+        record: normal_boiling_point
+      units: K
+      values:
+        property_kind: normal_boiling_point
+        value_C: 1704
+        value_K: 1977.15
+        pressure_basis_Pa: 101325
+        citation:
+          primary: CRC normal boiling point 1704 C as retained in vapor_pressures.yaml NaF notes (interval-only
+            identity row)
+        acquisition_status: REVIEWABLE_STATIC
+        note: No certified Antoine on NaF live row; BP is identity only
+    - observation_id: anchor_NaF_pure_Psat
+      type: psat_series
+      locator:
+        note: JANAF NaF(l/g); molten NaF vapor-pressure / KEMS (not Stull-only)
+        record: JANAF-4th#NaF
+      units: as published
+      values:
+        quantity: pure_Psat
+        T_range_K:
+        - 1200
+        - 2000
+        phase: liquid_NaF_to_NaF_g
+        standard_state: pure NaF
+  MgCl2:
+    observations:
+    - observation_id: MgCl2_melting_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Chase (1998) NIST-JANAF MgCl2 table Cl-083: CRYSTAL LIQUID 950.000 K'',
+          ''url'': ''https://janaf.nist.gov/tables/Cl-083.html''}'
+        record: melting_point
+      units: K
+      values:
+        property_kind: melting_point
+        value_K: 950.0
+        citation:
+          primary: 'Chase (1998) NIST-JANAF MgCl2 table Cl-083: CRYSTAL LIQUID 950.000 K'
+          url: https://janaf.nist.gov/tables/Cl-083.html
+        acquisition_status: REVIEWABLE_STATIC
+  SO3:
+    observations:
+    - observation_id: anchor_SO3_pure_Psat
+      type: psat_series
+      locator:
+        note: 'Schrage, J. (1991), "Vapor-liquid equilibrium of the system H2SO4–SO3. Part I–II", Fluid
+          Phase Equilibria (and earlier: Miles et al. oleum Psat compilations). Prefer: Liler, M. (1971)
+          Reaction Mechanisms in Sulphuric Acid chapter data, or primary Abercromby alternative — Giauque-class
+          SO3 vaporizati'
+        record: JANAF-4th#SO3_l_g_deltafG_crosscheck
+      units: as published
+      values: &id002
+        quantity: pure_Psat
+        preferred_primary:
+          citation: Brandner, J.D. et al. historical SO3 liquid vapor-pressure measurements as cited by
+            NIST WebBook alternative sources for CAS 7446-11-9; recover page-level non-Abercromby primary
+            before certified flip.
+          status: PARTIAL_NEED_PAGE
+        T_range_K:
+        - 333
+        - 483
+        phase: liquid_SO3_to_SO3_g
+        standard_state: pure SO3; log10 P as WebBook
+        independence_note: Abercromby & Tiley is the fit source — cannot self-validate. JANAF ΔfG reconstruction
+          is model-independent of the Antoine coefficients but shares literature pool; hunt a second lab
+          VP series before full validated flip.
+  FeO_gas:
+    observations:
+    - observation_id: anchor_FeO_gas_melt_partial_or_deltafG
+      type: gibbs_table
+      locator:
+        note: '(A) Sossi, P.A. & Fegley, B. (2018), Rev. Mineral. Geochem. 84:393–459, DOI 10.2138/rmg.2018.84.11,
+          Table 1 FeO(g) volatility entry (review — use only to locate primaries). (B) Primary preferred:
+          Kazenas, E.K. & Tsvetkov, Yu.V., Thermodynamics of Evaporation of Oxides (book; Russian academy
+          series) '
+        record: JANAF-4th#FeO_g
+      units: as published
+      values:
+        quantity: melt_partial_or_deltafG
+        T_range_K:
+        - 1500
+        - 2200
+        phase: oxide_condensed_or_melt_to_FeO_g
+        standard_state: FeO(g) ideal gas, 1 bar; condensed FeO or melt oxide component basis must be declared
+          at flip (solid vs liquid vs melt activity)
+        independence_note: Catalog row has no Antoine fit to avoid; do not use VapoRock-only
+  SiO2_gas:
+    observations:
+    - observation_id: anchor_SiO2_gas_melt_partial
+      type: gibbs_table
+      locator:
+        note: 'Dominant vapor over SiO2 is SiO(g)+O2, not molecular SiO2(g). For SiO2(g) itself: JANAF
+          SiO2(g) Chase 1998 if needed for minority channel. Plant-relevant independent evidence is SiO(g)
+          melt partials — see SiO P1 row (Costa & Jacobson 2015; Schaefer & Fegley 2004 Table 9).'
+        record: JANAF-4th#SiO2_g_minority
+      units: as published
+      values:
+        quantity: melt_partial
+        T_range_K:
+        - 1700
+        - 2000
+        phase: silicate_to_SiO_g_not_SiO2_g
+        standard_state: prefer SiO(g) 1 bar + stated a_SiO2 / fO2
+        independence_note: SiO2_gas catalog id must not be validated as if pure SiO2(g) Psat were plant-dominant
+  TiO2_gas:
+    observations:
+    - observation_id: anchor_TiO2_gas_deltafG
+      type: gibbs_table
+      locator:
+        note: JANAF TiO(g)/TiO2(g) Chase 1998 (REF-020); LH87 Ti–O gas if tabulated; melt-context Ti volatility
+          reviews in Sossi & Fegley 2018 Table 1.
+        record: JANAF-4th#TiO_g
+      units: as published
+      values:
+        quantity: deltafG
+        T_range_K:
+        - 1800
+        - 2500
+        phase: condensed_TiO2_to_TiO_TiO2_g
+        standard_state: TiO2(g)/TiO(g) 1 bar; declare dominant channel
+        independence_note: Inventory-only
+  Cr2O3_gas:
+    observations:
+    - observation_id: anchor_Cr2O3_gas_melt_partial
+      type: gibbs_table
+      locator:
+        note: 'Plant Cr gas is often CrO2(g)/CrO3(g) under oxidizing, Cr(g) under reducing. Independent:
+          Ebbinghaus, B.B. (1993) and later Cr–O gas KEMS reviews; JANAF CrO/CrO2/CrO3(g) Chase 1998.
+          Live numeric CrO2 family fit is JANAF minimax — for CrO2 see P1 independence via measured KEMS,
+          not JANAF self-check.'
+        record: JANAF-4th#CrO2_g
+      units: as published
+      values:
+        quantity: melt_partial
+        T_range_K:
+        - 1500
+        - 2200
+        phase: Cr2O3_condensed_to_Cr_O_gas
+        standard_state: declare CrOx(g) formula + fO2
+        independence_note: Catalog id is not the live CrO2 Antoine/standard-term row
+  MnO_gas:
+    observations:
+    - observation_id: anchor_MnO_gas_deltafG
+      type: gibbs_table
+      locator:
+        note: JANAF MnO(g) Chase 1998 (REF-020); Sossi & Fegley 2018 Table 1 MnO(g) entry as literature
+          pointer only.
+        record: JANAF-4th#MnO_g
+      units: as published
+      values:
+        quantity: deltafG
+        T_range_K:
+        - 1500
+        - 2200
+        phase: condensed_MnO_to_MnO_g
+        standard_state: MnO(g) 1 bar
+        independence_note: Inventory-only
+  NiO_gas:
+    observations:
+    - observation_id: anchor_NiO_gas_deltafG
+      type: gibbs_table
+      locator:
+        note: JANAF NiO(g) Chase 1998 (REF-020); oxide vaporization reviews (Kazenas & Tsvetkov) for Ni–O
+          gas.
+        record: JANAF-4th#NiO_g
+      units: as published
+      values:
+        quantity: deltafG
+        T_range_K:
+        - 1500
+        - 2200
+        phase: condensed_NiO_to_NiO_g
+        standard_state: NiO(g) 1 bar
+        independence_note: Inventory-only
+  O:
+    observations:
+    - observation_id: anchor_O_deltafG
+      type: gibbs_table
+      locator:
+        note: 'NIST-JANAF O(g) and O2(g) Chase 1998 (REF-020) — equilibrium constant for ½ O2 ⇌ O is the
+          measurable free-energy anchor (spectroscopic + thermal). Not a pure-component Psat. Independence:
+          acquisition row did not fit an Antoine to JANAF; it declares pO2 exponent 0.5 from stoichiometry.'
+        record: JANAF-4th#O_g
+      units: as published
+      values:
+        quantity: deltafG
+        T_range_K:
+        - 1500
+        - 2500
+        phase: gas_phase_equilibrium
+        standard_state: O(g), O2(g) ideal gas 1 bar
+        independence_note: Free-energy equilibrium is the correct quantity class
+  K2Cl2:
+    observations:
+    - observation_id: anchor_K2Cl2_dimer_partial
+      type: gibbs_table
+      locator:
+        note: Analogous KCl dimer KEMS literature + JANAF K2Cl2(g)
+        record: JANAF-4th#K2Cl2_g
+      units: as published
+      values:
+        quantity: dimer_partial
+        T_range_K:
+        - 1100
+        - 1500
+        phase: liquid_KCl_to_K2Cl2_g
+        standard_state: dimer partial
+  S2:
+    observations:
+    - observation_id: anchor_S2_pure_Psat_or_speciation
+      type: psat_series
+      locator:
+        note: JANAF S2(g); Rau / sulfur allotrope vapor-pressure ladder (analogous to Se); Stull total-S
+          if not already the fit
+        record: JANAF-4th#S2_g
+      units: as published
+      values:
+        quantity: pure_Psat_or_speciation
+        T_range_K:
+        - 300
+        - 2000
+        phase: condensed_S_to_S2_g
+        standard_state: S2(g) vs total sulfur vapor honesty
+  BaO:
+    observations:
+    - observation_id: anchor_BaO_deltafG
+      type: gibbs_table
+      locator:
+        note: 'NIST-JANAF BaO(g) Chase 1998 (REF-020) — independent evaluation path from LH87 JPCRD review
+          (shared literature pool caveat: still the best available second table; true lab independence
+          would be raw KEMS of Farber/other).'
+        record: JANAF-4th#BaO_g
+      units: as published
+      values:
+        quantity: deltafG
+        T_range_K:
+        - 1500
+        - 2500
+        phase: condensed_BaO_to_BaO_g
+        standard_state: BaO(g) 1 bar; LH87/JANAF standard states
+        independence_note: LH87 is acquisition source
+fidelity_samples:
+- path: species.PO.observations[JANAF1998_PO_formation_tabulation].values.tabulated_delta_fG_kJ_mol[0]
+  value: *id001
+  note: JANAF PO ΔfG grid point 0 retained under species PO (not list-index key)
+  locator:
+    table: O-004
+    record: JANAF1998_PO_formation_tabulation
+- path: species.SO3.observations[anchor_SO3_pure_Psat].values
+  value: *id002
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: 'Schrage, J. (1991), "Vapor-liquid equilibrium of the system H2SO4–SO3. Part I–II", Fluid Phase
+      Equilibria (and earlier: Miles et al. oleum Psat compilations). Prefer: Liler, M. (1971) Reaction
+      Mechanisms in Sulphuric Acid chapter data, or primary Abercromby alternative — Giauque-class SO3
+      vaporizati'
+    record: JANAF-4th#SO3_l_g_deltafG_crosscheck

@@ -1,0 +1,82 @@
+schema_version: literature_extract.v1
+source_id: datz-and-smith-1961
+source:
+  citation: Datz, S. & Smith, W. T. Jr. (and related Datz 1961 tabulations) — Na2Cl2 dissociation equilibrium
+    constants (Table II lineage) as transcribed in vp-acquire-5 chloride-dimers DRAFT
+  year: 1961
+extraction:
+  method: manual transcription from vp-acquire-5 chloride-dimers DRAFT
+  date: '2026-07-30'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-07-30-vp-acquire-5/chloride-dimers-and-gates.md
+review_status: draft
+species:
+  Na2Cl2:
+    observations:
+    - observation_id: Datz1961_TableII_Kd
+      type: gibbs_table
+      locator:
+        table: II
+        note: Datz 1961 correlation Datz1961_TableII_Kd
+        record: Datz1961_TableII_Kd
+      phase: gas
+      standard_state: Kd in mol/L as published
+      units: mol/L (Kd); log10 form as published
+      values:
+        reaction: Na2Cl2(g) = 2 NaCl(g)
+        form: "log10(Kd / (mol/L)) = -4.378\n  - (48000/(2.302585*1.987204))*(1/T - 1/1300)\nKp_atm =\
+          \ Kd * 0.08205746 * T\n"
+        acquisition_status: REVIEWABLE_PRIMARY_K
+        original_Kd_unit: mol_L
+        original_Kp_unit: atm
+        temperature_unit: K
+        valid_range_K:
+        - 1277.0
+        - 1406.0
+        condensed_phase: none
+        standard_state: Kd concentration; Kp with P°=1 atm for ΔS
+        doi: 10.1063/1.1700983
+        locator: Table II p.561; Table I p.560; Figs. 2-4
+    - observation_id: JANAF1998_WebBook_Shomate
+      type: gibbs_table
+      locator:
+        note: Kp(1300 K) ~8× larger than Datz; do not average
+        record: JANAF1998_WebBook_Shomate
+        section: recorded_disagreement
+      phase: gas
+      standard_state: Kp / Shomate (JANAF/WebBook competing evaluation)
+      units: dimensionless Kp ratio note (not averaged with Datz)
+      uncertainty:
+        note: Kp(1300 K) ~8× larger than Datz; do not average
+      values:
+        competitor_id: JANAF1998_WebBook_Shomate
+        note: Kp(1300 K) ~8× larger than Datz; do not average
+        doi_monograph: J. Phys. Chem. Ref. Data Monograph 9 (1998)
+        webbook_ids:
+        - C7647145
+        - C12258989
+        semantics: competing_observation_do_not_average
+  NaCl:
+    observations:
+    - observation_id: Datz1961_TableII_Kd_nacl_side
+      type: gibbs_table
+      locator:
+        table: II
+        note: NaCl monomer side of Datz1961_TableII_Kd
+        record: Datz1961_TableII_Kd
+      phase: gas
+      units: mol/L (Kd); log10 form as published
+      values:
+        reaction: Na2Cl2(g) = 2 NaCl(g)
+        role: monomer_product
+        form: "log10(Kd / (mol/L)) = -4.378\n  - (48000/(2.302585*1.987204))*(1/T - 1/1300)\nKp_atm =\
+          \ Kd * 0.08205746 * T\n"
+        semantics: pointer_to_dimer_equilibrium
+fidelity_samples:
+- path: species.Na2Cl2.observations[Datz1961_TableII_Kd].values.form
+  value: "log10(Kd / (mol/L)) = -4.378\n  - (48000/(2.302585*1.987204))*(1/T - 1/1300)\nKp_atm = Kd *\
+    \ 0.08205746 * T\n"
+  note: Datz Table II Kd form retained; recorded_disagreement also migrated
+  locator:
+    table: II
+    record: Datz1961_TableII_Kd

@@ -1,0 +1,47 @@
+schema_version: literature_extract.v1
+source_id: pending-as2o3-second-primary
+source:
+  citation: Second arsenolite vapor-pressure primary distinct from Behrens & Rosenblatt 1972 (e.g. earlier
+    static-method series cited by BR72 itself — use BR72's cited experimental sources, not BR72 coefficients).
+    JANAF As4O6 if tabulated.
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  As4O6:
+    observations:
+    - observation_id: anchor_As4O6_pure_Psat
+      type: psat_series
+      locator:
+        note: Second arsenolite vapor-pressure primary distinct from Behrens & Rosenblatt 1972 (e.g. earlier
+          static-method series cited by BR72 itself — use BR72's cited experimental sources, not BR72
+          coefficients). JANAF As4O6 if tabulated.
+        record: PENDING#As2O3_second_primary
+      units: as published
+      values:
+        quantity: pure_Psat
+        T_range_K:
+        - 369
+        - 730
+        phase: solid_As2O3_arsenolite_to_As4O6_g
+        standard_state: As4O6(g); condensed arsenolite
+        independence_note: BR72/NIST is the acquisition citation
+fidelity_samples:
+- path: species.As4O6.observations[anchor_As4O6_pure_Psat].values
+  value:
+    quantity: pure_Psat
+    T_range_K:
+    - 369
+    - 730
+    phase: solid_As2O3_arsenolite_to_As4O6_g
+    standard_state: As4O6(g); condensed arsenolite
+    independence_note: BR72/NIST is the acquisition citation
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: Second arsenolite vapor-pressure primary distinct from Behrens & Rosenblatt 1972 (e.g. earlier
+      static-method series cited by BR72 itself — use BR72's cited experimental sources, not BR72 coefficients).
+      JANAF As4O6 if tabulated.
+    record: PENDING#As2O3_second_primary

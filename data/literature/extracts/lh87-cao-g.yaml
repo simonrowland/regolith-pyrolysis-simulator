@@ -1,0 +1,44 @@
+schema_version: literature_extract.v1
+source_id: lh87-cao-g
+source:
+  citation: Lamoreaux, Hildenbrand & Brewer (1987) J. Phys. Chem. Ref. Data 16:419–443, DOI 10.1063/1.555799,
+    Table 3 CaO(g); + JANAF CaO(g) Chase 1998 (REF-020).
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  CaO_gas:
+    observations:
+    - observation_id: anchor_CaO_gas_deltafG
+      type: gibbs_table
+      locator:
+        note: Lamoreaux, Hildenbrand & Brewer (1987) J. Phys. Chem. Ref. Data 16:419–443, DOI 10.1063/1.555799,
+          Table 3 CaO(g); + JANAF CaO(g) Chase 1998 (REF-020).
+        record: LH87#CaO_g
+      units: as published
+      values:
+        quantity: deltafG
+        T_range_K:
+        - 1600
+        - 2500
+        phase: condensed_CaO_to_CaO_g
+        standard_state: CaO(g) 1 bar; pure condensed CaO
+        independence_note: No rail Antoine fit source to avoid
+fidelity_samples:
+- path: species.CaO_gas.observations[anchor_CaO_gas_deltafG].values
+  value:
+    quantity: deltafG
+    T_range_K:
+    - 1600
+    - 2500
+    phase: condensed_CaO_to_CaO_g
+    standard_state: CaO(g) 1 bar; pure condensed CaO
+    independence_note: No rail Antoine fit source to avoid
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: Lamoreaux, Hildenbrand & Brewer (1987) J. Phys. Chem. Ref. Data 16:419–443, DOI 10.1063/1.555799,
+      Table 3 CaO(g); + JANAF CaO(g) Chase 1998 (REF-020).
+    record: LH87#CaO_g

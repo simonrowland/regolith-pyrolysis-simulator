@@ -1,0 +1,52 @@
+schema_version: literature_extract.v1
+source_id: datz-smith-taylor-1961-nacl-vapor
+source:
+  citation: 'Zimmermann, K. / later KEMS salt reviews; preferred primary: Barton, J.L. & Bloom, H. (1956–),
+    molten alkali-halide vapor pressures (transpirations), and Datz, S., Smith, W.T. & Taylor, E.H. (1961),
+    "The Molecular Composition of Sodium Chloride Vapor", J. Chem. Phys. 34:558–564, DOI 10.1063/1.1700984
+    — monomer/dimer partials over liquid NaCl (independent of Stull Antoine). Thermochemical: NIST-JANAF
+    NaCl(l)/NaCl(g)/Na2Cl2(g) Chase 1998 (REF-020).'
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  NaCl:
+    observations:
+    - observation_id: anchor_NaCl_pure_Psat
+      type: psat_series
+      locator:
+        note: 'Zimmermann, K. / later KEMS salt reviews; preferred primary: Barton, J.L. & Bloom, H. (1956–),
+          molten alkali-halide vapor pressures (transpirations), and Datz, S., Smith, W.T. & Taylor, E.H.
+          (1961), "The Molecular Composition of Sodium Chloride Vapor", J. Chem. Phys. 34:558–564, DOI
+          10.1063/1.170098'
+        record: Datz-Smith-Taylor-1961#NaCl_vapor
+      units: as published
+      values:
+        quantity: pure_Psat
+        T_range_K:
+        - 1100
+        - 1500
+        phase: liquid_NaCl_to_NaCl_g_plus_dimer
+        standard_state: pure liquid NaCl; report monomer partial separately from total pressure (Na2Cl2
+          dimer must not be collapsed — see Na2Cl2 family)
+        independence_note: Stull 1947 is fit source; Datz 1961 / JANAF dimer-aware is independent
+fidelity_samples:
+- path: species.NaCl.observations[anchor_NaCl_pure_Psat].values
+  value:
+    quantity: pure_Psat
+    T_range_K:
+    - 1100
+    - 1500
+    phase: liquid_NaCl_to_NaCl_g_plus_dimer
+    standard_state: pure liquid NaCl; report monomer partial separately from total pressure (Na2Cl2 dimer
+      must not be collapsed — see Na2Cl2 family)
+    independence_note: Stull 1947 is fit source; Datz 1961 / JANAF dimer-aware is independent
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: 'Zimmermann, K. / later KEMS salt reviews; preferred primary: Barton, J.L. & Bloom, H. (1956–),
+      molten alkali-halide vapor pressures (transpirations), and Datz, S., Smith, W.T. & Taylor, E.H.
+      (1961), "The Molecular Composition of Sodium Chloride Vapor", J. Chem. Phys. 34:558–564, DOI 10.1063/1.170098'
+    record: Datz-Smith-Taylor-1961#NaCl_vapor

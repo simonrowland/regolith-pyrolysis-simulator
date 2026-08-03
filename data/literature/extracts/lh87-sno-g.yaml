@@ -1,0 +1,39 @@
+schema_version: literature_extract.v1
+source_id: lh87-sno-g
+source:
+  citation: LH87 SnO(g); JANAF SnO(g)
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  SnO:
+    observations:
+    - observation_id: anchor_SnO_pure_Psat
+      type: psat_series
+      locator:
+        note: LH87 SnO(g); JANAF SnO(g)
+        record: LH87#SnO_g
+      units: as published
+      values:
+        quantity: pure_Psat
+        T_range_K:
+        - 1000
+        - 2000
+        phase: condensed_SnO_to_SnO_g
+        standard_state: SnO(g) 1 bar
+fidelity_samples:
+- path: species.SnO.observations[anchor_SnO_pure_Psat].values
+  value:
+    quantity: pure_Psat
+    T_range_K:
+    - 1000
+    - 2000
+    phase: condensed_SnO_to_SnO_g
+    standard_state: SnO(g) 1 bar
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: LH87 SnO(g); JANAF SnO(g)
+    record: LH87#SnO_g

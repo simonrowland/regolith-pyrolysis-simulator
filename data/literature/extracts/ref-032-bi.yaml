@@ -1,0 +1,39 @@
+schema_version: literature_extract.v1
+source_id: ref-032-bi
+source:
+  citation: Alcock et al. (1984) REF-032 Bi; JANAF Bi(g)
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  Bi:
+    observations:
+    - observation_id: anchor_Bi_pure_Psat
+      type: psat_series
+      locator:
+        note: Alcock et al. (1984) REF-032 Bi; JANAF Bi(g)
+        record: REF-032#Bi
+      units: as published
+      values:
+        quantity: pure_Psat
+        T_range_K:
+        - 1073
+        - 1323
+        phase: liquid_Bi_to_Bi_g
+        standard_state: pure Bi
+fidelity_samples:
+- path: species.Bi.observations[anchor_Bi_pure_Psat].values
+  value:
+    quantity: pure_Psat
+    T_range_K:
+    - 1073
+    - 1323
+    phase: liquid_Bi_to_Bi_g
+    standard_state: pure Bi
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: Alcock et al. (1984) REF-032 Bi; JANAF Bi(g)
+    record: REF-032#Bi

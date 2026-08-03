@@ -1,0 +1,39 @@
+schema_version: literature_extract.v1
+source_id: pending-teo2-vp
+source:
+  citation: Primary TeO2 vapor-pressure / effusion papers (recover pages)
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  TeO2:
+    observations:
+    - observation_id: anchor_TeO2_pure_Psat
+      type: psat_series
+      locator:
+        note: Primary TeO2 vapor-pressure / effusion papers (recover pages)
+        record: PENDING#TeO2_VP
+      units: as published
+      values:
+        quantity: pure_Psat
+        T_range_K:
+        - 884
+        - 987
+        phase: condensed_TeO2_to_TeO2_g
+        standard_state: TeO2(g)
+fidelity_samples:
+- path: species.TeO2.observations[anchor_TeO2_pure_Psat].values
+  value:
+    quantity: pure_Psat
+    T_range_K:
+    - 884
+    - 987
+    phase: condensed_TeO2_to_TeO2_g
+    standard_state: TeO2(g)
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: Primary TeO2 vapor-pressure / effusion papers (recover pages)
+    record: PENDING#TeO2_VP

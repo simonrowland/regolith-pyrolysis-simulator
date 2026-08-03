@@ -1,0 +1,53 @@
+schema_version: literature_extract.v1
+source_id: ref-032-fe-liquid-equation
+source:
+  citation: 'Alcock, C.B., Itkin, V.P. & Horrigan, M.K. (1984), "Vapour Pressure Equations for the Metallic
+    Elements: 298–2500 K", Canadian Metallurgical Quarterly 23(3):309–313, DOI 10.1179/cmq.1984.23.3.309
+    (project REF-032). Fe solid/liquid equations (log10 P form as tabulated).'
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  Fe:
+    observations:
+    - observation_id: anchor_Fe_pure_Psat
+      type: psat_series
+      locator:
+        note: 'Alcock, C.B., Itkin, V.P. & Horrigan, M.K. (1984), "Vapour Pressure Equations for the Metallic
+          Elements: 298–2500 K", Canadian Metallurgical Quarterly 23(3):309–313, DOI 10.1179/cmq.1984.23.3.309
+          (project REF-032). Fe solid/liquid equations (log10 P form as tabulated).'
+        record: REF-032#Fe_liquid_equation
+      units: as published
+      values:
+        quantity: pure_Psat
+        T_range_K:
+        - 298
+        - 2500
+        phase: liquid_metal_to_Fe_g
+        standard_state: pure Fe metal in equilibrium with Fe(g) monomer; pressure in source atm, convert
+          to Pa for rail; 1 bar gas standard when comparing to JANAF Fe(g)
+        independence_note: Fit source is CRC/NIST Tb+dH_vap construction, not Alcock evaluated equations.
+          Do NOT use VapoRock Fe(g) grid residual as the independent anchor (same JANAF gas).
+        locator: Can. Metall. Q. 23 (1984) 309; REF-032
+fidelity_samples:
+- path: species.Fe.observations[anchor_Fe_pure_Psat].values
+  value:
+    quantity: pure_Psat
+    T_range_K:
+    - 298
+    - 2500
+    phase: liquid_metal_to_Fe_g
+    standard_state: pure Fe metal in equilibrium with Fe(g) monomer; pressure in source atm, convert to
+      Pa for rail; 1 bar gas standard when comparing to JANAF Fe(g)
+    independence_note: Fit source is CRC/NIST Tb+dH_vap construction, not Alcock evaluated equations.
+      Do NOT use VapoRock Fe(g) grid residual as the independent anchor (same JANAF gas).
+    locator: Can. Metall. Q. 23 (1984) 309; REF-032
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: 'Alcock, C.B., Itkin, V.P. & Horrigan, M.K. (1984), "Vapour Pressure Equations for the Metallic
+      Elements: 298–2500 K", Canadian Metallurgical Quarterly 23(3):309–313, DOI 10.1179/cmq.1984.23.3.309
+      (project REF-032). Fe solid/liquid equations (log10 P form as tabulated).'
+    record: REF-032#Fe_liquid_equation

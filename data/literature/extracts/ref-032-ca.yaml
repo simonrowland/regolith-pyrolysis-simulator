@@ -1,0 +1,44 @@
+schema_version: literature_extract.v1
+source_id: ref-032-ca
+source:
+  citation: Alcock, Itkin & Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Ca equations; JANAF Ca(g)
+    Chase 1998.
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  Ca:
+    observations:
+    - observation_id: anchor_Ca_pure_Psat
+      type: psat_series
+      locator:
+        note: Alcock, Itkin & Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Ca equations; JANAF Ca(g)
+          Chase 1998.
+        record: REF-032#Ca
+      units: as published
+      values:
+        quantity: pure_Psat
+        T_range_K:
+        - 1254
+        - 2000
+        phase: liquid_Ca_to_Ca_g
+        standard_state: pure liquid Ca
+        independence_note: Hartmann & Schneider is fit source
+fidelity_samples:
+- path: species.Ca.observations[anchor_Ca_pure_Psat].values
+  value:
+    quantity: pure_Psat
+    T_range_K:
+    - 1254
+    - 2000
+    phase: liquid_Ca_to_Ca_g
+    standard_state: pure liquid Ca
+    independence_note: Hartmann & Schneider is fit source
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: Alcock, Itkin & Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Ca equations; JANAF Ca(g) Chase
+      1998.
+    record: REF-032#Ca

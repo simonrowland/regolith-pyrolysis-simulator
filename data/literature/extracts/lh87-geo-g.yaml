@@ -1,0 +1,39 @@
+schema_version: literature_extract.v1
+source_id: lh87-geo-g
+source:
+  citation: LH87 GeO(g); JANAF GeO(g); classical GeO sublimation measurements
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  GeO:
+    observations:
+    - observation_id: anchor_GeO_pure_Psat
+      type: psat_series
+      locator:
+        note: LH87 GeO(g); JANAF GeO(g); classical GeO sublimation measurements
+        record: LH87#GeO_g
+      units: as published
+      values:
+        quantity: pure_Psat
+        T_range_K:
+        - 1313
+        - 1373
+        phase: condensed_GeO_to_GeO_g
+        standard_state: GeO(g) 1 bar
+fidelity_samples:
+- path: species.GeO.observations[anchor_GeO_pure_Psat].values
+  value:
+    quantity: pure_Psat
+    T_range_K:
+    - 1313
+    - 1373
+    phase: condensed_GeO_to_GeO_g
+    standard_state: GeO(g) 1 bar
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: LH87 GeO(g); JANAF GeO(g); classical GeO sublimation measurements
+    record: LH87#GeO_g

@@ -1,0 +1,51 @@
+schema_version: literature_extract.v1
+source_id: lh87-mgo-g
+source:
+  citation: Lamoreaux, R.H., Hildenbrand, D.L. & Brewer, L. (1987), "High-Temperature Vaporization Behavior
+    of Oxides. II. Oxides of Be, Mg, Ca, Sr, Ba, B, Al, Ga, In, Tl, Si, Ge, Sn, Pb, Zn, Cd, and Hg", J.
+    Phys. Chem. Ref. Data 16:419–443, DOI 10.1063/1.555799 (LH87 Table 3 — MgO(g) thermochemistry). Cross-check
+    NIST-JANAF MgO(g) Chase 1998 (REF-020).
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  MgO_gas:
+    observations:
+    - observation_id: anchor_MgO_gas_deltafG
+      type: gibbs_table
+      locator:
+        note: Lamoreaux, R.H., Hildenbrand, D.L. & Brewer, L. (1987), "High-Temperature Vaporization Behavior
+          of Oxides. II. Oxides of Be, Mg, Ca, Sr, Ba, B, Al, Ga, In, Tl, Si, Ge, Sn, Pb, Zn, Cd, and
+          Hg", J. Phys. Chem. Ref. Data 16:419–443, DOI 10.1063/1.555799 (LH87 Table 3 — MgO(g) thermochemistry).
+          Cross-ch
+        record: LH87#MgO_g
+      units: as published
+      values:
+        quantity: deltafG
+        T_range_K:
+        - 1500
+        - 2500
+        phase: condensed_MgO_to_MgO_g
+        standard_state: MgO(g) 1 bar; condensed pure MgO solid/liquid as stated in LH87
+        independence_note: Inventory-only row; LH87 is measured/evaluated oxide vaporization, not rail
+          fit
+fidelity_samples:
+- path: species.MgO_gas.observations[anchor_MgO_gas_deltafG].values
+  value:
+    quantity: deltafG
+    T_range_K:
+    - 1500
+    - 2500
+    phase: condensed_MgO_to_MgO_g
+    standard_state: MgO(g) 1 bar; condensed pure MgO solid/liquid as stated in LH87
+    independence_note: Inventory-only row; LH87 is measured/evaluated oxide vaporization, not rail fit
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: Lamoreaux, R.H., Hildenbrand, D.L. & Brewer, L. (1987), "High-Temperature Vaporization Behavior
+      of Oxides. II. Oxides of Be, Mg, Ca, Sr, Ba, B, Al, Ga, In, Tl, Si, Ge, Sn, Pb, Zn, Cd, and Hg",
+      J. Phys. Chem. Ref. Data 16:419–443, DOI 10.1063/1.555799 (LH87 Table 3 — MgO(g) thermochemistry).
+      Cross-ch
+    record: LH87#MgO_g

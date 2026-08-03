@@ -1,0 +1,39 @@
+schema_version: literature_extract.v1
+source_id: pending-mg2cl4
+source:
+  citation: MgCl2 dimerization equilibrium literature (not JANAF-only if JANAF is fit)
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  Mg2Cl4:
+    observations:
+    - observation_id: anchor_Mg2Cl4_dimer_partial
+      type: gibbs_table
+      locator:
+        note: MgCl2 dimerization equilibrium literature (not JANAF-only if JANAF is fit)
+        record: PENDING#Mg2Cl4
+      units: as published
+      values:
+        quantity: dimer_partial
+        T_range_K:
+        - 800
+        - 1000
+        phase: MgCl2_system_to_Mg2Cl4_g
+        standard_state: dimer
+fidelity_samples:
+- path: species.Mg2Cl4.observations[anchor_Mg2Cl4_dimer_partial].values
+  value:
+    quantity: dimer_partial
+    T_range_K:
+    - 800
+    - 1000
+    phase: MgCl2_system_to_Mg2Cl4_g
+    standard_state: dimer
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: MgCl2 dimerization equilibrium literature (not JANAF-only if JANAF is fit)
+    record: PENDING#Mg2Cl4

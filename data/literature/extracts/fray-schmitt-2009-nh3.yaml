@@ -1,0 +1,47 @@
+schema_version: literature_extract.v1
+source_id: fray-schmitt-2009-nh3
+source:
+  citation: 'Fray & Schmitt (2009), Planet. Space Sci. 57:2053–2080, NH3 correlations (NASA NTRS supplementary
+    Table 2). Alternate liquid branch: NIST Chemistry WebBook SRD 69 ammonia Antoine (Stull 1947 lineage),
+    ~164–240 K liquid — independent of the 2024 QCM ice fit.'
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  NH3:
+    observations:
+    - observation_id: anchor_NH3_pure_Psat
+      type: psat_series
+      locator:
+        note: 'Fray & Schmitt (2009), Planet. Space Sci. 57:2053–2080, NH3 correlations (NASA NTRS supplementary
+          Table 2). Alternate liquid branch: NIST Chemistry WebBook SRD 69 ammonia Antoine (Stull 1947
+          lineage), ~164–240 K liquid — independent of the 2024 QCM ice fit.'
+        record: Fray-Schmitt-2009#NH3
+      units: as published
+      values:
+        quantity: pure_Psat
+        T_range_K:
+        - 164
+        - 240
+        phase: liquid_NH3_to_NH3_g
+        standard_state: pure NH3
+        independence_note: Gerakines 2024 is fit source; FS09 / NIST liquid are independent
+fidelity_samples:
+- path: species.NH3.observations[anchor_NH3_pure_Psat].values
+  value:
+    quantity: pure_Psat
+    T_range_K:
+    - 164
+    - 240
+    phase: liquid_NH3_to_NH3_g
+    standard_state: pure NH3
+    independence_note: Gerakines 2024 is fit source; FS09 / NIST liquid are independent
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: 'Fray & Schmitt (2009), Planet. Space Sci. 57:2053–2080, NH3 correlations (NASA NTRS supplementary
+      Table 2). Alternate liquid branch: NIST Chemistry WebBook SRD 69 ammonia Antoine (Stull 1947 lineage),
+      ~164–240 K liquid — independent of the 2024 QCM ice fit.'
+    record: Fray-Schmitt-2009#NH3

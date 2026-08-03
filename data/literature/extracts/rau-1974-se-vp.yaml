@@ -1,0 +1,47 @@
+schema_version: literature_extract.v1
+source_id: rau-1974-se-vp
+source:
+  citation: Declare fit = Stull 1947 total-P Antoine; anchor = Rau (1974) selenium vapor-pressure / speciation
+    measurements (or NEA Chemical Thermodynamics of Selenium if Rau is fit). KEMS allotrope fractions
+    separate from total P.
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  Se6:
+    observations:
+    - observation_id: anchor_Se6_pure_Psat_total_plus_speciation
+      type: psat_series
+      locator:
+        note: Declare fit = Stull 1947 total-P Antoine; anchor = Rau (1974) selenium vapor-pressure /
+          speciation measurements (or NEA Chemical Thermodynamics of Selenium if Rau is fit). KEMS allotrope
+          fractions separate from total P.
+        record: Rau-1974#Se_VP
+      units: as published
+      values:
+        quantity: pure_Psat_total_plus_speciation
+        T_range_K:
+        - 400
+        - 1000
+        phase: condensed_Se_to_Se_n_g
+        standard_state: total pressure + mole fractions Se_n
+        independence_note: Split fit vs anchor among NEA05/Rau74/Stull — do not use all three as fit
+fidelity_samples:
+- path: species.Se6.observations[anchor_Se6_pure_Psat_total_plus_speciation].values
+  value:
+    quantity: pure_Psat_total_plus_speciation
+    T_range_K:
+    - 400
+    - 1000
+    phase: condensed_Se_to_Se_n_g
+    standard_state: total pressure + mole fractions Se_n
+    independence_note: Split fit vs anchor among NEA05/Rau74/Stull — do not use all three as fit
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: Declare fit = Stull 1947 total-P Antoine; anchor = Rau (1974) selenium vapor-pressure / speciation
+      measurements (or NEA Chemical Thermodynamics of Selenium if Rau is fit). KEMS allotrope fractions
+      separate from total P.
+    record: Rau-1974#Se_VP

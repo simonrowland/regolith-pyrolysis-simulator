@@ -1,0 +1,329 @@
+schema_version: literature_extract.v1
+source_id: lamoreaux-hildenbrand-1984
+source:
+  citation: Lamoreaux, R. H. & Hildenbrand, D. L., High Temperature Vaporization Behavior of Oxides. I.
+    Alkali Metal Binary Oxides, J. Phys. Chem. Ref. Data 13 (1984) 151–173
+  doi: 10.1063/1.555706
+  url: https://doi.org/10.1063/1.555706
+  year: 1984
+extraction:
+  method: manual transcription from vp-acquire-5 dominant-missing-12 DRAFT
+  date: '2026-07-30'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+review_status: draft
+species:
+  Li2O:
+    observations:
+    - observation_id: LH84_Li2O_g_formation
+      type: gibbs_table
+      locator:
+        table: 'Table 4, p. 157 — Li2O(g) row: ΔfH°298/R = −20.78 ± 0.45 kK; S°298/R = 27.56 ± 0.75; (H°298−H°0)/R
+          = 1.50 kK'
+        note: 'Table 4, p. 157 — Li2O(g) row: ΔfH°298/R = −20.78 ± 0.45 kK; S°298/R = 27.56 ± 0.75; (H°298−H°0)/R
+          = 1.50 kK'
+        record: LH84_Li2O_g_formation
+      T_range_K:
+      - 298
+      - 3000
+      phase: gas
+      standard_state: 1 bar
+      units: kJ/mol and J/(mol·K) for formation; over_R in kK as published
+      uncertainty:
+        Delta_f_H_298_over_R_uncertainty_kK: 0.45
+        S_298_over_R_uncertainty: 0.75
+      values: &id001
+        Delta_f_H_298_over_R_kK: -20.78
+        Delta_f_H_298_over_R_uncertainty_kK: 0.45
+        Delta_f_H_298_kJ_mol:
+          value: -172.8
+          arithmetic: (-20.78 kK) * 8.314462618 kJ·mol⁻¹·kK⁻¹ = -172.8 kJ·mol⁻¹
+        S_298_over_R: 27.56
+        S_298_over_R_uncertainty: 0.75
+        S_298_J_molK:
+          value: 229.1
+          arithmetic: 27.56 * 8.314462618 = 229.1 J·K⁻¹·mol⁻¹
+        H298_minus_H0_over_R_kK: 1.5
+        gas_species: Li2O
+        valid_range_note: 'GEF polynomials in LH84 Table 2 cover 298–3000 K for Li2O(g).
+
+          SF18 dominance window for Li-bearing gases over Li2O is 1000–1700 K.
+
+          Recipe melt band 1173–2273 K intersects the upper end.
+
+          '
+    - observation_id: LH84_Li2O_s_formation
+      type: gibbs_table
+      locator:
+        table: null
+        note: ΔfH°298/R = −71.91 ± 0.04 kK; S°298/R = 4.56 ± 0.02
+        record: LH84_Li2O_s_formation
+      T_range_K: null
+      phase: solid
+      standard_state: null
+      units: kJ/mol and J/(mol·K) for formation; over_R in kK as published
+      uncertainty:
+        Delta_f_H_298_over_R_uncertainty_kK: 0.04
+        S_298_over_R_uncertainty: 0.02
+      values:
+        Delta_f_H_298_over_R_kK: -71.91
+        Delta_f_H_298_over_R_uncertainty_kK: 0.04
+        S_298_over_R: 4.56
+        S_298_over_R_uncertainty: 0.02
+        formula: Li2O
+  Rb2O:
+    observations:
+    - observation_id: LH84_Rb2O_g_formation
+      type: gibbs_table
+      locator:
+        table: 'Table 4, p. 157 — Rb2O(g): ΔfH°298/R = −8.05 ± 2.50 kK; S°298/R = 36.31 ± 0.75; (H°298−H°0)/R
+          = 1.66 kK'
+        note: 'Table 4, p. 157 — Rb2O(g): ΔfH°298/R = −8.05 ± 2.50 kK; S°298/R = 36.31 ± 0.75; (H°298−H°0)/R
+          = 1.66 kK'
+        record: LH84_Rb2O_g_formation
+      T_range_K:
+      - 298
+      - 3000
+      phase: gas
+      standard_state: 1 bar
+      units: kJ/mol and J/(mol·K) for formation; over_R in kK as published
+      uncertainty:
+        Delta_f_H_298_over_R_uncertainty_kK: 2.5
+        S_298_over_R_uncertainty: 0.75
+      values:
+        Delta_f_H_298_over_R_kK: -8.05
+        Delta_f_H_298_over_R_uncertainty_kK: 2.5
+        Delta_f_H_298_kJ_mol:
+          value: -66.9
+          arithmetic: (-8.05)*8.314462618 = -66.9 kJ·mol⁻¹
+        S_298_over_R: 36.31
+        S_298_over_R_uncertainty: 0.75
+        S_298_J_molK:
+          value: 301.9
+          arithmetic: 36.31*8.314462618 = 301.9 J·K⁻¹·mol⁻¹
+        H298_minus_H0_over_R_kK: 1.66
+        gas_species: Rb2O
+        measurement_window_K:
+        - 1020
+        - 1135
+        measurement_window_note: Nicolosi et al. 1979 range cited by SF18-T1 p.405
+    - observation_id: LH84_Rb2O_s_formation
+      type: gibbs_table
+      locator:
+        table: null
+        note: LH84_Rb2O_s_formation
+        record: LH84_Rb2O_s_formation
+      T_range_K: null
+      phase: gas
+      standard_state: null
+      units: kJ/mol and J/(mol·K) for formation; over_R in kK as published
+      uncertainty:
+        Delta_f_H_298_over_R_uncertainty_kK: 1.56
+        S_298_over_R_uncertainty: 0.75
+      values:
+        Delta_f_H_298_over_R_kK: -40.76
+        Delta_f_H_298_over_R_uncertainty_kK: 1.56
+        S_298_over_R: 15.32
+        S_298_over_R_uncertainty: 0.75
+  Cs2O:
+    observations:
+    - observation_id: LH84_Cs2O_g_formation
+      type: gibbs_table
+      locator:
+        table: 'Table 4, p. 157–158 — Cs2O(g): ΔfH°298/R = −19.10 ± 3.00 kK; S°298/R = 38.23 ± 1.00; (H°298−H°0)/R
+          = 1.66 kK'
+        note: 'Table 4, p. 157–158 — Cs2O(g): ΔfH°298/R = −19.10 ± 3.00 kK; S°298/R = 38.23 ± 1.00; (H°298−H°0)/R
+          = 1.66 kK'
+        record: LH84_Cs2O_g_formation
+      T_range_K:
+      - 298
+      - 3000
+      phase: gas
+      standard_state: 1 bar
+      units: kJ/mol and J/(mol·K) for formation; over_R in kK as published
+      uncertainty:
+        Delta_f_H_298_over_R_uncertainty_kK: 3.0
+        S_298_over_R_uncertainty: 1.0
+      values:
+        Delta_f_H_298_over_R_kK: -19.1
+        Delta_f_H_298_over_R_uncertainty_kK: 3.0
+        Delta_f_H_298_kJ_mol:
+          value: -158.8
+          arithmetic: (-19.10)*8.314462618 = -158.8 kJ·mol⁻¹
+        S_298_over_R: 38.23
+        S_298_over_R_uncertainty: 1.0
+        S_298_J_molK:
+          value: 317.9
+          arithmetic: 38.23*8.314462618 = 317.9 J·K⁻¹·mol⁻¹
+        H298_minus_H0_over_R_kK: 1.66
+        gas_species: Cs2O
+        dominance_window_K:
+        - 1070
+        - 1170
+        dominance_window_source: SF18-T1 p.403 Cs2O(s,l) row
+    - observation_id: LH84_Cs2O_g_GEF_segments
+      type: gibbs_table
+      locator:
+        table: null
+        note: pp. 154–156 region of JPCRD 13(1)
+        record: LH84_Cs2O_g_GEF_segments
+      T_range_K: null
+      phase: gas
+      standard_state: null
+      units: kJ/mol and J/(mol·K) for formation; over_R in kK as published
+      values:
+        note: 'LH84 Table 2 (OCR-recovered segments for Cs2O(g)):
+
+          298–600 K:  A=40.61, B=-19.222, C=46.327, D=-28.754
+
+          600–1400 K: A=35.68, B=7.100, C=-1.063, D=-0.053
+
+          1400–3000 K: A=35.89, B=7.136, C=-1.427, D=0.142
+
+          VERIFY against NIST PDF before use — OCR of dual-column tables
+
+          is error-prone. Form is the LH84 Table 2 GEF polynomial.
+
+          '
+  Se_n_ladder:
+    observations:
+    - observation_id: NEA05_Se2_g
+      type: gibbs_table
+      locator:
+        table: null
+        note: selected ΔfH°298(Se2,g) = (141.1 ± 3.0) kJ·mol⁻¹; ΔfG°298 = (92.4 ± 3.0); S°298 = (247.38
+          ± 0.40) J·K⁻¹·mol⁻¹; pp. 98–99 of content
+        record: NEA05_Se2_g
+      T_range_K: null
+      phase: gas
+      standard_state: 1 bar
+      units: kJ/mol and J/(mol·K) for formation; over_R in kK as published
+      values:
+        Delta_f_H_298_kJ_mol: 141.1
+        Delta_f_H_298_uncertainty_kJ_mol: 3.0
+        Delta_f_G_298_kJ_mol: 92.4
+        Delta_f_G_298_uncertainty_kJ_mol: 3.0
+        S_298_J_molK: 247.38
+        S_298_uncertainty_J_molK: 0.4
+        Cp_298_J_molK: 41.71
+        Cp_298_uncertainty_J_molK: 0.2
+        gas_species: Se2
+        dominance_note: Se2 mole fraction exceeds ~50% above ~800 K (NEA05 §V.1.5)
+    - observation_id: NEA05_Se5_g
+      type: gibbs_table
+      locator:
+        table: null
+        note: selected ΔfH°298 = (144.4 ± 4.3) kJ·mol⁻¹; ΔfG°298 = (88.4 ± 5.3); S°298 = (398.3 ± 10.0)
+          J·K⁻¹·mol⁻¹
+        record: NEA05_Se5_g
+      T_range_K: null
+      phase: gas
+      standard_state: 1 bar
+      units: kJ/mol and J/(mol·K) for formation; over_R in kK as published
+      values:
+        Delta_f_H_298_kJ_mol: 144.4
+        Delta_f_H_298_uncertainty_kJ_mol: 4.3
+        Delta_f_G_298_kJ_mol: 88.4
+        Delta_f_G_298_uncertainty_kJ_mol: 5.3
+        S_298_J_molK: 398.3
+        S_298_uncertainty_J_molK: 10.0
+        gas_species: Se5
+        dominance_note: 'Co-dominant with Se6 over Se(l) below ~800 K; NEA05 notes Se5 is
+
+          more abundant than Se6 at some intermediate T (contra older
+
+          Se6-only assumptions in Grønvold–Drowart–Westrum 1984).
+
+          '
+    - observation_id: NEA05_Se6_g
+      type: gibbs_table
+      locator:
+        table: null
+        note: selected ΔfH°298 = (136.1 ± 3.8) kJ·mol⁻¹; ΔfG°298 = (83.6 ± 4.9); S°298 = (428.5 ± 10.0)
+          J·K⁻¹·mol⁻¹
+        record: NEA05_Se6_g
+      T_range_K: null
+      phase: gas
+      standard_state: 1 bar
+      units: kJ/mol and J/(mol·K) for formation; over_R in kK as published
+      values:
+        Delta_f_H_298_kJ_mol: 136.1
+        Delta_f_H_298_uncertainty_kJ_mol: 3.8
+        Delta_f_G_298_kJ_mol: 83.6
+        Delta_f_G_298_uncertainty_kJ_mol: 4.9
+        S_298_J_molK: 428.5
+        S_298_uncertainty_J_molK: 10.0
+        gas_species: Se6
+        dominance_note: Se6 ≳ Se5 over elemental Se at low T (closure KEMS14; NEA05 ladder)
+  Ga2O:
+    observations:
+    - observation_id: illustrative_dissociation_reaction
+      type: gibbs_table
+      locator:
+        table: null
+        note: illustrative_dissociation_reaction
+        record: illustrative_dissociation_reaction
+      T_range_K: null
+      phase: gas
+      standard_state: null
+      units: kJ/mol and J/(mol·K) for formation; over_R in kK as published
+      values:
+        reaction: Ga2O3(s) = Ga2O(g) + O2(g)
+        note: 'Illustrative oxygen-liberating path. Under Ga-metal saturation the
+
+          relevant path is Ga2O3 + 4 Ga(l) = 3 Ga2O(g) (Frosch & Thurmond
+
+          1962 regime). Do not use the illustrative path as runtime authority
+
+          without specifying a(Ga)/p(O2).
+
+          '
+        Delta_f_H_rxn_298_over_R_kK:
+          value: 119.74
+          arithmetic: ΔfH(Ga2O)/R − ΔfH(Ga2O3)/R = −11.46 − (−131.2) = 119.74 kK (O2 = 0)
+  SrO:
+    observations:
+    - observation_id: sublimation_SrO_s_to_SrO_g
+      type: gibbs_table
+      locator:
+        table: null
+        note: sublimation_SrO_s_to_SrO_g
+        record: sublimation_SrO_s_to_SrO_g
+      T_range_K: null
+      phase: gas
+      standard_state: 1 bar; elements cancel
+      units: kJ/mol and J/(mol·K) for formation; over_R in kK as published
+      values:
+        reaction: SrO(s) = SrO(g)
+        Delta_f_H_rxn_298_over_R_kK:
+          value: 71.2
+          arithmetic: 0.2 − (−71.0) = 71.2 kK → 592 kJ·mol⁻¹
+        Delta_f_H_rxn_298_kJ_mol: 592.0
+  BaO:
+    observations:
+    - observation_id: sublimation_BaO_s_to_BaO_g
+      type: gibbs_table
+      locator:
+        table: null
+        note: sublimation_BaO_s_to_BaO_g
+        record: sublimation_BaO_s_to_BaO_g
+      T_range_K: null
+      phase: gas
+      standard_state: null
+      units: kJ/mol and J/(mol·K) for formation; over_R in kK as published
+      values:
+        reaction: BaO(s) = BaO(g)
+        Delta_f_H_rxn_298_over_R_kK:
+          value: 50.5
+          arithmetic: −15.4 − (−65.9) = 50.5 kK → 420 kJ·mol⁻¹
+        Delta_f_H_rxn_298_kJ_mol: 420.0
+fidelity_samples:
+- path: species.Li2O.observations[LH84_Li2O_g_formation].values
+  value: *id001
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    table: 'Table 4, p. 157 — Li2O(g) row: ΔfH°298/R = −20.78 ± 0.45 kK; S°298/R = 27.56 ± 0.75; (H°298−H°0)/R
+      = 1.50 kK'
+    note: 'Table 4, p. 157 — Li2O(g) row: ΔfH°298/R = −20.78 ± 0.45 kK; S°298/R = 27.56 ± 0.75; (H°298−H°0)/R
+      = 1.50 kK'
+    record: LH84_Li2O_g_formation

@@ -1,0 +1,49 @@
+schema_version: literature_extract.v1
+source_id: fray-schmitt-2009-co-1
+source:
+  citation: Fray & Schmitt (2009), Planet. Space Sci. 57:2053–2080, DOI 10.1016/j.pss.2009.09.011, CO-1
+    correlation (coefficients in NASA NTRS 20210019502 supplementary Table 2). Row already records disagreement
+    at 31 K (~513% vs Grundy); use FS09 as the independent promotion check, not a second fit of Grundy.
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  CO:
+    observations:
+    - observation_id: anchor_CO_pure_Psat
+      type: psat_series
+      locator:
+        note: Fray & Schmitt (2009), Planet. Space Sci. 57:2053–2080, DOI 10.1016/j.pss.2009.09.011, CO-1
+          correlation (coefficients in NASA NTRS 20210019502 supplementary Table 2). Row already records
+          disagreement at 31 K (~513% vs Grundy); use FS09 as the independent promotion check, not a second
+          fit of Grundy.
+        record: Fray-Schmitt-2009#CO-1
+      units: as published
+      values:
+        quantity: pure_Psat
+        T_range_K:
+        - null
+        - 61.57
+        phase: solid_CO_to_CO_g
+        standard_state: pure CO solid sublimation; P in bar in source
+        independence_note: Fit source is Grundy 2024 QCM; FS09 is independent compilation of earlier lab
+          data
+fidelity_samples:
+- path: species.CO.observations[anchor_CO_pure_Psat].values
+  value:
+    quantity: pure_Psat
+    T_range_K:
+    - null
+    - 61.57
+    phase: solid_CO_to_CO_g
+    standard_state: pure CO solid sublimation; P in bar in source
+    independence_note: Fit source is Grundy 2024 QCM; FS09 is independent compilation of earlier lab data
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: Fray & Schmitt (2009), Planet. Space Sci. 57:2053–2080, DOI 10.1016/j.pss.2009.09.011, CO-1
+      correlation (coefficients in NASA NTRS 20210019502 supplementary Table 2). Row already records disagreement
+      at 31 K (~513% vs Grundy); use FS09 as the independent promotion check, not a second fit of Grundy.
+    record: Fray-Schmitt-2009#CO-1

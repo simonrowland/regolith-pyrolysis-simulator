@@ -1,0 +1,58 @@
+# Per-observable-family source priority (VALUE-PRECEDENCE policy as DATA).
+# First listed source_id wins for same-observable conflicts. Never average.
+# Regime / phase / standard-state differences are different observables — not
+# ordered by this list. Changes are reviewed data edits, not code constants.
+#
+# Fail-closed: every observable family must be present and non-empty.
+# Unlisted sources in a competing group cannot become priority winners
+# (merge emits no winner rather than lexical fall-through).
+#
+# schema: literature_extract_source_priority.v1
+
+schema_version: literature_extract_source_priority.v1
+policy_ref: docs-private/design/2026-07-30-vapour-rail-unification/VALUE-PRECEDENCE.md
+
+# Order within each family: evaluated compilation → primary measurement with
+# stated uncertainty → secondary/derived → estimate. Ties: evaluation recency,
+# T-range match to operating regime, stated uncertainty (documented in review).
+source_priority:
+  psat_series:
+    - janaf-4th
+    - nasa-cea-thermo
+    - nist-webbook
+    - lamoreaux-hildenbrand-1984
+    - lamoreaux-hildenbrand-hildenbrand-1987
+    - behrens-rosenblatt-1972
+    - habermann-daane-1964
+    - berkowitz-chupka-inghram-1957
+    - alcock-itkin-horrigan-1984
+  gibbs_table:
+    - janaf-4th
+    - nasa-cea-thermo
+    - lamoreaux-hildenbrand-1984
+    - lamoreaux-hildenbrand-hildenbrand-1987
+    - datz-and-smith-1961
+    - datz-1961-na2cl2
+    - datz-smith-taylor-1961-nacl-vapor
+    - ames-walsh-white-1967
+    - banchor-matsui-naito-1986
+  activity_coefficient:
+    - sossi-fegley-2018
+    - fedkin-grossman-ghiorso-2006
+  alpha:
+    # Dual-regime Fe: KEMS and Langmuir are different regimes (not ordered as
+    # conflicts). Within a single regime, primary measurement wins.
+    - costa-jacobson-2015
+    - fedkin-grossman-ghiorso-2006
+    - sossi-et-al-2019
+    - richter-et-al-2007
+    - wetzel-gail-2013-sio-arrhenius
+  rate_series:
+    - hashimoto-1983
+    - yu-et-al-2003
+    - fedkin-grossman-ghiorso-2006
+  transition_point:
+    - janaf-4th
+    - nist-webbook
+    - nasa-cea-thermo
+    - crc-handbook

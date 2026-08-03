@@ -1,0 +1,185 @@
+schema_version: literature_extract.v1
+source_id: lamoreaux-hildenbrand-hildenbrand-1987
+source:
+  citation: Lamoreaux, R. H., Hildenbrand, D. L. & Brewer, L., High-Temperature Vaporization Behavior
+    of Oxides II. Oxides of Be, Mg, Ca, Sr, Ba, B, Al, Ga, In, Tl, Si, Ge, Sn, Pb, Zn, Cd, and Hg, J.
+    Phys. Chem. Ref. Data 16 (1987) 419–443
+  doi: 10.1063/1.555799
+  url: https://doi.org/10.1063/1.555799
+  year: 1987
+extraction:
+  method: manual transcription from vp-acquire-5 dominant-missing-12 DRAFT
+  date: '2026-07-30'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+review_status: draft
+species:
+  Ga2O:
+    observations:
+    - observation_id: LH87_Ga2O_g_formation
+      type: gibbs_table
+      locator:
+        table: 'Table 3, p. 424 — Ga2O(g): ΔfH°298/R = −11.46 ± 1 kK; S°298/R = 34.21 ± 0.4; (H°298−H°0)/R
+          = 1.4712 kK'
+        note: 'Table 3, p. 424 — Ga2O(g): ΔfH°298/R = −11.46 ± 1 kK; S°298/R = 34.21 ± 0.4; (H°298−H°0)/R
+          = 1.4712 kK'
+        record: LH87_Ga2O_g_formation
+      T_range_K:
+      - 298
+      - 3000
+      phase: gas
+      standard_state: 1 bar
+      units: kJ/mol and J/(mol·K) for formation; over_R in kK as published
+      uncertainty:
+        Delta_f_H_298_over_R_uncertainty_kK: 1.0
+        S_298_over_R_uncertainty: 0.4
+      values: &id001
+        Delta_f_H_298_over_R_kK: -11.46
+        Delta_f_H_298_over_R_uncertainty_kK: 1.0
+        Delta_f_H_298_kJ_mol:
+          value: -95.3
+          arithmetic: (-11.46)*8.314462618 = -95.3 kJ·mol⁻¹
+        S_298_over_R: 34.21
+        S_298_over_R_uncertainty: 0.4
+        S_298_J_molK:
+          value: 284.4
+          arithmetic: 34.21*8.314462618 = 284.4 J·K⁻¹·mol⁻¹
+        H298_minus_H0_over_R_kK: 1.4712
+        gas_species: Ga2O
+        dominance_window_K:
+        - 1013
+        - 1841
+        dominance_window_source: SF18-T1 p.404 Ga2O3(s) row
+    - observation_id: LH87_Ga2O3_s_formation
+      type: gibbs_table
+      locator:
+        table: null
+        note: ΔfH°298/R = −131.2 ± 0.5 kK
+        record: LH87_Ga2O3_s_formation
+      T_range_K: null
+      phase: gas
+      standard_state: null
+      units: kJ/mol and J/(mol·K) for formation; over_R in kK as published
+      uncertainty:
+        Delta_f_H_298_over_R_uncertainty_kK: 0.5
+        S_298_over_R_uncertainty: 0.04
+      values:
+        Delta_f_H_298_over_R_kK: -131.2
+        Delta_f_H_298_over_R_uncertainty_kK: 0.5
+        S_298_over_R: 10.216
+        S_298_over_R_uncertainty: 0.04
+  SrO:
+    observations:
+    - observation_id: LH87_SrO_g_formation
+      type: gibbs_table
+      locator:
+        table: null
+        note: ΔfH°298/R = 0.2 ± 3 kK; S°298/R = 27.656 ± 0.002; system §2.2.d pp. 428–429; Figs. 13–16
+        record: LH87_SrO_g_formation
+      T_range_K:
+      - 298
+      - 3000
+      phase: gas
+      standard_state: 1 bar
+      units: kJ/mol and J/(mol·K) for formation; over_R in kK as published
+      uncertainty:
+        Delta_f_H_298_over_R_uncertainty_kK: 3.0
+        S_298_over_R_uncertainty: 0.002
+      values:
+        Delta_f_H_298_over_R_kK: 0.2
+        Delta_f_H_298_over_R_uncertainty_kK: 3.0
+        Delta_f_H_298_kJ_mol:
+          value: 1.7
+          arithmetic: (0.2)*8.314462618 = 1.7 kJ·mol⁻¹
+          note: Large relative uncertainty (±3 kK → ±25 kJ·mol⁻¹)
+        S_298_over_R: 27.656
+        S_298_over_R_uncertainty: 0.002
+        S_298_J_molK:
+          value: 229.9
+          arithmetic: 27.656*8.314462618 = 229.9 J·K⁻¹·mol⁻¹
+        H298_minus_H0_over_R_kK: 1.0873
+        gas_species: SrO
+        dominance_window_K:
+        - 1575
+        - 2102
+        dominance_window_source: SF18-T1 p.406
+    - observation_id: LH87_SrO_s_formation
+      type: gibbs_table
+      locator:
+        table: null
+        note: LH87_SrO_s_formation
+        record: LH87_SrO_s_formation
+      T_range_K: null
+      phase: gas
+      standard_state: null
+      units: kJ/mol and J/(mol·K) for formation; over_R in kK as published
+      uncertainty:
+        Delta_f_H_298_over_R_uncertainty_kK: 0.1
+        S_298_over_R_uncertainty: 0.06
+      values:
+        Delta_f_H_298_over_R_kK: -71.0
+        Delta_f_H_298_over_R_uncertainty_kK: 0.1
+        S_298_over_R: 6.668
+        S_298_over_R_uncertainty: 0.06
+  BaO:
+    observations:
+    - observation_id: LH87_BaO_g_formation
+      type: gibbs_table
+      locator:
+        table: null
+        note: ΔfH°298/R = −15.4 ± 1 kK; S°298/R = 28.306 ± 0.05; system §2.2.e p. 430; Figs. 17–20
+        record: LH87_BaO_g_formation
+      T_range_K:
+      - 298
+      - 3000
+      phase: gas
+      standard_state: 1 bar
+      units: kJ/mol and J/(mol·K) for formation; over_R in kK as published
+      uncertainty:
+        Delta_f_H_298_over_R_uncertainty_kK: 1.0
+        S_298_over_R_uncertainty: 0.05
+      values:
+        Delta_f_H_298_over_R_kK: -15.4
+        Delta_f_H_298_over_R_uncertainty_kK: 1.0
+        Delta_f_H_298_kJ_mol:
+          value: -128.0
+          arithmetic: (-15.4)*8.314462618 = -128.0 kJ·mol⁻¹
+        S_298_over_R: 28.306
+        S_298_over_R_uncertainty: 0.05
+        S_298_J_molK:
+          value: 235.3
+          arithmetic: 28.306*8.314462618 = 235.3 J·K⁻¹·mol⁻¹
+        H298_minus_H0_over_R_kK: 1.084
+        gas_species: BaO
+        dominance_window_K:
+        - 1150
+        - 1758
+        dominance_window_source: SF18-T1 p.403 BaO(s) row
+    - observation_id: LH87_BaO_s_formation
+      type: gibbs_table
+      locator:
+        table: null
+        note: LH87_BaO_s_formation
+        record: LH87_BaO_s_formation
+      T_range_K: null
+      phase: gas
+      standard_state: null
+      units: kJ/mol and J/(mol·K) for formation; over_R in kK as published
+      uncertainty:
+        Delta_f_H_298_over_R_uncertainty_kK: 0.3
+        S_298_over_R_uncertainty: 0.05
+      values:
+        Delta_f_H_298_over_R_kK: -65.9
+        Delta_f_H_298_over_R_uncertainty_kK: 0.3
+        S_298_over_R: 8.66
+        S_298_over_R_uncertainty: 0.05
+fidelity_samples:
+- path: species.Ga2O.observations[LH87_Ga2O_g_formation].values
+  value: *id001
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    table: 'Table 3, p. 424 — Ga2O(g): ΔfH°298/R = −11.46 ± 1 kK; S°298/R = 34.21 ± 0.4; (H°298−H°0)/R
+      = 1.4712 kK'
+    note: 'Table 3, p. 424 — Ga2O(g): ΔfH°298/R = −11.46 ± 1 kK; S°298/R = 34.21 ± 0.4; (H°298−H°0)/R
+      = 1.4712 kK'
+    record: LH87_Ga2O_g_formation

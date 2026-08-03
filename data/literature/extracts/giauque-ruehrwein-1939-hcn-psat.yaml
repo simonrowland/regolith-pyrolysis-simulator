@@ -1,0 +1,49 @@
+schema_version: literature_extract.v1
+source_id: giauque-ruehrwein-1939-hcn-psat
+source:
+  citation: Giauque, W.F. & Ruehrwein, R.A. (1939), "The Entropy of Hydrogen Cyanide. Heat Capacity, Heat
+    of Vaporization and Vapor Pressure of Hydrogen Cyanide. The Structure of the Hydrogen Cyanide Molecule",
+    J. Am. Chem. Soc. 61:2626–2633, DOI 10.1021/ja01265a030 — classical vapor-pressure / calorimetry primary.
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  HCN:
+    observations:
+    - observation_id: anchor_HCN_pure_Psat
+      type: psat_series
+      locator:
+        note: Giauque, W.F. & Ruehrwein, R.A. (1939), "The Entropy of Hydrogen Cyanide. Heat Capacity,
+          Heat of Vaporization and Vapor Pressure of Hydrogen Cyanide. The Structure of the Hydrogen Cyanide
+          Molecule", J. Am. Chem. Soc. 61:2626–2633, DOI 10.1021/ja01265a030 — classical vapor-pressure
+          / calorimetry prim
+        record: Giauque-Ruehrwein-1939#HCN_Psat
+      units: as published
+      values:
+        quantity: pure_Psat
+        T_range_K:
+        - ~250
+        - 300
+        phase: liquid_HCN_to_HCN_g
+        standard_state: pure HCN
+        independence_note: Not the 2023 QCM/IR film fit
+fidelity_samples:
+- path: species.HCN.observations[anchor_HCN_pure_Psat].values
+  value:
+    quantity: pure_Psat
+    T_range_K:
+    - ~250
+    - 300
+    phase: liquid_HCN_to_HCN_g
+    standard_state: pure HCN
+    independence_note: Not the 2023 QCM/IR film fit
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: Giauque, W.F. & Ruehrwein, R.A. (1939), "The Entropy of Hydrogen Cyanide. Heat Capacity, Heat
+      of Vaporization and Vapor Pressure of Hydrogen Cyanide. The Structure of the Hydrogen Cyanide Molecule",
+      J. Am. Chem. Soc. 61:2626–2633, DOI 10.1021/ja01265a030 — classical vapor-pressure / calorimetry
+      prim
+    record: Giauque-Ruehrwein-1939#HCN_Psat

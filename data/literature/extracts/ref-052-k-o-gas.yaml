@@ -1,0 +1,44 @@
+schema_version: literature_extract.v1
+source_id: ref-052-k-o-gas
+source:
+  citation: Lamoreaux & Hildenbrand (1984) JPCRD 13:151–173, DOI 10.1063/1.555706 (REF-052), K–O gas species
+    tables — independent of Fiock & Rodebush pure K.
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  K2O_gas:
+    observations:
+    - observation_id: anchor_K2O_gas_deltafG
+      type: gibbs_table
+      locator:
+        note: Lamoreaux & Hildenbrand (1984) JPCRD 13:151–173, DOI 10.1063/1.555706 (REF-052), K–O gas
+          species tables — independent of Fiock & Rodebush pure K.
+        record: REF-052#K_O_gas
+      units: as published
+      values:
+        quantity: deltafG
+        T_range_K:
+        - 1000
+        - 2000
+        phase: condensed_K2O_to_K_O_gas
+        standard_state: K-bearing oxide gas 1 bar
+        independence_note: Not metals_k_family pure K fit
+fidelity_samples:
+- path: species.K2O_gas.observations[anchor_K2O_gas_deltafG].values
+  value:
+    quantity: deltafG
+    T_range_K:
+    - 1000
+    - 2000
+    phase: condensed_K2O_to_K_O_gas
+    standard_state: K-bearing oxide gas 1 bar
+    independence_note: Not metals_k_family pure K fit
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: Lamoreaux & Hildenbrand (1984) JPCRD 13:151–173, DOI 10.1063/1.555706 (REF-052), K–O gas species
+      tables — independent of Fiock & Rodebush pure K.
+    record: REF-052#K_O_gas

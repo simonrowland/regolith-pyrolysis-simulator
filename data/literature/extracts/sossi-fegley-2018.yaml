@@ -1,0 +1,398 @@
+schema_version: literature_extract.v1
+source_id: sossi-fegley-2018
+source:
+  citation: Sossi, P. A. & Fegley, B. Jr., Thermodynamics of Element Volatility and its Application to
+    Planetary Processes, Reviews in Mineralogy and Geochemistry 84 (2018) 393–459
+  doi: 10.2138/rmg.2018.84.11
+  url: https://doi.org/10.2138/rmg.2018.84.11
+  year: 2018
+extraction:
+  method: manual transcription from vp-acquire-5 dominant-missing-12 DRAFT
+  date: '2026-07-30'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+review_status: draft
+species:
+  Li2O:
+    observations:
+    - observation_id: sf18_speciation_Li2O
+      type: activity_coefficient
+      locator:
+        note: 'SF18-T1 p.404: Li ~ Li2O > LiO > Li3O, Li2O2 over Li2O, 1000–1700 K;
+
+          primary review LH84 (closure §2.4).
+
+          '
+        section: SF18-T1 / speciation ordering
+      phase: gas_over_oxide
+      units: dimensionless ordering (not a numeric gamma)
+      values: &id001
+        speciation_note: 'SF18-T1 p.404 (Kimura et al. 1980; LH84): Li ~ Li2O > LiO > Li3O, Li2O2.
+
+          Li is least-volatile alkali in ferrobasalt evaporation (SF18-T3 p.424).
+
+          '
+        semantics: bound_not_point_ordering
+  Rb2O:
+    observations:
+    - observation_id: sf18_speciation_Rb2O
+      type: activity_coefficient
+      locator:
+        note: 'SF18-T1 p.405: Rb, Rb2, Rb2O, RbO, Rb2O2 over Rb2O (m.p. 900 K);
+
+          LH84; Nicolosi et al. 1979 measurement window 1020–1135 K.
+
+          '
+        section: SF18-T1 / speciation ordering
+      phase: gas_over_oxide
+      units: dimensionless ordering (not a numeric gamma)
+      values:
+        speciation_note: Rb, Rb2, Rb2O, RbO, Rb2O2 (SF18-T1 p.405)
+        semantics: bound_not_point_ordering
+  Cs2O:
+    observations:
+    - observation_id: sf18_speciation_Cs2O
+      type: activity_coefficient
+      locator:
+        note: 'SF18-T1 p.403: Cs2O, Cs, Cs2O2, CsO over Cs2O — Cs2O is the *most
+
+          abundant* (congruent associative). LH84; Tower 1969.
+
+          T window cited: 1070–1170 K (SF18-T1).
+
+          '
+        section: SF18-T1 / speciation ordering
+      phase: gas_over_oxide
+      units: dimensionless ordering (not a numeric gamma)
+      values:
+        speciation_note: Cs2O dominant (associative); Cs, Cs2O2, CsO secondary (SF18-T1 p.403; Tower 1969
+          via SF18)
+        semantics: bound_not_point_ordering
+  Ga2O:
+    observations:
+    - observation_id: sf18_speciation_Ga2O
+      type: activity_coefficient
+      locator:
+        note: 'SF18-T1 p.404: Ga2O most abundant over Ga2O3(s), 1013–1841 K;
+
+          Frosch & Thurmond 1962; Shchukarev et al. 1969; LH87 §2.2.h p.432.
+
+          Ferrobasalt column lists GaO, Ga (SF18-T5) — regime-dependent.
+
+          '
+        section: SF18-T1 / speciation ordering
+      phase: gas_over_oxide
+      units: dimensionless ordering (not a numeric gamma)
+      values:
+        speciation_note: Ga2O ≫ Ga, GaO over pure Ga2O3 under reducing; ferrobasalt may shift to Ga/GaO
+          (SF18-T5)
+        semantics: bound_not_point_ordering
+  As4O6:
+    observations:
+    - observation_id: sf18_speciation_As4O6
+      type: activity_coefficient
+      locator:
+        note: 'SF18-T1 p.402: As4O6 ≫ As4O5, As4O4, As2O3, AsO over As2O3(s,l),
+
+          367–1700 K; Behrens & Rosenblatt 1972; Brittain et al. 1982.
+
+          We carry As2O3 forms only — a minor member.
+
+          '
+        section: SF18-T1 / speciation ordering
+      phase: gas_over_oxide
+      units: dimensionless ordering (not a numeric gamma)
+      values:
+        speciation_note: Dominant gas is As4O6; As2O3(g) is a minor member (SF18-T1 p.402)
+        semantics: bound_not_point_ordering
+  Sb4O6:
+    observations:
+    - observation_id: sf18_speciation_Sb4O6
+      type: activity_coefficient
+      locator:
+        note: 'SF18-T1 p.405: Sb4O6 dominant over Sb2O3(s,l), 580–1073 K;
+
+          Hincke 1930; Behrens & Rosenblatt 1973; Semenov et al. 1983.
+
+          We carry Sb2O3, not the tetramer.
+
+          '
+        section: SF18-T1 / speciation ordering
+      phase: gas_over_oxide
+      units: dimensionless ordering (not a numeric gamma)
+      values:
+        speciation_note: Sb4O6 (+ Sb4O5, Sb3O4, Sb2O2, SbO); congruent associative (SF18-T1 p.405)
+        semantics: bound_not_point_ordering
+  VO_VO2:
+    observations:
+    - observation_id: sf18_speciation_VO_VO2
+      type: activity_coefficient
+      locator:
+        note: 'SF18-T1 p.407: VO dominant over VO(s) and V2O3; VO2 over V2O4;
+
+          V4O10 over V2O5; 1003–2270 K. Berkowitz et al. 1957a; Farber et al.
+
+          1972b; Frantseva & Semenov 1969.
+
+          '
+        section: SF18-T1 / speciation ordering
+      phase: gas_over_oxide
+      units: dimensionless ordering (not a numeric gamma)
+      values:
+        speciation_note: 'Over VO(s): VO(g) > V(g) > VO2(g) (Ban86; BIC57). VO2 becomes
+
+          important over higher oxides (SF18-T1). V4O10 over V2O5 is a
+
+          separate associative channel at lower T.
+
+          '
+        semantics: bound_not_point_ordering
+  SrO:
+    observations:
+    - observation_id: sf18_speciation_SrO
+      type: activity_coefficient
+      locator:
+        note: 'SF18-T1 p.406: Sr ~ SrO over SrO(s), 1575–2102 K; Pelchowitch 1954;
+
+          Farber & Srivastava 1976; LH87 §2.2.d p.428.
+
+          '
+        section: SF18-T1 / speciation ordering
+      phase: gas_over_oxide
+      units: dimensionless ordering (not a numeric gamma)
+      values:
+        speciation_note: Sr(g) ~ SrO(g); Sr2O minor (LH87 includes estimated Sr2O for completeness)
+        semantics: bound_not_point_ordering
+  BaO:
+    observations:
+    - observation_id: sf18_speciation_BaO
+      type: activity_coefficient
+      locator:
+        note: 'SF18-T1 p.403: BaO, Ba, Ba2O3, Ba2O2, Ba2O over BaO(s), 1150–1758 K;
+
+          Inghram et al. 1955; Hilpert & Gerads 1975; LH87 §2.2.e p.430.
+
+          BaO is the most abundant Ba gas.
+
+          '
+        section: SF18-T1 / speciation ordering
+      phase: gas_over_oxide
+      units: dimensionless ordering (not a numeric gamma)
+      values:
+        speciation_note: BaO dominant (neutral/oxidizing); Ba, Ba2O, Ba2O2, Ba2O3 secondary
+        semantics: bound_not_point_ordering
+  Eu_metal_and_EuO:
+    observations:
+    - observation_id: SF18_Eu2O3_window
+      type: activity_coefficient
+      locator:
+        table: null
+        note: SF18_Eu2O3_window
+        record: SF18_Eu2O3_window
+      T_range_K:
+      - 1950
+      - 2350
+      phase: gas
+      standard_state: null
+      units: kJ/mol and J/(mol·K) for formation; over_R in kK as published
+      values:
+        condensed_reservoir: Eu2O3(s)
+        gas_species_order:
+        - Eu
+        - EuO
+    - observation_id: sf18_speciation_Eu_metal_and_EuO
+      type: activity_coefficient
+      locator:
+        note: 'SF18-T1 p.403: Eu, EuO over Eu2O3(s), 1950–2350 K; Eu(g) first —
+
+          Eu is the anomalously volatile REE. Ames et al. 1967; Panish 1961a;
+
+          Dulick et al. 1986.
+
+          '
+        section: SF18-T1 / speciation ordering
+      phase: gas_over_oxide
+      units: dimensionless ordering (not a numeric gamma)
+      values:
+        speciation_note: Eu(g) first over Eu2O3 (anomalously volatile REE); EuO secondary
+        semantics: bound_not_point_ordering
+  Yb_metal_and_YbO:
+    observations:
+    - observation_id: SF18_Yb2O3_window
+      type: activity_coefficient
+      locator:
+        table: null
+        note: SF18_Yb2O3_window
+        record: SF18_Yb2O3_window
+      T_range_K:
+      - 2000
+      - 2626
+      phase: gas
+      standard_state: null
+      units: kJ/mol and J/(mol·K) for formation; over_R in kK as published
+      values:
+        condensed_reservoir: Yb2O3(s)
+        gas_species_order:
+        - Yb
+        - YbO
+    - observation_id: sf18_speciation_Yb_metal_and_YbO
+      type: activity_coefficient
+      locator:
+        note: 'SF18-T1 p.407: Yb, YbO over Yb2O3(s), 2000–2626 K; Yb(g) first —
+
+          Yb, like Eu, is anomalously volatile. Panish 1961b; Stolyarova et al.
+
+          2014; Ames et al. 1967.
+
+          '
+        section: SF18-T1 / speciation ordering
+      phase: gas_over_oxide
+      units: dimensionless ordering (not a numeric gamma)
+      values:
+        speciation_note: Yb(g) first over Yb2O3 (anomalously volatile REE); YbO secondary
+        semantics: bound_not_point_ordering
+  PO:
+    observations:
+    - observation_id: SF18_Mk86_PO_from_silicate_melt
+      type: gibbs_table
+      locator:
+        table: null
+        note: Sossi & Fegley (2018) Rev. Mineral. Geochem. 84:393-459, Table 5 p.431 (PO in solar-nebula
+          column) and text citing Markova et al. 1986 for PO/PO2 from silicate liquids
+        record: SF18_Mk86_PO_from_silicate_melt
+        source_path: null
+      T_range_K: null
+      phase: ideal_gas
+      standard_state: 1 bar
+      units: kJ/mol (ΔfG / formation tabulation as published)
+      values: &id002
+        gas_species: PO
+        condensed_reservoir: P2O5 in silicate melt, activity a_P2O5 (Raoultian pure-oxide standard state)
+        reaction: P2O5(melt) = 2 PO(g) + 1.5 O2(g)
+        monomeric_form: PO2.5(melt) = PO(g) + 0.75 O2(g)
+        pressure_form: p_PO/p0 = a_P2O5^0.5 * K_PO(T)^0.5 * (p_O2/p0)^(-0.75)
+        fO2_exponent: -0.75
+        standard_pressure: 1 bar
+        valid_range_note: Markova et al. 1986 T/composition window UNKNOWN-NO-SOURCE this pass; SF18 applies
+          claim to silicate liquids generally
+        dominance_window: reduced melts / solar-nebula column; SF18 Table 5 log fO2=-18.06 @ 1500 K, 1e-4
+          bar
+        melt_activity_warning:
+          citation: 'Turkdogan (2000) ISIJ Int. 40:964-970, via SF18 Table 2: gamma(PO2.5)=1e-6..1e-10
+            in CMFS, 1823-1923 K'
+          doi: 10.2355/isijinternational.40.964
+  PO2:
+    observations:
+    - observation_id: SF18_Mk86_PO2_from_silicate_melt
+      type: gibbs_table
+      locator:
+        table: null
+        note: Sossi & Fegley (2018) Rev. Mineral. Geochem. 84:393-459, text citing Markova et al. 1986
+          (PO and PO2 from silicate liquids)
+        record: SF18_Mk86_PO2_from_silicate_melt
+        source_path: null
+      T_range_K: null
+      phase: ideal_gas
+      standard_state: 1 bar
+      units: kJ/mol (ΔfG / formation tabulation as published)
+      values:
+        gas_species: PO2
+        condensed_reservoir: P2O5 in silicate melt, a_P2O5
+        reaction: P2O5(melt) = 2 PO2(g) + 0.5 O2(g)
+        monomeric_form: PO2.5(melt) = PO2(g) + 0.25 O2(g)
+        pressure_form: p_PO2/p0 = a_P2O5^0.5 * K_PO2(T)^0.5 * (p_O2/p0)^(-0.25)
+        fO2_exponent: -0.25
+        standard_pressure: 1 bar
+        valid_range_note: Markova 1986 primary window UNKNOWN-NO-SOURCE; claim via SF18 only
+  P4O6:
+    observations:
+    - observation_id: SF18_T5_P4O6_Hchondrite_column
+      type: gibbs_table
+      locator:
+        table: null
+        note: Sossi & Fegley (2018) Rev. Mineral. Geochem. 84:393-459, Table 5 p.431 (P as P4O6 under
+          H-chondrite outgassing); Schaefer & Fegley (2007) Icarus 186:462-483
+        record: SF18_T5_P4O6_Hchondrite_column
+        source_path: null
+      T_range_K: null
+      phase: ideal_gas
+      standard_state: 1 bar
+      units: kJ/mol (ΔfG / formation tabulation as published)
+      values:
+        gas_species: P4O6
+        condensed_reservoir: P2O5 in silicate/chondritic melt, a_P2O5
+        reaction: 2 P2O5(melt) = P4O6(g) + 2 O2(g)
+        pressure_form: p_P4O6/p0 = K_P4O6(T) * a_P2O5^2 * (p_O2/p0)^(-2)
+        fO2_exponent: -2.0
+        standard_pressure: 1 bar
+        dominance_window: 'SF18 Table 5 H-chondrite column: 1500 K, 1e-4 bar, log fO2=-12.48'
+  P4O10:
+    observations:
+    - observation_id: SF18_T1_P4O10_KEMS_dominance
+      type: activity_coefficient
+      locator:
+        table: null
+        note: Sossi & Fegley (2018) Rev. Mineral. Geochem. 84 Table 1 p.405; Hashizume et al. (1966) Bull.
+          Chem. Soc. Jpn. 39:150-155; Muenow et al. (1970) J. Inorg. Nucl. Chem. 32:3459-3467; Kazenas
+          & Petrov (1997) Russ. Metall. 29-34
+        record: SF18_T1_P4O10_KEMS_dominance
+        source_path: null
+      T_range_K: null
+      phase: ideal_gas
+      standard_state: 1 bar (0.1 MPa)
+      units: as published in P-carriers DRAFT
+      values:
+        condensed_reservoir: P4O10(s)
+        gas_order: P4O10 >> P4O9, P4O8, P4O7, P4O6
+        primary_T_windows_K:
+          Hashizume1966:
+          - 333
+          - 923
+          Muenow1970:
+          - 313
+          - 773
+          KazenasPetrov1997:
+          - 370
+          - 423
+        melting_point_K_SF18: 699
+        antoine_coefficients: null
+        antoine_status: UNKNOWN-NO-SOURCE (primary equation coefficients not recovered this pass)
+    - observation_id: melt_associative_P4O10
+      type: gibbs_table
+      locator:
+        table: null
+        note: stoichiometry of associative evaporation of P4O10; SF18 Table 1 pure-oxide limit
+        record: melt_associative_P4O10
+        source_path: null
+      T_range_K: null
+      phase: ideal_gas
+      standard_state: 1 bar
+      units: kJ/mol (ΔfG / formation tabulation as published)
+      values:
+        gas_species: P4O10
+        condensed_reservoir: P2O5 in melt, a_P2O5
+        reaction: 2 P2O5(melt) = P4O10(g)
+        pressure_form: p_P4O10/p0 = K_P4O10(T) * a_P2O5^2
+        fO2_exponent: 0.0
+        standard_pressure: 1 bar
+        se5_ban: do not set a_P2O5=1 for dilute basalt
+fidelity_samples:
+- path: species.Li2O.observations[sf18_speciation_Li2O].values
+  value: *id001
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: 'SF18-T1 p.404: Li ~ Li2O > LiO > Li3O, Li2O2 over Li2O, 1000–1700 K;
+
+      primary review LH84 (closure §2.4).
+
+      '
+    section: SF18-T1 / speciation ordering
+- path: species.PO.observations[SF18_Mk86_PO_from_silicate_melt].values
+  value: *id002
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    table: null
+    note: Sossi & Fegley (2018) Rev. Mineral. Geochem. 84:393-459, Table 5 p.431 (PO in solar-nebula column)
+      and text citing Markova et al. 1986 for PO/PO2 from silicate liquids
+    record: SF18_Mk86_PO_from_silicate_melt
+    source_path: null

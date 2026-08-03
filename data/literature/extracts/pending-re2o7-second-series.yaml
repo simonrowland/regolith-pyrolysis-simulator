@@ -1,0 +1,46 @@
+schema_version: literature_extract.v1
+source_id: pending-re2o7-second-series
+source:
+  citation: Second lab series for Re2O7 (search post-1952 effusion); or JANAF Re2O7 thermochemistry if
+    not used in fit. Smith et al. 1952 is likely the fit source — need non-Smith primary for validated
+    flip.
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  Re2O7:
+    observations:
+    - observation_id: anchor_Re2O7_pure_Psat
+      type: psat_series
+      locator:
+        note: Second lab series for Re2O7 (search post-1952 effusion); or JANAF Re2O7 thermochemistry
+          if not used in fit. Smith et al. 1952 is likely the fit source — need non-Smith primary for
+          validated flip.
+        record: PENDING#Re2O7_second_series
+      units: as published
+      values:
+        quantity: pure_Psat
+        T_range_K:
+        - 503.15
+        - 573.45
+        phase: solid_Re2O7_to_Re2O7_g
+        standard_state: pure Re2O7
+        independence_note: If Smith is fit source, do not self-cite
+fidelity_samples:
+- path: species.Re2O7.observations[anchor_Re2O7_pure_Psat].values
+  value:
+    quantity: pure_Psat
+    T_range_K:
+    - 503.15
+    - 573.45
+    phase: solid_Re2O7_to_Re2O7_g
+    standard_state: pure Re2O7
+    independence_note: If Smith is fit source, do not self-cite
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: Second lab series for Re2O7 (search post-1952 effusion); or JANAF Re2O7 thermochemistry if not
+      used in fit. Smith et al. 1952 is likely the fit source — need non-Smith primary for validated flip.
+    record: PENDING#Re2O7_second_series

@@ -1,0 +1,99 @@
+schema_version: literature_extract.v1
+source_id: habermann-daane-1964
+source:
+  citation: Habermann & Daane, J. Chem. Phys. 41 (1964) 2818–2827
+  year: 1964
+extraction:
+  method: manual transcription from vp-acquire-5 dominant-missing-12 DRAFT
+  date: '2026-07-30'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+review_status: draft
+species:
+  Eu_metal_and_EuO:
+    observations:
+    - observation_id: Hab64_Eu_metal_third_law
+      type: gibbs_table
+      locator:
+        table: null
+        note: Hab64_Eu_metal_third_law
+        record: Hab64_Eu_metal_third_law
+      T_range_K: null
+      phase: gas
+      standard_state: 1 atm for -log Patm column in Table 15
+      units: kJ/mol and J/(mol·K) for formation; over_R in kK as published
+      values: &id001
+        Delta_sub_H_298_kcal_mol: 41.923
+        Delta_sub_H_298_uncertainty_kcal_mol: 0.027
+        Delta_sub_H_298_kJ_mol:
+          value: 175.4
+          arithmetic: 41.923 * 4.184 = 175.40 kJ·mol⁻¹
+        second_law_kcal_mol: 42.177
+        second_law_uncertainty_kcal_mol: 0.025
+        normal_boiling_point_K: 1885
+        normal_boiling_point_note: Habermann third-law NBP; Hanak estimated 1762 K
+        gas_species: Eu
+        condensed_reservoir: Eu(s/l)
+        temperature_points_in_third_law_table_K:
+        - 696
+        - 899
+        temperature_points_source: Habermann thesis Table 15 third-law grid
+        note: 'Habermann did NOT re-measure Eu; data are Hanak’s. Explicit
+
+          log10 P = A − B/T coefficients for Eu were not printed in the
+
+          Habermann Eu section (only third-law table).
+
+          '
+  Yb_metal_and_YbO:
+    observations:
+    - observation_id: Hab64_Yb_metal_antoine
+      type: psat_series
+      locator:
+        table: null
+        note: Hab64_Yb_metal_antoine
+        record: Hab64_Yb_metal_antoine
+      T_range_K:
+      - 623
+      - 931
+      phase: solid_sublimation
+      standard_state: null
+      units: log10(P_mmHg) = A − B/T_K
+      uncertainty:
+        mid_range_Delta_sub_H_uncertainty_kcal_mol: 0.15
+        third_law_Delta_sub_H_298_uncertainty_kcal_mol: 0.057
+      values:
+        gas_species: Yb
+        condensed_reservoir: Yb(s)
+        phase_branch: solid_sublimation
+        source_form: log10(P_mmHg) = A − B/T_K
+        coefficients:
+          A: 8.295
+          A_uncertainty: 0.043
+          B: 7696
+          B_uncertainty: 33
+          C: 0.0
+        runtime_form: log10(P_Pa) = (A + log10(133.322368)) − B/T_K
+        runtime_coefficients:
+          A_Pa: 10.4199
+          arithmetic_A: 8.295 + log10(133.322368) = 8.295 + 2.1249 = 10.4199
+          B: 7696
+          C: 0.0
+        valid_range_source: 'Habermann thesis Fig. 15 caption: 623–931 K; mid-range 777 K'
+        mid_range_Delta_sub_H_kcal_mol: 35.216
+        mid_range_Delta_sub_H_uncertainty_kcal_mol: 0.15
+        third_law_Delta_sub_H_298_kcal_mol: 36.332
+        third_law_Delta_sub_H_298_uncertainty_kcal_mol: 0.057
+        third_law_Delta_sub_H_298_kJ_mol:
+          value: 152.01
+          arithmetic: 36.332 * 4.184 = 152.01 kJ·mol⁻¹
+        n_points: 157
+        n_runs: 8
+fidelity_samples:
+- path: species.Eu_metal_and_EuO.observations[Hab64_Eu_metal_third_law].values
+  value: *id001
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    table: null
+    note: Hab64_Eu_metal_third_law
+    record: Hab64_Eu_metal_third_law

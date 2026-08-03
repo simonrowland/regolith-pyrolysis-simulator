@@ -1,0 +1,50 @@
+schema_version: literature_extract.v1
+source_id: giauque-powell-1939-cl2
+source:
+  citation: Giauque, W.F. & Powell, T.M. (1939), "Chlorine. The Heat Capacity, Vapor Pressure, Heats of
+    Fusion and Vaporization, and Entropy", J. Am. Chem. Soc. 61:1970–1974, DOI 10.1021/ja01877a012 — primary
+    calorimetry/VP (use solid and liquid branches separately; do not promote a single Antoine across the
+    triple point).
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  Cl2:
+    observations:
+    - observation_id: anchor_Cl2_pure_Psat
+      type: psat_series
+      locator:
+        note: Giauque, W.F. & Powell, T.M. (1939), "Chlorine. The Heat Capacity, Vapor Pressure, Heats
+          of Fusion and Vaporization, and Entropy", J. Am. Chem. Soc. 61:1970–1974, DOI 10.1021/ja01877a012
+          — primary calorimetry/VP (use solid and liquid branches separately; do not promote a single
+          Antoine across the tr
+        record: Giauque-Powell-1939#Cl2
+      units: as published
+      values:
+        quantity: pure_Psat
+        T_range_K:
+        - ~150
+        - 239
+        phase: solid_and_liquid_Cl2_separate_branches
+        standard_state: pure Cl2
+        independence_note: Stull is fit source; Giauque is primary experimental
+fidelity_samples:
+- path: species.Cl2.observations[anchor_Cl2_pure_Psat].values
+  value:
+    quantity: pure_Psat
+    T_range_K:
+    - ~150
+    - 239
+    phase: solid_and_liquid_Cl2_separate_branches
+    standard_state: pure Cl2
+    independence_note: Stull is fit source; Giauque is primary experimental
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: Giauque, W.F. & Powell, T.M. (1939), "Chlorine. The Heat Capacity, Vapor Pressure, Heats of
+      Fusion and Vaporization, and Entropy", J. Am. Chem. Soc. 61:1970–1974, DOI 10.1021/ja01877a012 —
+      primary calorimetry/VP (use solid and liquid branches separately; do not promote a single Antoine
+      across the tr
+    record: Giauque-Powell-1939#Cl2

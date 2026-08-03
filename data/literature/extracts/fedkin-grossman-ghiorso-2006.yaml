@@ -1,0 +1,238 @@
+schema_version: literature_extract.v1
+source_id: fedkin-grossman-ghiorso-2006
+source:
+  citation: Fedkin, A. V., Grossman, L. & Ghiorso, M. S. (2006), Geochim. Cosmochim. Acta 70:206-223,
+    Table 3 pp. 212-213; primary vacuum free-evaporation data Hashimoto, A. (1983), Geochem. J. 17:111-145
+  doi: 10.1016/j.gca.2005.08.014
+  url: https://doi.org/10.1016/j.gca.2005.08.014
+  year: 2006
+extraction:
+  method: manual transcription from vp-acquire-6 alpha-kinetics DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/alpha-kinetics.md
+review_status: draft
+species:
+  Fe:
+    observations:
+    - observation_id: fedkin_2006_table3_fe_hashimoto_langmuir
+      type: alpha
+      locator:
+        note: Fedkin, A. V., Grossman, L. & Ghiorso, M. S. (2006), Geochim. Cosmochim. Acta 70:206-223,
+          Table 3 pp. 212-213; primary vacuum free-evaporation data Hashimoto, A. (1983), Geochem. J.
+          17:111-145
+        record: fedkin_2006_table3_fe_hashimoto_langmuir
+      T_range_K:
+      - 1973.0
+      - 2273.0
+      phase: silicate_melt
+      standard_state: MELTS activities for P_sat; α is free-evaporation coefficient for Fe(g). α_FeO assumed
+        equal to α_Fe within ±0.04 class sensitivity (Fedkin Fig. 3).
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      values: &id009
+        alpha: 0.24
+        alpha_range: &id001
+        - 0.21
+        - 0.27
+        gas_species: Fe(g)
+        material: Hashimoto_1983_FMSCA_silicate_melt
+        per_temperature: &id002
+        - T_K: 1973.0
+          alpha: 0.23
+          sigma: 0.02
+        - T_K: 2073.0
+          alpha: 0.25
+          sigma: 0.02
+        - T_K: 2173.0
+          alpha: 0.24
+          sigma: 0.02
+        - T_K: 2273.0
+          alpha: 0.23
+          sigma: 0.02
+      uncertainty:
+        note: Distinct from Costa KEMS pin; do not average into one Fe alpha
+        alpha_range: *id001
+    - observation_id: fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series
+      type: rate_series
+      locator:
+        table: '3'
+        note: Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)
+        record: fedkin_2006_table3_fe_hashimoto_langmuir
+      T_range_K:
+      - 1973.0
+      - 2273.0
+      phase: silicate_melt
+      regime: langmuir_free_evaporation
+      units: dimensionless alpha vs T_K
+      values:
+        series: *id002
+  Na:
+    observations:
+    - observation_id: fedkin_2006_yu_na_vacuum_langmuir
+      type: alpha
+      locator:
+        note: Fedkin et al. (2006) GCA 70:206-223 pp. 213-214; primary experiment Yu, Y., Hewins, R. H.,
+          Alexander, C. M. O'D. & Wang, J. (2003) Geochim. Cosmochim. Acta 67:773-786
+        record: fedkin_2006_yu_na_vacuum_langmuir
+      T_range_K:
+      - 1723.15
+      - 1723.15
+      phase: silicate_melt
+      standard_state: MELTS Na2SiO3 activity basis in Fedkin model; gas is monatomic Na
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      values:
+        alpha: 0.26
+        alpha_range: &id003
+        - 0.21
+        - 0.31
+        gas_species: Na(g)
+        material: Yu_et_al_2003_C1_silicate_melt
+        draft_competing_runtime:
+          value: 1.0
+          regime: open_furnace_apparent
+          citation: Sossi et al. (2019) GCA 260:204-231
+      uncertainty:
+        note: 'OWNER GATE: flip runtime Na from open-furnace 1.0 to vacuum 0.26 only after series-resistance
+          model review'
+        alpha_range: *id003
+  K:
+    observations:
+    - observation_id: fedkin_2006_yu_k_vacuum_langmuir
+      type: alpha
+      locator:
+        note: Fedkin et al. (2006) GCA 70:206-223 models Yu et al. (2003) GCA 67:773-786; tabulated with
+          uncertainty also by Richter lineage; rail sidecar vapour_rail_langmuir_anchors.yaml::fedkin_2006_k_silicate_vacuum_langmuir
+        record: fedkin_2006_yu_k_vacuum_langmuir
+      T_range_K:
+      - 1723.15
+      - 1723.15
+      phase: silicate_melt
+      standard_state: MELTS activities; monatomic K(g); NOT KEMS effusion
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      values:
+        alpha: 0.13
+        alpha_range: &id004
+        - 0.11
+        - 0.15
+        gas_species: K(g)
+        material: Yu_et_al_2003_C1_silicate_melt
+        draft_runtime_provenance_bug: REF-014 string still says KEMS sealed-chamber — false
+        draft_action: keep value; repair regime label to langmuir_free_evaporation
+      uncertainty:
+        alpha_range: *id004
+  Mg:
+    observations:
+    - observation_id: fedkin_2006_table3_mg_hashimoto_langmuir
+      type: alpha
+      locator:
+        note: Fedkin et al. (2006) GCA 70:206-223 Table 3; Hashimoto (1983) Geochem. J. 17:111-145 vacuum
+          free evaporation
+        record: fedkin_2006_table3_mg_hashimoto_langmuir
+      T_range_K:
+      - 1973.0
+      - 2273.0
+      phase: silicate_melt
+      standard_state: MELTS Mg activity in P_sat; α free-evaporation
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      values:
+        alpha: 0.27
+        alpha_range: &id005
+        - 0.23
+        - 0.29
+        gas_species: Mg(g)
+        material: Hashimoto_1983_FMSCA_silicate_melt
+        per_temperature: &id006
+        - T_K: 1973.0
+          alpha: 0.24
+          sigma: 0.01
+        - T_K: 2073.0
+          alpha: 0.28
+          sigma: 0.01
+        - T_K: 2173.0
+          alpha: 0.28
+          sigma: 0.01
+        - T_K: 2273.0
+          alpha: 0.27
+          sigma: 0.01
+        draft_runtime_compatible_pin: 0.2
+      uncertainty:
+        note: Runtime 0.20 [0.1,0.21] is lower-bound conservative vs Table 3; either keep pin or re-center
+          on 0.27 with wider envelope
+        alpha_range: *id005
+    - observation_id: fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series
+      type: rate_series
+      locator:
+        table: '3'
+        note: Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)
+        record: fedkin_2006_table3_mg_hashimoto_langmuir
+      T_range_K:
+      - 1973.0
+      - 2273.0
+      phase: silicate_melt
+      regime: langmuir_free_evaporation
+      units: dimensionless alpha vs T_K
+      values:
+        series: *id006
+  SiO:
+    observations:
+    - observation_id: fedkin_2006_table3_sio_hashimoto_langmuir
+      type: alpha
+      locator:
+        note: Fedkin et al. (2006) GCA 70:206-223 Table 3; Hashimoto (1983)
+        record: fedkin_2006_table3_sio_hashimoto_langmuir
+      T_range_K:
+      - 1973.0
+      - 2273.0
+      phase: silicate_melt
+      standard_state: null
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      values:
+        alpha: 0.17
+        alpha_range: &id007
+        - 0.11
+        - 0.22
+        gas_species: SiO(g)
+        material: Hashimoto_1983_FMSCA_silicate_melt
+        per_temperature: &id008
+        - T_K: 1973.0
+          alpha: 0.12
+          sigma: 0.01
+        - T_K: 2073.0
+          alpha: 0.17
+          sigma: 0.01
+        - T_K: 2173.0
+          alpha: 0.2
+          sigma: 0.01
+        - T_K: 2273.0
+          alpha: 0.21
+          sigma: 0.01
+      uncertainty:
+        note: Cross-check only; T band mostly above Wetzel valid_range_K ceiling
+        alpha_range: *id007
+    - observation_id: fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series
+      type: rate_series
+      locator:
+        table: '3'
+        note: Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)
+        record: fedkin_2006_table3_sio_hashimoto_langmuir
+      T_range_K:
+      - 1973.0
+      - 2273.0
+      phase: silicate_melt
+      regime: langmuir_free_evaporation
+      units: dimensionless alpha vs T_K
+      values:
+        series: *id008
+fidelity_samples:
+- path: species.Fe.observations[fedkin_2006_table3_fe_hashimoto_langmuir].values
+  value: *id009
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: Fedkin, A. V., Grossman, L. & Ghiorso, M. S. (2006), Geochim. Cosmochim. Acta 70:206-223, Table
+      3 pp. 212-213; primary vacuum free-evaporation data Hashimoto, A. (1983), Geochem. J. 17:111-145
+    record: fedkin_2006_table3_fe_hashimoto_langmuir

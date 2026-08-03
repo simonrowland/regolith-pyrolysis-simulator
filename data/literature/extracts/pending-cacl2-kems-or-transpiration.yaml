@@ -1,0 +1,44 @@
+schema_version: literature_extract.v1
+source_id: pending-cacl2-kems-or-transpiration
+source:
+  citation: 'Measured monomer/dimer salt vapor pressures: e.g. Hildenbrand / KEMS alkaline-earth chloride
+    literature; Bloom & Welch molten CaCl2 VP. JANAF cannot self-validate a JANAF-derived Antoine.'
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  CaCl2:
+    observations:
+    - observation_id: anchor_CaCl2_pure_Psat
+      type: psat_series
+      locator:
+        note: 'Measured monomer/dimer salt vapor pressures: e.g. Hildenbrand / KEMS alkaline-earth chloride
+          literature; Bloom & Welch molten CaCl2 VP. JANAF cannot self-validate a JANAF-derived Antoine.'
+        record: PENDING#CaCl2_KEMS_or_transpiration
+      units: as published
+      values:
+        quantity: pure_Psat
+        T_range_K:
+        - 1100
+        - 1500
+        phase: liquid_CaCl2_to_CaCl2_g
+        standard_state: monomer partial; polymers separate
+        independence_note: Fit is JANAF table fit
+fidelity_samples:
+- path: species.CaCl2.observations[anchor_CaCl2_pure_Psat].values
+  value:
+    quantity: pure_Psat
+    T_range_K:
+    - 1100
+    - 1500
+    phase: liquid_CaCl2_to_CaCl2_g
+    standard_state: monomer partial; polymers separate
+    independence_note: Fit is JANAF table fit
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: 'Measured monomer/dimer salt vapor pressures: e.g. Hildenbrand / KEMS alkaline-earth chloride
+      literature; Bloom & Welch molten CaCl2 VP. JANAF cannot self-validate a JANAF-derived Antoine.'
+    record: PENDING#CaCl2_KEMS_or_transpiration

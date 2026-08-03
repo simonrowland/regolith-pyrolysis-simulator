@@ -1,0 +1,72 @@
+schema_version: literature_extract.v1
+source_id: costa-jacobson-2015
+source:
+  citation: Costa, G. C. C. & Jacobson, N. S. (2015), Vaporization Studies of Olivine via Knudsen Effusion
+    Mass Spectrometry, NASA NTRS 20150002321
+  url: https://ntrs.nasa.gov/citations/20150002321
+  year: 2015
+extraction:
+  method: manual transcription from vp-acquire-6 alpha-kinetics DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/alpha-kinetics.md
+review_status: draft
+species:
+  Fe:
+    observations:
+    - observation_id: costa_jacobson_2015_fe_olivine_kems
+      type: alpha
+      locator:
+        note: Costa, G. C. C. & Jacobson, N. S. (2015), Vaporization Studies of Olivine via Knudsen Effusion
+          Mass Spectrometry, NASA NTRS 20150002321
+        record: costa_jacobson_2015_fe_olivine_kems
+      T_range_K:
+      - 1700.0
+      - 1800.0
+      phase: solid_solution_olivine
+      standard_state: KEMS vaporization coefficient on olivine condensed phase; activity in P_sat separate
+      regime: kems_effusion
+      units: dimensionless
+      values: &id003
+        alpha: 0.02
+        alpha_range: &id001
+        - 0.011
+        - 0.02
+        gas_species: Fe(g)
+        material: Fo93Fa7_olivine
+      uncertainty:
+        note: high-side of measured D(Fe+) band adopted as conservative pin
+        alpha_range: *id001
+  SiO:
+    observations:
+    - observation_id: costa_jacobson_2015_sio_olivine_kems
+      type: alpha
+      locator:
+        note: Costa & Jacobson (2015) NASA NTRS 20150002321; D(SiO+) plot band ~0.01-0.04 class (prior
+          runtime cross-check REF-016)
+        record: costa_jacobson_2015_sio_olivine_kems
+      T_range_K:
+      - 1700.0
+      - 1800.0
+      phase: solid_solution_olivine
+      standard_state: null
+      regime: kems_effusion
+      units: dimensionless
+      values:
+        alpha: null
+        alpha_range: &id002
+        - 0.003
+        - 0.036
+        gas_species: SiO(g)
+        material: Fo93Fa7_olivine
+      uncertainty:
+        note: Range from figure band / prior extract; not a single pin
+        alpha_range: *id002
+fidelity_samples:
+- path: species.Fe.observations[costa_jacobson_2015_fe_olivine_kems].values
+  value: *id003
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: Costa, G. C. C. & Jacobson, N. S. (2015), Vaporization Studies of Olivine via Knudsen Effusion
+      Mass Spectrometry, NASA NTRS 20150002321
+    record: costa_jacobson_2015_fe_olivine_kems

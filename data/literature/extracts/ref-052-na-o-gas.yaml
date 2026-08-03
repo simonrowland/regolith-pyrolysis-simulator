@@ -1,0 +1,49 @@
+schema_version: literature_extract.v1
+source_id: ref-052-na-o-gas
+source:
+  citation: Lamoreaux, R.H. & Hildenbrand, D.L. (1984), "High Temperature Vaporization Behavior of Oxides.
+    I. Alkali Metal Binary Oxides", J. Phys. Chem. Ref. Data 13:151–173, DOI 10.1063/1.555706 (project
+    REF-052), Table 4 Na–O gas species (NaO, Na2O, Na2O2, …). Independent of pure Na metal Rodebush Antoine.
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  Na2O_gas:
+    observations:
+    - observation_id: anchor_Na2O_gas_deltafG
+      type: gibbs_table
+      locator:
+        note: Lamoreaux, R.H. & Hildenbrand, D.L. (1984), "High Temperature Vaporization Behavior of Oxides.
+          I. Alkali Metal Binary Oxides", J. Phys. Chem. Ref. Data 13:151–173, DOI 10.1063/1.555706 (project
+          REF-052), Table 4 Na–O gas species (NaO, Na2O, Na2O2, …). Independent of pure Na metal Rodebush
+          Antoine.
+        record: REF-052#Na_O_gas
+      units: as published
+      values:
+        quantity: deltafG
+        T_range_K:
+        - 1000
+        - 2000
+        phase: condensed_Na2O_to_Na_O_gas
+        standard_state: Na-bearing oxide gas 1 bar; LH84 standard states
+        independence_note: Not the metals_na_family pure Na fit
+fidelity_samples:
+- path: species.Na2O_gas.observations[anchor_Na2O_gas_deltafG].values
+  value:
+    quantity: deltafG
+    T_range_K:
+    - 1000
+    - 2000
+    phase: condensed_Na2O_to_Na_O_gas
+    standard_state: Na-bearing oxide gas 1 bar; LH84 standard states
+    independence_note: Not the metals_na_family pure Na fit
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: Lamoreaux, R.H. & Hildenbrand, D.L. (1984), "High Temperature Vaporization Behavior of Oxides.
+      I. Alkali Metal Binary Oxides", J. Phys. Chem. Ref. Data 13:151–173, DOI 10.1063/1.555706 (project
+      REF-052), Table 4 Na–O gas species (NaO, Na2O, Na2O2, …). Independent of pure Na metal Rodebush
+      Antoine.
+    record: REF-052#Na_O_gas

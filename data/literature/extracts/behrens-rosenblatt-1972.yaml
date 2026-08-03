@@ -1,0 +1,44 @@
+schema_version: literature_extract.v1
+source_id: behrens-rosenblatt-1972
+source:
+  citation: Behrens & Rosenblatt, J. Chem. Thermodyn. 4 (1972) 175–190
+  year: 1972
+extraction:
+  method: manual transcription from vp-acquire-5 dominant-missing-12 DRAFT
+  date: '2026-07-30'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+review_status: draft
+species:
+  As4O6:
+    observations:
+    - observation_id: NIST_BR72_arsenolite_As4O6
+      type: psat_series
+      locator:
+        table: null
+        note: NIST Antoine table for diarsenic trioxide, row 369.29–421.69 K, citing Behrens and Rosenblatt
+          1972
+        record: NIST_BR72_arsenolite_As4O6
+      T_range_K:
+      - 369.29
+      - 421.69
+      phase: solid_arsenolite
+      standard_state: null
+      units: log10(P_bar) = A − B/(T_K + C)
+      values: &id001
+        gas_species: As4O6
+        phase_branch: solid_arsenolite
+        source_form: log10(P_bar) = A − B/(T_K + C)
+        coefficients:
+          A: 4.23424
+          B: 2406.912
+          C: -146.969
+fidelity_samples:
+- path: species.As4O6.observations[NIST_BR72_arsenolite_As4O6].values
+  value: *id001
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    table: null
+    note: NIST Antoine table for diarsenic trioxide, row 369.29–421.69 K, citing Behrens and Rosenblatt
+      1972
+    record: NIST_BR72_arsenolite_As4O6

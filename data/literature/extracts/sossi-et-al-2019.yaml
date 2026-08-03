@@ -1,0 +1,45 @@
+schema_version: literature_extract.v1
+source_id: sossi-et-al-2019
+source:
+  citation: Sossi, P. A. et al. (2019), Geochim. Cosmochim. Acta 260:204-231, DOI 10.1016/j.gca.2019.06.021
+  doi: 10.1016/j.gca.2019.06.021
+  url: https://doi.org/10.1016/j.gca.2019.06.021
+  year: 2019
+extraction:
+  method: manual transcription from vp-acquire-6 alpha-kinetics DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/alpha-kinetics.md
+review_status: draft
+species:
+  Na:
+    observations:
+    - observation_id: sossi_2019_na_open_furnace_apparent
+      type: alpha
+      locator:
+        note: Sossi, P. A. et al. (2019), Geochim. Cosmochim. Acta 260:204-231, DOI 10.1016/j.gca.2019.06.021
+        record: sossi_2019_na_open_furnace_apparent
+      T_range_K:
+      - 1573.15
+      - 1823.15
+      phase: silicate_melt
+      standard_state: 1-bar gas-mixing furnace apparent alpha; transport-limited
+      regime: open_furnace_apparent
+      units: dimensionless
+      values: &id002
+        alpha: 1.0
+        alpha_range: &id001
+        - 0.9
+        - 1.0
+        gas_species: Na(g)
+        material: ferrobasalt_FCMAS_open_furnace
+      uncertainty:
+        note: Retain as regime-tagged apparent alpha; do not treat as intrinsic vacuum alpha
+        alpha_range: *id001
+fidelity_samples:
+- path: species.Na.observations[sossi_2019_na_open_furnace_apparent].values
+  value: *id002
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: Sossi, P. A. et al. (2019), Geochim. Cosmochim. Acta 260:204-231, DOI 10.1016/j.gca.2019.06.021
+    record: sossi_2019_na_open_furnace_apparent

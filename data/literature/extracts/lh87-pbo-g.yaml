@@ -1,0 +1,42 @@
+schema_version: literature_extract.v1
+source_id: lh87-pbo-g
+source:
+  citation: Lamoreaux, Hildenbrand & Brewer (1987) JPCRD 16:419–443 PbO(g); JANAF PbO(g); Kazenas oxide
+    evaporation KEMS.
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  PbO:
+    observations:
+    - observation_id: anchor_PbO_pure_Psat_or_deltafG
+      type: psat_series
+      locator:
+        note: Lamoreaux, Hildenbrand & Brewer (1987) JPCRD 16:419–443 PbO(g); JANAF PbO(g); Kazenas oxide
+          evaporation KEMS.
+        record: LH87#PbO_g
+      units: as published
+      values:
+        quantity: pure_Psat_or_deltafG
+        T_range_K:
+        - 810
+        - 1200
+        phase: condensed_PbO_to_PbO_g
+        standard_state: PbO(g) 1 bar
+fidelity_samples:
+- path: species.PbO.observations[anchor_PbO_pure_Psat_or_deltafG].values
+  value:
+    quantity: pure_Psat_or_deltafG
+    T_range_K:
+    - 810
+    - 1200
+    phase: condensed_PbO_to_PbO_g
+    standard_state: PbO(g) 1 bar
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: Lamoreaux, Hildenbrand & Brewer (1987) JPCRD 16:419–443 PbO(g); JANAF PbO(g); Kazenas oxide
+      evaporation KEMS.
+    record: LH87#PbO_g

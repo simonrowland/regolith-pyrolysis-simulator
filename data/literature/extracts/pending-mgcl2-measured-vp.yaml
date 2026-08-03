@@ -1,0 +1,39 @@
+schema_version: literature_extract.v1
+source_id: pending-mgcl2-measured-vp
+source:
+  citation: Independent molten MgCl2 vapor-pressure / KEMS series (not JANAF)
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  MgCl2:
+    observations:
+    - observation_id: anchor_MgCl2_pure_Psat
+      type: psat_series
+      locator:
+        note: Independent molten MgCl2 vapor-pressure / KEMS series (not JANAF)
+        record: PENDING#MgCl2_measured_VP
+      units: as published
+      values:
+        quantity: pure_Psat
+        T_range_K:
+        - 1100
+        - 1700
+        phase: liquid_MgCl2_to_MgCl2_g
+        standard_state: monomer basis
+fidelity_samples:
+- path: species.MgCl2.observations[anchor_MgCl2_pure_Psat].values
+  value:
+    quantity: pure_Psat
+    T_range_K:
+    - 1100
+    - 1700
+    phase: liquid_MgCl2_to_MgCl2_g
+    standard_state: monomer basis
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: Independent molten MgCl2 vapor-pressure / KEMS series (not JANAF)
+    record: PENDING#MgCl2_measured_VP

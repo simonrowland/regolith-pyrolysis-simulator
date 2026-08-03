@@ -1,0 +1,42 @@
+schema_version: literature_extract.v1
+source_id: berkowitz-chupka-inghram-1957
+source:
+  citation: Berkowitz, Chupka & Inghram, J. Chem. Phys. 27 (1957) 87–90
+  year: 1957
+extraction:
+  method: manual transcription from vp-acquire-5 dominant-missing-12 DRAFT
+  date: '2026-07-30'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+review_status: draft
+species:
+  VO_VO2:
+    observations:
+    - observation_id: BIC57_VO_absolute_points
+      type: psat_series
+      locator:
+        table: null
+        note: BIC57_VO_absolute_points
+        record: BIC57_VO_absolute_points
+      T_range_K: null
+      phase: gas
+      standard_state: null
+      units: P as published (bar / Pa / mmHg per source_form)
+      values: &id001
+        gas_species: VO
+        condensed_reservoir: VO(s)
+        points:
+        - T_K: 1875
+          p_Pa: 0.155
+          note: Berkowitz et al. 1957 as quoted by Ban86 p. 603
+        - T_K: 1876
+          p_Pa: 0.116
+          note: same; temperature nearly identical — internal scatter
+fidelity_samples:
+- path: species.VO_VO2.observations[BIC57_VO_absolute_points].values
+  value: *id001
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    table: null
+    note: BIC57_VO_absolute_points
+    record: BIC57_VO_absolute_points

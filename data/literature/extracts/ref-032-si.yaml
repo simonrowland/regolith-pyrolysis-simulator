@@ -1,0 +1,44 @@
+schema_version: literature_extract.v1
+source_id: ref-032-si
+source:
+  citation: Alcock, Itkin & Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Si equations; JANAF Si(g)
+    Chase 1998.
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  Si:
+    observations:
+    - observation_id: anchor_Si_pure_Psat
+      type: psat_series
+      locator:
+        note: Alcock, Itkin & Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Si equations; JANAF Si(g)
+          Chase 1998.
+        record: REF-032#Si
+      units: as published
+      values:
+        quantity: pure_Psat
+        T_range_K:
+        - 1997
+        - 2500
+        phase: liquid_Si_to_Si_g
+        standard_state: pure liquid Si
+        independence_note: Stull is fit source; plant Si path is usually SiO not Si(g)
+fidelity_samples:
+- path: species.Si.observations[anchor_Si_pure_Psat].values
+  value:
+    quantity: pure_Psat
+    T_range_K:
+    - 1997
+    - 2500
+    phase: liquid_Si_to_Si_g
+    standard_state: pure liquid Si
+    independence_note: Stull is fit source; plant Si path is usually SiO not Si(g)
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: Alcock, Itkin & Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Si equations; JANAF Si(g) Chase
+      1998.
+    record: REF-032#Si

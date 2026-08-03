@@ -1,0 +1,44 @@
+schema_version: literature_extract.v1
+source_id: ref-032-al
+source:
+  citation: Alcock, Itkin & Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g)
+    Chase 1998 (REF-020).
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  Al:
+    observations:
+    - observation_id: anchor_Al_pure_Psat
+      type: psat_series
+      locator:
+        note: Alcock, Itkin & Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g)
+          Chase 1998 (REF-020).
+        record: REF-032#Al
+      units: as published
+      values:
+        quantity: pure_Psat
+        T_range_K:
+        - 1557
+        - 2500
+        phase: liquid_Al_to_Al_g
+        standard_state: pure liquid Al
+        independence_note: Stull 1947 is fit source
+fidelity_samples:
+- path: species.Al.observations[anchor_Al_pure_Psat].values
+  value:
+    quantity: pure_Psat
+    T_range_K:
+    - 1557
+    - 2500
+    phase: liquid_Al_to_Al_g
+    standard_state: pure liquid Al
+    independence_note: Stull 1947 is fit source
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: Alcock, Itkin & Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g) Chase
+      1998 (REF-020).
+    record: REF-032#Al

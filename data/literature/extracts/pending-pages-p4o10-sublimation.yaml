@@ -1,0 +1,42 @@
+schema_version: literature_extract.v1
+source_id: pending-pages-p4o10-sublimation
+source:
+  citation: Classical P4O10 sublimation vapor-pressure measurements (recover page-level primary independent
+    of any rail fit); JANAF P4O10.
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  P4O10:
+    observations:
+    - observation_id: anchor_P4O10_pure_Psat
+      type: psat_series
+      locator:
+        note: Classical P4O10 sublimation vapor-pressure measurements (recover page-level primary independent
+          of any rail fit); JANAF P4O10.
+        record: PENDING-pages#P4O10_sublimation
+      units: as published
+      values:
+        quantity: pure_Psat
+        T_range_K:
+        - 298
+        - 800
+        phase: solid_P4O10_to_P4O10_g
+        standard_state: pure P4O10
+fidelity_samples:
+- path: species.P4O10.observations[anchor_P4O10_pure_Psat].values
+  value:
+    quantity: pure_Psat
+    T_range_K:
+    - 298
+    - 800
+    phase: solid_P4O10_to_P4O10_g
+    standard_state: pure P4O10
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: Classical P4O10 sublimation vapor-pressure measurements (recover page-level primary independent
+      of any rail fit); JANAF P4O10.
+    record: PENDING-pages#P4O10_sublimation

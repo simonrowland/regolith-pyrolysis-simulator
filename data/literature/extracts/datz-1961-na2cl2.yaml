@@ -1,0 +1,42 @@
+schema_version: literature_extract.v1
+source_id: datz-1961-na2cl2
+source:
+  citation: Datz, Smith & Taylor (1961) J. Chem. Phys. 34:558–564 DOI 10.1063/1.1700984 Na2Cl2 dimer over
+    NaCl(l); JANAF Na2Cl2(g)
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  Na2Cl2:
+    observations:
+    - observation_id: anchor_Na2Cl2_dimer_partial
+      type: gibbs_table
+      locator:
+        note: Datz, Smith & Taylor (1961) J. Chem. Phys. 34:558–564 DOI 10.1063/1.1700984 Na2Cl2 dimer
+          over NaCl(l); JANAF Na2Cl2(g)
+        record: Datz-1961#Na2Cl2
+      units: as published
+      values:
+        quantity: dimer_partial
+        T_range_K:
+        - 1100
+        - 1500
+        phase: liquid_NaCl_to_Na2Cl2_g
+        standard_state: dimer partial pressure
+fidelity_samples:
+- path: species.Na2Cl2.observations[anchor_Na2Cl2_dimer_partial].values
+  value:
+    quantity: dimer_partial
+    T_range_K:
+    - 1100
+    - 1500
+    phase: liquid_NaCl_to_Na2Cl2_g
+    standard_state: dimer partial pressure
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: Datz, Smith & Taylor (1961) J. Chem. Phys. 34:558–564 DOI 10.1063/1.1700984 Na2Cl2 dimer over
+      NaCl(l); JANAF Na2Cl2(g)
+    record: Datz-1961#Na2Cl2

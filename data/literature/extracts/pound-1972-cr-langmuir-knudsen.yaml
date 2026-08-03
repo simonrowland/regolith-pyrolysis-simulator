@@ -1,0 +1,46 @@
+schema_version: literature_extract.v1
+source_id: pound-1972-cr-langmuir-knudsen
+source:
+  citation: Pound, G. M. (1972), J. Phys. Chem. Ref. Data 1:135-146 Table 1, DOI 10.1063/1.3253096; primary
+    McCabe, Hudson & Paxton (1958), Trans. Met. Soc. AIME 212:102
+  doi: 10.1063/1.3253096
+  url: https://doi.org/10.1063/1.3253096
+extraction:
+  method: manual transcription from vp-acquire-6 alpha-kinetics DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/alpha-kinetics.md
+review_status: draft
+species:
+  Cr:
+    observations:
+    - observation_id: pound_1972_cr_langmuir_knudsen
+      type: alpha
+      locator:
+        note: Pound, G. M. (1972), J. Phys. Chem. Ref. Data 1:135-146 Table 1, DOI 10.1063/1.3253096;
+          primary McCabe, Hudson & Paxton (1958), Trans. Met. Soc. AIME 212:102
+        record: pound_1972_cr_langmuir_knudsen
+      T_range_K:
+      - 1318.0
+      - 1563.0
+      phase: solid_metal
+      standard_state: Pure solid Cr; melt activity must live in P_sat for dissolved Cr
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      values: &id002
+        alpha: 0.9
+        alpha_range: &id001
+        - 0.8
+        - 1.0
+        gas_species: Cr(g)
+        material: 99.9_percent_polycrystalline_solid_chromium
+      uncertainty:
+        alpha_range: *id001
+fidelity_samples:
+- path: species.Cr.observations[pound_1972_cr_langmuir_knudsen].values
+  value: *id002
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: Pound, G. M. (1972), J. Phys. Chem. Ref. Data 1:135-146 Table 1, DOI 10.1063/1.3253096; primary
+      McCabe, Hudson & Paxton (1958), Trans. Met. Soc. AIME 212:102
+    record: pound_1972_cr_langmuir_knudsen

@@ -1,0 +1,47 @@
+schema_version: literature_extract.v1
+source_id: ref-032-th
+source:
+  citation: Ackermann, R.J. & Rauh, E.G. (historical Argonne) thorium metal vapor pressure / effusion;
+    Alcock et al. (1984) Can. Metall. Q. 23:309 (REF-032) Th equation if present; JANAF Th(g) Chase 1998.
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  Th:
+    observations:
+    - observation_id: anchor_Th_pure_Psat
+      type: psat_series
+      locator:
+        note: Ackermann, R.J. & Rauh, E.G. (historical Argonne) thorium metal vapor pressure / effusion;
+          Alcock et al. (1984) Can. Metall. Q. 23:309 (REF-032) Th equation if present; JANAF Th(g) Chase
+          1998.
+        record: REF-032#Th
+      units: as published
+      values:
+        quantity: pure_Psat
+        T_range_K:
+        - 1800
+        - 2500
+        phase: solid_liquid_Th_to_Th_g
+        standard_state: pure Th metal / Th(g) 1 bar
+        independence_note: No numeric fit landed yet — first independent series becomes BOTH fit and needs
+          a second for validated flip
+fidelity_samples:
+- path: species.Th.observations[anchor_Th_pure_Psat].values
+  value:
+    quantity: pure_Psat
+    T_range_K:
+    - 1800
+    - 2500
+    phase: solid_liquid_Th_to_Th_g
+    standard_state: pure Th metal / Th(g) 1 bar
+    independence_note: No numeric fit landed yet — first independent series becomes BOTH fit and needs
+      a second for validated flip
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: Ackermann, R.J. & Rauh, E.G. (historical Argonne) thorium metal vapor pressure / effusion; Alcock
+      et al. (1984) Can. Metall. Q. 23:309 (REF-032) Th equation if present; JANAF Th(g) Chase 1998.
+    record: REF-032#Th

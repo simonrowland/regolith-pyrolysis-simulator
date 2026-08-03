@@ -1,0 +1,44 @@
+schema_version: literature_extract.v1
+source_id: ref-032-zr
+source:
+  citation: 'Alcock, Itkin & Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Zr equations; JANAF Zr(g)
+    Chase 1998. Oxide: JANAF ZrO(g)/ZrO2(g).'
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  Zr:
+    observations:
+    - observation_id: anchor_Zr_pure_Psat
+      type: psat_series
+      locator:
+        note: 'Alcock, Itkin & Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Zr equations; JANAF Zr(g)
+          Chase 1998. Oxide: JANAF ZrO(g)/ZrO2(g).'
+        record: REF-032#Zr
+      units: as published
+      values:
+        quantity: pure_Psat
+        T_range_K:
+        - 1800
+        - 2500
+        phase: solid_liquid_Zr_to_Zr_g
+        standard_state: pure Zr / Zr(g) 1 bar
+        independence_note: Pending numeric — dual-primary rule as for Th
+fidelity_samples:
+- path: species.Zr.observations[anchor_Zr_pure_Psat].values
+  value:
+    quantity: pure_Psat
+    T_range_K:
+    - 1800
+    - 2500
+    phase: solid_liquid_Zr_to_Zr_g
+    standard_state: pure Zr / Zr(g) 1 bar
+    independence_note: Pending numeric — dual-primary rule as for Th
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: 'Alcock, Itkin & Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Zr equations; JANAF Zr(g)
+      Chase 1998. Oxide: JANAF ZrO(g)/ZrO2(g).'
+    record: REF-032#Zr

@@ -1,0 +1,50 @@
+schema_version: literature_extract.v1
+source_id: pound-1972-mccabe-cr
+source:
+  citation: McCabe, C.L., Hudson, R.G. & Paxton, H.W. (1958) Langmuir/Knudsen solid-Cr vaporization (as
+    selected in Pound 1972 J. Phys. Chem. Ref. Data Table 1, DOI 10.1063/1.3253096) — already used for
+    α_Cr in docs/lab-validation-whitepaper.md; Alcock et al. (1984) REF-032 Cr equations as second pure-Psat
+    set.
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  Cr:
+    observations:
+    - observation_id: anchor_Cr_pure_Psat
+      type: psat_series
+      locator:
+        note: McCabe, C.L., Hudson, R.G. & Paxton, H.W. (1958) Langmuir/Knudsen solid-Cr vaporization
+          (as selected in Pound 1972 J. Phys. Chem. Ref. Data Table 1, DOI 10.1063/1.3253096) — already
+          used for α_Cr in docs/lab-validation-whitepaper.md; Alcock et al. (1984) REF-032 Cr equations
+          as second pure-Psat set.
+        record: Pound-1972#McCabe_Cr
+      units: as published
+      values:
+        quantity: pure_Psat
+        T_range_K:
+        - 1318
+        - 1563
+        phase: solid_Cr_to_Cr_g
+        standard_state: pure solid Cr (not melt-dissolved Cr)
+        independence_note: Stull Antoine is fit source; McCabe/Pound is independent measurement class
+fidelity_samples:
+- path: species.Cr.observations[anchor_Cr_pure_Psat].values
+  value:
+    quantity: pure_Psat
+    T_range_K:
+    - 1318
+    - 1563
+    phase: solid_Cr_to_Cr_g
+    standard_state: pure solid Cr (not melt-dissolved Cr)
+    independence_note: Stull Antoine is fit source; McCabe/Pound is independent measurement class
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: McCabe, C.L., Hudson, R.G. & Paxton, H.W. (1958) Langmuir/Knudsen solid-Cr vaporization (as
+      selected in Pound 1972 J. Phys. Chem. Ref. Data Table 1, DOI 10.1063/1.3253096) — already used for
+      α_Cr in docs/lab-validation-whitepaper.md; Alcock et al. (1984) REF-032 Cr equations as second pure-Psat
+      set.
+    record: Pound-1972#McCabe_Cr

@@ -1,0 +1,43 @@
+schema_version: literature_extract.v1
+source_id: safarian-engh-2013-si-pure-langmuir
+source:
+  citation: Safarian, J. & Engh, T. A. (2013), Metall. Mater. Trans. A 44:747-753, DOI 10.1007/s11661-012-1464-2
+  doi: 10.1007/s11661-012-1464-2
+  url: https://doi.org/10.1007/s11661-012-1464-2
+extraction:
+  method: manual transcription from vp-acquire-6 alpha-kinetics DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/alpha-kinetics.md
+review_status: draft
+species:
+  Si:
+    observations:
+    - observation_id: safarian_engh_2013_si_pure_langmuir
+      type: alpha
+      locator:
+        note: Safarian, J. & Engh, T. A. (2013), Metall. Mater. Trans. A 44:747-753, DOI 10.1007/s11661-012-1464-2
+        record: safarian_engh_2013_si_pure_langmuir
+      T_range_K:
+      - 1687.0
+      - 2000.0
+      phase: pure_liquid_or_solid_elemental_Si
+      standard_state: Pure elemental branch only; melt Si path is SiO(g)
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      values: &id002
+        alpha: 1.0
+        alpha_range: &id001
+        - 0.84
+        - 1.0
+        gas_species: Si(g)
+        material: pure_elemental_silicon
+      uncertainty:
+        alpha_range: *id001
+fidelity_samples:
+- path: species.Si.observations[safarian_engh_2013_si_pure_langmuir].values
+  value: *id002
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: Safarian, J. & Engh, T. A. (2013), Metall. Mater. Trans. A 44:747-753, DOI 10.1007/s11661-012-1464-2
+    record: safarian_engh_2013_si_pure_langmuir

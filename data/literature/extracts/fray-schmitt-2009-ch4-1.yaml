@@ -1,0 +1,44 @@
+schema_version: literature_extract.v1
+source_id: fray-schmitt-2009-ch4-1
+source:
+  citation: Fray & Schmitt (2009), Planet. Space Sci. 57:2053–2080, DOI 10.1016/j.pss.2009.09.011, CH4-1
+    correlation; disagreement vs Grundy already stored on the family row (~69.5% at 37 K).
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  CH4:
+    observations:
+    - observation_id: anchor_CH4_pure_Psat
+      type: psat_series
+      locator:
+        note: Fray & Schmitt (2009), Planet. Space Sci. 57:2053–2080, DOI 10.1016/j.pss.2009.09.011, CH4-1
+          correlation; disagreement vs Grundy already stored on the family row (~69.5% at 37 K).
+        record: Fray-Schmitt-2009#CH4-1
+      units: as published
+      values:
+        quantity: pure_Psat
+        T_range_K:
+        - 20.4
+        - 90.67
+        phase: solid_CH4_I_to_CH4_g
+        standard_state: pure methane solid; absolute Psat
+        independence_note: Independent of Grundy 2024 fit source
+fidelity_samples:
+- path: species.CH4.observations[anchor_CH4_pure_Psat].values
+  value:
+    quantity: pure_Psat
+    T_range_K:
+    - 20.4
+    - 90.67
+    phase: solid_CH4_I_to_CH4_g
+    standard_state: pure methane solid; absolute Psat
+    independence_note: Independent of Grundy 2024 fit source
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: Fray & Schmitt (2009), Planet. Space Sci. 57:2053–2080, DOI 10.1016/j.pss.2009.09.011, CH4-1
+      correlation; disagreement vs Grundy already stored on the family row (~69.5% at 37 K).
+    record: Fray-Schmitt-2009#CH4-1

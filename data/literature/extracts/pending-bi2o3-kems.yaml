@@ -1,0 +1,39 @@
+schema_version: literature_extract.v1
+source_id: pending-bi2o3-kems
+source:
+  citation: Oxide vaporization KEMS for Bi–O (Kazenas; search Bi4O6/BiO)
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  Bi2O3:
+    observations:
+    - observation_id: anchor_Bi2O3_pure_Psat
+      type: psat_series
+      locator:
+        note: Oxide vaporization KEMS for Bi–O (Kazenas; search Bi4O6/BiO)
+        record: PENDING#Bi2O3_KEMS
+      units: as published
+      values:
+        quantity: pure_Psat
+        T_range_K:
+        - 1163
+        - 1400
+        phase: condensed_Bi2O3_to_Bi_O_gas
+        standard_state: declare gas formula
+fidelity_samples:
+- path: species.Bi2O3.observations[anchor_Bi2O3_pure_Psat].values
+  value:
+    quantity: pure_Psat
+    T_range_K:
+    - 1163
+    - 1400
+    phase: condensed_Bi2O3_to_Bi_O_gas
+    standard_state: declare gas formula
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: Oxide vaporization KEMS for Bi–O (Kazenas; search Bi4O6/BiO)
+    record: PENDING#Bi2O3_KEMS

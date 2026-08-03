@@ -1,0 +1,48 @@
+schema_version: literature_extract.v1
+source_id: banchor-matsui-naito-1986
+source:
+  citation: Banchornheavakul, Matsui & Naito, J. Nucl. Sci. Technol. 23 (1986) 602–611
+  year: 1986
+extraction:
+  method: manual transcription from vp-acquire-5 dominant-missing-12 DRAFT
+  date: '2026-07-30'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+review_status: draft
+species:
+  VO_VO2:
+    observations:
+    - observation_id: Ban86_equations
+      type: gibbs_table
+      locator:
+        table: Table 1 (equations); Figs. 1–4; comparison to Berkowitz points
+        note: Table 1 (equations); Figs. 1–4; comparison to Berkowitz points
+        record: Ban86_equations
+      T_range_K: null
+      phase: gas
+      standard_state: null
+      units: kJ/mol and J/(mol·K) for formation; over_R in kK as published
+      values: &id001
+        gas_species:
+        - VO
+        - V
+        note: 'Ban86 Table 1: equations for partial vapor pressures over
+
+          VO1.022(s) and over V(s)+VO(s) two-phase. Table is figure/image
+
+          in the PDF; numeric A,B coefficients were NOT recovered by OCR.
+
+          Paper reports ΔfH and dissociation energy of VO(g) via second/third
+
+          law (Tables 3, 5).
+
+          '
+        valid_range_note: Mass-spectrometric study; typical T ~ 1600–2000 K band (see paper figures)
+fidelity_samples:
+- path: species.VO_VO2.observations[Ban86_equations].values
+  value: *id001
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    table: Table 1 (equations); Figs. 1–4; comparison to Berkowitz points
+    note: Table 1 (equations); Figs. 1–4; comparison to Berkowitz points
+    record: Ban86_equations

@@ -1,0 +1,44 @@
+schema_version: literature_extract.v1
+source_id: ref-032-mg
+source:
+  citation: Alcock, Itkin & Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g)
+    Chase 1998 (REF-020) free-energy path as secondary.
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  Mg:
+    observations:
+    - observation_id: anchor_Mg_pure_Psat
+      type: psat_series
+      locator:
+        note: Alcock, Itkin & Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g)
+          Chase 1998 (REF-020) free-energy path as secondary.
+        record: REF-032#Mg
+      units: as published
+      values:
+        quantity: pure_Psat
+        T_range_K:
+        - 701
+        - 1361
+        phase: liquid_Mg_to_Mg_g
+        standard_state: pure liquid Mg
+        independence_note: Stull/CRC table is fit lineage; Alcock is independent evaluation
+fidelity_samples:
+- path: species.Mg.observations[anchor_Mg_pure_Psat].values
+  value:
+    quantity: pure_Psat
+    T_range_K:
+    - 701
+    - 1361
+    phase: liquid_Mg_to_Mg_g
+    standard_state: pure liquid Mg
+    independence_note: Stull/CRC table is fit lineage; Alcock is independent evaluation
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: Alcock, Itkin & Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g) Chase
+      1998 (REF-020) free-energy path as secondary.
+    record: REF-032#Mg

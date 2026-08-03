@@ -1,0 +1,757 @@
+schema_version: literature_extract.v1
+source_id: nist-webbook
+source:
+  citation: NIST Chemistry WebBook, SRD 69 (species thermochemistry pages)
+  url: https://webbook.nist.gov/chemistry/
+extraction:
+  method: manual transcription from vp-acquire-6 phase-properties DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/phase-properties.md
+review_status: draft
+species:
+  K:
+    observations:
+    - observation_id: K_triple_point_temperature
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Honig & Kramer (1969) RCA Rev. 30, 285'', ''webbook'': ''NIST-WB SRD 69
+          Potassium (CAS 7440-09-7): Ttriple=336.35 K; TRC u=0.1 K'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7440097&Units=SI&Mask=4''}'
+        record: triple_point_temperature
+      units: K
+      values:
+        property_kind: triple_point_temperature
+        value_K: 336.35
+        citation:
+          primary: Honig & Kramer (1969) RCA Rev. 30, 285
+          webbook: 'NIST-WB SRD 69 Potassium (CAS 7440-09-7): Ttriple=336.35 K; TRC u=0.1 K'
+          url: https://webbook.nist.gov/cgi/cbook.cgi?ID=C7440097&Units=SI&Mask=4
+        note: NIST-WB phase page lists Ttriple; Tfus not separately tabulated (use Ttriple as melt proxy)
+        acquisition_status: REVIEWABLE_STATIC
+    - observation_id: K_melting_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Honig & Kramer (1969) via NIST-WB SRD 69 Potassium'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7440097&Units=SI&Mask=4''}'
+        record: melting_point
+      units: K
+      values:
+        property_kind: melting_point
+        value_K: 336.35
+        value_source: adopt Ttriple as Tfus proxy (NIST-WB does not list separate Tfus for K)
+        citation:
+          primary: Honig & Kramer (1969) via NIST-WB SRD 69 Potassium
+          url: https://webbook.nist.gov/cgi/cbook.cgi?ID=C7440097&Units=SI&Mask=4
+        acquisition_status: REVIEWABLE_STATIC
+        uncertainty_note: TRC u=0.1 K on Ttriple; melt/triple split not resolved on WebBook page
+    - observation_id: K_normal_boiling_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Honig & Kramer (1969) RCA Rev. 30, 285'', ''webbook'': ''NIST-WB SRD 69
+          Potassium: Tboil=1037 K; TRC u=1 K'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7440097&Units=SI&Mask=4''}'
+        record: normal_boiling_point
+      units: K
+      values:
+        property_kind: normal_boiling_point
+        value_K: 1037.0
+        value_C: 763.85
+        pressure_basis_Pa: 101325
+        citation:
+          primary: Honig & Kramer (1969) RCA Rev. 30, 285
+          webbook: 'NIST-WB SRD 69 Potassium: Tboil=1037 K; TRC u=1 K'
+          url: https://webbook.nist.gov/cgi/cbook.cgi?ID=C7440097&Units=SI&Mask=4
+        catalog_crosscheck: catalog 759 C = 1032.15 K is 4.85 K below NIST Tboil — prefer NIST 1037 K
+          for static row; Antoine domain still 679.4–1033 K (Fiock & Rodebush 1926)
+        acquisition_status: REVIEWABLE_STATIC
+  Mg:
+    observations:
+    - observation_id: Mg_triple_point_temperature
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Honig & Kramer (1969) RCA Rev. 30, 285'', ''webbook'': ''NIST-WB SRD 69
+          Magnesium (CAS 7439-95-4): Ttriple=922 K; TRC u=0.6 K'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7439954&Units=SI&Mask=4''}'
+        record: triple_point_temperature
+      units: K
+      values:
+        property_kind: triple_point_temperature
+        value_K: 922.0
+        citation:
+          primary: Honig & Kramer (1969) RCA Rev. 30, 285
+          webbook: 'NIST-WB SRD 69 Magnesium (CAS 7439-95-4): Ttriple=922 K; TRC u=0.6 K'
+          url: https://webbook.nist.gov/cgi/cbook.cgi?ID=C7439954&Units=SI&Mask=4
+        note: Use as melting anchor (WebBook lists Ttriple, not separate Tfus)
+        acquisition_status: REVIEWABLE_STATIC
+    - observation_id: Mg_melting_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Honig & Kramer (1969) via NIST-WB SRD 69 Magnesium'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7439954&Units=SI&Mask=4''}'
+        record: melting_point
+      units: K
+      values:
+        property_kind: melting_point
+        value_K: 922.0
+        value_source: NIST-WB Ttriple adopted as Tfus (u=0.6 K)
+        citation:
+          primary: Honig & Kramer (1969) via NIST-WB SRD 69 Magnesium
+          url: https://webbook.nist.gov/cgi/cbook.cgi?ID=C7439954&Units=SI&Mask=4
+        acquisition_status: REVIEWABLE_STATIC
+    - observation_id: Mg_normal_boiling_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Honig & Kramer (1969) RCA Rev. 30, 285'', ''webbook'': ''NIST-WB SRD 69
+          Magnesium: Tboil=1363 K; TRC u=1.5 K'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7439954&Units=SI&Mask=4''}'
+        record: normal_boiling_point
+      units: K
+      values:
+        property_kind: normal_boiling_point
+        value_K: 1363.0
+        value_C: 1089.85
+        pressure_basis_Pa: 101325
+        citation:
+          primary: Honig & Kramer (1969) RCA Rev. 30, 285
+          webbook: 'NIST-WB SRD 69 Magnesium: Tboil=1363 K; TRC u=1.5 K'
+          url: https://webbook.nist.gov/cgi/cbook.cgi?ID=C7439954&Units=SI&Mask=4
+        catalog_crosscheck: catalog 1090 C and ellingham 1363.15 K are within TRC u=1.5 K of NIST 1363
+          K
+        acquisition_status: REVIEWABLE_STATIC
+        authority_note: 'Mg is the documented split-brain case: pure-component BP selection must use this
+          physical Tboil, not an Antoine fit join'
+  Ca:
+    observations:
+    - observation_id: Ca_triple_point_temperature
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Honig & Kramer (1969) RCA Rev. 30, 285'', ''webbook'': ''NIST-WB SRD 69
+          Calcium (CAS 7440-70-2): Ttriple=1112.9 K; TRC u=2 K'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7440702&Units=SI&Mask=4''}'
+        record: triple_point_temperature
+      units: K
+      values:
+        property_kind: triple_point_temperature
+        value_K: 1112.9
+        citation:
+          primary: Honig & Kramer (1969) RCA Rev. 30, 285
+          webbook: 'NIST-WB SRD 69 Calcium (CAS 7440-70-2): Ttriple=1112.9 K; TRC u=2 K'
+          url: https://webbook.nist.gov/cgi/cbook.cgi?ID=C7440702&Units=SI&Mask=4
+        acquisition_status: REVIEWABLE_STATIC
+    - observation_id: Ca_melting_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Honig & Kramer (1969) via NIST-WB Calcium''}'
+        record: melting_point
+      units: K
+      values:
+        property_kind: melting_point
+        value_K: 1112.9
+        value_source: Ttriple as Tfus proxy
+        citation:
+          primary: Honig & Kramer (1969) via NIST-WB Calcium
+        acquisition_status: REVIEWABLE_STATIC
+    - observation_id: Ca_normal_boiling_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Honig & Kramer (1969) RCA Rev. 30, 285'', ''webbook'': ''NIST-WB Calcium:
+          Tboil=1757 K; TRC u=2 K'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7440702&Units=SI&Mask=4''}'
+        record: normal_boiling_point
+      units: K
+      values:
+        property_kind: normal_boiling_point
+        value_K: 1757.0
+        value_C: 1483.85
+        pressure_basis_Pa: 101325
+        citation:
+          primary: Honig & Kramer (1969) RCA Rev. 30, 285
+          webbook: 'NIST-WB Calcium: Tboil=1757 K; TRC u=2 K'
+          url: https://webbook.nist.gov/cgi/cbook.cgi?ID=C7440702&Units=SI&Mask=4
+        catalog_crosscheck: catalog 1484 C = 1757.15 K (match)
+        acquisition_status: REVIEWABLE_STATIC
+  Al:
+    observations:
+    - observation_id: Al_melting_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Anonymous (1988) catalog fixed-point value via TRC; NIST-WB Aluminum Tfus'',
+          ''webbook'': ''NIST-WB SRD 69 Aluminum (CAS 7429-90-5): Tfus=933.45 K; TRC u=0.2 K (nominal
+          catalog value)'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7429905&Units=SI&Mask=4''}'
+        record: melting_point
+      units: K
+      values:
+        property_kind: melting_point
+        value_K: 933.45
+        citation:
+          primary: Anonymous (1988) catalog fixed-point value via TRC; NIST-WB Aluminum Tfus
+          webbook: 'NIST-WB SRD 69 Aluminum (CAS 7429-90-5): Tfus=933.45 K; TRC u=0.2 K (nominal catalog
+            value)'
+          url: https://webbook.nist.gov/cgi/cbook.cgi?ID=C7429905&Units=SI&Mask=4
+        acquisition_status: REVIEWABLE_STATIC
+    - observation_id: Al_triple_point_temperature
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Honig & Kramer (1969) RCA Rev. 30, 285'', ''webbook'': ''NIST-WB Aluminum:
+          Ttriple=933.25 K; TRC u=0.2 K''}'
+        record: triple_point_temperature
+      units: K
+      values:
+        property_kind: triple_point_temperature
+        value_K: 933.25
+        citation:
+          primary: Honig & Kramer (1969) RCA Rev. 30, 285
+          webbook: 'NIST-WB Aluminum: Ttriple=933.25 K; TRC u=0.2 K'
+        acquisition_status: REVIEWABLE_STATIC
+    - observation_id: Al_normal_boiling_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Honig & Kramer (1969) RCA Rev. 30, 285'', ''webbook'': ''NIST-WB Aluminum:
+          Tboil=2793 K; TRC u=4 K'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7429905&Units=SI&Mask=4''}'
+        record: normal_boiling_point
+      units: K
+      values:
+        property_kind: normal_boiling_point
+        value_K: 2793.0
+        value_C: 2519.85
+        pressure_basis_Pa: 101325
+        citation:
+          primary: Honig & Kramer (1969) RCA Rev. 30, 285
+          webbook: 'NIST-WB Aluminum: Tboil=2793 K; TRC u=4 K'
+          url: https://webbook.nist.gov/cgi/cbook.cgi?ID=C7429905&Units=SI&Mask=4
+        catalog_crosscheck: catalog 2519 C = 2792.15 K within TRC u=4 K of 2793 K
+        acquisition_status: REVIEWABLE_STATIC
+  H2O:
+    observations:
+    - observation_id: H2O_triple_point_temperature
+      type: transition_point
+      locator:
+        note: '{''primary'': ''ITS-90 definition of the triple point of water (fixed point)'', ''secondary'':
+          ''Feistel & Wagner (2007) Geochim. Cosmochim. Acta 71, 36–45 — ice Ih sublimation ends at 273.16
+          K'', ''doi'': ''10.1016/j.gca.2006.08.034''}'
+        record: triple_point_temperature
+      units: K
+      values:
+        property_kind: triple_point_temperature
+        value_K: 273.16
+        citation:
+          primary: ITS-90 definition of the triple point of water (fixed point)
+          secondary: Feistel & Wagner (2007) Geochim. Cosmochim. Acta 71, 36–45 — ice Ih sublimation ends
+            at 273.16 K
+          doi: 10.1016/j.gca.2006.08.034
+        acquisition_status: REVIEWABLE_STATIC
+    - observation_id: H2O_normal_boiling_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''IAPWS-95 / ITS-90 liquid–vapor saturation at 101325 Pa (modern value slightly
+          below 100 C)'', ''note'': ''NIST-WB phase page did not return Tboil in TRC scrape; IAPWS is
+          the standard engineering source''}'
+        record: normal_boiling_point
+      units: K
+      values:
+        property_kind: normal_boiling_point
+        value_K: 373.124
+        value_C: 99.974
+        pressure_basis_Pa: 101325
+        citation:
+          primary: IAPWS-95 / ITS-90 liquid–vapor saturation at 101325 Pa (modern value slightly below
+            100 C)
+          note: NIST-WB phase page did not return Tboil in TRC scrape; IAPWS is the standard engineering
+            source
+        acquisition_status: REVIEWABLE_STATIC
+    - observation_id: H2O_melting_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''ITS-90 ice point definition at 101325 Pa''}'
+        record: melting_point
+      units: K
+      values:
+        property_kind: melting_point
+        value_K: 273.15
+        pressure_basis: 1 atm ice point (distinct from 273.16 K triple)
+        citation:
+          primary: ITS-90 ice point definition at 101325 Pa
+        acquisition_status: REVIEWABLE_STATIC
+  CO2:
+    observations:
+    - observation_id: CO2_triple_point_temperature
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Marsh (1987) recommended fixed point; NIST-WB CO2 Ttriple=216.58 K; TRC
+          u=0.008 K'', ''secondary'': ''Angus, Armstrong et al. (1976) IUPAC CO2 tables'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C124389&Units=SI&Mask=4''}'
+        record: triple_point_temperature
+      units: K
+      values:
+        property_kind: triple_point_temperature
+        value_K: 216.58
+        citation:
+          primary: Marsh (1987) recommended fixed point; NIST-WB CO2 Ttriple=216.58 K; TRC u=0.008 K
+          secondary: Angus, Armstrong et al. (1976) IUPAC CO2 tables
+          url: https://webbook.nist.gov/cgi/cbook.cgi?ID=C124389&Units=SI&Mask=4
+        acquisition_status: REVIEWABLE_STATIC
+  CO:
+    observations:
+    - observation_id: CO_normal_boiling_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Mullins, Kirk et al. (1963) via NIST-WB CO Tboil=81.63 K'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C630080&Units=SI&Mask=4''}'
+        record: normal_boiling_point
+      units: K
+      values:
+        property_kind: normal_boiling_point
+        value_K: 81.63
+        citation:
+          primary: Mullins, Kirk et al. (1963) via NIST-WB CO Tboil=81.63 K
+          url: https://webbook.nist.gov/cgi/cbook.cgi?ID=C630080&Units=SI&Mask=4
+        acquisition_status: REVIEWABLE_STATIC
+    - observation_id: CO_triple_point_temperature
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Gill & Morrison (1966) via NIST-WB CO Ttriple=67.95 K''}'
+        record: triple_point_temperature
+      units: K
+      values:
+        property_kind: triple_point_temperature
+        value_K: 67.95
+        citation:
+          primary: Gill & Morrison (1966) via NIST-WB CO Ttriple=67.95 K
+        acquisition_status: REVIEWABLE_STATIC
+  CH4:
+    observations:
+    - observation_id: CH4_melting_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Streng (1971) via NIST-WB Methane Tfus=85.7 K; TRC u=0.3 K class'', ''url'':
+          ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C74828&Units=SI&Mask=4''}'
+        record: melting_point
+      units: K
+      values:
+        property_kind: melting_point
+        value_K: 85.7
+        citation:
+          primary: Streng (1971) via NIST-WB Methane Tfus=85.7 K; TRC u=0.3 K class
+          url: https://webbook.nist.gov/cgi/cbook.cgi?ID=C74828&Units=SI&Mask=4
+        acquisition_status: REVIEWABLE_STATIC
+  NH3:
+    observations:
+    - observation_id: NH3_melting_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Timmermans (1921) via NIST-WB Ammonia Tfus=194.95 K'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7664417&Units=SI&Mask=4''}'
+        record: melting_point
+      units: K
+      values:
+        property_kind: melting_point
+        value_K: 194.95
+        citation:
+          primary: Timmermans (1921) via NIST-WB Ammonia Tfus=194.95 K
+          url: https://webbook.nist.gov/cgi/cbook.cgi?ID=C7664417&Units=SI&Mask=4
+        acquisition_status: REVIEWABLE_STATIC
+  N2:
+    observations:
+    - observation_id: N2_melting_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Streng (1971) via NIST-WB Nitrogen Tfus=63.3 K'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7727379&Units=SI&Mask=4''}'
+        record: melting_point
+      units: K
+      values:
+        property_kind: melting_point
+        value_K: 63.3
+        citation:
+          primary: Streng (1971) via NIST-WB Nitrogen Tfus=63.3 K
+          url: https://webbook.nist.gov/cgi/cbook.cgi?ID=C7727379&Units=SI&Mask=4
+        acquisition_status: REVIEWABLE_STATIC
+    - observation_id: N2_normal_boiling_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Jacobsen, Stewart et al. (1986) via NIST-WB N2 Tboil=77.34 K''}'
+        record: normal_boiling_point
+      units: K
+      values:
+        property_kind: normal_boiling_point
+        value_K: 77.34
+        citation:
+          primary: Jacobsen, Stewart et al. (1986) via NIST-WB N2 Tboil=77.34 K
+        acquisition_status: REVIEWABLE_STATIC
+    - observation_id: N2_triple_point_temperature
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Jacobsen, Stewart et al. (1986) via NIST-WB N2 Ttriple=63.14 K''}'
+        record: triple_point_temperature
+      units: K
+      values:
+        property_kind: triple_point_temperature
+        value_K: 63.14
+        citation:
+          primary: Jacobsen, Stewart et al. (1986) via NIST-WB N2 Ttriple=63.14 K
+        acquisition_status: REVIEWABLE_STATIC
+  O2:
+    observations:
+    - observation_id: O2_melting_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Streng (1971) via NIST-WB Oxygen Tfus=54.8 K'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7782447&Units=SI&Mask=4''}'
+        record: melting_point
+      units: K
+      values:
+        property_kind: melting_point
+        value_K: 54.8
+        citation:
+          primary: Streng (1971) via NIST-WB Oxygen Tfus=54.8 K
+          url: https://webbook.nist.gov/cgi/cbook.cgi?ID=C7782447&Units=SI&Mask=4
+        acquisition_status: REVIEWABLE_STATIC
+    - observation_id: O2_normal_boiling_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Streng (1971) via NIST-WB O2 Tboil=90.2 K''}'
+        record: normal_boiling_point
+      units: K
+      values:
+        property_kind: normal_boiling_point
+        value_K: 90.2
+        citation:
+          primary: Streng (1971) via NIST-WB O2 Tboil=90.2 K
+        acquisition_status: REVIEWABLE_STATIC
+    - observation_id: O2_triple_point_temperature
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Henning & Otto (1936) via NIST-WB O2 Ttriple=54.33 K''}'
+        record: triple_point_temperature
+      units: K
+      values:
+        property_kind: triple_point_temperature
+        value_K: 54.33
+        citation:
+          primary: Henning & Otto (1936) via NIST-WB O2 Ttriple=54.33 K
+        acquisition_status: REVIEWABLE_STATIC
+  H2S:
+    observations:
+    - observation_id: H2S_melting_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Beckmann & Waentig (1910) via NIST-WB H2S Tfus=190.85 K'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7783064&Units=SI&Mask=4''}'
+        record: melting_point
+      units: K
+      values:
+        property_kind: melting_point
+        value_K: 190.85
+        citation:
+          primary: Beckmann & Waentig (1910) via NIST-WB H2S Tfus=190.85 K
+          url: https://webbook.nist.gov/cgi/cbook.cgi?ID=C7783064&Units=SI&Mask=4
+        acquisition_status: REVIEWABLE_STATIC
+    - observation_id: H2S_normal_boiling_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Goodwin (1983) via NIST-WB H2S Tboil=212.87 K''}'
+        record: normal_boiling_point
+      units: K
+      values:
+        property_kind: normal_boiling_point
+        value_K: 212.87
+        citation:
+          primary: Goodwin (1983) via NIST-WB H2S Tboil=212.87 K
+        acquisition_status: REVIEWABLE_STATIC
+    - observation_id: H2S_triple_point_temperature
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Goodwin (1983) via NIST-WB H2S Ttriple=187.66 K''}'
+        record: triple_point_temperature
+      units: K
+      values:
+        property_kind: triple_point_temperature
+        value_K: 187.66
+        citation:
+          primary: Goodwin (1983) via NIST-WB H2S Ttriple=187.66 K
+        acquisition_status: REVIEWABLE_STATIC
+  SO2:
+    observations:
+    - observation_id: SO2_melting_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Hoffman & Vanderwerf (1946) via NIST-WB SO2 Tfus=200.75 K'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7446095&Units=SI&Mask=4''}'
+        record: melting_point
+      units: K
+      values:
+        property_kind: melting_point
+        value_K: 200.75
+        citation:
+          primary: Hoffman & Vanderwerf (1946) via NIST-WB SO2 Tfus=200.75 K
+          url: https://webbook.nist.gov/cgi/cbook.cgi?ID=C7446095&Units=SI&Mask=4
+        acquisition_status: REVIEWABLE_STATIC
+    - observation_id: SO2_triple_point_temperature
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Giauque & Stephenson (1938) J. Am. Chem. Soc. 60, 1389 — via NIST-WB Ttriple=197.64
+          K''}'
+        record: triple_point_temperature
+      units: K
+      values:
+        property_kind: triple_point_temperature
+        value_K: 197.64
+        citation:
+          primary: Giauque & Stephenson (1938) J. Am. Chem. Soc. 60, 1389 — via NIST-WB Ttriple=197.64
+            K
+        acquisition_status: REVIEWABLE_STATIC
+  Cl2:
+    observations:
+    - observation_id: Cl2_normal_boiling_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Thiele & Schulte (1920) via NIST-WB Cl2 Tboil=239.5 K; TRC u=0.6 K'', ''url'':
+          ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7782505&Units=SI&Mask=4''}'
+        record: normal_boiling_point
+      units: K
+      values:
+        property_kind: normal_boiling_point
+        value_K: 239.5
+        citation:
+          primary: Thiele & Schulte (1920) via NIST-WB Cl2 Tboil=239.5 K; TRC u=0.6 K
+          url: https://webbook.nist.gov/cgi/cbook.cgi?ID=C7782505&Units=SI&Mask=4
+        acquisition_status: REVIEWABLE_STATIC
+    - observation_id: Cl2_triple_point_temperature
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Angus, Armstrong et al. (1984) IUPAC Cl2 tables via NIST-WB; u=0.05 K''}'
+        record: triple_point_temperature
+      units: K
+      values:
+        property_kind: triple_point_temperature
+        value_K: 172.17
+        citation:
+          primary: Angus, Armstrong et al. (1984) IUPAC Cl2 tables via NIST-WB; u=0.05 K
+        acquisition_status: REVIEWABLE_STATIC
+  HF:
+    observations:
+    - observation_id: HF_melting_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Streng (1971) via NIST-WB HF Tfus=190.0 K'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7664393&Units=SI&Mask=4''}'
+        record: melting_point
+      units: K
+      values:
+        property_kind: melting_point
+        value_K: 190.0
+        citation:
+          primary: Streng (1971) via NIST-WB HF Tfus=190.0 K
+          url: https://webbook.nist.gov/cgi/cbook.cgi?ID=C7664393&Units=SI&Mask=4
+        acquisition_status: REVIEWABLE_STATIC
+    - observation_id: HF_normal_boiling_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Streng (1971) via NIST-WB HF Tboil=292.7 K''}'
+        record: normal_boiling_point
+      units: K
+      values:
+        property_kind: normal_boiling_point
+        value_K: 292.7
+        citation:
+          primary: Streng (1971) via NIST-WB HF Tboil=292.7 K
+        acquisition_status: REVIEWABLE_STATIC
+  HCl:
+    observations:
+    - observation_id: HCl_melting_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Beckmann & Waentig (1910) via NIST-WB HCl Tfus=161.15 K'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7647010&Units=SI&Mask=4''}'
+        record: melting_point
+      units: K
+      values:
+        property_kind: melting_point
+        value_K: 161.15
+        citation:
+          primary: Beckmann & Waentig (1910) via NIST-WB HCl Tfus=161.15 K
+          url: https://webbook.nist.gov/cgi/cbook.cgi?ID=C7647010&Units=SI&Mask=4
+        acquisition_status: REVIEWABLE_STATIC
+  HCHO:
+    observations:
+    - observation_id: HCHO_melting_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Anonymous (1958) via NIST-WB Formaldehyde Tfus=181.0 K'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C50000&Units=SI&Mask=4''}'
+        record: melting_point
+      units: K
+      values:
+        property_kind: melting_point
+        value_K: 181.0
+        citation:
+          primary: Anonymous (1958) via NIST-WB Formaldehyde Tfus=181.0 K
+          url: https://webbook.nist.gov/cgi/cbook.cgi?ID=C50000&Units=SI&Mask=4
+        acquisition_status: REVIEWABLE_STATIC
+    - observation_id: HCHO_normal_boiling_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Spence & Wild (1935) via NIST-WB HCHO Tboil=253.85 K''}'
+        record: normal_boiling_point
+      units: K
+      values:
+        property_kind: normal_boiling_point
+        value_K: 253.85
+        citation:
+          primary: Spence & Wild (1935) via NIST-WB HCHO Tboil=253.85 K
+        acquisition_status: REVIEWABLE_STATIC
+    - observation_id: HCHO_triple_point_temperature
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Spence & Wild (1935) via NIST-WB HCHO Ttriple=155.1 K''}'
+        record: triple_point_temperature
+      units: K
+      values:
+        property_kind: triple_point_temperature
+        value_K: 155.1
+        citation:
+          primary: Spence & Wild (1935) via NIST-WB HCHO Ttriple=155.1 K
+        acquisition_status: REVIEWABLE_STATIC
+  NO2:
+    observations:
+    - observation_id: NO2_normal_boiling_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Thorpe (1880) via NIST-WB NO2 Tboil=295.08 K — treat with dissociation
+          caveat'', ''crosscheck'': ''Giauque & Powell, J. Am. Chem. Soc. 61 (1939) 1970–1974 report melting
+          261.90 K and boiling 294.25 K for N2O4 system'', ''doi_giauque'': ''10.1021/ja01877a010''}'
+        record: normal_boiling_point
+      units: K
+      values:
+        property_kind: normal_boiling_point
+        value_K: 295.08
+        citation:
+          primary: Thorpe (1880) via NIST-WB NO2 Tboil=295.08 K — treat with dissociation caveat
+          crosscheck: Giauque & Powell, J. Am. Chem. Soc. 61 (1939) 1970–1974 report melting 261.90 K
+            and boiling 294.25 K for N2O4 system
+          doi_giauque: 10.1021/ja01877a010
+        acquisition_status: REVIEWABLE_STATIC_WITH_DISSOCIATION_CAVEAT
+    - observation_id: NO2_melting_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Giauque & Powell (1939) JACS 61, 1970 — melting of N2O4 (not pure undissociated
+          NO2)''}'
+        record: melting_point
+      units: K
+      values:
+        property_kind: melting_point
+        value_K: 261.9
+        citation:
+          primary: Giauque & Powell (1939) JACS 61, 1970 — melting of N2O4 (not pure undissociated NO2)
+        acquisition_status: REVIEWABLE_STATIC
+        species_note: Condensed phase is N2O4-rich; do not assign to monomeric NO2 without association
+          model
+  Pb:
+    observations:
+    - observation_id: Pb_melting_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Anonymous (1988) catalog via NIST-WB Lead Tfus=600.64 K'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7439921&Units=SI&Mask=4''}'
+        record: melting_point
+      units: K
+      values:
+        property_kind: melting_point
+        value_K: 600.64
+        citation:
+          primary: Anonymous (1988) catalog via NIST-WB Lead Tfus=600.64 K
+          url: https://webbook.nist.gov/cgi/cbook.cgi?ID=C7439921&Units=SI&Mask=4
+        acquisition_status: REVIEWABLE_STATIC
+  Br2:
+    observations:
+    - observation_id: Br2_melting_point
+      type: transition_point
+      locator:
+        note: '{''primary'': ''Weber (1912) via NIST-WB Bromine Tfus=266.0 K'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7726956&Units=SI&Mask=4''}'
+        record: melting_point
+      units: K
+      values:
+        property_kind: melting_point
+        value_K: 266.0
+        citation:
+          primary: Weber (1912) via NIST-WB Bromine Tfus=266.0 K
+          url: https://webbook.nist.gov/cgi/cbook.cgi?ID=C7726956&Units=SI&Mask=4
+        acquisition_status: REVIEWABLE_STATIC
+  Se_n_ladder:
+    observations:
+    - observation_id: NIST_Stull_Se_total_P
+      type: psat_series
+      locator:
+        table: null
+        note: NIST_Stull_Se_total_P
+        record: NIST_Stull_Se_total_P
+      T_range_K:
+      - 629.0
+      - 953.0
+      phase: liquid
+      standard_state: null
+      units: log10(P_bar) = A − B/(T_K + C)
+      uncertainty:
+        warning: TOTAL selenium vapor pressure — speciation is multi-Sen
+      values:
+        gas_basis: TOTAL_PRESSURE_not_species
+        phase_branch: liquid
+        source_form: log10(P_bar) = A − B/(T_K + C)
+        coefficients:
+          A: 6.33714
+          B: 6588.125
+          C: 86.633
+        warning: TOTAL selenium vapor pressure — speciation is multi-Sen
+    - observation_id: Rau74_critical_constants
+      type: gibbs_table
+      locator:
+        table: null
+        note: NIST-WB Selenium critical constants citing Rau 1974
+        record: Rau74_critical_constants
+      T_range_K: null
+      phase: gas
+      standard_state: null
+      units: kJ/mol and J/(mol·K) for formation; over_R in kK as published
+      values:
+        Tc_K: 1766.0
+        Pc_bar: 271.551
+        rho_c_mol_L: 15.64
+  As4O6:
+    observations:
+    - observation_id: NIST_Stull47_As2O3_highT
+      type: psat_series
+      locator:
+        table: null
+        note: NIST Antoine table row 485.7–730.4 K
+        record: NIST_Stull47_As2O3_highT
+      T_range_K:
+      - 485.7
+      - 730.4
+      phase: highT_compiled
+      standard_state: null
+      units: log10(P_bar) = A − B/(T_K + C)
+      uncertainty:
+        warning: 'Stull is a compiled multi-source table; phase purity (solid vs
+
+          liquid; arsenolite vs claudetite) across 485–730 K must be
+
+          verified against BR72 fusion/transition data before promotion.
+
+          Gap 421.69–485.7 K is not licensed for interpolation.
+
+          '
+      values:
+        gas_species: As4O6
+        phase_branch: highT_compiled
+        source_form: log10(P_bar) = A − B/(T_K + C)
+        coefficients:
+          A: 2.15798
+          B: 925.481
+          C: -302.329
+        warning: 'Stull is a compiled multi-source table; phase purity (solid vs
+
+          liquid; arsenolite vs claudetite) across 485–730 K must be
+
+          verified against BR72 fusion/transition data before promotion.
+
+          Gap 421.69–485.7 K is not licensed for interpolation.
+
+          '
+fidelity_samples:
+- path: species.Se_n_ladder.observations[NIST_Stull_Se_total_P].values
+  value:
+    gas_basis: TOTAL_PRESSURE_not_species
+    phase_branch: liquid
+    source_form: log10(P_bar) = A − B/(T_K + C)
+    coefficients:
+      A: 6.33714
+      B: 6588.125
+      C: 86.633
+    warning: TOTAL selenium vapor pressure — speciation is multi-Sen
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    table: null
+    note: NIST_Stull_Se_total_P
+    record: NIST_Stull_Se_total_P

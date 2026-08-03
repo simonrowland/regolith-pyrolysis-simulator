@@ -1,0 +1,47 @@
+schema_version: literature_extract.v1
+source_id: ref-032-mn-if-not-in-fit
+source:
+  citation: If JANAF evaluation is part of the fit, pure independent measurement is Alcock et al. (1984)
+    REF-032 Mn equations (use Alcock alone as anchor) or Nesmeyanov-class experimental Mn vapor-pressure
+    series cited therein. Do not use Chase 1998 as independent if it entered the fit residual.
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  Mn:
+    observations:
+    - observation_id: anchor_Mn_pure_Psat
+      type: psat_series
+      locator:
+        note: If JANAF evaluation is part of the fit, pure independent measurement is Alcock et al. (1984)
+          REF-032 Mn equations (use Alcock alone as anchor) or Nesmeyanov-class experimental Mn vapor-pressure
+          series cited therein. Do not use Chase 1998 as independent if it entered the fit residual.
+        record: REF-032#Mn_if_not_in_fit
+      units: as published
+      values:
+        quantity: pure_Psat
+        T_range_K:
+        - 1228
+        - 2335
+        phase: solid_liquid_Mn_to_Mn_g
+        standard_state: pure Mn
+        independence_note: Prefer experimental series not used in the minimax residual construction
+fidelity_samples:
+- path: species.Mn.observations[anchor_Mn_pure_Psat].values
+  value:
+    quantity: pure_Psat
+    T_range_K:
+    - 1228
+    - 2335
+    phase: solid_liquid_Mn_to_Mn_g
+    standard_state: pure Mn
+    independence_note: Prefer experimental series not used in the minimax residual construction
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: If JANAF evaluation is part of the fit, pure independent measurement is Alcock et al. (1984)
+      REF-032 Mn equations (use Alcock alone as anchor) or Nesmeyanov-class experimental Mn vapor-pressure
+      series cited therein. Do not use Chase 1998 as independent if it entered the fit residual.
+    record: REF-032#Mn_if_not_in_fit

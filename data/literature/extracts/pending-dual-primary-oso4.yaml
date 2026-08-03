@@ -1,0 +1,45 @@
+schema_version: literature_extract.v1
+source_id: pending-dual-primary-oso4
+source:
+  citation: Classical OsO4 vapor-pressure measurements (multiple 20th-c. lab series; e.g. Ogawa / later
+    reviews). JANAF OsO4(g/l). With no fit yet, land first primary as fit and second as anchor in the
+    same promotion commit.
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  OsO4:
+    observations:
+    - observation_id: anchor_OsO4_pure_Psat
+      type: psat_series
+      locator:
+        note: Classical OsO4 vapor-pressure measurements (multiple 20th-c. lab series; e.g. Ogawa / later
+          reviews). JANAF OsO4(g/l). With no fit yet, land first primary as fit and second as anchor in
+          the same promotion commit.
+        record: PENDING-dual-primary#OsO4
+      units: as published
+      values:
+        quantity: pure_Psat
+        T_range_K:
+        - 298
+        - 400
+        phase: solid_liquid_OsO4_to_OsO4_g
+        standard_state: pure OsO4
+fidelity_samples:
+- path: species.OsO4.observations[anchor_OsO4_pure_Psat].values
+  value:
+    quantity: pure_Psat
+    T_range_K:
+    - 298
+    - 400
+    phase: solid_liquid_OsO4_to_OsO4_g
+    standard_state: pure OsO4
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: Classical OsO4 vapor-pressure measurements (multiple 20th-c. lab series; e.g. Ogawa / later
+      reviews). JANAF OsO4(g/l). With no fit yet, land first primary as fit and second as anchor in the
+      same promotion commit.
+    record: PENDING-dual-primary#OsO4

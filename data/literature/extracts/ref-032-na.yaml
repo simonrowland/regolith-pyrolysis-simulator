@@ -1,0 +1,44 @@
+schema_version: literature_extract.v1
+source_id: ref-032-na
+source:
+  citation: Alcock, Itkin & Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) sodium vapor-pressure equations
+    (298–2500 K evaluated set) — independent of Rodebush & Walters 1930 primary used by NIST Antoine.
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  Na:
+    observations:
+    - observation_id: anchor_Na_pure_Psat
+      type: psat_series
+      locator:
+        note: Alcock, Itkin & Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) sodium vapor-pressure equations
+          (298–2500 K evaluated set) — independent of Rodebush & Walters 1930 primary used by NIST Antoine.
+        record: REF-032#Na
+      units: as published
+      values:
+        quantity: pure_Psat
+        T_range_K:
+        - 298
+        - 2500
+        phase: liquid_Na_to_Na_g
+        standard_state: pure liquid Na; Na(g) monomer
+        independence_note: REF-041 is fit source; REF-032 is independent evaluation
+fidelity_samples:
+- path: species.Na.observations[anchor_Na_pure_Psat].values
+  value:
+    quantity: pure_Psat
+    T_range_K:
+    - 298
+    - 2500
+    phase: liquid_Na_to_Na_g
+    standard_state: pure liquid Na; Na(g) monomer
+    independence_note: REF-041 is fit source; REF-032 is independent evaluation
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: Alcock, Itkin & Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) sodium vapor-pressure equations
+      (298–2500 K evaluated set) — independent of Rodebush & Walters 1930 primary used by NIST Antoine.
+    record: REF-032#Na

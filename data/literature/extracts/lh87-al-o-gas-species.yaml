@@ -1,0 +1,49 @@
+schema_version: literature_extract.v1
+source_id: lh87-al-o-gas-species
+source:
+  citation: Lamoreaux, Hildenbrand & Brewer (1987) JPCRD 16:419–443, DOI 10.1063/1.555799, Al–O gas species
+    tables (AlO, Al2O, Al2O2 — note Al2O3(g) is often NOT the dominant vapor; confirm molecular identity
+    before flip). JANAF AlO(g)/Al2O(g)/Al2O2(g) Chase 1998.
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  Al2O3_gas:
+    observations:
+    - observation_id: anchor_Al2O3_gas_deltafG
+      type: gibbs_table
+      locator:
+        note: Lamoreaux, Hildenbrand & Brewer (1987) JPCRD 16:419–443, DOI 10.1063/1.555799, Al–O gas
+          species tables (AlO, Al2O, Al2O2 — note Al2O3(g) is often NOT the dominant vapor; confirm molecular
+          identity before flip). JANAF AlO(g)/Al2O(g)/Al2O2(g) Chase 1998.
+        record: LH87#Al_O_gas_species
+      units: as published
+      values:
+        quantity: deltafG
+        T_range_K:
+        - 1800
+        - 2500
+        phase: condensed_Al2O3_to_Al_O_gas_mix
+        standard_state: Declare actual dominant gas (AlO/Al2O) — "Al2O3_gas" catalog id may be a collision
+          alias; do not certify a non-dominant formula
+        independence_note: Catalog inventory; LH87/JANAF independent
+fidelity_samples:
+- path: species.Al2O3_gas.observations[anchor_Al2O3_gas_deltafG].values
+  value:
+    quantity: deltafG
+    T_range_K:
+    - 1800
+    - 2500
+    phase: condensed_Al2O3_to_Al_O_gas_mix
+    standard_state: Declare actual dominant gas (AlO/Al2O) — "Al2O3_gas" catalog id may be a collision
+      alias; do not certify a non-dominant formula
+    independence_note: Catalog inventory; LH87/JANAF independent
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: Lamoreaux, Hildenbrand & Brewer (1987) JPCRD 16:419–443, DOI 10.1063/1.555799, Al–O gas species
+      tables (AlO, Al2O, Al2O2 — note Al2O3(g) is often NOT the dominant vapor; confirm molecular identity
+      before flip). JANAF AlO(g)/Al2O(g)/Al2O2(g) Chase 1998.
+    record: LH87#Al_O_gas_species

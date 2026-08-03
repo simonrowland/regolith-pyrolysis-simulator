@@ -1,0 +1,60 @@
+schema_version: literature_extract.v1
+source_id: ames-walsh-white-1967
+source:
+  citation: Ames, Walsh & White, J. Phys. Chem. 71 (1967) 2707–2718
+  year: 1967
+extraction:
+  method: manual transcription from vp-acquire-5 dominant-missing-12 DRAFT
+  date: '2026-07-30'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md
+review_status: draft
+species:
+  Eu_metal_and_EuO:
+    observations:
+    - observation_id: Ames67_EuO_dissociation
+      type: gibbs_table
+      locator:
+        table: null
+        note: Ames67_EuO_dissociation
+        record: Ames67_EuO_dissociation
+      T_range_K: null
+      phase: gas
+      standard_state: null
+      units: kJ/mol and J/(mol·K) for formation; over_R in kK as published
+      values: &id001
+        gas_species: EuO
+        note: 'Ames, Walsh & White (1967) provide dissociation energies of
+
+          gaseous REE monoxides including EuO — the oxide-channel anchor
+
+          for EuO(g) over Eu2O3. Numeric D0 value not transcribed this
+
+          tranche (paywalled ACS PDF).
+
+          '
+        acquisition_status_detail: UNKNOWN-NO-SOURCE_for_numeric_D0
+  Yb_metal_and_YbO:
+    observations:
+    - observation_id: Ames67_YbO_dissociation
+      type: gibbs_table
+      locator:
+        table: null
+        note: Ames67_YbO_dissociation
+        record: Ames67_YbO_dissociation
+      T_range_K: null
+      phase: gas
+      standard_state: null
+      units: kJ/mol and J/(mol·K) for formation; over_R in kK as published
+      values:
+        gas_species: YbO
+        note: Ames et al. 1967 REE monoxide dissociation energies include YbO; numeric D0 UNKNOWN-NO-SOURCE
+          this tranche
+fidelity_samples:
+- path: species.Eu_metal_and_EuO.observations[Ames67_EuO_dissociation].values
+  value: *id001
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    table: null
+    note: Ames67_EuO_dissociation
+    record: Ames67_EuO_dissociation

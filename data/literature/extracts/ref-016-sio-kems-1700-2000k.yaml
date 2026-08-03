@@ -1,0 +1,55 @@
+schema_version: literature_extract.v1
+source_id: ref-016-sio-kems-1700-2000k
+source:
+  citation: "(1) Costa, G.C.C. & Jacobson, N.S. (2015) olivine KEMS SiO partials —\n    Clausius–Clapeyron\
+    \ A=7.83, B=22.43 (grid-25-sio cj2015 @1700–2000 K:\n    4.32e-3 … 4.12e-1 Pa) — project REF-016;\
+    \ docs-private/vapor-pressure-\n    calibration-sio-tsweep-2026-05-19.md.\n(2) Schaefer, L. & Fegley,\
+    \ B. (2004) Icarus 169:216–241,\n    DOI 10.1016/j.icarus.2003.08.023 (REF-018), Table 9 SiO partials\
+    \ on\n    Io tholeiite (1.66e-4 Pa @1700 K; 1.31e-2 Pa @1900 K).\n(3) Sossi & Fegley (2018) Fig. 3\
+    \ lunar 12022 SiO digitization (sof2018-mineru\n    grid) — review figure; prefer (1)(2) as measured.\n\
+    NOT independent: Visscher & Fegley (2013) model grids; local VapoRock re-eval."
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  SiO:
+    observations:
+    - observation_id: anchor_SiO_melt_partial
+      type: gibbs_table
+      locator:
+        note: "(1) Costa, G.C.C. & Jacobson, N.S. (2015) olivine KEMS SiO partials —\n    Clausius–Clapeyron\
+          \ A=7.83, B=22.43 (grid-25-sio cj2015 @1700–2000 K:\n    4.32e-3 … 4.12e-1 Pa) — project REF-016;\
+          \ docs-private/vapor-pressure-\n    calibration-sio-tsweep-2026-05-19.md.\n(2) Schaefer, L.\
+          \ & Fegley, B. (2004) Icar"
+        record: REF-016#SiO_KEMS_1700_2000K
+      units: as published
+      values:
+        quantity: melt_partial
+        T_range_K:
+        - 1700
+        - 2000
+        phase: silicate_melt_or_olivine_to_SiO_g
+        standard_state: measured p_SiO at stated composition and fO2; reaction SiO2(l)=SiO(g)+1/2 O2(g);
+          a_SiO2 and pO2 must be carried with each point
+        independence_note: Fit is JANAF+TE minimax; CJ2015/SF2004 are external measured partials
+fidelity_samples:
+- path: species.SiO.observations[anchor_SiO_melt_partial].values
+  value:
+    quantity: melt_partial
+    T_range_K:
+    - 1700
+    - 2000
+    phase: silicate_melt_or_olivine_to_SiO_g
+    standard_state: measured p_SiO at stated composition and fO2; reaction SiO2(l)=SiO(g)+1/2 O2(g); a_SiO2
+      and pO2 must be carried with each point
+    independence_note: Fit is JANAF+TE minimax; CJ2015/SF2004 are external measured partials
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: "(1) Costa, G.C.C. & Jacobson, N.S. (2015) olivine KEMS SiO partials —\n    Clausius–Clapeyron\
+      \ A=7.83, B=22.43 (grid-25-sio cj2015 @1700–2000 K:\n    4.32e-3 … 4.12e-1 Pa) — project REF-016;\
+      \ docs-private/vapor-pressure-\n    calibration-sio-tsweep-2026-05-19.md.\n(2) Schaefer, L. & Fegley,\
+      \ B. (2004) Icar"
+    record: REF-016#SiO_KEMS_1700_2000K

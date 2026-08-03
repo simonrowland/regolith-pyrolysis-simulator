@@ -1,0 +1,49 @@
+schema_version: literature_extract.v1
+source_id: wetzel-gail-2013-sio-arrhenius
+source:
+  citation: Wetzel, S. & Gail, H.-P. (2013), Astron. Astrophys. 553:A92, DOI 10.1051/0004-6361/201220803
+  doi: 10.1051/0004-6361/201220803
+  url: https://doi.org/10.1051/0004-6361/201220803
+  year: 2013
+extraction:
+  method: manual transcription from vp-acquire-6 alpha-kinetics DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/alpha-kinetics.md
+review_status: draft
+species:
+  SiO:
+    observations:
+    - observation_id: wetzel_gail_2013_sio_arrhenius
+      type: alpha
+      locator:
+        note: Wetzel, S. & Gail, H.-P. (2013), Astron. Astrophys. 553:A92, DOI 10.1051/0004-6361/201220803
+        record: wetzel_gail_2013_sio_arrhenius
+      T_range_K:
+      - 1000.0
+      - 1800.0
+      phase: oxide_source_evaporation
+      standard_state: HOT source evaporation only; cold-wall condensation uses Pound unity separately
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      values:
+        alpha: null
+        alpha_range: null
+        gas_species: SiO(g)
+        material: reaction_rate_limited_SiO_source_compilation
+        alpha_form: &id002
+          type: arrhenius
+          expression: alpha = 0.52 * exp(-3685/T_K)
+          A: 0.52
+          B_K: 3685.0
+          uncertainty_envelope: &id001
+          - 0.003
+          - 0.067
+      uncertainty:
+        uncertainty_envelope: *id001
+fidelity_samples:
+- path: species.SiO.observations[wetzel_gail_2013_sio_arrhenius].values.alpha_form
+  value: *id002
+  note: alpha_form retained verbatim from alpha-kinetics DRAFT (P1-F1 fix)
+  locator:
+    record: wetzel_gail_2013_sio_arrhenius

@@ -1,0 +1,65 @@
+schema_version: literature_extract.v1
+source_id: nist-srd69-p4
+source:
+  citation: 'Elemental white phosphorus: NIST Chemistry WebBook SRD 69 P4 vapor pressure (Stull 1947 lineage)
+    — independent of oxide-carrier path. Plant carriers (preferred promotion targets): (1) PO/PO2 — JANAF
+    PO(g)/PO2(g) Chase 1998 free energies (REF-020); (2) P4O10(s) sublimation — Muenow et al. / Hashimoto-class
+    phosphate vaporization; Sossi & Fegley 2018 Table 5 speciation guidance. See docs-private/research/2026-07-30-vp-acquire-5/P-carriers.md.'
+extraction:
+  method: manual transcription from vp-acquire-6 validation-anchors DRAFT
+  date: '2026-08-01'
+  worker: t508-store-gk
+  provenance_path: docs-private/research/2026-08-01-vp-acquire-6/validation-anchors.md
+review_status: draft
+species:
+  P:
+    observations:
+    - observation_id: anchor_P_pure_Psat
+      type: psat_series
+      locator:
+        note: 'Elemental white phosphorus: NIST Chemistry WebBook SRD 69 P4 vapor pressure (Stull 1947
+          lineage) — independent of oxide-carrier path. Plant carriers (preferred promotion targets):
+          (1) PO/PO2 — JANAF PO(g)/PO2(g) Chase 1998 free energies (REF-020); (2) P4O10(s) sublimation
+          — Muenow et al. / Hashimoto'
+        record: NIST-SRD69#P4
+      units: as published
+      values:
+        quantity: pure_Psat
+        T_range_K:
+        - 298
+        - 600
+        phase: P4_solid_liquid_to_P4_g_OR_phosphate_to_PO_g
+        standard_state: declare carrier formula; do not validate elemental P as melt carrier
+        independence_note: Acquisition is cross-family pointer, not a locked Antoine from one primary
+  P4:
+    observations:
+    - observation_id: anchor_P4_pure_Psat
+      type: psat_series
+      locator:
+        note: NIST SRD 69 white phosphorus; JANAF P4(g)
+        record: NIST-SRD69#P4
+      units: as published
+      values:
+        quantity: pure_Psat
+        T_range_K:
+        - 298
+        - 600
+        phase: solid_liquid_P_to_P4_g
+        standard_state: pure P4
+fidelity_samples:
+- path: species.P.observations[anchor_P_pure_Psat].values
+  value:
+    quantity: pure_Psat
+    T_range_K:
+    - 298
+    - 600
+    phase: P4_solid_liquid_to_P4_g_OR_phosphate_to_PO_g
+    standard_state: declare carrier formula; do not validate elemental P as melt carrier
+    independence_note: Acquisition is cross-family pointer, not a locked Antoine from one primary
+  note: auto fidelity sample from first observation payload (pilot migration)
+  locator:
+    note: 'Elemental white phosphorus: NIST Chemistry WebBook SRD 69 P4 vapor pressure (Stull 1947 lineage)
+      — independent of oxide-carrier path. Plant carriers (preferred promotion targets): (1) PO/PO2 —
+      JANAF PO(g)/PO2(g) Chase 1998 free energies (REF-020); (2) P4O10(s) sublimation — Muenow et al.
+      / Hashimoto'
+    record: NIST-SRD69#P4
