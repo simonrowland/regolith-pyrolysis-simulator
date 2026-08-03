@@ -4613,6 +4613,7 @@ def _try_antoine_psat_pa(
     """Return a wall pressure or a named, fail-closed range refusal."""
 
     from engines.builtin.vapor_pressure import VaporPressureRangeError
+    from simulator.vapour_rail.catalog import CatalogCompileError
 
     try:
         return (
@@ -4625,7 +4626,7 @@ def _try_antoine_psat_pa(
             ),
             False,
         )
-    except VaporPressureRangeError as exc:
+    except (CatalogCompileError, VaporPressureRangeError) as exc:
         if (
             antoine_extrapolation_warnings is not None
             and str(exc) not in antoine_extrapolation_warnings

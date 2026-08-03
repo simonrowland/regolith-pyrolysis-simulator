@@ -23,7 +23,9 @@ from simulator.vapour_rail.activity import (
     ActivityInputDeclaration,
     ActivityVerdictKind,
     BoundDirection,
+    CondensedPhaseActivityProvider,
     SourceReactionActivity,
+    StandardStateIdentity,
 )
 from simulator.vapour_rail.batch import FluxActivationContext
 from simulator.vapour_rail.nasa_cea import (
@@ -398,12 +400,13 @@ class CompiledPressureEvaluator:
     activity_exponent: float = 0.0
     pO2_exponent: float = 0.0
     pO2_reference_bar: float = 1.0
+    oxygen_fugacity_channel: str | None = None
 
     def evaluate(
         self,
         temperature_K: float,
         *,
-        source_activity: float = 1.0,
+        source_activity: float | None = None,
         pO2_bar: float | None = None,
     ) -> PressureEvaluation:
         temperature_K = _finite_positive(temperature_K, "temperature_K")
@@ -422,13 +425,20 @@ class CompiledPressureEvaluator:
 
         log10_pressure = log10_reference
         if self.activity_exponent:
+            if source_activity is None:
+                raise CatalogCompileError(
+                    f"{self.species_id}: activity-dependent evaluator requires "
+                    "explicit source_activity; implicit a=1 is forbidden"
+                )
             activity = _finite_positive(source_activity, "source_activity")
             log10_pressure += self.activity_exponent * math.log10(activity)
         if self.pO2_exponent:
-            oxygen = _finite_positive(
-                self.pO2_reference_bar if pO2_bar is None else pO2_bar,
-                "pO2_bar",
-            )
+            if pO2_bar is None:
+                raise CatalogCompileError(
+                    f"{self.species_id}: oxygen-dependent evaluator requires "
+                    f"explicit {self.oxygen_fugacity_channel or 'pO2'} input"
+                )
+            oxygen = _finite_positive(pO2_bar, "pO2_bar")
             log10_pressure += self.pO2_exponent * math.log10(
                 oxygen / self.pO2_reference_bar
             )
@@ -507,6 +517,8 @@ class CompiledSpecies:
     vaporisation_coefficients: CompiledVaporisationCoefficients
     code_metadata: CompiledCodeMetadata
     validation_anchor_refs: tuple[str, ...] = ()
+    source_reaction_id: str | None = None
+    source_reaction_activity: ActivityInputDeclaration | None = None
 
 
 class VapourRailCatalog:
@@ -610,6 +622,7 @@ class VapourRailCatalog:
         state: Any | None = None,
         *,
         provider_candidates_by_species: Mapping[str, Sequence[Any]] | None = None,
+        activity_provider: CondensedPhaseActivityProvider | None = None,
         caller_species_filter: Sequence[str] | None = None,
         flux_activation_context: FluxActivationContext,
     ) -> Any:
@@ -637,6 +650,19 @@ class VapourRailCatalog:
                 stage=state.get("stage"),
                 total_pressure_Pa=state.get("total_pressure_Pa"),
                 fO2_bar=state.get("fO2_bar"),
+                source_reaction_activities=(
+                    state.get("source_reaction_activities") or {}
+                ),
+                source_reaction_activity_provider=state.get(
+                    "source_reaction_activity_provider"
+                ),
+                source_reaction_activity_evidence_refs=(
+                    state.get("source_reaction_activity_evidence_refs") or {}
+                ),
+                source_reaction_activity_standard_states=(
+                    state.get("source_reaction_activity_standard_states") or {}
+                ),
+                source_reaction_fO2_bar=state.get("source_reaction_fO2_bar"),
                 extras={
                     key: value
                     for key, value in state.items()
@@ -647,6 +673,11 @@ class VapourRailCatalog:
                         "stage",
                         "total_pressure_Pa",
                         "fO2_bar",
+                        "source_reaction_activities",
+                        "source_reaction_activity_provider",
+                        "source_reaction_activity_evidence_refs",
+                        "source_reaction_activity_standard_states",
+                        "source_reaction_fO2_bar",
                     }
                 },
             )
@@ -662,6 +693,7 @@ class VapourRailCatalog:
             ledger_snapshot=ledger_snapshot,
             state=resolve_state,
             provider_candidates_by_species=provider_candidates_by_species,
+            activity_provider=activity_provider,
             catalog_species=self._species,
             caller_species_filter=caller_species_filter,
             flux_activation_context=flux_activation_context,
@@ -827,6 +859,15 @@ def compile_vapour_rail_catalog(
                     validation_status=status,
                     kinetics=kinetics,
                 )
+            source_reaction_id, source_reaction_activity = (
+                _compile_source_reaction_activity(
+                    species_id=str(species_id),
+                    row=row,
+                    model=model,
+                    evaluator=evaluator,
+                    source_account=compiled_code.source_account,
+                )
+            )
             compiled[str(species_id)] = CompiledSpecies(
                 species_id=str(species_id),
                 family_id=str(family_id),
@@ -839,6 +880,8 @@ def compile_vapour_rail_catalog(
                 vaporisation_coefficients=compiled_kinetics,
                 code_metadata=compiled_code,
                 validation_anchor_refs=anchor_refs,
+                source_reaction_id=source_reaction_id,
+                source_reaction_activity=source_reaction_activity,
             )
             legacy_group[str(species_id)] = _legacy_species_row(
                 species_id=str(species_id),
@@ -1121,6 +1164,21 @@ def _compile_evaluator(
             f"{species_id}: evaluator family {evaluator_family!r} belongs to a later chunk"
         )
 
+    oxygen_fugacity_channel = None
+    if pO2_exponent != 0.0:
+        oxygen_fugacity_channel = _required_string(
+            model.get("oxygen_fugacity_channel"),
+            f"{species_id}.oxygen_fugacity_channel",
+        )
+        if oxygen_fugacity_channel not in {
+            "intrinsic_melt",
+            "transport_headspace",
+        }:
+            raise CatalogCompileError(
+                f"{species_id}.oxygen_fugacity_channel must be "
+                "'intrinsic_melt' or 'transport_headspace'"
+            )
+
     return CompiledPressureEvaluator(
         species_id=species_id,
         evaluator_family=evaluator_family,
@@ -1137,6 +1195,258 @@ def _compile_evaluator(
         activity_exponent=activity_exponent,
         pO2_exponent=pO2_exponent,
         pO2_reference_bar=pO2_reference,
+        oxygen_fugacity_channel=oxygen_fugacity_channel,
+    )
+
+
+def _compile_source_reaction_activity(
+    *,
+    species_id: str,
+    row: Mapping[str, Any],
+    model: Mapping[str, Any],
+    evaluator: CompiledPressureEvaluator | None,
+    source_account: str,
+) -> tuple[str | None, ActivityInputDeclaration | None]:
+    """Compile the exact activity declaration consumed by one pressure model.
+
+    An activity-dependent model may never inherit ``a=1`` from an evaluator
+    default.  Its selected source reaction must declare the component,
+    standard state, and missing-evidence policy explicitly.  This keeps a
+    pure-component point distinct from a Henrian unity upper bound.
+    """
+
+    reaction_id_raw = model.get("source_reaction_id")
+    reaction_id = (
+        str(reaction_id_raw).strip()
+        if isinstance(reaction_id_raw, str) and reaction_id_raw.strip()
+        else None
+    )
+    if (
+        evaluator is not None
+        and evaluator.evaluator_family == "standard_reaction_term"
+        and "activity_exponent" not in model
+    ):
+        raise CatalogCompileError(
+            f"{species_id}: standard_reaction_term requires explicit "
+            "activity_exponent; implicit a=1 is forbidden"
+        )
+    activity_semantics = model.get("activity_semantics")
+    if evaluator is not None and evaluator.activity_exponent != 0.0:
+        activity_semantics = _required_string(
+            activity_semantics,
+            f"{species_id}.pressure_models[0].activity_semantics",
+        )
+        if activity_semantics != "source_reaction_activity":
+            raise CatalogCompileError(
+                f"{species_id}: activity-dependent evaluator requires "
+                "activity_semantics='source_reaction_activity'; got "
+                f"{activity_semantics!r}"
+            )
+    elif evaluator is not None and source_account == "process.cleaned_melt":
+        activity_semantics = _required_string(
+            activity_semantics,
+            f"{species_id}.pressure_models[0].activity_semantics",
+        )
+        if activity_semantics != "effective_pressure_reference_fit":
+            raise CatalogCompileError(
+                f"{species_id}: activity-independent melt evaluator requires "
+                "activity_semantics='effective_pressure_reference_fit'; got "
+                f"{activity_semantics!r}. Pure condensed phases require a "
+                "dedicated non-melt source account and identity."
+            )
+        if (
+            evaluator.pressure_observable
+            is not PressureObservable.EQUILIBRIUM_PARTIAL_PRESSURE
+        ):
+            raise CatalogCompileError(
+                f"{species_id}: activity-independent melt answer must be an "
+                "explicit effective-pressure reference fit, never pure P_sat"
+            )
+
+    if evaluator is not None and (
+        activity_semantics == "pure_condensed_phase"
+        or evaluator.pressure_observable
+        is PressureObservable.PURE_COMPONENT_SATURATION_PRESSURE
+    ):
+        if activity_semantics != "pure_condensed_phase":
+            raise CatalogCompileError(
+                f"{species_id}: pure-component saturation requires explicit "
+                "activity_semantics='pure_condensed_phase'"
+            )
+        if source_account == "process.cleaned_melt":
+            raise CatalogCompileError(
+                f"{species_id}: pure condensed phase cannot use mixed-melt "
+                "source account process.cleaned_melt"
+            )
+        identity = _mapping(
+            model.get("pure_condensed_phase_identity"),
+            f"{species_id}.pure_condensed_phase_identity",
+        )
+        identity_component = _required_string(
+            identity.get("component_id"),
+            f"{species_id}.pure_condensed_phase_identity.component_id",
+        )
+        identity_phase = _required_string(
+            identity.get("phase"),
+            f"{species_id}.pure_condensed_phase_identity.phase",
+        )
+        if identity_phase not in {"condensed_solid", "condensed_liquid"}:
+            raise CatalogCompileError(
+                f"{species_id}.pure_condensed_phase_identity.phase must be "
+                "'condensed_solid' or 'condensed_liquid'"
+            )
+        identity_account = _required_string(
+            identity.get("source_account"),
+            f"{species_id}.pure_condensed_phase_identity.source_account",
+        )
+        if identity_account != source_account:
+            raise CatalogCompileError(
+                f"{species_id}: pure condensed phase identity source_account "
+                f"{identity_account!r} does not match code_metadata "
+                f"{source_account!r}"
+            )
+        if evaluator.pressure_observable is PressureObservable.PURE_COMPONENT_SATURATION_PRESSURE:
+            if _strip_phase_suffix(identity_component) != _strip_phase_suffix(
+                str(row.get("formula", species_id))
+            ):
+                raise CatalogCompileError(
+                    f"{species_id}: pure condensed phase component "
+                    f"{identity_component!r} does not match species formula"
+                )
+        else:
+            reactions = row.get("source_reactions")
+            matched_reactions = (
+                [
+                    reaction
+                    for reaction in reactions
+                    if isinstance(reaction, Mapping)
+                    and reaction.get("id") == reaction_id
+                ]
+                if isinstance(reactions, list) and reaction_id is not None
+                else []
+            )
+            condensed_reactants = {
+                str(reactant.get("formula", ""))
+                for reaction in matched_reactions
+                for reactant in reaction.get("reactants", [])
+                if isinstance(reactant, Mapping)
+                and str(reactant.get("formula", "")).lower().endswith(
+                    ("(cr)", "(s)", "(l)", "(liq)", "(solid)")
+                )
+            }
+            if identity_component not in condensed_reactants:
+                raise CatalogCompileError(
+                    f"{species_id}: pure condensed phase component "
+                    f"{identity_component!r} is not a phase-tagged reactant"
+                )
+    if evaluator is None or evaluator.activity_exponent == 0.0:
+        return reaction_id, None
+    if reaction_id is None:
+        raise CatalogCompileError(
+            f"{species_id}: activity-dependent pressure model requires "
+            "source_reaction_id"
+        )
+
+    reactions = row.get("source_reactions")
+    if not isinstance(reactions, list):
+        raise CatalogCompileError(
+            f"{species_id}: activity-dependent pressure model requires "
+            "source_reactions"
+        )
+    matched = [
+        reaction
+        for reaction in reactions
+        if isinstance(reaction, Mapping) and reaction.get("id") == reaction_id
+    ]
+    if len(matched) != 1:
+        raise CatalogCompileError(
+            f"{species_id}: source reaction {reaction_id!r} must resolve once"
+        )
+    activity_raw = matched[0].get("activity_input")
+    if not isinstance(activity_raw, Mapping):
+        raise CatalogCompileError(
+            f"{species_id}: activity-dependent source reaction {reaction_id!r} "
+            "requires activity_input; silent a=1 is forbidden"
+        )
+    standard_raw = activity_raw.get("standard_state")
+    if not isinstance(standard_raw, Mapping):
+        raise CatalogCompileError(
+            f"{species_id}.{reaction_id}.activity_input.standard_state must be a mapping"
+        )
+
+    component_id = _required_string(
+        activity_raw.get("component_id"),
+        f"{species_id}.{reaction_id}.activity_input.component_id",
+    )
+    reactants_raw = matched[0].get("reactants")
+    if not isinstance(reactants_raw, list):
+        raise CatalogCompileError(
+            f"{species_id}.{reaction_id}.reactants must be a list"
+        )
+    reactant_components = {
+        _strip_phase_suffix(str(reactant.get("formula", "")))
+        for reactant in reactants_raw
+        if isinstance(reactant, Mapping)
+    }
+    if _strip_phase_suffix(component_id) not in reactant_components:
+        raise CatalogCompileError(
+            f"{species_id}.{reaction_id}.activity_input.component_id "
+            f"{component_id!r} is not a selected-reaction reactant"
+        )
+    activity_model = _required_string(
+        activity_raw.get("activity_model"),
+        f"{species_id}.{reaction_id}.activity_input.activity_model",
+    )
+    if activity_model != "provider_reported_thermodynamic_activity":
+        raise CatalogCompileError(
+            f"{species_id}.{reaction_id}.activity_input.activity_model "
+            f"{activity_model!r} is unsupported by catalog channel evaluation"
+        )
+
+    def _declared_bool(field: str, default: bool) -> bool:
+        value = activity_raw.get(field, default)
+        if not isinstance(value, bool):
+            raise CatalogCompileError(
+                f"{species_id}.{reaction_id}.activity_input.{field} must be boolean"
+            )
+        return value
+
+    reference_temperature = standard_raw.get("reference_temperature_K")
+    if reference_temperature is not None:
+        reference_temperature = _finite_positive(
+            reference_temperature,
+            f"{species_id}.{reaction_id}.activity_input.reference_temperature_K",
+        )
+    standard_state = StandardStateIdentity(
+        convention=_required_string(
+            standard_raw.get("convention"),
+            f"{species_id}.{reaction_id}.activity_input.standard_state.convention",
+        ),
+        phase=_required_string(
+            standard_raw.get("phase"),
+            f"{species_id}.{reaction_id}.activity_input.standard_state.phase",
+        ),
+        reference_pressure_bar=_finite_positive(
+            standard_raw.get("reference_pressure_bar"),
+            f"{species_id}.{reaction_id}.activity_input.standard_state.reference_pressure_bar",
+        ),
+        reference_temperature_K=reference_temperature,
+        component_basis=_required_string(
+            standard_raw.get("component_basis"),
+            f"{species_id}.{reaction_id}.activity_input.standard_state.component_basis",
+        ),
+    )
+    return reaction_id, ActivityInputDeclaration(
+        component_id=component_id,
+        standard_state=standard_state,
+        activity_model=activity_model,
+        allow_henrian_upper_bound=_declared_bool(
+            "allow_henrian_upper_bound", False
+        ),
+        compound_bearing=_declared_bool("compound_bearing", False),
+        require_assemblage_match=_declared_bool(
+            "require_assemblage_match", True
+        ),
     )
 
 
@@ -1763,13 +2073,39 @@ def _legacy_species_row(
     result.pop("pressure_models", None)
     result.pop("source_reactions", None)
     result.pop("validation", None)
-    result["fit_target"] = model.get("fit_target", model.get("evaluator_family"))
+    result["fit_target"] = model.get(
+        "compatibility_fit_target",
+        model.get("fit_target", model.get("evaluator_family")),
+    )
     domain = _mapping(model.get("valid_domain"), "valid_domain")
     if not model.get("compatibility_omit_valid_range_K"):
         # Accept both temperature_K:[lo,hi] and CEA-ingest T_min_K/T_max_K.
-        low, high = _domain_temperature_bounds(
-            domain, field=f"{species_id}.valid_domain"
-        )
+        compatibility_range = model.get("compatibility_valid_range_K")
+        if compatibility_range is not None:
+            if (
+                not isinstance(compatibility_range, Sequence)
+                or isinstance(compatibility_range, (str, bytes))
+                or len(compatibility_range) != 2
+            ):
+                raise CatalogCompileError(
+                    f"{species_id}.compatibility_valid_range_K must be [low, high]"
+                )
+            low = _finite_positive(
+                compatibility_range[0],
+                f"{species_id}.compatibility_valid_range_K[0]",
+            )
+            high = _finite_positive(
+                compatibility_range[1],
+                f"{species_id}.compatibility_valid_range_K[1]",
+            )
+            if high <= low:
+                raise CatalogCompileError(
+                    f"{species_id}.compatibility_valid_range_K must be increasing"
+                )
+        else:
+            low, high = _domain_temperature_bounds(
+                domain, field=f"{species_id}.valid_domain"
+            )
         result["valid_range_K"] = [low, high]
     evaluator_family = model.get("evaluator_family")
     reference = (
@@ -1777,7 +2113,30 @@ def _legacy_species_row(
         if evaluator_family == "standard_reaction_term"
         else model
     )
-    if (
+    compatibility_antoine = model.get("compatibility_antoine")
+    if compatibility_antoine is not None:
+        # The schema-v2 evaluator may move from a pure-component Antoine row to
+        # an activity-corrected standard reaction without changing the legacy
+        # backend projection.  Keeping that compatibility row explicit prevents
+        # the catalog migration from changing the pre-RG effective-pressure seam.
+        compatibility_coefficients = _mapping(
+            compatibility_antoine, f"{species_id}.compatibility_antoine"
+        )
+        if set(compatibility_coefficients) != {"A", "B", "C"}:
+            raise CatalogCompileError(
+                f"{species_id}.compatibility_antoine must contain exactly A, B, C"
+            )
+        for coefficient_name in ("A", "B", "C"):
+            coefficient_value = compatibility_coefficients[coefficient_name]
+            if isinstance(coefficient_value, bool) or not isinstance(
+                coefficient_value, (int, float)
+            ) or not math.isfinite(float(coefficient_value)):
+                raise CatalogCompileError(
+                    f"{species_id}.compatibility_antoine.{coefficient_name} "
+                    "must be a finite number"
+                )
+        result["antoine"] = deepcopy(dict(compatibility_coefficients))
+    elif (
         reference.get("evaluator_family") == "antoine"
         and not model.get("compatibility_omit_antoine")
     ):
@@ -2014,6 +2373,8 @@ def _required_string(value: Any, field_name: str) -> str:
 
 
 def _finite_positive(value: Any, field_name: str) -> float:
+    if isinstance(value, bool):
+        raise CatalogCompileError(f"{field_name} must be numeric, not boolean")
     try:
         result = float(value)
     except (TypeError, ValueError) as exc:

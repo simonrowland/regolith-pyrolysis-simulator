@@ -80,11 +80,47 @@ def _strata(
     phase_properties: list | None = None,
     source_reactions: list | None = None,
     hot_train: str = "not_applicable",
+    source_account: str = "process.fixture_pure_condensed",
 ) -> dict:
     """Minimal four-strata family for a single dormant thermo species."""
+    reactions = source_reactions or []
+    for model in pressure_models:
+        pure_component = (
+            model.get("pressure_kind") == "pure_component_saturation_pressure"
+        )
+        reaction_id = model.get("source_reaction_id")
+        matched = [
+            reaction
+            for reaction in reactions
+            if reaction.get("id") == reaction_id
+        ]
+        condensed_reactants = [
+            str(reactant.get("formula", ""))
+            for reaction in matched
+            for reactant in reaction.get("reactants", [])
+            if str(reactant.get("formula", "")).lower().endswith(
+                ("(cr)", "(s)", "(l)", "(liq)", "(solid)")
+            )
+        ]
+        if pure_component or condensed_reactants:
+            component_id = condensed_reactants[0] if condensed_reactants else formula
+            phase = (
+                "condensed_liquid"
+                if component_id.lower().endswith(("(l)", "(liq)"))
+                else "condensed_solid"
+            )
+            model.setdefault("activity_semantics", "pure_condensed_phase")
+            model.setdefault(
+                "pure_condensed_phase_identity",
+                {
+                    "component_id": component_id,
+                    "phase": phase,
+                    "source_account": source_account,
+                },
+            )
     row: dict = {
         "formula": formula,
-        "source_reactions": source_reactions or [],
+        "source_reactions": reactions,
         "pressure_models": pressure_models,
         "validation": {"status": "pending_validation", "anchor_refs": []},
         "molar_mass_g_mol": 1.0,
@@ -111,7 +147,7 @@ def _strata(
                 },
                 "code_metadata": {
                     "formula_id": species_id,
-                    "source_account": "process.cleaned_melt",
+                    "source_account": source_account,
                     "request_rule": "source_inventory_present",
                     "solve_group_id": f"dormant_{species_id}_family",
                     "compatibility_projection": "metals",
@@ -345,6 +381,7 @@ def test_nasa9_dormant_fixture_compiles_and_dispatches_without_flux() -> None:
             {
                 "evaluator": "nasa9",  # short alias accepted
                 "pressure_kind": "pure_component_saturation_pressure",
+                "activity_semantics": "pure_condensed_phase",
                 "species_basis": "monomer",
                 "valid_domain": {"temperature_K": [400.0, 1500.0]},
                 "reference_pressure_Pa": 100_000.0,
@@ -463,6 +500,7 @@ def test_shomate_dormant_fixture_compiles_and_dispatches() -> None:
             {
                 "evaluator_family": "shomate",
                 "pressure_kind": "pure_component_saturation_pressure",
+                "activity_semantics": "pure_condensed_phase",
                 "species_basis": "monomer",
                 "valid_domain": {"temperature_K": [200.0, 600.0]},
                 "gas_thermo_record": {
@@ -525,6 +563,7 @@ def test_nasa7_source_reaction_K_dispatch() -> None:
             {
                 "evaluator_family": "nasa7",
                 "pressure_kind": "equilibrium_partial_pressure",
+                "activity_semantics": "pure_condensed_phase",
                 "species_basis": "monomer",
                 "valid_domain": {"temperature_K": [400.0, 1500.0]},
                 "source_reaction_id": "m_subl",
@@ -741,11 +780,13 @@ def test_source_reaction_o2_power_algebra_nu_v_two() -> None:
             {
                 "evaluator_family": "nasa7",
                 "pressure_kind": "equilibrium_partial_pressure",
+                "activity_semantics": "pure_condensed_phase",
                 "species_basis": "monomer",
                 "valid_domain": {"temperature_K": [400.0, 1500.0]},
                 "source_reaction_id": "mo_subl",
                 "pO2_reference_bar": 0.01,
                 "pO2_exponent": -0.5,  # −ν_O2/ν_v; must match stoich
+                "oxygen_fugacity_channel": "intrinsic_melt",
                 "species_thermo": thermo,
             }
         ],
@@ -785,10 +826,12 @@ def test_source_reaction_o2_phase_suffix_and_derived_exponent() -> None:
             {
                 "evaluator_family": "nasa7",
                 "pressure_kind": "equilibrium_partial_pressure",
+                "activity_semantics": "pure_condensed_phase",
                 "species_basis": "monomer",
                 "valid_domain": {"temperature_K": [400.0, 1500.0]},
                 "source_reaction_id": "mo_subl",
                 "pO2_reference_bar": 0.21,
+                "oxygen_fugacity_channel": "intrinsic_melt",
                 # pO2_exponent intentionally omitted → derive −0.5 from stoich
                 "species_thermo": thermo,
             }
@@ -867,6 +910,7 @@ def test_pure_psat_rejects_gas_gas_pair() -> None:
             {
                 "evaluator_family": "nasa7",
                 "pressure_kind": "pure_component_saturation_pressure",
+                "activity_semantics": "pure_condensed_phase",
                 "species_basis": "monomer",
                 "valid_domain": {"temperature_K": [400.0, 1500.0]},
                 "gas_thermo_record": _const_nasa7(standard_state="gas"),
@@ -908,11 +952,12 @@ def test_cea_ingest_T_min_T_max_domain_shape_compiles() -> None:
         species_id="M",
         formula="M",
         pressure_models=[
-            {
-                "evaluator_family": "nasa7",
-                "pressure_kind": "pure_component_saturation_pressure",
-                "species_basis": "monomer",
-                "valid_domain": {"T_min_K": 400.0, "T_max_K": 1500.0},
+                {
+                    "evaluator_family": "nasa7",
+                    "pressure_kind": "pure_component_saturation_pressure",
+                    "activity_semantics": "pure_condensed_phase",
+                    "species_basis": "monomer",
+                    "valid_domain": {"T_min_K": 400.0, "T_max_K": 1500.0},
                 "gas_thermo_record": _const_nasa7(
                     standard_state="gas", a7=0.0
                 ),

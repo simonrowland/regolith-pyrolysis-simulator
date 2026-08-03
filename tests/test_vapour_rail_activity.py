@@ -193,6 +193,112 @@ def test_provider_matched_point_and_identity_gates():
     assert answer.may_certify() is False
 
 
+def test_provider_reported_activity_point_records_exact_provenance():
+    declaration = ActivityInputDeclaration(
+        component_id="MgO",
+        standard_state=_RAOULTIAN,
+        activity_model="provider_reported_thermodynamic_activity",
+        allow_henrian_upper_bound=False,
+        require_assemblage_match=False,
+    )
+    state_fingerprint = _state().fingerprint()
+    answer = CondensedPhaseActivityProvider().resolve_source_reaction_activity(
+        declaration,
+        magemin=None,
+        thermoengine=None,
+        activity_exponent=1.0,
+        state_fingerprint=state_fingerprint,
+        reported_activity=2.5e-3,
+        reported_activity_provider="InternalAnalyticalBackend",
+        reported_activity_evidence_ref=(
+            "InternalAnalyticalBackend:"
+            "EquilibriumResult.activity_coefficients[Mg]"
+        ),
+        reported_activity_standard_state=_RAOULTIAN,
+    )
+
+    assert answer.verdict is ActivityVerdictKind.POINT
+    assert answer.value == pytest.approx(2.5e-3)
+    assert answer.state_fingerprint == state_fingerprint
+    assert answer.provider == "InternalAnalyticalBackend"
+    assert answer.evidence_ref.endswith("activity_coefficients[Mg]")
+    assert answer.authority is False
+
+    missing_provenance = (
+        CondensedPhaseActivityProvider().resolve_source_reaction_activity(
+            declaration,
+            magemin=None,
+            thermoengine=None,
+            activity_exponent=1.0,
+            reported_activity=2.5e-3,
+        )
+    )
+    assert missing_provenance.verdict is ActivityVerdictKind.REFUSAL
+    assert missing_provenance.refusal_code is ActivityRefusalCode.MISSING_EVIDENCE
+
+    for provider, evidence_ref in (
+        ("   ", "test:evidence"),
+        ("test_provider", "\t"),
+    ):
+        whitespace_provenance = (
+            CondensedPhaseActivityProvider().resolve_source_reaction_activity(
+                declaration,
+                magemin=None,
+                thermoengine=None,
+                activity_exponent=1.0,
+                reported_activity=2.5e-3,
+                reported_activity_provider=provider,
+                reported_activity_evidence_ref=evidence_ref,
+                reported_activity_standard_state=_RAOULTIAN,
+            )
+        )
+        assert whitespace_provenance.verdict is ActivityVerdictKind.REFUSAL
+        assert (
+            whitespace_provenance.refusal_code
+            is ActivityRefusalCode.MISSING_EVIDENCE
+        )
+
+    normalized_provenance = (
+        CondensedPhaseActivityProvider().resolve_source_reaction_activity(
+            declaration,
+            magemin=None,
+            thermoengine=None,
+            activity_exponent=1.0,
+            reported_activity=2.5e-3,
+            reported_activity_provider="  test_provider  ",
+            reported_activity_evidence_ref="  test:evidence  ",
+            reported_activity_standard_state=_RAOULTIAN,
+        )
+    )
+    assert normalized_provenance.provider == "test_provider"
+    assert normalized_provenance.evidence_ref == "test:evidence"
+
+    mismatched_standard_state = StandardStateIdentity(
+        convention=_RAOULTIAN.convention,
+        phase="solid",
+        reference_pressure_bar=_RAOULTIAN.reference_pressure_bar,
+        reference_temperature_K=_RAOULTIAN.reference_temperature_K,
+        component_basis=_RAOULTIAN.component_basis,
+    )
+    standard_state_mismatch = (
+        CondensedPhaseActivityProvider().resolve_source_reaction_activity(
+            declaration,
+            magemin=None,
+            thermoengine=None,
+            activity_exponent=1.0,
+            reported_activity=2.5e-3,
+            reported_activity_provider="test_provider",
+            reported_activity_evidence_ref="test:evidence",
+            reported_activity_standard_state=mismatched_standard_state,
+        )
+    )
+    assert standard_state_mismatch.verdict is ActivityVerdictKind.REFUSAL
+    assert (
+        standard_state_mismatch.refusal_code
+        is ActivityRefusalCode.STANDARD_STATE_MISMATCH
+    )
+
+
 @pytest.mark.parametrize(
     "fault,code",
     [

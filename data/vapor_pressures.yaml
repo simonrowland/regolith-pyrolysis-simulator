@@ -88,7 +88,8 @@ families:
           source_reactions: []
           pressure_models:
           - fit_target: pseudo_psat_backsolved_from_vaporock
-            pressure_kind: pure_component_saturation_pressure
+            pressure_kind: equilibrium_partial_pressure
+            activity_semantics: effective_pressure_reference_fit
             species_basis: monomer
             valid_domain:
               temperature_K:
@@ -294,6 +295,17 @@ families:
               stoichiometry: 1.0
             - formula: O2
               stoichiometry: 0.25
+            activity_input:
+              component_id: KO0.5
+              standard_state:
+                convention: raoultian_pure_endmember
+                phase: liquid
+                reference_pressure_bar: 1.0
+                component_basis: raoultian_pure_endmember
+              activity_model: provider_reported_thermodynamic_activity
+              allow_henrian_upper_bound: false
+              compound_bearing: false
+              require_assemblage_match: false
           pressure_models:
           - fit_target: standard_reaction_term
             pressure_kind: equilibrium_partial_pressure
@@ -306,6 +318,8 @@ families:
             - source: schema_v1_in_place_migration
             evaluator_family: standard_reaction_term
             source_reaction_id: liquid_ko0_5_to_k_gas
+            activity_semantics: source_reaction_activity
+            oxygen_fugacity_channel: intrinsic_melt
             reference_pressure_model:
               evaluator_family: antoine
               coefficients:
@@ -422,8 +436,9 @@ families:
 
               '
           boiling_point_C: 1090
-          notes: Runtime reference is the CRC/Stull pure-component Mg sidecar, multiplied by the builtin
-            Ellingham MgO activity path. The 2026-06-14 VapoRock dense-grid pseudo-fit was removed on
+          notes: The legacy compatibility projection retains the CRC/Stull pure-component Mg sidecar.
+            The schema-v2 catalog uses the liquid-MgO standard reaction with provider-reported activity.
+            The 2026-06-14 VapoRock dense-grid pseudo-fit was removed on
             2026-06-29 because its negative-B Antoine row was non-monotonic for T > 1000 K and non-certifying
             outside its fit intent.
           gas_rail_standard_reaction:
@@ -465,21 +480,52 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-          source_reactions: []
+          source_reactions:
+          - id: liquid_mgo_to_mg_gas
+            reactants:
+            - formula: MgO
+              stoichiometry: 1.0
+            products:
+            - formula: Mg
+              stoichiometry: 1.0
+            - formula: O2
+              stoichiometry: 0.5
+            activity_input:
+              component_id: MgO
+              standard_state:
+                convention: raoultian_pure_endmember
+                phase: liquid
+                reference_pressure_bar: 1.0
+                component_basis: raoultian_pure_endmember
+              activity_model: provider_reported_thermodynamic_activity
+              allow_henrian_upper_bound: false
+              compound_bearing: false
+              require_assemblage_match: false
           pressure_models:
-          - fit_target: pure_component_psat
-            pressure_kind: pure_component_saturation_pressure
+          - fit_target: standard_reaction_term
+            pressure_kind: equilibrium_partial_pressure
             species_basis: monomer
             valid_domain:
-              temperature_K: *id001
+              temperature_K:
+              - 1366
+              - 2273.15
             provenance:
             - source: schema_v1_in_place_migration
+            evaluator_family: standard_reaction_term
+            source_reaction_id: liquid_mgo_to_mg_gas
+            activity_semantics: source_reaction_activity
+            oxygen_fugacity_channel: intrinsic_melt
+            reference_pressure_model:
+              evaluator_family: antoine
+              coefficients:
+                A: 13.4693238
+                B: 32944.8707002
+                C: -109.51
+            activity_exponent: 1.0
+            pO2_exponent: -0.5
+            pO2_reference_bar: 1.0
+            compatibility_fit_target: pure_component_psat
             legacy_extrapolation_policy: refuse
-            evaluator_family: antoine
-            coefficients:
-              A: 9.4964271591
-              B: 5613.103906
-              C: -110.759803
             compatibility_omit_antoine: true
             compatibility_omit_valid_range_K: true
     fiat_routing:
@@ -588,7 +634,8 @@ families:
           source_reactions: []
           pressure_models:
           - fit_target: pseudo_psat_backsolved_from_vaporock
-            pressure_kind: pure_component_saturation_pressure
+            pressure_kind: equilibrium_partial_pressure
+            activity_semantics: effective_pressure_reference_fit
             species_basis: monomer
             valid_domain:
               temperature_K:
@@ -648,7 +695,8 @@ families:
           parent_oxide: CaO
           authority_class: uncertified
           source: REF-043 NIST Chemistry WebBook SRD 69 Hartmann and Schneider 1929 calcium (C7440702);
-            runtime pure-component source is pure_component_antoine
+            pure_component_antoine is retained as a legacy compatibility sidecar;
+            the schema-v2 catalog uses the activity-corrected liquid-CaO reaction
           pure_component_antoine:
             source: REF-043 NIST Chemistry WebBook SRD 69 Hartmann and Schneider 1929 calcium (C7440702);
               log10(P/bar)=2.78473-3121.368/(T-594.591), converted to Pa by A+5
@@ -696,19 +744,55 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-          source_reactions: []
+          source_reactions:
+          - id: liquid_cao_to_ca_gas
+            reactants:
+            - formula: CaO
+              stoichiometry: 1.0
+            products:
+            - formula: Ca
+              stoichiometry: 1.0
+            - formula: O2
+              stoichiometry: 0.5
+            activity_input:
+              component_id: CaO
+              standard_state:
+                convention: raoultian_pure_endmember
+                phase: liquid
+                reference_pressure_bar: 1.0
+                component_basis: raoultian_pure_endmember
+              activity_model: provider_reported_thermodynamic_activity
+              allow_henrian_upper_bound: false
+              compound_bearing: false
+              require_assemblage_match: false
           pressure_models:
-          - fit_target: pure_component_psat
-            pressure_kind: pure_component_saturation_pressure
+          - fit_target: standard_reaction_term
+            pressure_kind: equilibrium_partial_pressure
             species_basis: monomer
             valid_domain:
               temperature_K:
-              - 1115
               - 1757
+              - 2273.15
             provenance:
             - source: schema_v1_in_place_migration
-            evaluator_family: antoine
-            coefficients:
+            evaluator_family: standard_reaction_term
+            source_reaction_id: liquid_cao_to_ca_gas
+            activity_semantics: source_reaction_activity
+            oxygen_fugacity_channel: intrinsic_melt
+            reference_pressure_model:
+              evaluator_family: antoine
+              coefficients:
+                A: 12.2168914
+                B: 37873.6892331
+                C: -116.89
+            activity_exponent: 1.0
+            pO2_exponent: -0.5
+            pO2_reference_bar: 1.0
+            compatibility_fit_target: pure_component_psat
+            compatibility_valid_range_K:
+            - 1115
+            - 1757
+            compatibility_antoine:
               A: 11.238
               B: 9520
               C: 0
@@ -759,8 +843,9 @@ families:
           electrons_per_atom: 3
           parent_oxide: Al2O3
           authority_class: uncertified
-          source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 aluminum (C7429905); runtime pure-component
-            source is pure_component_antoine
+          source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 aluminum (C7429905); pure_component_antoine
+            is retained as a legacy compatibility sidecar; the schema-v2 catalog uses the activity-corrected
+            liquid-AlO1.5 reaction
           pure_component_antoine:
             source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 aluminum (C7429905); log10(P/bar)=5.73623-13204.109/(T-24.306),
               converted to Pa by A+5
@@ -807,19 +892,55 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-          source_reactions: []
+          source_reactions:
+          - id: liquid_alo1_5_to_al_gas
+            reactants:
+            - formula: AlO1.5
+              stoichiometry: 1.0
+            products:
+            - formula: Al
+              stoichiometry: 1.0
+            - formula: O2
+              stoichiometry: 0.75
+            activity_input:
+              component_id: AlO1.5
+              standard_state:
+                convention: raoultian_pure_endmember
+                phase: liquid
+                reference_pressure_bar: 1.0
+                component_basis: raoultian_pure_endmember
+              activity_model: provider_reported_thermodynamic_activity
+              allow_henrian_upper_bound: false
+              compound_bearing: false
+              require_assemblage_match: false
           pressure_models:
-          - fit_target: pure_component_psat
-            pressure_kind: pure_component_saturation_pressure
+          - fit_target: standard_reaction_term
+            pressure_kind: equilibrium_partial_pressure
             species_basis: monomer
             valid_domain:
               temperature_K:
-              - 933
-              - 2792
+              - 1400
+              - 2273.15
             provenance:
             - source: schema_v1_in_place_migration
-            evaluator_family: antoine
-            coefficients:
+            evaluator_family: standard_reaction_term
+            source_reaction_id: liquid_alo1_5_to_al_gas
+            activity_semantics: source_reaction_activity
+            oxygen_fugacity_channel: intrinsic_melt
+            reference_pressure_model:
+              evaluator_family: antoine
+              coefficients:
+                A: 17.2874548
+                B: 54230.9684109
+                C: -49.89
+            activity_exponent: 1.0
+            pO2_exponent: -0.75
+            pO2_reference_bar: 1.0
+            compatibility_fit_target: pure_component_psat
+            compatibility_valid_range_K:
+            - 933
+            - 2792
+            compatibility_antoine:
               A: 11.553
               B: 17340
               C: 0
@@ -869,8 +990,8 @@ families:
           electrons_per_atom: 4
           parent_oxide: SiO2
           consumer_status: inactive
-          source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 silicon (C7440213); runtime pure-component
-            source is pure_component_antoine
+          source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 silicon (C7440213); pure_component_antoine
+            remains a legacy pure-element sidecar and is not a melt-source catalog answer
           pure_component_antoine:
             source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 silicon (C7440213); log10(P/bar)=9.56436-23308.848/(T-123.133),
               converted to Pa by A+5
@@ -890,6 +1011,7 @@ families:
           pressure_models:
           - fit_target: pure_component_psat
             pressure_kind: pure_component_saturation_pressure
+            availability: unavailable_pending_acquisition
             species_basis: monomer
             valid_domain:
               temperature_K:
@@ -949,7 +1071,8 @@ families:
           parent_oxide: TiO2
           authority_class: uncertified
           source: REF-032 CRC Handbook 84th ed. / Alcock-Itkin-Horrigan 1984 vapor-pressure equation for
-            titanium; runtime pure-component source is pure_component_antoine
+            titanium; pure_component_antoine is retained as a legacy compatibility sidecar; the schema-v2
+            catalog uses the activity-corrected liquid-TiO2 reaction
           pure_component_antoine:
             source: REF-032 Alcock-Itkin-Horrigan 1984 titanium liquid equation, CRC/CR2 Pa-converted
               form; dense 10 K minimax refit from 1941-2400 K plus exact 3560.15 K normal-boiling anchor
@@ -1040,19 +1163,55 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-          source_reactions: []
+          source_reactions:
+          - id: liquid_tio2_to_ti_gas
+            reactants:
+            - formula: TiO2
+              stoichiometry: 1.0
+            products:
+            - formula: Ti
+              stoichiometry: 1.0
+            - formula: O2
+              stoichiometry: 1.0
+            activity_input:
+              component_id: TiO2
+              standard_state:
+                convention: raoultian_pure_endmember
+                phase: liquid
+                reference_pressure_bar: 1.0
+                component_basis: raoultian_pure_endmember
+              activity_model: provider_reported_thermodynamic_activity
+              allow_henrian_upper_bound: false
+              compound_bearing: false
+              require_assemblage_match: false
           pressure_models:
-          - fit_target: pure_component_psat
-            pressure_kind: pure_component_saturation_pressure
+          - fit_target: standard_reaction_term
+            pressure_kind: equilibrium_partial_pressure
             species_basis: monomer
             valid_domain:
               temperature_K:
               - 1941
-              - 3560
+              - 2273.15
             provenance:
             - source: schema_v1_in_place_migration
-            evaluator_family: antoine
-            coefficients:
+            evaluator_family: standard_reaction_term
+            source_reaction_id: liquid_tio2_to_ti_gas
+            activity_semantics: source_reaction_activity
+            oxygen_fugacity_channel: intrinsic_melt
+            reference_pressure_model:
+              evaluator_family: antoine
+              coefficients:
+                A: 17.7414184
+                B: 63882.5899238
+                C: -74.44
+            activity_exponent: 1.0
+            pO2_exponent: -1.0
+            pO2_reference_bar: 1.0
+            compatibility_fit_target: pure_component_psat
+            compatibility_valid_range_K:
+            - 1941
+            - 3560
+            compatibility_antoine:
               A: 11.65
               B: 23200
               C: 0
@@ -1102,8 +1261,9 @@ families:
           electrons_per_atom: 3
           parent_oxide: Cr2O3
           authority_class: uncertified
-          source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 chromium (C7440473); runtime pure-component
-            source is pure_component_antoine
+          source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 chromium (C7440473); pure_component_antoine
+            is retained as a legacy compatibility sidecar; the schema-v2 catalog uses the activity-corrected
+            liquid-CrO1.5 reaction
           pure_component_antoine:
             source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 chromium (C7440473); log10(P/bar)=6.02371-16064.989/(T-83.86),
               converted to Pa by A+5
@@ -1150,19 +1310,55 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-          source_reactions: []
+          source_reactions:
+          - id: liquid_cro1_5_to_cr_gas
+            reactants:
+            - formula: CrO1.5
+              stoichiometry: 1.0
+            products:
+            - formula: Cr
+              stoichiometry: 1.0
+            - formula: O2
+              stoichiometry: 0.75
+            activity_input:
+              component_id: CrO1.5
+              standard_state:
+                convention: raoultian_pure_endmember
+                phase: liquid
+                reference_pressure_bar: 1.0
+                component_basis: raoultian_pure_endmember
+              activity_model: provider_reported_thermodynamic_activity
+              allow_henrian_upper_bound: false
+              compound_bearing: false
+              require_assemblage_match: false
           pressure_models:
-          - fit_target: pure_component_psat
-            pressure_kind: pure_component_saturation_pressure
+          - fit_target: standard_reaction_term
+            pressure_kind: equilibrium_partial_pressure
             species_basis: monomer
             valid_domain:
               temperature_K:
-              - 2180
-              - 2944
+              - 1400
+              - 2273.15
             provenance:
             - source: schema_v1_in_place_migration
-            evaluator_family: antoine
-            coefficients:
+            evaluator_family: standard_reaction_term
+            source_reaction_id: liquid_cro1_5_to_cr_gas
+            activity_semantics: source_reaction_activity
+            oxygen_fugacity_channel: intrinsic_melt
+            reference_pressure_model:
+              evaluator_family: antoine
+              coefficients:
+                A: 17.179279
+                B: 43230.115398
+                C: -108.5
+            activity_exponent: 1.0
+            pO2_exponent: -0.75
+            pO2_reference_bar: 1.0
+            compatibility_fit_target: pure_component_psat
+            compatibility_valid_range_K:
+            - 2180
+            - 2944
+            compatibility_antoine:
               A: 11.42
               B: 20730
               C: 0
@@ -1214,8 +1410,9 @@ families:
           parent_oxide: MnO
           authority_class: uncertified
           source: REF-020 NIST-JANAF/Chase 1998 solid/liquid Mn->Mn(g) evaluation; REF-032 Alcock solid,
-            REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as comparators; runtime pure-component
-            source is pure_component_antoine
+            REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as comparators; pure_component_antoine
+            is retained as a legacy compatibility sidecar; the schema-v2 catalog uses the activity-corrected
+            liquid-MnO reaction
           pure_component_antoine:
             source: REF-020 NIST-JANAF/Chase 1998 Mn(s/l)->Mn(g) thermodynamic evaluation fit; REF-032
               Alcock solid, REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as documented comparators
@@ -1454,19 +1651,55 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
-          source_reactions: []
+          source_reactions:
+          - id: liquid_mno_to_mn_gas
+            reactants:
+            - formula: MnO
+              stoichiometry: 1.0
+            products:
+            - formula: Mn
+              stoichiometry: 1.0
+            - formula: O2
+              stoichiometry: 0.5
+            activity_input:
+              component_id: MnO
+              standard_state:
+                convention: raoultian_pure_endmember
+                phase: liquid
+                reference_pressure_bar: 1.0
+                component_basis: raoultian_pure_endmember
+              activity_model: provider_reported_thermodynamic_activity
+              allow_henrian_upper_bound: false
+              compound_bearing: false
+              require_assemblage_match: false
           pressure_models:
-          - fit_target: pure_component_psat
-            pressure_kind: pure_component_saturation_pressure
+          - fit_target: standard_reaction_term
+            pressure_kind: equilibrium_partial_pressure
             species_basis: monomer
             valid_domain:
               temperature_K:
               - 1519
-              - 2334
+              - 2273.15
             provenance:
             - source: schema_v1_in_place_migration
-            evaluator_family: antoine
-            coefficients:
+            evaluator_family: standard_reaction_term
+            source_reaction_id: liquid_mno_to_mn_gas
+            activity_semantics: source_reaction_activity
+            oxygen_fugacity_channel: intrinsic_melt
+            reference_pressure_model:
+              evaluator_family: antoine
+              coefficients:
+                A: 12.5780234
+                B: 28619.0370835
+                C: -118.49
+            activity_exponent: 1.0
+            pO2_exponent: -0.5
+            pO2_reference_bar: 1.0
+            compatibility_fit_target: pure_component_psat
+            compatibility_valid_range_K:
+            - 1519
+            - 2334
+            compatibility_antoine:
               A: 11.183
               B: 14740
               C: 0
@@ -1597,6 +1830,17 @@ families:
               stoichiometry: 1.0
             - formula: O2
               stoichiometry: 0.5
+            activity_input:
+              component_id: SiO2
+              standard_state:
+                convention: raoultian_pure_endmember
+                phase: liquid
+                reference_pressure_bar: 1.0
+                component_basis: raoultian_pure_endmember
+              activity_model: provider_reported_thermodynamic_activity
+              allow_henrian_upper_bound: false
+              compound_bearing: false
+              require_assemblage_match: false
           pressure_models:
           - fit_target: standard_reaction_term
             pressure_kind: equilibrium_partial_pressure
@@ -1609,6 +1853,8 @@ families:
             - source: schema_v1_in_place_migration
             evaluator_family: standard_reaction_term
             source_reaction_id: liquid_sio2_to_sio_gas
+            activity_semantics: source_reaction_activity
+            oxygen_fugacity_channel: transport_headspace
             reference_pressure_model:
               evaluator_family: antoine
               coefficients:
@@ -1741,6 +1987,17 @@ families:
             products:
             - formula: CrO2
               stoichiometry: 1.0
+            activity_input:
+              component_id: CrO1.5
+              standard_state:
+                convention: raoultian_pure_endmember
+                phase: liquid
+                reference_pressure_bar: 1.0
+                component_basis: raoultian_pure_endmember
+              activity_model: provider_reported_thermodynamic_activity
+              allow_henrian_upper_bound: false
+              compound_bearing: false
+              require_assemblage_match: false
           pressure_models:
           - fit_target: standard_reaction_term
             pressure_kind: equilibrium_partial_pressure
@@ -1753,6 +2010,8 @@ families:
             - source: schema_v1_in_place_migration
             evaluator_family: standard_reaction_term
             source_reaction_id: liquid_cro1_5_to_cro2_gas
+            activity_semantics: source_reaction_activity
+            oxygen_fugacity_channel: transport_headspace
             reference_pressure_model:
               evaluator_family: antoine
               coefficients:
@@ -1837,6 +2096,11 @@ families:
           pressure_models:
           - fit_target: pure_component_psat
             pressure_kind: pure_component_saturation_pressure
+            activity_semantics: pure_condensed_phase
+            pure_condensed_phase_identity:
+              component_id: NaCl
+              phase: condensed_liquid
+              source_account: process.stage0_foulant
             species_basis: monomer
             valid_domain:
               temperature_K:
@@ -1912,6 +2176,11 @@ families:
           pressure_models:
           - fit_target: pure_component_psat
             pressure_kind: pure_component_saturation_pressure
+            activity_semantics: pure_condensed_phase
+            pure_condensed_phase_identity:
+              component_id: KCl
+              phase: condensed_liquid
+              source_account: process.stage0_foulant
             species_basis: monomer
             valid_domain:
               temperature_K:

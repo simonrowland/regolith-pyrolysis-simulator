@@ -22,16 +22,25 @@ from types import MappingProxyType
 from typing import TYPE_CHECKING, Any, Protocol
 
 from simulator.alpha_kinetics import AlphaSpecError, parse_alpha_contract
+from simulator.vapour_rail.activity import (
+    ActivityInputDeclaration,
+    ActivityVerdictKind,
+    CondensedPhaseActivityProvider,
+    SourceReactionActivity,
+    StandardStateIdentity,
+)
 from simulator.vapour_rail.batch import (
     CERTIFICATION_CEILING_NEVER,
     FLUX_ACTIVATION_EPOCH_PRE_RG,
     FLUX_ACTIVATION_EPOCH_RG_MANIFEST,
     VERDICT_STATUS_BEARING_NON_AUTHORITATIVE,
     FluxActivationContext,
+    FluxDiagnosticUpperBound,
     FluxEligible,
     FluxRefusal,
     IncompleteVapourBatchError,
     PressureRefusal,
+    PressureUpperBound,
     PressureValue,
     VapourAnswer,
     VapourBatch,
@@ -107,6 +116,7 @@ class RequestRule:
     evidence: Mapping[str, Any] = field(
         default_factory=lambda: MappingProxyType({})
     )
+    source_reaction_activity: ActivityInputDeclaration | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -150,8 +160,35 @@ class VapourResolveState:
     extras: Mapping[str, Any] = field(
         default_factory=lambda: MappingProxyType({})
     )
+    # ABI-safe tail: older callers may pass ``extras`` positionally.
+    source_reaction_activities: Mapping[str, float] = field(
+        default_factory=lambda: MappingProxyType({})
+    )
+    source_reaction_activity_provider: str | None = None
+    source_reaction_activity_evidence_refs: Mapping[str, str] = field(
+        default_factory=lambda: MappingProxyType({})
+    )
+    source_reaction_activity_standard_states: Mapping[
+        str, StandardStateIdentity
+    ] = field(default_factory=lambda: MappingProxyType({}))
+    source_reaction_fO2_bar: float | None = None
 
     def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "source_reaction_activities",
+            MappingProxyType(dict(self.source_reaction_activities)),
+        )
+        object.__setattr__(
+            self,
+            "source_reaction_activity_evidence_refs",
+            MappingProxyType(dict(self.source_reaction_activity_evidence_refs)),
+        )
+        object.__setattr__(
+            self,
+            "source_reaction_activity_standard_states",
+            MappingProxyType(dict(self.source_reaction_activity_standard_states)),
+        )
         object.__setattr__(self, "extras", MappingProxyType(dict(self.extras)))
 
     def as_mapping(self) -> dict[str, Any]:
@@ -161,6 +198,17 @@ class VapourResolveState:
             "stage": self.stage,
             "total_pressure_Pa": self.total_pressure_Pa,
             "fO2_bar": self.fO2_bar,
+            "source_reaction_activity_provider": (
+                self.source_reaction_activity_provider
+            ),
+            "source_reaction_activities": dict(self.source_reaction_activities),
+            "source_reaction_activity_evidence_refs": dict(
+                self.source_reaction_activity_evidence_refs
+            ),
+            "source_reaction_activity_standard_states": dict(
+                self.source_reaction_activity_standard_states
+            ),
+            "source_reaction_fO2_bar": self.source_reaction_fO2_bar,
             **dict(self.extras),
         }
 
@@ -291,6 +339,9 @@ def emit_request_rules(
             has_alpha=base.has_alpha or other.has_alpha,
             has_route=base.has_route or other.has_route,
             has_formula=base.has_formula or other.has_formula,
+            source_reaction_activity=(
+                base.source_reaction_activity or other.source_reaction_activity
+            ),
         )
 
     # --- Catalog species (channel contracts + live request rules) ----------
@@ -326,6 +377,8 @@ def emit_request_rules(
         if parent_oxide:
             parents.add(parent_oxide)
             required_atoms |= set(_formula_elements(parent_oxide))
+        if compiled.source_reaction_id is not None:
+            reaction_id = compiled.source_reaction_id
         # Carrier-is-own-vapor (halides): parent is the gas formula itself.
         if not parents:
             parents.add(compiled.formula or species_id)
@@ -364,6 +417,7 @@ def emit_request_rules(
                         "request_rule": code.request_rule,
                     }
                 ),
+                source_reaction_activity=compiled.source_reaction_activity,
             )
         )
 
@@ -700,6 +754,7 @@ def refusal_closure(
     ]
     | None = None,
     catalog_species: Mapping[str, Any] | None = None,
+    activity_provider: CondensedPhaseActivityProvider | None = None,
 ) -> RefusalClosureResult:
     """Monotone refusal closure to a fixed point (DESIGN-REV5 §4.2 step 2).
 
@@ -722,12 +777,19 @@ def refusal_closure(
 
     candidates_map = dict(provider_candidates_by_species or {})
     catalog_species = catalog_species or {}
+    activity_provider = activity_provider or CondensedPhaseActivityProvider()
 
     # Seed answers as non-refused placeholders; iterate to fixed point.
     answers: dict[str, VapourAnswer] = {}
     refused: set[str] = set()
 
-    def _make_refusal(rule: RequestRule, code: str, detail: str) -> VapourAnswer:
+    def _make_refusal(
+        rule: RequestRule,
+        code: str,
+        detail: str,
+        *,
+        source_reaction_activity: SourceReactionActivity | None = None,
+    ) -> VapourAnswer:
         return VapourAnswer(
             species_id=rule.species_id,
             pressure=PressureRefusal(code=code, detail=detail),
@@ -744,6 +806,7 @@ def refusal_closure(
             certification_ceiling=CERTIFICATION_CEILING_NEVER,
             refusal_code=code,
             extra=MappingProxyType({"detail": detail, "origin": rule.origin}),
+            source_reaction_activity=source_reaction_activity,
         )
 
     def _outcome_state_refusal_detail(rule: RequestRule) -> str | None:
@@ -773,23 +836,131 @@ def refusal_closure(
 
     def _make_live(rule: RequestRule) -> VapourAnswer:
         compiled = catalog_species.get(rule.species_id)
-        pressure: PressureValue | PressureRefusal
-        flux: FluxEligible | FluxRefusal
+        pressure: PressureValue | PressureUpperBound | PressureRefusal
+        flux: FluxEligible | FluxDiagnosticUpperBound | FluxRefusal
         source_label = "catalog"
         pressure_pa = None
+        source_reaction_activity: SourceReactionActivity | None = None
+        source_activity = 1.0
         if (
             compiled is not None
             and compiled.evaluator is not None
             and state is not None
             and state.temperature_K is not None
         ):
+            evaluator_activity_exponent = float(
+                getattr(compiled.evaluator, "activity_exponent", 0.0) or 0.0
+            )
+            if evaluator_activity_exponent != 0.0:
+                declaration = rule.source_reaction_activity
+                if declaration is None:
+                    return _make_refusal(
+                        rule,
+                        REFUSAL_MISSING_CHANNEL_CONTRACT,
+                        "activity-dependent pressure model lacks an explicit "
+                        "source_reactions[].activity_input declaration; silent "
+                        "pure-component substitution is forbidden",
+                    )
+                reported_activity = state.source_reaction_activities.get(
+                    rule.species_id
+                )
+                evidence_ref = state.source_reaction_activity_evidence_refs.get(
+                    rule.species_id
+                )
+                reported_standard_state = (
+                    state.source_reaction_activity_standard_states.get(
+                        rule.species_id
+                    )
+                )
+                source_reaction_activity = (
+                    activity_provider.resolve_source_reaction_activity(
+                        declaration,
+                        magemin=None,
+                        thermoengine=None,
+                        activity_exponent=evaluator_activity_exponent,
+                        solve_group_id=rule.solve_group_id,
+                        state_fingerprint=_state_fingerprint(state),
+                        reported_activity=reported_activity,
+                        reported_activity_provider=(
+                            state.source_reaction_activity_provider
+                        ),
+                        reported_activity_evidence_ref=evidence_ref,
+                        reported_activity_standard_state=reported_standard_state,
+                    )
+                )
+                if source_reaction_activity.verdict is ActivityVerdictKind.REFUSAL:
+                    refusal_code = (
+                        source_reaction_activity.refusal_code.value
+                        if source_reaction_activity.refusal_code is not None
+                        else REFUSAL_MISSING_CHANNEL_CONTRACT
+                    )
+                    return _make_refusal(
+                        rule,
+                        refusal_code,
+                        source_reaction_activity.detail
+                        or "source-reaction activity provider refused",
+                        source_reaction_activity=source_reaction_activity,
+                    )
+                numeric_activity = source_reaction_activity.as_pressure_activity()
+                if numeric_activity is None:
+                    return _make_refusal(
+                        rule,
+                        REFUSAL_MISSING_CHANNEL_CONTRACT,
+                        "source-reaction activity verdict carried no numeric value",
+                        source_reaction_activity=source_reaction_activity,
+                    )
+                source_activity = numeric_activity
             try:
                 # Pass every evaluator domain input present on the resolve
-                # state (fO2 → pO2_bar). Omitting fO2 silently returns the
-                # pO2_reference_bar answer for every oxygen partial pressure.
+                # state (fO2 → pO2_bar). The evaluator refuses omitted
+                # activity/fO2 rather than substituting reference conditions.
+                #
+                # Derivation (RG-1 gateway):
+                # premise: the selected source-reaction model declares
+                #   log10(P_eff) = log10(P_ref) + n*log10(a_M)
+                #   + m*log10(fO2/fO2_ref).
+                # algebra: P_eff = P_ref * a_M**n * (fO2/fO2_ref)**m;
+                #   for the Ca/Mg/K/Al probe n=1, so the activity correction is
+                #   exactly P_eff = a_M * P_sat/reaction-reference.
+                # units: P_ref is Pa; activity and reduced fugacity are
+                #   dimensionless; P_eff remains Pa.
+                # sanity at 1600 C lunar: the result must be in the backend
+                #   effective-pressure class (~4.6e-9, 7.3e-3, 0.469,
+                #   1.4e-8 Pa for Ca/Mg/K/Al), never the former pure/reference
+                #   class (~8.35e5, 6.87e5, 4.51e6, 110 Pa).
+                oxygen_fugacity_channel = getattr(
+                    compiled.evaluator, "oxygen_fugacity_channel", None
+                )
+                evaluator_fO2_bar = state.fO2_bar
+                if oxygen_fugacity_channel == "intrinsic_melt":
+                    if state.source_reaction_fO2_bar is None:
+                        return _make_refusal(
+                            rule,
+                            REFUSAL_MISSING_OUTCOME_STATE,
+                            "intrinsic_melt oxygen fugacity is unavailable; "
+                            "transport/headspace fO2 substitution is forbidden",
+                            source_reaction_activity=source_reaction_activity,
+                        )
+                    try:
+                        evaluator_fO2_bar = float(state.source_reaction_fO2_bar)
+                    except (TypeError, ValueError):
+                        return _make_refusal(
+                            rule,
+                            REFUSAL_MISSING_OUTCOME_STATE,
+                            "intrinsic_melt oxygen fugacity is malformed",
+                            source_reaction_activity=source_reaction_activity,
+                        )
+                    if not math.isfinite(evaluator_fO2_bar) or evaluator_fO2_bar <= 0.0:
+                        return _make_refusal(
+                            rule,
+                            REFUSAL_MISSING_OUTCOME_STATE,
+                            "intrinsic_melt oxygen fugacity must be finite and positive",
+                            source_reaction_activity=source_reaction_activity,
+                        )
                 evaluation = compiled.evaluator.evaluate(
                     state.temperature_K,
-                    pO2_bar=state.fO2_bar,
+                    source_activity=source_activity,
+                    pO2_bar=evaluator_fO2_bar,
                 )
                 pressure_pa = evaluation.pressure_pa
                 # VR-11: thread real evaluator range/acquisition state — never
@@ -810,11 +981,11 @@ def refusal_closure(
                     rule,
                     REFUSAL_MISSING_CHANNEL_CONTRACT,
                     f"evaluator failed: {exc}",
+                    source_reaction_activity=source_reaction_activity,
                 )
         else:
             evaluation_extra = {}
         if pressure_pa is not None:
-            pressure = PressureValue(pa=float(pressure_pa))
             alpha = (
                 compiled.vaporisation_coefficients.evaporation_alpha
                 if compiled is not None
@@ -825,10 +996,29 @@ def refusal_closure(
                 if alpha
                 else f"alpha_missing:{rule.species_id}"
             )
-            flux = FluxEligible(
-                alpha_ref=alpha_ref,
-                reaction_id=rule.source_reaction_id,
-            )
+            if (
+                source_reaction_activity is not None
+                and source_reaction_activity.verdict
+                is ActivityVerdictKind.UPPER_BOUND
+            ):
+                bound_evidence = (
+                    source_reaction_activity.evidence_ref
+                    or source_reaction_activity.reason
+                    or "source_reaction_activity_upper_bound"
+                )
+                pressure = PressureUpperBound(
+                    pa=float(pressure_pa), evidence_ref=bound_evidence
+                )
+                flux = FluxDiagnosticUpperBound(
+                    alpha_ref=alpha_ref,
+                    reaction_id=rule.source_reaction_id,
+                )
+            else:
+                pressure = PressureValue(pa=float(pressure_pa))
+                flux = FluxEligible(
+                    alpha_ref=alpha_ref,
+                    reaction_id=rule.source_reaction_id,
+                )
         else:
             contract_detail = _channel_contract_refusal(rule)
             if contract_detail is not None:
@@ -855,6 +1045,20 @@ def refusal_closure(
             verdict = VERDICT_STATUS_BEARING_NON_AUTHORITATIVE
 
         extra_payload: dict[str, Any] = {"origin": rule.origin}
+        if source_reaction_activity is not None:
+            source_label = "catalog_activity_corrected"
+            extra_payload.update(
+                {
+                    "activity_verdict": source_reaction_activity.verdict.value,
+                    "activity_provider": source_reaction_activity.provider,
+                    "activity_evidence_ref": source_reaction_activity.evidence_ref,
+                }
+            )
+            if source_reaction_activity.verdict is ActivityVerdictKind.UPPER_BOUND:
+                extra_payload["activity_bound"] = (
+                    source_reaction_activity.report_label
+                    or "bound-not-point"
+                )
         extra_payload.update(evaluation_extra)
         return VapourAnswer(
             species_id=rule.species_id,
@@ -872,6 +1076,7 @@ def refusal_closure(
             certification_ceiling=CERTIFICATION_CEILING_NEVER,
             refusal_code=None,
             extra=MappingProxyType(extra_payload),
+            source_reaction_activity=source_reaction_activity,
         )
 
     # Channel-local refusal predicates are monotone and independent of the
@@ -1037,12 +1242,23 @@ def build_solve_bundles(
 def _state_fingerprint(state: VapourResolveState | None) -> str:
     if state is None:
         return "state:none"
+
+    def _number_part(raw: Any) -> str:
+        if raw is None:
+            return "na"
+        try:
+            return f"{float(raw):.6g}"
+        except (TypeError, ValueError):
+            return repr(raw)
+
     t = state.temperature_K
-    t_part = f"{t:.6g}" if t is not None else "na"
+    t_part = _number_part(t)
     fo2 = state.fO2_bar
-    fo2_part = f"{fo2:.6g}" if fo2 is not None else "na"
+    fo2_part = _number_part(fo2)
     p_tot = state.total_pressure_Pa
-    p_part = f"{p_tot:.6g}" if p_tot is not None else "na"
+    p_part = _number_part(p_tot)
+    source_fo2 = state.source_reaction_fO2_bar
+    source_fo2_part = _number_part(source_fo2)
     extras = state.extras or {}
     extra_part = ""
     if extras:
@@ -1051,10 +1267,26 @@ def _state_fingerprint(state: VapourResolveState | None) -> str:
             f"{key}={extras[key]!r}" for key in sorted(extras)
         )
         extra_part = f"|extras={items}"
+    activity_part = ""
+    if state.source_reaction_activities:
+        formatted_activities: list[str] = []
+        for key in sorted(state.source_reaction_activities):
+            raw_value = state.source_reaction_activities[key]
+            try:
+                value_text = f"{float(raw_value):.12g}"
+            except (TypeError, ValueError):
+                value_text = repr(raw_value)
+            formatted_activities.append(f"{key}={value_text}")
+        activity_items = ",".join(formatted_activities)
+        activity_part = (
+            f"|activity_provider={state.source_reaction_activity_provider or 'na'}"
+            f"|activities={activity_items}"
+        )
     return (
         f"state:T={t_part}|phase={state.process_phase or 'na'}|"
-        f"stage={state.stage or 'na'}|fO2={fo2_part}|P={p_part}"
-        f"{extra_part}"
+        f"stage={state.stage or 'na'}|fO2={fo2_part}|"
+        f"source_fO2={source_fo2_part}|P={p_part}"
+        f"{activity_part}{extra_part}"
     )
 
 
@@ -1068,6 +1300,7 @@ def resolve_vapour_batch(
     ]
     | None = None,
     catalog_species: Mapping[str, Any] | None = None,
+    activity_provider: CondensedPhaseActivityProvider | None = None,
     caller_species_filter: Sequence[str] | None = None,
     flux_activation_context: FluxActivationContext,
 ) -> VapourBatch:
@@ -1087,6 +1320,7 @@ def resolve_vapour_batch(
         state=state,
         provider_candidates_by_species=provider_candidates_by_species,
         catalog_species=catalog_species,
+        activity_provider=activity_provider,
     )
     answers = dict(closure.answers)
 

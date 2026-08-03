@@ -16,6 +16,8 @@ from dataclasses import dataclass, field
 from types import MappingProxyType
 from typing import Any
 
+from simulator.vapour_rail.activity import SourceReactionActivity
+
 
 class IncompleteVapourBatchError(KeyError):
     """Raised when a requested channel is absent from the exact-key batch."""
@@ -170,6 +172,7 @@ class VapourAnswer:
     certification_ceiling: str = CERTIFICATION_CEILING_NEVER
     refusal_code: str | None = None
     extra: Mapping[str, Any] = field(default_factory=lambda: MappingProxyType({}))
+    source_reaction_activity: SourceReactionActivity | None = None
 
     @property
     def is_refused(self) -> bool:

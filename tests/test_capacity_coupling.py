@@ -27,7 +27,10 @@ from simulator.core import PyrolysisSimulator
 from simulator.evaporation import _pre_rg_effective_pressure_source
 from simulator.physical_constants import GAS_CONSTANT
 from simulator.state import CampaignPhase, EvaporationFlux
+from simulator.vapour_rail.activity import ActivityVerdictKind
+from simulator.vapour_rail.batch import PressureRefusal, PressureValue
 from simulator.vapour_rail.instrumentation import (
+    EffectivePressureSource,
     compare_live_shadow_to_batch_flux,
     flux_pressures_from_batch,
     serialize_vapour_batch,
@@ -441,6 +444,159 @@ def test_default_runtime_policy_is_no_cold_train():
     assert isinstance(capacity, NoColdTrain)
     assert capacity.reason == "runtime_enforcement_disabled"
     assert cold_train.runtime_enforcement is False
+
+
+def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
+    """RG-1 gateway: catalog P_eff class without a flux-value cutover.
+
+    The one-decade band is deliberately stated: it covers the verifier's
+    independent probe across config overlays while rejecting the former
+    pure-component/reference pressures by many orders of magnitude.
+    """
+
+    sim = _real_capacity_sim()
+    sim.start_campaign(CampaignPhase.C0)
+    sim.melt.temperature_C = 1600.0
+    equilibrium = sim._get_equilibrium()
+    effective_source = _pre_rg_effective_pressure_source(
+        sim.vapor_pressures, equilibrium
+    )
+    batch = sim._resolve_evaporation_vapour_batch(
+        equilibrium,
+        temperature_K=equilibrium.temperature_C + 273.15,
+        effective_pressure_source=effective_source,
+    )
+    assert batch is not None
+
+    verifier_probe_pa = {
+        "Ca": 4.6e-9,
+        "Mg": 7.3e-3,
+        "K": 0.469,
+        "Al": 1.4e-8,
+    }
+
+    def within_one_decade(actual: float, reference: float) -> bool:
+        return abs(math.log10(actual / reference)) <= 1.0
+
+    metals = sim.vapor_pressures["metals"]
+    temperature_K = equilibrium.temperature_C + 273.15
+    for species_id, probe_pa in verifier_probe_pa.items():
+        answer = batch.channel(species_id)
+        assert isinstance(answer.pressure, PressureValue)
+        catalog_pa = float(answer.pressure.pa)
+        seam_pa = effective_source.pressure_pa(species_id)
+        assert seam_pa is not None and seam_pa > 0.0
+        assert within_one_decade(float(seam_pa), probe_pa)
+        assert within_one_decade(catalog_pa, float(seam_pa))
+        activity = answer.source_reaction_activity
+        assert activity is not None
+        assert activity.verdict is ActivityVerdictKind.POINT
+        assert activity.provider == "BuiltinVaporPressureProvider"
+        assert activity.evidence_ref is not None
+        assert "_last_vapor_pressure_diagnostic.activities" in activity.evidence_ref
+
+        # Mutation proof: reverting the answer to the row's pure-component
+        # saturation pressure must leave the effective-pressure band.
+        pure = metals[species_id]["pure_component_antoine"]
+        pure_component_pa = 10.0 ** (
+            float(pure["A"])
+            - float(pure["B"]) / (temperature_K + float(pure["C"]))
+        )
+        assert not within_one_decade(pure_component_pa, float(seam_pa))
+
+    # Source-reaction oxygen fugacity is intrinsic melt fO2, not transport
+    # headspace pO2. Varying only transport pO2 must leave catalog P_eff fixed.
+    original_catalog_pa = {
+        species_id: float(batch.channel(species_id).pressure.pa)
+        for species_id in verifier_probe_pa
+    }
+    sim._last_vapor_pressure_diagnostic["pO2_bar"] = 1.0e-3
+    transport_mutation_batch = sim._resolve_evaporation_vapour_batch(
+        equilibrium,
+        temperature_K=temperature_K,
+        effective_pressure_source=effective_source,
+    )
+    assert transport_mutation_batch is not None
+    for species_id, expected_pa in original_catalog_pa.items():
+        assert transport_mutation_batch.channel(species_id).pressure.pa == (
+            pytest.approx(expected_pa, rel=0.0, abs=0.0)
+        )
+
+    # The exact intrinsic fO2 used by the pressure solve is carried on that
+    # solve's diagnostic. A later/mismatched EquilibriumResult.fO2_log must not
+    # retune catalog P_eff while activities and the effective seam stay fixed.
+    assert sim._last_vapor_pressure_diagnostic["source_reaction_fO2_bar"] > 0.0
+    equilibrium_fO2_log = equilibrium.fO2_log
+    equilibrium.fO2_log = float(equilibrium_fO2_log) + 6.0
+    result_mutation_batch = sim._resolve_evaporation_vapour_batch(
+        equilibrium,
+        temperature_K=temperature_K,
+        effective_pressure_source=effective_source,
+    )
+    equilibrium.fO2_log = equilibrium_fO2_log
+    assert result_mutation_batch is not None
+    for species_id, expected_pa in original_catalog_pa.items():
+        assert result_mutation_batch.channel(species_id).pressure.pa == (
+            pytest.approx(expected_pa, rel=0.0, abs=0.0)
+        )
+
+    # Golden-neutral cutover guard: batch channels own eligibility, but the
+    # numeric operand still comes from the typed equilibrium-backend seam.
+    flux_pressures, flux_report = flux_pressures_from_batch(
+        batch,
+        effective_pressure_source=effective_source,
+    )
+    assert flux_report["selection_source"] == (
+        "equilibrium_backend_effective_pressure_pre_rg"
+    )
+    for species_id in verifier_probe_pa:
+        assert flux_pressures[species_id] == pytest.approx(
+            effective_source.pressure_pa(species_id), rel=0.0, abs=0.0
+        )
+    assert flux_pressures["K"] != pytest.approx(
+        batch.channel("K").pressure.pa, rel=1.0e-6
+    )
+
+    assert effective_source.source_id == (
+        "equilibrium_backend_effective_pressure_pre_rg"
+    )
+
+
+def test_catalog_intrinsic_fo2_refuses_without_exact_solve_diagnostic():
+    sim = _real_capacity_sim()
+    sim.start_campaign(CampaignPhase.C0)
+    sim.melt.temperature_C = 1600.0
+    equilibrium = sim._get_equilibrium()
+    temperature_K = equilibrium.temperature_C + 273.15
+    diagnostic = dict(sim._last_vapor_pressure_diagnostic)
+    assert diagnostic["pO2_bar"] > 0.0
+    assert math.isfinite(float(equilibrium.fO2_log))
+
+    # Keep valid transport and EquilibriumResult redox values available. The
+    # catalog must still refuse when the exact intrinsic fO2 carried by the
+    # pressure solve is absent or malformed; neither is an admissible fallback.
+    for mutation in ("missing", "malformed"):
+        mutated_diagnostic = dict(diagnostic)
+        if mutation == "missing":
+            mutated_diagnostic.pop("source_reaction_fO2_bar")
+        else:
+            mutated_diagnostic["source_reaction_fO2_bar"] = "bogus"
+        sim._last_vapor_pressure_diagnostic = mutated_diagnostic
+        batch = sim._resolve_evaporation_vapour_batch(
+            equilibrium,
+            temperature_K=temperature_K,
+            effective_pressure_source=EffectivePressureSource(
+                "test_no_flux_activation",
+                {},
+            ),
+        )
+        assert batch is not None
+        for species_id in ("Ca", "Mg", "K", "Al"):
+            answer = batch.channel(species_id)
+            assert isinstance(answer.pressure, PressureRefusal)
+            assert "intrinsic_melt oxygen fugacity" in (
+                answer.extra.get("detail") or ""
+            )
 
 
 def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):

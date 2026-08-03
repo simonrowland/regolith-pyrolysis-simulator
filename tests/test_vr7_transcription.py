@@ -406,7 +406,7 @@ def test_legacy_view_memoized_per_payload_identity() -> None:
     assert warm_s * 20 < cold_s + 0.05
 
 
-def test_original_fifteen_evaluators_unchanged_presence() -> None:
+def test_runtime_evaluator_presence_excludes_unavailable_melt_psat() -> None:
     catalog = _catalog()
     expect_eval = {
         "Na",
@@ -415,7 +415,6 @@ def test_original_fifteen_evaluators_unchanged_presence() -> None:
         "Fe",
         "Ca",
         "Al",
-        "Si",
         "Ti",
         "Cr",
         "Mn",
@@ -426,4 +425,7 @@ def test_original_fifteen_evaluators_unchanged_presence() -> None:
     }
     for sid in expect_eval:
         assert catalog.species[sid].evaluator is not None
+    # Si's retained pure-component sidecar is not a valid melt-source answer;
+    # it remains unavailable until an activity-bearing reaction model lands.
+    assert catalog.species["Si"].evaluator is None
     assert catalog.species["NaF"].evaluator is None

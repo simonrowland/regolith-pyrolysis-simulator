@@ -1042,6 +1042,14 @@ class EquilibriumMixin:
             warnings=warnings,
             status='ok',
             diagnostics={
+                'activities_provider': 'internal_analytical_equilibrium',
+                'activities_standard_state': {
+                    'convention': 'raoultian_pure_endmember',
+                    'phase': 'liquid',
+                    'reference_pressure_bar': 1.0,
+                    'reference_temperature_K': None,
+                    'component_basis': 'raoultian_pure_endmember',
+                },
                 'a_FeO_calphad': feo_activity_diagnostic,
                 'ellingham_authority': ellingham_authority_diagnostic(
                     ellingham_extrapolations,

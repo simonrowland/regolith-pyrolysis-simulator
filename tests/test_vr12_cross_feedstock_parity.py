@@ -564,13 +564,10 @@ def _parity_surface(sim: PyrolysisSimulator) -> dict[str, Any]:
 
     equilibrium = sim._get_equilibrium()
     effective = _pre_rg_effective_pressure_source(sim.vapor_pressures, equilibrium)
-    batch = sim.build_vapour_batch(
+    batch = sim._resolve_evaporation_vapour_batch(
+        equilibrium,
         temperature_K=float(sim.melt.temperature_C) + 273.15,
-        process_phase="hot",
-        flux_activation_context=FluxActivationContext(
-            epoch=FLUX_ACTIVATION_EPOCH_PRE_RG,
-            effective_pressure_species_ids=effective.species_ids,
-        ),
+        effective_pressure_source=effective,
     )
     assert batch is not None
     assert isinstance(batch, VapourBatch)

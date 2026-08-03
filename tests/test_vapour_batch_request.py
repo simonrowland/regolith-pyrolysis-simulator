@@ -14,6 +14,7 @@ Acceptance (DECOMPOSITION VR-6 / DESIGN-REV5 §1.2 / §4.2):
 from __future__ import annotations
 
 from copy import deepcopy
+import math
 from pathlib import Path
 from types import MappingProxyType, SimpleNamespace
 from typing import Any
@@ -21,12 +22,19 @@ from typing import Any
 import pytest
 import yaml
 
+from simulator.vapour_rail.activity import (
+    ActivityRefusalCode,
+    ActivityVerdictKind,
+    StandardStateIdentity,
+)
 from simulator.vapour_rail.batch import (
     FLUX_ACTIVATION_EPOCH_PRE_RG,
     FLUX_ACTIVATION_EPOCH_RG_MANIFEST,
     FluxActivationContext,
+    FluxDiagnosticUpperBound,
     IncompleteVapourBatchError,
     PressureRefusal,
+    PressureUpperBound,
     PressureValue,
     VapourAnswer,
     VapourBatch,
@@ -53,6 +61,7 @@ from simulator.vapour_rail.request import (
     refusal_closure,
     resolve_vapour_batch,
 )
+from simulator.vapour_rail.instrumentation import serialize_vapour_answer
 from simulator.vapour_rail.u0_manifest import load_u0_manifest
 
 
@@ -117,6 +126,19 @@ def _minimal_family(
             {"formula": "K", "stoichiometry": 1.0},
             {"formula": "O2", "stoichiometry": 0.25},
         ],
+        "activity_input": {
+            "component_id": "KO0.5",
+            "standard_state": {
+                "convention": "raoultian_pure_endmember",
+                "phase": "liquid",
+                "reference_pressure_bar": 1.0,
+                "component_basis": "raoultian_pure_endmember",
+            },
+            "activity_model": "provider_reported_thermodynamic_activity",
+            "allow_henrian_upper_bound": False,
+            "compound_bearing": False,
+            "require_assemblage_match": False,
+        },
     }
     model: dict = {
         "evaluator_family": "standard_reaction_term",
@@ -125,6 +147,7 @@ def _minimal_family(
         "species_basis": "monomer",
         "valid_domain": {"temperature_K": [1000.0, 2000.0]},
         "source_reaction_id": "ko0_5_to_k",
+        "activity_semantics": "source_reaction_activity",
         "reference_pressure_model": {
             "evaluator_family": "tabulated_equilibrium",
             "points": [
@@ -135,12 +158,14 @@ def _minimal_family(
         "activity_exponent": 1.0,
         "pO2_exponent": -0.25,
         "pO2_reference_bar": 1.0,
+        "oxygen_fugacity_channel": "intrinsic_melt",
     }
     if not with_reaction:
         model = {
             "evaluator_family": "antoine",
             "fit_target": "antoine",
-            "pressure_kind": "pure_component_saturation_pressure",
+            "pressure_kind": "equilibrium_partial_pressure",
+            "activity_semantics": "effective_pressure_reference_fit",
             "species_basis": "monomer",
             "valid_domain": {"temperature_K": [1000.0, 2000.0]},
             "coefficients": {"A": 10.0, "B": 10000.0, "C": 0.0},
@@ -191,6 +216,27 @@ def _minimal_family(
             }
         },
     }
+
+
+_TEST_ACTIVITY_STANDARD_STATE = StandardStateIdentity(
+    convention="raoultian_pure_endmember",
+    phase="liquid",
+    reference_pressure_bar=1.0,
+    component_basis="raoultian_pure_endmember",
+)
+
+
+def _state_with_k_activity(**kwargs: Any) -> VapourResolveState:
+    kwargs.setdefault("source_reaction_fO2_bar", 1.0e-8)
+    return VapourResolveState(
+        source_reaction_activities={"K": 0.25},
+        source_reaction_activity_provider="test_activity_provider",
+        source_reaction_activity_evidence_refs={"K": "test:activity[K]"},
+        source_reaction_activity_standard_states={
+            "K": _TEST_ACTIVITY_STANDARD_STATE
+        },
+        **kwargs,
+    )
 
 
 def _u0_stub(*v_ids: str, c_ids: tuple[str, ...] = ()) -> dict:
@@ -618,7 +664,7 @@ def test_pending_validation_is_not_refusal() -> None:
     ledger = {"process.cleaned_melt": {"K2O": 1.0, "KO0.5": 1.0}}
     batch = catalog.resolve_batch(
         ledger,
-        VapourResolveState(temperature_K=1500.0),
+        _state_with_k_activity(temperature_K=1500.0),
         flux_activation_context=_pre_rg_activation_context(),
     )
     answer = batch.channel("K")
@@ -632,7 +678,7 @@ def test_pending_validation_is_not_refusal() -> None:
     assert batch.flux_active_species_ids == frozenset()
     effective_batch = catalog.resolve_batch(
         ledger,
-        VapourResolveState(temperature_K=1500.0),
+        _state_with_k_activity(temperature_K=1500.0),
         flux_activation_context=_pre_rg_activation_context("K"),
     )
     assert effective_batch.flux_active_species_ids == frozenset({"K"})
@@ -649,12 +695,113 @@ def test_pending_validation_is_not_refusal() -> None:
         )
     rg_batch = catalog.resolve_batch(
         ledger,
-        VapourResolveState(temperature_K=1500.0),
+        _state_with_k_activity(temperature_K=1500.0),
         flux_activation_context=_rg_activation_context(),
     )
     assert rg_batch.flux_active_species_ids == frozenset({"K"})
     assert answer.certification_ceiling == "never"
     assert answer.verdict_status == "status_bearing_non_authoritative"
+
+
+def test_missing_activity_is_refusal_or_declared_henrian_upper_bound() -> None:
+    payload = _minimal_family("K")
+    catalog = compile_vapour_rail_catalog(payload, u0_manifest=_u0_stub("K"))
+    ledger = {"process.cleaned_melt": {"K2O": 1.0, "KO0.5": 1.0}}
+
+    refused = catalog.resolve_batch(
+        ledger,
+        VapourResolveState(temperature_K=1500.0),
+        flux_activation_context=_pre_rg_activation_context(),
+    ).channel("K")
+    assert isinstance(refused.pressure, PressureRefusal)
+    assert refused.source_reaction_activity is not None
+    assert (
+        refused.source_reaction_activity.verdict
+        is ActivityVerdictKind.REFUSAL
+    )
+
+    bounded_payload = deepcopy(payload)
+    reaction = bounded_payload["families"]["k_test_family"][
+        "physical_properties"
+    ]["species"]["K"]["source_reactions"][0]
+    reaction["activity_input"]["allow_henrian_upper_bound"] = True
+    bounded_catalog = compile_vapour_rail_catalog(
+        bounded_payload, u0_manifest=_u0_stub("K")
+    )
+    bounded = bounded_catalog.resolve_batch(
+        ledger,
+        VapourResolveState(
+            temperature_K=1500.0,
+            source_reaction_fO2_bar=1.0e-8,
+        ),
+        flux_activation_context=_pre_rg_activation_context(),
+    ).channel("K")
+    assert isinstance(bounded.pressure, PressureUpperBound)
+    assert isinstance(bounded.flux, FluxDiagnosticUpperBound)
+    assert bounded.source_reaction_activity is not None
+    assert (
+        bounded.source_reaction_activity.verdict
+        is ActivityVerdictKind.UPPER_BOUND
+    )
+    assert serialize_vapour_answer(bounded)["activity_bound"] == "bound-not-point"
+
+
+def test_malformed_reported_activity_becomes_typed_refusal() -> None:
+    catalog = compile_vapour_rail_catalog(
+        _minimal_family("K"), u0_manifest=_u0_stub("K")
+    )
+    ledger = {"process.cleaned_melt": {"K2O": 1.0, "KO0.5": 1.0}}
+    state = VapourResolveState(
+        temperature_K=1500.0,
+        source_reaction_activities={"K": "bogus"},  # type: ignore[dict-item]
+        source_reaction_activity_provider="test_activity_provider",
+        source_reaction_activity_evidence_refs={"K": "test:activity[K]"},
+        source_reaction_activity_standard_states={
+            "K": _TEST_ACTIVITY_STANDARD_STATE
+        },
+    )
+
+    answer = catalog.resolve_batch(
+        ledger,
+        state,
+        flux_activation_context=_pre_rg_activation_context(),
+    ).channel("K")
+    assert isinstance(answer.pressure, PressureRefusal)
+    assert answer.source_reaction_activity is not None
+    assert answer.source_reaction_activity.verdict is ActivityVerdictKind.REFUSAL
+
+
+def test_resolve_batch_preserves_reported_standard_state_mismatch() -> None:
+    catalog = compile_vapour_rail_catalog(
+        _minimal_family("K"), u0_manifest=_u0_stub("K")
+    )
+    ledger = {"process.cleaned_melt": {"K2O": 1.0, "KO0.5": 1.0}}
+    mismatched_standard_state = StandardStateIdentity(
+        convention=_TEST_ACTIVITY_STANDARD_STATE.convention,
+        phase="solid",
+        reference_pressure_bar=_TEST_ACTIVITY_STANDARD_STATE.reference_pressure_bar,
+        component_basis=_TEST_ACTIVITY_STANDARD_STATE.component_basis,
+    )
+    state = VapourResolveState(
+        temperature_K=1500.0,
+        source_reaction_fO2_bar=1.0e-8,
+        source_reaction_activities={"K": 0.25},
+        source_reaction_activity_provider="test_activity_provider",
+        source_reaction_activity_evidence_refs={"K": "test:activity[K]"},
+        source_reaction_activity_standard_states={"K": mismatched_standard_state},
+    )
+
+    answer = catalog.resolve_batch(
+        ledger,
+        state,
+        flux_activation_context=_pre_rg_activation_context(),
+    ).channel("K")
+    assert isinstance(answer.pressure, PressureRefusal)
+    assert answer.source_reaction_activity is not None
+    assert (
+        answer.source_reaction_activity.refusal_code
+        is ActivityRefusalCode.STANDARD_STATE_MISMATCH
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -912,7 +1059,7 @@ def test_absent_source_atom_no_substring_credit_for_f_in_fe2o3() -> None:
     assert "F" in (answer.extra.get("detail") or "")
 
 
-def test_fo2_affects_pressure_and_state_fingerprint() -> None:
+def test_intrinsic_fo2_affects_pressure_and_state_fingerprint() -> None:
     """codex P1 (fO2): evaluator must receive fO2; fingerprint must include it.
 
     Null hypothesis: p at 1 bar equals p at 1e-8 bar and fingerprints match.
@@ -925,12 +1072,20 @@ def test_fo2_affects_pressure_and_state_fingerprint() -> None:
 
     batch_1 = catalog.resolve_batch(
         ledger,
-        VapourResolveState(temperature_K=1500.0, fO2_bar=1.0),
+        _state_with_k_activity(
+            temperature_K=1500.0,
+            fO2_bar=3.0e-6,
+            source_reaction_fO2_bar=1.0,
+        ),
         flux_activation_context=_rg_activation_context(),
     )
     batch_lo = catalog.resolve_batch(
         ledger,
-        VapourResolveState(temperature_K=1500.0, fO2_bar=1e-8),
+        _state_with_k_activity(
+            temperature_K=1500.0,
+            fO2_bar=3.0e-6,
+            source_reaction_fO2_bar=1.0e-8,
+        ),
         flux_activation_context=_rg_activation_context(),
     )
     a1 = batch_1.channel("K")
@@ -942,7 +1097,31 @@ def test_fo2_affects_pressure_and_state_fingerprint() -> None:
     ratio = a_lo.pressure.pa / a1.pressure.pa
     assert ratio == pytest.approx(100.0, rel=1e-9)
     assert a1.state_fingerprint != a_lo.state_fingerprint
-    assert "fO2=" in a1.state_fingerprint
+    assert "source_fO2=" in a1.state_fingerprint
+
+
+@pytest.mark.parametrize("intrinsic_fO2", [None, "bogus", -1.0, math.nan])
+def test_intrinsic_fo2_missing_or_malformed_is_typed_refusal(
+    intrinsic_fO2: Any,
+) -> None:
+    payload = _minimal_family("K")
+    catalog = compile_vapour_rail_catalog(payload, u0_manifest=_u0_stub("K"))
+    ledger = {"process.cleaned_melt": {"K2O": 1.0, "KO0.5": 1.0}}
+
+    batch = catalog.resolve_batch(
+        ledger,
+        _state_with_k_activity(
+            temperature_K=1500.0,
+            fO2_bar=1.0e-8,
+            source_reaction_fO2_bar=intrinsic_fO2,
+        ),
+        flux_activation_context=_rg_activation_context(),
+    )
+
+    answer = batch.channel("K")
+    assert answer.is_refused
+    assert answer.refusal_code == REFUSAL_MISSING_OUTCOME_STATE
+    assert "intrinsic_melt oxygen fugacity" in (answer.extra.get("detail") or "")
 
 
 def test_validation_anchors_propagate_to_rule_and_answer() -> None:

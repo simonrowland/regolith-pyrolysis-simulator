@@ -39,6 +39,7 @@ from simulator.vapour_rail.batch import (
     FLUX_ACTIVATION_EPOCH_PRE_RG,
     FluxActivationContext,
 )
+from simulator.vapour_rail.activity import StandardStateIdentity
 from simulator.vapour_rail.instrumentation import (
     CONTROL_BATCH_REPORT_KEY,
     CONTROL_FLUX_PRESSURES_KEY,
@@ -320,15 +321,15 @@ def _pre_rg_effective_pressure_source(
 ) -> EffectivePressureSource:
     """Return the sole typed pre-RG handoff for flux-driving pressure values.
 
-    Catalog evaluators currently expose pure-component ``P_sat`` for melt
-    species, not ``P_eff = a_M * P_sat``. The verifier's 1873.15 K probe found
-    catalog/effective Pa of Ca 8.35e5/4.6e-9, Mg 6.87e5/7.3e-3,
-    K 4.51e6/0.469, and Al 110.2/1.4e-8. The equilibrium-backend values are
-    therefore the physically correct pre-RG flux values.
+    The catalog can now evaluate activity-corrected ``P_eff`` for melt species,
+    but VR-13/RG-1 has not authorized a flux-value cutover. The verifier's
+    1873.15 K baseline exposed the former pure/reference-vs-effective gap:
+    Ca 8.35e5/4.6e-9 Pa, Mg 6.87e5/7.3e-3 Pa, K 4.51e6/0.469 Pa, and
+    Al 110.2/1.4e-8 Pa. This factory therefore remains the sole pre-RG handoff
+    and continues to return equilibrium-backend effective pressures.
 
-    TODO(t-499 / RG-1 hard precondition added 2026-08-02): switch this one
-    factory to catalog ``P_eff`` only after the activity-corrected evaluation
-    path and the DESIGN-REV5 §7.4 precondition row are implemented and green.
+    TODO(VR-13 / RG-1): switch this one factory only after owner authorization
+    and the remaining DESIGN-REV5 §7.4 cutover preconditions are green.
     """
 
     effective_pressures = _legacy_evaporation_shadow_pressure_map(
@@ -1956,9 +1957,22 @@ class EvaporationMixin:
         vapor_pressure_diagnostic = dict(
             getattr(self, '_last_vapor_pressure_diagnostic', {}) or {}
         )
-        pO2_bar = vapor_pressure_diagnostic.get('pO2_bar')
-        if pO2_bar is None:
-            pO2_bar = getattr(equilibrium, 'pO2_bar', None)
+        transport_pO2_bar = vapor_pressure_diagnostic.get('pO2_bar')
+        if transport_pO2_bar is None:
+            transport_pO2_bar = getattr(equilibrium, 'pO2_bar', None)
+        source_reaction_fO2_bar = vapor_pressure_diagnostic.get(
+            'source_reaction_fO2_bar'
+        )
+        if source_reaction_fO2_bar is not None:
+            try:
+                source_reaction_fO2_bar = float(source_reaction_fO2_bar)
+            except (TypeError, ValueError):
+                source_reaction_fO2_bar = None
+            if source_reaction_fO2_bar is not None and (
+                not math.isfinite(source_reaction_fO2_bar)
+                or source_reaction_fO2_bar <= 0.0
+            ):
+                source_reaction_fO2_bar = None
         total_pressure_Pa = None
         try:
             total_pressure_Pa = float(
@@ -1967,12 +1981,77 @@ class EvaporationMixin:
         except (TypeError, ValueError):
             total_pressure_Pa = None
         try:
+            reported_activities = dict(
+                getattr(equilibrium, 'activity_coefficients', {}) or {}
+            )
+            kernel_activities = vapor_pressure_diagnostic.get('activities')
+            kernel_activity_source = (
+                isinstance(kernel_activities, Mapping)
+                and dict(kernel_activities) == reported_activities
+                and bool(reported_activities)
+            )
+            if kernel_activity_source:
+                activity_metadata = vapor_pressure_diagnostic
+                activity_evidence_owner = '_last_vapor_pressure_diagnostic.activities'
+            else:
+                activity_metadata = dict(
+                    getattr(equilibrium, 'diagnostics', {}) or {}
+                )
+                activity_evidence_owner = 'EquilibriumResult.activity_coefficients'
+            activity_provider_id = activity_metadata.get('activities_provider')
+            standard_state_raw = activity_metadata.get(
+                'activities_standard_state'
+            )
+            activity_standard_state = None
+            if isinstance(standard_state_raw, Mapping):
+                activity_standard_state = StandardStateIdentity(
+                    convention=str(standard_state_raw.get('convention') or ''),
+                    phase=str(standard_state_raw.get('phase') or ''),
+                    reference_pressure_bar=float(
+                        standard_state_raw.get('reference_pressure_bar')
+                    ),
+                    reference_temperature_K=(
+                        float(standard_state_raw['reference_temperature_K'])
+                        if standard_state_raw.get('reference_temperature_K')
+                        is not None
+                        else None
+                    ),
+                    component_basis=str(
+                        standard_state_raw.get('component_basis') or ''
+                    ),
+                )
+            activity_evidence_refs = {
+                str(species_id): (
+                    f'{activity_provider_id}:'
+                    f'{activity_evidence_owner}[{species_id}]'
+                )
+                for species_id in reported_activities
+                if activity_provider_id and activity_standard_state is not None
+            }
+            activity_standard_states = {
+                str(species_id): activity_standard_state
+                for species_id in reported_activities
+                if activity_provider_id and activity_standard_state is not None
+            }
             batch = builder(
                 temperature_K=float(temperature_K),
                 process_phase='hot_train',
                 stage='evaporation',
                 total_pressure_Pa=total_pressure_Pa,
-                fO2_bar=float(pO2_bar) if pO2_bar is not None else None,
+                fO2_bar=(
+                    float(transport_pO2_bar)
+                    if transport_pO2_bar is not None
+                    else None
+                ),
+                source_reaction_fO2_bar=source_reaction_fO2_bar,
+                source_reaction_activities=reported_activities,
+                source_reaction_activity_provider=(
+                    str(activity_provider_id) if activity_provider_id else None
+                ),
+                source_reaction_activity_evidence_refs=activity_evidence_refs,
+                source_reaction_activity_standard_states=(
+                    activity_standard_states
+                ),
                 flux_activation_context=FluxActivationContext(
                     epoch=FLUX_ACTIVATION_EPOCH_PRE_RG,
                     effective_pressure_species_ids=(

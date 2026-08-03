@@ -215,6 +215,7 @@ class SourceReactionActivity:
     refusal_code: ActivityRefusalCode | None = None
     detail: str | None = None
     derivation: Mapping[str, Any] = field(default_factory=dict)
+    evidence_ref: str | None = None
 
     def may_certify(self) -> bool:
         """Bounds and refusals never certify; points stay non-authoritative here."""
@@ -458,8 +459,13 @@ class CondensedPhaseActivityProvider:
         thermoengine: ThermoEnginePotentialEvidence | None,
         activity_exponent: float,
         solve_group_id: str | None = None,
+        state_fingerprint: str | None = None,
         measured_gamma: float | None = None,
         mole_fraction: float | None = None,
+        reported_activity: float | None = None,
+        reported_activity_provider: str | None = None,
+        reported_activity_evidence_ref: str | None = None,
+        reported_activity_standard_state: StandardStateIdentity | None = None,
         compound_bearing_state: bool = False,
     ) -> SourceReactionActivity:
         """Answer one ``activity_input`` declaration with a typed activity."""
@@ -474,8 +480,104 @@ class CondensedPhaseActivityProvider:
                     "evidence; free-oxide ACTIVITY_KEYS proxy is diagnostic-only "
                     "and cannot answer this contract",
                     standard_state=declaration.standard_state,
+                    state_fingerprint=state_fingerprint,
                     solve_group_id=solve_group_id,
                 )
+
+        if reported_activity is not None:
+            # A backend-reported thermodynamic activity is already the
+            # dimensionless value in the declaration's standard state.  It is
+            # not a gamma and must not be routed through ``a = gamma * X``.
+            # Compound-bearing declarations still require the matched
+            # MAGEMin/ThermoEngine path above; this point path is only admitted
+            # when the catalog explicitly says assemblage matching is not
+            # required for the source component.
+            if declaration.activity_model != "provider_reported_thermodynamic_activity":
+                return _refusal(
+                    declaration.component_id,
+                    ActivityRefusalCode.MISSING_EVIDENCE,
+                    "reported activity cannot answer activity_model "
+                    f"{declaration.activity_model!r}",
+                    standard_state=declaration.standard_state,
+                    state_fingerprint=state_fingerprint,
+                    solve_group_id=solve_group_id,
+                )
+            if declaration.require_assemblage_match:
+                return _refusal(
+                    declaration.component_id,
+                    ActivityRefusalCode.MISSING_EVIDENCE,
+                    "reported activity cannot satisfy an assemblage-matched "
+                    "activity_input declaration",
+                    standard_state=declaration.standard_state,
+                    state_fingerprint=state_fingerprint,
+                    solve_group_id=solve_group_id,
+                )
+            provider_id = (
+                reported_activity_provider.strip()
+                if isinstance(reported_activity_provider, str)
+                else ""
+            )
+            evidence_ref = (
+                reported_activity_evidence_ref.strip()
+                if isinstance(reported_activity_evidence_ref, str)
+                else ""
+            )
+            if not provider_id or not evidence_ref or reported_activity_standard_state is None:
+                return _refusal(
+                    declaration.component_id,
+                    ActivityRefusalCode.MISSING_EVIDENCE,
+                    "reported activity requires provider, evidence reference, and "
+                    "standard-state identity",
+                    standard_state=declaration.standard_state,
+                    state_fingerprint=state_fingerprint,
+                    solve_group_id=solve_group_id,
+                )
+            if reported_activity_standard_state != declaration.standard_state:
+                return _refusal(
+                    declaration.component_id,
+                    ActivityRefusalCode.STANDARD_STATE_MISMATCH,
+                    "reported activity standard state does not match the catalog "
+                    "activity_input declaration",
+                    standard_state=declaration.standard_state,
+                    state_fingerprint=state_fingerprint,
+                    solve_group_id=solve_group_id,
+                )
+            try:
+                value = float(reported_activity)
+            except (TypeError, ValueError):
+                value = math.nan
+            if not math.isfinite(value) or value <= 0.0:
+                return _refusal(
+                    declaration.component_id,
+                    ActivityRefusalCode.MISSING_EVIDENCE,
+                    "reported activity must be finite and positive",
+                    standard_state=declaration.standard_state,
+                    state_fingerprint=state_fingerprint,
+                    solve_group_id=solve_group_id,
+                )
+            return SourceReactionActivity(
+                component_id=declaration.component_id,
+                value=value,
+                verdict=ActivityVerdictKind.POINT,
+                bound_direction=None,
+                reason="provider_reported_thermodynamic_activity",
+                standard_state=declaration.standard_state,
+                phase_assemblage_ref=None,
+                chemical_potential_ref=None,
+                state_fingerprint=state_fingerprint,
+                solve_group_id=solve_group_id,
+                provider=provider_id,
+                authority=False,
+                derivation={
+                    "premise": (
+                        "provider reports a in the exact declared standard state"
+                    ),
+                    "algebra": "a_source = a_reported",
+                    "units": "activity is dimensionless",
+                    "limiting_case": "pure endmember in its standard state has a=1",
+                },
+                evidence_ref=evidence_ref,
+            )
 
         if measured_gamma is not None and mole_fraction is not None:
             # Point path for an independently supplied gamma (still diagnostic).
@@ -485,6 +587,7 @@ class CondensedPhaseActivityProvider:
                     ActivityRefusalCode.MISSING_EVIDENCE,
                     "mole_fraction must be finite and non-negative",
                     standard_state=declaration.standard_state,
+                    state_fingerprint=state_fingerprint,
                     solve_group_id=solve_group_id,
                 )
             if measured_gamma < 0.0 or not math.isfinite(measured_gamma):
@@ -493,6 +596,7 @@ class CondensedPhaseActivityProvider:
                     ActivityRefusalCode.MISSING_EVIDENCE,
                     "measured_gamma must be finite and non-negative",
                     standard_state=declaration.standard_state,
+                    state_fingerprint=state_fingerprint,
                     solve_group_id=solve_group_id,
                 )
             value = float(measured_gamma) * float(mole_fraction)
@@ -505,7 +609,7 @@ class CondensedPhaseActivityProvider:
                 standard_state=declaration.standard_state,
                 phase_assemblage_ref=None,
                 chemical_potential_ref=None,
-                state_fingerprint=None,
+                state_fingerprint=state_fingerprint,
                 solve_group_id=solve_group_id,
                 provider="measured_gamma",
                 authority=False,
@@ -523,6 +627,7 @@ class CondensedPhaseActivityProvider:
                     component_id=declaration.component_id,
                     activity_exponent=activity_exponent,
                     standard_state=declaration.standard_state,
+                    state_fingerprint=state_fingerprint,
                     solve_group_id=solve_group_id,
                 )
             return _refusal(
@@ -530,6 +635,7 @@ class CondensedPhaseActivityProvider:
                 ActivityRefusalCode.MISSING_EVIDENCE,
                 "no assemblage/potential evidence and Henrian upper bound disabled",
                 standard_state=declaration.standard_state,
+                state_fingerprint=state_fingerprint,
                 solve_group_id=solve_group_id,
             )
 
@@ -540,6 +646,7 @@ class CondensedPhaseActivityProvider:
                 "both MAGEMin assemblage and ThermoEngine potentials are required "
                 "for a matched chemical-potential activity point",
                 standard_state=declaration.standard_state,
+                state_fingerprint=state_fingerprint,
                 solve_group_id=solve_group_id,
             )
 

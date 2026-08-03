@@ -83,6 +83,19 @@ def _reaction_fixture() -> dict:
                                         {"formula": "K", "stoichiometry": 1.0},
                                         {"formula": "O2", "stoichiometry": 0.25},
                                     ],
+                                    "activity_input": {
+                                        "component_id": "KO0.5",
+                                        "standard_state": {
+                                            "convention": "raoultian_pure_endmember",
+                                            "phase": "liquid",
+                                            "reference_pressure_bar": 1.0,
+                                            "component_basis": "raoultian_pure_endmember",
+                                        },
+                                        "activity_model": "provider_reported_thermodynamic_activity",
+                                        "allow_henrian_upper_bound": False,
+                                        "compound_bearing": False,
+                                        "require_assemblage_match": False,
+                                    },
                                 }
                             ],
                             "pressure_models": [
@@ -93,6 +106,7 @@ def _reaction_fixture() -> dict:
                                     "species_basis": "monomer",
                                     "valid_domain": {"temperature_K": [1000.0, 1200.0]},
                                     "source_reaction_id": "ko0_5_to_k",
+                                    "activity_semantics": "source_reaction_activity",
                                     "reference_pressure_model": {
                                         "evaluator_family": "tabulated_equilibrium",
                                         "points": [
@@ -103,6 +117,7 @@ def _reaction_fixture() -> dict:
                                     "activity_exponent": 1.0,
                                     "pO2_exponent": -0.25,
                                     "pO2_reference_bar": 1.0,
+                                    "oxygen_fugacity_channel": "intrinsic_melt",
                                 }
                             ],
                             "validation": {
@@ -263,6 +278,18 @@ def test_production_schema_compiles_exact_four_strata_and_legacy_projection() ->
     assert set(legacy["oxide_vapors"]) == {"SiO", "CrO2"}
     assert set(legacy["foulant_vapor"]) == {"NaCl", "KCl", "NaF"}
     assert legacy["metals"]["K"]["antoine"]["A"] == pytest.approx(10.641294)
+    # Activity-corrected schema-v2 models must not leak into the legacy
+    # projection that still feeds the pre-RG equilibrium-backend seam.
+    assert {
+        species_id: legacy["metals"][species_id]["antoine"]
+        for species_id in ("Ca", "Al", "Ti", "Cr", "Mn")
+    } == {
+        "Ca": {"A": 11.238, "B": 9520, "C": 0},
+        "Al": {"A": 11.553, "B": 17340, "C": 0},
+        "Ti": {"A": 11.65, "B": 23200, "C": 0},
+        "Cr": {"A": 11.42, "B": 20730, "C": 0},
+        "Mn": {"A": 11.183, "B": 14740, "C": 0},
+    }
     sodium = catalog.species["Na"]
     assert sodium.fiat_routing.process_or_terminal_destination == (
         "process.condensation_train"
@@ -276,6 +303,102 @@ def test_production_schema_compiles_exact_four_strata_and_legacy_projection() ->
     bundle = load_config_bundle(DATA_DIR)
     assert bundle.vapor_pressures == legacy
     assert bundle.vapor_pressures.catalog_payload == payload
+
+
+@pytest.mark.parametrize(
+    "mutation,match",
+    [
+        ("malformed_antoine", "compatibility_antoine.A"),
+        ("missing_antoine_key", "must contain exactly A, B, C"),
+        ("extra_antoine_key", "must contain exactly A, B, C"),
+        ("nonfinite_antoine", "compatibility_antoine.B must be a finite number"),
+        ("boolean_antoine", "compatibility_antoine.A must be a finite number"),
+        ("reversed_range", "compatibility_valid_range_K must be increasing"),
+        ("malformed_range_shape", r"must be \[low, high\]"),
+        ("nonfinite_range", r"compatibility_valid_range_K\[1\] must be finite"),
+        ("boolean_range", "compatibility_valid_range_K.*must be numeric, not boolean"),
+    ],
+)
+def test_legacy_compatibility_projection_rejects_malformed_flux_inputs(
+    mutation: str,
+    match: str,
+) -> None:
+    payload = _yaml("vapor_pressures.yaml")
+    ca_model = payload["families"]["metals_ca_family"]["physical_properties"][
+        "species"
+    ]["Ca"]["pressure_models"][0]
+    if mutation == "malformed_antoine":
+        ca_model["compatibility_antoine"]["A"] = "bogus"
+    elif mutation == "missing_antoine_key":
+        ca_model["compatibility_antoine"].pop("B")
+    elif mutation == "extra_antoine_key":
+        ca_model["compatibility_antoine"]["D"] = 0.0
+    elif mutation == "nonfinite_antoine":
+        ca_model["compatibility_antoine"]["B"] = math.nan
+    elif mutation == "boolean_antoine":
+        ca_model["compatibility_antoine"]["A"] = True
+    elif mutation == "reversed_range":
+        ca_model["compatibility_valid_range_K"] = [2000.0, 1000.0]
+    elif mutation == "malformed_range_shape":
+        ca_model["compatibility_valid_range_K"] = [1000.0]
+    elif mutation == "nonfinite_range":
+        ca_model["compatibility_valid_range_K"] = [1000.0, math.inf]
+    else:
+        ca_model["compatibility_valid_range_K"] = [True, 1000.0]
+
+    with pytest.raises(CatalogCompileError, match=match):
+        compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)
+
+
+def test_pure_component_phase_requires_explicit_non_melt_identity() -> None:
+    payload = _yaml("vapor_pressures.yaml")
+    nacl_model = payload["families"]["foulant_vapor_nacl_family"][
+        "physical_properties"
+    ]["species"]["NaCl"]["pressure_models"][0]
+    nacl_model.pop("activity_semantics")
+    with pytest.raises(CatalogCompileError, match="pure-component saturation requires"):
+        compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)
+
+    payload = _yaml("vapor_pressures.yaml")
+    nacl_family = payload["families"]["foulant_vapor_nacl_family"]
+    nacl_family["code_metadata"]["source_account"] = "process.cleaned_melt"
+    identity = nacl_family["physical_properties"]["species"]["NaCl"][
+        "pressure_models"
+    ][0]["pure_condensed_phase_identity"]
+    identity["source_account"] = "process.cleaned_melt"
+    with pytest.raises(CatalogCompileError, match="dedicated non-melt"):
+        compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)
+
+
+@pytest.mark.parametrize(
+    "mutation,match",
+    [
+        ("missing_identity", "pure_condensed_phase_identity must be a mapping"),
+        ("wrong_component", "does not match species formula"),
+        ("gas_phase", "phase must be 'condensed_solid' or 'condensed_liquid'"),
+        ("wrong_account", "does not match code_metadata"),
+    ],
+)
+def test_pure_component_phase_identity_is_independently_enforced(
+    mutation: str,
+    match: str,
+) -> None:
+    payload = _yaml("vapor_pressures.yaml")
+    nacl_model = payload["families"]["foulant_vapor_nacl_family"][
+        "physical_properties"
+    ]["species"]["NaCl"]["pressure_models"][0]
+    identity = nacl_model["pure_condensed_phase_identity"]
+    if mutation == "missing_identity":
+        nacl_model.pop("pure_condensed_phase_identity")
+    elif mutation == "wrong_component":
+        identity["component_id"] = "KCl"
+    elif mutation == "gas_phase":
+        identity["phase"] = "gas"
+    else:
+        identity["source_account"] = "process.other_foulant"
+
+    with pytest.raises(CatalogCompileError, match=match):
+        compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)
 
 
 def test_species_catalog_closes_collision_gases_and_carrier_only_rows() -> None:
@@ -347,19 +470,59 @@ def test_b1_standard_reaction_without_antoine_uses_shared_evaluator() -> None:
     assert evaporation.pressure_pa == pytest.approx(condensation.pressure_pa)
     assert evaporation.pressure_pa > 0.0
 
-    # Regression for b-110's silent train refusal: compiled capability replaces
-    # the old A/B/C field-presence gate, so missing Antoine is not 100% offgas.
-    assert _species_has_antoine_data("K", vapor_pressure_data=payload) is True
-    pressure_pa, refused = _try_antoine_psat_pa(
-        "K", 1100.0, vapor_pressure_data=payload
-    )
-    assert refused is False
-    assert pressure_pa == pytest.approx(
-        condensation_evaluator.evaluate(1100.0).pressure_pa
-    )
+    # Direct evaluator callers cannot bypass the typed activity/fO2 path by
+    # inheriting unity activity or the oxygen reference pressure.
+    with pytest.raises(CatalogCompileError, match="explicit source_activity"):
+        condensation_evaluator.evaluate(1100.0)
+    with pytest.raises(CatalogCompileError, match="explicit source_activity"):
+        condensation_evaluator.evaluate(1100.0, pO2_bar=1.0e-4)
+    with pytest.raises(CatalogCompileError, match="explicit intrinsic_melt"):
+        condensation_evaluator.evaluate(1100.0, source_activity=0.25)
 
 
-def test_b1_oxide_row_reaches_evaporation_and_condensation_without_antoine() -> None:
+def test_activity_dependent_model_requires_explicit_activity_declaration() -> None:
+    payload = _reaction_fixture()
+    reaction = payload["families"]["potassium_test_family"][
+        "physical_properties"
+    ]["species"]["K"]["source_reactions"][0]
+    reaction.pop("activity_input")
+
+    with pytest.raises(CatalogCompileError, match="silent a=1 is forbidden"):
+        compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)
+
+
+@pytest.mark.parametrize(
+    "mutation,match",
+    [
+        ("missing_exponent", "implicit a=1 is forbidden"),
+        ("missing_semantics", "activity_semantics"),
+        ("unknown_model", "unsupported by catalog channel evaluation"),
+        ("wrong_component", "is not a selected-reaction reactant"),
+    ],
+)
+def test_activity_contract_identity_mutations_fail_compile(
+    mutation: str, match: str
+) -> None:
+    payload = _reaction_fixture()
+    species = payload["families"]["potassium_test_family"][
+        "physical_properties"
+    ]["species"]["K"]
+    model = species["pressure_models"][0]
+    activity_input = species["source_reactions"][0]["activity_input"]
+    if mutation == "missing_exponent":
+        model.pop("activity_exponent")
+    elif mutation == "missing_semantics":
+        model.pop("activity_semantics")
+    elif mutation == "unknown_model":
+        activity_input["activity_model"] = "nonsense_unvalidated"
+    else:
+        activity_input["component_id"] = "DefinitelyNotAReactant"
+
+    with pytest.raises(CatalogCompileError, match=match):
+        compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)
+
+
+def test_b1_oxide_row_requires_activity_for_condensation_without_antoine() -> None:
     payload = _reaction_fixture()
     family = payload["families"]["potassium_test_family"]
     family["code_metadata"]["compatibility_projection"] = "oxide_vapors"
@@ -386,8 +549,8 @@ def test_b1_oxide_row_reaches_evaporation_and_condensation_without_antoine() -> 
     pressure_pa, refused = _try_antoine_psat_pa(
         "K", 1100.0, vapor_pressure_data=payload
     )
-    assert refused is False
-    assert pressure_pa is not None and pressure_pa > 0.0
+    assert refused is True
+    assert pressure_pa is None
 
     model = CondensationModel(
         CondensationTrain.create_default(),
@@ -406,17 +569,33 @@ def test_b1_oxide_row_reaches_evaporation_and_condensation_without_antoine() -> 
         EvaporationFlux(species_kg_hr={"K": 1.0}, total_kg_hr=1.0),
         melt,
     )
-    # VR-11/B3 may record typed pass_through efficiency outcomes on
-    # zero-residence stages; hard Antoine refusals must still be absent.
+    # Condensation has no source-activity evidence for this synthetic row and
+    # must status-bearing pass through instead of evaluating at implicit a=1.
     k_refusal = route.condensation_refusals_by_species.get("K")
-    if k_refusal is not None:
-        assert k_refusal.get("status") != "refused"
-        assert k_refusal.get("reason") != "antoine_data_unavailable"
-    assert route.wall_deposit_by_species["K"] > 0.0
-    assert route.remaining_by_species["K"] < 1.0
-    assert route.wall_deposit_by_species["K"] + route.remaining_by_species[
-        "K"
-    ] == pytest.approx(1.0)
+    assert k_refusal is not None
+    assert k_refusal.get("status") == "pass_through"
+    assert "K" not in route.wall_deposit_by_species
+    assert route.remaining_by_species["K"] == pytest.approx(1.0)
+
+
+def test_metals_projection_reference_evaluation_declares_neutral_inputs() -> None:
+    payload = _reaction_fixture()
+    provider = BuiltinVaporPressureProvider(payload)
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {"K2O": 1.0}},
+            species_formula_registry={},
+        ),
+        temperature_C=826.85,
+        pressure_bar=1.0e-6,
+        fO2_log=-4.0,
+        control_inputs={"pO2_bar": 1.0e-4, "intrinsic_fO2_log": -4.0},
+    )
+
+    result = provider.dispatch(request)
+    diagnostic = result.diagnostic or {}
+    assert diagnostic["vapor_pressures_Pa"]["K"] > 0.0
 
 
 def test_config_bundle_retains_compiler_capability_for_b1(
@@ -434,8 +613,8 @@ def test_config_bundle_retains_compiler_capability_for_b1(
     pressure_pa, refused = _try_antoine_psat_pa(
         "K", 1100.0, vapor_pressure_data=catalog_payload
     )
-    assert refused is False
-    assert pressure_pa is not None and pressure_pa > 0.0
+    assert refused is True
+    assert pressure_pa is None
 
     sim = PyrolysisSimulator(
         InternalAnalyticalBackend(),
@@ -452,23 +631,32 @@ def test_config_bundle_retains_compiler_capability_for_b1(
 
 def test_anti_cliff_continuation_is_status_bearing_nonzero_and_conservative() -> None:
     evaluator = compile_vapour_rail_catalog(_reaction_fixture()).evaluator_for("K")
-    endpoint = evaluator.evaluate(1200.0).pressure_pa
-    beyond = evaluator.evaluate(1300.0)
+    endpoint = evaluator.evaluate(
+        1200.0, source_activity=1.0, pO2_bar=1.0
+    ).pressure_pa
+    beyond = evaluator.evaluate(1300.0, source_activity=1.0, pO2_bar=1.0)
     straight_log10 = math.log10(endpoint) + (2.0 / 200.0) * 100.0
 
     assert beyond.out_of_range is True
     assert beyond.status == OUT_OF_RANGE_STATUS
     assert beyond.acquisition_flag == "acquire:test:K"
     assert endpoint < beyond.pressure_pa < 10.0**straight_log10
-    assert evaluator.evaluate(900.0).pressure_pa > 0.0
+    assert (
+        evaluator.evaluate(900.0, source_activity=1.0, pO2_bar=1.0).pressure_pa
+        > 0.0
+    )
 
 
 def test_sio_typed_evaluator_applies_oxygen_mass_action_once() -> None:
     evaluator = compile_vapour_rail_catalog(
         _yaml("vapor_pressures.yaml")
     ).evaluator_for("SiO")
-    at_reference = evaluator.evaluate(1800.0, pO2_bar=1.0e-9).pressure_pa
-    oxygen_rich = evaluator.evaluate(1800.0, pO2_bar=1.0e-6).pressure_pa
+    at_reference = evaluator.evaluate(
+        1800.0, source_activity=1.0, pO2_bar=1.0e-9
+    ).pressure_pa
+    oxygen_rich = evaluator.evaluate(
+        1800.0, source_activity=1.0, pO2_bar=1.0e-6
+    ).pressure_pa
 
     assert evaluator.pO2_exponent == pytest.approx(-0.5)
     assert oxygen_rich / at_reference == pytest.approx(

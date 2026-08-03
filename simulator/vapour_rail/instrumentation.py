@@ -238,6 +238,45 @@ def _flux_payload(flux: Any) -> dict[str, Any]:
     return {"kind": "unknown", "repr": repr(flux)}
 
 
+def _activity_payload(activity: Any) -> dict[str, Any] | None:
+    if activity is None:
+        return None
+    standard_state = getattr(activity, "standard_state", None)
+    standard_payload = None
+    if standard_state is not None:
+        standard_payload = {
+            "convention": standard_state.convention,
+            "phase": standard_state.phase,
+            "reference_pressure_bar": float(
+                standard_state.reference_pressure_bar
+            ),
+            "reference_temperature_K": standard_state.reference_temperature_K,
+            "component_basis": standard_state.component_basis,
+        }
+    verdict = getattr(activity, "verdict", None)
+    refusal_code = getattr(activity, "refusal_code", None)
+    bound_direction = getattr(activity, "bound_direction", None)
+    return {
+        "component_id": activity.component_id,
+        "value": activity.value,
+        "verdict": getattr(verdict, "value", verdict),
+        "bound_direction": getattr(bound_direction, "value", bound_direction),
+        "reason": activity.reason,
+        "standard_state": standard_payload,
+        "phase_assemblage_ref": activity.phase_assemblage_ref,
+        "chemical_potential_ref": activity.chemical_potential_ref,
+        "state_fingerprint": activity.state_fingerprint,
+        "solve_group_id": activity.solve_group_id,
+        "provider": activity.provider,
+        "authority": bool(activity.authority),
+        "report_label": activity.report_label,
+        "refusal_code": getattr(refusal_code, "value", refusal_code),
+        "detail": activity.detail,
+        "evidence_ref": activity.evidence_ref,
+        "derivation": dict(activity.derivation),
+    }
+
+
 def serialize_vapour_answer(answer: VapourAnswer) -> dict[str, Any]:
     """JSON-safe channel answer for runner/artifact/UI."""
 
@@ -269,6 +308,9 @@ def serialize_vapour_answer(answer: VapourAnswer) -> dict[str, Any]:
         "acquisition_flag": extra.get("acquisition_flag"),
         "activity_bound": extra.get("activity_bound"),
         "source_boundary": extra.get("source_boundary"),
+        "source_reaction_activity": _activity_payload(
+            answer.source_reaction_activity
+        ),
     }
 
 

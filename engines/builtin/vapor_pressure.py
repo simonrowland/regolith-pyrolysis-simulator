@@ -1157,7 +1157,14 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     and not antoine
                 ):
                     evaluator = self._vapour_rail_catalog.evaluator_for(species)
-                    compiled_reference_Pa = evaluator.evaluate(T_K).pressure_pa
+                    # This is the declared standard-reaction reference point,
+                    # not a live melt evaluation. Make both neutral inputs
+                    # explicit so activity/fO2 can never default silently.
+                    compiled_reference_Pa = evaluator.evaluate(
+                        T_K,
+                        source_activity=1.0,
+                        pO2_bar=evaluator.pO2_reference_bar,
+                    ).pressure_pa
                     coefficient_block = "compiled_reference_pressure_model"
                 if _is_noncertifying_pseudo_vapor_pressure_runtime(
                     species,
@@ -1938,11 +1945,22 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         f"{T_K:.2f} K"
                     )
             if compiled_evaluator is not None:
-                reference_evaluation = compiled_evaluator.evaluate(T_K)
+                # Explicit unit/reference inputs here are the declared standard
+                # reaction reference, not evaluator defaults. The live point
+                # below uses the physical activity and the evaluator's named
+                # oxygen channel.
+                reference_evaluation = compiled_evaluator.evaluate(
+                    T_K,
+                    source_activity=1.0,
+                    pO2_bar=compiled_evaluator.pO2_reference_bar,
+                )
+                evaluator_pO2_bar = transport_pO2_bar
+                if compiled_evaluator.oxygen_fugacity_channel == "intrinsic_melt":
+                    evaluator_pO2_bar = melt_dissociation_pO2_bar
                 evaluation = compiled_evaluator.evaluate(
                     T_K,
                     source_activity=max(a_ox, 1.0e-300) if parent_oxide else 1.0,
-                    pO2_bar=transport_pO2_bar,
+                    pO2_bar=evaluator_pO2_bar,
                 )
                 P_reference_Pa = reference_evaluation.pressure_pa
                 P_eq_Pa = evaluation.pressure_pa
@@ -2099,6 +2117,23 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             "vapor_pressures_source": vapor_pressure_sources,
             "vapor_pressure_numerator_provenance": vapor_pressure_provenance,
             "activities": activities,
+            "activities_provider": "BuiltinVaporPressureProvider",
+            "activities_standard_state": {
+                "convention": "raoultian_pure_endmember",
+                "phase": "liquid",
+                "reference_pressure_bar": 1.0,
+                "reference_temperature_K": None,
+                "component_basis": "raoultian_pure_endmember",
+            },
+            # Exact intrinsic-melt oxygen channel used above for metal-source
+            # dissociation. Catalog activity evaluation must consume this solve
+            # input, never reconstruct it from a later EquilibriumResult or
+            # substitute transport/headspace pO2.
+            "source_reaction_fO2_bar": (
+                melt_dissociation_pO2_bar
+                if intrinsic_fO2_log_supplied
+                else None
+            ),
             "pO2_bar": transport_pO2_bar,
             "vacuum_floor_bar": vacuum_floor_bar,
             "extrapolated_beyond_valid_range_K": {
