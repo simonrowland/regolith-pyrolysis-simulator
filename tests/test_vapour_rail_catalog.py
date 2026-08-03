@@ -350,6 +350,29 @@ def test_legacy_compatibility_projection_rejects_malformed_flux_inputs(
         compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)
 
 
+def test_nonfinite_named_field_yields_field_specific_not_digest_message() -> None:
+    """Ordering regression: schema field message must beat digest non-finite guard.
+
+    t-517's compile-input digest refuses NaN/Inf with a generic message. That
+    guard must not fire *before* field validation, or operators lose which
+    named coefficient/range entry is bad. Both paths stay fail-closed; this
+    asserts the diagnostic that wins is the field-specific one.
+    """
+
+    payload = _yaml("vapor_pressures.yaml")
+    ca_model = payload["families"]["metals_ca_family"]["physical_properties"][
+        "species"
+    ]["Ca"]["pressure_models"][0]
+    ca_model["compatibility_antoine"]["B"] = math.nan
+
+    with pytest.raises(
+        CatalogCompileError,
+        match=r"compatibility_antoine\.B must be a finite number",
+    ) as caught:
+        compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)
+    assert "compile-input digest requires finite floats" not in str(caught.value)
+
+
 def test_pure_component_phase_requires_explicit_non_melt_identity() -> None:
     payload = _yaml("vapor_pressures.yaml")
     nacl_model = payload["families"]["foulant_vapor_nacl_family"][

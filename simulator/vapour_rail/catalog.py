@@ -1034,18 +1034,30 @@ def compile_vapour_rail_catalog(
         emit_u0_request_rules=emit_u0_request_rules,
         effective_u0_manifest=effective_manifest,
     )
-    cache_key = _compile_identity_with_hint(
-        payload,
-        emit_u0_request_rules=emit_u0_request_rules,
-        input_vector=input_vector,
-    )
-    if content_key is not None and content_key != cache_key:
-        raise CatalogCompileError(
-            "content_key does not match the current compile-input identity"
+    # Digest refuses non-finite floats generically. Defer that refusal so
+    # schema/field validation can name the bad field first; after a successful
+    # compile we still re-raise the digest error so non-finite input is never
+    # digested or cached (fail-closed on both paths).
+    deferred_digest_error: CatalogCompileError | None = None
+    cache_key: str | None = None
+    try:
+        cache_key = _compile_identity_with_hint(
+            payload,
+            emit_u0_request_rules=emit_u0_request_rules,
+            input_vector=input_vector,
         )
-    cached = _COMPILE_CACHE.get(cache_key)
-    if cached is not None:
-        return cached
+    except CatalogCompileError as exc:
+        if "compile-input digest requires finite floats" not in str(exc):
+            raise
+        deferred_digest_error = exc
+    else:
+        if content_key is not None and content_key != cache_key:
+            raise CatalogCompileError(
+                "content_key does not match the current compile-input identity"
+            )
+        cached = _COMPILE_CACHE.get(cache_key)
+        if cached is not None:
+            return cached
     if payload.get("schema_version") != SCHEMA_VERSION:
         raise CatalogCompileError("vapour catalog schema_version must be 2")
     families = _mapping(payload.get("families"), "families")
@@ -1197,6 +1209,11 @@ def compile_vapour_rail_catalog(
         request_rules=request_rules,
         catalog_payload=payload,
     )
+    # Schema validation passed; residual digest refusal still fail-closes so a
+    # non-finite leaf that escaped field checks is never memoized.
+    if deferred_digest_error is not None:
+        raise deferred_digest_error
+    assert cache_key is not None  # set whenever digest path succeeded
     # Insert / refresh LRU under the content-digest identity key.
     if cache_key in _COMPILE_CACHE:
         try:
