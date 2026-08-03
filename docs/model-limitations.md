@@ -193,7 +193,7 @@ Generated from ADOPTED (priority-winner) extract-store observations of
 type `psat_series` / `rate_series` / `activity_coefficient`. Residuals
 are the deliverable (doctrine: *Headline accuracy is the product*).
 Engine refusals surface as typed skips; mismatches are FINDINGs —
-tolerances are **not** widened to pass. Geometry: tools/motzfeldt.py absent — no Motzfeldt multi-orifice inversion; pure-component / unit-activity oxide melt at reported T; default pO2 boundary unless equipment.cell_material or equipment.chamber_pressure supplies one.
+tolerances are **not** widened to pass. Geometry: tools/motzfeldt.py present; multi-orifice geometry may be applied.
 
 Comparable points: **12** (α/rate=12, psat=0, activity/γ=0). psat currently yields zero scored comparisons when the engine lacks the species; activity/γ is structurally skipped pending melt recipes (`activity_requires_melt_recipe`). Headline residual budget is the α rate_series set. Extrapolated-α FINDINGs marked in-line: **4**.
 
