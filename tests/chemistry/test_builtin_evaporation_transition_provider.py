@@ -393,6 +393,10 @@ def test_provider_emits_expected_proposal_for_known_inputs(
 # fixture ceiling is >=3x that maximum, and xdist_group pins every consumer to
 # one gateway. Module pytestmark deliberately has no xdist_group: xdist 3.8
 # unions group marks (see module comment).
+# Nightly: co-tenant of package fixture full_builtin_provider_run (shared with
+# the condensation full-run consumers). Mark it too so the PR tier does not
+# re-run the fixture for a lone unmarked consumer.
+@pytest.mark.nightly
 @pytest.mark.xdist_group("magemin_fullrun_c")
 @pytest.mark.timeout(5400)
 def test_full_run_mass_balance_holds_with_kernel_committed_transitions(

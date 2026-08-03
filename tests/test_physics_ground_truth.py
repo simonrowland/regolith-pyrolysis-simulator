@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import math
+from functools import lru_cache
 from pathlib import Path
 
 import pytest
@@ -190,7 +191,9 @@ NIST_JANAF_MN_SHOMATE = {
 }
 
 
+@lru_cache(maxsize=1)
 def _vapor_pressure_data() -> dict:
+    """Module-safe: pure YAML + VR-3/VR-7 legacy view, no mutable state."""
     with (DATA_DIR / "vapor_pressures.yaml").open() as handle:
         payload = yaml.safe_load(handle)
     from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
@@ -198,7 +201,9 @@ def _vapor_pressure_data() -> dict:
     return vapor_pressure_legacy_view(payload)
 
 
+@lru_cache(maxsize=1)
 def _setpoints_data() -> dict:
+    """Module-safe: pure YAML load shared across ground-truth pins."""
     with (DATA_DIR / "setpoints.yaml").open() as handle:
         return yaml.safe_load(handle)
 
@@ -472,19 +477,13 @@ def test_mg_sidecar_is_monotonic_but_gas_runtime_uses_liquid_oxide_standard() ->
     )
 
 
-@pytest.mark.parametrize(
-    ("body", "melt_fO2_bar", "owner_target_C", "derived_root_C"),
-    [
-        ("moon", MOON_VACUUM_FLOOR_BAR, 1979, 1978.564),
-        ("asteroid", ASTEROID_VACUUM_FLOOR_BAR, 1841, 1840.802),
-    ],
+_MG_PHASE_0P01_BAR_CASES = (
+    ("moon", MOON_VACUUM_FLOOR_BAR, 1979, 1978.564),
+    ("asteroid", ASTEROID_VACUUM_FLOOR_BAR, 1841, 1840.802),
 )
-def test_mg_phase_correct_0p01_bar_threshold(
-    body: str,
-    melt_fO2_bar: float,
-    owner_target_C: int,
-    derived_root_C: float,
-) -> None:
+
+
+def _bisect_mg_0p01_bar_root_K(melt_fO2_bar: float) -> float:
     # Premise: compare both bodies at the historical fixed lunar-melt activity
     # a_MgO=0.0926 and ask where supported Mg reaches 0.01 bar = 1000 Pa.
     # Algebra: MgO -> Mg + 1/2 O2 gives K1, while the per-mol-O2 JANAF
@@ -510,7 +509,35 @@ def test_mg_phase_correct_0p01_bar_threshold(
             low_K = mid_K
         else:
             high_K = mid_K
-    root_K = (low_K + high_K) / 2.0
+    return (low_K + high_K) / 2.0
+
+
+@pytest.fixture(scope="module")
+def mg_phase_0p01_bar_roots() -> dict[str, float]:
+    """Module-scope the expensive pure-function bisections (~19 s each).
+
+    Roots depend only on (fO2, a_MgO, graph) — no engine process, no mutable
+    simulator state. Sharing across the two body params is golden-neutral.
+    """
+    return {
+        body: _bisect_mg_0p01_bar_root_K(melt_fO2_bar)
+        for body, melt_fO2_bar, _owner, _derived in _MG_PHASE_0P01_BAR_CASES
+    }
+
+
+@pytest.mark.parametrize(
+    ("body", "melt_fO2_bar", "owner_target_C", "derived_root_C"),
+    list(_MG_PHASE_0P01_BAR_CASES),
+)
+def test_mg_phase_correct_0p01_bar_threshold(
+    body: str,
+    melt_fO2_bar: float,
+    owner_target_C: int,
+    derived_root_C: float,
+    mg_phase_0p01_bar_roots: dict[str, float],
+) -> None:
+    a_MgO = 0.0926
+    root_K = mg_phase_0p01_bar_roots[body]
 
     target_data = _setpoints_data()["campaigns"]["C4"]["Mg_threshold_grounding"]
     body_data = target_data["lunar" if body == "moon" else body]

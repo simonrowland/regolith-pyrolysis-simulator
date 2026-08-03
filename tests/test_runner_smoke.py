@@ -1986,6 +1986,8 @@ def test_status_with_mass_balance_invariant_refuses_completed_run_without_eviden
 # t-385 (2026-07-21): mass-balance class measured 992.8 s at -n0
 # (compose-vapor-work/n0-loop t10); ceiling >= 1.2x headroom over
 # measured n0 (family serialized on one gateway). xdist_group pins the MAGEMin full-run family to one gateway.
+# Nightly (2026-08-02 CI tiering): operator/decision path (~251 s junit).
+@pytest.mark.nightly
 @pytest.mark.xdist_group("magemin_fullrun_a")
 @pytest.mark.timeout(1800)
 def test_runner_records_operator_decision_in_shadow_trace():

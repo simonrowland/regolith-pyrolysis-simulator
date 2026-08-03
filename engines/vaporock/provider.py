@@ -294,6 +294,12 @@ class VapoRockProvider(ChemistryProvider):
         :class:`ProviderUnavailableError` in :meth:`dispatch`, not as a
         traceback at provider-construction time.  This matches the MAGEMin
         shadow's lazy posture.
+
+        When ``REGOLITH_VAPOROCK_SESSION_WARM=1`` (pytest default), lazy
+        construction reuses a process-scoped VR-5 warm pool so repeated
+        provider boots do not re-import VapoRock. Explicit backends passed
+        to the constructor are never replaced. Availability probes and
+        unit tests that monkeypatch imports keep the cold path.
         """
         if self._backend is not None:
             if not self._backend_initialised:
@@ -304,7 +310,18 @@ class VapoRockProvider(ChemistryProvider):
                 self._backend_initialised = True
             return self._backend
         try:
-            from simulator.melt_backend.vaporock import VapoRockBackend
+            from simulator.melt_backend.vaporock import (
+                VapoRockBackend,
+                get_or_create_session_backend,
+                session_warm_enabled,
+            )
+
+            if session_warm_enabled():
+                shared = get_or_create_session_backend({})
+                if shared is not None:
+                    self._backend = shared
+                    self._backend_initialised = True
+                    return shared
 
             backend = VapoRockBackend()
             backend.initialize({})

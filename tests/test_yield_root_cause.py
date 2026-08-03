@@ -176,6 +176,10 @@ def test_na_shuttle_janaf_feo_crossover_is_below_practical_c3_temperature():
 # Studio train gate (2026-07-27): the shared full track measured 2051 s on a
 # quiet box, while co-tenancy inflates it 1.3-2x; 7200 s is the >=3x-clean
 # contention-robust hang backstop.
+# Nightly (2026-08-02 CI tiering): campaign-length retained full track (~1455 s
+# junit); assertion-only siblings share the module fixture — mark them too so
+# the PR tier does not re-run the fixture for a 0 s consumer.
+@pytest.mark.nightly
 @pytest.mark.xdist_group("magemin_fullrun_b")
 @pytest.mark.timeout(7200)
 def test_pyrolysis_track_c5_reduces_feo_without_additives(
@@ -425,6 +429,8 @@ def test_c5_declared_ladder_hold_scopes_shared_voltage_species_before_refusal():
 # Historical duration is about 340 s; 1020 s is the 3x fullrun hang backstop.
 # fullrun_d is the lightest chain (1659 s hinted), so adding ~340 s here keeps
 # the chains balanced rather than stacking onto the fullrun_b critical path.
+# Nightly (2026-08-02 CI tiering): distinct-input full track (~36 s junit).
+@pytest.mark.nightly
 @pytest.mark.timeout(1020)
 @pytest.mark.xdist_group("magemin_fullrun_d")
 def test_c5_targeted_feo_full_track_reduces_target_after_low_temperature_hours():
@@ -568,6 +574,8 @@ def test_c3_shuttle_injects_na_from_condensed_alkali_alone():
 
 # This can be the first consumer to construct the shared full-track fixture
 # under selection, so it uses the same 7200 s calibrated hang backstop.
+# Nightly: assertion-only sibling of the retained full track (fixture co-tenant).
+@pytest.mark.nightly
 @pytest.mark.xdist_group("magemin_fullrun_b")
 @pytest.mark.timeout(7200)
 def test_pc_extract_fe_target_has_fe_product_after_full_pyrolysis_track(
@@ -585,6 +593,8 @@ def test_pc_extract_fe_target_has_fe_product_after_full_pyrolysis_track(
 
 # This can also construct the shared fixture when selected alone; keep the
 # studio-contention backstop aligned with its sibling consumers.
+# Nightly: assertion-only sibling of the retained full track (fixture co-tenant).
+@pytest.mark.nightly
 @pytest.mark.xdist_group("magemin_fullrun_b")
 @pytest.mark.timeout(7200)
 def test_pc_extract_al_remains_infeasible_at_1p6v_c5_cap(

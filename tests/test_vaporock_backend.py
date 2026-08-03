@@ -1749,3 +1749,50 @@ def test_no_result_cache_on_backend():
         "cache_put",
     ):
         assert not hasattr(backend, name)
+
+
+def test_session_warm_boot_cache_reuses_identical_config(monkeypatch):
+    """Process-scoped warm-boot cache shares one backend for identical keys.
+
+    Golden-neutral: only the boot is shared; equilibrate still runs. Disabled
+    when REGOLITH_VAPOROCK_SESSION_WARM is off so monkeypatched unit tests
+    keep a private cold path.
+    """
+    from simulator.melt_backend import vaporock as vaporock_mod
+
+    vaporock_mod.clear_session_backend_cache()
+    monkeypatch.setenv(vaporock_mod.SESSION_WARM_ENV, "0")
+    assert vaporock_mod.session_warm_enabled() is False
+    assert vaporock_mod.get_or_create_session_backend({}) is None
+
+    monkeypatch.setenv(vaporock_mod.SESSION_WARM_ENV, "1")
+    assert vaporock_mod.session_warm_enabled() is True
+
+    created: list[object] = []
+    real_cls = vaporock_mod.VapoRockBackend
+
+    class TrackingBackend(real_cls):  # type: ignore[misc, valid-type]
+        def initialize(self, config):  # type: ignore[no-untyped-def]
+            created.append(dict(config))
+            # Force a cheap in-process "available" path — no real spawn.
+            self._available = True
+            self._config = dict(config or {})
+            self._warm_worker_enabled = bool(self._config.get("warm_worker", False))
+            self._warm_pool = object()  # truthy so uses_warm_pool is True
+            return True
+
+        def close(self) -> None:
+            self._available = False
+            self._warm_pool = None
+
+    monkeypatch.setattr(vaporock_mod, "VapoRockBackend", TrackingBackend)
+    vaporock_mod.clear_session_backend_cache()
+    try:
+        first = vaporock_mod.get_or_create_session_backend({})
+        second = vaporock_mod.get_or_create_session_backend({})
+        assert first is not None and second is not None
+        assert first is second
+        assert len(created) == 1
+        assert created[0].get("warm_worker") is True
+    finally:
+        vaporock_mod.clear_session_backend_cache()

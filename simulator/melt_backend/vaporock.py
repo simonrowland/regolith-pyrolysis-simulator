@@ -92,8 +92,10 @@ from __future__ import annotations
 
 import importlib
 import math
+import os
 import re
 import tempfile
+import threading
 import warnings
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional
@@ -591,6 +593,106 @@ def _clear_vaporock_runtime_available_cache() -> None:
 vaporock_runtime_available.cache_clear = (  # type: ignore[attr-defined]
     _clear_vaporock_runtime_available_cache
 )
+
+
+# ---------------------------------------------------------------------------
+# Process-scoped warm-boot cache (CI-speed; golden-neutral)
+# ---------------------------------------------------------------------------
+# VR-5 warm pools are opt-in per backend instance. Test suites that construct
+# many short-lived VapoRockProvider shadows otherwise pay a cold import (or a
+# fresh warm-pool spawn) on every construction. When enabled, one warm backend
+# is shared for identical initialize configs within the process. Equilibrate
+# results are NOT cached — only the boot/import/worker lifecycle.
+#
+# Enable with REGOLITH_VAPOROCK_SESSION_WARM=1 (pytest conftest sets this by
+# default). Availability probes and monkeypatched unit tests keep warm_worker
+# False and never enter this path.
+SESSION_WARM_ENV = 'REGOLITH_VAPOROCK_SESSION_WARM'
+_SESSION_BACKEND_CACHE: Dict[tuple, 'VapoRockBackend'] = {}
+_SESSION_BACKEND_LOCK = threading.Lock()
+
+
+def session_warm_enabled() -> bool:
+    """True when process-scoped VapoRock warm-boot sharing is requested."""
+    raw = os.environ.get(SESSION_WARM_ENV, '').strip().lower()
+    return raw in ('1', 'true', 'yes', 'on')
+
+
+def _session_backend_cache_key(config: Mapping[str, Any]) -> tuple:
+    """Stable hashable key for initialize-config identity."""
+    items: list[tuple[str, Any]] = []
+    for key in sorted(config.keys()):
+        value = config[key]
+        if isinstance(value, (str, int, float, bool)) or value is None:
+            items.append((str(key), value))
+        else:
+            items.append((str(key), repr(value)))
+    return tuple(items)
+
+
+def get_or_create_session_backend(
+    config: Optional[Mapping[str, Any]] = None,
+) -> Optional['VapoRockBackend']:
+    """Return a process-scoped warm ``VapoRockBackend`` for *config*.
+
+    Golden-neutral: callers share the VR-5 warm pool for identical boots;
+    each ``equilibrate`` still runs through the worker. Returns ``None`` when
+    session warm is disabled or initialization fails (caller falls back to a
+    private cold backend).
+    """
+    if not session_warm_enabled():
+        return None
+
+    cfg: Dict[str, Any] = dict(config or {})
+    # Session sharing only pays off with a warm pool; force the VR-5 path.
+    cfg['warm_worker'] = True
+    key = _session_backend_cache_key(cfg)
+
+    with _SESSION_BACKEND_LOCK:
+        existing = _SESSION_BACKEND_CACHE.get(key)
+        if existing is not None:
+            if existing.is_available():
+                return existing
+            # Cache hit but backend is no longer available: close the dead
+            # instance before replacing it (N4a). Worker is already gone;
+            # close() is still the correct teardown for any residual state.
+            try:
+                existing.close()
+            except Exception:  # noqa: BLE001
+                pass
+            _SESSION_BACKEND_CACHE.pop(key, None)
+
+        backend = VapoRockBackend()
+        try:
+            with warnings.catch_warnings():
+                warnings.simplefilter('ignore', UserWarning)
+                ok = backend.initialize(cfg)
+        except Exception:  # noqa: BLE001 - mirrors provider boundary catch
+            try:
+                backend.close()
+            except Exception:  # noqa: BLE001
+                pass
+            return None
+        if not ok or not backend.is_available():
+            try:
+                backend.close()
+            except Exception:  # noqa: BLE001
+                pass
+            return None
+        _SESSION_BACKEND_CACHE[key] = backend
+        return backend
+
+
+def clear_session_backend_cache() -> None:
+    """Close and drop every process-scoped warm backend (session teardown)."""
+    with _SESSION_BACKEND_LOCK:
+        backends = list(_SESSION_BACKEND_CACHE.values())
+        _SESSION_BACKEND_CACHE.clear()
+    for backend in backends:
+        try:
+            backend.close()
+        except Exception:  # noqa: BLE001
+            pass
 
 
 class VapoRockBackend(MeltBackend):

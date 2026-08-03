@@ -2180,6 +2180,8 @@ def test_provider_skips_below_numerical_floor(
 # ci-train-tip2: matching provider runs measured up to 1728.787 s. The shared
 # fixture ceiling is >=3x that maximum, and xdist_group pins every consumer to
 # one gateway.
+# Nightly (2026-08-02 CI tiering): package consumers ×3 (~537 s junit).
+@pytest.mark.nightly
 @pytest.mark.xdist_group("magemin_fullrun_c")
 @pytest.mark.timeout(5400)
 def test_full_run_mass_balance_holds_with_kernel_committed_condensation(
@@ -2295,6 +2297,8 @@ def test_full_run_mass_balance_holds_with_kernel_committed_condensation(
 # ci-train-tip2: matching provider runs measured up to 1728.787 s. The shared
 # fixture ceiling is >=3x that maximum, and xdist_group pins every consumer to
 # one gateway.
+# Nightly: assertion-only sibling of full_builtin_provider_run (fixture co-tenant).
+@pytest.mark.nightly
 @pytest.mark.xdist_group("magemin_fullrun_c")
 @pytest.mark.timeout(5400)
 def test_split_path_end_state_matches_pre_flip_account_balances(

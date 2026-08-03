@@ -444,6 +444,8 @@ def test_pyrolysis_run_completes_with_band_adjustment_provenance():
 # t-385 (2026-07-21): mass-balance class measured 1302.6 s standalone
 # (subset-junit-3); ceiling >= 1.2x headroom over measured n0 (family serialized on one gateway). xdist_group
 # pins the MAGEMin full-run family to one gateway.
+# Nightly (2026-08-02 CI tiering): executor partial path (~247 s junit).
+@pytest.mark.nightly
 @pytest.mark.xdist_group("magemin_fullrun_a")
 @pytest.mark.timeout(1800)
 def test_run_executor_partial_path_sets_status_and_decisions():

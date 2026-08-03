@@ -70,6 +70,15 @@ def _configure_worker_cache_isolation() -> None:
 _configure_worker_cache_isolation()
 
 
+# CI-speed (process-scoped VapoRock warm-boot cache): share one VR-5 warm pool
+# across lazy VapoRockProvider constructions within each pytest process.
+# Golden-neutral — equilibrate still runs; only the import/worker boot is
+# reused. Opt out with REGOLITH_VAPOROCK_SESSION_WARM=0. Runs at import so
+# xdist workers inherit the same default as the controller.
+if os.environ.get("REGOLITH_VAPOROCK_SESSION_WARM") is None:
+    os.environ["REGOLITH_VAPOROCK_SESSION_WARM"] = "1"
+
+
 _SESSION_WATCHDOG: SessionWatchdog | None = None
 
 
@@ -129,6 +138,14 @@ def pytest_sessionfinish(
     del session, exitstatus
     # t-420: close warm engine pools before the b-093 watchdog disarms, so the
     # bounded-cleanup path still runs under session-safety supervision.
+    # Drop the process-scoped VapoRock warm-boot cache first so its pools are
+    # closed under the same session-safety window as every other engine pool.
+    try:
+        from simulator.melt_backend.vaporock import clear_session_backend_cache
+
+        clear_session_backend_cache()
+    except Exception:  # noqa: BLE001 - teardown must not mask suite status
+        pass
     from simulator.engine_pool import close_all_engine_pools
 
     close_all_engine_pools(cancel_pending=True)

@@ -164,14 +164,22 @@ def test_suite_shape_heavy_tests_are_grouped_and_rostered(request) -> None:
     # way). Only enforceable when the whole suite is collected — under -k
     # or single-file runs most roster rows are legitimately absent, so
     # gate on a full-collection heuristic rather than skipping silently.
+    #
+    # Marker expressions (``-m``) also deselect real roster members by
+    # design (CI-tiering: ``@pytest.mark.nightly`` + ``-m "not nightly"``
+    # on the PR tier). Treat those as legitimately absent — do not report
+    # phantom rows when any mark expression is active. The group/duration-
+    # hint invariants still run; they only care about collected items.
     if len(request.session.items) > 1000:
-        collected = {_item_key(item) for item in request.session.items}
-        for entry in sorted(HEAVY_ROSTER - collected):
-            violations.append(
-                f"roster entry {entry} matches no collected test — "
-                "phantom row (typo or removed test); fix the name or "
-                "delete the entry"
-            )
+        markexpr = (getattr(request.config.option, "markexpr", None) or "").strip()
+        if not markexpr:
+            collected = {_item_key(item) for item in request.session.items}
+            for entry in sorted(HEAVY_ROSTER - collected):
+                violations.append(
+                    f"roster entry {entry} matches no collected test — "
+                    "phantom row (typo or removed test); fix the name or "
+                    "delete the entry"
+                )
         collected_groups = {
             group
             for item in request.session.items

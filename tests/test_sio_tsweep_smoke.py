@@ -114,6 +114,8 @@ def test_sio_tsweep_cli_smoke_2x2x2_grid(tmp_path, feedstock):
 # 2026-07-23 re-measure (post 54df34f honest walls): 343 s (mars) / 329 s
 # (lunar) at -n0. Ceiling = 343 x ~1.75 = 600 s, absorbing cross-chain
 # MAGEMin K-slot waits without hiding a 2x regression.
+# Nightly (2026-08-02 CI tiering): live MAGEMin SiO tsweep (~50 s junit).
+@pytest.mark.nightly
 @pytest.mark.xdist_group("magemin_fullrun_c")
 @pytest.mark.timeout(600)
 @pytest.mark.parametrize("feedstock", FEEDSTOCKS)
@@ -148,6 +150,8 @@ def test_sio_tsweep_single_cell_deterministic(tmp_path, feedstock):
 # 2026-07-23 re-measure (post 54df34f honest walls): 1098 s at -n0 — the old
 # 1200 s ceiling left only 9 % headroom (it red under in-gate chain load).
 # Ceiling = 1098 x ~1.35 = 1500 s.
+# Nightly (2026-08-02 CI tiering): wall sweep CLI smoke (~23 s junit).
+@pytest.mark.nightly
 @pytest.mark.xdist_group("magemin_fullrun_c")
 @pytest.mark.timeout(1500)
 def test_sio_wall_sweep_cli_smoke(tmp_path):

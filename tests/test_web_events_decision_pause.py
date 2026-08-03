@@ -362,6 +362,8 @@ def test_null_make_decision_while_parked_at_path_ab_is_rejected(client):
     assert second['type'] == EXPECTED_DECISIONS[1]
 
 
+# Nightly (2026-08-02 CI tiering): serial web full path (~391 s junit).
+@pytest.mark.nightly
 @pytest.mark.timeout(1200)
 def test_pause_resume_around_every_gate_is_ledger_identical(client):
     """(b) pause/resume churn at every gate -> one gate each, correct routing, identical ledger.

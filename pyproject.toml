@@ -123,6 +123,7 @@ markers = [
     "serial: run under -n0 only; flakes under xdist co-scheduling (sqlite lock / stateful fixture / heavy real-backend)",
     "xdist_group(name): run marked tests on the same xdist worker under --dist loadgroup",
     "live_engine: requires a responsive optional live chemistry engine",
+    "nightly: campaign-length physics; full coverage nightly; excluded from the PR tier",
 ]
 
 # Explicit package layout. Auto-discovery works for this repo today, but

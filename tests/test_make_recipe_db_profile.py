@@ -598,7 +598,17 @@ def test_no_declared_campaign_window_is_target_visible(
     assert target["thermal_window"] == "not-declared-for-campaign:C3"
 
 
-@pytest.mark.parametrize("target_id", RUNNABLE_TARGET_IDS)
+# Nightly (2026-08-02 CI tiering): only SC67 extract-* D-chain rows (~232 s junit);
+# other target_ids stay on the PR tier.
+@pytest.mark.parametrize(
+    "target_id",
+    [
+        pytest.param(tid, marks=pytest.mark.nightly)
+        if tid in SC67_CRO2_TARGET_IDS
+        else tid
+        for tid in RUNNABLE_TARGET_IDS
+    ],
+)
 # gate-2: C6-continue lengthened profile evals past the 300 s default (3x timeout observed); measured class + slot-wait allowance.
 @pytest.mark.xdist_group("magemin_fullrun_d")
 @pytest.mark.timeout(900)

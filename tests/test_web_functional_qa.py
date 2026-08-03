@@ -229,6 +229,8 @@ def _story_total(story, *keys):
 # Regression: WEBQA-001 — terminal UI hid the feedstock-to-product story.
 # Found by /qa on 2026-07-19
 # Report: docs-private/research/2026-07-19-webqa/report.md
+# Nightly (2026-08-02 CI tiering): serial web full path (~187 s junit).
+@pytest.mark.nightly
 def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
     sid, state, events, decisions, completion = _drive(
         web_driver,
@@ -488,6 +490,8 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
     assert sid in _simulations
 
 
+# Nightly (2026-08-02 CI tiering): serial web full path (~327 s junit).
+@pytest.mark.nightly
 @pytest.mark.timeout(1200)
 # Hang-backstop, not a perf bar: measured 268s serial on Studio 1 pre-train and
 # slower with the disposition machinery; the 300s global default was always

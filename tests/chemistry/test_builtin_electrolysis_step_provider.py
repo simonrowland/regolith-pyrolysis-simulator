@@ -1997,6 +1997,8 @@ def test_provider_short_circuits_below_voltage(
 # t-385 (2026-07-21): mass-balance class measured 955.7-968.5 s standalone
 # (subset-junit-3); ceiling >= 1.2x headroom over measured n0 (family serialized on one gateway). xdist_group
 # pins the MAGEMin full-run family to one gateway.
+# Nightly (2026-08-02 CI tiering): retained full runs ×2 (~2367 s junit).
+@pytest.mark.nightly
 @pytest.mark.xdist_group("magemin_fullrun_a")
 @pytest.mark.timeout(1800)
 def test_full_run_mass_balance_holds_with_kernel_committed_electrolysis(
@@ -2099,6 +2101,8 @@ def test_full_run_mass_balance_holds_with_kernel_committed_electrolysis(
 # t-385 (2026-07-21): mass-balance class measured 960.6-963.0 s standalone
 # (subset-junit-3); ceiling >= 1.2x headroom over measured n0 (family serialized on one gateway). xdist_group
 # pins the MAGEMin full-run family to one gateway.
+# Nightly: assertion-only sibling of full_electrolysis_run (fixture co-tenant).
+@pytest.mark.nightly
 @pytest.mark.xdist_group("magemin_fullrun_a")
 @pytest.mark.timeout(1800)
 def test_full_run_o2_yields_split_across_distinct_bins(

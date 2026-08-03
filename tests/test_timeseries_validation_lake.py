@@ -12,12 +12,32 @@ from simulator.diagnostic_helpers.timeseries_validation_lake import (
 )
 
 
-def _by_dataset():
-    return {report.dataset_id: report for report in validate_lake()}
+@pytest.fixture(scope="module")
+def validation_lake_catalog():
+    """Session-safe catalog load — pure YAML, no mutable simulator state."""
+    return load_catalog()
 
 
-def test_catalog_keeps_unavailable_datasets_as_explicit_gaps() -> None:
-    catalog = load_catalog()
+@pytest.fixture(scope="module")
+def validation_lake_reports():
+    """One validate_lake() pass for the module.
+
+    Three consumers previously re-ran the full lake (~35 s each). The lake is
+    pure read-only validation over static datasets — module scope is
+    golden-neutral.
+    """
+    return validate_lake(DEFAULT_DATA_ROOT)
+
+
+@pytest.fixture(scope="module")
+def validation_lake_by_dataset(validation_lake_reports):
+    return {report.dataset_id: report for report in validation_lake_reports}
+
+
+def test_catalog_keeps_unavailable_datasets_as_explicit_gaps(
+    validation_lake_catalog,
+) -> None:
+    catalog = validation_lake_catalog
     by_id = {entry["id"]: entry for entry in catalog["datasets"]}
 
     assert by_id["DS-002"]["status"] == "unavailable-automation"
@@ -29,8 +49,10 @@ def test_catalog_keeps_unavailable_datasets_as_explicit_gaps() -> None:
     assert "session-gated" in by_id["DS-012"]["condition_gap"]
 
 
-def test_validation_lake_reports_dimensionally_honest_comparisons() -> None:
-    reports = _by_dataset()
+def test_validation_lake_reports_dimensionally_honest_comparisons(
+    validation_lake_by_dataset,
+) -> None:
+    reports = validation_lake_by_dataset
 
     assert reports["DS-001"].rows_evaluated == 3
     assert reports["DS-003"].rows_evaluated == 12
@@ -87,8 +109,10 @@ def test_validation_lake_reports_dimensionally_honest_comparisons() -> None:
     assert all(math.isfinite(item.error_factor) for item in direct_flux)
 
 
-def test_endpoint_rank_metric_is_not_labeled_as_kinetic_ordering() -> None:
-    report = _by_dataset()["DS-003"]
+def test_endpoint_rank_metric_is_not_labeled_as_kinetic_ordering(
+    validation_lake_by_dataset,
+) -> None:
+    report = validation_lake_by_dataset["DS-003"]
 
     payload = report.as_dict()
     assert "endpoint_rank_disagreement_fraction" in payload
@@ -105,9 +129,12 @@ def test_endpoint_rank_metric_is_not_labeled_as_kinetic_ordering() -> None:
     )
 
 
-def test_markdown_report_contains_summary_and_json_pointer_for_long_skips() -> None:
-    reports = validate_lake(DEFAULT_DATA_ROOT)
-    markdown = render_markdown_report(reports, catalog=load_catalog())
+def test_markdown_report_contains_summary_and_json_pointer_for_long_skips(
+    validation_lake_reports,
+    validation_lake_catalog,
+) -> None:
+    reports = validation_lake_reports
+    markdown = render_markdown_report(reports, catalog=validation_lake_catalog)
 
     assert "endpoint rank disagreement" in markdown
     assert "ordering inversions" not in markdown

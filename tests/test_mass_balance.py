@@ -299,6 +299,8 @@ def test_product_summary_sums_duplicate_volatile_species():
     assert products["O2"] == pytest.approx(1.0)
 
 
+# Nightly (2026-08-02 CI tiering): freeze-gate pair (~38 s junit; campaign/serial).
+@pytest.mark.nightly
 @pytest.mark.parametrize(
     "freeze_gate_enabled",
     (False, True),
@@ -382,6 +384,8 @@ def test_c2a_staged_freeze_gate_on_closes_mass_balance(
 # xdist 3.8 UNIONS group marks: keep exactly ONE xdist_group here — the
 # magemin_fullrun_b scope replaces the old per-test "serial" group (the
 # pytest.mark.serial selector mark stays for the two-pass helper).
+# Nightly (2026-08-02 CI tiering): cumulative mass balance campaign (~141 s junit).
+@pytest.mark.nightly
 @pytest.mark.xdist_group("magemin_fullrun_b")
 @pytest.mark.timeout(1800)
 @pytest.mark.serial
