@@ -1589,20 +1589,26 @@ def test_sso2_owner_execution_uses_certified_na_dose_and_partition_path() -> Non
     assert evidence["metal_product_path"]["Fe_kg"] == pytest.approx(0.0)
     assert evidence["metal_product_path"]["product_ledger_Fe_kg"] > 0.0
     fallback = evidence["prototype_alpha_fallback_provenance"]
+    # ce14fd3 (VR-11; DESIGN-REV5 §1.2/§7.4) made the typed VapourBatch
+    # the eligibility authority: CrO2's policy-only alpha row is a missing
+    # channel contract, not an executable alpha value.  The explicit prototype
+    # fallback opt-in therefore remains visible but must not engage.
     assert fallback == {
         "severity": "warning",
-        "status": "engaged",
+        "status": "not_engaged",
         "policy": "alpha=1.0 prototype fallback",
         "scope": "SSO-2 trace CrO2 species lacking grounded evaporation alpha",
         "permitted_species": ["CrO2"],
-        "engaged_species": ["CrO2"],
-        "total_engagement_count": fallback["total_engagement_count"],
+        "engaged_species": [],
+        "total_engagement_count": 0,
     }
-    assert fallback["total_engagement_count"] > 0
     report = _markdown_report(evidence, execution)
     assert "WARNING prototype_alpha_fallback" in report
     assert "alpha=1.0 prototype fallback" in report
+    assert "status=`not_engaged`" in report
     assert "permitted_species=`CrO2`" in report
+    assert "engaged_species=``" in report
+    assert "engagement_count=`0`" in report
 
 
 def test_sso2_evidence_reports_stage3_fe_and_delivered_purity_margin() -> None:

@@ -887,6 +887,7 @@ def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
     }
     steps = 0
     worst_delta_kg_hr = 0.0
+    refused_reference_species_seen: set[str] = set()
     while not sim.is_complete() and steps < 60:
         if sim.paused_for_decision:
             decision = sim.pending_decision
@@ -910,8 +911,24 @@ def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
         kernel_flux = dict(
             sim._calculate_evaporation(equilibrium).species_kg_hr
         )
+        refusals = sim._last_vapour_batch_report["refusals_by_species"]
+        refused_reference_species = set(reference_flux) & set(refusals)
+        # ce14fd3 (VR-11; DESIGN-REV5 §1.2/§7.4), later pinned as b-114
+        # in 1a6ad25, made batch eligibility authoritative.  CrO2's policy-only
+        # alpha row is therefore a typed refusal and is outside this wiring
+        # parity comparison; every executable species must still match.
+        assert refused_reference_species <= {"CrO2"}
+        if "CrO2" in refused_reference_species:
+            refusal = refusals["CrO2"]
+            assert refusal["refusal_code"] == "missing_channel_contract"
+            assert "missing alpha" in refusal["extra"]["detail"]
+            assert refusal["is_flux_active"] is False
+            assert "CrO2" not in kernel_flux
+        refused_reference_species_seen.update(refused_reference_species)
 
         for species in set(reference_flux) | set(kernel_flux):
+            if species in refused_reference_species:
+                continue
             legacy_value = float(reference_flux.get(species, 0.0))
             kernel_value = float(kernel_flux.get(species, 0.0))
             delta = abs(legacy_value - kernel_value)
@@ -929,6 +946,8 @@ def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
             )
 
     assert steps > 0, f"smoke run for {feedstock_key} executed zero steps"
+    if feedstock_key in {"lunar_mare_low_ti", "s_type_asteroid_silicate"}:
+        assert refused_reference_species_seen == {"CrO2"}
     assert worst_delta_kg_hr <= 1.0, (
         f"worst observed parity delta {worst_delta_kg_hr:.6g} kg/hr is "
         f"suspiciously large for a refactor-only change"
