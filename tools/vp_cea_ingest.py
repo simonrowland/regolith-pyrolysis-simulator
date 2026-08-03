@@ -115,6 +115,10 @@ class CeaSpeciesRecord:
     intervals: list[dict[str, Any]]
     raw_header_line: str
     raw_name_line: str
+    # Provenance when --skip-invalid-segments drops inverted/zero-width rows:
+    # source_n_intervals is the header-declared count; n_intervals is retained.
+    source_n_intervals: int = 0
+    dropped_inverted_segments: int = 0
 
     def to_polynomial(self) -> NasaCeaPolynomial:
         segments: list[Nasa9Segment] = []
@@ -310,22 +314,47 @@ def _extract_formula_tokens(header_line: str) -> list[str]:
     return cleaned
 
 
+@dataclass
+class BulkSkipReport:
+    """Provenance for classified bulk skips (inverted/zero-width only).
+
+    Non-classifiable parse defects always raise; they never enter this report.
+    """
+
+    dropped_inverted_segments: list[dict[str, Any]] = field(default_factory=list)
+    skipped_species: list[dict[str, Any]] = field(default_factory=list)
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "dropped_inverted_segments": list(self.dropped_inverted_segments),
+            "skipped_species": list(self.skipped_species),
+        }
+
+
 def parse_thermo_inp(
     text: str,
     *,
     skip_invalid_segments: bool = False,
+    skip_report: BulkSkipReport | None = None,
 ) -> list[CeaSpeciesRecord]:
     """Parse a NASA CEA ``thermo.inp`` (or subset) into preserved records.
 
     Parameters
     ----------
     skip_invalid_segments:
-        When True (bulk / full-database mode), drop intervals with
+        When True (bulk / full-database mode), drop **only** intervals with
         ``T_min >= T_max`` (Snyder 2021 T-range floor artifact in the public
         ``thermo.inp``) with a stderr warning, and skip species that retain no
-        valid intervals. Default False keeps fail-loud behaviour for fixtures
-        and unit tests.
+        valid intervals after those classified drops. All other parse /
+        segment defects (gaps, truncated blocks, bad coefficients, convention
+        errors) always raise — bulk mode is fail-closed for unrecognized
+        defects. Default False keeps fail-loud behaviour for fixtures and
+        unit tests (inverted segments raise too).
+    skip_report:
+        Optional mutable report that receives dropped-segment and
+        skipped-species provenance under bulk mode.
     """
+    report = skip_report if skip_report is not None else BulkSkipReport()
     lines = text.splitlines()
     # Skip to after the ``thermo`` marker when present.
     i = 0
@@ -358,6 +387,7 @@ def parse_thermo_inp(
         header = _parse_header_line(lines[i + 1])
         nint = int(header["n_intervals"])
         intervals: list[dict[str, Any]] = []
+        dropped_inverted = 0
         cursor = i + 2
         for _ in range(nint):
             if cursor + 2 >= len(lines):
@@ -421,12 +451,24 @@ def parse_thermo_inp(
                 )
 
             if not (float(T_min) < float(T_max)):
+                # Classified Snyder-2021 floor artifact only. Every other
+                # defect refuses — bulk mode must not swallow gaps / convention
+                # / coefficient errors as "invalid segments".
                 msg = (
                     f"{name}: inverted/zero-width segment "
                     f"T=[{T_min}, {T_max}] K"
                 )
                 if skip_invalid_segments:
                     print(f"warning: dropping {msg}", file=sys.stderr)
+                    dropped_inverted += 1
+                    report.dropped_inverted_segments.append(
+                        {
+                            "cea_name": name,
+                            "T_min_K": float(T_min),
+                            "T_max_K": float(T_max),
+                            "reason": "inverted_or_zero_width_T_range",
+                        }
+                    )
                     cursor += 3
                     continue
                 raise NasaCeaSegmentError(
@@ -450,11 +492,21 @@ def parse_thermo_inp(
             cursor += 3
 
         if not intervals:
-            if skip_invalid_segments:
+            if skip_invalid_segments and dropped_inverted > 0:
+                # Only skip the whole species when every interval was the
+                # classified inverted/zero-width drop — not for other defects.
                 print(
                     f"warning: skipping {name}: no valid T segments after "
                     "dropping inverted/zero-width intervals",
                     file=sys.stderr,
+                )
+                report.skipped_species.append(
+                    {
+                        "cea_name": name,
+                        "reason": "no_valid_segments_after_inverted_drops",
+                        "source_n_intervals": nint,
+                        "dropped_inverted_segments": dropped_inverted,
+                    }
                 )
                 i = cursor
                 continue
@@ -481,22 +533,15 @@ def parse_thermo_inp(
                 intervals=intervals,
                 raw_header_line=lines[i + 1],
                 raw_name_line=line,
+                source_n_intervals=nint,
+                dropped_inverted_segments=dropped_inverted,
             )
         )
         # Construction validates segment coverage via to_polynomial.
-        try:
-            records[-1].to_polynomial()
-        except (NasaCeaSegmentError, NasaCeaConventionError, NasaCeaError) as exc:
-            if skip_invalid_segments:
-                print(
-                    f"warning: skipping {name}: post-parse validation failed: "
-                    f"{exc}",
-                    file=sys.stderr,
-                )
-                records.pop()
-                i = cursor
-                continue
-            raise
+        # Fail-closed: post-parse defects (gaps, domain, convention) ALWAYS
+        # raise, even under --skip-invalid-segments. Bulk mode may only drop
+        # the classified inverted/zero-width T-range class above.
+        records[-1].to_polynomial()
         i = cursor
 
     return records
@@ -521,6 +566,7 @@ _VOLATILE_CEA_TARGETS: dict[str, list[str]] = {
 class IngestResult:
     records: list[CeaSpeciesRecord] = field(default_factory=list)
     draft_document: dict[str, Any] = field(default_factory=dict)
+    bulk_skip_report: BulkSkipReport | None = None
 
 
 # NASA/TP-2002-211556 mixed standard-state pressures (report p. 2):
@@ -600,12 +646,18 @@ def _merge_same_name_records(
         citations: list[str] = []
         refs: list[str] = []
         phase_flags: list[int] = []
+        source_n_intervals = 0
+        dropped_inverted = 0
         for rec in ordered:
             if rec.citation and rec.citation not in citations:
                 citations.append(rec.citation)
             if rec.source_ref_code and rec.source_ref_code not in refs:
                 refs.append(rec.source_ref_code)
             phase_flags.append(int(rec.phase_flag))
+            source_n_intervals += int(
+                rec.source_n_intervals or rec.n_intervals
+            )
+            dropped_inverted += int(rec.dropped_inverted_segments)
             for iv in rec.intervals:
                 if intervals:
                     prev_max = float(intervals[-1]["T_max_K"])
@@ -646,6 +698,8 @@ def _merge_same_name_records(
             intervals=intervals,
             raw_header_line=head.raw_header_line,
             raw_name_line=head.raw_name_line,
+            source_n_intervals=source_n_intervals,
+            dropped_inverted_segments=dropped_inverted,
         )
         # Validate merged segment chain (gaps/overlap) via polynomial builder.
         merged_rec.to_polynomial()
@@ -656,7 +710,7 @@ def _merge_same_name_records(
 def _record_to_thermo_payload(record: CeaSpeciesRecord) -> dict[str, Any]:
     """Serialize a preserved CEA record (coefficients intact — no refit)."""
     ref_pa, ref_conv = _ref_pressure_fields(record)
-    return {
+    payload: dict[str, Any] = {
         "cea_name": record.name,
         "evaluator_family": "nasa_cea_9",
         "standard_state": record.standard_state,
@@ -669,6 +723,10 @@ def _record_to_thermo_payload(record: CeaSpeciesRecord) -> dict[str, Any]:
         "citation": record.citation,
         "reference_pressure_Pa": ref_pa,
         "reference_pressure_convention": ref_conv,
+        "n_intervals": record.n_intervals,
+        "source_n_intervals": int(
+            record.source_n_intervals or record.n_intervals
+        ),
         "segments": [
             {
                 "T_min_K": iv["T_min_K"],
@@ -685,6 +743,11 @@ def _record_to_thermo_payload(record: CeaSpeciesRecord) -> dict[str, Any]:
             record.intervals[-1]["T_max_K"],
         ],
     }
+    if record.dropped_inverted_segments:
+        payload["dropped_inverted_segments"] = int(
+            record.dropped_inverted_segments
+        )
+    return payload
 
 
 def _paired_gas_name(
@@ -975,7 +1038,51 @@ def resolve_trial_cea_names(
 
 
 class CeaIngestSelectionError(NasaCeaError):
-    """Explicit --species request unmatched or empty selection (CLI fail-loud)."""
+    """Explicit --species request unmatched or empty selection (fail-closed)."""
+
+
+class CeaSpeciesFileError(NasaCeaError):
+    """--species-file missing, empty, or malformed (fail-closed bulk gate)."""
+
+
+def load_species_file(path: Path) -> list[str]:
+    """Load one CEA species name per line from a bulk selection file.
+
+    Fail-closed:
+    - path must be an existing regular file
+    - after stripping blank lines and ``#`` comments, at least one name must
+      remain (an empty bulk selection must not silently widen to the full
+      thermo parse)
+    - non-empty lines must be a single CEA name token (no interior whitespace);
+      multi-token / garbage lines refuse rather than partial-parse
+    """
+    if not path.is_file():
+        raise CeaSpeciesFileError(f"--species-file not found: {path}")
+    try:
+        raw_text = path.read_text(encoding="utf-8")
+    except UnicodeDecodeError as exc:
+        raise CeaSpeciesFileError(
+            f"--species-file is not valid UTF-8: {path}: {exc}"
+        ) from exc
+
+    names: list[str] = []
+    for lineno, raw in enumerate(raw_text.splitlines(), start=1):
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        # CEA species names are single tokens (e.g. O2, H2O(cr), Fe2O3(cr)).
+        # Interior whitespace means the line is malformed for this bulk format.
+        if any(ch.isspace() for ch in line):
+            raise CeaSpeciesFileError(
+                f"--species-file {path}:{lineno}: expected one CEA species "
+                f"name per line, got multi-token {line!r}"
+            )
+        names.append(line)
+    if not names:
+        raise CeaSpeciesFileError(
+            f"--species-file empty after comments/blanks: {path}"
+        )
+    return names
 
 
 def ingest(
@@ -986,13 +1093,22 @@ def ingest(
     skip_invalid_segments: bool = False,
 ) -> IngestResult:
     text = thermo_path.read_text(encoding="utf-8", errors="replace")
+    skip_report = BulkSkipReport() if skip_invalid_segments else None
     records = parse_thermo_inp(
-        text, skip_invalid_segments=skip_invalid_segments
+        text,
+        skip_invalid_segments=skip_invalid_segments,
+        skip_report=skip_report,
     )
     by_name = {r.name: r for r in records}
     species_filter: set[str] | None = None
-    if species:
+    # Fail-closed: an explicit empty selection (species=[]) must refuse, not
+    # silently widen to the full parse. Only species is None means "no filter".
+    if species is not None:
         requested = list(species)
+        if not requested:
+            raise CeaIngestSelectionError(
+                "explicit --species selection is empty"
+            )
         missing = sorted({name for name in requested if name not in by_name})
         if missing:
             raise CeaIngestSelectionError(
@@ -1023,7 +1139,15 @@ def ingest(
         ),
         species_filter=species_filter,
     )
-    return IngestResult(records=records, draft_document=draft)
+    if skip_report is not None and (
+        skip_report.dropped_inverted_segments or skip_report.skipped_species
+    ):
+        draft["bulk_skip_report"] = skip_report.as_dict()
+    return IngestResult(
+        records=records,
+        draft_document=draft,
+        bulk_skip_report=skip_report,
+    )
 
 
 def _portable_path_str(path: Path) -> str:
@@ -1088,9 +1212,9 @@ def main(argv: list[str] | None = None) -> int:
         "--skip-invalid-segments",
         action="store_true",
         help=(
-            "bulk / full-database mode: drop inverted/zero-width T segments "
-            "(Snyder 2021 thermo.inp floor artifacts) with warnings instead "
-            "of failing the whole parse"
+            "bulk / full-database mode: drop ONLY inverted/zero-width T "
+            "segments (Snyder 2021 thermo.inp floor artifacts) with warnings; "
+            "all other parse/segment defects still fail closed"
         ),
     )
     parser.add_argument(
@@ -1104,20 +1228,17 @@ def main(argv: list[str] | None = None) -> int:
         print(f"error: thermo file not found: {args.thermo}", file=sys.stderr)
         return 2
 
-    species: list[str] | None = list(args.species) if args.species else None
+    # Fail-closed: distinguish "flag absent" (None → full parse) from
+    # "flag present with zero names" ([] → refuse). Never coerce empty to None.
+    species: list[str] | None = (
+        list(args.species) if args.species is not None else None
+    )
     if args.species_file is not None:
-        if not args.species_file.is_file():
-            print(
-                f"error: --species-file not found: {args.species_file}",
-                file=sys.stderr,
-            )
+        try:
+            from_file = load_species_file(args.species_file)
+        except CeaSpeciesFileError as exc:
+            print(f"error: {exc}", file=sys.stderr)
             return 2
-        from_file: list[str] = []
-        for raw in args.species_file.read_text(encoding="utf-8").splitlines():
-            line = raw.strip()
-            if not line or line.startswith("#"):
-                continue
-            from_file.append(line)
         if species is None:
             species = from_file
         else:
@@ -1132,6 +1253,7 @@ def main(argv: list[str] | None = None) -> int:
         )
     except (
         CeaIngestSelectionError,
+        CeaSpeciesFileError,
         NasaCeaSegmentError,
         NasaCeaConventionError,
         NasaCeaError,

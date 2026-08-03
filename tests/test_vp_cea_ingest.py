@@ -446,3 +446,354 @@ def test_cli_unmatched_species_fails_loudly(tmp_path: Path) -> None:
 def test_ingest_api_unmatched_species_raises(ingest_mod) -> None:
     with pytest.raises(ingest_mod.CeaIngestSelectionError, match="not present"):
         ingest_mod.ingest(THERMO, species=["NOTASPECIES"])
+
+
+# ---------------------------------------------------------------------------
+# b-115: CEA bulk-parse flags fail-CLOSED (0fcd725 follow-up)
+# Null-hypothesis per fix: empty/malformed bulk inputs silently widen or
+# partially parse; non-inverted defects are swallowed under skip mode.
+# Each regression must go red under reversion of the matching gate.
+# ---------------------------------------------------------------------------
+
+_INVERTED_ONLY = """\
+INVONLY           inverted-only synthetic.
+ 1 g 1/00 X   1.00    0.00    0.00    0.00    0.00 0   10.0000000          0.000
+    300.000    298.1507 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0            0.000
+ 0.000000000D+00 0.000000000D+00 2.500000000D+00 0.000000000D+00 0.000000000D+00
+ 0.000000000D+00 0.000000000D+00                 0.000000000D+00 0.000000000D+00
+END PRODUCTS
+"""
+
+_MIXED_INVERTED_THEN_VALID = """\
+MIXED             one inverted then valid.
+ 2 g 1/00 X   1.00    0.00    0.00    0.00    0.00 0   10.0000000          0.000
+    300.000    298.1507 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0            0.000
+ 0.000000000D+00 0.000000000D+00 2.500000000D+00 0.000000000D+00 0.000000000D+00
+ 0.000000000D+00 0.000000000D+00                 0.000000000D+00 0.000000000D+00
+    298.150   1000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0            0.000
+ 0.000000000D+00 0.000000000D+00 2.500000000D+00 0.000000000D+00 0.000000000D+00
+ 0.000000000D+00 0.000000000D+00                 0.000000000D+00 0.000000000D+00
+END PRODUCTS
+"""
+
+_GAP_TWO_INTERVALS = """\
+TESTGAP           synthetic gap record for loud-failure test.
+ 2 g 1/00 X   1.00    0.00    0.00    0.00    0.00 0   10.0000000          0.000
+    200.000    500.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0            0.000
+ 0.000000000D+00 0.000000000D+00 2.500000000D+00 0.000000000D+00 0.000000000D+00
+ 0.000000000D+00 0.000000000D+00                 0.000000000D+00 0.000000000D+00
+    600.000   1000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0            0.000
+ 0.000000000D+00 0.000000000D+00 2.500000000D+00 0.000000000D+00 0.000000000D+00
+ 0.000000000D+00 0.000000000D+00                 0.000000000D+00 0.000000000D+00
+END PRODUCTS
+"""
+
+
+def test_empty_species_list_fails_closed_not_full_db(ingest_mod) -> None:
+    """Null-hypothesis: species=[] is falsy and silently ingests full parse."""
+    with pytest.raises(
+        ingest_mod.CeaIngestSelectionError, match="selection is empty"
+    ):
+        ingest_mod.ingest(THERMO, species=[])
+    # Contrast: species=None still means "no filter".
+    full = ingest_mod.ingest(THERMO, species=None)
+    assert full.draft_document["record_count"] >= 1
+
+
+def test_cli_empty_species_flag_fails_closed(tmp_path: Path) -> None:
+    """CLI `--species` with zero names must not write a full-DB success draft."""
+    out = tmp_path / "should-not-exist.yaml"
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(INGEST_PATH),
+            "--thermo",
+            str(THERMO),
+            "--species",
+            "--output",
+            str(out),
+        ],
+        cwd=str(ROOT),
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert proc.returncode != 0, proc.stdout + proc.stderr
+    assert "empty" in proc.stderr.lower() or "error:" in proc.stderr.lower()
+    assert not out.is_file()
+
+
+def test_default_fail_loud_inverted_segment(ingest_mod) -> None:
+    """Without --skip-invalid-segments, inverted T ranges raise (fixture mode)."""
+    with pytest.raises(NasaCeaSegmentError, match="T_min < T_max"):
+        ingest_mod.parse_thermo_inp(_INVERTED_ONLY, skip_invalid_segments=False)
+
+
+def test_skip_invalid_segments_drops_only_classified_inverted(
+    ingest_mod,
+) -> None:
+    """Bulk skip may drop inverted/zero-width only; provenance retained."""
+    report = ingest_mod.BulkSkipReport()
+    records = ingest_mod.parse_thermo_inp(
+        _MIXED_INVERTED_THEN_VALID,
+        skip_invalid_segments=True,
+        skip_report=report,
+    )
+    assert len(records) == 1
+    rec = records[0]
+    assert rec.n_intervals == 1
+    assert rec.source_n_intervals == 2
+    assert rec.dropped_inverted_segments == 1
+    assert rec.intervals[0]["T_min_K"] == pytest.approx(298.15)
+    assert rec.intervals[0]["T_max_K"] == pytest.approx(1000.0)
+    assert len(report.dropped_inverted_segments) == 1
+    assert report.dropped_inverted_segments[0]["cea_name"] == "MIXED"
+    assert (
+        report.dropped_inverted_segments[0]["reason"]
+        == "inverted_or_zero_width_T_range"
+    )
+
+
+def test_skip_invalid_segments_skips_species_with_only_inverted(
+    ingest_mod,
+) -> None:
+    report = ingest_mod.BulkSkipReport()
+    records = ingest_mod.parse_thermo_inp(
+        _INVERTED_ONLY,
+        skip_invalid_segments=True,
+        skip_report=report,
+    )
+    assert records == []
+    assert len(report.skipped_species) == 1
+    assert report.skipped_species[0]["cea_name"] == "INVONLY"
+    assert report.skipped_species[0]["source_n_intervals"] == 1
+
+
+def test_skip_invalid_segments_does_not_swallow_segment_gaps(
+    ingest_mod,
+) -> None:
+    """Null-hypothesis: broad except around to_polynomial drops gapped species."""
+    with pytest.raises(NasaCeaSegmentError, match="gap"):
+        ingest_mod.parse_thermo_inp(
+            _GAP_TWO_INTERVALS, skip_invalid_segments=True
+        )
+
+
+def test_cli_skip_invalid_segments_gap_still_fails(
+    tmp_path: Path, ingest_mod
+) -> None:
+    thermo = tmp_path / "gap.inp"
+    thermo.write_text(_GAP_TWO_INTERVALS, encoding="utf-8")
+    out = tmp_path / "out.yaml"
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(INGEST_PATH),
+            "--thermo",
+            str(thermo),
+            "--skip-invalid-segments",
+            "--output",
+            str(out),
+        ],
+        cwd=str(ROOT),
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert proc.returncode != 0, proc.stdout + proc.stderr
+    assert "gap" in proc.stderr.lower() or "error:" in proc.stderr.lower()
+    assert not out.is_file()
+
+
+def test_cli_skip_invalid_segments_inverted_only_succeeds_empty_skip(
+    tmp_path: Path,
+) -> None:
+    """Classified inverted-only species may be skipped under bulk flag."""
+    thermo = tmp_path / "inv.inp"
+    thermo.write_text(_INVERTED_ONLY, encoding="utf-8")
+    out = tmp_path / "out.yaml"
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(INGEST_PATH),
+            "--thermo",
+            str(thermo),
+            "--skip-invalid-segments",
+            "--output",
+            str(out),
+        ],
+        cwd=str(ROOT),
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    # Empty draft after skipping all classified-invalid species is a valid
+    # bulk outcome (record_count 0) — the skip path ran, no non-classified
+    # defect was swallowed.
+    assert proc.returncode == 0, proc.stdout + proc.stderr
+    assert out.is_file()
+    doc = yaml.safe_load(
+        "\n".join(
+            ln
+            for ln in out.read_text(encoding="utf-8").splitlines()
+            if not ln.startswith("#")
+        )
+    )
+    assert doc["record_count"] == 0
+    assert doc["enabled_for_merge"] is False
+    report = doc.get("bulk_skip_report") or {}
+    assert report.get("skipped_species")
+    assert report["skipped_species"][0]["cea_name"] == "INVONLY"
+
+
+def test_load_species_file_missing_fails_closed(ingest_mod, tmp_path: Path) -> None:
+    missing = tmp_path / "nope.txt"
+    with pytest.raises(ingest_mod.CeaSpeciesFileError, match="not found"):
+        ingest_mod.load_species_file(missing)
+
+
+def test_load_species_file_empty_fails_closed(ingest_mod, tmp_path: Path) -> None:
+    """Null-hypothesis: empty species-file → species=[] → full-DB ingest."""
+    empty = tmp_path / "empty.txt"
+    empty.write_text("# comment only\n\n", encoding="utf-8")
+    with pytest.raises(ingest_mod.CeaSpeciesFileError, match="empty"):
+        ingest_mod.load_species_file(empty)
+
+
+def test_load_species_file_malformed_multi_token_fails_closed(
+    ingest_mod, tmp_path: Path
+) -> None:
+    bad = tmp_path / "bad.txt"
+    bad.write_text("O2 Na Fe\n", encoding="utf-8")
+    with pytest.raises(ingest_mod.CeaSpeciesFileError, match="multi-token"):
+        ingest_mod.load_species_file(bad)
+
+
+def test_load_species_file_valid_names(ingest_mod, tmp_path: Path) -> None:
+    path = tmp_path / "ok.txt"
+    path.write_text("# bulk selection\nO2\nNa\n\n# trailing\n", encoding="utf-8")
+    assert ingest_mod.load_species_file(path) == ["O2", "Na"]
+
+
+def test_cli_species_file_missing_fails(tmp_path: Path) -> None:
+    out = tmp_path / "out.yaml"
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(INGEST_PATH),
+            "--thermo",
+            str(THERMO),
+            "--species-file",
+            str(tmp_path / "missing.txt"),
+            "--output",
+            str(out),
+        ],
+        cwd=str(ROOT),
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert proc.returncode != 0
+    assert "not found" in proc.stderr.lower() or "error:" in proc.stderr.lower()
+    assert not out.is_file()
+
+
+def test_cli_species_file_empty_fails(tmp_path: Path) -> None:
+    sp = tmp_path / "empty.txt"
+    sp.write_text("# only comments\n", encoding="utf-8")
+    out = tmp_path / "out.yaml"
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(INGEST_PATH),
+            "--thermo",
+            str(THERMO),
+            "--species-file",
+            str(sp),
+            "--output",
+            str(out),
+        ],
+        cwd=str(ROOT),
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert proc.returncode != 0, proc.stdout + proc.stderr
+    assert "empty" in proc.stderr.lower() or "error:" in proc.stderr.lower()
+    assert not out.is_file()
+
+
+def test_cli_species_file_unknown_species_fails(tmp_path: Path) -> None:
+    sp = tmp_path / "unknown.txt"
+    sp.write_text("NOTASPECIES\n", encoding="utf-8")
+    out = tmp_path / "out.yaml"
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(INGEST_PATH),
+            "--thermo",
+            str(THERMO),
+            "--species-file",
+            str(sp),
+            "--output",
+            str(out),
+        ],
+        cwd=str(ROOT),
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert proc.returncode != 0, proc.stdout + proc.stderr
+    assert "not present" in proc.stderr.lower() or "error:" in proc.stderr.lower()
+    assert not out.is_file()
+
+
+def test_cli_species_file_valid_selects(tmp_path: Path) -> None:
+    sp = tmp_path / "sel.txt"
+    sp.write_text("O2\n", encoding="utf-8")
+    out = tmp_path / "out.yaml"
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(INGEST_PATH),
+            "--thermo",
+            str(THERMO),
+            "--species-file",
+            str(sp),
+            "--output",
+            str(out),
+        ],
+        cwd=str(ROOT),
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert proc.returncode == 0, proc.stdout + proc.stderr
+    doc = yaml.safe_load(
+        "\n".join(
+            ln
+            for ln in out.read_text(encoding="utf-8").splitlines()
+            if not ln.startswith("#")
+        )
+    )
+    assert doc["record_count"] == 1
+    assert doc["enabled_for_merge"] is False
+
+
+def test_ingest_bulk_skip_report_on_mixed_fixture(
+    ingest_mod, tmp_path: Path
+) -> None:
+    thermo = tmp_path / "mixed.inp"
+    thermo.write_text(_MIXED_INVERTED_THEN_VALID, encoding="utf-8")
+    result = ingest_mod.ingest(thermo, skip_invalid_segments=True)
+    assert result.draft_document["record_count"] == 1
+    report = result.draft_document.get("bulk_skip_report")
+    assert report is not None
+    assert report["dropped_inverted_segments"]
+    # Retained thermo payload keeps source vs retained interval provenance.
+    fams = result.draft_document["families"]
+    sp = next(iter(next(iter(fams.values()))["physical_properties"]["species"].values()))
+    tr = sp["pressure_models"][0]["thermo_record"]
+    assert tr["n_intervals"] == 1
+    assert tr["source_n_intervals"] == 2
+    assert tr["dropped_inverted_segments"] == 1
