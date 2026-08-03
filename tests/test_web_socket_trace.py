@@ -14,16 +14,25 @@ GOLDEN_TRACE = (
     / "web_trace"
     / "lunar_mare_low_ti_short_operator_decision.json"
 )
-# CI-audit 2026-07-24 finding 8: this dynamic xfail means the committed
-# golden is NOT enforced (the required-event + determinism checks above
-# it still are). Rebaselining is an owner-gated behavior-change review —
-# when it happens, replace the xfail with a hard byte assertion; the
-# current mismatch must become a failure, never a silently blessed
-# new baseline.
+# CI-audit 2026-07-24 finding 8 / b-105 rebaseline 2026-08-03:
+# Soft pytest.xfail remains only as a skip-unmask removal target; the
+# golden is current again (byte-equal to the executable capture). First
+# pre-rebaseline diverge was byte 82: golden "StubBackend" vs live
+# "InternalAnalyticalBackend" (test forces InternalAnalyticalBackend;
+# golden predated the stub→internal-analytical rename + post-2026-05-26
+# payload growth). Causal stack locked into the new golden, recomputed
+# from the executable (Hard Invariant 7 / AGENTS golden rule — not
+# hand-edited): backend_active/backend_requested rename; backend_*
+# policy fields; CONTROLLED_O2_FLOW + pO2_mbar=9 default vs HARD_VACUUM;
+# max_hours=1 event sequence (11 events, one tick per C0/C0B) vs stale
+# 13-event 2-tick C0; per-hour redox/shuttle/energy panels; decision
+# recommendation A→A_staged + Na-cleanup context. VOLATILE_KEYS still
+# strip timestamps/run ids; two-pass self-equality proves determinism —
+# rebaseline is honest, not papering over nondeterminism. skip-unmask
+# may now delete the soft xfail and hard-assert only.
 GOLDEN_DRIFT_REASON = (
-    "Golden trace drift from V1b convention metadata + F4 by-species rump "
-    "payload + S1b shuttle gate post-2026-05-26 stack. Awaiting the "
-    "controller-owned golden rebaseline."
+    "Stale-golden soft-xfail path retained until skip-unmask lands; "
+    "should be unreachable after b-105 rebaseline."
 )
 
 VOLATILE_KEYS = {

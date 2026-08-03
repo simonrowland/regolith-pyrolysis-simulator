@@ -2,11 +2,18 @@
   {
     "event": "simulation_status",
     "payload": {
-      "backend_active": "StubBackend",
+      "backend_active": "InternalAnalyticalBackend",
+      "backend_authoritative": false,
       "backend_message": "Using built-in fallback",
-      "backend_requested": "stub",
+      "backend_requested": "InternalAnalyticalBackend",
+      "backend_selection_policy": "unknown",
+      "backend_status": "unavailable",
+      "backend_status_message": "internal-analytical backend selected; no authoritative melt result available",
+      "c5_enabled": false,
       "feedstock": "lunar_mare_low_ti",
       "mass_kg": 1000.0,
+      "mre_max_voltage_V": 0.0,
+      "mre_target_species": "",
       "status": "started"
     }
   },
@@ -36,10 +43,13 @@
       "actual_ramp_rate": 50.0,
       "ambient_atmosphere": "",
       "ambient_pressure_mbar": 0.0,
-      "atmosphere": "HARD_VACUUM",
+      "atmosphere": "CONTROLLED_O2_FLOW",
+      "backend_authoritative": false,
       "backend_error": "",
       "backend_fallback_active": false,
       "backend_message": "Using built-in fallback",
+      "backend_status": "ok",
+      "backend_status_reason": "",
       "campaign": "C0",
       "carbon_reductant_required_kg": 0.0,
       "cleaned_melt_source": "composition_wt_pct",
@@ -60,15 +70,46 @@
         "TiO2": 1.54
       },
       "condensation": {},
+      "condensation_refusals_panel": {
+        "by_species": {},
+        "diagnostic_only": true,
+        "has_refusals": false,
+        "message": "Per-species condensation refusals / efficiency pass-through outcomes (VR-11 B2/B3).",
+        "n_species": 0,
+        "status": "empty"
+      },
       "drain_tap_kg": {},
+      "energy_cumulative_breakdown_kWh": {
+        "dissociation": 0.0,
+        "electrical": 0.0,
+        "electrical_plus_evaporation": 0.0,
+        "evaporation_thermal": 0.0,
+        "latent": 0.0
+      },
+      "energy_dissociation_kWh": 0,
+      "energy_electrical_kWh": 0.0,
       "energy_electrical_plus_evaporation_cumulative_kWh": 0.0,
       "energy_electrical_plus_evaporation_kWh": 0.0,
+      "energy_evaporation_breakdown_kWh": {
+        "evaporation_enthalpy_sink": 0,
+        "net_unallocated": 0.0,
+        "product_vapor_enthalpy_sink": 0,
+        "reaction_disproportionation_enthalpy_sink": 0
+      },
+      "energy_evaporation_thermal_kWh": 0,
+      "energy_latent_kWh": 0,
       "energy_scope": "electrical_plus_known_evaporation_enthalpy",
       "evap_species": {},
       "evap_total_kg_hr": 0.0,
+      "flue_composition": {},
+      "flue_composition_note": "No gas-offtake species flow reported for this tick; partial pressures are surfaced separately when available.",
+      "flue_composition_units": "kg/hr",
+      "flue_partial_pressure_mbar": {},
       "furnace_heat_status": "partial",
       "hour": 1,
-      "mass_balance_error_pct": 0.0,
+      "mass_balance_error_breached": false,
+      "mass_balance_error_category": null,
+      "mass_balance_error_pct": 1.1368683772161604e-14,
       "melt_mass_kg": 1000.0,
       "melt_offgas_O2_mol_hr": 0.0,
       "melt_offgas_O2_stored_kg": 0.0,
@@ -80,11 +121,58 @@
       "mre_metals_kg_hr": {},
       "mre_voltage_V": 0.0,
       "nominal_ramp_rate": 50.0,
+      "overlap_evaporation": {
+        "campaign": "C0",
+        "campaign_hour": 0,
+        "completion_target_species": [
+          "H2O",
+          "CO2",
+          "S2",
+          "CHNOPS"
+        ],
+        "endpoint_species_monitored": [],
+        "off_target_evaporation": {},
+        "off_target_total_kg_hr": 0,
+        "temperature_C": 75.0
+      },
       "oxygen_kg": 0.0,
-      "pO2_mbar": 0.0,
-      "p_total_mbar": 0.0,
+      "pO2_mbar": 9.0,
+      "p_total_mbar": 9.0,
+      "pot_composition": {
+        "Al2O3": 138.9604,
+        "CaO": 113.227,
+        "Cr2O3": 3.6027,
+        "FeO": 169.8405,
+        "K2O": 1.0293,
+        "MgO": 92.6402,
+        "MnO": 2.0587,
+        "Na2O": 4.1173,
+        "P2O5": 1.0293,
+        "SiO2": 458.0546,
+        "TiO2": 15.44
+      },
+      "pot_composition_units": "kg",
+      "pot_composition_wt_pct": {
+        "Al2O3": 13.9,
+        "CaO": 11.32,
+        "Cr2O3": 0.36,
+        "FeO": 16.98,
+        "K2O": 0.1,
+        "MgO": 9.26,
+        "MnO": 0.21,
+        "Na2O": 0.41,
+        "P2O5": 0.1,
+        "SiO2": 45.81,
+        "TiO2": 1.54
+      },
       "pressure_mbar": 0.0,
+      "process_bucket_metadata": {
+        "chloride_salt_phase": {
+          "disposition": "separated_chloride_salt_fouling_risk"
+        }
+      },
       "process_buckets_kg": {
+        "chloride_salt_phase": {},
         "gas_volatiles": {},
         "metal_alloy": {},
         "salt_phase": {},
@@ -121,108 +209,1274 @@
         20.0,
         950.0
       ],
+      "stage_purity_report": {
+        "stage_0": {
+          "accepted_species": [],
+          "coproduct_species_kg": {},
+          "designated_kg": 0,
+          "designated_species_kg": {},
+          "impurity_kg": 0,
+          "impurity_species_kg": {},
+          "label": "Hot Duct (IR)",
+          "purity_fraction": 1.0,
+          "stage_number": 0,
+          "total_kg": 0,
+          "verdict": "PURE",
+          "warning": ""
+        },
+        "stage_1_fe_condenser": {
+          "accepted_species": [
+            "Fe"
+          ],
+          "coproduct_species_kg": {},
+          "designated_kg": 0,
+          "designated_species_kg": {},
+          "impurity_kg": 0,
+          "impurity_species_kg": {},
+          "label": "Fe Condenser",
+          "purity_fraction": 1.0,
+          "stage_number": 1,
+          "total_kg": 0,
+          "verdict": "PURE",
+          "warning": ""
+        },
+        "stage_2_cr_oxide_harvest": {
+          "accepted_species": [
+            "Cr",
+            "Cr2O3",
+            "CrO2",
+            "Mn"
+          ],
+          "coproduct_species_kg": {},
+          "designated_kg": 0,
+          "designated_species_kg": {},
+          "impurity_kg": 0,
+          "impurity_species_kg": {},
+          "label": "Cr Oxide Harvester",
+          "purity_fraction": 1.0,
+          "stage_number": 2,
+          "total_kg": 0,
+          "verdict": "PURE",
+          "warning": ""
+        },
+        "stage_3_sio_zone": {
+          "accepted_species": [
+            "Si",
+            "SiO",
+            "SiO2"
+          ],
+          "coproduct_species_kg": {},
+          "designated_kg": 0,
+          "designated_species_kg": {},
+          "impurity_kg": 0,
+          "impurity_species_kg": {},
+          "label": "SiO Zone",
+          "purity_fraction": 1.0,
+          "stage_number": 3,
+          "total_kg": 0,
+          "verdict": "PURE",
+          "warning": ""
+        },
+        "stage_4_alkali_mg_cyclone": {
+          "accepted_species": [
+            "K",
+            "Mg",
+            "Na"
+          ],
+          "coproduct_species_kg": {},
+          "designated_kg": 0,
+          "designated_species_kg": {},
+          "impurity_kg": 0,
+          "impurity_species_kg": {},
+          "label": "Alkali/Mg Cyclone",
+          "purity_fraction": 1.0,
+          "stage_number": 4,
+          "total_kg": 0,
+          "verdict": "PURE",
+          "warning": ""
+        },
+        "stage_5": {
+          "accepted_species": [],
+          "coproduct_species_kg": {},
+          "designated_kg": 0,
+          "designated_species_kg": {},
+          "impurity_kg": 0,
+          "impurity_species_kg": {},
+          "label": "Vortex Dust Filter",
+          "purity_fraction": 1.0,
+          "stage_number": 5,
+          "total_kg": 0,
+          "verdict": "PURE",
+          "warning": ""
+        },
+        "stage_6": {
+          "accepted_species": [],
+          "coproduct_species_kg": {},
+          "designated_kg": 0,
+          "designated_species_kg": {},
+          "impurity_kg": 0,
+          "impurity_species_kg": {},
+          "label": "Turbine-Compressor",
+          "purity_fraction": 1.0,
+          "stage_number": 6,
+          "total_kg": 0,
+          "verdict": "PURE",
+          "warning": ""
+        },
+        "stage_7": {
+          "accepted_species": [],
+          "coproduct_species_kg": {},
+          "designated_kg": 0,
+          "designated_species_kg": {},
+          "impurity_kg": 0,
+          "impurity_species_kg": {},
+          "label": "Turbine Outlet Monitor",
+          "purity_fraction": 1.0,
+          "stage_number": 7,
+          "total_kg": 0,
+          "verdict": "PURE",
+          "warning": ""
+        }
+      },
       "temperature_C": 75.0,
       "throttle_reason": "",
       "transport_saturation_pct": 0.0,
       "turbine_limited": false,
       "turbine_shaft_power_kW": 0.0,
-      "turbine_utilization_pct": 0.0
+      "turbine_utilization_pct": 0.0,
+      "vapor_pressure_authority_panel": {
+        "diagnostic_only": true,
+        "message": "n/a",
+        "status": "n/a"
+      },
+      "vapour_rail_instrumentation_panel": {
+        "channels_by_species": {
+          "Al": {
+            "acquisition_flag": "vapour_pressure_out_of_range:Al",
+            "activity_bound": null,
+            "certification_ceiling": "never",
+            "extra": {
+              "acquisition_flag": "vapour_pressure_out_of_range:Al",
+              "origin": "catalog",
+              "out_of_range": true,
+              "status": "out_of_range_conservative_continuation"
+            },
+            "flux": {
+              "alpha_ref": "alpha:Al",
+              "kind": "eligible",
+              "reaction_id": null
+            },
+            "formula_id": "Al",
+            "is_flux_active": false,
+            "is_flux_dormant_by_epoch": true,
+            "is_refused": false,
+            "is_union_flux_eligible": true,
+            "out_of_range": true,
+            "pressure": {
+              "kind": "value",
+              "pa": 3.1339798911471327e-25
+            },
+            "refusal_code": null,
+            "selected_runtime_pressure": {
+              "kind": "value",
+              "pa": 3.1339798911471327e-25
+            },
+            "solve_group_id": "metals_al_family",
+            "source_account": "process.cleaned_melt",
+            "source_boundary": null,
+            "source_label": "catalog",
+            "species_id": "Al",
+            "state_fingerprint": "state:T=348.15|phase=hot_train|stage=evaporation|fO2=na|P=0",
+            "validation_anchor_refs": [],
+            "validation_status": "pending_validation",
+            "verdict_status": "status_bearing_non_authoritative"
+          },
+          "Ca": {
+            "acquisition_flag": "vapour_pressure_out_of_range:Ca",
+            "activity_bound": null,
+            "certification_ceiling": "never",
+            "extra": {
+              "acquisition_flag": "vapour_pressure_out_of_range:Ca",
+              "origin": "catalog",
+              "out_of_range": true,
+              "status": "out_of_range_conservative_continuation"
+            },
+            "flux": {
+              "alpha_ref": "alpha:Ca",
+              "kind": "eligible",
+              "reaction_id": null
+            },
+            "formula_id": "Ca",
+            "is_flux_active": false,
+            "is_flux_dormant_by_epoch": true,
+            "is_refused": false,
+            "is_union_flux_eligible": true,
+            "out_of_range": true,
+            "pressure": {
+              "kind": "value",
+              "pa": 7.801093977385432e-07
+            },
+            "refusal_code": null,
+            "selected_runtime_pressure": {
+              "kind": "value",
+              "pa": 7.801093977385432e-07
+            },
+            "solve_group_id": "metals_ca_family",
+            "source_account": "process.cleaned_melt",
+            "source_boundary": null,
+            "source_label": "catalog",
+            "species_id": "Ca",
+            "state_fingerprint": "state:T=348.15|phase=hot_train|stage=evaporation|fO2=na|P=0",
+            "validation_anchor_refs": [],
+            "validation_status": "pending_validation",
+            "verdict_status": "status_bearing_non_authoritative"
+          },
+          "Cr": {
+            "acquisition_flag": "vapour_pressure_out_of_range:Cr",
+            "activity_bound": null,
+            "certification_ceiling": "never",
+            "extra": {
+              "acquisition_flag": "vapour_pressure_out_of_range:Cr",
+              "origin": "catalog",
+              "out_of_range": true,
+              "status": "out_of_range_conservative_continuation"
+            },
+            "flux": {
+              "alpha_ref": "alpha:Cr",
+              "kind": "eligible",
+              "reaction_id": null
+            },
+            "formula_id": "Cr",
+            "is_flux_active": false,
+            "is_flux_dormant_by_epoch": true,
+            "is_refused": false,
+            "is_union_flux_eligible": true,
+            "out_of_range": true,
+            "pressure": {
+              "kind": "value",
+              "pa": 8.42234713277652e-11
+            },
+            "refusal_code": null,
+            "selected_runtime_pressure": {
+              "kind": "value",
+              "pa": 8.42234713277652e-11
+            },
+            "solve_group_id": "metals_cr_family",
+            "source_account": "process.cleaned_melt",
+            "source_boundary": null,
+            "source_label": "catalog",
+            "species_id": "Cr",
+            "state_fingerprint": "state:T=348.15|phase=hot_train|stage=evaporation|fO2=na|P=0",
+            "validation_anchor_refs": [],
+            "validation_status": "pending_validation",
+            "verdict_status": "status_bearing_non_authoritative"
+          },
+          "Cr2O3_gas": {
+            "acquisition_flag": null,
+            "activity_bound": null,
+            "certification_ceiling": "never",
+            "extra": {
+              "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route",
+              "origin": "u0_v"
+            },
+            "flux": {
+              "code": "missing_channel_contract",
+              "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route",
+              "kind": "refusal"
+            },
+            "formula_id": "Cr2O3",
+            "is_flux_active": false,
+            "is_flux_dormant_by_epoch": false,
+            "is_refused": true,
+            "is_union_flux_eligible": false,
+            "out_of_range": false,
+            "pressure": {
+              "code": "missing_channel_contract",
+              "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route",
+              "kind": "refusal"
+            },
+            "refusal_code": "missing_channel_contract",
+            "selected_runtime_pressure": {
+              "code": "missing_channel_contract",
+              "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route",
+              "kind": "refusal"
+            },
+            "solve_group_id": "u0_v:Cr2O3_gas",
+            "source_account": "process.cleaned_melt",
+            "source_boundary": null,
+            "source_label": "refusal_closure",
+            "species_id": "Cr2O3_gas",
+            "state_fingerprint": "state:T=348.15|phase=hot_train|stage=evaporation|fO2=na|P=0",
+            "validation_anchor_refs": [],
+            "validation_status": "pending_validation",
+            "verdict_status": "status_bearing_non_authoritative"
+          },
+          "CrO2": {
+            "acquisition_flag": null,
+            "activity_bound": null,
+            "certification_ceiling": "never",
+            "extra": {
+              "detail": "channel contract incomplete: missing alpha",
+              "origin": "catalog"
+            },
+            "flux": {
+              "code": "missing_channel_contract",
+              "detail": "channel contract incomplete: missing alpha",
+              "kind": "refusal"
+            },
+            "formula_id": "CrO2",
+            "is_flux_active": false,
+            "is_flux_dormant_by_epoch": false,
+            "is_refused": true,
+            "is_union_flux_eligible": false,
+            "out_of_range": false,
+            "pressure": {
+              "code": "missing_channel_contract",
+              "detail": "channel contract incomplete: missing alpha",
+              "kind": "refusal"
+            },
+            "refusal_code": "missing_channel_contract",
+            "selected_runtime_pressure": {
+              "code": "missing_channel_contract",
+              "detail": "channel contract incomplete: missing alpha",
+              "kind": "refusal"
+            },
+            "solve_group_id": "oxide_vapors_cro2_family",
+            "source_account": "process.cleaned_melt",
+            "source_boundary": null,
+            "source_label": "refusal_closure",
+            "species_id": "CrO2",
+            "state_fingerprint": "state:T=348.15|phase=hot_train|stage=evaporation|fO2=na|P=0",
+            "validation_anchor_refs": [],
+            "validation_status": "pending_validation",
+            "verdict_status": "status_bearing_non_authoritative"
+          },
+          "Fe": {
+            "acquisition_flag": "vapour_pressure_out_of_range:Fe",
+            "activity_bound": null,
+            "certification_ceiling": "never",
+            "extra": {
+              "acquisition_flag": "vapour_pressure_out_of_range:Fe",
+              "origin": "catalog",
+              "out_of_range": true,
+              "status": "out_of_range_conservative_continuation"
+            },
+            "flux": {
+              "alpha_ref": "alpha:Fe",
+              "kind": "eligible",
+              "reaction_id": null
+            },
+            "formula_id": "Fe",
+            "is_flux_active": false,
+            "is_flux_dormant_by_epoch": true,
+            "is_refused": false,
+            "is_union_flux_eligible": true,
+            "out_of_range": true,
+            "pressure": {
+              "kind": "value",
+              "pa": 2.0395058840129344e-07
+            },
+            "refusal_code": null,
+            "selected_runtime_pressure": {
+              "kind": "value",
+              "pa": 2.0395058840129344e-07
+            },
+            "solve_group_id": "metals_fe_family",
+            "source_account": "process.cleaned_melt",
+            "source_boundary": null,
+            "source_label": "catalog",
+            "species_id": "Fe",
+            "state_fingerprint": "state:T=348.15|phase=hot_train|stage=evaporation|fO2=na|P=0",
+            "validation_anchor_refs": [],
+            "validation_status": "pending_validation",
+            "verdict_status": "status_bearing_non_authoritative"
+          },
+          "K": {
+            "acquisition_flag": "vapour_pressure_out_of_range:K",
+            "activity_bound": null,
+            "certification_ceiling": "never",
+            "extra": {
+              "acquisition_flag": "vapour_pressure_out_of_range:K",
+              "origin": "catalog",
+              "out_of_range": true,
+              "status": "out_of_range_conservative_continuation"
+            },
+            "flux": {
+              "alpha_ref": "alpha:K",
+              "kind": "eligible",
+              "reaction_id": "liquid_ko0_5_to_k_gas"
+            },
+            "formula_id": "K",
+            "is_flux_active": false,
+            "is_flux_dormant_by_epoch": true,
+            "is_refused": false,
+            "is_union_flux_eligible": true,
+            "out_of_range": true,
+            "pressure": {
+              "kind": "value",
+              "pa": 1.7730851508853623e-10
+            },
+            "refusal_code": null,
+            "selected_runtime_pressure": {
+              "kind": "value",
+              "pa": 1.7730851508853623e-10
+            },
+            "solve_group_id": "metals_k_family",
+            "source_account": "process.cleaned_melt",
+            "source_boundary": null,
+            "source_label": "catalog",
+            "species_id": "K",
+            "state_fingerprint": "state:T=348.15|phase=hot_train|stage=evaporation|fO2=na|P=0",
+            "validation_anchor_refs": [],
+            "validation_status": "pending_validation",
+            "verdict_status": "status_bearing_non_authoritative"
+          },
+          "Mg": {
+            "acquisition_flag": "vapour_pressure_out_of_range:Mg",
+            "activity_bound": null,
+            "certification_ceiling": "never",
+            "extra": {
+              "acquisition_flag": "vapour_pressure_out_of_range:Mg",
+              "origin": "catalog",
+              "out_of_range": true,
+              "status": "out_of_range_conservative_continuation"
+            },
+            "flux": {
+              "alpha_ref": "alpha:Mg",
+              "kind": "eligible",
+              "reaction_id": null
+            },
+            "formula_id": "Mg",
+            "is_flux_active": false,
+            "is_flux_dormant_by_epoch": true,
+            "is_refused": false,
+            "is_union_flux_eligible": true,
+            "out_of_range": true,
+            "pressure": {
+              "kind": "value",
+              "pa": 2.8834688868426222e-09
+            },
+            "refusal_code": null,
+            "selected_runtime_pressure": {
+              "kind": "value",
+              "pa": 2.8834688868426222e-09
+            },
+            "solve_group_id": "metals_mg_family",
+            "source_account": "process.cleaned_melt",
+            "source_boundary": null,
+            "source_label": "catalog",
+            "species_id": "Mg",
+            "state_fingerprint": "state:T=348.15|phase=hot_train|stage=evaporation|fO2=na|P=0",
+            "validation_anchor_refs": [],
+            "validation_status": "pending_validation",
+            "verdict_status": "status_bearing_non_authoritative"
+          },
+          "Mn": {
+            "acquisition_flag": "vapour_pressure_out_of_range:Mn",
+            "activity_bound": null,
+            "certification_ceiling": "never",
+            "extra": {
+              "acquisition_flag": "vapour_pressure_out_of_range:Mn",
+              "origin": "catalog",
+              "out_of_range": true,
+              "status": "out_of_range_conservative_continuation"
+            },
+            "flux": {
+              "alpha_ref": "alpha:Mn",
+              "kind": "eligible",
+              "reaction_id": null
+            },
+            "formula_id": "Mn",
+            "is_flux_active": false,
+            "is_flux_dormant_by_epoch": true,
+            "is_refused": false,
+            "is_union_flux_eligible": true,
+            "out_of_range": true,
+            "pressure": {
+              "kind": "value",
+              "pa": 1.821062571978787e-10
+            },
+            "refusal_code": null,
+            "selected_runtime_pressure": {
+              "kind": "value",
+              "pa": 1.821062571978787e-10
+            },
+            "solve_group_id": "metals_mn_family",
+            "source_account": "process.cleaned_melt",
+            "source_boundary": null,
+            "source_label": "catalog",
+            "species_id": "Mn",
+            "state_fingerprint": "state:T=348.15|phase=hot_train|stage=evaporation|fO2=na|P=0",
+            "validation_anchor_refs": [],
+            "validation_status": "pending_validation",
+            "verdict_status": "status_bearing_non_authoritative"
+          },
+          "MnO_gas": {
+            "acquisition_flag": null,
+            "activity_bound": null,
+            "certification_ceiling": "never",
+            "extra": {
+              "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route",
+              "origin": "u0_v"
+            },
+            "flux": {
+              "code": "missing_channel_contract",
+              "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route",
+              "kind": "refusal"
+            },
+            "formula_id": "MnO",
+            "is_flux_active": false,
+            "is_flux_dormant_by_epoch": false,
+            "is_refused": true,
+            "is_union_flux_eligible": false,
+            "out_of_range": false,
+            "pressure": {
+              "code": "missing_channel_contract",
+              "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route",
+              "kind": "refusal"
+            },
+            "refusal_code": "missing_channel_contract",
+            "selected_runtime_pressure": {
+              "code": "missing_channel_contract",
+              "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route",
+              "kind": "refusal"
+            },
+            "solve_group_id": "u0_v:MnO_gas",
+            "source_account": "process.cleaned_melt",
+            "source_boundary": null,
+            "source_label": "refusal_closure",
+            "species_id": "MnO_gas",
+            "state_fingerprint": "state:T=348.15|phase=hot_train|stage=evaporation|fO2=na|P=0",
+            "validation_anchor_refs": [],
+            "validation_status": "pending_validation",
+            "verdict_status": "status_bearing_non_authoritative"
+          },
+          "Na": {
+            "acquisition_flag": "vapour_pressure_out_of_range:Na",
+            "activity_bound": null,
+            "certification_ceiling": "never",
+            "extra": {
+              "acquisition_flag": "vapour_pressure_out_of_range:Na",
+              "origin": "catalog",
+              "out_of_range": true,
+              "status": "out_of_range_conservative_continuation"
+            },
+            "flux": {
+              "alpha_ref": "alpha:Na",
+              "kind": "eligible",
+              "reaction_id": null
+            },
+            "formula_id": "Na",
+            "is_flux_active": false,
+            "is_flux_dormant_by_epoch": true,
+            "is_refused": false,
+            "is_union_flux_eligible": true,
+            "out_of_range": true,
+            "pressure": {
+              "kind": "value",
+              "pa": 0.003173024738485665
+            },
+            "refusal_code": null,
+            "selected_runtime_pressure": {
+              "kind": "value",
+              "pa": 0.003173024738485665
+            },
+            "solve_group_id": "metals_na_family",
+            "source_account": "process.cleaned_melt",
+            "source_boundary": null,
+            "source_label": "catalog",
+            "species_id": "Na",
+            "state_fingerprint": "state:T=348.15|phase=hot_train|stage=evaporation|fO2=na|P=0",
+            "validation_anchor_refs": [],
+            "validation_status": "pending_validation",
+            "verdict_status": "status_bearing_non_authoritative"
+          },
+          "P2O5_gas": {
+            "acquisition_flag": null,
+            "activity_bound": null,
+            "certification_ceiling": "never",
+            "extra": {
+              "detail": "declared applicability predicate 'not_applicable' is inactive",
+              "origin": "catalog"
+            },
+            "flux": {
+              "code": "inapplicable_by_declared_predicate",
+              "detail": "declared applicability predicate 'not_applicable' is inactive",
+              "kind": "refusal"
+            },
+            "formula_id": "P2O5_gas",
+            "is_flux_active": false,
+            "is_flux_dormant_by_epoch": false,
+            "is_refused": true,
+            "is_union_flux_eligible": false,
+            "out_of_range": false,
+            "pressure": {
+              "code": "inapplicable_by_declared_predicate",
+              "detail": "declared applicability predicate 'not_applicable' is inactive",
+              "kind": "refusal"
+            },
+            "refusal_code": "inapplicable_by_declared_predicate",
+            "selected_runtime_pressure": {
+              "code": "inapplicable_by_declared_predicate",
+              "detail": "declared applicability predicate 'not_applicable' is inactive",
+              "kind": "refusal"
+            },
+            "solve_group_id": "phosphorus_P2O5_gas_family",
+            "source_account": "process.cleaned_melt",
+            "source_boundary": null,
+            "source_label": "refusal_closure",
+            "species_id": "P2O5_gas",
+            "state_fingerprint": "state:T=348.15|phase=hot_train|stage=evaporation|fO2=na|P=0",
+            "validation_anchor_refs": [],
+            "validation_status": "pending_validation",
+            "verdict_status": "status_bearing_non_authoritative"
+          },
+          "Si": {
+            "acquisition_flag": "vapour_pressure_out_of_range:Si",
+            "activity_bound": null,
+            "certification_ceiling": "never",
+            "extra": {
+              "acquisition_flag": "vapour_pressure_out_of_range:Si",
+              "origin": "catalog",
+              "out_of_range": true,
+              "status": "out_of_range_conservative_continuation"
+            },
+            "flux": {
+              "alpha_ref": "alpha:Si",
+              "kind": "eligible",
+              "reaction_id": null
+            },
+            "formula_id": "Si",
+            "is_flux_active": false,
+            "is_flux_dormant_by_epoch": true,
+            "is_refused": false,
+            "is_union_flux_eligible": true,
+            "out_of_range": true,
+            "pressure": {
+              "kind": "value",
+              "pa": 3.869841019193202e-17
+            },
+            "refusal_code": null,
+            "selected_runtime_pressure": {
+              "kind": "value",
+              "pa": 3.869841019193202e-17
+            },
+            "solve_group_id": "metals_si_family",
+            "source_account": "process.cleaned_melt",
+            "source_boundary": null,
+            "source_label": "catalog",
+            "species_id": "Si",
+            "state_fingerprint": "state:T=348.15|phase=hot_train|stage=evaporation|fO2=na|P=0",
+            "validation_anchor_refs": [],
+            "validation_status": "pending_validation",
+            "verdict_status": "status_bearing_non_authoritative"
+          },
+          "SiO": {
+            "acquisition_flag": "vapour_pressure_out_of_range:SiO",
+            "activity_bound": null,
+            "certification_ceiling": "never",
+            "extra": {
+              "acquisition_flag": "vapour_pressure_out_of_range:SiO",
+              "origin": "catalog",
+              "out_of_range": true,
+              "status": "out_of_range_conservative_continuation"
+            },
+            "flux": {
+              "alpha_ref": "alpha:SiO",
+              "kind": "eligible",
+              "reaction_id": "liquid_sio2_to_sio_gas"
+            },
+            "formula_id": "SiO",
+            "is_flux_active": false,
+            "is_flux_dormant_by_epoch": true,
+            "is_refused": false,
+            "is_union_flux_eligible": true,
+            "out_of_range": true,
+            "pressure": {
+              "kind": "value",
+              "pa": 9.50458814197612e-41
+            },
+            "refusal_code": null,
+            "selected_runtime_pressure": {
+              "kind": "value",
+              "pa": 9.50458814197612e-41
+            },
+            "solve_group_id": "oxide_vapors_sio_family",
+            "source_account": "process.cleaned_melt",
+            "source_boundary": null,
+            "source_label": "catalog",
+            "species_id": "SiO",
+            "state_fingerprint": "state:T=348.15|phase=hot_train|stage=evaporation|fO2=na|P=0",
+            "validation_anchor_refs": [],
+            "validation_status": "pending_validation",
+            "verdict_status": "status_bearing_non_authoritative"
+          },
+          "Ti": {
+            "acquisition_flag": "vapour_pressure_out_of_range:Ti",
+            "activity_bound": null,
+            "certification_ceiling": "never",
+            "extra": {
+              "acquisition_flag": "vapour_pressure_out_of_range:Ti",
+              "origin": "catalog",
+              "out_of_range": true,
+              "status": "out_of_range_conservative_continuation"
+            },
+            "flux": {
+              "alpha_ref": "alpha:Ti",
+              "kind": "eligible",
+              "reaction_id": null
+            },
+            "formula_id": "Ti",
+            "is_flux_active": false,
+            "is_flux_dormant_by_epoch": true,
+            "is_refused": false,
+            "is_union_flux_eligible": true,
+            "out_of_range": true,
+            "pressure": {
+              "kind": "value",
+              "pa": 9.673057722580709e-16
+            },
+            "refusal_code": null,
+            "selected_runtime_pressure": {
+              "kind": "value",
+              "pa": 9.673057722580709e-16
+            },
+            "solve_group_id": "metals_ti_family",
+            "source_account": "process.cleaned_melt",
+            "source_boundary": null,
+            "source_label": "catalog",
+            "species_id": "Ti",
+            "state_fingerprint": "state:T=348.15|phase=hot_train|stage=evaporation|fO2=na|P=0",
+            "validation_anchor_refs": [],
+            "validation_status": "pending_validation",
+            "verdict_status": "status_bearing_non_authoritative"
+          }
+        },
+        "condensation_refusals": {
+          "by_species": {},
+          "has_refusals": false,
+          "n_species": 0,
+          "schema": "condensation_refusals.v1"
+        },
+        "diagnostic_only": true,
+        "flux_overlay": {
+          "batch_channel_states": {
+            "Al": "dormant_by_epoch",
+            "Ca": "dormant_by_epoch",
+            "Cr": "dormant_by_epoch",
+            "Cr2O3_gas": "refusal",
+            "CrO2": "refusal",
+            "Fe": "dormant_by_epoch",
+            "K": "dormant_by_epoch",
+            "Mg": "dormant_by_epoch",
+            "Mn": "dormant_by_epoch",
+            "MnO_gas": "refusal",
+            "Na": "dormant_by_epoch",
+            "P2O5_gas": "refusal",
+            "Si": "dormant_by_epoch",
+            "SiO": "dormant_by_epoch",
+            "Ti": "dormant_by_epoch"
+          },
+          "batch_flux_active_not_in_live": [],
+          "batch_pa_by_species": {
+            "Al": 3.1339798911471327e-25,
+            "Ca": 7.801093977385432e-07,
+            "Cr": 8.42234713277652e-11,
+            "Fe": 2.0395058840129344e-07,
+            "K": 1.7730851508853623e-10,
+            "Mg": 2.8834688868426222e-09,
+            "Mn": 1.821062571978787e-10,
+            "Na": 0.003173024738485665,
+            "Si": 3.869841019193202e-17,
+            "SiO": 9.50458814197612e-41,
+            "Ti": 9.673057722580709e-16
+          },
+          "batch_present": true,
+          "batch_refused_live_species": [],
+          "catalog_pa_shadow_equal": false,
+          "catalog_pa_shadow_outcome": "absent_comparison",
+          "detail": "independent compatibility comparison evidence is absent",
+          "dropped_nonfinite_live_species": [],
+          "effective_pressure_source": "equilibrium_backend_effective_pressure_pre_rg",
+          "effective_pressure_species_not_batch_active": [],
+          "effective_pressure_zero_reason": "pre_rg_backend_below_effective_pressure_threshold",
+          "live_flux_active_not_in_batch": [],
+          "live_only_bridge_species": [],
+          "mismatched_species": [],
+          "missing_batch_keys": [],
+          "missing_effective_pressure_species": [],
+          "missing_in_batch_path": [],
+          "missing_in_legacy_path": [],
+          "n_flux_pressures": 0,
+          "n_live_pressures": 0,
+          "note": "VapourBatch owns channel refusal, eligibility, and the active set; effective values cross one typed source seam before RG-1.",
+          "schema": "vapour_batch_flux_overlay.v1",
+          "selected_runtime_pa_by_species": {},
+          "selection_source": "equilibrium_backend_effective_pressure_pre_rg",
+          "shadow_equal": false,
+          "shadow_outcome": "absent_comparison"
+        },
+        "message": "Exact-key vapour channel answers and advisory diagnostics; not flux-authoritative until an R-family flip.",
+        "n_flux_active": 0,
+        "n_refused": 4,
+        "n_requested": 15,
+        "refusals_by_species": {
+          "Cr2O3_gas": {
+            "acquisition_flag": null,
+            "activity_bound": null,
+            "certification_ceiling": "never",
+            "extra": {
+              "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route",
+              "origin": "u0_v"
+            },
+            "flux": {
+              "code": "missing_channel_contract",
+              "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route",
+              "kind": "refusal"
+            },
+            "formula_id": "Cr2O3",
+            "is_flux_active": false,
+            "is_flux_dormant_by_epoch": false,
+            "is_refused": true,
+            "is_union_flux_eligible": false,
+            "out_of_range": false,
+            "pressure": {
+              "code": "missing_channel_contract",
+              "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route",
+              "kind": "refusal"
+            },
+            "refusal_code": "missing_channel_contract",
+            "selected_runtime_pressure": {
+              "code": "missing_channel_contract",
+              "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route",
+              "kind": "refusal"
+            },
+            "solve_group_id": "u0_v:Cr2O3_gas",
+            "source_account": "process.cleaned_melt",
+            "source_boundary": null,
+            "source_label": "refusal_closure",
+            "species_id": "Cr2O3_gas",
+            "state_fingerprint": "state:T=348.15|phase=hot_train|stage=evaporation|fO2=na|P=0",
+            "validation_anchor_refs": [],
+            "validation_status": "pending_validation",
+            "verdict_status": "status_bearing_non_authoritative"
+          },
+          "CrO2": {
+            "acquisition_flag": null,
+            "activity_bound": null,
+            "certification_ceiling": "never",
+            "extra": {
+              "detail": "channel contract incomplete: missing alpha",
+              "origin": "catalog"
+            },
+            "flux": {
+              "code": "missing_channel_contract",
+              "detail": "channel contract incomplete: missing alpha",
+              "kind": "refusal"
+            },
+            "formula_id": "CrO2",
+            "is_flux_active": false,
+            "is_flux_dormant_by_epoch": false,
+            "is_refused": true,
+            "is_union_flux_eligible": false,
+            "out_of_range": false,
+            "pressure": {
+              "code": "missing_channel_contract",
+              "detail": "channel contract incomplete: missing alpha",
+              "kind": "refusal"
+            },
+            "refusal_code": "missing_channel_contract",
+            "selected_runtime_pressure": {
+              "code": "missing_channel_contract",
+              "detail": "channel contract incomplete: missing alpha",
+              "kind": "refusal"
+            },
+            "solve_group_id": "oxide_vapors_cro2_family",
+            "source_account": "process.cleaned_melt",
+            "source_boundary": null,
+            "source_label": "refusal_closure",
+            "species_id": "CrO2",
+            "state_fingerprint": "state:T=348.15|phase=hot_train|stage=evaporation|fO2=na|P=0",
+            "validation_anchor_refs": [],
+            "validation_status": "pending_validation",
+            "verdict_status": "status_bearing_non_authoritative"
+          },
+          "MnO_gas": {
+            "acquisition_flag": null,
+            "activity_bound": null,
+            "certification_ceiling": "never",
+            "extra": {
+              "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route",
+              "origin": "u0_v"
+            },
+            "flux": {
+              "code": "missing_channel_contract",
+              "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route",
+              "kind": "refusal"
+            },
+            "formula_id": "MnO",
+            "is_flux_active": false,
+            "is_flux_dormant_by_epoch": false,
+            "is_refused": true,
+            "is_union_flux_eligible": false,
+            "out_of_range": false,
+            "pressure": {
+              "code": "missing_channel_contract",
+              "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route",
+              "kind": "refusal"
+            },
+            "refusal_code": "missing_channel_contract",
+            "selected_runtime_pressure": {
+              "code": "missing_channel_contract",
+              "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route",
+              "kind": "refusal"
+            },
+            "solve_group_id": "u0_v:MnO_gas",
+            "source_account": "process.cleaned_melt",
+            "source_boundary": null,
+            "source_label": "refusal_closure",
+            "species_id": "MnO_gas",
+            "state_fingerprint": "state:T=348.15|phase=hot_train|stage=evaporation|fO2=na|P=0",
+            "validation_anchor_refs": [],
+            "validation_status": "pending_validation",
+            "verdict_status": "status_bearing_non_authoritative"
+          },
+          "P2O5_gas": {
+            "acquisition_flag": null,
+            "activity_bound": null,
+            "certification_ceiling": "never",
+            "extra": {
+              "detail": "declared applicability predicate 'not_applicable' is inactive",
+              "origin": "catalog"
+            },
+            "flux": {
+              "code": "inapplicable_by_declared_predicate",
+              "detail": "declared applicability predicate 'not_applicable' is inactive",
+              "kind": "refusal"
+            },
+            "formula_id": "P2O5_gas",
+            "is_flux_active": false,
+            "is_flux_dormant_by_epoch": false,
+            "is_refused": true,
+            "is_union_flux_eligible": false,
+            "out_of_range": false,
+            "pressure": {
+              "code": "inapplicable_by_declared_predicate",
+              "detail": "declared applicability predicate 'not_applicable' is inactive",
+              "kind": "refusal"
+            },
+            "refusal_code": "inapplicable_by_declared_predicate",
+            "selected_runtime_pressure": {
+              "code": "inapplicable_by_declared_predicate",
+              "detail": "declared applicability predicate 'not_applicable' is inactive",
+              "kind": "refusal"
+            },
+            "solve_group_id": "phosphorus_P2O5_gas_family",
+            "source_account": "process.cleaned_melt",
+            "source_boundary": null,
+            "source_label": "refusal_closure",
+            "species_id": "P2O5_gas",
+            "state_fingerprint": "state:T=348.15|phase=hot_train|stage=evaporation|fO2=na|P=0",
+            "validation_anchor_refs": [],
+            "validation_status": "pending_validation",
+            "verdict_status": "status_bearing_non_authoritative"
+          }
+        },
+        "setpoints_t_cond_audit": {
+          "al_ti_policy": "Al and Ti overrides are estimated/operator-routing only; no additional Al/Ti/trace T_cond overrides without independent engineering policy approval (DESIGN-REV5 \u00a77.2).",
+          "operator_override_species": [
+            "Al",
+            "Ca",
+            "Cr",
+            "CrO2",
+            "Fe",
+            "K",
+            "Mg",
+            "Mn",
+            "Na",
+            "SiO",
+            "Ti"
+          ],
+          "reaction_fixed_windows": "Reaction-fixed condensation windows remain non-operator settings.",
+          "schema": "setpoints_t_cond_audit.v1"
+        },
+        "shadow_equal": false,
+        "shadow_outcome": "absent_comparison",
+        "solve_bundle_ids": {},
+        "source_vapour_ceiling_table": [
+          {
+            "advisory_only": true,
+            "ceiling_mol": 0.013617600827,
+            "evidence": "FROZEN_SIO_SOURCE_VAPOR_CEILING_MOL diagnostic pin",
+            "legacy_key": "SiO",
+            "lookup_gas_id": "SiO",
+            "source_parent_id": "SiO2",
+            "status": "frozen_sio_proxy"
+          },
+          {
+            "advisory_only": true,
+            "ceiling_mol": 0.0,
+            "evidence": "inherited zero; not measured ZeroByPhysics",
+            "legacy_key": "Na2O",
+            "lookup_gas_id": "Na2O_gas",
+            "source_parent_id": "Na2O",
+            "status": "unvalidated_legacy"
+          },
+          {
+            "advisory_only": true,
+            "ceiling_mol": 0.0,
+            "evidence": "inherited zero; not measured ZeroByPhysics",
+            "legacy_key": "K2O",
+            "lookup_gas_id": "K2O_gas",
+            "source_parent_id": "K2O",
+            "status": "unvalidated_legacy"
+          },
+          {
+            "advisory_only": true,
+            "ceiling_mol": 0.0,
+            "evidence": "inherited zero; not measured ZeroByPhysics",
+            "legacy_key": "FeO",
+            "lookup_gas_id": "FeO_gas",
+            "source_parent_id": "FeO",
+            "status": "unvalidated_legacy"
+          },
+          {
+            "advisory_only": true,
+            "ceiling_mol": 0.0,
+            "evidence": "inherited zero; not measured ZeroByPhysics",
+            "legacy_key": "MgO",
+            "lookup_gas_id": "MgO_gas",
+            "source_parent_id": "MgO",
+            "status": "unvalidated_legacy"
+          },
+          {
+            "advisory_only": true,
+            "ceiling_mol": 0.0,
+            "evidence": "inherited zero; not measured ZeroByPhysics",
+            "legacy_key": "CaO",
+            "lookup_gas_id": "CaO_gas",
+            "source_parent_id": "CaO",
+            "status": "unvalidated_legacy"
+          },
+          {
+            "advisory_only": true,
+            "ceiling_mol": 0.0,
+            "evidence": "inherited zero; not measured ZeroByPhysics",
+            "legacy_key": "Al2O3",
+            "lookup_gas_id": "Al2O3_gas",
+            "source_parent_id": "Al2O3",
+            "status": "unvalidated_legacy"
+          },
+          {
+            "advisory_only": true,
+            "ceiling_mol": 0.0,
+            "evidence": "inherited zero; not measured ZeroByPhysics",
+            "legacy_key": "TiO2",
+            "lookup_gas_id": "TiO2_gas",
+            "source_parent_id": "TiO2",
+            "status": "unvalidated_legacy"
+          },
+          {
+            "advisory_only": true,
+            "ceiling_mol": 0.0,
+            "evidence": "inherited zero; collision-free gas ID retained",
+            "legacy_key": "CrO2",
+            "lookup_gas_id": "CrO2",
+            "source_parent_id": "Cr2O3",
+            "status": "unvalidated_legacy"
+          }
+        ],
+        "status": "ok"
+      },
+      "wall_risk_panel": {
+        "active_species": [],
+        "message": "n/a",
+        "operating_point": {
+          "pO2_mbar": 9.0,
+          "p_buffer_mbar": 0.0,
+          "po2_regime": "oxidizing",
+          "pressure_regime": "vacuum"
+        },
+        "status": "n/a",
+        "zones": []
+      }
     }
   },
   {
     "event": "per_hour_summary",
     "payload": {
+      "Kn": null,
+      "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
+      "O2_source_side_potential_kg_cumulative": 0.0,
       "O2_yield_kg_cumulative": 0.0,
       "P_total_bar": 0.0,
       "T_C": 75.0,
       "campaign": "C0",
       "condensation_train_kg": {},
+      "energy_cumulative_breakdown_kWh": {
+        "dissociation": 0.0,
+        "electrical": 0.0,
+        "electrical_plus_evaporation": 0.0,
+        "evaporation_thermal": 0.0,
+        "latent": 0.0
+      },
+      "energy_dissociation_kWh": 0.0,
+      "energy_electrical_kWh": 0.0,
+      "energy_electrical_plus_evaporation_cumulative_kWh": 0.0,
+      "energy_electrical_plus_evaporation_kWh": 0.0,
+      "energy_evaporation_breakdown_kWh": {
+        "evaporation_enthalpy_sink": 0,
+        "net_unallocated": 0.0,
+        "product_vapor_enthalpy_sink": 0,
+        "reaction_disproportionation_enthalpy_sink": 0
+      },
+      "energy_evaporation_thermal_kWh": 0.0,
+      "energy_latent_kWh": 0.0,
+      "energy_scope": "electrical_plus_known_evaporation_enthalpy",
+      "fe_redox_split": {
+        "authoritative": false,
+        "diagnostic_only": true,
+        "extrapolation": true,
+        "fO2_log": -9.0,
+        "fe2o3_equiv_wt_pct": 18.59026650562306,
+        "fe2o3_over_feo_molar": 8365413905198.211,
+        "fe3_over_sigma_fe": 0.9999999999999403,
+        "feo_equiv_wt_pct": 1.0008616891634039e-12,
+        "ferric_frac": 0.9999999999999403,
+        "ferrous_frac": 5.972999872483342e-14,
+        "high_uncertainty": true,
+        "iw_log": -71.60032888122936,
+        "native_fe_activity": "8.854028621385623e-15",
+        "native_fe_activity_source": "Holzheid1997 DOI 10.1016/S0009-2541(97)00030-2 FeO(l)=Fe+0.5O2 saturation",
+        "native_fe_frac": 0.0,
+        "native_fe_pure_feo_iw_log": "-66.35994004094093",
+        "native_fe_saturation": false,
+        "native_fe_saturation_activity": "4.785970534277484e+28",
+        "native_fe_saturation_event": {
+          "native_fe_event": "deferred_not_liquid_for_redox",
+          "native_fe_event_reason": "deferred_not_liquid_for_redox",
+          "native_fe_event_status": "deferred",
+          "temperature_C": 75.0
+        },
+        "native_fe_threshold": "FeO_activity_saturation",
+        "pressure_bar": 1e-09,
+        "reference": "Kress and Carmichael 1991 Contrib Mineral Petrol 108:82-92 doi:10.1007/BF00307328",
+        "source": "simulator.fe_redox:kress91_split",
+        "status": "ok",
+        "temperature_K": 348.15,
+        "temperature_band_case": "below_1200C_extrapolation",
+        "temperature_band_source": "REF-001 Kress91 liquid relation; below 1200 C calibration floor",
+        "temperature_band_status": "extrapolation_below_calibration_floor"
+      },
+      "furnace_heat_status": "partial",
       "hour": 1,
       "mass_balance_pct": 1.1368683772161604e-14,
       "metal_yields_kg": {},
-      "pO2_bar": 0.0
-    }
-  },
-  {
-    "event": "simulation_tick",
-    "payload": {
-      "O2_stored_kg": 0.0,
-      "O2_vented_cumulative_kg": 0.0,
-      "O2_vented_kg_hr": 0.0,
-      "O2_vented_mol_hr": 0.0,
-      "actual_ramp_rate": 50.0,
-      "ambient_atmosphere": "",
-      "ambient_pressure_mbar": 0.0,
-      "atmosphere": "CONTROLLED_O2_FLOW",
-      "backend_error": "",
-      "backend_fallback_active": false,
-      "backend_message": "Using built-in fallback",
-      "campaign": "C0B",
-      "carbon_reductant_required_kg": 0.0,
-      "cleaned_melt_source": "composition_wt_pct",
-      "composition_wt_pct": {
-        "Al2O3": 13.9,
-        "CaO": 11.32,
-        "CoO": 0.0,
-        "Cr2O3": 0.36,
-        "Fe2O3": 0.0,
-        "FeO": 16.98,
-        "K2O": 0.1,
-        "MgO": 9.26,
-        "MnO": 0.21,
-        "Na2O": 0.41,
-        "NiO": 0.0,
-        "P2O5": 0.1,
-        "SiO2": 45.81,
-        "TiO2": 1.54
-      },
-      "condensation": {},
-      "drain_tap_kg": {},
-      "energy_electrical_plus_evaporation_cumulative_kWh": 0.0,
-      "energy_electrical_plus_evaporation_kWh": 0.0,
-      "energy_scope": "electrical_plus_known_evaporation_enthalpy",
-      "evap_species": {},
-      "evap_total_kg_hr": 0.0,
-      "furnace_heat_status": "partial",
-      "hour": 2,
-      "mass_balance_error_pct": 0.0,
-      "melt_mass_kg": 1000.0,
-      "melt_offgas_O2_mol_hr": 0.0,
-      "melt_offgas_O2_stored_kg": 0.0,
-      "melt_offgas_O2_vented_kg": 0.0,
-      "mre_anode_O2_mol_hr": 0.0,
-      "mre_anode_O2_stored_kg": 0.0,
       "mre_current_A": 0.0,
-      "mre_energy_kWh": 0.0,
-      "mre_metals_kg_hr": {},
       "mre_voltage_V": 0.0,
-      "nominal_ramp_rate": 50.0,
-      "oxygen_kg": 0.0,
-      "pO2_mbar": 9.0,
-      "p_total_mbar": 9.0,
-      "pressure_mbar": 0.0,
-      "process_buckets_kg": {
-        "gas_volatiles": {},
-        "metal_alloy": {},
-        "salt_phase": {},
-        "sulfide_matte": {},
-        "terminal_slag": {}
+      "pO2_bar": 0.0,
+      "redox_source_breakdown": {
+        "applied_terms_mol_o2_equiv_by_label": {},
+        "delta_ln_fO2": 0.0,
+        "delta_log10_fO2": 0.0,
+        "fe_redox_respeciation": {
+          "direction": "none",
+          "ferric_divergence_after": {
+            "attribution": "sub_liquid_respeciation_deferred",
+            "delta_abs": 0.9999999999999403,
+            "delta_signed": 0.9999999999999403,
+            "implied_ferric_fraction": 0.9999999999999403,
+            "ledger_ferric_fraction": 0.0,
+            "reason": "sub_liquid_respeciation_deferred",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "status": "warning",
+            "warning": true,
+            "warning_threshold_abs": 0.05,
+            "warning_threshold_ferric_fraction_abs": 0.05
+          },
+          "internal_o2_capacity_mol": 0.0,
+          "oxygen_source": "overhead_gas",
+          "reason": "fe_redox_respeciation_not_liquid",
+          "residual_attribution": "sub_liquid_respeciation_deferred",
+          "respeciation_status": "skipped_solid",
+          "status": "ok"
+        },
+        "fe_redox_respeciation_attempts": [
+          {
+            "direction": "none",
+            "ferric_divergence_after": {
+              "attribution": "sub_liquid_respeciation_deferred",
+              "delta_abs": 0.9999999999999403,
+              "delta_signed": 0.9999999999999403,
+              "implied_ferric_fraction": 0.9999999999999403,
+              "ledger_ferric_fraction": 0.0,
+              "reason": "sub_liquid_respeciation_deferred",
+              "sampling_context": "current_ledger_vs_current_reservoir",
+              "status": "warning",
+              "warning": true,
+              "warning_threshold_abs": 0.05,
+              "warning_threshold_ferric_fraction_abs": 0.05
+            },
+            "internal_o2_capacity_mol": 0.0,
+            "oxygen_source": "overhead_gas",
+            "reason": "fe_redox_respeciation_not_liquid",
+            "residual_attribution": "sub_liquid_respeciation_deferred",
+            "respeciation_status": "skipped_solid",
+            "status": "ok"
+          },
+          {
+            "direction": "none",
+            "ferric_divergence_after": {
+              "attribution": "sub_liquid_respeciation_deferred",
+              "delta_abs": 0.9999999999999403,
+              "delta_signed": 0.9999999999999403,
+              "implied_ferric_fraction": 0.9999999999999403,
+              "ledger_ferric_fraction": 0.0,
+              "reason": "sub_liquid_respeciation_deferred",
+              "sampling_context": "current_ledger_vs_current_reservoir",
+              "status": "warning",
+              "warning": true,
+              "warning_threshold_abs": 0.05,
+              "warning_threshold_ferric_fraction_abs": 0.05
+            },
+            "internal_o2_capacity_mol": 0.0,
+            "oxygen_source": "overhead_gas",
+            "reason": "fe_redox_respeciation_not_liquid",
+            "residual_attribution": "sub_liquid_respeciation_deferred",
+            "respeciation_status": "skipped_solid",
+            "status": "ok"
+          }
+        ],
+        "ferric_divergence": {
+          "attribution": "sub_liquid_respeciation_deferred",
+          "delta_abs": 0.9999999999999403,
+          "delta_signed": 0.9999999999999403,
+          "implied_ferric_fraction": 0.9999999999999403,
+          "ledger_ferric_fraction": 0.0,
+          "reason": "sub_liquid_respeciation_deferred",
+          "sampling_context": "current_ledger_vs_current_reservoir",
+          "status": "warning",
+          "warning": true,
+          "warning_threshold_abs": 0.05,
+          "warning_threshold_ferric_fraction_abs": 0.05
+        },
+        "net_mol_o2_equiv": 0,
+        "redox_source_refusal_context": {},
+        "redox_source_skip_reason": "",
+        "redox_source_terms_applied": false,
+        "skipped_reasons_by_label": {},
+        "skipped_terms_mol_o2_equiv_by_label": {},
+        "source_campaign": "C0",
+        "source_campaign_hour": 1,
+        "source_context": {
+          "campaign": "C0",
+          "campaign_hour": 1,
+          "hour": 1
+        },
+        "source_hour": 1,
+        "terms_mol_o2_equiv_by_label": {}
       },
-      "ramp_throttled": false,
-      "raw_inventory_kg": {
-        "Al2O3": 138.96,
-        "CaO": 113.227,
-        "Cr2O3": 3.603,
-        "FeO": 169.84,
-        "K2O": 1.029,
-        "MgO": 92.64,
-        "MnO": 2.059,
-        "Na2O": 4.117,
-        "P2O5": 1.029,
-        "SiO2": 458.055,
-        "TiO2": 15.44
-      },
-      "residual_inventory_kg": {},
+      "regime": "",
       "shuttle_K_inventory_kg": 0.0,
       "shuttle_Na_inventory_kg": 0.0,
       "shuttle_cycle": 0,
@@ -230,34 +1484,88 @@
       "shuttle_metal_produced_kg_hr": 0.0,
       "shuttle_phase": "",
       "shuttle_reduced_kg_hr": 0.0,
-      "stage0_O2_stored_kg": 0.0,
-      "stage0_mass_balance_delta_kg": 0.0,
-      "stage0_products_kg": {},
-      "stage0_profile": "bulk_preservation",
-      "stage0_temp_range_C": [
-        20.0,
-        950.0
-      ],
-      "temperature_C": 125.0,
-      "throttle_reason": "",
-      "transport_saturation_pct": 0.0,
-      "turbine_limited": false,
-      "turbine_shaft_power_kW": 0.0,
-      "turbine_utilization_pct": 0.0
-    }
-  },
-  {
-    "event": "per_hour_summary",
-    "payload": {
-      "O2_yield_kg_cumulative": 0.0,
-      "P_total_bar": 0.0,
-      "T_C": 125.0,
-      "campaign": "C0B",
-      "condensation_train_kg": {},
-      "hour": 2,
-      "mass_balance_pct": 1.1368683772161604e-14,
-      "metal_yields_kg": {},
-      "pO2_bar": 0.009000000000000001
+      "stage_3_capture": {
+        "Fe_kg": 0.0,
+        "Fe_wt_pct": 0.0,
+        "total_kg": 0.0
+      },
+      "transport_formula_id": "not_applicable_until_p0",
+      "vapor_species_kg_hr": {},
+      "vapour_batch_flux_overlay": {
+        "batch_channel_states": {
+          "Al": "dormant_by_epoch",
+          "Ca": "dormant_by_epoch",
+          "Cr": "dormant_by_epoch",
+          "Cr2O3_gas": "refusal",
+          "CrO2": "refusal",
+          "Fe": "dormant_by_epoch",
+          "K": "dormant_by_epoch",
+          "Mg": "dormant_by_epoch",
+          "Mn": "dormant_by_epoch",
+          "MnO_gas": "refusal",
+          "Na": "dormant_by_epoch",
+          "P2O5_gas": "refusal",
+          "Si": "dormant_by_epoch",
+          "SiO": "dormant_by_epoch",
+          "Ti": "dormant_by_epoch"
+        },
+        "batch_flux_active_not_in_live": [],
+        "batch_pa_by_species": {
+          "Al": 3.1339798911471327e-25,
+          "Ca": 7.801093977385432e-07,
+          "Cr": 8.42234713277652e-11,
+          "Fe": 2.0395058840129344e-07,
+          "K": 1.7730851508853623e-10,
+          "Mg": 2.8834688868426222e-09,
+          "Mn": 1.821062571978787e-10,
+          "Na": 0.003173024738485665,
+          "Si": 3.869841019193202e-17,
+          "SiO": 9.50458814197612e-41,
+          "Ti": 9.673057722580709e-16
+        },
+        "batch_present": true,
+        "batch_refused_live_species": [],
+        "catalog_pa_shadow_equal": false,
+        "catalog_pa_shadow_outcome": "absent_comparison",
+        "detail": "independent compatibility comparison evidence is absent",
+        "dropped_nonfinite_live_species": [],
+        "effective_pressure_source": "equilibrium_backend_effective_pressure_pre_rg",
+        "effective_pressure_species_not_batch_active": [],
+        "effective_pressure_zero_reason": "pre_rg_backend_below_effective_pressure_threshold",
+        "live_flux_active_not_in_batch": [],
+        "live_only_bridge_species": [],
+        "mismatched_species": [],
+        "missing_batch_keys": [],
+        "missing_effective_pressure_species": [],
+        "missing_in_batch_path": [],
+        "missing_in_legacy_path": [],
+        "n_flux_pressures": 0,
+        "n_live_pressures": 0,
+        "note": "VapourBatch owns channel refusal, eligibility, and the active set; effective values cross one typed source seam before RG-1.",
+        "schema": "vapour_batch_flux_overlay.v1",
+        "selected_runtime_pa_by_species": {},
+        "selection_source": "equilibrium_backend_effective_pressure_pre_rg",
+        "shadow_equal": false,
+        "shadow_outcome": "absent_comparison"
+      },
+      "vapour_batch_summary": {
+        "metadata": {
+          "flux_activation_epoch": "pre_rg_legacy_live",
+          "n_flux_active": 0,
+          "n_flux_dormant_by_epoch": 11,
+          "n_refused": 4,
+          "n_requested": 15,
+          "n_solve_bundles": 0,
+          "refusal_closure_fixed_point": true,
+          "refusal_closure_iterations": 2
+        },
+        "n_flux_active": 0,
+        "n_refused": 4,
+        "n_requested": 15,
+        "solve_bundle_ids": {}
+      },
+      "wall_deposit_cumulative_kg": {},
+      "wall_deposit_delta_kg": {}
     }
   },
   {
@@ -271,6 +1579,19 @@
       "energy_scope": "electrical_plus_known_evaporation_enthalpy",
       "furnace_heat_status": "partial",
       "mass_lost_kg": 0.0,
+      "rump_expectation": {
+        "actual_rump_elements_kg": {
+          "Al": 138.96037056098817,
+          "Ca": 113.22696860524962,
+          "Mg": 92.64024704065878,
+          "Si": 458.0545548121462,
+          "Ti": 15.440041173443129
+        },
+        "campaign": "C0",
+        "expected_unconsumed_rump_elements": [],
+        "missing_expected_rump_elements": [],
+        "targeted_rump_elements": []
+      },
       "species_extracted": {},
       "start_mass_kg": 1000.0
     }
@@ -286,9 +1607,12 @@
       "ambient_atmosphere": "",
       "ambient_pressure_mbar": 0.0,
       "atmosphere": "CONTROLLED_O2_FLOW",
+      "backend_authoritative": false,
       "backend_error": "",
       "backend_fallback_active": false,
       "backend_message": "Using built-in fallback",
+      "backend_status": "ok",
+      "backend_status_reason": "",
       "campaign": "C0B",
       "carbon_reductant_required_kg": 0.0,
       "cleaned_melt_source": "composition_wt_pct",
@@ -309,15 +1633,48 @@
         "TiO2": 1.54
       },
       "condensation": {},
+      "condensation_refusals_panel": {
+        "by_species": {},
+        "diagnostic_only": true,
+        "has_refusals": false,
+        "message": "Per-species condensation refusals / efficiency pass-through outcomes (VR-11 B2/B3).",
+        "n_species": 0,
+        "status": "empty"
+      },
       "drain_tap_kg": {},
+      "energy_cumulative_breakdown_kWh": {
+        "dissociation": 0.0,
+        "electrical": 0.0,
+        "electrical_plus_evaporation": 0.0,
+        "evaporation_thermal": 0.0,
+        "latent": 0.0
+      },
+      "energy_dissociation_kWh": 0,
+      "energy_electrical_kWh": 0.0,
       "energy_electrical_plus_evaporation_cumulative_kWh": 0.0,
       "energy_electrical_plus_evaporation_kWh": 0.0,
+      "energy_evaporation_breakdown_kWh": {
+        "evaporation_enthalpy_sink": 0,
+        "net_unallocated": 0.0,
+        "product_vapor_enthalpy_sink": 0,
+        "reaction_disproportionation_enthalpy_sink": 0
+      },
+      "energy_evaporation_thermal_kWh": 0,
+      "energy_latent_kWh": 0,
       "energy_scope": "electrical_plus_known_evaporation_enthalpy",
       "evap_species": {},
       "evap_total_kg_hr": 0.0,
+      "flue_composition": {},
+      "flue_composition_note": "No gas-offtake species flow reported for this tick; partial pressures are surfaced separately when available.",
+      "flue_composition_units": "kg/hr",
+      "flue_partial_pressure_mbar": {
+        "O2": 9.0
+      },
       "furnace_heat_status": "partial",
-      "hour": 3,
-      "mass_balance_error_pct": 0.0,
+      "hour": 2,
+      "mass_balance_error_breached": false,
+      "mass_balance_error_category": null,
+      "mass_balance_error_pct": 1.1368683772161604e-14,
       "melt_mass_kg": 1000.0,
       "melt_offgas_O2_mol_hr": 0.0,
       "melt_offgas_O2_stored_kg": 0.0,
@@ -329,11 +1686,56 @@
       "mre_metals_kg_hr": {},
       "mre_voltage_V": 0.0,
       "nominal_ramp_rate": 30.0,
+      "overlap_evaporation": {
+        "campaign": "C0B",
+        "campaign_hour": 0,
+        "completion_target_species": [
+          "PO",
+          "POx"
+        ],
+        "endpoint_species_monitored": [],
+        "off_target_evaporation": {},
+        "off_target_total_kg_hr": 0,
+        "temperature_C": 105.0
+      },
       "oxygen_kg": 0.0,
       "pO2_mbar": 9.0,
       "p_total_mbar": 9.0,
+      "pot_composition": {
+        "Al2O3": 138.9604,
+        "CaO": 113.227,
+        "Cr2O3": 3.6027,
+        "FeO": 169.8405,
+        "K2O": 1.0293,
+        "MgO": 92.6402,
+        "MnO": 2.0587,
+        "Na2O": 4.1173,
+        "P2O5": 1.0293,
+        "SiO2": 458.0546,
+        "TiO2": 15.44
+      },
+      "pot_composition_units": "kg",
+      "pot_composition_wt_pct": {
+        "Al2O3": 13.9,
+        "CaO": 11.32,
+        "Cr2O3": 0.36,
+        "FeO": 16.98,
+        "K2O": 0.1,
+        "MgO": 9.26,
+        "MnO": 0.21,
+        "Na2O": 0.41,
+        "P2O5": 0.1,
+        "SiO2": 45.81,
+        "TiO2": 1.54
+      },
       "pressure_mbar": 9.0,
+      "process_bucket_metadata": {
+        "chloride_salt_phase": {
+          "disposition": "separated_chloride_salt_fouling_risk"
+        }
+      },
       "process_buckets_kg": {
+        "chloride_salt_phase": {},
         "gas_volatiles": {},
         "metal_alloy": {},
         "salt_phase": {},
@@ -370,26 +1772,1363 @@
         20.0,
         950.0
       ],
-      "temperature_C": 155.0,
+      "stage_purity_report": {
+        "stage_0": {
+          "accepted_species": [],
+          "coproduct_species_kg": {},
+          "designated_kg": 0,
+          "designated_species_kg": {},
+          "impurity_kg": 0,
+          "impurity_species_kg": {},
+          "label": "Hot Duct (IR)",
+          "purity_fraction": 1.0,
+          "stage_number": 0,
+          "total_kg": 0,
+          "verdict": "PURE",
+          "warning": ""
+        },
+        "stage_1_fe_condenser": {
+          "accepted_species": [
+            "Fe"
+          ],
+          "coproduct_species_kg": {},
+          "designated_kg": 0,
+          "designated_species_kg": {},
+          "impurity_kg": 0,
+          "impurity_species_kg": {},
+          "label": "Fe Condenser",
+          "purity_fraction": 1.0,
+          "stage_number": 1,
+          "total_kg": 0,
+          "verdict": "PURE",
+          "warning": ""
+        },
+        "stage_2_cr_oxide_harvest": {
+          "accepted_species": [
+            "Cr",
+            "Cr2O3",
+            "CrO2",
+            "Mn"
+          ],
+          "coproduct_species_kg": {},
+          "designated_kg": 0,
+          "designated_species_kg": {},
+          "impurity_kg": 0,
+          "impurity_species_kg": {},
+          "label": "Cr Oxide Harvester",
+          "purity_fraction": 1.0,
+          "stage_number": 2,
+          "total_kg": 0,
+          "verdict": "PURE",
+          "warning": ""
+        },
+        "stage_3_sio_zone": {
+          "accepted_species": [
+            "Si",
+            "SiO",
+            "SiO2"
+          ],
+          "coproduct_species_kg": {},
+          "designated_kg": 0,
+          "designated_species_kg": {},
+          "impurity_kg": 0,
+          "impurity_species_kg": {},
+          "label": "SiO Zone",
+          "purity_fraction": 1.0,
+          "stage_number": 3,
+          "total_kg": 0,
+          "verdict": "PURE",
+          "warning": ""
+        },
+        "stage_4_alkali_mg_cyclone": {
+          "accepted_species": [
+            "K",
+            "Mg",
+            "Na"
+          ],
+          "coproduct_species_kg": {},
+          "designated_kg": 0,
+          "designated_species_kg": {},
+          "impurity_kg": 0,
+          "impurity_species_kg": {},
+          "label": "Alkali/Mg Cyclone",
+          "purity_fraction": 1.0,
+          "stage_number": 4,
+          "total_kg": 0,
+          "verdict": "PURE",
+          "warning": ""
+        },
+        "stage_5": {
+          "accepted_species": [],
+          "coproduct_species_kg": {},
+          "designated_kg": 0,
+          "designated_species_kg": {},
+          "impurity_kg": 0,
+          "impurity_species_kg": {},
+          "label": "Vortex Dust Filter",
+          "purity_fraction": 1.0,
+          "stage_number": 5,
+          "total_kg": 0,
+          "verdict": "PURE",
+          "warning": ""
+        },
+        "stage_6": {
+          "accepted_species": [],
+          "coproduct_species_kg": {},
+          "designated_kg": 0,
+          "designated_species_kg": {},
+          "impurity_kg": 0,
+          "impurity_species_kg": {},
+          "label": "Turbine-Compressor",
+          "purity_fraction": 1.0,
+          "stage_number": 6,
+          "total_kg": 0,
+          "verdict": "PURE",
+          "warning": ""
+        },
+        "stage_7": {
+          "accepted_species": [],
+          "coproduct_species_kg": {},
+          "designated_kg": 0,
+          "designated_species_kg": {},
+          "impurity_kg": 0,
+          "impurity_species_kg": {},
+          "label": "Turbine Outlet Monitor",
+          "purity_fraction": 1.0,
+          "stage_number": 7,
+          "total_kg": 0,
+          "verdict": "PURE",
+          "warning": ""
+        }
+      },
+      "temperature_C": 105.0,
       "throttle_reason": "",
       "transport_saturation_pct": 0.0,
       "turbine_limited": false,
       "turbine_shaft_power_kW": 0.0,
-      "turbine_utilization_pct": 0.0
+      "turbine_utilization_pct": 0.0,
+      "vapor_pressure_authority_panel": {
+        "diagnostic_only": true,
+        "message": "n/a",
+        "status": "n/a"
+      },
+      "vapour_rail_instrumentation_panel": {
+        "channels_by_species": {
+          "Al": {
+            "acquisition_flag": "vapour_pressure_out_of_range:Al",
+            "activity_bound": null,
+            "certification_ceiling": "never",
+            "extra": {
+              "acquisition_flag": "vapour_pressure_out_of_range:Al",
+              "origin": "catalog",
+              "out_of_range": true,
+              "status": "out_of_range_conservative_continuation"
+            },
+            "flux": {
+              "alpha_ref": "alpha:Al",
+              "kind": "eligible",
+              "reaction_id": null
+            },
+            "formula_id": "Al",
+            "is_flux_active": false,
+            "is_flux_dormant_by_epoch": true,
+            "is_refused": false,
+            "is_union_flux_eligible": true,
+            "out_of_range": true,
+            "pressure": {
+              "kind": "value",
+              "pa": 2.467802229811685e-24
+            },
+            "refusal_code": null,
+            "selected_runtime_pressure": {
+              "kind": "value",
+              "pa": 2.467802229811685e-24
+            },
+            "solve_group_id": "metals_al_family",
+            "source_account": "process.cleaned_melt",
+            "source_boundary": null,
+            "source_label": "catalog",
+            "species_id": "Al",
+            "state_fingerprint": "state:T=378.15|phase=hot_train|stage=evaporation|fO2=na|P=900",
+            "validation_anchor_refs": [],
+            "validation_status": "pending_validation",
+            "verdict_status": "status_bearing_non_authoritative"
+          },
+          "Ca": {
+            "acquisition_flag": "vapour_pressure_out_of_range:Ca",
+            "activity_bound": null,
+            "certification_ceiling": "never",
+            "extra": {
+              "acquisition_flag": "vapour_pressure_out_of_range:Ca",
+              "origin": "catalog",
+              "out_of_range": true,
+              "status": "out_of_range_conservative_continuation"
+            },
+            "flux": {
+              "alpha_ref": "alpha:Ca",
+              "kind": "eligible",
+              "reaction_id": null
+            },
+            "formula_id": "Ca",
+            "is_flux_active": false,
+            "is_flux_dormant_by_epoch": true,
+            "is_refused": false,
+            "is_union_flux_eligible": true,
+            "out_of_range": true,
+            "pressure": {
+              "kind": "value",
+              "pa": 1.7247388070137042e-06
+            },
+            "refusal_code": null,
+            "selected_runtime_pressure": {
+              "kind": "value",
+              "pa": 1.7247388070137042e-06
+            },
+            "solve_group_id": "metals_ca_family",
+            "source_account": "process.cleaned_melt",
+            "source_boundary": null,
+            "source_label": "catalog",
+            "species_id": "Ca",
+            "state_fingerprint": "state:T=378.15|phase=hot_train|stage=evaporation|fO2=na|P=900",
+            "validation_anchor_refs": [],
+            "validation_status": "pending_validation",
+            "verdict_status": "status_bearing_non_authoritative"
+          },
+          "Cr": {
+            "acquisition_flag": "vapour_pressure_out_of_range:Cr",
+            "activity_bound": null,
+            "certification_ceiling": "never",
+            "extra": {
+              "acquisition_flag": "vapour_pressure_out_of_range:Cr",
+              "origin": "catalog",
+              "out_of_range": true,
+              "status": "out_of_range_conservative_continuation"
+            },
+            "flux": {
+              "alpha_ref": "alpha:Cr",
+              "kind": "eligible",
+              "reaction_id": null
+            },
+            "formula_id": "Cr",
+            "is_flux_active": false,
+            "is_flux_dormant_by_epoch": true,
+            "is_refused": false,
+            "is_union_flux_eligible": true,
+            "out_of_range": true,
+            "pressure": {
+              "kind": "value",
+              "pa": 1.3234774734804468e-10
+            },
+            "refusal_code": null,
+            "selected_runtime_pressure": {
+              "kind": "value",
+              "pa": 1.3234774734804468e-10
+            },
+            "solve_group_id": "metals_cr_family",
+            "source_account": "process.cleaned_melt",
+            "source_boundary": null,
+            "source_label": "catalog",
+            "species_id": "Cr",
+            "state_fingerprint": "state:T=378.15|phase=hot_train|stage=evaporation|fO2=na|P=900",
+            "validation_anchor_refs": [],
+            "validation_status": "pending_validation",
+            "verdict_status": "status_bearing_non_authoritative"
+          },
+          "Cr2O3_gas": {
+            "acquisition_flag": null,
+            "activity_bound": null,
+            "certification_ceiling": "never",
+            "extra": {
+              "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route",
+              "origin": "u0_v"
+            },
+            "flux": {
+              "code": "missing_channel_contract",
+              "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route",
+              "kind": "refusal"
+            },
+            "formula_id": "Cr2O3",
+            "is_flux_active": false,
+            "is_flux_dormant_by_epoch": false,
+            "is_refused": true,
+            "is_union_flux_eligible": false,
+            "out_of_range": false,
+            "pressure": {
+              "code": "missing_channel_contract",
+              "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route",
+              "kind": "refusal"
+            },
+            "refusal_code": "missing_channel_contract",
+            "selected_runtime_pressure": {
+              "code": "missing_channel_contract",
+              "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route",
+              "kind": "refusal"
+            },
+            "solve_group_id": "u0_v:Cr2O3_gas",
+            "source_account": "process.cleaned_melt",
+            "source_boundary": null,
+            "source_label": "refusal_closure",
+            "species_id": "Cr2O3_gas",
+            "state_fingerprint": "state:T=378.15|phase=hot_train|stage=evaporation|fO2=na|P=900",
+            "validation_anchor_refs": [],
+            "validation_status": "pending_validation",
+            "verdict_status": "status_bearing_non_authoritative"
+          },
+          "CrO2": {
+            "acquisition_flag": null,
+            "activity_bound": null,
+            "certification_ceiling": "never",
+            "extra": {
+              "detail": "channel contract incomplete: missing alpha",
+              "origin": "catalog"
+            },
+            "flux": {
+              "code": "missing_channel_contract",
+              "detail": "channel contract incomplete: missing alpha",
+              "kind": "refusal"
+            },
+            "formula_id": "CrO2",
+            "is_flux_active": false,
+            "is_flux_dormant_by_epoch": false,
+            "is_refused": true,
+            "is_union_flux_eligible": false,
+            "out_of_range": false,
+            "pressure": {
+              "code": "missing_channel_contract",
+              "detail": "channel contract incomplete: missing alpha",
+              "kind": "refusal"
+            },
+            "refusal_code": "missing_channel_contract",
+            "selected_runtime_pressure": {
+              "code": "missing_channel_contract",
+              "detail": "channel contract incomplete: missing alpha",
+              "kind": "refusal"
+            },
+            "solve_group_id": "oxide_vapors_cro2_family",
+            "source_account": "process.cleaned_melt",
+            "source_boundary": null,
+            "source_label": "refusal_closure",
+            "species_id": "CrO2",
+            "state_fingerprint": "state:T=378.15|phase=hot_train|stage=evaporation|fO2=na|P=900",
+            "validation_anchor_refs": [],
+            "validation_status": "pending_validation",
+            "verdict_status": "status_bearing_non_authoritative"
+          },
+          "Fe": {
+            "acquisition_flag": "vapour_pressure_out_of_range:Fe",
+            "activity_bound": null,
+            "certification_ceiling": "never",
+            "extra": {
+              "acquisition_flag": "vapour_pressure_out_of_range:Fe",
+              "origin": "catalog",
+              "out_of_range": true,
+              "status": "out_of_range_conservative_continuation"
+            },
+            "flux": {
+              "alpha_ref": "alpha:Fe",
+              "kind": "eligible",
+              "reaction_id": null
+            },
+            "formula_id": "Fe",
+            "is_flux_active": false,
+            "is_flux_dormant_by_epoch": true,
+            "is_refused": false,
+            "is_union_flux_eligible": true,
+            "out_of_range": true,
+            "pressure": {
+              "kind": "value",
+              "pa": 3.102048677387235e-07
+            },
+            "refusal_code": null,
+            "selected_runtime_pressure": {
+              "kind": "value",
+              "pa": 3.102048677387235e-07
+            },
+            "solve_group_id": "metals_fe_family",
+            "source_account": "process.cleaned_melt",
+            "source_boundary": null,
+            "source_label": "catalog",
+            "species_id": "Fe",
+            "state_fingerprint": "state:T=378.15|phase=hot_train|stage=evaporation|fO2=na|P=900",
+            "validation_anchor_refs": [],
+            "validation_status": "pending_validation",
+            "verdict_status": "status_bearing_non_authoritative"
+          },
+          "K": {
+            "acquisition_flag": "vapour_pressure_out_of_range:K",
+            "activity_bound": null,
+            "certification_ceiling": "never",
+            "extra": {
+              "acquisition_flag": "vapour_pressure_out_of_range:K",
+              "origin": "catalog",
+              "out_of_range": true,
+              "status": "out_of_range_conservative_continuation"
+            },
+            "flux": {
+              "alpha_ref": "alpha:K",
+              "kind": "eligible",
+              "reaction_id": "liquid_ko0_5_to_k_gas"
+            },
+            "formula_id": "K",
+            "is_flux_active": false,
+            "is_flux_dormant_by_epoch": true,
+            "is_refused": false,
+            "is_union_flux_eligible": true,
+            "out_of_range": true,
+            "pressure": {
+              "kind": "value",
+              "pa": 4.3914574268264994e-10
+            },
+            "refusal_code": null,
+            "selected_runtime_pressure": {
+              "kind": "value",
+              "pa": 4.3914574268264994e-10
+            },
+            "solve_group_id": "metals_k_family",
+            "source_account": "process.cleaned_melt",
+            "source_boundary": null,
+            "source_label": "catalog",
+            "species_id": "K",
+            "state_fingerprint": "state:T=378.15|phase=hot_train|stage=evaporation|fO2=na|P=900",
+            "validation_anchor_refs": [],
+            "validation_status": "pending_validation",
+            "verdict_status": "status_bearing_non_authoritative"
+          },
+          "Mg": {
+            "acquisition_flag": "vapour_pressure_out_of_range:Mg",
+            "activity_bound": null,
+            "certification_ceiling": "never",
+            "extra": {
+              "acquisition_flag": "vapour_pressure_out_of_range:Mg",
+              "origin": "catalog",
+              "out_of_range": true,
+              "status": "out_of_range_conservative_continuation"
+            },
+            "flux": {
+              "alpha_ref": "alpha:Mg",
+              "kind": "eligible",
+              "reaction_id": null
+            },
+            "formula_id": "Mg",
+            "is_flux_active": false,
+            "is_flux_dormant_by_epoch": true,
+            "is_refused": false,
+            "is_union_flux_eligible": true,
+            "out_of_range": true,
+            "pressure": {
+              "kind": "value",
+              "pa": 1.5306208792920037e-08
+            },
+            "refusal_code": null,
+            "selected_runtime_pressure": {
+              "kind": "value",
+              "pa": 1.5306208792920037e-08
+            },
+            "solve_group_id": "metals_mg_family",
+            "source_account": "process.cleaned_melt",
+            "source_boundary": null,
+            "source_label": "catalog",
+            "species_id": "Mg",
+            "state_fingerprint": "state:T=378.15|phase=hot_train|stage=evaporation|fO2=na|P=900",
+            "validation_anchor_refs": [],
+            "validation_status": "pending_validation",
+            "verdict_status": "status_bearing_non_authoritative"
+          },
+          "Mn": {
+            "acquisition_flag": "vapour_pressure_out_of_range:Mn",
+            "activity_bound": null,
+            "certification_ceiling": "never",
+            "extra": {
+              "acquisition_flag": "vapour_pressure_out_of_range:Mn",
+              "origin": "catalog",
+              "out_of_range": true,
+              "status": "out_of_range_conservative_continuation"
+            },
+            "flux": {
+              "alpha_ref": "alpha:Mn",
+              "kind": "eligible",
+              "reaction_id": null
+            },
+            "formula_id": "Mn",
+            "is_flux_active": false,
+            "is_flux_dormant_by_epoch": true,
+            "is_refused": false,
+            "is_union_flux_eligible": true,
+            "out_of_range": true,
+            "pressure": {
+              "kind": "value",
+              "pa": 3.5300488609557024e-10
+            },
+            "refusal_code": null,
+            "selected_runtime_pressure": {
+              "kind": "value",
+              "pa": 3.5300488609557024e-10
+            },
+            "solve_group_id": "metals_mn_family",
+            "source_account": "process.cleaned_melt",
+            "source_boundary": null,
+            "source_label": "catalog",
+            "species_id": "Mn",
+            "state_fingerprint": "state:T=378.15|phase=hot_train|stage=evaporation|fO2=na|P=900",
+            "validation_anchor_refs": [],
+            "validation_status": "pending_validation",
+            "verdict_status": "status_bearing_non_authoritative"
+          },
+          "MnO_gas": {
+            "acquisition_flag": null,
+            "activity_bound": null,
+            "certification_ceiling": "never",
+            "extra": {
+              "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route",
+              "origin": "u0_v"
+            },
+            "flux": {
+              "code": "missing_channel_contract",
+              "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route",
+              "kind": "refusal"
+            },
+            "formula_id": "MnO",
+            "is_flux_active": false,
+            "is_flux_dormant_by_epoch": false,
+            "is_refused": true,
+            "is_union_flux_eligible": false,
+            "out_of_range": false,
+            "pressure": {
+              "code": "missing_channel_contract",
+              "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route",
+              "kind": "refusal"
+            },
+            "refusal_code": "missing_channel_contract",
+            "selected_runtime_pressure": {
+              "code": "missing_channel_contract",
+              "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route",
+              "kind": "refusal"
+            },
+            "solve_group_id": "u0_v:MnO_gas",
+            "source_account": "process.cleaned_melt",
+            "source_boundary": null,
+            "source_label": "refusal_closure",
+            "species_id": "MnO_gas",
+            "state_fingerprint": "state:T=378.15|phase=hot_train|stage=evaporation|fO2=na|P=900",
+            "validation_anchor_refs": [],
+            "validation_status": "pending_validation",
+            "verdict_status": "status_bearing_non_authoritative"
+          },
+          "Na": {
+            "acquisition_flag": "vapour_pressure_out_of_range:Na",
+            "activity_bound": null,
+            "certification_ceiling": "never",
+            "extra": {
+              "acquisition_flag": "vapour_pressure_out_of_range:Na",
+              "origin": "catalog",
+              "out_of_range": true,
+              "status": "out_of_range_conservative_continuation"
+            },
+            "flux": {
+              "alpha_ref": "alpha:Na",
+              "kind": "eligible",
+              "reaction_id": null
+            },
+            "formula_id": "Na",
+            "is_flux_active": false,
+            "is_flux_dormant_by_epoch": true,
+            "is_refused": false,
+            "is_union_flux_eligible": true,
+            "out_of_range": true,
+            "pressure": {
+              "kind": "value",
+              "pa": 0.003876187100488788
+            },
+            "refusal_code": null,
+            "selected_runtime_pressure": {
+              "kind": "value",
+              "pa": 0.003876187100488788
+            },
+            "solve_group_id": "metals_na_family",
+            "source_account": "process.cleaned_melt",
+            "source_boundary": null,
+            "source_label": "catalog",
+            "species_id": "Na",
+            "state_fingerprint": "state:T=378.15|phase=hot_train|stage=evaporation|fO2=na|P=900",
+            "validation_anchor_refs": [],
+            "validation_status": "pending_validation",
+            "verdict_status": "status_bearing_non_authoritative"
+          },
+          "P2O5_gas": {
+            "acquisition_flag": null,
+            "activity_bound": null,
+            "certification_ceiling": "never",
+            "extra": {
+              "detail": "declared applicability predicate 'not_applicable' is inactive",
+              "origin": "catalog"
+            },
+            "flux": {
+              "code": "inapplicable_by_declared_predicate",
+              "detail": "declared applicability predicate 'not_applicable' is inactive",
+              "kind": "refusal"
+            },
+            "formula_id": "P2O5_gas",
+            "is_flux_active": false,
+            "is_flux_dormant_by_epoch": false,
+            "is_refused": true,
+            "is_union_flux_eligible": false,
+            "out_of_range": false,
+            "pressure": {
+              "code": "inapplicable_by_declared_predicate",
+              "detail": "declared applicability predicate 'not_applicable' is inactive",
+              "kind": "refusal"
+            },
+            "refusal_code": "inapplicable_by_declared_predicate",
+            "selected_runtime_pressure": {
+              "code": "inapplicable_by_declared_predicate",
+              "detail": "declared applicability predicate 'not_applicable' is inactive",
+              "kind": "refusal"
+            },
+            "solve_group_id": "phosphorus_P2O5_gas_family",
+            "source_account": "process.cleaned_melt",
+            "source_boundary": null,
+            "source_label": "refusal_closure",
+            "species_id": "P2O5_gas",
+            "state_fingerprint": "state:T=378.15|phase=hot_train|stage=evaporation|fO2=na|P=900",
+            "validation_anchor_refs": [],
+            "validation_status": "pending_validation",
+            "verdict_status": "status_bearing_non_authoritative"
+          },
+          "Si": {
+            "acquisition_flag": "vapour_pressure_out_of_range:Si",
+            "activity_bound": null,
+            "certification_ceiling": "never",
+            "extra": {
+              "acquisition_flag": "vapour_pressure_out_of_range:Si",
+              "origin": "catalog",
+              "out_of_range": true,
+              "status": "out_of_range_conservative_continuation"
+            },
+            "flux": {
+              "alpha_ref": "alpha:Si",
+              "kind": "eligible",
+              "reaction_id": null
+            },
+            "formula_id": "Si",
+            "is_flux_active": false,
+            "is_flux_dormant_by_epoch": true,
+            "is_refused": false,
+            "is_union_flux_eligible": true,
+            "out_of_range": true,
+            "pressure": {
+              "kind": "value",
+              "pa": 8.492454874453977e-17
+            },
+            "refusal_code": null,
+            "selected_runtime_pressure": {
+              "kind": "value",
+              "pa": 8.492454874453977e-17
+            },
+            "solve_group_id": "metals_si_family",
+            "source_account": "process.cleaned_melt",
+            "source_boundary": null,
+            "source_label": "catalog",
+            "species_id": "Si",
+            "state_fingerprint": "state:T=378.15|phase=hot_train|stage=evaporation|fO2=na|P=900",
+            "validation_anchor_refs": [],
+            "validation_status": "pending_validation",
+            "verdict_status": "status_bearing_non_authoritative"
+          },
+          "SiO": {
+            "acquisition_flag": "vapour_pressure_out_of_range:SiO",
+            "activity_bound": null,
+            "certification_ceiling": "never",
+            "extra": {
+              "acquisition_flag": "vapour_pressure_out_of_range:SiO",
+              "origin": "catalog",
+              "out_of_range": true,
+              "status": "out_of_range_conservative_continuation"
+            },
+            "flux": {
+              "alpha_ref": "alpha:SiO",
+              "kind": "eligible",
+              "reaction_id": "liquid_sio2_to_sio_gas"
+            },
+            "formula_id": "SiO",
+            "is_flux_active": false,
+            "is_flux_dormant_by_epoch": true,
+            "is_refused": false,
+            "is_union_flux_eligible": true,
+            "out_of_range": true,
+            "pressure": {
+              "kind": "value",
+              "pa": 8.364519907706688e-40
+            },
+            "refusal_code": null,
+            "selected_runtime_pressure": {
+              "kind": "value",
+              "pa": 8.364519907706688e-40
+            },
+            "solve_group_id": "oxide_vapors_sio_family",
+            "source_account": "process.cleaned_melt",
+            "source_boundary": null,
+            "source_label": "catalog",
+            "species_id": "SiO",
+            "state_fingerprint": "state:T=378.15|phase=hot_train|stage=evaporation|fO2=na|P=900",
+            "validation_anchor_refs": [],
+            "validation_status": "pending_validation",
+            "verdict_status": "status_bearing_non_authoritative"
+          },
+          "Ti": {
+            "acquisition_flag": "vapour_pressure_out_of_range:Ti",
+            "activity_bound": null,
+            "certification_ceiling": "never",
+            "extra": {
+              "acquisition_flag": "vapour_pressure_out_of_range:Ti",
+              "origin": "catalog",
+              "out_of_range": true,
+              "status": "out_of_range_conservative_continuation"
+            },
+            "flux": {
+              "alpha_ref": "alpha:Ti",
+              "kind": "eligible",
+              "reaction_id": null
+            },
+            "formula_id": "Ti",
+            "is_flux_active": false,
+            "is_flux_dormant_by_epoch": true,
+            "is_refused": false,
+            "is_union_flux_eligible": true,
+            "out_of_range": true,
+            "pressure": {
+              "kind": "value",
+              "pa": 1.8308337082009277e-15
+            },
+            "refusal_code": null,
+            "selected_runtime_pressure": {
+              "kind": "value",
+              "pa": 1.8308337082009277e-15
+            },
+            "solve_group_id": "metals_ti_family",
+            "source_account": "process.cleaned_melt",
+            "source_boundary": null,
+            "source_label": "catalog",
+            "species_id": "Ti",
+            "state_fingerprint": "state:T=378.15|phase=hot_train|stage=evaporation|fO2=na|P=900",
+            "validation_anchor_refs": [],
+            "validation_status": "pending_validation",
+            "verdict_status": "status_bearing_non_authoritative"
+          }
+        },
+        "condensation_refusals": {
+          "by_species": {},
+          "has_refusals": false,
+          "n_species": 0,
+          "schema": "condensation_refusals.v1"
+        },
+        "diagnostic_only": true,
+        "flux_overlay": {
+          "batch_channel_states": {
+            "Al": "dormant_by_epoch",
+            "Ca": "dormant_by_epoch",
+            "Cr": "dormant_by_epoch",
+            "Cr2O3_gas": "refusal",
+            "CrO2": "refusal",
+            "Fe": "dormant_by_epoch",
+            "K": "dormant_by_epoch",
+            "Mg": "dormant_by_epoch",
+            "Mn": "dormant_by_epoch",
+            "MnO_gas": "refusal",
+            "Na": "dormant_by_epoch",
+            "P2O5_gas": "refusal",
+            "Si": "dormant_by_epoch",
+            "SiO": "dormant_by_epoch",
+            "Ti": "dormant_by_epoch"
+          },
+          "batch_flux_active_not_in_live": [],
+          "batch_pa_by_species": {
+            "Al": 2.467802229811685e-24,
+            "Ca": 1.7247388070137042e-06,
+            "Cr": 1.3234774734804468e-10,
+            "Fe": 3.102048677387235e-07,
+            "K": 4.3914574268264994e-10,
+            "Mg": 1.5306208792920037e-08,
+            "Mn": 3.5300488609557024e-10,
+            "Na": 0.003876187100488788,
+            "Si": 8.492454874453977e-17,
+            "SiO": 8.364519907706688e-40,
+            "Ti": 1.8308337082009277e-15
+          },
+          "batch_present": true,
+          "batch_refused_live_species": [],
+          "catalog_pa_shadow_equal": false,
+          "catalog_pa_shadow_outcome": "absent_comparison",
+          "detail": "independent compatibility comparison evidence is absent",
+          "dropped_nonfinite_live_species": [],
+          "effective_pressure_source": "equilibrium_backend_effective_pressure_pre_rg",
+          "effective_pressure_species_not_batch_active": [],
+          "effective_pressure_zero_reason": "pre_rg_backend_below_effective_pressure_threshold",
+          "live_flux_active_not_in_batch": [],
+          "live_only_bridge_species": [],
+          "mismatched_species": [],
+          "missing_batch_keys": [],
+          "missing_effective_pressure_species": [],
+          "missing_in_batch_path": [],
+          "missing_in_legacy_path": [],
+          "n_flux_pressures": 0,
+          "n_live_pressures": 0,
+          "note": "VapourBatch owns channel refusal, eligibility, and the active set; effective values cross one typed source seam before RG-1.",
+          "schema": "vapour_batch_flux_overlay.v1",
+          "selected_runtime_pa_by_species": {},
+          "selection_source": "equilibrium_backend_effective_pressure_pre_rg",
+          "shadow_equal": false,
+          "shadow_outcome": "absent_comparison"
+        },
+        "message": "Exact-key vapour channel answers and advisory diagnostics; not flux-authoritative until an R-family flip.",
+        "n_flux_active": 0,
+        "n_refused": 4,
+        "n_requested": 15,
+        "refusals_by_species": {
+          "Cr2O3_gas": {
+            "acquisition_flag": null,
+            "activity_bound": null,
+            "certification_ceiling": "never",
+            "extra": {
+              "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route",
+              "origin": "u0_v"
+            },
+            "flux": {
+              "code": "missing_channel_contract",
+              "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route",
+              "kind": "refusal"
+            },
+            "formula_id": "Cr2O3",
+            "is_flux_active": false,
+            "is_flux_dormant_by_epoch": false,
+            "is_refused": true,
+            "is_union_flux_eligible": false,
+            "out_of_range": false,
+            "pressure": {
+              "code": "missing_channel_contract",
+              "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route",
+              "kind": "refusal"
+            },
+            "refusal_code": "missing_channel_contract",
+            "selected_runtime_pressure": {
+              "code": "missing_channel_contract",
+              "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route",
+              "kind": "refusal"
+            },
+            "solve_group_id": "u0_v:Cr2O3_gas",
+            "source_account": "process.cleaned_melt",
+            "source_boundary": null,
+            "source_label": "refusal_closure",
+            "species_id": "Cr2O3_gas",
+            "state_fingerprint": "state:T=378.15|phase=hot_train|stage=evaporation|fO2=na|P=900",
+            "validation_anchor_refs": [],
+            "validation_status": "pending_validation",
+            "verdict_status": "status_bearing_non_authoritative"
+          },
+          "CrO2": {
+            "acquisition_flag": null,
+            "activity_bound": null,
+            "certification_ceiling": "never",
+            "extra": {
+              "detail": "channel contract incomplete: missing alpha",
+              "origin": "catalog"
+            },
+            "flux": {
+              "code": "missing_channel_contract",
+              "detail": "channel contract incomplete: missing alpha",
+              "kind": "refusal"
+            },
+            "formula_id": "CrO2",
+            "is_flux_active": false,
+            "is_flux_dormant_by_epoch": false,
+            "is_refused": true,
+            "is_union_flux_eligible": false,
+            "out_of_range": false,
+            "pressure": {
+              "code": "missing_channel_contract",
+              "detail": "channel contract incomplete: missing alpha",
+              "kind": "refusal"
+            },
+            "refusal_code": "missing_channel_contract",
+            "selected_runtime_pressure": {
+              "code": "missing_channel_contract",
+              "detail": "channel contract incomplete: missing alpha",
+              "kind": "refusal"
+            },
+            "solve_group_id": "oxide_vapors_cro2_family",
+            "source_account": "process.cleaned_melt",
+            "source_boundary": null,
+            "source_label": "refusal_closure",
+            "species_id": "CrO2",
+            "state_fingerprint": "state:T=378.15|phase=hot_train|stage=evaporation|fO2=na|P=900",
+            "validation_anchor_refs": [],
+            "validation_status": "pending_validation",
+            "verdict_status": "status_bearing_non_authoritative"
+          },
+          "MnO_gas": {
+            "acquisition_flag": null,
+            "activity_bound": null,
+            "certification_ceiling": "never",
+            "extra": {
+              "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route",
+              "origin": "u0_v"
+            },
+            "flux": {
+              "code": "missing_channel_contract",
+              "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route",
+              "kind": "refusal"
+            },
+            "formula_id": "MnO",
+            "is_flux_active": false,
+            "is_flux_dormant_by_epoch": false,
+            "is_refused": true,
+            "is_union_flux_eligible": false,
+            "out_of_range": false,
+            "pressure": {
+              "code": "missing_channel_contract",
+              "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route",
+              "kind": "refusal"
+            },
+            "refusal_code": "missing_channel_contract",
+            "selected_runtime_pressure": {
+              "code": "missing_channel_contract",
+              "detail": "channel contract incomplete: missing pressure_evaluator, alpha, route",
+              "kind": "refusal"
+            },
+            "solve_group_id": "u0_v:MnO_gas",
+            "source_account": "process.cleaned_melt",
+            "source_boundary": null,
+            "source_label": "refusal_closure",
+            "species_id": "MnO_gas",
+            "state_fingerprint": "state:T=378.15|phase=hot_train|stage=evaporation|fO2=na|P=900",
+            "validation_anchor_refs": [],
+            "validation_status": "pending_validation",
+            "verdict_status": "status_bearing_non_authoritative"
+          },
+          "P2O5_gas": {
+            "acquisition_flag": null,
+            "activity_bound": null,
+            "certification_ceiling": "never",
+            "extra": {
+              "detail": "declared applicability predicate 'not_applicable' is inactive",
+              "origin": "catalog"
+            },
+            "flux": {
+              "code": "inapplicable_by_declared_predicate",
+              "detail": "declared applicability predicate 'not_applicable' is inactive",
+              "kind": "refusal"
+            },
+            "formula_id": "P2O5_gas",
+            "is_flux_active": false,
+            "is_flux_dormant_by_epoch": false,
+            "is_refused": true,
+            "is_union_flux_eligible": false,
+            "out_of_range": false,
+            "pressure": {
+              "code": "inapplicable_by_declared_predicate",
+              "detail": "declared applicability predicate 'not_applicable' is inactive",
+              "kind": "refusal"
+            },
+            "refusal_code": "inapplicable_by_declared_predicate",
+            "selected_runtime_pressure": {
+              "code": "inapplicable_by_declared_predicate",
+              "detail": "declared applicability predicate 'not_applicable' is inactive",
+              "kind": "refusal"
+            },
+            "solve_group_id": "phosphorus_P2O5_gas_family",
+            "source_account": "process.cleaned_melt",
+            "source_boundary": null,
+            "source_label": "refusal_closure",
+            "species_id": "P2O5_gas",
+            "state_fingerprint": "state:T=378.15|phase=hot_train|stage=evaporation|fO2=na|P=900",
+            "validation_anchor_refs": [],
+            "validation_status": "pending_validation",
+            "verdict_status": "status_bearing_non_authoritative"
+          }
+        },
+        "setpoints_t_cond_audit": {
+          "al_ti_policy": "Al and Ti overrides are estimated/operator-routing only; no additional Al/Ti/trace T_cond overrides without independent engineering policy approval (DESIGN-REV5 \u00a77.2).",
+          "operator_override_species": [
+            "Al",
+            "Ca",
+            "Cr",
+            "CrO2",
+            "Fe",
+            "K",
+            "Mg",
+            "Mn",
+            "Na",
+            "SiO",
+            "Ti"
+          ],
+          "reaction_fixed_windows": "Reaction-fixed condensation windows remain non-operator settings.",
+          "schema": "setpoints_t_cond_audit.v1"
+        },
+        "shadow_equal": false,
+        "shadow_outcome": "absent_comparison",
+        "solve_bundle_ids": {},
+        "source_vapour_ceiling_table": [
+          {
+            "advisory_only": true,
+            "ceiling_mol": 0.013617600827,
+            "evidence": "FROZEN_SIO_SOURCE_VAPOR_CEILING_MOL diagnostic pin",
+            "legacy_key": "SiO",
+            "lookup_gas_id": "SiO",
+            "source_parent_id": "SiO2",
+            "status": "frozen_sio_proxy"
+          },
+          {
+            "advisory_only": true,
+            "ceiling_mol": 0.0,
+            "evidence": "inherited zero; not measured ZeroByPhysics",
+            "legacy_key": "Na2O",
+            "lookup_gas_id": "Na2O_gas",
+            "source_parent_id": "Na2O",
+            "status": "unvalidated_legacy"
+          },
+          {
+            "advisory_only": true,
+            "ceiling_mol": 0.0,
+            "evidence": "inherited zero; not measured ZeroByPhysics",
+            "legacy_key": "K2O",
+            "lookup_gas_id": "K2O_gas",
+            "source_parent_id": "K2O",
+            "status": "unvalidated_legacy"
+          },
+          {
+            "advisory_only": true,
+            "ceiling_mol": 0.0,
+            "evidence": "inherited zero; not measured ZeroByPhysics",
+            "legacy_key": "FeO",
+            "lookup_gas_id": "FeO_gas",
+            "source_parent_id": "FeO",
+            "status": "unvalidated_legacy"
+          },
+          {
+            "advisory_only": true,
+            "ceiling_mol": 0.0,
+            "evidence": "inherited zero; not measured ZeroByPhysics",
+            "legacy_key": "MgO",
+            "lookup_gas_id": "MgO_gas",
+            "source_parent_id": "MgO",
+            "status": "unvalidated_legacy"
+          },
+          {
+            "advisory_only": true,
+            "ceiling_mol": 0.0,
+            "evidence": "inherited zero; not measured ZeroByPhysics",
+            "legacy_key": "CaO",
+            "lookup_gas_id": "CaO_gas",
+            "source_parent_id": "CaO",
+            "status": "unvalidated_legacy"
+          },
+          {
+            "advisory_only": true,
+            "ceiling_mol": 0.0,
+            "evidence": "inherited zero; not measured ZeroByPhysics",
+            "legacy_key": "Al2O3",
+            "lookup_gas_id": "Al2O3_gas",
+            "source_parent_id": "Al2O3",
+            "status": "unvalidated_legacy"
+          },
+          {
+            "advisory_only": true,
+            "ceiling_mol": 0.0,
+            "evidence": "inherited zero; not measured ZeroByPhysics",
+            "legacy_key": "TiO2",
+            "lookup_gas_id": "TiO2_gas",
+            "source_parent_id": "TiO2",
+            "status": "unvalidated_legacy"
+          },
+          {
+            "advisory_only": true,
+            "ceiling_mol": 0.0,
+            "evidence": "inherited zero; collision-free gas ID retained",
+            "legacy_key": "CrO2",
+            "lookup_gas_id": "CrO2",
+            "source_parent_id": "Cr2O3",
+            "status": "unvalidated_legacy"
+          }
+        ],
+        "status": "ok"
+      },
+      "wall_risk_panel": {
+        "active_species": [],
+        "message": "n/a",
+        "operating_point": {
+          "pO2_mbar": 9.0,
+          "p_buffer_mbar": 0.0,
+          "po2_regime": "oxidizing",
+          "pressure_regime": "vacuum"
+        },
+        "status": "n/a",
+        "zones": []
+      }
     }
   },
   {
     "event": "per_hour_summary",
     "payload": {
+      "Kn": null,
+      "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
+      "O2_source_side_potential_kg_cumulative": 0.0,
       "O2_yield_kg_cumulative": 0.0,
       "P_total_bar": 0.009000000000000001,
-      "T_C": 155.0,
+      "T_C": 105.0,
       "campaign": "C0B",
       "condensation_train_kg": {},
-      "hour": 3,
+      "energy_cumulative_breakdown_kWh": {
+        "dissociation": 0.0,
+        "electrical": 0.0,
+        "electrical_plus_evaporation": 0.0,
+        "evaporation_thermal": 0.0,
+        "latent": 0.0
+      },
+      "energy_dissociation_kWh": 0.0,
+      "energy_electrical_kWh": 0.0,
+      "energy_electrical_plus_evaporation_cumulative_kWh": 0.0,
+      "energy_electrical_plus_evaporation_kWh": 0.0,
+      "energy_evaporation_breakdown_kWh": {
+        "evaporation_enthalpy_sink": 0,
+        "net_unallocated": 0.0,
+        "product_vapor_enthalpy_sink": 0,
+        "reaction_disproportionation_enthalpy_sink": 0
+      },
+      "energy_evaporation_thermal_kWh": 0.0,
+      "energy_latent_kWh": 0.0,
+      "energy_scope": "electrical_plus_known_evaporation_enthalpy",
+      "fe_redox_split": {
+        "authoritative": false,
+        "diagnostic_only": true,
+        "extrapolation": true,
+        "fO2_log": -9.0,
+        "fe2o3_equiv_wt_pct": 18.59026650558336,
+        "fe2o3_over_feo_molar": 223621244332.33234,
+        "fe3_over_sigma_fe": 0.9999999999977641,
+        "feo_equiv_wt_pct": 3.7402107199114176e-11,
+        "ferric_frac": 0.9999999999977641,
+        "ferrous_frac": 2.2358781492926028e-12,
+        "high_uncertainty": true,
+        "iw_log": -65.3987954515404,
+        "native_fe_activity": "3.308742169139123e-13",
+        "native_fe_activity_source": "Holzheid1997 DOI 10.1016/S0009-2541(97)00030-2 FeO(l)=Fe+0.5O2 saturation",
+        "native_fe_frac": 0.0,
+        "native_fe_pure_feo_iw_log": "-60.62184811851447",
+        "native_fe_saturation": false,
+        "native_fe_saturation_activity": "6.470294662693492e+25",
+        "native_fe_saturation_event": {
+          "native_fe_event": "deferred_not_liquid_for_redox",
+          "native_fe_event_reason": "deferred_not_liquid_for_redox",
+          "native_fe_event_status": "deferred",
+          "temperature_C": 105.0
+        },
+        "native_fe_threshold": "FeO_activity_saturation",
+        "pressure_bar": 0.009,
+        "reference": "Kress and Carmichael 1991 Contrib Mineral Petrol 108:82-92 doi:10.1007/BF00307328",
+        "source": "simulator.fe_redox:kress91_split",
+        "status": "ok",
+        "temperature_K": 378.15,
+        "temperature_band_case": "below_1200C_extrapolation",
+        "temperature_band_source": "REF-001 Kress91 liquid relation; below 1200 C calibration floor",
+        "temperature_band_status": "extrapolation_below_calibration_floor"
+      },
+      "furnace_heat_status": "partial",
+      "hour": 2,
       "mass_balance_pct": 1.1368683772161604e-14,
       "metal_yields_kg": {},
-      "pO2_bar": 0.009000000000000001
+      "mre_current_A": 0.0,
+      "mre_voltage_V": 0.0,
+      "pO2_bar": 0.009000000000000001,
+      "redox_source_breakdown": {
+        "applied_terms_mol_o2_equiv_by_label": {},
+        "delta_ln_fO2": 0.0,
+        "delta_log10_fO2": 0.0,
+        "fe_redox_respeciation": {
+          "direction": "none",
+          "ferric_divergence_after": {
+            "attribution": "sub_liquid_respeciation_deferred",
+            "delta_abs": 0.9999999999977641,
+            "delta_signed": 0.9999999999977641,
+            "implied_ferric_fraction": 0.9999999999977641,
+            "ledger_ferric_fraction": 0.0,
+            "reason": "sub_liquid_respeciation_deferred",
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "status": "warning",
+            "warning": true,
+            "warning_threshold_abs": 0.05,
+            "warning_threshold_ferric_fraction_abs": 0.05
+          },
+          "internal_o2_capacity_mol": 0.0,
+          "oxygen_source": "overhead_gas",
+          "reason": "fe_redox_respeciation_not_liquid",
+          "residual_attribution": "sub_liquid_respeciation_deferred",
+          "respeciation_status": "skipped_solid",
+          "status": "ok"
+        },
+        "fe_redox_respeciation_attempts": [
+          {
+            "direction": "none",
+            "ferric_divergence_after": {
+              "attribution": "sub_liquid_respeciation_deferred",
+              "delta_abs": 0.9999999999977641,
+              "delta_signed": 0.9999999999977641,
+              "implied_ferric_fraction": 0.9999999999977641,
+              "ledger_ferric_fraction": 0.0,
+              "reason": "sub_liquid_respeciation_deferred",
+              "sampling_context": "current_ledger_vs_current_reservoir",
+              "status": "warning",
+              "warning": true,
+              "warning_threshold_abs": 0.05,
+              "warning_threshold_ferric_fraction_abs": 0.05
+            },
+            "internal_o2_capacity_mol": 0.0,
+            "oxygen_source": "overhead_gas",
+            "reason": "fe_redox_respeciation_not_liquid",
+            "residual_attribution": "sub_liquid_respeciation_deferred",
+            "respeciation_status": "skipped_solid",
+            "status": "ok"
+          },
+          {
+            "direction": "none",
+            "ferric_divergence_after": {
+              "attribution": "sub_liquid_respeciation_deferred",
+              "delta_abs": 0.9999999999977641,
+              "delta_signed": 0.9999999999977641,
+              "implied_ferric_fraction": 0.9999999999977641,
+              "ledger_ferric_fraction": 0.0,
+              "reason": "sub_liquid_respeciation_deferred",
+              "sampling_context": "current_ledger_vs_current_reservoir",
+              "status": "warning",
+              "warning": true,
+              "warning_threshold_abs": 0.05,
+              "warning_threshold_ferric_fraction_abs": 0.05
+            },
+            "internal_o2_capacity_mol": 0.0,
+            "oxygen_source": "overhead_gas",
+            "reason": "fe_redox_respeciation_not_liquid",
+            "residual_attribution": "sub_liquid_respeciation_deferred",
+            "respeciation_status": "skipped_solid",
+            "status": "ok"
+          }
+        ],
+        "ferric_divergence": {
+          "attribution": "sub_liquid_respeciation_deferred",
+          "delta_abs": 0.9999999999977641,
+          "delta_signed": 0.9999999999977641,
+          "implied_ferric_fraction": 0.9999999999977641,
+          "ledger_ferric_fraction": 0.0,
+          "reason": "sub_liquid_respeciation_deferred",
+          "sampling_context": "current_ledger_vs_current_reservoir",
+          "status": "warning",
+          "warning": true,
+          "warning_threshold_abs": 0.05,
+          "warning_threshold_ferric_fraction_abs": 0.05
+        },
+        "net_mol_o2_equiv": 0,
+        "redox_source_refusal_context": {},
+        "redox_source_skip_reason": "",
+        "redox_source_terms_applied": false,
+        "skipped_reasons_by_label": {},
+        "skipped_terms_mol_o2_equiv_by_label": {},
+        "source_campaign": "C0B",
+        "source_campaign_hour": 1,
+        "source_context": {
+          "campaign": "C0B",
+          "campaign_hour": 1,
+          "hour": 2
+        },
+        "source_hour": 2,
+        "terms_mol_o2_equiv_by_label": {}
+      },
+      "regime": "",
+      "shuttle_K_inventory_kg": 0.0,
+      "shuttle_Na_inventory_kg": 0.0,
+      "shuttle_cycle": 0,
+      "shuttle_injected_kg_hr": 0.0,
+      "shuttle_metal_produced_kg_hr": 0.0,
+      "shuttle_phase": "",
+      "shuttle_reduced_kg_hr": 0.0,
+      "stage_3_capture": {
+        "Fe_kg": 0.0,
+        "Fe_wt_pct": 0.0,
+        "total_kg": 0.0
+      },
+      "transport_formula_id": "not_applicable_until_p0",
+      "vapor_species_kg_hr": {},
+      "vapour_batch_flux_overlay": {
+        "batch_channel_states": {
+          "Al": "dormant_by_epoch",
+          "Ca": "dormant_by_epoch",
+          "Cr": "dormant_by_epoch",
+          "Cr2O3_gas": "refusal",
+          "CrO2": "refusal",
+          "Fe": "dormant_by_epoch",
+          "K": "dormant_by_epoch",
+          "Mg": "dormant_by_epoch",
+          "Mn": "dormant_by_epoch",
+          "MnO_gas": "refusal",
+          "Na": "dormant_by_epoch",
+          "P2O5_gas": "refusal",
+          "Si": "dormant_by_epoch",
+          "SiO": "dormant_by_epoch",
+          "Ti": "dormant_by_epoch"
+        },
+        "batch_flux_active_not_in_live": [],
+        "batch_pa_by_species": {
+          "Al": 2.467802229811685e-24,
+          "Ca": 1.7247388070137042e-06,
+          "Cr": 1.3234774734804468e-10,
+          "Fe": 3.102048677387235e-07,
+          "K": 4.3914574268264994e-10,
+          "Mg": 1.5306208792920037e-08,
+          "Mn": 3.5300488609557024e-10,
+          "Na": 0.003876187100488788,
+          "Si": 8.492454874453977e-17,
+          "SiO": 8.364519907706688e-40,
+          "Ti": 1.8308337082009277e-15
+        },
+        "batch_present": true,
+        "batch_refused_live_species": [],
+        "catalog_pa_shadow_equal": false,
+        "catalog_pa_shadow_outcome": "absent_comparison",
+        "detail": "independent compatibility comparison evidence is absent",
+        "dropped_nonfinite_live_species": [],
+        "effective_pressure_source": "equilibrium_backend_effective_pressure_pre_rg",
+        "effective_pressure_species_not_batch_active": [],
+        "effective_pressure_zero_reason": "pre_rg_backend_below_effective_pressure_threshold",
+        "live_flux_active_not_in_batch": [],
+        "live_only_bridge_species": [],
+        "mismatched_species": [],
+        "missing_batch_keys": [],
+        "missing_effective_pressure_species": [],
+        "missing_in_batch_path": [],
+        "missing_in_legacy_path": [],
+        "n_flux_pressures": 0,
+        "n_live_pressures": 0,
+        "note": "VapourBatch owns channel refusal, eligibility, and the active set; effective values cross one typed source seam before RG-1.",
+        "schema": "vapour_batch_flux_overlay.v1",
+        "selected_runtime_pa_by_species": {},
+        "selection_source": "equilibrium_backend_effective_pressure_pre_rg",
+        "shadow_equal": false,
+        "shadow_outcome": "absent_comparison"
+      },
+      "vapour_batch_summary": {
+        "metadata": {
+          "flux_activation_epoch": "pre_rg_legacy_live",
+          "n_flux_active": 0,
+          "n_flux_dormant_by_epoch": 11,
+          "n_refused": 4,
+          "n_requested": 15,
+          "n_solve_bundles": 0,
+          "refusal_closure_fixed_point": true,
+          "refusal_closure_iterations": 2
+        },
+        "n_flux_active": 0,
+        "n_refused": 4,
+        "n_requested": 15,
+        "solve_bundle_ids": {}
+      },
+      "wall_deposit_cumulative_kg": {},
+      "wall_deposit_delta_kg": {}
     }
   },
   {
@@ -403,6 +3142,19 @@
       "energy_scope": "electrical_plus_known_evaporation_enthalpy",
       "furnace_heat_status": "partial",
       "mass_lost_kg": 0.0,
+      "rump_expectation": {
+        "actual_rump_elements_kg": {
+          "Al": 138.96037056098817,
+          "Ca": 113.22696860524962,
+          "Mg": 92.64024704065878,
+          "Si": 458.0545548121462,
+          "Ti": 15.440041173443129
+        },
+        "campaign": "C0B",
+        "expected_unconsumed_rump_elements": [],
+        "missing_expected_rump_elements": [],
+        "targeted_rump_elements": []
+      },
       "species_extracted": {},
       "start_mass_kg": 1000.0
     }
@@ -410,20 +3162,20 @@
   {
     "event": "decision_required",
     "payload": {
-      "context": "Path A: Continuous pN\u2082 ramp extracts Na/K/Fe/SiO\u2082. Path A_staged: staged pN\u2082 ramp separates alkali, SiO, hot Fe hold, then cool K shuttle. Path B: pO\u2082-managed Fe-only pyrolysis preserving CMAS glass for tapping as Material 1.",
+      "context": "Path A: Continuous pN\u2082 ramp extracts Na/K/Fe/SiO\u2082. Path A_staged: staged pN\u2082 ramp separates alkali, SiO, hot Fe hold, then cool Na cleanup. Path B: pO\u2082-managed Fe-only pyrolysis preserving CMAS glass for tapping as Material 1.",
       "options": [
         "A",
         "A_staged",
         "B"
       ],
-      "recommendation": "A",
+      "recommendation": "A_staged",
       "type": "PATH_AB"
     }
   },
   {
     "event": "simulation_status",
     "payload": {
-      "choice": "A",
+      "choice": "A_staged",
       "status": "decision_applied"
     }
   }
