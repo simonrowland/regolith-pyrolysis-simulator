@@ -219,32 +219,97 @@ def _account_mols(
 ) -> dict[str, float]:
     if hasattr(ledger, "mol_by_account") and not isinstance(ledger, Mapping):
         raw = ledger.mol_by_account(account)  # type: ignore[union-attr]
-        if not isinstance(raw, Mapping):
+        if raw is None:
             return {}
+        if not isinstance(raw, Mapping):
+            # Unreadable inventory is unknown, not empty — reading it as {}
+            # would drop every parent and silence evolution for the account.
+            raise VapourRequestConstructionError(
+                f"unreadable inventory account {account!r}: expected mapping, "
+                f"got {type(raw).__name__}"
+            )
         # Single-account view: species -> mol
         if raw and all(not isinstance(v, Mapping) for v in raw.values()):
-            return {str(k): float(v) for k, v in raw.items()}
+            return {
+                str(k): _require_readable_mol(v, species_id=str(k), account=account)
+                for k, v in raw.items()
+            }
         nested = raw.get(account) if account in raw else raw
         if isinstance(nested, Mapping):
-            return {str(k): float(v) for k, v in nested.items()}
-        return {}
+            return {
+                str(k): _require_readable_mol(v, species_id=str(k), account=account)
+                for k, v in nested.items()
+            }
+        if nested is None:
+            return {}
+        raise VapourRequestConstructionError(
+            f"unreadable inventory account {account!r}: nested view is "
+            f"{type(nested).__name__}, not a species→mol mapping"
+        )
 
     if not isinstance(ledger, Mapping):
-        return {}
+        raise VapourRequestConstructionError(
+            f"unreadable ledger for account {account!r}: expected mapping or "
+            f"LedgerSnapshot, got {type(ledger).__name__}"
+        )
     # Full ledger: account -> species -> mol
     if account in ledger and isinstance(ledger[account], Mapping):
-        return {str(k): float(v) for k, v in ledger[account].items()}
+        return {
+            str(k): _require_readable_mol(v, species_id=str(k), account=account)
+            for k, v in ledger[account].items()
+        }
+    if account in ledger and ledger[account] is not None:
+        raise VapourRequestConstructionError(
+            f"unreadable inventory account {account!r}: expected mapping, "
+            f"got {type(ledger[account]).__name__}"
+        )
     # Flat species map (already sliced to one account by caller)
     if ledger and all(not isinstance(v, Mapping) for v in ledger.values()):
-        return {str(k): float(v) for k, v in ledger.items()}
+        return {
+            str(k): _require_readable_mol(v, species_id=str(k), account=account)
+            for k, v in ledger.items()
+        }
     return {}
 
 
-def _positive_mol(mols: Mapping[str, float], species_id: str) -> bool:
+def _require_readable_mol(
+    value: Any,
+    *,
+    species_id: str,
+    account: str,
+) -> float:
+    """Parse one inventory amount; refuse unreadable values (not zero)."""
     try:
-        return float(mols.get(species_id, 0.0)) > _INVENTORY_EPSILON
-    except (TypeError, ValueError):
+        amount = float(value)
+    except (TypeError, ValueError) as exc:
+        raise VapourRequestConstructionError(
+            f"unreadable inventory for {species_id!r} in {account!r}: "
+            f"{value!r}; unknown inventory is not zero inventory"
+        ) from exc
+    if not math.isfinite(amount):
+        raise VapourRequestConstructionError(
+            f"non-finite inventory for {species_id!r} in {account!r}: "
+            f"{value!r}; unknown inventory is not zero inventory"
+        )
+    return amount
+
+
+def _positive_mol(mols: Mapping[str, float], species_id: str) -> bool:
+    if species_id not in mols:
         return False
+    try:
+        amount = float(mols[species_id])
+    except (TypeError, ValueError) as exc:
+        raise VapourRequestConstructionError(
+            f"unreadable inventory for {species_id!r}: {mols[species_id]!r}; "
+            "unknown inventory is not zero inventory"
+        ) from exc
+    if not math.isfinite(amount):
+        raise VapourRequestConstructionError(
+            f"non-finite inventory for {species_id!r}: {mols[species_id]!r}; "
+            "unknown inventory is not zero inventory"
+        )
+    return amount > _INVENTORY_EPSILON
 
 
 def _formula_elements(formula: str | None) -> frozenset[str]:

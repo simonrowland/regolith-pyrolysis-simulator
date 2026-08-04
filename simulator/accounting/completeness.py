@@ -72,9 +72,11 @@ DEFAULT_RESIDUAL_SPECIES_BY_TARGET: Mapping[str, tuple[str, ...]] = MappingProxy
 class TargetExtractionCompleteness:
     target_species: str
     completeness_fraction: float | None
-    product_target_equiv_mol: float
-    residual_target_equiv_mol: float
-    denominator_target_equiv_mol: float
+    # Core mol fields are Optional: unknown/missing is None, never a silent 0.0
+    # "zero product" claim. Explicit 0.0 remains a proven-zero product.
+    product_target_equiv_mol: float | None
+    residual_target_equiv_mol: float | None
+    denominator_target_equiv_mol: float | None
     reason: str = ""
     wall_deposit_target_equiv_mol: float = 0.0
     reagent_target_equiv_mol: float = 0.0

@@ -1329,10 +1329,18 @@ def _stage0_optional_float(value: Any) -> float | None:
     return amount
 
 
-def _stage0_fraction(value: Any) -> float:
+def _stage0_fraction(value: Any, *, field: str = "fraction") -> float:
+    """Require a finite fraction; never invent 0.0 for missing diagnostics.
+
+    A missing/non-numeric extent or partition fraction is unknown reaction
+    progress, not proof of zero escape / zero wall / full retention.
+    """
     amount = _stage0_optional_float(value)
     if amount is None:
-        return 0.0
+        raise AccountingError(
+            f"Stage-0 foulant diagnostic missing required fraction "
+            f"{field}={value!r}; unknown extent is not proof of zero reaction"
+        )
     return amount
 
 
@@ -1460,7 +1468,10 @@ def _stage0_authoritative_foulant_source_debit_kg(
                     f"for carrier {carrier!r}"
                 )
             raw_key, raw_cl_kg = source
-            split = _stage0_fraction(diagnostic.get("chloride_split_fraction"))
+            split = _stage0_fraction(
+                diagnostic.get("chloride_split_fraction"),
+                field="chloride_split_fraction",
+            )
             if split <= 0.0:
                 source_cl_kg = _stage0_positive_float(
                     diagnostic.get("source_cl_kg")
@@ -1583,7 +1594,7 @@ def _coalesced_stage0_foulant_diagnostics(
                 "_phase_rows": [],
             },
         )
-        extent = _stage0_fraction(diagnostic.get("extent"))
+        extent = _stage0_fraction(diagnostic.get("extent"), field="extent")
         row["_retained_fraction_product"] *= 1.0 - extent
         row["_phase_rows"].append(dict(diagnostic))
     for row in sulfate.values():
@@ -1615,12 +1626,17 @@ def _stage0_foulant_partition_rows(
 
     if family == REACTION_FAMILY_VOLATILIZATION:
         escaped = feed_kg * _stage0_fraction(
-            diagnostic.get("cumulative_escaped_frac")
+            diagnostic.get("cumulative_escaped_frac"),
+            field="cumulative_escaped_frac",
         )
         retained = feed_kg * _stage0_fraction(
-            diagnostic.get("cumulative_retained_frac")
+            diagnostic.get("cumulative_retained_frac"),
+            field="cumulative_retained_frac",
         )
-        wall = feed_kg * _stage0_fraction(diagnostic.get("wall_deposit_frac"))
+        wall = feed_kg * _stage0_fraction(
+            diagnostic.get("wall_deposit_frac"),
+            field="wall_deposit_frac",
+        )
         if wall > escaped and math.isclose(
             wall,
             escaped,
@@ -1642,7 +1658,7 @@ def _stage0_foulant_partition_rows(
         REACTION_FAMILY_SULFATE_DECOMP,
         REACTION_FAMILY_CARBONATE_DECOMPOSITION,
     }:
-        extent = _stage0_fraction(diagnostic.get("extent"))
+        extent = _stage0_fraction(diagnostic.get("extent"), field="extent")
         return [_stage0_partition_row(
             group,
             family,
@@ -1652,7 +1668,7 @@ def _stage0_foulant_partition_rows(
         )]
 
     if family == REACTION_FAMILY_SILICATE_DISPLACEMENT:
-        extent = _stage0_fraction(diagnostic.get("extent"))
+        extent = _stage0_fraction(diagnostic.get("extent"), field="extent")
         return [_stage0_partition_row(
             group,
             family,
@@ -1698,7 +1714,10 @@ def _stage0_foulant_partition_rows(
         return rows
 
     if family == REACTION_FAMILY_INERT_TO_RUMP:
-        rump_frac = _stage0_fraction(diagnostic.get("rump_frac", 1.0))
+        rump_frac = _stage0_fraction(
+            diagnostic.get("rump_frac", 1.0),
+            field="rump_frac",
+        )
         return [_stage0_partition_row(
             group,
             family,
@@ -1730,7 +1749,10 @@ def _stage0_partition_carbon_rows(
         feed_kg,
     )
     if labile_kg > 0.0:
-        labile_extent = _stage0_fraction(diagnostic.get("labile_extent"))
+        labile_extent = _stage0_fraction(
+            diagnostic.get("labile_extent"),
+            field="labile_extent",
+        )
         assigned_kg += labile_kg
         rows.append(_stage0_partition_row(
             "trapped_gasses",
@@ -1748,8 +1770,11 @@ def _stage0_partition_carbon_rows(
     if refractory_kg > 0.0:
         assigned_kg += refractory_kg
         interval = dict(diagnostic.get("refractory_interval") or {})
-        low = _stage0_fraction(interval.get("low"))
-        high = _stage0_fraction(interval.get("high", 1.0))
+        low = _stage0_fraction(interval.get("low"), field="refractory_interval.low")
+        high = _stage0_fraction(
+            interval.get("high", 1.0),
+            field="refractory_interval.high",
+        )
         retained_kg = refractory_kg * high
         burned_kg = refractory_kg - retained_kg
         rows.append(_stage0_partition_row(
@@ -2818,8 +2843,16 @@ def _wall_geometry_conductance_weight(segment: Any) -> float:
     else:
         try:
             view_factor_value = float(view_factor)
-        except (TypeError, ValueError):
-            return 0.0
+        except (TypeError, ValueError) as exc:
+            raise AccountingError(
+                f"wall geometry view_factor_from_melt is not numeric: "
+                f"{view_factor!r}; unknown view factor is not proof of zero "
+                f"deposition weight"
+            ) from exc
         if not math.isfinite(view_factor_value):
-            return 0.0
+            raise AccountingError(
+                f"wall geometry view_factor_from_melt is non-finite: "
+                f"{view_factor!r}; unknown view factor is not proof of zero "
+                f"deposition weight"
+            )
     return area_m2 * max(0.0, min(1.0, view_factor_value))

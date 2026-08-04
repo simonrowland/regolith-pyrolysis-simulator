@@ -4734,7 +4734,6 @@ def _rump_terminal_not_earned(
 
 
 def _rump_terminal_margin(assessment: RumpTerminalAssessment) -> GateMargin:
-    observed = float(assessment.liquid_fraction or 0.0)
     threshold = ThresholdSpec(
         id="rump_terminal_liquid_fraction_max",
         value=RUMP_TERMINAL_LIQUID_FRACTION_MAX,
@@ -4745,9 +4744,31 @@ def _rump_terminal_margin(assessment: RumpTerminalAssessment) -> GateMargin:
             "RUMP_TERMINAL_LIQUID_FRACTION_MAX"
         ),
     )
+    # Unknown liquid_fraction is not proof of a frozen (zero-liquid) rump.
+    # Claiming observed=0.0 would green-light the solid margin without proof.
+    if assessment.liquid_fraction is None:
+        # observed=+inf (not-applicable pattern): serializable, and not the
+        # false solid claim of observed=0.0 that green-lit the solid margin.
+        return GateMargin(
+            gate="rump_terminal",
+            feasible=False,
+            margin=-math.inf,
+            threshold=threshold,
+            observed=math.inf,
+            detail=(
+                "rump_terminal: liquid_fraction unknown "
+                f"(reason={assessment.reason or 'unspecified'}); "
+                "refuse solid-margin claim — unknown is not frozen"
+            ),
+            status="unavailable",
+            authoritative=False,
+            output_status="unavailable",
+            status_reason=assessment.reason or "liquid_fraction_unknown",
+        )
+    observed = float(assessment.liquid_fraction)
     return GateMargin(
         gate="rump_terminal",
-        feasible=True,
+        feasible=observed <= RUMP_TERMINAL_LIQUID_FRACTION_MAX,
         margin=RUMP_TERMINAL_LIQUID_FRACTION_MAX - observed,
         threshold=threshold,
         observed=observed,

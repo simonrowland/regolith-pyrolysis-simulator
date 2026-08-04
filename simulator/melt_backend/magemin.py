@@ -1866,12 +1866,31 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         if isinstance(state, dict):
             for key in ('mass_kg', 'mass', 'm', 'amount_kg'):
                 if key in state:
-                    return state[key]
+                    value = state[key]
+                    # Present key with None is the same unparseable class as a
+                    # missing key — typed refuse, do not return None for a
+                    # later TypeError on float(None). Non-finite numeric mass
+                    # still flows to LiquidFractionInvalidError downstream.
+                    if value is None:
+                        raise MeltCompositionError(
+                            'unparseable_phase_mass: '
+                            f'{key!r} is None; refusing mass=0.0'
+                        )
+                    return value
+            # Unrecognized mass key is not proof of zero phase mass — that
+            # would freeze liquid_fraction and hold species in the melt.
+            raise MeltCompositionError(
+                'unparseable_phase_mass: no recognized mass key in '
+                f'{sorted(state.keys())!r}; refusing mass=0.0'
+            )
         for attr in ('mass_kg', 'mass', 'm', 'amount_kg'):
             value = getattr(state, attr, None)
             if value is not None:
                 return value
-        return 0.0
+        raise MeltCompositionError(
+            f'unparseable_phase_mass: no mass attribute on {type(state).__name__}; '
+            'refusing mass=0.0'
+        )
 
     @staticmethod
     def _extract_phase_composition(state: Any) -> Dict[str, float]:

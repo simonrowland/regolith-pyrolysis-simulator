@@ -67,8 +67,28 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_legacy_activation_set_uses_only_finite_pressure_keys() -> None:
+    # Pure-finite maps still project to the finite species set.
     assert finite_live_pressure_species_ids(
-        {"Na": 1.0, "K": float("nan"), "Si": float("inf"), "Ti": "bad"}
+        {"Na": 1.0, "Fe": 2.0}
+    ) == frozenset({"Na", "Fe"})
+
+
+def test_finite_live_pressure_map_refuses_nonfinite_silent_drop() -> None:
+    """T3: non-finite live pressure must not silently un-claim a species."""
+    from simulator.vapour_rail.instrumentation import finite_live_pressure_map
+
+    with pytest.raises(ValueError, match="non-finite live pressures"):
+        finite_live_pressure_map(
+            {"Na": 1.0, "K": float("nan"), "Si": float("inf"), "Ti": "bad"}
+        )
+    with pytest.raises(ValueError, match="non-finite live pressures"):
+        finite_live_pressure_species_ids(
+            {"Na": 1.0, "K": float("nan"), "Si": float("inf"), "Ti": "bad"}
+        )
+    # Explicit opt-in for diagnostics that already track drops.
+    assert finite_live_pressure_species_ids(
+        {"Na": 1.0, "K": float("nan")},
+        refuse_nonfinite=False,
     ) == frozenset({"Na"})
 
 

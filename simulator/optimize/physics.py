@@ -1084,46 +1084,82 @@ def _target_extraction_result_from_payload(
         fraction_raw,
         f"{target}.completeness_fraction",
     )
+    # Core mol fields: None is incomplete provenance, never silent 0.0 product.
+    # A claimed completeness_fraction without mol evidence is refused.
+    product_mol = _optional_finite_number(
+        payload.get("product_target_equiv_mol"),
+        f"{target}.product_target_equiv_mol",
+    )
+    residual_mol = _optional_finite_number(
+        payload.get("residual_target_equiv_mol"),
+        f"{target}.residual_target_equiv_mol",
+    )
+    denominator_mol = _optional_finite_number(
+        payload.get("denominator_target_equiv_mol"),
+        f"{target}.denominator_target_equiv_mol",
+    )
+    wall_mol = _optional_finite_number(
+        payload.get("wall_deposit_target_equiv_mol"),
+        f"{target}.wall_deposit_target_equiv_mol",
+    )
+    reagent_mol = _optional_finite_number(
+        payload.get("reagent_target_equiv_mol"),
+        f"{target}.reagent_target_equiv_mol",
+    )
+    gross_mol = _optional_finite_number(
+        payload.get("gross_product_target_equiv_mol"),
+        f"{target}.gross_product_target_equiv_mol",
+    )
+    feedstock_recovered_mol = _optional_finite_number(
+        payload.get("feedstock_recovered_reagent_target_equiv_mol"),
+        f"{target}.feedstock_recovered_reagent_target_equiv_mol",
+    )
+    credit_line_mol = _optional_finite_number(
+        payload.get("credit_line_reagent_target_equiv_mol"),
+        f"{target}.credit_line_reagent_target_equiv_mol",
+    )
+    external_additive_mol = _optional_finite_number(
+        payload.get("external_additive_reagent_target_equiv_mol"),
+        f"{target}.external_additive_reagent_target_equiv_mol",
+    )
+    missing_core = [
+        name
+        for name, value in (
+            ("product_target_equiv_mol", product_mol),
+            ("residual_target_equiv_mol", residual_mol),
+            ("denominator_target_equiv_mol", denominator_mol),
+        )
+        if value is None
+    ]
+    reason = str(payload.get("reason") or "unknown: no result")
+    if missing_core:
+        # Refuse the completeness claim; do not assert zero product for a
+        # target the fraction (if any) said was extracted.
+        fraction = None
+        reason = (
+            "incomplete extraction-completeness payload: missing mol fields "
+            f"{missing_core}; unknown mol is not zero product"
+        )
     return TargetExtractionCompleteness(
         target,
         fraction,
-        _optional_finite_number(
-            payload.get("product_target_equiv_mol"),
-            f"{target}.product_target_equiv_mol",
-        ),
-        _optional_finite_number(
-            payload.get("residual_target_equiv_mol"),
-            f"{target}.residual_target_equiv_mol",
-        ),
-        _optional_finite_number(
-            payload.get("denominator_target_equiv_mol"),
-            f"{target}.denominator_target_equiv_mol",
-        ),
-        str(payload.get("reason") or "unknown: no result"),
-        wall_deposit_target_equiv_mol=_optional_finite_number(
-            payload.get("wall_deposit_target_equiv_mol"),
-            f"{target}.wall_deposit_target_equiv_mol",
-        ),
-        reagent_target_equiv_mol=_optional_finite_number(
-            payload.get("reagent_target_equiv_mol"),
-            f"{target}.reagent_target_equiv_mol",
-        ),
-        gross_product_target_equiv_mol=_optional_finite_number(
-            payload.get("gross_product_target_equiv_mol"),
-            f"{target}.gross_product_target_equiv_mol",
-        ),
+        # Honest fields: missing core mols stay None (not fabricated 0.0).
+        product_mol,
+        residual_mol,
+        denominator_mol,
+        reason,
+        wall_deposit_target_equiv_mol=0.0 if wall_mol is None else wall_mol,
+        reagent_target_equiv_mol=0.0 if reagent_mol is None else reagent_mol,
+        gross_product_target_equiv_mol=0.0 if gross_mol is None else gross_mol,
         contract_id=str(payload.get("contract_id") or ""),
-        feedstock_recovered_reagent_target_equiv_mol=_optional_finite_number(
-            payload.get("feedstock_recovered_reagent_target_equiv_mol"),
-            f"{target}.feedstock_recovered_reagent_target_equiv_mol",
+        feedstock_recovered_reagent_target_equiv_mol=(
+            0.0 if feedstock_recovered_mol is None else feedstock_recovered_mol
         ),
-        credit_line_reagent_target_equiv_mol=_optional_finite_number(
-            payload.get("credit_line_reagent_target_equiv_mol"),
-            f"{target}.credit_line_reagent_target_equiv_mol",
+        credit_line_reagent_target_equiv_mol=(
+            0.0 if credit_line_mol is None else credit_line_mol
         ),
-        external_additive_reagent_target_equiv_mol=_optional_finite_number(
-            payload.get("external_additive_reagent_target_equiv_mol"),
-            f"{target}.external_additive_reagent_target_equiv_mol",
+        external_additive_reagent_target_equiv_mol=(
+            0.0 if external_additive_mol is None else external_additive_mol
         ),
         denominator_basis_source=str(
             payload.get("denominator_basis_source") or "product_plus_residual"
@@ -1695,7 +1731,12 @@ def _finite_number(value: Any, name: str) -> float:
     return amount
 
 
-def _optional_finite_number(value: Any, name: str) -> float:
+def _optional_finite_number(value: Any, name: str) -> float | None:
+    """Parse a finite number, or return None when the field is absent.
+
+    Callers must not treat None as physical zero: missing mol fields on an
+    extraction-completeness payload are incomplete provenance.
+    """
     if value is None:
-        return 0.0
+        return None
     return _finite_number(value, name)

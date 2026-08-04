@@ -274,18 +274,18 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                     )
                 )
             else:
-                vapor_pressures = self._activities_times_antoine_or_fail(
+                projection = self._activities_times_antoine_or_fail(
                     temperature_C,
                     payload.activity_coefficients,
                     comp_wt,
+                    pO2_bar=max(10.0 ** solved_fO2_log, 1e-30),
                     context='ThermoEngine VapoRock fallback unavailable',
                 )
-                vapor_pressure_source = (
-                    self._antoine_vapor_pressure_source_by_species(
-                        'thermoengine', vapor_pressures
+                vapor_pressures, vapor_pressure_source = (
+                    self._finalize_antoine_projection(
+                        projection,
+                        base_source='thermoengine',
                     )
-                    if vapor_pressures
-                    else 'no_volatile_species'
                 )
             eq = self._emit_equilibrium_result(
                 temperature_C=temperature_C,

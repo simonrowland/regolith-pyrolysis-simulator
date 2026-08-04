@@ -35,6 +35,9 @@ import subprocess
 import tempfile
 import traceback
 import warnings
+from dataclasses import dataclass
+from functools import lru_cache
+from itertools import product
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional
 
@@ -44,6 +47,7 @@ from simulator.accounting.formulas import (
     ATOMIC_WEIGHTS_G_PER_MOL,
     resolve_species_formula,
 )
+from simulator.accounting.exceptions import UnknownSpeciesError
 from simulator.melt_backend.base import (
     EquilibriumResult,
     LiquidFractionInvalidError,
@@ -454,6 +458,115 @@ ACTIVITY_KEYS_BY_VAPOR_SPECIES = {
     'CrO2': ('CrO2', 'Cr2O3'),
     'Mn': ('Mn', 'MnO'),
 }
+
+
+@dataclass(frozen=True)
+class VaporPressureActivityRefusal:
+    """Status-bearing refusal for an incomplete activity projection."""
+
+    missing_precursor_species: tuple[str, ...]
+    context: str
+    reason: str = 'missing_melt_activity'
+
+    def diagnostic(self) -> dict[str, object]:
+        return {
+            'status': 'refused',
+            'reason': self.reason,
+            'missing_precursor_species': list(self.missing_precursor_species),
+            'context': self.context,
+        }
+
+
+@lru_cache(maxsize=None)
+def _activity_formula_atoms(formula: str) -> tuple[tuple[str, float], ...]:
+    """Parse a MELTS activity label, including decimal endmember subscripts."""
+    text = str(formula).strip().strip('"\'')
+    try:
+        atoms = dict(resolve_species_formula(text).atoms)
+    except UnknownSpeciesError:
+        # The accounting parser treats ASCII '.' as a hydrate separator, while
+        # ThermoEngine names Mn/Co/Ni endmembers with Si0.5. Those names contain
+        # no groups, so a complete token cover is an exact decimal-safe parse.
+        tokens = list(re.finditer(r'([A-Z][a-z]?)(\d+(?:\.\d+)?)?', text))
+        if not tokens or ''.join(token.group(0) for token in tokens) != text:
+            return ()
+        atoms = {}
+        for token in tokens:
+            element = token.group(1)
+            count = float(token.group(2) or 1.0)
+            atoms[element] = atoms.get(element, 0.0) + count
+    return tuple(sorted((str(element), float(count)) for element, count in atoms.items()))
+
+
+@lru_cache(maxsize=None)
+def _oxide_component_stoichiometry(
+    endmember: str,
+) -> tuple[tuple[str, float], ...]:
+    """Derive the unique MELTS-oxide decomposition of an endmember formula.
+
+    Premise: the endmember atom vector E is a sum of MELTS oxide vectors O_j.
+    Algebra: for each cation c, nu_j = n_c(E) / n_c(O_j); accept the mapping
+    only when one combination reconstructs every atom, including oxygen.
+    nu_j has units mol oxide component / mol endmember. Multiplying the
+    dimensionless endmember activity by nu_j therefore remains dimensionless;
+    it is a component-equivalent proxy for this explicitly non-authoritative
+    fallback, not a claim of a pure-oxide chemical-potential standard state.
+
+    Sanity checks: Na2SiO3 = 1 Na2O + 1 SiO2 (O: 1 + 2 = 3);
+    KAlSiO4 = 0.5 K2O + 0.5 Al2O3 + 1 SiO2 because K: 1/2 =
+    0.5 and Al: 1/2 = 0.5 (O: 0.5 + 1.5 + 2 = 4);
+    MgCr2O4 = 1 MgO + 1 Cr2O3 (O: 1 + 3 = 4); and
+    MnSi0.5O2 = 1 MnO + 0.5 SiO2 (O: 1 + 1 = 2). H2O has no
+    MELTS oxide component used by the vapor rail, so it returns no mapping.
+    """
+    atoms = dict(_activity_formula_atoms(str(endmember)))
+    if not atoms or float(atoms.get('O', 0.0)) <= 0.0:
+        return ()
+    cations = tuple(sorted(element for element in atoms if element != 'O'))
+    oxide_atoms = {
+        oxide: dict(_activity_formula_atoms(oxide))
+        for oxide in MELTS_OXIDE_BASIS
+    }
+    choices: list[list[tuple[str, float]]] = []
+    for cation in cations:
+        candidates: list[tuple[str, float]] = []
+        for oxide, component_atoms in oxide_atoms.items():
+            component_cations = {
+                element for element in component_atoms if element != 'O'
+            }
+            if component_cations != {cation}:
+                continue
+            coefficient = atoms[cation] / component_atoms[cation]
+            candidates.append((oxide, coefficient))
+        if not candidates:
+            return ()
+        choices.append(candidates)
+
+    decompositions: list[dict[str, float]] = []
+    for combination in product(*choices):
+        reconstructed: dict[str, float] = {}
+        coefficients: dict[str, float] = {}
+        for oxide, coefficient in combination:
+            coefficients[oxide] = coefficients.get(oxide, 0.0) + coefficient
+            for element, count in oxide_atoms[oxide].items():
+                reconstructed[element] = (
+                    reconstructed.get(element, 0.0) + coefficient * count
+                )
+        if set(reconstructed) != set(atoms):
+            continue
+        if all(
+            math.isclose(
+                reconstructed[element],
+                atoms[element],
+                rel_tol=0.0,
+                abs_tol=1e-12,
+            )
+            for element in atoms
+        ):
+            decompositions.append(coefficients)
+    if len(decompositions) != 1:
+        return ()
+    return tuple(sorted(decompositions[0].items()))
 
 
 def activity_from_chem_potential(mu: float, mu0: float, T_K: float) -> float:
@@ -1880,19 +1993,15 @@ class _MELTSBackendSupport(MeltBackend):
                 # Only pure_component_psat rows are pure-component /
                 # first-principles; pseudo rows are backsolved VapoRock
                 # curve-fit fallbacks.
-                eq.vapor_pressures_Pa = self._activities_times_antoine_or_fail(
+                projection = self._activities_times_antoine_or_fail(
                     temperature_C,
                     eq.activity_coefficients,
                     comp_wt,
                     context='PetThermoTools VapoRock fallback unavailable',
                 )
-                source = (
-                    self._antoine_vapor_pressure_source_by_species(
-                        'alphamelts_python_api',
-                        eq.vapor_pressures_Pa,
-                    )
-                    if eq.vapor_pressures_Pa
-                    else 'no_volatile_species'
+                eq.vapor_pressures_Pa, source = self._finalize_antoine_projection(
+                    projection,
+                    base_source='alphamelts_python_api',
                 )
             eq.vapor_pressures_source = self._vapor_pressure_source_map(
                 eq.vapor_pressures_Pa,
@@ -4038,8 +4147,16 @@ class _MELTSBackendSupport(MeltBackend):
         eq: EquilibriumResult,
     ) -> tuple[Dict[str, float], Dict[str, str], Dict[str, object]]:
         from simulator.melt_regime import MeltRegime, melt_regime
+        # None liquid_fraction is unknown phase state, not proof of FROZEN.
+        # Only exact zero (via melt_regime epsilon=0) may claim no_liquid_phase.
+        if eq.liquid_fraction is None:
+            raise _alphamelts_backend_failure_error(
+                ALPHAMELTS_REASON_VAPOR_PROJECTION_EMPTY,
+                'liquid_fraction is None; refusing frozen zero vapor map '
+                '(unknown liquid fraction is not proof of no liquid phase)',
+            )
         if melt_regime(
-            liquid_fraction=float(eq.liquid_fraction or 0.0), epsilon=0.0
+            liquid_fraction=float(eq.liquid_fraction), epsilon=0.0
         ) is MeltRegime.FROZEN:
             return {}, {}, {'vapor_pressure_zero_reason': 'no_liquid_phase'}
         if not eq.liquid_composition_wt_pct:
@@ -4124,7 +4241,10 @@ class _MELTSBackendSupport(MeltBackend):
         fO2_log: float,
         pressure_bar: float,
         activities: Mapping[str, float],
-    ) -> tuple[Dict[str, float], str]:
+    ) -> tuple[
+        Dict[str, float],
+        str | Dict[str, str] | VaporPressureActivityRefusal,
+    ]:
         """
         Vapor partial pressures (Pa) for the post-equilibrium melt.
 
@@ -4151,11 +4271,14 @@ class _MELTSBackendSupport(MeltBackend):
         ``liquid_fraction`` with an empty solved liquid composition is a
         fail-loud solver/API contract violation.
 
-        Returns ``(pressures_Pa, source_label)``.  FAIL-LOUD: never
-        returns an empty dict for a volatile-bearing melt (an empty dict
-        zeroes evaporation flux).  On any non-``ok`` VapoRock outcome it
-        logs a WARN and explicitly calls the Antoine fallback; a genuine
-        library exception is re-raised as a labelled ``RuntimeError``.
+        Returns ``(pressures_Pa, source_label_or_refusal)``. A volatile
+        melt whose activity data cannot support every precursor returns an
+        empty pressure map plus ``VaporPressureActivityRefusal``; the caller
+        records that status-bearing facet refusal rather than asserting a
+        physical zero or aborting the equilibrium run. On any non-``ok``
+        VapoRock outcome it logs a WARN and explicitly calls the Antoine
+        fallback; genuine library/solver contract failures remain labelled
+        ``RuntimeError`` exceptions.
         """
         try:
             liquid_fraction_value = float(liquid_fraction)
@@ -4195,21 +4318,16 @@ class _MELTSBackendSupport(MeltBackend):
 
         helper = self._vaporock_helper
         if helper is None or not helper.is_available():
-            pressures = self._activities_times_antoine_or_fail(
+            projection = self._activities_times_antoine_or_fail(
                 T_C,
                 dict(activities),
                 dict(melt_wt),
                 pO2_bar=max(10.0 ** float(fO2_log), 1e-30),
                 context='VapoRock helper unavailable',
             )
-            return (
-                pressures,
-                self._antoine_vapor_pressure_source_by_species(
-                    'antoine_fallback_from_vaporock',
-                    pressures,
-                )
-                if pressures
-                else 'no_volatile_species',
+            return self._finalize_antoine_projection(
+                projection,
+                base_source='antoine_fallback_from_vaporock',
             )
 
         try:
@@ -4235,21 +4353,16 @@ class _MELTSBackendSupport(MeltBackend):
                 'pseudo rows are backsolved VapoRock curve-fits).',
                 stacklevel=2,
             )
-            pressures = self._activities_times_antoine_or_fail(
+            projection = self._activities_times_antoine_or_fail(
                 T_C,
                 dict(activities),
                 dict(melt_wt),
                 pO2_bar=max(10.0 ** float(fO2_log), 1e-30),
                 context=f'VapoRock status {result.status!r}',
             )
-            return (
-                pressures,
-                self._antoine_vapor_pressure_source_by_species(
-                    'antoine_fallback_from_vaporock',
-                    pressures,
-                )
-                if pressures
-                else 'no_volatile_species',
+            return self._finalize_antoine_projection(
+                projection,
+                base_source='antoine_fallback_from_vaporock',
             )
 
         # ALREADY Pa — do not re-scale, do not normalize.
@@ -4263,7 +4376,7 @@ class _MELTSBackendSupport(MeltBackend):
         *,
         pO2_bar: float | None = None,
         context: str,
-    ) -> Dict[str, float]:
+    ) -> Dict[str, float] | VaporPressureActivityRefusal:
         table = self._load_vapor_pressure_table()
         if not table:
             raise RuntimeError(
@@ -4278,6 +4391,19 @@ class _MELTSBackendSupport(MeltBackend):
             comp_wt,
             pO2_bar=pO2_bar,
         )
+        # Partial activity maps that omit melt-present volatiles (e.g. Na/K
+        # when only FeO/SiO2 activities are present) would debit those
+        # species as zero by omission. Refuse the whole projection.
+        missing_precursor_species = self._antoine_precursor_species_missing_activity(
+            comp_wt,
+            table,
+            activities,
+        )
+        if missing_precursor_species:
+            return VaporPressureActivityRefusal(
+                missing_precursor_species=tuple(missing_precursor_species),
+                context=str(context),
+            )
         if pressures:
             return pressures
 
@@ -4293,6 +4419,25 @@ class _MELTSBackendSupport(MeltBackend):
             f'{reason} for volatile-bearing melt ({context}); refusing '
             'empty vapor_pressures_Pa because it would silently zero '
             'evaporation flux'
+        )
+
+    def _finalize_antoine_projection(
+        self,
+        projection: Dict[str, float] | VaporPressureActivityRefusal,
+        *,
+        base_source: str,
+    ) -> tuple[
+        Dict[str, float],
+        str | Dict[str, str] | VaporPressureActivityRefusal,
+    ]:
+        if isinstance(projection, VaporPressureActivityRefusal):
+            return {}, projection
+        pressures = dict(projection)
+        if not pressures:
+            return {}, 'no_volatile_species'
+        return (
+            pressures,
+            self._antoine_vapor_pressure_source_by_species(base_source, pressures),
         )
 
     def _antoine_vapor_pressure_source_by_species(
@@ -4314,8 +4459,10 @@ class _MELTSBackendSupport(MeltBackend):
     @staticmethod
     def _vapor_pressure_source_map(
         pressures: Mapping[str, float],
-        source: str | Mapping[str, str],
+        source: str | Mapping[str, str] | VaporPressureActivityRefusal,
     ) -> Dict[str, str]:
+        if isinstance(source, VaporPressureActivityRefusal):
+            return {}
         if isinstance(source, Mapping):
             return {
                 str(species): str(
@@ -4334,17 +4481,21 @@ class _MELTSBackendSupport(MeltBackend):
     def _vapor_pressure_zero_diagnostics(
         diagnostics: Optional[Mapping[str, object]],
         pressures: Mapping[str, float],
-        source: str | Mapping[str, str],
+        source: str | Mapping[str, str] | VaporPressureActivityRefusal,
     ) -> dict[str, object]:
         payload = dict(diagnostics or {})
+        if isinstance(source, VaporPressureActivityRefusal):
+            payload.setdefault('vapor_pressure_zero_reason', 'typed_refusal')
         if not pressures and source == 'no_volatile_species':
             payload.setdefault('vapor_pressure_zero_reason', 'no_volatile_species')
         return payload
 
     @staticmethod
     def _vapor_pressure_degraded_to_antoine(
-        source: str | Mapping[str, str],
+        source: str | Mapping[str, str] | VaporPressureActivityRefusal,
     ) -> bool:
+        if isinstance(source, VaporPressureActivityRefusal):
+            return False
         labels = source.values() if isinstance(source, Mapping) else (source,)
         return any(
             str(label).startswith('antoine_fallback_from_vaporock')
@@ -4355,13 +4506,19 @@ class _MELTSBackendSupport(MeltBackend):
         self,
         diagnostics: Optional[Mapping[str, object]],
         pressures: Mapping[str, float],
-        source: str | Mapping[str, str],
+        source: str | Mapping[str, str] | VaporPressureActivityRefusal,
     ) -> dict[str, object]:
         payload = self._vapor_pressure_zero_diagnostics(
             diagnostics,
             pressures,
             source,
         )
+        if isinstance(source, VaporPressureActivityRefusal):
+            payload['vapor_pressure_backend_status'] = 'refused'
+            payload['vapor_pressure_backend_status_reason'] = source.reason
+            payload['vapor_pressure_refusal'] = source.diagnostic()
+            payload['authoritative_for_requested_vapor_pressure'] = False
+            return payload
         if self._vapor_pressure_degraded_to_antoine(source):
             # Facet-scoped honesty: the equilibrium solve answered the
             # requested conditions, so parent status/backend_status stay
@@ -4408,6 +4565,10 @@ class _MELTSBackendSupport(MeltBackend):
         P_i = a_i x P_reference_i(T)
 
         If activities are unavailable, no pressure is emitted.
+        Missing activity for a melt-present precursor is a hard refusal of the
+        whole projection (via ``_activities_times_antoine_or_fail``); this
+        helper records partial omissions so the outer gate can refuse rather
+        than emit a map with silently dropped volatiles.
         """
         if not activities:
             return {}
@@ -4426,6 +4587,7 @@ class _MELTSBackendSupport(MeltBackend):
         for species, spec in table.items():
             raw_activity = self._activity_for_vapor_species(species, activities)
             if raw_activity is None:
+                # Omission is handled by or_fail when melt has precursor.
                 continue
             if not self._is_number(raw_activity):
                 continue
@@ -4489,14 +4651,94 @@ class _MELTSBackendSupport(MeltBackend):
                 return True
         return False
 
+    def _antoine_precursor_species_missing_activity(
+        self,
+        comp_wt: Mapping[str, float],
+        table: Mapping[str, Mapping[str, object]],
+        activities: Mapping[str, object],
+    ) -> list[str]:
+        """Vapor species whose melt precursor is present but activity is not.
+
+        Used to refuse partial activity×Antoine maps that would omit Na/K
+        (and similar) while still succeeding for other species.
+        """
+        missing: list[str] = []
+        for vapor_species in table:
+            activity_keys = ACTIVITY_KEYS_BY_VAPOR_SPECIES.get(
+                str(vapor_species), (str(vapor_species),)
+            )
+            melt_has_precursor = False
+            for key in activity_keys:
+                wt = (comp_wt or {}).get(key)
+                if self._is_number(wt) and float(wt) > 0.0:
+                    melt_has_precursor = True
+                    break
+            if not melt_has_precursor:
+                continue
+            raw = self._activity_for_vapor_species(str(vapor_species), dict(activities))
+            if raw is None or not self._is_number(raw):
+                missing.append(str(vapor_species))
+        return sorted(missing)
+
     @staticmethod
     def _activity_for_vapor_species(species: str, activities: dict) -> Optional[float]:
         # ThermoEngine reports liquid oxide/endmember activities, not vapor
         # species activities. Direct vapor keys win; mapped oxide/endmember
         # keys are proxy activities for this non-authoritative fallback.
-        for key in ACTIVITY_KEYS_BY_VAPOR_SPECIES.get(str(species), (str(species),)):
-            if key in activities:
-                return activities[key]
+        keys = ACTIVITY_KEYS_BY_VAPOR_SPECIES.get(
+            str(species), (str(species),)
+        )
+        target_oxide = next(
+            (
+                canonical_melt_oxide_activity_name(key)
+                for key in keys
+                if canonical_melt_oxide_activity_name(key) is not None
+            ),
+            None,
+        )
+        if target_oxide is None:
+            return None
+
+        # Keep the declared carrier preference without treating an endmember
+        # activity as though it were already an oxide activity. Exact species
+        # or oxide keys need no projection; endmembers use the formula-derived
+        # mol oxide / mol endmember coefficient above.
+        for key in keys:
+            if key not in activities:
+                continue
+            try:
+                activity = float(activities[key])
+            except (TypeError, ValueError):
+                continue
+            if not math.isfinite(activity):
+                continue
+            if key == str(species) or key == target_oxide:
+                return activity
+            coefficient = dict(
+                _oxide_component_stoichiometry(str(key))
+            ).get(target_oxide)
+            if coefficient is not None:
+                return coefficient * activity
+
+        candidates: list[float] = []
+        for endmember, raw_activity in activities.items():
+            if endmember in keys:
+                continue
+            coefficient = dict(
+                _oxide_component_stoichiometry(str(endmember))
+            ).get(target_oxide)
+            if coefficient is None:
+                continue
+            try:
+                activity = float(raw_activity)
+            except (TypeError, ValueError):
+                continue
+            if math.isfinite(activity):
+                candidates.append(coefficient * activity)
+        # Never sum two endmember activities as if they were extensive moles.
+        # One unique carrier supplies the proxy; ambiguity leaves the gate red.
+        if len(candidates) == 1:
+            return candidates[0]
         return None
 
     def _load_vapor_pressure_table(self) -> dict:

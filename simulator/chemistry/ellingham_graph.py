@@ -39,6 +39,14 @@ _DEFAULT_VAPOR_PRESSURES_PATH = (
 )
 
 
+class EllinghamPressureRefusal(ValueError):
+    """Typed refusal: cannot prove P_eff without inventing a silent zero.
+
+    Callers must not convert this into P_eff=0.0 / evolves=False without an
+    independent physical proof of nonvolatility.
+    """
+
+
 @dataclass(frozen=True)
 class EvolutionRankEntry:
     species: str
@@ -153,13 +161,40 @@ def _antoine_reference_pressure_Pa(
     antoine: Mapping[str, Any],
     temperature_K: float,
 ) -> float | None:
-    A = antoine.get("A", 0)
-    B = antoine.get("B", 0)
-    C = antoine.get("C", 0)
-    T_K = float(temperature_K)
-    if not (A > 0 and T_K > 300):
+    """Evaluate catalog Antoine reference pressure (Pa), or None if no number.
+
+    Three-category rule (project doctrine):
+    (1) missing/corrupt input (A <= 0, non-coercible coeffs, non-finite log):
+        return None → callers raise EllinghamPressureRefusal.
+    (2) out-of-domain T (historical comfort band T_K <= 300 K) with evaluable
+        coeffs: COMPUTE the value. This is non-authoritative extrapolation on
+        a diagnostic API, not missing physics and not a hard refuse.
+    (3) proven zero is handled at the species-catalog layer (inactive row),
+        not here.
+
+    Derivation (Antoine, log10 form used by the vapor_pressures catalog)::
+
+        log10(P_Pa) = A - B / (T_K + C)
+        P_Pa        = 10 ** log10(P_Pa)
+
+    Units: A,B,C are catalog coefficients for P in Pa; T_K in kelvin.
+    Sanity: Na metal Antoine at 250 K yields finite P ~ 1.9e-4 Pa (formula);
+    at furnace T ≫ 300 K the same path is the in-domain authoritative rail.
+    The old ``T_K > 300`` gate collapsed (1) and (2) into None and over-refused
+    computable cold-T diagnostics.
+    """
+    try:
+        A = float(antoine.get("A", 0) or 0)
+        B = float(antoine.get("B", 0) or 0)
+        C = float(antoine.get("C", 0) or 0)
+    except (TypeError, ValueError):
         return None
-    log_P = float(A) - float(B) / (T_K + float(C))
+    T_K = float(temperature_K)
+    # Category (1): no positive A → coefficients cannot produce a pressure.
+    if not (A > 0) or not math.isfinite(T_K):
+        return None
+    # Category (2): T may be outside the historical comfort band; still evaluate.
+    log_P = A - B / (T_K + C)
     if not math.isfinite(log_P) or log_P > 308.0:
         return None
     return 10.0 ** log_P
@@ -193,9 +228,13 @@ def effective_equilibrium_pressure_Pa(
     if species in metals:
         sp_data = metals[species] or {}
         if str(sp_data.get("consumer_status", "")).lower() == "inactive":
+            # Declared inactive: proven nonvolatile by catalog contract.
             return 0.0
         if species not in ELLINGHAM_THERMO:
-            return 0.0
+            raise EllinghamPressureRefusal(
+                f"species {species!r} lacks ELLINGHAM_THERMO; refusing "
+                f"P_eff=0.0 (missing thermo is not proof of nonvolatility)"
+            )
         fit_target = str(sp_data.get("fit_target", "") or "")
         if not math.isfinite(T_K):
             ellingham_metal_phase_kind(species, T_K)
@@ -208,7 +247,10 @@ def effective_equilibrium_pressure_Pa(
             antoine_liq = liquid_rxn.get("antoine") or {}
             P_reference_Pa = _antoine_reference_pressure_Pa(antoine_liq, T_K)
             if P_reference_Pa is None:
-                return 0.0
+                raise EllinghamPressureRefusal(
+                    f"Antoine reference pressure unavailable for {species!r} "
+                    f"liquid-oxide rail at T_K={T_K!r}; refusing P_eff=0.0"
+                )
             activity_exponent = float(
                 liquid_rxn.get("oxide_activity_exponent", 1.0) or 1.0
             )
@@ -244,7 +286,10 @@ def effective_equilibrium_pressure_Pa(
             antoine_gas = gas_rail_rxn.get("antoine") or {}
             P_reference_Pa = _antoine_reference_pressure_Pa(antoine_gas, T_K)
             if P_reference_Pa is None:
-                return 0.0
+                raise EllinghamPressureRefusal(
+                    f"Antoine reference pressure unavailable for {species!r} "
+                    f"gas-rail at T_K={T_K!r}; refusing P_eff=0.0"
+                )
             activity_exponent = float(
                 gas_rail_rxn.get("oxide_activity_exponent", 1.0) or 1.0
             )
@@ -275,7 +320,11 @@ def effective_equilibrium_pressure_Pa(
         antoine, _ = vapor_pressure_antoine_coefficients(sp_data, temperature_K=T_K)
         P_reference_Pa = _antoine_reference_pressure_Pa(antoine, T_K)
         if P_reference_Pa is None:
-            return 0.0
+            raise EllinghamPressureRefusal(
+                f"Antoine reference pressure unavailable for {species!r} at "
+                f"T_K={T_K!r}; refusing P_eff=0.0 (missing/corrupt "
+                f"Antoine is not proof of nonvolatility)"
+            )
         if fit_target == "standard_reaction_term":
             activity_exponent = float(
                 sp_data.get("oxide_activity_exponent", 1.0) or 1.0
@@ -305,7 +354,10 @@ def effective_equilibrium_pressure_Pa(
         antoine = (row.get("antoine", {}) or {})
         P_reference_Pa = _antoine_reference_pressure_Pa(antoine, T_K)
         if P_reference_Pa is None:
-            return 0.0
+            raise EllinghamPressureRefusal(
+                f"Antoine reference pressure unavailable for oxide vapor "
+                f"{species!r} at T_K={T_K!r}; refusing P_eff=0.0"
+            )
         activity_exponent = float(row.get("oxide_activity_exponent", 1.0) or 1.0)
         activity_factor = max(a_ox, 0.0) ** activity_exponent
         P_eq_Pa = P_reference_Pa * activity_factor
@@ -321,7 +373,10 @@ def effective_equilibrium_pressure_Pa(
             P_eq_Pa *= math.sqrt(float(vacuum_floor_bar) / pO2)
         return max(P_eq_Pa, 0.0)
 
-    return 0.0
+    raise EllinghamPressureRefusal(
+        f"species {species!r} not in metals/oxide_vapors catalog; refusing "
+        f"P_eff=0.0 (unknown species is not proof of nonvolatility)"
+    )
 
 
 def evolves(

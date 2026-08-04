@@ -478,24 +478,49 @@ def _finite_live_map(
 
 def finite_live_pressure_species_ids(
     live_pressures_Pa: Mapping[str, float] | None,
+    *,
+    refuse_nonfinite: bool = True,
 ) -> frozenset[str]:
-    """Canonical finite species set used by pre-RG projections."""
+    """Canonical finite species set used by pre-RG projections.
 
-    return frozenset(finite_live_pressure_map(live_pressures_Pa))
+    Default refuses non-finite entries rather than silently dropping them
+    from the activation set (silent drop → species un-claimed → zero debit).
+    """
+
+    return frozenset(
+        finite_live_pressure_map(
+            live_pressures_Pa,
+            refuse_nonfinite=refuse_nonfinite,
+        )
+    )
 
 
 def finite_live_pressure_map(
     live_pressures_Pa: Mapping[str, float] | None,
     *,
     read_context: str | None = None,
+    refuse_nonfinite: bool = True,
 ) -> dict[str, float]:
-    """Read a finite compatibility projection under an explicit purpose label."""
+    """Read a finite compatibility projection under an explicit purpose label.
+
+    Non-finite live pressures are not silently dropped from the typed seam:
+    dropping would un-claim a species and debit it as zero. When
+    ``refuse_nonfinite`` is True (default), any non-finite/unparseable value
+    raises. The shadow comparator path uses :func:`_finite_live_map` directly
+    and records drops as ``SHADOW_NONFINITE_LIVE``.
+    """
 
     if read_context is None:
-        live, _ = _finite_live_map(live_pressures_Pa)
-        return live
-    with compatibility_pressure_read_context(read_context):
-        live, _ = _finite_live_map(live_pressures_Pa)
+        live, dropped = _finite_live_map(live_pressures_Pa)
+    else:
+        with compatibility_pressure_read_context(read_context):
+            live, dropped = _finite_live_map(live_pressures_Pa)
+    if refuse_nonfinite and dropped:
+        raise ValueError(
+            "non-finite live pressures for species "
+            f"{dropped}; refusing silent drop (unknown pressure is not "
+            "zero pressure / un-claimed species)"
+        )
     return live
 
 
