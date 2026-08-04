@@ -449,9 +449,8 @@ def test_default_runtime_policy_is_no_cold_train():
 def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
     """RG-1 gateway: catalog P_eff class without a flux-value cutover.
 
-    The one-decade band is deliberately stated: it covers the verifier's
-    independent probe across config overlays while rejecting the former
-    pure-component/reference pressures by many orders of magnitude.
+    Each species' band is derived from its verifier-probed effective-vs-pure
+    separation so every pure-component reversion is independently red.
     """
 
     sim = _real_capacity_sim()
@@ -474,11 +473,32 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
         "K": 0.469,
         "Al": 1.4e-8,
     }
+    pure_component_probe_pa = {
+        "Ca": 8.35e5,
+        "Mg": 6.87e5,
+        "K": 4.51e6,
+        "Al": 110.2,
+    }
+    # Premise: the legacy probes give separation R_i = P_pure,i / P_eff,i.
+    # Algebra: admit one tenth of that measured log separation,
+    # b_i = log10(R_i) / 10. The band therefore admits ratios
+    # [R_i^-0.1, R_i^0.1] around P_eff,i, not the full raw separation.
+    # Catalog a=1 answers also pass through source-reaction/fO2 evaluation;
+    # the isolated re-evaluations below prove none can fit its species' band.
+    probe_band_decades = {
+        species_id: abs(math.log10(pure_component_probe_pa[species_id] / probe_pa))
+        / 10.0
+        for species_id, probe_pa in verifier_probe_pa.items()
+    }
 
-    def within_one_decade(actual: float, reference: float) -> bool:
-        return abs(math.log10(actual / reference)) <= 1.0
+    def within_probe_band(
+        species_id: str, actual: float, reference: float
+    ) -> bool:
+        return (
+            abs(math.log10(actual / reference))
+            <= probe_band_decades[species_id]
+        )
 
-    metals = sim.vapor_pressures["metals"]
     temperature_K = equilibrium.temperature_C + 273.15
     for species_id, probe_pa in verifier_probe_pa.items():
         answer = batch.channel(species_id)
@@ -486,8 +506,9 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
         catalog_pa = float(answer.pressure.pa)
         seam_pa = effective_source.pressure_pa(species_id)
         assert seam_pa is not None and seam_pa > 0.0
-        assert within_one_decade(float(seam_pa), probe_pa)
-        assert within_one_decade(catalog_pa, float(seam_pa))
+        assert within_probe_band(species_id, float(seam_pa), probe_pa)
+        assert within_probe_band(species_id, catalog_pa, probe_pa)
+        assert within_probe_band(species_id, catalog_pa, float(seam_pa))
         activity = answer.source_reaction_activity
         assert activity is not None
         assert activity.verdict is ActivityVerdictKind.POINT
@@ -495,14 +516,43 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
         assert activity.evidence_ref is not None
         assert "_last_vapor_pressure_diagnostic.activities" in activity.evidence_ref
 
-        # Mutation proof: reverting the answer to the row's pure-component
-        # saturation pressure must leave the effective-pressure band.
-        pure = metals[species_id]["pure_component_antoine"]
-        pure_component_pa = 10.0 ** (
-            float(pure["A"])
-            - float(pure["B"]) / (temperature_K + float(pure["C"]))
+    original_activities = dict(equilibrium.activity_coefficients)
+    original_diagnostic_activities = dict(
+        sim._last_vapor_pressure_diagnostic["activities"]
+    )
+    assert original_activities == original_diagnostic_activities
+    try:
+        for species_id in verifier_probe_pa:
+            # Mutate one species at a time from the same baseline. This proves
+            # every activity=1 reversion independently leaves its own band.
+            mutated_activities = dict(original_activities)
+            mutated_activities[species_id] = 1.0
+            equilibrium.activity_coefficients = dict(mutated_activities)
+            sim._last_vapor_pressure_diagnostic["activities"] = dict(
+                mutated_activities
+            )
+            a1_reversion_batch = sim._resolve_evaporation_vapour_batch(
+                equilibrium,
+                temperature_K=temperature_K,
+                effective_pressure_source=effective_source,
+            )
+            assert a1_reversion_batch is not None
+            a1_answer = a1_reversion_batch.channel(species_id)
+            assert isinstance(a1_answer.pressure, PressureValue)
+            assert a1_answer.source_reaction_activity is not None
+            assert a1_answer.source_reaction_activity.value == pytest.approx(1.0)
+            seam_pa = effective_source.pressure_pa(species_id)
+            assert seam_pa is not None and seam_pa > 0.0
+            assert not within_probe_band(
+                species_id,
+                float(a1_answer.pressure.pa),
+                float(seam_pa),
+            )
+    finally:
+        equilibrium.activity_coefficients = original_activities
+        sim._last_vapor_pressure_diagnostic["activities"] = (
+            original_diagnostic_activities
         )
-        assert not within_one_decade(pure_component_pa, float(seam_pa))
 
     # Source-reaction oxygen fugacity is intrinsic melt fO2, not transport
     # headspace pO2. Varying only transport pO2 must leave catalog P_eff fixed.
