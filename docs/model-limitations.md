@@ -104,6 +104,65 @@ Basis: Apollo 12022 lunar basalt; `log10 pK` is K(g) pressure in atm from the De
 | 1428.571429 | -8.800000 | -7.858279 | +1.241499 |
 | 1408.450704 | -8.900000 | -8.100739 | +1.282637 |
 
+## Vapour-rail / MELTS-family engine cross-check
+
+The 2026-08-03 engine cross-check is the second external baseline beside the
+mass-spec residuals above. It compares the live builtin vapour rail with
+VapoRock at the **same** `lunar_mare_low_ti` oxide-mol composition and absolute
+fO2. All 42 VapoRock evaluations used the VR-5 warm pool: 14 temperatures across
+the externally validated 1350--1950 K envelope and fixed admitted
+`log10(fO2/bar) = -9, -8, -7`. The fixed grid avoids silently clamping the live
+rail's 1e-9 bar transport floor; IW-1 lies below that floor at lower
+temperatures.
+
+Liquid state is **unverified, not asserted** in this campaign. VapoRock used its
+internal melt solve; the harness did not fabricate `liquid_fraction = 1` to
+bypass the external liquid-fraction gate. Therefore the low-temperature rows
+remain diagnostic pressure comparisons, not evidence that the feedstock is a
+fully admitted liquid at every cell.
+
+This is a measured-divergence report, not a validation verdict. Signed delta is
+`log10(P_rail/P_VapoRock)`. The difference is retained as the observed
+polymerisation/activity correction; no coefficient was calibrated or changed.
+The temperature trend is the fitted delta slope at `log10(fO2/bar) = -8`.
+Magnitude labels are descriptive only: **wild** means at least one matched cell
+differs by 2 dex (100x) or more.
+
+| Species | matched cells | VapoRock-only cells | median delta dex | delta range dex | delta T trend dex/100 K | median rail fO2 slope | median VapoRock fO2 slope | measured finding |
+|---|---:|---:|---:|---:|---:|---:|---:|---|
+| Al | 31 | 11 | -0.425 | -0.486 to -0.364 | -0.027 | -0.750 | -0.750 | below 0.5 dex |
+| Ca | 42 | 0 | +0.546 | **-2.317** to +0.856 | -0.626 | -0.500 | -0.500 | **wild** at 1950 K, log fO2 -9 |
+| Cr | 42 | 0 | -0.194 | -0.273 to -0.148 | +0.019 | -0.750 | -0.750 | below 0.5 dex |
+| CrO2 | 33 | 9 | -0.180 | -0.227 to -0.148 | +0.017 | +0.250 | +0.250 | below 0.5 dex with low-T coverage gaps |
+| Fe | 42 | 0 | +0.014 | -0.212 to +0.341 | +0.022 | **-0.547** | -0.500 | magnitude small; slope differs by -0.047 |
+| K | 42 | 0 | +0.775 | -0.399 to **+2.207** | -0.429 | -0.250 | -0.250 | **wild** at 1350 K, log fO2 -8 |
+| Mg | 42 | 0 | -0.444 | -0.484 to +0.144 | -0.048 | -0.500 | -0.500 | below 0.5 dex |
+| Na | 42 | 0 | +0.415 | -0.456 to **+1.437** | -0.315 | -0.250 | -0.250 | large (1--2 dex), not wild |
+| SiO | 39 | 3 | -0.017 | -0.041 to -0.002 | +0.007 | -0.500 | -0.500 | close magnitude; three coverage gaps |
+| Ti | 15 | 27 | -0.162 | -0.176 to -0.156 | +0.007 | -1.000 | -1.000 | close where shared; VapoRock answers much more of the grid |
+
+Coverage is itself a finding. Of the 11 pressure species declared by both
+surfaces, 10 produced matched points. Mn was rail-only in all 42 cells;
+VapoRock did not answer it. VapoRock answered while the rail did not for Al
+(11 cells), CrO2 (9), SiO (3), and Ti (27). VapoRock also produced 24 molecular,
+atomic-oxygen, dimer, and oxide-gas species with no executable rail counterpart,
+including O, O2, Si, NaO, KO, AlO, TiO, and the namespaced oxide gases. These
+are coverage asymmetries, not zero pressures.
+
+alphaMELTS and MAGEMin are relevant condensed-state context, not additional gas
+pressure comparators. The VapoRock family uses alphaMELTS for the melt solve,
+but alphaMELTS exposes no independent gas-pressure API; a separate direct call
+would also risk its unpooled VapoRock helper. MAGEMin supplies phase assemblage
+and liquid-fraction context but no vapour pressures, and the matched
+MAGEMin-plus-ThermoEngine activity-evidence conversion is not runtime-wired.
+No pressure parity is fabricated for either engine.
+
+The full per-cell pressures, censored/refused observations, coverage labels,
+per-temperature fO2 slopes, and exact wild-divergence coordinates are in
+[`docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json`](../docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json),
+with the human-readable companion
+[`engine_crosscheck_report.md`](../docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.md).
+
 ## Stage-0 bakeout: unlimited-reductant assumption and non-rock clearance
 
 Stage 0 is meant to strip non-rock species (volatiles, salts, sulfides, native metals, refractory trace) from the feedstock before the cleaned silicate oxide composition reaches `MeltState` and the downstream melt backends. The operator-facing simplification is that unlimited C, CO, and O₂ reductant/oxidant are available during bakeout. **As coded, that assumption does not drive thermodynamic clearance for most species**, and the sections below make that structural fact explicit rather than leaving it implied by the ledger.
