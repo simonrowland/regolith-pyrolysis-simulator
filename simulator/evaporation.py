@@ -645,6 +645,39 @@ class EvaporationMixin:
                 state == 'zero_by_physics' for state in channel_states.values()
             ):
                 return flux
+            # b-118: out-of-domain answers are typed upper_bound (non-debiting).
+            # When every channel is a typed non-debit outcome (upper_bound,
+            # refusal, zero, dormant) and none is eligible / missing-seam,
+            # empty flux is authorized — not an empty-provider false zero.
+            _typed_non_debit = frozenset(
+                {
+                    'zero_by_physics',
+                    'upper_bound',
+                    'refusal',
+                    'dormant_by_epoch',
+                    'incomplete_channel',
+                }
+            )
+            if (
+                channel_states
+                and all(
+                    state in _typed_non_debit for state in channel_states.values()
+                )
+            ):
+                self._last_evaporation_flux_diagnostic = {
+                    **regime_diagnostic,
+                    'reason': 'vapour_batch_all_channels_non_debiting',
+                    'detail': (
+                        'every requested vapour channel is a typed non-debit '
+                        'outcome (upper_bound / refusal / zero / dormant); '
+                        'empty flux is authorized'
+                    ),
+                    'batch_channel_states': channel_states,
+                    'evaporation_flux_kg_hr': {},
+                    'vapour_batch_flux_overlay': flux_overlay_report,
+                    'vapour_batch': batch_report,
+                }
+                return flux
             reason = 'vapour_batch_no_debiting_pressure_outcome'
             diagnostic = {
                 **regime_diagnostic,

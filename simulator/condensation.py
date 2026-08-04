@@ -3626,13 +3626,21 @@ class CondensationModel:
                 alpha_s_value=float(alpha_s_value),
             )
 
-        P_local_pa = _local_species_pressure_pa(
+        # Resolve Antoine (or catalog) Psat at T_cond; uncovered segments and
+        # range errors are typed refusals (b-127), never a fabricated 100 Pa.
+        P_local_pa, psat_refused = _try_antoine_psat_pa(
             species,
-            T_cond_C,
+            T_cond_C + CELSIUS_TO_KELVIN_OFFSET,
             vapor_pressure_data=self.vapor_pressure_data,
             antoine_extrapolations=antoine_extrapolations,
             antoine_extrapolation_warnings=antoine_extrapolation_warnings,
         )
+        if psat_refused or P_local_pa is None:
+            return _mint_zero(
+                'antoine_psat_unavailable_at_T',
+                T_cond_C=float(T_cond_C),
+                T_K=float(T_cond_C + CELSIUS_TO_KELVIN_OFFSET),
+            )
         if P_local_pa <= 0.0:
             return _mint_zero(
                 'nonpositive_local_pressure',
@@ -4652,21 +4660,24 @@ def _try_antoine_psat_pa(
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
 ) -> tuple[float | None, bool]:
-    """Return a wall pressure or a named, fail-closed range refusal."""
+    """Return a wall pressure or a named, fail-closed range refusal.
+
+    ``(None, True)`` means typed refusal — including the case where the
+    species has Antoine data somewhere but no segment covers ``T_K``
+    (``_antoine_psat_pa`` returns None without raising). Never invent a
+    pressure for that gap (b-127 fabricated 100 Pa).
+    """
 
     from engines.builtin.vapor_pressure import VaporPressureRangeError
     from simulator.vapour_rail.catalog import CatalogCompileError
 
     try:
-        return (
-            _antoine_psat_pa(
-                species,
-                T_K,
-                vapor_pressure_data=vapor_pressure_data,
-                antoine_extrapolations=antoine_extrapolations,
-                antoine_extrapolation_warnings=antoine_extrapolation_warnings,
-            ),
-            False,
+        pressure_pa = _antoine_psat_pa(
+            species,
+            T_K,
+            vapor_pressure_data=vapor_pressure_data,
+            antoine_extrapolations=antoine_extrapolations,
+            antoine_extrapolation_warnings=antoine_extrapolation_warnings,
         )
     except (CatalogCompileError, VaporPressureRangeError) as exc:
         if (
@@ -4675,6 +4686,9 @@ def _try_antoine_psat_pa(
         ):
             antoine_extrapolation_warnings.append(str(exc))
         return None, True
+    if pressure_pa is None:
+        return None, True
+    return float(pressure_pa), False
 
 
 def _local_species_pressure_pa(
@@ -4685,6 +4699,13 @@ def _local_species_pressure_pa(
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
 ) -> float:
+    """Local stage pressure for capture efficiency, or 0.0 on typed refusal.
+
+    Refused / uncovered Antoine temperatures return 0.0 so
+    ``_condensation_efficiency`` mints a status-bearing pass-through via
+    ``_mint_zero`` (folded into ``condensation_refusals_by_species``). A
+    fabricated ~1 mbar (100 Pa) is never returned (b-127).
+    """
     P_local_pa, refused = _try_antoine_psat_pa(
         species,
         T_cond_C + CELSIUS_TO_KELVIN_OFFSET,
@@ -4696,8 +4717,7 @@ def _local_species_pressure_pa(
         return 0.0
     if P_local_pa is not None and P_local_pa > 0.0:
         return P_local_pa
-    # Existing condensation temperatures are documented at ~1 mbar.
-    return 100.0
+    return 0.0
 
 
 def _record_wall_surface_antoine_telemetry(

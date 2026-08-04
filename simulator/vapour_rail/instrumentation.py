@@ -745,11 +745,18 @@ def flux_pressures_from_batch(
     extra_source_species = sorted(source_species_ids - batch_active_species_ids)
     report["missing_effective_pressure_species"] = missing_source_species
     report["effective_pressure_species_not_batch_active"] = extra_source_species
-    if missing_source_species or extra_source_species:
+    # Batch-active species must have a seam value (hard fail if not). Source
+    # extras that the batch demoted to upper_bound / non-debiting (b-118
+    # out-of-domain continuation) are expected: they keep the anti-cliff
+    # screening answer but do not debit inventory, so they must not empty the
+    # whole flux map.
+    if missing_source_species:
         report["selection_source"] = (
             "typed_failure_effective_pressure_species_set_mismatch"
         )
         return {}, report
+    if extra_source_species:
+        report["demoted_effective_pressure_species"] = list(extra_source_species)
 
     report["selection_source"] = effective_pressure_source.source_id
     flux_pressures: dict[str, float] = {}
@@ -845,6 +852,10 @@ def compare_live_shadow_to_batch_flux(
     refused_live: list[str] = []
     missing_channel_keys: list[str] = []
     catalog_pa_by_species: dict[str, float] = {}
+    # b-118: catalog upper_bound (out-of-domain) demotes seam claims. Live may
+    # still carry those species as legacy pressures; they are not batch
+    # flux-active and must not fail the activation-set shadow proof.
+    demoted_upper_bound: set[str] = set()
 
     if batch is not None:
         for species_id in sorted(batch.requested_species_ids):
@@ -854,6 +865,8 @@ def compare_live_shadow_to_batch_flux(
                 continue
             if answer.is_refused and live.get(species_id, 0.0) > 0.0:
                 refused_live.append(species_id)
+            if _channel_flux_gate_state(answer) == "upper_bound":
+                demoted_upper_bound.add(species_id)
             if (
                 species_id in batch.flux_active_species_ids
                 and isinstance(answer.pressure, PressureValue)
@@ -862,10 +875,17 @@ def compare_live_shadow_to_batch_flux(
                 if math.isfinite(catalog_pa):
                     catalog_pa_by_species[species_id] = catalog_pa
 
+    legacy_active_ids = (
+        tuple(sid for sid in live if sid not in demoted_upper_bound)
+        if batch is not None
+        else None
+    )
     comparison = compare_legacy_vs_batch_flux_paths(
-        legacy_pressures_Pa=live,
+        legacy_pressures_Pa={
+            sid: pa for sid, pa in live.items() if sid not in demoted_upper_bound
+        },
         batch_flux_pressures_Pa=batch_flux_pressures_Pa,
-        legacy_flux_active_species_ids=tuple(live) if batch is not None else None,
+        legacy_flux_active_species_ids=legacy_active_ids,
         batch_flux_active_species_ids=(
             tuple(batch.flux_active_species_ids) if batch is not None else None
         ),
@@ -878,8 +898,9 @@ def compare_live_shadow_to_batch_flux(
     comparison.update(
         {
             "n_live_pressures": len(live),
+            "demoted_upper_bound_species": sorted(demoted_upper_bound),
             "live_only_bridge_species": sorted(
-                set(live) - set(batch_flux_pressures_Pa)
+                set(live) - set(batch_flux_pressures_Pa) - demoted_upper_bound
             ),
             "batch_refused_live_species": refused_live,
             "batch_flux_active_not_in_live": sorted(
@@ -888,7 +909,7 @@ def compare_live_shadow_to_batch_flux(
             if batch is not None
             else [],
             "live_flux_active_not_in_batch": sorted(
-                set(live) - set(batch.flux_active_species_ids)
+                (set(live) - demoted_upper_bound) - set(batch.flux_active_species_ids)
             )
             if batch is not None
             else sorted(live),

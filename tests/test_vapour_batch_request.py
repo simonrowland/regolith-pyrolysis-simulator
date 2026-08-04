@@ -703,6 +703,58 @@ def test_pending_validation_is_not_refusal() -> None:
     assert answer.verdict_status == "status_bearing_non_authoritative"
 
 
+def test_b118_out_of_domain_is_pressure_upper_bound_not_flux_eligible() -> None:
+    """b-118: out-of-domain continuation must not debit inventory.
+
+    Red-under-reversion: if request.py again mints PressureValue + FluxEligible
+    for evaluation.out_of_range, this fails. Authority is stripped while the
+    anti-cliff continuous envelope remains as a screening upper bound.
+    """
+    payload = _minimal_family("K")
+    # Domain [1000, 2000] K — 2100 K is out of range.
+    catalog = compile_vapour_rail_catalog(payload, u0_manifest=_u0_stub("K"))
+    ledger = {"process.cleaned_melt": {"K2O": 1.0, "KO0.5": 1.0}}
+    # RG epoch: out-of-domain upper bounds are answerable but never flux-active.
+    # (Pre-RG refuses construction if a named effective-pressure species is not
+    # flux-eligible — that is correct; UpperBound must not activate.)
+    batch = catalog.resolve_batch(
+        ledger,
+        _state_with_k_activity(temperature_K=2100.0),
+        flux_activation_context=_rg_activation_context(),
+    )
+    answer = batch.channel("K")
+    assert not answer.is_refused
+    assert answer.extra.get("out_of_range") is True
+    assert isinstance(answer.pressure, PressureUpperBound)
+    assert isinstance(answer.flux, FluxDiagnosticUpperBound)
+    assert answer.pressure.pa > 0.0
+    assert "out_of_domain" in answer.pressure.evidence_ref
+    # Upper bound may not join flux-active debit set.
+    assert not answer.is_flux_active
+    assert "K" not in batch.flux_active_species_ids
+
+    # Pre-RG demotes OOD upper bounds out of the debit set (no hard-fail of
+    # the whole batch when one claimed species is out of domain).
+    pre_rg = catalog.resolve_batch(
+        ledger,
+        _state_with_k_activity(temperature_K=2100.0),
+        flux_activation_context=_pre_rg_activation_context("K"),
+    )
+    assert isinstance(pre_rg.channel("K").pressure, PressureUpperBound)
+    assert "K" not in pre_rg.flux_active_species_ids
+
+    # In-domain control still full-authority (when activated).
+    in_domain = catalog.resolve_batch(
+        ledger,
+        _state_with_k_activity(temperature_K=1500.0),
+        flux_activation_context=_pre_rg_activation_context("K"),
+    ).channel("K")
+    assert in_domain.extra.get("out_of_range") is not True
+    assert isinstance(in_domain.pressure, PressureValue)
+    assert isinstance(in_domain.flux, FluxEligible)
+    assert in_domain.is_flux_active
+
+
 def test_missing_activity_is_refusal_or_declared_henrian_upper_bound() -> None:
     payload = _minimal_family("K")
     catalog = compile_vapour_rail_catalog(payload, u0_manifest=_u0_stub("K"))

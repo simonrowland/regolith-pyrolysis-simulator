@@ -243,14 +243,20 @@ def test_shadow_records_show_zero_alkali_wall_flux_via_dewpoint(
     # own wall band: the shadow rate model must report identically zero
     # alkali wall flux, with the record's own fields showing the reason is
     # the dew-point relation at the wall temperature.
+    #
+    # Hold at 1300 C (1573 K) so both Na and K stay inside their catalog
+    # fit domains (Na [1400,1900] K, K [1190,1600] K). At 1600 C K is
+    # out-of-domain and b-118 demotes it to PressureUpperBound (no inventory
+    # debit) — which would vacate the dew-point claim for K. The dew-point
+    # physics under test is independent of that authority fix.
     payload = PyrolysisRun(
         feedstock_id="lunar_mare_low_ti",
         campaign="C2A",
         hours=1,
         allow_fallback_vapor=True,
         allow_unmeasured_alpha_fallback=True,
-        sio_start_temperature_c=1600.0,
-        sio_hold_temperature_c=1600.0,
+        sio_start_temperature_c=1300.0,
+        sio_hold_temperature_c=1300.0,
         sio_liner_temperature_c=wall_temperature_C,
         sio_pO2_mbar=0.0,
         include_wall_deposit_rate_diagnostics=True,

@@ -662,7 +662,12 @@ class CompiledPressureEvaluator:
                     f"{self.species_id}: unsupported extrapolation policy "
                     f"{self.extrapolation_policy!r}"
                 )
-            log10_reference = self._conservative_log10_continuation(temperature_K)
+            # Anti-cliff: continuous non-zero at the domain edge (no silent
+            # zero). Consumers MUST type this as PressureUpperBound /
+            # FluxDiagnosticUpperBound — never full-authority PressureValue.
+            log10_reference = self._out_of_domain_log10_continuation(
+                temperature_K
+            )
         else:
             log10_reference = self.reference_model.log10_pressure(temperature_K)
 
@@ -700,7 +705,21 @@ class CompiledPressureEvaluator:
             acquisition_flag=self.acquisition_flag if out_of_range else None,
         )
 
-    def _conservative_log10_continuation(self, temperature_K: float) -> float:
+    def _out_of_domain_log10_continuation(self, temperature_K: float) -> float:
+        """Continuous out-of-domain envelope (anti-cliff; not full authority).
+
+        Owner-ratified anti-cliff policy: never drop to silent zero at the
+        fit-domain edge (that would invent a volatility cliff). The returned
+        number is a **screening upper envelope**, not a point PressureValue.
+
+        Consequence-directed bound (coating failure mode, CLAUDE.md §4):
+        under-stating flux flatters yield and hides wall coating. A bound that
+        may inform coating risk must not under-state outward volatility —
+        amplify outward increases and attenuate outward decreases relative to
+        the straight log-linear slope. Inventory debit remains forbidden:
+        request.py maps ``out_of_range`` evaluations to PressureUpperBound +
+        FluxDiagnosticUpperBound.
+        """
         low, high = self.valid_temperature_K
         boundary = low if temperature_K < low else high
         span = max(high - low, 1.0)
@@ -710,11 +729,13 @@ class CompiledPressureEvaluator:
         inside_log = self.reference_model.log10_pressure(inside)
         slope = (boundary_log - inside_log) / (boundary - inside)
         straight_delta = slope * (temperature_K - boundary)
-        # Conservative means never more volatile than straight continuation.
-        # Retain a non-zero slope: attenuate outward increases and strengthen
-        # outward decreases instead of introducing a flat/zero cliff.
-        factor = 0.5 if straight_delta >= 0.0 else 1.5
+        # Coating-risk upper envelope (not yield-flattering half-slope):
+        # outward increase → steeper; outward decrease → shallower; never flat.
+        factor = 1.5 if straight_delta >= 0.0 else 0.5
         return boundary_log + factor * straight_delta
+
+    # Compat alias — older tests/callers may still import the private name.
+    _conservative_log10_continuation = _out_of_domain_log10_continuation
 
 
 @dataclass(frozen=True)

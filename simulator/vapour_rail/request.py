@@ -996,16 +996,27 @@ def refusal_closure(
                 if alpha
                 else f"alpha_missing:{rule.species_id}"
             )
-            if (
+            activity_is_upper_bound = (
                 source_reaction_activity is not None
                 and source_reaction_activity.verdict
                 is ActivityVerdictKind.UPPER_BOUND
-            ):
-                bound_evidence = (
-                    source_reaction_activity.evidence_ref
-                    or source_reaction_activity.reason
-                    or "source_reaction_activity_upper_bound"
-                )
+            )
+            # b-118: out-of-domain continuation is a typed upper bound, never
+            # full-authority PressureValue + FluxEligible (that under-stated
+            # coating flux while debiting inventory). Anti-cliff continuity is
+            # preserved in the evaluator; authority is stripped here.
+            out_of_domain = bool(evaluation_extra.get("out_of_range"))
+            if activity_is_upper_bound or out_of_domain:
+                if activity_is_upper_bound:
+                    bound_evidence = (
+                        source_reaction_activity.evidence_ref
+                        or source_reaction_activity.reason
+                        or "source_reaction_activity_upper_bound"
+                    )
+                else:
+                    bound_evidence = (
+                        f"catalog:out_of_domain_continuation:{rule.species_id}"
+                    )
                 pressure = PressureUpperBound(
                     pa=float(pressure_pa), evidence_ref=bound_evidence
                 )
@@ -1337,21 +1348,33 @@ def resolve_vapour_batch(
         for species_id, answer in answers.items()
         if answer.is_flux_active
     )
-    # Answerability is not activation authority. Pre-RG keeps the exact species
-    # set supplied by the typed effective-pressure seam, but only after refusal
-    # closure proves every member catalog-eligible. RG-1 may activate the full
-    # manifest/catalog union after its activity-corrected value path lands.
+    # Answerability is not activation authority. Pre-RG keeps the species set
+    # supplied by the typed effective-pressure seam, but only after refusal
+    # closure proves every *remaining debit claim* is catalog-eligible.
+    # Typed non-debiting answers (PressureUpperBound / FluxDiagnosticUpperBound,
+    # ZeroByPhysics) demote the seam claim rather than hard-fail the batch —
+    # b-118 out-of-domain is an upper bound, not a full-authority debit, and
+    # must not collapse the whole evaporation step when one species is OOD.
+    # True refusals among claimed species still hard-fail construction.
+    # RG-1 may activate the full manifest/catalog union after its
+    # activity-corrected value path lands.
     if flux_activation_context.epoch == FLUX_ACTIVATION_EPOCH_PRE_RG:
-        missing_effective = (
-            flux_activation_context.effective_pressure_species_ids
-            - union_eligible
+        claimed = flux_activation_context.effective_pressure_species_ids
+        demoted_non_debiting = frozenset(
+            species_id
+            for species_id in claimed
+            if species_id in answers
+            and not answers[species_id].is_refused
+            and not answers[species_id].is_flux_active
         )
+        required_debit_claims = claimed - demoted_non_debiting
+        missing_effective = required_debit_claims - union_eligible
         if missing_effective:
             raise VapourRequestConstructionError(
                 "pre-RG effective-pressure channels are not flux-eligible: "
                 f"{sorted(missing_effective)}"
             )
-        flux_active = flux_activation_context.effective_pressure_species_ids
+        flux_active = claimed & union_eligible
     elif flux_activation_context.epoch == FLUX_ACTIVATION_EPOCH_RG_MANIFEST:
         flux_active = union_eligible
     else:  # FluxActivationContext rejects this; retain a fail-closed guard.

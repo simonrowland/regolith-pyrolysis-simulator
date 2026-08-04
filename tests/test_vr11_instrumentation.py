@@ -106,10 +106,12 @@ def test_b112_nonpositive_local_pressure_mints_typed_outcome(monkeypatch) -> Non
 
     model = _efficiency_model()
     stage = next(s for s in model.train.stages if s.stage_number == 3)
+    # Force a non-refused but nonpositive pressure so the nonpositive branch
+    # (not antoine_psat_unavailable_at_T) is the one that mints.
     monkeypatch.setattr(
         condensation_module,
-        "_local_species_pressure_pa",
-        lambda *args, **kwargs: 0.0,
+        "_try_antoine_psat_pa",
+        lambda *args, **kwargs: (0.0, False),
     )
     outcomes: list[dict[str, Any]] = []
     eta = model._condensation_efficiency(
@@ -125,6 +127,72 @@ def test_b112_nonpositive_local_pressure_mints_typed_outcome(monkeypatch) -> Non
     assert outcomes[0]["reason"] == "nonpositive_local_pressure"
 
 
+def test_b127_uncovered_antoine_segment_is_typed_refusal_not_100_pa() -> None:
+    """b-127: has Antoine data but no usable segment at T → refuse, never 100 Pa.
+
+    Red-under-reversion: restoring ``return 100.0`` in
+    ``_local_species_pressure_pa`` or treating ``None`` as non-refused makes
+    this fail. Fabricated ~1 mbar drove the capture integral with false
+    authority.
+    """
+    import simulator.condensation as condensation_module
+
+    # Standard-reaction row with pure sidecar that poles at 1000 K → wall
+    # selector returns empty coefficients → _antoine_psat_pa returns None
+    # without raising, while _species_has_antoine_data is still True.
+    vapor_data = {
+        "metals": {
+            "Na": {
+                "fit_target": "standard_reaction_term",
+                "interval_required": False,
+                "pure_component_antoine": {
+                    "A": 5.0,
+                    "B": 2000.0,
+                    "C": -1000.0,
+                },
+            }
+        }
+    }
+    assert condensation_module._species_has_antoine_data(
+        "Na", vapor_pressure_data=vapor_data
+    )
+    T_K = 1000.0
+    raw = condensation_module._antoine_psat_pa(
+        "Na", T_K, vapor_pressure_data=vapor_data
+    )
+    assert raw is None
+    pressure_pa, refused = condensation_module._try_antoine_psat_pa(
+        "Na", T_K, vapor_pressure_data=vapor_data
+    )
+    assert pressure_pa is None
+    assert refused is True
+    local = condensation_module._local_species_pressure_pa(
+        "Na",
+        T_K - condensation_module.CELSIUS_TO_KELVIN_OFFSET,
+        vapor_pressure_data=vapor_data,
+    )
+    assert local == 0.0
+    assert local != 100.0
+
+    model = _efficiency_model()
+    model.vapor_pressure_data = vapor_data
+    stage = next(s for s in model.train.stages if s.stage_number == 3)
+    outcomes: list[dict[str, Any]] = []
+    eta = model._condensation_efficiency(
+        stage=stage,
+        species="Na",
+        T_cond_C=T_K - condensation_module.CELSIUS_TO_KELVIN_OFFSET,
+        residence_s=1.0,
+        available_kg=1.0,
+        alpha_s_value=1.0,
+        efficiency_outcomes=outcomes,
+    )
+    assert eta == 0.0
+    assert outcomes[0]["status"] == "pass_through"
+    assert outcomes[0]["reason"] == "antoine_psat_unavailable_at_T"
+    assert outcomes[0]["output_status"] == "status_bearing"
+
+
 def test_b112_nonpositive_reference_flux_mints_typed_outcome(monkeypatch) -> None:
     import simulator.condensation as condensation_module
 
@@ -132,8 +200,8 @@ def test_b112_nonpositive_reference_flux_mints_typed_outcome(monkeypatch) -> Non
     stage = next(s for s in model.train.stages if s.stage_number == 3)
     monkeypatch.setattr(
         condensation_module,
-        "_local_species_pressure_pa",
-        lambda *args, **kwargs: 10.0,
+        "_try_antoine_psat_pa",
+        lambda *args, **kwargs: (10.0, False),
     )
     monkeypatch.setattr(
         condensation_module,
@@ -161,8 +229,8 @@ def test_b112_positive_efficiency_does_not_mint_outcome(monkeypatch) -> None:
     stage = next(s for s in model.train.stages if s.stage_number == 3)
     monkeypatch.setattr(
         condensation_module,
-        "_local_species_pressure_pa",
-        lambda *args, **kwargs: 1.0,
+        "_try_antoine_psat_pa",
+        lambda *args, **kwargs: (1.0, False),
     )
     monkeypatch.setattr(
         condensation_module,

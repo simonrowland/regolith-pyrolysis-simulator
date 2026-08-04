@@ -537,9 +537,9 @@ def wall_condensation_antoine_coefficients(
     Melt-source standard-reaction terms are not pure-species saturation
     pressures. When a standard-reaction row carries a grounded pure-component
     sidecar usable at this temperature, wall re-evaporation uses that sidecar;
-    otherwise it fails closed (empty block -> the caller's documented ~1 mbar
-    reference fallback) rather than serve the melt activity/pO2 term as a
-    local P_sat. Non-standard-reaction rows keep the runtime selector's
+    otherwise it fails closed (empty block -> caller types a refusal; never
+    invents a fiat pressure) rather than serve the melt activity/pO2 term as
+    a local P_sat. Non-standard-reaction rows keep the runtime selector's
     behavior byte-for-byte.
     """
 
@@ -552,7 +552,7 @@ def wall_condensation_antoine_coefficients(
             if _pure_segment_usable(selected, temperature_K):
                 return selected, COEFF_BLOCK_PURE_COMPONENT
             # A grounded pure-species wall answer exists but not at this
-            # temperature: fail closed (caller's reference fallback) rather
+            # temperature: fail closed so the caller types a refusal rather
             # than extrapolate through a pole or substitute the melt term.
             return {}, COEFF_BLOCK_PURE_COMPONENT
     return {}, COEFF_BLOCK_PURE_COMPONENT

@@ -726,8 +726,8 @@ def test_configured_stage_area_scales_baffle_capture(monkeypatch):
     stage = next(item for item in model.train.stages if item.stage_number == 3)
     monkeypatch.setattr(
         condensation_module,
-        "_local_species_pressure_pa",
-        lambda *args, **kwargs: 1.0,
+        "_try_antoine_psat_pa",
+        lambda *args, **kwargs: (1.0, False),
     )
     monkeypatch.setattr(
         condensation_module,
@@ -765,8 +765,8 @@ def test_missing_stage_area_cannot_make_flux_ratio_a_rate_constant(monkeypatch):
     stage = next(item for item in model.train.stages if item.stage_number == 3)
     monkeypatch.setattr(
         condensation_module,
-        "_local_species_pressure_pa",
-        lambda *args, **kwargs: 1.0,
+        "_try_antoine_psat_pa",
+        lambda *args, **kwargs: (1.0, False),
     )
     monkeypatch.setattr(
         condensation_module,

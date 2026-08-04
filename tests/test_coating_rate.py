@@ -383,14 +383,15 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
         )
         + "\n"
     ).encode("utf-8")
-    # Regenerated from the executable VR-11/b-114 batch instrumentation path.
-    # regenerated 2026-08-02 under REPAIRED MAGEMin config per the train13
-    # adjudication; prior value was generated against the broken-liquidus job
-    # tree (2b353706…1a288). Double-isolated studio generations agreed on this
-    # SHA (medium-confidence stability gate). Laptop third surface c552c73b…f32c
-    # was not restored. docs-private/research/2026-08-02-train13-adjudication.md
+    # Regenerated from the executable b-118/b-127 coating-cluster path
+    # (2026-08-04): out-of-domain vapour answers are PressureUpperBound (no
+    # inventory debit; coating-risk upper envelope) and uncovered Antoine
+    # segments refuse instead of fabricating 100 Pa. Golden moves because
+    # OOD K/Ti no longer debit under half-slope under-report, and capture
+    # integrals no longer invent ~1 mbar — both correct for the coating
+    # failure mode. Double in-process SHA match on this worktree.
     assert hashlib.sha256(actual_bytes).hexdigest() == (
-        "edab4eca8ba85551c0e33355fa96a7e4117f385db214a66bd8519c9469c5412b"
+        "a4e352f79753172ed767bf457960112b09904605bff16226cf80f2d8f416e1e0"
     )
 
 
