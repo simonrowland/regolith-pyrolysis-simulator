@@ -912,7 +912,11 @@ def test_evaporation_caller_counts_condensation_degraded_path_engagement(
     rate_kg_hr = 1e-6
     sim.condensation_model.route = lambda evap_flux, melt: CondensationRouteResult(
         remaining_by_species={"Na": rate_kg_hr},
-        antoine_extrapolations={"Na:stage-1": {}, "Na:wall": {}},
+        antoine_extrapolations={"Na:stage-1": {}},
+        antoine_extrapolation_warnings=[
+            "Na wall Antoine source range refused",
+            "K wall Antoine source range refused",
+        ],
         transport_parameter_notice={"species": ["Na", "K"]},
         capture_budget_regularizer_notice={"code": "capture_budget_regularizer"},
     )
@@ -925,9 +929,46 @@ def test_evaporation_caller_counts_condensation_degraded_path_engagement(
     )
 
     summary = sim._degraded_path_engagement_summary()
-    assert summary["condensation_antoine_extrapolation"]["total_count"] == 2
+    assert summary["condensation_antoine_extrapolation"]["total_count"] == 3
     assert summary["capture_budget_regularizer"]["total_count"] == 1
     assert summary["transport_d_ab_proxy"]["total_count"] == 2
+
+
+def test_evaporation_caller_deduplicates_record_backed_antoine_warning(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    rate_kg_hr = 1e-6
+    sim.condensation_model.route = lambda evap_flux, melt: CondensationRouteResult(
+        remaining_by_species={"Na": rate_kg_hr},
+        antoine_extrapolations={
+            "Na:stage-1": {
+                "temperature_K": 900.0,
+                "valid_range_K": [1800.0, 3100.0],
+            }
+        },
+        antoine_extrapolation_warnings=[
+            "Na metal Antoine fit extrapolated beyond "
+            "valid_range_K [1800, 3100] at 900 K"
+        ],
+    )
+
+    sim._route_to_condensation(
+        EvaporationFlux(
+            species_kg_hr={"Na": rate_kg_hr},
+            total_kg_hr=rate_kg_hr,
+        )
+    )
+
+    summary = sim._degraded_path_engagement_summary()
+    assert summary["condensation_antoine_extrapolation"]["total_count"] == 1
 
 
 # ---------------------------------------------------------------------------

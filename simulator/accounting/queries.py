@@ -2552,7 +2552,6 @@ def wall_deposit_candidate_for_surface_kg(
         _knudsen_number,
         _series_resistance_deposition_flux_mol_m2_s,
         _transport_parameter_notice,
-        _try_antoine_psat_pa,
         _wall_alpha_record,
         _wall_alpha_s,
         classify_knudsen_regime,
@@ -2645,17 +2644,8 @@ def wall_deposit_candidate_for_surface_kg(
     )
     rate_diagnostic["species_partial_pressure_pa"] = P_local_pa
     rate_diagnostic["total_pressure_pa"] = overhead_pressure_pa
-    wall_saturation_pressure_pa, saturation_pressure_refused = (
-        _try_antoine_psat_pa(
-            species,
-            T_wall_K,
-            vapor_pressure_data=vapor_pressure_data,
-            antoine_extrapolation_warnings=antoine_extrapolation_warnings,
-        )
-    )
-    rate_diagnostic["wall_saturation_pressure_pa"] = wall_saturation_pressure_pa
-    rate_diagnostic["wall_saturation_pressure_refused"] = (
-        saturation_pressure_refused
+    wall_saturation_pressure_pa = rate_diagnostic.get(
+        "wall_saturation_pressure_pa"
     )
     rate_diagnostic["supersaturated"] = (
         wall_saturation_pressure_pa is not None

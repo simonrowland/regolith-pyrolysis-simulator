@@ -6,16 +6,22 @@ import json
 
 import pytest
 
+from simulator.accounting.queries import wall_deposit_candidate_for_surface_kg
 from simulator.coating_rate import continuous_wall_deposition_flux
 from simulator.condensation import (
+    CondensationModel,
+    VAPOR_PRESSURE_DATA,
+    WallSaturationPressureRefusal,
     _series_resistance_deposition_flux_mol_m2_s,
+    _wall_deposition_driving_pressure_pa,
 )
+from simulator.core import CondensationTrain
 from simulator.runner import (
     PyrolysisRun,
     _wall_deposit_rate_from_delta,
     _with_wall_deposit_rate_diagnostics,
 )
-from simulator.state import HourSnapshot
+from simulator.state import HourSnapshot, PipeSegment
 
 
 def test_continuous_rate_matches_design_example_components() -> None:
@@ -126,6 +132,128 @@ def test_production_series_resistance_exports_rate_decomposition() -> None:
         "reevaporated_mol_m2_s"
     ] == pytest.approx(flux)
     assert diagnostic["wall_temperature_K"] == 1500.0
+
+
+def test_cold_wall_below_certified_antoine_range_deposits() -> None:
+    vapor_pressure_data = copy.deepcopy(VAPOR_PRESSURE_DATA)
+    fe_antoine = vapor_pressure_data["metals"]["Fe"]["pure_component_antoine"]
+    fe_antoine["source_certified_range_K"] = [1800.0, 3100.0]
+    fe_antoine["extrapolation_policy"] = "refuse"
+    diagnostic: dict[str, object] = {}
+
+    flux = _series_resistance_deposition_flux_mol_m2_s(
+        "Fe",
+        100.0,
+        900.0,
+        0.7,
+        regime_factor=1.0,
+        T_gas_K=1700.0,
+        vapor_pressure_data=vapor_pressure_data,
+        diagnostic_out=diagnostic,
+    )
+
+    assert flux > 0.0
+    assert diagnostic["net_mol_m2_s"] == pytest.approx(flux)
+    assert diagnostic["wall_saturation_pressure_pa"] == pytest.approx(0.0)
+    assert diagnostic["wall_saturation_pressure_refused"] is False
+
+    model = CondensationModel(
+        CondensationTrain.create_default(),
+        vapor_pressure_data=vapor_pressure_data,
+        wall_temperature_C=626.85,
+    )
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={"Fe": 1.0},
+        gas_temperature_C=1426.85,
+        campaign_name="C0",
+    )
+    segment = PipeSegment(
+        name="cold_fe_test",
+        upstream_stage="stage_0",
+        downstream_stage="stage_1",
+        wall_temperature_C=626.85,
+        length_m=1.0,
+        inner_diameter_m=0.12,
+    )
+    wall_deposit_kg = wall_deposit_candidate_for_surface_kg(
+        model,
+        species="Fe",
+        rate_kg_hr=1.0,
+        T_cond_C=model.condensation_temperatures_C["Fe"],
+        melt_temperature_C=1700.0,
+        wall_temperature_C=segment.wall_temperature_C,
+        surface_area_m2=segment.surface_area_m2,
+        segment=segment,
+    )
+
+    assert wall_deposit_kg > 0.0
+
+
+def test_hot_wall_above_certified_antoine_range_is_status_bearing() -> None:
+    vapor_pressure_data = copy.deepcopy(VAPOR_PRESSURE_DATA)
+    fe_antoine = vapor_pressure_data["metals"]["Fe"]["pure_component_antoine"]
+    fe_antoine["source_certified_range_K"] = [1800.0, 3100.0]
+    fe_antoine["extrapolation_policy"] = "refuse"
+    diagnostic: dict[str, object] = {}
+
+    flux = _series_resistance_deposition_flux_mol_m2_s(
+        "Fe",
+        100.0,
+        3200.0,
+        0.7,
+        regime_factor=1.0,
+        T_gas_K=3200.0,
+        vapor_pressure_data=vapor_pressure_data,
+        diagnostic_out=diagnostic,
+    )
+
+    assert flux == pytest.approx(0.0)
+    assert diagnostic["wall_saturation_pressure_refused"] is True
+    assert (
+        diagnostic["wall_saturation_pressure_refusal_reason"]
+        == "above_source_certified_range"
+    )
+
+
+def test_missing_wall_antoine_data_raises_typed_refusal(monkeypatch) -> None:
+    monkeypatch.setattr(
+        "simulator.condensation._species_vapor_data",
+        lambda *args, **kwargs: {
+            "total_source_certified_range_K": [1800.0, 3100.0]
+        },
+    )
+
+    with pytest.raises(
+        WallSaturationPressureRefusal,
+        match="reason=antoine_data_unavailable",
+    ):
+        _wall_deposition_driving_pressure_pa(
+            "Fe",
+            100.0,
+            900.0,
+        )
+
+
+def test_unusable_wall_antoine_coefficients_raise_typed_refusal(
+    monkeypatch,
+) -> None:
+    monkeypatch.setattr(
+        "simulator.condensation._species_vapor_data",
+        lambda *args, **kwargs: {
+            "pure_component_antoine": {"A": 1.0, "B": "invalid", "C": 0.0}
+        },
+    )
+
+    with pytest.raises(
+        WallSaturationPressureRefusal,
+        match="reason=saturation_pressure_unavailable",
+    ):
+        _wall_deposition_driving_pressure_pa(
+            "Fe",
+            100.0,
+            900.0,
+        )
 
 
 def test_committed_rate_projection_exports_mol_s_and_kg_h() -> None:

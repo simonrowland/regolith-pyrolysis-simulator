@@ -3700,6 +3700,7 @@ class CondensationModel:
                 1.0,
             )
             overhead_pressure_pa = float(self.overhead_pressure_mbar) * 100.0
+            rate_diagnostic: dict[str, Any] = {}
             flux = _series_resistance_deposition_flux_mol_m2_s(
                 species, P_local_pa, T_surface_K, sample_alpha_s,
                 pipe_diameter_m=self.pipe_diameter_m,
@@ -3730,7 +3731,15 @@ class CondensationModel:
                 stable_condensation_product_backstop=(species == 'CrO2'),
                 antoine_extrapolations=antoine_extrapolations,
                 antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+                diagnostic_out=rate_diagnostic,
             )
+            if (
+                bool(rate_diagnostic.get('wall_saturation_pressure_refused'))
+                and flux > 0.0
+            ):
+                raise RuntimeError(
+                    "wall saturation-pressure refusal produced positive flux"
+                )
             band_flux_mol_m2_s += flux
         band_flux_mol_m2_s /= HKL_BAND_SAMPLES
         if isinstance(alpha_record, MutableMapping) and isinstance(spec, Mapping):
@@ -4977,6 +4986,70 @@ def _hkl_impingement_flux_mol_m2_s(
     return pressure_pa / denominator / AVOGADRO_MOL
 
 
+class WallSaturationPressureRefusal(RuntimeError):
+    """Wall deposition cannot derive an authoritative saturation pressure."""
+
+    terminal_refusal = True
+
+    def __init__(self, species: str, T_surface_K: float, reason: str) -> None:
+        self.species = str(species)
+        self.temperature_K = float(T_surface_K)
+        self.reason = str(reason)
+        super().__init__(
+            "wall_saturation_pressure_refused: "
+            f"species={self.species} temperature_K={self.temperature_K:.3f} "
+            f"reason={self.reason}"
+        )
+
+
+def _wall_antoine_temperature_relation(
+    species: str,
+    T_surface_K: float,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None,
+    antoine_extrapolations: Mapping[str, Mapping[str, Any]] | None,
+) -> str | None:
+    from engines.builtin.vapor_pressure import (
+        vapor_pressure_source_equation_range_K,
+        wall_condensation_antoine_coefficients,
+    )
+
+    data = _species_vapor_data(
+        species,
+        vapor_pressure_data=vapor_pressure_data,
+    )
+    antoine, coefficient_block = wall_condensation_antoine_coefficients(
+        data,
+        temperature_K=T_surface_K,
+    )
+    candidate_ranges = [
+        data.get("total_source_certified_range_K"),
+        vapor_pressure_source_equation_range_K(
+            data,
+            coefficient_block,
+            temperature_K=T_surface_K,
+        ),
+    ]
+    if isinstance(antoine, Mapping):
+        candidate_ranges.append(antoine.get("source_certified_range_K"))
+    for key, record in (antoine_extrapolations or {}).items():
+        if str(key).split("#", 1)[0] != species or not isinstance(record, Mapping):
+            continue
+        if record.get("temperature_K") == T_surface_K:
+            candidate_ranges.append(record.get("valid_range_K"))
+
+    for value in candidate_ranges:
+        bounds = _valid_temperature_range_K(value)
+        if bounds is None:
+            continue
+        low_K, high_K = bounds
+        if T_surface_K < low_K:
+            return "below"
+        if T_surface_K > high_K:
+            return "above"
+    return None
+
+
 def _wall_deposition_driving_pressure_pa(
     species: str,
     P_local_pa: float,
@@ -4987,6 +5060,7 @@ def _wall_deposition_driving_pressure_pa(
     stable_condensation_product_backstop: bool = False,
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
+    diagnostic_out: MutableMapping[str, Any] | None = None,
 ) -> float:
     try:
         local_pressure_pa = float(P_local_pa)
@@ -5002,7 +5076,7 @@ def _wall_deposition_driving_pressure_pa(
         antoine_extrapolations,
         antoine_extrapolation_warnings,
     )
-    P_sat_pa, _ = _try_antoine_psat_pa(
+    P_sat_pa, saturation_pressure_refused = _try_antoine_psat_pa(
         species,
         T_surface_K,
         vapor_pressure_data=vapor_pressure_data,
@@ -5014,6 +5088,12 @@ def _wall_deposition_driving_pressure_pa(
             raise ValueError(
                 'stable condensation-product backstop is authorized only '
                 f'for CrO2, got {species!r}'
+            )
+        if diagnostic_out is not None:
+            diagnostic_out["wall_saturation_pressure_pa"] = 0.0
+            diagnostic_out["wall_saturation_pressure_refused"] = False
+            diagnostic_out["wall_saturation_pressure_status"] = (
+                "stable_condensation_product_backstop"
             )
         return max(0.0, local_pressure_pa)
     reactivity_class = None
@@ -5030,8 +5110,68 @@ def _wall_deposition_driving_pressure_pa(
             # wall P_sat. Its authorized wall product is disproportionated
             # Si/SiO2 with the existing first-order P_sat ~= 0 backstop, so the
             # full local SiO pressure remains the deposition driving pressure.
+            if diagnostic_out is not None:
+                diagnostic_out["wall_saturation_pressure_pa"] = 0.0
+                diagnostic_out["wall_saturation_pressure_refused"] = False
+                diagnostic_out["wall_saturation_pressure_status"] = (
+                    "reactive_product_backstop"
+                )
             return max(0.0, local_pressure_pa)
-        return 0.0
+        has_antoine_data = _species_has_antoine_data(
+            species,
+            vapor_pressure_data=vapor_pressure_data,
+        )
+        if not has_antoine_data:
+            raise WallSaturationPressureRefusal(
+                species,
+                T_surface_K,
+                "antoine_data_unavailable",
+            )
+        range_relation = _wall_antoine_temperature_relation(
+            species,
+            T_surface_K,
+            vapor_pressure_data=vapor_pressure_data,
+            antoine_extrapolations=antoine_extrapolations,
+        )
+        if range_relation == "below":
+            # P_sat decreases monotonically as T falls; at T << T_boil,
+            # P_sat/P_local -> 0, so P_local - P_sat -> P_local. This is the
+            # cold-limit derivation, not an Antoine extrapolation.
+            if diagnostic_out is not None:
+                diagnostic_out["wall_saturation_pressure_pa"] = 0.0
+                diagnostic_out["wall_saturation_pressure_refused"] = False
+                diagnostic_out["wall_saturation_pressure_status"] = (
+                    "derived_below_certified_range_limit"
+                )
+            return max(0.0, local_pressure_pa)
+
+        if range_relation == "above":
+            refusal_reason = "above_source_certified_range"
+        elif saturation_pressure_refused:
+            refusal_reason = "source_certified_range_refused"
+        else:
+            refusal_reason = "saturation_pressure_unavailable"
+        if (
+            refusal_reason == "saturation_pressure_unavailable"
+            and species == "SiO"
+            and not reactive_product_backstop
+        ):
+            return 0.0
+        if diagnostic_out is not None:
+            diagnostic_out["wall_saturation_pressure_pa"] = None
+            diagnostic_out["wall_saturation_pressure_refused"] = True
+            diagnostic_out["wall_saturation_pressure_refusal_reason"] = (
+                refusal_reason
+            )
+            return 0.0
+        raise WallSaturationPressureRefusal(
+            species,
+            T_surface_K,
+            refusal_reason,
+        )
+    if diagnostic_out is not None:
+        diagnostic_out["wall_saturation_pressure_pa"] = P_sat_pa
+        diagnostic_out["wall_saturation_pressure_refused"] = False
     if reactivity_class == 'reactive':
         if P_sat_pa < local_pressure_pa:
             return max(0.0, local_pressure_pa - P_sat_pa)
@@ -5181,6 +5321,7 @@ def _series_resistance_deposition_flux_mol_m2_s(
         ),
         antoine_extrapolations=antoine_extrapolations,
         antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+        diagnostic_out=diagnostic_out,
     )
     if driving_pressure_pa <= 0.0:
         return 0.0

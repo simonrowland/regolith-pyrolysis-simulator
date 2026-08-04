@@ -2485,10 +2485,44 @@ class EvaporationMixin:
         antoine_extrapolations = dict(
             getattr(route_result, 'antoine_extrapolations', {}) or {}
         )
-        if antoine_extrapolations:
+        antoine_extrapolation_warnings = tuple(
+            getattr(route_result, 'antoine_extrapolation_warnings', ()) or ()
+        )
+        warnings_represented_by_records: set[str] = set()
+        for record_key, record in antoine_extrapolations.items():
+            if not isinstance(record, Mapping):
+                continue
+            status = record.get('status')
+            if status is not None:
+                warnings_represented_by_records.add(str(status))
+            valid_range = record.get('valid_range_K')
+            temperature_K = record.get('temperature_K')
+            if not (
+                isinstance(valid_range, (list, tuple))
+                and len(valid_range) == 2
+            ):
+                continue
+            try:
+                valid_low = float(valid_range[0])
+                valid_high = float(valid_range[1])
+                temperature = float(temperature_K)
+            except (TypeError, ValueError):
+                continue
+            species = str(record_key).split('#', 1)[0].split(':', 1)[0]
+            temperature_text = f"{temperature:.3f}".rstrip('0').rstrip('.')
+            warnings_represented_by_records.add(
+                f"{species} metal Antoine fit extrapolated beyond "
+                f"valid_range_K [{valid_low:g}, {valid_high:g}] at "
+                f"{temperature_text} K"
+            )
+        distinct_warnings = set(antoine_extrapolation_warnings)
+        antoine_degraded_path_count = len(antoine_extrapolations) + len(
+            distinct_warnings - warnings_represented_by_records
+        )
+        if antoine_degraded_path_count:
             self._record_degraded_path_engagement(
                 'condensation_antoine_extrapolation',
-                count=len(antoine_extrapolations),
+                count=antoine_degraded_path_count,
             )
         capture_budget_notice = dict(
             getattr(route_result, 'capture_budget_regularizer_notice', {}) or {}
