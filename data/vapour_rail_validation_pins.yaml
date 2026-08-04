@@ -1,0 +1,171 @@
+schema_version: 1
+kind: vapour_rail_validation_pins
+description: >-
+  Residual ceilings seeded from the current mass-spec reproduction and VapoRock
+  engine-crosscheck harnesses. A residual above its pin is a regression; a
+  residual more than margin_dex below its pin is a stale pin that must tighten.
+policy:
+  metric: max_absolute_residual_dex
+  margin_dex: 0.01
+  target_tier: T4
+  loosening: >-
+    A larger pin is an owner-reviewable data-file diff; tests never widen a pin
+    automatically.
+demand_manifest_ratchet:
+  minimum_elements: 19
+  minimum_carriers: 102
+  minimum_pairs: 128
+  minimum_catalog_linked_pairs: 76
+  note: >-
+    Reviewable lower bounds prevent catalog or source-census deletion from
+    becoming green merely by regenerating the manifest.
+conformance:
+  live_pair_floor: 10
+  note: Pinned non-gap-gated (element, carrier) cases; prevents a vacuous green suite.
+internal_sensibility:
+  tier: T1
+  delta_h_vap_kJ_mol: [50.0, 1000.0]
+  pure_component_species: [Fe, KCl, Na, NaCl]
+  temperature_monotone: increasing
+  y_zero_ratio: 1.0
+  note: >-
+    T1 is a necessary internal-consistency floor and NEVER validates a species;
+    applying a vapourization-enthalpy bound to a standard-reaction pressure is
+    dimensionally the wrong branch (b-134 self-agreement trap).
+species:
+  Al:
+    tier: T2
+    target_tier: T4
+    validations:
+      vaporock:
+        pinned_residual_dex: 0.48565570074150183
+        evidence_refs:
+          - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+  Ca:
+    tier: T2
+    target_tier: T4
+    validations:
+      vaporock:
+        pinned_residual_dex: 2.3169715202228525
+        evidence_refs:
+          - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+  Cr:
+    tier: T3
+    target_tier: T4
+    validations:
+      vaporock:
+        pinned_residual_dex: 0.2727768111618302
+        evidence_refs:
+          - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+      mass_spec:
+        pinned_residual_dex: 0.0
+        evidence_refs:
+          - tests/chemistry/extract_store_reproduction_residual_baselines.yaml
+          - docs/model-limitations.md#extract-store-reproduction-battery
+  CrO2:
+    tier: T2
+    target_tier: T4
+    validations:
+      vaporock:
+        pinned_residual_dex: 0.22658647578501132
+        evidence_refs:
+          - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+  Fe:
+    tier: T3
+    target_tier: T4
+    validations:
+      vaporock:
+        pinned_residual_dex: 0.3407931412581238
+        evidence_refs:
+          - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+      mass_spec:
+        pinned_residual_dex: 1.6989700043360187
+        evidence_refs:
+          - tests/chemistry/extract_store_reproduction_residual_baselines.yaml
+          - docs/model-limitations.md#extract-store-reproduction-battery
+  K:
+    tier: T3
+    target_tier: T4
+    validations:
+      vaporock:
+        pinned_residual_dex: 2.206760319412937
+        evidence_refs:
+          - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+      mass_spec:
+        pinned_residual_dex: 0.8860566476931632
+        evidence_refs:
+          - tests/chemistry/extract_store_reproduction_residual_baselines.yaml
+          - docs/model-limitations.md#extract-store-reproduction-battery
+  Mg:
+    tier: T3
+    target_tier: T4
+    validations:
+      vaporock:
+        pinned_residual_dex: 0.4844513515713212
+        evidence_refs:
+          - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+      mass_spec:
+        pinned_residual_dex: 0.6989700043360189
+        evidence_refs:
+          - tests/chemistry/extract_store_reproduction_residual_baselines.yaml
+          - docs/model-limitations.md#extract-store-reproduction-battery
+  Mn:
+    tier: T1
+    target_tier: T4
+    validations:
+      structural:
+        evidence_refs:
+          - data/vapor_pressures.yaml
+  Na:
+    tier: T3
+    target_tier: T4
+    validations:
+      vaporock:
+        pinned_residual_dex: 1.4368670475601244
+        evidence_refs:
+          - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+      mass_spec:
+        pinned_residual_dex: 0.585026652029182
+        evidence_refs:
+          - tests/chemistry/extract_store_reproduction_residual_baselines.yaml
+          - docs/model-limitations.md#extract-store-reproduction-battery
+  SiO:
+    tier: T3
+    target_tier: T4
+    validations:
+      vaporock:
+        pinned_residual_dex: 0.04091055507277361
+        evidence_refs:
+          - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+      mass_spec:
+        pinned_residual_dex: 1.2974849325542646
+        evidence_refs:
+          - tests/chemistry/extract_store_reproduction_residual_baselines.yaml
+          - docs/model-limitations.md#extract-store-reproduction-battery
+  Ti:
+    tier: T2
+    target_tier: T4
+    validations:
+      vaporock:
+        pinned_residual_dex: 0.17562698423078063
+        evidence_refs:
+          - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+systematic_sio_oracle:
+  status: evaluator_gap
+  reason: acquisition-pending
+  missing: >-
+    Absolute bottom-up SiO pressure path: checked-in gas Si/SiO/O2 polynomials
+    do not include the shared condensed SiO2 reservoir term needed for an
+    independent absolute comparison.
+  oracle_family_id: oxide_vapors_sio_family
+  oracle_species_id: SiO
+  systematic_species_id: null
+  uncertainty_dex: 0.05
+  comparison_grid:
+    - {temperature_K: 1600.0, pO2_bar: 1.0e-9, activity: 0.37}
+    - {temperature_K: 1800.0, pO2_bar: 1.0e-9, activity: 0.37}
+    - {temperature_K: 2000.0, pO2_bar: 1.0e-9, activity: 0.37}
+  required_failure_message: "investigate \u2014 do NOT tune the systematic path to match the incumbent."
+  evidence_refs:
+    - data/vapor_pressures.yaml#oxide_vapors_sio_family
+    - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json

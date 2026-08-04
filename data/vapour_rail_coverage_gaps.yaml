@@ -1,0 +1,839 @@
+schema_version: 1
+kind: vapour_rail_coverage_gaps
+description: >-
+  Typed, reviewable demanded-but-unmodelled pairs. Program completion means
+  entries is empty. A carrier-discovery entry may use the reserved
+  __carrier_discovery__ carrier only when a feedstock element has no known
+  demand pair.
+reason_types:
+- thermo_missing
+- activity_missing
+- acquisition-pending
+- negligibility-proven-with-margin
+entries:
+- element: Al
+  carrier: Al2
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Al
+  carrier: Al2O
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Al
+  carrier: Al2O2
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Al
+  carrier: Al2O3_gas
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Al
+  carrier: AlO
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Al
+  carrier: AlO2
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: C
+  carrier: C2H5OH
+  contract: C2-C5
+  reason: thermo_missing
+  missing: executable gas pressure thermochemistry or correlation for catalog carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: C
+  carrier: C2H6
+  contract: C2-C5
+  reason: thermo_missing
+  missing: executable gas pressure thermochemistry or correlation for catalog carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: C
+  carrier: CH3COOH
+  contract: C2-C5
+  reason: thermo_missing
+  missing: executable gas pressure thermochemistry or correlation for catalog carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: C
+  carrier: CH4
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: C
+  carrier: CH4O
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: C
+  carrier: CO
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: C
+  carrier: CO2
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: C
+  carrier: COS
+  contract: C2-C5
+  reason: thermo_missing
+  missing: executable gas pressure thermochemistry or correlation for catalog carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: C
+  carrier: CS2
+  contract: C2-C5
+  reason: thermo_missing
+  missing: executable gas pressure thermochemistry or correlation for catalog carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: C
+  carrier: HCHO
+  contract: C2-C5
+  reason: thermo_missing
+  missing: executable gas pressure thermochemistry or correlation for catalog carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: C
+  carrier: HCN
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: C
+  carrier: HNCO
+  contract: C2-C5
+  reason: thermo_missing
+  missing: executable gas pressure thermochemistry or correlation for catalog carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: C
+  carrier: NH4CN
+  contract: C2-C5
+  reason: thermo_missing
+  missing: executable gas pressure thermochemistry or correlation for catalog carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Ca
+  carrier: Ca2
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Ca
+  carrier: CaCl2
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Ca
+  carrier: CaO_gas
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Cl
+  carrier: CaCl2
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Cl
+  carrier: Cl
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Cl
+  carrier: Cl2
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Cl
+  carrier: ClO4
+  contract: C2-C5
+  reason: thermo_missing
+  missing: executable gas pressure thermochemistry or correlation for catalog carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Cl
+  carrier: HCl
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Cl
+  carrier: K2Cl2
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Cl
+  carrier: KCl
+  contract: C5
+  reason: acquisition-pending
+  missing: Stage-0 volatilization returns diagnostic transition=None; executable carrier inventory debit is absent
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Cl
+  carrier: Mg2Cl4
+  contract: C2-C5
+  reason: thermo_missing
+  missing: executable gas pressure thermochemistry or correlation for catalog carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Cl
+  carrier: MgCl2
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Cl
+  carrier: Na2Cl2
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Cl
+  carrier: NaCl
+  contract: C5
+  reason: acquisition-pending
+  missing: Stage-0 volatilization returns diagnostic transition=None; executable carrier inventory debit is absent
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Co
+  carrier: Co
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Cr
+  carrier: Cr2O3_gas
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Cr
+  carrier: CrO
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Cr
+  carrier: CrO2
+  contract: C5
+  reason: acquisition-pending
+  missing: evaporation alpha and executable inventory-debit path for CrO2; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Cr
+  carrier: CrO3
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Fe
+  carrier: FeO_gas
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: H
+  carrier: C2H5OH
+  contract: C2-C5
+  reason: thermo_missing
+  missing: executable gas pressure thermochemistry or correlation for catalog carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: H
+  carrier: C2H6
+  contract: C2-C5
+  reason: thermo_missing
+  missing: executable gas pressure thermochemistry or correlation for catalog carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: H
+  carrier: CH3COOH
+  contract: C2-C5
+  reason: thermo_missing
+  missing: executable gas pressure thermochemistry or correlation for catalog carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: H
+  carrier: CH4
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: H
+  carrier: CH4O
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: H
+  carrier: H
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: H
+  carrier: H2
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: H
+  carrier: H2O
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: H
+  carrier: H2S
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: H
+  carrier: HCHO
+  contract: C2-C5
+  reason: thermo_missing
+  missing: executable gas pressure thermochemistry or correlation for catalog carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: H
+  carrier: HCN
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: H
+  carrier: HCl
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: H
+  carrier: HNCO
+  contract: C2-C5
+  reason: thermo_missing
+  missing: executable gas pressure thermochemistry or correlation for catalog carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: H
+  carrier: KOH
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: H
+  carrier: NH3
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: H
+  carrier: NH4CN
+  contract: C2-C5
+  reason: thermo_missing
+  missing: executable gas pressure thermochemistry or correlation for catalog carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: H
+  carrier: NaOH
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: K
+  carrier: K2
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: K
+  carrier: K2Cl2
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: K
+  carrier: K2O_gas
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: K
+  carrier: KCl
+  contract: C5
+  reason: acquisition-pending
+  missing: Stage-0 volatilization returns diagnostic transition=None; executable carrier inventory debit is absent
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: K
+  carrier: KO
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: K
+  carrier: KOH
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Mg
+  carrier: Mg2
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Mg
+  carrier: Mg2Cl4
+  contract: C2-C5
+  reason: thermo_missing
+  missing: executable gas pressure thermochemistry or correlation for catalog carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Mg
+  carrier: MgCl2
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Mg
+  carrier: MgO_gas
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Mn
+  carrier: MnO_gas
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: N
+  carrier: HCN
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: N
+  carrier: HNCO
+  contract: C2-C5
+  reason: thermo_missing
+  missing: executable gas pressure thermochemistry or correlation for catalog carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: N
+  carrier: N
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: N
+  carrier: N2
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: N
+  carrier: N2O
+  contract: C2-C5
+  reason: thermo_missing
+  missing: executable gas pressure thermochemistry or correlation for catalog carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: N
+  carrier: N2O4
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: N
+  carrier: NH3
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: N
+  carrier: NH4CN
+  contract: C2-C5
+  reason: thermo_missing
+  missing: executable gas pressure thermochemistry or correlation for catalog carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: N
+  carrier: 'NO'
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: N
+  carrier: NO2
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Na
+  carrier: Na2
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Na
+  carrier: Na2Cl2
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Na
+  carrier: Na2O_gas
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Na
+  carrier: NaCl
+  contract: C5
+  reason: acquisition-pending
+  missing: Stage-0 volatilization returns diagnostic transition=None; executable carrier inventory debit is absent
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Na
+  carrier: NaO
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Na
+  carrier: NaOH
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Ni
+  carrier: Ni
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Ni
+  carrier: NiO_gas
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: P
+  carrier: P
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: P
+  carrier: P2
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: P
+  carrier: P2O5_gas
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: P
+  carrier: P4
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: P
+  carrier: P4O10
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: P
+  carrier: P4O6
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: P
+  carrier: P4O7
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: P
+  carrier: P4O8
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: P
+  carrier: P4O9
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: P
+  carrier: PO
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: P
+  carrier: PO2
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: S
+  carrier: COS
+  contract: C2-C5
+  reason: thermo_missing
+  missing: executable gas pressure thermochemistry or correlation for catalog carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: S
+  carrier: CS2
+  contract: C2-C5
+  reason: thermo_missing
+  missing: executable gas pressure thermochemistry or correlation for catalog carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: S
+  carrier: H2S
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: S
+  carrier: S2
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: S
+  carrier: S3
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: S
+  carrier: S4
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: S
+  carrier: S5
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: S
+  carrier: S6
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: S
+  carrier: S7
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: S
+  carrier: S8
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: S
+  carrier: SO2
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: S
+  carrier: SO3
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: S
+  carrier: S_total
+  contract: C2-C5
+  reason: thermo_missing
+  missing: executable gas pressure thermochemistry or correlation for catalog carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Si
+  carrier: Si
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Si
+  carrier: Si2
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Si
+  carrier: Si3
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Si
+  carrier: SiO2_gas
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Ti
+  carrier: TiO
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Ti
+  carrier: TiO2_gas
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Zr
+  carrier: Zr
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Zr
+  carrier: ZrO
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
+- element: Zr
+  carrier: ZrO2
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
+  filed: tddharness-seed
+  since: '2026-08-04'
