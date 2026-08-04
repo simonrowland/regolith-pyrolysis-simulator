@@ -1,0 +1,155 @@
+schema_version: literature_extract.v1
+source_id: kems-003-pound-1972
+source:
+  citation: Pound, G. M. (1972), "Selected values of evaporation and condensation coefficients for simple
+    substances", J. Phys. Chem. Ref. Data 1:135-146, DOI 10.1063/1.3253096 (review compilation; Table
+    1)
+  year: 1972
+extraction:
+  method: OCR-artifact transcription (MinerU vlm) + phase-2 alpha/Clausing review extract
+  date: '2026-08-03'
+  worker: ocr-phase2b-gk
+  provenance_path: docs-private/research/ocr-artifacts/kems-003-pound-1972/
+review_status: draft
+species:
+  Fe:
+    observations:
+    - observation_id: pound_1972_fe_solid_alpha_wessel
+      type: alpha
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-003-pound-1972/spool/out/kems-003-pound-1972/vlm/kems-003-pound-1972.md
+        table: '1'
+        line_range: 279-281
+        note: Table 1 selected α_v for solid Fe (OCR 'Ircn'); Wessel 1951
+      T_range_K: [1540.0, 1740.0]
+      phase: solid_polycrystalline
+      standard_state: selected literature α_v from Langmuir-Knudsen comparison
+      regime: langmuir_knudsen_comparison_review
+      units: dimensionless
+      values:
+        alpha: 1.0
+        alpha_range: [0.8, 1.2]
+        gas_species: Fe(g)
+        material: solid_Fe_polycrystalline
+        technique: Langmuir-Knudsen
+        vacuum: ~1e-5 torr
+        authors: Wessel 1951
+        note: OCR table row 'Ircn, solid' — iron; α_v = 1±0.2
+      uncertainty:
+        note: ±0.2 as tabulated
+        alpha_range: [0.8, 1.2]
+    - observation_id: pound_1972_fe_solid_alpha_mccabe
+      type: alpha
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-003-pound-1972/spool/out/kems-003-pound-1972/vlm/kems-003-pound-1972.md
+        table: '1'
+        line_range: 279-281
+      T_range_K: [1358.0, 1520.0]
+      phase: solid_polycrystalline
+      regime: langmuir_knudsen_comparison_review
+      units: dimensionless
+      values:
+        alpha: 0.9
+        alpha_range: [0.8, 1.0]
+        gas_species: Fe(g)
+        material: Fisher_Electrolytic_Fe_solid
+        technique: Langmuir-Knudsen
+        authors: McCabe et al. [1956]
+        note: OCR table row 'Ircn, solid' / Fisher Electrolytic Fe; α_v = 0.9±0.1; McCabe et al. [1956].
+          Separate Table 1 row from Chromium McCabe et al. [1956] (1318–1563 K, same α_v=0.9±0.1) — both
+          rows are in the source (not a Fe/Cr misread).
+      uncertainty:
+        alpha_range: [0.8, 1.0]
+    - observation_id: pound_1972_clausing_method_discussion
+      type: rate_series
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-003-pound-1972/spool/out/kems-003-pound-1972/vlm/kems-003-pound-1972.md
+        section: Experimental Methods / Criteria
+        line_range: 23-91
+      phase: method_review
+      standard_state: Clausing factor as vapor-transport impedance (review vocabulary)
+      regime: review_compilation
+      units: dimensionless
+      values:
+        quantity: clausing_factor_discussion
+        clausing_refs:
+        - Clausing 1930
+        - Clausing 1932
+        note: QUALITATIVE methods discussion (not a numeric rate series). Typed rate_series as least-bad
+          closed-set fit. Review requires Clausing (self-diffusion / wall impedance) be duly considered
+          when assessing α_v data. No numeric Motzfeldt cell geometry for Fe/Mg/SiO experiments.
+        missing_for_motzfeldt:
+        - orifice_area
+        - sample_surface_area
+        - cell_material
+        missing_note: Compilation review — Clausing discussed qualitatively; no single experimental cell
+          package.
+      equipment:
+        clausing_factor:
+          value:
+            role: selection_criterion_and_error_source
+            numeric: null
+            note: Clausing cited as required correction; Burrows reanalysis of Wyllie glycerol raises
+              α from 0.052 to ≥0.5 when Clausing properly considered (example).
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-003-pound-1972/spool/out/kems-003-pound-1972/vlm/kems-003-pound-1972.md
+            paragraph: Clausing factor; Burrows estimates proper consideration raises α to at least 0.5
+            line_range: 23-74
+  Cr:
+    observations:
+    - observation_id: pound_1972_cr_solid_alpha_mccabe
+      type: alpha
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-003-pound-1972/spool/out/kems-003-pound-1972/vlm/kems-003-pound-1972.md
+        table: '1'
+        line_range: '281'
+        note: Table 1 Chromium, solid; McCabe et al. [1956]; OCR verified
+      T_range_K: [1318.0, 1563.0]
+      phase: solid_polycrystalline
+      standard_state: selected literature α_v from Langmuir-Knudsen comparison
+      regime: langmuir_knudsen_comparison_review
+      units: dimensionless
+      values:
+        alpha: 0.9
+        alpha_range: [0.8, 1.0]
+        gas_species: Cr(g)
+        material: 99.9_percent_polycrystalline_solid_chromium_A_D_Mackay
+        technique: Langmuir-Knudsen
+        authors: McCabe et al. [1956]
+        note: 'Table 1: Chromium, solid; 1318–1563 K; α_v=0.9±0.1. Complementary to Fe McCabe row (different
+          substance/T); pilot pound-1972-cr-langmuir-knudsen and pound-1972-mccabe-cr target this same
+          row — not a conflict with Fe.'
+      uncertainty:
+        alpha_range: [0.8, 1.0]
+        note: ±0.1 as tabulated
+fidelity_samples:
+- species: Fe
+  observable: alpha
+  observation_id: pound_1972_fe_solid_alpha_wessel
+  field: alpha
+  value: 1.0
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-003-pound-1972/spool/out/kems-003-pound-1972/vlm/kems-003-pound-1972.md
+    table: '1'
+    paragraph: Iron solid Langmuir-Knudsen α_v = 1±0.2 (Wessel)
+    line_range: '281'
+- species: Fe
+  observable: alpha
+  observation_id: pound_1972_fe_solid_alpha_mccabe
+  field: alpha
+  value: 0.9
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-003-pound-1972/spool/out/kems-003-pound-1972/vlm/kems-003-pound-1972.md
+    table: '1'
+    paragraph: Iron solid McCabe α_v = 0.9±0.1
+    line_range: '281'
+- species: Cr
+  observable: alpha
+  observation_id: pound_1972_cr_solid_alpha_mccabe
+  field: alpha
+  value: 0.9
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-003-pound-1972/spool/out/kems-003-pound-1972/vlm/kems-003-pound-1972.md
+    table: '1'
+    paragraph: Chromium solid McCabe α_v = 0.9±0.1 (1318–1563 K)
+    line_range: '281'

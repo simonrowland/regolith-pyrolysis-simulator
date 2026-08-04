@@ -1,0 +1,111 @@
+schema_version: literature_extract.v1
+source_id: kems-011-wetzel-gail-2013
+source:
+  citation: >-
+    Wetzel, S., Pucci, A. & Gail, H.-P. (2013), "Solid silicon monoxide: optical
+    properties and growth coefficient α(T)", Astron. Astrophys. (SiO dust shell /
+    UHV SiO evaporation study)
+  year: 2013
+extraction:
+  method: OCR-artifact transcription (MinerU vlm) + phase-2 geometry/alpha extract
+  date: '2026-08-03'
+  worker: ocr-phase2b-gk
+  provenance_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/
+review_status: draft
+species:
+  SiO:
+    observations:
+    - observation_id: wetzel_gail_2013_sio_growth_alpha_arrhenius
+      type: alpha
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+        equation: '8'
+        line_range: '317-329'
+        note: growth coefficient α(T) for solid SiO condensation/growth from lab measurements
+      T_range_K: [1000.0, 1800.0]
+      phase: solid_SiO_film_growth
+      standard_state: >-
+        Growth/condensation coefficient for solid SiO (not melt free-evap HKL α).
+        Authors extrapolate to 1000 K → α≈0.013 for stellar-dust models.
+      regime: solid_SiO_growth_coefficient
+      units: dimensionless
+      values:
+        alpha: null
+        alpha_form:
+          type: arrhenius
+          expression: alpha = 0.52 * exp(-3685/T_K)
+          A: 0.52
+          B_K: 3685.0
+        alpha_at_1000K_extrapolated: 0.013
+        competing_forms:
+          - expression: alpha(T) = 0.1687 - 2.909e-4*T + 1.373e-7*T^2
+            T_range_K: [1175.0, 1410.0]
+            source: Rocabois et al. 1992 (cited)
+        material: solid_SiO
+        gas_species: SiO(g)
+      uncertainty:
+        note: Extrapolation to 1000 K may be too low per authors (L397)
+      equipment:
+        cell_material:
+          value: Ta Knudsen cell (electron-bombardment heated) for commercial SiO evaporation under UHV
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+            paragraph: evaporated from a tantalum Knudsen cell heated by electron bombardment
+            line_range: '53'
+        chamber_pressure:
+          value: 1.0e-9
+          units: mbar
+          note: background pressure during evaporation did not exceed 1e-9 mbar; base UHV <1e-10 mbar
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+            paragraph: background pressure measured during evaporation
+            line_range: '51-53'
+    - observation_id: wetzel_gail_2013_sio_ta_knudsen_geometry_partial
+      type: rate_series
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+        section: 2.1. Experimental setup
+        line_range: '49-53'
+      phase: solid_SiO_source
+      standard_state: UHV film-growth apparatus (not Motzfeldt melt α geometry)
+      regime: kems_effusion
+      units: as published
+      values:
+        quantity: Ta_Knudsen_source_for_SiO_film_deposition
+        missing_for_motzfeldt:
+          - orifice_area
+          - clausing_factor
+          - sample_surface_area
+        missing_note: >-
+          Ta Knudsen cell named for solid SiO evaporation source; orifice diameter,
+          channel length, and Clausing not stated. Partial geometry only.
+      equipment:
+        cell_material:
+          value: Ta Knudsen cell
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+            paragraph: tantalum Knudsen cell heated by electron bombardment
+            line_range: '53'
+fidelity_samples:
+- species: SiO
+  observable: alpha
+  observation_id: wetzel_gail_2013_sio_growth_alpha_arrhenius
+  field: alpha_form
+  value:
+    type: arrhenius
+    expression: alpha = 0.52 * exp(-3685/T_K)
+    A: 0.52
+    B_K: 3685.0
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+    equation: '8'
+    line_range: '323-326'
+- species: SiO
+  observable: alpha
+  observation_id: wetzel_gail_2013_sio_growth_alpha_arrhenius
+  field: alpha_at_1000K_extrapolated
+  value: 0.013
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+    paragraph: Extrapolating these results down to a temperature of 1000K results in α ≈ 0.013
+    line_range: '329'

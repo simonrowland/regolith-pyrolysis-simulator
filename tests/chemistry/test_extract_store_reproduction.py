@@ -36,6 +36,7 @@ from simulator.diagnostic_helpers.extract_reproduction import (
     TARGET_TYPES,
     AdoptedObservation,
     append_rollup_to_model_limitations,
+    coverage_summary,
     evaluate_all,
     evaluate_observation,
     extract_rollup_section,
@@ -46,6 +47,7 @@ from simulator.diagnostic_helpers.extract_reproduction import (
     load_vapor_pressure_data,
     motzfeldt_available,
     residual_dex,
+    resolve_chamber_pressure_pa,
     resolve_pO2_bar,
     resolve_uncertainty,
     rollup_species_error_bars,
@@ -59,6 +61,14 @@ BASELINES_PATH = (
 )
 # Escape hatch: write the committed rollup section (off by default).
 REGEN_ENV = "RPS_T512_REGEN_ROLLUP"
+
+
+def _record_pin_key(record) -> tuple[str, str]:
+    return (str(record.case_id), str(record.observable_id))
+
+
+def _baseline_pin_key(point: dict) -> tuple[str, str]:
+    return (str(point["case_id"]), str(point["key"]))
 
 
 @pytest.fixture(scope="module")
@@ -84,7 +94,9 @@ def residual_baselines() -> dict:
     raw = yaml.safe_load(BASELINES_PATH.read_text(encoding="utf-8"))
     assert isinstance(raw, dict)
     points = raw.get("points") or []
-    by_key = {str(p["key"]): p for p in points}
+    keys = [_baseline_pin_key(p) for p in points]
+    assert len(keys) == len(set(keys)), "duplicate residual baseline identity"
+    by_key = {key: point for key, point in zip(keys, points, strict=True)}
     assert by_key, f"empty residual baselines at {BASELINES_PATH}"
     return {"meta": raw, "by_key": by_key}
 
@@ -92,14 +104,16 @@ def residual_baselines() -> dict:
 def test_store_yields_adopted_target_type_observations(
     adopted_observations: list[AdoptedObservation],
 ) -> None:
-    """Battery is store-driven: non-empty ADOPTED set of the three types."""
+    """Battery includes every family and all 15 KEMS sources before precedence."""
 
     assert adopted_observations, "extract store produced zero ADOPTED observations"
     types = {obs.obs_type for obs in adopted_observations}
-    assert types <= TARGET_TYPES
-    assert types & TARGET_TYPES
+    assert types == TARGET_TYPES
+    kems = [obs for obs in adopted_observations if obs.source_id.startswith("kems-")]
+    assert len(kems) == 39
+    assert len({obs.source_id for obs in kems}) == 15
     for obs in adopted_observations:
-        assert obs.is_priority_winner
+        assert obs.is_priority_winner or obs.adoption_basis == "mass_spec_extract"
         assert obs.source_id
         assert obs.observation_id
         assert obs.species_id
@@ -111,7 +125,7 @@ def test_geometry_assumption_is_stated_when_motzfeldt_absent() -> None:
         assert "motzfeldt.py absent" in text
         assert "pure-component" in text or "unit-activity" in text
     else:
-        assert "motzfeldt.py present" in text
+        assert "motzfeldt.py available" in text
 
 
 def test_default_uncertainty_is_documented_per_observation() -> None:
@@ -189,8 +203,8 @@ def test_comparison_vocabulary_matches_kems_precedent() -> None:
     }
 
 
-def test_resolve_pO2_mbar_not_swallowed_by_bar_substring() -> None:
-    """P3: ``"bar" in "mbar"`` must not leave mbar unconverted (1000× bug)."""
+def test_total_chamber_pressure_is_not_relabelled_as_pO2() -> None:
+    """Total mbar vacuum converts to Pa but never masquerades as oxygen fugacity."""
 
     obs = AdoptedObservation(
         species_id="X",
@@ -212,31 +226,11 @@ def test_resolve_pO2_mbar_not_swallowed_by_bar_substring() -> None:
         geometry_assumption=geometry_assumption_text(),
     )
     pO2, note = resolve_pO2_bar(obs)
-    assert pO2 == pytest.approx(0.002)
-    assert "mbar" in note
-
-    obs_bar = AdoptedObservation(
-        species_id="X",
-        source_id="s",
-        observation_id="o",
-        obs_type="psat_series",
-        review_status=None,
-        phase=None,
-        regime=None,
-        standard_state=None,
-        T_range_K=None,
-        units=None,
-        uncertainty=None,
-        locator={},
-        values={},
-        equipment={"chamber_pressure": {"value": 2.0, "units": "bar"}},
-        disagreement_dex=None,
-        is_priority_winner=True,
-        geometry_assumption=geometry_assumption_text(),
-    )
-    p_bar, note_bar = resolve_pO2_bar(obs_bar)
-    assert p_bar == pytest.approx(2.0)
-    assert "bar" in note_bar and "mbar" not in note_bar
+    pressure_pa, pressure_note = resolve_chamber_pressure_pa(obs)
+    assert pO2 is None
+    assert "pO2_boundary" in note
+    assert pressure_pa == pytest.approx(200.0)
+    assert "mbar→Pa" in pressure_note
 
 
 def test_A_Pa_runtime_coefficients_are_parsed_not_no_usable_payload() -> None:
@@ -329,8 +323,7 @@ def _observation_params() -> list[pytest.ParameterSet]:
         return [
             pytest.param(
                 None,
-                id="store-load-failed",
-                marks=pytest.mark.skip(reason=f"extract store load failed: {exc}"),
+                id=f"store-load-failed:{exc}",
             )
         ]
     if not observations:
@@ -338,7 +331,6 @@ def _observation_params() -> list[pytest.ParameterSet]:
             pytest.param(
                 None,
                 id="empty-store",
-                marks=pytest.mark.skip(reason="no ADOPTED observations in store"),
             )
         ]
     return [pytest.param(obs, id=obs.param_id()) for obs in observations]
@@ -372,19 +364,6 @@ def test_adopted_observation_reproduction(
     for record in evaluation.records:
         assert record.status in COMPARISON_STATUSES
 
-    # Engine refusal / non-runnable payload → typed skip (pytest.skip), not fail.
-    if evaluation.skip_reason and all(
-        r.status
-        in {
-            "unsupported-observable",
-            "unsupported-speciation",
-            "out-of-domain",
-            "assumed-input",
-        }
-        for r in evaluation.records
-    ):
-        pytest.skip(evaluation.skip_reason)
-
     mismatches = [r for r in evaluation.records if r.status == "mismatch"]
     matches = [r for r in evaluation.records if r.status == "match"]
     comparable = mismatches + matches
@@ -400,7 +379,7 @@ def test_adopted_observation_reproduction(
             for record in mismatches:
                 # runtime is digested; check FINDING text for extrapolated tag
                 # when the baseline marks extrapolated.
-                pin = residual_baselines["by_key"].get(record.observable_id)
+                pin = residual_baselines["by_key"].get(_record_pin_key(record))
                 if pin and pin.get("extrapolated"):
                     assert any(
                         "extrapolated: true" in f for f in evaluation.findings
@@ -411,7 +390,7 @@ def test_adopted_observation_reproduction(
         # point must be pinned, not silently accepted).
         by_key = residual_baselines["by_key"]
         for record in comparable:
-            key = record.observable_id
+            key = _record_pin_key(record)
             assert key in by_key, (
                 f"{obs.param_id()}: comparable point {key!r} has no residual "
                 f"baseline — pin residual_dex in {BASELINES_PATH.name} "
@@ -444,12 +423,14 @@ def test_adopted_observation_reproduction(
                 )
         return
 
-    # Only gap statuses remain — treat as typed skip for collection clarity.
+    # Only gap statuses remain — assert the typed roadmap entry; do not hide it
+    # behind pytest's skipped-test count.
     statuses = {r.status for r in evaluation.records}
-    pytest.skip(
-        evaluation.skip_reason
-        or f"no comparable points; statuses={sorted(statuses)}"
+    assert is_typed_skip(evaluation.skip_reason), (
+        f"{obs.param_id()}: no comparable points and no typed skip; "
+        f"statuses={sorted(statuses)} reason={evaluation.skip_reason!r}"
     )
+    assert evaluation.skip_reasons
 
 
 def test_pinned_residuals_cover_all_live_comparable_points(
@@ -459,17 +440,141 @@ def test_pinned_residuals_cover_all_live_comparable_points(
     """Baseline file and live battery must agree on the comparable set."""
 
     live_keys = {
-        r.observable_id
+        _record_pin_key(r)
         for ev in battery_evaluations
         for r in ev.records
         if r.status in {"match", "mismatch"}
     }
+    assert len(live_keys) == sum(
+        r.status in {"match", "mismatch"}
+        for ev in battery_evaluations
+        for r in ev.records
+    ), "duplicate live residual identity"
     pin_keys = set(residual_baselines["by_key"])
     assert live_keys == pin_keys, (
         f"baseline/live comparable-key mismatch: "
         f"live_only={sorted(live_keys - pin_keys)} "
         f"pin_only={sorted(pin_keys - live_keys)}"
     )
+
+
+def test_measured_rate_series_executes_hkl(monkeypatch) -> None:
+    import simulator.diagnostic_helpers.extract_reproduction as er
+
+    real_hkl = er.langmuir_molar_flux
+    calls: list[tuple[float, float]] = []
+
+    def _spy(T_K, p_eq_pa, p_bulk_pa, alpha, *, molar_mass_kg_mol):
+        calls.append((float(T_K), float(p_eq_pa)))
+        return real_hkl(
+            T_K,
+            p_eq_pa,
+            p_bulk_pa,
+            alpha,
+            molar_mass_kg_mol=molar_mass_kg_mol,
+        )
+
+    monkeypatch.setattr(er, "langmuir_molar_flux", _spy)
+    obs = next(
+        row
+        for row in load_adopted_observations()
+        if row.observation_id == "richter_2007_mg_rate_series_geometry"
+    )
+    evaluation = evaluate_observation(obs, vapor_pressure_data=load_vapor_pressure_data())
+    comparable = [r for r in evaluation.records if r.status in {"match", "mismatch"}]
+    assert len(calls) == 4
+    assert not comparable
+    assert {r.status for r in evaluation.records} == {"assumed-input"}
+    assert evaluation.skip_reason == "typed-refusal:missing_condition:melt_composition"
+    assert "typed-refusal:missing_condition:pO2_boundary" in evaluation.skip_reasons
+    assert all(r.observable_id.endswith(":rate") for r in evaluation.records)
+
+
+def test_numeric_activity_executes_melt_activity_model(monkeypatch) -> None:
+    import simulator.diagnostic_helpers.extract_reproduction as er
+
+    real_activity = er.melt_oxide_activity
+    calls: list[str] = []
+
+    def _spy(parent_oxide, account_mol, **kwargs):
+        calls.append(str(parent_oxide))
+        return real_activity(parent_oxide, account_mol, **kwargs)
+
+    monkeypatch.setattr(er, "melt_oxide_activity", _spy)
+    obs = next(
+        row
+        for row in load_adopted_observations()
+        if row.observation_id == "demaria_1971_fe_lunar_basalt_kems_main_cell"
+    )
+    evaluation = evaluate_observation(obs, vapor_pressure_data=load_vapor_pressure_data())
+    comparable = [r for r in evaluation.records if r.status in {"match", "mismatch"}]
+    assert calls == ["FeO"]
+    assert not comparable
+    assert {r.status for r in evaluation.records} == {"assumed-input"}
+    assert (
+        "typed-refusal:missing_capability:documented_melt_activity_coefficient:FeO"
+        in evaluation.skip_reasons
+    )
+
+
+def test_psat_standard_state_selects_one_compatible_vapor_rail(monkeypatch) -> None:
+    import simulator.diagnostic_helpers.extract_reproduction as er
+
+    pure_calls: list[tuple[str, float]] = []
+    melt_calls: list[tuple[str, float, float]] = []
+
+    def _pure(species, T_K, vapor_pressure_data):
+        pure_calls.append((str(species), float(T_K)))
+        return 2.0, None
+
+    def _melt(species, T_K, pO2_bar, vapor_pressure_data, **kwargs):
+        melt_calls.append((str(species), float(T_K), float(pO2_bar)))
+        return 3.0, None, {"provider_status": "ok"}
+
+    monkeypatch.setattr(er, "_engine_pure_psat_pa", _pure)
+    monkeypatch.setattr(er, "_engine_melt_psat_pa", _melt)
+    common = dict(
+        species_id="Mg",
+        source_id="synthetic-standard-state",
+        obs_type="psat_series",
+        review_status="accepted",
+        regime="equilibrium",
+        T_range_K=(1800.0, 1800.0),
+        units="Pa",
+        uncertainty={"kind": "relative_fraction", "value": 0.1},
+        locator={"record": "synthetic-standard-state"},
+        equipment={},
+        disagreement_dex=None,
+        is_priority_winner=True,
+        geometry_assumption="synthetic standard-state routing test",
+    )
+    pure_obs = AdoptedObservation(
+        **common,
+        observation_id="pure",
+        phase="pure metal",
+        standard_state="pure Mg metal",
+        values={"points": [{"T_K": 1800.0, "p_Pa": 2.0}]},
+    )
+    melt_obs = AdoptedObservation(
+        **common,
+        observation_id="melt",
+        phase="silicate melt",
+        standard_state="silicate melt at stated pO2",
+        values={
+            "points": [{"T_K": 1800.0, "p_Pa": 3.0}],
+            "composition_mol": {"MgO": 1.0},
+            "pO2_bar": 1.0e-8,
+        },
+    )
+    pure_eval = evaluate_observation(pure_obs, vapor_pressure_data={"metals": {}})
+    assert pure_calls == [("Mg", 1800.0)]
+    assert not melt_calls
+    assert pure_eval.records[0].status == "match"
+
+    melt_eval = evaluate_observation(melt_obs, vapor_pressure_data={"metals": {}})
+    assert pure_calls == [("Mg", 1800.0)]
+    assert melt_calls == [("Mg", 1800.0, 1.0e-8)]
+    assert melt_eval.records[0].status == "match"
 
 
 def test_engine_value_mutation_moves_residual_outside_band_goes_red(
@@ -518,7 +623,7 @@ def test_engine_value_mutation_moves_residual_outside_band_goes_red(
     by_key = residual_baselines["by_key"]
     reds: list[str] = []
     for record in comparable:
-        pin = by_key.get(record.observable_id)
+        pin = by_key.get(_record_pin_key(record))
         if pin is None:
             continue
         measured = residual_dex(record)
@@ -538,7 +643,7 @@ def test_engine_value_mutation_moves_residual_outside_band_goes_red(
     # Also assert the public param-style check would raise.
     with pytest.raises(AssertionError, match="RESIDUAL REGRESSION"):
         for record in comparable:
-            pin = by_key[record.observable_id]
+            pin = by_key[_record_pin_key(record)]
             measured = residual_dex(record)
             assert measured is not None
             assert abs(measured - float(pin["residual_dex"])) <= float(pin["band_dex"]), (
@@ -546,6 +651,31 @@ def test_engine_value_mutation_moves_residual_outside_band_goes_red(
                 f"measured={measured:.6g} pin={float(pin['residual_dex']):.6g} "
                 f"band=±{float(pin['band_dex']):g}"
             )
+
+
+def test_hkl_assumption_diagnostic_is_not_promoted_or_pinned(
+    monkeypatch, residual_baselines
+) -> None:
+    import simulator.diagnostic_helpers.extract_reproduction as er
+
+    real_hkl = er.langmuir_molar_flux
+
+    def _ten_x(*args, **kwargs):
+        return 10.0 * real_hkl(*args, **kwargs)
+
+    monkeypatch.setattr(er, "langmuir_molar_flux", _ten_x)
+    obs = next(
+        row
+        for row in load_adopted_observations()
+        if row.observation_id == "richter_2007_mg_rate_series_geometry"
+    )
+    evaluation = evaluate_observation(obs, vapor_pressure_data=load_vapor_pressure_data())
+    assert {record.status for record in evaluation.records} == {"assumed-input"}
+    assert all(
+        _record_pin_key(record) not in residual_baselines["by_key"]
+        for record in evaluation.records
+    )
+    assert evaluation.skip_reasons
 
 
 def test_battery_rollup_matches_committed_model_limitations(
@@ -577,7 +707,12 @@ def test_battery_rollup_matches_committed_model_limitations(
     assert generated_section.startswith(ROLLUP_BEGIN)
     assert generated_section.endswith(ROLLUP_END)
     assert "Extract-store single-species reproduction battery (t-512)" in generated_section
-    assert "Comparable points:" in generated_section
+    assert "Observations:" in generated_section
+    assert "Coverage by observation type" in generated_section
+    assert "Coverage by species" in generated_section
+    assert "Coverage by source" in generated_section
+    assert "Combined propagated uncertainty" in generated_section
+    assert "not computable (engine uncertainty unavailable)" in generated_section
     for row in rows:
         assert row["species"] in generated_section
 
@@ -665,6 +800,53 @@ def test_evaluate_all_covers_every_adopted_observation(
             assert record.status in COMPARISON_STATUSES
         # No silent pass: skip reason or at least one record.
         assert ev.records or ev.skip_reason
+
+
+def test_coverage_ledger_is_observation_first_and_exact(
+    battery_evaluations,
+    adopted_observations: list[AdoptedObservation],
+) -> None:
+    coverage = coverage_summary(battery_evaluations)
+    assert coverage["observations"] == len(adopted_observations) == 76
+    assert coverage["comparable"] == 32
+    assert coverage["skipped"] == 44
+    assert coverage["comparable"] + coverage["skipped"] == coverage["observations"]
+    assert coverage["comparable_points"] == 74
+    assert coverage["gap_points"] == 56
+    assert all(reason.startswith("typed-refusal:") for reason in coverage["skip_reasons"])
+
+    by_type = {row["type"]: row for row in coverage["by_type"]}
+    assert {
+        key: (
+            row["observations"],
+            row["comparable"],
+            row["skipped"],
+            row["comparable_points"],
+        )
+        for key, row in by_type.items()
+    } == {
+        "activity_coefficient": (19, 0, 19, 0),
+        "alpha": (31, 29, 2, 62),
+        "psat_series": (9, 0, 9, 0),
+        "rate_series": (17, 3, 14, 12),
+    }
+    by_family = {row["comparison_family"]: row for row in coverage["by_family"]}
+    assert {
+        key: (row["observations"], row["comparable"], row["comparable_points"])
+        for key, row in by_family.items()
+    } == {
+        "activity_coefficient": (19, 0, 0),
+        "alpha": (31, 29, 62),
+        "alpha_in_legacy_rate_series": (3, 3, 12),
+        "psat_series": (9, 0, 0),
+        "rate_hkl": (14, 0, 0),
+    }
+    assert {row["species"] for row in coverage["by_species"]} == {
+        obs.species_id for obs in adopted_observations
+    }
+    assert {row["source"] for row in coverage["by_source"]} == {
+        obs.source_id for obs in adopted_observations
+    }
 
 
 def test_model_limitations_path_constant_matches_repo_doc() -> None:

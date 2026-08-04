@@ -1,0 +1,180 @@
+schema_version: literature_extract.v1
+source_id: kems-005-fedkin-2006
+source:
+  citation: Fedkin, A. V., Grossman, L. & Ghiorso, M. S. (2006), "Vapor pressures and evaporation coefficients
+    for melts of ferromagnesian chondrule-like compositions", Geochim. Cosmochim. Acta 70:206-223, DOI
+    10.1016/j.gca.2005.08.014
+  doi: 10.1016/j.gca.2005.08.014
+  year: 2006
+extraction:
+  method: OCR-artifact transcription (MinerU vlm) + phase-2 free-evap alpha extract
+  date: '2026-08-03'
+  worker: ocr-phase2b-gk
+  provenance_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/
+review_status: draft
+species:
+  Fe:
+    observations:
+    - observation_id: fedkin_2006_fe_hashimoto_langmuir_table3
+      type: alpha
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+        table: '3'
+        line_range: 186-197
+      T_range_K: [1973.0, 2273.0]
+      phase: silicate_melt
+      standard_state: MELTS activities for P_sat; free-evaporation α for Fe(g) from Hashimoto 1983
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      values:
+        alpha: 0.24
+        alpha_range: [0.21, 0.27]
+        gas_species: Fe(g)
+        material: Hashimoto_1983_FCMAS_silicate_melt
+        per_temperature:
+        - T_K: 1973.0
+          alpha: 0.23
+          sigma: 0.02
+        - T_K: 2073.0
+          alpha: 0.25
+          sigma: 0.02
+        - T_K: 2173.0
+          alpha: 0.24
+          sigma: 0.02
+        - T_K: 2273.0
+          alpha: 0.23
+          sigma: 0.02
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+        missing_note: Models Hashimoto free-evap graphite-crucible vacuum runs — not Knudsen geometry.
+      uncertainty:
+        note: ±0.02 on α_Fe from visual fit envelope (authors)
+        alpha_range: [0.21, 0.27]
+      equipment:
+        cell_material:
+          value: graphite crucible (cited Hashimoto 1983 apparatus)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+            paragraph: graphite crucible in a vacuum chamber
+            line_range: '171'
+  Mg:
+    observations:
+    - observation_id: fedkin_2006_mg_hashimoto_langmuir_table3
+      type: alpha
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+        table: '3'
+        line_range: 186-197
+      T_range_K: [1973.0, 2273.0]
+      phase: silicate_melt
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      values:
+        alpha: 0.24
+        gas_species: Mg(g)
+        material: Hashimoto_1983_FCMAS_silicate_melt
+        sigma: 0.01
+        note: Table 3 Mg this-work at 1973 K is 0.24±0.01 (OCR content_list); weak T dependence
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+      uncertainty:
+        note: ±0.01 on α_Mg (authors visual fit)
+      equipment:
+        cell_material:
+          value: graphite crucible (Hashimoto 1983)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+            paragraph: graphite crucible in a vacuum chamber
+            line_range: '171'
+  SiO:
+    observations:
+    - observation_id: fedkin_2006_sio_hashimoto_langmuir_table3
+      type: alpha
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+        table: '3'
+        line_range: 186-197
+      T_range_K: [1973.0, 2273.0]
+      phase: silicate_melt
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      values:
+        alpha: null
+        gas_species: SiO(g)
+        material: Hashimoto_1983_FCMAS_silicate_melt
+        note: α_SiO shows progressive increase with T (authors); per-T table values partially truncated
+          in OCR HTML table — retain series envelope ±0.01 uncertainty
+        alpha_uncertainty_sigma: 0.01
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+      equipment:
+        cell_material:
+          value: graphite crucible (Hashimoto 1983)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+            paragraph: graphite crucible
+            line_range: '171'
+  Na:
+    observations:
+    - observation_id: fedkin_2006_na_yu_langmuir
+      type: alpha
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+        figure: '4'
+        line_range: 241-243
+      T_range_K: [1723.15, 1723.15]
+      phase: silicate_melt
+      standard_state: MELTS Na2SiO3 activity; monatomic Na(g); models Yu et al. 2003
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      values:
+        alpha: 0.26
+        alpha_range: [0.21, 0.31]
+        gas_species: Na(g)
+        material: Yu_et_al_2003_chondrule_analog
+        note: Alexander (2002) got α_Na=0.12 on same data — competing; retain Fedkin value
+      uncertainty:
+        alpha_range: [0.21, 0.31]
+  K:
+    observations:
+    - observation_id: fedkin_2006_k_yu_langmuir
+      type: alpha
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+        figure: '4'
+        line_range: 241-243
+      T_range_K: [1723.15, 1723.15]
+      phase: silicate_melt
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      values:
+        alpha: 0.13
+        alpha_range: [0.11, 0.15]
+        gas_species: K(g)
+        material: Yu_et_al_2003_chondrule_analog
+      uncertainty:
+        note: α_K=0.13±0.02 (authors)
+        alpha_range: [0.11, 0.15]
+fidelity_samples:
+- species: Fe
+  observable: alpha
+  observation_id: fedkin_2006_fe_hashimoto_langmuir_table3
+  field: alpha
+  value: 0.24
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+    table: '3'
+    line_range: '197'
+    note: mid-range of per-T Fe alphas ~0.23-0.25
+- species: K
+  observable: alpha
+  observation_id: fedkin_2006_k_yu_langmuir
+  field: alpha
+  value: 0.13
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+    paragraph: α_K=0.13±0.02
+    line_range: '243'

@@ -1,0 +1,115 @@
+schema_version: literature_extract.v1
+source_id: kems-037-richter-2002
+source:
+  citation: 'Richter, F. M., Davis, A. M., Ebel, D. S. & Hashimoto, A. (2002), "Elemental and isotopic
+    fractionation of Type B calcium-, aluminum-rich inclusions: experiments, theoretical considerations,
+    and constraints on their thermal evolution", Geochim. Cosmochim. Acta 66:521-540'
+  year: 2002
+extraction:
+  method: OCR-artifact transcription (MinerU vlm) + phase-2 free-evap geometry extract
+  date: '2026-08-03'
+  worker: ocr-phase2b-gk
+  provenance_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/
+review_status: draft
+species:
+  Mg:
+    observations:
+    - observation_id: richter_2002_mg_cai_langmuir_gamma
+      type: alpha
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+        table: '1'
+        figure: '12'
+        line_range: 174-178
+        note: γ_Mg evaporation coefficients from vacuum and H2 experiments
+      T_range_K: [1673.0, 1773.0]
+      phase: silicate_melt_Type_B_CAI_like
+      standard_state: free evaporation / low-P H2; γ from HKL with thermodynamic P_sat
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      values:
+        alpha: 0.04
+        alpha_note: γ_Mg = 0.04 chosen so calculated curve passes through average Mg evaporation rate
+          of BCAI series at 1500°C (Fig. 12; limit a→0 no recondensation)
+        gas_species: Mg(g)
+        material: Type_B_CAI_like_liquid
+        surface_area_range_cm2: [0.063, 0.416]
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+        missing_note: Free-evap / furnace experiments — not Knudsen-cell Motzfeldt geometry.
+      uncertainty:
+        note: single γ_Mg=0.04 fit to average BCAI rate at 1500°C; Table 1 has per-run γ
+      equipment:
+        sample_surface_area:
+          value:
+            range_cm2: [0.063, 0.416]
+            table: 1
+            note: Avg.area (cm2) column in Table 1; range used to assess recondensation
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+            paragraph: samples with a range of surface areas from 0.063 to 0.416 cm2
+            line_range: '450'
+            note: Authors prose range (Table 1 Avg.area spans ~0.062–0.425; prose rounds to 0.063–0.416)
+        chamber_pressure:
+          value:
+            vacuum_bar: 1.0e-09
+            hydrogen_bar_example: 0.000187
+            one_bar_gas_mix: true
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+            paragraph: vacuum experiments P≈10^-6 torr; also H2 and 1 bar gas-mix furnaces
+            line_range: 194-196
+          note: Scoped to vacuum-run subset (~10^-6 Torr) that owns the pinned γ_Mg=0.04; H2 (1.87e-4
+            bar) and 1-bar gas-mix runs are separate atmospheres in the paper — not collapsed into this
+            pressure field.
+          scope: vacuum_runs_only
+  SiO:
+    observations:
+    - observation_id: richter_2002_sio_cai_langmuir_gamma
+      type: alpha
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+        table: '1'
+        line_range: 174-178
+      T_range_K: [1673.0, 1773.0]
+      phase: silicate_melt_Type_B_CAI_like
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      values:
+        alpha: null
+        gas_species: SiO(g)
+        material: Type_B_CAI_like_liquid
+        note: Table 1 includes γ_Si per run; OCR table truncated — retain package with surface areas
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+        - complete_gamma_table_numeric
+      equipment:
+        sample_surface_area:
+          value:
+            range_cm2: [0.063, 0.416]
+            table: 1
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+            paragraph: samples with a range of surface areas from 0.063 to 0.416 cm2
+            line_range: '450'
+            note: Authors prose range (Table 1 Avg.area spans ~0.062–0.425; prose rounds to 0.063–0.416)
+fidelity_samples:
+- species: Mg
+  observable: alpha
+  observation_id: richter_2002_mg_cai_langmuir_gamma
+  field: alpha
+  value: 0.04
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+    figure: '12'
+    paragraph: evaporation coefficient γ_Mg = 0.04
+    line_range: 530-548
+- path: species.Mg.observations[richter_2002_mg_cai_langmuir_gamma].equipment.sample_surface_area.value.range_cm2
+  value: [0.063, 0.416]
+  note: BCAI surface-area range for recondensation test
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+    paragraph: samples with a range of surface areas from 0.063 to 0.416 cm2
+    line_range: '450'

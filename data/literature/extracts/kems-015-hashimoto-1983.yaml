@@ -1,0 +1,150 @@
+schema_version: literature_extract.v1
+source_id: kems-015-hashimoto-1983
+source:
+  citation: >-
+    Hashimoto, A. (1983), "Evaporation metamorphism in the early solar nebula —
+    evaporation experiments on the melt FeO-MgO-SiO2-CaO-Al2O3", Geochem. J. 17:111-145
+  year: 1983
+extraction:
+  method: OCR-artifact transcription (MinerU vlm) + phase-2 free-evap geometry extract
+  date: '2026-08-03'
+  worker: ocr-phase2b-gk
+  provenance_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/
+review_status: draft
+species:
+  Fe:
+    observations:
+    - observation_id: hashimoto_1983_fe_fcmas_free_evap_geometry
+      type: rate_series
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        section: EXPERIMENTS
+        line_range: '33-90'
+        figure: '1'
+      T_range_K: [1973.0, 2273.0]
+      phase: silicate_melt_FCMAS_solar_abundance
+      standard_state: vacuum free evaporation of multicomponent melt (not Knudsen cell)
+      regime: langmuir_free_evaporation
+      units: as published (vaporized fraction VF wt%)
+      values:
+        quantity: free_evap_residue_composition_vs_time
+        material: FeO-MgO-SiO2-CaO-Al2O3 solar-abundance melt
+        starting_tube_od_mm: 4.0
+        starting_tube_height_mm: 4.0
+        starting_tube_hole_mm: 1.2
+        starting_tube_hole_note: sample preform hole — NOT Knudsen cell orifice
+        recovered_form: single_spherule
+        vacuum_during_run_Torr: 1.0e-4
+        max_vacuum_Torr: 7.0e-8
+        missing_for_motzfeldt:
+          - orifice_area
+          - clausing_factor
+          - numeric_spherule_surface_area_series
+        missing_note: >-
+          Free-evap graphite crucible; sample forms molten spherule. Surface area of
+          spherule used for rates but per-run numeric As not tabulated in OCR text
+          (scale ~1 mm in Fig. 2). Do not invent Clausing or Knudsen orifice.
+      equipment:
+        cell_material:
+          value: high-purity graphite crucible (atomic-pile grade block)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+            paragraph: Graphite crucible; high purity graphite block
+            line_range: '70-74'
+            figure: '1'
+        sample_surface_area:
+          value:
+            form: molten_spherule
+            starting_preform_mm: {height: 4.0, diameter: 4.0, hole_diameter: 1.2}
+            numeric_m2_series: null
+            note: recovered single spherules; free surface of melt droplet
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+            paragraph: All the recovered samples were single spherules
+            line_range: '90'
+        chamber_pressure:
+          value: 1.0e-4
+          units: Torr
+          note: vacuum level during experiments ~10^-4 Torr; max pump vacuum 7e-8 Torr
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+            paragraph: Vacuum was kept by diffusion pump; vacuum level about 10^-4 Torr during experiments
+            line_range: '80-160'
+  Mg:
+    observations:
+    - observation_id: hashimoto_1983_mg_fcmas_free_evap_geometry
+      type: rate_series
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        section: EXPERIMENTS
+        line_range: '33-90'
+      T_range_K: [1973.0, 2273.0]
+      phase: silicate_melt_FCMAS_solar_abundance
+      regime: langmuir_free_evaporation
+      units: as published
+      values:
+        quantity: free_evap_MgO_loss_with_VF
+        material: FeO-MgO-SiO2-CaO-Al2O3
+        missing_for_motzfeldt:
+          - orifice_area
+          - clausing_factor
+      equipment:
+        cell_material:
+          value: graphite crucible
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+            paragraph: Graphite crucible
+            line_range: '70-74'
+        sample_surface_area:
+          value:
+            form: molten_spherule
+            numeric_m2_series: null
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+            paragraph: single spherules
+            line_range: '90'
+  SiO:
+    observations:
+    - observation_id: hashimoto_1983_sio_fcmas_free_evap_geometry
+      type: rate_series
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        section: EXPERIMENTS
+        line_range: '33-90'
+      T_range_K: [1973.0, 2273.0]
+      phase: silicate_melt_FCMAS_solar_abundance
+      regime: langmuir_free_evaporation
+      units: as published
+      values:
+        quantity: free_evap_SiO2_loss_with_VF
+        gas_species: SiO(g)
+        material: FeO-MgO-SiO2-CaO-Al2O3
+        missing_for_motzfeldt:
+          - orifice_area
+          - clausing_factor
+      equipment:
+        cell_material:
+          value: graphite crucible
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+            paragraph: Graphite crucible
+            line_range: '70-74'
+fidelity_samples:
+- species: Fe
+  observable: rate_series
+  observation_id: hashimoto_1983_fe_fcmas_free_evap_geometry
+  field: starting_tube_hole_mm
+  value: 1.2
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+    paragraph: tubes of 4mm height and 4mm diameter with a straight hole of 1.2mm diameter
+    line_range: '37'
+- species: Fe
+  observable: rate_series
+  observation_id: hashimoto_1983_fe_fcmas_free_evap_geometry
+  field: vacuum_during_run_Torr
+  value: 1.0e-4
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+    paragraph: vacuum level in the chamber was about 10^-4 Torr during the experiments
+    line_range: '160'

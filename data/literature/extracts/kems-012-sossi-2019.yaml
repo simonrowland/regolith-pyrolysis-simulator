@@ -1,0 +1,154 @@
+schema_version: literature_extract.v1
+source_id: kems-012-sossi-2019
+source:
+  citation: 'Sossi, P. A., Klemme, S., O''Neill, H. St.C., Berndt, J. & Moynier, F. (2019), "Evaporation
+    of moderately volatile elements from silicate melts: experiments and theory", Geochim. Cosmochim.
+    Acta 260:204-231, DOI 10.1016/j.gca.2019.06.021'
+  doi: 10.1016/j.gca.2019.06.021
+  year: 2019
+extraction:
+  method: OCR-artifact transcription (prior MinerU of byte-identical PDF; 2026-08-03 spool failed; retry1
+    still in errors on s2 — no supersede) + phase-2 geometry extract
+  date: '2026-08-03'
+  worker: ocr-phase2b-gk
+  provenance_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/
+review_status: draft
+species:
+  Na:
+    observations:
+    - observation_id: sossi_2019_na_alpha_e_gamma_derived_range
+      type: alpha
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        section: 4.6 Evaporation coefficients
+        line_range: 300-302
+        note: α_e,NaO0.5 from eq.6 using literature γ_NaO0.5 at 1400 °C
+      T_range_K: [1673.15, 1673.15]
+      phase: silicate_melt_ferrobasalt_FCMAS
+      standard_state: 1-bar open furnace; α_e from K*/(γ K) with independent γ
+      regime: open_furnace_apparent
+      units: dimensionless
+      values:
+        alpha_range: [0.3, 1.7]
+        gas_species: Na(g)
+        material: ferrobasalt_FCMAS_open_furnace
+        alpha_e_NaO05_at_1400C_range: [0.3, 1.7]
+        note: 'Source §4.6: γ_NaO0.5 ≈ 10^-3 (DeMaria/Gooding/Mathieu) gives α_e,NaO0.5 between 0.3–1.7
+          at 1400 °C. Competing with authors_adopted α_e=1 observation; do not average (VALUE-PRECEDENCE).'
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+        missing_note: Open 1-atm furnace wire-loop experiments — NOT Knudsen-cell geometry.
+      uncertainty:
+        note: range from span of literature γ_NaO0.5; not a fit uncertainty
+        alpha_range: [0.3, 1.7]
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          note: 'Source: "surface areas (≈ 2×10^{-5} m)" (OCR units m; interpreted as m² for bead surface).
+            Thermocouple bead radius 10^{-4} m given same paragraph.'
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m) than the thermocouple bead
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+    - observation_id: sossi_2019_na_alpha_e_authors_adopted_unity
+      type: alpha
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        section: 4.6 Evaporation coefficients
+        line_range: '306'
+        note: authors set α_e=1 after concluding coefficients close to unity within ×2–3
+      T_range_K: [1573.15, 1823.15]
+      phase: silicate_melt_ferrobasalt_FCMAS
+      standard_state: 1-bar open furnace; authors adopt α_e=1 for γ_i^∞ = K*/K
+      regime: open_furnace_apparent
+      units: dimensionless
+      values:
+        alpha: 1.0
+        gas_species: Na(g)
+        material: ferrobasalt_FCMAS_open_furnace
+        authors_summary: evaporation coefficients close to unity within a factor of 2-3; α_e set to 1
+        note: 'Source: "evaporation coefficients are close to unity (within a factor of 2-3)… Based on
+          these observations α_e is set to 1 and γ_i^∞ is calculated from K*/K". Competing with gamma-derived
+          0.3–1.7 range observation; do not average.'
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+      uncertainty:
+        note: Authors qualitative bound "close to unity within a factor of 2–3"; they then set α_e=1.
+          Do not invent a numeric interval from the prose.
+  K:
+    observations:
+    - observation_id: sossi_2019_k_open_furnace_alpha_e_context
+      type: alpha
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        line_range: 302-306
+      T_range_K: [1573.15, 1823.15]
+      phase: silicate_melt_ferrobasalt_FCMAS
+      regime: open_furnace_apparent
+      units: dimensionless
+      values:
+        alpha: 1.0
+        gas_species: K(g)
+        material: ferrobasalt_FCMAS_open_furnace
+        note: α_e close to unity within factor 2-3 (authors general conclusion for MVEs)
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: surface areas ≈ 2×10^-5 m
+            line_range: '71'
+        cell_material:
+          value: Re/Pt wire loops
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: metal wire loop
+            line_range: '67'
+fidelity_samples:
+- species: Na
+  observable: alpha
+  observation_id: sossi_2019_na_alpha_e_gamma_derived_range
+  field: alpha_range
+  value: [0.3, 1.7]
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    paragraph: α_e,NaO0.5 between 0.3 – 1.7 for our experiments at 1400 °C
+    line_range: '302'
+- species: Na
+  observable: alpha
+  observation_id: sossi_2019_na_alpha_e_authors_adopted_unity
+  field: alpha
+  value: 1.0
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    paragraph: evaporation coefficients are close to unity (within a factor of 2-3); α_e is set to 1
+    line_range: '306'
+- path: species.Na.observations[sossi_2019_na_alpha_e_gamma_derived_range].equipment.sample_surface_area.value
+  value: 2.0e-05
+  note: stated sample surface area ≈ 2e-5 m2
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    paragraph: surface areas (≈ 2×10^{-5} m)
+    line_range: '71'

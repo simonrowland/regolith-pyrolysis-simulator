@@ -1,0 +1,92 @@
+schema_version: literature_extract.v1
+source_id: kems-027-plante-hastie-1983
+source:
+  citation: >-
+    Plante, E. R., Hastie, J. W. & Bonnell, D. W. (1983), NBSIR 83-2731,
+    "Experimental and Theoretical Models for Transpiration Mass Spectrometry"
+    (alkali-bearing glass KMS/TMS vaporization methods)
+  year: 1983
+extraction:
+  method: OCR-artifact transcription (MinerU vlm) + phase-2 geometry extract
+  date: '2026-08-03'
+  worker: ocr-phase2b-gk
+  provenance_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/
+review_status: draft
+species:
+  Na:
+    observations:
+    - observation_id: plante_hastie_1983_kms_pt_cell_geometry
+      type: rate_series
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
+        paragraph: Knudsen cell Pt construction; effusion orifice 0.5 cm; Clausing in mass-loss eqn
+        line_range: '145-163'
+        figure: '2'
+      phase: SNW_alkali_bearing_glass
+      standard_state: KMS vacuum vaporization method geometry (Na species observed as Na+/metaborates)
+      regime: kems_effusion
+      units: as published
+      values:
+        quantity: KMS_method_geometry_reference
+        clausing_symbol_in_mass_loss_eqn: C
+        practical_orifice_size_mm_typical: 0.5
+        cell_od_cm: 0.80
+        cell_height_cm: 1.90
+        cell_wall_thickness_cm: 0.025
+        missing_for_motzfeldt:
+          - numeric_clausing_factor_value
+          - orifice_channel_length
+          - sample_surface_area
+        missing_note: >-
+          Clausing factor C appears in the mass-loss equation but no numeric C is tabulated
+          for the 0.5 cm orifice. Channel length not stated — do not invent Clausing.
+          Practical ~0.5 mm is a molecular-flow upper-limit discussion, not this cell's orifice.
+      uncertainty:
+        note: method apparatus paper; species pressures elsewhere in report
+      equipment:
+        orifice_area:
+          value: 1.963495e-05
+          units: m2
+          diameter_m: 0.005
+          orifice_shape: circular_effusion
+          inferred: true
+          inference: area = π (d/2)^2 from stated effusion orifice diameter 0.5 cm
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
+            paragraph: An effusion orifice diameter of 0.5 cm was used
+            line_range: '163'
+        clausing_factor:
+          value:
+            symbol: C
+            role: mass_loss_equation_factor
+            numeric: null
+            note: >-
+              C appears in m_i / (Δt) = P_i C a √(M_i/(2πRT)) form; numeric Clausing for this
+              orifice not given — partial observation only.
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
+            paragraph: C the Clausing factor, a the orifice area
+            line_range: '145'
+        cell_material:
+          value: Pt (0.025 cm sheet welded; lid 0.015 cm Pt sheet)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
+            paragraph: Knudsen cell was made of 0.025 cm Pt sheet
+            line_range: '163'
+fidelity_samples:
+- path: species.Na.observations[plante_hastie_1983_kms_pt_cell_geometry].equipment.orifice_area.value
+  value: 1.963495e-05
+  note: inferred from 0.5 cm effusion orifice diameter
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
+    paragraph: An effusion orifice diameter of 0.5 cm was used
+    line_range: '163'
+- species: Na
+  observable: rate_series
+  observation_id: plante_hastie_1983_kms_pt_cell_geometry
+  field: cell_od_cm
+  value: 0.80
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
+    paragraph: 0.80 cm o.d. by 1.90 cm high
+    line_range: '163'

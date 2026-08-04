@@ -1,0 +1,183 @@
+schema_version: literature_extract.v1
+source_id: kems-010-richter-2007
+source:
+  citation: >-
+    Richter, F. M., Janney, P. E., Mendybaev, R. A., Davis, A. M. & Wadhwa, M. (2007),
+    "Elemental and isotopic fractionation of Type B CAI-like liquids by evaporation",
+    Geochim. Cosmochim. Acta 71:5544-5564, DOI 10.1016/j.gca.2007.09.005
+  doi: 10.1016/j.gca.2007.09.005
+  year: 2007
+extraction:
+  method: OCR-artifact transcription (MinerU vlm) + phase-2 free-evap geometry extract
+  date: '2026-08-03'
+  worker: ocr-phase2b-gk
+  provenance_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/
+review_status: draft
+species:
+  Mg:
+    observations:
+    - observation_id: richter_2007_mg_cai_langmuir_alpha_arrhenius
+      type: alpha
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+        figure: '3'
+        line_range: '447-448'
+        note: vacuum free evaporation; γ_Mg = γo exp(-E/RT)
+      T_range_K: [1873.0, 2173.0]
+      phase: silicate_melt_Type_B_CAI_like
+      standard_state: Berman CMAS activities for P_sat; vacuum free evaporation (NOT Knudsen cell)
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      values:
+        alpha: null
+        gas_species: Mg(g)
+        material: Type_B_CAI_like_liquid
+        alpha_form:
+          type: arrhenius
+          expression: gamma = gamma_o * exp(-E/(R*T))
+          c0: 143.0
+          gamma_o: 143.0
+          E_J_per_mol: 121000.0
+          E_uncertainty_J_per_mol: 53000.0
+          R_J_per_mol_K: 8.314
+        flux_form:
+          expression: J = J_o * exp(-E/RT)
+          J_o_mol_cm2_s: 3.81e6
+          E_J_per_mol: 551000.0
+          E_uncertainty_J_per_mol: 63000.0
+        missing_for_motzfeldt:
+          - orifice_area
+          - clausing_factor
+        missing_note: Free-evaporation vacuum furnace (Hashimoto design) — no Knudsen orifice.
+      uncertainty:
+        E_uncertainty_J_per_mol: 53000.0
+      equipment:
+        sample_surface_area:
+          value:
+            method: equivalent_sphere_from_weight_and_thickness_on_Ir_loop
+            sample_diameters_mm: [1.0, 2.5, 6.0]
+            rates_reported_for_mm: [2.5, 6.0]
+            area_uncertainty_pct: 10.0
+            note: >-
+              Surface areas tabulated per sample (Init/Final area mm2 in Table 1).
+              1 mm samples excluded from rates due to larger area uncertainty (~20%).
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+            paragraph: surface area of each sample must be known; 2.5 and 6 mm samples
+            line_range: '107-122'
+            table: '1'
+        cell_material:
+          value: Ir wire loop (vacuum free-evap furnace; not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+            paragraph: iridium loop; Hashimoto high-temperature vacuum furnace
+            line_range: '105-107'
+    - observation_id: richter_2007_mg_rate_series_geometry
+      type: rate_series
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+        figure: '2'
+        line_range: '183-191'
+      T_range_K: [1873.0, 2173.0]
+      phase: silicate_melt_Type_B_CAI_like
+      regime: langmuir_free_evaporation
+      units: mol cm^-2 s^-1 (log10 scale in Fig. 2 OCR scatter)
+      values:
+        quantity: vacuum_evaporation_flux_J_Mg_vs_T
+        sample_diameters_mm_used: [2.5, 6.0]
+        figure_2_log10_J_approx:
+          - {T_C: 1900, log10_J_Mg: -6.6}
+          - {T_C: 1800, log10_J_Mg: -7.2}
+          - {T_C: 1700, log10_J_Mg: -7.9}
+          - {T_C: 1600, log10_J_Mg: -8.8}
+        note: approximate OCR scatter digitization of Fig. 2; use Arrhenius J form for quantitative work
+      equipment:
+        sample_surface_area:
+          value:
+            method: measured_per_sample
+            sample_diameters_mm: [2.5, 6.0]
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+            figure: '2'
+            line_range: '191'
+  SiO:
+    observations:
+    - observation_id: richter_2007_sio_cai_langmuir_alpha_arrhenius
+      type: alpha
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+        figure: '3'
+        line_range: '447-448'
+      T_range_K: [1873.0, 2173.0]
+      phase: silicate_melt_Type_B_CAI_like
+      standard_state: vacuum free evaporation; γ_Si for SiO(g)
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      values:
+        alpha: null
+        gas_species: SiO(g)
+        material: Type_B_CAI_like_liquid
+        alpha_form:
+          type: arrhenius
+          expression: gamma = gamma_o * exp(-E/(R*T))
+          c0: 25.3
+          gamma_o: 25.3
+          E_J_per_mol: 92000.0
+          E_uncertainty_J_per_mol: 37000.0
+        flux_form:
+          expression: J = J_o * exp(-E/RT)
+          J_o_mol_cm2_s: 4.17e7
+          E_J_per_mol: 576000.0
+          E_uncertainty_J_per_mol: 36000.0
+        missing_for_motzfeldt:
+          - orifice_area
+          - clausing_factor
+      uncertainty:
+        E_uncertainty_J_per_mol: 37000.0
+      equipment:
+        sample_surface_area:
+          value:
+            method: equivalent_sphere_from_weight_and_thickness_on_Ir_loop
+            sample_diameters_mm: [2.5, 6.0]
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+            paragraph: 2.5 and 6 mm samples
+            line_range: '107-122'
+        cell_material:
+          value: Ir wire loop (vacuum free-evap; not Knudsen orifice)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+            paragraph: iridium loop
+            line_range: '107'
+fidelity_samples:
+- species: Mg
+  observable: alpha
+  observation_id: richter_2007_mg_cai_langmuir_alpha_arrhenius
+  field: alpha_form
+  value:
+    type: arrhenius
+    expression: gamma = gamma_o * exp(-E/(R*T))
+    c0: 143.0
+    gamma_o: 143.0
+    E_J_per_mol: 121000.0
+    E_uncertainty_J_per_mol: 53000.0
+    R_J_per_mol_K: 8.314
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+    line_range: '448'
+    note: γo=143, E=121±53 kJ/mol for γ_Mg
+- species: SiO
+  observable: alpha
+  observation_id: richter_2007_sio_cai_langmuir_alpha_arrhenius
+  field: alpha_form
+  value:
+    type: arrhenius
+    expression: gamma = gamma_o * exp(-E/(R*T))
+    c0: 25.3
+    gamma_o: 25.3
+    E_J_per_mol: 92000.0
+    E_uncertainty_J_per_mol: 37000.0
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+    line_range: '448'
+    note: γo=25.3, E=92±37 kJ/mol for γ_Si

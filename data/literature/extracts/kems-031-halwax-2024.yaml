@@ -1,0 +1,126 @@
+schema_version: literature_extract.v1
+source_id: kems-031-halwax-2024
+source:
+  citation: >-
+    Halwax, A., Sergeev, D., Müller, M. & Schenk, J. (2024), "Enthalpy of Formation
+    of Calcium and Magnesium Oxide Obtained by Knudsen Effusion Mass Spectrometry",
+    Metall. Mater. Trans. B, DOI 10.1007/s11663-024-02995-6
+  doi: 10.1007/s11663-024-02995-6
+  year: 2024
+extraction:
+  method: OCR-artifact transcription (MinerU vlm) + phase-2 geometry extract
+  date: '2026-08-03'
+  worker: ocr-phase2b-gk
+  provenance_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/
+review_status: draft
+species:
+  MgO:
+    observations:
+    - observation_id: halwax_2024_mgo_kems_geometry_psat_package
+      type: rate_series
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+        section: III. EXPERIMENTAL
+        line_range: '220-230'
+        note: Pure MgO vaporization in Ir Knudsen cell; lid orifice 0.3 mm
+      T_range_K: [1850.0, 2100.0]
+      phase: pure_solid_MgO
+      standard_state: pure MgO(s) activity defined as 1; KEMS ion intensities → partial pressures
+      regime: kems_effusion
+      units: as published (partial pressures Pa; formation enthalpy product)
+      values:
+        quantity: pure_MgO_KEMS_geometry_and_vaporization
+        gas_species_observed: [Mg(g), O(g), O2(g)]
+        sample_mass_approx_mg: 50.0
+        chamber_pressure_start_mbar: 1.0e-5
+        missing_for_motzfeldt:
+          - clausing_factor
+          - orifice_channel_length
+          - sample_surface_area
+        missing_note: >-
+          Lid orifice diameter 0.3 mm stated without channel length — Clausing not
+          invented. Sample free-surface area not stated (powder load ~50 mg).
+      uncertainty:
+        note: temperature systematic ±5 K estimated by authors; ΔfH product is primary result (not α)
+      equipment:
+        orifice_area:
+          value: 7.068583e-08
+          units: m2
+          diameter_m: 0.0003
+          orifice_shape: lid_orifice
+          inferred: true
+          inference: area = π (d/2)^2 from stated lid orifice diameter 0.3 mm
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+            paragraph: The orifice in the lid of the cell had a diameter of 0.3 mm
+            line_range: '222'
+        cell_material:
+          value: Ir Knudsen cell in Mo container; Ta radiation shields; W heater wire
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+            paragraph: iridium cell; molybdenum container; tantalum radiation shields
+            line_range: '222'
+        chamber_pressure:
+          value: 1.0e-5
+          units: mbar
+          note: heating started after chamber pressure decreased below 10^-5 mbar
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+            paragraph: pressure decreased below 10^-5 mbar
+            line_range: '230'
+  CaO:
+    observations:
+    - observation_id: halwax_2024_cao_kems_geometry_package
+      type: rate_series
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+        section: III. EXPERIMENTAL
+        line_range: '220-230'
+      T_range_K: [1850.0, 2150.0]
+      phase: pure_solid_CaO
+      standard_state: pure CaO(s) activity defined as 1
+      regime: kems_effusion
+      units: as published
+      values:
+        quantity: pure_CaO_KEMS_geometry_and_vaporization
+        gas_species_observed: [Ca(g), O(g), O2(g)]
+        sample_mass_approx_mg: 50.0
+        missing_for_motzfeldt:
+          - clausing_factor
+          - orifice_channel_length
+          - sample_surface_area
+        missing_note: Same Ir cell geometry as MgO; orifice d only — no Clausing invented.
+      equipment:
+        orifice_area:
+          value: 7.068583e-08
+          units: m2
+          diameter_m: 0.0003
+          inferred: true
+          inference: area = π (d/2)^2 from stated lid orifice diameter 0.3 mm (same cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+            paragraph: The orifice in the lid of the cell had a diameter of 0.3 mm
+            line_range: '222'
+        cell_material:
+          value: Ir Knudsen cell in Mo container; Ta radiation shields
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+            paragraph: iridium cell; molybdenum container; tantalum radiation shields
+            line_range: '222'
+fidelity_samples:
+- path: species.MgO.observations[halwax_2024_mgo_kems_geometry_psat_package].equipment.orifice_area.value
+  value: 7.068583e-08
+  note: inferred orifice area from 0.3 mm lid diameter
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+    paragraph: The orifice in the lid of the cell had a diameter of 0.3 mm
+    line_range: '222'
+- species: MgO
+  observable: rate_series
+  observation_id: halwax_2024_mgo_kems_geometry_psat_package
+  field: sample_mass_approx_mg
+  value: 50.0
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+    paragraph: approximately 50 mg of the pure CaO or MgO powder
+    line_range: '228'

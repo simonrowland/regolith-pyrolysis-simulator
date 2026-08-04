@@ -1,0 +1,118 @@
+schema_version: literature_extract.v1
+source_id: kems-008-schaefer-fegley-2004
+source:
+  citation: >-
+    Schaefer, L. & Fegley, B. (2004), "A thermodynamic model of high temperature
+    lava vaporization on Io", Icarus 169:216-241 (MAGMA code; α_s survey Table 10)
+  year: 2004
+extraction:
+  method: OCR-artifact transcription (MinerU vlm) + phase-2 alpha-bounds review extract
+  date: '2026-08-03'
+  worker: ocr-phase2b-gk
+  provenance_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/
+review_status: draft
+species:
+  SiO:
+    observations:
+    - observation_id: schaefer_fegley_2004_sio_alpha_s_survey
+      type: alpha
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
+        table: '10'
+        line_range: '649-661'
+      T_range_K: [2173.0, 2373.0]
+      phase: oxide_silicate_literature_survey
+      standard_state: vaporization coefficient α_s = P_obs/P_vap survey (mostly solids)
+      regime: review_compilation
+      units: dimensionless
+      values:
+        alpha: 0.2
+        alpha_range: [0.04, 0.2]
+        gas_species: SiO(g)
+        material_scope: silica_and_forsterite_literature
+        pins:
+          - material: liquid_silica
+            alpha_approx: 0.04
+            T_range_K: [2173.0, 2373.0]
+          - material: Mg2SiO4_liquid
+            alpha_approx: 0.2
+            source: Hashimoto 1990 (cited)
+        note: >-
+          Authors cannot compute α_s for their Io lavas from data; survey Table 10.
+          α_s increases with T; many solid values <1. Not a single experimental Motzfeldt set.
+        missing_for_motzfeldt:
+          - orifice_area
+          - clausing_factor
+          - sample_surface_area
+          - cell_material_for_own_experiment
+      uncertainty:
+        note: compilation bounds; contradictory Al2O3 literature cited as example
+  Mg:
+    observations:
+    - observation_id: schaefer_fegley_2004_mg_forsterite_alpha_s_survey
+      type: alpha
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
+        table: '10'
+        line_range: '649-661'
+      T_range_K: [2163.0, 2323.0]
+      phase: Mg2SiO4_s_l_literature
+      regime: review_compilation
+      units: dimensionless
+      values:
+        alpha: 0.2
+        alpha_range: [0.20, 0.21]
+        T_range_K: [2163.0, 2323.0]
+        gas_species: Mg(g)
+        material: Mg2SiO4_liquid
+        note: >-
+          Table 10 row Mg2SiO4 (l): T 2163–2323 K, α_s 0.20–0.21 (Hashimoto 1990).
+          α_s for Mg(g) and SiO(g) from Mg2SiO4 taken as equal (authors Table 10 note b).
+          Solid forsterite row is separate: 1873–2163 K, α_s 0.09–0.16.
+          Verified OCR locator: kems-008 …/vlm/…md Table 10 line 654
+          (prior extract T_range_K [2000,2300] was NOT in Table 10).
+        missing_for_motzfeldt:
+          - orifice_area
+          - clausing_factor
+          - sample_surface_area
+fidelity_samples:
+- species: SiO
+  observable: alpha
+  observation_id: schaefer_fegley_2004_sio_alpha_s_survey
+  field: alpha
+  value: 0.2
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
+    table: '10'
+    paragraph: ~0.2 for SiO vaporized from Mg2SiO4 liquid
+    line_range: '661'
+- species: SiO
+  observable: alpha
+  observation_id: schaefer_fegley_2004_sio_alpha_s_survey
+  field: alpha_range
+  value: [0.04, 0.2]
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
+    paragraph: ~0.04 liquid silica to ~0.2 forsterite liquid
+    line_range: '661'
+- species: Mg
+  observable: alpha
+  observation_id: schaefer_fegley_2004_mg_forsterite_alpha_s_survey
+  field: T_range_K
+  value: [2163.0, 2323.0]
+  note: Table 10 Mg2SiO4(l) T 2163–2323 K (Hashimoto 1990) — corrected from erroneous 2000–2300
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
+    table: '10'
+    paragraph: Mg2SiO4 (l) 2163–2323 K α_s 0.20–0.21 Hashimoto 1990
+    line_range: '654'
+- species: Mg
+  observable: alpha
+  observation_id: schaefer_fegley_2004_mg_forsterite_alpha_s_survey
+  field: alpha
+  value: 0.2
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
+    table: '10'
+    paragraph: Mg2SiO4 (l) α_s 0.20–0.21; Mg(g) and SiO(g) taken as equal
+    line_range: '654-657'

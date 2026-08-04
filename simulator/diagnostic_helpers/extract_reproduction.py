@@ -24,6 +24,7 @@ from __future__ import annotations
 import math
 import re
 import sys
+from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Mapping, Sequence
@@ -36,22 +37,32 @@ from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
 from simulator.chemistry.langmuir_knudsen import (
     grounded_alpha,
     knudsen_effusion_molar_flux,
+    langmuir_molar_flux,
+    species_molar_mass_kg_mol,
 )
+from simulator.chemistry.melt_activity import (
+    MELT_OXIDE_ACTIVITY_COEFFICIENTS,
+    melt_oxide_activity,
+)
+from simulator.state import MOLAR_MASS
 from simulator.diagnostic_helpers.reproduction_compare import (
     COMPARISON_STATUSES,
     ComparisonRecord,
     compare_values,
-    records_to_markdown,
 )
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 EXTRACTS_DIR = REPO_ROOT / "data" / "literature" / "extracts"
 VAPOR_PRESSURES_PATH = REPO_ROOT / "data" / "vapor_pressures.yaml"
+FEEDSTOCKS_PATH = REPO_ROOT / "data" / "feedstocks.yaml"
 MODEL_LIMITATIONS_PATH = REPO_ROOT / "docs" / "model-limitations.md"
 MOTZFELDT_TOOL_PATH = REPO_ROOT / "tools" / "motzfeldt.py"
 TOOLS_DIR = REPO_ROOT / "tools"
 
-TARGET_TYPES = frozenset({"psat_series", "rate_series", "activity_coefficient"})
+TARGET_TYPES = frozenset(
+    {"psat_series", "rate_series", "activity_coefficient", "alpha"}
+)
+KEMS_SOURCE_PREFIX = "kems-"
 
 # Documented defaults when an observation carries no usable numeric uncertainty.
 # These are stated per-observation on the comparison record (defaulted=true).
@@ -82,22 +93,19 @@ DEFAULT_ACTIVITY_UNCERTAINTY: dict[str, Any] = {
         "default 50% relative activity/γ envelope (t-512)"
     ),
 }
-
-# When equipment.cell_material is present but no chamber pO2 is stated,
-# map common KEMS cell materials to an effective pO2 boundary (bar).
-# Halwax 2024 KEMS presets use 1e-8 bar as the assumed control floor.
-CELL_MATERIAL_PO2_BAR: dict[str, float] = {
-    "iridium": 1.0e-8,
-    "ir": 1.0e-8,
-    "platinum": 1.0e-8,
-    "pt": 1.0e-8,
-    "molybdenum": 1.0e-8,
-    "mo": 1.0e-8,
-    "tungsten": 1.0e-8,
-    "w": 1.0e-8,
-    "graphite": 1.0e-10,
-    "c": 1.0e-10,
+DEFAULT_RATE_UNCERTAINTY: dict[str, Any] = {
+    "kind": "log10_decades",
+    "value": 0.5,
+    "defaulted": True,
+    "rationale": (
+        "extract rate observation has no usable numeric uncertainty; "
+        "default half-dex digitized high-temperature flux envelope (t-512)"
+    ),
 }
+
+# Engine diagnostic default used only for rate rows that do not state pO2.
+# Coverage/reporting retains that this is defaulted; psat comparisons never
+# relabel a categorical cell-material boundary or total vacuum as numeric pO2.
 DEFAULT_PO2_BAR = 1.0e-8
 
 # Oxide melt wt% composition used when an observation does not state a
@@ -148,6 +156,7 @@ class AdoptedObservation:
     disagreement_dex: float | None
     is_priority_winner: bool
     geometry_assumption: str
+    adoption_basis: str = "priority_winner"
 
     @property
     def case_id(self) -> str:
@@ -166,6 +175,7 @@ class ObservationEvaluation:
     skip_reason: str | None = None
     findings: list[str] = field(default_factory=list)
     runtime_notes: list[str] = field(default_factory=list)
+    skip_reasons: list[str] = field(default_factory=list)
 
     @property
     def statuses(self) -> list[str]:
@@ -184,7 +194,10 @@ def motzfeldt_available() -> bool:
 
 def geometry_assumption_text() -> str:
     if motzfeldt_available():
-        return "tools/motzfeldt.py present; multi-orifice geometry may be applied"
+        return (
+            "tools/motzfeldt.py available; geometry inversion is used only with "
+            "complete numeric inputs, otherwise a typed capability/data gap is reported"
+        )
     return (
         "tools/motzfeldt.py absent — no Motzfeldt multi-orifice inversion; "
         "pure-component / unit-activity oxide melt at reported T; "
@@ -207,7 +220,13 @@ def load_adopted_observations(
     *,
     extracts_dir: Path | None = None,
 ) -> list[AdoptedObservation]:
-    """Return ADOPTED (priority-winner) observations of the three target types."""
+    """Return the reproduction scope: priority winners plus every KEMS row.
+
+    VALUE-PRECEDENCE intentionally chooses one source for production data, but
+    that is not a license for the validation harness to erase the remaining
+    external mass-spectrometry evidence.  All ``kems-*`` observations therefore
+    enter the coverage ledger even when their source is not production-priority.
+    """
 
     _ensure_tools_path()
     import extract_merge as em  # noqa: WPS433 — tools/ is not a package
@@ -235,11 +254,14 @@ def load_adopted_observations(
     for species_id, block in sorted((view.get("species") or {}).items()):
         for obs in block.get("observations") or []:
             otype = str(obs.get("type") or "")
+            source_id = str(obs.get("source_id") or "")
             if otype not in TARGET_TYPES:
                 continue
             if obs.get("review_status") == "rejected":
                 continue
-            if not obs.get("is_priority_winner"):
+            is_priority_winner = bool(obs.get("is_priority_winner"))
+            is_mass_spec = source_id.startswith(KEMS_SOURCE_PREFIX)
+            if not (is_priority_winner or is_mass_spec):
                 continue
             values = obs.get("values") if isinstance(obs.get("values"), Mapping) else {}
             equipment = (
@@ -258,7 +280,6 @@ def load_adopted_observations(
                     t_range_out = None
             else:
                 t_range_out = None
-            source_id = str(obs.get("source_id") or "")
             dex = dex_by_key.get((str(species_id), otype, source_id))
             adopted.append(
                 AdoptedObservation(
@@ -287,8 +308,11 @@ def load_adopted_observations(
                     values=dict(values),
                     equipment=dict(equipment),
                     disagreement_dex=dex,
-                    is_priority_winner=True,
+                    is_priority_winner=is_priority_winner,
                     geometry_assumption=geometry,
+                    adoption_basis=(
+                        "priority_winner" if is_priority_winner else "mass_spec_extract"
+                    ),
                 )
             )
     adopted.sort(key=lambda row: (row.species_id, row.source_id, row.observation_id))
@@ -302,43 +326,82 @@ def _equipment_scalar(equipment: Mapping[str, Any], field: str) -> Any:
     return None
 
 
-def resolve_pO2_bar(obs: AdoptedObservation) -> tuple[float, str]:
-    """Return (pO2_bar, provenance note)."""
+def resolve_chamber_pressure_pa(obs: AdoptedObservation) -> tuple[float | None, str]:
+    """Resolve total chamber pressure without pretending it is oxygen fugacity."""
 
     chamber = _equipment_scalar(obs.equipment, "chamber_pressure")
-    if chamber is not None:
-        try:
-            p = float(chamber)
-            if math.isfinite(p) and p >= 0.0:
-                # chamber_pressure may be total P; treat as O2-equivalent only
-                # when clearly labelled — otherwise use as order-of-magnitude floor.
-                # Unit match order is longest / most-specific first: "mbar" contains
-                # the substring "bar", so a naive `"bar" in units` check would make
-                # the mbar branch dead code and silently leave mbar unconverted
-                # (1000× too high). Prefer equality / word-boundary-ish tokens.
-                units = ""
-                block = obs.equipment.get("chamber_pressure")
-                if isinstance(block, Mapping):
-                    units = str(block.get("units") or "").lower().strip()
-                if units in {"mbar", "millibar"} or "mbar" in units:
-                    return max(p / 1000.0, 1.0e-30), "equipment.chamber_pressure (mbar→bar)"
-                if units in {"pa", "pascal"} or units == "pa" or re.search(
-                    r"(^|[^a-z])pa([^a-z]|$)", units
-                ):
-                    return max(p / 1.0e5, 1.0e-30), "equipment.chamber_pressure (Pa→bar)"
-                if units in {"bar"} or re.search(r"(^|[^a-z])bar([^a-z]|$)", units):
-                    return p, "equipment.chamber_pressure (bar)"
-        except (TypeError, ValueError):
-            pass
+    if chamber is None:
+        return None, "chamber pressure not stated"
+    block = obs.equipment.get("chamber_pressure")
+    units = str(block.get("units") or "").lower().strip() if isinstance(block, Mapping) else ""
+    factors = {
+        "pa": 1.0,
+        "pascal": 1.0,
+        "mbar": 100.0,
+        "millibar": 100.0,
+        "bar": 1.0e5,
+        "torr": 133.322368,
+        "mmhg": 133.322368,
+    }
+    factor = factors.get(units)
+    if factor is None:
+        return None, f"chamber pressure units unsupported:{units or 'missing'}"
+    try:
+        pressure = float(chamber) * factor
+    except (TypeError, ValueError):
+        return None, "chamber pressure not numeric"
+    if not math.isfinite(pressure) or pressure < 0.0:
+        return None, "chamber pressure non-finite or negative"
+    return pressure, f"equipment.chamber_pressure ({units}→Pa total pressure)"
 
-    material = _equipment_scalar(obs.equipment, "cell_material")
-    if material is not None:
-        key = re.sub(r"[^a-z0-9]+", "", str(material).strip().lower())
-        for name, pO2 in CELL_MATERIAL_PO2_BAR.items():
-            if name in key or key == name:
-                return pO2, f"cell_material={material!r} → default pO2={pO2:g} bar"
 
-    return DEFAULT_PO2_BAR, f"default pO2={DEFAULT_PO2_BAR:g} bar (no equipment pO2)"
+def resolve_pO2_bar(obs: AdoptedObservation) -> tuple[float | None, str]:
+    """Return quantitative pO2 only when the observation states it.
+
+    Cell material supplies a categorical redox boundary, not a numeric oxygen
+    fugacity. Total chamber pressure is likewise not pO2.
+    """
+
+    for container_name, container in (("values", obs.values), ("equipment", obs.equipment)):
+        if not isinstance(container, Mapping):
+            continue
+        for key in ("pO2_bar", "fO2_bar", "oxygen_fugacity_bar"):
+            raw = container.get(key)
+            if isinstance(raw, Mapping):
+                raw = raw.get("value")
+            if raw is None:
+                continue
+            try:
+                value = float(raw)
+            except (TypeError, ValueError):
+                continue
+            if math.isfinite(value) and value > 0.0:
+                return value, f"{container_name}.{key}"
+        for key in ("log10_pO2_bar", "fO2_log10_bar"):
+            raw = container.get(key)
+            if isinstance(raw, Mapping):
+                raw = raw.get("value")
+            if raw is None:
+                continue
+            try:
+                value = 10.0 ** float(raw)
+            except (TypeError, ValueError, OverflowError):
+                continue
+            if math.isfinite(value) and value > 0.0:
+                return value, f"{container_name}.{key} (10^x bar)"
+
+    _ensure_tools_path()
+    from motzfeldt import effective_po2_boundary_for_observation  # noqa: WPS433
+
+    boundary = effective_po2_boundary_for_observation({"equipment": obs.equipment})
+    if boundary is not None:
+        return (
+            None,
+            "cell_material_boundary="
+            f"{boundary.get('boundary')} ({boundary.get('material_normalized')}); "
+            "missing quantitative pO2 capability",
+        )
+    return None, "missing_condition:pO2_boundary"
 
 
 def _engine_species_candidates(obs: AdoptedObservation) -> list[str]:
@@ -601,7 +664,20 @@ def _literature_alpha_points(
 
     values = obs.values
     drops: list[dict[str, Any]] = []
-    series = values.get("series")
+    series = None
+    series_name = None
+    for candidate_name in (
+        "series",
+        "per_temperature",
+        "alpha_series_figure_approx",
+        "pins",
+        "points",
+    ):
+        candidate = values.get(candidate_name)
+        if isinstance(candidate, list) and candidate:
+            series = candidate
+            series_name = candidate_name
+            break
     if isinstance(series, list) and series:
         out: list[dict[str, Any]] = []
         for idx, pt in enumerate(series):
@@ -614,8 +690,15 @@ def _literature_alpha_points(
                     }
                 )
                 continue
+            point_range = pt.get("T_range_K")
             T = pt.get("T_K") or pt.get("temperature_K")
+            if T is None and isinstance(point_range, (list, tuple)) and len(point_range) == 2:
+                T = 0.5 * (float(point_range[0]) + float(point_range[1]))
+            if T is None and obs.T_range_K is not None:
+                T = 0.5 * (float(obs.T_range_K[0]) + float(obs.T_range_K[1]))
             alpha = pt.get("alpha")
+            if alpha is None:
+                alpha = pt.get("alpha_approx")
             if T is None or alpha is None:
                 # rate/flux-only point — cannot invert without geometry.
                 if pt.get("rate") is not None or pt.get("flux") is not None:
@@ -669,12 +752,57 @@ def _literature_alpha_points(
                     "alpha": a_f,
                     "sigma": sigma_f,
                     "point_index": idx,
+                    "series_name": series_name,
                 }
             )
         if out:
             return out, None, drops
         if series:
             return None, "rate_series_without_alpha_and_no_motzfeldt_geometry", drops
+
+    alpha_form = values.get("alpha_form")
+    if isinstance(alpha_form, Mapping) and obs.T_range_K is not None:
+        lo, hi = (float(obs.T_range_K[0]), float(obs.T_range_K[1]))
+        temperatures = list(dict.fromkeys((lo, 0.5 * (lo + hi), hi)))
+        out = []
+        for idx, T_K in enumerate(temperatures):
+            try:
+                if alpha_form.get("A") is not None and alpha_form.get("B_K") is not None:
+                    alpha = float(alpha_form["A"]) * math.exp(
+                        -float(alpha_form["B_K"]) / T_K
+                    )
+                    sigma = None
+                else:
+                    prefactor = float(
+                        alpha_form.get("gamma_o", alpha_form.get("c0"))
+                    )
+                    activation = float(alpha_form["E_J_per_mol"])
+                    gas_constant = float(alpha_form.get("R_J_per_mol_K") or 8.314462618)
+                    alpha = prefactor * math.exp(-activation / (gas_constant * T_K))
+                    sigma_E = alpha_form.get("E_uncertainty_J_per_mol")
+                    sigma = (
+                        abs(alpha) * float(sigma_E) / (gas_constant * T_K)
+                        if sigma_E is not None
+                        else None
+                    )
+            except (KeyError, TypeError, ValueError, OverflowError):
+                return None, "alpha_form_not_evaluable", drops
+            out.append(
+                {
+                    "T_K": T_K,
+                    "alpha": alpha,
+                    "sigma": sigma,
+                    "point_index": idx,
+                    "series_name": "alpha_form",
+                    "uncertainty_components": (
+                        ["Arrhenius E uncertainty propagated as sigma_alpha/alpha=sigma_E/(R*T)"]
+                        if sigma is not None
+                        else []
+                    ),
+                }
+            )
+        return out, None, drops
+
     if values.get("alpha") is not None:
         T = None
         if obs.T_range_K is not None:
@@ -689,7 +817,145 @@ def _literature_alpha_points(
             )
         except (TypeError, ValueError):
             return None, "alpha_not_numeric", drops
+
+    alpha_range = values.get("alpha_range")
+    if isinstance(alpha_range, (list, tuple)) and len(alpha_range) == 2:
+        if obs.T_range_K is None:
+            return None, "alpha_range_without_temperature", drops
+        try:
+            low, high = float(alpha_range[0]), float(alpha_range[1])
+            T = 0.5 * (float(obs.T_range_K[0]) + float(obs.T_range_K[1]))
+        except (TypeError, ValueError):
+            return None, "alpha_range_not_numeric", drops
+        return (
+            [
+                {
+                    "T_K": T,
+                    "alpha": 0.5 * (low + high),
+                    "sigma": 0.5 * abs(high - low),
+                    "point_index": 0,
+                    "series_name": "alpha_range",
+                }
+            ],
+            None,
+            drops,
+        )
     return None, "no_usable_rate_series_payload", drops
+
+
+def _literature_rate_points(
+    obs: AdoptedObservation,
+) -> tuple[list[dict[str, Any]] | None, str | None, list[dict[str, Any]]]:
+    """Normalize measured species-rate points to mol/(m2*s)."""
+
+    values = obs.values
+    drops: list[dict[str, Any]] = []
+    figure_points = values.get("figure_2_log10_J_approx")
+    if isinstance(figure_points, list) and figure_points:
+        out: list[dict[str, Any]] = []
+        for idx, point in enumerate(figure_points):
+            if not isinstance(point, Mapping):
+                drops.append({"point_index": idx, "reason": "rate_point_not_mapping"})
+                continue
+            log_key = next(
+                (str(key) for key in point if str(key).startswith("log10_J_")),
+                None,
+            )
+            try:
+                T_K = (
+                    float(point["T_K"])
+                    if point.get("T_K") is not None
+                    else float(point["T_C"]) + 273.15
+                )
+                log10_rate = float(point[log_key]) if log_key is not None else None
+                if log10_rate is None:
+                    raise ValueError("missing log10 rate")
+                # Published figure units are mol cm^-2 s^-1.  1 m2 = 1e4 cm2.
+                rate = (10.0**log10_rate) * 1.0e4
+            except (KeyError, TypeError, ValueError, OverflowError) as exc:
+                drops.append(
+                    {
+                        "point_index": idx,
+                        "reason": "rate_point_not_evaluable",
+                        "detail": str(exc),
+                    }
+                )
+                continue
+            out.append(
+                {
+                    "T_K": T_K,
+                    "rate_mol_m2_s": rate,
+                    "point_index": idx,
+                    "source_units": "mol cm^-2 s^-1",
+                }
+            )
+        if out:
+            return out, None, drops
+
+    for series_name in ("series", "points"):
+        series = values.get(series_name)
+        if not isinstance(series, list) or not series:
+            continue
+        out = []
+        for idx, point in enumerate(series):
+            if not isinstance(point, Mapping):
+                continue
+            T = point.get("T_K") or point.get("temperature_K")
+            raw = None
+            scale = 1.0
+            for key, key_scale in (
+                ("rate_mol_m2_s", 1.0),
+                ("flux_mol_m2_s", 1.0),
+                ("rate_mol_cm2_s", 1.0e4),
+                ("flux_mol_cm2_s", 1.0e4),
+            ):
+                if point.get(key) is not None:
+                    raw = point[key]
+                    scale = key_scale
+                    break
+            if T is None or raw is None:
+                continue
+            try:
+                out.append(
+                    {
+                        "T_K": float(T),
+                        "rate_mol_m2_s": float(raw) * scale,
+                        "point_index": idx,
+                        "source_units": str(obs.units or "mol m^-2 s^-1"),
+                    }
+                )
+            except (TypeError, ValueError):
+                drops.append({"point_index": idx, "reason": "rate_point_not_numeric"})
+        if out:
+            return out, None, drops
+
+    quantity = str(values.get("quantity") or "").lower()
+    if "clausing" in quantity:
+        return None, "unsupported_observable:clausing_factor_not_species_rate", drops
+    if values.get("semantics") == "bound_not_point_ordering":
+        return None, "missing_numeric_species_rate:qualitative_bound", drops
+    return None, "missing_numeric_species_rate", drops
+
+
+def _has_alpha_payload(obs: AdoptedObservation) -> bool:
+    values = obs.values
+    return any(
+        values.get(key) is not None
+        for key in (
+            "alpha",
+            "alpha_range",
+            "alpha_form",
+            "per_temperature",
+            "alpha_series_figure_approx",
+            "pins",
+        )
+    ) or (
+        isinstance(values.get("series"), list)
+        and any(
+            isinstance(point, Mapping) and point.get("alpha") is not None
+            for point in values["series"]
+        )
+    )
 
 
 def resolve_uncertainty(
@@ -710,6 +976,7 @@ def resolve_uncertainty(
                     "value": sigma,
                     "defaulted": False,
                     "source": "point.sigma",
+                    "components": list(point.get("uncertainty_components") or []),
                 }
         except (TypeError, ValueError):
             pass
@@ -757,6 +1024,50 @@ def resolve_uncertainty(
                     }
                 except (TypeError, ValueError):
                     pass
+        alpha_range = unc.get("alpha_range")
+        if isinstance(alpha_range, (list, tuple)) and len(alpha_range) == 2:
+            try:
+                low, high = float(alpha_range[0]), float(alpha_range[1])
+                return {
+                    "kind": "absolute",
+                    "value": 0.5 * abs(high - low),
+                    "defaulted": False,
+                    "source": "observation.uncertainty.alpha_range",
+                    "components": ["published alpha range half-width"],
+                }
+            except (TypeError, ValueError):
+                pass
+
+    if kind_hint == "alpha":
+        for container, source in (
+            (obs.values, "values"),
+            (obs.uncertainty if isinstance(obs.uncertainty, Mapping) else {}, "uncertainty"),
+        ):
+            alpha_range = container.get("alpha_range")
+            if isinstance(alpha_range, (list, tuple)) and len(alpha_range) == 2:
+                try:
+                    low, high = float(alpha_range[0]), float(alpha_range[1])
+                    return {
+                        "kind": "absolute",
+                        "value": 0.5 * abs(high - low),
+                        "defaulted": False,
+                        "source": f"observation.{source}.alpha_range",
+                        "components": ["published alpha range half-width"],
+                    }
+                except (TypeError, ValueError):
+                    pass
+        for key in ("sigma", "alpha_uncertainty_sigma"):
+            if obs.values.get(key) is not None:
+                try:
+                    return {
+                        "kind": "absolute",
+                        "value": float(obs.values[key]),
+                        "defaulted": False,
+                        "source": f"observation.values.{key}",
+                        "components": [key],
+                    }
+                except (TypeError, ValueError):
+                    pass
 
     # Propagate store-level disagreement_dex when present.
     if obs.disagreement_dex is not None and math.isfinite(obs.disagreement_dex):
@@ -771,6 +1082,8 @@ def resolve_uncertainty(
         return dict(DEFAULT_PSAT_UNCERTAINTY)
     if kind_hint == "alpha":
         return dict(DEFAULT_ALPHA_UNCERTAINTY)
+    if kind_hint == "rate":
+        return dict(DEFAULT_RATE_UNCERTAINTY)
     return dict(DEFAULT_ACTIVITY_UNCERTAINTY)
 
 
@@ -779,7 +1092,7 @@ def _engine_pure_psat_pa(
     T_K: float,
     vapor_pressure_data: Mapping[str, Any],
 ) -> tuple[float | None, str | None]:
-    """Pure-component Antoine path (wall/condensation helper)."""
+    """Pure-component pressure from the same versioned vapor-rail catalog."""
 
     from simulator.condensation import _try_antoine_psat_pa
 
@@ -807,17 +1120,23 @@ def _engine_melt_psat_pa(
     vapor_pressure_data: Mapping[str, Any],
     *,
     oxide: str | None = None,
+    account_mol: Mapping[str, float] | None = None,
 ) -> tuple[float | None, str | None, dict[str, Any]]:
-    """Builtin vapor-pressure provider over a pure parent-oxide melt."""
+    """Builtin vapor-pressure provider at an explicit melt recipe and pO2."""
 
     oxide_formula = oxide or PARENT_OXIDE_BY_ENGINE_SPECIES.get(species)
     if oxide_formula is None:
         return None, "no_parent_oxide_for_species", {}
+    account = (
+        {str(key): float(value) for key, value in account_mol.items()}
+        if account_mol is not None
+        else {oxide_formula: 100.0}
+    )
     provider = BuiltinVaporPressureProvider(vapor_pressure_data)
     request = IntentRequest(
         intent=ChemistryIntent.VAPOR_PRESSURE,
         account_view=ProviderAccountView(
-            accounts={"process.cleaned_melt": {oxide_formula: 100.0}},
+            accounts={"process.cleaned_melt": account},
             species_formula_registry={},
         ),
         temperature_C=float(T_K) - 273.15,
@@ -837,6 +1156,7 @@ def _engine_melt_psat_pa(
         "temperature_K": float(T_K),
         "pO2_bar": float(pO2_bar),
         "oxide": oxide_formula,
+        "account_mol": account,
         "vapor_pressures_Pa": dict(diagnostic.get("vapor_pressures_Pa") or {}),
         "warnings": list(result.warnings or ()),
     }
@@ -886,6 +1206,8 @@ def evaluate_observation(
         return _evaluate_psat(obs, evaluation, vp_data, pO2)
     if obs.obs_type == "rate_series":
         return _evaluate_rate(obs, evaluation, vp_data, pO2)
+    if obs.obs_type == "alpha":
+        return _evaluate_alpha(obs, evaluation)
     if obs.obs_type == "activity_coefficient":
         return _evaluate_activity(obs, evaluation)
     evaluation.skip_reason = f"unknown_observation_type:{obs.obs_type}"
@@ -983,13 +1305,36 @@ def _emit_point_drop_records(
         evaluation.runtime_notes.append(
             f"point drop idx={idx!r} reason={reason} detail={dict(drop)}"
         )
+        evaluation.skip_reasons.append(f"point_drop:{reason}")
+
+
+def _pressure_standard_state_kind(obs: AdoptedObservation) -> str | None:
+    """Classify the literature pressure basis without crossing standard states."""
+
+    text = " ".join(
+        str(value)
+        for value in (
+            obs.standard_state,
+            obs.phase,
+            obs.values.get("standard_state"),
+            obs.values.get("quantity"),
+            obs.values.get("condensed_reservoir"),
+            obs.values.get("material"),
+        )
+        if value is not None
+    ).lower()
+    if "pure" in text or "pure_psat" in text:
+        return "pure_component"
+    if any(token in text for token in ("melt", "silicate", "basalt", "slag")):
+        return "melt"
+    return None
 
 
 def _evaluate_psat(
     obs: AdoptedObservation,
     evaluation: ObservationEvaluation,
     vp_data: Mapping[str, Any],
-    pO2: float,
+    pO2: float | None,
 ) -> ObservationEvaluation:
     points, skip, drops = _literature_pressure_points(obs)
     if drops:
@@ -1001,6 +1346,9 @@ def _evaluate_psat(
             extra_runtime={"pO2_bar": pO2},
         )
     if skip is not None:
+        typed_skip = (
+            skip if skip.startswith(_TYPED_SKIP_PREFIX) else f"{_TYPED_SKIP_PREFIX}{skip}"
+        )
         # Still emit a typed unsupported-observable record so the battery
         # never silently passes an adopted observation.
         evaluation.records.append(
@@ -1013,17 +1361,25 @@ def _evaluate_psat(
                 uncertainty=None,
                 actual=None,
                 units=str(obs.units or "Pa"),
-                runtime={"skip_reason": skip, "pO2_bar": pO2, "n_point_drops": len(drops)},
+                runtime={
+                    "skip_reason": typed_skip,
+                    "pO2_bar": pO2,
+                    "n_point_drops": len(drops),
+                },
             )
         )
-        evaluation.skip_reason = skip
-        evaluation.runtime_notes.append(f"psat payload skip: {skip}")
+        evaluation.skip_reason = typed_skip
+        evaluation.skip_reasons.append(typed_skip)
+        evaluation.runtime_notes.append(f"psat payload skip: {typed_skip}")
         return evaluation
 
     assert points is not None
     candidates = _engine_species_candidates(obs)
+    standard_state_kind = _pressure_standard_state_kind(obs)
+    melt_recipe, melt_recipe_source, melt_recipe_error = _melt_recipe_mol(obs)
     any_numeric = False
     last_refusal: str | None = None
+    temperature_counts = Counter(float(point["T_K"]) for point in points)
     for pt in points:
         T_K = float(pt["T_K"])
         expected = float(pt["P_Pa"])
@@ -1034,27 +1390,47 @@ def _evaluate_psat(
             "pO2_bar": pO2,
             "candidates": candidates,
             "geometry_assumption": obs.geometry_assumption,
+            "standard_state_kind": standard_state_kind,
+            "melt_recipe_source": melt_recipe_source,
         }
         unsupported = False
         out_of_domain = False
         matched_species: str | None = None
 
         for species in candidates:
-            # Prefer pure-component path for pure-metal / pure-solid reservoirs.
-            P_pure, refuse_pure = _engine_pure_psat_pa(species, T_K, vp_data)
-            if P_pure is not None:
-                actual = P_pure
-                matched_species = species
-                runtime["engine_path"] = "pure_component_antoine"
-                runtime["species"] = species
-                break
-            if refuse_pure:
-                last_refusal = refuse_pure
-                runtime.setdefault("pure_refusals", {})[species] = refuse_pure
+            if standard_state_kind == "pure_component":
+                P_pure, refuse_pure = _engine_pure_psat_pa(species, T_K, vp_data)
+                if P_pure is not None:
+                    actual = P_pure
+                    matched_species = species
+                    runtime["engine_path"] = "vapor_rail_pure_component"
+                    runtime["species"] = species
+                    break
+                if refuse_pure:
+                    last_refusal = refuse_pure
+                    runtime.setdefault("pure_refusals", {})[species] = refuse_pure
+                continue
 
-            P_melt, refuse_melt, melt_rt = _engine_melt_psat_pa(
-                species, T_K, pO2, vp_data
-            )
+            if standard_state_kind is None:
+                last_refusal = "missing_condition:standard_state_boundary"
+                runtime["refusal"] = last_refusal
+                continue
+            if melt_recipe is None:
+                last_refusal = melt_recipe_error or "missing_condition:melt_composition"
+                runtime["refusal"] = last_refusal
+                continue
+            if pO2 is None:
+                last_refusal = "missing_condition:pO2_boundary"
+                runtime["refusal"] = last_refusal
+                continue
+            else:
+                P_melt, refuse_melt, melt_rt = _engine_melt_psat_pa(
+                    species,
+                    T_K,
+                    pO2,
+                    vp_data,
+                    account_mol=melt_recipe,
+                )
             runtime.setdefault("melt_attempts", {})[species] = {
                 "refusal": refuse_melt,
                 **{k: melt_rt.get(k) for k in ("provider_status", "oxide", "warnings")},
@@ -1116,7 +1492,14 @@ def _evaluate_psat(
         # status is for recipe-side assumed controls, not missing literature σ).
         record = _compare_point(
             obs=obs,
-            observable_id=f"{obs.observation_id}:T={T_K:g}",
+            observable_id=(
+                f"{obs.observation_id}:T={T_K:g}"
+                + (
+                    f":point={pt.get('point_index')}"
+                    if temperature_counts[T_K] > 1
+                    else ""
+                )
+            ),
             species=matched_species or obs.species_id,
             coordinate={"temperature_K": T_K},
             expected=expected,
@@ -1146,6 +1529,7 @@ def _evaluate_psat(
         evaluation.skip_reason = (
             f"{_TYPED_SKIP_PREFIX}{last_refusal or 'engine_refusal_all_points'}"
         )
+        evaluation.skip_reasons.append(evaluation.skip_reason)
     return evaluation
 
 
@@ -1153,9 +1537,180 @@ def _evaluate_rate(
     obs: AdoptedObservation,
     evaluation: ObservationEvaluation,
     vp_data: Mapping[str, Any],
-    pO2: float,
+    pO2: float | None,
 ) -> ObservationEvaluation:
-    del vp_data, pO2  # alpha path does not use pO2 / VP surface
+    """Compare measured flux only when rail conditions match; otherwise diagnose."""
+
+    points, skip, drops = _literature_rate_points(obs)
+    if points is None and _has_alpha_payload(obs):
+        evaluation.runtime_notes.append(
+            "legacy rate_series payload contains alpha, not a measured rate; alpha path used"
+        )
+        return _evaluate_alpha(obs, evaluation)
+    if drops:
+        _emit_point_drop_records(
+            obs,
+            evaluation,
+            drops,
+            units="mol m^-2 s^-1",
+            extra_runtime={"engine_path": "vapor_rail_plus_hkl"},
+        )
+    if points is None:
+        reason = skip or "missing_numeric_species_rate"
+        typed = f"{_TYPED_SKIP_PREFIX}{reason}"
+        evaluation.records.append(
+            _compare_point(
+                obs=obs,
+                observable_id=f"{obs.observation_id}:payload",
+                species=obs.species_id,
+                coordinate={"window": "payload-absent"},
+                expected=None,
+                uncertainty=None,
+                actual=None,
+                units=str(obs.units or "mol m^-2 s^-1"),
+                runtime={"skip_reason": typed, "engine_path": "vapor_rail_plus_hkl"},
+            )
+        )
+        evaluation.skip_reason = typed
+        evaluation.skip_reasons.append(typed)
+        return evaluation
+
+    candidates = _engine_species_candidates(obs)
+    melt_recipe, melt_recipe_source, melt_recipe_error = _melt_recipe_mol(obs)
+    condition_gaps: list[str] = []
+    if melt_recipe is None:
+        condition_gaps.append(melt_recipe_error or "missing_condition:melt_composition")
+    if pO2 is None:
+        condition_gaps.append("missing_condition:pO2_boundary")
+    diagnostic_pO2 = float(pO2) if pO2 is not None else DEFAULT_PO2_BAR
+    if condition_gaps:
+        evaluation.runtime_notes.append(
+            "HKL assumption diagnostic excluded from external residuals: "
+            + "; ".join(condition_gaps)
+        )
+    any_numeric = False
+    last_refusal = "missing_capability:vapor_rail_species_or_hkl_inputs"
+    for point in points:
+        T_K = float(point["T_K"])
+        expected = float(point["rate_mol_m2_s"])
+        uncertainty = resolve_uncertainty(obs, point=point, kind_hint="rate")
+        actual = None
+        matched = None
+        runtime: dict[str, Any] = {
+            "engine_path": "vapor_rail_plus_hkl",
+            "temperature_K": T_K,
+            "pO2_bar": diagnostic_pO2,
+            "pO2_defaulted": pO2 is None,
+            "candidates": candidates,
+            "source_units": point.get("source_units"),
+            "melt_recipe_source": melt_recipe_source,
+            "condition_gaps": list(condition_gaps),
+            "engine_uncertainty": (
+                "unavailable: vapor-pressure, alpha, composition, and pO2 "
+                "components are not jointly quantified"
+            ),
+        }
+        for species in candidates:
+            if melt_recipe is not None and pO2 is not None:
+                pressure, refusal, pressure_runtime = _engine_melt_psat_pa(
+                    species,
+                    T_K,
+                    pO2,
+                    vp_data,
+                    account_mol=melt_recipe,
+                )
+                pressure_path = "melt_oxide_vapor_pressure"
+            else:
+                pressure, refusal, pressure_runtime = _engine_melt_psat_pa(
+                    species,
+                    T_K,
+                    diagnostic_pO2,
+                    vp_data,
+                )
+                pressure_path = "pure_parent_oxide_assumption_diagnostic"
+                if pressure is None:
+                    pressure, pure_refusal = _engine_pure_psat_pa(
+                        species, T_K, vp_data
+                    )
+                    refusal = refusal or pure_refusal
+                    pressure_path = "pure_component_assumption_diagnostic"
+            if pressure is None:
+                last_refusal = refusal or last_refusal
+                runtime.setdefault("pressure_refusals", {})[species] = last_refusal
+                continue
+            alpha, alpha_refusal, alpha_runtime = _engine_alpha(species, T_K)
+            if alpha is None:
+                last_refusal = alpha_refusal or "missing_capability:grounded_alpha"
+                runtime.setdefault("alpha_refusals", {})[species] = last_refusal
+                continue
+            try:
+                molar_mass = species_molar_mass_kg_mol(species)
+                actual = langmuir_molar_flux(
+                    T_K,
+                    pressure,
+                    0.0,
+                    alpha,
+                    molar_mass_kg_mol=molar_mass,
+                )
+            except (KeyError, TypeError, ValueError) as exc:
+                last_refusal = f"missing_capability:hkl_species_inputs:{type(exc).__name__}"
+                runtime.setdefault("hkl_refusals", {})[species] = str(exc)
+                continue
+            matched = species
+            runtime.update(
+                {
+                    "species": species,
+                    "pressure_path": pressure_path,
+                    "p_eq_pa": pressure,
+                    "alpha": alpha,
+                    "molar_mass_kg_mol": molar_mass,
+                    "alpha_context": alpha_runtime,
+                    "pressure_runtime": pressure_runtime,
+                }
+            )
+            break
+
+        record = _compare_point(
+            obs=obs,
+            observable_id=f"{obs.observation_id}:T={T_K:g}:rate",
+            species=matched or obs.species_id,
+            coordinate={"temperature_K": T_K},
+            expected=expected,
+            uncertainty=uncertainty,
+            actual=actual,
+            units="mol m^-2 s^-1",
+            runtime=runtime,
+            unsupported_speciation=actual is None,
+            assumed_input=bool(condition_gaps and actual is not None),
+        )
+        evaluation.records.append(record)
+        if actual is not None:
+            any_numeric = True
+        if record.status == "mismatch":
+            dex = residual_dex(record)
+            evaluation.findings.append(
+                f"FINDING mismatch {obs.species_id} rate T={T_K:g}K "
+                f"expected={expected:.6g} actual={actual:.6g} "
+                f"residual_dex={dex:.6g} budget={uncertainty}"
+            )
+
+    if condition_gaps:
+        typed_gaps = [
+            gap if gap.startswith(_TYPED_SKIP_PREFIX) else f"{_TYPED_SKIP_PREFIX}{gap}"
+            for gap in condition_gaps
+        ]
+        evaluation.skip_reasons.extend(typed_gaps)
+        evaluation.skip_reason = typed_gaps[0]
+    elif not any_numeric:
+        evaluation.skip_reason = f"{_TYPED_SKIP_PREFIX}{last_refusal}"
+        evaluation.skip_reasons.append(evaluation.skip_reason)
+    return evaluation
+
+
+def _evaluate_alpha(
+    obs: AdoptedObservation,
+    evaluation: ObservationEvaluation,
+) -> ObservationEvaluation:
     points, skip, drops = _literature_alpha_points(obs)
     if drops:
         _emit_point_drop_records(
@@ -1165,6 +1720,9 @@ def _evaluate_rate(
             units=str(obs.units or "alpha"),
         )
     if skip is not None:
+        typed_skip = (
+            skip if skip.startswith(_TYPED_SKIP_PREFIX) else f"{_TYPED_SKIP_PREFIX}{skip}"
+        )
         evaluation.records.append(
             _compare_point(
                 obs=obs,
@@ -1175,16 +1733,18 @@ def _evaluate_rate(
                 uncertainty=None,
                 actual=None,
                 units=str(obs.units or "alpha"),
-                runtime={"skip_reason": skip, "n_point_drops": len(drops)},
+                runtime={"skip_reason": typed_skip, "n_point_drops": len(drops)},
             )
         )
-        evaluation.skip_reason = skip
+        evaluation.skip_reason = typed_skip
+        evaluation.skip_reasons.append(typed_skip)
         return evaluation
 
     assert points is not None
     candidates = _engine_species_candidates(obs)
     any_numeric = False
     last_refusal: str | None = None
+    temperature_counts = Counter(float(point["T_K"]) for point in points)
     for pt in points:
         T_K = float(pt["T_K"])
         expected = float(pt["alpha"])
@@ -1228,7 +1788,14 @@ def _evaluate_rate(
             runtime["alpha_s_extrapolated"] = True
         record = _compare_point(
             obs=obs,
-            observable_id=f"{obs.observation_id}:T={T_K:g}",
+            observable_id=(
+                f"{obs.observation_id}:T={T_K:g}"
+                + (
+                    f":point={pt.get('point_index')}"
+                    if temperature_counts[T_K] > 1
+                    else ""
+                )
+            ),
             species=matched or obs.species_id,
             coordinate={"temperature_K": T_K},
             expected=expected,
@@ -1250,6 +1817,77 @@ def _evaluate_rate(
         evaluation.skip_reason = (
             f"{_TYPED_SKIP_PREFIX}{last_refusal or 'alpha_unsupported'}"
         )
+        evaluation.skip_reasons.append(evaluation.skip_reason)
+    return evaluation
+
+
+def _melt_recipe_mol(
+    obs: AdoptedObservation,
+) -> tuple[dict[str, float] | None, str, str | None]:
+    """Resolve an extract recipe to oxide moles, including the production 12022 proxy."""
+
+    values = obs.values
+    for key in ("composition_mol", "melt_composition_mol"):
+        raw = values.get(key)
+        if isinstance(raw, Mapping) and raw:
+            try:
+                return {str(k): float(v) for k, v in raw.items()}, key, None
+            except (TypeError, ValueError):
+                return None, key, "invalid_melt_composition_mol"
+
+    raw_wt = values.get("composition_wt_pct") or values.get("melt_composition_wt_pct")
+    provenance = "extract composition_wt_pct"
+    material = str(values.get("material") or obs.phase or "").lower()
+    if not isinstance(raw_wt, Mapping) and (
+        "apollo_12" in material or "lunar_basalt_120" in material
+    ):
+        feedstocks = yaml.safe_load(FEEDSTOCKS_PATH.read_text(encoding="utf-8")) or {}
+        feedstock = feedstocks.get("lunar_mare_low_ti") or {}
+        raw_wt = feedstock.get("composition_wt_pct")
+        provenance = "data/feedstocks.yaml::lunar_mare_low_ti (Apollo 12 proxy)"
+    if isinstance(raw_wt, Mapping) and raw_wt:
+        try:
+            mol = {
+                str(oxide): float(wt) / float(MOLAR_MASS[str(oxide)])
+                for oxide, wt in raw_wt.items()
+                if float(wt) > 0.0 and str(oxide) in MOLAR_MASS
+            }
+        except (TypeError, ValueError):
+            return None, provenance, "invalid_melt_composition_wt_pct"
+        if mol:
+            return mol, provenance, None
+    return None, "none", "missing_condition:melt_composition"
+
+
+def _activity_skip(
+    obs: AdoptedObservation,
+    evaluation: ObservationEvaluation,
+    reason: str,
+    *,
+    expected: float | None = None,
+    observable: str = "activity",
+) -> ObservationEvaluation:
+    typed = reason if reason.startswith(_TYPED_SKIP_PREFIX) else f"{_TYPED_SKIP_PREFIX}{reason}"
+    evaluation.records.append(
+        _compare_point(
+            obs=obs,
+            observable_id=f"{obs.observation_id}:{observable}",
+            species=obs.species_id,
+            coordinate={"window": "activity-model-gap"},
+            expected=expected,
+            uncertainty=(
+                resolve_uncertainty(obs, kind_hint="activity")
+                if expected is not None
+                else None
+            ),
+            actual=None,
+            units="dimensionless",
+            runtime={"skip_reason": typed},
+            out_of_domain=expected is not None,
+        )
+    )
+    evaluation.skip_reason = typed
+    evaluation.skip_reasons.append(typed)
     return evaluation
 
 
@@ -1260,74 +1898,160 @@ def _evaluate_activity(
     values = obs.values
     semantics = str(values.get("semantics") or "")
     if "bound_not_point" in semantics or "ordering" in semantics.lower():
-        evaluation.records.append(
-            _compare_point(
-                obs=obs,
-                observable_id=f"{obs.observation_id}:qualitative",
-                species=obs.species_id,
-                coordinate={"window": "qualitative-ordering"},
-                expected=None,
-                uncertainty=None,
-                actual=None,
-                units=str(obs.units or "dimensionless"),
-                runtime={
-                    "skip_reason": "qualitative_bound_not_point_ordering",
-                    "semantics": semantics,
-                },
-            )
+        return _activity_skip(
+            obs,
+            evaluation,
+            "unsupported_observable:qualitative_activity_ordering",
+            observable="qualitative",
         )
-        evaluation.skip_reason = "qualitative_bound_not_point_ordering"
-        return evaluation
 
-    # Numeric gamma / activity if present.
-    gamma = None
-    for key in ("gamma", "activity", "value", "alpha"):
-        if values.get(key) is not None:
-            try:
-                gamma = float(values[key])
-                break
-            except (TypeError, ValueError):
-                continue
-    if gamma is None:
-        evaluation.records.append(
-            _compare_point(
-                obs=obs,
-                observable_id=f"{obs.observation_id}:payload",
-                species=obs.species_id,
-                coordinate={"window": "payload-absent"},
-                expected=None,
-                uncertainty=None,
-                actual=None,
-                units=str(obs.units or "dimensionless"),
-                runtime={"skip_reason": "activity_without_numeric_gamma"},
-            )
+    expected = None
+    observable_kind = None
+    for key in ("gamma", "activity", "value"):
+        if values.get(key) is None:
+            continue
+        try:
+            expected = float(values[key])
+            observable_kind = "gamma" if key == "gamma" else "activity"
+            break
+        except (TypeError, ValueError):
+            continue
+    if expected is None or observable_kind is None:
+        return _activity_skip(
+            obs,
+            evaluation,
+            "missing_numeric_activity",
+            observable="payload",
         )
-        evaluation.skip_reason = "activity_without_numeric_gamma"
-        return evaluation
 
-    # Engine melt_oxide_activity is composition-dependent; pure-oxide a≈1 is the
-    # only defensible default without a melt recipe — refuse rather than invent.
-    evaluation.records.append(
-        _compare_point(
-            obs=obs,
-            observable_id=f"{obs.observation_id}:gamma",
-            species=obs.species_id,
-            coordinate={"window": "no-melt-recipe"},
-            expected=gamma,
-            uncertainty=resolve_uncertainty(obs, kind_hint="activity"),
-            actual=None,
-            units="dimensionless",
-            runtime={
-                "skip_reason": "activity_requires_melt_recipe",
-                "note": (
-                    "extract activity/γ is multi-component; battery refuses to "
-                    "assume pure-oxide a=1 as a false match"
-                ),
-            },
-            out_of_domain=True,
+    parent_oxide = PARENT_OXIDE_BY_ENGINE_SPECIES.get(obs.species_id)
+    if parent_oxide is None and obs.species_id in MOLAR_MASS:
+        parent_oxide = obs.species_id
+    if parent_oxide is None:
+        return _activity_skip(
+            obs,
+            evaluation,
+            f"missing_capability:parent_oxide_mapping:{obs.species_id}",
+            expected=expected,
+            observable=observable_kind,
         )
+
+    runtime: dict[str, Any] = {
+        "engine_path": "melt_oxide_activity",
+        "parent_oxide": parent_oxide,
+        "engine_uncertainty": (
+            "unavailable: melt-activity coefficient/model uncertainty is not "
+            "quantified by this engine path"
+        ),
+    }
+    assumption_gaps: list[str] = []
+    if observable_kind == "gamma":
+        coefficient = MELT_OXIDE_ACTIVITY_COEFFICIENTS.get(parent_oxide)
+        if coefficient is None:
+            return _activity_skip(
+                obs,
+                evaluation,
+                f"missing_capability:melt_activity_gamma:{parent_oxide}",
+                expected=expected,
+                observable=observable_kind,
+            )
+        actual = float(coefficient.gamma)
+        runtime["citation"] = coefficient.citation
+    else:
+        recipe, recipe_source, recipe_error = _melt_recipe_mol(obs)
+        runtime["recipe_source"] = recipe_source
+        if recipe is None:
+            return _activity_skip(
+                obs,
+                evaluation,
+                recipe_error or "missing_condition:melt_composition",
+                expected=expected,
+                observable=observable_kind,
+            )
+        result = melt_oxide_activity(parent_oxide, recipe)
+        if result is None:
+            return _activity_skip(
+                obs,
+                evaluation,
+                f"missing_capability:melt_activity:{parent_oxide}",
+                expected=expected,
+                observable=observable_kind,
+            )
+        actual = float(result.activity)
+        runtime.update(result.provenance())
+        warning = getattr(result, "warning", None)
+        if warning:
+            assumption_gaps.append(
+                f"missing_capability:documented_melt_activity_coefficient:{parent_oxide}"
+            )
+        if "proxy" in recipe_source.lower() or "modeled" in recipe_source.lower():
+            assumption_gaps.append("missing_condition:source_sample_composition")
+        standard_state = str(obs.standard_state or "").lower()
+        if "pure fe" in standard_state or "pure iron" in standard_state:
+            assumption_gaps.append(
+                "missing_capability:reference_state_conversion:pure_Fe_to_FeO"
+            )
+        qualifier_text = " ".join(
+            str(value)
+            for value in (
+                values.get("activity_note"),
+                (obs.uncertainty or {}).get("note")
+                if isinstance(obs.uncertainty, Mapping)
+                else obs.uncertainty,
+            )
+            if value is not None
+        ).lower()
+        if any(
+            token in qualifier_text
+            for token in ("nearly", "figure-only", "without tabulated", "qualitative")
+        ):
+            assumption_gaps.append(
+                "unsupported_observable:qualitative_activity_not_point"
+            )
+        runtime["condition_gaps"] = list(dict.fromkeys(assumption_gaps))
+
+    T_mid = (
+        0.5 * (float(obs.T_range_K[0]) + float(obs.T_range_K[1]))
+        if obs.T_range_K is not None
+        else None
     )
-    evaluation.skip_reason = f"{_TYPED_SKIP_PREFIX}activity_requires_melt_recipe"
+    record = _compare_point(
+        obs=obs,
+        observable_id=f"{obs.observation_id}:{observable_kind}",
+        species=obs.species_id,
+        coordinate=(
+            {"temperature_K": T_mid}
+            if T_mid is not None
+            else {"window": "temperature-not-stated"}
+        ),
+        expected=expected,
+        uncertainty=resolve_uncertainty(obs, kind_hint="activity"),
+        actual=actual,
+        units="dimensionless",
+        runtime=runtime,
+        assumed_input=bool(assumption_gaps),
+    )
+    evaluation.records.append(record)
+    if assumption_gaps:
+        typed_gaps = [
+            gap if gap.startswith(_TYPED_SKIP_PREFIX) else f"{_TYPED_SKIP_PREFIX}{gap}"
+            for gap in dict.fromkeys(assumption_gaps)
+        ]
+        evaluation.skip_reasons.extend(typed_gaps)
+        evaluation.skip_reason = typed_gaps[0]
+        evaluation.runtime_notes.append(
+            "activity assumption diagnostic excluded from external residuals: "
+            + "; ".join(typed_gaps)
+        )
+        return evaluation
+    if record.status == "mismatch":
+        dex = residual_dex(record)
+        evaluation.findings.append(
+            f"FINDING mismatch {obs.species_id} {observable_kind} "
+            f"expected={expected:.6g} actual={actual:.6g} "
+            f"residual_dex={dex if dex is not None else 'n/a'} "
+            f"budget={record.expected_uncertainty}"
+        )
     return evaluation
 
 
@@ -1359,6 +2083,221 @@ def residual_dex(record: ComparisonRecord) -> float | None:
     return abs(math.log10(record.actual_value / record.expected_value))
 
 
+def normalized_residual(record: ComparisonRecord) -> float | None:
+    """Absolute residual divided by the literature-side uncertainty budget."""
+
+    if (
+        record.expected_value is None
+        or record.actual_value is None
+        or record.expected_uncertainty is None
+    ):
+        return None
+    kind = str(record.expected_uncertainty.get("kind") or "")
+    try:
+        tolerance = float(record.expected_uncertainty["value"])
+    except (KeyError, TypeError, ValueError):
+        return None
+    if tolerance <= 0.0:
+        return math.inf if record.actual_value != record.expected_value else 0.0
+    if kind == "absolute":
+        return abs(record.actual_value - record.expected_value) / tolerance
+    if kind == "relative_fraction":
+        denominator = abs(record.expected_value) * tolerance
+        return (
+            abs(record.actual_value - record.expected_value) / denominator
+            if denominator > 0.0
+            else None
+        )
+    if kind == "log10_decades":
+        dex = residual_dex(record)
+        return dex / tolerance if dex is not None else None
+    return None
+
+
+def coverage_summary(
+    evaluations: Sequence[ObservationEvaluation],
+) -> dict[str, Any]:
+    """Observation-first coverage ledger; records/points are secondary detail."""
+
+    entries: list[dict[str, Any]] = []
+    for evaluation in evaluations:
+        comparison_family = evaluation.observation.obs_type
+        if evaluation.observation.obs_type == "rate_series":
+            comparison_family = (
+                "alpha_in_legacy_rate_series"
+                if _has_alpha_payload(evaluation.observation)
+                else "rate_hkl"
+            )
+        comparable_points = sum(
+            record.status in {"match", "mismatch"} for record in evaluation.records
+        )
+        gap_points = len(evaluation.records) - comparable_points
+        comparable = comparable_points > 0
+        reasons = list(dict.fromkeys(evaluation.skip_reasons))
+        if not comparable and not reasons:
+            reasons = [
+                evaluation.skip_reason
+                or "typed-refusal:missing_capability:comparison_not_produced"
+            ]
+        primary_reason = None if comparable else reasons[0]
+        entries.append(
+            {
+                "source": evaluation.observation.source_id,
+                "species": evaluation.observation.species_id,
+                "type": evaluation.observation.obs_type,
+                "comparison_family": comparison_family,
+                "observation_id": evaluation.observation.observation_id,
+                "adoption_basis": evaluation.observation.adoption_basis,
+                "comparable": comparable,
+                "comparable_points": comparable_points,
+                "gap_points": gap_points,
+                "primary_skip_reason": primary_reason,
+                "partial_gap_reasons": reasons if comparable else [],
+            }
+        )
+
+    def grouped(key: str) -> list[dict[str, Any]]:
+        buckets: dict[str, list[dict[str, Any]]] = defaultdict(list)
+        for entry in entries:
+            buckets[str(entry[key])].append(entry)
+        out = []
+        for label, rows in sorted(buckets.items()):
+            skip_reasons = Counter(
+                str(row["primary_skip_reason"])
+                for row in rows
+                if row["primary_skip_reason"] is not None
+            )
+            out.append(
+                {
+                    key: label,
+                    "observations": len(rows),
+                    "comparable": sum(bool(row["comparable"]) for row in rows),
+                    "skipped": sum(not bool(row["comparable"]) for row in rows),
+                    "comparable_points": sum(int(row["comparable_points"]) for row in rows),
+                    "gap_points": sum(int(row["gap_points"]) for row in rows),
+                    "skip_reasons": dict(sorted(skip_reasons.items())),
+                }
+            )
+        return out
+
+    skipped_reasons = Counter(
+        str(entry["primary_skip_reason"])
+        for entry in entries
+        if entry["primary_skip_reason"] is not None
+    )
+    return {
+        "observations": len(entries),
+        "comparable": sum(bool(entry["comparable"]) for entry in entries),
+        "skipped": sum(not bool(entry["comparable"]) for entry in entries),
+        "comparable_points": sum(int(entry["comparable_points"]) for entry in entries),
+        "gap_points": sum(int(entry["gap_points"]) for entry in entries),
+        "skip_reasons": dict(sorted(skipped_reasons.items())),
+        "entries": entries,
+        "by_type": grouped("type"),
+        "by_family": grouped("comparison_family"),
+        "by_species": grouped("species"),
+        "by_source": grouped("source"),
+    }
+
+
+def _format_reason_counts(reasons: Mapping[str, Any]) -> str:
+    if not reasons:
+        return "—"
+    return "; ".join(f"`{reason}` ×{count}" for reason, count in reasons.items())
+
+
+def _format_uncertainty(record: ComparisonRecord) -> str:
+    uncertainty = record.expected_uncertainty
+    if not uncertainty:
+        return "—"
+    kind = str(uncertainty.get("kind") or "?")
+    value = uncertainty.get("value")
+    source = uncertainty.get("source") or (
+        "documented default" if uncertainty.get("defaulted") else "extract"
+    )
+    components = uncertainty.get("components") or []
+    detail = f"{kind}={value} ({source})"
+    if components:
+        detail += "; " + ", ".join(str(component) for component in components)
+    return detail.replace("|", "\\|")
+
+
+def _format_residual_table(evaluations: Sequence[ObservationEvaluation]) -> str:
+    lines = [
+        "| Source | Observation | Type | Species | Coordinate | Literature | Literature uncertainty | Engine uncertainty | Combined propagated uncertainty | Engine | Residual | Residual dex | Residual / literature budget | Status |",
+        "|---|---|---|---|---|---:|---|---|---|---:|---:|---:|---:|---|",
+    ]
+    for evaluation in evaluations:
+        for record in evaluation.records:
+            if record.status not in {"match", "mismatch"}:
+                continue
+            coordinate = ", ".join(
+                f"{key}={value:g}" if isinstance(value, (int, float)) else f"{key}={value}"
+                for key, value in record.coordinate.items()
+            )
+            dex = residual_dex(record)
+            normalized = normalized_residual(record)
+            lines.append(
+                "| {source} | {observation} | {type} | {species} | {coordinate} | "
+                "{expected:.6g} | {uncertainty} | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | {actual:.6g} | {residual:.6g} | "
+                "{dex} | {normalized} | {status} |".format(
+                    source=evaluation.observation.source_id,
+                    observation=evaluation.observation.observation_id,
+                    type=evaluation.observation.obs_type,
+                    species=record.species or evaluation.observation.species_id,
+                    coordinate=coordinate,
+                    expected=float(record.expected_value),
+                    uncertainty=_format_uncertainty(record),
+                    actual=float(record.actual_value),
+                    residual=float(record.residual),
+                    dex=f"{dex:.6g}" if dex is not None else "—",
+                    normalized=(
+                        f"{normalized:.6g}"
+                        if normalized is not None and math.isfinite(normalized)
+                        else "—"
+                    ),
+                    status=record.status,
+                )
+            )
+    return "\n".join(lines)
+
+
+def _format_assumption_diagnostic_table(
+    evaluations: Sequence[ObservationEvaluation],
+) -> str:
+    """Show numerical diagnostics that are intentionally excluded from coverage."""
+
+    lines = [
+        "| Source | Observation | Type | Species | Coordinate | Literature | Assumption-only engine value | Raw residual dex | Typed gaps | Status |",
+        "|---|---|---|---|---|---:|---:|---:|---|---|",
+    ]
+    for evaluation in evaluations:
+        reasons = "; ".join(evaluation.skip_reasons).replace("|", "\\|")
+        for record in evaluation.records:
+            if record.status != "assumed-input":
+                continue
+            coordinate = ", ".join(
+                f"{key}={value:g}" if isinstance(value, (int, float)) else f"{key}={value}"
+                for key, value in record.coordinate.items()
+            )
+            dex = residual_dex(record)
+            lines.append(
+                "| {source} | {observation} | {type} | {species} | {coordinate} | "
+                "{expected:.6g} | {actual:.6g} | {dex} | {reasons} | assumed-input (excluded) |".format(
+                    source=evaluation.observation.source_id,
+                    observation=evaluation.observation.observation_id,
+                    type=evaluation.observation.obs_type,
+                    species=record.species or evaluation.observation.species_id,
+                    coordinate=coordinate,
+                    expected=float(record.expected_value),
+                    actual=float(record.actual_value),
+                    dex=f"{dex:.6g}" if dex is not None else "—",
+                    reasons=reasons or "—",
+                )
+            )
+    return "\n".join(lines)
+
+
 def rollup_species_error_bars(
     evaluations: Sequence[ObservationEvaluation],
 ) -> list[dict[str, Any]]:
@@ -1378,10 +2317,13 @@ def rollup_species_error_bars(
     for sid in sorted(by_species):
         records = by_species[sid]
         statuses = [r.status for r in records]
-        dex_vals = [d for r in records if (d := residual_dex(r)) is not None]
+        comparable_records = [r for r in records if r.status in {"match", "mismatch"}]
+        dex_vals = [
+            d for r in comparable_records if (d := residual_dex(r)) is not None
+        ]
         abs_residuals = [
             abs(r.residual)
-            for r in records
+            for r in comparable_records
             if r.residual is not None and math.isfinite(r.residual)
         ]
         match_n = statuses.count("match")
@@ -1432,49 +2374,31 @@ def format_rollup_markdown(
 ) -> str:
     """Markdown section for docs/model-limitations.md."""
 
-    n_obs = len(evaluations) if evaluations is not None else sum(1 for _ in rows)
     n_findings = sum(1 for r in rows if r.get("classification") == "FINDING-mismatch")
-    n_comparable = 0
-    n_psat_comparable = 0
-    n_rate_comparable = 0
-    n_activity_comparable = 0
     n_extrapolated_findings = 0
+    coverage = coverage_summary(evaluations or []) if evaluations is not None else None
     if evaluations is not None:
-        for ev in evaluations:
-            for r in ev.records:
-                if r.status not in {"match", "mismatch"}:
-                    continue
-                n_comparable += 1
-                otype = ev.observation.obs_type
-                if otype == "psat_series":
-                    n_psat_comparable += 1
-                elif otype == "rate_series":
-                    n_rate_comparable += 1
-                elif otype == "activity_coefficient":
-                    n_activity_comparable += 1
         for row in rows:
             for f in row.get("findings") or []:
                 if "extrapolated: true" in str(f):
                     n_extrapolated_findings += 1
-    coverage_line = (
-        f"Comparable points: **{n_comparable}** "
-        f"(α/rate={n_rate_comparable}, psat={n_psat_comparable}, "
-        f"activity/γ={n_activity_comparable}). "
-        "psat currently yields zero scored comparisons when the engine lacks "
-        "the species; activity/γ is structurally skipped pending melt recipes "
-        "(`activity_requires_melt_recipe`). Headline residual budget is the "
-        f"α rate_series set. Extrapolated-α FINDINGs marked in-line: "
-        f"**{n_extrapolated_findings}**."
-        if evaluations is not None
-        else "Comparable-point coverage computed when evaluations are supplied."
-    )
+    coverage_line = "Coverage computed when evaluations are supplied."
+    if coverage is not None:
+        coverage_line = (
+            f"Observations: **{coverage['observations']} total / "
+            f"{coverage['comparable']} comparable / {coverage['skipped']} skipped**. "
+            f"Comparable residual points: **{coverage['comparable_points']}**; "
+            f"explicit gap records: **{coverage['gap_points']}**. "
+            f"Extrapolated-alpha FINDINGs: **{n_extrapolated_findings}**."
+        )
     lines = [
         ROLLUP_BEGIN,
         "",
         "### Extract-store single-species reproduction battery (t-512)",
         "",
-        "Generated from ADOPTED (priority-winner) extract-store observations of",
-        "type `psat_series` / `rate_series` / `activity_coefficient`. Residuals",
+        "Generated from production priority-winner observations plus every KEMS",
+        "extract observation of type `psat_series` / `rate_series` /",
+        "`activity_coefficient` / `alpha`. Residuals",
         "are the deliverable (doctrine: *Headline accuracy is the product*).",
         "Engine refusals surface as typed skips; mismatches are FINDINGs —",
         "tolerances are **not** widened to pass. Geometry: "
@@ -1483,7 +2407,9 @@ def format_rollup_markdown(
         "",
         coverage_line,
         "",
-        f"- Adopted observations evaluated: **{n_obs if evaluations is not None else '—'}**",
+        f"- In-scope observations evaluated: **{coverage['observations'] if coverage is not None else '—'}**",
+        f"- Comparable observations: **{coverage['comparable'] if coverage is not None else '—'}**",
+        f"- Skipped observations with typed reasons: **{coverage['skipped'] if coverage is not None else '—'}**",
         f"- Species with FINDING (mismatch outside stated/default budget): **{n_findings}**",
         "",
         "| Species | Types | N pts | Match | Mismatch | Skip/gap | "
@@ -1507,9 +2433,63 @@ def format_rollup_markdown(
             )
         )
 
+    if coverage is not None:
+        lines.extend(
+            [
+                "",
+                "**Typed observation skips (roadmap, one primary reason per skipped observation):**",
+                "",
+            ]
+        )
+        for reason, count in coverage["skip_reasons"].items():
+            lines.append(f"- `{reason}`: **{count}**")
+
+        for title, key, label in (
+            ("Coverage by observation type", "by_type", "Type"),
+            ("Coverage by comparison family", "by_family", "Comparison family"),
+            ("Coverage by species", "by_species", "Species"),
+            ("Coverage by source", "by_source", "Source"),
+        ):
+            lines.extend(
+                [
+                    "",
+                    f"**{title}:**",
+                    "",
+                    f"| {label} | Observations | Comparable | Skipped | Comparable points | Gap points | Typed skip reasons |",
+                    "|---|---:|---:|---:|---:|---:|---|",
+                ]
+            )
+            field = {
+                "by_type": "type",
+                "by_family": "comparison_family",
+                "by_species": "species",
+                "by_source": "source",
+            }[key]
+            for coverage_row in coverage[key]:
+                lines.append(
+                    "| {label} | {observations} | {comparable} | {skipped} | "
+                    "{points} | {gaps} | {reasons} |".format(
+                        label=coverage_row[field],
+                        observations=coverage_row["observations"],
+                        comparable=coverage_row["comparable"],
+                        skipped=coverage_row["skipped"],
+                        points=coverage_row["comparable_points"],
+                        gaps=coverage_row["gap_points"],
+                        reasons=_format_reason_counts(coverage_row["skip_reasons"]),
+                    )
+                )
+
     # Default-tolerance legend
     lines.extend(
         [
+            "",
+            "**Uncertainty ledger:** extract-side terms are propagated when the",
+            "source supplies a quantitative form (for example Arrhenius activation-energy",
+            "uncertainty). The engine paths expose no quantitative joint uncertainty for",
+            "vapor pressure, activity, composition/redox, or grounded alpha; therefore the",
+            "combined propagated uncertainty is reported as **not computable**, not replaced",
+            "with an invented model error bar. `Residual / literature budget` uses only the",
+            "stated/default literature-side budget.",
             "",
             "**Default tolerances** (used only when the extract carries no usable",
             "numeric uncertainty; each defaulted comparison carries",
@@ -1519,7 +2499,10 @@ def format_rollup_markdown(
             f"- `psat_series`: `{DEFAULT_PSAT_UNCERTAINTY['kind']}` = "
             f"{DEFAULT_PSAT_UNCERTAINTY['value']} "
             f"({DEFAULT_PSAT_UNCERTAINTY['rationale']})",
-            f"- `rate_series` (α): `{DEFAULT_ALPHA_UNCERTAINTY['kind']}` = "
+            f"- `rate_series` (measured flux): `{DEFAULT_RATE_UNCERTAINTY['kind']}` = "
+            f"{DEFAULT_RATE_UNCERTAINTY['value']} "
+            f"({DEFAULT_RATE_UNCERTAINTY['rationale']})",
+            f"- `alpha`: `{DEFAULT_ALPHA_UNCERTAINTY['kind']}` = "
             f"{DEFAULT_ALPHA_UNCERTAINTY['value']} "
             f"({DEFAULT_ALPHA_UNCERTAINTY['rationale']})",
             f"- `activity_coefficient`: `{DEFAULT_ACTIVITY_UNCERTAINTY['kind']}` = "
@@ -1550,9 +2533,24 @@ def format_rollup_markdown(
             if r.status in {"match", "mismatch"}
         ]
         if comparable:
-            lines.append("Comparable point residuals:")
+            lines.append("Comparable per-observation residuals and uncertainty ledger:")
             lines.append("")
-            lines.append(records_to_markdown(comparable))
+            lines.append(_format_residual_table(evaluations))
+            lines.append("")
+
+        assumed = [
+            r
+            for ev in evaluations
+            for r in ev.records
+            if r.status == "assumed-input"
+        ]
+        if assumed:
+            lines.append(
+                "Assumption-only engine diagnostics (visible negative results, but excluded "
+                "from comparable coverage, headlines, and residual pins):"
+            )
+            lines.append("")
+            lines.append(_format_assumption_diagnostic_table(evaluations))
             lines.append("")
 
     lines.append(ROLLUP_END)
@@ -1633,6 +2631,7 @@ __all__ = [
     "COMPARISON_STATUSES",
     "DEFAULT_ALPHA_UNCERTAINTY",
     "DEFAULT_PSAT_UNCERTAINTY",
+    "DEFAULT_RATE_UNCERTAINTY",
     "ExtractReproductionError",
     "MODEL_LIMITATIONS_PATH",
     "ObservationEvaluation",
@@ -1640,6 +2639,7 @@ __all__ = [
     "ROLLUP_END",
     "TARGET_TYPES",
     "append_rollup_to_model_limitations",
+    "coverage_summary",
     "evaluate_all",
     "evaluate_observation",
     "extract_rollup_section",
@@ -1649,7 +2649,9 @@ __all__ = [
     "load_adopted_observations",
     "load_vapor_pressure_data",
     "motzfeldt_available",
+    "normalized_residual",
     "residual_dex",
+    "resolve_chamber_pressure_pa",
     "resolve_pO2_bar",
     "resolve_uncertainty",
     "rollup_species_error_bars",

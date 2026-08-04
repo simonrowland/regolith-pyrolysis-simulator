@@ -1,0 +1,163 @@
+schema_version: literature_extract.v1
+source_id: kems-016-stolyarova-1992
+source:
+  citation: Stolyarova, V., Shornikov, S., Ivanov, G. & Shultz, M. (1992), "High temperature mass spectrometric
+    study of multicomponent silicate systems", Institute of Silicate Chemistry RAS (conference abstract/paper;
+    venue not fully resolved from OCR header — retain as RAS silicate KEMS geometry source)
+  year: 1992
+extraction:
+  method: OCR-artifact transcription (MinerU vlm) + phase-2 geometry extract
+  date: '2026-08-03'
+  worker: ocr-phase2b-gk
+  provenance_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/
+review_status: draft
+species:
+  SiO2:
+    observations:
+    - observation_id: stolyarova_1992_silicate_kems_geometry_activities
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+        section: 2. Experimental procedures
+        line_range: 15-19
+      T_range_K: [1300.0, 1973.0]
+      phase: multicomponent_silicate_melt
+      standard_state: oxide activities via Belton-Fruehan / comparison method (Ag, Au standards)
+      regime: kems_effusion
+      units: as published (activities; Gibbs energies kcal/mol in tables)
+      values:
+        quantity: multicomponent_silicate_KEMS_activities_geometry
+        hole_to_vaporization_area_ratios: [100, 400, 500]
+        hole_to_vaporization_area_ratios_note: '"ratio of the areas of the effusion hole and vaporization
+          was equaled to 1:100,400,500" — absolute orifice diameter not stated'
+        cell_materials:
+        - Pt
+        - Mo
+        - W
+        vapor_species_examples:
+        - CaSiO3+
+        - CaSiO2+
+        - CaSiO+
+        - CaAlO+
+        - AlSiO+
+        missing_for_motzfeldt:
+        - absolute_orifice_diameter
+        - clausing_factor
+        - absolute_sample_surface_area_m2
+        missing_note: Area ratios only (no absolute orifice d or channel L). Clausing not inventable.
+          Sample vaporization area absolute value not stated.
+      uncertainty:
+        note: short conference paper; geometry ratios qualitative package
+      equipment:
+        multi_orifice_series:
+          value:
+            hole_to_vaporization_area_ratios:
+            - 1:100
+            - 1:400
+            - 1:500
+            absolute_orifice_area_m2: null
+            note: ratios only — not a Whitman-Motzfeldt multi-cell α series with numeric d
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+            paragraph: ratio of the areas of the effusion hole and vaporization was equaled to 1:100,400,500
+            line_range: '17'
+        sample_surface_area:
+          value:
+            via_area_ratio: true
+            ratios_to_orifice: [100, 400, 500]
+            numeric_m2: null
+            note: vaporization area implied only as multiple of hole area; absolute As missing
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+            paragraph: ratio of the areas of the effusion hole and vaporization
+            line_range: '17'
+        cell_material:
+          value: Pt, Mo, and W effusion cells (selection system-dependent)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+            paragraph: Vaporization has been carried out from platinum, molybdenum and tungsten effusion
+              cells
+            line_range: '17'
+  Fe:
+    observations:
+    - observation_id: stolyarova_1992_fe_bearing_melt_activity_context
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+        paragraph: CaO-Al2O3-SiO2-FeO-MgO melts studied; oxide activities
+        line_range: 7-23
+      T_range_K: [1300.0, 1973.0]
+      phase: multicomponent_silicate_melt
+      regime: kems_effusion
+      units: as published
+      values:
+        quantity: FeO_bearing_multicomponent_system_studied
+        systems_include: CaO-Al2O3-SiO2-FeO-MgO
+        note: Gibbs energies tabulated for selected compositions; Fe partials not tabulated as α
+        missing_for_motzfeldt:
+        - absolute_orifice_diameter
+        - clausing_factor
+      equipment:
+        cell_material:
+          value: Pt, Mo, W effusion cells (Mo mentioned for ion-identification runs)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+            paragraph: evaporation from molybdenum cell; platinum, molybdenum and tungsten
+            line_range: 17-19
+  Mg:
+    observations:
+    - observation_id: stolyarova_1992_mg_bearing_melt_activity_context
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+        paragraph: systems containing MgO among multi-oxide melts
+        line_range: 7-23
+      T_range_K: [1300.0, 1973.0]
+      phase: multicomponent_silicate_melt
+      regime: kems_effusion
+      units: as published
+      values:
+        quantity: MgO_bearing_multicomponent_system_studied
+        systems_include: CaO-Al2O3-SiO2-FeO-MgO
+        missing_for_motzfeldt:
+        - absolute_orifice_diameter
+        - clausing_factor
+      equipment:
+        multi_orifice_series:
+          value:
+            hole_to_vaporization_area_ratios:
+            - 1:100
+            - 1:400
+            - 1:500
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+            paragraph: ratio of the areas of the effusion hole and vaporization
+            line_range: '17'
+        cell_material:
+          value: Pt, Mo, W
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+            paragraph: platinum, molybdenum and tungsten effusion cells
+            line_range: '17'
+fidelity_samples:
+- species: SiO2
+  observable: activity_coefficient
+  observation_id: stolyarova_1992_silicate_kems_geometry_activities
+  field: hole_to_vaporization_area_ratios
+  value: [100, 400, 500]
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+    paragraph: ratio of the areas of the effusion hole and vaporization was equaled to 1:100,400,500
+    line_range: '17'
+- species: SiO2
+  observable: activity_coefficient
+  observation_id: stolyarova_1992_silicate_kems_geometry_activities
+  field: cell_materials
+  value:
+  - Pt
+  - Mo
+  - W
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+    paragraph: platinum, molybdenum and tungsten effusion cells
+    line_range: '17'

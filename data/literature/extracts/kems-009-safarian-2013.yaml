@@ -1,0 +1,79 @@
+schema_version: literature_extract.v1
+source_id: kems-009-safarian-2013
+source:
+  citation: Safarian, J. & Engh, T. A. (2013), "Vacuum Evaporation of Pure Metals", Metall. Mater. Trans.
+    A (Hertz-Knudsen / Schrage theory; pure Si context in corpus)
+  year: 2013
+extraction:
+  method: OCR-artifact transcription (MinerU vlm) + phase-2 theory/geometry extract
+  date: '2026-08-03'
+  worker: ocr-phase2b-gk
+  provenance_path: docs-private/research/ocr-artifacts/kems-009-safarian-2013/
+review_status: draft
+species:
+  Si:
+    observations:
+    - observation_id: safarian_2013_si_pure_langmuir_theory
+      type: rate_series
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-009-safarian-2013/spool/out/kems-009-safarian-2013/vlm/kems-009-safarian-2013.md
+        section: Hertz-Knudsen / Schrage / vapor velocity / flux (theory review)
+        line_range: 112-245
+        note: Primary theory block; S_cr and p_eff at line 229; flux-ratio figure context 245
+      phase: pure_liquid_metal_theory
+      standard_state: theoretical HKL/Schrage vacuum evaporation (pure metals including Si literature)
+      regime: langmuir_free_evaporation_theory
+      units: as published
+      values:
+        quantity: pure_metal_vacuum_evaporation_theory
+        weak_evaporation_eta: 1.667
+        weak_evaporation_eta_note: η=α/(1-0.4α) with α=1 → η=1.667 (Muratova & Labuntsov)
+        p_eff_over_p_sat_at_eta_1: 0.193
+        S_cr: 0.913
+        literature_flux_ratios_vs_max: [0.92, 0.82, 0.85]
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+        - sample_surface_area
+        - experimental_cell_material
+        missing_note: Theory/literature review of free vacuum evaporation. Knudsen number theory for mean-free-path
+          vs surface size; no Knudsen-cell Motzfeldt geometry package.
+        S_cr_provenance: 'line 229: S_cr=0.913 gives effective sonic condition with η=1'
+        p_eff_over_p_sat_at_eta_1_provenance: 'line 229: η=1 → p_eff=0.193 p°'
+        literature_flux_ratios_vs_max_provenance: Fig.4 / literature free-evaporation flux ratios vs max
+          for pure metals (Zn/Fe/Ag/Si context); values 0.92, 0.82, 0.85 as tabulated in extract from
+          theory-comparison discussion around lines 241-245
+        weak_evaporation_eta_provenance: η=1/(1-0.4)=1.667 from Muratova & Labuntsov form η=α/(1-0.4α)
+          with α=1 (lines 116-118 region)
+      uncertainty:
+        note: theoretical coefficients; pure-metal literature scatter on flux ratios
+      equipment:
+        sample_surface_area:
+          value:
+            role: theory_characteristic_dimension
+            note: Net evaporation equals phase-transition rate only if characteristic surface dimension
+              ≲ half mean free path in equilibrium vapor (cited)
+            numeric_m2: null
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-009-safarian-2013/spool/out/kems-009-safarian-2013/vlm/kems-009-safarian-2013.md
+            paragraph: characteristic dimension of the surface is less than about half the mean-free path
+            line_range: '243'
+fidelity_samples:
+- species: Si
+  observable: rate_series
+  observation_id: safarian_2013_si_pure_langmuir_theory
+  field: weak_evaporation_eta
+  value: 1.667
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-009-safarian-2013/spool/out/kems-009-safarian-2013/vlm/kems-009-safarian-2013.md
+    paragraph: α as unity, η=1.667 is obtained
+    line_range: 116-118
+- species: Si
+  observable: rate_series
+  observation_id: safarian_2013_si_pure_langmuir_theory
+  field: p_eff_over_p_sat_at_eta_1
+  value: 0.193
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-009-safarian-2013/spool/out/kems-009-safarian-2013/vlm/kems-009-safarian-2013.md
+    paragraph: η as unity yields p_eff = 0.193 p°
+    line_range: '229'
