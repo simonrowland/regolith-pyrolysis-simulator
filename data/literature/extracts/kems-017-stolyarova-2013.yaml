@@ -1,0 +1,98 @@
+schema_version: literature_extract.v1
+source_id: kems-017-stolyarova-2013
+source:
+  citation: Stolyarova, V.L. (2013), review/compilation on high-temperature mass spectrometry of oxide
+    systems and ternary silicate melts (CAS, CTS, MAS, BTS families) — vapour composition map Table 1
+  year: 2013
+extraction:
+  method: OCR MinerU; Table 1 is a SPECIES MAP with NO numeric partial pressures or activities. Extracted
+    as report-only structured map under rate_series with semantics bound_not_point_ordering. No fabricated
+    YAML numeric rows from species names.
+  date: '2026-08-04'
+  worker: mine-multicarrier-gk
+  provenance_path: docs-private/research/ocr-artifacts/kems-017-stolyarova-2013/
+review_status: draft
+species:
+  SiO:
+    observations:
+    - observation_id: stolyarova_2013_ternary_silicate_vapour_species_map_table1
+      type: rate_series
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-017-stolyarova-2013/spool/out/kems-017-stolyarova-2013/vlm/kems-017-stolyarova-2013.md
+        table: '1'
+        line_range: 104-126
+        paragraph: Composition of Vapour Over the Ternary Silicate Systems Studied
+      T_range_K:
+      - 900.0
+      - 2500.0
+      phase: ternary_silicate_melts_various_systems
+      regime: kems_effusion
+      units: none (species names only; no pressures)
+      values:
+        quantity: vapour_species_map_no_numeric_pressures
+        semantics: bound_not_point_ordering
+        condensed_phase: ternary_silicate_melt
+        note: Table 1 lists vapour species over CAS/CTS/MAS/BTS-type systems by name and T range only.
+          No activities or partial pressures in this paper's Table 1. Downstream must not treat species
+          presence as measured p.
+        systems:
+        - system: $Na_{2}O-B_{2}O_{3}-SiO_{2}$
+          T_K_as_published: '1200'
+          vapour_species_as_published: $NaBO_{2}, (NaBO_{2})_{2}, B_{2}O_{3}$
+          references: '[22, 23]'
+        - system: $Cs_{2}O-B_{2}O_{3}-SiO_{2}$
+          T_K_as_published: '1020'
+          vapour_species_as_published: $CsBO_{2}, (CsBO_{2})_{2}, B_{2}O_{3}$
+          references: '[9, 24]'
+        - system: $Rb_{2}O-B_{2}O_{3}-SiO_{2}$
+          T_K_as_published: '900'
+          vapour_species_as_published: $RbBO_{2}, (RbBO_{2})_{2}, B_{2}O_{3}$
+          references: '[25]'
+        - system: $MgO-B_{2}O_{3}-SiO_{2}$
+          T_K_as_published: 1550-1800
+          vapour_species_as_published: $MgBO_{2}, MgB_{2}O_{4}, B_{2}O_{3}, SiO, O_{2}$
+          references: '[10]'
+        - system: $CaO-B_{2}O_{3}-SiO_{2}$
+          T_K_as_published: '1800'
+          vapour_species_as_published: $CaBO_{2}, CaB_{2}O_{4}, B_{2}O_{3}, SiO, O_{2}$
+          references: '[26, 27]'
+        - system: $SrO-B_{2}O_{3}-SiO_{2}$
+          T_K_as_published: '1720'
+          vapour_species_as_published: $SrBO_{2}, SrB_{2}O_{4}, B_{2}O_{3}, SiO, O_{2}$
+          references: '[27, 28]'
+        - system: $BaO-B_{2}O_{3}-SiO_{2}$
+          T_K_as_published: '1650'
+          vapour_species_as_published: $BaBO_{2}, BaB_{2}O_{4}, B_{2}O_{3}, SiO, O_{2}$
+          references: '[27, 29, 30]'
+        - system: $MgO-Al_{2}O_{3}-SiO_{2}$
+          T_K_as_published: 1770-1940
+          vapour_species_as_published: $Mg, SiO, O_{2}$
+          references: '[9]'
+        - system: $CaO-Al_{2}O_{3}-SiO_{2}$
+          T_K_as_published: 1800-2000
+          vapour_species_as_published: $Ca, CaO, CaSiO_{3}, AlSiO, Al, AlO, SiO, O_{2}$
+          references: '[8, 31-33]'
+        - system: $CaO-TiO_{2}-SiO_{2}$
+          T_K_as_published: 1800-2000
+          vapour_species_as_published: $Ca, CaO, TiO_{2}, TiO, SiO, O_{2}$
+          references: '[8, 33-35]'
+        - system: $BaO-TiO_{2}-SiO_{2}$
+          T_K_as_published: 1800-2000
+          vapour_species_as_published: $Ba, BaO, TiO_{2}, TiO, SiO, O_{2}$
+          references: '[8, 33, 36]'
+        numeric_tables_present_in_ocr: false
+        co_measurement_note: species co-listed per system imply co-observation in cited primary sources,
+          not numeric ratios here
+fidelity_samples:
+- path: species.SiO.observations[stolyarova_2013_ternary_silicate_vapour_species_map_table1].values.numeric_tables_present_in_ocr
+  value: false
+  note: Table 1 is species map only — confirmed no numeric P/activity in this extract
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-017-stolyarova-2013/spool/out/kems-017-stolyarova-2013/vlm/kems-017-stolyarova-2013.md
+    table: '1'
+- path: species.SiO.observations[stolyarova_2013_ternary_silicate_vapour_species_map_table1].values.systems[0].system
+  value: $Na_{2}O-B_{2}O_{3}-SiO_{2}$
+  note: first Table 1 system row
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-017-stolyarova-2013/spool/out/kems-017-stolyarova-2013/vlm/kems-017-stolyarova-2013.md
+    table: '1'

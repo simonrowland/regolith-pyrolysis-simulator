@@ -2,47 +2,81 @@ schema_version: literature_extract.v1
 source_id: kems-022-demaria-1971
 source:
   citation: >-
-    De Maria, G., Balducci, G., Guido, M. & Piacente, V. (1971),
-    "Mass spectrometric investigation of the vaporization process of Apollo 12
-    lunar samples", Proc. Lunar Sci. Conf. 2, 1367–1380
+    De Maria, G., Balducci, G., Guido, M. & Piacente, V. (1971), "Mass spectrometric investigation of
+    the vaporization process of Apollo 12 lunar samples", Proc. Lunar Sci. Conf. 2, 1367–1380
   year: 1971
 extraction:
-  method: OCR-artifact transcription (MinerU vlm) + phase-2 geometry extract
-  date: '2026-08-03'
-  worker: ocr-phase2-gk
+  method: >-
+    OCR-artifact transcription (MinerU vlm) of Tables 1–8 + prior phase-2 geometry; multicarrier ladder
+    2026-08-04 (mine-multicarrier-gk). Absolute P only from published tables — figure-only series (Na,
+    K, Fe, Ca, SiO, TiO, TiO2, Al monatomic) retained as qualitative/first-observed or figure-digitization
+    notes, not fabricated absolute series. Co-measurement groups documented in values.co_measured_with
+    lists of observation_ids (schema has no co_measurement_id field — proposed in findings).
+  date: '2026-08-04'
+  worker: mine-multicarrier-gk
   provenance_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/
 review_status: draft
 species:
-  Fe:
+  O2:
     observations:
-    - observation_id: demaria_1971_fe_lunar_basalt_kems_main_cell
-      type: activity_coefficient
+    - observation_id: demaria_1971_o2_psat_table1_alkali_range
+      type: psat_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
-        paragraph: Fe+ ion peaks first observed ~1300 K; nearly unit activity vs pure Fe
-        line_range: '111-155'
-        figure: '3'
-      T_range_K: [1300.0, 1800.0]
-      phase: lunar_basalt_12022_12065
-      standard_state: pure Fe metal (Hultgren 1967 reference vapor-pressure line on Fig. 3)
+        source_path: >-
+          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        table: '1'
+        line_range: 103-105
+        paragraph: Partial pressures of O2 corresponding approximately to alkali metal vaporization
+      T_range_K:
+      - 1396.0
+      - 1499.0
+      phase: Apollo_12_lunar_basalt_melt_12022_12065
+      standard_state: partial pressure over multicomponent lunar basalt melt (not pure oxide)
       regime: kems_effusion
-      units: dimensionless
+      units: atm as published (p_Pa = p_atm × 101325)
       values:
-        activity: 1.0
-        activity_note: nearly unit activity; temperature dependence very close to pure iron (Hultgren et al. 1967)
-        gas_species: Fe(g)
-        material: Apollo_12_lunar_basalt_12022_12065
-        first_observed_T_K: 1300.0
-        missing_for_motzfeldt:
-          - clausing_factor
-          - sample_surface_area
-          - orifice_channel_length
-        missing_note: >-
-          Knife-edge orifice diameter stated without channel length; Clausing not
-          reported. Do not invent Clausing ≈ 1 for knife-edge without measured L.
-          Sample free-surface area not stated.
+        gas_species: O2(g)
+        quantity: partial_pressure_over_lunar_basalt
+        material: Apollo_12_12022_and_12065
+        condensed_phase: lunar_basalt_melt
+        vaporization_regime_note: alkali vaporization window; O2 far below stoichiometric Me2O→2Me+1/2O2
+        points:
+        - T_K: 1396.0
+          p_atm: 5.540000e-09
+          p_Pa: 5.613405e-04
+          sample: '12022'
+        - T_K: 1475.0
+          p_atm: 4.960000e-08
+          p_Pa: 0.00502572
+          sample: '12022'
+        - T_K: 1433.0
+          p_atm: 3.780000e-09
+          p_Pa: 3.830085e-04
+          sample: '12065'
+        - T_K: 1482.0
+          p_atm: 1.220000e-08
+          p_Pa: 0.001236165
+          sample: '12065'
+        - T_K: 1499.0
+          p_atm: 2.110000e-08
+          p_Pa: 0.0021379575
+          sample: '12065'
+        - T_K: 1471.0
+          p_atm: 1.270000e-08
+          p_Pa: 0.0012868274999999999
+          sample: '12065'
+        - T_K: 1459.0
+          p_atm: 8.780000e-09
+          p_Pa: 8.896335e-04
+          sample: '12065'
+        negative_stoichiometry_note: >-
+          Molecular oxygen partial pressure far below stoichiometric amount for Me2O(s)→2Me(g)+1/2O2(g).
+          Authors attribute partially to O interaction with Re container; passivated Re cells on 12065
+          showed higher O2+/Me+.
+        co_measured_context: >-
+          same alkali T window as Na/K figure series (Figs 1–2); tabulated co-species O2 only
       uncertainty:
-        note: qualitative "nearly unit activity"; multi-rotating-cell activity points on Fig. 3 (Δ markers for 12065)
+        note: authors state ≥factor 2 uncertainty in absolute P from calibration
       equipment:
         orifice_area:
           value: 4.154756e-06
@@ -51,49 +85,386 @@ species:
           orifice_shape: knife_edge
           inferred: true
           inference: >-
-            area = π (d/2)^2 from stated knife-edge effusion-hole diameter 2.3 mm
-            (main Re containers for progressive-depletion / fixed-T vaporization runs)
+            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
             line_range: '32'
         cell_material:
           value: Re
+          note: >-
+            Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
+            observed at higher T.
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
-            paragraph: rhenium containers; passivated Re noted for sample 12065 O2 behavior
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers; passivated Re for 12065
+            line_range: 32-56
+  Mn:
+    observations:
+    - observation_id: demaria_1971_mn_psat_table2_sample_12022
+      type: psat_series
+      locator:
+        source_path: >-
+          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        table: '2'
+        line_range: 157-159
+        paragraph: Partial pressures of Mn and Cr over sample 12022; initial points
+      T_range_K:
+      - 1583.0
+      - 1725.0
+      phase: Apollo_12_lunar_basalt_melt_12022_12065
+      standard_state: partial pressure over multicomponent lunar basalt melt (not pure oxide)
+      regime: kems_effusion
+      units: atm as published (p_Pa = p_atm × 101325)
+      values:
+        gas_species: Mn(g)
+        quantity: partial_pressure_initial_points
+        material: Apollo_12_12022
+        condensed_phase: lunar_basalt_melt
+        activity_order: 1e-5 to 1e-6 (authors)
+        points:
+        - T_K: 1583.0
+          p_atm: 7.660000e-09
+          p_Pa: 7.761495e-04
+          sample: '12022'
+        - T_K: 1609.0
+          p_atm: 1.320000e-08
+          p_Pa: 0.00133749
+          sample: '12022'
+        - T_K: 1725.0
+          p_atm: 8.470000e-08
+          p_Pa: 0.0085822275
+          sample: '12022'
+        co_measured_with:
+        - demaria_1971_cr_psat_table2_sample_12022
+        co_measurement_note: >-
+          Mn and Cr tabulated on same Table 2; both present at 1725 K (ratio-recoverable at that T)
+      uncertainty:
+        note: ≥factor 2 absolute P; minor constituents low activity 1e-5–1e-6
+      equipment:
+        orifice_area:
+          value: 4.154756e-06
+          units: m2
+          diameter_m: 0.0023
+          orifice_shape: knife_edge
+          inferred: true
+          inference: >-
+            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          locator:
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
             line_range: '32'
+        cell_material:
+          value: Re
+          note: >-
+            Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
+            observed at higher T.
+          locator:
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers; passivated Re for 12065
+            line_range: 32-56
+  Cr:
+    observations:
+    - observation_id: demaria_1971_cr_psat_table2_sample_12022
+      type: psat_series
+      locator:
+        source_path: >-
+          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        table: '2'
+        line_range: 157-159
+        paragraph: Partial pressures of Mn and Cr over sample 12022; initial points
+      T_range_K:
+      - 1725.0
+      - 1794.0
+      phase: Apollo_12_lunar_basalt_melt_12022_12065
+      standard_state: partial pressure over multicomponent lunar basalt melt (not pure oxide)
+      regime: kems_effusion
+      units: atm as published (p_Pa = p_atm × 101325)
+      values:
+        gas_species: Cr(g)
+        quantity: partial_pressure_initial_points
+        material: Apollo_12_12022
+        condensed_phase: lunar_basalt_melt
+        activity_order: 1e-5 to 1e-6 (authors)
+        points:
+        - T_K: 1725.0
+          p_atm: 1.030000e-08
+          p_Pa: 0.0010436475
+          sample: '12022'
+        - T_K: 1794.0
+          p_atm: 6.200000e-08
+          p_Pa: 0.00628215
+          sample: '12022'
+        co_measured_with:
+        - demaria_1971_mn_psat_table2_sample_12022
+        co_measurement_note: Cr co-tabulated with Mn on Table 2; co-present at 1725 K
+      uncertainty:
+        note: ≥factor 2 absolute P; OCR header misread Cf→Cr (species is chromium in text)
+      equipment:
+        orifice_area:
+          value: 4.154756e-06
+          units: m2
+          diameter_m: 0.0023
+          orifice_shape: knife_edge
+          inferred: true
+          inference: >-
+            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          locator:
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+            line_range: '32'
+        cell_material:
+          value: Re
+          note: >-
+            Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
+            observed at higher T.
+          locator:
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers; passivated Re for 12065
+            line_range: 32-56
+  Mg:
+    observations:
+    - observation_id: demaria_1971_mg_psat_table3_lunar_basalt
+      type: psat_series
+      locator:
+        source_path: >-
+          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        table: '3'
+        line_range: 173-175
+        paragraph: Partial pressures of Mg over samples 12022 and 12065; indicative initial points
+      T_range_K:
+      - 1650.0
+      - 1927.0
+      phase: Apollo_12_lunar_basalt_melt_12022_12065
+      standard_state: partial pressure over multicomponent lunar basalt melt (not pure oxide)
+      regime: kems_effusion
+      units: atm as published (p_Pa = p_atm × 101325)
+      values:
+        gas_species: Mg(g)
+        quantity: partial_pressure_initial_points
+        material: Apollo_12_12022_and_12065
+        condensed_phase: lunar_basalt_melt
+        activity_note: low activity; same order as pure-oxide decomposition pressures (Altman 1963)
+        points:
+        - T_K: 1650.0
+          p_atm: 1.600000e-08
+          p_Pa: 0.0016212000000000002
+          instrument: BC
+          sample: '12022'
+        - T_K: 1694.0
+          p_atm: 5.700000e-08
+          p_Pa: 0.005775525
+          instrument: NAA
+          sample: '12022'
+        - T_K: 1815.0
+          p_atm: 3.960000e-06
+          p_Pa: 0.401247
+          instrument: NAA
+          sample: '12022'
+        - T_K: 1747.0
+          p_atm: 1.650000e-09
+          p_Pa: 1.671862e-04
+          instrument: NAA
+          sample: '12065'
+        - T_K: 1854.0
+          p_atm: 9.400000e-09
+          p_Pa: 9.524550e-04
+          instrument: NAA
+          sample: '12065'
+        - T_K: 1776.0
+          p_atm: 2.400000e-09
+          p_Pa: 2.431800e-04
+          instrument: NAA
+          sample: '12065'
+        - T_K: 1857.0
+          p_atm: 8.850000e-08
+          p_Pa: 0.0089672625
+          instrument: NAA
+          sample: '12065'
+        - T_K: 1927.0
+          p_atm: 3.200000e-08
+          p_Pa: 0.0032424000000000003
+          instrument: NAA
+          sample: '12065'
+        caveat: >-
+          Authors: Mg activity decreased after initial observation — attribution of reported data to true
+          initial points is 'questionable'.
+        figure_also: Fig. 4 (Ca companion figure; Ca not tabulated — figure-only)
+      uncertainty:
+        note: ≥factor 2 absolute; questionable initial-point attribution per authors
+      equipment:
+        orifice_area:
+          value: 4.154756e-06
+          units: m2
+          diameter_m: 0.0023
+          orifice_shape: knife_edge
+          inferred: true
+          inference: >-
+            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          locator:
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+            line_range: '32'
+        cell_material:
+          value: Re
+          note: >-
+            Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
+            observed at higher T.
+          locator:
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers; passivated Re for 12065
+            line_range: 32-56
+  Ca:
+    observations:
+    - observation_id: demaria_1971_ca_figure_only_and_measurement_difficulty
+      type: rate_series
+      locator:
+        source_path: >-
+          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        figure: '4'
+        line_range: 169-198
+        paragraph: >-
+          Ca partial pressures reported in Fig. 4 only; ion intensity measurement difficult
+      T_range_K:
+      - 1600.0
+      - 2000.0
+      phase: Apollo_12_lunar_basalt_melt_12022_12065
+      standard_state: partial pressure over multicomponent lunar basalt melt (not pure oxide)
+      regime: kems_effusion
+      units: atm as published (p_Pa = p_atm × 101325)
+      values:
+        gas_species: Ca(g)
+        quantity: partial_pressure_figure_only_not_tabulated
+        material: Apollo_12_12022_and_12065
+        condensed_phase: lunar_basalt_melt
+        semantics: bound_not_point_ordering
+        activity_note: low activity; same order as pure-oxide decomposition (Ackermann & Thorn 1961)
+        measurement_difficulty: >-
+          Measurement of calcium ion intensities made difficult by strong re-evaporation effect. Absolute
+          P(T) points not tabulated in text — Fig. 4 only. Not digitized here (OCR scatter would invent
+          numbers).
+        negative_result: >-
+          No reliable tabulated absolute Ca partial pressures published; re-evaporation limits quantitative
+          recovery. Species WAS detected as monatomic Ca.
+        companion_species_tabulated: Mg Table 3 at overlapping mid-T window
+      uncertainty:
+        note: figure-only; re-evaporation; ≥factor 2 if digitized
+      equipment:
+        orifice_area:
+          value: 4.154756e-06
+          units: m2
+          diameter_m: 0.0023
+          orifice_shape: knife_edge
+          inferred: true
+          inference: >-
+            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          locator:
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+            line_range: '32'
+        cell_material:
+          value: Re
+          note: >-
+            Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
+            observed at higher T.
+          locator:
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers; passivated Re for 12065
+            line_range: 32-56
+  Fe:
+    observations:
+    - observation_id: demaria_1971_fe_lunar_basalt_kems_main_cell
+      type: activity_coefficient
+      locator:
+        source_path: >-
+          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        paragraph: Fe+ ion peaks first observed ~1300 K; nearly unit activity vs pure Fe
+        line_range: 111-155
+        figure: '3'
+      T_range_K:
+      - 1300.0
+      - 1800.0
+      phase: lunar_basalt_melt_12022_12065
+      standard_state: pure Fe metal (Hultgren 1967 reference vapor-pressure line on Fig. 3)
+      regime: kems_effusion
+      units: dimensionless
+      values:
+        activity: 1.0
+        activity_note: >-
+          nearly unit activity; temperature dependence very close to pure iron (Hultgren et al. 1967)
+        gas_species: Fe(g)
+        material: Apollo_12_lunar_basalt_12022_12065
+        condensed_phase: lunar_basalt_melt
+        first_observed_T_K: 1300.0
+        absolute_P_note: Fig. 3 only — absolute Fe partial pressures not tabulated in text
+        missing_for_motzfeldt:
+        - clausing_factor
+        - sample_surface_area
+        - orifice_channel_length
+        - absolute_psat_series
+      uncertainty:
+        note: >-
+          qualitative nearly unit activity; multi-rotating-cell Δ markers on Fig. 3 for 12065
+      equipment:
+        orifice_area:
+          value: 4.154756e-06
+          units: m2
+          diameter_m: 0.0023
+          orifice_shape: knife_edge
+          inferred: true
+          inference: >-
+            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          locator:
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+            line_range: '32'
+        cell_material:
+          value: Re
+          note: >-
+            Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
+            observed at higher T.
+          locator:
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers; passivated Re for 12065
+            line_range: 32-56
     - observation_id: demaria_1971_fe_activity_multi_rotating_cell
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        source_path: >-
+          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         section: ACTIVITY DETERMINATION BY MULTIPLE-ROTATING KNUDSEN CELL
-        line_range: '340-356'
+        line_range: 340-356
         figure: '3'
-      phase: lunar_basalt_12065
+      phase: lunar_basalt_melt_12065
       standard_state: pure Fe chips in Fe crucible (multi-rotating cell reference)
       regime: kems_effusion
       units: dimensionless
       values:
         activity: 1.0
-        activity_note: multi-rotating-cell Fe activity points plotted as Δ on Fig. 3; positive results for iron
+        activity_note: >-
+          multi-rotating-cell Fe activity points plotted as Δ on Fig. 3; positive results for iron
         gas_species: Fe(g)
         material: Apollo_12_12065_in_Re_crucible
+        condensed_phase: lunar_basalt_melt
         method: multiple_rotating_Knudsen_cell
-        multi_cell_materials: [Re, Fe, MgO]
-        multi_cell_loads:
-          Re: 106 mg of 12065 lunar sample
-          MgO: Na2O
-          Fe: iron chips (Ta external cap on lid)
-        missing_for_motzfeldt:
-          - clausing_factor
-          - sample_surface_area
-          - orifice_channel_length
-        missing_note: >-
-          Knife-edge 1 mm orifices; channel length and Clausing not stated. Partial
-          multi-cell geometry only.
+        multi_cell_materials:
+        - Re
+        - Fe
+        - MgO
       uncertainty:
-        note: activity values figure-only; text reports positive Fe activity results without tabulated numbers
+        note: activity values figure-only
       equipment:
         orifice_area:
           value: 7.853982e-07
@@ -102,65 +473,64 @@ species:
           orifice_shape: knife_edge
           inferred: true
           inference: >-
-            area = π (d/2)^2 from stated knife-edge orifice diameter 1 mm on all
-            multi-rotating-cell crucibles
+            area = π (d/2)^2 from knife-edge orifice diameter 1 mm on multi-rotating-cell crucibles
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
-            paragraph: effusion holes of all crucibles knife-edge orifice 1 mm diameter
-            line_range: '350-352'
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: effusion holes knife-edge orifice 1 mm diameter
+            line_range: 350-352
         multi_orifice_series:
           value:
             n_cells: 3
-            materials: [Re, Fe, MgO]
+            materials:
+            - Re
+            - Fe
+            - MgO
             orifice_diameter_mm: 1.0
             orifice_shape: knife_edge
-            note: three cells in graphite block; same orifice diameter on all crucibles (not a Motzfeldt multi-orifice α series)
+            note: three cells in graphite block; not a Motzfeldt multi-orifice α series
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             section: ACTIVITY DETERMINATION BY MULTIPLE-ROTATING KNUDSEN CELL
-            line_range: '342-352'
+            line_range: 342-352
         cell_material:
-          value: Re (sample cell); multi-cell set Re / Fe / MgO; Ta external cap on Fe-cell lid; Pt unsuccessful (foam overflow)
+          value: >-
+            Re (sample cell); multi-cell set Re / Fe / MgO; Ta external cap on Fe-cell lid; Pt unsuccessful
+            (foam overflow)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: crucibles Re, Fe, MgO; Ta cap; Pt unsuccessful
-            line_range: '346-356'
-  SiO:
-    observations:
-    - observation_id: demaria_1971_sio_lunar_basalt_kems_main_cell
+            line_range: 346-356
+    - observation_id: demaria_1971_feo_detected_not_tabulated_P
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
-        paragraph: SiO first observed ~1650 K; partial pressures ~10× below cristobalite
-        line_range: '202-258'
-        figure: '5'
-      T_range_K: [1650.0, 2200.0]
-      phase: lunar_basalt_12022_12065
-      standard_state: SiO(g) over condensed lunar basalt vs cristobalite SiO2 reference (Porter et al. 1955)
+        source_path: >-
+          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        table: '6'
+        line_range: 324-328
+        paragraph: FeO among molecular species detected; equilibria in Table 6
+      T_range_K:
+      - 1300.0
+      - 2200.0
+      phase: lunar_basalt_melt_12022_12065
       regime: kems_effusion
-      units: as published (partial pressure; Fig. 5 lg P scale)
+      units: as published
       values:
-        gas_species: SiO(g)
-        also_observed: SiO2(g)
-        first_observed_T_K: 1650.0
-        material: Apollo_12_lunar_basalt_12022_12065
-        pressure_vs_cristobalite: ~factor of 10 lower than SiO over cristobalite (Porter et al. 1955)
+        gas_species: FeO(g)
+        quantity: species_detected_absolute_P_not_tabulated
+        material: Apollo_12_lunar_basalt
+        condensed_phase: lunar_basalt_melt
         semantics: bound_not_point_ordering
         note: >-
-          Initial-point SiO partial pressures on Fig. 5; fixed-T procedure shifts
-          equilibrium toward SiO2(g). OCR scatter points not transcribed as
-          absolute P series (figure digitization deferred). Same main-cell geometry
-          as Fe vaporization runs.
-        missing_for_motzfeldt:
-          - clausing_factor
-          - sample_surface_area
-          - orifice_channel_length
-          - absolute_psat_series
-        missing_note: >-
-          Knife-edge 2.3 mm orifice without channel length — Clausing not invented.
-          Sample surface area not stated. Absolute P(T) points not tabulated in text.
-      uncertainty:
-        note: initial-points attribution "somewhat questionable" for SiO per authors' conclusions
+          FeO(g) detected; absolute partial pressures not in Tables 1–5. Third-law ΔH for FeO(g)⇌Fe(g)+1/2O2(g)
+          in Table 6 implies simultaneous Fe/FeO/O2 measurements existed.
+        equilibrium_delta_H0_kcal_mol:
+          BC: 39 ± 2
+          NAA: 38 ± 2
+          table: '6'
+          reaction: FeO(g) ⇌ Fe(g) + 1/2 O2(g)
       equipment:
         orifice_area:
           value: 4.154756e-06
@@ -169,43 +539,985 @@ species:
           orifice_shape: knife_edge
           inferred: true
           inference: >-
-            area = π (d/2)^2 from stated knife-edge effusion-hole diameter 2.3 mm
-            (same main Re cells used for SiO observations)
+            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
             line_range: '32'
         cell_material:
           value: Re
+          note: >-
+            Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
+            observed at higher T.
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
-            paragraph: rhenium containers
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers; passivated Re for 12065
+            line_range: 32-56
+  SiO:
+    observations:
+    - observation_id: demaria_1971_sio_lunar_basalt_kems_main_cell
+      type: rate_series
+      locator:
+        source_path: >-
+          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        paragraph: SiO first observed ~1650 K; partial pressures ~10× below cristobalite
+        line_range: 202-258
+        figure: '5'
+      T_range_K:
+      - 1650.0
+      - 2200.0
+      phase: lunar_basalt_melt_12022_12065
+      standard_state: >-
+        SiO(g) over condensed lunar basalt vs cristobalite SiO2 reference (Porter et al. 1955)
+      regime: kems_effusion
+      units: as published (partial pressure; Fig. 5 lg P scale)
+      values:
+        gas_species: SiO(g)
+        also_observed: SiO2(g)
+        first_observed_T_K: 1650.0
+        material: Apollo_12_lunar_basalt_12022_12065
+        condensed_phase: lunar_basalt_melt
+        pressure_vs_cristobalite: ~factor of 10 lower than SiO over cristobalite (Porter et al. 1955)
+        semantics: bound_not_point_ordering
+        note: >-
+          Absolute SiO P(T) on Fig. 5 only — not tabulated. Fixed-T procedure shifts equilibrium toward
+          SiO2(g). Table 7 third-law treatment uses simultaneous SiO2/SiO/O2 Kp at listed T (ratio-recoverable
+          via Kp without absolute P).
+        co_measured_with:
+        - demaria_1971_sio2_sio_o2_equilibrium_table7
+      uncertainty:
+        note: >-
+          initial-point SiO attribution somewhat questionable per authors; ≥factor 2 absolute
+      equipment:
+        orifice_area:
+          value: 4.154756e-06
+          units: m2
+          diameter_m: 0.0023
+          orifice_shape: knife_edge
+          inferred: true
+          inference: >-
+            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          locator:
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
             line_range: '32'
+        cell_material:
+          value: Re
+          note: >-
+            Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
+            observed at higher T.
+          locator:
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers; passivated Re for 12065
+            line_range: 32-56
+  SiO2:
+    observations:
+    - observation_id: demaria_1971_sio2_sio_o2_equilibrium_table7
+      type: gibbs_table
+      locator:
+        source_path: >-
+          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        table: '7'
+        line_range: 330-334
+        paragraph: Third-law heat of SiO2(g)=SiO(g)+1/2O2(g); simultaneous partial pressures
+      T_range_K:
+      - 1850.0
+      - 2170.0
+      phase: lunar_basalt_melt_12022_12065
+      regime: kems_effusion
+      units: kcal/mol for ΔH0; -R ln Kp as published
+      values:
+        reaction: SiO2(g) = SiO(g) + 1/2 O2(g)
+        quantity: third_law_delta_H0_from_simultaneous_partial_pressures
+        material: Apollo_12_12022_and_12065
+        condensed_phase: lunar_basalt_melt
+        gas_species_in_equilibrium:
+        - SiO2(g)
+        - SiO(g)
+        - O2(g)
+        co_measured_with:
+        - demaria_1971_sio_lunar_basalt_kems_main_cell
+        co_measurement_note: >-
+          Authors: basic data were partial pressures of gaseous species measured SIMULTANEOUSLY at various
+          temperatures. Kp embeds p(SiO)*p(O2)^0.5/p(SiO2) — carrier ratio recoverable.
+        points:
+        - sample: '12022'
+          T_K: 2060.0
+          minus_R_ln_Kp: 4.09
+          minus_delta_fef: 19.025
+          delta_H0_kcal_mol: 47.6
+        - sample: '12022'
+          T_K: 2080.0
+          minus_R_ln_Kp: 3.8
+          minus_delta_fef: 19.02
+          delta_H0_kcal_mol: 47.5
+        - sample: '12022'
+          T_K: 2120.0
+          minus_R_ln_Kp: 3.07
+          minus_delta_fef: 19.0
+          delta_H0_kcal_mol: 46.8
+        - sample: '12022'
+          T_K: 2150.0
+          minus_R_ln_Kp: 3.07
+          minus_delta_fef: 18.99
+          delta_H0_kcal_mol: 47.4
+        - sample: '12022'
+          T_K: 2170.0
+          minus_R_ln_Kp: 2.7
+          minus_delta_fef: 18.98
+          delta_H0_kcal_mol: 47.0
+        - sample: '12065'
+          T_K: 1990.0
+          minus_R_ln_Kp: 4.62
+          minus_delta_fef: 19.05
+          delta_H0_kcal_mol: 47.1
+        - sample: '12065'
+          T_K: 2035.0
+          minus_R_ln_Kp: 4.3
+          minus_delta_fef: 19.03
+          delta_H0_kcal_mol: 47.5
+        - sample: '12065'
+          T_K: 2060.0
+          minus_R_ln_Kp: 3.98
+          minus_delta_fef: 19.02
+          delta_H0_kcal_mol: 47.4
+        - sample: '12065'
+          T_K: 1850.0
+          minus_R_ln_Kp: 5.995
+          minus_delta_fef: 19.105
+          delta_H0_kcal_mol: 46.4
+          note: footnote b in table
+        mean_delta_H0_kcal_mol: 47.3
+        mean_delta_H0_sigma: 0.3
+        table6_summary_kcal_mol:
+          BC: 47 ± 2
+          NAA: 46 ± 2
+      uncertainty:
+        note: std dev on mean ±0.3; third-law inclusive of calibration errors in Table 6 ±2
+      equipment:
+        orifice_area:
+          value: 4.154756e-06
+          units: m2
+          diameter_m: 0.0023
+          orifice_shape: knife_edge
+          inferred: true
+          inference: >-
+            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          locator:
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+            line_range: '32'
+        cell_material:
+          value: Re
+          note: >-
+            Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
+            observed at higher T.
+          locator:
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers; passivated Re for 12065
+            line_range: 32-56
+  TiO:
+    observations:
+    - observation_id: demaria_1971_tio_tio2_figure6_comparable_pressures
+      type: rate_series
+      locator:
+        source_path: >-
+          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        figure: '6'
+        table: '6'
+        line_range: 262-268, 324-328
+        paragraph: TiO and TiO2 only Ti-containing species; comparable P in 2000–2170 K
+      T_range_K:
+      - 2000.0
+      - 2170.0
+      phase: lunar_basalt_melt_12022_12065
+      regime: kems_effusion
+      units: as published (Fig. 6)
+      values:
+        gas_species: TiO(g)
+        also_observed: TiO2(g)
+        quantity: partial_pressure_figure_only_comparable_to_TiO2
+        material: Apollo_12_lunar_basalt
+        condensed_phase: lunar_basalt_melt
+        semantics: bound_not_point_ordering
+        ratio_note: >-
+          Authors: partial pressures of TiO and TiO2 in 2000–2170 K were COMPARABLE (p_TiO / p_TiO2 ≈
+          O(1) on same melt/apparatus — ratio-recoverable from Fig. 6 even without absolute digitization).
+        absolute_P_note: Absolute points on Fig. 6 only; not tabulated. Not figure-digitized here.
+        co_measured_with:
+        - demaria_1971_tio2_figure6_comparable_to_tio
+        equilibrium_delta_H0_kcal_mol:
+          reaction_TiO2_to_TiO_half_O2:
+            BC: 83 ± 2
+            table: '6'
+          reaction_TiO2_to_TiO_O:
+            NAA: 142 ± 3
+            table: '6'
+      uncertainty:
+        note: ≥factor 2 absolute; ratio more robust
+      equipment:
+        orifice_area:
+          value: 4.154756e-06
+          units: m2
+          diameter_m: 0.0023
+          orifice_shape: knife_edge
+          inferred: true
+          inference: >-
+            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          locator:
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+            line_range: '32'
+        cell_material:
+          value: Re
+          note: >-
+            Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
+            observed at higher T.
+          locator:
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers; passivated Re for 12065
+            line_range: 32-56
+  TiO2:
+    observations:
+    - observation_id: demaria_1971_tio2_figure6_comparable_to_tio
+      type: rate_series
+      locator:
+        source_path: >-
+          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        figure: '6'
+        line_range: 262-268
+      T_range_K:
+      - 2000.0
+      - 2170.0
+      phase: lunar_basalt_melt_12022_12065
+      regime: kems_effusion
+      units: as published (Fig. 6)
+      values:
+        gas_species: TiO2(g)
+        quantity: partial_pressure_figure_only_comparable_to_TiO
+        material: Apollo_12_lunar_basalt
+        condensed_phase: lunar_basalt_melt
+        semantics: bound_not_point_ordering
+        ratio_note: p_TiO ≈ p_TiO2 in 2000–2170 K (authors)
+        co_measured_with:
+        - demaria_1971_tio_tio2_figure6_comparable_pressures
+      equipment:
+        orifice_area:
+          value: 4.154756e-06
+          units: m2
+          diameter_m: 0.0023
+          orifice_shape: knife_edge
+          inferred: true
+          inference: >-
+            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          locator:
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+            line_range: '32'
+        cell_material:
+          value: Re
+          note: >-
+            Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
+            observed at higher T.
+          locator:
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers; passivated Re for 12065
+            line_range: 32-56
+  Al2O:
+    observations:
+    - observation_id: demaria_1971_al2o_psat_table4
+      type: psat_series
+      locator:
+        source_path: >-
+          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        table: '4'
+        line_range: 294-296
+        paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
+      T_range_K:
+      - 2060.0
+      - 2500.0
+      phase: Apollo_12_lunar_basalt_melt_12022_12065
+      standard_state: partial pressure over multicomponent lunar basalt melt (not pure oxide)
+      regime: kems_effusion
+      units: atm as published (p_Pa = p_atm × 101325)
+      values:
+        gas_species: Al2O(g)
+        quantity: partial_pressure_intermediate_range_reliable
+        material: Apollo_12_12022_and_12065
+        condensed_phase: lunar_basalt_melt
+        reliability_note: >-
+          Only intermediate-range data included by authors; initial (other species still depleting) and
+          final (exhaustion) ranges excluded due to poor T-reproducibility of ion intensity.
+        points:
+        - T_K: 2060.0
+          p_atm: 5.070000e-09
+          p_Pa: 5.137178e-04
+          instrument: NAA
+          sample: '12022'
+        - T_K: 2104.0
+          p_atm: 1.130000e-08
+          p_Pa: 0.0011449725000000001
+          instrument: NAA
+          sample: '12022'
+        - T_K: 2125.0
+          p_atm: 1.570000e-08
+          p_Pa: 0.0015908025000000003
+          instrument: NAA
+          sample: '12022'
+        - T_K: 2146.0
+          p_atm: 2.240000e-08
+          p_Pa: 0.00226968
+          instrument: NAA
+          sample: '12022'
+        - T_K: 2180.0
+          p_atm: 3.650000e-08
+          p_Pa: 0.0036983625000000003
+          instrument: NAA
+          sample: '12022'
+        - T_K: 2183.0
+          p_atm: 3.820000e-08
+          p_Pa: 0.003870615
+          instrument: NAA
+          sample: '12022'
+        - T_K: 2194.0
+          p_atm: 4.010000e-08
+          p_Pa: 0.0040631325
+          instrument: NAA
+          sample: '12022'
+        - T_K: 2290.0
+          p_atm: 1.550000e-07
+          p_Pa: 0.015705375
+          instrument: NAA
+          sample: '12022'
+        - T_K: 2270.0
+          p_atm: 1.040000e-07
+          p_Pa: 0.0105378
+          instrument: NAA
+          sample: '12022'
+        - T_K: 2360.0
+          p_atm: 6.900000e-07
+          p_Pa: 0.06991425
+          instrument: BC
+          sample: '12065'
+        - T_K: 2395.0
+          p_atm: 9.880000e-07
+          p_Pa: 0.10010909999999999
+          instrument: BC
+          sample: '12065'
+        - T_K: 2425.0
+          p_atm: 1.900000e-06
+          p_Pa: 0.1925175
+          instrument: BC
+          sample: '12065'
+        - T_K: 2465.0
+          p_atm: 3.390000e-06
+          p_Pa: 0.34349175000000004
+          instrument: BC
+          sample: '12065'
+        - T_K: 2500.0
+          p_atm: 4.730000e-06
+          p_Pa: 0.47926725
+          instrument: BC
+          sample: '12065'
+        co_measured_with:
+        - demaria_1971_alo_psat_table4
+        - demaria_1971_o_atomic_psat_table5
+        - demaria_1971_alo_al_o_kp_table8
+        co_measurement_note: >-
+          On sample 12065 BC, Al2O and AlO co-tabulated at 2360,2395,2425,2465,2500 K — ratio p(Al2O)/p(AlO)
+          recoverable. Atomic O (Table 5) co-tabulated at same T on both samples. Table 8 Kp(AlO=Al+O)
+          uses simultaneous AlO, Al, O at 2360–2500 K on 12065 BC.
+      uncertainty:
+        note: ≥factor 2 absolute; intermediate-range subset only
+      equipment:
+        orifice_area:
+          value: 4.154756e-06
+          units: m2
+          diameter_m: 0.0023
+          orifice_shape: knife_edge
+          inferred: true
+          inference: >-
+            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          locator:
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+            line_range: '32'
+        cell_material:
+          value: Re
+          note: >-
+            Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
+            observed at higher T.
+          locator:
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers; passivated Re for 12065
+            line_range: 32-56
+  AlO:
+    observations:
+    - observation_id: demaria_1971_alo_psat_table4
+      type: psat_series
+      locator:
+        source_path: >-
+          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        table: '4'
+        line_range: 294-296
+      T_range_K:
+      - 2320.0
+      - 2500.0
+      phase: Apollo_12_lunar_basalt_melt_12022_12065
+      standard_state: partial pressure over multicomponent lunar basalt melt (not pure oxide)
+      regime: kems_effusion
+      units: atm as published (p_Pa = p_atm × 101325)
+      values:
+        gas_species: AlO(g)
+        quantity: partial_pressure_BC_12065
+        material: Apollo_12_12065
+        condensed_phase: lunar_basalt_melt
+        reliability_note: AlO NAA points mostly final-range — excluded by authors from tables
+        points:
+        - T_K: 2320.0
+          p_atm: 1.050000e-06
+          p_Pa: 0.10639124999999999
+          instrument: BC
+          sample: '12065'
+        - T_K: 2360.0
+          p_atm: 1.300000e-06
+          p_Pa: 0.1317225
+          instrument: BC
+          sample: '12065'
+        - T_K: 2395.0
+          p_atm: 2.220000e-06
+          p_Pa: 0.2249415
+          instrument: BC
+          sample: '12065'
+        - T_K: 2425.0
+          p_atm: 3.790000e-06
+          p_Pa: 0.38402175
+          instrument: BC
+          sample: '12065'
+        - T_K: 2465.0
+          p_atm: 6.840000e-06
+          p_Pa: 0.693063
+          instrument: BC
+          sample: '12065'
+        - T_K: 2500.0
+          p_atm: 8.960000e-06
+          p_Pa: 0.907872
+          instrument: BC
+          sample: '12065'
+        co_measured_with:
+        - demaria_1971_al2o_psat_table4
+        - demaria_1971_o_atomic_psat_table5
+        - demaria_1971_alo_al_o_kp_table8
+      uncertainty:
+        note: ≥factor 2 absolute
+      equipment:
+        orifice_area:
+          value: 4.154756e-06
+          units: m2
+          diameter_m: 0.0023
+          orifice_shape: knife_edge
+          inferred: true
+          inference: >-
+            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          locator:
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+            line_range: '32'
+        cell_material:
+          value: Re
+          note: >-
+            Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
+            observed at higher T.
+          locator:
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers; passivated Re for 12065
+            line_range: 32-56
+    - observation_id: demaria_1971_alo_al_o_kp_table8
+      type: gibbs_table
+      locator:
+        source_path: >-
+          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        table: '8'
+        line_range: 337-341
+        paragraph: Third-law AlO(g)=Al(g)+O(g); 12065 BC; simultaneous Kp
+      T_range_K:
+      - 2360.0
+      - 2500.0
+      phase: lunar_basalt_melt_12065
+      regime: kems_effusion
+      units: Kp dimensionless (partial P in atm standard); ΔH0 kcal/mol
+      values:
+        reaction: AlO(g) = Al(g) + O(g)
+        quantity: third_law_Kp_and_delta_H0
+        material: Apollo_12_12065_BC
+        condensed_phase: lunar_basalt_melt
+        gas_species_in_equilibrium:
+        - AlO(g)
+        - Al(g)
+        - O(g)
+        co_measured_with:
+        - demaria_1971_alo_psat_table4
+        - demaria_1971_o_atomic_psat_table5
+        - demaria_1971_al_monatomic_figure7
+        points:
+        - T_K: 2360.0
+          Kp: 3.190000e-05
+          minus_R_ln_Kp: 20.56
+          minus_delta_fef: 27.26
+          delta_H0_kcal_mol: 112.8
+        - T_K: 2395.0
+          Kp: 4.020000e-05
+          minus_R_ln_Kp: 20.01
+          minus_delta_fef: 27.3
+          delta_H0_kcal_mol: 113.4
+        - T_K: 2425.0
+          Kp: 8.030000e-05
+          minus_R_ln_Kp: 18.73
+          minus_delta_fef: 27.32
+          delta_H0_kcal_mol: 111.6
+        - T_K: 2465.0
+          Kp: 1.330000e-04
+          minus_R_ln_Kp: 17.74
+          minus_delta_fef: 27.35
+          delta_H0_kcal_mol: 111.1
+        - T_K: 2500.0
+          Kp: 1.580000e-04
+          minus_R_ln_Kp: 17.39
+          minus_delta_fef: 27.38
+          delta_H0_kcal_mol: 111.9
+        mean_delta_H0_kcal_mol: 112.2
+        mean_delta_H0_sigma: 0.9
+        literature_compare_kcal_mol: 112 ± 3 (this work BC Table 6) vs 115 ± 5 (Drowart et al. 1960)
+        ratio_recoverable: >-
+          Kp = p(Al)*p(O)/p(AlO) from simultaneous measurements — carrier ratios without absolute calibration
+      uncertainty:
+        note: std dev ±0.9 on mean; Table 6 BC 112±3 inclusive of calibration
+      equipment:
+        orifice_area:
+          value: 4.154756e-06
+          units: m2
+          diameter_m: 0.0023
+          orifice_shape: knife_edge
+          inferred: true
+          inference: >-
+            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          locator:
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+            line_range: '32'
+        cell_material:
+          value: Re
+          note: >-
+            Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
+            observed at higher T.
+          locator:
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers; passivated Re for 12065
+            line_range: 32-56
+  Al:
+    observations:
+    - observation_id: demaria_1971_al_monatomic_figure7
+      type: rate_series
+      locator:
+        source_path: >-
+          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        figure: '7'
+        line_range: 268-292
+        paragraph: Al, Al2O, AlO observed; Al partial pressures in Fig. 7
+      T_range_K:
+      - 2000.0
+      - 2500.0
+      phase: lunar_basalt_melt_12022_12065
+      regime: kems_effusion
+      units: as published (Fig. 7)
+      values:
+        gas_species: Al(g)
+        quantity: partial_pressure_figure_only
+        material: Apollo_12_lunar_basalt
+        condensed_phase: lunar_basalt_melt
+        semantics: bound_not_point_ordering
+        note: >-
+          Absolute Al(g) on Fig. 7 only. Used with AlO and O in Table 8 Kp simultaneous equilibria.
+        co_measured_with:
+        - demaria_1971_alo_al_o_kp_table8
+        - demaria_1971_al2o_psat_table4
+        - demaria_1971_alo_psat_table4
+        first_appreciable_oxide_T_K_range:
+        - 1900.0
+        - 2000.0
+      equipment:
+        orifice_area:
+          value: 4.154756e-06
+          units: m2
+          diameter_m: 0.0023
+          orifice_shape: knife_edge
+          inferred: true
+          inference: >-
+            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          locator:
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+            line_range: '32'
+        cell_material:
+          value: Re
+          note: >-
+            Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
+            observed at higher T.
+          locator:
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers; passivated Re for 12065
+            line_range: 32-56
+  O:
+    observations:
+    - observation_id: demaria_1971_o_atomic_psat_table5
+      type: psat_series
+      locator:
+        source_path: >-
+          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        table: '5'
+        line_range: 298-300
+        paragraph: Partial pressures of O in range of Al-containing species vaporization
+      T_range_K:
+      - 2015.0
+      - 2500.0
+      phase: Apollo_12_lunar_basalt_melt_12022_12065
+      standard_state: partial pressure over multicomponent lunar basalt melt (not pure oxide)
+      regime: kems_effusion
+      units: atm as published (p_Pa = p_atm × 101325)
+      values:
+        gas_species: O(g)
+        quantity: partial_pressure_atomic_oxygen
+        material: Apollo_12_12022_and_12065
+        condensed_phase: lunar_basalt_melt
+        points:
+        - T_K: 2015.0
+          p_atm: 9.200000e-08
+          p_Pa: 0.009321900000000001
+          instrument: NAA
+          sample: '12022'
+        - T_K: 2060.0
+          p_atm: 2.200000e-07
+          p_Pa: 0.022291500000000002
+          instrument: NAA
+          sample: '12022'
+        - T_K: 2104.0
+          p_atm: 3.200000e-07
+          p_Pa: 0.032424
+          instrument: NAA
+          sample: '12022'
+        - T_K: 2146.0
+          p_atm: 6.500000e-07
+          p_Pa: 0.06586125
+          instrument: NAA
+          sample: '12022'
+        - T_K: 2162.0
+          p_atm: 9.000000e-07
+          p_Pa: 0.0911925
+          instrument: NAA
+          sample: '12022'
+        - T_K: 2194.0
+          p_atm: 8.540000e-07
+          p_Pa: 0.08653155
+          instrument: NAA
+          sample: '12022'
+        - T_K: 2270.0
+          p_atm: 2.000000e-06
+          p_Pa: 0.20265
+          instrument: NAA
+          sample: '12022'
+        - T_K: 2320.0
+          p_atm: 1.630000e-06
+          p_Pa: 0.16515975
+          instrument: BC
+          sample: '12065'
+        - T_K: 2360.0
+          p_atm: 2.910000e-06
+          p_Pa: 0.29485575
+          instrument: BC
+          sample: '12065'
+        - T_K: 2395.0
+          p_atm: 3.800000e-06
+          p_Pa: 0.385035
+          instrument: BC
+          sample: '12065'
+        - T_K: 2425.0
+          p_atm: 7.400000e-06
+          p_Pa: 0.749805
+          instrument: BC
+          sample: '12065'
+        - T_K: 2465.0
+          p_atm: 1.130000e-05
+          p_Pa: 1.1449725
+          instrument: BC
+          sample: '12065'
+        - T_K: 2500.0
+          p_atm: 1.420000e-05
+          p_Pa: 1.438815
+          instrument: BC
+          sample: '12065'
+        co_measured_with:
+        - demaria_1971_al2o_psat_table4
+        - demaria_1971_alo_psat_table4
+        - demaria_1971_alo_al_o_kp_table8
+        co_measurement_note: >-
+          Atomic O co-tabulated with Al2O (12022 NAA same T: 2060,2104,2146,2194,2270) and with AlO/Al2O
+          (12065 BC: 2320–2500). Enables p(Al2O)/p(O), p(AlO)/p(O) ratios and Table 8 Kp.
+      uncertainty:
+        note: >-
+          ≥factor 2 absolute; Re cell O interaction caveat applies more to O2 than atomic O at high T
+      equipment:
+        orifice_area:
+          value: 4.154756e-06
+          units: m2
+          diameter_m: 0.0023
+          orifice_shape: knife_edge
+          inferred: true
+          inference: >-
+            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          locator:
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+            line_range: '32'
+        cell_material:
+          value: Re
+          note: >-
+            Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
+            observed at higher T.
+          locator:
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers; passivated Re for 12065
+            line_range: 32-56
+  Na:
+    observations:
+    - observation_id: demaria_1971_na_first_observed_figure1
+      type: rate_series
+      locator:
+        source_path: >-
+          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        figure: '1'
+        line_range: 56-80
+        paragraph: Na+ first ion species ~1250 K; Figs 1–2; rapid depletion
+      T_range_K:
+      - 1250.0
+      - 1500.0
+      phase: lunar_basalt_melt_12022_12065
+      regime: kems_effusion
+      units: as published (Fig. 1)
+      values:
+        gas_species: Na(g)
+        quantity: partial_pressure_figure_only_rapid_depletion
+        material: Apollo_12_lunar_basalt
+        condensed_phase: lunar_basalt_melt
+        sample_Na2O_wt_pct: 0.36
+        first_observed_T_K: 1250.0
+        semantics: bound_not_point_ordering
+        note: >-
+          Absolute P on Fig. 1 only; few initial points before depletion. Not figure-digitized.
+        co_measured_context: same alkali window as K and Table 1 O2
+        companion_O2_table: demaria_1971_o2_psat_table1_alkali_range
+      equipment:
+        orifice_area:
+          value: 4.154756e-06
+          units: m2
+          diameter_m: 0.0023
+          orifice_shape: knife_edge
+          inferred: true
+          inference: >-
+            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          locator:
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+            line_range: '32'
+        cell_material:
+          value: Re
+          note: >-
+            Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
+            observed at higher T.
+          locator:
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers; passivated Re for 12065
+            line_range: 32-56
+  K:
+    observations:
+    - observation_id: demaria_1971_k_first_observed_figure2
+      type: rate_series
+      locator:
+        source_path: >-
+          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        figure: '2'
+        line_range: 56-101
+        paragraph: K+ first ion species ~1250 K; Fig. 2; rapid depletion
+      T_range_K:
+      - 1250.0
+      - 1500.0
+      phase: lunar_basalt_melt_12022_12065
+      regime: kems_effusion
+      units: as published (Fig. 2)
+      values:
+        gas_species: K(g)
+        quantity: partial_pressure_figure_only_rapid_depletion
+        material: Apollo_12_lunar_basalt
+        condensed_phase: lunar_basalt_melt
+        sample_K2O_wt_pct: 0.068
+        first_observed_T_K: 1250.0
+        semantics: bound_not_point_ordering
+        note: Absolute P on Fig. 2 only. Not figure-digitized.
+        companion_O2_table: demaria_1971_o2_psat_table1_alkali_range
+      equipment:
+        orifice_area:
+          value: 4.154756e-06
+          units: m2
+          diameter_m: 0.0023
+          orifice_shape: knife_edge
+          inferred: true
+          inference: >-
+            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          locator:
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+            line_range: '32'
+        cell_material:
+          value: Re
+          note: >-
+            Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
+            observed at higher T.
+          locator:
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers; passivated Re for 12065
+            line_range: 32-56
+  Si:
+    observations:
+    - observation_id: demaria_1971_si_monatomic_not_reported
+      type: rate_series
+      locator:
+        source_path: >-
+          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        line_range: 10-34,202
+        paragraph: Si-containing species listed as SiO and SiO2 only
+      T_range_K:
+      - 1650.0
+      - 2200.0
+      phase: lunar_basalt_melt_12022_12065
+      regime: kems_effusion
+      units: as published
+      values:
+        gas_species: Si(g)
+        quantity: not_reported_among_detected_species
+        material: Apollo_12_lunar_basalt
+        condensed_phase: lunar_basalt_melt
+        semantics: bound_not_point_ordering
+        negative_result: >-
+          Monatomic Si not listed among detected vapor species. Detected Si carriers: SiO, SiO2 only.
+          This is a real negative for Si(g) dominance under these conditions (consistent with SiO carrier).
+        detected_si_carriers:
+        - SiO(g)
+        - SiO2(g)
+      equipment:
+        orifice_area:
+          value: 4.154756e-06
+          units: m2
+          diameter_m: 0.0023
+          orifice_shape: knife_edge
+          inferred: true
+          inference: >-
+            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          locator:
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+            line_range: '32'
+        cell_material:
+          value: Re
+          note: >-
+            Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
+            observed at higher T.
+          locator:
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers; passivated Re for 12065
+            line_range: 32-56
 fidelity_samples:
+- path: species.Al2O.observations[demaria_1971_al2o_psat_table4].values.points[0].p_atm
+  value: 5.070000e-09
+  note: 'Table 4: Al2O NAA 12022 at 2060 K = 5.07e-9 atm (prize ratio-anchor point)'
+  locator:
+    source_path: >-
+      docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    table: '4'
+    line_range: '296'
+- path: species.AlO.observations[demaria_1971_alo_psat_table4].values.points[1].p_atm
+  value: 1.300000e-06
+  note: 'Table 4: AlO BC 12065 at 2360 K = 1.30e-6 atm (co-measured with Al2O 6.90e-7)'
+  locator:
+    source_path: >-
+      docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    table: '4'
+    line_range: '296'
+- path: species.O.observations[demaria_1971_o_atomic_psat_table5].values.points[1].p_atm
+  value: 2.200000e-07
+  note: 'Table 5: O NAA 12022 at 2060 K = 2.2e-7 atm (same T as Al2O 5.07e-9)'
+  locator:
+    source_path: >-
+      docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    table: '5'
+    line_range: '300'
+- path: >-
+    species.Mn.observations[demaria_1971_mn_psat_table2_sample_12022].values.points[2].p_atm
+  value: 8.470000e-08
+  note: 'Table 2: Mn 1725 K = 8.47e-8 atm (co-measured with Cr 1.03e-8)'
+  locator:
+    source_path: >-
+      docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    table: '2'
+    line_range: '159'
+- path: >-
+    species.Mg.observations[demaria_1971_mg_psat_table3_lunar_basalt].values.points[0].p_atm
+  value: 1.600000e-08
+  note: 'Table 3: Mg BC 12022 at 1650 K = 1.6e-8 atm'
+  locator:
+    source_path: >-
+      docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    table: '3'
+    line_range: '175'
 - species: Fe
   observable: activity_coefficient
   observation_id: demaria_1971_fe_lunar_basalt_kems_main_cell
   field: activity
   value: 1.0
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
-    paragraph: Fe vaporizes at nearly unit activity
-    line_range: '111'
+    source_path: >-
+      docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
     figure: '3'
-- path: species.Fe.observations[demaria_1971_fe_lunar_basalt_kems_main_cell].equipment.orifice_area.value
-  value: 4.154756e-06
-  note: inferred orifice area from 2.3 mm knife-edge diameter (main Re cell)
+    line_range: '111'
+- path: species.AlO.observations[demaria_1971_alo_al_o_kp_table8].values.points[0].Kp
+  value: 3.190000e-05
+  note: 'Table 8: Kp(AlO=Al+O) at 2360 K = 3.19e-5'
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
-    paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
-    line_range: '32'
-- species: SiO
-  observable: rate_series
-  observation_id: demaria_1971_sio_lunar_basalt_kems_main_cell
-  field: first_observed_T_K
-  value: 1650.0
-  locator:
-    source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
-    paragraph: SiO first observed around 1650 K
-    line_range: '202'
-    figure: '5'
+    source_path: >-
+      docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    table: '8'
+    line_range: '337'

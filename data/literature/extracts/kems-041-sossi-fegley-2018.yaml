@@ -1,0 +1,841 @@
+schema_version: literature_extract.v1
+source_id: kems-041-sossi-fegley-2018
+source:
+  citation: Sossi, P.A. & Fegley, B. Jr. (2018), review compilation of metal-oxide vapour speciation and
+    melt activity coefficients (Table 1 pure oxides; Table 2 complex silicate melts)
+  year: 2018
+  doi: null
+extraction:
+  method: OCR MinerU Table 2 full activity-coefficient inventory (28 oxides) + Table 1 index note. Secondary
+    compilation — not primary KEMS co-measured partial pressures.
+  date: '2026-08-04'
+  worker: mine-multicarrier-gk
+  provenance_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/
+review_status: draft
+species:
+  Al:
+    observations:
+    - observation_id: sossi_fegley_2018_table2_gamma_Al__AlO_1_5_
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        table: '2'
+        paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
+      T_range_K:
+      - 1573.0
+      - 1773.0
+      phase: complex_silicate_melt_CMAS_An_Di_
+      standard_state: oxide activity coefficient as compiled by Sossi & Fegley 2018 from cited primaries
+      regime: compiled_melt_activity
+      units: dimensionless γ as published range
+      values:
+        quantity: activity_coefficient_range
+        oxide_formula_as_published: $AlO_{1.5}$
+        melt_composition_as_published: CMAS (An–Di)
+        gamma_range_as_published: 0.28–0.37
+        temperature_as_published: 1573–1773
+        references_as_published: Ghiorso & Sack 1995
+        condensed_phase: complex_silicate_melt
+        compilation_note: Secondary compilation (review chapter). Values are literature ranges over stated
+          melt systems; not primary KEMS ion intensities. Retain for melt-activity inventory; prefer primary
+          extracts when available for the same system.
+      uncertainty:
+        note: range endpoints as printed; compilation from heterogeneous methods/labs
+  As:
+    observations:
+    - observation_id: sossi_fegley_2018_table2_gamma_As__AsO_1_5_
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        table: '2'
+        paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
+      T_range_K:
+      - 1573.0
+      - 1573.0
+      phase: complex_silicate_melt_FCS
+      standard_state: oxide activity coefficient as compiled by Sossi & Fegley 2018 from cited primaries
+      regime: compiled_melt_activity
+      units: dimensionless γ as published range
+      values:
+        quantity: activity_coefficient_range
+        oxide_formula_as_published: $AsO_{1.5}$
+        melt_composition_as_published: FCS
+        gamma_range_as_published: 0.03–0.56
+        temperature_as_published: '1573'
+        references_as_published: Chen & Jahanshahi 2010
+        condensed_phase: complex_silicate_melt
+        compilation_note: Secondary compilation (review chapter). Values are literature ranges over stated
+          melt systems; not primary KEMS ion intensities. Retain for melt-activity inventory; prefer primary
+          extracts when available for the same system.
+      uncertainty:
+        note: range endpoints as printed; compilation from heterogeneous methods/labs
+  Bi:
+    observations:
+    - observation_id: sossi_fegley_2018_table2_gamma_Bi__BiO_1_5_
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        table: '2'
+        paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
+      T_range_K:
+      - 1573.0
+      - 1573.0
+      phase: complex_silicate_melt_FCS
+      standard_state: oxide activity coefficient as compiled by Sossi & Fegley 2018 from cited primaries
+      regime: compiled_melt_activity
+      units: dimensionless γ as published range
+      values:
+        quantity: activity_coefficient_range
+        oxide_formula_as_published: $BiO_{1.5}$
+        melt_composition_as_published: FCS
+        gamma_range_as_published: 0.3–0.5
+        temperature_as_published: '1573'
+        references_as_published: Paulina et al. 2013
+        condensed_phase: complex_silicate_melt
+        compilation_note: Secondary compilation (review chapter). Values are literature ranges over stated
+          melt systems; not primary KEMS ion intensities. Retain for melt-activity inventory; prefer primary
+          extracts when available for the same system.
+      uncertainty:
+        note: range endpoints as printed; compilation from heterogeneous methods/labs
+  Ca:
+    observations:
+    - observation_id: sossi_fegley_2018_table2_gamma_Ca_CaO
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        table: '2'
+        paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: complex_silicate_melt_CMAS_0_55_Basicity_0_65_
+      standard_state: oxide activity coefficient as compiled by Sossi & Fegley 2018 from cited primaries
+      regime: compiled_melt_activity
+      units: dimensionless γ as published range
+      values:
+        quantity: activity_coefficient_range
+        oxide_formula_as_published: CaO
+        melt_composition_as_published: CMAS(0.55 < Basicity < 0.65)
+        gamma_range_as_published: ≈0.001–0.15
+        temperature_as_published: '1873'
+        references_as_published: Beckett 2002
+        condensed_phase: complex_silicate_melt
+        compilation_note: Secondary compilation (review chapter). Values are literature ranges over stated
+          melt systems; not primary KEMS ion intensities. Retain for melt-activity inventory; prefer primary
+          extracts when available for the same system.
+      uncertainty:
+        note: range endpoints as printed; compilation from heterogeneous methods/labs
+  Co:
+    observations:
+    - observation_id: sossi_fegley_2018_table2_gamma_Co_CoO
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        table: '2'
+        paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
+      T_range_K:
+      - 1573.0
+      - 1873.0
+      phase: complex_silicate_melt__F_CMAS_a_CMAS_b_
+      standard_state: oxide activity coefficient as compiled by Sossi & Fegley 2018 from cited primaries
+      regime: compiled_melt_activity
+      units: dimensionless γ as published range
+      values:
+        quantity: activity_coefficient_range
+        oxide_formula_as_published: CoO
+        melt_composition_as_published: (F)CMAS $^{a}$ CMAS $^{b}$
+        gamma_range_as_published: 0.5–2.2 $^{a}$ 0.8–1.8 $^{b}$
+        temperature_as_published: 1573–1873 $^{a}$ 1673 $^{b}$
+        references_as_published: $^{a}$ Holzheid et al. 1997 $^{b}$ O’Neill & Eggins 2002;O’Neill & Berry
+          2006
+        condensed_phase: complex_silicate_melt
+        compilation_note: Secondary compilation (review chapter). Values are literature ranges over stated
+          melt systems; not primary KEMS ion intensities. Retain for melt-activity inventory; prefer primary
+          extracts when available for the same system.
+      uncertainty:
+        note: range endpoints as printed; compilation from heterogeneous methods/labs
+  Cr:
+    observations:
+    - observation_id: sossi_fegley_2018_table2_gamma_Cr_CrO
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        table: '2'
+        paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
+      T_range_K:
+      - 1773.0
+      - 1773.0
+      phase: complex_silicate_melt_CAS
+      standard_state: oxide activity coefficient as compiled by Sossi & Fegley 2018 from cited primaries
+      regime: compiled_melt_activity
+      units: dimensionless γ as published range
+      values:
+        quantity: activity_coefficient_range
+        oxide_formula_as_published: CrO
+        melt_composition_as_published: CAS
+        gamma_range_as_published: 1.9–7.2
+        temperature_as_published: '1773'
+        references_as_published: Pretorius & Muan 1992
+        condensed_phase: complex_silicate_melt
+        compilation_note: Secondary compilation (review chapter). Values are literature ranges over stated
+          melt systems; not primary KEMS ion intensities. Retain for melt-activity inventory; prefer primary
+          extracts when available for the same system.
+      uncertainty:
+        note: range endpoints as printed; compilation from heterogeneous methods/labs
+    - observation_id: sossi_fegley_2018_table2_gamma_Cr__CrO_1_5_
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        table: '2'
+        paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
+      T_range_K:
+      - 1773.0
+      - 1773.0
+      phase: complex_silicate_melt_CAS
+      standard_state: oxide activity coefficient as compiled by Sossi & Fegley 2018 from cited primaries
+      regime: compiled_melt_activity
+      units: dimensionless γ as published range
+      values:
+        quantity: activity_coefficient_range
+        oxide_formula_as_published: $CrO_{1.5}$
+        melt_composition_as_published: CAS
+        gamma_range_as_published: 23–42
+        temperature_as_published: '1773'
+        references_as_published: Pretorius & Muan 1992
+        condensed_phase: complex_silicate_melt
+        compilation_note: Secondary compilation (review chapter). Values are literature ranges over stated
+          melt systems; not primary KEMS ion intensities. Retain for melt-activity inventory; prefer primary
+          extracts when available for the same system.
+      uncertainty:
+        note: range endpoints as printed; compilation from heterogeneous methods/labs
+  Cu:
+    observations:
+    - observation_id: sossi_fegley_2018_table2_gamma_Cu__CuO_0_5_
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        table: '2'
+        paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
+      T_range_K:
+      - 1573.0
+      - 1923.0
+      phase: complex_silicate_melt__F_CMAS_a_CMAS_b_
+      standard_state: oxide activity coefficient as compiled by Sossi & Fegley 2018 from cited primaries
+      regime: compiled_melt_activity
+      units: dimensionless γ as published range
+      values:
+        quantity: activity_coefficient_range
+        oxide_formula_as_published: $CuO_{0.5}$
+        melt_composition_as_published: (F)CMAS $^{a}$ CMAS $^{b}$
+        gamma_range_as_published: 9–11 $^{a}$ 3.5 $^{b}$
+        temperature_as_published: 1573 $^{a}$ 1923 $^{b}$
+        references_as_published: $^{a}$ Holzheid & Lodders 2001 $^{b}$ Wood & Wade 2013
+        condensed_phase: complex_silicate_melt
+        compilation_note: Secondary compilation (review chapter). Values are literature ranges over stated
+          melt systems; not primary KEMS ion intensities. Retain for melt-activity inventory; prefer primary
+          extracts when available for the same system.
+      uncertainty:
+        note: range endpoints as printed; compilation from heterogeneous methods/labs
+  Fe:
+    observations:
+    - observation_id: sossi_fegley_2018_table2_gamma_Fe_FeO
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        table: '2'
+        paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
+      T_range_K:
+      - 1573.0
+      - 1923.0
+      phase: complex_silicate_melt_SKAnFa_F_CMAS_b_CMAS_c_d_
+      standard_state: oxide activity coefficient as compiled by Sossi & Fegley 2018 from cited primaries
+      regime: compiled_melt_activity
+      units: dimensionless γ as published range
+      values:
+        quantity: activity_coefficient_range
+        oxide_formula_as_published: FeO
+        melt_composition_as_published: SKAnFa(F)CMAS $^{b}$ CMAS $^{c,d}$
+        gamma_range_as_published: 0.6–2.3 $^{a}$ 1.2–2.1 $^{b}$ 0.9–1.8 $^{c}$ ≈0.5–2.5 $^{d}$
+        temperature_as_published: 1600 $^{a}$ 1573–1873 $^{b}$ 1673 $^{c}$ 1923 $^{c}$
+        references_as_published: $^{a}$ Doyle 1988 $^{b}$ Holzheid et al. 1997 $^{c}$ O’Neill & Eggins
+          2002 $^{d}$ Wood & Wade 2013
+        condensed_phase: complex_silicate_melt
+        compilation_note: Secondary compilation (review chapter). Values are literature ranges over stated
+          melt systems; not primary KEMS ion intensities. Retain for melt-activity inventory; prefer primary
+          extracts when available for the same system.
+      uncertainty:
+        note: range endpoints as printed; compilation from heterogeneous methods/labs
+  Ge:
+    observations:
+    - observation_id: sossi_fegley_2018_table2_gamma_Ge_GeO
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        table: '2'
+        paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
+      T_range_K:
+      - 1423.0
+      - 1523.0
+      phase: complex_silicate_melt_FCAS
+      standard_state: oxide activity coefficient as compiled by Sossi & Fegley 2018 from cited primaries
+      regime: compiled_melt_activity
+      units: dimensionless γ as published range
+      values:
+        quantity: activity_coefficient_range
+        oxide_formula_as_published: GeO
+        melt_composition_as_published: FCAS
+        gamma_range_as_published: 1.44–2.55
+        temperature_as_published: 1423–1523
+        references_as_published: Yan & Swinbourne 2013
+        condensed_phase: complex_silicate_melt
+        compilation_note: Secondary compilation (review chapter). Values are literature ranges over stated
+          melt systems; not primary KEMS ion intensities. Retain for melt-activity inventory; prefer primary
+          extracts when available for the same system.
+      uncertainty:
+        note: range endpoints as printed; compilation from heterogeneous methods/labs
+  GeO2:
+    observations:
+    - observation_id: sossi_fegley_2018_table2_gamma_GeO2__GeO_2_
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        table: '2'
+        paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
+      T_range_K:
+      - 1573.0
+      - 1573.0
+      phase: complex_silicate_melt_FCMS
+      standard_state: oxide activity coefficient as compiled by Sossi & Fegley 2018 from cited primaries
+      regime: compiled_melt_activity
+      units: dimensionless γ as published range
+      values:
+        quantity: activity_coefficient_range
+        oxide_formula_as_published: $GeO_{2}$
+        melt_composition_as_published: FCMS
+        gamma_range_as_published: 0.24–1.50
+        temperature_as_published: '1573'
+        references_as_published: Shuva et al. 2016
+        condensed_phase: complex_silicate_melt
+        compilation_note: Secondary compilation (review chapter). Values are literature ranges over stated
+          melt systems; not primary KEMS ion intensities. Retain for melt-activity inventory; prefer primary
+          extracts when available for the same system.
+      uncertainty:
+        note: range endpoints as printed; compilation from heterogeneous methods/labs
+  In:
+    observations:
+    - observation_id: sossi_fegley_2018_table2_gamma_In__InO_1_5_
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        table: '2'
+        paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
+      T_range_K:
+      - 1923.0
+      - 1923.0
+      phase: complex_silicate_melt_CMAS
+      standard_state: oxide activity coefficient as compiled by Sossi & Fegley 2018 from cited primaries
+      regime: compiled_melt_activity
+      units: dimensionless γ as published range
+      values:
+        quantity: activity_coefficient_range
+        oxide_formula_as_published: $InO_{1.5}$
+        melt_composition_as_published: CMAS
+        gamma_range_as_published: '0.02'
+        temperature_as_published: '1923'
+        references_as_published: Wood & Wade 2013
+        condensed_phase: complex_silicate_melt
+        compilation_note: Secondary compilation (review chapter). Values are literature ranges over stated
+          melt systems; not primary KEMS ion intensities. Retain for melt-activity inventory; prefer primary
+          extracts when available for the same system.
+      uncertainty:
+        note: range endpoints as printed; compilation from heterogeneous methods/labs
+  K:
+    observations:
+    - observation_id: sossi_fegley_2018_table2_gamma_K__KO_0_5_
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        table: '2'
+        paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
+      T_range_K:
+      - 1573.0
+      - 1573.0
+      phase: complex_silicate_melt_KFCAS_with_KAlSiO_4_s_
+      standard_state: oxide activity coefficient as compiled by Sossi & Fegley 2018 from cited primaries
+      regime: compiled_melt_activity
+      units: dimensionless γ as published range
+      values:
+        quantity: activity_coefficient_range
+        oxide_formula_as_published: $KO_{0.5}$
+        melt_composition_as_published: KFCAS** with KAlSiO $_{4(s)}$
+        gamma_range_as_published: $6.3 \times 10^{-5}$ – $7.1 \times 10^{-4}$
+        temperature_as_published: '1573'
+        references_as_published: Hastie et al. 1981
+        condensed_phase: complex_silicate_melt
+        compilation_note: Secondary compilation (review chapter). Values are literature ranges over stated
+          melt systems; not primary KEMS ion intensities. Retain for melt-activity inventory; prefer primary
+          extracts when available for the same system.
+      uncertainty:
+        note: range endpoints as printed; compilation from heterogeneous methods/labs
+  Mg:
+    observations:
+    - observation_id: sossi_fegley_2018_table2_gamma_Mg_MgO
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        table: '2'
+        paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: complex_silicate_melt_CMAS_0_55_Basicity_0_65_
+      standard_state: oxide activity coefficient as compiled by Sossi & Fegley 2018 from cited primaries
+      regime: compiled_melt_activity
+      units: dimensionless γ as published range
+      values:
+        quantity: activity_coefficient_range
+        oxide_formula_as_published: MgO
+        melt_composition_as_published: CMAS(0.55 < Basicity < 0.65)
+        gamma_range_as_published: ≈0.25–4
+        temperature_as_published: '1873'
+        references_as_published: Beckett 2002
+        condensed_phase: complex_silicate_melt
+        compilation_note: Secondary compilation (review chapter). Values are literature ranges over stated
+          melt systems; not primary KEMS ion intensities. Retain for melt-activity inventory; prefer primary
+          extracts when available for the same system.
+      uncertainty:
+        note: range endpoints as printed; compilation from heterogeneous methods/labs
+  Mn:
+    observations:
+    - observation_id: sossi_fegley_2018_table2_gamma_Mn_MnO
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        table: '2'
+        paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
+      T_range_K:
+      - 1823.0
+      - 1923.0
+      phase: complex_silicate_melt_FCMS_P_a_CAS_b_
+      standard_state: oxide activity coefficient as compiled by Sossi & Fegley 2018 from cited primaries
+      regime: compiled_melt_activity
+      units: dimensionless γ as published range
+      values:
+        quantity: activity_coefficient_range
+        oxide_formula_as_published: MnO
+        melt_composition_as_published: FCMS(P) $^{a}$ CAS $^{b}$
+        gamma_range_as_published: 0.7–3.5 $^{a}$ 0.5–7.2 $^{b}$
+        temperature_as_published: 1823–1923 $^{a}$ 1873 $^{b}$
+        references_as_published: $^{a}$ Suito & Inoue 1984 $^{b}$ Ohta & Suito 1995
+        condensed_phase: complex_silicate_melt
+        compilation_note: Secondary compilation (review chapter). Values are literature ranges over stated
+          melt systems; not primary KEMS ion intensities. Retain for melt-activity inventory; prefer primary
+          extracts when available for the same system.
+      uncertainty:
+        note: range endpoints as printed; compilation from heterogeneous methods/labs
+  MoO2:
+    observations:
+    - observation_id: sossi_fegley_2018_table2_gamma_MoO2__MoO_2_
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        table: '2'
+        paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
+      T_range_K:
+      - 1673.0
+      - 1923.0
+      phase: complex_silicate_melt_CMAS_a_b_
+      standard_state: oxide activity coefficient as compiled by Sossi & Fegley 2018 from cited primaries
+      regime: compiled_melt_activity
+      units: dimensionless γ as published range
+      values:
+        quantity: activity_coefficient_range
+        oxide_formula_as_published: $MoO_{2}$
+        melt_composition_as_published: CMAS $^{a,b}$
+        gamma_range_as_published: 67–227 $^{a}$ ≈5–100 $^{b}$
+        temperature_as_published: 1673 $^{a}$ 1923 $^{b}$
+        references_as_published: $^{a}$ O’Neill & Eggins 2002 $^{b}$ Wood & Wade 2013
+        condensed_phase: complex_silicate_melt
+        compilation_note: Secondary compilation (review chapter). Values are literature ranges over stated
+          melt systems; not primary KEMS ion intensities. Retain for melt-activity inventory; prefer primary
+          extracts when available for the same system.
+      uncertainty:
+        note: range endpoints as printed; compilation from heterogeneous methods/labs
+  MoO3:
+    observations:
+    - observation_id: sossi_fegley_2018_table2_gamma_MoO3__MoO_3_
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        table: '2'
+        paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
+      T_range_K:
+      - 1673.0
+      - 1673.0
+      phase: complex_silicate_melt_CMAS
+      standard_state: oxide activity coefficient as compiled by Sossi & Fegley 2018 from cited primaries
+      regime: compiled_melt_activity
+      units: dimensionless γ as published range
+      values:
+        quantity: activity_coefficient_range
+        oxide_formula_as_published: $MoO_3$
+        melt_composition_as_published: CMAS
+        gamma_range_as_published: 0.1–0.8* * $\log\gamma MoO_3$ = 1.49( $\log\gamma MoO_2$ )-3.59
+        temperature_as_published: '1673'
+        references_as_published: O’Neill & Eggins 2002
+        condensed_phase: complex_silicate_melt
+        compilation_note: Secondary compilation (review chapter). Values are literature ranges over stated
+          melt systems; not primary KEMS ion intensities. Retain for melt-activity inventory; prefer primary
+          extracts when available for the same system.
+      uncertainty:
+        note: range endpoints as printed; compilation from heterogeneous methods/labs
+  Na:
+    observations:
+    - observation_id: sossi_fegley_2018_table2_gamma_Na__NaO_0_5_
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        table: '2'
+        paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
+      T_range_K:
+      - 1623.0
+      - 1673.0
+      phase: complex_silicate_melt_CMASa_CMS_b_
+      standard_state: oxide activity coefficient as compiled by Sossi & Fegley 2018 from cited primaries
+      regime: compiled_melt_activity
+      units: dimensionless γ as published range
+      values:
+        quantity: activity_coefficient_range
+        oxide_formula_as_published: $NaO_{0.5}$
+        melt_composition_as_published: CMASa $CMS^b$
+        gamma_range_as_published: a $10^{-3}$ b $8.4 \times 10^{-4}$ –2.2 × $10^{-3}$
+        temperature_as_published: 1623a1673b
+        references_as_published: aMathieu et al. 2008bMathieu et al. 2011
+        condensed_phase: complex_silicate_melt
+        compilation_note: Secondary compilation (review chapter). Values are literature ranges over stated
+          melt systems; not primary KEMS ion intensities. Retain for melt-activity inventory; prefer primary
+          extracts when available for the same system.
+      uncertainty:
+        note: range endpoints as printed; compilation from heterogeneous methods/labs
+  Ni:
+    observations:
+    - observation_id: sossi_fegley_2018_table2_gamma_Ni_NiO
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        table: '2'
+        paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
+      T_range_K:
+      - 1573.0
+      - 1923.0
+      phase: complex_silicate_melt__F_CMASa_CMAS_b_c_
+      standard_state: oxide activity coefficient as compiled by Sossi & Fegley 2018 from cited primaries
+      regime: compiled_melt_activity
+      units: dimensionless γ as published range
+      values:
+        quantity: activity_coefficient_range
+        oxide_formula_as_published: NiO
+        melt_composition_as_published: (F)CMASa $CMAS^{b,c}$
+        gamma_range_as_published: 1.3–3.5a2.0–4.3b≈1.5–3.0c
+        temperature_as_published: 1573–1873a1673b1923c
+        references_as_published: aHolzheid et al. 1997bO’Neill & Eggins 2002;O’Neill & Berry, 2006cWood
+          & Wade 2013
+        condensed_phase: complex_silicate_melt
+        compilation_note: Secondary compilation (review chapter). Values are literature ranges over stated
+          melt systems; not primary KEMS ion intensities. Retain for melt-activity inventory; prefer primary
+          extracts when available for the same system.
+      uncertainty:
+        note: range endpoints as printed; compilation from heterogeneous methods/labs
+  P:
+    observations:
+    - observation_id: sossi_fegley_2018_table2_gamma_P__PO_2_5_
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        table: '2'
+        paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
+      T_range_K:
+      - 1823.0
+      - 1923.0
+      phase: complex_silicate_melt_CMFS
+      standard_state: oxide activity coefficient as compiled by Sossi & Fegley 2018 from cited primaries
+      regime: compiled_melt_activity
+      units: dimensionless γ as published range
+      values:
+        quantity: activity_coefficient_range
+        oxide_formula_as_published: $PO_{2.5}$
+        melt_composition_as_published: CMFS
+        gamma_range_as_published: $10^{-6}$ – $10^{-10}$
+        temperature_as_published: 1823–1923
+        references_as_published: Turkdogan (2000)
+        condensed_phase: complex_silicate_melt
+        compilation_note: Secondary compilation (review chapter). Values are literature ranges over stated
+          melt systems; not primary KEMS ion intensities. Retain for melt-activity inventory; prefer primary
+          extracts when available for the same system.
+      uncertainty:
+        note: range endpoints as printed; compilation from heterogeneous methods/labs
+  Pb:
+    observations:
+    - observation_id: sossi_fegley_2018_table2_gamma_Pb_PbO
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        table: '2'
+        paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
+      T_range_K:
+      - 1923.0
+      - 1923.0
+      phase: complex_silicate_melt_CMAS
+      standard_state: oxide activity coefficient as compiled by Sossi & Fegley 2018 from cited primaries
+      regime: compiled_melt_activity
+      units: dimensionless γ as published range
+      values:
+        quantity: activity_coefficient_range
+        oxide_formula_as_published: PbO
+        melt_composition_as_published: CMAS
+        gamma_range_as_published: '0.22'
+        temperature_as_published: '1923'
+        references_as_published: Wood & Wade 2013
+        condensed_phase: complex_silicate_melt
+        compilation_note: Secondary compilation (review chapter). Values are literature ranges over stated
+          melt systems; not primary KEMS ion intensities. Retain for melt-activity inventory; prefer primary
+          extracts when available for the same system.
+      uncertainty:
+        note: range endpoints as printed; compilation from heterogeneous methods/labs
+  SiO2:
+    observations:
+    - observation_id: sossi_fegley_2018_table2_gamma_SiO2__SiO_2_
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        table: '2'
+        paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
+      T_range_K:
+      - 1573.0
+      - 1773.0
+      phase: complex_silicate_melt_CMAS_An_Di_
+      standard_state: oxide activity coefficient as compiled by Sossi & Fegley 2018 from cited primaries
+      regime: compiled_melt_activity
+      units: dimensionless γ as published range
+      values:
+        quantity: activity_coefficient_range
+        oxide_formula_as_published: $SiO_2$
+        melt_composition_as_published: CMAS (An-Di)
+        gamma_range_as_published: 0.9–1.1
+        temperature_as_published: 1573–1773
+        references_as_published: Ghiorso & Sack 1995
+        condensed_phase: complex_silicate_melt
+        compilation_note: Secondary compilation (review chapter). Values are literature ranges over stated
+          melt systems; not primary KEMS ion intensities. Retain for melt-activity inventory; prefer primary
+          extracts when available for the same system.
+      uncertainty:
+        note: range endpoints as printed; compilation from heterogeneous methods/labs
+  Sn:
+    observations:
+    - observation_id: sossi_fegley_2018_table2_gamma_Sn_SnO
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        table: '2'
+        paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
+      T_range_K:
+      - 1573.0
+      - 1573.0
+      phase: complex_silicate_melt_FCS
+      standard_state: oxide activity coefficient as compiled by Sossi & Fegley 2018 from cited primaries
+      regime: compiled_melt_activity
+      units: dimensionless γ as published range
+      values:
+        quantity: activity_coefficient_range
+        oxide_formula_as_published: SnO
+        melt_composition_as_published: FCS
+        gamma_range_as_published: 5–6.2
+        temperature_as_published: '1573'
+        references_as_published: Takeda & Yazawa 1989
+        condensed_phase: complex_silicate_melt
+        compilation_note: Secondary compilation (review chapter). Values are literature ranges over stated
+          melt systems; not primary KEMS ion intensities. Retain for melt-activity inventory; prefer primary
+          extracts when available for the same system.
+      uncertainty:
+        note: range endpoints as printed; compilation from heterogeneous methods/labs
+  TiO2:
+    observations:
+    - observation_id: sossi_fegley_2018_table2_gamma_TiO2__TiO_2_
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        table: '2'
+        paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
+      T_range_K:
+      - 1573.0
+      - 1773.0
+      phase: complex_silicate_melt_CMAS
+      standard_state: oxide activity coefficient as compiled by Sossi & Fegley 2018 from cited primaries
+      regime: compiled_melt_activity
+      units: dimensionless γ as published range
+      values:
+        quantity: activity_coefficient_range
+        oxide_formula_as_published: $TiO_2$
+        melt_composition_as_published: CMAS
+        gamma_range_as_published: 1.5–1.7
+        temperature_as_published: 1573–1773
+        references_as_published: Ghiorso & Sack 1995
+        condensed_phase: complex_silicate_melt
+        compilation_note: Secondary compilation (review chapter). Values are literature ranges over stated
+          melt systems; not primary KEMS ion intensities. Retain for melt-activity inventory; prefer primary
+          extracts when available for the same system.
+      uncertainty:
+        note: range endpoints as printed; compilation from heterogeneous methods/labs
+  V:
+    observations:
+    - observation_id: sossi_fegley_2018_table2_gamma_V__V_2O_3_
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        table: '2'
+        paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
+      T_range_K:
+      - 1900.0
+      - 2100.0
+      phase: complex_silicate_melt_CMASCMASCMAS
+      standard_state: oxide activity coefficient as compiled by Sossi & Fegley 2018 from cited primaries
+      regime: compiled_melt_activity
+      units: dimensionless γ as published range
+      values:
+        quantity: activity_coefficient_range
+        oxide_formula_as_published: $V_2O_3$
+        melt_composition_as_published: CMASCMASCMAS
+        gamma_range_as_published: 1.2–20.80.3–5.20.05–1.65
+        temperature_as_published: '190020002100'
+        references_as_published: Wang et al. 2010
+        condensed_phase: complex_silicate_melt
+        compilation_note: Secondary compilation (review chapter). Values are literature ranges over stated
+          melt systems; not primary KEMS ion intensities. Retain for melt-activity inventory; prefer primary
+          extracts when available for the same system.
+      uncertainty:
+        note: range endpoints as printed; compilation from heterogeneous methods/labs
+  WO2:
+    observations:
+    - observation_id: sossi_fegley_2018_table2_gamma_WO2__WO_2_
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        table: '2'
+        paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
+      T_range_K:
+      - 1673.0
+      - 1673.0
+      phase: complex_silicate_melt_CMAS
+      standard_state: oxide activity coefficient as compiled by Sossi & Fegley 2018 from cited primaries
+      regime: compiled_melt_activity
+      units: dimensionless γ as published range
+      values:
+        quantity: activity_coefficient_range
+        oxide_formula_as_published: $WO_2$
+        melt_composition_as_published: CMAS
+        gamma_range_as_published: 7.4–45* * $\log\gamma WO_2$ = $\log\gamma MoO_2$ –2.200.02–0.3a*
+        temperature_as_published: '1673'
+        references_as_published: O’Neill et al. 2008
+        condensed_phase: complex_silicate_melt
+        compilation_note: Secondary compilation (review chapter). Values are literature ranges over stated
+          melt systems; not primary KEMS ion intensities. Retain for melt-activity inventory; prefer primary
+          extracts when available for the same system.
+      uncertainty:
+        note: range endpoints as printed; compilation from heterogeneous methods/labs
+  WO3:
+    observations:
+    - observation_id: sossi_fegley_2018_table2_gamma_WO3__WO_3_
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        table: '2'
+        paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
+      T_range_K:
+      - 1673.0
+      - 1923.0
+      phase: complex_silicate_melt__CMAS_a_b_
+      standard_state: oxide activity coefficient as compiled by Sossi & Fegley 2018 from cited primaries
+      regime: compiled_melt_activity
+      units: dimensionless γ as published range
+      values:
+        quantity: activity_coefficient_range
+        oxide_formula_as_published: $WO_3$
+        melt_composition_as_published: $CMAS^{a,b}$
+        gamma_range_as_published: '* $\log\gamma WO_3$ = $\log\gamma MoO_3$ –1.42≈0.001–0.05b'
+        temperature_as_published: 1673a1923b
+        references_as_published: aO’Neill et al. 2008bWood & Wade 2013
+        condensed_phase: complex_silicate_melt
+        compilation_note: Secondary compilation (review chapter). Values are literature ranges over stated
+          melt systems; not primary KEMS ion intensities. Retain for melt-activity inventory; prefer primary
+          extracts when available for the same system.
+      uncertainty:
+        note: range endpoints as printed; compilation from heterogeneous methods/labs
+  Zn:
+    observations:
+    - observation_id: sossi_fegley_2018_table2_gamma_Zn_ZnO
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        table: '2'
+        paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
+      T_range_K:
+      - 1673.0
+      - 1823.0
+      phase: complex_silicate_melt_CAS
+      standard_state: oxide activity coefficient as compiled by Sossi & Fegley 2018 from cited primaries
+      regime: compiled_melt_activity
+      units: dimensionless γ as published range
+      values:
+        quantity: activity_coefficient_range
+        oxide_formula_as_published: ZnO
+        melt_composition_as_published: CAS
+        gamma_range_as_published: 0.25–0.58
+        temperature_as_published: 1673–1823
+        references_as_published: Reyes & Gaskell 1983
+        condensed_phase: complex_silicate_melt
+        compilation_note: Secondary compilation (review chapter). Values are literature ranges over stated
+          melt systems; not primary KEMS ion intensities. Retain for melt-activity inventory; prefer primary
+          extracts when available for the same system.
+      uncertainty:
+        note: range endpoints as printed; compilation from heterogeneous methods/labs
+  SiO:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_pure_oxide_vapour_speciation_index
+      type: rate_series
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        table: '1'
+        paragraph: metal bearing gases in the saturated vapour over ~80 pure oxides
+      T_range_K:
+      - 1000.0
+      - 2500.0
+      phase: pure_metal_oxides_solid_or_liquid
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series transcribed this pass)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        condensed_phase: pure_oxide_not_melt
+        note: Table 1 compiles dominant metal-bearing gas species over ~77–80 pure oxides. This is PURE-OXIDE
+          context, not melt. Useful for carrier identity ladder; absolute P not bulk-transcribed in this
+          multicarrier-mine pass (table is long). Do not treat pure-oxide carriers as melt partial pressures.
+        distinct_from_table2: Table 2 = melt activity coefficients; Table 1 = pure oxide vapour speciation
+fidelity_samples:
+- path: species.Fe.observations[sossi_fegley_2018_table2_gamma_Fe_FeO].values.gamma_range_as_published
+  value: 0.6–2.3 $^{a}$ 1.2–2.1 $^{b}$ 0.9–1.8 $^{c}$ ≈0.5–2.5 $^{d}$
+  note: Table 2 FeO activity coefficient range as printed
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+    table: '2'
+- path: species.SiO2.observations[sossi_fegley_2018_table2_gamma_SiO2__SiO_2_].values.gamma_range_as_published
+  value: 0.9–1.1
+  note: Table 2 SiO2 γ 0.9–1.1 CMAS
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+    table: '2'
+- path: species.TiO2.observations[sossi_fegley_2018_table2_gamma_TiO2__TiO_2_].values.gamma_range_as_published
+  value: 1.5–1.7
+  note: Table 2 TiO2 γ
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+    table: '2'

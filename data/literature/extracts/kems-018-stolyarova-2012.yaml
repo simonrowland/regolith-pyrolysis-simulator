@@ -1,0 +1,105 @@
+schema_version: literature_extract.v1
+source_id: kems-018-stolyarova-2012
+source:
+  citation: Stolyarova, V. (2012), "Thermodynamic properties and vaporization processes of the ionic silicate
+    melts" — review; Table 1 vapour composition over ternary ionic silicate systems
+  year: 2012
+extraction:
+  method: 'OCR MinerU. Review paper: Table 1 species map; figures are iso-activity contours (not digitizable
+    absolute series without inventing). No numeric partial-pressure tables in OCR. Extracted species map
+    only.'
+  date: '2026-08-04'
+  worker: mine-multicarrier-gk
+  provenance_path: docs-private/research/ocr-artifacts/kems-018-stolyarova-2012/
+review_status: draft
+species:
+  SiO:
+    observations:
+    - observation_id: stolyarova_2012_ternary_ionic_silicate_vapour_map_table1
+      type: rate_series
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-018-stolyarova-2012/spool/out/kems-018-stolyarova-2012/vlm/kems-018-stolyarova-2012.md
+        table: '1'
+        paragraph: Composition of vapour over ternary ionic silicate systems studied
+      T_range_K:
+      - 900.0
+      - 2500.0
+      phase: ternary_ionic_silicate_melts
+      regime: kems_effusion
+      units: none (species names only)
+      values:
+        quantity: vapour_species_map_no_numeric_pressures
+        semantics: bound_not_point_ordering
+        condensed_phase: silicate_melt
+        note: 2012 review Table 1 is species map (parallel to 2013). Iso-activity figures (e.g. MgO, PbO)
+          not transcribed as numbers. No absolute p series in OCR.
+        systems:
+        - system: $Na_{2}O-B_{2}O_{3}-SiO_{2}$
+          T_K_as_published: '1200'
+          vapour_species_as_published: $NaBO_{2}, (NaBO_{2})_{2}, B_{2}O_{3}$
+          references: '[23, 24]'
+        - system: $Cs_{2}O-B_{2}O_{3}-SiO_{2}$
+          T_K_as_published: '1020'
+          vapour_species_as_published: $CsBO_{2}, (CsBO_{2})_{2}, B_{2}O_{3}$
+          references: '[8, 25]'
+        - system: $Rb_{2}O-B_{2}O_{3}-SiO_{2}$
+          T_K_as_published: '900'
+          vapour_species_as_published: $RbBO_{2}, (RbBO_{2})_{2}, B_{2}O_{3}$
+          references: '[26]'
+        - system: $MgO-B_{2}O_{3}-SiO_{2}$
+          T_K_as_published: 1550-1800
+          vapour_species_as_published: $MgBO_{2}, MgB_{2}O_{4}, B_{2}O_{3}, SiO, O_{2}$
+          references: '[9, 27]'
+        - system: $CaO-B_{2}O_{3}-SiO_{2}$
+          T_K_as_published: '1800'
+          vapour_species_as_published: $CaBO_{2}, CaB_{2}O_{4}, B_{2}O_{3}, SiO, O_{2}$
+          references: '[28, 29]'
+        - system: $SrO-B_{2}O_{3}-SiO_{2}$
+          T_K_as_published: '1720'
+          vapour_species_as_published: $SrBO_{2}, SrB_{2}O_{4}, B_{2}O_{3}, SiO, O_{2}$
+          references: '[9, 29, 30]'
+        - system: $BaO-B_{2}O_{3}-SiO_{2}$
+          T_K_as_published: '1650'
+          vapour_species_as_published: $BaBO_{2}, BaB_{2}O_{4}, B_{2}O_{3}, SiO, O_{2}$
+          references: '[9, 29, 31]'
+        - system: $PbO-B_{2}O_{3}-SiO_{2}$
+          T_K_as_published: '1100'
+          vapour_species_as_published: $PbO, Pb, O_{2}$
+          references: '[32]'
+        - system: $ZnO-B_{2}O_{3}-SiO_{2}$
+          T_K_as_published: '1100'
+          vapour_species_as_published: $Zn, O_{2}$
+          references: '[32]'
+        - system: $MgO-Al_{2}O_{3}-SiO_{2}$
+          T_K_as_published: 1770-1940
+          vapour_species_as_published: $Mg, SiO, O_{2}$
+          references: '[8, 33]'
+        - system: $CaO-Al_{2}O_{3}-SiO_{2}$
+          T_K_as_published: 1800-2000
+          vapour_species_as_published: $Ca, CaO, CaSiO_{3}, AlSiO, Al, AlO, SiO, O_{2}$
+          references: '[7, 34-36]'
+        - system: $CaO-TiO_{2}-SiO_{2}$
+          T_K_as_published: 1800-2000
+          vapour_species_as_published: $Ca, CaO, TiO_{2}, TiO, SiO, O_{2}$
+          references: '[7, 36-38]'
+        - system: $BaO-TiO_{2}-SiO_{2}$
+          T_K_as_published: 1800-2000
+          vapour_species_as_published: $Ba, BaO, TiO_{2}, TiO, SiO, O_{2}$
+          references: '[7, 36, 39]'
+        numeric_partial_pressure_tables_in_ocr: false
+        figures_with_activity_contours:
+        - Fig. 3 iso-activity MgO in MgO-B2O3-SiO2 at 1623 K
+        - Fig. 5 iso-activity PbO in PbO-B2O3-SiO2
+fidelity_samples:
+- path: species.SiO.observations[stolyarova_2012_ternary_ionic_silicate_vapour_map_table1].values.numeric_partial_pressure_tables_in_ocr
+  value: false
+  note: confirmed no numeric P tables
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-018-stolyarova-2012/spool/out/kems-018-stolyarova-2012/vlm/kems-018-stolyarova-2012.md
+    table: '1'
+- path: species.SiO.observations[stolyarova_2012_ternary_ionic_silicate_vapour_map_table1].values.systems[0].system
+  value: $Na_{2}O-B_{2}O_{3}-SiO_{2}$
+  note: first Table 1 system
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-018-stolyarova-2012/spool/out/kems-018-stolyarova-2012/vlm/kems-018-stolyarova-2012.md
+    table: '1'
