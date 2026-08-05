@@ -32,7 +32,9 @@ METALLIC_TAP_DECLARED_ACCOUNTS = frozenset({
 })
 PINNED_NATIVE_FE_MIGRATION_GOLDENS = {
     "lunar_mare_low_ti": {
-        "native_fe_mol": 1610.7768609700126,
+        # 2026-08-05 MC-1 trace wiring d1b4f5d: Co/Ni/S/Cl passengers shift
+        # the lunar cleaned-melt basis; migration routing assertions below stay.
+        "native_fe_mol": 1607.3611432553353,
         "native_vapor_Fe_kg": 0.1682078458614615,
     },
     "mars_basalt": {

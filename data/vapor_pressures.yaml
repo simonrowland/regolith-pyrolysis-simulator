@@ -7399,7 +7399,9 @@ families:
       acquisition_flag: vapour_pressure_pending_acquisition:Pb
     code_metadata:
       formula_id: Pb
-      source_account: process.stage0_foulant
+      # MC-1 (d1b4f5d): cited elemental Pb is retained in the cleaned-melt
+      # inert partition; keep the dormant rule account-aligned with inventory.
+      source_account: process.cleaned_melt
       request_rule: dormant_pending_validation
       solve_group_id: metal_trace_Pb_family
       compatibility_projection: dormant_acquisition
@@ -8168,7 +8170,9 @@ families:
       acquisition_flag: vapour_pressure_pending_acquisition:Bi
     code_metadata:
       formula_id: Bi
-      source_account: process.stage0_foulant
+      # MC-1 (d1b4f5d): cited elemental Bi is retained in the cleaned-melt
+      # inert partition; keep the dormant rule account-aligned with inventory.
+      source_account: process.cleaned_melt
       request_rule: dormant_pending_validation
       solve_group_id: metal_trace_Bi_family
       compatibility_projection: dormant_acquisition

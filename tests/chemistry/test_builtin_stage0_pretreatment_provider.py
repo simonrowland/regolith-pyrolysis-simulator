@@ -1169,7 +1169,9 @@ def test_full_batch_stage0_kernel_routes_to_declared_accounts_lunar(
     salt = sim.atom_ledger.kg_by_account("terminal.stage0_salt_phase")
     matte = sim.atom_ledger.kg_by_account("terminal.stage0_sulfide_matte")
     assert not salt
-    assert not matte
+    # 2026-08-05 MC-1 trace wiring d1b4f5d: lunar low-Ti now carries
+    # 0.7190121804730926 kg feedstock S into the declared Stage-0 matte account.
+    assert matte == pytest.approx({"S": 0.7190121804730926})
 
 
 def test_full_batch_stage0_kernel_credits_mars_perchlorate_to_declared_accounts(

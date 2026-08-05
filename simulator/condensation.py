@@ -1786,6 +1786,7 @@ class CondensationModel:
         wall_surface_area_m2: float | None = None,
         wall_temperature_C: float = DEFAULT_PIPE_TEMPERATURE_C,
         materials: Mapping[str, Any] | None = None,
+        species_formula_registry: Mapping[str, Any] | None = None,
     ):
         self.train = train
         # Owner-boundary projection: schema-v2 → legacy view once so the
@@ -1809,6 +1810,7 @@ class CondensationModel:
         self.materials = copy.deepcopy(
             materials if materials is not None else MATERIALS_DATA
         )
+        self.species_formula_registry = species_formula_registry or {}
 
         # 0.5.4.1 review-cluster-C (P2 #1, evening-4commits review):
         # per-instance per-species condensation temperatures so each

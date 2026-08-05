@@ -154,7 +154,14 @@ def test_tc8_si_target_mre_policy_splits_cache_key_and_internal_analytical_outco
         CANONICAL_SIO2_MRE_CAP_V
     )
 
-    assert _product_ledger(off) == {}
+    # 2026-08-05 MC-1 trace wiring d1b4f5d: these Stage-0 products exist for
+    # both policies and are orthogonal to the C5 Si-target cache-key contract.
+    assert _product_ledger(off) == pytest.approx({
+        "Cl": 0.015407403867280558,
+        "Co": 0.035950609023654635,
+        "Ni": 0.20543205156374078,
+        "S": 0.7190121804730926,
+    })
     assert _product_ledger(si_target) != _product_ledger(off)
     assert _product_ledger(si_target)["Si"] > 0.0
     assert "Na" not in _product_ledger(si_target)

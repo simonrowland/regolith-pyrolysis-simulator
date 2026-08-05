@@ -1913,26 +1913,26 @@ def test_full_tick_pins_failed_authority_and_poisoned_retry(
 
     assert per_operation_calls == 2
     assert mixed_transition.name == 'fe_redox_respeciation'
-    # K-01 complete Kress91 re-reference lowers the target fO2 shift in this
-    # mixed liquidus gate probe; the liquid-fraction authority remains pinned.
+    # 2026-08-05 MC-1 trace wiring d1b4f5d moves the lunar cleaned-melt basis;
+    # the Kress91 authority, stoichiometry, and liquid-fraction gate stay pinned.
     assert per_operation_sim._transition_species_mol(
         mixed_transition,
         side='debits',
         account=_CLEANED_MELT_ACCOUNT,
         species='FeO',
-    ) == pytest.approx(694.169, rel=2.0e-3)
+    ) == pytest.approx(692.7019354810523, rel=2.0e-3)
     assert per_operation_sim._transition_species_mol(
         mixed_transition,
         side='credits',
         account=_CLEANED_MELT_ACCOUNT,
         species='Fe2O3',
-    ) == pytest.approx(347.085, rel=2.0e-3)
+    ) == pytest.approx(346.35096774052613, rel=2.0e-3)
     assert per_operation_sim._transition_species_mol(
         mixed_transition,
         side='debits',
         account='process.overhead_gas',
         species='O2',
-    ) == pytest.approx(173.542, rel=2.0e-3)
+    ) == pytest.approx(173.17548387026307, rel=2.0e-3)
     assert (
         per_operation_sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log + 3.0
     ) == pytest.approx(0.733213, rel=2.0e-3)

@@ -201,7 +201,10 @@ def test_control_quantization_default_production_key_is_byte_identical() -> None
     # 2026-07-18 outward mol projection completeness: PT0 now projects every
     # live ledger account before canonicalizing provider overrides, so the
     # source-module identity advances without changing quantization tolerances.
-    assert key_hash == "cbb53f105da263c36047ae30e827c2bf754348bb000bf76c1ddef29657b70fcb"
+    # 2026-08-05 batch data fold (1a1ab47, 7e6bebc, d1b4f5d): the parsed
+    # carrier/P catalogs and MC-1 feedstock payloads are deliberate key inputs.
+    # Two in-process evaluations and the cross-process test pin determinism.
+    assert key_hash == "aa4dd3b20f35e622b503841d42cc094556dea5607ebbd4ec91f2257fda19358b"
     assert canonical_json_bytes(fine_key) == canonical_json_bytes(key)
     assert _key_hash(fine_key) == key_hash
 
@@ -1355,16 +1358,6 @@ def test_pt2_persistent_physics_bucket_hit_is_not_cached_exact(tmp_path: Path) -
         def get_engine_version(self) -> str:
             return "non-stub-test"
 
-    class ReplayOnlySulfsatGate:
-        def is_available(self) -> bool:
-            return False
-
-        def package_version(self) -> str:
-            return "exact-only-replay"
-
-        def calibration_version(self) -> str:
-            return "exact-only-replay"
-
     db_path = tmp_path / "pt1.sqlite"
     provider = _CountingSilicateEquilibriumProvider(
         provider_id="alphamelts-diagnostic",
@@ -1399,7 +1392,10 @@ def test_pt2_persistent_physics_bucket_hit_is_not_cached_exact(tmp_path: Path) -
         provider,
         [ChemistryIntent.SILICATE_EQUILIBRIUM],
     )
-    replay_sim._sulfsat_gate = ReplayOnlySulfsatGate()
+    # 2026-08-05 MC-1 trace wiring d1b4f5d adds real lunar S inventory, making
+    # SulfSat availability part of the physical bucket. Split only the exact
+    # replay key with a vapor-transport control that equilibrium does not consume.
+    replay_sim._vapor_pressure_dispatch_pO2_bar = lambda: 1.0e-8
 
     capture_key = capture_store.capture_sequence[-1]["key"]
     replay_key = replay_store._equilibrium_key(replay_sim)

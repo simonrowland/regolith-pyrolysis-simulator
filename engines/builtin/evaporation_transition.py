@@ -87,6 +87,9 @@ from simulator.chemistry.kernel.dto import (
 from simulator.chemistry.kernel.provider import ChemistryProvider
 
 
+_NUMERICAL_FLOOR_KG = 1.0e-12
+
+
 class BuiltinEvaporationTransitionProvider(ChemistryProvider):
     """Authoritative ``EVAPORATION_TRANSITION`` provider.
 
@@ -188,7 +191,10 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         product_kg = rate_kg_hr * dt_hr
         O2_kg = rate_kg_hr * dt_hr * O2_per_product_kg
 
-        if oxide_removed <= 1e-12 or available_kg <= 1e-12:
+        if (
+            oxide_removed <= _NUMERICAL_FLOOR_KG
+            or available_kg <= _NUMERICAL_FLOOR_KG
+        ):
             return IntentResult(
                 intent=ChemistryIntent.EVAPORATION_TRANSITION,
                 status="ok",
@@ -254,6 +260,38 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
             species, condensed_kg, sp_data, registry,
             resolve_species_formula,
         )
+        coupled_leg_kg = {
+            "parent_oxide": oxide_removed,
+            "remaining_vapor": remaining_kg,
+            "oxygen_coproduct": abs(O2_kg),
+            **{
+                f"condensed:{product_species}": (
+                    float(product_mol)
+                    * resolve_species_formula(
+                        product_species,
+                        registry,
+                    ).molar_mass_kg_per_mol()
+                )
+                for product_species, product_mol in condensed_product_mol.items()
+            },
+        }
+        subfloor_legs = {
+            name: kg
+            for name, kg in coupled_leg_kg.items()
+            if 0.0 < kg <= _NUMERICAL_FLOOR_KG
+        }
+        if subfloor_legs:
+            return IntentResult(
+                intent=ChemistryIntent.EVAPORATION_TRANSITION,
+                status="ok",
+                transition=None,
+                control_audit=control_audit,
+                diagnostic={
+                    "credited_condensed_kg": 0.0,
+                    "reason_skipped": "coupled stoichiometric leg below numerical floor",
+                    "subfloor_legs_kg": subfloor_legs,
+                },
+            )
 
         # ------------------------------------------------------------------
         # Build the mol-native proposal. Per-account species_mol dicts:
@@ -270,15 +308,18 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         if oxide_mol > 0.0:
             debits["process.cleaned_melt"] = {parent_oxide: oxide_mol}
 
-        if condensed_kg > 1e-12 and condensed_product_mol:
+        # Once the parent debit clears the transition floor, retain every
+        # positive stoichiometric leg. Dropping a smaller coproduct here makes
+        # individually admitted carrier transitions lose atoms cumulatively.
+        if condensed_kg > 0.0 and condensed_product_mol:
             credits["process.condensation_train"] = dict(condensed_product_mol)
 
         overhead_credit: dict[str, float] = {}
-        if remaining_kg > 1e-12:
+        if remaining_kg > 0.0:
             overhead_credit[species] = (
                 remaining_kg / vapor_formula.molar_mass_kg_per_mol()
             )
-        if O2_kg > 1e-12:
+        if O2_kg > 0.0:
             o2_formula = resolve_species_formula("O2", registry)
             o2_mol = O2_kg / o2_formula.molar_mass_kg_per_mol()
             if (
@@ -293,7 +334,7 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
                 overhead_credit["O2"] = o2_mol
         if overhead_credit:
             credits["process.overhead_gas"] = overhead_credit
-        if O2_kg < -1e-12:
+        if O2_kg < 0.0:
             o2_formula = resolve_species_formula("O2", registry)
             overhead_debit = debits.setdefault("process.overhead_gas", {})
             overhead_debit["O2"] = (

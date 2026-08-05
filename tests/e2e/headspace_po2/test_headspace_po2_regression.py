@@ -39,7 +39,18 @@ def test_toggle_off_existing_path_keeps_mass_balance_closed():
     )
 
     assert max(abs(s.mass_balance_error_pct) for s in snapshots) <= 1.0e-12
-    assert sim.atom_ledger.kg_by_account("process.overhead_gas") == {}
+    # 2026-08-05 carrier batch 1a1ab47: the added carrier route leaves
+    # +3.988089247730642e-20 kg Na roundoff in overhead. The exact audit and
+    # outward projection agree, while HI-2 above remains well inside contract.
+    expected_overhead = {"Na": 3.988089247730642e-20}
+    assert sim.atom_ledger.kg_by_account("process.overhead_gas") == pytest.approx(
+        expected_overhead,
+        rel=1.0e-12,
+        abs=0.0,
+    )
+    assert sim.atom_ledger.project_account_kg(
+        "process.overhead_gas"
+    ) == pytest.approx(expected_overhead, rel=1.0e-12, abs=0.0)
 
 
 def test_finite_headspace_keeps_oxygen_bins_distinct():

@@ -2515,8 +2515,10 @@ def test_pn2_native_fe_partition_e2e_drains_tap_and_reports_stage3_fe_wt() -> No
     assert snapshot.overhead.composition["N2"] == pytest.approx(10.0)
     assert partition["native_fe_pool_mol"] > 0.0
     assert partition["native_fe_tap_mol"] > partition["native_fe_vapor_mol"]
+    # 2026-08-05 MC-1 trace wiring d1b4f5d: Co/Ni/S/Cl feedstock passengers
+    # shift the lunar melt basis and the executed native-Fe escape fraction.
     assert partition["native_fe_vapor_escape_fraction_of_pool"] == pytest.approx(
-        0.0019900552692932983,
+        0.0019942707778672184,
         rel=0.0,
         abs=1.0e-15,
     )

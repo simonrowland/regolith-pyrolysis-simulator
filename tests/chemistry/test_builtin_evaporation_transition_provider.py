@@ -383,6 +383,26 @@ def test_provider_emits_expected_proposal_for_known_inputs(
             f"atom_balance_proof[{element!r}] = {net} is not zero"
         )
 
+    # The parent debit can clear the 1e-12 kg transition floor while its O2
+    # coproduct is smaller. The whole coupled transition must then stay out of
+    # the ledger or repeated carrier transitions accumulate an oxygen deficit.
+    tiny_controls = dict(request.control_inputs)
+    tiny_controls["rate_kg_hr"] = 2.0e-12
+    tiny_result = provider.dispatch(IntentRequest(
+        intent=ChemistryIntent.EVAPORATION_TRANSITION,
+        account_view=view,
+        temperature_C=1500.0,
+        pressure_bar=1e-6,
+        control_inputs=tiny_controls,
+    ))
+    assert tiny_result.transition is None
+    assert tiny_result.diagnostic["reason_skipped"] == (
+        "coupled stoichiometric leg below numerical floor"
+    )
+    assert tiny_result.diagnostic["subfloor_legs_kg"] == pytest.approx({
+        "oxygen_coproduct": 2.0e-12 * canonical_stoich["O2_per_product_kg"],
+    })
+
 
 # ---------------------------------------------------------------------------
 # 5. Smoke parity: full C0 -> C6 run keeps mass balance + non-zero count

@@ -84,6 +84,9 @@ def test_account_vector_uses_exact_builtin_tuple_and_sorted_extensions():
 
 
 def test_cache_identity_golden_matches_executable_generators():
+    # 2026-08-05 batch data fold (1a1ab47, 7e6bebc, d1b4f5d): regenerated via
+    # scripts/regenerate_cache_identity_goldens.py after functional data hashes
+    # advanced for carrier/P catalogs and MC-1 feedstock trace payloads.
     expected = json.loads(
         regenerate_cache_identity_goldens.GOLDEN.read_text(encoding="utf-8")
     )

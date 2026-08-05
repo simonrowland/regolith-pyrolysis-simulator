@@ -1051,7 +1051,10 @@ class OverheadGasModel:
         # ── Product partial pressures (proportional to evaporation rates) ──
         if total_evap_kg_hr > 0:
             gas.composition.update(self.species_partial_pressures(
-                evap_flux, vapor_pressure_mbar))
+                evap_flux,
+                vapor_pressure_mbar,
+                self.species_formula_registry,
+            ))
 
         # Controlled/background atmosphere partial pressures.
         atmosphere_name = getattr(melt.atmosphere, 'name', '')

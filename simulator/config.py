@@ -12,7 +12,7 @@ import math
 from pathlib import Path
 from typing import Any
 
-import yaml
+from simulator.yaml_cache import load_cached_safe_yaml
 
 
 DEFAULT_DATA_DIR = Path(__file__).resolve().parent.parent / "data"
@@ -122,7 +122,11 @@ def _parse_required_yaml(
     functional_digest: bool,
     path: Path,
 ) -> tuple[dict[str, Any], str]:
-    parsed = yaml.safe_load(raw.decode("utf-8"))
+    digest = sha256(raw).hexdigest()
+    parsed = load_cached_safe_yaml(
+        raw.decode("utf-8"),
+        content_sha256=digest,
+    )
     if not isinstance(parsed, dict):
         raise TypeError(
             f"required config file must have a mapping root: {path}; "
@@ -134,7 +138,7 @@ def _parse_required_yaml(
         # and a real root-structure change cannot collide. Neutral for real mappings.
         functional_data_yaml_digest(parsed)
         if functional_digest
-        else sha256(raw).hexdigest()
+        else digest
     )
     return parsed, digest
 

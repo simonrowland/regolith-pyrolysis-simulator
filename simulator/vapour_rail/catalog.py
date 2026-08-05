@@ -24,6 +24,8 @@ from typing import Any
 
 import yaml
 
+from simulator.yaml_cache import load_cached_safe_yaml
+
 from simulator.alpha_kinetics import AlphaSpecError, parse_alpha_contract
 from simulator.vapour_rail.activity import (
     ActivityInputDeclaration,
@@ -127,7 +129,10 @@ def _load_thermo_extract(source_id: str, *, field: str) -> Mapping[str, Any]:
         _THERMO_EXTRACT_PARSE_CACHE[source_id] = (signature, digest, cached[2])
         return cached[2]
     try:
-        parsed = yaml.safe_load(raw)
+        parsed = load_cached_safe_yaml(
+            raw,
+            content_sha256=digest,
+        )
     except yaml.YAMLError as exc:
         raise CatalogCompileError(
             f"{field}: cannot parse thermo extract {source_id!r}"

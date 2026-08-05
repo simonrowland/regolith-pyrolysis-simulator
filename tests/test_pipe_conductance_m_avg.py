@@ -148,6 +148,19 @@ def test_catalog_generated_carriers_reach_overhead_partial_pressures():
 
     assert partials == pytest.approx({"TiO2_gas": 50.0, "CaO_gas": 50.0})
 
+    model = OverheadGasModel(
+        {"enabled": False},
+        species_formula_registry=registry,
+    )
+    melt = MeltState()
+    melt.temperature_C = 1500.0
+    gas = model.update(flux, melt, CondensationTrain.create_default())
+    assert set(gas.composition) == {"TiO2_gas", "CaO_gas"}
+    assert gas.composition["TiO2_gas"] > 0.0
+    assert gas.composition["TiO2_gas"] == pytest.approx(
+        gas.composition["CaO_gas"]
+    )
+
 
 def test_pure_kr_returns_kr_molar_mass_without_fallback():
     M_avg = _mean_molar_mass_kg_mol({"Kr": 1.0})

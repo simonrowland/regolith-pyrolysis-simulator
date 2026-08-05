@@ -1089,6 +1089,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 vapor_pressure_data=self.vapor_pressure_catalog_data,
                 wall_temperature_C=self.overhead_model.pipe_temperature_C,
                 materials=self.materials,
+                species_formula_registry=self.species_formula_registry,
             )
             self._condensation_model.apply_setpoints_overrides(
                 self.setpoints
@@ -2071,6 +2072,38 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'canonicalization support'
                 )
             account_mol_overrides = canonicalizer(self)
+        if intent in {
+            ChemistryIntent.SILICATE_LIQUIDUS,
+            ChemistryIntent.SILICATE_EQUILIBRIUM,
+            ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
+            ChemistryIntent.GATE_LIQUID_FRACTION,
+        }:
+            inert_species = set(
+                (getattr(self.inventory, 'inert_melt_components_kg', {}) or {})
+            )
+            if account_mol_overrides is None:
+                cleaned_melt_mol = self.atom_ledger.project_account_mol(
+                    'process.cleaned_melt'
+                )
+                account_mol_overrides = {
+                    'process.cleaned_melt': cleaned_melt_mol,
+                }
+            else:
+                account_mol_overrides = {
+                    account: dict(species_mol)
+                    for account, species_mol in account_mol_overrides.items()
+                }
+            # MC-1 keeps cited refractory traces in the mol-native melt ledger,
+            # but they are outside silicate-engine chemistry. Preserve their
+            # inventory while excluding only that explicit inert partition from
+            # AlphaMELTS/MAGEMin diagnostic account views.
+            account_mol_overrides['process.cleaned_melt'] = {
+                species: float(mol)
+                for species, mol in account_mol_overrides.get(
+                    'process.cleaned_melt', {}
+                ).items()
+                if species not in inert_species and float(mol) > 0.0
+            }
         if (
             intent is ChemistryIntent.METALLOTHERMIC_STEP
             and temperature_C_override is None
@@ -12110,10 +12143,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # --- 5. Condensation routing ---
         # Send evaporated species through the 8-stage train.
         # Each stage collects species based on its temperature.
+        self._ledger_committed_evap_flux_this_tick = evap_flux
         if evap_flux.total_kg_hr > 0:
             self._configure_condensation_operating_conditions(evap_flux)
             self._apply_lab_surface_temperatures(sample_time_h=sample_time_h)
             overhead_flux = self._route_to_condensation(evap_flux)
+            evap_flux = self._ledger_committed_evap_flux_this_tick
+            effective_transport_capacity = (
+                self._controlled_o2_transport_capacity(evap_flux)
+            )
+            self._effective_transport_capacity_this_tick = (
+                effective_transport_capacity
+            )
         self._pending_knudsen_zero_overhead_flow_marker = None
 
         # --- 6. Update melt composition ---
@@ -12202,6 +12243,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self.overhead_model.species_partial_pressures(
                 evap_flux,
                 upstream_transport['vapor_pressure_mbar'],
+                self.species_formula_registry,
             )
         )
         if capacity_result is not None and effective_transport_capacity is None:

@@ -174,11 +174,17 @@ def test_pc_extract_al_blocks_when_campaign_set_lacks_c6(
         == 0
     )
 
-    profile = yaml.safe_load(out.read_text())
-    assert profile["status"] == "BLOCKED"
-    assert profile["target_id"] == "pc-extract-al"
-    assert profile["blocked_reason"] == "Al reachable via C6 thermite - row lacks C6"
-    assert profile["disposition"]["kind"] == "missing_extraction_mechanism"
+    profile = validate_profile(
+        yaml.safe_load(out.read_text()),
+        expected_feedstock="lunar_mare_low_ti",
+        source=out,
+    )
+    target = profile["objectives"][0]["target"]
+    assert target["extraction"]["completeness_min"]["Al"] == pytest.approx(1.0)
+    # Regrounded after carrier batch 1a1ab47: explicit AlO/Al2O volatility
+    # makes Al thermally reachable in C2B; C6 thermite is no longer the sole
+    # extraction mechanism for this menu row.
+    assert target["extraction"]["mechanisms"]["Al"] == "thermal_volatilization"
 
 
 def test_pc_extract_fe_is_askable_via_c3_shuttle(

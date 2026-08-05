@@ -71,11 +71,11 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
             .setpoints
         )
     ).encode()
-    # VR-11 expanded the Al/Ti operator-routing provenance stored in setpoints.
-    # The resolved full-config serialization includes that metadata, so this
-    # pin moves while the empty recipe/setpoints patch bytes remain neutral.
+    # Recomputed after phosphorus batch 7e6bebc: its C0b-P controls changed
+    # data/setpoints.yaml, the sole batch input serialized by this resolved
+    # setpoints digest. Empty recipe/setpoints patch bytes remain neutral.
     assert hashlib.sha256(resolved).hexdigest() == (
-        "9f49a813ecf0fb079e7eaa64fb1ed8274a19f7b1037a8e7b419fbf4a0c79c3c2"
+        "cf07d358722e3d29effdca1d18a1b700733c1ba421c8ddc96a54ee0448b7ad45"
     )
     assert schema.bounds_digest == (
         "5a5aba76747df5b17a0dc98ce81eb47bccf045687394656f55474ca60ecd9184"

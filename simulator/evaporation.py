@@ -2563,8 +2563,10 @@ class EvaporationMixin:
 
         Returns an :class:`EvaporationFlux` containing only this tick's vapor
         that remains free in ``process.overhead_gas`` after all committed
-        baffle, wall, and retained-holdup routing. Melt depletion still uses
-        the original full evolved flux at the caller.
+        baffle, wall, and retained-holdup routing. The separately recorded
+        ``_ledger_committed_evap_flux_this_tick`` excludes any carrier whose
+        coupled transition was rejected at the numerical floor; the caller
+        uses that committed flux for reporting, transport, and energy.
 
         End-of-tick ledger state is identical to the pre-flip behaviour:
         between the two kernel commits the vapor passes through
@@ -2588,6 +2590,7 @@ class EvaporationMixin:
                     self.overhead_model.species_partial_pressures(
                         evap_flux,
                         transport['vapor_pressure_mbar'],
+                        self.species_formula_registry,
                     )
                 ),
                 pipe_diameter_m=self.overhead_model.pipe_diameter_m,
@@ -2673,6 +2676,7 @@ class EvaporationMixin:
             species: max(0.0, float(rate_kg_hr) * phase_scalar)
             for species, rate_kg_hr in evap_flux.species_kg_hr.items()
         }
+        committed_species_kg_hr: dict[str, float] = {}
         for species in species_order:
             if species not in evap_flux.species_kg_hr:
                 continue
@@ -2683,11 +2687,13 @@ class EvaporationMixin:
                 )
                 or 0.0
             )
-            self._route_evaporated_species_to_condensation(
+            route_outcome = self._route_evaporated_species_to_condensation(
                 route_result,
                 species,
                 rate_kg_hr,
             )
+            if route_outcome.get('evaporation_transition') is not None:
+                committed_species_kg_hr[species] = rate_kg_hr
             overhead_after_kg = float(
                 self.atom_ledger.kg_by_account('process.overhead_gas').get(
                     species, 0.0,
@@ -2706,6 +2712,12 @@ class EvaporationMixin:
             )
 
         self._sync_oxygen_kg_counters()
+
+        committed_flux = EvaporationFlux(
+            species_kg_hr=committed_species_kg_hr,
+        )
+        committed_flux.update_totals()
+        self._ledger_committed_evap_flux_this_tick = committed_flux
 
         residual_flux = EvaporationFlux(
             species_kg_hr=residual_species_kg_hr,

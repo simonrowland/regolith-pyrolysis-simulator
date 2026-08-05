@@ -102,7 +102,6 @@ def _series_resistance_reference_flux(
         assert M_g_mol is not None, species
         M_kg_mol = M_g_mol / 1000.0
         stoich = sim._evaporation_stoich(species, sp_data)
-        P_ambient_Pa = sim._evaporation_bulk_partial_pressure_pa(species)
         alpha = alpha_s(
             species,
             T_K,
@@ -114,6 +113,14 @@ def _series_resistance_reference_flux(
         kernel_config = dict(sim.setpoints.get("chemistry_kernel", {}) or {})
         series_config = dict(
             kernel_config.get("evaporation_series_resistance", {}) or {}
+        )
+        gas_resistance_enabled = bool(
+            series_config.get("gas_resistance_enabled", True)
+        )
+        P_ambient_Pa = (
+            sim._evaporation_bulk_partial_pressure_pa(species)
+            if gas_resistance_enabled
+            else 0.0
         )
         carrier_resolver = getattr(sim, "_resolve_condensation_carrier_gas", None)
         carrier_gas = carrier_resolver() if callable(carrier_resolver) else "N2"
@@ -142,9 +149,7 @@ def _series_resistance_reference_flux(
                     "disabled:missing-species-state-dependent-melt-transfer-inputs",
                 )
             ),
-            gas_resistance_enabled=bool(
-                series_config.get("gas_resistance_enabled", True)
-            ),
+            gas_resistance_enabled=gas_resistance_enabled,
         ).flux_kg_s_m2
         if J_kg_s_m2 <= 0:
             continue
@@ -976,7 +981,17 @@ def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
         # in 1a6ad25, made batch eligibility authoritative.  CrO2's policy-only
         # alpha row is therefore a typed refusal and is outside this wiring
         # parity comparison; every executable species must still match.
-        assert refused_reference_species <= {"CrO2"}
+        # 2026-08-05 phosphorus carrier activation 7e6bebc adds a C0b cleanup
+        # stage whose declared predicate admits only P2O5-sourced carriers. The
+        # legacy math helper has no stage predicate, so typed non-P refusals are
+        # outside wiring parity exactly as CrO2's incomplete channel already is.
+        c0b_predicate_refusals = refused_reference_species - {"CrO2"}
+        for species in c0b_predicate_refusals:
+            refusal = refusals[species]
+            assert refusal["refusal_code"] == "inapplicable_by_declared_predicate"
+            assert "c0b_p_cleanup admits only P2O5-sourced carrier rules" in (
+                refusal["extra"]["detail"]
+            )
         if "CrO2" in refused_reference_species:
             refusal = refusals["CrO2"]
             assert refusal["refusal_code"] == "missing_channel_contract"
@@ -1006,7 +1021,7 @@ def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
 
     assert steps > 0, f"smoke run for {feedstock_key} executed zero steps"
     if feedstock_key in {"lunar_mare_low_ti", "s_type_asteroid_silicate"}:
-        assert refused_reference_species_seen == {"CrO2"}
+        assert "CrO2" in refused_reference_species_seen
     assert worst_delta_kg_hr <= 1.0, (
         f"worst observed parity delta {worst_delta_kg_hr:.6g} kg/hr is "
         f"suspiciously large for a refactor-only change"
@@ -1161,6 +1176,23 @@ def test_provider_suppresses_ledger_yields_at_transitional_kn_domain():
             gas_temperature_K=2023.15,
         )
     assert ei.value.reason == "viscous_p_bulk_transport_out_of_domain"
+
+
+@pytest.mark.xdist_group("serial")
+def test_provider_transitional_hkl_upper_bound_ignores_viscous_p_bulk():
+    result = _w3_result_with_controls(
+        1.0,
+        overhead_pressure_pa=3.632,
+        overhead_partials_Pa={"Na": 200.0},
+        evaporation_series_resistance={"gas_resistance_enabled": False},
+    )
+
+    assert result.status == "ok"
+    assert result.diagnostic["evaporation_flux_kg_hr"]["Na"] > 0.0
+    diagnostic = result.diagnostic["evaporation_series_resistance"]["Na"]
+    assert diagnostic["r_gas"] == 0.0
+    assert diagnostic["P_bulk_Pa"] == 0.0
+    assert diagnostic["P_eq_Pa"] == pytest.approx(100.0)
 
 
 @pytest.mark.xdist_group("serial")

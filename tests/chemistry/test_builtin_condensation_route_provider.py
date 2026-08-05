@@ -2323,10 +2323,37 @@ def test_full_run_mass_balance_holds_with_kernel_committed_condensation(
     # End-of-batch mass-balance closure: same 5e-12 % bound as
     # test_mass_balance.py and the EVAPORATION_TRANSITION flip test.
     snapshot = sim._make_snapshot()
+    oxygen_terms_by_route: dict[str, list[float]] = {}
+    for transition in transitions:
+        debit_species = sorted({
+            species
+            for lot in transition.debits
+            for species in lot.species_moles_for(registry)
+        })
+        credit_species = sorted({
+            species
+            for lot in transition.credits
+            for species in lot.species_moles_for(registry)
+        })
+        route = (
+            f"{transition.name}:"
+            f"{'+'.join(debit_species)}->{'+'.join(credit_species)}"
+        )
+        oxygen_terms_by_route.setdefault(route, []).append(
+            transition.credit_atom_moles(registry).get("O", 0.0)
+            - transition.debit_atom_moles(registry).get("O", 0.0)
+        )
+    oxygen_drift_by_route = {
+        route: math.fsum(terms)
+        for route, terms in oxygen_terms_by_route.items()
+        if math.fsum(terms) != 0.0
+    }
     assert abs(snapshot.mass_balance_error_pct) < 5e-12, (
         f"feedstock {feedstock_key} mass balance closure "
         f"{snapshot.mass_balance_error_pct:.3e} % exceeds the 5e-12 % "
-        "kernel-path bound"
+        "kernel-path bound; atom_drift="
+        f"{sim.atom_ledger.element_atom_drift_report()['whole_run_boundary_residual_mol_atoms']}; "
+        f"oxygen_drift_by_route={oxygen_drift_by_route}"
     )
 
 

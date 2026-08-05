@@ -17,7 +17,10 @@ from simulator.backend_names import (  # noqa: F401 - re-exported for callers
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     canonical_backend_name,
 )
+from simulator.accounting.exceptions import AccountingError
+from simulator.accounting.formulas import resolve_species_formula
 from simulator.core import PyrolysisSimulator
+from simulator.grind_preflight import STAGE0_INPROCESS_SAFE_FEEDSTOCK_IDS
 from simulator.melt_backend.alphamelts import (
     AlphaMELTSBackend,
     MELTS_MAJOR_OXIDES,
@@ -511,6 +514,31 @@ def _oxide_wt_pct(composition: Mapping[str, Any], oxide: str) -> float:
     return number
 
 
+def _is_declared_trace_component(
+    species: str,
+    trace_rows: Mapping[str, Any] | None,
+) -> bool:
+    """Return whether a non-MELTS component is backed by cited trace data."""
+
+    if not isinstance(trace_rows, Mapping):
+        return False
+    cited_elements = {
+        str(element)
+        for element, row in trace_rows.items()
+        if isinstance(row, Mapping)
+        and str(row.get("basis", "")).strip().lower() == "element"
+        and str(row.get("source", "")).strip()
+    }
+    if not cited_elements:
+        return False
+    try:
+        formula = resolve_species_formula(str(species))
+    except AccountingError:
+        return False
+    non_oxygen_elements = set(formula.elements) - {"O"}
+    return bool(non_oxygen_elements) and non_oxygen_elements <= cited_elements
+
+
 def requires_stage0_subprocess(
     feedstock_id: str | None,
     feedstocks: Mapping[str, Any] | None,
@@ -558,6 +586,7 @@ def real_backend_feedstock_domain_reason(
     composition = feedstock.get("composition_wt_pct")
     if not isinstance(composition, Mapping):
         return None
+    trace_rows = feedstock.get("trace_elements")
     if _melts_major_oxide_sum(composition) <= 0.0:
         return "non_silicate_feedstock"
     if not (
@@ -570,6 +599,10 @@ def real_backend_feedstock_domain_reason(
             for species in sorted(composition)
             if species not in MELTS_MAJOR_OXIDES
             and species not in MELTS_OXIDE_ALIASES
+            and not (
+                feedstock_id in STAGE0_INPROCESS_SAFE_FEEDSTOCK_IDS
+                and _is_declared_trace_component(species, trace_rows)
+            )
             and _oxide_wt_pct(composition, species) > 0.0
         ]
         if unsupported_species:

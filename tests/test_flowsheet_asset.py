@@ -1002,7 +1002,9 @@ def test_trace_major_exclusion_explicitly_rejects_legacy_production_alias(
     feedstocks = yaml.safe_load(FEEDSTOCK_PATH.read_text(encoding="utf-8"))
     targeted = feedstocks["targeted_super_kreep_ore"]
     assert targeted["composition_wt_pct"]["ZrO2"] > 0.0
-    assert "Zr_ppm" in targeted["trace_elements"]
+    # 2026-08-05 MC-1 trace wiring d1b4f5d canonicalized passenger symbols;
+    # the legacy production alias remains illegal even though the key is now Zr.
+    assert "Zr" in targeted["trace_elements"]
     errors = renderer.validate_feedstock_trace_major_exclusion(
         "targeted_super_kreep_ore", targeted, SPECIES_CATALOG_PATH
     )

@@ -3,16 +3,20 @@ from __future__ import annotations
 from hashlib import sha256
 from pathlib import Path
 import shutil
+import subprocess
+import sys
 
 import pytest
 import yaml
 
 import simulator.config as config_module
+import simulator.yaml_cache as yaml_cache_module
 from simulator.config import (
     DEFAULT_DATA_DIR,
     functional_data_yaml_digest,
     load_config_bundle,
 )
+from simulator.yaml_cache import load_cached_safe_yaml
 
 
 REQUIRED_CONFIGS = {
@@ -70,7 +74,9 @@ def test_load_config_bundle_digests_are_stable_and_scoped() -> None:
 
 def test_load_config_bundle_reuses_exact_yaml_parse_without_sharing_mutations(
     monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
 ) -> None:
+    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_DIR", str(tmp_path / "yaml-cache"))
     config_module._parse_required_yaml.cache_clear()
     original_safe_load = yaml.safe_load
     parse_calls = 0
@@ -80,7 +86,7 @@ def test_load_config_bundle_reuses_exact_yaml_parse_without_sharing_mutations(
         parse_calls += 1
         return original_safe_load(value)
 
-    monkeypatch.setattr(config_module.yaml, "safe_load", counted_safe_load)
+    monkeypatch.setattr(yaml_cache_module.yaml, "safe_load", counted_safe_load)
     first = load_config_bundle()
     first.setpoints["perf_cache_mutation_probe"] = True
     second = load_config_bundle()
@@ -100,6 +106,119 @@ def test_load_config_bundle_parse_cache_tracks_exact_file_bytes(tmp_path: Path) 
     assert "changed" not in first.setpoints
     assert second.setpoints["changed"] is True
     assert first.digests["setpoints"] != second.digests["setpoints"]
+
+
+def test_parsed_yaml_process_cache_is_keyed_by_exact_content(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_DIR", str(tmp_path / "yaml-cache"))
+    original = b"root:\n  value: 1\n"
+    changed = b"root:\n  value: 2\n"
+    original_safe_load = yaml.safe_load
+    parse_calls = 0
+
+    def counted_safe_load(value: str | bytes) -> object:
+        nonlocal parse_calls
+        parse_calls += 1
+        return original_safe_load(value)
+
+    monkeypatch.setattr(yaml_cache_module.yaml, "safe_load", counted_safe_load)
+    first = load_cached_safe_yaml(original)
+    second = load_cached_safe_yaml(original)
+    third = load_cached_safe_yaml(changed)
+
+    assert first == second == {"root": {"value": 1}}
+    assert third == {"root": {"value": 2}}
+    assert parse_calls == 2
+
+
+def test_parsed_yaml_process_cache_preserves_shared_aliases(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_DIR", str(tmp_path / "yaml-cache"))
+    original_safe_load = yaml.safe_load
+    parse_calls = 0
+
+    def counted_safe_load(value: str | bytes) -> object:
+        nonlocal parse_calls
+        parse_calls += 1
+        return original_safe_load(value)
+
+    monkeypatch.setattr(yaml_cache_module.yaml, "safe_load", counted_safe_load)
+    payload = "base: &shared\n  value: 1\ncopy: *shared\n"
+    first = load_cached_safe_yaml(payload)
+    second = load_cached_safe_yaml(payload)
+
+    assert first["base"] is first["copy"]
+    assert second["base"] is second["copy"]
+    assert parse_calls == 2
+
+
+def test_parsed_yaml_cache_is_reused_by_fresh_process(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_DIR", str(tmp_path / "yaml-cache"))
+    payload = b"root:\n  value: 1\n"
+    assert load_cached_safe_yaml(payload) == {"root": {"value": 1}}
+
+    child = """
+import simulator.yaml_cache as cache_module
+
+def fail_if_parsed(value):
+    raise AssertionError(f"fresh process reparsed cached YAML: {value!r}")
+
+cache_module.yaml.safe_load = fail_if_parsed
+assert cache_module.load_cached_safe_yaml(b"root:\\n  value: 1\\n") == {
+    "root": {"value": 1}
+}
+"""
+    subprocess.run(
+        [sys.executable, "-c", child],
+        check=True,
+        cwd=DEFAULT_DATA_DIR.parent,
+        capture_output=True,
+        text=True,
+    )
+
+
+def test_parsed_yaml_cache_default_is_in_writable_temp_root(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    monkeypatch.delenv("REGOLITH_PARSED_YAML_CACHE_DIR", raising=False)
+    monkeypatch.delenv("XDG_CACHE_HOME", raising=False)
+    monkeypatch.setattr(yaml_cache_module.tempfile, "gettempdir", lambda: str(tmp_path))
+
+    path = yaml_cache_module._cache_path("a" * 64)
+
+    assert tmp_path in path.parents
+    assert path.name == f"{'a' * 64}.json"
+
+
+def test_parsed_yaml_cache_rejects_untrusted_temp_root(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    monkeypatch.delenv("REGOLITH_PARSED_YAML_CACHE_DIR", raising=False)
+    monkeypatch.delenv("XDG_CACHE_HOME", raising=False)
+    monkeypatch.setattr(yaml_cache_module.tempfile, "gettempdir", lambda: str(tmp_path))
+    user_token = (
+        str(yaml_cache_module.os.getuid())
+        if hasattr(yaml_cache_module.os, "getuid")
+        else "user"
+    )
+    hostile_parent = tmp_path / f"regolith-pyrolysis-simulator-{user_token}"
+    hostile_parent.mkdir()
+    hostile_parent.chmod(0o777)
+    hostile = hostile_parent / "parsed-yaml"
+
+    path = yaml_cache_module._cache_path("b" * 64)
+
+    assert hostile not in path.parents
+    assert yaml_cache_module._ensure_private_directory(path.parents[2])
 
 
 def test_functional_data_digest_resolves_mre_canonical_voltage_tokens() -> None:

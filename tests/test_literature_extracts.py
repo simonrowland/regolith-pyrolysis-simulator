@@ -106,7 +106,9 @@ def tmp_extracts(tmp_path: Path):
                     # so a pure lexical sort would pick the wrong winner.
                     "alpha": ["other-source", "fixture-source"],
                     "psat_series": ["fixture-source", "other-source"],
-                    "partial_pressure_series": ["fixture-source", "other-source"],
+                    # 2026-08-05 carrier merge 1a1ab47 removed the non-schema
+                    # partial_pressure_series family; custom-priority coverage
+                    # must use the same closed family set as production data.
                     "gibbs_table": ["fixture-source", "other-source"],
                     "activity_coefficient": ["fixture-source"],
                     "rate_series": ["fixture-source"],

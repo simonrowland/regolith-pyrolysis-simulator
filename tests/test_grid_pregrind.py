@@ -146,6 +146,22 @@ def test_backend_selector_defaults_to_subprocess_and_accepts_thermoengine():
     )
 
 
+def test_grid_point_refuses_undeclared_non_melts_component() -> None:
+    point = grid_pregrind.GridPoint(
+        ordinal=0,
+        temperature_C=1500.0,
+        intended_fO2_log=-8.0,
+        pressure_bar=1.0,
+        composition_wt_pct={"SiO2": 99.0, "CaF2": 1.0},
+    )
+    args = grid_pregrind.parser().parse_args(["--backend", "thermoengine"])
+
+    with pytest.raises(ValueError, match="CaF2"):
+        grid_pregrind.alphamelts_queue_domain_reason(point)
+    with pytest.raises(ValueError, match="CaF2"):
+        grid_pregrind.point_inputs(point, args)
+
+
 def test_kress_partition_preserves_iron_and_moves_target_into_composition():
     composition = {
         "SiO2": 50.0,
@@ -204,6 +220,9 @@ def test_thermoengine_fixed_ferric_grind_prep_solves_mare_matrix_when_installed(
             "lunar_mare_lms1",
         ):
             composition = feedstocks[feedstock_id]["composition_wt_pct"]
+            excluded_species = grid_pregrind.declared_trace_components(
+                feedstocks[feedstock_id]
+            )
             for temperature_C in (1500.0, 1600.0, 1700.0):
                 point = grid_pregrind.GridPoint(
                     ordinal=0,
@@ -211,6 +230,8 @@ def test_thermoengine_fixed_ferric_grind_prep_solves_mare_matrix_when_installed(
                     intended_fO2_log=-8.0,
                     pressure_bar=1.0,
                     composition_wt_pct=composition,
+                    melts_excluded_species=excluded_species,
+                    melts_exclusion_basis="feedstock.trace_elements",
                 )
                 inputs = point_inputs(point, args)
                 result = backend.equilibrate(
@@ -227,7 +248,12 @@ def test_thermoengine_fixed_ferric_grind_prep_solves_mare_matrix_when_installed(
 
                 assert inputs["composition_mol"]["FeO"] > 0.0
                 assert inputs["composition_mol"]["Fe2O3"] > 0.0
-                assert result.status == "ok", (feedstock_id, temperature_C)
+                assert result.status == "ok", (
+                    feedstock_id,
+                    temperature_C,
+                    result.diagnostics,
+                    inputs["composition_mol"],
+                )
                 assert math.isfinite(result.fO2_log)
                 assert result.ledger_transition is None
                 assert result.chem_potentials

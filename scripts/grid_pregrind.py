@@ -175,6 +175,8 @@ class GridPoint:
     intended_fO2_log: float
     pressure_bar: float
     composition_wt_pct: dict[str, float]
+    melts_excluded_species: frozenset[str] = frozenset()
+    melts_exclusion_basis: str | None = None
 
 
 @dataclasses.dataclass(frozen=True)
@@ -203,6 +205,62 @@ def normalize_composition(composition: Mapping[str, float]) -> dict[str, float]:
     return {
         species: value * 100.0 / total
         for species, value in sorted(positive.items())
+    }
+
+
+def declared_trace_components(feedstock: Mapping[str, Any]) -> frozenset[str]:
+    """Return non-MELTS components backed by cited elemental trace rows."""
+
+    from simulator.accounting.exceptions import AccountingError
+    from simulator.accounting.formulas import resolve_species_formula
+
+    trace_rows = feedstock.get("trace_elements")
+    if not isinstance(trace_rows, Mapping):
+        return frozenset()
+    cited_elements = {
+        str(element)
+        for element, row in trace_rows.items()
+        if isinstance(row, Mapping)
+        and str(row.get("basis", "")).strip().lower() == "element"
+        and str(row.get("source", "")).strip()
+    }
+    declared: set[str] = set()
+    for species, amount in (feedstock.get("composition_wt_pct") or {}).items():
+        species = str(species)
+        if species in MELTS_OXIDE_BASIS or float(amount) <= 0.0:
+            continue
+        try:
+            formula = resolve_species_formula(species)
+        except AccountingError:
+            continue
+        non_oxygen_elements = set(formula.elements) - {"O"}
+        if non_oxygen_elements and non_oxygen_elements <= cited_elements:
+            declared.add(species)
+    return frozenset(declared)
+
+
+def melts_composition_wt_pct(point: GridPoint) -> dict[str, float]:
+    """Project only explicitly attributed trace passengers off MELTS inputs."""
+
+    unsupported = {
+        str(species)
+        for species, value in point.composition_wt_pct.items()
+        if str(species) not in MELTS_OXIDE_BASIS and float(value) > 0.0
+    }
+    undeclared = unsupported - set(point.melts_excluded_species)
+    if undeclared:
+        raise ValueError(
+            "MELTS input contains non-basis components without declared trace "
+            f"exclusion: {', '.join(sorted(undeclared))}"
+        )
+    if unsupported and point.melts_exclusion_basis != "feedstock.trace_elements":
+        raise ValueError(
+            "MELTS trace exclusions require basis=feedstock.trace_elements"
+        )
+    return {
+        str(species): float(value)
+        for species, value in point.composition_wt_pct.items()
+        if str(species) in MELTS_OXIDE_BASIS
     }
 
 
@@ -656,8 +714,11 @@ def alphamelts_queue_domain_reason(point: GridPoint) -> str | None:
 
     # Domain filter composition is Kress91-partitioned at the same contract T
     # the queue will later key and execute (not the raw grid float).
+    # MC-1 d1b4f5d wires cited trace passengers into composition_wt_pct. They
+    # remain in the simulator ledger but are outside the real melt-engine basis.
+    melts_composition = melts_composition_wt_pct(point)
     composition_mol = kress91_partitioned_composition_mol(
-        point.composition_wt_pct,
+        melts_composition,
         temperature_C=alphamelts_grid_temperature_C(point.temperature_C),
         intended_fO2_log=point.intended_fO2_log,
         pressure_bar=point.pressure_bar,
@@ -715,8 +776,11 @@ def point_inputs(point: GridPoint, args: argparse.Namespace) -> dict[str, Any]:
     partition_provenance = kress91_partition_authority_record(
         temperature_C=temperature_C,
     )
+    # MC-1 d1b4f5d wires cited trace passengers into composition_wt_pct. They
+    # remain in the simulator ledger but are outside the real melt-engine basis.
+    melts_composition = melts_composition_wt_pct(point)
     composition_mol = kress91_partitioned_composition_mol(
-        point.composition_wt_pct,
+        melts_composition,
         temperature_C=temperature_C,
         intended_fO2_log=point.intended_fO2_log,
         pressure_bar=point.pressure_bar,

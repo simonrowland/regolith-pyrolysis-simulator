@@ -17,7 +17,7 @@ from simulator.account_ids import (
     STAGE_COLLECTION_SOURCE_ACCOUNTS,
 )
 from simulator.accounting.queries import AccountingQueries
-from simulator.accounting.queries import REE_ENRICHMENT_SOURCE_IDS
+from simulator.accounting.queries import REE_ENRICHMENT_SOURCE_IDS, REE_OXIDE_SPECIES
 from simulator.chemistry.melt_activity import melt_oxide_activity
 from simulator.condensation_routing import (
     PRODUCT_DESTINATIONS,
@@ -41,7 +41,7 @@ class ExtractionMixin:
         'Mg': ('MgO',),
         'Ca': ('CaO',),
         'Ti': ('TiO2',),
-        'REE': ('REE_oxides',),
+        'REE': tuple(sorted(REE_OXIDE_SPECIES)),
     }
     _C5_BRANCH_ONE_TARGET_CANDIDATES = frozenset({'Si', 'Al', 'Mg', 'Ca'})
 
@@ -3339,7 +3339,7 @@ class ExtractionMixin:
                 if account == 'terminal.slag' and species in aluminate_species:
                     continue
                 residual_kg += amount
-                if species == 'REE_oxides':
+                if species in REE_OXIDE_SPECIES:
                     ree_kg += amount
         wt_pct = (ree_kg / residual_kg * 100.0) if residual_kg > 0.0 else 0.0
         return {

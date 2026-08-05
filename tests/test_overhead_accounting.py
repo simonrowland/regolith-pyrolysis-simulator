@@ -1581,8 +1581,34 @@ def test_next_tick_p_bulk_uses_upstream_headspace_after_near_total_capture(
     sim._get_equilibrium = lambda: object()
     sim._calculate_evaporation = lambda _equilibrium: flux
     _bypass_analytic_depletion(sim)
+    partial_pressure_registries = []
+    real_species_partial_pressures = sim.overhead_model.species_partial_pressures
+
+    def _capture_species_partial_pressures(
+        projected_flux,
+        vapor_pressure_mbar,
+        species_formula_registry=None,
+    ):
+        partial_pressure_registries.append(species_formula_registry)
+        return real_species_partial_pressures(
+            projected_flux,
+            vapor_pressure_mbar,
+            species_formula_registry,
+        )
+
+    monkeypatch.setattr(
+        sim.overhead_model,
+        "species_partial_pressures",
+        _capture_species_partial_pressures,
+    )
 
     sim.step()
+
+    assert partial_pressure_registries
+    assert all(
+        registry is sim.species_formula_registry
+        for registry in partial_pressure_registries
+    )
 
     upstream_transport = sim.overhead_model.estimate_transport_state(
         flux, sim.melt
@@ -1635,6 +1661,42 @@ def test_next_tick_p_bulk_uses_upstream_headspace_after_near_total_capture(
     )
     assert seen["overhead_partials_Pa"]["Fe"] > 0.0
     assert seen["vapour_batch_flux_pressures_Pa"] == {"Fe": 100.0}
+
+
+def test_uncommitted_evaporation_transition_is_removed_from_tick_flux(
+    monkeypatch,
+):
+    sim = _gas_train_sim()
+    flux = EvaporationFlux(total_kg_hr=1.0, species_kg_hr={"Fe": 1.0})
+    monkeypatch.setattr(
+        sim.condensation_model,
+        "route",
+        lambda _flux, _melt: CondensationRouteResult(
+            remaining_by_species={"Fe": 1.0},
+            condensed_by_stage_species={},
+        ),
+    )
+    monkeypatch.setattr(
+        sim,
+        "_route_evaporated_species_to_condensation",
+        lambda *_args, **_kwargs: {},
+    )
+    sim.melt.campaign = CampaignPhase.C2A
+    sim.melt.temperature_C = 1500.0
+    sim._apply_native_fe_saturation_split = lambda **_kwargs: None
+    sim._update_temperature = lambda: None
+    sim._get_equilibrium = lambda: object()
+    sim._calculate_evaporation = lambda _equilibrium: flux
+    _bypass_analytic_depletion(sim)
+
+    cleaned_before = sim.atom_ledger.kg_by_account("process.cleaned_melt")
+    sim.step()
+
+    assert sim.record.snapshots[-1].evap_flux.species_kg_hr == {}
+    assert sim._melt_headspace_composition_mbar == {}
+    assert sim.atom_ledger.kg_by_account("process.cleaned_melt") == pytest.approx(
+        cleaned_before
+    )
 
 
 def test_commanded_po2_numerical_floor_when_all_inputs_zero():

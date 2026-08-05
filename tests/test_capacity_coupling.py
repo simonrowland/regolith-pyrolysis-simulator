@@ -794,9 +794,11 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     # above (+2 transitions, 23 -> 25); all three Ti carrier debits still sum
     # into one TiO2 parent draw. CrO3 adds none because its O2-consuming route
     # is starved by the fixture's zero overhead O2, not by pressure/domain gating.
-    # The phosphorus union adds evaporate_P2, evaporate_PO, and evaporate_PO2;
-    # the remaining P carrier rates are below this fixture's transition floor.
-    assert len(sim.atom_ledger.transitions) == 28
+    # The phosphorus union adds evaporate_P2 and evaporate_PO2. Regrind now
+    # rejects a whole coupled carrier transition when any nonzero ledger leg is
+    # at or below the 1e-12 kg floor, so the earlier PO dust transition is no
+    # longer committed (28 -> 27); snapshot flux and ledger remain identical.
+    assert len(sim.atom_ledger.transitions) == 27
     assert tuple(
         transition.reason for transition in sim.atom_ledger.transitions[-5:]
     ) == (

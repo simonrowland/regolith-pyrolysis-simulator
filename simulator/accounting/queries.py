@@ -2564,7 +2564,8 @@ def wall_deposit_candidates_by_segment_kg(
     )
     if isinstance(by_segment, dict):
         molar_mass_kg_mol = resolve_species_formula(
-            species
+            species,
+            getattr(model, "species_formula_registry", None),
         ).molar_mass_kg_per_mol()
         for segment_name, candidate_kg_h in candidates.items():
             record = by_segment.get(segment_name, {}).get(species)
@@ -2713,6 +2714,7 @@ def wall_deposit_candidate_for_surface_kg(
         species=species,
         flux_mol_m2_s=flux,
         surface_area_m2=surface_area_m2,
+        formula_registry=getattr(model, "species_formula_registry", None),
     )
     carrier_gas = str(getattr(model, "carrier_gas", "N2") or "N2")
     knudsen_number = _knudsen_number(
@@ -2737,7 +2739,8 @@ def wall_deposit_candidate_for_surface_kg(
     if isinstance(by_segment, dict):
         reported_kg_h = min(rate_kg_hr, budget_kg_hr)
         molar_mass_kg_mol = resolve_species_formula(
-            species
+            species,
+            getattr(model, "species_formula_registry", None),
         ).molar_mass_kg_per_mol()
         reported_mol_s = (
             reported_kg_h / molar_mass_kg_mol / SECONDS_PER_HOUR
@@ -2812,6 +2815,7 @@ def _wall_deposition_flux_budget_kg_hr(
     species: str,
     flux_mol_m2_s: float,
     surface_area_m2: float,
+    formula_registry: Mapping[str, Any] | None = None,
 ) -> float:
     values = {
         "flux_mol_m2_s": flux_mol_m2_s,
@@ -2825,7 +2829,10 @@ def _wall_deposition_flux_budget_kg_hr(
     # Algebra: m_dot = J*A*M. Unit check:
     # (mol/m2/s)*(m2)*(kg/mol)*(3600 s/h) = kg/h.
     # Sanity: the budget is zero at zero flux/area and linear before supply cap.
-    molar_mass_kg_mol = resolve_species_formula(species).molar_mass_kg_per_mol()
+    molar_mass_kg_mol = resolve_species_formula(
+        species,
+        formula_registry,
+    ).molar_mass_kg_per_mol()
     return (
         flux_mol_m2_s
         * surface_area_m2

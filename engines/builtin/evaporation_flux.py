@@ -884,7 +884,11 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         )
         from simulator.condensation import _knudsen_number as _kn_eval
 
-        if overhead_pressure_pa > 0.0:
+        # When gas resistance is disabled, the executed model is the HKL-only
+        # path and does not use viscous Poiseuille P_bulk. Batch carriers can
+        # raise the diagnostic overhead pressure into transitional Kn without
+        # making that deliberately disabled transport model authoritative.
+        if gas_resistance_enabled and overhead_pressure_pa > 0.0:
             kn_domain = _kn_eval(
                 overhead_pressure_pa,
                 max(gas_temperature_K, 1.0),
@@ -1017,7 +1021,18 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 # error surface is owned by the caller.
                 continue
 
-            P_bulk_Pa = float(overhead_partials.get(species, 0.0))
+            uses_gas_resistance = (
+                gas_resistance_enabled
+                and species not in hkl_upper_bound_transport_species
+            )
+            # The reconstructed HKL upper bound is a free-evaporation boundary:
+            # when gas resistance is disabled, viscous Poiseuille P_bulk is not
+            # part of the executed model and must not suppress its pressure drive.
+            P_bulk_Pa = (
+                float(overhead_partials.get(species, 0.0))
+                if uses_gas_resistance
+                else 0.0
+            )
             delta_p_Pa = max(0.0, P_eq_Pa - P_bulk_Pa)
             if delta_p_Pa <= 0:
                 continue
@@ -1108,10 +1123,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                     carrier_gas=carrier_gas,
                     T_gas_K=gas_temperature_K,
                     melt_resistance_enabled=melt_resistance_enabled,
-                    gas_resistance_enabled=(
-                        gas_resistance_enabled
-                        and species not in hkl_upper_bound_transport_species
-                    ),
+                    gas_resistance_enabled=uses_gas_resistance,
                     melt_surface_renewal_base_kg_s_m2_pa=melt_surface_renewal_base,
                     melt_surface_renewal_source=melt_surface_renewal_source,
                 )

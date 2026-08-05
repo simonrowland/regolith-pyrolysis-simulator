@@ -70,6 +70,26 @@ def test_stage0_route_coverage_accepts_known_safe_inprocess_feedstocks() -> None
     )
 
 
+def test_trace_citation_does_not_hide_unsupported_major_compound() -> None:
+    feedstocks = {
+        "synthetic": {
+            "composition_wt_pct": {"SiO2": 99.0, "CaF2": 1.0},
+            "trace_elements": {
+                "F": {
+                    "basis": "element",
+                    "source": "synthetic cited fluorine row",
+                }
+            },
+        }
+    }
+
+    assert real_backend_feedstock_domain_reason(
+        "alphamelts",
+        "synthetic",
+        feedstocks,
+    ) == "unsupported_melts_species"
+
+
 def test_stage0_inprocess_safe_feedstock_ids_are_grounded() -> None:
     feedstocks = load_config_bundle().feedstocks
     safe_digest = hashlib.md5(

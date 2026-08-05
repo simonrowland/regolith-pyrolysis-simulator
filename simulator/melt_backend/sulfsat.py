@@ -65,7 +65,9 @@ the builtin Stage 0 path stays authoritative for everything else.
 
 from __future__ import annotations
 
+import contextlib
 import importlib
+import io
 import math
 import warnings
 from dataclasses import dataclass, field
@@ -495,7 +497,7 @@ class SulfSatGate:
         )
         df['Fe3Fet_Liq'] = fe3fet_value
 
-        with warnings.catch_warnings():
+        with warnings.catch_warnings(), contextlib.redirect_stdout(io.StringIO()):
             warnings.simplefilter('ignore')
             # Smythe 2017 SCSS; Fe_FeNiCu_Sulf=0.65 is the canonical
             # MORB-like sulfide default used in PySulfSat's tutorial.

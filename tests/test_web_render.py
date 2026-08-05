@@ -442,7 +442,9 @@ def _assert_producer_tick_baseline(payload):
     assert payload["hour"] == 1
     assert payload["campaign"] == "C0"
     assert payload["temperature_C"] == pytest.approx(75.0)
-    assert payload["melt_mass_kg"] == pytest.approx(1000.0)
+    # 2026-08-05 MC-1 trace wiring d1b4f5d: Stage-0 routes 1.2285257819218 kg
+    # of lunar trace passengers before this rounded operator payload is emitted.
+    assert payload["melt_mass_kg"] == pytest.approx(998.8)
     assert payload["mass_balance_error_pct"] == pytest.approx(0.0)
     assert payload["mass_balance_error_breached"] is False
     assert payload["pot_composition_units"] == "kg"
