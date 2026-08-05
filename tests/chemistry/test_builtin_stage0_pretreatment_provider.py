@@ -115,8 +115,8 @@ def test_provider_declares_only_stage0_pretreatment_intent():
             assert not profile.is_authoritative(intent)
 
 
-def test_provider_declares_exactly_eighteen_stage0_accounts():
-    """Provider declares exactly the fifteen accounts touched by every
+def test_provider_declares_exactly_nineteen_stage0_accounts():
+    """Provider declares exactly the nineteen accounts touched by every
     legacy ``_record_stage0_*_transitions`` call including carbonate
     decomposition and cation-sulfate carbothermal cleanup (MO -> melt,
     CaS -> sulfide matte), plus foulant residual-C diagnostic accounts.
@@ -130,6 +130,7 @@ def test_provider_declares_exactly_eighteen_stage0_accounts():
         "process.stage0_volatile_feed",
         "process.stage0_salt_feed",
         "process.stage0_carbonate_feed",
+        "process.stage0_foulant",
         "process.reagent_inventory",
         "process.stage0_perchlorate_feed",
         "process.cleaned_melt",

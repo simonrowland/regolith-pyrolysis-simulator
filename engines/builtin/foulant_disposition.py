@@ -144,6 +144,18 @@ def _load_vapor_pressures(path: Path | None = None) -> Mapping[str, Any]:
     return vapor_pressure_legacy_view(payload)
 
 
+def _compiled_pressure_evaluator(carrier_key: str, path: Path | None = None):
+    yaml_path = path or _DEFAULT_VAPOR_PRESSURES_PATH
+    with yaml_path.open(encoding="utf-8") as handle:
+        payload = yaml.safe_load(handle) or {}
+    from simulator.vapour_rail.catalog import compiled_catalog_for
+
+    return compiled_catalog_for(
+        payload,
+        emit_u0_request_rules=False,
+    ).evaluator_for(carrier_key)
+
+
 def chi_escape_salt(
     carrier: str,
     T_C: float,
@@ -168,12 +180,21 @@ def chi_escape_salt(
         )
 
     temperature_K = float(T_C) + 273.15
+    if entry.get("pure_component_antoine"):
+        valid_range = _valid_range_K(entry)
+        p_sat_pa = _pure_component_antoine_pa(entry, temperature_K)
+    else:
+        compiled_evaluator = _compiled_pressure_evaluator(carrier_key)
+        valid_range = compiled_evaluator.valid_temperature_K
+        p_sat_pa = compiled_evaluator.evaluate(
+            temperature_K,
+            source_activity=1.0,
+        ).pressure_pa
     warning = _temperature_range_warning(
         carrier_key,
         temperature_K,
-        _valid_range_K(entry),
+        valid_range,
     )
-    p_sat_pa = _pure_component_antoine_pa(entry, temperature_K)
     p_total_pa = float(p_overhead_bar) * PA_PER_BAR
     if p_sat_pa < 0.0 or p_total_pa < 0.0:
         raise ValueError("pressures must be non-negative")

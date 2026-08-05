@@ -45,7 +45,7 @@ COLLISION_GASES = {
     "SiO2_gas",
     "TiO2_gas",
 }
-ACTIVE_COLLISION_GASES = {"CaO_gas", "TiO2_gas"}
+ACTIVE_COLLISION_GASES = {"Al2O3_gas", "CaO_gas", "TiO2_gas"}
 CARRIER_ONLY = {
     "CH4_NH3_HCN",
     "CO_CH4_propellant",
@@ -262,10 +262,10 @@ def test_production_schema_compiles_exact_four_strata_and_legacy_projection() ->
     )
     legacy = catalog.legacy_view()
     assert len(legacy["metals"]) == 10
-    # The oxide and phosphorus chunks intentionally activate twelve carriers
-    # through the pre-RG oxide-vapor compatibility seam.
-    assert len(legacy["oxide_vapors"]) == 14
-    assert len(legacy["foulant_vapor"]) == 3
+    # The oxide, phosphorus, and MC-4 systematic-carrier chunks intentionally
+    # activate twenty carriers through the pre-RG compatibility seam.
+    assert len(legacy["oxide_vapors"]) == 20
+    assert len(legacy["foulant_vapor"]) == 23
     assert set(legacy["metals"]) == {
         "Na",
         "K",
@@ -286,6 +286,12 @@ def test_production_schema_compiles_exact_four_strata_and_legacy_projection() ->
         "CaO_gas",
         "AlO",
         "Al2O",
+        "Al2",
+        "Al2O2",
+        "Al2O3_gas",
+        "AlO2",
+        "Ca2",
+        "CrO",
         "CrO3",
         "PO",
         "PO2",
@@ -294,7 +300,31 @@ def test_production_schema_compiles_exact_four_strata_and_legacy_projection() ->
         "P4O6",
         "P4O10",
     }
-    assert set(legacy["foulant_vapor"]) == {"NaCl", "KCl", "NaF"}
+    assert set(legacy["foulant_vapor"]) == {
+        "C2H5OH",
+        "C2H6",
+        "CH3COOH",
+        "CH4",
+        "CO",
+        "CO2",
+        "COS",
+        "CS2",
+        "CaCl2",
+        "Cl2",
+        "H2O",
+        "H2S",
+        "HCHO",
+        "HCN",
+        "HCl",
+        "HNCO",
+        "K2Cl2",
+        "KCl",
+        "MgCl2",
+        "NH3",
+        "Na2Cl2",
+        "NaCl",
+        "NaF",
+    }
     assert legacy["metals"]["K"]["antoine"]["A"] == pytest.approx(10.641294)
     # Activity-corrected schema-v2 models must not leak into the legacy
     # projection that still feeds the pre-RG equilibrium-backend seam.

@@ -98,7 +98,9 @@ def test_builtin_vapor_pressure_po2_slope_once(
     temperature_C: float,
     expected_slope: float,
 ):
-    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    # Composite carriers live on the canonical compiled catalog. The legacy
+    # projection remains Antoine-only and intentionally omits their evaluators.
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data.catalog_payload)
     pressures = []
     po2_levels = _po2_levels_for_species(species)
     for pO2_bar in po2_levels:

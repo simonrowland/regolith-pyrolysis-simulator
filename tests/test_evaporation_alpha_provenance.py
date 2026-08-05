@@ -150,9 +150,7 @@ EXPECTED_OWNER_RATIFY_ALPHA = {
     ("foulant_vapor", "KCl"),
 }
 
-EXPECTED_MISSING_ALPHA_POLICY = {
-    ("oxide_vapors", "CrO2"): "Fedkin et al. 2006",
-}
+EXPECTED_MISSING_ALPHA_POLICY = {}
 
 
 def _vapor_pressure_data() -> dict:
@@ -211,6 +209,10 @@ def test_calibrated_evaporation_alpha_values_sources_and_envelopes():
         else:
             assert "OWNER-RATIFY" in source
             assert "intrinsic" in source
+
+    cro2_alpha = data["oxide_vapors"]["CrO2"]["evaporation_alpha"]
+    assert cro2_alpha["tag"] == "broad_proxy_not_intrinsic"
+    assert "no CrO2-specific alpha" in cro2_alpha["source"]
 
 
 def test_tier_3_species_have_fail_loud_policy_not_placeholder_alpha():

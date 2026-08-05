@@ -854,6 +854,22 @@ def test_c5_debit_route_alpha_and_source_metadata_are_executable(
             / parent_formula.elements[owner]
         )
         expected_owner_atoms = carrier_mol * carrier_formula.elements[owner]
+        oxygen_consumed_kg = max(
+            0.0,
+            -float(legacy_row.get("stoich_O2_per_vapor", 0.0)) * rate_kg_hr,
+        )
+        if oxygen_consumed_kg > 0.0:
+            oxygen_buffer_kg = 2.0 * oxygen_consumed_kg
+            conformance_sim.record.additives_kg["O2"] = (
+                conformance_sim.record.additives_kg.get("O2", 0.0)
+                + oxygen_buffer_kg
+            )
+            conformance_sim.atom_ledger.load_external(
+                "process.overhead_gas",
+                {"O2": oxygen_buffer_kg},
+                source=f"{species_id} conformance reactant buffer",
+                material_origin="feedstock",
+            )
         before_parent = conformance_sim.atom_ledger.mol_by_species(
             "process.cleaned_melt"
         )[parent]
@@ -1197,4 +1213,106 @@ def test_c6_shared_ti_reservoir_conserves_three_carrier_sum_once() -> None:
         "evaporate_TiO",
         "evaporate_TiO2_gas",
     } <= transition_reasons
+    assert abs(sim._make_snapshot().mass_balance_error_pct) <= 5.0e-12
+
+
+def test_c6_shared_al_reservoir_conserves_seven_carrier_sum_once() -> None:
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        _load_yaml("vapor_pressures.yaml"),
+        _load_yaml("feedstocks.yaml"),
+        _load_yaml("setpoints.yaml"),
+    )
+    requested_rates = {
+        "Al": 1.0e-8,
+        "Al2": 2.0e-8,
+        "Al2O": 3.0e-8,
+        "Al2O2": 4.0e-8,
+        "Al2O3_gas": 5.0e-8,
+        "AlO": 6.0e-8,
+        "AlO2": 7.0e-8,
+    }
+    before_al = sim.atom_ledger.atom_moles_by_account("process.cleaned_melt")["Al"]
+    before_o2 = sum(
+        sim.atom_ledger.mol_by_species(account).get("O2", 0.0)
+        for account in ("process.overhead_gas", "reservoir.fo2_buffer")
+    )
+
+    releasing_rates = {
+        species_id: rate
+        for species_id, rate in requested_rates.items()
+        if species_id != "AlO2"
+    }
+    smoothed_releasing = sim._apply_analytic_evaporation_depletion(
+        _flux(releasing_rates)
+    )
+    assert set(smoothed_releasing.species_kg_hr) == set(releasing_rates)
+    sim._configure_condensation_operating_conditions(smoothed_releasing)
+    sim._route_to_condensation(smoothed_releasing)
+    sim._update_melt_composition(smoothed_releasing)
+
+    # AlO2 consumes O2, so evaluate it after the co-carriers have populated
+    # the physical overhead O2 reservoir rather than inventing external oxygen.
+    smoothed_oxidizing = sim._apply_analytic_evaporation_depletion(
+        _flux({"AlO2": requested_rates["AlO2"]})
+    )
+    assert set(smoothed_oxidizing.species_kg_hr) == {"AlO2"}
+    sim._configure_condensation_operating_conditions(smoothed_oxidizing)
+    sim._route_to_condensation(smoothed_oxidizing)
+    sim._update_melt_composition(smoothed_oxidizing)
+    applied_rates = dict(smoothed_releasing.species_kg_hr)
+    applied_rates.update(smoothed_oxidizing.species_kg_hr)
+    # Premise: all seven carriers draw from one Al2O3 reservoir. Al atoms per
+    # carrier are 1,2,2,2,2,1,1; O2 released per carrier is
+    # 3/4,3/2,1,1/2,0,1/4,-1/4. Algebra: sum each applied carrier mole times
+    # its coefficient exactly once. Unit check: kg/(kg/mol)=mol. Sanity:
+    # AlO2 consumes O2 while every other oxidized carrier releases no more
+    # oxygen than its shared Al2O3 parent contains.
+    carrier_mol = {
+        species_id: rate_kg_hr
+        / resolve_species_formula(
+            species_id, sim.species_formula_registry
+        ).molar_mass_kg_per_mol()
+        for species_id, rate_kg_hr in applied_rates.items()
+    }
+    al_atoms_per_carrier = {
+        "Al": 1.0,
+        "Al2": 2.0,
+        "Al2O": 2.0,
+        "Al2O2": 2.0,
+        "Al2O3_gas": 2.0,
+        "AlO": 1.0,
+        "AlO2": 1.0,
+    }
+    o2_per_carrier = {
+        "Al": 0.75,
+        "Al2": 1.5,
+        "Al2O": 1.0,
+        "Al2O2": 0.5,
+        "Al2O3_gas": 0.0,
+        "AlO": 0.25,
+        "AlO2": -0.25,
+    }
+    expected_al_debit_mol = sum(
+        carrier_mol[species_id] * al_atoms_per_carrier[species_id]
+        for species_id in carrier_mol
+    )
+    expected_o2_release_mol = sum(
+        carrier_mol[species_id] * o2_per_carrier[species_id]
+        for species_id in carrier_mol
+    )
+
+    after_al = sim.atom_ledger.atom_moles_by_account("process.cleaned_melt")["Al"]
+    after_o2 = sum(
+        sim.atom_ledger.mol_by_species(account).get("O2", 0.0)
+        for account in ("process.overhead_gas", "reservoir.fo2_buffer")
+    )
+    assert before_al - after_al == pytest.approx(expected_al_debit_mol, rel=1.0e-11)
+    assert after_o2 - before_o2 == pytest.approx(expected_o2_release_mol, rel=1.0e-11)
+    transition_reasons = {
+        transition.reason for transition in sim.atom_ledger.transitions
+    }
+    assert {f"evaporate_{species_id}" for species_id in requested_rates} <= (
+        transition_reasons
+    )
     assert abs(sim._make_snapshot().mass_balance_error_pct) <= 5.0e-12

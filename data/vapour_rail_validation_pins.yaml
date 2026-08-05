@@ -41,6 +41,13 @@ species:
         pinned_residual_dex: 0.48565570074150183
         evidence_refs:
           - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+  Al2:
+    tier: T1
+    target_tier: T4
+    validations:
+      structural:
+        evidence_refs:
+          - data/vapor_pressures.yaml
   Al2O:
     tier: T1
     target_tier: T4
@@ -48,7 +55,28 @@ species:
       structural:
         evidence_refs:
           - data/vapor_pressures.yaml
+  Al2O2:
+    tier: T1
+    target_tier: T4
+    validations:
+      structural:
+        evidence_refs:
+          - data/vapor_pressures.yaml
+  Al2O3_gas:
+    tier: T1
+    target_tier: T4
+    validations:
+      structural:
+        evidence_refs:
+          - data/vapor_pressures.yaml
   AlO:
+    tier: T1
+    target_tier: T4
+    validations:
+      structural:
+        evidence_refs:
+          - data/vapor_pressures.yaml
+  AlO2:
     tier: T1
     target_tier: T4
     validations:
@@ -64,6 +92,13 @@ species:
         evidence_refs:
           - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
   CaO_gas:
+    tier: T1
+    target_tier: T4
+    validations:
+      structural:
+        evidence_refs:
+          - data/vapor_pressures.yaml
+  Ca2:
     tier: T1
     target_tier: T4
     validations:
@@ -88,9 +123,19 @@ species:
     target_tier: T4
     validations:
       vaporock:
-        pinned_residual_dex: 0.22658647578501132
+        # MC-4 attribution: CEA gas-exchange composition replaces the legacy
+        # CrO2 standard-reaction fit, increasing this external residual while
+        # preserving the source-reaction -> pressure -> HKL coupling path.
+        pinned_residual_dex: 0.711041923195987
         evidence_refs:
           - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+  CrO:
+    tier: T1
+    target_tier: T4
+    validations:
+      structural:
+        evidence_refs:
+          - data/vapor_pressures.yaml
   CrO3:
     tier: T1
     target_tier: T4

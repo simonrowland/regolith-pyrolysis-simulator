@@ -29,7 +29,6 @@ from simulator.vapour_rail.instrumentation import (
     flux_pressures_from_batch,
     serialize_vapour_answer,
 )
-from simulator.vapour_rail.request import REFUSAL_MISSING_CHANNEL_CONTRACT
 from tests.chemistry.corpus_fixtures import alpha_envelope_anchors
 
 
@@ -250,8 +249,8 @@ def test_cro2_missing_alpha_refuses_only_cro2_and_retains_parent_oxide():
     assert "per-species evaporation refusal" in result.warnings[0]
 
 
-def test_cro2_policy_only_alpha_is_refused_by_vapour_batch() -> None:
-    """A fail-loud policy describes absence; it is not an alpha value."""
+def test_cro2_composite_refuses_missing_activity_evidence() -> None:
+    """An executable alpha does not replace the required melt activity."""
 
     catalog = compile_vapour_rail_catalog(_vapor_pressure_data())
     batch = catalog.resolve_batch(
@@ -268,11 +267,11 @@ def test_cro2_policy_only_alpha_is_refused_by_vapour_batch() -> None:
     )
 
     answer = batch.channel("CrO2")
-    assert answer.refusal_code == REFUSAL_MISSING_CHANNEL_CONTRACT
+    assert answer.refusal_code == "missing_evidence"
     assert isinstance(answer.pressure, PressureRefusal)
     assert isinstance(answer.selected_runtime_pressure, PressureRefusal)
     assert isinstance(answer.flux, FluxRefusal)
-    assert "alpha" in answer.pressure.detail
+    assert "assemblage/potential evidence" in answer.pressure.detail
     assert "CrO2" not in batch.flux_active_species_ids
     assert serialize_vapour_answer(answer)["is_refused"] is True
     flux_pressures, _ = flux_pressures_from_batch(

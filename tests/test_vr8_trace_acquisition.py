@@ -228,8 +228,8 @@ def test_rows_dormant_legacy_outputs_identical():
         "Cr",
         "Mn",
     }
-    # The oxide and phosphorus chunks move this golden intentionally: twelve
-    # reviewed carriers now evolve through the compatibility projection.
+    # The oxide, phosphorus, and MC-4A chunks move this golden intentionally:
+    # the six systematic Al/Ca/Cr carriers join the reviewed live projection.
     assert set(legacy["oxide_vapors"]) == {
         "SiO",
         "CrO2",
@@ -239,6 +239,12 @@ def test_rows_dormant_legacy_outputs_identical():
         "AlO",
         "Al2O",
         "CrO3",
+        "Al2",
+        "Al2O2",
+        "Al2O3_gas",
+        "AlO2",
+        "Ca2",
+        "CrO",
         "PO",
         "PO2",
         "P2",
@@ -246,7 +252,11 @@ def test_rows_dormant_legacy_outputs_identical():
         "P4O6",
         "P4O10",
     }
-    assert set(legacy["foulant_vapor"]) == {"NaCl", "KCl", "NaF"}
+    assert set(legacy["foulant_vapor"]) == {
+        "C2H5OH", "C2H6", "CH3COOH", "CH4", "CO", "CO2", "COS", "CS2",
+        "CaCl2", "Cl2", "H2O", "H2S", "HCHO", "HCN", "HCl", "HNCO",
+        "K2Cl2", "KCl", "MgCl2", "NH3", "Na2Cl2", "NaCl", "NaF",
+    }
     # O is projected only into the dormant rail-gap bucket, not live maps.
     assert "O" not in legacy["metals"]
     assert "O" not in legacy["oxide_vapors"]

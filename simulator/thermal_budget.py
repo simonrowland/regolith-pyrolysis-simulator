@@ -151,6 +151,36 @@ _OXIDE_DISSOCIATION_KJ_PER_MOL: dict[str, EnthalpyCoefficient] = {
 # ΔH follows the balanced per-mol-vapor reaction below; the parent-oxide
 # coefficient is species-specific (1 SiO2 per SiO, but 1/2 Cr2O3 per CrO2).
 _OXIDE_VAPOR_REACTION_KJ_PER_MOL: dict[str, EnthalpyCoefficient] = {
+    "Al2": EnthalpyCoefficient(
+        2176.991722,
+        "nasa-cea-thermo:cea_AL2_gibbs ΔfH298=+501.301722 kJ/mol + NIST-JANAF "
+        "Al2O3(s) ΔfH298=-1675.69; Al2O3->Al2(g)+3/2O2 => +2176.991722",
+    ),
+    "Al2O2": EnthalpyCoefficient(
+        1272.594413,
+        "nasa-cea-thermo:cea_AL2O2_gibbs ΔfH298=-403.095587 kJ/mol + NIST-JANAF "
+        "Al2O3(s) ΔfH298=-1675.69; Al2O3->Al2O2(g)+1/2O2 => +1272.594413",
+    ),
+    "Al2O3_gas": EnthalpyCoefficient(
+        1128.799470,
+        "nasa-cea-thermo:cea_AL2O3_gibbs ΔfH298=-546.890530 kJ/mol + NIST-JANAF "
+        "Al2O3(s) ΔfH298=-1675.69; Al2O3(s)->Al2O3(g) => +1128.799470",
+    ),
+    "AlO2": EnthalpyCoefficient(
+        799.187129,
+        "nasa-cea-thermo:cea_ALO2_gibbs ΔfH298=-38.657871 kJ/mol + 1/2 NIST-JANAF "
+        "Al2O3(s) ΔfH298=-1675.69; 1/2Al2O3+1/4O2->AlO2(g) => +799.187129",
+    ),
+    "Ca2": EnthalpyCoefficient(
+        1611.945336,
+        "nasa-cea-thermo:cea_Ca2_gibbs ΔfH298=+341.765336 kJ/mol + 2 NIST-JANAF "
+        "CaO(s) ΔfH298=-635.09; 2CaO->Ca2(g)+O2 => +1611.945336",
+    ),
+    "CrO": EnthalpyCoefficient(
+        756.431318,
+        "nasa-cea-thermo:cea_CrO_gibbs ΔfH298=+186.581318 kJ/mol + 1/2 NIST-JANAF "
+        "Cr2O3(s) ΔfH298=-1139.70; 1/2Cr2O3->CrO(g)+1/4O2 => +756.431318",
+    ),
     # NIST-JANAF Chase 1998: ΔfH°[SiO2, α-quartz]=-910.94, ΔfH°[SiO(g)]=-100.42;
     # SiO2 -> SiO(g) + 1/2 O2 = -100.42 - (-910.94) = +810.52 kJ/mol SiO.
     "SiO": EnthalpyCoefficient(
@@ -233,6 +263,12 @@ _OXIDE_VAPOR_REACTION_KJ_PER_MOL: dict[str, EnthalpyCoefficient] = {
 _OXIDE_VAPOR_SPECIES: frozenset[str] = frozenset(
     {
         "SiO",
+        "Al2",
+        "Al2O2",
+        "Al2O3_gas",
+        "AlO2",
+        "Ca2",
+        "CrO",
         "CrO2",
         "TiO",
         "TiO2_gas",

@@ -1907,7 +1907,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             activity_factor = 1.0
             oxide_activity = None
             if parent_oxide:
-                retain_analytical_channel = bool(
+                retain_analytical_channel = compiled_evaluator is not None or bool(
                     data.get("retain_analytical_pressure_channel", False)
                 )
                 activity_exponent = float(
@@ -2027,20 +2027,17 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         "acquisition_flag": evaluation.acquisition_flag,
                     }
                     warnings.append(str(evaluation.status))
-                    liquid_tio2_below_fit_floor = (
-                        name in {"TiO", "TiO2_gas"}
-                        and T_K < compiled_evaluator.valid_temperature_K[0]
-                    )
-                    if not liquid_tio2_below_fit_floor:
+                    below_fit_floor = T_K < compiled_evaluator.valid_temperature_K[0]
+                    if not below_fit_floor:
                         continue
                     # Premise: the compiled evaluator's consequence-aware
-                    # liquid-TiO2 continuation is its best available point
-                    # estimate; refusing to publish it would assert zero Ti vapor
+                    # lower-edge continuation is its best available point estimate;
+                    # refusing to publish it would assert zero carrier pressure
                     # below the fit floor. Algebra: P_eq = 10**log10(P_cont),
                     # with activity and fO2 powers already applied exactly once
                     # by evaluate(). Units: P_eq remains Pa. Sanity: only the two
-                    # Ti composites below their lower edge cross this compatibility
-                    # seam; every other OOR contract remains refusal-only here.
+                    # lower-edge path is published; upper-edge extrapolation remains
+                    # refusal-only on this compatibility surface.
             else:
                 log_P = A - B / (T_K + C)
                 P_reference_Pa = _pow10_pressure_or_raise(
@@ -2100,7 +2097,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 )
                 pO2_scaled = True
 
-            retain_analytical_channel = bool(
+            retain_analytical_channel = compiled_evaluator is not None or bool(
                 data.get("retain_analytical_pressure_channel", False)
             )
             if P_eq_Pa > 0.0 and (

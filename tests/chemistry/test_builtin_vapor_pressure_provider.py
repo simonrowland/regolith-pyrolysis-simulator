@@ -670,7 +670,7 @@ def test_k_wall_condensation_uses_pure_component_sidecar(vapor_pressure_data):
     assert wall_coeff is row["pure_component_antoine"]
 
 
-def test_cro2_wall_condensation_rejects_standard_reaction_term(
+def test_cro2_wall_condensation_has_no_pure_component_proxy(
     vapor_pressure_data,
 ):
     row = vapor_pressure_data["oxide_vapors"]["CrO2"]
@@ -685,7 +685,7 @@ def test_cro2_wall_condensation_rejects_standard_reaction_term(
     )
 
     assert runtime_block == "antoine"
-    assert runtime_coeff is row["antoine"]
+    assert runtime_coeff == {}
     assert wall_block == "pure_component_antoine"
     assert wall_coeff == {}
 
@@ -1190,16 +1190,16 @@ def test_pairing_metals_authority_class_emitted(
         )
 
 
-def test_cro2_authority_class_emitted_with_authoritative_source_label(
+def test_cro2_non_authoritative_class_survives_authoritative_provider_label(
     vapor_pressure_data,
 ):
-    """CrO2 standard-reaction term: authority_class demotes source label."""
+    """CrO2 standard-reaction term remains explicitly non-authoritative."""
 
     cro2_row = vapor_pressure_data["oxide_vapors"]["CrO2"]
-    assert cro2_row["authority_class"] == "uncertified"
-    assert cro2_row["valid_range_K"] == [1500, 2273.15]
+    assert cro2_row["authority_class"] == "analytical_non_authoritative"
+    assert cro2_row["valid_range_K"] == [1400.0, 2273.15]
 
-    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data.catalog_payload)
     request = IntentRequest(
         intent=ChemistryIntent.VAPOR_PRESSURE,
         account_view=ProviderAccountView(
@@ -1218,9 +1218,9 @@ def test_cro2_authority_class_emitted_with_authoritative_source_label(
     assert source.startswith("builtin_authoritative:")
     assert "standard_reaction_term" in source
     provenance = diagnostic["vapor_pressure_numerator_provenance"]["CrO2"]
-    assert provenance["authority_class"] == "uncertified"
+    assert provenance["authority_class"] == "analytical_non_authoritative"
     assert diagnostic["species_authority"]["CrO2"]["authority_class"] == (
-        "uncertified"
+        "analytical_non_authoritative"
     )
 
 
@@ -2802,6 +2802,13 @@ def test_vapor_pressure_provider_raises_on_unregistered_species_in_view(
     with pytest.raises(AccountingError):
         provider.dispatch(request)
 _REVIEWED_ADDITIVE_CARRIERS = {
+    "Al2",
+    "Al2O2",
+    "Al2O3_gas",
+    "AlO2",
+    "Ca2",
+    "CrO",
+    "CrO2",
     "TiO",
     "TiO2_gas",
     "CaO_gas",

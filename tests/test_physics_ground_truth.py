@@ -1011,7 +1011,13 @@ def test_antoine_values_are_finite_positive_ground_truth_numbers() -> None:
     for species, entry in _vapor_pressure_data()["foulant_vapor"].items():
         if "pure_component_antoine" not in entry:
             continue
-        temperature_K = float(entry["boiling_point_C"]) + 273.15
+        if "boiling_point_C" in entry:
+            temperature_K = float(entry["boiling_point_C"]) + 273.15
+        else:
+            # Newly executable Stage-0 rows preserve their source-tabulated
+            # validity bands instead of inventing a normal-boiling-point field.
+            valid_range_K = tuple(float(value) for value in entry["valid_range_K"])
+            temperature_K = sum(valid_range_K) / 2.0
         pressure_pa = _pure_component_antoine_pa(entry, temperature_K)
         assert math.isfinite(pressure_pa)
         assert pressure_pa > 0.0

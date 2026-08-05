@@ -4979,8 +4979,10 @@ def test_activities_times_antoine_maps_thermoengine_liquid_activity_keys():
 
     required = {
         'Na', 'K', 'Mg', 'Fe', 'Ca', 'Al', 'Si', 'Ti',
-        'Cr', 'Mn', 'SiO', 'CrO2',
+        'Cr', 'Mn', 'SiO',
     }
+    # Composite CrO2 is evaluated by the canonical vapour-rail catalog; this
+    # legacy AlphaMELTS bridge covers only its original Antoine/activity surface.
     assert required == set(pressures)
     assert all(pressures[species] > 0.0 for species in required)
     assert backend._activity_for_vapor_species('Na', activities) == pytest.approx(

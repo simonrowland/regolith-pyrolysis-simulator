@@ -260,7 +260,6 @@ def test_volatilization_diagnostic_matches_helper(
         "phase_specs": phase_specs,
         "foulant_registry": foulant_registry,
     })
-    assert result.transition is None
     diag = result.diagnostic
     assert diag["cumulative_escaped_frac"] == pytest.approx(
         1.0
@@ -269,6 +268,18 @@ def test_volatilization_diagnostic_matches_helper(
         abs=1e-9,
     )
     assert diag["wall_deposit_frac"] == diag["cumulative_escaped_frac"]
+    transition = result.transition
+    assert transition is not None
+    escaped_mol = diag["escaped_carrier_mol"]
+    assert transition.debits["process.stage0_foulant"]["NaCl"] == pytest.approx(
+        escaped_mol,
+        abs=1e-12,
+    )
+    assert transition.credits["terminal.offgas"]["NaCl"] == pytest.approx(
+        escaped_mol,
+        abs=1e-12,
+    )
+    assert all(abs(net_mol) <= 1e-12 for net_mol in transition.atom_balance_proof.values())
 
 
 def test_sulfate_decomp_diagnostic_matches_helper(

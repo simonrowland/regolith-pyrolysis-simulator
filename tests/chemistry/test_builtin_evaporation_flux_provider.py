@@ -870,12 +870,9 @@ def test_evaporation_caller_wiring_matches_shared_helper_for_lunar_case(
         "series-resistance reference returned no flux -- the test "
         "fixture is not exercising the path it claims to cover"
     )
-    # b-114: CrO2's policy-only evaporation-alpha row is not a numeric value.
-    # The catalog refuses that channel and retains parent Cr2O3; it must not be
-    # compared to the helper's deliberate alpha=1 prototype fallback.
-    assert refused_reference_species == {"CrO2"}
-    assert refusals["CrO2"]["refusal_code"] == "missing_channel_contract"
-    assert "missing alpha" in refusals["CrO2"]["extra"]["detail"]
+    # MC-4A activates CrO2 with a numeric, explicitly non-authoritative alpha
+    # proxy, so every reference species is now batch-eligible at this C0 point.
+    assert refused_reference_species == set()
     for species, legacy_value in reference_flux.items():
         if species in refused_reference_species:
             continue
@@ -978,26 +975,18 @@ def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
         refusals = sim._last_vapour_batch_report["refusals_by_species"]
         refused_reference_species = set(reference_flux) & set(refusals)
         # ce14fd3 (VR-11; DESIGN-REV5 §1.2/§7.4), later pinned as b-114
-        # in 1a6ad25, made batch eligibility authoritative.  CrO2's policy-only
-        # alpha row is therefore a typed refusal and is outside this wiring
-        # parity comparison; every executable species must still match.
+        # in 1a6ad25, made batch eligibility authoritative.
         # 2026-08-05 phosphorus carrier activation 7e6bebc adds a C0b cleanup
         # stage whose declared predicate admits only P2O5-sourced carriers. The
         # legacy math helper has no stage predicate, so typed non-P refusals are
-        # outside wiring parity exactly as CrO2's incomplete channel already is.
-        c0b_predicate_refusals = refused_reference_species - {"CrO2"}
-        for species in c0b_predicate_refusals:
+        # outside wiring parity. MC-4A makes CrO2 executable, so at C0b it follows
+        # that same typed predicate refusal instead of missing a channel contract.
+        for species in refused_reference_species:
             refusal = refusals[species]
             assert refusal["refusal_code"] == "inapplicable_by_declared_predicate"
             assert "c0b_p_cleanup admits only P2O5-sourced carrier rules" in (
                 refusal["extra"]["detail"]
             )
-        if "CrO2" in refused_reference_species:
-            refusal = refusals["CrO2"]
-            assert refusal["refusal_code"] == "missing_channel_contract"
-            assert "missing alpha" in refusal["extra"]["detail"]
-            assert refusal["is_flux_active"] is False
-            assert "CrO2" not in kernel_flux
         refused_reference_species_seen.update(refused_reference_species)
 
         for species in set(reference_flux) | set(kernel_flux):

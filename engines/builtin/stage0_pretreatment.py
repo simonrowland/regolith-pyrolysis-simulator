@@ -246,6 +246,7 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
         "process.stage0_carbonate_feed",
         "process.reagent_inventory",
         "process.stage0_perchlorate_feed",
+        "process.stage0_foulant",
         "process.cleaned_melt",
         SOLID_CHAR_CARBON_ACCOUNT,
         "process.metal_phase",
@@ -325,7 +326,7 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
             )
         if reaction_family == REACTION_FAMILY_VOLATILIZATION:
             return self._dispatch_volatilization_diagnostic(
-                controls, control_audit,
+                controls, registry, resolve_species_formula, control_audit,
             )
         if reaction_family == REACTION_FAMILY_SULFATE_DECOMP:
             return self._dispatch_sulfate_decomp_diagnostic(
@@ -996,6 +997,8 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
     def _dispatch_volatilization_diagnostic(
         self,
         controls: Mapping[str, Any],
+        formula_registry: Mapping[str, Any],
+        resolve_species_formula,
         control_audit,
     ) -> IntentResult:
         from engines.builtin.foulant_disposition import (
@@ -1066,10 +1069,49 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
             phase_splits.append(phase_split)
 
         cumulative_escaped = 1.0 - retained_after_phases
+        transition = None
+        escaped_carrier_mol = 0.0
+        source_formula = carrier
+        source_stoichiometry = 1.0
+        if cumulative_escaped > 0.0:
+            source_by_association_carrier = {
+                "Na2Cl2": "NaCl",
+                "K2Cl2": "KCl",
+            }
+            source_formula = source_by_association_carrier.get(carrier, carrier)
+            source_stoichiometry = 2.0 if source_formula != carrier else 1.0
+            carrier_formula = resolve_species_formula(carrier, formula_registry)
+            escaped_carrier_mol = (
+                feed_kg
+                * cumulative_escaped
+                / carrier_formula.molar_mass_kg_per_mol()
+            )
+            debits = {
+                "process.stage0_foulant": {
+                    source_formula: escaped_carrier_mol * source_stoichiometry,
+                }
+            }
+            credits = {
+                "terminal.offgas": {
+                    carrier: escaped_carrier_mol,
+                }
+            }
+            atom_proof = self._build_atom_balance_proof(
+                debits,
+                credits,
+                formula_registry,
+                resolve_species_formula,
+            )
+            transition = LedgerTransitionProposal(
+                debits=debits,
+                credits=credits,
+                reason=f"stage0_volatilization_{carrier}",
+                atom_balance_proof=atom_proof,
+            )
         return IntentResult(
             intent=ChemistryIntent.STAGE0_PRETREATMENT,
             status="ok",
-            transition=None,
+            transition=transition,
             control_audit=control_audit,
             diagnostic={
                 "reaction_family": REACTION_FAMILY_VOLATILIZATION,
@@ -1079,8 +1121,11 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
                 "cumulative_escaped_frac": cumulative_escaped,
                 "cumulative_retained_frac": retained_after_phases,
                 "wall_deposit_frac": cumulative_escaped,
+                "escaped_carrier_mol": escaped_carrier_mol,
+                "source_inventory_formula": source_formula,
+                "source_inventory_stoichiometry": source_stoichiometry,
                 "interval_required": interval_required,
-                "behavior_change_gate": "instrument_first",
+                "behavior_change_gate": "status_bearing_transition",
                 "warnings": tuple(warnings),
             },
             warnings=tuple(warnings),

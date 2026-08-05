@@ -6,7 +6,7 @@ counts:
   elements: 69
   carriers: 955
   pairs: 1872
-  catalog_linked_pairs: 101
+  catalog_linked_pairs: 107
 provenance:
   feedstocks: data/feedstocks.yaml
   nasa_cea_extract: data/literature/extracts/nasa-cea-thermo.yaml
@@ -1100,10 +1100,14 @@ pairs:
     Al: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:AL2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Al2
+  catalog_family_ids:
+  - oxide_vapors_al2_family
+  catalog_species_ids:
+  - Al2
   thermo_available: true
 - element: Al
   carrier: Al2Br6
@@ -1197,10 +1201,14 @@ pairs:
     O: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:AL2O2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Al2O2
+  catalog_family_ids:
+  - oxide_vapors_al2o2_family
+  catalog_species_ids:
+  - Al2O2
   thermo_available: true
 - element: Al
   carrier: Al2O3_gas
@@ -1210,10 +1218,14 @@ pairs:
     O: 3.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:AL2O3
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Al2O3_gas
+  catalog_family_ids:
+  - oxide_vapors_al2o3_gas_family
+  catalog_species_ids:
+  - Al2O3_gas
   thermo_available: true
 - element: Al
   carrier: Al2S
@@ -1643,10 +1655,14 @@ pairs:
     O: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:ALO2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:AlO2
+  catalog_family_ids:
+  - oxide_vapors_alo2_family
+  catalog_species_ids:
+  - AlO2
   thermo_available: true
 - element: Al
   carrier: AlO2H2
@@ -7645,10 +7661,14 @@ pairs:
     Ca: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Ca2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Ca2
+  catalog_family_ids:
+  - oxide_vapors_ca2_family
+  catalog_species_ids:
+  - Ca2
   thermo_available: true
 - element: Ca
   carrier: CaBr
@@ -10610,10 +10630,14 @@ pairs:
     O: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:CrO
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:CrO
+  catalog_family_ids:
+  - oxide_vapors_cro_family
+  catalog_species_ids:
+  - CrO
   thermo_available: true
 - element: Cr
   carrier: CrO2

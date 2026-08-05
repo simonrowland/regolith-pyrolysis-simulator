@@ -19,6 +19,7 @@ import marshal
 import math
 from pathlib import Path
 import re
+import sys
 from types import MappingProxyType
 from typing import Any
 
@@ -937,19 +938,23 @@ class CompiledPressureEvaluator:
                 oxygen / self.pO2_reference_bar
             )
 
-        # A physically finite trace pressure can fall below IEEE-754's smallest
-        # positive float after activity depletion (Al2O has an a^2 coupling).
-        # Premise: P=10^logP Pa; when logP<log10(nextafter(0,+inf)), no positive
-        # float represents P. Preserve the limiting direction with the smallest
-        # positive Pa value instead of fabricating an exact zero or refusing the
-        # entire chemistry step. Units remain Pa. Sanity: values within the
-        # representable range are bit-for-bit unchanged; the floor is ~5e-324 Pa
-        # and therefore cannot create a material debit.
+        # A finite continued log-pressure can lie outside IEEE-754's representable
+        # pressure interval: activity depletion drives trace carriers below the
+        # minimum, while far-above-window Stage-0 correlations can exceed the
+        # maximum. Premise: P=10^logP Pa. Clamp only at the numerical endpoints so
+        # the first case never invents zero and the second retains the limiting
+        # escape direction without returning inf. Units remain Pa. Sanity: every
+        # representable pressure is bit-for-bit unchanged; both cases remain typed
+        # non-certifying continuations.
         minimum_positive_pa = math.nextafter(0.0, math.inf)
+        maximum_finite_pa = math.nextafter(sys.float_info.max, 0.0)
         numerical_underflow = log10_pressure < math.log10(minimum_positive_pa)
+        numerical_overflow = log10_pressure > math.log10(maximum_finite_pa)
         pressure_pa = (
             minimum_positive_pa
             if numerical_underflow
+            else maximum_finite_pa
+            if numerical_overflow
             else 10.0**log10_pressure
         )
         if not math.isfinite(pressure_pa) or pressure_pa <= 0.0:
@@ -964,7 +969,11 @@ class CompiledPressureEvaluator:
             status=(
                 self.out_of_range_status
                 if out_of_range
-                else "numerical_underflow_floor" if numerical_underflow else None
+                else "numerical_underflow_floor"
+                if numerical_underflow
+                else "numerical_overflow_ceiling"
+                if numerical_overflow
+                else None
             ),
             acquisition_flag=(
                 self.acquisition_flag
@@ -972,6 +981,8 @@ class CompiledPressureEvaluator:
                 else (
                     f"pressure_below_float_range:{self.species_id}"
                     if numerical_underflow
+                    else f"pressure_above_float_range:{self.species_id}"
+                    if numerical_overflow
                     else None
                 )
             ),

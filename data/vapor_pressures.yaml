@@ -3098,6 +3098,881 @@ families:
       compatibility_projection: oxide_vapors
       canonical_aliases: []
       hot_train_applicability: applicable
+  oxide_vapors_al2_family:
+    physical_properties:
+      species:
+        Al2:
+          formula: Al2
+          molar_mass_g_mol: 53.963077
+          parent_oxide: Al2O3
+          fit_target: standard_reaction_term
+          authority_class: analytical_non_authoritative
+          confidence_tier: status_bearing_composed_carrier
+          reaction:
+            formula: 2 AlO1.5(l) -> Al2(g) + 1.5 O2(g)
+            basis: existing AlO1.5 condensed standard reaction plus NASA CEA cea_AL_gibbs, cea_AL2_gibbs, and cea_O2_gibbs gas
+              exchange
+            derivation: 'Premise: 2 AlO1.5 supplies one Al2; the displayed source reaction is atom balanced. Algebra: K=(p_vapor/P0)*(pO2/P0)^1.5/a_AlO1.5^2,
+              so activity exponent=2 and pO2 exponent=-nu_O2/nu_vapor=-1.5. Unit check: K, activities, and pressure ratios are
+              dimensionless; evaluator output is Pa. Sanity check: the independently stored kg identity is oxide_per=1.88944149719261=1+O2_per
+              (0.889441497192608).'
+          stoich_oxide_per_vapor: 1.8894414971926081
+          stoich_O2_per_vapor: 0.8894414971926082
+          stoichiometry_derivation: 1*M(Al2O3)/M(Al2)=1.88944149719261 kg/kg; 1.5*M(O2)/M(Al2)=0.889441497192608 kg/kg. Unit
+            check kg/kg; mass identity 1.88944149719261=1+(0.889441497192608).
+          oxide_activity_exponent: 2.0
+          pO2_exponent: -1.5
+          pO2_reference_bar: 1.0
+          notes: Systematic carrier-completeness composition. Pressure, activity coupling, and evaporation alpha remain status-bearing
+            non-authoritative and can never certify.
+          validation:
+            status: pending_validation
+            anchor_refs: []
+          source_reactions:
+          - id: liquid_alo1_5_to_al2_gas
+            reactants:
+            - formula: AlO1.5
+              stoichiometry: 2.0
+            products:
+            - formula: Al2
+              stoichiometry: 1.0
+            - formula: O2
+              stoichiometry: 1.5
+            activity_input:
+              component_id: AlO1.5
+              standard_state:
+                convention: raoultian_pure_endmember
+                phase: liquid
+                reference_pressure_bar: 1.0
+                component_basis: raoultian_pure_endmember
+              activity_model: provider_reported_thermodynamic_activity
+              allow_henrian_upper_bound: false
+              compound_bearing: false
+              require_assemblage_match: false
+          pressure_models:
+          - fit_target: standard_reaction_term
+            pressure_kind: equilibrium_partial_pressure
+            species_basis: monomer
+            valid_domain:
+              temperature_K:
+              - 1400.0
+              - 2273.15
+            provenance:
+            - source_id: nasa-cea-thermo
+              observation_ids:
+              - cea_AL_gibbs
+              - cea_AL2_gibbs
+              - cea_O2_gibbs
+            - source_id: metals_al_family
+              observation_id: liquid_oxide_standard_reaction
+            evaluator_family: nasa_cea_9
+            source_reaction_id: liquid_alo1_5_to_al2_gas
+            activity_semantics: source_reaction_activity
+            oxygen_fugacity_channel: intrinsic_melt
+            base_reference_pressure_model:
+              evaluator_family: antoine
+              coefficients:
+                A: 17.2874548
+                B: 54230.9684109
+                C: -49.89
+            base_vapor_formula: Al
+            gas_exchange_reaction:
+              reactants:
+              - formula: Al
+                stoichiometry: 2.0
+              products:
+              - formula: Al2
+                stoichiometry: 1.0
+            species_thermo:
+              Al:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_AL_gibbs
+              Al2:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_AL2_gibbs
+              O2:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_O2_gibbs
+            derivation: 'Premise: the NASA CEA gas exchange composes on the existing monatomic condensed rail and the balanced
+              source reaction. Algebra: the exchange pressure is multiplied by a_AlO1.5^2 and pO2^-1.5 exactly once; the compiler
+              re-derives both exponents from atom balance. Unit check: gas pressure ratios and K are dimensionless and output
+              is Pa. Sanity check: setting all gas standard-state ratios to one recovers the declared condensed reaction powers.'
+            activity_exponent: 2.0
+            pO2_exponent: -1.5
+            pO2_reference_bar: 1.0
+    fiat_routing:
+      plant_bin: null
+      engineering_capture_policy: downstream_equilibrium_required
+      products_and_coproducts: []
+      process_or_terminal_destination: process.condensation_train
+      routing_note: No carrier-specific deposition curve is available; routing is structural only and cannot certify capture.
+      condensation_reference_at_1mbar_C: 2729.789285156076
+      condensation_reference_derivation: 'Solve the compiled unit-activity, pO2_reference=1 bar curve for P_Al2=100 Pa: T=3002.93928516
+        K = 2729.78928516 C. Unit check Pa=Pa. The root is outside the reviewed pressure-fit domain and is a routing-only status-bearing
+        proxy, never validation evidence.'
+    vaporisation_coefficients:
+      evaporation_alpha:
+        value: 0.3
+        source: Status-bearing broad proxy inherited from metals_al_family; no Al2-specific alpha is available.
+        T_band_K:
+        - 1400.0
+        - 2273.15
+        envelope:
+        - 0.03
+        - 1.0
+        tier: 2
+        tag: broad_proxy_not_intrinsic
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 1400.0
+        - 2273.15
+        envelope:
+        - 0.03
+        - 1.0
+      extrapolation_policy: conservative_slope_continuation
+      out_of_range_status: out_of_range_conservative_continuation
+      acquisition_flag: evaporation_alpha_proxy:Al2
+    code_metadata:
+      formula_id: Al2
+      source_account: process.cleaned_melt
+      request_rule: source_inventory_present
+      solve_group_id: oxide_vapors_al2_family
+      compatibility_projection: oxide_vapors
+      canonical_aliases: []
+      hot_train_applicability: applicable
+  oxide_vapors_al2o2_family:
+    physical_properties:
+      species:
+        Al2O2:
+          formula: Al2O2
+          molar_mass_g_mol: 85.961077
+          parent_oxide: Al2O3
+          fit_target: standard_reaction_term
+          authority_class: analytical_non_authoritative
+          confidence_tier: status_bearing_composed_carrier
+          reaction:
+            formula: 2 AlO1.5(l) -> Al2O2(g) + 0.5 O2(g)
+            basis: existing AlO1.5 condensed standard reaction plus NASA CEA cea_AL_gibbs, cea_AL2O2_gibbs, and cea_O2_gibbs
+              gas exchange
+            derivation: 'Premise: 2 AlO1.5 supplies one Al2O2; the displayed source reaction is atom balanced. Algebra: K=(p_vapor/P0)*(pO2/P0)^0.5/a_AlO1.5^2,
+              so activity exponent=2 and pO2 exponent=-nu_O2/nu_vapor=-0.5. Unit check: K, activities, and pressure ratios are
+              dimensionless; evaluator output is Pa. Sanity check: the independently stored kg identity is oxide_per=1.18611911993611=1+O2_per
+              (0.186119119936108).'
+          stoich_oxide_per_vapor: 1.1861191199361079
+          stoich_O2_per_vapor: 0.18611911993610783
+          stoichiometry_derivation: 1*M(Al2O3)/M(Al2O2)=1.18611911993611 kg/kg; 0.5*M(O2)/M(Al2O2)=0.186119119936108 kg/kg.
+            Unit check kg/kg; mass identity 1.18611911993611=1+(0.186119119936108).
+          oxide_activity_exponent: 2.0
+          pO2_exponent: -0.5
+          pO2_reference_bar: 1.0
+          notes: Systematic carrier-completeness composition. Pressure, activity coupling, and evaporation alpha remain status-bearing
+            non-authoritative and can never certify.
+          validation:
+            status: pending_validation
+            anchor_refs: []
+          source_reactions:
+          - id: liquid_alo1_5_to_al2o2_gas
+            reactants:
+            - formula: AlO1.5
+              stoichiometry: 2.0
+            products:
+            - formula: Al2O2
+              stoichiometry: 1.0
+            - formula: O2
+              stoichiometry: 0.5
+            activity_input:
+              component_id: AlO1.5
+              standard_state:
+                convention: raoultian_pure_endmember
+                phase: liquid
+                reference_pressure_bar: 1.0
+                component_basis: raoultian_pure_endmember
+              activity_model: provider_reported_thermodynamic_activity
+              allow_henrian_upper_bound: false
+              compound_bearing: false
+              require_assemblage_match: false
+          pressure_models:
+          - fit_target: standard_reaction_term
+            pressure_kind: equilibrium_partial_pressure
+            species_basis: monomer
+            valid_domain:
+              temperature_K:
+              - 1400.0
+              - 2273.15
+            provenance:
+            - source_id: nasa-cea-thermo
+              observation_ids:
+              - cea_AL_gibbs
+              - cea_AL2O2_gibbs
+              - cea_O2_gibbs
+            - source_id: metals_al_family
+              observation_id: liquid_oxide_standard_reaction
+            evaluator_family: nasa_cea_9
+            source_reaction_id: liquid_alo1_5_to_al2o2_gas
+            activity_semantics: source_reaction_activity
+            oxygen_fugacity_channel: intrinsic_melt
+            base_reference_pressure_model:
+              evaluator_family: antoine
+              coefficients:
+                A: 17.2874548
+                B: 54230.9684109
+                C: -49.89
+            base_vapor_formula: Al
+            gas_exchange_reaction:
+              reactants:
+              - formula: Al
+                stoichiometry: 2.0
+              - formula: O2
+                stoichiometry: 1.0
+              products:
+              - formula: Al2O2
+                stoichiometry: 1.0
+            species_thermo:
+              Al:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_AL_gibbs
+              Al2O2:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_AL2O2_gibbs
+              O2:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_O2_gibbs
+            derivation: 'Premise: the NASA CEA gas exchange composes on the existing monatomic condensed rail and the balanced
+              source reaction. Algebra: the exchange pressure is multiplied by a_AlO1.5^2 and pO2^-0.5 exactly once; the compiler
+              re-derives both exponents from atom balance. Unit check: gas pressure ratios and K are dimensionless and output
+              is Pa. Sanity check: setting all gas standard-state ratios to one recovers the declared condensed reaction powers.'
+            activity_exponent: 2.0
+            pO2_exponent: -0.5
+            pO2_reference_bar: 1.0
+    fiat_routing:
+      plant_bin: null
+      engineering_capture_policy: downstream_equilibrium_required
+      products_and_coproducts: []
+      process_or_terminal_destination: process.condensation_train
+      routing_note: No carrier-specific deposition curve is available; routing is structural only and cannot certify capture.
+      condensation_reference_at_1mbar_C: 2553.486987083829
+      condensation_reference_derivation: 'Solve the compiled unit-activity, pO2_reference=1 bar curve for P_Al2O2=100 Pa: T=2826.63698708
+        K = 2553.48698708 C. Unit check Pa=Pa. The root is outside the reviewed pressure-fit domain and is a routing-only status-bearing
+        proxy, never validation evidence.'
+    vaporisation_coefficients:
+      evaporation_alpha:
+        value: 0.3
+        source: Status-bearing broad proxy inherited from metals_al_family; no Al2O2-specific alpha is available.
+        T_band_K:
+        - 1400.0
+        - 2273.15
+        envelope:
+        - 0.03
+        - 1.0
+        tier: 2
+        tag: broad_proxy_not_intrinsic
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 1400.0
+        - 2273.15
+        envelope:
+        - 0.03
+        - 1.0
+      extrapolation_policy: conservative_slope_continuation
+      out_of_range_status: out_of_range_conservative_continuation
+      acquisition_flag: evaporation_alpha_proxy:Al2O2
+    code_metadata:
+      formula_id: Al2O2
+      source_account: process.cleaned_melt
+      request_rule: source_inventory_present
+      solve_group_id: oxide_vapors_al2o2_family
+      compatibility_projection: oxide_vapors
+      canonical_aliases: []
+      hot_train_applicability: applicable
+  oxide_vapors_al2o3_gas_family:
+    physical_properties:
+      species:
+        Al2O3_gas:
+          formula: Al2O3
+          molar_mass_g_mol: 101.960077
+          parent_oxide: Al2O3
+          fit_target: standard_reaction_term
+          authority_class: analytical_non_authoritative
+          confidence_tier: status_bearing_composed_carrier
+          reaction:
+            formula: 2 AlO1.5(l) -> Al2O3(g)
+            basis: existing AlO1.5 condensed standard reaction plus NASA CEA cea_AL_gibbs, cea_AL2O3_gibbs, and cea_O2_gibbs
+              gas exchange
+            derivation: 'Premise: 2 AlO1.5 supplies one Al2O3; the displayed source reaction is atom balanced. Algebra: K=(p_vapor/P0)*(pO2/P0)^0/a_AlO1.5^2,
+              so activity exponent=2 and pO2 exponent=-nu_O2/nu_vapor=-0. Unit check: K, activities, and pressure ratios are
+              dimensionless; evaluator output is Pa. Sanity check: the independently stored kg identity is oxide_per=1=1+O2_per
+              (0).'
+          stoich_oxide_per_vapor: 1.0
+          stoich_O2_per_vapor: 0.0
+          stoichiometry_derivation: 1*M(Al2O3)/M(Al2O3)=1 kg/kg; 0*M(O2)/M(Al2O3)=0 kg/kg. Unit check kg/kg; mass identity 1=1+(0).
+          oxide_activity_exponent: 2.0
+          pO2_exponent: -0.0
+          pO2_reference_bar: 1.0
+          notes: Systematic carrier-completeness composition. Pressure, activity coupling, and evaporation alpha remain status-bearing
+            non-authoritative and can never certify.
+          validation:
+            status: pending_validation
+            anchor_refs: []
+          source_reactions:
+          - id: liquid_alo1_5_to_al2o3_gas
+            reactants:
+            - formula: AlO1.5
+              stoichiometry: 2.0
+            products:
+            - formula: Al2O3
+              stoichiometry: 1.0
+            activity_input:
+              component_id: AlO1.5
+              standard_state:
+                convention: raoultian_pure_endmember
+                phase: liquid
+                reference_pressure_bar: 1.0
+                component_basis: raoultian_pure_endmember
+              activity_model: provider_reported_thermodynamic_activity
+              allow_henrian_upper_bound: false
+              compound_bearing: false
+              require_assemblage_match: false
+          pressure_models:
+          - fit_target: standard_reaction_term
+            pressure_kind: equilibrium_partial_pressure
+            species_basis: monomer
+            valid_domain:
+              temperature_K:
+              - 1400.0
+              - 2273.15
+            provenance:
+            - source_id: nasa-cea-thermo
+              observation_ids:
+              - cea_AL_gibbs
+              - cea_AL2O3_gibbs
+              - cea_O2_gibbs
+            - source_id: metals_al_family
+              observation_id: liquid_oxide_standard_reaction
+            evaluator_family: nasa_cea_9
+            source_reaction_id: liquid_alo1_5_to_al2o3_gas
+            activity_semantics: source_reaction_activity
+            oxygen_fugacity_channel: intrinsic_melt
+            base_reference_pressure_model:
+              evaluator_family: antoine
+              coefficients:
+                A: 17.2874548
+                B: 54230.9684109
+                C: -49.89
+            base_vapor_formula: Al
+            gas_exchange_reaction:
+              reactants:
+              - formula: Al
+                stoichiometry: 2.0
+              - formula: O2
+                stoichiometry: 1.5
+              products:
+              - formula: Al2O3
+                stoichiometry: 1.0
+            species_thermo:
+              Al:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_AL_gibbs
+              Al2O3:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_AL2O3_gibbs
+              O2:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_O2_gibbs
+            derivation: 'Premise: the NASA CEA gas exchange composes on the existing monatomic condensed rail and the balanced
+              source reaction. Algebra: the exchange pressure is multiplied by a_AlO1.5^2 and pO2^-0 exactly once; the compiler
+              re-derives both exponents from atom balance. Unit check: gas pressure ratios and K are dimensionless and output
+              is Pa. Sanity check: setting all gas standard-state ratios to one recovers the declared condensed reaction powers.'
+            activity_exponent: 2.0
+            pO2_exponent: -0.0
+            pO2_reference_bar: 1.0
+    fiat_routing:
+      plant_bin: null
+      engineering_capture_policy: downstream_equilibrium_required
+      products_and_coproducts: []
+      process_or_terminal_destination: process.condensation_train
+      routing_note: No carrier-specific deposition curve is available; routing is structural only and cannot certify capture.
+      condensation_reference_at_1mbar_C: 2639.2557672225034
+      condensation_reference_derivation: 'Solve the compiled unit-activity, pO2_reference=1 bar curve for P_Al2O3_gas=100 Pa:
+        T=2912.40576722 K = 2639.25576722 C. Unit check Pa=Pa. The root is outside the reviewed pressure-fit domain and is a
+        routing-only status-bearing proxy, never validation evidence.'
+    vaporisation_coefficients:
+      evaporation_alpha:
+        value: 0.3
+        source: Status-bearing broad proxy inherited from metals_al_family; no Al2O3(g)-specific alpha is available.
+        T_band_K:
+        - 1400.0
+        - 2273.15
+        envelope:
+        - 0.03
+        - 1.0
+        tier: 2
+        tag: broad_proxy_not_intrinsic
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 1400.0
+        - 2273.15
+        envelope:
+        - 0.03
+        - 1.0
+      extrapolation_policy: conservative_slope_continuation
+      out_of_range_status: out_of_range_conservative_continuation
+      acquisition_flag: evaporation_alpha_proxy:Al2O3_gas
+    code_metadata:
+      formula_id: Al2O3_gas
+      source_account: process.cleaned_melt
+      request_rule: source_inventory_present
+      solve_group_id: oxide_vapors_al2o3_gas_family
+      compatibility_projection: oxide_vapors
+      canonical_aliases: []
+      hot_train_applicability: applicable
+  oxide_vapors_alo2_family:
+    physical_properties:
+      species:
+        AlO2:
+          formula: AlO2
+          molar_mass_g_mol: 58.9795385
+          parent_oxide: Al2O3
+          fit_target: standard_reaction_term
+          authority_class: analytical_non_authoritative
+          confidence_tier: status_bearing_composed_carrier
+          reaction:
+            formula: AlO1.5(l) + 0.25 O2(g) -> AlO2(g)
+            basis: existing AlO1.5 condensed standard reaction plus NASA CEA cea_AL_gibbs, cea_ALO2_gibbs, and cea_O2_gibbs
+              gas exchange
+            derivation: 'Premise: 1 AlO1.5 supplies one AlO2; the displayed source reaction is atom balanced. Algebra: K=(p_vapor/P0)*(pO2/P0)^-0.25/a_AlO1.5^1,
+              so activity exponent=1 and pO2 exponent=-nu_O2/nu_vapor=0.25. Unit check: K, activities, and pressure ratios are
+              dimensionless; evaluator output is Pa. Sanity check: the independently stored kg identity is oxide_per=0.864368216445098=1+O2_per
+              (-0.135631783554902).'
+          stoich_oxide_per_vapor: 0.8643682164450982
+          stoich_O2_per_vapor: -0.13563178355490185
+          stoichiometry_derivation: 0.5*M(Al2O3)/M(AlO2)=0.864368216445098 kg/kg; -0.25*M(O2)/M(AlO2)=-0.135631783554902 kg/kg.
+            Unit check kg/kg; mass identity 0.864368216445098=1+(-0.135631783554902).
+          oxide_activity_exponent: 1.0
+          pO2_exponent: 0.25
+          pO2_reference_bar: 1.0
+          notes: Systematic carrier-completeness composition. Pressure, activity coupling, and evaporation alpha remain status-bearing
+            non-authoritative and can never certify.
+          validation:
+            status: pending_validation
+            anchor_refs: []
+          source_reactions:
+          - id: liquid_alo1_5_to_alo2_gas
+            reactants:
+            - formula: AlO1.5
+              stoichiometry: 1.0
+            - formula: O2
+              stoichiometry: 0.25
+            products:
+            - formula: AlO2
+              stoichiometry: 1.0
+            activity_input:
+              component_id: AlO1.5
+              standard_state:
+                convention: raoultian_pure_endmember
+                phase: liquid
+                reference_pressure_bar: 1.0
+                component_basis: raoultian_pure_endmember
+              activity_model: provider_reported_thermodynamic_activity
+              allow_henrian_upper_bound: false
+              compound_bearing: false
+              require_assemblage_match: false
+          pressure_models:
+          - fit_target: standard_reaction_term
+            pressure_kind: equilibrium_partial_pressure
+            species_basis: monomer
+            valid_domain:
+              temperature_K:
+              - 1400.0
+              - 2273.15
+            provenance:
+            - source_id: nasa-cea-thermo
+              observation_ids:
+              - cea_AL_gibbs
+              - cea_ALO2_gibbs
+              - cea_O2_gibbs
+            - source_id: metals_al_family
+              observation_id: liquid_oxide_standard_reaction
+            evaluator_family: nasa_cea_9
+            source_reaction_id: liquid_alo1_5_to_alo2_gas
+            activity_semantics: source_reaction_activity
+            oxygen_fugacity_channel: intrinsic_melt
+            base_reference_pressure_model:
+              evaluator_family: antoine
+              coefficients:
+                A: 17.2874548
+                B: 54230.9684109
+                C: -49.89
+            base_vapor_formula: Al
+            gas_exchange_reaction:
+              reactants:
+              - formula: Al
+                stoichiometry: 1.0
+              - formula: O2
+                stoichiometry: 1.0
+              products:
+              - formula: AlO2
+                stoichiometry: 1.0
+            species_thermo:
+              Al:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_AL_gibbs
+              AlO2:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_ALO2_gibbs
+              O2:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_O2_gibbs
+            derivation: 'Premise: the NASA CEA gas exchange composes on the existing monatomic condensed rail and the balanced
+              source reaction. Algebra: the exchange pressure is multiplied by a_AlO1.5^1 and pO2^0.25 exactly once; the compiler
+              re-derives both exponents from atom balance. Unit check: gas pressure ratios and K are dimensionless and output
+              is Pa. Sanity check: setting all gas standard-state ratios to one recovers the declared condensed reaction powers.'
+            activity_exponent: 1.0
+            pO2_exponent: 0.25
+            pO2_reference_bar: 1.0
+    fiat_routing:
+      plant_bin: null
+      engineering_capture_policy: downstream_equilibrium_required
+      products_and_coproducts: []
+      process_or_terminal_destination: process.condensation_train
+      routing_note: No carrier-specific deposition curve is available; routing is structural only and cannot certify capture.
+      condensation_reference_at_1mbar_C: 2511.2351465219976
+      condensation_reference_derivation: 'Solve the compiled unit-activity, pO2_reference=1 bar curve for P_AlO2=100 Pa: T=2784.38514652
+        K = 2511.23514652 C. Unit check Pa=Pa. The root is outside the reviewed pressure-fit domain and is a routing-only status-bearing
+        proxy, never validation evidence.'
+    vaporisation_coefficients:
+      evaporation_alpha:
+        value: 0.3
+        source: Status-bearing broad proxy inherited from metals_al_family; no AlO2-specific alpha is available.
+        T_band_K:
+        - 1400.0
+        - 2273.15
+        envelope:
+        - 0.03
+        - 1.0
+        tier: 2
+        tag: broad_proxy_not_intrinsic
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 1400.0
+        - 2273.15
+        envelope:
+        - 0.03
+        - 1.0
+      extrapolation_policy: conservative_slope_continuation
+      out_of_range_status: out_of_range_conservative_continuation
+      acquisition_flag: evaporation_alpha_proxy:AlO2
+    code_metadata:
+      formula_id: AlO2
+      source_account: process.cleaned_melt
+      request_rule: source_inventory_present
+      solve_group_id: oxide_vapors_alo2_family
+      compatibility_projection: oxide_vapors
+      canonical_aliases: []
+      hot_train_applicability: applicable
+  oxide_vapors_ca2_family:
+    physical_properties:
+      species:
+        Ca2:
+          formula: Ca2
+          molar_mass_g_mol: 80.156
+          parent_oxide: CaO
+          fit_target: standard_reaction_term
+          authority_class: analytical_non_authoritative
+          confidence_tier: status_bearing_composed_carrier
+          reaction:
+            formula: 2 CaO(l) -> Ca2(g) + O2(g)
+            basis: existing CaO condensed standard reaction plus NASA CEA cea_Ca_gibbs, cea_Ca2_gibbs, and cea_O2_gibbs gas
+              exchange
+            derivation: 'Premise: 2 CaO supplies one Ca2; the displayed source reaction is atom balanced. Algebra: K=(p_vapor/P0)*(pO2/P0)^1/a_CaO^2,
+              so activity exponent=2 and pO2 exponent=-nu_O2/nu_vapor=-1. Unit check: K, activities, and pressure ratios are
+              dimensionless; evaluator output is Pa. Sanity check: the independently stored kg identity is oxide_per=1.39919656669494=1+O2_per
+              (0.399196566694945).'
+          stoich_oxide_per_vapor: 1.3991965666949446
+          stoich_O2_per_vapor: 0.39919656669494485
+          stoichiometry_derivation: 2*M(CaO)/M(Ca2)=1.39919656669494 kg/kg; 1*M(O2)/M(Ca2)=0.399196566694945 kg/kg. Unit check
+            kg/kg; mass identity 1.39919656669494=1+(0.399196566694945).
+          oxide_activity_exponent: 2.0
+          pO2_exponent: -1.0
+          pO2_reference_bar: 1.0
+          notes: Systematic carrier-completeness composition. Pressure, activity coupling, and evaporation alpha remain status-bearing
+            non-authoritative and can never certify.
+          validation:
+            status: pending_validation
+            anchor_refs: []
+          source_reactions:
+          - id: liquid_cao_to_ca2_gas
+            reactants:
+            - formula: CaO
+              stoichiometry: 2.0
+            products:
+            - formula: Ca2
+              stoichiometry: 1.0
+            - formula: O2
+              stoichiometry: 1.0
+            activity_input:
+              component_id: CaO
+              standard_state:
+                convention: raoultian_pure_endmember
+                phase: liquid
+                reference_pressure_bar: 1.0
+                component_basis: raoultian_pure_endmember
+              activity_model: provider_reported_thermodynamic_activity
+              allow_henrian_upper_bound: false
+              compound_bearing: false
+              require_assemblage_match: false
+          pressure_models:
+          - fit_target: standard_reaction_term
+            pressure_kind: equilibrium_partial_pressure
+            species_basis: monomer
+            valid_domain:
+              temperature_K:
+              - 1757.0
+              - 2273.15
+            provenance:
+            - source_id: nasa-cea-thermo
+              observation_ids:
+              - cea_Ca_gibbs
+              - cea_Ca2_gibbs
+              - cea_O2_gibbs
+            - source_id: metals_ca_family
+              observation_id: gas_rail_standard_reaction
+            evaluator_family: nasa_cea_9
+            source_reaction_id: liquid_cao_to_ca2_gas
+            activity_semantics: source_reaction_activity
+            oxygen_fugacity_channel: intrinsic_melt
+            base_reference_pressure_model:
+              evaluator_family: antoine
+              coefficients:
+                A: 12.2168914
+                B: 37873.6892331
+                C: -116.89
+            base_vapor_formula: Ca
+            gas_exchange_reaction:
+              reactants:
+              - formula: Ca
+                stoichiometry: 2.0
+              products:
+              - formula: Ca2
+                stoichiometry: 1.0
+            species_thermo:
+              Ca:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_Ca_gibbs
+              Ca2:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_Ca2_gibbs
+              O2:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_O2_gibbs
+            derivation: 'Premise: the NASA CEA gas exchange composes on the existing monatomic condensed rail and the balanced
+              source reaction. Algebra: the exchange pressure is multiplied by a_CaO^2 and pO2^-1 exactly once; the compiler
+              re-derives both exponents from atom balance. Unit check: gas pressure ratios and K are dimensionless and output
+              is Pa. Sanity check: setting all gas standard-state ratios to one recovers the declared condensed reaction powers.'
+            activity_exponent: 2.0
+            pO2_exponent: -1.0
+            pO2_reference_bar: 1.0
+    fiat_routing:
+      plant_bin: null
+      engineering_capture_policy: downstream_equilibrium_required
+      products_and_coproducts: []
+      process_or_terminal_destination: process.condensation_train
+      routing_note: No carrier-specific deposition curve is available; routing is structural only and cannot certify capture.
+      condensation_reference_at_1mbar_C: 2885.716628152633
+      condensation_reference_derivation: 'Solve the compiled unit-activity, pO2_reference=1 bar curve for P_Ca2=100 Pa: T=3158.86662815
+        K = 2885.71662815 C. Unit check Pa=Pa. The root is outside the reviewed pressure-fit domain and is a routing-only status-bearing
+        proxy, never validation evidence.'
+    vaporisation_coefficients:
+      evaporation_alpha:
+        value: 0.9
+        source: Status-bearing broad proxy inherited from metals_ca_family; no Ca2-specific alpha is available.
+        T_band_K:
+        - 1757.0
+        - 2273.15
+        envelope:
+        - 0.48
+        - 1.2
+        tier: 2
+        tag: broad_proxy_not_intrinsic
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 1757.0
+        - 2273.15
+        envelope:
+        - 0.48
+        - 1.2
+      extrapolation_policy: conservative_slope_continuation
+      out_of_range_status: out_of_range_conservative_continuation
+      acquisition_flag: evaporation_alpha_proxy:Ca2
+    code_metadata:
+      formula_id: Ca2
+      source_account: process.cleaned_melt
+      request_rule: source_inventory_present
+      solve_group_id: oxide_vapors_ca2_family
+      compatibility_projection: oxide_vapors
+      canonical_aliases: []
+      hot_train_applicability: applicable
+  oxide_vapors_cro_family:
+    physical_properties:
+      species:
+        CrO:
+          formula: CrO
+          molar_mass_g_mol: 67.9951
+          parent_oxide: Cr2O3
+          fit_target: standard_reaction_term
+          authority_class: analytical_non_authoritative
+          confidence_tier: status_bearing_composed_carrier
+          reaction:
+            formula: CrO1.5(l) -> CrO(g) + 0.25 O2(g)
+            basis: existing CrO1.5 condensed standard reaction plus NASA CEA cea_Cr_gibbs, cea_CrO_gibbs, and cea_O2_gibbs gas
+              exchange
+            derivation: 'Premise: 1 CrO1.5 supplies one CrO; the displayed source reaction is atom balanced. Algebra: K=(p_vapor/P0)*(pO2/P0)^0.25/a_CrO1.5^1,
+              so activity exponent=1 and pO2 exponent=-nu_O2/nu_vapor=-0.25. Unit check: K, activities, and pressure ratios
+              are dimensionless; evaluator output is Pa. Sanity check: the independently stored kg identity is oxide_per=1.11764818347204=1+O2_per
+              (0.117648183472044).'
+          stoich_oxide_per_vapor: 1.1176481834720444
+          stoich_O2_per_vapor: 0.11764818347204432
+          stoichiometry_derivation: 0.5*M(Cr2O3)/M(CrO)=1.11764818347204 kg/kg; 0.25*M(O2)/M(CrO)=0.117648183472044 kg/kg. Unit
+            check kg/kg; mass identity 1.11764818347204=1+(0.117648183472044).
+          oxide_activity_exponent: 1.0
+          pO2_exponent: -0.25
+          pO2_reference_bar: 1.0
+          notes: Systematic carrier-completeness composition. Pressure, activity coupling, and evaporation alpha remain status-bearing
+            non-authoritative and can never certify.
+          validation:
+            status: pending_validation
+            anchor_refs: []
+          source_reactions:
+          - id: liquid_cro1_5_to_cro_gas
+            reactants:
+            - formula: CrO1.5
+              stoichiometry: 1.0
+            products:
+            - formula: CrO
+              stoichiometry: 1.0
+            - formula: O2
+              stoichiometry: 0.25
+            activity_input:
+              component_id: CrO1.5
+              standard_state:
+                convention: raoultian_pure_endmember
+                phase: liquid
+                reference_pressure_bar: 1.0
+                component_basis: raoultian_pure_endmember
+              activity_model: provider_reported_thermodynamic_activity
+              allow_henrian_upper_bound: false
+              compound_bearing: false
+              require_assemblage_match: false
+          pressure_models:
+          - fit_target: standard_reaction_term
+            pressure_kind: equilibrium_partial_pressure
+            species_basis: monomer
+            valid_domain:
+              temperature_K:
+              - 1400.0
+              - 2273.15
+            provenance:
+            - source_id: nasa-cea-thermo
+              observation_ids:
+              - cea_Cr_gibbs
+              - cea_CrO_gibbs
+              - cea_O2_gibbs
+            - source_id: metals_cr_family
+              observation_id: liquid_oxide_standard_reaction
+            evaluator_family: nasa_cea_9
+            source_reaction_id: liquid_cro1_5_to_cro_gas
+            activity_semantics: source_reaction_activity
+            oxygen_fugacity_channel: intrinsic_melt
+            base_reference_pressure_model:
+              evaluator_family: antoine
+              coefficients:
+                A: 17.179279
+                B: 43230.115398
+                C: -108.5
+            base_vapor_formula: Cr
+            gas_exchange_reaction:
+              reactants:
+              - formula: Cr
+                stoichiometry: 1.0
+              - formula: O2
+                stoichiometry: 0.5
+              products:
+              - formula: CrO
+                stoichiometry: 1.0
+            species_thermo:
+              Cr:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_Cr_gibbs
+              CrO:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_CrO_gibbs
+              O2:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_O2_gibbs
+            derivation: 'Premise: the NASA CEA gas exchange composes on the existing monatomic condensed rail and the balanced
+              source reaction. Algebra: the exchange pressure is multiplied by a_CrO1.5^1 and pO2^-0.25 exactly once; the compiler
+              re-derives both exponents from atom balance. Unit check: gas pressure ratios and K are dimensionless and output
+              is Pa. Sanity check: setting all gas standard-state ratios to one recovers the declared condensed reaction powers.'
+            activity_exponent: 1.0
+            pO2_exponent: -0.25
+            pO2_reference_bar: 1.0
+    fiat_routing:
+      plant_bin: null
+      engineering_capture_policy: downstream_equilibrium_required
+      products_and_coproducts: []
+      process_or_terminal_destination: process.condensation_train
+      routing_note: No carrier-specific deposition curve is available; routing is structural only and cannot certify capture.
+      condensation_reference_at_1mbar_C: 2195.1479907539538
+      condensation_reference_derivation: 'Solve the compiled unit-activity, pO2_reference=1 bar curve for P_CrO=100 Pa: T=2468.29799075
+        K = 2195.14799075 C. Unit check Pa=Pa. The root is outside the reviewed pressure-fit domain and is a routing-only status-bearing
+        proxy, never validation evidence.'
+    vaporisation_coefficients:
+      evaporation_alpha:
+        value: 0.9
+        source: Status-bearing broad proxy inherited from metals_cr_family; no CrO-specific alpha is available.
+        T_band_K:
+        - 1400.0
+        - 2273.15
+        envelope:
+        - 0.48
+        - 1.2
+        tier: 2
+        tag: broad_proxy_not_intrinsic
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 1400.0
+        - 2273.15
+        envelope:
+        - 0.48
+        - 1.2
+      extrapolation_policy: conservative_slope_continuation
+      out_of_range_status: out_of_range_conservative_continuation
+      acquisition_flag: evaporation_alpha_proxy:CrO
+    code_metadata:
+      formula_id: CrO
+      source_account: process.cleaned_melt
+      request_rule: source_inventory_present
+      solve_group_id: oxide_vapors_cro_family
+      compatibility_projection: oxide_vapors
+      canonical_aliases: []
+      hot_train_applicability: applicable
   oxide_vapors_sio_family:
     physical_properties:
       species:
@@ -3292,45 +4167,26 @@ families:
           formula: CrO2
           molar_mass_g_mol: 83.9941
           parent_oxide: Cr2O3
-          authority_class: uncertified
+          fit_target: standard_reaction_term
+          authority_class: analytical_non_authoritative
+          confidence_tier: status_bearing_composed_carrier
           reaction:
             formula: CrO1.5(l) + 0.25 O2(g) -> CrO2(g)
-            exponent_oxide: 1.0
-            exponent_pO2: 0.25
-            basis: JANAF CrO2(g)/O2 + ThermoEngine v1.0 pure-liquid CrO1.5 mu0; composition-independent
-              p0*Kp(T) minimax refit over 1500-2273.15 K. Replaces stale fallback (+0.390 dex @1500 K)
-              and extends process envelope.
-          stoich_oxide_per_vapor: 0.904761167748687
+            basis: existing CrO1.5 condensed standard reaction plus NASA CEA cea_Cr_gibbs, cea_CrO2_gibbs, and cea_O2_gibbs
+              gas exchange
+            derivation: 'Premise: 1 CrO1.5 supplies one CrO2; the displayed source reaction is atom balanced. Algebra: K=(p_vapor/P0)*(pO2/P0)^-0.25/a_CrO1.5^1,
+              so activity exponent=1 and pO2 exponent=-nu_O2/nu_vapor=0.25. Unit check: K, activities, and pressure ratios are
+              dimensionless; evaluator output is Pa. Sanity check: the independently stored kg identity is oxide_per=0.904761167748687=1+O2_per
+              (-0.0952388322513129).'
+          stoich_oxide_per_vapor: 0.9047611677486871
           stoich_O2_per_vapor: -0.0952388322513129
+          stoichiometry_derivation: 0.5*M(Cr2O3)/M(CrO2)=0.904761167748687 kg/kg; -0.25*M(O2)/M(CrO2)=-0.0952388322513129 kg/kg.
+            Unit check kg/kg; mass identity 0.904761167748687=1+(-0.0952388322513129).
           oxide_activity_exponent: 1.0
           pO2_exponent: 0.25
           pO2_reference_bar: 1.0
-          residual_dex: 0.005059
-          vaporock_janaf0_shomate:
-            source_file: ../VapoRock/src/vaporock/data/JANAF0-vapor-data.csv
-            source_row: 34
-            species_name: CrO2(g)
-            valid_range_K:
-            - 1100
-            - 6000
-            A: 57.85928
-            B: 0.190282
-            C: -0.038347
-            D: 0.002643
-            E: -2.578022
-            F: -99.71476
-            G: 328.5921
-            H: -75.312
-          source: REF-020 JANAF coefficients shipped by VapoRock.
-          notes: 'Option A engineering path: CrO2(g) is collected as stable Cr2O3 in a
-
-            dedicated high-temperature Cr oxide stage between Fe and SiO. Sossi-Moon
-
-            fixture records CrO2(g) as significant above 1500 K; VapoRock JANAF0
-
-            supplies CrO2(g) thermochemistry over 1100-6000 K.
-
-            '
+          notes: Systematic carrier-completeness composition. Pressure, activity coupling, and evaporation alpha remain status-bearing
+            non-authoritative and can never certify.
           validation:
             status: pending_validation
             anchor_refs: []
@@ -3361,23 +4217,53 @@ families:
             species_basis: monomer
             valid_domain:
               temperature_K:
-              - 1500
+              - 1400.0
               - 2273.15
             provenance:
-            - source: schema_v1_in_place_migration
-            evaluator_family: standard_reaction_term
+            - source_id: nasa-cea-thermo
+              observation_ids:
+              - cea_Cr_gibbs
+              - cea_CrO2_gibbs
+              - cea_O2_gibbs
+            - source_id: metals_cr_family
+              observation_id: liquid_oxide_standard_reaction
+            evaluator_family: nasa_cea_9
             source_reaction_id: liquid_cro1_5_to_cro2_gas
             activity_semantics: source_reaction_activity
-            oxygen_fugacity_channel: transport_headspace
-            reference_pressure_model:
+            oxygen_fugacity_channel: intrinsic_melt
+            base_reference_pressure_model:
               evaluator_family: antoine
               coefficients:
-                A: 11.1773865
-                B: 18397.4295704
-                C: -228.62
-                derivation: 'Premise: liquid CrO1.5 standard matching single-cation activity. Algebra:
-                  delG0=G_CrO2-mu0_CrO1.5-0.25 G_O2; log10(P_ref/Pa)=5-delG0/(RT ln10); P=P_ref*a*fO2^0.25.
-                  Unit Pa. Sanity: max residual 0.005059 dex (audit before +0.390 @1500 K).'
+                A: 17.179279
+                B: 43230.115398
+                C: -108.5
+            base_vapor_formula: Cr
+            gas_exchange_reaction:
+              reactants:
+              - formula: Cr
+                stoichiometry: 1.0
+              - formula: O2
+                stoichiometry: 1.0
+              products:
+              - formula: CrO2
+                stoichiometry: 1.0
+            species_thermo:
+              Cr:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_Cr_gibbs
+              CrO2:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_CrO2_gibbs
+              O2:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_O2_gibbs
+            derivation: 'Premise: the NASA CEA gas exchange composes on the existing monatomic condensed rail and the balanced
+              source reaction. Algebra: the exchange pressure is multiplied by a_CrO1.5^1 and pO2^0.25 exactly once; the compiler
+              re-derives both exponents from atom balance. Unit check: gas pressure ratios and K are dimensionless and output
+              is Pa. Sanity check: setting all gas standard-state ratios to one recovers the declared condensed reaction powers.'
             activity_exponent: 1.0
             pO2_exponent: 0.25
             pO2_reference_bar: 1.0
@@ -3386,6 +4272,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.condensation_train
+      routing_note: No carrier-specific deposition curve is available; routing is structural only and cannot certify capture.
       condensation_temperature_C:
       - 1100
       - 1300
@@ -3401,17 +4288,26 @@ families:
           O2: process.overhead_gas
     vaporisation_coefficients:
       evaporation_alpha:
-        status: no_data
-        policy: &id002
-          tier: 3
-          policy: fail_loud_missing_alpha
-          source: REF-014 Fedkin et al. 2006 plus chromia-boiler literature; no isolated CrO2 HK alpha
-            adopted
-        compatibility_policy_field: *id002
-      alpha_domain_and_uncertainty: {}
+        value: 0.9
+        source: Status-bearing broad proxy inherited from metals_cr_family; no CrO2-specific alpha is available.
+        T_band_K:
+        - 1400.0
+        - 2273.15
+        envelope:
+        - 0.48
+        - 1.2
+        tier: 2
+        tag: broad_proxy_not_intrinsic
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 1400.0
+        - 2273.15
+        envelope:
+        - 0.48
+        - 1.2
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: vapour_pressure_out_of_range:CrO2
+      acquisition_flag: evaporation_alpha_proxy:CrO2
     code_metadata:
       formula_id: CrO2
       source_account: process.cleaned_melt
@@ -3430,16 +4326,15 @@ families:
           association_relation:
             dimer_species_id: Na2Cl2
             equilibrium: Na2Cl2 = 2 NaCl
-            note: 'Runtime NaCl pure_component_antoine is TOTAL saturated vapour (Stull). Near liquid
-              window, Datz K implies large dimer mass fraction; species-resolved monomer partial requires
-              Na2Cl2 association row. VR-7 dormant dimer family: halide_association_Na2Cl2_family.'
+            note: 'Runtime NaCl pure_component_antoine is TOTAL saturated vapour (Stull). Near liquid window, Datz K implies
+              large dimer mass fraction; species-resolved monomer partial requires Na2Cl2 association row. VR-7 dormant dimer
+              family: halide_association_Na2Cl2_family.'
             source: docs-private/research/2026-07-30-vp-acquire-5/chloride-dimers-and-gates.md
           species_basis_runtime_note: Legacy total pure-component row; monomer partial is a distinct observable
           molar_mass_g_mol: 58.44
           carrier_is_own_vapor: true
           pure_component_antoine:
-            source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 NaCl (C7647145); CRC normal bp 1465
-              C
+            source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 NaCl (C7647145); CRC normal bp 1465 C
             source_certification: source_equation_fit
             A: 10.07184
             B: 8388.497
@@ -3449,6 +4344,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
+            note: MC-4 Stage-0 composition; executable but status-bearing non-authoritative and certification ceiling never.
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -3471,26 +4367,44 @@ families:
               B: 18397.4295704
               C: -228.62
               derivation: 'Premise: liquid CrO1.5 standard with single-cation activity. Algebra: delG0=G_CrO2-mu0_CrO1.5-0.25
-                G_O2; log10(P_ref/Pa)=5-delG0/(RT ln10); P=P_ref*a*fO2^0.25. Sanity: max residual 0.005059
-                dex (audit before +0.390 @1500 K).
+                G_O2; log10(P_ref/Pa)=5-delG0/(RT ln10); P=P_ref*a*fO2^0.25. Sanity: max residual 0.005059 dex (audit before
+                +0.390 @1500 K).
 
                 '
+          runtime_disposition: status_bearing_non_authoritative
+          flux_dormant: false
     fiat_routing:
       plant_bin: null
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
-      process_or_terminal_destination: process.condensation_train
+      process_or_terminal_destination: process.stage0_volatile_hold
       condensation_reference_at_1mbar_C: 900
+      compatibility_fields:
+        flux_dormant: false
+        consumer_status: status_bearing_non_authoritative
     vaporisation_coefficients:
       evaporation_alpha:
         value: 1.0
         source: 'OWNER-RATIFY salt_proxy_not_intrinsic: REF-013 Salt analogy - Sossi et al. 2019 GCA near-ideal
           alkali evaporation; no isolated regolith-NaCl HK measurement'
+        T_band_K:
+        - 1138
+        - 1738
+        envelope:
+        - 0.1
+        - 1.0
         tier: 2
-      alpha_domain_and_uncertainty: {}
+        tag: broad_proxy_not_intrinsic
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 1138
+        - 1738
+        envelope:
+        - 0.1
+        - 1.0
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: vapour_pressure_out_of_range:NaCl
+      acquisition_flag: evaporation_alpha_proxy:NaCl
     code_metadata:
       formula_id: NaCl
       source_account: process.stage0_foulant
@@ -3500,6 +4414,7 @@ families:
       canonical_aliases: []
       hot_train_applicability: not_applicable
       compatibility_condensation_reference_table: true
+      hot_train_not_applicable_reason: Stage-0 overhead carrier; excluded from cleaned-melt evaporation hot train.
   foulant_vapor_kcl_family:
     physical_properties:
       species:
@@ -3508,18 +4423,17 @@ families:
           association_relation:
             dimer_species_id: K2Cl2
             equilibrium: K2Cl2 = 2 KCl
-            note: 'Runtime KCl pure_component_antoine is TOTAL saturated vapour. Datz K near mp implies
-              large dimer fraction. VR-7 dormant dimer: halide_association_K2Cl2_family.'
+            note: 'Runtime KCl pure_component_antoine is TOTAL saturated vapour. Datz K near mp implies large dimer fraction.
+              VR-7 dormant dimer: halide_association_K2Cl2_family.'
             source: docs-private/research/2026-07-30-vp-acquire-5/chloride-dimers-and-gates.md
           molar_mass_g_mol: 74.55
           carrier_is_own_vapor: true
           source_drift_dex: 0.04427
-          source_drift_note: 'DRIFT-LOW: ~0.044 dex mid-range Stull equation vs NBP-anchored pure_component_antoine
-            near 1550 K. Runtime ground-truth uses pure_component_antoine; no coefficient retune in pairing
-            wave.'
+          source_drift_note: 'DRIFT-LOW: ~0.044 dex mid-range Stull equation vs NBP-anchored pure_component_antoine near 1550
+            K. Runtime ground-truth uses pure_component_antoine; no coefficient retune in pairing wave.'
           pure_component_antoine:
-            source: REF-002 NIST WebBook SRD 69 Stull 1947 KCl (C7447407); CRC bp 1420 C; Clausius-Clapeyron
-              anchored at 1 atm (Stull raw overshoots bp)
+            source: REF-002 NIST WebBook SRD 69 Stull 1947 KCl (C7447407); CRC bp 1420 C; Clausius-Clapeyron anchored at 1 atm
+              (Stull raw overshoots bp)
             provenance_class: derived_from_evaluation
             A: 10.1859
             B: 8774.5
@@ -3529,6 +4443,7 @@ families:
           validation:
             status: pending_validation
             anchor_refs: []
+            note: MC-4 Stage-0 composition; executable but status-bearing non-authoritative and certification ceiling never.
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -3547,27 +4462,44 @@ families:
             - source: schema_v1_in_place_migration
             evaluator_family: antoine
             coefficients:
-              source: REF-002 NIST Stull 1947 mid-range faithful runtime row; bp overshoots - tests use
-                pure_component_antoine
+              source: REF-002 NIST Stull 1947 mid-range faithful runtime row; bp overshoots - tests use pure_component_antoine
               A: 9.78236
               B: 7440.691
               C: -122.709
+          runtime_disposition: status_bearing_non_authoritative
+          flux_dormant: false
     fiat_routing:
       plant_bin: null
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
-      process_or_terminal_destination: process.condensation_train
+      process_or_terminal_destination: process.stage0_volatile_hold
       condensation_reference_at_1mbar_C: 880
+      compatibility_fields:
+        flux_dormant: false
+        consumer_status: status_bearing_non_authoritative
     vaporisation_coefficients:
       evaporation_alpha:
         value: 1.0
         source: 'OWNER-RATIFY salt_proxy_not_intrinsic: REF-013 Salt analogy - Sossi et al. 2019 GCA near-ideal
           alkali evaporation; no isolated regolith-KCl HK measurement'
+        T_band_K:
+        - 1094
+        - 1680
+        envelope:
+        - 0.1
+        - 1.0
         tier: 2
-      alpha_domain_and_uncertainty: {}
+        tag: broad_proxy_not_intrinsic
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 1094
+        - 1680
+        envelope:
+        - 0.1
+        - 1.0
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: vapour_pressure_out_of_range:KCl
+      acquisition_flag: evaporation_alpha_proxy:KCl
     code_metadata:
       formula_id: KCl
       source_account: process.stage0_foulant
@@ -3577,6 +4509,7 @@ families:
       canonical_aliases: []
       hot_train_applicability: not_applicable
       compatibility_condensation_reference_table: true
+      hot_train_not_applicable_reason: Stage-0 overhead carrier; excluded from cleaned-melt evaporation hot train.
   foulant_vapor_naf_family:
     physical_properties:
       species:
@@ -3658,14 +4591,14 @@ families:
           formula: H2O
           chemical_family: volatile_water
           acquisition_status: t425_grounded
-          runtime_disposition: dormant_pending_owner_physics_review
-          flux_dormant: true
-          notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::H2O_ice. review_status=grounded;
-            phase_branch=solid_Ih_sublimation. DRAFT/owner/physics gates survive; dormant to flux.
+          runtime_disposition: status_bearing_non_authoritative
+          flux_dormant: false
+          notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::H2O_ice. review_status=grounded; phase_branch=solid_Ih_sublimation.
+            DRAFT/owner/physics gates survive; dormant to flux.
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT - no flux; owner + physics review required before enablement
+            note: MC-4 Stage-0 composition; executable but status-bearing non-authoritative and certification ceiling never.
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -3673,15 +4606,27 @@ families:
             species_basis: monomer
             valid_domain:
               temperature_K:
-              - 20.0
+              - 100.0
               - 273.16
             provenance:
-            - source: t-425 vp-volatile-rows-DRAFT.yaml
-              draft_key: H2O_ice
-              review_status: grounded
-              phase_branch: solid_Ih_sublimation
+            - source: Feistel and Wagner 2007, Sublimation Pressure and Sublimation Enthalpy of H2O Ice Ih Between 0 and 273.16
+                K; form and coefficients reproduced in NASA NTRS supplementary table
             evaluator_family: tabulated_equilibrium
-            availability: unavailable_pending_acquisition
+            points:
+            - temperature_K: 100.0
+              pressure_Pa: 1.0857020504839495e-14
+            - temperature_K: 180.0
+              pressure_Pa: 0.005394352570928808
+            - temperature_K: 273.16
+              pressure_Pa: 611.6577
+            derivation: Points are direct evaluations of the named literature correlation in its native pressure units, converted
+              to Pa. Interpolation is log-pressure versus temperature; outside the source window the shared consequence-aware
+              continuation computes and marks a non-certifying value instead of dropping the carrier.
+            activity_semantics: pure_condensed_phase
+            pure_condensed_phase_identity:
+              component_id: H2O
+              phase: condensed_solid
+              source_account: process.stage0_foulant
           literature_correlation:
             form: ln(P/P_triple) = 1.5*ln(T/T_triple) + (1-T_triple/T)*sum(e_i*(T/T_triple)^i)
             T_triple_K: 273.16
@@ -3697,8 +4642,8 @@ families:
             valid_range_K:
             - 20.0
             - 273.16
-            source: Feistel and Wagner 2007, Sublimation Pressure and Sublimation Enthalpy of H2O Ice
-              Ih Between 0 and 273.16 K; form and coefficients reproduced in NASA NTRS supplementary table
+            source: Feistel and Wagner 2007, Sublimation Pressure and Sublimation Enthalpy of H2O Ice Ih Between 0 and 273.16
+              K; form and coefficients reproduced in NASA NTRS supplementary table
             source_urls:
             - https://doi.org/10.1016/j.gca.2006.08.034
             - https://ntrs.nasa.gov/api/citations/20210019502/downloads/Supplementary%20Online%20Material%2020210019502.pdf?attachment=true
@@ -3710,30 +4655,41 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
-        flux_dormant: true
-        consumer_status: inactive
+        flux_dormant: false
+        consumer_status: status_bearing_non_authoritative
     vaporisation_coefficients:
       evaporation_alpha:
-        status: no_data
-        policy: refuse_nonzero_flux
-        compatibility_policy_field: refuse_nonzero_flux
-      alpha_domain_and_uncertainty: {}
+        value: 1.0
+        source: Status-bearing broad phase-change proxy; no carrier-specific Stage-0 Hertz-Knudsen alpha is available.
+        T_band_K:
+        - 100.0
+        - 273.16
+        envelope:
+        - 0.1
+        - 1.0
+        tier: 2
+        tag: broad_proxy_not_intrinsic
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 100.0
+        - 273.16
+        envelope:
+        - 0.1
+        - 1.0
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: vapour_pressure_pending_acquisition:H2O
+      acquisition_flag: evaporation_alpha_proxy:H2O
     code_metadata:
       formula_id: H2O
       source_account: process.stage0_foulant
-      request_rule: dormant_pending_validation
+      request_rule: stage0_only
       solve_group_id: volatile_water_H2O_family
-      compatibility_projection: dormant_acquisition
+      compatibility_projection: foulant_vapor
       canonical_aliases:
       - H2O_ice
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
-        / VR-16
+      hot_train_not_applicable_reason: Stage-0 overhead carrier; excluded from cleaned-melt evaporation hot train.
       yaml_quote_species_id: false
       chemical_family: volatile_water
   volatile_carbon_oxide_CO2_family:
@@ -3743,14 +4699,14 @@ families:
           formula: CO2
           chemical_family: volatile_carbon_oxide
           acquisition_status: t425_grounded
-          runtime_disposition: dormant_pending_owner_physics_review
-          flux_dormant: true
-          notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::CO2_frost. review_status=grounded;
-            phase_branch=solid_sublimation. DRAFT/owner/physics gates survive; dormant to flux.
+          runtime_disposition: status_bearing_non_authoritative
+          flux_dormant: false
+          notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::CO2_frost. review_status=grounded; phase_branch=solid_sublimation.
+            DRAFT/owner/physics gates survive; dormant to flux.
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT - no flux; owner + physics review required before enablement
+            note: MC-4 Stage-0 composition; executable but status-bearing non-authoritative and certification ceiling never.
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -3758,15 +4714,26 @@ families:
             species_basis: monomer
             valid_domain:
               temperature_K:
-              - 40.0
+              - 100.0
               - 194.7
             provenance:
-            - source: t-425 vp-volatile-rows-DRAFT.yaml
-              draft_key: CO2_frost
-              review_status: grounded
-              phase_branch: solid_sublimation
+            - source: Fray and Schmitt 2009; coefficients reproduced in NASA NTRS supplementary Table 2
             evaluator_family: tabulated_equilibrium
-            availability: unavailable_pending_acquisition
+            points:
+            - temperature_K: 100.0
+              pressure_Pa: 0.018966622881943177
+            - temperature_K: 150.0
+              pressure_Pa: 841.8002462975626
+            - temperature_K: 194.7
+              pressure_Pa: 100933.58612476771
+            derivation: Points are direct evaluations of the named literature correlation in its native pressure units, converted
+              to Pa. Interpolation is log-pressure versus temperature; outside the source window the shared consequence-aware
+              continuation computes and marks a non-certifying value instead of dropping the carrier.
+            activity_semantics: pure_condensed_phase
+            pure_condensed_phase_identity:
+              component_id: CO2
+              phase: condensed_solid
+              source_account: process.stage0_foulant
           literature_candidate_correlations:
           - designation: CO2-1
             form: ln(P_bar)=sum(A_i/T^i)
@@ -3810,30 +4777,41 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
-        flux_dormant: true
-        consumer_status: inactive
+        flux_dormant: false
+        consumer_status: status_bearing_non_authoritative
     vaporisation_coefficients:
       evaporation_alpha:
-        status: no_data
-        policy: refuse_nonzero_flux
-        compatibility_policy_field: refuse_nonzero_flux
-      alpha_domain_and_uncertainty: {}
+        value: 1.0
+        source: Status-bearing broad phase-change proxy; no carrier-specific Stage-0 Hertz-Knudsen alpha is available.
+        T_band_K:
+        - 100.0
+        - 194.7
+        envelope:
+        - 0.1
+        - 1.0
+        tier: 2
+        tag: broad_proxy_not_intrinsic
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 100.0
+        - 194.7
+        envelope:
+        - 0.1
+        - 1.0
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: vapour_pressure_pending_acquisition:CO2
+      acquisition_flag: evaporation_alpha_proxy:CO2
     code_metadata:
       formula_id: CO2
       source_account: process.stage0_foulant
-      request_rule: dormant_pending_validation
+      request_rule: stage0_only
       solve_group_id: volatile_carbon_oxide_CO2_family
-      compatibility_projection: dormant_acquisition
+      compatibility_projection: foulant_vapor
       canonical_aliases:
       - CO2_frost
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
-        / VR-16
+      hot_train_not_applicable_reason: Stage-0 overhead carrier; excluded from cleaned-melt evaporation hot train.
       yaml_quote_species_id: false
       chemical_family: volatile_carbon_oxide
   volatile_carbon_oxide_CO_family:
@@ -3843,14 +4821,14 @@ families:
           formula: CO
           chemical_family: volatile_carbon_oxide
           acquisition_status: t425_grounded_low_temperature_fit
-          runtime_disposition: dormant_pending_owner_physics_review
-          flux_dormant: true
-          notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::CO. review_status=grounded_low_temperature_fit;
-            phase_branch=alpha_solid_sublimation. DRAFT/owner/physics gates survive; dormant to flux.
+          runtime_disposition: status_bearing_non_authoritative
+          flux_dormant: false
+          notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::CO. review_status=grounded_low_temperature_fit; phase_branch=alpha_solid_sublimation.
+            DRAFT/owner/physics gates survive; dormant to flux.
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT - no flux; owner + physics review required before enablement
+            note: MC-4 Stage-0 composition; executable but status-bearing non-authoritative and certification ceiling never.
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -3858,15 +4836,26 @@ families:
             species_basis: monomer
             valid_domain:
               temperature_K:
-              - 20.0
-              - 300.0
+              - 31.0
+              - 61.57
             provenance:
-            - source: t-425 vp-volatile-rows-DRAFT.yaml
-              draft_key: CO
-              review_status: grounded_low_temperature_fit
-              phase_branch: alpha_solid_sublimation
+            - source: Grundy et al. 2024, laboratory QCM measurements, constant-latent-heat fit Table 1
             evaluator_family: tabulated_equilibrium
-            availability: unavailable_pending_acquisition
+            points:
+            - temperature_K: 31.0
+              pressure_Pa: 0.00016399999999999995
+            - temperature_K: 45.0
+              pressure_Pa: 5.479767288179419
+            - temperature_K: 61.57
+              pressure_Pa: 2720.5054667882146
+            derivation: Points are direct evaluations of the named literature correlation in its native pressure units, converted
+              to Pa. Interpolation is log-pressure versus temperature; outside the source window the shared consequence-aware
+              continuation computes and marks a non-certifying value instead of dropping the carrier.
+            activity_semantics: pure_condensed_phase
+            pure_condensed_phase_identity:
+              component_id: CO
+              phase: condensed_solid
+              source_account: process.stage0_foulant
           literature_correlation:
             form: ln(P_bar)=ln(p0_bar)+(L/R)*(1/T0-1/T)
             T0_K: 31.0
@@ -3879,8 +4868,8 @@ families:
             phase_domain_K:
             - null
             - 61.57
-            range_note: Exact experimental fit range was not tabulated in the paper text and must be recovered
-              from the archived point data before merge; phase_domain_K is not fit certification.
+            range_note: Exact experimental fit range was not tabulated in the paper text and must be recovered from the archived
+              point data before merge; phase_domain_K is not fit certification.
             source: Grundy et al. 2024, laboratory QCM measurements, constant-latent-heat fit Table 1
             source_urls:
             - https://doi.org/10.1016/j.icarus.2023.115767
@@ -3898,29 +4887,40 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
-        flux_dormant: true
-        consumer_status: inactive
+        flux_dormant: false
+        consumer_status: status_bearing_non_authoritative
     vaporisation_coefficients:
       evaporation_alpha:
-        status: no_data
-        policy: refuse_nonzero_flux
-        compatibility_policy_field: refuse_nonzero_flux
-      alpha_domain_and_uncertainty: {}
+        value: 1.0
+        source: Status-bearing broad phase-change proxy; no carrier-specific Stage-0 Hertz-Knudsen alpha is available.
+        T_band_K:
+        - 31.0
+        - 61.57
+        envelope:
+        - 0.1
+        - 1.0
+        tier: 2
+        tag: broad_proxy_not_intrinsic
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 31.0
+        - 61.57
+        envelope:
+        - 0.1
+        - 1.0
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: vapour_pressure_pending_acquisition:CO
+      acquisition_flag: evaporation_alpha_proxy:CO
     code_metadata:
       formula_id: CO
       source_account: process.stage0_foulant
-      request_rule: dormant_pending_validation
+      request_rule: stage0_only
       solve_group_id: volatile_carbon_oxide_CO_family
-      compatibility_projection: dormant_acquisition
+      compatibility_projection: foulant_vapor
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
-        / VR-16
+      hot_train_not_applicable_reason: Stage-0 overhead carrier; excluded from cleaned-melt evaporation hot train.
       yaml_quote_species_id: false
       chemical_family: volatile_carbon_oxide
   volatile_hydrocarbon_CH4_family:
@@ -3930,14 +4930,14 @@ families:
           formula: CH4
           chemical_family: volatile_hydrocarbon
           acquisition_status: t425_grounded_low_temperature_fit
-          runtime_disposition: dormant_pending_owner_physics_review
-          flux_dormant: true
-          notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::CH4. review_status=grounded_low_temperature_fit;
-            phase_branch=CH4_I_solid_sublimation. DRAFT/owner/physics gates survive; dormant to flux.
+          runtime_disposition: status_bearing_non_authoritative
+          flux_dormant: false
+          notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::CH4. review_status=grounded_low_temperature_fit; phase_branch=CH4_I_solid_sublimation.
+            DRAFT/owner/physics gates survive; dormant to flux.
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT - no flux; owner + physics review required before enablement
+            note: MC-4 Stage-0 composition; executable but status-bearing non-authoritative and certification ceiling never.
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -3945,15 +4945,26 @@ families:
             species_basis: monomer
             valid_domain:
               temperature_K:
-              - 20.0
-              - 300.0
+              - 37.0
+              - 90.67
             provenance:
-            - source: t-425 vp-volatile-rows-DRAFT.yaml
-              draft_key: CH4
-              review_status: grounded_low_temperature_fit
-              phase_branch: CH4_I_solid_sublimation
+            - source: Grundy et al. 2024, laboratory QCM measurements, constant-latent-heat fit Table 1
             evaluator_family: tabulated_equilibrium
-            availability: unavailable_pending_acquisition
+            points:
+            - temperature_K: 37.0
+              pressure_Pa: 4.300000000000007e-05
+            - temperature_K: 60.0
+              pressure_Pa: 8.754664252233367
+            - temperature_K: 90.67
+              pressure_Pa: 6777.090324219372
+            derivation: Points are direct evaluations of the named literature correlation in its native pressure units, converted
+              to Pa. Interpolation is log-pressure versus temperature; outside the source window the shared consequence-aware
+              continuation computes and marks a non-certifying value instead of dropping the carrier.
+            activity_semantics: pure_condensed_phase
+            pure_condensed_phase_identity:
+              component_id: CH4
+              phase: condensed_solid
+              source_account: process.stage0_foulant
           literature_correlation:
             form: ln(P_bar)=ln(p0_bar)+(L/R)*(1/T0-1/T)
             T0_K: 37.0
@@ -3984,29 +4995,40 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
-        flux_dormant: true
-        consumer_status: inactive
+        flux_dormant: false
+        consumer_status: status_bearing_non_authoritative
     vaporisation_coefficients:
       evaporation_alpha:
-        status: no_data
-        policy: refuse_nonzero_flux
-        compatibility_policy_field: refuse_nonzero_flux
-      alpha_domain_and_uncertainty: {}
+        value: 1.0
+        source: Status-bearing broad phase-change proxy; no carrier-specific Stage-0 Hertz-Knudsen alpha is available.
+        T_band_K:
+        - 37.0
+        - 90.67
+        envelope:
+        - 0.1
+        - 1.0
+        tier: 2
+        tag: broad_proxy_not_intrinsic
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 37.0
+        - 90.67
+        envelope:
+        - 0.1
+        - 1.0
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: vapour_pressure_pending_acquisition:CH4
+      acquisition_flag: evaporation_alpha_proxy:CH4
     code_metadata:
       formula_id: CH4
       source_account: process.stage0_foulant
-      request_rule: dormant_pending_validation
+      request_rule: stage0_only
       solve_group_id: volatile_hydrocarbon_CH4_family
-      compatibility_projection: dormant_acquisition
+      compatibility_projection: foulant_vapor
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
-        / VR-16
+      hot_train_not_applicable_reason: Stage-0 overhead carrier; excluded from cleaned-melt evaporation hot train.
       yaml_quote_species_id: false
       chemical_family: volatile_hydrocarbon
   volatile_nitrogen_NH3_family:
@@ -4016,14 +5038,14 @@ families:
           formula: NH3
           chemical_family: volatile_nitrogen
           acquisition_status: t425_grounded_supersedes_fray_low_T
-          runtime_disposition: dormant_pending_owner_physics_review
-          flux_dormant: true
-          notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::NH3. review_status=grounded_supersedes_fray_low_T;
-            phase_branch=solid_sublimation. DRAFT/owner/physics gates survive; dormant to flux.
+          runtime_disposition: status_bearing_non_authoritative
+          flux_dormant: false
+          notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::NH3. review_status=grounded_supersedes_fray_low_T; phase_branch=solid_sublimation.
+            DRAFT/owner/physics gates survive; dormant to flux.
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT - no flux; owner + physics review required before enablement
+            note: MC-4 Stage-0 composition; executable but status-bearing non-authoritative and certification ceiling never.
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -4034,12 +5056,23 @@ families:
               - 95.0
               - 195.36
             provenance:
-            - source: t-425 vp-volatile-rows-DRAFT.yaml
-              draft_key: NH3
-              review_status: grounded_supersedes_fray_low_T
-              phase_branch: solid_sublimation
+            - source: Gerakines, Yarnall, and Hudson 2024, Eq. 18; fit links 95-115 K measurements to 175-200 K literature data
             evaluator_family: tabulated_equilibrium
-            availability: unavailable_pending_acquisition
+            points:
+            - temperature_K: 95.0
+              pressure_Pa: 5.214928730699801e-06
+            - temperature_K: 145.0
+              pressure_Pa: 5.629471655204692
+            - temperature_K: 195.36
+              pressure_Pa: 6076.81676
+            derivation: Points are direct evaluations of the named literature correlation in its native pressure units, converted
+              to Pa. Interpolation is log-pressure versus temperature; outside the source window the shared consequence-aware
+              continuation computes and marks a non-certifying value instead of dropping the carrier.
+            activity_semantics: pure_condensed_phase
+            pure_condensed_phase_identity:
+              component_id: NH3
+              phase: condensed_solid
+              source_account: process.stage0_foulant
           literature_correlation:
             form: ln(P/P0)=(1-T0/T)*exp(A0+A1*T+A2*T^2)
             T0_K: 195.36
@@ -4050,8 +5083,7 @@ families:
             valid_range_K:
             - 95.0
             - 195.36
-            source: Gerakines, Yarnall, and Hudson 2024, Eq. 18; fit links 95-115 K measurements to 175-200
-              K literature data
+            source: Gerakines, Yarnall, and Hudson 2024, Eq. 18; fit links 95-115 K measurements to 175-200 K literature data
             source_urls:
             - https://doi.org/10.1016/j.icarus.2024.116007
             - https://science.gsfc.nasa.gov/691/cosmicice/reprints/Gerakines-2024-2981.pdf
@@ -4066,29 +5098,40 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
-        flux_dormant: true
-        consumer_status: inactive
+        flux_dormant: false
+        consumer_status: status_bearing_non_authoritative
     vaporisation_coefficients:
       evaporation_alpha:
-        status: no_data
-        policy: refuse_nonzero_flux
-        compatibility_policy_field: refuse_nonzero_flux
-      alpha_domain_and_uncertainty: {}
+        value: 1.0
+        source: Status-bearing broad phase-change proxy; no carrier-specific Stage-0 Hertz-Knudsen alpha is available.
+        T_band_K:
+        - 95.0
+        - 195.36
+        envelope:
+        - 0.1
+        - 1.0
+        tier: 2
+        tag: broad_proxy_not_intrinsic
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 95.0
+        - 195.36
+        envelope:
+        - 0.1
+        - 1.0
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: vapour_pressure_pending_acquisition:NH3
+      acquisition_flag: evaporation_alpha_proxy:NH3
     code_metadata:
       formula_id: NH3
       source_account: process.stage0_foulant
-      request_rule: dormant_pending_validation
+      request_rule: stage0_only
       solve_group_id: volatile_nitrogen_NH3_family
-      compatibility_projection: dormant_acquisition
+      compatibility_projection: foulant_vapor
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
-        / VR-16
+      hot_train_not_applicable_reason: Stage-0 overhead carrier; excluded from cleaned-melt evaporation hot train.
       yaml_quote_species_id: false
       chemical_family: volatile_nitrogen
   volatile_nitrogen_HCN_family:
@@ -4098,15 +5141,14 @@ families:
           formula: HCN
           chemical_family: volatile_nitrogen
           acquisition_status: t425_grounded_supersedes_fray_low_T
-          runtime_disposition: dormant_pending_owner_physics_review
-          flux_dormant: true
-          notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::HCN. review_status=grounded_supersedes_fray_low_T;
-            phase_branch=crystalline_solid_sublimation. DRAFT/owner/physics gates survive; dormant to
-            flux.
+          runtime_disposition: status_bearing_non_authoritative
+          flux_dormant: false
+          notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::HCN. review_status=grounded_supersedes_fray_low_T; phase_branch=crystalline_solid_sublimation.
+            DRAFT/owner/physics gates survive; dormant to flux.
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT - no flux; owner + physics review required before enablement
+            note: MC-4 Stage-0 composition; executable but status-bearing non-authoritative and certification ceiling never.
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -4117,12 +5159,23 @@ families:
               - 121.0
               - 259.86
             provenance:
-            - source: t-425 vp-volatile-rows-DRAFT.yaml
-              draft_key: HCN
-              review_status: grounded_supersedes_fray_low_T
-              phase_branch: crystalline_solid_sublimation
+            - source: Hudson and Gerakines 2023, Eq. 6; fit links 121-139 K measurements to high-temperature literature data
             evaluator_family: tabulated_equilibrium
-            availability: unavailable_pending_acquisition
+            points:
+            - temperature_K: 121.0
+              pressure_Pa: 1.3493100513392757e-05
+            - temperature_K: 190.0
+              pressure_Pa: 22.108235242833963
+            - temperature_K: 259.86
+              pressure_Pa: 18775.73726
+            derivation: Points are direct evaluations of the named literature correlation in its native pressure units, converted
+              to Pa. Interpolation is log-pressure versus temperature; outside the source window the shared consequence-aware
+              continuation computes and marks a non-certifying value instead of dropping the carrier.
+            activity_semantics: pure_condensed_phase
+            pure_condensed_phase_identity:
+              component_id: HCN
+              phase: condensed_solid
+              source_account: process.stage0_foulant
           literature_correlation:
             form: ln(P/P0)=(1-T0/T)*exp(A0+A1*T+A2*T^2)
             T0_K: 259.86
@@ -4133,8 +5186,7 @@ families:
             valid_range_K:
             - 121.0
             - 259.86
-            source: Hudson and Gerakines 2023, Eq. 6; fit links 121-139 K measurements to high-temperature
-              literature data
+            source: Hudson and Gerakines 2023, Eq. 6; fit links 121-139 K measurements to high-temperature literature data
             source_urls:
             - https://doi.org/10.3847/PSJ/ad0040
             - https://science.gsfc.nasa.gov/691/cosmicice/reprints/Hudson-2023-2959.pdf
@@ -4143,36 +5195,46 @@ families:
             status: literature_present_pending_validation
           disagreement:
             source_2: Fray and Schmitt 2009 HCN-1
-            reported_difference: Fray-Schmitt is about 130% high over 121-139 K; the new Cox fit averages
-              about 4% from measurements.
+            reported_difference: Fray-Schmitt is about 130% high over 121-139 K; the new Cox fit averages about 4% from measurements.
     fiat_routing:
       plant_bin: null
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
-        flux_dormant: true
-        consumer_status: inactive
+        flux_dormant: false
+        consumer_status: status_bearing_non_authoritative
     vaporisation_coefficients:
       evaporation_alpha:
-        status: no_data
-        policy: refuse_nonzero_flux
-        compatibility_policy_field: refuse_nonzero_flux
-      alpha_domain_and_uncertainty: {}
+        value: 1.0
+        source: Status-bearing broad phase-change proxy; no carrier-specific Stage-0 Hertz-Knudsen alpha is available.
+        T_band_K:
+        - 121.0
+        - 259.86
+        envelope:
+        - 0.1
+        - 1.0
+        tier: 2
+        tag: broad_proxy_not_intrinsic
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 121.0
+        - 259.86
+        envelope:
+        - 0.1
+        - 1.0
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: vapour_pressure_pending_acquisition:HCN
+      acquisition_flag: evaporation_alpha_proxy:HCN
     code_metadata:
       formula_id: HCN
       source_account: process.stage0_foulant
-      request_rule: dormant_pending_validation
+      request_rule: stage0_only
       solve_group_id: volatile_nitrogen_HCN_family
-      compatibility_projection: dormant_acquisition
+      compatibility_projection: foulant_vapor
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
-        / VR-16
+      hot_train_not_applicable_reason: Stage-0 overhead carrier; excluded from cleaned-melt evaporation hot train.
       yaml_quote_species_id: false
       chemical_family: volatile_nitrogen
   volatile_sulfur_H2S_family:
@@ -4182,14 +5244,14 @@ families:
           formula: H2S
           chemical_family: volatile_sulfur
           acquisition_status: t425_uncertain_segment_mapping
-          runtime_disposition: dormant_pending_owner_physics_review
-          flux_dormant: true
-          notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::H2S. review_status=uncertain_segment_mapping;
-            phase_branch=solid_sublimation. DRAFT/owner/physics gates survive; dormant to flux.
+          runtime_disposition: status_bearing_non_authoritative
+          flux_dormant: false
+          notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::H2S. review_status=uncertain_segment_mapping; phase_branch=solid_sublimation.
+            DRAFT/owner/physics gates survive; dormant to flux.
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT - no flux; owner + physics review required before enablement
+            note: MC-4 Stage-0 composition; executable but status-bearing non-authoritative and certification ceiling never.
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -4197,15 +5259,26 @@ families:
             species_basis: monomer
             valid_domain:
               temperature_K:
-              - 200.0
-              - 2000.0
+              - 100.0
+              - 187.66
             provenance:
-            - source: t-425 vp-volatile-rows-DRAFT.yaml
-              draft_key: H2S
-              review_status: uncertain_segment_mapping
-              phase_branch: solid_sublimation
+            - source: Fray and Schmitt 2009; coefficients reproduced in NASA NTRS supplementary Table 2
             evaluator_family: tabulated_equilibrium
-            availability: unavailable_pending_acquisition
+            points:
+            - temperature_K: 100.0
+              pressure_Pa: 0.07599600278373901
+            - temperature_K: 150.0
+              pressure_Pa: 630.3396482417284
+            - temperature_K: 187.66
+              pressure_Pa: 23574.042354176792
+            derivation: Points are direct evaluations of the named literature correlation in its native pressure units, converted
+              to Pa. Interpolation is log-pressure versus temperature; outside the source window the shared consequence-aware
+              continuation computes and marks a non-certifying value instead of dropping the carrier.
+            activity_semantics: pure_condensed_phase
+            pure_condensed_phase_identity:
+              component_id: H2S
+              phase: condensed_solid
+              source_account: process.stage0_foulant
           literature_candidate_correlations:
           - designation: H2S-1
             form: ln(P_bar)=sum(A_i/T^i)
@@ -4274,8 +5347,8 @@ families:
               - 187.61
               source_certification: primary_static_vapor_pressure_fit
               source:
-                citation: Giauque and Blue, Hydrogen Sulfide. The Heat Capacity and Vapor Pressure of
-                  Solid and Liquid, JACS 58 (1936) 831-837
+                citation: Giauque and Blue, Hydrogen Sulfide. The Heat Capacity and Vapor Pressure of Solid and Liquid, JACS
+                  58 (1936) 831-837
                 doi: 10.1021/ja01296a045
                 locator: equation (1) and Table I, p. 832
                 url: https://doi.org/10.1021/ja01296a045
@@ -4312,8 +5385,8 @@ families:
               - 213.17
               source_certification: primary_static_vapor_pressure_fit
               source:
-                citation: Giauque and Blue, Hydrogen Sulfide. The Heat Capacity and Vapor Pressure of
-                  Solid and Liquid, JACS 58 (1936) 831-837
+                citation: Giauque and Blue, Hydrogen Sulfide. The Heat Capacity and Vapor Pressure of Solid and Liquid, JACS
+                  58 (1936) 831-837
                 doi: 10.1021/ja01296a045
                 locator: equation (2) and Table I, p. 832
                 url: https://doi.org/10.1021/ja01296a045
@@ -4395,29 +5468,40 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
-        flux_dormant: true
-        consumer_status: inactive
+        flux_dormant: false
+        consumer_status: status_bearing_non_authoritative
     vaporisation_coefficients:
       evaporation_alpha:
-        status: no_data
-        policy: refuse_nonzero_flux
-        compatibility_policy_field: refuse_nonzero_flux
-      alpha_domain_and_uncertainty: {}
+        value: 1.0
+        source: Status-bearing broad phase-change proxy; no carrier-specific Stage-0 Hertz-Knudsen alpha is available.
+        T_band_K:
+        - 100.0
+        - 187.66
+        envelope:
+        - 0.1
+        - 1.0
+        tier: 2
+        tag: broad_proxy_not_intrinsic
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 100.0
+        - 187.66
+        envelope:
+        - 0.1
+        - 1.0
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: vapour_pressure_pending_acquisition:H2S
+      acquisition_flag: evaporation_alpha_proxy:H2S
     code_metadata:
       formula_id: H2S
       source_account: process.stage0_foulant
-      request_rule: dormant_pending_validation
+      request_rule: stage0_only
       solve_group_id: volatile_sulfur_H2S_family
-      compatibility_projection: dormant_acquisition
+      compatibility_projection: foulant_vapor
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
-        / VR-16
+      hot_train_not_applicable_reason: Stage-0 overhead carrier; excluded from cleaned-melt evaporation hot train.
       yaml_quote_species_id: false
       chemical_family: volatile_sulfur
   volatile_sulfur_SO2_family:
@@ -4509,36 +5593,40 @@ families:
           formula: COS
           chemical_family: volatile_sulfur
           acquisition_status: t425_grounded_but_no_frost_branch
-          runtime_disposition: dormant_pending_owner_physics_review
-          flux_dormant: true
-          notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::COS. review_status=grounded_but_no_frost_branch;
-            phase_branch=liquid_vapor_only. DRAFT/owner/physics gates survive; dormant to flux.
+          runtime_disposition: status_bearing_non_authoritative
+          flux_dormant: false
+          notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::COS. review_status=grounded_but_no_frost_branch; phase_branch=liquid_vapor_only.
+            DRAFT/owner/physics gates survive; dormant to flux.
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT - no flux; owner + physics review required before enablement
+            note: MC-4 Stage-0 composition; executable but status-bearing non-authoritative and certification ceiling never.
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
             pressure_kind: pure_component_saturation_pressure
+            activity_semantics: pure_condensed_phase
+            pure_condensed_phase_identity:
+              component_id: COS
+              phase: condensed_liquid
+              source_account: process.stage0_foulant
             species_basis: monomer
             valid_domain:
               temperature_K:
               - 161.8
               - 223.84
             provenance:
-            - source: t-425 vp-volatile-rows-DRAFT.yaml
-              draft_key: COS
-              review_status: grounded_but_no_frost_branch
-              phase_branch: liquid_vapor_only
-            evaluator_family: tabulated_equilibrium
-            availability: unavailable_pending_acquisition
+            - source: NIST Chemistry WebBook SRD 69, Kemp and Giauque 1937; native log10(P/bar), A converted by +5
+            evaluator_family: antoine
+            coefficients:
+              A: 9.0436
+              B: 808.49
+              C: -22.72
           pure_component_antoine:
             A: 9.0436
             B: 808.49
             C: -22.72
-            source: NIST Chemistry WebBook SRD 69, Kemp and Giauque 1937; native log10(P/bar), A converted
-              by +5
+            source: NIST Chemistry WebBook SRD 69, Kemp and Giauque 1937; native log10(P/bar), A converted by +5
             source_urls:
             - https://webbook.nist.gov/cgi/cbook.cgi?ID=C463581&Mask=4
             anchor_check:
@@ -4562,29 +5650,40 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
-        flux_dormant: true
-        consumer_status: inactive
+        flux_dormant: false
+        consumer_status: status_bearing_non_authoritative
     vaporisation_coefficients:
       evaporation_alpha:
-        status: no_data
-        policy: refuse_nonzero_flux
-        compatibility_policy_field: refuse_nonzero_flux
-      alpha_domain_and_uncertainty: {}
+        value: 1.0
+        source: Status-bearing broad phase-change proxy; no carrier-specific Stage-0 Hertz-Knudsen alpha is available.
+        T_band_K:
+        - 161.8
+        - 223.84
+        envelope:
+        - 0.1
+        - 1.0
+        tier: 2
+        tag: broad_proxy_not_intrinsic
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 161.8
+        - 223.84
+        envelope:
+        - 0.1
+        - 1.0
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: vapour_pressure_pending_acquisition:COS
+      acquisition_flag: evaporation_alpha_proxy:COS
     code_metadata:
       formula_id: COS
       source_account: process.stage0_foulant
-      request_rule: dormant_pending_validation
+      request_rule: stage0_only
       solve_group_id: volatile_sulfur_COS_family
-      compatibility_projection: dormant_acquisition
+      compatibility_projection: foulant_vapor
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
-        / VR-16
+      hot_train_not_applicable_reason: Stage-0 overhead carrier; excluded from cleaned-melt evaporation hot train.
       yaml_quote_species_id: false
       chemical_family: volatile_sulfur
   volatile_nitrogen_N2_family:
@@ -4798,14 +5897,14 @@ families:
           formula: HCHO
           chemical_family: volatile_organic
           acquisition_status: t425_grounded
-          runtime_disposition: dormant_pending_owner_physics_review
-          flux_dormant: true
+          runtime_disposition: status_bearing_non_authoritative
+          flux_dormant: false
           notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::HCHO. review_status=grounded; phase_branch=crystalline_solid_sublimation.
             DRAFT/owner/physics gates survive; dormant to flux.
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT - no flux; owner + physics review required before enablement
+            note: MC-4 Stage-0 composition; executable but status-bearing non-authoritative and certification ceiling never.
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -4816,12 +5915,23 @@ families:
               - 100.0
               - 109.0
             provenance:
-            - source: t-425 vp-volatile-rows-DRAFT.yaml
-              draft_key: HCHO
-              review_status: grounded
-              phase_branch: crystalline_solid_sublimation
+            - source: Hudson, Yarnall, and Gerakines 2024, Eq. 4 and Table 8; crystalline formaldehyde QCM/IR sublimation measurement
             evaluator_family: tabulated_equilibrium
-            availability: unavailable_pending_acquisition
+            points:
+            - temperature_K: 100.0
+              pressure_Pa: 8.400387307242942e-06
+            - temperature_K: 104.5
+              pressure_Pa: 5.099475523302775e-05
+            - temperature_K: 109.0
+              pressure_Pa: 0.00026673601572726585
+            derivation: Points are direct evaluations of the named literature correlation in its native pressure units, converted
+              to Pa. Interpolation is log-pressure versus temperature; outside the source window the shared consequence-aware
+              continuation computes and marks a non-certifying value instead of dropping the carrier.
+            activity_semantics: pure_condensed_phase
+            pure_condensed_phase_identity:
+              component_id: HCHO
+              phase: condensed_solid
+              source_account: process.stage0_foulant
           literature_correlation:
             form: ln(P_Pa)=ln(133.322)+25.3-4188/T
             B_K: 4188.0
@@ -4829,8 +5939,7 @@ families:
             valid_range_K:
             - 100.0
             - 109.0
-            source: Hudson, Yarnall, and Gerakines 2024, Eq. 4 and Table 8; crystalline formaldehyde QCM/IR
-              sublimation measurement
+            source: Hudson, Yarnall, and Gerakines 2024, Eq. 4 and Table 8; crystalline formaldehyde QCM/IR sublimation measurement
             source_urls:
             - https://doi.org/10.3847/1538-4357/ad8c43
             - https://science.gsfc.nasa.gov/691/cosmicice/reprints/Hudson-2024-3018.pdf
@@ -4842,29 +5951,40 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
-        flux_dormant: true
-        consumer_status: inactive
+        flux_dormant: false
+        consumer_status: status_bearing_non_authoritative
     vaporisation_coefficients:
       evaporation_alpha:
-        status: no_data
-        policy: refuse_nonzero_flux
-        compatibility_policy_field: refuse_nonzero_flux
-      alpha_domain_and_uncertainty: {}
+        value: 1.0
+        source: Status-bearing broad phase-change proxy; no carrier-specific Stage-0 Hertz-Knudsen alpha is available.
+        T_band_K:
+        - 100.0
+        - 109.0
+        envelope:
+        - 0.1
+        - 1.0
+        tier: 2
+        tag: broad_proxy_not_intrinsic
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 100.0
+        - 109.0
+        envelope:
+        - 0.1
+        - 1.0
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: vapour_pressure_pending_acquisition:HCHO
+      acquisition_flag: evaporation_alpha_proxy:HCHO
     code_metadata:
       formula_id: HCHO
       source_account: process.stage0_foulant
-      request_rule: dormant_pending_validation
+      request_rule: stage0_only
       solve_group_id: volatile_organic_HCHO_family
-      compatibility_projection: dormant_acquisition
+      compatibility_projection: foulant_vapor
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
-        / VR-16
+      hot_train_not_applicable_reason: Stage-0 overhead carrier; excluded from cleaned-melt evaporation hot train.
       yaml_quote_species_id: false
       chemical_family: volatile_organic
   volatile_hydrocarbon_C2H6_family:
@@ -4874,14 +5994,14 @@ families:
           formula: C2H6
           chemical_family: volatile_hydrocarbon
           acquisition_status: t425_uncertain_lower_range
-          runtime_disposition: dormant_pending_owner_physics_review
-          flux_dormant: true
-          notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::C2H6. review_status=uncertain_lower_range;
-            phase_branch=solid_sublimation. DRAFT/owner/physics gates survive; dormant to flux.
+          runtime_disposition: status_bearing_non_authoritative
+          flux_dormant: false
+          notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::C2H6. review_status=uncertain_lower_range; phase_branch=solid_sublimation.
+            DRAFT/owner/physics gates survive; dormant to flux.
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT - no flux; owner + physics review required before enablement
+            note: MC-4 Stage-0 composition; executable but status-bearing non-authoritative and certification ceiling never.
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -4889,15 +6009,26 @@ families:
             species_basis: monomer
             valid_domain:
               temperature_K:
-              - 20.0
+              - 60.0
               - 90.35
             provenance:
-            - source: t-425 vp-volatile-rows-DRAFT.yaml
-              draft_key: C2H6
-              review_status: uncertain_lower_range
-              phase_branch: solid_sublimation
+            - source: Fray and Schmitt 2009 C2H6-1; coefficients reproduced in NASA NTRS supplementary Table 2
             evaluator_family: tabulated_equilibrium
-            availability: unavailable_pending_acquisition
+            points:
+            - temperature_K: 60.0
+              pressure_Pa: 7.665963064473016e-07
+            - temperature_K: 75.0
+              pressure_Pa: 0.0037246487902224093
+            - temperature_K: 90.35
+              pressure_Pa: 1.1378669270220239
+            derivation: Points are direct evaluations of the named literature correlation in its native pressure units, converted
+              to Pa. Interpolation is log-pressure versus temperature; outside the source window the shared consequence-aware
+              continuation computes and marks a non-certifying value instead of dropping the carrier.
+            activity_semantics: pure_condensed_phase
+            pure_condensed_phase_identity:
+              component_id: C2H6
+              phase: condensed_solid
+              source_account: process.stage0_foulant
           literature_correlation:
             form: ln(P_bar)=sum(A_i/T^i)
             A_i:
@@ -4911,8 +6042,7 @@ families:
             valid_range_K:
             - null
             - 90.35
-            source: Fray and Schmitt 2009 C2H6-1; coefficients reproduced in NASA NTRS supplementary Table
-              2
+            source: Fray and Schmitt 2009 C2H6-1; coefficients reproduced in NASA NTRS supplementary Table 2
             source_urls:
             - https://doi.org/10.1016/j.pss.2009.09.011
             - https://ntrs.nasa.gov/api/citations/20210019502/downloads/Supplementary%20Online%20Material%2020210019502.pdf?attachment=true
@@ -4924,29 +6054,40 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
-        flux_dormant: true
-        consumer_status: inactive
+        flux_dormant: false
+        consumer_status: status_bearing_non_authoritative
     vaporisation_coefficients:
       evaporation_alpha:
-        status: no_data
-        policy: refuse_nonzero_flux
-        compatibility_policy_field: refuse_nonzero_flux
-      alpha_domain_and_uncertainty: {}
+        value: 1.0
+        source: Status-bearing broad phase-change proxy; no carrier-specific Stage-0 Hertz-Knudsen alpha is available.
+        T_band_K:
+        - 60.0
+        - 90.35
+        envelope:
+        - 0.1
+        - 1.0
+        tier: 2
+        tag: broad_proxy_not_intrinsic
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 60.0
+        - 90.35
+        envelope:
+        - 0.1
+        - 1.0
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: vapour_pressure_pending_acquisition:C2H6
+      acquisition_flag: evaporation_alpha_proxy:C2H6
     code_metadata:
       formula_id: C2H6
       source_account: process.stage0_foulant
-      request_rule: dormant_pending_validation
+      request_rule: stage0_only
       solve_group_id: volatile_hydrocarbon_C2H6_family
-      compatibility_projection: dormant_acquisition
+      compatibility_projection: foulant_vapor
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
-        / VR-16
+      hot_train_not_applicable_reason: Stage-0 overhead carrier; excluded from cleaned-melt evaporation hot train.
       yaml_quote_species_id: false
       chemical_family: volatile_hydrocarbon
   volatile_organic_C2H5OH_family:
@@ -4956,36 +6097,40 @@ families:
           formula: C2H5OH
           chemical_family: volatile_organic
           acquisition_status: t425_grounded_but_no_frost_branch
-          runtime_disposition: dormant_pending_owner_physics_review
-          flux_dormant: true
-          notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::C2H5OH. review_status=grounded_but_no_frost_branch;
-            phase_branch=liquid_vapor_only. DRAFT/owner/physics gates survive; dormant to flux.
+          runtime_disposition: status_bearing_non_authoritative
+          flux_dormant: false
+          notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::C2H5OH. review_status=grounded_but_no_frost_branch; phase_branch=liquid_vapor_only.
+            DRAFT/owner/physics gates survive; dormant to flux.
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT - no flux; owner + physics review required before enablement
+            note: MC-4 Stage-0 composition; executable but status-bearing non-authoritative and certification ceiling never.
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
             pressure_kind: pure_component_saturation_pressure
+            activity_semantics: pure_condensed_phase
+            pure_condensed_phase_identity:
+              component_id: C2H5OH
+              phase: condensed_liquid
+              source_account: process.stage0_foulant
             species_basis: monomer
             valid_domain:
               temperature_K:
               - 292.77
               - 366.63
             provenance:
-            - source: t-425 vp-volatile-rows-DRAFT.yaml
-              draft_key: C2H5OH
-              review_status: grounded_but_no_frost_branch
-              phase_branch: liquid_vapor_only
-            evaluator_family: tabulated_equilibrium
-            availability: unavailable_pending_acquisition
+            - source: NIST Chemistry WebBook SRD 69, Ambrose and Sprake 1970; native log10(P/atm), A converted by +log10(101325)
+            evaluator_family: antoine
+            coefficients:
+              A: 10.246776612
+              B: 1598.673
+              C: -46.424
           pure_component_antoine:
             A: 10.246776612
             B: 1598.673
             C: -46.424
-            source: NIST Chemistry WebBook SRD 69, Ambrose and Sprake 1970; native log10(P/atm), A converted
-              by +log10(101325)
+            source: NIST Chemistry WebBook SRD 69, Ambrose and Sprake 1970; native log10(P/atm), A converted by +log10(101325)
             source_urls:
             - https://webbook.nist.gov/cgi/cbook.cgi?ID=C64175&Mask=4
             - https://doi.org/10.1016/0021-9614(70)90038-8
@@ -5010,29 +6155,40 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
-        flux_dormant: true
-        consumer_status: inactive
+        flux_dormant: false
+        consumer_status: status_bearing_non_authoritative
     vaporisation_coefficients:
       evaporation_alpha:
-        status: no_data
-        policy: refuse_nonzero_flux
-        compatibility_policy_field: refuse_nonzero_flux
-      alpha_domain_and_uncertainty: {}
+        value: 1.0
+        source: Status-bearing broad phase-change proxy; no carrier-specific Stage-0 Hertz-Knudsen alpha is available.
+        T_band_K:
+        - 292.77
+        - 366.63
+        envelope:
+        - 0.1
+        - 1.0
+        tier: 2
+        tag: broad_proxy_not_intrinsic
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 292.77
+        - 366.63
+        envelope:
+        - 0.1
+        - 1.0
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: vapour_pressure_pending_acquisition:C2H5OH
+      acquisition_flag: evaporation_alpha_proxy:C2H5OH
     code_metadata:
       formula_id: C2H5OH
       source_account: process.stage0_foulant
-      request_rule: dormant_pending_validation
+      request_rule: stage0_only
       solve_group_id: volatile_organic_C2H5OH_family
-      compatibility_projection: dormant_acquisition
+      compatibility_projection: foulant_vapor
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
-        / VR-16
+      hot_train_not_applicable_reason: Stage-0 overhead carrier; excluded from cleaned-melt evaporation hot train.
       yaml_quote_species_id: false
       chemical_family: volatile_organic
   volatile_sulfur_CS2_family:
@@ -5042,36 +6198,40 @@ families:
           formula: CS2
           chemical_family: volatile_sulfur
           acquisition_status: t425_grounded_but_no_frost_branch
-          runtime_disposition: dormant_pending_owner_physics_review
-          flux_dormant: true
-          notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::CS2. review_status=grounded_but_no_frost_branch;
-            phase_branch=liquid_vapor_only. DRAFT/owner/physics gates survive; dormant to flux.
+          runtime_disposition: status_bearing_non_authoritative
+          flux_dormant: false
+          notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::CS2. review_status=grounded_but_no_frost_branch; phase_branch=liquid_vapor_only.
+            DRAFT/owner/physics gates survive; dormant to flux.
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT - no flux; owner + physics review required before enablement
+            note: MC-4 Stage-0 composition; executable but status-bearing non-authoritative and certification ceiling never.
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
             pressure_kind: pure_component_saturation_pressure
+            activity_semantics: pure_condensed_phase
+            pure_condensed_phase_identity:
+              component_id: CS2
+              phase: condensed_liquid
+              source_account: process.stage0_foulant
             species_basis: monomer
             valid_domain:
               temperature_K:
               - 276.74
               - 353.08
             provenance:
-            - source: t-425 vp-volatile-rows-DRAFT.yaml
-              draft_key: CS2
-              review_status: grounded_but_no_frost_branch
-              phase_branch: liquid_vapor_only
-            evaluator_family: tabulated_equilibrium
-            availability: unavailable_pending_acquisition
+            - source: NIST Chemistry WebBook SRD 69, Waddington et al. 1962; native log10(P/bar), A converted by +5
+            evaluator_family: antoine
+            coefficients:
+              A: 9.06683
+              B: 1168.62
+              C: -31.616
           pure_component_antoine:
             A: 9.06683
             B: 1168.62
             C: -31.616
-            source: NIST Chemistry WebBook SRD 69, Waddington et al. 1962; native log10(P/bar), A converted
-              by +5
+            source: NIST Chemistry WebBook SRD 69, Waddington et al. 1962; native log10(P/bar), A converted by +5
             source_urls:
             - https://webbook.nist.gov/cgi/cbook.cgi?ID=C75150&Mask=4
             - https://doi.org/10.1021/j100812a025
@@ -5096,29 +6256,40 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
-        flux_dormant: true
-        consumer_status: inactive
+        flux_dormant: false
+        consumer_status: status_bearing_non_authoritative
     vaporisation_coefficients:
       evaporation_alpha:
-        status: no_data
-        policy: refuse_nonzero_flux
-        compatibility_policy_field: refuse_nonzero_flux
-      alpha_domain_and_uncertainty: {}
+        value: 1.0
+        source: Status-bearing broad phase-change proxy; no carrier-specific Stage-0 Hertz-Knudsen alpha is available.
+        T_band_K:
+        - 276.74
+        - 353.08
+        envelope:
+        - 0.1
+        - 1.0
+        tier: 2
+        tag: broad_proxy_not_intrinsic
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 276.74
+        - 353.08
+        envelope:
+        - 0.1
+        - 1.0
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: vapour_pressure_pending_acquisition:CS2
+      acquisition_flag: evaporation_alpha_proxy:CS2
     code_metadata:
       formula_id: CS2
       source_account: process.stage0_foulant
-      request_rule: dormant_pending_validation
+      request_rule: stage0_only
       solve_group_id: volatile_sulfur_CS2_family
-      compatibility_projection: dormant_acquisition
+      compatibility_projection: foulant_vapor
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
-        / VR-16
+      hot_train_not_applicable_reason: Stage-0 overhead carrier; excluded from cleaned-melt evaporation hot train.
       yaml_quote_species_id: false
       chemical_family: volatile_sulfur
   volatile_nitrogen_HNCO_family:
@@ -5128,14 +6299,14 @@ families:
           formula: HNCO
           chemical_family: volatile_nitrogen
           acquisition_status: t425_grounded
-          runtime_disposition: dormant_pending_owner_physics_review
-          flux_dormant: true
+          runtime_disposition: status_bearing_non_authoritative
+          flux_dormant: false
           notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::HNCO. review_status=grounded; phase_branch=crystalline_solid_sublimation.
             DRAFT/owner/physics gates survive; dormant to flux.
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT - no flux; owner + physics review required before enablement
+            note: MC-4 Stage-0 composition; executable but status-bearing non-authoritative and certification ceiling never.
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
@@ -5146,12 +6317,23 @@ families:
               - 119.0
               - 137.0
             provenance:
-            - source: t-425 vp-volatile-rows-DRAFT.yaml
-              draft_key: HNCO
-              review_status: grounded
-              phase_branch: crystalline_solid_sublimation
+            - source: Hudson, Yarnall, and Gerakines 2024, Eq. 3 and Table 4; crystalline isocyanic-acid QCM measurement
             evaluator_family: tabulated_equilibrium
-            availability: unavailable_pending_acquisition
+            points:
+            - temperature_K: 119.0
+              pressure_Pa: 8.261772536677613e-06
+            - temperature_K: 128.0
+              pressure_Pa: 0.00017715548845419462
+            - temperature_K: 137.0
+              pressure_Pa: 0.0025393531801669767
+            derivation: Points are direct evaluations of the named literature correlation in its native pressure units, converted
+              to Pa. Interpolation is log-pressure versus temperature; outside the source window the shared consequence-aware
+              continuation computes and marks a non-certifying value instead of dropping the carrier.
+            activity_semantics: pure_condensed_phase
+            pure_condensed_phase_identity:
+              component_id: HNCO
+              phase: condensed_solid
+              source_account: process.stage0_foulant
           literature_correlation:
             form: ln(P_Pa)=ln(133.322)+27.0-5188/T
             B_K: 5188.0
@@ -5159,8 +6341,7 @@ families:
             valid_range_K:
             - 119.0
             - 137.0
-            source: Hudson, Yarnall, and Gerakines 2024, Eq. 3 and Table 4; crystalline isocyanic-acid
-              QCM measurement
+            source: Hudson, Yarnall, and Gerakines 2024, Eq. 3 and Table 4; crystalline isocyanic-acid QCM measurement
             source_urls:
             - https://doi.org/10.3847/1538-4357/ad8c43
             - https://science.gsfc.nasa.gov/691/cosmicice/reprints/Hudson-2024-3018.pdf
@@ -5172,29 +6353,40 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
-        flux_dormant: true
-        consumer_status: inactive
+        flux_dormant: false
+        consumer_status: status_bearing_non_authoritative
     vaporisation_coefficients:
       evaporation_alpha:
-        status: no_data
-        policy: refuse_nonzero_flux
-        compatibility_policy_field: refuse_nonzero_flux
-      alpha_domain_and_uncertainty: {}
+        value: 1.0
+        source: Status-bearing broad phase-change proxy; no carrier-specific Stage-0 Hertz-Knudsen alpha is available.
+        T_band_K:
+        - 119.0
+        - 137.0
+        envelope:
+        - 0.1
+        - 1.0
+        tier: 2
+        tag: broad_proxy_not_intrinsic
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 119.0
+        - 137.0
+        envelope:
+        - 0.1
+        - 1.0
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: vapour_pressure_pending_acquisition:HNCO
+      acquisition_flag: evaporation_alpha_proxy:HNCO
     code_metadata:
       formula_id: HNCO
       source_account: process.stage0_foulant
-      request_rule: dormant_pending_validation
+      request_rule: stage0_only
       solve_group_id: volatile_nitrogen_HNCO_family
-      compatibility_projection: dormant_acquisition
+      compatibility_projection: foulant_vapor
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
-        / VR-16
+      hot_train_not_applicable_reason: Stage-0 overhead carrier; excluded from cleaned-melt evaporation hot train.
       yaml_quote_species_id: false
       chemical_family: volatile_nitrogen
   volatile_nitrogen_NH4CN_family:
@@ -5281,36 +6473,41 @@ families:
           formula: CH3COOH
           chemical_family: volatile_organic
           acquisition_status: t425_grounded_but_no_salt_or_frost_branch
-          runtime_disposition: dormant_pending_owner_physics_review
-          flux_dormant: true
+          runtime_disposition: status_bearing_non_authoritative
+          flux_dormant: false
           notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::CH3COOH. review_status=grounded_but_no_salt_or_frost_branch;
             phase_branch=liquid_vapor_only. DRAFT/owner/physics gates survive; dormant to flux.
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT - no flux; owner + physics review required before enablement
+            note: MC-4 Stage-0 composition; executable but status-bearing non-authoritative and certification ceiling never.
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
             pressure_kind: pure_component_saturation_pressure
+            activity_semantics: pure_condensed_phase
+            pure_condensed_phase_identity:
+              component_id: CH3COOH
+              phase: condensed_liquid
+              source_account: process.stage0_foulant
             species_basis: monomer
             valid_domain:
               temperature_K:
               - 290.26
               - 391.01
             provenance:
-            - source: t-425 vp-volatile-rows-DRAFT.yaml
-              draft_key: CH3COOH
-              review_status: grounded_but_no_salt_or_frost_branch
-              phase_branch: liquid_vapor_only
-            evaluator_family: tabulated_equilibrium
-            availability: unavailable_pending_acquisition
+            - source: NIST Chemistry WebBook SRD 69, McDonald, Shrader, and Stull 1959; native log10(P/bar), A converted by
+                +5
+            evaluator_family: antoine
+            coefficients:
+              A: 9.68206
+              B: 1642.54
+              C: -39.764
           pure_component_antoine:
             A: 9.68206
             B: 1642.54
             C: -39.764
-            source: NIST Chemistry WebBook SRD 69, McDonald, Shrader, and Stull 1959; native log10(P/bar),
-              A converted by +5
+            source: NIST Chemistry WebBook SRD 69, McDonald, Shrader, and Stull 1959; native log10(P/bar), A converted by +5
             source_urls:
             - https://webbook.nist.gov/cgi/cbook.cgi?ID=C64197&Mask=5&Units=SI
             - https://doi.org/10.1021/je60004a009
@@ -5335,29 +6532,40 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
-        flux_dormant: true
-        consumer_status: inactive
+        flux_dormant: false
+        consumer_status: status_bearing_non_authoritative
     vaporisation_coefficients:
       evaporation_alpha:
-        status: no_data
-        policy: refuse_nonzero_flux
-        compatibility_policy_field: refuse_nonzero_flux
-      alpha_domain_and_uncertainty: {}
+        value: 1.0
+        source: Status-bearing broad phase-change proxy; no carrier-specific Stage-0 Hertz-Knudsen alpha is available.
+        T_band_K:
+        - 290.26
+        - 391.01
+        envelope:
+        - 0.1
+        - 1.0
+        tier: 2
+        tag: broad_proxy_not_intrinsic
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 290.26
+        - 391.01
+        envelope:
+        - 0.1
+        - 1.0
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: vapour_pressure_pending_acquisition:CH3COOH
+      acquisition_flag: evaporation_alpha_proxy:CH3COOH
     code_metadata:
       formula_id: CH3COOH
       source_account: process.stage0_foulant
-      request_rule: dormant_pending_validation
+      request_rule: stage0_only
       solve_group_id: volatile_organic_CH3COOH_family
-      compatibility_projection: dormant_acquisition
+      compatibility_projection: foulant_vapor
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
-        / VR-16
+      hot_train_not_applicable_reason: Stage-0 overhead carrier; excluded from cleaned-melt evaporation hot train.
       yaml_quote_species_id: false
       chemical_family: volatile_organic
   halide_hydrogen_HCl_family:
@@ -5367,31 +6575,35 @@ families:
           formula: HCl
           chemical_family: halide_hydrogen
           acquisition_status: t425_uncertain_for_frost_use
-          runtime_disposition: dormant_pending_owner_physics_review
-          flux_dormant: true
-          notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::HCl. review_status=uncertain_for_frost_use;
-            phase_branch=source_unlabeled_crosses_condensed_phases. DRAFT/owner/physics gates survive;
-            dormant to flux.
+          runtime_disposition: status_bearing_non_authoritative
+          flux_dormant: false
+          notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::HCl. review_status=uncertain_for_frost_use; phase_branch=source_unlabeled_crosses_condensed_phases.
+            DRAFT/owner/physics gates survive; dormant to flux.
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT - no flux; owner + physics review required before enablement
+            note: MC-4 Stage-0 composition; executable but status-bearing non-authoritative and certification ceiling never.
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
             pressure_kind: pure_component_saturation_pressure
+            activity_semantics: pure_condensed_phase
+            pure_condensed_phase_identity:
+              component_id: HCl
+              phase: condensed_liquid
+              source_account: process.stage0_foulant
             species_basis: monomer
             valid_domain:
               temperature_K:
               - 122.3
               - 188.3
             provenance:
-            - source: t-425 vp-volatile-rows-DRAFT.yaml
-              draft_key: HCl
-              review_status: uncertain_for_frost_use
-              phase_branch: source_unlabeled_crosses_condensed_phases
-            evaluator_family: tabulated_equilibrium
-            availability: unavailable_pending_acquisition
+            - source: NIST Chemistry WebBook SRD 69, Stull 1947; native log10(P/bar), A converted by +5
+            evaluator_family: antoine
+            coefficients:
+              A: 8.60765
+              B: 535.172
+              C: -39.847
           pure_component_antoine:
             A: 8.60765
             B: 535.172
@@ -5445,29 +6657,40 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
-        flux_dormant: true
-        consumer_status: inactive
+        flux_dormant: false
+        consumer_status: status_bearing_non_authoritative
     vaporisation_coefficients:
       evaporation_alpha:
-        status: no_data
-        policy: refuse_nonzero_flux
-        compatibility_policy_field: refuse_nonzero_flux
-      alpha_domain_and_uncertainty: {}
+        value: 1.0
+        source: Status-bearing broad phase-change proxy; no carrier-specific Stage-0 Hertz-Knudsen alpha is available.
+        T_band_K:
+        - 122.3
+        - 188.3
+        envelope:
+        - 0.1
+        - 1.0
+        tier: 2
+        tag: broad_proxy_not_intrinsic
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 122.3
+        - 188.3
+        envelope:
+        - 0.1
+        - 1.0
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: vapour_pressure_pending_acquisition:HCl
+      acquisition_flag: evaporation_alpha_proxy:HCl
     code_metadata:
       formula_id: HCl
       source_account: process.stage0_foulant
-      request_rule: dormant_pending_validation
+      request_rule: stage0_only
       solve_group_id: halide_hydrogen_HCl_family
-      compatibility_projection: dormant_acquisition
+      compatibility_projection: foulant_vapor
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
-        / VR-16
+      hot_train_not_applicable_reason: Stage-0 overhead carrier; excluded from cleaned-melt evaporation hot train.
       yaml_quote_species_id: false
       chemical_family: halide_hydrogen
   halide_elemental_Cl2_family:
@@ -5477,31 +6700,35 @@ families:
           formula: Cl2
           chemical_family: halide_elemental
           acquisition_status: t425_uncertain_for_frost_use
-          runtime_disposition: dormant_pending_owner_physics_review
-          flux_dormant: true
-          notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::Cl2. review_status=uncertain_for_frost_use;
-            phase_branch=source_unlabeled_crosses_condensed_phases. DRAFT/owner/physics gates survive;
-            dormant to flux.
+          runtime_disposition: status_bearing_non_authoritative
+          flux_dormant: false
+          notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::Cl2. review_status=uncertain_for_frost_use; phase_branch=source_unlabeled_crosses_condensed_phases.
+            DRAFT/owner/physics gates survive; dormant to flux.
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT - no flux; owner + physics review required before enablement
+            note: MC-4 Stage-0 composition; executable but status-bearing non-authoritative and certification ceiling never.
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
             pressure_kind: pure_component_saturation_pressure
+            activity_semantics: pure_condensed_phase
+            pure_condensed_phase_identity:
+              component_id: Cl2
+              phase: condensed_liquid
+              source_account: process.stage0_foulant
             species_basis: monomer
             valid_domain:
               temperature_K:
               - 155.0
               - 239.4
             provenance:
-            - source: t-425 vp-volatile-rows-DRAFT.yaml
-              draft_key: Cl2
-              review_status: uncertain_for_frost_use
-              phase_branch: source_unlabeled_crosses_condensed_phases
-            evaluator_family: tabulated_equilibrium
-            availability: unavailable_pending_acquisition
+            - source: NIST Chemistry WebBook SRD 69, Stull 1947; native log10(P/atm), A converted by +log10(101325)
+            evaluator_family: antoine
+            coefficients:
+              A: 8.021316612
+              B: 530.591
+              C: -64.639
           pure_component_antoine:
             A: 8.021316612
             B: 530.591
@@ -5559,29 +6786,40 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
-        flux_dormant: true
-        consumer_status: inactive
+        flux_dormant: false
+        consumer_status: status_bearing_non_authoritative
     vaporisation_coefficients:
       evaporation_alpha:
-        status: no_data
-        policy: refuse_nonzero_flux
-        compatibility_policy_field: refuse_nonzero_flux
-      alpha_domain_and_uncertainty: {}
+        value: 1.0
+        source: Status-bearing broad phase-change proxy; no carrier-specific Stage-0 Hertz-Knudsen alpha is available.
+        T_band_K:
+        - 155.0
+        - 239.4
+        envelope:
+        - 0.1
+        - 1.0
+        tier: 2
+        tag: broad_proxy_not_intrinsic
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 155.0
+        - 239.4
+        envelope:
+        - 0.1
+        - 1.0
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: vapour_pressure_pending_acquisition:Cl2
+      acquisition_flag: evaporation_alpha_proxy:Cl2
     code_metadata:
       formula_id: Cl2
       source_account: process.stage0_foulant
-      request_rule: dormant_pending_validation
+      request_rule: stage0_only
       solve_group_id: halide_elemental_Cl2_family
-      compatibility_projection: dormant_acquisition
+      compatibility_projection: foulant_vapor
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
-        / VR-16
+      hot_train_not_applicable_reason: Stage-0 overhead carrier; excluded from cleaned-melt evaporation hot train.
       yaml_quote_species_id: false
       chemical_family: halide_elemental
   halide_salt_MgCl2_family:
@@ -5591,38 +6829,43 @@ families:
           formula: MgCl2
           chemical_family: halide_salt
           acquisition_status: t425_grounded_fit_but_not_total_saturated_vapor
-          runtime_disposition: dormant_pending_owner_physics_review
-          flux_dormant: true
+          runtime_disposition: status_bearing_non_authoritative
+          flux_dormant: false
           notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::MgCl2. review_status=grounded_fit_but_not_total_saturated_vapor;
-            phase_branch=liquid_to_monomer_gas_equilibrium. DRAFT/owner/physics gates survive; dormant
-            to flux. Antoine is JANAF monomer partial over pure liquid - NOT total saturated vapour (dimer
-            Mg2Cl4 contributes; see chloride-dimers-and-gates.md).
+            phase_branch=liquid_to_monomer_gas_equilibrium. DRAFT/owner/physics gates survive; dormant to flux. Antoine is JANAF
+            monomer partial over pure liquid - NOT total saturated vapour (dimer Mg2Cl4 contributes; see chloride-dimers-and-gates.md).
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT - no flux; owner + physics review required before enablement
+            note: MC-4 Stage-0 composition; executable but status-bearing non-authoritative and certification ceiling never.
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
             pressure_kind: pure_component_saturation_pressure
+            activity_semantics: pure_condensed_phase
+            pure_condensed_phase_identity:
+              component_id: MgCl2
+              phase: condensed_liquid
+              source_account: process.stage0_foulant
             species_basis: monomer
             valid_domain:
               temperature_K:
               - 1100.0
               - 1700.0
             provenance:
-            - source: t-425 vp-volatile-rows-DRAFT.yaml
-              draft_key: MgCl2
-              review_status: grounded_fit_but_not_total_saturated_vapor
-              phase_branch: liquid_to_monomer_gas_equilibrium
-            evaluator_family: tabulated_equilibrium
-            availability: unavailable_pending_acquisition
+            - source: Least-squares Antoine fit to NIST-JANAF MgCl2(l) and MgCl2(g) Gibbs-formation tables; log10(P_monomer/bar)=-(Gf_gas-Gf_liquid)/(2.303RT),
+                converted to Pa
+            evaluator_family: antoine
+            coefficients:
+              A: 10.1247675
+              B: 7655.71191
+              C: -135.7
           pure_component_antoine:
             A: 10.1247675
             B: 7655.71191
             C: -135.7
-            source: Least-squares Antoine fit to NIST-JANAF MgCl2(l) and MgCl2(g) Gibbs-formation tables;
-              log10(P_monomer/bar)=-(Gf_gas-Gf_liquid)/(2.303RT), converted to Pa
+            source: Least-squares Antoine fit to NIST-JANAF MgCl2(l) and MgCl2(g) Gibbs-formation tables; log10(P_monomer/bar)=-(Gf_gas-Gf_liquid)/(2.303RT),
+              converted to Pa
             source_urls:
             - https://janaf.nist.gov/tables/Cl-094.html
             - https://janaf.nist.gov/tables/Cl-096.html
@@ -5653,29 +6896,40 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
-        flux_dormant: true
-        consumer_status: inactive
+        flux_dormant: false
+        consumer_status: status_bearing_non_authoritative
     vaporisation_coefficients:
       evaporation_alpha:
-        status: no_data
-        policy: refuse_nonzero_flux
-        compatibility_policy_field: refuse_nonzero_flux
-      alpha_domain_and_uncertainty: {}
+        value: 1.0
+        source: Status-bearing broad phase-change proxy; no carrier-specific Stage-0 Hertz-Knudsen alpha is available.
+        T_band_K:
+        - 1100.0
+        - 1700.0
+        envelope:
+        - 0.1
+        - 1.0
+        tier: 2
+        tag: broad_proxy_not_intrinsic
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 1100.0
+        - 1700.0
+        envelope:
+        - 0.1
+        - 1.0
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: vapour_pressure_pending_acquisition:MgCl2
+      acquisition_flag: evaporation_alpha_proxy:MgCl2
     code_metadata:
       formula_id: MgCl2
       source_account: process.stage0_foulant
-      request_rule: dormant_pending_validation
+      request_rule: stage0_only
       solve_group_id: halide_salt_MgCl2_family
-      compatibility_projection: dormant_acquisition
+      compatibility_projection: foulant_vapor
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
-        / VR-16
+      hot_train_not_applicable_reason: Stage-0 overhead carrier; excluded from cleaned-melt evaporation hot train.
       yaml_quote_species_id: false
       chemical_family: halide_salt
   halide_salt_CaCl2_family:
@@ -5685,37 +6939,43 @@ families:
           formula: CaCl2
           chemical_family: halide_salt
           acquisition_status: t425_grounded_fit_but_not_total_saturated_vapor
-          runtime_disposition: dormant_pending_owner_physics_review
-          flux_dormant: true
+          runtime_disposition: status_bearing_non_authoritative
+          flux_dormant: false
           notes: Transcribed from t-425 vp-volatile-rows-DRAFT.yaml::CaCl2. review_status=grounded_fit_but_not_total_saturated_vapor;
-            phase_branch=liquid_to_monomer_gas_equilibrium. DRAFT/owner/physics gates survive; dormant
-            to flux. Monomer-basis fit; total mixture may include polymers if present.
+            phase_branch=liquid_to_monomer_gas_equilibrium. DRAFT/owner/physics gates survive; dormant to flux. Monomer-basis
+            fit; total mixture may include polymers if present.
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT - no flux; owner + physics review required before enablement
+            note: MC-4 Stage-0 composition; executable but status-bearing non-authoritative and certification ceiling never.
           source_reactions: []
           pressure_models:
           - fit_target: pure_component_psat
             pressure_kind: pure_component_saturation_pressure
+            activity_semantics: pure_condensed_phase
+            pure_condensed_phase_identity:
+              component_id: CaCl2
+              phase: condensed_liquid
+              source_account: process.stage0_foulant
             species_basis: monomer
             valid_domain:
               temperature_K:
               - 1100.0
               - 2200.0
             provenance:
-            - source: t-425 vp-volatile-rows-DRAFT.yaml
-              draft_key: CaCl2
-              review_status: grounded_fit_but_not_total_saturated_vapor
-              phase_branch: liquid_to_monomer_gas_equilibrium
-            evaluator_family: tabulated_equilibrium
-            availability: unavailable_pending_acquisition
+            - source: Least-squares Antoine fit to NIST-JANAF CaCl2(l) and CaCl2(g) Gibbs-formation tables; log10(P_monomer/bar)=-(Gf_gas-Gf_liquid)/(2.303RT),
+                converted to Pa
+            evaluator_family: antoine
+            coefficients:
+              A: 10.3607013
+              B: 10961.6099
+              C: -156.9
           pure_component_antoine:
             A: 10.3607013
             B: 10961.6099
             C: -156.9
-            source: Least-squares Antoine fit to NIST-JANAF CaCl2(l) and CaCl2(g) Gibbs-formation tables;
-              log10(P_monomer/bar)=-(Gf_gas-Gf_liquid)/(2.303RT), converted to Pa
+            source: Least-squares Antoine fit to NIST-JANAF CaCl2(l) and CaCl2(g) Gibbs-formation tables; log10(P_monomer/bar)=-(Gf_gas-Gf_liquid)/(2.303RT),
+              converted to Pa
             source_urls:
             - https://janaf.nist.gov/tables/Ca-010.html
             - https://janaf.nist.gov/tables/Ca-012.html
@@ -5746,29 +7006,40 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
-        flux_dormant: true
-        consumer_status: inactive
+        flux_dormant: false
+        consumer_status: status_bearing_non_authoritative
     vaporisation_coefficients:
       evaporation_alpha:
-        status: no_data
-        policy: refuse_nonzero_flux
-        compatibility_policy_field: refuse_nonzero_flux
-      alpha_domain_and_uncertainty: {}
+        value: 1.0
+        source: Status-bearing broad phase-change proxy; no carrier-specific Stage-0 Hertz-Knudsen alpha is available.
+        T_band_K:
+        - 1100.0
+        - 2200.0
+        envelope:
+        - 0.1
+        - 1.0
+        tier: 2
+        tag: broad_proxy_not_intrinsic
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 1100.0
+        - 2200.0
+        envelope:
+        - 0.1
+        - 1.0
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: vapour_pressure_pending_acquisition:CaCl2
+      acquisition_flag: evaporation_alpha_proxy:CaCl2
     code_metadata:
       formula_id: CaCl2
       source_account: process.stage0_foulant
-      request_rule: dormant_pending_validation
+      request_rule: stage0_only
       solve_group_id: halide_salt_CaCl2_family
-      compatibility_projection: dormant_acquisition
+      compatibility_projection: foulant_vapor
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
-        / VR-16
+      hot_train_not_applicable_reason: Stage-0 overhead carrier; excluded from cleaned-melt evaporation hot train.
       yaml_quote_species_id: false
       chemical_family: halide_salt
   volatile_sulfur_SO3_family:
@@ -9662,17 +10933,24 @@ families:
           formula: Na2Cl2
           chemical_family: halide_association
           acquisition_status: REVIEWABLE_PRIMARY_K
-          runtime_disposition: dormant_pending_owner_physics_review
-          flux_dormant: true
-          notes: Na2Cl2 <-> 2 NaCl(g). Primary K from Datz, Smith & Taylor 1961 (JCP 34:558). K_p = p(monomer)^2
-            / p(dimer) in atm; P deg = 1 atm. Certified use range 1277-1406 K; outside = flagged extrapolation.
-            Monomer foulant_vapor NaCl row is pure-component TOTAL (Stull) - do not treat NaCl monomer
-            Antoine as dimer-free total without the split. DRAFT dormant.
+          runtime_disposition: status_bearing_non_authoritative
+          flux_dormant: false
+          notes: Na2Cl2 <-> 2 NaCl(g). Primary K from Datz, Smith & Taylor 1961 (JCP 34:558). K_p = p(monomer)^2 / p(dimer)
+            in atm; P deg = 1 atm. Certified use range 1277-1406 K; outside = flagged extrapolation. Monomer foulant_vapor NaCl
+            row is pure-component TOTAL (Stull) - do not treat NaCl monomer Antoine as dimer-free total without the split. DRAFT
+            dormant.
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT - no flux; owner + physics review required before enablement
-          source_reactions: []
+            note: MC-4 Stage-0 association composition; K(T) slope remains a proxy, so certification ceiling is never.
+          source_reactions:
+          - id: stage0_nacl_to_na2cl2
+            reactants:
+            - formula: NaCl
+              stoichiometry: 2.0
+            products:
+            - formula: Na2Cl2
+              stoichiometry: 1.0
           pressure_models:
           - fit_target: association_partial_pressure
             pressure_kind: association_partial_pressure
@@ -9682,11 +10960,23 @@ families:
               - 1277.0
               - 1406.0
             provenance:
-            - source: docs-private/research/2026-07-30-vp-acquire-5/chloride-dimers-and-gates.md
-              authority: Datz1961
-              doi: 10.1063/1.1700983
+            - source: Datz, Smith & Taylor 1961 Table II
+              role: primary_K_anchor
+              K_p_1300K_atm: 0.00447
+            - source: Stull / project pure_component NaCl (TOTAL over liquid)
+              role: total_pressure_base
             evaluator_family: tabulated_equilibrium
-            availability: unavailable_pending_acquisition
+            points:
+            - temperature_K: 1277.0
+              pressure_Pa: 597.6744546046444
+            - temperature_K: 1300.0
+              pressure_Pa: 884.5312524954018
+            - temperature_K: 1406.0
+              pressure_Pa: 4053.381681537246
+            derivation: 'Premise: P_total=P_monomer+P_dimer and Kp=P_monomer^2/P_dimer in atm. Algebra: P_monomer=(-Kp+sqrt(Kp^2+4*Kp*P_total))/2,
+              then P_dimer=P_monomer^2/Kp; the transcribed primary Kp(1300 K) is held as a status-bearing proxy across the narrow
+              Datz table window. Unit check: atm terms yield atm, converted to Pa. Sanity check: both partial pressures are
+              positive and sum once.'
           association_relation:
             equilibrium: Na2Cl2 = 2 NaCl
             K_definition: K_p = p_NaCl^2 / p_Na2Cl2
@@ -9718,31 +11008,44 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
-        flux_dormant: true
-        consumer_status: inactive
+        flux_dormant: false
+        consumer_status: status_bearing_non_authoritative
     vaporisation_coefficients:
       evaporation_alpha:
-        status: no_data
-        policy: refuse_nonzero_flux
-        compatibility_policy_field: refuse_nonzero_flux
-      alpha_domain_and_uncertainty: {}
+        value: 1.0
+        source: Status-bearing monomer salt proxy; no isolated dimer evaporation alpha is available.
+        T_band_K:
+        - 1277.0
+        - 1406.0
+        envelope:
+        - 0.1
+        - 1.0
+        tier: 2
+        tag: association_proxy_not_intrinsic
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 1277.0
+        - 1406.0
+        envelope:
+        - 0.1
+        - 1.0
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: vapour_pressure_pending_acquisition:Na2Cl2
+      acquisition_flag: evaporation_alpha_proxy:Na2Cl2
     code_metadata:
       formula_id: Na2Cl2
       source_account: process.stage0_foulant
-      request_rule: dormant_pending_validation
+      request_rule: stage0_only
       solve_group_id: halide_nacl_association_group
-      compatibility_projection: dormant_acquisition
+      compatibility_projection: foulant_vapor
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
-        / VR-16
+      hot_train_not_applicable_reason: Stage-0 association carrier; excluded from cleaned-melt hot train.
       yaml_quote_species_id: false
       chemical_family: halide_association
+      source_inventory_formula: NaCl
+      source_inventory_stoichiometry: 2.0
   halide_association_K2Cl2_family:
     physical_properties:
       species:
@@ -9750,16 +11053,22 @@ families:
           formula: K2Cl2
           chemical_family: halide_association
           acquisition_status: REVIEWABLE_PRIMARY_K
-          runtime_disposition: dormant_pending_owner_physics_review
-          flux_dormant: true
-          notes: K2Cl2 <-> 2 KCl(g). Primary K Datz 1961. K_p(1300 K)=3.37e-2 atm. JANAF comparator ~1.5x
-            higher - do not average. Near-mp saturated vapour ~39 mol% / ~56 mass% dimer under Datz K.
-            DRAFT dormant.
+          runtime_disposition: status_bearing_non_authoritative
+          flux_dormant: false
+          notes: K2Cl2 <-> 2 KCl(g). Primary K Datz 1961. K_p(1300 K)=3.37e-2 atm. JANAF comparator ~1.5x higher - do not average.
+            Near-mp saturated vapour ~39 mol% / ~56 mass% dimer under Datz K. DRAFT dormant.
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT - no flux; owner + physics review required before enablement
-          source_reactions: []
+            note: MC-4 Stage-0 association composition; K(T) slope remains a proxy, so certification ceiling is never.
+          source_reactions:
+          - id: stage0_kcl_to_k2cl2
+            reactants:
+            - formula: KCl
+              stoichiometry: 2.0
+            products:
+            - formula: K2Cl2
+              stoichiometry: 1.0
           pressure_models:
           - fit_target: association_partial_pressure
             pressure_kind: association_partial_pressure
@@ -9769,10 +11078,23 @@ families:
               - 1310.0
               - 1404.0
             provenance:
-            - source: docs-private/research/2026-07-30-vp-acquire-5/chloride-dimers-and-gates.md
-              authority: Datz1961
+            - source: Datz, Smith & Taylor 1961 Table II
+              role: primary_K_anchor
+              K_p_1300K_atm: 0.0337
+            - source: Stull / project pure_component KCl (TOTAL)
+              role: total_pressure_base
             evaluator_family: tabulated_equilibrium
-            availability: unavailable_pending_acquisition
+            points:
+            - temperature_K: 1300.0
+              pressure_Pa: 939.5815698130386
+            - temperature_K: 1310.0
+              pressure_Pa: 1119.5354892648393
+            - temperature_K: 1404.0
+              pressure_Pa: 4650.0971324157435
+            derivation: 'Premise: P_total=P_monomer+P_dimer and Kp=P_monomer^2/P_dimer in atm. Algebra: P_monomer=(-Kp+sqrt(Kp^2+4*Kp*P_total))/2,
+              then P_dimer=P_monomer^2/Kp; the transcribed primary Kp(1300 K) is held as a status-bearing proxy across the narrow
+              Datz table window. Unit check: atm terms yield atm, converted to Pa. Sanity check: both partial pressures are
+              positive and sum once.'
           association_relation:
             equilibrium: K2Cl2 = 2 KCl
             K_definition: K_p = p_KCl^2 / p_K2Cl2
@@ -9801,31 +11123,44 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT - no flux; owner + physics review required before enablement
       compatibility_fields:
-        flux_dormant: true
-        consumer_status: inactive
+        flux_dormant: false
+        consumer_status: status_bearing_non_authoritative
     vaporisation_coefficients:
       evaporation_alpha:
-        status: no_data
-        policy: refuse_nonzero_flux
-        compatibility_policy_field: refuse_nonzero_flux
-      alpha_domain_and_uncertainty: {}
+        value: 1.0
+        source: Status-bearing monomer salt proxy; no isolated dimer evaporation alpha is available.
+        T_band_K:
+        - 1310.0
+        - 1404.0
+        envelope:
+        - 0.1
+        - 1.0
+        tier: 2
+        tag: association_proxy_not_intrinsic
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 1310.0
+        - 1404.0
+        envelope:
+        - 0.1
+        - 1.0
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: vapour_pressure_pending_acquisition:K2Cl2
+      acquisition_flag: evaporation_alpha_proxy:K2Cl2
     code_metadata:
       formula_id: K2Cl2
       source_account: process.stage0_foulant
-      request_rule: dormant_pending_validation
+      request_rule: stage0_only
       solve_group_id: halide_kcl_association_group
-      compatibility_projection: dormant_acquisition
+      compatibility_projection: foulant_vapor
       canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
-        / VR-16
+      hot_train_not_applicable_reason: Stage-0 association carrier; excluded from cleaned-melt hot train.
       yaml_quote_species_id: false
       chemical_family: halide_association
+      source_inventory_formula: KCl
+      source_inventory_stoichiometry: 2.0
   halide_association_Mg2Cl4_family:
     physical_properties:
       species:

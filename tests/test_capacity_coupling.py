@@ -773,14 +773,24 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         # trace inventory; 0.987143121334345 kg is explicitly routed to slag,
         # chloride, and sulfide accounts). The slightly diluted major-oxide
         # activities lower flux by 0.0031308794125107 kg/hr and transport
-        # saturation by 1433.775192481 points; post-step melt follows by
-        # -1.2253948978958 kg. Recomputed from this quiesced executable probe.
-        (
-            1,
-            1550.0,
-            2.620642932108552,
-            1161068.096113942,
-            996.1418136795224,
+            # saturation by 1433.775192481 points; post-step melt follows by
+            # -1.2253948978958 kg. Recomputed from this quiesced executable probe.
+            # 2026-08-05 MC-4A systematic carriers: the executable 1550 C head
+            # table adds CrO=0.0012405690130816466 Pa and makes CrO2 pressure-
+            # positive at 0.0011084725622752761 Pa. CrO follows PressureValue ->
+            # FluxEligible -> shared-Cr2O3 sum-once depletion, raising total flux
+            # +0.001389175252095587 kg/hr and transport saturation
+            # +215.12939772568643 points while lowering melt mass
+            # -0.0015528073208770365 kg. CrO2 still makes no head transition here:
+            # its oxidizing reaction needs overhead O2 and this probe starts at
+            # zero. Al2/Al2O2/Al2O3(g)/AlO2/Ca2 heads are <=4.89e-12 Pa and do
+            # not move the reported trio. Recomputed from the executable probe.
+            (
+                1,
+                1550.0,
+                2.6220321073606474,
+                1161283.2255116678,
+                996.1402608722016,
         ),
         rel=1.0e-12,
         abs=1.0e-12,
@@ -798,7 +808,11 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     # rejects a whole coupled carrier transition when any nonzero ledger leg is
     # at or below the 1e-12 kg floor, so the earlier PO dust transition is no
     # longer committed (28 -> 27); snapshot flux and ledger remain identical.
-    assert len(sim.atom_ledger.transitions) == 27
+    # MC-4A adds one evaporate_CrO transition (1550 C head
+    # 0.0012405690130816466 Pa) through the shared Cr2O3 parent path. CrO2's
+    # 0.0011084725622752761 Pa head remains transition-free here because the
+    # oxidizing leg has no overhead O2 to debit (27 -> 28).
+    assert len(sim.atom_ledger.transitions) == 28
     assert tuple(
         transition.reason for transition in sim.atom_ledger.transitions[-5:]
     ) == (

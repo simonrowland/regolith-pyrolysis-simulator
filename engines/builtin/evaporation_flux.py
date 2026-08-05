@@ -72,7 +72,7 @@ DEFAULT_MELT_SURFACE_RENEWAL_BASE_KG_S_M2_PA = 0.0
 DEFAULT_MELT_SURFACE_RENEWAL_SOURCE = (
     "disabled:missing-species-state-dependent-melt-transfer-inputs"
 )
-# EVAPORATION-only class proxies: oxygen-bearing refractory carriers borrow
+# EVAPORATION-only class proxies: systematically composed refractory carriers borrow
 # SiO sigma and epsilon/k because direct high-temperature transport data are
 # absent, but each retains its formula molar mass. Premise: Chapman-Enskog
 # D_AB scales as sqrt(1/M_A+1/M_B)/(sigma_AB^2*Omega_D); copying SiO's
@@ -84,8 +84,14 @@ DEFAULT_MELT_SURFACE_RENEWAL_SOURCE = (
 # direct collision data remain acquisition targets.
 _EVAPORATION_LJ_PROXY_PARAMS = {
     "CrO2": (3.374, 71.4, 83.9941),
+    "CrO": (3.374, 71.4, 67.9951),
+    "Al2": (3.374, 71.4, 53.9630770),
     "AlO": (3.374, 71.4, 42.9805385),
     "Al2O": (3.374, 71.4, 69.9620770),
+    "Al2O2": (3.374, 71.4, 85.9610770),
+    "Al2O3_gas": (3.374, 71.4, 101.9600770),
+    "AlO2": (3.374, 71.4, 58.9795385),
+    "Ca2": (3.374, 71.4, 80.1560),
     "CaO_gas": (3.374, 71.4, 56.0770),
     "TiO": (3.374, 71.4, 63.8660),
     "TiO2_gas": (3.374, 71.4, 79.8650),

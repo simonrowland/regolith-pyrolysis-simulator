@@ -163,6 +163,14 @@ EXPECTED_C4B_WALL_SEGMENT_DEPOSITS_KG = {
     # metadata; lunar Fe at 228927d equals tip (byte-identical), so S-03
     # is not the mass mover. Regenerated at fb73ec6 from the executable
     # split path at rel=1e-12.
+    #
+    # 2026-08-05 MC-4A systematic Cr carriers: executable 1650 C heads from
+    # scripts/vapour_head_pressure_table.py are CrO=0.01458817810317001 Pa
+    # and CrO2=0.004760283832548438 Pa (both newly positive in the carrier
+    # sum). Their shared-parent Cr2O3 debits change the coupled overhead/redox
+    # trajectory and reduce the downstream first-segment Fe wall capture:
+    # lunar -7.262858%, Mars -6.923087%, S-type -68.059736%. These are
+    # executable split-path pins, not retuned wall coefficients.
     "lunar_mare_low_ti": {
         # Partial-pressure caps remove Cr/Na/K capture; Fe depletes locally.
         # 0c56d99 pin 0.024262339673022347 -> SC-109 residual-path Fe below.
@@ -170,14 +178,14 @@ EXPECTED_C4B_WALL_SEGMENT_DEPOSITS_KG = {
         # prototype fallback debits changes the shared redox trajectory by a
         # sub-ppb fraction; this Fe wall pin records that typed non-debit.
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Fe": 0.024088657043402847,
+            "Fe": 0.02233913212821439,
         },
     },
     "mars_basalt": {
         # Na/K stay undersaturated; the limited Fe supply depletes locally.
         # 0c56d99 pin 0.02795693349498251 -> SC-109 residual-path Fe below.
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Fe": 0.02744112814751388,
+            "Fe": 0.02554135495921052,
         },
     },
     "s_type_asteroid_silicate": {
@@ -187,7 +195,7 @@ EXPECTED_C4B_WALL_SEGMENT_DEPOSITS_KG = {
         # fallback debits shifts the shared redox trajectory by a sub-ppb
         # fraction; this Fe wall pin records that typed non-debit.
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Fe": 0.04196132183519873,
+            "Fe": 0.01340255688015776,
         },
     },
 }

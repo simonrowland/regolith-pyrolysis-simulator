@@ -385,13 +385,32 @@ species:
   estimated: false
   source: Stoichiometric vapor formula from species id.
 - id: CrO2
+  formula: CrO2
   atoms:
     Cr: 1
     O: 2
   basis: molecular_formula
-  category: vapor
-  estimated: false
-  source: CrO2(g) chromium-bearing vapor species; atoms explicit for Cr2O3/O2 condensation accounting.
+  category: vapor_species
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: true
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: analytical_non_authoritative
+    temperature_K:
+    - 1400.0
+    - 2273.15
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: evaporation_alpha_proxy:CrO2
+  code_metadata:
+    formula_id: CrO2
+    canonical_aliases: []
+    request_rule: source_inventory_present
+  source: NASA CEA cea_CrO2_gibbs gas polynomial composed with the existing CrO1.5 condensed rail.
 - id: NaCl
   formula: NaCl
   basis: molecular_formula
@@ -751,6 +770,139 @@ species:
     canonical_aliases: []
     request_rule: source_inventory_present
   source: NASA CEA cea_AL2O_gibbs gas polynomial + existing liquid-AlO1.5 rail; De Maria 1971 Table 4 anchor
+- id: Al2
+  formula: Al2
+  atoms:
+    Al: 2
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: true
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: analytical_non_authoritative
+    temperature_K:
+    - 1400.0
+    - 2273.15
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: evaporation_alpha_proxy:Al2
+  code_metadata:
+    formula_id: Al2
+    canonical_aliases: []
+    request_rule: source_inventory_present
+  source: NASA CEA cea_AL2_gibbs gas polynomial composed with the existing AlO1.5 condensed rail.
+- id: Al2O2
+  formula: Al2O2
+  atoms:
+    Al: 2
+    O: 2
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: true
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: analytical_non_authoritative
+    temperature_K:
+    - 1400.0
+    - 2273.15
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: evaporation_alpha_proxy:Al2O2
+  code_metadata:
+    formula_id: Al2O2
+    canonical_aliases: []
+    request_rule: source_inventory_present
+  source: NASA CEA cea_AL2O2_gibbs gas polynomial composed with the existing AlO1.5 condensed rail.
+- id: AlO2
+  formula: AlO2
+  atoms:
+    Al: 1
+    O: 2
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: true
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: analytical_non_authoritative
+    temperature_K:
+    - 1400.0
+    - 2273.15
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: evaporation_alpha_proxy:AlO2
+  code_metadata:
+    formula_id: AlO2
+    canonical_aliases: []
+    request_rule: source_inventory_present
+  source: NASA CEA cea_ALO2_gibbs gas polynomial composed with the existing AlO1.5 condensed rail.
+- id: Ca2
+  formula: Ca2
+  atoms:
+    Ca: 2
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: true
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: analytical_non_authoritative
+    temperature_K:
+    - 1757.0
+    - 2273.15
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: evaporation_alpha_proxy:Ca2
+  code_metadata:
+    formula_id: Ca2
+    canonical_aliases: []
+    request_rule: source_inventory_present
+  source: NASA CEA cea_Ca2_gibbs gas polynomial composed with the existing CaO condensed rail.
+- id: CrO
+  formula: CrO
+  atoms:
+    Cr: 1
+    O: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: true
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: analytical_non_authoritative
+    temperature_K:
+    - 1400.0
+    - 2273.15
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: evaporation_alpha_proxy:CrO
+  code_metadata:
+    formula_id: CrO
+    canonical_aliases: []
+    request_rule: source_inventory_present
+  source: NASA CEA cea_CrO_gibbs gas polynomial composed with the existing CrO1.5 condensed rail.
 - id: TiO
   formula: TiO
   atoms:
@@ -817,25 +969,27 @@ species:
   category: vapor_species
   phase: gas
   catalog_role: gas
-  direct_vapour_flux: false
-  formula_alias: Al2O3
+  direct_vapour_flux: true
   validation:
     status: pending_validation
     anchor_refs: []
   pressure_observable: equilibrium_partial_pressure
   valid_domain:
-    status: pending_acquisition
-    temperature_K: null
+    status: analytical_non_authoritative
+    temperature_K:
+    - 1400.0
+    - 2273.15
   extrapolation_policy: conservative_slope_continuation
   out_of_range_status: out_of_range_conservative_continuation
-  acquisition_flag: vapour_pressure_pending_acquisition:Al2O3_gas
+  acquisition_flag: evaporation_alpha_proxy:Al2O3_gas
   code_metadata:
     formula_id: Al2O3
     canonical_aliases:
     - Al2O3
-    collision_only_suffix: true
-    request_rule: pending_family_compilation
-  source: VR-1 U0 collision_gas membership set
+    request_rule: source_inventory_present
+    collision_only_suffix: false
+  source: NASA CEA cea_AL2O3_gibbs gas polynomial composed with the existing AlO1.5 condensed rail.
+  formula_alias: Al2O3
 - id: CaO_gas
   formula: CaO
   atoms:
