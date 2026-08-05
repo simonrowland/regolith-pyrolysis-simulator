@@ -265,6 +265,46 @@ def test_rump_ree_enrichment_extent_is_ledger_derived_not_fitted():
     assert extent['ree_enrichment_factor'] == pytest.approx(2.0)
 
 
+def test_rump_ree_enrichment_aggregates_split_inert_lanthanide_oxides():
+    class Ledger:
+        @staticmethod
+        def project_account_kg(account):
+            return (
+                {'SiO2': 48.0, 'La2O3': 1.2, 'Ce2O3': 0.8}
+                if account == 'process.cleaned_melt'
+                else {}
+            )
+
+    sim = SimpleNamespace(
+        product_ledger=lambda: {},
+        train=SimpleNamespace(stages=[]),
+        atom_ledger=Ledger(),
+        record=SimpleNamespace(
+            initial_inventory=SimpleNamespace(
+                melt_oxide_kg={'SiO2': 98.0},
+                inert_melt_components_kg={'La2O3': 1.2, 'Ce2O3': 0.8},
+            )
+        ),
+        _terminal_rump_by_species=lambda: {
+            'SiO2': 48.0,
+            'La2O3': 1.2,
+            'Ce2O3': 0.8,
+        },
+    )
+
+    rump = classify_products(sim)['refractory_ceramic_rump']
+    extent = rump['ree_enrichment_extent']
+
+    assert rump['rump_refractory_oxides_kg'] == pytest.approx(2.0)
+    assert rump['rump_silicate_residual_kg'] == pytest.approx(48.0)
+    assert extent['initial_ree_oxides_kg'] == pytest.approx(2.0)
+    assert extent['terminal_ree_oxides_kg'] == pytest.approx(2.0)
+    assert extent['ree_retention_fraction'] == pytest.approx(1.0)
+    assert extent['initial_ree_oxides_wt_pct'] == pytest.approx(2.0)
+    assert extent['terminal_ree_oxides_wt_pct'] == pytest.approx(4.0)
+    assert extent['ree_enrichment_factor'] == pytest.approx(2.0)
+
+
 def test_rump_ree_extent_excludes_c7_credit_and_aluminate_product():
     class Ledger:
         @staticmethod

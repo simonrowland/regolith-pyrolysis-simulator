@@ -195,6 +195,65 @@ def test_builtin_feedstocks_initially_conserve_batch_mass():
         assert snapshot.mass_balance_error_pct == pytest.approx(0.0), key
 
 
+def test_cited_trace_components_without_stage0_routes_remain_in_cleaned_melt():
+    data_path = Path(__file__).parent.parent / "data" / "feedstocks.yaml"
+    feedstocks = yaml.safe_load(data_path.read_text())
+    sim = _sim_with_data(feedstocks)
+
+    sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
+
+    cleaned_melt = sim.atom_ledger.project_account_kg("process.cleaned_melt")
+    residual = sim.atom_ledger.project_account_kg("process.raw_feedstock")
+    for component in ("La2O3", "Zn", "F"):
+        assert cleaned_melt[component] > 0.0
+        assert component not in residual
+
+
+def test_super_kreep_ree_split_preserves_the_replaced_lump_mass():
+    data_path = Path(__file__).parent.parent / "data" / "feedstocks.yaml"
+    feedstocks = yaml.safe_load(data_path.read_text())
+    composition = feedstocks["targeted_super_kreep_ore"]["composition_wt_pct"]
+    ree_oxides = [
+        f"{element}2O3"
+        for element in (
+            "La",
+            "Ce",
+            "Pr",
+            "Nd",
+            "Sm",
+            "Eu",
+            "Gd",
+            "Tb",
+            "Dy",
+            "Ho",
+            "Er",
+            "Tm",
+            "Yb",
+            "Lu",
+        )
+    ]
+
+    assert "REE_oxides" not in composition
+    assert sum(composition[oxide] for oxide in ree_oxides) == pytest.approx(
+        1.55,
+        abs=0.004,
+    )
+
+
+def test_uncited_bare_fluorine_still_requires_an_explicit_stage0_carrier():
+    sim = _sim(
+        {
+            "test": {
+                "composition_wt_pct": {"SiO2": 99.0, "F": 1.0},
+                "formula_inventory": {"F": {"formula": "F"}},
+            }
+        }
+    )
+
+    with pytest.raises(ValueError, match="bare 'f' is not accepted"):
+        sim.load_batch("test", mass_kg=1000.0)
+
+
 def test_load_batch_refuses_status_blocked_feedstocks():
     data_path = Path(__file__).parent.parent / "data" / "feedstocks.yaml"
     feedstocks = yaml.safe_load(data_path.read_text())

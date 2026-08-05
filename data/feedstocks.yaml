@@ -35,6 +35,64 @@ lunar_mare_low_ti:
     Cr2O3:  0.35
     MnO:    0.20
     P2O5:   0.10
+    # MC-1 additive trace/minor inventory. Staging values are elemental ppm by mass.
+    # Oxide rows: oxide wt% = element ppm x staged oxide factor / 10,000.
+    # Element-symbol rows: element wt% = element ppm / 10,000 (basis exception).
+    La2O3: 0.0027694  # 23.614 ppm La x 1.17278 / 10,000
+    Ce2O3: 0.0068065  # 58.1109 ppm Ce x 1.17129 / 10,000
+    Pr2O3: 0.0008603  # 7.3511 ppm Pr x 1.17032 / 10,000
+    Nd2O3: 0.004335  # 37.1663 ppm Nd x 1.16639 / 10,000
+    Sm2O3: 0.0011596  # 10 ppm Sm x 1.15962 / 10,000
+    Eu2O3: 0.0001274  # 1.1 ppm Eu x 1.15793 / 10,000
+    Gd2O3: 0.0013491  # 11.7043 ppm Gd x 1.15262 / 10,000
+    Tb2O3: 0.0002387  # 2.0739 ppm Tb x 1.15101 / 10,000
+    Dy2O3: 0.0015271  # 13.306 ppm Dy x 1.14769 / 10,000
+    Ho2O3: 0.0003293  # 2.8747 ppm Ho x 1.14552 / 10,000
+    Er2O3: 0.0009228  # 8.0698 ppm Er x 1.14349 / 10,000
+    Tm2O3: 0.000133  # 1.1643 ppm Tm x 1.14207 / 10,000
+    Yb2O3: 0.0008371  # 7.3511 ppm Yb x 1.13869 / 10,000
+    Lu2O3: 0.000128  # 1.1253 ppm Lu x 1.13717 / 10,000
+    Y2O3: 0.0057148  # 45 ppm Y x 1.26995 / 10,000
+    Sc2O3: 0.0058287  # 38 ppm Sc x 1.53386 / 10,000
+    V: 0.012
+    Sr: 0.014
+    ThO2: 0.0002276  # 2 ppm Th x 1.13791 / 10,000
+    UO2: 6.24e-05  # 0.55 ppm U x 1.13444 / 10,000
+    ZrO2: 0.0243141  # 180 ppm Zr x 1.35078 / 10,000
+    HfO2: 0.0006486  # 5.5 ppm Hf x 1.17928 / 10,000
+    Ba: 0.012
+    Rb: 0.00025
+    Cs: 1.5e-05
+    Li: 0.001
+    Nb: 0.0012
+    Co: 0.0035
+    Ni: 0.02
+    Cu: 0.001
+    Zn: 0.002
+    Ga: 0.0005
+    Ge: 5.0e-05
+    Mo: 1.5e-05
+    W: 2.5e-05
+    F: 0.008
+    Cl: 0.0015
+    Br: 2.5e-05
+    I: 5.0e-06
+    S: 0.07
+    B: 0.0002
+    Pb: 0.00012
+    Sn: 3.0e-05
+    Bi: 5.0e-07
+    In: 5.0e-07
+    Te: 2.0e-06
+    Se: 1.5e-05
+    As: 8.0e-06
+    Sb: 3.0e-06
+    Cd: 3.0e-06
+    Ag: 2.0e-06
+    Au: 4.0e-07
+    Ir: 8.0e-07
+    Os: 7.0e-07
+    Pt: 1.2e-06
   composition_ranges:
     SiO2:  [43, 46]
     TiO2:  [1.0, 2.0]   # low-Ti subset
@@ -48,6 +106,99 @@ lunar_mare_low_ti:
     MnO:   [0.15, 0.25]
     P2O5:  [0.05, 0.15]
   sum_check: 97.15  # see note
+  trace_elements:
+    # Element-basis values and citations underlying the component rows above.
+    La: {value: 23.614, interval: [14.1684, 37.7823], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=10.00 µg/g", confidence: "medium"}
+    Ce: {value: 58.1109, interval: [34.8665, 92.9774], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=10.00 µg/g", confidence: "medium"}
+    Pr: {value: 7.3511, interval: [4.4107, 11.7618], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=10.00 µg/g", confidence: "medium"}
+    Nd: {value: 37.1663, interval: [22.2998, 59.4661], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=10.00 µg/g", confidence: "medium"}
+    Sm: {value: 10, interval: [6, 16], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=10.00 µg/g", confidence: "medium"}
+    Eu: {value: 1.1, interval: [0.7, 1.6], unit: ppm_mass_ug_per_g, basis: element, source: "Sm-scale context: LSB Table 8.1 KREEP Eu=3.1 µg/g; family Eu set to 1.1 µg/g for Lunar Mare Basalt (Low-Ti) (Korotev highland soils / mare basalt ranges / Warren KREEP). Primary pattern source: Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g", confidence: "medium"}
+    Gd: {value: 11.7043, interval: [7.0226, 18.7269], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=10.00 µg/g", confidence: "medium"}
+    Tb: {value: 2.0739, interval: [1.2444, 3.3183], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=10.00 µg/g", confidence: "medium"}
+    Dy: {value: 13.306, interval: [7.9836, 21.2895], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=10.00 µg/g", confidence: "medium"}
+    Ho: {value: 2.8747, interval: [1.7248, 4.5996], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=10.00 µg/g", confidence: "medium"}
+    Er: {value: 8.0698, interval: [4.8419, 12.9117], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=10.00 µg/g", confidence: "medium"}
+    Tm: {value: 1.1643, interval: [0.6986, 1.8628], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=10.00 µg/g", confidence: "medium"}
+    Yb: {value: 7.3511, interval: [4.4107, 11.7618], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=10.00 µg/g", confidence: "medium"}
+    Lu: {value: 1.1253, interval: [0.6752, 1.8004], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=10.00 µg/g", confidence: "medium"}
+    Y: {value: 45, interval: [25, 80], unit: ppm_mass_ug_per_g, basis: element, source: "Family synthesis: Y tracks HREE; high-K KREEP Y~200 µg/g (Warren 1989 high-K KREEP compilation (Workshop Moon in Transition TR 89-03); Haskin et al. 2000 JGR PKT; LSB Ch.8 §8.4 incompatible correlations; Zr/Hf~42 highland (Hughes & Schmitt 1985 via LSB)); scaled/set for terrane.", confidence: "medium"}
+    Sc: {value: 38, interval: [25, 50], unit: ppm_mass_ug_per_g, basis: element, source: "LSB Table A8.3 Sc in MBAS/S&RB; mare high-Ti Sc-rich (~40–80 µg/g), highland soils ~5–13 µg/g (Korotev et al. 2003).", confidence: "medium-high"}
+    V: {value: 120, interval: [70, 180], unit: ppm_mass_ug_per_g, basis: element, source: "LSB Table A8.3 V; mare soils tens–hundreds µg/g; highland lower.", confidence: "medium"}
+    Sr: {value: 140, interval: [100, 180], unit: ppm_mass_ug_per_g, basis: element, source: "LSB Table A8.3 Sr; plagioclase host; highland soils ~140–220 µg/g.", confidence: "medium-high"}
+    Th: {value: 2, interval: [0.8, 4], unit: ppm_mass_ug_per_g, basis: element, source: "Cross-check: feedstock trace_elements.Th_ppm where present; LSB/orbital GRS PKT Th; Korotev highland soils Th~1–3 µg/g.", confidence: "medium-high"}
+    U: {value: 0.55, interval: [0.2, 1.2], unit: ppm_mass_ug_per_g, basis: element, source: "Lunar Th/U ~3.6 (LSB §8.4); U = Th/3.6 family synthesis.", confidence: "medium"}
+    Zr: {value: 180, interval: [80, 350], unit: ppm_mass_ug_per_g, basis: element, source: "Cross-check: feedstock trace_elements.Zr_ppm / ZrO2; LSB Zr-Sm highland correlation; Hughes & Schmitt Zr/Hf.", confidence: "medium-high"}
+    Hf: {value: 5.5, interval: [2.5, 11], unit: ppm_mass_ug_per_g, basis: element, source: "Zr/Hf ≈ 33 mare, ≈42 highland KREEPy (LSB §8.4; Hughes & Schmitt 1985).", confidence: "medium"}
+    Ba: {value: 120, interval: [50, 250], unit: ppm_mass_ug_per_g, basis: element, source: "LSB §8.4 Ba-Sm highland correlation; KREEP Ba high (Warren 1989).", confidence: "medium"}
+    Rb: {value: 2.5, interval: [1, 6], unit: ppm_mass_ug_per_g, basis: element, source: "LSB §8.4 Rb-Sm; KREEP elevated; mare soils few µg/g.", confidence: "medium"}
+    Cs: {value: 0.15, interval: [0.05, 0.4], unit: ppm_mass_ug_per_g, basis: element, source: "LSB §8.4 Cs sparse; soils ~0.1–1 µg/g; KREEP elevated.", confidence: "low-medium"}
+    Li: {value: 10, interval: [5, 18], unit: ppm_mass_ug_per_g, basis: element, source: "LSB §8.4 Li soils typically 5–20 µg/g (A8.2 Li statistics).", confidence: "medium"}
+    Nb: {value: 12, interval: [5, 25], unit: ppm_mass_ug_per_g, basis: element, source: "LSB §8.4 Nb sparse; tracks Ti/HFSE; KREEP elevated.", confidence: "medium"}
+    Co: {value: 35, interval: [20, 55], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 / Table A8.4 soils&regolith breccias (Co µg/g averages by mission); meteoritic elevation in soils", confidence: "medium"}
+    Ni: {value: 200, interval: [100, 400], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 / Table A8.4 (Ni in S&RB elevated vs monomict basalt by ~1–2% meteoritic component)", confidence: "medium"}
+    Cu: {value: 10, interval: [5, 20], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / Table A8.5 vapor-mobilized elements; soils few–tens µg/g Cu", confidence: "medium"}
+    Zn: {value: 20, interval: [5, 50], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 surface-correlated Zn; maturity-dependent; soils typically 5–50 µg/g", confidence: "medium"}
+    Ga: {value: 5, interval: [3, 8], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB Table A8.3 miscellaneous minors (Ga µg/g in S&RB); few µg/g class", confidence: "medium"}
+    Ge: {value: 0.5, interval: [0.1, 1.5], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 Ge mostly meteoritic in soils; Dickinson et al. 1989 LPSC 19:189 KREEP Ge elevated", confidence: "low-medium"}
+    Mo: {value: 0.15, interval: [0.05, 0.5], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 sparse Mo data (RNAA); Newsom 1986; soils sub-µg/g to ~1 µg/g", confidence: "low"}
+    W: {value: 0.25, interval: [0.08, 0.6], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 / A8.4 W in S&RB; high-K KREEP elevated W (Warren 1989)", confidence: "medium"}
+    F: {value: 80, interval: [40, 150], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 F; soils tens–hundreds µg/g; McCubbin et al. 2015 AmMin volatiles review", confidence: "medium"}
+    Cl: {value: 15, interval: [5, 40], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 Cl; mare basalts typically <10 ppm Cl, soils higher maturity-correlated; McCubbin 2015", confidence: "medium"}
+    Br: {value: 0.25, interval: [0.05, 1], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 Br often ng/g–µg/g, surface-correlated", confidence: "low-medium"}
+    I: {value: 0.05, interval: [0.01, 0.2], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 I sparse; often leachable ng/g–0.1 µg/g", confidence: "low"}
+    S: {value: 700, interval: [440, 1200], unit: ppm_mass_ug_per_g, basis: element, source: "Cross-check vs feedstock solar_wind_volatiles.species_ppm.S (Gibson 1977; Fegley & Swindle 1993; LSB ch.8); indigenous sulfide dominant in mare", confidence: "high"}
+    B: {value: 2, interval: [0.5, 6], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.4 sparse B data (few µg/g soils); compilation ranges", confidence: "low"}
+    Pb: {value: 1.2, interval: [0.4, 3], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 Pb; radiogenic + vapor-mobilized + meteoritic", confidence: "medium"}
+    Sn: {value: 0.3, interval: [0.05, 1], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.4 sparse Sn; Taylor compilations; sub-µg/g to few µg/g", confidence: "low"}
+    Bi: {value: 0.005, interval: [0.001, 0.03], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 Bi ng/g class", confidence: "low"}
+    In: {value: 0.005, interval: [0.001, 0.03], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 In ng/g class", confidence: "low"}
+    Te: {value: 0.02, interval: [0.005, 0.1], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 Te ng/g–0.1 µg/g", confidence: "low"}
+    Se: {value: 0.15, interval: [0.05, 0.4], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 Se; sub-µg/g soils", confidence: "low-medium"}
+    As: {value: 0.08, interval: [0.02, 0.3], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 As sparse ng/g–sub-µg/g", confidence: "low"}
+    Sb: {value: 0.03, interval: [0.005, 0.15], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 Sb; sub-µg/g", confidence: "low"}
+    Cd: {value: 0.03, interval: [0.005, 0.15], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 surface-correlated Cd", confidence: "low-medium"}
+    Ag: {value: 0.02, interval: [0.005, 0.1], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 Ag ng/g–0.1 µg/g", confidence: "low"}
+    Au: {value: 0.004, interval: [0.001, 0.012], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 Au meteoritic in soils; ng/g class (A8.4)", confidence: "medium"}
+    Ir: {value: 0.008, interval: [0.002, 0.02], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 Ir type-siderophile; soils ~1–20 ng/g from meteoritic component (A8.4)", confidence: "medium-high"}
+    Os: {value: 0.007, interval: [0.002, 0.018], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 Os tracks Ir (chondritic-ish in soils); sparse RNAA", confidence: "low-medium"}
+    Pt: {value: 0.012, interval: [0.003, 0.03], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 Pt follows Ir meteoritic; sparse data — scaled ~1.5× Ir from CI relative abundance", confidence: "low"}
+  formula_inventory:
+    # Exact formulas for MC-1 trace bookkeeping; abundances and citations live in trace_elements.
+    Ag: {formula: Ag, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Au: {formula: Au, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    B: {formula: B, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Bi: {formula: Bi, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Br: {formula: Br, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Cd: {formula: Cd, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Ce2O3: {formula: Ce2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Cu: {formula: Cu, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Dy2O3: {formula: Dy2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Er2O3: {formula: Er2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Eu2O3: {formula: Eu2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    F: {formula: F, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Gd2O3: {formula: Gd2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Ge: {formula: Ge, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    HfO2: {formula: HfO2, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Ho2O3: {formula: Ho2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    I: {formula: I, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    In: {formula: In, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    La2O3: {formula: La2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Lu2O3: {formula: Lu2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Mo: {formula: Mo, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Nd2O3: {formula: Nd2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Pb: {formula: Pb, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Pr2O3: {formula: Pr2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Sc2O3: {formula: Sc2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Sm2O3: {formula: Sm2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Sn: {formula: Sn, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Tb2O3: {formula: Tb2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Te: {formula: Te, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Tm2O3: {formula: Tm2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    W: {formula: W, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Y2O3: {formula: Y2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Yb2O3: {formula: Yb2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Zn: {formula: Zn, estimated: false, source: "MC-1 staged trace/minor component identity"}
   key_feature: "Standard lunar basalt; moderate Fe and Mg; low TiO2"
   preferred_for: "General ISRU baseline; Fe/Mg shuttle feedstock"
   process_notes: "Standard C0-C6 flowsheet; ~0.5 wt% nanophase Fe0 present"
@@ -102,6 +253,64 @@ lunar_mare_high_ti:
     Cr2O3:  0.35
     MnO:    0.20
     P2O5:   0.10
+    # MC-1 additive trace/minor inventory. Staging values are elemental ppm by mass.
+    # Oxide rows: oxide wt% = element ppm x staged oxide factor / 10,000.
+    # Element-symbol rows: element wt% = element ppm / 10,000 (basis exception).
+    La2O3: 0.0036002  # 30.6982 ppm La x 1.17278 / 10,000
+    Ce2O3: 0.0088484  # 75.5441 ppm Ce x 1.17129 / 10,000
+    Pr2O3: 0.0011184  # 9.5565 ppm Pr x 1.17032 / 10,000
+    Nd2O3: 0.0056355  # 48.3162 ppm Nd x 1.16639 / 10,000
+    Sm2O3: 0.0015075  # 13 ppm Sm x 1.15962 / 10,000
+    Eu2O3: 0.0001853  # 1.6 ppm Eu x 1.15793 / 10,000
+    Gd2O3: 0.0017538  # 15.2156 ppm Gd x 1.15262 / 10,000
+    Tb2O3: 0.0003103  # 2.6961 ppm Tb x 1.15101 / 10,000
+    Dy2O3: 0.0019852  # 17.2977 ppm Dy x 1.14769 / 10,000
+    Ho2O3: 0.0004281  # 3.7372 ppm Ho x 1.14552 / 10,000
+    Er2O3: 0.0011996  # 10.4908 ppm Er x 1.14349 / 10,000
+    Tm2O3: 0.0001729  # 1.5136 ppm Tm x 1.14207 / 10,000
+    Yb2O3: 0.0010882  # 9.5565 ppm Yb x 1.13869 / 10,000
+    Lu2O3: 0.0001663  # 1.4628 ppm Lu x 1.13717 / 10,000
+    Y2O3: 0.0069847  # 55 ppm Y x 1.26995 / 10,000
+    Sc2O3: 0.0084362  # 55 ppm Sc x 1.53386 / 10,000
+    V: 0.014
+    Sr: 0.016
+    ThO2: 0.0002845  # 2.5 ppm Th x 1.13791 / 10,000
+    UO2: 7.94e-05  # 0.7 ppm U x 1.13444 / 10,000
+    ZrO2: 0.037822  # 280 ppm Zr x 1.35078 / 10,000
+    HfO2: 0.0010614  # 9 ppm Hf x 1.17928 / 10,000
+    Ba: 0.015
+    Rb: 0.0003
+    Cs: 1.8e-05
+    Li: 0.0012
+    Nb: 0.0018
+    Co: 0.003
+    Ni: 0.018
+    Cu: 0.0012
+    Zn: 0.0025
+    Ga: 0.00055
+    Ge: 4.0e-05
+    Mo: 1.2e-05
+    W: 2.0e-05
+    F: 0.009
+    Cl: 0.0018
+    Br: 3.0e-05
+    I: 6.0e-06
+    S: 0.08
+    B: 0.00025
+    Pb: 0.0001
+    Sn: 2.5e-05
+    Bi: 5.0e-07
+    In: 5.0e-07
+    Te: 2.0e-06
+    Se: 1.5e-05
+    As: 8.0e-06
+    Sb: 3.0e-06
+    Cd: 4.0e-06
+    Ag: 2.0e-06
+    Au: 3.5e-07
+    Ir: 7.0e-07
+    Os: 6.0e-07
+    Pt: 1.0e-06
   composition_ranges:
     SiO2:  [43, 46]
     TiO2:  [6.0, 8.0]   # high-Ti subset
@@ -115,6 +324,99 @@ lunar_mare_high_ti:
     MnO:   [0.15, 0.25]
     P2O5:  [0.05, 0.15]
   sum_check: 103.65  # see note; normalise for simulation
+  trace_elements:
+    # Element-basis values and citations underlying the component rows above.
+    La: {value: 30.6982, interval: [18.8912, 47.2279], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=13.00 µg/g", confidence: "medium"}
+    Ce: {value: 75.5441, interval: [46.4887, 116.2218], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=13.00 µg/g", confidence: "medium"}
+    Pr: {value: 9.5565, interval: [5.8809, 14.7023], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=13.00 µg/g", confidence: "medium"}
+    Nd: {value: 48.3162, interval: [29.7331, 74.3326], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=13.00 µg/g", confidence: "medium"}
+    Sm: {value: 13, interval: [8, 20], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=13.00 µg/g", confidence: "medium"}
+    Eu: {value: 1.6, interval: [1, 2.5], unit: ppm_mass_ug_per_g, basis: element, source: "Sm-scale context: LSB Table 8.1 KREEP Eu=3.1 µg/g; family Eu set to 1.6 µg/g for Lunar Mare Basalt (High-Ti) (Korotev highland soils / mare basalt ranges / Warren KREEP). Primary pattern source: Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g", confidence: "medium"}
+    Gd: {value: 15.2156, interval: [9.3634, 23.4086], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=13.00 µg/g", confidence: "medium"}
+    Tb: {value: 2.6961, interval: [1.6591, 4.1478], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=13.00 µg/g", confidence: "medium"}
+    Dy: {value: 17.2977, interval: [10.6448, 26.6119], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=13.00 µg/g", confidence: "medium"}
+    Ho: {value: 3.7372, interval: [2.2998, 5.7495], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=13.00 µg/g", confidence: "medium"}
+    Er: {value: 10.4908, interval: [6.4559, 16.1396], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=13.00 µg/g", confidence: "medium"}
+    Tm: {value: 1.5136, interval: [0.9314, 2.3285], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=13.00 µg/g", confidence: "medium"}
+    Yb: {value: 9.5565, interval: [5.8809, 14.7023], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=13.00 µg/g", confidence: "medium"}
+    Lu: {value: 1.4628, interval: [0.9002, 2.2505], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=13.00 µg/g", confidence: "medium"}
+    Y: {value: 55, interval: [30, 100], unit: ppm_mass_ug_per_g, basis: element, source: "Family synthesis: Y tracks HREE; high-K KREEP Y~200 µg/g (Warren 1989 high-K KREEP compilation (Workshop Moon in Transition TR 89-03); Haskin et al. 2000 JGR PKT; LSB Ch.8 §8.4 incompatible correlations; Zr/Hf~42 highland (Hughes & Schmitt 1985 via LSB)); scaled/set for terrane.", confidence: "medium"}
+    Sc: {value: 55, interval: [40, 80], unit: ppm_mass_ug_per_g, basis: element, source: "LSB Table A8.3 Sc in MBAS/S&RB; mare high-Ti Sc-rich (~40–80 µg/g), highland soils ~5–13 µg/g (Korotev et al. 2003).", confidence: "medium-high"}
+    V: {value: 140, interval: [80, 220], unit: ppm_mass_ug_per_g, basis: element, source: "LSB Table A8.3 V; mare soils tens–hundreds µg/g; highland lower.", confidence: "medium"}
+    Sr: {value: 160, interval: [120, 220], unit: ppm_mass_ug_per_g, basis: element, source: "LSB Table A8.3 Sr; plagioclase host; highland soils ~140–220 µg/g.", confidence: "medium-high"}
+    Th: {value: 2.5, interval: [1, 5], unit: ppm_mass_ug_per_g, basis: element, source: "Cross-check: feedstock trace_elements.Th_ppm where present; LSB/orbital GRS PKT Th; Korotev highland soils Th~1–3 µg/g.", confidence: "medium-high"}
+    U: {value: 0.7, interval: [0.3, 1.5], unit: ppm_mass_ug_per_g, basis: element, source: "Lunar Th/U ~3.6 (LSB §8.4); U = Th/3.6 family synthesis.", confidence: "medium"}
+    Zr: {value: 280, interval: [150, 500], unit: ppm_mass_ug_per_g, basis: element, source: "Cross-check: feedstock trace_elements.Zr_ppm / ZrO2; LSB Zr-Sm highland correlation; Hughes & Schmitt Zr/Hf.", confidence: "medium-high"}
+    Hf: {value: 9, interval: [5, 16], unit: ppm_mass_ug_per_g, basis: element, source: "Zr/Hf ≈ 33 mare, ≈42 highland KREEPy (LSB §8.4; Hughes & Schmitt 1985).", confidence: "medium"}
+    Ba: {value: 150, interval: [60, 350], unit: ppm_mass_ug_per_g, basis: element, source: "LSB §8.4 Ba-Sm highland correlation; KREEP Ba high (Warren 1989).", confidence: "medium"}
+    Rb: {value: 3, interval: [1, 8], unit: ppm_mass_ug_per_g, basis: element, source: "LSB §8.4 Rb-Sm; KREEP elevated; mare soils few µg/g.", confidence: "medium"}
+    Cs: {value: 0.18, interval: [0.05, 0.5], unit: ppm_mass_ug_per_g, basis: element, source: "LSB §8.4 Cs sparse; soils ~0.1–1 µg/g; KREEP elevated.", confidence: "low-medium"}
+    Li: {value: 12, interval: [6, 20], unit: ppm_mass_ug_per_g, basis: element, source: "LSB §8.4 Li soils typically 5–20 µg/g (A8.2 Li statistics).", confidence: "medium"}
+    Nb: {value: 18, interval: [8, 40], unit: ppm_mass_ug_per_g, basis: element, source: "LSB §8.4 Nb sparse; tracks Ti/HFSE; KREEP elevated.", confidence: "medium"}
+    Co: {value: 30, interval: [15, 50], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 / Table A8.4 soils&regolith breccias (Co µg/g averages by mission); meteoritic elevation in soils", confidence: "medium"}
+    Ni: {value: 180, interval: [80, 350], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 / Table A8.4 (Ni in S&RB elevated vs monomict basalt by ~1–2% meteoritic component)", confidence: "medium"}
+    Cu: {value: 12, interval: [5, 25], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / Table A8.5 vapor-mobilized elements; soils few–tens µg/g Cu", confidence: "medium"}
+    Zn: {value: 25, interval: [8, 60], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 surface-correlated Zn; maturity-dependent; soils typically 5–50 µg/g", confidence: "medium"}
+    Ga: {value: 5.5, interval: [3, 9], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB Table A8.3 miscellaneous minors (Ga µg/g in S&RB); few µg/g class", confidence: "medium"}
+    Ge: {value: 0.4, interval: [0.1, 1.2], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 Ge mostly meteoritic in soils; Dickinson et al. 1989 LPSC 19:189 KREEP Ge elevated", confidence: "low-medium"}
+    Mo: {value: 0.12, interval: [0.04, 0.4], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 sparse Mo data (RNAA); Newsom 1986; soils sub-µg/g to ~1 µg/g", confidence: "low"}
+    W: {value: 0.2, interval: [0.06, 0.5], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 / A8.4 W in S&RB; high-K KREEP elevated W (Warren 1989)", confidence: "medium"}
+    F: {value: 90, interval: [45, 180], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 F; soils tens–hundreds µg/g; McCubbin et al. 2015 AmMin volatiles review", confidence: "medium"}
+    Cl: {value: 18, interval: [5, 45], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 Cl; mare basalts typically <10 ppm Cl, soils higher maturity-correlated; McCubbin 2015", confidence: "medium"}
+    Br: {value: 0.3, interval: [0.05, 1.2], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 Br often ng/g–µg/g, surface-correlated", confidence: "low-medium"}
+    I: {value: 0.06, interval: [0.01, 0.25], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 I sparse; often leachable ng/g–0.1 µg/g", confidence: "low"}
+    S: {value: 800, interval: [500, 1400], unit: ppm_mass_ug_per_g, basis: element, source: "Cross-check vs feedstock solar_wind_volatiles.species_ppm.S (Gibson 1977; Fegley & Swindle 1993; LSB ch.8); indigenous sulfide dominant in mare", confidence: "high"}
+    B: {value: 2.5, interval: [0.5, 7], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.4 sparse B data (few µg/g soils); compilation ranges", confidence: "low"}
+    Pb: {value: 1, interval: [0.3, 2.5], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 Pb; radiogenic + vapor-mobilized + meteoritic", confidence: "medium"}
+    Sn: {value: 0.25, interval: [0.05, 0.8], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.4 sparse Sn; Taylor compilations; sub-µg/g to few µg/g", confidence: "low"}
+    Bi: {value: 0.005, interval: [0.001, 0.03], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 Bi ng/g class", confidence: "low"}
+    In: {value: 0.005, interval: [0.001, 0.03], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 In ng/g class", confidence: "low"}
+    Te: {value: 0.02, interval: [0.005, 0.1], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 Te ng/g–0.1 µg/g", confidence: "low"}
+    Se: {value: 0.15, interval: [0.05, 0.4], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 Se; sub-µg/g soils", confidence: "low-medium"}
+    As: {value: 0.08, interval: [0.02, 0.3], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 As sparse ng/g–sub-µg/g", confidence: "low"}
+    Sb: {value: 0.03, interval: [0.005, 0.15], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 Sb; sub-µg/g", confidence: "low"}
+    Cd: {value: 0.04, interval: [0.008, 0.2], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 surface-correlated Cd", confidence: "low-medium"}
+    Ag: {value: 0.02, interval: [0.005, 0.1], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 Ag ng/g–0.1 µg/g", confidence: "low"}
+    Au: {value: 0.0035, interval: [0.001, 0.01], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 Au meteoritic in soils; ng/g class (A8.4)", confidence: "medium"}
+    Ir: {value: 0.007, interval: [0.002, 0.018], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 Ir type-siderophile; soils ~1–20 ng/g from meteoritic component (A8.4)", confidence: "medium-high"}
+    Os: {value: 0.006, interval: [0.0015, 0.015], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 Os tracks Ir (chondritic-ish in soils); sparse RNAA", confidence: "low-medium"}
+    Pt: {value: 0.01, interval: [0.002, 0.025], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 Pt follows Ir meteoritic; sparse data — scaled ~1.5× Ir from CI relative abundance", confidence: "low"}
+  formula_inventory:
+    # Exact formulas for MC-1 trace bookkeeping; abundances and citations live in trace_elements.
+    Ag: {formula: Ag, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Au: {formula: Au, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    B: {formula: B, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Bi: {formula: Bi, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Br: {formula: Br, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Cd: {formula: Cd, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Ce2O3: {formula: Ce2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Cu: {formula: Cu, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Dy2O3: {formula: Dy2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Er2O3: {formula: Er2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Eu2O3: {formula: Eu2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    F: {formula: F, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Gd2O3: {formula: Gd2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Ge: {formula: Ge, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    HfO2: {formula: HfO2, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Ho2O3: {formula: Ho2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    I: {formula: I, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    In: {formula: In, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    La2O3: {formula: La2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Lu2O3: {formula: Lu2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Mo: {formula: Mo, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Nd2O3: {formula: Nd2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Pb: {formula: Pb, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Pr2O3: {formula: Pr2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Sc2O3: {formula: Sc2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Sm2O3: {formula: Sm2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Sn: {formula: Sn, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Tb2O3: {formula: Tb2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Te: {formula: Te, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Tm2O3: {formula: Tm2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    W: {formula: W, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Y2O3: {formula: Y2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Yb2O3: {formula: Yb2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Zn: {formula: Zn, estimated: false, source: "MC-1 staged trace/minor component identity"}
   key_feature: "Ti-rich ilmenite basalt; TiO2 ~8 wt% drives ilmenite reduction pathway"
   preferred_for: "TiO2 recovery; ilmenite H2 reduction (alternative O2 pathway)"
   process_notes: "Standard C0-C6 flowsheet; ilmenite (FeTiO3) alters C2 Fe reduction kinetics; ~0.5 wt% nanophase Fe0 present"
@@ -158,6 +460,64 @@ lunar_highland:
     Cr2O3:  0.10
     MnO:    0.07
     P2O5:   0.05
+    # MC-1 additive trace/minor inventory. Staging values are elemental ppm by mass.
+    # Oxide rows: oxide wt% = element ppm x staged oxide factor / 10,000.
+    # Element-symbol rows: element wt% = element ppm / 10,000 (basis exception).
+    La2O3: 0.0015232  # 12.9877 ppm La x 1.17278 / 10,000
+    Ce2O3: 0.0037435  # 31.961 ppm Ce x 1.17129 / 10,000
+    Pr2O3: 0.0004732  # 4.0431 ppm Pr x 1.17032 / 10,000
+    Nd2O3: 0.0023843  # 20.4415 ppm Nd x 1.16639 / 10,000
+    Sm2O3: 0.0006378  # 5.5 ppm Sm x 1.15962 / 10,000
+    Eu2O3: 0.0001158  # 1 ppm Eu x 1.15793 / 10,000
+    Gd2O3: 0.000742  # 6.4374 ppm Gd x 1.15262 / 10,000
+    Tb2O3: 0.0001313  # 1.1407 ppm Tb x 1.15101 / 10,000
+    Dy2O3: 0.0008399  # 7.3183 ppm Dy x 1.14769 / 10,000
+    Ho2O3: 0.0001811  # 1.5811 ppm Ho x 1.14552 / 10,000
+    Er2O3: 0.0005075  # 4.4384 ppm Er x 1.14349 / 10,000
+    Tm2O3: 7.31e-05  # 0.6403 ppm Tm x 1.14207 / 10,000
+    Yb2O3: 0.0004604  # 4.0431 ppm Yb x 1.13869 / 10,000
+    Lu2O3: 7.04e-05  # 0.6189 ppm Lu x 1.13717 / 10,000
+    Y2O3: 0.0025399  # 20 ppm Y x 1.26995 / 10,000
+    Sc2O3: 0.0013805  # 9 ppm Sc x 1.53386 / 10,000
+    V: 0.003
+    Sr: 0.017
+    ThO2: 0.0002276  # 2 ppm Th x 1.13791 / 10,000
+    UO2: 6.24e-05  # 0.55 ppm U x 1.13444 / 10,000
+    ZrO2: 0.0135078  # 100 ppm Zr x 1.35078 / 10,000
+    HfO2: 0.0002948  # 2.5 ppm Hf x 1.17928 / 10,000
+    Ba: 0.008
+    Rb: 0.0002
+    Cs: 1.2e-05
+    Li: 0.0008
+    Nb: 0.0006
+    Co: 0.0025
+    Ni: 0.025
+    Cu: 0.0008
+    Zn: 0.0015
+    Ga: 0.00045
+    Ge: 6.0e-05
+    Mo: 1.0e-05
+    W: 1.5e-05
+    F: 0.007
+    Cl: 0.0012
+    Br: 2.0e-05
+    I: 4.0e-06
+    S: 0.05
+    B: 0.00015
+    Pb: 0.00015
+    Sn: 2.0e-05
+    Bi: 4.0e-07
+    In: 4.0e-07
+    Te: 2.5e-06
+    Se: 1.2e-05
+    As: 6.0e-06
+    Sb: 2.5e-06
+    Cd: 2.5e-06
+    Ag: 2.5e-06
+    Au: 5.0e-07
+    Ir: 1.0e-06
+    Os: 9.0e-07
+    Pt: 1.5e-06
   composition_ranges:
     SiO2:  [44, 46]
     TiO2:  [0.3, 0.6]
@@ -171,6 +531,99 @@ lunar_highland:
     MnO:   [0.05, 0.10]   # estimated
     P2O5:  [0.03, 0.08]   # estimated
   sum_check: 99.27
+  trace_elements:
+    # Element-basis values and citations underlying the component rows above.
+    La: {value: 12.9877, interval: [4.7228, 21.2526], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=5.50 µg/g", confidence: "medium"}
+    Ce: {value: 31.961, interval: [11.6222, 52.2998], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=5.50 µg/g", confidence: "medium"}
+    Pr: {value: 4.0431, interval: [1.4702, 6.616], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=5.50 µg/g", confidence: "medium"}
+    Nd: {value: 20.4415, interval: [7.4333, 33.4497], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=5.50 µg/g", confidence: "medium"}
+    Sm: {value: 5.5, interval: [2, 9], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=5.50 µg/g", confidence: "medium"}
+    Eu: {value: 1, interval: [0.7, 1.4], unit: ppm_mass_ug_per_g, basis: element, source: "Sm-scale context: LSB Table 8.1 KREEP Eu=3.1 µg/g; family Eu set to 1.0 µg/g for Lunar Highland Anorthosite (Korotev highland soils / mare basalt ranges / Warren KREEP). Primary pattern source: Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g", confidence: "medium"}
+    Gd: {value: 6.4374, interval: [2.3409, 10.5339], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=5.50 µg/g", confidence: "medium"}
+    Tb: {value: 1.1407, interval: [0.4148, 1.8665], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=5.50 µg/g", confidence: "medium"}
+    Dy: {value: 7.3183, interval: [2.6612, 11.9754], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=5.50 µg/g", confidence: "medium"}
+    Ho: {value: 1.5811, interval: [0.5749, 2.5873], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=5.50 µg/g", confidence: "medium"}
+    Er: {value: 4.4384, interval: [1.614, 7.2628], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=5.50 µg/g", confidence: "medium"}
+    Tm: {value: 0.6403, interval: [0.2329, 1.0478], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=5.50 µg/g", confidence: "medium"}
+    Yb: {value: 4.0431, interval: [1.4702, 6.616], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=5.50 µg/g", confidence: "medium"}
+    Lu: {value: 0.6189, interval: [0.2251, 1.0127], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=5.50 µg/g", confidence: "medium"}
+    Y: {value: 20, interval: [10, 40], unit: ppm_mass_ug_per_g, basis: element, source: "Family synthesis: Y tracks HREE; high-K KREEP Y~200 µg/g (Warren 1989 high-K KREEP compilation (Workshop Moon in Transition TR 89-03); Haskin et al. 2000 JGR PKT; LSB Ch.8 §8.4 incompatible correlations; Zr/Hf~42 highland (Hughes & Schmitt 1985 via LSB)); scaled/set for terrane.", confidence: "medium"}
+    Sc: {value: 9, interval: [5, 13], unit: ppm_mass_ug_per_g, basis: element, source: "LSB Table A8.3 Sc in MBAS/S&RB; mare high-Ti Sc-rich (~40–80 µg/g), highland soils ~5–13 µg/g (Korotev et al. 2003).", confidence: "medium-high"}
+    V: {value: 30, interval: [15, 50], unit: ppm_mass_ug_per_g, basis: element, source: "LSB Table A8.3 V; mare soils tens–hundreds µg/g; highland lower.", confidence: "medium"}
+    Sr: {value: 170, interval: [140, 220], unit: ppm_mass_ug_per_g, basis: element, source: "LSB Table A8.3 Sr; plagioclase host; highland soils ~140–220 µg/g.", confidence: "medium-high"}
+    Th: {value: 2, interval: [0.5, 3.5], unit: ppm_mass_ug_per_g, basis: element, source: "Cross-check: feedstock trace_elements.Th_ppm where present; LSB/orbital GRS PKT Th; Korotev highland soils Th~1–3 µg/g.", confidence: "medium-high"}
+    U: {value: 0.55, interval: [0.15, 1], unit: ppm_mass_ug_per_g, basis: element, source: "Lunar Th/U ~3.6 (LSB §8.4); U = Th/3.6 family synthesis.", confidence: "medium"}
+    Zr: {value: 100, interval: [40, 200], unit: ppm_mass_ug_per_g, basis: element, source: "Cross-check: feedstock trace_elements.Zr_ppm / ZrO2; LSB Zr-Sm highland correlation; Hughes & Schmitt Zr/Hf.", confidence: "medium-high"}
+    Hf: {value: 2.5, interval: [1, 5], unit: ppm_mass_ug_per_g, basis: element, source: "Zr/Hf ≈ 33 mare, ≈42 highland KREEPy (LSB §8.4; Hughes & Schmitt 1985).", confidence: "medium"}
+    Ba: {value: 80, interval: [40, 160], unit: ppm_mass_ug_per_g, basis: element, source: "LSB §8.4 Ba-Sm highland correlation; KREEP Ba high (Warren 1989).", confidence: "medium"}
+    Rb: {value: 2, interval: [0.8, 5], unit: ppm_mass_ug_per_g, basis: element, source: "LSB §8.4 Rb-Sm; KREEP elevated; mare soils few µg/g.", confidence: "medium"}
+    Cs: {value: 0.12, interval: [0.04, 0.35], unit: ppm_mass_ug_per_g, basis: element, source: "LSB §8.4 Cs sparse; soils ~0.1–1 µg/g; KREEP elevated.", confidence: "low-medium"}
+    Li: {value: 8, interval: [4, 15], unit: ppm_mass_ug_per_g, basis: element, source: "LSB §8.4 Li soils typically 5–20 µg/g (A8.2 Li statistics).", confidence: "medium"}
+    Nb: {value: 6, interval: [2, 15], unit: ppm_mass_ug_per_g, basis: element, source: "LSB §8.4 Nb sparse; tracks Ti/HFSE; KREEP elevated.", confidence: "medium"}
+    Co: {value: 25, interval: [15, 40], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 / Table A8.4 soils&regolith breccias (Co µg/g averages by mission); meteoritic elevation in soils", confidence: "medium"}
+    Ni: {value: 250, interval: [100, 450], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 / Table A8.4 (Ni in S&RB elevated vs monomict basalt by ~1–2% meteoritic component)", confidence: "medium"}
+    Cu: {value: 8, interval: [3, 15], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / Table A8.5 vapor-mobilized elements; soils few–tens µg/g Cu", confidence: "medium"}
+    Zn: {value: 15, interval: [3, 40], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 surface-correlated Zn; maturity-dependent; soils typically 5–50 µg/g", confidence: "medium"}
+    Ga: {value: 4.5, interval: [2.5, 7], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB Table A8.3 miscellaneous minors (Ga µg/g in S&RB); few µg/g class", confidence: "medium"}
+    Ge: {value: 0.6, interval: [0.15, 2], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 Ge mostly meteoritic in soils; Dickinson et al. 1989 LPSC 19:189 KREEP Ge elevated", confidence: "low-medium"}
+    Mo: {value: 0.1, interval: [0.03, 0.35], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 sparse Mo data (RNAA); Newsom 1986; soils sub-µg/g to ~1 µg/g", confidence: "low"}
+    W: {value: 0.15, interval: [0.05, 0.4], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 / A8.4 W in S&RB; high-K KREEP elevated W (Warren 1989)", confidence: "medium"}
+    F: {value: 70, interval: [30, 140], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 F; soils tens–hundreds µg/g; McCubbin et al. 2015 AmMin volatiles review", confidence: "medium"}
+    Cl: {value: 12, interval: [4, 35], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 Cl; mare basalts typically <10 ppm Cl, soils higher maturity-correlated; McCubbin 2015", confidence: "medium"}
+    Br: {value: 0.2, interval: [0.04, 0.8], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 Br often ng/g–µg/g, surface-correlated", confidence: "low-medium"}
+    I: {value: 0.04, interval: [0.01, 0.15], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 I sparse; often leachable ng/g–0.1 µg/g", confidence: "low"}
+    S: {value: 500, interval: [200, 900], unit: ppm_mass_ug_per_g, basis: element, source: "Cross-check vs feedstock solar_wind_volatiles.species_ppm.S (Gibson 1977; Fegley & Swindle 1993; LSB ch.8); indigenous sulfide dominant in mare", confidence: "high"}
+    B: {value: 1.5, interval: [0.3, 5], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.4 sparse B data (few µg/g soils); compilation ranges", confidence: "low"}
+    Pb: {value: 1.5, interval: [0.5, 4], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 Pb; radiogenic + vapor-mobilized + meteoritic", confidence: "medium"}
+    Sn: {value: 0.2, interval: [0.05, 0.7], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.4 sparse Sn; Taylor compilations; sub-µg/g to few µg/g", confidence: "low"}
+    Bi: {value: 0.004, interval: [0.001, 0.02], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 Bi ng/g class", confidence: "low"}
+    In: {value: 0.004, interval: [0.001, 0.02], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 In ng/g class", confidence: "low"}
+    Te: {value: 0.025, interval: [0.005, 0.12], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 Te ng/g–0.1 µg/g", confidence: "low"}
+    Se: {value: 0.12, interval: [0.04, 0.35], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 Se; sub-µg/g soils", confidence: "low-medium"}
+    As: {value: 0.06, interval: [0.015, 0.25], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 As sparse ng/g–sub-µg/g", confidence: "low"}
+    Sb: {value: 0.025, interval: [0.005, 0.12], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 Sb; sub-µg/g", confidence: "low"}
+    Cd: {value: 0.025, interval: [0.005, 0.12], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 surface-correlated Cd", confidence: "low-medium"}
+    Ag: {value: 0.025, interval: [0.005, 0.12], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 Ag ng/g–0.1 µg/g", confidence: "low"}
+    Au: {value: 0.005, interval: [0.0015, 0.015], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 Au meteoritic in soils; ng/g class (A8.4)", confidence: "medium"}
+    Ir: {value: 0.01, interval: [0.003, 0.025], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 Ir type-siderophile; soils ~1–20 ng/g from meteoritic component (A8.4)", confidence: "medium-high"}
+    Os: {value: 0.009, interval: [0.002, 0.022], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 Os tracks Ir (chondritic-ish in soils); sparse RNAA", confidence: "low-medium"}
+    Pt: {value: 0.015, interval: [0.004, 0.035], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 Pt follows Ir meteoritic; sparse data — scaled ~1.5× Ir from CI relative abundance", confidence: "low"}
+  formula_inventory:
+    # Exact formulas for MC-1 trace bookkeeping; abundances and citations live in trace_elements.
+    Ag: {formula: Ag, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Au: {formula: Au, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    B: {formula: B, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Bi: {formula: Bi, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Br: {formula: Br, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Cd: {formula: Cd, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Ce2O3: {formula: Ce2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Cu: {formula: Cu, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Dy2O3: {formula: Dy2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Er2O3: {formula: Er2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Eu2O3: {formula: Eu2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    F: {formula: F, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Gd2O3: {formula: Gd2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Ge: {formula: Ge, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    HfO2: {formula: HfO2, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Ho2O3: {formula: Ho2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    I: {formula: I, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    In: {formula: In, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    La2O3: {formula: La2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Lu2O3: {formula: Lu2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Mo: {formula: Mo, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Nd2O3: {formula: Nd2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Pb: {formula: Pb, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Pr2O3: {formula: Pr2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Sc2O3: {formula: Sc2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Sm2O3: {formula: Sm2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Sn: {formula: Sn, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Tb2O3: {formula: Tb2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Te: {formula: Te, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Tm2O3: {formula: Tm2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    W: {formula: W, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Y2O3: {formula: Y2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Yb2O3: {formula: Yb2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Zn: {formula: Zn, estimated: false, source: "MC-1 staged trace/minor component identity"}
   key_feature: "Al2O3 dominant (130-148 kg Al/t); 3-4x less Fe, near-zero Ti vs mare"
   preferred_for: "Al production, mullite, anorthite, CA cement, near-pure alumina"
   process_notes: "Mg shuttle draw 100-115 kg; ~neutral at >=80% bakeout recovery; mare batches replenish Mg"
@@ -201,8 +654,8 @@ lunar_pkt_kreep_average:
   confidence: "High"
   note: >
     Source data omits Cr2O3, MnO; typical KREEP basalt values added.
-    REE and Zr reported in source but not included in oxide total.
-    Sum ~100.5 wt%.
+    MC-1 trace/minor rows are additive; the legacy major-oxide sum_check
+    remains unchanged. Prior REE/Zr/Th ranges are retained below.
   composition_wt_pct:
     SiO2:  50.5
     TiO2:   2.25
@@ -215,6 +668,64 @@ lunar_pkt_kreep_average:
     P2O5:   1.00
     Cr2O3:  0.30
     MnO:    0.20
+    # MC-1 additive trace/minor inventory. Staging values are elemental ppm by mass.
+    # Oxide rows: oxide wt% = element ppm x staged oxide factor / 10,000.
+    # Element-symbol rows: element wt% = element ppm / 10,000 (basis exception).
+    La2O3: 0.0088621  # 75.5647 ppm La x 1.17278 / 10,000
+    Ce2O3: 0.0217806  # 185.9548 ppm Ce x 1.17129 / 10,000
+    Pr2O3: 0.002753  # 23.5236 ppm Pr x 1.17032 / 10,000
+    Nd2O3: 0.0138721  # 118.9322 ppm Nd x 1.16639 / 10,000
+    Sm2O3: 0.0037108  # 32 ppm Sm x 1.15962 / 10,000
+    Eu2O3: 0.0002547  # 2.2 ppm Eu x 1.15793 / 10,000
+    Gd2O3: 0.004317  # 37.4538 ppm Gd x 1.15262 / 10,000
+    Tb2O3: 0.0007639  # 6.6366 ppm Tb x 1.15101 / 10,000
+    Dy2O3: 0.0048868  # 42.5791 ppm Dy x 1.14769 / 10,000
+    Ho2O3: 0.0010538  # 9.1992 ppm Ho x 1.14552 / 10,000
+    Er2O3: 0.0029529  # 25.8234 ppm Er x 1.14349 / 10,000
+    Tm2O3: 0.0004255  # 3.7257 ppm Tm x 1.14207 / 10,000
+    Yb2O3: 0.0026786  # 23.5236 ppm Yb x 1.13869 / 10,000
+    Lu2O3: 0.0004095  # 3.6008 ppm Lu x 1.13717 / 10,000
+    Y2O3: 0.0165093  # 130 ppm Y x 1.26995 / 10,000
+    Sc2O3: 0.0033745  # 22 ppm Sc x 1.53386 / 10,000
+    V: 0.0055
+    Sr: 0.018
+    ThO2: 0.0015931  # 14 ppm Th x 1.13791 / 10,000
+    UO2: 0.0004424  # 3.9 ppm U x 1.13444 / 10,000
+    ZrO2: 0.1215706  # 900 ppm Zr x 1.35078 / 10,000
+    HfO2: 0.0024765  # 21 ppm Hf x 1.17928 / 10,000
+    Ba: 0.048
+    Rb: 0.0014
+    Cs: 5.5e-05
+    Li: 0.0018
+    Nb: 0.0036
+    Co: 0.003
+    Ni: 0.022
+    Cu: 0.0012
+    Zn: 0.0025
+    Ga: 0.0006
+    Ge: 8.0e-05
+    Mo: 4.0e-05
+    W: 0.0001
+    F: 0.01
+    Cl: 0.0025
+    Br: 4.0e-05
+    I: 8.0e-06
+    S: 0.09
+    B: 0.0004
+    Pb: 0.0003
+    Sn: 6.0e-05
+    Bi: 1.0e-06
+    In: 8.0e-07
+    Te: 3.0e-06
+    Se: 2.0e-05
+    As: 1.2e-05
+    Sb: 5.0e-06
+    Cd: 5.0e-06
+    Ag: 3.0e-06
+    Au: 4.0e-07
+    Ir: 8.0e-07
+    Os: 7.0e-07
+    Pt: 1.2e-06
   composition_ranges:
     SiO2:  [49, 52]
     TiO2:  [1.5, 3.0]
@@ -229,9 +740,99 @@ lunar_pkt_kreep_average:
     MnO:   [0.15, 0.25]  # estimated
   sum_check: 100.45
   trace_elements:
-    REE_wt_pct: [0.1, 0.8]     # total REE oxide
-    Zr_ppm: [500, 1500]
-    Th_ppm: [8, 20]
+    # Prior aggregate cross-checks: REE_wt_pct [0.1, 0.8], Zr_ppm [500, 1500], Th_ppm [8, 20].
+    # Element-basis values and citations underlying the component rows above.
+    La: {value: 75.5647, interval: [47.2279, 113.347], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=32.00 µg/g", confidence: "medium-high"}
+    Ce: {value: 185.9548, interval: [116.2218, 278.9322], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=32.00 µg/g", confidence: "medium-high"}
+    Pr: {value: 23.5236, interval: [14.7023, 35.2854], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=32.00 µg/g", confidence: "medium-high"}
+    Nd: {value: 118.9322, interval: [74.3326, 178.3984], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=32.00 µg/g", confidence: "medium-high"}
+    Sm: {value: 32, interval: [20, 48], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=32.00 µg/g", confidence: "medium-high"}
+    Eu: {value: 2.2, interval: [1.5, 3], unit: ppm_mass_ug_per_g, basis: element, source: "Sm-scale context: LSB Table 8.1 KREEP Eu=3.1 µg/g; family Eu set to 2.2 µg/g for Procellarum KREEP Terrane (PKT) Average (Korotev highland soils / mare basalt ranges / Warren KREEP). Primary pattern source: Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g", confidence: "medium"}
+    Gd: {value: 37.4538, interval: [23.4086, 56.1807], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=32.00 µg/g", confidence: "medium-high"}
+    Tb: {value: 6.6366, interval: [4.1478, 9.9548], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=32.00 µg/g", confidence: "medium-high"}
+    Dy: {value: 42.5791, interval: [26.6119, 63.8686], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=32.00 µg/g", confidence: "medium-high"}
+    Ho: {value: 9.1992, interval: [5.7495, 13.7988], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=32.00 µg/g", confidence: "medium-high"}
+    Er: {value: 25.8234, interval: [16.1396, 38.7351], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=32.00 µg/g", confidence: "medium-high"}
+    Tm: {value: 3.7257, interval: [2.3285, 5.5885], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=32.00 µg/g", confidence: "medium-high"}
+    Yb: {value: 23.5236, interval: [14.7023, 35.2854], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=32.00 µg/g", confidence: "medium-high"}
+    Lu: {value: 3.6008, interval: [2.2505, 5.4012], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=32.00 µg/g", confidence: "medium-high"}
+    Y: {value: 130, interval: [80, 200], unit: ppm_mass_ug_per_g, basis: element, source: "Family synthesis: Y tracks HREE; high-K KREEP Y~200 µg/g (Warren 1989 high-K KREEP compilation (Workshop Moon in Transition TR 89-03); Haskin et al. 2000 JGR PKT; LSB Ch.8 §8.4 incompatible correlations; Zr/Hf~42 highland (Hughes & Schmitt 1985 via LSB)); scaled/set for terrane.", confidence: "medium"}
+    Sc: {value: 22, interval: [15, 30], unit: ppm_mass_ug_per_g, basis: element, source: "LSB Table A8.3 Sc in MBAS/S&RB; mare high-Ti Sc-rich (~40–80 µg/g), highland soils ~5–13 µg/g (Korotev et al. 2003).", confidence: "medium-high"}
+    V: {value: 55, interval: [30, 90], unit: ppm_mass_ug_per_g, basis: element, source: "LSB Table A8.3 V; mare soils tens–hundreds µg/g; highland lower.", confidence: "medium"}
+    Sr: {value: 180, interval: [140, 240], unit: ppm_mass_ug_per_g, basis: element, source: "LSB Table A8.3 Sr; plagioclase host; highland soils ~140–220 µg/g.", confidence: "medium-high"}
+    Th: {value: 14, interval: [8, 20], unit: ppm_mass_ug_per_g, basis: element, source: "Cross-check: feedstock trace_elements.Th_ppm where present; LSB/orbital GRS PKT Th; Korotev highland soils Th~1–3 µg/g.", confidence: "high"}
+    U: {value: 3.9, interval: [2, 6], unit: ppm_mass_ug_per_g, basis: element, source: "Lunar Th/U ~3.6 (LSB §8.4); U = Th/3.6 family synthesis.", confidence: "medium"}
+    Zr: {value: 900, interval: [500, 1500], unit: ppm_mass_ug_per_g, basis: element, source: "Cross-check: feedstock trace_elements.Zr_ppm / ZrO2; LSB Zr-Sm highland correlation; Hughes & Schmitt Zr/Hf.", confidence: "high"}
+    Hf: {value: 21, interval: [12, 36], unit: ppm_mass_ug_per_g, basis: element, source: "Zr/Hf ≈ 33 mare, ≈42 highland KREEPy (LSB §8.4; Hughes & Schmitt 1985).", confidence: "medium"}
+    Ba: {value: 480, interval: [250, 800], unit: ppm_mass_ug_per_g, basis: element, source: "LSB §8.4 Ba-Sm highland correlation; KREEP Ba high (Warren 1989).", confidence: "medium"}
+    Rb: {value: 14, interval: [8, 22], unit: ppm_mass_ug_per_g, basis: element, source: "LSB §8.4 Rb-Sm; KREEP elevated; mare soils few µg/g.", confidence: "medium"}
+    Cs: {value: 0.55, interval: [0.3, 1], unit: ppm_mass_ug_per_g, basis: element, source: "LSB §8.4 Cs sparse; soils ~0.1–1 µg/g; KREEP elevated.", confidence: "low-medium"}
+    Li: {value: 18, interval: [10, 30], unit: ppm_mass_ug_per_g, basis: element, source: "LSB §8.4 Li soils typically 5–20 µg/g (A8.2 Li statistics).", confidence: "medium"}
+    Nb: {value: 36, interval: [20, 55], unit: ppm_mass_ug_per_g, basis: element, source: "LSB §8.4 Nb sparse; tracks Ti/HFSE; KREEP elevated.", confidence: "medium"}
+    Co: {value: 30, interval: [18, 50], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 / Table A8.4 soils&regolith breccias (Co µg/g averages by mission); meteoritic elevation in soils", confidence: "medium"}
+    Ni: {value: 220, interval: [100, 400], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 / Table A8.4 (Ni in S&RB elevated vs monomict basalt by ~1–2% meteoritic component)", confidence: "medium"}
+    Cu: {value: 12, interval: [5, 25], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / Table A8.5 vapor-mobilized elements; soils few–tens µg/g Cu", confidence: "medium"}
+    Zn: {value: 25, interval: [8, 55], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 surface-correlated Zn; maturity-dependent; soils typically 5–50 µg/g", confidence: "medium"}
+    Ga: {value: 6, interval: [3.5, 10], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB Table A8.3 miscellaneous minors (Ga µg/g in S&RB); few µg/g class", confidence: "medium"}
+    Ge: {value: 0.8, interval: [0.2, 2.5], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 Ge mostly meteoritic in soils; Dickinson et al. 1989 LPSC 19:189 KREEP Ge elevated", confidence: "low-medium"}
+    Mo: {value: 0.4, interval: [0.1, 1], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 sparse Mo data (RNAA); Newsom 1986; soils sub-µg/g to ~1 µg/g", confidence: "low"}
+    W: {value: 1, interval: [0.4, 2], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 / A8.4 W in S&RB; high-K KREEP elevated W (Warren 1989)", confidence: "medium"}
+    F: {value: 100, interval: [50, 200], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 F; soils tens–hundreds µg/g; McCubbin et al. 2015 AmMin volatiles review", confidence: "medium"}
+    Cl: {value: 25, interval: [8, 60], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 Cl; mare basalts typically <10 ppm Cl, soils higher maturity-correlated; McCubbin 2015", confidence: "medium"}
+    Br: {value: 0.4, interval: [0.1, 1.5], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 Br often ng/g–µg/g, surface-correlated", confidence: "low-medium"}
+    I: {value: 0.08, interval: [0.02, 0.3], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 I sparse; often leachable ng/g–0.1 µg/g", confidence: "low"}
+    S: {value: 900, interval: [400, 1600], unit: ppm_mass_ug_per_g, basis: element, source: "Cross-check vs feedstock solar_wind_volatiles.species_ppm.S (Gibson 1977; Fegley & Swindle 1993; LSB ch.8); indigenous sulfide dominant in mare", confidence: "high"}
+    B: {value: 4, interval: [1, 10], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.4 sparse B data (few µg/g soils); compilation ranges", confidence: "low"}
+    Pb: {value: 3, interval: [1, 8], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 Pb; radiogenic + vapor-mobilized + meteoritic", confidence: "medium"}
+    Sn: {value: 0.6, interval: [0.15, 1.5], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.4 sparse Sn; Taylor compilations; sub-µg/g to few µg/g", confidence: "low"}
+    Bi: {value: 0.01, interval: [0.002, 0.05], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 Bi ng/g class", confidence: "low"}
+    In: {value: 0.008, interval: [0.002, 0.04], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 In ng/g class", confidence: "low"}
+    Te: {value: 0.03, interval: [0.008, 0.15], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 Te ng/g–0.1 µg/g", confidence: "low"}
+    Se: {value: 0.2, interval: [0.06, 0.5], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 Se; sub-µg/g soils", confidence: "low-medium"}
+    As: {value: 0.12, interval: [0.03, 0.4], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 As sparse ng/g–sub-µg/g", confidence: "low"}
+    Sb: {value: 0.05, interval: [0.01, 0.2], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 Sb; sub-µg/g", confidence: "low"}
+    Cd: {value: 0.05, interval: [0.01, 0.2], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 surface-correlated Cd", confidence: "low-medium"}
+    Ag: {value: 0.03, interval: [0.008, 0.15], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 Ag ng/g–0.1 µg/g", confidence: "low"}
+    Au: {value: 0.004, interval: [0.001, 0.012], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 Au meteoritic in soils; ng/g class (A8.4)", confidence: "medium"}
+    Ir: {value: 0.008, interval: [0.002, 0.02], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 Ir type-siderophile; soils ~1–20 ng/g from meteoritic component (A8.4)", confidence: "medium-high"}
+    Os: {value: 0.007, interval: [0.002, 0.018], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 Os tracks Ir (chondritic-ish in soils); sparse RNAA", confidence: "low-medium"}
+    Pt: {value: 0.012, interval: [0.003, 0.03], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 Pt follows Ir meteoritic; sparse data — scaled ~1.5× Ir from CI relative abundance", confidence: "low"}
+  formula_inventory:
+    # Exact formulas for MC-1 trace bookkeeping; abundances and citations live in trace_elements.
+    Ag: {formula: Ag, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Au: {formula: Au, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    B: {formula: B, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Bi: {formula: Bi, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Br: {formula: Br, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Cd: {formula: Cd, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Ce2O3: {formula: Ce2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Cu: {formula: Cu, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Dy2O3: {formula: Dy2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Er2O3: {formula: Er2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Eu2O3: {formula: Eu2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    F: {formula: F, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Gd2O3: {formula: Gd2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Ge: {formula: Ge, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    HfO2: {formula: HfO2, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Ho2O3: {formula: Ho2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    I: {formula: I, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    In: {formula: In, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    La2O3: {formula: La2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Lu2O3: {formula: Lu2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Mo: {formula: Mo, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Nd2O3: {formula: Nd2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Pb: {formula: Pb, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Pr2O3: {formula: Pr2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Sc2O3: {formula: Sc2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Sm2O3: {formula: Sm2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Sn: {formula: Sn, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Tb2O3: {formula: Tb2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Te: {formula: Te, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Tm2O3: {formula: Tm2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    W: {formula: W, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Y2O3: {formula: Y2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Yb2O3: {formula: Yb2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Zn: {formula: Zn, estimated: false, source: "MC-1 staged trace/minor component identity"}
   key_feature: "Enriched KREEP ejecta; good balance of K-shuttle boost + manageable P"
   preferred_for: "Early PKT landing sites; enhanced alkali shuttle yield"
   process_notes: "K2O 3-30x mare baseline; P2O5 requires extended C0 or Phase 0b P volatilisation"
@@ -256,6 +857,64 @@ lunar_spa_kreep_influenced:
     P2O5:   0.50
     Cr2O3:  0.30
     MnO:    0.20
+    # MC-1 additive trace/minor inventory. Staging values are elemental ppm by mass.
+    # Oxide rows: oxide wt% = element ppm x staged oxide factor / 10,000.
+    # Element-symbol rows: element wt% = element ppm / 10,000 (basis exception).
+    La2O3: 0.0038772  # 33.0595 ppm La x 1.17278 / 10,000
+    Ce2O3: 0.009529  # 81.3552 ppm Ce x 1.17129 / 10,000
+    Pr2O3: 0.0012044  # 10.2916 ppm Pr x 1.17032 / 10,000
+    Nd2O3: 0.006069  # 52.0329 ppm Nd x 1.16639 / 10,000
+    Sm2O3: 0.0016235  # 14 ppm Sm x 1.15962 / 10,000
+    Eu2O3: 0.0001505  # 1.3 ppm Eu x 1.15793 / 10,000
+    Gd2O3: 0.0018887  # 16.386 ppm Gd x 1.15262 / 10,000
+    Tb2O3: 0.0003342  # 2.9035 ppm Tb x 1.15101 / 10,000
+    Dy2O3: 0.002138  # 18.6283 ppm Dy x 1.14769 / 10,000
+    Ho2O3: 0.000461  # 4.0246 ppm Ho x 1.14552 / 10,000
+    Er2O3: 0.0012919  # 11.2977 ppm Er x 1.14349 / 10,000
+    Tm2O3: 0.0001862  # 1.63 ppm Tm x 1.14207 / 10,000
+    Yb2O3: 0.0011719  # 10.2916 ppm Yb x 1.13869 / 10,000
+    Lu2O3: 0.0001791  # 1.5754 ppm Lu x 1.13717 / 10,000
+    Y2O3: 0.0069847  # 55 ppm Y x 1.26995 / 10,000
+    Sc2O3: 0.0030677  # 20 ppm Sc x 1.53386 / 10,000
+    V: 0.007
+    Sr: 0.016
+    ThO2: 0.000569  # 5 ppm Th x 1.13791 / 10,000
+    UO2: 0.0001588  # 1.4 ppm U x 1.13444 / 10,000
+    ZrO2: 0.0540314  # 400 ppm Zr x 1.35078 / 10,000
+    HfO2: 0.0011793  # 10 ppm Hf x 1.17928 / 10,000
+    Ba: 0.022
+    Rb: 0.0006
+    Cs: 2.5e-05
+    Li: 0.0012
+    Nb: 0.0016
+    Co: 0.0032
+    Ni: 0.022
+    Cu: 0.001
+    Zn: 0.002
+    Ga: 0.0005
+    Ge: 5.0e-05
+    Mo: 2.0e-05
+    W: 4.0e-05
+    F: 0.008
+    Cl: 0.0015
+    Br: 2.5e-05
+    I: 5.0e-06
+    S: 0.07
+    B: 0.00025
+    Pb: 0.00018
+    Sn: 3.0e-05
+    Bi: 6.0e-07
+    In: 5.0e-07
+    Te: 2.5e-06
+    Se: 1.5e-05
+    As: 8.0e-06
+    Sb: 3.0e-06
+    Cd: 3.0e-06
+    Ag: 2.5e-06
+    Au: 4.0e-07
+    Ir: 9.0e-07
+    Os: 8.0e-07
+    Pt: 1.3e-06
   composition_ranges:
     SiO2:  [45, 52]
     TiO2:  [0.5, 2.5]
@@ -270,9 +929,99 @@ lunar_spa_kreep_influenced:
     MnO:   [0.15, 0.25]  # estimated
   sum_check: 103.10  # see note; normalise for simulation
   trace_elements:
-    REE_wt_pct: [0.05, 0.6]
-    Zr_ppm: [200, 800]
-    Th_ppm: [2, 8]
+    # Prior aggregate cross-checks: REE_wt_pct [0.05, 0.6], Zr_ppm [200, 800], Th_ppm [2, 8].
+    # Element-basis values and citations underlying the component rows above.
+    La: {value: 33.0595, interval: [14.1684, 66.1191], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=14.00 µg/g", confidence: "medium"}
+    Ce: {value: 81.3552, interval: [34.8665, 162.7105], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=14.00 µg/g", confidence: "medium"}
+    Pr: {value: 10.2916, interval: [4.4107, 20.5832], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=14.00 µg/g", confidence: "medium"}
+    Nd: {value: 52.0329, interval: [22.2998, 104.0657], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=14.00 µg/g", confidence: "medium"}
+    Sm: {value: 14, interval: [6, 28], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=14.00 µg/g", confidence: "medium"}
+    Eu: {value: 1.3, interval: [0.8, 2], unit: ppm_mass_ug_per_g, basis: element, source: "Sm-scale context: LSB Table 8.1 KREEP Eu=3.1 µg/g; family Eu set to 1.3 µg/g for South Pole-Aitken KREEP-Influenced (Korotev highland soils / mare basalt ranges / Warren KREEP). Primary pattern source: Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g", confidence: "medium"}
+    Gd: {value: 16.386, interval: [7.0226, 32.7721], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=14.00 µg/g", confidence: "medium"}
+    Tb: {value: 2.9035, interval: [1.2444, 5.807], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=14.00 µg/g", confidence: "medium"}
+    Dy: {value: 18.6283, interval: [7.9836, 37.2567], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=14.00 µg/g", confidence: "medium"}
+    Ho: {value: 4.0246, interval: [1.7248, 8.0493], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=14.00 µg/g", confidence: "medium"}
+    Er: {value: 11.2977, interval: [4.8419, 22.5955], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=14.00 µg/g", confidence: "medium"}
+    Tm: {value: 1.63, interval: [0.6986, 3.26], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=14.00 µg/g", confidence: "medium"}
+    Yb: {value: 10.2916, interval: [4.4107, 20.5832], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=14.00 µg/g", confidence: "medium"}
+    Lu: {value: 1.5754, interval: [0.6752, 3.1507], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=14.00 µg/g", confidence: "medium"}
+    Y: {value: 55, interval: [25, 110], unit: ppm_mass_ug_per_g, basis: element, source: "Family synthesis: Y tracks HREE; high-K KREEP Y~200 µg/g (Warren 1989 high-K KREEP compilation (Workshop Moon in Transition TR 89-03); Haskin et al. 2000 JGR PKT; LSB Ch.8 §8.4 incompatible correlations; Zr/Hf~42 highland (Hughes & Schmitt 1985 via LSB)); scaled/set for terrane.", confidence: "medium"}
+    Sc: {value: 20, interval: [12, 35], unit: ppm_mass_ug_per_g, basis: element, source: "LSB Table A8.3 Sc in MBAS/S&RB; mare high-Ti Sc-rich (~40–80 µg/g), highland soils ~5–13 µg/g (Korotev et al. 2003).", confidence: "medium-high"}
+    V: {value: 70, interval: [40, 120], unit: ppm_mass_ug_per_g, basis: element, source: "LSB Table A8.3 V; mare soils tens–hundreds µg/g; highland lower.", confidence: "medium"}
+    Sr: {value: 160, interval: [120, 220], unit: ppm_mass_ug_per_g, basis: element, source: "LSB Table A8.3 Sr; plagioclase host; highland soils ~140–220 µg/g.", confidence: "medium-high"}
+    Th: {value: 5, interval: [2, 8], unit: ppm_mass_ug_per_g, basis: element, source: "Cross-check: feedstock trace_elements.Th_ppm where present; LSB/orbital GRS PKT Th; Korotev highland soils Th~1–3 µg/g.", confidence: "high"}
+    U: {value: 1.4, interval: [0.5, 2.5], unit: ppm_mass_ug_per_g, basis: element, source: "Lunar Th/U ~3.6 (LSB §8.4); U = Th/3.6 family synthesis.", confidence: "medium"}
+    Zr: {value: 400, interval: [200, 800], unit: ppm_mass_ug_per_g, basis: element, source: "Cross-check: feedstock trace_elements.Zr_ppm / ZrO2; LSB Zr-Sm highland correlation; Hughes & Schmitt Zr/Hf.", confidence: "high"}
+    Hf: {value: 10, interval: [5, 20], unit: ppm_mass_ug_per_g, basis: element, source: "Zr/Hf ≈ 33 mare, ≈42 highland KREEPy (LSB §8.4; Hughes & Schmitt 1985).", confidence: "medium"}
+    Ba: {value: 220, interval: [100, 450], unit: ppm_mass_ug_per_g, basis: element, source: "LSB §8.4 Ba-Sm highland correlation; KREEP Ba high (Warren 1989).", confidence: "medium"}
+    Rb: {value: 6, interval: [2.5, 12], unit: ppm_mass_ug_per_g, basis: element, source: "LSB §8.4 Rb-Sm; KREEP elevated; mare soils few µg/g.", confidence: "medium"}
+    Cs: {value: 0.25, interval: [0.1, 0.6], unit: ppm_mass_ug_per_g, basis: element, source: "LSB §8.4 Cs sparse; soils ~0.1–1 µg/g; KREEP elevated.", confidence: "low-medium"}
+    Li: {value: 12, interval: [6, 22], unit: ppm_mass_ug_per_g, basis: element, source: "LSB §8.4 Li soils typically 5–20 µg/g (A8.2 Li statistics).", confidence: "medium"}
+    Nb: {value: 16, interval: [8, 35], unit: ppm_mass_ug_per_g, basis: element, source: "LSB §8.4 Nb sparse; tracks Ti/HFSE; KREEP elevated.", confidence: "medium"}
+    Co: {value: 32, interval: [18, 55], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 / Table A8.4 soils&regolith breccias (Co µg/g averages by mission); meteoritic elevation in soils", confidence: "medium"}
+    Ni: {value: 220, interval: [100, 400], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 / Table A8.4 (Ni in S&RB elevated vs monomict basalt by ~1–2% meteoritic component)", confidence: "medium"}
+    Cu: {value: 10, interval: [4, 20], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / Table A8.5 vapor-mobilized elements; soils few–tens µg/g Cu", confidence: "medium"}
+    Zn: {value: 20, interval: [5, 50], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 surface-correlated Zn; maturity-dependent; soils typically 5–50 µg/g", confidence: "medium"}
+    Ga: {value: 5, interval: [3, 8], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB Table A8.3 miscellaneous minors (Ga µg/g in S&RB); few µg/g class", confidence: "medium"}
+    Ge: {value: 0.5, interval: [0.1, 1.5], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 Ge mostly meteoritic in soils; Dickinson et al. 1989 LPSC 19:189 KREEP Ge elevated", confidence: "low-medium"}
+    Mo: {value: 0.2, interval: [0.05, 0.6], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 sparse Mo data (RNAA); Newsom 1986; soils sub-µg/g to ~1 µg/g", confidence: "low"}
+    W: {value: 0.4, interval: [0.15, 1], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 / A8.4 W in S&RB; high-K KREEP elevated W (Warren 1989)", confidence: "medium"}
+    F: {value: 80, interval: [40, 160], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 F; soils tens–hundreds µg/g; McCubbin et al. 2015 AmMin volatiles review", confidence: "medium"}
+    Cl: {value: 15, interval: [5, 40], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 Cl; mare basalts typically <10 ppm Cl, soils higher maturity-correlated; McCubbin 2015", confidence: "medium"}
+    Br: {value: 0.25, interval: [0.05, 1], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 Br often ng/g–µg/g, surface-correlated", confidence: "low-medium"}
+    I: {value: 0.05, interval: [0.01, 0.2], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 I sparse; often leachable ng/g–0.1 µg/g", confidence: "low"}
+    S: {value: 700, interval: [300, 1300], unit: ppm_mass_ug_per_g, basis: element, source: "Cross-check vs feedstock solar_wind_volatiles.species_ppm.S (Gibson 1977; Fegley & Swindle 1993; LSB ch.8); indigenous sulfide dominant in mare", confidence: "high"}
+    B: {value: 2.5, interval: [0.5, 7], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.4 sparse B data (few µg/g soils); compilation ranges", confidence: "low"}
+    Pb: {value: 1.8, interval: [0.5, 4.5], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 Pb; radiogenic + vapor-mobilized + meteoritic", confidence: "medium"}
+    Sn: {value: 0.3, interval: [0.08, 1], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.4 sparse Sn; Taylor compilations; sub-µg/g to few µg/g", confidence: "low"}
+    Bi: {value: 0.006, interval: [0.001, 0.03], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 Bi ng/g class", confidence: "low"}
+    In: {value: 0.005, interval: [0.001, 0.03], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 In ng/g class", confidence: "low"}
+    Te: {value: 0.025, interval: [0.005, 0.12], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 Te ng/g–0.1 µg/g", confidence: "low"}
+    Se: {value: 0.15, interval: [0.05, 0.4], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 Se; sub-µg/g soils", confidence: "low-medium"}
+    As: {value: 0.08, interval: [0.02, 0.3], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 As sparse ng/g–sub-µg/g", confidence: "low"}
+    Sb: {value: 0.03, interval: [0.008, 0.15], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 Sb; sub-µg/g", confidence: "low"}
+    Cd: {value: 0.03, interval: [0.008, 0.15], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 surface-correlated Cd", confidence: "low-medium"}
+    Ag: {value: 0.025, interval: [0.005, 0.12], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 Ag ng/g–0.1 µg/g", confidence: "low"}
+    Au: {value: 0.004, interval: [0.001, 0.012], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 Au meteoritic in soils; ng/g class (A8.4)", confidence: "medium"}
+    Ir: {value: 0.009, interval: [0.002, 0.022], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 Ir type-siderophile; soils ~1–20 ng/g from meteoritic component (A8.4)", confidence: "medium-high"}
+    Os: {value: 0.008, interval: [0.002, 0.02], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 Os tracks Ir (chondritic-ish in soils); sparse RNAA", confidence: "low-medium"}
+    Pt: {value: 0.013, interval: [0.003, 0.032], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 Pt follows Ir meteoritic; sparse data — scaled ~1.5× Ir from CI relative abundance", confidence: "low"}
+  formula_inventory:
+    # Exact formulas for MC-1 trace bookkeeping; abundances and citations live in trace_elements.
+    Ag: {formula: Ag, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Au: {formula: Au, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    B: {formula: B, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Bi: {formula: Bi, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Br: {formula: Br, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Cd: {formula: Cd, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Ce2O3: {formula: Ce2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Cu: {formula: Cu, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Dy2O3: {formula: Dy2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Er2O3: {formula: Er2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Eu2O3: {formula: Eu2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    F: {formula: F, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Gd2O3: {formula: Gd2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Ge: {formula: Ge, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    HfO2: {formula: HfO2, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Ho2O3: {formula: Ho2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    I: {formula: I, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    In: {formula: In, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    La2O3: {formula: La2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Lu2O3: {formula: Lu2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Mo: {formula: Mo, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Nd2O3: {formula: Nd2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Pb: {formula: Pb, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Pr2O3: {formula: Pr2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Sc2O3: {formula: Sc2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Sm2O3: {formula: Sm2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Sn: {formula: Sn, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Tb2O3: {formula: Tb2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Te: {formula: Te, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Tm2O3: {formula: Tm2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    W: {formula: W, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Y2O3: {formula: Y2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Yb2O3: {formula: Yb2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Zn: {formula: Zn, estimated: false, source: "MC-1 staged trace/minor component identity"}
   key_feature: "Mafic/noritic + mild KREEP; higher Fe/Mg for C2/C4 yields"
   preferred_for: "Farside diversity + potential mantle samples"
   process_notes: "Intermediate KREEP enrichment; K2O 2-8x mare"
@@ -283,11 +1032,11 @@ targeted_super_kreep_ore:
   confidence: "Medium-High"
   note: >
     Synthetic enriched-blend scenario for Copernicus rays, Aristarchus,
-    Lalande ejecta, and Imbrium enriched strata. Includes REE and ZrO2
+    Lalande ejecta, and Imbrium enriched strata. Includes per-element La-Lu oxides and ZrO2
     as oxide components. The 105.88 wt% sum is a deliberate enrichment
-    construction, not measured-table closure: REE/ZrO2 are additive to
+    construction, not measured-table closure: per-REE oxides/ZrO2 are additive to
     the major-oxide budget in extreme enrichments. Normalise for
-    simulation; or treat REE+ZrO2 as trace substitutions.
+    simulation; or treat the per-REE oxides plus ZrO2 as trace substitutions.
   composition_wt_pct:
     SiO2:  50.5
     TiO2:   2.50
@@ -300,8 +1049,64 @@ targeted_super_kreep_ore:
     P2O5:   2.35
     Cr2O3:  0.50
     MnO:    0.225
-    ZrO2:   0.30
-    REE_oxides: 1.55
+    # MC-1 additive trace/minor inventory. Staging values are elemental ppm by mass.
+    # Oxide rows: oxide wt% = element ppm x staged oxide factor / 10,000.
+    # Element-symbol rows: element wt% = element ppm / 10,000 (basis exception).
+    ZrO2:   0.30  # authority retained: 0.30 wt% ZrO2 = 2221 ppm Zr; staged 2500 ppm is a cross-check
+    La2O3: 0.1999379  # 1704.8209 ppm La x 1.17278 / 10,000
+    Ce2O3: 0.4913948  # 4195.342 ppm Ce x 1.17129 / 10,000
+    Pr2O3: 0.0621112  # 530.7182 ppm Pr x 1.17032 / 10,000
+    Nd2O3: 0.3129696  # 2683.2399 ppm Nd x 1.16639 / 10,000
+    Sm2O3: 0.0837191  # 721.9546 ppm Sm x 1.15962 / 10,000
+    Eu2O3: 0.0018625  # 16.0846 ppm Eu x 1.15793 / 10,000
+    Gd2O3: 0.0973965  # 844.9982 ppm Gd x 1.15262 / 10,000
+    Tb2O3: 0.0172339  # 149.7278 ppm Tb x 1.15101 / 10,000
+    Dy2O3: 0.1102507  # 960.6295 ppm Dy x 1.14769 / 10,000
+    Ho2O3: 0.0237744  # 207.5434 ppm Ho x 1.14552 / 10,000
+    Er2O3: 0.0666202  # 582.604 ppm Er x 1.14349 / 10,000
+    Tm2O3: 0.0095997  # 84.0551 ppm Tm x 1.14207 / 10,000
+    Yb2O3: 0.0604325  # 530.7182 ppm Yb x 1.13869 / 10,000
+    Lu2O3: 0.0092382  # 81.2384 ppm Lu x 1.13717 / 10,000
+    Y2O3: 0.3765278  # 2964.906 ppm Y x 1.26995 / 10,000
+    Sc2O3: 0.0027609  # 18 ppm Sc x 1.53386 / 10,000
+    V: 0.004
+    Sr: 0.022
+    ThO2: 0.0056895  # 50 ppm Th x 1.13791 / 10,000
+    UO2: 0.0015882  # 14 ppm U x 1.13444 / 10,000
+    HfO2: 0.0070757  # 60 ppm Hf x 1.17928 / 10,000
+    Ba: 0.2
+    Rb: 0.006
+    Cs: 0.00025
+    Li: 0.004
+    Nb: 0.08153491
+    Co: 0.0028
+    Ni: 0.02
+    Cu: 0.0015
+    Zn: 0.003
+    Ga: 0.0007
+    Ge: 0.00015
+    Mo: 0.0001
+    W: 0.0003
+    F: 0.012
+    Cl: 0.004
+    Br: 6.0e-05
+    I: 1.2e-05
+    S: 0.1
+    B: 0.0008
+    Pb: 0.0008
+    Sn: 0.00015
+    Bi: 2.0e-06
+    In: 1.5e-06
+    Te: 5.0e-06
+    Se: 3.0e-05
+    As: 2.0e-05
+    Sb: 1.0e-05
+    Cd: 8.0e-06
+    Ag: 5.0e-06
+    Au: 4.0e-07
+    Ir: 8.0e-07
+    Os: 7.0e-07
+    Pt: 1.2e-06
   composition_ranges:
     SiO2:  [48, 53]
     TiO2:  [1.5, 3.5]
@@ -315,11 +1120,104 @@ targeted_super_kreep_ore:
     Cr2O3: [0.3, 0.7]
     MnO:   [0.15, 0.30]
     ZrO2:  [0.15, 0.45]
-    REE_oxides: [0.6, 2.5]
+    # Prior REE_oxides range [0.6, 2.5] retained as provenance for the La-Lu split.
   sum_check: 105.88  # see note; REE+ZrO2 push total above 100%
   trace_elements:
-    Th_ppm: [25, 80]    # ore-grade in hotspots
-    Zr_ppm: [1500, 4000]
+    # Prior lump provenance: REE_oxides 1.55 wt%; replacement La-Lu oxide sum is 1.5465412 wt%.
+    # Y and Sc are additive and were not part of the prior REE lump.
+    # Existing ZrO2 0.30 wt% remains authoritative; staged Zr is retained only as the cited cross-check below.
+    # Element-basis values and citations underlying the component rows above.
+    La: {value: 1704.8209, interval: [1022.8926, 2386.7493], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=721.95 µg/g", confidence: "medium-high"}
+    Ce: {value: 4195.342, interval: [2517.2052, 5873.4788], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=721.95 µg/g", confidence: "medium-high"}
+    Pr: {value: 530.7182, interval: [318.4309, 743.0054], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=721.95 µg/g", confidence: "medium-high"}
+    Nd: {value: 2683.2399, interval: [1609.944, 3756.5359], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=721.95 µg/g", confidence: "medium-high"}
+    Sm: {value: 721.9546, interval: [433.1728, 1010.7365], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=721.95 µg/g", confidence: "medium-high"}
+    Eu: {value: 16.0846, interval: [9.6508, 22.5185], unit: ppm_mass_ug_per_g, basis: element, source: "Sm-scale context: LSB Table 8.1 KREEP Eu=3.1 µg/g; family Eu set to 16.084614994712386 µg/g for Targeted Super-KREEP Ore (Modeled Enriched Blend) (Korotev highland soils / mare basalt ranges / Warren KREEP). Primary pattern source: Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g", confidence: "medium"}
+    Gd: {value: 844.9982, interval: [506.9989, 1182.9975], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=721.95 µg/g", confidence: "medium-high"}
+    Tb: {value: 149.7278, interval: [89.8367, 209.6189], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=721.95 µg/g", confidence: "medium-high"}
+    Dy: {value: 960.6295, interval: [576.3777, 1344.8814], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=721.95 µg/g", confidence: "medium-high"}
+    Ho: {value: 207.5434, interval: [124.5261, 290.5608], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=721.95 µg/g", confidence: "medium-high"}
+    Er: {value: 582.604, interval: [349.5624, 815.6456], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=721.95 µg/g", confidence: "medium-high"}
+    Tm: {value: 84.0551, interval: [50.4331, 117.6771], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=721.95 µg/g", confidence: "medium-high"}
+    Yb: {value: 530.7182, interval: [318.4309, 743.0054], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=721.95 µg/g", confidence: "medium-high"}
+    Lu: {value: 81.2384, interval: [48.7431, 113.7338], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 Lunar Sourcebook Ch.8 Table 8.1 (Apollo 14 KREEP, adapted from Warren & Wasson 1979a); element basis µg/g; scaled to family Sm=721.95 µg/g", confidence: "medium-high"}
+    Y: {value: 2964.906, interval: [1778.9436, 4150.8684], unit: ppm_mass_ug_per_g, basis: element, source: "Family synthesis: Y tracks HREE; high-K KREEP Y~200 µg/g (Warren 1989 high-K KREEP compilation (Workshop Moon in Transition TR 89-03); Haskin et al. 2000 JGR PKT; LSB Ch.8 §8.4 incompatible correlations; Zr/Hf~42 highland (Hughes & Schmitt 1985 via LSB)); scaled/set for terrane.", confidence: "medium"}
+    Sc: {value: 18, interval: [10, 30], unit: ppm_mass_ug_per_g, basis: element, source: "LSB Table A8.3 Sc in MBAS/S&RB; mare high-Ti Sc-rich (~40–80 µg/g), highland soils ~5–13 µg/g (Korotev et al. 2003).", confidence: "medium-high"}
+    V: {value: 40, interval: [20, 80], unit: ppm_mass_ug_per_g, basis: element, source: "LSB Table A8.3 V; mare soils tens–hundreds µg/g; highland lower.", confidence: "medium"}
+    Sr: {value: 220, interval: [150, 350], unit: ppm_mass_ug_per_g, basis: element, source: "LSB Table A8.3 Sr; plagioclase host; highland soils ~140–220 µg/g.", confidence: "medium-high"}
+    Th: {value: 50, interval: [25, 80], unit: ppm_mass_ug_per_g, basis: element, source: "Cross-check: feedstock trace_elements.Th_ppm where present; LSB/orbital GRS PKT Th; Korotev highland soils Th~1–3 µg/g.", confidence: "high"}
+    U: {value: 14, interval: [7, 25], unit: ppm_mass_ug_per_g, basis: element, source: "Lunar Th/U ~3.6 (LSB §8.4); U = Th/3.6 family synthesis.", confidence: "medium"}
+    Zr: {value: 2500, interval: [1500, 4000], unit: ppm_mass_ug_per_g, basis: element, source: "Cross-check: feedstock trace_elements.Zr_ppm / ZrO2; LSB Zr-Sm highland correlation; Hughes & Schmitt Zr/Hf.", confidence: "high"}
+    Hf: {value: 60, interval: [35, 95], unit: ppm_mass_ug_per_g, basis: element, source: "Zr/Hf ≈ 33 mare, ≈42 highland KREEPy (LSB §8.4; Hughes & Schmitt 1985).", confidence: "medium"}
+    Ba: {value: 2000, interval: [1000, 4000], unit: ppm_mass_ug_per_g, basis: element, source: "LSB §8.4 Ba-Sm highland correlation; KREEP Ba high (Warren 1989).", confidence: "medium"}
+    Rb: {value: 60, interval: [30, 120], unit: ppm_mass_ug_per_g, basis: element, source: "LSB §8.4 Rb-Sm; KREEP elevated; mare soils few µg/g.", confidence: "medium"}
+    Cs: {value: 2.5, interval: [1, 5], unit: ppm_mass_ug_per_g, basis: element, source: "LSB §8.4 Cs sparse; soils ~0.1–1 µg/g; KREEP elevated.", confidence: "low-medium"}
+    Li: {value: 40, interval: [20, 80], unit: ppm_mass_ug_per_g, basis: element, source: "LSB §8.4 Li soils typically 5–20 µg/g (A8.2 Li statistics).", confidence: "medium"}
+    Nb: {value: 815.3491, interval: [489.2095, 1141.4888], unit: ppm_mass_ug_per_g, basis: element, source: "LSB §8.4 Nb sparse; tracks Ti/HFSE; KREEP elevated.", confidence: "medium"}
+    Co: {value: 28, interval: [15, 45], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 / Table A8.4 soils&regolith breccias (Co µg/g averages by mission); meteoritic elevation in soils", confidence: "medium"}
+    Ni: {value: 200, interval: [80, 400], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 / Table A8.4 (Ni in S&RB elevated vs monomict basalt by ~1–2% meteoritic component)", confidence: "medium"}
+    Cu: {value: 15, interval: [5, 30], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / Table A8.5 vapor-mobilized elements; soils few–tens µg/g Cu", confidence: "medium"}
+    Zn: {value: 30, interval: [10, 70], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 surface-correlated Zn; maturity-dependent; soils typically 5–50 µg/g", confidence: "medium"}
+    Ga: {value: 7, interval: [4, 12], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB Table A8.3 miscellaneous minors (Ga µg/g in S&RB); few µg/g class", confidence: "medium"}
+    Ge: {value: 1.5, interval: [0.5, 4], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 Ge mostly meteoritic in soils; Dickinson et al. 1989 LPSC 19:189 KREEP Ge elevated", confidence: "low-medium"}
+    Mo: {value: 1, interval: [0.3, 3], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 sparse Mo data (RNAA); Newsom 1986; soils sub-µg/g to ~1 µg/g", confidence: "low"}
+    W: {value: 3, interval: [1, 8], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 / A8.4 W in S&RB; high-K KREEP elevated W (Warren 1989)", confidence: "medium"}
+    F: {value: 120, interval: [60, 250], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 F; soils tens–hundreds µg/g; McCubbin et al. 2015 AmMin volatiles review", confidence: "medium"}
+    Cl: {value: 40, interval: [15, 100], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 Cl; mare basalts typically <10 ppm Cl, soils higher maturity-correlated; McCubbin 2015", confidence: "medium"}
+    Br: {value: 0.6, interval: [0.15, 2], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 Br often ng/g–µg/g, surface-correlated", confidence: "low-medium"}
+    I: {value: 0.12, interval: [0.03, 0.4], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 I sparse; often leachable ng/g–0.1 µg/g", confidence: "low"}
+    S: {value: 1000, interval: [500, 2000], unit: ppm_mass_ug_per_g, basis: element, source: "Cross-check vs feedstock solar_wind_volatiles.species_ppm.S (Gibson 1977; Fegley & Swindle 1993; LSB ch.8); indigenous sulfide dominant in mare", confidence: "high"}
+    B: {value: 8, interval: [2, 20], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.4 sparse B data (few µg/g soils); compilation ranges", confidence: "low"}
+    Pb: {value: 8, interval: [3, 20], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 Pb; radiogenic + vapor-mobilized + meteoritic", confidence: "medium"}
+    Sn: {value: 1.5, interval: [0.4, 4], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.4 sparse Sn; Taylor compilations; sub-µg/g to few µg/g", confidence: "low"}
+    Bi: {value: 0.02, interval: [0.005, 0.08], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 Bi ng/g class", confidence: "low"}
+    In: {value: 0.015, interval: [0.003, 0.06], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 In ng/g class", confidence: "low"}
+    Te: {value: 0.05, interval: [0.01, 0.2], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 Te ng/g–0.1 µg/g", confidence: "low"}
+    Se: {value: 0.3, interval: [0.1, 0.8], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 Se; sub-µg/g soils", confidence: "low-medium"}
+    As: {value: 0.2, interval: [0.05, 0.6], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 / A8.5 As sparse ng/g–sub-µg/g", confidence: "low"}
+    Sb: {value: 0.1, interval: [0.02, 0.4], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 Sb; sub-µg/g", confidence: "low"}
+    Cd: {value: 0.08, interval: [0.02, 0.3], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 surface-correlated Cd", confidence: "low-medium"}
+    Ag: {value: 0.05, interval: [0.01, 0.2], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.7 Ag ng/g–0.1 µg/g", confidence: "low"}
+    Au: {value: 0.004, interval: [0.001, 0.012], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 Au meteoritic in soils; ng/g class (A8.4)", confidence: "medium"}
+    Ir: {value: 0.008, interval: [0.002, 0.02], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 Ir type-siderophile; soils ~1–20 ng/g from meteoritic component (A8.4)", confidence: "medium-high"}
+    Os: {value: 0.007, interval: [0.002, 0.018], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 Os tracks Ir (chondritic-ish in soils); sparse RNAA", confidence: "low-medium"}
+    Pt: {value: 0.012, interval: [0.003, 0.03], unit: ppm_mass_ug_per_g, basis: element, source: "Haskin & Warren 1991 LSB §8.6 Pt follows Ir meteoritic; sparse data — scaled ~1.5× Ir from CI relative abundance", confidence: "low"}
+  formula_inventory:
+    # Exact formulas for MC-1 trace bookkeeping; abundances and citations live in trace_elements.
+    Ag: {formula: Ag, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Au: {formula: Au, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    B: {formula: B, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Bi: {formula: Bi, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Br: {formula: Br, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Cd: {formula: Cd, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Ce2O3: {formula: Ce2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Cu: {formula: Cu, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Dy2O3: {formula: Dy2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Er2O3: {formula: Er2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Eu2O3: {formula: Eu2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    F: {formula: F, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Gd2O3: {formula: Gd2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Ge: {formula: Ge, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    HfO2: {formula: HfO2, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Ho2O3: {formula: Ho2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    I: {formula: I, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    In: {formula: In, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    La2O3: {formula: La2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Lu2O3: {formula: Lu2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Mo: {formula: Mo, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Nd2O3: {formula: Nd2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Pb: {formula: Pb, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Pr2O3: {formula: Pr2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Sc2O3: {formula: Sc2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Sm2O3: {formula: Sm2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Sn: {formula: Sn, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Tb2O3: {formula: Tb2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Te: {formula: Te, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Tm2O3: {formula: Tm2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    W: {formula: W, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Y2O3: {formula: Y2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Yb2O3: {formula: Yb2O3, estimated: false, source: "MC-1 staged trace/minor component identity"}
+    Zn: {formula: Zn, estimated: false, source: "MC-1 staged trace/minor component identity"}
   key_feature: "Supercharged alkali shuttle stock + premium REE-Zr-P-Th slag byproduct"
   preferred_for: "Economic valorisation of terminal slag (REE extraction, P chemicals)"
   process_notes: >

@@ -7303,6 +7303,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             kernel_credited_melt_kg,
             context=f'{label} Stage 0 melt oxide products',
         )
+        self._merge_masses(
+            terminal_melt_external,
+            self.inventory.inert_melt_components_kg,
+        )
         terminal_sulfide_external = self._subtract_species_kg(
             self.inventory.sulfide_matte_kg,
             cation_sulfate_sulfide_kg,
@@ -9015,7 +9019,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             feedstock.get('structural_water', {}) or {}, mass_kg)
         self._merge_masses(raw, structural)
         self._normalize_component_masses(raw, mass_kg)
-        self._validate_stage0_unmodeled_nitrate_components(raw)
+        inert_melt = self._inert_trace_component_masses(feedstock, raw)
+        self._validate_stage0_unmodeled_nitrate_components(
+            raw,
+            allowed_bare_elemental_traces=set(inert_melt),
+        )
         unbacked_declared_kg = self._unbacked_declared_stage0_products_kg(
             declared_stage0_buckets, raw)
         if unbacked_declared_kg > 1e-9:
@@ -9080,6 +9088,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 buckets = self._classify_stage0_components(non_oxide)
                 processed_components = self._processable_stage0_components(raw)
 
+        processed_components.update(inert_melt)
+
         formula_species = set(raw)
         formula_species.update(self._bucket_species(buckets))
         formula_species.update(self._bucket_species(declared_stage0_buckets))
@@ -9110,6 +9120,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             mass_kg,
             melt,
             buckets,
+            inert_melt=inert_melt,
             unbacked_declared_stage0_products_kg=unbacked_declared_kg,
             stage0_external_inputs_kg=sum(stage0_external_inputs.values()),
         )
@@ -9125,6 +9136,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return ProcessInventory(
             raw_components_kg=raw,
             melt_oxide_kg=melt,
+            inert_melt_components_kg=inert_melt,
             residual_components_kg=residual,
             stage0_products_kg=stage0_products,
             gas_volatiles_kg=buckets['gas_volatiles'],
@@ -10057,11 +10069,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         melt: Mapping[str, float],
         buckets: Mapping[str, Mapping[str, float]],
         *,
+        inert_melt: Mapping[str, float] | None = None,
         unbacked_declared_stage0_products_kg: float = 0.0,
         stage0_external_inputs_kg: float = 0.0,
     ) -> float:
         accounted = (
             sum(melt.values())
+            + sum((inert_melt or {}).values())
             + cls._bucket_mass(buckets)
             + sum(residual.values())
         )
@@ -10290,8 +10304,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     @classmethod
     def _validate_stage0_unmodeled_nitrate_components(
-        cls, raw: Mapping[str, float]
+        cls,
+        raw: Mapping[str, float],
+        *,
+        allowed_bare_elemental_traces: set[str] | None = None,
     ) -> None:
+        allowed_traces = allowed_bare_elemental_traces or set()
         for component, kg in raw.items():
             if kg <= 0.0:
                 continue
@@ -10302,11 +10320,44 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'remove the nitrate key'
                 )
             key = cls._normalized_component_key(component)
-            if key == 'f':
+            if key == 'f' and component not in allowed_traces:
                 raise ValueError(
                     "Stage 0 fluoride routing requires an explicit key "
                     "(CaF2, NaF, fluorite, fluoride); bare 'f' is not accepted"
                 )
+
+    def _inert_trace_component_masses(
+        self,
+        feedstock: Mapping[str, Any],
+        raw: Mapping[str, float],
+    ) -> Dict[str, float]:
+        if feedstock.get('anhydrous_silicate_after_degassing'):
+            return {}
+        trace_rows = feedstock.get('trace_elements') or {}
+        if not isinstance(trace_rows, Mapping):
+            return {}
+        cited_elements = {
+            str(element)
+            for element, row in trace_rows.items()
+            if isinstance(row, Mapping)
+            and str(row.get('basis', '')).strip().lower() == 'element'
+            and str(row.get('source', '')).strip()
+        }
+        if not cited_elements:
+            return {}
+        inert: Dict[str, float] = {}
+        for component, kg in raw.items():
+            if kg <= 0.0 or component in OXIDE_SPECIES:
+                continue
+            if self._stage0_bucket_for_name(component) is not None:
+                continue
+            formula = resolve_species_formula(
+                component,
+                self.species_formula_registry,
+            )
+            if cited_elements.intersection(formula.elements):
+                inert[component] = float(kg)
+        return inert
 
     @classmethod
     def _is_stage0_refractory_fluoride_component(cls, component: str) -> bool:

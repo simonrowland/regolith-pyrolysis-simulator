@@ -79,6 +79,25 @@ TERMINAL_RUMP_ACCOUNTS = (
 PROCESS_INVENTORY_SPENT_REDUCTANT_ACCOUNTS = (
     SPENT_REDUCTANT_RESIDUE_ACCOUNT,
 )
+REE_OXIDE_SPECIES = frozenset(
+    {
+        "REE_oxides",
+        "La2O3",
+        "Ce2O3",
+        "Pr2O3",
+        "Nd2O3",
+        "Sm2O3",
+        "Eu2O3",
+        "Gd2O3",
+        "Tb2O3",
+        "Dy2O3",
+        "Ho2O3",
+        "Er2O3",
+        "Tm2O3",
+        "Yb2O3",
+        "Lu2O3",
+    }
+)
 # SiO2 remains the separate silicate_residual class in the terminal-product
 # overlay; yield disposition imports this set so both projections agree.
 TERMINAL_RUMP_REFRACTORY_OXIDES = frozenset({
@@ -88,7 +107,7 @@ TERMINAL_RUMP_REFRACTORY_OXIDES = frozenset({
     "TiO2",
     "Cr2O3",
     "REE_oxides",
-})
+}) | REE_OXIDE_SPECIES
 TERMINAL_RUMP_SILICATE_RESIDUAL = frozenset({"SiO2"})
 TERMINAL_RUMP_UNEXTRACTED_METALS = frozenset({"Fe", "Ni", "Co", "Mn"})
 TERMINAL_RUMP_CLASS_TOLERANCE_PCT = 5e-12
@@ -358,9 +377,17 @@ class AccountingQueries:
             raise AccountingError(
                 "initial process.cleaned_melt inventory surface is unavailable"
             )
+        inert_melt = getattr(inventory, "inert_melt_components_kg", {}) or {}
+        if not isinstance(inert_melt, Mapping):
+            raise AccountingError(
+                "initial inert process.cleaned_melt inventory surface is not a mapping"
+            )
+        combined: dict[str, float] = {}
+        _merge_masses(combined, melt)
+        _merge_masses(combined, inert_melt)
         return {
             str(species): float(kg)
-            for species, kg in melt.items()
+            for species, kg in combined.items()
             if float(kg) > 0.0
         }
 
@@ -379,11 +406,12 @@ class AccountingQueries:
 
         REEs are treated as refractory, incompatible lithophiles (REF-056,
         REF-057), so extraction removes carrier mass while the ledger keeps the
-        lumped ``REE_oxides`` inventory in the residue.  No empirical enrichment
-        coefficient is fitted here.  If ``M`` is total rump mass and ``R`` is
-        REE-oxide mass, then ``E = (R1/M1)/(R0/M0)`` and the process extent is
-        ``X = 1 - M1/M0``.  ``R1/R0`` is reported separately so any future REE
-        loss or addition cannot hide behind the concentration ratio.
+        lumped ``REE_oxides`` or per-element lanthanide oxide inventory in the
+        residue.  No empirical enrichment coefficient is fitted here.  If ``M``
+        is total rump mass and ``R`` is REE-oxide mass, then
+        ``E = (R1/M1)/(R0/M0)`` and the process extent is ``X = 1 - M1/M0``.
+        ``R1/R0`` is reported separately so any future REE loss or addition
+        cannot hide behind the concentration ratio.
         """
         initial = self.initial_cleaned_melt_kg()
         # This is the residual ceramic, not every terminal-rump account: unused
@@ -408,8 +436,12 @@ class AccountingQueries:
         )
         initial_total_kg = sum(initial.values())
         terminal_total_kg = sum(terminal.values())
-        initial_ree_kg = float(initial.get("REE_oxides", 0.0))
-        terminal_ree_kg = float(terminal.get("REE_oxides", 0.0))
+        initial_ree_kg = sum(
+            float(initial.get(species, 0.0)) for species in REE_OXIDE_SPECIES
+        )
+        terminal_ree_kg = sum(
+            float(terminal.get(species, 0.0)) for species in REE_OXIDE_SPECIES
+        )
         initial_wt_pct = (
             initial_ree_kg / initial_total_kg * 100.0
             if initial_total_kg > 0.0 else 0.0

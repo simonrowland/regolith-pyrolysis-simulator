@@ -395,6 +395,7 @@ class ProcessInventory:
     """
     raw_components_kg: Dict[str, float] = field(default_factory=dict)
     melt_oxide_kg: Dict[str, float] = field(default_factory=dict)
+    inert_melt_components_kg: Dict[str, float] = field(default_factory=dict)
     residual_components_kg: Dict[str, float] = field(default_factory=dict)
     stage0_products_kg: Dict[str, float] = field(default_factory=dict)
     gas_volatiles_kg: Dict[str, float] = field(default_factory=dict)
@@ -416,6 +417,7 @@ class ProcessInventory:
         return ProcessInventory(
             raw_components_kg=dict(self.raw_components_kg),
             melt_oxide_kg=dict(self.melt_oxide_kg),
+            inert_melt_components_kg=dict(self.inert_melt_components_kg),
             residual_components_kg=dict(self.residual_components_kg),
             stage0_products_kg=dict(self.stage0_products_kg),
             gas_volatiles_kg=dict(self.gas_volatiles_kg),

@@ -761,17 +761,26 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         # but the head has zero overhead O2, so the allocator correctly zeros it.
         # 2026-08-05 phosphorus-carrier union: at 1550 C, PO=0.00209063758295 Pa,
         # PO2=0.000168203490621 Pa, and P2=5.32056804627e-9 Pa dominate the six
-        # new P channels (P4/P4O6/P4O10 are positive but negligible here). Their
-        # three executable transitions add 0.0023652645523379867 kg/hr total flux,
-        # +518.9310568999499 transport-saturation points, and lower melt mass by
-        # 0.0034963082154035874 kg. Values come from the executable head-pressure
+            # new P channels (P4/P4O6/P4O10 are positive but negligible here). Their
+            # three executable transitions add 0.0023652645523379867 kg/hr total flux,
+            # +518.9310568999499 transport-saturation points, and lower melt mass by
+            # 0.0034963082154035874 kg. Values come from the executable head-pressure
         # table and this quiesced default-off probe on the resolved union tree.
+        # 2026-08-05 MC-1 additive lunar traces: the low-Ti declaration grows by
+        # 0.2057916 wt% without changing any major-oxide row. Existing load-time
+        # whole-feed normalization plus Stage-0 disposition leaves
+        # 998.7714742180782 kg in cleaned melt (0.8852837472074954 kg is inert
+        # trace inventory; 0.987143121334345 kg is explicitly routed to slag,
+        # chloride, and sulfide accounts). The slightly diluted major-oxide
+        # activities lower flux by 0.0031308794125107 kg/hr and transport
+        # saturation by 1433.775192481 points; post-step melt follows by
+        # -1.2253948978958 kg. Recomputed from this quiesced executable probe.
         (
             1,
             1550.0,
-            2.6237738115210627,
-            1162501.871306423,
-            997.3672085774182,
+            2.620642932108552,
+            1161068.096113942,
+            996.1418136795224,
         ),
         rel=1.0e-12,
         abs=1.0e-12,
