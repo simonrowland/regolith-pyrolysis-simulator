@@ -300,6 +300,19 @@ def _catalog_rows(collector: _DemandCollector, path: Path) -> None:
             continue
         for species_id, row in species.items():
             row = row if isinstance(row, Mapping) else {}
+            # Premise: "thermo available" means a computable standard model for
+            # this carrier exists SOMEWHERE, not only in the extract-store gibbs
+            # tables. A catalog row carrying a cited pure-component Antoine fit
+            # or a standard-reaction assembly IS thermo (e.g. the t425-grounded
+            # organics). Algebra: availability is the OR over sources, matching
+            # the collector's row["thermo_available"] |= semantics. Sanity: a
+            # bare structural stub with neither field still reports False.
+            row_has_thermo = bool(
+                row.get("pure_component_antoine")
+                or row.get("gas_rail_standard_reaction")
+                or row.get("liquid_oxide_standard_reaction")
+                or row.get("literature_correlation")
+            )
             collector.add(
                 formula=str(row.get("formula") or species_id),
                 source="vapor_pressures_catalog",
@@ -307,6 +320,7 @@ def _catalog_rows(collector: _DemandCollector, path: Path) -> None:
                 carrier_id=str(species_id),
                 catalog_family=str(family_id),
                 catalog_species_id=str(species_id),
+                thermo_available=row_has_thermo,
             )
 
 

@@ -3609,6 +3609,11 @@ def test_endmember_activity_labels_resolve_antoine_without_mutating_payload():
         1600.0,
         result.activity_coefficients,
         {'Na2O': 5.0},
+        # 2026-08-05 MC-4 wave 1B: Si now carries a standard-reaction model
+        # with a pO2 exponent, making pO2_bar a required input of this helper
+        # (the raise on absence is the fail-loud caller-bug guard; production
+        # callers thread it per the b-139 fix).
+        pO2_bar=1.0e-9,
     )
     assert projected_pressures['Na'] > 0.0
     assert projected_pressures['Si'] > 0.0
@@ -5083,6 +5088,11 @@ def test_thermoengine_missing_activity_is_typed_vapor_refusal_not_raise():
             1600.0,
             {'SiO2': 0.4},
             {'SiO2': 70.0, 'Na2O': 30.0},
+            # 2026-08-05 MC-4 wave 1B: Si now carries a standard-reaction
+            # model with a pO2 exponent, making pO2_bar a required input of
+            # this helper (the raise on absence is the fail-loud caller-bug
+            # guard; production callers thread it per the b-139 fix).
+            pO2_bar=1.0e-9,
             context='test missing activity',
         ),
         VaporPressureActivityRefusal,

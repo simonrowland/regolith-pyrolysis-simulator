@@ -66,6 +66,12 @@ _SEED_LOAD_EXTERNAL_CONTEXTS = (
     ("simulator/core.py", "_record_stage0_carbonate_decomposition_transitions"),
     ("simulator/core.py", "_record_stage0_oxidation_transitions"),
     ("simulator/core.py", "_record_stage0_perchlorate_cleanup_transitions"),
+    # 2026-08-05 MC-4 wave 1B: seed-time bulk load of feedstock-origin
+    # foulant/volatile source mass into process.stage0_foulant /
+    # process.stage0_volatile_feed, ahead of the kernel-committed
+    # volatilization transitions in the same helper -- the same seeding
+    # pattern as the whitelisted _record_stage0_* siblings above.
+    ("simulator/core.py", "_record_stage0_volatilization_transitions"),
     ("simulator/core.py", "_seed_atom_ledger"),
 )
 

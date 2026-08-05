@@ -6,7 +6,7 @@ counts:
   elements: 69
   carriers: 955
   pairs: 1872
-  catalog_linked_pairs: 107
+  catalog_linked_pairs: 116
 provenance:
   feedstocks: data/feedstocks.yaml
   nasa_cea_extract: data/literature/extracts/nasa-cea-thermo.yaml
@@ -5287,7 +5287,7 @@ pairs:
   - volatile_organic_C2H5OH_family
   catalog_species_ids:
   - C2H5OH
-  thermo_available: false
+  thermo_available: true
 - element: C
   carrier: C2H6
   formula: C2H6
@@ -6665,7 +6665,7 @@ pairs:
   - volatile_organic_CH3COOH_family
   catalog_species_ids:
   - CH3COOH
-  thermo_available: false
+  thermo_available: true
 - element: C
   carrier: CH3Cl
   formula: CH3Cl
@@ -7430,7 +7430,7 @@ pairs:
   - volatile_organic_HCHO_family
   catalog_species_ids:
   - HCHO
-  thermo_available: false
+  thermo_available: true
 - element: C
   carrier: HCN
   formula: HCN
@@ -7580,7 +7580,7 @@ pairs:
   - volatile_nitrogen_NH4CN_family
   catalog_species_ids:
   - NH4CN
-  thermo_available: false
+  thermo_available: true
 - element: C
   carrier: NaCN
   formula: NaCN
@@ -16014,7 +16014,7 @@ pairs:
   - volatile_organic_C2H5OH_family
   catalog_species_ids:
   - C2H5OH
-  thermo_available: false
+  thermo_available: true
 - element: H
   carrier: C2H6
   formula: C2H6
@@ -16865,7 +16865,7 @@ pairs:
   - volatile_organic_CH3COOH_family
   catalog_species_ids:
   - CH3COOH
-  thermo_available: false
+  thermo_available: true
 - element: H
   carrier: CH3Cl
   formula: CH3Cl
@@ -17800,7 +17800,7 @@ pairs:
   - volatile_organic_HCHO_family
   catalog_species_ids:
   - HCHO
-  thermo_available: false
+  thermo_available: true
 - element: H
   carrier: HCN
   formula: HCN
@@ -18318,7 +18318,7 @@ pairs:
   - volatile_nitrogen_NH4CN_family
   catalog_species_ids:
   - NH4CN
-  thermo_available: false
+  thermo_available: true
 - element: H
   carrier: NHF
   formula: NHF
@@ -20033,10 +20033,14 @@ pairs:
     K: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:K2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:K2
+  catalog_family_ids:
+  - oxide_vapors_k2_cluster_family
+  catalog_species_ids:
+  - K2
   thermo_available: true
 - element: K
   carrier: K2Br2
@@ -20159,10 +20163,14 @@ pairs:
     O: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:K2O
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:K2O_gas
+  catalog_family_ids:
+  - oxide_vapors_k2o_family
+  catalog_species_ids:
+  - K2O_gas
   thermo_available: true
 - element: K
   carrier: K2SO4
@@ -20835,10 +20843,14 @@ pairs:
     Mg: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Mg2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Mg2
+  catalog_family_ids:
+  - oxide_vapors_mg2_cluster_family
+  catalog_species_ids:
+  - Mg2
   thermo_available: true
 - element: Mg
   carrier: Mg2Cl4
@@ -21040,10 +21052,14 @@ pairs:
     O: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:MgO
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:MgO_gas
+  catalog_family_ids:
+  - oxide_vapors_mgo_family
+  catalog_species_ids:
+  - MgO_gas
   thermo_available: true
 - element: Mg
   carrier: MgS
@@ -22012,7 +22028,7 @@ pairs:
   - volatile_nitrogen_NH4CN_family
   catalog_species_ids:
   - NH4CN
-  thermo_available: false
+  thermo_available: true
 - element: N
   carrier: NHF
   formula: NHF
@@ -22373,10 +22389,14 @@ pairs:
     Na: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Na2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Na2
+  catalog_family_ids:
+  - oxide_vapors_na2_cluster_family
+  catalog_species_ids:
+  - Na2
   thermo_available: true
 - element: Na
   carrier: Na2Br2
@@ -22469,10 +22489,14 @@ pairs:
     O: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Na2O
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Na2O_gas
+  catalog_family_ids:
+  - oxide_vapors_na2o_family
+  catalog_species_ids:
+  - Na2O_gas
   thermo_available: true
 - element: Na
   carrier: Na2SO4
@@ -25024,10 +25048,14 @@ pairs:
     Si: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Si2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Si2
+  catalog_family_ids:
+  - oxide_vapors_si2_cluster_family
+  catalog_species_ids:
+  - Si2
   thermo_available: true
 - element: Si
   carrier: Si2C
@@ -25075,10 +25103,14 @@ pairs:
     Si: 3.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Si3
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Si3
+  catalog_family_ids:
+  - oxide_vapors_si3_cluster_family
+  catalog_species_ids:
+  - Si3
   thermo_available: true
 - element: Si
   carrier: SiBr
@@ -25594,12 +25626,16 @@ pairs:
   - janaf_4th_extract
   - kems-022-demaria-1971
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - janaf_4th_extract:SiO2_gas
   - kems-022-demaria-1971:SiO
   - nasa_cea_extract:SiO2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:SiO2_gas
+  catalog_family_ids:
+  - oxide_vapors_sio2_family
+  catalog_species_ids:
+  - SiO2_gas
   thermo_available: true
 - element: Si
   carrier: SiS

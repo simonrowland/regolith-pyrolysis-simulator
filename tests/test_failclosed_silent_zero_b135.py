@@ -216,6 +216,11 @@ def test_a2_partial_activity_map_refuses_not_drop_alkali() -> None:
         1600.0,
         {"FeO": 0.1, "SiO2": 0.5},
         {"FeO": 10.0, "SiO2": 50.0, "Na2O": 5.0},
+        # 2026-08-05 MC-4 wave 1B: Si now carries a standard-reaction model
+        # with a pO2 exponent, making pO2_bar a required input of this helper
+        # (the raise on absence is the fail-loud caller-bug guard; production
+        # callers thread it per the b-139 fix).
+        pO2_bar=1.0e-9,
         context="b135-a2-partial-activity",
     )
     assert isinstance(refusal, VaporPressureActivityRefusal)
@@ -229,6 +234,11 @@ def test_a2_full_activity_map_still_emits_pressures() -> None:
         1600.0,
         {"FeO": 0.1, "SiO2": 0.5, "Na2O": 0.05},
         {"FeO": 10.0, "SiO2": 50.0, "Na2O": 5.0},
+        # 2026-08-05 MC-4 wave 1B: Si now carries a standard-reaction model
+        # with a pO2 exponent, making pO2_bar a required input of this helper
+        # (the raise on absence is the fail-loud caller-bug guard; production
+        # callers thread it per the b-139 fix).
+        pO2_bar=1.0e-9,
         context="b135-a2-full-activity",
     )
     assert "Na" in pressures

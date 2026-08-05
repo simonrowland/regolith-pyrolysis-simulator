@@ -63,7 +63,12 @@ SIO_ANCHOR_HOUR = 6
 # routing lower the finite-pO2/IW SiO drift.
 # 2026-07-18 a91db36 loaded-melt/flow-boundary trajectory rebaseline on
 # corrected tip 0990232.
-EXPECTED_SIO_DECADE_DRIFT = 0.18436767251999514
+# 2026-08-05 MC-4 wave 1B (a34318c): the Si-family carrier union (active Si
+# metal standard-reaction row, plus the pO2-insensitive SiO2(g) gas-exchange
+# channel drawing ~2% of the SiO2 pool) moves the finite-pO2/IW separation
+# 0.1844 -> 0.2044 decade. The SiO Antoine row itself is bit-identical to
+# the base; the hard AtomLedger closure is unaffected.
+EXPECTED_SIO_DECADE_DRIFT = 0.20438023169672037
 
 
 def test_vaporock_sio_iw_vs_vacuum_floor_hot_c2a_anchor():

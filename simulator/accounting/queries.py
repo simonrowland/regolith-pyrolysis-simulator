@@ -1595,6 +1595,7 @@ def _coalesced_stage0_foulant_diagnostics(
     coalesced: list[Mapping[str, Any]] = []
     sulfate: dict[tuple[str, float, str], dict[str, Any]] = {}
     seen_non_sulfate: set[tuple[str, str, float, str]] = set()
+    volatilization: dict[tuple[str, float, str], dict[str, Any]] = {}
     for diagnostic in diagnostics:
         if not isinstance(diagnostic, Mapping):
             continue
@@ -1612,6 +1613,29 @@ def _coalesced_stage0_foulant_diagnostics(
                     f"source_component={source_component!r}"
                 )
             seen_non_sulfate.add(key)
+            if family == REACTION_FAMILY_VOLATILIZATION and feed_kg > 0.0:
+                # 2026-08-05 MC-4 wave 1B (b-134 sum-once): the association
+                # carriers (K2Cl2/Na2Cl2) share their monomer salt reservoir.
+                # Coalesce each source group into one planning row whose
+                # escaped fraction mirrors the runtime allocation semantics
+                # (min(1, sum of the channel fractions)); reporting each
+                # channel's diagnostic separately would double-debit the
+                # shared source in this read-only projection.
+                group_key = (
+                    str(diagnostic.get("source_species") or carrier),
+                    feed_kg,
+                    source_component,
+                )
+                group = volatilization.setdefault(
+                    group_key,
+                    {"diagnostics": [], "escaped_frac_total": 0.0},
+                )
+                group["diagnostics"].append(diagnostic)
+                group["escaped_frac_total"] += _stage0_fraction(
+                    diagnostic.get("cumulative_escaped_frac"),
+                    field="cumulative_escaped_frac",
+                )
+                continue
             coalesced.append(diagnostic)
             continue
         source_component = _stage0_normalized_component_key(
@@ -1634,6 +1658,33 @@ def _coalesced_stage0_foulant_diagnostics(
         row["extent"] = 1.0 - retained
         row["phase_rows"] = tuple(row.pop("_phase_rows"))
         coalesced.append(row)
+    for group in volatilization.values():
+        group_diagnostics = group["diagnostics"]
+        if len(group_diagnostics) == 1:
+            # Single carrier for the source: pass through untouched so a
+            # corrupt fraction set still trips the group closure guard.
+            coalesced.append(group_diagnostics[0])
+            continue
+        merged = dict(group_diagnostics[0])
+        escaped = min(1.0, float(group["escaped_frac_total"]))
+        merged["cumulative_escaped_frac"] = escaped
+        merged["cumulative_retained_frac"] = 1.0 - escaped
+        merged["wall_deposit_frac"] = min(
+            1.0,
+            sum(
+                _stage0_fraction(
+                    channel.get("wall_deposit_frac"),
+                    field="wall_deposit_frac",
+                )
+                for channel in group_diagnostics
+            ),
+        )
+        if len(group_diagnostics) > 1:
+            merged["association_channels"] = tuple(
+                str(channel.get("carrier") or channel.get("species") or "")
+                for channel in group_diagnostics
+            )
+        coalesced.append(merged)
     return coalesced
 
 

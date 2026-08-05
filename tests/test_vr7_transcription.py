@@ -88,37 +88,72 @@ def test_production_catalog_compiles_with_dormant_projection() -> None:
         "Cr",
         "Mn",
     }
+    # 2026-08-05 MC-4 wave-1 union (4625df1+ee1e2bc, adjudicated: P2O5_gas
+    # tombstone restored, MgCl2 dormant): membership recomputed from the
+    # compiled catalog by execution.
     assert set(legacy["oxide_vapors"]) == {
-        "SiO",
-        "CrO2",
-        "TiO",
-        "TiO2_gas",
-        "CaO_gas",
-        "AlO",
-        "Al2O",
-        "CrO3",
         "Al2",
+        "Al2O",
         "Al2O2",
         "Al2O3_gas",
+        "AlO",
         "AlO2",
         "Ca2",
+        "CaO_gas",
         "CrO",
-        "PO",
-        "PO2",
+        "CrO2",
+        "CrO3",
+        "K2",
+        "K2O_gas",
+        "Mg2",
+        "MgO_gas",
+        "Na2",
+        "Na2O_gas",
         "P2",
         "P4",
-        "P4O6",
         "P4O10",
+        "P4O6",
+        "PO",
+        "PO2",
+        "Si2",
+        "Si3",
+        "SiO",
+        "SiO2_gas",
+        "TiO",
+        "TiO2_gas",
     }
     assert set(legacy["foulant_vapor"]) == {
-        "C2H5OH", "C2H6", "CH3COOH", "CH4", "CO", "CO2", "COS", "CS2",
-        "CaCl2", "Cl2", "H2O", "H2S", "HCHO", "HCN", "HCl", "HNCO",
-        "K2Cl2", "KCl", "MgCl2", "NH3", "Na2Cl2", "NaCl", "NaF",
+        "C2H5OH",
+        "C2H6",
+        "CH3COOH",
+        "CH4",
+        "CO",
+        "CO2",
+        "COS",
+        "CS2",
+        "CaCl2",
+        "Cl2",
+        "H2O",
+        "H2S",
+        "HCHO",
+        "HCN",
+        "HCl",
+        "HNCO",
+        "K2Cl2",
+        "KCl",
+        "N2",
+        "NH3",
+        "Na2Cl2",
+        "NaCl",
+        "NaF",
+        "SO2",
     }
     assert "dormant_acquisition" in legacy
     # MC-4A promotes twenty Stage-0 overhead rows; 28 unrelated acquisition
     # leads remain dormant in the compatibility projection.
-    assert len(legacy["dormant_acquisition"]) == 28
+    # 27 after the wave-1 union: N2/NH3/SO2 activated per the owner ruling;
+    # MgCl2 joined dormant (NEEDS-BASE, no Stage-0 reservoir).
+    assert len(legacy["dormant_acquisition"]) == 27
 
 
 def test_legacy_runtime_antoine_coefficients_unchanged() -> None:
@@ -475,7 +510,9 @@ def test_runtime_evaluator_presence_excludes_unavailable_melt_psat() -> None:
     }
     for sid in expect_eval:
         assert catalog.species[sid].evaluator is not None
-    # Si's retained pure-component sidecar is not a valid melt-source answer;
-    # it remains unavailable until an activity-bearing reaction model lands.
-    assert catalog.species["Si"].evaluator is None
+    # 2026-08-05 MC-4 wave 1B: the activity-bearing Si standard-reaction model
+    # LANDED (equilibrium observable, activity exponent 1.0, pO2 exponent -1.0),
+    # so Si now carries a compiled evaluator — the condition this exclusion was
+    # waiting on is satisfied.
+    assert catalog.species["Si"].evaluator is not None
     assert catalog.species["NaF"].evaluator is None

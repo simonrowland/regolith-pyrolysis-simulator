@@ -265,8 +265,11 @@ def test_vaporock_full_speciation_stays_out_of_evaporation_flux(
 
     assert captured["vapor_pressures_Pa"] == result.vapor_pressures_Pa
     assert "O2" not in captured["vapor_pressures_Pa"]
-    assert "Si2" not in captured["vapor_pressures_Pa"]
-    assert "SiO2_gas" not in captured["vapor_pressures_Pa"]
+    # 2026-08-05 MC-4 wave 1B (a34318c): Si2/Si3/SiO2_gas are now composed
+    # builtin carriers, so the authoritative builtin map (and therefore the
+    # evaporation-flux handoff) legitimately contains them; the pre-wave
+    # "Si2"/"SiO2_gas" exclusion assertions are retired. The shadow-only
+    # exclusion contract survives for O2, which VapoRock alone reports.
 
 
 def test_vaporock_unavailable_no_flag_still_uses_builtin_authority(

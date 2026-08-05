@@ -314,10 +314,34 @@ species:
   source: Extra oxygen product key mapped to O2.
 - id: N2
   formula: N2
+  atoms:
+    N: 2.0
+  molar_mass_g_mol: 28.014
   basis: molecular_formula
-  category: gas
-  estimated: false
-  source: Stoichiometric molecular formula from species id.
+  category: volatile_gas
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: true
+  runtime_disposition: active_status_bearing_non_authoritative
+  validation:
+    status: pending_validation
+    certification_ceiling: never
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: analytical_non_authoritative
+    temperature_K:
+    - 20
+    - 35.61
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: active_stage0_carrier:N2
+  code_metadata:
+    formula_id: N2
+    canonical_aliases: []
+    request_rule: stage0_only
+    source_account: process.stage0_volatile_feed
+  source: Wave-1 grounded Stage-0 overhead/salt carrier; status-bearing and never certifying.
 - id: S2
   formula: S2
   basis: molecular_formula
@@ -326,10 +350,35 @@ species:
   source: Stoichiometric molecular formula from species id.
 - id: SO2
   formula: SO2
+  atoms:
+    S: 1.0
+    O: 2.0
+  molar_mass_g_mol: 64.058
   basis: molecular_formula
-  category: gas
-  estimated: false
-  source: Stoichiometric molecular formula from species id.
+  category: volatile_gas
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: true
+  runtime_disposition: active_status_bearing_non_authoritative
+  validation:
+    status: pending_validation
+    certification_ceiling: never
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: analytical_non_authoritative
+    temperature_K:
+    - 80
+    - 197.64
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: active_stage0_carrier:SO2
+  code_metadata:
+    formula_id: SO2
+    canonical_aliases: []
+    request_rule: stage0_only
+    source_account: process.stage0_salt_feed
+  source: Wave-1 grounded Stage-0 overhead/salt carrier; status-bearing and never certifying.
 - id: H2O
   formula: H2O
   basis: molecular_formula
@@ -366,12 +415,37 @@ species:
   source: Stoichiometric molecular formula from species id.
 - id: NH3
   formula: NH3
+  atoms:
+    N: 1.0
+    H: 3.0
+  molar_mass_g_mol: 17.031
   basis: molecular_formula
-  category: gas
-  estimated: false
+  category: volatile_gas
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: true
+  runtime_disposition: active_status_bearing_non_authoritative
   aliases:
   - NH3_kg_per_tonne
-  source: Stoichiometric molecular formula from species id.
+  validation:
+    status: pending_validation
+    certification_ceiling: never
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: analytical_non_authoritative
+    temperature_K:
+    - 95
+    - 195.36
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: active_stage0_carrier:NH3
+  code_metadata:
+    formula_id: NH3
+    canonical_aliases: []
+    request_rule: stage0_only
+    source_account: process.stage0_volatile_feed
+  source: Wave-1 grounded Stage-0 overhead/salt carrier; status-bearing and never certifying.
 - id: HCN
   formula: HCN
   basis: molecular_formula
@@ -413,16 +487,66 @@ species:
   source: NASA CEA cea_CrO2_gibbs gas polynomial composed with the existing CrO1.5 condensed rail.
 - id: NaCl
   formula: NaCl
+  atoms:
+    Na: 1.0
+    Cl: 1.0
+  molar_mass_g_mol: 58.43976928
   basis: molecular_formula
-  category: salt
-  estimated: false
-  source: Stoichiometric salt formula from species id.
+  category: salt_vapor
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: true
+  runtime_disposition: active_status_bearing_non_authoritative
+  validation:
+    status: pending_validation
+    certification_ceiling: never
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: analytical_non_authoritative
+    temperature_K:
+    - 1138
+    - 1738
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: active_stage0_carrier:NaCl
+  code_metadata:
+    formula_id: NaCl
+    canonical_aliases: []
+    request_rule: stage0_only
+    source_account: process.stage0_foulant
+  source: Wave-1 grounded Stage-0 overhead/salt carrier; status-bearing and never certifying.
 - id: KCl
   formula: KCl
+  atoms:
+    K: 1.0
+    Cl: 1.0
+  molar_mass_g_mol: 74.5483
   basis: molecular_formula
-  category: salt
-  estimated: false
-  source: Stoichiometric salt formula from species id.
+  category: salt_vapor
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: true
+  runtime_disposition: active_status_bearing_non_authoritative
+  validation:
+    status: pending_validation
+    certification_ceiling: never
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: analytical_non_authoritative
+    temperature_K:
+    - 1094
+    - 1680
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: active_stage0_carrier:KCl
+  code_metadata:
+    formula_id: KCl
+    canonical_aliases: []
+    request_rule: stage0_only
+    source_account: process.stage0_foulant
+  source: Wave-1 grounded Stage-0 overhead/salt carrier; status-bearing and never certifying.
 - id: CaF2
   formula: CaF2
   basis: mineral_formula
@@ -769,7 +893,8 @@ species:
     formula_id: Al2O
     canonical_aliases: []
     request_rule: source_inventory_present
-  source: NASA CEA cea_AL2O_gibbs gas polynomial + existing liquid-AlO1.5 rail; De Maria 1971 Table 4 anchor
+  source: NASA CEA cea_AL2O_gibbs gas polynomial + existing liquid-AlO1.5 rail; De Maria 1971 Table 4
+    anchor
 - id: Al2
   formula: Al2
   atoms:
@@ -1133,62 +1258,236 @@ species:
     collision_only_suffix: true
     request_rule: pending_family_compilation
   source: VR-1 U0 collision_gas membership set
+- id: K2
+  formula: K2
+  atoms:
+    K: 2.0
+  molar_mass_g_mol: 78.1966
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: true
+  runtime_disposition: active_status_bearing_non_authoritative
+  validation:
+    status: pending_validation
+    certification_ceiling: never
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: analytical_non_authoritative
+    temperature_K:
+    - 1190
+    - 1600
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: active_cea_composite_thermo:K2
+  code_metadata:
+    formula_id: K2
+    canonical_aliases: []
+    collision_only_suffix: false
+    request_rule: source_inventory_present
+    source_account: process.cleaned_melt
+  source: Wave-1 landed NASA CEA gas-exchange composition on the existing condensed-reservoir standard
+    reaction; status-bearing and never certifying.
+- id: Mg2
+  formula: Mg2
+  atoms:
+    Mg: 2.0
+  molar_mass_g_mol: 48.61
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: true
+  runtime_disposition: active_status_bearing_non_authoritative
+  validation:
+    status: pending_validation
+    certification_ceiling: never
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: analytical_non_authoritative
+    temperature_K:
+    - 1366
+    - 2273.15
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: active_cea_composite_thermo:Mg2
+  code_metadata:
+    formula_id: Mg2
+    canonical_aliases: []
+    collision_only_suffix: false
+    request_rule: source_inventory_present
+    source_account: process.cleaned_melt
+  source: Wave-1 landed NASA CEA gas-exchange composition on the existing condensed-reservoir standard
+    reaction; status-bearing and never certifying.
+- id: Na2
+  formula: Na2
+  atoms:
+    Na: 2.0
+  molar_mass_g_mol: 45.97953856
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: true
+  runtime_disposition: active_status_bearing_non_authoritative
+  validation:
+    status: pending_validation
+    certification_ceiling: never
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: analytical_non_authoritative
+    temperature_K:
+    - 1400
+    - 1900
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: active_cea_composite_thermo:Na2
+  code_metadata:
+    formula_id: Na2
+    canonical_aliases: []
+    collision_only_suffix: false
+    request_rule: source_inventory_present
+    source_account: process.cleaned_melt
+  source: Wave-1 landed NASA CEA gas-exchange composition on the existing condensed-reservoir standard
+    reaction; status-bearing and never certifying.
+- id: Si2
+  formula: Si2
+  atoms:
+    Si: 2.0
+  molar_mass_g_mol: 56.17
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: true
+  runtime_disposition: active_status_bearing_non_authoritative
+  validation:
+    status: pending_validation
+    certification_ceiling: never
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: analytical_non_authoritative
+    temperature_K:
+    - 1400
+    - 2273.15
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: active_cea_composite_thermo:Si2
+  code_metadata:
+    formula_id: Si2
+    canonical_aliases: []
+    collision_only_suffix: false
+    request_rule: source_inventory_present
+    source_account: process.cleaned_melt
+  source: Wave-1 landed NASA CEA gas-exchange composition on the existing condensed-reservoir standard
+    reaction; status-bearing and never certifying.
+- id: Si3
+  formula: Si3
+  atoms:
+    Si: 3.0
+  molar_mass_g_mol: 84.255
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: true
+  runtime_disposition: active_status_bearing_non_authoritative
+  validation:
+    status: pending_validation
+    certification_ceiling: never
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: analytical_non_authoritative
+    temperature_K:
+    - 1400
+    - 2273.15
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: active_cea_composite_thermo:Si3
+  code_metadata:
+    formula_id: Si3
+    canonical_aliases: []
+    collision_only_suffix: false
+    request_rule: source_inventory_present
+    source_account: process.cleaned_melt
+  source: Wave-1 landed NASA CEA gas-exchange composition on the existing condensed-reservoir standard
+    reaction; status-bearing and never certifying.
 - id: K2O_gas
   formula: K2O
   atoms:
-    K: 2
-    O: 1
+    K: 2.0
+    O: 1.0
+  molar_mass_g_mol: 94.1956
   basis: molecular_formula
   category: vapor_species
   phase: gas
   catalog_role: gas
-  direct_vapour_flux: false
+  direct_vapour_flux: true
   formula_alias: K2O
+  runtime_disposition: active_status_bearing_non_authoritative
   validation:
     status: pending_validation
+    certification_ceiling: never
     anchor_refs: []
   pressure_observable: equilibrium_partial_pressure
   valid_domain:
-    status: pending_acquisition
-    temperature_K: null
+    status: analytical_non_authoritative
+    temperature_K:
+    - 1190
+    - 1600
   extrapolation_policy: conservative_slope_continuation
   out_of_range_status: out_of_range_conservative_continuation
-  acquisition_flag: vapour_pressure_pending_acquisition:K2O_gas
+  acquisition_flag: active_cea_composite_thermo:K2O_gas
   code_metadata:
     formula_id: K2O
     canonical_aliases:
     - K2O
-    collision_only_suffix: true
-    request_rule: pending_family_compilation
-  source: VR-1 U0 collision_gas membership set
+    collision_only_suffix: false
+    request_rule: source_inventory_present
+    source_account: process.cleaned_melt
+  source: Wave-1 landed NASA CEA gas-exchange composition on the existing condensed-reservoir standard
+    reaction; status-bearing and never certifying.
 - id: MgO_gas
   formula: MgO
   atoms:
-    Mg: 1
-    O: 1
+    Mg: 1.0
+    O: 1.0
+  molar_mass_g_mol: 40.304
   basis: molecular_formula
   category: vapor_species
   phase: gas
   catalog_role: gas
-  direct_vapour_flux: false
+  direct_vapour_flux: true
   formula_alias: MgO
+  runtime_disposition: active_status_bearing_non_authoritative
   validation:
     status: pending_validation
+    certification_ceiling: never
     anchor_refs: []
   pressure_observable: equilibrium_partial_pressure
   valid_domain:
-    status: pending_acquisition
-    temperature_K: null
+    status: analytical_non_authoritative
+    temperature_K:
+    - 1366
+    - 2273.15
   extrapolation_policy: conservative_slope_continuation
   out_of_range_status: out_of_range_conservative_continuation
-  acquisition_flag: vapour_pressure_pending_acquisition:MgO_gas
+  acquisition_flag: active_cea_composite_thermo:MgO_gas
   code_metadata:
     formula_id: MgO
     canonical_aliases:
     - MgO
-    collision_only_suffix: true
-    request_rule: pending_family_compilation
-  source: VR-1 U0 collision_gas membership set
+    collision_only_suffix: false
+    request_rule: source_inventory_present
+    source_account: process.cleaned_melt
+  source: Wave-1 landed NASA CEA gas-exchange composition on the existing condensed-reservoir standard
+    reaction; status-bearing and never certifying.
 - id: MnO_gas
   formula: MnO
   atoms:
@@ -1220,31 +1519,38 @@ species:
 - id: Na2O_gas
   formula: Na2O
   atoms:
-    Na: 2
-    O: 1
+    Na: 2.0
+    O: 1.0
+  molar_mass_g_mol: 61.97853856
   basis: molecular_formula
   category: vapor_species
   phase: gas
   catalog_role: gas
-  direct_vapour_flux: false
+  direct_vapour_flux: true
   formula_alias: Na2O
+  runtime_disposition: active_status_bearing_non_authoritative
   validation:
     status: pending_validation
+    certification_ceiling: never
     anchor_refs: []
   pressure_observable: equilibrium_partial_pressure
   valid_domain:
-    status: pending_acquisition
-    temperature_K: null
+    status: analytical_non_authoritative
+    temperature_K:
+    - 1400
+    - 1900
   extrapolation_policy: conservative_slope_continuation
   out_of_range_status: out_of_range_conservative_continuation
-  acquisition_flag: vapour_pressure_pending_acquisition:Na2O_gas
+  acquisition_flag: active_cea_composite_thermo:Na2O_gas
   code_metadata:
     formula_id: Na2O
     canonical_aliases:
     - Na2O
-    collision_only_suffix: true
-    request_rule: pending_family_compilation
-  source: VR-1 U0 collision_gas membership set
+    collision_only_suffix: false
+    request_rule: source_inventory_present
+    source_account: process.cleaned_melt
+  source: Wave-1 landed NASA CEA gas-exchange composition on the existing condensed-reservoir standard
+    reaction; status-bearing and never certifying.
 - id: NiO_gas
   formula: NiO
   atoms:
@@ -1300,7 +1606,8 @@ species:
     collision_only_suffix: true
     request_rule: not_applicable_retired_legacy_placeholder
     hot_train_applicability: not_applicable
-  source: b-108 retired collision-gas placeholder; exact CEA species.P2O5 gas thermo exists but this legacy ID is not a selected melt carrier
+  source: b-108 retired collision-gas placeholder; exact CEA species.P2O5 gas thermo exists but this legacy
+    ID is not a selected melt carrier
   not_substitutable_for:
   - PO
   - PO2
@@ -1308,35 +1615,43 @@ species:
   - P4O10
   - P2
   - P4
-  notes: 'Retired from flux. Exact-key P2O5 CEA thermo does not reactivate this legacy namespace or let it substitute for selected P carriers (PO/PO2/P4On/P2/P4).'
+  notes: Retired from flux. Exact-key P2O5 CEA thermo does not reactivate this legacy namespace or let
+    it substitute for selected P carriers (PO/PO2/P4On/P2/P4).
 - id: SiO2_gas
   formula: SiO2
   atoms:
-    Si: 1
-    O: 2
+    Si: 1.0
+    O: 2.0
+  molar_mass_g_mol: 60.083
   basis: molecular_formula
   category: vapor_species
   phase: gas
   catalog_role: gas
-  direct_vapour_flux: false
+  direct_vapour_flux: true
   formula_alias: SiO2
+  runtime_disposition: active_status_bearing_non_authoritative
   validation:
     status: pending_validation
+    certification_ceiling: never
     anchor_refs: []
   pressure_observable: equilibrium_partial_pressure
   valid_domain:
-    status: pending_acquisition
-    temperature_K: null
+    status: analytical_non_authoritative
+    temperature_K:
+    - 1400
+    - 2273.15
   extrapolation_policy: conservative_slope_continuation
   out_of_range_status: out_of_range_conservative_continuation
-  acquisition_flag: vapour_pressure_pending_acquisition:SiO2_gas
+  acquisition_flag: active_cea_composite_thermo:SiO2_gas
   code_metadata:
     formula_id: SiO2
     canonical_aliases:
     - SiO2
-    collision_only_suffix: true
-    request_rule: pending_family_compilation
-  source: VR-1 U0 collision_gas membership set
+    collision_only_suffix: false
+    request_rule: source_inventory_present
+    source_account: process.cleaned_melt
+  source: Wave-1 landed NASA CEA gas-exchange composition on the existing condensed-reservoir standard
+    reaction; status-bearing and never certifying.
 - id: TiO2_gas
   formula: TiO2
   atoms:
@@ -1367,7 +1682,8 @@ species:
     - TiO2
     collision_only_suffix: false
     request_rule: source_inventory_present
-  source: NASA CEA cea_TiO2_gibbs gas polynomial + existing liquid-TiO2 rail; Stolyarova 2013 Table 1 carrier
+  source: NASA CEA cea_TiO2_gibbs gas polynomial + existing liquid-TiO2 rail; Stolyarova 2013 Table 1
+    carrier
 - id: 'NO'
   formula: 'NO'
   atoms:
@@ -1637,41 +1953,65 @@ species:
   atoms:
     Na: 2.0
     Cl: 2.0
+  molar_mass_g_mol: 116.87953856
   basis: molecular_formula
   category: association_dimer
   phase: gas
   catalog_role: vapour_species
-  direct_vapour_flux: false
+  direct_vapour_flux: true
+  runtime_disposition: active_status_bearing_non_authoritative
   validation:
     status: pending_validation
+    certification_ceiling: never
     anchor_refs: []
-  source: VR-7 dormant transcription (association_dimer)
+  pressure_observable: association_partial_pressure
+  valid_domain:
+    status: analytical_non_authoritative
+    temperature_K:
+    - 1138
+    - 1738
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: active_stage0_carrier:Na2Cl2
   code_metadata:
     formula_id: Na2Cl2
     canonical_aliases: []
-    request_rule: dormant_pending_validation
-    yaml_quote_species_id: false
+    request_rule: stage0_only
+    source_account: process.stage0_foulant
   association_polymer: true
+  source: Wave-1 grounded Stage-0 overhead/salt carrier; status-bearing and never certifying.
 - id: K2Cl2
   formula: K2Cl2
   atoms:
     K: 2.0
     Cl: 2.0
+  molar_mass_g_mol: 149.0966
   basis: molecular_formula
   category: association_dimer
   phase: gas
   catalog_role: vapour_species
-  direct_vapour_flux: false
+  direct_vapour_flux: true
+  runtime_disposition: active_status_bearing_non_authoritative
   validation:
     status: pending_validation
+    certification_ceiling: never
     anchor_refs: []
-  source: VR-7 dormant transcription (association_dimer)
+  pressure_observable: association_partial_pressure
+  valid_domain:
+    status: analytical_non_authoritative
+    temperature_K:
+    - 1094
+    - 1680
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: active_stage0_carrier:K2Cl2
   code_metadata:
     formula_id: K2Cl2
     canonical_aliases: []
-    request_rule: dormant_pending_validation
-    yaml_quote_species_id: false
+    request_rule: stage0_only
+    source_account: process.stage0_foulant
   association_polymer: true
+  source: Wave-1 grounded Stage-0 overhead/salt carrier; status-bearing and never certifying.
 - id: Mg2Cl4
   formula: Mg2Cl4
   atoms:
@@ -1722,7 +2062,9 @@ species:
   pressure_observable: equilibrium_partial_pressure
   valid_domain:
     status: analytical_cea_grounded_pending_validation
-    temperature_K: [699.0, 2500.0]
+    temperature_K:
+    - 699.0
+    - 2500.0
   extrapolation_policy: conservative_slope_continuation
   out_of_range_status: out_of_range_conservative_continuation
   acquisition_flag: active_cea_nasa9_reaction_thermo:PO
@@ -1757,7 +2099,9 @@ species:
   pressure_observable: equilibrium_partial_pressure
   valid_domain:
     status: analytical_cea_grounded_pending_validation
-    temperature_K: [699.0, 2500.0]
+    temperature_K:
+    - 699.0
+    - 2500.0
   extrapolation_policy: conservative_slope_continuation
   out_of_range_status: out_of_range_conservative_continuation
   acquisition_flag: active_cea_nasa9_reaction_thermo:PO2
@@ -1792,7 +2136,9 @@ species:
   pressure_observable: equilibrium_partial_pressure
   valid_domain:
     status: analytical_cea_grounded_pending_validation
-    temperature_K: [699.0, 2500.0]
+    temperature_K:
+    - 699.0
+    - 2500.0
   extrapolation_policy: conservative_slope_continuation
   out_of_range_status: out_of_range_conservative_continuation
   acquisition_flag: active_cea_nasa9_reaction_thermo:P4O6
@@ -1827,7 +2173,9 @@ species:
   pressure_observable: equilibrium_partial_pressure
   valid_domain:
     status: analytical_cea_grounded_pending_validation
-    temperature_K: [699.0, 2500.0]
+    temperature_K:
+    - 699.0
+    - 2500.0
   extrapolation_policy: conservative_slope_continuation
   out_of_range_status: out_of_range_conservative_continuation
   acquisition_flag: active_cea_nasa9_reaction_thermo:P4O10
@@ -1861,7 +2209,9 @@ species:
   pressure_observable: equilibrium_partial_pressure
   valid_domain:
     status: analytical_cea_grounded_pending_validation
-    temperature_K: [699.0, 2500.0]
+    temperature_K:
+    - 699.0
+    - 2500.0
   extrapolation_policy: conservative_slope_continuation
   out_of_range_status: out_of_range_conservative_continuation
   acquisition_flag: active_cea_nasa9_reaction_thermo:P2
@@ -1895,7 +2245,9 @@ species:
   pressure_observable: equilibrium_partial_pressure
   valid_domain:
     status: analytical_cea_grounded_pending_validation
-    temperature_K: [699.0, 2500.0]
+    temperature_K:
+    - 699.0
+    - 2500.0
   extrapolation_policy: conservative_slope_continuation
   out_of_range_status: out_of_range_conservative_continuation
   acquisition_flag: active_cea_nasa9_reaction_thermo:P4

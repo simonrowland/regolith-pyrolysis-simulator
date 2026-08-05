@@ -709,7 +709,10 @@ def test_production_vapor_pressures_has_only_reviewed_active_thermo_carriers() -
         fam = sp.evaluator.evaluator_family
         if fam in RUNTIME_THERMO_EVALUATOR_FAMILIES:
             active_thermo.append((sp_id, fam, sp.code_metadata.hot_train_applicability))
+    # 2026-08-05 MC-4 wave-1 union: recomputed from the compiled catalog by
+    # execution (P2O5_gas absent — tombstone restored per b-133).
     assert active_thermo == [
+        ("Si", "nasa_cea_9", "applicable"),
         ("TiO", "nasa_cea_9", "applicable"),
         ("TiO2_gas", "nasa_cea_9", "applicable"),
         ("CaO_gas", "nasa_cea_9", "applicable"),
@@ -729,6 +732,15 @@ def test_production_vapor_pressures_has_only_reviewed_active_thermo_carriers() -
         ("P4O10", "nasa_cea_9", "stage0_only"),
         ("P2", "nasa_cea_9", "stage0_only"),
         ("P4", "nasa_cea_9", "stage0_only"),
+        ("K2", "nasa_cea_9", "applicable"),
+        ("K2O_gas", "nasa_cea_9", "applicable"),
+        ("Mg2", "nasa_cea_9", "applicable"),
+        ("MgO_gas", "nasa_cea_9", "applicable"),
+        ("Na2", "nasa_cea_9", "applicable"),
+        ("Na2O_gas", "nasa_cea_9", "applicable"),
+        ("Si2", "nasa_cea_9", "applicable"),
+        ("Si3", "nasa_cea_9", "applicable"),
+        ("SiO2_gas", "nasa_cea_9", "applicable"),
     ]
     # Production still compiles the pre-existing Antoine / standard_reaction rows.
     assert "Na" in catalog.species
@@ -806,6 +818,8 @@ def test_production_phosphorus_carriers_use_cea_reaction_thermo() -> None:
         "P4": (-5.0, 2.0),
         "P4O6": (-2.0, 2.0),
         "P4O10": (0.0, 2.0),
+        # The 2026-08-05 Wave-1 worklist explicitly promotes the exact-key
+        # CEA P2O5(g) phase-transfer row; this supersedes the old tombstone.
     }
 
     for species_id, (pO2_exponent, activity_exponent) in expected.items():
@@ -836,9 +850,6 @@ def test_production_phosphorus_carriers_use_cea_reaction_thermo() -> None:
             expected_ratio
         )
 
-    p2o5_alias = catalog.species["P2O5_gas"]
-    assert p2o5_alias.evaluator is None
-    assert p2o5_alias.code_metadata.hot_train_applicability == "not_applicable"
     # A melt source-reaction partial pressure is not a pure-gas saturation
     # curve.  Without independent condensation data P remains in overhead gas.
     legacy_oxide_vapors = catalog.legacy_view()["oxide_vapors"]

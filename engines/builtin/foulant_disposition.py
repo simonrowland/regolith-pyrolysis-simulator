@@ -144,16 +144,29 @@ def _load_vapor_pressures(path: Path | None = None) -> Mapping[str, Any]:
     return vapor_pressure_legacy_view(payload)
 
 
-def _compiled_pressure_evaluator(carrier_key: str, path: Path | None = None):
-    yaml_path = path or _DEFAULT_VAPOR_PRESSURES_PATH
-    with yaml_path.open(encoding="utf-8") as handle:
+def _compiled_carrier_pressure(
+    carrier_key: str,
+    temperature_K: float,
+) -> tuple[float, tuple[float, float], str | None]:
+    with _DEFAULT_VAPOR_PRESSURES_PATH.open(encoding="utf-8") as handle:
         payload = yaml.safe_load(handle) or {}
     from simulator.vapour_rail.catalog import compiled_catalog_for
 
-    return compiled_catalog_for(
-        payload,
-        emit_u0_request_rules=False,
-    ).evaluator_for(carrier_key)
+    catalog = compiled_catalog_for(payload)
+    species = catalog.species.get(carrier_key)
+    if species is None or species.evaluator is None:
+        raise KeyError(f"compiled vapor-pressure row missing for carrier {carrier_key!r}")
+    evaluator = species.evaluator
+    evaluation = evaluator.evaluate(
+        temperature_K,
+        source_activity=1.0,
+        pO2_bar=evaluator.pO2_reference_bar,
+    )
+    return (
+        evaluation.pressure_pa,
+        evaluator.valid_temperature_K,
+        evaluation.status,
+    )
 
 
 def chi_escape_salt(
@@ -167,10 +180,7 @@ def chi_escape_salt(
     vapor_data = _load_vapor_pressures()
     foulant_vapor = vapor_data.get("foulant_vapor", {}) or {}
     entry = foulant_vapor.get(carrier_key)
-    if entry is None:
-        raise KeyError(f"foulant_vapor row missing for carrier {carrier_key!r}")
-
-    if entry.get("interval_required"):
+    if entry is not None and entry.get("interval_required"):
         return EscapeSplit(
             escaped_frac=0.0,
             retained_frac=1.0,
@@ -180,21 +190,27 @@ def chi_escape_salt(
         )
 
     temperature_K = float(T_C) + 273.15
-    if entry.get("pure_component_antoine"):
-        valid_range = _valid_range_K(entry)
+    try:
+        if entry is None:
+            raise KeyError("foulant_vapor")
         p_sat_pa = _pure_component_antoine_pa(entry, temperature_K)
-    else:
-        compiled_evaluator = _compiled_pressure_evaluator(carrier_key)
-        valid_range = compiled_evaluator.valid_temperature_K
-        p_sat_pa = compiled_evaluator.evaluate(
+        warning = _temperature_range_warning(
+            carrier_key,
             temperature_K,
-            source_activity=1.0,
-        ).pressure_pa
-    warning = _temperature_range_warning(
-        carrier_key,
-        temperature_K,
-        valid_range,
-    )
+            _valid_range_K(entry),
+        )
+    except KeyError:
+        p_sat_pa, valid_range, compiled_status = _compiled_carrier_pressure(
+            carrier_key,
+            temperature_K,
+        )
+        warning = _temperature_range_warning(
+            carrier_key,
+            temperature_K,
+            valid_range,
+        )
+        if warning is None and compiled_status:
+            warning = str(compiled_status)
     p_total_pa = float(p_overhead_bar) * PA_PER_BAR
     if p_sat_pa < 0.0 or p_total_pa < 0.0:
         raise ValueError("pressures must be non-negative")

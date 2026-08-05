@@ -45,7 +45,15 @@ COLLISION_GASES = {
     "SiO2_gas",
     "TiO2_gas",
 }
-ACTIVE_COLLISION_GASES = {"Al2O3_gas", "CaO_gas", "TiO2_gas"}
+ACTIVE_COLLISION_GASES = {
+    "Al2O3_gas",
+    "CaO_gas",
+    "K2O_gas",
+    "MgO_gas",
+    "Na2O_gas",
+    "SiO2_gas",
+    "TiO2_gas",
+}
 CARRIER_ONLY = {
     "CH4_NH3_HCN",
     "CO_CH4_propellant",
@@ -264,8 +272,22 @@ def test_production_schema_compiles_exact_four_strata_and_legacy_projection() ->
     assert len(legacy["metals"]) == 10
     # The oxide, phosphorus, and MC-4 systematic-carrier chunks intentionally
     # activate twenty carriers through the pre-RG compatibility seam.
-    assert len(legacy["oxide_vapors"]) == 20
-    assert len(legacy["foulant_vapor"]) == 23
+    # 2026-08-05 MC-4 wave-1 integration: the union of wave A (Al/C/Ca/Cl/
+    # Cr/Fe/H) and wave B (K/Mg/N/Na/P/S/Si) carriers projects 30 oxide-vapor
+    # rows through the pre-RG compatibility seam (20 from A alone; +10 exact
+    # CEA-composed K2O/MgO/Na2O/P2O5/SiO2-class carriers from B).
+    assert len(legacy["oxide_vapors"]) == 29  # 29 after the P2O5_gas tombstone restore
+    # 2026-08-05 MC-4 integration: the A+B union projects 24 foulant rows
+    # (wave A adds the CaCl2/Cl-family foulant carriers; wave B the chloride
+    # dimers) — one more than either wave alone pinned.
+    assert len(legacy["foulant_vapor"]) == 24
+    # MC-4b adds ten exact CEA-composed K/Mg/Na/P/Si carriers through the
+    # same oxide-vapor compatibility seam. Each is independently listed;
+    # the parent ledger still performs one grouped reservoir debit.
+    # MC-4b activates five previously catalog-only Stage-0 overhead carriers:
+    # N2, NH3, SO2, and the K/Na salt dimers. MgCl2 remains NEEDS-BASE because
+    # no runtime Stage-0 MgCl2 reservoir exists. (The B-side ==8 foulant pin
+    # was superseded by the A+B union count asserted above.)
     assert set(legacy["metals"]) == {
         "Na",
         "K",
@@ -299,7 +321,20 @@ def test_production_schema_compiles_exact_four_strata_and_legacy_projection() ->
         "P4",
         "P4O6",
         "P4O10",
+        "K2",
+        "K2O_gas",
+        "Mg2",
+        "MgO_gas",
+        "Na2",
+        "Na2O_gas",
+        "Si2",
+        "Si3",
+        "SiO2_gas",
     }
+    # 2026-08-05 MC-4 integration: wave A deliberately projects all Stage-0
+    # overhead species (volatiles/organics included) through the foulant_vapor
+    # compatibility group; the curated salt-only membership B pinned is
+    # superseded by the A+B union view.
     assert set(legacy["foulant_vapor"]) == {
         "C2H5OH",
         "C2H6",
@@ -319,12 +354,14 @@ def test_production_schema_compiles_exact_four_strata_and_legacy_projection() ->
         "HNCO",
         "K2Cl2",
         "KCl",
-        "MgCl2",
+        "N2",
         "NH3",
         "Na2Cl2",
         "NaCl",
         "NaF",
+        "SO2",
     }
+    # (duplicate B-side membership pin superseded by the union set above)
     assert legacy["metals"]["K"]["antoine"]["A"] == pytest.approx(10.641294)
     # Activity-corrected schema-v2 models must not leak into the legacy
     # projection that still feeds the pre-RG equilibrium-backend seam.

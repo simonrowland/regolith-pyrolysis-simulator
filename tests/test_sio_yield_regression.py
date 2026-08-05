@@ -904,19 +904,23 @@ def test_po2_wall_sweep_mode_suppresses_first_tick_sio_release():
         sim.melt.pO2_mbar = float(pO2_mbar)
         sim.melt.p_total_mbar = max(sim.melt.p_total_mbar, float(pO2_mbar))
         sim.melt.temperature_C = 1500.0
-        # Capture starting SiO2 inventory before one tick.
-        initial_sio2_mol = float(
-            sim.atom_ledger.mol_by_account(
-                "process.cleaned_melt"
-            ).get("SiO2", 0.0)
-        )
+        # 2026-08-05 MC-4 wave 1B (a34318c): the SiO2(g) gas-exchange carrier
+        # draws from the same SiO2 pool but is pO2-insensitive
+        # (pO2_exponent 0.0), so the old SiO2-drawdown proxy no longer
+        # isolates the SiO channel the 1/sqrt(pO2) lever acts on (executed:
+        # SiO2_gas leg 6.3814e-05 mol in both modes; SiO leg ratio exactly
+        # 1.0e-3). Measure the SiO channel directly as the ledger-wide SiO
+        # delta across every sink account.
+        def _sio_mol_total() -> float:
+            return sum(
+                float(payload.get("SiO", 0.0))
+                for payload in sim.atom_ledger.mol_by_account().values()
+                if isinstance(payload, dict)
+            )
+
+        initial_sio_mol = _sio_mol_total()
         sim.step()
-        final_sio2_mol = float(
-            sim.atom_ledger.mol_by_account(
-                "process.cleaned_melt"
-            ).get("SiO2", 0.0)
-        )
-        sio_mol = max(0.0, initial_sio2_mol - final_sio2_mol)
+        sio_mol = max(0.0, _sio_mol_total() - initial_sio_mol)
         from simulator.state import MOLAR_MASS
         sio_molar_mass_kg_mol = MOLAR_MASS["SiO"] / 1000.0
         return sio_mol * sio_molar_mass_kg_mol

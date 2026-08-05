@@ -464,6 +464,13 @@ STAGE0_CHLORIDE_SALT_ACCOUNT = 'terminal.stage0_chloride_salt_phase'
 STAGE0_CHLORIDE_SALT_DISPOSITION = (
     'separated_chloride_salt_fouling_risk'
 )
+# Competing Stage-0 vapor channels keyed by the authentic condensed salt
+# reservoir.  Association carriers share their monomer reservoir and are
+# normalized as one group before any ledger debit (the b-134 sum-once rule).
+STAGE0_FOULANT_CARRIERS_BY_SOURCE = {
+    'KCl': ('KCl', 'K2Cl2'),
+    'NaCl': ('NaCl', 'Na2Cl2'),
+}
 STAGE0_CARBONATE_COMPONENTS = frozenset({
     'carbonate', 'carbonates', 'carbonate_salts',
     'mgco3', 'caco3', 'feco3', 'na2co3', 'k2co3',
@@ -560,6 +567,11 @@ FLOW_MASS_EXCLUDED_ACCOUNTS = (
     'process.stage0_perchlorate_feed',
     'process.stage0_salt_feed',
     'process.stage0_volatile_feed',
+    # 2026-08-05 MC-4 wave 1B: Stage-0 foulant staging account (seeded from
+    # feedstock, debited by the kernel-committed volatilization transitions
+    # to terminal.offgas) -- same transient-staging exclusion as its
+    # stage0_*_feed siblings above.
+    'process.stage0_foulant',
 )
 BACKEND_REACTIVE_ACCOUNTS = (
     'process.cleaned_melt',
@@ -7245,6 +7257,203 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_native_fe_saturation_event = dict(event)
         return {**split, 'native_fe_partition': dict(partition), **event}
 
+    def _stage0_foulant_transition_plan(
+        self,
+        source_inventory_kg: Mapping[str, float],
+    ) -> tuple[list[dict[str, Any]], Dict[str, float], Dict[str, float]]:
+        """Allocate competing salt-vapor channels against each source once."""
+
+        retained = {
+            str(species): float(kg)
+            for species, kg in source_inventory_kg.items()
+            if float(kg) > 1.0e-12
+        }
+        allowed_carriers = {
+            carrier
+            for carriers in STAGE0_FOULANT_CARRIERS_BY_SOURCE.values()
+            for carrier in carriers
+        }
+        grouped: dict[str, list[dict[str, Any]]] = {}
+        for diagnostic in self._stage0_foulant_diagnostics:
+            if diagnostic.get('reaction_family') != 'volatilization':
+                continue
+            carrier = str(diagnostic.get('carrier') or '')
+            source_species = str(diagnostic.get('source_species') or '')
+            if carrier not in allowed_carriers or source_species not in retained:
+                continue
+            requested_kg = max(
+                0.0,
+                float(diagnostic.get('escaped_source_kg') or 0.0),
+            )
+            if requested_kg <= 1.0e-12:
+                continue
+            grouped.setdefault(source_species, []).append({
+                'diagnostic': diagnostic,
+                'carrier': carrier,
+                'source_species': source_species,
+                'source_stoichiometry': float(
+                    diagnostic.get('source_stoichiometry') or 1.0
+                ),
+                'carrier_stoichiometry': float(
+                    diagnostic.get('carrier_stoichiometry') or 1.0
+                ),
+                'feed_kg': float(diagnostic.get('feed_kg') or 0.0),
+                'requested_source_kg': requested_kg,
+            })
+
+        specs: list[dict[str, Any]] = []
+        offgas_kg: Dict[str, float] = {}
+        for source_species, rows in grouped.items():
+            available_kg = float(retained.get(source_species, 0.0))
+            requested_total_kg = sum(
+                float(row['requested_source_kg']) for row in rows
+            )
+            if available_kg <= 1.0e-12 or requested_total_kg <= 1.0e-12:
+                continue
+            allocation_scale = min(1.0, available_kg / requested_total_kg)
+            transferred_total_kg = 0.0
+            source_formula = resolve_species_formula(
+                source_species, self.species_formula_registry
+            )
+            for row in rows:
+                transferred_source_kg = (
+                    float(row['requested_source_kg']) * allocation_scale
+                )
+                if transferred_source_kg <= 1.0e-12:
+                    continue
+                source_nu = float(row['source_stoichiometry'])
+                carrier_nu = float(row['carrier_stoichiometry'])
+                extent_mol = (
+                    transferred_source_kg
+                    / source_formula.molar_mass_kg_per_mol()
+                    / source_nu
+                )
+                carrier = str(row['carrier'])
+                carrier_formula = resolve_species_formula(
+                    carrier, self.species_formula_registry
+                )
+                product_kg = (
+                    extent_mol
+                    * carrier_nu
+                    * carrier_formula.molar_mass_kg_per_mol()
+                )
+                transferred_total_kg += transferred_source_kg
+                offgas_kg[carrier] = offgas_kg.get(carrier, 0.0) + product_kg
+                specs.append({
+                    **row,
+                    'source_account': 'process.stage0_foulant',
+                    'transferred_source_kg': transferred_source_kg,
+                    'product_kg': product_kg,
+                    'allocation_scale': allocation_scale,
+                })
+            remaining_kg = available_kg - transferred_total_kg
+            if remaining_kg > 1.0e-12:
+                retained[source_species] = remaining_kg
+            else:
+                retained.pop(source_species, None)
+        return specs, retained, offgas_kg
+
+    @staticmethod
+    def _stage0_direct_volatile_transition_plan(
+        terminal_offgas_external: Mapping[str, float],
+    ) -> tuple[list[dict[str, Any]], Dict[str, float]]:
+        """Route direct N/S volatile feeds through the kernel, not seeding."""
+
+        remaining = {
+            str(species): float(kg)
+            for species, kg in terminal_offgas_external.items()
+            if float(kg) > 1.0e-12
+        }
+        specs: list[dict[str, Any]] = []
+        for species in ('N2', 'NH3', 'SO2'):
+            kg = float(remaining.pop(species, 0.0))
+            if kg <= 1.0e-12:
+                continue
+            specs.append({
+                'carrier': species,
+                'source_species': species,
+                'source_stoichiometry': 1.0,
+                'carrier_stoichiometry': 1.0,
+                'feed_kg': kg,
+                'requested_source_kg': kg,
+                'transferred_source_kg': kg,
+                'product_kg': kg,
+                'allocation_scale': 1.0,
+                'source_account': 'process.stage0_volatile_feed',
+                'diagnostic': None,
+            })
+        return specs, remaining
+
+    def _record_stage0_volatilization_transitions(
+        self,
+        label: str,
+        specs: list[dict[str, Any]],
+    ) -> None:
+        """Commit normalized Stage-0 phase transfers through ``commit_batch``.
+
+        The ``load_external`` call is kept here for legacy seeding
+        semantics (process.stage0_foulant / process.stage0_volatile_feed)
+        -- bringing source mass IN from the feedstock inventory is distinct
+        from the chemistry-transition payload the kernel commits.  Same
+        seed-time pattern as the ``_record_stage0_*`` siblings; whitelisted
+        in tests/chemistry/test_writer_purity.py.
+        """
+
+        from engines.builtin.stage0_pretreatment import (
+            REACTION_FAMILY_VOLATILIZATION,
+        )
+
+        source_payloads: dict[str, Dict[str, float]] = {}
+        for spec in specs:
+            account = str(spec['source_account'])
+            species = str(spec['source_species'])
+            payload = source_payloads.setdefault(account, {})
+            payload[species] = payload.get(species, 0.0) + float(
+                spec['transferred_source_kg']
+            )
+        for account, payload in source_payloads.items():
+            self.atom_ledger.load_external(
+                account,
+                payload,
+                source=f'{label} Stage 0 normalized volatile source',
+                material_origin='feedstock',
+            )
+
+        phase_specs = self._foulant_volatilization_phase_specs()
+        for spec in specs:
+            result = self._dispatch_and_commit(
+                ChemistryIntent.STAGE0_PRETREATMENT,
+                control_inputs={
+                    'reaction_family': REACTION_FAMILY_VOLATILIZATION,
+                    'carrier': str(spec['carrier']),
+                    'source_species': str(spec['source_species']),
+                    'source_stoichiometry': float(
+                        spec['source_stoichiometry']
+                    ),
+                    'carrier_stoichiometry': float(
+                        spec['carrier_stoichiometry']
+                    ),
+                    'source_account': str(spec['source_account']),
+                    'feed_kg': float(spec['feed_kg']),
+                    'escaped_source_kg_override': float(
+                        spec['transferred_source_kg']
+                    ),
+                    'phase_specs': phase_specs,
+                    'foulant_registry': self._load_foulant_registry_cached(),
+                    'foulant_thermo_path': str(self._foulant_thermo_path()),
+                },
+            )
+            diagnostic = spec.get('diagnostic')
+            if isinstance(diagnostic, dict):
+                diagnostic.update({
+                    'allocation_scale': float(spec['allocation_scale']),
+                    'committed_source_kg': float(
+                        spec['transferred_source_kg']
+                    ),
+                    'committed_product_kg': float(spec['product_kg']),
+                    'transition_committed': result.transition is not None,
+                })
+
     def _seed_atom_ledger(
         self,
         feedstock_key: str,
@@ -7315,20 +7524,45 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         perchlorate_salt_kg: Dict[str, float] = {}
         for spec in perchlorate_specs:
             self._merge_masses(perchlorate_salt_kg, spec['salt_products_kg'])
+        chloride_external_before_foulant = self._subtract_species_kg(
+            self.inventory.chloride_salt_phase_kg,
+            perchlorate_salt_kg,
+            context=f'{label} Stage 0 chloride salt products',
+        )
+        (
+            foulant_specs,
+            terminal_chloride_external,
+            foulant_offgas_kg,
+        ) = self._stage0_foulant_transition_plan(
+            chloride_external_before_foulant
+        )
+        if foulant_specs:
+            self.inventory.chloride_salt_phase_kg = dict(
+                terminal_chloride_external
+            )
+            self._merge_masses(
+                self.inventory.chloride_salt_phase_kg,
+                perchlorate_salt_kg,
+            )
+            self._merge_masses(
+                self.inventory.gas_volatiles_kg,
+                foulant_offgas_kg,
+            )
         generated_offgas_kg = dict(oxidized_offgas_kg)
         self._merge_masses(generated_offgas_kg, carbon_offgas_kg)
         self._merge_masses(generated_offgas_kg, carbonate_offgas_kg)
+        self._merge_masses(generated_offgas_kg, foulant_offgas_kg)
         terminal_offgas_external = self._subtract_species_kg(
             self.inventory.gas_volatiles_kg,
             generated_offgas_kg,
             context=f'{label} Stage 0 oxidation products',
         )
-        terminal_salt_external = dict(self.inventory.salt_phase_kg)
-        terminal_chloride_external = self._subtract_species_kg(
-            self.inventory.chloride_salt_phase_kg,
-            perchlorate_salt_kg,
-            context=f'{label} Stage 0 chloride salt products',
+        direct_volatile_specs, terminal_offgas_external = (
+            self._stage0_direct_volatile_transition_plan(
+                terminal_offgas_external
+            )
         )
+        terminal_salt_external = dict(self.inventory.salt_phase_kg)
         kernel_credited_melt_kg = dict(carbonate_oxide_kg)
         self._merge_masses(kernel_credited_melt_kg, cation_sulfate_oxide_kg)
         terminal_melt_external = self._subtract_species_kg(
@@ -7420,6 +7654,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._record_stage0_carbon_cleanup_transitions(label, carbon_specs)
         self._record_stage0_perchlorate_cleanup_transitions(
             label, perchlorate_specs)
+        self._record_stage0_volatilization_transitions(
+            label,
+            [*foulant_specs, *direct_volatile_specs],
+        )
         # SULFUR_SATURATION_GATE — Stage 0 hook. Refines the sulfate /
         # sulfide partitioning diagnostic when PySulfSat is available;
         # otherwise records an 'unavailable' result so the builtin Stage
@@ -10659,27 +10897,44 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             for carrier_name, split_kg, basis in self._expand_chloride_foulant_feed(
                 component, feed_kg, feedstock,
             ):
-                carrier_key = self._resolve_foulant_carrier_key(carrier_name)
-                if carrier_key is None:
-                    continue
-                entry = foulant_registry.carriers.get(carrier_key)
-                if entry is None or entry.reaction_family != "volatilization":
-                    continue
-                diag = self._dispatch_stage0_foulant_diagnostic({
-                    **common,
-                    "reaction_family": REACTION_FAMILY_VOLATILIZATION,
-                    "carrier": entry.carrier_key,
-                    "feed_kg": split_kg,
-                    "source_component": component,
-                    **basis,
-                    "phase_specs": phase_specs,
-                })
-                if diag is not None:
-                    diag.update({
+                systematic_carriers = STAGE0_FOULANT_CARRIERS_BY_SOURCE.get(
+                    carrier_name
+                )
+                carrier_ids = systematic_carriers or (carrier_name,)
+                for carrier_id in carrier_ids:
+                    carrier_key = self._resolve_foulant_carrier_key(carrier_id)
+                    if carrier_key is None:
+                        carrier_key = carrier_id
+                    entry = foulant_registry.carriers.get(carrier_key)
+                    if (
+                        entry is not None
+                        and entry.reaction_family != "volatilization"
+                    ):
+                        continue
+                    # Missing legacy foulant rows are permitted only for the
+                    # explicit systematic carrier fan-out above.  Their
+                    # pressure comes from the compiled four-strata catalog.
+                    if (
+                        entry is None
+                        and systematic_carriers is None
+                    ):
+                        continue
+                    diag = self._dispatch_stage0_foulant_diagnostic({
+                        **common,
+                        "reaction_family": REACTION_FAMILY_VOLATILIZATION,
+                        "carrier": carrier_key,
+                        "source_species": carrier_name,
+                        "feed_kg": split_kg,
                         "source_component": component,
                         **basis,
+                        "phase_specs": phase_specs,
                     })
-                    self._stage0_foulant_diagnostics.append(diag)
+                    if diag is not None:
+                        diag.update({
+                            "source_component": component,
+                            **basis,
+                        })
+                        self._stage0_foulant_diagnostics.append(diag)
 
         for component, feed_kg in (carrier_snapshot.get("salt_phase") or {}).items():
             key = self._normalized_component_key(component)

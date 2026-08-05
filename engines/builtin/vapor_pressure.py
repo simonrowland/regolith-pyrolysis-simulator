@@ -1001,9 +1001,16 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             vapor_pressure_legacy_view,
         )
 
-        self._vapour_rail_catalog = (
-            compile_vapour_rail_catalog(vapor_pressure_data)
+        compatibility_payload = getattr(vapor_pressure_data, "catalog_payload", None)
+        catalog_payload = (
+            vapor_pressure_data
             if vapor_pressure_data.get("schema_version") == 2
+            else compatibility_payload
+        )
+        self._vapour_rail_catalog = (
+            compile_vapour_rail_catalog(catalog_payload)
+            if isinstance(catalog_payload, Mapping)
+            and catalog_payload.get("schema_version") == 2
             else None
         )
         self._vapor_pressure_data = vapor_pressure_legacy_view(vapor_pressure_data)
@@ -1145,6 +1152,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             coefficient_block: str | None = None
             P_reference_Pa: float | None = None
             reconstructed_vapor_limit: dict[str, Any] | None = None
+            compiled_reference_evaluator = None
             if not gas_standard_rail and liquid_rxn_early is None:
                 compiled_reference_Pa: float | None = None
                 antoine, coefficient_block = vapor_pressure_antoine_coefficients(
@@ -1154,9 +1162,15 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 if (
                     fit_target == FIT_TARGET_STANDARD_REACTION
                     and self._vapour_rail_catalog is not None
-                    and not antoine
+                    and (
+                        not antoine
+                        or bool(
+                            sp_data.get("prefer_compiled_reference_pressure_model")
+                        )
+                    )
                 ):
                     evaluator = self._vapour_rail_catalog.evaluator_for(species)
+                    compiled_reference_evaluator = evaluator
                     # This is the declared standard-reaction reference point,
                     # not a live melt evaluation. Make both neutral inputs
                     # explicit so activity/fO2 can never default silently.
@@ -1242,10 +1256,14 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         T_K,
                         consumer="builtin_condensed_rail",
                     )
-                    valid_range = vapor_pressure_valid_range_K(
-                        sp_data,
-                        coefficient_block,
-                        temperature_K=T_K,
+                    valid_range = (
+                        compiled_reference_evaluator.valid_temperature_K
+                        if compiled_reference_evaluator is not None
+                        else vapor_pressure_valid_range_K(
+                            sp_data,
+                            coefficient_block,
+                            temperature_K=T_K,
+                        )
                     )
                     if valid_range and len(valid_range) == 2:
                         valid_low = float(valid_range[0])
@@ -1276,12 +1294,18 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
 
             if _fit_target(sp_data) == FIT_TARGET_STANDARD_REACTION:
                 assert P_reference_Pa is not None
+                retain_analytical_channel = bool(
+                    sp_data.get("retain_analytical_pressure_channel", False)
+                )
                 oxide_activity = melt_oxide_activity(
                     parent_oxide,
                     melt_account_mol,
                     temperature_K=(T_K if parent_oxide == "P2O5" else None),
                 )
-                if oxide_activity is None or oxide_activity.activity <= 1e-10:
+                if oxide_activity is None or oxide_activity.activity <= 0.0 or (
+                    not retain_analytical_channel
+                    and oxide_activity.activity <= 1e-10
+                ):
                     continue
                 if oxide_activity.warning:
                     warnings.append(oxide_activity.warning)
@@ -1327,7 +1351,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         f"{gamma_auth['gamma_domain_K'][1]:g}] at "
                         f"{T_K:.2f} K (constant-gamma UNCERTIFIED)"
                     )
-                if P_eq_Pa > 1e-15:
+                if P_eq_Pa > 0.0 and (
+                    retain_analytical_channel or P_eq_Pa > 1e-15
+                ):
                     vapor_pressures[species] = P_eq_Pa
                     source_label = vapor_pressure_source_label(
                         "builtin_authoritative",
@@ -2027,17 +2053,16 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         "acquisition_flag": evaluation.acquisition_flag,
                     }
                     warnings.append(str(evaluation.status))
-                    below_fit_floor = T_K < compiled_evaluator.valid_temperature_K[0]
-                    if not below_fit_floor:
-                        continue
                     # Premise: the compiled evaluator's consequence-aware
-                    # lower-edge continuation is its best available point estimate;
-                    # refusing to publish it would assert zero carrier pressure
-                    # below the fit floor. Algebra: P_eq = 10**log10(P_cont),
+                    # continuation is its best available point estimate; refusing
+                    # to publish it would assert zero carrier outside the source
+                    # window and create a discontinuity at every grid floor.
+                    # Algebra: P_eq = 10**log10(P_cont),
                     # with activity and fO2 powers already applied exactly once
                     # by evaluate(). Units: P_eq remains Pa. Sanity: only the two
-                    # lower-edge path is published; upper-edge extrapolation remains
-                    # refusal-only on this compatibility surface.
+                    # fields above change at the boundary (typed warning +
+                    # acquisition flag); the pressure remains continuous for every
+                    # status-bearing compiled carrier.
             else:
                 log_P = A - B / (T_K + C)
                 P_reference_Pa = _pow10_pressure_or_raise(

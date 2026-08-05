@@ -169,6 +169,22 @@ species:
         evidence_refs:
           - tests/chemistry/extract_store_reproduction_residual_baselines.yaml
           - docs/model-limitations.md#extract-store-reproduction-battery
+  K2:
+    tier: T1
+    target_tier: T4
+    validations:
+      structural:
+        evidence_refs:
+          - data/vapor_pressures.yaml
+          - data/literature/extracts/nasa-cea-thermo.yaml
+  K2O_gas:
+    tier: T1
+    target_tier: T4
+    validations:
+      structural:
+        evidence_refs:
+          - data/vapor_pressures.yaml
+          - data/literature/extracts/nasa-cea-thermo.yaml
   Mg:
     tier: T3
     target_tier: T4
@@ -182,6 +198,22 @@ species:
         evidence_refs:
           - tests/chemistry/extract_store_reproduction_residual_baselines.yaml
           - docs/model-limitations.md#extract-store-reproduction-battery
+  Mg2:
+    tier: T1
+    target_tier: T4
+    validations:
+      structural:
+        evidence_refs:
+          - data/vapor_pressures.yaml
+          - data/literature/extracts/nasa-cea-thermo.yaml
+  MgO_gas:
+    tier: T1
+    target_tier: T4
+    validations:
+      structural:
+        evidence_refs:
+          - data/vapor_pressures.yaml
+          - data/literature/extracts/nasa-cea-thermo.yaml
   Mn:
     tier: T3
     target_tier: T4
@@ -204,6 +236,22 @@ species:
         evidence_refs:
           - tests/chemistry/extract_store_reproduction_residual_baselines.yaml
           - docs/model-limitations.md#extract-store-reproduction-battery
+  Na2:
+    tier: T1
+    target_tier: T4
+    validations:
+      structural:
+        evidence_refs:
+          - data/vapor_pressures.yaml
+          - data/literature/extracts/nasa-cea-thermo.yaml
+  Na2O_gas:
+    tier: T1
+    target_tier: T4
+    validations:
+      structural:
+        evidence_refs:
+          - data/vapor_pressures.yaml
+          - data/literature/extracts/nasa-cea-thermo.yaml
   P2:
     tier: T1
     target_tier: T4
@@ -211,6 +259,14 @@ species:
       structural:
         evidence_refs:
           - data/vapor_pressures.yaml
+  P2O5_gas:
+    tier: T1
+    target_tier: T4
+    validations:
+      structural:
+        evidence_refs:
+          - data/vapor_pressures.yaml
+          - data/literature/extracts/nasa-cea-thermo.yaml
   P4:
     tier: T1
     target_tier: T4
@@ -259,6 +315,38 @@ species:
         evidence_refs:
           - tests/chemistry/extract_store_reproduction_residual_baselines.yaml
           - docs/model-limitations.md#extract-store-reproduction-battery
+  Si:
+    tier: T1
+    target_tier: T4
+    validations:
+      structural:
+        evidence_refs:
+          - data/vapor_pressures.yaml
+          - data/literature/extracts/nasa-cea-thermo.yaml
+  Si2:
+    tier: T1
+    target_tier: T4
+    validations:
+      structural:
+        evidence_refs:
+          - data/vapor_pressures.yaml
+          - data/literature/extracts/nasa-cea-thermo.yaml
+  Si3:
+    tier: T1
+    target_tier: T4
+    validations:
+      structural:
+        evidence_refs:
+          - data/vapor_pressures.yaml
+          - data/literature/extracts/nasa-cea-thermo.yaml
+  SiO2_gas:
+    tier: T1
+    target_tier: T4
+    validations:
+      structural:
+        evidence_refs:
+          - data/vapor_pressures.yaml
+          - data/literature/extracts/nasa-cea-thermo.yaml
   Ti:
     tier: T2
     target_tier: T4

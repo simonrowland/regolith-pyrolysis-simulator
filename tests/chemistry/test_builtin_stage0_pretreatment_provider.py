@@ -120,8 +120,9 @@ def test_provider_declares_exactly_nineteen_stage0_accounts():
     legacy ``_record_stage0_*_transitions`` call including carbonate
     decomposition and cation-sulfate carbothermal cleanup (MO -> melt,
     CaS -> sulfide matte), plus foulant residual-C diagnostic accounts.
-    Pinning the set stops a future refactor from silently widening the
-    surface beyond Stage 0's scope.
+    MC-4b adds the process.stage0_foulant debit reservoir for executable
+    salt/overhead phase transfers. Pinning the set stops a future refactor
+    from silently widening the surface beyond Stage 0's scope.
     """
 
     provider = BuiltinStage0PretreatmentProvider()
@@ -132,8 +133,9 @@ def test_provider_declares_exactly_nineteen_stage0_accounts():
         "process.stage0_carbonate_feed",
         "process.stage0_foulant",
         "process.reagent_inventory",
-        "process.stage0_perchlorate_feed",
-        "process.cleaned_melt",
+            "process.stage0_perchlorate_feed",
+            "process.stage0_foulant",
+            "process.cleaned_melt",
         "process.solid_char_carbon",
         "process.metal_phase",
         "reservoir.stage0_oxidant",

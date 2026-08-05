@@ -3641,12 +3641,20 @@ def build_sio_yield_report(
     sio_wall_mol = _sio_wall_terminal_mol(wall_deposit)
     sio_escape_mol = float(terminal_offgas.get("SiO", 0.0))
     sio_retained_holdup_mol = float(retained_holdup.get("SiO", 0.0))
+    # 2026-08-05 MC-4 wave 1B (a34318c): the SiO2(g) gas-exchange carrier
+    # draws from the same SiO2 pool as SiO (1 mol SiO2_gas = 1 mol
+    # SiO2-equivalent) and escapes to offgas in this window; it must count
+    # as a chain destination or the projection reports a phantom ~2%
+    # non-closure (executed: lunar 4.7007953e-06 mol, mars 4.7355038e-06
+    # mol; the hard AtomLedger mass_balance_error_pct remains 0.0).
+    sio2_gas_escape_mol = float(terminal_offgas.get("SiO2_gas", 0.0))
     terminal_mol = (
         si_terminal_mol
         + sio2_terminal_mol
         + sio_wall_mol
         + sio_escape_mol
         + sio_retained_holdup_mol
+        + sio2_gas_escape_mol
     )
     if sio_evaporated_mol > 0.0:
         closure_error_pct = abs(
@@ -3720,6 +3728,7 @@ def build_sio_yield_report(
             "sio_wall_mol": sio_wall_mol,
             "sio_escape_mol": sio_escape_mol,
             "sio_retained_holdup_mol": sio_retained_holdup_mol,
+            "sio2_gas_escape_mol": sio2_gas_escape_mol,
             "closure_error_pct": closure_error_pct,
             "mass_balance_error_pct": _latest_mass_balance_pct(result),
             "wall_deposit_total_kg": sum(float(v) for v in wall_deposit_kg.values()),

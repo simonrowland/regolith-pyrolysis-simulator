@@ -7,6 +7,7 @@ residuals without mistaking internal self-consistency for validation.
 
 from __future__ import annotations
 
+from copy import deepcopy
 import hashlib
 import json
 import math
@@ -20,13 +21,7 @@ import pytest
 import yaml
 
 from engines.builtin.foulant_disposition import chi_escape_salt
-from engines.builtin.stage0_pretreatment import (
-    BuiltinStage0PretreatmentProvider,
-    REACTION_FAMILY_VOLATILIZATION,
-)
 from simulator.accounting.formulas import resolve_species_formula
-from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
-from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.chemistry.langmuir_knudsen import grounded_alpha
 from simulator.diagnostic_helpers.extract_reproduction import (
     evaluate_all,
@@ -192,6 +187,7 @@ def _reaction_formula_atoms(formula: str) -> dict[str, float]:
 
     import re
 
+    formula = re.sub(r"\([^()]+\)$", "", formula)
     token = re.compile(r"([A-Z][a-z]?)(\d+(?:\.\d+)?|\.\d+)?")
     matches = list(token.finditer(formula))
     assert matches and "".join(match.group(0) for match in matches) == formula
@@ -233,6 +229,11 @@ def _expected_po2_exponent(species_id: str) -> float:
 
 
 def _expected_activity_exponent(species_id: str) -> float | None:
+    import re
+
+    def phase_neutral(formula: str) -> str:
+        return re.sub(r"\([^()]+\)$", "", formula)
+
     declaration = CATALOG.species[species_id].source_reaction_activity
     if declaration is None:
         return None
@@ -246,7 +247,8 @@ def _expected_activity_exponent(species_id: str) -> float | None:
     nu_activity = -sum(
         float(term["stoichiometry"])
         for term in reaction["reactants"]
-        if term["formula"] == declaration.component_id
+        if phase_neutral(str(term["formula"]))
+        == phase_neutral(declaration.component_id)
     )
     assert nu_vapor > 0.0 and nu_activity < 0.0
     return -nu_activity / nu_vapor
@@ -335,48 +337,104 @@ def conformance_sim():
 
 
 @pytest.fixture(scope="module")
-def stage0_transition_results(conformance_sim) -> dict[str, Any]:
-    results: dict[str, Any] = {}
-    for species_id in STRUCTURAL_SPECIES:
-        species = CATALOG.species[species_id]
-        if species.code_metadata.source_account != "process.stage0_foulant":
+def stage0_committed_carriers(conformance_sim) -> set[str]:
+    vapor_data = _load_yaml("vapor_pressures.yaml")
+    feedstocks = _load_yaml("feedstocks.yaml")
+    setpoints = _load_yaml("setpoints.yaml")
+
+    chloride_feedstocks = deepcopy(feedstocks)
+    chloride_row = deepcopy(chloride_feedstocks["lunar_mare_low_ti"])
+    composition = dict(chloride_row["composition_wt_pct"])
+    for species in ("Cl", "KCl", "NaCl"):
+        composition.pop(species, None)
+    composition.update({"KCl": 0.3, "NaCl": 0.3})
+    chloride_row["composition_wt_pct"] = composition
+    chloride_row["sum_check"] = sum(float(value) for value in composition.values())
+    chloride_feedstocks["mc4b_stage0_chlorides"] = chloride_row
+
+    ceres_feed = feedstocks["ceres_regolith"]
+    ceres_carbon_kg = conformance_sim._carbon_reductant_required_kg(
+        ceres_feed, 1000.0
+    )
+    sulfate_feed = feedstocks["mars_sulfate_rich"]
+    sulfate_carbon_kg = conformance_sim._carbon_reductant_required_kg(
+        sulfate_feed, 1000.0
+    )
+    sims = (
+        _build_sim(
+            "mc4b_stage0_chlorides",
+            vapor_data,
+            chloride_feedstocks,
+            setpoints,
+        ),
+        _build_sim(
+            "ceres_regolith",
+            vapor_data,
+            feedstocks,
+            setpoints,
+            additives_kg={"C": ceres_carbon_kg},
+        ),
+        _build_sim(
+            "mars_sulfate_rich",
+            vapor_data,
+            feedstocks,
+            setpoints,
+            additives_kg={"C": sulfate_carbon_kg},
+        ),
+    )
+    chloride_debit_kg = {"KCl": 0.0, "NaCl": 0.0}
+    chloride_products: dict[str, set[str]] = {"KCl": set(), "NaCl": set()}
+    for transition in sims[0].atom_ledger.transitions:
+        if transition.reason != "stage0_foulant_volatilization":
             continue
-        results[species_id] = BuiltinStage0PretreatmentProvider().dispatch(
-            IntentRequest(
-                intent=ChemistryIntent.STAGE0_PRETREATMENT,
-                account_view=ProviderAccountView(
-                    accounts={},
-                    species_formula_registry=(
-                        conformance_sim.species_formula_registry
-                    ),
-                ),
-                temperature_C=1200.0,
-                pressure_bar=1.0e-3,
-                control_inputs={
-                    "reaction_family": REACTION_FAMILY_VOLATILIZATION,
-                    "carrier": species_id,
-                    "feed_kg": 1.0,
-                    "phase_specs": (
-                        {
-                            "phase": 1,
-                            "T_C": 1200.0,
-                            "p_overhead_bar": 1.0e-3,
-                        },
-                    ),
-                    "foulant_thermo_path": DATA / "foulant_thermo.yaml",
-                },
-            )
-        )
-    return results
+        for lot in transition.debits:
+            if lot.account != "process.stage0_foulant":
+                continue
+            for source_species in chloride_debit_kg:
+                chloride_debit_kg[source_species] += float(
+                    lot.species_kg.get(source_species, 0.0)
+                )
+        credited = {
+            species
+            for lot in transition.credits
+            if lot.account == "terminal.offgas"
+            for species in lot.species_kg
+        }
+        if any(
+            float(lot.species_kg.get("KCl", 0.0)) > 0.0
+            for lot in transition.debits
+        ):
+            chloride_products["KCl"].update(credited)
+        if any(
+            float(lot.species_kg.get("NaCl", 0.0)) > 0.0
+            for lot in transition.debits
+        ):
+            chloride_products["NaCl"].update(credited)
+    # C6-style independent source bound: monomer+dimer channels may split the
+    # normalized raw-feed reservoir, but their summed debit can never exceed
+    # the one externally supplied source mass.
+    raw_chloride_kg = sims[0].inventory.raw_components_kg
+    assert chloride_debit_kg["KCl"] <= raw_chloride_kg["KCl"] + 1.0e-10
+    assert chloride_debit_kg["NaCl"] <= raw_chloride_kg["NaCl"] + 1.0e-10
+    assert chloride_products == {
+        "KCl": {"KCl", "K2Cl2"},
+        "NaCl": {"NaCl", "Na2Cl2"},
+    }
+    committed: set[str] = set()
+    for sim in sims:
+        for transition in sim.atom_ledger.transitions:
+            for lot in transition.credits:
+                if lot.account == "terminal.offgas":
+                    committed.update(lot.species_kg)
+    return committed
 
 
-def _covered_pairs(stage0_transition_results: dict[str, Any]) -> set[tuple[str, str]]:
+def _covered_pairs(stage0_committed_carriers: set[str]) -> set[tuple[str, str]]:
     covered = set(LIVE_BY_KEY)
     covered.update(
         key
         for key, species_id in STRUCTURAL_BY_KEY.items()
-        if species_id in stage0_transition_results
-        and stage0_transition_results[species_id].transition is not None
+        if species_id in stage0_committed_carriers
     )
     return covered
 
@@ -488,6 +546,14 @@ def test_gap_ledger_schema_and_reason_types() -> None:
                 assert key not in STRUCTURAL_BY_KEY, (
                     f"{key}: acquisition-pending C1-C5 gap is stale; C1-C4 are ready"
                 )
+            elif row["contract"] == "C2-C5":
+                assert row.get("disposition") == "NEEDS-BASE", (
+                    f"{key}: acquisition-pending C2-C5 is reserved for an explicit "
+                    "NEEDS-BASE reservoir gap"
+                )
+                assert key not in STRUCTURAL_BY_KEY, (
+                    f"{key}: acquisition-pending C2-C5 gap is stale; C2-C4 are ready"
+                )
             elif row["contract"] == "C5":
                 assert demanded["catalog_species_ids"] and key not in LIVE_BY_KEY, (
                     f"{key}: acquisition-pending C5 gap does not match live capabilities"
@@ -547,18 +613,18 @@ def test_feedstock_element_without_catalog_carrier_requires_typed_gap() -> None:
     )
 
 
-def test_every_uncovered_demand_pair_is_listed(stage0_transition_results) -> None:
+def test_every_uncovered_demand_pair_is_listed(stage0_committed_carriers) -> None:
     listed = set(GAP_BY_KEY)
-    expected = set(DEMAND_BY_KEY) - _covered_pairs(stage0_transition_results)
+    expected = set(DEMAND_BY_KEY) - _covered_pairs(stage0_committed_carriers)
     missing = sorted(expected - listed)
     assert not missing, f"uncovered demanded pairs missing from gap ledger: {missing}"
     unexpected = sorted(listed - set(DEMAND_BY_KEY))
     assert not unexpected, f"C1-C5 ledger entries are not demanded: {unexpected}"
 
 
-def test_covered_pairs_are_not_stale_in_gap_ledger(stage0_transition_results) -> None:
+def test_covered_pairs_are_not_stale_in_gap_ledger(stage0_committed_carriers) -> None:
     listed = set(GAP_BY_KEY)
-    stale = sorted(_covered_pairs(stage0_transition_results) & listed)
+    stale = sorted(_covered_pairs(stage0_committed_carriers) & listed)
     assert not stale, f"covered pairs remain stale in gap ledger: {stale}"
     demand_elements = {row["element"] for row in MANIFEST["pairs"]}
     stale_discovery = sorted(
@@ -574,7 +640,7 @@ def test_covered_pairs_are_not_stale_in_gap_ledger(stage0_transition_results) ->
 
 
 def test_partial_structural_pairs_name_only_the_remaining_contract_gap(
-    stage0_transition_results,
+    stage0_committed_carriers,
 ) -> None:
     partial = set(STRUCTURAL_BY_KEY) & set(GAP_BY_KEY)
     for key in partial:
@@ -585,12 +651,25 @@ def test_partial_structural_pairs_name_only_the_remaining_contract_gap(
     for species_id in sorted({STRUCTURAL_BY_KEY[key] for key in partial}):
         species = CATALOG.species[species_id]
         assert species.code_metadata.source_account == "process.stage0_foulant"
-        result = stage0_transition_results[species_id]
-        assert result.status == "ok"
-        assert result.transition is None, (
-            f"{species_id}: C5 gap is stale because Stage-0 now emits an "
-            "inventory transition; remove the ledger entry and exercise its debit"
+        assert species_id not in stage0_committed_carriers, (
+            f"{species_id}: C5 gap is stale because an end-to-end Stage-0 "
+            "batch committed its source debit and offgas credit"
         )
+
+
+def test_stage0_coverage_requires_committed_runtime_debit_credit(
+    stage0_committed_carriers,
+) -> None:
+    assert {
+        "KCl",
+        "K2Cl2",
+        "NaCl",
+        "Na2Cl2",
+        "N2",
+        "NH3",
+        "SO2",
+    } <= stage0_committed_carriers
+    assert "MgCl2" not in stage0_committed_carriers
 
 
 def test_live_parametrization_has_pinned_non_vacuity_floor() -> None:
@@ -1103,6 +1182,13 @@ def _flux(species_kg_hr: dict[str, float]) -> EvaporationFlux:
         {"SiO": 0.002, "Si": 0.001},
         {"Si": 0.002, "SiO": 0.001},
         {"Si": 1.0e-7, "SiO": 3.0e-7},
+        {
+            "Si": 1.0e-7,
+            "SiO": 2.0e-7,
+            "Si2": 3.0e-7,
+            "Si3": 4.0e-7,
+            "SiO2_gas": 5.0e-7,
+        },
     ),
     ids=(
         "si_singleton",
@@ -1111,6 +1197,7 @@ def _flux(species_kg_hr: dict[str, float]) -> EvaporationFlux:
         "sio_dominant_reversed_order",
         "si_dominant",
         "scaled_down",
+        "mc4b_five_carrier_sum_once",
     ),
 )
 def test_c6_shared_si_reservoir_conserves_independent_carrier_sum(
@@ -1133,19 +1220,34 @@ def test_c6_shared_si_reservoir_conserves_independent_carrier_sum(
     )
     assert set(smoothed.species_kg_hr) == set(requested_rates)
     # Independent expectation from applied carrier masses, not ledger deltas.
-    # Premise: both carriers hold one Si; Si releases (2-0)/2 = 1 O2 and
-    # SiO releases (2-1)/2 = 1/2 O2 per carrier mole. Algebra:
-    # debit_Si = n_Si + n_SiO; release_O2 = n_Si + n_SiO/2.
-    # Unit check: kg / (kg mol^-1) = mol. Sanity: adding either positive
-    # flux increases one shared Si debit exactly once.
+    # Premise: each Si_xO_y carrier debits x Si atoms from the one shared SiO2
+    # parent and releases (2x-y)/2 O2 per carrier molecule. Algebra:
+    # debit_Si=sum(n_i*x_i); release_O2=sum(n_i*(2x_i-y_i)/2).
+    # Unit check: kg / (kg mol^-1) = mol. Sanity: the MC-4b Si/SiO/Si2/Si3/
+    # SiO2(g) case adds every carrier independently, then performs one grouped
+    # reservoir debit rather than debiting the full SiO2 parent five times.
+    carrier_formulas = {
+        species_id: resolve_species_formula(
+            species_id, sim.species_formula_registry
+        )
+        for species_id in smoothed.species_kg_hr
+    }
     carrier_mol = {
         species_id: rate_kg_hr
-        / resolve_species_formula(species_id).molar_mass_kg_per_mol()
+        / carrier_formulas[species_id].molar_mass_kg_per_mol()
         for species_id, rate_kg_hr in smoothed.species_kg_hr.items()
     }
-    expected_si_debit_mol = sum(carrier_mol.values())
+    expected_si_debit_mol = sum(
+        carrier_mol[species_id] * carrier_formulas[species_id].elements["Si"]
+        for species_id in carrier_mol
+    )
     expected_o2_release_mol = sum(
-        carrier_mol[species_id] * {"Si": 1.0, "SiO": 0.5}[species_id]
+        carrier_mol[species_id]
+        * (
+            2.0 * carrier_formulas[species_id].elements["Si"]
+            - carrier_formulas[species_id].elements.get("O", 0.0)
+        )
+        / 2.0
         for species_id in carrier_mol
     )
 

@@ -496,6 +496,10 @@ def _assert_sio_destination_closure(diagnostics: dict[str, float]) -> None:
         + diagnostics["sio2_terminal_mol"]
         + diagnostics["sio_wall_mol"]
         + diagnostics["sio_escape_mol"]
+        # 2026-08-05 MC-4 wave 1B (a34318c): the pO2-insensitive SiO2(g)
+        # gas-exchange carrier is a real chain destination drawn from the
+        # same SiO2 pool; counted by the report projection post-wave.
+        + diagnostics["sio2_gas_escape_mol"]
     )
     abs_gap_mol = abs(diagnostics["sio_evaporated_mol"] - destinations_mol)
     if diagnostics["sio_evaporated_mol"] <= 0.0:

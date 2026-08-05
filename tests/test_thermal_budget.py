@@ -1,3 +1,4 @@
+import math
 from pathlib import Path
 
 import pytest
@@ -99,6 +100,45 @@ def test_phosphorus_carrier_enthalpy_uses_runtime_cea_reaction_delta_h():
     ]
     assert "metastable P4O10(L)-derived component reference" in metastable_source
     assert "status-bearing" in metastable_source
+
+
+def test_mc4b_composite_carrier_enthalpy_uses_base_plus_gas_exchange_delta_h():
+    payload_path = Path(__file__).resolve().parent.parent / "data" / "vapor_pressures.yaml"
+    payload = yaml.safe_load(payload_path.read_text(encoding="utf-8"))
+    legacy = compile_vapour_rail_catalog(
+        payload, emit_u0_request_rules=False
+    ).legacy_view()
+    carriers = {
+        "K2",
+        "K2O_gas",
+        "Mg2",
+        "MgO_gas",
+        "Na2",
+        "Na2O_gas",
+        # 2026-08-05 b-133 adjudication: the P2O5_gas tombstone is RESTORED
+        # (wave 1B had wrongly reactivated it); it is no longer a composite
+        # carrier and has no executable molar-mass row.
+        "Si2",
+        "Si3",
+        "SiO2_gas",
+    }
+
+    result = evaporation_enthalpy_budget(
+        {carrier: 1.0e-9 for carrier in carriers},
+        vapor_pressures=legacy,
+        temperature_K=1923.15,
+    )
+
+    assert set(result["latent_by_species_kWh"]) == carriers
+    assert all(value == 0.0 for value in result["latent_by_species_kWh"].values())
+    assert all(
+        math.isfinite(value)
+        for value in result["dissociation_by_species_kWh"].values()
+    )
+    for carrier in carriers:
+        source = result["sources"][f"analytical_source_reaction:{carrier}"]
+        assert "analytical/status-bearing" in source
+        assert "cannot certify" in source
 
 
 def test_evaporation_enthalpy_budget_oxide_vapor_uses_single_reaction_not_double_charge():

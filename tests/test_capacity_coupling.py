@@ -761,10 +761,10 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         # but the head has zero overhead O2, so the allocator correctly zeros it.
         # 2026-08-05 phosphorus-carrier union: at 1550 C, PO=0.00209063758295 Pa,
         # PO2=0.000168203490621 Pa, and P2=5.32056804627e-9 Pa dominate the six
-            # new P channels (P4/P4O6/P4O10 are positive but negligible here). Their
-            # three executable transitions add 0.0023652645523379867 kg/hr total flux,
-            # +518.9310568999499 transport-saturation points, and lower melt mass by
-            # 0.0034963082154035874 kg. Values come from the executable head-pressure
+        # new P channels (P4/P4O6/P4O10 are positive but negligible here). Their
+        # three executable transitions add 0.0023652645523379867 kg/hr total flux,
+        # +518.9310568999499 transport-saturation points, and lower melt mass by
+        # 0.0034963082154035874 kg. Values come from the executable head-pressure
         # table and this quiesced default-off probe on the resolved union tree.
         # 2026-08-05 MC-1 additive lunar traces: the low-Ti declaration grows by
         # 0.2057916 wt% without changing any major-oxide row. Existing load-time
@@ -785,12 +785,19 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
             # its oxidizing reaction needs overhead O2 and this probe starts at
             # zero. Al2/Al2O2/Al2O3(g)/AlO2/Ca2 heads are <=4.89e-12 Pa and do
             # not move the reported trio. Recomputed from the executable probe.
-            (
+                    # 2026-08-05 MC-4 wave-1 integration (e389444+217cf32 union): the merged
+        # 56-carrier composition moves the head trio again — flux +0.33 kg/hr
+        # dominated by the newly-live CrO channel plus the K2O/Na2O/SiO2/MgO
+        # additions; per-carrier pressures in scripts/vapour_head_pressure_table.py
+        # on this tree. Fe/Na/K seam-selected values unchanged. Re-pinned after
+    # the P2O5_gas tombstone restore removed its Stage-0 flux contribution
+    # (b-133 adjudication upheld at integration).
+(
                 1,
                 1550.0,
-                2.6220321073606474,
-                1161283.2255116678,
-                996.1402608722016,
+                2.9516520099235124,
+                1204062.0946067297,
+                995.8106409826071,
         ),
         rel=1.0e-12,
         abs=1.0e-12,
@@ -812,7 +819,10 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     # 0.0012405690130816466 Pa) through the shared Cr2O3 parent path. CrO2's
     # 0.0011084725622752761 Pa head remains transition-free here because the
     # oxidizing leg has no overhead O2 to debit (27 -> 28).
-    assert len(sim.atom_ledger.transitions) == 28
+    # 2026-08-05 MC-4 wave-1 union: 37 transitions (A adds evaporate_CrO et
+    # al.; B adds K2/K2O/MgO/Na2/Na2O/P2O5/Si/SiO2 reasons) — recomputed from
+    # the merged roster by execution.
+    assert len(sim.atom_ledger.transitions) == 36  # 36 after the P2O5_gas tombstone restore
     assert tuple(
         transition.reason for transition in sim.atom_ledger.transitions[-5:]
     ) == (

@@ -42,7 +42,10 @@ def test_toggle_off_existing_path_keeps_mass_balance_closed():
     # 2026-08-05 carrier batch 1a1ab47: the added carrier route leaves
     # +3.988089247730642e-20 kg Na roundoff in overhead. The exact audit and
     # outward projection agree, while HI-2 above remains well inside contract.
-    expected_overhead = {"Na": 3.988089247730642e-20}
+    # 2026-08-05 MC-4 wave 1B (a34318c): the composed Na carrier set routes
+    # the tick flux exactly; the residual Na roundoff dust is gone and the
+    # audited overhead is now empty. HI-2 above remains <= 1e-12 %.
+    expected_overhead: dict[str, float] = {}
     assert sim.atom_ledger.kg_by_account("process.overhead_gas") == pytest.approx(
         expected_overhead,
         rel=1.0e-12,

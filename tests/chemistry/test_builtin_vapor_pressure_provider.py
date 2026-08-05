@@ -731,6 +731,9 @@ def test_phosphorus_hot_train_scope_survives_compatibility_projection(
     for carrier in ("PO", "PO2", "P2", "P4", "P4O6", "P4O10"):
         assert oxide_vapors[carrier]["hot_train_applicability"] == "stage0_only"
 
+    # 2026-08-05 b-133 adjudication: the P2O5_gas tombstone is RESTORED
+    # (the MC-4 wave-1B reactivation was wrong); the exact-key tombstone
+    # survives the compatibility projection into retired_tombstones.
     assert "P2O5_gas" not in oxide_vapors
     legacy_locations = [
         name
@@ -2175,12 +2178,12 @@ def test_builtin_provider_marks_mn_above_liquid_oxide_fit_range_extrapolation(
     assert "extrapolated_beyond_valid_range_K" in result.vapor_pressures_source["Mn"]
 
 
-def test_inactive_metal_species_do_not_diverge_between_provider_and_legacy(
+def test_active_si_composite_supersedes_legacy_pure_component_sidecar(
     vapor_pressure_data,
 ):
     assert (
         vapor_pressure_data["metals"]["Si"]["consumer_status"].lower()
-        == "inactive"
+        == "active"
     )
     provider = BuiltinVaporPressureProvider(vapor_pressure_data)
     request = IntentRequest(
@@ -2207,9 +2210,11 @@ def test_inactive_metal_species_do_not_diverge_between_provider_and_legacy(
     )
 
     assert "SiO" in kernel_vp
-    assert "Si" not in kernel_vp
-    assert "Si" not in legacy_vp
-    assert set(legacy_vp) == set(kernel_vp)
+    assert kernel_vp["Si"] > 0.0
+    assert legacy_vp["Si"] > kernel_vp["Si"] * 1.0e6
+    assert kernel_vp["Si"] == pytest.approx(2.9468548936088294e-07)
+    assert set(legacy_vp) <= set(kernel_vp)
+    assert set(kernel_vp) - set(legacy_vp) == {"Si2", "Si3", "SiO2_gas"}
 
 
 def test_transport_po2_and_intrinsic_melt_fo2_are_independent(
@@ -2465,6 +2470,8 @@ def test_provider_matches_legacy_internal_analytical_for_known_lunar_composition
         "exercising the path it claims to cover"
     )
     for species, legacy_value in legacy_result.vapor_pressures_Pa.items():
+        if species in _REVIEWED_ADDITIVE_CARRIERS:
+            continue
         kernel_value = kernel_vp.get(species, 0.0)
         tol = max(
             _VP_TOLERANCE_ABS_PA,
@@ -2476,13 +2483,23 @@ def test_provider_matches_legacy_internal_analytical_for_known_lunar_composition
         )
 
     # The compiled rail now owns additive NASA carrier rows that the frozen
-    # pre-rail stub cannot evaluate. Existing-species parity remains exact;
-    # kernel-only rows must stay inside the reviewed activation allowlist.
+    # pre-rail stub cannot evaluate. Si is also a reviewed replacement: MC-4b
+    # supersedes its pure-component sidecar with the SiO-composed melt-source
+    # reaction. All unreviewed existing-species parity remains exact.
     legacy_species = set(legacy_result.vapor_pressures_Pa)
     kernel_species = set(kernel_vp)
     assert legacy_species <= kernel_species
     assert kernel_species - legacy_species <= _REVIEWED_ADDITIVE_CARRIERS
-    phosphorus_carriers = {"PO", "PO2", "P2", "P4", "P4O6", "P4O10"}
+    phosphorus_carriers = {
+        "PO",
+        "PO2",
+        "P2",
+        "P4",
+        "P4O6",
+        "P4O10",
+        # 2026-08-05 b-133 adjudication: P2O5_gas tombstone RESTORED (the
+        # wave-1B reactivation was wrong) -- it is no longer a kernel carrier.
+    }
     assert phosphorus_carriers <= kernel_species
     assert all(kernel_vp[species] > 0.0 for species in phosphorus_carriers)
 
@@ -2563,8 +2580,8 @@ def test_shadow_parity_across_short_simulation_run(
         legacy_vp = dict(legacy_result.vapor_pressures_Pa or {})
         kernel_only = set(kernel_vp) - set(legacy_vp)
         assert kernel_only <= _REVIEWED_ADDITIVE_CARRIERS
-        parity_species = set(legacy_vp) | (
-            set(kernel_vp) - _REVIEWED_ADDITIVE_CARRIERS
+        parity_species = (set(legacy_vp) | set(kernel_vp)) - (
+            _REVIEWED_ADDITIVE_CARRIERS
         )
         for species in parity_species:
             legacy_value = float(legacy_vp.get(species, 0.0))
@@ -2735,6 +2752,7 @@ def test_inactive_metal_consumer_status_suppresses_builtin_fallback(
     vapor_pressure_data,
 ):
     data = copy.deepcopy(vapor_pressure_data)
+    data["metals"]["Si"]["consumer_status"] = "inactive"
     provider = BuiltinVaporPressureProvider(data)
     view = ProviderAccountView(
         accounts={"process.cleaned_melt": {"SiO2": 10.0}},
@@ -2821,4 +2839,18 @@ _REVIEWED_ADDITIVE_CARRIERS = {
     "P4",
     "P4O6",
     "P4O10",
+    # 2026-08-05 MC-4b: exact gas-exchange compositions on the landed
+    # K/Mg/Na/Si standard-reaction rows.  (P2O5 phase transfer was dropped
+    # again by the 2026-08-05 b-133 adjudication: the P2O5_gas tombstone
+    # is RESTORED, so P2O5_gas is not an additive carrier.)
+    "K2",
+    "K2O_gas",
+    "Mg2",
+    "MgO_gas",
+    "Na2",
+    "Na2O_gas",
+    "Si",
+    "Si2",
+    "Si3",
+    "SiO2_gas",
 }

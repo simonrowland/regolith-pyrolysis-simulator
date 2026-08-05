@@ -134,6 +134,7 @@ tenth account; the declared set is the first-line gate.  Every legacy
 from __future__ import annotations
 
 from collections.abc import Mapping
+import math
 from typing import Any
 
 from engines.builtin._common import (
@@ -202,6 +203,15 @@ FO2_BUFFER_ACCOUNT = "reservoir.fo2_buffer"
 CLEANED_MELT_ACCOUNT = "process.cleaned_melt"
 METAL_PHASE_ACCOUNT = "process.metal_phase"
 OFFGAS_ACCOUNT = "terminal.offgas"
+STAGE0_FOULANT_ACCOUNT = "process.stage0_foulant"
+
+# Association carriers consume the landed monomer salt reservoir.  The tuple is
+# (source species, source stoichiometry, vapor stoichiometry); every other
+# volatilization carrier is a 1:1 phase transfer of its own formula.
+_VOLATILIZATION_SOURCE_REACTIONS = {
+    "K2Cl2": ("KCl", 2.0, 1.0),
+    "Na2Cl2": ("NaCl", 2.0, 1.0),
+}
 
 
 class BuiltinStage0PretreatmentProvider(ChemistryProvider):
@@ -246,7 +256,7 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
         "process.stage0_carbonate_feed",
         "process.reagent_inventory",
         "process.stage0_perchlorate_feed",
-        "process.stage0_foulant",
+        STAGE0_FOULANT_ACCOUNT,
         "process.cleaned_melt",
         SOLID_CHAR_CARBON_ACCOUNT,
         "process.metal_phase",
@@ -1069,34 +1079,62 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
             phase_splits.append(phase_split)
 
         cumulative_escaped = 1.0 - retained_after_phases
-        transition = None
-        escaped_carrier_mol = 0.0
-        source_formula = carrier
-        source_stoichiometry = 1.0
-        if cumulative_escaped > 0.0:
-            source_by_association_carrier = {
-                "Na2Cl2": "NaCl",
-                "K2Cl2": "KCl",
-            }
-            source_formula = source_by_association_carrier.get(carrier, carrier)
-            source_stoichiometry = 2.0 if source_formula != carrier else 1.0
-            carrier_formula = resolve_species_formula(carrier, formula_registry)
-            escaped_carrier_mol = (
-                feed_kg
-                * cumulative_escaped
-                / carrier_formula.molar_mass_kg_per_mol()
+        source_species, source_nu, carrier_nu = _VOLATILIZATION_SOURCE_REACTIONS.get(
+            carrier,
+            (carrier, 1.0, 1.0),
+        )
+        source_species = str(controls.get("source_species") or source_species)
+        source_nu = float(controls.get("source_stoichiometry") or source_nu)
+        carrier_nu = float(controls.get("carrier_stoichiometry") or carrier_nu)
+        if source_nu <= 0.0 or carrier_nu <= 0.0:
+            return self._out_of_domain(
+                "volatilization stoichiometry must be positive",
+                control_audit=control_audit,
             )
+
+        model_escaped_source_kg = feed_kg * cumulative_escaped
+        escaped_override = controls.get("escaped_source_kg_override")
+        escaped_source_kg = (
+            model_escaped_source_kg
+            if escaped_override is None
+            else float(escaped_override)
+        )
+        if (
+            not 0.0 <= escaped_source_kg <= feed_kg + 1.0e-12
+            or not math.isfinite(escaped_source_kg)
+        ):
+            return self._out_of_domain(
+                "volatilization escaped-source override must be finite and "
+                "within [0, feed_kg]",
+                control_audit=control_audit,
+            )
+        source_account = str(
+            controls.get("source_account") or STAGE0_FOULANT_ACCOUNT
+        )
+        if source_account not in {
+            STAGE0_FOULANT_ACCOUNT,
+            "process.stage0_volatile_feed",
+        }:
+            return self._out_of_domain(
+                f"volatilization source account {source_account!r} is not allowed",
+                control_audit=control_audit,
+            )
+        source_formula = resolve_species_formula(source_species, formula_registry)
+        source_mol = escaped_source_kg / source_formula.molar_mass_kg_per_mol()
+        extent_mol = source_mol / source_nu
+        transition = None
+        if extent_mol > 0.0:
             debits = {
-                "process.stage0_foulant": {
-                    source_formula: escaped_carrier_mol * source_stoichiometry,
-                }
+                source_account: {
+                    source_species: extent_mol * source_nu,
+                },
             }
             credits = {
-                "terminal.offgas": {
-                    carrier: escaped_carrier_mol,
-                }
+                OFFGAS_ACCOUNT: {
+                    carrier: extent_mol * carrier_nu,
+                },
             }
-            atom_proof = self._build_atom_balance_proof(
+            atom_proof = build_atom_balance_proof(
                 debits,
                 credits,
                 formula_registry,
@@ -1105,7 +1143,7 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
             transition = LedgerTransitionProposal(
                 debits=debits,
                 credits=credits,
-                reason=f"stage0_volatilization_{carrier}",
+                reason="stage0_foulant_volatilization",
                 atom_balance_proof=atom_proof,
             )
         return IntentResult(
@@ -1121,11 +1159,19 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
                 "cumulative_escaped_frac": cumulative_escaped,
                 "cumulative_retained_frac": retained_after_phases,
                 "wall_deposit_frac": cumulative_escaped,
-                "escaped_carrier_mol": escaped_carrier_mol,
-                "source_inventory_formula": source_formula,
-                "source_inventory_stoichiometry": source_stoichiometry,
+                "model_escaped_source_kg": model_escaped_source_kg,
+                "source_species": source_species,
+                "source_account": source_account,
+                "source_stoichiometry": source_nu,
+                "carrier_stoichiometry": carrier_nu,
+                "escaped_source_kg": escaped_source_kg,
+                # Committed carrier mol (extent x carrier stoichiometry); for
+                # the 1:1 monomers this equals the debited source mol, and for
+                # association carriers (K2Cl2/Na2Cl2) it is the offgas-credit
+                # mol.  Exposed so callers can reconcile the transition legs.
+                "escaped_carrier_mol": extent_mol * carrier_nu,
                 "interval_required": interval_required,
-                "behavior_change_gate": "status_bearing_transition",
+                "behavior_change_gate": "kernel_commit_required",
                 "warnings": tuple(warnings),
             },
             warnings=tuple(warnings),

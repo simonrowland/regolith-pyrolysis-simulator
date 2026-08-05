@@ -82,6 +82,7 @@ KNOWN_LEDGER_ACCOUNTS: frozenset[str] = frozenset({
     "process.spent_reductant_residue",
     SOLID_CHAR_CARBON_ACCOUNT,
     "process.stage0_carbonate_feed",
+    "process.stage0_foulant",
     "process.stage0_perchlorate_feed",
     "process.stage0_salt_feed",
     "process.stage0_volatile_feed",

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import importlib
 import json
 import types
@@ -142,13 +143,18 @@ def test_provider_keeps_authoritative_pressure_dict_empty():
 def test_provider_allowed_species_honors_inactive_consumer_status(
     vapor_pressure_data,
 ):
+    # 2026-08-05 MC-4 wave 1B: Si is now an ACTIVE composed carrier, so the
+    # inactive-consumer-status contract is exercised against a deepcopy with
+    # Si forced inactive (the same pattern as
+    # test_inactive_metal_consumer_status_suppresses_builtin_fallback).
+    data = copy.deepcopy(vapor_pressure_data)
     assert (
-        vapor_pressure_data["metals"]["Si"]["consumer_status"].lower()
-        == "inactive"
+        data["metals"]["Si"]["consumer_status"].lower() == "active"
     )
+    data["metals"]["Si"]["consumer_status"] = "inactive"
 
     allowed_species = VapoRockProvider._build_allowed_species(
-        vapor_pressure_data
+        data
     )
 
     assert "Si" not in allowed_species

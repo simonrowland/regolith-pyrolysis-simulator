@@ -32,7 +32,7 @@ from typing import Any
 from simulator.equipment import EquipmentDesigner, STEFAN_BOLTZMANN
 from simulator.furnace_materials import load_furnace_materials
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
-from simulator.state import MOLAR_MASS, OXIDE_TO_METAL, STOICH_RATIOS
+from simulator.state import GAS_CONSTANT, MOLAR_MASS, OXIDE_TO_METAL, STOICH_RATIOS
 
 
 CITED = "CITED"
@@ -757,13 +757,30 @@ def _analytical_reaction_enthalpy(
 ) -> EnthalpyCoefficient | None:
     """Return NASA-polynomial delta-H per mole vapor for a source reaction."""
 
+    model = metadata.get("reference_pressure_model")
+    if isinstance(model, Mapping) and isinstance(
+        model.get("gas_exchange_reaction"), Mapping
+    ):
+        return _composite_exchange_reaction_enthalpy(
+            species,
+            metadata,
+            model,
+            temperature_K=temperature_K,
+        )
+
+    if species == "P2O5_gas":
+        return _direct_phase_transfer_reaction_enthalpy(
+            species,
+            model,
+            temperature_K=temperature_K,
+        )
+
     if species not in {"PO", "PO2", "P2", "P4", "P4O6", "P4O10"}:
         # b-133 lands a new thermal coefficient path only for its six CEA
         # phosphorus carriers. Existing analytical families retain their
         # pre-b-133 latent/dissociation accounting until separately reviewed.
         return None
 
-    model = metadata.get("reference_pressure_model")
     if not isinstance(model, Mapping):
         return None
     family = str(model.get("evaluator_family") or "")
@@ -835,6 +852,181 @@ def _analytical_reaction_enthalpy(
             f"NASA CEA {family} delta-H(T={T_K:.2f} K) for the catalog "
             f"{parent}(melt) source reaction; analytical/status-bearing, "
             f"cannot certify{phase_status}"
+        ),
+    )
+
+
+def _composite_exchange_reaction_enthalpy(
+    species: str,
+    metadata: Mapping[str, Any],
+    model: Mapping[str, Any],
+    *,
+    temperature_K: float | None,
+) -> EnthalpyCoefficient:
+    """Compose base-reaction and gas-exchange delta-H per mole target vapor."""
+
+    if temperature_K is None:
+        raise ValueError(
+            f"temperature_K is required for analytical source-reaction enthalpy of {species!r}"
+        )
+    T_K = float(temperature_K)
+    if not math.isfinite(T_K) or T_K <= 0.0:
+        raise ValueError("temperature_K must be finite and positive")
+
+    base_model = model.get("base_reference_pressure_model")
+    if not isinstance(base_model, Mapping) or str(
+        base_model.get("evaluator_family") or ""
+    ) != "antoine":
+        raise ValueError(
+            f"analytical composite base reaction unavailable for {species!r}"
+        )
+    coefficients = base_model.get("coefficients")
+    if not isinstance(coefficients, Mapping):
+        raise ValueError(
+            f"analytical composite base coefficients unavailable for {species!r}"
+        )
+    B = float(coefficients.get("B", 0.0))
+    C = float(coefficients.get("C", 0.0))
+    if B <= 0.0 or T_K + C <= 0.0:
+        raise ValueError(
+            f"analytical composite base coefficients invalid for {species!r}"
+        )
+    # Premise: log10(P_base/Pa)=A-B/(T+C) is the landed unit-activity
+    # standard-reaction term. Van't Hoff gives
+    # DeltaH_base = R*T^2*d(ln K)/dT = R*ln(10)*B*T^2/(T+C)^2.
+    # Units: J/mol base vapor. Sanity: B>0 yields an endothermic base release.
+    base_delta_h_J_per_mol = (
+        GAS_CONSTANT * math.log(10.0) * B * T_K**2 / (T_K + C) ** 2
+    )
+
+    family = str(model.get("evaluator_family") or "")
+    thermo = model.get("species_thermo")
+    exchange = model.get("gas_exchange_reaction")
+    if family not in {"nasa_cea_7", "nasa_cea_9"} or not isinstance(
+        thermo, Mapping
+    ) or not isinstance(exchange, Mapping):
+        raise ValueError(
+            f"analytical gas-exchange thermo unavailable for {species!r}"
+        )
+
+    from simulator.vapour_rail.catalog import (
+        _polynomial_from_thermo_record,
+        _resolve_thermo_record,
+    )
+
+    target_formula = str(metadata.get("formula") or species)
+    base_formula = str(model.get("base_vapor_formula") or "")
+    target_nu = 0.0
+    base_reactant_nu = 0.0
+    exchange_delta_h_J_per_mol = 0.0
+    for sign, side in ((-1.0, "reactants"), (1.0, "products")):
+        participants = exchange.get(side)
+        if not isinstance(participants, list):
+            raise ValueError(
+                f"analytical gas-exchange reaction is incomplete for {species!r}"
+            )
+        for participant in participants:
+            if not isinstance(participant, Mapping):
+                raise ValueError(
+                    f"analytical gas-exchange participant is invalid for {species!r}"
+                )
+            formula = str(participant.get("formula") or "")
+            amount = float(participant.get("stoichiometry", 0.0))
+            record = thermo.get(formula)
+            if not formula or amount <= 0.0 or not isinstance(record, Mapping):
+                raise ValueError(
+                    f"analytical gas-exchange thermo unavailable for {species!r}:{formula!r}"
+                )
+            resolved = _resolve_thermo_record(
+                record, field=f"thermal_budget:{species}:{formula}"
+            )
+            polynomial = _polynomial_from_thermo_record(
+                name=f"thermal_budget:{species}:{formula}",
+                family=family,
+                record=resolved,
+            )
+            exchange_delta_h_J_per_mol += (
+                sign * amount * polynomial.evaluate(T_K).h_J_per_mol
+            )
+            if sign > 0.0 and formula == target_formula:
+                target_nu += amount
+            if sign < 0.0 and formula == base_formula:
+                base_reactant_nu += amount
+    if target_nu <= 0.0 or base_reactant_nu <= 0.0:
+        raise ValueError(
+            f"analytical gas-exchange stoichiometry unavailable for {species!r}"
+        )
+
+    delta_h_J_per_mol_vapor = (
+        base_reactant_nu * base_delta_h_J_per_mol
+        + exchange_delta_h_J_per_mol
+    ) / target_nu
+    if not math.isfinite(delta_h_J_per_mol_vapor):
+        raise ValueError(
+            f"analytical source-reaction enthalpy is non-finite for {species!r}"
+        )
+    return EnthalpyCoefficient(
+        delta_h_J_per_mol_vapor / 1000.0,
+        (
+            f"Landed base standard-reaction Antoine van't Hoff delta-H plus "
+            f"NASA CEA {family} gas-exchange delta-H(T={T_K:.2f} K); "
+            "analytical/status-bearing, cannot certify"
+        ),
+    )
+
+
+def _direct_phase_transfer_reaction_enthalpy(
+    species: str,
+    model: Any,
+    *,
+    temperature_K: float | None,
+) -> EnthalpyCoefficient:
+    """Evaluate the landed P2O5(L) -> P2O5(g) CEA phase-transfer delta-H."""
+
+    if temperature_K is None:
+        raise ValueError(
+            f"temperature_K is required for analytical source-reaction enthalpy of {species!r}"
+        )
+    T_K = float(temperature_K)
+    if not math.isfinite(T_K) or T_K <= 0.0:
+        raise ValueError("temperature_K must be finite and positive")
+    if not isinstance(model, Mapping):
+        raise ValueError(f"analytical phase-transfer model unavailable for {species!r}")
+    family = str(model.get("evaluator_family") or "")
+    thermo = model.get("species_thermo")
+    if family not in {"nasa_cea_7", "nasa_cea_9"} or not isinstance(
+        thermo, Mapping
+    ):
+        raise ValueError(f"analytical phase-transfer thermo unavailable for {species!r}")
+
+    from simulator.vapour_rail.catalog import (
+        _polynomial_from_thermo_record,
+        _resolve_thermo_record,
+    )
+
+    polynomials = {}
+    for formula in ("P2O5(L)", "P2O5"):
+        record = thermo.get(formula)
+        if not isinstance(record, Mapping):
+            raise ValueError(
+                f"analytical phase-transfer thermo unavailable for {species!r}:{formula}"
+            )
+        polynomials[formula] = _polynomial_from_thermo_record(
+            name=f"thermal_budget:{species}:{formula}",
+            family=family,
+            record=_resolve_thermo_record(
+                record, field=f"thermal_budget:{species}:{formula}"
+            ),
+        )
+    delta_h_J_per_mol = (
+        polynomials["P2O5"].evaluate(T_K).h_J_per_mol
+        - polynomials["P2O5(L)"].evaluate(T_K).h_J_per_mol
+    )
+    return EnthalpyCoefficient(
+        delta_h_J_per_mol / 1000.0,
+        (
+            f"NASA CEA {family} delta-H(T={T_K:.2f} K) for "
+            "P2O5(L)->P2O5(g); analytical/status-bearing, cannot certify"
         ),
     )
 

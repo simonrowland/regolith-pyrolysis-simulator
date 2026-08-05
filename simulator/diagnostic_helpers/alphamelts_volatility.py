@@ -368,12 +368,17 @@ def _analytical_vapor_pressures_from_activities(
                 wt_fraction_activity_factor=wt_activity_factor,
                 P_reference_Antoine_Pa=P_reference_Pa,
                 pO2_bar=pO2,
-                source=vapor_pressure_source_label(
+                source_label=vapor_pressure_source_label(
                     "alphamelts_activity_diagnostic",
                     sp_data,
                     coefficient_block=coefficient_block,
                     temperature_K=T_K,
-                    extrapolated=(
+                    # 2026-08-05 MC-4 wave 1B: Si's new standard-reaction row
+                    # made this branch reachable and exposed two latent
+                    # wrong-kwarg calls (source= for source_label= above;
+                    # extrapolated= for the helper's real parameter
+                    # authority_limited_by_ellingham_fit_range here).
+                    authority_limited_by_ellingham_fit_range=(
                         str(species) in extrapolations
                         and extrapolations[str(species)]["authority_status"]
                         == "extrapolation_limited"

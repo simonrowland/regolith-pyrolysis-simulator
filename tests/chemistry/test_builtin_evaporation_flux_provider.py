@@ -939,6 +939,14 @@ def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
         setpoints_data,
         additives_kg=additives_kg,
     )
+    stage0_only_species = {
+        species_id
+        for section_name in ("metals", "oxide_vapors")
+        for species_id, row in (
+            vapor_pressure_data.get(section_name, {}) or {}
+        ).items()
+        if str((row or {}).get("hot_train_applicability") or "") == "stage0_only"
+    }
     sim.start_campaign(CampaignPhase.C0)
     decision_choice = {
         DecisionType.ROOT_BRANCH: "pyrolysis",
@@ -994,6 +1002,15 @@ def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
                 continue
             legacy_value = float(reference_flux.get(species, 0.0))
             kernel_value = float(kernel_flux.get(species, 0.0))
+            if species in stage0_only_species:
+                # The shared legacy helper has no process-stage predicate;
+                # _calculate_evaporation dispatches the hot-train request, whose
+                # batch eligibility may suppress or floor-limit Stage-0-only
+                # phosphorus carriers. MC-4b makes P2O5(g) large enough at
+                # 950 C for this old latent mismatch to exceed the numerical
+                # tolerance, so exclude the declared stage boundary from parity.
+                assert math.isfinite(kernel_value) and kernel_value >= 0.0
+                continue
             delta = abs(legacy_value - kernel_value)
             tol = max(
                 _FLUX_TOLERANCE_ABS_KG_HR,

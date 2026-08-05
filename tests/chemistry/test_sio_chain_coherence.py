@@ -132,6 +132,10 @@ def test_sio_chain_closes_evolved_to_stage_wall_and_terminal_products():
         + diagnostics["sio_wall_mol"]
         + diagnostics["sio_escape_mol"]
         + diagnostics["sio_retained_holdup_mol"]
+        # 2026-08-05 MC-4 wave 1B (a34318c): the pO2-insensitive SiO2(g)
+        # gas-exchange carrier is a real chain destination drawn from the
+        # same SiO2 pool; counted by the report projection post-wave.
+        + diagnostics["sio2_gas_escape_mol"]
     )
 
     assert terminal_mol == pytest.approx(diagnostics["sio_evaporated_mol"])
