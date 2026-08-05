@@ -148,6 +148,29 @@ def test_perf_ratchet_guards_call_volume_and_cpu_cost() -> None:
         )
 
 
+def test_measure_all_selects_fastest_independent_stage_process(monkeypatch) -> None:
+    calls_by_stage = {stage: 0 for stage in STAGE_NAMES}
+
+    def fake_run(command, **_kwargs):
+        stage = command[-1]
+        calls_by_stage[stage] += 1
+        return subprocess.CompletedProcess(
+            command,
+            0,
+            stdout=json.dumps({"rate": float(calls_by_stage[stage])}),
+            stderr="",
+        )
+
+    monkeypatch.setattr(bench.subprocess, "run", fake_run)
+
+    measurements = bench.measure_all()
+
+    for stage in STAGE_NAMES:
+        repeats = bench.PROTOCOL["stage_process_repeats"][stage]
+        assert calls_by_stage[stage] == repeats
+        assert measurements[stage]["rate"] == pytest.approx(float(repeats))
+
+
 @pytest.mark.parametrize(
     ("output", "expected_source", "expected_percent"),
     (

@@ -43,7 +43,10 @@ from simulator.accounting import AccountingError
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.condensation import GAS_CONSTANT_J_MOL_K, alpha_s
 from simulator.core import PyrolysisSimulator
-from simulator.evaporation import _load_evaporation_alpha_by_species
+from simulator.evaporation import (
+    _load_evaporation_alpha_by_species,
+    _pre_rg_effective_pressure_source,
+)
 from simulator.state import (
     MOLAR_MASS,
     CampaignPhase,
@@ -319,6 +322,62 @@ def test_evaporation_caller_counts_cro2_mn_alpha_fallback_engagement(
 
     summary = sim._degraded_path_engagement_summary()
     assert summary["unmeasured_alpha_evaporation_fallback"]["total_count"] == 2
+
+
+@pytest.mark.xdist_group("serial")
+def test_k_at_1650c_drives_flux_with_extrapolation_status(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    setpoints_data = dict(setpoints_data)
+    kernel_config = dict(setpoints_data.get("chemistry_kernel", {}) or {})
+    series_config = dict(
+        kernel_config.get("evaporation_series_resistance", {}) or {}
+    )
+    series_config["gas_resistance_enabled"] = False
+    kernel_config["evaporation_series_resistance"] = series_config
+    setpoints_data["chemistry_kernel"] = kernel_config
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    sim.melt.temperature_C = 1650.0
+
+    equilibrium = sim._get_equilibrium()
+    effective_source = _pre_rg_effective_pressure_source(
+        sim.vapor_pressures, equilibrium
+    )
+    flux = sim._calculate_evaporation(equilibrium)
+
+    assert flux.species_kg_hr.get("K", 0.0) > 0.0
+    answer = sim._last_vapour_batch.channel("K")
+    continuation_pa = answer.pressure.pa
+    seam_pa = effective_source.pressure_pa("K")
+    assert seam_pa is not None and seam_pa > 0.0
+    assert seam_pa != pytest.approx(continuation_pa, rel=1.0e-6)
+    assert answer.extra.get("out_of_range") is True
+    assert answer.verdict_status == "status_bearing_non_authoritative"
+    assert answer.certification_ceiling == "never"
+    overlay = sim._last_vapour_batch_flux_overlay
+    assert overlay["selected_runtime_pa_by_species"]["K"] == pytest.approx(
+        seam_pa, rel=0.0, abs=0.0
+    )
+    assert (
+        overlay["selected_pressure_source_by_species"]["K"]
+        == effective_source.source_id
+    )
+    assert "K" in overlay["extrapolated_flux_species"]
+    assert "K" not in overlay["catalog_continuation_flux_species"]
+    expected_flux = _series_resistance_reference_flux(
+        sim,
+        {"K": seam_pa},
+    )
+    assert flux.species_kg_hr["K"] == pytest.approx(expected_flux["K"])
+    degraded = sim._degraded_path_engagement_summary()
+    assert degraded["vapour_pressure_extrapolation"]["total_count"] >= 1
 
 
 @pytest.mark.xdist_group("serial")

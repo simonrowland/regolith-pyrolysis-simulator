@@ -245,10 +245,9 @@ def test_shadow_records_show_zero_alkali_wall_flux_via_dewpoint(
     # the dew-point relation at the wall temperature.
     #
     # Hold at 1300 C (1573 K) so both Na and K stay inside their catalog
-    # fit domains (Na [1400,1900] K, K [1190,1600] K). At 1600 C K is
-    # out-of-domain and b-118 demotes it to PressureUpperBound (no inventory
-    # debit) — which would vacate the dew-point claim for K. The dew-point
-    # physics under test is independent of that authority fix.
+    # fit domains (Na [1400,1900] K, K [1190,1600] K). This isolates the
+    # dew-point claim from the status-bearing K continuation that drives flux
+    # above 1600 K.
     payload = PyrolysisRun(
         feedstock_id="lunar_mare_low_ti",
         campaign="C2A",

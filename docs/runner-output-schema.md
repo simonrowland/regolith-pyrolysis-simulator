@@ -14,8 +14,10 @@ Schema 1.9.0 adds the unconditional top-level
 plus required per-hour `vapour_batch_summary` and
 `vapour_batch_flux_overlay` fields. These surfaces expose typed vapour-channel
 selection, refusals, the named pre-RG effective-pressure value seam, and
-legacy-shadow comparison. Compatibility values cannot enter flux outside that
-seam.
+legacy-shadow comparison. Eligible channels consume the pre-RG seam whenever a
+value is present, regardless of domain status. Only a genuinely missing seam
+value uses the catalog fallback; the overlay reports that source per species
+while retaining out-of-domain status for degraded-path accounting.
 
 Schema 1.8.0 adds the unconditional top-level
 `terminal_product_taxonomy` field. Successful and handled-failure runs with a
@@ -579,6 +581,7 @@ both fields, preserving the exact top-level key contract.
 
 ```jsonc
 "degraded_path_engagement": {
+  "vapour_pressure_extrapolation": {...},
   "condensation_antoine_extrapolation": {
     "engaged": true,
     "total_count": 2,
@@ -593,7 +596,7 @@ both fields, preserving the exact top-level key contract.
 }
 ```
 
-The umbrella field and all five path objects are always present in success and
+The umbrella field and all six path objects are always present in success and
 failure envelopes. A path that did not engage serializes as
 `{engaged: false, total_count: 0, by_hour: []}`. The field is additive in
 schema 1.3.3; it does not change any degraded-path calculation or gate.
@@ -601,9 +604,10 @@ Schema 1.4.0 preserves this field shape and clarifies that Antoine
 extrapolation engagement counts records, not unique species.
 
 `total_count` and each `by_hour[].count` count the path's native engagement
-units: Antoine extrapolation records, capture-regularizer route calls,
-transport-proxy species, unmeasured-alpha species, or pipe-conductance
-calculations using the documented M_avg fallback. The rows also carry campaign,
+units: flux-driving vapour-pressure extrapolated species, condensation Antoine
+extrapolation records, capture-regularizer route calls, transport-proxy species,
+unmeasured-alpha species, or pipe-conductance calculations using the documented
+M_avg fallback. The rows also carry campaign,
 global hour, and campaign hour so repeated engagements are attributable without
 parsing warnings. These counts are diagnostics only; they never enter mass,
 mole, energy, pressure, or partition arithmetic.

@@ -51,44 +51,26 @@ def _captured_sio_equivalent_mol(liner_temperature_c: float) -> float:
 
 
 def test_subfloor_sio_does_not_create_unmaterialized_stage3_product():
-    # 2026-07-23 B1 premise shift: pre-wall-gate, the unconditional hot-wall
-    # backstop stole the SiO stream before Stage 3, leaving sub-floor crumbs
-    # there (the old ==0.0 pin). With hot walls honest (2b9f8d4), Stage-3
-    # capture is INVARIANT to liner temperature (probed 1400-1650 C: same
-    # value) — the hot-walls design doing its job. The 1e-12 kg
-    # materialization floor remains enforced at the MaterialLot layer; this
-    # scenario can no longer reach it via liner temperature.
-    # 2026-08-01 REPIN round 4 (SC-109): causal commit 228927d closed the C2A
-    # soft-endpoint fail-open (affirmative flux arming with typed refusal).
-    # Pre-fix the soft endpoint could complete campaigns BEFORE flux ever
-    # armed; post-fix campaigns run their full extraction window and evolve
-    # ~8x more SiO, so Stage-3 product scales with the longer-campaign supply
-    # (8.598e-7 -> 6.731e-6, ~7.83x). Authority:
-    # ~/Repos/rps-adjudicate/m2-bisect.md — drift at 228927d, bit-identical
-    # across the whole VR range. Old pin encoded the premature-completion bug.
-    # Regenerated at tip d13f597 from build_sio_yield_report.
-    # regenerated 2026-08-02 under REPAIRED MAGEMin config per the train13
-    # adjudication; prior value was generated against the broken-liquidus job
-    # tree (6.73114533926e-06). docs-private/research/2026-08-02-train13-adjudication.md
-    assert _stage3_silica_kg(1400.0) == pytest.approx(
-        6.73119341581e-06, rel=1e-9
-    )
+    # b-127: no Antoine segment covers this condenser temperature. The stage
+    # therefore refuses capture instead of fabricating a saturation pressure;
+    # evolved SiO remains in the gas train and cannot become Stage-3 product.
+    assert _stage3_silica_kg(1400.0) == 0.0
     retained_mol = _retained_holdup_sio_mol(1400.0)
     assert retained_mol >= 0.0
     assert retained_mol + _terminal_escape_sio_mol(1400.0) > 0.0
 
 
-def test_wall_band_capture_stays_bounded_after_reactive_sio_fix():
+def test_wall_band_refusal_preserves_sio_throughput():
     capture_1050 = _captured_sio_equivalent_mol(1050.0)
     capture_1300 = _captured_sio_equivalent_mol(1300.0)
     capture_1400 = _captured_sio_equivalent_mol(1400.0)
 
-    # Count every Si-bearing terminal and reactive wall product on a common
-    # SiO-mol basis. Direct wall SiO is now zero because the wall route emits
-    # Si, SiO2, and FeSi; counting only SiO created the false 57% spread.
-    captures = (capture_1050, capture_1300, capture_1400)
-    assert min(captures) > 0.0
-    assert max(captures) - min(captures) <= 0.04 * max(captures)
+    # The covered 1050 C interval captures; uncovered 1300/1400 C intervals
+    # refuse capture. Total captured + escaped SiO-equivalent stays bounded,
+    # proving the refusal passes vapor onward instead of returning it to melt.
+    assert capture_1050 > 0.0
+    assert capture_1300 == 0.0
+    assert capture_1400 == 0.0
     # The report's presentation bucket named terminal_offgas_escape also adds
     # downstream collected SiO2, so it is not an escape-only invariant. Use the
     # ledger-derived SiO escape mol on the same basis as the capture check.
@@ -96,4 +78,10 @@ def test_wall_band_capture_stays_bounded_after_reactive_sio_fix():
         _terminal_escape_sio_mol(temperature_C)
         for temperature_C in (1050.0, 1300.0, 1400.0)
     )
-    assert max(escapes) - min(escapes) <= 0.01 * max(escapes)
+    totals = tuple(
+        capture + escape for capture, escape in zip(
+            (capture_1050, capture_1300, capture_1400), escapes
+        )
+    )
+    assert min(totals) > 0.0
+    assert max(totals) - min(totals) <= 0.04 * max(totals)

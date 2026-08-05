@@ -1138,6 +1138,9 @@ def test_cross_feedstock_request_activation_and_seam_parity(
         assert math.isclose(pa, live, rel_tol=1.0e-9, abs_tol=1.0e-12), (
             f"{feedstock_id}/{sid}: batch seam Pa {pa} != live seam {live}"
         )
+        assert surface["flux_report"][
+            "selected_pressure_source_by_species"
+        ][sid] == surface["effective_source_id"]
 
     # Provenance / verdict ceilings on every requested channel (SC-50 consumers).
     for sid, ch in surface["channel_surface"].items():

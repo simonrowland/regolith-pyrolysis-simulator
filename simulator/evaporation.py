@@ -557,6 +557,14 @@ class EvaporationMixin:
         self._last_vapour_batch = vapour_batch
         self._last_vapour_batch_report = batch_report
         self._last_vapour_batch_flux_overlay = flux_overlay_report
+        extrapolated_flux_species = tuple(
+            flux_overlay_report.get('extrapolated_flux_species', ()) or ()
+        )
+        if extrapolated_flux_species:
+            self._record_degraded_path_engagement(
+                'vapour_pressure_extrapolation',
+                count=len(extrapolated_flux_species),
+            )
 
         if resolve_error:
             reason = str(resolve_error.get('reason') or 'vapour_batch_resolution_error')
@@ -645,10 +653,9 @@ class EvaporationMixin:
                 state == 'zero_by_physics' for state in channel_states.values()
             ):
                 return flux
-            # b-118: out-of-domain answers are typed upper_bound (non-debiting).
-            # When every channel is a typed non-debit outcome (upper_bound,
+            # When every channel is a typed non-debit outcome (genuine bound,
             # refusal, zero, dormant) and none is eligible / missing-seam,
-            # empty flux is authorized — not an empty-provider false zero.
+            # empty flux is authorized, not an empty-provider false zero.
             _typed_non_debit = frozenset(
                 {
                     'zero_by_physics',

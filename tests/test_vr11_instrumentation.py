@@ -482,7 +482,7 @@ def test_flux_pressures_from_batch_channel_unions() -> None:
     assert report["catalog_pa_shadow_equal"] is False
 
 
-def test_effective_pressure_set_mismatch_fails_closed() -> None:
+def test_in_domain_effective_pressure_set_mismatch_fails_closed() -> None:
     batch = _toy_batch({"Na"}, pressures={"Na": 1.0})
 
     flux, report = _flux_with_live_shadow(batch, {"Na": 12.5}, effective={})
@@ -492,6 +492,7 @@ def test_effective_pressure_set_mismatch_fails_closed() -> None:
         "typed_failure_effective_pressure_species_set_mismatch"
     )
     assert report["missing_effective_pressure_species"] == ["Na"]
+    assert report["catalog_continuation_flux_species"] == []
 
 
 def test_flux_pressures_proved_when_legacy_and_batch_agree() -> None:

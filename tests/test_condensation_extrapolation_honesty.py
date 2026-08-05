@@ -111,15 +111,18 @@ def test_wall_antoine_applied_path_reports_extrapolation_without_value_change():
     assert sio_range == [1400, 2273.15]
     sio_extrap: dict[str, dict[str, object]] = {}
     sio_warns: list[str] = []
-    sio_pressure = condensation._wall_deposition_driving_pressure_pa(
-        "SiO",
-        local_pressure_pa,
-        1173.15,
-        reactive_product_backstop=False,
-        antoine_extrapolations=sio_extrap,
-        antoine_extrapolation_warnings=sio_warns,
-    )
-    assert sio_pressure == 0.0
+    with pytest.raises(
+        condensation.WallSaturationPressureRefusal,
+        match="reason=source_certified_range_refused",
+    ):
+        condensation._wall_deposition_driving_pressure_pa(
+            "SiO",
+            local_pressure_pa,
+            1173.15,
+            reactive_product_backstop=False,
+            antoine_extrapolations=sio_extrap,
+            antoine_extrapolation_warnings=sio_warns,
+        )
     assert sio_extrap == {}
     assert sio_warns == []
 

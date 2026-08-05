@@ -61,7 +61,11 @@ from simulator.vapour_rail.request import (
     refusal_closure,
     resolve_vapour_batch,
 )
-from simulator.vapour_rail.instrumentation import serialize_vapour_answer
+from simulator.vapour_rail.instrumentation import (
+    EffectivePressureSource,
+    flux_pressures_from_batch,
+    serialize_vapour_answer,
+)
 from simulator.vapour_rail.u0_manifest import load_u0_manifest
 
 
@@ -703,47 +707,74 @@ def test_pending_validation_is_not_refusal() -> None:
     assert answer.verdict_status == "status_bearing_non_authoritative"
 
 
-def test_b118_out_of_domain_is_pressure_upper_bound_not_flux_eligible() -> None:
-    """b-118: out-of-domain continuation must not debit inventory.
-
-    Red-under-reversion: if request.py again mints PressureValue + FluxEligible
-    for evaluation.out_of_range, this fails. Authority is stripped while the
-    anti-cliff continuous envelope remains as a screening upper bound.
-    """
+def test_out_of_domain_k_at_1650c_is_flux_eligible_but_non_authoritative() -> None:
+    """An OOD point answer keeps K flux-eligible without certifying its value."""
     payload = _minimal_family("K")
-    # Domain [1000, 2000] K — 2100 K is out of range.
+    pressure_model = payload["families"]["k_test_family"]["physical_properties"][
+        "species"
+    ]["K"]["pressure_models"][0]
+    pressure_model["valid_domain"]["temperature_K"] = [1190.0, 1600.0]
     catalog = compile_vapour_rail_catalog(payload, u0_manifest=_u0_stub("K"))
     ledger = {"process.cleaned_melt": {"K2O": 1.0, "KO0.5": 1.0}}
-    # RG epoch: out-of-domain upper bounds are answerable but never flux-active.
-    # (Pre-RG refuses construction if a named effective-pressure species is not
-    # flux-eligible — that is correct; UpperBound must not activate.)
+    temperature_K = 1650.0 + 273.15
     batch = catalog.resolve_batch(
         ledger,
-        _state_with_k_activity(temperature_K=2100.0),
+        _state_with_k_activity(temperature_K=temperature_K),
         flux_activation_context=_rg_activation_context(),
     )
     answer = batch.channel("K")
     assert not answer.is_refused
     assert answer.extra.get("out_of_range") is True
-    assert isinstance(answer.pressure, PressureUpperBound)
-    assert isinstance(answer.flux, FluxDiagnosticUpperBound)
+    assert answer.extra.get("status") == OUT_OF_RANGE_STATUS
+    assert isinstance(answer.pressure, PressureValue)
+    assert isinstance(answer.flux, FluxEligible)
     assert answer.pressure.pa > 0.0
-    assert "out_of_domain" in answer.pressure.evidence_ref
-    # Upper bound may not join flux-active debit set.
-    assert not answer.is_flux_active
-    assert "K" not in batch.flux_active_species_ids
+    assert answer.is_flux_active
+    assert "K" in batch.flux_active_species_ids
+    assert answer.verdict_status == "status_bearing_non_authoritative"
+    assert answer.certification_ceiling == "never"
 
-    # Pre-RG demotes OOD upper bounds out of the debit set (no hard-fail of
-    # the whole batch when one claimed species is out of domain).
+    seam_pa = float(answer.pressure.pa) / 10.0
+    flux_pressures, overlay = flux_pressures_from_batch(
+        batch,
+        effective_pressure_source=EffectivePressureSource(
+            "populated_pre_rg_seam",
+            {"K": seam_pa},
+        ),
+    )
+    assert overlay["missing_effective_pressure_species"] == []
+    assert flux_pressures["K"] == pytest.approx(seam_pa, rel=0.0, abs=0.0)
+    assert (
+        overlay["selected_pressure_source_by_species"]["K"]
+        == "populated_pre_rg_seam"
+    )
+    assert overlay["catalog_continuation_flux_species"] == []
+    assert overlay["extrapolated_flux_species"] == ["K"]
+
+    fallback_flux_pressures, fallback_overlay = flux_pressures_from_batch(
+        batch,
+        effective_pressure_source=EffectivePressureSource(
+            "empty_pre_rg_seam",
+            {},
+        ),
+    )
+    assert fallback_overlay["missing_effective_pressure_species"] == ["K"]
+    assert fallback_flux_pressures["K"] == pytest.approx(answer.pressure.pa)
+    assert (
+        fallback_overlay["selected_pressure_source_by_species"]["K"]
+        == "vapour_batch_catalog_continuation"
+    )
+    assert fallback_overlay["catalog_continuation_flux_species"] == ["K"]
+
     pre_rg = catalog.resolve_batch(
         ledger,
-        _state_with_k_activity(temperature_K=2100.0),
+        _state_with_k_activity(temperature_K=temperature_K),
         flux_activation_context=_pre_rg_activation_context("K"),
     )
-    assert isinstance(pre_rg.channel("K").pressure, PressureUpperBound)
-    assert "K" not in pre_rg.flux_active_species_ids
+    assert isinstance(pre_rg.channel("K").pressure, PressureValue)
+    assert "K" in pre_rg.flux_active_species_ids
 
-    # In-domain control still full-authority (when activated).
+    # In-domain control remains eligible without extrapolation status.
     in_domain = catalog.resolve_batch(
         ledger,
         _state_with_k_activity(temperature_K=1500.0),
@@ -795,6 +826,15 @@ def test_missing_activity_is_refusal_or_declared_henrian_upper_bound() -> None:
         bounded.source_reaction_activity.verdict
         is ActivityVerdictKind.UPPER_BOUND
     )
+    assert not bounded.is_flux_active
+    assert "K" not in bounded_catalog.resolve_batch(
+        ledger,
+        VapourResolveState(
+            temperature_K=1500.0,
+            source_reaction_fO2_bar=1.0e-8,
+        ),
+        flux_activation_context=_pre_rg_activation_context("K"),
+    ).flux_active_species_ids
     assert serialize_vapour_answer(bounded)["activity_bound"] == "bound-not-point"
 
 

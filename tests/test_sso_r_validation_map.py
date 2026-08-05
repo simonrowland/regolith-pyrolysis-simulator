@@ -495,8 +495,12 @@ def test_owner_pn2_anchor_reports_current_certification_state(smoke_payload):
     assert owner["native_fe_vapor_escape_fraction_of_pool"] == pytest.approx(
         0.00134254286028043, rel=0.0, abs=1.0e-15
     )
+    # t-523 restores nonzero OOD inventory debits while retaining the
+    # equilibrium-backend pressure seam. That changes the downstream stage-3
+    # composition denominator; the native Fe pool/tap/vapour pins above remain
+    # unchanged, so this is not a redox-authority or value-source cutover.
     assert owner["stage_3_Fe_wt_pct"] == pytest.approx(
-        0.012182606647785619, rel=0.0, abs=1.0e-15
+        0.0121860033141556, rel=0.0, abs=1.0e-15
     )
     assert owner["ferric_divergence_material"] is False
     assert abs(owner["mass_balance_error_pct"]) <= 5e-12

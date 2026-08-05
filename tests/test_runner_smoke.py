@@ -466,6 +466,7 @@ TOP_LEVEL_KEYS = frozenset({
 })
 
 DEGRADED_PATH_KEYS = frozenset({
+    "vapour_pressure_extrapolation",
     "condensation_antoine_extrapolation",
     "capture_budget_regularizer",
     "transport_d_ab_proxy",

@@ -247,7 +247,7 @@ def test_unusable_wall_antoine_coefficients_raise_typed_refusal(
 
     with pytest.raises(
         WallSaturationPressureRefusal,
-        match="reason=saturation_pressure_unavailable",
+        match="reason=source_certified_range_refused",
     ):
         _wall_deposition_driving_pressure_pa(
             "Fe",
@@ -383,15 +383,14 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
         )
         + "\n"
     ).encode("utf-8")
-    # Regenerated from the executable b-118/b-127 coating-cluster path
-    # (2026-08-04): out-of-domain vapour answers are PressureUpperBound (no
-    # inventory debit; coating-risk upper envelope) and uncovered Antoine
-    # segments refuse instead of fabricating 100 Pa. Golden moves because
-    # OOD K/Ti no longer debit under half-slope under-report, and capture
-    # integrals no longer invent ~1 mbar — both correct for the coating
-    # failure mode. Double in-process SHA match on this worktree.
+    # Regenerated from the executable t-523 correction to b-118 (2026-08-04):
+    # the coating-risk upper-envelope continuation is unchanged, but
+    # out-of-domain K/Ti again debit inventory while carrying extrapolated,
+    # non-certifying status. The dedicated degraded-path counter is serialized.
+    # b-127 still refuses uncovered condenser Antoine segments rather than
+    # fabricating 100 Pa. Re-derived from the executable path.
     assert hashlib.sha256(actual_bytes).hexdigest() == (
-        "a4e352f79753172ed767bf457960112b09904605bff16226cf80f2d8f416e1e0"
+        "6e75e35eb39c2413e2e86ca52ac1b4492f6a8f4ebf77e54d069ce8f260c7b9de"
     )
 
 

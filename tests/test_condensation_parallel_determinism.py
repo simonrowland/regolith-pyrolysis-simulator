@@ -39,13 +39,10 @@ def _silica_feedstocks() -> dict:
 
 
 def _silica_vapor_pressures() -> dict:
-    # schema_version 2 production catalog is required: VR-11 evaporation
-    # refuses vapour_rail_catalog_missing when schema_version != 2 (legacy
-    # metals/oxide_vapors-only fixtures no longer compile a catalog). The
-    # forced SiO EvaporationFlux path under test is independent of melt
-    # evaporation channels; the full catalog only satisfies the advance()
-    # catalog contract. Wall-attribution pin J is unchanged vs the prior
-    # legacy-fixture era (0.062205888833975716).
+    # The forced SiO EvaporationFlux path under test is independent of melt
+    # evaporation channels. Keep the production catalog because the direct
+    # condensation route consumes its wall-pressure coverage; no warm-up
+    # advance is needed to exercise wall attribution.
     return yaml.safe_load((_ROOT / "data" / "vapor_pressures.yaml").read_text())
 
 
@@ -116,7 +113,6 @@ def _multi_tick_trace(
     session = _start_session(feedstocks, setpoints, vapor_pressures)
     trace = []
     for tick in range(MULTI_TICK_COUNT):
-        session.advance()
         _route_cold_wall_sio_tick(session)
         snapshot = session.snapshot()
         trace.append(
@@ -141,7 +137,6 @@ def _has_runtime_wall_keys(mapping: dict) -> bool:
 
 def test_cold_wall_segment_attribution_matches_configured_geometry_values():
     session = _start_session()
-    session.advance()
 
     attribution = _route_cold_wall_sio_tick(session)
 
@@ -163,16 +158,17 @@ def test_cold_wall_segment_attribution_matches_configured_geometry_values():
     # from the species PARTIAL pressure in the flowing gas against saturation
     # at the wall temperature, replacing the pure-component P_sat(T_melt) that
     # was not an admissible partial pressure.
-    # 2026-08-04 re-pin (b-118/b-127 coating-cluster): out-of-domain catalogue
-    # answers are typed upper bounds (no inventory debit) and uncovered Antoine
-    # segments refuse rather than invent 100 Pa. Cold-wall SiO J moves
+    # 2026-08-04 re-pin (b-118/b-127 coating-cluster): the continuation became
+    # coating-conservative and uncovered Antoine segments refuse rather than
+    # invent 100 Pa. Cold-wall SiO J moves
     # 0.062205888833975716 -> the value below (+0.865 %), i.e. MORE wall flux
     # — the physically correct direction for the coating failure mode (prior
     # under-reporting path removed). Re-derived from the executable cold-wall
     # path by inverting this test's own algebra,
     # J = Si_kg/(0.5*A1*M_Si/1000*3600), and cross-checked against the SiO2
     # leg — both legs agree to 1e-12 relative. Area ratio A2/A1 = 4.5/4.0
-    # unchanged.
+    # unchanged. The later t-523 correction restores extrapolated inventory
+    # debit without changing this coating-conservative continuation or its pin.
     sio_flux_mol_m2_s = 0.06274375148239172
     segment_areas_m2 = {
         "process.wall_deposit_segment_stage_0_to_stage_1": (
@@ -242,8 +238,6 @@ def test_parallel_simsessions_isolate_shared_wall_route_inputs():
 
     left = _start_session(feedstocks, setpoints, vapor_pressures)
     right = _start_session(feedstocks, setpoints, vapor_pressures)
-    left.advance()
-    right.advance()
 
     left_attribution = _route_cold_wall_sio_tick(left)
     assert _wall_attribution(right) == {}

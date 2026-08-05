@@ -192,6 +192,39 @@ def test_unsupported_refusal_snapshot_graph_raises_typed_error() -> None:
         sim._snapshot_terminal_refusal_hour_state()
 
 
+def test_refusal_snapshot_preserves_compiled_vapour_catalog_owner(monkeypatch) -> None:
+    class ImmutableCatalogOwner:
+        def __deepcopy__(self, _memo):
+            raise AssertionError("compiled catalog must not enter rollback deepcopy")
+
+    sim = object.__new__(PyrolysisSimulator)
+    catalog = ImmutableCatalogOwner()
+    sim.vapour_rail_catalog = catalog
+    sim.runtime_state = {"mutable": [1, 2, 3]}
+    sim.atom_ledger = object()
+    sim._chem_registry = object()
+    sim._chem_kernel = object()
+    rebuilt_kernel = object()
+    sim._build_chemistry_kernel = lambda: rebuilt_kernel
+    monkeypatch.setattr("simulator.core.snapshot_atom_ledger", lambda _ledger: {})
+
+    state, ledger, cost_state = sim._snapshot_terminal_refusal_hour_state()
+
+    assert "vapour_rail_catalog" not in state
+    assert sim.vapour_rail_catalog is catalog
+    assert state["runtime_state"] == {"mutable": [1, 2, 3]}
+    assert ledger == {}
+    assert cost_state is None
+
+    sim.runtime_state["mutable"].append(4)
+    sim._restore_terminal_refusal_hour_state(state, ledger, cost_state)
+
+    assert sim.runtime_state == {"mutable": [1, 2, 3]}
+    assert sim.vapour_rail_catalog is catalog
+    assert sim.atom_ledger == {}
+    assert sim._chem_kernel is rebuilt_kernel
+
+
 @pytest.mark.parametrize(
     ("hook", "error_type"),
     (("deepcopy", ValueError), ("reduce", RuntimeError)),

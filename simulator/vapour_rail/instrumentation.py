@@ -555,7 +555,8 @@ def _channel_flux_pressure_pa(
 
     Returns ``(pa_or_None, state)`` where ``pa`` is only set for inventory-
     debiting HKL (PressureValue + FluxEligible). Batch outcomes decide whether
-    the source may be read; the source never expands eligibility or membership.
+    the pre-RG source may be read. The catalog point answer is a fallback only
+    when an eligible channel has no seam value.
     """
 
     state = _channel_flux_gate_state(answer)
@@ -564,8 +565,13 @@ def _channel_flux_pressure_pa(
     if state != "eligible":
         return None, state
     pa = effective_pressure_source.pressure_pa(answer.species_id)
-    if pa is None:
-        return None, "missing_effective_pressure"
+    if pa is not None:
+        return pa, "eligible"
+    pressure = answer.pressure
+    assert isinstance(pressure, PressureValue)
+    pa = float(pressure.pa)
+    if not math.isfinite(pa) or pa < 0.0:
+        return None, "invalid_catalog_pressure"
     return pa, "eligible"
 
 
@@ -733,9 +739,12 @@ def flux_pressures_from_batch(
 
     Active path: require batch, iterate ``requested_species_ids``, branch on
     catalog pressure/flux unions, enforce the batch-active set, then read values
-    from ``effective_pressure_source``. Refusal/upper-bound/zero are typed
-    non-debit states. Before RG-1 the source is the equilibrium backend; the
-    batch remains channel/refusal/set authority.
+    from ``effective_pressure_source``. An eligible point answer supplies a
+    catalog fallback only when that seam has no value.
+    Refusal/upper-bound/zero are typed non-debit states. Before RG-1 the source
+    is the equilibrium backend; the batch remains channel/refusal/set authority.
+    Extrapolated point estimates are named explicitly for status/degraded
+    accounting regardless of which numeric source supplies their flux value.
     Absent batch or resolve error → empty flux map + typed failure report;
     this consumer accepts no anonymous compatibility mapping.
     """
@@ -744,10 +753,13 @@ def flux_pressures_from_batch(
         "schema": "vapour_batch_flux_overlay.v1",
         "batch_present": batch is not None,
         "n_flux_pressures": 0,
+        "n_extrapolated_flux_species": 0,
+        "extrapolated_flux_species": [],
         "batch_channel_states": {},
         "note": (
             "VapourBatch owns channel refusal, eligibility, and the active set; "
-            "effective values cross one typed source seam before RG-1."
+            "values cross the typed pre-RG seam when present; eligible point "
+            "answers supply the catalog value only as a missing-seam fallback."
         ),
         "effective_pressure_source": effective_pressure_source.source_id,
         "effective_pressure_zero_reason": (
@@ -764,22 +776,40 @@ def flux_pressures_from_batch(
         report["selection_source"] = "typed_failure_missing_batch"
         return {}, report
 
-    source_species_ids = effective_pressure_source.species_ids
     batch_active_species_ids = batch.flux_active_species_ids
-    missing_source_species = sorted(batch_active_species_ids - source_species_ids)
+    source_species_ids = effective_pressure_source.species_ids
+    missing_source_species_ids = batch_active_species_ids - source_species_ids
+    out_of_range_active_species_ids = frozenset(
+        species_id
+        for species_id in batch_active_species_ids
+        if (
+            (answer := batch.channels_by_species.get(species_id)) is not None
+            and bool(dict(answer.extra).get("out_of_range", False))
+        )
+    )
+    catalog_continuation_fallback_species_ids = (
+        missing_source_species_ids & out_of_range_active_species_ids
+    )
+    missing_source_species = sorted(missing_source_species_ids)
+    unresolved_missing_source_species = sorted(
+        missing_source_species_ids - catalog_continuation_fallback_species_ids
+    )
     extra_source_species = sorted(source_species_ids - batch_active_species_ids)
     report["missing_effective_pressure_species"] = missing_source_species
+    report["catalog_continuation_flux_species"] = sorted(
+        catalog_continuation_fallback_species_ids
+    )
     report["effective_pressure_species_not_batch_active"] = extra_source_species
-    # Batch-active species must have a seam value (hard fail if not). Source
-    # extras that the batch demoted to upper_bound / non-debiting (b-118
-    # out-of-domain continuation) are expected: they keep the anti-cliff
-    # screening answer but do not debit inventory, so they must not empty the
-    # whole flux map.
-    if missing_source_species:
+    # Only OOD point answers may bridge a genuine seam absence with their
+    # catalog continuation. An in-domain seam gap remains a typed failure:
+    # accepting its catalog point would be an implicit RG-1 value cutover.
+    if unresolved_missing_source_species:
         report["selection_source"] = (
             "typed_failure_effective_pressure_species_set_mismatch"
         )
         return {}, report
+    # Source extras that the batch marks as genuine upper bounds are expected
+    # and must not empty the whole flux map.
     if extra_source_species:
         report["demoted_effective_pressure_species"] = list(extra_source_species)
 
@@ -787,6 +817,8 @@ def flux_pressures_from_batch(
     flux_pressures: dict[str, float] = {}
     batch_pa_by_species: dict[str, float] = {}
     selected_runtime_pa_by_species: dict[str, float] = {}
+    selected_pressure_source_by_species: dict[str, str] = {}
+    extrapolated_flux_species: list[str] = []
     channel_states: dict[str, str] = {}
     missing_channel_keys: list[str] = []
 
@@ -816,16 +848,32 @@ def flux_pressures_from_batch(
         if state == "eligible" and selected_pa is not None:
             selected_runtime_pa_by_species[species_id] = float(selected_pa)
             flux_pressures[species_id] = float(selected_pa)
+            if bool(dict(answer.extra).get("out_of_range", False)):
+                extrapolated_flux_species.append(species_id)
+            if species_id not in catalog_continuation_fallback_species_ids:
+                selected_pressure_source_by_species[species_id] = (
+                    effective_pressure_source.source_id
+                )
+            else:
+                selected_pressure_source_by_species[species_id] = (
+                    "vapour_batch_catalog_continuation"
+                )
         elif state == "zero_by_physics":
             selected_runtime_pa_by_species[species_id] = 0.0
             flux_pressures[species_id] = 0.0
+            selected_pressure_source_by_species[species_id] = "zero_by_physics"
         # refusal / upper_bound / nonfinite / dormant eligible: no debit
 
     report["batch_channel_states"] = channel_states
     report["batch_pa_by_species"] = batch_pa_by_species
     report["selected_runtime_pa_by_species"] = selected_runtime_pa_by_species
+    report["selected_pressure_source_by_species"] = (
+        selected_pressure_source_by_species
+    )
     report["missing_batch_keys"] = missing_channel_keys
     report["n_flux_pressures"] = len(flux_pressures)
+    report["extrapolated_flux_species"] = extrapolated_flux_species
+    report["n_extrapolated_flux_species"] = len(extrapolated_flux_species)
 
     return flux_pressures, report
 
@@ -877,9 +925,9 @@ def compare_live_shadow_to_batch_flux(
     refused_live: list[str] = []
     missing_channel_keys: list[str] = []
     catalog_pa_by_species: dict[str, float] = {}
-    # b-118: catalog upper_bound (out-of-domain) demotes seam claims. Live may
-    # still carry those species as legacy pressures; they are not batch
-    # flux-active and must not fail the activation-set shadow proof.
+    # Genuine catalog upper bounds demote seam claims. Live may still carry
+    # those species as legacy pressures; they are not batch flux-active and
+    # must not fail the activation-set shadow proof.
     demoted_upper_bound: set[str] = set()
 
     if batch is not None:

@@ -4,6 +4,10 @@
   "margin_frac": 0.1,
   "protocol": {
     "aggregation": "max_trial_rate",
+    "condensation_fixture": {
+      "wall_capture_solver": "coupled_fixed_point",
+      "wall_species_partial_pressure_mbar": 0.1
+    },
     "hot_path_calls_per_trial": {
       "condensation_route_hour": 164,
       "internal_analytical_equilibrium": 500,
@@ -13,6 +17,14 @@
     },
     "in_process_timer": "time.process_time",
     "isolation": "one_process_per_stage",
+    "revision": 5,
+    "stage_process_repeats": {
+      "condensation_route_hour": 5,
+      "internal_analytical_equilibrium": 1,
+      "runner_fixture_replay": 3,
+      "sim_step_c2a_hour": 1,
+      "vapor_pressure_eval": 1
+    },
     "stage_work_units_per_trial": {
       "condensation_route_hour": 4,
       "internal_analytical_equilibrium": 500,
@@ -29,12 +41,12 @@
   "stages": {
     "condensation_route_hour": {
       "hot_path": "CondensationModel.route -> _condensation_efficiency",
-      "ratchet_rate": 39.91657435958829,
+      "ratchet_rate": 16.431828451710963,
       "rate_unit": "work_units_per_cpu_second"
     },
     "internal_analytical_equilibrium": {
       "hot_path": "PyrolysisSimulator._internal_analytical_equilibrium",
-      "ratchet_rate": 6103.068622903584,
+      "ratchet_rate": 9530.889613236483,
       "rate_unit": "work_units_per_cpu_second"
     },
     "runner_fixture_replay": {
@@ -49,7 +61,7 @@
     },
     "vapor_pressure_eval": {
       "hot_path": "effective_equilibrium_pressure_Pa",
-      "ratchet_rate": 676412.0100710248,
+      "ratchet_rate": 1015572.1056195075,
       "rate_unit": "work_units_per_cpu_second"
     }
   }

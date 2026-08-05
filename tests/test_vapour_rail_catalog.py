@@ -652,13 +652,13 @@ def test_config_bundle_retains_compiler_capability_for_b1(
     ) is sim.vapour_rail_catalog.evaluator_for_condensation("K")
 
 
-def test_anti_cliff_continuation_is_status_bearing_nonzero_upper_envelope() -> None:
-    """Out-of-domain continues without a zero cliff; coating-risk upper envelope.
+def test_anti_cliff_continuation_is_status_bearing_coating_conservative() -> None:
+    """Out-of-domain continues with a coating-conservative point estimate.
 
     Rationale (b-118): the prior half-slope always under-stated outward
     volatility (anti-conservative for coating). The anti-cliff intent is
-    preserved (nonzero, continuous from the domain edge); the bound direction
-    is now an upper envelope so a screening bound never under-states flux.
+    preserved (nonzero, continuous from the domain edge); the continuation
+    direction is conservative for coating so the estimate never under-states flux.
     """
     evaluator = compile_vapour_rail_catalog(_reaction_fixture()).evaluator_for("K")
     endpoint = evaluator.evaluate(
@@ -673,7 +673,7 @@ def test_anti_cliff_continuation_is_status_bearing_nonzero_upper_envelope() -> N
     assert beyond.acquisition_flag == "acquire:test:K"
     # Anti-cliff: strictly above the domain-edge value, never silent zero.
     assert beyond.pressure_pa > endpoint > 0.0
-    # Coating-risk upper envelope: at or above straight log-linear continuation.
+    # Coating-conservative estimate: at or above straight log-linear continuation.
     assert beyond.pressure_pa >= straight_pa
     assert (
         evaluator.evaluate(900.0, source_activity=1.0, pO2_bar=1.0).pressure_pa

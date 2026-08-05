@@ -310,6 +310,7 @@ _VALID_DECISION_CHOICES = {
 _RESOLVE_MELT_REDOX_GATE_AUTHORITY = object()
 _MELT_REDOX_GATE_FALLBACK_HISTORY_MAXLEN = 256
 DEGRADED_PATH_ENGAGEMENT_KEYS = (
+    'vapour_pressure_extrapolation',
     'condensation_antoine_extrapolation',
     'capture_budget_regularizer',
     'transport_d_ab_proxy',
@@ -11605,6 +11606,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'atom_ledger',
             '_chem_kernel',
             'cost_ledger',
+            # Compiled catalog state is immutable by owner contract: species
+            # are exposed through a mapping proxy, rules are tuples, and raw
+            # projections are deepcopy-on-read. It cannot participate in an
+            # hourly mutation that refusal rollback needs to restore.
+            'vapour_rail_catalog',
         }
         memo = {id(self): self}
         state_source = {
@@ -11641,6 +11647,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'species_formula_registry',
             '_chem_registry',
             'cost_ledger',
+            'vapour_rail_catalog',
         }
         preserved = {
             name: self.__dict__[name]

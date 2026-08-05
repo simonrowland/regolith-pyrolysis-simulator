@@ -170,10 +170,11 @@ def test_batch_cli_web_mol_ledger_parity(monkeypatch):
     assert EXPECTED_CORE_ACCOUNTS <= set(batch.ledger)
     for account in OPTIONAL_PRODUCT_ACCOUNTS:
         assert len({account in surface.ledger for surface in surfaces}) == 1
-    assert {"Fe", "Cr", "Si"} <= set(
-        batch.ledger["process.condensation_train"]
-    )
-    assert {"Na", "K", "Mg"} <= set(batch.ledger["terminal.offgas"])
+    assert {"Fe", "Cr"} <= set(batch.ledger["process.condensation_train"])
+    # SiO wall saturation is outside its source-certified range on this drive,
+    # so the typed pass-through remains terminal offgas rather than fabricating
+    # a condensed Si product. All three surfaces must preserve that routing.
+    assert {"Na", "K", "Mg", "SiO"} <= set(batch.ledger["terminal.offgas"])
     assert {"Al2O3", "CaO", "FeO", "MgO", "SiO2"} <= set(
         batch.ledger["process.cleaned_melt"]
     )

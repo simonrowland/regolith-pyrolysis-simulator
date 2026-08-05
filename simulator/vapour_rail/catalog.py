@@ -663,8 +663,8 @@ class CompiledPressureEvaluator:
                     f"{self.extrapolation_policy!r}"
                 )
             # Anti-cliff: continuous non-zero at the domain edge (no silent
-            # zero). Consumers MUST type this as PressureUpperBound /
-            # FluxDiagnosticUpperBound — never full-authority PressureValue.
+            # zero). Consumers may compute with this continuation but must
+            # preserve its extrapolated, non-certifying status.
             log10_reference = self._out_of_domain_log10_continuation(
                 temperature_K
             )
@@ -706,19 +706,18 @@ class CompiledPressureEvaluator:
         )
 
     def _out_of_domain_log10_continuation(self, temperature_K: float) -> float:
-        """Continuous out-of-domain envelope (anti-cliff; not full authority).
+        """Continuous out-of-domain estimate (anti-cliff; not claim authority).
 
         Owner-ratified anti-cliff policy: never drop to silent zero at the
         fit-domain edge (that would invent a volatility cliff). The returned
-        number is a **screening upper envelope**, not a point PressureValue.
+        number is the best available continuation, not certifying evidence.
 
-        Consequence-directed bound (coating failure mode, CLAUDE.md §4):
-        under-stating flux flatters yield and hides wall coating. A bound that
-        may inform coating risk must not under-state outward volatility —
+        Consequence-directed estimate (coating failure mode, CLAUDE.md §4): one
+        value drives both yield and wall-deposit risk, so no direction protects
+        both claims. Err toward not hiding the co-equal coating failure mode:
         amplify outward increases and attenuate outward decreases relative to
-        the straight log-linear slope. Inventory debit remains forbidden:
-        request.py maps ``out_of_range`` evaluations to PressureUpperBound +
-        FluxDiagnosticUpperBound.
+        the straight log-linear slope. The caller may evolve inventory from the
+        estimate but must keep it status-bearing and unable to certify.
         """
         low, high = self.valid_temperature_K
         boundary = low if temperature_K < low else high

@@ -1066,22 +1066,17 @@ def refusal_closure(
                 and source_reaction_activity.verdict
                 is ActivityVerdictKind.UPPER_BOUND
             )
-            # b-118: out-of-domain continuation is a typed upper bound, never
-            # full-authority PressureValue + FluxEligible (that under-stated
-            # coating flux while debiting inventory). Anti-cliff continuity is
-            # preserved in the evaluator; authority is stripped here.
-            out_of_domain = bool(evaluation_extra.get("out_of_range"))
-            if activity_is_upper_bound or out_of_domain:
-                if activity_is_upper_bound:
-                    bound_evidence = (
-                        source_reaction_activity.evidence_ref
-                        or source_reaction_activity.reason
-                        or "source_reaction_activity_upper_bound"
-                    )
-                else:
-                    bound_evidence = (
-                        f"catalog:out_of_domain_continuation:{rule.species_id}"
-                    )
+            # Computation and certification are separate. A genuine Henrian
+            # a=1 activity bound remains non-debiting. An out-of-domain
+            # continuation is instead the best available point estimate and
+            # must evolve inventory; its out_of_range/status/acquisition fields
+            # plus the verdict/certification ceiling strip claim authority.
+            if activity_is_upper_bound:
+                bound_evidence = (
+                    source_reaction_activity.evidence_ref
+                    or source_reaction_activity.reason
+                    or "source_reaction_activity_upper_bound"
+                )
                 pressure = PressureUpperBound(
                     pa=float(pressure_pa), evidence_ref=bound_evidence
                 )
@@ -1416,10 +1411,9 @@ def resolve_vapour_batch(
     # Answerability is not activation authority. Pre-RG keeps the species set
     # supplied by the typed effective-pressure seam, but only after refusal
     # closure proves every *remaining debit claim* is catalog-eligible.
-    # Typed non-debiting answers (PressureUpperBound / FluxDiagnosticUpperBound,
-    # ZeroByPhysics) demote the seam claim rather than hard-fail the batch —
-    # b-118 out-of-domain is an upper bound, not a full-authority debit, and
-    # must not collapse the whole evaporation step when one species is OOD.
+    # Typed non-debiting answers (genuine PressureUpperBound /
+    # FluxDiagnosticUpperBound, ZeroByPhysics) demote the seam claim rather
+    # than hard-fail the batch.
     # True refusals among claimed species still hard-fail construction.
     # RG-1 may activate the full manifest/catalog union after its
     # activity-corrected value path lands.

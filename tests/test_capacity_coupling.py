@@ -29,6 +29,7 @@ from simulator.physical_constants import GAS_CONSTANT
 from simulator.state import CampaignPhase, EvaporationFlux
 from simulator.vapour_rail.activity import ActivityVerdictKind
 from simulator.vapour_rail.batch import PressureRefusal, PressureValue
+from simulator.vapour_rail.catalog import OUT_OF_RANGE_STATUS
 from simulator.vapour_rail.instrumentation import (
     EffectivePressureSource,
     compare_live_shadow_to_batch_flux,
@@ -500,27 +501,46 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
         )
 
     temperature_K = equilibrium.temperature_C + 273.15
-    for species_id, probe_pa in verifier_probe_pa.items():
-        answer = batch.channel(species_id)
-        assert isinstance(answer.pressure, PressureValue)
-        catalog_pa = float(answer.pressure.pa)
-        seam_pa = effective_source.pressure_pa(species_id)
-        assert seam_pa is not None and seam_pa > 0.0
-        assert within_probe_band(species_id, float(seam_pa), probe_pa)
-        assert within_probe_band(species_id, catalog_pa, probe_pa)
-        assert within_probe_band(species_id, catalog_pa, float(seam_pa))
-        activity = answer.source_reaction_activity
-        assert activity is not None
-        assert activity.verdict is ActivityVerdictKind.POINT
-        assert activity.provider == "BuiltinVaporPressureProvider"
-        assert activity.evidence_ref is not None
-        assert "_last_vapor_pressure_diagnostic.activities" in activity.evidence_ref
-
     original_activities = dict(equilibrium.activity_coefficients)
     original_diagnostic_activities = dict(
         sim._last_vapor_pressure_diagnostic["activities"]
     )
     assert original_activities == original_diagnostic_activities
+    baseline_catalog_pa: dict[str, float] = {}
+    activity_exponents: dict[str, float] = {}
+    for species_id, probe_pa in verifier_probe_pa.items():
+        answer = batch.channel(species_id)
+        assert isinstance(answer.pressure, PressureValue)
+        catalog_pa = float(answer.pressure.pa)
+        baseline_catalog_pa[species_id] = catalog_pa
+        seam_pa = effective_source.pressure_pa(species_id)
+        assert seam_pa is not None and seam_pa > 0.0
+        assert within_probe_band(species_id, float(seam_pa), probe_pa)
+        if species_id == "K":
+            assert answer.extra.get("out_of_range") is True
+            assert answer.extra["status"] == OUT_OF_RANGE_STATUS
+            assert answer.extra.get("acquisition_flag")
+            assert answer.verdict_status == "status_bearing_non_authoritative"
+            assert answer.certification_ceiling == "never"
+            assert math.isfinite(catalog_pa) and 0.0 < catalog_pa
+            assert catalog_pa < pure_component_probe_pa[species_id]
+            assert not within_probe_band(species_id, catalog_pa, float(seam_pa))
+        else:
+            assert not answer.extra.get("out_of_range", False)
+            assert within_probe_band(species_id, catalog_pa, probe_pa)
+            assert within_probe_band(species_id, catalog_pa, float(seam_pa))
+        activity = answer.source_reaction_activity
+        assert activity is not None
+        assert activity.verdict is ActivityVerdictKind.POINT
+        assert activity.value == pytest.approx(
+            original_activities[species_id], rel=0.0, abs=0.0
+        )
+        assert activity.provider == "BuiltinVaporPressureProvider"
+        assert activity.evidence_ref is not None
+        assert "_last_vapor_pressure_diagnostic.activities" in activity.evidence_ref
+        evaluator = sim.vapour_rail_catalog.species[species_id].evaluator
+        assert evaluator is not None
+        activity_exponents[species_id] = evaluator.activity_exponent
     try:
         for species_id in verifier_probe_pa:
             # Mutate one species at a time from the same baseline. This proves
@@ -541,6 +561,13 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
             assert isinstance(a1_answer.pressure, PressureValue)
             assert a1_answer.source_reaction_activity is not None
             assert a1_answer.source_reaction_activity.value == pytest.approx(1.0)
+            if batch.channel(species_id).extra.get("out_of_range", False):
+                exponent = activity_exponents[species_id]
+                assert exponent > 0.0
+                expected_scale = (1.0 / original_activities[species_id]) ** exponent
+                assert (
+                    float(a1_answer.pressure.pa) / baseline_catalog_pa[species_id]
+                ) == pytest.approx(expected_scale, rel=1.0e-12, abs=0.0)
             seam_pa = effective_source.pressure_pa(species_id)
             assert seam_pa is not None and seam_pa > 0.0
             assert not within_probe_band(
@@ -603,9 +630,14 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
         assert flux_pressures[species_id] == pytest.approx(
             effective_source.pressure_pa(species_id), rel=0.0, abs=0.0
         )
+        assert flux_report["selected_pressure_source_by_species"][species_id] == (
+            effective_source.source_id
+        )
+    assert batch.channel("K").extra.get("out_of_range") is True
     assert flux_pressures["K"] != pytest.approx(
         batch.channel("K").pressure.pa, rel=1.0e-6
     )
+    assert "K" in flux_report["extrapolated_flux_species"]
 
     assert effective_source.source_id == (
         "equilibrium_backend_effective_pressure_pre_rg"
@@ -699,10 +731,9 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         rel=1.0e-12,
         abs=1.0e-12,
     )
-    # 2026-07-21 B1 vapor-package regen: the re-grounded Ti row crosses its
-    # evolution threshold at this 1600 C hour-1 probe, adding evaporate_Ti +
-    # condense_Ti (19 -> 21 transitions).
-    assert len(sim.atom_ledger.transitions) == 21
+    # The status-bearing out-of-domain point path removes one earlier
+    # zero-quantity transition; the hot-tail mechanism is otherwise unchanged.
+    assert len(sim.atom_ledger.transitions) == 20
     assert tuple(
         transition.reason for transition in sim.atom_ledger.transitions[-5:]
     ) == (
