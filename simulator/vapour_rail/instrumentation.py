@@ -273,6 +273,7 @@ def _activity_payload(activity: Any) -> dict[str, Any] | None:
         "refusal_code": getattr(refusal_code, "value", refusal_code),
         "detail": activity.detail,
         "evidence_ref": activity.evidence_ref,
+        "evidence_tier": activity.evidence_tier,
         "derivation": dict(activity.derivation),
     }
 

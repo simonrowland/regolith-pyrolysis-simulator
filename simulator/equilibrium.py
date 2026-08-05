@@ -274,6 +274,7 @@ class EquilibriumMixin:
         vapor_pressures = {}
         vapor_pressure_sources = {}
         activities = {}
+        activity_provenance = {}
         metal_extrapolations = {}
         ellingham_extrapolations = {}
         vapor_pressure_authority_limits = {}
@@ -521,10 +522,14 @@ class EquilibriumMixin:
                     parent_oxide,
                     melt_account_mol,
                     cation_mol_fraction=cation_mol_fraction,
+                    temperature_K=T_K,
                 )
                 if oxide_activity is None or oxide_activity.activity <= 1e-10:
                     continue
+                if oxide_activity.warning:
+                    warnings.append(oxide_activity.warning)
                 activities[species] = oxide_activity.activity
+                activity_provenance[species] = oxide_activity.provenance()
 
                 # provenance: k_mox_liquid_standard_reaction
                 # Lamoreaux & Hildenbrand 1984 Tables 2/4
@@ -604,10 +609,14 @@ class EquilibriumMixin:
                     parent_oxide,
                     melt_account_mol,
                     cation_mol_fraction=cation_mol_fraction,
+                    temperature_K=T_K,
                 )
                 if oxide_activity is None or oxide_activity.activity <= 1e-10:
                     continue
+                if oxide_activity.warning:
+                    warnings.append(oxide_activity.warning)
                 activities[species] = oxide_activity.activity
+                activity_provenance[species] = oxide_activity.provenance()
                 activity_exponent = float(
                     liquid_rxn.get("oxide_activity_exponent", 1.0) or 1.0
                 )
@@ -656,10 +665,14 @@ class EquilibriumMixin:
                     parent_oxide,
                     melt_account_mol,
                     cation_mol_fraction=cation_mol_fraction,
+                    temperature_K=T_K,
                 )
                 if oxide_activity is None or oxide_activity.activity <= 1e-10:
                     continue
+                if oxide_activity.warning:
+                    warnings.append(oxide_activity.warning)
                 activities[species] = oxide_activity.activity
+                activity_provenance[species] = oxide_activity.provenance()
                 if isinstance(
                     sp_data.get(RECONSTRUCTED_VAPOR_PRESSURE_SEGMENT_KEY),
                     Mapping,
@@ -764,9 +777,12 @@ class EquilibriumMixin:
                     parent_oxide,
                     melt_account_mol,
                     cation_mol_fraction=cation_mol_fraction,
+                    temperature_K=T_K,
                 )
                 if oxide_activity is None:
                     continue
+                if oxide_activity.warning:
+                    warnings.append(oxide_activity.warning)
                 a_oxide = oxide_activity.equivalent_parent_activity(
                     n_ox / n_M
                 )
@@ -797,6 +813,19 @@ class EquilibriumMixin:
             activities[species] = (
                 a_oxide if oxide_activity is None else oxide_activity.activity
             )
+            if oxide_activity is not None:
+                activity_provenance[species] = oxide_activity.provenance()
+            else:
+                feo_sources = feo_activity_diagnostic.get('sources')
+                activity_provenance[species] = {
+                    'activity_evidence_ref': (
+                        '; '.join(str(value) for value in feo_sources.values())
+                        if isinstance(feo_sources, Mapping)
+                        else 'REF-001 Kress & Carmichael 1991'
+                    ),
+                    'melt_oxide_activity_evidence_tier': 'ANALYTICAL_EXTERNAL_GROUNDED',
+                    'melt_oxide_activity_model': 'kress_calphad_ferrous_feo',
+                }
 
             # --- Ellingham decomposition equilibrium ---          [ELLI-1..3]
             #
@@ -958,13 +987,17 @@ class EquilibriumMixin:
                     parent_oxide,
                     melt_account_mol,
                     cation_mol_fraction=cation_mol_fraction,
+                    temperature_K=T_K,
                 )
                 if oxide_activity is None or oxide_activity.activity <= 1e-10:
                     continue
+                if oxide_activity.warning:
+                    warnings.append(oxide_activity.warning)
                 a_ox = oxide_activity.equivalent_parent_activity(
                     activity_exponent
                 )
                 activities[name] = oxide_activity.activity
+                activity_provenance[name] = oxide_activity.provenance()
                 P_sat = _require_finite_vapor_value(
                     P_sat * max(a_ox, 0.0) ** activity_exponent,
                     species=name,
@@ -1050,6 +1083,7 @@ class EquilibriumMixin:
                     'reference_temperature_K': None,
                     'component_basis': 'raoultian_pure_endmember',
                 },
+                'activity_provenance': activity_provenance,
                 'a_FeO_calphad': feo_activity_diagnostic,
                 'ellingham_authority': ellingham_authority_diagnostic(
                     ellingham_extrapolations,

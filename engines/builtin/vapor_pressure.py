@@ -203,28 +203,17 @@ def _gamma_domain_authority(
     temperature_K: float,
     oxide_activity: Any,
 ) -> dict[str, Any] | None:
-    """Typed out-of-domain result for constant-gamma table rows (K anchor)."""
+    """Typed authority status for temperature-anchored gamma table rows."""
 
-    from simulator.chemistry.melt_activity import MELT_OXIDE_ACTIVITY_COEFFICIENTS
+    from simulator.chemistry.melt_activity import (
+        melt_oxide_gamma_domain_authority,
+    )
 
-    coeff = MELT_OXIDE_ACTIVITY_COEFFICIENTS.get(parent_oxide)
-    if coeff is None or coeff.valid_range_K is None:
-        return None
-    low, high = (float(coeff.valid_range_K[0]), float(coeff.valid_range_K[1]))
-    if low <= float(temperature_K) <= high:
-        return {
-            "authority_status": "in_domain",
-            "gamma_domain_K": (low, high),
-            "temperature_K": float(temperature_K),
-            "gamma": float(oxide_activity.gamma),
-        }
-    return {
-        "authority_status": "out_of_gamma_domain",
-        "gamma_domain_K": (low, high),
-        "temperature_K": float(temperature_K),
-        "gamma": float(oxide_activity.gamma),
-        "anchor_T_K": coeff.anchor_T_K,
-    }
+    return melt_oxide_gamma_domain_authority(
+        parent_oxide,
+        temperature_K,
+        gamma=float(oxide_activity.gamma),
+    )
 
 
 def _is_mapping(value: Any) -> bool:
@@ -1298,9 +1287,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     sp_data.get("retain_analytical_pressure_channel", False)
                 )
                 oxide_activity = melt_oxide_activity(
-                    parent_oxide,
-                    melt_account_mol,
-                    temperature_K=(T_K if parent_oxide == "P2O5" else None),
+                    parent_oxide, melt_account_mol, temperature_K=T_K
                 )
                 if oxide_activity is None or oxide_activity.activity <= 0.0 or (
                     not retain_analytical_channel
@@ -1349,7 +1336,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         f"{species} melt-oxide gamma out of declared domain "
                         f"gamma_domain_K=[{gamma_auth['gamma_domain_K'][0]:g}, "
                         f"{gamma_auth['gamma_domain_K'][1]:g}] at "
-                        f"{T_K:.2f} K (constant-gamma UNCERTIFIED)"
+                        f"{T_K:.2f} K (regular-solution continuation "
+                        "UNCERTIFIED)"
                     )
                 if P_eq_Pa > 0.0 and (
                     retain_analytical_channel or P_eq_Pa > 1e-15
@@ -1432,9 +1420,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     field="P_reference_liquid_oxide_standard_reaction_Pa",
                 )
                 oxide_activity = melt_oxide_activity(
-                    parent_oxide,
-                    melt_account_mol,
-                    temperature_K=(T_K if parent_oxide == "P2O5" else None),
+                    parent_oxide, melt_account_mol, temperature_K=T_K
                 )
                 if oxide_activity is None or oxide_activity.activity <= 1e-10:
                     continue
@@ -1553,9 +1539,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         reconstructed_vapor_limit["pressure_Pa"]
                     )
                 oxide_activity = melt_oxide_activity(
-                    parent_oxide,
-                    melt_account_mol,
-                    temperature_K=(T_K if parent_oxide == "P2O5" else None),
+                    parent_oxide, melt_account_mol, temperature_K=T_K
                 )
                 if oxide_activity is None or oxide_activity.activity <= 1e-10:
                     continue
@@ -1671,9 +1655,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     )
             else:
                 oxide_activity = melt_oxide_activity(
-                    parent_oxide,
-                    melt_account_mol,
-                    temperature_K=(T_K if parent_oxide == "P2O5" else None),
+                    parent_oxide, melt_account_mol, temperature_K=T_K
                 )
                 if oxide_activity is None:
                     continue
@@ -1940,9 +1922,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     data.get('oxide_activity_exponent', 1.0)
                 )
                 oxide_activity = melt_oxide_activity(
-                    parent_oxide,
-                    melt_account_mol,
-                    temperature_K=(T_K if parent_oxide == "P2O5" else None),
+                    parent_oxide, melt_account_mol, temperature_K=T_K
                 )
                 if oxide_activity is None:
                     continue

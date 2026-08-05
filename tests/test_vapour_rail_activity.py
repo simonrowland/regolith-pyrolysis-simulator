@@ -141,39 +141,48 @@ def test_p2o5_dilute_activity_has_literature_grounded_gamma_upper_envelope():
     assert provenance["melt_oxide_activity_temperature_K"] == 1473.15
 
 
-def test_henrian_unknown_gamma_emits_upper_bound_never_point():
+def test_henrian_gamma_property_emits_upper_bound_never_point():
     answer = henrian_unknown_gamma_upper_bound(
-        component_id="LiO0.5",
+        component_id="CaO",
         activity_exponent=1.0,
         standard_state=_RAOULTIAN,
+        mole_fraction=0.25,
     )
     assert answer.verdict is ActivityVerdictKind.UPPER_BOUND
     assert answer.verdict is not ActivityVerdictKind.POINT
-    assert answer.value == pytest.approx(1.0)
+    assert answer.value == pytest.approx(0.25)
     assert answer.bound_direction is BoundDirection.UPPER
     assert answer.reason == REASON_HENRIAN_GAMMA_UNMEASURED
     assert answer.authority is False
     assert answer.report_label == BOUND_NOT_POINT
     assert answer.may_certify() is False
-    # Derivation must explain why a=1 bounds volatilization from above.
-    assert "P(a) ≤ P(1)" in answer.derivation["algebra"] or "P(a) <= P(1)" in answer.derivation[
-        "algebra"
-    ]
-    assert "a_i ≤ 1" in answer.derivation["premise"] or "a_i <= 1" in answer.derivation[
-        "premise"
-    ]
+    assert answer.derivation["gamma_property"] == "gamma<=1"
+    assert answer.evidence_ref is not None
+    assert "DOI" in answer.evidence_ref
 
 
-def test_henrian_refuses_when_monotonicity_unproved():
+def test_henrian_negative_pressure_exponent_reverses_activity_bound():
     answer = henrian_unknown_gamma_upper_bound(
-        component_id="trace",
+        component_id="CaO",
         activity_exponent=-1.0,
         standard_state=_RAOULTIAN,
+        mole_fraction=0.25,
+    )
+    assert answer.verdict is ActivityVerdictKind.LOWER_BOUND
+    assert answer.bound_direction is BoundDirection.LOWER
+    assert answer.value == pytest.approx(0.25)
+    assert answer.authority is False
+
+
+def test_henrian_refuses_nonfinite_pressure_exponent():
+    answer = henrian_unknown_gamma_upper_bound(
+        component_id="CaO",
+        activity_exponent=float("nan"),
+        standard_state=_RAOULTIAN,
+        mole_fraction=0.25,
     )
     assert answer.verdict is ActivityVerdictKind.REFUSAL
     assert answer.refusal_code is ActivityRefusalCode.MONOTONICITY_UNPROVED
-    assert answer.value is None
-    assert answer.authority is False
 
 
 def test_henrian_refuses_non_raoultian_basis():
@@ -258,10 +267,7 @@ def test_provider_reported_activity_point_records_exact_provenance():
         state_fingerprint=state_fingerprint,
         reported_activity=2.5e-3,
         reported_activity_provider="InternalAnalyticalBackend",
-        reported_activity_evidence_ref=(
-            "InternalAnalyticalBackend:"
-            "EquilibriumResult.activity_coefficients[Mg]"
-        ),
+        reported_activity_evidence_ref="Sossi & Fegley 2018 DOI 10.2138/rmg.2018.84.11",
         reported_activity_standard_state=_RAOULTIAN,
     )
 
@@ -269,8 +275,45 @@ def test_provider_reported_activity_point_records_exact_provenance():
     assert answer.value == pytest.approx(2.5e-3)
     assert answer.state_fingerprint == state_fingerprint
     assert answer.provider == "InternalAnalyticalBackend"
-    assert answer.evidence_ref.endswith("activity_coefficients[Mg]")
+    assert answer.evidence_ref is not None
+    assert "10.2138/rmg.2018.84.11" in answer.evidence_ref
     assert answer.authority is False
+
+    self_issued = CondensedPhaseActivityProvider().resolve_source_reaction_activity(
+        declaration,
+        magemin=None,
+        thermoengine=None,
+        activity_exponent=1.0,
+        reported_activity=2.5e-3,
+        reported_activity_provider="InternalAnalyticalBackend",
+        reported_activity_evidence_ref=(
+            "InternalAnalyticalBackend:"
+            "EquilibriumResult.activity_coefficients[Mg]"
+        ),
+        reported_activity_standard_state=_RAOULTIAN,
+    )
+    assert self_issued.verdict is ActivityVerdictKind.STATUS_BEARING_VALUE
+    assert self_issued.reason == "producer_self_reference_rejected"
+    assert self_issued.evidence_ref is None
+    assert self_issued.as_pressure_activity() == pytest.approx(2.5e-3)
+
+    fake_bibliography_ref = (
+        CondensedPhaseActivityProvider().resolve_source_reaction_activity(
+            declaration,
+            magemin=None,
+            thermoengine=None,
+            activity_exponent=1.0,
+            reported_activity=2.5e-3,
+            reported_activity_provider="InternalAnalyticalBackend",
+            reported_activity_evidence_ref="self-ref-123",
+            reported_activity_standard_state=_RAOULTIAN,
+        )
+    )
+    assert (
+        fake_bibliography_ref.verdict
+        is ActivityVerdictKind.STATUS_BEARING_VALUE
+    )
+    assert fake_bibliography_ref.evidence_ref is None
 
     missing_provenance = (
         CondensedPhaseActivityProvider().resolve_source_reaction_activity(
@@ -284,27 +327,38 @@ def test_provider_reported_activity_point_records_exact_provenance():
     assert missing_provenance.verdict is ActivityVerdictKind.REFUSAL
     assert missing_provenance.refusal_code is ActivityRefusalCode.MISSING_EVIDENCE
 
-    for provider, evidence_ref in (
-        ("   ", "test:evidence"),
-        ("test_provider", "\t"),
-    ):
-        whitespace_provenance = (
-            CondensedPhaseActivityProvider().resolve_source_reaction_activity(
-                declaration,
-                magemin=None,
-                thermoengine=None,
-                activity_exponent=1.0,
-                reported_activity=2.5e-3,
-                reported_activity_provider=provider,
-                reported_activity_evidence_ref=evidence_ref,
-                reported_activity_standard_state=_RAOULTIAN,
-            )
+    missing_provider = (
+        CondensedPhaseActivityProvider().resolve_source_reaction_activity(
+            declaration,
+            magemin=None,
+            thermoengine=None,
+            activity_exponent=1.0,
+            reported_activity=2.5e-3,
+            reported_activity_provider="   ",
+            reported_activity_evidence_ref="doi:10.1234/example",
+            reported_activity_standard_state=_RAOULTIAN,
         )
-        assert whitespace_provenance.verdict is ActivityVerdictKind.REFUSAL
-        assert (
-            whitespace_provenance.refusal_code
-            is ActivityRefusalCode.MISSING_EVIDENCE
+    )
+    assert missing_provider.verdict is ActivityVerdictKind.REFUSAL
+    assert missing_provider.refusal_code is ActivityRefusalCode.MISSING_EVIDENCE
+
+    missing_external_ref = (
+        CondensedPhaseActivityProvider().resolve_source_reaction_activity(
+            declaration,
+            magemin=None,
+            thermoengine=None,
+            activity_exponent=1.0,
+            reported_activity=2.5e-3,
+            reported_activity_provider="test_provider",
+            reported_activity_evidence_ref="\t",
+            reported_activity_standard_state=_RAOULTIAN,
         )
+    )
+    assert (
+        missing_external_ref.verdict
+        is ActivityVerdictKind.STATUS_BEARING_VALUE
+    )
+    assert missing_external_ref.as_pressure_activity() == pytest.approx(2.5e-3)
 
     normalized_provenance = (
         CondensedPhaseActivityProvider().resolve_source_reaction_activity(
@@ -314,12 +368,28 @@ def test_provider_reported_activity_point_records_exact_provenance():
             activity_exponent=1.0,
             reported_activity=2.5e-3,
             reported_activity_provider="  test_provider  ",
-            reported_activity_evidence_ref="  test:evidence  ",
+            reported_activity_evidence_ref="  doi:10.1234/test-evidence  ",
             reported_activity_standard_state=_RAOULTIAN,
         )
     )
     assert normalized_provenance.provider == "test_provider"
-    assert normalized_provenance.evidence_ref == "test:evidence"
+    assert normalized_provenance.evidence_ref == "doi:10.1234/test-evidence"
+    assert normalized_provenance.verdict is ActivityVerdictKind.POINT
+
+    missing_external = (
+        CondensedPhaseActivityProvider().resolve_source_reaction_activity(
+            declaration,
+            magemin=None,
+            thermoengine=None,
+            activity_exponent=1.0,
+            reported_activity=2.5e-3,
+            reported_activity_provider="test_provider",
+            reported_activity_standard_state=_RAOULTIAN,
+        )
+    )
+    assert missing_external.verdict is ActivityVerdictKind.STATUS_BEARING_VALUE
+    assert missing_external.reason == "external_activity_evidence_missing"
+    assert missing_external.as_pressure_activity() == pytest.approx(2.5e-3)
 
     mismatched_standard_state = StandardStateIdentity(
         convention=_RAOULTIAN.convention,
@@ -345,6 +415,64 @@ def test_provider_reported_activity_point_records_exact_provenance():
         standard_state_mismatch.refusal_code
         is ActivityRefusalCode.STANDARD_STATE_MISMATCH
     )
+
+
+def test_reported_out_of_domain_and_ideal_activities_stay_numeric_but_not_points():
+    declaration = ActivityInputDeclaration(
+        component_id="KO0.5",
+        standard_state=_RAOULTIAN,
+        activity_model="provider_reported_thermodynamic_activity",
+        allow_henrian_upper_bound=False,
+        require_assemblage_match=False,
+    )
+    provider = CondensedPhaseActivityProvider()
+    out_of_domain = provider.resolve_source_reaction_activity(
+        declaration,
+        magemin=None,
+        thermoengine=None,
+        activity_exponent=1.0,
+        reported_activity=1.0e-6,
+        reported_activity_provider="BuiltinVaporPressureProvider",
+        reported_activity_evidence_ref="Sossi & Fegley 2018 DOI 10.2138/rmg.2018.84.11",
+        reported_activity_standard_state=_RAOULTIAN,
+        reported_activity_provenance={
+            "melt_oxide_activity_evidence_tier": "UNCERTIFIED",
+            "melt_oxide_activity_model": "constant_gamma_table_with_endmember_continuity",
+            "gamma_domain_authority": {
+                "authority_status": "out_of_gamma_domain",
+                "gamma_domain_K": (1500.0, 1500.0),
+                "temperature_K": 1873.15,
+            },
+        },
+    )
+
+    assert out_of_domain.verdict is ActivityVerdictKind.STATUS_BEARING_VALUE
+    assert out_of_domain.reason == "out_of_gamma_domain"
+    assert out_of_domain.as_pressure_activity() == pytest.approx(1.0e-6)
+    assert out_of_domain.evidence_tier == "UNCERTIFIED"
+    assert out_of_domain.may_certify() is False
+
+    ideal = provider.resolve_source_reaction_activity(
+        declaration,
+        magemin=None,
+        thermoengine=None,
+        activity_exponent=1.0,
+        reported_activity=0.2,
+        reported_activity_provider="BuiltinVaporPressureProvider",
+        reported_activity_standard_state=_RAOULTIAN,
+        reported_activity_provenance={
+            "melt_oxide_activity_evidence_tier": "ASSUMED_IDEAL_SOLUTION",
+            "melt_oxide_activity_model": "declared_ideal_solution",
+            "melt_oxide_activity_warning": (
+                "declared_ideal_solution_activity_assertion: parent_oxide=P2O5"
+            ),
+        },
+    )
+    assert ideal.verdict is ActivityVerdictKind.STATUS_BEARING_VALUE
+    assert ideal.reason == "declared_ideal_solution_activity"
+    assert ideal.evidence_tier == "ASSUMED_IDEAL_SOLUTION"
+    assert "declared_ideal_solution_activity_assertion" in (ideal.detail or "")
+    assert ideal.as_pressure_activity() == pytest.approx(0.2)
 
 
 @pytest.mark.parametrize(
@@ -458,21 +586,38 @@ def test_provider_refuses_mismatch_timeout_unmapped(fault, code):
 
 def test_provider_henrian_path_without_engine_evidence():
     provider = CondensedPhaseActivityProvider()
-    declaration = ActivityInputDeclaration(
-        component_id="RbO0.5",
-        standard_state=_RAOULTIAN,
-        activity_model="henrian_dilute",
-        allow_henrian_upper_bound=True,
-    )
-    answer = provider.resolve_source_reaction_activity(
-        declaration,
-        magemin=None,
-        thermoengine=None,
-        activity_exponent=1.0,
-    )
-    assert answer.verdict is ActivityVerdictKind.UPPER_BOUND
-    assert answer.value == pytest.approx(1.0)
-    assert answer.authority is False
+    def resolve(component_id: str, mole_fraction: float | None):
+        declaration = ActivityInputDeclaration(
+            component_id=component_id,
+            standard_state=_RAOULTIAN,
+            activity_model="henrian_dilute",
+            allow_henrian_upper_bound=True,
+        )
+        return provider.resolve_source_reaction_activity(
+            declaration,
+            magemin=None,
+            thermoengine=None,
+            activity_exponent=1.0,
+            mole_fraction=mole_fraction,
+        )
+
+    upper = resolve("CaO", 0.2)
+    assert upper.verdict is ActivityVerdictKind.UPPER_BOUND
+    assert upper.bound_direction is BoundDirection.UPPER
+    assert upper.value == pytest.approx(0.2)
+    assert upper.derivation["gamma_property"] == "gamma<=1"
+
+    lower = resolve("CrO1.5", 0.2)
+    assert lower.verdict is ActivityVerdictKind.LOWER_BOUND
+    assert lower.bound_direction is BoundDirection.LOWER
+    assert lower.value == pytest.approx(0.2)
+    assert lower.derivation["gamma_property"] == "gamma>1"
+
+    ideal = resolve("RbO0.5", None)
+    assert ideal.verdict is ActivityVerdictKind.STATUS_BEARING_VALUE
+    assert ideal.reason == "declared_ideal_solution_activity"
+    assert ideal.value == pytest.approx(1.0)
+    assert ideal.authority is False
 
 
 def test_compound_bearing_refuses_free_oxide_proxy_without_engines():
@@ -538,12 +683,13 @@ def test_as_pressure_activity_refusal_none_and_bound_numeric_contract():
     assert refused_with_junk.as_pressure_activity() is None
 
     bound = henrian_unknown_gamma_upper_bound(
-        component_id="LiO0.5",
+        component_id="CaO",
         activity_exponent=1.0,
         standard_state=_RAOULTIAN,
+        mole_fraction=0.2,
     )
     assert bound.verdict is ActivityVerdictKind.UPPER_BOUND
-    assert bound.as_pressure_activity() == pytest.approx(1.0)
+    assert bound.as_pressure_activity() == pytest.approx(0.2)
     assert bound.may_certify() is False
 
     point = SourceReactionActivity(
@@ -580,15 +726,18 @@ def test_pending_validation_and_bound_never_certify():
     declaration = ActivityInputDeclaration(
         component_id="NaO0.5",
         standard_state=_RAOULTIAN,
-        activity_model="gamma_table",
+        activity_model="provider_reported_thermodynamic_activity",
+        require_assemblage_match=False,
     )
     point = provider.resolve_source_reaction_activity(
         declaration,
         magemin=None,
         thermoengine=None,
         activity_exponent=1.0,
-        measured_gamma=1.0e-3,
-        mole_fraction=0.01,
+        reported_activity=1.0e-5,
+        reported_activity_provider="test_provider",
+        reported_activity_evidence_ref="doi:10.1234/example",
+        reported_activity_standard_state=_RAOULTIAN,
     )
     assert point.verdict is ActivityVerdictKind.POINT
     assert point.authority is False

@@ -1219,6 +1219,9 @@ class VapourRailCatalog:
                 source_reaction_activity_standard_states=(
                     state.get("source_reaction_activity_standard_states") or {}
                 ),
+                source_reaction_activity_provenance=(
+                    state.get("source_reaction_activity_provenance") or {}
+                ),
                 source_reaction_fO2_bar=state.get("source_reaction_fO2_bar"),
                 extras={
                     key: value
@@ -1234,6 +1237,7 @@ class VapourRailCatalog:
                         "source_reaction_activity_provider",
                         "source_reaction_activity_evidence_refs",
                         "source_reaction_activity_standard_states",
+                        "source_reaction_activity_provenance",
                         "source_reaction_fO2_bar",
                     }
                 },

@@ -10,6 +10,7 @@ import pytest
 import yaml
 
 import simulator.capacity_coupling as capacity_coupling
+import simulator.chemistry.melt_activity as melt_activity
 from engines.builtin.overhead_bleed import (
     BuiltinOverheadBleedProvider,
     compressible_pressure_capacity_fraction,
@@ -447,6 +448,58 @@ def test_default_runtime_policy_is_no_cold_train():
     assert cold_train.runtime_enforcement is False
 
 
+def test_missing_gamma_ideal_assertion_reaches_activity_seam(monkeypatch):
+    coefficients = dict(melt_activity.MELT_OXIDE_ACTIVITY_COEFFICIENTS)
+    coefficients.pop("K2O")
+    monkeypatch.setattr(
+        melt_activity,
+        "MELT_OXIDE_ACTIVITY_COEFFICIENTS",
+        coefficients,
+    )
+
+    sim = _real_capacity_sim()
+    sim.start_campaign(CampaignPhase.C0)
+    # 1600 K is inside the K pressure-model domain but outside its 1500 K
+    # activity-anchor domain. This isolates t-523: activity uncertainty must
+    # remain numeric and flux-driving.
+    sim.melt.temperature_C = 1600.0 - 273.15
+    equilibrium = sim._get_equilibrium()
+    effective_source = _pre_rg_effective_pressure_source(
+        sim.vapor_pressures, equilibrium
+    )
+
+    provenance = sim._last_vapor_pressure_diagnostic[
+        "vapor_pressure_numerator_provenance"
+    ]["K"]
+    assert provenance["melt_oxide_activity_model"] == (
+        melt_activity.MELT_OXIDE_IDEAL_SOLUTION_MODEL
+    )
+    assert provenance["melt_oxide_activity_evidence_tier"] == (
+        melt_activity.MELT_OXIDE_IDEAL_ASSERTION_TIER
+    )
+    assert "declared_ideal_solution_activity_assertion" in provenance[
+        "melt_oxide_activity_warning"
+    ]
+
+    batch = sim._resolve_evaporation_vapour_batch(
+        equilibrium,
+        temperature_K=equilibrium.temperature_C + 273.15,
+        effective_pressure_source=effective_source,
+    )
+    assert batch is not None
+    answer = batch.channel("K")
+    activity = answer.source_reaction_activity
+    assert activity is not None
+    assert activity.verdict is ActivityVerdictKind.STATUS_BEARING_VALUE
+    assert activity.reason == "declared_ideal_solution_activity"
+    assert activity.evidence_tier == (
+        melt_activity.MELT_OXIDE_IDEAL_ASSERTION_TIER
+    )
+    assert "declared_ideal_solution_activity_assertion" in (activity.detail or "")
+    assert activity.evidence_ref is None
+    assert answer.is_flux_active
+
+
 def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
     """RG-1 gateway: catalog P_eff class without a flux-value cutover.
 
@@ -471,6 +524,7 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
     verifier_probe_pa = {
         "Ca": 4.6e-9,
         "Mg": 7.3e-3,
+        # Constant table gamma (no T*/T / pseudo-binary mid-range).
         "K": 0.469,
         "Al": 1.4e-8,
     }
@@ -531,13 +585,25 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
             assert within_probe_band(species_id, catalog_pa, float(seam_pa))
         activity = answer.source_reaction_activity
         assert activity is not None
-        assert activity.verdict is ActivityVerdictKind.POINT
-        assert activity.value == pytest.approx(
-            original_activities[species_id], rel=0.0, abs=0.0
-        )
         assert activity.provider == "BuiltinVaporPressureProvider"
+        if species_id == "K":
+            # b-121: OOD table gamma is status-bearing (not POINT) while the
+            # HEAD oodfix seam still publishes PressureValue + FluxEligible.
+            assert (
+                activity.verdict
+                is ActivityVerdictKind.STATUS_BEARING_VALUE
+            )
+            assert activity.reason == "out_of_gamma_domain"
+            assert answer.is_flux_active
+        else:
+            assert activity.verdict is ActivityVerdictKind.POINT
+            assert activity.value == pytest.approx(
+                original_activities[species_id], rel=0.0, abs=0.0
+            )
         assert activity.evidence_ref is not None
-        assert "_last_vapor_pressure_diagnostic.activities" in activity.evidence_ref
+        # Structured external-evidence provenance (INCOMING activity landing).
+        assert "DOI " in activity.evidence_ref
+        assert "_last_vapor_pressure_diagnostic" not in activity.evidence_ref
         evaluator = sim.vapour_rail_catalog.species[species_id].evaluator
         assert evaluator is not None
         activity_exponents[species_id] = evaluator.activity_exponent
@@ -792,16 +858,23 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         # on this tree. Fe/Na/K seam-selected values unchanged. Re-pinned after
     # the P2O5_gas tombstone restore removed its Stage-0 flux contribution
     # (b-133 adjudication upheld at integration).
-(
-                1,
-                1550.0,
-                2.9516520099235124,
-                1204062.0946067297,
-                995.8106409826071,
+        # 2026-08-06 chemact-land merge: constant table gamma (no
+        # pseudo-binary mid-range) + b-121 OOD status-bearing activity on
+        # the HEAD oodfix seam. Head-result trio DID NOT MOVE vs HEAD
+        # 090d048 pins (activity values for majors are the same constant-
+        # table path HEAD already used; only labels/provenance changed).
+        (
+            1,
+            1550.0,
+            2.9516520099235124,
+            1204062.0946067297,
+            995.8106409826071,
         ),
         rel=1.0e-12,
         abs=1.0e-12,
     )
+    # 2026-08-06 chemact-land merge: activity-cluster split does not change
+    # the OOD seam/roster; transition count DID NOT MOVE (still 36).
     # The status-bearing out-of-domain point path removes one earlier
     # zero-quantity transition; the hot-tail mechanism is otherwise unchanged.
     # 2026-08-04 regrind batch: +3 transitions = evaporate_AlO, evaporate_Al2O,

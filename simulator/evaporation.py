@@ -2091,13 +2091,37 @@ class EvaporationMixin:
             )
             if kernel_activity_source:
                 activity_metadata = vapor_pressure_diagnostic
-                activity_evidence_owner = '_last_vapor_pressure_diagnostic.activities'
+                activity_evidence_owner = (
+                    '_last_vapor_pressure_diagnostic.activities'
+                )
             else:
                 activity_metadata = dict(
                     getattr(equilibrium, 'diagnostics', {}) or {}
                 )
-                activity_evidence_owner = 'EquilibriumResult.activity_coefficients'
+                activity_evidence_owner = (
+                    'EquilibriumResult.activity_coefficients'
+                )
             activity_provider_id = activity_metadata.get('activities_provider')
+            activity_provenance_raw = (
+                activity_metadata.get('vapor_pressure_numerator_provenance')
+                or activity_metadata.get('activity_provenance')
+                or {}
+            )
+            if not isinstance(activity_provenance_raw, Mapping):
+                activity_provenance_raw = {}
+            activity_provenance = {
+                str(species_id): dict(provenance)
+                for species_id, provenance in dict(activity_provenance_raw).items()
+                if isinstance(provenance, Mapping)
+                and species_id in reported_activities
+            }
+            feo_activity = activity_metadata.get('a_FeO_calphad')
+            if 'Fe' in reported_activities and isinstance(feo_activity, Mapping):
+                feo_sources = feo_activity.get('sources')
+                if isinstance(feo_sources, Mapping) and feo_sources:
+                    activity_provenance.setdefault('Fe', {})[
+                        'activity_evidence_ref'
+                    ] = '; '.join(str(value) for value in feo_sources.values())
             standard_state_raw = activity_metadata.get(
                 'activities_standard_state'
             )
@@ -2119,44 +2143,48 @@ class EvaporationMixin:
                         standard_state_raw.get('component_basis') or ''
                     ),
                 )
+            # Compose: INCOMING structured citation/evidence_ref first
+            # (external DOI provenance for activity-corrected channels); HEAD
+            # provider-token fallback for channels without melt-oxide citation;
+            # HEAD b-133 P-carrier authority annotations when present.
             activity_evidence_refs: dict[str, str] = {}
-            activity_provenance = dict(
-                vapor_pressure_diagnostic.get(
-                    'vapor_pressure_numerator_provenance', {}
-                )
-                or {}
-            )
             for species_id in reported_activities:
                 if not activity_provider_id or activity_standard_state is None:
+                    continue
+                provenance = dict(activity_provenance.get(str(species_id)) or {})
+                citation = (
+                    provenance.get('melt_oxide_gamma_citation')
+                    or provenance.get('activity_evidence_ref')
+                )
+                if citation:
+                    activity_evidence_refs[str(species_id)] = str(citation)
                     continue
                 evidence = (
                     f'{activity_provider_id}:'
                     f'{activity_evidence_owner}[{species_id}]'
                 )
-                if species_id not in {
+                if species_id in {
                     'PO', 'PO2', 'P2', 'P4', 'P4O6', 'P4O10'
                 }:
-                    # b-133 authority annotations are a key-scoped P overlay.
-                    # Preserve every existing hot-train channel's pre-b-133
-                    # evidence token byte-for-byte.
-                    activity_evidence_refs[str(species_id)] = evidence
-                    continue
-                provenance = dict(activity_provenance.get(species_id) or {})
-                authority_status = provenance.get(
-                    'melt_oxide_activity_authority_status'
-                )
-                gamma_range = provenance.get('melt_oxide_gamma_valid_range_K')
-                activity_basis = (
-                    'parent_oxide'
-                    if provenance.get('equivalent_parent_oxide_activity')
-                    == reported_activities.get(species_id)
-                    else 'reported_component'
-                )
-                if authority_status:
-                    evidence += f';authority_status={authority_status}'
-                if gamma_range:
-                    evidence += f';gamma_valid_range_K={tuple(gamma_range)}'
-                evidence += f';activity_basis={activity_basis}'
+                    authority_status = provenance.get(
+                        'melt_oxide_activity_authority_status'
+                    )
+                    gamma_range = provenance.get(
+                        'melt_oxide_gamma_valid_range_K'
+                    )
+                    activity_basis = (
+                        'parent_oxide'
+                        if provenance.get('equivalent_parent_oxide_activity')
+                        == reported_activities.get(species_id)
+                        else 'reported_component'
+                    )
+                    if authority_status:
+                        evidence += f';authority_status={authority_status}'
+                    if gamma_range:
+                        evidence += (
+                            f';gamma_valid_range_K={tuple(gamma_range)}'
+                        )
+                    evidence += f';activity_basis={activity_basis}'
                 activity_evidence_refs[str(species_id)] = evidence
             activity_standard_states = {
                 str(species_id): activity_standard_state
@@ -2204,6 +2232,7 @@ class EvaporationMixin:
                 source_reaction_activity_standard_states=(
                     activity_standard_states
                 ),
+                source_reaction_activity_provenance=activity_provenance,
                 flux_activation_context=FluxActivationContext(
                     epoch=FLUX_ACTIVATION_EPOCH_PRE_RG,
                     effective_pressure_species_ids=effective_pressure_species_ids,

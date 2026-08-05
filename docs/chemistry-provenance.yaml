@@ -38,17 +38,22 @@ values:
       (p_M proportional to gamma_MO0.5 * X_MO0.5, i.e. LINEAR in gamma on this basis).
     value: {NaO0.5: 1.0e-3, KO0.5: 3.5e-5}
     units: dimensionless
-    tier: UNCERTIFIED   # single-temperature datum, extrapolated to the 1773-2173 K recipe band; T-dependence not yet fit
+    tier: UNCERTIFIED   # point anchors analytically continued; no fitted multicomponent T-X activity surface
     basis: >-
       single-cation NaO0.5 / KO0.5 component; RAOULTIAN reference (activity -> 1 for the pure liquid
       oxide, consistent with the JANAF pure-oxide K_p); MOLE fraction (single-cation-normalized). The
       reaction is NaO0.5(l) = Na(g) + 1/4 O2 (Sossi & Fegley Eqn 25), so gamma enters p_Na LINEARLY.
+      Runtime treats each value as a constant mid-range table gamma (a = gamma* * X for
+      X <= 0.99). A thin pure-endmember continuity shell reparameterizes ln(gamma) only for
+      X > 0.99 so gamma->1 and a->1 continuously as X->1, removing the former gamma*X to a=1
+      step without inventing mid-range pseudo-binary curvature. The one-parameter regular-
+      solution (ln gamma = ln(gamma*)*(T*/T)*(1-X)^2) is held (enghar median regression).
     range:
       T_K: [1500, 1673]
       anchors:
         NaO0.5: {anchor_T_K: 1673, composition: "FCMAS ferrobasalt (Na 3252 ppm, K 944 ppm), lunar-analog"}
         KO0.5: {anchor_T_K: 1500, composition: "Apollo 12022 / DeMaria lunar basalt KEMS inversion"}
-      measured_vs_extrapolated: point_anchor_extrapolated_to_recipe_band   # recipe band 1773-2173 K is HOTTER; gamma rises toward 1 with T
+      measured_vs_extrapolated: point_anchor_extrapolated_to_recipe_band   # recipe band 1773-2173 K is HOTTER; constant table gamma (no T*/T scaling); OOD status-bearing
     uncertainty: "NaO0.5 +/-2.2e-4 (Sossi 2019); KO0.5 is DeMaria/Sossi-Fegley point-anchor value 3.5e-5 at 1500 K; table envelope KO0.5 6.3e-5-7.1e-4 remains a comparison band"
     chosen:
       ref: "REF-013 REF-019 REF-049"   # Sossi 2019 for Na; Sossi & Fegley 2018 + DeMaria 1971 for K

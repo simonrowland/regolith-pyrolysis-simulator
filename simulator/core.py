@@ -1797,6 +1797,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         source_reaction_activity_provider: str | None = None,
         source_reaction_activity_evidence_refs: Mapping[str, str] | None = None,
         source_reaction_activity_standard_states: Mapping[str, Any] | None = None,
+        source_reaction_activity_provenance: Mapping[
+            str, Mapping[str, Any]
+        ] | None = None,
         source_reaction_fO2_bar: float | None = None,
         provider_candidates_by_species: dict | None = None,
         flux_activation_context: FluxActivationContext | None = None,
@@ -1843,6 +1846,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             "source_reaction_activity_standard_states": dict(
                 source_reaction_activity_standard_states or {}
             ),
+            "source_reaction_activity_provenance": {
+                str(species_id): dict(provenance)
+                for species_id, provenance in dict(
+                    source_reaction_activity_provenance or {}
+                ).items()
+            },
             "source_reaction_fO2_bar": source_reaction_fO2_bar,
         }
         return self.vapour_rail_catalog.resolve_batch(

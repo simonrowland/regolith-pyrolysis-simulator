@@ -14,11 +14,18 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import re
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Final
 
+from simulator.chemistry.melt_activity import (
+    MELT_OXIDE_ACTIVITY_TIER,
+    MELT_OXIDE_IDEAL_ASSERTION_TIER,
+    MELT_OXIDE_IDEAL_SOLUTION_MODEL,
+    melt_oxide_activity_coefficient,
+)
 from simulator.physical_constants import GAS_CONSTANT
 
 # CODATA R, J/(mol·K). Activities use mu in J/mol so RT ln(a) is dimensionally
@@ -27,6 +34,8 @@ R_J_PER_MOL_K: Final[float] = GAS_CONSTANT
 
 REASON_HENRIAN_GAMMA_UNMEASURED: Final[str] = "henrian_gamma_unmeasured"
 BOUND_NOT_POINT: Final[str] = "bound-not-point"
+LOWER_BOUND_NOT_POINT: Final[str] = "lower-bound-not-point"
+STATUS_BEARING_NOT_POINT: Final[str] = "status-bearing-not-point"
 DIAGNOSTIC_AUTHORITY: Final[bool] = False
 
 
@@ -34,7 +43,9 @@ class ActivityVerdictKind(str, Enum):
     """How an activity number may be consumed by a pressure/flux path."""
 
     POINT = "Point"
+    STATUS_BEARING_VALUE = "StatusBearingValue"
     UPPER_BOUND = "UpperBound"
+    LOWER_BOUND = "LowerBound"
     REFUSAL = "Refusal"
 
 
@@ -216,6 +227,7 @@ class SourceReactionActivity:
     detail: str | None = None
     derivation: Mapping[str, Any] = field(default_factory=dict)
     evidence_ref: str | None = None
+    evidence_tier: str | None = None
 
     def may_certify(self) -> bool:
         """Bounds and refusals never certify; points stay non-authoritative here."""
@@ -327,29 +339,23 @@ def henrian_unknown_gamma_upper_bound(
     component_id: str,
     activity_exponent: float,
     standard_state: StandardStateIdentity,
+    mole_fraction: float | None = None,
     state_fingerprint: str | None = None,
     solve_group_id: str | None = None,
 ) -> SourceReactionActivity:
-    """Emit the monotonicity-proved ``a=1`` *upper bound* for unknown Henrian γ.
+    """Classify a unity-gamma activity by the coefficient *property*.
 
-    Why ``a = 1`` bounds volatilization from above
-    ---------------------------------------------
-    Premise: the pure-endmember Raoultian standard state is chosen so that the
-    physical activity of a stable single-phase mixture satisfies ``a_i ≤ 1``,
-    with equality only at the pure endmember (``mu_i = mu_i0``). An unmeasured
-    dilute Henrian γ therefore cannot honestly be replaced by a *point*
-    ``a = 1``; the only admissible stand-in under that standard state is the
-    pure-endmember ceiling ``a = 1`` as an **upper bound**.
+    The name is retained for API compatibility, but the result is not always
+    an upper bound.  At a fixed declared mole fraction ``X``, the regular-
+    solution closure preserves the side of unity carried by the coefficient
+    table: ``gamma_anchor <= 1`` gives ``a <= X`` and ``gamma_anchor > 1``
+    gives ``a >= X``.  For the normal positive source-reaction exponent this
+    means the unity-gamma value ``X`` is respectively an upper or lower
+    pressure bound.  A negative exponent reverses the pressure direction.
 
-    Algebra: when the source-reaction pressure is monotone nondecreasing in
-    activity (``n = activity_exponent ≥ 0``), ``P(a) ≤ P(1)`` for all admissible
-    ``a ∈ (0, 1]``. The resulting pressure, HKL flux, and recession therefore
-    upper-bound true volatilization and must retain ``UpperBound`` / report
-    ``bound-not-point``.
-
-    Failure modes that refuse instead of bounding:
-    - monotonicity unproved (``n < 0`` or non-finite);
-    - standard state that does not make unity an upper bound.
+    Missing coefficient or composition evidence produces an explicit
+    status-bearing ideal-solution assertion.  It still supplies a numeric
+    prediction, but it is never mislabeled as a proved bound or clean point.
     """
 
     if standard_state.component_basis != "raoultian_pure_endmember":
@@ -369,12 +375,17 @@ def henrian_unknown_gamma_upper_bound(
             report_label=BOUND_NOT_POINT,
             refusal_code=ActivityRefusalCode.UNITY_NOT_UPPER_BOUND,
             detail=(
-                "a=1 upper-bound semantics require raoultian_pure_endmember "
+                "unity-gamma activity-bound semantics require "
+                "raoultian_pure_endmember "
                 f"basis; got {standard_state.component_basis!r}"
             ),
         )
 
-    if not prove_pressure_monotone_nondecreasing_in_activity(activity_exponent):
+    try:
+        exponent = float(activity_exponent)
+    except (TypeError, ValueError):
+        exponent = math.nan
+    if not math.isfinite(exponent):
         return SourceReactionActivity(
             component_id=component_id,
             value=None,
@@ -391,17 +402,73 @@ def henrian_unknown_gamma_upper_bound(
             report_label=BOUND_NOT_POINT,
             refusal_code=ActivityRefusalCode.MONOTONICITY_UNPROVED,
             detail=(
-                "cannot prove P monotone nondecreasing in activity for "
-                f"activity_exponent={activity_exponent!r}; refusing rather "
-                "than emitting a false upper bound"
+                "cannot classify pressure-bound direction for non-finite "
+                f"activity_exponent={activity_exponent!r}"
             ),
         )
 
+    x_value: float | None
+    try:
+        x_value = None if mole_fraction is None else float(mole_fraction)
+    except (TypeError, ValueError):
+        x_value = None
+    if x_value is not None and (
+        not math.isfinite(x_value) or not 0.0 <= x_value <= 1.0
+    ):
+        x_value = None
+
+    coeff = melt_oxide_activity_coefficient(component_id)
+    if coeff is None or x_value is None:
+        assumed_activity = x_value if x_value is not None else 1.0
+        missing = []
+        if coeff is None:
+            missing.append("coefficient_table_row")
+        if x_value is None:
+            missing.append("mole_fraction")
+        return SourceReactionActivity(
+            component_id=component_id,
+            value=assumed_activity,
+            verdict=ActivityVerdictKind.STATUS_BEARING_VALUE,
+            bound_direction=None,
+            reason="declared_ideal_solution_activity",
+            standard_state=standard_state,
+            phase_assemblage_ref=None,
+            chemical_potential_ref=None,
+            state_fingerprint=state_fingerprint,
+            solve_group_id=solve_group_id,
+            provider="declared_ideal_solution_policy",
+            authority=False,
+            report_label=STATUS_BEARING_NOT_POINT,
+            detail=(
+                "ideal-solution activity asserted because required analytical "
+                f"inputs are absent: {', '.join(missing)}"
+            ),
+            derivation={
+                "premise": "declared ideal solution has gamma=1",
+                "algebra": "a = gamma*X = X",
+                "units": "gamma, X, and activity are dimensionless",
+                "limiting_case": "X=1 gives a=1",
+                "assumed_mole_fraction": assumed_activity,
+                "missing_inputs": tuple(missing),
+                "activity_model": MELT_OXIDE_IDEAL_SOLUTION_MODEL,
+            },
+            evidence_tier=MELT_OXIDE_IDEAL_ASSERTION_TIER,
+        )
+
+    gamma_is_at_most_unity = float(coeff.gamma) <= 1.0
+    pressure_increases_with_activity = exponent >= 0.0
+    is_upper = gamma_is_at_most_unity == pressure_increases_with_activity
+    direction = BoundDirection.UPPER if is_upper else BoundDirection.LOWER
+    verdict = (
+        ActivityVerdictKind.UPPER_BOUND
+        if is_upper
+        else ActivityVerdictKind.LOWER_BOUND
+    )
     return SourceReactionActivity(
         component_id=component_id,
-        value=1.0,
-        verdict=ActivityVerdictKind.UPPER_BOUND,
-        bound_direction=BoundDirection.UPPER,
+        value=x_value,
+        verdict=verdict,
+        bound_direction=direction,
         reason=REASON_HENRIAN_GAMMA_UNMEASURED,
         standard_state=standard_state,
         phase_assemblage_ref=None,
@@ -410,24 +477,58 @@ def henrian_unknown_gamma_upper_bound(
         solve_group_id=solve_group_id,
         provider="henrian_bound_policy",
         authority=False,
-        report_label=BOUND_NOT_POINT,
+        report_label=BOUND_NOT_POINT if is_upper else LOWER_BOUND_NOT_POINT,
         derivation={
             "premise": (
-                "pure-endmember Raoultian standard state ⇒ a_i ≤ 1 for a "
-                "stable single-phase mixture"
+                "at fixed X, the coefficient table determines whether "
+                "a=gamma*X lies above or below the unity-gamma value X"
             ),
             "algebra": (
-                "P = P_ref * a^n * fO2_factor with n>=0 ⇒ P(a) ≤ P(1) "
-                "for a in (0, 1]"
+                "gamma<=1 ⇒ a<=X; gamma>1 ⇒ a>=X; the sign of the "
+                "pressure activity exponent preserves or reverses that bound"
             ),
             "units": "a dimensionless; n dimensionless activity exponent",
-            "limiting_case": "a=1 at pure endmember (mu = mu0)",
-            "activity_exponent": float(activity_exponent),
-            "source": (
-                "docs-private/research/2026-07-30-vp-acquire-5/"
-                "henrian-correlations.md; DESIGN-REV5 §9.2"
-            ),
+            "limiting_case": "gamma=1 makes the bound exact at a=X",
+            "activity_exponent": exponent,
+            "mole_fraction": x_value,
+            "gamma_anchor": float(coeff.gamma),
+            "gamma_property": "gamma<=1" if gamma_is_at_most_unity else "gamma>1",
+            "coefficient_domain_K": coeff.valid_range_K,
         },
+        evidence_ref=coeff.citation,
+        evidence_tier=MELT_OXIDE_ACTIVITY_TIER,
+    )
+
+
+def _is_external_activity_evidence_ref(provider_id: str, evidence_ref: str) -> bool:
+    """Return whether a reported activity cites evidence outside its producer."""
+
+    reference = evidence_ref.strip()
+    if not reference:
+        return False
+    folded = reference.casefold()
+    provider = provider_id.strip().casefold()
+    producer_markers = (
+        "_last_vapor_pressure_diagnostic",
+        "equilibriumresult.activity_coefficients",
+        "activity_coefficients[",
+        ".activities[",
+    )
+    if any(marker in folded for marker in producer_markers):
+        return False
+    if provider and (folded.startswith(f"{provider}:") or folded == provider):
+        return False
+    external_patterns = (
+        r"\bdoi\s*:?[\s]*10\.\d{4,9}/\S+",
+        r"https?://\S+",
+        r"\bisbn(?:-1[03])?\s*:?[\s]*[0-9Xx-]{10,}",
+        r"\bissn\s*:?[\s]*\d{4}-\d{3}[\dXx]\b",
+        r"\bnasa\s+ads\s+bibcode\b",
+        r"\bbibcode\s*:?[\s]*[12]\d{3}[A-Za-z0-9.&]{10,}",
+    )
+    return any(
+        re.search(pattern, reference, re.IGNORECASE)
+        for pattern in external_patterns
     )
 
 
@@ -466,6 +567,7 @@ class CondensedPhaseActivityProvider:
         reported_activity_provider: str | None = None,
         reported_activity_evidence_ref: str | None = None,
         reported_activity_standard_state: StandardStateIdentity | None = None,
+        reported_activity_provenance: Mapping[str, Any] | None = None,
         compound_bearing_state: bool = False,
     ) -> SourceReactionActivity:
         """Answer one ``activity_input`` declaration with a typed activity."""
@@ -522,12 +624,11 @@ class CondensedPhaseActivityProvider:
                 if isinstance(reported_activity_evidence_ref, str)
                 else ""
             )
-            if not provider_id or not evidence_ref or reported_activity_standard_state is None:
+            if not provider_id or reported_activity_standard_state is None:
                 return _refusal(
                     declaration.component_id,
                     ActivityRefusalCode.MISSING_EVIDENCE,
-                    "reported activity requires provider, evidence reference, and "
-                    "standard-state identity",
+                    "reported activity requires provider and standard-state identity",
                     standard_state=declaration.standard_state,
                     state_fingerprint=state_fingerprint,
                     solve_group_id=solve_group_id,
@@ -555,12 +656,56 @@ class CondensedPhaseActivityProvider:
                     state_fingerprint=state_fingerprint,
                     solve_group_id=solve_group_id,
                 )
+            provenance = dict(reported_activity_provenance or {})
+            domain_authority = provenance.get("gamma_domain_authority")
+            domain_status = (
+                str(domain_authority.get("authority_status") or "")
+                if isinstance(domain_authority, Mapping)
+                else ""
+            )
+            activity_model = str(
+                provenance.get("melt_oxide_activity_model") or ""
+            )
+            evidence_tier = str(
+                provenance.get("melt_oxide_activity_evidence_tier")
+                or provenance.get("melt_oxide_gamma_tier")
+                or "UNSPECIFIED"
+            )
+            warning = str(
+                provenance.get("melt_oxide_activity_warning") or ""
+            ).strip()
+            evidence_is_external = _is_external_activity_evidence_ref(
+                provider_id, evidence_ref
+            )
+            status_reasons: list[str] = []
+            if domain_status == "out_of_gamma_domain":
+                status_reasons.append("out_of_gamma_domain")
+            if activity_model == MELT_OXIDE_IDEAL_SOLUTION_MODEL:
+                status_reasons.append("declared_ideal_solution_activity")
+            if not evidence_is_external:
+                status_reasons.append(
+                    "producer_self_reference_rejected"
+                    if evidence_ref
+                    else "external_activity_evidence_missing"
+                )
+            if warning and warning not in status_reasons:
+                status_reasons.append(warning)
+
+            is_status_bearing = bool(status_reasons)
             return SourceReactionActivity(
                 component_id=declaration.component_id,
                 value=value,
-                verdict=ActivityVerdictKind.POINT,
+                verdict=(
+                    ActivityVerdictKind.STATUS_BEARING_VALUE
+                    if is_status_bearing
+                    else ActivityVerdictKind.POINT
+                ),
                 bound_direction=None,
-                reason="provider_reported_thermodynamic_activity",
+                reason=(
+                    status_reasons[0]
+                    if is_status_bearing
+                    else "provider_reported_thermodynamic_activity"
+                ),
                 standard_state=declaration.standard_state,
                 phase_assemblage_ref=None,
                 chemical_potential_ref=None,
@@ -568,6 +713,10 @@ class CondensedPhaseActivityProvider:
                 solve_group_id=solve_group_id,
                 provider=provider_id,
                 authority=False,
+                report_label=(
+                    STATUS_BEARING_NOT_POINT if is_status_bearing else None
+                ),
+                detail="; ".join(status_reasons) if status_reasons else None,
                 derivation={
                     "premise": (
                         "provider reports a in the exact declared standard state"
@@ -575,8 +724,10 @@ class CondensedPhaseActivityProvider:
                     "algebra": "a_source = a_reported",
                     "units": "activity is dimensionless",
                     "limiting_case": "pure endmember in its standard state has a=1",
+                    "reported_activity_provenance": provenance,
                 },
-                evidence_ref=evidence_ref,
+                evidence_ref=evidence_ref if evidence_is_external else None,
+                evidence_tier=evidence_tier,
             )
 
         if measured_gamma is not None and mole_fraction is not None:
@@ -603,9 +754,9 @@ class CondensedPhaseActivityProvider:
             return SourceReactionActivity(
                 component_id=declaration.component_id,
                 value=value,
-                verdict=ActivityVerdictKind.POINT,
+                verdict=ActivityVerdictKind.STATUS_BEARING_VALUE,
                 bound_direction=None,
-                reason="measured_or_validated_gamma",
+                reason="measured_gamma_external_evidence_missing",
                 standard_state=declaration.standard_state,
                 phase_assemblage_ref=None,
                 chemical_potential_ref=None,
@@ -613,6 +764,8 @@ class CondensedPhaseActivityProvider:
                 solve_group_id=solve_group_id,
                 provider="measured_gamma",
                 authority=False,
+                report_label=STATUS_BEARING_NOT_POINT,
+                detail="measured gamma lacks an external evidence reference",
                 derivation={
                     "premise": "a = gamma * X under the declared standard state",
                     "algebra": f"a = {measured_gamma} * {mole_fraction}",
@@ -629,6 +782,7 @@ class CondensedPhaseActivityProvider:
                     standard_state=declaration.standard_state,
                     state_fingerprint=state_fingerprint,
                     solve_group_id=solve_group_id,
+                    mole_fraction=mole_fraction,
                 )
             return _refusal(
                 declaration.component_id,
@@ -860,9 +1014,7 @@ def validation_row_may_certify(
     if status in {"pending_validation", "pending"}:
         return False
     if activity is not None:
-        if activity.verdict is ActivityVerdictKind.UPPER_BOUND:
-            return False
-        if activity.verdict is ActivityVerdictKind.REFUSAL:
+        if activity.verdict is not ActivityVerdictKind.POINT:
             return False
         if not activity.authority:
             return False
@@ -907,8 +1059,10 @@ def _stable_hash(payload: Any) -> str:
 __all__ = [
     "BOUND_NOT_POINT",
     "DIAGNOSTIC_AUTHORITY",
+    "LOWER_BOUND_NOT_POINT",
     "R_J_PER_MOL_K",
     "REASON_HENRIAN_GAMMA_UNMEASURED",
+    "STATUS_BEARING_NOT_POINT",
     "ActivityInputDeclaration",
     "ActivityRefusalCode",
     "ActivityVerdictKind",

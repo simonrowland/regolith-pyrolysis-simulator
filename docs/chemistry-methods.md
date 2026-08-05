@@ -180,13 +180,35 @@ far from ideal.
 
 **The activity that feeds the authoritative vapor-pressure path is the builtin analytic treatment, not
 a melt-equilibrium engine.** For every oxide except iron oxide, the builtin provider forms a
-single-cation mole fraction `X_MOx` and applies the species-specific constant coefficient table as
-`a_MOx = γ_MOx × X_MOx` (for example, `γ_NaO0.5 = 1e-3` and `γ_KO0.5 = 3.5e-5`). A species without a
-documented table row uses an explicit unity-γ fallback with a warning, and the pure single-cation limit
-returns activity 1. Iron oxide is the exception in interactive and batch simulator runs: those runs
-pass intrinsic oxygen fugacity into the vapor-pressure provider, so FeO uses the redox-resolved ferrous
-activity from the Kress & Carmichael / CALPHAD treatment of §7. The builtin single-cation-gamma,
-Kress-for-iron activity surface is what the vapor pressures of §2 are built on.
+single-cation mole fraction `X_MOx` and applies the species-specific table coefficient `γ*` as a
+**constant mid-range gamma** (for example, `γ*_NaO0.5 = 1e-3` and `γ*_KO0.5 = 3.5e-5`):
+
+```
+a(X) = γ* × X          for X ≤ X_blend (X_blend = 0.99)
+```
+
+A thin pure-endmember continuity shell then enforces the Raoultian pure-liquid reference without
+mid-range curvature:
+
+```
+ln γ_eff = ln γ* × ((1 − X)/(1 − X_blend))^2     for X_blend < X ≤ 1
+a = γ_eff × X
+```
+
+so `a → 1` continuously as `X → 1`, eliminating the former hard branch from `γ*X` to `a = 1` (a 31.1×
+step for the Cr₂O₃ anchor). The one-parameter pseudo-binary regular-solution mid-range model
+`ln γ = ln γ* · (T*/T) · (1−X)²` is **not** used: stored-cell enghar bisection showed that mid-range
+`(1−X)²` alone raised every Ca pressure by +0.418 dex at lunar `X_Ca ≈ 0.12` and that `T*/T` drove
+the K median regression (see `docs-private/research/2026-08-05-chemact-root/findings.md`). Multi-
+component excess G and constrained H^E remain future MC-5 work. Anchor temperatures `T*` label the
+declared gamma domain for status-bearing out-of-domain consumption (b-121); they do **not** scale the
+numeric gamma. A species without a documented table row uses an explicit declared ideal-solution
+assertion (`γ = 1`) carrying the `ASSUMED_IDEAL_SOLUTION` tier and a warning through the activity
+seam; it is a flux-driving prediction, not a clean evidence point. Iron oxide is the exception in
+interactive and batch simulator runs: those runs pass intrinsic oxygen fugacity into the vapor-
+pressure provider, so FeO uses the redox-resolved ferrous activity from the Kress & Carmichael /
+CALPHAD treatment of §7. The builtin single-cation-gamma, Kress-for-iron activity surface is what
+the vapor pressures of §2 are built on.
 <!-- impl: §3 -> engines/builtin/vapor_pressure.py BuiltinVaporPressureProvider.dispatch:1010 — FeO Kress activity -->
 <!-- impl: §3 -> simulator/fe_redox.py kress91_ferrous_feo_activity:718 — FeO activity path -->
 
@@ -250,8 +272,10 @@ The grounded point-anchor values are:
 | KO₀.₅ | 3.5 × 10⁻⁵ | 1500 K | point anchor; comparison envelope 6.3 × 10⁻⁵ to 7.1 × 10⁻⁴ at 1573 K | UNCERTIFIED |
 
 They are tagged UNCERTIFIED because they are a single-temperature datum extrapolated into the hotter
-1773–2173 K recipe band, where the true coefficient rises toward unity (the melt holds the alkali less
-tightly as it gets hotter) and the temperature dependence is not yet fit.
+1773–2173 K recipe band. The runtime applies the table gamma as a **constant** mid-range value (no
+analytical `T*/T` temperature scaling of gamma — that one-parameter pseudo-binary path was reverted
+after enghar median regression). An out-of-anchor-domain result therefore remains numeric and drives
+flux while carrying `out_of_gamma_domain`; it cannot certify as a clean activity point.
 
 The chosen source is Sossi et al. 2019 (*Geochim. Cosmochim. Acta* 260:204–231, §4.5.1, Tables 3–4;
 [doi:10.1016/j.gca.2019.06.021](https://doi.org/10.1016/j.gca.2019.06.021)). It is chosen because it is

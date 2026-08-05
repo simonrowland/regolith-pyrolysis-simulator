@@ -778,12 +778,20 @@ def _assert_activity_verdicts_nonvacuous(
         f"{feedstock_id}: activity provider returned zero structured answers "
         f"(vacuous gate)"
     )
+    # 2026-08-06 chemact landing (09fefc0): POINT authority now requires an
+    # external evidence_ref (b-121/b-122 discipline); production free-oxide
+    # activities without one honestly report STATUS_BEARING_VALUE. The
+    # contract here is value-bearing flux-driving verdicts, either kind.
+    value_bearing = (
+        ActivityVerdictKind.POINT,
+        ActivityVerdictKind.STATUS_BEARING_VALUE,
+    )
     point_answers = [
-        a for a in answers if a.verdict is ActivityVerdictKind.POINT
+        a for a in answers if a.verdict in value_bearing
     ]
     assert point_answers, (
-        f"{feedstock_id}: expected ≥1 POINT activity verdict on free oxides; "
-        f"got {[a.verdict for a in answers]}"
+        f"{feedstock_id}: expected ≥1 value-bearing activity verdict on free "
+        f"oxides; got {[a.verdict for a in answers]}"
     )
     for ans in point_answers:
         assert ans.value is not None and math.isfinite(float(ans.value))
@@ -1394,7 +1402,9 @@ def test_activity_verdict_assertion_red_under_mutation() -> None:
         measured_gamma=1.0,
         mole_fraction=0.05,
     )
-    assert good.verdict is ActivityVerdictKind.POINT
+    # 2026-08-06 chemact landing: no evidence_ref supplied, so the honest
+    # verdict is STATUS_BEARING_VALUE (POINT now requires external evidence).
+    assert good.verdict is ActivityVerdictKind.STATUS_BEARING_VALUE
     assert good.value == pytest.approx(0.05)
 
     # In-memory mutation: empty answers → non-vacuous gate RED.
@@ -1404,7 +1414,11 @@ def test_activity_verdict_assertion_red_under_mutation() -> None:
 
     # In-memory mutation: strip to non-POINT → RED.
     answers = [good]
-    point_answers = [a for a in answers if a.verdict is ActivityVerdictKind.POINT]
+    value_bearing = (
+        ActivityVerdictKind.POINT,
+        ActivityVerdictKind.STATUS_BEARING_VALUE,
+    )
+    point_answers = [a for a in answers if a.verdict in value_bearing]
     assert point_answers  # baseline green
     mutated = [
         dataclasses.replace(good, verdict=ActivityVerdictKind.REFUSAL, value=None)
@@ -1428,9 +1442,9 @@ def test_activity_verdict_assertion_red_under_mutation() -> None:
         provider=None,
         authority=False,
     )
-    mutated_points = [a for a in [refused] if a.verdict is ActivityVerdictKind.POINT]
+    mutated_points = [a for a in [refused] if a.verdict in value_bearing]
     with pytest.raises(AssertionError):
-        assert mutated_points, "expected ≥1 POINT activity verdict"
+        assert mutated_points, "expected ≥1 value-bearing activity verdict"
 
 
 def test_onee_minus_nine_mol_activation_threshold_parity(

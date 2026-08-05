@@ -22,6 +22,10 @@ from types import MappingProxyType
 from typing import TYPE_CHECKING, Any, Protocol
 
 from simulator.alpha_kinetics import AlphaSpecError, parse_alpha_contract
+from simulator.chemistry.melt_activity import (
+    melt_oxide_activity_coefficient,
+    single_cation_mole_fractions,
+)
 from simulator.vapour_rail.activity import (
     ActivityInputDeclaration,
     ActivityVerdictKind,
@@ -172,6 +176,9 @@ class VapourResolveState:
         str, StandardStateIdentity
     ] = field(default_factory=lambda: MappingProxyType({}))
     source_reaction_fO2_bar: float | None = None
+    source_reaction_activity_provenance: Mapping[str, Mapping[str, Any]] = field(
+        default_factory=lambda: MappingProxyType({})
+    )
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -188,6 +195,18 @@ class VapourResolveState:
             self,
             "source_reaction_activity_standard_states",
             MappingProxyType(dict(self.source_reaction_activity_standard_states)),
+        )
+        object.__setattr__(
+            self,
+            "source_reaction_activity_provenance",
+            MappingProxyType(
+                {
+                    str(species_id): MappingProxyType(dict(provenance))
+                    for species_id, provenance in dict(
+                        self.source_reaction_activity_provenance
+                    ).items()
+                }
+            ),
         )
         object.__setattr__(self, "extras", MappingProxyType(dict(self.extras)))
 
@@ -208,6 +227,10 @@ class VapourResolveState:
             "source_reaction_activity_standard_states": dict(
                 self.source_reaction_activity_standard_states
             ),
+            "source_reaction_activity_provenance": {
+                species_id: dict(provenance)
+                for species_id, provenance in self.source_reaction_activity_provenance.items()
+            },
             "source_reaction_fO2_bar": self.source_reaction_fO2_bar,
             **dict(self.extras),
         }
@@ -949,6 +972,23 @@ def refusal_closure(
                         rule.species_id
                     )
                 )
+                reported_provenance = state.source_reaction_activity_provenance.get(
+                    rule.species_id, {}
+                )
+                reported_mole_fraction = reported_provenance.get(
+                    "melt_oxide_X_single_cation"
+                )
+                if reported_mole_fraction is None:
+                    coeff = melt_oxide_activity_coefficient(
+                        declaration.component_id
+                    )
+                    if coeff is not None:
+                        source_fractions = single_cation_mole_fractions(
+                            _account_mols(ledger_snapshot, rule.source_account)
+                        )
+                        reported_mole_fraction = source_fractions.get(
+                            coeff.parent_oxide
+                        )
                 source_reaction_activity = (
                     activity_provider.resolve_source_reaction_activity(
                         declaration,
@@ -957,12 +997,14 @@ def refusal_closure(
                         activity_exponent=evaluator_activity_exponent,
                         solve_group_id=rule.solve_group_id,
                         state_fingerprint=_state_fingerprint(state),
+                        mole_fraction=reported_mole_fraction,
                         reported_activity=reported_activity,
                         reported_activity_provider=(
                             state.source_reaction_activity_provider
                         ),
                         reported_activity_evidence_ref=evidence_ref,
                         reported_activity_standard_state=reported_standard_state,
+                        reported_activity_provenance=reported_provenance,
                     )
                 )
                 if source_reaction_activity.verdict is ActivityVerdictKind.REFUSAL:
@@ -1078,21 +1120,24 @@ def refusal_closure(
                 if isinstance(alpha, Mapping)
                 else ""
             )
-            activity_is_upper_bound = (
+            # HEAD oodfix seam: out-of-domain pressure stays PressureValue +
+            # FluxEligible (status/acquisition/certification strip authority).
+            # INCOMING activity semantics (b-121/b-122): only a genuine Henrian
+            # activity bound (UPPER or LOWER) remains non-debiting; OOD gamma
+            # is status-bearing and flux-driving.
+            activity_is_bound = (
                 source_reaction_activity is not None
                 and source_reaction_activity.verdict
-                is ActivityVerdictKind.UPPER_BOUND
+                in {
+                    ActivityVerdictKind.UPPER_BOUND,
+                    ActivityVerdictKind.LOWER_BOUND,
+                }
             )
-            # Computation and certification are separate. A genuine Henrian
-            # a=1 activity bound remains non-debiting. An out-of-domain
-            # continuation is instead the best available point estimate and
-            # must evolve inventory; its out_of_range/status/acquisition fields
-            # plus the verdict/certification ceiling strip claim authority.
-            if activity_is_upper_bound:
+            if activity_is_bound:
                 bound_evidence = (
                     source_reaction_activity.evidence_ref
                     or source_reaction_activity.reason
-                    or "source_reaction_activity_upper_bound"
+                    or "source_reaction_activity_bound"
                 )
                 pressure = PressureUpperBound(
                     pa=float(pressure_pa), evidence_ref=bound_evidence
@@ -1148,12 +1193,31 @@ def refusal_closure(
                     "activity_verdict": source_reaction_activity.verdict.value,
                     "activity_provider": source_reaction_activity.provider,
                     "activity_evidence_ref": source_reaction_activity.evidence_ref,
+                    "activity_evidence_tier": source_reaction_activity.evidence_tier,
+                    "activity_reason": source_reaction_activity.reason,
+                    "activity_detail": source_reaction_activity.detail,
                 }
             )
-            if source_reaction_activity.verdict is ActivityVerdictKind.UPPER_BOUND:
+            if source_reaction_activity.verdict in {
+                ActivityVerdictKind.UPPER_BOUND,
+                ActivityVerdictKind.LOWER_BOUND,
+            }:
                 extra_payload["activity_bound"] = (
                     source_reaction_activity.report_label
                     or "bound-not-point"
+                )
+                extra_payload["activity_bound_direction"] = (
+                    source_reaction_activity.bound_direction.value
+                    if source_reaction_activity.bound_direction is not None
+                    else None
+                )
+            elif (
+                source_reaction_activity.verdict
+                is ActivityVerdictKind.STATUS_BEARING_VALUE
+            ):
+                extra_payload["activity_status"] = (
+                    source_reaction_activity.report_label
+                    or "status-bearing-not-point"
                 )
         extra_payload.update(evaluation_extra)
         return VapourAnswer(

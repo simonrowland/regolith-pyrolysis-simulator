@@ -54,8 +54,12 @@ from simulator.chemistry import ellingham_graph
 from simulator.chemistry import melt_activity
 from simulator.chemistry.melt_activity import (
     MELT_OXIDE_ACTIVITY_COEFFICIENTS,
+    MELT_OXIDE_IDEAL_ASSERTION_TIER,
+    MELT_OXIDE_IDEAL_SOLUTION_MODEL,
+    MELT_OXIDE_TABLE_GAMMA_MODEL,
     melt_oxide_activity,
     single_cation_mole_fractions,
+    table_gamma_effective,
 )
 from simulator.chemistry.kernel import (
     ChemistryIntent,
@@ -610,6 +614,9 @@ def test_grounded_melt_activity_coefficients_match_single_cation_sources():
     assert k_coeff.valid_range_K == (1500.0, 1500.0)
     assert k_coeff.anchor_T_K == pytest.approx(1500.0)
     assert "DeMaria" in k_coeff.citation
+    na_coeff = MELT_OXIDE_ACTIVITY_COEFFICIENTS["Na2O"]
+    assert na_coeff.valid_range_K == (1673.0, 1673.0)
+    assert na_coeff.anchor_T_K == pytest.approx(1673.0)
 
 
 def test_k_standard_reaction_term_reconstructs_liquid_ko05_source_rows(
@@ -805,6 +812,8 @@ def test_demaria_1971_k_validation_case_uses_measured_table1_po2(
     floor_delta_dex = math.log10(modeled_floor_po2 / modeled_measured_po2)
 
     assert math.log10(measured_po2_bar) == pytest.approx(-7.853, abs=0.002)
+    # Constant table gamma (no T*/T scaling); residual matches the
+    # DeMaria-held-out constant-gamma baseline.
     assert residual_dex == pytest.approx(1.241, abs=0.005)
     assert abs(residual_dex) > 1.0
     assert floor_delta_dex == pytest.approx(0.288, abs=0.005)
@@ -820,7 +829,11 @@ def test_single_cation_mole_fraction_uses_mol_ledger_not_wt_proxy():
     assert fractions["Al2O3"] == pytest.approx(0.25)
     assert fractions["SiO2"] == pytest.approx(0.5)
     assert activity is not None
-    assert activity.activity == pytest.approx(1.0e-3 * 0.25)
+    expected_gamma = table_gamma_effective(1.0e-3, 0.25)
+    assert expected_gamma == pytest.approx(1.0e-3)
+    assert activity.effective_gamma == pytest.approx(expected_gamma)
+    assert activity.activity == pytest.approx(expected_gamma * 0.25)
+    assert activity.activity_model == MELT_OXIDE_TABLE_GAMMA_MODEL
 
 
 @pytest.mark.parametrize("oxide", ["Cr2O3", "MnO", "TiO2", "Na2O"])
@@ -839,12 +852,115 @@ def test_melt_activity_normalizes_pure_raoultian_component_to_unity(oxide):
     assert "melt_oxide_gamma_valid_range_K" not in provenance
 
 
-def test_melt_activity_retains_constant_gamma_x_for_mixed_melts():
+@pytest.mark.parametrize("oxide", ["Cr2O3", "MnO", "TiO2", "Na2O"])
+def test_melt_activity_is_continuous_into_pure_raoultian_endpoint(oxide):
+    near_pure = melt_oxide_activity(
+        oxide,
+        {},
+        cation_mol_fraction={oxide: 1.0 - 1.0e-9},
+    )
+    pure = melt_oxide_activity(oxide, {oxide: 1.0})
+
+    assert near_pure is not None and pure is not None
+    assert near_pure.activity == pytest.approx(1.0, abs=2.0e-9)
+    assert pure.activity == pytest.approx(1.0)
+    assert abs(pure.activity - near_pure.activity) < 2.0e-9
+
+
+def test_melt_activity_uses_constant_table_gamma_for_mixed_melts():
     activity = melt_oxide_activity("Cr2O3", {"Cr2O3": 0.01, "SiO2": 0.99})
 
     assert activity is not None
     assert activity.x_single_cation == pytest.approx(0.019801980198019802)
-    assert activity.activity == pytest.approx(31.1 * activity.x_single_cation)
+    # Mid-range: constant table gamma (no pseudo-binary (1-X)^2 curvature).
+    expected_gamma = table_gamma_effective(31.1, activity.x_single_cation)
+    assert expected_gamma == pytest.approx(31.1)
+    assert activity.effective_gamma == pytest.approx(expected_gamma)
+    assert activity.activity == pytest.approx(
+        expected_gamma * activity.x_single_cation
+    )
+    assert activity.activity_model == MELT_OXIDE_TABLE_GAMMA_MODEL
+
+
+def test_k_table_gamma_is_temperature_independent_but_domain_labeled():
+    """Constant-gamma path: numeric a is T-independent; domain status still labels OOD.
+
+    The reverted pseudo-binary T*/T scaling must not move mid-range activity.
+    anchor_T_K remains for b-121 domain authority only.
+    """
+
+    fractions = {"K2O": 0.01, "SiO2": 0.99}
+    cold = melt_oxide_activity(
+        "K2O", {}, cation_mol_fraction=fractions, temperature_K=1350.0
+    )
+    anchor = melt_oxide_activity(
+        "K2O", {}, cation_mol_fraction=fractions, temperature_K=1500.0
+    )
+    hot = melt_oxide_activity(
+        "K2O", {}, cation_mol_fraction=fractions, temperature_K=1950.0
+    )
+    pure_hot = melt_oxide_activity(
+        "K2O", {}, cation_mol_fraction={"K2O": 1.0}, temperature_K=1950.0
+    )
+
+    assert cold is not None and anchor is not None and hot is not None
+    # No T*/T scaling: same mid-range activity at every T.
+    assert cold.activity == pytest.approx(anchor.activity)
+    assert hot.activity == pytest.approx(anchor.activity)
+    assert pure_hot is not None
+    assert pure_hot.activity == pytest.approx(1.0)
+    assert hot.provenance()["gamma_domain_authority"]["authority_status"] == (
+        "out_of_gamma_domain"
+    )
+    assert cold.provenance()["gamma_domain_authority"]["authority_status"] == (
+        "out_of_gamma_domain"
+    )
+    assert anchor.provenance()["gamma_domain_authority"]["authority_status"] == (
+        "in_domain"
+    )
+
+
+def test_melt_activity_endmember_shell_is_local_only():
+    """Continuity shell must not move lunar mid-range; pure endmember stays continuous."""
+
+    lunar_ca = melt_oxide_activity(
+        "CaO", {}, cation_mol_fraction={"CaO": 0.1156}
+    )
+    assert lunar_ca is not None
+    assert lunar_ca.effective_gamma == pytest.approx(0.012)
+    assert lunar_ca.activity == pytest.approx(0.012 * 0.1156)
+
+    # Just inside the shell floor (X=0.99): still exact table gamma.
+    at_floor = melt_oxide_activity(
+        "Cr2O3", {}, cation_mol_fraction={"Cr2O3": 0.99}
+    )
+    assert at_floor is not None
+    assert at_floor.effective_gamma == pytest.approx(31.1)
+    assert at_floor.activity == pytest.approx(31.1 * 0.99)
+
+    # Deep in shell: continuous into pure (no 31.1x cliff).
+    near = melt_oxide_activity(
+        "Cr2O3", {}, cation_mol_fraction={"Cr2O3": 1.0 - 1.0e-9}
+    )
+    pure = melt_oxide_activity("Cr2O3", {"Cr2O3": 1.0})
+    assert near is not None and pure is not None
+    assert near.activity == pytest.approx(1.0, abs=2.0e-9)
+    assert pure.activity == pytest.approx(1.0)
+    # Pre-continuity cliff magnitude: gamma*X at near-pure was ~31.1.
+    assert abs(near.activity - 31.1 * (1.0 - 1.0e-9)) > 30.0
+
+
+def test_missing_gamma_row_is_explicit_status_bearing_ideal_assertion():
+    activity = melt_oxide_activity(
+        "Fe2O3", {"Fe2O3": 0.25, "SiO2": 0.75}, temperature_K=1873.15
+    )
+
+    assert activity is not None
+    assert activity.activity_model == MELT_OXIDE_IDEAL_SOLUTION_MODEL
+    assert activity.evidence_tier == MELT_OXIDE_IDEAL_ASSERTION_TIER
+    assert activity.warning is not None
+    assert "declared_ideal_solution_activity_assertion" in activity.warning
+    assert activity.provenance()["melt_oxide_activity_warning"] == activity.warning
 
 
 def test_metal_vapor_activity_gamma_is_linear_for_alkalis_and_refractory_species(
@@ -887,19 +1003,20 @@ def test_metal_vapor_activity_gamma_is_linear_for_alkalis_and_refractory_species
     ideal_pressures = provider.dispatch(request).diagnostic["vapor_pressures_Pa"]
 
     assert ideal_pressures["Na"] / grounded_pressures["Na"] == pytest.approx(
-        1.0 / 1.0e-3,
+        1.0 / grounded_provenance["Na"]["melt_oxide_effective_gamma"],
         rel=1e-9,
     )
     assert ideal_pressures["K"] / grounded_pressures["K"] == pytest.approx(
-        1.0 / 3.5e-5,
+        1.0 / grounded_provenance["K"]["melt_oxide_effective_gamma"],
         rel=1e-9,
     )
     assert grounded_pressures["Cr"] / ideal_pressures["Cr"] == pytest.approx(
-        31.1,
+        grounded_provenance["Cr"]["melt_oxide_effective_gamma"],
         rel=1e-9,
     )
     assert grounded_provenance["Na"]["melt_oxide_activity"] == pytest.approx(
-        1.0e-3 * grounded_provenance["Na"]["melt_oxide_X_single_cation"]
+        grounded_provenance["Na"]["melt_oxide_effective_gamma"]
+        * grounded_provenance["Na"]["melt_oxide_X_single_cation"]
     )
     assert grounded_provenance["Na"]["alphamelts_cross_check_status"] == (
         "inconclusive_no_activities"
@@ -929,7 +1046,7 @@ def test_metal_vapor_activity_gamma_is_linear_for_alkalis_and_refractory_species
     )
     ti_ideal = provider.dispatch(ti_request).diagnostic["vapor_pressures_Pa"]
     assert ti_grounded["Ti"] / ti_ideal["Ti"] == pytest.approx(
-        1.60,
+        grounded_provenance["Ti"]["melt_oxide_effective_gamma"],
         rel=1e-9,
     )
 
@@ -1042,15 +1159,14 @@ def test_demaria_1971_na_validation_case_reports_measured_pressure_gap(
     assert p_na_by_T[1538.0] > p_na_by_T[1396.0]
     # E-08: the selected Na Ellingham row is gas-basis, so the runtime
     # pressure is f_Na = a_Na(g) * p° rather than a second P_sat multiplier.
+    # Constant table gamma (no T*/T) restores the DeMaria-held-out baseline.
     assert gap_factor == pytest.approx(5.056080393750948, rel=1e-6)
 
 
-def test_na_interim_authority_bracket_golden_neutral(vapor_pressure_data):
-    """Alternative B labels: authority/bracket emitted; P_Na byte-unchanged.
-
-    Pre-change staged-tree pin at DeMaria-class 1429 K probe (investigation
-    input). Labels-only demotion must not move runtime Na pressure.
-    """
+def test_na_interim_authority_bracket_and_constant_gamma_golden(
+    vapor_pressure_data,
+):
+    """Historical bracket stays provenance-only; runtime uses constant table gamma."""
 
     na_row = vapor_pressure_data["metals"]["Na"]
     assert na_row["authority_class"] == "uncertified"
@@ -1086,7 +1202,7 @@ def test_na_interim_authority_bracket_golden_neutral(vapor_pressure_data):
     assert result.status == "ok"
     diagnostic = result.diagnostic or {}
 
-    # Golden-neutrality tooth: exact pre-label-change float at this probe.
+    # Golden tooth for constant table gamma (no T*/T mid-range scaling).
     p_na = diagnostic["vapor_pressures_Pa"]["Na"]
     assert p_na == 0.02684167312949837
 

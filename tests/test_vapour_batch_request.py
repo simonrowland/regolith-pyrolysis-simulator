@@ -235,7 +235,7 @@ def _state_with_k_activity(**kwargs: Any) -> VapourResolveState:
     return VapourResolveState(
         source_reaction_activities={"K": 0.25},
         source_reaction_activity_provider="test_activity_provider",
-        source_reaction_activity_evidence_refs={"K": "test:activity[K]"},
+        source_reaction_activity_evidence_refs={"K": "doi:10.1234/test-activity"},
         source_reaction_activity_standard_states={
             "K": _TEST_ACTIVITY_STANDARD_STATE
         },
@@ -849,6 +849,13 @@ def test_out_of_domain_k_at_1650c_is_flux_eligible_but_non_authoritative() -> No
 
 
 def test_missing_activity_is_refusal_or_declared_henrian_upper_bound() -> None:
+    """Henrian a=1 bound remains non-debiting (HEAD rail); b-122 direction.
+
+    Activity verdict is UPPER_BOUND (gamma<=1 property). Pressure is typed as
+    PressureUpperBound + FluxDiagnosticUpperBound so inventory does not debit.
+    OOD gamma status-bearing (b-121) is covered separately and stays
+    flux-driving on the oodfix seam.
+    """
     payload = _minimal_family("K")
     catalog = compile_vapour_rail_catalog(payload, u0_manifest=_u0_stub("K"))
     ledger = {"process.cleaned_melt": {"K2O": 1.0, "KO0.5": 1.0}}
@@ -881,6 +888,7 @@ def test_missing_activity_is_refusal_or_declared_henrian_upper_bound() -> None:
         ),
         flux_activation_context=_pre_rg_activation_context(),
     ).channel("K")
+    # HEAD rail: genuine activity bound is non-debiting.
     assert isinstance(bounded.pressure, PressureUpperBound)
     assert isinstance(bounded.flux, FluxDiagnosticUpperBound)
     assert bounded.source_reaction_activity is not None
@@ -898,6 +906,49 @@ def test_missing_activity_is_refusal_or_declared_henrian_upper_bound() -> None:
         flux_activation_context=_pre_rg_activation_context("K"),
     ).flux_active_species_ids
     assert serialize_vapour_answer(bounded)["activity_bound"] == "bound-not-point"
+    assert bounded.verdict_status == "status_bearing_non_authoritative"
+    assert bounded.certification_ceiling == "never"
+
+
+def test_out_of_domain_gamma_status_stays_numeric_and_flux_driving() -> None:
+    catalog = compile_vapour_rail_catalog(
+        _minimal_family("K"), u0_manifest=_u0_stub("K")
+    )
+    ledger = {"process.cleaned_melt": {"K2O": 1.0, "KO0.5": 1.0}}
+    state = _state_with_k_activity(
+        temperature_K=1600.0,
+        source_reaction_activity_provenance={
+            "K": {
+                "melt_oxide_activity_evidence_tier": "UNCERTIFIED",
+                "melt_oxide_activity_model": (
+                    "constant_gamma_table_with_endmember_continuity"
+                ),
+                "gamma_domain_authority": {
+                    "authority_status": "out_of_gamma_domain",
+                    "gamma_domain_K": (1500.0, 1500.0),
+                    "temperature_K": 1600.0,
+                },
+            }
+        },
+    )
+
+    answer = catalog.resolve_batch(
+        ledger,
+        state,
+        flux_activation_context=_pre_rg_activation_context("K"),
+    ).channel("K")
+
+    assert isinstance(answer.pressure, PressureValue)
+    assert isinstance(answer.flux, FluxEligible)
+    assert answer.is_flux_active
+    assert answer.source_reaction_activity is not None
+    assert (
+        answer.source_reaction_activity.verdict
+        is ActivityVerdictKind.STATUS_BEARING_VALUE
+    )
+    assert answer.source_reaction_activity.reason == "out_of_gamma_domain"
+    assert answer.source_reaction_activity.may_certify() is False
+    assert answer.extra["activity_status"] == "status-bearing-not-point"
 
 
 def test_malformed_reported_activity_becomes_typed_refusal() -> None:
@@ -909,7 +960,7 @@ def test_malformed_reported_activity_becomes_typed_refusal() -> None:
         temperature_K=1500.0,
         source_reaction_activities={"K": "bogus"},  # type: ignore[dict-item]
         source_reaction_activity_provider="test_activity_provider",
-        source_reaction_activity_evidence_refs={"K": "test:activity[K]"},
+        source_reaction_activity_evidence_refs={"K": "doi:10.1234/test-activity"},
         source_reaction_activity_standard_states={
             "K": _TEST_ACTIVITY_STANDARD_STATE
         },
@@ -941,7 +992,7 @@ def test_resolve_batch_preserves_reported_standard_state_mismatch() -> None:
         source_reaction_fO2_bar=1.0e-8,
         source_reaction_activities={"K": 0.25},
         source_reaction_activity_provider="test_activity_provider",
-        source_reaction_activity_evidence_refs={"K": "test:activity[K]"},
+        source_reaction_activity_evidence_refs={"K": "doi:10.1234/test-activity"},
         source_reaction_activity_standard_states={"K": mismatched_standard_state},
     )
 
