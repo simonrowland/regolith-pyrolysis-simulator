@@ -214,7 +214,8 @@ def test_rows_dormant_legacy_outputs_identical():
     vp = yaml.safe_load((DATA / "vapor_pressures.yaml").read_text())
     catalog = compile_vapour_rail_catalog(vp)
     legacy = catalog.legacy_view()
-    # Live sections unchanged in membership.
+    # Metals remain unchanged; six analytically activated oxide carriers join
+    # the live compatibility projection.
     assert set(legacy["metals"]) == {
         "Na",
         "K",
@@ -227,7 +228,9 @@ def test_rows_dormant_legacy_outputs_identical():
         "Cr",
         "Mn",
     }
-    assert set(legacy["oxide_vapors"]) == {"SiO", "CrO2"}
+    assert set(legacy["oxide_vapors"]) == {
+        "SiO", "CrO2", "TiO", "TiO2_gas", "CaO_gas", "AlO", "Al2O", "CrO3"
+    }
     assert set(legacy["foulant_vapor"]) == {"NaCl", "KCl", "NaF"}
     # O is projected only into the dormant rail-gap bucket, not live maps.
     assert "O" not in legacy["metals"]

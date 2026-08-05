@@ -165,6 +165,21 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         dt_hr = float(controls.get("dt_hr", 1.0))
         sp_data = dict(controls.get("sp_data") or {})
         available_kg = float(controls.get("available_kg") or 0.0)
+        oxygen_destination = str(sp_data.get("oxygen_destination") or "")
+        if oxygen_destination and oxygen_destination not in {
+            "process.overhead_gas",
+            "reservoir.fo2_buffer",
+        }:
+            return IntentResult(
+                intent=ChemistryIntent.EVAPORATION_TRANSITION,
+                status="unsupported",
+                control_audit=control_audit,
+                diagnostic={
+                    "reason": (
+                        f"unsupported oxygen_destination {oxygen_destination!r}"
+                    ),
+                },
+            )
 
         # Negative dt_hr or species the caller flagged should never reach
         # here; if they do, surface as 'ok' with no transition (matches
@@ -266,7 +281,13 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         if O2_kg > 1e-12:
             o2_formula = resolve_species_formula("O2", registry)
             o2_mol = O2_kg / o2_formula.molar_mass_kg_per_mol()
-            if vapor_oxygen_atoms <= 0.0:
+            if (
+                oxygen_destination == "reservoir.fo2_buffer"
+                or (
+                    not oxygen_destination
+                    and vapor_oxygen_atoms <= 0.0
+                )
+            ):
                 credits["reservoir.fo2_buffer"] = {"O2": o2_mol}
             else:
                 overhead_credit["O2"] = o2_mol

@@ -1904,7 +1904,22 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 if oxide_activity.warning:
                     warnings.append(oxide_activity.warning)
                 activities[name] = oxide_activity.activity
-                activity_factor = max(a_ox, 0.0) ** activity_exponent
+                if compiled_evaluator is not None:
+                    # The compiled source reaction owns its declared activity
+                    # power.  Premise: for q A_cond -> nu V + ..., mass action
+                    # gives p_V proportional to a_A^(q/nu).  The melt provider
+                    # already reports the single-cation component activity, so
+                    # pass a_A itself and let the evaluator apply q/nu once.
+                    # Unit check: activity and its power are dimensionless.
+                    # Sanity: q/nu=1 matches legacy rows; Al2O's q/nu=2 must
+                    # quarter pressure when activity halves.  Calling
+                    # equivalent_parent_activity(2) here would take sqrt(a)
+                    # and silently flatten that physical square to a.
+                    activity_factor = max(oxide_activity.activity, 0.0) ** float(
+                        compiled_evaluator.activity_exponent
+                    )
+                else:
+                    activity_factor = max(a_ox, 0.0) ** activity_exponent
 
             valid_range = _range_tuple(valid)
             if compiled_evaluator is None and valid_range is not None:
@@ -1959,7 +1974,11 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     evaluator_pO2_bar = melt_dissociation_pO2_bar
                 evaluation = compiled_evaluator.evaluate(
                     T_K,
-                    source_activity=max(a_ox, 1.0e-300) if parent_oxide else 1.0,
+                    source_activity=(
+                        max(oxide_activity.activity, 1.0e-300)
+                        if parent_oxide
+                        else 1.0
+                    ),
                     pO2_bar=evaluator_pO2_bar,
                 )
                 P_reference_Pa = reference_evaluation.pressure_pa
@@ -1974,6 +1993,20 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         "acquisition_flag": evaluation.acquisition_flag,
                     }
                     warnings.append(str(evaluation.status))
+                    liquid_tio2_below_fit_floor = (
+                        name in {"TiO", "TiO2_gas"}
+                        and T_K < compiled_evaluator.valid_temperature_K[0]
+                    )
+                    if not liquid_tio2_below_fit_floor:
+                        continue
+                    # Premise: the compiled evaluator's consequence-aware
+                    # liquid-TiO2 continuation is its best available point
+                    # estimate; refusing to publish it would assert zero Ti vapor
+                    # below the fit floor. Algebra: P_eq = 10**log10(P_cont),
+                    # with activity and fO2 powers already applied exactly once
+                    # by evaluate(). Units: P_eq remains Pa. Sanity: only the two
+                    # Ti composites below their lower edge cross this compatibility
+                    # seam; every other OOR contract remains refusal-only here.
             else:
                 log_P = A - B / (T_K + C)
                 P_reference_Pa = _pow10_pressure_or_raise(

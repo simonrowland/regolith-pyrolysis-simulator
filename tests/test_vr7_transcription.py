@@ -88,7 +88,9 @@ def test_production_catalog_compiles_with_dormant_projection() -> None:
         "Cr",
         "Mn",
     }
-    assert set(legacy["oxide_vapors"]) == {"SiO", "CrO2"}
+    assert set(legacy["oxide_vapors"]) == {
+        "SiO", "CrO2", "TiO", "TiO2_gas", "CaO_gas", "AlO", "Al2O", "CrO3"
+    }
     assert set(legacy["foulant_vapor"]) == {"NaCl", "KCl", "NaF"}
     assert "dormant_acquisition" in legacy
     assert len(legacy["dormant_acquisition"]) >= 30

@@ -695,6 +695,119 @@ species:
   direct_vapour_flux: false
   requires_balanced_decomposition: true
   pressure_models: []
+- id: AlO
+  formula: AlO
+  atoms:
+    Al: 1
+    O: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: true
+  validation:
+    status: pending_validation
+    anchor_refs:
+    - kems-022-demaria-1971
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: analytical_non_authoritative
+    temperature_K:
+    - 1400
+    - 2273.15
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_out_of_range:AlO
+  code_metadata:
+    formula_id: AlO
+    canonical_aliases: []
+    request_rule: source_inventory_present
+  source: NASA CEA cea_ALO_gibbs gas polynomial + existing liquid-AlO1.5 rail; De Maria 1971 Table 4 anchor
+- id: Al2O
+  formula: Al2O
+  atoms:
+    Al: 2
+    O: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: true
+  validation:
+    status: pending_validation
+    anchor_refs:
+    - kems-022-demaria-1971
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: analytical_non_authoritative
+    temperature_K:
+    - 1400
+    - 2273.15
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_out_of_range:Al2O
+  code_metadata:
+    formula_id: Al2O
+    canonical_aliases: []
+    request_rule: source_inventory_present
+  source: NASA CEA cea_AL2O_gibbs gas polynomial + existing liquid-AlO1.5 rail; De Maria 1971 Table 4 anchor
+- id: TiO
+  formula: TiO
+  atoms:
+    Ti: 1
+    O: 1
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: true
+  validation:
+    status: pending_validation
+    anchor_refs:
+    - kems-017-stolyarova-2013
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: analytical_non_authoritative
+    temperature_K:
+    - 1923.15
+    - 2273.15
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: vapour_pressure_out_of_range:TiO
+  code_metadata:
+    formula_id: TiO
+    canonical_aliases: []
+    request_rule: source_inventory_present
+  source: NASA CEA cea_TiO_gibbs gas polynomial + existing liquid-TiO2 rail; Stolyarova 2013 Table 1 carrier
+- id: CrO3
+  formula: CrO3
+  atoms:
+    Cr: 1
+    O: 3
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: true
+  validation:
+    status: pending_validation
+    anchor_refs:
+    - nasa-cea-thermo
+    - KimBelton1974_dry_CrO3
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: analytical_non_authoritative
+    temperature_K:
+    - 1400
+    - 2273.15
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: evaporation_alpha_proxy:CrO3
+  code_metadata:
+    formula_id: CrO3
+    canonical_aliases: []
+    request_rule: source_inventory_present
+  source: NASA CEA cea_CrO3_gibbs gas polynomial + existing liquid-CrO1.5 rail; Kim-Belton 1974 dry anchor
 - id: Al2O3_gas
   formula: Al2O3
   atoms:
@@ -732,25 +845,28 @@ species:
   category: vapor_species
   phase: gas
   catalog_role: gas
-  direct_vapour_flux: false
+  direct_vapour_flux: true
   formula_alias: CaO
   validation:
     status: pending_validation
-    anchor_refs: []
+    anchor_refs:
+    - kems-017-stolyarova-2013
   pressure_observable: equilibrium_partial_pressure
   valid_domain:
-    status: pending_acquisition
-    temperature_K: null
+    status: analytical_non_authoritative
+    temperature_K:
+    - 1757
+    - 2273.15
   extrapolation_policy: conservative_slope_continuation
   out_of_range_status: out_of_range_conservative_continuation
-  acquisition_flag: vapour_pressure_pending_acquisition:CaO_gas
+  acquisition_flag: vapour_pressure_out_of_range:CaO_gas
   code_metadata:
     formula_id: CaO
     canonical_aliases:
     - CaO
-    collision_only_suffix: true
-    request_rule: pending_family_compilation
-  source: VR-1 U0 collision_gas membership set
+    collision_only_suffix: false
+    request_rule: source_inventory_present
+  source: NASA CEA cea_CaO_gibbs gas polynomial + existing liquid-CaO rail; Stolyarova 2013 Table 1 carrier
 - id: CoO_gas
   formula: CoO
   atoms:
@@ -1076,25 +1192,28 @@ species:
   category: vapor_species
   phase: gas
   catalog_role: gas
-  direct_vapour_flux: false
+  direct_vapour_flux: true
   formula_alias: TiO2
   validation:
     status: pending_validation
-    anchor_refs: []
+    anchor_refs:
+    - kems-017-stolyarova-2013
   pressure_observable: equilibrium_partial_pressure
   valid_domain:
-    status: pending_acquisition
-    temperature_K: null
+    status: analytical_non_authoritative
+    temperature_K:
+    - 1923.15
+    - 2273.15
   extrapolation_policy: conservative_slope_continuation
   out_of_range_status: out_of_range_conservative_continuation
-  acquisition_flag: vapour_pressure_pending_acquisition:TiO2_gas
+  acquisition_flag: vapour_pressure_out_of_range:TiO2_gas
   code_metadata:
     formula_id: TiO2
     canonical_aliases:
     - TiO2
-    collision_only_suffix: true
-    request_rule: pending_family_compilation
-  source: VR-1 U0 collision_gas membership set
+    collision_only_suffix: false
+    request_rule: source_inventory_present
+  source: NASA CEA cea_TiO2_gibbs gas polynomial + existing liquid-TiO2 rail; Stolyarova 2013 Table 1 carrier
 - id: 'NO'
   formula: 'NO'
   atoms:

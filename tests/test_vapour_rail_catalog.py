@@ -45,6 +45,7 @@ COLLISION_GASES = {
     "SiO2_gas",
     "TiO2_gas",
 }
+ACTIVE_COLLISION_GASES = {"CaO_gas", "TiO2_gas"}
 CARRIER_ONLY = {
     "CH4_NH3_HCN",
     "CO_CH4_propellant",
@@ -261,7 +262,7 @@ def test_production_schema_compiles_exact_four_strata_and_legacy_projection() ->
     )
     legacy = catalog.legacy_view()
     assert len(legacy["metals"]) == 10
-    assert len(legacy["oxide_vapors"]) == 2
+    assert len(legacy["oxide_vapors"]) == 8
     assert len(legacy["foulant_vapor"]) == 3
     assert set(legacy["metals"]) == {
         "Na",
@@ -275,7 +276,16 @@ def test_production_schema_compiles_exact_four_strata_and_legacy_projection() ->
         "Cr",
         "Mn",
     }
-    assert set(legacy["oxide_vapors"]) == {"SiO", "CrO2"}
+    assert set(legacy["oxide_vapors"]) == {
+        "SiO",
+        "CrO2",
+        "TiO",
+        "TiO2_gas",
+        "CaO_gas",
+        "AlO",
+        "Al2O",
+        "CrO3",
+    }
     assert set(legacy["foulant_vapor"]) == {"NaCl", "KCl", "NaF"}
     assert legacy["metals"]["K"]["antoine"]["A"] == pytest.approx(10.641294)
     # Activity-corrected schema-v2 models must not leak into the legacy
@@ -445,7 +455,9 @@ def test_species_catalog_closes_collision_gases_and_carrier_only_rows() -> None:
         assert row["out_of_range_status"] == OUT_OF_RANGE_STATUS
         assert row["acquisition_flag"].endswith(species_id)
         assert row["code_metadata"]["formula_id"] == row["formula"]
-        assert row["code_metadata"]["collision_only_suffix"] is True
+        assert row["code_metadata"]["collision_only_suffix"] is (
+            species_id not in ACTIVE_COLLISION_GASES
+        )
 
     carrier_rows = {
         species_id
@@ -464,10 +476,19 @@ def test_species_catalog_closes_collision_gases_and_carrier_only_rows() -> None:
 def test_collision_gases_do_not_enter_legacy_volatile_runtime_registry() -> None:
     formulas, aliases, catalog_specs, formula_texts = _volatile_runtime_catalog()
 
-    assert COLLISION_GASES.isdisjoint(formulas)
-    assert COLLISION_GASES.isdisjoint(aliases)
-    assert COLLISION_GASES.isdisjoint(catalog_specs)
-    assert COLLISION_GASES.isdisjoint(formula_texts)
+    inactive_collision_gases = COLLISION_GASES - ACTIVE_COLLISION_GASES
+    assert inactive_collision_gases.isdisjoint(formulas)
+    assert inactive_collision_gases.isdisjoint(aliases)
+    assert inactive_collision_gases.isdisjoint(catalog_specs)
+    assert inactive_collision_gases.isdisjoint(formula_texts)
+    # Once a collision-safe gas row becomes a direct carrier its suffixed id,
+    # formula alias, atom spec, and formula text must all enter together; ledger
+    # code cannot infer TiO2(g) from condensed TiO2 by string collision.
+    for species_id in ACTIVE_COLLISION_GASES:
+        assert species_id in formulas
+        assert species_id in aliases
+        assert species_id in catalog_specs
+        assert species_id in formula_texts
 
 
 def test_b1_standard_reaction_without_antoine_uses_shared_evaluator() -> None:

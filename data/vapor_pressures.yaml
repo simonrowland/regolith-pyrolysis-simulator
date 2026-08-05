@@ -857,7 +857,10 @@ families:
             - 1557
             - 2329
           boiling_point_C: 2519
-          notes: dH_vap ~ 332.0 kJ/mol. Negligible below 2500 degC  --  not pyrolysable.
+          notes: dH_vap ~ 332.0 kJ/mol. AlO and Al2O are measured Apollo-basalt
+            carriers and are modelled separately; their ratios to Al vary strongly
+            with oxygen fugacity, so this metal branch alone cannot establish
+            negligible total Al volatilisation.
           liquid_oxide_standard_reaction:
             formula: AlO1.5(l) -> Al(g) + 0.75 O2(g)
             basis: 'VapoRock JANAF metal(g)/O2(g) + ThermoEngine v1.0 pure-liquid oxide mu0; minimax refit
@@ -1069,6 +1072,14 @@ families:
           molar_mass_g_mol: 47.87
           electrons_per_atom: 4
           parent_oxide: TiO2
+          oxygen_destination: process.overhead_gas
+          oxygen_destination_derivation: 'All Ti carriers draw one TiO2 reservoir.
+            TiO2(l)->Ti(g)+O2 releases 1 mol O2 per mol Ti; TiO releases 0.5
+            and TiO2(g) releases zero. Crediting each released amount to the
+            same process.overhead_gas account makes total O2 the carrier sum
+            and leaves commit_batch as sole writer. Unit check: destination
+            changes no molar coefficient. Sanity: the Ti-only limit credits one
+            O2 exactly, while the intact TiO2(g) limit credits zero.'
           authority_class: uncertified
           source: REF-032 CRC Handbook 84th ed. / Alcock-Itkin-Horrigan 1984 vapor-pressure equation for
             titanium; pure_component_antoine is retained as a legacy compatibility sidecar; the schema-v2
@@ -1133,7 +1144,10 @@ families:
             formula: TiO2(l) -> Ti(g) + O2(g)
             basis: 'VapoRock JANAF metal(g)/O2(g) + ThermoEngine v1.0 pure-liquid oxide mu0; minimax refit
               over 1941-2273.15 K. Closes solid-oxide Ellingham vs liquid-oxide activity pairing (2026-07-20
-              vaporock-fit-audit).
+              vaporock-fit-audit). The live lower bound is extended only to the
+              1923.15 K audit point (17.85 K below the fitted grid); that point is
+              status-bearing/non-authoritative until the liquid reference grid is
+              regenerated there.
 
               '
             standard_pressure_Pa: 100000.0
@@ -1150,7 +1164,7 @@ families:
 
                 '
             valid_range_K:
-            - 1941
+            - 1923.15
             - 2273.15
             fit_residual_dex:
               max_abs: 0.00012
@@ -1190,7 +1204,7 @@ families:
             species_basis: monomer
             valid_domain:
               temperature_K:
-              - 1941
+              - 1923.15
               - 2273.15
             provenance:
             - source: schema_v1_in_place_migration
@@ -1741,6 +1755,785 @@ families:
       canonical_aliases: []
       hot_train_applicability: applicable
       compatibility_condensation_reference_table: true
+  oxide_vapors_tio_family:
+    physical_properties:
+      species:
+        TiO:
+          formula: TiO
+          molar_mass_g_mol: 63.866
+          parent_oxide: TiO2
+          fit_target: standard_reaction_term
+          authority_class: analytical_non_authoritative
+          confidence_tier: moderate
+          reaction:
+            formula: TiO2(l) -> TiO(g) + 0.5 O2(g)
+            basis: existing liquid-TiO2-to-Ti standard reaction plus NASA CEA
+              cea_Ti_gibbs, cea_TiO_gibbs, and cea_O2_gibbs gas exchange
+            derivation: 'Premise: one Ti atom fixes one TiO product; balancing two
+              reservoir oxygens leaves one O atom = 0.5 O2. Mass action:
+              K=(p_TiO/P0)*(pO2/P0)^0.5/a_TiO2, so p_TiO is proportional to
+              a_TiO2*(pO2/P0)^-0.5 and the exponent is -nu_O2/nu_TiO=-0.5/1=-0.5.
+              K(T)=exp(-DeltaG_rxn/(R*T)); the gas-exchange DeltaG uses CEA
+              Ti, TiO, O2 while the existing liquid-TiO2->Ti rail supplies the
+              condensed standard state. Unit check: K, activities, and pressure
+              ratios are dimensionless; final pressure is Pa. Sanity: dividing
+              by Ti(g) gives K_exchange*(pO2/P0)^0.5, so TiO/Ti falls as pO2 falls.'
+          stoich_oxide_per_vapor: 1.25050887796324
+          stoich_O2_per_vapor: 0.250508877963236
+          stoichiometry_derivation: 'M(TiO2)/M(TiO)=79.865/63.866=1.25050887796324
+            kg/kg; 0.5*M(O2)/M(TiO)=0.5*31.998/63.866=0.250508877963236
+            kg/kg. Unit check: kg/kg. Mass sanity: 1.25050887796324 =
+            1 + 0.250508877963236.'
+          oxide_activity_exponent: 1.0
+          pO2_exponent: -0.5
+          pO2_reference_bar: 1.0
+          notes: Status-bearing analytical carrier. Stolyarova 2013 Table 1 observes
+            TiO over CTS melt; validation remains pending because melt activity and
+            evaporation alpha are inherited proxies, not direct TiO measurements.
+          validation:
+            status: pending_validation
+            anchor_refs:
+            - kems-017-stolyarova-2013
+          source_reactions:
+          - id: liquid_tio2_to_tio_gas
+            reactants:
+            - formula: TiO2
+              stoichiometry: 1.0
+            products:
+            - formula: TiO
+              stoichiometry: 1.0
+            - formula: O2
+              stoichiometry: 0.5
+            activity_input:
+              component_id: TiO2
+              standard_state:
+                convention: raoultian_pure_endmember
+                phase: liquid
+                reference_pressure_bar: 1.0
+                component_basis: raoultian_pure_endmember
+              activity_model: provider_reported_thermodynamic_activity
+              allow_henrian_upper_bound: false
+              compound_bearing: false
+              require_assemblage_match: false
+          pressure_models:
+          - fit_target: standard_reaction_term
+            pressure_kind: equilibrium_partial_pressure
+            species_basis: monomer
+            valid_domain:
+              temperature_K:
+              - 1923.15
+              - 2273.15
+            provenance:
+            - source_id: nasa-cea-thermo
+              observation_ids:
+              - cea_Ti_gibbs
+              - cea_TiO_gibbs
+              - cea_O2_gibbs
+            - source_id: metals_ti_family
+              observation_id: liquid_oxide_standard_reaction
+            evaluator_family: nasa_cea_9
+            source_reaction_id: liquid_tio2_to_tio_gas
+            activity_semantics: source_reaction_activity
+            oxygen_fugacity_channel: intrinsic_melt
+            base_reference_pressure_model:
+              evaluator_family: antoine
+              coefficients:
+                A: 17.7414184
+                B: 63882.5899238
+                C: -74.44
+            base_vapor_formula: Ti
+            gas_exchange_reaction:
+              reactants:
+              - formula: Ti
+                stoichiometry: 1.0
+              - formula: O2
+                stoichiometry: 0.5
+              products:
+              - formula: TiO
+                stoichiometry: 1.0
+            species_thermo:
+              Ti:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_Ti_gibbs
+              TiO:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_TiO_gibbs
+              O2:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_O2_gibbs
+            derivation: 'At pO2_ref, r_TiO=(K_exchange*r_Ti*r_O2^0.5);
+              K_exchange=exp(-[G_TiO-G_Ti-0.5*G_O2]/RT). The outer source
+              reaction contributes a_TiO2^1 and pO2^-0.5. All r=p/P0 are
+              dimensionless. If K_exchange=1 and O2=1, the Ti reference pressure
+              is recovered.'
+            activity_exponent: 1.0
+            pO2_exponent: -0.5
+            pO2_reference_bar: 1.0
+    fiat_routing:
+      plant_bin: null
+      engineering_capture_policy: temperature_threshold
+      products_and_coproducts: []
+      process_or_terminal_destination: process.condensation_train
+      condensation_reference_at_1mbar_C: 2480.251847
+      condensation_reference_derivation: 'Solve the compiled unit-activity,
+        pO2_reference=1 bar curve for P_TiO=100 Pa by monotone bisection:
+        T=2753.401847 K=2480.251847 C. Pa target and Pa curve share units.
+        This root lies above the 2273.15 K pressure domain, so it is an
+        engineering routing proxy, never validation evidence; acquisition
+        target is a measured TiO condensation/deposition curve.'
+    vaporisation_coefficients:
+      evaporation_alpha:
+        value: 0.8
+        source: 'Status-bearing proxy: metals_ti_family CaTiO3-melt activity proxy;
+          no TiO-specific alpha is available.'
+        T_band_K:
+        - 2278
+        - 2278
+        envelope:
+        - 0.39
+        - 1.0
+        tier: 2
+        tag: proxy_not_intrinsic
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 2278
+        - 2278
+        envelope:
+        - 0.39
+        - 1.0
+      extrapolation_policy: conservative_slope_continuation
+      out_of_range_status: out_of_range_conservative_continuation
+      acquisition_flag: evaporation_alpha_proxy:TiO
+    code_metadata:
+      formula_id: TiO
+      source_account: process.cleaned_melt
+      request_rule: source_inventory_present
+      solve_group_id: oxide_vapors_tio_family
+      compatibility_projection: oxide_vapors
+      canonical_aliases: []
+      hot_train_applicability: applicable
+  oxide_vapors_tio2_family:
+    physical_properties:
+      species:
+        TiO2_gas:
+          formula: TiO2
+          molar_mass_g_mol: 79.865
+          parent_oxide: TiO2
+          fit_target: standard_reaction_term
+          authority_class: analytical_non_authoritative
+          confidence_tier: moderate
+          reaction:
+            formula: TiO2(l) -> TiO2(g)
+            basis: existing liquid-TiO2-to-Ti standard reaction plus NASA CEA
+              cea_Ti_gibbs, cea_TiO2_gibbs, and cea_O2_gibbs gas exchange
+            derivation: 'Premise: gas and reservoir have identical TiO2 formula,
+              so atom balance needs no O2. Mass action gives
+              K=(p_TiO2/P0)/a_TiO2; therefore p is proportional to a^1 and the
+              pO2 exponent is -nu_O2/nu_v=0/1=0. K(T)=exp(-DeltaG_rxn/(R*T));
+              gas-only CEA conversion Ti+O2->TiO2 is composed with the existing
+              liquid-TiO2->Ti rail. Unit check: K and activity are dimensionless,
+              pressure is Pa. Sanity: TiO2/Ti=K_exchange*(pO2/P0), so the oxide
+              carrier falls relative to Ti when pO2 falls.'
+          stoich_oxide_per_vapor: 1.0
+          stoich_O2_per_vapor: 0.0
+          stoichiometry_derivation: 'Identical TiO2 formulas give
+            M_parent/M_vapor=79.865/79.865=1 and zero O2. Unit kg/kg; mass
+            sanity 1=1+0.'
+          oxide_activity_exponent: 1.0
+          pO2_exponent: 0.0
+          pO2_reference_bar: 1.0
+          notes: Status-bearing analytical carrier. Stolyarova 2013 Table 1 observes
+            TiO2 over CTS melt; validation remains pending because activity and
+            alpha are inherited proxies.
+          validation:
+            status: pending_validation
+            anchor_refs:
+            - kems-017-stolyarova-2013
+          source_reactions:
+          - id: liquid_tio2_to_tio2_gas
+            reactants:
+            - formula: TiO2
+              stoichiometry: 1.0
+            products:
+            - formula: TiO2
+              stoichiometry: 1.0
+            activity_input:
+              component_id: TiO2
+              standard_state:
+                convention: raoultian_pure_endmember
+                phase: liquid
+                reference_pressure_bar: 1.0
+                component_basis: raoultian_pure_endmember
+              activity_model: provider_reported_thermodynamic_activity
+              allow_henrian_upper_bound: false
+              compound_bearing: false
+              require_assemblage_match: false
+          pressure_models:
+          - fit_target: standard_reaction_term
+            pressure_kind: equilibrium_partial_pressure
+            species_basis: monomer
+            valid_domain:
+              temperature_K:
+              - 1923.15
+              - 2273.15
+            provenance:
+            - source_id: nasa-cea-thermo
+              observation_ids:
+              - cea_Ti_gibbs
+              - cea_TiO2_gibbs
+              - cea_O2_gibbs
+            - source_id: metals_ti_family
+              observation_id: liquid_oxide_standard_reaction
+            evaluator_family: nasa_cea_9
+            source_reaction_id: liquid_tio2_to_tio2_gas
+            activity_semantics: source_reaction_activity
+            base_reference_pressure_model:
+              evaluator_family: antoine
+              coefficients:
+                A: 17.7414184
+                B: 63882.5899238
+                C: -74.44
+            base_vapor_formula: Ti
+            gas_exchange_reaction:
+              reactants:
+              - formula: Ti
+                stoichiometry: 1.0
+              - formula: O2
+                stoichiometry: 1.0
+              products:
+              - formula: TiO2
+                stoichiometry: 1.0
+            species_thermo:
+              Ti:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_Ti_gibbs
+              TiO2:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_TiO2_gibbs
+              O2:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_O2_gibbs
+            derivation: 'At pO2_ref, r_TiO2=K_exchange*r_Ti*r_O2;
+              K_exchange=exp(-[G_TiO2-G_Ti-G_O2]/RT). The final source reaction
+              contributes a_TiO2^1 and pO2^0. Ratios are dimensionless; final
+              pressure is Pa. At K_exchange=1 and O2=1, base pressure is recovered.'
+            activity_exponent: 1.0
+            pO2_exponent: 0.0
+            pO2_reference_bar: 1.0
+    fiat_routing:
+      plant_bin: null
+      engineering_capture_policy: temperature_threshold
+      products_and_coproducts: []
+      process_or_terminal_destination: process.condensation_train
+      condensation_reference_at_1mbar_C: 2272.647126
+      condensation_reference_derivation: 'Solve the compiled unit-activity,
+        pO2_reference=1 bar curve for P_TiO2=100 Pa: T=2545.797126 K =
+        2272.647126 C. Unit check Pa=Pa. The root is outside the 2273.15 K
+        pressure domain and is a non-authoritative routing proxy pending a
+        measured TiO2 deposition curve.'
+    vaporisation_coefficients:
+      evaporation_alpha:
+        value: 0.8
+        source: 'Status-bearing proxy: metals_ti_family CaTiO3-melt activity proxy;
+          no TiO2(g)-specific alpha is available.'
+        T_band_K:
+        - 2278
+        - 2278
+        envelope:
+        - 0.39
+        - 1.0
+        tier: 2
+        tag: proxy_not_intrinsic
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 2278
+        - 2278
+        envelope:
+        - 0.39
+        - 1.0
+      extrapolation_policy: conservative_slope_continuation
+      out_of_range_status: out_of_range_conservative_continuation
+      acquisition_flag: evaporation_alpha_proxy:TiO2_gas
+    code_metadata:
+      formula_id: TiO2_gas
+      source_account: process.cleaned_melt
+      request_rule: source_inventory_present
+      solve_group_id: oxide_vapors_tio2_family
+      compatibility_projection: oxide_vapors
+      canonical_aliases: []
+      hot_train_applicability: applicable
+  oxide_vapors_cao_family:
+    physical_properties:
+      species:
+        CaO_gas:
+          formula: CaO
+          molar_mass_g_mol: 56.077
+          parent_oxide: CaO
+          fit_target: standard_reaction_term
+          authority_class: analytical_non_authoritative
+          confidence_tier: moderate
+          reaction:
+            formula: CaO(l) -> CaO(g)
+            basis: existing liquid-CaO-to-Ca standard reaction plus NASA CEA
+              cea_Ca_gibbs, cea_CaO_gibbs, and cea_O2_gibbs gas exchange
+            derivation: 'Premise: gas and reservoir share CaO stoichiometry, so
+              no O2 is produced. K=(p_CaO/P0)/a_CaO gives activity exponent 1
+              and pO2 exponent -0/1=0. K(T)=exp(-DeltaG_rxn/(R*T)); CEA
+              Ca+0.5O2->CaO is composed with the existing liquid-CaO->Ca rail.
+              Unit check: K and activity are dimensionless, pressure is Pa.
+              Sanity: CaO/Ca=K_exchange*(pO2/P0)^0.5, so CaO becomes less
+              important at lower pO2.'
+          stoich_oxide_per_vapor: 1.0
+          stoich_O2_per_vapor: 0.0
+          stoichiometry_derivation: 'Identical CaO formulas give
+            56.077/56.077=1 kg/kg and zero O2; mass sanity 1=1+0.'
+          oxide_activity_exponent: 1.0
+          pO2_exponent: 0.0
+          pO2_reference_bar: 1.0
+          notes: Status-bearing completeness carrier. Stolyarova 2013 Table 1
+            observes CaO, but CEA predicts Ca(g) remains the primary carrier over
+            reducing process conditions.
+          validation:
+            status: pending_validation
+            anchor_refs:
+            - kems-017-stolyarova-2013
+          source_reactions:
+          - id: liquid_cao_to_cao_gas
+            reactants:
+            - formula: CaO
+              stoichiometry: 1.0
+            products:
+            - formula: CaO
+              stoichiometry: 1.0
+            activity_input:
+              component_id: CaO
+              standard_state:
+                convention: raoultian_pure_endmember
+                phase: liquid
+                reference_pressure_bar: 1.0
+                component_basis: raoultian_pure_endmember
+              activity_model: provider_reported_thermodynamic_activity
+              allow_henrian_upper_bound: false
+              compound_bearing: false
+              require_assemblage_match: false
+          pressure_models:
+          - fit_target: standard_reaction_term
+            pressure_kind: equilibrium_partial_pressure
+            species_basis: monomer
+            valid_domain:
+              temperature_K:
+              - 1757
+              - 2273.15
+            provenance:
+            - source_id: nasa-cea-thermo
+              observation_ids:
+              - cea_Ca_gibbs
+              - cea_CaO_gibbs
+              - cea_O2_gibbs
+            - source_id: metals_ca_family
+              observation_id: gas_rail_standard_reaction
+            evaluator_family: nasa_cea_9
+            source_reaction_id: liquid_cao_to_cao_gas
+            activity_semantics: source_reaction_activity
+            base_reference_pressure_model:
+              evaluator_family: antoine
+              coefficients:
+                A: 12.2168914
+                B: 37873.6892331
+                C: -116.89
+            base_vapor_formula: Ca
+            gas_exchange_reaction:
+              reactants:
+              - formula: Ca
+                stoichiometry: 1.0
+              - formula: O2
+                stoichiometry: 0.5
+              products:
+              - formula: CaO
+                stoichiometry: 1.0
+            species_thermo:
+              Ca:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_Ca_gibbs
+              CaO:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_CaO_gibbs
+              O2:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_O2_gibbs
+            derivation: 'At pO2_ref, r_CaO=K_exchange*r_Ca*r_O2^0.5;
+              K_exchange=exp(-[G_CaO-G_Ca-0.5*G_O2]/RT). Final reaction applies
+              a_CaO^1 and pO2^0. Ratios are dimensionless; output is Pa. K=1,
+              O2=1 recovers the Ca base pressure.'
+            activity_exponent: 1.0
+            pO2_exponent: 0.0
+            pO2_reference_bar: 1.0
+    fiat_routing:
+      plant_bin: null
+      engineering_capture_policy: temperature_threshold
+      products_and_coproducts: []
+      process_or_terminal_destination: process.condensation_train
+      condensation_reference_at_1mbar_C: 2605.166613
+      condensation_reference_derivation: 'Solve the compiled unit-activity,
+        pO2_reference=1 bar curve for P_CaO=100 Pa: T=2878.316613 K =
+        2605.166613 C. Unit check Pa=Pa. This is outside the 2273.15 K domain,
+        so it is only a status-bearing routing proxy pending a measured CaO
+        deposition curve.'
+    vaporisation_coefficients:
+      evaporation_alpha:
+        value: 0.9
+        source: 'Status-bearing proxy: metals_ca_family CaTiO3-melt activity
+          proxy; no CaO(g)-specific alpha is available.'
+        T_band_K:
+        - 2278
+        - 2278
+        envelope:
+        - 0.48
+        - 1.2
+        tier: 2
+        tag: proxy_not_intrinsic
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 2278
+        - 2278
+        envelope:
+        - 0.48
+        - 1.2
+      extrapolation_policy: conservative_slope_continuation
+      out_of_range_status: out_of_range_conservative_continuation
+      acquisition_flag: evaporation_alpha_proxy:CaO_gas
+    code_metadata:
+      formula_id: CaO_gas
+      source_account: process.cleaned_melt
+      request_rule: source_inventory_present
+      solve_group_id: oxide_vapors_cao_family
+      compatibility_projection: oxide_vapors
+      canonical_aliases: []
+      hot_train_applicability: applicable
+  oxide_vapors_alo_family:
+    physical_properties:
+      species:
+        AlO:
+          formula: AlO
+          molar_mass_g_mol: 42.9805385
+          parent_oxide: Al2O3
+          fit_target: standard_reaction_term
+          authority_class: analytical_non_authoritative
+          confidence_tier: measured_carrier_analytical_pressure
+          reaction:
+            formula: AlO1.5(l) -> AlO(g) + 0.25 O2(g)
+            basis: existing liquid-AlO1.5-to-Al standard reaction plus NASA CEA
+              cea_AL_gibbs, cea_ALO_gibbs, and cea_O2_gibbs gas exchange
+            derivation: 'Premise: single-cation melt component AlO1.5 supplies
+              one AlO; the remaining 0.5 O atom is 0.25 O2. Thus
+              K=(p_AlO/P0)*(pO2/P0)^0.25/a_AlO1.5 and p is proportional to
+              a^1*pO2^-0.25; exponent=-0.25/1=-0.25. CEA gas polynomials give
+              K_exchange for Al+0.5O2->AlO, composed with the existing liquid
+              AlO1.5->Al rail. Unit check: all activities/ratios are
+              dimensionless and output is Pa. Sanity: AlO/Al is proportional
+              to pO2^0.5 and falls under stronger reduction.'
+          stoich_oxide_per_vapor: 1.18611911993611
+          stoich_O2_per_vapor: 0.186119119936108
+          stoichiometry_derivation: '0.5*M(Al2O3)/M(AlO)=
+            0.5*101.960077/42.9805385=1.18611911993611 kg/kg;
+            0.25*M(O2)/M(AlO)=0.186119119936108 kg/kg. Unit kg/kg; mass
+            sanity 1.18611911993611=1+0.186119119936108.'
+          oxide_activity_exponent: 1.0
+          pO2_exponent: -0.25
+          pO2_reference_bar: 1.0
+          notes: De Maria 1971 Table 4 directly observes AlO over Apollo 12 basalt
+            at 2320-2500 K. The analytical row covers process temperature using
+            CEA but remains non-authoritative because melt activity and alpha are proxies.
+          validation:
+            status: pending_validation
+            anchor_refs:
+            - kems-022-demaria-1971
+          source_reactions:
+          - id: liquid_alo1_5_to_alo_gas
+            reactants:
+            - formula: AlO1.5
+              stoichiometry: 1.0
+            products:
+            - formula: AlO
+              stoichiometry: 1.0
+            - formula: O2
+              stoichiometry: 0.25
+            activity_input:
+              component_id: AlO1.5
+              standard_state:
+                convention: raoultian_pure_endmember
+                phase: liquid
+                reference_pressure_bar: 1.0
+                component_basis: raoultian_pure_endmember
+              activity_model: provider_reported_thermodynamic_activity
+              allow_henrian_upper_bound: false
+              compound_bearing: false
+              require_assemblage_match: false
+          pressure_models:
+          - fit_target: standard_reaction_term
+            pressure_kind: equilibrium_partial_pressure
+            species_basis: monomer
+            valid_domain:
+              temperature_K:
+              - 1400
+              - 2273.15
+            provenance:
+            - source_id: nasa-cea-thermo
+              observation_ids:
+              - cea_AL_gibbs
+              - cea_ALO_gibbs
+              - cea_O2_gibbs
+            - source_id: kems-022-demaria-1971
+              observation_id: demaria_table4_alo_partial_pressure
+              role: measured_external_anchor
+            evaluator_family: nasa_cea_9
+            source_reaction_id: liquid_alo1_5_to_alo_gas
+            activity_semantics: source_reaction_activity
+            oxygen_fugacity_channel: intrinsic_melt
+            base_reference_pressure_model:
+              evaluator_family: antoine
+              coefficients:
+                A: 17.2874548
+                B: 54230.9684109
+                C: -49.89
+            base_vapor_formula: Al
+            gas_exchange_reaction:
+              reactants:
+              - formula: Al
+                stoichiometry: 1.0
+              - formula: O2
+                stoichiometry: 0.5
+              products:
+              - formula: AlO
+                stoichiometry: 1.0
+            species_thermo:
+              Al:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_AL_gibbs
+              AlO:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_ALO_gibbs
+              O2:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_O2_gibbs
+            derivation: 'r_AlO=K_exchange*r_Al*r_O2^0.5 at pO2_ref;
+              K_exchange=exp(-[G_AlO-G_Al-0.5*G_O2]/RT). Final reaction applies
+              a_AlO1.5^1 and pO2^-0.25. Ratios are dimensionless and output is
+              Pa; K=1, O2=1 recovers the Al base pressure.'
+            activity_exponent: 1.0
+            pO2_exponent: -0.25
+            pO2_reference_bar: 1.0
+    fiat_routing:
+      plant_bin: null
+      engineering_capture_policy: temperature_threshold
+      products_and_coproducts: []
+      process_or_terminal_destination: process.condensation_train
+      condensation_reference_at_1mbar_C: 2458.900603
+      condensation_reference_derivation: 'Solve the compiled unit-activity,
+        pO2_reference=1 bar curve for P_AlO=100 Pa: T=2732.050603 K =
+        2458.900603 C. Unit check Pa=Pa. The extrapolated root is a routing
+        proxy, not validation; acquire an AlO deposition curve over basalt.'
+    vaporisation_coefficients:
+      evaporation_alpha:
+        value: 0.3
+        source: 'Status-bearing broad proxy inherited from metals_al_family;
+          no AlO-specific alpha is available.'
+        T_band_K:
+        - 1700
+        - 2273
+        envelope:
+        - 0.03
+        - 1.0
+        tier: 2
+        tag: broad_proxy_not_intrinsic
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 1700
+        - 2273
+        envelope:
+        - 0.03
+        - 1.0
+      extrapolation_policy: conservative_slope_continuation
+      out_of_range_status: out_of_range_conservative_continuation
+      acquisition_flag: evaporation_alpha_proxy:AlO
+    code_metadata:
+      formula_id: AlO
+      source_account: process.cleaned_melt
+      request_rule: source_inventory_present
+      solve_group_id: oxide_vapors_alo_family
+      compatibility_projection: oxide_vapors
+      canonical_aliases: []
+      hot_train_applicability: applicable
+  oxide_vapors_al2o_family:
+    physical_properties:
+      species:
+        Al2O:
+          formula: Al2O
+          molar_mass_g_mol: 69.962077
+          parent_oxide: Al2O3
+          fit_target: standard_reaction_term
+          authority_class: analytical_non_authoritative
+          confidence_tier: measured_carrier_analytical_pressure
+          reaction:
+            formula: 2 AlO1.5(l) -> Al2O(g) + O2(g)
+            basis: existing liquid-AlO1.5-to-Al standard reaction plus NASA CEA
+              cea_AL_gibbs, cea_AL2O_gibbs, and cea_O2_gibbs gas exchange
+            derivation: 'Premise: two single-cation AlO1.5 components supply
+              Al2O; three reservoir O atoms minus one product O leave two O
+              atoms = one O2. K=(p_Al2O/P0)*(pO2/P0)/a_AlO1.5^2, so
+              activity exponent=2/1=2 and pO2 exponent=-1/1=-1.
+              K(T)=exp(-DeltaG_rxn/(R*T)); CEA 2Al+0.5O2->Al2O is composed
+              with two copies of the liquid-AlO1.5->Al rail. Unit check:
+              ratios and K are dimensionless; output is Pa. Sanity:
+              Al2O/Al^2 is proportional to pO2^0.5.'
+          stoich_oxide_per_vapor: 1.45736206487981
+          stoich_O2_per_vapor: 0.457362064879806
+          stoichiometry_derivation: 'M(Al2O3)/M(Al2O)=
+            101.960077/69.962077=1.45736206487981 kg/kg;
+            M(O2)/M(Al2O)=31.998/69.962077=0.457362064879806 kg/kg.
+            Unit kg/kg; mass sanity 1.45736206487981=1+0.457362064879806.'
+          oxide_activity_exponent: 2.0
+          pO2_exponent: -1.0
+          pO2_reference_bar: 1.0
+          notes: De Maria 1971 Table 4 measures Al2O over Apollo 12 basalt from
+            2060 K. Live analytical pressure is non-authoritative because the
+            activity-squared coupling and alpha still need direct melt validation.
+          validation:
+            status: pending_validation
+            anchor_refs:
+            - kems-022-demaria-1971
+          source_reactions:
+          - id: liquid_alo1_5_to_al2o_gas
+            reactants:
+            - formula: AlO1.5
+              stoichiometry: 2.0
+            products:
+            - formula: Al2O
+              stoichiometry: 1.0
+            - formula: O2
+              stoichiometry: 1.0
+            activity_input:
+              component_id: AlO1.5
+              standard_state:
+                convention: raoultian_pure_endmember
+                phase: liquid
+                reference_pressure_bar: 1.0
+                component_basis: raoultian_pure_endmember
+              activity_model: provider_reported_thermodynamic_activity
+              allow_henrian_upper_bound: false
+              compound_bearing: false
+              require_assemblage_match: false
+          pressure_models:
+          - fit_target: standard_reaction_term
+            pressure_kind: equilibrium_partial_pressure
+            species_basis: monomer
+            valid_domain:
+              temperature_K:
+              - 1400
+              - 2273.15
+            provenance:
+            - source_id: nasa-cea-thermo
+              observation_ids:
+              - cea_AL_gibbs
+              - cea_AL2O_gibbs
+              - cea_O2_gibbs
+            - source_id: kems-022-demaria-1971
+              observation_id: demaria_table4_al2o_partial_pressure
+              role: measured_external_anchor
+            evaluator_family: nasa_cea_9
+            source_reaction_id: liquid_alo1_5_to_al2o_gas
+            activity_semantics: source_reaction_activity
+            oxygen_fugacity_channel: intrinsic_melt
+            base_reference_pressure_model:
+              evaluator_family: antoine
+              coefficients:
+                A: 17.2874548
+                B: 54230.9684109
+                C: -49.89
+            base_vapor_formula: Al
+            gas_exchange_reaction:
+              reactants:
+              - formula: Al
+                stoichiometry: 2.0
+              - formula: O2
+                stoichiometry: 0.5
+              products:
+              - formula: Al2O
+                stoichiometry: 1.0
+            species_thermo:
+              Al:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_AL_gibbs
+              Al2O:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_AL2O_gibbs
+              O2:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_O2_gibbs
+            derivation: 'r_Al2O=K_exchange*r_Al^2*r_O2^0.5 at pO2_ref;
+              K_exchange=exp(-[G_Al2O-2G_Al-0.5G_O2]/RT). The final source
+              reaction applies a_AlO1.5^2 and pO2^-1. Ratios are dimensionless;
+              output is Pa. With K=1 and O2=1, result equals P0*r_Al^2, as
+              required for a bimolecular association standard state.'
+            activity_exponent: 2.0
+            pO2_exponent: -1.0
+            pO2_reference_bar: 1.0
+    fiat_routing:
+      plant_bin: null
+      engineering_capture_policy: temperature_threshold
+      products_and_coproducts: []
+      process_or_terminal_destination: process.condensation_train
+      condensation_reference_at_1mbar_C: 2579.250215
+      condensation_reference_derivation: 'Solve the compiled unit-activity,
+        pO2_reference=1 bar curve for P_Al2O=100 Pa: T=2852.400215 K =
+        2579.250215 C. Unit check Pa=Pa. The extrapolated root is a routing
+        proxy, not validation; acquire an Al2O deposition curve over basalt.'
+    vaporisation_coefficients:
+      evaporation_alpha:
+        value: 0.3
+        source: 'Status-bearing broad proxy inherited from metals_al_family;
+          no Al2O-specific alpha is available.'
+        T_band_K:
+        - 1700
+        - 2273
+        envelope:
+        - 0.03
+        - 1.0
+        tier: 2
+        tag: broad_proxy_not_intrinsic
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 1700
+        - 2273
+        envelope:
+        - 0.03
+        - 1.0
+      extrapolation_policy: conservative_slope_continuation
+      out_of_range_status: out_of_range_conservative_continuation
+      acquisition_flag: evaporation_alpha_proxy:Al2O
+    code_metadata:
+      formula_id: Al2O
+      source_account: process.cleaned_melt
+      request_rule: source_inventory_present
+      solve_group_id: oxide_vapors_al2o_family
+      compatibility_projection: oxide_vapors
+      canonical_aliases: []
+      hot_train_applicability: applicable
   oxide_vapors_sio_family:
     physical_properties:
       species:
@@ -5356,34 +6149,125 @@ families:
       species:
         CrO3:
           formula: CrO3
+          molar_mass_g_mol: 99.9931
+          parent_oxide: Cr2O3
+          fit_target: standard_reaction_term
           chemical_family: oxide_trace
-          acquisition_status: REVIEWABLE_CONDITIONAL_REACTION_ROWS
-          runtime_disposition: dormant_pending_owner_physics_review
-          flux_dormant: true
-          notes: "t-431 t14 row CrO3. status=REVIEWABLE_CONDITIONAL_REACTION_ROWS. Disposition preserved:\
-            \ Dry CrO3(g) over Cr2O3(s) is grounded. It is not pure condensed-CrO3\nP_sat: it is an oxygen-fugacity-scaled\
-            \ reaction pressure. Humid loss\nmust be a separate species route. High-temperature Kim-Belton\
-            \ supports\nCrO2OH(g); lower-temperature modern work supports CrO2(OH)2(g).\n DRAFT; dormant\
-            \ to flux."
+          authority_class: analytical_non_authoritative
+          acquisition_status: ACTIVATED_DRY_CARRIER
+          runtime_disposition: live_status_bearing
+          flux_dormant: false
+          reaction:
+            formula: CrO1.5(l) + 0.75 O2(g) -> CrO3(g)
+            basis: existing liquid-CrO1.5-to-Cr standard reaction plus NASA CEA
+              cea_Cr_gibbs, cea_CrO3_gibbs, and cea_O2_gibbs gas exchange
+            derivation: 'Premise: the single-Cr melt component CrO1.5 plus
+              0.75 O2 supplies 1.5 additional O atoms, giving CrO3. With O2
+              on the reactant side nu_O2=-0.75 and nu_v=1, mass action gives
+              p_CrO3 proportional to a_CrO1.5*pO2^0.75; exponent
+              -nu_O2/nu_v=-(-0.75)/1=+0.75. K(T)=exp(-DeltaG_rxn/(R*T));
+              CEA Cr+1.5O2->CrO3 is composed with the existing liquid
+              CrO1.5->Cr rail. Unit check: K/activity/pressure ratios are
+              dimensionless and output is Pa. Sanity: pressure tends to zero
+              as pO2 tends to zero, unlike reduced Cr and CrO2 carriers.'
+          stoich_oxide_per_vapor: 0.759998439892353
+          stoich_O2_per_vapor: -0.240001560107647
+          stoichiometry_derivation: '0.5*M(Cr2O3)/M(CrO3)=
+            0.5*151.9892/99.9931=0.759998439892353 kg/kg; oxygen is consumed,
+            so -0.75*M(O2)/M(CrO3)=-0.240001560107647 kg/kg. Unit kg/kg;
+            mass sanity 0.759998439892353=1-0.240001560107647.'
+          oxide_activity_exponent: 1.0
+          pO2_exponent: 0.75
+          pO2_reference_bar: 1.0
+          notes: 'Dry CrO3 is now a status-bearing analytical carrier, not a
+            pure-component Psat. The liquid-melt route is distinct from the
+            retained Kim-Belton solid-Cr2O3 anchor and from humid CrO2OH /
+            CrO2(OH)2 routes. Melt activity and CrO3-specific alpha remain
+            unvalidated, so this row is live but non-authoritative.'
           validation:
             status: pending_validation
-            anchor_refs: []
-            note: DRAFT - no flux; owner + physics review required before enablement
-          source_reactions: []
+            anchor_refs:
+            - nasa-cea-thermo
+            - KimBelton1974_dry_CrO3
+            note: Live analytical prediction; direct melt/activity validation pending
+          source_reactions:
+          - id: liquid_cro1_5_to_cro3_gas
+            reactants:
+            - formula: CrO1.5
+              stoichiometry: 1.0
+            - formula: O2
+              stoichiometry: 0.75
+            products:
+            - formula: CrO3
+              stoichiometry: 1.0
+            activity_input:
+              component_id: CrO1.5
+              standard_state:
+                convention: raoultian_pure_endmember
+                phase: liquid
+                reference_pressure_bar: 1.0
+                component_basis: raoultian_pure_endmember
+              activity_model: provider_reported_thermodynamic_activity
+              allow_henrian_upper_bound: false
+              compound_bearing: false
+              require_assemblage_match: false
           pressure_models:
-          - fit_target: pure_component_psat
-            pressure_kind: pure_component_saturation_pressure
+          - fit_target: standard_reaction_term
+            pressure_kind: equilibrium_partial_pressure
             species_basis: monomer
             valid_domain:
               temperature_K:
-              - 573.0
-              - 1173.0
+              - 1400
+              - 2273.15
             provenance:
-            - source: t-431 t14 draft-rows
-              acquisition_status: REVIEWABLE_CONDITIONAL_REACTION_ROWS
-              tier: 2
-            evaluator_family: tabulated_equilibrium
-            availability: unavailable_pending_acquisition
+            - source_id: nasa-cea-thermo
+              observation_ids:
+              - cea_Cr_gibbs
+              - cea_CrO3_gibbs
+              - cea_O2_gibbs
+            - source_id: metals_cr_family
+              observation_id: liquid_oxide_standard_reaction
+            evaluator_family: nasa_cea_9
+            source_reaction_id: liquid_cro1_5_to_cro3_gas
+            activity_semantics: source_reaction_activity
+            oxygen_fugacity_channel: intrinsic_melt
+            base_reference_pressure_model:
+              evaluator_family: antoine
+              coefficients:
+                A: 17.179279
+                B: 43230.115398
+                C: -108.5
+            base_vapor_formula: Cr
+            gas_exchange_reaction:
+              reactants:
+              - formula: Cr
+                stoichiometry: 1.0
+              - formula: O2
+                stoichiometry: 1.5
+              products:
+              - formula: CrO3
+                stoichiometry: 1.0
+            species_thermo:
+              Cr:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_Cr_gibbs
+              CrO3:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_CrO3_gibbs
+              O2:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_O2_gibbs
+            derivation: 'At pO2_ref, r_CrO3=K_exchange*r_Cr*r_O2^1.5;
+              K_exchange=exp(-[G_CrO3-G_Cr-1.5G_O2]/RT). The final source
+              reaction applies a_CrO1.5^1 and pO2^+0.75. Ratios are
+              dimensionless; output is Pa. K=1 and O2=1 recovers the Cr base
+              pressure.'
+            activity_exponent: 1.0
+            pO2_exponent: 0.75
+            pO2_reference_bar: 1.0
           t431_correlations:
           - id: KimBelton1974_dry_CrO3
             kind: standard_reaction
@@ -5485,30 +6369,46 @@ families:
       plant_bin: null
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
-      process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT - no flux; owner + physics review required before enablement
+      process_or_terminal_destination: process.condensation_train
+      condensation_reference_at_1mbar_C: 1673.634502
+      condensation_reference_derivation: 'Solve the compiled unit-activity,
+        pO2_reference=1 bar curve for P_CrO3=100 Pa: T=1946.784502 K =
+        1673.634502 C, inside its 1400-2273.15 K pressure domain. Unit check
+        Pa=Pa; sanity check monotone pressure crosses 1 mbar once.'
       compatibility_fields:
-        flux_dormant: true
-        consumer_status: inactive
+        flux_dormant: false
+        consumer_status: active
     vaporisation_coefficients:
       evaporation_alpha:
-        status: no_data
-        policy: refuse_nonzero_flux
-        compatibility_policy_field: refuse_nonzero_flux
-      alpha_domain_and_uncertainty: {}
+        value: 0.9
+        source: 'Status-bearing proxy inherited from metals_cr_family; grounded
+          Cr metal alpha is not intrinsic to CrO3.'
+        T_band_K:
+        - 1318
+        - 1563
+        envelope:
+        - 0.8
+        - 1.0
+        tier: 2
+        tag: proxy_not_intrinsic
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 1318
+        - 1563
+        envelope:
+        - 0.8
+        - 1.0
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: vapour_pressure_pending_acquisition:CrO3
+      acquisition_flag: evaporation_alpha_proxy:CrO3
     code_metadata:
       formula_id: CrO3
-      source_account: process.stage0_foulant
-      request_rule: dormant_pending_validation
+      source_account: process.cleaned_melt
+      request_rule: source_inventory_present
       solve_group_id: oxide_trace_CrO3_family
-      compatibility_projection: dormant_acquisition
+      compatibility_projection: oxide_vapors
       canonical_aliases: []
-      hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
-        / VR-16
+      hot_train_applicability: applicable
       yaml_quote_species_id: false
       chemical_family: oxide_trace
   oxide_trace_GeO_family:

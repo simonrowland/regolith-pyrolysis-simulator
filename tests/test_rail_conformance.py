@@ -1134,3 +1134,56 @@ def test_c6_shared_si_reservoir_conserves_independent_carrier_sum(
     assert before_si - after_si == pytest.approx(expected_si_debit_mol, rel=1.0e-11)
     assert after_o2 - before_o2 == pytest.approx(expected_o2_release_mol, rel=1.0e-11)
     assert abs(sim._make_snapshot().mass_balance_error_pct) <= 5.0e-12
+
+
+def test_c6_shared_ti_reservoir_conserves_three_carrier_sum_once() -> None:
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        _load_yaml("vapor_pressures.yaml"),
+        _load_yaml("feedstocks.yaml"),
+        _load_yaml("setpoints.yaml"),
+    )
+    requested_rates = {"Ti": 1.0e-7, "TiO": 2.0e-7, "TiO2_gas": 3.0e-7}
+    before_ti = sim.atom_ledger.atom_moles_by_account("process.cleaned_melt")["Ti"]
+    before_o2 = sum(
+        sim.atom_ledger.mol_by_species(account).get("O2", 0.0)
+        for account in ("process.overhead_gas", "reservoir.fo2_buffer")
+    )
+
+    smoothed = sim._apply_analytic_evaporation_depletion(_flux(requested_rates))
+    assert set(smoothed.species_kg_hr) == set(requested_rates)
+    # Premise: Ti, TiO, and TiO2(g) each carry one Ti atom; relative to the
+    # TiO2 parent they release 1, 1/2, and 0 O2 per carrier mole. Algebra:
+    # debit_Ti=sum(n_i), release_O2=n_Ti+n_TiO/2. Unit check: kg divided by
+    # kg/mol gives mol. Sanity: three per-carrier transitions must sum to one
+    # shared parent debit, never debit the TiO2 reservoir three times.
+    carrier_mol = {
+        species_id: rate_kg_hr
+        / resolve_species_formula(
+            species_id, sim.species_formula_registry
+        ).molar_mass_kg_per_mol()
+        for species_id, rate_kg_hr in smoothed.species_kg_hr.items()
+    }
+    expected_ti_debit_mol = sum(carrier_mol.values())
+    expected_o2_release_mol = carrier_mol["Ti"] + 0.5 * carrier_mol["TiO"]
+
+    sim._configure_condensation_operating_conditions(smoothed)
+    sim._route_to_condensation(smoothed)
+    sim._update_melt_composition(smoothed)
+
+    after_ti = sim.atom_ledger.atom_moles_by_account("process.cleaned_melt")["Ti"]
+    after_o2 = sum(
+        sim.atom_ledger.mol_by_species(account).get("O2", 0.0)
+        for account in ("process.overhead_gas", "reservoir.fo2_buffer")
+    )
+    assert before_ti - after_ti == pytest.approx(expected_ti_debit_mol, rel=1.0e-11)
+    assert after_o2 - before_o2 == pytest.approx(expected_o2_release_mol, rel=1.0e-11)
+    transition_reasons = {
+        transition.reason for transition in sim.atom_ledger.transitions
+    }
+    assert {
+        "evaporate_Ti",
+        "evaporate_TiO",
+        "evaporate_TiO2_gas",
+    } <= transition_reasons
+    assert abs(sim._make_snapshot().mass_balance_error_pct) <= 5.0e-12

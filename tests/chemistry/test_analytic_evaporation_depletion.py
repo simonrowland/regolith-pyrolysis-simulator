@@ -62,6 +62,124 @@ def test_parent_grouped_analytic_depletion_is_shared_and_deterministic(
     ) == pytest.approx(3.0 / 5.0, rel=1e-12)
 
 
+def test_three_titanium_carriers_share_one_parent_debit_and_o2_overhead(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    carriers = ("Ti", "TiO", "TiO2_gas")
+    stoich = {
+        species: sim._evaporation_stoich(species, _species_data(sim, species))
+        for species in carriers
+    }
+    available_tio2_kg = sim.atom_ledger.kg_by_account(
+        "process.cleaned_melt"
+    )["TiO2"]
+    # Give every channel one full-parent-equivalent raw demand. The grouped
+    # limiter must see total exposure=3 and allocate one smoothed parent pool,
+    # not let each channel independently debit the same inventory.
+    raw_rates = {
+        species: available_tio2_kg / row["oxide_per_product_kg"]
+        for species, row in stoich.items()
+    }
+    smoothed = sim._apply_analytic_evaporation_depletion(_flux(raw_rates))
+    expected_parent_draw_kg = available_tio2_kg * (-math.expm1(-3.0))
+    actual_parent_draw_kg = sum(
+        smoothed.species_kg_hr[species]
+        * stoich[species]["oxide_per_product_kg"]
+        for species in carriers
+    )
+    assert actual_parent_draw_kg == pytest.approx(
+        expected_parent_draw_kg, rel=1e-12
+    )
+    assert actual_parent_draw_kg < available_tio2_kg
+
+    parent_before_mol = sim.atom_ledger.mol_by_account(
+        "process.cleaned_melt"
+    )["TiO2"]
+    overhead_before_kg = sim.atom_ledger.kg_by_account(
+        "process.overhead_gas"
+    ).get("O2", 0.0)
+    buffer_before_kg = sim.atom_ledger.kg_by_account(
+        "reservoir.fo2_buffer"
+    ).get("O2", 0.0)
+    sim._configure_condensation_operating_conditions(smoothed)
+    sim._route_to_condensation(smoothed)
+    sim._update_melt_composition(smoothed)
+    parent_after_mol = sim.atom_ledger.mol_by_account(
+        "process.cleaned_melt"
+    ).get("TiO2", 0.0)
+    overhead_after_kg = sim.atom_ledger.kg_by_account(
+        "process.overhead_gas"
+    ).get("O2", 0.0)
+    buffer_after_kg = sim.atom_ledger.kg_by_account(
+        "reservoir.fo2_buffer"
+    ).get("O2", 0.0)
+
+    # One Ti per parent formula and one Ti per gas carrier: parent Ti removed
+    # must equal the SUM of carrier Ti, with no hidden per-row full debit.
+    carrier_ti_mol = sum(
+        sim._atom_moles_for_kg(species, smoothed.species_kg_hr[species])["Ti"]
+        for species in carriers
+    )
+    assert parent_before_mol - parent_after_mol == pytest.approx(
+        carrier_ti_mol, rel=1e-12
+    )
+    expected_o2_kg = sum(
+        smoothed.species_kg_hr[species]
+        * stoich[species]["O2_per_product_kg"]
+        for species in carriers
+    )
+    projected_source = sim._project_evaporation_overhead_source_mol_hr(
+        smoothed.species_kg_hr,
+        stoich,
+    )
+    o2_molar_mass = sim.species_formula_registry["O2"].molar_mass_kg_per_mol()
+    assert projected_source["O2"] == pytest.approx(
+        expected_o2_kg / o2_molar_mass,
+        rel=1e-12,
+    )
+    # All three competing Ti channels credit their different oxygen yields to
+    # one overhead reservoir; the fO2 buffer must not hide the elemental branch.
+    actual_o2_kg = overhead_after_kg - overhead_before_kg
+    assert actual_o2_kg == pytest.approx(
+        expected_o2_kg, rel=1e-12
+    )
+    assert buffer_after_kg == pytest.approx(buffer_before_kg, abs=1e-15)
+    transitions = {
+        transition.name: transition
+        for transition in sim.atom_ledger.transitions
+        if transition.name in {
+            "evaporate_Ti",
+            "evaporate_TiO",
+            "evaporate_TiO2_gas",
+        }
+    }
+    assert set(transitions) == {
+        "evaporate_Ti",
+        "evaporate_TiO",
+        "evaporate_TiO2_gas",
+    }
+    ti_terms = sim._evaporative_redox_source_terms_from_transition(
+        transitions["evaporate_Ti"]
+    )
+    tio_terms = sim._evaporative_redox_source_terms_from_transition(
+        transitions["evaporate_TiO"]
+    )
+    tio2_terms = sim._evaporative_redox_source_terms_from_transition(
+        transitions["evaporate_TiO2_gas"]
+    )
+    assert "redox_source:evaporative_metal_loss" not in ti_terms
+    assert ti_terms["redox_source:evaporative_oxygen_loss"] < 0.0
+    assert tio_terms["redox_source:evaporative_oxygen_loss"] < 0.0
+    assert tio2_terms == {}
+    assert abs(sim._make_snapshot().mass_balance_error_pct) <= 5e-12
+
+
 def test_depletion_output_ignores_tier_one_phase_context_fields(
     vapor_pressure_data, feedstocks_data, setpoints_data, monkeypatch,
 ):

@@ -22,8 +22,10 @@ from __future__ import annotations
 import copy
 import math
 from dataclasses import replace
+from pathlib import Path
 
 import pytest
+import yaml
 
 from engines.builtin import vapor_pressure as vapor_pressure_module
 from engines.builtin._common import composition_wt_pct_from_account_view
@@ -1883,6 +1885,62 @@ def test_sio_row_peq_matches_hand_antoine_lunar_low_ti_floor_po2(
     )
 
 
+def test_al2o_provider_applies_single_cation_activity_square_once(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    # Controlled two-component melt keeps Al2O above the provider's negligible
+    # pressure cutoff while retaining a non-unity activity.
+    melt_mol = {"Al2O3": 1.0, "SiO2": 1.0}
+    account_view = ProviderAccountView(
+        accounts={"process.cleaned_melt": melt_mol},
+        species_formula_registry=sim.species_formula_registry,
+    )
+    production_payload = yaml.safe_load(
+        (
+            Path(__file__).resolve().parents[2]
+            / "data"
+            / "vapor_pressures.yaml"
+        ).read_text()
+    )
+    provider = BuiltinVaporPressureProvider(production_payload)
+    result = provider.dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.VAPOR_PRESSURE,
+            account_view=account_view,
+            temperature_C=1650.0,
+            pressure_bar=1.0e-6,
+            control_inputs={"pO2_bar": 1.0e-9, "intrinsic_fO2_log": -9.0},
+        )
+    )
+    oxide_activity = melt_oxide_activity("Al2O3", melt_mol)
+    assert oxide_activity is not None
+    provenance = result.diagnostic["vapor_pressure_numerator_provenance"]["Al2O"]
+
+    # 2 AlO1.5(l) -> Al2O(g)+O2 gives p proportional to a_AlO1.5^2.
+    # Activity is dimensionless. Halving activity would quarter pressure; the
+    # provider must not take sqrt(a) before the compiled evaluator squares it.
+    assert provenance["activity_factor"] == pytest.approx(
+        oxide_activity.activity**2
+    )
+    evaluator = provider._vapour_rail_catalog.evaluator_for("Al2O")
+    expected = evaluator.evaluate(
+        1923.15,
+        source_activity=oxide_activity.activity,
+        pO2_bar=1.0e-9,
+    ).pressure_pa
+    assert result.diagnostic["vapor_pressures_Pa"]["Al2O"] == pytest.approx(
+        expected
+    )
+
+
 @pytest.mark.parametrize("pO2_bar", [-1.0, 0.0, 1e-12])
 def test_explicit_transport_po2_rejects_invalid_or_subfloor_values(
     vapor_pressure_data,
@@ -2365,11 +2423,13 @@ def test_provider_matches_legacy_internal_analytical_for_known_lunar_composition
             f"kernel={kernel_value:.6g} Pa (tol={tol:.3g} Pa)"
         )
 
-    assert set(kernel_vp) == set(legacy_result.vapor_pressures_Pa), (
-        "legacy/kernel vapor-pressure species sets diverged: "
-        f"legacy_only={set(legacy_result.vapor_pressures_Pa) - set(kernel_vp)} "
-        f"kernel_only={set(kernel_vp) - set(legacy_result.vapor_pressures_Pa)}"
-    )
+    # The compiled rail now owns additive NASA carrier rows that the frozen
+    # pre-rail stub cannot evaluate. Existing-species parity remains exact;
+    # kernel-only rows must stay inside the reviewed activation allowlist.
+    legacy_species = set(legacy_result.vapor_pressures_Pa)
+    kernel_species = set(kernel_vp)
+    assert legacy_species <= kernel_species
+    assert kernel_species - legacy_species <= _REVIEWED_ADDITIVE_CARRIERS
 
 
 # ---------------------------------------------------------------------------
@@ -2446,7 +2506,12 @@ def test_shadow_parity_across_short_simulation_run(
             (kernel_result.diagnostic or {}).get("vapor_pressures_Pa") or {}
         )
         legacy_vp = dict(legacy_result.vapor_pressures_Pa or {})
-        for species in set(legacy_vp) | set(kernel_vp):
+        kernel_only = set(kernel_vp) - set(legacy_vp)
+        assert kernel_only <= _REVIEWED_ADDITIVE_CARRIERS
+        parity_species = set(legacy_vp) | (
+            set(kernel_vp) - _REVIEWED_ADDITIVE_CARRIERS
+        )
+        for species in parity_species:
             legacy_value = float(legacy_vp.get(species, 0.0))
             kernel_value = float(kernel_vp.get(species, 0.0))
             delta = abs(legacy_value - kernel_value)
@@ -2680,3 +2745,11 @@ def test_vapor_pressure_provider_raises_on_unregistered_species_in_view(
 
     with pytest.raises(AccountingError):
         provider.dispatch(request)
+_REVIEWED_ADDITIVE_CARRIERS = {
+    "TiO",
+    "TiO2_gas",
+    "CaO_gas",
+    "AlO",
+    "Al2O",
+    "CrO3",
+}

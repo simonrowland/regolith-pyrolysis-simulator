@@ -28,7 +28,7 @@ from simulator.evaporation import _pre_rg_effective_pressure_source
 from simulator.physical_constants import GAS_CONSTANT
 from simulator.state import CampaignPhase, EvaporationFlux
 from simulator.vapour_rail.activity import ActivityVerdictKind
-from simulator.vapour_rail.batch import PressureRefusal, PressureValue
+from simulator.vapour_rail.batch import FluxEligible, PressureRefusal, PressureValue
 from simulator.vapour_rail.catalog import OUT_OF_RANGE_STATUS
 from simulator.vapour_rail.instrumentation import (
     EffectivePressureSource,
@@ -633,6 +633,24 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
         assert flux_report["selected_pressure_source_by_species"][species_id] == (
             effective_source.source_id
         )
+    for species_id in ("TiO", "TiO2_gas"):
+        answer = batch.channel(species_id)
+        assert isinstance(answer.pressure, PressureValue)
+        assert isinstance(answer.flux, FluxEligible)
+        assert answer.extra.get("out_of_range") is True
+        assert answer.extra["status"] == OUT_OF_RANGE_STATUS
+        assert answer.extra.get("acquisition_flag")
+        assert answer.verdict_status == "status_bearing_non_authoritative"
+        assert answer.certification_ceiling == "never"
+        seam_pa = effective_source.pressure_pa(species_id)
+        assert seam_pa is not None and math.isfinite(seam_pa) and seam_pa > 0.0
+        assert flux_pressures[species_id] == pytest.approx(
+            seam_pa, rel=0.0, abs=0.0
+        )
+        assert species_id in flux_report["extrapolated_flux_species"]
+        assert flux_report["selected_pressure_source_by_species"][species_id] == (
+            effective_source.source_id
+        )
     assert batch.channel("K").extra.get("out_of_range") is True
     assert flux_pressures["K"] != pytest.approx(
         batch.channel("K").pressure.pa, rel=1.0e-6
@@ -721,25 +739,52 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         # regenerated under CI engine config (studio grind overlay) per the
         # 5c6c015 doctrine; laptop-config value was identical (studio emit
         # 2026-08-02 @ tip 0de9c6d confirmed bit-match for the head-result trio).
+        # 2026-08-04 regrind batch (b-137 six-carrier activation): the trio
+        # moves at parts-per-billion because TiO2(g)/TiO/CaO(g)/AlO/Al2O/CrO3
+        # add ~7.8e-5 Pa of new head pressure (TiO2 7.19e-5, TiO 4.44e-6,
+        # AlO 5.63e-7, CrO3 1.27e-6, Al2O 4.8e-10, CaO 1.43e-10 — per
+        # scripts/vapour_head_pressure_table.py on this tree) whose flux
+        # couples into the Fe line only through shared O2/thermal state:
+        # flux +9.27e-9 kg/hr, energy +2.29e-3 kWh-line, follower -1.1e-8.
+        # Fe/Na/K per-species pressures byte-identical (seam-selected, OOD).
+        # Pending studio-config confirmation at the batch gate.
+        # 2026-08-04 b-142 category-2 fix: the 1550 C continuation now carries
+        # TiO=1.0355070316502984e-6 Pa and TiO2(g)=2.9802561250738806e-5 Pa,
+        # both OOR/status-bearing/non-certifying. PressureValue -> FluxEligible
+        # -> seam-selected analytic depletion adds 1.0014035860409567e-6 and
+        # 3.222946295412925e-5 kg/hr respectively; the three Ti carriers still
+        # share one grouped TiO2 parent draw and debit once. Total flux rises
+        # +3.323086654027918e-5 kg/hr, transport saturation +4.4160473477095366,
+        # and the grouped parent debit lowers melt mass -3.3481727086837054e-5 kg.
+        # CrO3 remains absent from transitions for a separate physical reason:
+        # raw 8.160077335392753e-7 kg/hr consumes 0.240001560107647 kg O2/kg,
+        # but the head has zero overhead O2, so the allocator correctly zeros it.
         (
             1,
             1550.0,
-            2.6213753068336443,
-            1161978.521915791,
-            997.3707383784229,
+            2.6214085469687247,
+            1161982.9402495231,
+            997.3707048856336,
         ),
         rel=1.0e-12,
         abs=1.0e-12,
     )
     # The status-bearing out-of-domain point path removes one earlier
     # zero-quantity transition; the hot-tail mechanism is otherwise unchanged.
-    assert len(sim.atom_ledger.transitions) == 20
+    # 2026-08-04 regrind batch: +3 transitions = evaporate_AlO, evaporate_Al2O,
+    # evaporate_CaO_gas (new carrier channels; per-carrier ledger transitions,
+    # grouped parent draw unchanged). b-142 adds evaporate_TiO and
+    # evaporate_TiO2_gas through the status-bearing OOR continuation described
+    # above (+2 transitions, 23 -> 25); all three Ti carrier debits still sum
+    # into one TiO2 parent draw. CrO3 adds none because its O2-consuming route
+    # is starved by the fixture's zero overhead O2, not by pressure/domain gating.
+    assert len(sim.atom_ledger.transitions) == 25
     assert tuple(
         transition.reason for transition in sim.atom_ledger.transitions[-5:]
     ) == (
-        "evaporate_Mn",
-        "evaporate_Ti",
         "condense_Ti",
+        "evaporate_TiO",
+        "evaporate_TiO2_gas",
         "fe_redox_respeciation",
         "overhead_bleed",
     )

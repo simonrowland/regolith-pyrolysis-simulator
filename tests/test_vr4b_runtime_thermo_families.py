@@ -1,9 +1,7 @@
-"""VR-4b: nasa7/nasa9/shomate as runtime catalog evaluator families (dormant).
+"""VR-4b: nasa7/nasa9/shomate runtime catalog evaluator families.
 
-Golden-neutral: production ``vapor_pressures.yaml`` is unchanged and carries no
-active nasa9/shomate flux rows. Compile+dispatch is proven on fixture rows with
-``hot_train_applicability: not_applicable`` — evaluate() works, flux is not
-armed through the hot train.
+Fixture coverage proves generic compile/dispatch and production coverage proves
+the explicitly activated analytical carrier rows remain a closed, reviewed set.
 """
 
 from __future__ import annotations
@@ -695,11 +693,11 @@ def test_phase_transition_breakpoints_remain_ellingham_single_home() -> None:
 
 
 # ---------------------------------------------------------------------------
-# Golden-neutral: production catalog has no active nasa/shomate flux
+# Production activation allowlist
 # ---------------------------------------------------------------------------
 
 
-def test_production_vapor_pressures_golden_neutral_no_active_nasa_shomate() -> None:
+def test_production_vapor_pressures_has_only_reviewed_active_thermo_carriers() -> None:
     payload = yaml.safe_load((DATA / "vapor_pressures.yaml").read_text())
     catalog = compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)
     active_thermo = []
@@ -709,10 +707,14 @@ def test_production_vapor_pressures_golden_neutral_no_active_nasa_shomate() -> N
         fam = sp.evaluator.evaluator_family
         if fam in RUNTIME_THERMO_EVALUATOR_FAMILIES:
             active_thermo.append((sp_id, fam, sp.code_metadata.hot_train_applicability))
-    assert active_thermo == [], (
-        "VR-4b golden-neutral: production must not activate nasa/shomate flux rows; "
-        f"found {active_thermo}"
-    )
+    assert active_thermo == [
+        ("TiO", "nasa_cea_9", "applicable"),
+        ("TiO2_gas", "nasa_cea_9", "applicable"),
+        ("CaO_gas", "nasa_cea_9", "applicable"),
+        ("AlO", "nasa_cea_9", "applicable"),
+        ("Al2O", "nasa_cea_9", "applicable"),
+        ("CrO3", "nasa_cea_9", "applicable"),
+    ]
     # Production still compiles the pre-existing Antoine / standard_reaction rows.
     assert "Na" in catalog.species
     assert catalog.species["Na"].evaluator is not None
@@ -721,6 +723,143 @@ def test_production_vapor_pressures_golden_neutral_no_active_nasa_shomate() -> N
         "standard_reaction_term",
         "tabulated_equilibrium",
     }
+
+
+def test_production_ti_carrier_ratios_reproduce_cea_exchange_algebra() -> None:
+    payload = yaml.safe_load((DATA / "vapor_pressures.yaml").read_text())
+    catalog = compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)
+    T_K = 2000.0  # inside the shared Ti base/composite validated domain
+    pO2_bar = 1.0e-6
+    p_ti = catalog.evaluator_for("Ti").evaluate(
+        T_K, source_activity=1.0, pO2_bar=pO2_bar
+    ).pressure_pa
+    p_tio = catalog.evaluator_for("TiO").evaluate(
+        T_K, source_activity=1.0, pO2_bar=pO2_bar
+    ).pressure_pa
+    p_tio2 = catalog.evaluator_for("TiO2_gas").evaluate(
+        T_K, source_activity=1.0, pO2_bar=pO2_bar
+    ).pressure_pa
+
+    # Premise: all three rows share the same liquid-TiO2 base, which cancels.
+    # Gas exchange gives TiO/Ti=K1*fO2^0.5 and TiO2/Ti=K2*fO2.
+    # Unit check: pressure ratios, K, and fO2/P° are dimensionless. Sanity:
+    # lowering pO2 by 1e-6 must lower these ratios by 3 and 6 dex respectively.
+    assert math.log10(p_tio / p_ti) == pytest.approx(5.266539, abs=1.0e-5)
+    assert math.log10(p_tio2 / p_ti) == pytest.approx(7.606222, abs=1.0e-5)
+
+    p_tio_low = catalog.evaluator_for("TiO").evaluate(
+        T_K, source_activity=1.0, pO2_bar=1.0e-12
+    ).pressure_pa
+    p_tio2_low = catalog.evaluator_for("TiO2_gas").evaluate(
+        T_K, source_activity=1.0, pO2_bar=1.0e-12
+    ).pressure_pa
+    p_ti_low = catalog.evaluator_for("Ti").evaluate(
+        T_K, source_activity=1.0, pO2_bar=1.0e-12
+    ).pressure_pa
+    assert math.log10(p_tio_low / p_ti_low) == pytest.approx(
+        math.log10(p_tio / p_ti) - 3.0
+    )
+    assert math.log10(p_tio2_low / p_ti_low) == pytest.approx(
+        math.log10(p_tio2 / p_ti) - 6.0
+    )
+
+    for species_id in ("TiO", "TiO2_gas"):
+        evaluator = catalog.evaluator_for(species_id)
+        samples = [
+            evaluator.evaluate(T, source_activity=1.0, pO2_bar=pO2_bar)
+            for T in (1922.0, 1923.0, 1924.0)
+        ]
+        assert [sample.out_of_range for sample in samples] == [True, True, False]
+        assert all(
+            math.isfinite(sample.pressure_pa) and sample.pressure_pa > 0.0
+            for sample in samples
+        )
+        # Premise: continuation and fit meet at the 1923.15 K floor. Algebra:
+        # adjacent log increments are log10(P_2/P_1), so a finite, same-sign,
+        # sub-0.1-decade pair rules out a zero cliff or local reversal. Units:
+        # pressure ratios are dimensionless. Sanity: 1922/1923/1924 K follows
+        # one smooth monotone trend while only the two sub-floor points are OOR.
+        log_pressures = [math.log10(sample.pressure_pa) for sample in samples]
+        increments = [
+            right - left for left, right in zip(log_pressures, log_pressures[1:])
+        ]
+        assert increments[0] * increments[1] > 0.0
+        assert max(abs(increment) for increment in increments) < 0.1
+
+        boundary = 1923.15
+        epsilon_K = 1.0e-3
+        boundary_pressures = [
+            evaluator.evaluate(T, source_activity=1.0, pO2_bar=pO2_bar).pressure_pa
+            for T in (boundary - epsilon_K, boundary, boundary + epsilon_K)
+        ]
+        below_slope = math.log10(
+            boundary_pressures[1] / boundary_pressures[0]
+        ) / epsilon_K
+        above_slope = math.log10(
+            boundary_pressures[2] / boundary_pressures[1]
+        ) / epsilon_K
+        assert below_slope == pytest.approx(above_slope, rel=1.0e-4, abs=1.0e-8)
+
+        ramp_edge = boundary - 10.0
+        ramp_epsilon_K = 1.0e-5
+        ramp_edge_pressures = [
+            evaluator.evaluate(T, source_activity=1.0, pO2_bar=pO2_bar).pressure_pa
+            for T in (
+                ramp_edge - ramp_epsilon_K,
+                ramp_edge,
+                ramp_edge + ramp_epsilon_K,
+            )
+        ]
+        outside_slope = math.log10(
+            ramp_edge_pressures[1] / ramp_edge_pressures[0]
+        ) / ramp_epsilon_K
+        blended_slope = math.log10(
+            ramp_edge_pressures[2] / ramp_edge_pressures[1]
+        ) / ramp_epsilon_K
+        assert outside_slope == pytest.approx(
+            blended_slope, rel=1.0e-4, abs=1.0e-8
+        )
+
+
+def test_production_al2o_activity_power_is_stoichiometric_square() -> None:
+    payload = yaml.safe_load((DATA / "vapor_pressures.yaml").read_text())
+    evaluator = compile_vapour_rail_catalog(
+        payload, emit_u0_request_rules=False
+    ).evaluator_for("Al2O")
+    p_unity = evaluator.evaluate(
+        2000.0, source_activity=1.0, pO2_bar=1.0e-8
+    ).pressure_pa
+    p_half = evaluator.evaluate(
+        2000.0, source_activity=0.5, pO2_bar=1.0e-8
+    ).pressure_pa
+    assert p_half / p_unity == pytest.approx(0.25)
+
+
+def test_production_al2o_depletion_underflow_is_typed_positive_floor() -> None:
+    payload = yaml.safe_load((DATA / "vapor_pressures.yaml").read_text())
+    evaluator = compile_vapour_rail_catalog(
+        payload, emit_u0_request_rules=False
+    ).evaluator_for("Al2O")
+
+    result = evaluator.evaluate(
+        2000.0, source_activity=1.0e-200, pO2_bar=1.0e-8
+    )
+
+    assert result.pressure_pa == math.nextafter(0.0, math.inf)
+    assert result.status == "numerical_underflow_floor"
+    assert result.acquisition_flag == "pressure_below_float_range:Al2O"
+
+
+def test_production_extract_reference_fails_closed_on_unknown_observation() -> None:
+    payload = yaml.safe_load((DATA / "vapor_pressures.yaml").read_text())
+    model = payload["families"]["oxide_vapors_tio_family"]["physical_properties"][
+        "species"
+    ]["TiO"]["pressure_models"][0]
+    model["species_thermo"]["TiO"]["extract_ref"]["observation_id"] = (
+        "cea_missing_gibbs"
+    )
+    with pytest.raises(CatalogCompileError, match="must resolve exactly once"):
+        compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)
 
 
 # ---------------------------------------------------------------------------

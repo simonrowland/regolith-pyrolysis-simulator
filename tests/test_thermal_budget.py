@@ -126,6 +126,42 @@ def test_evaporation_enthalpy_budget_cro2_uses_single_reaction_not_fail_loud():
     assert "CrO2(g)" in result["sources"]["oxide_vapor_reaction:CrO2"]
 
 
+@pytest.mark.parametrize(
+    "species,molar_mass,reaction_kj_mol",
+    [
+        ("TiO", 63.8660, 994.253615),
+        ("TiO2_gas", 79.8650, 639.320),
+        ("CaO_gas", 56.0770, 673.095308),
+        ("AlO", 42.9805385, 905.164006),
+        ("Al2O", 69.9620770, 1527.078714),
+        ("CrO3", 99.9931, 247.812916),
+    ],
+)
+def test_activated_oxide_carrier_uses_one_cited_reaction_enthalpy(
+    species,
+    molar_mass,
+    reaction_kj_mol,
+):
+    result = evaporation_enthalpy_budget(
+        {species: 1.0},
+        vapor_pressures={
+            "oxide_vapors": {
+                species: {"molar_mass_g_mol": molar_mass}
+            }
+        },
+    )
+
+    product_mol = 1000.0 / molar_mass
+    expected_kWh = product_mol * reaction_kj_mol / 3600.0
+    assert result["latent_by_species_kWh"][species] == 0.0
+    assert result["dissociation_by_species_kWh"][species] == pytest.approx(
+        expected_kWh
+    )
+    assert "nasa-cea-thermo:cea_" in result["sources"][
+        f"oxide_vapor_reaction:{species}"
+    ]
+
+
 def test_evaporation_enthalpy_budget_fails_loud_for_uncited_oxide_vapor(monkeypatch):
     # An oxide-vapor species with no cited reaction enthalpy must fail loud rather
     # than fall back to a metal double-charge or a fabricated value.

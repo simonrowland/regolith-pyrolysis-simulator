@@ -89,7 +89,7 @@ _LATENT_VAPORIZATION_KJ_PER_MOL: dict[str, EnthalpyCoefficient] = {
     "Cr": EnthalpyCoefficient(339.50, "NIST-JANAF Chase 1998 Cr(l)->Cr(g) ΔvapH=339.50 kJ/mol"),
     # NIST-JANAF phase-change table, Chase 1998: Mn(l)->Mn(g), ΔvapH=220.50 kJ/mol.
     "Mn": EnthalpyCoefficient(220.50, "NIST-JANAF Chase 1998 Mn(l)->Mn(g) ΔvapH=220.50 kJ/mol"),
-    # Oxide vapors (SiO, CrO2) are NOT reduced metals: they do not go through a
+    # Oxide vapors are NOT reduced metals: they do not go through a
     # metal latent + full oxide->element dissociation. They form directly from
     # the melt oxide in a single reaction (parent_oxide -> oxide_vapor(g) +
     # partial O2) and are handled via _OXIDE_VAPOR_REACTION_KJ_PER_MOL below.
@@ -179,10 +179,69 @@ _OXIDE_VAPOR_REACTION_KJ_PER_MOL: dict[str, EnthalpyCoefficient] = {
         "NIST-JANAF; MODERATE/UNCERTIFIED -- Barin & Ebbinghaus not verified, gas "
         "Cr-oxide scatter not closed) => +494.54 kJ/mol CrO2",
     ),
+    # CEA cea_TiO_gibbs gives ΔfH°298[TiO(g)]=+49.503615 kJ/mol and
+    # NIST-JANAF gives ΔfH°298[TiO2(s)]=-944.75. For
+    # TiO2->TiO(g)+1/2O2, ΔH=49.503615-(-944.75)=+994.253615 kJ/mol.
+    "TiO": EnthalpyCoefficient(
+        994.253615,
+        "nasa-cea-thermo:cea_TiO_gibbs ΔfH298=+49.503615 kJ/mol + "
+        "NIST-JANAF TiO2(s) ΔfH298=-944.75; TiO2->TiO(g)+1/2O2 => +994.253615",
+    ),
+    # CEA cea_TiO2_gibbs gives -305.430 kJ/mol. For TiO2(s)->TiO2(g),
+    # ΔH=-305.430-(-944.75)=+639.320 kJ/mol; O2 coefficient is zero.
+    "TiO2_gas": EnthalpyCoefficient(
+        639.320,
+        "nasa-cea-thermo:cea_TiO2_gibbs ΔfH298=-305.430 kJ/mol + "
+        "NIST-JANAF TiO2(s) ΔfH298=-944.75; TiO2(s)->TiO2(g) => +639.320",
+    ),
+    # CEA cea_CaO_gibbs gives +38.005308 kJ/mol. For CaO(s)->CaO(g),
+    # ΔH=38.005308-(-635.09)=+673.095308 kJ/mol; dimensions are kJ/mol gas.
+    "CaO_gas": EnthalpyCoefficient(
+        673.095308,
+        "nasa-cea-thermo:cea_CaO_gibbs ΔfH298=+38.005308 kJ/mol + "
+        "NIST-JANAF CaO(s) ΔfH298=-635.09; CaO(s)->CaO(g) => +673.095308",
+    ),
+    # One AlO consumes 1/2 Al2O3. CEA cea_ALO_gibbs gives +67.319006;
+    # ΔH=67.319006-0.5*(-1675.69)=+905.164006 kJ/mol AlO. The 1/2
+    # coefficient also checks one Al atom on each side.
+    "AlO": EnthalpyCoefficient(
+        905.164006,
+        "nasa-cea-thermo:cea_ALO_gibbs ΔfH298=+67.319006 kJ/mol + "
+        "NIST-JANAF Al2O3(s) ΔfH298=-1675.69; 1/2Al2O3->AlO(g)+1/4O2 "
+        "=> +905.164006",
+    ),
+    # One Al2O consumes one Al2O3. CEA cea_AL2O_gibbs gives -148.611286;
+    # ΔH=-148.611286-(-1675.69)=+1527.078714 kJ/mol Al2O.
+    "Al2O": EnthalpyCoefficient(
+        1527.078714,
+        "nasa-cea-thermo:cea_AL2O_gibbs ΔfH298=-148.611286 kJ/mol + "
+        "NIST-JANAF Al2O3(s) ΔfH298=-1675.69; Al2O3->Al2O(g)+O2 "
+        "=> +1527.078714",
+    ),
+    # One CrO3 consumes 1/2 Cr2O3 plus 3/4 O2. CEA cea_CrO3_gibbs gives
+    # -322.037084; ΔH=-322.037084-0.5*(-1139.70)=+247.812916 kJ/mol.
+    # Positive but smaller than CrO2 is sensible because this is oxidation.
+    "CrO3": EnthalpyCoefficient(
+        247.812916,
+        "nasa-cea-thermo:cea_CrO3_gibbs ΔfH298=-322.037084 kJ/mol + "
+        "NIST-JANAF Cr2O3(s) ΔfH298=-1139.70; 1/2Cr2O3+3/4O2->CrO3(g) "
+        "=> +247.812916",
+    ),
 }
 
 # Species that evaporate as an oxide vapor (single-reaction path), not a metal.
-_OXIDE_VAPOR_SPECIES: frozenset[str] = frozenset({"SiO", "CrO2"})
+_OXIDE_VAPOR_SPECIES: frozenset[str] = frozenset(
+    {
+        "SiO",
+        "CrO2",
+        "TiO",
+        "TiO2_gas",
+        "CaO_gas",
+        "AlO",
+        "Al2O",
+        "CrO3",
+    }
+)
 
 
 def evaporation_enthalpy_budget(
@@ -199,7 +258,7 @@ def evaporation_enthalpy_budget(
     dissociation from 298 K ΔfH). It omits the M(s)->M(l) fusion step (~1-4% of
     the per-metal total, Si worst) and all 298 K->process-T sensible heat, so it
     is a consistent low-order ESTIMATE of the evaporation enthalpy, not the full
-    MOx(melt, T)->M(g)+1/2 O2 path enthalpy. Oxide vapors (SiO, CrO2) use a
+    MOx(melt, T)->M(g)+1/2 O2 path enthalpy. Oxide vapors use a
     single cited melt-oxide->oxide-vapor(g) reaction instead of that two-leg form.
     """
 

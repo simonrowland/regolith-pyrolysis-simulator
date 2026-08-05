@@ -72,11 +72,24 @@ DEFAULT_MELT_SURFACE_RENEWAL_BASE_KG_S_M2_PA = 0.0
 DEFAULT_MELT_SURFACE_RENEWAL_SOURCE = (
     "disabled:missing-species-state-dependent-melt-transfer-inputs"
 )
-# EVAPORATION-only class proxy: CrO2 borrows SiO sigma and epsilon/k because
-# direct CrO2 transport data are absent, but retains its own molar mass. This
-# weak proxy must not alter condensation/deposition transport.
+# EVAPORATION-only class proxies: oxygen-bearing refractory carriers borrow
+# SiO sigma and epsilon/k because direct high-temperature transport data are
+# absent, but each retains its formula molar mass. Premise: Chapman-Enskog
+# D_AB scales as sqrt(1/M_A+1/M_B)/(sigma_AB^2*Omega_D); copying SiO's
+# (sigma, epsilon/k) therefore changes only the unknown collision class while
+# preserving the exactly derivable mass term. Units are Angstrom, K, g/mol.
+# Sanity: SiO itself is the closest measured rail carrier; this proxy affects
+# only continuum gas resistance, never K(T), P_eq, stoichiometry, or the
+# condensation/deposition transport table. Outputs remain status-bearing and
+# direct collision data remain acquisition targets.
 _EVAPORATION_LJ_PROXY_PARAMS = {
     "CrO2": (3.374, 71.4, 83.9941),
+    "AlO": (3.374, 71.4, 42.9805385),
+    "Al2O": (3.374, 71.4, 69.9620770),
+    "CaO_gas": (3.374, 71.4, 56.0770),
+    "TiO": (3.374, 71.4, 63.8660),
+    "TiO2_gas": (3.374, 71.4, 79.8650),
+    "CrO3": (3.374, 71.4, 99.9931),
 }
 
 

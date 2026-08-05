@@ -540,12 +540,15 @@ def test_provider_matches_legacy_credit_evaporation_transition_pattern(
     }
     for trans in evap_transitions:
         for lot in trans.debits:
-            is_cro2_o2_reactant = (
-                trans.name == "evaporate_CrO2"
+            is_oxide_vapor_o2_reactant = (
+                trans.name in {"evaporate_CrO2", "evaporate_CrO3"}
                 and lot.account == "process.overhead_gas"
                 and set(lot.species_kg) == {"O2"}
             )
-            assert lot.account == "process.cleaned_melt" or is_cro2_o2_reactant, (
+            assert (
+                lot.account == "process.cleaned_melt"
+                or is_oxide_vapor_o2_reactant
+            ), (
                 f"evap transition {trans.name} debits unexpected account "
                 f"{lot.account!r}; expected process.cleaned_melt"
             )

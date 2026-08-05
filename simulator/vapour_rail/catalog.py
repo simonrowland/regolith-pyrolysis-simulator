@@ -17,9 +17,12 @@ import hashlib
 import json
 import marshal
 import math
+from pathlib import Path
 import re
 from types import MappingProxyType
 from typing import Any
+
+import yaml
 
 from simulator.alpha_kinetics import AlphaSpecError, parse_alpha_contract
 from simulator.vapour_rail.activity import (
@@ -68,6 +71,221 @@ RUNTIME_THERMO_EVALUATOR_FAMILIES = frozenset(
 )
 # CEA / JANAF standard-state pressure P° (Pa).
 _THERMO_REFERENCE_PRESSURE_PA = 100_000.0
+_THERMO_EXTRACT_DIR = (
+    Path(__file__).resolve().parents[2] / "data" / "literature" / "extracts"
+)
+_THERMO_EXTRACT_PARSE_CACHE: dict[
+    str, tuple[tuple[int, int, int, int, int], str, Mapping[str, Any]]
+] = {}
+_THERMO_OBSERVATION_CACHE: dict[
+    tuple[str, str], tuple[Mapping[str, Any], Mapping[str, Any]]
+] = {}
+
+
+def _thermo_extract_stat_signature(
+    source_id: str, *, field: str
+) -> tuple[int, int, int, int, int]:
+    extract_path = _THERMO_EXTRACT_DIR / f"{source_id}.yaml"
+    try:
+        stat = extract_path.stat()
+    except OSError as exc:
+        raise CatalogCompileError(
+            f"{field}: cannot load thermo extract {source_id!r}"
+        ) from exc
+    return (
+        int(stat.st_dev),
+        int(stat.st_ino),
+        int(stat.st_size),
+        int(stat.st_mtime_ns),
+        int(stat.st_ctime_ns),
+    )
+
+
+def _load_thermo_extract(source_id: str, *, field: str) -> Mapping[str, Any]:
+    """Load one extract with content-digest-checked parse reuse."""
+
+    extract_path = _THERMO_EXTRACT_DIR / f"{source_id}.yaml"
+    signature = _thermo_extract_stat_signature(source_id, field=field)
+    # A warm catalog compile resolves the same small set of external rows many
+    # times. Premise: unchanged inode/size/mtime/ctime means the cached bytes and
+    # their SHA-256 still identify the selected evidence. The stat tuple is only
+    # a fast invalidation guard; a changed signature re-reads and re-hashes the
+    # complete file before reuse. Unit check: metadata values are integer file
+    # attributes, never chemistry inputs. Sanity: an atomic replace changes the
+    # inode; an in-place edit changes mtime/ctime, so either invalidates reuse.
+    cached = _THERMO_EXTRACT_PARSE_CACHE.get(source_id)
+    if cached is not None and cached[0] == signature:
+        return cached[2]
+    try:
+        raw = extract_path.read_bytes()
+    except OSError as exc:
+        raise CatalogCompileError(
+            f"{field}: cannot load thermo extract {source_id!r}"
+        ) from exc
+    digest = hashlib.sha256(raw).hexdigest()
+    if cached is not None and cached[1] == digest:
+        _THERMO_EXTRACT_PARSE_CACHE[source_id] = (signature, digest, cached[2])
+        return cached[2]
+    try:
+        parsed = yaml.safe_load(raw)
+    except yaml.YAMLError as exc:
+        raise CatalogCompileError(
+            f"{field}: cannot parse thermo extract {source_id!r}"
+        ) from exc
+    extract = _mapping(parsed, f"thermo extract {source_id}")
+    _THERMO_EXTRACT_PARSE_CACHE[source_id] = (signature, digest, extract)
+    return extract
+
+
+def _thermo_extract_observation(
+    ref: Mapping[str, Any], *, field: str
+) -> Mapping[str, Any]:
+    """Resolve one immutable thermo observation by source and observation id.
+
+    Extract references are deliberately content-addressed by two catalog-native
+    identifiers, never by an arbitrary path.  This keeps runtime thermo traceable
+    to the evidence store while preventing path traversal or accidental selection
+    of a different observation for the same formula.
+    """
+
+    if set(ref) != {"source_id", "observation_id"}:
+        raise CatalogCompileError(
+            f"{field} must contain exactly source_id and observation_id"
+        )
+    source_id = _required_string(ref.get("source_id"), f"{field}.source_id")
+    observation_id = _required_string(
+        ref.get("observation_id"), f"{field}.observation_id"
+    )
+    if re.fullmatch(r"[a-z0-9][a-z0-9-]*", source_id) is None:
+        raise CatalogCompileError(f"{field}.source_id is not a safe extract id")
+    extract = _load_thermo_extract(source_id, field=field)
+    if extract.get("source_id") != source_id:
+        raise CatalogCompileError(
+            f"{field}: extract source_id mismatch for {source_id!r}"
+        )
+    observation_cache_key = (source_id, observation_id)
+    cached_observation = _THERMO_OBSERVATION_CACHE.get(observation_cache_key)
+    if cached_observation is not None and cached_observation[0] is extract:
+        return deepcopy(dict(cached_observation[1]))
+    species = _mapping(extract.get("species"), f"thermo extract {source_id}.species")
+    matches: list[Mapping[str, Any]] = []
+    for species_row in species.values():
+        if not isinstance(species_row, Mapping):
+            continue
+        observations = species_row.get("observations")
+        if not isinstance(observations, list):
+            continue
+        matches.extend(
+            observation
+            for observation in observations
+            if isinstance(observation, Mapping)
+            and observation.get("observation_id") == observation_id
+        )
+    if len(matches) != 1:
+        raise CatalogCompileError(
+            f"{field}: observation {observation_id!r} must resolve exactly once "
+            f"in extract {source_id!r}; found {len(matches)}"
+        )
+    observation = matches[0]
+    if observation.get("type") != "gibbs_table":
+        raise CatalogCompileError(
+            f"{field}: observation {observation_id!r} is not a gibbs_table"
+        )
+    values = deepcopy(
+        dict(_mapping(observation.get("values"), f"{field}.observation.values"))
+    )
+    phase = _required_string(observation.get("phase"), f"{field}.observation.phase")
+    values["standard_state"] = "gas" if phase == "gas" else phase
+    _THERMO_OBSERVATION_CACHE[observation_cache_key] = (extract, values)
+    return deepcopy(values)
+
+
+def _resolve_thermo_record(
+    record: Mapping[str, Any], *, field: str
+) -> Mapping[str, Any]:
+    ref = record.get("extract_ref")
+    if ref is None:
+        return record
+    if set(record) != {"extract_ref"}:
+        raise CatalogCompileError(f"{field}: extract_ref may not be mixed with inline thermo")
+    return _thermo_extract_observation(_mapping(ref, f"{field}.extract_ref"), field=field)
+
+
+def _thermo_extract_dependencies(payload: Mapping[str, Any]) -> dict[str, Any]:
+    """External extract identities that are part of the compiler input."""
+
+    refs_by_source: dict[str, set[str]] = {}
+    # Extract-backed records are executable only in this compiler-owned schema
+    # path. Walk that path directly instead of recursively visiting the catalog's
+    # large prose/acquisition archive on every warm lookup. Premise: the runtime
+    # resolver consumes only pressure_models[].species_thermo[*]; therefore this
+    # is the complete dependency surface. Unit check: navigation changes no
+    # chemistry values. Sanity: every discovered record is still resolved by the
+    # same exact source_id+observation_id guard below.
+    families = payload.get("families")
+    if not isinstance(families, Mapping):
+        return {}
+    for family_id, family in families.items():
+        if not isinstance(family, Mapping):
+            continue
+        physical = family.get("physical_properties")
+        if not isinstance(physical, Mapping):
+            continue
+        species_rows = physical.get("species")
+        if not isinstance(species_rows, Mapping):
+            continue
+        for species_id, row in species_rows.items():
+            if not isinstance(row, Mapping):
+                continue
+            pressure_models = row.get("pressure_models")
+            if not isinstance(pressure_models, list):
+                continue
+            for model_index, model in enumerate(pressure_models):
+                if not isinstance(model, Mapping):
+                    continue
+                species_thermo = model.get("species_thermo")
+                if not isinstance(species_thermo, Mapping):
+                    continue
+                for formula, record in species_thermo.items():
+                    if not isinstance(record, Mapping) or "extract_ref" not in record:
+                        continue
+                    field = (
+                        f"families.{family_id}.physical_properties.species."
+                        f"{species_id}.pressure_models[{model_index}]."
+                        f"species_thermo[{formula}]"
+                    )
+                    ref = _mapping(record["extract_ref"], f"{field}.extract_ref")
+                    if set(ref) != {"source_id", "observation_id"}:
+                        raise CatalogCompileError(
+                            f"{field}.extract_ref must contain exactly "
+                            "source_id and observation_id"
+                        )
+                    source_id = _required_string(
+                        ref.get("source_id"), f"{field}.extract_ref.source_id"
+                    )
+                    observation_id = _required_string(
+                        ref.get("observation_id"),
+                        f"{field}.extract_ref.observation_id",
+                    )
+                    if re.fullmatch(r"[a-z0-9][a-z0-9-]*", source_id) is None:
+                        raise CatalogCompileError(
+                            f"{field}.extract_ref.source_id is not a safe extract id"
+                        )
+                    refs_by_source.setdefault(source_id, set()).add(observation_id)
+
+    dependencies: dict[str, Any] = {}
+    for source_id, observation_ids in sorted(refs_by_source.items()):
+        _load_thermo_extract(source_id, field=f"thermo dependency {source_id}")
+        cached = _THERMO_EXTRACT_PARSE_CACHE.get(source_id)
+        if cached is None:
+            raise CatalogCompileError(
+                f"thermo dependency {source_id!r} did not enter parse cache"
+            )
+        dependencies[source_id] = {
+            "extract_sha256": cached[1],
+            "observation_ids": sorted(observation_ids),
+        }
+    return dependencies
 
 
 def _strip_phase_suffix(formula: str) -> str:
@@ -172,6 +390,19 @@ _COMPILE_CACHE_ORDER: list[str] = []
 # prevents id reuse, and a changed fingerprint always falls back to the digest.
 _COMPILE_IDENTITY_HINTS: OrderedDict[
     tuple[int, bool], tuple[Mapping[str, Any], bytes, str]
+] = OrderedDict()
+# Same-owner fast hit after both the owner tree and external extract stat
+# signatures match. This avoids rebuilding the external dependency vector on
+# every warm lookup while preserving in-place mutation and file-change misses.
+_COMPILE_FAST_HINTS: OrderedDict[
+    tuple[int, bool],
+    tuple[
+        Mapping[str, Any],
+        bytes,
+        tuple[str, ...],
+        tuple[tuple[str, tuple[int, int, int, int, int]], ...],
+        str,
+    ],
 ] = OrderedDict()
 # key: content-digest of payload; value: schema-v1 projection dict
 _legacy_view_cache: OrderedDict[str, dict[str, Any]] = OrderedDict()
@@ -312,6 +543,16 @@ def _compile_input_vector(
         "payload": payload,
         "emit_u0_request_rules": bool(emit_u0_request_rules),
     }
+    # Extract-backed thermo changes compiled pressure output even when the owner
+    # catalog payload is unchanged. Include selected observation ids plus the
+    # containing extract digest: premise output=f(payload, selected rows), and a
+    # whole-file digest is the cheap fail-closed identity for those rows. Sanity:
+    # editing a referenced NASA segment invalidates the compile cache; editing an
+    # unrelated row in that same source may conservatively invalidate too, but can
+    # never serve stale chemistry.
+    thermo_dependencies = _thermo_extract_dependencies(payload)
+    if thermo_dependencies:
+        vector["thermo_extract_observations"] = thermo_dependencies
     if bool(emit_u0_request_rules):
         vector["u0_manifest"] = effective_u0_manifest
     return vector
@@ -691,7 +932,21 @@ class CompiledPressureEvaluator:
                 oxygen / self.pO2_reference_bar
             )
 
-        pressure_pa = 10.0**log10_pressure
+        # A physically finite trace pressure can fall below IEEE-754's smallest
+        # positive float after activity depletion (Al2O has an a^2 coupling).
+        # Premise: P=10^logP Pa; when logP<log10(nextafter(0,+inf)), no positive
+        # float represents P. Preserve the limiting direction with the smallest
+        # positive Pa value instead of fabricating an exact zero or refusing the
+        # entire chemistry step. Units remain Pa. Sanity: values within the
+        # representable range are bit-for-bit unchanged; the floor is ~5e-324 Pa
+        # and therefore cannot create a material debit.
+        minimum_positive_pa = math.nextafter(0.0, math.inf)
+        numerical_underflow = log10_pressure < math.log10(minimum_positive_pa)
+        pressure_pa = (
+            minimum_positive_pa
+            if numerical_underflow
+            else 10.0**log10_pressure
+        )
         if not math.isfinite(pressure_pa) or pressure_pa <= 0.0:
             raise CatalogCompileError(
                 f"{self.species_id}: evaluator produced invalid pressure"
@@ -701,8 +956,20 @@ class CompiledPressureEvaluator:
             pressure_observable=self.pressure_observable,
             validation_status=self.validation_status,
             out_of_range=out_of_range,
-            status=self.out_of_range_status if out_of_range else None,
-            acquisition_flag=self.acquisition_flag if out_of_range else None,
+            status=(
+                self.out_of_range_status
+                if out_of_range
+                else "numerical_underflow_floor" if numerical_underflow else None
+            ),
+            acquisition_flag=(
+                self.acquisition_flag
+                if out_of_range
+                else (
+                    f"pressure_below_float_range:{self.species_id}"
+                    if numerical_underflow
+                    else None
+                )
+            ),
         )
 
     def _out_of_domain_log10_continuation(self, temperature_K: float) -> float:
@@ -728,9 +995,20 @@ class CompiledPressureEvaluator:
         inside_log = self.reference_model.log10_pressure(inside)
         slope = (boundary_log - inside_log) / (boundary - inside)
         straight_delta = slope * (temperature_K - boundary)
-        # Coating-risk upper envelope (not yield-flattering half-slope):
-        # outward increase → steeper; outward decrease → shallower; never flat.
-        factor = 1.5 if straight_delta >= 0.0 else 0.5
+        # Premise: the consequence envelope must not create a derivative kink at
+        # either end of its boundary blend, while established far-OOR estimates
+        # must not move. Algebra: over at most 10 K, u=|dT|/ramp and the cubic
+        # h(u)=3u^2-2u^3 has h'(0)=h'(1)=0; blending
+        # f=1+(f_target-1)h therefore joins both the in-domain slope at u=0 and
+        # the existing consequence slope at u=1. Units: u, h, and f are
+        # dimensionless; logP remains log10(Pa). Sanity: value and first
+        # derivative stay continuous at both joins, while points >=10 K outside
+        # retain the exact established 0.5/1.5 factor.
+        target_factor = 1.5 if straight_delta >= 0.0 else 0.5
+        ramp_span_K = min(span, 10.0)
+        distance_fraction = min(abs(temperature_K - boundary) / ramp_span_K, 1.0)
+        smooth_fraction = distance_fraction**2 * (3.0 - 2.0 * distance_fraction)
+        factor = 1.0 + (target_factor - 1.0) * smooth_fraction
         return boundary_log + factor * straight_delta
 
     # Compat alias — older tests/callers may still import the private name.
@@ -981,6 +1259,62 @@ def clear_vapour_rail_compile_cache() -> None:
     _COMPILE_CACHE.clear()
     _COMPILE_CACHE_ORDER.clear()
     _COMPILE_IDENTITY_HINTS.clear()
+    _COMPILE_FAST_HINTS.clear()
+
+
+def _compile_owner_fingerprint(
+    payload: Mapping[str, Any],
+    *,
+    emit_u0_request_rules: bool,
+    effective_u0_manifest: Mapping[str, Any] | None,
+) -> bytes | None:
+    vector: dict[str, Any] = {
+        "payload": payload,
+        "emit_u0_request_rules": bool(emit_u0_request_rules),
+    }
+    if emit_u0_request_rules:
+        vector["u0_manifest"] = effective_u0_manifest
+    return _compile_input_fingerprint(vector)
+
+
+def _thermo_source_signatures(
+    source_ids: tuple[str, ...],
+) -> tuple[tuple[str, tuple[int, int, int, int, int]], ...]:
+    return tuple(
+        (
+            source_id,
+            _thermo_extract_stat_signature(
+                source_id, field=f"thermo dependency {source_id}"
+            ),
+        )
+        for source_id in source_ids
+    )
+
+
+def _remember_compile_fast_hint(
+    payload: Mapping[str, Any],
+    *,
+    emit_u0_request_rules: bool,
+    owner_fingerprint: bytes | None,
+    input_vector: Mapping[str, Any],
+    content_key: str,
+) -> None:
+    if owner_fingerprint is None:
+        return
+    raw_dependencies = input_vector.get("thermo_extract_observations")
+    source_ids = tuple(sorted(raw_dependencies)) if isinstance(raw_dependencies, Mapping) else ()
+    signatures = _thermo_source_signatures(source_ids)
+    locator = (id(payload), bool(emit_u0_request_rules))
+    _COMPILE_FAST_HINTS[locator] = (
+        payload,
+        owner_fingerprint,
+        source_ids,
+        signatures,
+        content_key,
+    )
+    _COMPILE_FAST_HINTS.move_to_end(locator)
+    while len(_COMPILE_FAST_HINTS) > _COMPILE_CACHE_MAX:
+        _COMPILE_FAST_HINTS.popitem(last=False)
 
 
 def compiled_catalog_for(
@@ -1046,6 +1380,29 @@ def compile_vapour_rail_catalog(
     effective_manifest = _resolve_effective_u0_manifest(
         u0_manifest, emit_u0_request_rules=emit_u0_request_rules
     )
+    owner_fingerprint = _compile_owner_fingerprint(
+        payload,
+        emit_u0_request_rules=emit_u0_request_rules,
+        effective_u0_manifest=effective_manifest,
+    )
+    locator = (id(payload), bool(emit_u0_request_rules))
+    fast_hint = _COMPILE_FAST_HINTS.get(locator)
+    if (
+        owner_fingerprint is not None
+        and fast_hint is not None
+        and fast_hint[0] is payload
+        and fast_hint[1] == owner_fingerprint
+        and fast_hint[3] == _thermo_source_signatures(fast_hint[2])
+    ):
+        fast_key = fast_hint[4]
+        if content_key is not None and content_key != fast_key:
+            raise CatalogCompileError(
+                "content_key does not match the current compile-input identity"
+            )
+        cached = _COMPILE_CACHE.get(fast_key)
+        if cached is not None:
+            _COMPILE_FAST_HINTS.move_to_end(locator)
+            return cached
     # Build identity from the exact manifest object emission will consume.
     # The same-owner hint is only a verified accelerator; object id never enters
     # the semantic cache key and changed content always re-digests.
@@ -1077,6 +1434,13 @@ def compile_vapour_rail_catalog(
             )
         cached = _COMPILE_CACHE.get(cache_key)
         if cached is not None:
+            _remember_compile_fast_hint(
+                payload,
+                emit_u0_request_rules=emit_u0_request_rules,
+                owner_fingerprint=owner_fingerprint,
+                input_vector=input_vector,
+                content_key=cache_key,
+            )
             return cached
     if payload.get("schema_version") != SCHEMA_VERSION:
         raise CatalogCompileError("vapour catalog schema_version must be 2")
@@ -1256,6 +1620,13 @@ def compile_vapour_rail_catalog(
             fingerprint=post_compile_fingerprint,
             content_key=cache_key,
         )
+    _remember_compile_fast_hint(
+        payload,
+        emit_u0_request_rules=emit_u0_request_rules,
+        owner_fingerprint=owner_fingerprint,
+        input_vector=input_vector,
+        content_key=cache_key,
+    )
     return result
 
 
@@ -1950,6 +2321,9 @@ def _compile_thermo_reference_model(
         polys: dict[str, Any] = {}
         for formula, rec in species_thermo_raw.items():
             rec_map = _mapping(rec, f"{species_id}.species_thermo[{formula}]")
+            rec_map = _resolve_thermo_record(
+                rec_map, field=f"{species_id}.species_thermo[{formula}]"
+            )
             fam = evaluator_family
             if rec_map.get("evaluator_family") or rec_map.get("evaluator"):
                 fam = _normalize_thermo_family(
@@ -1968,6 +2342,182 @@ def _compile_thermo_reference_model(
         if row_formula is not None and str(row_formula).strip():
             target_keys.add(str(row_formula).strip())
             target_keys.add(_strip_phase_suffix(str(row_formula)))
+
+        base_reference_raw = model.get("base_reference_pressure_model")
+        if base_reference_raw is not None:
+            # Composite carrier mode reuses the already-grounded liquid-reservoir
+            # standard reaction for a monatomic gas, then applies a gas-only CEA
+            # exchange reaction.  It never invents a condensed NASA polynomial.
+            #
+            # Premise: base pressure supplies r_b=p_b/P° at a=1 and pO2_ref.
+            # For m B(g)+n O2(g)->ν V(g), dimensionless mass action is
+            #   K = r_v^ν/(r_b^m r_O2^n)
+            # hence r_v=(K r_b^m r_O2^n)^(1/ν).  K=exp(-ΔG°/RT), with
+            # ΔG° from CEA gas polynomials.  Unit check: K and every r are
+            # dimensionless; r_v*P° returns Pa.  Sanity: m=ν=1, n=0, K=1
+            # exactly recovers the base pressure.
+            base_reference = _compile_reference_model(
+                species_id,
+                _mapping(
+                    base_reference_raw,
+                    f"{species_id}.base_reference_pressure_model",
+                ),
+            )
+            exchange = _mapping(
+                model.get("gas_exchange_reaction"),
+                f"{species_id}.gas_exchange_reaction",
+            )
+            _validate_balanced_reaction(species_id, exchange)
+            base_formula = _required_string(
+                model.get("base_vapor_formula"), f"{species_id}.base_vapor_formula"
+            )
+
+            exchange_terms: list[tuple[float, Any, str]] = []
+            target_exchange_nu = 0.0
+            base_reactant_nu = 0.0
+            exchange_nu_o2 = 0.0
+            for sign, key in ((-1.0, "reactants"), (1.0, "products")):
+                participants = exchange.get(key)
+                if not isinstance(participants, list):
+                    raise CatalogCompileError(
+                        f"{species_id}: gas_exchange_reaction requires {key}"
+                    )
+                for item in participants:
+                    part = _mapping(item, f"{species_id}.gas_exchange_reaction.{key}")
+                    formula = _required_string(
+                        part.get("formula"), f"{species_id}.gas_exchange_reaction.formula"
+                    )
+                    amount = _finite_positive(
+                        part.get("stoichiometry"),
+                        f"{species_id}.gas_exchange_reaction.stoichiometry",
+                    )
+                    if formula not in polys:
+                        raise CatalogCompileError(
+                            f"{species_id}: missing thermo for gas-exchange species {formula!r}"
+                        )
+                    poly = polys[formula]
+                    if getattr(poly, "standard_state", None) != "gas":
+                        raise CatalogCompileError(
+                            f"{species_id}: gas-exchange species {formula!r} must use gas thermo"
+                        )
+                    nu = sign * amount
+                    exchange_terms.append((nu, poly, formula))
+                    formula_keys = {formula, _strip_phase_suffix(formula)}
+                    if sign > 0.0 and not formula_keys.isdisjoint(target_keys):
+                        target_exchange_nu += amount
+                    if sign < 0.0 and _strip_phase_suffix(formula) == _strip_phase_suffix(base_formula):
+                        base_reactant_nu += amount
+                    if _is_dioxygen_formula(formula):
+                        exchange_nu_o2 += nu
+            if target_exchange_nu <= 0.0 or base_reactant_nu <= 0.0:
+                raise CatalogCompileError(
+                    f"{species_id}: gas exchange must consume base vapor {base_formula!r} "
+                    "and produce the target vapor"
+                )
+
+            # Derive final pO2 and activity powers from the atom-balanced source
+            # reaction, not from carrier intuition.  If
+            # q A_cond -> ν V + n O2, mass action gives
+            # p_V ∝ a_A^(q/ν) pO2^(-n/ν).  Both ratios are dimensionless;
+            # ν=1 recovers the familiar q and -n exponents.
+            final_vapor_nu = 0.0
+            final_nu_o2 = 0.0
+            condensed_activity_nu = 0.0
+            activity_input = _mapping(
+                reaction.get("activity_input"), f"{species_id}.reaction.activity_input"
+            )
+            activity_component = _required_string(
+                activity_input.get("component_id"),
+                f"{species_id}.reaction.activity_input.component_id",
+            )
+            for sign, key in ((-1.0, "reactants"), (1.0, "products")):
+                participants = reaction.get(key)
+                if not isinstance(participants, list):
+                    raise CatalogCompileError(f"{species_id}: reaction requires {key}")
+                for item in participants:
+                    part = _mapping(item, f"{species_id}.reaction.{key}")
+                    formula = _required_string(
+                        part.get("formula"), f"{species_id}.reaction.formula"
+                    )
+                    amount = _finite_positive(
+                        part.get("stoichiometry"),
+                        f"{species_id}.reaction.stoichiometry",
+                    )
+                    formula_keys = {formula, _strip_phase_suffix(formula)}
+                    if sign > 0.0 and not formula_keys.isdisjoint(target_keys):
+                        final_vapor_nu += amount
+                    if _is_dioxygen_formula(formula):
+                        final_nu_o2 += sign * amount
+                    if sign < 0.0 and formula == activity_component:
+                        condensed_activity_nu += amount
+            if final_vapor_nu <= 0.0 or condensed_activity_nu <= 0.0:
+                raise CatalogCompileError(
+                    f"{species_id}: final reaction must consume its declared activity "
+                    "component and produce the target vapor"
+                )
+            derived_pO2_exponent = -final_nu_o2 / final_vapor_nu
+            derived_activity_exponent = condensed_activity_nu / final_vapor_nu
+            declared_activity_exponent = float(model.get("activity_exponent", 0.0) or 0.0)
+            if not math.isclose(
+                declared_activity_exponent,
+                derived_activity_exponent,
+                rel_tol=0.0,
+                abs_tol=1.0e-9,
+            ):
+                raise CatalogCompileError(
+                    f"{species_id}: activity_exponent {declared_activity_exponent} "
+                    f"disagrees with stoichiometry-derived {derived_activity_exponent}"
+                )
+            if pO2_exponent_declared and not math.isclose(
+                pO2_exponent,
+                derived_pO2_exponent,
+                rel_tol=0.0,
+                abs_tol=1.0e-9,
+            ):
+                raise CatalogCompileError(
+                    f"{species_id}: pO2_exponent {pO2_exponent} disagrees with "
+                    f"stoichiometry-derived {derived_pO2_exponent}"
+                )
+            for formula, poly in polys.items():
+                _require_poly_covers_domain(
+                    species_id=species_id,
+                    label=formula,
+                    poly=poly,
+                    domain_low=domain_low,
+                    domain_high=domain_high,
+                )
+
+            def _log10_from_composite(temperature_K: float) -> float:
+                states = [
+                    (nu, poly.evaluate(temperature_K))
+                    for nu, poly, _formula in exchange_terms
+                ]
+                K_exchange = reaction_equilibrium_constant(states, T_K=temperature_K)
+                base_pressure_pa = 10.0 ** base_reference.log10_pressure(temperature_K)
+                base_ratio = base_pressure_pa / Pstd
+                pO2_over_Pstd = (pO2_reference_bar * 1.0e5) / Pstd
+                target_ratio = (
+                    K_exchange
+                    * base_ratio**base_reactant_nu
+                    * pO2_over_Pstd ** (-exchange_nu_o2)
+                ) ** (1.0 / target_exchange_nu)
+                pressure_pa = target_ratio * Pstd
+                if not math.isfinite(pressure_pa) or pressure_pa <= 0.0:
+                    raise CatalogCompileError(
+                        f"{species_id}: composite thermo evaluator produced invalid "
+                        f"pressure at T={temperature_K}"
+                    )
+                return math.log10(pressure_pa)
+
+            return (
+                _ReferencePressureModel(
+                    evaluator_family=evaluator_family,
+                    coefficients=MappingProxyType({}),
+                    points=(),
+                    thermo_log10_pressure=_log10_from_composite,
+                ),
+                derived_pO2_exponent,
+            )
 
         # Stoichiometric (ν, poly, formula) terms: products +, reactants −.
         terms_builders: list[tuple[float, Any, str]] = []

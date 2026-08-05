@@ -1109,6 +1109,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 degraded_path_engagement_recorder=(
                     self._record_degraded_path_engagement
                 ),
+                species_formula_registry=getattr(
+                    self, "species_formula_registry", {}
+                ),
             )
         return self._overhead_model
 
@@ -2487,10 +2490,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             species=OXYGEN_SPECIES,
         )
         net_overhead_o2_mol = overhead_o2_credit_mol - overhead_o2_debit_mol
-        if vapor_oxygen_atoms > 0.0:
-            if abs(net_overhead_o2_mol) <= OXYGEN_RESERVOIR_NOOP_MOL:
-                return {}
+        # Actual ledger destination outranks carrier class. Premise: when a
+        # channel credits/debits O2 in process.overhead_gas, that physical O2
+        # transfer is the redox source even if the vapor itself is elemental
+        # (Ti is explicitly co-routed with TiO/TiO2). Algebra uses
+        # source=-net_overhead_O2 so release is reducing (negative) and uptake
+        # is oxidising (positive). Units remain mol O2 equivalent. Sanity:
+        # legacy Na/K buffer-routed channels have net=0 and retain the metal-loss
+        # branch; TiO2(g) has net=0 and no spurious source.
+        if abs(net_overhead_o2_mol) > OXYGEN_RESERVOIR_NOOP_MOL:
             return {'redox_source:evaporative_oxygen_loss': -net_overhead_o2_mol}
+        if vapor_oxygen_atoms > 0.0:
+            return {}
 
         # Elemental vapor classes (Na/K/Fe/Mg/Ca in current data) are
         # ledger-balanced as parent oxide -> metal vapor + O2.  The metal
@@ -3130,14 +3141,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self.melt,
             **transport_kwargs,
         )
+        species_formula_registry = getattr(
+            self, "species_formula_registry", {}
+        )
+        partial_pressure_args = (
+            (evap_flux, transport['vapor_pressure_mbar'], species_formula_registry)
+            if species_formula_registry
+            else (evap_flux, transport['vapor_pressure_mbar'])
+        )
         self.condensation_model.configure_operating_conditions(
             wall_temperature_C=transport['pipe_temperature_C'],
             overhead_pressure_mbar=transport['pressure_mbar'],
             species_partial_pressures_mbar=(
-                self.overhead_model.species_partial_pressures(
-                    evap_flux,
-                    transport['vapor_pressure_mbar'],
-                )
+                self.overhead_model.species_partial_pressures(*partial_pressure_args)
             ),
             pipe_diameter_m=self.overhead_model.pipe_diameter_m,
             # The upstream vapor is evaluated at the melt-side temperature used

@@ -118,6 +118,37 @@ def test_pure_sio_returns_sio_molar_mass():
     assert M_avg == pytest.approx(MOLAR_MASS["SiO"] / 1000.0)
 
 
+def test_catalog_generated_carrier_uses_formula_registry_molar_mass():
+    """A carrier absent from the legacy mass table stays in gas accounting."""
+
+    formula = SimpleNamespace(molar_mass_g_mol=79.865)
+    M_avg = _mean_molar_mass_kg_mol(
+        {"TiO2_gas": 1.0},
+        species_formula_registry={"TiO2_gas": formula},
+    )
+
+    assert M_avg == pytest.approx(0.079865)
+
+
+def test_catalog_generated_carriers_reach_overhead_partial_pressures():
+    """Equal molar carrier flows receive equal overhead partial pressures."""
+
+    flux = EvaporationFlux(
+        species_kg_hr={"TiO2_gas": 0.079865, "CaO_gas": 0.056077},
+        total_kg_hr=0.135942,
+    )
+    registry = {
+        "TiO2_gas": SimpleNamespace(molar_mass_g_mol=79.865),
+        "CaO_gas": SimpleNamespace(molar_mass_g_mol=56.077),
+    }
+
+    partials = OverheadGasModel.species_partial_pressures(
+        flux, 100.0, registry
+    )
+
+    assert partials == pytest.approx({"TiO2_gas": 50.0, "CaO_gas": 50.0})
+
+
 def test_pure_kr_returns_kr_molar_mass_without_fallback():
     M_avg = _mean_molar_mass_kg_mol({"Kr": 1.0})
 

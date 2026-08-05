@@ -496,25 +496,34 @@ def _vapor_pressure_trial_factory(
     )
     expected_calls = len(roster) * len(TEMPERATURES_K)
     configured_work = PROTOCOL["stage_work_units_per_trial"]["vapor_pressure_eval"]
-    assert configured_work % expected_calls == 0
-    roster_sweeps = configured_work // expected_calls
+    work_grid = tuple(
+        (species, temperature_K)
+        for temperature_K in TEMPERATURES_K
+        for species in roster
+    )
+    assert len(work_grid) == expected_calls and work_grid
 
     def trial() -> TrialObservation:
         hot_path_calls = 0
         positive_pressures = 0
         cpu_before = time.process_time()
-        for _ in range(roster_sweeps):
-            for temperature_K in TEMPERATURES_K:
-                for species in roster:
-                    pressure = effective_equilibrium_pressure_Pa(
-                        species,
-                        temperature_K,
-                        1.0e-9,
-                        vapor_pressure_data=pressure_data,
-                        a_oxide=0.5,
-                    )
-                    hot_path_calls += 1
-                    positive_pressures += pressure > 0.0
+        # Keep the ratchet's configured call volume stable when the live carrier
+        # roster changes. Cycling the Cartesian work grid gives every
+        # species/temperature pair either floor(N/G) or ceil(N/G) evaluations;
+        # the imbalance is at most one call. Unit check: both N and G are call
+        # counts. Sanity: when N is divisible by G this is exactly the former
+        # complete-sweep loop, while a new carrier cannot crash the benchmark.
+        for index in range(configured_work):
+            species, temperature_K = work_grid[index % expected_calls]
+            pressure = effective_equilibrium_pressure_Pa(
+                species,
+                temperature_K,
+                1.0e-9,
+                vapor_pressure_data=pressure_data,
+                a_oxide=0.5,
+            )
+            hot_path_calls += 1
+            positive_pressures += pressure > 0.0
         cpu_seconds = time.process_time() - cpu_before
         assert positive_pressures > 0
         assert hot_path_calls == configured_work

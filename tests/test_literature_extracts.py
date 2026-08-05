@@ -106,6 +106,7 @@ def tmp_extracts(tmp_path: Path):
                     # so a pure lexical sort would pick the wrong winner.
                     "alpha": ["other-source", "fixture-source"],
                     "psat_series": ["fixture-source", "other-source"],
+                    "partial_pressure_series": ["fixture-source", "other-source"],
                     "gibbs_table": ["fixture-source", "other-source"],
                     "activity_coefficient": ["fixture-source"],
                     "rate_series": ["fixture-source"],

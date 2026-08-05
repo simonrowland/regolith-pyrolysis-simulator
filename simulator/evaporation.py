@@ -2291,10 +2291,17 @@ class EvaporationMixin:
             o2_kg_hr = rate_kg_hr * float(
                 stoich.get('O2_per_product_kg') or 0.0
             )
+            oxygen_destination = str(
+                stoich.get('oxygen_destination') or ''
+            )
             vapor_oxygen_atoms = float(
                 formula.elements.get('O', 0.0) or 0.0
             )
-            if o2_kg_hr < 0.0 or vapor_oxygen_atoms > 0.0:
+            if (
+                o2_kg_hr < 0.0
+                or vapor_oxygen_atoms > 0.0
+                or oxygen_destination == 'process.overhead_gas'
+            ):
                 source_mol_hr['O2'] = (
                     source_mol_hr.get('O2', 0.0)
                     + o2_kg_hr / o2_molar_mass
@@ -3222,6 +3229,7 @@ class EvaporationMixin:
                 'parent_oxide': parent_oxide,
                 'oxide_per_product_kg': oxide_per_product,
                 'O2_per_product_kg': O2_per_product,
+                'oxygen_destination': sp_data.get('oxygen_destination'),
             }
 
         implied = OXIDE_TO_METAL.get(parent_oxide, ('', 0, 0))[0]
@@ -3260,6 +3268,7 @@ class EvaporationMixin:
             'parent_oxide': parent_oxide,
             'oxide_per_product_kg': oxide_per_product,
             'O2_per_product_kg': O2_per_product,
+            'oxygen_destination': sp_data.get('oxygen_destination'),
         }
 
     def _validate_evaporation_stoich_atoms(

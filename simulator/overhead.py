@@ -274,6 +274,7 @@ def _mean_molar_mass_kg_mol(
     species_kg: Optional[Mapping[str, float]],
     *,
     fallback_engagement_recorder: Optional[Callable[[], None]] = None,
+    species_formula_registry: Optional[Mapping[str, Any]] = None,
 ) -> float:
     """Mole-weighted mean molar mass of a species mixture, kg/mol.
 
@@ -318,7 +319,9 @@ def _mean_molar_mass_kg_mol(
             continue
         if not math.isfinite(mass) or mass <= 0.0:
             continue
-        molar_mass_g_mol = MOLAR_MASS.get(species)  # g/mol — species molar mass
+        molar_mass_g_mol = _species_molar_mass_g_mol(
+            species, species_formula_registry
+        )
         if molar_mass_g_mol is None or molar_mass_g_mol <= 0.0:
             # Unknown species — skip rather than poison the mean.
             # The fallback covers the "all unknown" degenerate case
@@ -331,6 +334,29 @@ def _mean_molar_mass_kg_mol(
             fallback_engagement_recorder()
         return DEFAULT_PIPE_M_AVG_KG_MOL
     return total_kg / total_mol
+
+
+def _species_molar_mass_g_mol(
+    species: str,
+    species_formula_registry: Optional[Mapping[str, Any]] = None,
+) -> float | None:
+    """Resolve legacy or catalog-generated gas molar mass in g/mol."""
+
+    value = MOLAR_MASS.get(species)
+    if value is None and species_formula_registry:
+        formula = species_formula_registry.get(species)
+        if formula is not None:
+            if isinstance(formula, Mapping):
+                value = formula.get("molar_mass_g_mol")
+            else:
+                value = getattr(formula, "molar_mass_g_mol", None)
+    if value is None:
+        return None
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
+        return None
+    return numeric if math.isfinite(numeric) and numeric > 0.0 else None
 
 
 class OverheadGasModel:
@@ -368,6 +394,7 @@ class OverheadGasModel:
         condenser_geometry_config: Optional[Mapping] = None,
         *,
         degraded_path_engagement_recorder: Optional[Callable[..., None]] = None,
+        species_formula_registry: Optional[Mapping[str, Any]] = None,
     ):
         # Pipe geometry (default for 1-tonne batch)
         self.initial_throat_area_m2 = DEFAULT_INITIAL_THROAT_AREA_M2  # m² — configurable throat cross-section
@@ -388,6 +415,7 @@ class OverheadGasModel:
         self._degraded_path_engagement_recorder = (
             degraded_path_engagement_recorder
         )
+        self.species_formula_registry = species_formula_registry or {}
         self.configure_condenser_geometry(condenser_geometry_config or {})
         self.configure_headspace(headspace_config or {})
 
@@ -1090,6 +1118,7 @@ class OverheadGasModel:
     def species_partial_pressures(
         evap_flux: EvaporationFlux,
         vapor_pressure_mbar: float,
+        species_formula_registry: Optional[Mapping[str, Any]] = None,
     ) -> dict[str, float]:
         """Project a species mass-flow mixture onto mole-fraction partials."""
         total_evap_kg_hr = max(0.0, float(evap_flux.total_kg_hr))
@@ -1097,7 +1126,15 @@ class OverheadGasModel:
             return {}
         molar_flow_by_species: dict[str, float] = {}
         for species, rate in evap_flux.species_kg_hr.items():
-            molar_mass_g_mol = MOLAR_MASS.get(species)
+            # Premise: gas mole fraction is n_i/sum(n), with
+            # n_dot_i=m_dot_i/M_i.  Catalog-generated carrier ids therefore
+            # must resolve M_i through the same formula registry as the ledger,
+            # not disappear when absent from the legacy constant. Units:
+            # (kg/hr)/(kg/mol)=mol/hr; p_i=y_i*P remains mbar. Sanity: legacy
+            # species still resolve from MOLAR_MASS, while pure TiO gives y=1.
+            molar_mass_g_mol = _species_molar_mass_g_mol(
+                species, species_formula_registry
+            )
             if molar_mass_g_mol is None or molar_mass_g_mol <= 0.0:
                 continue
             molar_flow_by_species[species] = max(0.0, float(rate)) / (
@@ -1369,6 +1406,7 @@ class OverheadGasModel:
             fallback_engagement_recorder=(
                 self._record_pipe_m_avg_fallback_engagement
             ),
+            species_formula_registry=self.species_formula_registry,
         )
         # F-112 derivation:
         # premise: compressible laminar pipe mass flow is proportional to
@@ -1418,6 +1456,7 @@ class OverheadGasModel:
             fallback_engagement_recorder=(
                 self._record_pipe_m_avg_fallback_engagement
             ),
+            species_formula_registry=self.species_formula_registry,
         )
         if T_K <= 0.0 or d <= 0.0 or L <= 0.0 or M_avg <= 0.0:
             return 0.0
