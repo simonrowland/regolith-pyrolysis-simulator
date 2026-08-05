@@ -724,6 +724,53 @@ def test_sodium_provider_omits_nonphysical_pole_branch(
     assert "Na" not in result.diagnostic["vapor_pressures_Pa"]
 
 
+def test_phosphorus_hot_train_scope_survives_compatibility_projection(
+    vapor_pressure_data,
+):
+    oxide_vapors = vapor_pressure_data["oxide_vapors"]
+    for carrier in ("PO", "PO2", "P2", "P4", "P4O6", "P4O10"):
+        assert oxide_vapors[carrier]["hot_train_applicability"] == "stage0_only"
+
+    assert "P2O5_gas" not in oxide_vapors
+    legacy_locations = [
+        name
+        for name, section in vapor_pressure_data.items()
+        if isinstance(section, dict) and "P2O5_gas" in section
+    ]
+    assert legacy_locations == ["retired_tombstones"]
+    retired = vapor_pressure_data["retired_tombstones"]["P2O5_gas"]
+    assert retired["hot_train_applicability"] == "not_applicable"
+
+
+def test_compiled_p_carrier_provenance_records_intrinsic_melt_fo2(
+    vapor_pressure_data,
+):
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data.catalog_payload)
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={
+                "process.cleaned_melt": {"P2O5": 0.01, "SiO2": 0.99}
+            },
+            species_formula_registry={},
+        ),
+        temperature_C=1400.0,
+        pressure_bar=1e-6,
+        control_inputs={
+            "pO2_bar": 1e-2,
+            "intrinsic_fO2_log": -11.0,
+            "process_phase": "stage0",
+        },
+    )
+
+    result = provider.dispatch(request)
+    provenance = result.diagnostic["vapor_pressure_numerator_provenance"]["PO"]
+
+    assert result.status == "ok"
+    assert provenance["pO2_bar"] == pytest.approx(1e-11)
+    assert provenance["oxygen_fugacity_channel"] == "intrinsic_melt"
+
+
 def test_demaria_1971_k_validation_case_uses_measured_table1_po2(
     vapor_pressure_data,
 ):
@@ -780,9 +827,13 @@ def test_melt_activity_normalizes_pure_raoultian_component_to_unity(oxide):
     assert activity is not None
     assert activity.x_single_cation == pytest.approx(1.0)
     assert activity.activity == pytest.approx(1.0)
-    assert activity.provenance()["melt_oxide_activity_reference_state"] == (
+    provenance = activity.provenance()
+    assert provenance["melt_oxide_activity_reference_state"] == (
         "single_cation_Raoultian_pure_liquid_reference"
     )
+    assert "melt_parent_oxide_activity" not in provenance
+    assert "melt_oxide_activity_authority_status" not in provenance
+    assert "melt_oxide_gamma_valid_range_K" not in provenance
 
 
 def test_melt_activity_retains_constant_gamma_x_for_mixed_melts():
@@ -2402,6 +2453,7 @@ def test_provider_matches_legacy_internal_analytical_for_known_lunar_composition
         control_inputs={
             "pO2_bar": sim._headspace_transport_pO2_bar(),
             "intrinsic_fO2_log": sim.melt.melt_fO2_log,
+            "process_phase": "stage0",
         },
     )
     kernel_vp = dict(
@@ -2430,6 +2482,9 @@ def test_provider_matches_legacy_internal_analytical_for_known_lunar_composition
     kernel_species = set(kernel_vp)
     assert legacy_species <= kernel_species
     assert kernel_species - legacy_species <= _REVIEWED_ADDITIVE_CARRIERS
+    phosphorus_carriers = {"PO", "PO2", "P2", "P4", "P4O6", "P4O10"}
+    assert phosphorus_carriers <= kernel_species
+    assert all(kernel_vp[species] > 0.0 for species in phosphorus_carriers)
 
 
 # ---------------------------------------------------------------------------
@@ -2583,6 +2638,7 @@ def test_get_equilibrium_returns_kernel_vapor_pressures(
         control_inputs={
             "pO2_bar": sim._headspace_transport_pO2_bar(),
             "intrinsic_fO2_log": sim.melt.melt_fO2_log,
+            "process_phase": "stage0",
         },
     )
     kernel_vp = dict(
@@ -2752,4 +2808,10 @@ _REVIEWED_ADDITIVE_CARRIERS = {
     "AlO",
     "Al2O",
     "CrO3",
+    "PO",
+    "PO2",
+    "P2",
+    "P4",
+    "P4O6",
+    "P4O10",
 }

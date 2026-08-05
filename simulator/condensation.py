@@ -3904,6 +3904,10 @@ def _species_has_antoine_data(
         if (block := data.get(block_name)) is not None
     ):
         return True
+    if data.get("condensation_saturation_model") == (
+        "unavailable_source_reaction_not_psat"
+    ):
+        return False
     catalog_payload = _authoritative_vapour_catalog_payload(vapor_pressure_data)
     if catalog_payload is not None:
         from simulator.vapour_rail.catalog import compiled_catalog_for

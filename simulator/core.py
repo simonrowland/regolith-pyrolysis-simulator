@@ -8391,6 +8391,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             float(getattr(self.melt, 'ambient_pressure_mbar', 0.0) or 0.0)
             / 1000.0
         )
+        campaign = getattr(self.melt, 'campaign', None)
+        campaign_name = str(getattr(campaign, 'name', '') or '')
+        process_phase = (
+            'stage0' if campaign_name in {'C0', 'C0B'} else 'hot_train'
+        )
         kernel_result = self._dispatch_only(
             ChemistryIntent.VAPOR_PRESSURE,
             control_inputs={
@@ -8398,6 +8403,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'intrinsic_fO2_log': intrinsic_fO2_log,
                 'vacuum_floor_bar': vacuum_floor,
                 'body': getattr(self.melt, 'body', ''),
+                'process_phase': process_phase,
                 'ambient_pressure_bar': (
                     ambient_pressure_bar if ambient_pressure_bar > 0.0 else None
                 ),
@@ -11681,6 +11687,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             '_base_species_formula_registry',
             'species_formula_registry',
             '_chem_registry',
+            # Immutable runtime compilation cache. Copying the full catalog
+            # into every hourly rollback snapshot is unnecessary and grows
+            # with each analytical carrier family; preserve object identity
+            # like the registry and kernel that consume it.
+            'vapour_rail_catalog',
             'atom_ledger',
             '_chem_kernel',
             'cost_ledger',

@@ -8,8 +8,9 @@ without importing engine code.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
 from collections.abc import Mapping
+from dataclasses import dataclass
+from typing import Any
 
 
 ALPHAMELTS_CROSS_CHECK_STATUS = "inconclusive_no_activities"
@@ -119,6 +120,22 @@ MELT_OXIDE_ACTIVITY_COEFFICIENTS: dict[str, MeltOxideActivityCoefficient] = {
     ),
 }
 
+# P2O5 is intentionally separate from the legacy coefficient table. Several
+# pre-b-133 consumers treat membership in that table as permission to activate
+# an activity correction without a temperature or authority check. Real P
+# carrier evaluation selects this coefficient explicitly below and supplies T.
+P2O5_ACTIVITY_COEFFICIENT = MeltOxideActivityCoefficient(
+    "P2O5",
+    "PO2.5",
+    2.0,
+    1.0e-6,
+    "Turkdogan 2000 ISIJ Int. 40:964-970, DOI "
+    "10.2355/isijinternational.40.964, as compiled by Sossi & Fegley "
+    "2018 Table 2: gamma_PO2.5=1e-6..1e-10 in CMFS melts",
+    valid_range_K=(1823.0, 1923.0),
+    anchor_T_K=1873.0,
+)
+
 MELT_OXIDE_CATIONS_PER_FORMULA = {
     "SiO2": 1.0,
     "TiO2": 1.0,
@@ -146,6 +163,9 @@ class MeltOxideActivity:
     activity: float
     citation: str
     warning: str | None = None
+    temperature_K: float | None = None
+    valid_range_K: tuple[float, float] | None = None
+    authority_status: str = "temperature_not_supplied"
 
     def equivalent_parent_activity(self, parent_activity_exponent: float) -> float:
         """Return parent-oxide activity that yields this activity after exponenting."""
@@ -157,8 +177,16 @@ class MeltOxideActivity:
             return 0.0
         return self.activity ** (1.0 / exponent)
 
-    def provenance(self) -> dict[str, float | str]:
-        payload: dict[str, float | str] = {
+    def thermodynamic_parent_activity(self) -> float:
+        """Return activity on the parent-oxide formula basis."""
+
+        cations = MELT_OXIDE_CATIONS_PER_FORMULA.get(self.parent_oxide, 1.0)
+        if self.activity <= 0.0:
+            return 0.0
+        return self.activity ** float(cations)
+
+    def provenance(self) -> dict[str, Any]:
+        payload: dict[str, Any] = {
             "melt_oxide_component": self.single_cation_component,
             "melt_oxide_gamma": self.gamma,
             "melt_oxide_X_single_cation": self.x_single_cation,
@@ -169,6 +197,15 @@ class MeltOxideActivity:
             "melt_oxide_gamma_limitation": MELT_OXIDE_ACTIVITY_LIMITATION,
             "alphamelts_cross_check_status": ALPHAMELTS_CROSS_CHECK_STATUS,
         }
+        if self.parent_oxide == "P2O5":
+            payload["melt_parent_oxide_activity"] = (
+                self.thermodynamic_parent_activity()
+            )
+            payload["melt_oxide_activity_authority_status"] = self.authority_status
+            if self.temperature_K is not None:
+                payload["melt_oxide_activity_temperature_K"] = self.temperature_K
+            if self.valid_range_K is not None:
+                payload["melt_oxide_gamma_valid_range_K"] = self.valid_range_K
         if self.warning:
             payload["melt_oxide_activity_warning"] = self.warning
         return payload
@@ -206,35 +243,84 @@ def melt_oxide_activity(
     account_mol: Mapping[str, float],
     *,
     cation_mol_fraction: Mapping[str, float] | None = None,
+    temperature_K: float | None = None,
 ) -> MeltOxideActivity | None:
     """Return a_MOx = gamma_MOx * X_MOx for a parent oxide."""
 
     parent = str(parent_oxide)
+    resolved_temperature_K = None
+    if temperature_K is not None:
+        resolved_temperature_K = float(temperature_K)
+        if not math.isfinite(resolved_temperature_K) or resolved_temperature_K <= 0.0:
+            raise ValueError("temperature_K must be finite and positive")
     if cation_mol_fraction is None:
         cation_mol_fraction = single_cation_mole_fractions(account_mol)
     if not cation_mol_fraction:
         return None
     x_single_cation = cation_mol_fraction.get(parent, 0.0)
 
-    coeff = MELT_OXIDE_ACTIVITY_COEFFICIENTS.get(parent)
+    # b-133 owns a temperature-qualified P2O5 activity for the real carrier
+    # rail. Legacy equilibrium callers do not supply temperature; silently
+    # activating the new coefficient there perturbs established redox and lets
+    # a formerly ungrounded P activity affect unrelated hot-train chemistry.
+    # Keep that path explicit and non-authoritative until it supplies T.
+    p2o5_temperature_required = (
+        parent == "P2O5" and resolved_temperature_K is None
+    )
+    if parent == "P2O5":
+        coeff = None if p2o5_temperature_required else P2O5_ACTIVITY_COEFFICIENT
+    else:
+        coeff = MELT_OXIDE_ACTIVITY_COEFFICIENTS.get(parent)
     if coeff is None:
         if x_single_cation <= 0.0:
             return None
         cations = MELT_OXIDE_CATIONS_PER_FORMULA.get(parent, 1.0)
         component = parent if cations == 1.0 else f"{parent}:single_cation"
-        warning = (
-            "undocumented_melt_oxide_activity_coefficient: "
-            f"parent_oxide={parent} gamma=1.0"
-        )
+        if p2o5_temperature_required:
+            warning = (
+                "melt_oxide_activity unity-gamma fallback: P2O5 literature "
+                "gamma requires temperature_K; result is non-authoritative"
+            )
+            citation = (
+                "ASSUMED unity fallback; temperature_K required for the "
+                "Turkdogan/Sossi-Fegley P2O5 gamma envelope"
+            )
+        else:
+            warning = (
+                "undocumented_melt_oxide_activity_coefficient: "
+                f"parent_oxide={parent} gamma=1.0"
+            )
+            citation = (
+                "ASSUMED unity fallback; no documented non-FeO gamma table row"
+            )
         return MeltOxideActivity(
             parent,
             component,
             1.0,
             x_single_cation,
             x_single_cation,
-            "ASSUMED unity fallback; no documented non-FeO gamma table row",
+            citation,
             warning,
+            resolved_temperature_K,
+            None,
+            "assumed_unity_fallback_non_authoritative",
         )
+
+    activity_authority_status = "temperature_not_supplied"
+    activity_warning = None
+    if resolved_temperature_K is not None and coeff.valid_range_K is not None:
+        low, high = (float(coeff.valid_range_K[0]), float(coeff.valid_range_K[1]))
+        if low <= resolved_temperature_K <= high:
+            activity_authority_status = "in_gamma_domain"
+        else:
+            activity_authority_status = (
+                "out_of_gamma_domain_status_bearing_non_authoritative"
+            )
+            activity_warning = (
+                "constant_gamma_extrapolated_out_of_domain: "
+                f"parent_oxide={parent} temperature_K={resolved_temperature_K:.3f} "
+                f"valid_range_K=[{low:g}, {high:g}] cannot_certify"
+            )
 
     if x_single_cation <= 0.0:
         return MeltOxideActivity(
@@ -244,6 +330,10 @@ def melt_oxide_activity(
             0.0,
             0.0,
             coeff.citation,
+            activity_warning,
+            resolved_temperature_K,
+            coeff.valid_range_K,
+            activity_authority_status,
         )
 
     # Raoultian standard state requires the pure single-cation component to
@@ -261,6 +351,10 @@ def melt_oxide_activity(
         x_single_cation,
         activity,
         coeff.citation,
+        activity_warning,
+        resolved_temperature_K,
+        coeff.valid_range_K,
+        activity_authority_status,
     )
 
 

@@ -262,7 +262,9 @@ def test_production_schema_compiles_exact_four_strata_and_legacy_projection() ->
     )
     legacy = catalog.legacy_view()
     assert len(legacy["metals"]) == 10
-    assert len(legacy["oxide_vapors"]) == 8
+    # The oxide and phosphorus chunks intentionally activate twelve carriers
+    # through the pre-RG oxide-vapor compatibility seam.
+    assert len(legacy["oxide_vapors"]) == 14
     assert len(legacy["foulant_vapor"]) == 3
     assert set(legacy["metals"]) == {
         "Na",
@@ -285,6 +287,12 @@ def test_production_schema_compiles_exact_four_strata_and_legacy_projection() ->
         "AlO",
         "Al2O",
         "CrO3",
+        "PO",
+        "PO2",
+        "P2",
+        "P4",
+        "P4O6",
+        "P4O10",
     }
     assert set(legacy["foulant_vapor"]) == {"NaCl", "KCl", "NaF"}
     assert legacy["metals"]["K"]["antoine"]["A"] == pytest.approx(10.641294)
@@ -313,6 +321,56 @@ def test_production_schema_compiles_exact_four_strata_and_legacy_projection() ->
     bundle = load_config_bundle(DATA_DIR)
     assert bundle.vapor_pressures == legacy
     assert bundle.vapor_pressures.catalog_payload == payload
+
+
+def test_production_p_carriers_share_parent_activity_and_never_sparsify() -> None:
+    payload = _yaml("vapor_pressures.yaml")
+    provider = BuiltinVaporPressureProvider(payload)
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={
+                "process.cleaned_melt": {"P2O5": 1.0, "SiO2": 99.0}
+            },
+            species_formula_registry={},
+        ),
+        temperature_C=1200.0,
+        pressure_bar=0.009,
+        fO2_log=-9.0,
+        control_inputs={
+            "pO2_bar": 0.009,
+            "intrinsic_fO2_log": -9.0,
+            "process_phase": "stage0",
+        },
+    )
+
+    result = provider.dispatch(request)
+    diagnostic = result.diagnostic or {}
+    carriers = {"PO", "PO2", "P2", "P4", "P4O6", "P4O10"}
+    pressures = diagnostic["vapor_pressures_Pa"]
+    activities = diagnostic["activities"]
+    assert carriers <= set(pressures)
+    assert carriers <= set(activities)
+
+    catalog = compile_vapour_rail_catalog(
+        payload, emit_u0_request_rules=False
+    )
+    intrinsic_fO2_bar = diagnostic["source_reaction_fO2_bar"]
+    for species in carriers:
+        evaluator = catalog.evaluator_for(species)
+        expected = evaluator.evaluate(
+            1473.15,
+            source_activity=activities[species],
+            pO2_bar=intrinsic_fO2_bar,
+        ).pressure_pa
+        assert pressures[species] == pytest.approx(expected, rel=1.0e-12)
+        provenance = diagnostic["vapor_pressure_numerator_provenance"][species]
+        assert provenance["equivalent_parent_oxide_activity"] == pytest.approx(
+            activities[species]
+        )
+        assert provenance["melt_oxide_activity_authority_status"] == (
+            "out_of_gamma_domain_status_bearing_non_authoritative"
+        )
 
 
 @pytest.mark.parametrize(

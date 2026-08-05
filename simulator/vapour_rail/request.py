@@ -698,6 +698,12 @@ def _predicate_active(
     """Return (active, detail). Inactive → refusal, never omission."""
 
     predicate = rule.applicability_predicate
+    stage = (state.stage if state else None) or ""
+    if stage == "c0b_p_cleanup" and "P2O5" not in rule.parent_species_ids:
+        return (
+            False,
+            "c0b_p_cleanup admits only P2O5-sourced carrier rules",
+        )
     if predicate in {"applicable", "always"}:
         return True, ""
     if predicate in {"not_applicable", "inapplicable"}:
@@ -707,8 +713,14 @@ def _predicate_active(
         )
     if predicate == "stage0_only":
         phase = (state.process_phase if state else None) or ""
-        stage = (state.stage if state else None) or ""
         if phase == "stage0" or stage == "stage0":
+            return True, ""
+        # Stage-0 P carriers run inside the legacy hot-train request surface.
+        # Wake only P2O5-sourced rules; treating the entire request as stage0
+        # changes unrelated volatile-channel eligibility.
+        if stage in {"stage0_p_carriers", "c0b_p_cleanup"} and (
+            "P2O5" in rule.parent_species_ids
+        ):
             return True, ""
         return (
             False,
@@ -1061,6 +1073,11 @@ def refusal_closure(
                 if alpha
                 else f"alpha_missing:{rule.species_id}"
             )
+            alpha_authority_status = (
+                str(alpha.get("status") or "")
+                if isinstance(alpha, Mapping)
+                else ""
+            )
             activity_is_upper_bound = (
                 source_reaction_activity is not None
                 and source_reaction_activity.verdict
@@ -1116,6 +1133,14 @@ def refusal_closure(
             verdict = VERDICT_STATUS_BEARING_NON_AUTHORITATIVE
 
         extra_payload: dict[str, Any] = {"origin": rule.origin}
+        if alpha_authority_status == "analytical_upper_bound":
+            extra_payload["alpha_authority_status"] = alpha_authority_status
+            # Inventory evolution is intentionally enabled by the owner's
+            # analytical-model directive, but this remains a bound-driven,
+            # non-certifying result rather than a measured alpha point.
+            extra_payload["alpha_inventory_policy"] = (
+                "inventory_eligible_analytical_upper_bound_noncertifying"
+            )
         if source_reaction_activity is not None:
             source_label = "catalog_activity_corrected"
             extra_payload.update(

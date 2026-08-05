@@ -814,10 +814,18 @@ The cleanup stage's treatment of carbon, nitrogen, oxygen, phosphorus, and sulfu
 - **Nitrogen** — assumed to volatilize. There is no nitride phase and no retained-nitrogen model.
 - **Oxygen** — the oxygen carried in water and carbonate leaves as water vapor and CO₂; structural
   oxide oxygen stays with the retained oxide inventory.
-- **Phosphorus** — **retained in the melt as P₂O₅ (phosphate)**, which is igneous-correct: phosphorus
-  is not volatilized in cleanup and phosphate stays in the cleaned silicate composition. All phosphorus
-  collapses to a single P₂O₅ account; individual phosphate minerals (apatite, merrillite) are not
-  separately resolved.
+- **Phosphorus** — normalized into the melt as P₂O₅, then allowed to evolve during C0/C0b through
+  the real gas carriers PO, PO₂, P₂, P₄, P₄O₆, and P₄O₁₀. Each channel has an atom-balanced source
+  reaction whose activity and oxygen-fugacity powers follow directly from its stoichiometry. Runtime
+  K(T) comes from CEA/Gurvich NASA9 Gibbs functions; the CEA P₄O₁₀(L) record is scaled by one half
+  onto the ledger's one-mole P₂O₅ component basis. The constant dilute-melt coefficient
+  γ(PO₂.₅)=10⁻⁶ is the high end of the Turkdogan range compiled by Sossi and Fegley, so γ≤1 and
+  a=1 is an upper bound. The provider converts the single-cation activity exactly once to the parent
+  component basis, a(P₂O₅)=a(PO₂.₅)², and the compiled reaction evaluator consumes that same value.
+  Its cited temperature window does not cover all C0b states, and α=1 is an HKL kinetic ceiling rather
+  than a measurement. Results are therefore analytical/status-bearing, non-authoritative, and cannot
+  certify. Evolved P is credited to overhead gas and then to terminal offgas by the normal bleed; no
+  independent condensation curve or certified capture fraction is asserted.
 - **Sulfur** — oxidized to SO₂ or retained as sulfate depending on oxygen pressure, routed through a
   sulfur-saturation gate. When the optional PySulfSat integration is installed and the melt composition
   falls inside its calibration windows, the gate reports the sulfide-capacity (SCSS) and

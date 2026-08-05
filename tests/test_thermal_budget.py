@@ -1,4 +1,7 @@
+from pathlib import Path
+
 import pytest
+import yaml
 
 from simulator.thermal_budget import (
     ASSUMED,
@@ -8,6 +11,7 @@ from simulator.thermal_budget import (
     furnace_material_context,
     thermal_budget_decomposition,
 )
+from simulator.vapour_rail.catalog import compile_vapour_rail_catalog
 
 
 BASE_THERMAL_BUDGET_ARGS = {
@@ -63,6 +67,38 @@ def test_evaporation_enthalpy_budget_fails_loud_for_uncited_species():
                 }
             },
         )
+
+
+def test_phosphorus_carrier_enthalpy_uses_runtime_cea_reaction_delta_h():
+    payload_path = Path(__file__).resolve().parent.parent / "data" / "vapor_pressures.yaml"
+    payload = yaml.safe_load(payload_path.read_text(encoding="utf-8"))
+    legacy = compile_vapour_rail_catalog(
+        payload, emit_u0_request_rules=False
+    ).legacy_view()
+
+    result = evaporation_enthalpy_budget(
+        {"PO": 1.0e-3},
+        vapor_pressures=legacy,
+        temperature_K=1473.15,
+    )
+
+    assert result["latent_kWh"] == 0.0
+    assert result["dissociation_kWh"] > 0.0
+    source = result["sources"]["analytical_source_reaction:PO"]
+    assert "NASA CEA nasa_cea_9 delta-H" in source
+    assert "cannot certify" in source
+
+    metastable = evaporation_enthalpy_budget(
+        {"P4O10": 1.0e-3},
+        vapor_pressures=legacy,
+        temperature_K=1923.15,
+    )
+    assert metastable["dissociation_kWh"] < 0.0
+    metastable_source = metastable["sources"][
+        "analytical_source_reaction:P4O10"
+    ]
+    assert "metastable P4O10(L)-derived component reference" in metastable_source
+    assert "status-bearing" in metastable_source
 
 
 def test_evaporation_enthalpy_budget_oxide_vapor_uses_single_reaction_not_double_charge():

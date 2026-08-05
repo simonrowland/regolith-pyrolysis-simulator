@@ -248,6 +248,7 @@ def evaporation_enthalpy_budget(
     species_kg_hr: Mapping[str, float],
     *,
     vapor_pressures: Mapping[str, Any] | None = None,
+    temperature_K: float | None = None,
 ) -> dict[str, Any]:
     """Return one-hour evaporation-enthalpy sinks for evaporated species.
 
@@ -273,6 +274,27 @@ def evaporation_enthalpy_budget(
 
         metadata = _vapor_metadata(species, vapor_pressures)
         product_mol = kg_hr * 1000.0 / _molar_mass_g_mol(species, metadata)
+
+        analytical_reaction_coeff = _analytical_reaction_enthalpy(
+            species,
+            metadata,
+            temperature_K=temperature_K,
+        )
+        if analytical_reaction_coeff is not None:
+            # Source-reaction carriers already include condensed-component
+            # breakup and any O2 coproduct in one NASA-polynomial delta-H.
+            # Charging a metal latent term as well would double-count.
+            reaction_kWh = (
+                product_mol
+                * analytical_reaction_coeff.kJ_per_mol
+                / KJ_PER_KWH
+            )
+            latent_by_species[species] = 0.0
+            dissociation_by_species[species] = reaction_kWh
+            sources[f"analytical_source_reaction:{species}"] = (
+                analytical_reaction_coeff.source
+            )
+            continue
 
         if species in _OXIDE_VAPOR_SPECIES:
             # Oxide vapor: a single reaction parent_oxide(melt) -> oxide_vapor(g)
@@ -689,6 +711,96 @@ def _vapor_metadata(
     if isinstance(raw, Mapping):
         return dict(raw)
     return {}
+
+
+def _analytical_reaction_enthalpy(
+    species: str,
+    metadata: Mapping[str, Any],
+    *,
+    temperature_K: float | None,
+) -> EnthalpyCoefficient | None:
+    """Return NASA-polynomial delta-H per mole vapor for a source reaction."""
+
+    if species not in {"PO", "PO2", "P2", "P4", "P4O6", "P4O10"}:
+        # b-133 lands a new thermal coefficient path only for its six CEA
+        # phosphorus carriers. Existing analytical families retain their
+        # pre-b-133 latent/dissociation accounting until separately reviewed.
+        return None
+
+    model = metadata.get("reference_pressure_model")
+    if not isinstance(model, Mapping):
+        return None
+    family = str(model.get("evaluator_family") or "")
+    thermo = model.get("species_thermo")
+    if family not in {"nasa_cea_7", "nasa_cea_9"} or not isinstance(
+        thermo, Mapping
+    ):
+        return None
+    if temperature_K is None:
+        raise ValueError(
+            f"temperature_K is required for analytical source-reaction enthalpy of {species!r}"
+        )
+    T_K = float(temperature_K)
+    if not math.isfinite(T_K) or T_K <= 0.0:
+        raise ValueError("temperature_K must be finite and positive")
+
+    parent = str(metadata.get("parent_oxide") or "")
+    parent_mol = float(metadata.get("source_oxide_mol_per_vapor_mol", 0.0))
+    oxygen_mol = float(metadata.get("source_O2_mol_per_vapor_mol", 0.0))
+    if not parent or parent_mol <= 0.0 or oxygen_mol < 0.0:
+        raise ValueError(
+            f"analytical source-reaction stoichiometry unavailable for {species!r}"
+        )
+    required = {parent, species}
+    if oxygen_mol > 0.0:
+        required.add("O2")
+    missing = sorted(required - set(str(key) for key in thermo))
+    if missing:
+        raise ValueError(
+            f"analytical source-reaction thermo unavailable for {species!r}: {missing}"
+        )
+
+    # Reuse the catalog's landed NASA7/NASA9 parser so pressure and energy
+    # diagnostics evaluate the same CEA coefficient convention.
+    from simulator.vapour_rail.catalog import _polynomial_from_thermo_record
+
+    polynomials = {
+        formula: _polynomial_from_thermo_record(
+            name=f"thermal_budget:{species}:{formula}",
+            family=family,
+            record=thermo[formula],
+        )
+        for formula in required
+    }
+    delta_h_J_per_mol_vapor = (
+        polynomials[species].evaluate(T_K).h_J_per_mol
+        + (
+            oxygen_mol * polynomials["O2"].evaluate(T_K).h_J_per_mol
+            if oxygen_mol > 0.0
+            else 0.0
+        )
+        - parent_mol * polynomials[parent].evaluate(T_K).h_J_per_mol
+    )
+    if not math.isfinite(delta_h_J_per_mol_vapor):
+        raise ValueError(
+            f"analytical source-reaction enthalpy is non-finite for {species!r}"
+        )
+    parent_record = thermo[parent]
+    parent_reference = str(parent_record.get("cea_name") or parent)
+    phase_status = ""
+    if "P4O10(L)" in parent_reference:
+        phase_status = (
+            "; metastable P4O10(L)-derived component reference, so signed "
+            "reaction heat is status-bearing and may be negative"
+        )
+    return EnthalpyCoefficient(
+        delta_h_J_per_mol_vapor / 1000.0,
+        (
+            f"NASA CEA {family} delta-H(T={T_K:.2f} K) for the catalog "
+            f"{parent}(melt) source reaction; analytical/status-bearing, "
+            f"cannot certify{phase_status}"
+        ),
+    )
 
 
 def _molar_mass_g_mol(species: str, metadata: Mapping[str, Any]) -> float:

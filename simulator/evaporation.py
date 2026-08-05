@@ -312,6 +312,27 @@ def _load_evaporation_alpha_by_species(vapor_pressure_data: dict) -> dict[str, A
     return alpha_by_species
 
 
+def _load_hkl_upper_bound_transport_species(
+    vapor_pressure_data: dict,
+) -> tuple[str, ...]:
+    """Return carriers explicitly modelled by the HKL kinetic upper limit."""
+
+    from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+
+    legacy = vapor_pressure_legacy_view(vapor_pressure_data)
+    species_ids: set[str] = set()
+    for group_name in _EVAPORATION_ALPHA_GROUPS:
+        group = legacy.get(group_name, {}) or {}
+        for species, species_data in group.items():
+            if not isinstance(species_data, Mapping):
+                continue
+            if species_data.get("gas_transport_model") == (
+                "hkl_kinetic_upper_bound_no_chapman_enskog"
+            ):
+                species_ids.add(str(species))
+    return tuple(sorted(species_ids))
+
+
 def _legacy_evaporation_shadow_pressure_map(
     vapor_pressure_data: dict,
     live_pressures_Pa: Mapping[str, float] | None,
@@ -2098,23 +2119,76 @@ class EvaporationMixin:
                         standard_state_raw.get('component_basis') or ''
                     ),
                 )
-            activity_evidence_refs = {
-                str(species_id): (
+            activity_evidence_refs: dict[str, str] = {}
+            activity_provenance = dict(
+                vapor_pressure_diagnostic.get(
+                    'vapor_pressure_numerator_provenance', {}
+                )
+                or {}
+            )
+            for species_id in reported_activities:
+                if not activity_provider_id or activity_standard_state is None:
+                    continue
+                evidence = (
                     f'{activity_provider_id}:'
                     f'{activity_evidence_owner}[{species_id}]'
                 )
-                for species_id in reported_activities
-                if activity_provider_id and activity_standard_state is not None
-            }
+                if species_id not in {
+                    'PO', 'PO2', 'P2', 'P4', 'P4O6', 'P4O10'
+                }:
+                    # b-133 authority annotations are a key-scoped P overlay.
+                    # Preserve every existing hot-train channel's pre-b-133
+                    # evidence token byte-for-byte.
+                    activity_evidence_refs[str(species_id)] = evidence
+                    continue
+                provenance = dict(activity_provenance.get(species_id) or {})
+                authority_status = provenance.get(
+                    'melt_oxide_activity_authority_status'
+                )
+                gamma_range = provenance.get('melt_oxide_gamma_valid_range_K')
+                activity_basis = (
+                    'parent_oxide'
+                    if provenance.get('equivalent_parent_oxide_activity')
+                    == reported_activities.get(species_id)
+                    else 'reported_component'
+                )
+                if authority_status:
+                    evidence += f';authority_status={authority_status}'
+                if gamma_range:
+                    evidence += f';gamma_valid_range_K={tuple(gamma_range)}'
+                evidence += f';activity_basis={activity_basis}'
+                activity_evidence_refs[str(species_id)] = evidence
             activity_standard_states = {
                 str(species_id): activity_standard_state
                 for species_id in reported_activities
                 if activity_provider_id and activity_standard_state is not None
             }
+            campaign = getattr(self.melt, 'campaign', None)
+            campaign_name = str(getattr(campaign, 'name', '') or '')
+            # Keep the global request phase on the legacy hot-train contract.
+            # Stage-0 phosphorus is a narrow marker consumed only by stage0-only
+            # rules sourced from P2O5; flipping the whole phase to stage0 changes
+            # unrelated Na/Fe/channel eligibility.
+            request_stage = (
+                'c0b_p_cleanup'
+                if campaign_name == 'C0B'
+                else (
+                    'stage0_p_carriers'
+                    if campaign_name == 'C0'
+                    else 'evaporation'
+                )
+            )
+            effective_pressure_species_ids = effective_pressure_source.species_ids
+            if campaign_name == 'C0B':
+                effective_pressure_species_ids = frozenset(
+                    species_id
+                    for species_id in effective_pressure_species_ids
+                    if species_id in {'PO', 'PO2', 'P2', 'P4', 'P4O6', 'P4O10'}
+                )
             batch = builder(
                 temperature_K=float(temperature_K),
                 process_phase='hot_train',
-                stage='evaporation',
+                stage=request_stage,
                 total_pressure_Pa=total_pressure_Pa,
                 fO2_bar=(
                     float(transport_pO2_bar)
@@ -2132,9 +2206,7 @@ class EvaporationMixin:
                 ),
                 flux_activation_context=FluxActivationContext(
                     epoch=FLUX_ACTIVATION_EPOCH_PRE_RG,
-                    effective_pressure_species_ids=(
-                        effective_pressure_source.species_ids
-                    ),
+                    effective_pressure_species_ids=effective_pressure_species_ids,
                 ),
             )
         except Exception as exc:  # noqa: BLE001 — typed failure, not live fallback
@@ -2233,6 +2305,9 @@ class EvaporationMixin:
             'alpha': _load_evaporation_alpha_by_species(self.vapor_pressures),
             'alpha_envelope': _load_evaporation_alpha_envelope_by_species(
                 self.vapor_pressures
+            ),
+            'hkl_upper_bound_transport_species': (
+                _load_hkl_upper_bound_transport_species(self.vapor_pressures)
             ),
             'allow_unmeasured_alpha_fallback': kernel_config.get(
                 'allow_unmeasured_alpha_fallback', False

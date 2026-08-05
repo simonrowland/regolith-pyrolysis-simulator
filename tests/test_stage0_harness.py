@@ -69,8 +69,33 @@ def test_default_max_stage0_hours_derives_from_setpoints():
     assert default_max_stage0_hours(setpoints) == pytest.approx(expected)
 
 
-def test_real_feedstock_stops_at_c0b_path_ab_pause():
+def test_real_feedstock_stops_at_c0b_path_ab_pause(monkeypatch):
     session = SimSession().start(_session_config("lunar_mare_low_ti"))
+    ledger = session.simulator.atom_ledger
+    initial_p2o5_mol = ledger.mol_by_account("process.cleaned_melt").get(
+        "P2O5", 0.0
+    )
+    initial_p_atoms = sum(
+        ledger.atom_moles_by_account(account).get("P", 0.0)
+        for account in ledger.mol_by_account()
+    )
+    original_advance = session.advance
+    c0b_entry: dict[str, float | int] = {}
+
+    def advance_with_c0b_boundary():
+        previous_campaign = session.simulator.melt.campaign
+        step = original_advance()
+        if (
+            previous_campaign != CampaignPhase.C0B
+            and session.simulator.melt.campaign == CampaignPhase.C0B
+        ):
+            c0b_entry["p2o5_mol"] = ledger.mol_by_account(
+                "process.cleaned_melt"
+            ).get("P2O5", 0.0)
+            c0b_entry["transition_count"] = len(ledger.transitions)
+        return step
+
+    monkeypatch.setattr(session, "advance", advance_with_c0b_boundary)
     result = run_stage0_harness(session)
 
     assert result.early_melt_reached is True
@@ -81,6 +106,81 @@ def test_real_feedstock_stops_at_c0b_path_ab_pause():
     assert result.cleaned_melt_kg
     assert result.verdicts is not None
     assert result.verdicts["verdict_a"]["warn_only"] is True
+
+    # b-133: C0b is a real P cleanup, not a label over zero removal.  The
+    # atom-balanced evaporation transition must debit melt P2O5 and retain the
+    # carrier phosphorus in the offgas account.  HI-2 closes the whole ledger.
+    final_p2o5_mol = ledger.mol_by_account("process.cleaned_melt").get(
+        "P2O5", 0.0
+    )
+    final_p_atoms = sum(
+        ledger.atom_moles_by_account(account).get("P", 0.0)
+        for account in ledger.mol_by_account()
+    )
+    offgas_p_atoms = ledger.atom_moles_by_account("terminal.offgas").get(
+        "P", 0.0
+    )
+    assert initial_p2o5_mol > 0.0
+    assert final_p2o5_mol < initial_p2o5_mol
+    assert c0b_entry
+    assert final_p2o5_mol < c0b_entry["p2o5_mol"]
+    # Trace-removal regression floor, not a process-efficacy claim.  This is
+    # six orders above binary64 resolution at the ~7 mol inventory scale and
+    # prevents an arbitrarily tiny positive float from satisfying C0b.
+    assert c0b_entry["p2o5_mol"] - final_p2o5_mol > 1.0e-9
+    c0b_transitions = ledger.transitions[int(c0b_entry["transition_count"]) :]
+    c0b_p_transitions = [
+        transition
+        for transition in c0b_transitions
+        if transition.debit_atom_moles(ledger.registry).get("P", 0.0) > 0.0
+    ]
+    assert c0b_p_transitions
+    assert all(
+        transition.credit_atom_moles(ledger.registry).get("P", 0.0)
+        == pytest.approx(
+            transition.debit_atom_moles(ledger.registry).get("P", 0.0),
+            rel=1.0e-12,
+            abs=1.0e-18,
+        )
+        for transition in c0b_p_transitions
+    )
+    # Hourly overhead bleed has moved most retained carrier P into the terminal
+    # product account at this pause; the remainder stays in the real overhead
+    # account and is included by the exact all-account P closure above.
+    assert offgas_p_atoms > 0.0
+    assert final_p_atoms == pytest.approx(initial_p_atoms, rel=1.0e-10, abs=1.0e-10)
+    assert ledger.close_report()["balanced"] is True
+    assert abs(session.simulator._make_snapshot().mass_balance_error_pct) <= 5.0e-12
+
+    carriers = {"PO", "PO2", "P2", "P4", "P4O6", "P4O10"}
+    flux_overlay = session.simulator._last_vapour_batch_flux_overlay
+    channel_states = flux_overlay["batch_channel_states"]
+    assert carriers <= set(channel_states)
+    assert channel_states["P2O5_gas"] == "refusal"
+    assert "P2O5_gas" not in flux_overlay["batch_pa_by_species"]
+    assert {species: channel_states[species] for species in carriers} == {
+        species: "eligible" for species in carriers
+    }
+    batch_report = session.simulator._last_vapour_batch_report
+    channels = batch_report["channels_by_species"]
+    retired_channel = channels["P2O5_gas"]
+    assert retired_channel["is_refused"] is True
+    assert retired_channel["is_union_flux_eligible"] is False
+    assert retired_channel["flux"]["kind"] == "refusal"
+    for species in carriers:
+        extra = channels[species]["extra"]
+        assert extra["alpha_authority_status"] == "analytical_upper_bound"
+        assert extra["alpha_inventory_policy"] == (
+            "inventory_eligible_analytical_upper_bound_noncertifying"
+        )
+    assert "P2O5_gas" not in ledger.mol_by_account("terminal.offgas")
+    assert all(
+        all(
+            "P2O5_gas" not in lot.species_kg
+            for lot in (*transition.debits, *transition.credits)
+        )
+        for transition in c0b_transitions
+    )
 
 
 def test_debug_feedstock_stops_on_campaign_leave():

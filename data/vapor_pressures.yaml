@@ -2,6 +2,570 @@ schema_version: 2
 description: Composite hot-vapour authority grouped by co-evolving family into physical properties, fiat
   routing, vaporisation coefficients, and code metadata. Legacy runtime shapes are compiler projections
   only.
+cea_phosphorus_thermo:
+  O2: &cea_O2_nasa9
+    cea_name: O2
+    evaluator_family: nasa_cea_9
+    standard_state: gas
+    phase_flag: 0
+    formula: O2
+    formula_tokens:
+    - O
+    - '2.00'
+    molecular_weight_g_per_mol: 31.9988
+    delta_f_H_298_15_J_per_mol: 0.0
+    source_ref_code: tpis89
+    citation: Ref-Elm. Gurvich,1989 pt1 p94 pt2 p9.
+    reference_pressure_Pa: 100000.0
+    reference_pressure_convention: CEA_JANAF_1_bar
+    n_intervals: 3
+    source_n_intervals: 3
+    segments:
+    - T_min_K: 200.0
+      T_max_K: 1000.0
+      exponents:
+      - -2.0
+      - -1.0
+      - 0.0
+      - 1.0
+      - 2.0
+      - 3.0
+      - 4.0
+      - 0.0
+      a_coefficients:
+      - -34255.6342
+      - 484.700097
+      - 1.119010961
+      - 0.00429388924
+      - -6.83630052e-07
+      - -2.0233727e-09
+      - 1.039040018e-12
+      b1: -3391.45487
+      b2: 18.4969947
+    - T_min_K: 1000.0
+      T_max_K: 6000.0
+      exponents:
+      - -2.0
+      - -1.0
+      - 0.0
+      - 1.0
+      - 2.0
+      - 3.0
+      - 4.0
+      - 0.0
+      a_coefficients:
+      - -1037939.022
+      - 2344.830282
+      - 1.819732036
+      - 0.001267847582
+      - -2.188067988e-07
+      - 2.053719572e-11
+      - -8.19346705e-16
+      b1: -16890.10929
+      b2: 17.38716506
+    - T_min_K: 6000.0
+      T_max_K: 20000.0
+      exponents:
+      - -2.0
+      - -1.0
+      - 0.0
+      - 1.0
+      - 2.0
+      - 3.0
+      - 4.0
+      - 0.0
+      a_coefficients:
+      - 497529430.0
+      - -286610.6874
+      - 66.9035225
+      - -0.00616995902
+      - 3.016396027e-07
+      - -7.4214166e-12
+      - 7.27817577e-17
+      b1: 2293554.027
+      b2: -553.062161
+    domain_K:
+    - 200.0
+    - 20000.0
+  PO: &cea_PO_nasa9
+    cea_name: PO
+    evaluator_family: nasa_cea_9
+    standard_state: gas
+    phase_flag: 0
+    formula: PO
+    formula_tokens:
+    - P
+    - '1.00'
+    - O
+    - '1.00'
+    molecular_weight_g_per_mol: 46.973161
+    delta_f_H_298_15_J_per_mol: -27857.687
+    source_ref_code: tpis89
+    citation: Gurvich,1989 pt1 p404 pt2 p258.
+    reference_pressure_Pa: 100000.0
+    reference_pressure_convention: CEA_JANAF_1_bar
+    n_intervals: 2
+    source_n_intervals: 2
+    segments:
+    - T_min_K: 300.0
+      T_max_K: 1000.0
+      exponents:
+      - -2.0
+      - -1.0
+      - 0.0
+      - 1.0
+      - 2.0
+      - 3.0
+      - 4.0
+      - 0.0
+      a_coefficients:
+      - -68457.5406
+      - 1141.295708
+      - -2.77955606
+      - 0.01678458047
+      - -1.974879516e-05
+      - 1.19260232e-08
+      - -2.927460912e-12
+      b1: -9847.74504
+      b2: 41.84328297
+    - T_min_K: 1000.0
+      T_max_K: 6000.0
+      exponents:
+      - -2.0
+      - -1.0
+      - 0.0
+      - 1.0
+      - 2.0
+      - 3.0
+      - 4.0
+      - 0.0
+      a_coefficients:
+      - -336666.744
+      - 622.935584
+      - 3.56560546
+      - 0.000651662072
+      - -2.061770841e-07
+      - 3.18441323e-11
+      - -1.573691908e-15
+      b1: -8939.79039
+      b2: 6.954859188
+    domain_K:
+    - 300.0
+    - 6000.0
+  PO2: &cea_PO2_nasa9
+    cea_name: PO2
+    evaluator_family: nasa_cea_9
+    standard_state: gas
+    phase_flag: 0
+    formula: PO2
+    formula_tokens:
+    - P
+    - '1.00'
+    - O
+    - '2.00'
+    molecular_weight_g_per_mol: 62.972561
+    delta_f_H_298_15_J_per_mol: -281527.237
+    source_ref_code: tpis89
+    citation: Gurvich,1989 pt1 p408 pt2 p260.
+    reference_pressure_Pa: 100000.0
+    reference_pressure_convention: CEA_JANAF_1_bar
+    n_intervals: 2
+    source_n_intervals: 2
+    segments:
+    - T_min_K: 300.0
+      T_max_K: 1000.0
+      exponents:
+      - -2.0
+      - -1.0
+      - 0.0
+      - 1.0
+      - 2.0
+      - 3.0
+      - 4.0
+      - 0.0
+      a_coefficients:
+      - -63726.9822
+      - 1036.741044
+      - -2.877797967
+      - 0.02278134083
+      - -2.567920328e-05
+      - 1.465060412e-08
+      - -3.3879967e-12
+      b1: -39935.4472
+      b2: 44.2530938
+    - T_min_K: 1000.0
+      T_max_K: 6000.0
+      exponents:
+      - -2.0
+      - -1.0
+      - 0.0
+      - 1.0
+      - 2.0
+      - 3.0
+      - 4.0
+      - 0.0
+      a_coefficients:
+      - 492621.099
+      - -2605.465745
+      - 9.51760561
+      - -0.001180371565
+      - 2.532912819e-07
+      - -1.789964539e-11
+      - 1.800381054e-16
+      b1: -20288.84763
+      b2: -29.69743125
+    domain_K:
+    - 300.0
+    - 6000.0
+  P2: &cea_P2_nasa9
+    cea_name: P2
+    evaluator_family: nasa_cea_9
+    standard_state: gas
+    phase_flag: 0
+    formula: P2
+    formula_tokens:
+    - P
+    - '2.00'
+    molecular_weight_g_per_mol: 61.947522
+    delta_f_H_298_15_J_per_mol: 144000.0
+    source_ref_code: tpis89
+    citation: Gurvich,1989 pt1 p398 pt2 p255.
+    reference_pressure_Pa: 100000.0
+    reference_pressure_convention: CEA_JANAF_1_bar
+    n_intervals: 2
+    source_n_intervals: 2
+    segments:
+    - T_min_K: 300.0
+      T_max_K: 1000.0
+      exponents:
+      - -2.0
+      - -1.0
+      - 0.0
+      - 1.0
+      - 2.0
+      - 3.0
+      - 4.0
+      - 0.0
+      a_coefficients:
+      - 30539.2251
+      - -324.617759
+      - 4.02246381
+      - 0.00323209479
+      - -5.51105245e-06
+      - 4.19557293e-09
+      - -1.21503218e-12
+      b1: 17969.1087
+      b2: 1.645350331
+    - T_min_K: 1000.0
+      T_max_K: 6000.0
+      exponents:
+      - -2.0
+      - -1.0
+      - 0.0
+      - 1.0
+      - 2.0
+      - 3.0
+      - 4.0
+      - 0.0
+      a_coefficients:
+      - -780693.649
+      - 2307.91087
+      - 1.41174313
+      - 0.00210823742
+      - -7.36085662e-07
+      - 1.25936012e-10
+      - -7.07975249e-15
+      b1: 1329.82474
+      b2: 21.69741365
+    domain_K:
+    - 300.0
+    - 6000.0
+  P4: &cea_P4_nasa9
+    cea_name: P4
+    evaluator_family: nasa_cea_9
+    standard_state: gas
+    phase_flag: 0
+    formula: P4
+    formula_tokens:
+    - P
+    - '4.00'
+    molecular_weight_g_per_mol: 123.895044
+    delta_f_H_298_15_J_per_mol: 58900.0
+    source_ref_code: tpis89
+    citation: Gurvich,1989 pt1 p402 pt2 p257.
+    reference_pressure_Pa: 100000.0
+    reference_pressure_convention: CEA_JANAF_1_bar
+    n_intervals: 2
+    source_n_intervals: 2
+    segments:
+    - T_min_K: 300.0
+      T_max_K: 1000.0
+      exponents:
+      - -2.0
+      - -1.0
+      - 0.0
+      - 1.0
+      - 2.0
+      - 3.0
+      - 4.0
+      - 0.0
+      a_coefficients:
+      - 120514.185
+      - -2345.71179
+      - 17.7394655
+      - -0.0145631497
+      - 1.58759409e-05
+      - -9.31471031e-09
+      - 2.27149167e-12
+      b1: 16088.4648
+      b2: -70.88590647
+    - T_min_K: 1000.0
+      T_max_K: 6000.0
+      exponents:
+      - -2.0
+      - -1.0
+      - 0.0
+      - 1.0
+      - 2.0
+      - 3.0
+      - 4.0
+      - 0.0
+      a_coefficients:
+      - -185870.586
+      - -62.8454689
+      - 10.0484488
+      - -1.98766885e-05
+      - 4.48240844e-09
+      - -5.22610367e-13
+      - 2.45579129e-17
+      b1: 3848.21092
+      b2: -24.77297797
+    domain_K:
+    - 300.0
+    - 6000.0
+  P4O6: &cea_P4O6_nasa9
+    cea_name: P4O6
+    evaluator_family: nasa_cea_9
+    standard_state: gas
+    phase_flag: 0
+    formula: P4O6
+    formula_tokens:
+    - P
+    - '4.00'
+    - O
+    - '6.00'
+    molecular_weight_g_per_mol: 219.891444
+    delta_f_H_298_15_J_per_mol: -1606000.0
+    source_ref_code: tpis89
+    citation: Gurvich,1989 pt1 p413 pt2 p266.
+    reference_pressure_Pa: 100000.0
+    reference_pressure_convention: CEA_JANAF_1_bar
+    n_intervals: 2
+    source_n_intervals: 2
+    segments:
+    - T_min_K: 300.0
+      T_max_K: 1000.0
+      exponents:
+      - -2.0
+      - -1.0
+      - 0.0
+      - 1.0
+      - 2.0
+      - 3.0
+      - 4.0
+      - 0.0
+      a_coefficients:
+      - 376089.475
+      - -5685.83262
+      - 29.1422545
+      - 0.0225153212
+      - -4.51026963e-05
+      - 3.58831269e-08
+      - -1.05757206e-11
+      b1: -168856.248
+      b2: -145.1359851
+    - T_min_K: 1000.0
+      T_max_K: 6000.0
+      exponents:
+      - -2.0
+      - -1.0
+      - 0.0
+      - 1.0
+      - 2.0
+      - 3.0
+      - 4.0
+      - 0.0
+      a_coefficients:
+      - -1008997.24
+      - -887.275399
+      - 28.6606483
+      - -0.000263601894
+      - 5.81094072e-08
+      - -6.64808696e-12
+      - 3.07439193e-16
+      b1: -199713.89
+      b2: -128.1853821
+    domain_K:
+    - 300.0
+    - 6000.0
+  P4O10: &cea_P4O10_nasa9
+    cea_name: P4O10
+    evaluator_family: nasa_cea_9
+    standard_state: gas
+    phase_flag: 0
+    formula: P4O10
+    formula_tokens:
+    - P
+    - '4.00'
+    - O
+    - '10.00'
+    molecular_weight_g_per_mol: 283.889044
+    delta_f_H_298_15_J_per_mol: -2906223.447
+    source_ref_code: tpis89
+    citation: Gurvich,1989 pt1 p419 pt2 p271.
+    reference_pressure_Pa: 100000.0
+    reference_pressure_convention: CEA_JANAF_1_bar
+    n_intervals: 2
+    source_n_intervals: 2
+    segments:
+    - T_min_K: 300.0
+      T_max_K: 1000.0
+      exponents:
+      - -2.0
+      - -1.0
+      - 0.0
+      - 1.0
+      - 2.0
+      - 3.0
+      - 4.0
+      - 0.0
+      a_coefficients:
+      - 167014.2268
+      - -2540.2433
+      - 11.36853403
+      - 0.0913781216
+      - -0.0001231990626
+      - 8.08103223e-08
+      - -2.106787011e-11
+      b1: -341015.191
+      b2: -46.4343134
+    - T_min_K: 1000.0
+      T_max_K: 6000.0
+      exponents:
+      - -2.0
+      - -1.0
+      - 0.0
+      - 1.0
+      - 2.0
+      - 3.0
+      - 4.0
+      - 0.0
+      a_coefficients:
+      - -1337201.132
+      - -3516.38233
+      - 42.6040331
+      - -0.001037406404
+      - 2.287613089e-07
+      - -2.620219946e-11
+      - 1.213529528e-15
+      b1: -345951.505
+      b2: -211.5498906
+    domain_K:
+    - 300.0
+    - 6000.0
+  P4O10_liquid: &cea_P4O10_liquid_nasa9
+    cea_name: P4O10(L)
+    evaluator_family: nasa_cea_9
+    standard_state: condensed_liquid
+    phase_flag: 3
+    formula: P4O10
+    formula_tokens:
+    - P
+    - '4.00'
+    - O
+    - '10.00'
+    molecular_weight_g_per_mol: 283.889044
+    delta_f_H_298_15_J_per_mol: -3010100.0
+    source_ref_code: tpis89
+    citation: Liquid. Gurvich,1989 pt1 p417 pt2 p270.
+    reference_pressure_Pa: 101325.0
+    reference_pressure_convention: CEA_condensed_1_atm
+    n_intervals: 1
+    source_n_intervals: 1
+    segments:
+    - T_min_K: 699.0
+      T_max_K: 6000.0
+      exponents:
+      - -2.0
+      - -1.0
+      - 0.0
+      - 1.0
+      - 2.0
+      - 3.0
+      - 4.0
+      - 0.0
+      a_coefficients:
+      - 0.0
+      - 0.0
+      - 44.50051777
+      - 0.0
+      - 0.0
+      - 0.0
+      - 0.0
+      b1: -376552.391
+      b2: -231.1704609
+    domain_K:
+    - 699.0
+    - 6000.0
+  # CEA supplies P4O10(L), while the melt ledger/activity component is P2O5.
+  # NASA9 G°/(RT) is linear in every polynomial coefficient, so multiplying
+  # the full P4O10(L) record by 1/2 gives the thermodynamically identical
+  # one-mole P2O5 component basis used by the reactions below.  This is not a
+  # P2O5(g) surrogate and carries the same Gurvich/CEA liquid evidence tier.
+  P2O5_liquid_component_basis: &cea_P2O5_liquid_basis_nasa9
+    cea_name: 0.5 P4O10(L) on P2O5 component basis
+    evaluator_family: nasa_cea_9
+    standard_state: condensed_liquid
+    phase_flag: 3
+    formula: P2O5
+    formula_tokens:
+    - P
+    - '2.00'
+    - O
+    - '5.00'
+    molecular_weight_g_per_mol: 141.944522
+    delta_f_H_298_15_J_per_mol: -1505050.0
+    source_ref_code: tpis89_scaled_half_p4o10_liquid
+    citation: Gurvich 1989 P4O10(L), CEA thermo.inp; coefficients scaled by 0.5 to the P2O5 component basis
+    reference_pressure_Pa: 101325.0
+    reference_pressure_convention: CEA_condensed_1_atm
+    n_intervals: 1
+    source_n_intervals: 1
+    segments:
+    - T_min_K: 699.0
+      T_max_K: 6000.0
+      exponents:
+      - -2.0
+      - -1.0
+      - 0.0
+      - 1.0
+      - 2.0
+      - 3.0
+      - 4.0
+      - 0.0
+      a_coefficients:
+      - 0.0
+      - 0.0
+      - 22.250258885
+      - 0.0
+      - 0.0
+      - 0.0
+      - 0.0
+      b1: -188276.1955
+      b2: -115.58523045
+    domain_K:
+    - 699.0
+    - 6000.0
 families:
   metals_na_family:
     physical_properties:
@@ -3062,6 +3626,8 @@ families:
             provenance:
             - source: schema_v1_in_place_migration
             evaluator_family: tabulated_equilibrium
+            # Schema-v2's only non-executable pressure-model sentinel. The
+            # retirement fields above are controlling; no acquisition is queued.
             availability: unavailable_pending_acquisition
     fiat_routing:
       plant_bin: null
@@ -7735,33 +8301,90 @@ families:
         PO:
           formula: PO
           chemical_family: phosphorus_carrier
-          acquisition_status: REVIEWABLE_JANAF_GAS_PLUS_REACTION_TEMPLATE
-          runtime_disposition: dormant_pending_owner_physics_review
-          flux_dormant: true
-          notes: "P-carrier from vp-acquire-5/P-carriers.md. tier=P_DOMINANT_REDUCED; status=REVIEWABLE_JANAF_GAS_PLUS_REACTION_TEMPLATE.\
-            \ ADOPT gas identity + JANAF thermo. Partial pressure requires melt\na(P2O5) and fO2 via the\
-            \ standard_reaction below. Do not invent Antoine\nfor pure PO(s/l) (no such reservoir).\n\
-            \ P2O5_gas cannot substitute for this carrier. DRAFT dormant. P2O5_gas is a VapoRock collision-gas\
-            \ placeholder and MUST NOT substitute for this carrier."
+          molar_mass_g_mol: 46.973161998
+          parent_oxide: P2O5
+          stoich_oxide_per_vapor: 1.5109024672856537
+          stoich_O2_per_vapor: 0.5109024672856538
+          source_oxide_mol_per_vapor_mol: 0.5
+          source_O2_mol_per_vapor_mol: 0.75
+          oxide_activity_exponent: 0.5
+          # Premise: P2O5(melt) -> 2 PO(g) + 1.5 O2(g).
+          # Algebra: K=(p_PO/Pstd)^2 (fO2/Pstd)^1.5 / a_P2O5; p_PO/Pstd=K^0.5 a_P2O5^0.5 (fO2/Pstd)^-0.75.
+          # Units: K, activities, and p/Pstd ratios are dimensionless; the evaluator
+          # multiplies the solved ratio by Pstd=100000 Pa before HKL.
+          # Sanity: lower fO2 increases PO, as required for the dominant reduced-melt carrier.
+          pO2_exponent: -0.75
+          pO2_reference_bar: 1.0
+          authority_class: analytical_cea_grounded
+          gas_transport_model: hkl_kinetic_upper_bound_no_chapman_enskog
+          condensation_saturation_model: unavailable_source_reaction_not_psat
+          source_activity_basis: parent_oxide
+          retain_analytical_pressure_channel: true
+          acquisition_status: ACTIVE_CEA_NASA9_REACTION_THERMO
+          runtime_disposition: active_status_bearing_non_authoritative
+          flux_dormant: false
+          notes: >-
+            Real phosphorus carrier predicted from an atom-balanced P2O5 melt
+            source reaction, CEA/Gurvich NASA9 Gibbs functions, dilute P2O5
+            activity, and the HKL alpha<=1 kinetic limit. Analytical and
+            status-bearing; cannot certify.
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT - no flux; owner + physics review required before enablement
-          source_reactions: []
+            note: Analytical CEA-grounded prediction; status-bearing and cannot certify.
+          reaction:
+            formula: P2O5(l) -> 2 PO(g) + 1.5 O2(g)
+            exponent_oxide: 0.5
+            exponent_pO2: -0.75
+            basis: Atom-balanced CEA NASA9 source reaction used by the runtime evaluator.
+          source_reactions:
+          - id: p2o5_melt_to_po
+            reactants:
+            - formula: P2O5
+              stoichiometry: 1.0
+            products:
+            - formula: PO
+              stoichiometry: 2.0
+            - formula: O2
+              stoichiometry: 1.5
+            activity_input:
+              component_id: P2O5
+              standard_state:
+                convention: raoultian_pure_endmember
+                phase: liquid
+                reference_pressure_bar: 1.0
+                component_basis: raoultian_pure_endmember
+              activity_model: provider_reported_thermodynamic_activity
+              allow_henrian_upper_bound: true
+              henrian_gamma_upper_envelope: 1.0e-6
+              gamma_upper_envelope_evidence: Turkdogan 2000 via Sossi and Fegley 2018 Table 2; gamma_PO2.5=1e-6..1e-10 in CMFS melts at 1823-1923 K
+              compound_bearing: false
+              require_assemblage_match: false
           pressure_models:
-          - fit_target: equilibrium_partial_pressure
+          - fit_target: standard_reaction_term
             pressure_kind: equilibrium_partial_pressure
             species_basis: monomer
             valid_domain:
               temperature_K:
-              - 298.15
+              - 699.0
               - 2500.0
             provenance:
-            - source: docs-private/research/2026-07-30-vp-acquire-5/P-carriers.md
-              tier: P_DOMINANT_REDUCED
-              acquisition_status: REVIEWABLE_JANAF_GAS_PLUS_REACTION_TEMPLATE
-            evaluator_family: tabulated_equilibrium
-            availability: unavailable_pending_acquisition
+            - source: NASA CEA thermo.inp; Gurvich/JANAF gas and P4O10(L) records
+              evidence_tier: analytical_cea_grounded
+              status: status_bearing_non_authoritative_cannot_certify
+            evaluator_family: nasa_cea_9
+            source_reaction_id: p2o5_melt_to_po
+            activity_semantics: source_reaction_activity
+            oxygen_fugacity_channel: intrinsic_melt
+            species_thermo:
+              P2O5: *cea_P2O5_liquid_basis_nasa9
+              PO: *cea_PO_nasa9
+              O2: *cea_O2_nasa9
+            activity_exponent: 0.5
+            pO2_exponent: -0.75
+            pO2_reference_bar: 1.0
+            reference_pressure_Pa: 100000.0
+            compatibility_omit_antoine: false
           not_substitutable_by:
           - P2O5_gas
           janaf:
@@ -7850,32 +8473,45 @@ families:
             phase: ideal_gas
     fiat_routing:
       plant_bin: null
-      engineering_capture_policy: temperature_threshold
+      engineering_capture_policy: retain_in_overhead_gas_pending_condensation_model
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT - no flux; owner + physics review required before enablement
+      evidence_gate: analytical CEA-grounded; status-bearing/non-authoritative; cannot certify
       compatibility_fields:
-        flux_dormant: true
-        consumer_status: inactive
+        flux_dormant: false
+        consumer_status: active
+        hot_train_applicability: stage0_only
     vaporisation_coefficients:
       evaporation_alpha:
-        status: no_data
-        policy: refuse_nonzero_flux
-        compatibility_policy_field: refuse_nonzero_flux
-      alpha_domain_and_uncertainty: {}
+        value: 1.0
+        status: analytical_upper_bound
+        source: Hertz-Knudsen-Langmuir kinetic ceiling alpha<=1; no carrier-specific measurement
+        T_band_K:
+        - 699.0
+        - 2500.0
+        envelope:
+        - 0.0
+        - 1.0
+        tier: 3
+      alpha_domain_and_uncertainty:
+        interpretation: upper_bound_not_point
+        temperature_K:
+        - 699.0
+        - 2500.0
+        admissible_range:
+        - 0.0
+        - 1.0
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: vapour_pressure_pending_acquisition:PO
+      acquisition_flag: analytical_upper_bound_alpha:PO
     code_metadata:
       formula_id: PO
       source_account: process.cleaned_melt
-      request_rule: dormant_pending_validation
+      request_rule: stage0_only
       solve_group_id: phosphorus_carriers_family
-      compatibility_projection: dormant_acquisition
+      compatibility_projection: oxide_vapors
       canonical_aliases: []
-      hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
-        / VR-16
+      hot_train_applicability: stage0_only
       yaml_quote_species_id: false
       chemical_family: phosphorus_carrier
   phosphorus_PO2_family:
@@ -7884,33 +8520,90 @@ families:
         PO2:
           formula: PO2
           chemical_family: phosphorus_carrier
-          acquisition_status: REVIEWABLE_JANAF_GAS_PLUS_REACTION_TEMPLATE
-          runtime_disposition: dormant_pending_owner_physics_review
-          flux_dormant: true
-          notes: "P-carrier from vp-acquire-5/P-carriers.md. tier=P_SECONDARY_INTERMEDIATE; status=REVIEWABLE_JANAF_GAS_PLUS_REACTION_TEMPLATE.\
-            \ ADOPT gas identity + JANAF thermo. Secondary to PO under reduced lunar\nconditions; rises\
-            \ relative to PO as fO2 increases (weaker negative exponent).\n P2O5_gas cannot substitute\
-            \ for this carrier. DRAFT dormant. P2O5_gas is a VapoRock collision-gas placeholder and MUST\
-            \ NOT substitute for this carrier."
+          molar_mass_g_mol: 62.972561998
+          parent_oxide: P2O5
+          stoich_oxide_per_vapor: 1.1270331295518468
+          stoich_O2_per_vapor: 0.12703312955184684
+          source_oxide_mol_per_vapor_mol: 0.5
+          source_O2_mol_per_vapor_mol: 0.25
+          oxide_activity_exponent: 0.5
+          # Premise: P2O5(melt) -> 2 PO2(g) + 0.5 O2(g).
+          # Algebra: K=(p_PO2/Pstd)^2 (fO2/Pstd)^0.5 / a_P2O5; p_PO2/Pstd=K^0.5 a_P2O5^0.5 (fO2/Pstd)^-0.25.
+          # Units: K, activities, and p/Pstd ratios are dimensionless; the evaluator
+          # multiplies the solved ratio by Pstd=100000 Pa before HKL.
+          # Sanity: lower fO2 increases PO2, but less strongly than PO.
+          pO2_exponent: -0.25
+          pO2_reference_bar: 1.0
+          authority_class: analytical_cea_grounded
+          gas_transport_model: hkl_kinetic_upper_bound_no_chapman_enskog
+          condensation_saturation_model: unavailable_source_reaction_not_psat
+          source_activity_basis: parent_oxide
+          retain_analytical_pressure_channel: true
+          acquisition_status: ACTIVE_CEA_NASA9_REACTION_THERMO
+          runtime_disposition: active_status_bearing_non_authoritative
+          flux_dormant: false
+          notes: >-
+            Real phosphorus carrier predicted from an atom-balanced P2O5 melt
+            source reaction, CEA/Gurvich NASA9 Gibbs functions, dilute P2O5
+            activity, and the HKL alpha<=1 kinetic limit. Analytical and
+            status-bearing; cannot certify.
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT - no flux; owner + physics review required before enablement
-          source_reactions: []
+            note: Analytical CEA-grounded prediction; status-bearing and cannot certify.
+          reaction:
+            formula: P2O5(l) -> 2 PO2(g) + 0.5 O2(g)
+            exponent_oxide: 0.5
+            exponent_pO2: -0.25
+            basis: Atom-balanced CEA NASA9 source reaction used by the runtime evaluator.
+          source_reactions:
+          - id: p2o5_melt_to_po2
+            reactants:
+            - formula: P2O5
+              stoichiometry: 1.0
+            products:
+            - formula: PO2
+              stoichiometry: 2.0
+            - formula: O2
+              stoichiometry: 0.5
+            activity_input:
+              component_id: P2O5
+              standard_state:
+                convention: raoultian_pure_endmember
+                phase: liquid
+                reference_pressure_bar: 1.0
+                component_basis: raoultian_pure_endmember
+              activity_model: provider_reported_thermodynamic_activity
+              allow_henrian_upper_bound: true
+              henrian_gamma_upper_envelope: 1.0e-6
+              gamma_upper_envelope_evidence: Turkdogan 2000 via Sossi and Fegley 2018 Table 2; gamma_PO2.5=1e-6..1e-10 in CMFS melts at 1823-1923 K
+              compound_bearing: false
+              require_assemblage_match: false
           pressure_models:
-          - fit_target: equilibrium_partial_pressure
+          - fit_target: standard_reaction_term
             pressure_kind: equilibrium_partial_pressure
             species_basis: monomer
             valid_domain:
               temperature_K:
-              - 298.15
+              - 699.0
               - 2500.0
             provenance:
-            - source: docs-private/research/2026-07-30-vp-acquire-5/P-carriers.md
-              tier: P_SECONDARY_INTERMEDIATE
-              acquisition_status: REVIEWABLE_JANAF_GAS_PLUS_REACTION_TEMPLATE
-            evaluator_family: tabulated_equilibrium
-            availability: unavailable_pending_acquisition
+            - source: NASA CEA thermo.inp; Gurvich/JANAF gas and P4O10(L) records
+              evidence_tier: analytical_cea_grounded
+              status: status_bearing_non_authoritative_cannot_certify
+            evaluator_family: nasa_cea_9
+            source_reaction_id: p2o5_melt_to_po2
+            activity_semantics: source_reaction_activity
+            oxygen_fugacity_channel: intrinsic_melt
+            species_thermo:
+              P2O5: *cea_P2O5_liquid_basis_nasa9
+              PO2: *cea_PO2_nasa9
+              O2: *cea_O2_nasa9
+            activity_exponent: 0.5
+            pO2_exponent: -0.25
+            pO2_reference_bar: 1.0
+            reference_pressure_Pa: 100000.0
+            compatibility_omit_antoine: false
           not_substitutable_by:
           - P2O5_gas
           janaf:
@@ -7986,32 +8679,45 @@ families:
             phase: ideal_gas
     fiat_routing:
       plant_bin: null
-      engineering_capture_policy: temperature_threshold
+      engineering_capture_policy: retain_in_overhead_gas_pending_condensation_model
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT - no flux; owner + physics review required before enablement
+      evidence_gate: analytical CEA-grounded; status-bearing/non-authoritative; cannot certify
       compatibility_fields:
-        flux_dormant: true
-        consumer_status: inactive
+        flux_dormant: false
+        consumer_status: active
+        hot_train_applicability: stage0_only
     vaporisation_coefficients:
       evaporation_alpha:
-        status: no_data
-        policy: refuse_nonzero_flux
-        compatibility_policy_field: refuse_nonzero_flux
-      alpha_domain_and_uncertainty: {}
+        value: 1.0
+        status: analytical_upper_bound
+        source: Hertz-Knudsen-Langmuir kinetic ceiling alpha<=1; no carrier-specific measurement
+        T_band_K:
+        - 699.0
+        - 2500.0
+        envelope:
+        - 0.0
+        - 1.0
+        tier: 3
+      alpha_domain_and_uncertainty:
+        interpretation: upper_bound_not_point
+        temperature_K:
+        - 699.0
+        - 2500.0
+        admissible_range:
+        - 0.0
+        - 1.0
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: vapour_pressure_pending_acquisition:PO2
+      acquisition_flag: analytical_upper_bound_alpha:PO2
     code_metadata:
       formula_id: PO2
       source_account: process.cleaned_melt
-      request_rule: dormant_pending_validation
+      request_rule: stage0_only
       solve_group_id: phosphorus_carriers_family
-      compatibility_projection: dormant_acquisition
+      compatibility_projection: oxide_vapors
       canonical_aliases: []
-      hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
-        / VR-16
+      hot_train_applicability: stage0_only
       yaml_quote_species_id: false
       chemical_family: phosphorus_carrier
   phosphorus_P4O6_family:
@@ -8020,33 +8726,90 @@ families:
         P4O6:
           formula: P4O6
           chemical_family: phosphorus_carrier
-          acquisition_status: UNCERTAIN_THERMO_BUT_SPECIES_REAL
-          runtime_disposition: dormant_pending_owner_physics_review
-          flux_dormant: true
-          notes: "P-carrier from vp-acquire-5/P-carriers.md. tier=P_POLYMER_MODERATE_OXIDIZED; status=UNCERTAIN_THERMO_BUT_SPECIES_REAL.\
-            \ ADOPT species identity and reaction template. DO NOT promote JANAF\nnumerical K as authoritative\
-            \ until owner picks a thermo branch\n(JANAF vs Bains2023/Smoes-Drowart family). B23: JANAF\
-            \ over-stabilizes P4O6.\n P2O5_gas cannot substitute for this carrier. DRAFT dormant. P2O5_gas\
-            \ is a VapoRock collision-gas placeholder and MUST NOT substitute for this carrier."
+          molar_mass_g_mol: 219.891447992
+          parent_oxide: P2O5
+          stoich_oxide_per_vapor: 1.2910376873446114
+          stoich_O2_per_vapor: 0.2910376873446116
+          source_oxide_mol_per_vapor_mol: 2.0
+          source_O2_mol_per_vapor_mol: 2.0
+          oxide_activity_exponent: 2.0
+          # Premise: 2 P2O5(melt) -> P4O6(g) + 2 O2(g).
+          # Algebra: K=(p_P4O6/Pstd) (fO2/Pstd)^2 / a_P2O5^2; p_P4O6/Pstd=K a_P2O5^2 (fO2/Pstd)^-2.
+          # Units: K, activities, and p/Pstd ratios are dimensionless; the evaluator
+          # multiplies the solved ratio by Pstd=100000 Pa before HKL.
+          # Sanity: lower fO2 strongly increases the reduced oxide P4O6.
+          pO2_exponent: -2.0
+          pO2_reference_bar: 1.0
+          authority_class: analytical_cea_grounded
+          gas_transport_model: hkl_kinetic_upper_bound_no_chapman_enskog
+          condensation_saturation_model: unavailable_source_reaction_not_psat
+          source_activity_basis: parent_oxide
+          retain_analytical_pressure_channel: true
+          acquisition_status: ACTIVE_CEA_NASA9_REACTION_THERMO
+          runtime_disposition: active_status_bearing_non_authoritative
+          flux_dormant: false
+          notes: >-
+            Real phosphorus carrier predicted from an atom-balanced P2O5 melt
+            source reaction, CEA/Gurvich NASA9 Gibbs functions, dilute P2O5
+            activity, and the HKL alpha<=1 kinetic limit. Analytical and
+            status-bearing; cannot certify.
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT - no flux; owner + physics review required before enablement
-          source_reactions: []
+            note: Analytical CEA-grounded prediction; status-bearing and cannot certify.
+          reaction:
+            formula: 2 P2O5(l) -> P4O6(g) + 2 O2(g)
+            exponent_oxide: 2.0
+            exponent_pO2: -2.0
+            basis: Atom-balanced CEA NASA9 source reaction used by the runtime evaluator.
+          source_reactions:
+          - id: p2o5_melt_to_p4o6
+            reactants:
+            - formula: P2O5
+              stoichiometry: 2.0
+            products:
+            - formula: P4O6
+              stoichiometry: 1.0
+            - formula: O2
+              stoichiometry: 2.0
+            activity_input:
+              component_id: P2O5
+              standard_state:
+                convention: raoultian_pure_endmember
+                phase: liquid
+                reference_pressure_bar: 1.0
+                component_basis: raoultian_pure_endmember
+              activity_model: provider_reported_thermodynamic_activity
+              allow_henrian_upper_bound: true
+              henrian_gamma_upper_envelope: 1.0e-6
+              gamma_upper_envelope_evidence: Turkdogan 2000 via Sossi and Fegley 2018 Table 2; gamma_PO2.5=1e-6..1e-10 in CMFS melts at 1823-1923 K
+              compound_bearing: false
+              require_assemblage_match: false
           pressure_models:
-          - fit_target: equilibrium_partial_pressure
+          - fit_target: standard_reaction_term
             pressure_kind: equilibrium_partial_pressure
-            species_basis: molecular
+            species_basis: monomer
             valid_domain:
               temperature_K:
-              - 298.15
+              - 699.0
               - 2500.0
             provenance:
-            - source: docs-private/research/2026-07-30-vp-acquire-5/P-carriers.md
-              tier: P_POLYMER_MODERATE_OXIDIZED
-              acquisition_status: UNCERTAIN_THERMO_BUT_SPECIES_REAL
-            evaluator_family: tabulated_equilibrium
-            availability: unavailable_pending_acquisition
+            - source: NASA CEA thermo.inp; Gurvich/JANAF gas and P4O10(L) records
+              evidence_tier: analytical_cea_grounded
+              status: status_bearing_non_authoritative_cannot_certify
+            evaluator_family: nasa_cea_9
+            source_reaction_id: p2o5_melt_to_p4o6
+            activity_semantics: source_reaction_activity
+            oxygen_fugacity_channel: intrinsic_melt
+            species_thermo:
+              P2O5: *cea_P2O5_liquid_basis_nasa9
+              P4O6: *cea_P4O6_nasa9
+              O2: *cea_O2_nasa9
+            activity_exponent: 2.0
+            pO2_exponent: -2.0
+            pO2_reference_bar: 1.0
+            reference_pressure_Pa: 100000.0
+            compatibility_omit_antoine: false
           not_substitutable_by:
           - P2O5_gas
           janaf:
@@ -8113,32 +8876,45 @@ families:
             phase: ideal_gas
     fiat_routing:
       plant_bin: null
-      engineering_capture_policy: temperature_threshold
+      engineering_capture_policy: retain_in_overhead_gas_pending_condensation_model
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT - no flux; owner + physics review required before enablement
+      evidence_gate: analytical CEA-grounded; status-bearing/non-authoritative; cannot certify
       compatibility_fields:
-        flux_dormant: true
-        consumer_status: inactive
+        flux_dormant: false
+        consumer_status: active
+        hot_train_applicability: stage0_only
     vaporisation_coefficients:
       evaporation_alpha:
-        status: no_data
-        policy: refuse_nonzero_flux
-        compatibility_policy_field: refuse_nonzero_flux
-      alpha_domain_and_uncertainty: {}
+        value: 1.0
+        status: analytical_upper_bound
+        source: Hertz-Knudsen-Langmuir kinetic ceiling alpha<=1; no carrier-specific measurement
+        T_band_K:
+        - 699.0
+        - 2500.0
+        envelope:
+        - 0.0
+        - 1.0
+        tier: 3
+      alpha_domain_and_uncertainty:
+        interpretation: upper_bound_not_point
+        temperature_K:
+        - 699.0
+        - 2500.0
+        admissible_range:
+        - 0.0
+        - 1.0
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: vapour_pressure_pending_acquisition:P4O6
+      acquisition_flag: analytical_upper_bound_alpha:P4O6
     code_metadata:
       formula_id: P4O6
       source_account: process.cleaned_melt
-      request_rule: dormant_pending_validation
+      request_rule: stage0_only
       solve_group_id: phosphorus_carriers_family
-      compatibility_projection: dormant_acquisition
+      compatibility_projection: oxide_vapors
       canonical_aliases: []
-      hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
-        / VR-16
+      hot_train_applicability: stage0_only
       yaml_quote_species_id: false
       chemical_family: phosphorus_carrier
   phosphorus_P4O10_family:
@@ -8147,34 +8923,87 @@ families:
         P4O10:
           formula: P4O10
           chemical_family: phosphorus_carrier
-          acquisition_status: REVIEWABLE_JANAF_GAS_PURE_OXIDE_ONLY
-          runtime_disposition: dormant_pending_owner_physics_review
-          flux_dormant: true
-          notes: "P-carrier from vp-acquire-5/P-carriers.md. tier=P_POLYMER_OXIDIZED_PURE_OXIDE; status=REVIEWABLE_JANAF_GAS_PURE_OXIDE_ONLY.\
-            \ ADOPT as gas species replacing unphysical P2O5_gas for the oxidized\ntetramer end-member.\
-            \ Pure-component Psat from JANAF DeltaG_sub is\nscreening-only and ONLY for pure P4O10(s) at low\
-            \ T. NEVER use as\ndilute-melt P2O5 proxy (se5 ban). Melt path must use a_P2O5^2 reaction.\n\
-            \ P2O5_gas cannot substitute for this carrier. DRAFT dormant. P2O5_gas is a VapoRock collision-gas\
-            \ placeholder and MUST NOT substitute for this carrier."
+          molar_mass_g_mol: 283.889047992
+          parent_oxide: P2O5
+          stoich_oxide_per_vapor: 1
+          stoich_O2_per_vapor: 0
+          source_oxide_mol_per_vapor_mol: 2.0
+          source_O2_mol_per_vapor_mol: 0.0
+          oxide_activity_exponent: 2.0
+          # Premise: 2 P2O5(melt) -> P4O10(g).
+          # Algebra: K=(p_P4O10/Pstd) / a_P2O5^2; p_P4O10/Pstd=K a_P2O5^2, so the derived fO2 exponent is zero.
+          # Units: K, activities, and p/Pstd ratios are dimensionless; the evaluator
+          # multiplies the solved ratio by Pstd=100000 Pa before HKL.
+          # Sanity: oxygen-balanced polymerization is independent of fO2.
+          pO2_exponent: 0.0
+          pO2_reference_bar: 1.0
+          authority_class: analytical_cea_grounded
+          gas_transport_model: hkl_kinetic_upper_bound_no_chapman_enskog
+          condensation_saturation_model: unavailable_source_reaction_not_psat
+          source_activity_basis: parent_oxide
+          retain_analytical_pressure_channel: true
+          acquisition_status: ACTIVE_CEA_NASA9_REACTION_THERMO
+          runtime_disposition: active_status_bearing_non_authoritative
+          flux_dormant: false
+          notes: >-
+            Real phosphorus carrier predicted from an atom-balanced P2O5 melt
+            source reaction, CEA/Gurvich NASA9 Gibbs functions, dilute P2O5
+            activity, and the HKL alpha<=1 kinetic limit. Analytical and
+            status-bearing; cannot certify.
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT - no flux; owner + physics review required before enablement
-          source_reactions: []
+            note: Analytical CEA-grounded prediction; status-bearing and cannot certify.
+          reaction:
+            formula: 2 P2O5(l) -> P4O10(g)
+            exponent_oxide: 2.0
+            exponent_pO2: 0.0
+            basis: Atom-balanced CEA NASA9 source reaction used by the runtime evaluator.
+          source_reactions:
+          - id: p2o5_melt_to_p4o10
+            reactants:
+            - formula: P2O5
+              stoichiometry: 2.0
+            products:
+            - formula: P4O10
+              stoichiometry: 1.0
+            activity_input:
+              component_id: P2O5
+              standard_state:
+                convention: raoultian_pure_endmember
+                phase: liquid
+                reference_pressure_bar: 1.0
+                component_basis: raoultian_pure_endmember
+              activity_model: provider_reported_thermodynamic_activity
+              allow_henrian_upper_bound: true
+              henrian_gamma_upper_envelope: 1.0e-6
+              gamma_upper_envelope_evidence: Turkdogan 2000 via Sossi and Fegley 2018 Table 2; gamma_PO2.5=1e-6..1e-10 in CMFS melts at 1823-1923 K
+              compound_bearing: false
+              require_assemblage_match: false
           pressure_models:
-          - fit_target: equilibrium_partial_pressure
+          - fit_target: standard_reaction_term
             pressure_kind: equilibrium_partial_pressure
-            species_basis: molecular
+            species_basis: monomer
             valid_domain:
               temperature_K:
-              - 298.15
+              - 699.0
               - 2500.0
             provenance:
-            - source: docs-private/research/2026-07-30-vp-acquire-5/P-carriers.md
-              tier: P_POLYMER_OXIDIZED_PURE_OXIDE
-              acquisition_status: REVIEWABLE_JANAF_GAS_PURE_OXIDE_ONLY
-            evaluator_family: tabulated_equilibrium
-            availability: unavailable_pending_acquisition
+            - source: NASA CEA thermo.inp; Gurvich/JANAF gas and P4O10(L) records
+              evidence_tier: analytical_cea_grounded
+              status: status_bearing_non_authoritative_cannot_certify
+            evaluator_family: nasa_cea_9
+            source_reaction_id: p2o5_melt_to_p4o10
+            activity_semantics: source_reaction_activity
+            oxygen_fugacity_channel: intrinsic_melt
+            species_thermo:
+              P2O5: *cea_P2O5_liquid_basis_nasa9
+              P4O10: *cea_P4O10_nasa9
+            activity_exponent: 2.0
+            pO2_exponent: 0.0
+            pO2_reference_bar: 1.0
+            reference_pressure_Pa: 100000.0
+            compatibility_omit_antoine: false
           not_substitutable_by:
           - P2O5_gas
           janaf:
@@ -8298,32 +9127,45 @@ families:
             phase: ideal_gas
     fiat_routing:
       plant_bin: null
-      engineering_capture_policy: temperature_threshold
+      engineering_capture_policy: retain_in_overhead_gas_pending_condensation_model
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT - no flux; owner + physics review required before enablement
+      evidence_gate: analytical CEA-grounded; status-bearing/non-authoritative; cannot certify
       compatibility_fields:
-        flux_dormant: true
-        consumer_status: inactive
+        flux_dormant: false
+        consumer_status: active
+        hot_train_applicability: stage0_only
     vaporisation_coefficients:
       evaporation_alpha:
-        status: no_data
-        policy: refuse_nonzero_flux
-        compatibility_policy_field: refuse_nonzero_flux
-      alpha_domain_and_uncertainty: {}
+        value: 1.0
+        status: analytical_upper_bound
+        source: Hertz-Knudsen-Langmuir kinetic ceiling alpha<=1; no carrier-specific measurement
+        T_band_K:
+        - 699.0
+        - 2500.0
+        envelope:
+        - 0.0
+        - 1.0
+        tier: 3
+      alpha_domain_and_uncertainty:
+        interpretation: upper_bound_not_point
+        temperature_K:
+        - 699.0
+        - 2500.0
+        admissible_range:
+        - 0.0
+        - 1.0
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: vapour_pressure_pending_acquisition:P4O10
+      acquisition_flag: analytical_upper_bound_alpha:P4O10
     code_metadata:
       formula_id: P4O10
       source_account: process.cleaned_melt
-      request_rule: dormant_pending_validation
+      request_rule: stage0_only
       solve_group_id: phosphorus_carriers_family
-      compatibility_projection: dormant_acquisition
+      compatibility_projection: oxide_vapors
       canonical_aliases: []
-      hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
-        / VR-16
+      hot_train_applicability: stage0_only
       yaml_quote_species_id: false
       chemical_family: phosphorus_carrier
   phosphorus_P2_family:
@@ -8332,33 +9174,90 @@ families:
         P2:
           formula: P2
           chemical_family: phosphorus_carrier
-          acquisition_status: REVIEWABLE_JANAF_GAS
-          runtime_disposition: dormant_pending_owner_physics_review
-          flux_dormant: true
-          notes: "P-carrier from vp-acquire-5/P-carriers.md. tier=P_ELEMENTAL_EXTREME_REDUCED; status=REVIEWABLE_JANAF_GAS.\
-            \ ADOPT for elemental ladder completeness. Not a normal phosphate-melt\ncarrier at recipe\
-            \ fO2. Note Deltaf==0 for T>=1200 K (reference transition).\n P2O5_gas cannot substitute for this\
-            \ carrier. DRAFT dormant. P2O5_gas is a VapoRock collision-gas placeholder and MUST NOT substitute\
-            \ for this carrier."
+          molar_mass_g_mol: 61.947523996
+          parent_oxide: P2O5
+          stoich_oxide_per_vapor: 2.291334904768193
+          stoich_O2_per_vapor: 1.2913349047681928
+          source_oxide_mol_per_vapor_mol: 1.0
+          source_O2_mol_per_vapor_mol: 2.5
+          oxide_activity_exponent: 1.0
+          # Premise: P2O5(melt) -> P2(g) + 2.5 O2(g).
+          # Algebra: K=(p_P2/Pstd) (fO2/Pstd)^2.5 / a_P2O5; p_P2/Pstd=K a_P2O5 (fO2/Pstd)^-2.5.
+          # Units: K, activities, and p/Pstd ratios are dimensionless; the evaluator
+          # multiplies the solved ratio by Pstd=100000 Pa before HKL.
+          # Sanity: lower fO2 strongly increases elemental P2.
+          pO2_exponent: -2.5
+          pO2_reference_bar: 1.0
+          authority_class: analytical_cea_grounded
+          gas_transport_model: hkl_kinetic_upper_bound_no_chapman_enskog
+          condensation_saturation_model: unavailable_source_reaction_not_psat
+          source_activity_basis: parent_oxide
+          retain_analytical_pressure_channel: true
+          acquisition_status: ACTIVE_CEA_NASA9_REACTION_THERMO
+          runtime_disposition: active_status_bearing_non_authoritative
+          flux_dormant: false
+          notes: >-
+            Real phosphorus carrier predicted from an atom-balanced P2O5 melt
+            source reaction, CEA/Gurvich NASA9 Gibbs functions, dilute P2O5
+            activity, and the HKL alpha<=1 kinetic limit. Analytical and
+            status-bearing; cannot certify.
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT - no flux; owner + physics review required before enablement
-          source_reactions: []
+            note: Analytical CEA-grounded prediction; status-bearing and cannot certify.
+          reaction:
+            formula: P2O5(l) -> P2(g) + 2.5 O2(g)
+            exponent_oxide: 1.0
+            exponent_pO2: -2.5
+            basis: Atom-balanced CEA NASA9 source reaction used by the runtime evaluator.
+          source_reactions:
+          - id: p2o5_melt_to_p2
+            reactants:
+            - formula: P2O5
+              stoichiometry: 1.0
+            products:
+            - formula: P2
+              stoichiometry: 1.0
+            - formula: O2
+              stoichiometry: 2.5
+            activity_input:
+              component_id: P2O5
+              standard_state:
+                convention: raoultian_pure_endmember
+                phase: liquid
+                reference_pressure_bar: 1.0
+                component_basis: raoultian_pure_endmember
+              activity_model: provider_reported_thermodynamic_activity
+              allow_henrian_upper_bound: true
+              henrian_gamma_upper_envelope: 1.0e-6
+              gamma_upper_envelope_evidence: Turkdogan 2000 via Sossi and Fegley 2018 Table 2; gamma_PO2.5=1e-6..1e-10 in CMFS melts at 1823-1923 K
+              compound_bearing: false
+              require_assemblage_match: false
           pressure_models:
-          - fit_target: equilibrium_partial_pressure
+          - fit_target: standard_reaction_term
             pressure_kind: equilibrium_partial_pressure
             species_basis: monomer
             valid_domain:
               temperature_K:
-              - 298.15
-              - 1100.0
+              - 699.0
+              - 2500.0
             provenance:
-            - source: docs-private/research/2026-07-30-vp-acquire-5/P-carriers.md
-              tier: P_ELEMENTAL_EXTREME_REDUCED
-              acquisition_status: REVIEWABLE_JANAF_GAS
-            evaluator_family: tabulated_equilibrium
-            availability: unavailable_pending_acquisition
+            - source: NASA CEA thermo.inp; Gurvich/JANAF gas and P4O10(L) records
+              evidence_tier: analytical_cea_grounded
+              status: status_bearing_non_authoritative_cannot_certify
+            evaluator_family: nasa_cea_9
+            source_reaction_id: p2o5_melt_to_p2
+            activity_semantics: source_reaction_activity
+            oxygen_fugacity_channel: intrinsic_melt
+            species_thermo:
+              P2O5: *cea_P2O5_liquid_basis_nasa9
+              P2: *cea_P2_nasa9
+              O2: *cea_O2_nasa9
+            activity_exponent: 1.0
+            pO2_exponent: -2.5
+            pO2_reference_bar: 1.0
+            reference_pressure_Pa: 100000.0
+            compatibility_omit_antoine: false
           not_substitutable_by:
           - P2O5_gas
           janaf:
@@ -8416,32 +9315,45 @@ families:
             phase: ideal_gas
     fiat_routing:
       plant_bin: null
-      engineering_capture_policy: temperature_threshold
+      engineering_capture_policy: retain_in_overhead_gas_pending_condensation_model
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT - no flux; owner + physics review required before enablement
+      evidence_gate: analytical CEA-grounded; status-bearing/non-authoritative; cannot certify
       compatibility_fields:
-        flux_dormant: true
-        consumer_status: inactive
+        flux_dormant: false
+        consumer_status: active
+        hot_train_applicability: stage0_only
     vaporisation_coefficients:
       evaporation_alpha:
-        status: no_data
-        policy: refuse_nonzero_flux
-        compatibility_policy_field: refuse_nonzero_flux
-      alpha_domain_and_uncertainty: {}
+        value: 1.0
+        status: analytical_upper_bound
+        source: Hertz-Knudsen-Langmuir kinetic ceiling alpha<=1; no carrier-specific measurement
+        T_band_K:
+        - 699.0
+        - 2500.0
+        envelope:
+        - 0.0
+        - 1.0
+        tier: 3
+      alpha_domain_and_uncertainty:
+        interpretation: upper_bound_not_point
+        temperature_K:
+        - 699.0
+        - 2500.0
+        admissible_range:
+        - 0.0
+        - 1.0
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: vapour_pressure_pending_acquisition:P2
+      acquisition_flag: analytical_upper_bound_alpha:P2
     code_metadata:
       formula_id: P2
       source_account: process.cleaned_melt
-      request_rule: dormant_pending_validation
+      request_rule: stage0_only
       solve_group_id: phosphorus_carriers_family
-      compatibility_projection: dormant_acquisition
+      compatibility_projection: oxide_vapors
       canonical_aliases: []
-      hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
-        / VR-16
+      hot_train_applicability: stage0_only
       yaml_quote_species_id: false
       chemical_family: phosphorus_carrier
   phosphorus_P4_family:
@@ -8450,33 +9362,90 @@ families:
         P4:
           formula: P4
           chemical_family: phosphorus_carrier
-          acquisition_status: REVIEWABLE_JANAF_GAS
-          runtime_disposition: dormant_pending_owner_physics_review
-          flux_dormant: true
-          notes: "P-carrier from vp-acquire-5/P-carriers.md. tier=P_ELEMENTAL_EXTREME_REDUCED; status=REVIEWABLE_JANAF_GAS.\
-            \ ADOPT for elemental ladder. Dominant elemental vapour near white-P\nboiling; loses to P2\
-            \ at high T in equilibrium elemental gas.\n P2O5_gas cannot substitute for this carrier. DRAFT\
-            \ dormant. P2O5_gas is a VapoRock collision-gas placeholder and MUST NOT substitute for this\
-            \ carrier."
+          molar_mass_g_mol: 123.895047992
+          parent_oxide: P2O5
+          stoich_oxide_per_vapor: 2.291334904768193
+          stoich_O2_per_vapor: 1.2913349047681928
+          source_oxide_mol_per_vapor_mol: 2.0
+          source_O2_mol_per_vapor_mol: 5.0
+          oxide_activity_exponent: 2.0
+          # Premise: 2 P2O5(melt) -> P4(g) + 5 O2(g).
+          # Algebra: K=(p_P4/Pstd) (fO2/Pstd)^5 / a_P2O5^2; p_P4/Pstd=K a_P2O5^2 (fO2/Pstd)^-5.
+          # Units: K, activities, and p/Pstd ratios are dimensionless; the evaluator
+          # multiplies the solved ratio by Pstd=100000 Pa before HKL.
+          # Sanity: lower fO2 most strongly increases fully reduced P4.
+          pO2_exponent: -5.0
+          pO2_reference_bar: 1.0
+          authority_class: analytical_cea_grounded
+          gas_transport_model: hkl_kinetic_upper_bound_no_chapman_enskog
+          condensation_saturation_model: unavailable_source_reaction_not_psat
+          source_activity_basis: parent_oxide
+          retain_analytical_pressure_channel: true
+          acquisition_status: ACTIVE_CEA_NASA9_REACTION_THERMO
+          runtime_disposition: active_status_bearing_non_authoritative
+          flux_dormant: false
+          notes: >-
+            Real phosphorus carrier predicted from an atom-balanced P2O5 melt
+            source reaction, CEA/Gurvich NASA9 Gibbs functions, dilute P2O5
+            activity, and the HKL alpha<=1 kinetic limit. Analytical and
+            status-bearing; cannot certify.
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT - no flux; owner + physics review required before enablement
-          source_reactions: []
+            note: Analytical CEA-grounded prediction; status-bearing and cannot certify.
+          reaction:
+            formula: 2 P2O5(l) -> P4(g) + 5 O2(g)
+            exponent_oxide: 2.0
+            exponent_pO2: -5.0
+            basis: Atom-balanced CEA NASA9 source reaction used by the runtime evaluator.
+          source_reactions:
+          - id: p2o5_melt_to_p4
+            reactants:
+            - formula: P2O5
+              stoichiometry: 2.0
+            products:
+            - formula: P4
+              stoichiometry: 1.0
+            - formula: O2
+              stoichiometry: 5.0
+            activity_input:
+              component_id: P2O5
+              standard_state:
+                convention: raoultian_pure_endmember
+                phase: liquid
+                reference_pressure_bar: 1.0
+                component_basis: raoultian_pure_endmember
+              activity_model: provider_reported_thermodynamic_activity
+              allow_henrian_upper_bound: true
+              henrian_gamma_upper_envelope: 1.0e-6
+              gamma_upper_envelope_evidence: Turkdogan 2000 via Sossi and Fegley 2018 Table 2; gamma_PO2.5=1e-6..1e-10 in CMFS melts at 1823-1923 K
+              compound_bearing: false
+              require_assemblage_match: false
           pressure_models:
-          - fit_target: equilibrium_partial_pressure
+          - fit_target: standard_reaction_term
             pressure_kind: equilibrium_partial_pressure
-            species_basis: molecular
+            species_basis: monomer
             valid_domain:
               temperature_K:
-              - 298.15
+              - 699.0
               - 2500.0
             provenance:
-            - source: docs-private/research/2026-07-30-vp-acquire-5/P-carriers.md
-              tier: P_ELEMENTAL_EXTREME_REDUCED
-              acquisition_status: REVIEWABLE_JANAF_GAS
-            evaluator_family: tabulated_equilibrium
-            availability: unavailable_pending_acquisition
+            - source: NASA CEA thermo.inp; Gurvich/JANAF gas and P4O10(L) records
+              evidence_tier: analytical_cea_grounded
+              status: status_bearing_non_authoritative_cannot_certify
+            evaluator_family: nasa_cea_9
+            source_reaction_id: p2o5_melt_to_p4
+            activity_semantics: source_reaction_activity
+            oxygen_fugacity_channel: intrinsic_melt
+            species_thermo:
+              P2O5: *cea_P2O5_liquid_basis_nasa9
+              P4: *cea_P4_nasa9
+              O2: *cea_O2_nasa9
+            activity_exponent: 2.0
+            pO2_exponent: -5.0
+            pO2_reference_bar: 1.0
+            reference_pressure_Pa: 100000.0
+            compatibility_omit_antoine: false
           not_substitutable_by:
           - P2O5_gas
           janaf:
@@ -8537,32 +9506,45 @@ families:
             phase: ideal_gas
     fiat_routing:
       plant_bin: null
-      engineering_capture_policy: temperature_threshold
+      engineering_capture_policy: retain_in_overhead_gas_pending_condensation_model
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT - no flux; owner + physics review required before enablement
+      evidence_gate: analytical CEA-grounded; status-bearing/non-authoritative; cannot certify
       compatibility_fields:
-        flux_dormant: true
-        consumer_status: inactive
+        flux_dormant: false
+        consumer_status: active
+        hot_train_applicability: stage0_only
     vaporisation_coefficients:
       evaporation_alpha:
-        status: no_data
-        policy: refuse_nonzero_flux
-        compatibility_policy_field: refuse_nonzero_flux
-      alpha_domain_and_uncertainty: {}
+        value: 1.0
+        status: analytical_upper_bound
+        source: Hertz-Knudsen-Langmuir kinetic ceiling alpha<=1; no carrier-specific measurement
+        T_band_K:
+        - 699.0
+        - 2500.0
+        envelope:
+        - 0.0
+        - 1.0
+        tier: 3
+      alpha_domain_and_uncertainty:
+        interpretation: upper_bound_not_point
+        temperature_K:
+        - 699.0
+        - 2500.0
+        admissible_range:
+        - 0.0
+        - 1.0
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: vapour_pressure_pending_acquisition:P4
+      acquisition_flag: analytical_upper_bound_alpha:P4
     code_metadata:
       formula_id: P4
       source_account: process.cleaned_melt
-      request_rule: dormant_pending_validation
+      request_rule: stage0_only
       solve_group_id: phosphorus_carriers_family
-      compatibility_projection: dormant_acquisition
+      compatibility_projection: oxide_vapors
       canonical_aliases: []
-      hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
-        / VR-16
+      hot_train_applicability: stage0_only
       yaml_quote_species_id: false
       chemical_family: phosphorus_carrier
   phosphorus_P2O5_gas_family:
@@ -8571,21 +9553,22 @@ families:
         P2O5_gas:
           formula: P2O5
           chemical_family: phosphorus_carrier
-          acquisition_status: NOT_A_CARRIER_PLACEHOLDER
-          runtime_disposition: dormant_pending_owner_physics_review
+          acquisition_status: RETIRED_LEGACY_COLLISION_PLACEHOLDER
+          runtime_disposition: retired_non_flux_tombstone
           flux_dormant: true
-          notes: 'VapoRock collision-gas / oxide-equivalent placeholder. NOT a reported high-T molecular
-            carrier over phosphate melts. MUST NOT substitute for PO, PO2, P4O6, P4O10, P2, or P4. se5
-            ban: pure P4O10 unit-activity Psat is NOT a silicate-melt P2O5 proxy.'
+          notes: 'Retired VapoRock collision-gas / oxide-equivalent namespace. An exact CEA/Gurvich
+            P2O5(g) Gibbs row exists under species.P2O5, but this legacy P2O5_gas identifier is not in
+            the selected melt-carrier set and MUST NOT substitute for PO, PO2, P4O6, P4O10, P2, or P4.
+            se5 ban: pure P4O10 unit-activity Psat is NOT a silicate-melt P2O5 proxy.'
           validation:
             status: pending_validation
             anchor_refs: []
-            note: DRAFT - no flux; owner + physics review required before enablement
+            note: Retired non-flux tombstone; exact CEA P2O5(g) thermo is a distinct key and does not enable this legacy row
           source_reactions: []
           pressure_models:
           - fit_target: equilibrium_partial_pressure
             pressure_kind: equilibrium_partial_pressure
-            species_basis: not_a_reported_literature_molecule
+            species_basis: retired_legacy_collision_placeholder
             valid_domain:
               temperature_K:
               - 1000.0
@@ -8593,7 +9576,7 @@ families:
             provenance:
             - source: vp-acquire-5/P-carriers.md
               se5_ban: true
-              flag: not_a_reported_literature_molecule
+              flag: exact_cea_p2o5_gas_exists_but_not_selected_as_melt_carrier
             evaluator_family: tabulated_equilibrium
             availability: unavailable_pending_acquisition
           carrier_eligible: false
@@ -8609,10 +9592,12 @@ families:
             tier: TOMBSTONE
             formula: P2O5
             gas_species: P2O5_gas
-            acquisition_status: REJECT_NOT_A_LITERATURE_MOLECULE
-            runtime_disposition: 'RETIRE. Not reported as a saturated-vapour species over P4O10(s)
+            acquisition_status: RETIRED_LEGACY_COLLISION_PLACEHOLDER
+            runtime_disposition: 'RETIRE this legacy collision-gas identity. Exact-key CEA P2O5(g)
 
-              (SF18-T1) nor as the melt carrier (Mk86/SF18: PO, PO2; SF18-T5: PO, P4O6).
+              thermochemistry exists, but P2O5_gas is not selected as the melt carrier (Mk86/SF18:
+
+              PO, PO2; SF18-T5: PO, P4O6).
 
               Replace with PO / PO2 / P4O6 / P4O10 per fO2 regime.
 
@@ -8624,7 +9609,7 @@ families:
           literature_values:
             status: literature_present_pending_validation
             kind: non_carrier_placeholder_with_child_expansion
-            note: P2O5_gas is not a reported molecular vapour carrier; finite child expansion to PO/PO2/P4On/P2/P4.
+            note: Exact CEA P2O5(g) thermo exists; the legacy P2O5_gas collision namespace remains retired in favor of the selected PO/PO2/P4On/P2/P4 carrier set.
           child_expansion:
             kind: finite_atom_balanced_carrier_set
             children:
@@ -8642,7 +9627,7 @@ families:
       engineering_capture_policy: temperature_threshold
       products_and_coproducts: []
       process_or_terminal_destination: process.stage0_volatile_hold
-      draft_gate: DRAFT - no flux; owner + physics review required before enablement
+      draft_gate: RETIRED - no flux; exact CEA P2O5(g) is a distinct key and does not reactivate this tombstone
       compatibility_fields:
         flux_dormant: true
         consumer_status: inactive
@@ -8654,18 +9639,16 @@ families:
       alpha_domain_and_uncertainty: {}
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: vapour_pressure_pending_acquisition:P2O5_gas
+      acquisition_flag: retired_legacy_collision_placeholder:P2O5_gas
     code_metadata:
       formula_id: P2O5_gas
       source_account: process.cleaned_melt
-      request_rule: dormant_pending_validation
+      request_rule: not_applicable_retired_legacy_placeholder
       solve_group_id: phosphorus_P2O5_gas_family
-      compatibility_projection: dormant_acquisition
-      canonical_aliases:
-      - P2O5
+      compatibility_projection: retired_tombstones
+      canonical_aliases: []
       hot_train_applicability: not_applicable
-      hot_train_not_applicable_reason: VR-7 dormant acquisition row; flux activation deferred to RG-3
-        / VR-16
+      hot_train_not_applicable_reason: Retired legacy collision namespace; exact-key CEA P2O5(g) does not bind this ID
       yaml_quote_species_id: false
       chemical_family: phosphorus_carrier
   halide_association_Na2Cl2_family:

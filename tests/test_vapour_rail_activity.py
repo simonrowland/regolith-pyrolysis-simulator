@@ -12,6 +12,10 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.chemistry.melt_activity import (
+    P2O5_ACTIVITY_COEFFICIENT,
+    melt_oxide_activity,
+)
 from simulator.physical_constants import GAS_CONSTANT
 from simulator.vapour_rail.activity import (
     BOUND_NOT_POINT,
@@ -91,6 +95,50 @@ def test_monotonicity_proof_sign_of_exponent():
     assert prove_pressure_monotone_nondecreasing_in_activity(0.0) is True
     assert prove_pressure_monotone_nondecreasing_in_activity(-0.5) is False
     assert prove_pressure_monotone_nondecreasing_in_activity(float("nan")) is False
+
+
+def test_p2o5_dilute_activity_has_literature_grounded_gamma_upper_envelope():
+    coefficient = P2O5_ACTIVITY_COEFFICIENT
+    assert coefficient.gamma == pytest.approx(1.0e-6)
+    assert 0.0 < coefficient.gamma <= 1.0
+
+    activity = melt_oxide_activity(
+        "P2O5",
+        {"P2O5": 1.0, "SiO2": 999.0},
+        temperature_K=1873.0,
+    )
+    assert activity is not None
+    assert activity.gamma <= 1.0
+    assert 0.0 < activity.activity < activity.x_single_cation < 1.0
+    assert "Turkdogan" in activity.citation
+
+    legacy_activity = melt_oxide_activity(
+        "P2O5",
+        {"P2O5": 1.0, "SiO2": 999.0},
+    )
+    assert legacy_activity is not None
+    assert legacy_activity.gamma == pytest.approx(1.0)
+    assert legacy_activity.authority_status == (
+        "assumed_unity_fallback_non_authoritative"
+    )
+    assert legacy_activity.warning is not None
+
+    c0b_activity = melt_oxide_activity(
+        "P2O5",
+        {"P2O5": 0.01, "SiO2": 0.99},
+        temperature_K=1473.15,
+    )
+    assert c0b_activity is not None
+    assert c0b_activity.thermodynamic_parent_activity() == pytest.approx(
+        c0b_activity.activity**2
+    )
+    assert c0b_activity.authority_status == (
+        "out_of_gamma_domain_status_bearing_non_authoritative"
+    )
+    assert c0b_activity.warning is not None
+    provenance = c0b_activity.provenance()
+    assert provenance["melt_oxide_gamma_valid_range_K"] == (1823.0, 1923.0)
+    assert provenance["melt_oxide_activity_temperature_K"] == 1473.15
 
 
 def test_henrian_unknown_gamma_emits_upper_bound_never_point():

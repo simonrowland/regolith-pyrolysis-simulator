@@ -9,7 +9,7 @@ The central control variable is overhead oxygen pressure. Hard-vacuum pyrolysis 
 The simulated process is organized as staged campaigns:
 
 - `C0` volatile bakeoff and hot-duct gas handling.
-- `C0b` mild oxidative conditioning for volatile residues; phosphorus remains tracked as phosphate.
+- `C0b` mild oxidative P cleanup: dilute melt P₂O₅ feeds analytical PO, PO₂, P₂, P₄, P₄O₆, and P₄O₁₀ evaporation channels, with phosphorus conserved through overhead gas into terminal offgas.
 - `C2A` low-pO2 or sweep-gas pyrolysis for Fe and SiO-bearing flows.
 - `C2B` pO2-managed Fe pyrolysis that preserves more silica-rich glass.
 - `C3_NA` Na metallothermic shuttle chemistry at the cool 1150 °C FeO window. Legacy `C3_K` and Cr/Ti targets are refused by the S1b engine gate under the V1c JANAF Ellingham refit and recorded in `shuttle_refusal_history`. See [`docs/recipe-playbook.md`](recipe-playbook.md).

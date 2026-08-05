@@ -759,12 +759,19 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         # CrO3 remains absent from transitions for a separate physical reason:
         # raw 8.160077335392753e-7 kg/hr consumes 0.240001560107647 kg O2/kg,
         # but the head has zero overhead O2, so the allocator correctly zeros it.
+        # 2026-08-05 phosphorus-carrier union: at 1550 C, PO=0.00209063758295 Pa,
+        # PO2=0.000168203490621 Pa, and P2=5.32056804627e-9 Pa dominate the six
+        # new P channels (P4/P4O6/P4O10 are positive but negligible here). Their
+        # three executable transitions add 0.0023652645523379867 kg/hr total flux,
+        # +518.9310568999499 transport-saturation points, and lower melt mass by
+        # 0.0034963082154035874 kg. Values come from the executable head-pressure
+        # table and this quiesced default-off probe on the resolved union tree.
         (
             1,
             1550.0,
-            2.6214085469687247,
-            1161982.9402495231,
-            997.3707048856336,
+            2.6237738115210627,
+            1162501.871306423,
+            997.3672085774182,
         ),
         rel=1.0e-12,
         abs=1.0e-12,
@@ -778,7 +785,9 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     # above (+2 transitions, 23 -> 25); all three Ti carrier debits still sum
     # into one TiO2 parent draw. CrO3 adds none because its O2-consuming route
     # is starved by the fixture's zero overhead O2, not by pressure/domain gating.
-    assert len(sim.atom_ledger.transitions) == 25
+    # The phosphorus union adds evaporate_P2, evaporate_PO, and evaporate_PO2;
+    # the remaining P carrier rates are below this fixture's transition floor.
+    assert len(sim.atom_ledger.transitions) == 28
     assert tuple(
         transition.reason for transition in sim.atom_ledger.transitions[-5:]
     ) == (

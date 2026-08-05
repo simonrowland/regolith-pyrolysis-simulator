@@ -330,6 +330,32 @@ def test_refusal_snapshot_preserves_compiled_vapour_catalog_owner(monkeypatch) -
     assert sim._chem_kernel is rebuilt_kernel
 
 
+def test_refusal_snapshot_preserves_immutable_vapour_rail_catalog() -> None:
+    class ImmutableCatalog:
+        def __deepcopy__(self, memo):
+            raise AssertionError("compiled catalog must not enter hourly snapshot")
+
+    class LedgerSnapshotStub:
+        pass
+
+    sim = object.__new__(PyrolysisSimulator)
+    sim.vapour_rail_catalog = ImmutableCatalog()
+    sim.runtime_state = {"hour": 1}
+    sim.atom_ledger = LedgerSnapshotStub()
+    sim.atom_ledger._balances = {}
+    sim.atom_ledger._policies = {}
+    sim.atom_ledger._transitions = []
+    sim.atom_ledger._terminal_debit_authorized_transition_ids = set()
+    sim.atom_ledger._external_loads = []
+    sim._chem_registry = object()
+    sim._chem_kernel = object()
+
+    state, _ledger, _cost = sim._snapshot_terminal_refusal_hour_state()
+
+    assert "vapour_rail_catalog" not in state
+    assert sim.vapour_rail_catalog is not None
+
+
 @pytest.mark.parametrize(
     ("hook", "error_type"),
     (("deepcopy", ValueError), ("reduce", RuntimeError)),

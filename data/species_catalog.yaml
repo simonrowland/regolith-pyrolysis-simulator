@@ -1135,18 +1135,18 @@ species:
     anchor_refs: []
   pressure_observable: equilibrium_partial_pressure
   valid_domain:
-    status: pending_acquisition
+    status: retired_legacy_collision_placeholder
     temperature_K: null
   extrapolation_policy: conservative_slope_continuation
   out_of_range_status: out_of_range_conservative_continuation
-  acquisition_flag: vapour_pressure_pending_acquisition:P2O5_gas
+  acquisition_flag: retired_legacy_collision_placeholder:P2O5_gas
   code_metadata:
     formula_id: P2O5
-    canonical_aliases:
-    - P2O5
+    canonical_aliases: []
     collision_only_suffix: true
-    request_rule: pending_family_compilation
-  source: VR-1 U0 collision_gas membership set
+    request_rule: not_applicable_retired_legacy_placeholder
+    hot_train_applicability: not_applicable
+  source: b-108 retired collision-gas placeholder; exact CEA species.P2O5 gas thermo exists but this legacy ID is not a selected melt carrier
   not_substitutable_for:
   - PO
   - PO2
@@ -1154,7 +1154,7 @@ species:
   - P4O10
   - P2
   - P4
-  notes: 'VR-7: cannot substitute for true P carriers (PO/PO2/P4On/P2/P4).'
+  notes: 'Retired from flux. Exact-key P2O5 CEA thermo does not reactivate this legacy namespace or let it substitute for selected P carriers (PO/PO2/P4On/P2/P4).'
 - id: SiO2_gas
   formula: SiO2
   atoms:
@@ -1547,31 +1547,32 @@ species:
   category: phosphorus_carrier
   phase: gas
   catalog_role: vapour_species
-  direct_vapour_flux: false
+  direct_vapour_flux: true
+  runtime_disposition: active_status_bearing_non_authoritative
   validation:
     status: pending_validation
     anchor_refs: []
-  source: VR-7 dormant transcription (phosphorus_carrier)
+  source: b-133 CEA NASA9 P2O5 source-reaction carrier; analytical/status-bearing, cannot certify
   code_metadata:
     formula_id: PO
     canonical_aliases: []
-    request_rule: dormant_pending_validation
+    request_rule: stage0_only
     yaml_quote_species_id: false
     source_account: process.cleaned_melt
-    hot_train_applicability: not_applicable
+    hot_train_applicability: stage0_only
     group: A
-    dormant_to_flux: true
+    dormant_to_flux: false
     chunk: VR-8
   not_substitutable_by:
   - P2O5_gas
   pressure_observable: equilibrium_partial_pressure
   valid_domain:
-    status: pending_acquisition
-    temperature_K: null
+    status: analytical_cea_grounded_pending_validation
+    temperature_K: [699.0, 2500.0]
   extrapolation_policy: conservative_slope_continuation
   out_of_range_status: out_of_range_conservative_continuation
-  acquisition_flag: vapour_pressure_pending_acquisition:PO
-  note: P family owned by VR-7 transcription (RG-3); VR-8 acquisition fields grafted at merge
+  acquisition_flag: active_cea_nasa9_reaction_thermo:PO
+  note: Live during C0/C0b only; dilute activity and HKL alpha are non-authoritative bounds.
 - id: PO2
   formula: PO2
   atoms:
@@ -1581,18 +1582,32 @@ species:
   category: phosphorus_carrier
   phase: gas
   catalog_role: vapour_species
-  direct_vapour_flux: false
+  direct_vapour_flux: true
+  runtime_disposition: active_status_bearing_non_authoritative
   validation:
     status: pending_validation
     anchor_refs: []
-  source: VR-7 dormant transcription (phosphorus_carrier)
+  source: b-133 CEA NASA9 P2O5 source-reaction carrier; analytical/status-bearing, cannot certify
   code_metadata:
     formula_id: PO2
     canonical_aliases: []
-    request_rule: dormant_pending_validation
+    request_rule: stage0_only
     yaml_quote_species_id: false
+    source_account: process.cleaned_melt
+    hot_train_applicability: stage0_only
+    group: A
+    dormant_to_flux: false
+    chunk: b-133
   not_substitutable_by:
   - P2O5_gas
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: analytical_cea_grounded_pending_validation
+    temperature_K: [699.0, 2500.0]
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: active_cea_nasa9_reaction_thermo:PO2
+  note: Live during C0/C0b only; dilute activity and HKL alpha are non-authoritative bounds.
 - id: P4O6
   formula: P4O6
   atoms:
@@ -1602,31 +1617,32 @@ species:
   category: phosphorus_carrier
   phase: gas
   catalog_role: vapour_species
-  direct_vapour_flux: false
+  direct_vapour_flux: true
+  runtime_disposition: active_status_bearing_non_authoritative
   validation:
     status: pending_validation
     anchor_refs: []
-  source: VR-7 dormant transcription (phosphorus_carrier)
+  source: b-133 CEA NASA9 P2O5 source-reaction carrier; analytical/status-bearing, cannot certify
   code_metadata:
     formula_id: P4O6
     canonical_aliases: []
-    request_rule: dormant_pending_validation
+    request_rule: stage0_only
     yaml_quote_species_id: false
     source_account: process.cleaned_melt
-    hot_train_applicability: not_applicable
+    hot_train_applicability: stage0_only
     group: A
-    dormant_to_flux: true
+    dormant_to_flux: false
     chunk: VR-8
   not_substitutable_by:
   - P2O5_gas
   pressure_observable: equilibrium_partial_pressure
   valid_domain:
-    status: pending_acquisition
-    temperature_K: null
+    status: analytical_cea_grounded_pending_validation
+    temperature_K: [699.0, 2500.0]
   extrapolation_policy: conservative_slope_continuation
   out_of_range_status: out_of_range_conservative_continuation
-  acquisition_flag: vapour_pressure_pending_acquisition:P4O6
-  note: P family owned by VR-7 transcription (RG-3); VR-8 acquisition fields grafted at merge
+  acquisition_flag: active_cea_nasa9_reaction_thermo:P4O6
+  note: Live during C0/C0b only; dilute activity and HKL alpha are non-authoritative bounds.
 - id: P4O10
   formula: P4O10
   atoms:
@@ -1636,31 +1652,32 @@ species:
   category: phosphorus_carrier
   phase: gas
   catalog_role: vapour_species
-  direct_vapour_flux: false
+  direct_vapour_flux: true
+  runtime_disposition: active_status_bearing_non_authoritative
   validation:
     status: pending_validation
     anchor_refs: []
-  source: VR-7 dormant transcription (phosphorus_carrier)
+  source: b-133 CEA NASA9 P2O5 source-reaction carrier; analytical/status-bearing, cannot certify
   code_metadata:
     formula_id: P4O10
     canonical_aliases: []
-    request_rule: dormant_pending_validation
+    request_rule: stage0_only
     yaml_quote_species_id: false
     source_account: process.cleaned_melt
-    hot_train_applicability: not_applicable
+    hot_train_applicability: stage0_only
     group: A
-    dormant_to_flux: true
+    dormant_to_flux: false
     chunk: VR-8
   not_substitutable_by:
   - P2O5_gas
   pressure_observable: equilibrium_partial_pressure
   valid_domain:
-    status: pending_acquisition
-    temperature_K: null
+    status: analytical_cea_grounded_pending_validation
+    temperature_K: [699.0, 2500.0]
   extrapolation_policy: conservative_slope_continuation
   out_of_range_status: out_of_range_conservative_continuation
-  acquisition_flag: vapour_pressure_pending_acquisition:P4O10
-  note: P family owned by VR-7 transcription (RG-3); VR-8 acquisition fields grafted at merge
+  acquisition_flag: active_cea_nasa9_reaction_thermo:P4O10
+  note: Live during C0/C0b only; dilute activity and HKL alpha are non-authoritative bounds.
 - id: P2
   formula: P2
   atoms:
@@ -1669,18 +1686,32 @@ species:
   category: phosphorus_carrier
   phase: gas
   catalog_role: vapour_species
-  direct_vapour_flux: false
+  direct_vapour_flux: true
+  runtime_disposition: active_status_bearing_non_authoritative
   validation:
     status: pending_validation
     anchor_refs: []
-  source: VR-7 dormant transcription (phosphorus_carrier)
+  source: b-133 CEA NASA9 P2O5 source-reaction carrier; analytical/status-bearing, cannot certify
   code_metadata:
     formula_id: P2
     canonical_aliases: []
-    request_rule: dormant_pending_validation
+    request_rule: stage0_only
     yaml_quote_species_id: false
+    source_account: process.cleaned_melt
+    hot_train_applicability: stage0_only
+    group: A
+    dormant_to_flux: false
+    chunk: b-133
   not_substitutable_by:
   - P2O5_gas
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: analytical_cea_grounded_pending_validation
+    temperature_K: [699.0, 2500.0]
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: active_cea_nasa9_reaction_thermo:P2
+  note: Live during C0/C0b only; dilute activity and HKL alpha are non-authoritative bounds.
 - id: P4
   formula: P4
   atoms:
@@ -1689,18 +1720,32 @@ species:
   category: phosphorus_carrier
   phase: gas
   catalog_role: vapour_species
-  direct_vapour_flux: false
+  direct_vapour_flux: true
+  runtime_disposition: active_status_bearing_non_authoritative
   validation:
     status: pending_validation
     anchor_refs: []
-  source: VR-7 dormant transcription (phosphorus_carrier)
+  source: b-133 CEA NASA9 P2O5 source-reaction carrier; analytical/status-bearing, cannot certify
   code_metadata:
     formula_id: P4
     canonical_aliases: []
-    request_rule: dormant_pending_validation
+    request_rule: stage0_only
     yaml_quote_species_id: false
+    source_account: process.cleaned_melt
+    hot_train_applicability: stage0_only
+    group: A
+    dormant_to_flux: false
+    chunk: b-133
   not_substitutable_by:
   - P2O5_gas
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: analytical_cea_grounded_pending_validation
+    temperature_K: [699.0, 2500.0]
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: active_cea_nasa9_reaction_thermo:P4
+  note: Live during C0/C0b only; dilute activity and HKL alpha are non-authoritative bounds.
 - id: HCHO
   formula: HCHO
   atoms:

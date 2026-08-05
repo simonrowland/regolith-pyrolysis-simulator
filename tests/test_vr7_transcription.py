@@ -89,7 +89,20 @@ def test_production_catalog_compiles_with_dormant_projection() -> None:
         "Mn",
     }
     assert set(legacy["oxide_vapors"]) == {
-        "SiO", "CrO2", "TiO", "TiO2_gas", "CaO_gas", "AlO", "Al2O", "CrO3"
+        "SiO",
+        "CrO2",
+        "TiO",
+        "TiO2_gas",
+        "CaO_gas",
+        "AlO",
+        "Al2O",
+        "CrO3",
+        "PO",
+        "PO2",
+        "P2",
+        "P4",
+        "P4O6",
+        "P4O10",
     }
     assert set(legacy["foulant_vapor"]) == {"NaCl", "KCl", "NaF"}
     assert "dormant_acquisition" in legacy
@@ -165,6 +178,7 @@ def test_p2o5_gas_cannot_substitute_for_true_p_carriers() -> None:
     p2 = payload["families"]["phosphorus_P2O5_gas_family"]["physical_properties"][
         "species"
     ]["P2O5_gas"]
+    assert p2["runtime_disposition"] == "retired_non_flux_tombstone"
     assert p2.get("carrier_eligible") is False
     assert p2.get("substitutes_for_carriers") is False
     children = set(p2["child_expansion"]["children"])
@@ -175,9 +189,27 @@ def test_p2o5_gas_cannot_substitute_for_true_p_carriers() -> None:
         sp = payload["families"][fam_id]["physical_properties"]["species"][carrier]
         assert "P2O5_gas" in (sp.get("not_substitutable_by") or [])
         assert sp["validation"]["status"] == "pending_validation"
-        assert sp["pressure_models"][0]["availability"] == (
-            "unavailable_pending_acquisition"
-        )
+        model = sp["pressure_models"][0]
+        assert model.get("availability", "available") == "available"
+        assert model["evaluator_family"] == "nasa_cea_9"
+
+    species_catalog = yaml.safe_load((DATA / "species_catalog.yaml").read_text())
+    catalog_row = {
+        row["id"]: row for row in species_catalog["species"]
+    }["P2O5_gas"]
+    assert catalog_row["direct_vapour_flux"] is False
+    assert catalog_row["code_metadata"]["request_rule"] == (
+        "not_applicable_retired_legacy_placeholder"
+    )
+    assert catalog_row["code_metadata"]["hot_train_applicability"] == (
+        "not_applicable"
+    )
+    assert catalog_row["acquisition_flag"].startswith(
+        "retired_legacy_collision_placeholder"
+    )
+    assert catalog_row["code_metadata"]["canonical_aliases"] == []
+    compiled = compile_vapour_rail_catalog(payload)
+    assert set(compiled.legacy_view()["retired_tombstones"]) == {"P2O5_gas"}
 
 
 def test_chloride_dimer_relations_explicit() -> None:

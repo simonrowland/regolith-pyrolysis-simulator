@@ -228,8 +228,23 @@ def test_rows_dormant_legacy_outputs_identical():
         "Cr",
         "Mn",
     }
+    # The oxide and phosphorus chunks move this golden intentionally: twelve
+    # reviewed carriers now evolve through the compatibility projection.
     assert set(legacy["oxide_vapors"]) == {
-        "SiO", "CrO2", "TiO", "TiO2_gas", "CaO_gas", "AlO", "Al2O", "CrO3"
+        "SiO",
+        "CrO2",
+        "TiO",
+        "TiO2_gas",
+        "CaO_gas",
+        "AlO",
+        "Al2O",
+        "CrO3",
+        "PO",
+        "PO2",
+        "P2",
+        "P4",
+        "P4O6",
+        "P4O10",
     }
     assert set(legacy["foulant_vapor"]) == {"NaCl", "KCl", "NaF"}
     # O is projected only into the dormant rail-gap bucket, not live maps.
@@ -242,18 +257,35 @@ def test_rows_dormant_legacy_outputs_identical():
     live = set(legacy["metals"]) | set(legacy["oxide_vapors"]) | set(
         legacy["foulant_vapor"]
     )
-    assert live.isdisjoint(GROUP_A_IDS - {"P"})  # P may exist only as feedstock id
+    activated_p_carriers = {"PO", "PO2", "P2", "P4", "P4O6", "P4O10"}
+    assert live.isdisjoint(GROUP_A_IDS - {"P"} - activated_p_carriers)
     assert live.isdisjoint(GROUP_B_IDS)
 
 
-def test_species_catalog_marks_group_rows_non_flux():
+def test_species_catalog_marks_only_activated_p_carriers_live():
     catalog = yaml.safe_load((DATA / "species_catalog.yaml").read_text())
     by_id = {s["id"]: s for s in catalog["species"]}
-    for sid in sorted(GROUP_A_IDS | GROUP_B_IDS | {MONATOMIC_OXYGEN_ID}):
+    activated_p_carriers = {"PO", "PO2", "P2", "P4", "P4O6", "P4O10"}
+    dormant_rows = (
+        GROUP_A_IDS | GROUP_B_IDS | {MONATOMIC_OXYGEN_ID}
+    ) - activated_p_carriers
+    for sid in sorted(dormant_rows):
         assert sid in by_id, f"missing species_catalog row {sid}"
         row = by_id[sid]
         assert row.get("direct_vapour_flux") is False
         assert (row.get("validation") or {}).get("status") == "pending_validation"
+    for sid in sorted(activated_p_carriers):
+        row = by_id[sid]
+        assert row["direct_vapour_flux"] is True
+        assert row["runtime_disposition"] == (
+            "active_status_bearing_non_authoritative"
+        )
+        assert row["validation"]["status"] == "pending_validation"
+        assert row["code_metadata"]["request_rule"] == "stage0_only"
+        assert row["code_metadata"]["source_account"] == "process.cleaned_melt"
+        assert row["code_metadata"]["hot_train_applicability"] == "stage0_only"
+        assert row["code_metadata"]["dormant_to_flux"] is False
+        assert row["valid_domain"]["temperature_K"] == [699.0, 2500.0]
     o = by_id["O"]
     assert o["formula"] == "O"
     assert float(o["code_metadata"]["pO2_exponent"]) == pytest.approx(0.5)

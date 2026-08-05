@@ -1,7 +1,8 @@
 """VR-4b: nasa7/nasa9/shomate runtime catalog evaluator families.
 
 Fixture coverage proves generic compile/dispatch and production coverage proves
-the explicitly activated analytical carrier rows remain a closed, reviewed set.
+the explicitly activated analytical carrier rows and reaction algebra remain a
+closed, reviewed set.
 """
 
 from __future__ import annotations
@@ -12,6 +13,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.condensation import _species_has_antoine_data
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_FIT_SEGMENTS,
     MG_NORMAL_BOILING_POINT_K,
@@ -714,6 +716,12 @@ def test_production_vapor_pressures_has_only_reviewed_active_thermo_carriers() -
         ("AlO", "nasa_cea_9", "applicable"),
         ("Al2O", "nasa_cea_9", "applicable"),
         ("CrO3", "nasa_cea_9", "applicable"),
+        ("PO", "nasa_cea_9", "stage0_only"),
+        ("PO2", "nasa_cea_9", "stage0_only"),
+        ("P4O6", "nasa_cea_9", "stage0_only"),
+        ("P4O10", "nasa_cea_9", "stage0_only"),
+        ("P2", "nasa_cea_9", "stage0_only"),
+        ("P4", "nasa_cea_9", "stage0_only"),
     ]
     # Production still compiles the pre-existing Antoine / standard_reaction rows.
     assert "Na" in catalog.species
@@ -723,6 +731,115 @@ def test_production_vapor_pressures_has_only_reviewed_active_thermo_carriers() -
         "standard_reaction_term",
         "tabulated_equilibrium",
     }
+
+
+# ---------------------------------------------------------------------------
+# Production phosphorus carriers: CEA-grounded source-reaction thermo
+# ---------------------------------------------------------------------------
+
+
+def test_production_phosphorus_thermo_matches_local_cea_extract() -> None:
+    payload = yaml.safe_load((DATA / "vapor_pressures.yaml").read_text())
+    store = yaml.safe_load(
+        (DATA / "literature" / "extracts" / "nasa-cea-thermo.yaml").read_text()
+    )
+    anchors = payload["cea_phosphorus_thermo"]
+    store_to_anchor = {
+        "PO": "PO",
+        "PO2": "PO2",
+        "P2": "P2",
+        "P4": "P4",
+        "P4O6": "P4O6",
+        "P4O10": "P4O10",
+        "P4O10_L": "P4O10_liquid",
+    }
+    assert len(store["species"]) >= 161
+    assert set(store_to_anchor) <= set(store["species"])
+    p2o5_gas_observation = store["species"]["P2O5"]["observations"][0]
+    assert p2o5_gas_observation["type"] == "gibbs_table"
+    assert p2o5_gas_observation["phase"] == "gas"
+    assert p2o5_gas_observation["locator"]["record"] == "P2O5"
+    assert store["species"]["P4O10_L"]["observations"][0]["regime"] == (
+        "condensed_liquid_standard_state_thermo"
+    )
+    for store_id, anchor_id in store_to_anchor.items():
+        observations = store["species"][store_id]["observations"]
+        assert len(observations) == 1
+        assert observations[0]["type"] == "gibbs_table"
+        values = observations[0]["values"]
+        anchor = anchors[anchor_id]
+        for field, expected in values.items():
+            assert anchor[field] == expected
+
+    liquid = anchors["P4O10_liquid"]
+    parent_basis = anchors["P2O5_liquid_component_basis"]
+    assert parent_basis["molecular_weight_g_per_mol"] == pytest.approx(
+        0.5 * liquid["molecular_weight_g_per_mol"]
+    )
+    assert parent_basis["delta_f_H_298_15_J_per_mol"] == pytest.approx(
+        0.5 * liquid["delta_f_H_298_15_J_per_mol"]
+    )
+    for parent_segment, liquid_segment in zip(
+        parent_basis["segments"], liquid["segments"], strict=True
+    ):
+        assert parent_segment["a_coefficients"] == pytest.approx(
+            [0.5 * value for value in liquid_segment["a_coefficients"]]
+        )
+        assert parent_segment["b1"] == pytest.approx(0.5 * liquid_segment["b1"])
+        assert parent_segment["b2"] == pytest.approx(0.5 * liquid_segment["b2"])
+
+
+def test_production_phosphorus_carriers_use_cea_reaction_thermo() -> None:
+    payload = yaml.safe_load((DATA / "vapor_pressures.yaml").read_text())
+    catalog = compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)
+    expected = {
+        "PO": (-0.75, 0.5),
+        "PO2": (-0.25, 0.5),
+        "P2": (-2.5, 1.0),
+        "P4": (-5.0, 2.0),
+        "P4O6": (-2.0, 2.0),
+        "P4O10": (0.0, 2.0),
+    }
+
+    for species_id, (pO2_exponent, activity_exponent) in expected.items():
+        species = catalog.species[species_id]
+        evaluator = species.evaluator
+        assert evaluator is not None
+        assert evaluator.evaluator_family == "nasa_cea_9"
+        assert evaluator.pO2_exponent == pytest.approx(pO2_exponent)
+        assert evaluator.activity_exponent == pytest.approx(activity_exponent)
+        assert species.code_metadata.request_rule == "stage0_only"
+        assert species.code_metadata.hot_train_applicability == "stage0_only"
+        assert species.validation_status.value == "pending_validation"
+
+        at_reference = evaluator.evaluate(
+            1473.15,
+            source_activity=1.0e-8,
+            pO2_bar=evaluator.pO2_reference_bar,
+        )
+        at_c0b = evaluator.evaluate(
+            1473.15,
+            source_activity=1.0e-8,
+            pO2_bar=0.009,
+        )
+        assert math.isfinite(at_reference.pressure_pa)
+        assert at_reference.pressure_pa > 0.0
+        expected_ratio = (0.009 / evaluator.pO2_reference_bar) ** pO2_exponent
+        assert at_c0b.pressure_pa / at_reference.pressure_pa == pytest.approx(
+            expected_ratio
+        )
+
+    p2o5_alias = catalog.species["P2O5_gas"]
+    assert p2o5_alias.evaluator is None
+    assert p2o5_alias.code_metadata.hot_train_applicability == "not_applicable"
+    # A melt source-reaction partial pressure is not a pure-gas saturation
+    # curve.  Without independent condensation data P remains in overhead gas.
+    legacy_oxide_vapors = catalog.legacy_view()["oxide_vapors"]
+    for carrier in expected:
+        assert legacy_oxide_vapors[carrier]["condensation_saturation_model"] == (
+            "unavailable_source_reaction_not_psat"
+        )
+        assert not _species_has_antoine_data(carrier, vapor_pressure_data=payload)
 
 
 def test_production_ti_carrier_ratios_reproduce_cea_exchange_algebra() -> None:

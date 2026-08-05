@@ -1276,7 +1276,11 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
 
             if _fit_target(sp_data) == FIT_TARGET_STANDARD_REACTION:
                 assert P_reference_Pa is not None
-                oxide_activity = melt_oxide_activity(parent_oxide, melt_account_mol)
+                oxide_activity = melt_oxide_activity(
+                    parent_oxide,
+                    melt_account_mol,
+                    temperature_K=(T_K if parent_oxide == "P2O5" else None),
+                )
                 if oxide_activity is None or oxide_activity.activity <= 1e-10:
                     continue
                 if oxide_activity.warning:
@@ -1402,7 +1406,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     field="P_reference_liquid_oxide_standard_reaction_Pa",
                 )
                 oxide_activity = melt_oxide_activity(
-                    parent_oxide, melt_account_mol
+                    parent_oxide,
+                    melt_account_mol,
+                    temperature_K=(T_K if parent_oxide == "P2O5" else None),
                 )
                 if oxide_activity is None or oxide_activity.activity <= 1e-10:
                     continue
@@ -1521,7 +1527,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         reconstructed_vapor_limit["pressure_Pa"]
                     )
                 oxide_activity = melt_oxide_activity(
-                    parent_oxide, melt_account_mol
+                    parent_oxide,
+                    melt_account_mol,
+                    temperature_K=(T_K if parent_oxide == "P2O5" else None),
                 )
                 if oxide_activity is None or oxide_activity.activity <= 1e-10:
                     continue
@@ -1636,7 +1644,11 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         "(documented degraded public-caller path, uncertified)"
                     )
             else:
-                oxide_activity = melt_oxide_activity(parent_oxide, melt_account_mol)
+                oxide_activity = melt_oxide_activity(
+                    parent_oxide,
+                    melt_account_mol,
+                    temperature_K=(T_K if parent_oxide == "P2O5" else None),
+                )
                 if oxide_activity is None:
                     continue
                 # provenance: gamma_alkali_melt_activity
@@ -1858,6 +1870,12 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
 
         oxide_vapors_data = self._vapor_pressure_data.get('oxide_vapors', {}) or {}
         for name, data in oxide_vapors_data.items():
+            if (
+                str((data or {}).get("hot_train_applicability") or "")
+                == "stage0_only"
+                and str(controls.get("process_phase") or "") != "stage0"
+            ):
+                continue
             if bool((data or {}).get("interval_required")):
                 reject_noncertifying_vapor_pressure_row(
                     name,
@@ -1889,33 +1907,49 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             activity_factor = 1.0
             oxide_activity = None
             if parent_oxide:
+                retain_analytical_channel = bool(
+                    data.get("retain_analytical_pressure_channel", False)
+                )
                 activity_exponent = float(
                     data.get('oxide_activity_exponent', 1.0)
                 )
-                oxide_activity = melt_oxide_activity(parent_oxide, melt_account_mol)
+                oxide_activity = melt_oxide_activity(
+                    parent_oxide,
+                    melt_account_mol,
+                    temperature_K=(T_K if parent_oxide == "P2O5" else None),
+                )
                 if oxide_activity is None:
                     continue
-                # provenance: gamma_alkali_melt_activity
-                a_ox = oxide_activity.equivalent_parent_activity(
-                    activity_exponent
-                )
-                if oxide_activity.activity <= 1e-10:
+                if data.get("source_activity_basis") == "parent_oxide":
+                    a_ox = oxide_activity.thermodynamic_parent_activity()
+                    reported_activity = a_ox
+                else:
+                    # Legacy single-cation reaction fits declare their own
+                    # exponent-adjusted compatibility basis.
+                    a_ox = oxide_activity.equivalent_parent_activity(
+                        activity_exponent
+                    )
+                    reported_activity = oxide_activity.activity
+                if oxide_activity.activity <= 0.0 or (
+                    not retain_analytical_channel
+                    and oxide_activity.activity <= 1e-10
+                ):
                     continue
                 if oxide_activity.warning:
                     warnings.append(oxide_activity.warning)
-                activities[name] = oxide_activity.activity
+                activities[name] = reported_activity
                 if compiled_evaluator is not None:
                     # The compiled source reaction owns its declared activity
                     # power.  Premise: for q A_cond -> nu V + ..., mass action
                     # gives p_V proportional to a_A^(q/nu).  The melt provider
-                    # already reports the single-cation component activity, so
-                    # pass a_A itself and let the evaluator apply q/nu once.
+                    # reports the declared source basis, so pass that activity
+                    # itself and let the evaluator apply q/nu once.
                     # Unit check: activity and its power are dimensionless.
                     # Sanity: q/nu=1 matches legacy rows; Al2O's q/nu=2 must
                     # quarter pressure when activity halves.  Calling
                     # equivalent_parent_activity(2) here would take sqrt(a)
                     # and silently flatten that physical square to a.
-                    activity_factor = max(oxide_activity.activity, 0.0) ** float(
+                    activity_factor = max(reported_activity, 0.0) ** float(
                         compiled_evaluator.activity_exponent
                     )
                 else:
@@ -1975,7 +2009,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 evaluation = compiled_evaluator.evaluate(
                     T_K,
                     source_activity=(
-                        max(oxide_activity.activity, 1.0e-300)
+                        max(reported_activity, 1.0e-300)
                         if parent_oxide
                         else 1.0
                     ),
@@ -2066,7 +2100,12 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 )
                 pO2_scaled = True
 
-            if P_eq_Pa > 1e-15:
+            retain_analytical_channel = bool(
+                data.get("retain_analytical_pressure_channel", False)
+            )
+            if P_eq_Pa > 0.0 and (
+                retain_analytical_channel or P_eq_Pa > 1e-15
+            ):
                 vapor_pressures[name] = P_eq_Pa
                 # Oxide rows outside valid_range_K but inside an optional
                 # extrapolation_allowed_range_K remain diagnostic-limited
@@ -2104,7 +2143,14 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     ),
                     "P_reference_Antoine_Pa": P_reference_Pa,
                     "P_eq_Pa": P_eq_Pa,
-                    "pO2_bar": transport_pO2_bar,
+                    "pO2_bar": (
+                        evaluator_pO2_bar
+                        if (
+                            compiled_evaluator is not None
+                            and parent_oxide == "P2O5"
+                        )
+                        else transport_pO2_bar
+                    ),
                     "activity_factor": activity_factor,
                     "source_label": source_label,
                 }
@@ -2112,6 +2158,10 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     vapor_pressure_provenance[name][
                         "P_reference_model_Pa"
                     ] = P_reference_Pa
+                if compiled_evaluator is not None and parent_oxide == "P2O5":
+                    vapor_pressure_provenance[name][
+                        "oxygen_fugacity_channel"
+                    ] = compiled_evaluator.oxygen_fugacity_channel
                 if oxide_activity is not None:
                     vapor_pressure_provenance[name].update(
                         oxide_activity.provenance()

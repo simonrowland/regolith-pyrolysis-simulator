@@ -41,6 +41,20 @@ species:
         pinned_residual_dex: 0.48565570074150183
         evidence_refs:
           - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+  Al2O:
+    tier: T1
+    target_tier: T4
+    validations:
+      structural:
+        evidence_refs:
+          - data/vapor_pressures.yaml
+  AlO:
+    tier: T1
+    target_tier: T4
+    validations:
+      structural:
+        evidence_refs:
+          - data/vapor_pressures.yaml
   Ca:
     tier: T2
     target_tier: T4
@@ -49,6 +63,13 @@ species:
         pinned_residual_dex: 2.3169715202228525
         evidence_refs:
           - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+  CaO_gas:
+    tier: T1
+    target_tier: T4
+    validations:
+      structural:
+        evidence_refs:
+          - data/vapor_pressures.yaml
   Cr:
     tier: T3
     target_tier: T4
@@ -58,7 +79,7 @@ species:
         evidence_refs:
           - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
       mass_spec:
-        pinned_residual_dex: 0.0
+        pinned_residual_dex: 4.216235656403892
         evidence_refs:
           - tests/chemistry/extract_store_reproduction_residual_baselines.yaml
           - docs/model-limitations.md#extract-store-reproduction-battery
@@ -70,6 +91,13 @@ species:
         pinned_residual_dex: 0.22658647578501132
         evidence_refs:
           - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+  CrO3:
+    tier: T1
+    target_tier: T4
+    validations:
+      structural:
+        evidence_refs:
+          - data/vapor_pressures.yaml
   Fe:
     tier: T3
     target_tier: T4
@@ -110,12 +138,14 @@ species:
           - tests/chemistry/extract_store_reproduction_residual_baselines.yaml
           - docs/model-limitations.md#extract-store-reproduction-battery
   Mn:
-    tier: T1
+    tier: T3
     target_tier: T4
     validations:
-      structural:
+      mass_spec:
+        pinned_residual_dex: 5.587674763372532
         evidence_refs:
-          - data/vapor_pressures.yaml
+          - tests/chemistry/extract_store_reproduction_residual_baselines.yaml
+          - docs/model-limitations.md#extract-store-reproduction-battery
   Na:
     tier: T3
     target_tier: T4
@@ -129,6 +159,48 @@ species:
         evidence_refs:
           - tests/chemistry/extract_store_reproduction_residual_baselines.yaml
           - docs/model-limitations.md#extract-store-reproduction-battery
+  P2:
+    tier: T1
+    target_tier: T4
+    validations:
+      structural:
+        evidence_refs:
+          - data/vapor_pressures.yaml
+  P4:
+    tier: T1
+    target_tier: T4
+    validations:
+      structural:
+        evidence_refs:
+          - data/vapor_pressures.yaml
+  P4O10:
+    tier: T1
+    target_tier: T4
+    validations:
+      structural:
+        evidence_refs:
+          - data/vapor_pressures.yaml
+  P4O6:
+    tier: T1
+    target_tier: T4
+    validations:
+      structural:
+        evidence_refs:
+          - data/vapor_pressures.yaml
+  PO:
+    tier: T1
+    target_tier: T4
+    validations:
+      structural:
+        evidence_refs:
+          - data/vapor_pressures.yaml
+  PO2:
+    tier: T1
+    target_tier: T4
+    validations:
+      structural:
+        evidence_refs:
+          - data/vapor_pressures.yaml
   SiO:
     tier: T3
     target_tier: T4
@@ -150,6 +222,20 @@ species:
         pinned_residual_dex: 0.17562698423078063
         evidence_refs:
           - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+  TiO:
+    tier: T1
+    target_tier: T4
+    validations:
+      structural:
+        evidence_refs:
+          - data/vapor_pressures.yaml
+  TiO2_gas:
+    tier: T1
+    target_tier: T4
+    validations:
+      structural:
+        evidence_refs:
+          - data/vapor_pressures.yaml
 systematic_sio_oracle:
   status: evaluator_gap
   reason: acquisition-pending

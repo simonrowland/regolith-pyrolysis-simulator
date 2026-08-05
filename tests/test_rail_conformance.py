@@ -36,9 +36,7 @@ from simulator.state import EvaporationFlux
 from simulator.vapour_rail.batch import (
     FLUX_ACTIVATION_EPOCH_RG_MANIFEST,
     FluxActivationContext,
-    FluxDiagnosticUpperBound,
     FluxEligible,
-    PressureUpperBound,
     PressureValue,
 )
 from simulator.vapour_rail.catalog import compile_vapour_rail_catalog
@@ -220,11 +218,12 @@ def _expected_po2_exponent(species_id: str) -> float:
     terms = _signed_reaction_terms(species_id)
     if not terms:
         return 0.0
+    reaction = _selected_reaction(species_id)
     vapor_formula = CATALOG.species[species_id].formula
     nu_vapor = sum(
-        coefficient
-        for coefficient, formula_id in terms
-        if formula_id == vapor_formula
+        float(term["stoichiometry"])
+        for term in reaction["products"]
+        if term["formula"] == vapor_formula
     )
     nu_o2 = sum(
         coefficient for coefficient, formula_id in terms if formula_id == "O2"
@@ -237,17 +236,17 @@ def _expected_activity_exponent(species_id: str) -> float | None:
     declaration = CATALOG.species[species_id].source_reaction_activity
     if declaration is None:
         return None
-    terms = _signed_reaction_terms(species_id)
+    reaction = _selected_reaction(species_id)
     vapor_formula = CATALOG.species[species_id].formula
     nu_vapor = sum(
-        coefficient
-        for coefficient, formula_id in terms
-        if formula_id == vapor_formula
+        float(term["stoichiometry"])
+        for term in reaction["products"]
+        if term["formula"] == vapor_formula
     )
-    nu_activity = sum(
-        coefficient
-        for coefficient, formula_id in terms
-        if formula_id == declaration.component_id
+    nu_activity = -sum(
+        float(term["stoichiometry"])
+        for term in reaction["reactants"]
+        if term["formula"] == declaration.component_id
     )
     assert nu_vapor > 0.0 and nu_activity < 0.0
     return -nu_activity / nu_vapor
@@ -284,6 +283,8 @@ def _resolve_one(species_id: str, temperature_K: float):
     ledger = {rule.source_account: {parent: 1.0 for parent in rule.parent_species_ids}}
     state_kwargs: dict[str, Any] = {
         "temperature_K": temperature_K,
+        "process_phase": "stage0",
+        "stage": "stage0",
         "fO2_bar": 1.0e-9,
         "source_reaction_fO2_bar": 1.0e-9,
     }
@@ -632,11 +633,15 @@ def test_validation_tiers_and_promotions_have_external_evidence() -> None:
         assert isinstance(validations, dict) and validations
         if tier == "T1":
             assert "structural" in validations
+        required_validation = TIER_VALIDATIONS.get(tier)
+        if required_validation is not None:
+            # Tiers classify the strongest available external evidence; they
+            # are not cumulative because an engine may not answer a species
+            # that has direct mass-spec coverage (Mn is the concrete case).
+            assert required_validation in validations, (
+                f"{species_id}: {tier} promotion lacks {required_validation} evidence"
+            )
         for required_tier, validation_name in TIER_VALIDATIONS.items():
-            if TIER_ORDER[tier] >= TIER_ORDER[required_tier]:
-                assert validation_name in validations, (
-                    f"{species_id}: {tier} promotion lacks {validation_name} evidence"
-                )
             if validation_name in validations:
                 assert TIER_ORDER[tier] >= TIER_ORDER[required_tier], (
                     f"{species_id}: {validation_name} evidence is hidden by {tier} demotion"
@@ -713,20 +718,25 @@ def test_c2_pressure_is_finite_over_required_grid(species_id: str) -> None:
 
 @pytest.mark.parametrize("species_id", STRUCTURAL_SPECIES)
 def test_c2_out_of_domain_value_is_typed_diagnostic_flux(species_id: str) -> None:
-    # Runtime contract b-118: the anti-cliff continuation drives a non-zero
-    # diagnostic flux bound, never an inventory debit. This is the only honest
-    # meaning of "still drives flux" for an out-of-domain rail answer.
+    # Runtime contract b-142: the anti-cliff continuation is the best available
+    # status-bearing point estimate. It evolves inventory while its verdict and
+    # certification ceiling remain explicitly non-authoritative.
     if CATALOG.species[species_id].code_metadata.source_account == "process.stage0_foulant":
         direct = _evaluate(species_id, 2300.0)
         split = chi_escape_salt(species_id, 2300.0 - 273.15, 1.0e-3)
         assert direct.out_of_range and direct.status and direct.pressure_pa > 0.0
         assert split.escaped_frac > 0.0 and split.warning
     else:
-        batch, answer = _resolve_one(species_id, 2300.0)
-        assert isinstance(answer.pressure, PressureUpperBound)
-        assert isinstance(answer.flux, FluxDiagnosticUpperBound)
+        evaluator = CATALOG.evaluator_for(species_id)
+        out_of_range_temperature_K = evaluator.valid_temperature_K[1] + 1.0
+        batch, answer = _resolve_one(species_id, out_of_range_temperature_K)
+        assert isinstance(answer.pressure, PressureValue)
+        assert isinstance(answer.flux, FluxEligible)
+        assert answer.extra["out_of_range"] is True
+        assert answer.extra["status"]
+        assert answer.extra["acquisition_flag"]
         assert answer.pressure.pa > 0.0
-        assert species_id not in batch.flux_active_species_ids
+        assert species_id in batch.flux_active_species_ids
 
 
 @pytest.mark.parametrize("species_id", STRUCTURAL_SPECIES)
@@ -771,8 +781,8 @@ def test_c3_y_zero_limiting_case_is_unity(species_id: str) -> None:
     evaluator = CATALOG.evaluator_for(species_id)
     assert evaluator.pO2_exponent == 0.0
     temperature_K = sum(evaluator.valid_temperature_K) / 2.0
-    low = evaluator.evaluate(temperature_K, pO2_bar=1.0e-12).pressure_pa
-    high = evaluator.evaluate(temperature_K, pO2_bar=1.0e-6).pressure_pa
+    low = _evaluate(species_id, temperature_K, pO2_bar=1.0e-12).pressure_pa
+    high = _evaluate(species_id, temperature_K, pO2_bar=1.0e-6).pressure_pa
     assert high / low == PINS["internal_sensibility"]["y_zero_ratio"]
 
 
@@ -886,6 +896,7 @@ def test_c5_debit_route_alpha_and_source_metadata_are_executable(
             temperature_K=sum(species.valid_temperature_K) / 2.0,
             fo2_log10_bar=-9.0,
             pressure_bar=float(report["domain"]["pressure_bar"]),
+            process_phase="stage0",
         )
         assert cell["status"] in {"ok", "non_authoritative"}
         assert float(cell["pressures_Pa"][species_id]) > 0.0

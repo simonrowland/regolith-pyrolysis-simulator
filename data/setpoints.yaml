@@ -85,9 +85,10 @@ campaigns:
     p_total_mbar_default: 9.0
     target_species: ["PO", "POx"]
     products:
-      phosphate_salts:
-        mass_kg: [0.2, 12.0]
-        note: "85-98% captured as clean Ca/Mg/alkali phosphates in 350-650 C trap"
+      phosphorus_carrier_offgas:
+        carriers: ["PO", "PO2", "P2", "P4", "P4O6", "P4O10"]
+        capture_status: "unmodeled_no_independent_condensation_equilibrium"
+        note: "Runtime ledger routes evolved P through overhead gas to terminal offgas; no phosphate-salt capture fraction is certified"
     O2_total_processed_kg_per_kg_P: [0.8, 2.5]
     O2_net_bound_kg_per_kg_P: [0.15, 0.60]
     endpoint:
@@ -1054,12 +1055,12 @@ condensation_train:
         temp_range_C: [50, 400]
         products: ["H2O", "CO2", "S2", "hydrocarbons"]
         note: "Solar-wind implanted volatiles from C0"
-      - label: "P-trap (C0b)"
+      - label: "P-carrier pass-through (C0b)"
         temp_range_C: [350, 650]
         material: "CaO/MgO sorbent bed"
-        products: ["phosphate_salts"]
-        capture_efficiency_pct: [85, 98]
-        note: "Clean Ca/Mg/alkali phosphates; active during C0b only"
+        products: ["phosphorus_carrier_offgas"]
+        capture_status: "unmodeled_no_independent_condensation_equilibrium"
+        note: "Hardware concept only; runtime does not assert phosphate-salt capture and sends uncondensed carriers to terminal offgas"
 
   # --- Metals Train (C2A/C2B through C6) ---
   metals_train:

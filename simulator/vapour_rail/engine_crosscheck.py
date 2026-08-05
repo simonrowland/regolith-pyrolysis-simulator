@@ -221,8 +221,15 @@ def _rail_request(
     temperature_K: float,
     fo2_log10_bar: float,
     pressure_bar: float,
+    process_phase: str | None = None,
 ) -> IntentRequest:
     oxygen_bar = 10.0**fo2_log10_bar
+    control_inputs: dict[str, Any] = {
+        "pO2_bar": oxygen_bar,
+        "intrinsic_fO2_log": fo2_log10_bar,
+    }
+    if process_phase is not None:
+        control_inputs["process_phase"] = process_phase
     return IntentRequest(
         intent=ChemistryIntent.VAPOR_PRESSURE,
         account_view=ProviderAccountView(
@@ -232,10 +239,7 @@ def _rail_request(
         temperature_C=temperature_K - 273.15,
         pressure_bar=pressure_bar,
         fO2_log=fo2_log10_bar,
-        control_inputs={
-            "pO2_bar": oxygen_bar,
-            "intrinsic_fO2_log": fo2_log10_bar,
-        },
+        control_inputs=control_inputs,
     )
 
 
@@ -246,6 +250,7 @@ def _run_rail_cell(
     temperature_K: float,
     fo2_log10_bar: float,
     pressure_bar: float,
+    process_phase: str | None = None,
 ) -> dict[str, Any]:
     try:
         result = provider.dispatch(
@@ -254,6 +259,7 @@ def _run_rail_cell(
                 temperature_K=temperature_K,
                 fo2_log10_bar=fo2_log10_bar,
                 pressure_bar=pressure_bar,
+                process_phase=process_phase,
             )
         )
     except Exception as exc:  # noqa: BLE001 -- recorded diagnostic refusal

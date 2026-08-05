@@ -538,6 +538,67 @@ def test_stage0_only_active_in_stage0() -> None:
         assert answer.refusal_code != REFUSAL_INAPPLICABLE_PREDICATE
 
 
+def test_stage0_p_markers_activate_only_p2o5_sourced_rules() -> None:
+    def rule(
+        species_id: str,
+        parent: str,
+        atoms: set[str],
+        *,
+        predicate: str = "stage0_only",
+    ) -> RequestRule:
+        return RequestRule(
+            species_id=species_id,
+            source_account="process.cleaned_melt",
+            parent_species_ids=frozenset({parent}),
+            required_source_atoms=frozenset(atoms),
+            solve_group_id=f"{species_id.lower()}_test",
+            applicability_predicate=predicate,
+            request_rule_kind="source_inventory_present",
+            origin="catalog",
+            formula_id=species_id,
+            has_pressure_evaluator=True,
+            has_alpha=True,
+            has_route=True,
+            has_formula=True,
+            validation_status="pending_validation",
+        )
+
+    for stage in ("stage0_p_carriers", "c0b_p_cleanup"):
+        state = VapourResolveState(
+            temperature_K=1873.15,
+            process_phase="hot_train",
+            stage=stage,
+        )
+        p_batch = resolve_vapour_batch(
+            rules=(rule("PO", "P2O5", {"P", "O"}),),
+            ledger_snapshot={"process.cleaned_melt": {"P2O5": 1.0}},
+            state=state,
+            flux_activation_context=_rg_activation_context(),
+        )
+        assert p_batch.channel("PO").refusal_code != (
+            REFUSAL_INAPPLICABLE_PREDICATE
+        )
+
+        non_p_batch = resolve_vapour_batch(
+            rules=(
+                rule(
+                    "NaCl",
+                    "NaCl",
+                    {"Na", "Cl"},
+                    predicate=(
+                        "applicable" if stage == "c0b_p_cleanup" else "stage0_only"
+                    ),
+                ),
+            ),
+            ledger_snapshot={"process.cleaned_melt": {"NaCl": 1.0}},
+            state=state,
+            flux_activation_context=_rg_activation_context(),
+        )
+        assert non_p_batch.channel("NaCl").refusal_code == (
+            REFUSAL_INAPPLICABLE_PREDICATE
+        )
+
+
 # ---------------------------------------------------------------------------
 # Absent source atom
 # ---------------------------------------------------------------------------
@@ -705,6 +766,7 @@ def test_pending_validation_is_not_refusal() -> None:
     assert rg_batch.flux_active_species_ids == frozenset({"K"})
     assert answer.certification_ceiling == "never"
     assert answer.verdict_status == "status_bearing_non_authoritative"
+    assert "alpha_authority_status" not in answer.extra
 
 
 def test_out_of_domain_k_at_1650c_is_flux_eligible_but_non_authoritative() -> None:

@@ -4,9 +4,9 @@ description: Generated (element, neutral gas carrier) demand. Oxygen and the lum
   are not element owners; individual REEs enter when feedstocks declare resolvable formulas.
 counts:
   elements: 19
-  carriers: 102
-  pairs: 128
-  catalog_linked_pairs: 76
+  carriers: 357
+  pairs: 643
+  catalog_linked_pairs: 81
 provenance:
   feedstocks: data/feedstocks.yaml
   nasa_cea_extract: data/literature/extracts/nasa-cea-thermo.yaml
@@ -22,11 +22,14 @@ provenance:
   - data/literature/extracts/kems-012-sossi-2019.yaml
   - data/literature/extracts/kems-015-hashimoto-1983.yaml
   - data/literature/extracts/kems-016-stolyarova-1992.yaml
+  - data/literature/extracts/kems-017-stolyarova-2013.yaml
+  - data/literature/extracts/kems-018-stolyarova-2012.yaml
   - data/literature/extracts/kems-022-demaria-1971.yaml
   - data/literature/extracts/kems-027-plante-hastie-1983.yaml
   - data/literature/extracts/kems-031-halwax-2024.yaml
   - data/literature/extracts/kems-032-copland-jacobson-2010.yaml
   - data/literature/extracts/kems-037-richter-2002.yaml
+  - data/literature/extracts/kems-041-sossi-fegley-2018.yaml
   catalog: data/vapor_pressures.yaml
   lane_b_full_cea_census:
     path: null
@@ -56,104 +59,359 @@ elements:
 carriers:
 - Al
 - Al2
+- Al2C2
+- Al2Cl6
 - Al2O
 - Al2O2
 - Al2O3_gas
+- Al2S
+- Al2S2
+- AlC
+- AlC2
+- AlCl
+- AlCl2
+- AlCl3
+- AlH
+- AlH2
+- AlH2Cl
+- AlH3
+- AlHCl
+- AlHCl2
+- AlN
 - AlO
 - AlO2
+- AlO2H2
+- AlO2H2Cl
+- AlO3H3
+- AlOCl
+- AlOCl2
+- AlOH
+- AlOHCl
+- AlOHCl2
+- AlS
+- AlS2
+- C
+- C10H21
+- C10H8
+- C12H10
+- C12H9
+- C2
+- C2Cl
+- C2Cl2
+- C2Cl3
+- C2Cl4
+- C2Cl6
+- C2H
+- C2H2
+- C2H2Cl2
+- C2H2O
+- C2H2O2
+- C2H2O4
+- C2H3
+- C2H3Cl
+- C2H3ClO2
+- C2H3N
+- C2H3O
+- C2H4
+- C2H4O
+- C2H4O2
+- C2H4O3
+- C2H5
 - C2H5OH
 - C2H6
+- C2H6N2
+- C2H6O
+- C2H6O2
+- C2HCl
+- C2HCl3
+- C2N
+- C2N2
+- C2NO
+- C2O
+- C2S2
+- C3
+- C3H3
+- C3H4
+- C3H5
+- C3H6
+- C3H6O
+- C3H7
+- C3H8
+- C3H8O
+- C3N2O
+- C3O2
+- C3OS
+- C3S2
+- C4H10
+- C4H2
+- C4H6
+- C4H8
+- C4H8O4
+- C4H9
+- C4N2
+- C5
+- C5H10
+- C5H11
+- C5H12
+- C6H12
+- C6H13
+- C6H14
+- C6H2
+- C6H5
+- C6H5O
+- C6H6
+- C6H6O
+- C7H14
+- C7H15
+- C7H16
+- C7H7
+- C7H8
+- C7H8O
+- C8H10
+- C8H16
+- C8H17
+- C8H18
+- C8H8
+- C9H19
+- CCl
+- CCl2
+- CCl3
+- CCl4
+- CH
+- CH2
+- CH2Cl
+- CH2Cl2
+- CH3
 - CH3COOH
+- CH3Cl
+- CH3O
 - CH4
 - CH4O
+- CH4O2
+- CHCl
+- CHCl2
+- CHCl3
+- CN
+- CN2
 - CO
 - CO2
+- CO2H
+- COCl
+- COCl2
+- COHCl
 - COS
+- CP
+- CS
 - CS2
 - Ca
 - Ca2
+- CaCl
 - CaCl2
+- CaH
+- CaO2H2
+- CaOH
 - CaO_gas
+- CaS
 - Cl
 - Cl2
+- Cl2O
+- ClCN
+- ClO
+- ClO2
 - ClO4
 - Co
 - Cr
 - Cr2O3_gas
+- CrN
 - CrO
 - CrO2
 - CrO3
 - Fe
+- Fe2Cl4
+- Fe2Cl6
+- FeC5O5
+- FeCl
+- FeCl2
+- FeCl3
+- FeO2H2
 - FeO_gas
 - H
 - H2
+- H2CO
+- H2CO2
 - H2O
+- H2O2
 - H2S
+- H2SO4
+- H4C2O4
+- HAlO2
+- HC2N
+- HC2O
 - HCHO
 - HCN
+- HCO
 - HCl
+- HNC
 - HNCO
+- HNO
+- HNO2
+- HNO3
+- HO2
+- HOCl
+- HPO
 - K
 - K2
+- K2C2N2
+- K2CO3
 - K2Cl2
+- K2O2
+- K2O2H2
 - K2O_gas
+- K2SO4
+- KCN
 - KCl
+- KH
+- KNO2
+- KNO3
+- KNa
 - KO
 - KOH
 - Mg
 - Mg2
 - Mg2Cl4
+- MgCl
 - MgCl2
+- MgH
+- MgN
+- MgO2H2
+- MgOH
 - MgO_gas
+- MgS
 - Mn
 - MnO_gas
 - N
 - N2
+- N2C
+- N2H2
+- N2H2O2
+- N2H4
 - N2O
+- N2O3
 - N2O4
+- N2O5
+- N3
+- N3H
+- NCO
+- NH
+- NH2
 - NH3
+- NH3O
 - NH4CN
 - 'NO'
 - NO2
+- NO2Cl
+- NO3
+- NOCl
 - Na
 - Na2
 - Na2Cl2
+- Na2O2
+- Na2O2H2
 - Na2O_gas
+- Na2SO4
+- Na3Cl3
+- NaCN
 - NaCl
+- NaH
+- NaNO2
+- NaNO3
 - NaO
 - NaOH
 - Ni
+- NiCl
+- NiCl2
 - NiO_gas
+- NiS
+- OH
 - P
 - P2
+- P2O3
+- P2O4
 - P2O5_gas
+- P3
+- P3O6
 - P4
 - P4O10
 - P4O6
 - P4O7
 - P4O8
 - P4O9
+- PCl
+- PCl2
+- PCl3
+- PCl5
+- PH
+- PH2
+- PH3
+- PN
 - PO
 - PO2
+- POCl3
+- PS
+- S
 - S2
+- S2Cl2
+- S2O
 - S3
 - S4
 - S5
 - S6
 - S7
 - S8
+- SCl
+- SCl2
+- SH
+- SN
+- SO
 - SO2
+- SO2Cl2
 - SO3
 - S_total
 - Si
 - Si2
+- Si2C
+- Si2N
 - Si3
+- SiC
+- SiC2
+- SiCl
+- SiCl2
+- SiCl3
+- SiCl4
+- SiH
+- SiH2
+- SiH2Cl2
+- SiH3
+- SiH3Cl
+- SiH4
+- SiHCl
+- SiHCl3
+- SiN
 - SiO
 - SiO2_gas
+- SiS
+- SiS2
 - Ti
+- TiCl
+- TiCl2
+- TiCl3
+- TiCl4
 - TiO
 - TiO2_gas
+- TiOCl
+- TiOCl2
 - Zr
+- ZrN
 - ZrO
 - ZrO2
 pairs:
@@ -163,9 +421,11 @@ pairs:
   atoms:
     Al: 1.0
   sources:
+  - kems-022-demaria-1971
   - nasa_cea_extract
   - vapor_pressures_catalog
   source_species_ids:
+  - kems-022-demaria-1971:Al
   - nasa_cea_extract:AL
   - vapor_pressures_catalog:Al
   catalog_family_ids:
@@ -186,17 +446,49 @@ pairs:
   catalog_species_ids: []
   thermo_available: true
 - element: Al
+  carrier: Al2C2
+  formula: Al2C2
+  atoms:
+    Al: 2.0
+    C: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:AL2C2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Al
+  carrier: Al2Cl6
+  formula: Al2Cl6
+  atoms:
+    Al: 2.0
+    Cl: 6.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:AL2CL6
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Al
   carrier: Al2O
   formula: Al2O
   atoms:
     Al: 2.0
     O: 1.0
   sources:
+  - kems-022-demaria-1971
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
+  - kems-022-demaria-1971:Al2O
   - nasa_cea_extract:AL2O
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Al2O
+  catalog_family_ids:
+  - oxide_vapors_al2o_family
+  catalog_species_ids:
+  - Al2O
   thermo_available: true
 - element: Al
   carrier: Al2O2
@@ -225,17 +517,208 @@ pairs:
   catalog_species_ids: []
   thermo_available: true
 - element: Al
+  carrier: Al2S
+  formula: Al2S
+  atoms:
+    Al: 2.0
+    S: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:AL2S
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Al
+  carrier: Al2S2
+  formula: Al2S2
+  atoms:
+    Al: 2.0
+    S: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:AL2S2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Al
+  carrier: AlC
+  formula: AlC
+  atoms:
+    Al: 1.0
+    C: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALC
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Al
+  carrier: AlC2
+  formula: AlC2
+  atoms:
+    Al: 1.0
+    C: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALC2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Al
+  carrier: AlCl
+  formula: AlCl
+  atoms:
+    Al: 1.0
+    Cl: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Al
+  carrier: AlCl2
+  formula: AlCl2
+  atoms:
+    Al: 1.0
+    Cl: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALCL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Al
+  carrier: AlCl3
+  formula: AlCl3
+  atoms:
+    Al: 1.0
+    Cl: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALCL3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Al
+  carrier: AlH
+  formula: AlH
+  atoms:
+    Al: 1.0
+    H: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Al
+  carrier: AlH2
+  formula: AlH2
+  atoms:
+    Al: 1.0
+    H: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALH2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Al
+  carrier: AlH2Cl
+  formula: AlH2Cl
+  atoms:
+    Al: 1.0
+    Cl: 1.0
+    H: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALH2CL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Al
+  carrier: AlH3
+  formula: AlH3
+  atoms:
+    Al: 1.0
+    H: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALH3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Al
+  carrier: AlHCl
+  formula: AlHCl
+  atoms:
+    Al: 1.0
+    Cl: 1.0
+    H: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALHCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Al
+  carrier: AlHCl2
+  formula: AlHCl2
+  atoms:
+    Al: 1.0
+    Cl: 2.0
+    H: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALHCL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Al
+  carrier: AlN
+  formula: AlN
+  atoms:
+    Al: 1.0
+    N: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALN
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Al
   carrier: AlO
   formula: AlO
   atoms:
     Al: 1.0
     O: 1.0
   sources:
+  - kems-022-demaria-1971
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
+  - kems-022-demaria-1971:AlO
   - nasa_cea_extract:ALO
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:AlO
+  catalog_family_ids:
+  - oxide_vapors_alo_family
+  catalog_species_ids:
+  - AlO
   thermo_available: true
 - element: Al
   carrier: AlO2
@@ -247,6 +730,564 @@ pairs:
   - nasa_cea_extract
   source_species_ids:
   - nasa_cea_extract:ALO2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Al
+  carrier: AlO2H2
+  formula: AlO2H2
+  atoms:
+    Al: 1.0
+    H: 2.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:AL(OH)2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Al
+  carrier: AlO2H2Cl
+  formula: AlO2H2Cl
+  atoms:
+    Al: 1.0
+    Cl: 1.0
+    H: 2.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:AL(OH)2CL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Al
+  carrier: AlO3H3
+  formula: AlO3H3
+  atoms:
+    Al: 1.0
+    H: 3.0
+    O: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:AL(OH)3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Al
+  carrier: AlOCl
+  formula: AlOCl
+  atoms:
+    Al: 1.0
+    Cl: 1.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALOCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Al
+  carrier: AlOCl2
+  formula: AlOCl2
+  atoms:
+    Al: 1.0
+    Cl: 2.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALOCL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Al
+  carrier: AlOH
+  formula: AlOH
+  atoms:
+    Al: 1.0
+    H: 1.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALOH
+  - nasa_cea_extract:HALO
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Al
+  carrier: AlOHCl
+  formula: AlOHCl
+  atoms:
+    Al: 1.0
+    Cl: 1.0
+    H: 1.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALOHCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Al
+  carrier: AlOHCl2
+  formula: AlOHCl2
+  atoms:
+    Al: 1.0
+    Cl: 2.0
+    H: 1.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALOHCL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Al
+  carrier: AlS
+  formula: AlS
+  atoms:
+    Al: 1.0
+    S: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALS
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Al
+  carrier: AlS2
+  formula: AlS2
+  atoms:
+    Al: 1.0
+    S: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALS2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Al
+  carrier: HAlO2
+  formula: HAlO2
+  atoms:
+    Al: 1.0
+    H: 1.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:HALO2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: Al2C2
+  formula: Al2C2
+  atoms:
+    Al: 2.0
+    C: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:AL2C2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: AlC
+  formula: AlC
+  atoms:
+    Al: 1.0
+    C: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALC
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: AlC2
+  formula: AlC2
+  atoms:
+    Al: 1.0
+    C: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALC2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C
+  formula: C
+  atoms:
+    C: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C10H21
+  formula: C10H21
+  atoms:
+    C: 10.0
+    H: 21.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C10H21,n-decyl
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C10H8
+  formula: C10H8
+  atoms:
+    C: 10.0
+    H: 8.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C10H8,naphthale
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C12H10
+  formula: C12H10
+  atoms:
+    C: 12.0
+    H: 10.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C12H10,biphenyl
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C12H9
+  formula: C12H9
+  atoms:
+    C: 12.0
+    H: 9.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C12H9,o-bipheny
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C2
+  formula: C2
+  atoms:
+    C: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C2Cl
+  formula: C2Cl
+  atoms:
+    C: 2.0
+    Cl: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2CL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C2Cl2
+  formula: C2Cl2
+  atoms:
+    C: 2.0
+    Cl: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2CL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C2Cl3
+  formula: C2Cl3
+  atoms:
+    C: 2.0
+    Cl: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2CL3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C2Cl4
+  formula: C2Cl4
+  atoms:
+    C: 2.0
+    Cl: 4.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2CL4
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C2Cl6
+  formula: C2Cl6
+  atoms:
+    C: 2.0
+    Cl: 6.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2CL6
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C2H
+  formula: C2H
+  atoms:
+    C: 2.0
+    H: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2H
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C2H2
+  formula: C2H2
+  atoms:
+    C: 2.0
+    H: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2H2,acetylene
+  - nasa_cea_extract:C2H2,vinylidene
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C2H2Cl2
+  formula: C2H2Cl2
+  atoms:
+    C: 2.0
+    Cl: 2.0
+    H: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2H2CL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C2H2O
+  formula: C2H2O
+  atoms:
+    C: 2.0
+    H: 2.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CH2CO,ketene
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C2H2O2
+  formula: C2H2O2
+  atoms:
+    C: 2.0
+    H: 2.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:O(CH)2O
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C2H2O4
+  formula: C2H2O4
+  atoms:
+    C: 2.0
+    H: 2.0
+    O: 4.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:HO(CO)2OH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C2H3
+  formula: C2H3
+  atoms:
+    C: 2.0
+    H: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2H3,vinyl
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C2H3Cl
+  formula: C2H3Cl
+  atoms:
+    C: 2.0
+    Cl: 1.0
+    H: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2H3CL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C2H3ClO2
+  formula: C2H3ClO2
+  atoms:
+    C: 2.0
+    Cl: 1.0
+    H: 3.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CH2CL-COOH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C2H3N
+  formula: C2H3N
+  atoms:
+    C: 2.0
+    H: 3.0
+    N: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CH3CN
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C2H3O
+  formula: C2H3O
+  atoms:
+    C: 2.0
+    H: 3.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CH3CO,acetyl
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C2H4
+  formula: C2H4
+  atoms:
+    C: 2.0
+    H: 4.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2H4
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C2H4O
+  formula: C2H4O
+  atoms:
+    C: 2.0
+    H: 4.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2H4O,ethylen-o
+  - nasa_cea_extract:CH3CHO,ethanal
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C2H4O2
+  formula: C2H4O2
+  atoms:
+    C: 2.0
+    H: 4.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CH3COOH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C2H4O3
+  formula: C2H4O3
+  atoms:
+    C: 2.0
+    H: 4.0
+    O: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:OHCH2COOH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C2H5
+  formula: C2H5
+  atoms:
+    C: 2.0
+    H: 5.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2H5
   catalog_family_ids: []
   catalog_species_ids: []
   thermo_available: true
@@ -273,14 +1314,871 @@ pairs:
     C: 2.0
     H: 6.0
   sources:
+  - nasa_cea_extract
   - vapor_pressures_catalog
   source_species_ids:
+  - nasa_cea_extract:C2H6
   - vapor_pressures_catalog:C2H6
   catalog_family_ids:
   - volatile_hydrocarbon_C2H6_family
   catalog_species_ids:
   - C2H6
-  thermo_available: false
+  thermo_available: true
+- element: C
+  carrier: C2H6N2
+  formula: C2H6N2
+  atoms:
+    C: 2.0
+    H: 6.0
+    N: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CH3N2CH3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C2H6O
+  formula: C2H6O
+  atoms:
+    C: 2.0
+    H: 6.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2H5OH
+  - nasa_cea_extract:CH3OCH3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C2H6O2
+  formula: C2H6O2
+  atoms:
+    C: 2.0
+    H: 6.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CH3O2CH3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C2HCl
+  formula: C2HCl
+  atoms:
+    C: 2.0
+    Cl: 1.0
+    H: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2HCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C2HCl3
+  formula: C2HCl3
+  atoms:
+    C: 2.0
+    Cl: 3.0
+    H: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2HCL3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C2N
+  formula: C2N
+  atoms:
+    C: 2.0
+    N: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CCN
+  - nasa_cea_extract:CNC
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C2N2
+  formula: C2N2
+  atoms:
+    C: 2.0
+    N: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2N2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C2NO
+  formula: C2NO
+  atoms:
+    C: 2.0
+    N: 1.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:OCCN
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C2O
+  formula: C2O
+  atoms:
+    C: 2.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2O
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C2S2
+  formula: C2S2
+  atoms:
+    C: 2.0
+    S: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2S2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C3
+  formula: C3
+  atoms:
+    C: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C3H3
+  formula: C3H3
+  atoms:
+    C: 3.0
+    H: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C3H3,1-propynl
+  - nasa_cea_extract:C3H3,2-propynl
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C3H4
+  formula: C3H4
+  atoms:
+    C: 3.0
+    H: 4.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C3H4,allene
+  - nasa_cea_extract:C3H4,propyne
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C3H5
+  formula: C3H5
+  atoms:
+    C: 3.0
+    H: 5.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C3H5,allyl
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C3H6
+  formula: C3H6
+  atoms:
+    C: 3.0
+    H: 6.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C3H6,propylene
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C3H6O
+  formula: C3H6O
+  atoms:
+    C: 3.0
+    H: 6.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C3H6O,acetone
+  - nasa_cea_extract:C3H6O,propanal
+  - nasa_cea_extract:C3H6O,propylox
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C3H7
+  formula: C3H7
+  atoms:
+    C: 3.0
+    H: 7.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C3H7,i-propyl
+  - nasa_cea_extract:C3H7,n-propyl
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C3H8
+  formula: C3H8
+  atoms:
+    C: 3.0
+    H: 8.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C3H8
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C3H8O
+  formula: C3H8O
+  atoms:
+    C: 3.0
+    H: 8.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C3H8O,1propanol
+  - nasa_cea_extract:C3H8O,2propanol
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C3N2O
+  formula: C3N2O
+  atoms:
+    C: 3.0
+    N: 2.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CNCOCN
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C3O2
+  formula: C3O2
+  atoms:
+    C: 3.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C3O2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C3OS
+  formula: C3OS
+  atoms:
+    C: 3.0
+    O: 1.0
+    S: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C3OS
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C3S2
+  formula: C3S2
+  atoms:
+    C: 3.0
+    S: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C3S2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C4H10
+  formula: C4H10
+  atoms:
+    C: 4.0
+    H: 10.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C4H10,isobutane
+  - nasa_cea_extract:C4H10,n-butane
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C4H2
+  formula: C4H2
+  atoms:
+    C: 4.0
+    H: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C4H2,butadiyne
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C4H6
+  formula: C4H6
+  atoms:
+    C: 4.0
+    H: 6.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C4H6,1butyne
+  - nasa_cea_extract:C4H6,2butyne
+  - nasa_cea_extract:C4H6,butadiene
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C4H8
+  formula: C4H8
+  atoms:
+    C: 4.0
+    H: 8.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C4H8,1-butene
+  - nasa_cea_extract:C4H8,cis2-buten
+  - nasa_cea_extract:C4H8,isobutene
+  - nasa_cea_extract:C4H8,tr2-butene
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C4H8O4
+  formula: C4H8O4
+  atoms:
+    C: 4.0
+    H: 8.0
+    O: 4.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:(CH3COOH)2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C4H9
+  formula: C4H9
+  atoms:
+    C: 4.0
+    H: 9.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C4H9,i-butyl
+  - nasa_cea_extract:C4H9,n-butyl
+  - nasa_cea_extract:C4H9,s-butyl
+  - nasa_cea_extract:C4H9,t-butyl
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C4N2
+  formula: C4N2
+  atoms:
+    C: 4.0
+    N: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C4N2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C5
+  formula: C5
+  atoms:
+    C: 5.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C5
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C5H10
+  formula: C5H10
+  atoms:
+    C: 5.0
+    H: 10.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C5H10,1-pentene
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C5H11
+  formula: C5H11
+  atoms:
+    C: 5.0
+    H: 11.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C5H11,pentyl
+  - nasa_cea_extract:C5H11,t-pentyl
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C5H12
+  formula: C5H12
+  atoms:
+    C: 5.0
+    H: 12.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C5H12,i-pentane
+  - nasa_cea_extract:C5H12,n-pentane
+  - nasa_cea_extract:CH3C(CH3)2CH3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C6H12
+  formula: C6H12
+  atoms:
+    C: 6.0
+    H: 12.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C6H12,1-hexene
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C6H13
+  formula: C6H13
+  atoms:
+    C: 6.0
+    H: 13.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C6H13,n-hexyl
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C6H14
+  formula: C6H14
+  atoms:
+    C: 6.0
+    H: 14.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C6H14,n-hexane
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C6H2
+  formula: C6H2
+  atoms:
+    C: 6.0
+    H: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C6H2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C6H5
+  formula: C6H5
+  atoms:
+    C: 6.0
+    H: 5.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C6H5,phenyl
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C6H5O
+  formula: C6H5O
+  atoms:
+    C: 6.0
+    H: 5.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C6H5O,phenoxy
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C6H6
+  formula: C6H6
+  atoms:
+    C: 6.0
+    H: 6.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C6H6
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C6H6O
+  formula: C6H6O
+  atoms:
+    C: 6.0
+    H: 6.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C6H5OH,phenol
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C7H14
+  formula: C7H14
+  atoms:
+    C: 7.0
+    H: 14.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C7H14,1-heptene
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C7H15
+  formula: C7H15
+  atoms:
+    C: 7.0
+    H: 15.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C7H15,n-heptyl
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C7H16
+  formula: C7H16
+  atoms:
+    C: 7.0
+    H: 16.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C7H16,2-methylh
+  - nasa_cea_extract:C7H16,n-heptane
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C7H7
+  formula: C7H7
+  atoms:
+    C: 7.0
+    H: 7.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C7H7,benzyl
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C7H8
+  formula: C7H8
+  atoms:
+    C: 7.0
+    H: 8.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C7H8
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C7H8O
+  formula: C7H8O
+  atoms:
+    C: 7.0
+    H: 8.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C7H8O,cresol-mx
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C8H10
+  formula: C8H10
+  atoms:
+    C: 8.0
+    H: 10.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C8H10,ethylbenz
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C8H16
+  formula: C8H16
+  atoms:
+    C: 8.0
+    H: 16.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C8H16,1-octene
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C8H17
+  formula: C8H17
+  atoms:
+    C: 8.0
+    H: 17.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C8H17,n-octyl
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C8H18
+  formula: C8H18
+  atoms:
+    C: 8.0
+    H: 18.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C8H18,isooctane
+  - nasa_cea_extract:C8H18,n-octane
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C8H8
+  formula: C8H8
+  atoms:
+    C: 8.0
+    H: 8.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C8H8,styrene
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: C9H19
+  formula: C9H19
+  atoms:
+    C: 9.0
+    H: 19.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C9H19,n-nonyl
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: CCl
+  formula: CCl
+  atoms:
+    C: 1.0
+    Cl: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: CCl2
+  formula: CCl2
+  atoms:
+    C: 1.0
+    Cl: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CCL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: CCl3
+  formula: CCl3
+  atoms:
+    C: 1.0
+    Cl: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CCL3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: CCl4
+  formula: CCl4
+  atoms:
+    C: 1.0
+    Cl: 4.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CCL4
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: CH
+  formula: CH
+  atoms:
+    C: 1.0
+    H: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: CH2
+  formula: CH2
+  atoms:
+    C: 1.0
+    H: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CH2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: CH2Cl
+  formula: CH2Cl
+  atoms:
+    C: 1.0
+    Cl: 1.0
+    H: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CH2CL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: CH2Cl2
+  formula: CH2Cl2
+  atoms:
+    C: 1.0
+    Cl: 2.0
+    H: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CH2CL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: CH3
+  formula: CH3
+  atoms:
+    C: 1.0
+    H: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CH3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
 - element: C
   carrier: CH3COOH
   formula: CH3COOH
@@ -297,6 +2195,35 @@ pairs:
   catalog_species_ids:
   - CH3COOH
   thermo_available: false
+- element: C
+  carrier: CH3Cl
+  formula: CH3Cl
+  atoms:
+    C: 1.0
+    Cl: 1.0
+    H: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CH3CL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: CH3O
+  formula: CH3O
+  atoms:
+    C: 1.0
+    H: 3.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CH2OH
+  - nasa_cea_extract:CH3O
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
 - element: C
   carrier: CH4
   formula: CH4
@@ -325,6 +2252,88 @@ pairs:
   - nasa_cea_extract
   source_species_ids:
   - nasa_cea_extract:CH3OH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: CH4O2
+  formula: CH4O2
+  atoms:
+    C: 1.0
+    H: 4.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CH3OOH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: CHCl
+  formula: CHCl
+  atoms:
+    C: 1.0
+    Cl: 1.0
+    H: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CHCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: CHCl2
+  formula: CHCl2
+  atoms:
+    C: 1.0
+    Cl: 2.0
+    H: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CHCL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: CHCl3
+  formula: CHCl3
+  atoms:
+    C: 1.0
+    Cl: 3.0
+    H: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CHCL3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: CN
+  formula: CN
+  atoms:
+    C: 1.0
+    N: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CN
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: CN2
+  formula: CN2
+  atoms:
+    C: 1.0
+    N: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CNN
   catalog_family_ids: []
   catalog_species_ids: []
   thermo_available: true
@@ -363,6 +2372,63 @@ pairs:
   - CO2
   thermo_available: true
 - element: C
+  carrier: CO2H
+  formula: CO2H
+  atoms:
+    C: 1.0
+    H: 1.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:COOH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: COCl
+  formula: COCl
+  atoms:
+    C: 1.0
+    Cl: 1.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:COCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: COCl2
+  formula: COCl2
+  atoms:
+    C: 1.0
+    Cl: 2.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:COCL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: COHCl
+  formula: COHCl
+  atoms:
+    C: 1.0
+    Cl: 1.0
+    H: 1.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:COHCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
   carrier: COS
   formula: COS
   atoms:
@@ -370,14 +2436,42 @@ pairs:
     O: 1.0
     S: 1.0
   sources:
+  - nasa_cea_extract
   - vapor_pressures_catalog
   source_species_ids:
+  - nasa_cea_extract:COS
   - vapor_pressures_catalog:COS
   catalog_family_ids:
   - volatile_sulfur_COS_family
   catalog_species_ids:
   - COS
-  thermo_available: false
+  thermo_available: true
+- element: C
+  carrier: CP
+  formula: CP
+  atoms:
+    C: 1.0
+    P: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CP
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: CS
+  formula: CS
+  atoms:
+    C: 1.0
+    S: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CS
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
 - element: C
   carrier: CS2
   formula: CS2
@@ -385,14 +2479,114 @@ pairs:
     C: 1.0
     S: 2.0
   sources:
+  - nasa_cea_extract
   - vapor_pressures_catalog
   source_species_ids:
+  - nasa_cea_extract:CS2
   - vapor_pressures_catalog:CS2
   catalog_family_ids:
   - volatile_sulfur_CS2_family
   catalog_species_ids:
   - CS2
-  thermo_available: false
+  thermo_available: true
+- element: C
+  carrier: ClCN
+  formula: ClCN
+  atoms:
+    C: 1.0
+    Cl: 1.0
+    N: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CLCN
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: FeC5O5
+  formula: FeC5O5
+  atoms:
+    C: 5.0
+    Fe: 1.0
+    O: 5.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:Fe(CO)5
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: H2CO
+  formula: H2CO
+  atoms:
+    C: 1.0
+    H: 2.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:HCHO,formaldehy
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: H2CO2
+  formula: H2CO2
+  atoms:
+    C: 1.0
+    H: 2.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:HCOOH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: H4C2O4
+  formula: H4C2O4
+  atoms:
+    C: 2.0
+    H: 4.0
+    O: 4.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:(HCOOH)2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: HC2N
+  formula: HC2N
+  atoms:
+    C: 2.0
+    H: 1.0
+    N: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:HCCN
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: HC2O
+  formula: HC2O
+  atoms:
+    C: 2.0
+    H: 1.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:HCCO
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
 - element: C
   carrier: HCHO
   formula: HCHO
@@ -428,6 +2622,34 @@ pairs:
   - HCN
   thermo_available: true
 - element: C
+  carrier: HCO
+  formula: HCO
+  atoms:
+    C: 1.0
+    H: 1.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:HCO
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: HNC
+  formula: HNC
+  atoms:
+    C: 1.0
+    H: 1.0
+    N: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:HNC
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
   carrier: HNCO
   formula: HNCO
   atoms:
@@ -436,14 +2658,85 @@ pairs:
     N: 1.0
     O: 1.0
   sources:
+  - nasa_cea_extract
   - vapor_pressures_catalog
   source_species_ids:
+  - nasa_cea_extract:HNCO
   - vapor_pressures_catalog:HNCO
   catalog_family_ids:
   - volatile_nitrogen_HNCO_family
   catalog_species_ids:
   - HNCO
-  thermo_available: false
+  thermo_available: true
+- element: C
+  carrier: K2C2N2
+  formula: K2C2N2
+  atoms:
+    C: 2.0
+    K: 2.0
+    N: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:K2C2N2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: K2CO3
+  formula: K2CO3
+  atoms:
+    C: 1.0
+    K: 2.0
+    O: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:K2CO3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: KCN
+  formula: KCN
+  atoms:
+    C: 1.0
+    K: 1.0
+    N: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:KCN
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: N2C
+  formula: N2C
+  atoms:
+    C: 1.0
+    N: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:NCN
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: NCO
+  formula: NCO
+  atoms:
+    C: 1.0
+    N: 1.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:NCO
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
 - element: C
   carrier: NH4CN
   formula: NH4CN
@@ -460,16 +2753,71 @@ pairs:
   catalog_species_ids:
   - NH4CN
   thermo_available: false
+- element: C
+  carrier: NaCN
+  formula: NaCN
+  atoms:
+    C: 1.0
+    N: 1.0
+    Na: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:NaCN
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: Si2C
+  formula: Si2C
+  atoms:
+    C: 1.0
+    Si: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:Si2C
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: SiC
+  formula: SiC
+  atoms:
+    C: 1.0
+    Si: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SiC
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: C
+  carrier: SiC2
+  formula: SiC2
+  atoms:
+    C: 2.0
+    Si: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SiC2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
 - element: Ca
   carrier: Ca
   formula: Ca
   atoms:
     Ca: 1.0
   sources:
+  - kems-022-demaria-1971
   - kems-031-halwax-2024
   - nasa_cea_extract
   - vapor_pressures_catalog
   source_species_ids:
+  - kems-022-demaria-1971:Ca
   - kems-031-halwax-2024:CaO
   - nasa_cea_extract:Ca
   - vapor_pressures_catalog:Ca
@@ -491,6 +2839,19 @@ pairs:
   catalog_species_ids: []
   thermo_available: true
 - element: Ca
+  carrier: CaCl
+  formula: CaCl
+  atoms:
+    Ca: 1.0
+    Cl: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CaCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Ca
   carrier: CaCl2
   formula: CaCl2
   atoms:
@@ -508,6 +2869,47 @@ pairs:
   - CaCl2
   thermo_available: true
 - element: Ca
+  carrier: CaH
+  formula: CaH
+  atoms:
+    Ca: 1.0
+    H: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CaH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Ca
+  carrier: CaO2H2
+  formula: CaO2H2
+  atoms:
+    Ca: 1.0
+    H: 2.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:Ca(OH)2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Ca
+  carrier: CaOH
+  formula: CaOH
+  atoms:
+    Ca: 1.0
+    H: 1.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CaOH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Ca
   carrier: CaO_gas
   formula: CaO
   atoms:
@@ -515,8 +2917,520 @@ pairs:
     O: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:CaO
+  - vapor_pressures_catalog:CaO_gas
+  catalog_family_ids:
+  - oxide_vapors_cao_family
+  catalog_species_ids:
+  - CaO_gas
+  thermo_available: true
+- element: Ca
+  carrier: CaS
+  formula: CaS
+  atoms:
+    Ca: 1.0
+    S: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CaS
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: Al2Cl6
+  formula: Al2Cl6
+  atoms:
+    Al: 2.0
+    Cl: 6.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:AL2CL6
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: AlCl
+  formula: AlCl
+  atoms:
+    Al: 1.0
+    Cl: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: AlCl2
+  formula: AlCl2
+  atoms:
+    Al: 1.0
+    Cl: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALCL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: AlCl3
+  formula: AlCl3
+  atoms:
+    Al: 1.0
+    Cl: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALCL3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: AlH2Cl
+  formula: AlH2Cl
+  atoms:
+    Al: 1.0
+    Cl: 1.0
+    H: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALH2CL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: AlHCl
+  formula: AlHCl
+  atoms:
+    Al: 1.0
+    Cl: 1.0
+    H: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALHCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: AlHCl2
+  formula: AlHCl2
+  atoms:
+    Al: 1.0
+    Cl: 2.0
+    H: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALHCL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: AlO2H2Cl
+  formula: AlO2H2Cl
+  atoms:
+    Al: 1.0
+    Cl: 1.0
+    H: 2.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:AL(OH)2CL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: AlOCl
+  formula: AlOCl
+  atoms:
+    Al: 1.0
+    Cl: 1.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALOCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: AlOCl2
+  formula: AlOCl2
+  atoms:
+    Al: 1.0
+    Cl: 2.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALOCL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: AlOHCl
+  formula: AlOHCl
+  atoms:
+    Al: 1.0
+    Cl: 1.0
+    H: 1.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALOHCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: AlOHCl2
+  formula: AlOHCl2
+  atoms:
+    Al: 1.0
+    Cl: 2.0
+    H: 1.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALOHCL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: C2Cl
+  formula: C2Cl
+  atoms:
+    C: 2.0
+    Cl: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2CL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: C2Cl2
+  formula: C2Cl2
+  atoms:
+    C: 2.0
+    Cl: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2CL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: C2Cl3
+  formula: C2Cl3
+  atoms:
+    C: 2.0
+    Cl: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2CL3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: C2Cl4
+  formula: C2Cl4
+  atoms:
+    C: 2.0
+    Cl: 4.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2CL4
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: C2Cl6
+  formula: C2Cl6
+  atoms:
+    C: 2.0
+    Cl: 6.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2CL6
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: C2H2Cl2
+  formula: C2H2Cl2
+  atoms:
+    C: 2.0
+    Cl: 2.0
+    H: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2H2CL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: C2H3Cl
+  formula: C2H3Cl
+  atoms:
+    C: 2.0
+    Cl: 1.0
+    H: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2H3CL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: C2H3ClO2
+  formula: C2H3ClO2
+  atoms:
+    C: 2.0
+    Cl: 1.0
+    H: 3.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CH2CL-COOH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: C2HCl
+  formula: C2HCl
+  atoms:
+    C: 2.0
+    Cl: 1.0
+    H: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2HCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: C2HCl3
+  formula: C2HCl3
+  atoms:
+    C: 2.0
+    Cl: 3.0
+    H: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2HCL3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: CCl
+  formula: CCl
+  atoms:
+    C: 1.0
+    Cl: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: CCl2
+  formula: CCl2
+  atoms:
+    C: 1.0
+    Cl: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CCL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: CCl3
+  formula: CCl3
+  atoms:
+    C: 1.0
+    Cl: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CCL3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: CCl4
+  formula: CCl4
+  atoms:
+    C: 1.0
+    Cl: 4.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CCL4
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: CH2Cl
+  formula: CH2Cl
+  atoms:
+    C: 1.0
+    Cl: 1.0
+    H: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CH2CL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: CH2Cl2
+  formula: CH2Cl2
+  atoms:
+    C: 1.0
+    Cl: 2.0
+    H: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CH2CL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: CH3Cl
+  formula: CH3Cl
+  atoms:
+    C: 1.0
+    Cl: 1.0
+    H: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CH3CL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: CHCl
+  formula: CHCl
+  atoms:
+    C: 1.0
+    Cl: 1.0
+    H: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CHCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: CHCl2
+  formula: CHCl2
+  atoms:
+    C: 1.0
+    Cl: 2.0
+    H: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CHCL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: CHCl3
+  formula: CHCl3
+  atoms:
+    C: 1.0
+    Cl: 3.0
+    H: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CHCL3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: COCl
+  formula: COCl
+  atoms:
+    C: 1.0
+    Cl: 1.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:COCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: COCl2
+  formula: COCl2
+  atoms:
+    C: 1.0
+    Cl: 2.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:COCL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: COHCl
+  formula: COHCl
+  atoms:
+    C: 1.0
+    Cl: 1.0
+    H: 1.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:COHCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: CaCl
+  formula: CaCl
+  atoms:
+    Ca: 1.0
+    Cl: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CaCL
   catalog_family_ids: []
   catalog_species_ids: []
   thermo_available: true
@@ -566,6 +3480,59 @@ pairs:
   - Cl2
   thermo_available: true
 - element: Cl
+  carrier: Cl2O
+  formula: Cl2O
+  atoms:
+    Cl: 2.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CL2O
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: ClCN
+  formula: ClCN
+  atoms:
+    C: 1.0
+    Cl: 1.0
+    N: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CLCN
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: ClO
+  formula: ClO
+  atoms:
+    Cl: 1.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CLO
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: ClO2
+  formula: ClO2
+  atoms:
+    Cl: 1.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CLO2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
   carrier: ClO4
   formula: ClO4
   atoms:
@@ -580,6 +3547,71 @@ pairs:
   catalog_species_ids:
   - ClO4
   thermo_available: false
+- element: Cl
+  carrier: Fe2Cl4
+  formula: Fe2Cl4
+  atoms:
+    Cl: 4.0
+    Fe: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:Fe2CL4
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: Fe2Cl6
+  formula: Fe2Cl6
+  atoms:
+    Cl: 6.0
+    Fe: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:Fe2CL6
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: FeCl
+  formula: FeCl
+  atoms:
+    Cl: 1.0
+    Fe: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:FeCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: FeCl2
+  formula: FeCl2
+  atoms:
+    Cl: 2.0
+    Fe: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:FeCL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: FeCl3
+  formula: FeCl3
+  atoms:
+    Cl: 3.0
+    Fe: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:FeCL3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
 - element: Cl
   carrier: HCl
   formula: HCl
@@ -596,6 +3628,20 @@ pairs:
   - halide_hydrogen_HCl_family
   catalog_species_ids:
   - HCl
+  thermo_available: true
+- element: Cl
+  carrier: HOCl
+  formula: HOCl
+  atoms:
+    Cl: 1.0
+    H: 1.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:HOCL
+  catalog_family_ids: []
+  catalog_species_ids: []
   thermo_available: true
 - element: Cl
   carrier: K2Cl2
@@ -651,6 +3697,19 @@ pairs:
   - Mg2Cl4
   thermo_available: false
 - element: Cl
+  carrier: MgCl
+  formula: MgCl
+  atoms:
+    Cl: 1.0
+    Mg: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:MgCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
   carrier: MgCl2
   formula: MgCl2
   atoms:
@@ -670,6 +3729,34 @@ pairs:
   - MgCl2
   thermo_available: true
 - element: Cl
+  carrier: NO2Cl
+  formula: NO2Cl
+  atoms:
+    Cl: 1.0
+    N: 1.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:NO2CL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: NOCl
+  formula: NOCl
+  atoms:
+    Cl: 1.0
+    N: 1.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:NOCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
   carrier: Na2Cl2
   formula: Na2Cl2
   atoms:
@@ -685,6 +3772,19 @@ pairs:
   - halide_association_Na2Cl2_family
   catalog_species_ids:
   - Na2Cl2
+  thermo_available: true
+- element: Cl
+  carrier: Na3Cl3
+  formula: Na3Cl3
+  atoms:
+    Cl: 3.0
+    Na: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:Na3CL3
+  catalog_family_ids: []
+  catalog_species_ids: []
   thermo_available: true
 - element: Cl
   carrier: NaCl
@@ -705,6 +3805,339 @@ pairs:
   catalog_species_ids:
   - NaCl
   thermo_available: true
+- element: Cl
+  carrier: NiCl
+  formula: NiCl
+  atoms:
+    Cl: 1.0
+    Ni: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:NiCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: NiCl2
+  formula: NiCl2
+  atoms:
+    Cl: 2.0
+    Ni: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:NiCL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: PCl
+  formula: PCl
+  atoms:
+    Cl: 1.0
+    P: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:PCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: PCl2
+  formula: PCl2
+  atoms:
+    Cl: 2.0
+    P: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:PCL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: PCl3
+  formula: PCl3
+  atoms:
+    Cl: 3.0
+    P: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:PCL3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: PCl5
+  formula: PCl5
+  atoms:
+    Cl: 5.0
+    P: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:PCL5
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: POCl3
+  formula: POCl3
+  atoms:
+    Cl: 3.0
+    O: 1.0
+    P: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:POCL3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: S2Cl2
+  formula: S2Cl2
+  atoms:
+    Cl: 2.0
+    S: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:S2CL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: SCl
+  formula: SCl
+  atoms:
+    Cl: 1.0
+    S: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: SCl2
+  formula: SCl2
+  atoms:
+    Cl: 2.0
+    S: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SCL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: SO2Cl2
+  formula: SO2Cl2
+  atoms:
+    Cl: 2.0
+    O: 2.0
+    S: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SO2CL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: SiCl
+  formula: SiCl
+  atoms:
+    Cl: 1.0
+    Si: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SiCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: SiCl2
+  formula: SiCl2
+  atoms:
+    Cl: 2.0
+    Si: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SiCL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: SiCl3
+  formula: SiCl3
+  atoms:
+    Cl: 3.0
+    Si: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SiCL3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: SiCl4
+  formula: SiCl4
+  atoms:
+    Cl: 4.0
+    Si: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SiCL4
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: SiH2Cl2
+  formula: SiH2Cl2
+  atoms:
+    Cl: 2.0
+    H: 2.0
+    Si: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SiH2CL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: SiH3Cl
+  formula: SiH3Cl
+  atoms:
+    Cl: 1.0
+    H: 3.0
+    Si: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SiH3CL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: SiHCl
+  formula: SiHCl
+  atoms:
+    Cl: 1.0
+    H: 1.0
+    Si: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SiHCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: SiHCl3
+  formula: SiHCl3
+  atoms:
+    Cl: 3.0
+    H: 1.0
+    Si: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SiHCL3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: TiCl
+  formula: TiCl
+  atoms:
+    Cl: 1.0
+    Ti: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:TiCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: TiCl2
+  formula: TiCl2
+  atoms:
+    Cl: 2.0
+    Ti: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:TiCL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: TiCl3
+  formula: TiCl3
+  atoms:
+    Cl: 3.0
+    Ti: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:TiCL3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: TiCl4
+  formula: TiCl4
+  atoms:
+    Cl: 4.0
+    Ti: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:TiCL4
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: TiOCl
+  formula: TiOCl
+  atoms:
+    Cl: 1.0
+    O: 1.0
+    Ti: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:TiOCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cl
+  carrier: TiOCl2
+  formula: TiOCl2
+  atoms:
+    Cl: 2.0
+    O: 1.0
+    Ti: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:TiOCL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
 - element: Co
   carrier: Co
   formula: Co
@@ -724,10 +4157,12 @@ pairs:
     Cr: 1.0
   sources:
   - janaf_4th_extract
+  - kems-022-demaria-1971
   - nasa_cea_extract
   - vapor_pressures_catalog
   source_species_ids:
   - janaf_4th_extract:Cr
+  - kems-022-demaria-1971:Cr
   - nasa_cea_extract:Cr
   - vapor_pressures_catalog:Cr
   catalog_family_ids:
@@ -745,6 +4180,19 @@ pairs:
   - janaf_4th_extract
   source_species_ids:
   - janaf_4th_extract:Cr2O3_gas
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Cr
+  carrier: CrN
+  formula: CrN
+  atoms:
+    Cr: 1.0
+    N: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CrN
   catalog_family_ids: []
   catalog_species_ids: []
   thermo_available: true
@@ -818,6 +4266,99 @@ pairs:
   - Fe
   thermo_available: true
 - element: Fe
+  carrier: Fe2Cl4
+  formula: Fe2Cl4
+  atoms:
+    Cl: 4.0
+    Fe: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:Fe2CL4
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Fe
+  carrier: Fe2Cl6
+  formula: Fe2Cl6
+  atoms:
+    Cl: 6.0
+    Fe: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:Fe2CL6
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Fe
+  carrier: FeC5O5
+  formula: FeC5O5
+  atoms:
+    C: 5.0
+    Fe: 1.0
+    O: 5.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:Fe(CO)5
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Fe
+  carrier: FeCl
+  formula: FeCl
+  atoms:
+    Cl: 1.0
+    Fe: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:FeCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Fe
+  carrier: FeCl2
+  formula: FeCl2
+  atoms:
+    Cl: 2.0
+    Fe: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:FeCL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Fe
+  carrier: FeCl3
+  formula: FeCl3
+  atoms:
+    Cl: 3.0
+    Fe: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:FeCL3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Fe
+  carrier: FeO2H2
+  formula: FeO2H2
+  atoms:
+    Fe: 1.0
+    H: 2.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:Fe(OH)2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Fe
   carrier: FeO_gas
   formula: FeO
   atoms:
@@ -825,10 +4366,455 @@ pairs:
     O: 1.0
   sources:
   - janaf_4th_extract
+  - kems-022-demaria-1971
   - nasa_cea_extract
   source_species_ids:
   - janaf_4th_extract:FeO_gas
+  - kems-022-demaria-1971:Fe
   - nasa_cea_extract:FeO
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: AlH
+  formula: AlH
+  atoms:
+    Al: 1.0
+    H: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: AlH2
+  formula: AlH2
+  atoms:
+    Al: 1.0
+    H: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALH2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: AlH2Cl
+  formula: AlH2Cl
+  atoms:
+    Al: 1.0
+    Cl: 1.0
+    H: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALH2CL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: AlH3
+  formula: AlH3
+  atoms:
+    Al: 1.0
+    H: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALH3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: AlHCl
+  formula: AlHCl
+  atoms:
+    Al: 1.0
+    Cl: 1.0
+    H: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALHCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: AlHCl2
+  formula: AlHCl2
+  atoms:
+    Al: 1.0
+    Cl: 2.0
+    H: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALHCL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: AlO2H2
+  formula: AlO2H2
+  atoms:
+    Al: 1.0
+    H: 2.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:AL(OH)2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: AlO2H2Cl
+  formula: AlO2H2Cl
+  atoms:
+    Al: 1.0
+    Cl: 1.0
+    H: 2.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:AL(OH)2CL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: AlO3H3
+  formula: AlO3H3
+  atoms:
+    Al: 1.0
+    H: 3.0
+    O: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:AL(OH)3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: AlOH
+  formula: AlOH
+  atoms:
+    Al: 1.0
+    H: 1.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALOH
+  - nasa_cea_extract:HALO
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: AlOHCl
+  formula: AlOHCl
+  atoms:
+    Al: 1.0
+    Cl: 1.0
+    H: 1.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALOHCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: AlOHCl2
+  formula: AlOHCl2
+  atoms:
+    Al: 1.0
+    Cl: 2.0
+    H: 1.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALOHCL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C10H21
+  formula: C10H21
+  atoms:
+    C: 10.0
+    H: 21.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C10H21,n-decyl
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C10H8
+  formula: C10H8
+  atoms:
+    C: 10.0
+    H: 8.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C10H8,naphthale
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C12H10
+  formula: C12H10
+  atoms:
+    C: 12.0
+    H: 10.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C12H10,biphenyl
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C12H9
+  formula: C12H9
+  atoms:
+    C: 12.0
+    H: 9.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C12H9,o-bipheny
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C2H
+  formula: C2H
+  atoms:
+    C: 2.0
+    H: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2H
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C2H2
+  formula: C2H2
+  atoms:
+    C: 2.0
+    H: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2H2,acetylene
+  - nasa_cea_extract:C2H2,vinylidene
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C2H2Cl2
+  formula: C2H2Cl2
+  atoms:
+    C: 2.0
+    Cl: 2.0
+    H: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2H2CL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C2H2O
+  formula: C2H2O
+  atoms:
+    C: 2.0
+    H: 2.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CH2CO,ketene
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C2H2O2
+  formula: C2H2O2
+  atoms:
+    C: 2.0
+    H: 2.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:O(CH)2O
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C2H2O4
+  formula: C2H2O4
+  atoms:
+    C: 2.0
+    H: 2.0
+    O: 4.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:HO(CO)2OH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C2H3
+  formula: C2H3
+  atoms:
+    C: 2.0
+    H: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2H3,vinyl
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C2H3Cl
+  formula: C2H3Cl
+  atoms:
+    C: 2.0
+    Cl: 1.0
+    H: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2H3CL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C2H3ClO2
+  formula: C2H3ClO2
+  atoms:
+    C: 2.0
+    Cl: 1.0
+    H: 3.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CH2CL-COOH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C2H3N
+  formula: C2H3N
+  atoms:
+    C: 2.0
+    H: 3.0
+    N: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CH3CN
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C2H3O
+  formula: C2H3O
+  atoms:
+    C: 2.0
+    H: 3.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CH3CO,acetyl
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C2H4
+  formula: C2H4
+  atoms:
+    C: 2.0
+    H: 4.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2H4
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C2H4O
+  formula: C2H4O
+  atoms:
+    C: 2.0
+    H: 4.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2H4O,ethylen-o
+  - nasa_cea_extract:CH3CHO,ethanal
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C2H4O2
+  formula: C2H4O2
+  atoms:
+    C: 2.0
+    H: 4.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CH3COOH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C2H4O3
+  formula: C2H4O3
+  atoms:
+    C: 2.0
+    H: 4.0
+    O: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:OHCH2COOH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C2H5
+  formula: C2H5
+  atoms:
+    C: 2.0
+    H: 5.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2H5
   catalog_family_ids: []
   catalog_species_ids: []
   thermo_available: true
@@ -855,14 +4841,661 @@ pairs:
     C: 2.0
     H: 6.0
   sources:
+  - nasa_cea_extract
   - vapor_pressures_catalog
   source_species_ids:
+  - nasa_cea_extract:C2H6
   - vapor_pressures_catalog:C2H6
   catalog_family_ids:
   - volatile_hydrocarbon_C2H6_family
   catalog_species_ids:
   - C2H6
-  thermo_available: false
+  thermo_available: true
+- element: H
+  carrier: C2H6N2
+  formula: C2H6N2
+  atoms:
+    C: 2.0
+    H: 6.0
+    N: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CH3N2CH3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C2H6O
+  formula: C2H6O
+  atoms:
+    C: 2.0
+    H: 6.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2H5OH
+  - nasa_cea_extract:CH3OCH3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C2H6O2
+  formula: C2H6O2
+  atoms:
+    C: 2.0
+    H: 6.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CH3O2CH3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C2HCl
+  formula: C2HCl
+  atoms:
+    C: 2.0
+    Cl: 1.0
+    H: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2HCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C2HCl3
+  formula: C2HCl3
+  atoms:
+    C: 2.0
+    Cl: 3.0
+    H: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2HCL3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C3H3
+  formula: C3H3
+  atoms:
+    C: 3.0
+    H: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C3H3,1-propynl
+  - nasa_cea_extract:C3H3,2-propynl
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C3H4
+  formula: C3H4
+  atoms:
+    C: 3.0
+    H: 4.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C3H4,allene
+  - nasa_cea_extract:C3H4,propyne
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C3H5
+  formula: C3H5
+  atoms:
+    C: 3.0
+    H: 5.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C3H5,allyl
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C3H6
+  formula: C3H6
+  atoms:
+    C: 3.0
+    H: 6.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C3H6,propylene
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C3H6O
+  formula: C3H6O
+  atoms:
+    C: 3.0
+    H: 6.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C3H6O,acetone
+  - nasa_cea_extract:C3H6O,propanal
+  - nasa_cea_extract:C3H6O,propylox
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C3H7
+  formula: C3H7
+  atoms:
+    C: 3.0
+    H: 7.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C3H7,i-propyl
+  - nasa_cea_extract:C3H7,n-propyl
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C3H8
+  formula: C3H8
+  atoms:
+    C: 3.0
+    H: 8.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C3H8
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C3H8O
+  formula: C3H8O
+  atoms:
+    C: 3.0
+    H: 8.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C3H8O,1propanol
+  - nasa_cea_extract:C3H8O,2propanol
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C4H10
+  formula: C4H10
+  atoms:
+    C: 4.0
+    H: 10.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C4H10,isobutane
+  - nasa_cea_extract:C4H10,n-butane
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C4H2
+  formula: C4H2
+  atoms:
+    C: 4.0
+    H: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C4H2,butadiyne
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C4H6
+  formula: C4H6
+  atoms:
+    C: 4.0
+    H: 6.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C4H6,1butyne
+  - nasa_cea_extract:C4H6,2butyne
+  - nasa_cea_extract:C4H6,butadiene
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C4H8
+  formula: C4H8
+  atoms:
+    C: 4.0
+    H: 8.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C4H8,1-butene
+  - nasa_cea_extract:C4H8,cis2-buten
+  - nasa_cea_extract:C4H8,isobutene
+  - nasa_cea_extract:C4H8,tr2-butene
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C4H8O4
+  formula: C4H8O4
+  atoms:
+    C: 4.0
+    H: 8.0
+    O: 4.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:(CH3COOH)2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C4H9
+  formula: C4H9
+  atoms:
+    C: 4.0
+    H: 9.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C4H9,i-butyl
+  - nasa_cea_extract:C4H9,n-butyl
+  - nasa_cea_extract:C4H9,s-butyl
+  - nasa_cea_extract:C4H9,t-butyl
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C5H10
+  formula: C5H10
+  atoms:
+    C: 5.0
+    H: 10.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C5H10,1-pentene
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C5H11
+  formula: C5H11
+  atoms:
+    C: 5.0
+    H: 11.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C5H11,pentyl
+  - nasa_cea_extract:C5H11,t-pentyl
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C5H12
+  formula: C5H12
+  atoms:
+    C: 5.0
+    H: 12.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C5H12,i-pentane
+  - nasa_cea_extract:C5H12,n-pentane
+  - nasa_cea_extract:CH3C(CH3)2CH3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C6H12
+  formula: C6H12
+  atoms:
+    C: 6.0
+    H: 12.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C6H12,1-hexene
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C6H13
+  formula: C6H13
+  atoms:
+    C: 6.0
+    H: 13.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C6H13,n-hexyl
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C6H14
+  formula: C6H14
+  atoms:
+    C: 6.0
+    H: 14.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C6H14,n-hexane
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C6H2
+  formula: C6H2
+  atoms:
+    C: 6.0
+    H: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C6H2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C6H5
+  formula: C6H5
+  atoms:
+    C: 6.0
+    H: 5.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C6H5,phenyl
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C6H5O
+  formula: C6H5O
+  atoms:
+    C: 6.0
+    H: 5.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C6H5O,phenoxy
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C6H6
+  formula: C6H6
+  atoms:
+    C: 6.0
+    H: 6.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C6H6
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C6H6O
+  formula: C6H6O
+  atoms:
+    C: 6.0
+    H: 6.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C6H5OH,phenol
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C7H14
+  formula: C7H14
+  atoms:
+    C: 7.0
+    H: 14.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C7H14,1-heptene
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C7H15
+  formula: C7H15
+  atoms:
+    C: 7.0
+    H: 15.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C7H15,n-heptyl
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C7H16
+  formula: C7H16
+  atoms:
+    C: 7.0
+    H: 16.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C7H16,2-methylh
+  - nasa_cea_extract:C7H16,n-heptane
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C7H7
+  formula: C7H7
+  atoms:
+    C: 7.0
+    H: 7.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C7H7,benzyl
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C7H8
+  formula: C7H8
+  atoms:
+    C: 7.0
+    H: 8.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C7H8
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C7H8O
+  formula: C7H8O
+  atoms:
+    C: 7.0
+    H: 8.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C7H8O,cresol-mx
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C8H10
+  formula: C8H10
+  atoms:
+    C: 8.0
+    H: 10.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C8H10,ethylbenz
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C8H16
+  formula: C8H16
+  atoms:
+    C: 8.0
+    H: 16.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C8H16,1-octene
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C8H17
+  formula: C8H17
+  atoms:
+    C: 8.0
+    H: 17.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C8H17,n-octyl
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C8H18
+  formula: C8H18
+  atoms:
+    C: 8.0
+    H: 18.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C8H18,isooctane
+  - nasa_cea_extract:C8H18,n-octane
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C8H8
+  formula: C8H8
+  atoms:
+    C: 8.0
+    H: 8.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C8H8,styrene
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: C9H19
+  formula: C9H19
+  atoms:
+    C: 9.0
+    H: 19.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C9H19,n-nonyl
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: CH
+  formula: CH
+  atoms:
+    C: 1.0
+    H: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: CH2
+  formula: CH2
+  atoms:
+    C: 1.0
+    H: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CH2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: CH2Cl
+  formula: CH2Cl
+  atoms:
+    C: 1.0
+    Cl: 1.0
+    H: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CH2CL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: CH2Cl2
+  formula: CH2Cl2
+  atoms:
+    C: 1.0
+    Cl: 2.0
+    H: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CH2CL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: CH3
+  formula: CH3
+  atoms:
+    C: 1.0
+    H: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CH3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
 - element: H
   carrier: CH3COOH
   formula: CH3COOH
@@ -879,6 +5512,35 @@ pairs:
   catalog_species_ids:
   - CH3COOH
   thermo_available: false
+- element: H
+  carrier: CH3Cl
+  formula: CH3Cl
+  atoms:
+    C: 1.0
+    Cl: 1.0
+    H: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CH3CL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: CH3O
+  formula: CH3O
+  atoms:
+    C: 1.0
+    H: 3.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CH2OH
+  - nasa_cea_extract:CH3O
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
 - element: H
   carrier: CH4
   formula: CH4
@@ -911,6 +5573,146 @@ pairs:
   catalog_species_ids: []
   thermo_available: true
 - element: H
+  carrier: CH4O2
+  formula: CH4O2
+  atoms:
+    C: 1.0
+    H: 4.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CH3OOH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: CHCl
+  formula: CHCl
+  atoms:
+    C: 1.0
+    Cl: 1.0
+    H: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CHCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: CHCl2
+  formula: CHCl2
+  atoms:
+    C: 1.0
+    Cl: 2.0
+    H: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CHCL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: CHCl3
+  formula: CHCl3
+  atoms:
+    C: 1.0
+    Cl: 3.0
+    H: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CHCL3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: CO2H
+  formula: CO2H
+  atoms:
+    C: 1.0
+    H: 1.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:COOH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: COHCl
+  formula: COHCl
+  atoms:
+    C: 1.0
+    Cl: 1.0
+    H: 1.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:COHCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: CaH
+  formula: CaH
+  atoms:
+    Ca: 1.0
+    H: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CaH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: CaO2H2
+  formula: CaO2H2
+  atoms:
+    Ca: 1.0
+    H: 2.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:Ca(OH)2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: CaOH
+  formula: CaOH
+  atoms:
+    Ca: 1.0
+    H: 1.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CaOH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: FeO2H2
+  formula: FeO2H2
+  atoms:
+    Fe: 1.0
+    H: 2.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:Fe(OH)2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
   carrier: H
   formula: H
   atoms:
@@ -935,6 +5737,34 @@ pairs:
   catalog_species_ids: []
   thermo_available: true
 - element: H
+  carrier: H2CO
+  formula: H2CO
+  atoms:
+    C: 1.0
+    H: 2.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:HCHO,formaldehy
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: H2CO2
+  formula: H2CO2
+  atoms:
+    C: 1.0
+    H: 2.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:HCOOH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
   carrier: H2O
   formula: H2O
   atoms:
@@ -952,6 +5782,19 @@ pairs:
   - H2O
   thermo_available: true
 - element: H
+  carrier: H2O2
+  formula: H2O2
+  atoms:
+    H: 2.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:H2O2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
   carrier: H2S
   formula: H2S
   atoms:
@@ -967,6 +5810,76 @@ pairs:
   - volatile_sulfur_H2S_family
   catalog_species_ids:
   - H2S
+  thermo_available: true
+- element: H
+  carrier: H2SO4
+  formula: H2SO4
+  atoms:
+    H: 2.0
+    O: 4.0
+    S: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:H2SO4
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: H4C2O4
+  formula: H4C2O4
+  atoms:
+    C: 2.0
+    H: 4.0
+    O: 4.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:(HCOOH)2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: HAlO2
+  formula: HAlO2
+  atoms:
+    Al: 1.0
+    H: 1.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:HALO2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: HC2N
+  formula: HC2N
+  atoms:
+    C: 2.0
+    H: 1.0
+    N: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:HCCN
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: HC2O
+  formula: HC2O
+  atoms:
+    C: 2.0
+    H: 1.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:HCCO
+  catalog_family_ids: []
+  catalog_species_ids: []
   thermo_available: true
 - element: H
   carrier: HCHO
@@ -1003,6 +5916,20 @@ pairs:
   - HCN
   thermo_available: true
 - element: H
+  carrier: HCO
+  formula: HCO
+  atoms:
+    C: 1.0
+    H: 1.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:HCO
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
   carrier: HCl
   formula: HCl
   atoms:
@@ -1020,6 +5947,20 @@ pairs:
   - HCl
   thermo_available: true
 - element: H
+  carrier: HNC
+  formula: HNC
+  atoms:
+    C: 1.0
+    H: 1.0
+    N: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:HNC
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
   carrier: HNCO
   formula: HNCO
   atoms:
@@ -1028,14 +5969,126 @@ pairs:
     N: 1.0
     O: 1.0
   sources:
+  - nasa_cea_extract
   - vapor_pressures_catalog
   source_species_ids:
+  - nasa_cea_extract:HNCO
   - vapor_pressures_catalog:HNCO
   catalog_family_ids:
   - volatile_nitrogen_HNCO_family
   catalog_species_ids:
   - HNCO
-  thermo_available: false
+  thermo_available: true
+- element: H
+  carrier: HNO
+  formula: HNO
+  atoms:
+    H: 1.0
+    N: 1.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:HNO
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: HNO2
+  formula: HNO2
+  atoms:
+    H: 1.0
+    N: 1.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:HNO2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: HNO3
+  formula: HNO3
+  atoms:
+    H: 1.0
+    N: 1.0
+    O: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:HNO3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: HO2
+  formula: HO2
+  atoms:
+    H: 1.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:HO2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: HOCl
+  formula: HOCl
+  atoms:
+    Cl: 1.0
+    H: 1.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:HOCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: HPO
+  formula: HPO
+  atoms:
+    H: 1.0
+    O: 1.0
+    P: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:HPO
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: K2O2H2
+  formula: K2O2H2
+  atoms:
+    H: 2.0
+    K: 2.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:K2O2H2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: KH
+  formula: KH
+  atoms:
+    H: 1.0
+    K: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:KH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
 - element: H
   carrier: KOH
   formula: KOH
@@ -1047,6 +6100,126 @@ pairs:
   - nasa_cea_extract
   source_species_ids:
   - nasa_cea_extract:KOH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: MgH
+  formula: MgH
+  atoms:
+    H: 1.0
+    Mg: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:MgH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: MgO2H2
+  formula: MgO2H2
+  atoms:
+    H: 2.0
+    Mg: 1.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:Mg(OH)2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: MgOH
+  formula: MgOH
+  atoms:
+    H: 1.0
+    Mg: 1.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:MgOH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: N2H2
+  formula: N2H2
+  atoms:
+    H: 2.0
+    N: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:N2H2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: N2H2O2
+  formula: N2H2O2
+  atoms:
+    H: 2.0
+    N: 2.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:NH2NO2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: N2H4
+  formula: N2H4
+  atoms:
+    H: 4.0
+    N: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:N2H4
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: N3H
+  formula: N3H
+  atoms:
+    H: 1.0
+    N: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:N3H
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: NH
+  formula: NH
+  atoms:
+    H: 1.0
+    N: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:NH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: NH2
+  formula: NH2
+  atoms:
+    H: 2.0
+    N: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:NH2
   catalog_family_ids: []
   catalog_species_ids: []
   thermo_available: true
@@ -1068,6 +6241,20 @@ pairs:
   - NH3
   thermo_available: true
 - element: H
+  carrier: NH3O
+  formula: NH3O
+  atoms:
+    H: 3.0
+    N: 1.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:NH2OH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
   carrier: NH4CN
   formula: NH4CN
   atoms:
@@ -1084,6 +6271,33 @@ pairs:
   - NH4CN
   thermo_available: false
 - element: H
+  carrier: Na2O2H2
+  formula: Na2O2H2
+  atoms:
+    H: 2.0
+    Na: 2.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:Na2O2H2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: NaH
+  formula: NaH
+  atoms:
+    H: 1.0
+    Na: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:NaH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
   carrier: NaOH
   formula: NaOH
   atoms:
@@ -1097,15 +6311,190 @@ pairs:
   catalog_family_ids: []
   catalog_species_ids: []
   thermo_available: true
+- element: H
+  carrier: OH
+  formula: OH
+  atoms:
+    H: 1.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:OH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: PH
+  formula: PH
+  atoms:
+    H: 1.0
+    P: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:PH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: PH2
+  formula: PH2
+  atoms:
+    H: 2.0
+    P: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:PH2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: PH3
+  formula: PH3
+  atoms:
+    H: 3.0
+    P: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:PH3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: SH
+  formula: SH
+  atoms:
+    H: 1.0
+    S: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: SiH
+  formula: SiH
+  atoms:
+    H: 1.0
+    Si: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SiH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: SiH2
+  formula: SiH2
+  atoms:
+    H: 2.0
+    Si: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SiH2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: SiH2Cl2
+  formula: SiH2Cl2
+  atoms:
+    Cl: 2.0
+    H: 2.0
+    Si: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SiH2CL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: SiH3
+  formula: SiH3
+  atoms:
+    H: 3.0
+    Si: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SiH3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: SiH3Cl
+  formula: SiH3Cl
+  atoms:
+    Cl: 1.0
+    H: 3.0
+    Si: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SiH3CL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: SiH4
+  formula: SiH4
+  atoms:
+    H: 4.0
+    Si: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SiH4
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: SiHCl
+  formula: SiHCl
+  atoms:
+    Cl: 1.0
+    H: 1.0
+    Si: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SiHCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: H
+  carrier: SiHCl3
+  formula: SiHCl3
+  atoms:
+    Cl: 3.0
+    H: 1.0
+    Si: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SiHCL3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
 - element: K
   carrier: K
   formula: K
   atoms:
     K: 1.0
   sources:
+  - kems-022-demaria-1971
   - nasa_cea_extract
   - vapor_pressures_catalog
   source_species_ids:
+  - kems-022-demaria-1971:K
   - nasa_cea_extract:K
   - vapor_pressures_catalog:K
   catalog_family_ids:
@@ -1122,6 +6511,34 @@ pairs:
   - nasa_cea_extract
   source_species_ids:
   - nasa_cea_extract:K2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: K
+  carrier: K2C2N2
+  formula: K2C2N2
+  atoms:
+    C: 2.0
+    K: 2.0
+    N: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:K2C2N2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: K
+  carrier: K2CO3
+  formula: K2CO3
+  atoms:
+    C: 1.0
+    K: 2.0
+    O: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:K2CO3
   catalog_family_ids: []
   catalog_species_ids: []
   thermo_available: true
@@ -1145,6 +6562,33 @@ pairs:
   - K2Cl2
   thermo_available: true
 - element: K
+  carrier: K2O2
+  formula: K2O2
+  atoms:
+    K: 2.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:K2O2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: K
+  carrier: K2O2H2
+  formula: K2O2H2
+  atoms:
+    H: 2.0
+    K: 2.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:K2O2H2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: K
   carrier: K2O_gas
   formula: K2O
   atoms:
@@ -1154,6 +6598,34 @@ pairs:
   - nasa_cea_extract
   source_species_ids:
   - nasa_cea_extract:K2O
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: K
+  carrier: K2SO4
+  formula: K2SO4
+  atoms:
+    K: 2.0
+    O: 4.0
+    S: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:K2SO4
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: K
+  carrier: KCN
+  formula: KCN
+  atoms:
+    C: 1.0
+    K: 1.0
+    N: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:KCN
   catalog_family_ids: []
   catalog_species_ids: []
   thermo_available: true
@@ -1175,6 +6647,60 @@ pairs:
   - foulant_vapor_kcl_family
   catalog_species_ids:
   - KCl
+  thermo_available: true
+- element: K
+  carrier: KH
+  formula: KH
+  atoms:
+    H: 1.0
+    K: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:KH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: K
+  carrier: KNO2
+  formula: KNO2
+  atoms:
+    K: 1.0
+    N: 1.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:KNO2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: K
+  carrier: KNO3
+  formula: KNO3
+  atoms:
+    K: 1.0
+    N: 1.0
+    O: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:KNO3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: K
+  carrier: KNa
+  formula: KNa
+  atoms:
+    K: 1.0
+    Na: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:KNa
+  catalog_family_ids: []
+  catalog_species_ids: []
   thermo_available: true
 - element: K
   carrier: KO
@@ -1209,10 +6735,12 @@ pairs:
   atoms:
     Mg: 1.0
   sources:
+  - kems-022-demaria-1971
   - kems-031-halwax-2024
   - nasa_cea_extract
   - vapor_pressures_catalog
   source_species_ids:
+  - kems-022-demaria-1971:Mg
   - kems-031-halwax-2024:MgO
   - nasa_cea_extract:Mg
   - vapor_pressures_catalog:Mg
@@ -1249,6 +6777,19 @@ pairs:
   - Mg2Cl4
   thermo_available: false
 - element: Mg
+  carrier: MgCl
+  formula: MgCl
+  atoms:
+    Cl: 1.0
+    Mg: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:MgCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Mg
   carrier: MgCl2
   formula: MgCl2
   atoms:
@@ -1268,6 +6809,60 @@ pairs:
   - MgCl2
   thermo_available: true
 - element: Mg
+  carrier: MgH
+  formula: MgH
+  atoms:
+    H: 1.0
+    Mg: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:MgH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Mg
+  carrier: MgN
+  formula: MgN
+  atoms:
+    Mg: 1.0
+    N: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:MgN
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Mg
+  carrier: MgO2H2
+  formula: MgO2H2
+  atoms:
+    H: 2.0
+    Mg: 1.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:Mg(OH)2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Mg
+  carrier: MgOH
+  formula: MgOH
+  atoms:
+    H: 1.0
+    Mg: 1.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:MgOH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Mg
   carrier: MgO_gas
   formula: MgO
   atoms:
@@ -1280,6 +6875,19 @@ pairs:
   catalog_family_ids: []
   catalog_species_ids: []
   thermo_available: true
+- element: Mg
+  carrier: MgS
+  formula: MgS
+  atoms:
+    Mg: 1.0
+    S: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:MgS
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
 - element: Mn
   carrier: Mn
   formula: Mn
@@ -1287,10 +6895,12 @@ pairs:
     Mn: 1.0
   sources:
   - janaf_4th_extract
+  - kems-022-demaria-1971
   - nasa_cea_extract
   - vapor_pressures_catalog
   source_species_ids:
   - janaf_4th_extract:Mn
+  - kems-022-demaria-1971:Mn
   - nasa_cea_extract:Mn
   - vapor_pressures_catalog:Mn
   catalog_family_ids:
@@ -1308,6 +6918,182 @@ pairs:
   - janaf_4th_extract
   source_species_ids:
   - janaf_4th_extract:MnO_gas
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
+  carrier: AlN
+  formula: AlN
+  atoms:
+    Al: 1.0
+    N: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALN
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
+  carrier: C2H3N
+  formula: C2H3N
+  atoms:
+    C: 2.0
+    H: 3.0
+    N: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CH3CN
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
+  carrier: C2H6N2
+  formula: C2H6N2
+  atoms:
+    C: 2.0
+    H: 6.0
+    N: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CH3N2CH3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
+  carrier: C2N
+  formula: C2N
+  atoms:
+    C: 2.0
+    N: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CCN
+  - nasa_cea_extract:CNC
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
+  carrier: C2N2
+  formula: C2N2
+  atoms:
+    C: 2.0
+    N: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2N2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
+  carrier: C2NO
+  formula: C2NO
+  atoms:
+    C: 2.0
+    N: 1.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:OCCN
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
+  carrier: C3N2O
+  formula: C3N2O
+  atoms:
+    C: 3.0
+    N: 2.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CNCOCN
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
+  carrier: C4N2
+  formula: C4N2
+  atoms:
+    C: 4.0
+    N: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C4N2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
+  carrier: CN
+  formula: CN
+  atoms:
+    C: 1.0
+    N: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CN
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
+  carrier: CN2
+  formula: CN2
+  atoms:
+    C: 1.0
+    N: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CNN
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
+  carrier: ClCN
+  formula: ClCN
+  atoms:
+    C: 1.0
+    Cl: 1.0
+    N: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CLCN
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
+  carrier: CrN
+  formula: CrN
+  atoms:
+    Cr: 1.0
+    N: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CrN
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
+  carrier: HC2N
+  formula: HC2N
+  atoms:
+    C: 2.0
+    H: 1.0
+    N: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:HCCN
   catalog_family_ids: []
   catalog_species_ids: []
   thermo_available: true
@@ -1330,6 +7116,20 @@ pairs:
   - HCN
   thermo_available: true
 - element: N
+  carrier: HNC
+  formula: HNC
+  atoms:
+    C: 1.0
+    H: 1.0
+    N: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:HNC
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
   carrier: HNCO
   formula: HNCO
   atoms:
@@ -1338,14 +7138,127 @@ pairs:
     N: 1.0
     O: 1.0
   sources:
+  - nasa_cea_extract
   - vapor_pressures_catalog
   source_species_ids:
+  - nasa_cea_extract:HNCO
   - vapor_pressures_catalog:HNCO
   catalog_family_ids:
   - volatile_nitrogen_HNCO_family
   catalog_species_ids:
   - HNCO
-  thermo_available: false
+  thermo_available: true
+- element: N
+  carrier: HNO
+  formula: HNO
+  atoms:
+    H: 1.0
+    N: 1.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:HNO
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
+  carrier: HNO2
+  formula: HNO2
+  atoms:
+    H: 1.0
+    N: 1.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:HNO2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
+  carrier: HNO3
+  formula: HNO3
+  atoms:
+    H: 1.0
+    N: 1.0
+    O: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:HNO3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
+  carrier: K2C2N2
+  formula: K2C2N2
+  atoms:
+    C: 2.0
+    K: 2.0
+    N: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:K2C2N2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
+  carrier: KCN
+  formula: KCN
+  atoms:
+    C: 1.0
+    K: 1.0
+    N: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:KCN
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
+  carrier: KNO2
+  formula: KNO2
+  atoms:
+    K: 1.0
+    N: 1.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:KNO2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
+  carrier: KNO3
+  formula: KNO3
+  atoms:
+    K: 1.0
+    N: 1.0
+    O: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:KNO3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
+  carrier: MgN
+  formula: MgN
+  atoms:
+    Mg: 1.0
+    N: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:MgN
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
 - element: N
   carrier: N
   formula: N
@@ -1375,20 +7288,88 @@ pairs:
   - N2
   thermo_available: true
 - element: N
+  carrier: N2C
+  formula: N2C
+  atoms:
+    C: 1.0
+    N: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:NCN
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
+  carrier: N2H2
+  formula: N2H2
+  atoms:
+    H: 2.0
+    N: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:N2H2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
+  carrier: N2H2O2
+  formula: N2H2O2
+  atoms:
+    H: 2.0
+    N: 2.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:NH2NO2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
+  carrier: N2H4
+  formula: N2H4
+  atoms:
+    H: 4.0
+    N: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:N2H4
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
   carrier: N2O
   formula: N2O
   atoms:
     N: 2.0
     O: 1.0
   sources:
+  - nasa_cea_extract
   - vapor_pressures_catalog
   source_species_ids:
+  - nasa_cea_extract:N2O
   - vapor_pressures_catalog:N2O
   catalog_family_ids:
   - volatile_nitrogen_N2O_family
   catalog_species_ids:
   - N2O
-  thermo_available: false
+  thermo_available: true
+- element: N
+  carrier: N2O3
+  formula: N2O3
+  atoms:
+    N: 2.0
+    O: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:N2O3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
 - element: N
   carrier: N2O4
   formula: N2O4
@@ -1399,6 +7380,84 @@ pairs:
   - nasa_cea_extract
   source_species_ids:
   - nasa_cea_extract:N2O4
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
+  carrier: N2O5
+  formula: N2O5
+  atoms:
+    N: 2.0
+    O: 5.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:N2O5
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
+  carrier: N3
+  formula: N3
+  atoms:
+    N: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:N3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
+  carrier: N3H
+  formula: N3H
+  atoms:
+    H: 1.0
+    N: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:N3H
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
+  carrier: NCO
+  formula: NCO
+  atoms:
+    C: 1.0
+    N: 1.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:NCO
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
+  carrier: NH
+  formula: NH
+  atoms:
+    H: 1.0
+    N: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:NH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
+  carrier: NH2
+  formula: NH2
+  atoms:
+    H: 2.0
+    N: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:NH2
   catalog_family_ids: []
   catalog_species_ids: []
   thermo_available: true
@@ -1418,6 +7477,20 @@ pairs:
   - volatile_nitrogen_NH3_family
   catalog_species_ids:
   - NH3
+  thermo_available: true
+- element: N
+  carrier: NH3O
+  formula: NH3O
+  atoms:
+    H: 3.0
+    N: 1.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:NH2OH
+  catalog_family_ids: []
+  catalog_species_ids: []
   thermo_available: true
 - element: N
   carrier: NH4CN
@@ -1469,6 +7542,167 @@ pairs:
   catalog_species_ids:
   - NO2
   thermo_available: true
+- element: N
+  carrier: NO2Cl
+  formula: NO2Cl
+  atoms:
+    Cl: 1.0
+    N: 1.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:NO2CL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
+  carrier: NO3
+  formula: NO3
+  atoms:
+    N: 1.0
+    O: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:NO3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
+  carrier: NOCl
+  formula: NOCl
+  atoms:
+    Cl: 1.0
+    N: 1.0
+    O: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:NOCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
+  carrier: NaCN
+  formula: NaCN
+  atoms:
+    C: 1.0
+    N: 1.0
+    Na: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:NaCN
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
+  carrier: NaNO2
+  formula: NaNO2
+  atoms:
+    N: 1.0
+    Na: 1.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:NaNO2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
+  carrier: NaNO3
+  formula: NaNO3
+  atoms:
+    N: 1.0
+    Na: 1.0
+    O: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:NaNO3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
+  carrier: PN
+  formula: PN
+  atoms:
+    N: 1.0
+    P: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:PN
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
+  carrier: SN
+  formula: SN
+  atoms:
+    N: 1.0
+    S: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SN
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
+  carrier: Si2N
+  formula: Si2N
+  atoms:
+    N: 1.0
+    Si: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:Si2N
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
+  carrier: SiN
+  formula: SiN
+  atoms:
+    N: 1.0
+    Si: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SiN
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: N
+  carrier: ZrN
+  formula: ZrN
+  atoms:
+    N: 1.0
+    Zr: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ZrN
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Na
+  carrier: KNa
+  formula: KNa
+  atoms:
+    K: 1.0
+    Na: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:KNa
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
 - element: Na
   carrier: Na
   formula: Na
@@ -1476,10 +7710,12 @@ pairs:
     Na: 1.0
   sources:
   - janaf_4th_extract
+  - kems-022-demaria-1971
   - nasa_cea_extract
   - vapor_pressures_catalog
   source_species_ids:
   - janaf_4th_extract:Na
+  - kems-022-demaria-1971:Na
   - nasa_cea_extract:Na
   - vapor_pressures_catalog:Na
   catalog_family_ids:
@@ -1517,6 +7753,33 @@ pairs:
   - Na2Cl2
   thermo_available: true
 - element: Na
+  carrier: Na2O2
+  formula: Na2O2
+  atoms:
+    Na: 2.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:Na2O2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Na
+  carrier: Na2O2H2
+  formula: Na2O2H2
+  atoms:
+    H: 2.0
+    Na: 2.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:Na2O2H2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Na
   carrier: Na2O_gas
   formula: Na2O
   atoms:
@@ -1526,6 +7789,47 @@ pairs:
   - nasa_cea_extract
   source_species_ids:
   - nasa_cea_extract:Na2O
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Na
+  carrier: Na2SO4
+  formula: Na2SO4
+  atoms:
+    Na: 2.0
+    O: 4.0
+    S: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:Na2SO4
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Na
+  carrier: Na3Cl3
+  formula: Na3Cl3
+  atoms:
+    Cl: 3.0
+    Na: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:Na3CL3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Na
+  carrier: NaCN
+  formula: NaCN
+  atoms:
+    C: 1.0
+    N: 1.0
+    Na: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:NaCN
   catalog_family_ids: []
   catalog_species_ids: []
   thermo_available: true
@@ -1547,6 +7851,47 @@ pairs:
   - foulant_vapor_nacl_family
   catalog_species_ids:
   - NaCl
+  thermo_available: true
+- element: Na
+  carrier: NaH
+  formula: NaH
+  atoms:
+    H: 1.0
+    Na: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:NaH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Na
+  carrier: NaNO2
+  formula: NaNO2
+  atoms:
+    N: 1.0
+    Na: 1.0
+    O: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:NaNO2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Na
+  carrier: NaNO3
+  formula: NaNO3
+  atoms:
+    N: 1.0
+    Na: 1.0
+    O: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:NaNO3
+  catalog_family_ids: []
+  catalog_species_ids: []
   thermo_available: true
 - element: Na
   carrier: NaO
@@ -1588,6 +7933,32 @@ pairs:
   catalog_species_ids: []
   thermo_available: true
 - element: Ni
+  carrier: NiCl
+  formula: NiCl
+  atoms:
+    Cl: 1.0
+    Ni: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:NiCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Ni
+  carrier: NiCl2
+  formula: NiCl2
+  atoms:
+    Cl: 2.0
+    Ni: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:NiCL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Ni
   carrier: NiO_gas
   formula: NiO
   atoms:
@@ -1599,6 +7970,46 @@ pairs:
   source_species_ids:
   - janaf_4th_extract:NiO_gas
   - nasa_cea_extract:NiO
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Ni
+  carrier: NiS
+  formula: NiS
+  atoms:
+    Ni: 1.0
+    S: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:NiS
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: P
+  carrier: CP
+  formula: CP
+  atoms:
+    C: 1.0
+    P: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CP
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: P
+  carrier: HPO
+  formula: HPO
+  atoms:
+    H: 1.0
+    O: 1.0
+    P: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:HPO
   catalog_family_ids: []
   catalog_species_ids: []
   thermo_available: true
@@ -1621,14 +8032,42 @@ pairs:
     P: 2.0
   sources:
   - janaf_4th_extract
+  - nasa_cea_extract
   - vapor_pressures_catalog
   source_species_ids:
   - janaf_4th_extract:P2
+  - nasa_cea_extract:P2
   - vapor_pressures_catalog:P2
   catalog_family_ids:
   - phosphorus_P2_family
   catalog_species_ids:
   - P2
+  thermo_available: true
+- element: P
+  carrier: P2O3
+  formula: P2O3
+  atoms:
+    O: 3.0
+    P: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:P2O3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: P
+  carrier: P2O4
+  formula: P2O4
+  atoms:
+    O: 4.0
+    P: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:P2O4
+  catalog_family_ids: []
+  catalog_species_ids: []
   thermo_available: true
 - element: P
   carrier: P2O5_gas
@@ -1648,15 +8087,42 @@ pairs:
   - P2O5_gas
   thermo_available: true
 - element: P
+  carrier: P3
+  formula: P3
+  atoms:
+    P: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:P3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: P
+  carrier: P3O6
+  formula: P3O6
+  atoms:
+    O: 6.0
+    P: 3.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:P3O6
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: P
   carrier: P4
   formula: P4
   atoms:
     P: 4.0
   sources:
   - janaf_4th_extract
+  - nasa_cea_extract
   - vapor_pressures_catalog
   source_species_ids:
   - janaf_4th_extract:P4
+  - nasa_cea_extract:P4
   - vapor_pressures_catalog:P4
   catalog_family_ids:
   - phosphorus_P4_family
@@ -1741,6 +8207,110 @@ pairs:
   catalog_species_ids: []
   thermo_available: true
 - element: P
+  carrier: PCl
+  formula: PCl
+  atoms:
+    Cl: 1.0
+    P: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:PCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: P
+  carrier: PCl2
+  formula: PCl2
+  atoms:
+    Cl: 2.0
+    P: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:PCL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: P
+  carrier: PCl3
+  formula: PCl3
+  atoms:
+    Cl: 3.0
+    P: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:PCL3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: P
+  carrier: PCl5
+  formula: PCl5
+  atoms:
+    Cl: 5.0
+    P: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:PCL5
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: P
+  carrier: PH
+  formula: PH
+  atoms:
+    H: 1.0
+    P: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:PH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: P
+  carrier: PH2
+  formula: PH2
+  atoms:
+    H: 2.0
+    P: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:PH2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: P
+  carrier: PH3
+  formula: PH3
+  atoms:
+    H: 3.0
+    P: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:PH3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: P
+  carrier: PN
+  formula: PN
+  atoms:
+    N: 1.0
+    P: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:PN
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: P
   carrier: PO
   formula: PO
   atoms:
@@ -1767,14 +8337,135 @@ pairs:
     P: 1.0
   sources:
   - janaf_4th_extract
+  - nasa_cea_extract
   - vapor_pressures_catalog
   source_species_ids:
   - janaf_4th_extract:PO2
+  - nasa_cea_extract:PO2
   - vapor_pressures_catalog:PO2
   catalog_family_ids:
   - phosphorus_PO2_family
   catalog_species_ids:
   - PO2
+  thermo_available: true
+- element: P
+  carrier: POCl3
+  formula: POCl3
+  atoms:
+    Cl: 3.0
+    O: 1.0
+    P: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:POCL3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: P
+  carrier: PS
+  formula: PS
+  atoms:
+    P: 1.0
+    S: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:PS
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: S
+  carrier: Al2S
+  formula: Al2S
+  atoms:
+    Al: 2.0
+    S: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:AL2S
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: S
+  carrier: Al2S2
+  formula: Al2S2
+  atoms:
+    Al: 2.0
+    S: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:AL2S2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: S
+  carrier: AlS
+  formula: AlS
+  atoms:
+    Al: 1.0
+    S: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALS
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: S
+  carrier: AlS2
+  formula: AlS2
+  atoms:
+    Al: 1.0
+    S: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ALS2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: S
+  carrier: C2S2
+  formula: C2S2
+  atoms:
+    C: 2.0
+    S: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C2S2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: S
+  carrier: C3OS
+  formula: C3OS
+  atoms:
+    C: 3.0
+    O: 1.0
+    S: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C3OS
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: S
+  carrier: C3S2
+  formula: C3S2
+  atoms:
+    C: 3.0
+    S: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:C3S2
+  catalog_family_ids: []
+  catalog_species_ids: []
   thermo_available: true
 - element: S
   carrier: COS
@@ -1784,14 +8475,29 @@ pairs:
     O: 1.0
     S: 1.0
   sources:
+  - nasa_cea_extract
   - vapor_pressures_catalog
   source_species_ids:
+  - nasa_cea_extract:COS
   - vapor_pressures_catalog:COS
   catalog_family_ids:
   - volatile_sulfur_COS_family
   catalog_species_ids:
   - COS
-  thermo_available: false
+  thermo_available: true
+- element: S
+  carrier: CS
+  formula: CS
+  atoms:
+    C: 1.0
+    S: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CS
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
 - element: S
   carrier: CS2
   formula: CS2
@@ -1799,14 +8505,29 @@ pairs:
     C: 1.0
     S: 2.0
   sources:
+  - nasa_cea_extract
   - vapor_pressures_catalog
   source_species_ids:
+  - nasa_cea_extract:CS2
   - vapor_pressures_catalog:CS2
   catalog_family_ids:
   - volatile_sulfur_CS2_family
   catalog_species_ids:
   - CS2
-  thermo_available: false
+  thermo_available: true
+- element: S
+  carrier: CaS
+  formula: CaS
+  atoms:
+    Ca: 1.0
+    S: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:CaS
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
 - element: S
   carrier: H2S
   formula: H2S
@@ -1825,6 +8546,99 @@ pairs:
   - H2S
   thermo_available: true
 - element: S
+  carrier: H2SO4
+  formula: H2SO4
+  atoms:
+    H: 2.0
+    O: 4.0
+    S: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:H2SO4
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: S
+  carrier: K2SO4
+  formula: K2SO4
+  atoms:
+    K: 2.0
+    O: 4.0
+    S: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:K2SO4
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: S
+  carrier: MgS
+  formula: MgS
+  atoms:
+    Mg: 1.0
+    S: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:MgS
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: S
+  carrier: Na2SO4
+  formula: Na2SO4
+  atoms:
+    Na: 2.0
+    O: 4.0
+    S: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:Na2SO4
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: S
+  carrier: NiS
+  formula: NiS
+  atoms:
+    Ni: 1.0
+    S: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:NiS
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: S
+  carrier: PS
+  formula: PS
+  atoms:
+    P: 1.0
+    S: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:PS
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: S
+  carrier: S
+  formula: S
+  atoms:
+    S: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:S
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: S
   carrier: S2
   formula: S2
   atoms:
@@ -1841,6 +8655,32 @@ pairs:
   - volatile_sulfur_S2_family
   catalog_species_ids:
   - S2
+  thermo_available: true
+- element: S
+  carrier: S2Cl2
+  formula: S2Cl2
+  atoms:
+    Cl: 2.0
+    S: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:S2CL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: S
+  carrier: S2O
+  formula: S2O
+  atoms:
+    O: 1.0
+    S: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:S2O
+  catalog_family_ids: []
+  catalog_species_ids: []
   thermo_available: true
 - element: S
   carrier: S3
@@ -1915,6 +8755,71 @@ pairs:
   catalog_species_ids: []
   thermo_available: true
 - element: S
+  carrier: SCl
+  formula: SCl
+  atoms:
+    Cl: 1.0
+    S: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: S
+  carrier: SCl2
+  formula: SCl2
+  atoms:
+    Cl: 2.0
+    S: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SCL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: S
+  carrier: SH
+  formula: SH
+  atoms:
+    H: 1.0
+    S: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: S
+  carrier: SN
+  formula: SN
+  atoms:
+    N: 1.0
+    S: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SN
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: S
+  carrier: SO
+  formula: SO
+  atoms:
+    O: 1.0
+    S: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SO
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: S
   carrier: SO2
   formula: SO2
   atoms:
@@ -1932,6 +8837,20 @@ pairs:
   - SO2
   thermo_available: true
 - element: S
+  carrier: SO2Cl2
+  formula: SO2Cl2
+  atoms:
+    Cl: 2.0
+    O: 2.0
+    S: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SO2CL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: S
   carrier: SO3
   formula: SO3
   atoms:
@@ -1939,9 +8858,11 @@ pairs:
     S: 1.0
   sources:
   - janaf_4th_extract
+  - nasa_cea_extract
   - vapor_pressures_catalog
   source_species_ids:
   - janaf_4th_extract:SO3
+  - nasa_cea_extract:SO3
   - vapor_pressures_catalog:SO3
   catalog_family_ids:
   - volatile_sulfur_SO3_family
@@ -1962,6 +8883,32 @@ pairs:
   catalog_species_ids:
   - S_total
   thermo_available: false
+- element: S
+  carrier: SiS
+  formula: SiS
+  atoms:
+    S: 1.0
+    Si: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SiS
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: S
+  carrier: SiS2
+  formula: SiS2
+  atoms:
+    S: 2.0
+    Si: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SiS2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
 - element: Si
   carrier: Si
   formula: Si
@@ -1969,10 +8916,12 @@ pairs:
     Si: 1.0
   sources:
   - janaf_4th_extract
+  - kems-022-demaria-1971
   - nasa_cea_extract
   - vapor_pressures_catalog
   source_species_ids:
   - janaf_4th_extract:Si
+  - kems-022-demaria-1971:Si
   - nasa_cea_extract:Si
   - vapor_pressures_catalog:Si
   catalog_family_ids:
@@ -1993,6 +8942,32 @@ pairs:
   catalog_species_ids: []
   thermo_available: true
 - element: Si
+  carrier: Si2C
+  formula: Si2C
+  atoms:
+    C: 1.0
+    Si: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:Si2C
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Si
+  carrier: Si2N
+  formula: Si2N
+  atoms:
+    N: 1.0
+    Si: 2.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:Si2N
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Si
   carrier: Si3
   formula: Si3
   atoms:
@@ -2001,6 +8976,205 @@ pairs:
   - nasa_cea_extract
   source_species_ids:
   - nasa_cea_extract:Si3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Si
+  carrier: SiC
+  formula: SiC
+  atoms:
+    C: 1.0
+    Si: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SiC
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Si
+  carrier: SiC2
+  formula: SiC2
+  atoms:
+    C: 2.0
+    Si: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SiC2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Si
+  carrier: SiCl
+  formula: SiCl
+  atoms:
+    Cl: 1.0
+    Si: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SiCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Si
+  carrier: SiCl2
+  formula: SiCl2
+  atoms:
+    Cl: 2.0
+    Si: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SiCL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Si
+  carrier: SiCl3
+  formula: SiCl3
+  atoms:
+    Cl: 3.0
+    Si: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SiCL3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Si
+  carrier: SiCl4
+  formula: SiCl4
+  atoms:
+    Cl: 4.0
+    Si: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SiCL4
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Si
+  carrier: SiH
+  formula: SiH
+  atoms:
+    H: 1.0
+    Si: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SiH
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Si
+  carrier: SiH2
+  formula: SiH2
+  atoms:
+    H: 2.0
+    Si: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SiH2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Si
+  carrier: SiH2Cl2
+  formula: SiH2Cl2
+  atoms:
+    Cl: 2.0
+    H: 2.0
+    Si: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SiH2CL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Si
+  carrier: SiH3
+  formula: SiH3
+  atoms:
+    H: 3.0
+    Si: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SiH3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Si
+  carrier: SiH3Cl
+  formula: SiH3Cl
+  atoms:
+    Cl: 1.0
+    H: 3.0
+    Si: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SiH3CL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Si
+  carrier: SiH4
+  formula: SiH4
+  atoms:
+    H: 4.0
+    Si: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SiH4
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Si
+  carrier: SiHCl
+  formula: SiHCl
+  atoms:
+    Cl: 1.0
+    H: 1.0
+    Si: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SiHCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Si
+  carrier: SiHCl3
+  formula: SiHCl3
+  atoms:
+    Cl: 3.0
+    H: 1.0
+    Si: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SiHCL3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Si
+  carrier: SiN
+  formula: SiN
+  atoms:
+    N: 1.0
+    Si: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SiN
   catalog_family_ids: []
   catalog_species_ids: []
   thermo_available: true
@@ -2042,6 +9216,32 @@ pairs:
   catalog_family_ids: []
   catalog_species_ids: []
   thermo_available: true
+- element: Si
+  carrier: SiS
+  formula: SiS
+  atoms:
+    S: 1.0
+    Si: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SiS
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Si
+  carrier: SiS2
+  formula: SiS2
+  atoms:
+    S: 2.0
+    Si: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:SiS2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
 - element: Ti
   carrier: Ti
   formula: Ti
@@ -2061,17 +9261,75 @@ pairs:
   - Ti
   thermo_available: true
 - element: Ti
+  carrier: TiCl
+  formula: TiCl
+  atoms:
+    Cl: 1.0
+    Ti: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:TiCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Ti
+  carrier: TiCl2
+  formula: TiCl2
+  atoms:
+    Cl: 2.0
+    Ti: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:TiCL2
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Ti
+  carrier: TiCl3
+  formula: TiCl3
+  atoms:
+    Cl: 3.0
+    Ti: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:TiCL3
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Ti
+  carrier: TiCl4
+  formula: TiCl4
+  atoms:
+    Cl: 4.0
+    Ti: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:TiCL4
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Ti
   carrier: TiO
   formula: TiO
   atoms:
     O: 1.0
     Ti: 1.0
   sources:
+  - kems-022-demaria-1971
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
+  - kems-022-demaria-1971:TiO
   - nasa_cea_extract:TiO
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:TiO
+  catalog_family_ids:
+  - oxide_vapors_tio_family
+  catalog_species_ids:
+  - TiO
   thermo_available: true
 - element: Ti
   carrier: TiO2_gas
@@ -2081,10 +9339,45 @@ pairs:
     Ti: 1.0
   sources:
   - janaf_4th_extract
+  - kems-022-demaria-1971
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - janaf_4th_extract:TiO2_gas
+  - kems-022-demaria-1971:TiO
+  - kems-022-demaria-1971:TiO2
   - nasa_cea_extract:TiO2
+  - vapor_pressures_catalog:TiO2_gas
+  catalog_family_ids:
+  - oxide_vapors_tio2_family
+  catalog_species_ids:
+  - TiO2_gas
+  thermo_available: true
+- element: Ti
+  carrier: TiOCl
+  formula: TiOCl
+  atoms:
+    Cl: 1.0
+    O: 1.0
+    Ti: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:TiOCL
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Ti
+  carrier: TiOCl2
+  formula: TiOCl2
+  atoms:
+    Cl: 2.0
+    O: 1.0
+    Ti: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:TiOCL2
   catalog_family_ids: []
   catalog_species_ids: []
   thermo_available: true
@@ -2097,6 +9390,19 @@ pairs:
   - nasa_cea_extract
   source_species_ids:
   - nasa_cea_extract:Zr
+  catalog_family_ids: []
+  catalog_species_ids: []
+  thermo_available: true
+- element: Zr
+  carrier: ZrN
+  formula: ZrN
+  atoms:
+    N: 1.0
+    Zr: 1.0
+  sources:
+  - nasa_cea_extract
+  source_species_ids:
+  - nasa_cea_extract:ZrN
   catalog_family_ids: []
   catalog_species_ids: []
   thermo_available: true

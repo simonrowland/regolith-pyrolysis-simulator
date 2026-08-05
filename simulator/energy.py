@@ -104,6 +104,7 @@ class EnergyTracker:
         thermal_budget = evaporation_enthalpy_budget(
             evap_flux.species_kg_hr,
             vapor_pressures=vapor_pressures,
+            temperature_K=float(melt.temperature_C) + 273.15,
         )
         record.evaporation_thermal_kWh = thermal_budget["evaporation_thermal_kWh"]
         record.energy_scope = thermal_budget["energy_scope"]

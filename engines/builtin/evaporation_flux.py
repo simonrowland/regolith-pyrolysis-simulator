@@ -842,6 +842,12 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 controls.get("gas_resistance_enabled", True),
             )
         )
+        hkl_upper_bound_transport_species = frozenset(
+            str(species)
+            for species in (
+                controls.get("hkl_upper_bound_transport_species", ()) or ()
+            )
+        )
         melt_surface_renewal_raw = series_config.get(
             "melt_surface_renewal_base_kg_s_m2_pa",
             controls.get("melt_surface_renewal_base_kg_s_m2_pa"),
@@ -1102,7 +1108,10 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                     carrier_gas=carrier_gas,
                     T_gas_K=gas_temperature_K,
                     melt_resistance_enabled=melt_resistance_enabled,
-                    gas_resistance_enabled=gas_resistance_enabled,
+                    gas_resistance_enabled=(
+                        gas_resistance_enabled
+                        and species not in hkl_upper_bound_transport_species
+                    ),
                     melt_surface_renewal_base_kg_s_m2_pa=melt_surface_renewal_base,
                     melt_surface_renewal_source=melt_surface_renewal_source,
                 )
@@ -1117,6 +1126,13 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             J_kg_s_m2 = series_flux.flux_kg_s_m2
 
             series_diagnostic = series_flux.as_diagnostic()
+            if species in hkl_upper_bound_transport_species:
+                series_diagnostic["gas_transport_model"] = (
+                    "hkl_kinetic_upper_bound_no_chapman_enskog"
+                )
+                series_diagnostic["authority_status"] = (
+                    "analytical_upper_bound_status_bearing_cannot_certify"
+                )
             series_diagnostic.update(
                 _series_pressure_provenance_diagnostic(
                     species=species,

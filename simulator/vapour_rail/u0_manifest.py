@@ -633,7 +633,8 @@ def parse_inventory_rows(path: Path) -> list[dict[str, Any]]:
         if species_id == "O":
             flags.append("monatomic_oxygen")
         if species_id == "P2O5_gas":
-            flags.append("not_a_reported_literature_molecule")
+            flags.append("retired_legacy_collision_placeholder")
+            flags.append("exact_cea_p2o5_gas_key_exists")
         if species_id == "NaF":
             flags.append("diagnostic_only")
             flags.append("tranche_2_do_not_promote")
@@ -648,7 +649,8 @@ def parse_inventory_rows(path: Path) -> list[dict[str, Any]]:
                     "diagnostic_only; tranche_2_do_not_promote"
                     if species_id == "NaF"
                     else (
-                        "not_a_reported_literature_molecule"
+                        "retired legacy collision placeholder; exact CEA "
+                        "species.P2O5 gas key exists"
                         if species_id == "P2O5_gas"
                         else None
                     )
@@ -872,8 +874,24 @@ def _union_rows(row_groups: Iterable[Iterable[Mapping[str, Any]]]) -> list[dict[
             flags.update({"diagnostic_only", "tranche_2_do_not_promote"})
             row["notes"] = "diagnostic_only; tranche_2_do_not_promote"
         if species_id == "P2O5_gas":
-            flags.add("not_a_reported_literature_molecule")
-            row["notes"] = "not_a_reported_literature_molecule"
+            # Historical inventory identity only. Exact-key CEA P2O5(g) thermo
+            # exists, but this legacy collision namespace is not in the selected
+            # melt-carrier set. Keep source membership for an auditable U0 union
+            # while making the tombstone incapable of asserting feedstock
+            # presence, regime applicability, or a V-channel disposition.
+            row["disposition"] = "U"
+            row["feedstock_presence"] = False
+            row["regime"] = _default_regime(unknown=True)
+            flags.update(
+                {
+                    "exact_cea_p2o5_gas_key_exists",
+                    "retired_legacy_collision_placeholder",
+                }
+            )
+            row["notes"] = (
+                "retired_legacy_collision_placeholder; exact CEA "
+                "species.P2O5 gas key exists but is not selected here"
+            )
         row["flags"] = sorted(flags)
     return [by_id[key] for key in sorted(by_id)]
 

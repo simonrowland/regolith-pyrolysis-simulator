@@ -3062,6 +3062,15 @@ def _legacy_species_row(
     compatibility_fields = routing.get("compatibility_fields", {})
     if isinstance(compatibility_fields, Mapping):
         result.update(deepcopy(dict(compatibility_fields)))
+    # b-133 namespace bridge: the builtin pressure provider consumes the
+    # compatibility projection, while P carrier eligibility is authoritative
+    # in schema-v2 code_metadata.  Project only this family's stage boundary so
+    # the retired P2O5_gas tombstone and the six live stage-0 carriers cannot be
+    # mistaken for unrestricted hot-train rows.
+    if code.get("chemical_family") == "phosphorus_carrier":
+        result["hot_train_applicability"] = deepcopy(
+            code.get("hot_train_applicability")
+        )
     legacy_extrapolation = model.get("legacy_extrapolation_policy")
     if legacy_extrapolation is not None:
         result["extrapolation_policy"] = deepcopy(legacy_extrapolation)

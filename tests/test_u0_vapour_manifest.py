@@ -424,11 +424,19 @@ def test_membership_unknown_no_source(manifest: dict) -> None:
         assert row["regime"]["millibar"]["outcome"] == "refuse"
 
 
-def test_p2o5_gas_flagged_unphysical(manifest: dict) -> None:
+def test_p2o5_gas_is_retired_legacy_collision_namespace(manifest: dict) -> None:
     row = next(r for r in manifest["species"] if r["id"] == "P2O5_gas")
-    assert "not_a_reported_literature_molecule" in (row.get("flags") or []) or (
-        row.get("notes") == "not_a_reported_literature_molecule"
-    )
+    flags = set(row.get("flags") or [])
+    assert "exact_cea_p2o5_gas_key_exists" in flags
+    assert "retired_legacy_collision_placeholder" in flags
+    assert row["disposition"] == "U"
+    assert row["feedstock_presence"] is False
+    for regime in ("millibar", "hard_vacuum"):
+        assert row["regime"][regime] == {
+            "applicable": False,
+            "dominance": "unknown_no_source",
+            "outcome": "refuse",
+        }
 
 
 def test_naf_kept_with_diagnostic_flag(manifest: dict) -> None:

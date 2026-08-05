@@ -25,7 +25,7 @@ Source: `data/setpoints.yaml` campaign key `campaigns.C0`.
 **Typical duration**: 0.5–2.5 h.  
 **Endpoint**: P-species IR signal decay to <5 % of peak.
 
-Recommended for all lunar feedstocks as a default; required when P₂O₅ > 0.04 wt% or persistent P IR signal remains after 1050 °C vacuum hold. Captures 85–98 % of phosphorus as clean Ca/Mg/alkali phosphates in a 350–650 °C trap. The controlled-O₂ cover suppresses alkali and SiO evolution during this hold, so C0b does not consume shuttle stock.
+Recommended for all lunar feedstocks as a default; required when P₂O₅ > 0.04 wt% or persistent P IR signal remains after 1050 °C vacuum hold. The simulator predicts PO, PO₂, P₂, P₄, P₄O₆, and P₄O₁₀ from atom-balanced P₂O₅ melt reactions using CEA NASA9 thermochemistry, dilute-melt activity, and an HKL kinetic upper bound. Evolved phosphorus enters overhead gas and follows the normal bleed to terminal offgas; no capture fraction or phosphate-trap product is certified. These channels are analytical, status-bearing, and non-authoritative.
 
 Operator note: beneficiation (magnetic pre-separation) is preferred before C0b to avoid absorbing O₂ into metallic Fe. Cool back to hard vacuum after C0b before starting C2A.
 

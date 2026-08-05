@@ -5052,28 +5052,29 @@ species:
   atoms:
     O: 5.0
     P: 2.0
-  disposition: V
+  disposition: U
   validation_status: pending_validation
   validation_anchor_refs: []
-  feedstock_presence: true
+  feedstock_presence: false
   sources:
     inventory: true
     gas_closure: false
     refractory_registry: false
   regime:
     millibar:
-      applicable: true
-      dominance: unspecified
-      outcome: as_disposition
+      applicable: false
+      dominance: unknown_no_source
+      outcome: refuse
     hard_vacuum:
-      applicable: true
-      dominance: unspecified
-      outcome: as_disposition
+      applicable: false
+      dominance: unknown_no_source
+      outcome: refuse
   flags:
   - collision_gas
-  - not_a_reported_literature_molecule
+  - exact_cea_p2o5_gas_key_exists
+  - retired_legacy_collision_placeholder
   - vaporock_42
-  notes: not_a_reported_literature_molecule
+  notes: retired_legacy_collision_placeholder; exact CEA species.P2O5 gas key exists but is not selected here
 - id: P4O10
   formula: P4O10
   atoms:
