@@ -54,6 +54,60 @@ class RefusalStateSnapshotError(TypeError):
     """Typed refusal when rollback state contains an unsupported proxy graph."""
 
 
+class _RefusalSnapshotHistoryPrefix:
+    """O(1) rollback view of committed, append-only batch snapshots.
+
+    ``BatchRecord.snapshots`` is only appended to by the core loop; committed
+    entries are read but never mutated by later hours.  Holding a prefix view
+    avoids recursively copying the complete hourly history before every step.
+    A terminal refusal materializes the prefix before the rollback consumer is
+    called, so restored state still owns an ordinary list with identical
+    ordered content.
+    """
+
+    __slots__ = ('_source', '_length', '_memo')
+
+    def __init__(self, source: list[Any], memo: Dict[int, Any]) -> None:
+        self._source = source
+        self._length = len(source)
+        self._memo = memo
+
+    def __len__(self) -> int:
+        return self._length
+
+    def __iter__(self):
+        for index in range(self._length):
+            yield self._source[index]
+
+    def materialize(self) -> list[Any]:
+        # Terminal refusal is the cold path: pay the legacy copy cost here so
+        # restored history remains detached from HourSnapshot objects already
+        # returned to callers.  Reuse the live-frontier memo to retain any
+        # cross-object aliases the eager whole-state deepcopy preserved.
+        materialized: list[Any] = []
+        self._memo[id(self._source)] = materialized
+        materialized.extend(
+            _deepcopy_refusal_state(list(self), self._memo)
+        )
+        return materialized
+
+    def release(self) -> None:
+        """Break the prefix↔memo cycle once the attempted hour resolves."""
+
+        memo = self._memo
+        self._memo = {}
+        memo.clear()
+
+
+def _materialize_refusal_snapshot_history(state: Mapping[str, Any]) -> None:
+    """Replace an internal history-prefix view with its rollback list."""
+
+    record = state.get('record')
+    history = getattr(record, 'snapshots', None)
+    if isinstance(history, _RefusalSnapshotHistoryPrefix):
+        record.snapshots = history.materialize()
+
+
 def _deepcopy_refusal_state(value: Any, memo: Dict[int, Any]) -> Any:
     """Deep-copy rollback state while retaining immutable mapping views."""
     visited: set[int] = set()
@@ -73,7 +127,13 @@ def _deepcopy_refusal_state(value: Any, memo: Dict[int, Any]) -> Any:
 
     def seed_mapping_proxies(candidate: Any) -> None:
         candidate_id = id(candidate)
-        if candidate_id in visited:
+        # The committed-history list has an O(1) prefix replacement in the
+        # deepcopy memo.  Do not recursively scan the source list after that
+        # replacement has been installed.
+        if (
+            isinstance(memo.get(candidate_id), _RefusalSnapshotHistoryPrefix)
+            or candidate_id in visited
+        ):
             return
         visited.add(candidate_id)
 
@@ -11596,6 +11656,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     def _snapshot_terminal_refusal_hour_state(
         self,
+        *,
+        defer_committed_history: bool = False,
     ) -> tuple[Dict[str, Any], Any, Optional[Dict[str, Any]]]:
         preserved_names = {
             'backend',
@@ -11613,6 +11675,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'vapour_rail_catalog',
         }
         memo = {id(self): self}
+        record = getattr(self, 'record', None)
+        record_snapshots = getattr(record, 'snapshots', None)
+        if (
+            defer_committed_history
+            and isinstance(record, BatchRecord)
+            and isinstance(record_snapshots, list)
+        ):
+            # BatchRecord history is append-only in the core loop.  Preserve
+            # its committed prefix by reference and copy only the live mutable
+            # frontier.  On terminal refusal step() materializes this prefix
+            # before handing the legacy payload to the restore consumer.
+            memo[id(record_snapshots)] = _RefusalSnapshotHistoryPrefix(
+                record_snapshots,
+                memo,
+            )
         state_source = {
             name: value
             for name, value in self.__dict__.items()
@@ -11680,7 +11757,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             terminal_refusal_ledger,
             terminal_refusal_cost_state,
         ) = (
-            self._snapshot_terminal_refusal_hour_state()
+            self._snapshot_terminal_refusal_hour_state(
+                defer_committed_history=True,
+            )
+        )
+        terminal_refusal_history = getattr(
+            terminal_refusal_state.get('record'),
+            'snapshots',
+            None,
         )
         try:
             return self._step_one_hour()
@@ -11694,6 +11778,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 getattr(type(exc), 'terminal_refusal', False)
             )
             if terminal_refusal:
+                _materialize_refusal_snapshot_history(terminal_refusal_state)
                 self._restore_terminal_refusal_hour_state(
                     terminal_refusal_state,
                     terminal_refusal_ledger,
@@ -11718,6 +11803,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 except BaseException:
                     pass
             raise
+        finally:
+            if isinstance(
+                terminal_refusal_history,
+                _RefusalSnapshotHistoryPrefix,
+            ):
+                terminal_refusal_history.release()
 
     def _step_one_hour(self) -> HourSnapshot:
         """

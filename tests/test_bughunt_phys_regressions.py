@@ -5,6 +5,7 @@ import math
 from types import MappingProxyType, SimpleNamespace
 
 import pytest
+import simulator.core as simulator_core
 import simulator.reduced_real_determinism as reduced_real_determinism
 
 from engines.builtin.metallothermic_step import _time_integrated_inventory_fraction
@@ -173,6 +174,110 @@ def test_typed_refusal_rolls_back_entire_hour(refusal: Exception) -> None:
     slotted_schedule = sim.runtime_state["slotted_holder"].schedule
     assert isinstance(slotted_schedule, MappingProxyType)
     assert slotted_schedule["points"] == [{"temperature_C": 75.0}]
+
+
+def test_successful_step_structurally_shares_committed_history(monkeypatch) -> None:
+    class HistoricalSnapshot:
+        def __deepcopy__(self, _memo):
+            raise AssertionError("committed history must stay off the hot deepcopy path")
+
+    class FakeLedger:
+        def __init__(self) -> None:
+            self._balances = {}
+            self._policies = {}
+            self._transitions = []
+            self._terminal_debit_authorized_transition_ids = set()
+            self._external_loads = []
+
+        @property
+        def transitions(self):
+            return self._transitions
+
+    created_prefixes = []
+
+    class TrackingHistoryPrefix(simulator_core._RefusalSnapshotHistoryPrefix):
+        def __init__(self, source, memo):
+            super().__init__(source, memo)
+            created_prefixes.append(self)
+
+    monkeypatch.setattr(
+        simulator_core,
+        "_RefusalSnapshotHistoryPrefix",
+        TrackingHistoryPrefix,
+    )
+    committed = HistoricalSnapshot()
+    sim = object.__new__(PyrolysisSimulator)
+    sim._poisoned_hour = None
+    sim._pending_shuttle_bakeout_cycle_increment = ""
+    sim.melt = SimpleNamespace(hour=4)
+    sim.record = BatchRecord(snapshots=[committed])
+    sim.runtime_state = {"nested": {"temperature_C": 25.0}}
+    sim.atom_ledger = FakeLedger()
+    sim._chem_registry = object()
+    sim._chem_kernel = object()
+    sim._build_chemistry_kernel = lambda: object()
+
+    sim._step_one_hour = lambda: HourSnapshot(hour=4)
+
+    assert sim.step().hour == 4
+    assert sim.runtime_state == {"nested": {"temperature_C": 25.0}}
+    assert isinstance(sim.record.snapshots, list)
+    assert sim.record.snapshots == [committed]
+    assert sim.record.snapshots[0] is committed
+    assert len(created_prefixes) == 1
+    assert created_prefixes[0]._memo == {}
+    with pytest.raises(RefusalStateSnapshotError) as direct_snapshot:
+        sim._snapshot_terminal_refusal_hour_state()
+    assert isinstance(direct_snapshot.value.__cause__, AssertionError)
+
+
+def test_terminal_refusal_materializes_detached_committed_history() -> None:
+    class FakeLedger:
+        def __init__(self) -> None:
+            self._balances = {}
+            self._policies = {}
+            self._transitions = []
+            self._terminal_debit_authorized_transition_ids = set()
+            self._external_loads = []
+
+        @property
+        def transitions(self):
+            return self._transitions
+
+    refusal = EvaporationFluxRefusal("terminal", {"reason": "test"})
+    committed = HourSnapshot(
+        hour=3,
+        composition_wt_pct={"FeO": 80.0, "SiO2": 20.0},
+    )
+    sim = object.__new__(PyrolysisSimulator)
+    sim._poisoned_hour = None
+    sim._pending_shuttle_bakeout_cycle_increment = ""
+    sim.melt = SimpleNamespace(hour=4)
+    sim.record = BatchRecord(snapshots=[committed])
+    sim.runtime_state = {"nested": {"temperature_C": 25.0}}
+    sim.atom_ledger = FakeLedger()
+    sim._chem_registry = object()
+    sim._chem_kernel = object()
+    sim._build_chemistry_kernel = lambda: object()
+
+    def refuse_after_mutation() -> None:
+        sim.runtime_state["nested"]["temperature_C"] = 900.0
+        sim.record.snapshots.append(HourSnapshot(hour=4))
+        raise refusal
+
+    sim._step_one_hour = refuse_after_mutation
+
+    with pytest.raises(EvaporationFluxRefusal) as raised:
+        sim.step()
+
+    assert raised.value is refusal
+    assert sim.runtime_state == {"nested": {"temperature_C": 25.0}}
+    assert isinstance(sim.record.snapshots, list)
+    assert sim.record.snapshots == [committed]
+    assert sim.record.snapshots[0] is not committed
+    assert sim.record.snapshots[0].composition_wt_pct is not (
+        committed.composition_wt_pct
+    )
 
 
 def test_unsupported_refusal_snapshot_graph_raises_typed_error() -> None:
