@@ -1,0 +1,244 @@
+schema_version: literature_extract.v1
+source_id: kems-001-homma-1966
+source:
+  citation: >-
+    Homma, M., Ohno, R. & Ishida, T. (1966), "Evaporation of Manganese, Copper
+    and Tin from Molten Iron under Vacuum", J. Japan Inst. Metals 30:515–520,
+    DOI 10.2320/jinstmet1952.30.6_515
+  doi: 10.2320/jinstmet1952.30.6_515
+  url: https://www.jstage.jst.go.jp/article/jinstmet1952/30/6/30_6_515/_pdf
+  year: 1966
+extraction:
+  method: >-
+    OCR-artifact transcription (MinerU vlm of scanned J-STAGE PDF) + t-544
+    langmuir-ingest pilot table extract. PDF text layer is garbled OCR; values
+    taken from MinerU markdown tables/abstract.
+  date: '2026-08-07'
+  worker: langmuir-ingest-gr-t544
+  provenance_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/
+review_status: draft
+species:
+  Mn:
+    observations:
+    - observation_id: homma_1966_mn_specific_evaporation_constant
+      type: rate_series
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+        table: '4'
+        paragraph: English abstract specific evaporation constants
+        line_range: '5-7'
+      T_range_K: [1873.15, 1873.15]
+      phase: liquid_Fe_Mn_alloy
+      standard_state: >-
+        Vacuum induction melt at 1600 °C; first-order specific evaporation
+        constant K_P^S (cm·s⁻¹) from −d[%B]/dt = K^S (A/V)[%B]
+      regime: vacuum_induction_free_evaporation_steel_melt
+      units: cm_s-1
+      values:
+        quantity: specific_evaporation_constant_K_P_S
+        T_C: 1600
+        chamber_pressure_mmHg_range: [0.001, 0.01]
+        Fe_Mn_K_P_S_cm_s:
+          - {melt: '6411-15', K_P_S: 8.1e-3, C_s_over_C_m: 0.09}
+          - {melt: '6411-1', K_P_S: 7.8e-3, C_s_over_C_m: 0.09}
+          - {melt: '6409-2', K_P_S: 8.5e-3, C_s_over_C_m: 0.10}
+          - {melt: '6411-2', K_P_S: 9.2e-3, C_s_over_C_m: 0.11}
+        Fe_C_Mn_K_P_S_cm_s:
+          - {melt: '6501-11', K_P_S: 1.1e-2, C_s_over_C_m: 0.12}
+          - {melt: '6501-12', K_P_S: 8.8e-3, C_s_over_C_m: 0.10}
+        abstract_range_Fe_Mn_cm_s: [9.2e-3, 1.2e-2]
+        abstract_range_Fe_C_Mn_cm_s: [8.8e-3, 1.1e-2]
+        gas_species: Mn(g)
+        material: molten_Fe_Mn_and_Fe_C_Mn
+      uncertainty:
+        note: Table 4 per-melt values; abstract quotes ranges over initial 10–15 min first-order window
+      equipment:
+        cell_material:
+          value: commercial alumina crucible CP-2 (ID 38 mm, OD 49 mm, height 120 mm)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+            paragraph: 市販アルミナるつぼ (CP-2)
+            line_range: '27'
+        chamber_pressure:
+          value: 1.0e-2
+          units: mmHg
+          note: 'dissolution vacuum range 10^{-2}–10^{-3} mmHg (upper end pinned)'
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+            paragraph: 溶解中の真空度は 10^{-2} ~ 10^{-3} mmHg
+            line_range: '29'
+        sample_surface_area:
+          value:
+            crucible_inner_diameter_mm: 38
+            note: free surface ≈ π(ID/2)² of alumina crucible; numeric A not tabulated as m²
+            inferred: true
+            inference: area from stated crucible ID 38 mm (not free-surface measured)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+            paragraph: るつぼ (CP-2) の寸法は内径 38 mm
+            line_range: '27'
+    - observation_id: homma_1966_mn_olette_alpha_exp_table1
+      type: alpha
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+        table: '1'
+        line_range: '162-164'
+      T_range_K: [1873.15, 1873.15]
+      phase: liquid_Fe_Mn_alloy
+      standard_state: >-
+        Olette relative evaporation coefficient α_B from mass-loss stoichiometry
+        (eq. 7–8), NOT the Hertz–Knudsen–Langmuir coefficient (0–1). Values ≫1
+        are expected for volatile solutes in Fe.
+      regime: olette_relative_evaporation_coefficient
+      units: dimensionless
+      values:
+        alpha: 115.0
+        alpha_note: representative 5 min experimental pin for melt 6502-1 (Table 1)
+        olette_alpha_exp_series:
+          - {melt: '6502-1', t_min: 5, alpha_exp: 115, pct_Mn0: 1.05}
+          - {melt: '6502-1', t_min: 10, alpha_exp: 99, pct_Mn0: 1.05}
+          - {melt: '6502-1', t_min: 15, alpha_exp: 91, pct_Mn0: 1.05}
+          - {melt: '6502-2', t_min: 5, alpha_exp: 113, pct_Mn0: 1.74}
+          - {melt: '6502-2', t_min: 10, alpha_exp: 122, pct_Mn0: 1.74}
+          - {melt: '6502-2', t_min: 15, alpha_exp: 119, pct_Mn0: 1.74}
+          - {melt: '6412-14', t_min: 5, alpha_exp: 233, pct_Mn0: 2.89}
+          - {melt: '6412-14', t_min: 10, alpha_exp: 115, pct_Mn0: 2.89}
+          - {melt: '6412-14', t_min: 15, alpha_exp: 79, pct_Mn0: 2.89}
+        olette_alpha_theo: 1095
+        lambda_Mn_by_melt: { '6502-1': 124, '6502-2': 115, '6412-14': 150 }
+        definition: 'α_B = (γ_B/γ_Fe)·(P_B°/P_Fe°)·√(M_Fe/M_B)  [Olette]'
+        not_hkl_langmuir_coefficient: true
+        gas_species: Mn(g)
+        material: molten_Fe_Mn
+      uncertainty:
+        note: >-
+          Per-run experimental scatter large (79–233); theoretical Olette value
+          1095 ≫ experimental — authors attribute to surface depletion (Ward Cs/Cm)
+  Cu:
+    observations:
+    - observation_id: homma_1966_cu_specific_evaporation_constant
+      type: rate_series
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+        table: '5'
+        line_range: '216-218'
+      T_range_K: [1873.15, 1873.15]
+      phase: liquid_Fe_Cu_alloy
+      regime: vacuum_induction_free_evaporation_steel_melt
+      units: cm_s-1
+      values:
+        quantity: specific_evaporation_constant_K_N_S
+        T_C: 1600
+        Fe_Cu_K_N_S_cm_s:
+          - {melt: '6503-12', K_N_S: 5.6e-3, C_s_over_C_m: 0.47}
+          - {melt: '6503-11', K_N_S: 5.8e-3, C_s_over_C_m: 0.49}
+          - {melt: '6503-16', K_N_S: 4.1e-3, C_s_over_C_m: 0.31}
+          - {melt: '6503-28', K_N_S: 3.4e-3, C_s_over_C_m: 0.25}
+        abstract_range_cm_s: [3.4e-3, 5.8e-3]
+        gas_species: Cu(g)
+        material: molten_Fe_Cu
+    - observation_id: homma_1966_cu_olette_alpha_exp_table2
+      type: alpha
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+        table: '2'
+        line_range: '166-168'
+      T_range_K: [1873.15, 1873.15]
+      phase: liquid_Fe_Cu_alloy
+      standard_state: Olette relative evaporation coefficient α_B — NOT HKL α
+      regime: olette_relative_evaporation_coefficient
+      units: dimensionless
+      values:
+        alpha: 51.0
+        alpha_note: 5 min experimental pin melt 6503-12 (Table 2)
+        olette_alpha_exp_series_6503_12:
+          - {t_min: 5, alpha_exp: 51}
+          - {t_min: 10, alpha_exp: 60}
+          - {t_min: 15, alpha_exp: 73}
+          - {t_min: 20, alpha_exp: 53}
+        olette_alpha_theo: 143
+        not_hkl_langmuir_coefficient: true
+        gas_species: Cu(g)
+        material: molten_Fe_Cu
+  Sn:
+    observations:
+    - observation_id: homma_1966_sn_specific_evaporation_constant
+      type: rate_series
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+        table: '5'
+        line_range: '216-218'
+      T_range_K: [1873.15, 1873.15]
+      phase: liquid_Fe_Sn_alloy
+      regime: vacuum_induction_free_evaporation_steel_melt
+      units: cm_s-1
+      values:
+        quantity: specific_evaporation_constant_K_N_S
+        T_C: 1600
+        Fe_Sn_K_N_S_cm_s:
+          - {melt: '6503-15', K_N_S: 1.6e-3, C_s_over_C_m: 0.96}
+          - {melt: '6503-14', K_N_S: 1.2e-3, C_s_over_C_m: 0.74}
+          - {melt: '6504-1', K_N_S: 1.5e-3, C_s_over_C_m: 0.91}
+        abstract_range_cm_s: [1.2e-3, 1.6e-3]
+        gas_species: Sn(g)
+        material: molten_Fe_Sn
+    - observation_id: homma_1966_sn_olette_alpha_exp_table3
+      type: alpha
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+        table: '3'
+        line_range: '174-176'
+      T_range_K: [1873.15, 1873.15]
+      phase: liquid_Fe_Sn_alloy
+      standard_state: Olette relative evaporation coefficient α_B — NOT HKL α
+      regime: olette_relative_evaporation_coefficient
+      units: dimensionless
+      values:
+        alpha: 19.0
+        alpha_note: 5 min experimental pin melt 6503-15 (Table 3)
+        olette_alpha_theo: 20
+        not_hkl_langmuir_coefficient: true
+        gas_species: Sn(g)
+        material: molten_Fe_Sn
+        note: >-
+          Sn is the only solute where Olette theo (20) ≈ exp (~19–31); Cs/Cm ~0.74–0.96
+          (near evaporation control)
+fidelity_samples:
+- species: Mn
+  observable: rate_series
+  observation_id: homma_1966_mn_specific_evaporation_constant
+  field: abstract_range_Fe_Mn_cm_s
+  value: [9.2e-3, 1.2e-2]
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+    paragraph: K_Mn^S (Fe-Mn) = 9.2e-3 ~ 1.2e-2 cm·sec^{-1}
+    line_range: '7'
+- species: Mn
+  observable: alpha
+  observation_id: homma_1966_mn_olette_alpha_exp_table1
+  field: olette_alpha_theo
+  value: 1095
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+    table: '1'
+    paragraph: α_Mn (theo.) = 1095
+    line_range: '164'
+- species: Cu
+  observable: alpha
+  observation_id: homma_1966_cu_olette_alpha_exp_table2
+  field: alpha
+  value: 51.0
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+    table: '2'
+    paragraph: α_Cu (exp.) = 51 at t=5 min melt 6503-12
+    line_range: '168'
+- species: Sn
+  observable: rate_series
+  observation_id: homma_1966_sn_specific_evaporation_constant
+  field: abstract_range_cm_s
+  value: [1.2e-3, 1.6e-3]
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+    paragraph: K_Sn^S = 1.2e-3 ~ 1.6e-3 cm·sec^{-1}
+    line_range: '7'
