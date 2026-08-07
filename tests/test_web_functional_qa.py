@@ -292,8 +292,20 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
     assert story["refractory_ceramic"]["class_total_kg"] > 0
     assert story["escaped_to_vacuum"]["class_total_kg"] >= 0
     assert story["terminal_residue"]["class_total_kg"] > 0
-    assert completion["terminal_rump_by_species"]["Cr2O3"] > 0
-    assert story["refractory_ceramic"]["species_kg"]["Cr2O3"] > 0
+    # 2026-08-06 b-145: physical-composite OOR lowers multi-dex inflated
+    # low-T composite pressures. The prior pin required residual Cr2O3 in the
+    # terminal ceramic rump; under the physical continuation the C3/C6 Cr
+    # metallothermic path fully reduces the lunar Cr2O3 inventory to metallic
+    # Cr (~2.44 kg product) rather than leaving ceramic dust. Sign check: Cr
+    # leaves as metal product (not vacuum oxide escape), mass balance holds
+    # (mb% ~1e-14), and the oxide residual is zero by reduction not by the
+    # wrong-direction volatilisation the OOR fix removes. Contract is now
+    # "Cr is extracted as metal" rather than "Cr2O3 survives as ceramic".
+    rump = completion["terminal_rump_by_species"]
+    assert rump.get("Cr2O3", 0.0) == 0.0
+    assert completion["products"].get("Cr", 0.0) > 0.0
+    assert story["metal_ingots"]["species_kg"].get("Cr", 0.0) > 0.0
+    assert story["refractory_ceramic"]["species_kg"].get("Cr2O3", 0.0) == 0.0
     ree_extent = story["refractory_ceramic"]["ree_enrichment_extent"]
     assert ree_extent["basis"] == (
         "initial_cleaned_melt_to_terminal_residual_ceramic"

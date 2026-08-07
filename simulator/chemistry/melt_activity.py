@@ -251,6 +251,17 @@ class MeltOxideActivity:
         return payload
 
 
+# AtomLedger keeps sub-tolerance signed dust rather than pruning it
+# (ledger.py). Multi-carrier parent debits (e.g. Cr / CrO / CrO2 / CrO3
+# against Cr2O3) can therefore leave residual mol of order 1e-15 after a
+# near-zero parent is fully consumed — not a mass-balance breach (HI-2
+# stays closed). Activity reads must treat that dust as empty inventory
+# rather than hard-fail the vapour batch. Raise only on true negatives
+# outside the dust floor. (b-145: Cr2O3 = -1.76e-15 mol after physical-
+# composite OOR changed the Cr-family branch schedule on the web full run.)
+_MELT_INVENTORY_NUMERICAL_DUST_MOL = 1.0e-12
+
+
 def single_cation_mole_fractions(
     account_mol: Mapping[str, float],
 ) -> dict[str, float]:
@@ -263,7 +274,16 @@ def single_cation_mole_fractions(
         cations = MELT_OXIDE_CATIONS_PER_FORMULA.get(str(parent_oxide))
         if cations is None:
             continue
-        if not math.isfinite(mol_value) or mol_value < 0.0:
+        if not math.isfinite(mol_value):
+            raise ValueError(
+                f"melt inventory for {parent_oxide!r} must be finite "
+                "and non-negative"
+            )
+        if mol_value < 0.0:
+            if mol_value >= -_MELT_INVENTORY_NUMERICAL_DUST_MOL:
+                # Signed dust from float cancellation on a depleted parent —
+                # treat as zero inventory for the activity projection.
+                continue
             raise ValueError(
                 f"melt inventory for {parent_oxide!r} must be finite "
                 "and non-negative"

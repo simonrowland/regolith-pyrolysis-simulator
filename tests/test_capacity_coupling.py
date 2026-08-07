@@ -863,12 +863,21 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         # the HEAD oodfix seam. Head-result trio DID NOT MOVE vs HEAD
         # 090d048 pins (activity values for majors are the same constant-
         # table path HEAD already used; only labels/provenance changed).
+        # 2026-08-06 b-145: composite OOR switches from log-linear slope
+        # continuation to physical composite (base Antoine × CEA K_ex at
+        # the actual T). At 1550 C the Ti/oxide carriers sit below their
+        # floors; the invented multi-dex inflation is gone, so total flux
+        # falls −0.2969906068147554 kg/hr, transport saturation
+        # −38475.2925606102 points, and melt mass rises
+        # +0.2969908083582 kg (less evaporative debit). Transition count
+        # and last-5 reasons DID NOT MOVE (still 36; TiO/TiO2_gas still
+        # status-bearing OOR flux-eligible).
         (
             1,
             1550.0,
-            2.9516520099235124,
-            1204062.0946067297,
-            995.8106409826071,
+            2.654661403108757,
+            1165586.8020461195,
+            996.1076317909653,
         ),
         rel=1.0e-12,
         abs=1.0e-12,

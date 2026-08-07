@@ -900,6 +900,12 @@ def test_production_ti_carrier_ratios_reproduce_cea_exchange_algebra() -> None:
 
     for species_id in ("TiO", "TiO2_gas"):
         evaluator = catalog.evaluator_for(species_id)
+        # Composite OOR uses the physical composite (base Antoine × CEA
+        # K_ex at the actual T), not log-linear slope continuation of the
+        # composed surface (b-145). Intent of this block (b-142): continuity
+        # at the floor — no cliff, matching first derivative across the edge,
+        # and smooth local curvature on the sub-floor side.
+        assert evaluator.reference_model.physical_composite_ood is True
         samples = [
             evaluator.evaluate(T, source_activity=1.0, pO2_bar=pO2_bar)
             for T in (1922.0, 1923.0, 1924.0)
@@ -909,11 +915,13 @@ def test_production_ti_carrier_ratios_reproduce_cea_exchange_algebra() -> None:
             math.isfinite(sample.pressure_pa) and sample.pressure_pa > 0.0
             for sample in samples
         )
-        # Premise: continuation and fit meet at the 1923.15 K floor. Algebra:
-        # adjacent log increments are log10(P_2/P_1), so a finite, same-sign,
+        # Premise: physical composite is one smooth function of T across the
+        # 1923.15 K floor (status flips; value does not). Algebra: adjacent
+        # log increments are log10(P_2/P_1), so a finite, same-sign,
         # sub-0.1-decade pair rules out a zero cliff or local reversal. Units:
         # pressure ratios are dimensionless. Sanity: 1922/1923/1924 K follows
-        # one smooth monotone trend while only the two sub-floor points are OOR.
+        # one smooth monotone trend while only the two sub-floor points are OOR;
+        # at the floor, OOR evaluation reproduces the in-domain edge value.
         log_pressures = [math.log10(sample.pressure_pa) for sample in samples]
         increments = [
             right - left for left, right in zip(log_pressures, log_pressures[1:])
@@ -922,6 +930,19 @@ def test_production_ti_carrier_ratios_reproduce_cea_exchange_algebra() -> None:
         assert max(abs(increment) for increment in increments) < 0.1
 
         boundary = 1923.15
+        # Exact floor match: physical composite at T_low equals in-domain value.
+        floor_oor = evaluator.evaluate(
+            boundary - 1.0e-9, source_activity=1.0, pO2_bar=pO2_bar
+        )
+        floor_in = evaluator.evaluate(
+            boundary, source_activity=1.0, pO2_bar=pO2_bar
+        )
+        assert floor_oor.out_of_range is True
+        assert floor_in.out_of_range is False
+        assert math.log10(floor_oor.pressure_pa) == pytest.approx(
+            math.log10(floor_in.pressure_pa), abs=1.0e-9
+        )
+
         epsilon_K = 1.0e-3
         boundary_pressures = [
             evaluator.evaluate(T, source_activity=1.0, pO2_bar=pO2_bar).pressure_pa
@@ -935,6 +956,8 @@ def test_production_ti_carrier_ratios_reproduce_cea_exchange_algebra() -> None:
         ) / epsilon_K
         assert below_slope == pytest.approx(above_slope, rel=1.0e-4, abs=1.0e-8)
 
+        # Sub-floor local slope continuity (physical thermo curvature is C1;
+        # previously this point was the cubic blend join for slope continuation).
         ramp_edge = boundary - 10.0
         ramp_epsilon_K = 1.0e-5
         ramp_edge_pressures = [

@@ -840,6 +840,10 @@ class _ReferencePressureModel:
     # Thermo-backed pressure (VR-4b nasa7/nasa9/shomate). Optional callables
     # avoid freezing large polynomial trees into every Antoine row.
     thermo_log10_pressure: Any | None = None
+    # Composite carriers (base reaction × gas-exchange) evaluate the physical
+    # composite at the actual T when OOR; pure Antoine / seam metals keep the
+    # log-linear conservative_slope_continuation (see CompiledPressureEvaluator).
+    physical_composite_ood: bool = False
 
     def log10_pressure(self, temperature_K: float) -> float:
         if self.evaluator_family == "antoine":
@@ -911,7 +915,10 @@ class CompiledPressureEvaluator:
                 )
             # Anti-cliff: continuous non-zero at the domain edge (no silent
             # zero). Consumers may compute with this continuation but must
-            # preserve its extrapolated, non-certifying status.
+            # preserve its extrapolated, non-certifying status. Composite
+            # carriers take the physical-composite branch inside
+            # _out_of_domain_log10_continuation; pure Antoine / seam metals
+            # keep the log-linear coating-conservative slope.
             log10_reference = self._out_of_domain_log10_continuation(
                 temperature_K
             )
@@ -995,13 +1002,43 @@ class CompiledPressureEvaluator:
         fit-domain edge (that would invent a volatility cliff). The returned
         number is the best available continuation, not certifying evidence.
 
-        Consequence-directed estimate (coating failure mode, CLAUDE.md §4): one
-        value drives both yield and wall-deposit risk, so no direction protects
-        both claims. Err toward not hiding the co-equal coating failure mode:
-        amplify outward increases and attenuate outward decreases relative to
-        the straight log-linear slope. The caller may evolve inventory from the
-        estimate but must keep it status-bearing and unable to certify.
+        Two branches:
+
+        1. **Physical composite** (``physical_composite_ood``): rows whose
+           pressure is base-reaction × gas-exchange composition. Evaluate the
+           composite thermo at the actual T — CEA gas polys stay in their
+           300–6000 K domain; the base Antoine (Clausius–Clapeyron 1/(T+C)
+           form fitted to the reaction ΔH) is the true thermodynamic
+           continuation of the base, not a log-linear slope of the already-
+           composed pressure. Status remains OOR/status-bearing; only the
+           value is physical. (b-145: linear-T slope + ×0.5 cooling
+           attenuation invented +4.33 dex on TiO2_gas at 1350 K.)
+
+        2. **Conservative slope continuation** (pure Antoine / seam metals):
+           consequence-directed estimate (coating failure mode, CLAUDE.md
+           §4): amplify outward increases and attenuate outward decreases
+           relative to the straight log-linear slope. The caller may evolve
+           inventory from the estimate but must keep it status-bearing and
+           unable to certify.
         """
+        if self.reference_model.physical_composite_ood:
+            # Premise: for composite carrier V, log10 P_V°(T) =
+            #   (1/ν) log10 K_ex(T) + (m/ν) log10 P_base°(T) + O2 term
+            # (see _log10_from_composite). Algebra: K_ex(T)=exp(-ΔG_ex°/RT)
+            # from CEA gas polys (valid 300–6000 K at any campaign T);
+            # P_base° is the liquid-reservoir Antoine
+            #   log10 P_base = A − B/(T+C)
+            # which is van't Hoff / Clausius–Clapeyron in 1/(T+C) with the
+            # fitted reaction dH (B ∝ ΔH/R ln10). Composing at the actual T
+            # therefore continues each physical factor on its own domain
+            # rather than log-linearly continuing the composed surface.
+            # Unit check: K_ex and every p/P° ratio are dimensionless;
+            # log10 P is log10(Pa). Sanity: at the domain floor T=T_low the
+            # physical composite reproduces the in-domain edge value exactly
+            # (no cliff); 1922/1923/1924 K are smooth; unit-a TiO2_gas at
+            # 1350 K lands within ~0.2 dex of VapoRock (b-145 base_compare).
+            return float(self.reference_model.log10_pressure(temperature_K))
+
         low, high = self.valid_temperature_K
         boundary = low if temperature_K < low else high
         span = max(high - low, 1.0)
@@ -2508,26 +2545,50 @@ def _compile_thermo_reference_model(
                 )
 
             def _log10_from_composite(temperature_K: float) -> float:
-                states = [
-                    (nu, poly.evaluate(temperature_K))
-                    for nu, poly, _formula in exchange_terms
-                ]
-                K_exchange = reaction_equilibrium_constant(states, T_K=temperature_K)
-                base_pressure_pa = 10.0 ** base_reference.log10_pressure(temperature_K)
-                base_ratio = base_pressure_pa / Pstd
-                pO2_over_Pstd = (pO2_reference_bar * 1.0e5) / Pstd
-                target_ratio = (
-                    K_exchange
-                    * base_ratio**base_reactant_nu
-                    * pO2_over_Pstd ** (-exchange_nu_o2)
-                ) ** (1.0 / target_exchange_nu)
-                pressure_pa = target_ratio * Pstd
-                if not math.isfinite(pressure_pa) or pressure_pa <= 0.0:
+                # Physical composite in pure log space (b-145 regrind).
+                #
+                # Premise: exchange m B + n O2 ⇌ ν V gives
+                #   (p_V/P°) = (K_ex · (p_B/P°)^m · (p_O2/P°)^n)^{1/ν}
+                # Algebra (log10 form, identical when every intermediate is
+                # representable):
+                #   log10 K_ex = −ΔG°_ex / (R T ln 10)
+                #              = −(Σ ν_i g_i°/RT) / ln(10)
+                #   log10(p_V/P°) = (1/ν)[log10 K_ex + m log10(p_B/P°)
+                #                           + n log10(p_O2/P°)]
+                #   log10 p_V(Pa) = log10(p_V/P°) + log10 P°
+                # Why log space: cluster carriers (Si3: m=3) at Stage-0 bakeout
+                # (~400 K) have K·ratio^m ~ 10^{-349}, which underflows float64
+                # to 0 in linear products even though the true log10 P is finite
+                # (~−200). The outer CompiledPressureEvaluator still clamps to
+                # the float range; only the intermediate arithmetic changes.
+                # Units: returns log10(Pa). Sanity: bit-matches the prior linear
+                # path wherever both are representable (TiO2_gas @ 1350–2200 K);
+                # Si3 @ 448.15 K now returns a finite physical log instead of
+                # raising CatalogCompileError.
+                delta_g_over_RT = 0.0
+                for nu, poly, _formula in exchange_terms:
+                    state = poly.evaluate(temperature_K)
+                    delta_g_over_RT += float(nu) * float(state.g_over_RT)
+                log10_K = -delta_g_over_RT / math.log(10.0)
+                # Base Antoine is the van't Hoff 1/(T+C) continuation of the
+                # fitted liquid-reservoir reaction dH; evaluate at actual T.
+                log10_base_pa = float(base_reference.log10_pressure(temperature_K))
+                log10_base_ratio = log10_base_pa - math.log10(Pstd)
+                log10_pO2_over_Pstd = math.log10(
+                    (pO2_reference_bar * 1.0e5) / Pstd
+                )
+                log10_target_ratio = (
+                    log10_K
+                    + base_reactant_nu * log10_base_ratio
+                    + (-exchange_nu_o2) * log10_pO2_over_Pstd
+                ) / target_exchange_nu
+                log10_pressure_pa = log10_target_ratio + math.log10(Pstd)
+                if not math.isfinite(log10_pressure_pa):
                     raise CatalogCompileError(
-                        f"{species_id}: composite thermo evaluator produced invalid "
-                        f"pressure at T={temperature_K}"
+                        f"{species_id}: composite thermo evaluator produced "
+                        f"non-finite log10 pressure at T={temperature_K}"
                     )
-                return math.log10(pressure_pa)
+                return log10_pressure_pa
 
             return (
                 _ReferencePressureModel(
@@ -2535,6 +2596,7 @@ def _compile_thermo_reference_model(
                     coefficients=MappingProxyType({}),
                     points=(),
                     thermo_log10_pressure=_log10_from_composite,
+                    physical_composite_ood=True,
                 ),
                 derived_pO2_exponent,
             )

@@ -68,7 +68,16 @@ SIO_ANCHOR_HOUR = 6
 # channel drawing ~2% of the SiO2 pool) moves the finite-pO2/IW separation
 # 0.1844 -> 0.2044 decade. The SiO Antoine row itself is bit-identical to
 # the base; the hard AtomLedger closure is unaffected.
-EXPECTED_SIO_DECADE_DRIFT = 0.20438023169672037
+# 2026-08-06 b-145: physical-composite OOR on composite oxide carriers
+# (SiO2_gas, Si2, Si3, …) removes the +multi-dex invented low-T pressures
+# from slope continuation. Pure SiO Antoine OOR is unchanged, but the
+# managed finite-pO2 headspace trajectory (self-oxidation / co-evaporation
+# of the composite Si family) shifts the finite-pO2 vs IW SiO separation
+# 0.2044 -> 0.1858 decade (DOWN). Sign check: lower composite low-T
+# pressures ⇒ less early Si-family loss ⇒ milder managed-branch
+# self-oxidation drift vs IW ⇒ smaller decade separation. Closure
+# unaffected; pin is the executed value under physical composite OOR.
+EXPECTED_SIO_DECADE_DRIFT = 0.18583228077057964
 
 
 def test_vaporock_sio_iw_vs_vacuum_floor_hot_c2a_anchor():
