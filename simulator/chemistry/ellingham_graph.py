@@ -275,11 +275,36 @@ def effective_equilibrium_pressure_Pa(
             else None
         )
         gas_rail_rxn = sp_data.get("gas_rail_standard_reaction")
+        gas_rail_authoritative = True
+        if isinstance(gas_rail_rxn, Mapping):
+            # Mirror Builtin demotion gate (MC-5 Ca): dormant TE liquid-oxide
+            # Pref must not select over JANAF gas-metal Ellingham gas_fugacity.
+            if gas_rail_rxn.get("authoritative") is False:
+                gas_rail_authoritative = False
+            else:
+                _gr_status = str(
+                    gas_rail_rxn.get("status")
+                    or gas_rail_rxn.get("runtime_disposition")
+                    or gas_rail_rxn.get("authority_status")
+                    or ""
+                ).strip().lower()
+                if _gr_status in {
+                    "dormant",
+                    "dormant_non_authoritative",
+                    "inactive",
+                    "inactive_dormant",
+                    "inactive_provenance_only",
+                    "status_bearing_non_authoritative",
+                    "non_authoritative",
+                    "provenance_only",
+                } or _gr_status.startswith("dormant"):
+                    gas_rail_authoritative = False
         if (
             fit_target != "standard_reaction_term"
             and metal_phase_kind == ELLINGHAM_METAL_PHASE_GAS
             and isinstance(gas_rail_rxn, Mapping)
             and gas_rail_rxn.get("antoine")
+            and gas_rail_authoritative
         ):
             # Ca/Mg two-rail gas path: liquid-oxide standard reaction, not
             # solid-oxide Ellingham gas fugacity (pairing fix 2026-07-20).

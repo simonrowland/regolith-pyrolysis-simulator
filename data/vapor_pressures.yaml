@@ -1268,8 +1268,9 @@ families:
           parent_oxide: CaO
           authority_class: uncertified
           source: REF-043 NIST Chemistry WebBook SRD 69 Hartmann and Schneider 1929 calcium (C7440702);
-            pure_component_antoine is retained as a legacy compatibility sidecar; the schema-v2 catalog
-            uses the activity-corrected liquid-CaO reaction
+            pure_component_antoine is the condensed-metal sidecar below boil; above boil Builtin uses
+            gas_fugacity (JANAF gas-metal Ellingham). TE gas_rail_standard_reaction is dormant
+            (MC-5 Ca 2026-08-07); schema-v2 catalog Pref is Pref_GF-aligned (not TE Pref_GR)
           pure_component_antoine:
             source: REF-043 NIST Chemistry WebBook SRD 69 Hartmann and Schneider 1929 calcium (C7440702);
               log10(P/bar)=2.78473-3121.368/(T-594.591), converted to Pa by A+5
@@ -1283,10 +1284,27 @@ families:
           boiling_point_C: 1484
           notes: dH_vap ~ 182.3 kJ/mol. Significant above ~1500 degC.
           gas_rail_standard_reaction:
+            # MC-5 Ca (2026-08-07): DORMANT / non-authoritative. Do not delete -
+            # retained as provenance for the TE+JANAF liquid-oxide Pref that
+            # created the t-534 seam. Builtin honors status and falls through to
+            # gas_fugacity (JANAF gas-metal Ellingham) above Ca boil 1757 K.
+            # Phase-1 audit: docs-private/research/2026-08-07-mc5-ca-fix/report.md
+            # (and investigation docs-private/research/2026-08-07-mc5-ca/findings.md).
+            # Numbers at 1950 K: Pref_GR-Pref_GF = -2.423 dex; TE mu0_CaO(l) is
+            # -92.5 kJ/mol vs CEA CaO(cr); JANAF-only CaO(cr)->Ca(g)+1/2O2 lands on
+            # Pref_GF (+/-0.06 dex); CEA CaO(L) domain starts 3172 K so TE liquid
+            # mu0 cannot be validated against JANAF pure liquid lime.
+            status: dormant_non_authoritative
+            authoritative: false
             formula: CaO(l) -> Ca(g) + 0.5 O2(g)
-            basis: 'VapoRock JANAF metal(g)/O2(g) + ThermoEngine v1.0 pure-liquid oxide mu0; minimax refit
-              over 1757-2273.15 K. Closes solid-oxide Ellingham vs liquid-oxide activity pairing (2026-07-20
-              vaporock-fit-audit).
+            basis: 'DORMANT (MC-5 Ca, 2026-08-07). Historical fit: VapoRock JANAF metal(g)/O2(g)
+              + ThermoEngine v1.0 pure-liquid oxide mu0 (MELTS endmember-transform oxide basis,
+              not JANAF pure liquid CaO); minimax refit over 1757-2273.15 K from 2026-07-20
+              vaporock-fit-audit pairing fix. Demoted because TE mu0_CaO is the divergent term
+              vs our own JANAF gas-metal Ellingham Pref_GF (-2.32...-2.55 dex over the
+              1757-2273.15 K domain) and cannot be
+              validated against JANAF/CEA pure CaO(l) (liquid domain only >=3172 K; solid JANAF
+              assembly matches Pref_GF). Runtime: gas_fugacity above boil.
 
               '
             standard_pressure_Pa: 100000.0
@@ -1297,9 +1315,11 @@ families:
               A: 12.2168914
               B: 37873.6892331
               C: -116.89
-              derivation: 'Premise: liquid-oxide activity pairs with liquid-oxide standard reaction. Algebra:
-                delG0=G_M(g)+n*G_O2-mu0_oxide(l); log10(P_ref/Pa)=5-delG0/(RT ln10); P=P_ref*a*fO2^n.
-                Unit Pa. Sanity: max residual 0.000736 dex vs TE+JANAF grid.
+              derivation: 'PROVENANCE ONLY (dormant). Premise was liquid-oxide activity with
+                TE liquid-oxide standard reaction. Algebra: delG0=G_M(g)+n*G_O2-mu0_oxide(l);
+                log10(P_ref/Pa)=5-delG0/(RT ln10); P=P_ref*a*fO2^n. Unit Pa. Sanity: max
+                residual 0.000736 dex vs TE+JANAF grid (self-consistent to TE, not to JANAF
+                solid Pref_GF). MC-5 demotion 2026-08-07.
 
                 '
             valid_range_K:
@@ -1314,6 +1334,15 @@ families:
               - 10
               method: minimax |log10P_fit-log10P_source| on 10 K grid
             rail_scope: gas_only_two_rail_preserved
+            demotion:
+              date: '2026-08-07'
+              ticket: t-534
+              option: B
+              reason: TE pure-liquid CaO mu0 (MELTS oxide-basis) sits -87...-93 kJ/mol vs
+                JANAF/CEA solid CaO; Pref_GR is -2.32...-2.55 dex below Pref_GF over the 1757-2273.15 K domain (-2.545 @1757 K, -2.423 @1950 K, -2.316 @2273 K); JANAF-only
+                assembly lands on Pref_GF; activity cannot absorb the residual inside SF18.
+              findings: docs-private/research/2026-08-07-mc5-ca/findings.md
+              audit: docs-private/research/2026-08-07-mc5-ca-fix/report.md
           validation:
             status: pending_validation
             anchor_refs: []
@@ -1339,6 +1368,11 @@ families:
               compound_bearing: false
               require_assemblage_match: false
           pressure_models:
+          # MC-5 Ca (2026-08-07): catalog Pref retargeted to JANAF gas-metal
+          # Ellingham Pref_GF so catalog matches Builtin gas_fugacity after
+          # demoting TE gas_rail_standard_reaction. Same reaction stoichiometry
+          # a^1 fO2^-0.5; only P_ref changes. Do not reintroduce TE Pref_GR
+          # (A=12.2168914,B=37873.6892331,C=-116.89) as authoritative.
           - fit_target: standard_reaction_term
             pressure_kind: equilibrium_partial_pressure
             species_basis: monomer
@@ -1348,6 +1382,17 @@ families:
               - 2273.15
             provenance:
             - source: schema_v1_in_place_migration
+            - source: mc5_ca_pref_gf_alignment_2026-08-07
+              note: 'Reference Antoine is a minimax-exact C=0 fit to Builtin
+                Pref_GF = P0 * K_decomp^(1/n_M) from ellingham_thermo Ca gas-metal
+                segments (2 Ca(g)+O2 -> 2 CaO(s); Chase 1998 JANAF Ca-029).
+                Premise: catalog and Builtin must share the same Pref family after
+                TE gas_rail demotion. Algebra: log10(P_ref/Pa)=A-B/(T+C) with C=0
+                because Ellingham dG is linear in T on each segment; float-eval residual ~5e-11
+                dex on 10 K grid 1757-2273.15 K (coefficients algebraically exact). Unit Pa. Sanity: at 1950 K
+                Pref_GF log10=-6.0206 matches live ellingham_delta_g root; old TE
+                Pref_GR was -8.4440 (-2.423 dex). See
+                docs-private/research/2026-08-07-mc5-ca-fix/report.md.'
             evaluator_family: standard_reaction_term
             source_reaction_id: liquid_cao_to_ca_gas
             activity_semantics: source_reaction_activity
@@ -1355,9 +1400,16 @@ families:
             reference_pressure_model:
               evaluator_family: antoine
               coefficients:
-                A: 12.2168914
-                B: 37873.6892331
-                C: -116.89
+                A: 15.0016562599
+                B: 40993.4487601735
+                C: 0.0
+              derivation: 'MC-5 Ca Pref_GF (2026-08-07). Premise: gas-metal JANAF
+                Ellingham root at a=1, fO2=1 bar is P_ref = P0 * exp(dG_f/(n_M R T))
+                with dG_f = ellingham_delta_g_kj_per_mol_o2(Ca,T)*1000 (formation
+                2Ca(g)+O2->2CaO(s), so decomp K_decomp=exp(dG_f/RT) and
+                Pref=P0*K_decomp^(1/2)). Algebra: fit log10 P_ref = A - B/(T+C) on
+                10 K grid; C=0 is exact for linear Ellingham segments. Unit Pa.
+                Sanity: max |fit-source| ~5e-11 dex (float eval; algebraically exact); T=1950 log10 Pref=-6.020625.'
             activity_exponent: 1.0
             pO2_exponent: -0.5
             pO2_reference_bar: 1.0
@@ -2780,15 +2832,18 @@ families:
               - cea_O2_gibbs
             - source_id: metals_ca_family
               observation_id: gas_rail_standard_reaction
+              note: 'MC-5 Ca 2026-08-07: monatomic base Pref retargeted to Pref_GF;
+                dormant TE gas_rail observation retained as provenance only.'
             evaluator_family: nasa_cea_9
             source_reaction_id: liquid_cao_to_cao_gas
             activity_semantics: source_reaction_activity
             base_reference_pressure_model:
               evaluator_family: antoine
               coefficients:
-                A: 12.2168914
-                B: 37873.6892331
-                C: -116.89
+                # Aligned with monatomic Ca Pref_GF (MC-5 Ca 2026-08-07); was TE Pref_GR.
+                A: 15.0016562599
+                B: 40993.4487601735
+                C: 0.0
             base_vapor_formula: Ca
             gas_exchange_reaction:
               reactants:
@@ -3828,6 +3883,8 @@ families:
               - cea_O2_gibbs
             - source_id: metals_ca_family
               observation_id: gas_rail_standard_reaction
+              note: 'MC-5 Ca 2026-08-07: monatomic base Pref retargeted to Pref_GF;
+                dormant TE gas_rail observation retained as provenance only.'
             evaluator_family: nasa_cea_9
             source_reaction_id: liquid_cao_to_ca2_gas
             activity_semantics: source_reaction_activity
@@ -3835,9 +3892,10 @@ families:
             base_reference_pressure_model:
               evaluator_family: antoine
               coefficients:
-                A: 12.2168914
-                B: 37873.6892331
-                C: -116.89
+                # Aligned with monatomic Ca Pref_GF (MC-5 Ca 2026-08-07); was TE Pref_GR.
+                A: 15.0016562599
+                B: 40993.4487601735
+                C: 0.0
             base_vapor_formula: Ca
             gas_exchange_reaction:
               reactants:

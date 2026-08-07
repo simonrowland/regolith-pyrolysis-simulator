@@ -522,7 +522,13 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
     assert batch is not None
 
     verifier_probe_pa = {
-        "Ca": 4.6e-9,
+        # MC-5 Ca (2026-08-07): catalog Pref retargeted TE Pref_GR -> JANAF
+        # Pref_GF (live move +2.465 dex at this probe's 1873.15 K). The PIN
+        # moves +3.096 dex (4.6e-9 -> 5.740e-6 Pa) because the assertion is
+        # band-based (within_probe_band ~1.43 dex), so the old pin sat below
+        # the old live value. SIGN CHECK: pressure UP, matching more high-T
+        # Ca volatilisation. See docs-private/research/2026-08-07-mc5-ca-fix/report.md.
+        "Ca": 5.740329129667688e-6,
         "Mg": 7.3e-3,
         # Constant table gamma (no T*/T / pseudo-binary mid-range).
         "K": 0.469,
@@ -872,12 +878,19 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         # +0.2969908083582 kg (less evaporative debit). Transition count
         # and last-5 reasons DID NOT MOVE (still 36; TiO/TiO2_gas still
         # status-bearing OOR flux-eligible).
+        # 2026-08-07 MC-5 Ca option B: TE gas_rail demoted; monatomic Ca and
+        # CaO/Ca2 base Pref move UP (Pref_GF; +2.32...+2.55 dex over the
+        # 1757-2273 K domain). SIGN CHECK: more high-T Ca volatilisation
+        # raises total flux (+1.2425e-6 kg/hr) and transport saturation
+        # (+0.326 points) while melt mass falls by the equal-and-opposite
+        # -1.2425e-6 kg (1 h step). Recomputed from this quiesced default-off
+        # probe; see docs-private/research/2026-08-07-mc5-ca-fix/report.md.
         (
             1,
             1550.0,
-            2.654661403108757,
-            1165586.8020461195,
-            996.1076317909653,
+            2.6546626456566544,
+            1165587.1283014542,
+            996.1076305484173,
         ),
         rel=1.0e-12,
         abs=1.0e-12,

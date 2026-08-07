@@ -301,11 +301,23 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
     # (mb% ~1e-14), and the oxide residual is zero by reduction not by the
     # wrong-direction volatilisation the OOR fix removes. Contract is now
     # "Cr is extracted as metal" rather than "Cr2O3 survives as ceramic".
+    # 2026-08-07 t-534: the exact ``== 0.0`` pin above was float-brittle.
+    # AtomLedger keeps sub-tolerance signed dust, so a fully reduced parent
+    # can legitimately terminate at O(1e-16) kg rather than an exact zero
+    # (observed Cr2O3 residual 2.56e-16 kg once the trajectory shifted — the
+    # perturbation source is the Ca Pref retarget and/or engines.local.toml
+    # presence, b-146; either way the brittleness is the defect). Same
+    # numerical-dust class as the b-145 melt_activity floor. Contract
+    # unchanged: Cr leaves as metal, ceramic Cr2O3 is dust-level only.
+    # Tolerance 1e-12 kg matches the activity-side dust floor magnitude.
+    _CR2O3_DUST_KG = 1.0e-12
     rump = completion["terminal_rump_by_species"]
-    assert rump.get("Cr2O3", 0.0) == 0.0
+    assert abs(rump.get("Cr2O3", 0.0)) <= _CR2O3_DUST_KG
     assert completion["products"].get("Cr", 0.0) > 0.0
     assert story["metal_ingots"]["species_kg"].get("Cr", 0.0) > 0.0
-    assert story["refractory_ceramic"]["species_kg"].get("Cr2O3", 0.0) == 0.0
+    assert abs(
+        story["refractory_ceramic"]["species_kg"].get("Cr2O3", 0.0)
+    ) <= _CR2O3_DUST_KG
     ree_extent = story["refractory_ceramic"]["ree_enrichment_extent"]
     assert ree_extent["basis"] == (
         "initial_cleaned_melt_to_terminal_residual_ceramic"

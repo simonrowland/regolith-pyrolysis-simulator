@@ -147,6 +147,41 @@ def _fit_target(row: Mapping[str, Any] | None) -> str:
     return str((row or {}).get("fit_target", "") or "").strip()
 
 
+def _gas_rail_block_is_authoritative(block: Mapping[str, Any]) -> bool:
+    """Return False for demoted / dormant gas_rail blocks (provenance only).
+
+    Premise: a present ``gas_rail_standard_reaction`` mapping historically
+    always selected the liquid-oxide Pref over Ellingham gas_fugacity.
+    Algebra: demotion is an explicit status/authority gate, not key deletion,
+    so the TE+JANAF coefficients remain inspectable while Builtin falls through
+    to the gas-metal Ellingham root. Unitless status string / bool. Sanity:
+    ``status: dormant_non_authoritative`` (MC-5 Ca, 2026-08-07) must not
+    produce ``pressure_rail=gas_rail_liquid_oxide_standard_reaction``.
+    """
+
+    if block.get("authoritative") is False:
+        return False
+    status = str(
+        block.get("status")
+        or block.get("runtime_disposition")
+        or block.get("authority_status")
+        or ""
+    ).strip().lower()
+    if not status:
+        return True
+    dormant_markers = (
+        "dormant",
+        "dormant_non_authoritative",
+        "inactive",
+        "inactive_dormant",
+        "inactive_provenance_only",
+        "status_bearing_non_authoritative",
+        "non_authoritative",
+        "provenance_only",
+    )
+    return status not in dormant_markers and not status.startswith("dormant")
+
+
 def _gas_rail_standard_reaction_block(
     row: Mapping[str, Any] | None,
 ) -> Mapping[str, Any] | None:
@@ -156,10 +191,18 @@ def _gas_rail_standard_reaction_block(
     preserved below boiling; above boiling the solid-oxide Ellingham gas
     term is replaced by a liquid-oxide standard reaction that matches the
     pure-liquid Raoultian activity basis.
+
+    Demoted blocks (``status: dormant_*`` / ``authoritative: false``) stay in
+    YAML as provenance but do not select the gas-rail path — Builtin then uses
+    gas_fugacity above the metal boil.
     """
 
     block = (row or {}).get(GAS_RAIL_STANDARD_REACTION_KEY)
-    return block if _is_mapping(block) else None
+    if not _is_mapping(block):
+        return None
+    if not _gas_rail_block_is_authoritative(block):
+        return None
+    return block
 
 
 def _liquid_oxide_standard_reaction_block(

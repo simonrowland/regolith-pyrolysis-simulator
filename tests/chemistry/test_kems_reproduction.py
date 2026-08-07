@@ -179,7 +179,12 @@ def test_kems_case_schema_rejects_unknown_fields() -> None:
             "halwax_2024_cao.yaml",
             "Ca",
             2077.0,
-            0.0007846301233479725,
+            # MC-5 Ca (2026-08-07) option B: TE gas_rail demoted; Pref_GF path.
+            # SIGN CHECK: high-T monatomic Ca pressure moves UP vs TE Pref_GR pin
+            # (0.00078463 -> 0.18399 Pa at 2077 K / a=1-class Halwax conditions).
+            # PROVIDER-DRIFT TRIPWIRE only; not a literature re-fit.
+            # docs-private/research/2026-08-07-mc5-ca-fix/report.md
+            0.18399149539451548,
         ),
         (
             "halwax_2024_mgo.yaml",
