@@ -1,10 +1,9 @@
 schema_version: literature_extract.v1
 source_id: kems-031-halwax-2024
 source:
-  citation: >-
-    Halwax, A., Sergeev, D., Müller, M. & Schenk, J. (2024), "Enthalpy of Formation
-    of Calcium and Magnesium Oxide Obtained by Knudsen Effusion Mass Spectrometry",
-    Metall. Mater. Trans. B, DOI 10.1007/s11663-024-02995-6
+  citation: Halwax, A., Sergeev, D., Müller, M. & Schenk, J. (2024), "Enthalpy of Formation of Calcium
+    and Magnesium Oxide Obtained by Knudsen Effusion Mass Spectrometry", Metall. Mater. Trans. B, DOI
+    10.1007/s11663-024-02995-6
   doi: 10.1007/s11663-024-02995-6
   year: 2024
 extraction:
@@ -21,25 +20,29 @@ species:
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
         section: III. EXPERIMENTAL
-        line_range: '220-230'
+        line_range: 220-230
         note: Pure MgO vaporization in Ir Knudsen cell; lid orifice 0.3 mm
-      T_range_K: [1850.0, 2100.0]
+      T_range_K:
+      - 1850.0
+      - 2100.0
       phase: pure_solid_MgO
       standard_state: pure MgO(s) activity defined as 1; KEMS ion intensities → partial pressures
       regime: kems_effusion
       units: as published (partial pressures Pa; formation enthalpy product)
       values:
         quantity: pure_MgO_KEMS_geometry_and_vaporization
-        gas_species_observed: [Mg(g), O(g), O2(g)]
+        gas_species_observed:
+        - Mg(g)
+        - O(g)
+        - O2(g)
         sample_mass_approx_mg: 50.0
-        chamber_pressure_start_mbar: 1.0e-5
+        chamber_pressure_start_mbar: 1.0e-05
         missing_for_motzfeldt:
-          - clausing_factor
-          - orifice_channel_length
-          - sample_surface_area
-        missing_note: >-
-          Lid orifice diameter 0.3 mm stated without channel length — Clausing not
-          invented. Sample free-surface area not stated (powder load ~50 mg).
+        - clausing_factor
+        - orifice_channel_length
+        - sample_surface_area
+        missing_note: Lid orifice diameter 0.3 mm stated without channel length — Clausing not invented.
+          Sample free-surface area not stated (powder load ~50 mg).
       uncertainty:
         note: temperature systematic ±5 K estimated by authors; ΔfH product is primary result (not α)
       equipment:
@@ -61,13 +64,48 @@ species:
             paragraph: iridium cell; molybdenum container; tantalum radiation shields
             line_range: '222'
         chamber_pressure:
-          value: 1.0e-5
+          value: 1.0e-05
           units: mbar
           note: heating started after chamber pressure decreased below 10^-5 mbar
           locator:
             source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
             paragraph: pressure decreased below 10^-5 mbar
             line_range: '230'
+    - observation_id: halwax_2024_geometry_not_alpha_b1
+      type: psat_series
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+        paragraph: Ir Knudsen cell geometry; explicitly not HKL α
+      T_range_K:
+      - 1800.0
+      - 2400.0
+      phase: pure_MgO_CaO
+      regime: kems_effusion
+      units: as published
+      values:
+        quantity: kems_geometry_package
+        method_class: method_only
+        system_class: pure_oxide_condensed
+        semantics: not_hkl_alpha
+        alpha: null
+        note: Paper measures equilibrium ΔH / Psat in Ir cell; EXPLICITLY not an HKL α measurement. Do
+          not promote as α.
+        missing_for_motzfeldt:
+        - clausing_factor
+        - sample_surface_area
+        - P_eq_for_alpha_inversion
+      equipment:
+        orifice_area:
+          value: 7.068583e-08
+          units: m2
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+            paragraph: orifice diameter from prior extract
+        cell_material:
+          value: Ir Knudsen cell in Mo container; Ta radiation shields; W heater
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+            paragraph: Ir cell
   CaO:
     observations:
     - observation_id: halwax_2024_cao_kems_geometry_package
@@ -75,20 +113,25 @@ species:
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
         section: III. EXPERIMENTAL
-        line_range: '220-230'
-      T_range_K: [1850.0, 2150.0]
+        line_range: 220-230
+      T_range_K:
+      - 1850.0
+      - 2150.0
       phase: pure_solid_CaO
       standard_state: pure CaO(s) activity defined as 1
       regime: kems_effusion
       units: as published
       values:
         quantity: pure_CaO_KEMS_geometry_and_vaporization
-        gas_species_observed: [Ca(g), O(g), O2(g)]
+        gas_species_observed:
+        - Ca(g)
+        - O(g)
+        - O2(g)
         sample_mass_approx_mg: 50.0
         missing_for_motzfeldt:
-          - clausing_factor
-          - orifice_channel_length
-          - sample_surface_area
+        - clausing_factor
+        - orifice_channel_length
+        - sample_surface_area
         missing_note: Same Ir cell geometry as MgO; orifice d only — no Clausing invented.
       equipment:
         orifice_area:
@@ -124,3 +167,11 @@ fidelity_samples:
     source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
     paragraph: approximately 50 mg of the pure CaO or MgO powder
     line_range: '228'
+- species: MgO
+  observable: psat_series
+  observation_id: halwax_2024_geometry_not_alpha_b1
+  field: semantics
+  value: not_hkl_alpha
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+    note: not alpha

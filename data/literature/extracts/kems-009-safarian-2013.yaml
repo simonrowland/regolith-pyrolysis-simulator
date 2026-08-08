@@ -30,7 +30,10 @@ species:
         weak_evaporation_eta_note: η=α/(1-0.4α) with α=1 → η=1.667 (Muratova & Labuntsov)
         p_eff_over_p_sat_at_eta_1: 0.193
         S_cr: 0.913
-        literature_flux_ratios_vs_max: [0.92, 0.82, 0.85]
+        literature_flux_ratios_vs_max:
+        - 0.92
+        - 0.82
+        - 0.85
         missing_for_motzfeldt:
         - orifice_area
         - clausing_factor
@@ -58,6 +61,36 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-009-safarian-2013/spool/out/kems-009-safarian-2013/vlm/kems-009-safarian-2013.md
             paragraph: characteristic dimension of the surface is less than about half the mean-free path
             line_range: '243'
+    - observation_id: safarian_2013_si_pure_liquid_alpha_b1
+      type: alpha
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-009-safarian-2013/spool/out/kems-009-safarian-2013/vlm/kems-009-safarian-2013.md
+        paragraph: liquid metal evaporation; 0.844 n_Max intensive vacuum limit
+      T_range_K:
+      - 1687.0
+      - 2000.0
+      phase: pure_elemental_Si_liquid
+      regime: langmuir_free_evaporation_theory
+      units: dimensionless
+      values:
+        alpha: 1.0
+        alpha_range:
+        - 0.84
+        - 1.0
+        gas_species: Si(g)
+        material: pure_elemental_Si
+        method_class: review_compilation
+        system_class: pure_element_condensed
+        transformation_class: congruent_no_transformation
+        interfacial_reaction: Si(l) -> Si(g)
+        semantics: competing_observation_do_not_average
+        note: 'Pure-element Si free-evaporation: liquids approach α≈1; intensive vacuum flux limit 0.844
+          n_Max cited. THIS IS NOT SILICATE-MELT SiO α evidence. Rail currently inherits Si=1.0 as SiO
+          family root while Wetzel SiO envelope is 0.003–0.067 — class mismatch.'
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+        - sample_surface_area_numeric
 fidelity_samples:
 - species: Si
   observable: rate_series
@@ -77,3 +110,11 @@ fidelity_samples:
     source_path: docs-private/research/ocr-artifacts/kems-009-safarian-2013/spool/out/kems-009-safarian-2013/vlm/kems-009-safarian-2013.md
     paragraph: η as unity yields p_eff = 0.193 p°
     line_range: '229'
+- species: Si
+  observable: alpha
+  observation_id: safarian_2013_si_pure_liquid_alpha_b1
+  field: alpha
+  value: 1.0
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-009-safarian-2013/spool/out/kems-009-safarian-2013/vlm/kems-009-safarian-2013.md
+    note: pure Si liquid α≈1

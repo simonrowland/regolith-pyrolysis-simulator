@@ -22,7 +22,9 @@ species:
         figure: '12'
         line_range: 174-178
         note: γ_Mg evaporation coefficients from vacuum and H2 experiments
-      T_range_K: [1673.0, 1773.0]
+      T_range_K:
+      - 1673.0
+      - 1773.0
       phase: silicate_melt_Type_B_CAI_like
       standard_state: free evaporation / low-P H2; γ from HKL with thermodynamic P_sat
       regime: langmuir_free_evaporation
@@ -33,7 +35,9 @@ species:
           of BCAI series at 1500°C (Fig. 12; limit a→0 no recondensation)
         gas_species: Mg(g)
         material: Type_B_CAI_like_liquid
-        surface_area_range_cm2: [0.063, 0.416]
+        surface_area_range_cm2:
+        - 0.063
+        - 0.416
         missing_for_motzfeldt:
         - orifice_area
         - clausing_factor
@@ -43,7 +47,9 @@ species:
       equipment:
         sample_surface_area:
           value:
-            range_cm2: [0.063, 0.416]
+            range_cm2:
+            - 0.063
+            - 0.416
             table: 1
             note: Avg.area (cm2) column in Table 1; range used to assess recondensation
           locator:
@@ -64,6 +70,180 @@ species:
             bar) and 1-bar gas-mix runs are separate atmospheres in the paper — not collapsed into this
             pressure field.
           scope: vacuum_runs_only
+    - observation_id: richter_2002_mg_table1_per_run_areas_b1
+      type: alpha
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+        table: '1'
+        paragraph: Avg.area (cm2) and γ_Mg per run
+      T_range_K:
+      - 1773.15
+      - 2073.15
+      phase: silicate_melt_Type_B_CAI_like
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      values:
+        alpha: 0.04
+        alpha_note: Existing pin ~0.04 for H2 series mid; full per-run γ_Mg matrix below
+        gas_species: Mg(g)
+        material: Type_B_CAI-like_CMAS
+        method_class: measured_direct
+        system_class: silicate_melt
+        transformation_class: redox_reduction_required
+        interfacial_reaction: MgO(melt) -> Mg(g) + 1/2 O2
+        semantics: competing_observation_do_not_average
+        per_run_table1:
+        - sample: B-133-11
+          pressure_note: <1e-9
+          T_C: 1800
+          T_K: 2073.15
+          avg_area_cm2: 0.12
+          avg_area_m2: 1.2e-05
+          gamma_Mg: 0.21
+          gamma_Si: 0.2
+        - sample: B-133-12
+          pressure_note: <1e-9
+          T_C: 1800
+          T_K: 2073.15
+          avg_area_cm2: 0.14
+          avg_area_m2: 1.4000000000000001e-05
+          gamma_Mg: 0.17
+          gamma_Si: 0.17
+        - sample: B-133-13
+          pressure_note: <1e-9
+          T_C: 1800
+          T_K: 2073.15
+          avg_area_cm2: 0.15
+          avg_area_m2: 1.5e-05
+          gamma_Mg: 0.18
+          gamma_Si: 0.18
+        - sample: B-133-15
+          pressure_note: <1e-9
+          T_C: 1800
+          T_K: 2073.15
+          avg_area_cm2: 0.19
+          avg_area_m2: 1.9e-05
+          gamma_Mg: 0.21
+          gamma_Si: 0.2
+        - sample: B-133-16
+          pressure_note: <1e-9
+          T_C: 1800
+          T_K: 2073.15
+          avg_area_cm2: 0.13
+          avg_area_m2: 1.3000000000000001e-05
+          gamma_Mg: 0.22
+          gamma_Si: 0.2
+        - sample: B-133-17
+          pressure_note: <1e-9
+          T_C: 1800
+          T_K: 2073.15
+          avg_area_cm2: 0.19
+          avg_area_m2: 1.9e-05
+          gamma_Mg: 0.12
+          gamma_Si: 0.13
+        - sample: B-133-19
+          pressure_note: <1e-9
+          T_C: 1800
+          T_K: 2073.15
+          avg_area_cm2: 0.26
+          avg_area_m2: 2.6000000000000002e-05
+          gamma_Mg: 0.1
+          gamma_Si: 0.11
+        - sample: B-113-8
+          pressure_note: <1e-9
+          T_C: 1800
+          T_K: 2073.15
+          avg_area_cm2: 0.161
+          avg_area_m2: 1.6100000000000002e-05
+          gamma_Mg: 0.15
+          gamma_Si: 0.14
+        - sample: B-113-9
+          pressure_note: <1e-9
+          T_C: 1800
+          T_K: 2073.15
+          avg_area_cm2: 0.135
+          avg_area_m2: 1.3500000000000001e-05
+          gamma_Mg: 0.24
+          gamma_Si: 0.15
+        - sample: B-113-10
+          pressure_note: <1e-9
+          T_C: 1700
+          T_K: 1973.15
+          avg_area_cm2: 0.131
+          avg_area_m2: 1.3100000000000002e-05
+          gamma_Mg: 0.18
+          gamma_Si: 0.14
+        - sample: BCAI-ss1
+          pressure_note: 1.87e-4_H2
+          T_C: 1500
+          T_K: 1773.15
+          avg_area_cm2: 0.0672
+          avg_area_m2: 6.72e-06
+          gamma_Mg: 0.051
+          gamma_Si: 0.058
+        - sample: BCAI-ss2
+          pressure_note: 1.87e-4_H2
+          T_C: 1500
+          T_K: 1773.15
+          avg_area_cm2: 0.0621
+          avg_area_m2: 6.210000000000001e-06
+          gamma_Mg: 0.047
+          gamma_Si: 0.068
+        - sample: BCAI-s1
+          pressure_note: 1.87e-4_H2
+          T_C: 1500
+          T_K: 1773.15
+          avg_area_cm2: 0.168
+          avg_area_m2: 1.6800000000000002e-05
+          gamma_Mg: 0.039
+          gamma_Si: 0.048
+        - sample: BCAI-s3
+          pressure_note: 1.87e-4_H2
+          T_C: 1500
+          T_K: 1773.15
+          avg_area_cm2: 0.134
+          avg_area_m2: 1.3400000000000002e-05
+          gamma_Mg: 0.048
+          gamma_Si: 0.069
+        - sample: BCAI-m1
+          pressure_note: 1.87e-4_H2
+          T_C: 1500
+          T_K: 1773.15
+          avg_area_cm2: 0.407
+          avg_area_m2: 4.07e-05
+          gamma_Mg: 0.026
+          gamma_Si: 0.049
+        - sample: BCAI-m2
+          pressure_note: 1.87e-4_H2
+          T_C: 1500
+          T_K: 1773.15
+          avg_area_cm2: 0.425
+          avg_area_m2: 4.25e-05
+          gamma_Mg: 0.029
+          gamma_Si: 0.05
+        note: Per-run Avg.area broken out of prior range 0.063–0.416 cm2. Areas are melt free surfaces
+          (Langmuir), not Knudsen orifices.
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+        - P_eq
+      equipment:
+        sample_surface_area:
+          value: 1.68e-05
+          units: m2
+          inferred: true
+          inference: A = 0.168 cm2 (BCAI-s1) * 1e-4 m2/cm2 = 1.68e-5 m2; full per-run series in values.per_run_table1
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+            table: '1'
+            paragraph: BCAI-s1 Avg.area 0.168 cm2
+        chamber_pressure:
+          value: 0.000187
+          units: bar
+          note: H2 series example; vacuum rows are <1e-9 bar
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+            table: '1'
   SiO:
     observations:
     - observation_id: richter_2002_sio_cai_langmuir_gamma
@@ -72,7 +252,9 @@ species:
         source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
         table: '1'
         line_range: 174-178
-      T_range_K: [1673.0, 1773.0]
+      T_range_K:
+      - 1673.0
+      - 1773.0
       phase: silicate_melt_Type_B_CAI_like
       regime: langmuir_free_evaporation
       units: dimensionless
@@ -88,13 +270,109 @@ species:
       equipment:
         sample_surface_area:
           value:
-            range_cm2: [0.063, 0.416]
+            range_cm2:
+            - 0.063
+            - 0.416
             table: 1
           locator:
             source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
             paragraph: samples with a range of surface areas from 0.063 to 0.416 cm2
             line_range: '450'
             note: Authors prose range (Table 1 Avg.area spans ~0.062–0.425; prose rounds to 0.063–0.416)
+    - observation_id: richter_2002_sio_table1_per_run_areas_b1
+      type: alpha
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+        table: '1'
+      T_range_K:
+      - 1773.15
+      - 2073.15
+      phase: silicate_melt_Type_B_CAI_like
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      values:
+        alpha: null
+        gas_species: SiO(g)
+        method_class: measured_direct
+        system_class: silicate_melt
+        transformation_class: network_former_dissociation
+        interfacial_reaction: SiO2(melt) -> SiO(g) + 1/2 O2
+        semantics: competing_observation_do_not_average
+        per_run_gamma_Si:
+        - sample: B-133-11
+          gamma_Si: 0.2
+          avg_area_cm2: 0.12
+          T_C: 1800
+        - sample: B-133-12
+          gamma_Si: 0.17
+          avg_area_cm2: 0.14
+          T_C: 1800
+        - sample: B-133-13
+          gamma_Si: 0.18
+          avg_area_cm2: 0.15
+          T_C: 1800
+        - sample: B-133-15
+          gamma_Si: 0.2
+          avg_area_cm2: 0.19
+          T_C: 1800
+        - sample: B-133-16
+          gamma_Si: 0.2
+          avg_area_cm2: 0.13
+          T_C: 1800
+        - sample: B-133-17
+          gamma_Si: 0.13
+          avg_area_cm2: 0.19
+          T_C: 1800
+        - sample: B-133-19
+          gamma_Si: 0.11
+          avg_area_cm2: 0.26
+          T_C: 1800
+        - sample: B-113-8
+          gamma_Si: 0.14
+          avg_area_cm2: 0.161
+          T_C: 1800
+        - sample: B-113-9
+          gamma_Si: 0.15
+          avg_area_cm2: 0.135
+          T_C: 1800
+        - sample: B-113-10
+          gamma_Si: 0.14
+          avg_area_cm2: 0.131
+          T_C: 1700
+        - sample: BCAI-ss1
+          gamma_Si: 0.058
+          avg_area_cm2: 0.0672
+          T_C: 1500
+        - sample: BCAI-ss2
+          gamma_Si: 0.068
+          avg_area_cm2: 0.0621
+          T_C: 1500
+        - sample: BCAI-s1
+          gamma_Si: 0.048
+          avg_area_cm2: 0.168
+          T_C: 1500
+        - sample: BCAI-s3
+          gamma_Si: 0.069
+          avg_area_cm2: 0.134
+          T_C: 1500
+        - sample: BCAI-m1
+          gamma_Si: 0.049
+          avg_area_cm2: 0.407
+          T_C: 1500
+        - sample: BCAI-m2
+          gamma_Si: 0.05
+          avg_area_cm2: 0.425
+          T_C: 1500
+        note: γ_Si per-run matrix from Table 1; no single pin.
+      equipment:
+        sample_surface_area:
+          value: 1.68e-05
+          units: m2
+          inferred: true
+          inference: same BCAI-s1 area as Mg package
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+            table: '1'
 fidelity_samples:
 - species: Mg
   observable: alpha
@@ -107,9 +385,93 @@ fidelity_samples:
     paragraph: evaporation coefficient γ_Mg = 0.04
     line_range: 530-548
 - path: species.Mg.observations[richter_2002_mg_cai_langmuir_gamma].equipment.sample_surface_area.value.range_cm2
-  value: [0.063, 0.416]
+  value:
+  - 0.063
+  - 0.416
   note: BCAI surface-area range for recondensation test
   locator:
     source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
     paragraph: samples with a range of surface areas from 0.063 to 0.416 cm2
     line_range: '450'
+- species: Mg
+  observable: alpha
+  observation_id: richter_2002_mg_table1_per_run_areas_b1
+  field: alpha
+  value: 0.04
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+    table: '1'
+    note: representative pin; matrix in per_run
+- species: SiO
+  observable: alpha
+  observation_id: richter_2002_sio_table1_per_run_areas_b1
+  field: per_run_gamma_Si
+  value:
+  - sample: B-133-11
+    gamma_Si: 0.2
+    avg_area_cm2: 0.12
+    T_C: 1800
+  - sample: B-133-12
+    gamma_Si: 0.17
+    avg_area_cm2: 0.14
+    T_C: 1800
+  - sample: B-133-13
+    gamma_Si: 0.18
+    avg_area_cm2: 0.15
+    T_C: 1800
+  - sample: B-133-15
+    gamma_Si: 0.2
+    avg_area_cm2: 0.19
+    T_C: 1800
+  - sample: B-133-16
+    gamma_Si: 0.2
+    avg_area_cm2: 0.13
+    T_C: 1800
+  - sample: B-133-17
+    gamma_Si: 0.13
+    avg_area_cm2: 0.19
+    T_C: 1800
+  - sample: B-133-19
+    gamma_Si: 0.11
+    avg_area_cm2: 0.26
+    T_C: 1800
+  - sample: B-113-8
+    gamma_Si: 0.14
+    avg_area_cm2: 0.161
+    T_C: 1800
+  - sample: B-113-9
+    gamma_Si: 0.15
+    avg_area_cm2: 0.135
+    T_C: 1800
+  - sample: B-113-10
+    gamma_Si: 0.14
+    avg_area_cm2: 0.131
+    T_C: 1700
+  - sample: BCAI-ss1
+    gamma_Si: 0.058
+    avg_area_cm2: 0.0672
+    T_C: 1500
+  - sample: BCAI-ss2
+    gamma_Si: 0.068
+    avg_area_cm2: 0.0621
+    T_C: 1500
+  - sample: BCAI-s1
+    gamma_Si: 0.048
+    avg_area_cm2: 0.168
+    T_C: 1500
+  - sample: BCAI-s3
+    gamma_Si: 0.069
+    avg_area_cm2: 0.134
+    T_C: 1500
+  - sample: BCAI-m1
+    gamma_Si: 0.049
+    avg_area_cm2: 0.407
+    T_C: 1500
+  - sample: BCAI-m2
+    gamma_Si: 0.05
+    avg_area_cm2: 0.425
+    T_C: 1500
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+    table: '1'
+    note: fidelity pin on one per-run γ_Si point

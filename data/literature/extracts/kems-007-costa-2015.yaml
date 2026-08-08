@@ -1,9 +1,8 @@
 schema_version: literature_extract.v1
 source_id: kems-007-costa-2015
 source:
-  citation: >-
-    Costa, G. C. C. & Jacobson, N. S. (2015), "Vaporization Studies of Olivine
-    via Knudsen Effusion Mass Spectrometry", NASA NTRS 20150002321
+  citation: Costa, G. C. C. & Jacobson, N. S. (2015), "Vaporization Studies of Olivine via Knudsen Effusion
+    Mass Spectrometry", NASA NTRS 20150002321
   url: https://ntrs.nasa.gov/citations/20150002321
   year: 2015
 extraction:
@@ -21,43 +20,49 @@ species:
         source_path: docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/kems-007-costa-2015.md
         figure: vaporization coefficients Fe+ / SiO+
         line_range: '386'
-        note: >-
-          Measured vaporization coefficients of Fe+ and SiO+ using three Mo
-          Knudsen cells with different orifice sizes; image
-          docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/images/142292b86695fb9b3d3098881d5279bbb57f83f1b18d4ecac847962321570fd5.jpg
-      T_range_K: [1700.0, 1800.0]
+        note: Measured vaporization coefficients of Fe+ and SiO+ using three Mo Knudsen cells with different
+          orifice sizes; image docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/images/142292b86695fb9b3d3098881d5279bbb57f83f1b18d4ecac847962321570fd5.jpg
+      T_range_K:
+      - 1700.0
+      - 1800.0
       phase: solid_solution_olivine
       standard_state: KEMS vaporization coefficient on Fo93Fa7 olivine condensed phase
       regime: kems_effusion
       units: dimensionless
       values:
         alpha: 0.02
-        alpha_range: [0.011, 0.02]
+        alpha_range:
+        - 0.011
+        - 0.02
         gas_species: Fe(g)
         material: Fo93Fa7_olivine
         method: Whitman-Motzfeld multi-cell (three Mo Knudsen cells, different orifice sizes)
         alpha_series_figure_approx:
-          - {T_K: 1700.0, alpha: 0.0165}
-          - {T_K: 1720.0, alpha: 0.0155}
-          - {T_K: 1750.0, alpha: 0.0197}
-          - {T_K: 1795.0, alpha: 0.0115}
-          - {T_K: 1800.0, alpha: 0.0130}
-        alpha_series_note: >-
-          Approximate digitization of Fe+ panel points (±~0.001); pin alpha=0.02
-          is high-side of measured band (matches ~1750 K peak).
+        - T_K: 1700.0
+          alpha: 0.0165
+        - T_K: 1720.0
+          alpha: 0.0155
+        - T_K: 1750.0
+          alpha: 0.0197
+        - T_K: 1795.0
+          alpha: 0.0115
+        - T_K: 1800.0
+          alpha: 0.013
+        alpha_series_note: Approximate digitization of Fe+ panel points (±~0.001); pin alpha=0.02 is high-side
+          of measured band (matches ~1750 K peak).
         missing_for_motzfeldt:
-          - numeric_orifice_diameters
-          - numeric_clausing_W_A_W_B
-          - numeric_sample_or_cell_cross_section_A
-        missing_note: >-
-          Multi-orifice Whitman–Motzfeld path is described (f = W_B·B/A; α from
-          ion-intensity ratios of cells 1,2) but numeric orifice diameters, W_A,
-          W_B, and cell cross-section A are not printed in text or readable from
-          apparatus figures (field/source apertures are collimation, not cell
-          orifices). Partial multi-orifice observation only — do not invent Clausing.
+        - numeric_orifice_diameters
+        - numeric_clausing_W_A_W_B
+        - numeric_sample_or_cell_cross_section_A
+        missing_note: Multi-orifice Whitman–Motzfeld path is described (f = W_B·B/A; α from ion-intensity
+          ratios of cells 1,2) but numeric orifice diameters, W_A, W_B, and cell cross-section A are not
+          printed in text or readable from apparatus figures (field/source apertures are collimation,
+          not cell orifices). Partial multi-orifice observation only — do not invent Clausing.
       uncertainty:
         note: high-side of measured D(Fe+) band adopted as conservative pin; figure scatter ~0.011–0.020
-        alpha_range: [0.011, 0.02]
+        alpha_range:
+        - 0.011
+        - 0.02
       equipment:
         multi_orifice_series:
           value:
@@ -72,20 +77,19 @@ species:
               A: cross sectional area of the cell
               B: cross sectional area of the orifice
               f: W_B * B / A
-              alpha_from_two_cells: >-
-                α = (f2 − f1·(I1/I2)) / ((I2/I1) − 1) using ion intensities of
-                cells with different orifice geometries
-            note: >-
-              Numeric orifice diameters and transmission factors not given in OCR
-              text; apparatus schematic shows field aperture 1 mm diam and source
-              aperture 2 mm diam (molecular-beam collimation, not Knudsen orifice).
+              alpha_from_two_cells: α = (f2 − f1·(I1/I2)) / ((I2/I1) − 1) using ion intensities of cells
+                with different orifice geometries
+            note: Numeric orifice diameters and transmission factors not given in OCR text; apparatus
+              schematic shows field aperture 1 mm diam and source aperture 2 mm diam (molecular-beam collimation,
+              not Knudsen orifice).
           locator:
             source_path: docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/kems-007-costa-2015.md
             paragraph: Multiple-cell configuration with different orifice diameters; Whitman-Motzfeld
-            line_range: '163-186'
+            line_range: 163-186
             figure: apparatus schematic (restricted collimation)
         cell_material:
-          value: Mo cells for multi-orifice α series; Ir liners in graphite cell required for equilibrium (Mo reacts with olivine)
+          value: Mo cells for multi-orifice α series; Ir liners in graphite cell required for equilibrium
+            (Mo reacts with olivine)
           locator:
             source_path: docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/kems-007-costa-2015.md
             paragraph: Mo forms compounds / erratic; Ir cell liners in graphite unreactive
@@ -94,13 +98,76 @@ species:
           value:
             definition: A equals cell cross-sectional area in Whitman-Motzfeld f = W_B·B/A
             numeric_m2: null
-            note: >-
-              Sample free-surface area not stated; A in the published method is
-              the cell cross-section (not melt free surface). Numeric A missing.
+            note: Sample free-surface area not stated; A in the published method is the cell cross-section
+              (not melt free surface). Numeric A missing.
           locator:
             source_path: docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/kems-007-costa-2015.md
             paragraph: A - cross sectional area of the cell
             line_range: '179'
+    - observation_id: costa_2015_fe_olivine_class_and_motzfeldt_absence_b1
+      type: alpha
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/kems-007-costa-2015.md
+        figure: vaporization coefficients Fe+ / SiO+
+        line_range: '386'
+        note: 'B1 harvest: class axis + Motzfeldt geometry typed absence; does not rewrite placeholder
+          multi-orifice row'
+      T_range_K:
+      - 1700.0
+      - 1800.0
+      phase: solid_solution_olivine
+      standard_state: KEMS vaporization coefficient on Fo93Fa7 olivine condensed phase
+      regime: kems_effusion
+      units: dimensionless
+      values:
+        alpha: 0.02
+        alpha_range:
+        - 0.011
+        - 0.02
+        gas_species: Fe(g)
+        material: Fo93Fa7_olivine
+        method: Whitman-Motzfeld multi-cell (three Mo Knudsen cells, different orifice sizes)
+        method_class: measured_direct
+        system_class: solid_solution_silicate
+        transformation_class: redox_reduction_required
+        interfacial_reaction: FeO(olivine_ss) -> Fe(g) + 1/2 O2
+        semantics: competing_observation_do_not_average
+        supersedes_placeholder_observation_id: costa_2015_fe_olivine_kems_alpha_multicell
+        supersession_reason: Placeholder equipment uses non-numeric maps; new row carries class axis +
+          typed Motzfeldt absences without rewriting placeholder.
+        orifice_area: null
+        clausing_factor: null
+        sample_surface_area_numeric: null
+        multi_orifice_points: null
+        P_eq: null
+        P_meas: null
+        cell_clausing_W_A: null
+        semantics_geometry: absent_not_published
+        missing_for_motzfeldt:
+        - numeric_orifice_diameters_x3
+        - numeric_clausing_W_B_bare_float
+        - numeric_cell_cross_section_A
+        - per_cell_P_meas_or_ion_intensity_table
+        missing_note: 'OCR+PDF re-read 2026-08-08: paper states three Mo cells with different orifice
+          sizes and defines f=W_B*B/A, α from ion-intensity ratios of cells 1,2, but does NOT print numeric
+          orifice diameters, W_A, W_B, cell cross-section A, or per-cell I/P. Field/source apertures (collimation)
+          are not Knudsen orifices. Do not invent.'
+        note: α pin retained from figure high-side ~0.02 (same as placeholder). Geometry for independent
+          Motzfeldt re-derivation remains ABSENT_NOT_PUBLISHED. A in method is cell cross-section, not
+          melt free surface.
+      uncertainty:
+        note: high-side of measured D(Fe+) band; figure scatter ~0.011–0.020
+        alpha_range:
+        - 0.011
+        - 0.02
+      equipment:
+        cell_material:
+          value: Mo (multi-orifice α series); Ir liners in graphite required for equilibrium (Mo reacts
+            with olivine)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/kems-007-costa-2015.md
+            paragraph: Mo forms compounds / Ir cell liners in graphite unreactive
+            line_range: '259'
   SiO:
     observations:
     - observation_id: costa_2015_sio_olivine_kems_alpha_multicell
@@ -109,39 +176,46 @@ species:
         source_path: docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/kems-007-costa-2015.md
         figure: vaporization coefficients Fe+ / SiO+
         line_range: '386'
-        note: >-
-          SiO+ panel of same multi-cell Mo figure; image
-          docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/images/142292b86695fb9b3d3098881d5279bbb57f83f1b18d4ecac847962321570fd5.jpg
-      T_range_K: [1700.0, 1800.0]
+        note: SiO+ panel of same multi-cell Mo figure; image docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/images/142292b86695fb9b3d3098881d5279bbb57f83f1b18d4ecac847962321570fd5.jpg
+      T_range_K:
+      - 1700.0
+      - 1800.0
       phase: solid_solution_olivine
       standard_state: KEMS vaporization coefficient on Fo93Fa7 olivine condensed phase
       regime: kems_effusion
       units: dimensionless
       values:
         alpha: null
-        alpha_range: [0.003, 0.036]
+        alpha_range:
+        - 0.003
+        - 0.036
         gas_species: SiO(g)
         material: Fo93Fa7_olivine
         method: Whitman-Motzfeld multi-cell (three Mo Knudsen cells, different orifice sizes)
         alpha_series_figure_approx:
-          - {T_K: 1700.0, alpha: 0.003}
-          - {T_K: 1725.0, alpha: 0.022}
-          - {T_K: 1750.0, alpha: 0.036}
-          - {T_K: 1795.0, alpha: 0.026}
-          - {T_K: 1800.0, alpha: 0.029}
-        alpha_series_note: >-
-          Approximate digitization of SiO+ panel (±~0.002); no single pin —
-          range retained as bound-not-point.
+        - T_K: 1700.0
+          alpha: 0.003
+        - T_K: 1725.0
+          alpha: 0.022
+        - T_K: 1750.0
+          alpha: 0.036
+        - T_K: 1795.0
+          alpha: 0.026
+        - T_K: 1800.0
+          alpha: 0.029
+        alpha_series_note: Approximate digitization of SiO+ panel (±~0.002); no single pin — range retained
+          as bound-not-point.
         missing_for_motzfeldt:
-          - numeric_orifice_diameters
-          - numeric_clausing_W_A_W_B
-          - numeric_sample_or_cell_cross_section_A
-        missing_note: >-
-          Same partial multi-orifice geometry as Fe observation; numeric orifice
-          sizes and Clausing factors not in text. Do not invent.
+        - numeric_orifice_diameters
+        - numeric_clausing_W_A_W_B
+        - numeric_sample_or_cell_cross_section_A
+        missing_note: Same partial multi-orifice geometry as Fe observation; numeric orifice sizes and
+          Clausing factors not in text. Do not invent.
       uncertainty:
         note: Range from figure band; not a single pin
-        alpha_range: [0.003, 0.036]
+        alpha_range:
+        - 0.003
+        - 0.036
       equipment:
         multi_orifice_series:
           value:
@@ -156,11 +230,12 @@ species:
             paragraph: Measured vaporization coefficients of Fe+ and SiO+ using three Mo Knudsen cells
             line_range: '386'
         cell_material:
-          value: Mo cells for multi-orifice α series; Ir liners in graphite cell required for equilibrium (Mo reacts with olivine)
+          value: Mo cells for multi-orifice α series; Ir liners in graphite cell required for equilibrium
+            (Mo reacts with olivine)
           locator:
             source_path: docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/kems-007-costa-2015.md
             paragraph: Mo reacts; Ir must be used
-            line_range: '259-391'
+            line_range: 259-391
         sample_surface_area:
           value:
             definition: A equals cell cross-sectional area in Whitman-Motzfeld f = W_B·B/A
@@ -170,6 +245,50 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/kems-007-costa-2015.md
             paragraph: A - cross sectional area of the cell
             line_range: '179'
+    - observation_id: costa_2015_sio_olivine_class_and_motzfeldt_absence_b1
+      type: alpha
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/kems-007-costa-2015.md
+        figure: vaporization coefficients Fe+ / SiO+
+        line_range: '386'
+      T_range_K:
+      - 1700.0
+      - 1800.0
+      phase: solid_solution_olivine
+      regime: kems_effusion
+      units: dimensionless
+      values:
+        alpha: null
+        alpha_range:
+        - 0.003
+        - 0.036
+        gas_species: SiO(g)
+        material: Fo93Fa7_olivine
+        method_class: measured_direct
+        system_class: solid_solution_silicate
+        transformation_class: network_former_dissociation
+        interfacial_reaction: SiO2(olivine_ss) -> SiO(g) + 1/2 O2
+        semantics: competing_observation_do_not_average
+        supersedes_placeholder_observation_id: costa_2015_sio_olivine_kems_alpha_multicell
+        semantics_geometry: absent_not_published
+        missing_for_motzfeldt:
+        - numeric_orifice_diameters_x3
+        - numeric_clausing_W_B_bare_float
+        - numeric_cell_cross_section_A
+        missing_note: Same multi-cell geometry absence as Fe observation; SiO α is a figure band not a
+          single pin.
+      uncertainty:
+        note: Range from figure band; not a single pin
+        alpha_range:
+        - 0.003
+        - 0.036
+      equipment:
+        cell_material:
+          value: Mo multi-orifice α series; Ir liners in graphite for equilibrium
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/kems-007-costa-2015.md
+            paragraph: Mo reacts; Ir must be used
+            line_range: 259-391
 fidelity_samples:
 - species: Fe
   observable: alpha
@@ -185,7 +304,9 @@ fidelity_samples:
   observable: alpha
   observation_id: costa_2015_fe_olivine_kems_alpha_multicell
   field: alpha_range
-  value: [0.011, 0.02]
+  value:
+  - 0.011
+  - 0.02
   locator:
     source_path: docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/kems-007-costa-2015.md
     figure: Fe+ α band ~0.011–0.020 over 1700–1800 K
@@ -194,8 +315,30 @@ fidelity_samples:
   observable: alpha
   observation_id: costa_2015_sio_olivine_kems_alpha_multicell
   field: alpha_range
-  value: [0.003, 0.036]
+  value:
+  - 0.003
+  - 0.036
   locator:
     source_path: docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/kems-007-costa-2015.md
     figure: SiO+ α band ~0.003–0.036 over 1700–1800 K
+    line_range: '386'
+- species: Fe
+  observable: alpha
+  observation_id: costa_2015_fe_olivine_class_and_motzfeldt_absence_b1
+  field: alpha
+  value: 0.02
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/kems-007-costa-2015.md
+    figure: Fe+ α high-side ~0.02
+    line_range: '386'
+- species: SiO
+  observable: alpha
+  observation_id: costa_2015_sio_olivine_class_and_motzfeldt_absence_b1
+  field: alpha_range
+  value:
+  - 0.003
+  - 0.036
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/kems-007-costa-2015.md
+    figure: SiO+ α band
     line_range: '386'

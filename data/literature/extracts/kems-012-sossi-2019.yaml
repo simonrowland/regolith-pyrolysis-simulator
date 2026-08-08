@@ -23,16 +23,22 @@ species:
         section: 4.6 Evaporation coefficients
         line_range: 300-302
         note: α_e,NaO0.5 from eq.6 using literature γ_NaO0.5 at 1400 °C
-      T_range_K: [1673.15, 1673.15]
+      T_range_K:
+      - 1673.15
+      - 1673.15
       phase: silicate_melt_ferrobasalt_FCMAS
       standard_state: 1-bar open furnace; α_e from K*/(γ K) with independent γ
       regime: open_furnace_apparent
       units: dimensionless
       values:
-        alpha_range: [0.3, 1.7]
+        alpha_range:
+        - 0.3
+        - 1.7
         gas_species: Na(g)
         material: ferrobasalt_FCMAS_open_furnace
-        alpha_e_NaO05_at_1400C_range: [0.3, 1.7]
+        alpha_e_NaO05_at_1400C_range:
+        - 0.3
+        - 1.7
         note: 'Source §4.6: γ_NaO0.5 ≈ 10^-3 (DeMaria/Gooding/Mathieu) gives α_e,NaO0.5 between 0.3–1.7
           at 1400 °C. Competing with authors_adopted α_e=1 observation; do not average (VALUE-PRECEDENCE).'
         missing_for_motzfeldt:
@@ -41,7 +47,9 @@ species:
         missing_note: Open 1-atm furnace wire-loop experiments — NOT Knudsen-cell geometry.
       uncertainty:
         note: range from span of literature γ_NaO0.5; not a fit uncertainty
-        alpha_range: [0.3, 1.7]
+        alpha_range:
+        - 0.3
+        - 1.7
       equipment:
         sample_surface_area:
           value: 2.0e-05
@@ -74,7 +82,9 @@ species:
         section: 4.6 Evaporation coefficients
         line_range: '306'
         note: authors set α_e=1 after concluding coefficients close to unity within ×2–3
-      T_range_K: [1573.15, 1823.15]
+      T_range_K:
+      - 1573.15
+      - 1823.15
       phase: silicate_melt_ferrobasalt_FCMAS
       standard_state: 1-bar open furnace; authors adopt α_e=1 for γ_i^∞ = K*/K
       regime: open_furnace_apparent
@@ -102,45 +112,49 @@ species:
         paragraph: log K* Na = -4.25±0.10 at 1400 °C (1673.15 K); n=1; reaction NaO0.5(l)=Na(g)+1/4 O2
         line_range: '1108'
         note: Table 3 fitted logK* at 1673.15 K; prose §4.2 also states -4.25±0.10
-      T_range_K: [1673.15, 1673.15]
+      T_range_K:
+      - 1673.15
+      - 1673.15
       phase: silicate_melt_ferrobasalt_FCMAS
-      standard_state: 'open 1-bar furnace; K* = α_e · γ_i · K for NaO0.5(l)=Na(g)+1/4 O2 (n=1)'
+      standard_state: open 1-bar furnace; K* = α_e · γ_i · K for NaO0.5(l)=Na(g)+1/4 O2 (n=1)
       regime: open_furnace_apparent
       units: log10 dimensionless (bar-based mass-action as published)
       uncertainty:
-        log10_K_star_uncertainty: 0.10
+        log10_K_star_uncertainty: 0.1
         note: Table 3 SD; authors also note K* accuracy harder to quantify than precision (~±5–30%)
       values:
         quantity: log10_K_star_equilibrium_fit
         gas_species: Na(g)
         melt_component: NaO0.5
-        reaction: 'NaO0.5(l) = Na(g) + 1/4 O2'
+        reaction: NaO0.5(l) = Na(g) + 1/4 O2
         n_electrons: 1
         t0_min: 0
         T_K: 1673.15
         log10_K_star: -4.25
-        log10_K_star_uncertainty: 0.10
+        log10_K_star_uncertainty: 0.1
         N_points_at_T: 2
         material: ferrobasalt_FCMAS_open_furnace
-        note: >-
-          Table 3 column 1673.15 K. Prose (OCR §4.2): "higher log K* of … K (−3.95±0.06)
-          relative to Na (−4.25±0.10) at 1400°C". Single-T row (Na* in Table 5 footnote).
+        note: 'Table 3 column 1673.15 K. Prose (OCR §4.2): "higher log K* of … K (−3.95±0.06) relative
+          to Na (−4.25±0.10) at 1400°C". Single-T row (Na* in Table 5 footnote).'
     - observation_id: sossi_2019_na_pure_system_LH_table5
       type: gibbs_table
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
         table: '5'
         section: Table 5 pure-system thermodynamic data
-        paragraph: 'Na* pure system ΔS°=0.128 kJ/molK, ΔH°=255.0 kJ; Source 2 = Lamoreaux & Hildenbrand 1984'
+        paragraph: Na* pure system ΔS°=0.128 kJ/molK, ΔH°=255.0 kJ; Source 2 = Lamoreaux & Hildenbrand
+          1984
         line_range: '1121'
         note: Table 5 pure-system columns for NaO0.5(l)=Na(g)+1/4 O2; Source column = 2 (L&H 1984)
-      T_range_K: [1673.15, 1673.15]
+      T_range_K:
+      - 1673.15
+      - 1673.15
       phase: pure_NaO0_5_liquid_standard
       standard_state: pure liquid NaO0.5 Raoultian; L&H 1984 assembly as cited by Sossi
       units: kJ/mol and kJ/(mol·K) as published in Table 5
       values:
         quantity: pure_system_reaction_enthalpy_entropy
-        reaction: 'NaO0.5(l) = Na(g) + 1/4 O2'
+        reaction: NaO0.5(l) = Na(g) + 1/4 O2
         n_electrons: 1
         Delta_S_std_kJ_molK: 0.128
         Delta_H_std_kJ_mol: 255.0
@@ -148,19 +162,79 @@ species:
         source_column_meaning: Lamoreaux_and_Hildenbrand_1984
         experimental_Delta_S_star_kJ_molK: 0.071
         experimental_Delta_H_star_kJ_mol: 255.0
-        experimental_note: >-
-          Table 5 Experimental columns for Na*: ΔS*=0.071, ΔH*=255.0 with #points=1;
-          footnote * = logK* measured at only 1 T; ΔS*/ΔH* by assuming γ_i constant in T.
+        experimental_note: 'Table 5 Experimental columns for Na*: ΔS*=0.071, ΔH*=255.0 with #points=1;
+          footnote * = logK* measured at only 1 T; ΔS*/ΔH* by assuming γ_i constant in T.'
         derived_log10_K_at_1673_15:
           value: -1.27487
-          arithmetic: >-
-            log10 K = (−ΔH + T·ΔS)/(R·T·ln(10)) with ΔH=255000 J/mol, ΔS=128 J/molK,
-            T=1673.15, R=8.314462618 → −1.27487 (matches July Na investigation pin)
-        note: >-
-          Pure-system (ΔH°,ΔS°)=(255.0, 0.128) is L&H-sourced second-hand linear form
-          (Sossi Table 5 Source 2). Landed Na Pref must still be fit to dual-extracted
-          L&H table rows (see t-383 Step 1), not this linear form alone.
-
+          arithmetic: log10 K = (−ΔH + T·ΔS)/(R·T·ln(10)) with ΔH=255000 J/mol, ΔS=128 J/molK, T=1673.15,
+            R=8.314462618 → −1.27487 (matches July Na investigation pin)
+        note: Pure-system (ΔH°,ΔS°)=(255.0, 0.128) is L&H-sourced second-hand linear form (Sossi Table
+          5 Source 2). Landed Na Pref must still be fit to dual-extracted L&H table rows (see t-383 Step
+          1), not this linear form alone.
+    - observation_id: sossi_2019_na_class_and_transport_b1
+      type: alpha
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        section: 4.6 Evaporation coefficients
+        line_range: 300-306
+      T_range_K:
+      - 1573.15
+      - 1823.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      regime: open_furnace_apparent
+      units: dimensionless
+      values:
+        alpha: 1.0
+        alpha_range:
+        - 0.3
+        - 1.7
+        gas_species: Na(g)
+        material: ferrobasalt_FCMAS_open_furnace_1bar
+        method_class: measured_direct
+        system_class: silicate_melt
+        transformation_class: network_modifier_desorption
+        interfacial_reaction: NaO0.5(l) -> Na(g) + 1/4 O2
+        transformation_class_confidence: low
+        semantics: competing_observation_do_not_average
+        authors_adopted_alpha: 1.0
+        gamma_derived_alpha_range_at_1400C:
+        - 0.3
+        - 1.7
+        transport_treatment: Lumped open-furnace apparent α_e from K*/(γ K). Authors model melt sphere
+          with HKL; §4.6 lists diffusion-limited evaporation and gas flow rate among experimental uncertainties
+          (±6% random sum, section 4.2) but does NOT apply an explicit gas-phase diffusion residual correction
+          that would isolate a vacuum-comparable intrinsic α. α_e is residual after independent γ, not
+          post-Fick inversion.
+        transport_treatment_verdict: lumped_apparent_not_post_diffusion_corrected
+        chamber_pressure_bar: 1.0
+        gas_mix: 1-atm vertical tube gas-mixing furnace (fO2 buffer; inert carrier + O2 control)
+        note: Authors set α_e=1 after concluding coefficients close to unity within ×2–3; gamma-derived
+          Na range is 0.3–1.7 @1400°C. Runtime envelope 0.9–1.0 is tighter than source range (report in
+          B1-NA-REGIME).
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: surface areas ≈ 2e-5 m
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt otherwise (not Knudsen)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: metal wire loop
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
   K:
     observations:
     - observation_id: sossi_2019_k_open_furnace_alpha_e_context
@@ -168,7 +242,9 @@ species:
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
         line_range: 302-306
-      T_range_K: [1573.15, 1823.15]
+      T_range_K:
+      - 1573.15
+      - 1823.15
       phase: silicate_melt_ferrobasalt_FCMAS
       regime: open_furnace_apparent
       units: dimensionless
@@ -194,12 +270,58 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
             paragraph: metal wire loop
             line_range: '67'
+    - observation_id: sossi_2019_k_class_b1
+      type: alpha
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        section: '4.6'
+        line_range: 302-306
+      T_range_K:
+      - 1573.15
+      - 1823.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      regime: open_furnace_apparent
+      units: dimensionless
+      values:
+        alpha: 1.0
+        alpha_range:
+        - 0.3
+        - 3.4
+        gas_species: K(g)
+        material: ferrobasalt_FCMAS_open_furnace_1bar
+        method_class: measured_direct
+        system_class: silicate_melt
+        transformation_class: network_modifier_desorption
+        interfacial_reaction: KO0.5(l) -> K(g) + 1/4 O2
+        transformation_class_confidence: low
+        semantics: competing_observation_do_not_average
+        note: γ-derived α_e,KO0.5 range 0.3–3.4 @1400°C; authors set α_e=1 for MVE suite.
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            line_range: '71'
+        cell_material:
+          value: Re/Pt wire loops
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            line_range: '408'
 fidelity_samples:
 - species: Na
   observable: alpha
   observation_id: sossi_2019_na_alpha_e_gamma_derived_range
   field: alpha_range
-  value: [0.3, 1.7]
+  value:
+  - 0.3
+  - 1.7
   locator:
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
     paragraph: α_e,NaO0.5 between 0.3 – 1.7 for our experiments at 1400 °C
@@ -220,7 +342,6 @@ fidelity_samples:
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
     paragraph: surface areas (≈ 2×10^{-5} m)
     line_range: '71'
-
 - species: Na
   observable: activity_coefficient
   observation_id: sossi_2019_na_logKstar_table3
@@ -239,3 +360,20 @@ fidelity_samples:
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
     table: '5'
     note: pure-system ΔH° = 255.0 kJ (Source 2 = L&H 1984)
+- species: Na
+  observable: alpha
+  observation_id: sossi_2019_na_class_and_transport_b1
+  field: alpha
+  value: 1.0
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    section: '4.6'
+    line_range: '306'
+- species: K
+  observable: alpha
+  observation_id: sossi_2019_k_class_b1
+  field: alpha
+  value: 1.0
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    section: '4.6'

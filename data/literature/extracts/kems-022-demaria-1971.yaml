@@ -1,15 +1,13 @@
 schema_version: literature_extract.v1
 source_id: kems-022-demaria-1971
 source:
-  citation: >-
-    De Maria, G., Balducci, G., Guido, M. & Piacente, V. (1971), "Mass spectrometric investigation of
-    the vaporization process of Apollo 12 lunar samples", Proc. Lunar Sci. Conf. 2, 1367–1380
+  citation: De Maria, G., Balducci, G., Guido, M. & Piacente, V. (1971), "Mass spectrometric investigation
+    of the vaporization process of Apollo 12 lunar samples", Proc. Lunar Sci. Conf. 2, 1367–1380
   year: 1971
 extraction:
-  method: >-
-    OCR-artifact transcription (MinerU vlm) of Tables 1–8 + prior phase-2 geometry; multicarrier ladder
-    2026-08-04 (mine-multicarrier-gk). Absolute P only from published tables — figure-only series (Na,
-    K, Fe, Ca, SiO, TiO, TiO2, Al monatomic) retained as qualitative/first-observed or figure-digitization
+  method: OCR-artifact transcription (MinerU vlm) of Tables 1–8 + prior phase-2 geometry; multicarrier
+    ladder 2026-08-04 (mine-multicarrier-gk). Absolute P only from published tables — figure-only series
+    (Na, K, Fe, Ca, SiO, TiO, TiO2, Al monatomic) retained as qualitative/first-observed or figure-digitization
     notes, not fabricated absolute series. Co-measurement groups documented in values.co_measured_with
     lists of observation_ids (schema has no co_measurement_id field — proposed in findings).
   date: '2026-08-04'
@@ -22,8 +20,7 @@ species:
     - observation_id: demaria_1971_o2_psat_table1_alkali_range
       type: psat_series
       locator:
-        source_path: >-
-          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         table: '1'
         line_range: 103-105
         paragraph: Partial pressures of O2 corresponding approximately to alkali metal vaporization
@@ -42,39 +39,38 @@ species:
         vaporization_regime_note: alkali vaporization window; O2 far below stoichiometric Me2O→2Me+1/2O2
         points:
         - T_K: 1396.0
-          p_atm: 5.540000e-09
-          p_Pa: 5.613405e-04
+          p_atm: 5.54e-09
+          p_Pa: 0.0005613405
           sample: '12022'
         - T_K: 1475.0
-          p_atm: 4.960000e-08
+          p_atm: 4.96e-08
           p_Pa: 0.00502572
           sample: '12022'
         - T_K: 1433.0
-          p_atm: 3.780000e-09
-          p_Pa: 3.830085e-04
+          p_atm: 3.78e-09
+          p_Pa: 0.0003830085
           sample: '12065'
         - T_K: 1482.0
-          p_atm: 1.220000e-08
+          p_atm: 1.22e-08
           p_Pa: 0.001236165
           sample: '12065'
         - T_K: 1499.0
-          p_atm: 2.110000e-08
+          p_atm: 2.11e-08
           p_Pa: 0.0021379575
           sample: '12065'
         - T_K: 1471.0
-          p_atm: 1.270000e-08
+          p_atm: 1.27e-08
           p_Pa: 0.0012868274999999999
           sample: '12065'
         - T_K: 1459.0
-          p_atm: 8.780000e-09
-          p_Pa: 8.896335e-04
+          p_atm: 8.78e-09
+          p_Pa: 0.0008896335
           sample: '12065'
-        negative_stoichiometry_note: >-
-          Molecular oxygen partial pressure far below stoichiometric amount for Me2O(s)→2Me(g)+1/2O2(g).
-          Authors attribute partially to O interaction with Re container; passivated Re cells on 12065
-          showed higher O2+/Me+.
-        co_measured_context: >-
-          same alkali T window as Na/K figure series (Figs 1–2); tabulated co-species O2 only
+        negative_stoichiometry_note: Molecular oxygen partial pressure far below stoichiometric amount
+          for Me2O(s)→2Me(g)+1/2O2(g). Authors attribute partially to O interaction with Re container;
+          passivated Re cells on 12065 showed higher O2+/Me+.
+        co_measured_context: same alkali T window as Na/K figure series (Figs 1–2); tabulated co-species
+          O2 only
       uncertainty:
         note: authors state ≥factor 2 uncertainty in absolute P from calibration
       equipment:
@@ -84,21 +80,17 @@ species:
           diameter_m: 0.0023
           orifice_shape: knife_edge
           inferred: true
-          inference: >-
-            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          inference: area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
             line_range: '32'
         cell_material:
           value: Re
-          note: >-
-            Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
+          note: Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
             observed at higher T.
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers; passivated Re for 12065
             line_range: 32-56
   Mn:
@@ -106,8 +98,7 @@ species:
     - observation_id: demaria_1971_mn_psat_table2_sample_12022
       type: psat_series
       locator:
-        source_path: >-
-          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         table: '2'
         line_range: 157-159
         paragraph: Partial pressures of Mn and Cr over sample 12022; initial points
@@ -126,21 +117,21 @@ species:
         activity_order: 1e-5 to 1e-6 (authors)
         points:
         - T_K: 1583.0
-          p_atm: 7.660000e-09
-          p_Pa: 7.761495e-04
+          p_atm: 7.66e-09
+          p_Pa: 0.0007761495
           sample: '12022'
         - T_K: 1609.0
-          p_atm: 1.320000e-08
+          p_atm: 1.32e-08
           p_Pa: 0.00133749
           sample: '12022'
         - T_K: 1725.0
-          p_atm: 8.470000e-08
+          p_atm: 8.47e-08
           p_Pa: 0.0085822275
           sample: '12022'
         co_measured_with:
         - demaria_1971_cr_psat_table2_sample_12022
-        co_measurement_note: >-
-          Mn and Cr tabulated on same Table 2; both present at 1725 K (ratio-recoverable at that T)
+        co_measurement_note: Mn and Cr tabulated on same Table 2; both present at 1725 K (ratio-recoverable
+          at that T)
       uncertainty:
         note: ≥factor 2 absolute P; minor constituents low activity 1e-5–1e-6
       equipment:
@@ -150,21 +141,17 @@ species:
           diameter_m: 0.0023
           orifice_shape: knife_edge
           inferred: true
-          inference: >-
-            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          inference: area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
             line_range: '32'
         cell_material:
           value: Re
-          note: >-
-            Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
+          note: Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
             observed at higher T.
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers; passivated Re for 12065
             line_range: 32-56
   Cr:
@@ -172,8 +159,7 @@ species:
     - observation_id: demaria_1971_cr_psat_table2_sample_12022
       type: psat_series
       locator:
-        source_path: >-
-          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         table: '2'
         line_range: 157-159
         paragraph: Partial pressures of Mn and Cr over sample 12022; initial points
@@ -192,11 +178,11 @@ species:
         activity_order: 1e-5 to 1e-6 (authors)
         points:
         - T_K: 1725.0
-          p_atm: 1.030000e-08
+          p_atm: 1.03e-08
           p_Pa: 0.0010436475
           sample: '12022'
         - T_K: 1794.0
-          p_atm: 6.200000e-08
+          p_atm: 6.2e-08
           p_Pa: 0.00628215
           sample: '12022'
         co_measured_with:
@@ -211,21 +197,17 @@ species:
           diameter_m: 0.0023
           orifice_shape: knife_edge
           inferred: true
-          inference: >-
-            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          inference: area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
             line_range: '32'
         cell_material:
           value: Re
-          note: >-
-            Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
+          note: Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
             observed at higher T.
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers; passivated Re for 12065
             line_range: 32-56
   Mg:
@@ -233,8 +215,7 @@ species:
     - observation_id: demaria_1971_mg_psat_table3_lunar_basalt
       type: psat_series
       locator:
-        source_path: >-
-          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         table: '3'
         line_range: 173-175
         paragraph: Partial pressures of Mg over samples 12022 and 12065; indicative initial points
@@ -253,48 +234,47 @@ species:
         activity_note: low activity; same order as pure-oxide decomposition pressures (Altman 1963)
         points:
         - T_K: 1650.0
-          p_atm: 1.600000e-08
+          p_atm: 1.6e-08
           p_Pa: 0.0016212000000000002
           instrument: BC
           sample: '12022'
         - T_K: 1694.0
-          p_atm: 5.700000e-08
+          p_atm: 5.7e-08
           p_Pa: 0.005775525
           instrument: NAA
           sample: '12022'
         - T_K: 1815.0
-          p_atm: 3.960000e-06
+          p_atm: 3.96e-06
           p_Pa: 0.401247
           instrument: NAA
           sample: '12022'
         - T_K: 1747.0
-          p_atm: 1.650000e-09
-          p_Pa: 1.671862e-04
+          p_atm: 1.65e-09
+          p_Pa: 0.0001671862
           instrument: NAA
           sample: '12065'
         - T_K: 1854.0
-          p_atm: 9.400000e-09
-          p_Pa: 9.524550e-04
+          p_atm: 9.4e-09
+          p_Pa: 0.000952455
           instrument: NAA
           sample: '12065'
         - T_K: 1776.0
-          p_atm: 2.400000e-09
-          p_Pa: 2.431800e-04
+          p_atm: 2.4e-09
+          p_Pa: 0.00024318
           instrument: NAA
           sample: '12065'
         - T_K: 1857.0
-          p_atm: 8.850000e-08
+          p_atm: 8.85e-08
           p_Pa: 0.0089672625
           instrument: NAA
           sample: '12065'
         - T_K: 1927.0
-          p_atm: 3.200000e-08
+          p_atm: 3.2e-08
           p_Pa: 0.0032424000000000003
           instrument: NAA
           sample: '12065'
-        caveat: >-
-          Authors: Mg activity decreased after initial observation — attribution of reported data to true
-          initial points is 'questionable'.
+        caveat: 'Authors: Mg activity decreased after initial observation — attribution of reported data
+          to true initial points is ''questionable''.'
         figure_also: Fig. 4 (Ca companion figure; Ca not tabulated — figure-only)
       uncertainty:
         note: ≥factor 2 absolute; questionable initial-point attribution per authors
@@ -305,21 +285,17 @@ species:
           diameter_m: 0.0023
           orifice_shape: knife_edge
           inferred: true
-          inference: >-
-            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          inference: area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
             line_range: '32'
         cell_material:
           value: Re
-          note: >-
-            Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
+          note: Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
             observed at higher T.
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers; passivated Re for 12065
             line_range: 32-56
   Ca:
@@ -327,12 +303,10 @@ species:
     - observation_id: demaria_1971_ca_figure_only_and_measurement_difficulty
       type: rate_series
       locator:
-        source_path: >-
-          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         figure: '4'
         line_range: 169-198
-        paragraph: >-
-          Ca partial pressures reported in Fig. 4 only; ion intensity measurement difficult
+        paragraph: Ca partial pressures reported in Fig. 4 only; ion intensity measurement difficult
       T_range_K:
       - 1600.0
       - 2000.0
@@ -347,13 +321,11 @@ species:
         condensed_phase: lunar_basalt_melt
         semantics: bound_not_point_ordering
         activity_note: low activity; same order as pure-oxide decomposition (Ackermann & Thorn 1961)
-        measurement_difficulty: >-
-          Measurement of calcium ion intensities made difficult by strong re-evaporation effect. Absolute
-          P(T) points not tabulated in text — Fig. 4 only. Not digitized here (OCR scatter would invent
-          numbers).
-        negative_result: >-
-          No reliable tabulated absolute Ca partial pressures published; re-evaporation limits quantitative
-          recovery. Species WAS detected as monatomic Ca.
+        measurement_difficulty: Measurement of calcium ion intensities made difficult by strong re-evaporation
+          effect. Absolute P(T) points not tabulated in text — Fig. 4 only. Not digitized here (OCR scatter
+          would invent numbers).
+        negative_result: No reliable tabulated absolute Ca partial pressures published; re-evaporation
+          limits quantitative recovery. Species WAS detected as monatomic Ca.
         companion_species_tabulated: Mg Table 3 at overlapping mid-T window
       uncertainty:
         note: figure-only; re-evaporation; ≥factor 2 if digitized
@@ -364,21 +336,17 @@ species:
           diameter_m: 0.0023
           orifice_shape: knife_edge
           inferred: true
-          inference: >-
-            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          inference: area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
             line_range: '32'
         cell_material:
           value: Re
-          note: >-
-            Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
+          note: Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
             observed at higher T.
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers; passivated Re for 12065
             line_range: 32-56
   Fe:
@@ -386,8 +354,7 @@ species:
     - observation_id: demaria_1971_fe_lunar_basalt_kems_main_cell
       type: activity_coefficient
       locator:
-        source_path: >-
-          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         paragraph: Fe+ ion peaks first observed ~1300 K; nearly unit activity vs pure Fe
         line_range: 111-155
         figure: '3'
@@ -400,8 +367,8 @@ species:
       units: dimensionless
       values:
         activity: 1.0
-        activity_note: >-
-          nearly unit activity; temperature dependence very close to pure iron (Hultgren et al. 1967)
+        activity_note: nearly unit activity; temperature dependence very close to pure iron (Hultgren
+          et al. 1967)
         gas_species: Fe(g)
         material: Apollo_12_lunar_basalt_12022_12065
         condensed_phase: lunar_basalt_melt
@@ -413,8 +380,7 @@ species:
         - orifice_channel_length
         - absolute_psat_series
       uncertainty:
-        note: >-
-          qualitative nearly unit activity; multi-rotating-cell Δ markers on Fig. 3 for 12065
+        note: qualitative nearly unit activity; multi-rotating-cell Δ markers on Fig. 3 for 12065
       equipment:
         orifice_area:
           value: 4.154756e-06
@@ -422,28 +388,23 @@ species:
           diameter_m: 0.0023
           orifice_shape: knife_edge
           inferred: true
-          inference: >-
-            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          inference: area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
             line_range: '32'
         cell_material:
           value: Re
-          note: >-
-            Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
+          note: Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
             observed at higher T.
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers; passivated Re for 12065
             line_range: 32-56
     - observation_id: demaria_1971_fe_activity_multi_rotating_cell
       type: activity_coefficient
       locator:
-        source_path: >-
-          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         section: ACTIVITY DETERMINATION BY MULTIPLE-ROTATING KNUDSEN CELL
         line_range: 340-356
         figure: '3'
@@ -453,8 +414,8 @@ species:
       units: dimensionless
       values:
         activity: 1.0
-        activity_note: >-
-          multi-rotating-cell Fe activity points plotted as Δ on Fig. 3; positive results for iron
+        activity_note: multi-rotating-cell Fe activity points plotted as Δ on Fig. 3; positive results
+          for iron
         gas_species: Fe(g)
         material: Apollo_12_12065_in_Re_crucible
         condensed_phase: lunar_basalt_melt
@@ -472,11 +433,9 @@ species:
           diameter_m: 0.001
           orifice_shape: knife_edge
           inferred: true
-          inference: >-
-            area = π (d/2)^2 from knife-edge orifice diameter 1 mm on multi-rotating-cell crucibles
+          inference: area = π (d/2)^2 from knife-edge orifice diameter 1 mm on multi-rotating-cell crucibles
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: effusion holes knife-edge orifice 1 mm diameter
             line_range: 350-352
         multi_orifice_series:
@@ -490,24 +449,20 @@ species:
             orifice_shape: knife_edge
             note: three cells in graphite block; not a Motzfeldt multi-orifice α series
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             section: ACTIVITY DETERMINATION BY MULTIPLE-ROTATING KNUDSEN CELL
             line_range: 342-352
         cell_material:
-          value: >-
-            Re (sample cell); multi-cell set Re / Fe / MgO; Ta external cap on Fe-cell lid; Pt unsuccessful
+          value: Re (sample cell); multi-cell set Re / Fe / MgO; Ta external cap on Fe-cell lid; Pt unsuccessful
             (foam overflow)
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: crucibles Re, Fe, MgO; Ta cap; Pt unsuccessful
             line_range: 346-356
     - observation_id: demaria_1971_feo_detected_not_tabulated_P
       type: rate_series
       locator:
-        source_path: >-
-          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         table: '6'
         line_range: 324-328
         paragraph: FeO among molecular species detected; equilibria in Table 6
@@ -523,8 +478,7 @@ species:
         material: Apollo_12_lunar_basalt
         condensed_phase: lunar_basalt_melt
         semantics: bound_not_point_ordering
-        note: >-
-          FeO(g) detected; absolute partial pressures not in Tables 1–5. Third-law ΔH for FeO(g)⇌Fe(g)+1/2O2(g)
+        note: FeO(g) detected; absolute partial pressures not in Tables 1–5. Third-law ΔH for FeO(g)⇌Fe(g)+1/2O2(g)
           in Table 6 implies simultaneous Fe/FeO/O2 measurements existed.
         equilibrium_delta_H0_kcal_mol:
           BC: 39 ± 2
@@ -538,30 +492,66 @@ species:
           diameter_m: 0.0023
           orifice_shape: knife_edge
           inferred: true
-          inference: >-
-            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          inference: area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
             line_range: '32'
         cell_material:
           value: Re
-          note: >-
-            Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
+          note: Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
             observed at higher T.
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers; passivated Re for 12065
             line_range: 32-56
+    - observation_id: demaria_1971_multi_rotating_geometry_absence_b1
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        paragraph: multiple rotating Knudsen cell; three cells 1 mm knife-edge
+      T_range_K:
+      - 1400.0
+      - 2500.0
+      phase: lunar_basalt_Apollo12
+      regime: kems_effusion
+      units: as published
+      values:
+        quantity: multi_cell_activity_geometry
+        method_class: measured_direct
+        system_class: silicate_melt
+        semantics: absent_not_published
+        multi_orifice_for_motzfeldt: false
+        note: Three cells (Re/Fe/MgO) all have the SAME knife-edge orifice diameter 1.0 mm — activity
+          comparison, not Whitman–Motzfeldt multi-orifice α series. Main vaporization uses Re containers
+          with 2.3 mm knife-edge. No second orifice diameter for Motzfeldt multi-orifice inversion. No
+          clausing numeric published.
+        orifice_diameter_main_mm: 2.3
+        orifice_diameter_multi_cell_mm: 1.0
+        missing_for_motzfeldt:
+        - clausing_factor
+        - distinct_orifice_series_for_alpha
+        - P_eq
+      equipment:
+        orifice_area:
+          value: 7.85398e-07
+          units: m2
+          inferred: true
+          inference: A=pi*(d/2)^2 with d=1.0 mm multi-cell orifice
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: knife-edge orifice, 1 mm in diameter
+        cell_material:
+          value: Re (sample); multi-cell set Re / Fe / MgO; Ta external cap on Fe cell
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium, iron, and magnesium oxide crucibles
   SiO:
     observations:
     - observation_id: demaria_1971_sio_lunar_basalt_kems_main_cell
       type: rate_series
       locator:
-        source_path: >-
-          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         paragraph: SiO first observed ~1650 K; partial pressures ~10× below cristobalite
         line_range: 202-258
         figure: '5'
@@ -569,8 +559,8 @@ species:
       - 1650.0
       - 2200.0
       phase: lunar_basalt_melt_12022_12065
-      standard_state: >-
-        SiO(g) over condensed lunar basalt vs cristobalite SiO2 reference (Porter et al. 1955)
+      standard_state: SiO(g) over condensed lunar basalt vs cristobalite SiO2 reference (Porter et al.
+        1955)
       regime: kems_effusion
       units: as published (partial pressure; Fig. 5 lg P scale)
       values:
@@ -581,15 +571,13 @@ species:
         condensed_phase: lunar_basalt_melt
         pressure_vs_cristobalite: ~factor of 10 lower than SiO over cristobalite (Porter et al. 1955)
         semantics: bound_not_point_ordering
-        note: >-
-          Absolute SiO P(T) on Fig. 5 only — not tabulated. Fixed-T procedure shifts equilibrium toward
+        note: Absolute SiO P(T) on Fig. 5 only — not tabulated. Fixed-T procedure shifts equilibrium toward
           SiO2(g). Table 7 third-law treatment uses simultaneous SiO2/SiO/O2 Kp at listed T (ratio-recoverable
           via Kp without absolute P).
         co_measured_with:
         - demaria_1971_sio2_sio_o2_equilibrium_table7
       uncertainty:
-        note: >-
-          initial-point SiO attribution somewhat questionable per authors; ≥factor 2 absolute
+        note: initial-point SiO attribution somewhat questionable per authors; ≥factor 2 absolute
       equipment:
         orifice_area:
           value: 4.154756e-06
@@ -597,21 +585,17 @@ species:
           diameter_m: 0.0023
           orifice_shape: knife_edge
           inferred: true
-          inference: >-
-            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          inference: area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
             line_range: '32'
         cell_material:
           value: Re
-          note: >-
-            Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
+          note: Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
             observed at higher T.
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers; passivated Re for 12065
             line_range: 32-56
   SiO2:
@@ -619,8 +603,7 @@ species:
     - observation_id: demaria_1971_sio2_sio_o2_equilibrium_table7
       type: gibbs_table
       locator:
-        source_path: >-
-          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         table: '7'
         line_range: 330-334
         paragraph: Third-law heat of SiO2(g)=SiO(g)+1/2O2(g); simultaneous partial pressures
@@ -641,9 +624,8 @@ species:
         - O2(g)
         co_measured_with:
         - demaria_1971_sio_lunar_basalt_kems_main_cell
-        co_measurement_note: >-
-          Authors: basic data were partial pressures of gaseous species measured SIMULTANEOUSLY at various
-          temperatures. Kp embeds p(SiO)*p(O2)^0.5/p(SiO2) — carrier ratio recoverable.
+        co_measurement_note: 'Authors: basic data were partial pressures of gaseous species measured SIMULTANEOUSLY
+          at various temperatures. Kp embeds p(SiO)*p(O2)^0.5/p(SiO2) — carrier ratio recoverable.'
         points:
         - sample: '12022'
           T_K: 2060.0
@@ -705,21 +687,17 @@ species:
           diameter_m: 0.0023
           orifice_shape: knife_edge
           inferred: true
-          inference: >-
-            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          inference: area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
             line_range: '32'
         cell_material:
           value: Re
-          note: >-
-            Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
+          note: Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
             observed at higher T.
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers; passivated Re for 12065
             line_range: 32-56
   TiO:
@@ -727,8 +705,7 @@ species:
     - observation_id: demaria_1971_tio_tio2_figure6_comparable_pressures
       type: rate_series
       locator:
-        source_path: >-
-          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         figure: '6'
         table: '6'
         line_range: 262-268, 324-328
@@ -746,9 +723,9 @@ species:
         material: Apollo_12_lunar_basalt
         condensed_phase: lunar_basalt_melt
         semantics: bound_not_point_ordering
-        ratio_note: >-
-          Authors: partial pressures of TiO and TiO2 in 2000–2170 K were COMPARABLE (p_TiO / p_TiO2 ≈
-          O(1) on same melt/apparatus — ratio-recoverable from Fig. 6 even without absolute digitization).
+        ratio_note: 'Authors: partial pressures of TiO and TiO2 in 2000–2170 K were COMPARABLE (p_TiO
+          / p_TiO2 ≈ O(1) on same melt/apparatus — ratio-recoverable from Fig. 6 even without absolute
+          digitization).'
         absolute_P_note: Absolute points on Fig. 6 only; not tabulated. Not figure-digitized here.
         co_measured_with:
         - demaria_1971_tio2_figure6_comparable_to_tio
@@ -768,21 +745,17 @@ species:
           diameter_m: 0.0023
           orifice_shape: knife_edge
           inferred: true
-          inference: >-
-            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          inference: area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
             line_range: '32'
         cell_material:
           value: Re
-          note: >-
-            Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
+          note: Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
             observed at higher T.
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers; passivated Re for 12065
             line_range: 32-56
   TiO2:
@@ -790,8 +763,7 @@ species:
     - observation_id: demaria_1971_tio2_figure6_comparable_to_tio
       type: rate_series
       locator:
-        source_path: >-
-          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         figure: '6'
         line_range: 262-268
       T_range_K:
@@ -816,21 +788,17 @@ species:
           diameter_m: 0.0023
           orifice_shape: knife_edge
           inferred: true
-          inference: >-
-            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          inference: area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
             line_range: '32'
         cell_material:
           value: Re
-          note: >-
-            Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
+          note: Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
             observed at higher T.
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers; passivated Re for 12065
             line_range: 32-56
   Al2O:
@@ -838,8 +806,7 @@ species:
     - observation_id: demaria_1971_al2o_psat_table4
       type: psat_series
       locator:
-        source_path: >-
-          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         table: '4'
         line_range: 294-296
         paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
@@ -855,77 +822,76 @@ species:
         quantity: partial_pressure_intermediate_range_reliable
         material: Apollo_12_12022_and_12065
         condensed_phase: lunar_basalt_melt
-        reliability_note: >-
-          Only intermediate-range data included by authors; initial (other species still depleting) and
-          final (exhaustion) ranges excluded due to poor T-reproducibility of ion intensity.
+        reliability_note: Only intermediate-range data included by authors; initial (other species still
+          depleting) and final (exhaustion) ranges excluded due to poor T-reproducibility of ion intensity.
         points:
         - T_K: 2060.0
-          p_atm: 5.070000e-09
-          p_Pa: 5.137178e-04
+          p_atm: 5.07e-09
+          p_Pa: 0.0005137178
           instrument: NAA
           sample: '12022'
         - T_K: 2104.0
-          p_atm: 1.130000e-08
+          p_atm: 1.13e-08
           p_Pa: 0.0011449725000000001
           instrument: NAA
           sample: '12022'
         - T_K: 2125.0
-          p_atm: 1.570000e-08
+          p_atm: 1.57e-08
           p_Pa: 0.0015908025000000003
           instrument: NAA
           sample: '12022'
         - T_K: 2146.0
-          p_atm: 2.240000e-08
+          p_atm: 2.24e-08
           p_Pa: 0.00226968
           instrument: NAA
           sample: '12022'
         - T_K: 2180.0
-          p_atm: 3.650000e-08
+          p_atm: 3.65e-08
           p_Pa: 0.0036983625000000003
           instrument: NAA
           sample: '12022'
         - T_K: 2183.0
-          p_atm: 3.820000e-08
+          p_atm: 3.82e-08
           p_Pa: 0.003870615
           instrument: NAA
           sample: '12022'
         - T_K: 2194.0
-          p_atm: 4.010000e-08
+          p_atm: 4.01e-08
           p_Pa: 0.0040631325
           instrument: NAA
           sample: '12022'
         - T_K: 2290.0
-          p_atm: 1.550000e-07
+          p_atm: 1.55e-07
           p_Pa: 0.015705375
           instrument: NAA
           sample: '12022'
         - T_K: 2270.0
-          p_atm: 1.040000e-07
+          p_atm: 1.04e-07
           p_Pa: 0.0105378
           instrument: NAA
           sample: '12022'
         - T_K: 2360.0
-          p_atm: 6.900000e-07
+          p_atm: 6.9e-07
           p_Pa: 0.06991425
           instrument: BC
           sample: '12065'
         - T_K: 2395.0
-          p_atm: 9.880000e-07
+          p_atm: 9.88e-07
           p_Pa: 0.10010909999999999
           instrument: BC
           sample: '12065'
         - T_K: 2425.0
-          p_atm: 1.900000e-06
+          p_atm: 1.9e-06
           p_Pa: 0.1925175
           instrument: BC
           sample: '12065'
         - T_K: 2465.0
-          p_atm: 3.390000e-06
+          p_atm: 3.39e-06
           p_Pa: 0.34349175000000004
           instrument: BC
           sample: '12065'
         - T_K: 2500.0
-          p_atm: 4.730000e-06
+          p_atm: 4.73e-06
           p_Pa: 0.47926725
           instrument: BC
           sample: '12065'
@@ -933,10 +899,9 @@ species:
         - demaria_1971_alo_psat_table4
         - demaria_1971_o_atomic_psat_table5
         - demaria_1971_alo_al_o_kp_table8
-        co_measurement_note: >-
-          On sample 12065 BC, Al2O and AlO co-tabulated at 2360,2395,2425,2465,2500 K — ratio p(Al2O)/p(AlO)
-          recoverable. Atomic O (Table 5) co-tabulated at same T on both samples. Table 8 Kp(AlO=Al+O)
-          uses simultaneous AlO, Al, O at 2360–2500 K on 12065 BC.
+        co_measurement_note: On sample 12065 BC, Al2O and AlO co-tabulated at 2360,2395,2425,2465,2500
+          K — ratio p(Al2O)/p(AlO) recoverable. Atomic O (Table 5) co-tabulated at same T on both samples.
+          Table 8 Kp(AlO=Al+O) uses simultaneous AlO, Al, O at 2360–2500 K on 12065 BC.
       uncertainty:
         note: ≥factor 2 absolute; intermediate-range subset only
       equipment:
@@ -946,21 +911,17 @@ species:
           diameter_m: 0.0023
           orifice_shape: knife_edge
           inferred: true
-          inference: >-
-            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          inference: area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
             line_range: '32'
         cell_material:
           value: Re
-          note: >-
-            Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
+          note: Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
             observed at higher T.
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers; passivated Re for 12065
             line_range: 32-56
   AlO:
@@ -968,8 +929,7 @@ species:
     - observation_id: demaria_1971_alo_psat_table4
       type: psat_series
       locator:
-        source_path: >-
-          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         table: '4'
         line_range: 294-296
       T_range_K:
@@ -987,32 +947,32 @@ species:
         reliability_note: AlO NAA points mostly final-range — excluded by authors from tables
         points:
         - T_K: 2320.0
-          p_atm: 1.050000e-06
+          p_atm: 1.05e-06
           p_Pa: 0.10639124999999999
           instrument: BC
           sample: '12065'
         - T_K: 2360.0
-          p_atm: 1.300000e-06
+          p_atm: 1.3e-06
           p_Pa: 0.1317225
           instrument: BC
           sample: '12065'
         - T_K: 2395.0
-          p_atm: 2.220000e-06
+          p_atm: 2.22e-06
           p_Pa: 0.2249415
           instrument: BC
           sample: '12065'
         - T_K: 2425.0
-          p_atm: 3.790000e-06
+          p_atm: 3.79e-06
           p_Pa: 0.38402175
           instrument: BC
           sample: '12065'
         - T_K: 2465.0
-          p_atm: 6.840000e-06
+          p_atm: 6.84e-06
           p_Pa: 0.693063
           instrument: BC
           sample: '12065'
         - T_K: 2500.0
-          p_atm: 8.960000e-06
+          p_atm: 8.96e-06
           p_Pa: 0.907872
           instrument: BC
           sample: '12065'
@@ -1029,28 +989,23 @@ species:
           diameter_m: 0.0023
           orifice_shape: knife_edge
           inferred: true
-          inference: >-
-            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          inference: area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
             line_range: '32'
         cell_material:
           value: Re
-          note: >-
-            Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
+          note: Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
             observed at higher T.
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers; passivated Re for 12065
             line_range: 32-56
     - observation_id: demaria_1971_alo_al_o_kp_table8
       type: gibbs_table
       locator:
-        source_path: >-
-          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         table: '8'
         line_range: 337-341
         paragraph: Third-law AlO(g)=Al(g)+O(g); 12065 BC; simultaneous Kp
@@ -1075,35 +1030,35 @@ species:
         - demaria_1971_al_monatomic_figure7
         points:
         - T_K: 2360.0
-          Kp: 3.190000e-05
+          Kp: 3.19e-05
           minus_R_ln_Kp: 20.56
           minus_delta_fef: 27.26
           delta_H0_kcal_mol: 112.8
         - T_K: 2395.0
-          Kp: 4.020000e-05
+          Kp: 4.02e-05
           minus_R_ln_Kp: 20.01
           minus_delta_fef: 27.3
           delta_H0_kcal_mol: 113.4
         - T_K: 2425.0
-          Kp: 8.030000e-05
+          Kp: 8.03e-05
           minus_R_ln_Kp: 18.73
           minus_delta_fef: 27.32
           delta_H0_kcal_mol: 111.6
         - T_K: 2465.0
-          Kp: 1.330000e-04
+          Kp: 0.000133
           minus_R_ln_Kp: 17.74
           minus_delta_fef: 27.35
           delta_H0_kcal_mol: 111.1
         - T_K: 2500.0
-          Kp: 1.580000e-04
+          Kp: 0.000158
           minus_R_ln_Kp: 17.39
           minus_delta_fef: 27.38
           delta_H0_kcal_mol: 111.9
         mean_delta_H0_kcal_mol: 112.2
         mean_delta_H0_sigma: 0.9
         literature_compare_kcal_mol: 112 ± 3 (this work BC Table 6) vs 115 ± 5 (Drowart et al. 1960)
-        ratio_recoverable: >-
-          Kp = p(Al)*p(O)/p(AlO) from simultaneous measurements — carrier ratios without absolute calibration
+        ratio_recoverable: Kp = p(Al)*p(O)/p(AlO) from simultaneous measurements — carrier ratios without
+          absolute calibration
       uncertainty:
         note: std dev ±0.9 on mean; Table 6 BC 112±3 inclusive of calibration
       equipment:
@@ -1113,21 +1068,17 @@ species:
           diameter_m: 0.0023
           orifice_shape: knife_edge
           inferred: true
-          inference: >-
-            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          inference: area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
             line_range: '32'
         cell_material:
           value: Re
-          note: >-
-            Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
+          note: Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
             observed at higher T.
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers; passivated Re for 12065
             line_range: 32-56
   Al:
@@ -1135,8 +1086,7 @@ species:
     - observation_id: demaria_1971_al_monatomic_figure7
       type: rate_series
       locator:
-        source_path: >-
-          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         figure: '7'
         line_range: 268-292
         paragraph: Al, Al2O, AlO observed; Al partial pressures in Fig. 7
@@ -1152,8 +1102,7 @@ species:
         material: Apollo_12_lunar_basalt
         condensed_phase: lunar_basalt_melt
         semantics: bound_not_point_ordering
-        note: >-
-          Absolute Al(g) on Fig. 7 only. Used with AlO and O in Table 8 Kp simultaneous equilibria.
+        note: Absolute Al(g) on Fig. 7 only. Used with AlO and O in Table 8 Kp simultaneous equilibria.
         co_measured_with:
         - demaria_1971_alo_al_o_kp_table8
         - demaria_1971_al2o_psat_table4
@@ -1168,21 +1117,17 @@ species:
           diameter_m: 0.0023
           orifice_shape: knife_edge
           inferred: true
-          inference: >-
-            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          inference: area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
             line_range: '32'
         cell_material:
           value: Re
-          note: >-
-            Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
+          note: Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
             observed at higher T.
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers; passivated Re for 12065
             line_range: 32-56
   O:
@@ -1190,8 +1135,7 @@ species:
     - observation_id: demaria_1971_o_atomic_psat_table5
       type: psat_series
       locator:
-        source_path: >-
-          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         table: '5'
         line_range: 298-300
         paragraph: Partial pressures of O in range of Al-containing species vaporization
@@ -1209,67 +1153,67 @@ species:
         condensed_phase: lunar_basalt_melt
         points:
         - T_K: 2015.0
-          p_atm: 9.200000e-08
+          p_atm: 9.2e-08
           p_Pa: 0.009321900000000001
           instrument: NAA
           sample: '12022'
         - T_K: 2060.0
-          p_atm: 2.200000e-07
+          p_atm: 2.2e-07
           p_Pa: 0.022291500000000002
           instrument: NAA
           sample: '12022'
         - T_K: 2104.0
-          p_atm: 3.200000e-07
+          p_atm: 3.2e-07
           p_Pa: 0.032424
           instrument: NAA
           sample: '12022'
         - T_K: 2146.0
-          p_atm: 6.500000e-07
+          p_atm: 6.5e-07
           p_Pa: 0.06586125
           instrument: NAA
           sample: '12022'
         - T_K: 2162.0
-          p_atm: 9.000000e-07
+          p_atm: 9.0e-07
           p_Pa: 0.0911925
           instrument: NAA
           sample: '12022'
         - T_K: 2194.0
-          p_atm: 8.540000e-07
+          p_atm: 8.54e-07
           p_Pa: 0.08653155
           instrument: NAA
           sample: '12022'
         - T_K: 2270.0
-          p_atm: 2.000000e-06
+          p_atm: 2.0e-06
           p_Pa: 0.20265
           instrument: NAA
           sample: '12022'
         - T_K: 2320.0
-          p_atm: 1.630000e-06
+          p_atm: 1.63e-06
           p_Pa: 0.16515975
           instrument: BC
           sample: '12065'
         - T_K: 2360.0
-          p_atm: 2.910000e-06
+          p_atm: 2.91e-06
           p_Pa: 0.29485575
           instrument: BC
           sample: '12065'
         - T_K: 2395.0
-          p_atm: 3.800000e-06
+          p_atm: 3.8e-06
           p_Pa: 0.385035
           instrument: BC
           sample: '12065'
         - T_K: 2425.0
-          p_atm: 7.400000e-06
+          p_atm: 7.4e-06
           p_Pa: 0.749805
           instrument: BC
           sample: '12065'
         - T_K: 2465.0
-          p_atm: 1.130000e-05
+          p_atm: 1.13e-05
           p_Pa: 1.1449725
           instrument: BC
           sample: '12065'
         - T_K: 2500.0
-          p_atm: 1.420000e-05
+          p_atm: 1.42e-05
           p_Pa: 1.438815
           instrument: BC
           sample: '12065'
@@ -1277,12 +1221,12 @@ species:
         - demaria_1971_al2o_psat_table4
         - demaria_1971_alo_psat_table4
         - demaria_1971_alo_al_o_kp_table8
-        co_measurement_note: >-
-          Atomic O co-tabulated with Al2O (12022 NAA same T: 2060,2104,2146,2194,2270) and with AlO/Al2O
-          (12065 BC: 2320–2500). Enables p(Al2O)/p(O), p(AlO)/p(O) ratios and Table 8 Kp.
+        co_measurement_note: 'Atomic O co-tabulated with Al2O (12022 NAA same T: 2060,2104,2146,2194,2270)
+          and with AlO/Al2O (12065 BC: 2320–2500). Enables p(Al2O)/p(O), p(AlO)/p(O) ratios and Table
+          8 Kp.'
       uncertainty:
-        note: >-
-          ≥factor 2 absolute; Re cell O interaction caveat applies more to O2 than atomic O at high T
+        note: ≥factor 2 absolute; Re cell O interaction caveat applies more to O2 than atomic O at high
+          T
       equipment:
         orifice_area:
           value: 4.154756e-06
@@ -1290,21 +1234,17 @@ species:
           diameter_m: 0.0023
           orifice_shape: knife_edge
           inferred: true
-          inference: >-
-            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          inference: area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
             line_range: '32'
         cell_material:
           value: Re
-          note: >-
-            Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
+          note: Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
             observed at higher T.
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers; passivated Re for 12065
             line_range: 32-56
   Na:
@@ -1312,8 +1252,7 @@ species:
     - observation_id: demaria_1971_na_first_observed_figure1
       type: rate_series
       locator:
-        source_path: >-
-          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         figure: '1'
         line_range: 56-80
         paragraph: Na+ first ion species ~1250 K; Figs 1–2; rapid depletion
@@ -1331,8 +1270,7 @@ species:
         sample_Na2O_wt_pct: 0.36
         first_observed_T_K: 1250.0
         semantics: bound_not_point_ordering
-        note: >-
-          Absolute P on Fig. 1 only; few initial points before depletion. Not figure-digitized.
+        note: Absolute P on Fig. 1 only; few initial points before depletion. Not figure-digitized.
         co_measured_context: same alkali window as K and Table 1 O2
         companion_O2_table: demaria_1971_o2_psat_table1_alkali_range
       equipment:
@@ -1342,45 +1280,40 @@ species:
           diameter_m: 0.0023
           orifice_shape: knife_edge
           inferred: true
-          inference: >-
-            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          inference: area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
             line_range: '32'
         cell_material:
           value: Re
-          note: >-
-            Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
+          note: Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
             observed at higher T.
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers; passivated Re for 12065
             line_range: 32-56
     - observation_id: demaria_1971_na_psat_figure1_sample_12022_digitized
       type: psat_series
       locator:
-        source_path: >-
-          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         figure: '1'
         page: 1369
-        paragraph: >-
-          Fig. 1 circles = sample 12022 (upper line); open=BC, full=NAA;
-          pre-depletion / first-observed points only (Na first ~1250 K; rapid depletion)
+        paragraph: Fig. 1 circles = sample 12022 (upper line); open=BC, full=NAA; pre-depletion / first-observed
+          points only (Na first ~1250 K; rapid depletion)
         note: figure-digitized absolute P series; not tabulated in source
-      T_range_K: [1299.0, 1429.0]
+      T_range_K:
+      - 1299.0
+      - 1429.0
       phase: Apollo_12_lunar_basalt_melt_12022
       standard_state: partial pressure over multicomponent lunar basalt melt (not pure oxide)
       regime: kems_effusion
       units: atm as published on Fig. 1 (p_Pa = p_atm × 101325)
       uncertainty:
-        sigma_log10P_dex_per_point: 0.30
-        fully_correlated_cell_calibration_offset_note: >-
-          Framework §4.3.A error model: one fully-correlated cell-calibration offset
-          across all points of a series (in addition to 0.30 dex/pt independent).
-          Authors also state ≥factor 2 absolute-P uncertainty from calibration.
+        sigma_log10P_dex_per_point: 0.3
+        fully_correlated_cell_calibration_offset_note: 'Framework §4.3.A error model: one fully-correlated
+          cell-calibration offset across all points of a series (in addition to 0.30 dex/pt independent).
+          Authors also state ≥factor 2 absolute-P uncertainty from calibration.'
         note: pre-registered digitization σ; do not retune Pref/γ to close residuals
       values:
         gas_species: Na(g)
@@ -1390,10 +1323,9 @@ species:
         sample: '12022'
         sample_Na2O_wt_pct: 0.36
         sample_K2O_wt_pct: 0.068
-        composition_source: >-
-          DeMaria 1971 text (Sample 12022,57 alkaline components paragraph):
-          "0.36 and 0.068 wt. % of Na2O and K2O, respectively"; full oxide suite
-          reported elsewhere (Smales 1971). Test fixture matches Na2O=0.36.
+        composition_source: 'DeMaria 1971 text (Sample 12022,57 alkaline components paragraph): "0.36
+          and 0.068 wt. % of Na2O and K2O, respectively"; full oxide suite reported elsewhere (Smales
+          1971). Test fixture matches Na2O=0.36.'
         figure_digitized: true
         series: upper_line_circles
         pre_depletion_only: true
@@ -1404,71 +1336,70 @@ species:
           T_K: 1429.0
           invT_times_1e4_K_inv: 6.9979
           log10_p_atm: -6.106
-          p_Pa: 7.93e-2
-          note: >-
-            Fitted-line evaluation at investigation T (July Na report);
-            consistent with upper-line visual digitization. Held-out only.
+          p_Pa: 0.0793
+          note: Fitted-line evaluation at investigation T (July Na report); consistent with upper-line
+            visual digitization. Held-out only.
         points:
-          - T_K: 1428.57
-            invT_times_1e4_K_inv: 7.0
-            log10_p_atm: -6.05
-            p_atm: 8.912509e-07
-            p_Pa: 9.030600e-02
-            symbol: open_circle
-            instrument: BC
-            figure_digitized: true
-            sigma_log10P_dex: 0.30
-            pre_depletion_initial_point: true
-          - T_K: 1412.43
-            invT_times_1e4_K_inv: 7.08
-            log10_p_atm: -6.15
-            p_atm: 7.079458e-07
-            p_Pa: 7.173261e-02
-            symbol: open_circle
-            instrument: BC
-            figure_digitized: true
-            sigma_log10P_dex: 0.30
-            pre_depletion_initial_point: true
-          - T_K: 1379.31
-            invT_times_1e4_K_inv: 7.25
-            log10_p_atm: -6.7
-            p_atm: 1.995262e-07
-            p_Pa: 2.021700e-02
-            symbol: filled_circle
-            instrument: NAA
-            figure_digitized: true
-            sigma_log10P_dex: 0.30
-            pre_depletion_initial_point: true
-          - T_K: 1360.54
-            invT_times_1e4_K_inv: 7.35
-            log10_p_atm: -7.15
-            p_atm: 7.079458e-08
-            p_Pa: 7.173261e-03
-            symbol: open_circle
-            instrument: BC
-            figure_digitized: true
-            sigma_log10P_dex: 0.30
-            pre_depletion_initial_point: true
-          - T_K: 1342.28
-            invT_times_1e4_K_inv: 7.45
-            log10_p_atm: -7.45
-            p_atm: 3.548134e-08
-            p_Pa: 3.595147e-03
-            symbol: filled_circle
-            instrument: NAA
-            figure_digitized: true
-            sigma_log10P_dex: 0.30
-            pre_depletion_initial_point: true
-          - T_K: 1298.7
-            invT_times_1e4_K_inv: 7.7
-            log10_p_atm: -8.05
-            p_atm: 8.912509e-09
-            p_Pa: 9.030600e-04
-            symbol: open_circle
-            instrument: BC
-            figure_digitized: true
-            sigma_log10P_dex: 0.30
-            pre_depletion_initial_point: true
+        - T_K: 1428.57
+          invT_times_1e4_K_inv: 7.0
+          log10_p_atm: -6.05
+          p_atm: 8.912509e-07
+          p_Pa: 0.090306
+          symbol: open_circle
+          instrument: BC
+          figure_digitized: true
+          sigma_log10P_dex: 0.3
+          pre_depletion_initial_point: true
+        - T_K: 1412.43
+          invT_times_1e4_K_inv: 7.08
+          log10_p_atm: -6.15
+          p_atm: 7.079458e-07
+          p_Pa: 0.07173261
+          symbol: open_circle
+          instrument: BC
+          figure_digitized: true
+          sigma_log10P_dex: 0.3
+          pre_depletion_initial_point: true
+        - T_K: 1379.31
+          invT_times_1e4_K_inv: 7.25
+          log10_p_atm: -6.7
+          p_atm: 1.995262e-07
+          p_Pa: 0.020217
+          symbol: filled_circle
+          instrument: NAA
+          figure_digitized: true
+          sigma_log10P_dex: 0.3
+          pre_depletion_initial_point: true
+        - T_K: 1360.54
+          invT_times_1e4_K_inv: 7.35
+          log10_p_atm: -7.15
+          p_atm: 7.079458e-08
+          p_Pa: 0.007173261
+          symbol: open_circle
+          instrument: BC
+          figure_digitized: true
+          sigma_log10P_dex: 0.3
+          pre_depletion_initial_point: true
+        - T_K: 1342.28
+          invT_times_1e4_K_inv: 7.45
+          log10_p_atm: -7.45
+          p_atm: 3.548134e-08
+          p_Pa: 0.003595147
+          symbol: filled_circle
+          instrument: NAA
+          figure_digitized: true
+          sigma_log10P_dex: 0.3
+          pre_depletion_initial_point: true
+        - T_K: 1298.7
+          invT_times_1e4_K_inv: 7.7
+          log10_p_atm: -8.05
+          p_atm: 8.912509e-09
+          p_Pa: 0.00090306
+          symbol: open_circle
+          instrument: BC
+          figure_digitized: true
+          sigma_log10P_dex: 0.3
+          pre_depletion_initial_point: true
       equipment:
         orifice_area:
           value: 4.154756e-06
@@ -1476,43 +1407,39 @@ species:
           diameter_m: 0.0023
           orifice_shape: knife_edge
           inferred: true
-          inference: >-
-            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          inference: area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
             line_range: '32'
         cell_material:
           value: Re
           note: Rhenium Knudsen cells (not Mo)
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers
             line_range: '32'
     - observation_id: demaria_1971_na_psat_figure1_sample_12065_digitized
       type: psat_series
       locator:
-        source_path: >-
-          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         figure: '1'
         page: 1369
-        paragraph: >-
-          Fig. 1 squares = sample 12065 (lower line); open=BC, full=NAA;
-          pre-depletion / first-observed points only
+        paragraph: Fig. 1 squares = sample 12065 (lower line); open=BC, full=NAA; pre-depletion / first-observed
+          points only
         note: figure-digitized absolute P series; not tabulated in source
-      T_range_K: [1325.0, 1475.0]
+      T_range_K:
+      - 1325.0
+      - 1475.0
       phase: Apollo_12_lunar_basalt_melt_12065
       standard_state: partial pressure over multicomponent lunar basalt melt (not pure oxide)
       regime: kems_effusion
       units: atm as published on Fig. 1 (p_Pa = p_atm × 101325)
       uncertainty:
-        sigma_log10P_dex_per_point: 0.30
-        fully_correlated_cell_calibration_offset_note: >-
-          Framework §4.3.A error model: one fully-correlated cell-calibration offset
-          across all points of a series (in addition to 0.30 dex/pt independent).
-          Authors state ≥factor 2 absolute-P uncertainty from calibration (12065 section).
+        sigma_log10P_dex_per_point: 0.3
+        fully_correlated_cell_calibration_offset_note: 'Framework §4.3.A error model: one fully-correlated
+          cell-calibration offset across all points of a series (in addition to 0.30 dex/pt independent).
+          Authors state ≥factor 2 absolute-P uncertainty from calibration (12065 section).'
         note: pre-registered digitization σ; do not retune Pref/γ to close residuals
       values:
         gas_species: Na(g)
@@ -1531,133 +1458,128 @@ species:
           Na2O: 0.27
           K2O: 0.073
           MnO: 0.256
-        composition_source: >-
-          Wolf et al. 2022/2023 VapoRock Table 2 "Lunar basalt" column (= Apollo 12065),
-          Refs [7] Maxwell & Wiik (1971); Meyer (2004); De Maria et al. (1971).
-          DeMaria 1971 itself does not tabulate 12065 bulk oxides (refers differences
-          to composition without numbers). Extracted from
-          docs-private/deep-research/literature/wolf-2022-vaporock/mineru/source/vlm/source.md
-          Table 2 + NOTE [7].
+        composition_source: Wolf et al. 2022/2023 VapoRock Table 2 "Lunar basalt" column (= Apollo 12065),
+          Refs [7] Maxwell & Wiik (1971); Meyer (2004); De Maria et al. (1971). DeMaria 1971 itself does
+          not tabulate 12065 bulk oxides (refers differences to composition without numbers). Extracted
+          from docs-private/deep-research/literature/wolf-2022-vaporock/mineru/source/vlm/source.md Table
+          2 + NOTE [7].
         figure_digitized: true
         series: lower_line_squares
         pre_depletion_only: true
         first_observed_T_K: 1250.0
-        excluded_points_note: >-
-          Three high-T open squares (~6.55–6.72 ×10^4 K^-1) sit well above the author's
-          fitted lower line and are treated as other-series / non-initial (paper: barred
-          points = different series; progressive depletion lowers later points). Not
-          included in this pre-depletion set.
+        excluded_points_note: 'Three high-T open squares (~6.55–6.72 ×10^4 K^-1) sit well above the author''s
+          fitted lower line and are treated as other-series / non-initial (paper: barred points = different
+          series; progressive depletion lowers later points). Not included in this pre-depletion set.'
         companion_O2_table: demaria_1971_o2_psat_table1_alkali_range
         co_measured_context: same alkali window as K Fig. 2 and Table 1 O2
         line_anchor_1429K:
           T_K: 1429.0
           invT_times_1e4_K_inv: 6.9979
           log10_p_atm: -7.743
-          p_Pa: 1.83e-3
-          note: >-
-            Fitted-line evaluation at investigation T (July Na report);
-            consistent with lower-line visual digitization. Held-out only.
+          p_Pa: 0.00183
+          note: Fitted-line evaluation at investigation T (July Na report); consistent with lower-line
+            visual digitization. Held-out only.
         points:
-          - T_K: 1474.93
-            invT_times_1e4_K_inv: 6.78
-            log10_p_atm: -7.05
-            p_atm: 8.912509e-08
-            p_Pa: 9.030600e-03
-            symbol: open_square
-            instrument: BC
-            figure_digitized: true
-            sigma_log10P_dex: 0.30
-            pre_depletion_initial_point: true
-          - T_K: 1459.85
-            invT_times_1e4_K_inv: 6.85
-            log10_p_atm: -7.2
-            p_atm: 6.309573e-08
-            p_Pa: 6.393175e-03
-            symbol: filled_square
-            instrument: NAA
-            figure_digitized: true
-            sigma_log10P_dex: 0.30
-            pre_depletion_initial_point: true
-          - T_K: 1449.28
-            invT_times_1e4_K_inv: 6.9
-            log10_p_atm: -7.3
-            p_atm: 5.011872e-08
-            p_Pa: 5.078280e-03
-            symbol: open_square
-            instrument: BC
-            figure_digitized: true
-            sigma_log10P_dex: 0.30
-            pre_depletion_initial_point: true
-          - T_K: 1438.85
-            invT_times_1e4_K_inv: 6.95
-            log10_p_atm: -7.4
-            p_atm: 3.981072e-08
-            p_Pa: 4.033821e-03
-            symbol: filled_square
-            instrument: NAA
-            figure_digitized: true
-            sigma_log10P_dex: 0.30
-            pre_depletion_initial_point: true
-          - T_K: 1428.57
-            invT_times_1e4_K_inv: 7.0
-            log10_p_atm: -7.55
-            p_atm: 2.818383e-08
-            p_Pa: 2.855727e-03
-            symbol: open_square
-            instrument: BC
-            figure_digitized: true
-            sigma_log10P_dex: 0.30
-            pre_depletion_initial_point: true
-          - T_K: 1418.44
-            invT_times_1e4_K_inv: 7.05
-            log10_p_atm: -7.7
-            p_atm: 1.995262e-08
-            p_Pa: 2.021700e-03
-            symbol: filled_square
-            instrument: NAA
-            figure_digitized: true
-            sigma_log10P_dex: 0.30
-            pre_depletion_initial_point: true
-          - T_K: 1398.6
-            invT_times_1e4_K_inv: 7.15
-            log10_p_atm: -8.0
-            p_atm: 1.000000e-08
-            p_Pa: 1.013250e-03
-            symbol: filled_square
-            instrument: NAA
-            figure_digitized: true
-            sigma_log10P_dex: 0.30
-            pre_depletion_initial_point: true
-          - T_K: 1379.31
-            invT_times_1e4_K_inv: 7.25
-            log10_p_atm: -8.15
-            p_atm: 7.079458e-09
-            p_Pa: 7.173261e-04
-            symbol: filled_square
-            instrument: NAA
-            figure_digitized: true
-            sigma_log10P_dex: 0.30
-            pre_depletion_initial_point: true
-          - T_K: 1351.35
-            invT_times_1e4_K_inv: 7.4
-            log10_p_atm: -8.7
-            p_atm: 1.995262e-09
-            p_Pa: 2.021700e-04
-            symbol: filled_square
-            instrument: NAA
-            figure_digitized: true
-            sigma_log10P_dex: 0.30
-            pre_depletion_initial_point: true
-          - T_K: 1324.5
-            invT_times_1e4_K_inv: 7.55
-            log10_p_atm: -9.35
-            p_atm: 4.466836e-10
-            p_Pa: 4.526021e-05
-            symbol: filled_square
-            instrument: NAA
-            figure_digitized: true
-            sigma_log10P_dex: 0.30
-            pre_depletion_initial_point: true
+        - T_K: 1474.93
+          invT_times_1e4_K_inv: 6.78
+          log10_p_atm: -7.05
+          p_atm: 8.912509e-08
+          p_Pa: 0.0090306
+          symbol: open_square
+          instrument: BC
+          figure_digitized: true
+          sigma_log10P_dex: 0.3
+          pre_depletion_initial_point: true
+        - T_K: 1459.85
+          invT_times_1e4_K_inv: 6.85
+          log10_p_atm: -7.2
+          p_atm: 6.309573e-08
+          p_Pa: 0.006393175
+          symbol: filled_square
+          instrument: NAA
+          figure_digitized: true
+          sigma_log10P_dex: 0.3
+          pre_depletion_initial_point: true
+        - T_K: 1449.28
+          invT_times_1e4_K_inv: 6.9
+          log10_p_atm: -7.3
+          p_atm: 5.011872e-08
+          p_Pa: 0.00507828
+          symbol: open_square
+          instrument: BC
+          figure_digitized: true
+          sigma_log10P_dex: 0.3
+          pre_depletion_initial_point: true
+        - T_K: 1438.85
+          invT_times_1e4_K_inv: 6.95
+          log10_p_atm: -7.4
+          p_atm: 3.981072e-08
+          p_Pa: 0.004033821
+          symbol: filled_square
+          instrument: NAA
+          figure_digitized: true
+          sigma_log10P_dex: 0.3
+          pre_depletion_initial_point: true
+        - T_K: 1428.57
+          invT_times_1e4_K_inv: 7.0
+          log10_p_atm: -7.55
+          p_atm: 2.818383e-08
+          p_Pa: 0.002855727
+          symbol: open_square
+          instrument: BC
+          figure_digitized: true
+          sigma_log10P_dex: 0.3
+          pre_depletion_initial_point: true
+        - T_K: 1418.44
+          invT_times_1e4_K_inv: 7.05
+          log10_p_atm: -7.7
+          p_atm: 1.995262e-08
+          p_Pa: 0.0020217
+          symbol: filled_square
+          instrument: NAA
+          figure_digitized: true
+          sigma_log10P_dex: 0.3
+          pre_depletion_initial_point: true
+        - T_K: 1398.6
+          invT_times_1e4_K_inv: 7.15
+          log10_p_atm: -8.0
+          p_atm: 1.0e-08
+          p_Pa: 0.00101325
+          symbol: filled_square
+          instrument: NAA
+          figure_digitized: true
+          sigma_log10P_dex: 0.3
+          pre_depletion_initial_point: true
+        - T_K: 1379.31
+          invT_times_1e4_K_inv: 7.25
+          log10_p_atm: -8.15
+          p_atm: 7.079458e-09
+          p_Pa: 0.0007173261
+          symbol: filled_square
+          instrument: NAA
+          figure_digitized: true
+          sigma_log10P_dex: 0.3
+          pre_depletion_initial_point: true
+        - T_K: 1351.35
+          invT_times_1e4_K_inv: 7.4
+          log10_p_atm: -8.7
+          p_atm: 1.995262e-09
+          p_Pa: 0.00020217
+          symbol: filled_square
+          instrument: NAA
+          figure_digitized: true
+          sigma_log10P_dex: 0.3
+          pre_depletion_initial_point: true
+        - T_K: 1324.5
+          invT_times_1e4_K_inv: 7.55
+          log10_p_atm: -9.35
+          p_atm: 4.466836e-10
+          p_Pa: 4.526021e-05
+          symbol: filled_square
+          instrument: NAA
+          figure_digitized: true
+          sigma_log10P_dex: 0.3
+          pre_depletion_initial_point: true
       equipment:
         orifice_area:
           value: 4.154756e-06
@@ -1665,31 +1587,25 @@ species:
           diameter_m: 0.0023
           orifice_shape: knife_edge
           inferred: true
-          inference: >-
-            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          inference: area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
             line_range: '32'
         cell_material:
           value: Re_passivated
-          note: >-
-            Passivated rhenium cells used for sample 12065 (higher O2+/Me+);
-            ReO2/ReO3 observed at higher T.
+          note: Passivated rhenium cells used for sample 12065 (higher O2+/Me+); ReO2/ReO3 observed at
+            higher T.
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: passivated rhenium cells for 12065
             line_range: 56-60
-
   K:
     observations:
     - observation_id: demaria_1971_k_first_observed_figure2
       type: rate_series
       locator:
-        source_path: >-
-          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         figure: '2'
         line_range: 56-101
         paragraph: K+ first ion species ~1250 K; Fig. 2; rapid depletion
@@ -1716,21 +1632,17 @@ species:
           diameter_m: 0.0023
           orifice_shape: knife_edge
           inferred: true
-          inference: >-
-            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          inference: area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
             line_range: '32'
         cell_material:
           value: Re
-          note: >-
-            Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
+          note: Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
             observed at higher T.
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers; passivated Re for 12065
             line_range: 32-56
   Si:
@@ -1738,8 +1650,7 @@ species:
     - observation_id: demaria_1971_si_monatomic_not_reported
       type: rate_series
       locator:
-        source_path: >-
-          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         line_range: 10-34,202
         paragraph: Si-containing species listed as SiO and SiO2 only
       T_range_K:
@@ -1754,9 +1665,9 @@ species:
         material: Apollo_12_lunar_basalt
         condensed_phase: lunar_basalt_melt
         semantics: bound_not_point_ordering
-        negative_result: >-
-          Monatomic Si not listed among detected vapor species. Detected Si carriers: SiO, SiO2 only.
-          This is a real negative for Si(g) dominance under these conditions (consistent with SiO carrier).
+        negative_result: 'Monatomic Si not listed among detected vapor species. Detected Si carriers:
+          SiO, SiO2 only. This is a real negative for Si(g) dominance under these conditions (consistent
+          with SiO carrier).'
         detected_si_carriers:
         - SiO(g)
         - SiO2(g)
@@ -1767,64 +1678,53 @@ species:
           diameter_m: 0.0023
           orifice_shape: knife_edge
           inferred: true
-          inference: >-
-            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          inference: area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
             line_range: '32'
         cell_material:
           value: Re
-          note: >-
-            Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
+          note: Rhenium Knudsen cells (not Mo). Passivated Re used for sample 12065 O2 behavior. ReO2/ReO3
             observed at higher T.
           locator:
-            source_path: >-
-              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers; passivated Re for 12065
             line_range: 32-56
 fidelity_samples:
 - path: species.Al2O.observations[demaria_1971_al2o_psat_table4].values.points[0].p_atm
-  value: 5.070000e-09
+  value: 5.07e-09
   note: 'Table 4: Al2O NAA 12022 at 2060 K = 5.07e-9 atm (prize ratio-anchor point)'
   locator:
-    source_path: >-
-      docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
     table: '4'
     line_range: '296'
 - path: species.AlO.observations[demaria_1971_alo_psat_table4].values.points[1].p_atm
-  value: 1.300000e-06
+  value: 1.3e-06
   note: 'Table 4: AlO BC 12065 at 2360 K = 1.30e-6 atm (co-measured with Al2O 6.90e-7)'
   locator:
-    source_path: >-
-      docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
     table: '4'
     line_range: '296'
 - path: species.O.observations[demaria_1971_o_atomic_psat_table5].values.points[1].p_atm
-  value: 2.200000e-07
+  value: 2.2e-07
   note: 'Table 5: O NAA 12022 at 2060 K = 2.2e-7 atm (same T as Al2O 5.07e-9)'
   locator:
-    source_path: >-
-      docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
     table: '5'
     line_range: '300'
-- path: >-
-    species.Mn.observations[demaria_1971_mn_psat_table2_sample_12022].values.points[2].p_atm
-  value: 8.470000e-08
+- path: species.Mn.observations[demaria_1971_mn_psat_table2_sample_12022].values.points[2].p_atm
+  value: 8.47e-08
   note: 'Table 2: Mn 1725 K = 8.47e-8 atm (co-measured with Cr 1.03e-8)'
   locator:
-    source_path: >-
-      docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
     table: '2'
     line_range: '159'
-- path: >-
-    species.Mg.observations[demaria_1971_mg_psat_table3_lunar_basalt].values.points[0].p_atm
-  value: 1.600000e-08
+- path: species.Mg.observations[demaria_1971_mg_psat_table3_lunar_basalt].values.points[0].p_atm
+  value: 1.6e-08
   note: 'Table 3: Mg BC 12022 at 1650 K = 1.6e-8 atm'
   locator:
-    source_path: >-
-      docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
     table: '3'
     line_range: '175'
 - species: Fe
@@ -1833,19 +1733,16 @@ fidelity_samples:
   field: activity
   value: 1.0
   locator:
-    source_path: >-
-      docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
     figure: '3'
     line_range: '111'
 - path: species.AlO.observations[demaria_1971_alo_al_o_kp_table8].values.points[0].Kp
-  value: 3.190000e-05
+  value: 3.19e-05
   note: 'Table 8: Kp(AlO=Al+O) at 2360 K = 3.19e-5'
   locator:
-    source_path: >-
-      docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
     table: '8'
     line_range: '337'
-
 - species: Na
   observable: psat_series
   observation_id: demaria_1971_na_psat_figure1_sample_12022_digitized
@@ -1872,3 +1769,11 @@ fidelity_samples:
   note: figure-digitized first 12065 pre-depletion square on lower line
   locator:
     figure: '1'
+- species: Fe
+  observable: activity_coefficient
+  observation_id: demaria_1971_multi_rotating_geometry_absence_b1
+  field: orifice_diameter_multi_cell_mm
+  value: 1.0
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    paragraph: 1 mm diameter

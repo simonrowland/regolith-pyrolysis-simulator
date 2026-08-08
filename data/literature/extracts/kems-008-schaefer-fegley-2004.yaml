@@ -1,9 +1,8 @@
 schema_version: literature_extract.v1
 source_id: kems-008-schaefer-fegley-2004
 source:
-  citation: >-
-    Schaefer, L. & Fegley, B. (2004), "A thermodynamic model of high temperature
-    lava vaporization on Io", Icarus 169:216-241 (MAGMA code; α_s survey Table 10)
+  citation: Schaefer, L. & Fegley, B. (2004), "A thermodynamic model of high temperature lava vaporization
+    on Io", Icarus 169:216-241 (MAGMA code; α_s survey Table 10)
   year: 2004
 extraction:
   method: OCR-artifact transcription (MinerU vlm) + phase-2 alpha-bounds review extract
@@ -19,32 +18,37 @@ species:
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
         table: '10'
-        line_range: '649-661'
-      T_range_K: [2173.0, 2373.0]
+        line_range: 649-661
+      T_range_K:
+      - 2173.0
+      - 2373.0
       phase: oxide_silicate_literature_survey
       standard_state: vaporization coefficient α_s = P_obs/P_vap survey (mostly solids)
       regime: review_compilation
       units: dimensionless
       values:
         alpha: 0.2
-        alpha_range: [0.04, 0.2]
+        alpha_range:
+        - 0.04
+        - 0.2
         gas_species: SiO(g)
         material_scope: silica_and_forsterite_literature
         pins:
-          - material: liquid_silica
-            alpha_approx: 0.04
-            T_range_K: [2173.0, 2373.0]
-          - material: Mg2SiO4_liquid
-            alpha_approx: 0.2
-            source: Hashimoto 1990 (cited)
-        note: >-
-          Authors cannot compute α_s for their Io lavas from data; survey Table 10.
-          α_s increases with T; many solid values <1. Not a single experimental Motzfeldt set.
+        - material: liquid_silica
+          alpha_approx: 0.04
+          T_range_K:
+          - 2173.0
+          - 2373.0
+        - material: Mg2SiO4_liquid
+          alpha_approx: 0.2
+          source: Hashimoto 1990 (cited)
+        note: Authors cannot compute α_s for their Io lavas from data; survey Table 10. α_s increases
+          with T; many solid values <1. Not a single experimental Motzfeldt set.
         missing_for_motzfeldt:
-          - orifice_area
-          - clausing_factor
-          - sample_surface_area
-          - cell_material_for_own_experiment
+        - orifice_area
+        - clausing_factor
+        - sample_surface_area
+        - cell_material_for_own_experiment
       uncertainty:
         note: compilation bounds; contradictory Al2O3 literature cited as example
   Mg:
@@ -54,27 +58,219 @@ species:
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
         table: '10'
-        line_range: '649-661'
-      T_range_K: [2163.0, 2323.0]
+        line_range: 649-661
+      T_range_K:
+      - 2163.0
+      - 2323.0
       phase: Mg2SiO4_s_l_literature
       regime: review_compilation
       units: dimensionless
       values:
         alpha: 0.2
-        alpha_range: [0.20, 0.21]
-        T_range_K: [2163.0, 2323.0]
+        alpha_range:
+        - 0.2
+        - 0.21
+        T_range_K:
+        - 2163.0
+        - 2323.0
         gas_species: Mg(g)
         material: Mg2SiO4_liquid
-        note: >-
-          Table 10 row Mg2SiO4 (l): T 2163–2323 K, α_s 0.20–0.21 (Hashimoto 1990).
-          α_s for Mg(g) and SiO(g) from Mg2SiO4 taken as equal (authors Table 10 note b).
-          Solid forsterite row is separate: 1873–2163 K, α_s 0.09–0.16.
-          Verified OCR locator: kems-008 …/vlm/…md Table 10 line 654
-          (prior extract T_range_K [2000,2300] was NOT in Table 10).
+        note: 'Table 10 row Mg2SiO4 (l): T 2163–2323 K, α_s 0.20–0.21 (Hashimoto 1990). α_s for Mg(g)
+          and SiO(g) from Mg2SiO4 taken as equal (authors Table 10 note b). Solid forsterite row is separate:
+          1873–2163 K, α_s 0.09–0.16. Verified OCR locator: kems-008 …/vlm/…md Table 10 line 654 (prior
+          extract T_range_K [2000,2300] was NOT in Table 10).'
         missing_for_motzfeldt:
-          - orifice_area
-          - clausing_factor
-          - sample_surface_area
+        - orifice_area
+        - clausing_factor
+        - sample_surface_area
+  Al2O3:
+    observations:
+    - observation_id: schaefer_fegley_2004_al2o3_table10_b1
+      type: alpha
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
+        table: '10'
+        paragraph: Vaporization coefficients for oxides and silicates
+      T_range_K:
+      - 1800.0
+      - 2310.0
+      phase: pure_oxide_literature_survey
+      regime: review_compilation
+      units: dimensionless
+      values:
+        alpha_range:
+        - 0.067
+        - 1.0
+        gas_species: survey_varies
+        material: Al2O3
+        method_class: review_compilation
+        system_class: pure_oxide_condensed
+        transformation_class: redox_reduction_required
+        interfacial_reaction: Al2O3(condensed) vaporization as published α_s survey (species-dependent)
+        table_10_rows:
+        - phase_state: solid
+          T_range_K:
+          - 1800.0
+          - 1900.0
+          alpha_range:
+          - 0.24
+          - 0.49
+          cite: Peleg and Alcock 1974
+        - phase_state: solid
+          T_range_K:
+          - 2000.0
+          - 2000.0
+          alpha: 0.14
+          cite: Kronert and Boehm 1972
+        - phase_state: solid
+          T_range_K:
+          - 2000.0
+          - 2000.0
+          alpha: 0.067
+          cite: Wolff and Alcock 1962
+        - phase_state: solid
+          T_range_K:
+          - 2195.0
+          - 2195.0
+          alpha: 0.08
+          cite: Farber et al. 1972
+        - phase_state: solid
+          T_range_K:
+          - 2290.0
+          - 2290.0
+          alpha_approx: 0.8
+          cite: Alcock and Peleg 1967
+        - phase_state: solid
+          T_range_K:
+          - 2310.0
+          - 2310.0
+          alpha: 0.3
+          sigma: 0.05
+          cite: Burns 1966
+        - phase_state: liquid
+          T_range_K:
+          - 2310.0
+          - 2310.0
+          alpha: 1.0
+          cite: Burns 1966
+        semantics: competing_observation_do_not_average
+        note: Table 10 complete oxide rows; α_s compilation mostly solids. Not Motzfeldt geometry.
+  MgO:
+    observations:
+    - observation_id: schaefer_fegley_2004_mgo_table10_b1
+      type: alpha
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
+        table: '10'
+        paragraph: Vaporization coefficients for oxides and silicates
+      T_range_K:
+      - 1800.0
+      - 2173.0
+      phase: pure_oxide_literature_survey
+      regime: review_compilation
+      units: dimensionless
+      values:
+        alpha_range:
+        - 0.09
+        - 0.4
+        gas_species: survey_varies
+        material: MgO
+        method_class: review_compilation
+        system_class: pure_oxide_condensed
+        transformation_class: redox_reduction_required
+        interfacial_reaction: MgO(condensed) vaporization as published α_s survey (species-dependent)
+        table_10_rows:
+        - phase_state: solid
+          T_range_K:
+          - 1800.0
+          - 1800.0
+          alpha: 0.25
+          cite: Peleg and Alcock 1974
+        - phase_state: solid
+          T_range_K:
+          - 1900.0
+          - 1900.0
+          alpha: 0.4
+          cite: Peleg and Alcock 1974
+        - phase_state: solid
+          T_range_K:
+          - 1820.0
+          - 1960.0
+          alpha_approx: 0.25
+          cite: Alcock and Peleg 1967
+        - phase_state: solid
+          T_range_K:
+          - 2273.0
+          - 2273.0
+          alpha: 0.09
+          cite: Kronert and Boehm 1972
+        - phase_state: solid
+          T_range_K:
+          - 1873.0
+          - 2173.0
+          alpha_range:
+          - 0.12
+          - 0.22
+          cite: Hashimoto 1990
+        semantics: competing_observation_do_not_average
+        note: Table 10 complete oxide rows; α_s compilation mostly solids. Not Motzfeldt geometry.
+  SiO2:
+    observations:
+    - observation_id: schaefer_fegley_2004_sio2_table10_b1
+      type: alpha
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
+        table: '10'
+        paragraph: Vaporization coefficients for oxides and silicates
+      T_range_K:
+      - 1823.0
+      - 2373.0
+      phase: pure_oxide_literature_survey
+      regime: review_compilation
+      units: dimensionless
+      values:
+        alpha_range:
+        - 0.015
+        - 0.11
+        gas_species: survey_varies
+        material: SiO2
+        method_class: review_compilation
+        system_class: pure_oxide_condensed
+        transformation_class: network_former_dissociation
+        interfacial_reaction: SiO2(condensed) vaporization as published α_s survey (species-dependent)
+        table_10_rows:
+        - phase_state: solid
+          T_range_K:
+          - 1823.0
+          - 1983.0
+          alpha: 0.022
+          sigma: 0.008
+          cite: Nagai et al. 1973
+        - phase_state: solid
+          T_range_K:
+          - 1700.0
+          - 1950.0
+          alpha: 0.022
+          sigma: 0.003
+          cite: Shornikov et al. 1999
+        - phase_state: solid
+          T_range_K:
+          - 1833.0
+          - 1958.0
+          alpha_range:
+          - 0.015
+          - 0.11
+          cite: Hashimoto 1990
+        - phase_state: liquid
+          T_range_K:
+          - 2173.0
+          - 2373.0
+          alpha_range:
+          - 0.038
+          - 0.048
+          cite: Hashimoto 1990
+        semantics: competing_observation_do_not_average
+        note: Table 10 complete oxide rows; α_s compilation mostly solids. Not Motzfeldt geometry.
 fidelity_samples:
 - species: SiO
   observable: alpha
@@ -90,7 +286,9 @@ fidelity_samples:
   observable: alpha
   observation_id: schaefer_fegley_2004_sio_alpha_s_survey
   field: alpha_range
-  value: [0.04, 0.2]
+  value:
+  - 0.04
+  - 0.2
   locator:
     source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
     paragraph: ~0.04 liquid silica to ~0.2 forsterite liquid
@@ -99,7 +297,9 @@ fidelity_samples:
   observable: alpha
   observation_id: schaefer_fegley_2004_mg_forsterite_alpha_s_survey
   field: T_range_K
-  value: [2163.0, 2323.0]
+  value:
+  - 2163.0
+  - 2323.0
   note: Table 10 Mg2SiO4(l) T 2163–2323 K (Hashimoto 1990) — corrected from erroneous 2000–2300
   locator:
     source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
@@ -115,4 +315,34 @@ fidelity_samples:
     source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
     table: '10'
     paragraph: Mg2SiO4 (l) α_s 0.20–0.21; Mg(g) and SiO(g) taken as equal
-    line_range: '654-657'
+    line_range: 654-657
+- species: Al2O3
+  observable: alpha
+  observation_id: schaefer_fegley_2004_al2o3_table10_b1
+  field: alpha_range
+  value:
+  - 0.067
+  - 1.0
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
+    table: '10'
+- species: MgO
+  observable: alpha
+  observation_id: schaefer_fegley_2004_mgo_table10_b1
+  field: alpha_range
+  value:
+  - 0.09
+  - 0.4
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
+    table: '10'
+- species: SiO2
+  observable: alpha
+  observation_id: schaefer_fegley_2004_sio2_table10_b1
+  field: alpha_range
+  value:
+  - 0.015
+  - 0.11
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
+    table: '10'

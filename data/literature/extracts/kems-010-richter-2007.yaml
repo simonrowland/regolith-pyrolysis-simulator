@@ -1,10 +1,9 @@
 schema_version: literature_extract.v1
 source_id: kems-010-richter-2007
 source:
-  citation: >-
-    Richter, F. M., Janney, P. E., Mendybaev, R. A., Davis, A. M. & Wadhwa, M. (2007),
-    "Elemental and isotopic fractionation of Type B CAI-like liquids by evaporation",
-    Geochim. Cosmochim. Acta 71:5544-5564, DOI 10.1016/j.gca.2007.09.005
+  citation: Richter, F. M., Janney, P. E., Mendybaev, R. A., Davis, A. M. & Wadhwa, M. (2007), "Elemental
+    and isotopic fractionation of Type B CAI-like liquids by evaporation", Geochim. Cosmochim. Acta 71:5544-5564,
+    DOI 10.1016/j.gca.2007.09.005
   doi: 10.1016/j.gca.2007.09.005
   year: 2007
 extraction:
@@ -21,9 +20,11 @@ species:
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
         figure: '3'
-        line_range: '447-448'
+        line_range: 447-448
         note: vacuum free evaporation; γ_Mg = γo exp(-E/RT)
-      T_range_K: [1873.0, 2173.0]
+      T_range_K:
+      - 1873.0
+      - 2173.0
       phase: silicate_melt_Type_B_CAI_like
       standard_state: Berman CMAS activities for P_sat; vacuum free evaporation (NOT Knudsen cell)
       regime: langmuir_free_evaporation
@@ -46,8 +47,8 @@ species:
           E_J_per_mol: 551000.0
           E_uncertainty_J_per_mol: 63000.0
         missing_for_motzfeldt:
-          - orifice_area
-          - clausing_factor
+        - orifice_area
+        - clausing_factor
         missing_note: Free-evaporation vacuum furnace (Hashimoto design) — no Knudsen orifice.
       uncertainty:
         E_uncertainty_J_per_mol: 53000.0
@@ -55,51 +56,144 @@ species:
         sample_surface_area:
           value:
             method: equivalent_sphere_from_weight_and_thickness_on_Ir_loop
-            sample_diameters_mm: [1.0, 2.5, 6.0]
-            rates_reported_for_mm: [2.5, 6.0]
+            sample_diameters_mm:
+            - 1.0
+            - 2.5
+            - 6.0
+            rates_reported_for_mm:
+            - 2.5
+            - 6.0
             area_uncertainty_pct: 10.0
-            note: >-
-              Surface areas tabulated per sample (Init/Final area mm2 in Table 1).
-              1 mm samples excluded from rates due to larger area uncertainty (~20%).
+            note: Surface areas tabulated per sample (Init/Final area mm2 in Table 1). 1 mm samples excluded
+              from rates due to larger area uncertainty (~20%).
           locator:
             source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
             paragraph: surface area of each sample must be known; 2.5 and 6 mm samples
-            line_range: '107-122'
+            line_range: 107-122
             table: '1'
         cell_material:
           value: Ir wire loop (vacuum free-evap furnace; not Knudsen cell)
           locator:
             source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
             paragraph: iridium loop; Hashimoto high-temperature vacuum furnace
-            line_range: '105-107'
+            line_range: 105-107
     - observation_id: richter_2007_mg_rate_series_geometry
       type: rate_series
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
         figure: '2'
-        line_range: '183-191'
-      T_range_K: [1873.0, 2173.0]
+        line_range: 183-191
+      T_range_K:
+      - 1873.0
+      - 2173.0
       phase: silicate_melt_Type_B_CAI_like
       regime: langmuir_free_evaporation
       units: mol cm^-2 s^-1 (log10 scale in Fig. 2 OCR scatter)
       values:
         quantity: vacuum_evaporation_flux_J_Mg_vs_T
-        sample_diameters_mm_used: [2.5, 6.0]
+        sample_diameters_mm_used:
+        - 2.5
+        - 6.0
         figure_2_log10_J_approx:
-          - {T_C: 1900, log10_J_Mg: -6.6}
-          - {T_C: 1800, log10_J_Mg: -7.2}
-          - {T_C: 1700, log10_J_Mg: -7.9}
-          - {T_C: 1600, log10_J_Mg: -8.8}
+        - T_C: 1900
+          log10_J_Mg: -6.6
+        - T_C: 1800
+          log10_J_Mg: -7.2
+        - T_C: 1700
+          log10_J_Mg: -7.9
+        - T_C: 1600
+          log10_J_Mg: -8.8
         note: approximate OCR scatter digitization of Fig. 2; use Arrhenius J form for quantitative work
       equipment:
         sample_surface_area:
           value:
             method: measured_per_sample
-            sample_diameters_mm: [2.5, 6.0]
+            sample_diameters_mm:
+            - 2.5
+            - 6.0
           locator:
             source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
             figure: '2'
             line_range: '191'
+    - observation_id: richter_2007_mg_table1_numeric_areas_b1
+      type: rate_series
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+        table: '1'
+        paragraph: Init/Final area mm2 columns
+      T_range_K:
+      - 1973.15
+      - 2173.15
+      phase: silicate_melt_Type_B_CAI_like
+      regime: langmuir_free_evaporation
+      units: as published
+      values:
+        quantity: sample_surface_area_series
+        method_class: measured_direct
+        system_class: silicate_melt
+        samples:
+        - sample: R3-12
+          diam_mm: 2.5
+          T_C: 1900
+          init_area_mm2: 22.4
+          final_area_mm2: 21.3
+        - sample: R3-10
+          diam_mm: 2.5
+          T_C: 1900
+          init_area_mm2: 24.0
+          final_area_mm2: 18.9
+        - sample: R3-11
+          diam_mm: 2.5
+          T_C: 1900
+          init_area_mm2: 20.9
+          final_area_mm2: 15.9
+        - sample: R-8
+          diam_mm: 6.0
+          T_C: 1800
+          init_area_mm2: 87.5
+          final_area_mm2: 83.4
+        - sample: R-9
+          diam_mm: 6.0
+          T_C: 1800
+          init_area_mm2: 82.6
+          final_area_mm2: 76.6
+        - sample: R-11
+          diam_mm: 6.0
+          T_C: 1800
+          init_area_mm2: 91.3
+          final_area_mm2: 80.0
+        - sample: R2-4
+          diam_mm: 6.0
+          T_C: 1800
+          init_area_mm2: 88.5
+          final_area_mm2: 75.5
+        - sample: R-16
+          diam_mm: 1.0
+          T_C: 1800
+          init_area_mm2: 5.9
+          final_area_mm2: 5.8
+        area_uncertainty_pct: 10.0
+        note: Table 1 Init/Final area (mm2) for Ir wire-loop samples. 1 mm samples have ~20% area uncertainty;
+          rates often exclude them. Not Knudsen orifice geometry.
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+        - P_eq
+      equipment:
+        sample_surface_area:
+          value: 2.24e-05
+          units: m2
+          inferred: true
+          inference: A = 22.4 mm2 (R3-12 Init) * 1e-6 m2/mm2 = 2.24e-5 m2; full series in values.samples
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+            table: '1'
+            paragraph: R3-12 Init area 22.4 mm2
+        cell_material:
+          value: Ir wire loop (vacuum free-evap furnace; not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+            paragraph: iridium loops
   SiO:
     observations:
     - observation_id: richter_2007_sio_cai_langmuir_alpha_arrhenius
@@ -107,8 +201,10 @@ species:
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
         figure: '3'
-        line_range: '447-448'
-      T_range_K: [1873.0, 2173.0]
+        line_range: 447-448
+      T_range_K:
+      - 1873.0
+      - 2173.0
       phase: silicate_melt_Type_B_CAI_like
       standard_state: vacuum free evaporation; γ_Si for SiO(g)
       regime: langmuir_free_evaporation
@@ -130,19 +226,21 @@ species:
           E_J_per_mol: 576000.0
           E_uncertainty_J_per_mol: 36000.0
         missing_for_motzfeldt:
-          - orifice_area
-          - clausing_factor
+        - orifice_area
+        - clausing_factor
       uncertainty:
         E_uncertainty_J_per_mol: 37000.0
       equipment:
         sample_surface_area:
           value:
             method: equivalent_sphere_from_weight_and_thickness_on_Ir_loop
-            sample_diameters_mm: [2.5, 6.0]
+            sample_diameters_mm:
+            - 2.5
+            - 6.0
           locator:
             source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
             paragraph: 2.5 and 6 mm samples
-            line_range: '107-122'
+            line_range: 107-122
         cell_material:
           value: Ir wire loop (vacuum free-evap; not Knudsen orifice)
           locator:
@@ -181,3 +279,51 @@ fidelity_samples:
     source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
     line_range: '448'
     note: γo=25.3, E=92±37 kJ/mol for γ_Si
+- species: Mg
+  observable: rate_series
+  observation_id: richter_2007_mg_table1_numeric_areas_b1
+  field: samples
+  value:
+  - sample: R3-12
+    diam_mm: 2.5
+    T_C: 1900
+    init_area_mm2: 22.4
+    final_area_mm2: 21.3
+  - sample: R3-10
+    diam_mm: 2.5
+    T_C: 1900
+    init_area_mm2: 24.0
+    final_area_mm2: 18.9
+  - sample: R3-11
+    diam_mm: 2.5
+    T_C: 1900
+    init_area_mm2: 20.9
+    final_area_mm2: 15.9
+  - sample: R-8
+    diam_mm: 6.0
+    T_C: 1800
+    init_area_mm2: 87.5
+    final_area_mm2: 83.4
+  - sample: R-9
+    diam_mm: 6.0
+    T_C: 1800
+    init_area_mm2: 82.6
+    final_area_mm2: 76.6
+  - sample: R-11
+    diam_mm: 6.0
+    T_C: 1800
+    init_area_mm2: 91.3
+    final_area_mm2: 80.0
+  - sample: R2-4
+    diam_mm: 6.0
+    T_C: 1800
+    init_area_mm2: 88.5
+    final_area_mm2: 75.5
+  - sample: R-16
+    diam_mm: 1.0
+    T_C: 1800
+    init_area_mm2: 5.9
+    final_area_mm2: 5.8
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+    table: '1'

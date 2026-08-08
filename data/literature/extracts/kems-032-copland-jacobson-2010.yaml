@@ -1,9 +1,8 @@
 schema_version: literature_extract.v1
 source_id: kems-032-copland-jacobson-2010
 source:
-  citation: >-
-    Copland, E. H. & Jacobson, N. S. (2010), "Measuring Thermodynamic Properties
-    of Metals and Alloys With Knudsen Effusion Mass Spectrometry", NASA/TP—2010-216795
+  citation: Copland, E. H. & Jacobson, N. S. (2010), "Measuring Thermodynamic Properties of Metals and
+    Alloys With Knudsen Effusion Mass Spectrometry", NASA/TP—2010-216795
   url: https://ntrs.nasa.gov/citations/20110001597
   year: 2010
 extraction:
@@ -20,11 +19,10 @@ species:
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
         paragraph: Whitman-Motzfeld design example; cavity 10×7.6 mm; orifice 1.5×4.0 mm
-        line_range: '304-315'
+        line_range: 304-315
       phase: method_monograph
-      standard_state: >-
-        Authors' example KEMS cell geometry (not a measured Fe α). Regime is
-        Knudsen effusion method for metals/alloys.
+      standard_state: Authors' example KEMS cell geometry (not a measured Fe α). Regime is Knudsen effusion
+        method for metals/alloys.
       regime: kems_effusion
       units: as published
       values:
@@ -46,13 +44,12 @@ species:
           D: surface area of the bottom of the cell cavity
           alpha_v: vaporization coefficient
         missing_for_motzfeldt:
-          - clausing_factor_at_exact_L_over_r_5_333
-        missing_note: >-
-          Orifice diameter and channel length both stated (L/r = 4.0/0.75 = 5.333).
-          Table I lists Clausing at L/r = 0.1, 1, 2, 4, 10 only — no row at 5.333.
-          Do not invent Clausing by interpolation; use Table I as separate observation
-          or Ref. 27 tabulated values with explicit review. Pe/Pm = 1.005 is authors'
-          design-check at α_v=1 with Ref. 27 Clausing (not a published W for this orifice).
+        - clausing_factor_at_exact_L_over_r_5_333
+        missing_note: Orifice diameter and channel length both stated (L/r = 4.0/0.75 = 5.333). Table
+          I lists Clausing at L/r = 0.1, 1, 2, 4, 10 only — no row at 5.333. Do not invent Clausing by
+          interpolation; use Table I as separate observation or Ref. 27 tabulated values with explicit
+          review. Pe/Pm = 1.005 is authors' design-check at α_v=1 with Ref. 27 Clausing (not a published
+          W for this orifice).
       uncertainty:
         note: method design example; not experimental Fe species data
       equipment:
@@ -64,9 +61,8 @@ species:
           orifice_shape: channel
           L_over_r: 5.333333
           inferred: true
-          inference: >-
-            area = π (d/2)^2 from stated typical orifice diameter 1.5 mm;
-            channel length 4.0 mm also stated (L/r = 5.333)
+          inference: area = π (d/2)^2 from stated typical orifice diameter 1.5 mm; channel length 4.0
+            mm also stated (L/r = 5.333)
           locator:
             source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
             paragraph: typical orifice diameter 1.5 mm and length 4.0 mm
@@ -78,27 +74,26 @@ species:
           cavity_height_m: 0.0076
           role: Motzfeldt D (surface area of bottom of cell cavity)
           inferred: true
-          inference: >-
-            cavity floor area = π (d/2)^2 from stated cavity diameter 10 mm
-            (height 7.6 mm stated but not used for floor area). This is cell
-            cavity bottom D in Whitman–Motzfeld, not an independent free-melt
-            free-surface measurement.
+          inference: cavity floor area = π (d/2)^2 from stated cavity diameter 10 mm (height 7.6 mm stated
+            but not used for floor area). This is cell cavity bottom D in Whitman–Motzfeld, not an independent
+            free-melt free-surface measurement.
           locator:
             source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
             paragraph: cavity diameter 10 mm and height 7.6 mm
             line_range: '315'
         cell_material:
-          value: system-dependent (Table II examples include W, Ta, graphite, Y2O3, Al2O3, Si3N4; SiO2 studied in Ta with ZrO2 liners)
+          value: system-dependent (Table II examples include W, Ta, graphite, Y2O3, Al2O3, Si3N4; SiO2
+            studied in Ta with ZrO2 liners)
           locator:
             source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
-            table: 'II'
+            table: II
             line_range: '319'
     - observation_id: copland_2010_clausing_table_I_fe_package
       type: rate_series
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
-        table: 'I'
-        line_range: '292-294'
+        table: I
+        line_range: 292-294
       phase: method_monograph
       standard_state: Monte Carlo Clausing factors for cylindrical orifices (authors' Table I)
       regime: kems_effusion
@@ -107,16 +102,19 @@ species:
         quantity: clausing_factor_table
         method: Monte Carlo modeling (authors)
         points:
-          - {L_over_r: 0.1, clausing_factor: 0.9523}
-          - {L_over_r: 1.0, clausing_factor: 0.6720}
-          - {L_over_r: 2.0, clausing_factor: 0.5144}
-          - {L_over_r: 4.0, clausing_factor: 0.3566}
-          - {L_over_r: 10.0, clausing_factor: 0.1910}
-        note: >-
-          Clausing factors are calculated; agreement with experiment depends on
-          machining accuracy and molecular-flow conditions. Knife-edge (short)
-          orifices have Clausing near unity; channel orifices preferred for KEMS.
-          Table does not include authors' typical orifice L/r = 5.333 — no
+        - L_over_r: 0.1
+          clausing_factor: 0.9523
+        - L_over_r: 1.0
+          clausing_factor: 0.672
+        - L_over_r: 2.0
+          clausing_factor: 0.5144
+        - L_over_r: 4.0
+          clausing_factor: 0.3566
+        - L_over_r: 10.0
+          clausing_factor: 0.191
+        note: Clausing factors are calculated; agreement with experiment depends on machining accuracy
+          and molecular-flow conditions. Knife-edge (short) orifices have Clausing near unity; channel
+          orifices preferred for KEMS. Table does not include authors' typical orifice L/r = 5.333 — no
           invented interpolation.
       uncertainty:
         note: Monte Carlo tabulated; experimental Clausing not measured in this monograph
@@ -125,16 +123,119 @@ species:
           value:
             table: I
             points:
-              - {L_over_r: 0.1, W: 0.9523}
-              - {L_over_r: 1.0, W: 0.6720}
-              - {L_over_r: 2.0, W: 0.5144}
-              - {L_over_r: 4.0, W: 0.3566}
-              - {L_over_r: 10.0, W: 0.1910}
+            - L_over_r: 0.1
+              W: 0.9523
+            - L_over_r: 1.0
+              W: 0.672
+            - L_over_r: 2.0
+              W: 0.5144
+            - L_over_r: 4.0
+              W: 0.3566
+            - L_over_r: 10.0
+              W: 0.191
             note: partial — use nearest tabulated L/r only with explicit review; do not invent W at L/r=5.333
           locator:
             source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
-            table: 'I'
-            line_range: '292-294'
+            table: I
+            line_range: 292-294
+    - observation_id: copland_2010_clausing_table_I_verbatim_full_b1
+      type: gibbs_table
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+        table: I
+        line_range: 292-294
+        paragraph: CLAUSING FACTORS FOR DIFFERENT ORIFICES FROM MONTE CARLO MODELING
+      T_range_K:
+      - 300.0
+      - 300.0
+      phase: method_monograph
+      regime: kems_effusion
+      units: dimensionless
+      values:
+        quantity: clausing_factor_table_I_verbatim
+        method_class: method_only
+        method: Monte Carlo modeling (authors Table I)
+        points:
+        - L_over_r: 0.1
+          clausing_factor: 0.9523
+          avg_wall_collisions_returns: 1.0513
+          avg_wall_collisions_escapes: 0.0523
+          fraction_escapes_no_wall: 0.9048
+        - L_over_r: 1.0
+          clausing_factor: 0.672
+          avg_wall_collisions_returns: 1.587
+          avg_wall_collisions_escapes: 0.7136
+          fraction_escapes_no_wall: 0.3821
+        - L_over_r: 2.0
+          clausing_factor: 0.5144
+          avg_wall_collisions_returns: 2.2429
+          avg_wall_collisions_escapes: 1.7694
+          fraction_escapes_no_wall: 0.1718
+        - L_over_r: 4.0
+          clausing_factor: 0.3566
+          avg_wall_collisions_returns: 3.5742
+          avg_wall_collisions_escapes: 4.7624
+          fraction_escapes_no_wall: 0.0557
+        - L_over_r: 10.0
+          clausing_factor: 0.191
+          avg_wall_collisions_returns: 7.5607
+          avg_wall_collisions_escapes: 20.3455
+          fraction_escapes_no_wall: 0.0098
+        note: Full Table I verbatim including wall-collision columns. Do NOT interpolate to L/r=5.333
+          (typical orifice). Do NOT transplant these f values into another paper's equipment (F9).
+        interpolation_policy: REFUSED_WOULD_INVENT at unlisted L/r
+        cross_source_transplant_policy: BANNED
+    - observation_id: copland_2010_clausing_bare_float_L_over_r_1_b1
+      type: rate_series
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+        table: I
+        paragraph: L/r=1.0 row W=0.6720
+      T_range_K:
+      - 300.0
+      - 300.0
+      phase: method_monograph
+      regime: kems_effusion
+      units: as published
+      values:
+        quantity: clausing_factor_at_tabulated_L_over_r
+        method_class: method_only
+        L_over_r: 1.0
+        clausing_factor: 0.672
+        semantics: method_geometry_reference_not_measured_species_observation
+        note: Bare float at authors' tabulated L/r only. Not for cross-source transplant.
+      equipment:
+        clausing_factor:
+          value: 0.672
+          units: dimensionless
+          inferred: false
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+            table: I
+            paragraph: L/r=1.0 Clausing factor 0.6720
+        orifice_area:
+          value: 1.767146e-06
+          units: m2
+          inferred: true
+          inference: 'from typical orifice diameter 1.5 mm: A=pi*(0.00075)^2'
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+            paragraph: typical orifice diameter 1.5 mm
+            line_range: '315'
+        sample_surface_area:
+          value: 7.853982e-05
+          units: m2
+          inferred: true
+          inference: cavity floor from diameter 10 mm
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+            paragraph: cavity diameter 10 mm
+            line_range: '315'
+        cell_material:
+          value: method design example (material system-dependent)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+            table: II
   SiO:
     observations:
     - observation_id: copland_2010_kems_method_geometry_sio_package
@@ -142,12 +243,10 @@ species:
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
         paragraph: Whitman-Motzfeld design example; Table II lists SiO2 cell materials
-        line_range: '304-319'
+        line_range: 304-319
       phase: method_monograph
-      standard_state: >-
-        Method geometry package for SiO/silicate KEMS context. Table II cites
-        SiO2 studied in Ta with ZrO2 liners (Zmbov et al.) — not a Costa/De Maria
-        run geometry.
+      standard_state: Method geometry package for SiO/silicate KEMS context. Table II cites SiO2 studied
+        in Ta with ZrO2 liners (Zmbov et al.) — not a Costa/De Maria run geometry.
       regime: kems_effusion
       units: as published
       values:
@@ -162,11 +261,10 @@ species:
         orifice_L_over_r: 5.333333
         table_II_sio2_cell_material: Ta with ZrO2 liners (Zmbov et al. Ref. 41)
         missing_for_motzfeldt:
-          - clausing_factor_at_exact_L_over_r_5_333
-          - experimental_SiO_series_from_this_source
-        missing_note: >-
-          Same geometry partial as Fe package. Monograph provides Clausing
-          vocabulary + example dimensions; no SiO α or Psat measured here.
+        - clausing_factor_at_exact_L_over_r_5_333
+        - experimental_SiO_series_from_this_source
+        missing_note: Same geometry partial as Fe package. Monograph provides Clausing vocabulary + example
+          dimensions; no SiO α or Psat measured here.
       uncertainty:
         note: method monograph; not experimental SiO species data
       equipment:
@@ -178,9 +276,8 @@ species:
           orifice_shape: channel
           L_over_r: 5.333333
           inferred: true
-          inference: >-
-            area = π (d/2)^2 from stated typical orifice diameter 1.5 mm;
-            channel length 4.0 mm also stated
+          inference: area = π (d/2)^2 from stated typical orifice diameter 1.5 mm; channel length 4.0
+            mm also stated
           locator:
             source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
             paragraph: typical orifice diameter 1.5 mm and length 4.0 mm
@@ -197,10 +294,11 @@ species:
             paragraph: cavity diameter 10 mm and height 7.6 mm
             line_range: '315'
         cell_material:
-          value: Ta with ZrO2 liners (Table II entry for SiO2); general Table II also W, Ta, graphite, Y2O3, Al2O3
+          value: Ta with ZrO2 liners (Table II entry for SiO2); general Table II also W, Ta, graphite,
+            Y2O3, Al2O3
           locator:
             source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
-            table: 'II'
+            table: II
             line_range: '319'
         clausing_factor:
           value:
@@ -209,14 +307,12 @@ species:
               L_over_r: 4.0
               clausing_factor: 0.3566
             typical_orifice_L_over_r: 5.333333
-            note: >-
-              Nearest published Table I row is L/r=4.0 → W=0.3566; exact L/r=5.333
-              not tabulated — do not use nearest as if measured for the typical
-              orifice without explicit review.
+            note: Nearest published Table I row is L/r=4.0 → W=0.3566; exact L/r=5.333 not tabulated —
+              do not use nearest as if measured for the typical orifice without explicit review.
           locator:
             source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
-            table: 'I'
-            line_range: '292-294'
+            table: I
+            line_range: 292-294
 fidelity_samples:
 - species: Fe
   observable: rate_series
@@ -238,16 +334,21 @@ fidelity_samples:
     line_range: '315'
 - path: species.Fe.observations[copland_2010_clausing_table_I_fe_package].values.points
   value:
-    - {L_over_r: 0.1, clausing_factor: 0.9523}
-    - {L_over_r: 1.0, clausing_factor: 0.6720}
-    - {L_over_r: 2.0, clausing_factor: 0.5144}
-    - {L_over_r: 4.0, clausing_factor: 0.3566}
-    - {L_over_r: 10.0, clausing_factor: 0.1910}
+  - L_over_r: 0.1
+    clausing_factor: 0.9523
+  - L_over_r: 1.0
+    clausing_factor: 0.672
+  - L_over_r: 2.0
+    clausing_factor: 0.5144
+  - L_over_r: 4.0
+    clausing_factor: 0.3566
+  - L_over_r: 10.0
+    clausing_factor: 0.191
   note: Table I Monte Carlo Clausing factors (verbatim OCR table)
   locator:
     source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
-    table: 'I'
-    line_range: '292-294'
+    table: I
+    line_range: 292-294
 - species: SiO
   observable: rate_series
   observation_id: copland_2010_kems_method_geometry_sio_package
@@ -257,3 +358,44 @@ fidelity_samples:
     source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
     paragraph: typical orifice diameter 1.5 mm
     line_range: '315'
+- species: Fe
+  observable: gibbs_table
+  observation_id: copland_2010_clausing_table_I_verbatim_full_b1
+  field: points
+  value:
+  - L_over_r: 0.1
+    clausing_factor: 0.9523
+    avg_wall_collisions_returns: 1.0513
+    avg_wall_collisions_escapes: 0.0523
+    fraction_escapes_no_wall: 0.9048
+  - L_over_r: 1.0
+    clausing_factor: 0.672
+    avg_wall_collisions_returns: 1.587
+    avg_wall_collisions_escapes: 0.7136
+    fraction_escapes_no_wall: 0.3821
+  - L_over_r: 2.0
+    clausing_factor: 0.5144
+    avg_wall_collisions_returns: 2.2429
+    avg_wall_collisions_escapes: 1.7694
+    fraction_escapes_no_wall: 0.1718
+  - L_over_r: 4.0
+    clausing_factor: 0.3566
+    avg_wall_collisions_returns: 3.5742
+    avg_wall_collisions_escapes: 4.7624
+    fraction_escapes_no_wall: 0.0557
+  - L_over_r: 10.0
+    clausing_factor: 0.191
+    avg_wall_collisions_returns: 7.5607
+    avg_wall_collisions_escapes: 20.3455
+    fraction_escapes_no_wall: 0.0098
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+    table: I
+- species: Fe
+  observable: rate_series
+  observation_id: copland_2010_clausing_bare_float_L_over_r_1_b1
+  field: clausing_factor
+  value: 0.672
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+    table: I

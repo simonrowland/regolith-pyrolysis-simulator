@@ -21,14 +21,18 @@ species:
         table: '1'
         line_range: 279-281
         note: Table 1 selected α_v for solid Fe (OCR 'Ircn'); Wessel 1951
-      T_range_K: [1540.0, 1740.0]
+      T_range_K:
+      - 1540.0
+      - 1740.0
       phase: solid_polycrystalline
       standard_state: selected literature α_v from Langmuir-Knudsen comparison
       regime: langmuir_knudsen_comparison_review
       units: dimensionless
       values:
         alpha: 1.0
-        alpha_range: [0.8, 1.2]
+        alpha_range:
+        - 0.8
+        - 1.2
         gas_species: Fe(g)
         material: solid_Fe_polycrystalline
         technique: Langmuir-Knudsen
@@ -37,20 +41,26 @@ species:
         note: OCR table row 'Ircn, solid' — iron; α_v = 1±0.2
       uncertainty:
         note: ±0.2 as tabulated
-        alpha_range: [0.8, 1.2]
+        alpha_range:
+        - 0.8
+        - 1.2
     - observation_id: pound_1972_fe_solid_alpha_mccabe
       type: alpha
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-003-pound-1972/spool/out/kems-003-pound-1972/vlm/kems-003-pound-1972.md
         table: '1'
         line_range: 279-281
-      T_range_K: [1358.0, 1520.0]
+      T_range_K:
+      - 1358.0
+      - 1520.0
       phase: solid_polycrystalline
       regime: langmuir_knudsen_comparison_review
       units: dimensionless
       values:
         alpha: 0.9
-        alpha_range: [0.8, 1.0]
+        alpha_range:
+        - 0.8
+        - 1.0
         gas_species: Fe(g)
         material: Fisher_Electrolytic_Fe_solid
         technique: Langmuir-Knudsen
@@ -59,7 +69,9 @@ species:
           Separate Table 1 row from Chromium McCabe et al. [1956] (1318–1563 K, same α_v=0.9±0.1) — both
           rows are in the source (not a Fe/Cr misread).
       uncertainty:
-        alpha_range: [0.8, 1.0]
+        alpha_range:
+        - 0.8
+        - 1.0
     - observation_id: pound_1972_clausing_method_discussion
       type: rate_series
       locator:
@@ -95,6 +107,28 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-003-pound-1972/spool/out/kems-003-pound-1972/vlm/kems-003-pound-1972.md
             paragraph: Clausing factor; Burrows estimates proper consideration raises α to at least 0.5
             line_range: 23-74
+    - observation_id: pound_1972_fe_solid_class_b1
+      type: alpha
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-003-pound-1972/spool/out/kems-003-pound-1972/vlm/kems-003-pound-1972.md
+        table: '1'
+        paragraph: Langmuir-Knudsen flux ratio compilation
+      T_range_K:
+      - 1600.0
+      - 1800.0
+      phase: solid_Fe_metal
+      regime: langmuir_knudsen_comparison_review
+      units: dimensionless
+      values:
+        alpha: 1.0
+        gas_species: Fe(g)
+        material: solid_Fe
+        method_class: review_compilation
+        system_class: pure_element_condensed
+        transformation_class: congruent_no_transformation
+        interfacial_reaction: Fe(s) -> Fe(g)
+        semantics: competing_observation_do_not_average
+        note: Solid metal α; pure_element_condensed. Cr is rail's only tier-1 α (solid Cr).
   Cr:
     observations:
     - observation_id: pound_1972_cr_solid_alpha_mccabe
@@ -104,14 +138,18 @@ species:
         table: '1'
         line_range: '281'
         note: Table 1 Chromium, solid; McCabe et al. [1956]; OCR verified
-      T_range_K: [1318.0, 1563.0]
+      T_range_K:
+      - 1318.0
+      - 1563.0
       phase: solid_polycrystalline
       standard_state: selected literature α_v from Langmuir-Knudsen comparison
       regime: langmuir_knudsen_comparison_review
       units: dimensionless
       values:
         alpha: 0.9
-        alpha_range: [0.8, 1.0]
+        alpha_range:
+        - 0.8
+        - 1.0
         gas_species: Cr(g)
         material: 99.9_percent_polycrystalline_solid_chromium_A_D_Mackay
         technique: Langmuir-Knudsen
@@ -120,8 +158,32 @@ species:
           substance/T); pilot pound-1972-cr-langmuir-knudsen and pound-1972-mccabe-cr target this same
           row — not a conflict with Fe.'
       uncertainty:
-        alpha_range: [0.8, 1.0]
+        alpha_range:
+        - 0.8
+        - 1.0
         note: ±0.1 as tabulated
+    - observation_id: pound_1972_cr_solid_class_b1
+      type: alpha
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-003-pound-1972/spool/out/kems-003-pound-1972/vlm/kems-003-pound-1972.md
+        table: '1'
+        paragraph: Langmuir-Knudsen flux ratio compilation
+      T_range_K:
+      - 1318.0
+      - 1563.0
+      phase: solid_Cr_metal
+      regime: langmuir_knudsen_comparison_review
+      units: dimensionless
+      values:
+        alpha: 0.9
+        gas_species: Cr(g)
+        material: solid_Cr
+        method_class: review_compilation
+        system_class: pure_element_condensed
+        transformation_class: congruent_no_transformation
+        interfacial_reaction: Cr(s) -> Cr(g)
+        semantics: competing_observation_do_not_average
+        note: Solid metal α; pure_element_condensed. Cr is rail's only tier-1 α (solid Cr).
 fidelity_samples:
 - species: Fe
   observable: alpha
@@ -153,3 +215,19 @@ fidelity_samples:
     table: '1'
     paragraph: Chromium solid McCabe α_v = 0.9±0.1 (1318–1563 K)
     line_range: '281'
+- species: Cr
+  observable: alpha
+  observation_id: pound_1972_cr_solid_class_b1
+  field: alpha
+  value: 0.9
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-003-pound-1972/spool/out/kems-003-pound-1972/vlm/kems-003-pound-1972.md
+    table: '1'
+- species: Fe
+  observable: alpha
+  observation_id: pound_1972_fe_solid_class_b1
+  field: alpha
+  value: 1.0
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-003-pound-1972/spool/out/kems-003-pound-1972/vlm/kems-003-pound-1972.md
+    table: '1'

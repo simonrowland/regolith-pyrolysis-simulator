@@ -1,9 +1,8 @@
 schema_version: literature_extract.v1
 source_id: kems-015-hashimoto-1983
 source:
-  citation: >-
-    Hashimoto, A. (1983), "Evaporation metamorphism in the early solar nebula —
-    evaporation experiments on the melt FeO-MgO-SiO2-CaO-Al2O3", Geochem. J. 17:111-145
+  citation: Hashimoto, A. (1983), "Evaporation metamorphism in the early solar nebula — evaporation experiments
+    on the melt FeO-MgO-SiO2-CaO-Al2O3", Geochem. J. 17:111-145
   year: 1983
 extraction:
   method: OCR-artifact transcription (MinerU vlm) + phase-2 free-evap geometry extract
@@ -19,9 +18,11 @@ species:
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
         section: EXPERIMENTS
-        line_range: '33-90'
+        line_range: 33-90
         figure: '1'
-      T_range_K: [1973.0, 2273.0]
+      T_range_K:
+      - 1973.0
+      - 2273.0
       phase: silicate_melt_FCMAS_solar_abundance
       standard_state: vacuum free evaporation of multicomponent melt (not Knudsen cell)
       regime: langmuir_free_evaporation
@@ -34,28 +35,30 @@ species:
         starting_tube_hole_mm: 1.2
         starting_tube_hole_note: sample preform hole — NOT Knudsen cell orifice
         recovered_form: single_spherule
-        vacuum_during_run_Torr: 1.0e-4
-        max_vacuum_Torr: 7.0e-8
+        vacuum_during_run_Torr: 0.0001
+        max_vacuum_Torr: 7.0e-08
         missing_for_motzfeldt:
-          - orifice_area
-          - clausing_factor
-          - numeric_spherule_surface_area_series
-        missing_note: >-
-          Free-evap graphite crucible; sample forms molten spherule. Surface area of
-          spherule used for rates but per-run numeric As not tabulated in OCR text
-          (scale ~1 mm in Fig. 2). Do not invent Clausing or Knudsen orifice.
+        - orifice_area
+        - clausing_factor
+        - numeric_spherule_surface_area_series
+        missing_note: Free-evap graphite crucible; sample forms molten spherule. Surface area of spherule
+          used for rates but per-run numeric As not tabulated in OCR text (scale ~1 mm in Fig. 2). Do
+          not invent Clausing or Knudsen orifice.
       equipment:
         cell_material:
           value: high-purity graphite crucible (atomic-pile grade block)
           locator:
             source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
             paragraph: Graphite crucible; high purity graphite block
-            line_range: '70-74'
+            line_range: 70-74
             figure: '1'
         sample_surface_area:
           value:
             form: molten_spherule
-            starting_preform_mm: {height: 4.0, diameter: 4.0, hole_diameter: 1.2}
+            starting_preform_mm:
+              height: 4.0
+              diameter: 4.0
+              hole_diameter: 1.2
             numeric_m2_series: null
             note: recovered single spherules; free surface of melt droplet
           locator:
@@ -63,13 +66,65 @@ species:
             paragraph: All the recovered samples were single spherules
             line_range: '90'
         chamber_pressure:
-          value: 1.0e-4
+          value: 0.0001
           units: Torr
           note: vacuum level during experiments ~10^-4 Torr; max pump vacuum 7e-8 Torr
           locator:
             source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
             paragraph: Vacuum was kept by diffusion pump; vacuum level about 10^-4 Torr during experiments
-            line_range: '80-160'
+            line_range: 80-160
+    - observation_id: hashimoto_1983_fe_geometry_class_b1
+      type: rate_series
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        paragraph: molten spherule free evaporation graphite crucible
+      T_range_K:
+      - 1973.0
+      - 2273.0
+      phase: silicate_melt_FCMAS
+      regime: langmuir_free_evaporation
+      units: as published
+      values:
+        quantity: free_evap_rate_geometry
+        method_class: measured_direct
+        system_class: silicate_melt
+        transformation_class: redox_reduction_required
+        interfacial_reaction: FeO(melt) -> Fe(g) + 1/2 O2
+        semantics: competing_observation_do_not_average
+        primary_behind_fedkin: true
+        starting_preform_mm:
+          height: 4.0
+          diameter: 4.0
+          hole_diameter: 1.2
+        note: 'Primary free-evap experiment behind Fedkin Fe/Mg/SiO α. Spherule free surface evolves with
+          mass loss; starting preform given; per-run free-surface series not tabulated as numeric m2 series
+          — ABSENT_NOT_NUMERIC for Motzfeldt (not a Knudsen cell). Sphere estimate from starting dia 4
+          mm: 4*pi*r^2 = 5.02655e-05 m2 (rough upper bound only).'
+        sample_surface_area_estimate_m2: 5.02655e-05
+        sample_surface_area_status: ABSENT_NOT_NUMERIC_series_sphere_estimate_only
+      equipment:
+        cell_material:
+          value: high-purity graphite crucible (atomic-pile grade)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+            paragraph: graphite crucible
+        sample_surface_area:
+          value: 5.02655e-05
+          units: m2
+          inferred: true
+          inference: rough sphere A=4*pi*r^2 with r=2 mm starting preform diameter 4 mm => 5.02655e-05
+            m2; NOT measured free surface series
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+            paragraph: starting preform height 4 mm diameter 4 mm
+        chamber_pressure:
+          value: 0.0013
+          units: Pa
+          inferred: true
+          inference: 1.3e-8 bar * 1e5 Pa/bar = 1.3e-3 Pa (from Fedkin citation of Hashimoto apparatus)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+            paragraph: Prior to evaporation, the pressure in the chamber was 1.3e-8 bar
   Mg:
     observations:
     - observation_id: hashimoto_1983_mg_fcmas_free_evap_geometry
@@ -77,8 +132,10 @@ species:
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
         section: EXPERIMENTS
-        line_range: '33-90'
-      T_range_K: [1973.0, 2273.0]
+        line_range: 33-90
+      T_range_K:
+      - 1973.0
+      - 2273.0
       phase: silicate_melt_FCMAS_solar_abundance
       regime: langmuir_free_evaporation
       units: as published
@@ -86,15 +143,15 @@ species:
         quantity: free_evap_MgO_loss_with_VF
         material: FeO-MgO-SiO2-CaO-Al2O3
         missing_for_motzfeldt:
-          - orifice_area
-          - clausing_factor
+        - orifice_area
+        - clausing_factor
       equipment:
         cell_material:
           value: graphite crucible
           locator:
             source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
             paragraph: Graphite crucible
-            line_range: '70-74'
+            line_range: 70-74
         sample_surface_area:
           value:
             form: molten_spherule
@@ -103,6 +160,58 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
             paragraph: single spherules
             line_range: '90'
+    - observation_id: hashimoto_1983_mg_geometry_class_b1
+      type: rate_series
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        paragraph: molten spherule free evaporation graphite crucible
+      T_range_K:
+      - 1973.0
+      - 2273.0
+      phase: silicate_melt_FCMAS
+      regime: langmuir_free_evaporation
+      units: as published
+      values:
+        quantity: free_evap_rate_geometry
+        method_class: measured_direct
+        system_class: silicate_melt
+        transformation_class: redox_reduction_required
+        interfacial_reaction: MgO(melt) -> Mg(g) + 1/2 O2
+        semantics: competing_observation_do_not_average
+        primary_behind_fedkin: true
+        starting_preform_mm:
+          height: 4.0
+          diameter: 4.0
+          hole_diameter: 1.2
+        note: 'Primary free-evap experiment behind Fedkin Fe/Mg/SiO α. Spherule free surface evolves with
+          mass loss; starting preform given; per-run free-surface series not tabulated as numeric m2 series
+          — ABSENT_NOT_NUMERIC for Motzfeldt (not a Knudsen cell). Sphere estimate from starting dia 4
+          mm: 4*pi*r^2 = 5.02655e-05 m2 (rough upper bound only).'
+        sample_surface_area_estimate_m2: 5.02655e-05
+        sample_surface_area_status: ABSENT_NOT_NUMERIC_series_sphere_estimate_only
+      equipment:
+        cell_material:
+          value: high-purity graphite crucible (atomic-pile grade)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+            paragraph: graphite crucible
+        sample_surface_area:
+          value: 5.02655e-05
+          units: m2
+          inferred: true
+          inference: rough sphere A=4*pi*r^2 with r=2 mm starting preform diameter 4 mm => 5.02655e-05
+            m2; NOT measured free surface series
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+            paragraph: starting preform height 4 mm diameter 4 mm
+        chamber_pressure:
+          value: 0.0013
+          units: Pa
+          inferred: true
+          inference: 1.3e-8 bar * 1e5 Pa/bar = 1.3e-3 Pa (from Fedkin citation of Hashimoto apparatus)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+            paragraph: Prior to evaporation, the pressure in the chamber was 1.3e-8 bar
   SiO:
     observations:
     - observation_id: hashimoto_1983_sio_fcmas_free_evap_geometry
@@ -110,8 +219,10 @@ species:
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
         section: EXPERIMENTS
-        line_range: '33-90'
-      T_range_K: [1973.0, 2273.0]
+        line_range: 33-90
+      T_range_K:
+      - 1973.0
+      - 2273.0
       phase: silicate_melt_FCMAS_solar_abundance
       regime: langmuir_free_evaporation
       units: as published
@@ -120,15 +231,67 @@ species:
         gas_species: SiO(g)
         material: FeO-MgO-SiO2-CaO-Al2O3
         missing_for_motzfeldt:
-          - orifice_area
-          - clausing_factor
+        - orifice_area
+        - clausing_factor
       equipment:
         cell_material:
           value: graphite crucible
           locator:
             source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
             paragraph: Graphite crucible
-            line_range: '70-74'
+            line_range: 70-74
+    - observation_id: hashimoto_1983_sio_geometry_class_b1
+      type: rate_series
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        paragraph: molten spherule free evaporation graphite crucible
+      T_range_K:
+      - 1973.0
+      - 2273.0
+      phase: silicate_melt_FCMAS
+      regime: langmuir_free_evaporation
+      units: as published
+      values:
+        quantity: free_evap_rate_geometry
+        method_class: measured_direct
+        system_class: silicate_melt
+        transformation_class: network_former_dissociation
+        interfacial_reaction: SiO2(melt) -> SiO(g) + 1/2 O2
+        semantics: competing_observation_do_not_average
+        primary_behind_fedkin: true
+        starting_preform_mm:
+          height: 4.0
+          diameter: 4.0
+          hole_diameter: 1.2
+        note: 'Primary free-evap experiment behind Fedkin Fe/Mg/SiO α. Spherule free surface evolves with
+          mass loss; starting preform given; per-run free-surface series not tabulated as numeric m2 series
+          — ABSENT_NOT_NUMERIC for Motzfeldt (not a Knudsen cell). Sphere estimate from starting dia 4
+          mm: 4*pi*r^2 = 5.02655e-05 m2 (rough upper bound only).'
+        sample_surface_area_estimate_m2: 5.02655e-05
+        sample_surface_area_status: ABSENT_NOT_NUMERIC_series_sphere_estimate_only
+      equipment:
+        cell_material:
+          value: high-purity graphite crucible (atomic-pile grade)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+            paragraph: graphite crucible
+        sample_surface_area:
+          value: 5.02655e-05
+          units: m2
+          inferred: true
+          inference: rough sphere A=4*pi*r^2 with r=2 mm starting preform diameter 4 mm => 5.02655e-05
+            m2; NOT measured free surface series
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+            paragraph: starting preform height 4 mm diameter 4 mm
+        chamber_pressure:
+          value: 0.0013
+          units: Pa
+          inferred: true
+          inference: 1.3e-8 bar * 1e5 Pa/bar = 1.3e-3 Pa (from Fedkin citation of Hashimoto apparatus)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+            paragraph: Prior to evaporation, the pressure in the chamber was 1.3e-8 bar
 fidelity_samples:
 - species: Fe
   observable: rate_series
@@ -143,8 +306,32 @@ fidelity_samples:
   observable: rate_series
   observation_id: hashimoto_1983_fe_fcmas_free_evap_geometry
   field: vacuum_during_run_Torr
-  value: 1.0e-4
+  value: 0.0001
   locator:
     source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
     paragraph: vacuum level in the chamber was about 10^-4 Torr during the experiments
     line_range: '160'
+- species: Fe
+  observable: rate_series
+  observation_id: hashimoto_1983_fe_geometry_class_b1
+  field: sample_surface_area_estimate_m2
+  value: 5.02655e-05
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+    paragraph: preform diameter 4 mm
+- species: Mg
+  observable: rate_series
+  observation_id: hashimoto_1983_mg_geometry_class_b1
+  field: sample_surface_area_estimate_m2
+  value: 5.02655e-05
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+    paragraph: preform diameter 4 mm
+- species: SiO
+  observable: rate_series
+  observation_id: hashimoto_1983_sio_geometry_class_b1
+  field: sample_surface_area_estimate_m2
+  value: 5.02655e-05
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+    paragraph: preform diameter 4 mm

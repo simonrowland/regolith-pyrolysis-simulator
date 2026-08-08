@@ -21,14 +21,18 @@ species:
         source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
         table: '3'
         line_range: 186-197
-      T_range_K: [1973.0, 2273.0]
+      T_range_K:
+      - 1973.0
+      - 2273.0
       phase: silicate_melt
       standard_state: MELTS activities for P_sat; free-evaporation α for Fe(g) from Hashimoto 1983
       regime: langmuir_free_evaporation
       units: dimensionless
       values:
         alpha: 0.24
-        alpha_range: [0.21, 0.27]
+        alpha_range:
+        - 0.21
+        - 0.27
         gas_species: Fe(g)
         material: Hashimoto_1983_FCMAS_silicate_melt
         per_temperature:
@@ -50,13 +54,45 @@ species:
         missing_note: Models Hashimoto free-evap graphite-crucible vacuum runs — not Knudsen geometry.
       uncertainty:
         note: ±0.02 on α_Fe from visual fit envelope (authors)
-        alpha_range: [0.21, 0.27]
+        alpha_range:
+        - 0.21
+        - 0.27
       equipment:
         cell_material:
           value: graphite crucible (cited Hashimoto 1983 apparatus)
           locator:
             source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
             paragraph: graphite crucible in a vacuum chamber
+            line_range: '171'
+    - observation_id: fedkin_2006_fe_class_b1
+      type: alpha
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+        table: '3'
+        line_range: 186-197
+      T_range_K:
+      - 1973.0
+      - 2273.0
+      phase: silicate_melt_FCMAS_chondrule_analog
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      values:
+        alpha: 0.24
+        gas_species: Fe(g)
+        material: Hashimoto 1983 FCMAS
+        method_class: model_derived
+        system_class: silicate_melt
+        transformation_class: redox_reduction_required
+        interfacial_reaction: FeO(melt) -> Fe(g) + 1/2 O2
+        transformation_class_confidence: high
+        semantics: competing_observation_do_not_average
+        note: Table 3 mid Fe; method_class model_derived over Hashimoto vacuum free-evap
+      equipment:
+        cell_material:
+          value: graphite crucible (Hashimoto 1983)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+            paragraph: apparatus of primary experiment
             line_range: '171'
   Mg:
     observations:
@@ -66,7 +102,9 @@ species:
         source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
         table: '3'
         line_range: 186-197
-      T_range_K: [1973.0, 2273.0]
+      T_range_K:
+      - 1973.0
+      - 2273.0
       phase: silicate_melt
       regime: langmuir_free_evaporation
       units: dimensionless
@@ -88,6 +126,36 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
             paragraph: graphite crucible in a vacuum chamber
             line_range: '171'
+    - observation_id: fedkin_2006_mg_class_b1
+      type: alpha
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+        table: '3'
+        line_range: 186-197
+      T_range_K:
+      - 1973.0
+      - 2273.0
+      phase: silicate_melt_FCMAS_chondrule_analog
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      values:
+        alpha: 0.24
+        gas_species: Mg(g)
+        material: Hashimoto 1983 FCMAS
+        method_class: model_derived
+        system_class: silicate_melt
+        transformation_class: redox_reduction_required
+        interfacial_reaction: MgO(melt) -> Mg(g) + 1/2 O2
+        transformation_class_confidence: high
+        semantics: competing_observation_do_not_average
+        note: Table 3 Mg ~0.24–0.28; redox step for monatomic Mg from oxide melt
+      equipment:
+        cell_material:
+          value: graphite crucible (Hashimoto 1983)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+            paragraph: apparatus of primary experiment
+            line_range: '171'
   SiO:
     observations:
     - observation_id: fedkin_2006_sio_hashimoto_langmuir_table3
@@ -96,7 +164,9 @@ species:
         source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
         table: '3'
         line_range: 186-197
-      T_range_K: [1973.0, 2273.0]
+      T_range_K:
+      - 1973.0
+      - 2273.0
       phase: silicate_melt
       regime: langmuir_free_evaporation
       units: dimensionless
@@ -117,6 +187,74 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
             paragraph: graphite crucible
             line_range: '171'
+    - observation_id: fedkin_2006_sio_hashimoto_table3_complete_b1
+      type: alpha
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+        table: '3'
+        line_range: 186-197
+        note: Table 3 SiO this-work column complete
+      T_range_K:
+      - 1973.0
+      - 2273.0
+      phase: silicate_melt_FCMAS_chondrule_analog
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      values:
+        alpha: 0.17
+        alpha_range:
+        - 0.11
+        - 0.22
+        gas_species: SiO(g)
+        material: Hashimoto_1983_FCMAS_silicate_melt
+        method_class: model_derived
+        primary_experiment: Hashimoto 1983 vacuum free evaporation graphite crucible
+        model_paper: Fedkin et al. 2006 MELTS + Hertz-Knudsen fit
+        system_class: silicate_melt
+        transformation_class: network_former_dissociation
+        interfacial_reaction: SiO2(melt) -> SiO(g) + 1/2 O2
+        semantics: competing_observation_do_not_average
+        supersedes_placeholder_observation_id: fedkin_2006_sio_hashimoto_langmuir_table3
+        per_temperature:
+        - T_K: 1973.0
+          alpha: 0.12
+          sigma: 0.01
+        - T_K: 2073.0
+          alpha: 0.17
+          sigma: 0.01
+        - T_K: 2173.0
+          alpha: 0.2
+          sigma: 0.01
+        - T_K: 2273.0
+          alpha: 0.21
+          sigma: 0.01
+        note: 'Table 3 this-work SiO row: 0.12/0.17/0.20/0.21 ±0.01 at 1973–2273 K. Authors note progressive
+          increase with T. Mid-range pin alpha=0.17 at 2073 K.'
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+        - P_eq
+        missing_note: Vacuum free-evap model over Hashimoto rates — not Knudsen geometry.
+      uncertainty:
+        note: ±0.01 authors visual fit envelope
+        alpha_range:
+        - 0.11
+        - 0.22
+      equipment:
+        cell_material:
+          value: graphite crucible (Hashimoto 1983 apparatus, cited)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+            paragraph: graphite crucible in a vacuum chamber
+            line_range: '171'
+        chamber_pressure:
+          value: 1.3e-08
+          units: bar
+          note: Hashimoto chamber pressure prior to evaporation (Fedkin §4.1)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+            paragraph: Prior to evaporation, the pressure in the chamber was 1.3e-8 bar
+            section: '4.1'
   Na:
     observations:
     - observation_id: fedkin_2006_na_yu_langmuir
@@ -125,19 +263,63 @@ species:
         source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
         figure: '4'
         line_range: 241-243
-      T_range_K: [1723.15, 1723.15]
+      T_range_K:
+      - 1723.15
+      - 1723.15
       phase: silicate_melt
       standard_state: MELTS Na2SiO3 activity; monatomic Na(g); models Yu et al. 2003
       regime: langmuir_free_evaporation
       units: dimensionless
       values:
         alpha: 0.26
-        alpha_range: [0.21, 0.31]
+        alpha_range:
+        - 0.21
+        - 0.31
         gas_species: Na(g)
         material: Yu_et_al_2003_chondrule_analog
         note: Alexander (2002) got α_Na=0.12 on same data — competing; retain Fedkin value
       uncertainty:
-        alpha_range: [0.21, 0.31]
+        alpha_range:
+        - 0.21
+        - 0.31
+    - observation_id: fedkin_2006_na_class_b1
+      type: alpha
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+        figure: '4'
+        line_range: 241-243
+      T_range_K:
+      - 1723.15
+      - 1723.15
+      phase: silicate_melt_chondrule_analog_Yu2003
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      values:
+        alpha: 0.26
+        gas_species: Na(g)
+        material: Yu et al. 2003 chondrule analog vacuum free-evap
+        method_class: model_derived
+        system_class: silicate_melt
+        transformation_class: network_modifier_desorption
+        interfacial_reaction: Na2O(melt) -> 2Na(g) + 1/2 O2
+        transformation_class_confidence: low
+        semantics: competing_observation_do_not_average
+        note: 'α_Na=0.26±0.05 @1723 K vacuum; model_derived. transformation_class_confidence low: alkali
+          may be activity-dominated (see note).'
+        alpha_range:
+        - 0.21
+        - 0.31
+      equipment:
+        cell_material:
+          value: graphite crucible (Hashimoto) / vacuum free-evap (Yu)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+            paragraph: apparatus of primary experiment
+            line_range: '171'
+      uncertainty:
+        alpha_range:
+        - 0.21
+        - 0.31
   K:
     observations:
     - observation_id: fedkin_2006_k_yu_langmuir
@@ -146,18 +328,62 @@ species:
         source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
         figure: '4'
         line_range: 241-243
-      T_range_K: [1723.15, 1723.15]
+      T_range_K:
+      - 1723.15
+      - 1723.15
       phase: silicate_melt
       regime: langmuir_free_evaporation
       units: dimensionless
       values:
         alpha: 0.13
-        alpha_range: [0.11, 0.15]
+        alpha_range:
+        - 0.11
+        - 0.15
         gas_species: K(g)
         material: Yu_et_al_2003_chondrule_analog
       uncertainty:
         note: α_K=0.13±0.02 (authors)
-        alpha_range: [0.11, 0.15]
+        alpha_range:
+        - 0.11
+        - 0.15
+    - observation_id: fedkin_2006_k_class_b1
+      type: alpha
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+        figure: '4'
+        line_range: 241-243
+      T_range_K:
+      - 1723.15
+      - 1723.15
+      phase: silicate_melt_chondrule_analog_Yu2003
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      values:
+        alpha: 0.13
+        gas_species: K(g)
+        material: Yu et al. 2003 chondrule analog vacuum free-evap
+        method_class: model_derived
+        system_class: silicate_melt
+        transformation_class: network_modifier_desorption
+        interfacial_reaction: K2O(melt) -> 2K(g) + 1/2 O2
+        transformation_class_confidence: low
+        semantics: competing_observation_do_not_average
+        note: α_K=0.13±0.02 @1723 K vacuum; model_derived. NOT KEMS.
+        alpha_range:
+        - 0.11
+        - 0.15
+      equipment:
+        cell_material:
+          value: graphite crucible (Hashimoto) / vacuum free-evap (Yu)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+            paragraph: apparatus of primary experiment
+            line_range: '171'
+      uncertainty:
+        note: α_K=0.13±0.02
+        alpha_range:
+        - 0.11
+        - 0.15
 fidelity_samples:
 - species: Fe
   observable: alpha
@@ -178,3 +404,44 @@ fidelity_samples:
     source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
     paragraph: α_K=0.13±0.02
     line_range: '243'
+- species: SiO
+  observable: alpha
+  observation_id: fedkin_2006_sio_hashimoto_table3_complete_b1
+  field: alpha
+  value: 0.17
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+    table: '3'
+    note: SiO this-work 2073 K = 0.17±0.01
+- species: Fe
+  observable: alpha
+  observation_id: fedkin_2006_fe_class_b1
+  field: alpha
+  value: 0.24
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+    note: B1 class-tag pin Fe=0.24
+- species: Mg
+  observable: alpha
+  observation_id: fedkin_2006_mg_class_b1
+  field: alpha
+  value: 0.24
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+    note: B1 class-tag pin Mg=0.24
+- species: Na
+  observable: alpha
+  observation_id: fedkin_2006_na_class_b1
+  field: alpha
+  value: 0.26
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+    note: B1 class-tag pin Na=0.26
+- species: K
+  observable: alpha
+  observation_id: fedkin_2006_k_class_b1
+  field: alpha
+  value: 0.13
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+    note: B1 class-tag pin K=0.13

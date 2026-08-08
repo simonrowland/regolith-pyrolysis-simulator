@@ -1,17 +1,14 @@
 schema_version: literature_extract.v1
 source_id: kems-002-ohno-1967
 source:
-  citation: >-
-    Ohno, R. & Ishida, T. (1967), "Rate of Evaporation of Mn, Cu, Sn, Cr and S
-    from Molten Iron under Vacuum", J. Japan Inst. Metals 31:1164–1169,
-    DOI 10.2320/jinstmet1952.31.10_1164
+  citation: Ohno, R. & Ishida, T. (1967), "Rate of Evaporation of Mn, Cu, Sn, Cr and S from Molten Iron
+    under Vacuum", J. Japan Inst. Metals 31:1164–1169, DOI 10.2320/jinstmet1952.31.10_1164
   doi: 10.2320/jinstmet1952.31.10_1164
   url: https://www.jstage.jst.go.jp/article/jinstmet1952/31/10/31_10_1164/_pdf
   year: 1967
 extraction:
-  method: >-
-    OCR-artifact transcription (MinerU vlm of scanned J-STAGE PDF) + t-544
-    langmuir-ingest pilot table extract. PDF has no usable text layer.
+  method: OCR-artifact transcription (MinerU vlm of scanned J-STAGE PDF) + t-544 langmuir-ingest pilot
+    table extract. PDF has no usable text layer.
   date: '2026-08-07'
   worker: langmuir-ingest-gr-t544
   provenance_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/
@@ -24,8 +21,10 @@ species:
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
         table: '1'
-        line_range: '8157-8200'
-      T_range_K: [1873.15, 1873.15]
+        line_range: 8157-8200
+      T_range_K:
+      - 1873.15
+      - 1873.15
       phase: liquid_Fe_Mn_alloy
       standard_state: Vacuum HF induction; first-order K_B^S at 1600 °C
       regime: vacuum_induction_free_evaporation_steel_melt
@@ -33,24 +32,37 @@ species:
       values:
         quantity: specific_evaporation_constant_K_B_S
         T_C: 1600
-        K_V_cm_s: 8.80e-2
+        K_V_cm_s: 0.088
         series:
-          - {melt: '6602-17', pct_B0: 0.86, K_B_S: 8.3e-3, C_s_over_C_m: 0.10, K_D: 9.2e-3}
-          - {melt: '6603-13', pct_B0: 1.55, K_B_S: 8.3e-3, C_s_over_C_m: 0.09, K_D: 9.1e-3}
-          - {melt: '6603-14', pct_B0: 2.63, K_B_S: 8.6e-3, C_s_over_C_m: 0.10, K_D: 9.5e-3}
+        - melt: 6602-17
+          pct_B0: 0.86
+          K_B_S: 0.0083
+          C_s_over_C_m: 0.1
+          K_D: 0.0092
+        - melt: 6603-13
+          pct_B0: 1.55
+          K_B_S: 0.0083
+          C_s_over_C_m: 0.09
+          K_D: 0.0091
+        - melt: 6603-14
+          pct_B0: 2.63
+          K_B_S: 0.0086
+          C_s_over_C_m: 0.1
+          K_D: 0.0095
         gas_species: Mn(g)
         material: molten_Fe_Mn
       equipment:
         cell_material:
-          value: commercial alumina crucible CP-2 (ID 38 mm, OD 49 mm, height 30 mm — shortened vs Homma 1966)
+          value: commercial alumina crucible CP-2 (ID 38 mm, OD 49 mm, height 30 mm — shortened vs Homma
+            1966)
           locator:
             source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
             paragraph: るつぼ (CP-2) の寸法は内径 38 mm
-            line_range: 'experimental method'
+            line_range: experimental method
         chamber_pressure:
-          value: 1.0e-2
+          value: 0.01
           units: mmHg
-          note: '10^{-2}–10^{-3} mmHg during vacuum hold'
+          note: 10^{-2}–10^{-3} mmHg during vacuum hold
           locator:
             source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
             paragraph: 溶解中の真空度は 10^{-2} ~ 10^{-3} mmHg
@@ -60,28 +72,50 @@ species:
         source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
         table: '3'
         paragraph: Evaporation coefficients of Mn, Cu, Sn, Cr and S in molten iron
-      T_range_K: [1873.15, 1873.15]
+      T_range_K:
+      - 1873.15
+      - 1873.15
       phase: liquid_Fe_Mn_alloy
-      standard_state: >-
-        Olette relative evaporation coefficient α_B (eq. 4–5) — NOT the
-        Hertz–Knudsen–Langmuir coefficient (0–1). Values ≫1 expected.
+      standard_state: Olette relative evaporation coefficient α_B (eq. 4–5) — NOT the Hertz–Knudsen–Langmuir
+        coefficient (0–1). Values ≫1 expected.
       regime: olette_relative_evaporation_coefficient
       units: dimensionless
       values:
         alpha: 121.0
         alpha_note: 5 min experimental pin melt 6602-17
         olette_alpha_exp_series:
-          - {melt: '6602-17', t_min: 5, alpha_exp: 121}
-          - {melt: '6602-17', t_min: 10, alpha_exp: 94}
-          - {melt: '6602-17', t_min: 15, alpha_exp: 99}
-          - {melt: '6603-13', t_min: 5, alpha_exp: 94}
-          - {melt: '6603-13', t_min: 10, alpha_exp: 84}
-          - {melt: '6603-13', t_min: 15, alpha_exp: 71}
-          - {melt: '6603-14', t_min: 5, alpha_exp: 155}
-          - {melt: '6603-14', t_min: 10, alpha_exp: 146}
-          - {melt: '6603-14', t_min: 15, alpha_exp: 100}
+        - melt: 6602-17
+          t_min: 5
+          alpha_exp: 121
+        - melt: 6602-17
+          t_min: 10
+          alpha_exp: 94
+        - melt: 6602-17
+          t_min: 15
+          alpha_exp: 99
+        - melt: 6603-13
+          t_min: 5
+          alpha_exp: 94
+        - melt: 6603-13
+          t_min: 10
+          alpha_exp: 84
+        - melt: 6603-13
+          t_min: 15
+          alpha_exp: 71
+        - melt: 6603-14
+          t_min: 5
+          alpha_exp: 155
+        - melt: 6603-14
+          t_min: 10
+          alpha_exp: 146
+        - melt: 6603-14
+          t_min: 15
+          alpha_exp: 100
         olette_alpha_theo: 1095
-        lambda_Mn_by_melt: { '6602-17': 104, '6603-13': 103, '6603-14': 106 }
+        lambda_Mn_by_melt:
+          6602-17: 104
+          6603-13: 103
+          6603-14: 106
         not_hkl_langmuir_coefficient: true
         gas_species: Mn(g)
         material: molten_Fe_Mn
@@ -92,18 +126,32 @@ species:
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
         table: '1'
-      T_range_K: [1873.15, 1873.15]
+      T_range_K:
+      - 1873.15
+      - 1873.15
       phase: liquid_Fe_Cu_alloy
       regime: vacuum_induction_free_evaporation_steel_melt
       units: cm_s-1
       values:
         quantity: specific_evaporation_constant_K_B_S
         T_C: 1600
-        K_V_cm_s: 1.16e-2
+        K_V_cm_s: 0.0116
         series:
-          - {melt: '6602-15', pct_B0: 0.94, K_B_S: 4.9e-3, C_s_over_C_m: 0.43, K_D: 8.6e-3}
-          - {melt: '6603-15', pct_B0: 1.92, K_B_S: 4.4e-3, C_s_over_C_m: 0.38, K_D: 7.1e-3}
-          - {melt: '6603-16', pct_B0: 2.90, K_B_S: 5.2e-3, C_s_over_C_m: 0.45, K_D: 9.5e-3}
+        - melt: 6602-15
+          pct_B0: 0.94
+          K_B_S: 0.0049
+          C_s_over_C_m: 0.43
+          K_D: 0.0086
+        - melt: 6603-15
+          pct_B0: 1.92
+          K_B_S: 0.0044
+          C_s_over_C_m: 0.38
+          K_D: 0.0071
+        - melt: 6603-16
+          pct_B0: 2.9
+          K_B_S: 0.0052
+          C_s_over_C_m: 0.45
+          K_D: 0.0095
         gas_species: Cu(g)
         material: molten_Fe_Cu
     - observation_id: ohno_1967_cu_olette_alpha_table3
@@ -111,7 +159,9 @@ species:
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
         table: '3'
-      T_range_K: [1873.15, 1873.15]
+      T_range_K:
+      - 1873.15
+      - 1873.15
       phase: liquid_Fe_Cu_alloy
       standard_state: Olette relative evaporation coefficient — NOT HKL α
       regime: olette_relative_evaporation_coefficient
@@ -130,7 +180,9 @@ species:
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
         table: '1'
-      T_range_K: [1873.15, 1873.15]
+      T_range_K:
+      - 1873.15
+      - 1873.15
       phase: liquid_Fe_Sn_alloy
       regime: vacuum_induction_free_evaporation_steel_melt
       units: cm_s-1
@@ -138,10 +190,22 @@ species:
         quantity: specific_evaporation_constant_K_B_S
         T_C: 1600
         series:
-          - {melt: '6602-16', pct_B0: 0.89, K_B_S: 2.1e-3, K_V: 2.3e-3, C_s_over_C_m: 0.92}
-          - {melt: '6603-17', pct_B0: 1.92, K_B_S: 2.6e-3, K_V: 2.9e-3, C_s_over_C_m: 0.90}
-          - {melt: '6603-18', pct_B0: 2.40, K_B_S: 2.2e-3, K_V: 2.4e-3, C_s_over_C_m: 0.92}
-        K_D_cm_s: 2.5e-2
+        - melt: 6602-16
+          pct_B0: 0.89
+          K_B_S: 0.0021
+          K_V: 0.0023
+          C_s_over_C_m: 0.92
+        - melt: 6603-17
+          pct_B0: 1.92
+          K_B_S: 0.0026
+          K_V: 0.0029
+          C_s_over_C_m: 0.9
+        - melt: 6603-18
+          pct_B0: 2.4
+          K_B_S: 0.0022
+          K_V: 0.0024
+          C_s_over_C_m: 0.92
+        K_D_cm_s: 0.025
         gas_species: Sn(g)
         material: molten_Fe_Sn
   Cr:
@@ -151,18 +215,32 @@ species:
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
         table: '1'
-      T_range_K: [1873.15, 1873.15]
+      T_range_K:
+      - 1873.15
+      - 1873.15
       phase: liquid_Fe_Cr_alloy
       regime: vacuum_induction_free_evaporation_steel_melt
       units: cm_s-1
       values:
         quantity: specific_evaporation_constant_K_B_S
         T_C: 1600
-        K_V_cm_s: 3.3e-4
+        K_V_cm_s: 0.00033
         series:
-          - {melt: '6606-1', pct_B0: 0.98, K_B_S: 2.1e-4, C_s_over_C_m: 0.64, K_D: 5.9e-4}
-          - {melt: '6606-2', pct_B0: 1.89, K_B_S: 2.0e-4, C_s_over_C_m: 0.60, K_D: 5.0e-4}
-          - {melt: '6606-3', pct_B0: 2.83, K_B_S: 2.3e-4, C_s_over_C_m: 0.69, K_D: 7.4e-4}
+        - melt: 6606-1
+          pct_B0: 0.98
+          K_B_S: 0.00021
+          C_s_over_C_m: 0.64
+          K_D: 0.00059
+        - melt: 6606-2
+          pct_B0: 1.89
+          K_B_S: 0.0002
+          C_s_over_C_m: 0.6
+          K_D: 0.0005
+        - melt: 6606-3
+          pct_B0: 2.83
+          K_B_S: 0.00023
+          C_s_over_C_m: 0.69
+          K_D: 0.00074
         gas_species: Cr(g)
         material: molten_Fe_Cr
         note: Cr is slowest metal solute in this series (K ~ 2e-4 cm/s)
@@ -171,32 +249,55 @@ species:
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
         table: '3'
-      T_range_K: [1873.15, 1873.15]
+      T_range_K:
+      - 1873.15
+      - 1873.15
       phase: liquid_Fe_Cr_alloy
       standard_state: Olette relative evaporation coefficient — NOT HKL α
       regime: olette_relative_evaporation_coefficient
       units: dimensionless
       values:
         alpha: 2.6
-        alpha_note: 5 min experimental pin melt 6606-1 (OCR melt id 6601-1 in header / 6606-1 in Table 1)
+        alpha_note: 5 min experimental pin melt 6606-1 (OCR melt id 6601-1 in header / 6606-1 in Table
+          1)
         olette_alpha_exp_series:
-          - {melt: '6606-1', t_min: 5, alpha_exp: 2.6}
-          - {melt: '6606-1', t_min: 10, alpha_exp: 2.5}
-          - {melt: '6606-1', t_min: 15, alpha_exp: 3.0}
-          - {melt: '6606-2', t_min: 5, alpha_exp: 3.0}
-          - {melt: '6606-2', t_min: 10, alpha_exp: 3.5}
-          - {melt: '6606-2', t_min: 15, alpha_exp: 3.8}
-          - {melt: '6606-3', t_min: 5, alpha_exp: 3.0}
-          - {melt: '6606-3', t_min: 10, alpha_exp: 3.6}
-          - {melt: '6606-3', t_min: 15, alpha_exp: 3.3}
+        - melt: 6606-1
+          t_min: 5
+          alpha_exp: 2.6
+        - melt: 6606-1
+          t_min: 10
+          alpha_exp: 2.5
+        - melt: 6606-1
+          t_min: 15
+          alpha_exp: 3.0
+        - melt: 6606-2
+          t_min: 5
+          alpha_exp: 3.0
+        - melt: 6606-2
+          t_min: 10
+          alpha_exp: 3.5
+        - melt: 6606-2
+          t_min: 15
+          alpha_exp: 3.8
+        - melt: 6606-3
+          t_min: 5
+          alpha_exp: 3.0
+        - melt: 6606-3
+          t_min: 10
+          alpha_exp: 3.6
+        - melt: 6606-3
+          t_min: 15
+          alpha_exp: 3.3
         olette_alpha_theo: 4.4
-        lambda_Cr_by_melt: { '6606-1': 2.8, '6606-2': 2.6, '6606-3': 3.0 }
+        lambda_Cr_by_melt:
+          6606-1: 2.8
+          6606-2: 2.6
+          6606-3: 3.0
         not_hkl_langmuir_coefficient: true
         gas_species: Cr(g)
         material: molten_Fe_Cr
-        note: >-
-          Closest Olette theo/exp agreement among metals here (4.4 vs ~2.5–3.8).
-          Relevant to Cr class for rail; still Olette α not HKL α.
+        note: Closest Olette theo/exp agreement among metals here (4.4 vs ~2.5–3.8). Relevant to Cr class
+          for rail; still Olette α not HKL α.
   S:
     observations:
     - observation_id: ohno_1967_s_specific_evaporation_constant
@@ -204,19 +305,37 @@ species:
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
         table: '1'
-      T_range_K: [1873.15, 1873.15]
+      T_range_K:
+      - 1873.15
+      - 1873.15
       phase: liquid_Fe_S_alloy
       regime: vacuum_induction_free_evaporation_steel_melt
       units: cm_s-1
       values:
         quantity: specific_evaporation_constant_K_B_S
         T_C: 1600
-        K_D_cm_s: 6.5e-3
+        K_D_cm_s: 0.0065
         series:
-          - {melt: '6510-13', pct_B0: 0.18, K_B_S: 6.6e-4, K_V: 7.4e-4, C_s_over_C_m: 0.90}
-          - {melt: '6505-8', pct_B0: 0.26, K_B_S: 6.7e-4, K_V: 7.5e-4, C_s_over_C_m: 0.90}
-          - {melt: '6510-12', pct_B0: 0.35, K_B_S: 8.4e-4, K_V: 9.7e-4, C_s_over_C_m: 0.87}
-          - {melt: '6510-11', pct_B0: 0.42, K_B_S: 7.0e-4, K_V: 7.9e-4, C_s_over_C_m: 0.89}
+        - melt: 6510-13
+          pct_B0: 0.18
+          K_B_S: 0.00066
+          K_V: 0.00074
+          C_s_over_C_m: 0.9
+        - melt: 6505-8
+          pct_B0: 0.26
+          K_B_S: 0.00067
+          K_V: 0.00075
+          C_s_over_C_m: 0.9
+        - melt: 6510-12
+          pct_B0: 0.35
+          K_B_S: 0.00084
+          K_V: 0.00097
+          C_s_over_C_m: 0.87
+        - melt: 6510-11
+          pct_B0: 0.42
+          K_B_S: 0.0007
+          K_V: 0.00079
+          C_s_over_C_m: 0.89
         gas_species: S(g)
         material: molten_Fe_S
         note: Authors argue desulfurization proceeds via S(g) or FeS(g), not S2(g)
@@ -226,42 +345,58 @@ species:
         source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
         table: '3'
         paragraph: α (cond) for Fe-S alloys
-      T_range_K: [1873.15, 1873.15]
+      T_range_K:
+      - 1873.15
+      - 1873.15
       phase: liquid_Fe_S_alloy
-      standard_state: >-
-        Condensation coefficient α(cond) from Ward/Machlin inversion of K_V
-        (eq. 11 with metal α=1 convention for pure metals; for S derived).
-        Dimensionless 0–1 — the HKL-class kinetic coefficient (not Olette α_B).
+      standard_state: Condensation coefficient α(cond) from Ward/Machlin inversion of K_V (eq. 11 with
+        metal α=1 convention for pure metals; for S derived). Dimensionless 0–1 — the HKL-class kinetic
+        coefficient (not Olette α_B).
       regime: condensation_coefficient_ward_machlin
       units: dimensionless
       values:
         alpha: 0.2
-        alpha_range: [0.2, 0.3]
+        alpha_range:
+        - 0.2
+        - 0.3
         condensation_alpha_by_melt:
-          - {melt: '6510-13', alpha_cond: 0.2}
-          - {melt: '6505-8', alpha_cond: 0.2}
-          - {melt: '6510-12', alpha_cond: 0.3}
-          - {melt: '6510-11', alpha_cond: 0.2}
+        - melt: 6510-13
+          alpha_cond: 0.2
+        - melt: 6505-8
+          alpha_cond: 0.2
+        - melt: 6510-12
+          alpha_cond: 0.3
+        - melt: 6510-11
+          alpha_cond: 0.2
         olette_alpha_S_exp_series:
-          - {melt: '6510-13', t_min: 5, alpha_exp: 6.0}
-          - {melt: '6510-13', t_min: 10, alpha_exp: 5.7}
-          - {melt: '6510-13', t_min: 15, alpha_exp: 6.0}
+        - melt: 6510-13
+          t_min: 5
+          alpha_exp: 6.0
+        - melt: 6510-13
+          t_min: 10
+          alpha_exp: 5.7
+        - melt: 6510-13
+          t_min: 15
+          alpha_exp: 6.0
         olette_alpha_theo_over_alpha_cond: 41
         gas_species: S(g)
         material: molten_Fe_S
-        note: >-
-          Authors: α(cond)=0.2–0.3 at high S; prior work with iron evaporation
-          neglected gave 0.09–0.18. Prefer high-S pins as closer to true condensation coefficient.
+        note: 'Authors: α(cond)=0.2–0.3 at high S; prior work with iron evaporation neglected gave 0.09–0.18.
+          Prefer high-S pins as closer to true condensation coefficient.'
       uncertainty:
-        note: '0.2–0.3 across four Fe-S melts; high-S preferred'
-        alpha_range: [0.2, 0.3]
+        note: 0.2–0.3 across four Fe-S melts; high-S preferred
+        alpha_range:
+        - 0.2
+        - 0.3
     - observation_id: ohno_1967_sis_desulfurization_rate_table2
       type: rate_series
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
         table: '2'
-        equation: 'log K_S^S = 0.28×[%Si] − 2.77 (1–3 %Si)'
-      T_range_K: [1873.15, 1873.15]
+        equation: log K_S^S = 0.28×[%Si] − 2.77 (1–3 %Si)
+      T_range_K:
+      - 1873.15
+      - 1873.15
       phase: liquid_Fe_Si_S_alloy
       regime: vacuum_induction_free_evaporation_steel_melt
       units: cm_s-1
@@ -269,20 +404,58 @@ species:
         quantity: specific_evaporation_constant_K_S_S_with_Si
         T_C: 1600
         fit: log10(K_S_S) = 0.28 * pct_Si - 2.77
-        fit_Si_range_wt_pct: [1.0, 3.0]
+        fit_Si_range_wt_pct:
+        - 1.0
+        - 3.0
         series:
-          - {melt: '6601-4', pct_Si: 1.06, pct_S: 0.25, K_S_S: 3.1e-3}
-          - {melt: '6601-3', pct_Si: 2.10, pct_S: 0.25, K_S_S: 6.5e-3}
-          - {melt: '6601-2', pct_Si: 2.99, pct_S: 0.25, K_S_S: 1.1e-2}
+        - melt: 6601-4
+          pct_Si: 1.06
+          pct_S: 0.25
+          K_S_S: 0.0031
+        - melt: 6601-3
+          pct_Si: 2.1
+          pct_S: 0.25
+          K_S_S: 0.0065
+        - melt: 6601-2
+          pct_Si: 2.99
+          pct_S: 0.25
+          K_S_S: 0.011
         gas_species: SiS(g)
         material: molten_Fe_Si_S
         note: Desulfurization accelerated by Si; SiS channel
+    - observation_id: ohno_1967_s_condensation_class_b1
+      type: alpha
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        table: '3'
+        paragraph: S condensation coefficient Ward-Machlin
+      T_range_K:
+      - 1873.15
+      - 1873.15
+      phase: liquid_Fe_S_alloy
+      regime: condensation_coefficient_ward_machlin
+      units: dimensionless
+      values:
+        alpha: 0.2
+        alpha_range:
+        - 0.2
+        - 0.3
+        gas_species: S(g)/S2 context
+        method_class: measured_direct
+        system_class: molten_metal
+        transformation_class: congruent_no_transformation
+        interfacial_reaction: 'S(g) -> S(dissolved_in_Fe_l)  # condensation/sticking α_s, not evaporation
+          α_e'
+        alpha_kind: condensation_sticking_not_evaporation
+        semantics: competing_observation_do_not_average
+        evidence_class_route: vacuum_pyrolysis_sticking.yaml class (α_s), not α_e pool
+        note: Only measured condensation coefficient in corpus. Must never pool with HKL α_e.
 fidelity_samples:
 - species: Cr
   observable: rate_series
   observation_id: ohno_1967_cr_specific_evaporation_constant
   field: K_V_cm_s
-  value: 3.3e-4
+  value: 0.00033
   locator:
     source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
     table: '1'
@@ -314,3 +487,11 @@ fidelity_samples:
     source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
     table: '3'
     paragraph: α_Mn (theo) = 1095
+- species: S
+  observable: alpha
+  observation_id: ohno_1967_s_condensation_class_b1
+  field: alpha
+  value: 0.2
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+    table: '3'
