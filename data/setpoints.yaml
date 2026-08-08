@@ -440,15 +440,18 @@ campaigns:
     Mg_threshold_grounding:
       target_metal_pressure_bar: 0.01
       MgO_activity: 0.0926
-      phase_basis: "Mg(g) liquid-oxide standard-reaction gas rail (pairing 2026-07-20); no condensed Antoine above 1363.15 K"
+      # b-147 Mg (2026-08-07): TE Pref_GR demoted; roots use JANAF Pref_GF
+      # (gas_fugacity). Higher Pref at fixed T → 0.01 bar window at LOWER T
+      # (moon 1978.564→1892.647 C; asteroid 1840.802→1768.703 C).
+      phase_basis: "Mg(g) JANAF gas-metal Ellingham Pref_GF / gas_fugacity (b-147; TE gas_rail dormant); no condensed Antoine above 1363.15 K"
       lunar:
         melt_fO2_floor_bar: 1.3e-12
-        target_C: 1979
-        derived_root_C: 1978.564
+        target_C: 1893
+        derived_root_C: 1892.647379974303
       asteroid:
         melt_fO2_floor_bar: 1.0e-14
-        target_C: 1841
-        derived_root_C: 1840.802
+        target_C: 1769
+        derived_root_C: 1768.703033642641
     prerequisite: "SiO2 activity reduced 30-50% by C3 conditioning"
     SiO_gunk_vs_vacuum: "10-40x lower"
     products:

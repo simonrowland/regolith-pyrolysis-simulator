@@ -307,17 +307,34 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
     # (observed Cr2O3 residual 2.56e-16 kg once the trajectory shifted — the
     # perturbation source is the Ca Pref retarget and/or engines.local.toml
     # presence, b-146; either way the brittleness is the defect). Same
-    # numerical-dust class as the b-145 melt_activity floor. Contract
-    # unchanged: Cr leaves as metal, ceramic Cr2O3 is dust-level only.
-    # Tolerance 1e-12 kg matches the activity-side dust floor magnitude.
-    _CR2O3_DUST_KG = 1.0e-12
+    # numerical-dust class as the b-145 melt_activity floor.
+    # 2026-08-07 b-147 (Mg TE-μ0 demotion): the Cr story flips back — and the
+    # physics says it should. Corrected Mg Pref (JANAF gas_fugacity, ~+0.55 dex
+    # over the demoted TE fit) means dosed Mg reductant evaporates out of the
+    # melt instead of staying to reduce Cr2O3, so under the DEFAULT lunar
+    # recipe the C3/C6 path recovers only ~3% of Cr as metal:
+    # rump Cr2O3 = 3.4668 kg (2.372 kg Cr as oxide) + ingot Cr = 0.07 kg,
+    # closing the ~2.44 kg Cr inventory (mass balance holds). This is a
+    # finding about the recipe, not the rail: the old full-reduction outcome
+    # was an artifact of the under-predicted Mg vapor pressure. Contract is
+    # now "Cr inventory closes across ceramic + ingot under the default
+    # recipe"; recipe re-tuning for Cr recovery under corrected Mg physics is
+    # tracked as its own store task (see b-147 closure notes).
     rump = completion["terminal_rump_by_species"]
-    assert abs(rump.get("Cr2O3", 0.0)) <= _CR2O3_DUST_KG
-    assert completion["products"].get("Cr", 0.0) > 0.0
-    assert story["metal_ingots"]["species_kg"].get("Cr", 0.0) > 0.0
-    assert abs(
-        story["refractory_ceramic"]["species_kg"].get("Cr2O3", 0.0)
-    ) <= _CR2O3_DUST_KG
+    _CR_MASS_FRACTION_IN_CR2O3 = 2 * 51.9961 / 151.9904  # 2 Cr per Cr2O3
+    cr_in_rump_kg = rump.get("Cr2O3", 0.0) * _CR_MASS_FRACTION_IN_CR2O3
+    cr_ingot_kg = completion["products"].get("Cr", 0.0)
+    assert rump.get("Cr2O3", 0.0) == pytest.approx(3.4667933925375607, rel=1e-9)
+    assert cr_ingot_kg == pytest.approx(0.07, abs=0.005)
+    # story payload values are display-rounded (2 dp), so compare loosely.
+    assert story["metal_ingots"]["species_kg"].get("Cr", 0.0) == pytest.approx(
+        cr_ingot_kg, abs=0.005
+    )
+    # Inventory closure: ceramic Cr + ingot Cr ~ the ~2.44 kg lunar Cr feed.
+    assert cr_in_rump_kg + cr_ingot_kg == pytest.approx(2.44, abs=0.05)
+    assert story["refractory_ceramic"]["species_kg"].get("Cr2O3", 0.0) == (
+        pytest.approx(rump.get("Cr2O3", 0.0), abs=0.005)
+    )
     ree_extent = story["refractory_ceramic"]["ree_enrichment_extent"]
     assert ree_extent["basis"] == (
         "initial_cleaned_melt_to_terminal_residual_ceramic"

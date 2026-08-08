@@ -198,9 +198,17 @@ species:
     target_tier: T4
     validations:
       vaporock:
-        pinned_residual_dex: 0.4844513515713212
+        # b-147 Mg (2026-08-07) option B: demote TE gas_rail Pref_GR; high-T
+        # Builtin uses JANAF gas_fugacity Pref_GF. SIGN CHECK: residual TIGHTENS
+        # (0.484 -> 0.144 dex) because high-T monatomic Mg pressures move UP by
+        # ~0.54-0.59 dex (Pref_GR was low vs Pref_GF and vs peer VR). Remaining
+        # ceiling is low-T pure-comp band (rail high). Attribution:
+        # docs-private/research/2026-08-07-mgfix/report.md
+        pinned_residual_dex: 0.14423087563301895
         evidence_refs:
           - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+          - docs-private/research/2026-08-07-mgfix/report.md
+          - docs-private/research/2026-08-07-mgfix/element_engine_run.log
       mass_spec:
         pinned_residual_dex: 0.6989700043360189
         evidence_refs:

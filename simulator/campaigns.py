@@ -67,6 +67,9 @@ C4_PROCESS_WINDOW_LOST_REFUSAL_REASON = 'c4_process_window_lost'
 C4_PROCESS_WALL_CLOCK_EXHAUSTED_REFUSAL_REASON = (
     'c4_process_wall_clock_exhausted'
 )
+C4_PREHEAT_WALL_CLOCK_EXHAUSTED_REFUSAL_REASON = (
+    'c4_preheat_wall_clock_exhausted'
+)
 
 
 class CampaignPressureSetpointRefusal(ValueError):
@@ -766,6 +769,106 @@ class CampaignManager:
                 'C4.max_process_wall_clock_hr must be finite and positive'
             )
         return limit, 'setpoint:C4.max_process_wall_clock_hr'
+
+    @staticmethod
+    def _c4_snapshot_was_transport_hold(snapshot: object) -> bool:
+        """True when Loop-3/4 fully zeroed a wanted preheat ramp this hour.
+
+        Premise: ``max_target_acquisition_hr`` budgets reaching
+        ``temp_range_C[0]`` at the campaign's nominal ramp (setpoint comment:
+        ~42 h from 1160 C at 10 C/h plus margin). Hours where the plant
+        wanted to ramp (``nominal_ramp_rate_C_hr > 0``) but transport
+        saturation forced ``actual_ramp_rate_C_hr == 0`` with a recorded
+        throttle reason are isothermal holdup-drain holds, not preheat
+        opportunity.
+
+        Algebra: transport-hold ⇔ nominal>0 ∧ actual≤0 ∧ throttle_reason≠''.
+        Unitless rates in C/hr; reason is a non-empty diagnostic string.
+        Sanity/limit: snapshots that never set ramp fields (unit tests,
+        default 0/0/'') are NOT holds, so opportunity collapses to wall
+        campaign hours when throttle telemetry is absent.
+        """
+        nominal = float(
+            getattr(snapshot, 'nominal_ramp_rate_C_hr', 0.0) or 0.0
+        )
+        actual = float(
+            getattr(snapshot, 'actual_ramp_rate_C_hr', 0.0) or 0.0
+        )
+        reason = str(getattr(snapshot, 'throttle_reason', '') or '')
+        return nominal > 0.0 and actual <= 0.0 and bool(reason)
+
+    @staticmethod
+    def _c4_current_is_transport_hold(
+        transport_state: Mapping[str, object] | None,
+    ) -> bool:
+        """True when this hour's applied ramp was fully transport-zeroed.
+
+        Uses the live ramp telemetry stamped into ``transport_state`` by
+        core._check_campaign_endpoint (nominal/actual/throttle_reason for the
+        ramp already applied this hour) — production always stamps all three
+        keys (core.py transport_state assembly). Absent telemetry is NOT a
+        hold (wall-clock semantics), same predicate as the snapshot form.
+        A sat-only fallback was deleted per the 2026-08-07 dual C4 review
+        P3a/P3b: it never fired in production, no test pinned it, and it
+        classified holds on weaker evidence (no throttle_reason) with a
+        fail-slow non-finite branch.
+        """
+        if transport_state is None:
+            return False
+        nominal = float(
+            transport_state.get('nominal_ramp_rate_C_hr', 0.0) or 0.0
+        )
+        actual = float(
+            transport_state.get('actual_ramp_rate_C_hr', 0.0) or 0.0
+        )
+        reason = str(transport_state.get('throttle_reason', '') or '')
+        return nominal > 0.0 and actual <= 0.0 and bool(reason)
+
+    def _c4_acquisition_opportunity_hr(
+        self,
+        *,
+        completed_campaign_hour: float,
+        c4_snapshots: list,
+        transport_state: Mapping[str, object] | None,
+        current_acquired: bool,
+    ) -> float:
+        """Count C4 hours that count against max_target_acquisition_hr.
+
+        Derivation (b-147 Mg Pref_GF landing, 2026-08-07):
+        - Pref_GF is ~0.54–0.59 dex above demoted TE Pref_GR on the gas
+          domain, so C3_NA evaporates more Mg into process.overhead_gas
+          (measured CI path: ~19 kg → ~51 kg rate-hour sum; ~17 kg holdup
+          remains at C4 entry).
+        - C4 controlled-O2 pipe capacity at p_total=0.2 mbar is ~0.35 kg/hr
+          with binding controlled_o2_no_equipment; demand≈holdup/dt saturates
+          transport at tens of × capacity and zeros ΔT/dt for ~50–75 h.
+        - Wall-clock acquisition then refuses at 60 h while T is still the
+          C3 carry-in (~1150 C), never giving the 42 h nominal preheat.
+        - Opportunity hours exclude fully transport-throttled isothermal
+          holds so the 60 h budget is preheat opportunity, not holdup drain.
+        Sanity: with no throttle telemetry / no holds, equals
+        completed_campaign_hour (bit-identical to pre-fix unit tests).
+        """
+        if not c4_snapshots:
+            # No prior telemetry: preserve wall-clock semantics (unit tests
+            # and the first C4 tick before any snapshot is recorded).
+            if current_acquired or not self._c4_current_is_transport_hold(
+                transport_state
+            ):
+                return float(completed_campaign_hour)
+            # Fully throttled first hour(s) with empty history: no opportunity
+            # yet. completed_campaign_hour still advances wall clock elsewhere.
+            return 0.0
+
+        prior_opportunity = sum(
+            1
+            for snapshot in c4_snapshots
+            if not self._c4_snapshot_was_transport_hold(snapshot)
+        )
+        current_counts = current_acquired or not self._c4_current_is_transport_hold(
+            transport_state
+        )
+        return float(prior_opportunity + int(current_counts))
 
     @staticmethod
     def c6_at_hold_target(
@@ -2166,15 +2269,67 @@ class CampaignManager:
             ]
             current_acquired = float(melt.temperature_C) >= window_low_C
             if not prior_acquisition_indexes and not current_acquired:
-                if completed_campaign_hour >= acquisition_limit_hr:
+                # Acquisition budget is preheat *opportunity*, not wall clock
+                # while Loop-3 zeros the ramp for overhead-holdup drain
+                # (see _c4_acquisition_opportunity_hr). Wall campaign hours
+                # remain in the diagnostic for operator forensics.
+                acquisition_elapsed_hr = self._c4_acquisition_opportunity_hr(
+                    completed_campaign_hour=completed_campaign_hour,
+                    c4_snapshots=c4_snapshots,
+                    transport_state=transport_state,
+                    current_acquired=current_acquired,
+                )
+                # Held-hours bound (b-147 dual C4-review P1, 2026-08-07): the
+                # opportunity clock excludes transport-hold hours, so a
+                # PERMANENT transport hold (zero-capacity or regenerating
+                # holdup) would freeze opportunity and spin C4 forever — the
+                # inverse of the liveness hole the clock fixed.
+                # Premise: held hours = wall hours − opportunity hours; a
+                # finite holdup drain contributes finitely, a permanent hold
+                # grows without bound. Algebra: refuse when held ≥
+                # acquisition_limit + process_limit (both setpoint-sourced;
+                # a flat wall-hours cap is WRONG — the honest CI Pref_GF path
+                # acquires near wall hour 120-135 and would trip it).
+                # Unit: hours. Sanity: CI path holds ~50-90 h (17 kg holdup
+                # at ~0.35 kg/hr) < 100 h budget, unaffected; a plant held
+                # 100+ hours with no ramp deserves the typed refusal (raise
+                # the setpoints if a feedstock legitimately needs longer).
+                if (
+                    completed_campaign_hour - acquisition_elapsed_hr
+                ) >= (
+                    acquisition_limit_hr + process_limit_hr
+                ):
+                    diagnostic = {
+                        'reason_refused': (
+                            C4_PREHEAT_WALL_CLOCK_EXHAUSTED_REFUSAL_REASON
+                        ),
+                        'requested_window_C': requested_window_C,
+                        'temperature_C': float(melt.temperature_C),
+                        'elapsed_hours': completed_campaign_hour,
+                        'completed_campaign_hour': completed_campaign_hour,
+                        'acquisition_opportunity_hr': acquisition_elapsed_hr,
+                        'acquisition_limit_hr': acquisition_limit_hr,
+                        'acquisition_limit_source': acquisition_limit_source,
+                        'process_wall_clock_limit_hr': process_limit_hr,
+                        'process_wall_clock_limit_source': (
+                            process_limit_source
+                        ),
+                    }
+                    if transport_state is not None:
+                        diagnostic['binding_transport_state'] = dict(
+                            transport_state
+                        )
+                    raise CampaignC4EndpointRefusal(diagnostic)
+                if acquisition_elapsed_hr >= acquisition_limit_hr:
                     diagnostic = {
                         'reason_refused': (
                             C4_TARGET_WINDOW_ACQUISITION_REFUSAL_REASON
                         ),
                         'requested_window_C': requested_window_C,
                         'temperature_C': float(melt.temperature_C),
-                        'elapsed_hours': completed_campaign_hour,
+                        'elapsed_hours': acquisition_elapsed_hr,
                         'completed_campaign_hour': completed_campaign_hour,
+                        'acquisition_opportunity_hr': acquisition_elapsed_hr,
                         'acquisition_limit_hr': acquisition_limit_hr,
                         'acquisition_limit_source': acquisition_limit_source,
                     }

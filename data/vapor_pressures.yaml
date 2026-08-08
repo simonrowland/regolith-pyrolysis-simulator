@@ -952,8 +952,10 @@ families:
           total_source_certified_range_K:
           - 701
           - 2273.15
-          source: REF-033 CRC.b/Stull magnesium pressure-level table fit (1-100000 Pa); runtime pure-component
-            source is pure_component_antoine
+          source: REF-033 CRC.b/Stull magnesium pressure-level table fit (1-100000 Pa); pure_component_antoine
+            is the condensed-metal sidecar below boil; above boil Builtin uses
+            gas_fugacity (JANAF gas-metal Ellingham). TE gas_rail_standard_reaction is dormant
+            (b-147 Mg 2026-08-07); schema-v2 catalog Pref is Pref_GF-aligned (not TE Pref_GR)
           pure_component_antoine:
             source: REF-033 CRC.b/Stull magnesium pressure-level table fit (1-100000 Pa); cross-checked
               against REF-034 Kaye-Laby/NPL Ambrose pressure-level table; not an Alcock liquid equation
@@ -997,28 +999,55 @@ families:
               pressure_Pa: 100000.0
               source: REF-033 CRC.b/Stull magnesium pressure-level table final certified point
             - temperature_K: 1366
-              pressure_rail: gas_rail_standard_reaction
-              source: gas_rail_standard_reaction Antoine value at its certified lower bound
+              # b-147 Mg (2026-08-07): upper bridge anchor is Pref_GF at 1366 K
+              # (JANAF gas-metal Ellingham), not TE Pref_GR. Explicit pressure_Pa
+              # so reconstruction does not depend on the now-dormant gas_rail
+              # block. Continuous with Builtin gas_fugacity above 1366 K.
+              # Old TE Pref_GR at 1366 was 1.776479712477316e-13 Pa
+              # (log10=-12.750439747819721).
+              pressure_Pa: 6.020045850530698e-13
+              source: Pref_GF at gas-domain lower bound 1366 K (b-147; was TE gas_rail)
             provenance: 'DECLARED RECONSTRUCTION, not a fit extrapolation. log10(P/Pa) is linear in 1/T
-              from REF-033 CRC.b/Stull''s certified 1361 K, 100000 Pa endpoint to the unchanged gas_rail_standard_reaction
-              evaluated at its certified 1366 K lower bound: 1.776479712477316e-13 Pa (log10(P/Pa)=-12.750439747819721).
-              The 5 K authority gap brackets NIST Chemistry WebBook SRD 69 T_boiling=1363.15 +/- 1.5 K;
-              the rail bounds disagree by less than their mutual temperature uncertainty. Across the closed
-              bridge, maximum deviation from naive extension is bounded by 17.77514 dex versus the condensed
-              fit and 17.85520 dex versus the gas fit. Neither source rail''s coefficients or certified
-              range is changed.
+              from REF-033 CRC.b/Stull''s certified 1361 K, 100000 Pa endpoint to Pref_GF
+              (JANAF gas-metal Ellingham root) at 1366 K: 6.020045850530698e-13 Pa
+              (log10(P/Pa)~=-12.2204 (pinned literal; live Pref_GF(1366) closed form gives -12.220565)). b-147 Mg 2026-08-07 retargeted the upper anchor from
+              dormant TE Pref_GR (1.776e-13 Pa, log10=-12.750) so the bridge joins continuously
+              onto Builtin gas_fugacity. The 5 K authority gap brackets NIST Chemistry WebBook
+              SRD 69 T_boiling=1363.15 +/- 1.5 K. Across the closed bridge, maximum deviation
+              from naive extension is bounded by ~17.25 dex versus the condensed fit and
+              ~17.32 dex versus Pref_GF gas path. Condensed sidecar coefficients and certified
+              range are unchanged; TE gas_rail is dormant provenance only.
 
               '
           boiling_point_C: 1090
-          notes: The legacy compatibility projection retains the CRC/Stull pure-component Mg sidecar.
-            The schema-v2 catalog uses the liquid-MgO standard reaction with provider-reported activity.
-            The 2026-06-14 VapoRock dense-grid pseudo-fit was removed on 2026-06-29 because its negative-B
-            Antoine row was non-monotonic for T > 1000 K and non-certifying outside its fit intent.
+          notes: The legacy compatibility projection retains the CRC/Stull pure-component Mg sidecar
+            below boil. Above boil Builtin uses gas_fugacity (JANAF gas-metal Ellingham). TE
+            gas_rail_standard_reaction is dormant (b-147 Mg 2026-08-07). Schema-v2 catalog Pref is
+            Pref_GF-aligned. The 2026-06-14 VapoRock dense-grid pseudo-fit was removed on 2026-06-29
+            because its negative-B Antoine row was non-monotonic for T > 1000 K and non-certifying
+            outside its fit intent.
           gas_rail_standard_reaction:
+            # b-147 Mg (2026-08-07): DORMANT / non-authoritative. Do not delete -
+            # retained as provenance for the TE+JANAF liquid-oxide Pref that created
+            # the same TE-mu0 defect class as Ca (t-534 / MC-5). Builtin honors status
+            # and falls through to gas_fugacity (JANAF gas-metal Ellingham) above Mg
+            # boil 1363.15 K (gas_rail domain lower bound 1366 K).
+            # Phase-1 audit: docs-private/research/2026-08-07-mgfix/report.md
+            # Numbers at 1950 K: Pref_GR-Pref_GF = -0.589 dex; TE mu0_MgO implied is
+            # -21.6 kJ/mol vs CEA MgO(cr); JANAF-only MgO(cr)->Mg(g)+1/2O2 lands on
+            # Pref_GF (+/-0.01 dex); CEA MgO(L) domain starts 3100 K so TE liquid
+            # mu0 cannot be validated against JANAF pure liquid periclase.
+            status: dormant_non_authoritative
+            authoritative: false
             formula: MgO(l) -> Mg(g) + 0.5 O2(g)
-            basis: 'VapoRock JANAF metal(g)/O2(g) + ThermoEngine v1.0 pure-liquid oxide mu0; minimax refit
-              over 1366-2273.15 K. Closes solid-oxide Ellingham vs liquid-oxide activity pairing (2026-07-20
-              vaporock-fit-audit).
+            basis: 'DORMANT (b-147 Mg, 2026-08-07). Historical fit: VapoRock JANAF metal(g)/O2(g)
+              + ThermoEngine v1.0 pure-liquid oxide mu0 (MELTS endmember-transform oxide basis,
+              not JANAF pure liquid MgO); minimax refit over 1366-2273.15 K from 2026-07-20
+              vaporock-fit-audit pairing fix. Demoted because TE mu0_MgO is the divergent term
+              vs our own JANAF gas-metal Ellingham Pref_GF (-0.53...-0.67 dex over the
+              1366-2273.15 K domain) and cannot be validated against JANAF/CEA pure MgO(l)
+              (liquid domain only >=3100 K; solid JANAF assembly matches Pref_GF).
+              Runtime: gas_fugacity above boil.
 
               '
             standard_pressure_Pa: 100000.0
@@ -1029,9 +1058,11 @@ families:
               A: 13.4693238
               B: 32944.8707002
               C: -109.51
-              derivation: 'Premise: liquid-oxide activity pairs with liquid-oxide standard reaction. Algebra:
-                delG0=G_M(g)+n*G_O2-mu0_oxide(l); log10(P_ref/Pa)=5-delG0/(RT ln10); P=P_ref*a*fO2^n.
-                Unit Pa. Sanity: max residual 0.006291 dex vs TE+JANAF grid.
+              derivation: 'PROVENANCE ONLY (dormant). Premise was liquid-oxide activity with
+                TE liquid-oxide standard reaction. Algebra: delG0=G_M(g)+n*G_O2-mu0_oxide(l);
+                log10(P_ref/Pa)=5-delG0/(RT ln10); P=P_ref*a*fO2^n. Unit Pa. Sanity: max
+                residual 0.006291 dex vs TE+JANAF grid (self-consistent to TE, not to JANAF
+                solid Pref_GF). b-147 demotion 2026-08-07.
 
                 '
             source_certified_range_K:
@@ -1050,6 +1081,18 @@ families:
               - 10
               method: minimax |log10P_fit-log10P_source| on 10 K grid
             rail_scope: gas_only_two_rail_preserved
+            demotion:
+              date: '2026-08-07'
+              ticket: b-147
+              option: B
+              reason: TE pure-liquid MgO mu0 (MELTS oxide-basis) sits -13...-22 kJ/mol vs
+                JANAF/CEA solid MgO; Pref_GR is -0.53...-0.67 dex below Pref_GF over the
+                1366-2273.15 K domain (-0.530 @1366 K, -0.544 @1800 K, -0.589 @1950 K,
+                -0.670 @2273 K); JANAF-only assembly lands on Pref_GF; activity cannot
+                absorb the residual inside SF18. Same defect class as Ca (t-534) at smaller
+                magnitude. Mg boil 1363 K is far below Ca 1757 K so the gas_rail domain
+                starts earlier; the physics of the TE-vs-JANAF mu0 gap is the same.
+              audit: docs-private/research/2026-08-07-mgfix/report.md
           validation:
             status: pending_validation
             anchor_refs: []
@@ -1075,6 +1118,11 @@ families:
               compound_bearing: false
               require_assemblage_match: false
           pressure_models:
+          # b-147 Mg (2026-08-07): catalog Pref retargeted to JANAF gas-metal
+          # Ellingham Pref_GF so catalog matches Builtin gas_fugacity after
+          # demoting TE gas_rail_standard_reaction. Same reaction stoichiometry
+          # a^1 fO2^-0.5; only P_ref changes. Do not reintroduce TE Pref_GR
+          # (A=13.4693238,B=32944.8707002,C=-109.51) as authoritative.
           - fit_target: standard_reaction_term
             pressure_kind: equilibrium_partial_pressure
             species_basis: monomer
@@ -1084,6 +1132,19 @@ families:
               - 2273.15
             provenance:
             - source: schema_v1_in_place_migration
+            - source: b147_mg_pref_gf_alignment_2026-08-07
+              note: 'Reference Antoine is the algebraically exact C=0 fit to Builtin
+                Pref_GF = P0 * K_decomp^(1/n_M) from ellingham_thermo Mg gas-metal
+                segment 1366-2000 K (2 Mg(g)+O2 -> 2 MgO(s); Chase 1998 JANAF Mg-010).
+                Premise: catalog and Builtin must share the same Pref family after
+                TE gas_rail demotion. Algebra: log10(P_ref/Pa)=A-B/(T+C) with C=0
+                because Ellingham dG is linear in T on each segment; float-eval residual
+                ~5e-11 dex on 10 K grid 1366-1996 K (coefficients algebraically exact).
+                Unit Pa. A second gas segment (2000-2600 K) differs by up to ~0.031 dex
+                if these coeffs are evaluated above 2000 K; Builtin gas_fugacity uses
+                live segments so runtime is exact. Sanity: at 1950 K Pref_GF log10=-3.8421
+                matches live ellingham root; old TE Pref_GR was -4.4307 (-0.589 dex). See
+                docs-private/research/2026-08-07-mgfix/report.md.'
             evaluator_family: standard_reaction_term
             source_reaction_id: liquid_mgo_to_mg_gas
             activity_semantics: source_reaction_activity
@@ -1091,9 +1152,20 @@ families:
             reference_pressure_model:
               evaluator_family: antoine
               coefficients:
-                A: 13.4693238
-                B: 32944.8707002
-                C: -109.51
+                A: 15.7554806875
+                B: 38215.2786789571
+                C: 0.0
+              derivation: 'b-147 Mg Pref_GF (2026-08-07). Premise: gas-metal JANAF
+                Ellingham root at a=1, fO2=1 bar is P_ref = P0 * exp(dG_f/(n_M R T))
+                with dG_f = ellingham_delta_g_kj_per_mol_o2(Mg,T)*1000 (formation
+                2Mg(g)+O2->2MgO(s), so decomp K_decomp=exp(dG_f/RT) and
+                Pref=P0*K_decomp^(1/2)). Algebra: A = 5 - dS*1000/(n_M R ln10),
+                B = -dH*1000/(n_M R ln10), C=0 for linear Ellingham segment
+                (dH=-1463.2445 kJ/mol O2, dS=-0.411822143 kJ/mol/K/mol O2, n_M=2,
+                1366-2000 K gas segment). Unit Pa. Sanity: max |fit-source| ~5e-11 dex
+                on 1366-1996 K (float eval; algebraically exact); T=1950 log10 Pref=-3.842098;
+                residual vs high segment (2000-2273) up to ~0.031 dex if catalog Antoine
+                alone is used above 2000 K (Builtin path is segment-exact).'
             activity_exponent: 1.0
             pO2_exponent: -0.5
             pO2_reference_bar: 1.0
@@ -12119,6 +12191,10 @@ families:
               - cea_Mg2_gibbs
             - source: Mg landed unit-activity standard-reaction reference
               status: status_bearing_non_authoritative
+            - source_id: metals_mg_family
+              observation_id: gas_rail_standard_reaction
+              note: 'b-147 Mg 2026-08-07: monatomic base Pref retargeted to Pref_GF;
+                dormant TE gas_rail observation retained as provenance only.'
             evaluator_family: nasa_cea_9
             source_reaction_id: liquid_mgo_to_mg2_gas
             activity_semantics: source_reaction_activity
@@ -12126,9 +12202,10 @@ families:
             base_reference_pressure_model:
               evaluator_family: antoine
               coefficients:
-                A: 13.4693238
-                B: 32944.8707002
-                C: -109.51
+                # Aligned with monatomic Mg Pref_GF (b-147 Mg 2026-08-07); was TE Pref_GR.
+                A: 15.7554806875
+                B: 38215.2786789571
+                C: 0.0
             base_vapor_formula: Mg
             gas_exchange_reaction:
               reactants:
@@ -12260,6 +12337,10 @@ families:
               - cea_O2_gibbs
             - source: Mg landed unit-activity standard-reaction reference
               status: status_bearing_non_authoritative
+            - source_id: metals_mg_family
+              observation_id: gas_rail_standard_reaction
+              note: 'b-147 Mg 2026-08-07: monatomic base Pref retargeted to Pref_GF;
+                dormant TE gas_rail observation retained as provenance only.'
             evaluator_family: nasa_cea_9
             source_reaction_id: liquid_mgo_to_mgo_gas_gas
             activity_semantics: source_reaction_activity
@@ -12267,9 +12348,10 @@ families:
             base_reference_pressure_model:
               evaluator_family: antoine
               coefficients:
-                A: 13.4693238
-                B: 32944.8707002
-                C: -109.51
+                # Aligned with monatomic Mg Pref_GF (b-147 Mg 2026-08-07); was TE Pref_GR.
+                A: 15.7554806875
+                B: 38215.2786789571
+                C: 0.0
             base_vapor_formula: Mg
             gas_exchange_reaction:
               reactants:

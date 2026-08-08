@@ -124,8 +124,13 @@ def test_endpoint_rank_metric_is_not_labeled_as_kinetic_ordering(
     # 2026-07-21 B1 vapor-package regen: corrected P_sat fits invert one more
     # DS-003 endpoint pair (2/17 -> 3/17); observed KEMS rows unchanged —
     # this residual is a recorded reproduction error, never a retune target.
+    # 2026-08-07 b-147 Mg TE-μ0 demotion: corrected Mg Pref (JANAF gas_fugacity,
+    # ~+0.55 dex) restores one DS-003 endpoint pair to the observed KEMS order
+    # (3/17 -> 2/17 = 0.1176). SIGN CHECK: agreement with the unchanged
+    # observed rows IMPROVES under the physically-audited Pref — recorded
+    # movement, not a retune.
     assert report.endpoint_rank_disagreement_fraction == pytest.approx(
-        0.17647058823529413
+        0.11764705882352941
     )
 
 

@@ -312,6 +312,114 @@ def test_c4_unreachable_window_is_typed_acquisition_refusal() -> None:
     )
 
 
+def test_c4_transport_hold_hours_do_not_burn_acquisition_budget() -> None:
+    """Loop-3 full transport holds must not spend max_target_acquisition_hr.
+
+    b-147 Pref_GF leaves ~17 kg C3 overhead holdup into C4; controlled_o2
+    pipe capacity ~0.35 kg/hr zeros the ramp for tens of hours. The 60 h
+    acquisition budget is preheat opportunity, not holdup-drain wall clock.
+    """
+    setpoints = _setpoints()
+    setpoints["campaigns"]["C4"]["max_target_acquisition_hr"] = 3.0
+    manager = CampaignManager(setpoints)
+    # Three prior hours fully transport-throttled below the window.
+    hold_snaps = [
+        HourSnapshot(
+            campaign=CampaignPhase.C4,
+            temperature_C=1150.0,
+            evap_flux=_flux(Mg=0.0),
+            nominal_ramp_rate_C_hr=10.0,
+            actual_ramp_rate_C_hr=0.0,
+            throttle_reason=(
+                "equipment incompatibility [controlled_o2_no_equipment] "
+                "saturated (5000%)"
+            ),
+        )
+        for _ in range(3)
+    ]
+    # Wall campaign hour 3 (completed=4) would refuse under wall-clock
+    # semantics; opportunity hours are still 0 (all holds + current hold).
+    assert manager.check_endpoint(
+        _melt(CampaignPhase.C4, 3, temperature_C=1150.0),
+        _flux(Mg=0.0),
+        CondensationTrain(),
+        BatchRecord(snapshots=hold_snaps),
+        transport_state={
+            "binding_cause": "controlled_o2_no_equipment",
+            "saturation_pct": 5000.0,
+            "nominal_ramp_rate_C_hr": 10.0,
+            "actual_ramp_rate_C_hr": 0.0,
+            "throttle_reason": (
+                "equipment incompatibility [controlled_o2_no_equipment] "
+                "saturated (5000%)"
+            ),
+        },
+    ) is False
+
+    # Three prior heating hours (no throttle) + current heating hour at
+    # T still below window → opportunity=4 >= limit 3 → refuse.
+    heat_snaps = [
+        HourSnapshot(
+            campaign=CampaignPhase.C4,
+            temperature_C=1200.0 + 10.0 * i,
+            evap_flux=_flux(Mg=0.0),
+            nominal_ramp_rate_C_hr=10.0,
+            actual_ramp_rate_C_hr=10.0,
+            throttle_reason="",
+        )
+        for i in range(3)
+    ]
+    with pytest.raises(CampaignC4EndpointRefusal) as refusal:
+        manager.check_endpoint(
+            _melt(CampaignPhase.C4, 3, temperature_C=1230.0),
+            _flux(Mg=0.0),
+            CondensationTrain(),
+            BatchRecord(snapshots=heat_snaps),
+            transport_state={
+                "binding_cause": "controlled_o2_no_equipment",
+                "saturation_pct": 0.0,
+                "nominal_ramp_rate_C_hr": 10.0,
+                "actual_ramp_rate_C_hr": 10.0,
+                "throttle_reason": "",
+            },
+        )
+    assert refusal.value.reason == "c4_target_window_not_acquired"
+    assert refusal.value.diagnostic["acquisition_opportunity_hr"] == 4.0
+    assert refusal.value.diagnostic["completed_campaign_hour"] == 4.0
+
+
+def test_c4_refusal_latches_is_complete() -> None:
+    """Bare step loops must terminate when C4 endpoint refuses."""
+    setpoints = _setpoints()
+    setpoints["campaigns"]["C4"]["max_target_acquisition_hr"] = 1.0
+    sim = object.__new__(PyrolysisSimulator)
+    sim.campaign_mgr = CampaignManager(setpoints)
+    sim.melt = _melt(CampaignPhase.C4, 0, temperature_C=1220.0)
+    sim.train = CondensationTrain()
+    sim.record = BatchRecord()
+    sim.overhead = SimpleNamespace(
+        transport_binding_cause="controlled_o2_no_equipment",
+        transport_saturation_pct=0.0,
+        evap_exceeds_transport=False,
+        turbine_limited=False,
+    )
+    sim._last_nominal_ramp = 10.0
+    sim._last_actual_ramp = 10.0
+    sim._last_throttle_reason = ""
+    sim.pending_decision = object()
+    sim.paused_for_decision = True
+    sim._last_c4_refusal_diagnostic = {}
+    sim._c4_campaign_refused = False
+    sim._last_c6_refusal_diagnostic = {}
+    sim._c6_campaign_refused = False
+
+    assert sim.is_complete() is False
+    assert sim._check_campaign_endpoint(_flux(Mg=0.0)) is True
+    assert sim._c4_campaign_refused is True
+    assert sim.is_complete() is True
+    assert sim.campaign_endpoint_refused() is True
+
+
 def test_c4_post_acquisition_window_loss_is_typed_refusal() -> None:
     setpoints = _setpoints()
     setpoints["campaigns"]["C4"]["max_process_wall_clock_hr"] = 3.0
@@ -983,3 +1091,58 @@ def test_sc109_mre_baseline_earlier_rung_arm_does_not_authorize_terminal_decay()
         CondensationTrain(),
         earlier_rung_only,
     ) is False
+
+
+def test_c4_permanent_transport_hold_trips_held_hours_wall() -> None:
+    """A permanent transport hold must refuse, not spin (b-147 review P1).
+
+    The opportunity clock excludes hold hours, so without a bound a
+    zero-capacity / regenerating-holdup plant never terminates C4. The
+    held-hours wall refuses when wall − opportunity ≥ acquisition_limit +
+    process_limit (setpoint-sourced budgets; finite drains stay under it —
+    the honest CI Pref_GF path holds ~50-90 h against a 100 h budget).
+    """
+    setpoints = _setpoints()
+    setpoints["campaigns"]["C4"]["max_target_acquisition_hr"] = 3.0
+    setpoints["campaigns"]["C4"]["max_process_wall_clock_hr"] = 2.0
+    manager = CampaignManager(setpoints)
+    throttle = {
+        "binding_cause": "controlled_o2_no_equipment",
+        "saturation_pct": 5000.0,
+        "nominal_ramp_rate_C_hr": 10.0,
+        "actual_ramp_rate_C_hr": 0.0,
+        "throttle_reason": (
+            "equipment incompatibility [controlled_o2_no_equipment] "
+            "saturated (5000%)"
+        ),
+    }
+    hold_snap = HourSnapshot(
+        campaign=CampaignPhase.C4,
+        temperature_C=1150.0,
+        evap_flux=_flux(Mg=0.0),
+        nominal_ramp_rate_C_hr=10.0,
+        actual_ramp_rate_C_hr=0.0,
+        throttle_reason=throttle["throttle_reason"],
+    )
+    # Completed hour 4 (campaign hour 3) < 3+2 budget: no refusal yet
+    # (opportunity stays 0; held hours = completed hours here).
+    assert manager.check_endpoint(
+        _melt(CampaignPhase.C4, 3, temperature_C=1150.0),
+        _flux(Mg=0.0),
+        CondensationTrain(),
+        BatchRecord(snapshots=[hold_snap] * 3),
+        transport_state=throttle,
+    ) is False
+    # Completed hour 5 (campaign hour 4) >= 3+2: typed refusal.
+    with pytest.raises(CampaignC4EndpointRefusal) as excinfo:
+        manager.check_endpoint(
+            _melt(CampaignPhase.C4, 4, temperature_C=1150.0),
+            _flux(Mg=0.0),
+            CondensationTrain(),
+            BatchRecord(snapshots=[hold_snap] * 4),
+            transport_state=throttle,
+        )
+    assert excinfo.value.diagnostic["reason_refused"] == (
+        "c4_preheat_wall_clock_exhausted"
+    )
+    assert excinfo.value.diagnostic["acquisition_opportunity_hr"] == 0.0

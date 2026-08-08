@@ -465,58 +465,55 @@ def test_runtime_p_eq_numerator_moves_with_parent_oxide_composition(
     assert high_provenance["pressure_kind"] == "effective_equilibrium"
 
 
-def test_mg_gas_rail_uses_liquid_oxide_standard_reaction_not_solid_ellingham(
+def test_mg_high_t_uses_gas_fugacity_after_te_gas_rail_demotion(
     vapor_pressure_data,
 ):
-    """Pairing fix: gas rail pairs liquid-MgO standard term with liquid activity."""
+    """b-147: TE gas_rail demoted; high-T Mg uses JANAF gas_fugacity Pref_GF."""
     provider = BuiltinVaporPressureProvider(vapor_pressure_data)
     account = dict(_COMPOSITION_SENSITIVITY_BASE_MOL)
     request = _composition_sensitivity_request(account)
     result = provider.dispatch(request)
     diagnostic = result.diagnostic or {}
 
+    gas_rail = vapor_pressure_data["metals"]["Mg"]["gas_rail_standard_reaction"]
+    assert gas_rail.get("status") == "dormant_non_authoritative"
+    assert gas_rail.get("authoritative") is False
+
     provenance = diagnostic["vapor_pressure_numerator_provenance"]["Mg"]
     assert provenance["metal_standard_state"] == "gas"
-    assert provenance["oxide_standard_state"] == "liquid"
-    assert provenance["pressure_rail"] == "gas_rail_liquid_oxide_standard_reaction"
-    assert "P_reference_Antoine_Pa" in provenance
+    assert provenance["pressure_rail"] == "gas_fugacity"
+    assert "P_reference_Antoine_Pa" not in provenance
+    assert "gas_standard_fugacity" in provenance["source_label"]
+    # activity_factor already folds a_oxide * fO2 stoichiometry for gas_fugacity.
     assert provenance["P_eq_Pa"] == pytest.approx(
-        provenance["P_reference_Antoine_Pa"] * provenance["activity_factor"]
-        * (
-            provenance["pO2_bar"]
-            / float(
-                vapor_pressure_data["metals"]["Mg"]["gas_rail_standard_reaction"][
-                    "pO2_reference_bar"
-                ]
-            )
-        )
-        ** float(
-            vapor_pressure_data["metals"]["Mg"]["gas_rail_standard_reaction"][
-                "pO2_exponent"
-            ]
-        )
+        provenance["P_standard_Pa"] * provenance["activity_factor"],
+        rel=1e-9,
     )
-    assert "gas_rail_liquid_oxide_standard_reaction" in provenance["source_label"]
+    assert provenance["P_eq_Pa"] > 0.0
 
 
-def test_ellingham_graph_mg_gas_rail_matches_liquid_oxide_standard_reaction(
+def test_ellingham_graph_mg_matches_pref_gf_after_te_gas_rail_demotion(
     vapor_pressure_data,
 ):
+    """b-147: graph path uses Pref_GF; dormant TE Pref_GR must not be selected."""
     temperature_K = 1773.15
     pO2_bar = 1e-3
     a_oxide = 0.5
-    gas_rxn = vapor_pressure_data["metals"]["Mg"]["gas_rail_standard_reaction"]
-    antoine = gas_rxn["antoine"]
     import math as _math
-
-    P_ref = 10.0 ** (
-        float(antoine["A"]) - float(antoine["B"]) / (temperature_K + float(antoine["C"]))
+    from simulator.chemistry.ellingham_thermo import (
+        ellingham_segment_for_temperature,
     )
-    pO2_exp = float(gas_rxn["pO2_exponent"])
-    pO2_ref = float(gas_rxn["pO2_reference_bar"])
-    expected = P_ref * (a_oxide ** float(gas_rxn["oxide_activity_exponent"])) * (
-        pO2_bar / pO2_ref
-    ) ** pO2_exp
+
+    # Expected: JANAF gas-metal Pref_GF * a * (pO2/pO2_ref)^n
+    seg = ellingham_segment_for_temperature("Mg", temperature_K)
+    assert "Mg(g)" in seg.phase_basis
+    dG = seg.delta_g_kJ_per_mol_O2(temperature_K)
+    R = 8.314462618
+    P0 = vapor_pressure_module.ELLINGHAM_STANDARD_PRESSURE_PA
+    P_ref_gf = P0 * _math.exp(dG * 1000.0 / (R * temperature_K)) ** (
+        1.0 / seg.n_M
+    )
+    expected = P_ref_gf * (a_oxide ** 1.0) * (pO2_bar / 1.0) ** (-0.5)
     pressure = ellingham_graph.effective_equilibrium_pressure_Pa(
         "Mg",
         temperature_K,
@@ -524,19 +521,19 @@ def test_ellingham_graph_mg_gas_rail_matches_liquid_oxide_standard_reaction(
         vapor_pressure_data=vapor_pressure_data,
         a_oxide=a_oxide,
     )
+    # rel=1e-5: graph and closed-form Pref_GF share the same segments; residual
+    # is float/root path, not Pref_GR class (~0.5 dex).
+    assert pressure == pytest.approx(expected, rel=1e-5)
 
-    assert pressure == pytest.approx(expected, rel=1e-12)
-    # Solid-oxide Ellingham gas fugacity must NOT be the gas-rail answer.
-    solid_root = ellingham_graph.metal_activity_factor(
-        "Mg",
-        temperature_K,
-        pO2_bar,
-        a_oxide=a_oxide,
-        clamp=False,
+    # Dormant TE Pref_GR path must differ (was low by ~0.54 dex).
+    gas_rxn = vapor_pressure_data["metals"]["Mg"]["gas_rail_standard_reaction"]
+    antoine = gas_rxn["antoine"]
+    P_ref_gr = 10.0 ** (
+        float(antoine["A"])
+        - float(antoine["B"]) / (temperature_K + float(antoine["C"]))
     )
-    solid_path = solid_root * vapor_pressure_module.ELLINGHAM_STANDARD_PRESSURE_PA
-    assert pressure != pytest.approx(solid_path, rel=1e-3)
-    assert abs(_math.log10(pressure / solid_path)) > 0.3  # pairing gap order
+    gr_path = P_ref_gr * (a_oxide ** 1.0) * (pO2_bar / 1.0) ** (-0.5)
+    assert abs(_math.log10(pressure / gr_path)) > 0.3
 
 
 def test_condensed_basis_ellingham_pressure_uses_raoult_psat(
@@ -1126,9 +1123,10 @@ def test_mg_gas_standard_pressure_rises_with_temperature(
     assert high.diagnostic["vapor_pressures_Pa"]["Mg"] > (
         low.diagnostic["vapor_pressures_Pa"]["Mg"]
     )
+    # b-147: high-T path is JANAF gas_fugacity (TE gas_rail dormant).
     assert high.diagnostic["vapor_pressure_numerator_provenance"]["Mg"][
         "pressure_rail"
-    ] == "gas_rail_liquid_oxide_standard_reaction"
+    ] == "gas_fugacity"
 
 
 def test_demaria_1971_na_validation_case_reports_measured_pressure_gap(
@@ -1434,6 +1432,8 @@ def test_mg_reconstructed_bridge_derivation_and_declared_bounds(
     assert mg_coeff["source_certified_range_K"] == [701, 1361]
     assert mg_coeff["valid_range_K"] == [701, 1361]
     gas_rail = mg_data["gas_rail_standard_reaction"]
+    # b-147: gas_rail retained as dormant provenance; bridge upper is Pref_GF.
+    assert gas_rail.get("status") == "dormant_non_authoritative"
     assert gas_rail["source_certified_range_K"] == [1366, 2273.15]
     segment = mg_data["reconstructed_vapor_pressure_segment"]
     assert segment["authority_status"] == (
@@ -1452,23 +1452,23 @@ def test_mg_reconstructed_bridge_derivation_and_declared_bounds(
     assert lower is not None
     assert upper is not None
     assert lower["pressure_Pa"] == pytest.approx(100000.0)
-    gas_antoine = gas_rail["antoine"]
-    expected_upper = 10.0 ** (
-        float(gas_antoine["A"])
-        - float(gas_antoine["B"])
-        / (1366.0 + float(gas_antoine["C"]))
-    )
+    # Upper anchor is Pref_GF at 1366 K (not dormant TE Pref_GR).
+    expected_upper = 6.020045850530698e-13
     assert upper["pressure_Pa"] == pytest.approx(expected_upper, rel=1e-14)
-    assert expected_upper == pytest.approx(1.776479712477316e-13, rel=1e-14)
-    assert "17.77514 dex" in segment["provenance"]
-    assert "17.85520 dex" in segment["provenance"]
+    assert "Pref_GF" in segment["provenance"]
+    assert "b-147" in segment["provenance"]
 
 
-@pytest.mark.parametrize("temperature_K", [1361.0, 1361.171, 1363.15, 1366.0])
+@pytest.mark.parametrize("temperature_K", [1361.0, 1361.171])
 def test_mg_reconstructed_bridge_emits_typed_provider_diagnostic(
     vapor_pressure_data,
     temperature_K,
 ):
+    """Bridge applies on the condensed rail below boil (≤1361 K certified side).
+
+    b-147: above Mg boil (1363.15 K) Builtin uses gas_fugacity (TE gas_rail
+    dormant), so reconstructed-segment diagnostics are condensed-rail only.
+    """
     provider = BuiltinVaporPressureProvider(vapor_pressure_data)
 
     result = provider.dispatch(_mg_vapor_request_at_T_K(temperature_K))
@@ -1495,6 +1495,24 @@ def test_mg_reconstructed_bridge_emits_typed_provider_diagnostic(
     )
 
 
+@pytest.mark.parametrize("temperature_K", [1363.15, 1366.0])
+def test_mg_above_boil_uses_gas_fugacity_not_reconstructed_bridge(
+    vapor_pressure_data,
+    temperature_K,
+):
+    """b-147: at/above boil the demoted gas_rail falls through to gas_fugacity."""
+    result = BuiltinVaporPressureProvider(vapor_pressure_data).dispatch(
+        _mg_vapor_request_at_T_K(temperature_K)
+    )
+    assert result.status == "ok"
+    assert result.diagnostic["vapor_pressures_Pa"]["Mg"] > 0.0
+    provenance = result.diagnostic["vapor_pressure_numerator_provenance"]["Mg"]
+    assert provenance["pressure_rail"] == "gas_fugacity"
+    assert "gas_standard_fugacity" in result.diagnostic["vapor_pressures_source"][
+        "Mg"
+    ]
+
+
 @pytest.mark.parametrize("temperature_K", [1360.999, 1366.001])
 def test_mg_reconstructed_bridge_flag_absent_outside_segment(
     vapor_pressure_data,
@@ -1514,20 +1532,27 @@ def test_mg_reconstructed_bridge_flag_absent_outside_segment(
 
 
 @pytest.mark.parametrize("temperature_K", [2273.151])
-def test_mg_provider_refuses_outside_total_certified_envelope(
+def test_mg_provider_accepts_process_cap_under_gas_fugacity(
     vapor_pressure_data,
     temperature_K,
 ):
-    with pytest.raises(
-        VaporPressureRangeError,
-        match=(
-            r"species=Mg consumer=builtin_(?:condensed|gas)_rail .*"
-            r"source_certified_range_K=\[701, 2273\.15\]"
-        ),
-    ):
-        BuiltinVaporPressureProvider(vapor_pressure_data).dispatch(
-            _mg_vapor_request_at_T_K(temperature_K)
-        )
+    """b-147: with TE gas_rail dormant, high-T uses JANAF gas_fugacity.
+
+    Ellingham gas-metal segments cover to 2600 K, so the historical
+    gas_rail upper bound 2273.15 is no longer a hard refuse for the live
+    high-T path. Process-cap T just above 2273.15 remains OK.
+    """
+    result = BuiltinVaporPressureProvider(vapor_pressure_data).dispatch(
+        _mg_vapor_request_at_T_K(temperature_K)
+    )
+    assert result.status == "ok"
+    assert result.diagnostic["vapor_pressures_Pa"]["Mg"] > 0.0
+    assert (
+        result.diagnostic["vapor_pressure_numerator_provenance"]["Mg"][
+            "pressure_rail"
+        ]
+        == "gas_fugacity"
+    )
 
 
 def test_mg_source_range_guard_refuses_below_total_certified_envelope(
@@ -1562,10 +1587,11 @@ def test_mg_provider_accepts_total_certified_envelope_endpoints(
 
 
 @pytest.mark.parametrize("temperature_K", [1366.001, 1873.0])
-def test_mg_gas_rail_is_independent_of_antoine_coefficients(
+def test_mg_gas_fugacity_is_independent_of_antoine_coefficients(
     vapor_pressure_data,
     temperature_K,
 ):
+    """b-147: high-T gas_fugacity is independent of pure-component Antoine."""
     baseline_data = copy.deepcopy(vapor_pressure_data)
     no_antoine_data = copy.deepcopy(vapor_pressure_data)
     no_antoine_data["metals"]["Mg"].pop("pure_component_antoine")
@@ -1584,11 +1610,9 @@ def test_mg_gas_rail_is_independent_of_antoine_coefficients(
     provenance = without_antoine.diagnostic[
         "vapor_pressure_numerator_provenance"
     ]["Mg"]
-    # Gas rail uses liquid-oxide standard reaction, independent of pure-component
-    # condensed Antoine (two-rail preserved; pure sidecar only for condensed).
-    assert provenance["pressure_rail"] == "gas_rail_liquid_oxide_standard_reaction"
-    assert "P_reference_Antoine_Pa" in provenance
-    assert "gas_rail_liquid_oxide_standard_reaction" in provenance["source_label"]
+    assert provenance["pressure_rail"] == "gas_fugacity"
+    assert "P_reference_Antoine_Pa" not in provenance
+    assert "gas_standard_fugacity" in provenance["source_label"]
 
     graph_pressure = ellingham_graph.effective_equilibrium_pressure_Pa(
         "Mg",
@@ -1610,7 +1634,8 @@ def test_mg_gas_rail_is_independent_of_antoine_coefficients(
 def test_legacy_mg_rails_use_reconstructed_bridge_and_ignore_gas_antoine(
     vapor_pressure_data,
 ):
-    for temperature_K in (1361.0, 1361.171, 1363.15, 1366.0):
+    # Condensed-rail bridge band (certified pure-comp upper 1361 K side).
+    for temperature_K in (1361.0, 1361.171):
         result = _LegacyInternalAnalyticalModel(
             vapor_pressure_data,
             melt=_MgOnlyMelt(temperature_K),
@@ -1622,14 +1647,27 @@ def test_legacy_mg_rails_use_reconstructed_bridge_and_ignore_gas_antoine(
             VAPOR_PRESSURE_RECONSTRUCTED_AUTHORITY_STATUS
         )
 
-    for temperature_K in (1360.999, 1366.001):
+    # b-147: at/above boil, demoted gas_rail falls through to gas_fugacity
+    # (no reconstructed-segment flag on the gas path).
+    for temperature_K in (1363.15, 1366.0, 1366.001):
         result = _LegacyInternalAnalyticalModel(
             vapor_pressure_data,
             melt=_MgOnlyMelt(temperature_K),
         )._internal_analytical_equilibrium()
+        assert result.vapor_pressures_Pa["Mg"] > 0.0
         assert result.diagnostics["vapor_pressure_authority"][
             VAPOR_PRESSURE_RECONSTRUCTED_AUTHORITY_FLAG
         ] is False
+        assert "gas_standard_fugacity" in result.vapor_pressures_source["Mg"]
+
+    # Just below the reconstructed segment remains pure-comp without bridge flag.
+    result = _LegacyInternalAnalyticalModel(
+        vapor_pressure_data,
+        melt=_MgOnlyMelt(1360.999),
+    )._internal_analytical_equilibrium()
+    assert result.diagnostics["vapor_pressure_authority"][
+        VAPOR_PRESSURE_RECONSTRUCTED_AUTHORITY_FLAG
+    ] is False
 
     below_range = _LegacyInternalAnalyticalModel(
         vapor_pressure_data,
@@ -1641,17 +1679,13 @@ def test_legacy_mg_rails_use_reconstructed_bridge_and_ignore_gas_antoine(
         for warning in below_range.warnings
     )
 
-    with pytest.raises(
-        VaporPressureRangeError,
-        match=(
-            r"species=Mg consumer=legacy_gas_rail .*"
-            r"source_certified_range_K=\[701, 2273\.15\]"
-        ),
-    ):
-        _LegacyInternalAnalyticalModel(
-            vapor_pressure_data,
-            melt=_MgOnlyMelt(2273.151),
-        )._internal_analytical_equilibrium()
+    # High-T process-cap under gas_fugacity remains live (Ellingham to 2600 K).
+    high = _LegacyInternalAnalyticalModel(
+        vapor_pressure_data,
+        melt=_MgOnlyMelt(2273.151),
+    )._internal_analytical_equilibrium()
+    assert high.vapor_pressures_Pa["Mg"] > 0.0
+    assert "gas_standard_fugacity" in high.vapor_pressures_source["Mg"]
 
     baseline = _LegacyInternalAnalyticalModel(
         vapor_pressure_data,
@@ -1667,11 +1701,8 @@ def test_legacy_mg_rails_use_reconstructed_bridge_and_ignore_gas_antoine(
     assert without_antoine.vapor_pressures_Pa["Mg"] == pytest.approx(
         baseline.vapor_pressures_Pa["Mg"]
     )
-    assert (
-        "gas_rail_liquid_oxide_standard_reaction"
-        in without_antoine.vapor_pressures_source["Mg"]
-        or "gas_standard_fugacity" in without_antoine.vapor_pressures_source["Mg"]
-    )
+    # b-147: high-T path is gas_fugacity (TE gas_rail dormant).
+    assert "gas_standard_fugacity" in without_antoine.vapor_pressures_source["Mg"]
 
 
 def test_sio_source_validated_domain_covers_process_envelope(

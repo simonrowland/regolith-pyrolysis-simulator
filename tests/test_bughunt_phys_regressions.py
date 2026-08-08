@@ -893,11 +893,18 @@ def test_c6_acquisition_timeout_ends_as_transport_bound_refusal() -> None:
         "c6_hold_target_not_acquired"
     )
     assert refusal["diagnostic"]["unacquired_hold_target_C"] == 1400.0
+    # 2026-08-07 b-147: transport_state now also carries this-hour ramp
+    # telemetry (nominal/actual/throttle_reason) for the C4 acquisition
+    # opportunity clock; this SimpleNamespace scenario sets none, so the
+    # stamped defaults (0.0/0.0/"") ride along in the diagnostic copy.
     assert refusal["diagnostic"]["binding_transport_state"] == {
         "binding_cause": "controlled_o2_no_equipment",
         "saturation_pct": 202.0,
         "evap_exceeds_transport": True,
         "turbine_limited": False,
+        "nominal_ramp_rate_C_hr": 0.0,
+        "actual_ramp_rate_C_hr": 0.0,
+        "throttle_reason": "",
     }
 
 

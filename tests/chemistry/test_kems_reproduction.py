@@ -190,7 +190,13 @@ def test_kems_case_schema_rejects_unknown_fields() -> None:
             "halwax_2024_mgo.yaml",
             "Mg",
             1926.0,
-            0.2151636240089096,
+            # b-147 Mg (2026-08-07) option B: TE gas_rail demoted; Pref_GF path.
+            # SIGN CHECK: high-T monatomic Mg pressure moves UP vs TE Pref_GR pin
+            # (0.21516 -> 0.81977 Pa at 1926 K / a=1-class Halwax conditions;
+            # +0.5809 dex = Pref_GF-Pref_GR at 1926 K). PROVIDER-DRIFT TRIPWIRE
+            # only; not a literature re-fit.
+            # docs-private/research/2026-08-07-mgfix/report.md
+            0.8197707668768197,
         ),
     ],
 )

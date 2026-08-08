@@ -529,7 +529,12 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
         # the old live value. SIGN CHECK: pressure UP, matching more high-T
         # Ca volatilisation. See docs-private/research/2026-08-07-mc5-ca-fix/report.md.
         "Ca": 5.740329129667688e-6,
-        "Mg": 7.3e-3,
+        # b-147 Mg (2026-08-07): TE gas_rail demoted; Pref_GF path. Live catalog
+        # probe at 1873.15 K moves 7.3e-3 -> 0.09398 Pa (+1.110 dex). Pref_GF-GR
+        # at this T is only +0.565 dex; the extra pin motion is band-based
+        # (old pin sat below old live). SIGN CHECK: pressure UP.
+        # docs-private/research/2026-08-07-mgfix/report.md
+        "Mg": 0.09397692153837497,
         # Constant table gamma (no T*/T / pseudo-binary mid-range).
         "K": 0.469,
         "Al": 1.4e-8,
@@ -885,12 +890,18 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         # (+0.326 points) while melt mass falls by the equal-and-opposite
         # -1.2425e-6 kg (1 h step). Recomputed from this quiesced default-off
         # probe; see docs-private/research/2026-08-07-mc5-ca-fix/report.md.
+        # 2026-08-07 b-147 Mg option B: TE gas_rail demoted; monatomic Mg and
+        # MgO/Mg2 base Pref move UP (Pref_GF; +0.53...+0.67 dex over the
+        # 1366-2273 K domain). SIGN CHECK: more high-T Mg volatilisation
+        # raises total flux (+2.7797e-3 kg/hr) and transport saturation
+        # (+1204 points) while melt mass falls by the equal-and-opposite
+        # -2.7797e-3 kg (1 h step). See docs-private/research/2026-08-07-mgfix/report.md.
         (
             1,
             1550.0,
-            2.6546626456566544,
-            1165587.1283014542,
-            996.1076305484173,
+            2.657442373039855,
+            1166791.150555329,
+            996.1048508210342,
         ),
         rel=1.0e-12,
         abs=1.0e-12,

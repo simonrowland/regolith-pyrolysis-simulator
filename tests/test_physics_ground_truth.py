@@ -464,9 +464,9 @@ def test_mg_sidecar_is_monotonic_but_gas_runtime_uses_liquid_oxide_standard() ->
             )
         )
         assert result.status == "ok"
-        # Two-rail preserved: gas rail is liquid-oxide standard reaction
-        # (not solid-oxide Ellingham gas fugacity; not pure-component Antoine).
-        assert "gas_rail_liquid_oxide_standard_reaction" in result.diagnostic[
+        # b-147: high-T Mg is JANAF gas_fugacity (TE gas_rail dormant).
+        # Not pure-component Antoine; not the demoted TE Pref_GR path.
+        assert "gas_standard_fugacity" in result.diagnostic[
             "vapor_pressures_source"
         ]["Mg"]
         effective_pressures_pa.append(result.diagnostic["vapor_pressures_Pa"]["Mg"])
@@ -477,9 +477,12 @@ def test_mg_sidecar_is_monotonic_but_gas_runtime_uses_liquid_oxide_standard() ->
     )
 
 
+# b-147 Mg (2026-08-07): TE Pref_GR demoted; roots use Pref_GF (higher P at
+# fixed T) so the 0.01 bar window opens at LOWER T. SIGN CHECK: moon
+# 1978.564 → 1892.647 C; asteroid 1840.802 → 1768.703 C.
 _MG_PHASE_0P01_BAR_CASES = (
-    ("moon", MOON_VACUUM_FLOOR_BAR, 1979, 1978.564),
-    ("asteroid", ASTEROID_VACUUM_FLOOR_BAR, 1841, 1840.802),
+    ("moon", MOON_VACUUM_FLOOR_BAR, 1893, 1892.647379974303),
+    ("asteroid", ASTEROID_VACUUM_FLOOR_BAR, 1769, 1768.703033642641),
 )
 
 

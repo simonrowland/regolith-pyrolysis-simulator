@@ -74,8 +74,13 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # Recomputed after phosphorus batch 7e6bebc: its C0b-P controls changed
     # data/setpoints.yaml, the sole batch input serialized by this resolved
     # setpoints digest. Empty recipe/setpoints patch bytes remain neutral.
+    # Recomputed 2026-08-07 (b-147 Mg TE-μ0 demotion): the derived
+    # Mg_threshold_grounding roots in data/setpoints.yaml moved with the
+    # Pref_GF retarget (moon 1978.564→1892.647 C; asteroid 1840.802→1768.703 C)
+    # plus the phase_basis provenance string — the digest tracks the file
+    # content by design. Empty patch bytes remain neutral (identity holds).
     assert hashlib.sha256(resolved).hexdigest() == (
-        "cf07d358722e3d29effdca1d18a1b700733c1ba421c8ddc96a54ee0448b7ad45"
+        "ba84a1a08ba61af122bb582bb1e02672e0f939e0d0711500bcdb9db573573ca9"
     )
     assert schema.bounds_digest == (
         "5a5aba76747df5b17a0dc98ce81eb47bccf045687394656f55474ca60ecd9184"

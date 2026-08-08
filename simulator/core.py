@@ -11326,7 +11326,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.campaign_mgr.c4_max_temp_C = self.c4_max_temp_C
 
     def is_complete(self) -> bool:
-        return self.melt.campaign == CampaignPhase.COMPLETE
+        # C4 typed endpoint refusal is a non-resumable terminal latch
+        # (no AUTO_APPLY into C6). Bare step loops that only poll
+        # is_complete() must terminate; otherwise post-refusal hours keep
+        # advancing forever with next_campaign=None (b-147 C4 liveness hole:
+        # acquisition refused while transport-throttled, then T coasts to the
+        # hold target and spins). Run-executor already treated the latch as
+        # terminal via _last_c4_refusal_diagnostic; is_complete must agree.
+        return (
+            self.melt.campaign == CampaignPhase.COMPLETE
+            or bool(self._c4_campaign_refused)
+        )
 
     @staticmethod
     def _diagnostic_target_species(value: Any) -> tuple[str, ...]:
@@ -12014,6 +12024,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         'turbine_limited',
                         False,
                     )),
+                    # This-hour Loop-3/4 ramp telemetry (applied at step start
+                    # from prior-hour sat). C4 acquisition opportunity uses
+                    # these so full transport holds do not burn the preheat
+                    # budget (b-147 Mg Pref_GF holdup → controlled_o2 sat).
+                    'nominal_ramp_rate_C_hr': float(
+                        getattr(self, '_last_nominal_ramp', 0.0) or 0.0
+                    ),
+                    'actual_ramp_rate_C_hr': float(
+                        getattr(self, '_last_actual_ramp', 0.0) or 0.0
+                    ),
+                    'throttle_reason': str(
+                        getattr(self, '_last_throttle_reason', '') or ''
+                    ),
                 },
             )
         except CampaignEndpointRefusal as exc:

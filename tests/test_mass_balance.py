@@ -344,11 +344,18 @@ def test_c2a_staged_freeze_gate_on_closes_mass_balance(
     steps = _run_c2a_staged_to_completion(sim)
 
     # C5 is default-off. With the C4 non-resumable acquisition ceiling this
-    # C2A_STAGED→C4 path saturates transport and refuses at
-    # c4_target_window_not_acquired (T stuck ~1300 C) rather than fail-opening
-    # into C6 / final boiloff. Live semantic duration pin (not a golden);
-    # both freeze_gate modes refuse at the same acquisition ceiling hour.
-    assert steps == 72
+    # C2A_STAGED→C4 path saturates transport and refuses rather than
+    # fail-opening into C6 / final boiloff. Live semantic duration pin (not a
+    # golden); both freeze_gate modes refuse at the same hour.
+    # 2026-08-07 b-147 C4 opportunity clock: transport-held hours (nominal
+    # ramp wanted, actual zeroed, throttle recorded) no longer burn the 60 h
+    # acquisition budget, so the old refusal at step 72 no longer fires; with
+    # T stuck (~1300 C) opportunity stays ~0 and the run now terminates via
+    # the held-hours preheat wall at acquisition(60)+process(40)=100 held C4
+    # hours → 127 total steps. SIGN: longer honest drain accounting, then a
+    # typed refusal (c4_preheat_wall_clock_exhausted) — never an infinite
+    # spin; closure asserts below unchanged and still bind.
+    assert steps == 127
     transition_names = {
         getattr(transition, "name", "")
         for transition in sim.atom_ledger.transitions
