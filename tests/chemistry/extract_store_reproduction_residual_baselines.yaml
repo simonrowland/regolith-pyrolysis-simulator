@@ -751,3 +751,39 @@ points:
   status: match
   note: Expanded real-harness pin; residual is reported, not tuned.
   temperature_K: 1800.0
+# 2026-08-08 t-544 Langmuir-corpus pins (fbd08a3 added kems-001/002 without
+# baselines; caught by the t-538 landing differential). Residuals reported,
+# not tuned — Olette-alpha rows (relative volatility vs Fe(l), NOT HKL alpha
+# in 0..1); the large Mn residuals are the first Mn ground-truth rows on the
+# battery and are honest current-state (multi-valence Mn speciation is
+# unmodeled, t-543).
+- key: ohno_1967_cr_olette_alpha_table3:T=1873.15
+  case_id: kems-002-ohno-1967::ohno_1967_cr_olette_alpha_table3
+  source_id: kems-002-ohno-1967
+  observation_type: alpha
+  species: Cr
+  residual_dex: 0.4607308385314931
+  band_dex: 0.01
+  status: match
+  note: Olette-alpha row; reported, not tuned (t-544 pilot ingest).
+  temperature_K: 1873.15
+- key: homma_1966_mn_olette_alpha_exp_table1:T=1873.15
+  case_id: kems-001-homma-1966::homma_1966_mn_olette_alpha_exp_table1
+  source_id: kems-001-homma-1966
+  observation_type: alpha
+  species: Mn
+  residual_dex: 2.060697840353612
+  band_dex: 0.01
+  status: mismatch
+  note: First Mn battery row; honest current-state residual (t-543 target).
+  temperature_K: 1873.15
+- key: ohno_1967_mn_olette_alpha_table3:T=1873.15
+  case_id: kems-002-ohno-1967::ohno_1967_mn_olette_alpha_table3
+  source_id: kems-002-ohno-1967
+  observation_type: alpha
+  species: Mn
+  residual_dex: 2.0827853703164503
+  band_dex: 0.01
+  status: mismatch
+  note: First Mn battery row; honest current-state residual (t-543 target).
+  temperature_K: 1873.15
