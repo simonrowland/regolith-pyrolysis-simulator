@@ -798,32 +798,62 @@ def test_config_bundle_retains_compiler_capability_for_b1(
     ) is sim.vapour_rail_catalog.evaluator_for_condensation("K")
 
 
-def test_anti_cliff_continuation_is_status_bearing_coating_conservative() -> None:
-    """Out-of-domain continues with a coating-conservative point estimate.
+def test_anti_cliff_continuation_is_status_bearing_physical_reciprocal_T() -> None:
+    """Out-of-domain continues with a physical 1/T (van 't Hoff) estimate.
 
-    Rationale (b-118): the prior half-slope always under-stated outward
-    volatility (anti-conservative for coating). The anti-cliff intent is
-    preserved (nonzero, continuous from the domain edge); the continuation
-    direction is conservative for coating so the estimate never under-states flux.
+    Rationale (t-538 / b-145 class): the prior attenuated linear-T slope
+    invented multi-dex low-T pressure. Anti-cliff intent is preserved
+    (nonzero, continuous from the domain edge, status-bearing OOR mark);
+    the *value* is the family-keyed physical continuation — for this
+    tabulated_equilibrium reference, the linear-in-1/T chord through the
+    two edge cells.
     """
     evaluator = compile_vapour_rail_catalog(_reaction_fixture()).evaluator_for("K")
     endpoint = evaluator.evaluate(
         1200.0, source_activity=1.0, pO2_bar=1.0
     ).pressure_pa
     beyond = evaluator.evaluate(1300.0, source_activity=1.0, pO2_bar=1.0)
-    straight_log10 = math.log10(endpoint) + (2.0 / 200.0) * 100.0
-    straight_pa = 10.0**straight_log10
+    below = evaluator.evaluate(900.0, source_activity=1.0, pO2_bar=1.0)
 
     assert beyond.out_of_range is True
     assert beyond.status == OUT_OF_RANGE_STATUS
     assert beyond.acquisition_flag == "acquire:test:K"
-    # Anti-cliff: strictly above the domain-edge value, never silent zero.
-    assert beyond.pressure_pa > endpoint > 0.0
-    # Coating-conservative estimate: at or above straight log-linear continuation.
-    assert beyond.pressure_pa >= straight_pa
-    assert (
-        evaluator.evaluate(900.0, source_activity=1.0, pO2_bar=1.0).pressure_pa
-        > 0.0
+    # Anti-cliff: never silent zero; continuous at the edge.
+    assert beyond.pressure_pa > 0.0
+    assert endpoint > 0.0
+    assert below.pressure_pa > 0.0
+    assert below.out_of_range is True
+
+    # Premise: tabulated edge cells (1000 K, 1 Pa) and (1200 K, 100 Pa)
+    # define a unique linear-in-1/T line. Algebra:
+    #   log10 P(T) = log10 P0 + (log10 P1 − log10 P0)
+    #                · (1/T − 1/T0) / (1/T1 − 1/T0)
+    # Unit Pa. Sanity: at T=T0/T1 the line recovers the cell pressures;
+    # at T=1300 K (above) and T=900 K (below) the OOR path matches.
+    t0, p0 = 1000.0, 1.0
+    t1, p1 = 1200.0, 100.0
+    log0, log1 = math.log10(p0), math.log10(p1)
+    inv0, inv1 = 1.0 / t0, 1.0 / t1
+
+    def expected_log10(T: float) -> float:
+        return log0 + (log1 - log0) * ((1.0 / T) - inv0) / (inv1 - inv0)
+
+    # Outer activity/pO2 factors are unity at a=1, pO2=1 bar with the
+    # fixture's exponents, so pressure_pa is the reference continuation.
+    assert math.log10(beyond.pressure_pa) == pytest.approx(
+        expected_log10(1300.0), rel=0.0, abs=1.0e-12
+    )
+    assert math.log10(below.pressure_pa) == pytest.approx(
+        expected_log10(900.0), rel=0.0, abs=1.0e-12
+    )
+    # Edge identity: 1/T continuation at T=Tb recovers the boundary value
+    # (anti-cliff; no jump). Finite-diff approach the high edge from above.
+    just_above = evaluator.evaluate(
+        1200.0 + 1.0e-6, source_activity=1.0, pO2_bar=1.0
+    )
+    assert just_above.out_of_range is True
+    assert math.log10(just_above.pressure_pa) == pytest.approx(
+        math.log10(endpoint), abs=1.0e-6
     )
 
 

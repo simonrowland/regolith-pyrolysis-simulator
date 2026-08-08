@@ -40,10 +40,12 @@ from simulator.vapour_rail.batch import FluxActivationContext
 from simulator.vapour_rail.nasa_cea import (
     Nasa7Segment,
     Nasa9Segment,
+    NasaCeaDomainError,
     NasaCeaPolynomial,
     reaction_equilibrium_constant,
 )
 from simulator.vapour_rail.shomate import (
+    ShomateDomainError,
     ShomatePolynomial,
     ShomateSegment,
     coefficients_from_mapping,
@@ -841,8 +843,10 @@ class _ReferencePressureModel:
     # avoid freezing large polynomial trees into every Antoine row.
     thermo_log10_pressure: Any | None = None
     # Composite carriers (base reaction × gas-exchange) evaluate the physical
-    # composite at the actual T when OOR; pure Antoine / seam metals keep the
-    # log-linear conservative_slope_continuation (see CompiledPressureEvaluator).
+    # composite at the actual T when OOR (b-145). Non-composite families take
+    # the family-keyed physical continuation in CompiledPressureEvaluator
+    # (t-538): direct van 't Hoff when C=0 / thermo-in-domain, else 1/T
+    # tangent from the domain edge. No species-name branches (ADR-001).
     physical_composite_ood: bool = False
 
     def log10_pressure(self, temperature_K: float) -> float:
@@ -915,10 +919,10 @@ class CompiledPressureEvaluator:
                 )
             # Anti-cliff: continuous non-zero at the domain edge (no silent
             # zero). Consumers may compute with this continuation but must
-            # preserve its extrapolated, non-certifying status. Composite
-            # carriers take the physical-composite branch inside
-            # _out_of_domain_log10_continuation; pure Antoine / seam metals
-            # keep the log-linear coating-conservative slope.
+            # preserve its extrapolated, non-certifying status. Continuation
+            # value is physical (family-keyed van 't Hoff / 1/T tangent /
+            # composite thermo) — never attenuated linear-T slope invention
+            # (b-145 composites; t-538 all non-composite families).
             log10_reference = self._out_of_domain_log10_continuation(
                 temperature_K
             )
@@ -1000,26 +1004,27 @@ class CompiledPressureEvaluator:
 
         Owner-ratified anti-cliff policy: never drop to silent zero at the
         fit-domain edge (that would invent a volatility cliff). The returned
-        number is the best available continuation, not certifying evidence.
+        number is the best available *physical* continuation, not certifying
+        evidence. Status remains OOR/status-bearing regardless of branch.
 
-        Two branches:
+        Family-keyed physical mechanism (ADR-001 — no species-name branches;
+        b-145 composites + t-538 non-composites):
 
-        1. **Physical composite** (``physical_composite_ood``): rows whose
-           pressure is base-reaction × gas-exchange composition. Evaluate the
-           composite thermo at the actual T — CEA gas polys stay in their
-           300–6000 K domain; the base Antoine (Clausius–Clapeyron 1/(T+C)
-           form fitted to the reaction ΔH) is the true thermodynamic
-           continuation of the base, not a log-linear slope of the already-
-           composed pressure. Status remains OOR/status-bearing; only the
-           value is physical. (b-145: linear-T slope + ×0.5 cooling
-           attenuation invented +4.33 dex on TiO2_gas at 1350 K.)
+        1. **Physical composite** (``physical_composite_ood``): evaluate the
+           composite thermo at the actual T (CEA K_ex in-domain × base
+           Antoine as van 't Hoff 1/(T+C) of the fitted base dH).
 
-        2. **Conservative slope continuation** (pure Antoine / seam metals):
-           consequence-directed estimate (coating failure mode, CLAUDE.md
-           §4): amplify outward increases and attenuate outward decreases
-           relative to the straight log-linear slope. The caller may evolve
-           inventory from the estimate but must keep it status-bearing and
-           unable to certify.
+        2. **Direct van 't Hoff** (Antoine / standard_reaction_term ref with
+           C = 0; pure thermo families while polys are in-domain): the
+           reference model *is* Clausius–Clapeyron linear-in-1/T (or the
+           thermo surface itself). Evaluate at the actual T — no invented
+           slope change.
+
+        3. **1/T-tangent from the domain edge** (Antoine C ≠ 0; tabulated
+           equilibrium edge cells; thermo when polys themselves are OOR):
+           continue log10 P as linear in 1/T from the boundary tangent
+           (van 't Hoff local form). Replaces the prior attenuated linear-T
+           slope that invented multi-dex low-T pressure.
         """
         if self.reference_model.physical_composite_ood:
             # Premise: for composite carrier V, log10 P_V°(T) =
@@ -1039,30 +1044,163 @@ class CompiledPressureEvaluator:
             # 1350 K lands within ~0.2 dex of VapoRock (b-145 base_compare).
             return float(self.reference_model.log10_pressure(temperature_K))
 
+        mode = self._physical_oor_continuation_mode()
+        if mode == "direct":
+            return float(self.reference_model.log10_pressure(temperature_K))
+
+        if mode == "direct_with_tangent_fallback":
+            # Pure thermo rows (nasa_cea_*/shomate, non-composite): the
+            # polynomial surface is the physical pressure. Prefer it when the
+            # polys themselves accept T; fall back to 1/T tangent when the
+            # thermo domain is also exceeded (e.g. CEA P-family floor 699 K).
+            try:
+                return float(self.reference_model.log10_pressure(temperature_K))
+            except (NasaCeaDomainError, ShomateDomainError, CatalogCompileError):
+                return self._reciprocal_T_tangent_log10(temperature_K)
+
+        # mode == "reciprocal_T_tangent"
+        return self._reciprocal_T_tangent_log10(temperature_K)
+
+    def _physical_oor_continuation_mode(self) -> str:
+        """Pick the physical OOR mode from evaluator / reference family only.
+
+        Returns one of ``\"direct\"``, ``\"direct_with_tangent_fallback\"``,
+        ``\"reciprocal_T_tangent\"``. Keyed by family structure (ADR-001) —
+        never by species id.
+        """
+        fam = self.evaluator_family
+        ref = self.reference_model
+
+        if fam in RUNTIME_THERMO_EVALUATOR_FAMILIES:
+            return "direct_with_tangent_fallback"
+
+        # Antoine pressure rows, and standard_reaction_term rows whose
+        # reference_pressure_model is Antoine: C=0 is exact van 't Hoff
+        # (Ellingham ΔG linear-in-T ⇒ log10 P = A − B/T). C ≠ 0 is an
+        # empirical in-domain fit — continue with the 1/T tangent of that
+        # fit rather than evaluating the C-curved form outside its window.
+        if ref.evaluator_family == "antoine":
+            try:
+                C = float(ref.coefficients["C"])
+            except (KeyError, TypeError, ValueError) as exc:
+                raise CatalogCompileError(
+                    f"{self.species_id}: Antoine OOR continuation requires "
+                    "numeric C"
+                ) from exc
+            if abs(C) <= 1.0e-12:
+                return "direct"
+            return "reciprocal_T_tangent"
+
+        if (
+            fam == "tabulated_equilibrium"
+            or ref.evaluator_family == "tabulated_equilibrium"
+        ):
+            return "reciprocal_T_tangent"
+
+        # Unknown / future families: still physical 1/T, never attenuated
+        # linear-T slope invention.
+        return "reciprocal_T_tangent"
+
+    def _reciprocal_T_tangent_log10(self, temperature_K: float) -> float:
+        """Continue log10 P as linear in 1/T from the fit-domain edge.
+
+        Premise (Clausius–Clapeyron / van 't Hoff): near a local temperature
+        where reaction ΔH is slowly varying,
+            d(ln P) / d(1/T) = −ΔH/R ≈ const,
+        so log10 P is locally linear in 1/T. Algebra: let L(T)=log10 P(T),
+        Tb the nearer domain edge, and
+            s = dL/d(1/T)|_Tb = (dL/dT)|_Tb · (−Tb²).
+        Then
+            L(T) = L(Tb) + s · (1/T − 1/Tb).
+        For tabulated_equilibrium the two edge cells define the unique
+        linear-in-1/T line (chord ≡ constant-ΔH fit through those points).
+        For Antoine A−B/(T+C) the analytic derivative is used:
+            dL/dT = B/(T+C)² ⇒ s = −B · Tb² / (Tb+C)².
+        Units: L is log10(Pa); s has units log10(Pa)·K; 1/T is K⁻¹.
+        Sanity: at T=Tb, L matches the in-domain edge exactly (no cliff);
+        dL/d(1/T) matches by construction; for pure van 't Hoff (C=0)
+        L=A−B/T the tangent *is* the function (bit-identity with direct
+        eval). Below-floor Stage-0 T (~400 K) therefore continues the
+        physical slope, not an attenuated linear-T invention.
+        """
         low, high = self.valid_temperature_K
         boundary = low if temperature_K < low else high
+        if not (math.isfinite(temperature_K) and temperature_K > 0.0):
+            raise CatalogCompileError(
+                f"{self.species_id}: OOR 1/T continuation requires T > 0 K"
+            )
+        if not (math.isfinite(boundary) and boundary > 0.0):
+            raise CatalogCompileError(
+                f"{self.species_id}: OOR 1/T continuation requires boundary > 0 K"
+            )
+
+        ref = self.reference_model
+
+        if ref.evaluator_family == "antoine":
+            try:
+                A = float(ref.coefficients["A"])
+                B = float(ref.coefficients["B"])
+                C = float(ref.coefficients["C"])
+            except (KeyError, TypeError, ValueError) as exc:
+                raise CatalogCompileError(
+                    f"{self.species_id}: Antoine 1/T continuation requires "
+                    "numeric A, B, C"
+                ) from exc
+            denom = boundary + C
+            if denom <= 0.0:
+                raise CatalogCompileError(
+                    f"{self.species_id}: Antoine 1/T continuation has "
+                    "non-positive denominator at boundary"
+                )
+            boundary_log = A - B / denom
+            # s = dL/d(1/T) = −B · Tb² / (Tb+C)²
+            s = -B * (boundary * boundary) / (denom * denom)
+            return boundary_log + s * (1.0 / temperature_K - 1.0 / boundary)
+
+        if ref.evaluator_family == "tabulated_equilibrium":
+            points = ref.points
+            if len(points) < 2:
+                raise CatalogCompileError(
+                    f"{self.species_id}: tabulated 1/T continuation needs "
+                    "≥2 points"
+                )
+            if temperature_K < low:
+                left, right = points[0], points[1]
+            else:
+                left, right = points[-2], points[-1]
+            t0, p0 = float(left[0]), float(left[1])
+            t1, p1 = float(right[0]), float(right[1])
+            if min(t0, t1, p0, p1) <= 0.0:
+                raise CatalogCompileError(
+                    f"{self.species_id}: tabulated edge cells must be positive"
+                )
+            inv0 = 1.0 / t0
+            inv1 = 1.0 / t1
+            d_inv = inv1 - inv0
+            if d_inv == 0.0:
+                raise CatalogCompileError(
+                    f"{self.species_id}: tabulated edge cells share 1/T"
+                )
+            log0 = math.log10(p0)
+            log1 = math.log10(p1)
+            # Linear-in-1/T through the two edge cells; evaluate at T.
+            # (Chord through edge cells ≡ constant-ΔH van 't Hoff fit.)
+            return log0 + (log1 - log0) * ((1.0 / temperature_K) - inv0) / d_inv
+
+        # General / thermo fallback: finite-difference dL/dT just inside the
+        # domain, convert to dL/d(1/T), continue. Prefer analytic when the
+        # reference surface is smooth.
         span = max(high - low, 1.0)
         step = min(max(span * 1.0e-4, 1.0e-3), 1.0)
         inside = boundary + step if boundary == low else boundary - step
-        boundary_log = self.reference_model.log10_pressure(boundary)
-        inside_log = self.reference_model.log10_pressure(inside)
-        slope = (boundary_log - inside_log) / (boundary - inside)
-        straight_delta = slope * (temperature_K - boundary)
-        # Premise: the consequence envelope must not create a derivative kink at
-        # either end of its boundary blend, while established far-OOR estimates
-        # must not move. Algebra: over at most 10 K, u=|dT|/ramp and the cubic
-        # h(u)=3u^2-2u^3 has h'(0)=h'(1)=0; blending
-        # f=1+(f_target-1)h therefore joins both the in-domain slope at u=0 and
-        # the existing consequence slope at u=1. Units: u, h, and f are
-        # dimensionless; logP remains log10(Pa). Sanity: value and first
-        # derivative stay continuous at both joins, while points >=10 K outside
-        # retain the exact established 0.5/1.5 factor.
-        target_factor = 1.5 if straight_delta >= 0.0 else 0.5
-        ramp_span_K = min(span, 10.0)
-        distance_fraction = min(abs(temperature_K - boundary) / ramp_span_K, 1.0)
-        smooth_fraction = distance_fraction**2 * (3.0 - 2.0 * distance_fraction)
-        factor = 1.0 + (target_factor - 1.0) * smooth_fraction
-        return boundary_log + factor * straight_delta
+        if inside <= 0.0:
+            inside = boundary + step  # force positive probe
+        boundary_log = float(ref.log10_pressure(boundary))
+        inside_log = float(ref.log10_pressure(inside))
+        dL_dT = (boundary_log - inside_log) / (boundary - inside)
+        # s = dL/d(1/T) = dL/dT · dT/d(1/T) = dL/dT · (−T²)
+        s = dL_dT * (-(boundary * boundary))
+        return boundary_log + s * (1.0 / temperature_K - 1.0 / boundary)
 
     # Compat alias — older tests/callers may still import the private name.
     _conservative_log10_continuation = _out_of_domain_log10_continuation

@@ -536,6 +536,8 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
         # docs-private/research/2026-08-07-mgfix/report.md
         "Mg": 0.09397692153837497,
         # Constant table gamma (no T*/T / pseudo-binary mid-range).
+        # t-538: seam pin unchanged (pre-rg Builtin path); catalog OOR value
+        # moves via physical 1/T tangent (see K branch below).
         "K": 0.469,
         "Al": 1.4e-8,
     }
@@ -582,6 +584,15 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
         assert seam_pa is not None and seam_pa > 0.0
         assert within_probe_band(species_id, float(seam_pa), probe_pa)
         if species_id == "K":
+            # K fit domain ends at 1600 K; this probe is at 1873.15 K → OOR.
+            # t-538: OOR value is the physical 1/T-tangent continuation of the
+            # Antoine reference (C≠0), not attenuated linear-T slope invention.
+            # SIGN CHECK: unit-a log10 Pref at 1873.15 K drops ~0.81 dex vs the
+            # prior ×1.5 heating amplification (5.766 → 4.960). Activity-scaled
+            # catalog pressure therefore moves DOWN toward the pre-rg seam
+            # (~0.71 vs ~0.69 Pa) — they can sit in the same probe band now.
+            # Separation catalog≠seam is no longer required; OOR status-bearing
+            # mark + a=1 reversion scale (below) still prove the catalog path.
             assert answer.extra.get("out_of_range") is True
             assert answer.extra["status"] == OUT_OF_RANGE_STATUS
             assert answer.extra.get("acquisition_flag")
@@ -589,7 +600,9 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
             assert answer.certification_ceiling == "never"
             assert math.isfinite(catalog_pa) and 0.0 < catalog_pa
             assert catalog_pa < pure_component_probe_pa[species_id]
-            assert not within_probe_band(species_id, catalog_pa, float(seam_pa))
+            # Physical OOR can land near the pre-rg seam; pin the live value
+            # so a future regression that re-inflates heating OOR is visible.
+            assert catalog_pa == pytest.approx(0.7101916366096568, rel=1.0e-9)
         else:
             assert not answer.extra.get("out_of_range", False)
             assert within_probe_band(species_id, catalog_pa, probe_pa)
