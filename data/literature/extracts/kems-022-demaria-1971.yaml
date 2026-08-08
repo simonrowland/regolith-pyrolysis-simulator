@@ -1359,6 +1359,330 @@ species:
               docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers; passivated Re for 12065
             line_range: 32-56
+    - observation_id: demaria_1971_na_psat_figure1_sample_12022_digitized
+      type: psat_series
+      locator:
+        source_path: >-
+          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        figure: '1'
+        page: 1369
+        paragraph: >-
+          Fig. 1 circles = sample 12022 (upper line); open=BC, full=NAA;
+          pre-depletion / first-observed points only (Na first ~1250 K; rapid depletion)
+        note: figure-digitized absolute P series; not tabulated in source
+      T_range_K: [1299.0, 1429.0]
+      phase: Apollo_12_lunar_basalt_melt_12022
+      standard_state: partial pressure over multicomponent lunar basalt melt (not pure oxide)
+      regime: kems_effusion
+      units: atm as published on Fig. 1 (p_Pa = p_atm × 101325)
+      uncertainty:
+        sigma_log10P_dex_per_point: 0.30
+        fully_correlated_cell_calibration_offset_note: >-
+          Framework §4.3.A error model: one fully-correlated cell-calibration offset
+          across all points of a series (in addition to 0.30 dex/pt independent).
+          Authors also state ≥factor 2 absolute-P uncertainty from calibration.
+        note: pre-registered digitization σ; do not retune Pref/γ to close residuals
+      values:
+        gas_species: Na(g)
+        quantity: partial_pressure_figure_digitized
+        material: Apollo_12_12022
+        condensed_phase: lunar_basalt_melt
+        sample: '12022'
+        sample_Na2O_wt_pct: 0.36
+        sample_K2O_wt_pct: 0.068
+        composition_source: >-
+          DeMaria 1971 text (Sample 12022,57 alkaline components paragraph):
+          "0.36 and 0.068 wt. % of Na2O and K2O, respectively"; full oxide suite
+          reported elsewhere (Smales 1971). Test fixture matches Na2O=0.36.
+        figure_digitized: true
+        series: upper_line_circles
+        pre_depletion_only: true
+        first_observed_T_K: 1250.0
+        companion_O2_table: demaria_1971_o2_psat_table1_alkali_range
+        co_measured_context: same alkali window as K Fig. 2 and Table 1 O2
+        line_anchor_1429K:
+          T_K: 1429.0
+          invT_times_1e4_K_inv: 6.9979
+          log10_p_atm: -6.106
+          p_Pa: 7.93e-2
+          note: >-
+            Fitted-line evaluation at investigation T (July Na report);
+            consistent with upper-line visual digitization. Held-out only.
+        points:
+          - T_K: 1428.57
+            invT_times_1e4_K_inv: 7.0
+            log10_p_atm: -6.05
+            p_atm: 8.912509e-07
+            p_Pa: 9.030600e-02
+            symbol: open_circle
+            instrument: BC
+            figure_digitized: true
+            sigma_log10P_dex: 0.30
+            pre_depletion_initial_point: true
+          - T_K: 1412.43
+            invT_times_1e4_K_inv: 7.08
+            log10_p_atm: -6.15
+            p_atm: 7.079458e-07
+            p_Pa: 7.173261e-02
+            symbol: open_circle
+            instrument: BC
+            figure_digitized: true
+            sigma_log10P_dex: 0.30
+            pre_depletion_initial_point: true
+          - T_K: 1379.31
+            invT_times_1e4_K_inv: 7.25
+            log10_p_atm: -6.7
+            p_atm: 1.995262e-07
+            p_Pa: 2.021700e-02
+            symbol: filled_circle
+            instrument: NAA
+            figure_digitized: true
+            sigma_log10P_dex: 0.30
+            pre_depletion_initial_point: true
+          - T_K: 1360.54
+            invT_times_1e4_K_inv: 7.35
+            log10_p_atm: -7.15
+            p_atm: 7.079458e-08
+            p_Pa: 7.173261e-03
+            symbol: open_circle
+            instrument: BC
+            figure_digitized: true
+            sigma_log10P_dex: 0.30
+            pre_depletion_initial_point: true
+          - T_K: 1342.28
+            invT_times_1e4_K_inv: 7.45
+            log10_p_atm: -7.45
+            p_atm: 3.548134e-08
+            p_Pa: 3.595147e-03
+            symbol: filled_circle
+            instrument: NAA
+            figure_digitized: true
+            sigma_log10P_dex: 0.30
+            pre_depletion_initial_point: true
+          - T_K: 1298.7
+            invT_times_1e4_K_inv: 7.7
+            log10_p_atm: -8.05
+            p_atm: 8.912509e-09
+            p_Pa: 9.030600e-04
+            symbol: open_circle
+            instrument: BC
+            figure_digitized: true
+            sigma_log10P_dex: 0.30
+            pre_depletion_initial_point: true
+      equipment:
+        orifice_area:
+          value: 4.154756e-06
+          units: m2
+          diameter_m: 0.0023
+          orifice_shape: knife_edge
+          inferred: true
+          inference: >-
+            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          locator:
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+            line_range: '32'
+        cell_material:
+          value: Re
+          note: Rhenium Knudsen cells (not Mo)
+          locator:
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers
+            line_range: '32'
+    - observation_id: demaria_1971_na_psat_figure1_sample_12065_digitized
+      type: psat_series
+      locator:
+        source_path: >-
+          docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        figure: '1'
+        page: 1369
+        paragraph: >-
+          Fig. 1 squares = sample 12065 (lower line); open=BC, full=NAA;
+          pre-depletion / first-observed points only
+        note: figure-digitized absolute P series; not tabulated in source
+      T_range_K: [1325.0, 1475.0]
+      phase: Apollo_12_lunar_basalt_melt_12065
+      standard_state: partial pressure over multicomponent lunar basalt melt (not pure oxide)
+      regime: kems_effusion
+      units: atm as published on Fig. 1 (p_Pa = p_atm × 101325)
+      uncertainty:
+        sigma_log10P_dex_per_point: 0.30
+        fully_correlated_cell_calibration_offset_note: >-
+          Framework §4.3.A error model: one fully-correlated cell-calibration offset
+          across all points of a series (in addition to 0.30 dex/pt independent).
+          Authors state ≥factor 2 absolute-P uncertainty from calibration (12065 section).
+        note: pre-registered digitization σ; do not retune Pref/γ to close residuals
+      values:
+        gas_species: Na(g)
+        quantity: partial_pressure_figure_digitized
+        material: Apollo_12_12065
+        condensed_phase: lunar_basalt_melt
+        sample: '12065'
+        sample_Na2O_wt_pct: 0.27
+        sample_oxide_composition_wt_pct:
+          SiO2: 46.87
+          MgO: 7.82
+          Al2O3: 10.05
+          TiO2: 3.34
+          FeO: 19.76
+          CaO: 10.73
+          Na2O: 0.27
+          K2O: 0.073
+          MnO: 0.256
+        composition_source: >-
+          Wolf et al. 2022/2023 VapoRock Table 2 "Lunar basalt" column (= Apollo 12065),
+          Refs [7] Maxwell & Wiik (1971); Meyer (2004); De Maria et al. (1971).
+          DeMaria 1971 itself does not tabulate 12065 bulk oxides (refers differences
+          to composition without numbers). Extracted from
+          docs-private/deep-research/literature/wolf-2022-vaporock/mineru/source/vlm/source.md
+          Table 2 + NOTE [7].
+        figure_digitized: true
+        series: lower_line_squares
+        pre_depletion_only: true
+        first_observed_T_K: 1250.0
+        excluded_points_note: >-
+          Three high-T open squares (~6.55–6.72 ×10^4 K^-1) sit well above the author's
+          fitted lower line and are treated as other-series / non-initial (paper: barred
+          points = different series; progressive depletion lowers later points). Not
+          included in this pre-depletion set.
+        companion_O2_table: demaria_1971_o2_psat_table1_alkali_range
+        co_measured_context: same alkali window as K Fig. 2 and Table 1 O2
+        line_anchor_1429K:
+          T_K: 1429.0
+          invT_times_1e4_K_inv: 6.9979
+          log10_p_atm: -7.743
+          p_Pa: 1.83e-3
+          note: >-
+            Fitted-line evaluation at investigation T (July Na report);
+            consistent with lower-line visual digitization. Held-out only.
+        points:
+          - T_K: 1474.93
+            invT_times_1e4_K_inv: 6.78
+            log10_p_atm: -7.05
+            p_atm: 8.912509e-08
+            p_Pa: 9.030600e-03
+            symbol: open_square
+            instrument: BC
+            figure_digitized: true
+            sigma_log10P_dex: 0.30
+            pre_depletion_initial_point: true
+          - T_K: 1459.85
+            invT_times_1e4_K_inv: 6.85
+            log10_p_atm: -7.2
+            p_atm: 6.309573e-08
+            p_Pa: 6.393175e-03
+            symbol: filled_square
+            instrument: NAA
+            figure_digitized: true
+            sigma_log10P_dex: 0.30
+            pre_depletion_initial_point: true
+          - T_K: 1449.28
+            invT_times_1e4_K_inv: 6.9
+            log10_p_atm: -7.3
+            p_atm: 5.011872e-08
+            p_Pa: 5.078280e-03
+            symbol: open_square
+            instrument: BC
+            figure_digitized: true
+            sigma_log10P_dex: 0.30
+            pre_depletion_initial_point: true
+          - T_K: 1438.85
+            invT_times_1e4_K_inv: 6.95
+            log10_p_atm: -7.4
+            p_atm: 3.981072e-08
+            p_Pa: 4.033821e-03
+            symbol: filled_square
+            instrument: NAA
+            figure_digitized: true
+            sigma_log10P_dex: 0.30
+            pre_depletion_initial_point: true
+          - T_K: 1428.57
+            invT_times_1e4_K_inv: 7.0
+            log10_p_atm: -7.55
+            p_atm: 2.818383e-08
+            p_Pa: 2.855727e-03
+            symbol: open_square
+            instrument: BC
+            figure_digitized: true
+            sigma_log10P_dex: 0.30
+            pre_depletion_initial_point: true
+          - T_K: 1418.44
+            invT_times_1e4_K_inv: 7.05
+            log10_p_atm: -7.7
+            p_atm: 1.995262e-08
+            p_Pa: 2.021700e-03
+            symbol: filled_square
+            instrument: NAA
+            figure_digitized: true
+            sigma_log10P_dex: 0.30
+            pre_depletion_initial_point: true
+          - T_K: 1398.6
+            invT_times_1e4_K_inv: 7.15
+            log10_p_atm: -8.0
+            p_atm: 1.000000e-08
+            p_Pa: 1.013250e-03
+            symbol: filled_square
+            instrument: NAA
+            figure_digitized: true
+            sigma_log10P_dex: 0.30
+            pre_depletion_initial_point: true
+          - T_K: 1379.31
+            invT_times_1e4_K_inv: 7.25
+            log10_p_atm: -8.15
+            p_atm: 7.079458e-09
+            p_Pa: 7.173261e-04
+            symbol: filled_square
+            instrument: NAA
+            figure_digitized: true
+            sigma_log10P_dex: 0.30
+            pre_depletion_initial_point: true
+          - T_K: 1351.35
+            invT_times_1e4_K_inv: 7.4
+            log10_p_atm: -8.7
+            p_atm: 1.995262e-09
+            p_Pa: 2.021700e-04
+            symbol: filled_square
+            instrument: NAA
+            figure_digitized: true
+            sigma_log10P_dex: 0.30
+            pre_depletion_initial_point: true
+          - T_K: 1324.5
+            invT_times_1e4_K_inv: 7.55
+            log10_p_atm: -9.35
+            p_atm: 4.466836e-10
+            p_Pa: 4.526021e-05
+            symbol: filled_square
+            instrument: NAA
+            figure_digitized: true
+            sigma_log10P_dex: 0.30
+            pre_depletion_initial_point: true
+      equipment:
+        orifice_area:
+          value: 4.154756e-06
+          units: m2
+          diameter_m: 0.0023
+          orifice_shape: knife_edge
+          inferred: true
+          inference: >-
+            area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          locator:
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+            line_range: '32'
+        cell_material:
+          value: Re_passivated
+          note: >-
+            Passivated rhenium cells used for sample 12065 (higher O2+/Me+);
+            ReO2/ReO3 observed at higher T.
+          locator:
+            source_path: >-
+              docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            paragraph: passivated rhenium cells for 12065
+            line_range: 56-60
+
   K:
     observations:
     - observation_id: demaria_1971_k_first_observed_figure2
@@ -1521,3 +1845,30 @@ fidelity_samples:
       docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
     table: '8'
     line_range: '337'
+
+- species: Na
+  observable: psat_series
+  observation_id: demaria_1971_na_psat_figure1_sample_12022_digitized
+  field: sample_Na2O_wt_pct
+  value: 0.36
+  locator:
+    figure: '1'
+    paragraph: 0.36 wt% Na2O in sample 12022 text
+- species: Na
+  observable: psat_series
+  observation_id: demaria_1971_na_psat_figure1_sample_12065_digitized
+  field: sample_Na2O_wt_pct
+  value: 0.27
+  locator:
+    note: Wolf 2022 Table 2 lunar basalt (12065) Na2O=0.27 wt%; Maxwell & Wiik 1971
+- path: species.Na.observations[demaria_1971_na_psat_figure1_sample_12022_digitized].values.points[0].log10_p_atm
+  value: -6.05
+  note: figure-digitized open-circle point invT*1e4=7.00, log10_p_atm=-6.05
+  locator:
+    figure: '1'
+    note: first digitized 12022 point on upper line
+- path: species.Na.observations[demaria_1971_na_psat_figure1_sample_12065_digitized].values.points[0].log10_p_atm
+  value: -7.05
+  note: figure-digitized first 12065 pre-depletion square on lower line
+  locator:
+    figure: '1'

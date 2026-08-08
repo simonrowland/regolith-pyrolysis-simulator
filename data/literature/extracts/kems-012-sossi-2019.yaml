@@ -93,6 +93,74 @@ species:
       uncertainty:
         note: Authors qualitative bound "close to unity within a factor of 2–3"; they then set α_e=1.
           Do not invent a numeric interval from the prose.
+    - observation_id: sossi_2019_na_logKstar_table3
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '3'
+        section: Results — Na / Table 3
+        paragraph: log K* Na = -4.25±0.10 at 1400 °C (1673.15 K); n=1; reaction NaO0.5(l)=Na(g)+1/4 O2
+        line_range: '1108'
+        note: Table 3 fitted logK* at 1673.15 K; prose §4.2 also states -4.25±0.10
+      T_range_K: [1673.15, 1673.15]
+      phase: silicate_melt_ferrobasalt_FCMAS
+      standard_state: 'open 1-bar furnace; K* = α_e · γ_i · K for NaO0.5(l)=Na(g)+1/4 O2 (n=1)'
+      regime: open_furnace_apparent
+      units: log10 dimensionless (bar-based mass-action as published)
+      uncertainty:
+        log10_K_star_uncertainty: 0.10
+        note: Table 3 SD; authors also note K* accuracy harder to quantify than precision (~±5–30%)
+      values:
+        quantity: log10_K_star_equilibrium_fit
+        gas_species: Na(g)
+        melt_component: NaO0.5
+        reaction: 'NaO0.5(l) = Na(g) + 1/4 O2'
+        n_electrons: 1
+        t0_min: 0
+        T_K: 1673.15
+        log10_K_star: -4.25
+        log10_K_star_uncertainty: 0.10
+        N_points_at_T: 2
+        material: ferrobasalt_FCMAS_open_furnace
+        note: >-
+          Table 3 column 1673.15 K. Prose (OCR §4.2): "higher log K* of … K (−3.95±0.06)
+          relative to Na (−4.25±0.10) at 1400°C". Single-T row (Na* in Table 5 footnote).
+    - observation_id: sossi_2019_na_pure_system_LH_table5
+      type: gibbs_table
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '5'
+        section: Table 5 pure-system thermodynamic data
+        paragraph: 'Na* pure system ΔS°=0.128 kJ/molK, ΔH°=255.0 kJ; Source 2 = Lamoreaux & Hildenbrand 1984'
+        line_range: '1121'
+        note: Table 5 pure-system columns for NaO0.5(l)=Na(g)+1/4 O2; Source column = 2 (L&H 1984)
+      T_range_K: [1673.15, 1673.15]
+      phase: pure_NaO0_5_liquid_standard
+      standard_state: pure liquid NaO0.5 Raoultian; L&H 1984 assembly as cited by Sossi
+      units: kJ/mol and kJ/(mol·K) as published in Table 5
+      values:
+        quantity: pure_system_reaction_enthalpy_entropy
+        reaction: 'NaO0.5(l) = Na(g) + 1/4 O2'
+        n_electrons: 1
+        Delta_S_std_kJ_molK: 0.128
+        Delta_H_std_kJ_mol: 255.0
+        source_column: 2
+        source_column_meaning: Lamoreaux_and_Hildenbrand_1984
+        experimental_Delta_S_star_kJ_molK: 0.071
+        experimental_Delta_H_star_kJ_mol: 255.0
+        experimental_note: >-
+          Table 5 Experimental columns for Na*: ΔS*=0.071, ΔH*=255.0 with #points=1;
+          footnote * = logK* measured at only 1 T; ΔS*/ΔH* by assuming γ_i constant in T.
+        derived_log10_K_at_1673_15:
+          value: -1.27487
+          arithmetic: >-
+            log10 K = (−ΔH + T·ΔS)/(R·T·ln(10)) with ΔH=255000 J/mol, ΔS=128 J/molK,
+            T=1673.15, R=8.314462618 → −1.27487 (matches July Na investigation pin)
+        note: >-
+          Pure-system (ΔH°,ΔS°)=(255.0, 0.128) is L&H-sourced second-hand linear form
+          (Sossi Table 5 Source 2). Landed Na Pref must still be fit to dual-extracted
+          L&H table rows (see t-383 Step 1), not this linear form alone.
+
   K:
     observations:
     - observation_id: sossi_2019_k_open_furnace_alpha_e_context
@@ -152,3 +220,22 @@ fidelity_samples:
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
     paragraph: surface areas (≈ 2×10^{-5} m)
     line_range: '71'
+
+- species: Na
+  observable: activity_coefficient
+  observation_id: sossi_2019_na_logKstar_table3
+  field: log10_K_star
+  value: -4.25
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '3'
+    note: logK* Na = -4.25±0.10 @1673.15 K
+- species: Na
+  observable: gibbs_table
+  observation_id: sossi_2019_na_pure_system_LH_table5
+  field: Delta_H_std_kJ_mol
+  value: 255.0
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '5'
+    note: pure-system ΔH° = 255.0 kJ (Source 2 = L&H 1984)
