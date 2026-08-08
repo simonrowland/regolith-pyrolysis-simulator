@@ -73,6 +73,11 @@ MRE_ELLINGHAM_METAL_BY_OXIDE = {
     "Al2O3": "Al",
     "MgO": "Mg",
     "CaO": "Ca",
+    # t-548 CEA primary-refit extensions (oxide -> Ellingham metal key)
+    "ZrO2": "Zr",
+    "Rb2O": "Rb",
+    "Cs2O": "Cs",
+    "P4O10": "P",
 }
 
 

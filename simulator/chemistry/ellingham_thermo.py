@@ -93,6 +93,12 @@ ELLINGHAM_THERMO: dict[str, tuple[float, float, float, float]] = {
     'Al': (-1126.073, -0.218805, 4/3, 2/3),  # Al-096,  dG(1600C) ~ -716
     'Ti': (-939.632, -0.177149, 1, 1),       # O-043,   dG(1600C) ~ -608
     'Si': (-910.940, -0.182400, 1, 1),       # Si+O2->SiO2; dG(1600C) ~ -569
+    # t-548 CEA primary-refit extensions. Flat rows are keying/stoichiometry
+    # only; authoritative dG(T) is ELLINGHAM_FIT_SEGMENTS.
+    'Zr': (-1080.503, -0.173901, 1, 1),      # Zr+O2->ZrO2; CEA dG(1600K) ~ -802
+    'Rb': (-852.249, -0.449638, 4, 2),       # 4 Rb(g)+O2->2 Rb2O(l); CEA
+    'Cs': (-873.813, -0.458111, 4, 2),       # 4 Cs(g)+O2->2 Cs2O(l); CEA
+    'P':  (-584.140, -0.171105, 4 / 5, 1 / 5),  # 4/5 P(l)+O2->1/5 P4O10(l)
 }
 
 
@@ -623,6 +629,199 @@ ELLINGHAM_FIT_SEGMENTS: dict[str, tuple[EllinghamFitSegment, ...]] = {
             (2500.0, 2600.0),
             "Si(l) + O2 -> SiO2(l); rows 2500-2600 K",
             "Chase 1998 NIST-JANAF O-039; confidence: primary-refit",
+        ),
+    ),
+    # Zr premise (t-548): NASA CEA thermo.inp condensed polynomials for
+    # Zr(a)/Zr(b)/Zr(L) and ZrO2(III)/ZrO2(II). Reaction Zr + O2 -> ZrO2
+    # (n_M=n_ox=1). Phase boundaries are the CEA phase-domain edges
+    # 1135 K (Zr a→b), 1445 K (ZrO2 III→II), 2125 K (Zr melt) — not
+    # hand-tuned. Endpoint-continuous linear pieces: dG(T)=dH−T·dS with
+    # dH,dS fixed by the true CEA dG at each segment endpoint so adjacent
+    # pieces join exactly (jump < 1e-6 kJ/mol O2).
+    # Algebra: dG_rxn = G(ZrO2) − G(Zr) − G(O2) from NASA-9
+    # G/(RT)=H/(RT)−S/R; convert J→kJ. Unit check: dS in kJ/(mol·K)/mol O2.
+    # Sanity: dG(1600 K) ≈ −802 kJ/mol O2 lands between Mg (−804) and Al
+    # (−776) on the oxygen-affinity ladder (ZrO2 more stable than TiO2).
+    # Max residual 0.286 kJ/mol O2 on the 1445–2125 K piece (< 0.5 budget).
+    "Zr": (
+        EllinghamFitSegment(
+            -1092.4661808947478,
+            -0.1818345939235152,
+            1,
+            1,
+            (1100.0, 1135.0),
+            "Zr(a) + O2 -> ZrO2(III); CEA endpoints 1100-1135 K",
+            "NASA CEA thermo.inp Zr(a)/ZrO2(III); confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -1094.2920845972103,
+            -0.1834433196639874,
+            1,
+            1,
+            (1135.0, 1445.0),
+            "Zr(b) + O2 -> ZrO2(III); CEA endpoints 1135-1445 K",
+            "NASA CEA thermo.inp Zr(b)/ZrO2(III); confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -1080.5032859091048,
+            -0.17390089824332502,
+            1,
+            1,
+            (1445.0, 2125.0),
+            "Zr(b) + O2 -> ZrO2(II); CEA endpoints 1445-2125 K",
+            "NASA CEA thermo.inp Zr(b)/ZrO2(II); confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -1099.1038281424167,
+            -0.1826540945611257,
+            1,
+            1,
+            (2125.0, 2600.0),
+            "Zr(L) + O2 -> ZrO2(II); CEA endpoints 2125-2600 K",
+            "NASA CEA thermo.inp Zr(L)/ZrO2(II); confidence: primary-refit",
+        ),
+    ),
+    # Rb premise (t-548): NASA CEA Rb(g) + Rb2O(L). Rb normal boiling point
+    # is below the rail window (~961 K), so gaseous metal is the physical
+    # standard state over 1100–2200 K; no condensed-metal CEA row is
+    # required. Reaction 4 Rb(g) + O2 -> 2 Rb2O(L). Boundaries are pure
+    # residual sub-splits of the single CEA phase field (no hardcoded
+    # boil). Endpoint-continuous; max residual 0.418 kJ/mol O2.
+    # Sanity: dG(1600 K) ≈ −133 kJ/mol O2 sits next to K (−142), correct
+    # alkali ordering (Cs slightly more stable than Rb at 1600 K).
+    "Rb": (
+        EllinghamFitSegment(
+            -885.5542828494675,
+            -0.47403065780469456,
+            4,
+            2,
+            (1100.0, 1237.5),
+            "4 Rb(g) + O2 -> 2 Rb2O(L); CEA endpoints 1100-1237.5 K",
+            "NASA CEA thermo.inp Rb(g)/Rb2O(L); confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -874.3963705269236,
+            -0.46501416299859843,
+            4,
+            2,
+            (1237.5, 1375.0),
+            "4 Rb(g) + O2 -> 2 Rb2O(L); CEA endpoints 1237.5-1375 K",
+            "NASA CEA thermo.inp Rb(g)/Rb2O(L); confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -863.2950306999418,
+            -0.456940461306248,
+            4,
+            2,
+            (1375.0, 1512.5),
+            "4 Rb(g) + O2 -> 2 Rb2O(L); CEA endpoints 1375-1512.5 K",
+            "NASA CEA thermo.inp Rb(g)/Rb2O(L); confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -852.2494909984562,
+            -0.4496376251399765,
+            4,
+            2,
+            (1512.5, 1650.0),
+            "4 Rb(g) + O2 -> 2 Rb2O(L); CEA endpoints 1512.5-1650 K",
+            "NASA CEA thermo.inp Rb(g)/Rb2O(L); confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -836.2325700721058,
+            -0.4399304003361278,
+            4,
+            2,
+            (1650.0, 1925.0),
+            "4 Rb(g) + O2 -> 2 Rb2O(L); CEA endpoints 1650-1925 K",
+            "NASA CEA thermo.inp Rb(g)/Rb2O(L); confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -814.5460539134051,
+            -0.42866467765628324,
+            4,
+            2,
+            (1925.0, 2200.0),
+            "4 Rb(g) + O2 -> 2 Rb2O(L); CEA endpoints 1925-2200 K",
+            "NASA CEA thermo.inp Rb(g)/Rb2O(L); confidence: primary-refit",
+        ),
+    ),
+    # Cs premise (t-548): NASA CEA Cs(g) + Cs2O(L). Cs NBP ~944 K is below
+    # the rail window, so gas-metal basis is physical for 1100–2200 K.
+    # Reaction 4 Cs(g) + O2 -> 2 Cs2O(L). Residual sub-splits only; max
+    # residual 0.498 kJ/mol O2. Sanity: dG(1600 K) ≈ −141 kJ/mol O2,
+    # between K (−142) and Rb (−133) — correct heavy-alkali ordering.
+    "Cs": (
+        EllinghamFitSegment(
+            -901.0641988268972,
+            -0.47883288495692505,
+            4,
+            2,
+            (1100.0, 1237.5),
+            "4 Cs(g) + O2 -> 2 Cs2O(L); CEA endpoints 1100-1237.5 K",
+            "NASA CEA thermo.inp Cs(g)/Cs2O(L); confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -889.8836339487332,
+            -0.4697980850553784,
+            4,
+            2,
+            (1237.5, 1375.0),
+            "4 Cs(g) + O2 -> 2 Cs2O(L); CEA endpoints 1237.5-1375 K",
+            "NASA CEA thermo.inp Cs(g)/Cs2O(L); confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -873.8134868206155,
+            -0.45811070532583825,
+            4,
+            2,
+            (1375.0, 1650.0),
+            "4 Cs(g) + O2 -> 2 Cs2O(L); CEA endpoints 1375-1650 K",
+            "NASA CEA thermo.inp Cs(g)/Cs2O(L); confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -851.9244006871047,
+            -0.44484459251764996,
+            4,
+            2,
+            (1650.0, 1925.0),
+            "4 Cs(g) + O2 -> 2 Cs2O(L); CEA endpoints 1650-1925 K",
+            "NASA CEA thermo.inp Cs(g)/Cs2O(L); confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -830.5051351948598,
+            -0.43371770135284743,
+            4,
+            2,
+            (1925.0, 2200.0),
+            "4 Cs(g) + O2 -> 2 Cs2O(L); CEA endpoints 1925-2200 K",
+            "NASA CEA thermo.inp Cs(g)/Cs2O(L); confidence: primary-refit",
+        ),
+    ),
+    # P premise (t-548): NASA CEA P(L) + P4O10(L). Reaction per mol O2 is
+    # (4/5) P(L) + O2 -> (1/5) P4O10(L) (P4O10 carries 4 P and 10 O).
+    # Phase field is single across 1100–2200 K; split only for residual.
+    # Max residual 0.469 kJ/mol O2. Sanity: dG(1600 K) ≈ −310 kJ/mol O2
+    # sits between Fe (−338) and Na (−287) — phosphate less stable than
+    # FeO but far less reducing than the alkali oxides. Not a metallothermic
+    # metal; lands for dissociation / oxygen-affinity ladder visibility.
+    "P": (
+        EllinghamFitSegment(
+            -584.1398035133319,
+            -0.17110537434045858,
+            4 / 5,
+            1 / 5,
+            (1100.0, 1650.0),
+            "4/5 P(L) + O2 -> 1/5 P4O10(L); CEA endpoints 1100-1650 K",
+            "NASA CEA thermo.inp P(L)/P4O10(L); confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -575.0194658470275,
+            -0.16557789696694075,
+            4 / 5,
+            1 / 5,
+            (1650.0, 2200.0),
+            "4/5 P(L) + O2 -> 1/5 P4O10(L); CEA endpoints 1650-2200 K",
+            "NASA CEA thermo.inp P(L)/P4O10(L); confidence: primary-refit",
         ),
     ),
 }

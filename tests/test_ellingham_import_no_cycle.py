@@ -46,8 +46,11 @@ def test_simulator_first_import_order():
 
 
 def test_leaf_first_import_order():
+    # Count is the landed Ellingham metal keys (11 pre-t548 majors + t-548
+    # CEA tranche Zr/Rb/Cs/P). Raising this number is an intentional inventory
+    # extension; do not silently shrink it.
     _import_in_fresh_interpreter(
         "from simulator.chemistry.ellingham_thermo import ELLINGHAM_THERMO, "
         "ELLINGHAM_FIT_RANGE_K; "
-        "assert len(ELLINGHAM_THERMO) == 11 and ELLINGHAM_FIT_RANGE_K == (1100.0, 1700.0)"
+        "assert len(ELLINGHAM_THERMO) == 15 and ELLINGHAM_FIT_RANGE_K == (1100.0, 1700.0)"
     )
