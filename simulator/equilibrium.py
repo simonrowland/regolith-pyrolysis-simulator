@@ -249,6 +249,7 @@ class EquilibriumMixin:
             _range_tuple,
             _require_finite_vapor_value,
             _standard_reaction_pressure_Pa,
+            physical_melt_dissociation_pO2_bar,
             reject_noncertifying_vapor_pressure_row,
             require_antoine_source_certified_temperature,
             vapor_pressure_authority_diagnostic,
@@ -311,14 +312,17 @@ class EquilibriumMixin:
                 intrinsic_fO2_log = float(getattr(self.melt, 'fO2_log', -9.0))
         else:
             intrinsic_fO2_log = float(intrinsic_fO2_value)
-        try:
-            melt_dissociation_pO2_bar = 10.0 ** intrinsic_fO2_log
-        except OverflowError:
-            melt_dissociation_pO2_bar = 1e300
-        melt_dissociation_pO2_bar = min(
-            max(melt_dissociation_pO2_bar, 1e-30),
-            1e300,
+
+        melt_dissociation_pO2_bar, melt_pO2_clamped = (
+            physical_melt_dissociation_pO2_bar(intrinsic_fO2_log)
         )
+        if melt_pO2_clamped:
+            # b-148: do not feed the 1e300 float sentinel into mass action.
+            warnings.append(
+                "melt_dissociation_pO2_clamped_to_physical_envelope: "
+                f"fO2_log={intrinsic_fO2_log:.6g} "
+                f"pO2_bar={melt_dissociation_pO2_bar:g}"
+            )
         feo_activity_pressure_bar = kress91_furnace_activity_pressure_bar(
             floor_bar=vacuum_floor_bar,
         )

@@ -902,3 +902,125 @@ def test_compiler_rejects_ambiguous_or_invalid_schema(mutation: str) -> None:
 
     with pytest.raises(CatalogCompileError):
         compile_vapour_rail_catalog(payload)
+
+
+def test_catalog_operating_envelope_no_nonphysical_pressure() -> None:
+    """b-148 regression: no hot-train in-domain row yields P > 1e9 Pa.
+
+    Sweep every *hot-train* compiled evaluator over a physical process
+    envelope (T band × melt pO2 band × activity). Stage-0-only carriers
+    (P-ladder, …) are excluded: they are gated off the hot train and
+    their large negative pO2 powers at unit activity are a separate
+    Stage-0 envelope question. A failure here means a stoichiometry /
+    sign / units defect or an unbounded oxygen mass-action path — the
+    class that produced AlO2 ~1e63 Pa in CI full-run dumps.
+    """
+    from simulator.physical_constants import (
+        CATALOG_PHYSICAL_PRESSURE_CEILING_PA,
+        MELT_DISSOCIATION_PO2_MAX_BAR,
+    )
+
+    catalog = compile_vapour_rail_catalog(
+        _yaml("vapor_pressures.yaml"), emit_u0_request_rules=False
+    )
+    temperatures_K = (1400.0, 1600.0, 1800.0, 2000.0, 2200.0)
+    # Process-representative melt pO2 band (inside the physical envelope).
+    pO2_bars = (1.0e-12, 1.0e-9, 1.0e-6, 1.0e-3, 1.0, 10.0)
+    activities = (1.0e-4, 0.01, 0.1, 1.0)
+    ceiling = CATALOG_PHYSICAL_PRESSURE_CEILING_PA
+    offenders: list[str] = []
+    assert MELT_DISSOCIATION_PO2_MAX_BAR >= 10.0
+
+    for species_id, species in catalog.species.items():
+        evaluator = species.evaluator
+        if evaluator is None:
+            continue
+        hot = str(
+            getattr(species.code_metadata, "hot_train_applicability", "") or ""
+        )
+        if hot in {"stage0_only", "not_applicable"}:
+            continue
+        for temperature_K in temperatures_K:
+            for pO2_bar in pO2_bars:
+                for activity in activities:
+                    kwargs: dict[str, float] = {}
+                    if evaluator.activity_exponent:
+                        kwargs["source_activity"] = activity
+                    if evaluator.pO2_exponent:
+                        kwargs["pO2_bar"] = pO2_bar
+                    try:
+                        evaluation = evaluator.evaluate(temperature_K, **kwargs)
+                    except CatalogCompileError:
+                        continue
+                    # In-domain only: OOR continuation may be multi-dex and is
+                    # already status-bearing (t-538 / b-145). The b-148 class
+                    # is non-physical pressure *claiming* a usable value.
+                    if evaluation.out_of_range:
+                        continue
+                    if evaluation.pressure_pa > ceiling:
+                        offenders.append(
+                            f"{species_id}: T={temperature_K:g} K "
+                            f"pO2={pO2_bar:g} bar a={activity:g} "
+                            f"P={evaluation.pressure_pa:.3e} Pa "
+                            f"pO2_exp={evaluator.pO2_exponent}"
+                        )
+
+    assert not offenders, (
+        "catalog operating-envelope physical ceiling exceeded "
+        f"(>{ceiling:g} Pa in-domain):\n" + "\n".join(offenders[:40])
+    )
+
+
+def test_alo2_pathological_fO2_no_longer_explodes() -> None:
+    """b-148: AlO2 must not reach ~1e63 Pa when fed the 1e300 pO2 sentinel.
+
+    Hand algebra of the pre-fix path:
+      P = P_ref(a=1, pO2_ref=1) * a * (pO2 / pO2_ref)^0.25
+      with pO2 = 1e300 → (1e300)^0.25 = 1e75, so unit-ref ~1e-8 Pa → ~1e67 Pa.
+    After the physical pO2 envelope clamp, the same call is bounded by
+    (100 bar)^0.25 ≈ 3.2 and must stay far below 1e9 Pa.
+    """
+    from simulator.physical_constants import CATALOG_PHYSICAL_PRESSURE_CEILING_PA
+
+    catalog = compile_vapour_rail_catalog(
+        _yaml("vapor_pressures.yaml"), emit_u0_request_rules=False
+    )
+    evaluator = catalog.evaluator_for("AlO2")
+    assert evaluator.pO2_exponent == pytest.approx(0.25)
+    assert evaluator.reference_model.physical_composite_ood is True
+
+    # Unit-reference sanity: physical composite at a=1, pO2_ref=1 bar.
+    unit = evaluator.evaluate(2000.0, source_activity=1.0, pO2_bar=1.0)
+    assert unit.pressure_pa < 1.0e-3
+    assert unit.pressure_pa > 0.0
+
+    # Pathological fO2 sentinel that previously produced ~1e63–1e66 Pa dumps.
+    exploded = evaluator.evaluate(
+        1800.0 + 273.15, source_activity=0.1, pO2_bar=1.0e300
+    )
+    assert exploded.pressure_pa < CATALOG_PHYSICAL_PRESSURE_CEILING_PA
+    # And must be within a few dex of the unit-ref * a * (100)^0.25 bound.
+    capped = evaluator.evaluate(
+        1800.0 + 273.15, source_activity=0.1, pO2_bar=100.0
+    )
+    assert exploded.pressure_pa == pytest.approx(capped.pressure_pa, rel=0.0, abs=0.0)
+
+
+def test_physical_melt_dissociation_pO2_bar_clamps_sentinel() -> None:
+    from engines.builtin.vapor_pressure import physical_melt_dissociation_pO2_bar
+    from simulator.physical_constants import (
+        MELT_DISSOCIATION_PO2_MAX_BAR,
+        MELT_DISSOCIATION_PO2_MIN_BAR,
+    )
+
+    p, clamped = physical_melt_dissociation_pO2_bar(300.0)
+    assert clamped is True
+    assert p == MELT_DISSOCIATION_PO2_MAX_BAR
+
+    p, clamped = physical_melt_dissociation_pO2_bar(-9.0)
+    assert clamped is False
+    assert p == pytest.approx(1.0e-9)
+
+    p, clamped = physical_melt_dissociation_pO2_bar(-400.0)
+    assert clamped is True
+    assert p == MELT_DISSOCIATION_PO2_MIN_BAR

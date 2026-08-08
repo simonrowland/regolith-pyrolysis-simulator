@@ -94,6 +94,47 @@ from simulator.chemistry.melt_activity import (  # noqa: E402
     MELT_OXIDE_ACTIVITY_TIER,
     melt_oxide_activity,
 )
+from simulator.physical_constants import (  # noqa: E402
+    MELT_DISSOCIATION_PO2_MAX_BAR,
+    MELT_DISSOCIATION_PO2_MIN_BAR,
+)
+
+
+def physical_melt_dissociation_pO2_bar(fO2_log: float) -> tuple[float, bool]:
+    """Map log10 melt fO2 to a physically bounded pO2 in bar (b-148).
+
+    Premise: vapor-pressure mass action for oxide-coupled carriers uses the
+    melt's oxygen chemical potential as pO2_bar = 10**(fO2_log). That pO2
+    must remain a *melt* state, not a float-range sentinel.
+    Algebra: p = clamp(10**fO2_log, p_min, p_max) with
+    p_min = MELT_DISSOCIATION_PO2_MIN_BAR and
+    p_max = MELT_DISSOCIATION_PO2_MAX_BAR.
+    Unit check: fO2_log is log10(bar); returned pO2 is bar absolute.
+    Sanity: fO2_log = 0 → 1 bar (pure O2); fO2_log = 300 no longer yields
+    1e300 bar (which made AlO2 ∝ pO2^0.25 explode by ~75 dex — b-148).
+
+    Returns ``(pO2_bar, was_clamped)``. Callers should surface a warning
+    when ``was_clamped`` is true so the redox pathology stays visible.
+    """
+    fO2 = float(fO2_log)
+    # log10 clamp first so 10**fO2 never under/overflows to 0/inf before the
+    # physical envelope is applied (fO2_log=-400 → 0.0 in float64 otherwise).
+    log_min = math.log10(MELT_DISSOCIATION_PO2_MIN_BAR)
+    log_max = math.log10(MELT_DISSOCIATION_PO2_MAX_BAR)
+    if not math.isfinite(fO2):
+        return MELT_DISSOCIATION_PO2_MAX_BAR, True
+    if fO2 < log_min:
+        return MELT_DISSOCIATION_PO2_MIN_BAR, True
+    if fO2 > log_max:
+        return MELT_DISSOCIATION_PO2_MAX_BAR, True
+    raw = 10.0 ** fO2
+    if not math.isfinite(raw) or raw <= 0.0:
+        # Should be unreachable after the log clamp; fail closed at the edge.
+        return (
+            MELT_DISSOCIATION_PO2_MIN_BAR if fO2 < 0.0 else MELT_DISSOCIATION_PO2_MAX_BAR,
+            True,
+        )
+    return raw, False
 
 
 class VaporPressureComputationError(RuntimeError):
@@ -236,7 +277,13 @@ def _standard_reaction_pressure_Pa(
     pO2_scaled = False
     if pO2_exponent:
         p_ref = max(1e-30, float(pO2_reference_bar) or 1.0)
-        P_eq_Pa *= (max(float(pO2_bar), 1e-30) / p_ref) ** float(pO2_exponent)
+        # b-148: physical melt pO2 envelope — never mass-action a float
+        # sentinel (1e300)^n through positive-n carriers (AlO2, CrO2, …).
+        oxygen = min(
+            max(float(pO2_bar), MELT_DISSOCIATION_PO2_MIN_BAR),
+            MELT_DISSOCIATION_PO2_MAX_BAR,
+        )
+        P_eq_Pa *= (oxygen / p_ref) ** float(pO2_exponent)
         pO2_scaled = True
     return P_eq_Pa, activity_factor, pO2_scaled
 
@@ -1108,14 +1155,10 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             else None
         )
         melt_dissociation_pO2_bar = transport_pO2_bar
+        melt_dissociation_pO2_clamped = False
         if intrinsic_fO2_log is not None:
-            try:
-                melt_dissociation_pO2_bar = 10.0 ** float(intrinsic_fO2_log)
-            except OverflowError:
-                melt_dissociation_pO2_bar = 1e300
-            melt_dissociation_pO2_bar = min(
-                max(melt_dissociation_pO2_bar, 1e-30),
-                1e300,
+            melt_dissociation_pO2_bar, melt_dissociation_pO2_clamped = (
+                physical_melt_dissociation_pO2_bar(float(intrinsic_fO2_log))
             )
         comp_wt = composition_wt_pct_from_account_view(
             request.account_view, self.DECLARED_ACCOUNT
@@ -1159,6 +1202,18 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         ellingham_extrapolations: dict[str, dict[str, object]] = {}
         vapor_pressure_authority_limits: dict[str, dict[str, Any]] = {}
         warnings: list[str] = []
+        if melt_dissociation_pO2_clamped and intrinsic_fO2_log is not None:
+            # Visible, non-authoritative: redox returned a non-physical fO2;
+            # mass action uses the physical envelope edge so oxygen-dependent
+            # carriers (AlO2, CrO2, CrO3, …) cannot invent multi-GPa vapor
+            # from a float clamp (b-148).
+            warnings.append(
+                "melt_dissociation_pO2_clamped_to_physical_envelope: "
+                f"fO2_log={float(intrinsic_fO2_log):.6g} "
+                f"pO2_bar={melt_dissociation_pO2_bar:g} "
+                f"envelope_bar=[{MELT_DISSOCIATION_PO2_MIN_BAR:g}, "
+                f"{MELT_DISSOCIATION_PO2_MAX_BAR:g}]"
+            )
 
         metals_data = self._vapor_pressure_data.get('metals', {}) or {}
         for species in _ELLINGHAM_THERMO:
@@ -2271,6 +2326,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 melt_dissociation_pO2_bar
                 if intrinsic_fO2_log_supplied
                 else None
+            ),
+            "melt_dissociation_pO2_clamped_to_physical_envelope": (
+                melt_dissociation_pO2_clamped
             ),
             "pO2_bar": transport_pO2_bar,
             "vacuum_floor_bar": vacuum_floor_bar,

@@ -26,6 +26,10 @@ from typing import Any
 import yaml
 
 from simulator.yaml_cache import load_cached_safe_yaml
+from simulator.physical_constants import (
+    MELT_DISSOCIATION_PO2_MAX_BAR,
+    MELT_DISSOCIATION_PO2_MIN_BAR,
+)
 
 from simulator.alpha_kinetics import AlphaSpecError, parse_alpha_contract
 from simulator.vapour_rail.activity import (
@@ -946,6 +950,18 @@ class CompiledPressureEvaluator:
                     f"explicit {self.oxygen_fugacity_channel or 'pO2'} input"
                 )
             oxygen = _finite_positive(pO2_bar, "pO2_bar")
+            # Physical melt/transport pO2 envelope (b-148). Premise: mass
+            # action p ∝ (pO2/p_ref)^n uses a *physical* oxygen pressure, not
+            # a float-range sentinel. Algebra: clamp pO2 into
+            # [MELT_DISSOCIATION_PO2_MIN_BAR, MELT_DISSOCIATION_PO2_MAX_BAR]
+            # before the log power. Unit check: bar/bar dimensionless.
+            # Sanity: (1e300)^0.25 = 1e75 turned AlO2 unit-ref ~1e-8 Pa into
+            # ~1e67 Pa (the b-148 dump); at the physical cap 100 bar the
+            # same power is only 10^{0.5} ≈ 3.2×.
+            if oxygen < MELT_DISSOCIATION_PO2_MIN_BAR:
+                oxygen = MELT_DISSOCIATION_PO2_MIN_BAR
+            elif oxygen > MELT_DISSOCIATION_PO2_MAX_BAR:
+                oxygen = MELT_DISSOCIATION_PO2_MAX_BAR
             log10_pressure += self.pO2_exponent * math.log10(
                 oxygen / self.pO2_reference_bar
             )
