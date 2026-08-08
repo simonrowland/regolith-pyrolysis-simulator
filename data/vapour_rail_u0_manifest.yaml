@@ -321,7 +321,12 @@ species:
     Al: 1.0
   disposition: U
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/vapour_rail_validation_pins.yaml#species.Al.validations.vaporock
+  - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+  - data/literature/extracts/kems-016-stolyarova-1992.yaml#stolyarova_1992_al_cas_vapor_ions_and_gibbs
+  - data/literature/extracts/ref-032-al.yaml#anchor_Al_pure_Psat
+  - data/literature/extracts/kems-022-demaria-1971.yaml#demaria_1971_al_monatomic_figure7
   feedstock_presence: false
   sources:
     inventory: true
@@ -373,7 +378,8 @@ species:
     O: 1.0
   disposition: U
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/kems-022-demaria-1971.yaml#demaria_1971_al2o_psat_table4
   feedstock_presence: false
   sources:
     inventory: true
@@ -474,7 +480,8 @@ species:
     O: 1.0
   disposition: U
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/kems-022-demaria-1971.yaml#demaria_1971_alo_psat_table4
   feedstock_presence: false
   sources:
     inventory: true
@@ -596,7 +603,10 @@ species:
     O: 6.0
   disposition: V
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/behrens-rosenblatt-1972.yaml#NIST_BR72_arsenolite_As4O6
+  - data/literature/extracts/nist-webbook.yaml#NIST_Stull47_As2O3_highT
+  - data/literature/extracts/pending-as2o3-second-primary.yaml#anchor_As4O6_pure_Psat
   feedstock_presence: false
   sources:
     inventory: false
@@ -937,7 +947,8 @@ species:
     Bi: 1.0
   disposition: C
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/ref-032-bi.yaml#anchor_Bi_pure_Psat
   feedstock_presence: false
   sources:
     inventory: true
@@ -983,7 +994,8 @@ species:
     O: 3.0
   disposition: V
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/pending-bi2o3-kems.yaml#anchor_Bi2O3_pure_Psat
   feedstock_presence: false
   sources:
     inventory: true
@@ -1143,7 +1155,8 @@ species:
     H: 4.0
   disposition: V
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/fray-schmitt-2009-ch4-1.yaml#anchor_CH4_pure_Psat
   feedstock_presence: true
   sources:
     inventory: true
@@ -1189,7 +1202,8 @@ species:
     O: 1.0
   disposition: V
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/fray-schmitt-2009-co-1.yaml#anchor_CO_pure_Psat
   feedstock_presence: true
   sources:
     inventory: true
@@ -1212,7 +1226,8 @@ species:
     O: 2.0
   disposition: V
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/span-wagner-1996-co2-psat.yaml#anchor_CO2_pure_Psat
   feedstock_presence: true
   sources:
     inventory: true
@@ -1302,7 +1317,12 @@ species:
     Ca: 1.0
   disposition: U
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/vapour_rail_validation_pins.yaml#species.Ca.validations.vaporock
+  - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+  - data/literature/vapour_rail_kems_anchors.yaml#halwax_2024_cao_kems_series
+  - data/literature/extracts/kems-022-demaria-1971.yaml#demaria_1971_ca_figure_only_and_measurement_difficulty
+  - data/literature/extracts/ref-032-ca.yaml#anchor_Ca_pure_Psat
   feedstock_presence: false
   sources:
     inventory: true
@@ -1450,7 +1470,8 @@ species:
     Cl: 2.0
   disposition: V
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/pending-cacl2-kems-or-transpiration.yaml#anchor_CaCl2_pure_Psat
   feedstock_presence: false
   sources:
     inventory: true
@@ -1496,7 +1517,8 @@ species:
     O: 1.0
   disposition: C
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/kems-031-halwax-2024.yaml#halwax_2024_cao_kems_geometry_package
   feedstock_presence: true
   sources:
     inventory: true
@@ -1736,7 +1758,8 @@ species:
     Cl: 2.0
   disposition: V
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/giauque-powell-1939-cl2.yaml#anchor_Cl2_pure_Psat
   feedstock_presence: false
   sources:
     inventory: true
@@ -1855,7 +1878,15 @@ species:
     Cr: 1.0
   disposition: V
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - tests/chemistry/extract_store_reproduction_residual_baselines.yaml#ohno_1967_cr_olette_alpha_table3:T=1873.15
+  - tests/chemistry/extract_store_reproduction_residual_baselines.yaml#pound_1972_cr_solid_alpha_mccabe:T=1440.5
+  - data/vapour_rail_validation_pins.yaml#species.Cr.validations.mass_spec
+  - docs/model-limitations.md#extract-store-reproduction-battery
+  - data/vapour_rail_validation_pins.yaml#species.Cr.validations.vaporock
+  - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+  - data/literature/vapour_rail_langmuir_anchors.yaml#pound_1972_cr_langmuir_knudsen
+  - data/literature/langmuir_knudsen_flux_validation.yaml#chromium_solid_langmuir_knudsen
   feedstock_presence: false
   sources:
     inventory: true
@@ -1955,7 +1986,9 @@ species:
     O: 2.0
   disposition: V
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/vapour_rail_validation_pins.yaml#species.CrO2.validations.vaporock
+  - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
   feedstock_presence: false
   sources:
     inventory: true
@@ -2027,7 +2060,8 @@ species:
     O: 3.0
   disposition: V
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/pending-kems-cro3.yaml#anchor_CrO3_pure_Psat
   feedstock_presence: false
   sources:
     inventory: true
@@ -2149,7 +2183,10 @@ species:
     Cu: 1.0
   disposition: R
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/kems-001-homma-1966.yaml#homma_1966_cu_olette_alpha_exp_table2
+  - data/literature/extracts/kems-001-homma-1966.yaml#homma_1966_cu_specific_evaporation_constant
+  - data/literature/extracts/kems-002-ohno-1967.yaml#ohno_1967_cu_olette_alpha_table3
   feedstock_presence: false
   sources:
     inventory: true
@@ -2318,7 +2355,15 @@ species:
     Fe: 1.0
   disposition: U
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - tests/chemistry/extract_store_reproduction_residual_baselines.yaml#costa_2015_fe_olivine_kems_alpha_multicell:T=1700
+  - tests/chemistry/extract_store_reproduction_residual_baselines.yaml#costa_2015_fe_olivine_kems_alpha_multicell:T=1720
+  - data/vapour_rail_validation_pins.yaml#species.Fe.validations.mass_spec
+  - docs/model-limitations.md#extract-store-reproduction-battery
+  - data/vapour_rail_validation_pins.yaml#species.Fe.validations.vaporock
+  - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+  - data/literature/vapour_rail_kems_anchors.yaml#costa_jacobson_2015_fe_olivine_kems
+  - data/literature/langmuir_knudsen_flux_validation.yaml#iron_olivine_kems
   feedstock_presence: true
   sources:
     inventory: true
@@ -2678,7 +2723,8 @@ species:
     O: 1.0
   disposition: V
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/lh87-geo-g.yaml#anchor_GeO_pure_Psat
   feedstock_presence: false
   sources:
     inventory: true
@@ -2746,7 +2792,8 @@ species:
     O: 1.0
   disposition: V
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/iapws-95-psat-liquid.yaml#anchor_H2O_pure_Psat
   feedstock_presence: true
   sources:
     inventory: true
@@ -2837,7 +2884,8 @@ species:
     N: 1.0
   disposition: V
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/giauque-ruehrwein-1939-hcn-psat.yaml#anchor_HCN_pure_Psat
   feedstock_presence: true
   sources:
     inventory: true
@@ -3303,7 +3351,15 @@ species:
     K: 1.0
   disposition: U
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - tests/chemistry/extract_store_reproduction_residual_baselines.yaml#fedkin_2006_k_yu_langmuir:T=1723.15
+  - tests/chemistry/extract_store_reproduction_residual_baselines.yaml#fedkin_2006_yu_k_vacuum_langmuir:T=1723.15
+  - data/vapour_rail_validation_pins.yaml#species.K.validations.mass_spec
+  - docs/model-limitations.md#extract-store-reproduction-battery
+  - data/vapour_rail_validation_pins.yaml#species.K.validations.vaporock
+  - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+  - data/literature/vapour_rail_langmuir_anchors.yaml#fedkin_2006_k_silicate_vacuum_langmuir
+  - data/literature/langmuir_knudsen_flux_validation.yaml#potassium_silicate_vacuum
   feedstock_presence: false
   sources:
     inventory: true
@@ -3771,7 +3827,15 @@ species:
     Mg: 1.0
   disposition: U
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - tests/chemistry/extract_store_reproduction_residual_baselines.yaml#fedkin_2006_mg_hashimoto_langmuir_table3:T=2123
+  - tests/chemistry/extract_store_reproduction_residual_baselines.yaml#fedkin_2006_table3_mg_hashimoto_langmuir:T=1973
+  - data/vapour_rail_validation_pins.yaml#species.Mg.validations.mass_spec
+  - docs/model-limitations.md#extract-store-reproduction-battery
+  - data/vapour_rail_validation_pins.yaml#species.Mg.validations.vaporock
+  - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+  - data/literature/extracts/fedkin-grossman-ghiorso-2006.yaml#fedkin_2006_table3_mg_hashimoto_langmuir
+  - data/literature/extracts/fedkin-grossman-ghiorso-2006.yaml#fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series
   feedstock_presence: false
   sources:
     inventory: true
@@ -3871,7 +3935,8 @@ species:
     Mg: 1.0
   disposition: V
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/pending-mgcl2-measured-vp.yaml#anchor_MgCl2_pure_Psat
   feedstock_presence: false
   sources:
     inventory: true
@@ -3917,7 +3982,8 @@ species:
     O: 1.0
   disposition: C
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/kems-031-halwax-2024.yaml#halwax_2024_mgo_kems_geometry_psat_package
   feedstock_presence: true
   sources:
     inventory: true
@@ -4016,7 +4082,14 @@ species:
     Mn: 1.0
   disposition: V
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - tests/chemistry/extract_store_reproduction_residual_baselines.yaml#homma_1966_mn_olette_alpha_exp_table1:T=1873.15
+  - tests/chemistry/extract_store_reproduction_residual_baselines.yaml#ohno_1967_mn_olette_alpha_table3:T=1873.15
+  - data/vapour_rail_validation_pins.yaml#species.Mn.validations.mass_spec
+  - docs/model-limitations.md#extract-store-reproduction-battery
+  - data/literature/extracts/kems-001-homma-1966.yaml#homma_1966_mn_olette_alpha_exp_table1
+  - data/literature/extracts/kems-001-homma-1966.yaml#homma_1966_mn_specific_evaporation_constant
+  - data/literature/extracts/kems-022-demaria-1971.yaml#demaria_1971_mn_psat_table2_sample_12022
   feedstock_presence: false
   sources:
     inventory: true
@@ -4202,7 +4275,8 @@ species:
     N: 1.0
   disposition: V
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/fray-schmitt-2009-nh3.yaml#anchor_NH3_pure_Psat
   feedstock_presence: true
   sources:
     inventory: true
@@ -4318,7 +4392,15 @@ species:
     Na: 1.0
   disposition: U
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - tests/chemistry/extract_store_reproduction_residual_baselines.yaml#fedkin_2006_na_yu_langmuir:T=1723.15
+  - tests/chemistry/extract_store_reproduction_residual_baselines.yaml#fedkin_2006_yu_na_vacuum_langmuir:T=1723.15
+  - data/vapour_rail_validation_pins.yaml#species.Na.validations.mass_spec
+  - docs/model-limitations.md#extract-store-reproduction-battery
+  - data/vapour_rail_validation_pins.yaml#species.Na.validations.vaporock
+  - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+  - data/literature/vapour_rail_langmuir_anchors.yaml#sossi_2019_na_open_furnace_langmuir
+  - data/literature/extracts/fedkin-grossman-ghiorso-2006.yaml#fedkin_2006_yu_na_vacuum_langmuir
   feedstock_presence: false
   sources:
     inventory: true
@@ -4487,7 +4569,8 @@ species:
     Na: 1.0
   disposition: V
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/datz-smith-taylor-1961-nacl-vapor.yaml#anchor_NaCl_pure_Psat
   feedstock_presence: true
   sources:
     inventory: true
@@ -4532,7 +4615,8 @@ species:
     Na: 1.0
   disposition: U
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/janaf-4th.yaml#anchor_NaF_pure_Psat
   feedstock_presence: false
   sources:
     inventory: true
@@ -4831,7 +4915,8 @@ species:
     O: 1.0
   disposition: U
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/kems-022-demaria-1971.yaml#demaria_1971_o_atomic_psat_table5
   feedstock_presence: false
   sources:
     inventory: true
@@ -4859,7 +4944,9 @@ species:
     O: 2.0
   disposition: U
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/iupac-o2-solid-psat.yaml#anchor_O2_pure_Psat
+  - data/literature/extracts/kems-022-demaria-1971.yaml#demaria_1971_o2_psat_table1_alkali_range
   feedstock_presence: false
   sources:
     inventory: true
@@ -4980,7 +5067,8 @@ species:
     Os: 1.0
   disposition: V
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/pending-dual-primary-oso4.yaml#anchor_OsO4_pure_Psat
   feedstock_presence: false
   sources:
     inventory: false
@@ -5004,7 +5092,8 @@ species:
     P: 1.0
   disposition: R
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/nist-srd69-p4.yaml#anchor_P_pure_Psat
   feedstock_presence: true
   sources:
     inventory: true
@@ -5082,7 +5171,8 @@ species:
     P: 4.0
   disposition: V
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/pending-pages-p4o10-sublimation.yaml#anchor_P4O10_pure_Psat
   feedstock_presence: false
   sources:
     inventory: false
@@ -5107,7 +5197,8 @@ species:
     P: 4.0
   disposition: V
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/pending-p4o6-vp.yaml#anchor_P4O6_pure_Psat
   feedstock_presence: false
   sources:
     inventory: false
@@ -5231,7 +5322,8 @@ species:
     Pb: 1.0
   disposition: C
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/ref-032-pb.yaml#anchor_Pb_pure_Psat
   feedstock_presence: false
   sources:
     inventory: true
@@ -5254,7 +5346,8 @@ species:
     Pb: 1.0
   disposition: V
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/lh87-pbo-g.yaml#anchor_PbO_pure_Psat_or_deltafG
   feedstock_presence: false
   sources:
     inventory: true
@@ -5594,7 +5687,8 @@ species:
     Re: 2.0
   disposition: V
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/pending-re2o7-second-series.yaml#anchor_Re2O7_pure_Psat
   feedstock_presence: false
   sources:
     inventory: true
@@ -5739,7 +5833,10 @@ species:
     S: 1.0
   disposition: C
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/kems-002-ohno-1967.yaml#ohno_1967_s_condensation_alpha_table3
+  - data/literature/extracts/kems-002-ohno-1967.yaml#ohno_1967_s_specific_evaporation_constant
+  - data/literature/extracts/kems-002-ohno-1967.yaml#ohno_1967_sis_desulfurization_rate_table2
   feedstock_presence: true
   sources:
     inventory: true
@@ -5783,7 +5880,8 @@ species:
     S: 2.0
   disposition: V
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/janaf-4th.yaml#anchor_S2_pure_Psat_or_speciation
   feedstock_presence: false
   sources:
     inventory: true
@@ -5961,7 +6059,8 @@ species:
     S: 1.0
   disposition: C
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/janaf-4th.yaml#anchor_SO3_pure_Psat
   feedstock_presence: true
   sources:
     inventory: true
@@ -6249,7 +6348,8 @@ species:
     Se: 6.0
   disposition: V
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/rau-1974-se-vp.yaml#anchor_Se6_pure_Psat_total_plus_speciation
   feedstock_presence: false
   sources:
     inventory: false
@@ -6344,7 +6444,11 @@ species:
     Si: 1.0
   disposition: U
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/vapour_rail_langmuir_anchors.yaml#safarian_engh_2013_si_pure_langmuir
+  - data/literature/extracts/safarian-engh-2013-si-pure-langmuir.yaml#safarian_engh_2013_si_pure_langmuir
+  - data/literature/extracts/kems-009-safarian-2013.yaml#safarian_2013_si_pure_langmuir_theory
+  - data/literature/extracts/ref-032-si.yaml#anchor_Si_pure_Psat
   feedstock_presence: false
   sources:
     inventory: true
@@ -6423,7 +6527,15 @@ species:
     Si: 1.0
   disposition: U
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - tests/chemistry/extract_store_reproduction_residual_baselines.yaml#costa_2015_sio_olivine_kems_alpha_multicell:T=1700
+  - tests/chemistry/extract_store_reproduction_residual_baselines.yaml#costa_2015_sio_olivine_kems_alpha_multicell:T=1725
+  - data/vapour_rail_validation_pins.yaml#species.SiO.validations.mass_spec
+  - docs/model-limitations.md#extract-store-reproduction-battery
+  - data/vapour_rail_validation_pins.yaml#species.SiO.validations.vaporock
+  - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+  - data/literature/extracts/costa-jacobson-2015.yaml#costa_jacobson_2015_sio_olivine_kems
+  - data/literature/extracts/fedkin-grossman-ghiorso-2006.yaml#fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series
   feedstock_presence: false
   sources:
     inventory: true
@@ -6550,7 +6662,10 @@ species:
     Sn: 1.0
   disposition: C
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/kems-001-homma-1966.yaml#homma_1966_sn_olette_alpha_exp_table3
+  - data/literature/extracts/kems-001-homma-1966.yaml#homma_1966_sn_specific_evaporation_constant
+  - data/literature/extracts/kems-002-ohno-1967.yaml#ohno_1967_sn_specific_evaporation_constant
   feedstock_presence: false
   sources:
     inventory: true
@@ -6642,7 +6757,8 @@ species:
     Sn: 1.0
   disposition: V
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/lh87-sno-g.yaml#anchor_SnO_pure_Psat
   feedstock_presence: false
   sources:
     inventory: true
@@ -6907,7 +7023,8 @@ species:
     Te: 1.0
   disposition: V
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/pending-teo2-vp.yaml#anchor_TeO2_pure_Psat
   feedstock_presence: false
   sources:
     inventory: true
@@ -6929,7 +7046,8 @@ species:
     Th: 1.0
   disposition: R
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/ref-032-th.yaml#anchor_Th_pure_Psat
   feedstock_presence: true
   sources:
     inventory: true
@@ -7005,7 +7123,10 @@ species:
     Ti: 1.0
   disposition: U
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/vapour_rail_validation_pins.yaml#species.Ti.validations.vaporock
+  - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+  - data/literature/extracts/janaf-4th.yaml#anchor_Ti_pure_Psat
   feedstock_presence: false
   sources:
     inventory: true
@@ -7055,7 +7176,8 @@ species:
     Ti: 1.0
   disposition: U
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/kems-022-demaria-1971.yaml#demaria_1971_tio_tio2_figure6_comparable_pressures
   feedstock_presence: false
   sources:
     inventory: true
@@ -7083,7 +7205,8 @@ species:
     Ti: 1.0
   disposition: C
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/kems-022-demaria-1971.yaml#demaria_1971_tio2_figure6_comparable_to_tio
   feedstock_presence: true
   sources:
     inventory: true
@@ -7569,7 +7692,8 @@ species:
     W: 1.0
   disposition: V
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/pending-pages-wo3-polymer-vp.yaml#anchor_WO3_pure_Psat
   feedstock_presence: false
   sources:
     inventory: true
@@ -7710,7 +7834,8 @@ species:
     Zr: 1.0
   disposition: R
   validation_status: pending_validation
-  validation_anchor_refs: []
+  validation_anchor_refs:
+  - data/literature/extracts/ref-032-zr.yaml#anchor_Zr_pure_Psat
   feedstock_presence: true
   sources:
     inventory: true
