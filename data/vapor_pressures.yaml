@@ -1707,28 +1707,43 @@ families:
       process_or_terminal_destination: process.condensation_train
       condensation_reference_at_1mbar_C: 780
     vaporisation_coefficients:
+      # b-136 / t-559 (RP3) 2026-08-08 posture rework: Zhang 2014 CaTiO3
+      # perovskite activity proxy remains WITHDRAWN as a mis-tagged HKL α for
+      # the Ca silicate-melt carrier. Missing α is NOT a missing
+      # pressure — α is a kinetic correction on a pressure we already have.
+      # Fail-closed category: ungrounded kinetic coefficient → compute with
+      # Hertz–Knudsen ideal α=1.0 as an explicit upper bound and mark
+      # status-bearing (never certifies). Refuse (status=no_data) would convert
+      # an unjustified coefficient into an unjustified zero and silently drop
+      # rail channels (silent-zero class; b-139/b-149). Mn α=1 monoatomic-class
+      # proxy is the closest landed precedent. Species-class model remains t-561.
       evaporation_alpha:
-        value: 0.9
-        source: 'OWNER-RATIFY proxy_not_intrinsic: Zhang et al. 2014 GCA 140:365-380 CaTiO3 melt at 2005
-          C; Ca activity proxy'
+        value: 1.0
+        source: 'b-136/t-559 2026-08-08: Zhang et al. 2014 GCA 140:365-380 CaTiO3 perovskite activity proxy WITHDRAWN as mis-tagged HKL α for the Ca silicate-melt carrier. No grounded melt-carrier α. Hertz–Knudsen ideal α=1.0 retained as explicit upper-bound kinetic ceiling (status_bearing, never certifies; true flux ≤ this). NOT a measured coefficient; NOT a silent default. Species-class model is t-561.'
         T_band_K:
-        - 2278
-        - 2278
+        - 1200
+        - 2500
         envelope:
-        - 0.48
-        - 1.2
+        - 0.01
+        - 1.0
         tier: 2
-        tag: proxy
+        tag: hkl_ideal_upper_bound_status_bearing
+        withdrawn_proxy:
+          former_value: 0.9
+          former_T_band_K:
+          - 2278
+          - 2278
+          former_source: Zhang et al. 2014 GCA 140:365-380 CaTiO3 melt Ca activity proxy
       alpha_domain_and_uncertainty:
         temperature_K:
-        - 2278
-        - 2278
+        - 1200
+        - 2500
         envelope:
-        - 0.48
-        - 1.2
+        - 0.01
+        - 1.0
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: vapour_pressure_out_of_range:Ca
+      acquisition_flag: evaporation_alpha_hkl_upper_bound_b136:Ca
     code_metadata:
       formula_id: Ca
       source_account: process.cleaned_melt
@@ -2220,28 +2235,43 @@ families:
       process_or_terminal_destination: process.condensation_train
       condensation_reference_at_1mbar_C: 1500
     vaporisation_coefficients:
+      # b-136 / t-559 (RP3) 2026-08-08 posture rework: Zhang 2014 CaTiO3
+      # perovskite activity proxy remains WITHDRAWN as a mis-tagged HKL α for
+      # the Ti silicate-melt carrier. Missing α is NOT a missing
+      # pressure — α is a kinetic correction on a pressure we already have.
+      # Fail-closed category: ungrounded kinetic coefficient → compute with
+      # Hertz–Knudsen ideal α=1.0 as an explicit upper bound and mark
+      # status-bearing (never certifies). Refuse (status=no_data) would convert
+      # an unjustified coefficient into an unjustified zero and silently drop
+      # rail channels (silent-zero class; b-139/b-149). Mn α=1 monoatomic-class
+      # proxy is the closest landed precedent. Species-class model remains t-561.
       evaporation_alpha:
-        value: 0.8
-        source: 'OWNER-RATIFY proxy_not_intrinsic: Zhang et al. 2014 GCA 140:365-380 CaTiO3 melt at 2005
-          C; Ti activity proxy'
+        value: 1.0
+        source: 'b-136/t-559 2026-08-08: Zhang et al. 2014 GCA 140:365-380 CaTiO3 perovskite activity proxy WITHDRAWN as mis-tagged HKL α for the Ti silicate-melt carrier. No grounded melt-carrier α. Hertz–Knudsen ideal α=1.0 retained as explicit upper-bound kinetic ceiling (status_bearing, never certifies; true flux ≤ this). NOT a measured coefficient; NOT a silent default. Species-class model is t-561.'
         T_band_K:
-        - 2278
-        - 2278
+        - 1200
+        - 2500
         envelope:
-        - 0.39
+        - 0.01
         - 1.0
         tier: 2
-        tag: proxy
+        tag: hkl_ideal_upper_bound_status_bearing
+        withdrawn_proxy:
+          former_value: 0.8
+          former_T_band_K:
+          - 2278
+          - 2278
+          former_source: Zhang et al. 2014 GCA 140:365-380 CaTiO3 melt Ti activity proxy
       alpha_domain_and_uncertainty:
         temperature_K:
-        - 2278
-        - 2278
+        - 1200
+        - 2500
         envelope:
-        - 0.39
+        - 0.01
         - 1.0
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: vapour_pressure_out_of_range:Ti
+      acquisition_flag: evaporation_alpha_hkl_upper_bound_b136:Ti
     code_metadata:
       formula_id: Ti
       source_account: process.cleaned_melt
@@ -2862,28 +2892,40 @@ families:
         proxy, never validation evidence; acquisition target is a measured TiO condensation/deposition
         curve.'
     vaporisation_coefficients:
+      # b-136 / t-559 (RP3) 2026-08-08: WITHDREW cascade of metals_ti_family
+      # b-136 / t-559 (RP3) 2026-08-08 posture rework: parent Zhang 2014 CaTiO3
+      # mis-tagged proxy stays withdrawn. No TiO-specific α was ever
+      # grounded. Same fail-closed category as parent: missing kinetic α is not
+      # missing pressure → Hertz–Knudsen ideal α=1.0 as explicit status-bearing
+      # upper bound (never certifies). Keeps the channel live so b-145 Ti
+      # pressure fixes and refractory rump tracking remain observable.
       evaporation_alpha:
-        value: 0.8
-        source: 'Status-bearing proxy: metals_ti_family CaTiO3-melt activity proxy; no TiO-specific alpha
-          is available.'
+        value: 1.0
+        source: 'b-136/t-559 2026-08-08: former status-bearing cascade of metals_ti_family Zhang 2014 CaTiO3 mis-tagged proxy WITHDRAWN; no TiO-specific HKL α. Hertz–Knudsen ideal α=1.0 retained as explicit upper-bound kinetic ceiling (status_bearing, never certifies; true flux ≤ this). NOT a measured coefficient. Species-class model is t-561.'
         T_band_K:
-        - 2278
-        - 2278
+        - 1200
+        - 2500
         envelope:
-        - 0.39
+        - 0.01
         - 1.0
         tier: 2
-        tag: proxy_not_intrinsic
+        tag: hkl_ideal_upper_bound_status_bearing
+        withdrawn_proxy:
+          former_value: 0.8
+          former_T_band_K:
+          - 2278
+          - 2278
+          former_source: metals_ti_family CaTiO3-melt activity proxy cascade
       alpha_domain_and_uncertainty:
         temperature_K:
-        - 2278
-        - 2278
+        - 1200
+        - 2500
         envelope:
-        - 0.39
+        - 0.01
         - 1.0
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: evaporation_alpha_proxy:TiO
+      acquisition_flag: evaporation_alpha_hkl_upper_bound_b136:TiO
     code_metadata:
       formula_id: TiO
       source_account: process.cleaned_melt
@@ -3014,28 +3056,40 @@ families:
         2273.15 K pressure domain and is a non-authoritative routing proxy pending a measured TiO2 deposition
         curve.'
     vaporisation_coefficients:
+      # b-136 / t-559 (RP3) 2026-08-08: WITHDREW cascade of metals_ti_family
+      # b-136 / t-559 (RP3) 2026-08-08 posture rework: parent Zhang 2014 CaTiO3
+      # mis-tagged proxy stays withdrawn. No TiO2_gas-specific α was ever
+      # grounded. Same fail-closed category as parent: missing kinetic α is not
+      # missing pressure → Hertz–Knudsen ideal α=1.0 as explicit status-bearing
+      # upper bound (never certifies). Keeps the channel live so b-145 Ti
+      # pressure fixes and refractory rump tracking remain observable.
       evaporation_alpha:
-        value: 0.8
-        source: 'Status-bearing proxy: metals_ti_family CaTiO3-melt activity proxy; no TiO2(g)-specific
-          alpha is available.'
+        value: 1.0
+        source: 'b-136/t-559 2026-08-08: former status-bearing cascade of metals_ti_family Zhang 2014 CaTiO3 mis-tagged proxy WITHDRAWN; no TiO2_gas-specific HKL α. Hertz–Knudsen ideal α=1.0 retained as explicit upper-bound kinetic ceiling (status_bearing, never certifies; true flux ≤ this). NOT a measured coefficient. Species-class model is t-561.'
         T_band_K:
-        - 2278
-        - 2278
+        - 1200
+        - 2500
         envelope:
-        - 0.39
+        - 0.01
         - 1.0
         tier: 2
-        tag: proxy_not_intrinsic
+        tag: hkl_ideal_upper_bound_status_bearing
+        withdrawn_proxy:
+          former_value: 0.8
+          former_T_band_K:
+          - 2278
+          - 2278
+          former_source: metals_ti_family CaTiO3-melt activity proxy cascade
       alpha_domain_and_uncertainty:
         temperature_K:
-        - 2278
-        - 2278
+        - 1200
+        - 2500
         envelope:
-        - 0.39
+        - 0.01
         - 1.0
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: evaporation_alpha_proxy:TiO2_gas
+      acquisition_flag: evaporation_alpha_hkl_upper_bound_b136:TiO2_gas
     code_metadata:
       formula_id: TiO2_gas
       source_account: process.cleaned_melt
@@ -3162,28 +3216,40 @@ families:
         for P_CaO=100 Pa: T=2878.316613 K = 2605.166613 C. Unit check Pa=Pa. This is outside the 2273.15
         K domain, so it is only a status-bearing routing proxy pending a measured CaO deposition curve.'
     vaporisation_coefficients:
+      # b-136 / t-559 (RP3) 2026-08-08: WITHDREW cascade of metals_ca_family
+      # b-136 / t-559 (RP3) 2026-08-08 posture rework: parent Zhang 2014 CaTiO3
+      # mis-tagged proxy stays withdrawn. No CaO_gas-specific α was ever
+      # grounded. Same fail-closed category as parent: missing kinetic α is not
+      # missing pressure → Hertz–Knudsen ideal α=1.0 as explicit status-bearing
+      # upper bound (never certifies). Keeps the channel live so b-145 Ti
+      # pressure fixes and refractory rump tracking remain observable.
       evaporation_alpha:
-        value: 0.9
-        source: 'Status-bearing proxy: metals_ca_family CaTiO3-melt activity proxy; no CaO(g)-specific
-          alpha is available.'
+        value: 1.0
+        source: 'b-136/t-559 2026-08-08: former status-bearing cascade of metals_ca_family Zhang 2014 CaTiO3 mis-tagged proxy WITHDRAWN; no CaO_gas-specific HKL α. Hertz–Knudsen ideal α=1.0 retained as explicit upper-bound kinetic ceiling (status_bearing, never certifies; true flux ≤ this). NOT a measured coefficient. Species-class model is t-561.'
         T_band_K:
-        - 2278
-        - 2278
+        - 1200
+        - 2500
         envelope:
-        - 0.48
-        - 1.2
+        - 0.01
+        - 1.0
         tier: 2
-        tag: proxy_not_intrinsic
+        tag: hkl_ideal_upper_bound_status_bearing
+        withdrawn_proxy:
+          former_value: 0.9
+          former_T_band_K:
+          - 2278
+          - 2278
+          former_source: metals_ca_family CaTiO3-melt activity proxy cascade
       alpha_domain_and_uncertainty:
         temperature_K:
-        - 2278
-        - 2278
+        - 1200
+        - 2500
         envelope:
-        - 0.48
-        - 1.2
+        - 0.01
+        - 1.0
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: evaporation_alpha_proxy:CaO_gas
+      acquisition_flag: evaporation_alpha_hkl_upper_bound_b136:CaO_gas
     code_metadata:
       formula_id: CaO_gas
       source_account: process.cleaned_melt
@@ -4216,27 +4282,40 @@ families:
         for P_Ca2=100 Pa: T=3158.86662815 K = 2885.71662815 C. Unit check Pa=Pa. The root is outside the
         reviewed pressure-fit domain and is a routing-only status-bearing proxy, never validation evidence.'
     vaporisation_coefficients:
+      # b-136 / t-559 (RP3) 2026-08-08: WITHDREW cascade of metals_ca_family
+      # b-136 / t-559 (RP3) 2026-08-08 posture rework: parent Zhang 2014 CaTiO3
+      # mis-tagged proxy stays withdrawn. No Ca2-specific α was ever
+      # grounded. Same fail-closed category as parent: missing kinetic α is not
+      # missing pressure → Hertz–Knudsen ideal α=1.0 as explicit status-bearing
+      # upper bound (never certifies). Keeps the channel live so b-145 Ti
+      # pressure fixes and refractory rump tracking remain observable.
       evaporation_alpha:
-        value: 0.9
-        source: Status-bearing broad proxy inherited from metals_ca_family; no Ca2-specific alpha is available.
+        value: 1.0
+        source: 'b-136/t-559 2026-08-08: former status-bearing cascade of metals_ca_family Zhang 2014 CaTiO3 mis-tagged proxy WITHDRAWN; no Ca2-specific HKL α. Hertz–Knudsen ideal α=1.0 retained as explicit upper-bound kinetic ceiling (status_bearing, never certifies; true flux ≤ this). NOT a measured coefficient. Species-class model is t-561.'
         T_band_K:
-        - 1757.0
-        - 2273.15
+        - 1200
+        - 2500
         envelope:
-        - 0.48
-        - 1.2
+        - 0.01
+        - 1.0
         tier: 2
-        tag: broad_proxy_not_intrinsic
+        tag: hkl_ideal_upper_bound_status_bearing
+        withdrawn_proxy:
+          former_value: 0.9
+          former_T_band_K:
+          - 1757.0
+          - 2273.15
+          former_source: metals_ca_family inherited broad proxy cascade
       alpha_domain_and_uncertainty:
         temperature_K:
-        - 1757.0
-        - 2273.15
+        - 1200
+        - 2500
         envelope:
-        - 0.48
-        - 1.2
+        - 0.01
+        - 1.0
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: evaporation_alpha_proxy:Ca2
+      acquisition_flag: evaporation_alpha_hkl_upper_bound_b136:Ca2
     code_metadata:
       formula_id: Ca2
       source_account: process.cleaned_melt

@@ -127,7 +127,12 @@ species:
     value: 0.90
     status: UNCERTIFIED
     source_class: uncertified_proxy_default
-    source: "Zhang et al. 2014 CaTiO3 melt Ca activity proxy exists for evaporation alpha, but no direct Ca wall/deposition alpha is cited; high-capture default remains UNCERTIFIED."
+    # b-136 / t-559 2026-08-08: the Zhang 2014 CaTiO3 evaporation-alpha proxy
+    # was withdrawn as a mis-tag (perovskite datum ≠ melt-carrier HKL α). This
+    # wall/deposition sticking entry was never a direct Ca measurement either;
+    # retain UNCERTIFIED high-capture default and drop the false claim that a
+    # grounded evaporation alpha exists.
+    source: "b-136/t-559 2026-08-08: Zhang et al. 2014 CaTiO3 evaporation-alpha proxy withdrawn as mis-tagged; no direct Ca wall/deposition alpha is cited either; high-capture default remains UNCERTIFIED."
     source_url: "https://doi.org/10.1016/j.gca.2014.05.047"
     temperature_range_K: [2278, 2278]
     envelope: [0.0, 1.0]

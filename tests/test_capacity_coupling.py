@@ -528,6 +528,10 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
         # band-based (within_probe_band ~1.43 dex), so the old pin sat below
         # the old live value. SIGN CHECK: pressure UP, matching more high-T
         # Ca volatilisation. See docs-private/research/2026-08-07-mc5-ca-fix/report.md.
+        # b-136 / t-559 posture rework 2026-08-08: Zhang CaTiO3 α remains
+        # WITHDRAWN; channel stays live on Hertz-Knudsen ideal α=1.0 as an
+        # explicit status-bearing upper bound (missing kinetic α ≠ missing
+        # pressure). Ca pressure probe retained. docs-private/research/2026-08-08-rp3-b136/report.md.
         "Ca": 5.740329129667688e-6,
         # b-147 Mg (2026-08-07): TE gas_rail demoted; Pref_GF path. Live catalog
         # probe at 1873.15 K moves 7.3e-3 -> 0.09398 Pa (+1.110 dex). Pref_GF-GR
@@ -723,6 +727,10 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
         assert flux_report["selected_pressure_source_by_species"][species_id] == (
             effective_source.source_id
         )
+    # b-145: TiO/TiO2_gas status-bearing OOR flux-eligible. b-136 posture
+    # rework keeps them live via Hertz-Knudsen ideal α=1.0 upper bound after
+    # Zhang cascade proxy withdrawal (refuse would zero Ti flux and negate
+    # the observable effect of the b-145 pressure fix).
     for species_id in ("TiO", "TiO2_gas"):
         answer = batch.channel(species_id)
         assert isinstance(answer.pressure, PressureValue)
@@ -917,12 +925,29 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         # equal-and-opposite -0.4971975457018 kg (1 h step; Na channel alone
         # ~2.95 kg/hr). Values from this quiesced default-off executable probe;
         # never hand-pasted. See docs-private/research/2026-08-08-t383-build/report.md.
+        # 2026-08-08 b-136 / t-559 posture: Zhang-2014 CaTiO3 perovskite
+        # datum remains WITHDRAWN as mis-tagged HKL α for Ca/Ti silicate-melt
+        # carriers (single-point [2278,2278] band fiction dies). Missing α is
+        # a kinetic correction gap on pressures we already have — not the
+        # missing-input refuse class — so the live posture is Hertz-Knudsen
+        # ideal α=1.0 as an explicit status-bearing upper bound (never
+        # certifies; true flux ≤ this). Channel set and transition count are
+        # deliberately KEPT at 36 (the seven Ca/Ti channels stay live); refuse
+        # would have dropped them 36→29 as an unjustified silent zero.
+        # SIGN CHECK vs pre-b136 (α 0.9/0.8 proxy): flux moves slightly UP
+        # (3.15463992 -> 3.15464311, +3.19e-6 kg/hr) because α 0.9/0.8 → 1.0
+        # HKL ceiling (high-side by construction for an upper bound);
+        # transport saturation UP (+0.440 points); melt mass DOWN
+        # (-3.20e-6 kg, equal-and-opposite evaporative debit). Magnitude
+        # remains tiny (Ca/Ti are refractory). Values from this quiesced
+        # default-off executable probe; never hand-pasted.
+        # docs-private/research/2026-08-08-rp3-b136/report.md
         (
             1,
             1550.0,
-            3.1546399187416787,
-            1394603.5037366392,
-            995.6076532753324,
+            3.1546431063407194,
+            1394603.9438876647,
+            995.6076500754036,
         ),
         rel=1.0e-12,
         abs=1.0e-12,
@@ -949,7 +974,33 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     # 2026-08-05 MC-4 wave-1 union: 37 transitions (A adds evaporate_CrO et
     # al.; B adds K2/K2O/MgO/Na2/Na2O/P2O5/Si/SiO2 reasons) — recomputed from
     # the merged roster by execution.
-    assert len(sim.atom_ledger.transitions) == 36  # 36 after the P2O5_gas tombstone restore
+    # b-136 / t-559 posture rework (2026-08-08): transition count is an
+    # EXPLICIT attributed decision, not an incidental consequence of α
+    # withdrawal. Zhang proxy α is withdrawn, but Ca/Ti-family channels stay
+    # live on HKL ideal α=1.0 status-bearing upper bound. The seven channels
+    # that a refuse posture deleted (evaporate_Ca, evaporate_CaO_gas,
+    # evaporate_Ca2, evaporate_Ti, evaporate_TiO, evaporate_TiO2, condense_Ca)
+    # are retained; count stays 36. A 36→29 drop is a silent-zero regression.
+    assert len(sim.atom_ledger.transitions) == 36  # 36 after the P2O5_gas tombstone restore; b-136 keeps Ca/Ti
+    ca_ti_reasons = {
+        transition.reason for transition in sim.atom_ledger.transitions
+    }
+    # Six of the seven channels the refuse posture deleted appear as ledger
+    # transitions at this head (1550 C / hour-1). evaporate_Ca2 is
+    # channel-contract-complete under the HKL upper-bound α but does not
+    # emit a nonzero ledger transition here (pressure/flux floor); it must
+    # NOT be used as a silent-zero canary for α. The seven-channel *rail*
+    # finding (controller verification: 36→29 under refuse) is recorded in
+    # docs-private/research/2026-08-08-rp3-b136/report.md §8.
+    for required in (
+        "evaporate_Ca",
+        "evaporate_CaO_gas",
+        "evaporate_Ti",
+        "evaporate_TiO",
+        "evaporate_TiO2_gas",
+        "condense_Ca",
+    ):
+        assert required in ca_ti_reasons, required
     assert tuple(
         transition.reason for transition in sim.atom_ledger.transitions[-5:]
     ) == (

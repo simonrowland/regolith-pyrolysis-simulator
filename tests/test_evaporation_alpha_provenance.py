@@ -57,15 +57,6 @@ EXPECTED_ALPHA = {
         ),
         "tier": 2,
     },
-    ("metals", "Ca"): {
-        "value": 0.90,
-        "envelope": (0.48, 1.20),
-        "source": (
-            "OWNER-RATIFY proxy_not_intrinsic: Zhang et al. 2014 GCA "
-            "140:365-380 CaTiO3 melt at 2005 C; Ca activity proxy"
-        ),
-        "tier": 2,
-    },
     ("metals", "Al"): {
         "value": 0.30,
         "envelope": (0.03, 1.00),
@@ -82,15 +73,6 @@ EXPECTED_ALPHA = {
         "source": (
             "REF-017 Safarian & Engh 2013 Metall. Mater. Trans. A 44:747-753 "
             "pure-Si vacuum evaporation; pure elemental Si branch only"
-        ),
-        "tier": 2,
-    },
-    ("metals", "Ti"): {
-        "value": 0.80,
-        "envelope": (0.39, 1.00),
-        "source": (
-            "OWNER-RATIFY proxy_not_intrinsic: Zhang et al. 2014 GCA "
-            "140:365-380 CaTiO3 melt at 2005 C; Ti activity proxy"
         ),
         "tier": 2,
     },
@@ -142,12 +124,23 @@ EXPECTED_ALPHA = {
 
 EXPECTED_OWNER_RATIFY_ALPHA = {
     ("metals", "Na"),
-    ("metals", "Ca"),
     ("metals", "Al"),
-    ("metals", "Ti"),
     ("metals", "Mn"),
     ("foulant_vapor", "NaCl"),
     ("foulant_vapor", "KCl"),
+}
+
+# b-136 / t-559: Zhang 2014 CaTiO3 perovskite proxy WITHDRAWN for these
+# carriers. Posture rework: missing α is not a missing pressure → Hertz-Knudsen
+# ideal α=1.0 as an explicit status-bearing upper bound (never certifies), so
+# the seven rail channels stay live. The single-point [2278,2278] measured-band
+# fiction and the mis-tagged proxy values must not return.
+HKL_UPPER_BOUND_CA_TI_ALPHA = {
+    ("metals", "Ca"),
+    ("metals", "Ti"),
+    ("oxide_vapors", "CaO_gas"),
+    ("oxide_vapors", "TiO"),
+    ("oxide_vapors", "TiO2_gas"),
 }
 
 EXPECTED_MISSING_ALPHA_POLICY = {}
@@ -226,6 +219,80 @@ def test_tier_3_species_have_fail_loud_policy_not_placeholder_alpha():
         assert policy["tier"] == 3
         assert policy["policy"] == "fail_loud_missing_alpha"
         assert source_marker in policy["source"]
+
+
+def test_zhang_2014_catio3_proxy_withdrawn_hkl_upper_bound_posture():
+    """b-136 / t-559: Zhang proxy withdrawn; HKL ideal α=1 upper-bound posture.
+
+    The perovskite CaTiO3 datum is not melt-carrier HKL α (withdrawal stays).
+    But α is a kinetic correction on a pressure we already have, so missing α
+    is NOT the missing-input refuse class (that class is for missing pressure,
+    e.g. NaF). Chosen posture: Hertz-Knudsen ideal α=1.0 as an explicit
+    status-bearing upper bound (true flux ≤ this; never certifies). This keeps
+    the seven Ca/Ti rail channels live — refuse would convert an unjustified
+    coefficient into an unjustified silent zero (b-139/b-149 class).
+
+    Guards:
+    - tag is hkl_ideal_upper_bound_status_bearing, value exactly 1.0
+    - source records WITHDRAWN b-136 and upper-bound language
+    - former [2278,2278] single-point band does not return
+    - former proxy values 0.9/0.8 do not return
+    - loader surfaces executable 1.0 (channel contract complete)
+    - Ca2 cascade included (same parent defect class)
+    """
+
+    raw = yaml.safe_load(VAPOR_PRESSURES_PATH.read_text()) or {}
+    families = raw["families"]
+    family_by_species = {
+        "Ca": "metals_ca_family",
+        "Ti": "metals_ti_family",
+        "CaO_gas": "oxide_vapors_cao_family",
+        "TiO": "oxide_vapors_tio_family",
+        "TiO2_gas": "oxide_vapors_tio2_family",
+        "Ca2": "oxide_vapors_ca2_family",
+    }
+    for species, family_id in family_by_species.items():
+        alpha = families[family_id]["vaporisation_coefficients"]["evaporation_alpha"]
+        assert alpha.get("value") == pytest.approx(1.0), species
+        assert alpha.get("tag") == "hkl_ideal_upper_bound_status_bearing", species
+        assert alpha.get("status") != "no_data", species
+        assert alpha.get("policy") != "refuse_nonzero_flux", species
+        source = str(alpha.get("source") or "")
+        assert "WITHDRAWN" in source and "b-136" in source, species
+        assert "upper-bound" in source or "upper bound" in source, species
+        assert "status_bearing" in source or "status-bearing" in source or (
+            "never certifies" in source
+        ), species
+        # Single-point [2278, 2278] measured-band fiction must not return.
+        t_band = tuple(alpha.get("T_band_K") or ())
+        assert t_band != (2278, 2278), species
+        # Former unjustified proxy scalars must not return as the live value.
+        assert alpha.get("value") not in (0.8, 0.9), species
+        withdrawn = alpha.get("withdrawn_proxy") or {}
+        assert "former_value" in withdrawn, species
+        assert withdrawn["former_T_band_K"] is not None, species
+
+    data = _vapor_pressure_data()
+    for section, species in HKL_UPPER_BOUND_CA_TI_ALPHA:
+        species_data = data[section][species]
+        alpha = species_data["evaporation_alpha"]
+        assert alpha["value"] == pytest.approx(1.0), (section, species)
+        assert alpha["tag"] == "hkl_ideal_upper_bound_status_bearing", (
+            section,
+            species,
+        )
+        blob = yaml.safe_dump(species_data)
+        assert "CaTiO3 melt at 2005" not in blob, (section, species)
+        # Zhang citation may appear only as WITHDRAWN provenance, not as live
+        # OWNER-RATIFY proxy wording.
+        if "Zhang et al. 2014 GCA 140:365-380" in blob:
+            assert "WITHDRAWN" in blob, (section, species)
+
+    from simulator.evaporation import _load_evaporation_alpha_by_species
+
+    loaded = _load_evaporation_alpha_by_species(raw)
+    for species in family_by_species:
+        assert loaded.get(species) == pytest.approx(1.0), species
 
 
 def test_default_setpoints_refuse_unmeasured_alpha_fallback():
