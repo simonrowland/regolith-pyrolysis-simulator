@@ -4933,10 +4933,20 @@ def test_activities_times_antoine_computes_activity_times_ppure_from_yaml():
 
     table = vapor_pressure_legacy_view(_load_data('vapor_pressures.yaml'))['metals']
     T_K = 1600.0 + 273.15
-    expected_na = 2.0 * 10.0 ** (
-        table['Na']['pure_component_antoine']['A']
-        - table['Na']['pure_component_antoine']['B']
-        / (T_K + table['Na']['pure_component_antoine']['C'])
+    # 2026-08-08 t-383: Na's runtime Antoine is the L&H liquid-NaO0.5
+    # standard-reaction reference (fit_target=standard_reaction_term), so the
+    # legacy bridge evaluates activity^1 x P_ref(T) x (pO2/pO2_ref)^-0.25 —
+    # the coherent-pair algebra — not the pure-component sidecar x activity
+    # this test previously pinned (they coincided only under the retired
+    # pseudo/backsolve row). SIGN/unit check: P_ref(1873.15 K)=1.739e4 Pa,
+    # x2 activity, x(1e-9)^-0.25=10^2.25 => ~6.19e6 Pa.
+    na_row = table['Na']
+    na_ref = na_row['antoine']
+    expected_na = (
+        2.0
+        * 10.0 ** (na_ref['A'] - na_ref['B'] / (T_K + na_ref['C']))
+        * (1e-9 / float(na_row.get('pO2_reference_bar', 1.0) or 1.0))
+        ** float(na_row['pO2_exponent'])
     )
 
     assert set(pressures) == {'Na', 'K'}
@@ -6199,8 +6209,10 @@ def test_vapor_bridge_helper_unavailable_uses_explicit_antoine_fallback_nonempty
         activities={'Na2O': 0.2, 'SiO2': 0.4, 'K2O': 0.05},
     )
 
+    # t-383: Na high-T rail is L&H liquid-NaO0.5 standard_reaction_term
+    # (coherent pair), not inactive pseudo-Antoine backsolve provenance.
     assert source["Na"] == (
-        "antoine_fallback_from_vaporock:backsolved_vaporock_curve_fit"
+        "antoine_fallback_from_vaporock:standard_reaction_term"
     )
     # B1 vapor package: the SiO fallback row now carries the calibrated
     # standard_reaction_term (melt-activity + pO2 context), and the
@@ -6231,8 +6243,11 @@ def test_vapor_bridge_empty_vaporock_result_falls_back_to_antoine_with_label():
             activities={'Na2O': 0.2, 'SiO2': 0.4},
         )
 
+    # t-383: Na provenance token follows standard_reaction_term after the
+    # coherent-pair rail flip (was backsolved_vaporock_curve_fit under Chase
+    # pseudo-Antoine inactive provenance).
     assert source["Na"] == (
-        "antoine_fallback_from_vaporock:backsolved_vaporock_curve_fit"
+        "antoine_fallback_from_vaporock:standard_reaction_term"
     )
     assert pressures != {}  # not a silent zero
 

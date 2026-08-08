@@ -1129,55 +1129,67 @@ def test_mg_gas_standard_pressure_rises_with_temperature(
     ] == "gas_fugacity"
 
 
-def test_demaria_1971_na_validation_case_reports_measured_pressure_gap(
+def test_na_standard_reaction_term_reconstructs_liquid_nao05_source_rows(
     vapor_pressure_data,
 ):
-    account = _wt_pct_to_mol_account(_DEMARIA_12022_WT_PCT)
-    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
-    p_na_by_T: dict[float, float] = {}
-    for temperature_K in (1396.0, 1538.0):
-        request = IntentRequest(
-            intent=ChemistryIntent.VAPOR_PRESSURE,
-            account_view=ProviderAccountView(
-                accounts={"process.cleaned_melt": account},
-                species_formula_registry={},
-            ),
-            temperature_C=temperature_K - 273.15,
-            pressure_bar=1e-6,
-            control_inputs={"pO2_bar": 5.54e-9 * 1.01325},
+    """K-style live recon: L&H NaO0.5 source rows reconstruct with recon_err ≈ 0."""
+
+    row = vapor_pressure_data["metals"]["Na"]
+    coeff = row["antoine"]
+    reaction = row["reaction"]
+
+    assert row["fit_target"] == "standard_reaction_term"
+    assert reaction["formula"] == "NaO0.5(l) -> Na(g) + 0.25 O2(g)"
+    assert "Lamoreaux & Hildenbrand 1984 Tables 2/4" in reaction["basis"]
+    assert "10.1063/1.555706" in reaction["basis"]
+    assert row["oxide_activity_exponent"] == pytest.approx(1.0)
+    assert row["pO2_exponent"] == pytest.approx(-0.25)
+    assert "declared_compensation" not in row
+    assert "pressure_bracket" not in row
+    assert row["coherent_pair"]["gamma"] == pytest.approx(1.0e-3)
+    assert row["shadow_bracket"]["status"] == "status_bearing_non_authoritative"
+    assert row["shadow_bracket"]["full_vaporock_Pa"] == pytest.approx(0.002032)
+
+    for source_row in reaction["source_table_values"]:
+        temperature_K = source_row["T_K"]
+        fit_log10_p_pa = coeff["A"] - coeff["B"] / (
+            temperature_K + coeff["C"]
         )
-        result = provider.dispatch(request)
-        p_na_by_T[temperature_K] = result.diagnostic["vapor_pressures_Pa"]["Na"]
+        assert fit_log10_p_pa == pytest.approx(
+            source_row["fit_log10_P_Na_ref_Pa"],
+            abs=1e-6,
+        )
+        assert fit_log10_p_pa == pytest.approx(
+            source_row["log10_P_Na_ref_Pa"],
+            abs=0.001,
+        )
 
-    modeled_p_na = p_na_by_T[1538.0]
-    measured_p_na = 3.2e-2
-    gap_factor = modeled_p_na / measured_p_na
+    assert reaction["fit_residual_dex"]["max_abs"] == pytest.approx(
+        0.000118,
+        abs=1e-6,
+    )
+    heldout = reaction["heldout_demaria_comparison"]
+    anchor = next(r for r in heldout if r["sample"] == "12022" and r["T_K"] == 1429.0)
+    assert anchor["residual_dex_model_minus_demaria"] == pytest.approx(
+        -0.3527,
+        abs=1e-3,
+    )
+    assert all(r.get("partial_melt") is True for r in heldout)
 
-    assert modeled_p_na > 0.0
-    assert p_na_by_T[1538.0] > p_na_by_T[1396.0]
-    # E-08: the selected Na Ellingham row is gas-basis, so the runtime
-    # pressure is f_Na = a_Na(g) * p° rather than a second P_sat multiplier.
-    # Constant table gamma (no T*/T) restores the DeMaria-held-out baseline.
-    assert gap_factor == pytest.approx(5.056080393750948, rel=1e-6)
 
-
-def test_na_interim_authority_bracket_and_constant_gamma_golden(
+def test_na_coherent_pair_and_constant_gamma_golden(
     vapor_pressure_data,
 ):
-    """Historical bracket stays provenance-only; runtime uses constant table gamma."""
+    """t-383 coherent pair: L&H standard_reaction_term + constant table gamma."""
 
     na_row = vapor_pressure_data["metals"]["Na"]
     assert na_row["authority_class"] == "uncertified"
-    assert na_row["declared_compensation"] is True
+    assert na_row["fit_target"] == "standard_reaction_term"
     assert na_row["pseudo_antoine_status"] == "inactive_provenance_only"
-    bracket = na_row["pressure_bracket"]
-    assert bracket["T_K"] == pytest.approx(1429.0)
-    assert bracket["spread_dex"] == pytest.approx(1.86)
-    candidates = bracket["candidates"]
-    assert candidates["lamoreaux_hildenbrand_plus_constant_gamma_Pa"] == (
-        pytest.approx(0.1459)
+    assert na_row["coherent_pair"]["standard"] == (
+        "lamoreaux_hildenbrand_1984_liquid_nao0_5"
     )
-    assert candidates["full_vaporock_Pa"] == pytest.approx(0.002032)
+    assert na_row["shadow_bracket"]["full_vaporock_Pa"] == pytest.approx(0.002032)
 
     account = _wt_pct_to_mol_account(_DEMARIA_12022_WT_PCT)
     provider = BuiltinVaporPressureProvider(vapor_pressure_data)
@@ -1200,31 +1212,88 @@ def test_na_interim_authority_bracket_and_constant_gamma_golden(
     assert result.status == "ok"
     diagnostic = result.diagnostic or {}
 
-    # Golden tooth for constant table gamma (no T*/T mid-range scaling).
+    # Golden tooth: constant table gamma on L&H Pref (P UP vs retired Chase).
     p_na = diagnostic["vapor_pressures_Pa"]["Na"]
-    assert p_na == 0.02684167312949837
+    assert p_na == pytest.approx(0.035201224843865266, rel=1e-9)
+    # Sign story: UP vs retired Chase pin 0.02684167312949837 (+0.118 dex).
+    assert p_na > 0.02684167312949837
 
     provenance = diagnostic["vapor_pressure_numerator_provenance"]["Na"]
     assert provenance["authority_class"] == "uncertified"
-    assert provenance["declared_compensation"] is True
     assert provenance["pseudo_antoine_status"] == "inactive_provenance_only"
-    assert provenance["pressure_bracket"]["candidates"][
-        "lamoreaux_hildenbrand_plus_constant_gamma_Pa"
-    ] == pytest.approx(0.1459)
-    assert provenance["pressure_bracket"]["candidates"][
-        "full_vaporock_Pa"
-    ] == pytest.approx(0.002032)
-    # Source rail unchanged (labels ride alongside, not instead of).
+    assert provenance["pressure_rail"] == "liquid_oxide_standard_reaction"
+    assert provenance["pO2_exponent"] == pytest.approx(-0.25)
+    assert provenance["shadow_bracket"]["full_vaporock_Pa"] == pytest.approx(
+        0.002032
+    )
+    # 1429 K is outside gamma_domain_K=[1673,1673] → DRIFT-HIGH suffix.
     assert diagnostic["vapor_pressures_source"]["Na"] == (
-        "builtin_authoritative:gas_standard_fugacity"
+        "builtin_authoritative:standard_reaction_term:out_of_gamma_domain"
     )
 
     species_authority = diagnostic["species_authority"]["Na"]
     assert species_authority["authority_class"] == "uncertified"
-    assert species_authority["declared_compensation"] is True
-    assert species_authority["pressure_bracket"]["spread_dex"] == (
-        pytest.approx(1.86)
+    assert species_authority["coherent_pair"]["gamma"] == pytest.approx(1.0e-3)
+    assert species_authority["shadow_bracket"]["status"] == (
+        "status_bearing_non_authoritative"
     )
+
+
+def test_demaria_1971_na_heldout_per_sample_residuals(
+    vapor_pressure_data,
+):
+    """Per-sample DeMaria binding; residuals reported inside pre-registered σ at anchor.
+
+    The misbound 1538 K / flat-1396-K-pO2 / 3.2e-2 Pa cross-sample gap pin is
+    deleted (t-383 Step 2/3). Residuals are never fitted away (ADR-001).
+    """
+
+    account = _wt_pct_to_mol_account(_DEMARIA_12022_WT_PCT)
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    temperature_K = 1429.0
+    pO2_bar = 10.0 ** _demaria_12022_log10_po2_bar(temperature_K)
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": account},
+            species_formula_registry={},
+        ),
+        temperature_C=temperature_K - 273.15,
+        pressure_bar=1e-6,
+        control_inputs={
+            "pO2_bar": pO2_bar,
+            "intrinsic_fO2_log": math.log10(pO2_bar),
+        },
+    )
+    result = provider.dispatch(request)
+    assert result.status == "ok"
+    p_na = result.diagnostic["vapor_pressures_Pa"]["Na"]
+    # Extract line_anchor_1429K for 12022 circles (upper line).
+    measured_p_na = 7.93e-2
+    residual_dex = math.log10(p_na / measured_p_na)
+    # Pre-registered digitization σ = 0.30 dex/pt; anchor residual near that band.
+    assert residual_dex == pytest.approx(-0.3527, abs=0.01)
+    assert abs(residual_dex) < 0.40
+    # fO2 slope −0.25 preserved (monatomic ν).
+    p_floor = 1e-9
+    request_floor = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": account},
+            species_formula_registry={},
+        ),
+        temperature_C=temperature_K - 273.15,
+        pressure_bar=1e-6,
+        control_inputs={
+            "pO2_bar": p_floor,
+            "intrinsic_fO2_log": math.log10(p_floor),
+        },
+    )
+    p_na_floor = provider.dispatch(request_floor).diagnostic[
+        "vapor_pressures_Pa"
+    ]["Na"]
+    slope = math.log10(p_na_floor / p_na) / math.log10(p_floor / pO2_bar)
+    assert slope == pytest.approx(-0.25, abs=1e-6)
 
 
 def test_sio_authority_class_emitted_with_authoritative_source_label(

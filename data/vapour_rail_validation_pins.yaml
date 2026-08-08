@@ -122,10 +122,14 @@ species:
         evidence_refs:
           - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
       mass_spec:
-        pinned_residual_dex: 4.216235656403892
+        # t-383: extract-reproduction standard-state classifier is melt-first
+        # (DeMaria rows say "not pure oxide" over basalt melt). Cr DeMaria
+        # Table-2 no longer misroutes to pure-metal Antoine; residual tightens.
+        pinned_residual_dex: 0.4607308385314931
         evidence_refs:
           - tests/chemistry/extract_store_reproduction_residual_baselines.yaml
           - docs/model-limitations.md#extract-store-reproduction-battery
+          - docs-private/research/2026-08-08-t383-build/report.md
   CrO2:
     tier: T2
     target_tier: T4
@@ -235,18 +239,28 @@ species:
     target_tier: T4
     validations:
       mass_spec:
-        pinned_residual_dex: 5.587674763372532
+        # t-383: same melt-first standard-state classifier fix as Cr (DeMaria
+        # "not pure oxide" multicomponent melt rows). Residual tightens.
+        pinned_residual_dex: 2.0827853703164503
         evidence_refs:
           - tests/chemistry/extract_store_reproduction_residual_baselines.yaml
           - docs/model-limitations.md#extract-store-reproduction-battery
+          - docs-private/research/2026-08-08-t383-build/report.md
   Na:
     tier: T3
     target_tier: T4
     validations:
       vaporock:
-        pinned_residual_dex: 1.4368670475601244
+        # t-383: L&H liquid-NaO0.5 Pref replaces Chase gas_standard_fugacity.
+        # Residual vs VapoRock peer WORSENS (REPORT-ONLY, framework §6.3 / ADR-001);
+        # no threshold tightening, no γ/Pref retune to improve this pin.
+        # Observed max|Δ| on enghar-matched grid after rail flip: 1.536140186984556
+        # (prior Chase pin 1.4368670475601244; Δ ≈ +0.099 dex from table-assembly
+        # L&H−Chase level shift, not the second-hand linear-form +0.735).
+        pinned_residual_dex: 1.536140186984556
         evidence_refs:
           - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+          - docs-private/research/2026-08-08-t383-build/report.md
       mass_spec:
         pinned_residual_dex: 0.585026652029182
         evidence_refs:

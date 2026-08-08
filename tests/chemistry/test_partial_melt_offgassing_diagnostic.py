@@ -120,11 +120,14 @@ def test_partial_melt_offgassing_diagnostic_stays_out_of_runner_summary(
     sim = _sim(vapor_pressure_data, feedstocks_data, setpoints_data)
     _install_flux_dispatch(monkeypatch, sim, {'Na': 0.01})
 
+    # t-383: Na standard_reaction_term needs NaO0.5 activity for pre-RG flux
+    # eligibility; Fe pure-Antoine keeps the batch resolvable so the partial-melt
+    # offgassing diagnostic (and runner-summary leak check) can run.
     equilibrium = EquilibriumResult(
         temperature_C=1150.0,
         pressure_bar=1e-8,
         liquid_fraction=0.2,
-        vapor_pressures_Pa={'Na': 1.0},
+        vapor_pressures_Pa={'Fe': 1.0},
         diagnostics={'solidus_T_C': 1000.0, 'liquidus_T_C': 1300.0},
     )
 

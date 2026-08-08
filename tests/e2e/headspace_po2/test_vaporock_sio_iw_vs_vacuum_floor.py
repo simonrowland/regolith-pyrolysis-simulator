@@ -77,7 +77,15 @@ SIO_ANCHOR_HOUR = 6
 # pressures ⇒ less early Si-family loss ⇒ milder managed-branch
 # self-oxidation drift vs IW ⇒ smaller decade separation. Closure
 # unaffected; pin is the executed value under physical composite OOR.
-EXPECTED_SIO_DECADE_DRIFT = 0.18583228077057964
+# 2026-08-08 t-383: Na coherent pair (L&H liquid-NaO0.5 standard_reaction_term
+# + γ=1e−3) replaces Chase gas_standard_fugacity. SIGN CHECK: Na pressures UP
+# (+0.118 dex at the 1429 K investigation cell) ⇒ more Na volatilisation on the
+# managed finite-pO2 branch. SiO Antoine row is bit-identical; the finite/IW
+# SiO separation moves 0.1858 → 0.2103 decade (UP) via the alkali-coupled
+# headspace trajectory (self-oxidation / co-evaporation of volatiles under the
+# managed pO2 path vs the IW-buffered control). Pin is the executed value
+# under the landed L&H Pref; never hand-pasted.
+EXPECTED_SIO_DECADE_DRIFT = 0.2103247134402787
 
 
 def test_vaporock_sio_iw_vs_vacuum_floor_hot_c2a_anchor():

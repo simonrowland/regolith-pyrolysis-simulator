@@ -200,9 +200,13 @@ def test_l5_thermoengine_mismatch_keeps_kernel_value(
     kernel_provenance = dict(
         (kernel.diagnostic or {}).get("vapor_pressure_numerator_provenance") or {}
     )["Na"]
-    assert kernel_provenance["pressure_rail"] == "gas_fugacity"
-    assert kernel_provenance["metal_standard_state"] == "gas"
-    assert "P_reference_Antoine_Pa" not in kernel_provenance
+    # t-383: Na high-T rail is L&H liquid-NaO0.5 standard_reaction_term (coherent
+    # pair), not Chase gas_standard_fugacity. Kernel keeps its liquid-oxide
+    # standard-reaction value when ThermoEngine disagrees. Pref Antoine is
+    # present (unlike the retired gas_fugacity rail which had no P_reference).
+    assert kernel_provenance["pressure_rail"] == "liquid_oxide_standard_reaction"
+    assert "P_reference_Antoine_Pa" in kernel_provenance
+    assert "standard_reaction_term" in str(kernel_provenance.get("source_label", ""))
     bad_na = kernel_vp["Na"] * 2.0
     result = EquilibriumResult(
         temperature_C=sim.melt.temperature_C,
@@ -216,9 +220,8 @@ def test_l5_thermoengine_mismatch_keeps_kernel_value(
     sim._refresh_vapor_pressures_from_kernel(result)
 
     assert result.vapor_pressures_Pa["Na"] == pytest.approx(kernel_vp["Na"])
-    assert (
-        result.vapor_pressures_source["Na"]
-        == "builtin_authoritative:gas_standard_fugacity"
+    assert result.vapor_pressures_source["Na"].startswith(
+        "builtin_authoritative:standard_reaction_term"
     )
 
 

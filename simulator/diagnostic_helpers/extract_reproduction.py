@@ -1323,10 +1323,15 @@ def _pressure_standard_state_kind(obs: AdoptedObservation) -> str | None:
         )
         if value is not None
     ).lower()
-    if "pure" in text or "pure_psat" in text:
-        return "pure_component"
+    # Melt/multicomponent tokens win over a bare "pure" substring. DeMaria
+    # Na figure-digitized rows (t-383 Step 0) say "not pure oxide" over lunar
+    # basalt melt — the old pure-first order misrouted them to condensed-metal
+    # pure_component Antoine (~6–10 dex residual). Melt-first matches the
+    # physical standard state and keeps K/Na DeMaria on the melt rail.
     if any(token in text for token in ("melt", "silicate", "basalt", "slag")):
         return "melt"
+    if "pure" in text or "pure_psat" in text:
+        return "pure_component"
     return None
 
 
@@ -1835,8 +1840,17 @@ def _melt_recipe_mol(
             except (TypeError, ValueError):
                 return None, key, "invalid_melt_composition_mol"
 
-    raw_wt = values.get("composition_wt_pct") or values.get("melt_composition_wt_pct")
+    raw_wt = (
+        values.get("composition_wt_pct")
+        or values.get("melt_composition_wt_pct")
+        # t-383 DeMaria digitized rows carry sample-specific oxide suites.
+        or values.get("sample_oxide_composition_wt_pct")
+    )
     provenance = "extract composition_wt_pct"
+    if isinstance(values.get("sample_oxide_composition_wt_pct"), Mapping) and raw_wt is values.get(
+        "sample_oxide_composition_wt_pct"
+    ):
+        provenance = "extract sample_oxide_composition_wt_pct"
     material = str(values.get("material") or obs.phase or "").lower()
     if not isinstance(raw_wt, Mapping) and (
         "apollo_12" in material or "lunar_basalt_120" in material
@@ -1845,6 +1859,18 @@ def _melt_recipe_mol(
         feedstock = feedstocks.get("lunar_mare_low_ti") or {}
         raw_wt = feedstock.get("composition_wt_pct")
         provenance = "data/feedstocks.yaml::lunar_mare_low_ti (Apollo 12 proxy)"
+    # Prefer sample_Na2O_wt_pct overlay on Apollo proxy when bulk suite absent
+    # (12022 text gives only alkali wt%; full suite is the production proxy).
+    if isinstance(raw_wt, Mapping) and values.get("sample_Na2O_wt_pct") is not None:
+        try:
+            overlaid = dict(raw_wt)
+            overlaid["Na2O"] = float(values["sample_Na2O_wt_pct"])
+            if values.get("sample_K2O_wt_pct") is not None:
+                overlaid["K2O"] = float(values["sample_K2O_wt_pct"])
+            raw_wt = overlaid
+            provenance = f"{provenance}+sample_alkali_wt_pct_overlay"
+        except (TypeError, ValueError):
+            pass
     if isinstance(raw_wt, Mapping) and raw_wt:
         try:
             mol = {

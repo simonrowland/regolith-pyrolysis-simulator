@@ -156,21 +156,24 @@ def test_grounded_alpha_and_p_eq_match_provider_wiring():
     assert alpha_na == pytest.approx(1.0)
     assert alpha_k == pytest.approx(0.13)
     assert alpha_sio == pytest.approx(0.52 * math.exp(-3685.0 / T_K))
-    p_na = pseudo_antoine_p_eq_pa("Na", T_K)
-    assert p_na > 0.0
-    # B1 vapor package: SiO now carries a standard_reaction_term (melt
-    # activity + pO2 context), so raw pseudo-Antoine evaluation refuses for
-    # SiO exactly as it already did for K — the effective P_eq must come
-    # from the builtin provider.
+    # t-383: Na joins K/SiO on standard_reaction_term (L&H liquid-NaO0.5
+    # coherent pair). Raw pseudo-Antoine evaluation would omit melt activity
+    # and pO2 context — refuse and take effective P_eq from the builtin
+    # vapor-pressure provider. Fe remains a pure-Antoine wiring probe.
+    with pytest.raises(ValueError, match="standard_reaction_term"):
+        pseudo_antoine_p_eq_pa("Na", T_K)
     with pytest.raises(ValueError, match="standard_reaction_term"):
         pseudo_antoine_p_eq_pa("SiO", T_K)
+    alpha_fe, _ = grounded_alpha("Fe", T_K)
+    p_fe = pseudo_antoine_p_eq_pa("Fe", T_K)
+    assert p_fe > 0.0
     provider = _series_resistance_evaporation_flux_kg_m2_s(
-        species="Na",
-        P_eq_pa=p_na,
+        species="Fe",
+        P_eq_pa=p_fe,
         P_bulk_pa=0.0,
         T_surface_K=T_K,
-        molar_mass_kg_mol=species_molar_mass_kg_mol("Na"),
-        alpha_i=alpha_na,
+        molar_mass_kg_mol=species_molar_mass_kg_mol("Fe"),
+        alpha_i=alpha_fe,
         knudsen_number=math.inf,
         axial_stir_factor=0.0,
         gas_resistance_enabled=False,
@@ -178,12 +181,12 @@ def test_grounded_alpha_and_p_eq_match_provider_wiring():
     )
     assert provider.flux_kg_s_m2 == pytest.approx(
         langmuir_flux(
-            "Na",
+            "Fe",
             T_K,
-            p_na,
+            p_fe,
             0.0,
-            alpha_na,
-            molar_mass_kg_mol=species_molar_mass_kg_mol("Na"),
+            alpha_fe,
+            molar_mass_kg_mol=species_molar_mass_kg_mol("Fe"),
         ),
         rel=1e-12,
     )

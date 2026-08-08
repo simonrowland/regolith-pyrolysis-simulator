@@ -100,9 +100,14 @@ def _set_freeze_gate(setpoints_data: dict, *, enabled: bool) -> dict:
 
 
 def _equilibrium() -> EquilibriumResult:
+    # t-383: Na is standard_reaction_term (L&H liquid-NaO0.5 coherent pair) and
+    # refuses pre-RG flux eligibility without NaO0.5 activity evidence. Freeze-gate
+    # tests only need a flux-eligible effective-pressure claim; Fe pure-Antoine
+    # remains eligible without oxide activity. Mocked EVAPORATION_FLUX diagnostics
+    # may still report Na rates independently of this seam claim.
     return EquilibriumResult(
         liquid_fraction=1.0,
-        vapor_pressures_Pa={'Na': 1.0},
+        vapor_pressures_Pa={'Fe': 1.0},
         status='ok',
     )
 

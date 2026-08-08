@@ -909,12 +909,20 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         # raises total flux (+2.7797e-3 kg/hr) and transport saturation
         # (+1204 points) while melt mass falls by the equal-and-opposite
         # -2.7797e-3 kg (1 h step). See docs-private/research/2026-08-07-mgfix/report.md.
+        # 2026-08-08 t-383 Na coherent pair: L&H liquid-NaO0.5 standard_reaction_term
+        # replaces Chase gas_standard_fugacity. SIGN CHECK: Na pressures UP
+        # (+0.118 dex at the 1429 K investigation cell; more Na volatilisation)
+        # raises total flux (+0.4971975457018237 kg/hr) and transport saturation
+        # (+227812.35318131023 points) while melt mass falls by the
+        # equal-and-opposite -0.4971975457018 kg (1 h step; Na channel alone
+        # ~2.95 kg/hr). Values from this quiesced default-off executable probe;
+        # never hand-pasted. See docs-private/research/2026-08-08-t383-build/report.md.
         (
             1,
             1550.0,
-            2.657442373039855,
-            1166791.150555329,
-            996.1048508210342,
+            3.1546399187416787,
+            1394603.5037366392,
+            995.6076532753324,
         ),
         rel=1.0e-12,
         abs=1.0e-12,

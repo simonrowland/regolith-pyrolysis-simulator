@@ -807,12 +807,17 @@ def test_coverage_ledger_is_observation_first_and_exact(
     adopted_observations: list[AdoptedObservation],
 ) -> None:
     coverage = coverage_summary(battery_evaluations)
-    assert coverage["observations"] == len(adopted_observations) == 76
-    assert coverage["comparable"] == 32
-    assert coverage["skipped"] == 44
+    # t-383 / t-547: live extract-store adoption counts after Step-0 DeMaria
+    # digitization + Homma/Ohno olette rows + broader adopted extract surface.
+    # Comparable-point count matches residual-baseline pins (77 including the
+    # three Cr/Mn olette rows). Regenerated from the executable battery, not
+    # hand-estimated.
+    assert coverage["observations"] == len(adopted_observations) == 142
+    assert coverage["comparable"] == 35
+    assert coverage["skipped"] == 107
     assert coverage["comparable"] + coverage["skipped"] == coverage["observations"]
-    assert coverage["comparable_points"] == 74
-    assert coverage["gap_points"] == 56
+    assert coverage["comparable_points"] == 77
+    assert coverage["gap_points"] == 179
     assert all(reason.startswith("typed-refusal:") for reason in coverage["skip_reasons"])
 
     by_type = {row["type"]: row for row in coverage["by_type"]}
@@ -825,21 +830,21 @@ def test_coverage_ledger_is_observation_first_and_exact(
         )
         for key, row in by_type.items()
     } == {
-        "activity_coefficient": (19, 0, 19, 0),
-        "alpha": (31, 29, 2, 62),
-        "psat_series": (9, 0, 9, 0),
-        "rate_series": (17, 3, 14, 12),
+        "activity_coefficient": (48, 0, 48, 0),
+        "alpha": (38, 32, 6, 65),
+        "psat_series": (18, 0, 18, 0),
+        "rate_series": (38, 3, 35, 12),
     }
     by_family = {row["comparison_family"]: row for row in coverage["by_family"]}
     assert {
         key: (row["observations"], row["comparable"], row["comparable_points"])
         for key, row in by_family.items()
     } == {
-        "activity_coefficient": (19, 0, 0),
-        "alpha": (31, 29, 62),
+        "activity_coefficient": (48, 0, 0),
+        "alpha": (38, 32, 65),
         "alpha_in_legacy_rate_series": (3, 3, 12),
-        "psat_series": (9, 0, 0),
-        "rate_hkl": (14, 0, 0),
+        "psat_series": (18, 0, 0),
+        "rate_hkl": (35, 0, 0),
     }
     assert {row["species"] for row in coverage["by_species"]} == {
         obs.species_id for obs in adopted_observations

@@ -315,8 +315,11 @@ def test_evaporation_caller_counts_cro2_mn_alpha_fallback_engagement(
             "unmeasured_alpha_fallback_species": ["CrO2", "Mn"],
         },
     )
+    # t-383: Na standard_reaction_term refuses pre-RG eligibility without
+    # NaO0.5 activity evidence. This counter test only needs a flux-eligible
+    # seam claim so the mocked EVAPORATION_FLUX path can record alpha fallbacks.
     equilibrium = SimpleNamespace(
-        vapor_pressures_Pa={"Na": 1.0},
+        vapor_pressures_Pa={"Fe": 1.0},
         vapor_pressures_source={},
         activity_coefficients={},
         diagnostics={},

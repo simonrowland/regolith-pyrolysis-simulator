@@ -813,6 +813,14 @@ def _species_authority_fields(
         candidates = bracket.get("candidates")
         if _is_mapping(candidates):
             out["pressure_bracket"]["candidates"] = dict(candidates)
+    # t-383: coherent_pair + retired shadow_bracket replace declared_compensation
+    # for Na; pass through without changing P_eq (pressure-neutral labels).
+    coherent = row.get("coherent_pair")
+    if _is_mapping(coherent):
+        out["coherent_pair"] = dict(coherent)
+    shadow = row.get("shadow_bracket")
+    if _is_mapping(shadow):
+        out["shadow_bracket"] = dict(shadow)
     status = row.get("pseudo_antoine_status")
     if status is not None and str(status).strip():
         out["pseudo_antoine_status"] = str(status).strip()
@@ -2235,6 +2243,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     "authority_class",
                     "declared_compensation",
                     "pressure_bracket",
+                    "coherent_pair",
+                    "shadow_bracket",
                     "pseudo_antoine_status",
                 )
                 if key in authority_fields

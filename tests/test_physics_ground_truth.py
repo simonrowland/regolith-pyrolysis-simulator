@@ -675,7 +675,10 @@ def test_mn_source_spread_and_join_resolution_are_documented_in_place() -> None:
 @pytest.mark.parametrize(
     ("species", "temperature_K", "expected_reference_pa", "rel_tol"),
     [
-        ("Na", 1118.0, 61_691.685390, 1e-6),
+        # t-383: Na high-T runtime is L&H liquid-NaO0.5 standard_reaction_term
+        # (coherent pair). Pure-component NIST Rodebush sidecar remains wall/NBP
+        # ground-truth only (covered by pure_component_antoine point tests), not
+        # the recovered-P runtime path — same class as Al/Cr oxide-coupled rails.
         # Ca condensed rail (below boil 1757 K) still uses pure-component * Ellingham.
         ("Ca", 1500.0, 21_740.153809, 1e-6),
         # Al/Cr oxide-coupled runtime uses liquid_oxide_standard_reaction (pairing
@@ -741,7 +744,6 @@ def test_pure_component_source_label_uses_explicit_provenance_tier() -> None:
     )
 
     label_cases = [
-        ("Na", 1118.0, "pure_component_source_equation_fit"),
         ("Fe", 3135.15, "pure_component_derived_from_evaluation"),
         ("Ca", 1700.0, "pure_component_source_equation_fit"),
         ("Al", 2300.0, "pure_component_source_equation_fit"),
@@ -768,6 +770,34 @@ def test_pure_component_source_label_uses_explicit_provenance_tier() -> None:
         if expected_fragment == "pure_component_extrapolated":
             assert "pure_component_first_principles" not in label
             assert "extrapolated_beyond_source" in label
+
+    # t-383: Na joins K on standard_reaction_term for the runtime selector.
+    # NIST Rodebush pure-component sidecar stays wall-only (wall_condensation
+    # / pure_component_antoine point tests); runtime coefficient block is antoine.
+    na_metal = data["metals"]["Na"]
+    _, na_block = vapor_pressure_antoine_coefficients(na_metal, 1429.0)
+    assert na_block == "antoine"
+    assert (
+        vapor_pressure_source_label(
+            "builtin_fallback",
+            na_metal,
+            coefficient_block=na_block,
+            temperature_K=1429.0,
+        )
+        == "builtin_fallback:standard_reaction_term"
+    )
+    # Pure-component provenance tier still honest when the sidecar is selected.
+    from engines.builtin.vapor_pressure import wall_condensation_antoine_coefficients
+
+    _, na_pure_block = wall_condensation_antoine_coefficients(na_metal, 1118.0)
+    assert na_pure_block == "pure_component_antoine"
+    na_pure_label = vapor_pressure_source_label(
+        "builtin_fallback",
+        na_metal,
+        coefficient_block=na_pure_block,
+        temperature_K=1118.0,
+    )
+    assert "pure_component_source_equation_fit" in na_pure_label
 
     k_metal = data["metals"]["K"]
     _, k_block = vapor_pressure_antoine_coefficients(k_metal, 1429.0)
@@ -799,14 +829,17 @@ def test_pure_component_source_label_uses_explicit_provenance_tier() -> None:
         assert "pure_component_unspecified" not in label
         assert "pure_component_first_principles" not in label
 
+    # t-383: runtime selector returns standard_reaction antoine for Na; force the
+    # pure-component sidecar block to exercise the unspecified-tier path.
     unannotated = copy.deepcopy(data["metals"]["Na"])
     unannotated["pure_component_antoine"].pop("provenance_class", None)
     unannotated["pure_component_antoine"].pop("source_certification", None)
-    _, unannotated_block = vapor_pressure_antoine_coefficients(unannotated)
+    unannotated_block = "pure_component_antoine"
     unannotated_label = vapor_pressure_source_label(
         "builtin_fallback",
         unannotated,
         coefficient_block=unannotated_block,
+        temperature_K=1118.0,
     )
     assert unannotated_label == "builtin_fallback:pure_component_unspecified"
     assert "pure_component_first_principles" not in unannotated_label

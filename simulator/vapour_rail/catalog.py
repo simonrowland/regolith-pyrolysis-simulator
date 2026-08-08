@@ -701,10 +701,11 @@ _LEGACY_CONDENSATION_REFERENCE_ORDER = (
 _LEGACY_FIELD_ORDER: Mapping[str, tuple[str, ...]] = {
     "Na": (
         "formula", "molar_mass_g_mol", "electrons_per_atom", "parent_oxide",
-        "fit_target", "authority_class", "declared_compensation",
-        "declared_compensation_note", "pressure_bracket", "residual_dex",
-        "confidence_tier", "pseudo_antoine_status", "backsolve",
-        "pure_component_antoine", "evaporation_alpha", "antoine",
+        "fit_target", "authority_class", "residual_dex", "confidence_tier",
+        "gamma_domain_K", "gamma_authority", "coherent_pair", "shadow_bracket",
+        "pseudo_antoine_status", "backsolve", "reaction",
+        "pure_component_antoine", "oxide_activity_exponent", "pO2_exponent",
+        "pO2_reference_bar", "evaporation_alpha", "antoine",
         "valid_range_K", "boiling_point_C", "condensation_T_C_at_1mbar", "notes",
     ),
     "K": (

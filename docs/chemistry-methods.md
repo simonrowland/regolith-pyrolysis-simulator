@@ -94,19 +94,22 @@ one atmosphere at its normal boiling point (3135 K). It is labelled UNCERTIFIED 
 but a derivation rather than a fitted primary.
 <!-- impl: §2.1 -> docs/chemistry-provenance.yaml Fe_pure_antoine:358 — Fe surrogate provenance -->
 
-Sodium and iron still carry **pseudo-Antoine** provenance metadata whose coefficients were back-solved
+Iron still carries **pseudo-Antoine** provenance metadata whose coefficients were back-solved
 so that the activity-scaled Antoine product reproduces a VapoRock gas-speciation target on a fixed
 reference grid (seven lunar and Mars feedstocks, 31 temperature points from 1350 to 1950 K, at an
-iron–wüstite oxygen fugacity per Kress & Carmichael 1991). These are the
-`pseudo_psat_backsolved_from_vaporock` rows. They are honestly a model-to-model fit, not a measurement:
-the residual metadata records about 0.379 dex for Na and 0.418 dex for Fe, and every such row is
-UNCERTIFIED. On the live Na high-T rail the backsolve block is inactive provenance only (Alternative B);
-Fe's residual pseudo Antoine is dormant. Silicon monoxide no longer uses that path: as of the vapor
-package (`3a85f59`), SiO is a `standard_reaction_term` with a composition-independent JANAF/ThermoEngine
-reaction block and mass-action pO₂ scaling. Potassium also uses a `standard_reaction_term`, while
-magnesium uses a `pure_component_psat` row. Where a usable `pure_component_antoine` sidecar exists, the
-runtime selector prefers it over any inactive pseudo fallback. The VapoRock target itself comes from
-Wolf et al. 2023 (*ApJ* 947:64,
+iron–wüstite oxygen fugacity per Kress & Carmichael 1991). That is the
+`pseudo_psat_backsolved_from_vaporock` path. It is honestly a model-to-model fit, not a measurement:
+the residual metadata records about 0.418 dex for Fe, and every such row is
+UNCERTIFIED. Fe's residual pseudo Antoine is dormant. Sodium no longer uses that path for the live
+high-T rail (t-383, 2026-08-08): Na is a liquid-NaO0.5 `standard_reaction_term` assembled from
+Lamoreaux & Hildenbrand 1984 Tables 2/4 (dual-extracted; minimax residual 1.18e-4 dex), paired with
+constant table `gamma_NaO0.5=1e-3` coherent by provenance in the L&H frame; the VapoRock-backsolved
+pseudo Antoine and the prior Chase gas-standard compensating-errors surface are inactive provenance
+only. Silicon monoxide no longer uses the pseudo path either: as of the vapor package (`3a85f59`),
+SiO is a `standard_reaction_term` with a composition-independent JANAF/ThermoEngine reaction block
+and mass-action pO₂ scaling. Potassium also uses a `standard_reaction_term` on the same L&H basis.
+Where a usable `pure_component_antoine` sidecar exists, the runtime selector prefers it over any
+inactive pseudo fallback. The VapoRock target itself comes from Wolf et al. 2023 (*ApJ* 947:64,
 [doi:10.3847/1538-4357/acbcc7](https://doi.org/10.3847/1538-4357/acbcc7)).
 <!-- impl: §2.1 -> engines/builtin/vapor_pressure.py _is_noncertifying_pseudo_vapor_pressure_runtime:828 — pseudo guard -->
 <!-- impl: §2.1 -> data/vapor_pressures.yaml oxide_vapors.SiO.reaction:826 — SiO standard reaction term (replaces pseudo backsolve; 3a85f59) -->
