@@ -1879,14 +1879,17 @@ species:
   disposition: V
   validation_status: pending_validation
   validation_anchor_refs:
-  - tests/chemistry/extract_store_reproduction_residual_baselines.yaml#ohno_1967_cr_olette_alpha_table3:T=1873.15
-  - tests/chemistry/extract_store_reproduction_residual_baselines.yaml#pound_1972_cr_solid_alpha_mccabe:T=1440.5
-  - data/vapour_rail_validation_pins.yaml#species.Cr.validations.mass_spec
-  - docs/model-limitations.md#extract-store-reproduction-battery
+  # si-comparability 2026-08-08: molten-metal/pure-element α rows remain as
+  # extract evidence but are not residual-comparable to the silicate-melt rail
+  # (mass_spec pin withdrawn). VapoRock residual pin stays.
+  - data/literature/extracts/kems-002-ohno-1967.yaml#ohno_1967_cr_olette_alpha_table3
+  - data/literature/extracts/kems-003-pound-1972.yaml#pound_1972_cr_solid_alpha_mccabe
   - data/vapour_rail_validation_pins.yaml#species.Cr.validations.vaporock
+  - docs/model-limitations.md#extract-store-reproduction-battery
   - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
   - data/literature/vapour_rail_langmuir_anchors.yaml#pound_1972_cr_langmuir_knudsen
   - data/literature/langmuir_knudsen_flux_validation.yaml#chromium_solid_langmuir_knudsen
+  - validation-data/pin-evidence/cr_mass_spec_melt_first_2026-08-08.yaml
   feedstock_presence: false
   sources:
     inventory: true
@@ -2359,6 +2362,7 @@ species:
   - tests/chemistry/extract_store_reproduction_residual_baselines.yaml#costa_2015_fe_olivine_kems_alpha_multicell:T=1700
   - tests/chemistry/extract_store_reproduction_residual_baselines.yaml#costa_2015_fe_olivine_kems_alpha_multicell:T=1720
   - data/vapour_rail_validation_pins.yaml#species.Fe.validations.mass_spec
+  - validation-data/pin-evidence/fe_mass_spec_class_comparable_2026-08-08.yaml
   - docs/model-limitations.md#extract-store-reproduction-battery
   - data/vapour_rail_validation_pins.yaml#species.Fe.validations.vaporock
   - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
@@ -4083,13 +4087,15 @@ species:
   disposition: V
   validation_status: pending_validation
   validation_anchor_refs:
-  - tests/chemistry/extract_store_reproduction_residual_baselines.yaml#homma_1966_mn_olette_alpha_exp_table1:T=1873.15
-  - tests/chemistry/extract_store_reproduction_residual_baselines.yaml#ohno_1967_mn_olette_alpha_table3:T=1873.15
-  - data/vapour_rail_validation_pins.yaml#species.Mn.validations.mass_spec
-  - docs/model-limitations.md#extract-store-reproduction-battery
+  # si-comparability 2026-08-08: molten-metal olette α is not residual-
+  # comparable to the silicate-melt rail (mass_spec pin withdrawn). Extract
+  # rows stay as typed not_comparable_system_class evidence.
   - data/literature/extracts/kems-001-homma-1966.yaml#homma_1966_mn_olette_alpha_exp_table1
   - data/literature/extracts/kems-001-homma-1966.yaml#homma_1966_mn_specific_evaporation_constant
+  - data/literature/extracts/kems-002-ohno-1967.yaml#ohno_1967_mn_olette_alpha_table3
   - data/literature/extracts/kems-022-demaria-1971.yaml#demaria_1971_mn_psat_table2_sample_12022
+  - docs/model-limitations.md#extract-store-reproduction-battery
+  - validation-data/pin-evidence/mn_mass_spec_melt_first_2026-08-08.yaml
   feedstock_presence: false
   sources:
     inventory: true

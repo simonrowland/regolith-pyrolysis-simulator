@@ -1,0 +1,47 @@
+# Distilled pin evidence — Ca vaporock residual (MC-5 / t-534 option B)
+# Public checkable record. Full thermo narrative remains private.
+schema_version: 1
+kind: vapour_rail_pin_evidence
+source_id: mc5-ca-fix-t534
+date: "2026-08-07"
+species: Ca
+validation: vaporock
+pinned_residual_dex: 0.855639676843498
+prior_pinned_residual_dex: 2.31697
+residual_change: tightens
+metric: max_absolute_residual_dex
+comparison_basis: >-
+  Peer residual vs VapoRock on the enghar-matched (T, fO2) grid;
+  monatomic Ca species max |Δ log10 P_rail − log10 P_VR|.
+method: >-
+  Option B demotion of TE MELTS gas_rail_standard_reaction (Pref_GR) to
+  dormant_non_authoritative; Builtin high-T path uses JANAF Ellingham
+  gas_fugacity (Pref_GF). Catalog Antoine retargeted to Pref_GF exact fit.
+  Demotion justified by internal Pref_GR vs Pref_GF inconsistency and TE
+  pure-liquid oxide μ0_CaO not validatable against JANAF pure CaO(l);
+  VapoRock residual is diagnostic, not the objective.
+conditions:
+  grid: enghar-matched multi-cell (T × fO2)
+  n_cells_species: 42
+  worst_cell_after: low-T pure-component band (rail high vs peer)
+  high_T_monatomic_band_dex: "0.11–0.23"
+pref_gap_probe:
+  reaction: "CaO → Ca(g) + ½ O2"
+  unit_activity_pO2_bar: 1.0
+  pref_GR_minus_pref_GF_dex:
+    "1800_K": -2.513
+    "1950_K": -2.423
+  janaf_solid_lands_on: Pref_GF
+checkable_claims:
+  - residual tightened 2.317 → 0.856 dex (high-T monatomic P moves UP ~2.42 dex)
+  - other enghar elements unmoved to printed precision
+  - Pref_GR is faithful TE μ0 assembly (not arithmetic mis-fit); gap is oxide free energy
+runtime_changes:
+  - data/vapor_pressures.yaml Ca gas_rail_standard_reaction dormant_non_authoritative
+  - data/vapor_pressures.yaml Ca pressure_models Pref_GF Antoine retarget
+  - engines/builtin/vapor_pressure.py dormant gas_rail fallthrough to gas_fugacity
+publishable_companion_refs:
+  - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+notes: >-
+  engine_crosscheck_report.json is a separately tracked peer-residual snapshot;
+  this artifact attributes the pin *change* after Pref_GF demotion.

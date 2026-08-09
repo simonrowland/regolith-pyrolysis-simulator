@@ -1335,6 +1335,158 @@ def _pressure_standard_state_kind(obs: AdoptedObservation) -> str | None:
     return None
 
 
+# Production vapour-rail residual validation is a claim about the *silicate /
+# oxide-condensed carrier* surface. Class axis (DECOMPOSITION §0.2 / B1):
+# "interfacial transformation required", not atomicity. Pure-element and
+# molten-metal α measure congruent metal evaporation; they are not evidence
+# for melt α (rail Fe 0.02 from oxide melt vs congruent metals near 1).
+RAIL_COMPARABLE_SYSTEM_CLASSES = frozenset(
+    {
+        "silicate_melt",
+        "solid_solution_silicate",
+        "pure_oxide_condensed",
+    }
+)
+RAIL_INCOMPARABLE_SYSTEM_CLASSES = frozenset(
+    {
+        "pure_element_condensed",
+        "molten_metal",
+        "solid_film_growth",
+    }
+)
+
+
+def observation_system_class(obs: AdoptedObservation) -> str | None:
+    """Return typed ``system_class`` or a conservative inference from phase text.
+
+    Prefer the extract's typed ``values.system_class`` (B1 harvest). Pre-B1
+    rows often lack it; phase/material/regime tokens then recover the class so
+    comparability is not species-name gated.
+    """
+
+    raw = obs.values.get("system_class")
+    if raw is not None and str(raw).strip():
+        return str(raw).strip()
+
+    text = " ".join(
+        str(value)
+        for value in (
+            obs.phase,
+            obs.regime,
+            obs.standard_state,
+            obs.values.get("material"),
+            obs.values.get("condensed_reservoir"),
+            obs.values.get("quantity"),
+            obs.values.get("gas_species"),
+        )
+        if value is not None
+    ).lower()
+
+    if any(
+        token in text
+        for token in (
+            "solid_sio_film",
+            "film_growth",
+            "solid_sio_growth",
+            "growth_coefficient",
+        )
+    ):
+        return "solid_film_growth"
+    if any(
+        token in text
+        for token in (
+            "molten_fe",
+            "liquid_fe_",
+            "steel_melt",
+            "fe_mn",
+            "fe_cr",
+            "fe_s_alloy",
+            "molten_metal",
+            "liquid metal",
+            "fe_alloy",
+            "liquid_fe_alloy",
+            "olette",
+        )
+    ):
+        return "molten_metal"
+    if any(
+        token in text
+        for token in (
+            "solid_polycrystalline",
+            "solid_fe",
+            "solid_cr",
+            "pure_elemental",
+            "pure_liquid_metal",
+            "electrolytic_fe",
+            "solid_metal",
+            "solid_cr_metal",
+            "solid_fe_metal",
+        )
+    ):
+        return "pure_element_condensed"
+    if any(token in text for token in ("olivine", "solid_solution")):
+        return "solid_solution_silicate"
+    if any(
+        token in text
+        for token in (
+            "silicate",
+            "melt",
+            "basalt",
+            "slag",
+            "cai",
+            "chondrule",
+            "fcmas",
+            "fmsca",
+            "ferrobasalt",
+            "forsterite",
+            "cmas",
+        )
+    ):
+        return "silicate_melt"
+    if any(
+        token in text
+        for token in (
+            "pure_oxide",
+            "oxide_silicate",
+            "oxide_source",
+            "oxide_literature",
+        )
+    ):
+        return "pure_oxide_condensed"
+    return None
+
+
+def rail_system_class_comparability(
+    obs: AdoptedObservation,
+) -> tuple[bool, str | None, str | None]:
+    """Whether an observation is class-comparable to the production rail carrier.
+
+    Returns ``(comparable, system_class_or_none, skip_reason_suffix_or_none)``.
+    A pin is a validation claim about the *carrier*; scoring pure-element /
+    molten-metal α against the silicate-melt rail is a category error.
+    """
+
+    system_class = observation_system_class(obs)
+    if system_class is None:
+        # Untyped and uninferable: leave scorable. Silent exclusion of
+        # unknown rows would hide coverage drift; typed class is preferred.
+        return True, None, None
+    if system_class in RAIL_COMPARABLE_SYSTEM_CLASSES:
+        return True, system_class, None
+    if system_class in RAIL_INCOMPARABLE_SYSTEM_CLASSES:
+        return (
+            False,
+            system_class,
+            f"not_comparable_system_class:{system_class}",
+        )
+    # Explicit but unlisted class — fail closed (do not invent comparability).
+    return (
+        False,
+        system_class,
+        f"not_comparable_system_class:{system_class}",
+    )
+
+
 def _evaluate_psat(
     obs: AdoptedObservation,
     evaluation: ObservationEvaluation,
@@ -1746,6 +1898,19 @@ def _evaluate_alpha(
         return evaluation
 
     assert points is not None
+    # Class gate: residual pins claim the production silicate/oxide carrier.
+    # Pure-element / molten-metal / solid-film rows stay visible with a typed
+    # reason; they must not enter the comparable residual set.
+    class_ok, system_class, class_skip = rail_system_class_comparability(obs)
+    class_typed_skip = (
+        f"{_TYPED_SKIP_PREFIX}{class_skip}" if class_skip is not None else None
+    )
+    if not class_ok and class_typed_skip is not None:
+        evaluation.runtime_notes.append(
+            "system-class not comparable to silicate-melt rail carrier: "
+            f"{system_class} ({class_typed_skip})"
+        )
+
     candidates = _engine_species_candidates(obs)
     any_numeric = False
     last_refusal: str | None = None
@@ -1761,7 +1926,11 @@ def _evaluate_alpha(
             "candidates": candidates,
             "geometry_assumption": obs.geometry_assumption,
             "engine_path": "grounded_alpha",
+            "system_class": system_class,
+            "rail_system_class_comparable": class_ok,
         }
+        if class_typed_skip is not None:
+            runtime["skip_reason"] = class_typed_skip
         for species in candidates:
             value, refuse, ctx = _engine_alpha(species, T_K)
             if value is not None:
@@ -1791,6 +1960,8 @@ def _evaluate_alpha(
         )
         if extrapolated:
             runtime["alpha_s_extrapolated"] = True
+        # Class-incomparable rows keep literature + engine values in runtime for
+        # audit, but out-of-domain status excludes them from residual pins.
         record = _compare_point(
             obs=obs,
             observable_id=(
@@ -1808,17 +1979,21 @@ def _evaluate_alpha(
             actual=actual,
             units="alpha",
             runtime=runtime,
-            unsupported_speciation=actual is None,
+            unsupported_speciation=actual is None and class_ok,
+            out_of_domain=not class_ok,
         )
         evaluation.records.append(record)
-        if record.status == "mismatch":
+        if class_ok and record.status == "mismatch":
             extr_tag = " extrapolated: true" if extrapolated else ""
             evaluation.findings.append(
                 f"FINDING mismatch {obs.species_id} α T={T_K:g}K "
                 f"expected={expected:.6g} actual={actual} budget={unc}{extr_tag}"
             )
 
-    if not any_numeric:
+    if not class_ok and class_typed_skip is not None:
+        evaluation.skip_reason = class_typed_skip
+        evaluation.skip_reasons.append(class_typed_skip)
+    elif not any_numeric:
         evaluation.skip_reason = (
             f"{_TYPED_SKIP_PREFIX}{last_refusal or 'alpha_unsupported'}"
         )
@@ -2661,6 +2836,8 @@ __all__ = [
     "ExtractReproductionError",
     "MODEL_LIMITATIONS_PATH",
     "ObservationEvaluation",
+    "RAIL_COMPARABLE_SYSTEM_CLASSES",
+    "RAIL_INCOMPARABLE_SYSTEM_CLASSES",
     "ROLLUP_BEGIN",
     "ROLLUP_END",
     "TARGET_TYPES",
@@ -2676,6 +2853,8 @@ __all__ = [
     "load_vapor_pressure_data",
     "motzfeldt_available",
     "normalized_residual",
+    "observation_system_class",
+    "rail_system_class_comparability",
     "residual_dex",
     "resolve_chamber_pressure_pa",
     "resolve_pO2_bar",

@@ -1,0 +1,48 @@
+# Distilled pin evidence — Na vaporock residual (t-383 L&H coherent pair)
+# REPORT-ONLY residual worsen; no retune to improve the peer number.
+schema_version: 1
+kind: vapour_rail_pin_evidence
+source_id: t383-build
+date: "2026-08-08"
+species: Na
+validation: vaporock
+pinned_residual_dex: 1.536140186984556
+prior_pinned_residual_dex: 1.4368670475601244
+residual_change: worsens_report_only
+metric: max_absolute_residual_dex
+comparison_basis: >-
+  Peer residual vs VapoRock on the enghar-matched (T, fO2) grid;
+  monatomic Na species max |Δ log10 P_rail − log10 P_VR|.
+method: >-
+  Land Lamoreaux & Hildenbrand 1984 liquid-NaO0.5 standard_reaction_term +
+  constant table γ_NaO0.5=1e-3 as the coherent high-T pair. Retire Chase /
+  JANAF gas_standard_fugacity compensating-errors surface. Full-VapoRock /
+  TE-μ0 route retained only as status_bearing_non_authoritative shadow
+  bracket. Framework §6.3 / ADR-001: residual vs VapoRock peer is REPORT-ONLY
+  — no threshold tightening and no γ/Pref retune to improve this pin.
+conditions:
+  liquid_domain_K: [1405.0, 1600.0]
+  gamma_NaO0_5: 1.0e-3
+  gamma_domain_K: [1673.0, 1673.0]
+  investigation_cell:
+    temperature_K: 1429.0
+    log10_fO2_bar: -7.853114
+    X_NaO0_5: 6.8526e-3
+    P_Na_Pa_landed: 0.035201224843865266
+  pref_antoine:
+    A: 11.342243
+    B: 12140.316409
+    C: -163.701
+    fit_residual_dex_max_abs: 1.18e-4
+checkable_claims:
+  - residual worsens 1.437 → 1.536 dex (+0.099); expected from table-assembly L&H−Chase level shift
+  - not the second-hand linear-form +0.735 dex (Sossi Table 5 is cross-check only)
+  - P UP vs retired Chase at investigation cell (+0.118 dex)
+  - Ca / Mg vaporock pin rows unmoved by this change
+  - no γ or Pref retune to close the peer residual
+runtime_changes:
+  - data/vapor_pressures.yaml metals_na_family Na fit_target standard_reaction_term
+  - engines/builtin/vapor_pressure.py coherent_pair / shadow_bracket diagnostics
+publishable_companion_refs:
+  - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+  - docs/model-limitations.md

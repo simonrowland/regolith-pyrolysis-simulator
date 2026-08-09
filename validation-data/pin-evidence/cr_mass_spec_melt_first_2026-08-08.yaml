@@ -1,0 +1,38 @@
+# Distilled pin evidence — Cr mass_spec residual (history + withdrawal)
+schema_version: 1
+kind: vapour_rail_pin_evidence
+source_id: si-comparability
+date: "2026-08-08"
+species: Cr
+validation: mass_spec
+status: withdrawn
+pinned_residual_dex: null
+prior_pinned_residual_dex: 0.4607308385314931
+prior_prior_pinned_residual_dex: 4.216
+residual_change: withdrawn_not_comparable
+metric: max_absolute_residual_dex
+comparison_basis: >-
+  Historical: extract-store residual against Cr mass-spec observations.
+  Withdrawal: residual was driven solely by molten-metal (Ohno olette) and
+  pure-element solid-Cr (Pound) α rows, which are not class-comparable to
+  the silicate-melt rail carrier.
+method: >-
+  2026-08-08 si-comparability: system-class gate excludes pure_element_condensed
+  and molten_metal α from the comparable residual set with typed reason
+  not_comparable_system_class. Cr therefore has no class-comparable residual
+  and the mass_spec pin is withdrawn (not replaced by a fake zero).
+  Earlier t-383 melt-first classifier still applies to DeMaria psat routing;
+  that is a separate path.
+conditions:
+  observation_class: molten_metal / pure_element_condensed Cr α (excluded)
+  carrier_class: silicate_melt production rail
+checkable_claims:
+  - mass_spec pin removed because no class-comparable residual remains
+  - Ohno/Pound extract rows remain with typed skip reason
+  - vaporock residual pin for Cr is unchanged
+runtime_changes:
+  - simulator/diagnostic_helpers/extract_reproduction.py rail_system_class_comparability
+publishable_companion_refs:
+  - docs/model-limitations.md#extract-store-reproduction-battery
+  - data/literature/extracts/kems-002-ohno-1967.yaml
+  - data/literature/extracts/kems-003-pound-1972.yaml

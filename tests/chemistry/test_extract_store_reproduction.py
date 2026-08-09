@@ -31,6 +31,8 @@ from simulator.diagnostic_helpers.extract_reproduction import (
     COMPARISON_STATUSES,
     DEFAULT_PSAT_UNCERTAINTY,
     MODEL_LIMITATIONS_PATH,
+    RAIL_COMPARABLE_SYSTEM_CLASSES,
+    RAIL_INCOMPARABLE_SYSTEM_CLASSES,
     ROLLUP_BEGIN,
     ROLLUP_END,
     TARGET_TYPES,
@@ -46,6 +48,8 @@ from simulator.diagnostic_helpers.extract_reproduction import (
     load_adopted_observations,
     load_vapor_pressure_data,
     motzfeldt_available,
+    observation_system_class,
+    rail_system_class_comparability,
     residual_dex,
     resolve_chamber_pressure_pa,
     resolve_pO2_bar,
@@ -110,8 +114,10 @@ def test_store_yields_adopted_target_type_observations(
     types = {obs.obs_type for obs in adopted_observations}
     assert types == TARGET_TYPES
     kems = [obs for obs in adopted_observations if obs.source_id.startswith("kems-")]
-    assert len(kems) == 39
-    assert len({obs.source_id for obs in kems}) == 15
+    # B1 harvest + class-tagged fence rows expanded the KEMS surface; keep the
+    # count live-derived so a silent shrink is RED without hard-coding B1 IDs.
+    assert len(kems) == 135
+    assert len({obs.source_id for obs in kems}) == 20
     for obs in adopted_observations:
         assert obs.is_priority_winner or obs.adoption_basis == "mass_spec_extract"
         assert obs.source_id
@@ -171,6 +177,81 @@ def test_engine_refusal_never_silent_pass_and_never_bare_failure() -> None:
     assert all(r.status in COMPARISON_STATUSES for r in evaluation.records)
     assert evaluation.skip_reason is not None
     assert is_typed_skip(evaluation.skip_reason) or evaluation.skip_reason
+
+
+def _alpha_fixture(
+    *,
+    species_id: str,
+    observation_id: str,
+    phase: str | None,
+    values: dict,
+) -> AdoptedObservation:
+    return AdoptedObservation(
+        species_id=species_id,
+        source_id="fixture-source",
+        observation_id=observation_id,
+        obs_type="alpha",
+        review_status="draft",
+        phase=phase,
+        regime=None,
+        standard_state=None,
+        T_range_K=(1700.0, 1700.0),
+        units="dimensionless",
+        uncertainty=None,
+        locator={"note": "fixture"},
+        values=values,
+        equipment={},
+        disagreement_dex=None,
+        is_priority_winner=True,
+        geometry_assumption=geometry_assumption_text(),
+    )
+
+
+def test_pure_element_alpha_is_not_comparable_to_silicate_melt_rail() -> None:
+    """Safarian-class pure Si α must not residual-pin the melt carrier."""
+
+    assert "pure_element_condensed" in RAIL_INCOMPARABLE_SYSTEM_CLASSES
+    assert "silicate_melt" in RAIL_COMPARABLE_SYSTEM_CLASSES
+    obs = _alpha_fixture(
+        species_id="Si",
+        observation_id="fixture_pure_si_alpha",
+        phase="pure_elemental_Si_liquid",
+        values={
+            "alpha": 1.0,
+            "system_class": "pure_element_condensed",
+            "transformation_class": "congruent_no_transformation",
+            "material": "pure_elemental_Si",
+        },
+    )
+    ok, sc, reason = rail_system_class_comparability(obs)
+    assert ok is False
+    assert sc == "pure_element_condensed"
+    assert reason == "not_comparable_system_class:pure_element_condensed"
+    evaluation = evaluate_observation(obs, vapor_pressure_data=load_vapor_pressure_data())
+    assert evaluation.skip_reason == (
+        "typed-refusal:not_comparable_system_class:pure_element_condensed"
+    )
+    assert all(r.status == "out-of-domain" for r in evaluation.records)
+    assert not any(r.status in {"match", "mismatch"} for r in evaluation.records)
+
+
+def test_silicate_melt_alpha_remains_comparable() -> None:
+    obs = _alpha_fixture(
+        species_id="Fe",
+        observation_id="fixture_melt_fe_alpha",
+        phase="silicate_melt",
+        values={
+            "alpha": 0.02,
+            "system_class": "silicate_melt",
+            "transformation_class": "redox_reduction_required",
+            "material": "FCMAS_silicate_melt",
+        },
+    )
+    ok, sc, reason = rail_system_class_comparability(obs)
+    assert ok is True
+    assert sc == "silicate_melt"
+    assert reason is None
+    assert observation_system_class(obs) == "silicate_melt"
 
 
 def test_comparison_vocabulary_matches_kems_precedent() -> None:
@@ -807,18 +888,20 @@ def test_coverage_ledger_is_observation_first_and_exact(
     adopted_observations: list[AdoptedObservation],
 ) -> None:
     coverage = coverage_summary(battery_evaluations)
-    # t-383 / t-547: live extract-store adoption counts after Step-0 DeMaria
-    # digitization + Homma/Ohno olette rows + broader adopted extract surface.
-    # Comparable-point count matches residual-baseline pins (77 including the
-    # three Cr/Mn olette rows). Regenerated from the executable battery, not
-    # hand-estimated.
-    assert coverage["observations"] == len(adopted_observations) == 142
-    assert coverage["comparable"] == 35
-    assert coverage["skipped"] == 107
+    # 2026-08-08 si-comparability: B1 harvest expanded adoption; pure-element /
+    # molten-metal / solid-film α are typed not_comparable_system_class skips
+    # (not residual pins). Counts are live battery, not hand-estimated.
+    assert coverage["observations"] == len(adopted_observations) == 172
+    assert coverage["comparable"] == 38
+    assert coverage["skipped"] == 134
     assert coverage["comparable"] + coverage["skipped"] == coverage["observations"]
-    assert coverage["comparable_points"] == 77
-    assert coverage["gap_points"] == 179
+    assert coverage["comparable_points"] == 81
+    assert coverage["gap_points"] == 208
     assert all(reason.startswith("typed-refusal:") for reason in coverage["skip_reasons"])
+    assert any(
+        reason.startswith("typed-refusal:not_comparable_system_class:")
+        for reason in coverage["skip_reasons"]
+    )
 
     by_type = {row["type"]: row for row in coverage["by_type"]}
     assert {
@@ -830,21 +913,21 @@ def test_coverage_ledger_is_observation_first_and_exact(
         )
         for key, row in by_type.items()
     } == {
-        "activity_coefficient": (48, 0, 48, 0),
-        "alpha": (38, 32, 6, 65),
-        "psat_series": (18, 0, 18, 0),
-        "rate_series": (38, 3, 35, 12),
+        "activity_coefficient": (49, 0, 49, 0),
+        "alpha": (60, 35, 25, 69),
+        "psat_series": (19, 0, 19, 0),
+        "rate_series": (44, 3, 41, 12),
     }
     by_family = {row["comparison_family"]: row for row in coverage["by_family"]}
     assert {
         key: (row["observations"], row["comparable"], row["comparable_points"])
         for key, row in by_family.items()
     } == {
-        "activity_coefficient": (48, 0, 0),
-        "alpha": (38, 32, 65),
+        "activity_coefficient": (49, 0, 0),
+        "alpha": (60, 35, 69),
         "alpha_in_legacy_rate_series": (3, 3, 12),
-        "psat_series": (18, 0, 0),
-        "rate_hkl": (35, 0, 0),
+        "psat_series": (19, 0, 0),
+        "rate_hkl": (41, 0, 0),
     }
     assert {row["species"] for row in coverage["by_species"]} == {
         obs.species_id for obs in adopted_observations

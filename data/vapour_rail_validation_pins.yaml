@@ -93,10 +93,12 @@ species:
         # (2.317 -> 0.856 dex) because high-T monatomic Ca pressures move UP by
         # ~2.42 dex (Pref_GR was low vs Pref_GF and vs peer VR). Low-T pure-comp
         # ceiling remains the max residual. Attribution:
-        # docs-private/research/2026-08-07-mc5-ca-fix/report.md
+        # validation-data/pin-evidence/ca_vaporock_pref_gf_2026-08-07.yaml
         pinned_residual_dex: 0.855639676843498
         evidence_refs:
           - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+          - validation-data/pin-evidence/ca_vaporock_pref_gf_2026-08-07.yaml
+        internal_notes_refs:
           - docs-private/research/2026-08-07-mc5-ca-fix/report.md
           - docs-private/research/2026-08-07-mc5-ca-fix/element_engine_run.log
   CaO_gas:
@@ -114,22 +116,22 @@ species:
         evidence_refs:
           - data/vapor_pressures.yaml
   Cr:
-    tier: T3
+    # si-comparability 2026-08-08: demoted T3→T2. mass_spec residual was only
+    # molten-metal/pure-element α (not silicate-melt carrier validation); pin
+    # withdrawn. VapoRock residual remains (T2).
+    tier: T2
     target_tier: T4
     validations:
       vaporock:
         pinned_residual_dex: 0.2727768111618302
         evidence_refs:
           - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
-      mass_spec:
-        # t-383: extract-reproduction standard-state classifier is melt-first
-        # (DeMaria rows say "not pure oxide" over basalt melt). Cr DeMaria
-        # Table-2 no longer misroutes to pure-metal Antoine; residual tightens.
-        pinned_residual_dex: 0.4607308385314931
-        evidence_refs:
-          - tests/chemistry/extract_store_reproduction_residual_baselines.yaml
-          - docs/model-limitations.md#extract-store-reproduction-battery
-          - docs-private/research/2026-08-08-t383-build/report.md
+      # mass_spec withdrawn 2026-08-08 (si-comparability): residual was driven
+      # solely by molten-metal / pure-element α (Ohno olette, Pound solid Cr).
+      # Those rows remain in the extract store as typed
+      # not_comparable_system_class exclusions; they are not silicate-melt
+      # carrier validation. See docs-private/research/2026-08-08-si-comparability/report.md
+      # and validation-data/pin-evidence/cr_mass_spec_melt_first_2026-08-08.yaml
   CrO2:
     tier: T2
     target_tier: T4
@@ -164,10 +166,15 @@ species:
         evidence_refs:
           - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
       mass_spec:
-        pinned_residual_dex: 1.6989700043360187
+        # si-comparability 2026-08-08: pure-element solid-Fe Pound rows excluded
+        # as not_comparable_system_class; residual tightens to silicate/olivine set.
+        pinned_residual_dex: 1.0969100130080565
         evidence_refs:
           - tests/chemistry/extract_store_reproduction_residual_baselines.yaml
           - docs/model-limitations.md#extract-store-reproduction-battery
+          - validation-data/pin-evidence/fe_mass_spec_class_comparable_2026-08-08.yaml
+        internal_notes_refs:
+          - docs-private/research/2026-08-08-si-comparability/report.md
   K:
     tier: T3
     target_tier: T4
@@ -207,10 +214,12 @@ species:
         # (0.484 -> 0.144 dex) because high-T monatomic Mg pressures move UP by
         # ~0.54-0.59 dex (Pref_GR was low vs Pref_GF and vs peer VR). Remaining
         # ceiling is low-T pure-comp band (rail high). Attribution:
-        # docs-private/research/2026-08-07-mgfix/report.md
+        # validation-data/pin-evidence/mg_vaporock_pref_gf_2026-08-07.yaml
         pinned_residual_dex: 0.14423087563301895
         evidence_refs:
           - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+          - validation-data/pin-evidence/mg_vaporock_pref_gf_2026-08-07.yaml
+        internal_notes_refs:
           - docs-private/research/2026-08-07-mgfix/report.md
           - docs-private/research/2026-08-07-mgfix/element_engine_run.log
       mass_spec:
@@ -235,17 +244,24 @@ species:
           - data/vapor_pressures.yaml
           - data/literature/extracts/nasa-cea-thermo.yaml
   Mn:
-    tier: T3
+    # si-comparability 2026-08-08: demoted T3→T1. The only mass_spec residual
+    # was molten-metal olette α (not silicate-melt carrier validation); pin
+    # withdrawn. No VapoRock residual pin either — structural catalog only.
+    tier: T1
     target_tier: T4
     validations:
-      mass_spec:
-        # t-383: same melt-first standard-state classifier fix as Cr (DeMaria
-        # "not pure oxide" multicomponent melt rows). Residual tightens.
-        pinned_residual_dex: 2.0827853703164503
+      structural:
         evidence_refs:
-          - tests/chemistry/extract_store_reproduction_residual_baselines.yaml
-          - docs/model-limitations.md#extract-store-reproduction-battery
-          - docs-private/research/2026-08-08-t383-build/report.md
+          - data/vapor_pressures.yaml
+          - data/literature/extracts/kems-001-homma-1966.yaml
+          - data/literature/extracts/kems-002-ohno-1967.yaml
+          - validation-data/pin-evidence/mn_mass_spec_melt_first_2026-08-08.yaml
+      # mass_spec withdrawn 2026-08-08 (si-comparability): residual was driven
+      # solely by molten-metal olette α (Homma/Ohno steel-melt rows). Those
+      # remain as typed not_comparable_system_class exclusions — not silicate-
+      # melt Mn carrier validation. See
+      # docs-private/research/2026-08-08-si-comparability/report.md and
+      # validation-data/pin-evidence/mn_mass_spec_melt_first_2026-08-08.yaml
   Na:
     tier: T3
     target_tier: T4
@@ -260,6 +276,8 @@ species:
         pinned_residual_dex: 1.536140186984556
         evidence_refs:
           - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+          - validation-data/pin-evidence/na_vaporock_lh_liquid_2026-08-08.yaml
+        internal_notes_refs:
           - docs-private/research/2026-08-08-t383-build/report.md
       mass_spec:
         pinned_residual_dex: 0.585026652029182

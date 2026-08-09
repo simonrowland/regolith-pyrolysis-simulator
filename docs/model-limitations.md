@@ -256,17 +256,18 @@ are the deliverable (doctrine: *Headline accuracy is the product*).
 Engine refusals surface as typed skips; mismatches are FINDINGs —
 tolerances are **not** widened to pass. Geometry: tools/motzfeldt.py available; geometry inversion is used only with complete numeric inputs, otherwise a typed capability/data gap is reported.
 
-Observations: **142 total / 35 comparable / 107 skipped**. Comparable residual points: **77**; explicit gap records: **179**. Extrapolated-alpha FINDINGs: **9**.
+Observations: **172 total / 38 comparable / 134 skipped**. Comparable residual points: **81**; explicit gap records: **208**. Extrapolated-alpha FINDINGs: **13**.
 
-- In-scope observations evaluated: **142**
-- Comparable observations: **35**
-- Skipped observations with typed reasons: **107**
-- Species with FINDING (mismatch outside stated/default budget): **7**
+- In-scope observations evaluated: **172**
+- Comparable observations: **38**
+- Skipped observations with typed reasons: **134**
+- Species with FINDING (mismatch outside stated/default budget): **5**
 
 | Species | Types | N pts | Match | Mismatch | Skip/gap | Max residual (dex) | Mean residual (dex) | Classification |
 |---|---|---:|---:|---:|---:|---:|---:|---|
 | Al | activity_coefficient,rate_series | 3 | 0 | 0 | 3 | — | — | engine-or-payload-skip |
 | Al2O | psat_series | 14 | 0 | 0 | 14 | — | — | engine-or-payload-skip |
+| Al2O3 | alpha | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | AlO | psat_series | 6 | 0 | 0 | 6 | — | — | engine-or-payload-skip |
 | As | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | As4O6 | activity_coefficient,psat_series | 7 | 0 | 0 | 7 | — | — | engine-or-payload-skip |
@@ -275,23 +276,23 @@ Observations: **142 total / 35 comparable / 107 skipped**. Comparable residual p
 | Ca | activity_coefficient,rate_series | 2 | 0 | 0 | 2 | — | — | engine-or-payload-skip |
 | CaO | rate_series | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | Co | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
-| Cr | activity_coefficient,alpha,psat_series,rate_series | 7 | 1 | 1 | 5 | 0.461 | 0.23 | FINDING-mismatch |
+| Cr | activity_coefficient,alpha,psat_series,rate_series | 8 | 0 | 0 | 8 | — | — | engine-or-payload-skip |
 | Cs2O | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
-| Cu | activity_coefficient,alpha,rate_series | 5 | 0 | 0 | 5 | — | — | engine-or-payload-skip |
+| Cu | activity_coefficient,alpha,rate_series | 6 | 0 | 0 | 6 | — | — | engine-or-payload-skip |
 | Eu_metal_and_EuO | activity_coefficient | 2 | 0 | 0 | 2 | — | — | engine-or-payload-skip |
-| Fe | activity_coefficient,alpha,rate_series | 29 | 4 | 16 | 9 | 1.7 | 0.844 | FINDING-mismatch |
+| Fe | activity_coefficient,alpha,rate_series | 35 | 5 | 15 | 15 | 1.1 | 0.73 | FINDING-mismatch |
 | Ga2O | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | Ge | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | GeO2 | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | In | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
-| K | activity_coefficient,alpha,rate_series | 5 | 2 | 1 | 2 | 0.886 | 0.295 | FINDING-mismatch |
+| K | activity_coefficient,alpha,rate_series | 7 | 4 | 1 | 2 | 0.886 | 0.354 | FINDING-mismatch |
 | Li2O | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
-| Mg | activity_coefficient,alpha,psat_series,rate_series | 32 | 7 | 10 | 15 | 0.699 | 0.204 | FINDING-mismatch |
-| MgO | rate_series | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
-| Mn | activity_coefficient,alpha,psat_series,rate_series | 8 | 0 | 2 | 6 | 2.08 | 2.07 | FINDING-mismatch |
+| Mg | activity_coefficient,alpha,psat_series,rate_series | 36 | 8 | 11 | 17 | 0.699 | 0.224 | FINDING-mismatch |
+| MgO | alpha,psat_series,rate_series | 3 | 0 | 0 | 3 | — | — | engine-or-payload-skip |
+| Mn | activity_coefficient,alpha,psat_series,rate_series | 10 | 0 | 0 | 10 | — | — | engine-or-payload-skip |
 | MoO2 | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | MoO3 | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
-| Na | activity_coefficient,alpha,psat_series,rate_series | 25 | 3 | 2 | 20 | 0.585 | 0.234 | FINDING-mismatch |
+| Na | activity_coefficient,alpha,psat_series,rate_series | 27 | 4 | 3 | 20 | 0.585 | 0.251 | FINDING-mismatch |
 | NaF | psat_series | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | Ni | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | O | psat_series | 13 | 0 | 0 | 13 | — | — | engine-or-payload-skip |
@@ -300,15 +301,15 @@ Observations: **142 total / 35 comparable / 107 skipped**. Comparable residual p
 | P4O10 | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | Pb | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | Rb2O | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
-| S | alpha,rate_series | 3 | 0 | 0 | 3 | — | — | engine-or-payload-skip |
+| S | alpha,rate_series | 4 | 0 | 0 | 4 | — | — | engine-or-payload-skip |
 | S2 | psat_series | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | SO3 | psat_series | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | Sb4O6 | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | Se_n_ladder | psat_series | 3 | 0 | 0 | 3 | — | — | engine-or-payload-skip |
-| Si | rate_series | 2 | 0 | 0 | 2 | — | — | engine-or-payload-skip |
-| SiO | alpha,rate_series | 37 | 13 | 15 | 9 | 1.3 | 0.244 | FINDING-mismatch |
-| SiO2 | activity_coefficient | 2 | 0 | 0 | 2 | — | — | engine-or-payload-skip |
-| Sn | activity_coefficient,alpha,rate_series | 4 | 0 | 0 | 4 | — | — | engine-or-payload-skip |
+| Si | alpha,rate_series | 3 | 0 | 0 | 3 | — | — | engine-or-payload-skip |
+| SiO | alpha,rate_series | 45 | 10 | 20 | 15 | 1.3 | 0.281 | FINDING-mismatch |
+| SiO2 | activity_coefficient,alpha | 3 | 0 | 0 | 3 | — | — | engine-or-payload-skip |
+| Sn | activity_coefficient,alpha,rate_series | 5 | 0 | 0 | 5 | — | — | engine-or-payload-skip |
 | SrO | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | Ti | psat_series | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | TiO | rate_series | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
@@ -322,39 +323,43 @@ Observations: **142 total / 35 comparable / 107 skipped**. Comparable residual p
 
 **Typed observation skips (roadmap, one primary reason per skipped observation):**
 
-- `typed-refusal:alpha_unsupported_species:'Cu'`: **2**
-- `typed-refusal:alpha_unsupported_species:'S'`: **1**
-- `typed-refusal:alpha_unsupported_species:'Sn'`: **1**
+- `typed-refusal:alpha_form_not_evaluable`: **1**
+- `typed-refusal:alpha_unsupported_species:'Al2O3'`: **1**
+- `typed-refusal:alpha_unsupported_species:'MgO'`: **1**
+- `typed-refusal:alpha_unsupported_species:'SiO2'`: **1**
 - `typed-refusal:missing_capability:documented_melt_activity_coefficient:FeO`: **2**
 - `typed-refusal:missing_condition:melt_composition`: **1**
 - `typed-refusal:missing_condition:pO2_boundary`: **9**
 - `typed-refusal:missing_condition:standard_state_boundary`: **5**
-- `typed-refusal:missing_numeric_activity`: **35**
-- `typed-refusal:missing_numeric_species_rate`: **19**
+- `typed-refusal:missing_numeric_activity`: **36**
+- `typed-refusal:missing_numeric_species_rate`: **24**
 - `typed-refusal:missing_numeric_species_rate:qualitative_bound`: **13**
-- `typed-refusal:no_usable_rate_series_payload`: **2**
-- `typed-refusal:pointer_or_anchor_without_numeric_points`: **4**
-- `typed-refusal:unsupported_observable:clausing_factor_not_species_rate`: **2**
+- `typed-refusal:no_usable_rate_series_payload`: **3**
+- `typed-refusal:not_comparable_system_class:molten_metal`: **11**
+- `typed-refusal:not_comparable_system_class:pure_element_condensed`: **6**
+- `typed-refusal:not_comparable_system_class:solid_film_growth`: **1**
+- `typed-refusal:pointer_or_anchor_without_numeric_points`: **5**
+- `typed-refusal:unsupported_observable:clausing_factor_not_species_rate`: **3**
 - `typed-refusal:unsupported_observable:qualitative_activity_ordering`: **11**
 
 **Coverage by observation type:**
 
 | Type | Observations | Comparable | Skipped | Comparable points | Gap points | Typed skip reasons |
 |---|---:|---:|---:|---:|---:|---|
-| activity_coefficient | 48 | 0 | 48 | 0 | 48 | `typed-refusal:missing_capability:documented_melt_activity_coefficient:FeO` ×2; `typed-refusal:missing_numeric_activity` ×35; `typed-refusal:unsupported_observable:qualitative_activity_ordering` ×11 |
-| alpha | 38 | 32 | 6 | 65 | 6 | `typed-refusal:alpha_unsupported_species:'Cu'` ×2; `typed-refusal:alpha_unsupported_species:'S'` ×1; `typed-refusal:alpha_unsupported_species:'Sn'` ×1; `typed-refusal:no_usable_rate_series_payload` ×2 |
-| psat_series | 18 | 0 | 18 | 0 | 87 | `typed-refusal:missing_condition:pO2_boundary` ×9; `typed-refusal:missing_condition:standard_state_boundary` ×5; `typed-refusal:pointer_or_anchor_without_numeric_points` ×4 |
-| rate_series | 38 | 3 | 35 | 12 | 38 | `typed-refusal:missing_condition:melt_composition` ×1; `typed-refusal:missing_numeric_species_rate` ×19; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×13; `typed-refusal:unsupported_observable:clausing_factor_not_species_rate` ×2 |
+| activity_coefficient | 49 | 0 | 49 | 0 | 49 | `typed-refusal:missing_capability:documented_melt_activity_coefficient:FeO` ×2; `typed-refusal:missing_numeric_activity` ×36; `typed-refusal:unsupported_observable:qualitative_activity_ordering` ×11 |
+| alpha | 60 | 35 | 25 | 69 | 27 | `typed-refusal:alpha_form_not_evaluable` ×1; `typed-refusal:alpha_unsupported_species:'Al2O3'` ×1; `typed-refusal:alpha_unsupported_species:'MgO'` ×1; `typed-refusal:alpha_unsupported_species:'SiO2'` ×1; `typed-refusal:no_usable_rate_series_payload` ×3; `typed-refusal:not_comparable_system_class:molten_metal` ×11; `typed-refusal:not_comparable_system_class:pure_element_condensed` ×6; `typed-refusal:not_comparable_system_class:solid_film_growth` ×1 |
+| psat_series | 19 | 0 | 19 | 0 | 88 | `typed-refusal:missing_condition:pO2_boundary` ×9; `typed-refusal:missing_condition:standard_state_boundary` ×5; `typed-refusal:pointer_or_anchor_without_numeric_points` ×5 |
+| rate_series | 44 | 3 | 41 | 12 | 44 | `typed-refusal:missing_condition:melt_composition` ×1; `typed-refusal:missing_numeric_species_rate` ×24; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×13; `typed-refusal:unsupported_observable:clausing_factor_not_species_rate` ×3 |
 
 **Coverage by comparison family:**
 
 | Comparison family | Observations | Comparable | Skipped | Comparable points | Gap points | Typed skip reasons |
 |---|---:|---:|---:|---:|---:|---|
-| activity_coefficient | 48 | 0 | 48 | 0 | 48 | `typed-refusal:missing_capability:documented_melt_activity_coefficient:FeO` ×2; `typed-refusal:missing_numeric_activity` ×35; `typed-refusal:unsupported_observable:qualitative_activity_ordering` ×11 |
-| alpha | 38 | 32 | 6 | 65 | 6 | `typed-refusal:alpha_unsupported_species:'Cu'` ×2; `typed-refusal:alpha_unsupported_species:'S'` ×1; `typed-refusal:alpha_unsupported_species:'Sn'` ×1; `typed-refusal:no_usable_rate_series_payload` ×2 |
+| activity_coefficient | 49 | 0 | 49 | 0 | 49 | `typed-refusal:missing_capability:documented_melt_activity_coefficient:FeO` ×2; `typed-refusal:missing_numeric_activity` ×36; `typed-refusal:unsupported_observable:qualitative_activity_ordering` ×11 |
+| alpha | 60 | 35 | 25 | 69 | 27 | `typed-refusal:alpha_form_not_evaluable` ×1; `typed-refusal:alpha_unsupported_species:'Al2O3'` ×1; `typed-refusal:alpha_unsupported_species:'MgO'` ×1; `typed-refusal:alpha_unsupported_species:'SiO2'` ×1; `typed-refusal:no_usable_rate_series_payload` ×3; `typed-refusal:not_comparable_system_class:molten_metal` ×11; `typed-refusal:not_comparable_system_class:pure_element_condensed` ×6; `typed-refusal:not_comparable_system_class:solid_film_growth` ×1 |
 | alpha_in_legacy_rate_series | 3 | 3 | 0 | 12 | 0 | — |
-| psat_series | 18 | 0 | 18 | 0 | 87 | `typed-refusal:missing_condition:pO2_boundary` ×9; `typed-refusal:missing_condition:standard_state_boundary` ×5; `typed-refusal:pointer_or_anchor_without_numeric_points` ×4 |
-| rate_hkl | 35 | 0 | 35 | 0 | 38 | `typed-refusal:missing_condition:melt_composition` ×1; `typed-refusal:missing_numeric_species_rate` ×19; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×13; `typed-refusal:unsupported_observable:clausing_factor_not_species_rate` ×2 |
+| psat_series | 19 | 0 | 19 | 0 | 88 | `typed-refusal:missing_condition:pO2_boundary` ×9; `typed-refusal:missing_condition:standard_state_boundary` ×5; `typed-refusal:pointer_or_anchor_without_numeric_points` ×5 |
+| rate_hkl | 41 | 0 | 41 | 0 | 44 | `typed-refusal:missing_condition:melt_composition` ×1; `typed-refusal:missing_numeric_species_rate` ×24; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×13; `typed-refusal:unsupported_observable:clausing_factor_not_species_rate` ×3 |
 
 **Coverage by species:**
 
@@ -362,6 +367,7 @@ Observations: **142 total / 35 comparable / 107 skipped**. Comparable residual p
 |---|---:|---:|---:|---:|---:|---|
 | Al | 3 | 0 | 3 | 0 | 3 | `typed-refusal:missing_numeric_activity` ×1; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×2 |
 | Al2O | 1 | 0 | 1 | 0 | 14 | `typed-refusal:missing_condition:pO2_boundary` ×1 |
+| Al2O3 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:alpha_unsupported_species:'Al2O3'` ×1 |
 | AlO | 1 | 0 | 1 | 0 | 6 | `typed-refusal:missing_condition:pO2_boundary` ×1 |
 | As | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_activity` ×1 |
 | As4O6 | 3 | 0 | 3 | 0 | 7 | `typed-refusal:missing_condition:standard_state_boundary` ×2; `typed-refusal:unsupported_observable:qualitative_activity_ordering` ×1 |
@@ -370,23 +376,23 @@ Observations: **142 total / 35 comparable / 107 skipped**. Comparable residual p
 | Ca | 2 | 0 | 2 | 0 | 2 | `typed-refusal:missing_numeric_activity` ×1; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×1 |
 | CaO | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_species_rate` ×1 |
 | Co | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_activity` ×1 |
-| Cr | 6 | 2 | 4 | 2 | 5 | `typed-refusal:missing_condition:pO2_boundary` ×1; `typed-refusal:missing_numeric_activity` ×2; `typed-refusal:missing_numeric_species_rate` ×1 |
+| Cr | 7 | 0 | 7 | 0 | 8 | `typed-refusal:missing_condition:pO2_boundary` ×1; `typed-refusal:missing_numeric_activity` ×2; `typed-refusal:missing_numeric_species_rate` ×1; `typed-refusal:not_comparable_system_class:molten_metal` ×1; `typed-refusal:not_comparable_system_class:pure_element_condensed` ×2 |
 | Cs2O | 1 | 0 | 1 | 0 | 1 | `typed-refusal:unsupported_observable:qualitative_activity_ordering` ×1 |
-| Cu | 5 | 0 | 5 | 0 | 5 | `typed-refusal:alpha_unsupported_species:'Cu'` ×2; `typed-refusal:missing_numeric_activity` ×1; `typed-refusal:missing_numeric_species_rate` ×2 |
+| Cu | 6 | 0 | 6 | 0 | 6 | `typed-refusal:missing_numeric_activity` ×1; `typed-refusal:missing_numeric_species_rate` ×2; `typed-refusal:not_comparable_system_class:molten_metal` ×3 |
 | Eu_metal_and_EuO | 2 | 0 | 2 | 0 | 2 | `typed-refusal:missing_numeric_activity` ×1; `typed-refusal:unsupported_observable:qualitative_activity_ordering` ×1 |
-| Fe | 16 | 7 | 9 | 20 | 9 | `typed-refusal:missing_capability:documented_melt_activity_coefficient:FeO` ×2; `typed-refusal:missing_numeric_activity` ×2; `typed-refusal:missing_numeric_species_rate` ×2; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×1; `typed-refusal:unsupported_observable:clausing_factor_not_species_rate` ×2 |
+| Fe | 22 | 7 | 15 | 20 | 15 | `typed-refusal:missing_capability:documented_melt_activity_coefficient:FeO` ×2; `typed-refusal:missing_numeric_activity` ×3; `typed-refusal:missing_numeric_species_rate` ×3; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×1; `typed-refusal:not_comparable_system_class:pure_element_condensed` ×3; `typed-refusal:unsupported_observable:clausing_factor_not_species_rate` ×3 |
 | Ga2O | 1 | 0 | 1 | 0 | 1 | `typed-refusal:unsupported_observable:qualitative_activity_ordering` ×1 |
 | Ge | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_activity` ×1 |
 | GeO2 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_activity` ×1 |
 | In | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_activity` ×1 |
-| K | 5 | 3 | 2 | 3 | 2 | `typed-refusal:missing_numeric_activity` ×1; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×1 |
+| K | 7 | 5 | 2 | 5 | 2 | `typed-refusal:missing_numeric_activity` ×1; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×1 |
 | Li2O | 1 | 0 | 1 | 0 | 1 | `typed-refusal:unsupported_observable:qualitative_activity_ordering` ×1 |
-| Mg | 12 | 7 | 5 | 17 | 15 | `typed-refusal:missing_condition:melt_composition` ×1; `typed-refusal:missing_condition:pO2_boundary` ×1; `typed-refusal:missing_numeric_activity` ×2; `typed-refusal:missing_numeric_species_rate` ×1 |
-| MgO | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_species_rate` ×1 |
-| Mn | 6 | 2 | 4 | 2 | 6 | `typed-refusal:missing_condition:pO2_boundary` ×1; `typed-refusal:missing_numeric_activity` ×1; `typed-refusal:missing_numeric_species_rate` ×2 |
+| Mg | 16 | 9 | 7 | 19 | 17 | `typed-refusal:missing_condition:melt_composition` ×1; `typed-refusal:missing_condition:pO2_boundary` ×1; `typed-refusal:missing_numeric_activity` ×2; `typed-refusal:missing_numeric_species_rate` ×3 |
+| MgO | 3 | 0 | 3 | 0 | 3 | `typed-refusal:alpha_unsupported_species:'MgO'` ×1; `typed-refusal:missing_numeric_species_rate` ×1; `typed-refusal:pointer_or_anchor_without_numeric_points` ×1 |
+| Mn | 8 | 0 | 8 | 0 | 10 | `typed-refusal:missing_condition:pO2_boundary` ×1; `typed-refusal:missing_numeric_activity` ×1; `typed-refusal:missing_numeric_species_rate` ×3; `typed-refusal:not_comparable_system_class:molten_metal` ×3 |
 | MoO2 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_activity` ×1 |
 | MoO3 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_activity` ×1 |
-| Na | 11 | 5 | 6 | 5 | 20 | `typed-refusal:missing_condition:pO2_boundary` ×2; `typed-refusal:missing_numeric_activity` ×2; `typed-refusal:missing_numeric_species_rate` ×1; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×1 |
+| Na | 13 | 7 | 6 | 7 | 20 | `typed-refusal:missing_condition:pO2_boundary` ×2; `typed-refusal:missing_numeric_activity` ×2; `typed-refusal:missing_numeric_species_rate` ×1; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×1 |
 | NaF | 1 | 0 | 1 | 0 | 1 | `typed-refusal:pointer_or_anchor_without_numeric_points` ×1 |
 | Ni | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_activity` ×1 |
 | O | 1 | 0 | 1 | 0 | 13 | `typed-refusal:missing_condition:pO2_boundary` ×1 |
@@ -395,15 +401,15 @@ Observations: **142 total / 35 comparable / 107 skipped**. Comparable residual p
 | P4O10 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_activity` ×1 |
 | Pb | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_activity` ×1 |
 | Rb2O | 1 | 0 | 1 | 0 | 1 | `typed-refusal:unsupported_observable:qualitative_activity_ordering` ×1 |
-| S | 3 | 0 | 3 | 0 | 3 | `typed-refusal:alpha_unsupported_species:'S'` ×1; `typed-refusal:missing_numeric_species_rate` ×2 |
+| S | 4 | 0 | 4 | 0 | 4 | `typed-refusal:missing_numeric_species_rate` ×2; `typed-refusal:not_comparable_system_class:molten_metal` ×2 |
 | S2 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:pointer_or_anchor_without_numeric_points` ×1 |
 | SO3 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:pointer_or_anchor_without_numeric_points` ×1 |
 | Sb4O6 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:unsupported_observable:qualitative_activity_ordering` ×1 |
 | Se_n_ladder | 1 | 0 | 1 | 0 | 3 | `typed-refusal:missing_condition:standard_state_boundary` ×1 |
-| Si | 2 | 0 | 2 | 0 | 2 | `typed-refusal:missing_numeric_species_rate` ×1; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×1 |
-| SiO | 18 | 9 | 9 | 28 | 9 | `typed-refusal:missing_numeric_species_rate` ×3; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×4; `typed-refusal:no_usable_rate_series_payload` ×2 |
-| SiO2 | 2 | 0 | 2 | 0 | 2 | `typed-refusal:missing_numeric_activity` ×2 |
-| Sn | 4 | 0 | 4 | 0 | 4 | `typed-refusal:alpha_unsupported_species:'Sn'` ×1; `typed-refusal:missing_numeric_activity` ×1; `typed-refusal:missing_numeric_species_rate` ×2 |
+| Si | 3 | 0 | 3 | 0 | 3 | `typed-refusal:missing_numeric_species_rate` ×1; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×1; `typed-refusal:not_comparable_system_class:pure_element_condensed` ×1 |
+| SiO | 23 | 10 | 13 | 30 | 15 | `typed-refusal:alpha_form_not_evaluable` ×1; `typed-refusal:missing_numeric_species_rate` ×4; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×4; `typed-refusal:no_usable_rate_series_payload` ×3; `typed-refusal:not_comparable_system_class:solid_film_growth` ×1 |
+| SiO2 | 3 | 0 | 3 | 0 | 3 | `typed-refusal:alpha_unsupported_species:'SiO2'` ×1; `typed-refusal:missing_numeric_activity` ×2 |
+| Sn | 5 | 0 | 5 | 0 | 5 | `typed-refusal:missing_numeric_activity` ×1; `typed-refusal:missing_numeric_species_rate` ×2; `typed-refusal:not_comparable_system_class:molten_metal` ×2 |
 | SrO | 1 | 0 | 1 | 0 | 1 | `typed-refusal:unsupported_observable:qualitative_activity_ordering` ×1 |
 | Ti | 1 | 0 | 1 | 0 | 1 | `typed-refusal:pointer_or_anchor_without_numeric_points` ×1 |
 | TiO | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×1 |
@@ -425,25 +431,25 @@ Observations: **142 total / 35 comparable / 107 skipped**. Comparable residual p
 | fedkin-grossman-ghiorso-2006 | 8 | 8 | 0 | 26 | 0 | — |
 | habermann-daane-1964 | 1 | 0 | 1 | 0 | 3 | `typed-refusal:missing_condition:standard_state_boundary` ×1 |
 | janaf-4th | 4 | 0 | 4 | 0 | 4 | `typed-refusal:pointer_or_anchor_without_numeric_points` ×4 |
-| kems-001-homma-1966 | 6 | 1 | 5 | 1 | 5 | `typed-refusal:alpha_unsupported_species:'Cu'` ×1; `typed-refusal:alpha_unsupported_species:'Sn'` ×1; `typed-refusal:missing_numeric_species_rate` ×3 |
-| kems-002-ohno-1967 | 10 | 2 | 8 | 2 | 8 | `typed-refusal:alpha_unsupported_species:'Cu'` ×1; `typed-refusal:alpha_unsupported_species:'S'` ×1; `typed-refusal:missing_numeric_species_rate` ×6 |
-| kems-003-pound-1972 | 4 | 3 | 1 | 3 | 1 | `typed-refusal:unsupported_observable:clausing_factor_not_species_rate` ×1 |
-| kems-005-fedkin-2006 | 5 | 4 | 1 | 7 | 1 | `typed-refusal:no_usable_rate_series_payload` ×1 |
-| kems-007-costa-2015 | 2 | 2 | 0 | 10 | 0 | — |
-| kems-008-schaefer-fegley-2004 | 2 | 2 | 0 | 3 | 0 | — |
-| kems-009-safarian-2013 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_species_rate` ×1 |
-| kems-010-richter-2007 | 3 | 2 | 1 | 6 | 4 | `typed-refusal:missing_condition:melt_composition` ×1 |
-| kems-011-wetzel-gail-2013 | 2 | 1 | 1 | 3 | 1 | `typed-refusal:missing_numeric_species_rate` ×1 |
-| kems-012-sossi-2019 | 4 | 3 | 1 | 3 | 1 | `typed-refusal:missing_numeric_activity` ×1 |
-| kems-015-hashimoto-1983 | 3 | 0 | 3 | 0 | 3 | `typed-refusal:missing_numeric_species_rate` ×3 |
+| kems-001-homma-1966 | 10 | 0 | 10 | 0 | 10 | `typed-refusal:missing_numeric_species_rate` ×4; `typed-refusal:not_comparable_system_class:molten_metal` ×6 |
+| kems-002-ohno-1967 | 11 | 0 | 11 | 0 | 11 | `typed-refusal:missing_numeric_species_rate` ×6; `typed-refusal:not_comparable_system_class:molten_metal` ×5 |
+| kems-003-pound-1972 | 6 | 0 | 6 | 0 | 6 | `typed-refusal:not_comparable_system_class:pure_element_condensed` ×5; `typed-refusal:unsupported_observable:clausing_factor_not_species_rate` ×1 |
+| kems-005-fedkin-2006 | 10 | 9 | 1 | 15 | 1 | `typed-refusal:no_usable_rate_series_payload` ×1 |
+| kems-007-costa-2015 | 4 | 4 | 0 | 12 | 0 | — |
+| kems-008-schaefer-fegley-2004 | 5 | 2 | 3 | 3 | 3 | `typed-refusal:alpha_unsupported_species:'Al2O3'` ×1; `typed-refusal:alpha_unsupported_species:'MgO'` ×1; `typed-refusal:alpha_unsupported_species:'SiO2'` ×1 |
+| kems-009-safarian-2013 | 2 | 0 | 2 | 0 | 2 | `typed-refusal:missing_numeric_species_rate` ×1; `typed-refusal:not_comparable_system_class:pure_element_condensed` ×1 |
+| kems-010-richter-2007 | 4 | 2 | 2 | 6 | 5 | `typed-refusal:missing_condition:melt_composition` ×1; `typed-refusal:missing_numeric_species_rate` ×1 |
+| kems-011-wetzel-gail-2013 | 3 | 0 | 3 | 0 | 5 | `typed-refusal:alpha_form_not_evaluable` ×1; `typed-refusal:missing_numeric_species_rate` ×1; `typed-refusal:not_comparable_system_class:solid_film_growth` ×1 |
+| kems-012-sossi-2019 | 6 | 5 | 1 | 5 | 1 | `typed-refusal:missing_numeric_activity` ×1 |
+| kems-015-hashimoto-1983 | 6 | 0 | 6 | 0 | 6 | `typed-refusal:missing_numeric_species_rate` ×6 |
 | kems-016-stolyarova-1992 | 4 | 0 | 4 | 0 | 4 | `typed-refusal:missing_numeric_activity` ×3; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×1 |
 | kems-017-stolyarova-2013 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×1 |
 | kems-018-stolyarova-2012 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×1 |
-| kems-022-demaria-1971 | 20 | 0 | 20 | 0 | 80 | `typed-refusal:missing_capability:documented_melt_activity_coefficient:FeO` ×2; `typed-refusal:missing_condition:pO2_boundary` ×9; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×9 |
+| kems-022-demaria-1971 | 21 | 0 | 21 | 0 | 81 | `typed-refusal:missing_capability:documented_melt_activity_coefficient:FeO` ×2; `typed-refusal:missing_condition:pO2_boundary` ×9; `typed-refusal:missing_numeric_activity` ×1; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×9 |
 | kems-027-plante-hastie-1983 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_species_rate` ×1 |
-| kems-031-halwax-2024 | 2 | 0 | 2 | 0 | 2 | `typed-refusal:missing_numeric_species_rate` ×2 |
-| kems-032-copland-jacobson-2010 | 3 | 0 | 3 | 0 | 3 | `typed-refusal:missing_numeric_species_rate` ×2; `typed-refusal:unsupported_observable:clausing_factor_not_species_rate` ×1 |
-| kems-037-richter-2002 | 2 | 1 | 1 | 1 | 1 | `typed-refusal:no_usable_rate_series_payload` ×1 |
+| kems-031-halwax-2024 | 3 | 0 | 3 | 0 | 3 | `typed-refusal:missing_numeric_species_rate` ×2; `typed-refusal:pointer_or_anchor_without_numeric_points` ×1 |
+| kems-032-copland-jacobson-2010 | 4 | 0 | 4 | 0 | 4 | `typed-refusal:missing_numeric_species_rate` ×2; `typed-refusal:unsupported_observable:clausing_factor_not_species_rate` ×2 |
+| kems-037-richter-2002 | 4 | 2 | 2 | 2 | 2 | `typed-refusal:no_usable_rate_series_payload` ×2 |
 | kems-041-sossi-fegley-2018 | 29 | 0 | 29 | 0 | 29 | `typed-refusal:missing_numeric_activity` ×28; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×1 |
 | nist-webbook | 2 | 0 | 2 | 0 | 6 | `typed-refusal:missing_condition:standard_state_boundary` ×2 |
 | richter-et-al-2007 | 2 | 2 | 0 | 6 | 0 | — |
@@ -471,7 +477,6 @@ match/mismatch against that documented budget):
 
 **FINDINGS (mismatches outside budget — not tuned away):**
 
-- FINDING mismatch Cr α T=1873.15K expected=2.6 actual=0.9 budget={'kind': 'absolute', 'value': 0.05, 'defaulted': True, 'rationale': 'extract observation has no usable numeric uncertainty; default absolute α envelope ±0.05 (t-512)'}
 - FINDING mismatch Fe α T=1973K expected=0.23 actual=0.02 budget={'kind': 'absolute', 'value': 0.02, 'defaulted': False, 'source': 'point.sigma', 'components': []}
 - FINDING mismatch Fe α T=2073K expected=0.25 actual=0.02 budget={'kind': 'absolute', 'value': 0.02, 'defaulted': False, 'source': 'point.sigma', 'components': []}
 - FINDING mismatch Fe α T=2173K expected=0.24 actual=0.02 budget={'kind': 'absolute', 'value': 0.02, 'defaulted': False, 'source': 'point.sigma', 'components': []}
@@ -480,8 +485,7 @@ match/mismatch against that documented budget):
 - FINDING mismatch Fe α T=2073K expected=0.25 actual=0.02 budget={'kind': 'absolute', 'value': 0.02, 'defaulted': False, 'source': 'point.sigma', 'components': []}
 - FINDING mismatch Fe α T=2173K expected=0.24 actual=0.02 budget={'kind': 'absolute', 'value': 0.02, 'defaulted': False, 'source': 'point.sigma', 'components': []}
 - FINDING mismatch Fe α T=2273K expected=0.23 actual=0.02 budget={'kind': 'absolute', 'value': 0.02, 'defaulted': False, 'source': 'point.sigma', 'components': []}
-- FINDING mismatch Fe α T=1439K expected=0.9 actual=0.02 budget={'kind': 'absolute', 'value': 0.09999999999999998, 'defaulted': False, 'source': 'observation.uncertainty.alpha_range', 'components': ['published alpha range half-width']}
-- FINDING mismatch Fe α T=1640K expected=1 actual=0.02 budget={'kind': 'absolute', 'value': 0.19999999999999996, 'defaulted': False, 'source': 'observation.uncertainty.alpha_range', 'components': ['published alpha range half-width']}
+- FINDING mismatch Fe α T=2123K expected=0.24 actual=0.02 budget={'kind': 'absolute', 'value': 0.05, 'defaulted': True, 'rationale': 'extract observation has no usable numeric uncertainty; default absolute α envelope ±0.05 (t-512)'}
 - FINDING mismatch Fe α T=1973K expected=0.23 actual=0.02 budget={'kind': 'absolute', 'value': 0.02, 'defaulted': False, 'source': 'point.sigma', 'components': []}
 - FINDING mismatch Fe α T=2073K expected=0.25 actual=0.02 budget={'kind': 'absolute', 'value': 0.02, 'defaulted': False, 'source': 'point.sigma', 'components': []}
 - FINDING mismatch Fe α T=2173K expected=0.24 actual=0.02 budget={'kind': 'absolute', 'value': 0.02, 'defaulted': False, 'source': 'point.sigma', 'components': []}
@@ -499,8 +503,8 @@ match/mismatch against that documented budget):
 - FINDING mismatch Mg α T=2273K expected=0.27 actual=0.2 budget={'kind': 'absolute', 'value': 0.01, 'defaulted': False, 'source': 'point.sigma', 'components': []}
 - FINDING mismatch Mg α T=2123K expected=0.24 actual=0.2 budget={'kind': 'absolute', 'value': 0.01, 'defaulted': False, 'source': 'observation.values.sigma', 'components': ['sigma']}
 - FINDING mismatch Mg α T=1723K expected=0.04 actual=0.2 budget={'kind': 'absolute', 'value': 0.05, 'defaulted': True, 'rationale': 'extract observation has no usable numeric uncertainty; default absolute α envelope ±0.05 (t-512)'}
-- FINDING mismatch Mn α T=1873.15K expected=115 actual=1.0 budget={'kind': 'absolute', 'value': 0.05, 'defaulted': True, 'rationale': 'extract observation has no usable numeric uncertainty; default absolute α envelope ±0.05 (t-512)'}
-- FINDING mismatch Mn α T=1873.15K expected=121 actual=1.0 budget={'kind': 'absolute', 'value': 0.05, 'defaulted': True, 'rationale': 'extract observation has no usable numeric uncertainty; default absolute α envelope ±0.05 (t-512)'}
+- FINDING mismatch Mg α T=1923.15K expected=0.04 actual=0.2 budget={'kind': 'absolute', 'value': 0.05, 'defaulted': True, 'rationale': 'extract observation has no usable numeric uncertainty; default absolute α envelope ±0.05 (t-512)'}
+- FINDING mismatch Na α T=1723.15K expected=0.26 actual=1.0 budget={'kind': 'absolute', 'value': 0.05, 'defaulted': False, 'source': 'observation.uncertainty.alpha_range', 'components': ['published alpha range half-width']}
 - FINDING mismatch Na α T=1723.15K expected=0.26 actual=1.0 budget={'kind': 'absolute', 'value': 0.05, 'defaulted': False, 'source': 'observation.uncertainty.alpha_range', 'components': ['published alpha range half-width']}
 - FINDING mismatch Na α T=1723.15K expected=0.26 actual=1.0 budget={'kind': 'absolute', 'value': 0.05, 'defaulted': False, 'source': 'observation.uncertainty.alpha_range', 'components': ['published alpha range half-width']}
 - FINDING mismatch SiO α T=1750K expected=0.0195 actual=0.06331450981454725 budget={'kind': 'absolute', 'value': 0.016499999999999997, 'defaulted': False, 'source': 'point.sigma', 'components': []}
@@ -512,6 +516,11 @@ match/mismatch against that documented budget):
 - FINDING mismatch SiO α T=2073K expected=0.17 actual=0.08790105714998556 budget={'kind': 'absolute', 'value': 0.01, 'defaulted': False, 'source': 'point.sigma', 'components': []} extrapolated: true
 - FINDING mismatch SiO α T=2173K expected=0.2 actual=0.09539408461828996 budget={'kind': 'absolute', 'value': 0.01, 'defaulted': False, 'source': 'point.sigma', 'components': []} extrapolated: true
 - FINDING mismatch SiO α T=2273K expected=0.21 actual=0.10278334807870564 budget={'kind': 'absolute', 'value': 0.01, 'defaulted': False, 'source': 'point.sigma', 'components': []} extrapolated: true
+- FINDING mismatch SiO α T=1973K expected=0.12 actual=0.08032771227334354 budget={'kind': 'absolute', 'value': 0.01, 'defaulted': False, 'source': 'point.sigma', 'components': []} extrapolated: true
+- FINDING mismatch SiO α T=2073K expected=0.17 actual=0.08790105714998556 budget={'kind': 'absolute', 'value': 0.01, 'defaulted': False, 'source': 'point.sigma', 'components': []} extrapolated: true
+- FINDING mismatch SiO α T=2173K expected=0.2 actual=0.09539408461828996 budget={'kind': 'absolute', 'value': 0.01, 'defaulted': False, 'source': 'point.sigma', 'components': []} extrapolated: true
+- FINDING mismatch SiO α T=2273K expected=0.21 actual=0.10278334807870564 budget={'kind': 'absolute', 'value': 0.01, 'defaulted': False, 'source': 'point.sigma', 'components': []} extrapolated: true
+- FINDING mismatch SiO α T=1750K expected=0.0195 actual=0.06331450981454725 budget={'kind': 'absolute', 'value': 0.016499999999999997, 'defaulted': False, 'source': 'point.sigma', 'components': []}
 - FINDING mismatch SiO α T=1700K expected=0.003 actual=0.05951222494762625 budget={'kind': 'absolute', 'value': 0.016499999999999997, 'defaulted': False, 'source': 'observation.uncertainty.alpha_range', 'components': ['published alpha range half-width']}
 - FINDING mismatch SiO α T=1725K expected=0.022 actual=0.06141148854585059 budget={'kind': 'absolute', 'value': 0.016499999999999997, 'defaulted': False, 'source': 'observation.uncertainty.alpha_range', 'components': ['published alpha range half-width']}
 - FINDING mismatch SiO α T=1750K expected=0.036 actual=0.06331450981454725 budget={'kind': 'absolute', 'value': 0.016499999999999997, 'defaulted': False, 'source': 'observation.uncertainty.alpha_range', 'components': ['published alpha range half-width']}
@@ -523,8 +532,6 @@ Comparable per-observation residuals and uncertainty ledger:
 
 | Source | Observation | Type | Species | Coordinate | Literature | Literature uncertainty | Engine uncertainty | Combined propagated uncertainty | Engine | Residual | Residual dex | Residual / literature budget | Status |
 |---|---|---|---|---|---:|---|---|---|---:|---:|---:|---:|---|
-| kems-002-ohno-1967 | ohno_1967_cr_olette_alpha_table3 | alpha | Cr | temperature_K=1873.15 | 2.6 | absolute=0.05 (documented default) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.9 | -1.7 | 0.460731 | 34 | mismatch |
-| kems-003-pound-1972 | pound_1972_cr_solid_alpha_mccabe | alpha | Cr | temperature_K=1440.5 | 0.9 | absolute=0.09999999999999998 (observation.uncertainty.alpha_range); published alpha range half-width | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.9 | 0 | 0 | 0 | match |
 | costa-jacobson-2015 | costa_jacobson_2015_fe_olivine_kems | alpha | Fe | temperature_K=1750 | 0.02 | absolute=0.0045000000000000005 (observation.uncertainty.alpha_range); published alpha range half-width | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.02 | 0 | 0 | 0 | match |
 | fedkin-grossman-ghiorso-2006 | fedkin_2006_table3_fe_hashimoto_langmuir | alpha | Fe | temperature_K=1973 | 0.23 | absolute=0.02 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.02 | -0.21 | 1.0607 | 10.5 | mismatch |
 | fedkin-grossman-ghiorso-2006 | fedkin_2006_table3_fe_hashimoto_langmuir | alpha | Fe | temperature_K=2073 | 0.25 | absolute=0.02 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.02 | -0.23 | 1.09691 | 11.5 | mismatch |
@@ -534,19 +541,21 @@ Comparable per-observation residuals and uncertainty ledger:
 | fedkin-grossman-ghiorso-2006 | fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series | rate_series | Fe | temperature_K=2073 | 0.25 | absolute=0.02 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.02 | -0.23 | 1.09691 | 11.5 | mismatch |
 | fedkin-grossman-ghiorso-2006 | fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series | rate_series | Fe | temperature_K=2173 | 0.24 | absolute=0.02 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.02 | -0.22 | 1.07918 | 11 | mismatch |
 | fedkin-grossman-ghiorso-2006 | fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series | rate_series | Fe | temperature_K=2273 | 0.23 | absolute=0.02 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.02 | -0.21 | 1.0607 | 10.5 | mismatch |
-| kems-003-pound-1972 | pound_1972_fe_solid_alpha_mccabe | alpha | Fe | temperature_K=1439 | 0.9 | absolute=0.09999999999999998 (observation.uncertainty.alpha_range); published alpha range half-width | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.02 | -0.88 | 1.65321 | 8.8 | mismatch |
-| kems-003-pound-1972 | pound_1972_fe_solid_alpha_wessel | alpha | Fe | temperature_K=1640 | 1 | absolute=0.19999999999999996 (observation.uncertainty.alpha_range); published alpha range half-width | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.02 | -0.98 | 1.69897 | 4.9 | mismatch |
+| kems-005-fedkin-2006 | fedkin_2006_fe_class_b1 | alpha | Fe | temperature_K=2123 | 0.24 | absolute=0.05 (documented default) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.02 | -0.22 | 1.07918 | 4.4 | mismatch |
 | kems-005-fedkin-2006 | fedkin_2006_fe_hashimoto_langmuir_table3 | alpha | Fe | temperature_K=1973 | 0.23 | absolute=0.02 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.02 | -0.21 | 1.0607 | 10.5 | mismatch |
 | kems-005-fedkin-2006 | fedkin_2006_fe_hashimoto_langmuir_table3 | alpha | Fe | temperature_K=2073 | 0.25 | absolute=0.02 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.02 | -0.23 | 1.09691 | 11.5 | mismatch |
 | kems-005-fedkin-2006 | fedkin_2006_fe_hashimoto_langmuir_table3 | alpha | Fe | temperature_K=2173 | 0.24 | absolute=0.02 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.02 | -0.22 | 1.07918 | 11 | mismatch |
 | kems-005-fedkin-2006 | fedkin_2006_fe_hashimoto_langmuir_table3 | alpha | Fe | temperature_K=2273 | 0.23 | absolute=0.02 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.02 | -0.21 | 1.0607 | 10.5 | mismatch |
+| kems-007-costa-2015 | costa_2015_fe_olivine_class_and_motzfeldt_absence_b1 | alpha | Fe | temperature_K=1750 | 0.02 | absolute=0.0045000000000000005 (observation.uncertainty.alpha_range); published alpha range half-width | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.02 | 0 | 0 | 0 | match |
 | kems-007-costa-2015 | costa_2015_fe_olivine_kems_alpha_multicell | alpha | Fe | temperature_K=1700 | 0.0165 | absolute=0.0045000000000000005 (observation.uncertainty.alpha_range); published alpha range half-width | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.02 | 0.0035 | 0.0835461 | 0.777778 | match |
 | kems-007-costa-2015 | costa_2015_fe_olivine_kems_alpha_multicell | alpha | Fe | temperature_K=1720 | 0.0155 | absolute=0.0045000000000000005 (observation.uncertainty.alpha_range); published alpha range half-width | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.02 | 0.0045 | 0.110698 | 1 | match |
 | kems-007-costa-2015 | costa_2015_fe_olivine_kems_alpha_multicell | alpha | Fe | temperature_K=1750 | 0.0197 | absolute=0.0045000000000000005 (observation.uncertainty.alpha_range); published alpha range half-width | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.02 | 0.0003 | 0.00656377 | 0.0666667 | match |
 | kems-007-costa-2015 | costa_2015_fe_olivine_kems_alpha_multicell | alpha | Fe | temperature_K=1795 | 0.0115 | absolute=0.0045000000000000005 (observation.uncertainty.alpha_range); published alpha range half-width | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.02 | 0.0085 | 0.240332 | 1.88889 | mismatch |
 | kems-007-costa-2015 | costa_2015_fe_olivine_kems_alpha_multicell | alpha | Fe | temperature_K=1800 | 0.013 | absolute=0.0045000000000000005 (observation.uncertainty.alpha_range); published alpha range half-width | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.02 | 0.007 | 0.187087 | 1.55556 | mismatch |
 | fedkin-grossman-ghiorso-2006 | fedkin_2006_yu_k_vacuum_langmuir | alpha | K | temperature_K=1723.15 | 0.13 | absolute=0.019999999999999997 (observation.uncertainty.alpha_range); published alpha range half-width | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.13 | 0 | 0 | 0 | match |
+| kems-005-fedkin-2006 | fedkin_2006_k_class_b1 | alpha | K | temperature_K=1723.15 | 0.13 | absolute=0.019999999999999997 (observation.uncertainty.alpha_range); published alpha range half-width | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.13 | 0 | 0 | 0 | match |
 | kems-005-fedkin-2006 | fedkin_2006_k_yu_langmuir | alpha | K | temperature_K=1723.15 | 0.13 | absolute=0.019999999999999997 (observation.uncertainty.alpha_range); published alpha range half-width | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.13 | 0 | 0 | 0 | match |
+| kems-012-sossi-2019 | sossi_2019_k_class_b1 | alpha | K | temperature_K=1698.15 | 1 | absolute=1.55 (observation.values.alpha_range); published alpha range half-width | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.13 | -0.87 | 0.886057 | 0.56129 | match |
 | kems-012-sossi-2019 | sossi_2019_k_open_furnace_alpha_e_context | alpha | K | temperature_K=1698.15 | 1 | absolute=0.05 (documented default) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.13 | -0.87 | 0.886057 | 17.4 | mismatch |
 | fedkin-grossman-ghiorso-2006 | fedkin_2006_table3_mg_hashimoto_langmuir | alpha | Mg | temperature_K=1973 | 0.24 | absolute=0.01 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.2 | -0.04 | 0.0791812 | 4 | mismatch |
 | fedkin-grossman-ghiorso-2006 | fedkin_2006_table3_mg_hashimoto_langmuir | alpha | Mg | temperature_K=2073 | 0.28 | absolute=0.01 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.2 | -0.08 | 0.146128 | 8 | mismatch |
@@ -556,21 +565,23 @@ Comparable per-observation residuals and uncertainty ledger:
 | fedkin-grossman-ghiorso-2006 | fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series | rate_series | Mg | temperature_K=2073 | 0.28 | absolute=0.01 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.2 | -0.08 | 0.146128 | 8 | mismatch |
 | fedkin-grossman-ghiorso-2006 | fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series | rate_series | Mg | temperature_K=2173 | 0.28 | absolute=0.01 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.2 | -0.08 | 0.146128 | 8 | mismatch |
 | fedkin-grossman-ghiorso-2006 | fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series | rate_series | Mg | temperature_K=2273 | 0.27 | absolute=0.01 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.2 | -0.07 | 0.130334 | 7 | mismatch |
+| kems-005-fedkin-2006 | fedkin_2006_mg_class_b1 | alpha | Mg | temperature_K=2123 | 0.24 | absolute=0.05 (documented default) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.2 | -0.04 | 0.0791812 | 0.8 | match |
 | kems-005-fedkin-2006 | fedkin_2006_mg_hashimoto_langmuir_table3 | alpha | Mg | temperature_K=2123 | 0.24 | absolute=0.01 (observation.values.sigma); sigma | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.2 | -0.04 | 0.0791812 | 4 | mismatch |
 | kems-008-schaefer-fegley-2004 | schaefer_fegley_2004_mg_forsterite_alpha_s_survey | alpha | Mg | temperature_K=2243 | 0.2 | absolute=0.0049999999999999906 (observation.values.alpha_range); published alpha range half-width | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.2 | 0 | 0 | 0 | match |
 | kems-010-richter-2007 | richter_2007_mg_cai_langmuir_alpha_arrhenius | alpha | Mg | temperature_K=1873 | 0.0603586 | absolute=0.2054316518789593 (point.sigma); Arrhenius E uncertainty propagated as sigma_alpha/alpha=sigma_E/(R*T) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.2 | 0.139641 | 0.520291 | 0.679746 | match |
 | kems-010-richter-2007 | richter_2007_mg_cai_langmuir_alpha_arrhenius | alpha | Mg | temperature_K=2023 | 0.107388 | absolute=0.3383970051344181 (point.sigma); Arrhenius E uncertainty propagated as sigma_alpha/alpha=sigma_E/(R*T) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.2 | 0.0926118 | 0.270073 | 0.273678 | match |
 | kems-010-richter-2007 | richter_2007_mg_cai_langmuir_alpha_arrhenius | alpha | Mg | temperature_K=2173 | 0.176453 | absolute=0.5176490661392505 (point.sigma); Arrhenius E uncertainty propagated as sigma_alpha/alpha=sigma_E/(R*T) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.2 | 0.0235469 | 0.0544007 | 0.0454881 | match |
 | kems-037-richter-2002 | richter_2002_mg_cai_langmuir_gamma | alpha | Mg | temperature_K=1723 | 0.04 | absolute=0.05 (documented default) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.2 | 0.16 | 0.69897 | 3.2 | mismatch |
+| kems-037-richter-2002 | richter_2002_mg_table1_per_run_areas_b1 | alpha | Mg | temperature_K=1923.15 | 0.04 | absolute=0.05 (documented default) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.2 | 0.16 | 0.69897 | 3.2 | mismatch |
 | richter-et-al-2007 | richter_2007_mg_cai_arrhenius_langmuir | alpha | Mg | temperature_K=1873 | 0.0603586 | absolute=0.2054316518789593 (point.sigma); Arrhenius E uncertainty propagated as sigma_alpha/alpha=sigma_E/(R*T) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.2 | 0.139641 | 0.520291 | 0.679746 | match |
 | richter-et-al-2007 | richter_2007_mg_cai_arrhenius_langmuir | alpha | Mg | temperature_K=2023 | 0.107388 | absolute=0.3383970051344181 (point.sigma); Arrhenius E uncertainty propagated as sigma_alpha/alpha=sigma_E/(R*T) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.2 | 0.0926118 | 0.270073 | 0.273678 | match |
 | richter-et-al-2007 | richter_2007_mg_cai_arrhenius_langmuir | alpha | Mg | temperature_K=2173 | 0.176453 | absolute=0.5176490661392505 (point.sigma); Arrhenius E uncertainty propagated as sigma_alpha/alpha=sigma_E/(R*T) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.2 | 0.0235469 | 0.0544007 | 0.0454881 | match |
-| kems-001-homma-1966 | homma_1966_mn_olette_alpha_exp_table1 | alpha | Mn | temperature_K=1873.15 | 115 | absolute=0.05 (documented default) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 1 | -114 | 2.0607 | 2280 | mismatch |
-| kems-002-ohno-1967 | ohno_1967_mn_olette_alpha_table3 | alpha | Mn | temperature_K=1873.15 | 121 | absolute=0.05 (documented default) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 1 | -120 | 2.08279 | 2400 | mismatch |
 | fedkin-grossman-ghiorso-2006 | fedkin_2006_yu_na_vacuum_langmuir | alpha | Na | temperature_K=1723.15 | 0.26 | absolute=0.05 (observation.uncertainty.alpha_range); published alpha range half-width | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 1 | 0.74 | 0.585027 | 14.8 | mismatch |
+| kems-005-fedkin-2006 | fedkin_2006_na_class_b1 | alpha | Na | temperature_K=1723.15 | 0.26 | absolute=0.05 (observation.uncertainty.alpha_range); published alpha range half-width | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 1 | 0.74 | 0.585027 | 14.8 | mismatch |
 | kems-005-fedkin-2006 | fedkin_2006_na_yu_langmuir | alpha | Na | temperature_K=1723.15 | 0.26 | absolute=0.05 (observation.uncertainty.alpha_range); published alpha range half-width | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 1 | 0.74 | 0.585027 | 14.8 | mismatch |
 | kems-012-sossi-2019 | sossi_2019_na_alpha_e_authors_adopted_unity | alpha | Na | temperature_K=1698.15 | 1 | absolute=0.05 (documented default) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 1 | 0 | 0 | 0 | match |
 | kems-012-sossi-2019 | sossi_2019_na_alpha_e_gamma_derived_range | alpha | Na | temperature_K=1673.15 | 1 | absolute=0.7 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 1 | 0 | 0 | 0 | match |
+| kems-012-sossi-2019 | sossi_2019_na_class_and_transport_b1 | alpha | Na | temperature_K=1698.15 | 1 | absolute=0.7 (observation.values.alpha_range); published alpha range half-width | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 1 | 0 | 0 | 0 | match |
 | sossi-et-al-2019 | sossi_2019_na_open_furnace_apparent | alpha | Na | temperature_K=1698.15 | 1 | absolute=0.04999999999999999 (observation.uncertainty.alpha_range); published alpha range half-width | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 1 | 0 | 0 | 0 | match |
 | costa-jacobson-2015 | costa_jacobson_2015_sio_olivine_kems | alpha | SiO | temperature_K=1750 | 0.0195 | absolute=0.016499999999999997 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0633145 | 0.0438145 | 0.511469 | 2.65542 | mismatch |
 | fedkin-grossman-ghiorso-2006 | fedkin_2006_table3_sio_hashimoto_langmuir | alpha | SiO | temperature_K=1973 | 0.12 | absolute=0.01 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0803277 | -0.0396723 | 0.174316 | 3.96723 | mismatch |
@@ -581,6 +592,11 @@ Comparable per-observation residuals and uncertainty ledger:
 | fedkin-grossman-ghiorso-2006 | fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series | rate_series | SiO | temperature_K=2073 | 0.17 | absolute=0.01 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0879011 | -0.0820989 | 0.286455 | 8.20989 | mismatch |
 | fedkin-grossman-ghiorso-2006 | fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series | rate_series | SiO | temperature_K=2173 | 0.2 | absolute=0.01 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0953941 | -0.104606 | 0.321509 | 10.4606 | mismatch |
 | fedkin-grossman-ghiorso-2006 | fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series | rate_series | SiO | temperature_K=2273 | 0.21 | absolute=0.01 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.102783 | -0.107217 | 0.310297 | 10.7217 | mismatch |
+| kems-005-fedkin-2006 | fedkin_2006_sio_hashimoto_table3_complete_b1 | alpha | SiO | temperature_K=1973 | 0.12 | absolute=0.01 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0803277 | -0.0396723 | 0.174316 | 3.96723 | mismatch |
+| kems-005-fedkin-2006 | fedkin_2006_sio_hashimoto_table3_complete_b1 | alpha | SiO | temperature_K=2073 | 0.17 | absolute=0.01 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0879011 | -0.0820989 | 0.286455 | 8.20989 | mismatch |
+| kems-005-fedkin-2006 | fedkin_2006_sio_hashimoto_table3_complete_b1 | alpha | SiO | temperature_K=2173 | 0.2 | absolute=0.01 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0953941 | -0.104606 | 0.321509 | 10.4606 | mismatch |
+| kems-005-fedkin-2006 | fedkin_2006_sio_hashimoto_table3_complete_b1 | alpha | SiO | temperature_K=2273 | 0.21 | absolute=0.01 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.102783 | -0.107217 | 0.310297 | 10.7217 | mismatch |
+| kems-007-costa-2015 | costa_2015_sio_olivine_class_and_motzfeldt_absence_b1 | alpha | SiO | temperature_K=1750 | 0.0195 | absolute=0.016499999999999997 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0633145 | 0.0438145 | 0.511469 | 2.65542 | mismatch |
 | kems-007-costa-2015 | costa_2015_sio_olivine_kems_alpha_multicell | alpha | SiO | temperature_K=1700 | 0.003 | absolute=0.016499999999999997 (observation.uncertainty.alpha_range); published alpha range half-width | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0595122 | 0.0565122 | 1.29748 | 3.42498 | mismatch |
 | kems-007-costa-2015 | costa_2015_sio_olivine_kems_alpha_multicell | alpha | SiO | temperature_K=1725 | 0.022 | absolute=0.016499999999999997 (observation.uncertainty.alpha_range); published alpha range half-width | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0614115 | 0.0394115 | 0.445827 | 2.38858 | mismatch |
 | kems-007-costa-2015 | costa_2015_sio_olivine_kems_alpha_multicell | alpha | SiO | temperature_K=1750 | 0.036 | absolute=0.016499999999999997 (observation.uncertainty.alpha_range); published alpha range half-width | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0633145 | 0.0273145 | 0.245201 | 1.65542 | mismatch |
@@ -591,9 +607,6 @@ Comparable per-observation residuals and uncertainty ledger:
 | kems-010-richter-2007 | richter_2007_sio_cai_langmuir_alpha_arrhenius | alpha | SiO | temperature_K=1873 | 0.0687787 | absolute=0.1634119997736591 (point.sigma); Arrhenius E uncertainty propagated as sigma_alpha/alpha=sigma_E/(R*T) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.072704 | 0.0039253 | 0.0241043 | 0.0240209 | match |
 | kems-010-richter-2007 | richter_2007_sio_cai_langmuir_alpha_arrhenius | alpha | SiO | temperature_K=2023 | 0.106584 | absolute=0.2344569366817506 (point.sigma); Arrhenius E uncertainty propagated as sigma_alpha/alpha=sigma_E/(R*T) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0841227 | -0.0224611 | 0.102778 | 0.0958007 | match |
 | kems-010-richter-2007 | richter_2007_sio_cai_langmuir_alpha_arrhenius | alpha | SiO | temperature_K=2173 | 0.155477 | absolute=0.3183997506581433 (point.sigma); Arrhenius E uncertainty propagated as sigma_alpha/alpha=sigma_E/(R*T) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0953941 | -0.0600825 | 0.212143 | 0.188701 | match |
-| kems-011-wetzel-gail-2013 | wetzel_gail_2013_sio_growth_alpha_arrhenius | alpha | SiO | temperature_K=1000 | 0.0130505 | absolute=0.05 (documented default) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0130505 | 0 | 0 | 0 | match |
-| kems-011-wetzel-gail-2013 | wetzel_gail_2013_sio_growth_alpha_arrhenius | alpha | SiO | temperature_K=1400 | 0.0374006 | absolute=0.05 (documented default) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0374006 | 0 | 0 | 0 | match |
-| kems-011-wetzel-gail-2013 | wetzel_gail_2013_sio_growth_alpha_arrhenius | alpha | SiO | temperature_K=1800 | 0.0671284 | absolute=0.05 (documented default) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0671284 | 0 | 0 | 0 | match |
 | richter-et-al-2007 | richter_2007_si_cai_arrhenius_langmuir | alpha | SiO | temperature_K=1873 | 0.0687787 | absolute=0.1634119997736591 (point.sigma); Arrhenius E uncertainty propagated as sigma_alpha/alpha=sigma_E/(R*T) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.072704 | 0.0039253 | 0.0241043 | 0.0240209 | match |
 | richter-et-al-2007 | richter_2007_si_cai_arrhenius_langmuir | alpha | SiO | temperature_K=2023 | 0.106584 | absolute=0.2344569366817506 (point.sigma); Arrhenius E uncertainty propagated as sigma_alpha/alpha=sigma_E/(R*T) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0841227 | -0.0224611 | 0.102778 | 0.0958007 | match |
 | richter-et-al-2007 | richter_2007_si_cai_arrhenius_langmuir | alpha | SiO | temperature_K=2173 | 0.155477 | absolute=0.3183997506581433 (point.sigma); Arrhenius E uncertainty propagated as sigma_alpha/alpha=sigma_E/(R*T) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0953941 | -0.0600825 | 0.212143 | 0.188701 | match |

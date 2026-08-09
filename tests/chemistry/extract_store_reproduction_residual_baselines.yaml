@@ -3,10 +3,175 @@
 # moving outside band_dex is RED. Existing bands are preserved verbatim.
 # New expanded-harness pins use ±0.01 dex as a regression/noise band, not an
 # accuracy tolerance. Never widen a band to hide a changed mechanism.
+#
+# 2026-08-08 si-comparability: pure-element / molten-metal / solid-film α
+# rows are class-incomparable to the silicate-melt rail carrier and no longer
+# pin residuals (typed-refusal:not_comparable_system_class:*). B1 class-tagged
+# silicate/solid-solution rows remain and are pinned when comparable.
 schema_version: 2
 metric: residual_dex
 band_kind: absolute_dex
 points:
+- key: costa_jacobson_2015_fe_olivine_kems:T=1750
+  case_id: costa-jacobson-2015::costa_jacobson_2015_fe_olivine_kems
+  source_id: costa-jacobson-2015
+  observation_type: alpha
+  species: Fe
+  residual_dex: 0.0
+  band_dex: 0.01
+  status: match
+  note: Expanded real-harness pin; residual is reported, not tuned.
+  temperature_K: 1750.0
+- key: fedkin_2006_table3_fe_hashimoto_langmuir:T=1973
+  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir
+  source_id: fedkin-grossman-ghiorso-2006
+  observation_type: alpha
+  species: Fe
+  residual_dex: 1.0606978403536116
+  band_dex: 0.01
+  status: mismatch
+  note: Expanded real-harness pin; residual is reported, not tuned.
+  temperature_K: 1973.0
+- key: fedkin_2006_table3_fe_hashimoto_langmuir:T=2073
+  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir
+  source_id: fedkin-grossman-ghiorso-2006
+  observation_type: alpha
+  species: Fe
+  residual_dex: 1.0969100130080565
+  band_dex: 0.01
+  status: mismatch
+  note: Expanded real-harness pin; residual is reported, not tuned.
+  temperature_K: 2073.0
+- key: fedkin_2006_table3_fe_hashimoto_langmuir:T=2173
+  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir
+  source_id: fedkin-grossman-ghiorso-2006
+  observation_type: alpha
+  species: Fe
+  residual_dex: 1.0791812460476249
+  band_dex: 0.01
+  status: mismatch
+  note: Expanded real-harness pin; residual is reported, not tuned.
+  temperature_K: 2173.0
+- key: fedkin_2006_table3_fe_hashimoto_langmuir:T=2273
+  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir
+  source_id: fedkin-grossman-ghiorso-2006
+  observation_type: alpha
+  species: Fe
+  residual_dex: 1.0606978403536116
+  band_dex: 0.01
+  status: mismatch
+  note: Expanded real-harness pin; residual is reported, not tuned.
+  temperature_K: 2273.0
+- key: fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series:T=1973
+  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series
+  source_id: fedkin-grossman-ghiorso-2006
+  observation_type: rate_series
+  species: Fe
+  residual_dex: 1.0606978403536116
+  band_dex: 0.05
+  status: mismatch
+  note: "Fe \u03B1 flat 0.02 vs lit 0.23 \u2192 ~1.06 dex"
+  temperature_K: 1973.0
+  residual: -0.21
+  band_residual: 0.02
+- key: fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series:T=2073
+  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series
+  source_id: fedkin-grossman-ghiorso-2006
+  observation_type: rate_series
+  species: Fe
+  residual_dex: 1.0969100130080565
+  band_dex: 0.05
+  status: mismatch
+  note: "Fe \u03B1 flat 0.02 vs lit 0.25 \u2192 ~1.10 dex (species max)"
+  temperature_K: 2073.0
+  residual: -0.23
+  band_residual: 0.02
+- key: fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series:T=2173
+  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series
+  source_id: fedkin-grossman-ghiorso-2006
+  observation_type: rate_series
+  species: Fe
+  residual_dex: 1.0791812460476249
+  band_dex: 0.05
+  status: mismatch
+  note: "Fe \u03B1 flat 0.02 vs lit 0.24 \u2192 ~1.08 dex"
+  temperature_K: 2173.0
+  residual: -0.22
+  band_residual: 0.02
+- key: fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series:T=2273
+  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series
+  source_id: fedkin-grossman-ghiorso-2006
+  observation_type: rate_series
+  species: Fe
+  residual_dex: 1.0606978403536116
+  band_dex: 0.05
+  status: mismatch
+  note: "Fe \u03B1 flat 0.02 vs lit 0.23 \u2192 ~1.06 dex"
+  temperature_K: 2273.0
+  residual: -0.21
+  band_residual: 0.02
+- key: fedkin_2006_fe_class_b1:T=2123
+  case_id: kems-005-fedkin-2006::fedkin_2006_fe_class_b1
+  source_id: kems-005-fedkin-2006
+  observation_type: alpha
+  species: Fe
+  residual_dex: 1.0791812460476249
+  band_dex: 0.01
+  status: mismatch
+  note: Class-comparable residual pin; residual reported, not tuned (si-comparability
+    2026-08-08).
+  temperature_K: 2123.0
+- key: fedkin_2006_fe_hashimoto_langmuir_table3:T=1973
+  case_id: kems-005-fedkin-2006::fedkin_2006_fe_hashimoto_langmuir_table3
+  source_id: kems-005-fedkin-2006
+  observation_type: alpha
+  species: Fe
+  residual_dex: 1.0606978403536116
+  band_dex: 0.01
+  status: mismatch
+  note: Expanded real-harness pin; residual is reported, not tuned.
+  temperature_K: 1973.0
+- key: fedkin_2006_fe_hashimoto_langmuir_table3:T=2073
+  case_id: kems-005-fedkin-2006::fedkin_2006_fe_hashimoto_langmuir_table3
+  source_id: kems-005-fedkin-2006
+  observation_type: alpha
+  species: Fe
+  residual_dex: 1.0969100130080565
+  band_dex: 0.01
+  status: mismatch
+  note: Expanded real-harness pin; residual is reported, not tuned.
+  temperature_K: 2073.0
+- key: fedkin_2006_fe_hashimoto_langmuir_table3:T=2173
+  case_id: kems-005-fedkin-2006::fedkin_2006_fe_hashimoto_langmuir_table3
+  source_id: kems-005-fedkin-2006
+  observation_type: alpha
+  species: Fe
+  residual_dex: 1.0791812460476249
+  band_dex: 0.01
+  status: mismatch
+  note: Expanded real-harness pin; residual is reported, not tuned.
+  temperature_K: 2173.0
+- key: fedkin_2006_fe_hashimoto_langmuir_table3:T=2273
+  case_id: kems-005-fedkin-2006::fedkin_2006_fe_hashimoto_langmuir_table3
+  source_id: kems-005-fedkin-2006
+  observation_type: alpha
+  species: Fe
+  residual_dex: 1.0606978403536116
+  band_dex: 0.01
+  status: mismatch
+  note: Expanded real-harness pin; residual is reported, not tuned.
+  temperature_K: 2273.0
+- key: costa_2015_fe_olivine_class_and_motzfeldt_absence_b1:T=1750
+  case_id: kems-007-costa-2015::costa_2015_fe_olivine_class_and_motzfeldt_absence_b1
+  source_id: kems-007-costa-2015
+  observation_type: alpha
+  species: Fe
+  residual_dex: 0.0
+  band_dex: 0.01
+  status: match
+  note: Class-comparable residual pin; residual reported, not tuned (si-comparability
+    2026-08-08).
+  temperature_K: 1750.0
 - key: costa_2015_fe_olivine_kems_alpha_multicell:T=1700
   case_id: kems-007-costa-2015::costa_2015_fe_olivine_kems_alpha_multicell
   source_id: kems-007-costa-2015
@@ -57,6 +222,487 @@ points:
   status: mismatch
   note: Expanded real-harness pin; residual is reported, not tuned.
   temperature_K: 1800.0
+- key: fedkin_2006_yu_k_vacuum_langmuir:T=1723.15
+  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_yu_k_vacuum_langmuir
+  source_id: fedkin-grossman-ghiorso-2006
+  observation_type: alpha
+  species: K
+  residual_dex: 0.0
+  band_dex: 0.01
+  status: match
+  note: Expanded real-harness pin; residual is reported, not tuned.
+  temperature_K: 1723.15
+- key: fedkin_2006_k_class_b1:T=1723.15
+  case_id: kems-005-fedkin-2006::fedkin_2006_k_class_b1
+  source_id: kems-005-fedkin-2006
+  observation_type: alpha
+  species: K
+  residual_dex: 0.0
+  band_dex: 0.01
+  status: match
+  note: Class-comparable residual pin; residual reported, not tuned (si-comparability
+    2026-08-08).
+  temperature_K: 1723.15
+- key: fedkin_2006_k_yu_langmuir:T=1723.15
+  case_id: kems-005-fedkin-2006::fedkin_2006_k_yu_langmuir
+  source_id: kems-005-fedkin-2006
+  observation_type: alpha
+  species: K
+  residual_dex: 0.0
+  band_dex: 0.01
+  status: match
+  note: Expanded real-harness pin; residual is reported, not tuned.
+  temperature_K: 1723.15
+- key: sossi_2019_k_class_b1:T=1698.15
+  case_id: kems-012-sossi-2019::sossi_2019_k_class_b1
+  source_id: kems-012-sossi-2019
+  observation_type: alpha
+  species: K
+  residual_dex: 0.8860566476931632
+  band_dex: 0.01
+  status: match
+  note: Class-comparable residual pin; residual reported, not tuned (si-comparability
+    2026-08-08).
+  temperature_K: 1698.15
+- key: sossi_2019_k_open_furnace_alpha_e_context:T=1698.15
+  case_id: kems-012-sossi-2019::sossi_2019_k_open_furnace_alpha_e_context
+  source_id: kems-012-sossi-2019
+  observation_type: alpha
+  species: K
+  residual_dex: 0.8860566476931632
+  band_dex: 0.01
+  status: mismatch
+  note: Expanded real-harness pin; residual is reported, not tuned.
+  temperature_K: 1698.15
+- key: fedkin_2006_table3_mg_hashimoto_langmuir:T=1973
+  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir
+  source_id: fedkin-grossman-ghiorso-2006
+  observation_type: alpha
+  species: Mg
+  residual_dex: 0.0791812460476248
+  band_dex: 0.01
+  status: mismatch
+  note: Expanded real-harness pin; residual is reported, not tuned.
+  temperature_K: 1973.0
+- key: fedkin_2006_table3_mg_hashimoto_langmuir:T=2073
+  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir
+  source_id: fedkin-grossman-ghiorso-2006
+  observation_type: alpha
+  species: Mg
+  residual_dex: 0.146128035678238
+  band_dex: 0.01
+  status: mismatch
+  note: Expanded real-harness pin; residual is reported, not tuned.
+  temperature_K: 2073.0
+- key: fedkin_2006_table3_mg_hashimoto_langmuir:T=2173
+  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir
+  source_id: fedkin-grossman-ghiorso-2006
+  observation_type: alpha
+  species: Mg
+  residual_dex: 0.146128035678238
+  band_dex: 0.01
+  status: mismatch
+  note: Expanded real-harness pin; residual is reported, not tuned.
+  temperature_K: 2173.0
+- key: fedkin_2006_table3_mg_hashimoto_langmuir:T=2273
+  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir
+  source_id: fedkin-grossman-ghiorso-2006
+  observation_type: alpha
+  species: Mg
+  residual_dex: 0.13033376849500614
+  band_dex: 0.01
+  status: mismatch
+  note: Expanded real-harness pin; residual is reported, not tuned.
+  temperature_K: 2273.0
+- key: fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series:T=1973
+  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series
+  source_id: fedkin-grossman-ghiorso-2006
+  observation_type: rate_series
+  species: Mg
+  residual_dex: 0.0791812460476248
+  band_dex: 0.05
+  status: mismatch
+  note: "Mg \u03B1 0.2 vs lit 0.24 \u2192 ~0.08 dex"
+  temperature_K: 1973.0
+  residual: -0.04
+  band_residual: 0.02
+- key: fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series:T=2073
+  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series
+  source_id: fedkin-grossman-ghiorso-2006
+  observation_type: rate_series
+  species: Mg
+  residual_dex: 0.146128035678238
+  band_dex: 0.05
+  status: mismatch
+  note: "Mg \u03B1 0.2 vs lit 0.28 \u2192 ~0.15 dex (species max)"
+  temperature_K: 2073.0
+  residual: -0.08
+  band_residual: 0.02
+- key: fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series:T=2173
+  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series
+  source_id: fedkin-grossman-ghiorso-2006
+  observation_type: rate_series
+  species: Mg
+  residual_dex: 0.146128035678238
+  band_dex: 0.05
+  status: mismatch
+  note: "Mg \u03B1 0.2 vs lit 0.28 \u2192 ~0.15 dex"
+  temperature_K: 2173.0
+  residual: -0.08
+  band_residual: 0.02
+- key: fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series:T=2273
+  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series
+  source_id: fedkin-grossman-ghiorso-2006
+  observation_type: rate_series
+  species: Mg
+  residual_dex: 0.13033376849500614
+  band_dex: 0.05
+  status: mismatch
+  note: "Mg \u03B1 0.2 vs lit 0.27 \u2192 ~0.13 dex"
+  temperature_K: 2273.0
+  residual: -0.07
+  band_residual: 0.02
+- key: fedkin_2006_mg_class_b1:T=2123
+  case_id: kems-005-fedkin-2006::fedkin_2006_mg_class_b1
+  source_id: kems-005-fedkin-2006
+  observation_type: alpha
+  species: Mg
+  residual_dex: 0.0791812460476248
+  band_dex: 0.01
+  status: match
+  note: Class-comparable residual pin; residual reported, not tuned (si-comparability
+    2026-08-08).
+  temperature_K: 2123.0
+- key: fedkin_2006_mg_hashimoto_langmuir_table3:T=2123
+  case_id: kems-005-fedkin-2006::fedkin_2006_mg_hashimoto_langmuir_table3
+  source_id: kems-005-fedkin-2006
+  observation_type: alpha
+  species: Mg
+  residual_dex: 0.0791812460476248
+  band_dex: 0.01
+  status: mismatch
+  note: Expanded real-harness pin; residual is reported, not tuned.
+  temperature_K: 2123.0
+- key: schaefer_fegley_2004_mg_forsterite_alpha_s_survey:T=2243
+  case_id: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_mg_forsterite_alpha_s_survey
+  source_id: kems-008-schaefer-fegley-2004
+  observation_type: alpha
+  species: Mg
+  residual_dex: 0.0
+  band_dex: 0.01
+  status: match
+  note: Expanded real-harness pin; residual is reported, not tuned.
+  temperature_K: 2243.0
+- key: richter_2007_mg_cai_langmuir_alpha_arrhenius:T=1873
+  case_id: kems-010-richter-2007::richter_2007_mg_cai_langmuir_alpha_arrhenius
+  source_id: kems-010-richter-2007
+  observation_type: alpha
+  species: Mg
+  residual_dex: 0.5202907093862962
+  band_dex: 0.01
+  status: match
+  note: Expanded real-harness pin; residual is reported, not tuned.
+  temperature_K: 1873.0
+- key: richter_2007_mg_cai_langmuir_alpha_arrhenius:T=2023
+  case_id: kems-010-richter-2007::richter_2007_mg_cai_langmuir_alpha_arrhenius
+  source_id: kems-010-richter-2007
+  observation_type: alpha
+  species: Mg
+  residual_dex: 0.27007345151278755
+  band_dex: 0.01
+  status: match
+  note: Expanded real-harness pin; residual is reported, not tuned.
+  temperature_K: 2023.0
+- key: richter_2007_mg_cai_langmuir_alpha_arrhenius:T=2173
+  case_id: kems-010-richter-2007::richter_2007_mg_cai_langmuir_alpha_arrhenius
+  source_id: kems-010-richter-2007
+  observation_type: alpha
+  species: Mg
+  residual_dex: 0.054400683911738565
+  band_dex: 0.01
+  status: match
+  note: Expanded real-harness pin; residual is reported, not tuned.
+  temperature_K: 2173.0
+- key: richter_2002_mg_cai_langmuir_gamma:T=1723
+  case_id: kems-037-richter-2002::richter_2002_mg_cai_langmuir_gamma
+  source_id: kems-037-richter-2002
+  observation_type: alpha
+  species: Mg
+  residual_dex: 0.6989700043360189
+  band_dex: 0.01
+  status: mismatch
+  note: Expanded real-harness pin; residual is reported, not tuned.
+  temperature_K: 1723.0
+- key: richter_2002_mg_table1_per_run_areas_b1:T=1923.15
+  case_id: kems-037-richter-2002::richter_2002_mg_table1_per_run_areas_b1
+  source_id: kems-037-richter-2002
+  observation_type: alpha
+  species: Mg
+  residual_dex: 0.6989700043360189
+  band_dex: 0.01
+  status: mismatch
+  note: Class-comparable residual pin; residual reported, not tuned (si-comparability
+    2026-08-08).
+  temperature_K: 1923.15
+- key: richter_2007_mg_cai_arrhenius_langmuir:T=1873
+  case_id: richter-et-al-2007::richter_2007_mg_cai_arrhenius_langmuir
+  source_id: richter-et-al-2007
+  observation_type: alpha
+  species: Mg
+  residual_dex: 0.5202907093862962
+  band_dex: 0.01
+  status: match
+  note: Expanded real-harness pin; residual is reported, not tuned.
+  temperature_K: 1873.0
+- key: richter_2007_mg_cai_arrhenius_langmuir:T=2023
+  case_id: richter-et-al-2007::richter_2007_mg_cai_arrhenius_langmuir
+  source_id: richter-et-al-2007
+  observation_type: alpha
+  species: Mg
+  residual_dex: 0.27007345151278755
+  band_dex: 0.01
+  status: match
+  note: Expanded real-harness pin; residual is reported, not tuned.
+  temperature_K: 2023.0
+- key: richter_2007_mg_cai_arrhenius_langmuir:T=2173
+  case_id: richter-et-al-2007::richter_2007_mg_cai_arrhenius_langmuir
+  source_id: richter-et-al-2007
+  observation_type: alpha
+  species: Mg
+  residual_dex: 0.054400683911738565
+  band_dex: 0.01
+  status: match
+  note: Expanded real-harness pin; residual is reported, not tuned.
+  temperature_K: 2173.0
+- key: fedkin_2006_yu_na_vacuum_langmuir:T=1723.15
+  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_yu_na_vacuum_langmuir
+  source_id: fedkin-grossman-ghiorso-2006
+  observation_type: alpha
+  species: Na
+  residual_dex: 0.585026652029182
+  band_dex: 0.01
+  status: mismatch
+  note: Expanded real-harness pin; residual is reported, not tuned.
+  temperature_K: 1723.15
+- key: fedkin_2006_na_class_b1:T=1723.15
+  case_id: kems-005-fedkin-2006::fedkin_2006_na_class_b1
+  source_id: kems-005-fedkin-2006
+  observation_type: alpha
+  species: Na
+  residual_dex: 0.585026652029182
+  band_dex: 0.01
+  status: mismatch
+  note: Class-comparable residual pin; residual reported, not tuned (si-comparability
+    2026-08-08).
+  temperature_K: 1723.15
+- key: fedkin_2006_na_yu_langmuir:T=1723.15
+  case_id: kems-005-fedkin-2006::fedkin_2006_na_yu_langmuir
+  source_id: kems-005-fedkin-2006
+  observation_type: alpha
+  species: Na
+  residual_dex: 0.585026652029182
+  band_dex: 0.01
+  status: mismatch
+  note: Expanded real-harness pin; residual is reported, not tuned.
+  temperature_K: 1723.15
+- key: sossi_2019_na_alpha_e_authors_adopted_unity:T=1698.15
+  case_id: kems-012-sossi-2019::sossi_2019_na_alpha_e_authors_adopted_unity
+  source_id: kems-012-sossi-2019
+  observation_type: alpha
+  species: Na
+  residual_dex: 0.0
+  band_dex: 0.01
+  status: match
+  note: Expanded real-harness pin; residual is reported, not tuned.
+  temperature_K: 1698.15
+- key: sossi_2019_na_alpha_e_gamma_derived_range:T=1673.15
+  case_id: kems-012-sossi-2019::sossi_2019_na_alpha_e_gamma_derived_range
+  source_id: kems-012-sossi-2019
+  observation_type: alpha
+  species: Na
+  residual_dex: 0.0
+  band_dex: 0.01
+  status: match
+  note: Expanded real-harness pin; residual is reported, not tuned.
+  temperature_K: 1673.15
+- key: sossi_2019_na_class_and_transport_b1:T=1698.15
+  case_id: kems-012-sossi-2019::sossi_2019_na_class_and_transport_b1
+  source_id: kems-012-sossi-2019
+  observation_type: alpha
+  species: Na
+  residual_dex: 0.0
+  band_dex: 0.01
+  status: match
+  note: Class-comparable residual pin; residual reported, not tuned (si-comparability
+    2026-08-08).
+  temperature_K: 1698.15
+- key: sossi_2019_na_open_furnace_apparent:T=1698.15
+  case_id: sossi-et-al-2019::sossi_2019_na_open_furnace_apparent
+  source_id: sossi-et-al-2019
+  observation_type: alpha
+  species: Na
+  residual_dex: 0.0
+  band_dex: 0.01
+  status: match
+  note: Expanded real-harness pin; residual is reported, not tuned.
+  temperature_K: 1698.15
+- key: costa_jacobson_2015_sio_olivine_kems:T=1750
+  case_id: costa-jacobson-2015::costa_jacobson_2015_sio_olivine_kems
+  source_id: costa-jacobson-2015
+  observation_type: alpha
+  species: SiO
+  residual_dex: 0.5114686375217193
+  band_dex: 0.01
+  status: mismatch
+  note: Expanded real-harness pin; residual is reported, not tuned.
+  temperature_K: 1750.0
+- key: fedkin_2006_table3_sio_hashimoto_langmuir:T=1973
+  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir
+  source_id: fedkin-grossman-ghiorso-2006
+  observation_type: alpha
+  species: SiO
+  residual_dex: 0.17431584757931465
+  band_dex: 0.01
+  status: mismatch
+  note: Expanded real-harness pin; residual is reported, not tuned.
+  temperature_K: 1973.0
+- key: fedkin_2006_table3_sio_hashimoto_langmuir:T=2073
+  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir
+  source_id: fedkin-grossman-ghiorso-2006
+  observation_type: alpha
+  species: SiO
+  residual_dex: 0.2864548231913682
+  band_dex: 0.01
+  status: mismatch
+  note: Expanded real-harness pin; residual is reported, not tuned.
+  temperature_K: 2073.0
+- key: fedkin_2006_table3_sio_hashimoto_langmuir:T=2173
+  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir
+  source_id: fedkin-grossman-ghiorso-2006
+  observation_type: alpha
+  species: SiO
+  residual_dex: 0.32150855070082623
+  band_dex: 0.01
+  status: mismatch
+  note: Expanded real-harness pin; residual is reported, not tuned.
+  temperature_K: 2173.0
+- key: fedkin_2006_table3_sio_hashimoto_langmuir:T=2273
+  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir
+  source_id: fedkin-grossman-ghiorso-2006
+  observation_type: alpha
+  species: SiO
+  residual_dex: 0.31029653438705807
+  band_dex: 0.01
+  status: mismatch
+  note: Expanded real-harness pin; residual is reported, not tuned.
+  temperature_K: 2273.0
+- key: fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series:T=1973
+  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series
+  source_id: fedkin-grossman-ghiorso-2006
+  observation_type: rate_series
+  species: SiO
+  residual_dex: 0.17431584757931465
+  band_dex: 0.05
+  status: mismatch
+  note: "SiO \u03B1 extrapolated engine surface; residual still pinned"
+  temperature_K: 1973.0
+  extrapolated: true
+  residual: -0.03967228772665646
+  band_residual: 0.01
+- key: fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series:T=2073
+  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series
+  source_id: fedkin-grossman-ghiorso-2006
+  observation_type: rate_series
+  species: SiO
+  residual_dex: 0.2864548231913682
+  band_dex: 0.05
+  status: mismatch
+  note: "SiO \u03B1 extrapolated engine surface; residual still pinned"
+  temperature_K: 2073.0
+  extrapolated: true
+  residual: -0.08209894285001446
+  band_residual: 0.01
+- key: fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series:T=2173
+  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series
+  source_id: fedkin-grossman-ghiorso-2006
+  observation_type: rate_series
+  species: SiO
+  residual_dex: 0.32150855070082623
+  band_dex: 0.05
+  status: mismatch
+  note: "SiO \u03B1 extrapolated; species max residual_dex ~0.32"
+  temperature_K: 2173.0
+  extrapolated: true
+  residual: -0.10460591538171005
+  band_residual: 0.01
+- key: fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series:T=2273
+  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series
+  source_id: fedkin-grossman-ghiorso-2006
+  observation_type: rate_series
+  species: SiO
+  residual_dex: 0.31029653438705807
+  band_dex: 0.05
+  status: mismatch
+  note: "SiO \u03B1 extrapolated engine surface; residual still pinned"
+  temperature_K: 2273.0
+  extrapolated: true
+  residual: -0.10721665192129436
+  band_residual: 0.01
+- key: fedkin_2006_sio_hashimoto_table3_complete_b1:T=1973
+  case_id: kems-005-fedkin-2006::fedkin_2006_sio_hashimoto_table3_complete_b1
+  source_id: kems-005-fedkin-2006
+  observation_type: alpha
+  species: SiO
+  residual_dex: 0.17431584757931465
+  band_dex: 0.01
+  status: mismatch
+  note: Class-comparable residual pin; residual reported, not tuned (si-comparability
+    2026-08-08).
+  temperature_K: 1973.0
+- key: fedkin_2006_sio_hashimoto_table3_complete_b1:T=2073
+  case_id: kems-005-fedkin-2006::fedkin_2006_sio_hashimoto_table3_complete_b1
+  source_id: kems-005-fedkin-2006
+  observation_type: alpha
+  species: SiO
+  residual_dex: 0.2864548231913682
+  band_dex: 0.01
+  status: mismatch
+  note: Class-comparable residual pin; residual reported, not tuned (si-comparability
+    2026-08-08).
+  temperature_K: 2073.0
+- key: fedkin_2006_sio_hashimoto_table3_complete_b1:T=2173
+  case_id: kems-005-fedkin-2006::fedkin_2006_sio_hashimoto_table3_complete_b1
+  source_id: kems-005-fedkin-2006
+  observation_type: alpha
+  species: SiO
+  residual_dex: 0.32150855070082623
+  band_dex: 0.01
+  status: mismatch
+  note: Class-comparable residual pin; residual reported, not tuned (si-comparability
+    2026-08-08).
+  temperature_K: 2173.0
+- key: fedkin_2006_sio_hashimoto_table3_complete_b1:T=2273
+  case_id: kems-005-fedkin-2006::fedkin_2006_sio_hashimoto_table3_complete_b1
+  source_id: kems-005-fedkin-2006
+  observation_type: alpha
+  species: SiO
+  residual_dex: 0.31029653438705807
+  band_dex: 0.01
+  status: mismatch
+  note: Class-comparable residual pin; residual reported, not tuned (si-comparability
+    2026-08-08).
+  temperature_K: 2273.0
+- key: costa_2015_sio_olivine_class_and_motzfeldt_absence_b1:T=1750
+  case_id: kems-007-costa-2015::costa_2015_sio_olivine_class_and_motzfeldt_absence_b1
+  source_id: kems-007-costa-2015
+  observation_type: alpha
+  species: SiO
+  residual_dex: 0.5114686375217193
+  band_dex: 0.01
+  status: mismatch
+  note: Class-comparable residual pin; residual reported, not tuned (si-comparability
+    2026-08-08).
+  temperature_K: 1750.0
 - key: costa_2015_sio_olivine_kems_alpha_multicell:T=1700
   case_id: kems-007-costa-2015::costa_2015_sio_olivine_kems_alpha_multicell
   source_id: kems-007-costa-2015
@@ -107,456 +753,52 @@ points:
   status: mismatch
   note: Expanded real-harness pin; residual is reported, not tuned.
   temperature_K: 1800.0
-- key: costa_jacobson_2015_fe_olivine_kems:T=1750
-  case_id: costa-jacobson-2015::costa_jacobson_2015_fe_olivine_kems
-  source_id: costa-jacobson-2015
+- key: schaefer_fegley_2004_sio_alpha_s_survey:T=2273:point=0
+  case_id: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_sio_alpha_s_survey
+  source_id: kems-008-schaefer-fegley-2004
   observation_type: alpha
-  species: Fe
-  residual_dex: 0.0
+  species: SiO
+  residual_dex: 0.40986276901889873
   band_dex: 0.01
   status: match
   note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 1750.0
-- key: costa_jacobson_2015_sio_olivine_kems:T=1750
-  case_id: costa-jacobson-2015::costa_jacobson_2015_sio_olivine_kems
-  source_id: costa-jacobson-2015
+  temperature_K: 2273.0
+- key: schaefer_fegley_2004_sio_alpha_s_survey:T=2273:point=1
+  case_id: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_sio_alpha_s_survey
+  source_id: kems-008-schaefer-fegley-2004
   observation_type: alpha
   species: SiO
-  residual_dex: 0.5114686375217193
-  band_dex: 0.01
-  status: mismatch
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 1750.0
-- key: fedkin_2006_fe_hashimoto_langmuir_table3:T=1973
-  case_id: kems-005-fedkin-2006::fedkin_2006_fe_hashimoto_langmuir_table3
-  source_id: kems-005-fedkin-2006
-  observation_type: alpha
-  species: Fe
-  residual_dex: 1.0606978403536116
-  band_dex: 0.01
-  status: mismatch
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 1973.0
-- key: fedkin_2006_fe_hashimoto_langmuir_table3:T=2073
-  case_id: kems-005-fedkin-2006::fedkin_2006_fe_hashimoto_langmuir_table3
-  source_id: kems-005-fedkin-2006
-  observation_type: alpha
-  species: Fe
-  residual_dex: 1.0969100130080565
-  band_dex: 0.01
-  status: mismatch
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 2073.0
-- key: fedkin_2006_fe_hashimoto_langmuir_table3:T=2173
-  case_id: kems-005-fedkin-2006::fedkin_2006_fe_hashimoto_langmuir_table3
-  source_id: kems-005-fedkin-2006
-  observation_type: alpha
-  species: Fe
-  residual_dex: 1.0791812460476249
-  band_dex: 0.01
-  status: mismatch
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 2173.0
-- key: fedkin_2006_fe_hashimoto_langmuir_table3:T=2273
-  case_id: kems-005-fedkin-2006::fedkin_2006_fe_hashimoto_langmuir_table3
-  source_id: kems-005-fedkin-2006
-  observation_type: alpha
-  species: Fe
-  residual_dex: 1.0606978403536116
+  residual_dex: 0.28910723531712
   band_dex: 0.01
   status: mismatch
   note: Expanded real-harness pin; residual is reported, not tuned.
   temperature_K: 2273.0
-- key: fedkin_2006_k_yu_langmuir:T=1723.15
-  case_id: kems-005-fedkin-2006::fedkin_2006_k_yu_langmuir
-  source_id: kems-005-fedkin-2006
-  observation_type: alpha
-  species: K
-  residual_dex: 0.0
-  band_dex: 0.01
-  status: match
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 1723.15
-- key: fedkin_2006_mg_hashimoto_langmuir_table3:T=2123
-  case_id: kems-005-fedkin-2006::fedkin_2006_mg_hashimoto_langmuir_table3
-  source_id: kems-005-fedkin-2006
-  observation_type: alpha
-  species: Mg
-  residual_dex: 0.0791812460476248
-  band_dex: 0.01
-  status: mismatch
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 2123.0
-- key: fedkin_2006_na_yu_langmuir:T=1723.15
-  case_id: kems-005-fedkin-2006::fedkin_2006_na_yu_langmuir
-  source_id: kems-005-fedkin-2006
-  observation_type: alpha
-  species: Na
-  residual_dex: 0.585026652029182
-  band_dex: 0.01
-  status: mismatch
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 1723.15
-- key: fedkin_2006_table3_fe_hashimoto_langmuir:T=1973
-  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir
-  source_id: fedkin-grossman-ghiorso-2006
-  observation_type: alpha
-  species: Fe
-  residual_dex: 1.0606978403536116
-  band_dex: 0.01
-  status: mismatch
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 1973.0
-- key: fedkin_2006_table3_fe_hashimoto_langmuir:T=2073
-  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir
-  source_id: fedkin-grossman-ghiorso-2006
-  observation_type: alpha
-  species: Fe
-  residual_dex: 1.0969100130080565
-  band_dex: 0.01
-  status: mismatch
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 2073.0
-- key: fedkin_2006_table3_fe_hashimoto_langmuir:T=2173
-  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir
-  source_id: fedkin-grossman-ghiorso-2006
-  observation_type: alpha
-  species: Fe
-  residual_dex: 1.0791812460476249
-  band_dex: 0.01
-  status: mismatch
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 2173.0
-- key: fedkin_2006_table3_fe_hashimoto_langmuir:T=2273
-  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir
-  source_id: fedkin-grossman-ghiorso-2006
-  observation_type: alpha
-  species: Fe
-  residual_dex: 1.0606978403536116
-  band_dex: 0.01
-  status: mismatch
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 2273.0
-- key: fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series:T=1973
-  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series
-  species: Fe
-  temperature_K: 1973.0
-  residual_dex: 1.0606978403536116
-  band_dex: 0.05
-  residual: -0.21
-  band_residual: 0.02
-  status: mismatch
-  note: Fe α flat 0.02 vs lit 0.23 → ~1.06 dex
-- key: fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series:T=2073
-  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series
-  species: Fe
-  temperature_K: 2073.0
-  residual_dex: 1.0969100130080565
-  band_dex: 0.05
-  residual: -0.23
-  band_residual: 0.02
-  status: mismatch
-  note: Fe α flat 0.02 vs lit 0.25 → ~1.10 dex (species max)
-- key: fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series:T=2173
-  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series
-  species: Fe
-  temperature_K: 2173.0
-  residual_dex: 1.0791812460476249
-  band_dex: 0.05
-  residual: -0.22
-  band_residual: 0.02
-  status: mismatch
-  note: Fe α flat 0.02 vs lit 0.24 → ~1.08 dex
-- key: fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series:T=2273
-  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series
-  species: Fe
-  temperature_K: 2273.0
-  residual_dex: 1.0606978403536116
-  band_dex: 0.05
-  residual: -0.21
-  band_residual: 0.02
-  status: mismatch
-  note: Fe α flat 0.02 vs lit 0.23 → ~1.06 dex
-- key: fedkin_2006_table3_mg_hashimoto_langmuir:T=1973
-  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir
-  source_id: fedkin-grossman-ghiorso-2006
-  observation_type: alpha
-  species: Mg
-  residual_dex: 0.0791812460476248
-  band_dex: 0.01
-  status: mismatch
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 1973.0
-- key: fedkin_2006_table3_mg_hashimoto_langmuir:T=2073
-  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir
-  source_id: fedkin-grossman-ghiorso-2006
-  observation_type: alpha
-  species: Mg
-  residual_dex: 0.146128035678238
-  band_dex: 0.01
-  status: mismatch
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 2073.0
-- key: fedkin_2006_table3_mg_hashimoto_langmuir:T=2173
-  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir
-  source_id: fedkin-grossman-ghiorso-2006
-  observation_type: alpha
-  species: Mg
-  residual_dex: 0.146128035678238
-  band_dex: 0.01
-  status: mismatch
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 2173.0
-- key: fedkin_2006_table3_mg_hashimoto_langmuir:T=2273
-  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir
-  source_id: fedkin-grossman-ghiorso-2006
-  observation_type: alpha
-  species: Mg
-  residual_dex: 0.13033376849500614
-  band_dex: 0.01
-  status: mismatch
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 2273.0
-- key: fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series:T=1973
-  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series
-  species: Mg
-  temperature_K: 1973.0
-  residual_dex: 0.0791812460476248
-  band_dex: 0.05
-  residual: -0.04
-  band_residual: 0.02
-  status: mismatch
-  note: Mg α 0.2 vs lit 0.24 → ~0.08 dex
-- key: fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series:T=2073
-  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series
-  species: Mg
-  temperature_K: 2073.0
-  residual_dex: 0.146128035678238
-  band_dex: 0.05
-  residual: -0.08
-  band_residual: 0.02
-  status: mismatch
-  note: Mg α 0.2 vs lit 0.28 → ~0.15 dex (species max)
-- key: fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series:T=2173
-  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series
-  species: Mg
-  temperature_K: 2173.0
-  residual_dex: 0.146128035678238
-  band_dex: 0.05
-  residual: -0.08
-  band_residual: 0.02
-  status: mismatch
-  note: Mg α 0.2 vs lit 0.28 → ~0.15 dex
-- key: fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series:T=2273
-  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series
-  species: Mg
-  temperature_K: 2273.0
-  residual_dex: 0.13033376849500614
-  band_dex: 0.05
-  residual: -0.07
-  band_residual: 0.02
-  status: mismatch
-  note: Mg α 0.2 vs lit 0.27 → ~0.13 dex
-- key: fedkin_2006_table3_sio_hashimoto_langmuir:T=1973
-  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir
-  source_id: fedkin-grossman-ghiorso-2006
+- key: richter_2007_sio_cai_langmuir_alpha_arrhenius:T=1873
+  case_id: kems-010-richter-2007::richter_2007_sio_cai_langmuir_alpha_arrhenius
+  source_id: kems-010-richter-2007
   observation_type: alpha
   species: SiO
-  residual_dex: 0.17431584757931465
-  band_dex: 0.01
-  status: mismatch
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 1973.0
-- key: fedkin_2006_table3_sio_hashimoto_langmuir:T=2073
-  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir
-  source_id: fedkin-grossman-ghiorso-2006
-  observation_type: alpha
-  species: SiO
-  residual_dex: 0.2864548231913682
-  band_dex: 0.01
-  status: mismatch
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 2073.0
-- key: fedkin_2006_table3_sio_hashimoto_langmuir:T=2173
-  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir
-  source_id: fedkin-grossman-ghiorso-2006
-  observation_type: alpha
-  species: SiO
-  residual_dex: 0.32150855070082623
-  band_dex: 0.01
-  status: mismatch
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 2173.0
-- key: fedkin_2006_table3_sio_hashimoto_langmuir:T=2273
-  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir
-  source_id: fedkin-grossman-ghiorso-2006
-  observation_type: alpha
-  species: SiO
-  residual_dex: 0.31029653438705807
-  band_dex: 0.01
-  status: mismatch
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 2273.0
-- key: fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series:T=1973
-  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series
-  species: SiO
-  temperature_K: 1973.0
-  residual_dex: 0.17431584757931465
-  band_dex: 0.05
-  residual: -0.03967228772665646
-  band_residual: 0.01
-  status: mismatch
-  extrapolated: true
-  note: SiO α extrapolated engine surface; residual still pinned
-- key: fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series:T=2073
-  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series
-  species: SiO
-  temperature_K: 2073.0
-  residual_dex: 0.2864548231913682
-  band_dex: 0.05
-  residual: -0.08209894285001446
-  band_residual: 0.01
-  status: mismatch
-  extrapolated: true
-  note: SiO α extrapolated engine surface; residual still pinned
-- key: fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series:T=2173
-  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series
-  species: SiO
-  temperature_K: 2173.0
-  residual_dex: 0.32150855070082623
-  band_dex: 0.05
-  residual: -0.10460591538171005
-  band_residual: 0.01
-  status: mismatch
-  extrapolated: true
-  note: SiO α extrapolated; species max residual_dex ~0.32
-- key: fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series:T=2273
-  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series
-  species: SiO
-  temperature_K: 2273.0
-  residual_dex: 0.31029653438705807
-  band_dex: 0.05
-  residual: -0.10721665192129436
-  band_residual: 0.01
-  status: mismatch
-  extrapolated: true
-  note: SiO α extrapolated engine surface; residual still pinned
-- key: fedkin_2006_yu_k_vacuum_langmuir:T=1723.15
-  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_yu_k_vacuum_langmuir
-  source_id: fedkin-grossman-ghiorso-2006
-  observation_type: alpha
-  species: K
-  residual_dex: 0.0
-  band_dex: 0.01
-  status: match
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 1723.15
-- key: fedkin_2006_yu_na_vacuum_langmuir:T=1723.15
-  case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_yu_na_vacuum_langmuir
-  source_id: fedkin-grossman-ghiorso-2006
-  observation_type: alpha
-  species: Na
-  residual_dex: 0.585026652029182
-  band_dex: 0.01
-  status: mismatch
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 1723.15
-- key: pound_1972_cr_solid_alpha_mccabe:T=1440.5
-  case_id: kems-003-pound-1972::pound_1972_cr_solid_alpha_mccabe
-  source_id: kems-003-pound-1972
-  observation_type: alpha
-  species: Cr
-  residual_dex: 0.0
-  band_dex: 0.01
-  status: match
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 1440.5
-- key: pound_1972_fe_solid_alpha_mccabe:T=1439
-  case_id: kems-003-pound-1972::pound_1972_fe_solid_alpha_mccabe
-  source_id: kems-003-pound-1972
-  observation_type: alpha
-  species: Fe
-  residual_dex: 1.6532125137753437
-  band_dex: 0.01
-  status: mismatch
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 1439.0
-- key: pound_1972_fe_solid_alpha_wessel:T=1640
-  case_id: kems-003-pound-1972::pound_1972_fe_solid_alpha_wessel
-  source_id: kems-003-pound-1972
-  observation_type: alpha
-  species: Fe
-  residual_dex: 1.6989700043360187
-  band_dex: 0.01
-  status: mismatch
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 1640.0
-- key: richter_2002_mg_cai_langmuir_gamma:T=1723
-  case_id: kems-037-richter-2002::richter_2002_mg_cai_langmuir_gamma
-  source_id: kems-037-richter-2002
-  observation_type: alpha
-  species: Mg
-  residual_dex: 0.6989700043360189
-  band_dex: 0.01
-  status: mismatch
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 1723.0
-- key: richter_2007_mg_cai_arrhenius_langmuir:T=1873
-  case_id: richter-et-al-2007::richter_2007_mg_cai_arrhenius_langmuir
-  source_id: richter-et-al-2007
-  observation_type: alpha
-  species: Mg
-  residual_dex: 0.5202907093862962
+  residual_dex: 0.024104330930435496
   band_dex: 0.01
   status: match
   note: Expanded real-harness pin; residual is reported, not tuned.
   temperature_K: 1873.0
-- key: richter_2007_mg_cai_arrhenius_langmuir:T=2023
-  case_id: richter-et-al-2007::richter_2007_mg_cai_arrhenius_langmuir
-  source_id: richter-et-al-2007
+- key: richter_2007_sio_cai_langmuir_alpha_arrhenius:T=2023
+  case_id: kems-010-richter-2007::richter_2007_sio_cai_langmuir_alpha_arrhenius
+  source_id: kems-010-richter-2007
   observation_type: alpha
-  species: Mg
-  residual_dex: 0.27007345151278755
+  species: SiO
+  residual_dex: 0.10277813385983575
   band_dex: 0.01
   status: match
   note: Expanded real-harness pin; residual is reported, not tuned.
   temperature_K: 2023.0
-- key: richter_2007_mg_cai_arrhenius_langmuir:T=2173
-  case_id: richter-et-al-2007::richter_2007_mg_cai_arrhenius_langmuir
-  source_id: richter-et-al-2007
-  observation_type: alpha
-  species: Mg
-  residual_dex: 0.054400683911738565
-  band_dex: 0.01
-  status: match
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 2173.0
-- key: richter_2007_mg_cai_langmuir_alpha_arrhenius:T=1873
-  case_id: kems-010-richter-2007::richter_2007_mg_cai_langmuir_alpha_arrhenius
+- key: richter_2007_sio_cai_langmuir_alpha_arrhenius:T=2173
+  case_id: kems-010-richter-2007::richter_2007_sio_cai_langmuir_alpha_arrhenius
   source_id: kems-010-richter-2007
   observation_type: alpha
-  species: Mg
-  residual_dex: 0.5202907093862962
-  band_dex: 0.01
-  status: match
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 1873.0
-- key: richter_2007_mg_cai_langmuir_alpha_arrhenius:T=2023
-  case_id: kems-010-richter-2007::richter_2007_mg_cai_langmuir_alpha_arrhenius
-  source_id: kems-010-richter-2007
-  observation_type: alpha
-  species: Mg
-  residual_dex: 0.27007345151278755
-  band_dex: 0.01
-  status: match
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 2023.0
-- key: richter_2007_mg_cai_langmuir_alpha_arrhenius:T=2173
-  case_id: kems-010-richter-2007::richter_2007_mg_cai_langmuir_alpha_arrhenius
-  source_id: kems-010-richter-2007
-  observation_type: alpha
-  species: Mg
-  residual_dex: 0.054400683911738565
+  species: SiO
+  residual_dex: 0.21214346131136663
   band_dex: 0.01
   status: match
   note: Expanded real-harness pin; residual is reported, not tuned.
@@ -591,106 +833,6 @@ points:
   status: match
   note: Expanded real-harness pin; residual is reported, not tuned.
   temperature_K: 2173.0
-- key: richter_2007_sio_cai_langmuir_alpha_arrhenius:T=1873
-  case_id: kems-010-richter-2007::richter_2007_sio_cai_langmuir_alpha_arrhenius
-  source_id: kems-010-richter-2007
-  observation_type: alpha
-  species: SiO
-  residual_dex: 0.024104330930435496
-  band_dex: 0.01
-  status: match
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 1873.0
-- key: richter_2007_sio_cai_langmuir_alpha_arrhenius:T=2023
-  case_id: kems-010-richter-2007::richter_2007_sio_cai_langmuir_alpha_arrhenius
-  source_id: kems-010-richter-2007
-  observation_type: alpha
-  species: SiO
-  residual_dex: 0.10277813385983575
-  band_dex: 0.01
-  status: match
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 2023.0
-- key: richter_2007_sio_cai_langmuir_alpha_arrhenius:T=2173
-  case_id: kems-010-richter-2007::richter_2007_sio_cai_langmuir_alpha_arrhenius
-  source_id: kems-010-richter-2007
-  observation_type: alpha
-  species: SiO
-  residual_dex: 0.21214346131136663
-  band_dex: 0.01
-  status: match
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 2173.0
-- key: schaefer_fegley_2004_mg_forsterite_alpha_s_survey:T=2243
-  case_id: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_mg_forsterite_alpha_s_survey
-  source_id: kems-008-schaefer-fegley-2004
-  observation_type: alpha
-  species: Mg
-  residual_dex: 0.0
-  band_dex: 0.01
-  status: match
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 2243.0
-- key: schaefer_fegley_2004_sio_alpha_s_survey:T=2273:point=0
-  case_id: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_sio_alpha_s_survey
-  source_id: kems-008-schaefer-fegley-2004
-  observation_type: alpha
-  species: SiO
-  residual_dex: 0.40986276901889873
-  band_dex: 0.01
-  status: match
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 2273.0
-- key: schaefer_fegley_2004_sio_alpha_s_survey:T=2273:point=1
-  case_id: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_sio_alpha_s_survey
-  source_id: kems-008-schaefer-fegley-2004
-  observation_type: alpha
-  species: SiO
-  residual_dex: 0.28910723531712
-  band_dex: 0.01
-  status: mismatch
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 2273.0
-- key: sossi_2019_k_open_furnace_alpha_e_context:T=1698.15
-  case_id: kems-012-sossi-2019::sossi_2019_k_open_furnace_alpha_e_context
-  source_id: kems-012-sossi-2019
-  observation_type: alpha
-  species: K
-  residual_dex: 0.8860566476931632
-  band_dex: 0.01
-  status: mismatch
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 1698.15
-- key: sossi_2019_na_alpha_e_authors_adopted_unity:T=1698.15
-  case_id: kems-012-sossi-2019::sossi_2019_na_alpha_e_authors_adopted_unity
-  source_id: kems-012-sossi-2019
-  observation_type: alpha
-  species: Na
-  residual_dex: 0.0
-  band_dex: 0.01
-  status: match
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 1698.15
-- key: sossi_2019_na_alpha_e_gamma_derived_range:T=1673.15
-  case_id: kems-012-sossi-2019::sossi_2019_na_alpha_e_gamma_derived_range
-  source_id: kems-012-sossi-2019
-  observation_type: alpha
-  species: Na
-  residual_dex: 0.0
-  band_dex: 0.01
-  status: match
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 1673.15
-- key: sossi_2019_na_open_furnace_apparent:T=1698.15
-  case_id: sossi-et-al-2019::sossi_2019_na_open_furnace_apparent
-  source_id: sossi-et-al-2019
-  observation_type: alpha
-  species: Na
-  residual_dex: 0.0
-  band_dex: 0.01
-  status: match
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 1698.15
 - key: wetzel_gail_2013_sio_arrhenius:T=1000
   case_id: wetzel-gail-2013-sio-arrhenius::wetzel_gail_2013_sio_arrhenius
   source_id: wetzel-gail-2013-sio-arrhenius
@@ -721,69 +863,3 @@ points:
   status: match
   note: Expanded real-harness pin; residual is reported, not tuned.
   temperature_K: 1800.0
-- key: wetzel_gail_2013_sio_growth_alpha_arrhenius:T=1000
-  case_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_sio_growth_alpha_arrhenius
-  source_id: kems-011-wetzel-gail-2013
-  observation_type: alpha
-  species: SiO
-  residual_dex: 0.0
-  band_dex: 0.01
-  status: match
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 1000.0
-- key: wetzel_gail_2013_sio_growth_alpha_arrhenius:T=1400
-  case_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_sio_growth_alpha_arrhenius
-  source_id: kems-011-wetzel-gail-2013
-  observation_type: alpha
-  species: SiO
-  residual_dex: 0.0
-  band_dex: 0.01
-  status: match
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 1400.0
-- key: wetzel_gail_2013_sio_growth_alpha_arrhenius:T=1800
-  case_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_sio_growth_alpha_arrhenius
-  source_id: kems-011-wetzel-gail-2013
-  observation_type: alpha
-  species: SiO
-  residual_dex: 0.0
-  band_dex: 0.01
-  status: match
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 1800.0
-# 2026-08-08 t-544 Langmuir-corpus pins (fbd08a3 added kems-001/002 without
-# baselines; caught by the t-538 landing differential). Residuals reported,
-# not tuned — Olette-alpha rows (relative volatility vs Fe(l), NOT HKL alpha
-# in 0..1); the large Mn residuals are the first Mn ground-truth rows on the
-# battery and are honest current-state (multi-valence Mn speciation is
-# unmodeled, t-543).
-- key: ohno_1967_cr_olette_alpha_table3:T=1873.15
-  case_id: kems-002-ohno-1967::ohno_1967_cr_olette_alpha_table3
-  source_id: kems-002-ohno-1967
-  observation_type: alpha
-  species: Cr
-  residual_dex: 0.4607308385314931
-  band_dex: 0.01
-  status: match
-  note: Olette-alpha row; reported, not tuned (t-544 pilot ingest).
-  temperature_K: 1873.15
-- key: homma_1966_mn_olette_alpha_exp_table1:T=1873.15
-  case_id: kems-001-homma-1966::homma_1966_mn_olette_alpha_exp_table1
-  source_id: kems-001-homma-1966
-  observation_type: alpha
-  species: Mn
-  residual_dex: 2.060697840353612
-  band_dex: 0.01
-  status: mismatch
-  note: First Mn battery row; honest current-state residual (t-543 target).
-  temperature_K: 1873.15
-- key: ohno_1967_mn_olette_alpha_table3:T=1873.15
-  case_id: kems-002-ohno-1967::ohno_1967_mn_olette_alpha_table3
-  source_id: kems-002-ohno-1967
-  observation_type: alpha
-  species: Mn
-  residual_dex: 2.0827853703164503
-  band_dex: 0.01
-  status: mismatch
-  note: First Mn battery row; honest current-state residual (t-543 target).
-  temperature_K: 1873.15

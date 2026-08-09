@@ -1,0 +1,33 @@
+# Distilled pin evidence — Fe mass_spec residual retighten (si-comparability)
+schema_version: 1
+kind: vapour_rail_pin_evidence
+source_id: si-comparability
+date: "2026-08-08"
+species: Fe
+validation: mass_spec
+pinned_residual_dex: 1.0969100130080565
+prior_pinned_residual_dex: 1.6989700043360187
+residual_change: tightens
+metric: max_absolute_residual_dex
+comparison_basis: >-
+  Extract-store reproduction battery residual (max absolute residual dex)
+  against class-comparable silicate-melt / solid-solution-silicate Fe α
+  observations only.
+method: >-
+  System-class comparability gate on the α path. Pure-element condensed
+  solid-Fe rows (Pound McCabe / Wessel / B1 class fence) are typed
+  not_comparable_system_class exclusions — they measure congruent metal
+  evaporation, not silicate-melt Fe α (rail Fe α=0.02). Residual tightens
+  to the silicate/olivine set max (Hashimoto/Fedkin ~1.097 dex).
+conditions:
+  observation_class: silicate_melt + solid_solution_silicate Fe α
+  excluded_class: pure_element_condensed (solid Fe metal)
+checkable_claims:
+  - residual tightened 1.699 → 1.097 dex after pure-element exclusion
+  - Pound solid-Fe rows remain in the store with typed skip reason
+  - no Fe Pref / γ retune to improve this pin
+runtime_changes:
+  - simulator/diagnostic_helpers/extract_reproduction.py rail_system_class_comparability
+publishable_companion_refs:
+  - tests/chemistry/extract_store_reproduction_residual_baselines.yaml
+  - docs/model-limitations.md#extract-store-reproduction-battery

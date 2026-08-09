@@ -8,6 +8,7 @@ residuals without mistaking internal self-consistency for validation.
 from __future__ import annotations
 
 from copy import deepcopy
+from functools import lru_cache
 import hashlib
 import json
 import math
@@ -86,6 +87,46 @@ def _yaml(path: Path) -> dict[str, Any]:
     payload = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
     assert isinstance(payload, dict), f"{path}: expected a YAML mapping"
     return payload
+
+
+@lru_cache(maxsize=1)
+def _git_tracked_files() -> frozenset[str]:
+    """Repo-relative paths present in the git index (tracked or staged).
+
+    Fresh-clone-green for promotion evidence requires every primary
+    ``evidence_refs`` path to survive ``git clone`` — presence on this
+    laptop is not enough (docs-private/ is gitignored and machine-local).
+    """
+    proc = subprocess.run(
+        ["git", "-C", str(ROOT), "ls-files", "-z"],
+        check=True,
+        capture_output=True,
+    )
+    return frozenset(
+        path for path in proc.stdout.decode("utf-8").split("\0") if path
+    )
+
+
+def _assert_evidence_ref_present_and_tracked(ref: str, *, context: str) -> None:
+    """Primary evidence must exist on disk AND be git-tracked.
+
+    URL / DOI refs are external identifiers and are accepted without a local
+    file. Fragment anchors (``path#section``) resolve against the path only.
+    Optional ``internal_notes_refs`` are not checked here — they may point at
+    machine-local private narratives.
+    """
+    assert isinstance(ref, str) and ref.strip(), f"{context}: empty evidence ref"
+    if "://" in ref or ref.startswith("doi:"):
+        return
+    rel = Path(ref.split("#", 1)[0]).as_posix()
+    evidence_path = ROOT / rel
+    assert evidence_path.is_file(), f"{context}: missing evidence {ref}"
+    assert rel in _git_tracked_files(), (
+        f"{context}: evidence {ref!r} exists on disk but is not git-tracked "
+        f"(fresh clone would be RED). Distil a publishable artifact under a "
+        f"tracked root (e.g. validation-data/pin-evidence/); do not point "
+        f"evidence_refs at docs-private/ or other untracked paths."
+    )
 
 
 MANIFEST = _yaml(MANIFEST_PATH)
@@ -693,11 +734,9 @@ def test_validation_tiers_and_promotions_have_external_evidence() -> None:
     oracle_refs = oracle.get("evidence_refs")
     assert isinstance(oracle_refs, list) and oracle_refs
     for ref in oracle_refs:
-        assert isinstance(ref, str) and ref.strip()
-        if "://" in ref or ref.startswith("doi:"):
-            continue
-        evidence_path = ROOT / ref.split("#", 1)[0]
-        assert evidence_path.is_file(), f"SiO oracle: missing evidence {ref}"
+        _assert_evidence_ref_present_and_tracked(
+            ref, context="SiO oracle"
+        )
     for species_id, row in sorted(PINS["species"].items()):
         tier = row["tier"]
         target = row["target_tier"]
@@ -736,12 +775,16 @@ def test_validation_tiers_and_promotions_have_external_evidence() -> None:
                 isinstance(ref, str) and ref.strip() for ref in refs
             ), f"{species_id}:{validation_name}: promotion evidence refs required"
             for ref in refs:
-                if "://" in ref or ref.startswith("doi:"):
-                    continue
-                evidence_path = ROOT / ref.split("#", 1)[0]
-                assert evidence_path.is_file(), (
-                    f"{species_id}:{validation_name}: missing evidence {ref}"
+                _assert_evidence_ref_present_and_tracked(
+                    ref, context=f"{species_id}:{validation_name}"
                 )
+            # Supplementary private notes are optional and unguarded: they must
+            # never be the sole promotion evidence (that is what evidence_refs is for).
+            notes = validation.get("internal_notes_refs")
+            if notes is not None:
+                assert isinstance(notes, list) and all(
+                    isinstance(n, str) and n.strip() for n in notes
+                ), f"{species_id}:{validation_name}: internal_notes_refs must be a string list"
 
 
 @pytest.mark.parametrize("element,carrier", STRUCTURAL_PAIRS)

@@ -1,0 +1,47 @@
+# Distilled pin evidence — Mg vaporock residual (b-147 option B)
+# Public checkable record. Full thermo narrative remains private.
+schema_version: 1
+kind: vapour_rail_pin_evidence
+source_id: b147-mgfix
+date: "2026-08-07"
+species: Mg
+validation: vaporock
+pinned_residual_dex: 0.14423087563301895
+prior_pinned_residual_dex: 0.48445
+residual_change: tightens
+metric: max_absolute_residual_dex
+comparison_basis: >-
+  Peer residual vs VapoRock on the enghar-matched (T, fO2) grid;
+  monatomic Mg species max |Δ log10 P_rail − log10 P_VR|.
+method: >-
+  Same defect class as Ca MC-5: demote TE MELTS gas_rail_standard_reaction
+  (Pref_GR) to dormant_non_authoritative; high-T Builtin uses JANAF
+  gas_fugacity Pref_GF. Catalog Antoine retargeted to Pref_GF exact C=0 fit
+  of the 1366–2000 K Ellingham gas-metal segment. Demotion is internal
+  correctness (Pref_GR inconsistent with Pref_GF and JANAF solid assembly);
+  residual after demotion tightens.
+conditions:
+  grid: enghar-matched multi-cell (T × fO2)
+  n_cells_species: 42
+  gas_rail_domain_K: [1366.0, 2273.15]
+  worst_cell_after: low-T pure-component band (rail high vs peer)
+  high_T_pref_shift_dex: "+0.54 to +0.59 (P UP)"
+pref_gap_probe:
+  reaction: "MgO → Mg(g) + ½ O2"
+  unit_activity_pO2_bar: 1.0
+  pref_GR_minus_pref_GF_dex:
+    "1366_K": -0.530
+    "1800_K": -0.544
+    "1950_K": -0.589
+  janaf_solid_lands_on: Pref_GF
+checkable_claims:
+  - residual tightened 0.484 → 0.144 dex (high-T monatomic residual closed)
+  - element max |Δ| 0.484 → 0.186
+  - other enghar elements unmoved to printed precision
+  - no other authoritative TE gas_rail blocks remain after this demotion
+runtime_changes:
+  - data/vapor_pressures.yaml Mg gas_rail_standard_reaction dormant_non_authoritative
+  - data/vapor_pressures.yaml Mg pressure_models Pref_GF Antoine retarget
+publishable_companion_refs:
+  - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+  - validation-data/pin-evidence/ca_vaporock_pref_gf_2026-08-07.yaml

@@ -1,0 +1,34 @@
+# Distilled pin evidence — Mn mass_spec residual (history + withdrawal)
+schema_version: 1
+kind: vapour_rail_pin_evidence
+source_id: si-comparability
+date: "2026-08-08"
+species: Mn
+validation: mass_spec
+status: withdrawn
+pinned_residual_dex: null
+prior_pinned_residual_dex: 2.0827853703164503
+residual_change: withdrawn_not_comparable
+metric: max_absolute_residual_dex
+comparison_basis: >-
+  Historical: extract-store residual against Homma/Ohno molten-metal olette α
+  rows. Withdrawal: those rows are molten_metal / congruent_no_transformation
+  and are not class-comparable to the silicate-melt rail carrier.
+method: >-
+  2026-08-08 si-comparability: system-class gate excludes molten_metal α from
+  the comparable residual set (typed-refusal:not_comparable_system_class:molten_metal).
+  Mn therefore has no class-comparable residual and the mass_spec pin is
+  withdrawn. Extract rows remain visible as evidence with the typed skip.
+conditions:
+  observation_class: molten_metal Fe-Mn steel-melt olette α (excluded)
+  carrier_class: silicate_melt production rail
+checkable_claims:
+  - mass_spec pin removed because no class-comparable residual remains
+  - Homma/Ohno extract rows remain with typed skip reason
+  - no Mn Pref / γ retune; class exclusion only
+runtime_changes:
+  - simulator/diagnostic_helpers/extract_reproduction.py rail_system_class_comparability
+publishable_companion_refs:
+  - docs/model-limitations.md#extract-store-reproduction-battery
+  - data/literature/extracts/kems-001-homma-1966.yaml
+  - data/literature/extracts/kems-002-ohno-1967.yaml
