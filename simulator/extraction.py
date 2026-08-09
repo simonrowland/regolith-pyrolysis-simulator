@@ -3465,8 +3465,80 @@ class ExtractionMixin:
         )
         antoine = dict(ca_entry.get('pure_component_antoine') or {})
         alpha_entry = dict(ca_entry.get('evaporation_alpha') or {})
-        ca_alpha = self._c7_float(alpha_entry.get('value'), 0.0)
+        _alpha_raw = alpha_entry.get('value')
+        ca_alpha = self._c7_float(_alpha_raw, 0.0)
         p_sat_pa = 0.0
+        # b-149 instance 6 (C7 Ca): missing evaporation_alpha / Antoine
+        # previously became ca_alpha=0 / p_sat=0 via _c7_float default and
+        # exception fall-through — silent zero flux. Keep the zeros; emit
+        # typed notes so the missing-coefficient class is visible.
+        from simulator.silent_zero import (
+            CATEGORY_REFUSE,
+            ZeroBecause,
+            note_dict,
+            record_on_host,
+        )
+
+        _c7_sz_notes: list = []
+        if _alpha_raw is None:
+            _n = note_dict(
+                ZeroBecause.MISSING_COEFFICIENT,
+                site='extraction.c7_ca',
+                species='Ca',
+                field='evaporation_alpha',
+                detail=(
+                    'evaporation_alpha.value absent; ca_alpha defaulted to '
+                    f'{ca_alpha!r} via _c7_float. Category-1 missing coefficient.'
+                ),
+                doctrine_category=CATEGORY_REFUSE,
+            )
+            _c7_sz_notes.append(_n)
+            record_on_host(
+                self,
+                ZeroBecause.MISSING_COEFFICIENT,
+                site='extraction.c7_ca',
+                species='Ca',
+                field='evaporation_alpha',
+                detail=_n['detail'],
+                doctrine_category=CATEGORY_REFUSE,
+            )
+        else:
+            _alpha_unparseable = False
+            _alpha_nonfinite = False
+            try:
+                _alpha_nonfinite = not math.isfinite(float(_alpha_raw))
+            except (TypeError, ValueError):
+                _alpha_unparseable = True
+            if _alpha_unparseable or _alpha_nonfinite:
+                # _c7_float coerces unparseable AND non-finite values to the
+                # 0.0 default; the float() probe alone misses the non-finite
+                # case, so both failure modes are named here.
+                _n = note_dict(
+                    ZeroBecause.UNPARSEABLE_SPEC,
+                    site='extraction.c7_ca',
+                    species='Ca',
+                    field='evaporation_alpha',
+                    detail=(
+                        f'evaporation_alpha.value={_alpha_raw!r} '
+                        + (
+                            'non-finite'
+                            if _alpha_nonfinite
+                            else 'unparseable'
+                        )
+                        + f'; ca_alpha defaulted to {ca_alpha!r}. Category-1.'
+                    ),
+                    doctrine_category=CATEGORY_REFUSE,
+                )
+                _c7_sz_notes.append(_n)
+                record_on_host(
+                    self,
+                    ZeroBecause.UNPARSEABLE_SPEC,
+                    site='extraction.c7_ca',
+                    species='Ca',
+                    field='evaporation_alpha',
+                    detail=_n['detail'],
+                    doctrine_category=CATEGORY_REFUSE,
+                )
         if antoine:
             try:
                 p_sat_pa = 10.0 ** (
@@ -3476,6 +3548,58 @@ class ExtractionMixin:
                 )
             except (OverflowError, TypeError, ValueError, ZeroDivisionError):
                 p_sat_pa = 0.0
+                _n = note_dict(
+                    ZeroBecause.MISSING_THERMO,
+                    site='extraction.c7_ca',
+                    species='Ca',
+                    field='pure_component_antoine',
+                    detail=(
+                        'Antoine evaluation raised; p_sat_pa forced to 0.0 '
+                        f'(antoine={antoine!r}). Category-1 missing thermo.'
+                    ),
+                    doctrine_category=CATEGORY_REFUSE,
+                )
+                _c7_sz_notes.append(_n)
+                record_on_host(
+                    self,
+                    ZeroBecause.MISSING_THERMO,
+                    site='extraction.c7_ca',
+                    species='Ca',
+                    field='pure_component_antoine',
+                    detail=_n['detail'],
+                    doctrine_category=CATEGORY_REFUSE,
+                )
+        else:
+            _n = note_dict(
+                ZeroBecause.MISSING_THERMO,
+                site='extraction.c7_ca',
+                species='Ca',
+                field='pure_component_antoine',
+                detail=(
+                    'pure_component_antoine missing for Ca; p_sat_pa=0.0. '
+                    'Category-1 missing thermo.'
+                ),
+                doctrine_category=CATEGORY_REFUSE,
+            )
+            _c7_sz_notes.append(_n)
+            record_on_host(
+                self,
+                ZeroBecause.MISSING_THERMO,
+                site='extraction.c7_ca',
+                species='Ca',
+                field='pure_component_antoine',
+                detail=_n['detail'],
+                doctrine_category=CATEGORY_REFUSE,
+            )
+        # SC-50: per-call replace keeps this bounded (``_last_`` semantics,
+        # matching the other ``_last_*`` diagnostics); the named read surface
+        # is the returned diagnostic below, which the caller folds into
+        # ``_last_c7_diagnostic`` (consumed by C7 reports/tests). The per-hour
+        # host list (record_on_host above) retains the accumulate-everything
+        # history.
+        self._last_c7_ca_silent_zero_notes = {
+            'silent_zero_notes': [dict(n) for n in _c7_sz_notes],
+        }
         p_bulk_pa = max(0.0, self._evaporation_bulk_partial_pressure_pa('Ca'))
         overhead_pressure_pa = max(0.0, p_total_mbar * 100.0)
         series_config = dict(
@@ -3651,6 +3775,10 @@ class ExtractionMixin:
             'c7_transport_refusal': transport_refusal,
             'c7_knob_saturation': saturation,
         }
+        if _c7_sz_notes:
+            # SC-50 read surface: flows into _last_c7_diagnostic via the
+            # caller's transport_diag splice.
+            diagnostic['silent_zero_notes'] = [dict(n) for n in _c7_sz_notes]
         if domain_diag is not None:
             # Provider-parity validity framing on the C7 ledger path.
             diagnostic.update(

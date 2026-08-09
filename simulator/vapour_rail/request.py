@@ -941,7 +941,13 @@ def refusal_closure(
         source_label = "catalog"
         pressure_pa = None
         source_reaction_activity: SourceReactionActivity | None = None
+        # b-149 instance 7: source_activity defaulted to 1.0 before the
+        # activity-dependent branch (REAL under b-119). Pure-component
+        # (exponent==0) legitimately uses a=1; activity-dependent paths
+        # must resolve or refuse. Instrument the pure-component default so
+        # the unit activity is typed, not silent.
         source_activity = 1.0
+        _unit_activity_note: dict[str, Any] | None = None
         if (
             compiled is not None
             and compiled.evaluator is not None
@@ -1029,6 +1035,28 @@ def refusal_closure(
                         source_reaction_activity=source_reaction_activity,
                     )
                 source_activity = numeric_activity
+            else:
+                # Pure-component / activity-independent evaluator: a=1 is
+                # the correct dimensionless unit activity, but it was
+                # previously indistinguishable from a forgotten default.
+                from simulator.silent_zero import (
+                    CATEGORY_PROVEN_ZERO,
+                    ZeroBecause,
+                    note_dict,
+                )
+
+                _unit_activity_note = note_dict(
+                    ZeroBecause.IMPLICIT_UNIT_ACTIVITY,
+                    site='vapour_rail.request._make_live',
+                    species=str(rule.species_id),
+                    field='source_activity',
+                    detail=(
+                        'source_activity=1.0 pure-component default '
+                        f'(activity_exponent={evaluator_activity_exponent}); '
+                        'typed as proven unit activity, not missing input'
+                    ),
+                    doctrine_category=CATEGORY_PROVEN_ZERO,
+                )
             try:
                 # Pass every evaluator domain input present on the resolve
                 # state (fO2 → pO2_bar). The evaluator refuses omitted
@@ -1095,6 +1123,12 @@ def refusal_closure(
                     ),
                     "status": getattr(evaluation, "status", None),
                 }
+                if _unit_activity_note is not None:
+                    from simulator.silent_zero import merge_notes_into_mapping
+
+                    merge_notes_into_mapping(
+                        evaluation_extra, [_unit_activity_note]
+                    )
             except Exception as exc:  # noqa: BLE001 — typed as contract miss
                 return _make_refusal(
                     rule,
@@ -1178,6 +1212,12 @@ def refusal_closure(
             verdict = VERDICT_STATUS_BEARING_NON_AUTHORITATIVE
 
         extra_payload: dict[str, Any] = {"origin": rule.origin}
+        if _unit_activity_note is not None:
+            from simulator.silent_zero import merge_notes_into_mapping
+
+            merge_notes_into_mapping(extra_payload, [_unit_activity_note])
+            extra_payload["source_activity"] = float(source_activity)
+            extra_payload["source_activity_origin"] = "pure_component_unit"
         if alpha_authority_status == "analytical_upper_bound":
             extra_payload["alpha_authority_status"] = alpha_authority_status
             # Inventory evolution is intentionally enabled by the owner's

@@ -918,6 +918,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_vapor_pressure_diagnostic: Dict[str, Any] = {}
         self._last_evaporation_flux_diagnostic: Dict[str, Any] = {}
         self._last_partial_melt_offgassing_diagnostic: Dict[str, Any] = {}
+        # b-149 silent-zero class: typed zero_because notes (diagnostic only).
+        self._silent_zero_notes: list = []
         # VR-11 instrumentation: exact-key batch + flux overlay report.
         self._last_vapour_batch: Any = None
         self._last_vapour_batch_report: Dict[str, Any] | None = None
@@ -4169,6 +4171,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             }
             for path, summary in self._degraded_path_engagement.items()
         }
+
+    def _silent_zero_diagnostic_payload(self) -> Dict[str, Any]:
+        """b-149: typed silent-zero notes for this hour (diagnostic only)."""
+
+        from simulator.silent_zero import silent_zero_diagnostic
+
+        return silent_zero_diagnostic(self)
 
     @staticmethod
     def _melt_redox_gate_authority_provenance(
@@ -8787,6 +8796,37 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 diagnostic[
                     'vapor_pressure_zero_reason'
                 ] = 'kernel_ok_empty'
+                # b-149 instance 2: kernel status=ok with empty pressures is
+                # accepted as an authoritative zero. Instrument (do not refuse)
+                # so the silent-zero class is visible on the diagnostic surface.
+                from simulator.silent_zero import (
+                    CATEGORY_PROVEN_ZERO,
+                    ZeroBecause,
+                    merge_notes_into_mapping,
+                    note_dict,
+                    record_on_host,
+                )
+
+                _sz_note = note_dict(
+                    ZeroBecause.KERNEL_OK_EMPTY,
+                    site='core.kernel_ok_empty',
+                    field='vapor_pressures_Pa',
+                    detail=(
+                        'kernel_status=ok with empty pressures accepted as '
+                        'authoritative zero (kernel_ok_empty); indistinguishable '
+                        'from a computed empty without this typed note'
+                    ),
+                    doctrine_category=CATEGORY_PROVEN_ZERO,
+                )
+                merge_notes_into_mapping(diagnostic, [_sz_note])
+                record_on_host(
+                    self,
+                    ZeroBecause.KERNEL_OK_EMPTY,
+                    site='core.kernel_ok_empty',
+                    field='vapor_pressures_Pa',
+                    detail=_sz_note['detail'],
+                    doctrine_category=CATEGORY_PROVEN_ZERO,
+                )
             else:
                 if not self._allow_fallback_vapor:
                     # Codex challenge pre-0.5.1 P2 (2026-05-27): keep the
@@ -12247,6 +12287,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_native_fe_saturation_event = {}
         self._native_fe_vapor_residual_capacity_mol_this_hr = None
         self._last_partial_melt_offgassing_diagnostic = {}
+        self._silent_zero_notes = []
         self._last_extraction_completeness_diagnostic = {}
         self._last_overlap_evaporation_diagnostic = {}
         self._last_metal_phase_stratification_diagnostic = {}
@@ -13356,6 +13397,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # latest condensation pass. Empty dict on ticks that
             # didn't trigger a condensation route.
             knudsen_regime_summary=self._latest_knudsen_summary(),
+            # b-149 silent-zero class (diagnostic only).
+            silent_zero_diagnostic=self._silent_zero_diagnostic_payload(),
         )
         if error_category:
             setattr(snapshot, 'mass_balance_error_category', error_category)

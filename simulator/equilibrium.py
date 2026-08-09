@@ -280,6 +280,83 @@ class EquilibriumMixin:
         ellingham_extrapolations = {}
         vapor_pressure_authority_limits = {}
         warnings = []
+        # b-149 instance 3: typed notes for omitted species / below-threshold
+        # zeros. status remains 'ok'; absence is no longer silent.
+        from simulator.silent_zero import (
+            CATEGORY_PROVEN_ZERO,
+            CATEGORY_REFUSE,
+            ZeroBecause,
+            append_note,
+            merge_notes_into_mapping,
+            record_on_host,
+        )
+
+        silent_zero_notes: list = []
+
+        def _sz_omit(
+            species_id: str,
+            because: ZeroBecause,
+            *,
+            field: str,
+            detail: str,
+            category: int,
+        ) -> None:
+            append_note(
+                silent_zero_notes,
+                because,
+                site='equilibrium.internal_analytical',
+                species=str(species_id),
+                field=field,
+                detail=detail,
+                doctrine_category=category,
+            )
+            record_on_host(
+                self,
+                because,
+                site='equilibrium.internal_analytical',
+                species=str(species_id),
+                field=field,
+                detail=detail,
+                doctrine_category=category,
+            )
+
+        def _sz_activity_skip(species_id: str, oxide_activity_obj) -> None:
+            if oxide_activity_obj is None:
+                _sz_omit(
+                    species_id,
+                    ZeroBecause.MISSING_ACTIVITY,
+                    field='oxide_activity',
+                    detail=(
+                        'melt_oxide_activity returned None; species omitted '
+                        'from vapor_pressures while status stays ok'
+                    ),
+                    category=CATEGORY_REFUSE,
+                )
+            else:
+                _sz_omit(
+                    species_id,
+                    ZeroBecause.PROVEN_BELOW_THRESHOLD,
+                    field='oxide_activity',
+                    detail=(
+                        'oxide activity <= 1e-10; species omitted as near-zero '
+                        'activity (proven-small, not missing coefficient)'
+                    ),
+                    category=CATEGORY_PROVEN_ZERO,
+                )
+
+        def _sz_below_threshold(species_id: str, p_pa: float, field: str) -> None:
+            _sz_omit(
+                species_id,
+                ZeroBecause.PROVEN_BELOW_THRESHOLD,
+                field=field,
+                detail=(
+                    f'{field}={p_pa!r} <= 1e-15 Pa; key omitted from '
+                    f'vapor_pressures_Pa while status=ok (distinguishable '
+                    f'proven-small zero)'
+                ),
+                category=CATEGORY_PROVEN_ZERO,
+            )
+
         pseudo_warning_seen = getattr(
             self,
             '_pseudo_vapor_pressure_warning_seen',
@@ -529,6 +606,7 @@ class EquilibriumMixin:
                     temperature_K=T_K,
                 )
                 if oxide_activity is None or oxide_activity.activity <= 1e-10:
+                    _sz_activity_skip(species, oxide_activity)
                     continue
                 if oxide_activity.warning:
                     warnings.append(oxide_activity.warning)
@@ -578,6 +656,8 @@ class EquilibriumMixin:
                             'extrapolated_beyond_valid_range_K'
                         )
                     vapor_pressure_sources[species] = source_label
+                else:
+                    _sz_below_threshold(species, P_effective_Pa, 'P_effective_Pa')
                 continue
 
             # Al/Ti/Cr/Mn: liquid-oxide standard reaction (pairing fix).
@@ -616,6 +696,7 @@ class EquilibriumMixin:
                     temperature_K=T_K,
                 )
                 if oxide_activity is None or oxide_activity.activity <= 1e-10:
+                    _sz_activity_skip(species, oxide_activity)
                     continue
                 if oxide_activity.warning:
                     warnings.append(oxide_activity.warning)
@@ -654,6 +735,8 @@ class EquilibriumMixin:
                             f"{source_label}:extrapolated_beyond_valid_range_K"
                         )
                     vapor_pressure_sources[species] = source_label
+                else:
+                    _sz_below_threshold(species, P_effective_Pa, 'P_effective_Pa')
                 continue
 
             # Ca/Mg gas rail: liquid-oxide standard reaction (pairing fix).
@@ -672,6 +755,7 @@ class EquilibriumMixin:
                     temperature_K=T_K,
                 )
                 if oxide_activity is None or oxide_activity.activity <= 1e-10:
+                    _sz_activity_skip(species, oxide_activity)
                     continue
                 if oxide_activity.warning:
                     warnings.append(oxide_activity.warning)
@@ -761,6 +845,8 @@ class EquilibriumMixin:
                             f"{source_label}:extrapolated_beyond_valid_range_K"
                         )
                     vapor_pressure_sources[species] = source_label
+                else:
+                    _sz_below_threshold(species, P_effective_Pa, 'P_effective_Pa')
                 continue
 
             # --- Oxide activity ---                              [ELLI-5]
@@ -784,6 +870,7 @@ class EquilibriumMixin:
                     temperature_K=T_K,
                 )
                 if oxide_activity is None:
+                    _sz_activity_skip(species, oxide_activity)
                     continue
                 if oxide_activity.warning:
                     warnings.append(oxide_activity.warning)
@@ -797,6 +884,27 @@ class EquilibriumMixin:
                 oxide_activity is not None
                 and oxide_activity.activity <= 1e-10
             ):
+                if oxide_activity is None:
+                    # FeO path: oxide_activity stays None by construction
+                    # above, but a_oxide IS the computed authoritative FeO
+                    # activity (kress_calphad_ferrous_feo, clamped >= 0).
+                    # Below-threshold here is proven-small evidence (cat-3),
+                    # not a missing activity model (cat-1) — tagging it
+                    # missing_activity would launder a proven zero into a
+                    # missing-input story.
+                    _sz_omit(
+                        species,
+                        ZeroBecause.PROVEN_BELOW_THRESHOLD,
+                        field='a_FeO_authoritative',
+                        detail=(
+                            f'a_FeO_authoritative={a_oxide!r} <= 1e-10; '
+                            'species omitted as proven-small FeO activity '
+                            '(computed authoritative value, not missing input)'
+                        ),
+                        category=CATEGORY_PROVEN_ZERO,
+                    )
+                else:
+                    _sz_activity_skip(species, oxide_activity)
                 continue
 
             ellingham_extrapolation = ellingham_authority_limit(
@@ -953,6 +1061,8 @@ class EquilibriumMixin:
                         stacklevel=3,
                     )
 
+            else:
+                _sz_below_threshold(species, P_effective_Pa, 'P_effective_Pa')
         # ================================================================
         # OXIDE VAPOR SPECIES (SiO, CrO2)                        [THERMO-8]
         # ================================================================
@@ -994,6 +1104,7 @@ class EquilibriumMixin:
                     temperature_K=T_K,
                 )
                 if oxide_activity is None or oxide_activity.activity <= 1e-10:
+                    _sz_activity_skip(name, oxide_activity)
                     continue
                 if oxide_activity.warning:
                     warnings.append(oxide_activity.warning)
@@ -1061,6 +1172,31 @@ class EquilibriumMixin:
                     stacklevel=3,
                 )
 
+            else:
+                _sz_below_threshold(name, P_sat, 'P_sat')
+        _eq_diagnostics = {
+            'activities_provider': 'internal_analytical_equilibrium',
+            'activities_standard_state': {
+                'convention': 'raoultian_pure_endmember',
+                'phase': 'liquid',
+                'reference_pressure_bar': 1.0,
+                'reference_temperature_K': None,
+                'component_basis': 'raoultian_pure_endmember',
+            },
+            'activity_provenance': activity_provenance,
+            'a_FeO_calphad': feo_activity_diagnostic,
+            'ellingham_authority': ellingham_authority_diagnostic(
+                ellingham_extrapolations,
+                consumer='legacy-equilibrium-fallback',
+            ),
+            'vapor_pressure_authority': vapor_pressure_authority_diagnostic(
+                vapor_pressure_authority_limits,
+                consumer='legacy-equilibrium-fallback',
+            ),
+        }
+        # b-149: surface typed omit/zero causes; status stays 'ok' (no refusal).
+        if silent_zero_notes:
+            merge_notes_into_mapping(_eq_diagnostics, silent_zero_notes)
         return EquilibriumResult(
             temperature_C=self.melt.temperature_C,
             pressure_bar=self.melt.p_total_mbar / 1000.0,
@@ -1078,24 +1214,5 @@ class EquilibriumMixin:
             fO2_log=intrinsic_fO2_log,
             warnings=warnings,
             status='ok',
-            diagnostics={
-                'activities_provider': 'internal_analytical_equilibrium',
-                'activities_standard_state': {
-                    'convention': 'raoultian_pure_endmember',
-                    'phase': 'liquid',
-                    'reference_pressure_bar': 1.0,
-                    'reference_temperature_K': None,
-                    'component_basis': 'raoultian_pure_endmember',
-                },
-                'activity_provenance': activity_provenance,
-                'a_FeO_calphad': feo_activity_diagnostic,
-                'ellingham_authority': ellingham_authority_diagnostic(
-                    ellingham_extrapolations,
-                    consumer='legacy-equilibrium-fallback',
-                ),
-                'vapor_pressure_authority': vapor_pressure_authority_diagnostic(
-                    vapor_pressure_authority_limits,
-                    consumer='legacy-equilibrium-fallback',
-                ),
-            },
+            diagnostics=_eq_diagnostics,
         )

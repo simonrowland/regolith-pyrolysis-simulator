@@ -617,11 +617,51 @@ class EvaporationMixin:
             # Request membership is inventory-only. An empty exact-key request
             # proves no positive eligible parent inventory; failed/absent
             # pressure coverage cannot produce this physical-zero branch.
-            self._last_evaporation_flux_diagnostic = {
+            #
+            # b-149 instance 1: VapourRailCatalog.build_request is the sole
+            # request constructor and it admits a species iff some parent in
+            # the rule's account has positive mols — monatomic-carrier
+            # presence plays no role in membership. An empty exact-key
+            # request therefore unambiguously proves no positive eligible
+            # parent inventory (category-3 proven empty; no residual
+            # monatomic-missing ambiguity at this terminus).
+            from simulator.silent_zero import (
+                CATEGORY_PROVEN_ZERO,
+                ZeroBecause,
+                merge_notes_into_mapping,
+                note_dict,
+                record_on_host,
+            )
+
+            _sz = note_dict(
+                ZeroBecause.PROVEN_EMPTY_INVENTORY,
+                site='evaporation.empty_requested_species_ids',
+                field='requested_species_ids',
+                detail=(
+                    'empty vapour request + liquid admits inventory zero → '
+                    'empty flux (reason=no_volatile_species_or_positive_parent_'
+                    'activity). build_request is the sole request constructor '
+                    'and membership is parent-inventory-only, so an empty '
+                    'exact-key request proves no positive eligible parent '
+                    'inventory (proven-empty, cat-3).'
+                ),
+                doctrine_category=CATEGORY_PROVEN_ZERO,
+            )
+            diagnostic = {
                 'evaporation_flux_kg_hr': {},
                 'reason': 'no_volatile_species_or_positive_parent_activity',
                 'vapour_batch_flux_overlay': flux_overlay_report,
             }
+            merge_notes_into_mapping(diagnostic, [_sz])
+            record_on_host(
+                self,
+                ZeroBecause.PROVEN_EMPTY_INVENTORY,
+                site='evaporation.empty_requested_species_ids',
+                field='requested_species_ids',
+                detail=_sz['detail'],
+                doctrine_category=CATEGORY_PROVEN_ZERO,
+            )
+            self._last_evaporation_flux_diagnostic = diagnostic
             return flux
 
         if not vapor_pressures:
@@ -727,6 +767,51 @@ class EvaporationMixin:
             )
         if T_K < 400:  # Catalog pressure exists; thermal physical zero.
             return flux
+        # b-149 instance 4: partial channel refusals. When some channels debit
+        # and others are typed refusals, refused species drop out of
+        # vapor_pressures and surface as flux 0 with no raise (all-non-debit
+        # already refuses above). Record each refused species so incomplete
+        # extraction is visible while the catalog can still subtract.
+        _channel_states_partial = dict(
+            flux_overlay_report.get('batch_channel_states', {}) or {}
+        )
+        _partial_sz_notes: list = []
+        if _channel_states_partial:
+            from simulator.silent_zero import (
+                CATEGORY_REFUSE,
+                ZeroBecause,
+                note_dict,
+                record_on_host,
+            )
+
+            for _sp, _state in sorted(_channel_states_partial.items()):
+                if str(_state) != 'refusal':
+                    continue
+                if _sp in vapor_pressures:
+                    continue
+                _n = note_dict(
+                    ZeroBecause.REFUSED_UPSTREAM,
+                    site='evaporation.partial_channel_refusal',
+                    species=str(_sp),
+                    field='batch_channel_state',
+                    detail=(
+                        f'channel state=refusal while peer channels still '
+                        f'debit; species omitted from flux (silent zero residual '
+                        f'of b-126 F3). Counted as category-1 missing input; '
+                        f'hard raise deferred pending blast-radius rebaseline.'
+                    ),
+                    doctrine_category=CATEGORY_REFUSE,
+                )
+                _partial_sz_notes.append(_n)
+                record_on_host(
+                    self,
+                    ZeroBecause.REFUSED_UPSTREAM,
+                    site='evaporation.partial_channel_refusal',
+                    species=str(_sp),
+                    field='batch_channel_state',
+                    detail=_n['detail'],
+                    doctrine_category=CATEGORY_REFUSE,
+                )
         self._last_partial_melt_offgassing_diagnostic = (
             self._build_partial_melt_offgassing_diagnostic(
                 equilibrium,
@@ -791,6 +876,14 @@ class EvaporationMixin:
         diagnostic['vapour_batch_flux_shadow_outcome'] = (
             flux_overlay_report.get('shadow_outcome')
         )
+        if _partial_sz_notes:
+            # b-149 dead-write fix: merge the partial-refusal notes into the
+            # final kernel diagnostic. They were previously written to
+            # _last_evaporation_flux_diagnostic before the kernel dispatch and
+            # then clobbered by this fresh assignment — instrumentation lost.
+            from simulator.silent_zero import merge_notes_into_mapping
+
+            merge_notes_into_mapping(diagnostic, _partial_sz_notes)
         self._last_evaporation_flux_diagnostic = diagnostic
         unmeasured_alpha_species = tuple(
             diagnostic.get('unmeasured_alpha_fallback_species', ()) or ()

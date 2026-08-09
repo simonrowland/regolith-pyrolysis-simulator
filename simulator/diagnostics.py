@@ -1427,13 +1427,24 @@ def vapour_rail_instrumentation_diagnostic(sim: Any) -> dict[str, Any]:
             overlay["shadow_equal"] if "shadow_equal" in overlay else None
         ),
         "shadow_outcome": overlay.get("shadow_outcome"),
+        # b-149: typed silent-zero notes for the hour (also on HourSnapshot).
+        "silent_zero": silent_zero_class_diagnostic(sim),
     }
+
+
+def silent_zero_class_diagnostic(sim: Any) -> dict[str, Any]:
+    """b-149 silent-zero class payload (diagnostic only; no behaviour change)."""
+
+    from simulator.silent_zero import silent_zero_diagnostic
+
+    return silent_zero_diagnostic(sim)
 
 
 __all__ = [
     "coating_summary_with_grounded_authority",
     "condensation_refusals_diagnostic",
     "pressure_coating_pareto_diagnostic",
+    "silent_zero_class_diagnostic",
     "vapour_rail_instrumentation_diagnostic",
     "wall_deposit_sticking_authority_status",
     "wall_deposit_remobilization_by_segment_species",

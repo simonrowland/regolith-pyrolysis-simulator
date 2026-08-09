@@ -4249,8 +4249,83 @@ def _coerce_alpha_s(
     try:
         alpha_value = float(spec)
     except (TypeError, ValueError):
+        # b-149 instance 5: unparseable alpha previously became 0.0 and
+        # silently killed sticking/condensation. Keep the zero (no behaviour
+        # change) but emit a typed silent-zero note on evaluation_out.
         alpha_value = 0.0
+        if evaluation_out is not None:
+            from simulator.silent_zero import (
+                CATEGORY_REFUSE,
+                ZeroBecause,
+                merge_notes_into_mapping,
+                note_dict,
+            )
+
+            evaluation_out.clear()
+            evaluation_out.update({
+                'species': str(species),
+                'alpha_s': 0.0,
+                'alpha_s_form': 'unparseable_scalar',
+                'alpha_s_temperature_K': T_K,
+                'alpha_s_extrapolated': False,
+                'alpha_s_unparseable': True,
+                'alpha_s_raw_spec': repr(spec),
+            })
+            merge_notes_into_mapping(
+                evaluation_out,
+                [
+                    note_dict(
+                        ZeroBecause.UNPARSEABLE_SPEC,
+                        site='condensation._coerce_alpha_s',
+                        species=str(species),
+                        field='alpha_s',
+                        detail=(
+                            'unparseable alpha_s spec coerced to 0.0; '
+                            'silently kills sticking/condensation for this '
+                            'species. Category-1 missing input — refuse '
+                            'conversion deferred pending rebaseline.'
+                        ),
+                        doctrine_category=CATEGORY_REFUSE,
+                    )
+                ],
+            )
+        return 0.0
     if not math.isfinite(alpha_value):
+        # Non-finite after parse: same silent-zero class as unparseable.
+        if evaluation_out is not None:
+            from simulator.silent_zero import (
+                CATEGORY_REFUSE,
+                ZeroBecause,
+                merge_notes_into_mapping,
+                note_dict,
+            )
+
+            evaluation_out.clear()
+            evaluation_out.update({
+                'species': str(species),
+                'alpha_s': 0.0,
+                'alpha_s_form': 'nonfinite_scalar',
+                'alpha_s_temperature_K': T_K,
+                'alpha_s_extrapolated': False,
+                'alpha_s_unparseable': True,
+                'alpha_s_raw_spec': repr(spec),
+            })
+            merge_notes_into_mapping(
+                evaluation_out,
+                [
+                    note_dict(
+                        ZeroBecause.UNPARSEABLE_SPEC,
+                        site='condensation._coerce_alpha_s',
+                        species=str(species),
+                        field='alpha_s',
+                        detail=(
+                            'non-finite alpha_s coerced to 0.0 '
+                            f'(raw={spec!r}); category-1 unparseable_spec'
+                        ),
+                        doctrine_category=CATEGORY_REFUSE,
+                    )
+                ],
+            )
         return 0.0
     value = max(0.0, min(1.0, alpha_value))
     if evaluation_out is not None:

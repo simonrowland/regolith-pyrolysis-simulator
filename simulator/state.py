@@ -1136,6 +1136,12 @@ class HourSnapshot:
     # Empty dict means the tick lacked enough melt-fraction or alkali pressure
     # context to compute the diagnostic. No gate, rate, or ledger path reads it.
 
+    # --- Silent-zero class instrumentation (b-149) ---
+    silent_zero_diagnostic: Dict[str, Any] = field(default_factory=dict)
+    # Typed zero_because notes for paths where an absent input previously
+    # yielded a zero/empty/default indistinguishable from a computed zero.
+    # Diagnostic only — does not change flux, ledger, or refusal behaviour.
+
     # --- C2A staged gas-control diagnostic (SSO-2) ---
     c2a_staged_gas: Dict[str, Any] = field(default_factory=dict)
     # Per-tick stage-owned gas cover selected before process execution.
