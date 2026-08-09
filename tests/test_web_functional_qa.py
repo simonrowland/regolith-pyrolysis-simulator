@@ -320,18 +320,74 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
     # now "Cr inventory closes across ceramic + ingot under the default
     # recipe"; recipe re-tuning for Cr recovery under corrected Mg physics is
     # tracked as its own store task (see b-147 closure notes).
+    # 2026-08-09 b-151 (Na2/Na2O_gas base retarget to L&H monatomic Pref):
+    # rump Cr2O3 3.4667933925375607 → 3.429852312059024 (post-rebase onto
+    # 4a0a574 / b-136 surface; prior pre-rebase probe was 3.4339744047894474).
+    # CANDIDATE shuttle mechanism FALSIFIED: C3 Na-shuttle
+    # per_oxide_reduced_kg['Cr2O3'] = 0.0 on both before/after legs (after does
+    # reduce FeO 0.161 kg once Na inventory is non-zero; still zero Cr).
+    #
+    # MECHANISM (artifact-supported; dual-review rewrite):
+    # The before leg's retired Na2O_gas composite base drives an unphysical
+    # cold Na2O boil-off (~4.1 kg/hr at ~175 °C) that drains melt Na2O by ~h96
+    # and bifurcates the later trajectory (Fe tap storm h101–106; Cr leaves
+    # mainly as metal and is fully captured). The after leg retains melt Na2O,
+    # keeps Cr oxidised through the 1800 °C C2A dwell, and evolves CrO vapor.
+    # Capture fractions are LEG-INVARIANT (Cr 100% / CrO 0% both legs —
+    # pressure-isolated per species). CrO has 0% capture by data construction
+    # (no Antoine block, no sticking-α; condensation_reference_at_1mbar_C=2195
+    # is a routing-only proxy — NOT "poorer capture"). Offgas CrO 0.0627 →
+    # 1.06718 mol; Cr-eq offgas 0.00350 → 0.055636 kg. Display-rounded product
+    # Cr 0.07 → 0.06; product/offgas CrO 0.0 → 0.07.
+    # Contract: Cr inventory closes across ceramic + ingot + offgas CrO, not
+    # ceramic+ingot alone. Pins = executed post-rebase probe values; never
+    # hand-pasted. See docs-private/research/2026-08-09-b151-disposition/ and
+    # validation-data/pin-evidence/na2_composite_lh_base_2026-08-09.yaml.
     rump = completion["terminal_rump_by_species"]
     _CR_MASS_FRACTION_IN_CR2O3 = 2 * 51.9961 / 151.9904  # 2 Cr per Cr2O3
+    _CR_MW = 51.9961
+    _CRO_MW = 51.9961 + 15.9994  # CrO
+    # Exact offgas CrO mass (kg species) from AtomLedger terminal.offgas;
+    # display-rounded product story uses round(mass, 2) → 0.07.
+    # Pin = executed web-golden value on the post-rebase surface (stable across
+    # repeated -n0 runs of this test; not the instrumented probe path which
+    # differs at ~6e-6 rel). Derivation: project_account_kg("terminal.offgas")
+    # ["CrO"] after the headless full-run path. Cr-eq = Σ n_Cr,i * M_Cr from
+    # Cr/CrO/CrO2/CrO3 offgas species masses.
+    _PINNED_CRO_OFFGAS_KG = 0.07256276804358505
+    _PINNED_CR_OFFGAS_EQ_KG = 0.0556351828
     cr_in_rump_kg = rump.get("Cr2O3", 0.0) * _CR_MASS_FRACTION_IN_CR2O3
     cr_ingot_kg = completion["products"].get("Cr", 0.0)
-    assert rump.get("Cr2O3", 0.0) == pytest.approx(3.4667933925375607, rel=1e-9)
-    assert cr_ingot_kg == pytest.approx(0.07, abs=0.005)
+    offgas_kg = sim.atom_ledger.project_account_kg("terminal.offgas")
+    cro_offgas_kg = float(offgas_kg.get("CrO", 0.0) or 0.0)
+    # Offgas Cr metal-equivalent (kg Cr) across Cr-bearing offgas species.
+    _CRO2_MW = _CR_MW + 2.0 * 15.9994
+    _CRO3_MW = _CR_MW + 3.0 * 15.9994
+    cr_offgas_eq_kg = (
+        float(offgas_kg.get("Cr", 0.0) or 0.0)
+        + cro_offgas_kg * (_CR_MW / _CRO_MW)
+        + float(offgas_kg.get("CrO2", 0.0) or 0.0) * (_CR_MW / _CRO2_MW)
+        + float(offgas_kg.get("CrO3", 0.0) or 0.0) * (_CR_MW / _CRO3_MW)
+    )
+    assert rump.get("Cr2O3", 0.0) == pytest.approx(3.429852312059024, rel=1e-9)
+    assert cr_ingot_kg == pytest.approx(0.06, abs=0.005)
+    # Offgas kg has ~1e-9 relative run-to-run noise on a full multi-hour path;
+    # pin at 1e-6 rel (same class as unit-activity pressure pins).
+    assert cro_offgas_kg == pytest.approx(_PINNED_CRO_OFFGAS_KG, rel=1e-6)
+    assert cr_offgas_eq_kg == pytest.approx(_PINNED_CR_OFFGAS_EQ_KG, rel=1e-6)
     # story payload values are display-rounded (2 dp), so compare loosely.
     assert story["metal_ingots"]["species_kg"].get("Cr", 0.0) == pytest.approx(
         cr_ingot_kg, abs=0.005
     )
-    # Inventory closure: ceramic Cr + ingot Cr ~ the ~2.44 kg lunar Cr feed.
-    assert cr_in_rump_kg + cr_ingot_kg == pytest.approx(2.44, abs=0.05)
+    assert story["escaped_to_vacuum"]["species_kg"].get("CrO", 0.0) == pytest.approx(
+        0.07, abs=0.005
+    )
+    # Inventory closure: ceramic Cr + ingot Cr + offgas Cr-eq closes the
+    # ~2.46 kg lunar Cr feed (AtomLedger total 2.459769). Ceramic+ingot alone
+    # no longer closes after b-151 parks ~0.055 kg Cr in terminal.offgas CrO.
+    assert cr_in_rump_kg + cr_ingot_kg + cr_offgas_eq_kg == pytest.approx(
+        2.46, abs=0.02
+    )
     assert story["refractory_ceramic"]["species_kg"].get("Cr2O3", 0.0) == (
         pytest.approx(rump.get("Cr2O3", 0.0), abs=0.005)
     )

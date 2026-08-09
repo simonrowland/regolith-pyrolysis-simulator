@@ -85,7 +85,25 @@ SIO_ANCHOR_HOUR = 6
 # headspace trajectory (self-oxidation / co-evaporation of volatiles under the
 # managed pO2 path vs the IW-buffered control). Pin is the executed value
 # under the landed L&H Pref; never hand-pasted.
-EXPECTED_SIO_DECADE_DRIFT = 0.2103247134402787
+# 2026-08-09 b-151: Na2/Na2O_gas composite base_reference retargeted from the
+# retired activity-folded pseudo_psat (A=5.18586…) to monatomic L&H Pref
+# (A=11.342243 / B=12140.316409 / C=−163.701). Unit-activity Na2 P up
+# +1.95…+6.26 dex (base^2). SIGN CHECK at hot C2A hour-6 anchor:
+#   cum Na-family flux 0.1293 → 0.1682 kg (+30%); melt Na2O Δ −0.121 → −0.155 kg;
+#   p_SiO_finite 1.07465 → 1.07475 Pa (≈flat; managed pO2 floor 1e−9 both legs);
+#   p_SiO_IW 0.66213 → 0.64839 Pa (DOWN).
+# IW branch driver is fO2_log_iw = _compute_intrinsic_melt_fO2(T), NOT the
+# managed-path melt fO2_log hour-trace series (−8.3739 → −8.3105). Correct
+# lever series (probe sio_{before,after}.json top-level fO2_log_iw):
+#   fO2_log_iw −8.579295695005907 → −8.560997361998243 (Δ = +0.018298333007663814);
+#   pO2 factor 10^Δ ≈ 1.04303; p_SiO ∝ pO2^−0.5 ⇒ scale 1/√factor ≈ 0.979154;
+#   0.6621306185414277 × 0.979154 ≈ 0.648328 (vs observed 0.648391; residual
+#   ~9.8e−5 relative — a_SiO2 / melt-path detail, not a missed lever).
+#   decade |log10(finite/IW)| 0.2103247134402787 → 0.21947209153015898 (UP).
+# Same alkali-coupled class as t-383; SiO Antoine row bit-identical; not a
+# mass-balance artifact (AtomLedger closes). Pin = executed probe value;
+# never hand-pasted. See docs-private/research/2026-08-09-b151-disposition/.
+EXPECTED_SIO_DECADE_DRIFT = 0.21947209153015898
 
 
 def test_vaporock_sio_iw_vs_vacuum_floor_hot_c2a_anchor():

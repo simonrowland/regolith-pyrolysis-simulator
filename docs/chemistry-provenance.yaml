@@ -400,13 +400,16 @@ values:
     status: active
 
   - id: pseudo_antoine_Na_backsolve
-    quantity: "Effective pseudo-Antoine sodium standard term backsolved from VapoRock gas abundances."
+    quantity: "Deprecated effective pseudo-Antoine sodium standard term backsolved from VapoRock gas abundances."
     value: {A: 5.18586, B: 11127.434869, C: 1000}
     units: "log10(P_Pa) = A - B/(T_K + C)"
     tier: UNCERTIFIED
     basis: >-
       Effective pseudo-saturation pressure term; activity_term * P_pseudo reproduces VapoRock p_Na at
-      Kress91 IW with the activity formula recorded in data/vapor_pressures.yaml.
+      Kress91 IW with the activity formula recorded historically in data/vapor_pressures.yaml.
+      RETIRED: monatomic Na uses L&H liquid-NaO0.5 (t-383); Na2/Na2O_gas composites retargeted to
+      the same unit-activity L&H base (b-151 2026-08-08). This fit folded melt activity at grid
+      compositions and must never be restored as a composite base_reference (dual-attribution).
     range:
       T_K: [1350, 1950]
       samples: 217
@@ -415,15 +418,15 @@ values:
     uncertainty: "Maximum dense-grid residual 0.379 dex against the VapoRock backsolve target."
     chosen:
       ref: REF-044
-      locus: "VapoRock ApJ 947:64 article plus local scripts/vaporock_pseudo_antoine_refit.py minimax-log10 backsolve; coefficient table/row is local data/vapor_pressures.yaml metals.Na.antoine, not a published primary table."
+      locus: "VapoRock ApJ 947:64 article plus local scripts/vaporock_pseudo_antoine_refit.py minimax-log10 backsolve; historical coefficient row only (no longer live in catalog)."
       url: "https://doi.org/10.3847/1538-4357/acbcc7"
-      why: "Documents the model target for the effective pseudo term; not a primary measurement."
+      why: "Documents the retired effective pseudo term; not a primary measurement; not a unit-activity reference."
     alternatives:
       - ref: REF-041
         lacks: "pure metal vapor pressure only; lacks silicate-melt nonideality and VapoRock gas speciation"
     code_sites:
-      - "data/vapor_pressures.yaml:metals.Na.antoine"
-    status: active
+      - "pending: deprecated by t-383 (monatomic L&H) + b-151 (Na2/Na2O_gas composite base retarget); coefficients intentionally no longer active in data/vapor_pressures.yaml"
+    status: deprecated
 
   - id: pseudo_antoine_K_backsolve
     quantity: "Deprecated effective pseudo-Antoine potassium standard term backsolved from VapoRock gas abundances."

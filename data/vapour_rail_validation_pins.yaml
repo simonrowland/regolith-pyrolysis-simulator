@@ -289,17 +289,75 @@ species:
     target_tier: T4
     validations:
       structural:
+        # b-151 (2026-08-08): base_reference retargeted from retired
+        # pseudo_psat (A=5.18586/B=11127.434869/C=1000) to monatomic L&H
+        # liquid-NaO0.5 Pref (A=11.342243/B=12140.316409/C=-163.701). Numeric
+        # unit-activity probes pin the post-fix catalog so a silent base
+        # regression cannot hide. Values are honest current-state (not tuned).
+        # Probe: source_activity=1.0, pO2_bar=1.0, CompiledPressureEvaluator.
+        # SIGN: P_after/P_before ≈ +1.95…+6.26 dex over 1400–1950 K (base^2).
+        # Domain: composite valid_domain [1400,1900]; 1950 K pin is status-bearing
+        # OOR continuation (not in-domain). L&H base fit certified [1405,1600];
+        # beyond that is MARKED EXTRAPOLATION (≤0.055 dex base incoherence @2073 K).
+        unit_activity_probe:
+          activity: 1.0
+          pO2_bar: 1.0
+          points:
+            - T_K: 1400.0
+              pinned_pressure_Pa: 3.969350e-04
+            - T_K: 1673.0
+              pinned_pressure_Pa: 4.847203e-01
+            - T_K: 1900.0
+              pinned_pressure_Pa: 3.143731e+01
+            - T_K: 1950.0
+              pinned_pressure_Pa: 6.807954e+01
+          base_reference_coefficients:
+            A: 11.342243
+            B: 12140.316409
+            C: -163.701
+            note: must match metals_na_family Na L&H reference_pressure_model
         evidence_refs:
           - data/vapor_pressures.yaml
           - data/literature/extracts/nasa-cea-thermo.yaml
+          - validation-data/pin-evidence/na2_composite_lh_base_2026-08-09.yaml
+        internal_notes_refs:
+          - docs-private/research/2026-08-08-b151-na-composites/report.md
+          - docs-private/research/2026-08-09-b151-disposition/report.md
   Na2O_gas:
     tier: T1
     target_tier: T4
     validations:
       structural:
+        # b-151 (2026-08-08): same L&H base retarget as Na2. Na2O_gas squares
+        # the monatomic base, so the retired→L&H base gap (~3 dex @1900 K)
+        # becomes ~6 dex here. Honest unit-activity catalog pins; do not tune.
+        # Domain: composite valid_domain [1400,1900]; 1950 K pin is status-bearing
+        # OOR continuation (not in-domain). L&H base fit certified [1405,1600];
+        # beyond that is MARKED EXTRAPOLATION (≤0.055 dex base incoherence @2073 K).
+        unit_activity_probe:
+          activity: 1.0
+          pO2_bar: 1.0
+          points:
+            - T_K: 1400.0
+              pinned_pressure_Pa: 3.429209e-01
+            - T_K: 1673.0
+              pinned_pressure_Pa: 4.977666e+01
+            - T_K: 1900.0
+              pinned_pressure_Pa: 8.916245e+02
+            - T_K: 1950.0
+              pinned_pressure_Pa: 1.517587e+03
+          base_reference_coefficients:
+            A: 11.342243
+            B: 12140.316409
+            C: -163.701
+            note: must match metals_na_family Na L&H reference_pressure_model
         evidence_refs:
           - data/vapor_pressures.yaml
           - data/literature/extracts/nasa-cea-thermo.yaml
+          - validation-data/pin-evidence/na2_composite_lh_base_2026-08-09.yaml
+        internal_notes_refs:
+          - docs-private/research/2026-08-08-b151-na-composites/report.md
+          - docs-private/research/2026-08-09-b151-disposition/report.md
   P2:
     tier: T1
     target_tier: T4

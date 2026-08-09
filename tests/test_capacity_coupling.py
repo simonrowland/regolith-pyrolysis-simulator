@@ -942,12 +942,27 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         # remains tiny (Ca/Ti are refractory). Values from this quiesced
         # default-off executable probe; never hand-pasted.
         # docs-private/research/2026-08-08-rp3-b136/report.md
+        # 2026-08-08 b-151 Na composites: Na2/Na2O_gas base_reference retargeted
+        # from retired activity-folded pseudo_psat (A=5.18586…) to monatomic L&H
+        # unit-activity Pref. SIGN CHECK: Na2 unit-activity P up +1.95…+6.26 dex
+        # (base^2); at this 1550 C head, Na2 channel becomes real flux
+        # (~0.513 kg/hr; was negligible), total flux +0.05078944409163633 kg/hr,
+        # melt mass equal-and-opposite -0.050789444091719815 kg. Transport
+        # saturation moves -94580.22580052097 points (not monotone with total
+        # flux: vapor-composition / throat-loading path, not a pin sign error).
+        # Monatomic Na residual / element max|Δ| unmoved (~1.536). Recomputed
+        # from this quiesced default-off executable probe; never hand-pasted.
+        # See docs-private/research/2026-08-08-b151-na-composites/report.md.
+        # NOTE: pin values are the post-rebase b-151+b-136 surface (Na2-dominant;
+        # b-136 Ca/Ti HKL α=1.0 contributes ~+3.2e-6 kg/hr vs pre-b136
+        # b-151-only probe). Recomputed on worktree after rebase onto
+        # 4a0a574; never hand-pasted.
         (
             1,
             1550.0,
-            3.1546431063407194,
-            1394603.9438876647,
-            995.6076500754036,
+            3.2054325504323558,
+            1300023.718087143,
+            995.556860631312,
         ),
         rel=1.0e-12,
         abs=1.0e-12,

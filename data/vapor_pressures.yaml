@@ -12766,10 +12766,34 @@ families:
           - fit_target: standard_reaction_term
             pressure_kind: equilibrium_partial_pressure
             species_basis: cluster
+            # valid_domain [1400,1900] RETAINED (not clamped to L&H monatomic
+            # base fit [1405,1600]). Honest choice under catalog OOR conventions:
+            # the hot C2A process operates to 1800 °C (2073 K), so clamping the
+            # composite domain would mark the plant operating window OOR and hide
+            # a channel that is already live. MARKED EXTRAPOLATION of the L&H
+            # base Antoine above its certified liquid-grid fit:
+            #   monatomic OOR uses 1/T tangent continuation from 1600 K;
+            #   composites evaluate the raw Antoine in-domain through 1900 K.
+            # Measured base incoherence (unit-activity, pO2=1 bar):
+            #   +0.026 dex @1900 K; +0.055 dex @2073 K (1800 °C plant point);
+            #   Na2 pressure inherits ~2× via r_base² (≤0.11 dex @2073 K).
+            # Direction: composite LOW vs monatomic-coherent. Coefficient-
+            # identity with metals_na_family Na Pref is byte-true; runtime
+            # identity holds only inside the L&H fit domain. Pins at 1950 K
+            # are status-bearing OOR (out_of_range_conservative_continuation).
             valid_domain:
               temperature_K:
               - 1400
               - 1900
+              marked_extrapolation:
+                base_fit_domain_K: [1405.0, 1600.0]
+                base_source: metals_na_family Na L&H liquid-NaO0.5 Pref (t-383)
+                max_base_incoherence_dex_at_2073_K: 0.055
+                note: >-
+                  Composite keeps the pre-existing [1400,1900] process window;
+                  L&H base coefficients are extrapolated above 1600 K while the
+                  monatomic row uses 1/T OOR tangent continuation. Quantified
+                  base incoherence ≤0.055 dex at 2073 K (1800 °C).
             provenance:
             - source_id: nasa-cea-thermo
               observation_ids:
@@ -12777,6 +12801,13 @@ families:
               - cea_Na2_gibbs
             - source: Na landed unit-activity standard-reaction reference
               status: status_bearing_non_authoritative
+            - source_id: metals_na_family
+              observation_id: liquid_nao0_5_standard_reaction
+              note: 'b-151 (2026-08-08): monatomic base Pref retargeted to L&H liquid-NaO0.5
+                unit-activity Antoine (t-383 landed monatomic). Prior base A=5.18586 /
+                B=11127.434869 / C=1000 was the retired pseudo_psat_backsolved_from_vaporock
+                effective-pressure fit (activity already folded at grid compositions) —
+                dual-attribution class. See docs-private/research/2026-08-08-b151-na-composites/.'
             evaluator_family: nasa_cea_9
             source_reaction_id: liquid_na2o_to_na2_gas
             activity_semantics: source_reaction_activity
@@ -12784,9 +12815,12 @@ families:
             base_reference_pressure_model:
               evaluator_family: antoine
               coefficients:
-                A: 5.18586
-                B: 11127.434869
-                C: 1000
+                # Aligned with monatomic Na L&H liquid-NaO0.5 Pref (t-383 / b-151 2026-08-08).
+                # Was retired VapoRock pseudo_psat A=5.18586 / B=11127.434869 / C=1000
+                # (activity-folded effective pressure — NOT a unit-activity reference).
+                A: 11.342243
+                B: 12140.316409
+                C: -163.701
             base_vapor_formula: Na
             gas_exchange_reaction:
               reactants:
@@ -12804,10 +12838,29 @@ families:
                 extract_ref:
                   source_id: nasa-cea-thermo
                   observation_id: cea_Na2_gibbs
-            derivation: 'Premise: r_base is the landed unit-activity reference at pO2_ref. Algebra: r_v=(K_exchange*r_base^2.0*r_O2^0.0)^(1/1),
-              K_exchange=exp(-DeltaG_exchange/RT). Unit check: every r and K is dimensionless; r_v*P0
-              is Pa. Sanity: K_exchange=1 with unit gas ratios recovers the stoichiometric base-power
-              limit.'
+            # Premise: r_base MUST be the monatomic unit-activity Pref at pO2_ref
+            #   (L&H liquid-NaO0.5 Antoine, identical to metals_na_family Na
+            #   reference_pressure_model). Composite Na2 = 2 Na(g) exchange, so
+            #   runtime then multiplies by a_Na2O once via activity_exponent.
+            # Algebra: r_v = (K_exchange * r_base^2.0 * r_O2^0.0)^(1/1),
+            #   K_exchange = exp(-ΔG_exchange/RT); final p_v = r_v * P0 * a^1 * (pO2/pO2_ref)^-0.5.
+            # Unit check: every r and K dimensionless; r_v * P0 is Pa.
+            # Sanity: K_exchange=1 with unit gas ratios recovers the stoichiometric
+            #   base-power limit; at a=1, pO2=pO2_ref this is P_base^2 / P0 * K.
+            # DOUBLE-COUNTING BAN (b-151): do NOT re-insert the retired
+            #   pseudo_psat_backsolved_from_vaporock base (A=5.18586…). That fit
+            #   already folded melt activity at grid compositions into an
+            #   *effective* pressure. Using it as base_reference then applying
+            #   activity_exponent again is the dual-attribution class Ca/Mg/Na
+            #   audits exist to eliminate. Base = unit-activity reference only;
+            #   activity is applied once, here.
+            derivation: 'Premise: r_base is the landed L&H liquid-NaO0.5 unit-activity
+              monatomic Pref at pO2_ref (b-151 retarget; was retired activity-folded
+              pseudo_psat). Algebra: r_v=(K_exchange*r_base^2.0*r_O2^0.0)^(1/1),
+              K_exchange=exp(-DeltaG_exchange/RT); activity applied once via
+              activity_exponent. Unit check: every r and K is dimensionless; r_v*P0
+              is Pa. Sanity: K_exchange=1 with unit gas ratios recovers the stoichiometric
+              base-power limit. Do not restore A=5.18586 (dual-attribution).'
             activity_exponent: 1.0
             pO2_exponent: -0.5
             pO2_reference_bar: 1
@@ -12906,10 +12959,34 @@ families:
           - fit_target: standard_reaction_term
             pressure_kind: equilibrium_partial_pressure
             species_basis: monomer
+            # valid_domain [1400,1900] RETAINED (not clamped to L&H monatomic
+            # base fit [1405,1600]). Honest choice under catalog OOR conventions:
+            # the hot C2A process operates to 1800 °C (2073 K), so clamping the
+            # composite domain would mark the plant operating window OOR and hide
+            # a channel that is already live. MARKED EXTRAPOLATION of the L&H
+            # base Antoine above its certified liquid-grid fit:
+            #   monatomic OOR uses 1/T tangent continuation from 1600 K;
+            #   composites evaluate the raw Antoine in-domain through 1900 K.
+            # Measured base incoherence (unit-activity, pO2=1 bar):
+            #   +0.026 dex @1900 K; +0.055 dex @2073 K (1800 °C plant point);
+            #   Na2 pressure inherits ~2× via r_base² (≤0.11 dex @2073 K).
+            # Direction: composite LOW vs monatomic-coherent. Coefficient-
+            # identity with metals_na_family Na Pref is byte-true; runtime
+            # identity holds only inside the L&H fit domain. Pins at 1950 K
+            # are status-bearing OOR (out_of_range_conservative_continuation).
             valid_domain:
               temperature_K:
               - 1400
               - 1900
+              marked_extrapolation:
+                base_fit_domain_K: [1405.0, 1600.0]
+                base_source: metals_na_family Na L&H liquid-NaO0.5 Pref (t-383)
+                max_base_incoherence_dex_at_2073_K: 0.055
+                note: >-
+                  Composite keeps the pre-existing [1400,1900] process window;
+                  L&H base coefficients are extrapolated above 1600 K while the
+                  monatomic row uses 1/T OOR tangent continuation. Quantified
+                  base incoherence ≤0.055 dex at 2073 K (1800 °C).
             provenance:
             - source_id: nasa-cea-thermo
               observation_ids:
@@ -12918,6 +12995,13 @@ families:
               - cea_O2_gibbs
             - source: Na landed unit-activity standard-reaction reference
               status: status_bearing_non_authoritative
+            - source_id: metals_na_family
+              observation_id: liquid_nao0_5_standard_reaction
+              note: 'b-151 (2026-08-08): monatomic base Pref retargeted to L&H liquid-NaO0.5
+                unit-activity Antoine (t-383 landed monatomic). Prior base A=5.18586 /
+                B=11127.434869 / C=1000 was the retired pseudo_psat_backsolved_from_vaporock
+                effective-pressure fit (activity already folded at grid compositions) —
+                dual-attribution class. See docs-private/research/2026-08-08-b151-na-composites/.'
             evaluator_family: nasa_cea_9
             source_reaction_id: liquid_na2o_to_na2o_gas_gas
             activity_semantics: source_reaction_activity
@@ -12925,9 +13009,12 @@ families:
             base_reference_pressure_model:
               evaluator_family: antoine
               coefficients:
-                A: 5.18586
-                B: 11127.434869
-                C: 1000
+                # Aligned with monatomic Na L&H liquid-NaO0.5 Pref (t-383 / b-151 2026-08-08).
+                # Was retired VapoRock pseudo_psat A=5.18586 / B=11127.434869 / C=1000
+                # (activity-folded effective pressure — NOT a unit-activity reference).
+                A: 11.342243
+                B: 12140.316409
+                C: -163.701
             base_vapor_formula: Na
             gas_exchange_reaction:
               reactants:
@@ -12951,10 +13038,31 @@ families:
                 extract_ref:
                   source_id: nasa-cea-thermo
                   observation_id: cea_O2_gibbs
-            derivation: 'Premise: r_base is the landed unit-activity reference at pO2_ref. Algebra: r_v=(K_exchange*r_base^2.0*r_O2^0.5)^(1/1),
-              K_exchange=exp(-DeltaG_exchange/RT). Unit check: every r and K is dimensionless; r_v*P0
-              is Pa. Sanity: K_exchange=1 with unit gas ratios recovers the stoichiometric base-power
-              limit.'
+            # Premise: r_base MUST be the monatomic unit-activity Pref at pO2_ref
+            #   (L&H liquid-NaO0.5 Antoine, identical to metals_na_family Na
+            #   reference_pressure_model). Composite Na2O(g) exchange uses 2 Na,
+            #   so runtime multiplies by a_Na2O once via activity_exponent.
+            # Algebra: r_v = (K_exchange * r_base^2.0 * r_O2^0.5)^(1/1),
+            #   K_exchange = exp(-ΔG_exchange/RT); final p_v = r_v * P0 * a^1 * (pO2/pO2_ref)^0.
+            # Unit check: every r and K dimensionless; r_v * P0 is Pa.
+            # Sanity: K_exchange=1 with unit gas ratios recovers the stoichiometric
+            #   base-power limit; at a=1, pO2=pO2_ref this is P_base^2 * K * r_O2^0.5 / P0.
+            # DOUBLE-COUNTING BAN (b-151): do NOT re-insert the retired
+            #   pseudo_psat_backsolved_from_vaporock base (A=5.18586…). That fit
+            #   already folded melt activity at grid compositions into an
+            #   *effective* pressure. Using it as base_reference then applying
+            #   activity_exponent again is the dual-attribution class Ca/Mg/Na
+            #   audits exist to eliminate. Base = unit-activity reference only;
+            #   activity is applied once, here. Na2O_gas squares the base, so the
+            #   retired-vs-L&H base gap (~3 dex @1900 K) becomes ~6 dex here.
+            derivation: 'Premise: r_base is the landed L&H liquid-NaO0.5 unit-activity
+              monatomic Pref at pO2_ref (b-151 retarget; was retired activity-folded
+              pseudo_psat). Algebra: r_v=(K_exchange*r_base^2.0*r_O2^0.5)^(1/1),
+              K_exchange=exp(-DeltaG_exchange/RT); activity applied once via
+              activity_exponent. Unit check: every r and K is dimensionless; r_v*P0
+              is Pa. Sanity: K_exchange=1 with unit gas ratios recovers the stoichiometric
+              base-power limit. Do not restore A=5.18586 (dual-attribution; ~6 dex at
+              high T because Na2O_gas squares the base).'
             activity_exponent: 1.0
             pO2_exponent: 0.0
             pO2_reference_bar: 1

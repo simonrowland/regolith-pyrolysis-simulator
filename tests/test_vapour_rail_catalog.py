@@ -1024,3 +1024,58 @@ def test_physical_melt_dissociation_pO2_bar_clamps_sentinel() -> None:
     p, clamped = physical_melt_dissociation_pO2_bar(-400.0)
     assert clamped is True
     assert p == MELT_DISSOCIATION_PO2_MIN_BAR
+
+
+def test_na_composites_base_matches_lh_monatomic_and_pins() -> None:
+    """b-151: Na2/Na2O_gas must track monatomic L&H Pref (not retired pseudo).
+
+    Premise: composite base_reference_pressure_model is the monatomic
+    unit-activity Pref; activity is applied once at runtime. The retired
+    VapoRock pseudo_psat (A=5.18586 / B=11127.434869 / C=1000) was an
+    activity-folded effective pressure — restoring it reopens dual-attribution.
+    Algebra: r_v ∝ r_base^ν_Na; unit-activity probes pin the post-fix surface.
+    Unit Pa. Sanity: base coeffs byte-match monatomic Na; pin file points exist.
+    """
+    catalog = compile_vapour_rail_catalog(_yaml("vapor_pressures.yaml"))
+    pins = _yaml("vapour_rail_validation_pins.yaml")
+    na_ref = catalog.species["Na"].evaluator.reference_model.coefficients
+    retired = {"A": 5.18586, "B": 11127.434869, "C": 1000.0}
+    lh = {"A": 11.342243, "B": 12140.316409, "C": -163.701}
+
+    assert na_ref["A"] == pytest.approx(lh["A"])
+    assert na_ref["B"] == pytest.approx(lh["B"])
+    assert na_ref["C"] == pytest.approx(lh["C"])
+
+    for species_id in ("Na2", "Na2O_gas"):
+        # Source YAML: composite base_reference must equal monatomic L&H Pref.
+        row = None
+        for family in _yaml("vapor_pressures.yaml")["families"].values():
+            spp = (family.get("physical_properties") or {}).get("species") or {}
+            if species_id in spp:
+                row = spp[species_id]
+                break
+        assert row is not None
+        model = row["pressure_models"][0]
+        base = model["base_reference_pressure_model"]["coefficients"]
+        assert base["A"] == pytest.approx(lh["A"])
+        assert base["B"] == pytest.approx(lh["B"])
+        assert base["C"] == pytest.approx(lh["C"])
+        assert base["A"] != pytest.approx(retired["A"])
+
+        probe = pins["species"][species_id]["validations"]["structural"][
+            "unit_activity_probe"
+        ]
+        assert probe["activity"] == pytest.approx(1.0)
+        assert probe["pO2_bar"] == pytest.approx(1.0)
+        for point in probe["points"]:
+            live = catalog.species[species_id].evaluator.evaluate(
+                float(point["T_K"]),
+                source_activity=1.0,
+                pO2_bar=1.0,
+            ).pressure_pa
+            # Relative tolerance absorbs float/path noise; pins are honest
+            # current-state values from the b-151 catalog probe, not tuned.
+            assert live == pytest.approx(
+                float(point["pinned_pressure_Pa"]), rel=1.0e-6, abs=0.0
+            )
+

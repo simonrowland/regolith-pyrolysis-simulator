@@ -1,0 +1,67 @@
+# Distilled pin evidence — Na2 / Na2O_gas structural unit-activity pins
+# (b-151 composite base_reference retarget to monatomic L&H Pref).
+# Publishable residual/catalog pin record; private narratives live under
+# docs-private/ and are listed only as internal_notes_refs on the pin.
+schema_version: 1
+kind: vapour_rail_pin_evidence
+source_id: b151-na-composites
+date: "2026-08-09"
+species: [Na2, Na2O_gas]
+validation: structural
+metric: unit_activity_pressure_Pa
+comparison_basis: >-
+  Unit-activity, pO2_bar=1.0 CompiledPressureEvaluator pressures for the
+  Na2 and Na2O_gas composite rows after base_reference retarget from the
+  retired activity-folded pseudo_psat (A=5.18586 / B=11127.434869 / C=1000)
+  to monatomic L&H liquid-NaO0.5 Pref (A=11.342243 / B=12140.316409 /
+  C=-163.701). Honest current-state pins — not tuned.
+method: >-
+  Align composite base_reference_pressure_model coefficients with the
+  landed monatomic Na L&H Pref (t-383). Exchange stoich remains 2 Na;
+  activity applied once via activity_exponent. Unit-activity pressures
+  recomputed from CEA 9-coefficient K_exchange × (P_base/P0)^2 × P0.
+  Dual-attribution ban: do not restore A=5.18586 as a composite base.
+conditions:
+  activity: 1.0
+  pO2_bar: 1.0
+  base_reference_coefficients:
+    A: 11.342243
+    B: 12140.316409
+    C: -163.701
+  base_fit_domain_K: [1405.0, 1600.0]
+  composite_valid_domain_K: [1400.0, 1900.0]
+  marked_extrapolation: >-
+    Composite valid_domain [1400,1900] retained (not clamped to L&H base
+    fit). Above 1600 K monatomic uses 1/T OOR tangent continuation while
+    composites evaluate the raw Antoine in-domain through 1900 K. Measured
+    base incoherence (unit-activity, pO2=1): +0.026 dex @1900 K;
+    +0.055 dex @2073 K (1800 °C plant point); Na2 inherits ~2× via
+    r_base^2 (≤0.11 dex @2073 K). 1950 K pin points are status-bearing
+    OOR continuation.
+pinned_unit_activity_pressures_Pa:
+  Na2:
+    "1400": 3.969350e-04
+    "1673": 4.847203e-01
+    "1900": 3.143731e+01
+    "1950": 6.807954e+01
+  Na2O_gas:
+    "1400": 3.429209e-01
+    "1673": 4.977666e+01
+    "1900": 8.916245e+02
+    "1950": 1.517587e+03
+checkable_claims:
+  - base coefficients byte-match metals_na_family Na L&H Pref
+  - unit-activity pressures reproduce from CEA K_exchange × base^2 algebra
+  - live evaluator matches pins to <1e-6 rel
+  - no live A=5.18586 remains as a composite base_reference
+  - monatomic vaporock residual (~1.536 dex) unmoved by this change
+  - domain extension is marked extrapolation (≤0.055 dex base @2073 K)
+runtime_changes:
+  - data/vapor_pressures.yaml Na2 / Na2O_gas base_reference_pressure_model
+  - data/vapour_rail_validation_pins.yaml Na2 / Na2O_gas unit_activity_probe
+  - docs/chemistry-provenance.yaml pseudo_antoine_Na_backsolve → deprecated
+publishable_companion_refs:
+  - data/vapor_pressures.yaml
+  - data/literature/extracts/nasa-cea-thermo.yaml
+  - validation-data/pin-evidence/na_vaporock_lh_liquid_2026-08-08.yaml
+  - docs/model-limitations.md
