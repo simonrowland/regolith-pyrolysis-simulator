@@ -168,13 +168,22 @@ species:
       mass_spec:
         # si-comparability 2026-08-08: pure-element solid-Fe Pound rows excluded
         # as not_comparable_system_class; residual tightens to silicate/olivine set.
+        # form589 2026-08-09: Costa Fo93Fa7 crystalline olivine α excluded as
+        # not_comparable_condensed_form:crystalline (not form-correctable).
+        # Numeric max UNCHANGED at Hashimoto liquid 2073 K; grounding relabel only.
+        # old max 1.096910013 (was already Hashimoto liquid after olivine match at 0);
+        # excluded Costa points (multicell series 0.0066–0.2403 dex; the two
+        # single-T rows at 0.0) all sat far below 1.0969 — did not set the ceiling.
         pinned_residual_dex: 1.0969100130080565
         evidence_refs:
           - tests/chemistry/extract_store_reproduction_residual_baselines.yaml
           - docs/model-limitations.md#extract-store-reproduction-battery
           - validation-data/pin-evidence/fe_mass_spec_class_comparable_2026-08-08.yaml
+          - validation-data/pin-evidence/fe_mass_spec_form_liquid_2026-08-09.yaml
         internal_notes_refs:
           - docs-private/research/2026-08-08-si-comparability/report.md
+          - docs-private/research/2026-08-09-form589-impl/report.md
+          - docs-private/research/2026-08-09-condensed-form/report.md
   K:
     tier: T3
     target_tier: T4
@@ -184,10 +193,17 @@ species:
         evidence_refs:
           - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
       mass_spec:
+        # form589 2026-08-09: Yu C1 unresolved supercooled/two-phase rows excluded
+        # (form_unresolved). Numeric max UNCHANGED — Sossi ferrobasalt liquid.
+        # old max 0.886056648; Yu residuals were lower and not ceiling-setting.
         pinned_residual_dex: 0.8860566476931632
         evidence_refs:
           - tests/chemistry/extract_store_reproduction_residual_baselines.yaml
           - docs/model-limitations.md#extract-store-reproduction-battery
+          - validation-data/pin-evidence/k_mass_spec_form_liquid_2026-08-09.yaml
+        internal_notes_refs:
+          - docs-private/research/2026-08-09-form589-impl/report.md
+          - docs-private/research/2026-08-09-condensed-form/report.md
   K2:
     tier: T1
     target_tier: T4
@@ -223,10 +239,18 @@ species:
           - docs-private/research/2026-08-07-mgfix/report.md
           - docs-private/research/2026-08-07-mgfix/element_engine_run.log
       mass_spec:
-        pinned_residual_dex: 0.6989700043360189
+        # form589 2026-08-09: Richter-2002 partially_molten / mixed-form CAI rows
+        # excluded (not_comparable_condensed_form:partially_molten). Residual
+        # TIGHTENS 0.698970004 → 0.520290709 (Richter-2007 liquid at 1873 K).
+        # SIGN: form exclusion removes a subliquidus/mixed ceiling, not a Pref retune.
+        pinned_residual_dex: 0.5202907093862962
         evidence_refs:
           - tests/chemistry/extract_store_reproduction_residual_baselines.yaml
           - docs/model-limitations.md#extract-store-reproduction-battery
+          - validation-data/pin-evidence/mg_mass_spec_form_liquid_2026-08-09.yaml
+        internal_notes_refs:
+          - docs-private/research/2026-08-09-form589-impl/report.md
+          - docs-private/research/2026-08-09-condensed-form/report.md
   Mg2:
     tier: T1
     target_tier: T4
@@ -280,10 +304,21 @@ species:
         internal_notes_refs:
           - docs-private/research/2026-08-08-t383-build/report.md
       mass_spec:
-        pinned_residual_dex: 0.585026652029182
+        # form589 2026-08-09: Yu C1 form_unresolved excluded (was governing
+        # 0.585 dex). Surviving Sossi liquid rows are form-matched with residual
+        # ~0 (authors_adopted α_e=1 match). RESEED at 0.0 — this is an honest
+        # match residual on the Sossi set, NOT a multi-source robust ceiling
+        # claim and NOT a silent zero after auto-exclusion. Prior Yu pin
+        # 0.585026652 is withdrawn as non-comparable. Two-way ratchet requires
+        # the live residual set to be pinned.
+        pinned_residual_dex: 0.0
         evidence_refs:
           - tests/chemistry/extract_store_reproduction_residual_baselines.yaml
           - docs/model-limitations.md#extract-store-reproduction-battery
+          - validation-data/pin-evidence/na_mass_spec_form_reseed_2026-08-09.yaml
+        internal_notes_refs:
+          - docs-private/research/2026-08-09-form589-impl/report.md
+          - docs-private/research/2026-08-09-condensed-form/report.md
   Na2:
     tier: T1
     target_tier: T4
@@ -417,10 +452,18 @@ species:
         evidence_refs:
           - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
       mass_spec:
-        pinned_residual_dex: 1.2974849325542646
+        # form589 2026-08-09: Costa Fo93Fa7 crystalline olivine α + Wetzel
+        # unresolved amorphous/provenance row excluded. Residual TIGHTENS
+        # 1.297484933 → 0.409862769 (Schaefer-Fegley liquid silica/forsterite
+        # survey). SIGN: old max was a solid-olivine point, not a melt residual.
+        pinned_residual_dex: 0.40986276901889873
         evidence_refs:
           - tests/chemistry/extract_store_reproduction_residual_baselines.yaml
           - docs/model-limitations.md#extract-store-reproduction-battery
+          - validation-data/pin-evidence/sio_mass_spec_form_liquid_2026-08-09.yaml
+        internal_notes_refs:
+          - docs-private/research/2026-08-09-form589-impl/report.md
+          - docs-private/research/2026-08-09-condensed-form/report.md
   Si:
     tier: T1
     target_tier: T4

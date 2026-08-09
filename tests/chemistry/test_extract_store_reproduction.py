@@ -29,10 +29,12 @@ import yaml
 
 from simulator.diagnostic_helpers.extract_reproduction import (
     COMPARISON_STATUSES,
+    CONDENSED_FORM_STATES,
     DEFAULT_PSAT_UNCERTAINTY,
     MODEL_LIMITATIONS_PATH,
     RAIL_COMPARABLE_SYSTEM_CLASSES,
     RAIL_INCOMPARABLE_SYSTEM_CLASSES,
+    RAIL_TARGET_CONDENSED_FORM,
     ROLLUP_BEGIN,
     ROLLUP_END,
     TARGET_TYPES,
@@ -42,13 +44,18 @@ from simulator.diagnostic_helpers.extract_reproduction import (
     evaluate_all,
     evaluate_observation,
     extract_rollup_section,
+    form_correction_delta_log10_alpha,
     format_rollup_markdown,
     geometry_assumption_text,
     is_typed_skip,
     load_adopted_observations,
     load_vapor_pressure_data,
     motzfeldt_available,
+    observation_condensed_form_state,
+    observation_form_transition_context,
     observation_system_class,
+    rail_alpha_comparability,
+    rail_condensed_form_comparability,
     rail_system_class_comparability,
     residual_dex,
     resolve_chamber_pressure_pa,
@@ -185,6 +192,7 @@ def _alpha_fixture(
     observation_id: str,
     phase: str | None,
     values: dict,
+    condensed_form: dict | None = None,
 ) -> AdoptedObservation:
     return AdoptedObservation(
         species_id=species_id,
@@ -204,6 +212,7 @@ def _alpha_fixture(
         disagreement_dex=None,
         is_priority_winner=True,
         geometry_assumption=geometry_assumption_text(),
+        condensed_form=condensed_form,
     )
 
 
@@ -222,6 +231,7 @@ def test_pure_element_alpha_is_not_comparable_to_silicate_melt_rail() -> None:
             "transformation_class": "congruent_no_transformation",
             "material": "pure_elemental_Si",
         },
+        condensed_form={"state": "liquid_melt", "metastable": False},
     )
     ok, sc, reason = rail_system_class_comparability(obs)
     assert ok is False
@@ -246,12 +256,375 @@ def test_silicate_melt_alpha_remains_comparable() -> None:
             "transformation_class": "redox_reduction_required",
             "material": "FCMAS_silicate_melt",
         },
+        condensed_form={"state": "liquid_melt", "metastable": False},
     )
     ok, sc, reason = rail_system_class_comparability(obs)
     assert ok is True
     assert sc == "silicate_melt"
     assert reason is None
     assert observation_system_class(obs) == "silicate_melt"
+    form_ok, form_state, form_skip, _ = rail_condensed_form_comparability(obs)
+    assert form_ok is True
+    assert form_state == RAIL_TARGET_CONDENSED_FORM
+    assert form_skip is None
+    pin_ok, pin_skip, _ = rail_alpha_comparability(obs)
+    assert pin_ok is True
+    assert pin_skip is None
+
+
+def test_crystalline_form_is_not_pin_bearing_even_when_class_comparable() -> None:
+    """Costa-class solid olivine α must not residual-pin the liquid-melt rail."""
+
+    assert "crystalline" in CONDENSED_FORM_STATES
+    obs = _alpha_fixture(
+        species_id="Fe",
+        observation_id="fixture_olivine_fe_alpha",
+        phase="solid_solution_olivine",
+        values={
+            "alpha": 0.02,
+            "system_class": "solid_solution_silicate",
+            "material": "Fo93Fa7_olivine",
+        },
+        condensed_form={
+            "state": "crystalline",
+            "polymorph_name": "olivine",
+            "metastable": False,
+            "solution_character": "solid_solution",
+            "basis": "explicit_author",
+        },
+    )
+    class_ok, sc, _ = rail_system_class_comparability(obs)
+    assert class_ok is True
+    assert sc == "solid_solution_silicate"
+    form_ok, state, reason, _ = rail_condensed_form_comparability(obs)
+    assert form_ok is False
+    assert state == "crystalline"
+    assert reason == "not_comparable_condensed_form:crystalline"
+    pin_ok, pin_skip, _ = rail_alpha_comparability(obs)
+    assert pin_ok is False
+    assert pin_skip == "not_comparable_condensed_form:crystalline"
+    evaluation = evaluate_observation(obs, vapor_pressure_data=load_vapor_pressure_data())
+    assert evaluation.skip_reason == (
+        "typed-refusal:not_comparable_condensed_form:crystalline"
+    )
+    assert all(r.status == "out-of-domain" for r in evaluation.records)
+    assert not any(r.status in {"match", "mismatch"} for r in evaluation.records)
+
+
+def test_unresolved_form_fail_closed() -> None:
+    obs = _alpha_fixture(
+        species_id="Na",
+        observation_id="fixture_yu_unresolved",
+        phase="silicate_melt",
+        values={"alpha": 0.1, "system_class": "silicate_melt"},
+        condensed_form={"state": "unresolved", "metastable": True, "basis": "mixed_evidence"},
+    )
+    form_ok, state, reason, _ = rail_condensed_form_comparability(obs)
+    assert form_ok is False
+    assert state == "unresolved"
+    assert reason == "form_unresolved"
+    assert observation_condensed_form_state(obs) == "unresolved"
+
+
+def test_form_correction_algebra_sign_and_units() -> None:
+    """Δlog10 α = (ν_c/ν_g) · ΔG / (R T ln 10); 10 kJ/mol @ 1700 K ≈ 0.307 dex."""
+
+    import math
+
+    R = 8.314462618
+    T = 1700.0
+    delta_g = -10000.0  # solid below Tm: G_s - G_l < 0
+    got = form_correction_delta_log10_alpha(
+        T_K=T, delta_G_o_minus_r_J_mol=delta_g, nu_c=1.0, nu_g=1.0
+    )
+    expected = delta_g / (R * T * math.log(10.0))
+    assert abs(got - expected) < 1e-12
+    assert got < 0.0  # solid→liquid equivalent α shrinks
+    assert abs(abs(got) - 0.307) < 0.005  # ~0.307 dex at 1700 K
+
+
+def _form_gate_fixture(
+    *,
+    observation_id: str,
+    values: dict,
+    condensed_form: dict | None,
+    T_range_K: tuple[float, float] | None = (1700.0, 1700.0),
+    species_id: str = "Fe",
+    phase: str = "silicate_melt",
+) -> AdoptedObservation:
+    return AdoptedObservation(
+        species_id=species_id,
+        source_id="fixture-source",
+        observation_id=observation_id,
+        obs_type="alpha",
+        review_status="draft",
+        phase=phase,
+        regime=None,
+        standard_state=None,
+        T_range_K=T_range_K,
+        units="dimensionless",
+        uncertainty=None,
+        locator={"note": "fixture"},
+        values=values,
+        equipment={},
+        disagreement_dex=None,
+        is_priority_winner=True,
+        geometry_assumption=geometry_assumption_text(),
+        condensed_form=condensed_form,
+    )
+
+
+def test_typed_liquid_claim_below_liquidus_fails_closed() -> None:
+    """LABEL-TRUST (grok P1): a typed liquid_melt row whose whole T_range sits
+    below its own typed liquidus must NOT pin the rail — downgrade to
+    form_unresolved with the conflict named."""
+
+    obs = _form_gate_fixture(
+        observation_id="fixture_mislabeled_liquid",
+        values={"alpha": 0.5, "system_class": "silicate_melt"},
+        condensed_form={
+            "state": "liquid_melt",
+            "basis": "explicit_author",
+            "transition_context": {"liquidus_K": 1823.0},
+        },
+        T_range_K=(1600.0, 1700.0),
+    )
+    assert observation_form_transition_context(obs) == {"liquidus_K": 1823.0}
+    form_ok, state, reason, detail = rail_condensed_form_comparability(obs)
+    assert form_ok is False
+    assert state == "liquid_melt"
+    assert reason == "form_unresolved:claim_conflict:liquid_melt_below_liquidus"
+    assert detail["form_T_consistency"]["conflict"] == "liquid_melt_below_liquidus"
+    pin_ok, pin_skip, axes = rail_alpha_comparability(obs)
+    assert pin_ok is False
+    assert pin_skip == "form_unresolved:claim_conflict:liquid_melt_below_liquidus"
+    assert axes["form_T_consistency"]["checked"] is True
+    evaluation = evaluate_observation(obs, vapor_pressure_data=load_vapor_pressure_data())
+    assert evaluation.skip_reason == (
+        "typed-refusal:form_unresolved:claim_conflict:liquid_melt_below_liquidus"
+    )
+    assert not any(r.status in {"match", "mismatch"} for r in evaluation.records)
+
+
+def test_liquid_claim_straddling_liquidus_aggregate_fails_closed() -> None:
+    """A scalar-α row claiming liquid_melt over a straddling T_range aggregates
+    subliquidus measurements into the value — fail closed, no midpoint rescue."""
+
+    obs = _form_gate_fixture(
+        observation_id="fixture_straddling_liquid_scalar",
+        values={"alpha": 0.5, "system_class": "silicate_melt"},
+        condensed_form={
+            "state": "liquid_melt",
+            "basis": "explicit_author",
+            "transition_context": {"liquidus_K": 1823.0},
+        },
+        T_range_K=(1773.15, 2073.15),
+    )
+    form_ok, _, reason, _ = rail_condensed_form_comparability(obs)
+    assert form_ok is False
+    assert reason == "form_unresolved:claim_conflict:liquid_melt_straddles_liquidus"
+    evaluation = evaluate_observation(obs, vapor_pressure_data=load_vapor_pressure_data())
+    # The synthetic midpoint (1923.15 K) is above the liquidus but is NOT a
+    # measured point T — the aggregate verdict must stick.
+    assert not any(r.status in {"match", "mismatch"} for r in evaluation.records)
+
+
+def test_liquid_claim_consistent_with_typed_liquidus_passes() -> None:
+    """Sossi-class row: liquid_melt at/above the typed liquidus cross-checks
+    clean and stays pin-bearing (the P1 check is not a blanket demotion)."""
+
+    obs = _form_gate_fixture(
+        observation_id="fixture_consistent_liquid",
+        values={"alpha": 0.5, "system_class": "silicate_melt"},
+        condensed_form={
+            "state": "liquid_melt",
+            "basis": "explicit_author",
+            "transition_context": {"liquidus_K": 1573.0},
+        },
+        T_range_K=(1573.15, 1823.15),
+    )
+    form_ok, state, reason, detail = rail_condensed_form_comparability(obs)
+    assert form_ok is True
+    assert state == RAIL_TARGET_CONDENSED_FORM
+    assert reason is None
+    assert detail["form_T_consistency"]["checked"] is True
+    assert detail["form_T_consistency"]["conflict"] is None
+    pin_ok, pin_skip, _ = rail_alpha_comparability(obs)
+    assert pin_ok is True
+    assert pin_skip is None
+
+
+def test_straddling_partially_molten_whole_row_exclusion_is_labeled() -> None:
+    """Richter-2002 b1 shape: straddling row whose payload is a single adopted
+    α cannot split; the exclusion must carry the typed straddles_transition
+    reason (never a silent unlabeled exclusion)."""
+
+    obs = _form_gate_fixture(
+        observation_id="fixture_straddling_partial_scalar",
+        values={"alpha": 0.04, "system_class": "silicate_melt"},
+        condensed_form={
+            "state": "partially_molten",
+            "basis": "temperature_inferred",
+            "transition_context": {"liquidus_K": 1823.0},
+        },
+        T_range_K=(1773.15, 2073.15),
+    )
+    form_ok, _, reason, detail = rail_condensed_form_comparability(obs)
+    assert form_ok is False
+    assert reason == "not_comparable_condensed_form:partially_molten:straddles_transition"
+    assert detail["form_T_consistency"]["straddles"] == "liquidus_K"
+    # Synthetic midpoint (1923.15 K, molten side) must NOT rescue the row:
+    # the adopted α is not a per-point measurement.
+    form_ok_pt, _, reason_pt, _ = rail_condensed_form_comparability(obs, T_K=1923.15)
+    assert form_ok_pt is False
+    assert "straddles_transition" in reason_pt
+    evaluation = evaluate_observation(obs, vapor_pressure_data=load_vapor_pressure_data())
+    assert evaluation.skip_reason == (
+        "typed-refusal:not_comparable_condensed_form:partially_molten:straddles_transition"
+    )
+    assert not any(r.status in {"match", "mismatch"} for r in evaluation.records)
+
+
+def test_straddling_partially_molten_per_point_series_splits() -> None:
+    """State-at-measurement split (grok P2): a genuine per-point (T, α) series
+    on a partially_molten row keeps its molten-side points as pin-bearing
+    liquid_melt; the subliquidus point stays excluded with a typed reason."""
+
+    obs = _form_gate_fixture(
+        observation_id="fixture_straddling_partial_series",
+        values={
+            "system_class": "silicate_melt",
+            "series": [
+                {"T_K": 1773.15, "alpha": 0.04},
+                {"T_K": 1973.15, "alpha": 0.10},
+                {"T_K": 2073.15, "alpha": 0.20},
+            ],
+        },
+        condensed_form={
+            "state": "partially_molten",
+            "basis": "temperature_inferred",
+            "transition_context": {"liquidus_K": 1823.0},
+        },
+        T_range_K=(1773.15, 2073.15),
+    )
+    # Observation-level verdict is still the labeled whole-row exclusion…
+    form_ok, _, reason, _ = rail_condensed_form_comparability(obs)
+    assert form_ok is False
+    assert reason == "not_comparable_condensed_form:partially_molten:straddles_transition"
+    # …but measured point Ts split at the boundary.
+    ok_below, _, skip_below, _ = rail_condensed_form_comparability(
+        obs, T_K=1773.15, point_T_is_measured=True
+    )
+    assert ok_below is False
+    assert skip_below == "not_comparable_condensed_form:partially_molten"
+    ok_above, state_above, skip_above, detail_above = rail_condensed_form_comparability(
+        obs, T_K=1973.15, point_T_is_measured=True
+    )
+    assert ok_above is True
+    assert state_above == RAIL_TARGET_CONDENSED_FORM
+    assert skip_above is None
+    assert detail_above["form_point_resolution"] == (
+        "partially_molten_point_liquid_side_of_liquidus"
+    )
+    evaluation = evaluate_observation(obs, vapor_pressure_data=load_vapor_pressure_data())
+    by_T = {r.coordinate["temperature_K"]: r for r in evaluation.records}
+    assert by_T[1973.15].status in {"match", "mismatch"}
+    assert by_T[2073.15].status in {"match", "mismatch"}
+    assert by_T[1773.15].status == "out-of-domain"
+
+
+def test_liquid_claim_per_point_below_liquidus_is_excluded() -> None:
+    """Per-point LABEL-TRUST: a liquid_melt-claimed series keeps molten-side
+    points but fails subliquidus points closed with the conflict named."""
+
+    obs = _form_gate_fixture(
+        observation_id="fixture_liquid_series_partial_conflict",
+        values={
+            "system_class": "silicate_melt",
+            "series": [
+                {"T_K": 1773.15, "alpha": 0.04},
+                {"T_K": 1973.15, "alpha": 0.10},
+            ],
+        },
+        condensed_form={
+            "state": "liquid_melt",
+            "basis": "explicit_author",
+            "transition_context": {"liquidus_K": 1823.0},
+        },
+        T_range_K=(1773.15, 1973.15),
+    )
+    ok_below, _, skip_below, _ = rail_condensed_form_comparability(
+        obs, T_K=1773.15, point_T_is_measured=True
+    )
+    assert ok_below is False
+    assert skip_below == "form_unresolved:claim_conflict:liquid_melt_below_liquidus"
+    evaluation = evaluate_observation(obs, vapor_pressure_data=load_vapor_pressure_data())
+    by_T = {r.coordinate["temperature_K"]: r for r in evaluation.records}
+    assert by_T[1973.15].status in {"match", "mismatch"}
+    assert by_T[1773.15].status == "out-of-domain"
+
+
+def test_dual_axis_skip_records_both_reasons() -> None:
+    """Wetzel shape (grok P2): class ∧ form both exclude — the ledger primary
+    reason must show both axes, not silently prefer class over form."""
+
+    obs = _form_gate_fixture(
+        observation_id="fixture_dual_axis_skip",
+        phase="solid_sio_film_growth",
+        values={"alpha": 0.5, "system_class": "solid_film_growth"},
+        condensed_form={"state": "glass_amorphous", "basis": "explicit_author"},
+    )
+    class_ok, _, class_skip = rail_system_class_comparability(obs)
+    form_ok, _, form_skip, _ = rail_condensed_form_comparability(obs)
+    assert class_ok is False and form_ok is False
+    pin_ok, pin_skip, axes = rail_alpha_comparability(obs)
+    assert pin_ok is False
+    assert pin_skip == f"{class_skip}+{form_skip}"
+    assert pin_skip == (
+        "not_comparable_system_class:solid_film_growth"
+        "+not_comparable_condensed_form:glass_amorphous"
+    )
+    assert axes["skip_reasons_all"] == [class_skip, form_skip]
+    evaluation = evaluate_observation(obs, vapor_pressure_data=load_vapor_pressure_data())
+    assert evaluation.skip_reason == f"typed-refusal:{pin_skip}"
+    assert "glass_amorphous" in evaluation.skip_reason
+
+
+def test_solid_claim_above_liquidus_conflicts_fail_closed() -> None:
+    """A crystalline claim entirely above its typed liquidus contradicts its
+    own transitions — downgrade to form_unresolved naming the conflict."""
+
+    obs = _form_gate_fixture(
+        observation_id="fixture_solid_above_liquidus",
+        values={"alpha": 0.5, "system_class": "silicate_melt"},
+        condensed_form={
+            "state": "crystalline",
+            "basis": "explicit_author",
+            "transition_context": {"liquidus_K": 2000.0},
+        },
+        T_range_K=(2100.0, 2200.0),
+    )
+    form_ok, state, reason, _ = rail_condensed_form_comparability(obs)
+    assert form_ok is False
+    assert state == "crystalline"
+    assert reason == "form_unresolved:claim_conflict:crystalline_above_liquidus"
+
+
+def test_untyped_transition_context_keeps_face_value_trust() -> None:
+    """Without typed transitions there is nothing to cross-check — the claim
+    is taken at face value (documented residual trust gap, not a silent one:
+    runtime simply carries no form_T_consistency detail)."""
+
+    obs = _form_gate_fixture(
+        observation_id="fixture_untransitions_liquid",
+        values={"alpha": 0.5, "system_class": "silicate_melt"},
+        condensed_form={"state": "liquid_melt", "basis": "explicit_author"},
+    )
+    assert observation_form_transition_context(obs) == {}
+    form_ok, _, reason, detail = rail_condensed_form_comparability(obs)
+    assert form_ok is True
+    assert reason is None
+    assert detail is None
 
 
 def test_comparison_vocabulary_matches_kems_precedent() -> None:
@@ -364,7 +737,7 @@ def test_point_level_drops_emit_gap_records_not_silent() -> None:
         observation_id="mixed_alpha_rate",
         obs_type="rate_series",
         review_status=None,
-        phase=None,
+        phase="silicate_melt",
         regime=None,
         standard_state=None,
         T_range_K=(1973.0, 1973.0),
@@ -375,12 +748,14 @@ def test_point_level_drops_emit_gap_records_not_silent() -> None:
             "series": [
                 {"T_K": 1973.0, "alpha": 0.23, "sigma": 0.02},
                 {"T_K": 2073.0, "rate": 1.0e-6},  # drop: rate without alpha
-            ]
+            ],
+            "system_class": "silicate_melt",
         },
         equipment={},
         disagreement_dex=None,
         is_priority_winner=True,
         geometry_assumption=geometry_assumption_text(),
+        condensed_form={"state": "liquid_melt", "metastable": False},
     )
     evaluation = evaluate_observation(obs, vapor_pressure_data=load_vapor_pressure_data())
     drop_records = [
@@ -888,18 +1263,24 @@ def test_coverage_ledger_is_observation_first_and_exact(
     adopted_observations: list[AdoptedObservation],
 ) -> None:
     coverage = coverage_summary(battery_evaluations)
-    # 2026-08-08 si-comparability: B1 harvest expanded adoption; pure-element /
-    # molten-metal / solid-film α are typed not_comparable_system_class skips
-    # (not residual pins). Counts are live battery, not hand-estimated.
+    # 2026-08-09 form589: condensed-form gate on α path. Class-incomparable
+    # pure-element / molten-metal / solid-film skips remain; form mismatches
+    # (crystalline / partially_molten / unresolved) are additional typed skips.
+    # Counts are live battery, not hand-estimated.
     assert coverage["observations"] == len(adopted_observations) == 172
-    assert coverage["comparable"] == 38
-    assert coverage["skipped"] == 134
+    assert coverage["comparable"] == 23
+    assert coverage["skipped"] == 149
     assert coverage["comparable"] + coverage["skipped"] == coverage["observations"]
-    assert coverage["comparable_points"] == 81
-    assert coverage["gap_points"] == 208
+    assert coverage["comparable_points"] == 56
+    assert coverage["gap_points"] == 233
     assert all(reason.startswith("typed-refusal:") for reason in coverage["skip_reasons"])
     assert any(
         reason.startswith("typed-refusal:not_comparable_system_class:")
+        for reason in coverage["skip_reasons"]
+    )
+    assert any(
+        reason.startswith("typed-refusal:not_comparable_condensed_form:")
+        or reason == "typed-refusal:form_unresolved"
         for reason in coverage["skip_reasons"]
     )
 
@@ -914,7 +1295,7 @@ def test_coverage_ledger_is_observation_first_and_exact(
         for key, row in by_type.items()
     } == {
         "activity_coefficient": (49, 0, 49, 0),
-        "alpha": (60, 35, 25, 69),
+        "alpha": (60, 20, 40, 44),
         "psat_series": (19, 0, 19, 0),
         "rate_series": (44, 3, 41, 12),
     }
@@ -924,7 +1305,7 @@ def test_coverage_ledger_is_observation_first_and_exact(
         for key, row in by_family.items()
     } == {
         "activity_coefficient": (49, 0, 0),
-        "alpha": (60, 35, 69),
+        "alpha": (60, 20, 44),
         "alpha_in_legacy_rate_series": (3, 3, 12),
         "psat_series": (19, 0, 0),
         "rate_hkl": (41, 0, 0),

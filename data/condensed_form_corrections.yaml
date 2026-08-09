@@ -1,0 +1,39 @@
+# Generalized condensed-form correction catalog (design 2026-08-09-condensed-form).
+#
+# Category-2 form corrections are pin-status_bearing_non_authoritative: a
+# numeric α adjustment is visible for diagnostics but MUST NOT certify, earn,
+# pass, or set a T3 residual maximum.
+#
+# A correction is computable only when:
+#   - same composition / reference frame as the observation carrier
+#   - both G branches are certified at measurement T (no domain extrapolation)
+#   - balanced stoichiometry (nu_c, nu_g) is explicit
+#   - solid solutions supply partial-molar G, not pure-endmember bulk fusion
+#
+# Audit (2026-08-09): Costa Fo93Fa7 olivine is NOT correctable here —
+# Mg2SiO4(L) CEA domain starts 2170 K (measurement 1700–1800 K), Fo93Fa7 is a
+# solid solution, and Fe/SiO channels need partial-molar chemical potentials.
+# Yu C1, Richter-2002 multiphase CAI, and amorphous SiO also lack in-repo
+# same-composition G pairs. Those rows use typed exclusion, not this catalog.
+#
+# Empty corrections map is intentional and fail-closed.
+schema_version: condensed_form_corrections.v1
+corrections: {}
+# Example shape (not authorized for production residual pins):
+# corrections:
+#   example_pure_endmember_solid_to_liquid:
+#     observed_state: crystalline
+#     rail_state: liquid_melt
+#     composition_frame: pure_endmember
+#     nu_c: 1.0
+#     nu_g: 1.0
+#     valid_T_K: [1200.0, 1600.0]
+#     delta_G_table:
+#       - T_K: 1400.0
+#         delta_G_o_minus_r_J_mol: -12000.0   # G_solid - G_liquid
+#     thermo_branches:
+#       observed: "EXAMPLE(cr)"
+#       rail: "EXAMPLE(L)"
+#     provenance:
+#       note: "illustrative only — not wired to any live observation"
+#       uncertainty_dex: 0.1

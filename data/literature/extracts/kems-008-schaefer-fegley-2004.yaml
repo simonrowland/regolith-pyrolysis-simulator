@@ -23,6 +23,11 @@ species:
       - 2173.0
       - 2373.0
       phase: oxide_silicate_literature_survey
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: Schaefer-Fegley liquid silica + liquid forsterite survey points
       standard_state: vaporization coefficient α_s = P_obs/P_vap survey (mostly solids)
       regime: review_compilation
       units: dimensionless
@@ -63,6 +68,11 @@ species:
       - 2163.0
       - 2323.0
       phase: Mg2SiO4_s_l_literature
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: 'Schaefer-Fegley forsterite melt survey; scored 2243 K > CEA 2170 K boundary'
       regime: review_compilation
       units: dimensionless
       values:
@@ -95,6 +105,16 @@ species:
       - 1800.0
       - 2310.0
       phase: pure_oxide_literature_survey
+      condensed_form:
+        state: crystalline
+        polymorph_name: corundum
+        metastable: false
+        solution_character: stoichiometric
+        basis: mixed_evidence
+        note: Survey aggregates solid corundum rows + one liquid at 2310; synthetic score point is solid-side
+        transition_context:
+          liquidus_K: 2310.0
+          source_locator: Schaefer-Fegley Table 10 survey row labeled liquid at 2310 K (aggregate note)
       regime: review_compilation
       units: dimensionless
       values:
@@ -167,6 +187,13 @@ species:
       - 1800.0
       - 2173.0
       phase: pure_oxide_literature_survey
+      condensed_form:
+        state: crystalline
+        polymorph_name: periclase
+        metastable: false
+        solution_character: stoichiometric
+        basis: explicit_author
+        note: Pure MgO solid survey; CEA MgO(cr) valid to 3100 K
       regime: review_compilation
       units: dimensionless
       values:
@@ -226,6 +253,11 @@ species:
       - 1823.0
       - 2373.0
       phase: pure_oxide_literature_survey
+      condensed_form:
+        state: unresolved
+        metastable: false
+        basis: mixed_evidence
+        note: Aggregates crystalline silica (to 1983) and liquid (2173–2373); synthetic 2098 matches neither
       regime: review_compilation
       units: dimensionless
       values:

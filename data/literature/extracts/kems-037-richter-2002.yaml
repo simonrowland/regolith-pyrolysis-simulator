@@ -26,6 +26,14 @@ species:
       - 1673.0
       - 1773.0
       phase: silicate_melt_Type_B_CAI_like
+      condensed_form:
+        state: partially_molten
+        metastable: false
+        basis: temperature_inferred
+        note: Richter-2002 CAI liquidus ~1823 K; scored/range includes subliquidus or mixed H2/vacuum grounding
+        transition_context:
+          liquidus_K: 1823.0
+          source_locator: Type-B CAI liquidus ~1823 K (audit 2026-08-09; Richter-2007 fully-molten claim)
       standard_state: free evaporation / low-P H2; γ from HKL with thermodynamic P_sat
       regime: langmuir_free_evaporation
       units: dimensionless
@@ -80,6 +88,14 @@ species:
       - 1773.15
       - 2073.15
       phase: silicate_melt_Type_B_CAI_like
+      condensed_form:
+        state: partially_molten
+        metastable: false
+        basis: temperature_inferred
+        note: Richter-2002 CAI liquidus ~1823 K; range straddles it — B-113/B-133 vacuum runs at 1973/2073 K are liquid-side but carry no adopted per-run α (adopted α=0.04 is the H2 1773 K subliquidus series pin), so no per-point split is possible
+        transition_context:
+          liquidus_K: 1823.0
+          source_locator: Type-B CAI liquidus ~1823 K (audit 2026-08-09; Richter-2007 fully-molten claim)
       regime: langmuir_free_evaporation
       units: dimensionless
       values:
@@ -256,6 +272,14 @@ species:
       - 1673.0
       - 1773.0
       phase: silicate_melt_Type_B_CAI_like
+      condensed_form:
+        state: partially_molten
+        metastable: false
+        basis: temperature_inferred
+        note: Richter-2002 CAI liquidus ~1823 K; scored/range includes subliquidus or mixed H2/vacuum grounding
+        transition_context:
+          liquidus_K: 1823.0
+          source_locator: Type-B CAI liquidus ~1823 K (audit 2026-08-09; Richter-2007 fully-molten claim)
       regime: langmuir_free_evaporation
       units: dimensionless
       values:
@@ -288,6 +312,14 @@ species:
       - 1773.15
       - 2073.15
       phase: silicate_melt_Type_B_CAI_like
+      condensed_form:
+        state: partially_molten
+        metastable: false
+        basis: temperature_inferred
+        note: Richter-2002 CAI liquidus ~1823 K; range straddles it — B-113/B-133 vacuum runs at 1973/2073 K are liquid-side but carry no adopted per-run α (adopted α=0.04 is the H2 1773 K subliquidus series pin), so no per-point split is possible
+        transition_context:
+          liquidus_K: 1823.0
+          source_locator: Type-B CAI liquidus ~1823 K (audit 2026-08-09; Richter-2007 fully-molten claim)
       regime: langmuir_free_evaporation
       units: dimensionless
       values:

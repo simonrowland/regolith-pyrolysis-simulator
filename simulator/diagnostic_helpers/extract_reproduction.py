@@ -157,6 +157,9 @@ class AdoptedObservation:
     is_priority_winner: bool
     geometry_assumption: str
     adoption_basis: str = "priority_winner"
+    # Typed condensed-form axis (state-at-measurement). Optional during
+    # migration; alpha residual path fail-closes when missing/unresolved.
+    condensed_form: Mapping[str, Any] | None = None
 
     @property
     def case_id(self) -> str:
@@ -281,6 +284,12 @@ def load_adopted_observations(
             else:
                 t_range_out = None
             dex = dex_by_key.get((str(species_id), otype, source_id))
+            raw_form = obs.get("condensed_form")
+            condensed_form: Mapping[str, Any] | None
+            if isinstance(raw_form, Mapping):
+                condensed_form = dict(raw_form)
+            else:
+                condensed_form = None
             adopted.append(
                 AdoptedObservation(
                     species_id=str(species_id),
@@ -313,6 +322,7 @@ def load_adopted_observations(
                     adoption_basis=(
                         "priority_winner" if is_priority_winner else "mass_spec_extract"
                     ),
+                    condensed_form=condensed_form,
                 )
             )
     adopted.sort(key=lambda row: (row.species_id, row.source_id, row.observation_id))
@@ -653,6 +663,19 @@ def _literature_pressure_points(
     return None, "no_usable_psat_payload", drops
 
 
+# values keys carrying genuine per-point (T, α) measurements, in priority
+# order. Scalar/fit payloads (alpha, alpha_range, alpha_form) are aggregates
+# over the observation T_range and can never split a straddling row.
+_PER_POINT_ALPHA_SERIES_PRIORITY = (
+    "series",
+    "per_temperature",
+    "alpha_series_figure_approx",
+    "pins",
+    "points",
+)
+_PER_POINT_ALPHA_SERIES_NAMES = frozenset(_PER_POINT_ALPHA_SERIES_PRIORITY)
+
+
 def _literature_alpha_points(
     obs: AdoptedObservation,
 ) -> tuple[list[dict[str, Any]] | None, str | None, list[dict[str, Any]]]:
@@ -666,13 +689,7 @@ def _literature_alpha_points(
     drops: list[dict[str, Any]] = []
     series = None
     series_name = None
-    for candidate_name in (
-        "series",
-        "per_temperature",
-        "alpha_series_figure_approx",
-        "pins",
-        "points",
-    ):
+    for candidate_name in _PER_POINT_ALPHA_SERIES_PRIORITY:
         candidate = values.get(candidate_name)
         if isinstance(candidate, list) and candidate:
             series = candidate
@@ -692,10 +709,13 @@ def _literature_alpha_points(
                 continue
             point_range = pt.get("T_range_K")
             T = pt.get("T_K") or pt.get("temperature_K")
+            t_provenance = "explicit" if T is not None else None
             if T is None and isinstance(point_range, (list, tuple)) and len(point_range) == 2:
                 T = 0.5 * (float(point_range[0]) + float(point_range[1]))
+                t_provenance = "point_range_midpoint"
             if T is None and obs.T_range_K is not None:
                 T = 0.5 * (float(obs.T_range_K[0]) + float(obs.T_range_K[1]))
+                t_provenance = "obs_range_midpoint"
             alpha = pt.get("alpha")
             if alpha is None:
                 alpha = pt.get("alpha_approx")
@@ -753,6 +773,7 @@ def _literature_alpha_points(
                     "sigma": sigma_f,
                     "point_index": idx,
                     "series_name": series_name,
+                    "T_provenance": t_provenance,
                 }
             )
         if out:
@@ -794,6 +815,7 @@ def _literature_alpha_points(
                     "sigma": sigma,
                     "point_index": idx,
                     "series_name": "alpha_form",
+                    "T_provenance": "alpha_form_synthetic",
                     "uncertainty_components": (
                         ["Arrhenius E uncertainty propagated as sigma_alpha/alpha=sigma_E/(R*T)"]
                         if sigma is not None
@@ -811,7 +833,14 @@ def _literature_alpha_points(
             return None, "alpha_without_temperature", drops
         try:
             return (
-                [{"T_K": float(T), "alpha": float(values["alpha"]), "sigma": None}],
+                [
+                    {
+                        "T_K": float(T),
+                        "alpha": float(values["alpha"]),
+                        "sigma": None,
+                        "T_provenance": "obs_range_midpoint",
+                    }
+                ],
                 None,
                 drops,
             )
@@ -835,6 +864,7 @@ def _literature_alpha_points(
                     "sigma": 0.5 * abs(high - low),
                     "point_index": 0,
                     "series_name": "alpha_range",
+                    "T_provenance": "obs_range_midpoint",
                 }
             ],
             None,
@@ -1487,6 +1517,544 @@ def rail_system_class_comparability(
     )
 
 
+# ---------------------------------------------------------------------------
+# Condensed-form axis (state-at-measurement)
+# ---------------------------------------------------------------------------
+# Rail residual pins claim a *liquid silicate melt* specimen form. A solid
+# olivine α, partially molten CAI row, amorphous-film growth coefficient, or
+# unresolved supercooled/two-phase measurement is not the same observable even
+# when system_class is silicate_melt / solid_solution_silicate.
+#
+# Closed vocabulary (design 2026-08-09-condensed-form). No species branches.
+CONDENSED_FORM_STATES = frozenset(
+    {
+        "liquid_melt",
+        "supercooled_liquid",
+        "partially_molten",
+        "glass_amorphous",
+        "crystalline",
+        "unresolved",
+    }
+)
+# Exact form match for the production silicate-melt rail residual path.
+RAIL_TARGET_CONDENSED_FORM = "liquid_melt"
+# States that can never pin the liquid-melt rail without a valid correction.
+RAIL_NONMATCH_CONDENSED_FORMS = frozenset(
+    {
+        "supercooled_liquid",
+        "partially_molten",
+        "glass_amorphous",
+        "crystalline",
+        "unresolved",
+    }
+)
+CONDENSED_FORM_CORRECTIONS_PATH = (
+    REPO_ROOT / "data" / "condensed_form_corrections.yaml"
+)
+_R_GAS_J_MOL_K = 8.314462618  # CODATA; used only in form-correction algebra
+
+
+def observation_condensed_form(
+    obs: AdoptedObservation,
+) -> Mapping[str, Any] | None:
+    """Return the typed condensed_form object, or None when absent."""
+
+    if isinstance(obs.condensed_form, Mapping) and obs.condensed_form:
+        return obs.condensed_form
+    # Allow values.condensed_form as a migration fallback (B1 harvest style).
+    raw = obs.values.get("condensed_form")
+    if isinstance(raw, Mapping) and raw:
+        return raw
+    return None
+
+
+def observation_condensed_form_state(obs: AdoptedObservation) -> str | None:
+    """Return closed-vocabulary ``state`` or None when untyped."""
+
+    form = observation_condensed_form(obs)
+    if form is None:
+        return None
+    raw = form.get("state")
+    if raw is None or not str(raw).strip():
+        return None
+    # Out-of-vocabulary tokens are returned verbatim; the comparability gate
+    # fails them closed with typed not_comparable_condensed_form:<token>.
+    return str(raw).strip()
+
+
+def observation_form_transition_context(
+    obs: AdoptedObservation,
+) -> dict[str, float]:
+    """Typed transition temperatures (K) declared on the condensed_form block.
+
+    Returns a dict carrying any of ``Tg_K`` / ``solidus_K`` / ``liquidus_K``
+    as finite positive floats (design 2026-08-09-condensed-form
+    ``transition_context``). Absent or non-numeric entries are omitted — the
+    T cross-check only runs on typed values; an untyped claim keeps the prior
+    trust level (no data to check against).
+    """
+
+    form = observation_condensed_form(obs)
+    ctx = form.get("transition_context") if isinstance(form, Mapping) else None
+    out: dict[str, float] = {}
+    if not isinstance(ctx, Mapping):
+        return out
+    for key in ("Tg_K", "solidus_K", "liquidus_K"):
+        try:
+            value = float(ctx.get(key))
+        except (TypeError, ValueError):
+            continue
+        if math.isfinite(value) and value > 0.0:
+            out[key] = value
+    return out
+
+
+# Boundary convention: T == liquidus is liquid-side (the last crystal dissolves
+# at the liquidus); T strictly below is subliquidus. Solidus mirrors this.
+_SOLID_FORM_CLAIMS = frozenset({"crystalline", "glass_amorphous"})
+
+
+def _form_claim_T_consistency(
+    obs: AdoptedObservation,
+    state: str,
+    transitions: Mapping[str, float],
+    T_K: float | None,
+    *,
+    point_T_is_measured: bool = False,
+) -> dict[str, Any]:
+    """Cross-check a typed form claim against T and the typed transitions.
+
+    LABEL-TRUST backstop (grok P1): an authored ``state`` string is not taken
+    on faith when the row also carries typed transition temperatures — the
+    T_range (or measured point T) must agree with the claim.
+
+    T basis: a *measured* per-point T (``point_T_is_measured=True``) decides on
+    its own (state-at-measurement split semantics); otherwise the observation
+    ``T_range_K`` decides so an aggregate value cannot hide behind a synthetic
+    midpoint on the "safe" side of a straddled transition.
+
+    Returns a detail mapping with keys:
+
+    - ``checked``: False when no T or no relevant transition is typed.
+    - ``claimed_state``: the authored state under check.
+    - ``conflict``: token naming a claim/T contradiction (fail-closed
+      downgrade to ``form_unresolved``), else None.
+    - ``straddles``: transition key the observation T_range straddles, else
+      None. Only non-match states straddle without conflict; a ``liquid_melt``
+      claim straddling its liquidus is a conflict (aggregate contamination).
+    - ``point_state``: resolved per-point state for a measured point T on a
+      ``partially_molten`` row (``liquid_melt`` on the molten side), else None.
+    """
+
+    result: dict[str, Any] = {
+        "checked": False,
+        "claimed_state": state,
+        "conflict": None,
+        "straddles": None,
+        "point_state": None,
+    }
+    liquidus = transitions.get("liquidus_K")
+    solidus = transitions.get("solidus_K")
+    if liquidus is None and solidus is None:
+        return result
+    if T_K is not None and (point_T_is_measured or obs.T_range_K is None):
+        lo = hi = float(T_K)
+    elif obs.T_range_K is not None:
+        lo, hi = float(obs.T_range_K[0]), float(obs.T_range_K[1])
+    else:
+        return result
+    result["checked"] = True
+    result["T_window_K"] = [lo, hi]
+
+    below_liquidus = liquidus is not None and hi < liquidus
+    above_liquidus = liquidus is not None and lo >= liquidus
+    straddles_liquidus = liquidus is not None and lo < liquidus <= hi
+    below_solidus = solidus is not None and hi < solidus
+    straddles_solidus = solidus is not None and lo < solidus <= hi
+
+    if state == RAIL_TARGET_CONDENSED_FORM:
+        if below_liquidus:
+            result["conflict"] = "liquid_melt_below_liquidus"
+        elif solidus is not None and below_solidus:
+            result["conflict"] = "liquid_melt_below_solidus"
+        elif straddles_liquidus:
+            result["conflict"] = "liquid_melt_straddles_liquidus"
+        return result
+    if state in _SOLID_FORM_CLAIMS:
+        if above_liquidus:
+            result["conflict"] = f"{state}_above_liquidus"
+        elif straddles_liquidus:
+            result["straddles"] = "liquidus_K"
+        elif state == "crystalline" and straddles_solidus:
+            result["straddles"] = "solidus_K"
+        return result
+    if state == "supercooled_liquid":
+        # Metastable by definition below the liquidus; above it the claim is
+        # self-contradictory.
+        if above_liquidus:
+            result["conflict"] = "supercooled_liquid_above_liquidus"
+        elif straddles_liquidus:
+            result["straddles"] = "liquidus_K"
+        return result
+    if state == "partially_molten":
+        if T_K is not None and point_T_is_measured:
+            # State-at-measurement split: a *measured* point decides on its own
+            # T — the molten side of the typed liquidus is a valid liquid
+            # point; below stays excluded as partially_molten.
+            if liquidus is not None:
+                result["point_state"] = (
+                    RAIL_TARGET_CONDENSED_FORM
+                    if float(T_K) >= liquidus
+                    else "partially_molten"
+                )
+            return result
+        if above_liquidus:
+            result["conflict"] = "partially_molten_above_liquidus"
+            return result
+        if solidus is not None and below_solidus:
+            result["conflict"] = "partially_molten_below_solidus"
+            return result
+        if straddles_liquidus:
+            result["straddles"] = "liquidus_K"
+        return result
+    return result
+
+
+def load_condensed_form_corrections(
+    path: Path | None = None,
+) -> dict[str, Mapping[str, Any]]:
+    """Load the generalized form-correction catalog keyed by correction_id.
+
+    Catalog entries declare balanced stoichiometry, composition frame, both
+    thermo branch references, valid T domain, and provenance. Empty catalog
+    is valid: the gate then has no category-2 path and fail-closes mismatches.
+    """
+
+    p = path or CONDENSED_FORM_CORRECTIONS_PATH
+    if not p.is_file():
+        return {}
+    raw = yaml.safe_load(p.read_text(encoding="utf-8")) or {}
+    if not isinstance(raw, Mapping):
+        return {}
+    corrections = raw.get("corrections") or {}
+    if not isinstance(corrections, Mapping):
+        return {}
+    return {
+        str(cid): dict(block)
+        for cid, block in corrections.items()
+        if isinstance(block, Mapping)
+    }
+
+
+def form_correction_delta_log10_alpha(
+    *,
+    T_K: float,
+    delta_G_o_minus_r_J_mol: float,
+    nu_c: float = 1.0,
+    nu_g: float = 1.0,
+) -> float:
+    """Flux-equivalent base-10 alpha correction for a form change.
+
+    Derivation (design 2026-08-09-condensed-form § form-match-or-corrected):
+
+    Common reaction basis (non-target µ fixed on the same frame)::
+
+        ν_c C(f) + … ⇌ ν_g V(g) + …
+
+    Equilibrium shift from observed form o to rail form r::
+
+        ln(p_o / p_r) = (ν_c / ν_g) · (G_o − G_r) / (R T)
+
+    Hertz–Knudsen flux J = α C(T) p_eq implies the rail-equivalent α::
+
+        log10 α_{o→r} = log10 α_o
+                        + (ν_c / ν_g) · (G_o − G_r) / (R T ln 10)
+
+    Sign check: higher-G observed form → higher p_eq → larger rail-equivalent α.
+    Solid-below-Tm → liquid rail: G_s − G_l < 0 → liquid-equivalent α shrinks.
+
+    Unit check::
+
+        (J mol⁻¹) / ((J mol⁻¹ K⁻¹) · K · ln 10) = dimensionless dex.
+
+    At 1700 K, 10 kJ/mol with ν_c/ν_g = 1 is 0.307 dex.
+    """
+
+    if not math.isfinite(T_K) or T_K <= 0.0:
+        raise ValueError(f"form correction requires T_K > 0, got {T_K!r}")
+    if not math.isfinite(delta_G_o_minus_r_J_mol):
+        raise ValueError("form correction requires finite ΔG")
+    if not math.isfinite(nu_c) or not math.isfinite(nu_g) or nu_g == 0.0:
+        raise ValueError("form correction requires finite nu_c and non-zero nu_g")
+    # Δlog10 α = (ν_c/ν_g) · ΔG / (R T ln 10)
+    return (nu_c / nu_g) * delta_G_o_minus_r_J_mol / (
+        _R_GAS_J_MOL_K * float(T_K) * math.log(10.0)
+    )
+
+
+def resolve_form_correction(
+    obs: AdoptedObservation,
+    *,
+    T_K: float,
+    corrections: Mapping[str, Mapping[str, Any]] | None = None,
+) -> tuple[float | None, str | None, Mapping[str, Any] | None]:
+    """Attempt a category-2 form correction at ``T_K``.
+
+    Returns ``(delta_log10_alpha, refusal_suffix_or_none, runtime_detail)``.
+    A successful correction still yields only a non-pin-bearing
+    ``form-corrected`` diagnostic (fail-closed for T3 residual maxima).
+
+    Computable only when the catalog supplies same-composition G branches
+    with overlapping certified domains at T. Solid-solution carriers that
+    lack partial-molar G, multiphase mixtures without phase fractions, and
+    out-of-domain CEA polynomials refuse here (Costa Fo93Fa7 is the audit
+    exemplar: Mg2SiO4(L) domain starts 2170 K; Fo93Fa7 is not pure Mg2SiO4).
+    """
+
+    form = observation_condensed_form(obs)
+    if form is None:
+        return None, "form_unresolved", {"detail": "missing_condensed_form"}
+    correction_id = form.get("correction_id") or obs.values.get("correction_id")
+    if correction_id is None or not str(correction_id).strip():
+        return (
+            None,
+            "missing_form_correction",
+            {"detail": "no_correction_id_on_observation"},
+        )
+    catalog = corrections if corrections is not None else load_condensed_form_corrections()
+    entry = catalog.get(str(correction_id))
+    if entry is None:
+        return (
+            None,
+            "missing_form_correction",
+            {"detail": f"correction_id_not_in_catalog:{correction_id}"},
+        )
+    # Domain gate — never extrapolate CEA polynomials outside declared range.
+    domain = entry.get("valid_T_K") or entry.get("T_domain_K")
+    if isinstance(domain, (list, tuple)) and len(domain) == 2:
+        try:
+            t_lo, t_hi = float(domain[0]), float(domain[1])
+        except (TypeError, ValueError):
+            return None, "form_correction_domain_invalid", {"correction_id": correction_id}
+        if not (t_lo <= float(T_K) <= t_hi):
+            return (
+                None,
+                "form_correction_out_of_domain",
+                {
+                    "correction_id": correction_id,
+                    "T_K": float(T_K),
+                    "valid_T_K": [t_lo, t_hi],
+                },
+            )
+    # Prefer pre-tabulated ΔG(T) samples; do not invent G from species names.
+    delta_g = entry.get("delta_G_o_minus_r_J_mol")
+    if delta_g is None:
+        # Optional T-table: list of {T_K, delta_G_o_minus_r_J_mol}
+        table = entry.get("delta_G_table") or []
+        if isinstance(table, Sequence):
+            for row in table:
+                if not isinstance(row, Mapping):
+                    continue
+                try:
+                    if abs(float(row["T_K"]) - float(T_K)) < 0.5:
+                        delta_g = row["delta_G_o_minus_r_J_mol"]
+                        break
+                except (KeyError, TypeError, ValueError):
+                    continue
+    if delta_g is None:
+        return (
+            None,
+            "missing_partial_molar_G",
+            {"correction_id": correction_id, "detail": "no_delta_G_at_T"},
+        )
+    try:
+        delta_g_f = float(delta_g)
+        nu_c = float(entry.get("nu_c", 1.0))
+        nu_g = float(entry.get("nu_g", 1.0))
+        delta = form_correction_delta_log10_alpha(
+            T_K=float(T_K),
+            delta_G_o_minus_r_J_mol=delta_g_f,
+            nu_c=nu_c,
+            nu_g=nu_g,
+        )
+    except (TypeError, ValueError) as exc:
+        return None, "form_correction_numeric_invalid", {"error": str(exc)}
+    return (
+        delta,
+        None,
+        {
+            "correction_id": str(correction_id),
+            "delta_G_o_minus_r_J_mol": delta_g_f,
+            "nu_c": nu_c,
+            "nu_g": nu_g,
+            "delta_log10_alpha": delta,
+            "fidelity": "status_bearing_non_authoritative",
+        },
+    )
+
+
+def rail_condensed_form_comparability(
+    obs: AdoptedObservation,
+    *,
+    T_K: float | None = None,
+    corrections: Mapping[str, Mapping[str, Any]] | None = None,
+    point_T_is_measured: bool = False,
+) -> tuple[bool, str | None, str | None, Mapping[str, Any] | None]:
+    """Whether the observation form is rail-comparable (match or correctable).
+
+    Returns
+    ``(pin_bearing_comparable, state_or_none, skip_reason_suffix_or_none,
+    form_runtime_detail_or_none)``.
+
+    Outcomes (design §form-match-or-corrected):
+
+    1. **Exact match** — ``state == liquid_melt`` → pin-bearing comparable.
+    2. **Corrected diagnostic** — non-match with a catalog-backed G correction
+       valid at T → not pin-bearing (``form_corrected`` path); caller emits a
+       non-residual status.
+    3. **Excluded** — missing/unresolved/mismatch without correction → typed
+       ``not_comparable_condensed_form:<state>`` or ``form_unresolved``.
+
+    LABEL-TRUST backstop (grok P1): a typed claim is cross-checked against the
+    typed ``transition_context`` whenever both T and transitions are available
+    (:func:`_form_claim_T_consistency`). A claim that contradicts its own
+    transitions is downgraded to ``form_unresolved:claim_conflict:<token>`` —
+    fail-closed, naming the conflict. A non-match row whose T_range straddles
+    the transition keeps its whole-row exclusion but with the typed
+    ``:straddles_transition`` suffix; a *measured* per-point T on a
+    ``partially_molten`` row splits at the boundary (molten-side points are
+    liquid state-at-measurement).
+
+    Composes with :func:`rail_system_class_comparability`: residual pins require
+    class-comparable AND form pin-bearing.
+    """
+
+    state = observation_condensed_form_state(obs)
+    if state is None:
+        # Fail closed: untyped form cannot ground a liquid-melt residual pin.
+        # Coverage ledger keeps the row with a typed reason.
+        return False, None, "form_unresolved", None
+    if state not in CONDENSED_FORM_STATES:
+        return (
+            False,
+            state,
+            f"not_comparable_condensed_form:{state}",
+            None,
+        )
+
+    transitions = observation_form_transition_context(obs)
+    consistency = _form_claim_T_consistency(
+        obs, state, transitions, T_K, point_T_is_measured=point_T_is_measured
+    )
+    detail: dict[str, Any] = {}
+    if consistency["checked"]:
+        detail["form_T_consistency"] = consistency
+    form_detail: Mapping[str, Any] | None = detail or None
+
+    if consistency["conflict"] is not None:
+        # Typed claim contradicts its own typed transitions at this T — the
+        # label cannot be trusted in either direction; fail closed.
+        return (
+            False,
+            state,
+            f"form_unresolved:claim_conflict:{consistency['conflict']}",
+            form_detail,
+        )
+
+    if state == RAIL_TARGET_CONDENSED_FORM:
+        return True, state, None, form_detail
+    if state == "unresolved":
+        return False, state, "form_unresolved", form_detail
+
+    # Remaining states are exactly the closed non-match set (enforced, not
+    # fall-through): anything else already returned above.
+    if state not in RAIL_NONMATCH_CONDENSED_FORMS:
+        return False, state, "form_unresolved", form_detail
+
+    # State-at-measurement split (grok P2): a measured point on the molten
+    # side of the typed liquidus of a partially_molten row is a valid liquid
+    # point. Only genuinely per-point payloads reach this (caller vouches via
+    # point_T_is_measured); aggregate/midpoint-scored rows keep the whole-row
+    # exclusion with the typed straddles_transition suffix below.
+    if consistency["point_state"] == RAIL_TARGET_CONDENSED_FORM:
+        split_detail = dict(detail)
+        split_detail["form_point_resolution"] = (
+            "partially_molten_point_liquid_side_of_liquidus"
+        )
+        return True, RAIL_TARGET_CONDENSED_FORM, None, split_detail
+
+    # Non-match: attempt category-2 correction only when T is known and a
+    # correction_id is declared. Without both, typed exclusion.
+    if T_K is not None:
+        delta, refusal, corr_detail = resolve_form_correction(
+            obs, T_K=float(T_K), corrections=corrections
+        )
+        if delta is not None and refusal is None:
+            # Corrected path is visible but NOT pin-bearing.
+            merged = dict(detail)
+            merged.update(corr_detail)
+            return False, state, "form_corrected", merged
+
+    suffix = f"not_comparable_condensed_form:{state}"
+    if consistency["straddles"] is not None:
+        # Whole-row exclusion of a straddling row must stay LABELED (grok P2):
+        # the molten-side points are knowingly excluded because the payload
+        # does not allow a per-point split.
+        suffix += ":straddles_transition"
+    return (False, state, suffix, form_detail)
+
+
+def rail_alpha_comparability(
+    obs: AdoptedObservation,
+    *,
+    T_K: float | None = None,
+    point_T_is_measured: bool = False,
+) -> tuple[bool, str | None, Mapping[str, Any]]:
+    """Class ∧ form comparability for α residual pins.
+
+    Returns ``(pin_bearing, primary_skip_suffix_or_none, runtime_axes)``.
+
+    Dual-axis exclusions (grok P2) record BOTH reasons: the primary suffix is
+    the compound ``<class_skip>+<form_skip>`` (class first) and
+    ``runtime_axes["skip_reasons_all"]`` carries the ordered list.
+    """
+
+    class_ok, system_class, class_skip = rail_system_class_comparability(obs)
+    form_ok, form_state, form_skip, form_detail = rail_condensed_form_comparability(
+        obs, T_K=T_K, point_T_is_measured=point_T_is_measured
+    )
+    runtime: dict[str, Any] = {
+        "system_class": system_class,
+        "rail_system_class_comparable": class_ok,
+        "condensed_form_state": form_state,
+        "rail_condensed_form_comparable": form_ok,
+        "rail_target_condensed_form": RAIL_TARGET_CONDENSED_FORM,
+    }
+    if form_detail is not None:
+        detail = dict(form_detail)
+        consistency = detail.pop("form_T_consistency", None)
+        if consistency is not None:
+            runtime["form_T_consistency"] = consistency
+        resolution = detail.pop("form_point_resolution", None)
+        if resolution is not None:
+            runtime["form_point_resolution"] = resolution
+        if detail:
+            runtime["form_correction"] = detail
+    skips = [
+        skip
+        for skip in (
+            class_skip if not class_ok else None,
+            form_skip if not form_ok else None,
+        )
+        if skip is not None
+    ]
+    if skips:
+        if len(skips) > 1:
+            runtime["skip_reasons_all"] = list(skips)
+        return False, "+".join(skips), runtime
+    return True, None, runtime
+
+
 def _evaluate_psat(
     obs: AdoptedObservation,
     evaluation: ObservationEvaluation,
@@ -1868,6 +2436,21 @@ def _evaluate_alpha(
     obs: AdoptedObservation,
     evaluation: ObservationEvaluation,
 ) -> ObservationEvaluation:
+    # Class + form gates run before payload-specific early returns so form
+    # exclusions remain visible even when alpha payload parsing also fails
+    # (design: 41 function-comparable vs 38 payload-reachable rows).
+    pin_ok_obs, axes_skip, axes_runtime = rail_alpha_comparability(obs)
+    axes_typed_skip = (
+        f"{_TYPED_SKIP_PREFIX}{axes_skip}" if axes_skip is not None else None
+    )
+    if not pin_ok_obs and axes_typed_skip is not None:
+        evaluation.runtime_notes.append(
+            "α not pin-bearing for silicate-melt liquid rail: "
+            f"class={axes_runtime.get('system_class')!r} "
+            f"form={axes_runtime.get('condensed_form_state')!r} "
+            f"({axes_typed_skip})"
+        )
+
     points, skip, drops = _literature_alpha_points(obs)
     if drops:
         _emit_point_drop_records(
@@ -1877,6 +2460,35 @@ def _evaluate_alpha(
             units=str(obs.units or "alpha"),
         )
     if skip is not None:
+        # Form/class exclusion takes precedence over payload gaps so the
+        # coverage skip ledger records the comparability reason first.
+        if not pin_ok_obs and axes_typed_skip is not None:
+            evaluation.records.append(
+                _compare_point(
+                    obs=obs,
+                    observable_id=f"{obs.observation_id}:payload",
+                    species=obs.species_id,
+                    coordinate={"window": "payload-absent"},
+                    expected=None,
+                    uncertainty=None,
+                    actual=None,
+                    units=str(obs.units or "alpha"),
+                    runtime={
+                        "skip_reason": axes_typed_skip,
+                        "payload_skip": (
+                            skip
+                            if skip.startswith(_TYPED_SKIP_PREFIX)
+                            else f"{_TYPED_SKIP_PREFIX}{skip}"
+                        ),
+                        "n_point_drops": len(drops),
+                        **axes_runtime,
+                    },
+                    out_of_domain=True,
+                )
+            )
+            evaluation.skip_reason = axes_typed_skip
+            evaluation.skip_reasons.append(axes_typed_skip)
+            return evaluation
         typed_skip = (
             skip if skip.startswith(_TYPED_SKIP_PREFIX) else f"{_TYPED_SKIP_PREFIX}{skip}"
         )
@@ -1890,7 +2502,11 @@ def _evaluate_alpha(
                 uncertainty=None,
                 actual=None,
                 units=str(obs.units or "alpha"),
-                runtime={"skip_reason": typed_skip, "n_point_drops": len(drops)},
+                runtime={
+                    "skip_reason": typed_skip,
+                    "n_point_drops": len(drops),
+                    **axes_runtime,
+                },
             )
         )
         evaluation.skip_reason = typed_skip
@@ -1898,27 +2514,30 @@ def _evaluate_alpha(
         return evaluation
 
     assert points is not None
-    # Class gate: residual pins claim the production silicate/oxide carrier.
-    # Pure-element / molten-metal / solid-film rows stay visible with a typed
-    # reason; they must not enter the comparable residual set.
-    class_ok, system_class, class_skip = rail_system_class_comparability(obs)
-    class_typed_skip = (
-        f"{_TYPED_SKIP_PREFIX}{class_skip}" if class_skip is not None else None
-    )
-    if not class_ok and class_typed_skip is not None:
-        evaluation.runtime_notes.append(
-            "system-class not comparable to silicate-melt rail carrier: "
-            f"{system_class} ({class_typed_skip})"
-        )
-
     candidates = _engine_species_candidates(obs)
     any_numeric = False
     last_refusal: str | None = None
     temperature_counts = Counter(float(point["T_K"]) for point in points)
+    # Observation-level skip (class/form) is the default; per-point form
+    # re-check allows T-dependent correction domain gates and the
+    # state-at-measurement split of straddling rows (only genuine per-point
+    # (T, α) measurements split — aggregate/midpoint-synthesized points keep
+    # the whole-row verdict).
+    any_pin_bearing = False
     for pt in points:
         T_K = float(pt["T_K"])
         expected = float(pt["alpha"])
         unc = resolve_uncertainty(obs, point=pt, kind_hint="alpha")
+        point_T_is_measured = (
+            pt.get("T_provenance") == "explicit"
+            and pt.get("series_name") in _PER_POINT_ALPHA_SERIES_NAMES
+        )
+        pin_ok, point_skip, point_axes = rail_alpha_comparability(
+            obs, T_K=T_K, point_T_is_measured=point_T_is_measured
+        )
+        point_typed_skip = (
+            f"{_TYPED_SKIP_PREFIX}{point_skip}" if point_skip is not None else None
+        )
         actual = None
         matched = None
         runtime: dict[str, Any] = {
@@ -1926,11 +2545,19 @@ def _evaluate_alpha(
             "candidates": candidates,
             "geometry_assumption": obs.geometry_assumption,
             "engine_path": "grounded_alpha",
-            "system_class": system_class,
-            "rail_system_class_comparable": class_ok,
+            **point_axes,
         }
-        if class_typed_skip is not None:
-            runtime["skip_reason"] = class_typed_skip
+        if point_typed_skip is not None:
+            runtime["skip_reason"] = point_typed_skip
+        # Category-2: apply numeric form correction to the literature α when
+        # a catalog entry resolves. Result stays non-pin-bearing (out-of-domain).
+        compare_expected = expected
+        if point_skip == "form_corrected" and point_axes.get("form_correction"):
+            delta = point_axes["form_correction"].get("delta_log10_alpha")
+            if delta is not None and expected > 0.0:
+                compare_expected = expected * (10.0 ** float(delta))
+                runtime["form_corrected_alpha"] = compare_expected
+                runtime["literature_alpha_uncorrected"] = expected
         for species in candidates:
             value, refuse, ctx = _engine_alpha(species, T_K)
             if value is not None:
@@ -1960,8 +2587,10 @@ def _evaluate_alpha(
         )
         if extrapolated:
             runtime["alpha_s_extrapolated"] = True
-        # Class-incomparable rows keep literature + engine values in runtime for
-        # audit, but out-of-domain status excludes them from residual pins.
+        # Pin-bearing only when class AND form match. Form-corrected and all
+        # other non-matches keep values for audit but out-of-domain status
+        # excludes them from residual pins.
+        out_of_domain = not pin_ok
         record = _compare_point(
             obs=obs,
             observable_id=(
@@ -1974,25 +2603,27 @@ def _evaluate_alpha(
             ),
             species=matched or obs.species_id,
             coordinate={"temperature_K": T_K},
-            expected=expected,
+            expected=compare_expected,
             uncertainty=unc,
             actual=actual,
             units="alpha",
             runtime=runtime,
-            unsupported_speciation=actual is None and class_ok,
-            out_of_domain=not class_ok,
+            unsupported_speciation=actual is None and pin_ok,
+            out_of_domain=out_of_domain,
         )
         evaluation.records.append(record)
-        if class_ok and record.status == "mismatch":
+        if pin_ok:
+            any_pin_bearing = True
+        if pin_ok and record.status == "mismatch":
             extr_tag = " extrapolated: true" if extrapolated else ""
             evaluation.findings.append(
                 f"FINDING mismatch {obs.species_id} α T={T_K:g}K "
-                f"expected={expected:.6g} actual={actual} budget={unc}{extr_tag}"
+                f"expected={compare_expected:.6g} actual={actual} budget={unc}{extr_tag}"
             )
 
-    if not class_ok and class_typed_skip is not None:
-        evaluation.skip_reason = class_typed_skip
-        evaluation.skip_reasons.append(class_typed_skip)
+    if not any_pin_bearing and axes_typed_skip is not None:
+        evaluation.skip_reason = axes_typed_skip
+        evaluation.skip_reasons.append(axes_typed_skip)
     elif not any_numeric:
         evaluation.skip_reason = (
             f"{_TYPED_SKIP_PREFIX}{last_refusal or 'alpha_unsupported'}"
@@ -2836,8 +3467,11 @@ __all__ = [
     "ExtractReproductionError",
     "MODEL_LIMITATIONS_PATH",
     "ObservationEvaluation",
+    "CONDENSED_FORM_STATES",
     "RAIL_COMPARABLE_SYSTEM_CLASSES",
     "RAIL_INCOMPARABLE_SYSTEM_CLASSES",
+    "RAIL_NONMATCH_CONDENSED_FORMS",
+    "RAIL_TARGET_CONDENSED_FORM",
     "ROLLUP_BEGIN",
     "ROLLUP_END",
     "TARGET_TYPES",
@@ -2846,17 +3480,25 @@ __all__ = [
     "evaluate_all",
     "evaluate_observation",
     "extract_rollup_section",
+    "form_correction_delta_log10_alpha",
     "format_rollup_markdown",
     "geometry_assumption_text",
     "is_typed_skip",
     "load_adopted_observations",
+    "load_condensed_form_corrections",
     "load_vapor_pressure_data",
     "motzfeldt_available",
     "normalized_residual",
+    "observation_condensed_form",
+    "observation_condensed_form_state",
+    "observation_form_transition_context",
     "observation_system_class",
+    "rail_alpha_comparability",
+    "rail_condensed_form_comparability",
     "rail_system_class_comparability",
     "residual_dex",
     "resolve_chamber_pressure_pa",
+    "resolve_form_correction",
     "resolve_pO2_bar",
     "resolve_uncertainty",
     "rollup_species_error_bars",

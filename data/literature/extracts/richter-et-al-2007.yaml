@@ -25,6 +25,14 @@ species:
       - 1873.0
       - 2173.0
       phase: silicate_melt_CMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: Richter-2007 Type-B CAI; runs above fully molten range
+        transition_context:
+          liquidus_K: 1823.0
+          source_locator: Type-B CAI liquidus ~1823 K (audit 2026-08-09); Richter-2007 runs start 1873 K, above it
       standard_state: Berman CMAS activities for P_sat; vacuum free evaporation
       regime: langmuir_free_evaporation
       units: dimensionless
@@ -54,6 +62,14 @@ species:
       - 1873.0
       - 2173.0
       phase: silicate_melt_CMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: Richter-2007 Type-B CAI; runs above fully molten range
+        transition_context:
+          liquidus_K: 1823.0
+          source_locator: Type-B CAI liquidus ~1823 K (audit 2026-08-09); Richter-2007 runs start 1873 K, above it
       standard_state: null
       regime: langmuir_free_evaporation
       units: dimensionless

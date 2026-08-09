@@ -23,6 +23,14 @@ species:
       - 1573.15
       - 1823.15
       phase: silicate_melt
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: Sossi ferrobasalt; scored T above ~1573 K liquidus
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (audit 2026-08-09)
       standard_state: 1-bar gas-mixing furnace apparent alpha; transport-limited
       regime: open_furnace_apparent
       units: dimensionless

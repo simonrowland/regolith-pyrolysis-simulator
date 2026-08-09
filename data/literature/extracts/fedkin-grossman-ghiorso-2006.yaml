@@ -26,6 +26,11 @@ species:
       - 1973.0
       - 2273.0
       phase: silicate_melt
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: Hashimoto FCMAS/FMSCA melt; MELTS no crystals at run T
       standard_state: MELTS activities for P_sat; α is free-evaporation coefficient for Fe(g). α_FeO assumed
         equal to α_Fe within ±0.04 class sensitivity (Fedkin Fig. 3).
       regime: langmuir_free_evaporation
@@ -65,6 +70,11 @@ species:
       - 1973.0
       - 2273.0
       phase: silicate_melt
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: Hashimoto FCMAS/FMSCA melt; MELTS no crystals at run T (legacy rate_series alpha payload)
       regime: langmuir_free_evaporation
       units: dimensionless alpha vs T_K
       values:
@@ -93,6 +103,11 @@ species:
       - 1723.15
       - 1723.15
       phase: silicate_melt
+      condensed_form:
+        state: unresolved
+        metastable: true
+        basis: mixed_evidence
+        note: 'Yu C1 at 1723 K: started molten 1823; MELTS predicts crystals at run T; residues called quench — fail-closed'
       standard_state: MELTS Na2SiO3 activity basis in Fedkin model; gas is monatomic Na
       regime: langmuir_free_evaporation
       units: dimensionless
@@ -125,6 +140,11 @@ species:
       - 1723.15
       - 1723.15
       phase: silicate_melt
+      condensed_form:
+        state: unresolved
+        metastable: true
+        basis: mixed_evidence
+        note: 'Yu C1 at 1723 K: started molten 1823; MELTS predicts crystals at run T; residues called quench — fail-closed'
       standard_state: MELTS activities; monatomic K(g); NOT KEMS effusion
       regime: langmuir_free_evaporation
       units: dimensionless
@@ -153,6 +173,11 @@ species:
       - 1973.0
       - 2273.0
       phase: silicate_melt
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: Hashimoto FCMAS/FMSCA melt; MELTS no crystals at run T
       standard_state: MELTS Mg activity in P_sat; α free-evaporation
       regime: langmuir_free_evaporation
       units: dimensionless
@@ -193,6 +218,11 @@ species:
       - 1973.0
       - 2273.0
       phase: silicate_melt
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: Hashimoto FCMAS/FMSCA melt; MELTS no crystals at run T (legacy rate_series alpha payload)
       regime: langmuir_free_evaporation
       units: dimensionless alpha vs T_K
       values:
@@ -220,6 +250,11 @@ species:
       - 1973.0
       - 2273.0
       phase: silicate_melt
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: Hashimoto FCMAS/FMSCA melt; MELTS no crystals at run T
       standard_state: null
       regime: langmuir_free_evaporation
       units: dimensionless
@@ -258,6 +293,11 @@ species:
       - 1973.0
       - 2273.0
       phase: silicate_melt
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: Hashimoto FCMAS/FMSCA melt; MELTS no crystals at run T (legacy rate_series alpha payload)
       regime: langmuir_free_evaporation
       units: dimensionless alpha vs T_K
       values:

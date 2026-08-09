@@ -24,6 +24,11 @@ species:
       - 1000.0
       - 1800.0
       phase: solid_SiO_film_growth
+      condensed_form:
+        state: glass_amorphous
+        metastable: false
+        basis: explicit_author
+        note: Solid SiO film growth coefficient on amorphous deposits
       standard_state: Growth/condensation coefficient for solid SiO (not melt free-evap HKL α). Authors
         extrapolate to 1000 K → α≈0.013 for stellar-dust models.
       regime: solid_SiO_growth_coefficient
@@ -96,6 +101,11 @@ species:
       - 1000.0
       - 1400.0
       phase: solid_SiO_film
+      condensed_form:
+        state: glass_amorphous
+        metastable: false
+        basis: explicit_author
+        note: B1 class fence for solid_film_growth SiO
       regime: solid_SiO_growth_coefficient
       units: dimensionless
       values:

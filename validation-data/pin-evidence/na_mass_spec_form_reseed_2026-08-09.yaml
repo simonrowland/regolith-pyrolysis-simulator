@@ -1,0 +1,37 @@
+# Distilled pin evidence — Na mass_spec reseed after form gate (form589)
+schema_version: 1
+kind: vapour_rail_pin_evidence
+source_id: form589
+date: "2026-08-09"
+species: Na
+validation: mass_spec
+pinned_residual_dex: 0.0
+prior_pinned_residual_dex: 0.585026652029182
+residual_change: reseed_after_form_exclusion
+metric: max_absolute_residual_dex
+comparison_basis: >-
+  Extract-store reproduction battery residual against class-comparable AND
+  form-matched liquid_melt Na α only (Sossi ferrobasalt survivors).
+method: >-
+  Condensed-form gate. Yu C1 rows at 1723 K (prior ceiling 0.585 dex) are
+  form_unresolved (supercooled liquid vs liquid+crystals) and fail-closed.
+  Surviving Sossi liquid rows remain form-matched with residual_dex ≈ 0.0
+  (authors adopt α_e=1; engine grounded_alpha matches). Two-way ratchet
+  requires this live residual set to be pinned. The 0.0 value is an honest
+  match residual on the Sossi set — it is NOT a multi-source robust ceiling
+  and must not be read as "Na α is certified perfect." Prior Yu-driven pin
+  is withdrawn as non-comparable, not silently zeroed.
+conditions:
+  observation_class: silicate_melt liquid_melt Na α (Sossi)
+  excluded_form: unresolved Yu C1 at 1723 K
+tier_consequence: T3 retained (mass_spec reseeded at 0.0 match residual)
+checkable_claims:
+  - mass_spec pin reseeds 0.585 → 0.0 after Yu form_unresolved exclusion
+  - governing survivors are Sossi liquid rows with match residual
+  - Yu Na rows remain with typed form_unresolved skip
+  - no Na Pref / γ retune
+runtime_changes:
+  - simulator/diagnostic_helpers/extract_reproduction.py rail_condensed_form_comparability
+publishable_companion_refs:
+  - tests/chemistry/extract_store_reproduction_residual_baselines.yaml
+  - docs/model-limitations.md#extract-store-reproduction-battery

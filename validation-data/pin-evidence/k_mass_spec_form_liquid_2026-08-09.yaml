@@ -1,0 +1,31 @@
+# Distilled pin evidence — K mass_spec form-gate grounding relabel (form589)
+schema_version: 1
+kind: vapour_rail_pin_evidence
+source_id: form589
+date: "2026-08-09"
+species: K
+validation: mass_spec
+pinned_residual_dex: 0.8860566476931632
+prior_pinned_residual_dex: 0.8860566476931632
+residual_change: grounding_only
+metric: max_absolute_residual_dex
+comparison_basis: >-
+  Extract-store reproduction battery residual against class-comparable AND
+  form-matched liquid_melt K α only.
+method: >-
+  Condensed-form gate. Yu C1 chondrule-analog rows at 1723 K are form_unresolved
+  (metastable supercooled liquid vs liquid+olivine/opx; MELTS predicts crystals
+  at run T while residues were called quench products). Fail-closed exclusion.
+  Numeric max remains Sossi ferrobasalt open-furnace liquid (0.886056648 dex).
+conditions:
+  observation_class: silicate_melt liquid_melt K α
+  excluded_form: unresolved Yu C1 at 1723 K
+checkable_claims:
+  - residual numeric unchanged at 0.886056648 dex (Sossi liquid)
+  - Yu K rows remain with typed form_unresolved skip
+  - no K Pref / γ retune
+runtime_changes:
+  - simulator/diagnostic_helpers/extract_reproduction.py rail_condensed_form_comparability
+publishable_companion_refs:
+  - tests/chemistry/extract_store_reproduction_residual_baselines.yaml
+  - docs/model-limitations.md#extract-store-reproduction-battery

@@ -1,0 +1,32 @@
+# Distilled pin evidence — Mg mass_spec form-gate residual tighten (form589)
+schema_version: 1
+kind: vapour_rail_pin_evidence
+source_id: form589
+date: "2026-08-09"
+species: Mg
+validation: mass_spec
+pinned_residual_dex: 0.5202907093862962
+prior_pinned_residual_dex: 0.6989700043360189
+residual_change: tightens
+metric: max_absolute_residual_dex
+comparison_basis: >-
+  Extract-store reproduction battery residual against class-comparable AND
+  form-matched liquid_melt Mg α only.
+method: >-
+  Condensed-form gate. Richter-2002 Type-B CAI rows (scored subliquidus or
+  mixed 1773 H2 / 1973–2073 vacuum grounding) are
+  not_comparable_condensed_form:partially_molten. Residual tightens to
+  Richter-2007 liquid CAI at 1873 K (0.520290709 dex). No Pref/γ retune.
+conditions:
+  observation_class: silicate_melt liquid_melt Mg α
+  excluded_form: partially_molten Richter-2002 CAI
+checkable_claims:
+  - residual tightened 0.69897 → 0.52029 dex after form exclusion
+  - governing point is richter_2007_mg_cai_langmuir_alpha_arrhenius at 1873 K
+  - Richter-2002 rows remain with typed partially_molten skip
+  - no Mg Pref / γ retune to improve this pin
+runtime_changes:
+  - simulator/diagnostic_helpers/extract_reproduction.py rail_condensed_form_comparability
+publishable_companion_refs:
+  - tests/chemistry/extract_store_reproduction_residual_baselines.yaml
+  - docs/model-limitations.md#extract-store-reproduction-battery

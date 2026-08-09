@@ -221,6 +221,32 @@ def _property_identity(obs: Mapping[str, Any]) -> str:
     return ""
 
 
+def _condensed_form_identity(obs: Mapping[str, Any]) -> str:
+    """Stable identity for the typed condensed_form axis (state-at-measurement).
+
+    Glass vs crystal of the same phase/regime must not collapse into one
+    merge key (design 2026-08-09-condensed-form). Only closed-vocabulary
+    state + optional polymorph + metastability enter the key.
+    """
+    form = obs.get("condensed_form")
+    if not isinstance(form, Mapping):
+        values = obs.get("values")
+        if isinstance(values, Mapping):
+            form = values.get("condensed_form")
+    if not isinstance(form, Mapping):
+        return ""
+    state = _norm_axis(form.get("state"))
+    polymorph = _norm_axis(form.get("polymorph_name"))
+    meta = form.get("metastable")
+    if meta is True:
+        meta_s = "metastable"
+    elif meta is False:
+        meta_s = "stable"
+    else:
+        meta_s = ""
+    return "|".join(part for part in (state, polymorph, meta_s) if part)
+
+
 def observable_key(obs: Mapping[str, Any]) -> tuple[str, ...]:
     """Canonical typed-observable key.
 
@@ -228,6 +254,8 @@ def observable_key(obs: Mapping[str, Any]) -> tuple[str, ...]:
     only mixed phase/standard-state/property into spurious conflicts (Fe mp+bp,
     Li2O gas vs solid, Mg multi-transition). Phase and standard-state branches
     are different observables per SCHEMA / VALUE-PRECEDENCE — not conflicts.
+    Condensed-form state is a first-class axis: same phase text on glass vs
+    crystal must not merge.
     """
     return (
         _norm_axis(obs.get("type")),
@@ -236,6 +264,7 @@ def observable_key(obs: Mapping[str, Any]) -> tuple[str, ...]:
         _norm_axis(obs.get("standard_state")),
         _property_identity(obs),
         _norm_axis(obs.get("units")),
+        _condensed_form_identity(obs),
     )
 
 
@@ -419,6 +448,12 @@ def build_by_species(
                     unc_out = list(unc)
                 else:
                     unc_out = unc
+                # Deep-copy condensed_form so merge views cannot alias extracts.
+                raw_form = obs.get("condensed_form")
+                if isinstance(raw_form, Mapping):
+                    form_out: Any = dict(raw_form)
+                else:
+                    form_out = raw_form
                 entry = {
                     "source_id": source_id,
                     "review_status": review,
@@ -434,6 +469,9 @@ def build_by_species(
                     "locator": obs.get("locator"),
                     "values": obs.get("values"),
                     "equipment": obs.get("equipment"),
+                    # Condensed-form axis (state-at-measurement); pin-bearing
+                    # residual path requires form-match or form-corrected.
+                    "condensed_form": form_out,
                     "_payload_present": _payload_present(obs),
                 }
                 # t-511: cell_material → effective-pO₂ boundary (Mo/W reducing
