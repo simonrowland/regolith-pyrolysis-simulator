@@ -173,6 +173,8 @@ class VapourAnswer:
     refusal_code: str | None = None
     extra: Mapping[str, Any] = field(default_factory=lambda: MappingProxyType({}))
     source_reaction_activity: SourceReactionActivity | None = None
+    source_reaction_activity_shadow: SourceReactionActivity | None = None
+    source_reaction_activity_shadow_evaluation: Mapping[str, Any] | None = None
 
     @property
     def is_refused(self) -> bool:
@@ -211,6 +213,9 @@ class VapourBatch:
     metadata: Mapping[str, Any] = field(
         default_factory=lambda: MappingProxyType({})
     )
+    # t-568 Phase 1 diagnostic surface. Existing serializers intentionally omit
+    # it so runner/head goldens stay bit-identical.
+    melt_activity_shadow: Any | None = None
 
     def __post_init__(self) -> None:
         requested = frozenset(self.requested_species_ids)

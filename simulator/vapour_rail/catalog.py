@@ -1016,6 +1016,148 @@ class CompiledPressureEvaluator:
             ),
         )
 
+    def evaluate_typed_shadow(
+        self,
+        temperature_K: float,
+        *,
+        activity: SourceReactionActivity,
+        pO2_bar: float | None,
+        expected_component_id: str,
+        expected_standard_state: StandardStateIdentity,
+        expected_state_fingerprint: str,
+    ) -> Mapping[str, Any]:
+        """Evaluate the t-568 typed activity term in ln space, diagnostics only."""
+
+        if activity.component_id != expected_component_id:
+            return MappingProxyType(
+                {
+                    "status": "refused",
+                    "refusal_code": "component_mismatch",
+                    "detail": "typed shadow component does not match declaration",
+                }
+            )
+        if activity.standard_state != expected_standard_state:
+            return MappingProxyType(
+                {
+                    "status": "refused",
+                    "refusal_code": "standard_state_mismatch",
+                    "detail": "typed shadow standard state does not match declaration",
+                }
+            )
+        if activity.target_standard_state != expected_standard_state:
+            return MappingProxyType(
+                {
+                    "status": "refused",
+                    "refusal_code": "target_standard_state_mismatch",
+                    "detail": (
+                        "typed shadow target standard state does not match "
+                        "declaration"
+                    ),
+                }
+            )
+        if activity.authority:
+            return MappingProxyType(
+                {
+                    "status": "refused",
+                    "refusal_code": "shadow_authority_violation",
+                    "detail": "diagnostic typed shadow cannot claim behavior authority",
+                }
+            )
+        if activity.state_fingerprint != expected_state_fingerprint:
+            return MappingProxyType(
+                {
+                    "status": "refused",
+                    "refusal_code": "state_fingerprint_mismatch",
+                    "detail": "typed shadow state fingerprint does not match batch",
+                }
+            )
+        if activity.verdict is ActivityVerdictKind.REFUSAL:
+            return MappingProxyType(
+                {
+                    "status": "refused",
+                    "refusal_code": (
+                        activity.refusal_code.value
+                        if activity.refusal_code is not None
+                        else "activity_refusal"
+                    ),
+                    "detail": activity.detail,
+                }
+            )
+        if activity.zero_because is not None:
+            return MappingProxyType(
+                {
+                    "status": "proven_zero",
+                    "ln_pressure_ratio": None,
+                    "zero_because": activity.zero_because,
+                    "flux_disposition": "shadow_zero_no_behavior_authority",
+                }
+            )
+        if activity.ln_value is None or not math.isfinite(activity.ln_value):
+            return MappingProxyType(
+                {
+                    "status": "refused",
+                    "refusal_code": "missing_ln_activity",
+                    "detail": "typed finite activity requires canonical ln_value",
+                }
+            )
+
+        temperature = _finite_positive(temperature_K, "temperature_K")
+        low, high = self.valid_temperature_K
+        out_of_range = temperature < low or temperature > high
+        reference_log10 = (
+            self._out_of_domain_log10_continuation(temperature)
+            if out_of_range
+            else self.reference_model.log10_pressure(temperature)
+        )
+        reference_ln = float(reference_log10) * math.log(10.0)
+        activity_term_ln = self.activity_exponent * float(activity.ln_value)
+        oxygen_term_ln = 0.0
+        if self.pO2_exponent:
+            if pO2_bar is None:
+                return MappingProxyType(
+                    {
+                        "status": "refused",
+                        "refusal_code": "missing_oxygen_fugacity",
+                        "detail": "typed pressure shadow requires explicit pO2",
+                    }
+                )
+            oxygen = _finite_positive(pO2_bar, "pO2_bar")
+            oxygen = min(
+                max(oxygen, MELT_DISSOCIATION_PO2_MIN_BAR),
+                MELT_DISSOCIATION_PO2_MAX_BAR,
+            )
+            oxygen_term_ln = self.pO2_exponent * math.log(
+                oxygen / self.pO2_reference_bar
+            )
+        ln_pressure = reference_ln + activity_term_ln + oxygen_term_ln
+
+        band = activity.ln_band
+        if band is None:
+            pressure_band = None
+        elif band[0] is None or band[1] is None:
+            pressure_band = (None, None)
+        else:
+            scaled = (
+                self.activity_exponent * float(band[0]),
+                self.activity_exponent * float(band[1]),
+            )
+            pressure_band = (min(scaled), max(scaled))
+        return MappingProxyType(
+            {
+                "status": "shadow_only_no_behavior_authority",
+                "ln_pressure_Pa": ln_pressure,
+                "ln_pressure_band_offsets": pressure_band,
+                "reference_term_ln": reference_ln,
+                "activity_term_ln": activity_term_ln,
+                "oxygen_term_ln": oxygen_term_ln,
+                "out_of_range": out_of_range,
+                "activity_random_variable_key": activity.random_variable_key,
+                "activity_model_row_id": activity.model_row_id,
+                "activity_verdict": activity.verdict.value,
+                "flux_disposition": "instrumented_not_selected",
+            }
+        )
+
     def _out_of_domain_log10_continuation(self, temperature_K: float) -> float:
         """Continuous out-of-domain estimate (anti-cliff; not claim authority).
 
@@ -1414,7 +1556,34 @@ class VapourRailCatalog:
                 source_reaction_activity_provenance=(
                     state.get("source_reaction_activity_provenance") or {}
                 ),
+                source_reaction_activity_results=(
+                    state.get("source_reaction_activity_results") or {}
+                ),
                 source_reaction_fO2_bar=state.get("source_reaction_fO2_bar"),
+                source_reaction_fO2_log10=state.get(
+                    "source_reaction_fO2_log10"
+                ),
+                source_reaction_activity_pressure_bar=state.get(
+                    "source_reaction_activity_pressure_bar"
+                ),
+                source_reaction_redox_model_id=state.get(
+                    "source_reaction_redox_model_id"
+                ),
+                source_reaction_composition_wt_pct=(
+                    state.get("source_reaction_composition_wt_pct") or {}
+                ),
+                melt_activity_shadow_state_fingerprint=state.get(
+                    "melt_activity_shadow_state_fingerprint"
+                ),
+                melt_activity_shadow_inventory_digest=state.get(
+                    "melt_activity_shadow_inventory_digest"
+                ),
+                melt_activity_shadow_enabled=state.get(
+                    "melt_activity_shadow_enabled", False
+                ),
+                melt_activity_engine_inputs=(
+                    state.get("melt_activity_engine_inputs") or {}
+                ),
                 extras={
                     key: value
                     for key, value in state.items()
@@ -1430,7 +1599,16 @@ class VapourRailCatalog:
                         "source_reaction_activity_evidence_refs",
                         "source_reaction_activity_standard_states",
                         "source_reaction_activity_provenance",
+                        "source_reaction_activity_results",
                         "source_reaction_fO2_bar",
+                        "source_reaction_fO2_log10",
+                        "source_reaction_activity_pressure_bar",
+                        "source_reaction_redox_model_id",
+                        "source_reaction_composition_wt_pct",
+                        "melt_activity_shadow_state_fingerprint",
+                        "melt_activity_shadow_inventory_digest",
+                        "melt_activity_shadow_enabled",
+                        "melt_activity_engine_inputs",
                     }
                 },
             )

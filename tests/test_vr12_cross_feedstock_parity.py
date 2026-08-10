@@ -1421,7 +1421,12 @@ def test_activity_verdict_assertion_red_under_mutation() -> None:
     point_answers = [a for a in answers if a.verdict in value_bearing]
     assert point_answers  # baseline green
     mutated = [
-        dataclasses.replace(good, verdict=ActivityVerdictKind.REFUSAL, value=None)
+        dataclasses.replace(
+            good,
+            verdict=ActivityVerdictKind.REFUSAL,
+            value=None,
+            ln_value=None,
+        )
         if hasattr(dataclasses, "replace")
         else good
     ]

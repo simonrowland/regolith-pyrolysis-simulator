@@ -14,6 +14,7 @@ Acceptance (DECOMPOSITION VR-6 / DESIGN-REV5 §1.2 / §4.2):
 from __future__ import annotations
 
 from copy import deepcopy
+from dataclasses import replace
 import math
 from pathlib import Path
 from types import MappingProxyType, SimpleNamespace
@@ -24,7 +25,9 @@ import yaml
 
 from simulator.vapour_rail.activity import (
     ActivityRefusalCode,
+    ActivityTier,
     ActivityVerdictKind,
+    SourceReactionActivity,
     StandardStateIdentity,
 )
 from simulator.vapour_rail.batch import (
@@ -64,6 +67,7 @@ from simulator.vapour_rail.request import (
 from simulator.vapour_rail.instrumentation import (
     EffectivePressureSource,
     flux_pressures_from_batch,
+    serialize_melt_activity_shadow,
     serialize_vapour_answer,
 )
 from simulator.vapour_rail.u0_manifest import load_u0_manifest
@@ -94,6 +98,26 @@ def _stub_catalog_species(
             if pO2_bar is not None:
                 pa = pa * (float(pO2_bar) ** -0.25)
             return SimpleNamespace(pressure_pa=pa)
+
+        def evaluate_typed_shadow(
+            self,
+            temperature_K,
+            *,
+            activity,
+            pO2_bar,
+            expected_component_id,
+            expected_standard_state,
+            expected_state_fingerprint,
+        ):
+            assert activity.component_id == expected_component_id
+            assert activity.standard_state == expected_standard_state
+            assert activity.state_fingerprint == expected_state_fingerprint
+            return {
+                "status": "shadow_only_no_behavior_authority",
+                "ln_pressure_Pa": math.log(float(pressure_pa)),
+                "activity_term_ln": 0.0,
+                "flux_disposition": "instrumented_not_selected",
+            }
 
     compiled = SimpleNamespace(
         species_id=species_id,
@@ -716,6 +740,76 @@ def test_provider_domain_miss_not_refusal_when_other_candidate_covers() -> None:
     assert refused.refusal_code == REFUSAL_NO_ADMITTED_SOURCE
 
 
+def test_fe_typed_shadow_traverses_per_answer_instrumentation() -> None:
+    rule = RequestRule(
+        species_id="Fe",
+        source_account="process.cleaned_melt",
+        parent_species_ids=frozenset({"FeO"}),
+        required_source_atoms=frozenset({"Fe", "O"}),
+        solve_group_id="fe_test",
+        applicability_predicate="applicable",
+        request_rule_kind="source_inventory_present",
+        origin="catalog",
+        formula_id="Fe",
+        has_pressure_evaluator=True,
+        has_alpha=True,
+        has_route=True,
+        has_formula=True,
+        validation_status="pending_validation",
+    )
+    standard = StandardStateIdentity(
+        convention="registry_exact",
+        phase="liquid_endmember",
+        reference_pressure_bar=1.0,
+        component_basis="provider_native",
+        identity_id="simulator.stoichiometric_FeO_l.current.v1",
+        component_id="FeO",
+    )
+    typed_fe = SourceReactionActivity(
+        component_id="FeO",
+        value=0.2,
+        ln_value=math.log(0.2),
+        verdict=ActivityVerdictKind.STATUS_BEARING_VALUE,
+        bound_direction=None,
+        reason="test_fe_shadow",
+        standard_state=standard,
+        phase_assemblage_ref="test:liquid_melt",
+        chemical_potential_ref="REF-001",
+        state_fingerprint="state:fe",
+        solve_group_id=None,
+        provider="test",
+        tier=ActivityTier.A,
+        target_standard_state=StandardStateIdentity(
+            convention="raoultian_pure_endmember",
+            phase="crystalline",
+            reference_pressure_bar=1.0,
+            identity_id=(
+                "rail.pure_oxide.FeO.raoultian.crystalline_at_T.1bar.v1"
+            ),
+            component_id="FeO",
+        ),
+    )
+    state = VapourResolveState(
+        temperature_K=1600.0,
+        source_reaction_activity_results={"FeO": typed_fe},
+        melt_activity_shadow_state_fingerprint="state:fe",
+    )
+
+    answer = refusal_closure(
+        requested=frozenset({"Fe"}),
+        rules=(rule,),
+        ledger_snapshot={"process.cleaned_melt": {"FeO": 3.0}},
+        state=state,
+        provider_candidates_by_species=None,
+        catalog_species=_stub_catalog_species("Fe"),
+    ).answers["Fe"]
+
+    assert answer.source_reaction_activity_shadow is typed_fe
+    assert answer.source_reaction_activity_shadow_evaluation["status"] == (
+        "shadow_only_no_behavior_authority"
+    )
+
+
 # ---------------------------------------------------------------------------
 # pending_validation is not refusal
 # ---------------------------------------------------------------------------
@@ -767,6 +861,158 @@ def test_pending_validation_is_not_refusal() -> None:
     assert answer.certification_ceiling == "never"
     assert answer.verdict_status == "status_bearing_non_authoritative"
     assert "alpha_authority_status" not in answer.extra
+
+
+def test_t568_shadow_is_golden_neutral_and_fail_isolated(monkeypatch) -> None:
+    payload = _minimal_family("K", validation_status="pending_validation")
+    catalog = compile_vapour_rail_catalog(payload, u0_manifest=_u0_stub("K"))
+    ledger = {
+        "process.cleaned_melt": {"K": 1.0, "K2O": 1.0, "KO0.5": 1.0}
+    }
+    state = _state_with_k_activity(
+        temperature_K=1500.0,
+        melt_activity_shadow_enabled=True,
+    )
+
+    instrumented = catalog.resolve_batch(
+        ledger,
+        state,
+        flux_activation_context=_pre_rg_activation_context("K"),
+    )
+    instrumented_answer = instrumented.channel("K")
+    assert instrumented_answer.source_reaction_activity_shadow is not None
+    assert (
+        instrumented_answer.source_reaction_activity_shadow_evaluation["status"]
+        == "shadow_only_no_behavior_authority"
+    )
+    shadow_report = serialize_melt_activity_shadow(instrumented)
+    assert shadow_report["schema"] == "melt_activity_shadow.v1"
+    assert shadow_report["behavior_authority"] is False
+    assert shadow_report["record_limit"] == 64
+    assert shadow_report["record_truncated"] is False
+    assert "KO0.5" in shadow_report["batch_shadow"]["results_by_component"]
+    assert "K" in shadow_report["answers_by_species"]
+
+    def _broken_shadow(**_kwargs):
+        raise RuntimeError("deliberate t568 shadow failure")
+
+    monkeypatch.setattr(
+        "simulator.vapour_rail.melt_activity_resolver.build_shadow_for_vapour_batch",
+        _broken_shadow,
+    )
+    fail_isolated = catalog.resolve_batch(
+        ledger,
+        state,
+        flux_activation_context=_pre_rg_activation_context("K"),
+    )
+
+    assert serialize_vapour_answer(fail_isolated.channel("K")) == (
+        serialize_vapour_answer(instrumented_answer)
+    )
+    assert fail_isolated.flux_active_species_ids == instrumented.flux_active_species_ids
+    assert fail_isolated.melt_activity_shadow["status"] == (
+        "shadow_unavailable_no_behavior_change"
+    )
+
+
+def test_t568_shadow_computation_is_lazy_until_explicitly_enabled(
+    monkeypatch,
+) -> None:
+    payload = _minimal_family("K", validation_status="pending_validation")
+    catalog = compile_vapour_rail_catalog(payload, u0_manifest=_u0_stub("K"))
+    ledger = {
+        "process.cleaned_melt": {"K": 1.0, "K2O": 1.0, "KO0.5": 1.0}
+    }
+    from simulator.vapour_rail import melt_activity_resolver
+
+    actual_builder = melt_activity_resolver.build_shadow_for_vapour_batch
+    calls = 0
+
+    def _counted_builder(**kwargs):
+        nonlocal calls
+        calls += 1
+        return actual_builder(**kwargs)
+
+    monkeypatch.setattr(
+        melt_activity_resolver,
+        "build_shadow_for_vapour_batch",
+        _counted_builder,
+    )
+    ordinary = catalog.resolve_batch(
+        ledger,
+        _state_with_k_activity(temperature_K=1500.0),
+        flux_activation_context=_pre_rg_activation_context("K"),
+    )
+    assert calls == 0
+    assert ordinary.melt_activity_shadow is None
+    assert serialize_melt_activity_shadow(ordinary)["batch_shadow"] is None
+
+    diagnostic = catalog.resolve_batch(
+        ledger,
+        _state_with_k_activity(
+            temperature_K=1500.0,
+            melt_activity_shadow_enabled=True,
+        ),
+        flux_activation_context=_pre_rg_activation_context("K"),
+    )
+    assert calls == 1
+    assert diagnostic.melt_activity_shadow is not None
+
+
+def test_t568_typed_evaluator_refuses_wrong_target_and_claimed_authority() -> None:
+    payload = _minimal_family("K", validation_status="pending_validation")
+    catalog = compile_vapour_rail_catalog(payload, u0_manifest=_u0_stub("K"))
+    evaluator = catalog._species["K"].evaluator
+    activity = SourceReactionActivity(
+        component_id="KO0.5",
+        value=0.25,
+        ln_value=math.log(0.25),
+        verdict=ActivityVerdictKind.STATUS_BEARING_VALUE,
+        bound_direction=None,
+        reason="test_t568_evaluator_contract",
+        standard_state=_TEST_ACTIVITY_STANDARD_STATE,
+        phase_assemblage_ref="test:liquid_melt",
+        chemical_potential_ref="test:mu",
+        state_fingerprint="state:test",
+        solve_group_id=None,
+        provider="test",
+        authority=False,
+        target_standard_state=_TEST_ACTIVITY_STANDARD_STATE,
+    )
+    kwargs = {
+        "pO2_bar": 1.0e-8,
+        "expected_component_id": "KO0.5",
+        "expected_standard_state": _TEST_ACTIVITY_STANDARD_STATE,
+        "expected_state_fingerprint": "state:test",
+    }
+    valid_result = evaluator.evaluate_typed_shadow(
+        1500.0,
+        activity=activity,
+        **kwargs,
+    )
+    assert valid_result["status"] == "shadow_only_no_behavior_authority"
+
+    wrong_target = replace(
+        activity,
+        target_standard_state=StandardStateIdentity(
+            convention="raoultian_pure_endmember",
+            phase="crystalline",
+            reference_pressure_bar=1.0,
+        ),
+    )
+    target_result = evaluator.evaluate_typed_shadow(
+        1500.0,
+        activity=wrong_target,
+        **kwargs,
+    )
+    assert target_result["refusal_code"] == "target_standard_state_mismatch"
+
+    authority_result = evaluator.evaluate_typed_shadow(
+        1500.0,
+        activity=replace(activity, authority=True),
+        **kwargs,
+    )
+    assert authority_result["refusal_code"] == "shadow_authority_violation"
 
 
 def test_out_of_domain_k_at_1650c_is_flux_eligible_but_non_authoritative() -> None:
@@ -1139,6 +1385,15 @@ def test_simulator_build_vapour_batch_is_available_and_golden_neutral() -> None:
     assert isinstance(batch, VapourBatch)
     assert batch.requested_species_ids == frozenset()
     assert dict(batch.channels_by_species) == {}
+
+    diagnostic_batch = sim.build_vapour_batch(
+        temperature_K=1600.0,
+        melt_activity_shadow_enabled=True,
+        flux_activation_context=_pre_rg_activation_context(),
+    )
+    assert diagnostic_batch is not None
+    assert diagnostic_batch.melt_activity_shadow is not None
+    assert diagnostic_batch.melt_activity_shadow.as_mapping()["record_limit"] == 64
 
 
 # ---------------------------------------------------------------------------

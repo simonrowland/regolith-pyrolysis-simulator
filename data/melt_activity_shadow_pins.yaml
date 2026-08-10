@@ -1,0 +1,144 @@
+schema_version: 1
+kind: melt_activity_shadow_pins
+canonical_comparison_space: ln_activity
+comparison_tolerance_ln: 1.0e-10
+pins:
+  - pin_id: table.NaO0_5.1673K
+    executed_legacy_path: constant_table
+    disposition: legacy_in_domain
+    comparison_status: not_comparable_yet
+    comparison_blocker: independent_engine_and_target_conversion_unavailable
+    component_id: NaO0.5
+    parent_oxide: Na2O
+    target_phase: liquid
+    temperature_K: 1673.0
+    account_mol: {Na2O: 0.1, SiO2: 0.9}
+  - pin_id: table.Na2O.1673K
+    executed_legacy_path: constant_table
+    disposition: legacy_in_domain
+    comparison_status: not_comparable_yet
+    comparison_blocker: independent_engine_and_target_conversion_unavailable
+    component_id: Na2O
+    parent_oxide: Na2O
+    target_phase: liquid
+    temperature_K: 1673.0
+    account_mol: {Na2O: 0.1, SiO2: 0.9}
+  - pin_id: table.KO0_5.1500K
+    executed_legacy_path: constant_table
+    disposition: legacy_in_domain
+    comparison_status: not_comparable_yet
+    comparison_blocker: independent_engine_and_target_conversion_unavailable
+    component_id: KO0.5
+    parent_oxide: K2O
+    target_phase: liquid
+    temperature_K: 1500.0
+    account_mol: {K2O: 0.1, SiO2: 0.9}
+  - pin_id: table.K2O.1500K
+    executed_legacy_path: constant_table
+    disposition: legacy_in_domain
+    comparison_status: not_comparable_yet
+    comparison_blocker: independent_engine_and_target_conversion_unavailable
+    component_id: K2O
+    parent_oxide: K2O
+    target_phase: liquid
+    temperature_K: 1500.0
+    account_mol: {K2O: 0.1, SiO2: 0.9}
+  - pin_id: table.CaO.1673K
+    executed_legacy_path: constant_table
+    disposition: legacy_in_domain
+    comparison_status: not_comparable_yet
+    comparison_blocker: independent_engine_and_target_conversion_unavailable
+    component_id: CaO
+    parent_oxide: CaO
+    target_phase: crystalline
+    temperature_K: 1673.0
+    account_mol: {CaO: 0.1, SiO2: 0.9}
+  - pin_id: table.AlO1_5.1673K
+    executed_legacy_path: constant_table
+    disposition: legacy_in_domain
+    comparison_status: not_comparable_yet
+    comparison_blocker: target_standard_state_unresolved_pending_t570
+    component_id: AlO1.5
+    parent_oxide: Al2O3
+    target_phase: liquid
+    temperature_K: 1673.0
+    account_mol: {Al2O3: 0.1, SiO2: 0.9}
+  - pin_id: table.SiO2.1673K
+    executed_legacy_path: constant_table
+    disposition: legacy_in_domain
+    comparison_status: not_comparable_yet
+    comparison_blocker: independent_engine_and_target_conversion_unavailable
+    component_id: SiO2
+    parent_oxide: SiO2
+    target_phase: liquid
+    temperature_K: 1673.0
+    account_mol: {Al2O3: 0.1, SiO2: 0.9}
+  - pin_id: table.TiO2.1673K
+    executed_legacy_path: constant_table
+    disposition: legacy_in_domain
+    comparison_status: not_comparable_yet
+    comparison_blocker: target_standard_state_unresolved_pending_t570
+    component_id: TiO2
+    parent_oxide: TiO2
+    target_phase: liquid
+    temperature_K: 1673.0
+    account_mol: {TiO2: 0.1, SiO2: 0.9}
+  - pin_id: table.CrO1_5.1673K
+    executed_legacy_path: constant_table
+    disposition: legacy_in_domain
+    comparison_status: not_comparable_yet
+    comparison_blocker: target_standard_state_unresolved_pending_t570
+    component_id: CrO1.5
+    parent_oxide: Cr2O3
+    target_phase: liquid
+    temperature_K: 1673.0
+    account_mol: {Cr2O3: 0.1, SiO2: 0.9}
+  - pin_id: table.MgO.1673K
+    executed_legacy_path: constant_table
+    disposition: legacy_in_domain
+    comparison_status: not_comparable_yet
+    comparison_blocker: independent_engine_and_target_conversion_unavailable
+    component_id: MgO
+    parent_oxide: MgO
+    target_phase: crystalline
+    temperature_K: 1673.0
+    account_mol: {MgO: 0.1, SiO2: 0.9}
+  - pin_id: table.MnO.1673K
+    executed_legacy_path: constant_table
+    disposition: legacy_in_domain
+    comparison_status: not_comparable_yet
+    comparison_blocker: target_standard_state_unresolved_pending_t570
+    component_id: MnO
+    parent_oxide: MnO
+    target_phase: liquid
+    temperature_K: 1673.0
+    account_mol: {MnO: 0.1, SiO2: 0.9}
+  - pin_id: table.P2O5.1873K
+    executed_legacy_path: constant_table
+    disposition: legacy_in_domain
+    comparison_status: not_comparable_yet
+    comparison_blocker: independent_engine_and_target_conversion_unavailable
+    component_id: P2O5
+    parent_oxide: P2O5
+    target_phase: liquid
+    temperature_K: 1873.0
+    account_mol: {P2O5: 0.01, SiO2: 0.99}
+  - &feo_in_domain
+    pin_id: kress.FeO.1873K.explicit_fO2
+    executed_legacy_path: kress_carmichael_feo
+    disposition: legacy_in_domain
+    comparison_status: not_comparable_yet
+    comparison_blocker: independent_engine_and_target_conversion_unavailable
+    component_id: FeO
+    target_phase: liquid_endmember
+    temperature_K: 1873.15
+    intrinsic_fO2_log10: -8.0
+    composition_wt_pct: {SiO2: 50.0, TiO2: 1.5, Al2O3: 15.0, FeO: 8.0, Fe2O3: 2.0, MnO: 0.2, MgO: 8.0, CaO: 10.0, Na2O: 3.0, K2O: 1.0, P2O5: 0.3}
+  - <<: *feo_in_domain
+    pin_id: degraded.FeO.1873K.absent_fO2
+    executed_legacy_path: feo_weight_fraction_fallback
+    disposition: legacy_degraded
+    comparison_status: legacy_degraded
+    intrinsic_fO2_log10: null
+    expected_typed_refusal: redox_state_unresolved
+    fallback_reason: feo_weight_fraction

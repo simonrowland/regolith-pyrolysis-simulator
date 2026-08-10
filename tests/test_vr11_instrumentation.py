@@ -11,6 +11,8 @@ Acceptance (DECOMPOSITION VR-11 / DESIGN-REV5 U4):
 
 from __future__ import annotations
 
+from dataclasses import replace
+import math
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
@@ -760,6 +762,7 @@ def test_runtime_tripwire_records_zero_flux_context_compatibility_reads() -> Non
             diagnostic={"evaporation_flux_kg_hr": {}},
         )
 
+    engine_inputs = {"CaO": object()}
     host = SimpleNamespace(
         vapor_pressures={
             "metals": {
@@ -780,6 +783,8 @@ def test_runtime_tripwire_records_zero_flux_context_compatibility_reads() -> Non
             "backend_vapor_pressures_Pa": backend_shadow,
         },
         _last_vapour_batch_resolve_error={},
+        _melt_activity_shadow_enabled=True,
+        _melt_activity_engine_inputs=engine_inputs,
         build_vapour_batch=_builder,
         _build_evaporation_aux_maps=lambda _pressures: (
             {"Na": 0.023},
@@ -834,6 +839,8 @@ def test_runtime_tripwire_records_zero_flux_context_compatibility_reads() -> Non
         == frozenset({"Na"})
     )
     assert "selected_runtime_pressures_Pa" not in captured
+    assert captured["melt_activity_shadow_enabled"] is True
+    assert captured["melt_activity_engine_inputs"] is engine_inputs
 
 
 def test_source_guard_flags_banned_controls_iteration() -> None:
@@ -1064,9 +1071,32 @@ def test_setpoints_t_cond_audit_covers_operator_overrides() -> None:
 
 def test_vapour_rail_instrumentation_diagnostic_shape() -> None:
     from simulator.diagnostics import vapour_rail_instrumentation_diagnostic
+    from simulator.vapour_rail.melt_activity_resolver import (
+        SHADOW_COMPARABLE,
+        MeltActivityShadow,
+        ShadowComparison,
+    )
     from web.advisory import vapour_rail_instrumentation_panel_payload
 
-    batch = _toy_batch({"Na"})
+    comparison = ShadowComparison(
+        component_id="CaO",
+        legacy_value=0.4,
+        typed_ln_value=math.log(0.2),
+        delta_ln=math.log(0.5),
+        equal=False,
+        population="legacy_in_domain",
+        comparison_status=SHADOW_COMPARABLE,
+        comparison_method="engine_basis_plus_standard_state_conversion",
+        tolerance_ln=1.0e-10,
+    )
+    shadow = MeltActivityShadow(
+        results_by_component={},
+        comparisons=(comparison,),
+        state_fingerprint="state:test",
+        inventory_digest="inventory:test",
+        registry_digest="registry:test",
+    )
+    batch = replace(_toy_batch({"Na"}), melt_activity_shadow=shadow)
     sim = SimpleNamespace(
         _last_vapour_batch=batch,
         _last_vapour_batch_report=serialize_vapour_batch(batch),
@@ -1083,6 +1113,14 @@ def test_vapour_rail_instrumentation_diagnostic_shape() -> None:
     assert diag["schema"] == "vapour_rail_instrumentation.v1"
     assert diag["shadow_equal"] is True
     assert diag["shadow_outcome"] == SHADOW_PROVED
+    assert diag["melt_activity_shadow"]["schema"] == "melt_activity_shadow.v1"
+    assert diag["melt_activity_shadow"]["record_limit"] == 64
+    assert diag["melt_activity_shadow"]["record_truncated"] is False
+    shadow_payload = diag["melt_activity_shadow"]["batch_shadow"]
+    assert shadow_payload["comparisons"][0]["delta_ln"] == pytest.approx(
+        math.log(0.5)
+    )
+    assert shadow_payload["equality_gate_status"] == "failed_divergence"
     assert len(diag["source_vapour_ceiling_table"]) == 9
     panel = vapour_rail_instrumentation_panel_payload(sim)
     assert panel["diagnostic_only"] is True
@@ -1106,6 +1144,7 @@ def test_absent_overlay_does_not_default_shadow_equal_true() -> None:
     )
     diag = vapour_rail_instrumentation_diagnostic(sim)
     assert diag["shadow_equal"] is None
+    assert diag["melt_activity_shadow"] is None
     panel = vapour_rail_instrumentation_panel_payload(sim)
     assert panel["shadow_equal"] is None
 

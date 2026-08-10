@@ -69,6 +69,67 @@ class ActivityRefusalCode(str, Enum):
     UNITY_NOT_UPPER_BOUND = "unity_not_upper_bound_for_standard_state"
     MISSING_EVIDENCE = "missing_evidence"
     COMPOUND_PROXY_FORBIDDEN = "compound_proxy_forbidden"
+    STANDARD_STATE_UNRESOLVED = "standard_state_unresolved"
+    BASIS_TRANSFORM_FAILED = "basis_transform_failed"
+    DESCRIPTOR_HULL_EXCEEDED = "descriptor_hull_exceeded"
+    VALIDATION_BAND_UNAVAILABLE = "validation_band_unavailable"
+    REDOX_STATE_UNRESOLVED = "redox_state_unresolved"
+    REDOX_MODEL_OUT_OF_DOMAIN = "redox_model_out_of_domain"
+    UNSUPPORTED_VALENCE_RESERVOIR = "unsupported_valence_reservoir"
+    SULFUR_RESERVOIR_OWNER_MISSING = "sulfur_reservoir_owner_missing"
+    HALIDE_RESERVOIR_OWNER_MISSING = "halide_reservoir_owner_missing"
+    INCOMPLETE_MELT_INVENTORY = "incomplete_melt_inventory"
+    UNMODELED_RESERVOIR_PRESENT = "unmodeled_reservoir_present"
+
+
+class ActivityTier(str, Enum):
+    """Evidence architecture tier for a typed activity result."""
+
+    A = "A"
+    B = "B"
+    C = "C"
+
+
+@dataclass(frozen=True)
+class ActivityAttempt:
+    """One deterministic resolver attempt, retained even when another wins."""
+
+    tier: ActivityTier | None
+    model_row_id: str | None
+    disposition: str
+    refusal_code: ActivityRefusalCode | None = None
+    detail: str | None = None
+
+    def as_mapping(self) -> dict[str, Any]:
+        return {
+            "tier": self.tier.value if self.tier is not None else None,
+            "model_row_id": self.model_row_id,
+            "disposition": self.disposition,
+            "refusal_code": (
+                self.refusal_code.value if self.refusal_code is not None else None
+            ),
+            "detail": self.detail,
+        }
+
+    @classmethod
+    def from_mapping(cls, payload: Mapping[str, Any]) -> "ActivityAttempt":
+        raw_tier = payload.get("tier")
+        raw_refusal = payload.get("refusal_code")
+        return cls(
+            tier=ActivityTier(str(raw_tier)) if raw_tier is not None else None,
+            model_row_id=(
+                str(payload["model_row_id"])
+                if payload.get("model_row_id") is not None
+                else None
+            ),
+            disposition=str(payload.get("disposition") or ""),
+            refusal_code=(
+                ActivityRefusalCode(str(raw_refusal))
+                if raw_refusal is not None
+                else None
+            ),
+            detail=(str(payload["detail"]) if payload.get("detail") else None),
+        )
 
 
 @dataclass(frozen=True)
@@ -80,6 +141,8 @@ class StandardStateIdentity:
     reference_pressure_bar: float
     reference_temperature_K: float | None = None
     component_basis: str = "raoultian_pure_endmember"
+    identity_id: str | None = None
+    component_id: str | None = None
 
     def fingerprint(self) -> str:
         payload = {
@@ -89,7 +152,46 @@ class StandardStateIdentity:
             "T_K": self.reference_temperature_K,
             "basis": self.component_basis,
         }
+        # Preserve legacy fingerprints when the ABI-safe identity tail is not
+        # supplied; component-qualified t-568 states cannot collide.
+        if self.identity_id is not None:
+            payload["id"] = self.identity_id
+        if self.component_id is not None:
+            payload["component_id"] = self.component_id
         return _stable_hash(payload)
+
+    def as_mapping(self) -> dict[str, Any]:
+        return {
+            "id": self.identity_id,
+            "component_id": self.component_id,
+            "convention": self.convention,
+            "phase": self.phase,
+            "reference_pressure_bar": float(self.reference_pressure_bar),
+            "reference_temperature_K": self.reference_temperature_K,
+            "component_basis": self.component_basis,
+        }
+
+    @classmethod
+    def from_mapping(cls, payload: Mapping[str, Any]) -> "StandardStateIdentity":
+        return cls(
+            convention=str(payload.get("convention") or ""),
+            phase=str(payload.get("phase") or ""),
+            reference_pressure_bar=float(payload.get("reference_pressure_bar")),
+            reference_temperature_K=(
+                float(payload["reference_temperature_K"])
+                if payload.get("reference_temperature_K") is not None
+                else None
+            ),
+            component_basis=str(
+                payload.get("component_basis") or "raoultian_pure_endmember"
+            ),
+            identity_id=(str(payload["id"]) if payload.get("id") else None),
+            component_id=(
+                str(payload["component_id"])
+                if payload.get("component_id")
+                else None
+            ),
+        )
 
 
 @dataclass(frozen=True)
@@ -228,6 +330,84 @@ class SourceReactionActivity:
     derivation: Mapping[str, Any] = field(default_factory=dict)
     evidence_ref: str | None = None
     evidence_tier: str | None = None
+    # t-568 Phase 1 ABI-safe tail. ``value`` remains the bounded legacy edge;
+    # resolver arithmetic and comparisons use ``ln_value``.
+    ln_value: float | None = None
+    ln_band: tuple[float | None, float | None] | None = None
+    band_kind: str | None = None
+    band_coverage: float | None = None
+    tier: ActivityTier | None = None
+    model_row_id: str | None = None
+    domain_status: str | None = None
+    conversion_ref: str | None = None
+    source_standard_state: StandardStateIdentity | None = None
+    target_standard_state: StandardStateIdentity | None = None
+    attempts: tuple[ActivityAttempt, ...] = ()
+    random_variable_key: tuple[str, str, str, str] | None = None
+    independent_sigma_ln: float | None = None
+    correlation_loadings: tuple[tuple[str, float], ...] = ()
+    correlation_basis_ref: str | None = None
+    zero_because: str | None = None
+
+    def __post_init__(self) -> None:
+        if self.target_standard_state is None and self.standard_state is not None:
+            object.__setattr__(self, "target_standard_state", self.standard_state)
+        if self.verdict is ActivityVerdictKind.REFUSAL:
+            if self.value is not None or self.ln_value is not None:
+                raise ValueError("activity refusal cannot carry a numeric value")
+            if self.zero_because is not None:
+                raise ValueError("activity refusal cannot carry a zero proof")
+        if self.tier is not None and self.target_standard_state is None:
+            raise ValueError("tiered activity requires a target standard state")
+        if self.tier is not None and self.value == 0.0 and self.zero_because is None:
+            raise ValueError("tiered zero requires an explicit zero_because proof")
+        if self.ln_band is not None:
+            lower, upper = self.ln_band
+            if (lower is None) != (upper is None):
+                raise ValueError("ln_band bounds must both be finite or both be null")
+            if lower is not None and upper is not None:
+                if not (
+                    math.isfinite(float(lower))
+                    and math.isfinite(float(upper))
+                    and float(lower) <= 0.0 <= float(upper)
+                ):
+                    raise ValueError("ln_band must be finite offsets enclosing zero")
+        if self.band_coverage is not None and not (
+            math.isfinite(float(self.band_coverage))
+            and 0.0 < float(self.band_coverage) <= 1.0
+        ):
+            raise ValueError("band_coverage must lie in (0, 1]")
+        if self.independent_sigma_ln is not None and not (
+            math.isfinite(float(self.independent_sigma_ln))
+            and float(self.independent_sigma_ln) >= 0.0
+        ):
+            raise ValueError("independent_sigma_ln must be finite and non-negative")
+        loading_groups: set[str] = set()
+        for group_id, loading in self.correlation_loadings:
+            if not group_id or group_id in loading_groups or not math.isfinite(float(loading)):
+                raise ValueError("correlation loadings need unique groups and finite values")
+            loading_groups.add(group_id)
+        if self.ln_value is None and self.value is not None and self.value > 0.0:
+            object.__setattr__(self, "ln_value", math.log(float(self.value)))
+        if self.value == 0.0 and self.zero_because is None:
+            # Existing constructors occasionally use zero as a numeric result.
+            # They remain valid legacy objects, but only the resolver may emit
+            # the typed proven-empty sentinel.
+            return
+        if self.zero_because is not None:
+            if self.value != 0.0 or self.ln_value is not None:
+                raise ValueError(
+                    "typed proven-zero activity requires value=0 and ln_value=None"
+                )
+        elif self.ln_value is not None:
+            if not math.isfinite(float(self.ln_value)):
+                raise ValueError("ln_value must be finite")
+            if self.value is not None and self.value > 0.0:
+                expected = math.log(float(self.value))
+                if not math.isclose(
+                    float(self.ln_value), expected, rel_tol=0.0, abs_tol=1.0e-12
+                ):
+                    raise ValueError("value and ln_value are inconsistent")
 
     def may_certify(self) -> bool:
         """Bounds and refusals never certify; points stay non-authoritative here."""
@@ -250,6 +430,216 @@ class SourceReactionActivity:
         if self.value is None:
             return None
         return float(self.value)
+
+    def as_mapping(self) -> dict[str, Any]:
+        """JSON-safe diagnostic form; numeric authority remains unchanged."""
+
+        return {
+            "component_id": self.component_id,
+            "value": self.value,
+            "ln_value": self.ln_value,
+            "verdict": self.verdict.value,
+            "bound_direction": (
+                self.bound_direction.value if self.bound_direction is not None else None
+            ),
+            "reason": self.reason,
+            "standard_state": (
+                self.standard_state.as_mapping()
+                if self.standard_state is not None
+                else None
+            ),
+            "phase_assemblage_ref": self.phase_assemblage_ref,
+            "chemical_potential_ref": self.chemical_potential_ref,
+            "state_fingerprint": self.state_fingerprint,
+            "solve_group_id": self.solve_group_id,
+            "provider": self.provider,
+            "authority": self.authority,
+            "report_label": self.report_label,
+            "refusal_code": (
+                self.refusal_code.value if self.refusal_code is not None else None
+            ),
+            "detail": self.detail,
+            "derivation": dict(self.derivation),
+            "evidence_ref": self.evidence_ref,
+            "evidence_tier": self.evidence_tier,
+            "ln_band": list(self.ln_band) if self.ln_band is not None else None,
+            "band_kind": self.band_kind,
+            "band_coverage": self.band_coverage,
+            "tier": self.tier.value if self.tier is not None else None,
+            "model_row_id": self.model_row_id,
+            "domain_status": self.domain_status,
+            "conversion_ref": self.conversion_ref,
+            "source_standard_state": (
+                self.source_standard_state.as_mapping()
+                if self.source_standard_state is not None
+                else None
+            ),
+            "target_standard_state": (
+                self.target_standard_state.as_mapping()
+                if self.target_standard_state is not None
+                else None
+            ),
+            "attempts": [attempt.as_mapping() for attempt in self.attempts],
+            "random_variable_key": (
+                list(self.random_variable_key)
+                if self.random_variable_key is not None
+                else None
+            ),
+            "independent_sigma_ln": self.independent_sigma_ln,
+            "correlation_loadings": [
+                {"group_id": group_id, "loading_sigma_ln": loading}
+                for group_id, loading in self.correlation_loadings
+            ],
+            "correlation_basis_ref": self.correlation_basis_ref,
+            "zero_because": self.zero_because,
+        }
+
+    @classmethod
+    def from_mapping(cls, payload: Mapping[str, Any]) -> "SourceReactionActivity":
+        raw_band = payload.get("ln_band")
+        raw_key = payload.get("random_variable_key")
+        raw_loadings = payload.get("correlation_loadings") or ()
+        return cls(
+            component_id=str(payload.get("component_id") or ""),
+            value=(
+                float(payload["value"]) if payload.get("value") is not None else None
+            ),
+            verdict=ActivityVerdictKind(str(payload.get("verdict"))),
+            bound_direction=(
+                BoundDirection(str(payload["bound_direction"]))
+                if payload.get("bound_direction") is not None
+                else None
+            ),
+            reason=(str(payload["reason"]) if payload.get("reason") else None),
+            standard_state=(
+                StandardStateIdentity.from_mapping(payload["standard_state"])
+                if isinstance(payload.get("standard_state"), Mapping)
+                else None
+            ),
+            phase_assemblage_ref=(
+                str(payload["phase_assemblage_ref"])
+                if payload.get("phase_assemblage_ref")
+                else None
+            ),
+            chemical_potential_ref=(
+                str(payload["chemical_potential_ref"])
+                if payload.get("chemical_potential_ref")
+                else None
+            ),
+            state_fingerprint=(
+                str(payload["state_fingerprint"])
+                if payload.get("state_fingerprint")
+                else None
+            ),
+            solve_group_id=(
+                str(payload["solve_group_id"])
+                if payload.get("solve_group_id")
+                else None
+            ),
+            provider=(str(payload["provider"]) if payload.get("provider") else None),
+            authority=bool(payload.get("authority", False)),
+            report_label=(
+                str(payload["report_label"]) if payload.get("report_label") else None
+            ),
+            refusal_code=(
+                ActivityRefusalCode(str(payload["refusal_code"]))
+                if payload.get("refusal_code") is not None
+                else None
+            ),
+            detail=(str(payload["detail"]) if payload.get("detail") else None),
+            derivation=(
+                dict(payload["derivation"])
+                if isinstance(payload.get("derivation"), Mapping)
+                else {}
+            ),
+            evidence_ref=(
+                str(payload["evidence_ref"]) if payload.get("evidence_ref") else None
+            ),
+            evidence_tier=(
+                str(payload["evidence_tier"])
+                if payload.get("evidence_tier")
+                else None
+            ),
+            ln_value=(
+                float(payload["ln_value"])
+                if payload.get("ln_value") is not None
+                else None
+            ),
+            ln_band=(
+                (raw_band[0], raw_band[1])
+                if isinstance(raw_band, Sequence) and len(raw_band) == 2
+                else None
+            ),
+            band_kind=(
+                str(payload["band_kind"]) if payload.get("band_kind") else None
+            ),
+            band_coverage=(
+                float(payload["band_coverage"])
+                if payload.get("band_coverage") is not None
+                else None
+            ),
+            tier=(
+                ActivityTier(str(payload["tier"]))
+                if payload.get("tier") is not None
+                else None
+            ),
+            model_row_id=(
+                str(payload["model_row_id"])
+                if payload.get("model_row_id")
+                else None
+            ),
+            domain_status=(
+                str(payload["domain_status"])
+                if payload.get("domain_status")
+                else None
+            ),
+            conversion_ref=(
+                str(payload["conversion_ref"])
+                if payload.get("conversion_ref")
+                else None
+            ),
+            source_standard_state=(
+                StandardStateIdentity.from_mapping(payload["source_standard_state"])
+                if isinstance(payload.get("source_standard_state"), Mapping)
+                else None
+            ),
+            target_standard_state=(
+                StandardStateIdentity.from_mapping(payload["target_standard_state"])
+                if isinstance(payload.get("target_standard_state"), Mapping)
+                else None
+            ),
+            attempts=tuple(
+                ActivityAttempt.from_mapping(attempt)
+                for attempt in payload.get("attempts") or ()
+                if isinstance(attempt, Mapping)
+            ),
+            random_variable_key=(
+                tuple(str(part) for part in raw_key)  # type: ignore[arg-type]
+                if isinstance(raw_key, Sequence) and len(raw_key) == 4
+                else None
+            ),
+            independent_sigma_ln=(
+                float(payload["independent_sigma_ln"])
+                if payload.get("independent_sigma_ln") is not None
+                else None
+            ),
+            correlation_loadings=tuple(
+                (
+                    str(item.get("group_id") or ""),
+                    float(item.get("loading_sigma_ln")),
+                )
+                for item in raw_loadings
+                if isinstance(item, Mapping)
+            ),
+            correlation_basis_ref=(
+                str(payload["correlation_basis_ref"])
+                if payload.get("correlation_basis_ref")
+                else None
+            ),
+            zero_because=(
+                str(payload["zero_because"]) if payload.get("zero_because") else None
+            ),
+        )
 
 
 def composition_fingerprint(composition: Mapping[str, float]) -> str:

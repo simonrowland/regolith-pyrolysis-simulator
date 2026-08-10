@@ -1403,6 +1403,7 @@ def vapour_rail_instrumentation_diagnostic(sim: Any) -> dict[str, Any]:
 
     from simulator.vapour_rail.instrumentation import (
         SETPOINTS_T_COND_AUDIT,
+        serialize_melt_activity_shadow,
         serialize_vapour_batch,
         source_vapour_ceiling_table,
     )
@@ -1417,6 +1418,10 @@ def vapour_rail_instrumentation_diagnostic(sim: Any) -> dict[str, Any]:
     return {
         "schema": "vapour_rail_instrumentation.v1",
         "vapour_batch": report,
+        # Named, bounded consumer for the opt-in t-568 recorder. Ordinary
+        # batch resolution leaves its nested batch_shadow null unless the state
+        # explicitly gates melt-activity shadow computation on.
+        "melt_activity_shadow": serialize_melt_activity_shadow(batch),
         "flux_overlay": overlay,
         "resolve_error": resolve_error or None,
         "condensation_refusals": condensation,

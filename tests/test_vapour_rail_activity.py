@@ -664,23 +664,23 @@ def test_as_pressure_activity_refusal_none_and_bound_numeric_contract():
     )
     assert refused.as_pressure_activity() is None
 
-    # Explicit non-None value on a refusal must still not coerce to a number.
-    refused_with_junk = SourceReactionActivity(
-        component_id="X",
-        value=1.0,
-        verdict=ActivityVerdictKind.REFUSAL,
-        bound_direction=None,
-        reason="test",
-        standard_state=None,
-        phase_assemblage_ref=None,
-        chemical_potential_ref=None,
-        state_fingerprint=None,
-        solve_group_id=None,
-        provider="test",
-        authority=False,
-        refusal_code=ActivityRefusalCode.TIMEOUT,
-    )
-    assert refused_with_junk.as_pressure_activity() is None
+    # The typed contract rejects a numeric refusal at construction time.
+    with pytest.raises(ValueError, match="refusal cannot carry a numeric"):
+        SourceReactionActivity(
+            component_id="X",
+            value=1.0,
+            verdict=ActivityVerdictKind.REFUSAL,
+            bound_direction=None,
+            reason="test",
+            standard_state=None,
+            phase_assemblage_ref=None,
+            chemical_potential_ref=None,
+            state_fingerprint=None,
+            solve_group_id=None,
+            provider="test",
+            authority=False,
+            refusal_code=ActivityRefusalCode.TIMEOUT,
+        )
 
     bound = henrian_unknown_gamma_upper_bound(
         component_id="CaO",

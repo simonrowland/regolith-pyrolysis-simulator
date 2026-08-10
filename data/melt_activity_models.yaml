@@ -1,0 +1,312 @@
+schema_version: 1
+kind: melt_activity_models
+description: >-
+  t-568 Phase-0/1 typed melt-activity registry. Phase 1 is shadow-only; no row
+  changes vapor-pressure, flux, ledger, or certification authority.
+
+target_standard_state:
+  selection_policy: per_row_exact
+  id_template: rail.pure_oxide.{component_id}.raoultian.supercooled_liquid_at_T.1bar.v1
+  convention: raoultian_pure_endmember
+  phase: liquid
+  reference_pressure_bar: 1.0
+  reference_temperature_policy: queried_T
+  component_basis: raoultian_pure_endmember
+  b154_crystalline_overrides: [CaO, MgO]
+  b154_crystalline_id_template: rail.pure_oxide.{component_id}.raoultian.crystalline_at_T.1bar.v1
+  b154_adjudication_commit: 7c8a7f695a479074be97daa969881896d562464c
+
+matrix_domains:
+  matrix_domain.silicate_melt.phase1.v1: &matrix_domain
+    matrix_class_id: complex_silicate_melt
+    composition_basis: ordered_complete_mole_inventory
+    hull_status: not_yet_admitted
+    descriptor_ranges: {}
+    digest: sha256:pending-phase2-matrix-domain
+
+templates:
+  pending_domain: &pending_domain
+    T_K: [1473.15, 1903.15]
+    P_bar: [0.0, 1.0]
+    matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1
+    redox_basis: complete_inventory_with_intrinsic_fO2_when_required
+    phase_requirement: liquid_melt
+    full_melt_inventory_required: true
+    unmodeled_reservoir_policy: refuse_if_nonzero
+  pending_band: &pending_band
+    space: ln_activity
+    lower_offset: null
+    upper_offset: null
+    marginal_sigma_ln: null
+    independent_sigma_ln: null
+    correlation_loadings: []
+    correlation_basis_ref: null
+    coverage: null
+    kind: validation_band_unavailable
+  pending_provenance: &pending_provenance
+    review_status: reviewed_architecture_pending_numeric_evidence
+    extract_loci: []
+    source_digest: sha256:pending-phase2-primary-evidence
+  pending_validation: &pending_validation
+    calibration_family_ids: []
+    holdout_ids: []
+    residual_metric: p95_abs_ln_activity
+    result: pending
+    certification_ceiling: status_bearing
+
+model_rows:
+  - row_id: activity.AlO1_5.target_unresolved.v1
+    rail_component: {id: AlO1.5, parent_oxide: Al2O3, formula_multiplier: 2}
+    tier: A
+    model_family: engine_standard_state_conversion
+    source: {provider: melts, engine_version: pending, database_id: pending, engine_component_ids: [Al2O3], basis_coefficients: [0.5], evidence_refs: []}
+    source_standard_state: {id: engine.melts.AlO1.5.liquid_endmember.1bar.pending, phase: liquid_endmember, reference_pressure_bar: 1.0}
+    target_standard_state: {id: rail.pure_oxide.AlO1.5.raoultian.supercooled_liquid_at_T.1bar.v1, convention: raoultian_pure_endmember, phase: liquid, reference_pressure_bar: 1.0, component_basis: raoultian_pure_endmember, metastable_policy: pending_t570_sidecar, resolution_status: standard_state_unresolved}
+    conversion: {mu0_source_ref: pending, mu0_target_ref: pending, formula_balance_receipt: sha256:pending, pressure_correction_model: none_same_1bar}
+    domain: *pending_domain
+    band: *pending_band
+    status: standard_state_unresolved
+    provenance: *pending_provenance
+    validation: *pending_validation
+  - row_id: activity.CaO.melts_to_crystalline_rail.v1
+    rail_component: {id: CaO, parent_oxide: CaO, formula_multiplier: 1}
+    tier: A
+    model_family: engine_standard_state_conversion
+    source: {provider: melts, engine_version: pending, database_id: pending, engine_component_ids: [CaO], basis_coefficients: [1], evidence_refs: []}
+    source_standard_state: {id: engine.melts.CaO.liquid_endmember.1bar.pending, phase: liquid_endmember, reference_pressure_bar: 1.0}
+    target_standard_state: {id: rail.pure_oxide.CaO.raoultian.crystalline_at_T.1bar.v1, convention: raoultian_pure_endmember, phase: crystalline, reference_pressure_bar: 1.0, component_basis: raoultian_pure_endmember, resolution_status: adjudicated_b154}
+    conversion: {mu0_source_ref: pending, mu0_target_ref: b154.crystalline.CaO.at_T.1bar, formula_balance_receipt: sha256:pending, pressure_correction_model: none_same_1bar}
+    domain: *pending_domain
+    band: *pending_band
+    status: pending_engine_potential_and_independent_validation
+    provenance: *pending_provenance
+    validation: *pending_validation
+  - row_id: activity.CrO1_5.target_unresolved.v1
+    rail_component: {id: CrO1.5, parent_oxide: Cr2O3, formula_multiplier: 2}
+    tier: A
+    model_family: engine_standard_state_conversion
+    source: {provider: melts, engine_version: pending, database_id: pending, engine_component_ids: [Cr2O3], basis_coefficients: [0.5], evidence_refs: []}
+    source_standard_state: {id: engine.melts.CrO1.5.liquid_endmember.1bar.pending, phase: liquid_endmember, reference_pressure_bar: 1.0}
+    target_standard_state: {id: rail.pure_oxide.CrO1.5.raoultian.supercooled_liquid_at_T.1bar.v1, convention: raoultian_pure_endmember, phase: liquid, reference_pressure_bar: 1.0, component_basis: raoultian_pure_endmember, metastable_policy: pending_t570_sidecar, resolution_status: standard_state_unresolved}
+    conversion: {mu0_source_ref: pending, mu0_target_ref: pending, formula_balance_receipt: sha256:pending, pressure_correction_model: none_same_1bar}
+    domain: *pending_domain
+    band: *pending_band
+    status: standard_state_unresolved
+    provenance: *pending_provenance
+    validation: *pending_validation
+  - row_id: activity.KO0_5.melts_to_supercooled_liquid_rail.v1
+    rail_component: {id: KO0.5, parent_oxide: K2O, formula_multiplier: 2}
+    tier: A
+    model_family: engine_standard_state_conversion
+    source: {provider: melts, engine_version: pending, database_id: pending, engine_component_ids: [K2O], basis_coefficients: [0.5], evidence_refs: []}
+    source_standard_state: {id: engine.melts.KO0.5.liquid_endmember.1bar.pending, phase: liquid_endmember, reference_pressure_bar: 1.0}
+    target_standard_state: {id: rail.pure_oxide.KO0.5.raoultian.supercooled_liquid_at_T.1bar.v1, convention: raoultian_pure_endmember, phase: liquid, reference_pressure_bar: 1.0, component_basis: raoultian_pure_endmember, metastable_policy: supercooled_candidate, resolution_status: declared_candidate}
+    conversion: {mu0_source_ref: pending, mu0_target_ref: pending, formula_balance_receipt: sha256:pending, pressure_correction_model: none_same_1bar}
+    domain: *pending_domain
+    band: *pending_band
+    status: pending_engine_potential_and_independent_validation
+    provenance: *pending_provenance
+    validation: *pending_validation
+  - row_id: activity.K2O.melts_to_supercooled_liquid_rail.v1
+    rail_component: {id: K2O, parent_oxide: K2O, formula_multiplier: 1}
+    tier: A
+    model_family: engine_standard_state_conversion
+    source: {provider: melts, engine_version: pending, database_id: pending, engine_component_ids: [K2O], basis_coefficients: [1], evidence_refs: []}
+    source_standard_state: {id: engine.melts.K2O.liquid_endmember.1bar.pending, phase: liquid_endmember, reference_pressure_bar: 1.0}
+    target_standard_state: {id: rail.pure_oxide.K2O.raoultian.supercooled_liquid_at_T.1bar.v1, convention: raoultian_pure_endmember, phase: liquid, reference_pressure_bar: 1.0, component_basis: raoultian_pure_endmember, metastable_policy: supercooled_candidate, resolution_status: declared_candidate}
+    conversion: {mu0_source_ref: pending, mu0_target_ref: pending, formula_balance_receipt: sha256:pending, pressure_correction_model: none_same_1bar}
+    domain: *pending_domain
+    band: *pending_band
+    status: pending_engine_potential_and_independent_validation
+    provenance: *pending_provenance
+    validation: *pending_validation
+  - row_id: activity.MgO.melts_to_crystalline_rail.v1
+    rail_component: {id: MgO, parent_oxide: MgO, formula_multiplier: 1}
+    tier: A
+    model_family: engine_standard_state_conversion
+    source: {provider: melts, engine_version: pending, database_id: pending, engine_component_ids: [MgO], basis_coefficients: [1], evidence_refs: []}
+    source_standard_state: {id: engine.melts.MgO.liquid_endmember.1bar.pending, phase: liquid_endmember, reference_pressure_bar: 1.0}
+    target_standard_state: {id: rail.pure_oxide.MgO.raoultian.crystalline_at_T.1bar.v1, convention: raoultian_pure_endmember, phase: crystalline, reference_pressure_bar: 1.0, component_basis: raoultian_pure_endmember, resolution_status: adjudicated_b154}
+    conversion: {mu0_source_ref: pending, mu0_target_ref: b154.crystalline.MgO.at_T.1bar, formula_balance_receipt: sha256:pending, pressure_correction_model: none_same_1bar}
+    domain: *pending_domain
+    band: *pending_band
+    status: pending_engine_potential_and_independent_validation
+    provenance: *pending_provenance
+    validation: *pending_validation
+  - row_id: activity.MnO.target_unresolved.v1
+    rail_component: {id: MnO, parent_oxide: MnO, formula_multiplier: 1}
+    tier: A
+    model_family: engine_standard_state_conversion
+    source: {provider: melts, engine_version: pending, database_id: pending, engine_component_ids: [MnO], basis_coefficients: [1], evidence_refs: []}
+    source_standard_state: {id: engine.melts.MnO.liquid_endmember.1bar.pending, phase: liquid_endmember, reference_pressure_bar: 1.0}
+    target_standard_state: {id: rail.pure_oxide.MnO.raoultian.supercooled_liquid_at_T.1bar.v1, convention: raoultian_pure_endmember, phase: liquid, reference_pressure_bar: 1.0, component_basis: raoultian_pure_endmember, metastable_policy: pending_t570_sidecar, resolution_status: standard_state_unresolved}
+    conversion: {mu0_source_ref: pending, mu0_target_ref: pending, formula_balance_receipt: sha256:pending, pressure_correction_model: none_same_1bar}
+    domain: *pending_domain
+    band: *pending_band
+    status: standard_state_unresolved
+    provenance: *pending_provenance
+    validation: *pending_validation
+  - row_id: activity.NaO0_5.melts_to_supercooled_liquid_rail.v1
+    rail_component: {id: NaO0.5, parent_oxide: Na2O, formula_multiplier: 2}
+    tier: A
+    model_family: engine_standard_state_conversion
+    source: {provider: melts, engine_version: pending, database_id: pending, engine_component_ids: [Na2O], basis_coefficients: [0.5], evidence_refs: []}
+    source_standard_state: {id: engine.melts.NaO0.5.liquid_endmember.1bar.pending, phase: liquid_endmember, reference_pressure_bar: 1.0}
+    target_standard_state: {id: rail.pure_oxide.NaO0.5.raoultian.supercooled_liquid_at_T.1bar.v1, convention: raoultian_pure_endmember, phase: liquid, reference_pressure_bar: 1.0, component_basis: raoultian_pure_endmember, metastable_policy: supercooled_candidate, resolution_status: declared_candidate}
+    conversion: {mu0_source_ref: pending, mu0_target_ref: pending, formula_balance_receipt: sha256:pending, pressure_correction_model: none_same_1bar}
+    domain: *pending_domain
+    band: *pending_band
+    status: pending_engine_potential_and_independent_validation
+    provenance: *pending_provenance
+    validation: *pending_validation
+  - row_id: activity.Na2O.melts_to_supercooled_liquid_rail.v1
+    rail_component: {id: Na2O, parent_oxide: Na2O, formula_multiplier: 1}
+    tier: A
+    model_family: engine_standard_state_conversion
+    source: {provider: melts, engine_version: pending, database_id: pending, engine_component_ids: [Na2O], basis_coefficients: [1], evidence_refs: []}
+    source_standard_state: {id: engine.melts.Na2O.liquid_endmember.1bar.pending, phase: liquid_endmember, reference_pressure_bar: 1.0}
+    target_standard_state: {id: rail.pure_oxide.Na2O.raoultian.supercooled_liquid_at_T.1bar.v1, convention: raoultian_pure_endmember, phase: liquid, reference_pressure_bar: 1.0, component_basis: raoultian_pure_endmember, metastable_policy: supercooled_candidate, resolution_status: declared_candidate}
+    conversion: {mu0_source_ref: pending, mu0_target_ref: pending, formula_balance_receipt: sha256:pending, pressure_correction_model: none_same_1bar}
+    domain: *pending_domain
+    band: *pending_band
+    status: pending_engine_potential_and_independent_validation
+    provenance: *pending_provenance
+    validation: *pending_validation
+  - row_id: activity.P2O5.melts_to_supercooled_liquid_rail.v1
+    rail_component: {id: P2O5, parent_oxide: P2O5, formula_multiplier: 1}
+    tier: A
+    model_family: engine_standard_state_conversion
+    source: {provider: melts, engine_version: pending, database_id: pending, engine_component_ids: [P2O5], basis_coefficients: [1], evidence_refs: []}
+    source_standard_state: {id: engine.melts.P2O5.liquid_endmember.1bar.pending, phase: liquid_endmember, reference_pressure_bar: 1.0}
+    target_standard_state: {id: rail.pure_oxide.P2O5.raoultian.supercooled_liquid_at_T.1bar.v1, convention: raoultian_pure_endmember, phase: liquid, reference_pressure_bar: 1.0, component_basis: raoultian_pure_endmember, metastable_policy: supercooled_candidate, resolution_status: declared_candidate}
+    conversion: {mu0_source_ref: pending, mu0_target_ref: pending, formula_balance_receipt: sha256:pending, pressure_correction_model: none_same_1bar}
+    domain: *pending_domain
+    band: *pending_band
+    status: pending_engine_potential_and_independent_validation
+    provenance: *pending_provenance
+    validation: *pending_validation
+  - row_id: activity.SiO2.melts_to_supercooled_liquid_rail.v1
+    rail_component: {id: SiO2, parent_oxide: SiO2, formula_multiplier: 1}
+    tier: A
+    model_family: engine_standard_state_conversion
+    source: {provider: melts, engine_version: pending, database_id: pending, engine_component_ids: [SiO2], basis_coefficients: [1], evidence_refs: []}
+    source_standard_state: {id: engine.melts.SiO2.liquid_endmember.1bar.pending, phase: liquid_endmember, reference_pressure_bar: 1.0}
+    target_standard_state: {id: rail.pure_oxide.SiO2.raoultian.supercooled_liquid_at_T.1bar.v1, convention: raoultian_pure_endmember, phase: liquid, reference_pressure_bar: 1.0, component_basis: raoultian_pure_endmember, metastable_policy: supercooled_candidate, resolution_status: declared_candidate}
+    conversion: {mu0_source_ref: pending, mu0_target_ref: pending, formula_balance_receipt: sha256:pending, pressure_correction_model: none_same_1bar}
+    domain: *pending_domain
+    band: *pending_band
+    status: pending_engine_potential_and_independent_validation
+    provenance: *pending_provenance
+    validation: *pending_validation
+  - row_id: activity.TiO2.target_unresolved.v1
+    rail_component: {id: TiO2, parent_oxide: TiO2, formula_multiplier: 1}
+    tier: A
+    model_family: engine_standard_state_conversion
+    source: {provider: melts, engine_version: pending, database_id: pending, engine_component_ids: [TiO2], basis_coefficients: [1], evidence_refs: []}
+    source_standard_state: {id: engine.melts.TiO2.liquid_endmember.1bar.pending, phase: liquid_endmember, reference_pressure_bar: 1.0}
+    target_standard_state: {id: rail.pure_oxide.TiO2.raoultian.supercooled_liquid_at_T.1bar.v1, convention: raoultian_pure_endmember, phase: liquid, reference_pressure_bar: 1.0, component_basis: raoultian_pure_endmember, metastable_policy: pending_t570_sidecar, resolution_status: standard_state_unresolved}
+    conversion: {mu0_source_ref: pending, mu0_target_ref: pending, formula_balance_receipt: sha256:pending, pressure_correction_model: none_same_1bar}
+    domain: *pending_domain
+    band: *pending_band
+    status: standard_state_unresolved
+    provenance: *pending_provenance
+    validation: *pending_validation
+  - row_id: activity.FeO.kress91_to_supercooled_liquid_rail.v1
+    rail_component: {id: FeO, parent_oxide: FeO, formula_multiplier: 1}
+    tier: A
+    model_family: kress_carmichael_feo_adapter
+    source: {provider: simulator.fe_redox.kress91_ferrous_feo_activity, engine_version: REF-001-kress-carmichael-1991, database_id: builtin, engine_component_ids: [FeO], basis_coefficients: [1], redox_inputs: [FeOt, Fe2O3], evidence_refs: [REF-001]}
+    source_standard_state: {id: simulator.stoichiometric_FeO_l.current.v1, phase: liquid_endmember, reference_pressure_bar: 1.0}
+    target_standard_state: {id: rail.pure_oxide.FeO.raoultian.supercooled_liquid_at_T.1bar.v1, convention: raoultian_pure_endmember, phase: liquid, reference_pressure_bar: 1.0, component_basis: raoultian_pure_endmember, metastable_policy: supercooled_candidate, resolution_status: standard_state_unresolved}
+    conversion: {mu0_source_ref: current_FeO_authority_blend, mu0_target_ref: pending, formula_balance_receipt: sha256:pending, pressure_correction_model: furnace_vacuum_floor}
+    domain: *pending_domain
+    band: *pending_band
+    status: pending_independent_validation
+    provenance: *pending_provenance
+    validation: *pending_validation
+
+# Tier B intentionally contains zero coefficient rows in Phase 1. Admission is
+# implemented in code and exercised with rejecting fixtures.
+tier_b_model_version:
+  id: descriptor_class_v1
+  ln_gamma_infinity_slots: [beta_0, beta_F, beta_chi, beta_q, beta_Lambda, beta_T]
+  wagner_interaction_slots: [theta_0, theta_F, theta_q, theta_Lambda, theta_T]
+  coefficient_rows: []
+
+tier_c_inventory:
+  - {row_id: inventory.Ag.unresolved.v1, element: Ag, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.As.unresolved.v1, element: As, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.Au.unresolved.v1, element: Au, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.B.unresolved.v1, element: B, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.Ba.unresolved.v1, element: Ba, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.Bi.unresolved.v1, element: Bi, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.Br.unresolved.v1, element: Br, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: halide_reservoir_owner_missing}
+  - {row_id: inventory.C.unresolved.v1, element: C, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.Cd.unresolved.v1, element: Cd, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.Ce.unresolved.v1, element: Ce, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.Cl.unresolved.v1, element: Cl, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: halide_reservoir_owner_missing}
+  - {row_id: inventory.Cs.unresolved.v1, element: Cs, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.Cu.unresolved.v1, element: Cu, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.Dy.unresolved.v1, element: Dy, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.Er.unresolved.v1, element: Er, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.Eu.unresolved.v1, element: Eu, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.F.unresolved.v1, element: F, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: halide_reservoir_owner_missing}
+  - {row_id: inventory.Ga.unresolved.v1, element: Ga, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.Gd.unresolved.v1, element: Gd, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.Ge.unresolved.v1, element: Ge, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.Hf.unresolved.v1, element: Hf, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.Ho.unresolved.v1, element: Ho, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.I.unresolved.v1, element: I, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: halide_reservoir_owner_missing}
+  - {row_id: inventory.In.unresolved.v1, element: In, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.Ir.unresolved.v1, element: Ir, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.La.unresolved.v1, element: La, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: activity.LiO0_5.tier_c.declared_ideal.v1, element: Li, component_id: LiO0.5, formula_basis: Li2O_on_single_cation_basis, target_standard_state_id: rail.pure_oxide.LiO0.5.raoultian.supercooled_liquid_at_T.1bar.v1, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: ideal_when_identity_supplied}
+  - {row_id: inventory.Lu.unresolved.v1, element: Lu, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.Mo.unresolved.v1, element: Mo, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.N.unresolved.v1, element: N, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.Nb.unresolved.v1, element: Nb, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.Nd.unresolved.v1, element: Nd, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.Os.unresolved.v1, element: Os, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.Pb.unresolved.v1, element: Pb, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.Pr.unresolved.v1, element: Pr, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.Pt.unresolved.v1, element: Pt, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.Rb.unresolved.v1, element: Rb, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.S.unresolved.v1, element: S, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: sulfur_reservoir_owner_missing}
+  - {row_id: inventory.Sb.unresolved.v1, element: Sb, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.Sc.unresolved.v1, element: Sc, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.Se.unresolved.v1, element: Se, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.Sm.unresolved.v1, element: Sm, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.Sn.unresolved.v1, element: Sn, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.Sr.unresolved.v1, element: Sr, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.Tb.unresolved.v1, element: Tb, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.Te.unresolved.v1, element: Te, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.Th.unresolved.v1, element: Th, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.Tm.unresolved.v1, element: Tm, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.U.unresolved.v1, element: U, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.V.unresolved.v1, element: V, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.W.unresolved.v1, element: W, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.Y.unresolved.v1, element: Y, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.Yb.unresolved.v1, element: Yb, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.Zn.unresolved.v1, element: Zn, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+  - {row_id: inventory.Zr.unresolved.v1, element: Zr, component_id: null, formula_basis: null, target_standard_state_id: null, matrix_domain_ref: matrix_domain.silicate_melt.phase1.v1, disposition: refuse, refusal_code: standard_state_unresolved}
+
+unsupported_reservoirs:
+  - {component_id: CrO, refusal_code: unsupported_valence_reservoir}
+  - {component_id: TiO1.5, refusal_code: unsupported_valence_reservoir}
+  - {component_id: S2-_melt, refusal_code: sulfur_reservoir_owner_missing}
+  - {component_id: SO4_melt, refusal_code: sulfur_reservoir_owner_missing}
+  - {component_id: S_dissolved, refusal_code: sulfur_reservoir_owner_missing}
+  - {component_id: F-_melt, refusal_code: halide_reservoir_owner_missing}
+  - {component_id: Cl-_melt, refusal_code: halide_reservoir_owner_missing}
+  - {component_id: Br-_melt, refusal_code: halide_reservoir_owner_missing}
+  - {component_id: I-_melt, refusal_code: halide_reservoir_owner_missing}
+  - {component_id: NaCl_melt, refusal_code: halide_reservoir_owner_missing}
+  - {component_id: salt_melt, refusal_code: halide_reservoir_owner_missing}
+
+phase0_pin_impact:
+  - {species_id: Mg, component_id: MgO, disposition: crystalline_coherent, validation_pin_ref: vapour_rail_validation_pins.yaml:223}
+  - {species_id: Ca, component_id: CaO, disposition: crystalline_coherent, validation_pin_ref: vapour_rail_validation_pins.yaml:86}
+  - {species_id: CaO_gas, component_id: CaO, disposition: crystalline_coherent, validation_pin_ref: vapour_rail_validation_pins.yaml:104}
+  - {species_id: Ca2, component_id: CaO, disposition: crystalline_coherent, validation_pin_ref: vapour_rail_validation_pins.yaml:104}
+  - {species_id: Mg2, component_id: MgO, disposition: crystalline_coherent, validation_pin_ref: vapour_rail_validation_pins.yaml:254}
+  - {species_id: MgO_gas, component_id: MgO, disposition: crystalline_coherent, validation_pin_ref: vapour_rail_validation_pins.yaml:254}

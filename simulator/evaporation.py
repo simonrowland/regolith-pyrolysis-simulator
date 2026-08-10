@@ -2317,6 +2317,39 @@ class EvaporationMixin:
                     else None
                 ),
                 source_reaction_fO2_bar=source_reaction_fO2_bar,
+                source_reaction_fO2_log10=(
+                    float(vapor_pressure_diagnostic["source_reaction_fO2_log10"])
+                    if vapor_pressure_diagnostic.get("source_reaction_fO2_log10")
+                    is not None
+                    else None
+                ),
+                source_reaction_activity_pressure_bar=(
+                    float(
+                        vapor_pressure_diagnostic[
+                            "source_reaction_activity_pressure_bar"
+                        ]
+                    )
+                    if vapor_pressure_diagnostic.get(
+                        "source_reaction_activity_pressure_bar"
+                    )
+                    is not None
+                    else None
+                ),
+                source_reaction_redox_model_id=(
+                    str(vapor_pressure_diagnostic["source_reaction_redox_model_id"])
+                    if vapor_pressure_diagnostic.get(
+                        "source_reaction_redox_model_id"
+                    )
+                    else None
+                ),
+                source_reaction_composition_wt_pct=(
+                    dict(
+                        vapor_pressure_diagnostic.get(
+                            "source_reaction_composition_wt_pct"
+                        )
+                        or {}
+                    )
+                ),
                 source_reaction_activities=reported_activities,
                 source_reaction_activity_provider=(
                     str(activity_provider_id) if activity_provider_id else None
@@ -2326,6 +2359,12 @@ class EvaporationMixin:
                     activity_standard_states
                 ),
                 source_reaction_activity_provenance=activity_provenance,
+                melt_activity_shadow_enabled=getattr(
+                    self, "_melt_activity_shadow_enabled", False
+                ),
+                melt_activity_engine_inputs=getattr(
+                    self, "_melt_activity_engine_inputs", {}
+                ),
                 flux_activation_context=FluxActivationContext(
                     epoch=FLUX_ACTIVATION_EPOCH_PRE_RG,
                     effective_pressure_species_ids=effective_pressure_species_ids,

@@ -179,8 +179,29 @@ class VapourResolveState:
     source_reaction_activity_provenance: Mapping[str, Mapping[str, Any]] = field(
         default_factory=lambda: MappingProxyType({})
     )
+    # t-568 Phase 1 component-keyed typed shadow. Parallel scalar maps remain
+    # legacy behavior authority until the separately gated adoption phase.
+    source_reaction_activity_results: Mapping[str, SourceReactionActivity] = field(
+        default_factory=lambda: MappingProxyType({})
+    )
+    source_reaction_fO2_log10: float | None = None
+    source_reaction_activity_pressure_bar: float | None = None
+    source_reaction_redox_model_id: str | None = None
+    source_reaction_composition_wt_pct: Mapping[str, float] = field(
+        default_factory=lambda: MappingProxyType({})
+    )
+    melt_activity_shadow_state_fingerprint: str | None = None
+    melt_activity_shadow_inventory_digest: str | None = None
+    # Explicit diagnostic opt-in: default request resolution pays no t-568
+    # engine/registry/shadow cost. Inputs are consumed only when enabled.
+    melt_activity_shadow_enabled: bool = False
+    melt_activity_engine_inputs: Mapping[str, Any] = field(
+        default_factory=lambda: MappingProxyType({})
+    )
 
     def __post_init__(self) -> None:
+        if not isinstance(self.melt_activity_shadow_enabled, bool):
+            raise TypeError("melt_activity_shadow_enabled must be bool")
         object.__setattr__(
             self,
             "source_reaction_activities",
@@ -208,6 +229,21 @@ class VapourResolveState:
                 }
             ),
         )
+        object.__setattr__(
+            self,
+            "source_reaction_activity_results",
+            MappingProxyType(dict(self.source_reaction_activity_results)),
+        )
+        object.__setattr__(
+            self,
+            "source_reaction_composition_wt_pct",
+            MappingProxyType(dict(self.source_reaction_composition_wt_pct)),
+        )
+        object.__setattr__(
+            self,
+            "melt_activity_engine_inputs",
+            MappingProxyType(dict(self.melt_activity_engine_inputs)),
+        )
         object.__setattr__(self, "extras", MappingProxyType(dict(self.extras)))
 
     def as_mapping(self) -> dict[str, Any]:
@@ -231,7 +267,26 @@ class VapourResolveState:
                 species_id: dict(provenance)
                 for species_id, provenance in self.source_reaction_activity_provenance.items()
             },
+            "source_reaction_activity_results": dict(
+                self.source_reaction_activity_results
+            ),
             "source_reaction_fO2_bar": self.source_reaction_fO2_bar,
+            "source_reaction_fO2_log10": self.source_reaction_fO2_log10,
+            "source_reaction_activity_pressure_bar": (
+                self.source_reaction_activity_pressure_bar
+            ),
+            "source_reaction_redox_model_id": self.source_reaction_redox_model_id,
+            "source_reaction_composition_wt_pct": dict(
+                self.source_reaction_composition_wt_pct
+            ),
+            "melt_activity_shadow_state_fingerprint": (
+                self.melt_activity_shadow_state_fingerprint
+            ),
+            "melt_activity_shadow_inventory_digest": (
+                self.melt_activity_shadow_inventory_digest
+            ),
+            "melt_activity_shadow_enabled": self.melt_activity_shadow_enabled,
+            "melt_activity_engine_inputs": dict(self.melt_activity_engine_inputs),
             **dict(self.extras),
         }
 
@@ -941,6 +996,9 @@ def refusal_closure(
         source_label = "catalog"
         pressure_pa = None
         source_reaction_activity: SourceReactionActivity | None = None
+        source_reaction_activity_shadow: SourceReactionActivity | None = None
+        typed_activity_evaluation: Mapping[str, Any] | None = None
+        declaration: ActivityInputDeclaration | None = None
         # b-149 instance 7: source_activity defaulted to 1.0 before the
         # activity-dependent branch (REAL under b-119). Pure-component
         # (exponent==0) legitimately uses a=1; activity-dependent paths
@@ -967,6 +1025,11 @@ def refusal_closure(
                         "source_reactions[].activity_input declaration; silent "
                         "pure-component substitution is forbidden",
                     )
+                source_reaction_activity_shadow = (
+                    state.source_reaction_activity_results.get(
+                        declaration.component_id
+                    )
+                )
                 reported_activity = state.source_reaction_activities.get(
                     rule.species_id
                 )
@@ -1057,6 +1120,10 @@ def refusal_closure(
                     ),
                     doctrine_category=CATEGORY_PROVEN_ZERO,
                 )
+                if rule.species_id == "Fe":
+                    source_reaction_activity_shadow = (
+                        state.source_reaction_activity_results.get("FeO")
+                    )
             try:
                 # Pass every evaluator domain input present on the resolve
                 # state (fO2 → pO2_bar). The evaluator refuses omitted
@@ -1129,6 +1196,54 @@ def refusal_closure(
                     merge_notes_into_mapping(
                         evaluation_extra, [_unit_activity_note]
                     )
+                if source_reaction_activity_shadow is not None:
+                    try:
+                        expected_shadow_component = (
+                            declaration.component_id
+                            if declaration is not None
+                            else source_reaction_activity_shadow.component_id
+                        )
+                        expected_shadow_standard_state = (
+                            declaration.standard_state
+                            if declaration is not None
+                            else source_reaction_activity_shadow.standard_state
+                        )
+                        if expected_shadow_standard_state is None:
+                            raise ValueError(
+                                "typed shadow has no standard-state identity"
+                            )
+                        typed_activity_evaluation = (
+                            compiled.evaluator.evaluate_typed_shadow(
+                                state.temperature_K,
+                                activity=source_reaction_activity_shadow,
+                                pO2_bar=evaluator_fO2_bar,
+                                expected_component_id=expected_shadow_component,
+                                expected_standard_state=(
+                                    expected_shadow_standard_state
+                                ),
+                                expected_state_fingerprint=str(
+                                    state.melt_activity_shadow_state_fingerprint or ""
+                                ),
+                            )
+                        )
+                        typed_payload = dict(typed_activity_evaluation)
+                        typed_ln_pressure = typed_payload.get("ln_pressure_Pa")
+                        if (
+                            typed_ln_pressure is not None
+                            and pressure_pa is not None
+                            and pressure_pa > 0.0
+                        ):
+                            typed_payload["legacy_pressure_delta_ln"] = float(
+                                typed_ln_pressure
+                            ) - math.log(float(pressure_pa))
+                        typed_activity_evaluation = MappingProxyType(typed_payload)
+                    except Exception as shadow_exc:  # noqa: BLE001 - fail-isolated
+                        typed_activity_evaluation = MappingProxyType(
+                            {
+                                "status": "shadow_unavailable_no_behavior_change",
+                                "detail": str(shadow_exc),
+                            }
+                        )
             except Exception as exc:  # noqa: BLE001 — typed as contract miss
                 return _make_refusal(
                     rule,
@@ -1277,6 +1392,8 @@ def refusal_closure(
             refusal_code=None,
             extra=MappingProxyType(extra_payload),
             source_reaction_activity=source_reaction_activity,
+            source_reaction_activity_shadow=source_reaction_activity_shadow,
+            source_reaction_activity_shadow_evaluation=typed_activity_evaluation,
         )
 
     # Channel-local refusal predicates are monotone and independent of the
@@ -1513,6 +1630,42 @@ def resolve_vapour_batch(
     )
     assert_request_coverage(rules, ledger_snapshot, requested)
 
+    # t-568 Phase 1 is diagnostic-only and explicitly gated. The ordinary
+    # request path stays lazy; opted-in callers compute once per component and
+    # carry typed objects beside the still-authoritative scalar maps.
+    melt_activity_shadow: Any | None = None
+    if state is not None and state.melt_activity_shadow_enabled:
+        try:
+            from simulator.vapour_rail.melt_activity_resolver import (
+                build_shadow_for_vapour_batch,
+            )
+
+            melt_activity_shadow = build_shadow_for_vapour_batch(
+                rules=rules,
+                ledger_snapshot=ledger_snapshot,  # type: ignore[arg-type]
+                state=state,
+                engine_inputs_by_component=state.melt_activity_engine_inputs,
+            )
+            state = replace(
+                state,
+                source_reaction_activity_results=(
+                    melt_activity_shadow.results_by_component
+                ),
+                melt_activity_shadow_state_fingerprint=(
+                    melt_activity_shadow.state_fingerprint
+                ),
+                melt_activity_shadow_inventory_digest=(
+                    melt_activity_shadow.inventory_digest
+                ),
+            )
+        except Exception as exc:  # noqa: BLE001 - diagnostic shadow is fail-isolated
+            melt_activity_shadow = MappingProxyType(
+                {
+                    "status": "shadow_unavailable_no_behavior_change",
+                    "detail": str(exc),
+                }
+            )
+
     closure = refusal_closure(
         requested=requested,
         rules=rules,
@@ -1588,4 +1741,5 @@ def resolve_vapour_batch(
                 "n_solve_bundles": len(bundles),
             }
         ),
+        melt_activity_shadow=melt_activity_shadow,
     )

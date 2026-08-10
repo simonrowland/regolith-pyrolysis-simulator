@@ -352,6 +352,68 @@ def serialize_vapour_batch(batch: VapourBatch | None) -> dict[str, Any] | None:
     }
 
 
+def serialize_melt_activity_shadow(
+    batch: VapourBatch | None,
+) -> dict[str, Any] | None:
+    """Serialize the opt-in t-568 surface without changing vapour_batch.v1."""
+
+    if batch is None:
+        return None
+    from simulator.vapour_rail.melt_activity_resolver import (
+        MELT_ACTIVITY_SHADOW_RECORD_LIMIT,
+    )
+
+    shadow = batch.melt_activity_shadow
+    if shadow is None:
+        shadow_payload: Any = None
+    elif hasattr(shadow, "as_mapping"):
+        shadow_payload = shadow.as_mapping()
+    elif isinstance(shadow, Mapping):
+        shadow_payload = dict(shadow)
+    else:
+        shadow_payload = {
+            "status": "shadow_unavailable_no_behavior_change",
+            "detail": f"unsupported shadow payload {type(shadow).__name__}",
+        }
+    record_limit = MELT_ACTIVITY_SHADOW_RECORD_LIMIT
+    answer_payloads: dict[str, Any] = {}
+    shadow_answer_count = 0
+    for species_id, answer in sorted(batch.channels_by_species.items()):
+        if (
+            answer.source_reaction_activity_shadow is None
+            and answer.source_reaction_activity_shadow_evaluation is None
+        ):
+            continue
+        shadow_answer_count += 1
+        if len(answer_payloads) >= record_limit:
+            continue
+        answer_payloads[species_id] = {
+            "activity": _activity_payload(answer.source_reaction_activity_shadow),
+            "evaluation": (
+                dict(answer.source_reaction_activity_shadow_evaluation)
+                if answer.source_reaction_activity_shadow_evaluation is not None
+                else None
+            ),
+        }
+    answers_omitted_count = shadow_answer_count - len(answer_payloads)
+    return {
+        "schema": "melt_activity_shadow.v1",
+        "behavior_authority": False,
+        "batch_shadow": shadow_payload,
+        "answers_by_species": answer_payloads,
+        "record_limit": record_limit,
+        "answers_recorded_count": len(answer_payloads),
+        "answers_omitted_count": answers_omitted_count,
+        "record_truncated": bool(
+            answers_omitted_count
+            or (
+                isinstance(shadow_payload, Mapping)
+                and shadow_payload.get("record_truncated") is True
+            )
+        ),
+    }
+
+
 # ---------------------------------------------------------------------------
 # VapourBatch flux cutover: batch is authority; live is shadow projection
 # ---------------------------------------------------------------------------

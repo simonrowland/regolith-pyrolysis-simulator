@@ -2327,6 +2327,16 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 if intrinsic_fO2_log_supplied
                 else None
             ),
+            # Exact pre-clamp redox input for the t-568 typed Fe shadow. The
+            # existing bar-valued field above stays the live evaluator channel.
+            "source_reaction_fO2_log10": (
+                float(intrinsic_fO2_log)
+                if intrinsic_fO2_log_supplied
+                else None
+            ),
+            "source_reaction_activity_pressure_bar": float(vacuum_floor_bar),
+            "source_reaction_redox_model_id": "REF-001-kress-carmichael-1991",
+            "source_reaction_composition_wt_pct": dict(comp_wt),
             "melt_dissociation_pO2_clamped_to_physical_envelope": (
                 melt_dissociation_pO2_clamped
             ),

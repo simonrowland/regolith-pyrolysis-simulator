@@ -925,6 +925,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_vapour_batch_report: Dict[str, Any] | None = None
         self._last_vapour_batch_flux_overlay: Dict[str, Any] = {}
         self._last_vapour_batch_resolve_error: Dict[str, Any] = {}
+        # t-568 diagnostic capture is default-off. A diagnostic harness may
+        # opt in and supply reviewed TierAEngineInput objects by component.
+        self._melt_activity_shadow_enabled: bool = False
+        self._melt_activity_engine_inputs: Dict[str, Any] = {}
         self._last_extraction_completeness_diagnostic: Dict[str, Any] = {}
         self._last_overlap_evaporation_diagnostic: Dict[str, Any] = {}
         self._feedstock_recovered_reagent_kg_by_species: Dict[str, float] = {}
@@ -1803,6 +1807,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             str, Mapping[str, Any]
         ] | None = None,
         source_reaction_fO2_bar: float | None = None,
+        source_reaction_fO2_log10: float | None = None,
+        source_reaction_activity_pressure_bar: float | None = None,
+        source_reaction_redox_model_id: str | None = None,
+        source_reaction_composition_wt_pct: Mapping[str, float] | None = None,
+        melt_activity_shadow_enabled: bool = False,
+        melt_activity_engine_inputs: Mapping[str, Any] | None = None,
         provider_candidates_by_species: dict | None = None,
         flux_activation_context: FluxActivationContext | None = None,
     ):
@@ -1855,6 +1865,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 ).items()
             },
             "source_reaction_fO2_bar": source_reaction_fO2_bar,
+            "source_reaction_fO2_log10": source_reaction_fO2_log10,
+            "source_reaction_activity_pressure_bar": (
+                source_reaction_activity_pressure_bar
+            ),
+            "source_reaction_redox_model_id": source_reaction_redox_model_id,
+            "source_reaction_composition_wt_pct": dict(
+                source_reaction_composition_wt_pct or {}
+            ),
+            "melt_activity_shadow_enabled": melt_activity_shadow_enabled,
+            "melt_activity_engine_inputs": dict(
+                melt_activity_engine_inputs or {}
+            ),
         }
         return self.vapour_rail_catalog.resolve_batch(
             ledger_snapshot,
