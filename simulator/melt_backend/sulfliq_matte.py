@@ -42,6 +42,22 @@ with ``μ_FeS = getSpecMu(8)`` and ``μ0_FeS = getMu0(8)``. For pure
 stoichiometric FeS liquid the free Fe + S dissociation leaves
 ``a_FeS ≈ 0.97`` (not exactly 1) — that is model physics, not a bug.
 
+S3 / LnS consumer contract (read before wiring)
+-----------------------------------------------
+* ``a_FeS`` is dimensionless Raoultian species activity. Use natural log:
+  ``Ln_a_FeS = math.log(result.a_FeS)`` only when
+  ``result.calibration_status == 'in_range'`` and ``math.isfinite(result.a_FeS)``.
+* On ``unavailable`` / bad input, ``a_FeS`` is ``float('nan')`` (not 0.0) so
+  naive ``ln(a_FeS)`` yields NaN rather than ``-inf``. Prefer the
+  ``ActivityResult.ln_a_FeS`` property, which is finite only for
+  ``in_range`` successes.
+* ``log_fO2`` / ``log_fS2`` are **log₁₀** (petrologic convention; matches
+  SulfLiq ``getlogfo2`` / ``getlogfs2``). Do not treat them as natural log.
+* ``matte_composition`` is bulk matte **O, S, Fe, Ni, Cu** (moles or mole
+  fractions, renormalised). There is no ledger → 5-vector adapter here;
+  the S-track caller must already own matte bulk speciation.
+* Pure-FeS zero-O leaves ``log_fO2 is None`` (engine refuses fo2 with O≤0).
+
 Adapter conventions (mirrors ``sulfsat.py``)
 --------------------------------------------
 * Optional import of ``SulfLiq``; failure → typed ``unavailable`` result.
@@ -58,8 +74,10 @@ from dataclasses import dataclass, field
 from importlib import metadata as importlib_metadata
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Union
 
-# Gas constant, J/(mol·K). Matches SulfLiq's R (Chem.h / NumUtil).
-_R_J_PER_MOL_K = 8.314462618
+# Gas constant, J/(mol·K). Matches SulfLiq Phase::R in Phase.cc (8.31468),
+# which is what getSpecMu / getMu0 / fugacity paths use internally.
+# (CODATA 2018 is 8.314462618; Δa_FeS from the swap is ≪0.01% at 1500 K.)
+_R_J_PER_MOL_K = 8.31468
 
 # Endmember component order expected by SulfLiq.setComps: O, S, Fe, Ni, Cu.
 _COMPONENT_ORDER = ('O', 'S', 'Fe', 'Ni', 'Cu')
@@ -76,7 +94,7 @@ _FES_SPECIES_INDEX = 8
 # DOI 10.1007/s004100000143; open-source encoding in ENKI-portal/sulfliq).
 FES_MU0_1300K_J_PER_MOL = -257599.6112
 
-SULFLIQ_CALIBRATION_VERSION = 'kress-sulfliq-1.0.4-a_FeS-v1'
+SULFLIQ_CALIBRATION_VERSION = 'kress-sulfliq-1.0.4-a_FeS-v2'
 
 
 @dataclass
@@ -89,18 +107,36 @@ class ActivityResult:
     * ``'out_of_range'`` — ran, but composition/T outside the documented
       model envelope (or activity non-positive / non-finite).
     * ``'unavailable'`` — SulfLiq not installed / import failed / bad inputs.
+      ``a_FeS`` is NaN (not 0.0) so ``ln(a_FeS)`` does not silently go to −∞.
+
+    ``log_fO2`` / ``log_fS2`` are **log₁₀** (base 10), or None when the
+    engine cannot evaluate them (e.g. pure-FeS zero-O leaves log_fO2 None).
     """
 
-    a_FeS: float = 0.0
+    a_FeS: float = field(default_factory=lambda: float('nan'))
     T_K: float = 0.0
     P_bar: float = 1.0
-    log_fO2: Optional[float] = None
-    log_fS2: Optional[float] = None
+    log_fO2: Optional[float] = None  # log10(fO2)
+    log_fS2: Optional[float] = None  # log10(fS2)
     is_stable: Optional[bool] = None
     species_mole_fractions: Dict[str, float] = field(default_factory=dict)
     warnings: List[str] = field(default_factory=list)
     calibration_status: str = 'unavailable'
     calibration_version: str = SULFLIQ_CALIBRATION_VERSION
+
+    @property
+    def ln_a_FeS(self) -> float:
+        """
+        Natural log of a_FeS for the O'Neill LnS chain slot.
+
+        Returns NaN unless ``calibration_status == 'in_range'`` and
+        ``a_FeS`` is finite and positive — never ``-inf`` from ln(0).
+        """
+        if self.calibration_status != 'in_range':
+            return float('nan')
+        if not math.isfinite(self.a_FeS) or self.a_FeS <= 0.0:
+            return float('nan')
+        return math.log(self.a_FeS)
 
 
 class SulfLiqMatteProvider:
@@ -116,6 +152,8 @@ class SulfLiqMatteProvider:
                 T_K=1473.15,
                 matte_composition={'S': 0.5, 'Fe': 0.5},
             )
+            if result.calibration_status == 'in_range':
+                ln_a = result.ln_a_FeS  # natural log; safe
     """
 
     def __init__(self) -> None:
@@ -178,6 +216,8 @@ class SulfLiqMatteProvider:
             'calibration_version': self.calibration_version(),
             'fes_species_index': str(_FES_SPECIES_INDEX),
             'component_order': ','.join(_COMPONENT_ORDER),
+            'log_f_base': '10',  # log_fO2 / log_fS2 are log10
+            'R_J_per_mol_K': str(_R_J_PER_MOL_K),
         }
 
     def a_FeS(
@@ -197,9 +237,16 @@ class SulfLiqMatteProvider:
         matte_composition
             Either a mapping keyed by ``O``, ``S``, ``Fe``, ``Ni``, ``Cu``
             (moles or mole fractions — renormalised internally) or a length-5
-            sequence in that component order.
+            sequence in that component order. This is **matte bulk**, not
+            silicate melt oxides.
         P_bar
             Pressure in bar (default 1 bar; SulfLiq takes Pa internally).
+
+        Returns
+        -------
+        ActivityResult
+            ``a_FeS`` is NaN when status is ``unavailable``; never 0.0 as a
+            stand-in for missing data. ``log_fO2`` / ``log_fS2`` are log₁₀.
         """
         if not self.is_available():
             return ActivityResult(
@@ -296,6 +343,7 @@ class SulfLiqMatteProvider:
             warnings_list.append(f'isStable failed: {exc!r}')
         try:
             # Pure FeS (zero O) makes getlogfo2 throw; leave None then.
+            # Returned values are log10 (SulfLiq API / petrologic convention).
             if comps[0] > 0.0:
                 log_fo2 = float(sl.getlogfo2())
             log_fs2 = float(sl.getlogfs2())
@@ -320,7 +368,7 @@ class SulfLiqMatteProvider:
         if not math.isfinite(a_fes) or a_fes <= 0.0:
             warnings_list.append(f'a_FeS non-physical: {a_fes!r}')
             status = 'out_of_range'
-            a_fes = 0.0
+            a_fes = float('nan')
 
         return ActivityResult(
             a_FeS=float(a_fes),
@@ -346,6 +394,8 @@ def a_FeS(
     Module-level convenience: ``a_FeS(T_K, matte_composition) -> ActivityResult``.
 
     Instantiates and initialises a provider when one is not supplied.
+    See ``SulfLiqMatteProvider.a_FeS`` and the module docstring S3/LnS
+    consumer contract before calling ``math.log`` on ``result.a_FeS``.
     """
     if provider is None:
         provider = SulfLiqMatteProvider()
