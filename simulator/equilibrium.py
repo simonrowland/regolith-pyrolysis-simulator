@@ -245,6 +245,7 @@ class EquilibriumMixin:
             _is_noncertifying_pseudo_vapor_pressure_runtime,
             _liquid_oxide_standard_reaction_block,
             _metadata_value,
+            _o2_channel_term_and_potential,
             _pow10_pressure_or_raise,
             _range_tuple,
             _require_finite_vapor_value,
@@ -257,6 +258,9 @@ class EquilibriumMixin:
             vapor_pressure_antoine_coefficients,
             vapor_pressure_valid_range_K,
             warn_pseudo_vapor_pressure_fallback,
+        )
+        from simulator.vapour_rail.channels import (
+            REACTION_PLANE_MELT_INTERFACE,
         )
 
         T_K = self.melt.temperature_C + CELSIUS_TO_KELVIN_OFFSET
@@ -712,13 +716,21 @@ class EquilibriumMixin:
                     1e-30,
                     float(liquid_rxn.get("pO2_reference_bar", 1.0) or 1.0),
                 )
+                # t-571: O2 enters through channel #1 (owner-gated,
+                # envelope-clamped) — bit-identical linear form.
+                o2_term, o2_potential = _o2_channel_term_and_potential(
+                    pO2_exponent=pO2_exponent,
+                    pO2_bar=melt_dissociation_pO2_bar,
+                    pO2_reference_bar=pO2_reference_bar,
+                    temperature_K=T_K,
+                    reaction_plane=REACTION_PLANE_MELT_INTERFACE,
+                )
                 P_eq_raw, _af, _ps = _standard_reaction_pressure_Pa(
                     P_reference_Pa=P_reference_Pa,
                     oxide_activity_value=oxide_activity.activity,
                     activity_exponent=activity_exponent,
-                    pO2_bar=melt_dissociation_pO2_bar,
-                    pO2_exponent=pO2_exponent,
-                    pO2_reference_bar=pO2_reference_bar,
+                    o2_term=o2_term,
+                    o2_potential=o2_potential,
                 )
                 P_effective_Pa = _require_finite_vapor_value(
                     P_eq_raw,
@@ -813,14 +825,22 @@ class EquilibriumMixin:
                     1e-30,
                     float(gas_rail_rxn.get("pO2_reference_bar", 1.0) or 1.0),
                 )
+                # t-571: O2 enters through channel #1 (owner-gated,
+                # envelope-clamped) — bit-identical linear form.
+                o2_term, o2_potential = _o2_channel_term_and_potential(
+                    pO2_exponent=pO2_exponent,
+                    pO2_bar=melt_dissociation_pO2_bar,
+                    pO2_reference_bar=pO2_reference_bar,
+                    temperature_K=T_K,
+                    reaction_plane=REACTION_PLANE_MELT_INTERFACE,
+                )
                 P_eq_raw, _activity_factor, _pO2_scaled = (
                     _standard_reaction_pressure_Pa(
                         P_reference_Pa=P_reference_Pa,
                         oxide_activity_value=oxide_activity.activity,
                         activity_exponent=activity_exponent,
-                        pO2_bar=melt_dissociation_pO2_bar,
-                        pO2_exponent=pO2_exponent,
-                        pO2_reference_bar=pO2_reference_bar,
+                        o2_term=o2_term,
+                        o2_potential=o2_potential,
                     )
                 )
                 P_effective_Pa = _require_finite_vapor_value(

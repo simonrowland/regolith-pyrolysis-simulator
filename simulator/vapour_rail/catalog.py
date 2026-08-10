@@ -41,6 +41,17 @@ from simulator.vapour_rail.activity import (
     StandardStateIdentity,
 )
 from simulator.vapour_rail.batch import FluxActivationContext
+from simulator.vapour_rail.channels import (
+    CHANNEL_O2,
+    LEGACY_FO2_PLANE,
+    REACTION_PLANE_TRANSPORT_HEADSPACE,
+    CompiledReactionTerm,
+    ReactionTermRole,
+    ReactionThermoInputs,
+    channel_log10_contribution,
+    compile_o2_channel_term,
+    o2_potential_from_pO2_bar,
+)
 from simulator.vapour_rail.nasa_cea import (
     Nasa7Segment,
     Nasa9Segment,
@@ -888,7 +899,14 @@ class _ReferencePressureModel:
 
 @dataclass(frozen=True)
 class CompiledPressureEvaluator:
-    """One immutable pressure path shared by evaporation and condensation."""
+    """One immutable pressure path shared by evaporation and condensation.
+
+    t-571 Phase 1: the O2 chemical-potential channel is first citizen.  Scalar
+    ``pO2_exponent`` / ``pO2_reference_bar`` remain as the compatibility view
+    of the compiled O2 :class:`CompiledReactionTerm`; evaluation through
+    either the legacy kwargs or :class:`ReactionThermoInputs` is bit-identical
+    for every existing catalog row.
+    """
 
     species_id: str
     evaluator_family: str
@@ -904,6 +922,20 @@ class CompiledPressureEvaluator:
     pO2_exponent: float = 0.0
     pO2_reference_bar: float = 1.0
     oxygen_fugacity_channel: str | None = None
+    reaction_terms: tuple[CompiledReactionTerm, ...] = ()
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "reaction_terms", tuple(self.reaction_terms))
+
+    @property
+    def o2_channel_term(self) -> CompiledReactionTerm | None:
+        for term in self.reaction_terms:
+            if (
+                term.role is ReactionTermRole.EXCHANGE_CHANNEL
+                and term.input_id == CHANNEL_O2
+            ):
+                return term
+        return None
 
     def evaluate(
         self,
@@ -911,6 +943,7 @@ class CompiledPressureEvaluator:
         *,
         source_activity: float | None = None,
         pO2_bar: float | None = None,
+        reaction_inputs: ReactionThermoInputs | None = None,
     ) -> PressureEvaluation:
         temperature_K = _finite_positive(temperature_K, "temperature_K")
         low, high = self.valid_temperature_K
@@ -936,35 +969,101 @@ class CompiledPressureEvaluator:
 
         log10_pressure = log10_reference
         if self.activity_exponent:
-            if source_activity is None:
-                raise CatalogCompileError(
-                    f"{self.species_id}: activity-dependent evaluator requires "
-                    "explicit source_activity; implicit a=1 is forbidden"
-                )
-            activity = _finite_positive(source_activity, "source_activity")
+            if reaction_inputs is not None and reaction_inputs.activities:
+                activity_value = None
+                for _component_id, activity_obj in reaction_inputs.activities.items():
+                    if hasattr(activity_obj, "as_pressure_activity"):
+                        activity_value = activity_obj.as_pressure_activity()
+                    elif isinstance(activity_obj, (int, float)):
+                        activity_value = float(activity_obj)
+                    if activity_value is not None:
+                        break
+                if activity_value is None and source_activity is not None:
+                    activity_value = source_activity
+                if activity_value is None:
+                    raise CatalogCompileError(
+                        f"{self.species_id}: activity-dependent evaluator requires "
+                        "explicit source_activity; implicit a=1 is forbidden"
+                    )
+                activity = _finite_positive(activity_value, "source_activity")
+            else:
+                if source_activity is None:
+                    raise CatalogCompileError(
+                        f"{self.species_id}: activity-dependent evaluator requires "
+                        "explicit source_activity; implicit a=1 is forbidden"
+                    )
+                activity = _finite_positive(source_activity, "source_activity")
             log10_pressure += self.activity_exponent * math.log10(activity)
-        if self.pO2_exponent:
-            if pO2_bar is None:
+
+        # O2 / exchange-channel terms (t-571).  THE BAR: bit-identical with
+        # the pre-t-571 scalar path for every existing catalog row.  Both the
+        # legacy pO2_bar kwargs and the typed ReactionThermoInputs path reduce
+        # to e · log10(p_clamped / p_ref) via channel_log10_contribution +
+        # the legacy_scalar_adapter.
+        o2_term = self.o2_channel_term
+        needs_o2 = abs(self.pO2_exponent) > 0.0 or o2_term is not None
+        if needs_o2:
+            plane = (
+                LEGACY_FO2_PLANE.get(self.oxygen_fugacity_channel or "")
+                or REACTION_PLANE_TRANSPORT_HEADSPACE
+            )
+            o2_potential = None
+            if reaction_inputs is not None and CHANNEL_O2 in reaction_inputs.channels:
+                o2_potential = reaction_inputs.channels[CHANNEL_O2]
+            elif pO2_bar is not None:
+                o2_potential = o2_potential_from_pO2_bar(
+                    pO2_bar=pO2_bar,
+                    temperature_K=temperature_K,
+                    reaction_plane=plane,
+                    pO2_reference_bar=self.pO2_reference_bar,
+                )
+            else:
                 raise CatalogCompileError(
                     f"{self.species_id}: oxygen-dependent evaluator requires "
                     f"explicit {self.oxygen_fugacity_channel or 'pO2'} input"
                 )
-            oxygen = _finite_positive(pO2_bar, "pO2_bar")
-            # Physical melt/transport pO2 envelope (b-148). Premise: mass
-            # action p ∝ (pO2/p_ref)^n uses a *physical* oxygen pressure, not
-            # a float-range sentinel. Algebra: clamp pO2 into
-            # [MELT_DISSOCIATION_PO2_MIN_BAR, MELT_DISSOCIATION_PO2_MAX_BAR]
-            # before the log power. Unit check: bar/bar dimensionless.
-            # Sanity: (1e300)^0.25 = 1e75 turned AlO2 unit-ref ~1e-8 Pa into
-            # ~1e67 Pa (the b-148 dump); at the physical cap 100 bar the
-            # same power is only 10^{0.5} ≈ 3.2×.
-            if oxygen < MELT_DISSOCIATION_PO2_MIN_BAR:
-                oxygen = MELT_DISSOCIATION_PO2_MIN_BAR
-            elif oxygen > MELT_DISSOCIATION_PO2_MAX_BAR:
-                oxygen = MELT_DISSOCIATION_PO2_MAX_BAR
-            log10_pressure += self.pO2_exponent * math.log10(
-                oxygen / self.pO2_reference_bar
-            )
+
+            term = o2_term
+            if term is None:
+                # Invert e = -nu_O2 / nu_g with nu_g = 1 → nu_O2 = -e.
+                term = compile_o2_channel_term(
+                    signed_nu_o2=-float(self.pO2_exponent),
+                    target_nu=1.0,
+                    reaction_plane=plane,
+                    pO2_reference_bar=self.pO2_reference_bar,
+                )
+            try:
+                log10_pressure += channel_log10_contribution(
+                    term,
+                    o2_potential,
+                    legacy_pO2_reference_bar=self.pO2_reference_bar,
+                )
+            except ValueError as exc:
+                raise CatalogCompileError(
+                    f"{self.species_id}: O2 channel evaluation failed: {exc}"
+                ) from exc
+
+            for extra in self.reaction_terms:
+                if extra.role is not ReactionTermRole.EXCHANGE_CHANNEL:
+                    continue
+                if extra.input_id == CHANNEL_O2:
+                    continue
+                if (
+                    reaction_inputs is None
+                    or extra.input_id not in reaction_inputs.channels
+                ):
+                    raise CatalogCompileError(
+                        f"{self.species_id}: missing channel input "
+                        f"{extra.input_id} (Phase 1: only O2 is owned)"
+                    )
+                pot = reaction_inputs.channels[extra.input_id]
+                try:
+                    log10_pressure += channel_log10_contribution(extra, pot)
+                except ValueError as exc:
+                    raise CatalogCompileError(
+                        f"{self.species_id}: channel {extra.input_id} "
+                        f"evaluation failed: {exc}"
+                    ) from exc
 
         # A finite continued log-pressure can lie outside IEEE-754's representable
         # pressure interval: activity depletion drives trace carriers below the
@@ -2287,6 +2386,36 @@ def _compile_evaluator(
                 "'intrinsic_melt' or 'transport_headspace'"
             )
 
+    # t-571 Phase 1: emit the O2 channel term from the scalar exponent.
+    # e_O2 = -nu_O2 / nu_g  ⇒  with nu_g = 1, nu_O2 = -e_O2.
+    # When a balanced source reaction is later available with multi-channel
+    # bindings, the compiler will replace this with the full term set; the
+    # scalar pO2_exponent must still agree bit-for-bit within 1e-9.
+    reaction_terms: tuple[CompiledReactionTerm, ...] = ()
+    if pO2_exponent != 0.0:
+        plane = LEGACY_FO2_PLANE.get(
+            oxygen_fugacity_channel or "", REACTION_PLANE_TRANSPORT_HEADSPACE
+        )
+        o2_term = compile_o2_channel_term(
+            signed_nu_o2=-float(pO2_exponent),
+            target_nu=1.0,
+            reaction_plane=plane,
+            pO2_reference_bar=pO2_reference,
+        )
+        # Guard: derived exponent must match the scalar compatibility view.
+        if not math.isclose(
+            o2_term.derived_exponent,
+            float(pO2_exponent),
+            rel_tol=0.0,
+            abs_tol=1.0e-9,
+        ):
+            raise CatalogCompileError(
+                f"{species_id}: O2 channel term exponent "
+                f"{o2_term.derived_exponent} disagrees with pO2_exponent "
+                f"{pO2_exponent}"
+            )
+        reaction_terms = (o2_term,)
+
     return CompiledPressureEvaluator(
         species_id=species_id,
         evaluator_family=evaluator_family,
@@ -2304,6 +2433,7 @@ def _compile_evaluator(
         pO2_exponent=pO2_exponent,
         pO2_reference_bar=pO2_reference,
         oxygen_fugacity_channel=oxygen_fugacity_channel,
+        reaction_terms=reaction_terms,
     )
 
 

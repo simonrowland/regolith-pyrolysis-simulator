@@ -77,6 +77,12 @@ REFUSAL_OMITTED_RULE = "omitted_request_rule"
 # Outcome-determining process state missing (HI-8 / DESIGN-REV5 §1.2):
 # never fabricate PressureValue(0.0) + FluxEligible as a stand-in.
 REFUSAL_MISSING_OUTCOME_STATE = "missing_outcome_determining_state"
+# t-571 chemical-potential channel refusals (design §9).  Distinct from the
+# legacy formula/evaluator/alpha/route "channel contract" check below.
+REFUSAL_CHEMICAL_POTENTIAL_CHANNEL = "refused_missing_channel_input"
+REFUSAL_HALIDE_RESERVOIR_OWNER_MISSING = "refused_halide_reservoir_owner_missing"
+REFUSAL_SULFUR_RESERVOIR_OWNER_MISSING = "refused_sulfur_reservoir_owner_missing"
+REFUSAL_CHANNEL_RUNTIME_OWNER_MISSING = "refused_channel_runtime_owner_missing"
 
 DEFAULT_SOURCE_ACCOUNT = "process.cleaned_melt"
 DEFAULT_SOLVE_GROUP_PREFIX = "u0_v:"
@@ -809,8 +815,15 @@ def _predicate_active(
     return False, f"unrecognized applicability predicate {predicate!r}"
 
 
-def _channel_contract_refusal(rule: RequestRule) -> str | None:
-    """Provider-independent missing-contract check (step 2)."""
+def _executable_contract_refusal(rule: RequestRule) -> str | None:
+    """Provider-independent missing-contract check (step 2).
+
+    Renamed from ``_channel_contract_refusal`` (t-571 design §2.1): this gate
+    checks formula / evaluator / alpha / route completeness.  It is **not** a
+    chemical-potential channel gate — those refusals live in
+    :mod:`simulator.vapour_rail.channels` and
+    :func:`chemical_potential_channel_refusal`.
+    """
 
     missing: list[str] = []
     if not rule.has_formula:
@@ -831,6 +844,97 @@ def _channel_contract_refusal(rule: RequestRule) -> str | None:
             + ", ".join(missing)
         )
     return None
+
+
+# Backward-compatible alias (pre-t-571 name).
+_channel_contract_refusal = _executable_contract_refusal
+
+
+def chemical_potential_channel_refusal(
+    *,
+    carrier: str,
+    element: str | None = None,
+    pathway: str | None = None,
+    missing_text: str | None = None,
+    required_channels: Sequence[str] | None = None,
+    temperature_K: float | None = 1800.0,
+) -> tuple[str, str] | None:
+    """t-571 admission rule: typed refusal for unowned chemical-potential channels.
+
+    Returns ``(refusal_code, detail)`` when composition cannot proceed, else
+    None.  Names both the missing channel IDs and the missing melt-side owner
+    (BaF → F2 + halide_reservoir_owner_missing).  No Rev-3 bypass.
+    """
+
+    from simulator.vapour_rail.channels import (
+        ChannelCompositionRefusal,
+        attempt_channel_composition,
+    )
+
+    result = attempt_channel_composition(
+        carrier=carrier,
+        element=element,
+        pathway=pathway,
+        missing_text=missing_text,
+        required_channels=required_channels,
+        temperature_K=temperature_K,
+    )
+    if isinstance(result, ChannelCompositionRefusal):
+        detail = (
+            f"missing_channels={list(result.missing_channels)}; "
+            f"missing_melt_owners={list(result.missing_melt_owners)}; "
+            f"{result.detail}"
+        )
+        return result.disposition, detail
+    return None
+
+
+def _chemical_potential_channel_gate(
+    rule: RequestRule,
+    compiled: Any,
+    state: VapourResolveState | None,
+) -> tuple[str, str] | None:
+    """Step-2 gate: non-O2 exchange-channel terms resolve or typed-refuse.
+
+    t-571 design §9 admission criterion 5: every gas exchange participant
+    must resolve through the channel resolver to a usable typed potential.
+    Phase 1 owns O2 only, so a compiled evaluator carrying a non-O2
+    :class:`CompiledReactionTerm` (an ``exchange_channel_bindings`` row)
+    composes through :func:`chemical_potential_channel_refusal` and the
+    closure emits the owner-specific refusal code —
+    ``refused_halide_reservoir_owner_missing`` etc. — naming the missing
+    channel **and** the missing melt-side owner.  Without this gate the same
+    row fell through to ``_make_live`` and surfaced as the generic
+    ``missing_channel_contract`` evaluator failure (P1 review: refusal
+    unwired).  Returns ``(refusal_code, detail)`` or None.
+    """
+
+    from simulator.vapour_rail.channels import (
+        CHANNEL_O2,
+        ReactionTermRole,
+    )
+
+    evaluator = getattr(compiled, "evaluator", None) if compiled is not None else None
+    terms = tuple(getattr(evaluator, "reaction_terms", ()) or ())
+    required_channels: list[str] = []
+    for term in terms:
+        if getattr(term, "role", None) is not ReactionTermRole.EXCHANGE_CHANNEL:
+            continue
+        input_id = getattr(term, "input_id", None)
+        if input_id is None or input_id == CHANNEL_O2:
+            # O2 is Phase-1 owned; its point/resolution path is the live
+            # evaluator itself (pO2_bar / reaction_inputs).
+            continue
+        required_channels.append(str(input_id))
+    if not required_channels:
+        return None
+    return chemical_potential_channel_refusal(
+        carrier=rule.species_id,
+        element=None,
+        pathway="catalog_exchange_channel_binding",
+        required_channels=tuple(sorted(dict.fromkeys(required_channels))),
+        temperature_K=state.temperature_K if state is not None else None,
+    )
 
 
 def _absent_source_atom_detail(
@@ -1439,6 +1543,22 @@ def refusal_closure(
             if contract_detail is not None:
                 answers[species_id] = _make_refusal(
                     rule, REFUSAL_MISSING_CHANNEL_CONTRACT, contract_detail
+                )
+                refused.add(species_id)
+                changed = True
+                continue
+
+            # 3b) t-571 chemical-potential channel gate (design §9): a
+            #     compiled non-O2 exchange-channel term attempts composition
+            #     through the channel resolver and typed-refuses with the
+            #     owner-specific code — never a generic contract miss.
+            channel_gate = _chemical_potential_channel_gate(
+                rule, catalog_species.get(species_id), state
+            )
+            if channel_gate is not None:
+                gate_code, gate_detail = channel_gate
+                answers[species_id] = _make_refusal(
+                    rule, gate_code, gate_detail
                 )
                 refused.add(species_id)
                 changed = True

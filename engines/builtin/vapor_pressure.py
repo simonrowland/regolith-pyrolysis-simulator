@@ -45,7 +45,15 @@ from __future__ import annotations
 import math
 import warnings as runtime_warnings
 from collections.abc import Mapping
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    # Annotations only; the runtime import stays lazy because simulator
+    # package init re-enters this module (see __init__ below).
+    from simulator.vapour_rail.channels import (
+        CompiledReactionTerm,
+        GasChannelPotential,
+    )
 
 from engines.builtin._common import (
     composition_wt_pct_from_account_view,
@@ -259,31 +267,85 @@ def _liquid_oxide_standard_reaction_block(
     block = (row or {}).get(LIQUID_OXIDE_STANDARD_REACTION_KEY)
     return block if _is_mapping(block) else None
 
+def _o2_channel_term_and_potential(
+    *,
+    pO2_exponent: float,
+    pO2_bar: float,
+    pO2_reference_bar: float,
+    temperature_K: float,
+    reaction_plane: str,
+) -> tuple[CompiledReactionTerm | None, GasChannelPotential | None]:
+    """Route a legacy linear-space rail's O2 dependence through channel #1.
+
+    t-571 Phase 1: the O2 scalar no longer enters pressure math as a free
+    fugacity — it is wrapped by the owner-gated channel factory
+    (:func:`o2_potential_from_pO2_bar`, the registered Phase-1 runtime
+    owner), which applies the b-148 physical envelope clamp and records the
+    clamp/reference receipts.  The returned pair feeds
+    :func:`channel_linear_mass_action_factor`, which reproduces the exact
+    pre-migration expression ``(p_clamped / p_ref) ** e`` bit-for-bit:
+
+    - ``legacy_pO2_bar`` is ``clamp_physical_pO2_bar(pO2_bar)``, identical to
+      the legacy inline ``min(max(pO2, MIN), MAX)``;
+    - ``term.derived_exponent`` is ``-(-e)/1 == e`` exactly (IEEE negation
+      and division by 1.0 are exact), matching the legacy scalar exponent;
+    - ``p_ref`` keeps the legacy ``max(1e-30, ref or 1.0)`` normalization.
+
+    Returns ``(None, None)`` for a zero exponent (no O2 dependence).
+    """
+
+    from simulator.vapour_rail.channels import (
+        compile_o2_channel_term,
+        o2_potential_from_pO2_bar,
+    )
+
+    exponent = float(pO2_exponent)
+    if not exponent:
+        return None, None
+    p_ref = max(1e-30, float(pO2_reference_bar) or 1.0)
+    term = compile_o2_channel_term(
+        signed_nu_o2=-exponent,
+        target_nu=1.0,
+        reaction_plane=reaction_plane,
+    )
+    potential = o2_potential_from_pO2_bar(
+        pO2_bar=float(pO2_bar),
+        temperature_K=float(temperature_K),
+        reaction_plane=reaction_plane,
+        pO2_reference_bar=p_ref,
+    )
+    return term, potential
+
+
 def _standard_reaction_pressure_Pa(
     *,
     P_reference_Pa: float,
     oxide_activity_value: float,
     activity_exponent: float,
-    pO2_bar: float,
-    pO2_exponent: float,
-    pO2_reference_bar: float,
+    o2_term: CompiledReactionTerm | None,
+    o2_potential: GasChannelPotential | None,
 ) -> tuple[float, float, bool]:
-    """Return (P_eq_Pa, activity_factor, pO2_scaled) for a standard reaction."""
+    """Return (P_eq_Pa, activity_factor, pO2_scaled) for a standard reaction.
+
+    t-571: the O2 factor arrives as a typed channel term + owner-gated
+    potential (see :func:`_o2_channel_term_and_potential`) and is applied
+    through :func:`channel_linear_mass_action_factor` — the channel
+    interface's linear-composer form, bit-identical to the pre-migration
+    ``(p_clamped / p_ref) ** e``.
+    """
+
+    from simulator.vapour_rail.channels import channel_linear_mass_action_factor
 
     activity_factor = max(float(oxide_activity_value), 0.0) ** float(
         activity_exponent
     )
     P_eq_Pa = float(P_reference_Pa) * activity_factor
     pO2_scaled = False
-    if pO2_exponent:
-        p_ref = max(1e-30, float(pO2_reference_bar) or 1.0)
-        # b-148: physical melt pO2 envelope — never mass-action a float
-        # sentinel (1e300)^n through positive-n carriers (AlO2, CrO2, …).
-        oxygen = min(
-            max(float(pO2_bar), MELT_DISSOCIATION_PO2_MIN_BAR),
-            MELT_DISSOCIATION_PO2_MAX_BAR,
-        )
-        P_eq_Pa *= (oxygen / p_ref) ** float(pO2_exponent)
+    if o2_term is not None:
+        # b-148: the physical melt pO2 envelope is applied inside the
+        # channel factory — never mass-action a float sentinel (1e300)^n
+        # through positive-n carriers (AlO2, CrO2, …).
+        P_eq_Pa *= channel_linear_mass_action_factor(o2_term, o2_potential)
         pO2_scaled = True
     return P_eq_Pa, activity_factor, pO2_scaled
 
@@ -1116,6 +1178,12 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         # re-enters this module during package init -- see
         # engines/builtin/__init__.py for the cycle description.
         from simulator.state import GAS_CONSTANT
+        from simulator.vapour_rail.channels import (
+            REACTION_PLANE_MELT_INTERFACE,
+            REACTION_PLANE_TRANSPORT_HEADSPACE,
+            channel_linear_mass_action_factor,
+            o2_potential_from_pO2_bar,
+        )
 
         wrong_intent = reject_wrong_intent(request, ChemistryIntent.VAPOR_PRESSURE)
         if wrong_intent is not None:
@@ -1416,14 +1484,22 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     1e-30,
                     float(sp_data.get("pO2_reference_bar", 1.0) or 1.0),
                 )
+                # t-571: O2 enters through channel #1 (owner-gated,
+                # envelope-clamped, receipted) — bit-identical linear form.
+                o2_term, o2_potential = _o2_channel_term_and_potential(
+                    pO2_exponent=pO2_exponent,
+                    pO2_bar=melt_dissociation_pO2_bar,
+                    pO2_reference_bar=pO2_reference_bar,
+                    temperature_K=T_K,
+                    reaction_plane=REACTION_PLANE_MELT_INTERFACE,
+                )
                 P_eq_raw, activity_factor, pO2_scaled = (
                     _standard_reaction_pressure_Pa(
                         P_reference_Pa=P_reference_Pa,
                         oxide_activity_value=oxide_activity.activity,
                         activity_exponent=activity_exponent,
-                        pO2_bar=melt_dissociation_pO2_bar,
-                        pO2_exponent=pO2_exponent,
-                        pO2_reference_bar=pO2_reference_bar,
+                        o2_term=o2_term,
+                        o2_potential=o2_potential,
                     )
                 )
                 P_eq_Pa = _require_finite_vapor_value(
@@ -1543,14 +1619,22 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     1e-30,
                     float(liquid_rxn.get("pO2_reference_bar", 1.0) or 1.0),
                 )
+                # t-571: O2 enters through channel #1 (owner-gated,
+                # envelope-clamped, receipted) — bit-identical linear form.
+                o2_term, o2_potential = _o2_channel_term_and_potential(
+                    pO2_exponent=pO2_exponent,
+                    pO2_bar=melt_dissociation_pO2_bar,
+                    pO2_reference_bar=pO2_reference_bar,
+                    temperature_K=T_K,
+                    reaction_plane=REACTION_PLANE_MELT_INTERFACE,
+                )
                 P_eq_raw, activity_factor, pO2_scaled = (
                     _standard_reaction_pressure_Pa(
                         P_reference_Pa=P_reference_Pa,
                         oxide_activity_value=oxide_activity.activity,
                         activity_exponent=activity_exponent,
-                        pO2_bar=melt_dissociation_pO2_bar,
-                        pO2_exponent=pO2_exponent,
-                        pO2_reference_bar=pO2_reference_bar,
+                        o2_term=o2_term,
+                        o2_potential=o2_potential,
                     )
                 )
                 P_eq_Pa = _require_finite_vapor_value(
@@ -1662,6 +1746,15 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     1e-30,
                     float(gas_rail_rxn.get("pO2_reference_bar", 1.0) or 1.0),
                 )
+                # t-571: O2 enters through channel #1 (owner-gated,
+                # envelope-clamped, receipted) — bit-identical linear form.
+                o2_term, o2_potential = _o2_channel_term_and_potential(
+                    pO2_exponent=pO2_exponent,
+                    pO2_bar=melt_dissociation_pO2_bar,
+                    pO2_reference_bar=pO2_reference_bar,
+                    temperature_K=T_K,
+                    reaction_plane=REACTION_PLANE_MELT_INTERFACE,
+                )
                 # Premise: gas-rail P_ref is liquid-oxide standard reaction at
                 # a=1, fO2=1 bar. Algebra: P = P_ref * a * fO2^n with the
                 # melt dissociation pO2 channel (not transport-only). Unit Pa.
@@ -1671,9 +1764,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         P_reference_Pa=P_reference_Pa,
                         oxide_activity_value=oxide_activity.activity,
                         activity_exponent=activity_exponent,
-                        pO2_bar=melt_dissociation_pO2_bar,
-                        pO2_exponent=pO2_exponent,
-                        pO2_reference_bar=pO2_reference_bar,
+                        o2_term=o2_term,
+                        o2_potential=o2_potential,
                     )
                 )
                 P_eq_Pa = _require_finite_vapor_value(
@@ -1821,6 +1913,22 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 if parent_oxide == 'FeO'
                 else melt_dissociation_pO2_bar
             )
+            if parent_oxide != 'FeO':
+                # t-571: the Ellingham O2 denominator is sourced from the
+                # owner-gated O2 channel potential (melt_interface plane).
+                # In-envelope the factory's envelope clamp is the identity,
+                # so legacy_pO2_bar equals dissociation_pO2_bar bit-for-bit;
+                # out-of-envelope degraded transport fallbacks (>100 bar
+                # without intrinsic fO2) now receive the declared b-148
+                # envelope instead of mass-actioning a float sentinel.
+                # FeO intentionally retains the legacy transport denominator
+                # (Kress91 activity already carries melt redox).
+                dissociation_pO2_bar = o2_potential_from_pO2_bar(
+                    pO2_bar=dissociation_pO2_bar,
+                    temperature_K=T_K,
+                    reaction_plane=REACTION_PLANE_MELT_INTERFACE,
+                    pO2_reference_bar=1.0,
+                ).legacy_pO2_bar
             # Premise: this value is the melt-supported metal source pressure,
             # not the later surface-flux boundary condition. For MgO(l) ->
             # Mg(g) + 1/2 O2, K1=(f_Mg/p0)*(fO2/p0)^1/2/a_MgO. The JANAF row
@@ -2170,10 +2278,20 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 pO2_reference_bar = max(
                     1e-30, float(data.get('pO2_reference_bar', 1.0) or 1.0)
                 )
+                # t-571: transport-plane O2 through channel #1.  The legacy
+                # form here applied no envelope clamp; the channel factory's
+                # clamp is the identity in-envelope (bit-identical) and now
+                # bounds out-of-envelope transport fallbacks (b-148 physics).
+                o2_term, o2_potential = _o2_channel_term_and_potential(
+                    pO2_exponent=pO2_exponent,
+                    pO2_bar=transport_pO2_bar,
+                    pO2_reference_bar=pO2_reference_bar,
+                    temperature_K=T_K,
+                    reaction_plane=REACTION_PLANE_TRANSPORT_HEADSPACE,
+                )
                 P_eq_Pa = _require_finite_vapor_value(
                     P_eq_Pa
-                    * (transport_pO2_bar / pO2_reference_bar)
-                    ** pO2_exponent,
+                    * channel_linear_mass_action_factor(o2_term, o2_potential),
                     species=name,
                     field="P_eq_pO2",
                 )
@@ -2200,7 +2318,23 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         or vacuum_floor_bar
                     ),
                 )
-                mass_action = math.sqrt(sio_reference_bar / transport_pO2_bar)
+                # t-571: the sqrt mass action consumes the owner-gated O2
+                # channel potential (transport_headspace plane).  The exact
+                # legacy expression sqrt(p_ref / p) is preserved — only the
+                # scalar source changes (typed, clamped, receipted).  The
+                # envelope clamp is the identity for fail-loud floored
+                # transport pO2 (>= 1e-9 bar); an out-of-envelope explicit
+                # control (>100 bar) now receives the b-148 envelope.
+                sio_o2_potential = o2_potential_from_pO2_bar(
+                    pO2_bar=transport_pO2_bar,
+                    temperature_K=T_K,
+                    reaction_plane=REACTION_PLANE_TRANSPORT_HEADSPACE,
+                    pO2_reference_bar=sio_reference_bar,
+                )
+                mass_action = math.sqrt(
+                    sio_o2_potential.legacy_pO2_reference_bar
+                    / sio_o2_potential.legacy_pO2_bar
+                )
                 P_eq_Pa = _require_finite_vapor_value(
                     P_eq_Pa * mass_action,
                     species=name,
