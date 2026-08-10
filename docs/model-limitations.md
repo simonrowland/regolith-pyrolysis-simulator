@@ -247,6 +247,8 @@ Melt iron redox is not future work: it is live. The Fe vapor-pressure path consu
 
 <!-- BEGIN t-512 extract-store reproduction rollup -->
 
+<a id="extract-store-reproduction-battery"></a>
+
 ### Extract-store single-species reproduction battery (t-512)
 
 Generated from production priority-winner observations plus every KEMS

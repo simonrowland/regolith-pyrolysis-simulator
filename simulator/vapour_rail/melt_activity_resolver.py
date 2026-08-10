@@ -164,6 +164,48 @@ class Phase0SelfCheck:
 
 
 @dataclass(frozen=True)
+class CatalogStandardStateRoles:
+    producer_identity: Mapping[str, Any]
+    thermodynamic_declaration: Mapping[str, Any]
+
+
+def catalog_standard_state_roles(
+    source_reaction: Mapping[str, Any],
+) -> CatalogStandardStateRoles:
+    """Return the two deliberately separate catalog standard-state roles.
+
+    ``producer_identity`` is ``activity_input.standard_state``: an exact-match
+    handshake against the activity producer's reported identity.  It does not
+    declare the reference-reaction physics.  ``thermodynamic_declaration`` is
+    ``source_reaction.thermodynamic_standard_state``: the physical standard
+    state used by the reaction rail.  Consumers must not substitute one role
+    for the other even when most catalog rows happen to make them equal.
+    """
+
+    activity_input = source_reaction.get("activity_input")
+    producer_identity = (
+        activity_input.get("standard_state")
+        if isinstance(activity_input, Mapping)
+        else None
+    )
+    thermodynamic_declaration = source_reaction.get(
+        "thermodynamic_standard_state"
+    )
+    return CatalogStandardStateRoles(
+        producer_identity=(
+            producer_identity
+            if isinstance(producer_identity, Mapping)
+            else MappingProxyType({})
+        ),
+        thermodynamic_declaration=(
+            thermodynamic_declaration
+            if isinstance(thermodynamic_declaration, Mapping)
+            else MappingProxyType({})
+        ),
+    )
+
+
+@dataclass(frozen=True)
 class ShadowComparison:
     component_id: str
     legacy_value: float | None
@@ -1142,7 +1184,7 @@ class MeltActivityRegistry:
         )
         payload = yaml.safe_load(path.read_text(encoding="utf-8"))
         failures: list[str] = []
-        checked: list[tuple[str, Mapping[str, Any]]] = []
+        checked: list[tuple[str, CatalogStandardStateRoles]] = []
 
         def visit(value: Any) -> None:
             if isinstance(value, Mapping):
@@ -1150,7 +1192,9 @@ class MeltActivityRegistry:
                 if isinstance(activity_input, Mapping):
                     component = str(activity_input.get("component_id") or "")
                     if component in {"CaO", "MgO"}:
-                        checked.append((component, activity_input))
+                        checked.append(
+                            (component, catalog_standard_state_roles(value))
+                        )
                 for child in value.values():
                     visit(child)
             elif isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
@@ -1160,8 +1204,8 @@ class MeltActivityRegistry:
         visit(payload)
         if len(checked) != 6:
             failures.append(f"expected 6 Ca/Mg declarations, found {len(checked)}")
-        for component, activity_input in checked:
-            standard = activity_input.get("standard_state") or {}
+        for component, state_roles in checked:
+            standard = state_roles.thermodynamic_declaration
             expected = self.target_standard_state(component)
             actual_tuple = (
                 standard.get("convention"),
@@ -1177,7 +1221,8 @@ class MeltActivityRegistry:
             )
             if actual_tuple != expected_tuple:
                 failures.append(
-                    f"{component} declaration {actual_tuple!r} != {expected_tuple!r}"
+                    f"{component} thermodynamic declaration {actual_tuple!r} "
+                    f"!= {expected_tuple!r}"
                 )
         impacts = self.payload.get("phase0_pin_impact", ())
         if len(impacts) != 6:

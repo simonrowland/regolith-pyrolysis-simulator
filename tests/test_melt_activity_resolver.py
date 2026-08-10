@@ -36,6 +36,7 @@ from simulator.vapour_rail.melt_activity_resolver import (
     ShadowComparison,
     TierAEngineInput,
     build_shadow_for_vapour_batch,
+    catalog_standard_state_roles,
     complete_inventory_identity,
     crystalline_target_standard_state,
     ownerless_nonzero_reservoir_ids,
@@ -132,6 +133,57 @@ def test_phase0_crystalline_target_self_check_passes_real_catalog_rows() -> None
     assert check.pin_impacts_checked == 6
     assert check.failures == ()
     assert "{component_id}" in check.target_standard_state_family
+
+
+def test_catalog_standard_state_roles_separate_identity_from_physics() -> None:
+    roles = catalog_standard_state_roles(
+        {
+            "activity_input": {"standard_state": {"phase": "liquid"}},
+            "thermodynamic_standard_state": {"phase": "crystalline"},
+        }
+    )
+
+    assert roles.producer_identity["phase"] == "liquid"
+    assert roles.thermodynamic_declaration["phase"] == "crystalline"
+
+
+def test_phase0_uses_thermodynamic_declaration_not_producer_identity(
+    tmp_path: Path,
+) -> None:
+    payload = yaml.safe_load((DATA / "vapor_pressures.yaml").read_text())
+    ca_mg_reactions: list[dict] = []
+
+    def visit(value: object) -> None:
+        if isinstance(value, dict):
+            activity_input = value.get("activity_input")
+            if isinstance(activity_input, dict) and activity_input.get(
+                "component_id"
+            ) in {"CaO", "MgO"}:
+                ca_mg_reactions.append(value)
+            for child in value.values():
+                visit(child)
+        elif isinstance(value, list):
+            for child in value:
+                visit(child)
+
+    visit(payload)
+    assert len(ca_mg_reactions) == 6
+
+    for reaction in ca_mg_reactions:
+        reaction["activity_input"]["standard_state"]["phase"] = (
+            "producer_identity_only"
+        )
+    path = tmp_path / "vapor_pressures.yaml"
+    path.write_text(yaml.safe_dump(payload), encoding="utf-8")
+
+    registry = MeltActivityRegistry.load()
+    assert registry.phase0_self_check(path).passed is True
+
+    ca_mg_reactions[0]["thermodynamic_standard_state"]["phase"] = "liquid"
+    path.write_text(yaml.safe_dump(payload), encoding="utf-8")
+    failed = registry.phase0_self_check(path)
+    assert failed.passed is False
+    assert "thermodynamic declaration" in failed.failures[0]
 
 
 def test_component_qualified_standard_states_do_not_hash_collide() -> None:

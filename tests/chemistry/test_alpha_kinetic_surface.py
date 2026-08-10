@@ -39,10 +39,12 @@ EXPECTED_ALPHA_BY_SPECIES = {
     "Mg": 0.20,
     "Na": 1.0,
     "K": 0.13,
-    "Ca": 0.90,
+    # b-136/t-559 withdrew the mis-tagged Zhang-2014 Ca/Ti proxy; both
+    # carriers now expose marked Hertz-Knudsen ideal upper-bound ceilings.
+    "Ca": 1.0,
     "Al": 0.30,
     "Si": 1.0,
-    "Ti": 0.80,
+    "Ti": 1.0,
     "Cr": 0.90,
 }
 SIO_ALPHA_FORM_T_K = 1500.0 + 273.15
@@ -189,7 +191,9 @@ def test_new_proxy_species_flux_scales_with_yaml_alpha():
     flux = result.diagnostic["evaporation_flux_kg_hr"]
 
     assert result.status == "ok"
-    assert flux["Ti"] / flux["Ca"] == pytest.approx(0.80 / 0.90)
+    assert flux["Ti"] / flux["Ca"] == pytest.approx(
+        EXPECTED_ALPHA_BY_SPECIES["Ti"] / EXPECTED_ALPHA_BY_SPECIES["Ca"]
+    )
 
 
 def test_cro2_missing_alpha_refuses_only_cro2_and_retains_parent_oxide():

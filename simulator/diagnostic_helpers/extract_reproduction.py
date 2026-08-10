@@ -3226,6 +3226,11 @@ def format_rollup_markdown(
     lines = [
         ROLLUP_BEGIN,
         "",
+        # Stable link target for evidence_refs that cite this section. The anchor
+        # lives inside the generated block, so the generator must emit it or the
+        # committed-vs-generated parity guard fails on a line-count mismatch.
+        '<a id="extract-store-reproduction-battery"></a>',
+        "",
         "### Extract-store single-species reproduction battery (t-512)",
         "",
         "Generated from production priority-winner observations plus every KEMS",

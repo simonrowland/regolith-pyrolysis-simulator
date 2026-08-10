@@ -243,6 +243,15 @@ def _ids(document: dict) -> set[str]:
     return {row["id"] for row in document["species"]}
 
 
+def _generator_owned_species(document: dict) -> list[dict]:
+    """Exclude the curated evidence overlay that ``build_u0_manifest`` does not own."""
+
+    return [
+        {key: value for key, value in row.items() if key != "validation_anchor_refs"}
+        for row in document["species"]
+    ]
+
+
 @pytest.fixture(scope="module")
 def manifest() -> dict:
     assert FIXTURE.is_file(), f"missing checked-in U0 fixture: {FIXTURE}"
@@ -460,6 +469,22 @@ def test_embedded_membership_sets_match_constants(manifest: dict) -> None:
     assert set(embedded["refractory_raw"]) == REFRACTORY_GAS_IDS_RAW
 
 
+def test_residual_baseline_validation_anchors_resolve(manifest: dict) -> None:
+    prefix = "tests/chemistry/extract_store_reproduction_residual_baselines.yaml#"
+    baseline = yaml.safe_load(
+        (ROOT / prefix.removesuffix("#")).read_text(encoding="utf-8")
+    )
+    live_keys = {point["key"] for point in baseline["points"]}
+    pinned = {
+        ref.removeprefix(prefix)
+        for row in manifest["species"]
+        for ref in row["validation_anchor_refs"]
+        if ref.startswith(prefix)
+    }
+
+    assert pinned <= live_keys
+
+
 @pytest.mark.skipif(
     not DEFAULT_INVENTORY_PATH.is_file() or not DEFAULT_REFRACTORY_PATH.is_file(),
     reason="docs-private inventory / refractory sources unavailable (CI fixture-only mode)",
@@ -475,8 +500,9 @@ def test_regenerated_union_matches_fixture_and_inputs(manifest: dict) -> None:
     fixture_ids = _ids(manifest)
     assert built_ids == fixture_ids
     assert built["row_count"] == manifest["row_count"] == _PINNED_U0_ROW_COUNT
-    # Full-document pin (IDs + content), not count-only.
-    assert built["species"] == manifest["species"]
+    # Pin all generator-owned content. Validation anchors are a curated evidence
+    # overlay added after generation and must not be erased by regeneration.
+    assert _generator_owned_species(built) == _generator_owned_species(manifest)
 
     # Exact set equality: every input ID is in the union; union has no extras.
     from simulator.vapour_rail.u0_manifest import input_id_sets
