@@ -77,7 +77,25 @@ _VP_TOLERANCE_REL = 1e-9
 _VP_TOLERANCE_ABS_PA = 3e-7
 _CA_RANGE_EXTRAPOLATION_T_K = 1713.0
 
-_V1C_JANAF_ELLINGHAM = {
+# ---------------------------------------------------------------------------
+# Ellingham flat-table provenance pins.
+#
+# Production ``ELLINGHAM_THERMO`` / ``_ELLINGHAM_THERMO`` is a multi-source
+# keying/stoichiometry table. Authoritative dG(T) lives on
+# ``ELLINGHAM_FIT_SEGMENTS``. This suite freezes each source group separately
+# so (a) an undeclared new row fails the union equality, and (b) each row's
+# source is readable at the assert site rather than being pasted into a
+# misnamed "JANAF" mirror.
+#
+# Tuple shape: (dH_f kJ/mol_O2, dS_f kJ/(mol*K)/mol_O2, n_M, n_ox).
+# ---------------------------------------------------------------------------
+
+# Pin: v1c high-T linear refit of Chase 1998 NIST-JANAF 4th multiphase rows
+# (Na-014, K-012, Fe-020, Cr-014, Mg-008, Ca-027, Al-096, O-043/Ti, Si, Mn-008
+# era flat compatibility). Mn's *segmented* dG authority later moved onto a
+# Pankratz primary-refit in ELLINGHAM_FIT_SEGMENTS; the flat row here remains
+# the legacy Mn(l) keying tuple.
+_V1C_JANAF_ELLINGHAM_ROWS: dict[str, tuple[float, float, float, float]] = {
     "Na": (-1135.130, -0.537417, 4, 2),
     "K": (-975.838, -0.520580, 4, 2),
     "Fe": (-538.946, -0.125272, 2, 2),
@@ -87,20 +105,61 @@ _V1C_JANAF_ELLINGHAM = {
     "Al": (-1126.073, -0.218805, 4 / 3, 2 / 3),
     "Ti": (-939.632, -0.177149, 1, 1),
     "Si": (-910.940, -0.182400, 1, 1),
-    # Mn updated 0.5.2 (2026-05-27) to a proper high-T linear refit
-    # anchored on Mn(l) above the solid→liquid transition at 1517 K
-    # (Chase 1998, Mn-008 + phase transition data). See
-    # simulator/equilibrium.py::_ELLINGHAM_THERMO for the full
-    # rationale.
     "Mn": (-794.540, -0.165650, 2, 2),
-    # t-006 / compose NiO MRE ladder (Mah & Pankratz 1976); not in vapor package base.
+}
+
+# Pin: t-006 / REF-058 Mah & Pankratz 1976 USBM Bulletin 668 NiO(s) formation
+# table (Ni(s,l)+1/2 O2 = NiO(s), per-O2 conversion). Not JANAF; not CEA
+# (NiO condensed is absent from the in-repo CEA extract).
+_USBM_B668_ELLINGHAM_ROWS: dict[str, tuple[float, float, float, float]] = {
     "Ni": (-465.852, -0.167751, 2, 2),
 }
 
+# Pin: t-548 (326cca7) CEA primary-refit flat keying rows. Coefficients are
+# the rounded mid-window ELLINGHAM_FIT_SEGMENTS pieces (endpoint-continuous
+# linear fits through true NASA-9 CEA ΔG at segment endpoints). Source:
+# data/literature/extracts/nasa-cea-thermo.yaml (McBride/Zehe/Gordon NASA
+# TP-2002-211556 thermo.inp). Re-derived 2026-08-09 in
+# docs-private/research/2026-08-09-b156-ellingham-mirror/.
+#   Zr: Zr(b)+O2->ZrO2(II) 1445–2125 K piece
+#   P:  (4/5)P(L)+O2->(1/5)P4O10(L) 1100–1650 K piece
+#   Rb: 4 Rb(g)+O2->2 Rb2O(L) 1512.5–1650 K piece
+#   Cs: 4 Cs(g)+O2->2 Cs2O(L) 1375–1650 K piece
+_T548_CEA_PRIMARY_ELLINGHAM_ROWS: dict[str, tuple[float, float, float, float]] = {
+    "Zr": (-1080.503, -0.173901, 1, 1),
+    "Rb": (-852.249, -0.449638, 4, 2),
+    "Cs": (-873.813, -0.458111, 4, 2),
+    "P": (-584.140, -0.171105, 4 / 5, 1 / 5),
+}
 
-def test_ellingham_table_matches_v1c_janaf_refit():
-    assert _ELLINGHAM_THERMO == _V1C_JANAF_ELLINGHAM
-    assert EquilibriumMixin._ELLINGHAM_THERMO == _V1C_JANAF_ELLINGHAM
+# Union of every declared source pin. Must equal production exactly: a new
+# production row without a pin here, or a pin without a production row, fails.
+_DECLARED_ELLINGHAM_PROVENANCE: dict[str, tuple[float, float, float, float]] = {
+    **_V1C_JANAF_ELLINGHAM_ROWS,
+    **_USBM_B668_ELLINGHAM_ROWS,
+    **_T548_CEA_PRIMARY_ELLINGHAM_ROWS,
+}
+
+
+def test_ellingham_table_matches_declared_provenance():
+    """No row enters production ELLINGHAM_THERMO without a declared, pinned source.
+
+    Groups are frozen per source (v1c JANAF / USBM B668 / t-548 CEA primary).
+    Their union must equal the production flat table exactly so provenance
+    drift is visible at the assert site and an undeclared row still fails.
+    """
+    # Groups must be pairwise-disjoint — a species in two pins is a bug in
+    # the freeze, not an allowed multi-source claim at this layer.
+    janaf_keys = set(_V1C_JANAF_ELLINGHAM_ROWS)
+    usbm_keys = set(_USBM_B668_ELLINGHAM_ROWS)
+    cea_keys = set(_T548_CEA_PRIMARY_ELLINGHAM_ROWS)
+    assert janaf_keys.isdisjoint(usbm_keys)
+    assert janaf_keys.isdisjoint(cea_keys)
+    assert usbm_keys.isdisjoint(cea_keys)
+    assert janaf_keys | usbm_keys | cea_keys == set(_DECLARED_ELLINGHAM_PROVENANCE)
+
+    assert _ELLINGHAM_THERMO == _DECLARED_ELLINGHAM_PROVENANCE
+    assert EquilibriumMixin._ELLINGHAM_THERMO == _DECLARED_ELLINGHAM_PROVENANCE
 
 
 @pytest.mark.parametrize(
