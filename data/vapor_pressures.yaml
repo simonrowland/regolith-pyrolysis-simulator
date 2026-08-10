@@ -1315,15 +1315,24 @@ families:
               stoichiometry: 0.5
             activity_input:
               component_id: MgO
-              # b-154 (2026-08-09): standard-state phase relabeled crystalline.
-              # Live computation is crystalline-oxide G(T) x SF18 activity referenced
-              # to the stable pure oxide at T (Sossi & Fegley 2018 Eq. 24: gamma_i=K*/K
-              # pure system; Table 1 tags CaO_(s) mp 3172 K / MgO_(s) mp 3100 K at rail T).
-              # Adjudication: docs-private/research/2026-08-09-b154-adjudication/memo.md
-              # option (i) — declaration fix only; NO numeric change.
+              # b-154 adjudication (2026-08-09): Pref COMPUTATION is crystalline-oxide
+              # G(T) x SF18 gamma referenced to the stable pure oxide at T (SF18 Eq. 24;
+              # CaO_(s) mp 3172 K / MgO_(s) mp 3100 K). That truth stands — see reaction
+              # formula (cr) tags on composed rows and the adjudication memo.
+              # b-154-fix (2026-08-09): activity_input.standard_state.phase is NOT a
+              # Pref-phase declaration. It is the runtime handshake token matched by
+              # exact equality against provider-reported activities_standard_state
+              # (BuiltinVaporPressureProvider + internal_analytical_equilibrium both
+              # emit phase=liquid; see activity.py STANDARD_STATE_MISMATCH gate and
+              # evaporation.py source_reaction_activity_standard_states). Relabeling
+              # this field to crystalline (b-154 option i) refused Ca/Mg batch
+              # admission (~138 studio failures). Runtime key stays liquid; human-
+              # facing Pref/SF18 crystalline truth lives on formula tags + comments.
+              # Memo: docs-private/research/2026-08-09-b154-adjudication/memo.md
+              # Fix report: docs-private/research/2026-08-09-b154-fix/report.md
               standard_state:
                 convention: raoultian_pure_endmember
-                phase: crystalline
+                phase: liquid
                 reference_pressure_bar: 1.0
                 component_basis: raoultian_pure_endmember
               activity_model: provider_reported_thermodynamic_activity
@@ -1643,15 +1652,24 @@ families:
               stoichiometry: 0.5
             activity_input:
               component_id: CaO
-              # b-154 (2026-08-09): standard-state phase relabeled crystalline.
-              # Live computation is crystalline-oxide G(T) x SF18 activity referenced
-              # to the stable pure oxide at T (Sossi & Fegley 2018 Eq. 24: gamma_i=K*/K
-              # pure system; Table 1 tags CaO_(s) mp 3172 K / MgO_(s) mp 3100 K at rail T).
-              # Adjudication: docs-private/research/2026-08-09-b154-adjudication/memo.md
-              # option (i) — declaration fix only; NO numeric change.
+              # b-154 adjudication (2026-08-09): Pref COMPUTATION is crystalline-oxide
+              # G(T) x SF18 gamma referenced to the stable pure oxide at T (SF18 Eq. 24;
+              # CaO_(s) mp 3172 K / MgO_(s) mp 3100 K). That truth stands — see reaction
+              # formula (cr) tags on composed rows and the adjudication memo.
+              # b-154-fix (2026-08-09): activity_input.standard_state.phase is NOT a
+              # Pref-phase declaration. It is the runtime handshake token matched by
+              # exact equality against provider-reported activities_standard_state
+              # (BuiltinVaporPressureProvider + internal_analytical_equilibrium both
+              # emit phase=liquid; see activity.py STANDARD_STATE_MISMATCH gate and
+              # evaporation.py source_reaction_activity_standard_states). Relabeling
+              # this field to crystalline (b-154 option i) refused Ca/Mg batch
+              # admission (~138 studio failures). Runtime key stays liquid; human-
+              # facing Pref/SF18 crystalline truth lives on formula tags + comments.
+              # Memo: docs-private/research/2026-08-09-b154-adjudication/memo.md
+              # Fix report: docs-private/research/2026-08-09-b154-fix/report.md
               standard_state:
                 convention: raoultian_pure_endmember
-                phase: crystalline
+                phase: liquid
                 reference_pressure_bar: 1.0
                 component_basis: raoultian_pure_endmember
               activity_model: provider_reported_thermodynamic_activity
@@ -3152,15 +3170,24 @@ families:
               stoichiometry: 1.0
             activity_input:
               component_id: CaO
-              # b-154 (2026-08-09): standard-state phase relabeled crystalline.
-              # Live computation is crystalline-oxide G(T) x SF18 activity referenced
-              # to the stable pure oxide at T (Sossi & Fegley 2018 Eq. 24: gamma_i=K*/K
-              # pure system; Table 1 tags CaO_(s) mp 3172 K / MgO_(s) mp 3100 K at rail T).
-              # Adjudication: docs-private/research/2026-08-09-b154-adjudication/memo.md
-              # option (i) — declaration fix only; NO numeric change.
+              # b-154 adjudication (2026-08-09): Pref COMPUTATION is crystalline-oxide
+              # G(T) x SF18 gamma referenced to the stable pure oxide at T (SF18 Eq. 24;
+              # CaO_(s) mp 3172 K / MgO_(s) mp 3100 K). That truth stands — see reaction
+              # formula (cr) tags on composed rows and the adjudication memo.
+              # b-154-fix (2026-08-09): activity_input.standard_state.phase is NOT a
+              # Pref-phase declaration. It is the runtime handshake token matched by
+              # exact equality against provider-reported activities_standard_state
+              # (BuiltinVaporPressureProvider + internal_analytical_equilibrium both
+              # emit phase=liquid; see activity.py STANDARD_STATE_MISMATCH gate and
+              # evaporation.py source_reaction_activity_standard_states). Relabeling
+              # this field to crystalline (b-154 option i) refused Ca/Mg batch
+              # admission (~138 studio failures). Runtime key stays liquid; human-
+              # facing Pref/SF18 crystalline truth lives on formula tags + comments.
+              # Memo: docs-private/research/2026-08-09-b154-adjudication/memo.md
+              # Fix report: docs-private/research/2026-08-09-b154-fix/report.md
               standard_state:
                 convention: raoultian_pure_endmember
-                phase: crystalline
+                phase: liquid
                 reference_pressure_bar: 1.0
                 component_basis: raoultian_pure_endmember
               activity_model: provider_reported_thermodynamic_activity
@@ -4221,15 +4248,24 @@ families:
               stoichiometry: 1.0
             activity_input:
               component_id: CaO
-              # b-154 (2026-08-09): standard-state phase relabeled crystalline.
-              # Live computation is crystalline-oxide G(T) x SF18 activity referenced
-              # to the stable pure oxide at T (Sossi & Fegley 2018 Eq. 24: gamma_i=K*/K
-              # pure system; Table 1 tags CaO_(s) mp 3172 K / MgO_(s) mp 3100 K at rail T).
-              # Adjudication: docs-private/research/2026-08-09-b154-adjudication/memo.md
-              # option (i) — declaration fix only; NO numeric change.
+              # b-154 adjudication (2026-08-09): Pref COMPUTATION is crystalline-oxide
+              # G(T) x SF18 gamma referenced to the stable pure oxide at T (SF18 Eq. 24;
+              # CaO_(s) mp 3172 K / MgO_(s) mp 3100 K). That truth stands — see reaction
+              # formula (cr) tags on composed rows and the adjudication memo.
+              # b-154-fix (2026-08-09): activity_input.standard_state.phase is NOT a
+              # Pref-phase declaration. It is the runtime handshake token matched by
+              # exact equality against provider-reported activities_standard_state
+              # (BuiltinVaporPressureProvider + internal_analytical_equilibrium both
+              # emit phase=liquid; see activity.py STANDARD_STATE_MISMATCH gate and
+              # evaporation.py source_reaction_activity_standard_states). Relabeling
+              # this field to crystalline (b-154 option i) refused Ca/Mg batch
+              # admission (~138 studio failures). Runtime key stays liquid; human-
+              # facing Pref/SF18 crystalline truth lives on formula tags + comments.
+              # Memo: docs-private/research/2026-08-09-b154-adjudication/memo.md
+              # Fix report: docs-private/research/2026-08-09-b154-fix/report.md
               standard_state:
                 convention: raoultian_pure_endmember
-                phase: crystalline
+                phase: liquid
                 reference_pressure_bar: 1.0
                 component_basis: raoultian_pure_endmember
               activity_model: provider_reported_thermodynamic_activity
@@ -12477,15 +12513,24 @@ families:
               stoichiometry: 1.0
             activity_input:
               component_id: MgO
-              # b-154 (2026-08-09): standard-state phase relabeled crystalline.
-              # Live computation is crystalline-oxide G(T) x SF18 activity referenced
-              # to the stable pure oxide at T (Sossi & Fegley 2018 Eq. 24: gamma_i=K*/K
-              # pure system; Table 1 tags CaO_(s) mp 3172 K / MgO_(s) mp 3100 K at rail T).
-              # Adjudication: docs-private/research/2026-08-09-b154-adjudication/memo.md
-              # option (i) — declaration fix only; NO numeric change.
+              # b-154 adjudication (2026-08-09): Pref COMPUTATION is crystalline-oxide
+              # G(T) x SF18 gamma referenced to the stable pure oxide at T (SF18 Eq. 24;
+              # CaO_(s) mp 3172 K / MgO_(s) mp 3100 K). That truth stands — see reaction
+              # formula (cr) tags on composed rows and the adjudication memo.
+              # b-154-fix (2026-08-09): activity_input.standard_state.phase is NOT a
+              # Pref-phase declaration. It is the runtime handshake token matched by
+              # exact equality against provider-reported activities_standard_state
+              # (BuiltinVaporPressureProvider + internal_analytical_equilibrium both
+              # emit phase=liquid; see activity.py STANDARD_STATE_MISMATCH gate and
+              # evaporation.py source_reaction_activity_standard_states). Relabeling
+              # this field to crystalline (b-154 option i) refused Ca/Mg batch
+              # admission (~138 studio failures). Runtime key stays liquid; human-
+              # facing Pref/SF18 crystalline truth lives on formula tags + comments.
+              # Memo: docs-private/research/2026-08-09-b154-adjudication/memo.md
+              # Fix report: docs-private/research/2026-08-09-b154-fix/report.md
               standard_state:
                 convention: raoultian_pure_endmember
-                phase: crystalline
+                phase: liquid
                 reference_pressure_bar: 1.0
                 component_basis: raoultian_pure_endmember
               activity_model: provider_reported_thermodynamic_activity
@@ -12628,15 +12673,24 @@ families:
               stoichiometry: 1.0
             activity_input:
               component_id: MgO
-              # b-154 (2026-08-09): standard-state phase relabeled crystalline.
-              # Live computation is crystalline-oxide G(T) x SF18 activity referenced
-              # to the stable pure oxide at T (Sossi & Fegley 2018 Eq. 24: gamma_i=K*/K
-              # pure system; Table 1 tags CaO_(s) mp 3172 K / MgO_(s) mp 3100 K at rail T).
-              # Adjudication: docs-private/research/2026-08-09-b154-adjudication/memo.md
-              # option (i) — declaration fix only; NO numeric change.
+              # b-154 adjudication (2026-08-09): Pref COMPUTATION is crystalline-oxide
+              # G(T) x SF18 gamma referenced to the stable pure oxide at T (SF18 Eq. 24;
+              # CaO_(s) mp 3172 K / MgO_(s) mp 3100 K). That truth stands — see reaction
+              # formula (cr) tags on composed rows and the adjudication memo.
+              # b-154-fix (2026-08-09): activity_input.standard_state.phase is NOT a
+              # Pref-phase declaration. It is the runtime handshake token matched by
+              # exact equality against provider-reported activities_standard_state
+              # (BuiltinVaporPressureProvider + internal_analytical_equilibrium both
+              # emit phase=liquid; see activity.py STANDARD_STATE_MISMATCH gate and
+              # evaporation.py source_reaction_activity_standard_states). Relabeling
+              # this field to crystalline (b-154 option i) refused Ca/Mg batch
+              # admission (~138 studio failures). Runtime key stays liquid; human-
+              # facing Pref/SF18 crystalline truth lives on formula tags + comments.
+              # Memo: docs-private/research/2026-08-09-b154-adjudication/memo.md
+              # Fix report: docs-private/research/2026-08-09-b154-fix/report.md
               standard_state:
                 convention: raoultian_pure_endmember
-                phase: crystalline
+                phase: liquid
                 reference_pressure_bar: 1.0
                 component_basis: raoultian_pure_endmember
               activity_model: provider_reported_thermodynamic_activity
