@@ -611,7 +611,7 @@ two species.
 
 ### Omitted metal-monoxide gas channels (FeO, MnO, CoO, NiO)
 
-VapoRock patch `0001` (and the simulator’s VapoRock-coupled path that consumes it) carries **Mn and Co as atomic gas only**. The monoxide channels **MnO(g)** and **CoO(g)** are **not** in the gas set: JANAF 4th has no Mn-oxide gas tables and only CoO(cr); NASA CEA supplies NiO(g) but not MnO(g)/CoO(g). Melt-oxide basis rows MnO/NiO/CoO remain so monatomic metal reactions atom-balance. **Ni is not in this hole** (NiO(g) is present).
+VapoRock patch `0001` (and the simulator’s VapoRock-coupled path that consumes it) carries **Mn and Co as atomic gas only**. All four monoxide channels lack **catalog rows**, but they split by **source availability**: **FeO(g)/NiO(g)** have NASA CEA gas tables and are *composable* (queued as composition work, not this section’s subject); **MnO(g)/CoO(g)** have no source gas tables at all — JANAF 4th has no Mn-oxide gas tables and only CoO(cr) — and are the omission this section bounds. Melt-oxide basis rows MnO/NiO/CoO remain so monatomic metal reactions atom-balance.
 
 **Bound (Pedley & Marshall 1983 ΔfH ± gef for MO; CEA NASA-9 for M(g)+O₂; range = ±Pedley uncertainty through \(\exp(\delta D_0/RT)\)):** fraction of metal-atom gas that could ride as MO under equilibrium,
 

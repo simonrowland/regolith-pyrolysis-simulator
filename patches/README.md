@@ -99,6 +99,10 @@ Clean. No local patches.
 
 **0001** fixes the ABI mismatch class (PyPI wheel / naive `pip install .` on multi-Python macOS hosts produces `SulfLiq.cpython-314` under a 3.12 site-packages tree). Same pain as ThermoEngine issues #9/#12/#27. Submit upstream to ENKI-portal/sulfliq.
 
+Provider status: **staged** — `simulator/melt_backend/sulfliq_matte.py` (a_FeS, r2 reviewed) has
+its named consumer in the in-fork S-track (t-549..t-551) and **zero runtime callers until that
+lands**; do not read its presence as a wired capability.
+
 ## Two-install policy: reference vs production (owner ruling 2026-08-10)
 
 Two VapoRock installs live side by side (t-603 / t-607):

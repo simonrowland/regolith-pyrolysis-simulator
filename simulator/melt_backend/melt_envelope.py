@@ -51,7 +51,7 @@ Sanity check (worked numbers; pure arithmetic of the two formulas)
             ln(10) = 2.302585092994046…  (use 2.302585 for hand check)
             denom  = 2.302585 · 8.314462618 · 2200
                    = 2.302585 · 18291.8177596
-                   ≈ 42121.55
+                   ≈ 42118.47
             σ_log10P = 1250 / (ln(10) · R · 2200)
                      = 1250 / (2.302585092994046 · 8.314462618 · 2200)
                      ≈ 0.029678 ≈ 0.0297 dex
