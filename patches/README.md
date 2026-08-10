@@ -52,7 +52,7 @@ coefficients. Harmless for single-interval `JANAF0`; corrupting for the multi-in
 with default-argument capture. Also removes a leftover `Mg2(g)` debug `print`.
 
 Verified on all 11 multi-interval species (`O2, Mg, Mg2, AlO, AlO2, SiO, Si2, K, CrO, CrO2,
-CrO3`): 0 of 11 now evaluate to the wrong interval. Pre-fix `Mg2(g)` was wrong by ~3.5 MJ/mol.
+CrO3`): 0 of 11 now evaluate to the wrong interval. Pre-fix `Mg2(g)` worst absolute error: **5.838 MJ/mol** (fresh 2026-08-09 re-verification; an earlier note said ~3.5).
 
 ### thermoengine — `../ThermoEngine` @ `df7a5f4`
 
@@ -98,6 +98,55 @@ Clean. No local patches.
 | 0001 | `cmake-python-executable` | **applied** (local checkout) | setup.py must pass `Python_EXECUTABLE` so FindPython does not link newest Homebrew CPython |
 
 **0001** fixes the ABI mismatch class (PyPI wheel / naive `pip install .` on multi-Python macOS hosts produces `SulfLiq.cpython-314` under a 3.12 site-packages tree). Same pain as ThermoEngine issues #9/#12/#27. Submit upstream to ENKI-portal/sulfliq.
+
+## Two-install policy: reference vs production (owner ruling 2026-08-10)
+
+Two VapoRock installs live side by side (t-603 / t-607):
+
+- **production** — the full high-T fork: all patches, the fitted mid-band tables, raised
+  temperature bands. This is what the simulator runs; the whole point is useful numbers
+  above 1950 K.
+- **reference** — upstream at pin + **bugfix patches only**. It exists to backcheck the fork
+  over the mainline-supported band (1350–1950 K). A *pristine* reference would be the wrong
+  reference: the fork differs from mainline by both correctness fixes and capability
+  extensions, and pristine A/B conflates "we fixed a bug" with "we extended the range" —
+  the capability delta is the only thing the A/B should isolate.
+
+**Classification rule:** a patch belongs in the REFERENCE install **iff** it corrects
+incorrect behaviour in something mainline already claims to do; it stays
+**PRODUCTION-ONLY iff** it extends what mainline does.
+
+Current classification (confirm at build time):
+
+| patch | install class | rationale |
+|---|---|---|
+| vaporock 0002 `janaf-multi-interval-closure` | reference | bugfix — mainline claims multi-interval evaluation |
+| vaporock 0003 `tmax-domain-check` (when adopted) | reference | makes mainline honest about its own limits; raises none |
+| thermoengine 0001 `comp-hashability` | **NEITHER as-is** (milestone sweep P1-4) | the classic `unsafe_hash=True` form is PROVEN BROKEN — `RecursionError` on `hash(OxideMolComp)`/`hash(ElemMolComp)` via the `elem_comp=self` self-reference (T1/port-status.md, verified live). Reference (and eventually production) needs a `0001b` explicit-`__hash__` variant mirroring the T1 TELite fix (hash the non-zero composition payload only). Classic 0001 stays applied locally as historical record but must not enter the reference build or the upstream bundle |
+| thermoengine 0002 `mu-lifetime` | reference, once ObjC rebuild unparked | bugfix |
+| thermoengine spinel-fix (W4) | reference | bugfix — silent infinite spin |
+| sulfliq 0001 `cmake-python-executable` | reference | build fix |
+| vaporock 0001 `mn-ni-co-carriers` | **production-only** | adds species mainline does not have |
+| fitted mid-band tables (11 rock-formers) | **production-only** | capability extension |
+| `VAPOROCK_T_MAX_K` raises | **production-only** | capability extension |
+
+**A/B invariant — required artifact of every raise:** every H5 band raise (1950→2200→2500→3000)
+includes a fork-vs-reference A/B over 1350–1950 K on the rail crosscheck fixtures, proving the
+band we have always trusted did not move. Honest consequence of the classification: **Mn/Ni/Co
+cannot be A/B'd at all** — the reference has no such rows. The A/B artifact must state that
+limit explicitly, never report those species as silently agreeing.
+
+**Distinct identity (CORRECTED 2026-08-10, milestone sweep P1-3):** an earlier revision of this
+section (and the t-607 ticket text) said distinct *version strings* prevent cache
+cross-contamination. That contradicts the binding cache-identity contract (AGENTS.md §"Cache
+identity contract", owner ruling 2026-07-19; locked by `tests/test_cached_real_backend.py`):
+**engine version is metadata and FORBIDDEN key material** — the engine-result key is the melt
+input vector only. Version strings therefore isolate nothing. The correct isolation for the two
+installs is **separate engine namespaces or separate cache stores** (e.g. engine identity
+`vaporock` vs `vaporock-reference` in `engines/engines.local.toml`, each with its own result
+store), with distinct provenance/version strings kept as *metadata* for human-driven expiry.
+Never add VERSION to either cache key. Must hold on the studios (the grind config installs its
+own engine config), not just the laptop.
 
 ## Working rules
 

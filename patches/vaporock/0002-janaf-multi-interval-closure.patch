@@ -1,0 +1,32 @@
+--- a/src/vaporock/equil.py
++++ b/src/vaporock/equil.py
+@@ -812,15 +812,20 @@
+             Trange_mask = (T<iTmax)&(T>=iTmin)
+             
+             condlist.append(Trange_mask)
+-            funclist.append(lambda T: self._janaf_G(T, icoef))
+-            # ind += 1
+-        
+-        
+-        if coefs.index[0] == 'Mg2(g)':
+-            print(f'condlist = {condlist}')
+-            print(f'funclist = {funclist}')
+-            print(f'coefs = {coefs}')
+-            
++            # `icoef` MUST be bound per-iteration via a default argument.
++            #
++            # Python closures capture the VARIABLE, not its value, so
++            # `lambda T: self._janaf_G(T, icoef)` leaves every branch pointing at
++            # whatever `icoef` holds after the loop ends -- the LAST interval.
++            # np.piecewise would then evaluate the final interval's Shomate
++            # coefficients across every temperature range.
++            #
++            # Harmless for a single-interval species (one branch, and the one
++            # binding is the right one), but silently wrong for every
++            # multi-interval species -- i.e. exactly the rows that carry
++            # coverage above ~2000 K in JANAF-vapor-data-full.csv.
++            funclist.append(lambda T, c=icoef: self._janaf_G(T, c))
++
+         values = np.piecewise(T, condlist, funclist)
+         
+         if scalarT:

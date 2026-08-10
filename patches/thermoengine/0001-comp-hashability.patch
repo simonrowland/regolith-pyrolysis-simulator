@@ -1,0 +1,54 @@
+diff --git a/thermoengine/thermoengine/chem_library.py b/thermoengine/thermoengine/chem_library.py
+index 2ea4587..04100a1 100644
+--- a/thermoengine/thermoengine/chem_library.py
++++ b/thermoengine/thermoengine/chem_library.py
+@@ -51,6 +51,9 @@ class Atom:
+         else:
+             return self.symbol == other
+ 
++    def __hash__(self):
++        return hash(self.symbol)
++
+ @dataclass
+ class Element:
+     H: Atom = Atom('H', 'hydrogen', 1, 1.0079, 130.68/2.0)
+diff --git a/thermoengine/thermoengine/chemistry.py b/thermoengine/thermoengine/chemistry.py
+index 009008f..8f9510c 100644
+--- a/thermoengine/thermoengine/chemistry.py
++++ b/thermoengine/thermoengine/chemistry.py
+@@ -231,7 +231,7 @@ class _SiteElement:
+         self.charge = charge
+         self.element_type = element_type
+ 
+-@dataclass(order=True)
++@dataclass(order=True, unsafe_hash=True)
+ class Comp(ABC):
+     """Abstract base composition class"""
+     sort_index : float =field(init=False, repr=False)
+@@ -352,7 +352,7 @@ class Comp(ABC):
+     def __eq__(self, other):
+         return self._is_equals(other, self.__class__)
+ 
+-@dataclass(order=True)
++@dataclass(order=True, unsafe_hash=True)
+ class OxideMolComp(Comp):
+     """
+     Composition defined in terms of molar oxide amounts
+@@ -407,7 +407,7 @@ class OxideMolComp(Comp):
+         )
+         self.sort_index = self.elem_comp.sort_index
+ 
+-@dataclass(order=True)
++@dataclass(order=True, unsafe_hash=True)
+ class OxideWtComp(Comp):
+     """
+     Composition defined in terms of oxide weights
+@@ -462,7 +462,7 @@ class OxideWtComp(Comp):
+         )
+         self.sort_index = self.elem_comp.sort_index
+ 
+-@dataclass(order=True)
++@dataclass(order=True, unsafe_hash=True)
+ class ElemMolComp(Comp):
+     """
+     Composition defined in terms of molar element amounts
