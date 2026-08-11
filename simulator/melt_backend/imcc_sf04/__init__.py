@@ -16,6 +16,7 @@ from simulator.melt_backend.imcc_sf04.adapter import (
     ImccNonconvergenceError,
     ImccRefusal,
     ImccResult,
+    ImccSPComponentRequiresExtensionError,
     ImccTOutsideDatapackDomainError,
     evaluate,
     load_datapack,
@@ -37,5 +38,6 @@ __all__ = [
     "ImccCompositionIncompleteError",
     "ImccFerricInputUnsupportedError",
     "ImccComponentOutsideDomainError",
+    "ImccSPComponentRequiresExtensionError",
     "ImccNonconvergenceError",
 ]

@@ -239,6 +239,71 @@ def test_refusal_malformed_datapack_bad_json(tmp_path: Path) -> None:
         load_datapack(bad_path)
 
 
+def test_refusal_contaminated_published_core_extension_row(tmp_path: Path) -> None:
+    data = json.loads(DATAPACK_PATH.read_text())
+    data["rows"][0].update(
+        {
+            "complex": "FeS",
+            "nu": {"FeO": 1, "S": 1},
+            "provenance_class": "extension-compound-thermo",
+        }
+    )
+    bad_path = tmp_path / "contaminated.json"
+    bad_path.write_text(json.dumps(data))
+
+    with pytest.raises(ImccMalformedDatapackError) as exc:
+        load_datapack(bad_path)
+    assert exc.value.code == "imcc_malformed_datapack"
+    assert "published core row 0" in str(exc.value)
+    assert "unknown key 'S'" in str(exc.value)
+
+
+def test_refusal_published_core_unknown_nu_key(tmp_path: Path) -> None:
+    data = json.loads(DATAPACK_PATH.read_text())
+    data["rows"][1]["nu"]["MnO"] = 1
+    bad_path = tmp_path / "unknown-nu.json"
+    bad_path.write_text(json.dumps(data))
+
+    with pytest.raises(ImccMalformedDatapackError) as exc:
+        load_datapack(bad_path)
+    assert "published core row 1" in str(exc.value)
+    assert "unknown key 'MnO'" in str(exc.value)
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    [
+        ("complex", "FeS", "complex 'FeS'"),
+        (
+            "nu",
+            {
+                "SiO2": 1,
+                "MgO": 3,
+                "FeO": 0,
+                "CaO": 0,
+                "Al2O3": 0,
+                "TiO2": 0,
+                "Na2O": 0,
+                "K2O": 0,
+            },
+            "nu['MgO']=3",
+        ),
+    ],
+)
+def test_refusal_published_core_manifest_deviation(
+    tmp_path: Path, field: str, value: object, message: str
+) -> None:
+    data = json.loads(DATAPACK_PATH.read_text())
+    data["rows"][0][field] = value
+    bad_path = tmp_path / "manifest-deviation.json"
+    bad_path.write_text(json.dumps(data))
+
+    with pytest.raises(ImccMalformedDatapackError) as exc:
+        load_datapack(bad_path)
+    assert "published core row 0" in str(exc.value)
+    assert message in str(exc.value)
+
+
 def test_refusal_classes_inherit_from_imcc_refusal() -> None:
     for cls in (
         ImccComponentOutsideDomainError,

@@ -7,6 +7,7 @@ wt-to-mol basis converter, and a canonical trust-vocabulary label block.
 
 from __future__ import annotations
 
+import hashlib
 import json
 from dataclasses import dataclass, replace
 from fractions import Fraction
@@ -32,7 +33,7 @@ from simulator.melt_backend.imcc_sf04.kernel import (
 )
 
 
-# Stable oxide molar masses (g/mol) for the 8 IMCC-SF04 parent oxides.
+# Stable molar masses (g/mol) for the IMCC-SF04 parent components.
 # Values from the project physical-constants table (CIAAW/NIST derived).
 _OXIDE_MOLAR_MASS_G_MOL = MappingProxyType(
     {
@@ -44,6 +45,8 @@ _OXIDE_MOLAR_MASS_G_MOL = MappingProxyType(
         "TiO2": 79.866,
         "Na2O": 61.9789,
         "K2O": 94.196,
+        "S": 32.06,
+        "P2O5": 141.9445,
     }
 )
 
@@ -57,6 +60,58 @@ _EXPECTED_PARENT_OXIDES = (
     "Na2O",
     "K2O",
 )
+
+# Frozen from datapack v1.0.2: the published FC87/SF04 species set,
+# source-verified, with the three published A-sign corrections applied.
+_PUBLISHED_CORE_MANIFEST = (
+    ("Mg2SiO4", (1, 2, 0, 0, 0, 0, 0, 0)),
+    ("MgSiO3", (1, 1, 0, 0, 0, 0, 0, 0)),
+    ("MgAl2O4", (0, 1, 0, 0, 1, 0, 0, 0)),
+    ("MgTiO3", (0, 1, 0, 0, 0, 1, 0, 0)),
+    ("MgTi2O5", (0, 1, 0, 0, 0, 2, 0, 0)),
+    ("Mg2TiO4", (0, 2, 0, 0, 0, 1, 0, 0)),
+    ("Al6Si2O13", (2, 0, 0, 0, 3, 0, 0, 0)),
+    ("CaAl2O4", (0, 0, 0, 1, 1, 0, 0, 0)),
+    ("CaAl4O7", (0, 0, 0, 1, 2, 0, 0, 0)),
+    ("Ca12Al14O33", (0, 0, 0, 12, 7, 0, 0, 0)),
+    ("CaSiO3", (1, 0, 0, 1, 0, 0, 0, 0)),
+    ("CaAl2Si2O8", (2, 0, 0, 1, 1, 0, 0, 0)),
+    ("CaMgSi2O6", (2, 1, 0, 1, 0, 0, 0, 0)),
+    ("Ca2MgSi2O7", (2, 1, 0, 2, 0, 0, 0, 0)),
+    ("Ca2Al2SiO7", (1, 0, 0, 2, 1, 0, 0, 0)),
+    ("CaTiO3", (0, 0, 0, 1, 0, 1, 0, 0)),
+    ("Ca2SiO4", (1, 0, 0, 2, 0, 0, 0, 0)),
+    ("CaTiSiO5", (1, 0, 0, 1, 0, 1, 0, 0)),
+    ("FeTiO3", (0, 0, 1, 0, 0, 1, 0, 0)),
+    ("Fe2SiO4", (1, 0, 2, 0, 0, 0, 0, 0)),
+    ("FeAl2O4", (0, 0, 1, 0, 1, 0, 0, 0)),
+    ("CaAl12O19", (0, 0, 0, 1, 6, 0, 0, 0)),
+    ("Mg2Al4Si5O18", (5, 2, 0, 0, 2, 0, 0, 0)),
+    ("Na2SiO3", (1, 0, 0, 0, 0, 0, 1, 0)),
+    ("Na2Si2O5", (2, 0, 0, 0, 0, 0, 1, 0)),
+    ("NaAlSiO4", (1, 0, 0, 0, 0.5, 0, 0.5, 0)),
+    ("NaAlSi3O8", (3, 0, 0, 0, 0.5, 0, 0.5, 0)),
+    ("NaAlO2", (0, 0, 0, 0, 0.5, 0, 0.5, 0)),
+    ("Na2TiO3", (0, 0, 0, 0, 0, 1, 1, 0)),
+    ("NaAlSi2O6", (2, 0, 0, 0, 0.5, 0, 0.5, 0)),
+    ("K2SiO3", (1, 0, 0, 0, 0, 0, 0, 1)),
+    ("K2Si2O5", (2, 0, 0, 0, 0, 0, 0, 1)),
+    ("KAlSiO4", (1, 0, 0, 0, 0.5, 0, 0, 0.5)),
+    ("KAlSi3O8", (3, 0, 0, 0, 0.5, 0, 0, 0.5)),
+    ("KAlO2", (0, 0, 0, 0, 0.5, 0, 0, 0.5)),
+    ("KAlSi2O6", (2, 0, 0, 0, 0.5, 0, 0, 0.5)),
+    ("K2Si4O9", (4, 0, 0, 0, 0, 0, 0, 1)),
+    ("KCaAlSi2O7", (2, 0, 0, 1, 0.5, 0, 0, 0.5)),
+)
+_PUBLISHED_CORE_MANIFEST_SHA256 = (
+    "72740c3578059e6ee1a09e61fd727a1e2df5f62df84489e160152e553eb9c59f"
+)
+
+_SP_EXTENSION_MODEL_ID = "IMCC-SF04-EXT"
+_SP_EXTENSION_PARENTS = ("S", "P2O5")
+_SP_EXTENSION_TIER = "EXT-SP"
+_SP_EXTENSION_FLAG = "enable_sp_extension"
+_SP_EXTENSION_PROVENANCE_CLASS = "extension-compound-thermo"
 
 # Canonical trust vocabulary for the IMCC-SF04 diagnostic shadow.
 # The spec r2.1 names this evidence class "diagnostic-shadow". The repo's
@@ -77,10 +132,41 @@ class ImccMalformedDatapackError(ImccRefusal):
     code = "imcc_malformed_datapack"
 
 
+def _published_core_manifest_hash(
+    manifest: Sequence[tuple[str, Sequence[int | float]]],
+) -> str:
+    content = [
+        {
+            "complex": complex_name,
+            "nu": dict(zip(_EXPECTED_PARENT_OXIDES, coefficients)),
+        }
+        for complex_name, coefficients in manifest
+    ]
+    payload = json.dumps(
+        content,
+        ensure_ascii=True,
+        separators=(",", ":"),
+        sort_keys=True,
+    ).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
+
+
+if _published_core_manifest_hash(_PUBLISHED_CORE_MANIFEST) != (
+    _PUBLISHED_CORE_MANIFEST_SHA256
+):
+    raise RuntimeError("frozen IMCC-SF04 published-core manifest hash mismatch")
+
+
 class ImccCompositionOutsideValidatedEnvelopeError(ImccRefusal):
     """Raised when the melt lies outside the validated Tier-A envelope."""
 
     code = "imcc_composition_outside_validated_envelope"
+
+
+class ImccSPComponentRequiresExtensionError(ImccComponentOutsideDomainError):
+    """Raised when S/P input lacks the EXT model plus explicit enable flag."""
+
+    code = "imcc_sp_extension_required"
 
 
 @dataclass(frozen=True)
@@ -91,6 +177,9 @@ class ImccLoadedDatapack:
     version: str
     parent_oxides: Sequence[str]
     domain_basis: Sequence[str]
+    model_id: str = "IMCC-SF04"
+    extension_parents: Sequence[str] = ()
+    extension_species: Sequence[str] = ()
 
 
 @dataclass(frozen=True)
@@ -112,10 +201,79 @@ def _as_fraction(value: Any) -> Fraction:
     raise TypeError(f"cannot parse {value!r} as a rational")
 
 
+def _validate_published_core(rows: Any) -> list[dict[str, Any]]:
+    if not isinstance(rows, list) or len(rows) != len(_PUBLISHED_CORE_MANIFEST):
+        raise ImccMalformedDatapackError(
+            "datapack must contain exactly 38 published-core rows, got "
+            f"{len(rows) if isinstance(rows, list) else None}"
+        )
+
+    expected_parent_set = set(_EXPECTED_PARENT_OXIDES)
+    for idx, (row, expected) in enumerate(zip(rows, _PUBLISHED_CORE_MANIFEST)):
+        if not isinstance(row, dict):
+            raise ImccMalformedDatapackError(
+                f"published core row {idx} is not an object"
+            )
+        nu = row.get("nu")
+        if not isinstance(nu, dict):
+            raise ImccMalformedDatapackError(
+                f"published core row {idx} missing 'nu' object"
+            )
+        unknown_nu = sorted(set(nu) - expected_parent_set)
+        if unknown_nu:
+            raise ImccMalformedDatapackError(
+                f"published core row {idx} nu has unknown key {unknown_nu[0]!r}"
+            )
+        missing_nu = sorted(expected_parent_set - set(nu))
+        if missing_nu:
+            raise ImccMalformedDatapackError(
+                f"published core row {idx} nu is missing key {missing_nu[0]!r}"
+            )
+
+        expected_name, expected_coefficients = expected
+        complex_name = row.get("complex")
+        if complex_name != expected_name:
+            raise ImccMalformedDatapackError(
+                f"published core row {idx} complex {complex_name!r} does not match "
+                f"frozen manifest complex {expected_name!r}"
+            )
+        coefficients = tuple(nu[parent] for parent in _EXPECTED_PARENT_OXIDES)
+        if coefficients != expected_coefficients:
+            mismatch = next(
+                parent
+                for parent, actual, frozen in zip(
+                    _EXPECTED_PARENT_OXIDES,
+                    coefficients,
+                    expected_coefficients,
+                )
+                if actual != frozen
+            )
+            raise ImccMalformedDatapackError(
+                f"published core row {idx} nu[{mismatch!r}]={nu[mismatch]!r} "
+                "does not match frozen manifest"
+            )
+        if _published_core_manifest_hash(((complex_name, coefficients),)) != (
+            _published_core_manifest_hash(((expected_name, expected_coefficients),))
+        ):
+            raise ImccMalformedDatapackError(
+                f"published core row {idx} numeric content does not match "
+                "the frozen manifest encoding"
+            )
+    return rows
+
+
 def _build_nu_vector(
-    parent_oxides: Sequence[str], nu: Mapping[str, Any]
+    parent_oxides: Sequence[str],
+    nu: Mapping[str, Any],
+    *,
+    row_label: str,
 ) -> list[float]:
     """Return a nu column aligned to parent_oxides, preserving exact rationals."""
+    unknown_nu = sorted(set(nu) - set(parent_oxides))
+    if unknown_nu:
+        raise ImccMalformedDatapackError(
+            f"{row_label} nu has unknown key {unknown_nu[0]!r}"
+        )
     return [float(_as_fraction(nu.get(name, 0))) for name in parent_oxides]
 
 
@@ -131,8 +289,9 @@ def _wt_to_mol(vector: np.ndarray, parent_oxides: Sequence[str]) -> np.ndarray:
 def load_datapack(path: str | Path) -> ImccLoadedDatapack:
     """Load an IMCC-SF04 datapack JSON into the kernel datapack object.
 
-    Validates the schema: 8 parent oxides, 38 complex rows, a version string,
-    per-row ``T_domain_K`` intervals, and their ``T_domain_basis``.
+    Validates the published 8-parent/38-row core. ``IMCC-SF04-EXT`` packs may
+    add the separately labelled ``sp_extension`` section; the published core
+    remains byte-for-byte and count-for-count distinct from extension rows.
     """
     path = Path(path)
     try:
@@ -153,20 +312,104 @@ def load_datapack(path: str | Path) -> ImccLoadedDatapack:
             "datapack missing 'imcc_sf04_datapack_version' string"
         )
 
-    parents = data.get("parents")
-    if not isinstance(parents, list) or parents != list(_EXPECTED_PARENT_OXIDES):
+    base_parents = data.get("parents")
+    if not isinstance(base_parents, list) or base_parents != list(_EXPECTED_PARENT_OXIDES):
         raise ImccMalformedDatapackError(
-            f"datapack parents {parents!r} do not match expected "
+            f"datapack parents {base_parents!r} do not match expected "
             f"{_EXPECTED_PARENT_OXIDES!r}"
         )
-    parents = tuple(parents)
+    base_parents = tuple(base_parents)
 
-    rows = data.get("rows")
-    if not isinstance(rows, list) or len(rows) != 38:
-        raise ImccMalformedDatapackError(
-            "datapack must contain exactly 38 rows, got "
-            f"{len(rows) if isinstance(rows, list) else None}"
-        )
+    rows = _validate_published_core(data.get("rows"))
+
+    model_id = data.get("model_id", "IMCC-SF04")
+    sp_extension = data.get("sp_extension")
+    extension_parents: tuple[str, ...] = ()
+    extension_rows: list[dict[str, Any]] = []
+    if sp_extension is None:
+        if model_id != "IMCC-SF04":
+            raise ImccMalformedDatapackError(
+                f"model_id {model_id!r} requires a recognized extension section"
+            )
+    else:
+        if model_id != _SP_EXTENSION_MODEL_ID:
+            raise ImccMalformedDatapackError(
+                "sp_extension requires model_id='IMCC-SF04-EXT'"
+            )
+        if not isinstance(sp_extension, dict):
+            raise ImccMalformedDatapackError("sp_extension must be an object")
+        if sp_extension.get("enable_flag") != _SP_EXTENSION_FLAG:
+            raise ImccMalformedDatapackError(
+                "sp_extension enable_flag must be 'enable_sp_extension'"
+            )
+        if sp_extension.get("tier") != _SP_EXTENSION_TIER:
+            raise ImccMalformedDatapackError("sp_extension tier must be 'EXT-SP'")
+        if sp_extension.get("certification") != "denied":
+            raise ImccMalformedDatapackError(
+                "sp_extension certification must be explicitly denied"
+            )
+        raw_extension_parents = sp_extension.get("parents")
+        if raw_extension_parents != list(_SP_EXTENSION_PARENTS):
+            raise ImccMalformedDatapackError(
+                f"sp_extension parents must be {list(_SP_EXTENSION_PARENTS)!r}"
+            )
+        raw_extension_rows = sp_extension.get("rows")
+        if not isinstance(raw_extension_rows, list) or not raw_extension_rows:
+            raise ImccMalformedDatapackError(
+                "sp_extension rows must be a non-empty list"
+            )
+        for idx, row in enumerate(raw_extension_rows):
+            if not isinstance(row, dict):
+                raise ImccMalformedDatapackError(
+                    f"sp_extension row {idx} is not an object"
+                )
+            if row.get("provenance_class") != _SP_EXTENSION_PROVENANCE_CLASS:
+                raise ImccMalformedDatapackError(
+                    f"sp_extension row {idx} provenance_class must be "
+                    f"{_SP_EXTENSION_PROVENANCE_CLASS!r}"
+                )
+            if row.get("tier") != _SP_EXTENSION_TIER:
+                raise ImccMalformedDatapackError(
+                    f"sp_extension row {idx} tier must be 'EXT-SP'"
+                )
+            if row.get("certification") != "denied":
+                raise ImccMalformedDatapackError(
+                    f"sp_extension row {idx} certification must be denied"
+                )
+            provenance = row.get("provenance")
+            if not isinstance(provenance, dict):
+                raise ImccMalformedDatapackError(
+                    f"sp_extension row {idx} missing provenance object"
+                )
+            if not all(
+                isinstance(provenance.get(field), str) and provenance[field]
+                for field in ("source", "table_id")
+            ):
+                raise ImccMalformedDatapackError(
+                    f"sp_extension row {idx} provenance requires source and table_id"
+                )
+            extension_nu = row.get("nu")
+            if isinstance(extension_nu, dict):
+                unknown_nu = set(extension_nu) - set(
+                    base_parents + _SP_EXTENSION_PARENTS
+                )
+                if unknown_nu:
+                    raise ImccMalformedDatapackError(
+                        f"sp_extension row {idx} nu has unknown parents "
+                        f"{sorted(unknown_nu)}"
+                    )
+                if not any(
+                    _as_fraction(extension_nu.get(parent, 0)) > 0
+                    for parent in _SP_EXTENSION_PARENTS
+                ):
+                    raise ImccMalformedDatapackError(
+                        f"sp_extension row {idx} must consume S or P2O5"
+                    )
+            extension_rows.append(row)
+        extension_parents = _SP_EXTENSION_PARENTS
+
+    parents = base_parents + extension_parents
+    all_rows = rows + extension_rows
 
     reactions: list[str] = []
     nu_cols: list[list[float]] = []
@@ -175,7 +418,7 @@ def load_datapack(path: str | Path) -> ImccLoadedDatapack:
     domains: list[tuple[float, float]] = []
     domain_basis: list[str] = []
 
-    for idx, row in enumerate(rows):
+    for idx, row in enumerate(all_rows):
         if not isinstance(row, dict):
             raise ImccMalformedDatapackError(f"row {idx} is not an object")
 
@@ -191,7 +434,12 @@ def load_datapack(path: str | Path) -> ImccLoadedDatapack:
             raise ImccMalformedDatapackError(
                 f"row {idx} missing 'nu' object"
             )
-        nu_cols.append(_build_nu_vector(parents, nu))
+        row_label = (
+            f"published core row {idx}"
+            if idx < len(rows)
+            else f"sp_extension row {idx - len(rows)}"
+        )
+        nu_cols.append(_build_nu_vector(parents, nu, row_label=row_label))
 
         A_val = row.get("A")
         B_val = row.get("B")
@@ -218,6 +466,9 @@ def load_datapack(path: str | Path) -> ImccLoadedDatapack:
             )
         domain_basis.append(basis)
 
+    if len(set(reactions)) != len(reactions):
+        raise ImccMalformedDatapackError("datapack complex names must be unique")
+
     # nu_cols is (n_complexes, n_parents); transpose to kernel shape.
     nu_array = np.array(nu_cols, dtype=float).T
 
@@ -236,6 +487,20 @@ def load_datapack(path: str | Path) -> ImccLoadedDatapack:
         version=version,
         parent_oxides=parents,
         domain_basis=tuple(domain_basis),
+        model_id=model_id,
+        extension_parents=extension_parents,
+        extension_species=tuple(
+            str(row["complex"]) for row in extension_rows
+        ),
+    )
+
+
+def _sp_extension_refusal(component_names: Sequence[str]) -> ImccSPComponentRequiresExtensionError:
+    names = ", ".join(sorted(component_names)) or "S/P EXT component(s)"
+    return ImccSPComponentRequiresExtensionError(
+        f"{names} belong to the S/P EXT component class; unlock only with "
+        "model_id='IMCC-SF04-EXT' and enable_sp_extension=True. Plain "
+        "IMCC-SF04 intentionally excludes S/P speciation."
     )
 
 
@@ -247,6 +512,7 @@ def evaluate(
     basis: float | None = None,
     basis_type: str = "mol",
     extra_mol: Mapping[str, float] | None = None,
+    enable_sp_extension: bool = False,
     allow_extrapolation: bool = False,
     allow_out_of_envelope: bool = False,
     tol: float = 1.0e-12,
@@ -276,6 +542,9 @@ def evaluate(
         Additional components in mol (e.g. Tier-B/C screens). Positive Fe2O3
         raises ``ImccFerricInputUnsupportedError``; other positives outside the
         parent basis raise ``ImccComponentOutsideDomainError``.
+    enable_sp_extension:
+        Explicitly enable S and P2O5 parents in an ``IMCC-SF04-EXT`` pack.
+        The flag alone never widens a plain ``IMCC-SF04`` pack.
     allow_extrapolation:
         If ``True``, evaluate outside declared T domains and mark the result
         as extrapolated.
@@ -297,10 +566,36 @@ def evaluate(
         kernel_pack = pack.kernel_datapack
         pack_version = pack.version
         parent_oxides = pack.parent_oxides
+        model_id = pack.model_id
+        extension_parents = tuple(pack.extension_parents)
+        extension_species = tuple(pack.extension_species)
     else:
         kernel_pack = pack
         pack_version = pack.version
         parent_oxides = pack.parent_oxides
+        model_id = "IMCC-SF04"
+        extension_parents = ()
+        extension_species = ()
+
+    supplied_sp_names: set[str] = set()
+    if isinstance(composition, Mapping):
+        supplied_sp_names.update(
+            name for name in _SP_EXTENSION_PARENTS
+            if float(composition.get(name, 0.0)) != 0.0
+        )
+    elif len(composition) > len(_EXPECTED_PARENT_OXIDES):
+        supplied_sp_names.update(_SP_EXTENSION_PARENTS)
+    if extra_mol:
+        supplied_sp_names.update(
+            name for name in _SP_EXTENSION_PARENTS
+            if float(extra_mol.get(name, 0.0)) != 0.0
+        )
+
+    if model_id == _SP_EXTENSION_MODEL_ID:
+        if not enable_sp_extension:
+            raise _sp_extension_refusal(extension_parents)
+    elif enable_sp_extension or supplied_sp_names:
+        raise _sp_extension_refusal(supplied_sp_names)
 
     if basis_type not in ("mol", "wt"):
         raise ImccCompositionIncompleteError(
@@ -378,7 +673,15 @@ def evaluate(
     alkali_mol = sum(
         float(vector[parent_oxides.index(name)]) for name in ("Na2O", "K2O")
     )
-    x_me2o = alkali_mol / float(vector.sum())
+    canonical_oxide_mol = sum(
+        float(vector[parent_oxides.index(name)])
+        for name in _EXPECTED_PARENT_OXIDES
+    )
+    if canonical_oxide_mol <= 0.0:
+        raise ImccCompositionIncompleteError(
+            "canonical 8-oxide composition total is zero"
+        )
+    x_me2o = alkali_mol / canonical_oxide_mol
     outside_validated_envelope = x_me2o > 0.5
     if outside_validated_envelope and not allow_out_of_envelope:
         raise ImccCompositionOutsideValidatedEnvelopeError(
@@ -404,11 +707,13 @@ def evaluate(
 
     # Build the spec section 7 label block with three separate typed fields.
     identity: Mapping[str, str] = {
-        "model_id": "IMCC-SF04",
+        "model_id": model_id,
         "datapack_version": pack_version,
     }
+    sp_names = set(extension_parents) | set(extension_species)
     coverage: Mapping[str, str] = {
-        name: "A-published-imcc" for name in result.species_names
+        name: (_SP_EXTENSION_TIER if name in sp_names else "A-published-imcc")
+        for name in result.species_names
     }
     trust = _IMCC_EVIDENCE_CLASS_CANONICAL
 
