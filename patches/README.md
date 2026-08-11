@@ -149,14 +149,16 @@ strings were first proposed as isolation — WRONG, the cache-identity contract 
 metadata and FORBIDDEN key material, so they isolate nothing; namespace/store separation was then
 proposed — correct but heavier than needed once single-registration retired dual installs.)
 
-**The one surviving constraint (runbook, not architecture):** because the engine-result cache key
-is the melt input vector ONLY, *sequential* A/B legs sharing one cache store still collide — the
-second leg gets served the first engine's cached rows and the A/B silently compares an engine
-against itself. **Each A/B leg must use a fresh or separate cache store, or run cache-bypassed.**
-Concretely: the engine result store is `CachedRealConfig.db_path`
-(`simulator/backends.py` — `reduced_real_cache.db_path` in config, plus optional
-`read_only_base_db_path` layering) — point each leg at its own db_path at invocation. Holds on
-the studios too (the grind config installs its own engine config).
+**The one surviving constraint (runbook, not architecture — OWNER-FINAL FORM):** because the
+engine-result cache key is the melt input vector ONLY, *sequential* A/B legs sharing one cache
+store collide — the second leg gets served the first engine's cached rows and the A/B silently
+compares an engine against itself. **Owner-final procedure: before each A/B leg, DELETE the engine
+result cache by hand** — the store at `CachedRealConfig.db_path` (`simulator/backends.py`;
+`reduced_real_cache.db_path` in config, plus optional `read_only_base_db_path` layering) — then
+register the leg's engine, run, capture artifacts, and diff externally. (Pointing legs at separate
+db_paths achieves the same isolation and is acceptable where hand-deletion is impractical, e.g.
+scripted studio runs — but manual deletion is the canonical form.) Holds on the studios too.
+THIS SECTION IS THE CANONICAL A/B RUNBOOK; HT-PLAN and the task notes defer to it.
 
 ## Working rules
 
