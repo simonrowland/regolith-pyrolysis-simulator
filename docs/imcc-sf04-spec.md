@@ -219,6 +219,22 @@ Amended rung-2, all pins pre-scoring:
   TABLE 9. This resolves the E3 K-lineage block for the chunk exit (workbook governs rung 3 only
   for the retained population; the paper lineage governs literature fixtures).
 
+**OWNER RULING (2026-08-11) — extensions welcome, provenance-labeled.** Complexes beyond the
+published 38 (alkali orthosilicates, Mn/Ni/Co silicates, and any compound with central-table
+liquid thermochemistry) MAY be added, under two hard rules: (1) every complex row carries
+`provenance_class: published-imcc | extension-compound-thermo` with its source — and extension
+rows live in a SEPARATE extension pack, never mixed into the published-model pack (the published
+shadow stays reproducible on its own); (2) results computed with any extension row active carry
+`model_id=IMCC-SF04-EXT` (never plain IMCC-SF04), so "shadow of the published model" and "our
+extended model" can never be conflated in a ledger. Extended-model validation targets are
+Tsaplin-class independent data, not the MAGMA workbook.
+
+**OWNER DIRECTION (2026-08-11) — the wide rail cross-reference:** run the IMCC machinery against
+~all species where JANAF/central tables carry the compound thermochemistry ("spam the JANAF data
+against the algorithm") as a rail cross-reference surface — shadow activities/pressures across the
+rail catalog at screening-to-extension grade, every row provenance- and tier-labeled. This is the
+t-616/t-627 lane; long-tail non-central sources still wait for grok per the standing ruling.
+
 ## 9. Non-goals
 
 MAGMA source parity; full-rail coverage claims; recipe authority; replacing or retuning MELTS;
