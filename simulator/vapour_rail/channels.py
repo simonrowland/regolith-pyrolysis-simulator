@@ -130,7 +130,11 @@ CHANNEL_REGISTRY: Mapping[str, ChannelRegistryEntry] = MappingProxyType(
             gas_standard_state_id=GAS_STANDARD_STATE_H2,
             required_planes=frozenset({REACTION_PLANE_MELT_INTERFACE}),
             runtime_owner=None,
-            missing_melt_owner_code=None,  # equipment/chemistry path, not melt halide
+            # t-583 Ba pilot: a missing H2 runtime channel must also name the
+            # missing melt-side hydrogen reservoir owner.  Otherwise BaH/BaOH
+            # refusals lose half of the chemistry receipt required by the
+            # composer admission boundary.
+            missing_melt_owner_code="hydrogen_reservoir_owner_missing",
         ),
         CHANNEL_F2: ChannelRegistryEntry(
             channel_id=CHANNEL_F2,
@@ -1063,7 +1067,10 @@ def resolve_channel_potential(
             state_fingerprint=state_fingerprint,
             missing_melt_owner="sulfur_reservoir_owner_missing",
         )
-    # H2 / N2: equipment / chemistry path missing (no melt halide code).
+    # H2 / N2: equipment / chemistry path missing.  H2 additionally carries
+    # the t-583 melt-side hydrogen-reservoir owner receipt; N2 has no such
+    # melt reservoir in Phase 1.
+    missing_owner = entry.missing_melt_owner_code
     return _refusal_potential(
         entry,
         reaction_plane=reaction_plane,
@@ -1072,8 +1079,14 @@ def resolve_channel_potential(
         detail=(
             f"channel {channel_id} has no runtime potential owner in Phase 1 "
             f"(equipment/chemistry path not landed; sources are a later chunk)"
+            + (
+                f"; melt-side owner missing: {missing_owner}"
+                if missing_owner is not None
+                else ""
+            )
         ),
         state_fingerprint=state_fingerprint,
+        missing_melt_owner=missing_owner,
     )
 
 
@@ -1183,6 +1196,29 @@ def infer_required_channels_from_carrier(
     text = missing_text or ""
     channels: set[str] = set()
 
+    # Domain-aware ledger triage records explicit ligand deficits as
+    # ``needs ligand fugacity channel for ['S']`` / ``['N', 'O']``.  Consume
+    # that typed evidence before formula heuristics: uppercase adjacency in
+    # BS/LiN defeated the earlier boundary regexes and produced an unhelpful
+    # empty-channel refusal.  Carbon remains a typed carbon-side refusal below
+    # because t-571 intentionally has no carbon gas-channel identity.
+    ligand_tokens = set(
+        re.findall(r"'([A-Z][a-z]?)'", text)
+        if "ligand fugacity channel" in text
+        else ()
+    )
+    for ligand, channel_id in {
+        "F": CHANNEL_F2,
+        "Cl": CHANNEL_Cl2,
+        "Br": CHANNEL_Br2,
+        "I": CHANNEL_I2,
+        "H": CHANNEL_H2,
+        "S": CHANNEL_S2,
+        "N": CHANNEL_N2,
+    }.items():
+        if ligand in ligand_tokens:
+            channels.add(channel_id)
+
     # Explicit tags in ledger free-text (when present).
     for token, channel_id in (
         ("F2", CHANNEL_F2),
@@ -1263,7 +1299,14 @@ def attempt_channel_composition(
     if not channels:
         # Carbon-side or unparseable: still a typed refusal.
         if missing_text and (
-            "carbon" in missing_text.lower() or "C?" in missing_text
+            "carbon" in missing_text.lower()
+            or "C?" in missing_text
+            or bool(
+                re.search(
+                    r"ligand fugacity channel for \[[^\]]*'C'",
+                    missing_text,
+                )
+            )
         ):
             return ChannelCompositionRefusal(
                 carrier=carrier,

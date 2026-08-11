@@ -139,6 +139,11 @@ CATALOG_RULES = {
     for rule in CATALOG.request_rules
     if rule.origin == "catalog"
 }
+CATALOG_RAW_ROWS = {
+    str(species_id): row
+    for family in CATALOG_PAYLOAD["families"].values()
+    for species_id, row in family["physical_properties"]["species"].items()
+}
 
 
 def _pair_key(row: dict[str, Any]) -> tuple[str, str]:
@@ -157,6 +162,37 @@ def _ready_catalog_species(row: dict[str, Any]) -> str | None:
             and rule.has_alpha
             and rule.has_route
             and rule.has_formula
+        ):
+            return str(species_id)
+    return None
+
+
+def _status_only_catalog_species(row: dict[str, Any]) -> str | None:
+    """Return only t-583 receipts that cover this exact demand element."""
+
+    for species_id in row.get("catalog_species_ids", []):
+        species = CATALOG.species.get(str(species_id))
+        if species is None or species.evaluator is None:
+            continue
+        metadata = species.code_metadata
+        element = str(row["element"])
+        existing_receipt = metadata.raw.get("t583_existing_executable_composed")
+        if (
+            isinstance(existing_receipt, dict)
+            and existing_receipt.get("status") == "existing_evaluator_wiring_receipt"
+            and element in {str(value) for value in existing_receipt.get("coverage_elements", [])}
+        ):
+            return str(species_id)
+        raw_row = CATALOG_RAW_ROWS[str(species_id)]
+        nested = raw_row.get("t583_composition")
+        coverage = nested if isinstance(nested, dict) else raw_row
+        alpha = species.vaporisation_coefficients.evaporation_alpha
+        if (
+            element in {str(value) for value in coverage.get("coverage_elements", [])}
+            and metadata.hot_train_applicability == "not_applicable"
+            and metadata.raw.get("t583_status_only_composed") is True
+            and alpha.get("status") == "no_data"
+            and alpha.get("policy") == "refuse_nonzero_flux"
         ):
             return str(species_id)
     return None
@@ -181,6 +217,11 @@ LIVE_BY_KEY = {
     for key, species_id in STRUCTURAL_BY_KEY.items()
     if CATALOG.species[species_id].code_metadata.source_account
     == "process.cleaned_melt"
+}
+STATUS_ONLY_BY_KEY = {
+    key: species_id
+    for key, row in DEMAND_BY_KEY.items()
+    if (species_id := _status_only_catalog_species(row)) is not None
 }
 STRUCTURAL_PAIRS = tuple(sorted(STRUCTURAL_BY_KEY))
 STRUCTURAL_SPECIES = tuple(sorted(set(STRUCTURAL_BY_KEY.values())))
@@ -472,6 +513,7 @@ def stage0_committed_carriers(conformance_sim) -> set[str]:
 
 def _covered_pairs(stage0_committed_carriers: set[str]) -> set[tuple[str, str]]:
     covered = set(LIVE_BY_KEY)
+    covered.update(STATUS_ONLY_BY_KEY)
     covered.update(
         key
         for key, species_id in STRUCTURAL_BY_KEY.items()

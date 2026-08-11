@@ -824,7 +824,9 @@ def test_production_catalog_emits_only_o2_terms(production_catalog):
             assert term.input_id == CHANNEL_O2, (
                 f"{species_id}: unexpected non-O2 term {term.input_id}"
             )
-    assert n_terms == 30  # the O2-dependent evaluator cohort
+    # t-583 adds 25 status-only, non-authoritative O2-dependent evaluators to
+    # the 30 pre-existing terms; no non-O2 channel is admitted.
+    assert n_terms == 55
 
 
 # ---------------------------------------------------------------------------

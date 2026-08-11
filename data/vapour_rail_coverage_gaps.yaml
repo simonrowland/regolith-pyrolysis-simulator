@@ -17,13 +17,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Al
-  carrier: Al2Br6
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide ALBr3_L (AlBr3, condensed_liquid) anchors halide vapor family for Al2Br6; anchor ALBr3_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Al
   carrier: Al2C2
   contract: C1-C5
   reason: acquisition-pending
@@ -36,20 +29,6 @@ entries:
   reason: acquisition-pending
   missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
   filed: batch-merge-cx
-  since: '2026-08-05'
-- element: Al
-  carrier: Al2F6
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=halide_condensed_family; overlap_fraction=0.8; related condensed halide ALF3_I (AlF3, condensed) anchors halide vapor family for Al2F6; anchor ALF3_I partial overlap_fraction=0.8000 (overlap 800 K of 1000 K); domain=[728,2100]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Al
-  carrier: Al2I6
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide ALI3_L (AlI3, condensed_liquid) anchors halide vapor family for Al2I6; anchor ALI3_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Al
   carrier: Al2S
@@ -77,13 +56,6 @@ entries:
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=halide_condensed_family; related condensed halide ALBr3_L (AlBr3, condensed_liquid) anchors halide vapor family for AlBr2; halide family ratio mismatch: carrier X:M=2 vs anchor ALBr3_L X:M=3 — balanced dissociation requires free halogen fugacity (no runtime channel)'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Al
-  carrier: AlBr3
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base ALBr3_L (condensed_liquid) anchors pure-component or direct dissociation Psat for AlBr3; anchor ALBr3_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Al
@@ -136,31 +108,10 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Al
-  carrier: AlF2Cl
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide ALCL3_L (AlCl3, condensed_liquid) anchors halide vapor family for AlF2Cl; anchor ALCL3_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Al
-  carrier: AlF3
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=pure_condensed_self; overlap_fraction=0.8; CEA condensed base ALF3_I (condensed) anchors pure-component or direct dissociation Psat for AlF3; anchor ALF3_I partial overlap_fraction=0.8000 (overlap 800 K of 1000 K); domain=[728,2100]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Al
   carrier: AlFCl
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=halide_condensed_family; related condensed halide ALCL3_L (AlCl3, condensed_liquid) anchors halide vapor family for AlFCl; halide family ratio mismatch: carrier X:M=2 vs anchor ALCL3_L X:M=3 — balanced dissociation requires free halogen fugacity (no runtime channel)'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Al
-  carrier: AlFCl2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide ALCL3_L (AlCl3, condensed_liquid) anchors halide vapor family for AlFCl2; anchor ALCL3_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Al
@@ -245,13 +196,6 @@ entries:
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=halide_condensed_family; related condensed halide ALI3_L (AlI3, condensed_liquid) anchors halide vapor family for AlI2; halide family ratio mismatch: carrier X:M=2 vs anchor ALI3_L X:M=3 — balanced dissociation requires free halogen fugacity (no runtime channel)'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Al
-  carrier: AlI3
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base ALI3_L (condensed_liquid) anchors pure-component or direct dissociation Psat for AlI3; anchor ALI3_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Al
@@ -500,13 +444,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: B
-  carrier: B2O3
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base B2O3_L (condensed_liquid) anchors pure-component or direct dissociation Psat for B2O3; anchor B2O3_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: B
   carrier: B2O4H4
   contract: C1-C5
   reason: acquisition-pending
@@ -525,13 +462,6 @@ entries:
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=related_binary_condensed; related condensed B2O3_L (B2O3) anchors B2S2; related_binary B2O3_L (B2O3) ≠ carrier B2S2: dissociation/exchange needs ligand fugacity channel for [''S'']'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: B
-  carrier: B2S3
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base B2S3_L (condensed_liquid) anchors pure-component or direct dissociation Psat for B2S3; anchor B2S3_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: B
@@ -864,13 +794,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: B
-  carrier: BN
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base BN_cr (condensed_solid) anchors pure-component or direct dissociation Psat for BN; anchor BN_cr covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: B
   carrier: BO
   contract: C1-C5
   reason: acquisition-pending
@@ -941,13 +864,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: B
-  carrier: CsBO2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self_multication; multi-primary carrier has condensed CEA base CsBO2_L (condensed_liquid); anchor CsBO2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: B
   carrier: H2BO
   contract: C1-C5
   reason: acquisition-pending
@@ -983,13 +899,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: B
-  carrier: H3BO3
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base H3BO3_L (condensed_liquid) anchors pure-component or direct dissociation Psat for H3BO3; anchor H3BO3_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: B
   carrier: HBO
   contract: C1-C5
   reason: acquisition-pending
@@ -997,59 +906,10 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: B
-  carrier: HBO2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base HBO2_L (condensed_liquid) anchors pure-component or direct dissociation Psat for HBO2; anchor HBO2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: B
   carrier: HBS
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=base_x_hydrogen_exchange; element/parent/catalog base present + H2(g) enables hydride exchange composition of HBS; pathway=base_x_hydrogen_exchange introduces non-O2 gas participants; runtime accepts only source_activity + pO2_bar'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: B
-  carrier: KBO2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self_multication; multi-primary carrier has condensed CEA base KBO2_L (condensed_liquid); anchor KBO2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: B
-  carrier: LiBO2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self_multication; multi-primary carrier has condensed CEA base LiBO2_L (condensed_liquid); anchor LiBO2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: B
-  carrier: NaBO2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self_multication; multi-primary carrier has condensed CEA base NaBO2_L (condensed_liquid); anchor NaBO2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: B
-  carrier: RbBO2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self_multication; multi-primary carrier has condensed CEA base RbBO2_L (condensed_liquid); anchor RbBO2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Ba
-  carrier: Ba
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=parent_oxide_for_metal_gas; overlap_fraction=0.946; CEA condensed parent oxide BaO_cr anchors liquid-oxide standard reaction for pure metal gas Ba; anchor BaO_cr partial overlap_fraction=0.9460 (overlap 946 K of 1000 K); domain=[300,2246]; activity=no_gamma_for_parent:BaO'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Ba
-  carrier: Ba2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=parent_oxide_for_metal_gas; overlap_fraction=0.946; CEA condensed parent oxide BaO_cr anchors liquid-oxide standard reaction for pure metal gas Ba2; anchor BaO_cr partial overlap_fraction=0.9460 (overlap 946 K of 1000 K); domain=[300,2246]; activity=no_gamma_for_parent:BaO'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Ba
@@ -1071,13 +931,6 @@ entries:
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=halide_condensed_family; related condensed halide BaCL2_L (BaCl2, condensed_liquid) anchors halide vapor family for BaCl; halide family ratio mismatch: carrier X:M=1 vs anchor BaCL2_L X:M=2 — balanced dissociation requires free halogen fugacity (no runtime channel)'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Ba
-  carrier: BaCl2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base BaCL2_L (condensed_liquid) anchors pure-component or direct dissociation Psat for BaCl2; anchor BaCL2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Ba
@@ -1116,31 +969,10 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Ba
-  carrier: BaO
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=pure_condensed_self; overlap_fraction=0.946; CEA condensed base BaO_cr (condensed_solid) anchors pure-component or direct dissociation Psat for BaO; anchor BaO_cr partial overlap_fraction=0.9460 (overlap 946 K of 1000 K); domain=[300,2246]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Ba
-  carrier: BaO2H2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base Ba_OH2_L (condensed_liquid) anchors pure-component or direct dissociation Psat for BaO2H2; anchor Ba_OH2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Ba
   carrier: BaOH
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=base_x_hydrogen_exchange; element/parent/catalog base present + H2(g) enables hydride exchange composition of BaOH; pathway=base_x_hydrogen_exchange introduces non-O2 gas participants; runtime accepts only source_activity + pO2_bar'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Ba
-  carrier: BaS
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base BaS_cr (condensed_solid) anchors pure-component or direct dissociation Psat for BaS; anchor BaS_cr covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Bi
@@ -1158,13 +990,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Br
-  carrier: Al2Br6
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide ALBr3_L (AlBr3, condensed_liquid) anchors halide vapor family for Al2Br6; anchor ALBr3_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Br
   carrier: AlBr
   contract: C1-C5
   reason: acquisition-pending
@@ -1176,13 +1001,6 @@ entries:
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=halide_condensed_family; related condensed halide ALBr3_L (AlBr3, condensed_liquid) anchors halide vapor family for AlBr2; halide family ratio mismatch: carrier X:M=2 vs anchor ALBr3_L X:M=3 — balanced dissociation requires free halogen fugacity (no runtime channel)'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Br
-  carrier: AlBr3
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base ALBr3_L (condensed_liquid) anchors pure-component or direct dissociation Psat for AlBr3; anchor ALBr3_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Br
@@ -1225,13 +1043,6 @@ entries:
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-BASE: missing condensed/reference base Br(l/cr); gas Br present; no condensed Br, no parent-oxide condensed, and no catalog executable base'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Br
-  carrier: Br2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=catalog_self_executable; catalog already has executable row for formula Br2; gap is wiring/composition status not missing base thermo; no condensed-domain gate (catalog/self path); activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Br
@@ -1473,13 +1284,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Br
-  carrier: CaBr2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base CaBr2_L (condensed_liquid) anchors pure-component or direct dissociation Psat for CaBr2; anchor CaBr2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Br
   carrier: Cs2Br2
   contract: C1-C5
   reason: acquisition-pending
@@ -1564,13 +1368,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Br
-  carrier: HBr
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=catalog_self_executable; catalog already has executable row for formula HBr; gap is wiring/composition status not missing base thermo; no condensed-domain gate (catalog/self path); activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Br
   carrier: In2Br2
   contract: C1-C5
   reason: acquisition-pending
@@ -1613,20 +1410,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Br
-  carrier: K2Br2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide KBr_L (KBr, condensed_liquid) anchors halide vapor family for K2Br2; anchor KBr_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Br
-  carrier: KBr
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base KBr_L (condensed_liquid) anchors pure-component or direct dissociation Psat for KBr; anchor KBr_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Br
   carrier: Li2Br2
   contract: C1-C5
   reason: acquisition-pending
@@ -1652,27 +1435,6 @@ entries:
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=halide_condensed_family; related condensed halide MgBr2_L (MgBr2, condensed_liquid) anchors halide vapor family for MgBr; halide family ratio mismatch: carrier X:M=1 vs anchor MgBr2_L X:M=2 — balanced dissociation requires free halogen fugacity (no runtime channel)'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Br
-  carrier: MgBr2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base MgBr2_L (condensed_liquid) anchors pure-component or direct dissociation Psat for MgBr2; anchor MgBr2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Br
-  carrier: Na2Br2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide NaBr_L (NaBr, condensed_liquid) anchors halide vapor family for Na2Br2; anchor NaBr_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Br
-  carrier: NaBr
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base NaBr_L (condensed_liquid) anchors pure-component or direct dissociation Psat for NaBr; anchor NaBr_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Br
@@ -3090,13 +2852,6 @@ entries:
   filed: batch-merge-cx
   since: '2026-08-05'
 - element: C
-  carrier: Cs2CO3
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base Cs2CO3_L (condensed_liquid) anchors pure-component or direct dissociation Psat for Cs2CO3; anchor Cs2CO3_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: C
   carrier: FCN
   contract: C1-C5
   reason: acquisition-pending
@@ -3247,13 +3002,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Ca
-  carrier: CaBr2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base CaBr2_L (condensed_liquid) anchors pure-component or direct dissociation Psat for CaBr2; anchor CaBr2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Ca
   carrier: CaCl
   contract: C1-C5
   reason: acquisition-pending
@@ -3268,13 +3016,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Ca
-  carrier: CaF2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=pure_condensed_self; overlap_fraction=0.609; CEA condensed base CaF2_L (condensed_liquid) anchors pure-component or direct dissociation Psat for CaF2; anchor CaF2_L partial overlap_fraction=0.6090 (overlap 609 K of 1000 K); domain=[1691,6000]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Ca
   carrier: CaH
   contract: C1-C5
   reason: acquisition-pending
@@ -3286,13 +3027,6 @@ entries:
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=halide_condensed_family; related condensed halide CaI2_L (CaI2, condensed_liquid) anchors halide vapor family for CaI; halide family ratio mismatch: carrier X:M=1 vs anchor CaI2_L X:M=2 — balanced dissociation requires free halogen fugacity (no runtime channel)'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Ca
-  carrier: CaI2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base CaI2_L (condensed_liquid) anchors pure-component or direct dissociation Psat for CaI2; anchor CaI2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Ca
@@ -3359,24 +3093,10 @@ entries:
   filed: batch-merge-cx
   since: '2026-08-05'
 - element: Cl
-  carrier: AlF2Cl
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide ALCL3_L (AlCl3, condensed_liquid) anchors halide vapor family for AlF2Cl; anchor ALCL3_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Cl
   carrier: AlFCl
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=halide_condensed_family; related condensed halide ALCL3_L (AlCl3, condensed_liquid) anchors halide vapor family for AlFCl; halide family ratio mismatch: carrier X:M=2 vs anchor ALCL3_L X:M=3 — balanced dissociation requires free halogen fugacity (no runtime channel)'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Cl
-  carrier: AlFCl2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide ALCL3_L (AlCl3, condensed_liquid) anchors halide vapor family for AlFCl2; anchor ALCL3_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Cl
@@ -3580,13 +3300,6 @@ entries:
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=halide_condensed_family; related condensed halide BaCL2_L (BaCl2, condensed_liquid) anchors halide vapor family for BaCl; halide family ratio mismatch: carrier X:M=1 vs anchor BaCL2_L X:M=2 — balanced dissociation requires free halogen fugacity (no runtime channel)'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Cl
-  carrier: BaCl2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base BaCL2_L (condensed_liquid) anchors pure-component or direct dissociation Psat for BaCl2; anchor BaCL2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Cl
@@ -4024,31 +3737,10 @@ entries:
   filed: tddharness-seed
   since: '2026-08-04'
 - element: Cl
-  carrier: Cs2Cl2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide CsCL_L (CsCl, condensed_liquid) anchors halide vapor family for Cs2Cl2; anchor CsCL_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Cl
-  carrier: CsCl
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base CsCL_L (condensed_liquid) anchors pure-component or direct dissociation Psat for CsCl; anchor CsCL_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Cl
   carrier: Cu3Cl3
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=halide_condensed_family; related condensed halide CuCL2_L (CuCl2, condensed_liquid) anchors halide vapor family for Cu3Cl3; halide family ratio mismatch: carrier X:M=1 vs anchor CuCL2_L X:M=2 — balanced dissociation requires free halogen fugacity (no runtime channel)'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Cl
-  carrier: CuCl
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=pure_condensed_self; overlap_fraction=0.4; CEA condensed base CuCL_L (condensed_liquid) anchors pure-component or direct dissociation Psat for CuCl; anchor CuCL_L partial overlap_fraction=0.4000 (overlap 400 K of 1000 K); domain=[696,1700]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Cl
@@ -4101,13 +3793,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Cl
-  carrier: Ga2Cl6
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide GaCL3_L (GaCl3, condensed_liquid) anchors halide vapor family for Ga2Cl6; anchor GaCL3_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Cl
   carrier: GaCl
   contract: C1-C5
   reason: acquisition-pending
@@ -4119,13 +3804,6 @@ entries:
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=halide_condensed_family; related condensed halide GaCL3_L (GaCl3, condensed_liquid) anchors halide vapor family for GaCl2; halide family ratio mismatch: carrier X:M=2 vs anchor GaCL3_L X:M=3 — balanced dissociation requires free halogen fugacity (no runtime channel)'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Cl
-  carrier: GaCl3
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base GaCL3_L (condensed_liquid) anchors pure-component or direct dissociation Psat for GaCl3; anchor GaCL3_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Cl
@@ -4178,52 +3856,10 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Cl
-  carrier: In2Cl6
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide InCL3_L (InCl3, condensed_liquid) anchors halide vapor family for In2Cl6; anchor InCL3_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Cl
-  carrier: InCl
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base InCL_L (condensed_liquid) anchors pure-component or direct dissociation Psat for InCl; anchor InCL_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Cl
   carrier: InCl2
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=halide_condensed_family; related condensed halide InCL3_L (InCl3, condensed_liquid) anchors halide vapor family for InCl2; halide family ratio mismatch: carrier X:M=2 vs anchor InCL3_L X:M=3 — balanced dissociation requires free halogen fugacity (no runtime channel)'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Cl
-  carrier: InCl3
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base InCL3_L (condensed_liquid) anchors pure-component or direct dissociation Psat for InCl3; anchor InCL3_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Cl
-  carrier: Li2Cl2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide LiCL_L (LiCl, condensed_liquid) anchors halide vapor family for Li2Cl2; anchor LiCL_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Cl
-  carrier: Li3Cl3
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide LiCL_L (LiCl, condensed_liquid) anchors halide vapor family for Li3Cl3; anchor LiCL_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Cl
-  carrier: LiCl
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base LiCL_L (condensed_liquid) anchors pure-component or direct dissociation Psat for LiCl; anchor LiCL_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Cl
@@ -4395,13 +4031,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Cl
-  carrier: PbCl2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base PbCL2_L (condensed_liquid) anchors pure-component or direct dissociation Psat for PbCl2; anchor PbCL2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Cl
   carrier: PbCl3
   contract: C1-C5
   reason: acquisition-pending
@@ -4413,20 +4042,6 @@ entries:
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=halide_condensed_family; related condensed halide PbCL2_L (PbCl2, condensed_liquid) anchors halide vapor family for PbCl4; halide family ratio mismatch: carrier X:M=4 vs anchor PbCL2_L X:M=2 — balanced dissociation requires free halogen fugacity (no runtime channel)'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Cl
-  carrier: Rb2Cl2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide RbCL_L (RbCl, condensed_liquid) anchors halide vapor family for Rb2Cl2; anchor RbCL_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Cl
-  carrier: RbCl
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base RbCL_L (condensed_liquid) anchors pure-component or direct dissociation Psat for RbCl; anchor RbCL_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Cl
@@ -4535,13 +4150,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Cl
-  carrier: SnCl2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base SnCL2_L (condensed_liquid) anchors pure-component or direct dissociation Psat for SnCl2; anchor SnCL2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Cl
   carrier: SnCl3
   contract: C1-C5
   reason: acquisition-pending
@@ -4549,24 +4157,10 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Cl
-  carrier: SnCl4
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base SnCL4_L (condensed_liquid) anchors pure-component or direct dissociation Psat for SnCl4; anchor SnCL4_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Cl
   carrier: SrCl
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=halide_condensed_family; related condensed halide SrCL2_L (SrCl2, condensed_liquid) anchors halide vapor family for SrCl; halide family ratio mismatch: carrier X:M=1 vs anchor SrCL2_L X:M=2 — balanced dissociation requires free halogen fugacity (no runtime channel)'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Cl
-  carrier: SrCl2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base SrCL2_L (condensed_liquid) anchors pure-component or direct dissociation Psat for SrCl2; anchor SrCL2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Cl
@@ -4619,24 +4213,10 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Cl
-  carrier: WCl6
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base WCL6_L (condensed_liquid) anchors pure-component or direct dissociation Psat for WCl6; anchor WCL6_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Cl
   carrier: WO2Cl2
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-BASE: missing condensed/reference base envelope-overlapping condensed phase for WO2Cl2; CEA condensed base WO2CL2_cr (condensed_solid) anchors pure-component or direct dissociation Psat for WO2Cl2; chosen anchor WO2CL2_cr domain [298.15,1000] K has ZERO overlap with envelope [1300.0, 2300.0]; rejected=[]'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Cl
-  carrier: WOCl4
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base WOCL4_L (condensed_liquid) anchors pure-component or direct dissociation Psat for WOCl4; anchor WOCL4_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Co
@@ -4682,20 +4262,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Cs
-  carrier: Cs2CO3
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base Cs2CO3_L (condensed_liquid) anchors pure-component or direct dissociation Psat for Cs2CO3; anchor Cs2CO3_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Cs
-  carrier: Cs2Cl2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide CsCL_L (CsCl, condensed_liquid) anchors halide vapor family for Cs2Cl2; anchor CsCL_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Cs
   carrier: Cs2F2
   contract: C1-C5
   reason: acquisition-pending
@@ -4710,38 +4276,10 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Cs
-  carrier: Cs2O
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base Cs2O_L (condensed_liquid) anchors pure-component or direct dissociation Psat for Cs2O; anchor Cs2O_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Cs
-  carrier: Cs2O2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base Cs2O2_L (condensed_liquid) anchors pure-component or direct dissociation Psat for Cs2O2; anchor Cs2O2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Cs
   carrier: Cs2O2H2
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=base_x_hydrogen_exchange; element/parent/catalog base present + H2(g) enables hydride exchange composition of Cs2O2H2; pathway=base_x_hydrogen_exchange introduces non-O2 gas participants; runtime accepts only source_activity + pO2_bar'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Cs
-  carrier: Cs2SO4
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base Cs2SO4_L (condensed_liquid) anchors pure-component or direct dissociation Psat for Cs2SO4; anchor Cs2SO4_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Cs
-  carrier: CsBO2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self_multication; multi-primary carrier has condensed CEA base CsBO2_L (condensed_liquid); anchor CsBO2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Cs
@@ -4752,24 +4290,10 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Cs
-  carrier: CsCl
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base CsCL_L (condensed_liquid) anchors pure-component or direct dissociation Psat for CsCl; anchor CsCL_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Cs
   carrier: CsF
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=parent_oxide_x_halogen_exchange; CEA parent oxide Cs2O_L + halogen gas enables standard-reaction/exchange composition of CsF; pathway=parent_oxide_x_halogen_exchange introduces non-O2 gas participants; runtime accepts only source_activity + pO2_bar'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Cs
-  carrier: CsH
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base CsH_L (condensed_liquid) anchors pure-component or direct dissociation Psat for CsH; anchor CsH_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Cs
@@ -4787,20 +4311,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Cs
-  carrier: CsNO2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base CsNO2_L (condensed_liquid) anchors pure-component or direct dissociation Psat for CsNO2; anchor CsNO2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Cs
-  carrier: CsNO3
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base CsNO3_L (condensed_liquid) anchors pure-component or direct dissociation Psat for CsNO3; anchor CsNO3_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Cs
   carrier: CsNa
   contract: C1-C5
   reason: acquisition-pending
@@ -4815,13 +4325,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Cs
-  carrier: CsOH
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base CsOH_L (condensed_liquid) anchors pure-component or direct dissociation Psat for CsOH; anchor CsOH_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Cs
   carrier: CsRb
   contract: C1-C5
   reason: acquisition-pending
@@ -4829,31 +4332,10 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Cu
-  carrier: Cu
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=parent_oxide_for_metal_gas; overlap_fraction=0.1; CEA condensed parent oxide CuO_cr anchors liquid-oxide standard reaction for pure metal gas Cu; anchor CuO_cr partial overlap_fraction=0.1000 (overlap 100 K of 1000 K); domain=[300,1400]; activity=no_gamma_for_parent:CuO'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Cu
-  carrier: Cu2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=parent_oxide_for_metal_gas; overlap_fraction=0.1; CEA condensed parent oxide CuO_cr anchors liquid-oxide standard reaction for pure metal gas Cu2; anchor CuO_cr partial overlap_fraction=0.1000 (overlap 100 K of 1000 K); domain=[300,1400]; activity=no_gamma_for_parent:CuO'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Cu
   carrier: Cu3Cl3
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=halide_condensed_family; related condensed halide CuCL2_L (CuCl2, condensed_liquid) anchors halide vapor family for Cu3Cl3; halide family ratio mismatch: carrier X:M=1 vs anchor CuCL2_L X:M=2 — balanced dissociation requires free halogen fugacity (no runtime channel)'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Cu
-  carrier: CuCl
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=pure_condensed_self; overlap_fraction=0.4; CEA condensed base CuCL_L (condensed_liquid) anchors pure-component or direct dissociation Psat for CuCl; anchor CuCL_L partial overlap_fraction=0.4000 (overlap 400 K of 1000 K); domain=[696,1700]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Cu
@@ -4868,13 +4350,6 @@ entries:
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=parent_oxide_x_halogen_exchange; CEA parent oxide CuO_cr + halogen gas enables standard-reaction/exchange composition of CuF2; pathway=parent_oxide_x_halogen_exchange introduces non-O2 gas participants; runtime accepts only source_activity + pO2_bar'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Cu
-  carrier: CuO
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=pure_condensed_self; overlap_fraction=0.1; CEA condensed base CuO_cr (condensed_solid) anchors pure-component or direct dissociation Psat for CuO; anchor CuO_cr partial overlap_fraction=0.1000 (overlap 100 K of 1000 K); domain=[300,1400]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Cu
@@ -4906,13 +4381,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: F
-  carrier: Al2F6
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=halide_condensed_family; overlap_fraction=0.8; related condensed halide ALF3_I (AlF3, condensed) anchors halide vapor family for Al2F6; anchor ALF3_I partial overlap_fraction=0.8000 (overlap 800 K of 1000 K); domain=[728,2100]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: F
   carrier: AlF
   contract: C1-C5
   reason: acquisition-pending
@@ -4927,31 +4395,10 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: F
-  carrier: AlF2Cl
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide ALCL3_L (AlCl3, condensed_liquid) anchors halide vapor family for AlF2Cl; anchor ALCL3_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: F
-  carrier: AlF3
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=pure_condensed_self; overlap_fraction=0.8; CEA condensed base ALF3_I (condensed) anchors pure-component or direct dissociation Psat for AlF3; anchor ALF3_I partial overlap_fraction=0.8000 (overlap 800 K of 1000 K); domain=[728,2100]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: F
   carrier: AlFCl
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=halide_condensed_family; related condensed halide ALCL3_L (AlCl3, condensed_liquid) anchors halide vapor family for AlFCl; halide family ratio mismatch: carrier X:M=2 vs anchor ALCL3_L X:M=3 — balanced dissociation requires free halogen fugacity (no runtime channel)'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: F
-  carrier: AlFCl2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide ALCL3_L (AlCl3, condensed_liquid) anchors halide vapor family for AlFCl2; anchor ALCL3_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: F
@@ -5536,13 +4983,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: F
-  carrier: CaF2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=pure_condensed_self; overlap_fraction=0.609; CEA condensed base CaF2_L (condensed_liquid) anchors pure-component or direct dissociation Psat for CaF2; anchor CaF2_L partial overlap_fraction=0.6090 (overlap 609 K of 1000 K); domain=[1691,6000]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: F
   carrier: ClF
   contract: C1-C5
   reason: acquisition-pending
@@ -5767,13 +5207,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: F
-  carrier: HF
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=catalog_self_executable; catalog already has executable row for formula HF; gap is wiring/composition status not missing base thermo; no condensed-domain gate (catalog/self path); activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: F
   carrier: HOF
   contract: C1-C5
   reason: acquisition-pending
@@ -5844,24 +5277,10 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: F
-  carrier: K2F2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide KF_L (KF, condensed_liquid) anchors halide vapor family for K2F2; anchor KF_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: F
   carrier: KAlF4
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-TRIAGE-MANUAL: multi-primary carrier needs coupled reservoir / activity policy; primary=[''Al'', ''K'']; no exact condensed formula'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: F
-  carrier: KF
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base KF_L (condensed_liquid) anchors pure-component or direct dissociation Psat for KF; anchor KF_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: F
@@ -5900,13 +5319,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: F
-  carrier: Mg2F4
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=halide_condensed_family; overlap_fraction=0.764; related condensed halide MgF2_L (MgF2, condensed_liquid) anchors halide vapor family for Mg2F4; anchor MgF2_L partial overlap_fraction=0.7640 (overlap 764 K of 1000 K); domain=[1536,6000]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: F
   carrier: MgF
   contract: C1-C5
   reason: acquisition-pending
@@ -5914,31 +5326,10 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: F
-  carrier: MgF2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=pure_condensed_self; overlap_fraction=0.764; CEA condensed base MgF2_L (condensed_liquid) anchors pure-component or direct dissociation Psat for MgF2; anchor MgF2_L partial overlap_fraction=0.7640 (overlap 764 K of 1000 K); domain=[1536,6000]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: F
-  carrier: N2F2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide NH4F_L (NH4F, condensed_liquid) anchors halide vapor family for N2F2; anchor NH4F_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: F
   carrier: N2F4
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=halide_condensed_family; related condensed halide NH4F_L (NH4F, condensed_liquid) anchors halide vapor family for N2F4; halide family ratio mismatch: carrier X:M=2 vs anchor NH4F_L X:M=1 — balanced dissociation requires free halogen fugacity (no runtime channel)'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: F
-  carrier: NF
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide NH4F_L (NH4F, condensed_liquid) anchors halide vapor family for NF; anchor NH4F_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: F
@@ -5956,45 +5347,10 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: F
-  carrier: NH2F
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide NH4F_L (NH4F, condensed_liquid) anchors halide vapor family for NH2F; anchor NH4F_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: F
-  carrier: NHF
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide NH4F_L (NH4F, condensed_liquid) anchors halide vapor family for NHF; anchor NH4F_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: F
   carrier: NHF2
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=halide_condensed_family; related condensed halide NH4F_L (NH4F, condensed_liquid) anchors halide vapor family for NHF2; halide family ratio mismatch: carrier X:M=2 vs anchor NH4F_L X:M=1 — balanced dissociation requires free halogen fugacity (no runtime channel)'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: F
-  carrier: NO2F
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide NH4F_L (NH4F, condensed_liquid) anchors halide vapor family for NO2F; anchor NH4F_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: F
-  carrier: NO3F
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide NH4F_L (NH4F, condensed_liquid) anchors halide vapor family for NO3F; anchor NH4F_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: F
-  carrier: NOF
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide NH4F_L (NH4F, condensed_liquid) anchors halide vapor family for NOF; anchor NH4F_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: F
@@ -6005,31 +5361,10 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: F
-  carrier: Na2F2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide NaF_L (NaF, condensed_liquid) anchors halide vapor family for Na2F2; anchor NaF_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: F
-  carrier: Na3F3
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide NaF_L (NaF, condensed_liquid) anchors halide vapor family for Na3F3; anchor NaF_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: F
   carrier: NaAlF4
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-TRIAGE-MANUAL: multi-primary carrier needs coupled reservoir / activity policy; primary=[''Al'', ''Na'']; no exact condensed formula'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: F
-  carrier: NaF
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base NaF_L (condensed_liquid) anchors pure-component or direct dissociation Psat for NaF; anchor NaF_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: F
@@ -6404,24 +5739,10 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: F
-  carrier: UO2F2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=pure_condensed_self; overlap_fraction=0.8; CEA condensed base UO2F2_cr (condensed_solid) anchors pure-component or direct dissociation Psat for UO2F2; anchor UO2F2_cr partial overlap_fraction=0.8000 (overlap 800 K of 1000 K); domain=[300,2100]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: F
   carrier: UOF
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=halide_condensed_family; related condensed halide UO2F2_cr (UO2F2, condensed_solid) anchors halide vapor family for UOF; halide family ratio mismatch: carrier X:M=1 vs anchor UO2F2_cr X:M=2 — balanced dissociation requires free halogen fugacity (no runtime channel)'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: F
-  carrier: UOF2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=halide_condensed_family; overlap_fraction=0.8; related condensed halide UO2F2_cr (UO2F2, condensed_solid) anchors halide vapor family for UOF2; anchor UO2F2_cr partial overlap_fraction=0.8000 (overlap 800 K of 1000 K); domain=[300,2100]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: F
@@ -6487,20 +5808,6 @@ entries:
   missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
   filed: batch-merge-cx
   since: '2026-08-05'
-- element: Fe
-  carrier: FeO_gas
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=pure_condensed_self; overlap_fraction=0.648; CEA condensed base Fe.947O_L (condensed_liquid) anchors pure-component or direct dissociation Psat for FeO_gas; anchor Fe.947O_L partial overlap_fraction=0.6480 (overlap 648 K of 1000 K); domain=[1652,6000]; activity=explicit_pure_phase_a1_contract'
-  filed: mc4a-cx
-  since: '2026-08-05'
-- element: Ga
-  carrier: Ga
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=parent_oxide_for_metal_gas; overlap_fraction=0.78; CEA condensed parent oxide Ga2O3_cr anchors liquid-oxide standard reaction for pure metal gas Ga; anchor Ga2O3_cr partial overlap_fraction=0.7800 (overlap 780 K of 1000 K); domain=[300,2080]; activity=no_gamma_for_parent:Ga2O3'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
 - element: Ga
   carrier: Ga2Br2
   contract: C1-C5
@@ -6534,13 +5841,6 @@ entries:
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=halide_condensed_family; related condensed halide GaCL3_L (GaCl3, condensed_liquid) anchors halide vapor family for Ga2Cl4; halide family ratio mismatch: carrier X:M=2 vs anchor GaCL3_L X:M=3 — balanced dissociation requires free halogen fugacity (no runtime channel)'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Ga
-  carrier: Ga2Cl6
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide GaCL3_L (GaCl3, condensed_liquid) anchors halide vapor family for Ga2Cl6; anchor GaCL3_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Ga
@@ -6586,13 +5886,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Ga
-  carrier: Ga2O
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=parent_oxide_cea; overlap_fraction=0.78; CEA condensed parent oxide Ga2O3_cr + gas Ga2O supports liquid-oxide standard reaction or composite exchange; anchor Ga2O3_cr partial overlap_fraction=0.7800 (overlap 780 K of 1000 K); domain=[300,2080]; activity=no_gamma_for_parent:Ga2O3'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Ga
   carrier: GaBr
   contract: C1-C5
   reason: acquisition-pending
@@ -6625,13 +5918,6 @@ entries:
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=halide_condensed_family; related condensed halide GaCL3_L (GaCl3, condensed_liquid) anchors halide vapor family for GaCl2; halide family ratio mismatch: carrier X:M=2 vs anchor GaCL3_L X:M=3 — balanced dissociation requires free halogen fugacity (no runtime channel)'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Ga
-  carrier: GaCl3
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base GaCL3_L (condensed_liquid) anchors pure-component or direct dissociation Psat for GaCl3; anchor GaCL3_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Ga
@@ -6684,13 +5970,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Ga
-  carrier: GaO
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=parent_oxide_cea; overlap_fraction=0.78; CEA condensed parent oxide Ga2O3_cr + gas GaO supports liquid-oxide standard reaction or composite exchange; anchor Ga2O3_cr partial overlap_fraction=0.7800 (overlap 780 K of 1000 K); domain=[300,2080]; activity=no_gamma_for_parent:Ga2O3'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Ga
   carrier: GaOH
   contract: C1-C5
   reason: acquisition-pending
@@ -6702,20 +5981,6 @@ entries:
   contract: carrier-discovery
   reason: acquisition-pending
   missing: neutral gas carrier census for newly declared feedstock element; carrier discovery pending
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Ge
-  carrier: Ge
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=parent_oxide_for_metal_gas; overlap_fraction=0.912; CEA condensed parent oxide GeO2_L anchors liquid-oxide standard reaction for pure metal gas Ge; anchor GeO2_L partial overlap_fraction=0.9120 (overlap 912 K of 1000 K); domain=[1388,6000]; activity=no_gamma_for_parent:GeO2'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Ge
-  carrier: Ge2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=parent_oxide_for_metal_gas; overlap_fraction=0.912; CEA condensed parent oxide GeO2_L anchors liquid-oxide standard reaction for pure metal gas Ge2; anchor GeO2_L partial overlap_fraction=0.9120 (overlap 912 K of 1000 K); domain=[1388,6000]; activity=no_gamma_for_parent:GeO2'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Ge
@@ -6814,34 +6079,6 @@ entries:
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=parent_oxide_x_halogen_exchange; CEA parent oxide GeO2_L + halogen gas enables standard-reaction/exchange composition of GeI; pathway=parent_oxide_x_halogen_exchange introduces non-O2 gas participants; runtime accepts only source_activity + pO2_bar'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Ge
-  carrier: GeO
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=catalog_self_executable; catalog already has executable row for formula GeO; gap is wiring/composition status not missing base thermo; no condensed-domain gate (catalog/self path); activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Ge
-  carrier: GeO2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=pure_condensed_self; overlap_fraction=0.912; CEA condensed base GeO2_L (condensed_liquid) anchors pure-component or direct dissociation Psat for GeO2; anchor GeO2_L partial overlap_fraction=0.9120 (overlap 912 K of 1000 K); domain=[1388,6000]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Ge
-  carrier: GeS
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base GeS_L (condensed_liquid) anchors pure-component or direct dissociation Psat for GeS; anchor GeS_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Ge
-  carrier: GeS2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base GeS2_L (condensed_liquid) anchors pure-component or direct dissociation Psat for GeS2; anchor GeS2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: H
@@ -7227,13 +6464,6 @@ entries:
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=base_x_hydrogen_exchange; element/parent/catalog base present + H2(g) enables hydride exchange composition of BaH; pathway=base_x_hydrogen_exchange introduces non-O2 gas participants; runtime accepts only source_activity + pO2_bar'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: H
-  carrier: BaO2H2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base Ba_OH2_L (condensed_liquid) anchors pure-component or direct dissociation Psat for BaO2H2; anchor Ba_OH2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: H
@@ -8035,20 +7265,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: H
-  carrier: CsH
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base CsH_L (condensed_liquid) anchors pure-component or direct dissociation Psat for CsH; anchor CsH_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: H
-  carrier: CsOH
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base CsOH_L (condensed_liquid) anchors pure-component or direct dissociation Psat for CsOH; anchor CsOH_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: H
   carrier: CuOH
   contract: C1-C5
   reason: acquisition-pending
@@ -8168,13 +7384,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: H
-  carrier: H3BO3
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base H3BO3_L (condensed_liquid) anchors pure-component or direct dissociation Psat for H3BO3; anchor H3BO3_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: H
   carrier: H3F3
   contract: C1-C5
   reason: acquisition-pending
@@ -8231,24 +7440,10 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: H
-  carrier: HBO2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base HBO2_L (condensed_liquid) anchors pure-component or direct dissociation Psat for HBO2; anchor HBO2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: H
   carrier: HBS
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=base_x_hydrogen_exchange; element/parent/catalog base present + H2(g) enables hydride exchange composition of HBS; pathway=base_x_hydrogen_exchange introduces non-O2 gas participants; runtime accepts only source_activity + pO2_bar'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: H
-  carrier: HBr
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=catalog_self_executable; catalog already has executable row for formula HBr; gap is wiring/composition status not missing base thermo; no condensed-domain gate (catalog/self path); activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: H
@@ -8271,20 +7466,6 @@ entries:
   reason: acquisition-pending
   missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
   filed: batch-merge-cx
-  since: '2026-08-05'
-- element: H
-  carrier: HF
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=catalog_self_executable; catalog already has executable row for formula HF; gap is wiring/composition status not missing base thermo; no condensed-domain gate (catalog/self path); activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: H
-  carrier: HI
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=catalog_self_executable; catalog already has executable row for formula HI; gap is wiring/composition status not missing base thermo; no condensed-domain gate (catalog/self path); activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
   since: '2026-08-05'
 - element: H
   carrier: HNC
@@ -8392,20 +7573,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: H
-  carrier: LiH
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base LiH_L (condensed_liquid) anchors pure-component or direct dissociation Psat for LiH; anchor LiH_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: H
-  carrier: LiOH
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base LiOH_L (condensed_liquid) anchors pure-component or direct dissociation Psat for LiOH; anchor LiOH_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: H
   carrier: MgH
   contract: C1-C5
   reason: acquisition-pending
@@ -8469,13 +7636,6 @@ entries:
   filed: batch-merge-cx
   since: '2026-08-05'
 - element: H
-  carrier: NH2F
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide NH4F_L (NH4F, condensed_liquid) anchors halide vapor family for NH2F; anchor NH4F_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: H
   carrier: NH3O
   contract: C1-C5
   reason: acquisition-pending
@@ -8492,13 +7652,6 @@ entries:
   note: '2026-08-05: thermo_missing retired — the catalog row itself carries computable thermo (Antoine/standard-reaction),
     counted by the extended manifest predicate.'
   disposition: NEEDS-BASE
-- element: H
-  carrier: NHF
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide NH4F_L (NH4F, condensed_liquid) anchors halide vapor family for NHF; anchor NH4F_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
 - element: H
   carrier: NHF2
   contract: C1-C5
@@ -8560,20 +7713,6 @@ entries:
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=base_x_hydrogen_exchange; element/parent/catalog base present + H2(g) enables hydride exchange composition of Rb2O2H2; pathway=base_x_hydrogen_exchange introduces non-O2 gas participants; runtime accepts only source_activity + pO2_bar'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: H
-  carrier: RbH
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base RbH_L (condensed_liquid) anchors pure-component or direct dissociation Psat for RbH; anchor RbH_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: H
-  carrier: RbOH
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base RbOH_L (condensed_liquid) anchors pure-component or direct dissociation Psat for RbOH; anchor RbOH_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: H
@@ -8717,13 +7856,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: H
-  carrier: SrO2H2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base Sr_OH2_L (condensed_liquid) anchors pure-component or direct dissociation Psat for SrO2H2; anchor Sr_OH2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: H
   carrier: SrOH
   contract: C1-C5
   reason: acquisition-pending
@@ -8745,13 +7877,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: I
-  carrier: Al2I6
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide ALI3_L (AlI3, condensed_liquid) anchors halide vapor family for Al2I6; anchor ALI3_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: I
   carrier: AlI
   contract: C1-C5
   reason: acquisition-pending
@@ -8763,13 +7888,6 @@ entries:
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=halide_condensed_family; related condensed halide ALI3_L (AlI3, condensed_liquid) anchors halide vapor family for AlI2; halide family ratio mismatch: carrier X:M=2 vs anchor ALI3_L X:M=3 — balanced dissociation requires free halogen fugacity (no runtime channel)'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: I
-  carrier: AlI3
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base ALI3_L (condensed_liquid) anchors pure-component or direct dissociation Psat for AlI3; anchor ALI3_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: I
@@ -8864,13 +7982,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: I
-  carrier: CaI2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base CaI2_L (condensed_liquid) anchors pure-component or direct dissociation Psat for CaI2; anchor CaI2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: I
   carrier: Cs2I2
   contract: C1-C5
   reason: acquisition-pending
@@ -8934,24 +8045,10 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: I
-  carrier: HI
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=catalog_self_executable; catalog already has executable row for formula HI; gap is wiring/composition status not missing base thermo; no condensed-domain gate (catalog/self path); activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: I
   carrier: I
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-BASE: missing condensed/reference base I(l/cr); gas I present; no condensed I, no parent-oxide condensed, and no catalog executable base'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: I
-  carrier: I2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=catalog_self_executable; catalog already has executable row for formula I2; gap is wiring/composition status not missing base thermo; no condensed-domain gate (catalog/self path); activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: I
@@ -9011,20 +8108,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: I
-  carrier: K2I2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide KI_L (KI, condensed_liquid) anchors halide vapor family for K2I2; anchor KI_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: I
-  carrier: KI
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base KI_L (condensed_liquid) anchors pure-component or direct dissociation Psat for KI; anchor KI_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: I
   carrier: Li2I2
   contract: C1-C5
   reason: acquisition-pending
@@ -9050,27 +8133,6 @@ entries:
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=halide_condensed_family; related condensed halide MgI2_L (MgI2, condensed_liquid) anchors halide vapor family for MgI; halide family ratio mismatch: carrier X:M=1 vs anchor MgI2_L X:M=2 — balanced dissociation requires free halogen fugacity (no runtime channel)'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: I
-  carrier: MgI2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base MgI2_L (condensed_liquid) anchors pure-component or direct dissociation Psat for MgI2; anchor MgI2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: I
-  carrier: Na2I2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide NaI_L (NaI, condensed_liquid) anchors halide vapor family for Na2I2; anchor NaI_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: I
-  carrier: NaI
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base NaI_L (condensed_liquid) anchors pure-component or direct dissociation Psat for NaI; anchor NaI_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: I
@@ -9193,13 +8255,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: In
-  carrier: In
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=parent_oxide_for_metal_gas; overlap_fraction=0.886; CEA condensed parent oxide In2O3_cr anchors liquid-oxide standard reaction for pure metal gas In; anchor In2O3_cr partial overlap_fraction=0.8860 (overlap 886 K of 1000 K); domain=[300,2186]; activity=no_gamma_for_parent:In2O3'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: In
   carrier: In2Br2
   contract: C1-C5
   reason: acquisition-pending
@@ -9232,13 +8287,6 @@ entries:
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=halide_condensed_family; related condensed halide InCL3_L (InCl3, condensed_liquid) anchors halide vapor family for In2Cl4; halide family ratio mismatch: carrier X:M=2 vs anchor InCL3_L X:M=3 — balanced dissociation requires free halogen fugacity (no runtime channel)'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: In
-  carrier: In2Cl6
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide InCL3_L (InCl3, condensed_liquid) anchors halide vapor family for In2Cl6; anchor InCL3_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: In
@@ -9284,13 +8332,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: In
-  carrier: In2O
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=catalog_self_executable; catalog already has executable row for formula In2O; gap is wiring/composition status not missing base thermo; no condensed-domain gate (catalog/self path); activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: In
   carrier: InBr
   contract: C1-C5
   reason: acquisition-pending
@@ -9312,24 +8353,10 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: In
-  carrier: InCl
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base InCL_L (condensed_liquid) anchors pure-component or direct dissociation Psat for InCl; anchor InCL_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: In
   carrier: InCl2
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=halide_condensed_family; related condensed halide InCL3_L (InCl3, condensed_liquid) anchors halide vapor family for InCl2; halide family ratio mismatch: carrier X:M=2 vs anchor InCL3_L X:M=3 — balanced dissociation requires free halogen fugacity (no runtime channel)'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: In
-  carrier: InCl3
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base InCL3_L (condensed_liquid) anchors pure-component or direct dissociation Psat for InCl3; anchor InCL3_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: In
@@ -9382,13 +8409,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: In
-  carrier: InO
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=parent_oxide_cea; overlap_fraction=0.886; CEA condensed parent oxide In2O3_cr + gas InO supports liquid-oxide standard reaction or composite exchange; anchor In2O3_cr partial overlap_fraction=0.8860 (overlap 886 K of 1000 K); domain=[300,2186]; activity=no_gamma_for_parent:In2O3'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: In
   carrier: InOH
   contract: C1-C5
   reason: acquisition-pending
@@ -9400,13 +8420,6 @@ entries:
   contract: carrier-discovery
   reason: acquisition-pending
   missing: neutral gas carrier census for newly declared feedstock element; carrier discovery pending
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: K
-  carrier: K2Br2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide KBr_L (KBr, condensed_liquid) anchors halide vapor family for K2Br2; anchor KBr_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: K
@@ -9422,20 +8435,6 @@ entries:
   reason: acquisition-pending
   missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
   filed: batch-merge-cx
-  since: '2026-08-05'
-- element: K
-  carrier: K2F2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide KF_L (KF, condensed_liquid) anchors halide vapor family for K2F2; anchor KF_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: K
-  carrier: K2I2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide KI_L (KI, condensed_liquid) anchors halide vapor family for K2I2; anchor KI_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
   since: '2026-08-05'
 - element: K
   carrier: K2O2
@@ -9466,20 +8465,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: K
-  carrier: KBO2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self_multication; multi-primary carrier has condensed CEA base KBO2_L (condensed_liquid); anchor KBO2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: K
-  carrier: KBr
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base KBr_L (condensed_liquid) anchors pure-component or direct dissociation Psat for KBr; anchor KBr_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: K
   carrier: KCN
   contract: C1-C5
   reason: acquisition-pending
@@ -9487,25 +8472,11 @@ entries:
   filed: batch-merge-cx
   since: '2026-08-05'
 - element: K
-  carrier: KF
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base KF_L (condensed_liquid) anchors pure-component or direct dissociation Psat for KF; anchor KF_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: K
   carrier: KH
   contract: C1-C5
   reason: acquisition-pending
   missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
   filed: batch-merge-cx
-  since: '2026-08-05'
-- element: K
-  carrier: KI
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base KI_L (condensed_liquid) anchors pure-component or direct dissociation Psat for KI; anchor KI_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
   since: '2026-08-05'
 - element: K
   carrier: KLi
@@ -9543,14 +8514,6 @@ entries:
   filed: tddharness-seed
   since: '2026-08-04'
 - element: K
-  carrier: KOH
-  contract: C1-C5
-  reason: acquisition-pending
-  disposition: NEEDS-BASE
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base KOH_L (condensed_liquid) anchors pure-component or direct dissociation Psat for KOH; anchor KOH_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc4b-wave1
-  since: '2026-08-05'
-- element: K
   carrier: RbK
   contract: C1-C5
   reason: acquisition-pending
@@ -9579,31 +8542,10 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Li
-  carrier: Li
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=parent_oxide_for_metal_gas; overlap_fraction=0.574; CEA condensed parent oxide Li2O_L anchors liquid-oxide standard reaction for pure metal gas Li; anchor Li2O_L partial overlap_fraction=0.5740 (overlap 574 K of 1000 K); domain=[1726,6000]; activity=no_gamma_for_parent:Li2O'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Li
-  carrier: Li2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=parent_oxide_for_metal_gas; overlap_fraction=0.574; CEA condensed parent oxide Li2O_L anchors liquid-oxide standard reaction for pure metal gas Li2; anchor Li2O_L partial overlap_fraction=0.5740 (overlap 574 K of 1000 K); domain=[1726,6000]; activity=no_gamma_for_parent:Li2O'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Li
   carrier: Li2Br2
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=parent_oxide_x_halogen_exchange; CEA parent oxide Li2O_L + halogen gas enables standard-reaction/exchange composition of Li2Br2; pathway=parent_oxide_x_halogen_exchange introduces non-O2 gas participants; runtime accepts only source_activity + pO2_bar'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Li
-  carrier: Li2Cl2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide LiCL_L (LiCl, condensed_liquid) anchors halide vapor family for Li2Cl2; anchor LiCL_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Li
@@ -9621,13 +8563,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Li
-  carrier: Li2O
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=pure_condensed_self; overlap_fraction=0.574; CEA condensed base Li2O_L (condensed_liquid) anchors pure-component or direct dissociation Psat for Li2O; anchor Li2O_L partial overlap_fraction=0.5740 (overlap 574 K of 1000 K); domain=[1726,6000]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Li
   carrier: Li2O2
   contract: C1-C5
   reason: acquisition-pending
@@ -9642,24 +8577,10 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Li
-  carrier: Li2SO4
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base Li2SO4_L (condensed_liquid) anchors pure-component or direct dissociation Psat for Li2SO4; anchor Li2SO4_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Li
   carrier: Li3Br3
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=parent_oxide_x_halogen_exchange; CEA parent oxide Li2O_L + halogen gas enables standard-reaction/exchange composition of Li3Br3; pathway=parent_oxide_x_halogen_exchange introduces non-O2 gas participants; runtime accepts only source_activity + pO2_bar'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Li
-  carrier: Li3Cl3
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide LiCL_L (LiCl, condensed_liquid) anchors halide vapor family for Li3Cl3; anchor LiCL_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Li
@@ -9684,13 +8605,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Li
-  carrier: LiBO2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self_multication; multi-primary carrier has condensed CEA base LiBO2_L (condensed_liquid); anchor LiBO2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Li
   carrier: LiBr
   contract: C1-C5
   reason: acquisition-pending
@@ -9698,24 +8612,10 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Li
-  carrier: LiCl
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base LiCL_L (condensed_liquid) anchors pure-component or direct dissociation Psat for LiCl; anchor LiCL_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Li
   carrier: LiF
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=parent_oxide_x_halogen_exchange; CEA parent oxide Li2O_L + halogen gas enables standard-reaction/exchange composition of LiF; pathway=parent_oxide_x_halogen_exchange introduces non-O2 gas participants; runtime accepts only source_activity + pO2_bar'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Li
-  carrier: LiH
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base LiH_L (condensed_liquid) anchors pure-component or direct dissociation Psat for LiH; anchor LiH_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Li
@@ -9733,38 +8633,10 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Li
-  carrier: LiNO2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base LiNO2_L (condensed_liquid) anchors pure-component or direct dissociation Psat for LiNO2; anchor LiNO2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Li
-  carrier: LiNO3
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base LiNO3_L (condensed_liquid) anchors pure-component or direct dissociation Psat for LiNO3; anchor LiNO3_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Li
-  carrier: LiO
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=parent_oxide_cea; overlap_fraction=0.574; CEA condensed parent oxide Li2O_L + gas LiO supports liquid-oxide standard reaction or composite exchange; anchor Li2O_L partial overlap_fraction=0.5740 (overlap 574 K of 1000 K); domain=[1726,6000]; activity=no_gamma_for_parent:Li2O'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Li
   carrier: LiOF
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=parent_oxide_x_halogen_exchange; CEA parent oxide Li2O_L + halogen gas enables standard-reaction/exchange composition of LiOF; pathway=parent_oxide_x_halogen_exchange introduces non-O2 gas participants; runtime accepts only source_activity + pO2_bar'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Li
-  carrier: LiOH
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base LiOH_L (condensed_liquid) anchors pure-component or direct dissociation Psat for LiOH; anchor LiOH_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Li
@@ -9803,24 +8675,10 @@ entries:
   filed: tddharness-seed
   since: '2026-08-04'
 - element: Mg
-  carrier: Mg2F4
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=halide_condensed_family; overlap_fraction=0.764; related condensed halide MgF2_L (MgF2, condensed_liquid) anchors halide vapor family for Mg2F4; anchor MgF2_L partial overlap_fraction=0.7640 (overlap 764 K of 1000 K); domain=[1536,6000]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Mg
   carrier: MgBr
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=halide_condensed_family; related condensed halide MgBr2_L (MgBr2, condensed_liquid) anchors halide vapor family for MgBr; halide family ratio mismatch: carrier X:M=1 vs anchor MgBr2_L X:M=2 — balanced dissociation requires free halogen fugacity (no runtime channel)'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Mg
-  carrier: MgBr2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base MgBr2_L (condensed_liquid) anchors pure-component or direct dissociation Psat for MgBr2; anchor MgBr2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Mg
@@ -9838,13 +8696,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Mg
-  carrier: MgF2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=pure_condensed_self; overlap_fraction=0.764; CEA condensed base MgF2_L (condensed_liquid) anchors pure-component or direct dissociation Psat for MgF2; anchor MgF2_L partial overlap_fraction=0.7640 (overlap 764 K of 1000 K); domain=[1536,6000]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Mg
   carrier: MgH
   contract: C1-C5
   reason: acquisition-pending
@@ -9856,13 +8707,6 @@ entries:
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=halide_condensed_family; related condensed halide MgI2_L (MgI2, condensed_liquid) anchors halide vapor family for MgI; halide family ratio mismatch: carrier X:M=1 vs anchor MgI2_L X:M=2 — balanced dissociation requires free halogen fugacity (no runtime channel)'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Mg
-  carrier: MgI2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base MgI2_L (condensed_liquid) anchors pure-component or direct dissociation Psat for MgI2; anchor MgI2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Mg
@@ -9943,20 +8787,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Mo
-  carrier: MoO2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base MoO2_cr (condensed_solid) anchors pure-component or direct dissociation Psat for MoO2; anchor MoO2_cr covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Mo
-  carrier: MoO3
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base MoO3_L (condensed_liquid) anchors pure-component or direct dissociation Psat for MoO3; anchor MoO3_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Mo
   carrier: MoO3_cross_check
   contract: C2-C5
   reason: thermo_missing
@@ -9982,13 +8812,6 @@ entries:
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=base_x_hydrogen_exchange; element/parent/catalog base present + H2(g) enables hydride exchange composition of BH6N; pathway=base_x_hydrogen_exchange introduces non-O2 gas participants; runtime accepts only source_activity + pO2_bar'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: N
-  carrier: BN
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base BN_cr (condensed_solid) anchors pure-component or direct dissociation Psat for BN; anchor BN_cr covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: N
@@ -10069,20 +8892,6 @@ entries:
   filed: batch-merge-cx
   since: '2026-08-05'
 - element: N
-  carrier: CsNO2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base CsNO2_L (condensed_liquid) anchors pure-component or direct dissociation Psat for CsNO2; anchor CsNO2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: N
-  carrier: CsNO3
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base CsNO3_L (condensed_liquid) anchors pure-component or direct dissociation Psat for CsNO3; anchor CsNO3_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: N
   carrier: FCN
   contract: C1-C5
   reason: acquisition-pending
@@ -10160,20 +8969,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: N
-  carrier: LiNO2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base LiNO2_L (condensed_liquid) anchors pure-component or direct dissociation Psat for LiNO2; anchor LiNO2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: N
-  carrier: LiNO3
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base LiNO3_L (condensed_liquid) anchors pure-component or direct dissociation Psat for LiNO3; anchor LiNO3_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: N
   carrier: LiON
   contract: C1-C5
   reason: acquisition-pending
@@ -10202,13 +8997,6 @@ entries:
   filed: batch-merge-cx
   since: '2026-08-05'
 - element: N
-  carrier: N2F2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide NH4F_L (NH4F, condensed_liquid) anchors halide vapor family for N2F2; anchor NH4F_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: N
   carrier: N2F4
   contract: C1-C5
   reason: acquisition-pending
@@ -10235,14 +9023,6 @@ entries:
   reason: acquisition-pending
   missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
   filed: batch-merge-cx
-  since: '2026-08-05'
-- element: N
-  carrier: N2O
-  contract: C1-C5
-  reason: acquisition-pending
-  disposition: NEEDS-BASE
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=catalog_self_executable; catalog already has executable row for formula N2O; gap is wiring/composition status not missing base thermo; no condensed-domain gate (catalog/self path); activity=explicit_pure_phase_a1_contract'
-  filed: mc4b-wave1
   since: '2026-08-05'
 - element: N
   carrier: N2O3
@@ -10287,13 +9067,6 @@ entries:
   filed: batch-merge-cx
   since: '2026-08-05'
 - element: N
-  carrier: NF
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide NH4F_L (NH4F, condensed_liquid) anchors halide vapor family for NF; anchor NH4F_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: N
   carrier: NF2
   contract: C1-C5
   reason: acquisition-pending
@@ -10322,13 +9095,6 @@ entries:
   filed: batch-merge-cx
   since: '2026-08-05'
 - element: N
-  carrier: NH2F
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide NH4F_L (NH4F, condensed_liquid) anchors halide vapor family for NH2F; anchor NH4F_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: N
   carrier: NH3O
   contract: C1-C5
   reason: acquisition-pending
@@ -10346,13 +9112,6 @@ entries:
     counted by the extended manifest predicate.'
   disposition: NEEDS-BASE
 - element: N
-  carrier: NHF
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide NH4F_L (NH4F, condensed_liquid) anchors halide vapor family for NHF; anchor NH4F_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: N
   carrier: NHF2
   contract: C1-C5
   reason: acquisition-pending
@@ -10367,26 +9126,11 @@ entries:
   filed: tddharness-seed
   since: '2026-08-04'
 - element: N
-  carrier: NO2
-  contract: C1-C5
-  reason: acquisition-pending
-  disposition: NEEDS-BASE
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=catalog_self_executable; catalog already has executable row for formula NO2; gap is wiring/composition status not missing base thermo; no condensed-domain gate (catalog/self path); activity=explicit_pure_phase_a1_contract'
-  filed: mc4b-wave1
-  since: '2026-08-05'
-- element: N
   carrier: NO2Cl
   contract: C1-C5
   reason: acquisition-pending
   missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
   filed: batch-merge-cx
-  since: '2026-08-05'
-- element: N
-  carrier: NO2F
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide NH4F_L (NH4F, condensed_liquid) anchors halide vapor family for NO2F; anchor NH4F_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
   since: '2026-08-05'
 - element: N
   carrier: NO3
@@ -10396,25 +9140,11 @@ entries:
   filed: batch-merge-cx
   since: '2026-08-05'
 - element: N
-  carrier: NO3F
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide NH4F_L (NH4F, condensed_liquid) anchors halide vapor family for NO3F; anchor NH4F_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: N
   carrier: NOCl
   contract: C1-C5
   reason: acquisition-pending
   missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
   filed: batch-merge-cx
-  since: '2026-08-05'
-- element: N
-  carrier: NOF
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide NH4F_L (NH4F, condensed_liquid) anchors halide vapor family for NOF; anchor NH4F_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
   since: '2026-08-05'
 - element: N
   carrier: NOF3
@@ -10452,20 +9182,6 @@ entries:
   filed: batch-merge-cx
   since: '2026-08-05'
 - element: N
-  carrier: RbNO2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base RbNO2_L (condensed_liquid) anchors pure-component or direct dissociation Psat for RbNO2; anchor RbNO2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: N
-  carrier: RbNO3
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base RbNO3_L (condensed_liquid) anchors pure-component or direct dissociation Psat for RbNO3; anchor RbNO3_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: N
   carrier: SN
   contract: C1-C5
   reason: acquisition-pending
@@ -10487,13 +9203,6 @@ entries:
   filed: batch-merge-cx
   since: '2026-08-05'
 - element: N
-  carrier: VN
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base VN_cr (condensed_solid) anchors pure-component or direct dissociation Psat for VN; anchor VN_cr covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: N
   carrier: ZrN
   contract: C1-C5
   reason: acquisition-pending
@@ -10513,27 +9222,6 @@ entries:
   reason: acquisition-pending
   missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
   filed: batch-merge-cx
-  since: '2026-08-05'
-- element: Na
-  carrier: Na2Br2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide NaBr_L (NaBr, condensed_liquid) anchors halide vapor family for Na2Br2; anchor NaBr_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Na
-  carrier: Na2F2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide NaF_L (NaF, condensed_liquid) anchors halide vapor family for Na2F2; anchor NaF_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Na
-  carrier: Na2I2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide NaI_L (NaI, condensed_liquid) anchors halide vapor family for Na2I2; anchor NaI_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Na
   carrier: Na2O2
@@ -10564,31 +9252,10 @@ entries:
   filed: batch-merge-cx
   since: '2026-08-05'
 - element: Na
-  carrier: Na3F3
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide NaF_L (NaF, condensed_liquid) anchors halide vapor family for Na3F3; anchor NaF_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Na
   carrier: NaAlF4
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-TRIAGE-MANUAL: multi-primary carrier needs coupled reservoir / activity policy; primary=[''Al'', ''Na'']; no exact condensed formula'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Na
-  carrier: NaBO2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self_multication; multi-primary carrier has condensed CEA base NaBO2_L (condensed_liquid); anchor NaBO2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Na
-  carrier: NaBr
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base NaBr_L (condensed_liquid) anchors pure-component or direct dissociation Psat for NaBr; anchor NaBr_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Na
@@ -10599,25 +9266,11 @@ entries:
   filed: batch-merge-cx
   since: '2026-08-05'
 - element: Na
-  carrier: NaF
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base NaF_L (condensed_liquid) anchors pure-component or direct dissociation Psat for NaF; anchor NaF_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Na
   carrier: NaH
   contract: C1-C5
   reason: acquisition-pending
   missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
   filed: batch-merge-cx
-  since: '2026-08-05'
-- element: Na
-  carrier: NaI
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base NaI_L (condensed_liquid) anchors pure-component or direct dissociation Psat for NaI; anchor NaI_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Na
   carrier: NaLi
@@ -10648,14 +9301,6 @@ entries:
   filed: tddharness-seed
   since: '2026-08-04'
 - element: Na
-  carrier: NaOH
-  contract: C1-C5
-  reason: acquisition-pending
-  disposition: NEEDS-BASE
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base NaOH_L (condensed_liquid) anchors pure-component or direct dissociation Psat for NaOH; anchor NaOH_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc4b-wave1
-  since: '2026-08-05'
-- element: Na
   carrier: RbNa
   contract: C1-C5
   reason: acquisition-pending
@@ -10663,31 +9308,10 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Nb
-  carrier: Nb
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=parent_oxide_for_metal_gas; overlap_fraction=0.517; CEA condensed parent oxide Nb2O5_L anchors liquid-oxide standard reaction for pure metal gas Nb; anchor Nb2O5_L partial overlap_fraction=0.5170 (overlap 517 K of 1000 K); domain=[1783,6000]; activity=no_gamma_for_parent:Nb2O5'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Nb
   carrier: NbCl5
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=parent_oxide_x_halogen_exchange; CEA parent oxide Nb2O5_L + halogen gas enables standard-reaction/exchange composition of NbCl5; pathway=parent_oxide_x_halogen_exchange introduces non-O2 gas participants; runtime accepts only source_activity + pO2_bar'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Nb
-  carrier: NbO
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=pure_condensed_self; overlap_fraction=0.917; CEA condensed base NbO_cr (condensed_solid) anchors pure-component or direct dissociation Psat for NbO; anchor NbO_cr partial overlap_fraction=0.9170 (overlap 917 K of 1000 K); domain=[298.15,2217]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Nb
-  carrier: NbO2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base NbO2_I (condensed) anchors pure-component or direct dissociation Psat for NbO2; anchor NbO2_I covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Nb
@@ -10985,13 +9609,6 @@ entries:
   filed: batch-merge-cx
   since: '2026-08-05'
 - element: Pb
-  carrier: Pb
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=catalog_self_executable; catalog already has executable row for formula Pb; gap is wiring/composition status not missing base thermo; no condensed-domain gate (catalog/self path); activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Pb
   carrier: PbBr
   contract: C1-C5
   reason: acquisition-pending
@@ -11024,13 +9641,6 @@ entries:
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=halide_condensed_family; related condensed halide PbCL2_L (PbCl2, condensed_liquid) anchors halide vapor family for PbCl; halide family ratio mismatch: carrier X:M=1 vs anchor PbCL2_L X:M=2 — balanced dissociation requires free halogen fugacity (no runtime channel)'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Pb
-  carrier: PbCl2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base PbCL2_L (condensed_liquid) anchors pure-component or direct dissociation Psat for PbCl2; anchor PbCL2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Pb
@@ -11104,24 +9714,10 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Pb
-  carrier: PbO
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base PbO_L (condensed_liquid) anchors pure-component or direct dissociation Psat for PbO; anchor PbO_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Pb
   carrier: PbO2
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-BASE: missing condensed/reference base envelope-overlapping condensed phase for PbO2; CEA condensed base PbO2_cr (condensed_solid) anchors pure-component or direct dissociation Psat for PbO2; chosen anchor PbO2_cr domain [100,1000] K has ZERO overlap with envelope [1300.0, 2300.0]; rejected=[]'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Pb
-  carrier: PbS
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=pure_condensed_self; overlap_fraction=0.9135; CEA condensed base PbS_L (condensed_liquid) anchors pure-component or direct dissociation Psat for PbS; anchor PbS_L partial overlap_fraction=0.9135 (overlap 913.5 K of 1000 K); domain=[1386.5,6000]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Pb
@@ -11167,13 +9763,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Rb
-  carrier: Rb2Cl2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=halide_condensed_family; related condensed halide RbCL_L (RbCl, condensed_liquid) anchors halide vapor family for Rb2Cl2; anchor RbCL_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Rb
   carrier: Rb2F2
   contract: C1-C5
   reason: acquisition-pending
@@ -11188,38 +9777,10 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Rb
-  carrier: Rb2O
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base Rb2O_L (condensed_liquid) anchors pure-component or direct dissociation Psat for Rb2O; anchor Rb2O_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Rb
-  carrier: Rb2O2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base Rb2O2_L (condensed_liquid) anchors pure-component or direct dissociation Psat for Rb2O2; anchor Rb2O2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Rb
   carrier: Rb2O2H2
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=base_x_hydrogen_exchange; element/parent/catalog base present + H2(g) enables hydride exchange composition of Rb2O2H2; pathway=base_x_hydrogen_exchange introduces non-O2 gas participants; runtime accepts only source_activity + pO2_bar'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Rb
-  carrier: Rb2SO4
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=pure_condensed_self; overlap_fraction=0.957; CEA condensed base Rb2SO4_L (condensed_liquid) anchors pure-component or direct dissociation Psat for Rb2SO4; anchor Rb2SO4_L partial overlap_fraction=0.9570 (overlap 957 K of 1000 K); domain=[1343,6000]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Rb
-  carrier: RbBO2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self_multication; multi-primary carrier has condensed CEA base RbBO2_L (condensed_liquid); anchor RbBO2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Rb
@@ -11230,24 +9791,10 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Rb
-  carrier: RbCl
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base RbCL_L (condensed_liquid) anchors pure-component or direct dissociation Psat for RbCl; anchor RbCL_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Rb
   carrier: RbF
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=parent_oxide_x_halogen_exchange; CEA parent oxide Rb2O_L + halogen gas enables standard-reaction/exchange composition of RbF; pathway=parent_oxide_x_halogen_exchange introduces non-O2 gas participants; runtime accepts only source_activity + pO2_bar'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Rb
-  carrier: RbH
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base RbH_L (condensed_liquid) anchors pure-component or direct dissociation Psat for RbH; anchor RbH_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Rb
@@ -11272,20 +9819,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Rb
-  carrier: RbNO2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base RbNO2_L (condensed_liquid) anchors pure-component or direct dissociation Psat for RbNO2; anchor RbNO2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Rb
-  carrier: RbNO3
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base RbNO3_L (condensed_liquid) anchors pure-component or direct dissociation Psat for RbNO3; anchor RbNO3_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Rb
   carrier: RbNa
   contract: C1-C5
   reason: acquisition-pending
@@ -11297,13 +9830,6 @@ entries:
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-ACTIVITY: missing activity component activity component for Rb2O (not in 9-entry oxide gamma table; no pure-phase a=1 contract); pathway=parent_oxide_cea; CEA condensed parent oxide Rb2O_L + gas RbO supports liquid-oxide standard reaction or composite exchange; anchor Rb2O_L covers full envelope but activity unresolved (no_gamma_for_parent:Rb2O)'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Rb
-  carrier: RbOH
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base RbOH_L (condensed_liquid) anchors pure-component or direct dissociation Psat for RbOH; anchor RbOH_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: S
@@ -11349,13 +9875,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: S
-  carrier: B2S3
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base B2S3_L (condensed_liquid) anchors pure-component or direct dissociation Psat for B2S3; anchor B2S3_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: S
   carrier: BS
   contract: C1-C5
   reason: acquisition-pending
@@ -11367,13 +9886,6 @@ entries:
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=related_binary_condensed; related condensed B2O3_L (B2O3) anchors BS2; related_binary B2O3_L (B2O3) ≠ carrier BS2: dissociation/exchange needs ligand fugacity channel for [''S'']'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: S
-  carrier: BaS
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base BaS_cr (condensed_solid) anchors pure-component or direct dissociation Psat for BaS; anchor BaS_cr covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: S
@@ -11412,31 +9924,10 @@ entries:
   filed: batch-merge-cx
   since: '2026-08-05'
 - element: S
-  carrier: Cs2SO4
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base Cs2SO4_L (condensed_liquid) anchors pure-component or direct dissociation Psat for Cs2SO4; anchor Cs2SO4_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: S
   carrier: F2S2
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=catalog_base_x_halogen_exchange; catalog base(s) [''S_total''] + halogen gas(es) [''F''] enable composite exchange composition of F2S2; pathway=catalog_base_x_halogen_exchange introduces non-O2 gas participants; runtime accepts only source_activity + pO2_bar'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: S
-  carrier: GeS
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base GeS_L (condensed_liquid) anchors pure-component or direct dissociation Psat for GeS; anchor GeS_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: S
-  carrier: GeS2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base GeS2_L (condensed_liquid) anchors pure-component or direct dissociation Psat for GeS2; anchor GeS2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: S
@@ -11468,13 +9959,6 @@ entries:
   filed: batch-merge-cx
   since: '2026-08-05'
 - element: S
-  carrier: Li2SO4
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base Li2SO4_L (condensed_liquid) anchors pure-component or direct dissociation Psat for Li2SO4; anchor Li2SO4_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: S
   carrier: MgS
   contract: C1-C5
   reason: acquisition-pending
@@ -11503,24 +9987,10 @@ entries:
   filed: batch-merge-cx
   since: '2026-08-05'
 - element: S
-  carrier: PbS
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=pure_condensed_self; overlap_fraction=0.9135; CEA condensed base PbS_L (condensed_liquid) anchors pure-component or direct dissociation Psat for PbS; anchor PbS_L partial overlap_fraction=0.9135 (overlap 913.5 K of 1000 K); domain=[1386.5,6000]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: S
   carrier: PbS2
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=related_binary_condensed; related condensed PbO_L (PbO) anchors PbS2; related_binary PbO_L (PbO) ≠ carrier PbS2: dissociation/exchange needs ligand fugacity channel for [''S'']'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: S
-  carrier: Rb2SO4
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=pure_condensed_self; overlap_fraction=0.957; CEA condensed base Rb2SO4_L (condensed_liquid) anchors pure-component or direct dissociation Psat for Rb2SO4; anchor Rb2SO4_L partial overlap_fraction=0.9570 (overlap 957 K of 1000 K); domain=[1343,6000]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: S
@@ -11699,14 +10169,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: S
-  carrier: SO3
-  contract: C1-C5
-  reason: acquisition-pending
-  disposition: NEEDS-BASE
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=catalog_self_executable; catalog already has executable row for formula SO3; gap is wiring/composition status not missing base thermo; no condensed-domain gate (catalog/self path); activity=explicit_pure_phase_a1_contract'
-  filed: mc4b-wave1
-  since: '2026-08-05'
-- element: S
   carrier: SOF2
   contract: C1-C5
   reason: acquisition-pending
@@ -11735,24 +10197,10 @@ entries:
   filed: batch-merge-cx
   since: '2026-08-05'
 - element: S
-  carrier: SnS
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base SnS_L (condensed_liquid) anchors pure-component or direct dissociation Psat for SnS; anchor SnS_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: S
   carrier: SnS2
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-BASE: missing condensed/reference base envelope-overlapping condensed phase for SnS2; CEA condensed base SnS2_cr (condensed_solid) anchors pure-component or direct dissociation Psat for SnS2; chosen anchor SnS2_cr domain [100,1143] K has ZERO overlap with envelope [1300.0, 2300.0]; rejected=[]'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: S
-  carrier: SrS
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base SrS_cr (condensed_solid) anchors pure-component or direct dissociation Psat for SrS; anchor SrS_cr covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Sb
@@ -12099,20 +10547,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Sn
-  carrier: Sn
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=parent_oxide_for_metal_gas; overlap_fraction=0.603; CEA condensed parent oxide SnO2_cr anchors liquid-oxide standard reaction for pure metal gas Sn; anchor SnO2_cr partial overlap_fraction=0.6030 (overlap 603 K of 1000 K); domain=[100,1903]; activity=no_gamma_for_parent:SnO2'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Sn
-  carrier: Sn2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=parent_oxide_for_metal_gas; overlap_fraction=0.603; CEA condensed parent oxide SnO2_cr anchors liquid-oxide standard reaction for pure metal gas Sn2; anchor SnO2_cr partial overlap_fraction=0.6030 (overlap 603 K of 1000 K); domain=[100,1903]; activity=no_gamma_for_parent:SnO2'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Sn
   carrier: SnBr
   contract: C1-C5
   reason: acquisition-pending
@@ -12148,24 +10582,10 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Sn
-  carrier: SnCl2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base SnCL2_L (condensed_liquid) anchors pure-component or direct dissociation Psat for SnCl2; anchor SnCL2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Sn
   carrier: SnCl3
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=halide_condensed_family; related condensed halide SnCL2_L (SnCl2, condensed_liquid) anchors halide vapor family for SnCl3; halide family ratio mismatch: carrier X:M=3 vs anchor SnCL2_L X:M=2 — balanced dissociation requires free halogen fugacity (no runtime channel)'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Sn
-  carrier: SnCl4
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base SnCL4_L (condensed_liquid) anchors pure-component or direct dissociation Psat for SnCl4; anchor SnCL4_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Sn
@@ -12225,27 +10645,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Sn
-  carrier: SnO
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base SnO_L (condensed_liquid) anchors pure-component or direct dissociation Psat for SnO; anchor SnO_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Sn
-  carrier: SnO2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=pure_condensed_self; overlap_fraction=0.603; CEA condensed base SnO2_cr (condensed_solid) anchors pure-component or direct dissociation Psat for SnO2; anchor SnO2_cr partial overlap_fraction=0.6030 (overlap 603 K of 1000 K); domain=[100,1903]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Sn
-  carrier: SnS
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base SnS_L (condensed_liquid) anchors pure-component or direct dissociation Psat for SnS; anchor SnS_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Sn
   carrier: SnS2
   contract: C1-C5
   reason: acquisition-pending
@@ -12288,13 +10687,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Sr
-  carrier: SrCl2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base SrCL2_L (condensed_liquid) anchors pure-component or direct dissociation Psat for SrCl2; anchor SrCL2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Sr
   carrier: SrF
   contract: C1-C5
   reason: acquisition-pending
@@ -12330,31 +10722,10 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Sr
-  carrier: SrO
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base SrO_cr (condensed_solid) anchors pure-component or direct dissociation Psat for SrO; anchor SrO_cr covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Sr
-  carrier: SrO2H2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base Sr_OH2_L (condensed_liquid) anchors pure-component or direct dissociation Psat for SrO2H2; anchor Sr_OH2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Sr
   carrier: SrOH
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=base_x_hydrogen_exchange; element/parent/catalog base present + H2(g) enables hydride exchange composition of SrOH; pathway=base_x_hydrogen_exchange introduces non-O2 gas participants; runtime accepts only source_activity + pO2_bar'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: Sr
-  carrier: SrS
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base SrS_cr (condensed_solid) anchors pure-component or direct dissociation Psat for SrS; anchor SrS_cr covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Tb
@@ -12484,13 +10855,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: U
-  carrier: UO2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base UO2_cr (condensed_solid) anchors pure-component or direct dissociation Psat for UO2; anchor UO2_cr covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: U
   carrier: UO2F
   contract: C1-C5
   reason: acquisition-pending
@@ -12498,31 +10862,10 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: U
-  carrier: UO2F2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=pure_condensed_self; overlap_fraction=0.8; CEA condensed base UO2F2_cr (condensed_solid) anchors pure-component or direct dissociation Psat for UO2F2; anchor UO2F2_cr partial overlap_fraction=0.8000 (overlap 800 K of 1000 K); domain=[300,2100]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: U
-  carrier: UO3
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base UO3_c (condensed_solid) anchors pure-component or direct dissociation Psat for UO3; anchor UO3_c covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: U
   carrier: UOF
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; pathway=halide_condensed_family; related condensed halide UO2F2_cr (UO2F2, condensed_solid) anchors halide vapor family for UOF; halide family ratio mismatch: carrier X:M=1 vs anchor UO2F2_cr X:M=2 — balanced dissociation requires free halogen fugacity (no runtime channel)'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: U
-  carrier: UOF2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=halide_condensed_family; overlap_fraction=0.8; related condensed halide UO2F2_cr (UO2F2, condensed_solid) anchors halide vapor family for UOF2; anchor UO2F2_cr partial overlap_fraction=0.8000 (overlap 800 K of 1000 K); domain=[300,2100]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: U
@@ -12561,20 +10904,6 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: V
-  carrier: VN
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base VN_cr (condensed_solid) anchors pure-component or direct dissociation Psat for VN; anchor VN_cr covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: V
-  carrier: VO
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=pure_condensed_self; overlap_fraction=0.763; CEA condensed base VO_cr (condensed_solid) anchors pure-component or direct dissociation Psat for VO; anchor VO_cr partial overlap_fraction=0.7630 (overlap 763 K of 1000 K); domain=[300,2063]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: V
   carrier: VO2
   contract: C1-C5
   reason: acquisition-pending
@@ -12582,80 +10911,10 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: W
-  carrier: W
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=parent_oxide_for_metal_gas; overlap_fraction=0.553; CEA condensed parent oxide WO3_L anchors liquid-oxide standard reaction for pure metal gas W; anchor WO3_L partial overlap_fraction=0.5530 (overlap 553 K of 1000 K); domain=[1747,6000]; activity=no_gamma_for_parent:WO3'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: W
-  carrier: W2O6
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=parent_oxide_cea; overlap_fraction=0.553; CEA condensed parent oxide WO3_L + gas W2O6 supports liquid-oxide standard reaction or composite exchange; anchor WO3_L partial overlap_fraction=0.5530 (overlap 553 K of 1000 K); domain=[1747,6000]; activity=no_gamma_for_parent:WO3'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: W
-  carrier: W3O9
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=parent_oxide_cea; overlap_fraction=0.553; CEA condensed parent oxide WO3_L + gas W3O9 supports liquid-oxide standard reaction or composite exchange; anchor WO3_L partial overlap_fraction=0.5530 (overlap 553 K of 1000 K); domain=[1747,6000]; activity=no_gamma_for_parent:WO3'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: W
-  carrier: W4O12
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=parent_oxide_cea; overlap_fraction=0.553; CEA condensed parent oxide WO3_L + gas W4O12 supports liquid-oxide standard reaction or composite exchange; anchor WO3_L partial overlap_fraction=0.5530 (overlap 553 K of 1000 K); domain=[1747,6000]; activity=no_gamma_for_parent:WO3'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: W
-  carrier: W5O15
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=parent_oxide_cea; overlap_fraction=0.553; CEA condensed parent oxide WO3_L + gas W5O15 supports liquid-oxide standard reaction or composite exchange; anchor WO3_L partial overlap_fraction=0.5530 (overlap 553 K of 1000 K); domain=[1747,6000]; activity=no_gamma_for_parent:WO3'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: W
-  carrier: WCl6
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base WCL6_L (condensed_liquid) anchors pure-component or direct dissociation Psat for WCl6; anchor WCL6_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: W
-  carrier: WO
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=parent_oxide_cea; overlap_fraction=0.553; CEA condensed parent oxide WO3_L + gas WO supports liquid-oxide standard reaction or composite exchange; anchor WO3_L partial overlap_fraction=0.5530 (overlap 553 K of 1000 K); domain=[1747,6000]; activity=no_gamma_for_parent:WO3'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: W
-  carrier: WO2
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base WO2_cr (condensed_solid) anchors pure-component or direct dissociation Psat for WO2; anchor WO2_cr covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: W
   carrier: WO2Cl2
   contract: C1-C5
   reason: acquisition-pending
   missing: 'NEEDS-BASE: missing condensed/reference base envelope-overlapping condensed phase for WO2Cl2; CEA condensed base WO2CL2_cr (condensed_solid) anchors pure-component or direct dissociation Psat for WO2Cl2; chosen anchor WO2CL2_cr domain [298.15,1000] K has ZERO overlap with envelope [1300.0, 2300.0]; rejected=[]'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: W
-  carrier: WO3
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-CLIPPED: gas thermo present; pathway=pure_condensed_self; overlap_fraction=0.553; CEA condensed base WO3_L (condensed_liquid) anchors pure-component or direct dissociation Psat for WO3; anchor WO3_L partial overlap_fraction=0.5530 (overlap 553 K of 1000 K); domain=[1747,6000]; activity=explicit_pure_phase_a1_contract'
-  filed: mc1-wire-cx
-  since: '2026-08-05'
-- element: W
-  carrier: WOCl4
-  contract: C1-C5
-  reason: acquisition-pending
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base WOCL4_L (condensed_liquid) anchors pure-component or direct dissociation Psat for WOCl4; anchor WOCL4_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: Y
@@ -12824,16 +11083,6 @@ entries:
   since: '2026-08-04'
   note: '2026-08-05 MC-4 integration: C1-C4 structural contracts satisfied by the wave-1 composition;
     C5 remains — Stage-0 committed-credit proof pending (wave-1B standard).'
-- element: Cl
-  carrier: MgCl2
-  contract: C5
-  reason: acquisition-pending
-  disposition: NEEDS-BASE
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base MgCL2_L (condensed_liquid) anchors pure-component or direct dissociation Psat for MgCl2; anchor MgCL2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc4b-wave1-review
-  since: '2026-08-05'
-  note: '2026-08-05 MC-4 integration: C1-C4 structural contracts satisfied by the wave-1 composition;
-    C5 remains — Stage-0 committed-credit proof pending (wave-1B standard).'
 - element: H
   carrier: C2H5OH
   contract: C5
@@ -12915,16 +11164,6 @@ entries:
   since: '2026-08-05'
   note: '2026-08-05 MC-4 integration: C1-C4 structural contracts satisfied by the wave-1 composition;
     C5 remains — Stage-0 committed-credit proof pending (wave-1B standard).'
-- element: Mg
-  carrier: MgCl2
-  contract: C5
-  reason: acquisition-pending
-  disposition: NEEDS-BASE
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=pure_condensed_self; CEA condensed base MgCL2_L (condensed_liquid) anchors pure-component or direct dissociation Psat for MgCl2; anchor MgCL2_L covers full envelope [1300.0, 2300.0]; activity=explicit_pure_phase_a1_contract'
-  filed: mc4b-wave1-review
-  since: '2026-08-05'
-  note: '2026-08-05 MC-4 integration: C1-C4 structural contracts satisfied by the wave-1 composition;
-    C5 remains — Stage-0 committed-credit proof pending (wave-1B standard).'
 - element: N
   carrier: HCN
   contract: C5
@@ -12961,16 +11200,6 @@ entries:
   reason: acquisition-pending
   disposition: NEEDS-BASE
   missing: 'NEEDS-TRIAGE-MANUAL: multi-primary carrier needs coupled reservoir / activity policy; primary=[''C'', ''S'']; no exact condensed formula'
-  filed: mc4b-wave1
-  since: '2026-08-05'
-  note: '2026-08-05 MC-4 integration: C1-C4 structural contracts satisfied by the wave-1 composition;
-    C5 remains — Stage-0 committed-credit proof pending (wave-1B standard).'
-- element: S
-  carrier: H2S
-  contract: C5
-  reason: acquisition-pending
-  disposition: NEEDS-BASE
-  missing: 'COMPOSABLE-NOW-STRICT: gas thermo present; pathway=catalog_self_executable; catalog already has executable row for formula H2S; gap is wiring/composition status not missing base thermo; no condensed-domain gate (catalog/self path); activity=explicit_pure_phase_a1_contract'
   filed: mc4b-wave1
   since: '2026-08-05'
   note: '2026-08-05 MC-4 integration: C1-C4 structural contracts satisfied by the wave-1 composition;

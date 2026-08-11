@@ -6,7 +6,7 @@ counts:
   elements: 69
   carriers: 955
   pairs: 1872
-  catalog_linked_pairs: 116
+  catalog_linked_pairs: 347
 provenance:
   feedstocks: data/feedstocks.yaml
   nasa_cea_extract: data/literature/extracts/nasa-cea-thermo.yaml
@@ -1119,10 +1119,14 @@ pairs:
     Br: 6.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:AL2Br6
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Al2Br6
+  catalog_family_ids:
+  - t583_status_al2br6_family
+  catalog_species_ids:
+  - Al2Br6
   thermo_available: true
 - element: Al
   carrier: Al2C2
@@ -1158,10 +1162,14 @@ pairs:
     F: 6.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:AL2F6
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Al2F6
+  catalog_family_ids:
+  - t583_status_al2f6_family
+  catalog_species_ids:
+  - Al2F6
   thermo_available: true
 - element: Al
   carrier: Al2I6
@@ -1171,10 +1179,14 @@ pairs:
     I: 6.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:AL2I6
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Al2I6
+  catalog_family_ids:
+  - t583_status_al2i6_family
+  catalog_species_ids:
+  - Al2I6
   thermo_available: true
 - element: Al
   carrier: Al2O
@@ -1289,10 +1301,14 @@ pairs:
     Br: 3.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:ALBr3
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:AlBr3
+  catalog_family_ids:
+  - t583_status_albr3_family
+  catalog_species_ids:
+  - AlBr3
   thermo_available: true
 - element: Al
   carrier: AlC
@@ -1394,10 +1410,14 @@ pairs:
     F: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:ALF2CL
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:AlF2Cl
+  catalog_family_ids:
+  - t583_status_alf2cl_family
+  catalog_species_ids:
+  - AlF2Cl
   thermo_available: true
 - element: Al
   carrier: AlF3
@@ -1407,10 +1427,14 @@ pairs:
     F: 3.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:ALF3
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:AlF3
+  catalog_family_ids:
+  - t583_status_alf3_family
+  catalog_species_ids:
+  - AlF3
   thermo_available: true
 - element: Al
   carrier: AlFCl
@@ -1435,10 +1459,14 @@ pairs:
     F: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:ALFCL2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:AlFCl2
+  catalog_family_ids:
+  - t583_status_alfcl2_family
+  catalog_species_ids:
+  - AlFCl2
   thermo_available: true
 - element: Al
   carrier: AlH
@@ -1612,10 +1640,14 @@ pairs:
     I: 3.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:ALI3
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:AlI3
+  catalog_family_ids:
+  - t583_status_ali3_family
+  catalog_species_ids:
+  - AlI3
   thermo_available: true
 - element: Al
   carrier: AlN
@@ -2115,10 +2147,14 @@ pairs:
     O: 3.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:B2O3
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:B2O3
+  catalog_family_ids:
+  - t583_status_b2o3_family
+  catalog_species_ids:
+  - B2O3
   thermo_available: true
 - element: B
   carrier: B2O4H4
@@ -2168,10 +2204,14 @@ pairs:
     S: 3.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:B2S3
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:B2S3
+  catalog_family_ids:
+  - t583_status_b2s3_family
+  catalog_species_ids:
+  - B2S3
   thermo_available: true
 - element: B
   carrier: B3H7
@@ -2824,10 +2864,14 @@ pairs:
     N: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:BN
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:BN
+  catalog_family_ids:
+  - t583_status_bn_family
+  catalog_species_ids:
+  - BN
   thermo_available: true
 - element: B
   carrier: BO
@@ -2974,10 +3018,14 @@ pairs:
     O: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:CsBO2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:CsBO2
+  catalog_family_ids:
+  - t583_status_csbo2_family
+  catalog_species_ids:
+  - CsBO2
   thermo_available: true
 - element: B
   carrier: H2BO
@@ -3058,10 +3106,14 @@ pairs:
     O: 3.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:H3BO3
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:H3BO3
+  catalog_family_ids:
+  - t583_status_h3bo3_family
+  catalog_species_ids:
+  - H3BO3
   thermo_available: true
 - element: B
   carrier: HBO
@@ -3086,10 +3138,14 @@ pairs:
     O: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:HBO2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:HBO2
+  catalog_family_ids:
+  - t583_status_hbo2_family
+  catalog_species_ids:
+  - HBO2
   thermo_available: true
 - element: B
   carrier: HBS
@@ -3114,10 +3170,14 @@ pairs:
     O: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:KBO2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:KBO2
+  catalog_family_ids:
+  - t583_status_kbo2_family
+  catalog_species_ids:
+  - KBO2
   thermo_available: true
 - element: B
   carrier: LiBO2
@@ -3128,10 +3188,14 @@ pairs:
     O: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:LiBO2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:LiBO2
+  catalog_family_ids:
+  - t583_status_libo2_family
+  catalog_species_ids:
+  - LiBO2
   thermo_available: true
 - element: B
   carrier: NaBO2
@@ -3142,10 +3206,14 @@ pairs:
     O: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:NaBO2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:NaBO2
+  catalog_family_ids:
+  - t583_status_nabo2_family
+  catalog_species_ids:
+  - NaBO2
   thermo_available: true
 - element: B
   carrier: RbBO2
@@ -3156,10 +3224,14 @@ pairs:
     Rb: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:RbBO2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:RbBO2
+  catalog_family_ids:
+  - t583_status_rbbo2_family
+  catalog_species_ids:
+  - RbBO2
   thermo_available: true
 - element: Ba
   carrier: Ba
@@ -3168,10 +3240,14 @@ pairs:
     Ba: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Ba
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Ba
+  catalog_family_ids:
+  - t583_status_ba_family
+  catalog_species_ids:
+  - Ba
   thermo_available: true
 - element: Ba
   carrier: Ba2
@@ -3180,10 +3256,14 @@ pairs:
     Ba: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Ba2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Ba2
+  catalog_family_ids:
+  - t583_status_ba2_family
+  catalog_species_ids:
+  - Ba2
   thermo_available: true
 - element: Ba
   carrier: BaBr
@@ -3232,10 +3312,14 @@ pairs:
     Cl: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:BaCL2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:BaCl2
+  catalog_family_ids:
+  - t583_status_bacl2_family
+  catalog_species_ids:
+  - BaCl2
   thermo_available: true
 - element: Ba
   carrier: BaF
@@ -3311,11 +3395,15 @@ pairs:
   sources:
   - janaf_4th_extract
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - janaf_4th_extract:BaO
   - nasa_cea_extract:BaO
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:BaO
+  catalog_family_ids:
+  - t583_status_bao_family
+  catalog_species_ids:
+  - BaO
   thermo_available: true
 - element: Ba
   carrier: BaO2H2
@@ -3326,10 +3414,14 @@ pairs:
     O: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Ba(OH)2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:BaO2H2
+  catalog_family_ids:
+  - t583_status_bao2h2_family
+  catalog_species_ids:
+  - BaO2H2
   thermo_available: true
 - element: Ba
   carrier: BaOH
@@ -3353,10 +3445,14 @@ pairs:
     S: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:BaS
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:BaS
+  catalog_family_ids:
+  - t583_status_bas_family
+  catalog_species_ids:
+  - BaS
   thermo_available: true
 - element: Bi
   carrier: Bi
@@ -3395,10 +3491,14 @@ pairs:
     Br: 6.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:AL2Br6
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Al2Br6
+  catalog_family_ids:
+  - t583_status_al2br6_family
+  catalog_species_ids:
+  - Al2Br6
   thermo_available: true
 - element: Br
   carrier: AlBr
@@ -3434,10 +3534,14 @@ pairs:
     Br: 3.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:ALBr3
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:AlBr3
+  catalog_family_ids:
+  - t583_status_albr3_family
+  catalog_species_ids:
+  - AlBr3
   thermo_available: true
 - element: Br
   carrier: BBr
@@ -4017,10 +4121,14 @@ pairs:
     Ca: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:CaBr2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:CaBr2
+  catalog_family_ids:
+  - t583_status_cabr2_family
+  catalog_species_ids:
+  - CaBr2
   thermo_available: true
 - element: Br
   carrier: Cs2Br2
@@ -4281,10 +4389,14 @@ pairs:
     K: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:K2Br2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:K2Br2
+  catalog_family_ids:
+  - t583_status_k2br2_family
+  catalog_species_ids:
+  - K2Br2
   thermo_available: true
 - element: Br
   carrier: KBr
@@ -4294,10 +4406,14 @@ pairs:
     K: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:KBr
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:KBr
+  catalog_family_ids:
+  - t583_status_kbr_family
+  catalog_species_ids:
+  - KBr
   thermo_available: true
 - element: Br
   carrier: Li2Br2
@@ -4359,10 +4475,14 @@ pairs:
     Mg: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:MgBr2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:MgBr2
+  catalog_family_ids:
+  - t583_status_mgbr2_family
+  catalog_species_ids:
+  - MgBr2
   thermo_available: true
 - element: Br
   carrier: Na2Br2
@@ -4372,10 +4492,14 @@ pairs:
     Na: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Na2Br2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Na2Br2
+  catalog_family_ids:
+  - t583_status_na2br2_family
+  catalog_species_ids:
+  - Na2Br2
   thermo_available: true
 - element: Br
   carrier: NaBr
@@ -4385,10 +4509,14 @@ pairs:
     Na: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:NaBr
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:NaBr
+  catalog_family_ids:
+  - t583_status_nabr_family
+  catalog_species_ids:
+  - NaBr
   thermo_available: true
 - element: Br
   carrier: PbBr
@@ -7300,10 +7428,14 @@ pairs:
     O: 3.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Cs2CO3
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Cs2CO3
+  catalog_family_ids:
+  - t583_status_cs2co3_family
+  catalog_species_ids:
+  - Cs2CO3
   thermo_available: true
 - element: C
   carrier: FCN
@@ -7693,10 +7825,14 @@ pairs:
     Ca: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:CaBr2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:CaBr2
+  catalog_family_ids:
+  - t583_status_cabr2_family
+  catalog_species_ids:
+  - CaBr2
   thermo_available: true
 - element: Ca
   carrier: CaCl
@@ -7749,10 +7885,14 @@ pairs:
     F: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:CaF2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:CaF2
+  catalog_family_ids:
+  - t583_status_caf2_family
+  catalog_species_ids:
+  - CaF2
   thermo_available: true
 - element: Ca
   carrier: CaH
@@ -7788,10 +7928,14 @@ pairs:
     I: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:CaI2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:CaI2
+  catalog_family_ids:
+  - t583_status_cai2_family
+  catalog_species_ids:
+  - CaI2
   thermo_available: true
 - element: Ca
   carrier: CaO2H2
@@ -7924,10 +8068,14 @@ pairs:
     F: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:ALF2CL
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:AlF2Cl
+  catalog_family_ids:
+  - t583_status_alf2cl_family
+  catalog_species_ids:
+  - AlF2Cl
   thermo_available: true
 - element: Cl
   carrier: AlFCl
@@ -7952,10 +8100,14 @@ pairs:
     F: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:ALFCL2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:AlFCl2
+  catalog_family_ids:
+  - t583_status_alfcl2_family
+  catalog_species_ids:
+  - AlFCl2
   thermo_available: true
 - element: Cl
   carrier: AlH2Cl
@@ -8376,10 +8528,14 @@ pairs:
     Cl: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:BaCL2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:BaCl2
+  catalog_family_ids:
+  - t583_status_bacl2_family
+  catalog_species_ids:
+  - BaCl2
   thermo_available: true
 - element: Cl
   carrier: BrCl
@@ -9290,10 +9446,14 @@ pairs:
     Cs: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Cs2CL2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Cs2Cl2
+  catalog_family_ids:
+  - t583_status_cs2cl2_family
+  catalog_species_ids:
+  - Cs2Cl2
   thermo_available: true
 - element: Cl
   carrier: CsCl
@@ -9303,10 +9463,14 @@ pairs:
     Cs: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:CsCL
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:CsCl
+  catalog_family_ids:
+  - t583_status_cscl_family
+  catalog_species_ids:
+  - CsCl
   thermo_available: true
 - element: Cl
   carrier: Cu3Cl3
@@ -9329,10 +9493,14 @@ pairs:
     Cu: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:CuCL
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:CuCl
+  catalog_family_ids:
+  - t583_status_cucl_family
+  catalog_species_ids:
+  - CuCl
   thermo_available: true
 - element: Cl
   carrier: Fe2Cl4
@@ -9433,10 +9601,14 @@ pairs:
     Ga: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Ga2CL6
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Ga2Cl6
+  catalog_family_ids:
+  - t583_status_ga2cl6_family
+  catalog_species_ids:
+  - Ga2Cl6
   thermo_available: true
 - element: Cl
   carrier: GaCl
@@ -9472,10 +9644,14 @@ pairs:
     Ga: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:GaCL3
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:GaCl3
+  catalog_family_ids:
+  - t583_status_gacl3_family
+  catalog_species_ids:
+  - GaCl3
   thermo_available: true
 - element: Cl
   carrier: GeCl
@@ -9594,10 +9770,14 @@ pairs:
     In: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:In2CL6
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:In2Cl6
+  catalog_family_ids:
+  - t583_status_in2cl6_family
+  catalog_species_ids:
+  - In2Cl6
   thermo_available: true
 - element: Cl
   carrier: InCl
@@ -9607,10 +9787,14 @@ pairs:
     In: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:InCL
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:InCl
+  catalog_family_ids:
+  - t583_status_incl_family
+  catalog_species_ids:
+  - InCl
   thermo_available: true
 - element: Cl
   carrier: InCl2
@@ -9633,10 +9817,14 @@ pairs:
     In: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:InCL3
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:InCl3
+  catalog_family_ids:
+  - t583_status_incl3_family
+  catalog_species_ids:
+  - InCl3
   thermo_available: true
 - element: Cl
   carrier: K2Cl2
@@ -9684,10 +9872,14 @@ pairs:
     Li: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Li2CL2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Li2Cl2
+  catalog_family_ids:
+  - t583_status_li2cl2_family
+  catalog_species_ids:
+  - Li2Cl2
   thermo_available: true
 - element: Cl
   carrier: Li3Cl3
@@ -9697,10 +9889,14 @@ pairs:
     Li: 3.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Li3CL3
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Li3Cl3
+  catalog_family_ids:
+  - t583_status_li3cl3_family
+  catalog_species_ids:
+  - Li3Cl3
   thermo_available: true
 - element: Cl
   carrier: LiCl
@@ -9710,10 +9906,14 @@ pairs:
     Li: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:LiCL
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:LiCl
+  catalog_family_ids:
+  - t583_status_licl_family
+  catalog_species_ids:
+  - LiCl
   thermo_available: true
 - element: Cl
   carrier: Mg2Cl4
@@ -10107,10 +10307,14 @@ pairs:
     Pb: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:PbCL2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:PbCl2
+  catalog_family_ids:
+  - t583_status_pbcl2_family
+  catalog_species_ids:
+  - PbCl2
   thermo_available: true
 - element: Cl
   carrier: PbCl3
@@ -10146,10 +10350,14 @@ pairs:
     Rb: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Rb2CL2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Rb2Cl2
+  catalog_family_ids:
+  - t583_status_rb2cl2_family
+  catalog_species_ids:
+  - Rb2Cl2
   thermo_available: true
 - element: Cl
   carrier: RbCl
@@ -10159,10 +10367,14 @@ pairs:
     Rb: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:RbCL
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:RbCl
+  catalog_family_ids:
+  - t583_status_rbcl_family
+  catalog_species_ids:
+  - RbCl
   thermo_available: true
 - element: Cl
   carrier: S2Cl2
@@ -10375,10 +10587,14 @@ pairs:
     Sn: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:SnCL2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:SnCl2
+  catalog_family_ids:
+  - t583_status_sncl2_family
+  catalog_species_ids:
+  - SnCl2
   thermo_available: true
 - element: Cl
   carrier: SnCl3
@@ -10401,10 +10617,14 @@ pairs:
     Sn: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:SnCL4
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:SnCl4
+  catalog_family_ids:
+  - t583_status_sncl4_family
+  catalog_species_ids:
+  - SnCl4
   thermo_available: true
 - element: Cl
   carrier: SrCl
@@ -10427,10 +10647,14 @@ pairs:
     Sr: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:SrCL2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:SrCl2
+  catalog_family_ids:
+  - t583_status_srcl2_family
+  catalog_species_ids:
+  - SrCl2
   thermo_available: true
 - element: Cl
   carrier: TiCl
@@ -10533,10 +10757,14 @@ pairs:
     W: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:WCL6
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:WCl6
+  catalog_family_ids:
+  - t583_status_wcl6_family
+  catalog_species_ids:
+  - WCl6
   thermo_available: true
 - element: Cl
   carrier: WO2Cl2
@@ -10561,10 +10789,14 @@ pairs:
     W: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:WOCL4
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:WOCl4
+  catalog_family_ids:
+  - t583_status_wocl4_family
+  catalog_species_ids:
+  - WOCl4
   thermo_available: true
 - element: Co
   carrier: Co
@@ -10721,10 +10953,14 @@ pairs:
     O: 3.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Cs2CO3
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Cs2CO3
+  catalog_family_ids:
+  - t583_status_cs2co3_family
+  catalog_species_ids:
+  - Cs2CO3
   thermo_available: true
 - element: Cs
   carrier: Cs2Cl2
@@ -10734,10 +10970,14 @@ pairs:
     Cs: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Cs2CL2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Cs2Cl2
+  catalog_family_ids:
+  - t583_status_cs2cl2_family
+  catalog_species_ids:
+  - Cs2Cl2
   thermo_available: true
 - element: Cs
   carrier: Cs2F2
@@ -10773,10 +11013,14 @@ pairs:
     O: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Cs2O
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Cs2O
+  catalog_family_ids:
+  - t583_status_cs2o_family
+  catalog_species_ids:
+  - Cs2O
   thermo_available: true
 - element: Cs
   carrier: Cs2O2
@@ -10786,10 +11030,14 @@ pairs:
     O: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Cs2O2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Cs2O2
+  catalog_family_ids:
+  - t583_status_cs2o2_family
+  catalog_species_ids:
+  - Cs2O2
   thermo_available: true
 - element: Cs
   carrier: Cs2O2H2
@@ -10814,10 +11062,14 @@ pairs:
     S: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Cs2SO4
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Cs2SO4
+  catalog_family_ids:
+  - t583_status_cs2so4_family
+  catalog_species_ids:
+  - Cs2SO4
   thermo_available: true
 - element: Cs
   carrier: CsBO2
@@ -10828,10 +11080,14 @@ pairs:
     O: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:CsBO2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:CsBO2
+  catalog_family_ids:
+  - t583_status_csbo2_family
+  catalog_species_ids:
+  - CsBO2
   thermo_available: true
 - element: Cs
   carrier: CsBr
@@ -10854,10 +11110,14 @@ pairs:
     Cs: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:CsCL
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:CsCl
+  catalog_family_ids:
+  - t583_status_cscl_family
+  catalog_species_ids:
+  - CsCl
   thermo_available: true
 - element: Cs
   carrier: CsF
@@ -10880,10 +11140,14 @@ pairs:
     H: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:CsH
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:CsH
+  catalog_family_ids:
+  - t583_status_csh_family
+  catalog_species_ids:
+  - CsH
   thermo_available: true
 - element: Cs
   carrier: CsI
@@ -10920,10 +11184,14 @@ pairs:
     O: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:CsNO2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:CsNO2
+  catalog_family_ids:
+  - t583_status_csno2_family
+  catalog_species_ids:
+  - CsNO2
   thermo_available: true
 - element: Cs
   carrier: CsNO3
@@ -10934,10 +11202,14 @@ pairs:
     O: 3.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:CsNO3
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:CsNO3
+  catalog_family_ids:
+  - t583_status_csno3_family
+  catalog_species_ids:
+  - CsNO3
   thermo_available: true
 - element: Cs
   carrier: CsNa
@@ -10974,10 +11246,14 @@ pairs:
     O: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:CsOH
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:CsOH
+  catalog_family_ids:
+  - t583_status_csoh_family
+  catalog_species_ids:
+  - CsOH
   thermo_available: true
 - element: Cs
   carrier: CsRb
@@ -10999,10 +11275,14 @@ pairs:
     Cu: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Cu
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Cu
+  catalog_family_ids:
+  - t583_status_cu_family
+  catalog_species_ids:
+  - Cu
   thermo_available: true
 - element: Cu
   carrier: Cu2
@@ -11011,10 +11291,14 @@ pairs:
     Cu: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Cu2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Cu2
+  catalog_family_ids:
+  - t583_status_cu2_family
+  catalog_species_ids:
+  - Cu2
   thermo_available: true
 - element: Cu
   carrier: Cu3Cl3
@@ -11037,10 +11321,14 @@ pairs:
     Cu: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:CuCL
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:CuCl
+  catalog_family_ids:
+  - t583_status_cucl_family
+  catalog_species_ids:
+  - CuCl
   thermo_available: true
 - element: Cu
   carrier: CuF
@@ -11076,10 +11364,14 @@ pairs:
     O: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:CuO
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:CuO
+  catalog_family_ids:
+  - t583_status_cuo_family
+  catalog_species_ids:
+  - CuO
   thermo_available: true
 - element: Cu
   carrier: CuOH
@@ -11103,10 +11395,14 @@ pairs:
     F: 6.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:AL2F6
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Al2F6
+  catalog_family_ids:
+  - t583_status_al2f6_family
+  catalog_species_ids:
+  - Al2F6
   thermo_available: true
 - element: F
   carrier: AlF
@@ -11143,10 +11439,14 @@ pairs:
     F: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:ALF2CL
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:AlF2Cl
+  catalog_family_ids:
+  - t583_status_alf2cl_family
+  catalog_species_ids:
+  - AlF2Cl
   thermo_available: true
 - element: F
   carrier: AlF3
@@ -11156,10 +11456,14 @@ pairs:
     F: 3.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:ALF3
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:AlF3
+  catalog_family_ids:
+  - t583_status_alf3_family
+  catalog_species_ids:
+  - AlF3
   thermo_available: true
 - element: F
   carrier: AlFCl
@@ -11184,10 +11488,14 @@ pairs:
     F: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:ALFCL2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:AlFCl2
+  catalog_family_ids:
+  - t583_status_alfcl2_family
+  catalog_species_ids:
+  - AlFCl2
   thermo_available: true
 - element: F
   carrier: AlH2F
@@ -12367,10 +12675,14 @@ pairs:
     F: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:CaF2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:CaF2
+  catalog_family_ids:
+  - t583_status_caf2_family
+  catalog_species_ids:
+  - CaF2
   thermo_available: true
 - element: F
   carrier: ClF
@@ -12947,10 +13259,14 @@ pairs:
     K: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:K2F2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:K2F2
+  catalog_family_ids:
+  - t583_status_k2f2_family
+  catalog_species_ids:
+  - K2F2
   thermo_available: true
 - element: F
   carrier: KAlF4
@@ -12974,10 +13290,14 @@ pairs:
     K: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:KF
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:KF
+  catalog_family_ids:
+  - t583_status_kf_family
+  catalog_species_ids:
+  - KF
   thermo_available: true
 - element: F
   carrier: Li2F2
@@ -13054,10 +13374,14 @@ pairs:
     Mg: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Mg2F4
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Mg2F4
+  catalog_family_ids:
+  - t583_status_mg2f4_family
+  catalog_species_ids:
+  - Mg2F4
   thermo_available: true
 - element: F
   carrier: MgF
@@ -13080,10 +13404,14 @@ pairs:
     Mg: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:MgF2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:MgF2
+  catalog_family_ids:
+  - t583_status_mgf2_family
+  catalog_species_ids:
+  - MgF2
   thermo_available: true
 - element: F
   carrier: N2F2
@@ -13093,10 +13421,14 @@ pairs:
     N: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:N2F2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:N2F2
+  catalog_family_ids:
+  - t583_status_n2f2_family
+  catalog_species_ids:
+  - N2F2
   thermo_available: true
 - element: F
   carrier: N2F4
@@ -13119,10 +13451,14 @@ pairs:
     N: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:NF
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:NF
+  catalog_family_ids:
+  - t583_status_nf_family
+  catalog_species_ids:
+  - NF
   thermo_available: true
 - element: F
   carrier: NF2
@@ -13159,10 +13495,14 @@ pairs:
     N: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:NH2F
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:NH2F
+  catalog_family_ids:
+  - t583_status_nh2f_family
+  catalog_species_ids:
+  - NH2F
   thermo_available: true
 - element: F
   carrier: NHF
@@ -13173,10 +13513,14 @@ pairs:
     N: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:NHF
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:NHF
+  catalog_family_ids:
+  - t583_status_nhf_family
+  catalog_species_ids:
+  - NHF
   thermo_available: true
 - element: F
   carrier: NHF2
@@ -13201,10 +13545,14 @@ pairs:
     O: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:NO2F
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:NO2F
+  catalog_family_ids:
+  - t583_status_no2f_family
+  catalog_species_ids:
+  - NO2F
   thermo_available: true
 - element: F
   carrier: NO3F
@@ -13215,10 +13563,14 @@ pairs:
     O: 3.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:NO3F
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:NO3F
+  catalog_family_ids:
+  - t583_status_no3f_family
+  catalog_species_ids:
+  - NO3F
   thermo_available: true
 - element: F
   carrier: NOF
@@ -13229,10 +13581,14 @@ pairs:
     O: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:NOF
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:NOF
+  catalog_family_ids:
+  - t583_status_nof_family
+  catalog_species_ids:
+  - NOF
   thermo_available: true
 - element: F
   carrier: NOF3
@@ -13256,10 +13612,14 @@ pairs:
     Na: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Na2F2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Na2F2
+  catalog_family_ids:
+  - t583_status_na2f2_family
+  catalog_species_ids:
+  - Na2F2
   thermo_available: true
 - element: F
   carrier: Na3F3
@@ -13269,10 +13629,14 @@ pairs:
     Na: 3.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Na3F3
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Na3F3
+  catalog_family_ids:
+  - t583_status_na3f3_family
+  catalog_species_ids:
+  - Na3F3
   thermo_available: true
 - element: F
   carrier: NaAlF4
@@ -14027,10 +14391,14 @@ pairs:
     U: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:UO2F2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:UO2F2
+  catalog_family_ids:
+  - t583_status_uo2f2_family
+  catalog_species_ids:
+  - UO2F2
   thermo_available: true
 - element: F
   carrier: UOF
@@ -14055,10 +14423,14 @@ pairs:
     U: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:UOF2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:UOF2
+  catalog_family_ids:
+  - t583_status_uof2_family
+  catalog_species_ids:
+  - UOF2
   thermo_available: true
 - element: F
   carrier: UOF3
@@ -14213,12 +14585,16 @@ pairs:
   - janaf_4th_extract
   - kems-022-demaria-1971
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - janaf_4th_extract:FeO_gas
   - kems-022-demaria-1971:Fe
   - nasa_cea_extract:FeO
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:FeO_gas
+  catalog_family_ids:
+  - t583_status_feo_gas_family
+  catalog_species_ids:
+  - FeO_gas
   thermo_available: true
 - element: Ga
   carrier: Ga
@@ -14227,10 +14603,14 @@ pairs:
     Ga: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Ga
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Ga
+  catalog_family_ids:
+  - t583_status_ga_family
+  catalog_species_ids:
+  - Ga
   thermo_available: true
 - element: Ga
   carrier: Ga2Br2
@@ -14305,10 +14685,14 @@ pairs:
     Ga: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Ga2CL6
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Ga2Cl6
+  catalog_family_ids:
+  - t583_status_ga2cl6_family
+  catalog_species_ids:
+  - Ga2Cl6
   thermo_available: true
 - element: Ga
   carrier: Ga2F2
@@ -14396,10 +14780,14 @@ pairs:
     O: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Ga2O
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Ga2O
+  catalog_family_ids:
+  - t583_status_ga2o_family
+  catalog_species_ids:
+  - Ga2O
   thermo_available: true
 - element: Ga
   carrier: GaBr
@@ -14474,10 +14862,14 @@ pairs:
     Ga: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:GaCL3
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:GaCl3
+  catalog_family_ids:
+  - t583_status_gacl3_family
+  catalog_species_ids:
+  - GaCl3
   thermo_available: true
 - element: Ga
   carrier: GaF
@@ -14578,10 +14970,14 @@ pairs:
     O: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:GaO
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:GaO
+  catalog_family_ids:
+  - t583_status_gao_family
+  catalog_species_ids:
+  - GaO
   thermo_available: true
 - element: Ga
   carrier: GaOH
@@ -14604,10 +15000,14 @@ pairs:
     Ge: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Ge
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Ge
+  catalog_family_ids:
+  - t583_status_ge_family
+  catalog_species_ids:
+  - Ge
   thermo_available: true
 - element: Ge
   carrier: Ge2
@@ -14616,10 +15016,14 @@ pairs:
     Ge: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Ge2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Ge2
+  catalog_family_ids:
+  - t583_status_ge2_family
+  catalog_species_ids:
+  - Ge2
   thermo_available: true
 - element: Ge
   carrier: GeBr
@@ -14828,10 +15232,14 @@ pairs:
     O: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:GeO2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:GeO2
+  catalog_family_ids:
+  - t583_status_geo2_family
+  catalog_species_ids:
+  - GeO2
   thermo_available: true
 - element: Ge
   carrier: GeS
@@ -14841,10 +15249,14 @@ pairs:
     S: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:GeS
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:GeS
+  catalog_family_ids:
+  - t583_status_ges_family
+  catalog_species_ids:
+  - GeS
   thermo_available: true
 - element: Ge
   carrier: GeS2
@@ -14854,10 +15266,14 @@ pairs:
     S: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:GeS2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:GeS2
+  catalog_family_ids:
+  - t583_status_ges2_family
+  catalog_species_ids:
+  - GeS2
   thermo_available: true
 - element: H
   carrier: AlH
@@ -15636,10 +16052,14 @@ pairs:
     O: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Ba(OH)2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:BaO2H2
+  catalog_family_ids:
+  - t583_status_bao2h2_family
+  catalog_species_ids:
+  - BaO2H2
   thermo_available: true
 - element: H
   carrier: BaOH
@@ -17310,10 +17730,14 @@ pairs:
     H: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:CsH
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:CsH
+  catalog_family_ids:
+  - t583_status_csh_family
+  catalog_species_ids:
+  - CsH
   thermo_available: true
 - element: H
   carrier: CsOH
@@ -17324,10 +17748,14 @@ pairs:
     O: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:CsOH
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:CsOH
+  catalog_family_ids:
+  - t583_status_csoh_family
+  catalog_species_ids:
+  - CsOH
   thermo_available: true
 - element: H
   carrier: CuOH
@@ -17602,10 +18030,14 @@ pairs:
     O: 3.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:H3BO3
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:H3BO3
+  catalog_family_ids:
+  - t583_status_h3bo3_family
+  catalog_species_ids:
+  - H3BO3
   thermo_available: true
 - element: H
   carrier: H3F3
@@ -17723,10 +18155,14 @@ pairs:
     O: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:HBO2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:HBO2
+  catalog_family_ids:
+  - t583_status_hbo2_family
+  catalog_species_ids:
+  - HBO2
   thermo_available: true
 - element: H
   carrier: HBS
@@ -18094,10 +18530,14 @@ pairs:
     O: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:KOH
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:KOH
+  catalog_family_ids:
+  - t583_status_koh_family
+  catalog_species_ids:
+  - KOH
   thermo_available: true
 - element: H
   carrier: Li2O2H2
@@ -18121,10 +18561,14 @@ pairs:
     Li: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:LiH
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:LiH
+  catalog_family_ids:
+  - t583_status_lih_family
+  catalog_species_ids:
+  - LiH
   thermo_available: true
 - element: H
   carrier: LiOH
@@ -18135,10 +18579,14 @@ pairs:
     O: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:LiOH
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:LiOH
+  catalog_family_ids:
+  - t583_status_lioh_family
+  catalog_species_ids:
+  - LiOH
   thermo_available: true
 - element: H
   carrier: MgH
@@ -18269,10 +18717,14 @@ pairs:
     N: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:NH2F
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:NH2F
+  catalog_family_ids:
+  - t583_status_nh2f_family
+  catalog_species_ids:
+  - NH2F
   thermo_available: true
 - element: H
   carrier: NH3
@@ -18330,10 +18782,14 @@ pairs:
     N: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:NHF
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:NHF
+  catalog_family_ids:
+  - t583_status_nhf_family
+  catalog_species_ids:
+  - NHF
   thermo_available: true
 - element: H
   carrier: NHF2
@@ -18385,10 +18841,14 @@ pairs:
     O: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:NaOH
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:NaOH
+  catalog_family_ids:
+  - t583_status_naoh_family
+  catalog_species_ids:
+  - NaOH
   thermo_available: true
 - element: H
   carrier: OH
@@ -18464,10 +18924,14 @@ pairs:
     Rb: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:RbH
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:RbH
+  catalog_family_ids:
+  - t583_status_rbh_family
+  catalog_species_ids:
+  - RbH
   thermo_available: true
 - element: H
   carrier: RbOH
@@ -18478,10 +18942,14 @@ pairs:
     Rb: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:RbOH
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:RbOH
+  catalog_family_ids:
+  - t583_status_rboh_family
+  catalog_species_ids:
+  - RbOH
   thermo_available: true
 - element: H
   carrier: SH
@@ -18766,10 +19234,14 @@ pairs:
     Sr: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Sr(OH)2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:SrO2H2
+  catalog_family_ids:
+  - t583_status_sro2h2_family
+  catalog_species_ids:
+  - SrO2H2
   thermo_available: true
 - element: H
   carrier: SrOH
@@ -18793,10 +19265,14 @@ pairs:
     I: 6.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:AL2I6
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Al2I6
+  catalog_family_ids:
+  - t583_status_al2i6_family
+  catalog_species_ids:
+  - Al2I6
   thermo_available: true
 - element: I
   carrier: AlI
@@ -18832,10 +19308,14 @@ pairs:
     I: 3.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:ALI3
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:AlI3
+  catalog_family_ids:
+  - t583_status_ali3_family
+  catalog_species_ids:
+  - AlI3
   thermo_available: true
 - element: I
   carrier: BI
@@ -19017,10 +19497,14 @@ pairs:
     I: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:CaI2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:CaI2
+  catalog_family_ids:
+  - t583_status_cai2_family
+  catalog_species_ids:
+  - CaI2
   thermo_available: true
 - element: I
   carrier: Cs2I2
@@ -19296,10 +19780,14 @@ pairs:
     K: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:K2I2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:K2I2
+  catalog_family_ids:
+  - t583_status_k2i2_family
+  catalog_species_ids:
+  - K2I2
   thermo_available: true
 - element: I
   carrier: KI
@@ -19309,10 +19797,14 @@ pairs:
     K: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:KI
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:KI
+  catalog_family_ids:
+  - t583_status_ki_family
+  catalog_species_ids:
+  - KI
   thermo_available: true
 - element: I
   carrier: Li2I2
@@ -19374,10 +19866,14 @@ pairs:
     Mg: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:MgI2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:MgI2
+  catalog_family_ids:
+  - t583_status_mgi2_family
+  catalog_species_ids:
+  - MgI2
   thermo_available: true
 - element: I
   carrier: Na2I2
@@ -19387,10 +19883,14 @@ pairs:
     Na: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Na2I2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Na2I2
+  catalog_family_ids:
+  - t583_status_na2i2_family
+  catalog_species_ids:
+  - Na2I2
   thermo_available: true
 - element: I
   carrier: NaI
@@ -19400,10 +19900,14 @@ pairs:
     Na: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:NaI
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:NaI
+  catalog_family_ids:
+  - t583_status_nai_family
+  catalog_species_ids:
+  - NaI
   thermo_available: true
 - element: I
   carrier: PbI
@@ -19636,10 +20140,14 @@ pairs:
     In: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:In
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:In
+  catalog_family_ids:
+  - t583_status_in_family
+  catalog_species_ids:
+  - In
   thermo_available: true
 - element: In
   carrier: In2Br2
@@ -19714,10 +20222,14 @@ pairs:
     In: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:In2CL6
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:In2Cl6
+  catalog_family_ids:
+  - t583_status_in2cl6_family
+  catalog_species_ids:
+  - In2Cl6
   thermo_available: true
 - element: In
   carrier: In2F2
@@ -19861,10 +20373,14 @@ pairs:
     In: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:InCL
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:InCl
+  catalog_family_ids:
+  - t583_status_incl_family
+  catalog_species_ids:
+  - InCl
   thermo_available: true
 - element: In
   carrier: InCl2
@@ -19887,10 +20403,14 @@ pairs:
     In: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:InCL3
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:InCl3
+  catalog_family_ids:
+  - t583_status_incl3_family
+  catalog_species_ids:
+  - InCl3
   thermo_available: true
 - element: In
   carrier: InF
@@ -19991,10 +20511,14 @@ pairs:
     O: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:InO
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:InO
+  catalog_family_ids:
+  - t583_status_ino_family
+  catalog_species_ids:
+  - InO
   thermo_available: true
 - element: In
   carrier: InOH
@@ -20052,10 +20576,14 @@ pairs:
     K: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:K2Br2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:K2Br2
+  catalog_family_ids:
+  - t583_status_k2br2_family
+  catalog_species_ids:
+  - K2Br2
   thermo_available: true
 - element: K
   carrier: K2C2N2
@@ -20112,10 +20640,14 @@ pairs:
     K: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:K2F2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:K2F2
+  catalog_family_ids:
+  - t583_status_k2f2_family
+  catalog_species_ids:
+  - K2F2
   thermo_available: true
 - element: K
   carrier: K2I2
@@ -20125,10 +20657,14 @@ pairs:
     K: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:K2I2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:K2I2
+  catalog_family_ids:
+  - t583_status_k2i2_family
+  catalog_species_ids:
+  - K2I2
   thermo_available: true
 - element: K
   carrier: K2O2
@@ -20211,10 +20747,14 @@ pairs:
     O: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:KBO2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:KBO2
+  catalog_family_ids:
+  - t583_status_kbo2_family
+  catalog_species_ids:
+  - KBO2
   thermo_available: true
 - element: K
   carrier: KBr
@@ -20224,10 +20764,14 @@ pairs:
     K: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:KBr
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:KBr
+  catalog_family_ids:
+  - t583_status_kbr_family
+  catalog_species_ids:
+  - KBr
   thermo_available: true
 - element: K
   carrier: KCN
@@ -20270,10 +20814,14 @@ pairs:
     K: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:KF
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:KF
+  catalog_family_ids:
+  - t583_status_kf_family
+  catalog_species_ids:
+  - KF
   thermo_available: true
 - element: K
   carrier: KH
@@ -20296,10 +20844,14 @@ pairs:
     K: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:KI
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:KI
+  catalog_family_ids:
+  - t583_status_ki_family
+  catalog_species_ids:
+  - KI
   thermo_available: true
 - element: K
   carrier: KLi
@@ -20377,10 +20929,14 @@ pairs:
     O: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:KOH
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:KOH
+  catalog_family_ids:
+  - t583_status_koh_family
+  catalog_species_ids:
+  - KOH
   thermo_available: true
 - element: K
   carrier: RbK
@@ -20428,10 +20984,14 @@ pairs:
     Li: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Li
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Li
+  catalog_family_ids:
+  - t583_status_li_family
+  catalog_species_ids:
+  - Li
   thermo_available: true
 - element: Li
   carrier: Li2
@@ -20440,10 +21000,14 @@ pairs:
     Li: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Li2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Li2
+  catalog_family_ids:
+  - t583_status_li2_family
+  catalog_species_ids:
+  - Li2
   thermo_available: true
 - element: Li
   carrier: Li2Br2
@@ -20466,10 +21030,14 @@ pairs:
     Li: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Li2CL2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Li2Cl2
+  catalog_family_ids:
+  - t583_status_li2cl2_family
+  catalog_species_ids:
+  - Li2Cl2
   thermo_available: true
 - element: Li
   carrier: Li2F2
@@ -20505,10 +21073,14 @@ pairs:
     O: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Li2O
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Li2O
+  catalog_family_ids:
+  - t583_status_li2o_family
+  catalog_species_ids:
+  - Li2O
   thermo_available: true
 - element: Li
   carrier: Li2O2
@@ -20546,10 +21118,14 @@ pairs:
     S: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Li2SO4
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Li2SO4
+  catalog_family_ids:
+  - t583_status_li2so4_family
+  catalog_species_ids:
+  - Li2SO4
   thermo_available: true
 - element: Li
   carrier: Li3Br3
@@ -20572,10 +21148,14 @@ pairs:
     Li: 3.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Li3CL3
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Li3Cl3
+  catalog_family_ids:
+  - t583_status_li3cl3_family
+  catalog_species_ids:
+  - Li3Cl3
   thermo_available: true
 - element: Li
   carrier: Li3F3
@@ -20626,10 +21206,14 @@ pairs:
     O: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:LiBO2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:LiBO2
+  catalog_family_ids:
+  - t583_status_libo2_family
+  catalog_species_ids:
+  - LiBO2
   thermo_available: true
 - element: Li
   carrier: LiBr
@@ -20652,10 +21236,14 @@ pairs:
     Li: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:LiCL
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:LiCl
+  catalog_family_ids:
+  - t583_status_licl_family
+  catalog_species_ids:
+  - LiCl
   thermo_available: true
 - element: Li
   carrier: LiF
@@ -20678,10 +21266,14 @@ pairs:
     Li: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:LiH
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:LiH
+  catalog_family_ids:
+  - t583_status_lih_family
+  catalog_species_ids:
+  - LiH
   thermo_available: true
 - element: Li
   carrier: LiI
@@ -20718,10 +21310,14 @@ pairs:
     O: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:LiNO2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:LiNO2
+  catalog_family_ids:
+  - t583_status_lino2_family
+  catalog_species_ids:
+  - LiNO2
   thermo_available: true
 - element: Li
   carrier: LiNO3
@@ -20732,10 +21328,14 @@ pairs:
     O: 3.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:LiNO3
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:LiNO3
+  catalog_family_ids:
+  - t583_status_lino3_family
+  catalog_species_ids:
+  - LiNO3
   thermo_available: true
 - element: Li
   carrier: LiO
@@ -20745,10 +21345,14 @@ pairs:
     O: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:LiO
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:LiO
+  catalog_family_ids:
+  - t583_status_lio_family
+  catalog_species_ids:
+  - LiO
   thermo_available: true
 - element: Li
   carrier: LiOF
@@ -20773,10 +21377,14 @@ pairs:
     O: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:LiOH
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:LiOH
+  catalog_family_ids:
+  - t583_status_lioh_family
+  catalog_species_ids:
+  - LiOH
   thermo_available: true
 - element: Li
   carrier: LiON
@@ -20877,10 +21485,14 @@ pairs:
     Mg: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Mg2F4
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Mg2F4
+  catalog_family_ids:
+  - t583_status_mg2f4_family
+  catalog_species_ids:
+  - Mg2F4
   thermo_available: true
 - element: Mg
   carrier: MgBr
@@ -20903,10 +21515,14 @@ pairs:
     Mg: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:MgBr2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:MgBr2
+  catalog_family_ids:
+  - t583_status_mgbr2_family
+  catalog_species_ids:
+  - MgBr2
   thermo_available: true
 - element: Mg
   carrier: MgCl
@@ -20961,10 +21577,14 @@ pairs:
     Mg: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:MgF2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:MgF2
+  catalog_family_ids:
+  - t583_status_mgf2_family
+  catalog_species_ids:
+  - MgF2
   thermo_available: true
 - element: Mg
   carrier: MgH
@@ -21000,10 +21620,14 @@ pairs:
     Mg: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:MgI2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:MgI2
+  catalog_family_ids:
+  - t583_status_mgi2_family
+  catalog_species_ids:
+  - MgI2
   thermo_available: true
 - element: Mg
   carrier: MgN
@@ -21194,10 +21818,14 @@ pairs:
     O: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:MoO2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:MoO2
+  catalog_family_ids:
+  - t583_status_moo2_family
+  catalog_species_ids:
+  - MoO2
   thermo_available: true
 - element: Mo
   carrier: MoO3
@@ -21207,10 +21835,14 @@ pairs:
     O: 3.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:MoO3
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:MoO3
+  catalog_family_ids:
+  - t583_status_moo3_family
+  catalog_species_ids:
+  - MoO3
   thermo_available: true
 - element: Mo
   carrier: MoO3_cross_check
@@ -21276,10 +21908,14 @@ pairs:
     N: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:BN
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:BN
+  catalog_family_ids:
+  - t583_status_bn_family
+  catalog_species_ids:
+  - BN
   thermo_available: true
 - element: N
   carrier: C2H3N
@@ -21439,10 +22075,14 @@ pairs:
     O: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:CsNO2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:CsNO2
+  catalog_family_ids:
+  - t583_status_csno2_family
+  catalog_species_ids:
+  - CsNO2
   thermo_available: true
 - element: N
   carrier: CsNO3
@@ -21453,10 +22093,14 @@ pairs:
     O: 3.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:CsNO3
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:CsNO3
+  catalog_family_ids:
+  - t583_status_csno3_family
+  catalog_species_ids:
+  - CsNO3
   thermo_available: true
 - element: N
   carrier: FCN
@@ -21657,10 +22301,14 @@ pairs:
     O: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:LiNO2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:LiNO2
+  catalog_family_ids:
+  - t583_status_lino2_family
+  catalog_species_ids:
+  - LiNO2
   thermo_available: true
 - element: N
   carrier: LiNO3
@@ -21671,10 +22319,14 @@ pairs:
     O: 3.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:LiNO3
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:LiNO3
+  catalog_family_ids:
+  - t583_status_lino3_family
+  catalog_species_ids:
+  - LiNO3
   thermo_available: true
 - element: N
   carrier: LiON
@@ -21752,10 +22404,14 @@ pairs:
     N: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:N2F2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:N2F2
+  catalog_family_ids:
+  - t583_status_n2f2_family
+  catalog_species_ids:
+  - N2F2
   thermo_available: true
 - element: N
   carrier: N2F4
@@ -21913,10 +22569,14 @@ pairs:
     N: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:NF
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:NF
+  catalog_family_ids:
+  - t583_status_nf_family
+  catalog_species_ids:
+  - NF
   thermo_available: true
 - element: N
   carrier: NF2
@@ -21979,10 +22639,14 @@ pairs:
     N: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:NH2F
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:NH2F
+  catalog_family_ids:
+  - t583_status_nh2f_family
+  catalog_species_ids:
+  - NH2F
   thermo_available: true
 - element: N
   carrier: NH3
@@ -22040,10 +22704,14 @@ pairs:
     N: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:NHF
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:NHF
+  catalog_family_ids:
+  - t583_status_nhf_family
+  catalog_species_ids:
+  - NHF
   thermo_available: true
 - element: N
   carrier: NHF2
@@ -22116,10 +22784,14 @@ pairs:
     O: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:NO2F
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:NO2F
+  catalog_family_ids:
+  - t583_status_no2f_family
+  catalog_species_ids:
+  - NO2F
   thermo_available: true
 - element: N
   carrier: NO3
@@ -22143,10 +22815,14 @@ pairs:
     O: 3.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:NO3F
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:NO3F
+  catalog_family_ids:
+  - t583_status_no3f_family
+  catalog_species_ids:
+  - NO3F
   thermo_available: true
 - element: N
   carrier: NOCl
@@ -22171,10 +22847,14 @@ pairs:
     O: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:NOF
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:NOF
+  catalog_family_ids:
+  - t583_status_nof_family
+  catalog_species_ids:
+  - NOF
   thermo_available: true
 - element: N
   carrier: NOF3
@@ -22254,10 +22934,14 @@ pairs:
     Rb: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:RbNO2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:RbNO2
+  catalog_family_ids:
+  - t583_status_rbno2_family
+  catalog_species_ids:
+  - RbNO2
   thermo_available: true
 - element: N
   carrier: RbNO3
@@ -22268,10 +22952,14 @@ pairs:
     Rb: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:RbNO3
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:RbNO3
+  catalog_family_ids:
+  - t583_status_rbno3_family
+  catalog_species_ids:
+  - RbNO3
   thermo_available: true
 - element: N
   carrier: SN
@@ -22320,10 +23008,14 @@ pairs:
     V: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:VN
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:VN
+  catalog_family_ids:
+  - t583_status_vn_family
+  catalog_species_ids:
+  - VN
   thermo_available: true
 - element: N
   carrier: ZrN
@@ -22408,10 +23100,14 @@ pairs:
     Na: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Na2Br2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Na2Br2
+  catalog_family_ids:
+  - t583_status_na2br2_family
+  catalog_species_ids:
+  - Na2Br2
   thermo_available: true
 - element: Na
   carrier: Na2Cl2
@@ -22438,10 +23134,14 @@ pairs:
     Na: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Na2F2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Na2F2
+  catalog_family_ids:
+  - t583_status_na2f2_family
+  catalog_species_ids:
+  - Na2F2
   thermo_available: true
 - element: Na
   carrier: Na2I2
@@ -22451,10 +23151,14 @@ pairs:
     Na: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Na2I2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Na2I2
+  catalog_family_ids:
+  - t583_status_na2i2_family
+  catalog_species_ids:
+  - Na2I2
   thermo_available: true
 - element: Na
   carrier: Na2O2
@@ -22535,10 +23239,14 @@ pairs:
     Na: 3.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Na3F3
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Na3F3
+  catalog_family_ids:
+  - t583_status_na3f3_family
+  catalog_species_ids:
+  - Na3F3
   thermo_available: true
 - element: Na
   carrier: NaAlF4
@@ -22563,10 +23271,14 @@ pairs:
     O: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:NaBO2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:NaBO2
+  catalog_family_ids:
+  - t583_status_nabo2_family
+  catalog_species_ids:
+  - NaBO2
   thermo_available: true
 - element: Na
   carrier: NaBr
@@ -22576,10 +23288,14 @@ pairs:
     Na: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:NaBr
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:NaBr
+  catalog_family_ids:
+  - t583_status_nabr_family
+  catalog_species_ids:
+  - NaBr
   thermo_available: true
 - element: Na
   carrier: NaCN
@@ -22654,10 +23370,14 @@ pairs:
     Na: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:NaI
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:NaI
+  catalog_family_ids:
+  - t583_status_nai_family
+  catalog_species_ids:
+  - NaI
   thermo_available: true
 - element: Na
   carrier: NaLi
@@ -22722,10 +23442,14 @@ pairs:
     O: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:NaOH
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:NaOH
+  catalog_family_ids:
+  - t583_status_naoh_family
+  catalog_species_ids:
+  - NaOH
   thermo_available: true
 - element: Na
   carrier: RbNa
@@ -22747,10 +23471,14 @@ pairs:
     Nb: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Nb
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Nb
+  catalog_family_ids:
+  - t583_status_nb_family
+  catalog_species_ids:
+  - Nb
   thermo_available: true
 - element: Nb
   carrier: NbCl5
@@ -22773,10 +23501,14 @@ pairs:
     O: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:NbO
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:NbO
+  catalog_family_ids:
+  - t583_status_nbo_family
+  catalog_species_ids:
+  - NbO
   thermo_available: true
 - element: Nb
   carrier: NbO2
@@ -22786,10 +23518,14 @@ pairs:
     O: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:NbO2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:NbO2
+  catalog_family_ids:
+  - t583_status_nbo2_family
+  catalog_species_ids:
+  - NbO2
   thermo_available: true
 - element: Nb
   carrier: NbOCl3
@@ -23543,10 +24279,14 @@ pairs:
     Pb: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:PbCL2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:PbCl2
+  catalog_family_ids:
+  - t583_status_pbcl2_family
+  catalog_species_ids:
+  - PbCl2
   thermo_available: true
 - element: Pb
   carrier: PbCl3
@@ -23716,10 +24456,14 @@ pairs:
     S: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:PbS
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:PbS
+  catalog_family_ids:
+  - t583_status_pbs_family
+  catalog_species_ids:
+  - PbS
   thermo_available: true
 - element: Pb
   carrier: PbS2
@@ -23780,10 +24524,14 @@ pairs:
     Rb: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Rb2CL2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Rb2Cl2
+  catalog_family_ids:
+  - t583_status_rb2cl2_family
+  catalog_species_ids:
+  - Rb2Cl2
   thermo_available: true
 - element: Rb
   carrier: Rb2F2
@@ -23819,10 +24567,14 @@ pairs:
     Rb: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Rb2O
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Rb2O
+  catalog_family_ids:
+  - t583_status_rb2o_family
+  catalog_species_ids:
+  - Rb2O
   thermo_available: true
 - element: Rb
   carrier: Rb2O2
@@ -23832,10 +24584,14 @@ pairs:
     Rb: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Rb2O2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Rb2O2
+  catalog_family_ids:
+  - t583_status_rb2o2_family
+  catalog_species_ids:
+  - Rb2O2
   thermo_available: true
 - element: Rb
   carrier: Rb2O2H2
@@ -23860,10 +24616,14 @@ pairs:
     S: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Rb2SO4
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Rb2SO4
+  catalog_family_ids:
+  - t583_status_rb2so4_family
+  catalog_species_ids:
+  - Rb2SO4
   thermo_available: true
 - element: Rb
   carrier: RbBO2
@@ -23874,10 +24634,14 @@ pairs:
     Rb: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:RbBO2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:RbBO2
+  catalog_family_ids:
+  - t583_status_rbbo2_family
+  catalog_species_ids:
+  - RbBO2
   thermo_available: true
 - element: Rb
   carrier: RbBr
@@ -23900,10 +24664,14 @@ pairs:
     Rb: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:RbCL
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:RbCl
+  catalog_family_ids:
+  - t583_status_rbcl_family
+  catalog_species_ids:
+  - RbCl
   thermo_available: true
 - element: Rb
   carrier: RbF
@@ -23926,10 +24694,14 @@ pairs:
     Rb: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:RbH
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:RbH
+  catalog_family_ids:
+  - t583_status_rbh_family
+  catalog_species_ids:
+  - RbH
   thermo_available: true
 - element: Rb
   carrier: RbI
@@ -23979,10 +24751,14 @@ pairs:
     Rb: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:RbNO2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:RbNO2
+  catalog_family_ids:
+  - t583_status_rbno2_family
+  catalog_species_ids:
+  - RbNO2
   thermo_available: true
 - element: Rb
   carrier: RbNO3
@@ -23993,10 +24769,14 @@ pairs:
     Rb: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:RbNO3
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:RbNO3
+  catalog_family_ids:
+  - t583_status_rbno3_family
+  catalog_species_ids:
+  - RbNO3
   thermo_available: true
 - element: Rb
   carrier: RbNa
@@ -24033,10 +24813,14 @@ pairs:
     Rb: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:RbOH
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:RbOH
+  catalog_family_ids:
+  - t583_status_rboh_family
+  catalog_species_ids:
+  - RbOH
   thermo_available: true
 - element: S
   carrier: Al2S
@@ -24124,10 +24908,14 @@ pairs:
     S: 3.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:B2S3
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:B2S3
+  catalog_family_ids:
+  - t583_status_b2s3_family
+  catalog_species_ids:
+  - B2S3
   thermo_available: true
 - element: S
   carrier: BS
@@ -24163,10 +24951,14 @@ pairs:
     S: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:BaS
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:BaS
+  catalog_family_ids:
+  - t583_status_bas_family
+  catalog_species_ids:
+  - BaS
   thermo_available: true
 - element: S
   carrier: C2S2
@@ -24278,10 +25070,14 @@ pairs:
     S: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Cs2SO4
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Cs2SO4
+  catalog_family_ids:
+  - t583_status_cs2so4_family
+  catalog_species_ids:
+  - Cs2SO4
   thermo_available: true
 - element: S
   carrier: F2S2
@@ -24304,10 +25100,14 @@ pairs:
     S: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:GeS
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:GeS
+  catalog_family_ids:
+  - t583_status_ges_family
+  catalog_species_ids:
+  - GeS
   thermo_available: true
 - element: S
   carrier: GeS2
@@ -24317,10 +25117,14 @@ pairs:
     S: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:GeS2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:GeS2
+  catalog_family_ids:
+  - t583_status_ges2_family
+  catalog_species_ids:
+  - GeS2
   thermo_available: true
 - element: S
   carrier: H2S
@@ -24405,10 +25209,14 @@ pairs:
     S: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Li2SO4
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Li2SO4
+  catalog_family_ids:
+  - t583_status_li2so4_family
+  catalog_species_ids:
+  - Li2SO4
   thermo_available: true
 - element: S
   carrier: MgS
@@ -24471,10 +25279,14 @@ pairs:
     S: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:PbS
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:PbS
+  catalog_family_ids:
+  - t583_status_pbs_family
+  catalog_species_ids:
+  - PbS
   thermo_available: true
 - element: S
   carrier: PbS2
@@ -24498,10 +25310,14 @@ pairs:
     S: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Rb2SO4
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Rb2SO4
+  catalog_family_ids:
+  - t583_status_rb2so4_family
+  catalog_species_ids:
+  - Rb2SO4
   thermo_available: true
 - element: S
   carrier: S
@@ -24928,10 +25744,14 @@ pairs:
     Sn: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:SnS
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:SnS
+  catalog_family_ids:
+  - t583_status_sns_family
+  catalog_species_ids:
+  - SnS
   thermo_available: true
 - element: S
   carrier: SnS2
@@ -24954,10 +25774,14 @@ pairs:
     Sr: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:SrS
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:SrS
+  catalog_family_ids:
+  - t583_status_srs_family
+  catalog_species_ids:
+  - SrS
   thermo_available: true
 - element: Sc
   carrier: Sc
@@ -25672,10 +26496,14 @@ pairs:
     Sn: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Sn
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Sn
+  catalog_family_ids:
+  - t583_status_sn_family
+  catalog_species_ids:
+  - Sn
   thermo_available: true
 - element: Sn
   carrier: Sn2
@@ -25684,10 +26512,14 @@ pairs:
     Sn: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Sn2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:Sn2
+  catalog_family_ids:
+  - t583_status_sn2_family
+  catalog_species_ids:
+  - Sn2
   thermo_available: true
 - element: Sn
   carrier: SnBr
@@ -25762,10 +26594,14 @@ pairs:
     Sn: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:SnCL2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:SnCl2
+  catalog_family_ids:
+  - t583_status_sncl2_family
+  catalog_species_ids:
+  - SnCl2
   thermo_available: true
 - element: Sn
   carrier: SnCl3
@@ -25788,10 +26624,14 @@ pairs:
     Sn: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:SnCL4
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:SnCl4
+  catalog_family_ids:
+  - t583_status_sncl4_family
+  catalog_species_ids:
+  - SnCl4
   thermo_available: true
 - element: Sn
   carrier: SnF
@@ -25922,10 +26762,14 @@ pairs:
     Sn: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:SnO2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:SnO2
+  catalog_family_ids:
+  - t583_status_sno2_family
+  catalog_species_ids:
+  - SnO2
   thermo_available: true
 - element: Sn
   carrier: SnS
@@ -25935,10 +26779,14 @@ pairs:
     Sn: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:SnS
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:SnS
+  catalog_family_ids:
+  - t583_status_sns_family
+  catalog_species_ids:
+  - SnS
   thermo_available: true
 - element: Sn
   carrier: SnS2
@@ -26024,10 +26872,14 @@ pairs:
     Sr: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:SrCL2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:SrCl2
+  catalog_family_ids:
+  - t583_status_srcl2_family
+  catalog_species_ids:
+  - SrCl2
   thermo_available: true
 - element: Sr
   carrier: SrF
@@ -26102,10 +26954,14 @@ pairs:
     Sr: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:SrO
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:SrO
+  catalog_family_ids:
+  - t583_status_sro_family
+  catalog_species_ids:
+  - SrO
   thermo_available: true
 - element: Sr
   carrier: SrO2H2
@@ -26116,10 +26972,14 @@ pairs:
     Sr: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:Sr(OH)2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:SrO2H2
+  catalog_family_ids:
+  - t583_status_sro2h2_family
+  catalog_species_ids:
+  - SrO2H2
   thermo_available: true
 - element: Sr
   carrier: SrOH
@@ -26143,10 +27003,14 @@ pairs:
     Sr: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:SrS
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:SrS
+  catalog_family_ids:
+  - t583_status_srs_family
+  catalog_species_ids:
+  - SrS
   thermo_available: true
 - element: Te
   carrier: TeO2
@@ -26413,10 +27277,14 @@ pairs:
     U: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:UO2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:UO2
+  catalog_family_ids:
+  - t583_status_uo2_family
+  catalog_species_ids:
+  - UO2
   thermo_available: true
 - element: U
   carrier: UO2F
@@ -26441,10 +27309,14 @@ pairs:
     U: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:UO2F2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:UO2F2
+  catalog_family_ids:
+  - t583_status_uo2f2_family
+  catalog_species_ids:
+  - UO2F2
   thermo_available: true
 - element: U
   carrier: UO3
@@ -26454,10 +27326,14 @@ pairs:
     U: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:UO3
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:UO3
+  catalog_family_ids:
+  - t583_status_uo3_family
+  catalog_species_ids:
+  - UO3
   thermo_available: true
 - element: U
   carrier: UOF
@@ -26482,10 +27358,14 @@ pairs:
     U: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:UOF2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:UOF2
+  catalog_family_ids:
+  - t583_status_uof2_family
+  catalog_species_ids:
+  - UOF2
   thermo_available: true
 - element: U
   carrier: UOF3
@@ -26561,10 +27441,14 @@ pairs:
     V: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:VN
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:VN
+  catalog_family_ids:
+  - t583_status_vn_family
+  catalog_species_ids:
+  - VN
   thermo_available: true
 - element: V
   carrier: VO
@@ -26574,10 +27458,14 @@ pairs:
     V: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:VO
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:VO
+  catalog_family_ids:
+  - t583_status_vo_family
+  catalog_species_ids:
+  - VO
   thermo_available: true
 - element: V
   carrier: VO2
@@ -26599,10 +27487,14 @@ pairs:
     W: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:W
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:W
+  catalog_family_ids:
+  - t583_status_w_family
+  catalog_species_ids:
+  - W
   thermo_available: true
 - element: W
   carrier: W2O6
@@ -26612,10 +27504,14 @@ pairs:
     W: 2.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:(WO3)2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:W2O6
+  catalog_family_ids:
+  - t583_status_w2o6_family
+  catalog_species_ids:
+  - W2O6
   thermo_available: true
 - element: W
   carrier: W3O9
@@ -26625,10 +27521,14 @@ pairs:
     W: 3.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:(WO3)3
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:W3O9
+  catalog_family_ids:
+  - t583_status_w3o9_family
+  catalog_species_ids:
+  - W3O9
   thermo_available: true
 - element: W
   carrier: W4O12
@@ -26638,10 +27538,14 @@ pairs:
     W: 4.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:(WO3)4
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:W4O12
+  catalog_family_ids:
+  - t583_status_w4o12_family
+  catalog_species_ids:
+  - W4O12
   thermo_available: true
 - element: W
   carrier: W5O15
@@ -26651,10 +27555,14 @@ pairs:
     W: 5.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:(WO3)5
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:W5O15
+  catalog_family_ids:
+  - t583_status_w5o15_family
+  catalog_species_ids:
+  - W5O15
   thermo_available: true
 - element: W
   carrier: WCl6
@@ -26664,10 +27572,14 @@ pairs:
     W: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:WCL6
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:WCl6
+  catalog_family_ids:
+  - t583_status_wcl6_family
+  catalog_species_ids:
+  - WCl6
   thermo_available: true
 - element: W
   carrier: WO
@@ -26677,10 +27589,14 @@ pairs:
     W: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:WO
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:WO
+  catalog_family_ids:
+  - t583_status_wo_family
+  catalog_species_ids:
+  - WO
   thermo_available: true
 - element: W
   carrier: WO2
@@ -26690,10 +27606,14 @@ pairs:
     W: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:WO2
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:WO2
+  catalog_family_ids:
+  - t583_status_wo2_family
+  catalog_species_ids:
+  - WO2
   thermo_available: true
 - element: W
   carrier: WO2Cl2
@@ -26735,10 +27655,14 @@ pairs:
     W: 1.0
   sources:
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - nasa_cea_extract:WOCL4
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:WOCl4
+  catalog_family_ids:
+  - t583_status_wocl4_family
+  catalog_species_ids:
+  - WOCl4
   thermo_available: true
 - element: Zn
   carrier: Zn
