@@ -140,17 +140,23 @@ band we have always trusted did not move. Honest consequence of the classificati
 cannot be A/B'd at all** — the reference has no such rows. The A/B artifact must state that
 limit explicitly, never report those species as silently agreeing.
 
-**Distinct identity (CORRECTED 2026-08-10, milestone sweep P1-3):** an earlier revision of this
-section (and the t-607 ticket text) said distinct *version strings* prevent cache
-cross-contamination. That contradicts the binding cache-identity contract (AGENTS.md §"Cache
-identity contract", owner ruling 2026-07-19; locked by `tests/test_cached_real_backend.py`):
-**engine version is metadata and FORBIDDEN key material** — the engine-result key is the melt
-input vector only. Version strings therefore isolate nothing. The correct isolation for the two
-installs is **separate engine namespaces or separate cache stores** (e.g. engine identity
-`vaporock` vs `vaporock-reference` in `engines/engines.local.toml`, each with its own result
-store), with distinct provenance/version strings kept as *metadata* for human-driven expiry.
-Never add VERSION to either cache key. Must hold on the studios (the grind config installs its
-own engine config), not just the laptop.
+**Identity/isolation (OWNER SIMPLIFICATION 2026-08-10, seq 40 — supersedes two earlier designs):**
+register **ONE engine at a time** and diff the A/B **outside the software**: run the fork, capture
+artifacts; swap the registration in `engines/engines.local.toml`; run the reference; diff
+externally. This *deletes* the isolation problem rather than solving it — no dual registration,
+no namespaces, no in-software parity harness. (History, kept so neither error recurs: version
+strings were first proposed as isolation — WRONG, the cache-identity contract makes engine version
+metadata and FORBIDDEN key material, so they isolate nothing; namespace/store separation was then
+proposed — correct but heavier than needed once single-registration retired dual installs.)
+
+**The one surviving constraint (runbook, not architecture):** because the engine-result cache key
+is the melt input vector ONLY, *sequential* A/B legs sharing one cache store still collide — the
+second leg gets served the first engine's cached rows and the A/B silently compares an engine
+against itself. **Each A/B leg must use a fresh or separate cache store, or run cache-bypassed.**
+Concretely: the engine result store is `CachedRealConfig.db_path`
+(`simulator/backends.py` — `reduced_real_cache.db_path` in config, plus optional
+`read_only_base_db_path` layering) — point each leg at its own db_path at invocation. Holds on
+the studios too (the grind config installs its own engine config).
 
 ## Working rules
 
