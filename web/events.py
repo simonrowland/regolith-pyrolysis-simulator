@@ -1598,6 +1598,7 @@ def _start_payload(
     c5_enabled: bool = False,
     mre_target_species: str = '',
     mre_max_voltage_V: float = 0.0,
+    lifecycle_generation: int | None = None,
 ):
     """Build the public start status payload."""
     payload = {
@@ -1609,6 +1610,8 @@ def _start_payload(
         'mre_target_species': str(mre_target_species or ''),
         'mre_max_voltage_V': float(mre_max_voltage_V or 0.0),
     }
+    if lifecycle_generation is not None:
+        payload['lifecycle_generation'] = lifecycle_generation
     if backend_payload is None:
         backend_payload = {
             'backend_requested': backend_requested,
@@ -3019,6 +3022,7 @@ def register_events(socketio):
         """
         sid = sid or request.sid
         socket_bound = ledger_client_id is None
+        lifecycle_generation = None
 
         def reject(
             payload: dict[str, object],
@@ -3034,6 +3038,8 @@ def register_events(socketio):
                 )
             socket_payload = dict(payload)
             socket_payload['error_type'] = error_type
+            if lifecycle_generation is not None:
+                socket_payload['lifecycle_generation'] = lifecycle_generation
             socketio.emit('simulation_status', socket_payload, room=sid)
             return None
 
@@ -3054,6 +3060,13 @@ def register_events(socketio):
                 'status': 'error',
                 'message': 'start_simulation payload must be an object',
             }, 'invalid_run_request')
+        raw_lifecycle_generation = data.get('lifecycle_generation')
+        if (
+            isinstance(raw_lifecycle_generation, int)
+            and not isinstance(raw_lifecycle_generation, bool)
+            and raw_lifecycle_generation > 0
+        ):
+            lifecycle_generation = raw_lifecycle_generation
 
         feedstock_key = data.get('feedstock', 'lunar_mare_low_ti')
         cost_parameters = None
@@ -3463,6 +3476,7 @@ def register_events(socketio):
                     c5_enabled=c5_enabled,
                     mre_target_species=mre_target_species,
                     mre_max_voltage_V=mre_max_voltage_V,
+                    lifecycle_generation=lifecycle_generation,
                 ),
             )
             if isinstance(cost_parameters, Mapping):

@@ -59,8 +59,7 @@ function showDecisionModal(data) {
 // --- Completion handler ---
 
 socket.on('simulation_complete', (data) => {
-    const el = document.getElementById('status-text');
-    if (el) el.textContent = 'Complete';
+    noteSimulationComplete(data);
     document.getElementById('btn-start').disabled = false;
     document.getElementById('btn-pause').disabled = true;
     console.log('Simulation complete:', data);

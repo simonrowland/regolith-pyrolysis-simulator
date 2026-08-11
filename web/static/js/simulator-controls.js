@@ -770,7 +770,9 @@ document.getElementById('recipe-load-confirm')?.addEventListener('click', () => 
 
 document.getElementById('btn-start').addEventListener('click', () => {
     if (!socket.connected) {
-        document.getElementById('status-text').textContent = 'Connection not ready';
+        transitionSimulatorLifecycle({
+            type: SimulatorLifecycleEvent.CONNECTION_NOT_READY,
+        });
         return;
     }
 
@@ -806,6 +808,10 @@ document.getElementById('btn-start').addEventListener('click', () => {
     };
     applyLoadedRecipeStartIdentity(payload);
     if (furnaceMaterialId) payload.furnace_material_id = furnaceMaterialId;
+    const lifecycle = transitionSimulatorLifecycle({
+        type: SimulatorLifecycleEvent.START_REQUEST,
+    });
+    payload.lifecycle_generation = lifecycle.state.generation;
     socket.emit('start_simulation', payload);
 
     // Reset ALL charts — re-initialise temperature & pressure inline,
@@ -854,21 +860,24 @@ document.getElementById('btn-start').addEventListener('click', () => {
 
     document.getElementById('btn-start').disabled = true;
     document.getElementById('btn-pause').disabled = false;
-    document.getElementById('status-text').textContent = 'Running';
 });
 
 document.getElementById('btn-pause').addEventListener('click', () => {
     socket.emit('pause_simulation');
     document.getElementById('btn-pause').disabled = true;
     document.getElementById('btn-resume').disabled = false;
-    document.getElementById('status-text').textContent = 'Paused';
+    transitionSimulatorLifecycle({
+        type: SimulatorLifecycleEvent.PAUSE_REQUEST,
+    });
 });
 
 document.getElementById('btn-resume').addEventListener('click', () => {
     socket.emit('resume_simulation');
     document.getElementById('btn-resume').disabled = true;
     document.getElementById('btn-pause').disabled = false;
-    document.getElementById('status-text').textContent = 'Running';
+    transitionSimulatorLifecycle({
+        type: SimulatorLifecycleEvent.RESUME_REQUEST,
+    });
 });
 
 // --- Event delegation for dynamically loaded controls ---

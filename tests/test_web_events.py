@@ -1960,9 +1960,66 @@ def test_live_ticks_refresh_backend_badge_without_losing_active_backend():
         _REPO_ROOT / "web/static/js/simulator-ticks.js"
     ).read_text()
 
-    assert "updateBackendBadge(data);" in tick_source
-    assert "badge.dataset.backendActive" in socket_source
+    # T1-04 supersedes the partial DOM-dataset guard: tick telemetry now
+    # merges through noteLiveSimulationTick's module-owned badge state.
+    assert "updateBackendBadge(data);" in socket_source
+    assert "updateBackendBadge(data);" not in tick_source
+    assert "_backendBadgeState.active" in socket_source
+    assert "badge.dataset.backendActive" not in socket_source
     assert "data.backend_status_reason" in socket_source
+
+
+def test_start_payload_echoes_status_strip_lifecycle_generation():
+    payload = web_events._start_payload(
+        sim=object(),
+        feedstock_key="lunar_mare_low_ti",
+        mass_kg=1000.0,
+        backend_requested="internal-analytical",
+        backend_active="internal-analytical",
+        backend_status="ok",
+        backend_authoritative=False,
+        backend_message="Internal analytical backend",
+        lifecycle_generation=7,
+    )
+
+    assert payload["status"] == "started"
+    assert payload["lifecycle_generation"] == 7
+
+
+def test_socket_start_rejection_echoes_status_strip_lifecycle_generation(
+    monkeypatch,
+):
+    app = app_module.create_app()
+    emitted = []
+
+    def unavailable(_name):
+        raise BackendUnavailableError("backend unavailable for test")
+
+    monkeypatch.setattr(web_events, "_get_backend", unavailable)
+    monkeypatch.setattr(
+        app_module.socketio,
+        "emit",
+        lambda event, payload, **kwargs: emitted.append(
+            (event, payload, kwargs)
+        ),
+    )
+
+    with app.app_context():
+        result = web_events._registered_start_handler(
+            {
+                "backend": "unavailable",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "lifecycle_generation": 9,
+            },
+            sid="generation-test",
+            ledger_client_id="generation-owner",
+        )
+
+    assert result is None
+    assert emitted[-1][0] == "simulation_status"
+    assert emitted[-1][1]["error_type"] == "backend_unavailable"
+    assert emitted[-1][1]["lifecycle_generation"] == 9
 
 
 def test_c4_start_payload_uses_rendered_setpoint_not_literal_1670():

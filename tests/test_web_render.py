@@ -24,9 +24,26 @@ _ADVISORY_HARNESS = (
     / "web_render"
     / "render_simulator_advisory_dom.mjs"
 )
+_STATUS_STRIP_HARNESS = (
+    _REPO_ROOT
+    / "tests"
+    / "fixtures"
+    / "web_render"
+    / "render_simulator_status_strip_dom.mjs"
+)
 _SIMULATOR_TICKS_JS = _REPO_ROOT / "web" / "static" / "js" / "simulator-ticks.js"
+_SIMULATOR_CHARTS_JS = (
+    _REPO_ROOT / "web" / "static" / "js" / "simulator-charts.js"
+)
 _SIMULATOR_ADVISORY_JS = (
     _REPO_ROOT / "web" / "static" / "js" / "simulator-advisory.js"
+)
+_SIMULATOR_SOCKET_JS = _REPO_ROOT / "web" / "static" / "js" / "simulator-socket.js"
+_SIMULATOR_DECISIONS_JS = (
+    _REPO_ROOT / "web" / "static" / "js" / "simulator-decisions.js"
+)
+_SIMULATOR_CONTROLS_JS = (
+    _REPO_ROOT / "web" / "static" / "js" / "simulator-controls.js"
 )
 
 _RENDER_IDS = [
@@ -359,6 +376,603 @@ def test_simulation_tick_renders_overlap_evaporation_diagnostic():
     assert "gates completion false" in content
 
 
+def _minimal_tick_payload(**overrides):
+    """Bare tick with the numeric fields the tick DOM path always reads."""
+    payload = {
+        "run_id": "run-1",
+        "hour": 70,
+        "temperature_C": 1459.0,
+        "campaign": "C3_NA",
+        "melt_mass_kg": 949.0,
+        "atmosphere": "HARD_VACUUM",
+        "composition_wt_pct": {},
+        "pot_composition": {},
+        "evap_species": {},
+        "condensation": {},
+        "energy_electrical_plus_evaporation_cumulative_kWh": 1.0,
+        "energy_electrical_plus_evaporation_kWh": 0.1,
+        "energy_electrical_kWh": 0.1,
+        "energy_evaporation_thermal_kWh": 0.0,
+        "energy_scope": "electrical_plus_known_evaporation_enthalpy",
+        "furnace_heat_status": "partial",
+        "oxygen_kg": 0.0,
+        "mass_balance_error_pct": 0.0,
+        "mass_balance_error_breached": False,
+        "backend_status": "ok",
+        "backend_authoritative": False,
+        "backend_message": "Internal analytical backend",
+        "backend_fallback_active": False,
+        "O2_stored_kg": 0.0,
+        "O2_vented_cumulative_kg": 0.0,
+        "O2_vented_kg_hr": 0.0,
+        "turbine_shaft_power_kW": 0.0,
+        "actual_ramp_rate": 50.0,
+        "nominal_ramp_rate": 50.0,
+        "transport_saturation_pct": 0.0,
+        "turbine_utilization_pct": 0.0,
+        "ramp_throttled": False,
+    }
+    payload.update(overrides)
+    return payload
+
+
+def _decision_gate_status_sequence():
+    """Reproduce F1/F2 through real controls, socket, decisions, and tick handlers."""
+    return [
+        {"event": "start_click", "payload": {}},
+        {
+            "event": "simulation_status",
+            "payload": {
+                "status": "started",
+                "run_id": "run-1",
+                "lifecycle_generation": 1,
+                "backend_active": "InternalAnalyticalBackend",
+                "backend_status": "ok",
+                "backend_authoritative": False,
+                "backend_message": "Internal analytical backend",
+            },
+        },
+        {
+            "event": "simulation_tick",
+            "payload": _minimal_tick_payload(hour=70, temperature_C=1459.0),
+        },
+        {
+            "event": "simulation_status",
+            "payload": {
+                "status": "decision_applied",
+                "run_id": "run-1",
+                "choice": "A",
+            },
+        },
+        {
+            "event": "simulation_tick",
+            "payload": _minimal_tick_payload(
+                hour=71,
+                temperature_C=1509.0,
+                campaign="C4",
+                melt_mass_kg=949.0,
+                # Tick carries status/auth but not always backend_active —
+                # the pre-fix path invented "unknown" for the missing half.
+                backend_status="ok",
+                backend_authoritative=False,
+                backend_message="Internal analytical backend",
+            ),
+        },
+    ]
+
+
+def test_decision_applied_does_not_stick_or_clobber_backend_badge():
+    """b-088: live ticks restore Running without erasing backend authority."""
+    rendered = _render_status_strip(sequence=_decision_gate_status_sequence())
+    final = rendered["final"]
+
+    after_decision = [
+        step for step in rendered["steps"] if step["event"] == "simulation_status"
+    ][-1]
+    assert after_decision["statusText"] == "decision_applied"
+    # decision_applied has no backend fields — badge must keep prior knowledge.
+    assert after_decision["backendText"] == (
+        "Backend: InternalAnalyticalBackend / ok"
+    )
+    assert "unknown" not in after_decision["backendText"].lower()
+    assert "backend-badge-internal-analytical" in after_decision["backendClass"]
+
+    assert final["statusText"] == "Running"
+    assert final["hourText"] == "Hour: 71"
+    assert final["backendText"] == "Backend: InternalAnalyticalBackend / ok"
+    assert "unknown / unknown" not in final["backendText"]
+    assert "backend-badge-internal-analytical" in final["backendClass"]
+    assert final["backendTitle"] == "Internal analytical backend"
+
+
+def test_status_strip_mutations_reproduce_b088_failure_mode():
+    """Named harness mutations restore both pre-fix failure symptoms."""
+    sequence = _decision_gate_status_sequence()
+
+    clobbered = _render_status_strip(
+        sequence=sequence,
+        mutate_badge_clobber=True,
+        mutate_no_tick_recovery=True,
+    )
+    final = clobbered["final"]
+    after_decision = [
+        step
+        for step in clobbered["steps"]
+        if step["event"] == "simulation_status"
+        and step["statusText"] == "decision_applied"
+    ][-1]
+
+    assert after_decision["backendText"] == "Backend: unknown / unknown"
+    assert final["statusText"] == "decision_applied"
+    assert final["hourText"] == "Hour: 71"
+    assert final["backendText"] == "Backend: unknown / unknown"
+
+    # Control: the identical sequence without mutations stays fixed.
+    fixed = _render_status_strip(sequence=sequence)
+    assert fixed["final"]["statusText"] == "Running"
+    assert "unknown" not in fixed["final"]["backendText"].lower()
+
+
+def test_mid_run_reconnect_does_not_claim_ready_over_live_telemetry():
+    """F3 property: a live run reconnects to restored, never idle Ready."""
+    sequence = [
+        {"event": "start_click", "payload": {}},
+        {
+            "event": "simulation_tick",
+            "payload": _minimal_tick_payload(
+                hour=42,
+                backend_active="InternalAnalyticalBackend",
+                backend_status="ok",
+                backend_authoritative=False,
+            ),
+        },
+        {"event": "disconnect", "payload": "transport close"},
+        {"event": "connect", "payload": {}},
+    ]
+    rendered = _render_status_strip(sequence=sequence)
+    final = rendered["final"]
+    assert final["statusText"] == "Connection restored"
+    assert final["hourText"] == "Hour: 42"
+    assert final["statusText"] != "Ready"
+    assert final["lifecycle"]["phase"] == "running"
+    assert final["lifecycle"]["activeRunId"] == "run-1"
+    assert len(rendered["startPayloads"]) == 1
+
+
+def test_fresh_run_reconnect_before_first_tick_does_not_claim_ready():
+    """F3 property: starting is an explicit reconnectable phase."""
+    sequence = [
+        {"event": "start_click", "payload": {}},
+        {"event": "disconnect", "payload": "transport close"},
+        {"event": "connect", "payload": {}},
+    ]
+    rendered = _render_status_strip(sequence=sequence)
+    assert rendered["final"]["statusText"] == "Connection restored"
+    assert rendered["final"]["statusText"] != "Ready"
+    assert rendered["final"]["lifecycle"]["phase"] == "starting"
+    assert rendered["final"]["lifecycle"]["generation"] == 1
+    assert len(rendered["startPayloads"]) == 1
+    assert rendered["startPayloads"][0]["lifecycle_generation"] == 1
+
+
+def test_complete_status_survives_failed_reconnect_then_success():
+    """F4 property: complete owns the strip across failed and live reconnects."""
+    sequence = [
+        {"event": "start_click", "payload": {}},
+        {
+            "event": "simulation_status",
+            "payload": {
+                "status": "started",
+                "run_id": "run-1",
+                "lifecycle_generation": 1,
+            },
+        },
+        {
+            "event": "simulation_tick",
+            "payload": _minimal_tick_payload(hour=6),
+        },
+        {"event": "simulation_complete", "payload": {"run_id": "run-1"}},
+        {"event": "connect_error", "payload": {"message": "still offline"}},
+        {"event": "connect", "payload": {}},
+    ]
+    rendered = _render_status_strip(sequence=sequence)
+    after_error = [
+        step for step in rendered["steps"] if step["event"] == "connect_error"
+    ][-1]
+    assert after_error["statusText"] == "Complete"
+    assert rendered["final"]["statusText"] == "Complete"
+    assert rendered["final"]["lifecycle"]["phase"] == "terminal-complete"
+
+
+@pytest.mark.parametrize(
+    ("terminal_payload", "expected"),
+    [
+        (
+            {"status": "refused", "message": "typed terminal refusal"},
+            "refused — typed terminal refusal",
+        ),
+        (
+            {
+                "status": "error",
+                "reason": "terminal_run_failed",
+                "message": "terminal failure",
+            },
+            "error — terminal failure",
+        ),
+    ],
+)
+def test_terminal_status_taxonomy_is_sticky_across_reconnect(
+    terminal_payload,
+    expected,
+):
+    rendered = _render_status_strip(
+        sequence=[
+            {"event": "start_click", "payload": {}},
+            {
+                "event": "simulation_status",
+                "payload": {
+                    "status": "started",
+                    "run_id": "run-1",
+                    "lifecycle_generation": 1,
+                    "backend_active": "InternalAnalyticalBackend",
+                    "backend_status": "ok",
+                },
+            },
+            {
+                "event": "simulation_status",
+                "payload": {**terminal_payload, "run_id": "run-1"},
+            },
+            {"event": "disconnect", "payload": "transport close"},
+            {"event": "connect", "payload": {}},
+        ]
+    )
+    assert rendered["final"]["statusText"] == expected
+    assert rendered["final"]["lifecycle"]["phase"].startswith("terminal-")
+
+
+def test_nonterminal_error_does_not_end_active_run():
+    """Recoverable command errors must not become sticky terminal labels."""
+    rendered = _render_status_strip(
+        sequence=[
+            {"event": "start_click", "payload": {}},
+            {
+                "event": "simulation_status",
+                "payload": {
+                    "status": "started",
+                    "run_id": "run-1",
+                    "lifecycle_generation": 1,
+                },
+            },
+            {
+                "event": "simulation_status",
+                "payload": {
+                    "status": "error",
+                    "message": "unsupported parameter adjustment",
+                    "run_id": "run-1",
+                },
+            },
+            {"event": "disconnect", "payload": "transport close"},
+            {"event": "connect", "payload": {}},
+        ]
+    )
+    assert rendered["final"]["statusText"] == "Connection restored"
+    assert rendered["final"]["lifecycle"]["phase"] == "running"
+
+
+def test_rejected_duplicate_start_does_not_freeze_advancing_prior_run():
+    """A rejected replacement returns to the identified prior run."""
+    sequence = [
+        {"event": "start_click", "payload": {}},
+        {
+            "event": "simulation_status",
+            "payload": {
+                "status": "started",
+                "run_id": "run-1",
+                "lifecycle_generation": 1,
+            },
+        },
+        {
+            "event": "simulation_tick",
+            "payload": _minimal_tick_payload(hour=9),
+        },
+        {"event": "start_click", "payload": {}},
+        {
+            "event": "simulation_status",
+            "payload": {
+                "status": "error",
+                "message": "invalid replacement request",
+                "error_type": "invalid_backend",
+                "lifecycle_generation": 2,
+            },
+        },
+        {
+            "event": "simulation_tick",
+            "payload": _minimal_tick_payload(hour=10),
+        },
+    ]
+    rendered = _render_status_strip(sequence=sequence)
+    assert rendered["steps"][-2]["statusText"] == (
+        "error — invalid replacement request"
+    )
+    assert rendered["final"]["statusText"] == "Running"
+    assert rendered["final"]["hourText"] == "Hour: 10"
+    assert rendered["final"]["lifecycle"]["phase"] == "running"
+    assert rendered["final"]["lifecycle"]["activeRunId"] == "run-1"
+    assert len(rendered["startPayloads"]) == 2
+    assert [
+        payload["lifecycle_generation"]
+        for payload in rendered["startPayloads"]
+    ] == [1, 2]
+
+
+def test_duplicate_terminal_events_keep_first_terminal_label():
+    """Later terminal-looking events cannot desynchronise cached and shown state."""
+    rendered = _render_status_strip(
+        sequence=[
+            {"event": "start_click", "payload": {}},
+            {
+                "event": "simulation_tick",
+                "payload": _minimal_tick_payload(hour=6),
+            },
+            {"event": "simulation_complete", "payload": {"run_id": "run-1"}},
+            {"event": "simulation_complete", "payload": {"run_id": "run-1"}},
+            {
+                "event": "simulation_status",
+                "payload": {
+                    "status": "error",
+                    "reason": "late_terminal_error",
+                    "message": "late terminal error",
+                    "run_id": "run-1",
+                },
+            },
+            {"event": "connect_error", "payload": {"message": "offline"}},
+            {"event": "connect", "payload": {}},
+        ]
+    )
+    assert all(
+        step["statusText"] == "Complete"
+        for step in rendered["steps"][2:]
+    )
+
+
+def test_status_strip_harness_loads_production_lifecycle_module_order():
+    """F5 property: the proof executes decisions before controls, as production does."""
+    rendered = _render_status_strip(
+        sequence=[
+            {"event": "start_click", "payload": {}},
+            {
+                "event": "simulation_status",
+                "payload": {
+                    "status": "started",
+                    "run_id": "run-1",
+                    "lifecycle_generation": 1,
+                },
+            },
+            {"event": "simulation_complete", "payload": {"run_id": "run-1"}},
+        ]
+    )
+    assert rendered["loadedModules"] == [
+        "simulator-socket.js",
+        "simulator-charts.js",
+        "simulator-ticks.js",
+        "simulator-advisory.js",
+        "simulator-decisions.js",
+        "simulator-controls.js",
+    ]
+    assert rendered["final"]["statusText"] == "Complete"
+
+
+def test_duplicate_pending_starts_accept_only_latest_generation():
+    sequence = [
+        {"event": "start_click", "payload": {}},
+        {"event": "start_click", "payload": {}},
+        {
+            "event": "simulation_status",
+            "payload": {
+                "status": "started",
+                "run_id": "run-stale",
+                "lifecycle_generation": 1,
+                "backend_active": "StaleBackend",
+                "backend_status": "stale",
+            },
+        },
+        {
+            "event": "simulation_status",
+            "payload": {
+                "status": "started",
+                "run_id": "run-current",
+                "lifecycle_generation": 2,
+                "backend_active": "CurrentBackend",
+                "backend_status": "ok",
+            },
+        },
+    ]
+    rendered = _render_status_strip(sequence=sequence)
+    assert rendered["steps"][-2]["lifecycle"]["phase"] == "starting"
+    assert rendered["final"]["lifecycle"]["phase"] == "running"
+    assert rendered["final"]["lifecycle"]["activeRunId"] == "run-current"
+    assert rendered["final"]["backendText"] == "Backend: CurrentBackend / ok"
+    assert [
+        payload["lifecycle_generation"]
+        for payload in rendered["startPayloads"]
+    ] == [1, 2]
+
+
+def test_stale_start_error_after_current_generation_is_ignored():
+    sequence = [
+        {"event": "start_click", "payload": {}},
+        {"event": "start_click", "payload": {}},
+        {
+            "event": "simulation_status",
+            "payload": {
+                "status": "started",
+                "run_id": "run-current",
+                "lifecycle_generation": 2,
+                "backend_active": "CurrentBackend",
+                "backend_status": "ok",
+            },
+        },
+        {
+            "event": "simulation_status",
+            "payload": {
+                "status": "error",
+                "message": "stale generation rejection",
+                "error_type": "invalid_backend",
+                "lifecycle_generation": 1,
+            },
+        },
+    ]
+    rendered = _render_status_strip(sequence=sequence)
+    accepted = rendered["steps"][-2]
+    stale = rendered["steps"][-1]
+    assert stale["statusText"] == accepted["statusText"]
+    assert stale["backendText"] == "Backend: CurrentBackend / ok"
+    assert stale["lifecycle"]["phase"] == "running"
+    assert stale["lifecycle"]["activeRunId"] == "run-current"
+    assert stale["startDisabled"] == accepted["startDisabled"]
+    assert stale["pauseDisabled"] == accepted["pauseDisabled"]
+    assert stale["resumeDisabled"] == accepted["resumeDisabled"]
+
+
+def test_replacement_launch_failure_after_cancellation_is_terminal():
+    error_text = (
+        "error — New run launch failed after prior run run-1 was cancelled"
+    )
+    rendered = _render_status_strip(
+        sequence=[
+            {"event": "start_click", "payload": {}},
+            {
+                "event": "simulation_status",
+                "payload": {
+                    "status": "started",
+                    "run_id": "run-1",
+                    "lifecycle_generation": 1,
+                    "backend_active": "InternalAnalyticalBackend",
+                    "backend_status": "ok",
+                },
+            },
+            {"event": "start_click", "payload": {}},
+            {
+                "event": "simulation_status",
+                "payload": {
+                    "status": "error",
+                    "message": (
+                        "New run launch failed after prior run run-1 was cancelled"
+                    ),
+                    "error_type": "run_launch_failed_after_replacement",
+                    "lifecycle_generation": 2,
+                    "prior_run_id": "run-1",
+                    "prior_run_cancelled": True,
+                },
+            },
+            {
+                "event": "simulation_tick",
+                "payload": _minimal_tick_payload(run_id="run-1", hour=10),
+            },
+            {"event": "disconnect", "payload": "transport close"},
+            {"event": "connect", "payload": {}},
+        ]
+    )
+    assert rendered["steps"][3]["statusText"] == error_text
+    assert rendered["final"]["statusText"] == error_text
+    assert rendered["final"]["lifecycle"]["phase"] == "terminal-error"
+    assert rendered["final"]["lifecycle"]["retiredRunId"] == "run-1"
+    assert rendered["final"]["backendText"] == "Backend: —"
+
+
+def test_prior_run_terminal_after_replacement_start_cannot_capture_new_run():
+    rendered = _render_status_strip(
+        sequence=[
+            {"event": "start_click", "payload": {}},
+            {
+                "event": "simulation_status",
+                "payload": {
+                    "status": "started",
+                    "run_id": "run-1",
+                    "lifecycle_generation": 1,
+                },
+            },
+            {"event": "start_click", "payload": {}},
+            {"event": "simulation_complete", "payload": {"run_id": "run-1"}},
+            {
+                "event": "simulation_status",
+                "payload": {
+                    "status": "started",
+                    "run_id": "run-2",
+                    "lifecycle_generation": 2,
+                },
+            },
+            {
+                "event": "simulation_tick",
+                "payload": _minimal_tick_payload(run_id="run-2", hour=10),
+            },
+        ]
+    )
+    assert rendered["steps"][3]["statusText"] == "Running"
+    assert rendered["final"]["statusText"] == "Running"
+    assert rendered["final"]["hourText"] == "Hour: 10"
+    assert rendered["final"]["lifecycle"]["activeRunId"] == "run-2"
+
+
+def test_terminal_then_new_run_clears_prior_terminal_authority():
+    rendered = _render_status_strip(
+        sequence=[
+            {"event": "start_click", "payload": {}},
+            {
+                "event": "simulation_status",
+                "payload": {
+                    "status": "started",
+                    "run_id": "run-1",
+                    "lifecycle_generation": 1,
+                },
+            },
+            {"event": "simulation_complete", "payload": {"run_id": "run-1"}},
+            {"event": "start_click", "payload": {}},
+            {
+                "event": "simulation_status",
+                "payload": {
+                    "status": "started",
+                    "run_id": "run-2",
+                    "lifecycle_generation": 2,
+                },
+            },
+            {
+                "event": "simulation_tick",
+                "payload": _minimal_tick_payload(run_id="run-2", hour=1),
+            },
+        ]
+    )
+    assert rendered["steps"][2]["statusText"] == "Complete"
+    assert rendered["steps"][3]["statusText"] == "Running"
+    assert rendered["final"]["lifecycle"]["phase"] == "running"
+    assert rendered["final"]["lifecycle"]["activeRunId"] == "run-2"
+
+
+def test_tick_for_new_run_clears_terminal_with_stale_run_identity():
+    rendered = _render_status_strip(
+        sequence=[
+            {"event": "start_click", "payload": {}},
+            {
+                "event": "simulation_status",
+                "payload": {
+                    "status": "started",
+                    "run_id": "run-1",
+                    "lifecycle_generation": 1,
+                },
+            },
+            {"event": "simulation_complete", "payload": {"run_id": "run-1"}},
+            {
+                "event": "simulation_tick",
+                "payload": _minimal_tick_payload(run_id="run-2", hour=10),
+            },
+        ]
+    )
+    assert rendered["steps"][-2]["statusText"] == "Complete"
+    assert rendered["final"]["statusText"] == "Running"
+    assert rendered["final"]["hourText"] == "Hour: 10"
+    assert rendered["final"]["lifecycle"]["activeRunId"] == "run-2"
+
+
 def test_refusal_status_renders_structured_knudsen_diagnostic():
     html = app_module.create_app().test_client().get("/").get_data(as_text=True)
     payload = {
@@ -492,6 +1106,36 @@ def _render_advisory_dom(*, html, event, payload):
                 "payload": payload,
                 "script_path": str(_SIMULATOR_ADVISORY_JS),
                 "ids": _ADVISORY_IDS,
+            }
+        ),
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stderr
+    return json.loads(completed.stdout)
+
+
+def _render_status_strip(
+    *,
+    sequence,
+    mutate_badge_clobber=False,
+    mutate_no_tick_recovery=False,
+):
+    completed = subprocess.run(
+        ["node", str(_STATUS_STRIP_HARNESS)],
+        input=json.dumps(
+            {
+                "socket_script_path": str(_SIMULATOR_SOCKET_JS),
+                "charts_script_path": str(_SIMULATOR_CHARTS_JS),
+                "ticks_script_path": str(_SIMULATOR_TICKS_JS),
+                "advisory_script_path": str(_SIMULATOR_ADVISORY_JS),
+                "decisions_script_path": str(_SIMULATOR_DECISIONS_JS),
+                "controls_script_path": str(_SIMULATOR_CONTROLS_JS),
+                "sequence": sequence,
+                "mutate_badge_clobber": mutate_badge_clobber,
+                "mutate_no_tick_recovery": mutate_no_tick_recovery,
             }
         ),
         text=True,
