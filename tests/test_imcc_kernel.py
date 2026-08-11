@@ -21,6 +21,7 @@ from simulator.melt_backend.imcc_sf04 import (
     ImccFerricInputUnsupportedError,
     ImccNonconvergenceError,
     ImccTOutsideDatapackDomainError,
+    evaluate,
     solve_imcc_sf04,
 )
 from simulator.melt_backend.imcc_sf04.kernel import _active_residual, LOG10
@@ -548,3 +549,166 @@ def test_p2_7_total_displacement() -> None:
     with pytest.raises(ImccNonconvergenceError) as exc:
         solve_imcc_sf04(stiff_parent, 1500.0, stiff_pack, tol=1.0e-12, max_iter=1)
     assert exc.value.diagnostics["total_displacement"] > 0.0
+
+
+# --------------------------------------------------------------------------- #
+# Rung-3 regression: real workbook compositions that refused with the original
+# ideal-fraction start (31/70 sheet-T melt solves).  Each vector is the 8-oxide
+# wt% feed recorded in docs-private/.../rung3/workings.json, with Fe2O3 already
+# folded into FeO per the rung-3 protocol.
+# --------------------------------------------------------------------------- #
+
+_RUNG3_PARENTS = (
+    "SiO2",
+    "MgO",
+    "FeO",
+    "CaO",
+    "Al2O3",
+    "TiO2",
+    "Na2O",
+    "K2O",
+)
+
+# Exact 38-row v1.0.1 kernel fixture used by the rung-3 run. Keeping the
+# sparse stoichiometry and A+B/T coefficients here makes the regression run in
+# a fresh checkout; docs-private evidence is intentionally gitignored.
+_RUNG3_COMPLEXES = [
+    ("Mg2SiO4", {"SiO2": 1, "MgO": 2}, -0.94, 7434, (2500, 3500)),
+    ("MgSiO3", {"SiO2": 1, "MgO": 1}, 0.42, 2329, (2500, 3500)),
+    ("MgAl2O4", {"MgO": 1, "Al2O3": 1}, 1.18, 464, (2500, 3500)),
+    ("MgTiO3", {"MgO": 1, "TiO2": 1}, -0.13, 3246, (2500, 3500)),
+    ("MgTi2O5", {"MgO": 1, "TiO2": 2}, 0.51, 2845, (2500, 3500)),
+    ("Mg2TiO4", {"MgO": 2, "TiO2": 1}, 0.67, 3812, (2500, 3500)),
+    ("Al6Si2O13", {"SiO2": 2, "Al2O3": 3}, -2.94, 9375, (2500, 3500)),
+    ("CaAl2O4", {"CaO": 1, "Al2O3": 1}, -1.89, 10060, (2500, 3500)),
+    ("CaAl4O7", {"CaO": 1, "Al2O3": 2}, -0.59, 9713, (2500, 3500)),
+    ("Ca12Al14O33", {"CaO": 12, "Al2O3": 7}, -6.3, 72239, (2500, 3500)),
+    ("CaSiO3", {"SiO2": 1, "CaO": 1}, 0.54, 5568, (2500, 3500)),
+    ("CaAl2Si2O8", {"SiO2": 2, "CaO": 1, "Al2O3": 1}, 2.63, 5326, (2500, 3500)),
+    ("CaMgSi2O6", {"SiO2": 2, "MgO": 1, "CaO": 1}, 1.46, 8485, (2500, 3500)),
+    ("Ca2MgSi2O7", {"SiO2": 2, "MgO": 1, "CaO": 2}, 0.63, 15327, (2500, 3500)),
+    ("Ca2Al2SiO7", {"SiO2": 1, "CaO": 2, "Al2O3": 1}, 2.01, 10710, (2500, 3500)),
+    ("CaTiO3", {"CaO": 1, "TiO2": 1}, -0.08, 7055, (2500, 3500)),
+    ("Ca2SiO4", {"SiO2": 1, "CaO": 2}, 0.63, 8416, (2500, 3500)),
+    ("CaTiSiO5", {"SiO2": 1, "CaO": 1, "TiO2": 1}, -0.18, 10071, (2500, 3500)),
+    ("FeTiO3", {"FeO": 1, "TiO2": 1}, -0.51, 3569, (2500, 3500)),
+    ("Fe2SiO4", {"SiO2": 1, "FeO": 2}, -0.63, 3103, (2500, 3500)),
+    ("FeAl2O4", {"FeO": 1, "Al2O3": 1}, -1.76, 5692, (2500, 3500)),
+    ("CaAl12O19", {"CaO": 1, "Al2O3": 6}, -3.79, 22612, (2500, 3500)),
+    ("Mg2Al4Si5O18", {"SiO2": 5, "MgO": 2, "Al2O3": 2}, 7.48, 0, (2500, 3500)),
+    ("Na2SiO3", {"SiO2": 1, "Na2O": 1}, -1.33, 13870, (2500, 3500)),
+    ("Na2Si2O5", {"SiO2": 2, "Na2O": 1}, -1.39, 15350, (2500, 3500)),
+    ("NaAlSiO4", {"SiO2": 1, "Al2O3": 0.5, "Na2O": 0.5}, 0.65, 6997, (2500, 3500)),
+    ("NaAlSi3O8", {"SiO2": 3, "Al2O3": 0.5, "Na2O": 0.5}, 1.29, 8788, (2500, 3500)),
+    ("NaAlO2", {"Al2O3": 0.5, "Na2O": 0.5}, 0.55, 3058, (2500, 3500)),
+    ("Na2TiO3", {"TiO2": 1, "Na2O": 1}, -1.38, 15445, (2500, 3500)),
+    ("NaAlSi2O6", {"SiO2": 2, "Al2O3": 0.5, "Na2O": 0.5}, -1.02, 9607, (2500, 3500)),
+    ("K2SiO3", {"SiO2": 1, "K2O": 1}, 0.27, 12735, (1700, 3000)),
+    ("K2Si2O5", {"SiO2": 2, "K2O": 1}, 0.35, 14685, (1700, 3000)),
+    ("KAlSiO4", {"SiO2": 1, "Al2O3": 0.5, "K2O": 0.5}, 0.97, 8675, (2500, 3500)),
+    ("KAlSi3O8", {"SiO2": 3, "Al2O3": 0.5, "K2O": 0.5}, 1.11, 11229, (2500, 3500)),
+    ("KAlO2", {"Al2O3": 0.5, "K2O": 0.5}, 0.72, 4679, (2500, 3500)),
+    ("KAlSi2O6", {"SiO2": 2, "Al2O3": 0.5, "K2O": 0.5}, 1.53, 10125, (2500, 3500)),
+    ("K2Si4O9", {"SiO2": 4, "K2O": 1}, -0.96, 17572, (1700, 3000)),
+    ("KCaAlSi2O7", {"SiO2": 2, "CaO": 1, "Al2O3": 0.5, "K2O": 0.5}, 4.3, 17037, (1700, 3000)),
+]
+
+
+def make_rung3_datapack() -> ImccDatapack:
+    """Build the tracked test copy of the source-verified v1.0.1 datapack."""
+    nu = np.zeros((len(_RUNG3_PARENTS), len(_RUNG3_COMPLEXES)))
+    for column, (_name, stoich, _A, _B, _domain) in enumerate(_RUNG3_COMPLEXES):
+        for parent, coefficient in stoich.items():
+            nu[_RUNG3_PARENTS.index(parent), column] = coefficient
+    return ImccDatapack(
+        reactions=tuple(row[0] for row in _RUNG3_COMPLEXES),
+        nu=nu,
+        A=np.array([row[2] for row in _RUNG3_COMPLEXES]),
+        B=np.array([row[3] for row in _RUNG3_COMPLEXES]),
+        domains=[row[4] for row in _RUNG3_COMPLEXES],
+        version="rung3-regression-v1.0.1",
+        parent_oxides=_RUNG3_PARENTS,
+    )
+
+
+# 8-oxide wt% vectors (Fe2O3 already folded into FeO) for the 31 (sheet, T)
+# melt solves that refused imcc_nonconvergence in the rung-3 workbook
+# regression.  Transcribed from docs-private/.../rung3/workings.json.
+_RUNG3_REGRESSION_CASES = [
+    # (sheet, T_K, {oxide: wt%})
+    ("tho", 1500.0, {"SiO2": 50.71, "MgO": 4.68, "FeO": 13.470072141126078, "CaO": 8.83, "Al2O3": 14.48, "TiO2": 1.7, "Na2O": 3.16, "K2O": 0.77}),
+    ("aba", 1500.0, {"SiO2": 44.8, "MgO": 11.07, "FeO": 12.24844783858423, "CaO": 10.16, "Al2O3": 13.86, "TiO2": 1.96, "Na2O": 3.19, "K2O": 1.09}),
+    ("aba", 1625.0, {"SiO2": 44.8, "MgO": 11.07, "FeO": 12.24844783858423, "CaO": 10.16, "Al2O3": 13.86, "TiO2": 1.96, "Na2O": 3.19, "K2O": 1.09}),
+    ("aba", 1750.0, {"SiO2": 44.8, "MgO": 11.07, "FeO": 12.24844783858423, "CaO": 10.16, "Al2O3": 13.86, "TiO2": 1.96, "Na2O": 3.19, "K2O": 1.09}),
+    ("aba", 1900.0, {"SiO2": 44.8, "MgO": 11.07, "FeO": 12.24844783858423, "CaO": 10.16, "Al2O3": 13.86, "TiO2": 1.96, "Na2O": 3.19, "K2O": 1.09}),
+    ("aba", 2000.0, {"SiO2": 44.8, "MgO": 11.07, "FeO": 12.24844783858423, "CaO": 10.16, "Al2O3": 13.86, "TiO2": 1.96, "Na2O": 3.19, "K2O": 1.09}),
+    ("aba", 2125.0, {"SiO2": 44.8, "MgO": 11.07, "FeO": 12.24844783858423, "CaO": 10.16, "Al2O3": 13.86, "TiO2": 1.96, "Na2O": 3.19, "K2O": 1.09}),
+    ("kom", 1500.0, {"SiO2": 47.1, "MgO": 29.6, "FeO": 11.53, "CaO": 5.44, "Al2O3": 4.04, "TiO2": 0.24, "Na2O": 0.46, "K2O": 0.09}),
+    ("kom", 1625.0, {"SiO2": 47.1, "MgO": 29.6, "FeO": 11.53, "CaO": 5.44, "Al2O3": 4.04, "TiO2": 0.24, "Na2O": 0.46, "K2O": 0.09}),
+    ("kom", 1900.0, {"SiO2": 47.1, "MgO": 29.6, "FeO": 11.53, "CaO": 5.44, "Al2O3": 4.04, "TiO2": 0.24, "Na2O": 0.46, "K2O": 0.09}),
+    ("kom", 2250.0, {"SiO2": 47.1, "MgO": 29.6, "FeO": 11.53, "CaO": 5.44, "Al2O3": 4.04, "TiO2": 0.24, "Na2O": 0.46, "K2O": 0.09}),
+    ("kom", 2375.0, {"SiO2": 47.1, "MgO": 29.6, "FeO": 11.53, "CaO": 5.44, "Al2O3": 4.04, "TiO2": 0.24, "Na2O": 0.46, "K2O": 0.09}),
+    ("kom", 2500.0, {"SiO2": 47.1, "MgO": 29.6, "FeO": 11.53, "CaO": 5.44, "Al2O3": 4.04, "TiO2": 0.24, "Na2O": 0.46, "K2O": 0.09}),
+    ("dun", 1500.0, {"SiO2": 40.2, "MgO": 43.2, "FeO": 13.609639482237126, "CaO": 0.8, "Al2O3": 0.8, "TiO2": 0.2, "Na2O": 0.3, "K2O": 0.1}),
+    ("dun", 1625.0, {"SiO2": 40.2, "MgO": 43.2, "FeO": 13.609639482237126, "CaO": 0.8, "Al2O3": 0.8, "TiO2": 0.2, "Na2O": 0.3, "K2O": 0.1}),
+    ("dun", 1750.0, {"SiO2": 40.2, "MgO": 43.2, "FeO": 13.609639482237126, "CaO": 0.8, "Al2O3": 0.8, "TiO2": 0.2, "Na2O": 0.3, "K2O": 0.1}),
+    ("dun", 1900.0, {"SiO2": 40.2, "MgO": 43.2, "FeO": 13.609639482237126, "CaO": 0.8, "Al2O3": 0.8, "TiO2": 0.2, "Na2O": 0.3, "K2O": 0.1}),
+    ("dun", 2250.0, {"SiO2": 40.2, "MgO": 43.2, "FeO": 13.609639482237126, "CaO": 0.8, "Al2O3": 0.8, "TiO2": 0.2, "Na2O": 0.3, "K2O": 0.1}),
+    ("bit", 1500.0, {"SiO2": 75.6, "MgO": 0.21, "FeO": 0.25, "CaO": 0.95, "Al2O3": 13.0, "TiO2": 1.1, "Na2O": 3.35, "K2O": 5.55}),
+    ("bit", 1625.0, {"SiO2": 75.6, "MgO": 0.21, "FeO": 0.25, "CaO": 0.95, "Al2O3": 13.0, "TiO2": 1.1, "Na2O": 3.35, "K2O": 5.55}),
+    ("bit", 1750.0, {"SiO2": 75.6, "MgO": 0.21, "FeO": 0.25, "CaO": 0.95, "Al2O3": 13.0, "TiO2": 1.1, "Na2O": 3.35, "K2O": 5.55}),
+    ("bit", 1875.0, {"SiO2": 75.6, "MgO": 0.21, "FeO": 0.25, "CaO": 0.95, "Al2O3": 13.0, "TiO2": 1.1, "Na2O": 3.35, "K2O": 5.55}),
+    ("bit", 2000.0, {"SiO2": 75.6, "MgO": 0.21, "FeO": 0.25, "CaO": 0.95, "Al2O3": 13.0, "TiO2": 1.1, "Na2O": 3.35, "K2O": 5.55}),
+    ("bit", 2125.0, {"SiO2": 75.6, "MgO": 0.21, "FeO": 0.25, "CaO": 0.95, "Al2O3": 13.0, "TiO2": 1.1, "Na2O": 3.35, "K2O": 5.55}),
+    ("bit", 2250.0, {"SiO2": 75.6, "MgO": 0.21, "FeO": 0.25, "CaO": 0.95, "Al2O3": 13.0, "TiO2": 1.1, "Na2O": 3.35, "K2O": 5.55}),
+    ("bit", 2375.0, {"SiO2": 75.6, "MgO": 0.21, "FeO": 0.25, "CaO": 0.95, "Al2O3": 13.0, "TiO2": 1.1, "Na2O": 3.35, "K2O": 5.55}),
+    ("bit", 2500.0, {"SiO2": 75.6, "MgO": 0.21, "FeO": 0.25, "CaO": 0.95, "Al2O3": 13.0, "TiO2": 1.1, "Na2O": 3.35, "K2O": 5.55}),
+    ("cai", 1500.0, {"SiO2": 29.1, "MgO": 10.2, "FeO": 0.6, "CaO": 28.8, "Al2O3": 29.6, "TiO2": 1.3, "Na2O": 0.18, "K2O": 0.1}),
+    ("cai", 1625.0, {"SiO2": 29.1, "MgO": 10.2, "FeO": 0.6, "CaO": 28.8, "Al2O3": 29.6, "TiO2": 1.3, "Na2O": 0.18, "K2O": 0.1}),
+    ("cai", 1750.0, {"SiO2": 29.1, "MgO": 10.2, "FeO": 0.6, "CaO": 28.8, "Al2O3": 29.6, "TiO2": 1.3, "Na2O": 0.18, "K2O": 0.1}),
+    ("cai", 2125.0, {"SiO2": 29.1, "MgO": 10.2, "FeO": 0.6, "CaO": 28.8, "Al2O3": 29.6, "TiO2": 1.3, "Na2O": 0.18, "K2O": 0.1}),
+]
+
+
+@pytest.mark.parametrize("sheet, T_K, comp_wt", _RUNG3_REGRESSION_CASES)
+def test_rung3_refusing_compositions_converge(
+    sheet: str, T_K: float, comp_wt: dict[str, float]
+) -> None:
+    """Previously refusing workbook compositions must now solve and close balance."""
+    pack = make_rung3_datapack()
+    res = evaluate(
+        comp_wt,
+        T_K=T_K,
+        pack=pack,
+        basis_type="wt",
+        allow_extrapolation=True,
+        tol=1.0e-12,
+    )
+    assert_solve_ok(res, pack)
+    assert res.convergence.residual_inf <= 1.0e-12, f"{sheet}@{T_K:g} K"
+    assert res.convergence.status == "converged"
+
+
+def test_rung3_bit_1900_control_converges() -> None:
+    """The requested bit@1900 K control was not one of the baseline refusals."""
+    pack = make_rung3_datapack()
+    bit_wt = {
+        "SiO2": 75.6,
+        "MgO": 0.21,
+        "FeO": 0.25,
+        "CaO": 0.95,
+        "Al2O3": 13.0,
+        "TiO2": 1.1,
+        "Na2O": 3.35,
+        "K2O": 5.55,
+    }
+    res = evaluate(
+        bit_wt,
+        T_K=1900.0,
+        pack=pack,
+        basis_type="wt",
+        allow_extrapolation=True,
+        tol=1.0e-12,
+    )
+    assert_solve_ok(res, pack)
+    assert res.convergence.residual_inf <= 1.0e-12

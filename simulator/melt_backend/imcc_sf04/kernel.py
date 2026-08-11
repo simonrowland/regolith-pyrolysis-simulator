@@ -21,6 +21,8 @@ from scipy.optimize import least_squares
 
 
 LOG10 = math.log(10.0)
+_CONTINUATION_LOGK_STEP = 2.0 * LOG10
+_CONTINUATION_INITIAL_COMPLEX_X = 1.0e-4
 
 
 # --------------------------------------------------------------------------- #
@@ -283,6 +285,33 @@ def _solve_active(
     explicit bounds in log-space variables ``y_i = ln x_i*``. This enforces
     strict positivity of the unbound parent fractions and is stable for
     strongly associated systems.
+
+    Solver robustness
+    -----------------
+    The ideal-fraction start ``x_i* = x_i`` (i.e. ``y = ln x``) is the correct
+    solution in the no-complexing limit (K -> 0).  For strongly associated
+    melts, however, the trust-region solver can be attracted to a flat residual
+    basin where one or more unbound fractions are driven toward the log-space
+    lower bound; the solver then terminates on ftol/xtol while the parent-
+    balance residual remains orders of magnitude above the requested tolerance.
+    The rung-3 workbook regression (31/70 melt solves refusing) showed exactly
+    this pattern: residual floors of 3e-3 to 1.4e-1 with final y values parked
+    near the bound.
+
+    If the direct solve stalls, association-strength continuation supplies a
+    physically connected start.  Multiplying every equilibrium constant by
+    ``lambda`` changes the mass-action term to
+
+        x_j(lambda) = lambda K_j prod_i (x_i*)**nu_ij.
+
+    At ``lambda -> 0``, complexes vanish and ``y = ln(x)`` is the exact
+    solution.  We choose the first log(lambda) so every complex evaluated at
+    that ideal solution is at most 1e-4, then increase log(lambda) by no more
+    than two decades per stage until lambda = 1.  This follows the same
+    equilibrium branch instead of guessing composition-specific starts.  All
+    residuals are dimensionless; lambda is dimensionless.  If continuation
+    cannot reach the requested tolerance inside the original evaluation
+    budget, the typed ``ImccNonconvergenceError`` remains the outcome.
     """
     n = len(x_target)
     if n == 0:
@@ -294,17 +323,9 @@ def _solve_active(
             {"iterations": 0, "residual_inf": float("inf"), "residual_l2": float("inf")},
         )
 
-    # Initial guess: unbound parent fraction near the analytical fraction.
-    # Use a floor to keep the logarithm finite for parents with tiny targets.
+    # Ideal-fraction start (no-complexing limit).  Floor tiny parents so the
+    # logarithm stays finite.
     y0 = np.log(np.maximum(x_target, 1.0e-12))
-
-    def fun(y: np.ndarray) -> np.ndarray:
-        f, _g, _D, _J = _active_residual(y, x_target, nu, lnK, S)
-        return f
-
-    def jac(y: np.ndarray) -> np.ndarray:
-        _f, _g, _D, J = _active_residual(y, x_target, nu, lnK, S)
-        return J
 
     # Trust-region reflective least-squares with explicit bounds keeps the
     # log-space variables away from the exponential overflow cliff while still
@@ -312,22 +333,59 @@ def _solve_active(
     lb = np.full(n, -200.0)
     ub = np.full(n, 100.0)
     max_nfev = max(10, max_iter * (n + 1))
-    try:
-        sol = least_squares(
-            fun,
-            y0,
-            jac=jac,
-            bounds=(lb, ub),
-            method="trf",
-            ftol=tol,
-            xtol=tol,
-            gtol=tol,
-            max_nfev=max_nfev,
+
+    def _attempt(
+        y_init: np.ndarray,
+        trial_lnK: np.ndarray,
+        nfev_budget: int,
+    ) -> tuple[np.ndarray, np.ndarray, float, int, float, float, float, str] | None:
+        """One least-squares attempt; returns None if residuals are non-finite."""
+        if nfev_budget <= 0:
+            return None
+
+        def fun(y: np.ndarray) -> np.ndarray:
+            f, _g, _D, _J = _active_residual(y, x_target, nu, trial_lnK, S)
+            return f
+
+        def jac(y: np.ndarray) -> np.ndarray:
+            _f, _g, _D, J = _active_residual(y, x_target, nu, trial_lnK, S)
+            return J
+
+        try:
+            sol = least_squares(
+                fun,
+                y_init,
+                jac=jac,
+                bounds=(lb, ub),
+                method="trf",
+                ftol=tol,
+                xtol=tol,
+                gtol=tol,
+                max_nfev=nfev_budget,
+            )
+        except ValueError:
+            # Non-finite residuals during this attempt (e.g. extreme K values).
+            return None
+        y = sol.x
+        f, g, D, _J = _active_residual(y, x_target, nu, trial_lnK, S)
+        residual_inf = float(np.linalg.norm(f, ord=np.inf))
+        residual_l2 = float(np.linalg.norm(f, ord=2))
+        total_displacement = float(np.linalg.norm(y - y0))
+        return (
+            y,
+            g,
+            D,
+            int(sol.nfev),
+            residual_inf,
+            residual_l2,
+            total_displacement,
+            str(sol.message),
         )
-    except ValueError as exc:
-        # Non-finite residuals during the solve (e.g. extreme K values) must
-        # be typed as nonconvergence, not allowed to escape as untyped scipy
-        # errors.
+
+    # The direct solve remains the fast path. The final message is retained only
+    # for a typed refusal, so converged returns slice it off.
+    first = _attempt(y0, lnK, max_nfev)
+    if first is None:
         raise ImccNonconvergenceError(
             "IMCC-SF04 parent-balance solve produced non-finite residuals",
             {
@@ -336,26 +394,84 @@ def _solve_active(
                 "residual_l2": float("inf"),
                 "final_y": y0.tolist(),
                 "total_displacement": 0.0,
-                "scipy_message": str(exc),
+                "continuation": [],
             },
-        ) from exc
+        )
 
-    y = sol.x
-    f, g, D, _J = _active_residual(y, x_target, nu, lnK, S)
-    residual_inf = float(np.linalg.norm(f, ord=np.inf))
-    residual_l2 = float(np.linalg.norm(f, ord=2))
+    if first[4] <= tol:
+        return first[:7]
 
-    total_displacement = float(np.linalg.norm(y - y0))
-    if residual_inf <= tol:
-        return y, g, D, int(sol.nfev), residual_inf, residual_l2, total_displacement
+    total_nfev = first[3]
+    continuation = [
+        {
+            "log_lambda": 0.0,
+            "iterations": first[3],
+            "residual_inf": first[4],
+        }
+    ]
+    max_log_complex_at_ideal = float(np.max(lnK + nu.T @ y0))
+    start_log_lambda = min(
+        0.0,
+        math.log(_CONTINUATION_INITIAL_COMPLEX_X) - max_log_complex_at_ideal,
+    )
+    stage_count = max(
+        1,
+        math.ceil(-start_log_lambda / _CONTINUATION_LOGK_STEP),
+    )
+    log_lambdas = np.linspace(start_log_lambda, 0.0, stage_count + 1)
 
+    best = first
+    y_stage = y0
+    for log_lambda in log_lambdas:
+        remaining_nfev = max_nfev - total_nfev
+        attempt = _attempt(y_stage, lnK + log_lambda, remaining_nfev)
+        if attempt is None:
+            break
+        total_nfev += attempt[3]
+        continuation.append(
+            {
+                "log_lambda": float(log_lambda),
+                "iterations": attempt[3],
+                "residual_inf": attempt[4],
+            }
+        )
+        if log_lambda == 0.0 and attempt[4] < best[4]:
+            best = attempt
+        if attempt[4] > tol:
+            break
+        y_stage = attempt[0]
+        if log_lambda == 0.0:
+            return (
+                attempt[0],
+                attempt[1],
+                attempt[2],
+                total_nfev,
+                attempt[4],
+                attempt[5],
+                attempt[6],
+            )
+
+    # Continuation did not reach lambda=1 at tolerance. Diagnostics remain for
+    # the full-strength system; intermediate homotopy residuals are a trajectory,
+    # not substitutes for the requested physical solution.
+    (
+        y_best,
+        g_best,
+        D_best,
+        nfev_best,
+        res_inf_best,
+        res_l2_best,
+        disp_best,
+        msg_best,
+    ) = best
     diagnostics = {
-        "iterations": int(sol.nfev),
-        "residual_inf": residual_inf,
-        "residual_l2": residual_l2,
-        "final_y": y.tolist(),
-        "total_displacement": total_displacement,
-        "scipy_message": sol.message,
+        "iterations": total_nfev,
+        "residual_inf": res_inf_best,
+        "residual_l2": res_l2_best,
+        "final_y": y_best.tolist(),
+        "total_displacement": disp_best,
+        "scipy_message": msg_best,
+        "continuation": continuation,
     }
     raise ImccNonconvergenceError(
         "IMCC-SF04 parent-balance solve did not converge",
