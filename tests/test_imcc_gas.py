@@ -8,6 +8,13 @@ from pathlib import Path
 import pytest
 
 from simulator.melt_backend.imcc_sf04.gas import (
+    IMCC_GAS_CHANNEL_SPECIES,
+    IMCC_GAS_INCOMPLETE_PARENT_SPECIES,
+    IMCC_GAS_NO_JANAF_ROWS,
+    IMCC_GAS_UNAVAILABLE_SPECIES,
+    IMCC_GAS_WORKBOOK_EXTRAPOLATION_LABELS,
+    IMCC_GAS_WORKBOOK_IN_DOMAIN_SPECIES,
+    IMCC_SF04_WORKBOOK_GRID_K,
     ImccGasDatapack,
     ImccGasSpeciesNotFoundError,
     ImccGasTemperatureOutsideDomainError,
@@ -81,6 +88,32 @@ _RUNG2B_PRINTED_JANAF = {
     }
 }
 
+# T-625 expansion reference: T = 2500 K, fO2 = 1 bar, parent activities = 1.
+# These log10(p/bar) literals are the Chase (1998) printed-JANAF lgK values,
+# rounded to the printed table's 3-decimal precision, then combined with the
+# disclosed melt-oxide reaction coefficients.  The JANAF gas rows live in
+# ../VapoRock/src/vaporock/data/JANAF-vapor-data-full.csv; the LAMOR/JANAF
+# liquid-parent rows live in ../VapoRock/data/condensate-thermo-data.csv.
+# The high-T-only rows are deliberately extrapolated here and separately locked
+# to typed refusal below; an evidence fixture does not widen their domain.
+_T625_PRINTED_JANAF = {
+    2500.0: {
+        "O": -1.839,
+        "AlO": -5.865,
+        "AlO2": -5.932,
+        "Al2O": -9.964,
+        "Al2O2": -8.422,
+        "Na2": -3.725,
+        "NaO": -1.414,
+        "K2": -0.030,
+        "KO": 0.534,
+        "Si": -11.904,
+        "Al": -8.695,
+        "CaO": -5.476,
+        "Ca": -6.261,
+    }
+}
+
 
 def test_p1_g1_rung2b_noncircular_against_printed_janaf(
     gas_pack: ImccGasDatapack, unit_activities: dict[str, float]
@@ -146,23 +179,86 @@ def test_p1_g1_rung2b_noncircular_against_printed_janaf(
     assert worst <= 0.01
 
 
+def test_t625_new_channels_noncircular_against_printed_janaf(
+    gas_pack: ImccGasDatapack, unit_activities: dict[str, float]
+) -> None:
+    """Every usable F3-6 addition agrees with an independently rounded lgK."""
+    T = 2500.0
+    refs = _T625_PRINTED_JANAF[T]
+    pressures = evaluate_gas(
+        unit_activities,
+        T,
+        fO2=1.0,
+        datapack=gas_pack,
+        allow_extrapolation=True,
+        gas_species=tuple(refs),
+    )
+
+    assert set(pressures) == set(refs)
+    for species, expected_log10 in refs.items():
+        actual_log10 = math.log10(pressures[species])
+        err = abs(actual_log10 - expected_log10)
+        assert 0.0 < err <= 0.01, (
+            f"{species} at {T} K: independently rounded reference must have "
+            f"nonzero error <= 0.01 dex, got {err:.6f}"
+        )
+
+
 # --------------------------------------------------------------------------- #
 # P1-G2: honest coverage statement for the rung-2b sample
 # --------------------------------------------------------------------------- #
 
 
 def test_p1_g2_rung2b_coverage_subset() -> None:
-    """E10: the rung-2b sample is the 9-species chunk-5a subset, not rung-3/4."""
-    # The 9 retained species implemented in the chunk-5a gas layer.
-    implemented = {"Na", "K", "SiO", "Fe", "FeO", "Mg", "MgO", "SiO2", "O2"}
+    """T-625 covers every workbook species with a complete thermodynamic path."""
+    implemented = set(IMCC_GAS_CHANNEL_SPECIES)
+    unavailable = set(IMCC_GAS_UNAVAILABLE_SPECIES)
     # Per IMCC-SF04 spec §8, the rung-3/4 workbook retained population is the
-    # 32 gas-species rows in Schaefer2004-MAGMA-valid.xlsx.  This rung-2b suite
-    # exercises only the implemented chunk-5a subset and does not claim coverage
-    # of the full rung-3/4 retained set.
+    # 32 gas-species rows in Schaefer2004-MAGMA-valid.xlsx.
     rung3_4_retained_count = 32
-    assert len(implemented) == 9
+    assert len(implemented) == 22
+    assert len(unavailable) == 10
+    assert implemented.isdisjoint(unavailable)
+    assert set(IMCC_GAS_WORKBOOK_IN_DOMAIN_SPECIES).isdisjoint(
+        IMCC_GAS_WORKBOOK_EXTRAPOLATION_LABELS
+    )
+    assert set(IMCC_GAS_WORKBOOK_IN_DOMAIN_SPECIES) | set(
+        IMCC_GAS_WORKBOOK_EXTRAPOLATION_LABELS
+    ) == implemented
     assert rung3_4_retained_count == 32
-    assert len(implemented) < rung3_4_retained_count
+    assert len(implemented | unavailable) == rung3_4_retained_count
+
+
+def test_t625_unavailable_species_name_the_closing_source(
+    gas_pack: ImccGasDatapack,
+) -> None:
+    assert set(IMCC_GAS_NO_JANAF_ROWS) == {
+        "Na2O",
+        "K2O",
+        "Na+",
+        "K+",
+        "e-",
+        "Zn",
+        "ZnO",
+    }
+    assert set(IMCC_GAS_INCOMPLETE_PARENT_SPECIES) == {
+        "Ti",
+        "TiO",
+        "TiO2",
+    }
+    assert all(
+        source.startswith("needs") or "; needs" in source
+        for source in IMCC_GAS_UNAVAILABLE_SPECIES.values()
+    )
+    assert all(
+        f"{species}(g)" not in gas_pack.gas_df.index
+        for species in IMCC_GAS_NO_JANAF_ROWS
+    )
+    assert all(
+        f"{species}(g)" in gas_pack.gas_df.index
+        for species in IMCC_GAS_INCOMPLETE_PARENT_SPECIES
+    )
+    assert "TiO2(l)" not in gas_pack.oxide_df.index
 
 
 # --------------------------------------------------------------------------- #
@@ -194,6 +290,67 @@ def test_p2_g3_refuses_outside_oxide_domain(
     # The first oxide in loop order is Na2O(l); do not hard-code the exact
     # species because the test only needs to prove the oxide-side refusal is live.
     assert "(l)" in str(exc.value)
+
+
+_EXTRAPOLATION_REFUSAL_CASES = (
+    ("SiO", 1900.0, "SiO2(l)"),
+    ("Fe", 2500.0, "Fe(g)"),
+    ("FeO", 2500.0, "FeO(g)"),
+    ("Mg", 2500.0, "MgO(l)"),
+    ("MgO", 2500.0, "MgO(g)"),
+    ("SiO2", 2500.0, "SiO2(g)"),
+    ("AlO", 2000.0, "Al2O3(l)"),
+    ("AlO2", 2000.0, "Al2O3(l)"),
+    ("Al2O", 2000.0, "Al2O3(l)"),
+    ("Al2O2", 2000.0, "Al2O3(l)"),
+    ("Si", 2500.0, "Si(g)"),
+    ("Al", 2500.0, "Al(g)"),
+    ("CaO", 2500.0, "CaO(g)"),
+    ("CaO", 4500.0, "CaO(l)"),
+    ("Ca", 1750.0, "Ca(g)"),
+    ("Ca", 2500.0, "CaO(l)"),
+)
+
+
+@pytest.mark.parametrize(
+    ("species", "T_K", "source_species"), _EXTRAPOLATION_REFUSAL_CASES
+)
+def test_t625_each_extrapolation_label_has_typed_domain_refusal(
+    gas_pack: ImccGasDatapack,
+    unit_activities: dict[str, float],
+    species: str,
+    T_K: float,
+    source_species: str,
+) -> None:
+    assert {case[0] for case in _EXTRAPOLATION_REFUSAL_CASES} == set(
+        IMCC_GAS_WORKBOOK_EXTRAPOLATION_LABELS
+    )
+    with pytest.raises(ImccGasTemperatureOutsideDomainError) as exc:
+        evaluate_gas(
+            unit_activities,
+            T_K,
+            fO2=1.0,
+            datapack=gas_pack,
+            gas_species=(species,),
+        )
+    assert exc.value.code == "imcc_gas_T_outside_domain"
+    assert source_species in str(exc.value)
+
+
+def test_t625_in_domain_labels_cover_the_whole_workbook_grid(
+    gas_pack: ImccGasDatapack,
+    unit_activities: dict[str, float],
+) -> None:
+    for species in IMCC_GAS_WORKBOOK_IN_DOMAIN_SPECIES:
+        for T_K in IMCC_SF04_WORKBOOK_GRID_K:
+            pressures = evaluate_gas(
+                unit_activities,
+                T_K,
+                fO2=1.0,
+                datapack=gas_pack,
+                gas_species=(species,),
+            )
+            assert species in pressures
 
 
 # --------------------------------------------------------------------------- #
@@ -339,17 +496,7 @@ def test_gas_layer_uses_imcc_activities() -> None:
     )
 
     # All retained species are present and non-negative.
-    assert set(pressures.keys()) == {
-        "Na",
-        "K",
-        "SiO",
-        "Fe",
-        "FeO",
-        "Mg",
-        "MgO",
-        "SiO2",
-        "O2",
-    }
+    assert set(pressures) == set(IMCC_GAS_CHANNEL_SPECIES)
     assert all(p >= 0.0 for p in pressures.values())
     # O2 is exactly the caller-pinned value.
     assert pressures["O2"] == 1.0e-10

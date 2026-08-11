@@ -75,10 +75,17 @@ DEFAULT_CONDENSATE_DATABASE_PATH = (
 # --------------------------------------------------------------------------- #
 
 # Map retained gas species to the vaporization reaction
-#     parent_oxide(l) -> n_gas * gas(g) + n_O2 * O2(g)
-# where n_gas is the stoichiometric coefficient of the gas species and n_O2 is
-# the stoichiometric coefficient of O2.  O2 itself is treated as a pinned input
-# (p_O2 = fO2) and has no oxide parent.
+#     parent_oxide(l) -> n_gas * gas(g) + n_O2 * O2(g).
+#
+# Derivation: for a parent E_a O_b and target gas E_c O_d, element balance gives
+# n_gas = a/c and n_O2 = (b - n_gas*d)/2.  A negative n_O2 puts O2 on the
+# reactant side.  O(g) is the oxide-free dissociation 1/2 O2(g) -> O(g), encoded
+# with an empty parent and n_O2 = -1/2.  All G degrees use elements in their
+# 298 K standard states and ideal gas at 1 bar, so the elemental references
+# cancel in Delta G degrees.  Unit check: stoichiometric coefficients multiply
+# J/mol values, hence -Delta G degrees/(R*T) is dimensionless.  Sanity checks:
+# Al2O3 -> 2 AlO + 1/2 O2 balances Al2O3, while
+# Na2O + 1/2 O2 -> 2 NaO balances Na2O2.
 _SF04_REACTIONS: dict[str, tuple[str, int, float]] = {
     "Na": ("Na2O", 2, 0.5),
     "K": ("K2O", 2, 0.5),
@@ -88,7 +95,119 @@ _SF04_REACTIONS: dict[str, tuple[str, int, float]] = {
     "Mg": ("MgO", 1, 0.5),
     "MgO": ("MgO", 1, 0.0),
     "SiO2": ("SiO2", 1, 0.0),
+    "O": ("", 1, -0.5),
+    "AlO": ("Al2O3", 2, 0.5),
+    "AlO2": ("Al2O3", 2, -0.5),
+    "Al2O": ("Al2O3", 1, 1.0),
+    "Al2O2": ("Al2O3", 1, 0.5),
+    "Na2": ("Na2O", 1, 0.5),
+    "NaO": ("Na2O", 2, -0.5),
+    "K2": ("K2O", 1, 0.5),
+    "KO": ("K2O", 2, -0.5),
+    "Si": ("SiO2", 1, 1.0),
+    "Al": ("Al2O3", 2, 1.5),
+    "CaO": ("CaO", 1, 0.0),
+    "Ca": ("CaO", 1, 0.5),
     "O2": ("", 1, 0.0),  # special: p_O2 = fO2
+}
+
+IMCC_GAS_CHANNEL_SPECIES = tuple(_SF04_REACTIONS)
+
+IMCC_SF04_WORKBOOK_GRID_K = (
+    1500.0,
+    1625.0,
+    1750.0,
+    1875.0,
+    1900.0,
+    2000.0,
+    2125.0,
+    2250.0,
+    2375.0,
+    2500.0,
+)
+
+# EXTRAPOLATED-INFORMATIONAL labels for every channel whose gas or parent-oxide
+# digitization does not cover the full Schaefer-2004 workbook grid above.  The
+# evaluator still refuses these temperatures unless allow_extrapolation=True;
+# these labels disclose the reason and never widen the executable domain.
+IMCC_GAS_WORKBOOK_EXTRAPOLATION_LABELS: dict[str, str] = {
+    "SiO": "SiO2(l) [1996, 3000] K misses workbook T < 1996 K",
+    "Fe": "Fe(g) [3133.345, 6000] K lies above the whole workbook grid",
+    "FeO": "FeO(g) [5000, 6000] K lies above the whole workbook grid",
+    "Mg": "MgO(l) [3100, 3500] K lies above the whole workbook grid",
+    "MgO": (
+        "MgO(g) [5000, 6000] K and MgO(l) [3100, 3500] K lie above "
+        "the whole workbook grid"
+    ),
+    "SiO2": (
+        "SiO2(g) [4500, 6000] K lies above the whole workbook grid; "
+        "SiO2(l) [1996, 3000] K also misses workbook T < 1996 K"
+    ),
+    "AlO": "Al2O3(l) [2327, 3000] K misses workbook T < 2327 K",
+    "AlO2": "Al2O3(l) [2327, 3000] K misses workbook T < 2327 K",
+    "Al2O": "Al2O3(l) [2327, 3000] K misses workbook T < 2327 K",
+    "Al2O2": "Al2O3(l) [2327, 3000] K misses workbook T < 2327 K",
+    "Si": (
+        "Si(g) [3504.616, 6000] K lies above the whole workbook grid; "
+        "SiO2(l) [1996, 3000] K also misses workbook T < 1996 K"
+    ),
+    "Al": (
+        "Al(g) [2790.812, 6000] K lies above the whole workbook grid; "
+        "Al2O3(l) [2327, 3000] K also misses workbook T < 2327 K"
+    ),
+    "CaO": (
+        "CaO(g) [4500, 6000] K and CaO(l) [2900, 3800] K lie above "
+        "the whole workbook grid"
+    ),
+    "Ca": (
+        "Ca(g) [1774, 6000] K misses 1500/1625/1750 K; "
+        "CaO(l) [2900, 3800] K lies above the whole workbook grid"
+    ),
+}
+
+IMCC_GAS_WORKBOOK_IN_DOMAIN_SPECIES = (
+    "Na",
+    "K",
+    "O",
+    "Na2",
+    "NaO",
+    "K2",
+    "KO",
+    "O2",
+)
+
+# F3-6 closure ledger.  The first seven species have no gas G(T) row anywhere
+# in the read-only VapoRock JANAF tree.  The titanium gas rows exist, but no
+# TiO2(l) parent row exists, so their melt-oxide reactions remain incomplete.
+IMCC_GAS_NO_JANAF_ROWS: dict[str, str] = {
+    "Na2O": "needs a source-rated Na2O(g) standard-Gibbs row",
+    "K2O": "needs a source-rated K2O(g) standard-Gibbs row",
+    "Na+": (
+        "needs Na+(g) and electron standard-Gibbs rows plus a disclosed "
+        "ionization/electroneutrality convention"
+    ),
+    "K+": (
+        "needs K+(g) and electron standard-Gibbs rows plus a disclosed "
+        "ionization/electroneutrality convention"
+    ),
+    "e-": "needs an electron standard state and a coupled charge-balance model",
+    "Zn": (
+        "needs Zn(g) and ZnO(l) standard-Gibbs rows plus ZnO in the melt-oxide basis"
+    ),
+    "ZnO": (
+        "needs ZnO(g) and ZnO(l) standard-Gibbs rows plus ZnO in the melt-oxide basis"
+    ),
+}
+
+IMCC_GAS_INCOMPLETE_PARENT_SPECIES: dict[str, str] = {
+    "Ti": "Ti(g) exists; needs a source-rated TiO2(l) standard-Gibbs row",
+    "TiO": "TiO(g) exists; needs a source-rated TiO2(l) standard-Gibbs row",
+    "TiO2": "TiO2(g) exists; needs a source-rated TiO2(l) standard-Gibbs row",
+}
+
+IMCC_GAS_UNAVAILABLE_SPECIES = {
+    **IMCC_GAS_NO_JANAF_ROWS,
+    **IMCC_GAS_INCOMPLETE_PARENT_SPECIES,
 }
 
 IMCC_PARENT_OXIDES = (
@@ -303,6 +422,7 @@ def evaluate_gas(
     datapack: ImccGasDatapack,
     parent_oxides: Sequence[str] | None = None,
     allow_extrapolation: bool = False,
+    gas_species: Sequence[str] | None = None,
 ) -> dict[str, float]:
     """Compute equilibrium partial pressures for the SF04 retained gas set.
 
@@ -326,6 +446,10 @@ def evaluate_gas(
         T falls outside the declared G(T) interval for any species consumed by
         the reaction set.  If True, select the nearest interval and evaluate
         silently (legacy run_gate.py behavior).
+    gas_species:
+        Optional retained-species subset.  The default evaluates every available
+        channel.  A subset permits channel-specific diagnostics and preserves
+        the same typed domain refusal semantics.
 
     Returns
     -------
@@ -373,6 +497,19 @@ def evaluate_gas(
     if parent_oxides is None:
         parent_oxides = IMCC_PARENT_OXIDES
 
+    if gas_species is None:
+        reactions = tuple(_SF04_REACTIONS.items())
+    else:
+        requested = (
+            (gas_species,) if isinstance(gas_species, str) else tuple(gas_species)
+        )
+        missing = [name for name in requested if name not in _SF04_REACTIONS]
+        if missing:
+            raise ImccGasSpeciesNotFoundError(
+                f"no IMCC-SF04 gas channel for species {missing!r}"
+            )
+        reactions = tuple((name, _SF04_REACTIONS[name]) for name in requested)
+
     T = float(T_K)
     p_O2 = float(fO2)
     if T <= 0.0:
@@ -398,7 +535,7 @@ def evaluate_gas(
     G_O2 = _janaf_gibbs(T, O2_row)
 
     result: dict[str, float] = {}
-    for gas_name, (oxide, n_gas, n_O2) in _SF04_REACTIONS.items():
+    for gas_name, (oxide, n_gas, n_O2) in reactions:
         if gas_name == "O2":
             result[gas_name] = p_O2
             continue
@@ -409,17 +546,24 @@ def evaluate_gas(
         )
         G_gas = _janaf_gibbs(T, gas_row)
 
-        oxide_name = f"{oxide}(l)"
-        oxide_row = _oxide_row_for_T(
-            datapack.oxide_df, oxide_name, T, allow_extrapolation=allow_extrapolation
-        )
-        G_oxide = _lamor_gibbs(T, oxide_row)
+        if oxide:
+            oxide_name = f"{oxide}(l)"
+            oxide_row = _oxide_row_for_T(
+                datapack.oxide_df,
+                oxide_name,
+                T,
+                allow_extrapolation=allow_extrapolation,
+            )
+            G_oxide = _lamor_gibbs(T, oxide_row)
+            a_oxide = act[oxide]
+        else:
+            G_oxide = 0.0
+            a_oxide = 1.0
 
         # Reaction (1): oxide(l) -> n_gas * gas(g) + n_O2 * O2(g)
         dG = n_gas * G_gas + n_O2 * G_O2 - G_oxide
         Kp = np.exp(-dG / (R_J_MOL_K * T))
 
-        a_oxide = act[oxide]
         if a_oxide < 0.0:
             raise ValueError(f"activity of {oxide!r} is negative: {a_oxide}")
 
