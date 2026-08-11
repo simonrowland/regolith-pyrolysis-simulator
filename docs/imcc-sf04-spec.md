@@ -1,4 +1,4 @@
-# IMCC-SF04 — independent melt-activity shadow engine (SPEC, r2.1 — CONVERGED)
+# IMCC-SF04 — independent melt-activity shadow engine (SPEC, r2.2 — CONVERGED + rung-2 erratum)
 
 Status: r2.1 2026-08-10 — convergence closer verdict CONVERGED (imccspec-rev2-close.md; fold
 verified genuine); binding errata E1–E5 + should-folds E6–E11 applied in this revision.
@@ -209,6 +209,15 @@ Amended rung-2, all pins pre-scoring:
 - F2 (K-fit sub-1700 K drift): no contract change — extrapolation labeling fired as designed;
   the sub-domain K rows are excluded by the population rule and reported informationally.
 - Re-scored results are reported per-row INCLUDING everything that still fails.
+- **OWNER RATIFICATION (2026-08-11) — rung-3 K/Na population:** the workbook's K and Na cells are
+  **computed and reported in full, but EXCLUDED from the gate population** as closed-code-divergent
+  ("calculate but exclude"). Evidence: the t-626 back-solve (IMCC-impl/t626/report.md) — reproducing
+  the workbook K columns requires ~−2.0 logK vs the PUBLISHED fits at 1900 K with composition-
+  dependent shifts, proving the shipped MAGMA code diverges from its published alkali parameters;
+  the same shadow reproduces Mg/MgO at +0.03..+0.06 dex median. The excluded cells' residuals
+  remain standing findings in every rung-3 report; the t-608 fixture adjudication is TRUST PAPER
+  TABLE 9. This resolves the E3 K-lineage block for the chunk exit (workbook governs rung 3 only
+  for the retained population; the paper lineage governs literature fixtures).
 
 ## 9. Non-goals
 
