@@ -1,27 +1,30 @@
-"""IMCC-SF04 independent melt-activity shadow engine (r2.1)."""
+"""Public IMCC-SF04 adapter API.
+
+Raw ``solve_*`` kernel entry points are intentionally excluded from public
+exports so every caller passes through the adapter's structural trust mapping.
+"""
 
 from simulator.melt_backend.imcc_sf04.adapter import (
     ImccAdapterLabels,
-    ImccLoadedDatapack,
-    ImccMalformedDatapackError,
-    evaluate,
-    load_datapack,
-)
-from simulator.melt_backend.imcc_sf04.kernel import (
     ImccComponentOutsideDomainError,
+    ImccCompositionOutsideValidatedEnvelopeError,
     ImccCompositionIncompleteError,
     ImccDatapack,
     ImccFerricInputUnsupportedError,
+    ImccLoadedDatapack,
+    ImccMalformedDatapackError,
     ImccNonconvergenceError,
     ImccRefusal,
     ImccResult,
     ImccTOutsideDatapackDomainError,
-    solve_imcc_sf04,
+    evaluate,
+    load_datapack,
 )
 
 __all__ = [
     # Adapter API (chunk 3)
     "ImccAdapterLabels",
+    "ImccCompositionOutsideValidatedEnvelopeError",
     "ImccLoadedDatapack",
     "ImccMalformedDatapackError",
     "evaluate",
@@ -35,5 +38,4 @@ __all__ = [
     "ImccFerricInputUnsupportedError",
     "ImccComponentOutsideDomainError",
     "ImccNonconvergenceError",
-    "solve_imcc_sf04",
 ]

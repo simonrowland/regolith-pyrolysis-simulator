@@ -9,6 +9,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
+import simulator.melt_backend.imcc_sf04 as imcc_sf04
 from simulator.backend_names import canonical_backend_name
 from simulator.fidelity_vocabulary import (
     CERTIFICATION_DENYLIST,
@@ -17,6 +18,7 @@ from simulator.fidelity_vocabulary import (
 from simulator.melt_backend.imcc_sf04 import (
     ImccAdapterLabels,
     ImccComponentOutsideDomainError,
+    ImccCompositionOutsideValidatedEnvelopeError,
     ImccCompositionIncompleteError,
     ImccFerricInputUnsupportedError,
     ImccLoadedDatapack,
@@ -38,10 +40,19 @@ def _make_uniform_composition(pack: ImccLoadedDatapack) -> dict[str, float]:
     return {name: 0.125 for name in pack.parent_oxides}
 
 
+def _make_alkali_composition(
+    pack: ImccLoadedDatapack, x_me2o: float
+) -> dict[str, float]:
+    composition = {name: 0.0 for name in pack.parent_oxides}
+    composition["SiO2"] = 1.0 - x_me2o
+    composition["Na2O"] = x_me2o
+    return composition
+
+
 def test_load_datapack_roundtrip() -> None:
     pack = load_datapack(DATAPACK_PATH)
     assert isinstance(pack, ImccLoadedDatapack)
-    assert pack.version == "1.0.1"
+    assert pack.version == "1.0.2"
     assert pack.parent_oxides == (
         "SiO2",
         "MgO",
@@ -53,13 +64,21 @@ def test_load_datapack_roundtrip() -> None:
         "K2O",
     )
     assert len(pack.domain_basis) == 38
-    assert set(pack.domain_basis) <= {"paper-demonstrated", "SF04-as-exercised"}
+    assert set(pack.domain_basis) <= {
+        "paper-demonstrated",
+        "SF04-as-exercised",
+        (
+            "sf04-exercised-ADOPTED (v1.0.2: FC87 fits were exercised by "
+            "SF04 over 1700-3000 K; the FC87-paper-demonstrated span is "
+            "preserved in T_domain_paper_demonstrated_K)"
+        ),
+    }
 
     kernel = pack.kernel_datapack
     assert kernel.n_parents == 8
     assert kernel.n_complexes == 38
     assert kernel.n_species == 46
-    assert kernel.version == "1.0.1"
+    assert kernel.version == "1.0.2"
 
     # Exact rationals: 0.5 survives as one-half (fractional Na/K/Al stoichiometry).
     half = Fraction(1, 2)
@@ -120,7 +139,7 @@ def test_wt_to_mol_known_value() -> None:
     assert np.isclose(result.parent_mol[1], 0.0, atol=1.0e-15)
     assert np.isclose(result.parent_mol[2], 1.0, rtol=1.0e-12)
     assert np.isclose(result.basis, 2.0, rtol=1.0e-12)
-    assert result.labels.identity["datapack_version"] == "1.0.1"
+    assert result.labels.identity["datapack_version"] == "1.0.2"
 
 
 def test_mol_basis_with_declared_basis() -> None:
@@ -129,6 +148,38 @@ def test_mol_basis_with_declared_basis() -> None:
     result = evaluate(composition, 2500.0, pack, basis=1.0, basis_type="mol")
     assert np.isclose(result.basis, 1.0, rtol=1.0e-12)
     assert np.isclose(result.parent_mol.sum(), 1.0, rtol=1.0e-12)
+
+
+def test_refusal_composition_outside_validated_envelope() -> None:
+    pack = load_datapack(DATAPACK_PATH)
+    with pytest.raises(ImccCompositionOutsideValidatedEnvelopeError) as exc:
+        evaluate(_make_alkali_composition(pack, 0.51), 2500.0, pack)
+    assert exc.value.code == "imcc_composition_outside_validated_envelope"
+    assert "X_Me2O=0.51" in str(exc.value)
+    assert "bound 0.5" in str(exc.value)
+
+
+def test_composition_envelope_boundary_is_inside() -> None:
+    pack = load_datapack(DATAPACK_PATH)
+    result = evaluate(_make_alkali_composition(pack, 0.5), 2500.0, pack)
+    assert result.labels.envelope_status == "inside"
+
+
+def test_allow_out_of_envelope_labels_result() -> None:
+    pack = load_datapack(DATAPACK_PATH)
+    result = evaluate(
+        _make_alkali_composition(pack, 0.51),
+        2500.0,
+        pack,
+        allow_out_of_envelope=True,
+    )
+    assert result.labels.envelope_status == "outside_validated"
+
+
+def test_in_envelope_composition_labels_result() -> None:
+    pack = load_datapack(DATAPACK_PATH)
+    result = evaluate(_make_uniform_composition(pack), 2500.0, pack)
+    assert result.labels.envelope_status == "inside"
 
 
 def test_refusal_ferric_input_in_composition() -> None:
@@ -191,6 +242,7 @@ def test_refusal_malformed_datapack_bad_json(tmp_path: Path) -> None:
 def test_refusal_classes_inherit_from_imcc_refusal() -> None:
     for cls in (
         ImccComponentOutsideDomainError,
+        ImccCompositionOutsideValidatedEnvelopeError,
         ImccCompositionIncompleteError,
         ImccFerricInputUnsupportedError,
         ImccNonconvergenceError,
@@ -207,7 +259,7 @@ def test_label_block_fields_and_denylist() -> None:
     labels = result.labels
     assert isinstance(labels, ImccAdapterLabels)
     assert labels.identity["model_id"] == "IMCC-SF04"
-    assert labels.identity["datapack_version"] == "1.0.1"
+    assert labels.identity["datapack_version"] == "1.0.2"
     assert labels.trust == canonical_backend_name("internal-analytical")
     assert labels.trust in CERTIFICATION_DENYLIST
     assert backend_name_denies_authority(labels.trust)
@@ -215,10 +267,20 @@ def test_label_block_fields_and_denylist() -> None:
         assert labels.coverage[name] == "A-published-imcc"
 
 
+def test_package_exports_only_denied_adapter_solve_path() -> None:
+    assert not any(name.startswith("solve_") for name in imcc_sf04.__all__)
+    assert not any(name.startswith("solve_") for name in dir(imcc_sf04))
+    assert not hasattr(imcc_sf04, "solve_imcc_sf04")
+
+    pack = load_datapack(DATAPACK_PATH)
+    result = imcc_sf04.evaluate(_make_uniform_composition(pack), 2500.0, pack)
+    assert backend_name_denies_authority(result.labels.trust)
+
+
 def test_extrapolation_flag() -> None:
     pack = load_datapack(DATAPACK_PATH)
-    # Binary MgO-SiO2 at 2400 K: only Mg-silicate complexes are active, and
-    # 2400 K is just below the FC87 demonstrated domain [2500, 3500] K.
+    # Binary MgO-SiO2 at 1600 K: only Mg-silicate complexes are active, and
+    # 1600 K is just below the SF04-exercised domain [1700, 3000] K.
     composition = {
         "SiO2": 0.5,
         "MgO": 0.5,
@@ -231,8 +293,8 @@ def test_extrapolation_flag() -> None:
     }
     # Default: refusal.
     with pytest.raises(ImccTOutsideDatapackDomainError):
-        evaluate(composition, 2400.0, pack)
+        evaluate(composition, 1600.0, pack)
     # Extrapolation flag: evaluate and mark.
-    result = evaluate(composition, 2400.0, pack, allow_extrapolation=True)
+    result = evaluate(composition, 1600.0, pack, allow_extrapolation=True)
     assert result.extrapolated is True
     assert isinstance(result.labels, ImccAdapterLabels)

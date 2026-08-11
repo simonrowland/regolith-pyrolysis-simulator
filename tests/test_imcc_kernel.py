@@ -22,8 +22,12 @@ from simulator.melt_backend.imcc_sf04 import (
     ImccNonconvergenceError,
     ImccTOutsideDatapackDomainError,
     evaluate,
-    solve_imcc_sf04,
 )
+
+# The raw kernel entry point is deliberately NOT package-exported (milestone-2 P1-5:
+# the adapter is the sole public API; its trust token is structurally certification-
+# denied while the kernel's is not). Kernel tests import it from the module directly.
+from simulator.melt_backend.imcc_sf04.kernel import solve_imcc_sf04
 from simulator.melt_backend.imcc_sf04.kernel import _active_residual, LOG10
 
 

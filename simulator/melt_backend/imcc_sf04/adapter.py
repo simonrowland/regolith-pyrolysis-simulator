@@ -77,6 +77,12 @@ class ImccMalformedDatapackError(ImccRefusal):
     code = "imcc_malformed_datapack"
 
 
+class ImccCompositionOutsideValidatedEnvelopeError(ImccRefusal):
+    """Raised when the melt lies outside the validated Tier-A envelope."""
+
+    code = "imcc_composition_outside_validated_envelope"
+
+
 @dataclass(frozen=True)
 class ImccLoadedDatapack:
     """Adapter-level loaded datapack: kernel datapack plus provenance metadata."""
@@ -89,11 +95,12 @@ class ImccLoadedDatapack:
 
 @dataclass(frozen=True)
 class ImccAdapterLabels:
-    """Three-field label block required by spec section 7."""
+    """Section 7 label block plus orthogonal composition-envelope status."""
 
     identity: Mapping[str, str]
     coverage: Mapping[str, str]
     trust: str
+    envelope_status: str
 
 
 def _as_fraction(value: Any) -> Fraction:
@@ -241,6 +248,7 @@ def evaluate(
     basis_type: str = "mol",
     extra_mol: Mapping[str, float] | None = None,
     allow_extrapolation: bool = False,
+    allow_out_of_envelope: bool = False,
     tol: float = 1.0e-12,
     max_iter: int = 100,
 ) -> ImccResult:
@@ -271,6 +279,9 @@ def evaluate(
     allow_extrapolation:
         If ``True``, evaluate outside declared T domains and mark the result
         as extrapolated.
+    allow_out_of_envelope:
+        If ``True``, evaluate outside the validated Tier-A composition
+        envelope and mark the result ``outside_validated``.
     tol:
         Infinity-norm residual convergence tolerance passed to the kernel.
     max_iter:
@@ -362,6 +373,18 @@ def evaluate(
         vector = _wt_to_mol(vector, parent_oxides)
         basis = float(vector.sum())
 
+    # X_Me2O = (n_Na2O + n_K2O) / sum(n_oxide) over the canonical
+    # 8-oxide mol vector. The r2.2 Tier-A boundary is inclusive at 0.5.
+    alkali_mol = sum(
+        float(vector[parent_oxides.index(name)]) for name in ("Na2O", "K2O")
+    )
+    x_me2o = alkali_mol / float(vector.sum())
+    outside_validated_envelope = x_me2o > 0.5
+    if outside_validated_envelope and not allow_out_of_envelope:
+        raise ImccCompositionOutsideValidatedEnvelopeError(
+            f"X_Me2O={x_me2o:.12g} exceeds validated bound 0.5"
+        )
+
     # Cache / kernel registration point (NOT wired in chunk 3).
     # Future integration: register this adapter as a shadow provider for
     # ChemistryIntent.SILICATE_EQUILIBRIUM via
@@ -393,6 +416,11 @@ def evaluate(
         identity=identity,
         coverage=coverage,
         trust=trust,
+        envelope_status=(
+            "outside_validated"
+            if outside_validated_envelope
+            else "inside"
+        ),
     )
 
     return replace(result, labels=adapter_labels)
