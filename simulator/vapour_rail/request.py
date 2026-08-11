@@ -21,7 +21,12 @@ from dataclasses import dataclass, field, replace
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Any, Protocol
 
-from simulator.alpha_kinetics import AlphaSpecError, parse_alpha_contract
+from simulator.alpha_kinetics import (
+    ALPHA_AUTHORITY_STATUS_FIELD,
+    ANALYTICAL_UPPER_BOUND_ALPHA_STATUS,
+    AlphaSpecError,
+    parse_alpha_contract,
+)
 from simulator.chemistry.melt_activity import (
     melt_oxide_activity_coefficient,
     single_cation_mole_fractions,
@@ -1437,8 +1442,8 @@ def refusal_closure(
             merge_notes_into_mapping(extra_payload, [_unit_activity_note])
             extra_payload["source_activity"] = float(source_activity)
             extra_payload["source_activity_origin"] = "pure_component_unit"
-        if alpha_authority_status == "analytical_upper_bound":
-            extra_payload["alpha_authority_status"] = alpha_authority_status
+        if alpha_authority_status == ANALYTICAL_UPPER_BOUND_ALPHA_STATUS:
+            extra_payload[ALPHA_AUTHORITY_STATUS_FIELD] = alpha_authority_status
             # Inventory evolution is intentionally enabled by the owner's
             # analytical-model directive, but this remains a bound-driven,
             # non-certifying result rather than a measured alpha point.

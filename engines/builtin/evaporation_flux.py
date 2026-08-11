@@ -61,6 +61,10 @@ from engines.builtin._common import (
     reject_wrong_intent,
     unpack_controls,
 )
+from simulator.alpha_kinetics import (
+    ALPHA_AUTHORITY_STATUS_FIELD,
+    ANALYTICAL_UPPER_BOUND_ALPHA_STATUS,
+)
 from simulator.chemistry.kernel.capabilities import CapabilityProfile, ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, IntentResult
 from simulator.chemistry.kernel.provider import ChemistryProvider
@@ -222,7 +226,16 @@ def _evaluate_alpha_control(
 
     context: dict[str, Any] = {'coefficient_spec': alpha_spec}
     value = alpha_s(species, T_K, context)
-    return value, dict(context.get('alpha_s_evaluation', {}))
+    evaluation = dict(context.get('alpha_s_evaluation', {}))
+    if (
+        isinstance(alpha_spec, Mapping)
+        and alpha_spec.get(ALPHA_AUTHORITY_STATUS_FIELD)
+        == ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
+    ):
+        evaluation[ALPHA_AUTHORITY_STATUS_FIELD] = (
+            ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
+        )
+    return value, evaluation
 
 
 def _coerce_alpha_envelope_by_species(alpha_envelope_control) -> dict[str, tuple[float, float]]:
@@ -996,6 +1009,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         flux_kg_hr: dict[str, float] = {}
         alpha_used_by_species: dict[str, float] = {}
         alpha_evaluations_by_species: dict[str, dict[str, Any]] = {}
+        alpha_authority_status_by_species: dict[str, str] = {}
         flux_uncertainty_pct: dict[str, float] = {}
         series_flux_diagnostics: dict[
             str, dict[str, float | str | bool | None]
@@ -1074,6 +1088,9 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             )
             if alpha_evaluation:
                 alpha_evaluations_by_species[species] = alpha_evaluation
+            alpha_authority_status = alpha_evaluation.get(
+                ALPHA_AUTHORITY_STATUS_FIELD
+            )
 
             baseline_alpha_1 = _series_resistance_evaporation_flux_kg_m2_s(
                 species=species,
@@ -1154,6 +1171,10 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             J_kg_s_m2 = series_flux.flux_kg_s_m2
 
             series_diagnostic = series_flux.as_diagnostic()
+            if alpha_authority_status == ANALYTICAL_UPPER_BOUND_ALPHA_STATUS:
+                series_diagnostic[ALPHA_AUTHORITY_STATUS_FIELD] = (
+                    alpha_authority_status
+                )
             if species in hkl_upper_bound_transport_species:
                 series_diagnostic["gas_transport_model"] = (
                     "hkl_kinetic_upper_bound_no_chapman_enskog"
@@ -1181,6 +1202,13 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             rate_kg_hr = J_kg_s_m2 * melt_surface_area_m2 * 3600.0
 
             if rate_kg_hr > _NONTRIVIAL_FLUX_KG_HR:
+                if (
+                    alpha_authority_status
+                    == ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
+                ):
+                    alpha_authority_status_by_species[species] = (
+                        alpha_authority_status
+                    )
                 flux_kg_hr[species] = rate_kg_hr
 
         if missing_transport_parameters and not computable_transport_species:
@@ -1214,6 +1242,10 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 "missing-species-state-dependent-melt-transfer-inputs"
             ),
         }
+        if alpha_authority_status_by_species:
+            diagnostic["alpha_authority_status_by_species"] = (
+                alpha_authority_status_by_species
+            )
         species_refusals: dict[str, dict[str, float | str]] = {}
         if missing_alpha:
             for species, refusal in missing_alpha.items():

@@ -62,7 +62,11 @@ def test_alpha_surface_loads_expected_species_values():
 
     assert set(EXPECTED_ALPHA_BY_SPECIES) <= set(alpha_by_species)
     for species, expected_alpha in EXPECTED_ALPHA_BY_SPECIES.items():
-        assert alpha_by_species[species] == pytest.approx(expected_alpha)
+        assert alpha_s(
+            species,
+            SIO_ALPHA_FORM_T_K,
+            {"coefficient_spec": alpha_by_species[species]},
+        ) == pytest.approx(expected_alpha)
     assert alpha_s(
         "SiO",
         SIO_ALPHA_FORM_T_K,

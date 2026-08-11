@@ -1387,6 +1387,13 @@ class PyrolysisRun:
         run_metadata["pressure_coating_pareto_diagnostic"] = _json_safe(
             pressure_coating_pareto_diagnostic(sim, execution.per_hour)
         )
+        alpha_authority_status_by_species = dict(
+            getattr(sim, "_alpha_authority_status_by_species_engaged", {}) or {}
+        )
+        if alpha_authority_status_by_species:
+            run_metadata["alpha_authority_status_by_species"] = _json_safe(
+                alpha_authority_status_by_species
+            )
         c3_na_hold_adjustment = dict(
             getattr(sim, "_last_c3_na_hold_adjustment", {}) or {}
         )

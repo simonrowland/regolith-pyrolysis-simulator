@@ -22,6 +22,7 @@ from engines.builtin.vapor_pressure import (
     VaporPressureRangeError,
 )
 from simulator.accounting import OverdraftError, resolve_species_formula
+from simulator.alpha_kinetics import ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
 from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     canonical_backend_name,
@@ -5341,6 +5342,23 @@ def _cache_trace_payload(
         payload["refusal_reason"] = refusal_reason
     if isinstance(refusal_diagnostic, Mapping) and refusal_diagnostic:
         payload["refusal_diagnostic"] = _compact_jsonable(dict(refusal_diagnostic))
+
+    simulator = getattr(run_execution, "simulator", None)
+    alpha_authority_status_by_species = getattr(
+        simulator,
+        "_alpha_authority_status_by_species_engaged",
+        None,
+    )
+    if isinstance(alpha_authority_status_by_species, Mapping):
+        compact_alpha_authority = {
+            str(species): str(status)
+            for species, status in alpha_authority_status_by_species.items()
+            if status == ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
+        }
+        if compact_alpha_authority:
+            payload["alpha_authority_status_by_species"] = (
+                compact_alpha_authority
+            )
 
     per_hour_cache: list[dict[str, Any]] = []
     pO2_enforcement_by_hour: list[dict[str, Any]] = []

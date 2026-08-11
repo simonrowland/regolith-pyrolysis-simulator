@@ -32,6 +32,7 @@ from typing import Any, Mapping, Sequence
 import yaml
 
 from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
+from simulator.alpha_kinetics import ALPHA_AUTHORITY_STATUS_FIELD
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
 from simulator.chemistry.langmuir_knudsen import (
@@ -2570,6 +2571,7 @@ def _evaluate_alpha(
                         "alpha_s",
                         "alpha_s_form",
                         "alpha_s_extrapolated",
+                        ALPHA_AUTHORITY_STATUS_FIELD,
                         "species",
                     )
                     if k in ctx

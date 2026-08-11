@@ -6,6 +6,11 @@ import json
 import math
 from typing import Any, Mapping, Sequence
 
+from simulator.alpha_kinetics import (
+    ALPHA_AUTHORITY_STATUS_FIELD,
+    ANALYTICAL_UPPER_BOUND_ALPHA_STATUS,
+)
+
 _EPS = 1e-12
 PRESSURE_COATING_PARETO_SPECIES = ("Na", "K", "SiO", "Fe")
 _PRESSURE_SWEEP_MIN_PA = 1.0e-3
@@ -934,8 +939,10 @@ def _finite_float(value: Any) -> float | None:
 def _pressure_coating_pareto_unavailable(
     target_species: Sequence[str],
     reason: str,
+    *,
+    alpha_authority_status_by_species: Mapping[str, str] | None = None,
 ) -> dict[str, Any]:
-    return {
+    diagnostic = {
         "schema_version": "pressure-coating-pareto-v1",
         "status": "unavailable",
         "reason": reason,
@@ -946,6 +953,11 @@ def _pressure_coating_pareto_unavailable(
             for species in target_species
         },
     }
+    if alpha_authority_status_by_species:
+        diagnostic["alpha_authority_status_by_species"] = dict(
+            alpha_authority_status_by_species
+        )
+    return diagnostic
 
 
 def pressure_coating_pareto_diagnostic(
@@ -967,6 +979,14 @@ def pressure_coating_pareto_diagnostic(
     condensation_model = getattr(sim, "condensation_model", None)
     latest_evap = dict(getattr(sim, "_last_evaporation_flux_diagnostic", {}) or {})
     series_by_species = dict(latest_evap.get("evaporation_series_resistance") or {})
+    raw_alpha_authority_status_by_species = dict(
+        getattr(sim, "_alpha_authority_status_by_species_engaged", {}) or {}
+    )
+    alpha_authority_status_by_species = {
+        str(species): str(status)
+        for species, status in raw_alpha_authority_status_by_species.items()
+        if status == ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
+    }
     knudsen_diagnostic = dict(
         getattr(condensation_model, "last_knudsen_regime_diagnostic", {}) or {}
     )
@@ -980,6 +1000,9 @@ def pressure_coating_pareto_diagnostic(
         return _pressure_coating_pareto_unavailable(
             target_species,
             "knudsen_regime_diagnostic_unavailable",
+            alpha_authority_status_by_species=(
+                alpha_authority_status_by_species
+            ),
         )
     gas_temperature_C = _first_finite(
         knudsen_diagnostic.get("gas_temperature_C"),
@@ -1000,6 +1023,9 @@ def pressure_coating_pareto_diagnostic(
         return _pressure_coating_pareto_unavailable(
             target_species,
             "knudsen_characteristic_length_unavailable",
+            alpha_authority_status_by_species=(
+                alpha_authority_status_by_species
+            ),
         )
     controlling = max(
         (
@@ -1046,6 +1072,9 @@ def pressure_coating_pareto_diagnostic(
         return _pressure_coating_pareto_unavailable(
             target_species,
             "controlling_knudsen_segment_unavailable",
+            alpha_authority_status_by_species=(
+                alpha_authority_status_by_species
+            ),
         )
     gate_pressure_pa = float(controlling["no_warning_pressure_pa"])
     hard_refusal_pressure_pa = float(controlling["hard_refusal_pressure_pa"])
@@ -1123,6 +1152,7 @@ def pressure_coating_pareto_diagnostic(
         current_flux = flux_at(current_pressure_pa)
         flux_5mbar = flux_at(_CURRENT_SETPOINT_LOW_PA)
         flux_15mbar = flux_at(_CURRENT_SETPOINT_HIGH_PA)
+        alpha_authority_status = alpha_authority_status_by_species.get(name)
         by_species[name] = {
             "status": "ok",
             # HKL upper-bound (matrix policy i): R_m disabled / missing melt inputs.
@@ -1133,6 +1163,14 @@ def pressure_coating_pareto_diagnostic(
             "P_eq_Pa": flux_kwargs["P_eq_pa"],
             "P_bulk_Pa": flux_kwargs["P_bulk_pa"],
             "alpha_intrinsic": flux_kwargs["alpha_i"],
+            **(
+                {
+                    ALPHA_AUTHORITY_STATUS_FIELD: alpha_authority_status,
+                }
+                if alpha_authority_status
+                == ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
+                else {}
+            ),
             "transport_length_m": flux_kwargs["pipe_diameter_m"],
             "max_rate_no_warning_pressure_pa": gate_pressure_pa,
             "max_rate_no_warning_pressure_mbar": gate_pressure_pa / 100.0,
@@ -1168,7 +1206,7 @@ def pressure_coating_pareto_diagnostic(
             ],
         }
 
-    return {
+    diagnostic = {
         "schema_version": "pressure-coating-pareto-v1",
         "status": "ok",
         "authority_class": "upper-bound",
@@ -1227,6 +1265,11 @@ def pressure_coating_pareto_diagnostic(
         },
         "by_species": by_species,
     }
+    if alpha_authority_status_by_species:
+        diagnostic["alpha_authority_status_by_species"] = (
+            alpha_authority_status_by_species
+        )
+    return diagnostic
 
 
 def _first_finite(*values: Any) -> float:

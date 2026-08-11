@@ -27,6 +27,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+import simulator.diagnostic_helpers.extract_reproduction as extract_reproduction
 from simulator.diagnostic_helpers.extract_reproduction import (
     COMPARISON_STATUSES,
     CONDENSED_FORM_STATES,
@@ -270,6 +271,48 @@ def test_silicate_melt_alpha_remains_comparable() -> None:
     pin_ok, pin_skip, _ = rail_alpha_comparability(obs)
     assert pin_ok is True
     assert pin_skip is None
+
+
+@pytest.mark.parametrize("species", ("Ca", "Ti"))
+def test_marked_ceiling_receipt_survives_alpha_report_runtime(
+    species,
+    monkeypatch,
+) -> None:
+    captured_runtime: list[dict] = []
+
+    def _capture_compare_values(**kwargs):
+        captured_runtime.append(dict(kwargs["runtime"]))
+        return compare_values(**kwargs)
+
+    monkeypatch.setattr(
+        extract_reproduction,
+        "compare_values",
+        _capture_compare_values,
+    )
+    obs = _alpha_fixture(
+        species_id=species,
+        observation_id=f"fixture_{species.lower()}_ceiling_alpha",
+        phase="silicate_melt",
+        values={
+            "alpha": 1.0,
+            "system_class": "silicate_melt",
+            "transformation_class": "redox_reduction_required",
+            "material": "fixture_silicate_melt",
+        },
+        condensed_form={"state": "liquid_melt", "metastable": False},
+    )
+
+    evaluation = evaluate_observation(
+        obs,
+        vapor_pressure_data=load_vapor_pressure_data(),
+    )
+
+    assert evaluation.records
+    assert any(
+        runtime.get("alpha_context", {}).get("alpha_authority_status")
+        == "analytical_upper_bound"
+        for runtime in captured_runtime
+    )
 
 
 def test_crystalline_form_is_not_pin_bearing_even_when_class_comparable() -> None:

@@ -13,6 +13,10 @@ class AlphaSpecError(ValueError):
     """Raised when policy metadata is presented as an executable alpha value."""
 
 
+ANALYTICAL_UPPER_BOUND_ALPHA_STATUS = "analytical_upper_bound"
+ALPHA_AUTHORITY_STATUS_FIELD = "alpha_authority_status"
+
+
 def _finite_pair(
     value: Any,
     *,
@@ -122,4 +126,14 @@ def parse_alpha_contract(contract: Any) -> float | dict[str, Any] | None:
         raise AlphaSpecError(
             "evaporation_alpha requires value or exact status='no_data'"
         )
-    return parse_alpha_value(contract["value"])
+    value = parse_alpha_value(contract["value"])
+    if contract.get("status") != ANALYTICAL_UPPER_BOUND_ALPHA_STATUS:
+        return value
+    if isinstance(value, Mapping):
+        executable = dict(value)
+    else:
+        executable = {"form": "scalar", "value": value}
+    executable[ALPHA_AUTHORITY_STATUS_FIELD] = (
+        ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
+    )
+    return executable

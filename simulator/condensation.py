@@ -69,7 +69,12 @@ from typing import Any, Dict
 
 import yaml
 
-from simulator.alpha_kinetics import AlphaSpecError, parse_alpha_value
+from simulator.alpha_kinetics import (
+    ALPHA_AUTHORITY_STATUS_FIELD,
+    ANALYTICAL_UPPER_BOUND_ALPHA_STATUS,
+    AlphaSpecError,
+    parse_alpha_value,
+)
 from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     canonical_backend_name,
@@ -983,6 +988,13 @@ def _alpha_s_scalar_evaluation(
         'alpha_s_temperature_K': T_K,
         'alpha_s_extrapolated': False,
     }
+    if (
+        spec.get(ALPHA_AUTHORITY_STATUS_FIELD)
+        == ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
+    ):
+        result[ALPHA_AUTHORITY_STATUS_FIELD] = (
+            ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
+        )
     if valid_range is not None:
         valid_low, valid_high = valid_range
         extrapolated = not (valid_low <= T_K <= valid_high)

@@ -2,12 +2,24 @@
 
 from __future__ import annotations
 
+import json
 import math
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 import yaml
 
+from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
+from simulator.chemistry.langmuir_knudsen import grounded_alpha
+from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
+from simulator.chemistry.kernel.dto import ProviderAccountView
+from simulator.diagnostic_helpers.extract_reproduction import _engine_alpha
+from simulator.diagnostics import pressure_coating_pareto_diagnostic
+from simulator.evaporation import _load_evaporation_alpha_by_species
+from simulator.fidelity_vocabulary import EvidenceClass
+from simulator.optimize.honesty import optimizer_tier_label
+from simulator.vapour_rail.instrumentation import CONTROL_FLUX_PRESSURES_KEY
 from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
 
 
@@ -288,11 +300,151 @@ def test_zhang_2014_catio3_proxy_withdrawn_hkl_upper_bound_posture():
         if "Zhang et al. 2014 GCA 140:365-380" in blob:
             assert "WITHDRAWN" in blob, (section, species)
 
-    from simulator.evaporation import _load_evaporation_alpha_by_species
-
     loaded = _load_evaporation_alpha_by_species(raw)
     for species in family_by_species:
-        assert loaded.get(species) == pytest.approx(1.0), species
+        alpha = families[family_by_species[species]]["vaporisation_coefficients"][
+            "evaporation_alpha"
+        ]
+        assert alpha["status"] == "analytical_upper_bound", species
+        spec = loaded[species]
+        assert spec["form"] == "scalar", species
+        assert spec["value"] == pytest.approx(1.0), species
+        assert spec["alpha_authority_status"] == "analytical_upper_bound", species
+
+
+def test_ca_ti_alpha_ceiling_survives_flux_serialization_replay_and_honesty():
+    raw = yaml.safe_load(VAPOR_PRESSURES_PATH.read_text()) or {}
+    alpha_by_species = _load_evaporation_alpha_by_species(raw)
+    species = ("Ca", "Ti")
+    request = IntentRequest(
+        intent=ChemistryIntent.EVAPORATION_FLUX,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {"CaO": 10.0, "TiO2": 10.0}},
+            species_formula_registry={},
+        ),
+        temperature_C=1700.0,
+        pressure_bar=1e-6,
+        fO2_log=None,
+        control_inputs={
+            "overhead_pressure_pa": 0.0,
+            CONTROL_FLUX_PRESSURES_KEY: {name: 100.0 for name in species},
+            "overhead_partials_Pa": {},
+            "molar_mass_kg_mol": {"Ca": 0.040078, "Ti": 0.047867},
+            "stoich_by_species": {
+                "Ca": {
+                    "parent_oxide": "CaO",
+                    "oxide_per_product_kg": 1.0,
+                    "O2_per_product_kg": 0.0,
+                },
+                "Ti": {
+                    "parent_oxide": "TiO2",
+                    "oxide_per_product_kg": 1.0,
+                    "O2_per_product_kg": 0.0,
+                },
+            },
+            "available_oxide_kg": {"Ca": 10.0, "Ti": 10.0},
+            "melt_surface_area_m2": 1.0,
+            "stir_factor": 1.0,
+            "alpha": alpha_by_species,
+        },
+    )
+
+    result = BuiltinEvaporationFluxProvider().dispatch(request)
+
+    assert result.status == "ok"
+    assert result.diagnostic["alpha_used_by_species"] == {
+        "Ca": pytest.approx(1.0),
+        "Ti": pytest.approx(1.0),
+    }
+    assert result.diagnostic["alpha_authority_status_by_species"] == {
+        "Ca": "analytical_upper_bound",
+        "Ti": "analytical_upper_bound",
+    }
+    serialized_flux = json.loads(json.dumps(dict(result.diagnostic)))
+    assert serialized_flux["alpha_authority_status_by_species"] == {
+        "Ca": "analytical_upper_bound",
+        "Ti": "analytical_upper_bound",
+    }
+
+    knudsen = {
+        "gas_temperature_C": 1000.0,
+        "carrier_gas": "N2",
+        "overhead_pressure_mbar": 10.0,
+        "segments": [
+            {
+                "name": "main",
+                "characteristic_length_m": 0.12,
+                "knudsen_number": 0.001,
+                "regime": "viscous",
+            }
+        ],
+    }
+    sim = SimpleNamespace(
+        condensation_model=SimpleNamespace(
+            last_knudsen_regime_diagnostic=knudsen,
+            gas_temperature_C=1000.0,
+            carrier_gas="N2",
+        ),
+        melt=SimpleNamespace(temperature_C=1700.0),
+        overhead=SimpleNamespace(pressure_mbar=10.0),
+        vapor_pressures=vapor_pressure_legacy_view(raw),
+        _last_evaporation_flux_diagnostic=serialized_flux,
+        _alpha_authority_status_by_species_engaged=serialized_flux[
+            "alpha_authority_status_by_species"
+        ],
+    )
+    replay = pressure_coating_pareto_diagnostic(
+        sim,
+        target_species=species,
+    )
+    artifact = json.loads(
+        json.dumps({"run_metadata": {"pressure_coating_pareto_diagnostic": replay}})
+    )
+
+    assert replay["alpha_authority_status_by_species"] == {
+        "Ca": "analytical_upper_bound",
+        "Ti": "analytical_upper_bound",
+    }
+    for name in species:
+        assert replay["by_species"][name]["alpha_intrinsic"] == pytest.approx(1.0)
+        assert replay["by_species"][name]["alpha_authority_status"] == (
+            "analytical_upper_bound"
+        )
+
+    label = optimizer_tier_label(
+        {
+            "cache_state": "live_fill",
+            "backend_name": "alphamelts",
+            "evidence_class": EvidenceClass.MELTS.value,
+            "backend_status": "ok",
+            "backend_authoritative": True,
+        },
+        artifact,
+    )
+    assert label["ux_label"] == "UNVERIFIED"
+    assert label["certification_allowed"] is False
+    assert label["canonical"]["certification_allowed"] is False
+    assert label["alpha_ceiling_species"] == ["Ca", "Ti"]
+
+
+@pytest.mark.parametrize("species", ("Ca", "Ti"))
+def test_ca_ti_alpha_ceiling_survives_grounded_report_consumer(species):
+    value, grounded_context = grounded_alpha(species, 1700.0)
+
+    assert value == pytest.approx(1.0)
+    assert grounded_context["alpha_s"] == pytest.approx(1.0)
+    assert grounded_context["alpha_authority_status"] == (
+        "analytical_upper_bound"
+    )
+
+    report_value, refusal, report_context = _engine_alpha(species, 1700.0)
+    serialized = json.loads(json.dumps({"alpha_context": report_context}))
+
+    assert refusal is None
+    assert report_value == pytest.approx(1.0)
+    assert serialized["alpha_context"]["alpha_authority_status"] == (
+        "analytical_upper_bound"
+    )
 
 
 def test_default_setpoints_refuse_unmeasured_alpha_fallback():

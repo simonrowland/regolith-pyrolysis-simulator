@@ -12476,6 +12476,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     )
                     if float(rate) > 1.0e-12
                 }
+                evap_flux.alpha_authority_status_by_species = {
+                    species: status
+                    for species, status in (
+                        live_effective_flux.alpha_authority_status_by_species.items()
+                    )
+                    if species in evap_flux.species_kg_hr
+                }
                 evap_flux.update_totals()
             else:
                 evap_flux = self._calculate_evaporation(equilibrium)
@@ -12504,6 +12511,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
             self._effective_transport_capacity_this_tick = (
                 effective_transport_capacity
+            )
+        if evap_flux.alpha_authority_status_by_species:
+            engaged_alpha_authority = dict(
+                getattr(
+                    self,
+                    '_alpha_authority_status_by_species_engaged',
+                    {},
+                )
+                or {}
+            )
+            engaged_alpha_authority.update(
+                evap_flux.alpha_authority_status_by_species
+            )
+            self._alpha_authority_status_by_species_engaged = dict(
+                sorted(engaged_alpha_authority.items())
             )
         self._pending_knudsen_zero_overhead_flow_marker = None
 

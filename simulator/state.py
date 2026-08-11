@@ -839,6 +839,9 @@ class EvaporationFlux:
     species_kg_hr: Dict[str, float] = field(default_factory=dict)
     # Mass evaporation rate per species (kg/hr)
     # Positive = leaving the melt
+    alpha_authority_status_by_species: Dict[str, str] = field(
+        default_factory=dict
+    )
 
     total_kg_hr: float = 0.0
     dominant_species: str = ''

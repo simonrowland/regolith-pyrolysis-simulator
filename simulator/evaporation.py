@@ -885,6 +885,9 @@ class EvaporationMixin:
 
             merge_notes_into_mapping(diagnostic, _partial_sz_notes)
         self._last_evaporation_flux_diagnostic = diagnostic
+        alpha_authority_statuses = dict(
+            diagnostic.get('alpha_authority_status_by_species', {}) or {}
+        )
         unmeasured_alpha_species = tuple(
             diagnostic.get('unmeasured_alpha_fallback_species', ()) or ()
         )
@@ -984,6 +987,11 @@ class EvaporationMixin:
                     }
             if gated_rate_kg_hr > 1e-12:
                 flux.species_kg_hr[species] = gated_rate_kg_hr
+                alpha_authority_status = alpha_authority_statuses.get(species)
+                if alpha_authority_status is not None:
+                    flux.alpha_authority_status_by_species[species] = str(
+                        alpha_authority_status
+                    )
 
         flux.update_totals()
         return flux
@@ -2566,7 +2574,16 @@ class EvaporationMixin:
                 )
             ),
         )
-        smoothed = EvaporationFlux(species_kg_hr=effective_rates)
+        smoothed = EvaporationFlux(
+            species_kg_hr=effective_rates,
+            alpha_authority_status_by_species={
+                species: status
+                for species, status in (
+                    evap_flux.alpha_authority_status_by_species.items()
+                )
+                if float(effective_rates.get(species, 0.0)) > 1.0e-12
+            },
+        )
         smoothed.update_totals()
         return smoothed
 
@@ -2876,12 +2893,26 @@ class EvaporationMixin:
 
         committed_flux = EvaporationFlux(
             species_kg_hr=committed_species_kg_hr,
+            alpha_authority_status_by_species={
+                species: status
+                for species, status in (
+                    evap_flux.alpha_authority_status_by_species.items()
+                )
+                if species in committed_species_kg_hr
+            },
         )
         committed_flux.update_totals()
         self._ledger_committed_evap_flux_this_tick = committed_flux
 
         residual_flux = EvaporationFlux(
             species_kg_hr=residual_species_kg_hr,
+            alpha_authority_status_by_species={
+                species: status
+                for species, status in (
+                    evap_flux.alpha_authority_status_by_species.items()
+                )
+                if float(residual_species_kg_hr.get(species, 0.0)) > 1.0e-12
+            },
         )
         residual_flux.update_totals()
         return residual_flux

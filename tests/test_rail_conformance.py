@@ -867,6 +867,30 @@ def test_c1_keys_resolve_through_real_consumers(
         assert rendered["pressure"]["pa"] > 0.0
 
 
+@pytest.mark.parametrize(
+    "species_id",
+    ("Ca", "Ti", "CaO_gas", "TiO", "TiO2_gas", "Ca2"),
+)
+def test_ca_ti_alpha_ceiling_uses_canonical_catalog_receipt(
+    species_id: str,
+) -> None:
+    compiled = CATALOG.species[species_id]
+    alpha = compiled.vaporisation_coefficients.evaporation_alpha
+    midpoint = sum(compiled.valid_temperature_K) / 2.0
+
+    _, answer = _resolve_one(species_id, midpoint)
+    rendered = serialize_vapour_answer(answer)
+
+    assert alpha["status"] == "analytical_upper_bound"
+    assert alpha["tag"] == "hkl_ideal_upper_bound_status_bearing"
+    assert rendered["extra"]["alpha_authority_status"] == (
+        "analytical_upper_bound"
+    )
+    assert rendered["extra"]["alpha_inventory_policy"] == (
+        "inventory_eligible_analytical_upper_bound_noncertifying"
+    )
+
+
 @pytest.mark.parametrize("species_id", STRUCTURAL_SPECIES)
 def test_c2_pressure_is_finite_over_required_grid(species_id: str) -> None:
     evaluator = CATALOG.evaluator_for(species_id)

@@ -5,6 +5,10 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any
 
+from simulator.alpha_kinetics import (
+    ALPHA_AUTHORITY_STATUS_FIELD,
+    ANALYTICAL_UPPER_BOUND_ALPHA_STATUS,
+)
 from simulator.backend_names import (
     LEGACY_ANALYTICAL_BACKEND_DIAGNOSTIC_TOKEN,
     LEGACY_ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
@@ -82,7 +86,16 @@ def optimizer_tier_label(
             backend_status=backend_status,
             backend_authoritative=backend_authoritative,
         )
+    ceiling_species = alpha_ceiling_species(
+        run_reference,
+        result_blob,
+        backend_payload,
+    )
     certification_allowed = bool(canonical.get("certification_allowed", False))
+    if ceiling_species:
+        certification_allowed = False
+        canonical = dict(canonical)
+        canonical["certification_allowed"] = False
     tier = stored_state or "unknown"
     if (
         tier in _CERTIFIED_CACHE_TIERS
@@ -107,11 +120,38 @@ def optimizer_tier_label(
         label["evidence_rank"] = proof_rank
         label["proof_rank"] = proof_rank
         label["proof_grade"] = proof_rank
+    if ceiling_species:
+        label[ALPHA_AUTHORITY_STATUS_FIELD] = (
+            ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
+        )
+        label["alpha_ceiling_species"] = list(ceiling_species)
     return label
 
 
 def _mapping_value(value: Any) -> Mapping[str, Any]:
     return value if isinstance(value, Mapping) else {}
+
+
+def alpha_ceiling_species(*carriers: Any) -> tuple[str, ...]:
+    species: set[str] = set()
+
+    def visit(value: Any) -> None:
+        if isinstance(value, Mapping):
+            by_species = value.get("alpha_authority_status_by_species")
+            if isinstance(by_species, Mapping):
+                for name, status in by_species.items():
+                    if status == ANALYTICAL_UPPER_BOUND_ALPHA_STATUS:
+                        species.add(str(name))
+            for key, nested in value.items():
+                if key != "alpha_authority_status_by_species":
+                    visit(nested)
+        elif isinstance(value, (list, tuple)):
+            for nested in value:
+                visit(nested)
+
+    for carrier in carriers:
+        visit(carrier)
+    return tuple(sorted(species))
 
 
 def _optional_bool(value: Any) -> bool | None:

@@ -1,7 +1,11 @@
 from __future__ import annotations
 
+import json
+from types import SimpleNamespace
+
 import pytest
 
+import simulator.optimize.evaluate as evaluate_module
 from simulator.fidelity_vocabulary import EvidenceClass, may_certify
 from simulator.optimize import study
 from simulator.optimize.evaluate import RunReference, ScoredResult
@@ -12,7 +16,11 @@ from simulator.optimize.strategy import Candidate
 from web.routes import _optimizer_tier_label
 
 
-def _real_path_record(*, proof_grade: str | None) -> study.StudyRecord:
+def _real_path_record(
+    *,
+    proof_grade: str | None,
+    alpha_ceiling_species: tuple[str, ...] = (),
+) -> study.StudyRecord:
     trace = {
         "backend_name": "alphamelts",
         "backend_status": "ok",
@@ -23,6 +31,30 @@ def _real_path_record(*, proof_grade: str | None) -> study.StudyRecord:
     }
     if proof_grade is not None:
         trace["proof_grade"] = proof_grade
+    if alpha_ceiling_species:
+        run_execution = SimpleNamespace(
+            simulator=SimpleNamespace(
+                _alpha_authority_status_by_species_engaged={
+                    species: "analytical_upper_bound"
+                    for species in alpha_ceiling_species
+                }
+            ),
+            session=SimpleNamespace(
+                _config=SimpleNamespace(backend_name="alphamelts")
+            ),
+            trace={},
+            per_hour=(),
+            refusal_diagnostic={},
+            reason="",
+            backend_status="ok",
+            backend_authoritative=True,
+            reduced_real_cache={},
+        )
+        trace.update(evaluate_module._cache_trace_payload(run_execution, None))
+        assert trace["alpha_authority_status_by_species"] == {
+            species: "analytical_upper_bound"
+            for species in alpha_ceiling_species
+        }
     reference = RunReference(
         status="ok",
         trace=trace,
@@ -132,6 +164,45 @@ def test_optimizer_tier_label_without_backend_authority_is_not_certified() -> No
 
     assert label["tier"] == "cached_exact"
     assert label["ux_label"] == "UNVERIFIED"
+
+
+def test_optimizer_tier_label_preserves_positive_alpha_ceiling_through_study_record() -> None:
+    record = _real_path_record(
+        proof_grade=None,
+        alpha_ceiling_species=("Ca", "Ti"),
+    )
+
+    assert record.result_blob["alpha_authority_status_by_species"] == {
+        "Ca": "analytical_upper_bound",
+        "Ti": "analytical_upper_bound",
+    }
+    serialized_result_blob = json.loads(json.dumps(dict(record.result_blob)))
+    label = optimizer_tier_label(record.trace_summary, serialized_result_blob)
+    assert label["ux_label"] == "UNVERIFIED"
+    assert label["certification_allowed"] is False
+    assert label["canonical"]["certification_allowed"] is False
+    assert label["alpha_ceiling_species"] == ["Ca", "Ti"]
+
+
+def test_optimizer_tier_label_does_not_veto_unevaporated_ceiling_spec() -> None:
+    run_reference = {
+        "cache_state": "live_fill",
+        "backend_name": "alphamelts",
+        "backend_status": "ok",
+        "backend_authoritative": True,
+        "evidence_class": EvidenceClass.MELTS.value,
+    }
+    result_blob = {
+        "evaporation_series_resistance": {
+            "Ca": {"alpha_authority_status": "analytical_upper_bound"},
+        },
+    }
+
+    label = optimizer_tier_label(run_reference, result_blob)
+
+    assert label["ux_label"] == "CERTIFIED"
+    assert label["certification_allowed"] is True
+    assert "alpha_ceiling_species" not in label
 
 
 def test_optimizer_tier_label_reads_per_hour_summary_fallback() -> None:

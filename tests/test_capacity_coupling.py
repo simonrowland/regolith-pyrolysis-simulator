@@ -314,7 +314,12 @@ def test_relief_is_additional_to_zero_conductance_and_avoids_vessel_refusal():
 
 def test_picard_source_uses_frozen_inventory_depletion_vector():
     sim = _real_capacity_sim()
-    raw = EvaporationFlux(species_kg_hr={"Fe": 1000.0})
+    raw = EvaporationFlux(
+        species_kg_hr={"Fe": 1000.0},
+        alpha_authority_status_by_species={
+            "Fe": "analytical_upper_bound",
+        },
+    )
     raw.update_totals()
     frozen_melt = sim.atom_ledger.kg_by_account("process.cleaned_melt")
     effective_rates = sim._analytic_evaporation_depletion_rates(
@@ -328,6 +333,9 @@ def test_picard_source_uses_frozen_inventory_depletion_vector():
 
     assert 0.0 < effective_rates["Fe"] < raw.species_kg_hr["Fe"]
     assert live_effective.species_kg_hr == pytest.approx(effective_rates)
+    assert live_effective.alpha_authority_status_by_species == {
+        "Fe": "analytical_upper_bound",
+    }
 
     fe_molar_mass = resolve_species_formula(
         "Fe", sim.species_formula_registry
@@ -810,6 +818,18 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     )
 
     snapshot = sim.step()
+
+    ceiling_flux_species = {"Ca", "CaO_gas", "Ti", "TiO", "TiO2_gas"}
+    assert ceiling_flux_species <= set(
+        snapshot.evap_flux.alpha_authority_status_by_species
+    )
+    assert {
+        snapshot.evap_flux.alpha_authority_status_by_species[species]
+        for species in ceiling_flux_species
+    } == {"analytical_upper_bound"}
+    assert sim._alpha_authority_status_by_species_engaged == (
+        snapshot.evap_flux.alpha_authority_status_by_species
+    )
 
     assert sim._equipment is not None
     assert snapshot.overhead.initial_throat_area_m2 == pytest.approx(
