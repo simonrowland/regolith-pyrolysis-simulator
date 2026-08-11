@@ -179,6 +179,37 @@ tolerance ratification at chunk-5 exit requires reviewer sign-off like every oth
 gate (E11). Tier-C source identity: every C-row pins its condensed + gas source identities
 (Konings / IVTAN-electronic / NIST-ASD) in the row metadata (E6/P2-12).
 
+**ERRATUM r2.2 (2026-08-11, review-converged: adversarial review imcc-r22-review.md verdict
+REVISE-with-substance-upheld; the four required pins are folded here; FAIL-as-scored under r2.1
+stays in the record).** The first rung-2 execution (IMCC-impl/rung2/, FAIL 0/40) exposed a class
+error: the ±0.5-ulp tolerance is a reproduce-own-print instrument, but the gateable population
+contained ZERO own-model prints — every gateable check was model-vs-independent-experiment.
+Amended rung-2, all pins pre-scoring:
+
+- **2-own** (ulp tolerance): population = own-model printed values; currently empty — discharged
+  structurally by rung 3's workbook reproduction.
+- **2-char** (independent-experiment characterization), population rule: in-domain rows only (no
+  `extrapolated=true`) AND in-envelope (X_Me2O ≤ 0.5 — the boundary row is deliberately IN, see
+  control below). Named checks, each with its kill target (review §3):
+  (1) FeO γ underprediction sign — kills sign-flipped engines and complexing-sign inversions;
+  (2) binary monotonicity sweep at fixture temperatures (∂a_Me2O/∂X > 0, ∂a_SiO2/∂X < 0 vs the
+  X-ordered prints) — kills reversed engines;
+  (3) Raoultian limit a_SiO2/x_SiO2 → 1 as X_SiO2 → 1 — kills denominator-confused engines
+  (which check 1 alone cannot catch);
+  (4) class tolerance on point rows: **±0.25 dex**, pinned BEFORE re-scoring from external
+  anchors only (SF04's own claimed MAGMA–Zaitsev agreement band ~0.1–0.2 dex; Plante ±40 % ≈
+  0.15 dex; KEMS lineage 0.11–0.18 dex) — NOT from the residual distribution.
+- **Tier-A composition envelope**: X_Me2O ≤ 0.5. Evidence: SF04 Fig-3 validated span; the pack's
+  alkali-richest associate is the 1:1 metasilicate (max Me2O:SiO2 = 1.00 over all 38 rows), so
+  X > 0.5 alkali is structurally unbindable; zero-sensitivity proof for all excluded rows
+  (∂a_Me2O/∂A_j = 0 for every pack row). Out-of-envelope evaluation returns typed
+  `imcc_composition_outside_validated_envelope`. **Control (pre-registered): K-12 at X = 0.500
+  exactly is IN-envelope, has nonzero sensitivity, and is EXPECTED TO FAIL the re-score** — the
+  amendment does not rescue it; it is a standing fit-level finding at the metasilicate edge.
+- F2 (K-fit sub-1700 K drift): no contract change — extrapolation labeling fired as designed;
+  the sub-domain K rows are excluded by the population rule and reported informationally.
+- Re-scored results are reported per-row INCLUDING everything that still fails.
+
 ## 9. Non-goals
 
 MAGMA source parity; full-rail coverage claims; recipe authority; replacing or retuning MELTS;
