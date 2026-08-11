@@ -235,6 +235,21 @@ against the algorithm") as a rail cross-reference surface — shadow activities/
 rail catalog at screening-to-extension grade, every row provenance- and tier-labeled. This is the
 t-616/t-627 lane; long-tail non-central sources still wait for grok per the standing ruling.
 
+**OWNER DIRECTION (2026-08-11) — S/P compound extension (EXT-class parent-basis growth):**
+JANAF carries liquid+gas tables for the regolith S/P compound classes (sulfides FeS/CaS/MgS/
+Na2S-class, sulfates, Ca/Mg phosphates, and the P/S gas set). These enter the EXT model as NEW
+PARENT COMPONENTS (S; P2O5) with compound SPECIES carrying the mass action — the same
+ideal-associated formalism, extended basis. Rules: (1) the published-model P/S hard refusal in §5
+STANDS for plain `IMCC-SF04` (the published model never contained them); under `IMCC-SF04-EXT`
+with an explicit `enable_sp_extension` flag the refusal is replaced by the EXT species set, and
+every S/P-bearing output row carries `tier=EXT-SP`, certification-denied; (2) coverage gates
+become EXPLANATORY: a refusal for an S/P species names the class, the missing data or flag, and
+what unlocks it; (3) sulfate/sulfide speciation is carried by the compound set itself (which
+compounds exist at equilibrium IS the speciation answer in this formalism) — but redox coupling
+to the Fe2+/Fe3+ couple and melt-solubility limits remain OUT of scope, stated per row; the rail's
+own S-track (SulfLiq a_FeS) remains the authority for matte chemistry — EXT-SP is a screening/
+cross-reference surface, never a competitor to it. Review-gated with the ext wave.
+
 ## 9. Non-goals
 
 MAGMA source parity; full-rail coverage claims; recipe authority; replacing or retuning MELTS;
