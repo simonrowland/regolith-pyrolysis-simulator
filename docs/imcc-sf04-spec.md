@@ -250,6 +250,34 @@ to the Fe2+/Fe3+ couple and melt-solubility limits remain OUT of scope, stated p
 own S-track (SulfLiq a_FeS) remains the authority for matte chemistry — EXT-SP is a screening/
 cross-reference surface, never a competitor to it. Review-gated with the ext wave.
 
+**OWNER STRATEGIC REFRAME (2026-08-11) — the shadow's success criterion changes.** The RE
+investigation closed BASIS-DIFFERS: the shipped 2022 MAGMA cannot be reproduced from the published
+basis (IMCC-impl/re6). That kills workbook-reproduction as a goal — but it does NOT diminish the
+shadow, because reproducing a closed code was never the point; being an independent, honest
+melt-activity reference was. The owner's direction: our EXTENDED model — published IMCC **plus our
+own corrections** (notably allocating alkali to one-alkali monomer silicates, MO-SiO2 form) plus
+JANAF-wide species coverage — is itself the useful product, and may be BETTER arithmetic than the
+published model.
+
+CONSEQUENCES, binding:
+1. **Validation moves from model-model to INDEPENDENT EXPERIMENT.** The MAGMA workbook is demoted
+   permanently to a divergence-measurement instrument (it is a different code's output). The
+   standard for IMCC-SF04-EXT is independent measured data — Tsaplin-class alkali-silicate
+   activities, KEMS partial pressures, published activity measurements — scored under the r2.2
+   2-char discipline (in-domain, in-envelope, externally-anchored tolerance, named teeth).
+2. **"Better than published" is a claim requiring evidence, per element.** The monomer allocation
+   demonstrably collapses alkali medians against the workbook (K -2.56 -> -0.29, Na -1.22 -> -0.06,
+   re2) and the fit prefers it (K 99.1% monomer, re4) — but it also DEGRADED core RMSE in both runs
+   (SiO2 0.076 -> 0.240). So the honest form of the claim is per-element with its trade stated, not
+   a blanket improvement. Any "improves on the published arithmetic" statement must cite the
+   independent-data result for that element, never the workbook.
+3. **Coverage is a first-class deliverable.** The JANAF-wide screen sweep (13 cations, 44 gas
+   channels, trace-volatility surface) serves the rail directly - condenser contamination and tap
+   purity - at labelled screening grade, independent of any MAGMA question.
+4. Provenance rules are UNCHANGED and now matter more: published / extension-compound-thermo /
+   reverse-engineered stay separate, EXT results carry the EXT id, and a model that has diverged
+   deliberately from the published one must never be able to wear its label.
+
 ## 9. Non-goals
 
 MAGMA source parity; full-rail coverage claims; recipe authority; replacing or retuning MELTS;
