@@ -591,27 +591,28 @@ Assumption-only engine diagnostics (visible negative results, but excluded from 
 | kems-010-richter-2007 | richter_2007_mg_rate_series_geometry | rate_series | Mg | temperature_K=1873.15 | 1.58489e-05 | 0.000926307 | 1.76675 | typed-refusal:missing_condition:melt_composition; typed-refusal:missing_condition:pO2_boundary | assumed-input (excluded) |
 
 <!-- END t-512 extract-store reproduction rollup -->
-Four transition-metal monoxide gas carriers are absent from the rail catalog, and the
-reason differs by species — the distinction matters because it says whether the gap is
-work or acquisition:
+Four transition-metal monoxide gas carriers were audited, and the source/composition
+split remains decisive:
 
 | carrier | source thermochemistry | catalog row | nature of the gap |
 |---|---|---|---|
-| `FeO(g)` | **available** (NASA CEA) | absent | composable; not yet built |
-| `NiO(g)` | **available** (NASA CEA) | absent | composable; not yet built |
+| `FeO(g)` | **available** (NASA CEA) | present | diagnostic-only CEA gas-association composition; never debits or certifies |
+| `NiO(g)` | **available** (NASA CEA) | present | diagnostic-only CEA gas-exchange composition; never debits or certifies |
 | `MnO(g)` | **absent** (no JANAF-4th Mn-oxide gas table; not in CEA) | absent | needs first-principles work |
 | `CoO(g)` | **absent** (JANAF-4th has CoO(cr) only; not in CEA) | absent | needs first-principles work |
 
-`FeO(g)` is the consequential one for oxidising recipes. An independent association check
-at 1800 K gives p(FeO)/p(Fe) of order 200 at 1 bar O2, so under an oxidising overhead the
-missing FeO channel would carry far more metal than the modelled Cr oxide carriers it
-would compete with — which is why no selective high-fO2 extraction window can be claimed
-from the current catalog. The Mn and Co bounds below quantify the same class for those
-two species.
+`FeO(g)` is the consequential one for oxidising recipes. Its landed association row
+derives the `+0.5` O2-channel exponent from `Fe(g) + 0.5 O2(g) -> FeO(g)` and exposes the
+competitor in the oxidative-volatility screen. It remains an upper-screen instrument:
+the Fe base is an activity-folded effective-pressure fit and the FeO kinetic coefficient
+is an explicit Hertz–Knudsen `alpha=1` ceiling, not form- and class-matched validation.
+The resulting pressure is observable, but the channel is never flux-eligible and never
+debits inventory. No selective high-fO2 extraction window may be certified from this row. The Mn and Co
+bounds below quantify the still-unmodelled members of the same class.
 
-### Omitted metal-monoxide gas channels (FeO, MnO, CoO, NiO)
+### Omitted metal-monoxide gas channels (MnO, CoO)
 
-VapoRock patch `0001` (and the simulator’s VapoRock-coupled path that consumes it) carries **Mn and Co as atomic gas only**. All four monoxide channels lack **catalog rows**, but they split by **source availability**: **FeO(g)/NiO(g)** have NASA CEA gas tables and are *composable* (queued as composition work, not this section’s subject); **MnO(g)/CoO(g)** have no source gas tables at all — JANAF 4th has no Mn-oxide gas tables and only CoO(cr) — and are the omission this section bounds. Melt-oxide basis rows MnO/NiO/CoO remain so monatomic metal reactions atom-balance.
+VapoRock patch `0001` (and the simulator’s VapoRock-coupled path that consumes it) carries **Mn and Co as atomic gas only**. The monoxide channels **MnO(g)** and **CoO(g)** are **not** in the gas set: JANAF 4th has no Mn-oxide gas tables and only CoO(cr); NASA CEA supplies FeO(g)/NiO(g) but not MnO(g)/CoO(g). Melt-oxide basis rows MnO/NiO/CoO remain so monatomic metal reactions atom-balance. **Fe and Ni are no longer in this catalog hole**; their new rows remain diagnostic-only, non-debiting, and non-authoritative.
 
 **Bound (Pedley & Marshall 1983 ΔfH ± gef for MO; CEA NASA-9 for M(g)+O₂; range = ±Pedley uncertainty through \(\exp(\delta D_0/RT)\)):** fraction of metal-atom gas that could ride as MO under equilibrium,
 

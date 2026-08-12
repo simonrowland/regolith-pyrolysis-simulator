@@ -3,6 +3,8 @@ from __future__ import annotations
 from copy import deepcopy
 import math
 from pathlib import Path
+import subprocess
+import sys
 
 import pytest
 import yaml
@@ -26,6 +28,7 @@ from simulator.vapour_rail.catalog import (
     compile_vapour_rail_catalog,
     validate_species_catalog,
 )
+from simulator.vapour_rail.channels import CHANNEL_O2
 
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
@@ -36,6 +39,7 @@ COLLISION_GASES = {
     "Cr2O3_gas",
     "Fe2O3_gas",
     "FeO_gas",
+    "FeO_association_gas",
     "K2O_gas",
     "MgO_gas",
     "MnO_gas",
@@ -48,9 +52,11 @@ COLLISION_GASES = {
 ACTIVE_COLLISION_GASES = {
     "Al2O3_gas",
     "CaO_gas",
+    "FeO_association_gas",
     "K2O_gas",
     "MgO_gas",
     "Na2O_gas",
+    "NiO_gas",
     "SiO2_gas",
     "TiO2_gas",
 }
@@ -71,6 +77,150 @@ CARRIER_ONLY = {
 
 def _yaml(name: str) -> dict:
     return yaml.safe_load((DATA_DIR / name).read_text())
+
+
+def test_t609_cross_revision_additivity_evidence_is_reproducible() -> None:
+    root = Path(__file__).resolve().parents[1]
+    evidence_path = (
+        root
+        / "validation-data"
+        / "pin-evidence"
+        / "t609_additivity_2026-08-11.yaml"
+    )
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(root / "scripts" / "prove_t609_cross_revision_additivity.py"),
+            "--check",
+            "--output",
+            str(evidence_path),
+        ],
+        cwd=root,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    assert (
+        "PASS: 227 pre-existing species, 2556 exact grid cases" in completed.stdout
+    )
+
+    evidence = yaml.safe_load(evidence_path.read_text(encoding="utf-8"))
+    assert evidence["result"] == "pass"
+    assert evidence["method"]["compiler_common_mode"] is False
+    assert evidence["species_delta"] == {
+        "baseline_compiled_species": 227,
+        "candidate_compiled_species": 229,
+        "additions": ["FeO_association_gas", "NiO_gas"],
+        "removals": [],
+    }
+    equivalence = evidence["preexisting_equivalence"]
+    assert equivalence["compiled_species_compared"] == 227
+    assert equivalence["evaluator_species_compared"] == 213
+    assert equivalence["evaluation_cases_compared"] == 2556
+    assert equivalence["baseline_compiled_dataclasses_sha256"] == equivalence[
+        "candidate_compiled_dataclasses_sha256"
+    ]
+    assert equivalence["baseline_evaluation_grid_sha256"] == equivalence[
+        "candidate_evaluation_grid_sha256"
+    ]
+    assert evidence["t583_coverage"]["total_t583_compositions_covered"] == 251
+
+
+def test_t609_feo_nio_exponents_are_stoichiometry_derived() -> None:
+    payload = _yaml("vapor_pressures.yaml")
+    rows = {
+        species_id: payload["families"][family_id]["physical_properties"][
+            "species"
+        ][species_id]
+        for species_id, family_id in {
+            "FeO_association_gas": "oxide_vapors_feo_association_family",
+            "NiO_gas": "oxide_vapors_nio_family",
+        }.items()
+    }
+    for row in rows.values():
+        assert "pO2_exponent" not in row
+        assert "pO2_exponent" not in row["pressure_models"][0]
+
+    catalog = compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)
+    feo = catalog.species["FeO_association_gas"].evaluator
+    nio = catalog.species["NiO_gas"].evaluator
+    assert feo is not None and nio is not None
+    assert feo.pO2_exponent == pytest.approx(0.5)
+    assert nio.pO2_exponent == pytest.approx(0.0)
+
+    term = feo.o2_channel_term
+    assert term is not None
+    assert term.input_id == CHANNEL_O2
+    assert term.signed_nu == pytest.approx(-0.5)
+    assert term.target_nu == pytest.approx(1.0)
+    assert term.derived_exponent == pytest.approx(0.5)
+    assert nio.o2_channel_term is None
+    assert catalog.species["FeO_gas"].family_id == "t583_status_feo_gas_family"
+
+
+def test_t609_feo_association_slope_and_1800k_ratio() -> None:
+    catalog = compile_vapour_rail_catalog(
+        _yaml("vapor_pressures.yaml"), emit_u0_request_rules=False
+    )
+    fe = catalog.species["Fe"].evaluator
+    feo = catalog.species["FeO_association_gas"].evaluator
+    assert fe is not None and feo is not None
+
+    p_fe = fe.evaluate(1800.0).pressure_pa
+    p_feo_1bar = feo.evaluate(1800.0, pO2_bar=1.0).pressure_pa
+    p_feo_001bar = feo.evaluate(1800.0, pO2_bar=0.01).pressure_pa
+    assert p_feo_1bar / p_fe == pytest.approx(217.3144, rel=2.0e-5)
+    assert p_feo_1bar / p_feo_001bar == pytest.approx(10.0, rel=1.0e-12)
+
+
+def test_t609_positive_reaction_scaling_leaves_feo_exponent_unchanged() -> None:
+    payload = _yaml("vapor_pressures.yaml")
+    row = payload["families"]["oxide_vapors_feo_association_family"][
+        "physical_properties"
+    ]["species"]["FeO_association_gas"]
+    model = row["pressure_models"][0]
+    for reaction in (row["source_reactions"][0], model["gas_exchange_reaction"]):
+        for side in ("reactants", "products"):
+            for participant in reaction[side]:
+                participant["stoichiometry"] *= 7.0
+
+    evaluator = compile_vapour_rail_catalog(
+        payload, emit_u0_request_rules=False
+    ).species["FeO_association_gas"].evaluator
+    assert evaluator is not None
+    assert evaluator.pO2_exponent == pytest.approx(0.5)
+    assert evaluator.o2_channel_term is not None
+    assert evaluator.o2_channel_term.signed_nu == pytest.approx(-0.5)
+
+
+def test_t609_nio_congruent_limit_is_activity_linear_and_po2_neutral() -> None:
+    evaluator = compile_vapour_rail_catalog(
+        _yaml("vapor_pressures.yaml"), emit_u0_request_rules=False
+    ).species["NiO_gas"].evaluator
+    assert evaluator is not None
+    p_unit = evaluator.evaluate(1800.0, source_activity=1.0).pressure_pa
+    p_half = evaluator.evaluate(1800.0, source_activity=0.5).pressure_pa
+    p_other_o2 = evaluator.evaluate(
+        1800.0, source_activity=1.0, pO2_bar=1.0e-8
+    ).pressure_pa
+    assert p_unit == pytest.approx(0.04120438, rel=2.0e-6)
+    assert p_half == pytest.approx(0.5 * p_unit, rel=1.0e-12)
+    assert p_other_o2 == pytest.approx(p_unit, rel=0.0, abs=0.0)
+
+
+@pytest.mark.parametrize(
+    "family_id",
+    ("oxide_vapors_feo_association_family", "oxide_vapors_nio_family"),
+)
+def test_t609_unknown_declared_alpha_authority_fails_closed(family_id: str) -> None:
+    payload = _yaml("vapor_pressures.yaml")
+    alpha = payload["families"][family_id]["vaporisation_coefficients"][
+        "evaporation_alpha"
+    ]
+    alpha["status"] = "invented_authoritative_measurement"
+
+    with pytest.raises(CatalogCompileError, match="unsupported authority class"):
+        compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)
 
 
 def _reaction_fixture() -> dict:
@@ -274,9 +424,9 @@ def test_production_schema_compiles_exact_four_strata_and_legacy_projection() ->
     # activate twenty carriers through the pre-RG compatibility seam.
     # 2026-08-05 MC-4 wave-1 integration: the union of wave A (Al/C/Ca/Cl/
     # Cr/Fe/H) and wave B (K/Mg/N/Na/P/S/Si) carriers projects 30 oxide-vapor
-    # rows through the pre-RG compatibility seam (20 from A alone; +10 exact
-    # CEA-composed K2O/MgO/Na2O/P2O5/SiO2-class carriers from B).
-    assert len(legacy["oxide_vapors"]) == 29  # 29 after the P2O5_gas tombstone restore
+    # rows through the pre-RG compatibility seam. t-609 adds the status-bearing
+    # FeO association and NiO channels without activating t-583's FeO audit row.
+    assert len(legacy["oxide_vapors"]) == 31
     # 2026-08-05 MC-4 integration: the A+B union projects 24 foulant rows
     # (wave A adds the CaCl2/Cl-family foulant carriers; wave B the chloride
     # dimers) — one more than either wave alone pinned.
@@ -315,6 +465,7 @@ def test_production_schema_compiles_exact_four_strata_and_legacy_projection() ->
         "Ca2",
         "CrO",
         "CrO3",
+        "FeO_association_gas",
         "PO",
         "PO2",
         "P2",
@@ -327,6 +478,7 @@ def test_production_schema_compiles_exact_four_strata_and_legacy_projection() ->
         "MgO_gas",
         "Na2",
         "Na2O_gas",
+        "NiO_gas",
         "Si2",
         "Si3",
         "SiO2_gas",
@@ -570,7 +722,12 @@ def test_species_catalog_closes_collision_gases_and_carrier_only_rows() -> None:
     assert collision_rows == COLLISION_GASES
     for species_id in COLLISION_GASES:
         row = by_id[species_id]
-        assert row["formula"] == species_id.removesuffix("_gas")
+        expected_formula = (
+            "FeO"
+            if species_id == "FeO_association_gas"
+            else species_id.removesuffix("_gas")
+        )
+        assert row["formula"] == expected_formula
         assert row["atoms"]
         assert row["phase"] == "gas"
         assert row["validation"]["status"] == "pending_validation"
@@ -1078,4 +1235,3 @@ def test_na_composites_base_matches_lh_monatomic_and_pins() -> None:
             assert live == pytest.approx(
                 float(point["pinned_pressure_Pa"]), rel=1.0e-6, abs=0.0
             )
-

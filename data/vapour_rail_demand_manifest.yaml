@@ -4,9 +4,9 @@ description: Generated (element, neutral gas carrier) demand. Oxygen and the lum
   are not element owners; individual REEs enter when feedstocks declare resolvable formulas.
 counts:
   elements: 69
-  carriers: 955
-  pairs: 1872
-  catalog_linked_pairs: 347
+  carriers: 956
+  pairs: 1873
+  catalog_linked_pairs: 349
 provenance:
   feedstocks: data/feedstocks.yaml
   nasa_cea_extract: data/literature/extracts/nasa-cea-thermo.yaml
@@ -536,6 +536,7 @@ carriers:
 - FeCl2
 - FeCl3
 - FeO2H2
+- FeO_association_gas
 - FeO_gas
 - Ga
 - Ga2Br2
@@ -14576,6 +14577,21 @@ pairs:
   catalog_species_ids: []
   thermo_available: true
 - element: Fe
+  carrier: FeO_association_gas
+  formula: FeO
+  atoms:
+    Fe: 1.0
+    O: 1.0
+  sources:
+  - vapor_pressures_catalog
+  source_species_ids:
+  - vapor_pressures_catalog:FeO_association_gas
+  catalog_family_ids:
+  - oxide_vapors_feo_association_family
+  catalog_species_ids:
+  - FeO_association_gas
+  thermo_available: false
+- element: Fe
   carrier: FeO_gas
   formula: FeO
   atoms:
@@ -23588,11 +23604,15 @@ pairs:
   sources:
   - janaf_4th_extract
   - nasa_cea_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - janaf_4th_extract:NiO_gas
   - nasa_cea_extract:NiO
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:NiO_gas
+  catalog_family_ids:
+  - oxide_vapors_nio_family
+  catalog_species_ids:
+  - NiO_gas
   thermo_available: true
 - element: Ni
   carrier: NiS

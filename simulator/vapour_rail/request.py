@@ -1378,8 +1378,10 @@ def refusal_closure(
                 if isinstance(alpha, Mapping)
                 else ""
             )
-            # HEAD oodfix seam: out-of-domain pressure stays PressureValue +
+            # Default OOD seam: out-of-domain pressure stays PressureValue +
             # FluxEligible (status/acquisition/certification strip authority).
+            # A diagnostic alpha upper bound remains visible but non-debiting
+            # both inside and outside the evaluator domain.
             # INCOMING activity semantics (b-121/b-122): only a genuine Henrian
             # activity bound (UPPER or LOWER) remains non-debiting; OOD gamma
             # is status-bearing and flux-driving.
@@ -1391,12 +1393,22 @@ def refusal_closure(
                     ActivityVerdictKind.LOWER_BOUND,
                 }
             )
-            if activity_is_bound:
-                bound_evidence = (
-                    source_reaction_activity.evidence_ref
-                    or source_reaction_activity.reason
-                    or "source_reaction_activity_bound"
-                )
+            alpha_is_diagnostic_bound = (
+                alpha_authority_status == "diagnostic_upper_bound"
+            )
+            if activity_is_bound or alpha_is_diagnostic_bound:
+                if activity_is_bound:
+                    bound_evidence = (
+                        source_reaction_activity.evidence_ref
+                        or source_reaction_activity.reason
+                        or "source_reaction_activity_bound"
+                    )
+                else:
+                    bound_evidence = str(
+                        alpha.get("tag")
+                        or alpha.get("source")
+                        or f"diagnostic_alpha_upper_bound:{rule.species_id}"
+                    )
                 pressure = PressureUpperBound(
                     pa=float(pressure_pa), evidence_ref=bound_evidence
                 )
@@ -1449,6 +1461,11 @@ def refusal_closure(
             # non-certifying result rather than a measured alpha point.
             extra_payload["alpha_inventory_policy"] = (
                 "inventory_eligible_analytical_upper_bound_noncertifying"
+            )
+        elif alpha_authority_status == "diagnostic_upper_bound":
+            extra_payload["alpha_authority_status"] = alpha_authority_status
+            extra_payload["alpha_inventory_policy"] = (
+                "diagnostic_only_no_inventory_debit"
             )
         if source_reaction_activity is not None:
             source_label = "catalog_activity_corrected"

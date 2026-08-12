@@ -44,6 +44,7 @@ from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.condensation import GAS_CONSTANT_J_MOL_K, alpha_s
 from simulator.core import PyrolysisSimulator
 from simulator.evaporation import (
+    _legacy_evaporation_shadow_pressure_map,
     _load_evaporation_alpha_by_species,
     _pre_rg_effective_pressure_source,
 )
@@ -1011,7 +1012,7 @@ def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
                 # batch eligibility may suppress or floor-limit Stage-0-only
                 # phosphorus carriers. MC-4b makes P2O5(g) large enough at
                 # 950 C for this old latent mismatch to exceed the numerical
-                # tolerance, so exclude the declared stage boundary from parity.
+                # tolerance, so exclude the declared stage boundary.
                 assert math.isfinite(kernel_value) and kernel_value >= 0.0
                 continue
             delta = abs(legacy_value - kernel_value)
@@ -1307,6 +1308,55 @@ def test_provider_refuses_missing_species_transport_parameters():
     assert result.warnings[0].startswith(
         "missing Chapman-Enskog transport parameters for sampled species:"
     )
+
+
+@pytest.mark.parametrize(
+    ("species_id", "parent_oxide", "molar_mass"),
+    (
+        ("FeO_association_gas", "FeO", 0.0718440),
+        ("NiO_gas", "NiO", 0.0746924),
+    ),
+)
+@pytest.mark.xdist_group("serial")
+def test_t609_diagnostic_upper_screen_has_explicit_transport_proxy(
+    species_id,
+    parent_oxide,
+    molar_mass,
+):
+    result = _w3_result_with_controls(
+        1.0,
+        overhead_pressure_pa=1000.0,
+        vapour_batch_flux_pressures_Pa={species_id: 100.0},
+        molar_mass_kg_mol={species_id: molar_mass},
+        stoich_by_species={
+            species_id: {
+                "parent_oxide": parent_oxide,
+                "oxide_per_product_kg": 1.0,
+                "O2_per_product_kg": 0.0,
+            }
+        },
+        available_oxide_kg={species_id: 10.0},
+        alpha={species_id: 1.0},
+    )
+
+    assert result.status == "ok"
+    assert result.diagnostic["evaporation_flux_kg_hr"][species_id] > 0.0
+    assert species_id in result.diagnostic["evaporation_series_resistance"]
+    assert "missing_transport_parameters" not in result.diagnostic
+
+
+@pytest.mark.parametrize("species_id", ("FeO_association_gas", "NiO_gas"))
+def test_t609_flux_dormant_carriers_remain_pressure_observable_without_legacy_debit(
+    vapor_pressure_data,
+    species_id,
+):
+    alpha_by_species = _load_evaporation_alpha_by_species(vapor_pressure_data)
+
+    assert alpha_by_species[species_id] == 0.0
+    assert _legacy_evaporation_shadow_pressure_map(
+        vapor_pressure_data,
+        {species_id: 123.0},
+    ) == {species_id: 123.0}
 
 
 @pytest.mark.xdist_group("serial")

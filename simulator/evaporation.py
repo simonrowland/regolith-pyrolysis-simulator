@@ -304,7 +304,7 @@ def _assert_runtime_alpha_source_not_vaporock(
 
 
 def _load_evaporation_alpha_by_species(vapor_pressure_data: dict) -> dict[str, Any]:
-    """Load per-species Hertz-Knudsen alpha specs from vapor pressure data."""
+    """Load executable alpha specs, preserving dormant pressure-only carriers."""
 
     from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
 
@@ -323,7 +323,9 @@ def _load_evaporation_alpha_by_species(vapor_pressure_data: dict) -> dict[str, A
             value = parse_alpha_contract(alpha_data)
             if value is None:
                 continue
-            alpha_by_species[species] = value
+            alpha_by_species[species] = (
+                0.0 if species_data.get("flux_dormant") is True else value
+            )
     return alpha_by_species
 
 

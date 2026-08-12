@@ -2058,7 +2058,7 @@ def test_low_confidence_k_pseudo_vaporock_gas_rail_ignores_condensed_fallback(
     )
 
 
-def test_default_in_range_builtin_provider_keeps_fe_pseudo_fallback_and_legacy_species(
+def test_default_in_range_builtin_provider_keeps_fe_and_adds_status_bearing_feo(
     vapor_pressure_data, monkeypatch
 ):
     def reject_only_interval_rows(species, row, coefficient_block):
@@ -2092,8 +2092,18 @@ def test_default_in_range_builtin_provider_keeps_fe_pseudo_fallback_and_legacy_s
         (provider_result.diagnostic or {}).get("vapor_pressures_Pa") or {}
     )
 
-    assert set(provider_vp) == set(legacy_result.vapor_pressures_Pa)
+    assert set(provider_vp) == set(legacy_result.vapor_pressures_Pa) | {
+        "FeO_association_gas"
+    }
     assert "Fe" in provider_vp
+    assert provider_vp["FeO_association_gas"] > 0.0
+    feo_provenance = provider_result.diagnostic[
+        "vapor_pressure_numerator_provenance"
+    ]["FeO_association_gas"]
+    assert feo_provenance["authority_class"] == "analytical_non_authoritative"
+    assert provider_result.diagnostic["species_authority"]["FeO_association_gas"][
+        "authority_class"
+    ] == "analytical_non_authoritative"
     for species, pressure in legacy_result.vapor_pressures_Pa.items():
         assert provider_vp[species] == pytest.approx(
             pressure, rel=_VP_TOLERANCE_REL, abs=_VP_TOLERANCE_ABS_PA
@@ -3108,6 +3118,7 @@ _REVIEWED_ADDITIVE_CARRIERS = {
     "AlO",
     "Al2O",
     "CrO3",
+    "FeO_association_gas",
     "PO",
     "PO2",
     "P2",
@@ -3124,6 +3135,7 @@ _REVIEWED_ADDITIVE_CARRIERS = {
     "MgO_gas",
     "Na2",
     "Na2O_gas",
+    "NiO_gas",
     "Si",
     "Si2",
     "Si3",

@@ -2883,6 +2883,17 @@ def _compile_thermo_reference_model(
                     f"{species_id}.base_reference_pressure_model",
                 ),
             )
+            composition_mode = str(
+                model.get("composition_mode", "source_reaction_activity")
+            ).strip()
+            if composition_mode not in {
+                "source_reaction_activity",
+                "gas_association_from_effective_base",
+            }:
+                raise CatalogCompileError(
+                    f"{species_id}: unsupported composite composition_mode "
+                    f"{composition_mode!r}"
+                )
             exchange = _mapping(
                 model.get("gas_exchange_reaction"),
                 f"{species_id}.gas_exchange_reaction",
@@ -2935,48 +2946,76 @@ def _compile_thermo_reference_model(
                     "and produce the target vapor"
                 )
 
-            # Derive final pO2 and activity powers from the atom-balanced source
-            # reaction, not from carrier intuition.  If
-            # q A_cond -> ν V + n O2, mass action gives
-            # p_V ∝ a_A^(q/ν) pO2^(-n/ν).  Both ratios are dimensionless;
-            # ν=1 recovers the familiar q and -n exponents.
-            final_vapor_nu = 0.0
-            final_nu_o2 = 0.0
-            condensed_activity_nu = 0.0
-            activity_input = _mapping(
-                reaction.get("activity_input"), f"{species_id}.reaction.activity_input"
-            )
-            activity_component = _required_string(
-                activity_input.get("component_id"),
-                f"{species_id}.reaction.activity_input.component_id",
-            )
-            for sign, key in ((-1.0, "reactants"), (1.0, "products")):
-                participants = reaction.get(key)
-                if not isinstance(participants, list):
-                    raise CatalogCompileError(f"{species_id}: reaction requires {key}")
-                for item in participants:
-                    part = _mapping(item, f"{species_id}.reaction.{key}")
-                    formula = _required_string(
-                        part.get("formula"), f"{species_id}.reaction.formula"
+            if composition_mode == "gas_association_from_effective_base":
+                if any(
+                    reaction.get(side) != exchange.get(side)
+                    for side in ("reactants", "products")
+                ):
+                    raise CatalogCompileError(
+                        f"{species_id}: association source reaction must exactly "
+                        "match gas_exchange_reaction stoichiometry"
                     )
-                    amount = _finite_positive(
-                        part.get("stoichiometry"),
-                        f"{species_id}.reaction.stoichiometry",
+                if reaction.get("activity_input") is not None:
+                    raise CatalogCompileError(
+                        f"{species_id}: association from an effective base must "
+                        "not apply a second condensed activity"
                     )
-                    formula_keys = {formula, _strip_phase_suffix(formula)}
-                    if sign > 0.0 and not formula_keys.isdisjoint(target_keys):
-                        final_vapor_nu += amount
-                    if _is_dioxygen_formula(formula):
-                        final_nu_o2 += sign * amount
-                    if sign < 0.0 and formula == activity_component:
-                        condensed_activity_nu += amount
-            if final_vapor_nu <= 0.0 or condensed_activity_nu <= 0.0:
-                raise CatalogCompileError(
-                    f"{species_id}: final reaction must consume its declared activity "
-                    "component and produce the target vapor"
+                # Premise: the base evaluator already owns the melt/reservoir
+                # dependence; this layer adds only m B(g)+n O2(g)->nu V(g).
+                # Algebra: e_O2=-nu_O2/nu_V and e_activity=0.  For
+                # M+0.5 O2->MO, signed nu_O2=-0.5 gives e_O2=+0.5.
+                # Unit check: the channel contributes to dimensionless p/Pstd.
+                # Sanity: n=0 derives zero and exactly recovers the base curve.
+                final_vapor_nu = target_exchange_nu
+                final_nu_o2 = exchange_nu_o2
+                derived_activity_exponent = 0.0
+            else:
+                # Derive final pO2 and activity powers from the atom-balanced
+                # source reaction, not from carrier intuition.  If
+                # q A_cond -> nu V + n O2, mass action gives
+                # p_V proportional to a_A^(q/nu) pO2^(-n/nu).
+                final_vapor_nu = 0.0
+                final_nu_o2 = 0.0
+                condensed_activity_nu = 0.0
+                activity_input = _mapping(
+                    reaction.get("activity_input"),
+                    f"{species_id}.reaction.activity_input",
+                )
+                activity_component = _required_string(
+                    activity_input.get("component_id"),
+                    f"{species_id}.reaction.activity_input.component_id",
+                )
+                for sign, key in ((-1.0, "reactants"), (1.0, "products")):
+                    participants = reaction.get(key)
+                    if not isinstance(participants, list):
+                        raise CatalogCompileError(
+                            f"{species_id}: reaction requires {key}"
+                        )
+                    for item in participants:
+                        part = _mapping(item, f"{species_id}.reaction.{key}")
+                        formula = _required_string(
+                            part.get("formula"), f"{species_id}.reaction.formula"
+                        )
+                        amount = _finite_positive(
+                            part.get("stoichiometry"),
+                            f"{species_id}.reaction.stoichiometry",
+                        )
+                        formula_keys = {formula, _strip_phase_suffix(formula)}
+                        if sign > 0.0 and not formula_keys.isdisjoint(target_keys):
+                            final_vapor_nu += amount
+                        if _is_dioxygen_formula(formula):
+                            final_nu_o2 += sign * amount
+                        if sign < 0.0 and formula == activity_component:
+                            condensed_activity_nu += amount
+                if final_vapor_nu <= 0.0 or condensed_activity_nu <= 0.0:
+                    raise CatalogCompileError(
+                        f"{species_id}: final reaction must consume its declared "
+                        "activity component and produce the target vapor"
+                    )
+                derived_activity_exponent = (
+                    condensed_activity_nu / final_vapor_nu
                 )
             derived_pO2_exponent = -final_nu_o2 / final_vapor_nu
-            derived_activity_exponent = condensed_activity_nu / final_vapor_nu
             declared_activity_exponent = float(model.get("activity_exponent", 0.0) or 0.0)
             if not math.isclose(
                 declared_activity_exponent,
@@ -3823,6 +3862,19 @@ def _validate_kinetics(family_id: str, kinetics: Mapping[str, Any]) -> None:
             f"{family_id}.vaporisation_coefficients.evaporation_alpha: {exc}"
         ) from exc
     if isinstance(alpha_contract, Mapping):
+        if "value" in alpha_contract:
+            # Legacy measured/analytical rows predate typed authority status and
+            # keep their established behavior. Once a row declares a status,
+            # fail closed on misspellings or invented authority classes.
+            authority_status = str(alpha_contract.get("status") or "").strip()
+            if authority_status and authority_status not in {
+                "analytical_upper_bound",
+                "diagnostic_upper_bound",
+            }:
+                raise CatalogCompileError(
+                    f"{family_id}.vaporisation_coefficients.evaporation_alpha.status "
+                    f"has unsupported authority class {authority_status!r}"
+                )
         _assert_alpha_provenance_not_vaporock(family_id, alpha_contract)
 
 

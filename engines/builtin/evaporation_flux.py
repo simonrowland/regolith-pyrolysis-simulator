@@ -87,6 +87,12 @@ DEFAULT_MELT_SURFACE_RENEWAL_SOURCE = (
 # condensation/deposition transport table. Outputs remain status-bearing and
 # direct collision data remain acquisition targets.
 _EVAPORATION_LJ_PROXY_PARAMS = {
+    # t-609: keep the diagnostic FeO/NiO upper-screen flux computable without
+    # pretending direct transport authority. The SiO collision class is a
+    # status-bearing continuum-resistance proxy; exact formula masses remain
+    # species-specific, and the request gate never admits inventory debit.
+    "FeO_association_gas": (3.374, 71.4, 71.8440),
+    "NiO_gas": (3.374, 71.4, 74.6924),
     "CrO2": (3.374, 71.4, 83.9941),
     "CrO": (3.374, 71.4, 67.9951),
     "Al2": (3.374, 71.4, 53.9630770),

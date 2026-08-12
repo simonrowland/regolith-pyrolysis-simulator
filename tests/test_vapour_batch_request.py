@@ -863,6 +863,67 @@ def test_pending_validation_is_not_refusal() -> None:
     assert "alpha_authority_status" not in answer.extra
 
 
+@pytest.mark.parametrize(
+    ("temperature_K", "expected_out_of_range"),
+    ((448.15, True), (1800.0, False), (2300.0, True)),
+)
+def test_t609_real_rows_stay_status_bearing_through_request_layer(
+    temperature_K: float,
+    expected_out_of_range: bool,
+) -> None:
+    payload = _yaml("vapor_pressures.yaml")
+    catalog = compile_vapour_rail_catalog(
+        payload, u0_manifest=load_u0_manifest()
+    )
+    nio_activity = catalog.species["NiO_gas"].source_reaction_activity
+    assert nio_activity is not None
+    state = VapourResolveState(
+        temperature_K=temperature_K,
+        process_phase="stage0",
+        stage="stage0",
+        total_pressure_Pa=1.0e5,
+        fO2_bar=1.0,
+        source_reaction_activities={"NiO_gas": 0.4},
+        source_reaction_activity_provider="t609_real_file_probe",
+        source_reaction_activity_evidence_refs={
+            "NiO_gas": "tests/test_vapour_batch_request.py:t609"
+        },
+        source_reaction_activity_standard_states={
+            "NiO_gas": nio_activity.standard_state
+        },
+        source_reaction_fO2_bar=1.0,
+    )
+    batch = catalog.resolve_batch(
+        {"process.cleaned_melt": {"FeO": 1.0, "NiO": 1.0}},
+        state,
+        flux_activation_context=_rg_activation_context(),
+    )
+
+    for species_id in ("FeO_association_gas", "NiO_gas"):
+        answer = batch.channel(species_id)
+        assert answer.source_account == "process.cleaned_melt"
+        assert answer.validation_status == "pending_validation"
+        assert answer.verdict_status == "status_bearing_non_authoritative"
+        assert answer.certification_ceiling == "never"
+        assert isinstance(answer.pressure, PressureUpperBound)
+        assert isinstance(answer.flux, FluxDiagnosticUpperBound)
+        assert not answer.is_flux_active
+        assert answer.extra["alpha_inventory_policy"] == (
+            "diagnostic_only_no_inventory_debit"
+        )
+        assert answer.extra["alpha_authority_status"] == "diagnostic_upper_bound"
+        assert answer.extra.get("out_of_range", False) is expected_out_of_range
+
+    fe_only = catalog.resolve_batch(
+        {"process.cleaned_melt": {"FeO": 1.0}},
+        state,
+        flux_activation_context=_rg_activation_context(),
+    )
+    assert "FeO_association_gas" in fe_only
+    assert "FeO_gas" not in fe_only
+    assert "NiO_gas" not in fe_only
+
+
 def test_t568_shadow_is_golden_neutral_and_fail_isolated(monkeypatch) -> None:
     payload = _minimal_family("K", validation_status="pending_validation")
     catalog = compile_vapour_rail_catalog(payload, u0_manifest=_u0_stub("K"))

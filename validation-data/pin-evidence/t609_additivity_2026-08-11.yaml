@@ -1,0 +1,59 @@
+schema_version: 1
+proof_id: t609_cross_revision_additivity_2026-08-11
+generated_by: scripts/prove_t609_cross_revision_additivity.py
+result: pass
+method:
+  baseline_revision: cf4a499dff2beee6741f1b4da6fa43b61b6ecaa2
+  baseline_materialization: immutable_git_export_or_verified_clean_detached_checkout
+  isolated_python_imports: true
+  compiler_common_mode: false
+  source_activity: 1.0
+  temperature_positions:
+  - low
+  - mid
+  - high
+  pO2_grid_bar:
+  - 1.0e-30
+  - 1.0e-09
+  - 1.0
+  - 100.0
+  comparison: exact canonical dataclass values and exception/result values
+  float_encoding: IEEE-754 float.hex
+source_digests:
+  baseline_catalog_sha256: 9d066f72eb7194be9dd226907ba24715f2d1bf270c591b7954243a3edd7e7c9d
+  baseline_compiler_sha256: f4e34a1d0795b68b11c64208ad04e867749f33a014b2dd74c3ec363f483e35d3
+  candidate_catalog_sha256: 020eb16f67d9850692dd0f1d753123ca24ce9658c0c448603a861479b4221ca3
+  candidate_compiler_sha256: 4ae4afbcac076cccf2444f22019df3d5429753a5e35f946993e4e11e7c485b76
+species_delta:
+  baseline_compiled_species: 227
+  candidate_compiled_species: 229
+  additions:
+  - FeO_association_gas
+  - NiO_gas
+  removals: []
+preexisting_equivalence:
+  compiled_species_compared: 227
+  evaluator_species_compared: 213
+  evaluation_cases_compared: 2556
+  baseline_exceptions: 0
+  candidate_exceptions: 0
+  compiled_dataclasses_exact: true
+  evaluation_results_and_exceptions_exact: true
+  baseline_compiled_dataclasses_sha256: c347be2569ebd38f86509f5b19853a36334440aa3f82c39c34d50949f1b8bbba
+  candidate_compiled_dataclasses_sha256: c347be2569ebd38f86509f5b19853a36334440aa3f82c39c34d50949f1b8bbba
+  baseline_evaluation_grid_sha256: ad884d396934fc7cd1b1f31ea0c388d061d74f9d43121a84962c4f8468016220
+  candidate_evaluation_grid_sha256: ad884d396934fc7cd1b1f31ea0c388d061d74f9d43121a84962c4f8468016220
+t583_coverage:
+  status_only_distinct_species: 151
+  status_only_ledger_pair_compositions: 250
+  existing_executable_species:
+  - H2S
+  existing_executable_ledger_pair_compositions: 1
+  total_t583_compositions_covered: 251
+added_species_digests:
+  FeO_association_gas:
+    compiled_dataclass_sha256: 29a5af6493538fd9dd9ccd49d66a28666f222822df303bd4877d4caf47a1cba4
+    evaluation_grid_sha256: 65f335b3103b86043b5f73b4193bb709afe06d97084c9e50272c249737838fe4
+  NiO_gas:
+    compiled_dataclass_sha256: ea1e337c701e536855f6e2ec4ec6561f93ec0d6a2060b5f6f3071ff0698fb20c
+    evaluation_grid_sha256: 2755cb85e1080f0aa5dc18631c00b7c3bdebbb7f62a116f628a090809ef790fd

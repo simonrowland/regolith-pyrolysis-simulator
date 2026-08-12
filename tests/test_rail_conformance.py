@@ -32,7 +32,9 @@ from simulator.state import EvaporationFlux
 from simulator.vapour_rail.batch import (
     FLUX_ACTIVATION_EPOCH_RG_MANIFEST,
     FluxActivationContext,
+    FluxDiagnosticUpperBound,
     FluxEligible,
+    PressureUpperBound,
     PressureValue,
 )
 from simulator.vapour_rail.catalog import compile_vapour_rail_catalog
@@ -217,6 +219,10 @@ LIVE_BY_KEY = {
     for key, species_id in STRUCTURAL_BY_KEY.items()
     if CATALOG.species[species_id].code_metadata.source_account
     == "process.cleaned_melt"
+    and CATALOG.species[
+        species_id
+    ].vaporisation_coefficients.evaporation_alpha.get("status")
+    != "diagnostic_upper_bound"
 }
 STATUS_ONLY_BY_KEY = {
     key: species_id
@@ -621,15 +627,18 @@ def test_gap_ledger_schema_and_reason_types() -> None:
                 f"{_pair_key(row)}: thermo_missing is stale; thermo is available"
             )
         if row["reason"] == "acquisition-pending":
-            assert demanded["thermo_available"], (
-                f"{_pair_key(row)}: acquisition-pending cannot mask missing thermo"
-            )
             key = _pair_key(row)
             if row["contract"] == "C1-C5":
+                assert demanded["thermo_available"], (
+                    f"{key}: acquisition-pending cannot mask missing thermo"
+                )
                 assert key not in STRUCTURAL_BY_KEY, (
                     f"{key}: acquisition-pending C1-C5 gap is stale; C1-C4 are ready"
                 )
             elif row["contract"] == "C2-C5":
+                assert demanded["thermo_available"], (
+                    f"{key}: acquisition-pending cannot mask missing thermo"
+                )
                 assert row.get("disposition") == "NEEDS-BASE", (
                     f"{key}: acquisition-pending C2-C5 is reserved for an explicit "
                     "NEEDS-BASE reservoir gap"
@@ -638,7 +647,7 @@ def test_gap_ledger_schema_and_reason_types() -> None:
                     f"{key}: acquisition-pending C2-C5 gap is stale; C2-C4 are ready"
                 )
             elif row["contract"] == "C5":
-                assert demanded["catalog_species_ids"] and key not in LIVE_BY_KEY, (
+                assert key in STRUCTURAL_BY_KEY and key not in LIVE_BY_KEY, (
                     f"{key}: acquisition-pending C5 gap does not match live capabilities"
                 )
             else:
@@ -733,11 +742,16 @@ def test_partial_structural_pairs_name_only_the_remaining_contract_gap(
 
     for species_id in sorted({STRUCTURAL_BY_KEY[key] for key in partial}):
         species = CATALOG.species[species_id]
-        assert species.code_metadata.source_account == "process.stage0_foulant"
-        assert species_id not in stage0_committed_carriers, (
-            f"{species_id}: C5 gap is stale because an end-to-end Stage-0 "
-            "batch committed its source debit and offgas credit"
-        )
+        if species.code_metadata.source_account == "process.stage0_foulant":
+            assert species_id not in stage0_committed_carriers, (
+                f"{species_id}: C5 gap is stale because an end-to-end Stage-0 "
+                "batch committed its source debit and offgas credit"
+            )
+        else:
+            assert species.code_metadata.source_account == "process.cleaned_melt"
+            alpha = species.vaporisation_coefficients.evaporation_alpha
+            assert alpha.get("status") == "diagnostic_upper_bound"
+            assert CATALOG_RAW_ROWS[species_id].get("flux_dormant") is True
 
 
 def test_stage0_coverage_requires_committed_runtime_debit_credit(
@@ -860,8 +874,14 @@ def test_c1_keys_resolve_through_real_consumers(
     else:
         batch, answer = _resolve_one(species_id, midpoint)
         assert species_id in batch.requested_species_ids
-        assert isinstance(answer.pressure, PressureValue)
-        assert isinstance(answer.flux, FluxEligible)
+        if answer.extra.get("alpha_authority_status") == "diagnostic_upper_bound":
+            assert isinstance(answer.pressure, PressureUpperBound)
+            assert isinstance(answer.flux, FluxDiagnosticUpperBound)
+            assert species_id not in batch.flux_active_species_ids
+        else:
+            assert isinstance(answer.pressure, PressureValue)
+            assert isinstance(answer.flux, FluxEligible)
+            assert species_id in batch.flux_active_species_ids
         rendered = serialize_vapour_answer(answer)
         assert rendered["species_id"] == species_id
         assert rendered["pressure"]["pa"] > 0.0
@@ -918,13 +938,18 @@ def test_c2_out_of_domain_value_is_typed_diagnostic_flux(species_id: str) -> Non
         evaluator = CATALOG.evaluator_for(species_id)
         out_of_range_temperature_K = evaluator.valid_temperature_K[1] + 1.0
         batch, answer = _resolve_one(species_id, out_of_range_temperature_K)
-        assert isinstance(answer.pressure, PressureValue)
-        assert isinstance(answer.flux, FluxEligible)
+        if answer.extra.get("alpha_authority_status") == "diagnostic_upper_bound":
+            assert isinstance(answer.pressure, PressureUpperBound)
+            assert isinstance(answer.flux, FluxDiagnosticUpperBound)
+            assert species_id not in batch.flux_active_species_ids
+        else:
+            assert isinstance(answer.pressure, PressureValue)
+            assert isinstance(answer.flux, FluxEligible)
+            assert species_id in batch.flux_active_species_ids
         assert answer.extra["out_of_range"] is True
         assert answer.extra["status"]
         assert answer.extra["acquisition_flag"]
         assert answer.pressure.pa > 0.0
-        assert species_id in batch.flux_active_species_ids
 
 
 @pytest.mark.parametrize("species_id", STRUCTURAL_SPECIES)
@@ -1042,6 +1067,25 @@ def test_c5_debit_route_alpha_and_source_metadata_are_executable(
             / parent_formula.elements[owner]
         )
         expected_owner_atoms = carrier_mol * carrier_formula.elements[owner]
+        parent_inventory = conformance_sim.atom_ledger.mol_by_species(
+            "process.cleaned_melt"
+        )
+        if parent not in parent_inventory:
+            parent_buffer_kg = (
+                2.0
+                * expected_parent_mol
+                * parent_formula.molar_mass_kg_per_mol()
+            )
+            conformance_sim.record.additives_kg[parent] = (
+                conformance_sim.record.additives_kg.get(parent, 0.0)
+                + parent_buffer_kg
+            )
+            conformance_sim.atom_ledger.load_external(
+                "process.cleaned_melt",
+                {parent: parent_buffer_kg},
+                source=f"{species_id} conformance parent buffer",
+                material_origin="feedstock",
+            )
         oxygen_consumed_kg = max(
             0.0,
             -float(legacy_row.get("stoich_O2_per_vapor", 0.0)) * rate_kg_hr,
@@ -1094,9 +1138,12 @@ def test_c5_debit_route_alpha_and_source_metadata_are_executable(
         assert alpha_diagnostic
         provider, _payload = load_rail_provider()
         report = json.loads(ENGINE_REPORT_PATH.read_text(encoding="utf-8"))
+        composition_mol = deepcopy(report["composition"]["composition_mol"])
+        if parent not in composition_mol:
+            composition_mol[parent] = 2.0 * expected_parent_mol
         cell = _run_rail_cell(
             provider,
-            composition_mol=report["composition"]["composition_mol"],
+            composition_mol=composition_mol,
             temperature_K=sum(species.valid_temperature_K) / 2.0,
             fo2_log10_bar=-9.0,
             pressure_bar=float(report["domain"]["pressure_bar"]),

@@ -1258,6 +1258,39 @@ species:
     collision_only_suffix: true
     request_rule: pending_family_compilation
   source: VR-1 U0 collision_gas membership set
+- id: FeO_association_gas
+  formula: FeO
+  atoms:
+    Fe: 1
+    O: 1
+  molar_mass_g_mol: 71.844
+  basis: molecular_formula
+  category: vapor_species
+  phase: gas
+  catalog_role: gas
+  direct_vapour_flux: true
+  formula_alias: FeO
+  validation:
+    status: pending_validation
+    anchor_refs: []
+  pressure_observable: equilibrium_partial_pressure
+  valid_domain:
+    status: active
+    temperature_K:
+    - 1400
+    - 1900
+  extrapolation_policy: conservative_slope_continuation
+  out_of_range_status: out_of_range_conservative_continuation
+  acquisition_flag: evaporation_alpha_hkl_upper_bound_t609:FeO_association_gas
+  code_metadata:
+    formula_id: FeO
+    canonical_aliases:
+    - FeO
+    collision_only_suffix: false
+    request_rule: source_inventory_present
+    source_account: process.cleaned_melt
+  source: t-609 landed NASA CEA Fe/FeO/O2 gas-association composition on the existing Fe effective-pressure
+    base; diagnostic-only, never inventory-debiting, and never certifying.
 - id: K2
   formula: K2
   atoms:
@@ -1556,29 +1589,34 @@ species:
   atoms:
     Ni: 1
     O: 1
+  molar_mass_g_mol: 74.6924
   basis: molecular_formula
   category: vapor_species
   phase: gas
   catalog_role: gas
-  direct_vapour_flux: false
+  direct_vapour_flux: true
   formula_alias: NiO
   validation:
     status: pending_validation
     anchor_refs: []
   pressure_observable: equilibrium_partial_pressure
   valid_domain:
-    status: pending_acquisition
-    temperature_K: null
+    status: active
+    temperature_K:
+    - 1400
+    - 2273.15
   extrapolation_policy: conservative_slope_continuation
   out_of_range_status: out_of_range_conservative_continuation
-  acquisition_flag: vapour_pressure_pending_acquisition:NiO_gas
+  acquisition_flag: evaporation_alpha_hkl_upper_bound_t609:NiO_gas
   code_metadata:
     formula_id: NiO
     canonical_aliases:
     - NiO
-    collision_only_suffix: true
-    request_rule: pending_family_compilation
-  source: VR-1 U0 collision_gas membership set
+    collision_only_suffix: false
+    request_rule: source_inventory_present
+    source_account: process.cleaned_melt
+  source: t-609 landed NASA CEA Ni/NiO/O2 gas-exchange composition on the liquid-NiO standard-reaction
+    base; diagnostic-only, never inventory-debiting, and never certifying.
 - id: P2O5_gas
   formula: P2O5
   atoms:

@@ -111,7 +111,6 @@ ALLOWED_RETAINED_FP_IDS = frozenset({"Cl", "He", "N"})
 # non-delta non-R non-U failures.
 #
 # Provenance (strict probe at authoring):
-# - NiO / NiO_gas: expansion {NiO_gas} with no literature channel
 # - MnO / MnO_gas: request children include MnO_gas without literature
 # - Cr2O3 / Cr2O3_gas: request children include Cr2O3_gas without literature
 # - Na2CO3: stage-0 products include Na2SiO3 without literature
@@ -121,8 +120,6 @@ OPEN_ACQUISITION_DEBT_IDS = frozenset(
         "Cr2O3_gas",
         "MnO",
         "MnO_gas",
-        "NiO",
-        "NiO_gas",
         "Na2CO3",
     }
 )
@@ -980,19 +977,14 @@ def test_u0_feedstock_presence_exact_join(
         assert products, f"stage0 expansion for {parent} is empty"
 
 
-def test_strict_join_partial_expansion_fails_not_soft_ok(
+def test_strict_join_nio_expansion_resolves_landed_evaluator(
     production_catalog,
     production_payload: dict[str, Any],
     parent_to_gas_ids: dict[str, frozenset[str]],
     yaml_phys_index: dict[str, dict[str, Any]],
     u0_by_id: dict[str, dict[str, Any]],
 ) -> None:
-    """Red-under-mutation / strictness unit: NiO partial expansion is not ok.
-
-    Null hypothesis: expansion graph non-empty alone greenwashes coverage
-    (old soft-C branch). Refutation: NiO → {NiO_gas} with no child literature
-    yields ok=False.
-    """
+    """t-609 closes the former NiO/NiO_gas strict-join debt."""
 
     legacy = vapor_pressure_legacy_view(production_payload)
     row = u0_by_id["NiO"]
@@ -1004,11 +996,7 @@ def test_strict_join_partial_expansion_fails_not_soft_ok(
         legacy_view=legacy,
         u0_by_id=u0_by_id,
     )
-    assert joined["ok"] is False, (
-        "NiO must fail strict join (NiO_gas has no literature); "
-        f"got resolution={joined['resolution']}"
-    )
-    # Request-rule-only gas rows also fail (no bare evaluator soft path).
+    assert joined["ok"] is True, joined["resolution"]
     gas = _join_feedstock_presence_row(
         u0_by_id["NiO_gas"],
         catalog=production_catalog,
@@ -1017,7 +1005,7 @@ def test_strict_join_partial_expansion_fails_not_soft_ok(
         legacy_view=legacy,
         u0_by_id=u0_by_id,
     )
-    assert gas["ok"] is False
+    assert gas["ok"] is True
     assert gas["resolution"] != "request_rule_pending_evaluator"
 
 

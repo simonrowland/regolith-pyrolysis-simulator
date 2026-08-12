@@ -184,6 +184,15 @@ species:
           - docs-private/research/2026-08-08-si-comparability/report.md
           - docs-private/research/2026-08-09-form589-impl/report.md
           - docs-private/research/2026-08-09-condensed-form/report.md
+  FeO_association_gas:
+    tier: T1
+    target_tier: T4
+    validations:
+      structural:
+        evidence_refs:
+          - data/vapor_pressures.yaml
+          - data/literature/extracts/nasa-cea-thermo.yaml
+          - validation-data/pin-evidence/feo_nio_composition_2026-08-10.yaml
   K:
     tier: T3
     target_tier: T4
@@ -267,6 +276,16 @@ species:
         evidence_refs:
           - data/vapor_pressures.yaml
           - data/literature/extracts/nasa-cea-thermo.yaml
+  NiO_gas:
+    tier: T1
+    target_tier: T4
+    validations:
+      structural:
+        evidence_refs:
+          - data/vapor_pressures.yaml
+          - data/literature/extracts/nasa-cea-thermo.yaml
+          - validation-data/pin-evidence/feo_nio_composition_2026-08-10.yaml
+          - validation-data/pin-evidence/nio_liquid_reference_fit_grid_2026-08-10.yaml
   Mn:
     # si-comparability 2026-08-08: demoted T3→T1. The only mass_spec residual
     # was molten-metal olette α (not silicate-melt carrier validation); pin

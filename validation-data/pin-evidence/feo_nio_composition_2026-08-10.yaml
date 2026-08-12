@@ -1,0 +1,120 @@
+# Distilled structural evidence for t-609 FeO(g) / NiO(g) composition.
+# This is a T1 reproducibility record, not a residual or promotion pin.
+schema_version: 1
+kind: vapour_rail_pin_evidence
+source_id: t609-feo-nio-composition
+date: "2026-08-10"
+species: [FeO_association_gas, NiO_gas]
+validation: structural
+certification_ceiling: never
+runtime_disposition: status_bearing_non_authoritative
+
+thermochemistry:
+  source_id: nasa-cea-thermo
+  gas_standard_state:
+    convention: CEA_JANAF_1_bar
+    system_class: gas_phase_thermochemistry
+    condensed_form: not_applicable
+  records:
+    Fe: {observation_id: cea_Fe_gibbs, domain_K: [300.0, 20000.0]}
+    FeO: {observation_id: cea_FeO_gibbs, domain_K: [300.0, 6000.0]}
+    Ni: {observation_id: cea_Ni_gibbs, domain_K: [300.0, 20000.0]}
+    NiO: {observation_id: cea_NiO_gibbs, domain_K: [300.0, 6000.0]}
+    O2: {observation_id: cea_O2_gibbs, domain_K: [200.0, 20000.0]}
+
+compositions:
+  FeO_association_gas:
+    pressure_reaction: Fe(g) + 0.5 O2(g) -> FeO(g)
+    base: metals_fe_family effective_pressure_reference_fit
+    base_system_class: silicate_melt_effective_fit
+    base_condensed_form: liquid_melt
+    base_validation_use: computational_provenance_only
+    derived_channel:
+      channel_id: O2
+      signed_nu: -0.5
+      target_nu: 1.0
+      exponent: 0.5
+      persisted_exponent_in_catalog: false
+    ledger_reaction: FeO(melt) -> FeO(g)
+    ledger_parent_kg_per_kg_vapor: 1.0
+    ledger_O2_kg_per_kg_vapor: 0.0
+    caveat: >-
+      The Fe base is an activity-folded effective pressure fit. Association
+      therefore supplies an explicit high-fO2 status-bearing screen, not a
+      certified unit-activity FeO vaporization curve.
+    alternative_condensed_standard_state_check:
+      source_observation_id: cea_Fe.947O(L)_gibbs
+      reaction: Fe0.95O(l) -> 0.95 FeO(g) + 0.025 O2(g)
+      derived_O2_exponent: -0.02631578947368421
+      pressure_Pa_at_1800K_1bar_O2: 0.01678
+      disposition: >-
+        Different question: pure condensed-reference vaporization rather than
+        association speciation of the existing effective Fe pressure channel.
+        Retained as a scale warning; neither curve is validation evidence.
+  NiO_gas:
+    pressure_reaction: NiO(liquid reference) -> NiO(g)
+    gas_exchange_reaction: Ni(g) + 0.5 O2(g) -> NiO(g)
+    base_reference_derivation:
+      observation_id: nio_liquid_reference_fit
+      premise: NiO(l) -> Ni(g) + 0.5 O2(g)
+      condensed_chemical_potential: >-
+        ThermoEngine MELTS pure-endmember G transformed to the oxide basis
+        with the VapoRock MOL_LIQ_OXIDES recipe.
+      gas_chemical_potentials:
+        source_id: nasa-cea-thermo
+        observation_ids: [cea_Ni_gibbs, cea_O2_gibbs]
+      equation: >-
+        log10(p_Ni/Pa) = 5 - delta_G_standard/(R*T*ln(10)) at unit
+        NiO activity and 1 bar O2.
+      fit_method: minimax absolute log10-pressure residual
+      grid_evidence_ref: validation-data/pin-evidence/nio_liquid_reference_fit_grid_2026-08-10.yaml
+    base_reference_antoine:
+      A: 14.600821570744165
+      B: 28695.91021034432
+      C: -88.4232486226076
+      domain_K: [1400.0, 2273.15]
+      max_abs_fit_residual_dex: 0.00354293876594447
+      rms_fit_residual_dex: 0.0015285441389054474
+    base_system_class: thermodynamic_model_liquid_oxide_endmember
+    base_condensed_form: liquid_melt
+    base_validation_use: computational_provenance_only
+    derived_channel:
+      channel_id: O2
+      net_signed_nu: 0.0
+      target_nu: 1.0
+      exponent: 0.0
+      persisted_exponent_in_catalog: false
+    ledger_parent_kg_per_kg_vapor: 1.0
+    ledger_O2_kg_per_kg_vapor: 0.0
+    caveat: >-
+      Pure-oxide standard-state thermochemistry is not a residual validation
+      of a NiO-bearing multicomponent silicate melt. It may drive only a
+      status-bearing answer with the runtime liquid-activity handshake.
+
+kinetics:
+  FeO_association_gas:
+    alpha: 1.0
+    status: hertz_knudsen_ideal_upper_bound
+    validation_use: none
+  NiO_gas:
+    alpha: 1.0
+    status: hertz_knudsen_ideal_upper_bound
+    validation_use: none
+  form_and_class_gate: >-
+    No atomic-Fe, molten-metal, crystalline-oxide, or unresolved-form alpha
+    record is attached to either carrier. Those evidence classes are not both
+    carrier- and liquid-melt-form matched.
+
+checkable_claims:
+  - source_reaction stoichiometry, not an editable scalar, derives every pO2 exponent
+  - FeO_association_gas compiles a typed O2 channel term with exponent +0.5
+  - NiO_gas derives the exact congruent-transfer limiting exponent 0.0
+  - both rows remain pending_validation and status_bearing_non_authoritative
+  - both kinetic coefficients are explicit upper bounds and never validation evidence
+
+publishable_companion_refs:
+  - data/vapor_pressures.yaml
+  - data/literature/extracts/nasa-cea-thermo.yaml
+  - data/vapour_rail_validation_pins.yaml
+  - validation-data/pin-evidence/nio_liquid_reference_fit_grid_2026-08-10.yaml
+  - docs/model-limitations.md

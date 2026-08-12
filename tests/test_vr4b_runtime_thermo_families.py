@@ -139,7 +139,7 @@ def _strata(
                     "process_or_terminal_destination": "process.condensation_train",
                 },
                 "vaporisation_coefficients": {
-                    "evaporation_alpha": {"value": 1.0, "status": "fixture"},
+                    "evaporation_alpha": {"value": 1.0},
                     "alpha_domain_and_uncertainty": {},
                     "extrapolation_policy": "conservative_slope_continuation",
                     "out_of_range_status": OUT_OF_RANGE_STATUS,

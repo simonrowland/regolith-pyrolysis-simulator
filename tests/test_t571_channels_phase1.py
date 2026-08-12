@@ -825,8 +825,9 @@ def test_production_catalog_emits_only_o2_terms(production_catalog):
                 f"{species_id}: unexpected non-O2 term {term.input_id}"
             )
     # t-583 adds 25 status-only, non-authoritative O2-dependent evaluators to
-    # the 30 pre-existing terms; no non-O2 channel is admitted.
-    assert n_terms == 55
+    # the 30 pre-existing terms; t-609 adds one FeO association term. No
+    # non-O2 channel is admitted.
+    assert n_terms == 56
 
 
 # ---------------------------------------------------------------------------
