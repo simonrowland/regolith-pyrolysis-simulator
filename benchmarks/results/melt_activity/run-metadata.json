@@ -1,10 +1,11 @@
 {
   "bench_set": "data/melt_activity/basalt-bench-set-v1.yaml",
-  "bench_set_sha256": "03746d031dc87c98640e16b927088b4da90017ec7cf1d7789785186bccfedd69",
+  "bench_set_sha256": "3506b9b780ad8a411c47ca3e7f4fa98544572adc28569dab3607828b0b19d7ab",
   "coverage_row_count": 168,
   "engines": [
     "imcc-published",
     "imcc-ext",
+    "internal_analytic",
     "alphamelts",
     "vaporock"
   ],
@@ -16,16 +17,114 @@
     }
   },
   "mode": "all",
+  "paired_decisions": [
+    {
+      "decision": "internal_analytic",
+      "imcc_closer_point_count": 0,
+      "imcc_engine": "imcc-ext",
+      "imcc_rmse_dex": 0.9330418590870391,
+      "internal_analytic_closer_point_count": 3,
+      "internal_analytic_rmse_dex": 0.3729664368525022,
+      "observable": "partial_pressure",
+      "paired_count": 3,
+      "species": "K",
+      "tie_point_count": 0
+    },
+    {
+      "decision": "internal_analytic",
+      "imcc_closer_point_count": 0,
+      "imcc_engine": "imcc-published",
+      "imcc_rmse_dex": 0.9338993351179371,
+      "internal_analytic_closer_point_count": 3,
+      "internal_analytic_rmse_dex": 0.3729664368525022,
+      "observable": "partial_pressure",
+      "paired_count": 3,
+      "species": "K",
+      "tie_point_count": 0
+    },
+    {
+      "decision": "imcc-ext",
+      "imcc_closer_point_count": 3,
+      "imcc_engine": "imcc-ext",
+      "imcc_rmse_dex": 0.11823767264148025,
+      "internal_analytic_closer_point_count": 0,
+      "internal_analytic_rmse_dex": 0.952481463657585,
+      "observable": "activity_coefficient",
+      "paired_count": 3,
+      "species": "Mg",
+      "tie_point_count": 0
+    },
+    {
+      "decision": "imcc-published",
+      "imcc_closer_point_count": 3,
+      "imcc_engine": "imcc-published",
+      "imcc_rmse_dex": 0.11025627648634946,
+      "internal_analytic_closer_point_count": 0,
+      "internal_analytic_rmse_dex": 0.952481463657585,
+      "observable": "activity_coefficient",
+      "paired_count": 3,
+      "species": "Mg",
+      "tie_point_count": 0
+    },
+    {
+      "decision": "imcc-ext",
+      "imcc_closer_point_count": 3,
+      "imcc_engine": "imcc-ext",
+      "imcc_rmse_dex": 0.5753765152725865,
+      "internal_analytic_closer_point_count": 0,
+      "internal_analytic_rmse_dex": 0.9450507910132347,
+      "observable": "activity_coefficient",
+      "paired_count": 3,
+      "species": "SiO",
+      "tie_point_count": 0
+    },
+    {
+      "decision": "imcc-published",
+      "imcc_closer_point_count": 3,
+      "imcc_engine": "imcc-published",
+      "imcc_rmse_dex": 0.5768608748202295,
+      "internal_analytic_closer_point_count": 0,
+      "internal_analytic_rmse_dex": 0.9450507910132347,
+      "observable": "activity_coefficient",
+      "paired_count": 3,
+      "species": "SiO",
+      "tie_point_count": 0
+    },
+    {
+      "decision": "imcc-ext",
+      "imcc_closer_point_count": 3,
+      "imcc_engine": "imcc-ext",
+      "imcc_rmse_dex": 0.23086468982900546,
+      "internal_analytic_closer_point_count": 0,
+      "internal_analytic_rmse_dex": 0.25629166723767854,
+      "observable": "partial_pressure",
+      "paired_count": 3,
+      "species": "SiO",
+      "tie_point_count": 0
+    },
+    {
+      "decision": "imcc-published",
+      "imcc_closer_point_count": 3,
+      "imcc_engine": "imcc-published",
+      "imcc_rmse_dex": 0.2307269099462597,
+      "internal_analytic_closer_point_count": 0,
+      "internal_analytic_rmse_dex": 0.25629166723767854,
+      "observable": "partial_pressure",
+      "paired_count": 3,
+      "species": "SiO",
+      "tie_point_count": 0
+    }
+  ],
   "point_status_counts": {
     "crash": 10,
-    "ok": 24,
+    "ok": 36,
     "out_of_domain": 6,
-    "refused": 8,
+    "refused": 12,
     "unavailable": 16
   },
   "probe_status_counts": {
     "crash": 1,
-    "ok": 10,
+    "ok": 15,
     "refused": 4,
     "unavailable": 5
   },
@@ -105,5 +204,23 @@
     ],
     "shared_magma_count": 288
   },
+  "rump_coverage": [
+    {
+      "below_30_count": 40,
+      "both_accept_count": 37,
+      "imcc_engine": "imcc-ext",
+      "imcc_only_count": 0,
+      "internal_analytic_only_count": 3,
+      "neither_count": 0
+    },
+    {
+      "below_30_count": 40,
+      "both_accept_count": 38,
+      "imcc_engine": "imcc-published",
+      "imcc_only_count": 0,
+      "internal_analytic_only_count": 2,
+      "neither_count": 0
+    }
+  ],
   "schema_version": "melt-activity-benchmark-run.v1"
 }

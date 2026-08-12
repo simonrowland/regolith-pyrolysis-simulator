@@ -51,6 +51,7 @@ def test_harness_runs_end_to_end_on_tiny_fixture(tmp_path, monkeypatch):
     assert (output_dir / "bench-set.yaml").is_file()
     assert (output_dir / "benchmark-results.csv").is_file()
     assert (output_dir / "coverage-map.csv").is_file()
+    assert (output_dir / "paired-decisions.csv").is_file()
     assert (output_dir / "reference-anchor-results.csv").is_file()
     assert result["metadata"]["reference_anchor"]["shared_magma_count"] == 288
     assert "Literal SF04 basalt empirical points: **0**" in (
@@ -85,6 +86,7 @@ def test_mode_specific_run_removes_stale_incompatible_outputs(tmp_path, monkeypa
     assert not (output_dir / "benchmark-results.csv").exists()
     assert not (output_dir / "composition-probes.csv").exists()
     assert not (output_dir / "reference-anchor-results.csv").exists()
+    assert not (output_dir / "paired-decisions.csv").exists()
     assert not (output_dir / "live-vaporock-check.csv").exists()
     assert not (output_dir / "report.md").exists()
 
@@ -134,6 +136,44 @@ def test_coverage_map_records_melts_refusal_below_30_sio2():
     }
 
 
+def test_rump_coverage_reports_internal_only_and_imcc_only_counts():
+    rows = [
+        {
+            "SiO2_wt_pct": 20.0,
+            "internal_analytic_status": "ok",
+            "imcc-published_status": "ok",
+        },
+        {
+            "SiO2_wt_pct": 25.0,
+            "internal_analytic_status": "ok",
+            "imcc-published_status": "refused",
+        },
+        {
+            "SiO2_wt_pct": 10.0,
+            "internal_analytic_status": "refused",
+            "imcc-published_status": "ok",
+        },
+        {
+            "SiO2_wt_pct": 40.0,
+            "internal_analytic_status": "refused",
+            "imcc-published_status": "refused",
+        },
+    ]
+
+    summary = benchmark.summarize_rump_coverage(rows)
+
+    assert summary == [
+        {
+            "imcc_engine": "imcc-published",
+            "below_30_count": 3,
+            "both_accept_count": 1,
+            "internal_analytic_only_count": 1,
+            "imcc_only_count": 1,
+            "neither_count": 0,
+        }
+    ]
+
+
 def test_reference_anchor_reproduces_controller_join_and_kems_column():
     fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
     rows = benchmark.run_reference_anchors(fixture)
@@ -173,6 +213,158 @@ def test_hastie_kems_points_use_shared_gas_layer_for_melt_engines():
     assert len(rows) == 6
     assert all(row["status"] == "ok" for row in rows)
     assert all(row["residual_dex"] is not None for row in rows)
+
+
+@pytest.mark.parametrize(
+    ("parent_oxide", "parent_activity", "single_cation_activity"),
+    (
+        ("Na2O", 0.25, 0.5),
+        ("K2O", 0.16, 0.4),
+        ("Li2O", 0.09, 0.3),
+        ("Al2O3", 0.36, 0.6),
+        ("MgO", 0.25, 0.25),
+    ),
+)
+def test_parent_formula_activity_is_converted_to_single_cation_gas_basis(
+    parent_oxide, parent_activity, single_cation_activity
+):
+    converted = benchmark._single_cation_gas_activities(
+        {parent_oxide: parent_activity}
+    )
+
+    assert converted[parent_oxide] == pytest.approx(single_cation_activity)
+
+
+def test_internal_analytical_live_adapter_uses_shared_gas_layer_at_pinned_fo2():
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    point = next(
+        point
+        for point in fixture["points"]
+        if point["id"] == "hastie_sio_1907_796"
+    )
+    composition = benchmark._normalize_wt(
+        fixture["compositions"][point["composition_id"]]["composition_wt_pct"]
+    )
+    low_fo2 = float(point["fO2_bar"])
+    high_fo2 = low_fo2 * 10.0
+    engine = benchmark.InternalAnalyticalEngine()
+
+    low_result = engine.evaluate(composition, point["temperature_K"], low_fo2)
+    high_result = engine.evaluate(composition, point["temperature_K"], high_fo2)
+    low_prediction, low_reason = benchmark._prediction_for_point(
+        {**point, "composition_wt_pct": composition, "fO2_bar": low_fo2},
+        low_result,
+    )
+    high_prediction, high_reason = benchmark._prediction_for_point(
+        {**point, "composition_wt_pct": composition, "fO2_bar": high_fo2},
+        high_result,
+    )
+
+    assert low_result.status == high_result.status == "ok"
+    assert low_reason == high_reason == ""
+    assert low_prediction is not None and high_prediction is not None
+    assert high_prediction < low_prediction
+
+    from simulator.diagnostic_helpers.alphamelts_volatility import (
+        _analytical_vapor_pressures_from_activities,
+        _load_default_vapor_pressure_data,
+    )
+
+    expected = _analytical_vapor_pressures_from_activities(
+        vapor_pressure_data=_load_default_vapor_pressure_data(),
+        temperature_C=float(point["temperature_K"]) - 273.15,
+        pO2_bar=low_fo2,
+        melt_oxide_activities=benchmark._single_cation_gas_activities(
+            low_result.activities
+        ),
+        composition_wt_pct=composition,
+    )["species"]["SiO"]["P_eq_Pa"]
+    assert low_prediction == pytest.approx(expected)
+
+
+def test_internal_analytical_live_adapter_converts_gamma_to_parent_oxide_basis():
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    point = next(
+        point
+        for point in fixture["points"]
+        if point["id"] == "richter_mg_gamma_1873"
+    )
+    composition = benchmark._normalize_wt(
+        fixture["compositions"][point["composition_id"]]["composition_wt_pct"]
+    )
+
+    result = benchmark.InternalAnalyticalEngine().evaluate(
+        composition, point["temperature_K"], 1.0e-9
+    )
+
+    assert result.status == "ok"
+    assert result.gammas["MgO"] == pytest.approx(0.8968179981767649)
+
+
+def test_missing_point_observable_is_recorded_as_refused():
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    fixture["points"] = [
+        point for point in fixture["points"] if point["id"] == "hastie_k_1917_186"
+    ]
+
+    class _MissingActivity(_FakeActivityEngine):
+        name = "internal_analytic"
+
+        def evaluate(self, composition_wt_pct, temperature_K, fO2_bar):
+            del composition_wt_pct, temperature_K, fO2_bar
+            return benchmark.EngineResult(status="ok")
+
+    row = benchmark.run_points(fixture, [_MissingActivity()])[0]
+
+    assert row["status"] == "refused"
+    assert row["prediction"] is None
+    assert "no positive partial_pressure" in row["reason"]
+
+
+def test_paired_decision_uses_identical_scored_points():
+    rows = [
+        {
+            "point_id": "p1",
+            "species": "Mg",
+            "observable": "activity_coefficient",
+            "engine": "internal_analytic",
+            "residual_dex": 0.4,
+        },
+        {
+            "point_id": "p1",
+            "species": "Mg",
+            "observable": "activity_coefficient",
+            "engine": "imcc-published",
+            "residual_dex": 0.1,
+        },
+        {
+            "point_id": "p2",
+            "species": "Mg",
+            "observable": "activity_coefficient",
+            "engine": "imcc-published",
+            "residual_dex": 0.01,
+        },
+    ]
+
+    decisions = benchmark.summarize_paired_decisions(rows)
+
+    assert len(decisions) == 1
+    assert decisions[0]["paired_count"] == 1
+    assert decisions[0]["decision"] == "imcc-published"
+
+
+def test_paired_verdict_does_not_call_win_plus_tie_better_on_every_group():
+    decisions = [
+        {"imcc_engine": "imcc-published", "decision": "imcc-published"},
+        {"imcc_engine": "imcc-published", "decision": "tie"},
+        {"imcc_engine": "imcc-ext", "decision": "internal_analytic"},
+        {"imcc_engine": "imcc-ext", "decision": "tie"},
+    ]
+
+    verdict = benchmark._paired_verdict(decisions)
+
+    assert "`imcc-published`: IMCC better or tied" in verdict
+    assert "`imcc-ext`: internal_analytic better or tied" in verdict
 
 
 def test_unscored_point_preserves_engine_crash_status():

@@ -4,9 +4,11 @@
 The harness reads a tracked YAML bench set, runs a configurable engine set,
 captures every point as ``ok``, ``out_of_domain``, ``crash``, ``refused``, or
 ``unavailable``, and writes deterministic CSV/JSON/Markdown artifacts. For
-gas observables it holds the tracked analytical gas layer constant and swaps
-only the engine-provided melt activity. Engine crashes are data, not process
-failures.
+gas observables it converts parent-formula activities to each rail's
+single-cation basis, then holds the tracked analytical gas layer constant and
+swaps only that converted melt activity. Activity coefficients are normalized
+to ``gamma = a/x`` on the parent-oxide formula-unit basis. Engine crashes are
+data, not process failures.
 
 Examples
 --------
@@ -44,7 +46,13 @@ if str(REPO_ROOT) not in sys.path:
 
 DEFAULT_BENCH_SET = REPO_ROOT / "data/melt_activity/basalt-bench-set-v1.yaml"
 DEFAULT_OUTPUT_DIR = REPO_ROOT / "benchmarks/results/melt_activity"
-DEFAULT_ENGINES = ("imcc-published", "imcc-ext", "alphamelts", "vaporock")
+DEFAULT_ENGINES = (
+    "imcc-published",
+    "imcc-ext",
+    "internal_analytic",
+    "alphamelts",
+    "vaporock",
+)
 SF04_ANCHOR_SPECIES = ("SiO2", "FeO", "Fe", "Mg", "SiO", "K", "Na", "O2")
 SF04_SHEET_COMPOSITIONS = {
     "tho": "sf04_tholeiite",
@@ -59,7 +67,7 @@ POINT_STATUSES = frozenset(
 
 @dataclass(frozen=True)
 class EngineResult:
-    """One melt-activity engine result at one composition and temperature."""
+    """One engine result on the parent-oxide formula-unit reference basis."""
 
     status: str
     activities: Mapping[str, float] = field(default_factory=dict)
@@ -129,6 +137,35 @@ def _oxide_mole_fractions(values: Mapping[str, Any]) -> dict[str, float]:
     mol = _wt_to_mol(values)
     total = sum(mol.values())
     return {key: value / total for key, value in mol.items()} if total else {}
+
+
+def _oxide_cations_per_formula(parent_oxide: str) -> float:
+    from simulator.accounting.formulas import resolve_species_formula
+
+    formula = resolve_species_formula(str(parent_oxide))
+    cations = [
+        float(count)
+        for element, count in formula.elements.items()
+        if element != "O"
+    ]
+    if "O" not in formula.elements or len(cations) != 1:
+        raise ValueError(
+            f"expected a one-cation-family oxide formula, got {parent_oxide!r}"
+        )
+    return cations[0]
+
+
+def _single_cation_gas_activities(
+    parent_oxide_activities: Mapping[str, float],
+) -> dict[str, float]:
+    converted: dict[str, float] = {}
+    for parent_oxide, activity in parent_oxide_activities.items():
+        cations = _oxide_cations_per_formula(parent_oxide)
+        # Premise: M_nO_m contains n units of the single-cation component
+        # MO_(m/n). Algebra: a_parent = a_single**n, so
+        # a_single = a_parent**(1/n). Sanity: K2O/Na2O/Li2O use sqrt(a_M2O).
+        converted[str(parent_oxide)] = float(activity) ** (1.0 / cations)
+    return _positive_finite(converted)
 
 
 def _reason_line(value: Any) -> str:
@@ -287,6 +324,116 @@ class ImccEngine:
                 "trust": labels.trust,
                 "envelope_status": labels.envelope_status,
                 "pack_sha256": _sha256(self.pack_path),
+            },
+        )
+
+    def coverage(
+        self,
+        composition_wt_pct: Mapping[str, float],
+        temperature_K: float,
+    ) -> EngineResult:
+        return self.evaluate(composition_wt_pct, temperature_K, 1.0e-9)
+
+
+class InternalAnalyticalEngine:
+    """Adapter for the simulator's active builtin analytical fallback."""
+
+    name = "internal_analytic"
+
+    def __init__(self) -> None:
+        self._vapor_pressure_data: dict[str, Any] | None = None
+
+    def _load_vapor_pressure_data(self) -> dict[str, Any]:
+        if self._vapor_pressure_data is None:
+            self._vapor_pressure_data = yaml.safe_load(
+                (REPO_ROOT / "data/vapor_pressures.yaml").read_text(encoding="utf-8")
+            )
+        return self._vapor_pressure_data
+
+    def evaluate(
+        self,
+        composition_wt_pct: Mapping[str, float],
+        temperature_K: float,
+        fO2_bar: float,
+    ) -> EngineResult:
+        from simulator.core import PyrolysisSimulator
+        from simulator.melt_backend.base import InternalAnalyticalBackend
+
+        backend = InternalAnalyticalBackend()
+        backend.initialize({})
+        sim = PyrolysisSimulator(
+            backend,
+            {"campaigns": {}},
+            {
+                "benchmark": {
+                    "label": "Melt-activity benchmark composition",
+                    "composition_wt_pct": dict(composition_wt_pct),
+                }
+            },
+            self._load_vapor_pressure_data(),
+        )
+        sim.load_batch("benchmark", mass_kg=100.0)
+        sim.melt.temperature_C = float(temperature_K) - 273.15
+        sim.melt.p_total_mbar = max(1.0e-3, float(fO2_bar) * 1000.0)
+        sim.melt.pO2_mbar = float(fO2_bar) * 1000.0
+        sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = math.log10(
+            float(fO2_bar)
+        )
+        sim.melt.oxygen_reservoir.headspace_transport_pO2_bar = float(fO2_bar)
+        result = sim._get_equilibrium()
+        raw_status = str(result.status)
+        status = (
+            raw_status
+            if raw_status in POINT_STATUSES
+            else "refused"
+        )
+        diagnostics = dict(result.diagnostics or {})
+        provenance = dict(diagnostics.get("activity_provenance", {}) or {})
+        activities: dict[str, float] = {}
+        gammas: dict[str, float] = {}
+        parent_mole_fractions = _oxide_mole_fractions(composition_wt_pct)
+        for section in ("metals", "oxide_vapors"):
+            for species, rail in sim.vapor_pressures.get(section, {}).items():
+                parent = str(rail.get("parent_oxide", "") or "")
+                activity = dict(provenance.get(species, {}) or {})
+                if not parent or not activity:
+                    continue
+                activity_value = activity.get("melt_oxide_activity")
+                gamma_value = activity.get("melt_oxide_effective_gamma")
+                x_single_value = activity.get("melt_oxide_X_single_cation")
+                cations = _oxide_cations_per_formula(parent)
+                if activity_value is not None:
+                    activities[parent] = float(activity_value) ** cations
+                x_parent = float(parent_mole_fractions.get(parent, 0.0) or 0.0)
+                if (
+                    gamma_value is not None
+                    and x_single_value is not None
+                    and x_parent > 0.0
+                ):
+                    # Internal provenance reports gamma_single on X_single.
+                    # Since a_single=gamma_single*X_single and
+                    # a_parent=a_single**n, gamma_parent=a_parent/X_parent.
+                    single_activity = float(gamma_value) * float(x_single_value)
+                    gammas[parent] = single_activity**cations / x_parent
+        return EngineResult(
+            status=status,
+            activities=_positive_finite(activities),
+            gammas=_positive_finite(gammas),
+            reason=(
+                ""
+                if status == "ok"
+                else _reason_line("; ".join(str(value) for value in result.warnings))
+            ),
+            details={
+                "backend": "internal-analytical",
+                "activities_provider": diagnostics.get("activities_provider"),
+                "activity_standard_state": diagnostics.get(
+                    "activities_standard_state"
+                ),
+                "source_activity_basis": "gamma_x_single_cation",
+                "benchmark_activity_basis": "parent_oxide_formula_unit",
+                "gas_path": "shared_tracked_analytical",
+                "warning_count": len(result.warnings),
             },
         )
 
@@ -512,6 +659,7 @@ def build_engines(
         "imcc-ext": lambda: ImccEngine(
             "imcc-ext", _repo_path(packs["imcc-ext"]), published=False
         ),
+        "internal_analytic": InternalAnalyticalEngine,
         "alphamelts": lambda: AlphaMeltsEngine(timeout_s=alphamelts_timeout_s),
         "vaporock": VapoRockEngine,
     }
@@ -545,7 +693,9 @@ def _prediction_for_point(
                 vapor_pressure_data=_load_default_vapor_pressure_data(),
                 temperature_C=float(point["temperature_K"]) - 273.15,
                 pO2_bar=float(point["fO2_bar"]),
-                melt_oxide_activities=result.activities,
+                melt_oxide_activities=_single_cation_gas_activities(
+                    result.activities
+                ),
                 composition_wt_pct=point["composition_wt_pct"],
             )["species"].get(str(point["species"]), {})
             pressure_pa = float(gas["P_eq_Pa"])
@@ -598,6 +748,11 @@ def run_points(
                     details={**result.details, "evaluation_status": "ok"},
                 )
             prediction, prediction_reason = _prediction_for_point(enriched, result)
+            point_status = (
+                "refused"
+                if result.status == "ok" and prediction is None
+                else result.status
+            )
             measured = float(point["measured"])
             residual = (
                 math.log10(prediction / measured)
@@ -617,7 +772,7 @@ def run_points(
                     "measured": measured,
                     "units": point["units"],
                     "engine": engine.name,
-                    "status": result.status,
+                    "status": point_status,
                     "prediction": prediction,
                     "residual_dex": residual,
                     "score": bool(point.get("score", True)),
@@ -718,7 +873,12 @@ def _write_csv(path: Path, rows: Sequence[Mapping[str, Any]]) -> None:
             if key not in fields:
                 fields.append(key)
     with path.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fields, extrasaction="ignore")
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=fields,
+            extrasaction="ignore",
+            lineterminator="\n",
+        )
         writer.writeheader()
         writer.writerows(rows)
 
@@ -1031,6 +1191,135 @@ def summarize_metrics(rows: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]
     return summary
 
 
+def summarize_paired_decisions(
+    rows: Sequence[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    """Compare IMCC and internal analytical errors on identical scored points."""
+
+    internal = {
+        str(row["point_id"]): row
+        for row in rows
+        if row["engine"] == "internal_analytic"
+        and row.get("residual_dex") is not None
+    }
+    groups: dict[tuple[str, str, str], list[tuple[float, float]]] = defaultdict(list)
+    for row in rows:
+        engine = str(row["engine"])
+        paired = internal.get(str(row["point_id"]))
+        if (
+            not engine.startswith("imcc-")
+            or paired is None
+            or row.get("residual_dex") is None
+        ):
+            continue
+        groups[(str(row["species"]), str(row["observable"]), engine)].append(
+            (float(row["residual_dex"]), float(paired["residual_dex"]))
+        )
+    decisions: list[dict[str, Any]] = []
+    for (species, observable, engine), residual_pairs in sorted(groups.items()):
+        imcc_rmse = _rmse(pair[0] for pair in residual_pairs)
+        internal_rmse = _rmse(pair[1] for pair in residual_pairs)
+        assert imcc_rmse is not None and internal_rmse is not None
+        if math.isclose(imcc_rmse, internal_rmse, rel_tol=0.0, abs_tol=1.0e-12):
+            decision = "tie"
+        elif imcc_rmse < internal_rmse:
+            decision = engine
+        else:
+            decision = "internal_analytic"
+        decisions.append(
+            {
+                "species": species,
+                "observable": observable,
+                "imcc_engine": engine,
+                "paired_count": len(residual_pairs),
+                "imcc_rmse_dex": imcc_rmse,
+                "internal_analytic_rmse_dex": internal_rmse,
+                "imcc_closer_point_count": sum(
+                    abs(pair[0]) < abs(pair[1]) for pair in residual_pairs
+                ),
+                "internal_analytic_closer_point_count": sum(
+                    abs(pair[1]) < abs(pair[0]) for pair in residual_pairs
+                ),
+                "tie_point_count": sum(
+                    math.isclose(
+                        abs(pair[0]), abs(pair[1]), rel_tol=0.0, abs_tol=1.0e-12
+                    )
+                    for pair in residual_pairs
+                ),
+                "decision": decision,
+            }
+        )
+    return decisions
+
+
+def _paired_verdict(decisions: Sequence[Mapping[str, Any]]) -> str:
+    if not decisions:
+        return "No convention-valid measured point was produced by both engine families."
+    clauses: list[str] = []
+    for engine in sorted({str(row["imcc_engine"]) for row in decisions}):
+        group = [row for row in decisions if row["imcc_engine"] == engine]
+        imcc_wins = sum(row["decision"] == engine for row in group)
+        internal_wins = sum(row["decision"] == "internal_analytic" for row in group)
+        ties = sum(row["decision"] == "tie" for row in group)
+        if imcc_wins and internal_wins:
+            verdict = "mixed by species/observable"
+        elif imcc_wins and ties:
+            verdict = "IMCC better or tied on every comparable group"
+        elif imcc_wins:
+            verdict = "IMCC better on every comparable group"
+        elif internal_wins and ties:
+            verdict = "internal_analytic better or tied on every comparable group"
+        elif internal_wins:
+            verdict = "internal_analytic better on every comparable group"
+        else:
+            verdict = "tied on every comparable group"
+        clauses.append(
+            f"`{engine}`: {verdict} ({imcc_wins} IMCC, "
+            f"{internal_wins} internal, {ties} tied)"
+        )
+    return "; ".join(clauses) + "."
+
+
+def summarize_rump_coverage(
+    rows: Sequence[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    low_silica = [row for row in rows if float(row["SiO2_wt_pct"]) < 30.0]
+    summary: list[dict[str, Any]] = []
+    for engine in sorted({
+        key.removesuffix("_status")
+        for row in rows
+        for key in row
+        if key.startswith("imcc-") and key.endswith("_status")
+    }):
+        both = sum(
+            row.get("internal_analytic_status") == "ok"
+            and row.get(f"{engine}_status") == "ok"
+            for row in low_silica
+        )
+        internal_only = sum(
+            row.get("internal_analytic_status") == "ok"
+            and row.get(f"{engine}_status") != "ok"
+            for row in low_silica
+        )
+        imcc_only = sum(
+            row.get("internal_analytic_status") != "ok"
+            and row.get(f"{engine}_status") == "ok"
+            for row in low_silica
+        )
+        neither = len(low_silica) - both - internal_only - imcc_only
+        summary.append(
+            {
+                "imcc_engine": engine,
+                "below_30_count": len(low_silica),
+                "both_accept_count": both,
+                "internal_analytic_only_count": internal_only,
+                "imcc_only_count": imcc_only,
+                "neither_count": neither,
+            }
+        )
+    return summary
+
+
 def _fmt(value: Any, digits: int = 4) -> str:
     if value is None or value == "":
         return "—"
@@ -1048,6 +1337,7 @@ def generate_report(
     live_vaporock_rows: Sequence[Mapping[str, Any]] = (),
 ) -> str:
     metrics = summarize_metrics(point_rows)
+    paired_decisions = summarize_paired_decisions(point_rows)
     point_engines = {str(row["engine"]) for row in point_rows}
     probe_engines = {str(row["engine"]) for row in probe_rows}
     coverage_engines = {
@@ -1088,6 +1378,26 @@ def generate_report(
                 unavailable=row["unavailable_count"],
             )
         )
+    lines.extend(
+        [
+            "",
+            "## IMCC versus internal_analytic decision column",
+            "",
+            "Only identical, convention-valid scored measurements produced by both engines enter this paired comparison.",
+            "",
+            "| Species | Observable | IMCC engine | Paired n | IMCC RMSE (dex) | internal_analytic RMSE (dex) | IMCC closer points | internal closer points | ties | Decision |",
+            "|---|---|---|---:|---:|---:|---:|---:|---:|---|",
+        ]
+    )
+    for row in paired_decisions:
+        lines.append(
+            "| {species} | {observable} | {imcc_engine} | {paired_count} | {imcc} | {internal} | {imcc_closer_point_count} | {internal_analytic_closer_point_count} | {tie_point_count} | {decision} |".format(
+                **row,
+                imcc=_fmt(row["imcc_rmse_dex"]),
+                internal=_fmt(row["internal_analytic_rmse_dex"]),
+            )
+        )
+    lines.extend(["", f"Decision verdict: {_paired_verdict(paired_decisions)}"])
     if reference_rows:
         anchor = summarize_reference_anchors(fixture, reference_rows)
         lines.extend(
@@ -1229,7 +1539,8 @@ def generate_report(
         low_refused = sum(row.get(f"{engine}_status") != "ok" for row in low_silica)
         lines.append(
             f"- `{engine}`: {accepted}/{len(coverage_rows)} accepted; {refused} refused/unavailable; "
-            f"below 30 wt% SiO2, {low_refused}/{len(low_silica)} refused/unavailable."
+            f"below 30 wt% SiO2, {len(low_silica) - low_refused}/{len(low_silica)} accepted "
+            f"and {low_refused}/{len(low_silica)} refused/unavailable."
         )
     alpha_rows = [row for row in coverage_rows if "alphamelts_status" in row]
     if alpha_rows:
@@ -1259,6 +1570,23 @@ def generate_report(
         lines.append(
             "It answers the rump question as a curve: AlphaMELTS rejects every normalized step below its 30 wt% SiO2 floor."
         )
+    rump_comparisons = summarize_rump_coverage(coverage_rows)
+    if rump_comparisons:
+        lines.extend(
+            [
+                "",
+                "Paired below-30 wt% SiO2 coverage:",
+                "",
+                "| IMCC engine | Both accept | internal_analytic only | IMCC only | Neither | Total |",
+                "|---|---:|---:|---:|---:|---:|",
+            ]
+        )
+        for row in rump_comparisons:
+            lines.append(
+                "| {imcc_engine} | {both_accept_count} | {internal_analytic_only_count} | {imcc_only_count} | {neither_count} | {below_30_count} |".format(
+                    **row
+                )
+            )
     lines.extend(
         [
             "",
@@ -1268,6 +1596,8 @@ def generate_report(
             "- Richter-2007 is an in-domain Type-B CAI-like CMAS melt, not a literal basalt; its six gamma targets are reported separately.",
             "- Four OCR-digitized Richter Mg flux points are retained but refused for scoring because no independent experimental fO2 pin closes the gas/reference-state comparison.",
             "- KEMS-008 Table 10 values are kinetic vaporization coefficients, not basalt melt activities.",
+            "- Every scored gas observable uses the fixture's pinned fO2 and the shared tracked analytical gas layer. Parent-formula activities are converted to the rail's single-cation component basis first; internally coupled engine gas pressures are excluded.",
+            "- Activity coefficients are reported as `gamma = a/x` on the parent-oxide formula-unit basis. The internal analytical adapter converts its native single-cation activity and mole-fraction provenance before comparison.",
         ]
     )
     if "vaporock" in present_engines:
@@ -1303,6 +1633,7 @@ def run_benchmark(
         "composition-probes.csv",
         "coverage-map.csv",
         "reference-anchor-results.csv",
+        "paired-decisions.csv",
         "live-vaporock-check.csv",
         "report.md",
         "run-metadata.json",
@@ -1314,6 +1645,7 @@ def run_benchmark(
     coverage_rows: list[dict[str, Any]] = []
     reference_rows: list[dict[str, Any]] = []
     live_vaporock_rows: list[dict[str, Any]] = []
+    paired_decisions: list[dict[str, Any]] = []
     if mode in {"benchmark", "all"}:
         point_rows = run_points(fixture, engines)
         probe_rows = run_composition_probes(fixture, engines)
@@ -1323,6 +1655,8 @@ def run_benchmark(
                 fixture, reference_rows
             )
         _write_csv(output_dir / "benchmark-results.csv", point_rows)
+        paired_decisions = summarize_paired_decisions(point_rows)
+        _write_csv(output_dir / "paired-decisions.csv", paired_decisions)
         _write_csv(output_dir / "composition-probes.csv", probe_rows)
         _write_csv(output_dir / "reference-anchor-results.csv", reference_rows)
         if live_vaporock_rows:
@@ -1344,6 +1678,8 @@ def run_benchmark(
         "point_status_counts": dict(sorted(Counter(row["status"] for row in point_rows).items())),
         "probe_status_counts": dict(sorted(Counter(row["status"] for row in probe_rows).items())),
         "coverage_row_count": len(coverage_rows),
+        "rump_coverage": summarize_rump_coverage(coverage_rows),
+        "paired_decisions": paired_decisions,
         "reference_anchor": (
             summarize_reference_anchors(fixture, reference_rows)
             if reference_rows
@@ -1378,6 +1714,7 @@ def run_benchmark(
         "coverage_rows": coverage_rows,
         "reference_rows": reference_rows,
         "live_vaporock_rows": live_vaporock_rows,
+        "paired_decisions": paired_decisions,
         "metadata": metadata,
     }
 
@@ -1401,7 +1738,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--engines",
         default=",".join(DEFAULT_ENGINES),
-        help="comma-separated engines: imcc-published,imcc-ext,alphamelts,vaporock",
+        help="comma-separated engines: imcc-published,imcc-ext,internal_analytic,alphamelts,vaporock",
     )
     parser.add_argument(
         "--mode", choices=("benchmark", "coverage", "all"), default="all"
