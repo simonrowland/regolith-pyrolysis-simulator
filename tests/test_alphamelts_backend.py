@@ -2,7 +2,10 @@ import contextlib
 import io
 import math
 import inspect
+import os
+import signal
 import subprocess
+import sys
 import time
 import types
 import warnings
@@ -28,6 +31,7 @@ from simulator.accounting.formulas import resolve_species_formula
 from simulator.core import CampaignPhase, PyrolysisSimulator
 from simulator.backends import BackendSelectionPolicy, resolve_backend
 from simulator.melt_backend.alphamelts import (
+    ALPHAMELTS_DESCENDANT_CONTAINMENT,
     ALPHAMELTS_EXECUTED_T_TOLERANCE_C,
     ALPHAMELTS_MELTS_FILE_TEMPERATURE_DECIMALS,
     ALPHAMELTS_REASON_EXECUTED_T_MISMATCH,
@@ -41,7 +45,9 @@ from simulator.melt_backend.alphamelts import (
     ALPHAMELTS_REASON_VAPOR_PROJECTION_EMPTY,
     AlphaMELTSBackend,
     VaporPressureActivityRefusal,
+    _cleanup_alphamelts_subprocess,
     _oxide_component_stoichiometry,
+    _run_alphamelts_subprocess,
     AlphaMELTSConfigurationError,
     AlphaMELTSSubprocessContractError,
     AlphaMELTSSubprocessRunMode,
@@ -445,7 +451,7 @@ def test_alphamelts_subprocess_subbar_pressure_refuses_before_execution(
     backend._mode = 'subprocess'
     backend._binary_path = Path('/tmp/fake-alphamelts')
     monkeypatch.setattr(
-        'simulator.melt_backend.alphamelts.subprocess.run',
+        'simulator.melt_backend.alphamelts._run_alphamelts_subprocess',
         lambda *args, **kwargs: pytest.fail('subprocess must not run'),
     )
 
@@ -504,7 +510,7 @@ def test_alphamelts_subprocess_requires_explicit_run_mode(monkeypatch):
     backend._mode = 'subprocess'
     backend._binary_path = Path('/tmp/fake-alphamelts')
     monkeypatch.setattr(
-        'simulator.melt_backend.alphamelts.subprocess.run',
+        'simulator.melt_backend.alphamelts._run_alphamelts_subprocess',
         lambda *args, **kwargs: pytest.fail('subprocess must not run'),
     )
 
@@ -780,7 +786,7 @@ def test_alphamelts_subprocess_isothermal_emits_and_parses_system_properties(
         )
 
     monkeypatch.setattr(
-        'simulator.melt_backend.alphamelts.subprocess.run',
+        'simulator.melt_backend.alphamelts._run_alphamelts_subprocess',
         fake_run,
     )
     monkeypatch.setattr(
@@ -1154,7 +1160,7 @@ def test_alphamelts_binary32_collapse_trio_shares_one_contract_key_and_string(
         )
 
     monkeypatch.setattr(
-        'simulator.melt_backend.alphamelts.subprocess.run',
+        'simulator.melt_backend.alphamelts._run_alphamelts_subprocess',
         fake_run,
     )
     monkeypatch.setattr(
@@ -1363,7 +1369,7 @@ def test_alphamelts_temperature_contract_matches_cache_key_value(monkeypatch):
         )
 
     monkeypatch.setattr(
-        'simulator.melt_backend.alphamelts.subprocess.run',
+        'simulator.melt_backend.alphamelts._run_alphamelts_subprocess',
         fake_run,
     )
     monkeypatch.setattr(
@@ -1459,7 +1465,7 @@ def test_alphamelts_subprocess_emits_contract_T_to_melts_and_env(monkeypatch):
         )
 
     monkeypatch.setattr(
-        'simulator.melt_backend.alphamelts.subprocess.run',
+        'simulator.melt_backend.alphamelts._run_alphamelts_subprocess',
         fake_run,
     )
     monkeypatch.setattr(
@@ -1734,7 +1740,7 @@ def test_alphamelts_python_api_clamped_pressure_reports_solved_condition(
     assert any('clamped operating point' in warning for warning in result.warnings)
 
 
-def test_alphamelts_subprocess_signal_exit_is_typed_crash_without_mode_flip(
+def test_alphamelts_subprocess_signal_exit_returns_typed_crash_without_mode_flip(
     monkeypatch,
 ):
     backend = AlphaMELTSBackend()
@@ -1763,7 +1769,10 @@ def test_alphamelts_subprocess_signal_exit_is_typed_crash_without_mode_flip(
             status='ok',
         )
 
-    monkeypatch.setattr('simulator.melt_backend.alphamelts.subprocess.run', fake_run)
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts._run_alphamelts_subprocess',
+        fake_run,
+    )
     monkeypatch.setattr(backend, '_parse_single_point_stdout', fake_parse)
     monkeypatch.setattr(
         backend,
@@ -1775,14 +1784,13 @@ def test_alphamelts_subprocess_signal_exit_is_typed_crash_without_mode_flip(
         ),
     )
 
-    with pytest.raises(AlphaMELTSSubprocessContractError) as excinfo:
-        backend.equilibrate(
-            temperature_C=1600.0,
-            composition_kg=_melts_domain_composition(),
-            fO2_log=-9.0,
-            pressure_bar=1.0,
-            subprocess_run_mode='isothermal',
-        )
+    first = backend.equilibrate(
+        temperature_C=1600.0,
+        composition_kg=_melts_domain_composition(),
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        subprocess_run_mode='isothermal',
+    )
     second = backend.equilibrate(
         temperature_C=1600.0,
         composition_kg=_melts_domain_composition(),
@@ -1791,17 +1799,24 @@ def test_alphamelts_subprocess_signal_exit_is_typed_crash_without_mode_flip(
         subprocess_run_mode='isothermal',
     )
 
-    assert excinfo.value.backend_failure_reason_code == (
+    assert first.status == 'out_of_domain'
+    assert first.diagnostics['backend_failure_reason_code'] == (
         ALPHAMELTS_REASON_SUBPROCESS_DIED
     )
-    assert excinfo.value.backend_failure_category == 'engine_crash'
-    assert 'SIGABRT' in str(excinfo.value)
+    assert first.diagnostics['backend_failure_category'] == 'engine_crash'
+    assert first.diagnostics['subprocess_failure']['signal'] == 'SIGABRT'
+    assert first.diagnostics['out_of_domain_crash_point'][
+        'composition_wt_pct'
+    ]
+    assert any('SIGABRT' in warning for warning in first.warnings)
     assert backend._mode == 'subprocess'
     assert second.status == 'ok'
     assert len(calls) == 2
 
 
-def test_alphamelts_subprocess_timeout_stays_loud_without_mode_flip(monkeypatch):
+def test_alphamelts_subprocess_timeout_returns_typed_status_without_mode_flip(
+    monkeypatch,
+):
     backend = AlphaMELTSBackend()
     backend._mode = 'subprocess'
     backend._binary_path = Path('/tmp/fake-alphamelts')
@@ -1811,32 +1826,195 @@ def test_alphamelts_subprocess_timeout_stays_loud_without_mode_flip(monkeypatch)
         seen['timeout'] = kwargs['timeout']
         raise subprocess.TimeoutExpired(cmd=args[0], timeout=kwargs['timeout'])
 
-    monkeypatch.setattr('simulator.melt_backend.alphamelts.subprocess.run', fake_run)
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts._run_alphamelts_subprocess',
+        fake_run,
+    )
 
-    with pytest.raises(RuntimeError, match='timed out') as excinfo:
-        backend.equilibrate(
+    result = backend.equilibrate(
+        temperature_C=1600.0,
+        composition_kg=_melts_domain_composition(),
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        subprocess_run_mode='isothermal',
+    )
+
+    assert result.status == 'out_of_domain'
+    assert result.diagnostics['backend_status_reason'] == ALPHAMELTS_REASON_TIMEOUT
+    assert result.diagnostics['backend_failure_reason_code'] == (
+        ALPHAMELTS_REASON_TIMEOUT
+    )
+    assert result.diagnostics['backend_failure_category'] == 'not_converged'
+    assert any('timed out' in warning for warning in result.warnings)
+    assert seen['timeout'] == 20.0
+    assert backend._mode == 'subprocess'
+
+
+@pytest.mark.skipif(os.name != 'posix', reason='POSIX process-group contract')
+def test_alphamelts_timeout_cleanup_oserror_is_secondary_to_typed_status(
+    monkeypatch,
+    tmp_path,
+    caplog,
+):
+    escaped_pid_path = tmp_path / 'escaped.pid'
+    launcher = tmp_path / 'launcher.py'
+    launcher.write_text('\n'.join((
+        'import os',
+        'import pathlib',
+        'import subprocess',
+        'import sys',
+        'import time',
+        'child = subprocess.Popen(',
+        "    [sys.executable, '-c', 'import time; time.sleep(60)'],",
+        '    start_new_session=True,',
+        '    stdout=subprocess.DEVNULL,',
+        '    stderr=subprocess.DEVNULL,',
+        ')',
+        "pathlib.Path(os.environ['ALPHAMELTS_TEST_ESCAPED_PID']).write_text(",
+        '    str(child.pid)',
+        ')',
+        'time.sleep(60)',
+    )))
+    binary = tmp_path / 'alphamelts2'
+    binary.write_text(
+        '#!/bin/sh\nexec /usr/bin/env python3 "$ALPHAMELTS_TEST_LAUNCHER"\n'
+    )
+    binary.chmod(0o755)
+    backend = AlphaMELTSBackend()
+    backend._mode = 'subprocess'
+    backend._binary_path = binary
+    backend._timeout_s = 0.8
+
+    def deny_process_group_kill(*_args):
+        raise PermissionError(1, 'poisoned process-group kill')
+
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts.os.killpg',
+        deny_process_group_kill,
+    )
+    monkeypatch.setenv(
+        'ALPHAMELTS_TEST_ESCAPED_PID',
+        str(escaped_pid_path),
+    )
+    monkeypatch.setenv('ALPHAMELTS_TEST_LAUNCHER', str(launcher))
+    caplog.set_level(
+        'WARNING',
+        logger='simulator.melt_backend.alphamelts',
+    )
+
+    escaped_pid = None
+    started = time.monotonic()
+    try:
+        result = backend.equilibrate(
             temperature_C=1600.0,
             composition_kg=_melts_domain_composition(),
             fO2_log=-9.0,
             pressure_bar=1.0,
             subprocess_run_mode='isothermal',
         )
+        elapsed_s = time.monotonic() - started
+        escaped_pid = int(escaped_pid_path.read_text())
 
-    assert (
-        getattr(excinfo.value, 'backend_status_reason')
-        == ALPHAMELTS_REASON_TIMEOUT
+        assert elapsed_s < 1.5
+        assert result.status == 'out_of_domain'
+        assert (
+            result.diagnostics['backend_status_reason']
+            == ALPHAMELTS_REASON_TIMEOUT
+        )
+        failure = result.diagnostics['subprocess_failure']
+        assert failure['process_group_killed'] is False
+        assert failure['launcher_reaped'] is True
+        assert (
+            failure['descendant_containment']
+            == ALPHAMELTS_DESCENDANT_CONTAINMENT
+        )
+        assert 'process-group kill failed' in caplog.text
+        os.kill(escaped_pid, 0)
+    finally:
+        if escaped_pid is not None:
+            try:
+                os.kill(escaped_pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+
+
+@pytest.mark.skipif(os.name != 'posix', reason='POSIX process-group contract')
+def test_alphamelts_timeout_documents_escaped_descendant_out_of_scope(
+    tmp_path,
+):
+    escaped_pid_path = tmp_path / 'escaped.pid'
+    launcher = '\n'.join((
+        'import pathlib',
+        'import subprocess',
+        'import sys',
+        'import time',
+        'child = subprocess.Popen(',
+        "    [sys.executable, '-c', 'import time; time.sleep(60)'],",
+        '    start_new_session=True,',
+        '    stdout=subprocess.DEVNULL,',
+        '    stderr=subprocess.DEVNULL,',
+        ')',
+        'pathlib.Path(sys.argv[1]).write_text(str(child.pid))',
+        'time.sleep(60)',
+    ))
+    escaped_pid = None
+    started = time.monotonic()
+    try:
+        with pytest.raises(subprocess.TimeoutExpired) as exc_info:
+            _run_alphamelts_subprocess(
+                [sys.executable, '-c', launcher, str(escaped_pid_path)],
+                timeout=0.4,
+            )
+        elapsed_s = time.monotonic() - started
+        escaped_pid = int(escaped_pid_path.read_text())
+
+        assert elapsed_s < 1.0
+        assert exc_info.value.process_group_killed is True
+        assert exc_info.value.launcher_reaped is True
+        assert (
+            exc_info.value.descendant_containment
+            == ALPHAMELTS_DESCENDANT_CONTAINMENT
+            == 'process_group'
+        )
+        os.kill(escaped_pid, 0)
+    finally:
+        if escaped_pid is not None:
+            try:
+                os.kill(escaped_pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+
+
+def test_alphamelts_cleanup_reaps_launcher_after_retry_kill(monkeypatch):
+    events = []
+
+    class FakeProcess:
+        pid = 12345
+        stdin = None
+        stdout = None
+        stderr = None
+
+        def poll(self):
+            return None
+
+        def wait(self, *, timeout):
+            events.append(('wait', timeout))
+            if len([event for event in events if event[0] == 'wait']) == 1:
+                raise subprocess.TimeoutExpired('alphamelts2', timeout)
+            return -signal.SIGKILL
+
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts._kill_alphamelts_process_group',
+        lambda _process: events.append(('kill',)) or True,
     )
-    assert (
-        getattr(excinfo.value, 'backend_failure_reason_code')
-        == ALPHAMELTS_REASON_TIMEOUT
-    )
-    assert getattr(excinfo.value, 'backend_failure_category') == 'not_converged'
-    assert 'timed out' in getattr(
-        excinfo.value,
-        'backend_status_reason_message',
-    )
-    assert seen['timeout'] == 20.0
-    assert backend._mode == 'subprocess'
+
+    assert _cleanup_alphamelts_subprocess(
+        FakeProcess(),
+        deadline=time.monotonic() + 0.2,
+        group_killed=False,
+    ) is True
+    assert [event[0] for event in events] == ['kill', 'wait', 'kill', 'wait']
+    assert events[3][1] <= 0.2
 
 
 def test_alphamelts_subprocess_rejects_below_operating_floor_without_launch(
@@ -1850,7 +2028,7 @@ def test_alphamelts_subprocess_rejects_below_operating_floor_without_launch(
         raise AssertionError('out-of-domain point must not launch AlphaMELTS')
 
     monkeypatch.setattr(
-        'simulator.melt_backend.alphamelts.subprocess.run',
+        'simulator.melt_backend.alphamelts._run_alphamelts_subprocess',
         forbidden_run,
     )
 
@@ -1881,19 +2059,22 @@ def test_alphamelts_subprocess_operating_floor_is_inclusive(monkeypatch):
         return types.SimpleNamespace(returncode=-6, stdout='', stderr='')
 
     monkeypatch.setattr(
-        'simulator.melt_backend.alphamelts.subprocess.run',
+        'simulator.melt_backend.alphamelts._run_alphamelts_subprocess',
         fake_run,
     )
 
-    with pytest.raises(AlphaMELTSSubprocessContractError):
-        backend.equilibrate(
-            temperature_C=800.0,
-            composition_kg=_melts_domain_composition(),
-            fO2_log=-9.0,
-            pressure_bar=1.0,
-            subprocess_run_mode='isothermal',
-        )
+    result = backend.equilibrate(
+        temperature_C=800.0,
+        composition_kg=_melts_domain_composition(),
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        subprocess_run_mode='isothermal',
+    )
 
+    assert result.status == 'out_of_domain'
+    assert result.diagnostics['backend_status_reason'] == (
+        ALPHAMELTS_REASON_SUBPROCESS_DIED
+    )
     assert len(calls) == 1
     assert calls[0][1]['timeout'] == 20.0
 
@@ -2118,20 +2299,22 @@ def test_alphamelts_subprocess_uses_configured_timeout(monkeypatch):
         seen['timeout'] = kwargs['timeout']
         return types.SimpleNamespace(returncode=-6, stdout='', stderr='')
 
-    monkeypatch.setattr('simulator.melt_backend.alphamelts.subprocess.run', fake_run)
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts._run_alphamelts_subprocess',
+        fake_run,
+    )
 
-    with pytest.raises(AlphaMELTSSubprocessContractError) as exc_info:
-        backend.equilibrate(
-            temperature_C=1600.0,
-            composition_kg=_melts_domain_composition(),
-            fO2_log=-9.0,
-            pressure_bar=1.0,
-            subprocess_run_mode='isothermal',
-        )
+    result = backend.equilibrate(
+        temperature_C=1600.0,
+        composition_kg=_melts_domain_composition(),
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        subprocess_run_mode='isothermal',
+    )
 
-    assert (
-        exc_info.value.backend_failure_reason_code
-        == ALPHAMELTS_REASON_SUBPROCESS_DIED
+    assert result.status == 'out_of_domain'
+    assert result.diagnostics['backend_failure_reason_code'] == (
+        ALPHAMELTS_REASON_SUBPROCESS_DIED
     )
     assert seen['timeout'] == 37.5
     assert backend._mode == 'subprocess'
@@ -2167,7 +2350,10 @@ def test_alphamelts_subprocess_missing_binary_is_loud_and_disables_mode(monkeypa
     def fake_run(*args, **kwargs):
         raise FileNotFoundError('missing binary')
 
-    monkeypatch.setattr('simulator.melt_backend.alphamelts.subprocess.run', fake_run)
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts._run_alphamelts_subprocess',
+        fake_run,
+    )
 
     with pytest.raises(RuntimeError, match='binary not found') as excinfo:
         backend.equilibrate(
@@ -2234,7 +2420,7 @@ def test_alphamelts_subprocess_positive_exit_stays_loud_without_mode_flip(
     backend._binary_path = Path('/tmp/fake-alphamelts')
 
     monkeypatch.setattr(
-        'simulator.melt_backend.alphamelts.subprocess.run',
+        'simulator.melt_backend.alphamelts._run_alphamelts_subprocess',
         lambda *args, **kwargs: types.SimpleNamespace(
             returncode=2,
             stdout='',
@@ -2271,7 +2457,7 @@ def test_alphamelts_subprocess_exit_zero_without_assemblage_stays_loud(
     backend._binary_path = Path('/tmp/fake-alphamelts')
 
     monkeypatch.setattr(
-        'simulator.melt_backend.alphamelts.subprocess.run',
+        'simulator.melt_backend.alphamelts._run_alphamelts_subprocess',
         lambda *args, **kwargs: types.SimpleNamespace(
             returncode=0,
             stdout='successful run but changed format',

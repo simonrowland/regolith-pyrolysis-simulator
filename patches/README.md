@@ -91,6 +91,20 @@ forever — but the state is explicit and reviewable rather than implied by abse
 
 Clean. No local patches.
 
+### alphamelts — bundled 2.3.1 arm64 artifact / upstream `957b8f5`
+
+The bundled executable crashes on gate-passing two-component Na2O-SiO2 and
+K2O-SiO2 inputs. `patches/alphamelts/` holds the pinned minimal reproduction
+and an owner-gated upstream bug-report draft. No engine patch exists: the
+upstream source is public, but no source checkout is present beside this repo;
+the local install is the compiled `alphamelts-app-2.3.1-macos-arm64` bundle.
+The simulator refuses the reproduced binary boundary before launch and catches
+other signal exits as typed diagnostics.
+
+alphaMELTS is AGPL-3.0. If a patched executable or source fork is redistributed,
+the unresolved distribution-posture decision is `q-004`; this record does not
+decide it.
+
 ### sulfliq — `~/Repos/sulfliq` @ `89d345a`
 
 | # | patch | STATUS | note |

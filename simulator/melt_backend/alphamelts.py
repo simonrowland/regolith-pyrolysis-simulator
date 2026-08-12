@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import importlib
 import importlib.metadata
+import logging
 import math
 import multiprocessing
 import os
@@ -33,6 +34,7 @@ import signal
 import struct
 import subprocess
 import tempfile
+import time
 import traceback
 import warnings
 from dataclasses import dataclass
@@ -75,6 +77,9 @@ from simulator.melt_backend.liquidus import (
 from simulator.physical_constants import GAS_CONSTANT
 
 
+logger = logging.getLogger(__name__)
+
+
 ALPHAMELTS_LIQUIDUS_SEED_TEMPERATURE_C = 800.0
 ALPHAMELTS_SUBPROCESS_MIN_TEMPERATURE_C = (
     ALPHAMELTS_LIQUIDUS_SEED_TEMPERATURE_C
@@ -84,6 +89,11 @@ ALPHAMELTS_SUBPROCESS_MIN_PRESSURE_BAR = 1.0
 # 20s is the established per-solve subprocess budget; bracket searches apply
 # it independently to each native call rather than treating it as a run budget.
 ALPHAMELTS_DEFAULT_TIMEOUT_S = 20.0
+ALPHAMELTS_REAP_GRACE_S = 1.0
+# ``nm -u`` plus ``strings`` verify that the supported alphamelts2 2.3.1
+# artifact has no fork, spawn, exec, system, or setsid surface. Arbitrary
+# launchers that detach a descendant are outside this process-group contract.
+ALPHAMELTS_DESCENDANT_CONTAINMENT = 'process_group'
 PETTHERMOTOOLS_WARM_CALL_TIMEOUT_S = 3.0
 MELTS_OXIDE_BASIS = (
     'SiO2', 'TiO2', 'Al2O3', 'FeO', 'Fe2O3', 'MgO', 'CaO',
@@ -120,6 +130,9 @@ ALPHAMELTS_REASON_EXECUTED_T_MISMATCH = 'executed_temperature_mismatch'
 ALPHAMELTS_REASON_PRESSURE_UNSUPPORTED = 'subprocess_pressure_below_minimum'
 ALPHAMELTS_REASON_TEMPERATURE_UNSUPPORTED = (
     'subprocess_temperature_below_minimum'
+)
+ALPHAMELTS_REASON_ALKALI_SILICA_BINARY_UNSUPPORTED = (
+    'subprocess_alkali_silica_binary_unsupported'
 )
 ALPHAMELTS_REASON_FO2_CONSTRAINT_INVALID = 'fo2_constraint_invalid'
 ALPHAMELTS_REASON_FO2_CONSTRAINT_UNAPPLIED = 'fo2_constraint_unapplied'
@@ -203,6 +216,7 @@ ALPHAMELTS_BACKEND_FAILURE_CATEGORY_BY_REASON = {
     ALPHAMELTS_REASON_EXECUTED_T_MISMATCH: 'contract_error',
     ALPHAMELTS_REASON_PRESSURE_UNSUPPORTED: 'out_of_domain',
     ALPHAMELTS_REASON_TEMPERATURE_UNSUPPORTED: 'out_of_domain',
+    ALPHAMELTS_REASON_ALKALI_SILICA_BINARY_UNSUPPORTED: 'out_of_domain',
     ALPHAMELTS_REASON_FO2_CONSTRAINT_INVALID: 'contract_error',
     ALPHAMELTS_REASON_FO2_CONSTRAINT_UNAPPLIED: 'contract_error',
     ALPHAMELTS_REASON_SYSTEM_OUTPUT_MISSING: 'parse_error',
@@ -245,6 +259,10 @@ ALPHAMELTS_BACKEND_FAILURE_MESSAGES = {
     ALPHAMELTS_REASON_TEMPERATURE_UNSUPPORTED: (
         'AlphaMELTS subprocess does not support the requested temperature'
     ),
+    ALPHAMELTS_REASON_ALKALI_SILICA_BINARY_UNSUPPORTED: (
+        'AlphaMELTS subprocess rejects a known-crashing two-component '
+        'alkali-silica input'
+    ),
     ALPHAMELTS_REASON_FO2_CONSTRAINT_INVALID: (
         'AlphaMELTS subprocess fO2 constraint was invalid'
     ),
@@ -283,6 +301,202 @@ def _validated_timeout_s(value: object) -> float:
             'AlphaMELTS timeout_s must be finite and positive'
         )
     return timeout_s
+
+
+def _kill_alphamelts_process_group(
+    process: subprocess.Popen,
+) -> bool:
+    group_killed = False
+    if os.name == 'posix':
+        try:
+            os.killpg(process.pid, signal.SIGKILL)
+            group_killed = True
+        except ProcessLookupError:
+            pass
+        except OSError:
+            logger.warning(
+                'AlphaMELTS process-group kill failed during timeout cleanup',
+                exc_info=True,
+            )
+    try:
+        launcher_running = process.poll() is None
+    except Exception:
+        logger.warning(
+            'AlphaMELTS launcher poll failed during timeout cleanup',
+            exc_info=True,
+        )
+        launcher_running = True
+    if launcher_running:
+        try:
+            process.kill()
+        except ProcessLookupError:
+            pass
+        except Exception:
+            logger.warning(
+                'AlphaMELTS launcher kill failed during timeout cleanup',
+                exc_info=True,
+            )
+    return group_killed
+
+
+def _close_subprocess_pipes(process: subprocess.Popen) -> None:
+    for stream_name in ('stdin', 'stdout', 'stderr'):
+        stream = getattr(process, stream_name, None)
+        if stream is not None and not stream.closed:
+            stream.close()
+
+
+def _cleanup_alphamelts_subprocess(
+    process: subprocess.Popen,
+    *,
+    deadline: float,
+    group_killed: bool,
+) -> bool:
+    try:
+        if process.poll() is None:
+            group_killed = (
+                _kill_alphamelts_process_group(process) or group_killed
+            )
+    except Exception:
+        logger.warning(
+            'AlphaMELTS kill cleanup failed after subprocess execution',
+            exc_info=True,
+        )
+    remaining_s = max(0.0, deadline - time.monotonic())
+    try:
+        process.wait(timeout=remaining_s * 0.5)
+    except subprocess.TimeoutExpired:
+        try:
+            group_killed = (
+                _kill_alphamelts_process_group(process) or group_killed
+            )
+        except Exception:
+            logger.warning(
+                'AlphaMELTS retry kill failed during timeout cleanup',
+                exc_info=True,
+            )
+        try:
+            process.wait(timeout=max(0.0, deadline - time.monotonic()))
+        except subprocess.TimeoutExpired:
+            logger.warning(
+                'AlphaMELTS launcher was not reaped before cleanup deadline'
+            )
+        except Exception:
+            logger.warning(
+                'AlphaMELTS final launcher reap failed during timeout cleanup',
+                exc_info=True,
+            )
+    except Exception:
+        logger.warning(
+            'AlphaMELTS launcher reap failed during timeout cleanup',
+            exc_info=True,
+        )
+    try:
+        _close_subprocess_pipes(process)
+    except Exception:
+        logger.warning(
+            'AlphaMELTS pipe close failed during timeout cleanup',
+            exc_info=True,
+        )
+    return group_killed
+
+
+def _run_alphamelts_subprocess(
+    args: list[str],
+    *,
+    cwd: str | None = None,
+    input: str | None = None,
+    capture_output: bool = True,
+    text: bool = True,
+    timeout: float,
+    env: Mapping[str, str] | None = None,
+) -> subprocess.CompletedProcess:
+    if not capture_output:
+        raise ValueError('AlphaMELTS subprocess requires captured output')
+    deadline = time.monotonic() + timeout
+    reap_reserve_s = min(ALPHAMELTS_REAP_GRACE_S, timeout * 0.25)
+    execution_timeout_s = max(timeout - reap_reserve_s, timeout * 0.5)
+    process = subprocess.Popen(
+        args,
+        cwd=cwd,
+        stdin=subprocess.PIPE if input is not None else None,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=text,
+        env=env,
+        start_new_session=True,
+    )
+    group_killed = False
+    timeout_error: subprocess.TimeoutExpired | None = None
+    try:
+        try:
+            stdout, stderr = process.communicate(
+                input=input,
+                timeout=execution_timeout_s,
+            )
+        except subprocess.TimeoutExpired as exc:
+            try:
+                group_killed = _kill_alphamelts_process_group(process)
+            except Exception:
+                logger.warning(
+                    'AlphaMELTS initial kill failed during timeout cleanup',
+                    exc_info=True,
+                )
+            remaining_s = max(0.0, deadline - time.monotonic())
+            try:
+                stdout, stderr = process.communicate(
+                    timeout=remaining_s * 0.5,
+                )
+            except subprocess.TimeoutExpired:
+                stdout, stderr = exc.output, exc.stderr
+            except Exception:
+                logger.warning(
+                    'AlphaMELTS communicate failed during timeout cleanup',
+                    exc_info=True,
+                )
+                stdout, stderr = exc.output, exc.stderr
+            timeout_error = subprocess.TimeoutExpired(
+                args,
+                timeout,
+                output=stdout,
+                stderr=stderr,
+            )
+            timeout_error.pid = process.pid  # type: ignore[attr-defined]
+            raise timeout_error from exc
+        return subprocess.CompletedProcess(
+            args=args,
+            returncode=process.returncode,
+            stdout=stdout,
+            stderr=stderr,
+        )
+    finally:
+        try:
+            group_killed = _cleanup_alphamelts_subprocess(
+                process,
+                deadline=deadline,
+                group_killed=group_killed,
+            )
+        except Exception:
+            logger.warning(
+                'AlphaMELTS subprocess cleanup failed',
+                exc_info=True,
+            )
+        if timeout_error is not None:
+            timeout_error.process_group_killed = (  # type: ignore[attr-defined]
+                group_killed
+            )
+            try:
+                launcher_reaped = process.poll() is not None
+            except Exception:
+                logger.warning(
+                    'AlphaMELTS launcher status failed after timeout cleanup',
+                    exc_info=True,
+                )
+                launcher_reaped = False
+            timeout_error.launcher_reaped = launcher_reaped  # type: ignore[attr-defined]
+            timeout_error.descendant_containment = (  # type: ignore[attr-defined]
+                ALPHAMELTS_DESCENDANT_CONTAINMENT
+            )
 
 
 def _alphamelts_backend_failure_category(reason_code: str,
@@ -732,7 +946,7 @@ class _MELTSBackendSupport(MeltBackend):
             else:
                 # Check system PATH
                 try:
-                    result = subprocess.run(
+                    result = _run_alphamelts_subprocess(
                         ['alphamelts', '--version'],
                         capture_output=True, text=True, timeout=5)
                     if result.returncode == 0:
@@ -965,7 +1179,7 @@ class _MELTSBackendSupport(MeltBackend):
             return None
         binary = self._binary_path or self._engine_path
         try:
-            result = subprocess.run(
+            result = _run_alphamelts_subprocess(
                 [str(binary), '--version'],
                 capture_output=True,
                 text=True,
@@ -2403,6 +2617,32 @@ class _MELTSBackendSupport(MeltBackend):
                 diagnostics=diagnostics,
                 reason=ALPHAMELTS_REASON_TEMPERATURE_UNSUPPORTED,
             )
+        active_components = frozenset(
+            str(oxide)
+            for oxide, wt_pct in comp_wt.items()
+            if float(wt_pct) > ALPHAMELTS_MIN_EMITTED_COMPONENT_WT_PCT
+        )
+        if active_components in (
+            frozenset({'SiO2', 'Na2O'}),
+            frozenset({'SiO2', 'K2O'}),
+        ):
+            guard_diagnostics = dict(diagnostics or {})
+            guard_diagnostics['subprocess_input_guard'] = {
+                'predicate': 'two_component_alkali_silica',
+                'active_components': sorted(active_components),
+                'engine_version': self._engine_version or 'unknown',
+            }
+            return self._domain_gate_result(
+                requested_temperature_C,
+                requested_pressure_bar,
+                fO2_log,
+                [
+                    'two-component alkali-silica input is a known crash '
+                    'boundary in bundled alphaMELTS 2.3.1'
+                ],
+                diagnostics=guard_diagnostics,
+                reason=ALPHAMELTS_REASON_ALKALI_SILICA_BINARY_UNSUPPORTED,
+            )
         fO2_path, fO2_offset = self._subprocess_fo2_constraint(fO2_log)
         with tempfile.TemporaryDirectory() as tmpdir:
             # Write .melts file
@@ -2467,7 +2707,7 @@ class _MELTSBackendSupport(MeltBackend):
                 ALPHAMELTS_DEFAULT_TIMEOUT_S,
             ))
             try:
-                result = subprocess.run(
+                result = _run_alphamelts_subprocess(
                     [str(binary), '1'],
                     cwd=tmpdir,
                     input=menu_input,
@@ -2476,10 +2716,53 @@ class _MELTSBackendSupport(MeltBackend):
                     env=env,
                 )
             except subprocess.TimeoutExpired as exc:
-                raise _alphamelts_backend_failure_error(
-                    ALPHAMELTS_REASON_TIMEOUT,
-                    str(exc),
-                ) from exc
+                process_group_killed = bool(getattr(
+                    exc,
+                    'process_group_killed',
+                    False,
+                ))
+                launcher_reaped = bool(getattr(
+                    exc,
+                    'launcher_reaped',
+                    False,
+                ))
+                descendant_containment = getattr(
+                    exc,
+                    'descendant_containment',
+                    ALPHAMELTS_DESCENDANT_CONTAINMENT,
+                )
+                cleanup_detail = '; '.join((
+                    (
+                        'process group SIGKILLed'
+                        if process_group_killed
+                        else 'process-group kill not confirmed'
+                    ),
+                    (
+                        'launcher reaped'
+                        if launcher_reaped
+                        else 'launcher reap not confirmed'
+                    ),
+                ))
+                return self._subprocess_operational_failure_result(
+                    temperature_C=requested_temperature_C,
+                    pressure_bar=requested_pressure_bar,
+                    fO2_log=fO2_log,
+                    warnings=result_warnings,
+                    diagnostics=diagnostics,
+                    reason_code=ALPHAMELTS_REASON_TIMEOUT,
+                    failure={
+                        'stage': 'alphamelts_subprocess_execute',
+                        'command': [str(binary), '1'],
+                        'timeout_s': timeout_s,
+                        'pid': getattr(exc, 'pid', None),
+                        'process_group_killed': process_group_killed,
+                        'launcher_reaped': launcher_reaped,
+                        'descendant_containment': descendant_containment,
+                    },
+                    detail=(
+                        f'exceeded {timeout_s:g}s; {cleanup_detail}'
+                    ),
+                )
             except FileNotFoundError as exc:
                 self._mode = None
                 raise _alphamelts_backend_failure_error(
@@ -2489,9 +2772,20 @@ class _MELTSBackendSupport(MeltBackend):
 
             if result.returncode < 0:
                 signal_name = _signal_name(result.returncode)
-                raise _alphamelts_backend_failure_error(
-                    ALPHAMELTS_REASON_SUBPROCESS_DIED,
-                    f'{signal_name} (returncode {result.returncode})',
+                return self._subprocess_operational_failure_result(
+                    temperature_C=requested_temperature_C,
+                    pressure_bar=requested_pressure_bar,
+                    fO2_log=fO2_log,
+                    warnings=result_warnings,
+                    diagnostics=diagnostics,
+                    reason_code=ALPHAMELTS_REASON_SUBPROCESS_DIED,
+                    failure={
+                        'stage': 'alphamelts_subprocess_execute',
+                        'command': [str(binary), '1'],
+                        'returncode': result.returncode,
+                        'signal': signal_name,
+                    },
+                    detail=f'{signal_name} (returncode {result.returncode})',
                 )
             if result.returncode > 0:
                 raise _alphamelts_backend_failure_error(
@@ -2546,6 +2840,40 @@ class _MELTSBackendSupport(MeltBackend):
                 {'subprocess_vapor_projection': vapor_diagnostics},
             )
             return eq
+
+    def _subprocess_operational_failure_result(
+        self,
+        *,
+        temperature_C: float,
+        pressure_bar: float,
+        fO2_log: float,
+        warnings: List[str],
+        diagnostics: Optional[Mapping[str, object]],
+        reason_code: str,
+        failure: Mapping[str, object],
+        detail: str,
+    ) -> EquilibriumResult:
+        message = _alphamelts_backend_failure_detail(reason_code, detail)
+        failure_diagnostics = self._diagnostics_with_backend_status_reason(
+            diagnostics,
+            backend_status='out_of_domain',
+            reason=reason_code,
+            message=message,
+        )
+        crash_point = dict(
+            failure_diagnostics.get('out_of_domain_crash_point', {}) or {}
+        )
+        crash_point['stage'] = 'alphamelts_subprocess_execute'
+        failure_diagnostics['out_of_domain_crash_point'] = crash_point
+        failure_diagnostics['subprocess_failure'] = dict(failure)
+        return self._emit_equilibrium_result(
+            temperature_C=temperature_C,
+            pressure_bar=pressure_bar,
+            fO2_log=fO2_log,
+            warnings=[*warnings, message],
+            status='out_of_domain',
+            diagnostics=failure_diagnostics,
+        )
 
     def _subprocess_fo2_constraint(self, fO2_log: float) -> tuple[str, float]:
         if self._redox_buffer is not None:

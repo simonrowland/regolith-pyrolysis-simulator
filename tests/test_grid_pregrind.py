@@ -694,7 +694,11 @@ def test_grind_positive_subthreshold_component_is_not_refused(monkeypatch):
     monkeypatch.setattr(
         grid_pregrind,
         "_WORKER_MODULE",
-        SimpleNamespace(subprocess=SimpleNamespace(run=lambda *_args, **_kwargs: None)),
+        SimpleNamespace(
+            _run_alphamelts_subprocess=(
+                lambda *_args, **_kwargs: None
+            )
+        ),
     )
 
     _key_id, output = grid_pregrind._run_point(
@@ -817,7 +821,7 @@ def test_run_point_applies_stored_timeout_and_captures_subprocess_budget(monkeyp
                 diagnostics,
                 run_mode,
             )
-            module.subprocess.run(
+            module._run_alphamelts_subprocess(
                 ["fake-alphamelts"],
                 input="fixture",
                 timeout=self._timeout_s,
@@ -840,12 +844,10 @@ def test_run_point_applies_stored_timeout_and_captures_subprocess_budget(monkeyp
             )
 
     module = SimpleNamespace(
-        subprocess=SimpleNamespace(
-            run=lambda *args, **kwargs: SimpleNamespace(
-                returncode=0,
-                stdout="",
-                stderr="",
-            )
+        _run_alphamelts_subprocess=lambda *args, **kwargs: SimpleNamespace(
+            returncode=0,
+            stdout="",
+            stderr="",
         )
     )
     backend = FakeBackend()

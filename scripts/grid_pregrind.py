@@ -1446,7 +1446,7 @@ def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
     backend._timeout_s = applied_timeout_s
     module = _WORKER_MODULE
     original_equilibrate_subprocess = backend._equilibrate_subprocess
-    original_run = module.subprocess.run
+    original_run = module._run_alphamelts_subprocess
 
     def capture_run(*args: Any, **kwargs: Any) -> Any:
         command = args[0] if args else kwargs.get("args")
@@ -1518,7 +1518,11 @@ def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
             "warnings": list(warnings or []),
             "diagnostics": dict(diagnostics or {}),
         }
-        with mock.patch.object(module.subprocess, "run", side_effect=capture_run):
+        with mock.patch.object(
+            module,
+            "_run_alphamelts_subprocess",
+            side_effect=capture_run,
+        ):
             return original_equilibrate_subprocess(
                 temperature_C,
                 composition_wt_pct,

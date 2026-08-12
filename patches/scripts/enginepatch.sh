@@ -28,9 +28,19 @@ engines() { for d in "$PATCHES"/*/; do b="$(basename "$d")"; [ "$b" = scripts ] 
 
 pin_sha() { [ -f "$PATCHES/$1/UPSTREAM.pin" ] && awk '/^base_sha:/{print $2}' "$PATCHES/$1/UPSTREAM.pin" || echo ""; }
 
+report_only() {
+  ! ls "$PATCHES/$1"/*.patch >/dev/null 2>&1 &&
+    awk '$1=="checkout:" && $2=="absent"{found=1} END{exit !found}' \
+      "$PATCHES/$1/UPSTREAM.pin" 2>/dev/null
+}
+
 cmd_status() {
   rc=0
   for e in ${1:-$(engines)}; do
+    if report_only "$e"; then
+      echo "$e: REPORT-ONLY (source checkout absent; no engine patch)"
+      continue
+    fi
     d="$(engine_dir "$e")"
     # A tracked patch dir whose checkout is absent is a FAILURE, not a skip — this
     # directory exists to catch drift, and "couldn't check" must never read as clean
@@ -50,6 +60,10 @@ cmd_status() {
 cmd_verify() {
   rc=0
   for e in ${1:-$(engines)}; do
+    if report_only "$e"; then
+      echo "$e: REPORT-ONLY (source checkout absent; no engine patch)"
+      continue
+    fi
     d="$(engine_dir "$e")"
     [ -d "$d" ] || { echo "$e: checkout MISSING (verify FAILED — cannot confirm no drift)"; rc=1; continue; }
     live="$(mktemp)"; want="$(mktemp)"
@@ -82,6 +96,10 @@ cmd_verify() {
 
 cmd_apply() {
   e="${1:?engine required}"; d="$(engine_dir "$e")"
+  report_only "$e" && {
+    echo "$e is report-only; no source patch or checkout to apply"
+    return 1
+  }
   [ -d "$d" ] || { echo "no checkout for $e"; return 1; }
   for p in "$PATCHES/$e"/*.patch; do
     [ -e "$p" ] || continue
@@ -96,6 +114,10 @@ cmd_apply() {
 # re-split by hand so the one-thing-per-patch rule is not silently collapsed.
 cmd_refresh() {
   e="${1:?engine required}"; d="$(engine_dir "$e")"
+  report_only "$e" && {
+    echo "$e is report-only; no source checkout to refresh"
+    return 1
+  }
   n=$(ls "$PATCHES/$e"/*.patch 2>/dev/null | wc -l | tr -d ' ')
   if [ "$n" -gt 1 ]; then
     echo "$e has $n patches; refusing to collapse them into one."
