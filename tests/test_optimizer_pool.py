@@ -322,8 +322,10 @@ def _fake_evaluate(
                     "mass_balance_error_pct": 0.0,
                 },
             },
+            backend_name="alphamelts",
             backend_status="ok",
             backend_authoritative=True,
+            evidence_class="melts",
         ),
         notes=("fake",),
     )
@@ -361,8 +363,10 @@ def _store_rejected_evaluate(
             "snapshots": [{"mass_balance_error_pct": 0.0}],
         },
         product_summary=result.run_reference.product_summary,
+        backend_name="alphamelts",
         backend_status="out_of_domain",
         backend_authoritative=True,
+        evidence_class="melts",
         backend_status_reason="earned_terminal_rump_out_of_domain",
     )
     return replace(

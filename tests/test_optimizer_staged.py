@@ -230,8 +230,10 @@ def _scored(
                 "furnace_amortization_status": "available",
                 "furnace_amortization_batch_cost_equivalents": furnace_penalty,
             },
+            backend_name="alphamelts",
             backend_status="ok",
             backend_authoritative=True,
+            evidence_class="melts",
         ),
     )
 
@@ -469,8 +471,10 @@ def test_staged_prefix_replay_hits_cache_and_matches_fresh_prefix(tmp_path) -> N
                 reason=fresh.run_reference.reason,
                 trace={"backend_status": "ok", "backend_authoritative": True},
                 product_summary=fresh.run_reference.product_summary,
+                backend_name="alphamelts",
                 backend_status="ok",
                 backend_authoritative=True,
+                evidence_class="melts",
             ),
     )
     assert_prefix_replay_equal(cached, fresh)

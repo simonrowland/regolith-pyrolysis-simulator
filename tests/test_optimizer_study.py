@@ -125,6 +125,13 @@ def _run_reference(**kwargs: Any) -> RunReference:
         "furnace_amortization_batch_cost_equivalents",
         0.0,
     )
+    trace = kwargs.get("trace")
+    authoritative = kwargs.get("backend_authoritative")
+    if authoritative is None and isinstance(trace, Mapping):
+        authoritative = trace.get("backend_authoritative")
+    if authoritative is True and kwargs.get("backend_name") is None:
+        kwargs["backend_name"] = "alphamelts"
+        kwargs.setdefault("evidence_class", "melts")
     return RunReference(product_summary=product_summary, **kwargs)
 
 

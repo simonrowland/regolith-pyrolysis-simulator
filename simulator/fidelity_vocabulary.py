@@ -39,6 +39,10 @@ class EvidenceClass(str, Enum):
     MAGEMIN = "magemin"
     INTERNAL_DATATABLES = "internal-datatables"
     INTERNAL_ANALYTICAL = "internal-analytical"
+    DIAGNOSTIC_SHADOW = "diagnostic-shadow"
+    C_HENRIAN_SCREEN = "C-henrian-screen"
+    B_DILUTE_SCREEN = "B-dilute-screen"
+    EXT_SP = "EXT-SP"
     # O1-ratified vapour-pressure analytical classes (version 1). Future
     # classes registered in design-fidelity-surface; may drive HKL flux only
     # with status_bearing_non_authoritative verdicts; may never certify.
@@ -85,6 +89,7 @@ class LabelSource(str, Enum):
     BACKEND_INTERNAL_ANALYTICAL = "backend_alias:internal-analytical"
     DIAGNOSTIC_INTERNAL_ANALYTICAL = "diagnostic_internal_analytical"
     BACKEND_ALIAS_ALPHAMELTS = "backend_alias:alphamelts"
+    BACKEND_ALIAS_THERMOENGINE = "backend_alias:thermoengine"
     BACKEND_SELECTION_AUTO = "backend_selection:auto"
     CACHED_REAL = "cached-real"
     MIXED = "mixed"
@@ -105,6 +110,10 @@ class DegradationReason(str, Enum):
 CERTIFICATION_DENYLIST: frozenset[str] = frozenset(
     {
         EvidenceClass.INTERNAL_ANALYTICAL.value,
+        EvidenceClass.DIAGNOSTIC_SHADOW.value,
+        EvidenceClass.C_HENRIAN_SCREEN.value,
+        EvidenceClass.B_DILUTE_SCREEN.value,
+        EvidenceClass.EXT_SP.value,
         EvidenceClass.ANALYTICAL_VAPOROCK_CALIBRATED.value,
         EvidenceClass.ANALYTICAL_EXTERNAL_GROUNDED.value,
     }
@@ -143,6 +152,7 @@ LEGACY_VOCABULARY_TOKENS: Mapping[str, frozenset[str]] = MappingProxyType(
                 LEGACY_INTERNAL_ANALYTICAL_VOCABULARY_TOKEN,
                 LEGACY_ANALYTICAL_BACKEND_DIAGNOSTIC_TOKEN,
                 "alphamelts",
+                "thermoengine",
                 "auto",
                 "cached-real",
                 "mixed:*",
@@ -308,6 +318,10 @@ _SIMPLE_TRANSLATIONS: Mapping[tuple[str, str], CanonicalFidelityMapping] = Mappi
             evidence_class=EvidenceClass.MELTS.value,
             label_source=LabelSource.BACKEND_ALIAS_ALPHAMELTS.value,
         ),
+        ("backend/status alias", "thermoengine"): CanonicalFidelityMapping(
+            evidence_class=EvidenceClass.MELTS.value,
+            label_source=LabelSource.BACKEND_ALIAS_THERMOENGINE.value,
+        ),
         ("backend/status alias", "missing"): CanonicalFidelityMapping(
             runtime_status=RuntimeStatus.MISSING.value,
             degradation_reason=DegradationReason.MISSING.value,
@@ -377,6 +391,11 @@ def translate_legacy_token(
     result = _SIMPLE_TRANSLATIONS.get((canonical_family, token_text))
     if result is not None:
         return result
+    if (
+        canonical_family == "backend/status alias"
+        and token_text in CANONICAL_EVIDENCE_CLASSES
+    ):
+        return CanonicalFidelityMapping(evidence_class=token_text)
 
     raise UnknownFidelityVocabularyTokenError(
         family,
@@ -456,31 +475,69 @@ def vapour_analytical_flux_verdict(
 def backend_name_denies_authority(backend_name: str | None) -> bool:
     """Return True when backend identity independently forbids authoritative admission."""
 
+    # This is a trust predicate: a missing or unknown identity cannot prove
+    # authority. Denial is the safe default; permitting would make typos and
+    # future unregistered evidence classes authoritative.
     if backend_name is None:
-        return False
-    normalized = canonical_backend_name(str(backend_name).strip())
-    if not normalized:
-        return False
-    # O1 vapour analytical tokens share the name-keyed boundary but are
-    # evidence-class identities, not melt backends. They always deny authority.
-    if normalized in RATIFIED_VAPOUR_ANALYTICAL_EVIDENCE_CLASSES:
         return True
+    raw_name = (
+        backend_name.value
+        if isinstance(backend_name, EvidenceClass)
+        else str(backend_name)
+    )
+    normalized = canonical_backend_name(raw_name.strip())
+    if not normalized:
+        return True
+    if normalized in CANONICAL_EVIDENCE_CLASSES:
+        return normalized in CERTIFICATION_DENYLIST
     if normalized.startswith("mixed:"):
         suffix = normalized[len("mixed:") :]
         for delimiter in ("+", "|"):
             suffix = suffix.replace(delimiter, ",")
-        return any(
-            backend_name_denies_authority(token.strip())
-            for token in suffix.split(",")
-            if token.strip()
-        )
+        tokens = tuple(token.strip() for token in suffix.split(","))
+        if not tokens or any(not token or token.startswith("mixed:") for token in tokens):
+            return True
+        return any(backend_name_denies_authority(token) for token in tokens)
     try:
         mapping = translate_legacy_token("backend/status alias", normalized)
     except (UnknownFidelityVocabularyTokenError, FidelityVocabularyTranslationError):
-        return False
+        return True
     if mapping.evidence_class is None:
-        return False
+        # A translated status is still not an authority-bearing identity.
+        # ``cached-real`` is the one contextual wrapper admitted here; its
+        # inherited evidence is checked by the fidelity/cache callers.
+        return normalized != "cached-real"
     return _evidence_class_value(mapping.evidence_class) in CERTIFICATION_DENYLIST
+
+
+def backend_evidence_authority_rejection(
+    backend_name: str | None,
+    inherited_evidence_class: str | EvidenceClass | None = None,
+    *,
+    requires_inherited_evidence_class: bool = False,
+) -> str | None:
+    """Return the shared backend/evidence authority rejection code, if any."""
+
+    if requires_inherited_evidence_class:
+        return "inherited_evidence_class_required"
+    if backend_name_denies_authority(backend_name):
+        return "backend_name_non_authoritative"
+    raw_name = (
+        backend_name.value
+        if isinstance(backend_name, EvidenceClass)
+        else str(backend_name)
+    )
+    normalized = canonical_backend_name(raw_name.strip())
+    if inherited_evidence_class is None:
+        if normalized == "cached-real":
+            return "inherited_evidence_class_required"
+        return None
+    try:
+        if not may_certify(inherited_evidence_class):
+            return "evidence_class_non_authoritative"
+    except (UnknownFidelityVocabularyTokenError, FidelityVocabularyTranslationError):
+        return "evidence_class_non_authoritative"
+    return None
 
 
 def canonicalize_fidelity_emission(
@@ -499,12 +556,25 @@ def canonicalize_fidelity_emission(
     """Return additive canonical trust fields for an emitted payload."""
 
     data: dict[str, Any] = {}
+    explicit_evidence_class = (
+        _evidence_class_value(evidence_class)
+        if evidence_class is not None
+        else None
+    )
+    explicit_evidence_overrides_inference = (
+        explicit_evidence_class is not None and backend_authoritative is False
+    )
     label_sources: list[str] = []
     degraded_from: list[str] = []
     contributor_payloads: list[dict[str, Any]] = []
 
     def merge(mapping: CanonicalFidelityMapping) -> None:
-        _merge_scalar(data, CanonicalDimension.EVIDENCE_CLASS.value, mapping.evidence_class)
+        if not explicit_evidence_overrides_inference:
+            _merge_scalar(
+                data,
+                CanonicalDimension.EVIDENCE_CLASS.value,
+                mapping.evidence_class,
+            )
         _merge_scalar(data, CanonicalDimension.CACHE_STATE.value, mapping.cache_state)
         _merge_scalar(data, CanonicalDimension.RUNTIME_STATUS.value, mapping.runtime_status)
         if mapping.label_source is not None:
@@ -565,12 +635,15 @@ def canonicalize_fidelity_emission(
                 migration_chunk=migration_chunk,
             )
         )
-    if evidence_class is not None:
-        _merge_scalar(
-            data,
-            CanonicalDimension.EVIDENCE_CLASS.value,
-            _evidence_class_value(evidence_class),
-        )
+    if explicit_evidence_class is not None:
+        if explicit_evidence_overrides_inference:
+            data[CanonicalDimension.EVIDENCE_CLASS.value] = explicit_evidence_class
+        else:
+            _merge_scalar(
+                data,
+                CanonicalDimension.EVIDENCE_CLASS.value,
+                explicit_evidence_class,
+            )
 
     if label_sources:
         data[CanonicalDimension.LABEL_SOURCE.value] = label_sources[0]

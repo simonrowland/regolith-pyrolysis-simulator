@@ -36,10 +36,15 @@ from simulator.optimize.objective import (
     objective_metric_aliases,
 )
 from simulator.optimize.pool import resolve_eval_timeout_seconds
+from simulator.optimize.result_trust import (
+    ResultTrustCarriers,
+    collect_result_trust_carriers,
+    compact_result_trust_carrier,
+)
 from simulator.fidelity_vocabulary import (
     CANONICAL_EVIDENCE_CLASSES,
     FidelityVocabularyTranslationError,
-    backend_name_denies_authority,
+    backend_evidence_authority_rejection,
     canonicalize_fidelity_emission,
     translate_legacy_token,
 )
@@ -471,10 +476,12 @@ def _queue_safe_run_reference(result: ScoredResult) -> Any | None:
     ref = result.run_reference
     if ref is None:
         return None
-    backend_status = _result_backend_status(result)
-    safe_trace = {"backend_status": backend_status} if backend_status is not None else None
+    safe_trace = compact_result_trust_carrier(getattr(ref, "trace", None)) or None
+    safe_summary = compact_result_trust_carrier(
+        getattr(ref, "product_summary", None)
+    )
     try:
-        return replace(ref, trace=safe_trace, product_summary={})
+        return replace(ref, trace=safe_trace, product_summary=safe_summary)
     except TypeError:
         return None
 
@@ -618,20 +625,39 @@ def _arm_backend_authority(
     tasks: Sequence[_FidelityTask],
     results: Sequence[ScoredResult],
 ) -> Mapping[str, Any]:
+    result_trust = tuple(collect_result_trust_carriers(result) for result in results)
     backend_names = {name for name in (_task_backend_name(task) for task in tasks) if name}
-    for result in results:
+    for result, trust in zip(results, result_trust):
         spec = getattr(result, "eval_spec", None)
         raw_name = getattr(spec, "backend_name", None)
         if raw_name:
-            backend_names.add(str(raw_name))
+            canonical_name = canonical_backend_name(str(raw_name))
+            if canonical_name:
+                backend_names.add(canonical_name)
+        backend_names.update(trust.backend_names)
     if not backend_names:
         backend_names.add(ANALYTICAL_BACKEND_SERIALIZATION_TOKEN)
     ordered_names = tuple(sorted(backend_names))
     backend_name = ordered_names[0] if len(ordered_names) == 1 else "mixed:" + ",".join(ordered_names)
 
-    statuses = [_result_backend_status(result) for result in results]
-    missing_statuses = sum(1 for status in statuses if status is None)
-    present_statuses = [status for status in statuses if status is not None]
+    present_statuses = tuple(
+        status for trust in result_trust for status in trust.backend_statuses
+    )
+    missing_statuses = sum(1 for trust in result_trust if not trust.backend_statuses)
+    distinct_statuses = tuple(sorted(set(present_statuses)))
+    authority_carriers_complete = all(
+        trust.backend_authorities for trust in result_trust
+    )
+    authority_carriers_allow = all(
+        authority
+        for trust in result_trust
+        for authority in trust.backend_authorities
+    )
+    certification_carriers_allow = all(
+        allowed
+        for trust in result_trust
+        for allowed in trust.certification_allowances
+    )
     if len(ordered_names) != 1:
         backend_status = "mixed_backend"
         authoritative = False
@@ -644,31 +670,65 @@ def _arm_backend_authority(
     elif missing_statuses:
         backend_status = "missing"
         authoritative = False
-    elif all(status == "ok" for status in present_statuses):
+    elif distinct_statuses == ("ok",):
         backend_status = "ok"
-        authoritative = True
+        authoritative = authority_carriers_complete and authority_carriers_allow
     else:
-        backend_status = "mixed:" + ",".join(sorted(set(present_statuses)))
+        backend_status = "mixed:" + ",".join(distinct_statuses)
         authoritative = False
-    inherited_evidence_class = (
-        _arm_inherited_evidence_class(tasks, results)
-        if backend_name == "cached-real"
+    if not certification_carriers_allow:
+        authoritative = False
+    evidence_classes = _arm_evidence_classes(tasks, result_trust)
+    evidence_class = evidence_classes[0] if len(evidence_classes) == 1 else None
+    verdict_evidence_class = evidence_class
+    if len(evidence_classes) > 1:
+        verdict_evidence_class = "mixed:" + ",".join(evidence_classes)
+    task_evidence_present = any(
+        isinstance(cache_config := _task_run_options(task).get("reduced_real_cache"), Mapping)
+        and cache_config.get("authorized_backend_name") is not None
+        for task in tasks
+    )
+    missing_result_evidence = any(
+        not trust.evidence_classes for trust in result_trust
+    ) and not (backend_name == "cached-real" and task_evidence_present)
+    if missing_result_evidence:
+        authoritative = False
+    requires_inherited_evidence_class = any(
+        requirement
+        for trust in result_trust
+        for requirement in trust.inherited_evidence_requirements
+    )
+    if authoritative and backend_evidence_authority_rejection(
+        backend_name,
+        verdict_evidence_class,
+        requires_inherited_evidence_class=requires_inherited_evidence_class,
+    ) is not None:
+        authoritative = False
+    emission_backend_name = (
+        backend_name
+        if len(ordered_names) == 1 and not backend_name.startswith("mixed:")
         else None
     )
-    if backend_name == "cached-real" and authoritative and inherited_evidence_class is None:
-        authoritative = False
-    if authoritative and backend_name_denies_authority(backend_name):
-        authoritative = False
+    emission_contributors = tuple(
+        name for name in ordered_names if not name.startswith("mixed:")
+    ) or (ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,)
     canonical = canonicalize_fidelity_emission(
-        backend_name=backend_name,
+        backend_name=emission_backend_name,
         backend_status=backend_status,
         backend_authoritative=authoritative,
-        contributors=ordered_names,
-        inherited_evidence_class=inherited_evidence_class,
-        certification_shape=authoritative and not (
-            backend_name == "cached-real" and inherited_evidence_class is None
-        ),
+        contributors=emission_contributors,
+        evidence_class=evidence_class,
+        inherited_evidence_class=evidence_class,
+        certification_shape=authoritative,
     )
+    if len(evidence_classes) > 1 or (
+        missing_result_evidence
+        and backend_name != ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+    ):
+        canonical.pop("evidence_class", None)
+        canonical.pop("certification_allowed", None)
+    elif not authoritative:
+        canonical["certification_allowed"] = False
     return {
         "tier": tier,
         "fidelity_name": fidelity_name,
@@ -679,14 +739,13 @@ def _arm_backend_authority(
     }
 
 
-def _arm_inherited_evidence_class(
+def _arm_evidence_classes(
     tasks: Sequence[_FidelityTask],
-    results: Sequence[ScoredResult],
-) -> str | None:
+    result_trust: Sequence[ResultTrustCarriers],
+) -> tuple[str, ...]:
     evidence_classes: set[str] = set()
-    for result in results:
-        token = _result_inherited_evidence_token(result)
-        if token is not None:
+    for trust in result_trust:
+        for token in trust.evidence_classes:
             evidence_classes.add(_inherited_evidence_class_from_token(token))
     for task in tasks:
         cache_config = _task_run_options(task).get("reduced_real_cache")
@@ -694,7 +753,7 @@ def _arm_inherited_evidence_class(
             token = cache_config.get("authorized_backend_name")
             if token is not None:
                 evidence_classes.add(_inherited_evidence_class_from_token(token))
-    return next(iter(evidence_classes)) if len(evidence_classes) == 1 else None
+    return tuple(sorted(evidence_classes))
 
 
 def _pair_evalspec_mismatch(
@@ -725,33 +784,6 @@ def _pair_evalspec_mismatch(
     return "fidelity pair EvalSpec mismatch: " + "; ".join(mismatches)
 
 
-def _result_inherited_evidence_token(result: ScoredResult) -> object | None:
-    ref = getattr(result, "run_reference", None)
-    carriers = (
-        ref,
-        getattr(ref, "trace", None),
-        getattr(result, "eval_spec", None),
-    )
-    for carrier in carriers:
-        token = _carrier_value(carrier, "evidence_class")
-        if token is not None:
-            return token
-        cache_config = _carrier_value(carrier, "reduced_real_cache")
-        if isinstance(cache_config, Mapping):
-            token = cache_config.get("authorized_backend_name")
-            if token is not None:
-                return token
-    return None
-
-
-def _carrier_value(carrier: Any, key: str) -> Any:
-    if carrier is None:
-        return None
-    if isinstance(carrier, Mapping):
-        return carrier.get(key)
-    return getattr(carrier, key, None)
-
-
 def _inherited_evidence_class_from_token(token: object) -> str:
     value = str(token).strip()
     if value in CANONICAL_EVIDENCE_CLASSES:
@@ -761,35 +793,6 @@ def _inherited_evidence_class_from_token(token: object) -> str:
     except FidelityVocabularyTranslationError:
         return value
     return mapped.evidence_class or value
-
-
-def _result_backend_status(result: ScoredResult) -> str | None:
-    ref = getattr(result, "run_reference", None)
-    if ref is None:
-        return None
-    for carrier in (getattr(ref, "trace", None), ref):
-        status = _extract_backend_status(carrier)
-        if status is not None:
-            return status
-    return None
-
-
-def _extract_backend_status(carrier: Any) -> str | None:
-    if carrier is None:
-        return None
-    if isinstance(carrier, Mapping):
-        per_hour = carrier.get("per_hour")
-        raw = carrier.get("backend_status")
-    else:
-        per_hour = getattr(carrier, "per_hour", None)
-        raw = getattr(carrier, "backend_status", None)
-    if isinstance(per_hour, (list, tuple)) and per_hour:
-        status = _extract_backend_status(per_hour[-1])
-        if status is not None:
-            return status
-    if raw is not None:
-        return str(raw)
-    return None
 
 
 def _start_method() -> str:

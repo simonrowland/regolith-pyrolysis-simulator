@@ -113,6 +113,8 @@ def test_strip_heavy_result_preserves_vapor_source_report_for_store_gate(
             status="ok",
             trace=trace,
             product_summary=_product_summary(),
+            backend_name="alphamelts",
+            evidence_class="melts",
         ),
         notes=("stored",),
     )
@@ -168,6 +170,8 @@ def test_reference_trace_fallback_preserves_vapor_source_report_for_store_gate(
             status="ok",
             trace=trace,
             product_summary=_product_summary(),
+            backend_name="alphamelts",
+            evidence_class="melts",
         ),
         notes=("stored",),
     )

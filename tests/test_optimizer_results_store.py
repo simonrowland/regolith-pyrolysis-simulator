@@ -151,6 +151,14 @@ def _scored(
     result_blob: dict[str, object] | None = None,
     product_summary: Mapping[str, object] | None = None,
 ) -> ScoredResult:
+    trace = _admissible_trace(
+        result_blob or {"hours": [{"hour": 1, "oxygen_kg": oxygen}]}
+    )
+    evidence_class = (
+        "internal-analytical"
+        if trace.get("backend_status") == "diagnostic_stub"
+        else "melts"
+    )
     return ScoredResult(
         candidate_id=candidate_id,
         eval_spec=spec,
@@ -161,10 +169,12 @@ def _scored(
         failing_gates=(),
         run_reference=RunReference(
             status="ok",
-            trace=_admissible_trace(
-                result_blob or {"hours": [{"hour": 1, "oxygen_kg": oxygen}]}
-            ),
-            product_summary=product_summary or {"oxygen_kg": oxygen},
+            trace=trace,
+            product_summary={
+                "backend_name": "alphamelts",
+                **dict(product_summary or {"oxygen_kg": oxygen}),
+            },
+            evidence_class=evidence_class,
         ),
         notes=("stored",),
     )
@@ -332,7 +342,10 @@ def test_round_trip_lossless_lookup(tmp_path) -> None:
         "snapshots": [{"mass_balance_error_pct": 0.0}],
         "status": "ok",
     }
-    assert loaded.run_reference.product_summary == {"oxygen_kg": 10.0}
+    assert loaded.run_reference.product_summary == {
+        "backend_name": "alphamelts",
+        "oxygen_kg": 10.0,
+    }
 
 
 def test_thermoengine_version_identity_is_optimizer_key_neutral(
@@ -881,6 +894,7 @@ def test_lookup_rejects_poisoned_run_reference_canonical_fields(tmp_path) -> Non
             (cache_key(spec),),
         ).fetchone()
         payload = json.loads(row[0])
+        payload.pop("evidence_class", None)
         payload.update(
             {
                 "backend_name": ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
@@ -1265,38 +1279,43 @@ def test_store_accepts_closure_clean_authoritative_in_domain_cache_write(
 
 
 @pytest.mark.parametrize(
-    "backend_name",
+    "carrier",
+    ("run_reference", "trace", "product_summary"),
+)
+@pytest.mark.parametrize(
+    ("backend_name", "rejected_as"),
     [
-        ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
-        LEGACY_ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        (
+            ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+            ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        ),
+        (
+            LEGACY_ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+            ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        ),
     ],
 )
-def test_store_rejects_analytical_backend_aliases_with_spoofed_authority_markers(
+def test_store_rejects_analytical_backend_aliases_across_identity_carriers(
     tmp_path,
+    carrier: str,
     backend_name: str,
+    rejected_as: str,
 ) -> None:
-    spec = _base_spec(backend_name=backend_name)
+    spec = _base_spec()
     trace = _admissible_trace(
-        {
-            "backend_name": backend_name,
-            "backend_status": "ok",
-            "backend_authoritative": True,
-        }
+        {"backend_name": backend_name} if carrier == "trace" else None
     )
-    scored = _scored(
-        spec,
-        result_blob=trace,
-        product_summary={"oxygen_kg": 10.0},
-    )
+    product_summary = {
+        "oxygen_kg": 10.0,
+        **({"backend_name": backend_name} if carrier == "product_summary" else {}),
+    }
     scored = replace(
-        scored,
+        _scored(spec),
         run_reference=RunReference(
             status="ok",
             trace=trace,
-            backend_name=backend_name,
-            backend_status="ok",
-            backend_authoritative=True,
-            product_summary={"oxygen_kg": 10.0},
+            product_summary=product_summary,
+            backend_name=backend_name if carrier == "run_reference" else None,
         ),
     )
     store = ResultStore(
@@ -1308,11 +1327,360 @@ def test_store_rejects_analytical_backend_aliases_with_spoofed_authority_markers
     with pytest.raises(ResultStoreWriteRejected) as exc_info:
         store.store(spec, scored, created_at="2026-06-01T00:00:00Z")
 
-    assert (
-        f"backend_name_non_authoritative:{ANALYTICAL_BACKEND_SERIALIZATION_TOKEN}"
-        in exc_info.value.reasons
-    )
+    assert f"backend_name_non_authoritative:{rejected_as}" in exc_info.value.reasons
     assert store.lookup(spec) is None
+
+
+@pytest.mark.parametrize(
+    "backend_name",
+    (
+        "",
+        "totally-made-up-xyz",
+        "ok",
+        "diagnostic-shadow",
+        "C-henrian-screen",
+        "B-dilute-screen",
+        "EXT-SP",
+    ),
+)
+def test_store_rejects_other_untrusted_product_summary_backend_names(
+    tmp_path,
+    backend_name: str,
+) -> None:
+    spec = _base_spec()
+    scored = replace(
+        _scored(spec),
+        run_reference=RunReference(
+            status="ok",
+            trace=_admissible_trace(),
+            product_summary={"oxygen_kg": 10.0, "backend_name": backend_name},
+        ),
+    )
+    store = ResultStore(tmp_path / "results.sqlite")
+
+    with pytest.raises(ResultStoreWriteRejected) as exc_info:
+        store.store(spec, scored, created_at="2026-06-01T00:00:00Z")
+
+    assert f"backend_name_non_authoritative:{backend_name}" in exc_info.value.reasons
+    assert store.lookup(spec) is None
+
+
+@pytest.mark.parametrize(
+    ("requested_name", "backend_name", "evidence_class", "expected_reason"),
+    (
+        (
+            "totally-made-up-xyz",
+            None,
+            None,
+            "backend_name_non_authoritative:missing",
+        ),
+        (
+            "alphamelts",
+            None,
+            "diagnostic-shadow",
+            "certification_forbidden",
+        ),
+        (
+            "cached-real",
+            "cached-real",
+            None,
+            "backend_name_requires_inherited_evidence_class:cached-real",
+        ),
+        (
+            "cached-real",
+            "cached-real",
+            "diagnostic-shadow",
+            "evidence_class_non_authoritative:diagnostic-shadow",
+        ),
+    ),
+)
+def test_store_rejects_shared_backend_evidence_authority_failures(
+    tmp_path,
+    requested_name: str,
+    backend_name: str | None,
+    evidence_class: str | None,
+    expected_reason: str,
+) -> None:
+    spec = _base_spec(backend_name=requested_name)
+    scored = replace(
+        _scored(spec),
+        run_reference=RunReference(
+            status="ok",
+            trace=_admissible_trace(),
+            product_summary={"oxygen_kg": 10.0},
+            backend_name=backend_name,
+            evidence_class=evidence_class,
+        ),
+    )
+    store = ResultStore(tmp_path / "results.sqlite")
+
+    with pytest.raises(ResultStoreWriteRejected) as exc_info:
+        store.store(spec, scored, created_at="2026-06-01T00:00:00Z")
+
+    assert expected_reason in exc_info.value.reasons
+    assert store.lookup(spec) is None
+
+
+@pytest.mark.parametrize(
+    ("reference_name", "trace_name", "summary_name", "denied_name"),
+    (
+        ("alphamelts", "totally-made-up-xyz", None, "totally-made-up-xyz"),
+        (None, "alphamelts", "diagnostic-shadow", "diagnostic-shadow"),
+    ),
+)
+def test_store_rejects_backend_name_carrier_disagreement_without_masking(
+    tmp_path,
+    reference_name: str | None,
+    trace_name: str,
+    summary_name: str | None,
+    denied_name: str,
+) -> None:
+    spec = _base_spec(backend_name="alphamelts")
+    summary = {"oxygen_kg": 10.0}
+    if summary_name is not None:
+        summary["backend_name"] = summary_name
+    scored = replace(
+        _scored(spec),
+        run_reference=RunReference(
+            status="ok",
+            trace=_admissible_trace({"backend_name": trace_name}),
+            product_summary=summary,
+            backend_name=reference_name,
+        ),
+    )
+    store = ResultStore(tmp_path / "results.sqlite")
+
+    with pytest.raises(ResultStoreWriteRejected) as exc_info:
+        store.store(spec, scored, created_at="2026-06-01T00:00:00Z")
+
+    assert any(
+        reason.startswith("backend_name_carrier_disagreement:")
+        for reason in exc_info.value.reasons
+    )
+    assert f"backend_name_non_authoritative:{denied_name}" in exc_info.value.reasons
+    assert store.lookup(spec) is None
+
+
+@pytest.mark.parametrize(
+    (
+        "reference_status",
+        "trace_status",
+        "reference_authoritative",
+        "trace_authoritative",
+        "expected_reason",
+    ),
+    (
+        (
+            "ok",
+            "ok",
+            True,
+            False,
+            "backend_authoritative_carrier_disagreement:False|True",
+        ),
+        (
+            "ok",
+            "unavailable",
+            True,
+            True,
+            "backend_status_carrier_disagreement:'ok'|'unavailable'",
+        ),
+    ),
+)
+def test_store_rejects_authority_and_status_carrier_disagreement_without_masking(
+    tmp_path,
+    reference_status: str,
+    trace_status: str,
+    reference_authoritative: bool,
+    trace_authoritative: bool,
+    expected_reason: str,
+) -> None:
+    spec = _base_spec(backend_name="alphamelts")
+    base = _scored(spec)
+    assert base.run_reference is not None
+    scored = replace(
+        base,
+        run_reference=RunReference(
+            status="ok",
+            trace=_admissible_trace(
+                {
+                    "backend_name": "alphamelts",
+                    "backend_status": trace_status,
+                    "backend_authoritative": trace_authoritative,
+                }
+            ),
+            product_summary=base.run_reference.product_summary,
+            backend_name="alphamelts",
+            backend_status=reference_status,
+            backend_authoritative=reference_authoritative,
+        ),
+    )
+    store = ResultStore(tmp_path / "results.sqlite")
+
+    with pytest.raises(ResultStoreWriteRejected) as exc_info:
+        store.store(spec, scored, created_at="2026-06-01T00:00:00Z")
+
+    assert expected_reason in exc_info.value.reasons
+    assert store.lookup(spec) is None
+
+
+def test_store_rejects_presented_inherited_evidence_requirement(tmp_path) -> None:
+    spec = _base_spec(backend_name="alphamelts")
+    base = _scored(spec)
+    assert base.run_reference is not None
+    scored = replace(
+        base,
+        run_reference=replace(
+            base.run_reference,
+            product_summary={
+                **dict(base.run_reference.product_summary),
+                "backend_name": "alphamelts",
+                "backend_status": "ok",
+                "backend_authoritative": True,
+                "evidence_class": "melts",
+                "certification_allowed": True,
+                "requires_inherited_evidence_class": True,
+            },
+        ),
+    )
+    store = ResultStore(tmp_path / "results.sqlite")
+
+    with pytest.raises(ResultStoreWriteRejected) as exc_info:
+        store.store(spec, scored, created_at="2026-06-01T00:00:00Z")
+
+    assert "inherited_evidence_class_required" in exc_info.value.reasons
+    assert store.lookup(spec) is None
+
+
+def test_existing_row_trust_metadata_is_marked_without_rejection_or_reranking_on_read(
+    tmp_path,
+) -> None:
+    low_spec = _base_spec(recipe_id="legacy-low")
+    winner_spec = replace(low_spec, recipe_id="legacy-winner")
+    store = ResultStore(tmp_path / "results.sqlite")
+    store.store(
+        low_spec,
+        _scored(low_spec, candidate_id="low", oxygen=5.0),
+        created_at="t1",
+    )
+    store.store(
+        winner_spec,
+        _scored(winner_spec, candidate_id="winner", oxygen=10.0),
+        created_at="t2",
+    )
+    winner_before = store.best(low_spec.feedstock_id, objective_metric="oxygen_kg")
+    assert winner_before is not None
+
+    with sqlite3.connect(tmp_path / "results.sqlite") as conn:
+        raw_reference = conn.execute(
+            "SELECT run_reference FROM results WHERE cache_key = ?",
+            (cache_key(winner_spec),),
+        ).fetchone()[0]
+        reference = json.loads(raw_reference)
+        reference["product_summary"]["backend_name"] = "diagnostic-shadow"
+        conn.execute(
+            "UPDATE results SET run_reference = ? WHERE cache_key = ?",
+            (json.dumps(reference), cache_key(winner_spec)),
+        )
+        conn.commit()
+
+    loaded = store.lookup(winner_spec)
+    winner_after = store.best(low_spec.feedstock_id, objective_metric="oxygen_kg")
+
+    assert loaded is not None
+    assert winner_after is not None
+    assert winner_after.candidate_id == winner_before.candidate_id == "winner"
+    assert winner_after.objectives == winner_before.objectives
+    assert loaded.feasible is True
+    assert any(
+        note.startswith("result_store_read_compatibility_rejections:")
+        for note in loaded.notes
+    )
+    assert any(
+        note.startswith("result_store_read_compatibility_rejections:")
+        for note in winner_after.notes
+    )
+
+
+def test_existing_row_missing_serialized_evidence_stays_missing_and_is_marked(
+    tmp_path,
+) -> None:
+    spec = _base_spec(recipe_id="legacy-missing-evidence", backend_name="alphamelts")
+    base = _scored(spec)
+    assert base.run_reference is not None
+    scored = replace(
+        base,
+        run_reference=RunReference(
+            status="ok",
+            trace=_admissible_trace({"backend_name": "alphamelts"}),
+            product_summary=base.run_reference.product_summary,
+            backend_name="alphamelts",
+            backend_status="ok",
+            backend_authoritative=True,
+            evidence_class="melts",
+        ),
+    )
+    store = ResultStore(tmp_path / "results.sqlite")
+    store.store(spec, scored, created_at="t1")
+
+    with sqlite3.connect(tmp_path / "results.sqlite") as conn:
+        raw_reference, raw_blob = conn.execute(
+            "SELECT run_reference, result_blob FROM results WHERE cache_key = ?",
+            (cache_key(spec),),
+        ).fetchone()
+        reference = json.loads(raw_reference)
+        blob = json.loads(raw_blob)
+        reference.pop("evidence_class", None)
+        reference.pop("certification_allowed", None)
+        blob.pop("evidence_class", None)
+        blob.pop("certification_allowed", None)
+        conn.execute(
+            "UPDATE results SET run_reference = ?, result_blob = ? WHERE cache_key = ?",
+            (json.dumps(reference), json.dumps(blob), cache_key(spec)),
+        )
+        conn.commit()
+
+    loaded = store.lookup(spec)
+
+    assert loaded is not None
+    assert loaded.run_reference is not None
+    assert loaded.run_reference.evidence_class is None
+    assert loaded.run_reference.certification_allowed is None
+    assert any(
+        note.startswith("result_store_read_compatibility_rejections:")
+        and "missing_evidence_class" in note
+        for note in loaded.notes
+    ), loaded.notes
+
+
+def test_existing_row_malformed_authority_is_marked_without_refusing_read(
+    tmp_path,
+) -> None:
+    spec = _base_spec(recipe_id="legacy-malformed-authority")
+    store = ResultStore(tmp_path / "results.sqlite")
+    store.store(spec, _scored(spec), created_at="t1")
+
+    with sqlite3.connect(tmp_path / "results.sqlite") as conn:
+        raw_blob = conn.execute(
+            "SELECT result_blob FROM results WHERE cache_key = ?",
+            (cache_key(spec),),
+        ).fetchone()[0]
+        result_blob = json.loads(raw_blob)
+        result_blob["backend_authoritative"] = "not-a-bool"
+        conn.execute(
+            "UPDATE results SET result_blob = ? WHERE cache_key = ?",
+            (json.dumps(result_blob), cache_key(spec)),
+        )
+        conn.commit()
+
+    loaded = store.lookup(spec)
+
+    assert loaded is not None
+    assert loaded.feasible is True
+    assert any(
+        note.startswith("result_store_read_compatibility_rejections:")
+        and "backend_authoritative_carrier_disagreement:False|True" in note
+        for note in loaded.notes
+    ), loaded.notes
 
 
 def test_store_rejects_nan_margin_numbers(tmp_path) -> None:

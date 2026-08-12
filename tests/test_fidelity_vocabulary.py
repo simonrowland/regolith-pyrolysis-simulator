@@ -20,6 +20,7 @@ from simulator.fidelity_vocabulary import (
     EvidenceClass,
     FidelityVocabularyTranslationError,
     UnknownFidelityVocabularyTokenError,
+    backend_evidence_authority_rejection,
     backend_name_denies_authority,
     canonicalize_fidelity_emission,
     is_ratified_vapour_analytical_evidence_class,
@@ -48,6 +49,7 @@ EXPECTED_LEGACY_TOKENS = {
         "stub",
         "diagnostic_stub",
         "alphamelts",
+        "thermoengine",
         "auto",
         "cached-real",
         "mixed:*",
@@ -212,7 +214,7 @@ def test_design_token_inventory_is_pinned_to_spec_table() -> None:
     assert {
         family: set(tokens) for family, tokens in LEGACY_VOCABULARY_TOKENS.items()
     } == EXPECTED_LEGACY_TOKENS
-    assert DESIGN_LEGACY_MAPPING_ROW_COUNT == 25
+    assert DESIGN_LEGACY_MAPPING_ROW_COUNT == 26
 
 
 def test_legacy_stub_vocabulary_survives_backend_identity_hinge_flip(
@@ -435,6 +437,10 @@ def test_certification_denylist_ignores_hostile_ordering_inputs() -> None:
     assert CERTIFICATION_DENYLIST == frozenset(
         {
             "internal-analytical",
+            "diagnostic-shadow",
+            "C-henrian-screen",
+            "B-dilute-screen",
+            "EXT-SP",
             VAPOUR_ANALYTICAL_VAPOROCK_CALIBRATED,
             VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
         }
@@ -462,6 +468,10 @@ def test_certification_denylist_ignores_hostile_ordering_inputs() -> None:
         ("magemin", True),
         ("internal-datatables", True),
         ("internal-analytical", False),
+        ("diagnostic-shadow", False),
+        ("C-henrian-screen", False),
+        ("B-dilute-screen", False),
+        ("EXT-SP", False),
         (VAPOUR_ANALYTICAL_VAPOROCK_CALIBRATED, False),
         (VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED, False),
     ],
@@ -491,6 +501,94 @@ def test_ratified_vapour_analytical_tokens_canonicalize_to_self(token: str) -> N
     assert canonical_backend_name(token) != "internal-analytical"
     assert is_ratified_vapour_analytical_evidence_class(token)
     assert backend_name_denies_authority(token) is True
+
+
+@pytest.mark.parametrize(
+    "token",
+    [
+        None,
+        "",
+        "totally-made-up-xyz",
+        "mixed:",
+        "mixed:alphamelts,   ",
+        "mixed:   ,alphamelts",
+        "mixed:mixed:alphamelts",
+        "mixed:alphamelts,totally-made-up-xyz",
+        "ok",
+        "missing",
+        "unavailable",
+        "mixed:ok",
+        "diagnostic-shadow",
+        "C-henrian-screen",
+        "B-dilute-screen",
+        "EXT-SP",
+    ],
+)
+def test_backend_name_authority_fails_closed_for_missing_unknown_and_diagnostic_tokens(
+    token: str | None,
+) -> None:
+    assert backend_name_denies_authority(token) is True
+
+
+@pytest.mark.parametrize(
+    "token",
+    [
+        "alphamelts",
+        "thermoengine",
+        "cached-real",
+        EvidenceClass.MELTS,
+        EvidenceClass.MAGEMIN,
+        EvidenceClass.INTERNAL_DATATABLES,
+    ],
+)
+def test_backend_name_authority_preserves_registered_non_denied_tokens(
+    token: str | EvidenceClass,
+) -> None:
+    assert backend_name_denies_authority(token) is False
+
+
+@pytest.mark.parametrize(
+    (
+        "backend_name",
+        "evidence_class",
+        "requires_inherited_evidence_class",
+        "expected",
+    ),
+    (
+        ("alphamelts", None, False, None),
+        ("cached-real", "melts", False, None),
+        (None, "melts", False, "backend_name_non_authoritative"),
+        ("cached-real", None, False, "inherited_evidence_class_required"),
+        (
+            "cached-real",
+            "diagnostic-shadow",
+            False,
+            "evidence_class_non_authoritative",
+        ),
+        (
+            "alphamelts",
+            "diagnostic-shadow",
+            False,
+            "evidence_class_non_authoritative",
+        ),
+        ("alphamelts", None, True, "inherited_evidence_class_required"),
+        ("alphamelts", "melts", True, "inherited_evidence_class_required"),
+    ),
+)
+def test_backend_evidence_authority_rejection_is_contextual_and_fail_closed(
+    backend_name: str | None,
+    evidence_class: str | None,
+    requires_inherited_evidence_class: bool,
+    expected: str | None,
+) -> None:
+    assert (
+        backend_evidence_authority_rejection(
+            backend_name,
+            evidence_class,
+            requires_inherited_evidence_class=requires_inherited_evidence_class,
+        )
+        == expected
+    )
 
 
 def test_legacy_stub_aliases_still_fold_to_internal_analytical() -> None:
@@ -590,6 +688,31 @@ def test_canonical_emission_combines_backend_status_and_runtime_flag() -> None:
     assert payload["backend_real_active"] is True
     assert payload["certification_allowed"] is True
     assert payload["label_source"] == "backend_alias:alphamelts"
+
+
+def test_canonical_emission_preserves_explicit_denied_evidence_over_backend_inference() -> None:
+    payload = canonicalize_fidelity_emission(
+        backend_name="alphamelts",
+        backend_status="ok",
+        backend_authoritative=False,
+        evidence_class="diagnostic-shadow",
+    )
+
+    assert payload["evidence_class"] == "diagnostic-shadow"
+    assert payload["certification_allowed"] is False
+
+
+def test_canonical_emission_refuses_authoritative_backend_evidence_conflict() -> None:
+    with pytest.raises(
+        FidelityVocabularyTranslationError,
+        match="conflicting canonical fidelity field evidence_class",
+    ):
+        canonicalize_fidelity_emission(
+            backend_name="alphamelts",
+            backend_status="ok",
+            backend_authoritative=True,
+            evidence_class="diagnostic-shadow",
+        )
 
 
 def test_canonical_emission_preserves_not_run_honesty() -> None:

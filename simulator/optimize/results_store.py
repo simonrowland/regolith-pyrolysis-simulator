@@ -11,7 +11,7 @@ latest result for that EvalSpec, not an append-only audit log.
 from __future__ import annotations
 
 from collections.abc import Sequence as SequenceABC
-from dataclasses import MISSING, fields
+from dataclasses import MISSING, fields, replace
 import errno
 import fcntl
 import json
@@ -53,8 +53,14 @@ from simulator.backend_names import (
     LEGACY_ANALYTICAL_BACKEND_DIAGNOSTIC_TOKEN,
     canonical_backend_name,
 )
-from simulator.fidelity_vocabulary import backend_name_denies_authority
+from simulator.fidelity_vocabulary import backend_evidence_authority_rejection
 from simulator.optimize.result_scope import result_scope_json, selector_where
+from simulator.optimize.result_trust import (
+    ResultTrustCarriers,
+    carrier_backend_status as _extract_backend_status,
+    collect_result_trust_carriers,
+    result_trust_carriers as _admission_carriers,
+)
 
 SCHEMA_VERSION = 5
 OBJECTIVE_EVIDENCE_SCHEMA_VERSION = 1
@@ -66,6 +72,9 @@ NON_AUTHORITATIVE_BACKEND_STATUSES = frozenset(
 )
 APPROXIMATE_REDUCED_REAL_CACHE_STATES = frozenset(
     {"cached_interpolated", "cached_physics_bucket"}
+)
+READ_COMPATIBILITY_REJECTION_NOTE_PREFIX = (
+    "result_store_read_compatibility_rejections:"
 )
 
 __all__ = [
@@ -769,7 +778,7 @@ def _row_to_scored_result(row: sqlite3.Row) -> ScoredResult:
         margins=margins,
     )
     objectives = _deserialize_objectives(_json_load(row["objectives"]))
-    return ScoredResult(
+    result = ScoredResult(
         candidate_id=row["candidate_id"],
         eval_spec=_deserialize_eval_spec(_json_load(row["eval_spec"])),
         cache_key=row["cache_key"],
@@ -787,6 +796,20 @@ def _row_to_scored_result(row: sqlite3.Row) -> ScoredResult:
         ),
         notes=tuple(_json_load(row["notes"])),
     )
+    reasons = _read_compatibility_rejections(result)
+    if not reasons:
+        return result
+    note = READ_COMPATIBILITY_REJECTION_NOTE_PREFIX + "|".join(reasons)
+    if note in result.notes:
+        return result
+    return replace(result, notes=(*result.notes, note))
+
+
+def _read_compatibility_rejections(scored_result: ScoredResult) -> tuple[str, ...]:
+    try:
+        return _cache_write_rejections(scored_result)
+    except (TypeError, ValueError) as exc:
+        return (f"admission_check_error:{type(exc).__name__}:{exc}",)
 
 
 def _validate_result_artifact(eval_spec: EvalSpec, scored_result: ScoredResult) -> None:
@@ -801,7 +824,7 @@ def _validate_result_artifact(eval_spec: EvalSpec, scored_result: ScoredResult) 
         raise ValueError("result artifact missing failure_category")
     if not scored_result.feasibility_margins:
         raise ValueError("result artifact missing feasibility_margins")
-    if _artifact_backend_status(scored_result) is None:
+    if not _artifact_backend_statuses(scored_result):
         raise ValueError("result artifact missing backend_status")
 
 
@@ -866,11 +889,18 @@ def reground_scored_result(scored_result: ScoredResult) -> ScoredResult:
 
 
 def _assert_cache_write_admissible(scored_result: ScoredResult) -> None:
+    reasons = _cache_write_rejections(scored_result)
+    if reasons:
+        raise ResultStoreWriteRejected(reasons)
+
+
+def _cache_write_rejections(scored_result: ScoredResult) -> tuple[str, ...]:
     if not scored_result.feasible:
-        return
+        return ()
+    trust = collect_result_trust_carriers(scored_result)
     reasons: list[str] = []
-    backend_status = _artifact_backend_status(scored_result)
-    backend_authoritative = _artifact_backend_authoritative(scored_result)
+    backend_status = _agreed_carrier_value(trust.backend_statuses)
+    backend_authoritative = _agreed_carrier_value(trust.backend_authorities)
     if backend_authoritative is not True:
         reasons.append("non_authoritative_backend")
     contradiction = _backend_authority_contradiction(
@@ -879,10 +909,7 @@ def _assert_cache_write_admissible(scored_result: ScoredResult) -> None:
     )
     if contradiction is not None:
         reasons.append(contradiction)
-    backend_name = _artifact_backend_name(scored_result)
-    name_rejection = _backend_name_admission_rejection(backend_name)
-    if name_rejection is not None:
-        reasons.append(name_rejection)
+    reasons.extend(_artifact_authority_rejections(scored_result, trust=trust))
     approximate_cache = _approximate_reduced_real_cache_state(scored_result)
     if approximate_cache is not None:
         reasons.append(f"approximate_reduced_real_cache_state:{approximate_cache}")
@@ -891,48 +918,72 @@ def _assert_cache_write_admissible(scored_result: ScoredResult) -> None:
         reasons.append(closure_rejection)
     if _has_out_of_domain_provenance(scored_result):
         reasons.append("out_of_domain_provenance")
-    if reasons:
-        raise ResultStoreWriteRejected(reasons)
+    return tuple(dict.fromkeys(reasons))
 
 
-def _artifact_backend_status(scored_result: ScoredResult) -> str | None:
-    for carrier in _admission_carriers(scored_result):
-        status = _extract_backend_status(carrier)
-        if status is not None:
-            return status
-    return None
+def _artifact_backend_statuses(scored_result: ScoredResult) -> tuple[str, ...]:
+    return collect_result_trust_carriers(scored_result).backend_statuses
 
 
-def _artifact_backend_name(scored_result: ScoredResult) -> str | None:
-    for carrier in _admission_carriers(scored_result):
-        name = _extract_backend_name(carrier)
-        if name is not None:
-            return canonical_backend_name(name)
-    return None
-
-
-def _extract_backend_name(carrier: Any) -> str | None:
-    raw = _carrier_value(carrier, "backend_name")
-    if raw is None:
-        return None
-    text = str(raw).strip()
-    return text or None
+def _artifact_authority_rejections(
+    scored_result: ScoredResult,
+    *,
+    trust: ResultTrustCarriers | None = None,
+) -> tuple[str, ...]:
+    trust = trust or collect_result_trust_carriers(scored_result)
+    distinct_names = tuple(dict.fromkeys(trust.backend_names))
+    distinct_evidence = tuple(dict.fromkeys(trust.evidence_classes))
+    reasons = list(trust.disagreement_rejections)
+    if not distinct_evidence:
+        reasons.append("missing_evidence_class")
+    if any(not allowed for allowed in trust.certification_allowances):
+        reasons.append("certification_forbidden")
+    requires_inherited_evidence_class = any(trust.inherited_evidence_requirements)
+    evidence_candidates: tuple[str | None, ...] = (
+        distinct_evidence if distinct_evidence else (None,)
+    )
+    for name in distinct_names or (None,):
+        for evidence_class in evidence_candidates:
+            rejection = _backend_evidence_admission_rejection(
+                name,
+                evidence_class,
+                requires_inherited_evidence_class=requires_inherited_evidence_class,
+            )
+            if rejection is not None:
+                reasons.append(rejection)
+    return tuple(dict.fromkeys(reasons))
 
 
 def _backend_name_admission_rejection(backend_name: str | None) -> str | None:
-    if backend_name is None:
-        return None
-    if backend_name_denies_authority(backend_name):
-        return f"backend_name_non_authoritative:{backend_name}"
+    return _backend_evidence_admission_rejection(backend_name, None)
+
+
+def _backend_evidence_admission_rejection(
+    backend_name: str | None,
+    evidence_class: str | None,
+    *,
+    requires_inherited_evidence_class: bool = False,
+) -> str | None:
+    rejection = backend_evidence_authority_rejection(
+        backend_name,
+        evidence_class,
+        requires_inherited_evidence_class=requires_inherited_evidence_class,
+    )
+    if rejection == "backend_name_non_authoritative":
+        name = "missing" if backend_name is None else backend_name
+        return f"backend_name_non_authoritative:{name}"
+    if rejection == "inherited_evidence_class_required":
+        if requires_inherited_evidence_class:
+            return "inherited_evidence_class_required"
+        return "backend_name_requires_inherited_evidence_class:cached-real"
+    if rejection == "evidence_class_non_authoritative":
+        return f"evidence_class_non_authoritative:{evidence_class}"
     return None
 
 
-def _artifact_backend_authoritative(scored_result: ScoredResult) -> bool | None:
-    for carrier in _admission_carriers(scored_result):
-        raw = _carrier_value(carrier, "backend_authoritative")
-        if raw is not None:
-            return _strict_bool(raw)
-    return None
+def _agreed_carrier_value(values: Sequence[Any]) -> Any | None:
+    distinct = tuple(dict.fromkeys(values))
+    return distinct[0] if len(distinct) == 1 else None
 
 
 def _backend_authority_contradiction(
@@ -974,22 +1025,6 @@ def _cache_states_from_carrier(carrier: Any) -> tuple[Any, ...]:
             if state is not None:
                 states.append(state)
     return tuple(states)
-
-
-def _admission_carriers(scored_result: ScoredResult) -> tuple[Any, ...]:
-    carriers: list[Any] = []
-    run_reference = getattr(scored_result, "run_reference", None)
-    if run_reference is not None:
-        carriers.extend(
-            (
-                run_reference,
-                getattr(run_reference, "trace", None),
-                getattr(run_reference, "product_summary", None),
-            )
-        )
-    if hasattr(scored_result, "result_blob"):
-        carriers.append(getattr(scored_result, "result_blob"))
-    return tuple(carrier for carrier in carriers if carrier is not None)
 
 
 def _carrier_value(carrier: Any, key: str) -> Any:
@@ -1168,43 +1203,6 @@ def _contains_out_of_domain_marker(
         _contains_out_of_domain_marker(value, depth=depth + 1, seen=seen)
         for value in values
     )
-
-
-def _extract_backend_status(carrier: Any) -> str | None:
-    if carrier is None:
-        return None
-    if isinstance(carrier, Mapping):
-        raw = carrier.get("backend_status")
-        if raw is not None:
-            return str(raw)
-        for key in ("per_hour", "hours"):
-            nested = carrier.get(key)
-            status = _extract_latest_backend_status(nested)
-            if status is not None:
-                return status
-        for key in ("trace", "backend_diagnostics", "diagnostics"):
-            status = _extract_backend_status(carrier.get(key))
-            if status is not None:
-                return status
-        return None
-    raw = getattr(carrier, "backend_status", None)
-    if raw is not None:
-        return str(raw)
-    for attr in ("per_hour", "hours"):
-        status = _extract_latest_backend_status(getattr(carrier, attr, None))
-        if status is not None:
-            return status
-    for attr in ("trace", "backend_diagnostics", "diagnostics"):
-        status = _extract_backend_status(getattr(carrier, attr, None))
-        if status is not None:
-            return status
-    return None
-
-
-def _extract_latest_backend_status(value: Any) -> str | None:
-    if not isinstance(value, SequenceABC) or isinstance(value, (str, bytes)) or not value:
-        return None
-    return _extract_backend_status(value[-1])
 
 
 def _serialize_eval_spec(eval_spec: EvalSpec) -> dict[str, Any]:
@@ -1617,7 +1615,7 @@ def _deserialize_run_reference(
         product_summary = coating_summary_with_grounded_authority(product_summary)
     else:
         product_summary = {}
-    return RunReference(
+    reference = RunReference(
         status=str(payload["status"]),
         error_message=str(payload.get("error_message", "")),
         reason=str(payload.get("reason", "")),
@@ -1666,6 +1664,10 @@ def _deserialize_run_reference(
             dict(item) for item in payload.get("contributors", ())
         ),
     )
+    for field in ("evidence_class", "certification_allowed"):
+        if payload.get(field) is None:
+            object.__setattr__(reference, field, None)
+    return reference
 
 
 def _result_blob(scored_result: ScoredResult) -> Any:

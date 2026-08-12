@@ -142,10 +142,35 @@ def _eval_spec(candidate_id: str | None, backend_name: str) -> EvalSpec:
     )
 
 
-def _run_reference(backend_status: str | None) -> RunReference | None:
+def _run_reference(
+    backend_status: str | None,
+    backend_name: str | None = None,
+) -> RunReference | None:
     if backend_status is None:
         return None
-    return RunReference(status="ok", trace={"backend_status": backend_status})
+    trace: dict[str, object] = {"backend_status": backend_status}
+    product_summary: dict[str, object] = {}
+    if backend_name is not None:
+        trace.update(
+            {
+                "backend_authoritative": backend_status == "ok",
+            }
+        )
+        product_summary["backend_name"] = backend_name
+    evidence_class = None
+    if backend_name is not None and backend_name != "cached-real":
+        evidence_class = {
+            "alphamelts": "melts",
+            "internal-analytical": "internal-analytical",
+        }.get(backend_name, backend_name)
+    return RunReference(
+        status="ok",
+        trace=trace,
+        product_summary=product_summary,
+        backend_status=backend_status,
+        backend_authoritative=(backend_status == "ok" if backend_name else None),
+        evidence_class=evidence_class,
+    )
 
 
 def _result(
@@ -159,7 +184,7 @@ def _result(
 ) -> ScoredResult:
     eval_spec = _eval_spec(candidate_id, backend_name or "stub")
     cache_key = f"cache-{candidate_id}"
-    run_reference = _run_reference(backend_status)
+    run_reference = _run_reference(backend_status, backend_name)
     if not feasible:
         return ScoredResult(
             candidate_id=candidate_id,
@@ -806,6 +831,366 @@ def test_cached_real_mixed_evidence_classes_cannot_certify() -> None:
     assert arm["authoritative"] is False
     assert arm["requires_inherited_evidence_class"] is True
     assert "evidence_class" not in arm
+
+
+def test_real_backend_mixed_evidence_classes_cannot_certify() -> None:
+    task = fidelity_module._FidelityTask(
+        index=0,
+        tier="high",
+        fn=_authoritative_mixed_perfect_high,
+        patch=RecipePatch({}),
+        feedstock_id=FEEDSTOCK_ID,
+        fidelity="high",
+        profile={"fidelities": {"high": {"backend_name": "alphamelts"}}},
+        candidate_id="fidelity-doe-000000-high",
+        kwargs={},
+    )
+    results = []
+    for index, evidence_class in enumerate(("melts", "magemin")):
+        result = _result(
+            f"fidelity-doe-{index:06d}-high",
+            oxygen_kg=1.0,
+            energy_kwh=2.0,
+            backend_name="alphamelts",
+            backend_status="ok",
+        )
+        assert result.run_reference is not None
+        results.append(
+            replace(
+                result,
+                run_reference=replace(
+                    result.run_reference,
+                    evidence_class=evidence_class,
+                ),
+            )
+        )
+
+    arm = fidelity_module._arm_backend_authority(
+        "high",
+        "high",
+        (task,),
+        results,
+    )
+
+    assert arm["backend_name"] == "alphamelts"
+    assert arm["backend_status"] == "ok"
+    assert arm["authoritative"] is False
+    assert "evidence_class" not in arm
+    assert "certification_allowed" not in arm
+
+def test_real_backend_same_result_evidence_carrier_disagreement_cannot_certify() -> None:
+    task = fidelity_module._FidelityTask(
+        index=0,
+        tier="high",
+        fn=_authoritative_mixed_perfect_high,
+        patch=RecipePatch({}),
+        feedstock_id=FEEDSTOCK_ID,
+        fidelity="high",
+        profile={"fidelities": {"high": {"backend_name": "alphamelts"}}},
+        candidate_id="fidelity-doe-000000-high",
+        kwargs={},
+    )
+    result = _result(
+        task.candidate_id,
+        oxygen_kg=1.0,
+        energy_kwh=2.0,
+        backend_name="alphamelts",
+        backend_status="ok",
+    )
+    assert result.run_reference is not None
+    result = replace(
+        result,
+        run_reference=RunReference(
+            status="ok",
+            trace={
+                "backend_name": "alphamelts",
+                "backend_status": "ok",
+                "backend_authoritative": True,
+                "evidence_class": "diagnostic-shadow",
+            },
+            backend_name="alphamelts",
+            backend_status="ok",
+            backend_authoritative=True,
+            evidence_class="melts",
+        ),
+    )
+
+    arm = fidelity_module._arm_backend_authority("high", "high", (task,), (result,))
+
+    assert arm["backend_name"] == "alphamelts"
+    assert arm["backend_status"] == "ok"
+    assert arm["authoritative"] is False
+    assert "evidence_class" not in arm
+    assert "certification_allowed" not in arm
+
+    queued_arm = fidelity_module._arm_backend_authority(
+        "high",
+        "high",
+        (task,),
+        (fidelity_module._queue_safe_result(result),),
+    )
+    assert queued_arm["authoritative"] is False
+    assert "evidence_class" not in queued_arm
+    assert "certification_allowed" not in queued_arm
+
+
+def test_real_backend_same_result_status_and_authority_disagreement_cannot_certify() -> None:
+    task = fidelity_module._FidelityTask(
+        index=0,
+        tier="high",
+        fn=_authoritative_mixed_perfect_high,
+        patch=RecipePatch({}),
+        feedstock_id=FEEDSTOCK_ID,
+        fidelity="high",
+        profile={"fidelities": {"high": {"backend_name": "alphamelts"}}},
+        candidate_id="fidelity-doe-000000-high",
+        kwargs={},
+    )
+    result = _result(
+        task.candidate_id,
+        oxygen_kg=1.0,
+        energy_kwh=2.0,
+        backend_name="alphamelts",
+        backend_status="ok",
+    )
+    result = replace(
+        result,
+        run_reference=RunReference(
+            status="ok",
+            trace={
+                "backend_name": "alphamelts",
+                "backend_status": "ok",
+                "backend_authoritative": True,
+                "evidence_class": "melts",
+            },
+            backend_name="alphamelts",
+            backend_status="unavailable",
+            backend_authoritative=False,
+            evidence_class="melts",
+        ),
+    )
+
+    arm = fidelity_module._arm_backend_authority("high", "high", (task,), (result,))
+
+    assert arm["backend_name"] == "alphamelts"
+    assert arm["backend_status"] == "mixed:ok,unavailable"
+    assert arm["authoritative"] is False
+    assert arm["certification_allowed"] is False
+
+    queued_arm = fidelity_module._arm_backend_authority(
+        "high",
+        "high",
+        (task,),
+        (fidelity_module._queue_safe_result(result),),
+    )
+    assert queued_arm["authoritative"] is False
+    assert queued_arm["certification_allowed"] is False
+
+
+def test_real_backend_inherited_evidence_requirement_cannot_certify() -> None:
+    task = fidelity_module._FidelityTask(
+        index=0,
+        tier="high",
+        fn=_authoritative_mixed_perfect_high,
+        patch=RecipePatch({}),
+        feedstock_id=FEEDSTOCK_ID,
+        fidelity="high",
+        profile={"fidelities": {"high": {"backend_name": "alphamelts"}}},
+        candidate_id="fidelity-doe-000000-high",
+        kwargs={},
+    )
+    result = _result(
+        task.candidate_id,
+        oxygen_kg=1.0,
+        energy_kwh=2.0,
+        backend_name="alphamelts",
+        backend_status="ok",
+    )
+    assert result.run_reference is not None
+    result = replace(
+        result,
+        run_reference=replace(
+            result.run_reference,
+            product_summary={
+                **dict(result.run_reference.product_summary),
+                "backend_name": "alphamelts",
+                "backend_status": "ok",
+                "backend_authoritative": True,
+                "evidence_class": "melts",
+                "certification_allowed": True,
+                "requires_inherited_evidence_class": True,
+            },
+        ),
+    )
+
+    arm = fidelity_module._arm_backend_authority("high", "high", (task,), (result,))
+
+    assert arm["backend_name"] == "alphamelts"
+    assert arm["backend_status"] == "ok"
+    assert arm["authoritative"] is False
+    assert arm["evidence_class"] == "melts"
+    assert arm["certification_allowed"] is False
+
+    queued_arm = fidelity_module._arm_backend_authority(
+        "high",
+        "high",
+        (task,),
+        (fidelity_module._queue_safe_result(result),),
+    )
+    assert queued_arm["authoritative"] is False
+    assert queued_arm["certification_allowed"] is False
+
+
+def test_real_backend_result_without_presented_evidence_cannot_certify() -> None:
+    task = fidelity_module._FidelityTask(
+        index=0,
+        tier="high",
+        fn=_authoritative_mixed_perfect_high,
+        patch=RecipePatch({}),
+        feedstock_id=FEEDSTOCK_ID,
+        fidelity="high",
+        profile={"fidelities": {"high": {"backend_name": "alphamelts"}}},
+        candidate_id="fidelity-doe-000000-high",
+        kwargs={},
+    )
+    reference = RunReference(
+        status="ok",
+        trace={
+            "backend_name": "alphamelts",
+            "backend_status": "ok",
+            "backend_authoritative": True,
+        },
+        backend_name="alphamelts",
+        backend_status="ok",
+        backend_authoritative=True,
+    )
+    object.__setattr__(reference, "evidence_class", None)
+    object.__setattr__(reference, "certification_allowed", None)
+    result = replace(
+        _result(
+            task.candidate_id,
+            oxygen_kg=1.0,
+            energy_kwh=2.0,
+            backend_name="alphamelts",
+            backend_status="ok",
+        ),
+        run_reference=reference,
+    )
+
+    arm = fidelity_module._arm_backend_authority("high", "high", (task,), (result,))
+
+    assert arm["backend_name"] == "alphamelts"
+    assert arm["backend_status"] == "ok"
+    assert arm["authoritative"] is False
+    assert "evidence_class" not in arm
+    assert "certification_allowed" not in arm
+
+
+@pytest.mark.parametrize(
+    "presented_name",
+    ("mixed:alphamelts,   ", "mixed:mixed:alphamelts"),
+)
+def test_real_backend_malformed_result_name_cannot_certify(
+    presented_name: str,
+) -> None:
+    task = fidelity_module._FidelityTask(
+        index=0,
+        tier="high",
+        fn=_authoritative_mixed_perfect_high,
+        patch=RecipePatch({}),
+        feedstock_id=FEEDSTOCK_ID,
+        fidelity="high",
+        profile={"fidelities": {"high": {"backend_name": "alphamelts"}}},
+        candidate_id="fidelity-doe-000000-high",
+        kwargs={},
+    )
+    result = _result(
+        task.candidate_id,
+        oxygen_kg=1.0,
+        energy_kwh=2.0,
+        backend_name="alphamelts",
+        backend_status="ok",
+    )
+    assert result.run_reference is not None
+    result = replace(
+        result,
+        run_reference=replace(
+            result.run_reference,
+            product_summary={"backend_name": presented_name},
+        ),
+    )
+
+    arm = fidelity_module._arm_backend_authority("high", "high", (task,), (result,))
+
+    assert arm["authoritative"] is False
+    assert arm["backend_name"].startswith("mixed:")
+
+
+def test_registered_diagnostic_backend_name_demotes_authority_without_changing_status() -> None:
+    backend_name = "diagnostic-shadow"
+    task = fidelity_module._FidelityTask(
+        index=0,
+        tier="high",
+        fn=_authoritative_mixed_perfect_high,
+        patch=RecipePatch({}),
+        feedstock_id=FEEDSTOCK_ID,
+        fidelity="high",
+        profile={"fidelities": {"high": {"backend_name": backend_name}}},
+        candidate_id="fidelity-doe-000000-high",
+        kwargs={},
+    )
+    result = _result(
+        task.candidate_id,
+        oxygen_kg=1.0,
+        energy_kwh=2.0,
+        backend_name=backend_name,
+        backend_status="ok",
+    )
+
+    arm = fidelity_module._arm_backend_authority("high", "high", (task,), (result,))
+
+    assert arm["backend_name"] == backend_name
+    assert arm["backend_status"] == "ok"
+    assert arm["evidence_class"] == backend_name
+    assert arm["authoritative"] is False
+
+
+def test_real_backend_preserves_presented_denied_evidence_and_cannot_certify() -> None:
+    task = fidelity_module._FidelityTask(
+        index=0,
+        tier="high",
+        fn=_authoritative_mixed_perfect_high,
+        patch=RecipePatch({}),
+        feedstock_id=FEEDSTOCK_ID,
+        fidelity="high",
+        profile={"fidelities": {"high": {"backend_name": "alphamelts"}}},
+        candidate_id="fidelity-doe-000000-high",
+        kwargs={},
+    )
+    result = _result(
+        task.candidate_id,
+        oxygen_kg=1.0,
+        energy_kwh=2.0,
+        backend_name="alphamelts",
+        backend_status="ok",
+    )
+    assert result.run_reference is not None
+    result = replace(
+        result,
+            run_reference=replace(
+                result.run_reference,
+                evidence_class="diagnostic-shadow",
+                certification_allowed=False,
+            ),
+    )
+
+    arm = fidelity_module._arm_backend_authority("high", "high", (task,), (result,))
+
+    assert arm["backend_name"] == "alphamelts"
+    assert arm["backend_status"] == "ok"
+    assert arm["evidence_class"] == "diagnostic-shadow"
+    assert arm["certification_allowed"] is False
+    assert arm["authoritative"] is False
 
 
 def test_fidelity_pair_drops_unequal_evalspec_hours_and_bounds(
