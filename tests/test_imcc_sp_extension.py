@@ -17,6 +17,7 @@ from simulator.melt_backend.imcc_sf04 import (
     load_datapack,
 )
 from simulator.melt_backend.sulfliq_matte import FES_MU0_1300K_J_PER_MOL
+from simulator.melt_backend.imcc_sf04.kernel import solve_imcc_sf04
 
 
 BASE_DATAPACK = Path(
@@ -127,6 +128,27 @@ def test_extension_flag_solves_and_labels_every_sp_output(tmp_path: Path) -> Non
     )
     assert result.labels.identity["model_id"] == "IMCC-SF04-EXT"
     for name in ("S", "P2O5", "FeS"):
+        assert result.labels.coverage[name] == "EXT-SP"
+    assert result.labels.coverage["SiO2"] == "A-published-imcc"
+
+
+def test_extension_pack_carries_identity_through_direct_kernel_path(
+    tmp_path: Path,
+) -> None:
+    pack = load_datapack(_write_migrated_delivered_ext_pack(tmp_path))
+    parent_mol = [
+        1.0 if name in {"SiO2", "MgO", "FeO", "S", "P2O5"} else 0.0
+        for name in pack.parent_oxides
+    ]
+    result = solve_imcc_sf04(
+        parent_mol,
+        1500.0,
+        pack.kernel_datapack,
+        allow_extrapolation=True,
+    )
+
+    assert result.labels.model_id == "IMCC-SF04-EXT"
+    for name in (*pack.extension_parents, *pack.extension_species):
         assert result.labels.coverage[name] == "EXT-SP"
     assert result.labels.coverage["SiO2"] == "A-published-imcc"
 

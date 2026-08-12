@@ -7,7 +7,6 @@ wt-to-mol basis converter, and a canonical trust-vocabulary label block.
 
 from __future__ import annotations
 
-import hashlib
 import json
 from dataclasses import dataclass, replace
 from fractions import Fraction
@@ -29,6 +28,11 @@ from simulator.melt_backend.imcc_sf04.kernel import (
     ImccRefusal,
     ImccResult,
     ImccTOutsideDatapackDomainError,
+    _PUBLISHED_DATAPACK_SHA256,
+    _PUBLISHED_MODEL_ID,
+    _label_loaded_datapack,
+    _published_datapack_manifest_hash,
+    label_research_datapack,
     solve_imcc_sf04,
 )
 
@@ -61,51 +65,7 @@ _EXPECTED_PARENT_OXIDES = (
     "K2O",
 )
 
-# Frozen from datapack v1.0.2: the published FC87/SF04 species set,
-# source-verified, with the three published A-sign corrections applied.
-_PUBLISHED_CORE_MANIFEST = (
-    ("Mg2SiO4", (1, 2, 0, 0, 0, 0, 0, 0)),
-    ("MgSiO3", (1, 1, 0, 0, 0, 0, 0, 0)),
-    ("MgAl2O4", (0, 1, 0, 0, 1, 0, 0, 0)),
-    ("MgTiO3", (0, 1, 0, 0, 0, 1, 0, 0)),
-    ("MgTi2O5", (0, 1, 0, 0, 0, 2, 0, 0)),
-    ("Mg2TiO4", (0, 2, 0, 0, 0, 1, 0, 0)),
-    ("Al6Si2O13", (2, 0, 0, 0, 3, 0, 0, 0)),
-    ("CaAl2O4", (0, 0, 0, 1, 1, 0, 0, 0)),
-    ("CaAl4O7", (0, 0, 0, 1, 2, 0, 0, 0)),
-    ("Ca12Al14O33", (0, 0, 0, 12, 7, 0, 0, 0)),
-    ("CaSiO3", (1, 0, 0, 1, 0, 0, 0, 0)),
-    ("CaAl2Si2O8", (2, 0, 0, 1, 1, 0, 0, 0)),
-    ("CaMgSi2O6", (2, 1, 0, 1, 0, 0, 0, 0)),
-    ("Ca2MgSi2O7", (2, 1, 0, 2, 0, 0, 0, 0)),
-    ("Ca2Al2SiO7", (1, 0, 0, 2, 1, 0, 0, 0)),
-    ("CaTiO3", (0, 0, 0, 1, 0, 1, 0, 0)),
-    ("Ca2SiO4", (1, 0, 0, 2, 0, 0, 0, 0)),
-    ("CaTiSiO5", (1, 0, 0, 1, 0, 1, 0, 0)),
-    ("FeTiO3", (0, 0, 1, 0, 0, 1, 0, 0)),
-    ("Fe2SiO4", (1, 0, 2, 0, 0, 0, 0, 0)),
-    ("FeAl2O4", (0, 0, 1, 0, 1, 0, 0, 0)),
-    ("CaAl12O19", (0, 0, 0, 1, 6, 0, 0, 0)),
-    ("Mg2Al4Si5O18", (5, 2, 0, 0, 2, 0, 0, 0)),
-    ("Na2SiO3", (1, 0, 0, 0, 0, 0, 1, 0)),
-    ("Na2Si2O5", (2, 0, 0, 0, 0, 0, 1, 0)),
-    ("NaAlSiO4", (1, 0, 0, 0, 0.5, 0, 0.5, 0)),
-    ("NaAlSi3O8", (3, 0, 0, 0, 0.5, 0, 0.5, 0)),
-    ("NaAlO2", (0, 0, 0, 0, 0.5, 0, 0.5, 0)),
-    ("Na2TiO3", (0, 0, 0, 0, 0, 1, 1, 0)),
-    ("NaAlSi2O6", (2, 0, 0, 0, 0.5, 0, 0.5, 0)),
-    ("K2SiO3", (1, 0, 0, 0, 0, 0, 0, 1)),
-    ("K2Si2O5", (2, 0, 0, 0, 0, 0, 0, 1)),
-    ("KAlSiO4", (1, 0, 0, 0, 0.5, 0, 0, 0.5)),
-    ("KAlSi3O8", (3, 0, 0, 0, 0.5, 0, 0, 0.5)),
-    ("KAlO2", (0, 0, 0, 0, 0.5, 0, 0, 0.5)),
-    ("KAlSi2O6", (2, 0, 0, 0, 0.5, 0, 0, 0.5)),
-    ("K2Si4O9", (4, 0, 0, 0, 0, 0, 0, 1)),
-    ("KCaAlSi2O7", (2, 0, 0, 1, 0.5, 0, 0, 0.5)),
-)
-_PUBLISHED_CORE_MANIFEST_SHA256 = (
-    "72740c3578059e6ee1a09e61fd727a1e2df5f62df84489e160152e553eb9c59f"
-)
+_PUBLISHED_CORE_ROWS = 38
 
 _SP_EXTENSION_MODEL_ID = "IMCC-SF04-EXT"
 _SP_EXTENSION_PARENTS = ("S", "P2O5")
@@ -132,29 +92,10 @@ class ImccMalformedDatapackError(ImccRefusal):
     code = "imcc_malformed_datapack"
 
 
-def _published_core_manifest_hash(
-    manifest: Sequence[tuple[str, Sequence[int | float]]],
-) -> str:
-    content = [
-        {
-            "complex": complex_name,
-            "nu": dict(zip(_EXPECTED_PARENT_OXIDES, coefficients)),
-        }
-        for complex_name, coefficients in manifest
-    ]
-    payload = json.dumps(
-        content,
-        ensure_ascii=True,
-        separators=(",", ":"),
-        sort_keys=True,
-    ).encode("utf-8")
-    return hashlib.sha256(payload).hexdigest()
+class ImccUnprovenDatapackError(ImccRefusal):
+    """Raised when adapter evaluation receives an unlabelled raw datapack."""
 
-
-if _published_core_manifest_hash(_PUBLISHED_CORE_MANIFEST) != (
-    _PUBLISHED_CORE_MANIFEST_SHA256
-):
-    raise RuntimeError("frozen IMCC-SF04 published-core manifest hash mismatch")
+    code = "imcc_unproven_datapack"
 
 
 class ImccCompositionOutsideValidatedEnvelopeError(ImccRefusal):
@@ -177,9 +118,12 @@ class ImccLoadedDatapack:
     version: str
     parent_oxides: Sequence[str]
     domain_basis: Sequence[str]
-    model_id: str = "IMCC-SF04"
     extension_parents: Sequence[str] = ()
     extension_species: Sequence[str] = ()
+
+    @property
+    def model_id(self) -> str:
+        return self.kernel_datapack.model_id
 
 
 @dataclass(frozen=True)
@@ -201,65 +145,59 @@ def _as_fraction(value: Any) -> Fraction:
     raise TypeError(f"cannot parse {value!r} as a rational")
 
 
-def _validate_published_core(rows: Any) -> list[dict[str, Any]]:
-    if not isinstance(rows, list) or len(rows) != len(_PUBLISHED_CORE_MANIFEST):
+def _published_core_manifest_payload(
+    data: Mapping[str, Any],
+    *,
+    model_id: str,
+    version: str,
+) -> dict[str, Any]:
+    payload = {
+        key: value
+        for key, value in data.items()
+        if key not in {"model_id", "sp_extension"}
+    }
+    if model_id == _SP_EXTENSION_MODEL_ID:
+        version = version.partition("-ext-sp-")[0]
+    payload["model_id"] = _PUBLISHED_MODEL_ID
+    payload["imcc_sf04_datapack_version"] = version
+    return payload
+
+
+def _validate_published_core(
+    data: Mapping[str, Any],
+    *,
+    model_id: str,
+    version: str,
+) -> tuple[list[dict[str, Any]], str]:
+    rows = data.get("rows")
+    if not isinstance(rows, list) or len(rows) != _PUBLISHED_CORE_ROWS:
         raise ImccMalformedDatapackError(
             "datapack must contain exactly 38 published-core rows, got "
             f"{len(rows) if isinstance(rows, list) else None}"
         )
-
-    expected_parent_set = set(_EXPECTED_PARENT_OXIDES)
-    for idx, (row, expected) in enumerate(zip(rows, _PUBLISHED_CORE_MANIFEST)):
+    for idx, row in enumerate(rows):
         if not isinstance(row, dict):
             raise ImccMalformedDatapackError(
                 f"published core row {idx} is not an object"
             )
-        nu = row.get("nu")
-        if not isinstance(nu, dict):
-            raise ImccMalformedDatapackError(
-                f"published core row {idx} missing 'nu' object"
+    try:
+        content_hash = _published_datapack_manifest_hash(
+            _published_core_manifest_payload(
+                data,
+                model_id=model_id,
+                version=version,
             )
-        unknown_nu = sorted(set(nu) - expected_parent_set)
-        if unknown_nu:
-            raise ImccMalformedDatapackError(
-                f"published core row {idx} nu has unknown key {unknown_nu[0]!r}"
-            )
-        missing_nu = sorted(expected_parent_set - set(nu))
-        if missing_nu:
-            raise ImccMalformedDatapackError(
-                f"published core row {idx} nu is missing key {missing_nu[0]!r}"
-            )
-
-        expected_name, expected_coefficients = expected
-        complex_name = row.get("complex")
-        if complex_name != expected_name:
-            raise ImccMalformedDatapackError(
-                f"published core row {idx} complex {complex_name!r} does not match "
-                f"frozen manifest complex {expected_name!r}"
-            )
-        coefficients = tuple(nu[parent] for parent in _EXPECTED_PARENT_OXIDES)
-        if coefficients != expected_coefficients:
-            mismatch = next(
-                parent
-                for parent, actual, frozen in zip(
-                    _EXPECTED_PARENT_OXIDES,
-                    coefficients,
-                    expected_coefficients,
-                )
-                if actual != frozen
-            )
-            raise ImccMalformedDatapackError(
-                f"published core row {idx} nu[{mismatch!r}]={nu[mismatch]!r} "
-                "does not match frozen manifest"
-            )
-        if _published_core_manifest_hash(((complex_name, coefficients),)) != (
-            _published_core_manifest_hash(((expected_name, expected_coefficients),))
-        ):
-            raise ImccMalformedDatapackError(
-                f"published core row {idx} numeric content does not match "
-                "the frozen manifest encoding"
-            )
-    return rows
+        )
+    except (TypeError, ValueError) as exc:
+        raise ImccMalformedDatapackError(
+            "published IMCC datapack cannot be canonically serialized"
+        ) from exc
+    if content_hash != _PUBLISHED_DATAPACK_SHA256:
+        raise ImccMalformedDatapackError(
+            "published IMCC datapack canonical hash mismatch: "
+            f"expected {_PUBLISHED_DATAPACK_SHA256}, got {content_hash}"
+        )
+    return rows, content_hash
 
 
 def _build_nu_vector(
@@ -289,9 +227,9 @@ def _wt_to_mol(vector: np.ndarray, parent_oxides: Sequence[str]) -> np.ndarray:
 def load_datapack(path: str | Path) -> ImccLoadedDatapack:
     """Load an IMCC-SF04 datapack JSON into the kernel datapack object.
 
-    Validates the published 8-parent/38-row core. ``IMCC-SF04-EXT`` packs may
-    add the separately labelled ``sp_extension`` section; the published core
-    remains byte-for-byte and count-for-count distinct from extension rows.
+    Validates the complete canonical published datapack hash. ``IMCC-SF04-EXT``
+    packs may add the separately labelled ``sp_extension`` section; their base
+    datapack projects to the same frozen published identity.
     """
     path = Path(path)
     try:
@@ -305,6 +243,9 @@ def load_datapack(path: str | Path) -> ImccLoadedDatapack:
         raise ImccMalformedDatapackError(
             f"datapack file not found: {path}"
         ) from exc
+
+    if not isinstance(data, dict):
+        raise ImccMalformedDatapackError("datapack JSON root must be an object")
 
     version = data.get("imcc_sf04_datapack_version")
     if not isinstance(version, str) or not version:
@@ -320,8 +261,6 @@ def load_datapack(path: str | Path) -> ImccLoadedDatapack:
         )
     base_parents = tuple(base_parents)
 
-    rows = _validate_published_core(data.get("rows"))
-
     model_id = data.get("model_id", "IMCC-SF04")
     sp_extension = data.get("sp_extension")
     extension_parents: tuple[str, ...] = ()
@@ -336,6 +275,14 @@ def load_datapack(path: str | Path) -> ImccLoadedDatapack:
             raise ImccMalformedDatapackError(
                 "sp_extension requires model_id='IMCC-SF04-EXT'"
             )
+
+    rows, published_manifest_sha256 = _validate_published_core(
+        data,
+        model_id=model_id,
+        version=version,
+    )
+
+    if sp_extension is not None:
         if not isinstance(sp_extension, dict):
             raise ImccMalformedDatapackError("sp_extension must be an object")
         if sp_extension.get("enable_flag") != _SP_EXTENSION_FLAG:
@@ -481,17 +428,26 @@ def load_datapack(path: str | Path) -> ImccLoadedDatapack:
         version=version,
         parent_oxides=parents,
     )
+    extension_species = tuple(str(row["complex"]) for row in extension_rows)
+    extension_names = set(extension_parents) | set(extension_species)
+    coverage = {
+        name: (_SP_EXTENSION_TIER if name in extension_names else "A-published-imcc")
+        for name in (*parents, *reactions)
+    }
+    kernel_datapack = _label_loaded_datapack(
+        kernel_datapack,
+        model_id=model_id,
+        coverage=coverage,
+        published_manifest_sha256=published_manifest_sha256,
+    )
 
     return ImccLoadedDatapack(
         kernel_datapack=kernel_datapack,
         version=version,
         parent_oxides=parents,
         domain_basis=tuple(domain_basis),
-        model_id=model_id,
         extension_parents=extension_parents,
-        extension_species=tuple(
-            str(row["complex"]) for row in extension_rows
-        ),
+        extension_species=extension_species,
     )
 
 
@@ -532,7 +488,8 @@ def evaluate(
     T_K:
         Temperature in Kelvin.
     pack:
-        Loaded datapack (``ImccLoadedDatapack``) or a raw kernel datapack.
+        Loaded datapack, or a raw kernel datapack labelled by
+        ``label_research_datapack()``. Unlabelled raw packs are refused.
     basis:
         Declared normalization basis in the same units as ``basis_type``. If
         ``None``, the composition sum is used.
@@ -564,18 +521,24 @@ def evaluate(
     # Resolve the kernel datapack and metadata.
     if isinstance(pack, ImccLoadedDatapack):
         kernel_pack = pack.kernel_datapack
-        pack_version = pack.version
         parent_oxides = pack.parent_oxides
-        model_id = pack.model_id
         extension_parents = tuple(pack.extension_parents)
-        extension_species = tuple(pack.extension_species)
     else:
         kernel_pack = pack
-        pack_version = pack.version
         parent_oxides = pack.parent_oxides
-        model_id = "IMCC-SF04"
-        extension_parents = ()
-        extension_species = ()
+        extension_parents = tuple(
+            name for name in _SP_EXTENSION_PARENTS if name in parent_oxides
+        )
+
+    if not kernel_pack.identity_is_proven:
+        raise ImccUnprovenDatapackError(
+            "raw ImccDatapack has no proven identity; load a frozen JSON pack "
+            "with load_datapack() or apply explicit non-published provenance "
+            "with label_research_datapack()"
+        )
+
+    pack_version = kernel_pack.version
+    model_id = kernel_pack.model_id
 
     supplied_sp_names: set[str] = set()
     if isinstance(composition, Mapping):
@@ -710,12 +673,8 @@ def evaluate(
         "model_id": model_id,
         "datapack_version": pack_version,
     }
-    sp_names = set(extension_parents) | set(extension_species)
-    coverage: Mapping[str, str] = {
-        name: (_SP_EXTENSION_TIER if name in sp_names else "A-published-imcc")
-        for name in result.species_names
-    }
-    trust = _IMCC_EVIDENCE_CLASS_CANONICAL
+    coverage: Mapping[str, str] = result.labels.coverage
+    trust = result.labels.evidence_class
 
     adapter_labels = ImccAdapterLabels(
         identity=identity,

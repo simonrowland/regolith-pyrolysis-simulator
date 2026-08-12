@@ -14,6 +14,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
+from simulator.fidelity_vocabulary import backend_name_denies_authority
 from simulator.melt_backend.imcc_sf04 import (
     ImccDatapack,
     ImccComponentOutsideDomainError,
@@ -22,11 +23,11 @@ from simulator.melt_backend.imcc_sf04 import (
     ImccNonconvergenceError,
     ImccTOutsideDatapackDomainError,
     evaluate,
+    label_research_datapack,
 )
 
-# The raw kernel entry point is deliberately NOT package-exported (milestone-2 P1-5:
-# the adapter is the sole public API; its trust token is structurally certification-
-# denied while the kernel's is not). Kernel tests import it from the module directly.
+# The raw kernel entry point is deliberately NOT package-exported. Kernel tests
+# import it from the module directly and require unproven packs to stay denied.
 from simulator.melt_backend.imcc_sf04.kernel import solve_imcc_sf04
 from simulator.melt_backend.imcc_sf04.kernel import _active_residual, LOG10
 
@@ -348,20 +349,22 @@ def test_log_space_stiff_synthetic() -> None:
     rel = assert_solve_ok(res, pack)
     assert np.all(res.parent_activity >= 0.0)
     assert np.all(np.isfinite(res.parent_gamma))
-    assert res.labels.model_id == "IMCC-SF04"
-    assert res.labels.evidence_class == "diagnostic-shadow"
+    assert res.labels.model_id == "internal-analytical"
+    assert backend_name_denies_authority(res.labels.evidence_class)
     assert rel <= 1.0e-12
 
 
-def test_result_labels_and_identity() -> None:
+def test_raw_result_labels_default_to_denied_untrusted_identity() -> None:
     pack = make_ab_datapack(A=0.0, B=0.0, version="r2.1-test")
     parent = np.array([0.4, 0.6])
     res = solve_imcc_sf04(parent, 1200.0, pack)
-    assert res.labels.model_id == "IMCC-SF04"
+    assert res.labels.model_id == "internal-analytical"
+    assert backend_name_denies_authority(res.labels.model_id)
     assert res.labels.datapack_version == "r2.1-test"
-    assert res.labels.evidence_class == "diagnostic-shadow"
+    assert res.labels.evidence_class == "internal-analytical"
+    assert backend_name_denies_authority(res.labels.evidence_class)
     for name in res.species_names:
-        assert res.labels.coverage[name] == "A-published-imcc"
+        assert res.labels.coverage[name] == "internal-analytical"
     assert res.extrapolated is False
 
 
@@ -624,7 +627,7 @@ def make_rung3_datapack() -> ImccDatapack:
     for column, (_name, stoich, _A, _B, _domain) in enumerate(_RUNG3_COMPLEXES):
         for parent, coefficient in stoich.items():
             nu[_RUNG3_PARENTS.index(parent), column] = coefficient
-    return ImccDatapack(
+    raw = ImccDatapack(
         reactions=tuple(row[0] for row in _RUNG3_COMPLEXES),
         nu=nu,
         A=np.array([row[2] for row in _RUNG3_COMPLEXES]),
@@ -632,6 +635,11 @@ def make_rung3_datapack() -> ImccDatapack:
         domains=[row[4] for row in _RUNG3_COMPLEXES],
         version="rung3-regression-v1.0.1",
         parent_oxides=_RUNG3_PARENTS,
+    )
+    return label_research_datapack(
+        raw,
+        model_id="IMCC-SF04-RE",
+        coverage="RE-regression",
     )
 
 

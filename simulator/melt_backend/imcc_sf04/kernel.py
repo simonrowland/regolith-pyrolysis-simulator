@@ -12,8 +12,12 @@ The gamma_i = x_i*/x_i subtlety (different denominators) is explicitly noted.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
+from decimal import Decimal
+import hashlib
+import json
 import math
+from types import MappingProxyType
 from typing import Any, Mapping, Sequence
 
 import numpy as np
@@ -23,6 +27,27 @@ from scipy.optimize import least_squares
 LOG10 = math.log(10.0)
 _CONTINUATION_LOGK_STEP = 2.0 * LOG10
 _CONTINUATION_INITIAL_COMPLEX_X = 1.0e-4
+_UNTRUSTED_IDENTITY_TOKEN = "internal-analytical"
+_PUBLISHED_MODEL_ID = "IMCC-SF04"
+_PUBLISHED_EXTENSION_MODEL_ID = "IMCC-SF04-EXT"
+_PUBLISHED_COVERAGE = "A-published-imcc"
+_PUBLISHED_PARENT_OXIDES = (
+    "SiO2",
+    "MgO",
+    "FeO",
+    "CaO",
+    "Al2O3",
+    "TiO2",
+    "Na2O",
+    "K2O",
+)
+_PUBLISHED_CORE_ROWS = 38
+# Complete canonical v1.0.2 published FC87/SF04 datapack, including every
+# field of every row and the top-level identity/version. Changing this digest
+# is deliberate published-datapack re-versioning, never a silent row edit.
+_PUBLISHED_DATAPACK_SHA256 = (
+    "f2b479cd54e3c82704a5863fcc06836f72045375d9a8c7f8d2fad19e98f75d05"
+)
 
 
 # --------------------------------------------------------------------------- #
@@ -61,6 +86,31 @@ class ImccNonconvergenceError(ImccRefusal):
 # --------------------------------------------------------------------------- #
 # Data pack
 # --------------------------------------------------------------------------- #
+
+
+@dataclass(frozen=True)
+class _ImccDatapackIdentity:
+    model_id: str
+    evidence_class: str
+    coverage: Mapping[str, str]
+    proven: bool
+
+
+def _untrusted_datapack_identity() -> _ImccDatapackIdentity:
+    return _ImccDatapackIdentity(
+        model_id=_UNTRUSTED_IDENTITY_TOKEN,
+        evidence_class=_UNTRUSTED_IDENTITY_TOKEN,
+        coverage=MappingProxyType({}),
+        proven=False,
+    )
+
+
+def _immutable_array_copy(values: np.ndarray) -> np.ndarray:
+    contiguous = np.ascontiguousarray(values)
+    return np.frombuffer(
+        contiguous.tobytes(),
+        dtype=contiguous.dtype,
+    ).reshape(contiguous.shape)
 
 
 @dataclass(frozen=True)
@@ -103,6 +153,12 @@ class ImccDatapack:
             "K2O",
         )
     )
+    _identity: _ImccDatapackIdentity = field(
+        default_factory=_untrusted_datapack_identity,
+        init=False,
+        repr=False,
+        compare=False,
+    )
 
     def __post_init__(self) -> None:
         # Convert to arrays for shape validation and arithmetic.
@@ -131,6 +187,9 @@ class ImccDatapack:
             raise ValueError("nu must be non-negative")
         if not np.all(np.isfinite(A)) or not np.all(np.isfinite(B)):
             raise ValueError("A and B must be finite")
+        object.__setattr__(self, "reactions", tuple(self.reactions))
+        object.__setattr__(self, "domains", tuple(self.domains))
+        object.__setattr__(self, "parent_oxides", tuple(self.parent_oxides))
         object.__setattr__(self, "nu", nu)
         object.__setattr__(self, "A", A)
         object.__setattr__(self, "B", B)
@@ -146,6 +205,185 @@ class ImccDatapack:
     @property
     def n_species(self) -> int:
         return self.n_parents + self.n_complexes
+
+    @property
+    def model_id(self) -> str:
+        return self._identity.model_id
+
+    @property
+    def evidence_class(self) -> str:
+        return self._identity.evidence_class
+
+    @property
+    def coverage(self) -> Mapping[str, str]:
+        return self._identity.coverage
+
+    @property
+    def identity_is_proven(self) -> bool:
+        return self._identity.proven
+
+
+def _canonical_published_serialization(value: Any) -> bytes:
+    """Serialize JSON data with sorted keys and value-normalized numbers."""
+
+    def encode(item: Any) -> str:
+        if item is None:
+            return "null"
+        if item is True:
+            return "true"
+        if item is False:
+            return "false"
+        if isinstance(item, (int, float)):
+            number = Decimal(str(item))
+            if not number.is_finite():
+                raise ValueError("canonical manifest numbers must be finite")
+            if number == 0:
+                return "0"
+            token = format(number, "f")
+            if "." in token:
+                token = token.rstrip("0").rstrip(".")
+            return token
+        if isinstance(item, str):
+            return json.dumps(item, ensure_ascii=True, separators=(",", ":"))
+        if isinstance(item, (list, tuple)):
+            return "[" + ",".join(encode(member) for member in item) + "]"
+        if isinstance(item, Mapping):
+            if not all(isinstance(key, str) for key in item):
+                raise TypeError("canonical manifest object keys must be strings")
+            members = (
+                json.dumps(key, ensure_ascii=True, separators=(",", ":"))
+                + ":"
+                + encode(item[key])
+                for key in sorted(item)
+            )
+            return "{" + ",".join(members) + "}"
+        raise TypeError(f"unsupported canonical manifest value {type(item).__name__}")
+
+    return encode(value).encode("utf-8")
+
+
+def _published_datapack_manifest_hash(value: Mapping[str, Any]) -> str:
+    return hashlib.sha256(_canonical_published_serialization(value)).hexdigest()
+
+
+def _datapack_with_identity(
+    datapack: ImccDatapack,
+    *,
+    model_id: str,
+    coverage: str | Mapping[str, str],
+    published_manifest_sha256: str | None = None,
+) -> ImccDatapack:
+    species_names = tuple(datapack.parent_oxides) + tuple(datapack.reactions)
+    if len(set(species_names)) != len(species_names):
+        raise ValueError("datapack parent and reaction names must be globally unique")
+    coverage_by_species = (
+        {name: coverage for name in species_names}
+        if isinstance(coverage, str)
+        else dict(coverage)
+    )
+    missing = sorted(set(species_names) - set(coverage_by_species))
+    extra = sorted(set(coverage_by_species) - set(species_names))
+    if missing or extra:
+        raise ValueError(
+            "datapack coverage must exactly match species; "
+            f"missing={missing}, extra={extra}"
+        )
+    if not isinstance(model_id, str) or not model_id:
+        raise ValueError("datapack model_id must be a non-empty string")
+    if not all(
+        isinstance(label, str) and label for label in coverage_by_species.values()
+    ):
+        raise ValueError("datapack coverage labels must be non-empty strings")
+    published_species = {
+        name
+        for name, label in coverage_by_species.items()
+        if label == _PUBLISHED_COVERAGE
+    }
+    claims_published = model_id == _PUBLISHED_MODEL_ID or bool(published_species)
+    if claims_published:
+        if model_id not in {_PUBLISHED_MODEL_ID, _PUBLISHED_EXTENSION_MODEL_ID}:
+            raise ValueError(
+                "published IMCC coverage requires a recognized IMCC model identity"
+            )
+        if published_manifest_sha256 != _PUBLISHED_DATAPACK_SHA256:
+            raise ValueError(
+                "published IMCC identity requires the frozen complete canonical "
+                "datapack hash"
+            )
+        expected_published_species = set(_PUBLISHED_PARENT_OXIDES) | set(
+            datapack.reactions[:_PUBLISHED_CORE_ROWS]
+        )
+        if published_species != expected_published_species:
+            raise ValueError(
+                "A-published-imcc coverage must exactly match the frozen core"
+            )
+        if model_id == _PUBLISHED_MODEL_ID and (
+            datapack.n_parents != len(_PUBLISHED_PARENT_OXIDES)
+            or datapack.n_complexes != _PUBLISHED_CORE_ROWS
+        ):
+            raise ValueError(
+                "plain IMCC-SF04 identity cannot include extension rows or parents"
+            )
+
+    labelled = replace(
+        datapack,
+        nu=_immutable_array_copy(datapack.nu),
+        A=_immutable_array_copy(datapack.A),
+        B=_immutable_array_copy(datapack.B),
+    )
+    object.__setattr__(
+        labelled,
+        "_identity",
+        _ImccDatapackIdentity(
+            model_id=model_id,
+            evidence_class=_UNTRUSTED_IDENTITY_TOKEN,
+            coverage=MappingProxyType(coverage_by_species),
+            proven=True,
+        ),
+    )
+    return labelled
+
+
+def label_research_datapack(
+    datapack: ImccDatapack,
+    *,
+    model_id: str,
+    coverage: str | Mapping[str, str],
+) -> ImccDatapack:
+    """Return a non-published raw pack with explicit research provenance.
+
+    This is the supported construction path for research scripts that build
+    ``ImccDatapack`` directly. Published identity and coverage are refused;
+    only ``load_datapack()`` can earn those labels from the frozen manifest.
+    """
+    coverage_values = (
+        (coverage,) if isinstance(coverage, str) else tuple(coverage.values())
+    )
+    if model_id == _PUBLISHED_MODEL_ID or _PUBLISHED_COVERAGE in coverage_values:
+        raise ValueError(
+            "research datapacks cannot claim published IMCC identity or coverage"
+        )
+    return _datapack_with_identity(
+        datapack,
+        model_id=model_id,
+        coverage=coverage,
+    )
+
+
+def _label_loaded_datapack(
+    datapack: ImccDatapack,
+    *,
+    model_id: str,
+    coverage: Mapping[str, str],
+    published_manifest_sha256: str | None = None,
+) -> ImccDatapack:
+    """Attach loader-proven identity after adapter manifest validation."""
+    return _datapack_with_identity(
+        datapack,
+        model_id=model_id,
+        coverage=coverage,
+        published_manifest_sha256=published_manifest_sha256,
+    )
 
 
 # --------------------------------------------------------------------------- #
@@ -164,9 +402,9 @@ class ImccConvergence:
 
 @dataclass(frozen=True)
 class ImccLabels:
-    model_id: str = "IMCC-SF04"
+    model_id: str = _UNTRUSTED_IDENTITY_TOKEN
     datapack_version: str = ""
-    evidence_class: str = "diagnostic-shadow"
+    evidence_class: str = _UNTRUSTED_IDENTITY_TOKEN
     coverage: Mapping[str, str] = field(default_factory=dict)
 
 
@@ -676,9 +914,13 @@ def solve_imcc_sf04(
     )
 
     labels = ImccLabels(
+        model_id=datapack.model_id,
         datapack_version=datapack.version,
-        coverage={name: "A-published-imcc" for name in species_names},
-        evidence_class="diagnostic-shadow",
+        coverage={
+            name: datapack.coverage.get(name, _UNTRUSTED_IDENTITY_TOKEN)
+            for name in species_names
+        },
+        evidence_class=datapack.evidence_class,
     )
 
     return ImccResult(

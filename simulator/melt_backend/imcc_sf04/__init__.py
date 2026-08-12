@@ -18,7 +18,9 @@ from simulator.melt_backend.imcc_sf04.adapter import (
     ImccResult,
     ImccSPComponentRequiresExtensionError,
     ImccTOutsideDatapackDomainError,
+    ImccUnprovenDatapackError,
     evaluate,
+    label_research_datapack,
     load_datapack,
 )
 
@@ -28,7 +30,9 @@ __all__ = [
     "ImccCompositionOutsideValidatedEnvelopeError",
     "ImccLoadedDatapack",
     "ImccMalformedDatapackError",
+    "ImccUnprovenDatapackError",
     "evaluate",
+    "label_research_datapack",
     "load_datapack",
     # Kernel API (chunk 2)
     "ImccDatapack",

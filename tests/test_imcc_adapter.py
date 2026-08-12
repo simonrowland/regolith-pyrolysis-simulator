@@ -20,15 +20,22 @@ from simulator.melt_backend.imcc_sf04 import (
     ImccComponentOutsideDomainError,
     ImccCompositionOutsideValidatedEnvelopeError,
     ImccCompositionIncompleteError,
+    ImccDatapack,
     ImccFerricInputUnsupportedError,
     ImccLoadedDatapack,
     ImccMalformedDatapackError,
     ImccNonconvergenceError,
     ImccTOutsideDatapackDomainError,
+    ImccUnprovenDatapackError,
     evaluate,
+    label_research_datapack,
     load_datapack,
 )
-from simulator.melt_backend.imcc_sf04.kernel import ImccRefusal
+from simulator.melt_backend.imcc_sf04.kernel import (
+    ImccRefusal,
+    _label_loaded_datapack,
+    solve_imcc_sf04,
+)
 
 
 DATAPACK_PATH = Path(
@@ -53,6 +60,8 @@ def test_load_datapack_roundtrip() -> None:
     pack = load_datapack(DATAPACK_PATH)
     assert isinstance(pack, ImccLoadedDatapack)
     assert pack.version == "1.0.2"
+    assert pack.model_id == "IMCC-SF04"
+    assert set(pack.kernel_datapack.coverage.values()) == {"A-published-imcc"}
     assert pack.parent_oxides == (
         "SiO2",
         "MgO",
@@ -254,8 +263,7 @@ def test_refusal_contaminated_published_core_extension_row(tmp_path: Path) -> No
     with pytest.raises(ImccMalformedDatapackError) as exc:
         load_datapack(bad_path)
     assert exc.value.code == "imcc_malformed_datapack"
-    assert "published core row 0" in str(exc.value)
-    assert "unknown key 'S'" in str(exc.value)
+    assert "canonical hash mismatch" in str(exc.value)
 
 
 def test_refusal_published_core_unknown_nu_key(tmp_path: Path) -> None:
@@ -266,14 +274,13 @@ def test_refusal_published_core_unknown_nu_key(tmp_path: Path) -> None:
 
     with pytest.raises(ImccMalformedDatapackError) as exc:
         load_datapack(bad_path)
-    assert "published core row 1" in str(exc.value)
-    assert "unknown key 'MnO'" in str(exc.value)
+    assert "canonical hash mismatch" in str(exc.value)
 
 
 @pytest.mark.parametrize(
-    ("field", "value", "message"),
+    ("field", "value"),
     [
-        ("complex", "FeS", "complex 'FeS'"),
+        ("complex", "FeS"),
         (
             "nu",
             {
@@ -286,12 +293,11 @@ def test_refusal_published_core_unknown_nu_key(tmp_path: Path) -> None:
                 "Na2O": 0,
                 "K2O": 0,
             },
-            "nu['MgO']=3",
         ),
     ],
 )
 def test_refusal_published_core_manifest_deviation(
-    tmp_path: Path, field: str, value: object, message: str
+    tmp_path: Path, field: str, value: object
 ) -> None:
     data = json.loads(DATAPACK_PATH.read_text())
     data["rows"][0][field] = value
@@ -300,8 +306,245 @@ def test_refusal_published_core_manifest_deviation(
 
     with pytest.raises(ImccMalformedDatapackError) as exc:
         load_datapack(bad_path)
-    assert "published core row 0" in str(exc.value)
-    assert message in str(exc.value)
+    assert "canonical hash mismatch" in str(exc.value)
+
+
+@pytest.mark.parametrize(("field", "delta"), [("A", 0.5), ("B", -12.0)])
+def test_refusal_published_core_altered_thermochemistry(
+    tmp_path: Path, field: str, delta: float
+) -> None:
+    data = json.loads(DATAPACK_PATH.read_text())
+    data["rows"][0][field] += delta
+    bad_path = tmp_path / f"altered-{field}.json"
+    bad_path.write_text(json.dumps(data))
+
+    with pytest.raises(ImccMalformedDatapackError) as exc:
+        load_datapack(bad_path)
+    assert "canonical hash mismatch" in str(exc.value)
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("provenance_class", "extension-compound-thermo"),
+        ("T_domain_K", [1.0, 1.0e9]),
+        ("T_domain_basis", "forged-domain"),
+        ("source", "forged-source"),
+        ("future_identity_field", "forged-future-value"),
+    ],
+)
+def test_refusal_published_core_any_row_field_hash_deviation(
+    tmp_path: Path, field: str, value: object
+) -> None:
+    data = json.loads(DATAPACK_PATH.read_text())
+    data["rows"][0][field] = value
+    bad_path = tmp_path / f"altered-{field}.json"
+    bad_path.write_text(json.dumps(data))
+
+    with pytest.raises(ImccMalformedDatapackError) as exc:
+        load_datapack(bad_path)
+    assert exc.value.code == "imcc_malformed_datapack"
+    assert "canonical hash mismatch" in str(exc.value)
+
+
+def test_refusal_published_core_extra_row_hash_deviation(tmp_path: Path) -> None:
+    data = json.loads(DATAPACK_PATH.read_text())
+    extra = dict(data["rows"][0])
+    extra["complex"] = "forged-row-39"
+    data["rows"].append(extra)
+    bad_path = tmp_path / "extra-row.json"
+    bad_path.write_text(json.dumps(data))
+
+    with pytest.raises(ImccMalformedDatapackError) as exc:
+        load_datapack(bad_path)
+    assert "exactly 38 published-core rows" in str(exc.value)
+
+
+def test_refusal_published_datapack_version_hash_deviation(tmp_path: Path) -> None:
+    data = json.loads(DATAPACK_PATH.read_text())
+    data["imcc_sf04_datapack_version"] = "1.0.3"
+    bad_path = tmp_path / "altered-version.json"
+    bad_path.write_text(json.dumps(data))
+
+    with pytest.raises(ImccMalformedDatapackError) as exc:
+        load_datapack(bad_path)
+    assert "canonical hash mismatch" in str(exc.value)
+
+
+def test_canonical_manifest_normalizes_equivalent_json_numbers(
+    tmp_path: Path,
+) -> None:
+    data = json.loads(DATAPACK_PATH.read_text())
+    data["rows"][0]["row"] = 1.0
+    data["rows"][0]["nu"]["SiO2"] = 1.0
+    data["rows"][0]["T_domain_K"] = [1700.0, 3000.0]
+    equivalent_path = tmp_path / "equivalent-numbers.json"
+    equivalent_path.write_text(json.dumps(data))
+
+    pack = load_datapack(equivalent_path)
+    assert pack.version == "1.0.2"
+    assert pack.model_id == "IMCC-SF04"
+    assert set(pack.kernel_datapack.coverage.values()) == {"A-published-imcc"}
+
+
+def test_refusal_raw_datapack_through_adapter() -> None:
+    loaded = load_datapack(DATAPACK_PATH)
+    source = loaded.kernel_datapack
+    raw = ImccDatapack(
+        reactions=source.reactions,
+        nu=source.nu,
+        A=source.A,
+        B=source.B,
+        domains=source.domains,
+        version=source.version,
+        parent_oxides=source.parent_oxides,
+    )
+
+    with pytest.raises(ImccUnprovenDatapackError) as exc:
+        evaluate(_make_uniform_composition(loaded), 2500.0, raw)
+    assert exc.value.code == "imcc_unproven_datapack"
+
+
+def test_explicit_research_datapack_labels_survive_adapter() -> None:
+    loaded = load_datapack(DATAPACK_PATH)
+    source = loaded.kernel_datapack
+    raw = ImccDatapack(
+        reactions=source.reactions,
+        nu=source.nu,
+        A=source.A,
+        B=source.B,
+        domains=source.domains,
+        version="research-test",
+        parent_oxides=source.parent_oxides,
+    )
+    labelled = label_research_datapack(
+        raw,
+        model_id="IMCC-SF04-RE",
+        coverage="RE-research",
+    )
+
+    result = evaluate(_make_uniform_composition(loaded), 2500.0, labelled)
+    assert result.labels.identity["model_id"] == "IMCC-SF04-RE"
+    assert set(result.labels.coverage.values()) == {"RE-research"}
+    assert backend_name_denies_authority(result.labels.trust)
+
+
+@pytest.mark.parametrize(
+    ("model_id", "coverage"),
+    [
+        ("IMCC-SF04", "RE-research"),
+        ("IMCC-SF04-RE", "A-published-imcc"),
+    ],
+)
+def test_research_labelling_helper_cannot_claim_published_identity(
+    model_id: str, coverage: str
+) -> None:
+    loaded = load_datapack(DATAPACK_PATH)
+    with pytest.raises(ValueError, match="cannot claim published"):
+        label_research_datapack(
+            loaded.kernel_datapack,
+            model_id=model_id,
+            coverage=coverage,
+        )
+
+
+def test_loaded_published_pack_carries_identity_into_kernel() -> None:
+    pack = load_datapack(DATAPACK_PATH)
+    result = solve_imcc_sf04(
+        [0.125] * len(pack.parent_oxides),
+        2500.0,
+        pack.kernel_datapack,
+    )
+    assert result.labels.model_id == "IMCC-SF04"
+    assert set(result.labels.coverage.values()) == {"A-published-imcc"}
+    assert backend_name_denies_authority(result.labels.evidence_class)
+
+
+def test_loaded_pack_identity_inputs_are_immutable() -> None:
+    kernel = load_datapack(DATAPACK_PATH).kernel_datapack
+    assert isinstance(kernel.reactions, tuple)
+    for array in (kernel.nu, kernel.A, kernel.B):
+        assert not array.flags.writeable
+        with pytest.raises(ValueError, match="WRITEABLE"):
+            array.setflags(write=True)
+    with pytest.raises(ValueError, match="read-only"):
+        kernel.A[0] += 0.5
+
+
+def test_kernel_identity_issuer_refuses_altered_published_pack() -> None:
+    source = load_datapack(DATAPACK_PATH).kernel_datapack
+    altered_A = np.array(source.A, copy=True)
+    altered_A[0] += 0.5
+    altered = ImccDatapack(
+        reactions=source.reactions,
+        nu=source.nu,
+        A=altered_A,
+        B=source.B,
+        domains=source.domains,
+        version=source.version,
+        parent_oxides=source.parent_oxides,
+    )
+    coverage = {
+        name: "A-published-imcc"
+        for name in (*altered.parent_oxides, *altered.reactions)
+    }
+
+    with pytest.raises(ValueError, match="complete canonical datapack hash"):
+        _label_loaded_datapack(
+            altered,
+            model_id="IMCC-SF04",
+            coverage=coverage,
+        )
+
+
+def test_kernel_identity_issuer_refuses_extension_nu_in_published_core() -> None:
+    source = load_datapack(DATAPACK_PATH).kernel_datapack
+    extended_nu = np.vstack([source.nu, np.zeros(source.n_complexes)])
+    extended_nu[-1, 0] = 1.0
+    altered = ImccDatapack(
+        reactions=source.reactions,
+        nu=extended_nu,
+        A=source.A,
+        B=source.B,
+        domains=source.domains,
+        version=f"{source.version}-forged-ext",
+        parent_oxides=(*source.parent_oxides, "S"),
+    )
+    coverage = {
+        name: ("EXT-SP" if name == "S" else "A-published-imcc")
+        for name in (*altered.parent_oxides, *altered.reactions)
+    }
+
+    with pytest.raises(ValueError, match="complete canonical datapack hash"):
+        _label_loaded_datapack(
+            altered,
+            model_id="IMCC-SF04-EXT",
+            coverage=coverage,
+        )
+
+
+def test_kernel_identity_issuer_refuses_duplicate_extension_name() -> None:
+    source = load_datapack(DATAPACK_PATH).kernel_datapack
+    duplicate = ImccDatapack(
+        reactions=source.reactions,
+        nu=np.vstack([source.nu, np.zeros(source.n_complexes)]),
+        A=source.A,
+        B=source.B,
+        domains=source.domains,
+        version=f"{source.version}-duplicate",
+        parent_oxides=(*source.parent_oxides, "SiO2"),
+    )
+    coverage = {
+        name: "A-published-imcc"
+        for name in (*duplicate.parent_oxides, *duplicate.reactions)
+    }
+
+    with pytest.raises(ValueError, match="globally unique"):
+        _label_loaded_datapack(
+            duplicate,
+            model_id="IMCC-SF04-EXT",
+            coverage=coverage,
+        )
 
 
 def test_refusal_classes_inherit_from_imcc_refusal() -> None:
@@ -313,6 +556,7 @@ def test_refusal_classes_inherit_from_imcc_refusal() -> None:
         ImccNonconvergenceError,
         ImccTOutsideDatapackDomainError,
         ImccMalformedDatapackError,
+        ImccUnprovenDatapackError,
     ):
         assert issubclass(cls, ImccRefusal)
 
