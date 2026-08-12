@@ -877,6 +877,71 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 controls.get("hkl_upper_bound_transport_species", ()) or ()
             )
         )
+        from simulator.condensation import (
+            GAS_CONSTANT_J_MOL_K,
+            _knudsen_number as _kn_eval,
+        )
+
+        alpha_by_species = _coerce_alpha_by_species(controls.get("alpha"))
+        alpha_envelope_by_species = _coerce_alpha_envelope_by_species(
+            controls.get("alpha_envelope")
+        )
+        active_gas_transport_species: list[str] = []
+        if (
+            gas_resistance_enabled
+            and melt_surface_area_m2 > 0.0
+            and pipe_diameter_m > 0.0
+        ):
+            for species, pressure in vapor_pressures.items():
+                species = str(species)
+                P_eq_Pa = float(pressure)
+                if P_eq_Pa <= 0.0:
+                    continue
+                if species in hkl_upper_bound_transport_species:
+                    continue
+                alpha_spec = alpha_by_species.get(
+                    species,
+                    alpha_by_species.get("*", _DEFAULT_EVAPORATION_ALPHA),
+                )
+                alpha, _alpha_evaluation = _evaluate_alpha_control(
+                    species,
+                    T_K,
+                    alpha_spec,
+                )
+                if alpha <= 0.0:
+                    continue
+                P_bulk_Pa = float(overhead_partials.get(species, 0.0))
+                if P_eq_Pa <= P_bulk_Pa:
+                    continue
+                delta_p_Pa = P_eq_Pa - P_bulk_Pa
+                stoich = stoich_by_species.get(species) or {}
+                if float(stoich.get("oxide_per_product_kg") or 0.0) <= 0.0:
+                    continue
+                if species in available_oxide_kg:
+                    available_parent_kg = float(
+                        available_oxide_kg.get(species, 0.0) or 0.0
+                    )
+                    if available_parent_kg <= 1.0e-12:
+                        continue
+                M_kg_mol = molar_masses_kg_mol.get(species)
+                if M_kg_mol is None or M_kg_mol <= 0.0:
+                    molar_mass_g_mol = MOLAR_MASS.get(species)
+                    if molar_mass_g_mol is None or molar_mass_g_mol <= 0.0:
+                        continue
+                    M_kg_mol = molar_mass_g_mol / 1000.0
+                hkl_upper_bound_rate_kg_hr = (
+                    alpha
+                    * math.sqrt(
+                        M_kg_mol
+                        / (2.0 * math.pi * GAS_CONSTANT_J_MOL_K * T_K)
+                    )
+                    * delta_p_Pa
+                    * melt_surface_area_m2
+                    * 3600.0
+                )
+                if hkl_upper_bound_rate_kg_hr <= _NONTRIVIAL_FLUX_KG_HR:
+                    continue
+                active_gas_transport_species.append(species)
         melt_surface_renewal_raw = series_config.get(
             "melt_surface_renewal_base_kg_s_m2_pa",
             controls.get("melt_surface_renewal_base_kg_s_m2_pa"),
@@ -899,24 +964,19 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 ),
             )
         )
-        # Ledger-authoritative EVAPORATION_FLUX: viscous Poiseuille P_bulk is
-        # out of domain when Kn exceeds VISCOUS_KNUDSEN_MAX at nonzero overhead.
-        # This is a transport-model validity domain (acceptance-matrix col 7),
-        # NOT a Kn safety gate and NOT a coating gate. Coating stays the
-        # continuous rate→lifespan model. 0.6.3 optimizer floor (~1 mbar,
-        # Kn≈0.004) never enters; t-379 (0.7) lifts this with real
-        # transitional/molecular conductance. True vacuum (P=0) keeps the HKL
-        # upper-bound path.
-        from simulator.transport_constants import (
-            FREE_MOLECULAR_KNUDSEN_MIN,
-            VISCOUS_KNUDSEN_MAX,
+        from simulator.evaporation import (
+            viscous_p_bulk_out_of_domain_diagnostic,
         )
-        from simulator.condensation import _knudsen_number as _kn_eval
 
         # When gas resistance is disabled, the executed model is the HKL-only
         # path and does not use viscous Poiseuille P_bulk. Batch carriers can
         # raise the diagnostic overhead pressure into transitional Kn without
         # making that deliberately disabled transport model authoritative.
+        commanded_pressure_pa = _finite_float(
+            controls.get("commanded_pressure_pa"),
+            overhead_pressure_pa,
+        )
+        domain_refusal = None
         if gas_resistance_enabled and overhead_pressure_pa > 0.0:
             kn_domain = _kn_eval(
                 overhead_pressure_pa,
@@ -924,71 +984,27 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 max(pipe_diameter_m, 0.0) or 0.12,
                 carrier_gas=carrier_gas,
             )
-            # Transitional only: viscous Poiseuille P_bulk is out of domain
-            # while free-molecular (Kn >= 10 or inf) keeps the HKL upper
-            # bound. 0.6.3 optimizer floor (~1 mbar, Kn≈0.004) is viscous.
-            transitional = (
-                math.isfinite(kn_domain)
-                and VISCOUS_KNUDSEN_MAX <= kn_domain < FREE_MOLECULAR_KNUDSEN_MIN
+            domain_refusal = viscous_p_bulk_out_of_domain_diagnostic(
+                knudsen_number=kn_domain,
+                overhead_pressure_pa=overhead_pressure_pa,
+                commanded_pressure_pa=commanded_pressure_pa,
+                pipe_diameter_m=pipe_diameter_m,
+                gas_temperature_K=gas_temperature_K,
+                carrier_gas=carrier_gas,
+                affected_species=tuple(active_gas_transport_species),
             )
-            if transitional:
-                # TRANSPORT-MODEL VALIDITY (not Kn safety / not coating):
-                # suppress ledger-authoritative yields. Do not report HKL
-                # flux under an out-of-domain viscous Poiseuille P_bulk.
-                # status=ok + empty flux (not hard campaign refuse) so
-                # startup ramps that transit the transitional band can
-                # continue; yields are simply not authorized. Hard refuse
-                # remains available via refuse_viscous_p_bulk_out_of_domain
-                # for explicit ledger paths that must not soft-zero.
-                # 0.6.3 optimizer floor (~1 mbar, Kn≈0.004) is viscous.
-                # t-379 (0.7) supplies transitional/molecular conductance.
+            if active_gas_transport_species and domain_refusal is not None:
                 return IntentResult(
                     intent=ChemistryIntent.EVAPORATION_FLUX,
-                    status="ok",
+                    status="refused",
                     transition=None,
                     control_audit=control_audit,
-                    diagnostic={
-                        "evaporation_flux_kg_hr": {},
-                        "authority_class": "diagnostic-limited",
-                        "authority_reason": (
-                            "viscous_p_bulk_transport_out_of_domain"
-                        ),
-                        "reason": "viscous_p_bulk_transport_out_of_domain",
-                        "p_bulk_transport_domain": "out_of_domain_transitional",
-                        "ledger_yields_authorized": False,
-                        "detail": (
-                            "transitional Kn uses viscous Poiseuille P_bulk "
-                            f"outside Kn < {VISCOUS_KNUDSEN_MAX:g}; free-"
-                            f"molecular Kn >= {FREE_MOLECULAR_KNUDSEN_MIN:g} "
-                            "keeps HKL upper-bound; t-379 (0.7) lifts this"
-                        ),
-                        "knudsen_number": kn_domain,
-                        "model_domain": (
-                            f"viscous Poiseuille P_bulk: Kn < "
-                            f"{VISCOUS_KNUDSEN_MAX:g}; free-molecular HKL: "
-                            f"Kn >= {FREE_MOLECULAR_KNUDSEN_MIN:g}"
-                        ),
-                        "VISCOUS_KNUDSEN_MAX": VISCOUS_KNUDSEN_MAX,
-                        "FREE_MOLECULAR_KNUDSEN_MIN": FREE_MOLECULAR_KNUDSEN_MIN,
-                        "overhead_pressure_pa": overhead_pressure_pa,
-                        "pipe_diameter_m": pipe_diameter_m,
-                        "gas_temperature_K": gas_temperature_K,
-                        "carrier_gas": carrier_gas,
-                        "framing": (
-                            "transport_model_validity_domain"
-                            ";not_kn_safety_gate;not_coating_gate"
-                        ),
-                    },
+                    diagnostic=domain_refusal,
                     warnings=(
                         "viscous_p_bulk_transport_out_of_domain: "
-                        "ledger evaporation yields suppressed in "
-                        "transitional Kn until t-379 (0.7)",
+                        "evaporation flux not evaluated in transitional Kn",
                     ),
                 )
-        alpha_by_species = _coerce_alpha_by_species(controls.get("alpha"))
-        alpha_envelope_by_species = _coerce_alpha_envelope_by_species(
-            controls.get("alpha_envelope")
-        )
         allow_unmeasured_alpha_fallback = bool(
             controls.get("allow_unmeasured_alpha_fallback", False)
         )
@@ -1114,6 +1130,12 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 baseline_alpha_1.flux_kg_s_m2 * melt_surface_area_m2 * 3600.0
             )
             available_parent_kg = float(available_oxide_kg.get(species, 0.0) or 0.0)
+            if (
+                domain_refusal is not None
+                and species in available_oxide_kg
+                and available_parent_kg <= 1.0e-12
+            ):
+                continue
             if (
                 alpha_is_unmeasured
                 and not alpha_fallback_permitted

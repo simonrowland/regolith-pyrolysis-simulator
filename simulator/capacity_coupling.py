@@ -281,6 +281,7 @@ def solve_capacity_shadow(
         * molar_mass_kg_mol[species]
         for species in species_order
     )
+    from simulator.evaporation import EvaporationFluxRefusal
 
     # Premise: HK source rates depend on the pressure produced by their own
     # post-source, post-bleed residual holdup. Algebra defines the Picard map
@@ -296,6 +297,8 @@ def solve_capacity_shadow(
                 str(species): max(0.0, float(rate))
                 for species, rate in flux_kg_hr_at_partials(partials).items()
             }
+        except EvaporationFluxRefusal:
+            raise
         except Exception as exc:
             return CapacityShadowRefusal(
                 f"evaporation_flux_refused:{type(exc).__name__}:{exc}",
@@ -315,6 +318,8 @@ def solve_capacity_shadow(
                         partials
                     ).items()
                 }
+            except EvaporationFluxRefusal:
+                raise
             except Exception as exc:
                 return CapacityShadowRefusal(
                     f"overhead_source_refused:{type(exc).__name__}:{exc}",

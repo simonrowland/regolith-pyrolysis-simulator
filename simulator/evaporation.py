@@ -108,8 +108,10 @@ def viscous_p_bulk_out_of_domain_diagnostic(
     pipe_diameter_m: float,
     gas_temperature_K: float,
     carrier_gas: str = "N2",
+    commanded_pressure_pa: float | None = None,
+    affected_species: tuple[str, ...] = (),
 ) -> dict[str, Any] | None:
-    """Soft diagnostic when ledger yields leave the viscous P_bulk domain.
+    """Build a refusal diagnostic when ledger yields leave the P_bulk domain.
 
     TRANSPORT-MODEL VALIDITY DOMAIN (acceptance-matrix col 7) — NOT a Kn
     safety gate and NOT a coating gate. Returns a typed diagnostic payload
@@ -117,10 +119,11 @@ def viscous_p_bulk_out_of_domain_diagnostic(
     out of domain); returns None when the operating point is in-domain
     (viscous continuum, free-molecular, true vacuum, or non-finite Kn).
 
-    Consumers that must not soft-zero should call
-    ``refuse_viscous_p_bulk_out_of_domain`` instead. The 0.6.3 optimizer
-    floor (~1 mbar, Kn≈0.004) never enters this domain; t-379 (0.7) lifts
-    it with transitional/molecular conductance.
+    The authoritative provider returns this payload with ``status=refused``;
+    direct hard-refusal consumers may call
+    ``refuse_viscous_p_bulk_out_of_domain``. The 0.6.3 optimizer floor
+    (~1 mbar, Kn≈0.004) never enters this domain; t-379 (0.7) lifts it with
+    transitional/molecular conductance.
     """
     from simulator.transport_constants import (
         FREE_MOLECULAR_KNUDSEN_MIN,
@@ -143,7 +146,13 @@ def viscous_p_bulk_out_of_domain_diagnostic(
         return None
     # Transitional band: continuum film is off but Poiseuille still evolves
     # P_bulk — out-of-domain for ledger-authoritative yields until t-379.
+    commanded_pa = (
+        float(overhead_pressure_pa)
+        if commanded_pressure_pa is None
+        else max(0.0, float(commanded_pressure_pa))
+    )
     return {
+        "status": "refused",
         "authority_class": "diagnostic-limited",
         "authority_reason": "viscous_p_bulk_transport_out_of_domain",
         "reason": "viscous_p_bulk_transport_out_of_domain",
@@ -165,14 +174,20 @@ def viscous_p_bulk_out_of_domain_diagnostic(
         "VISCOUS_KNUDSEN_MAX": VISCOUS_KNUDSEN_MAX,
         "FREE_MOLECULAR_KNUDSEN_MIN": FREE_MOLECULAR_KNUDSEN_MIN,
         "overhead_pressure_pa": float(overhead_pressure_pa),
+        "overhead_pressure_mbar": float(overhead_pressure_pa) / 100.0,
+        "commanded_pressure_pa": commanded_pa,
+        "commanded_pressure_mbar": commanded_pa / 100.0,
         "pipe_diameter_m": float(pipe_diameter_m),
         "gas_temperature_K": float(gas_temperature_K),
+        "gas_temperature_C": float(gas_temperature_K) - 273.15,
         "carrier_gas": str(carrier_gas),
+        "affected_species": tuple(sorted(str(species) for species in affected_species)),
         "framing": (
             "transport_model_validity_domain"
             ";not_kn_safety_gate;not_coating_gate"
         ),
-        "evaporation_flux_kg_hr": {},
+        "evaporation_flux_status": "not_evaluated",
+        "evaporation_flux_kg_hr": None,
     }
 
 
@@ -187,10 +202,10 @@ def refuse_viscous_p_bulk_out_of_domain(
     """Typed refusal when ledger yields leave the viscous P_bulk domain.
 
     TRANSPORT-MODEL VALIDITY DOMAIN (acceptance-matrix col 7) — NOT a Kn
-    safety gate and NOT a coating gate. Hard-raises when the soft
-    diagnostic helper reports transitional out-of-domain. Soft consumers
-    (provider projection, C7 extent, native-Fe partition) use
-    ``viscous_p_bulk_out_of_domain_diagnostic`` instead.
+    safety gate and NOT a coating gate. Hard-raises when the diagnostic helper
+    reports transitional out-of-domain. The authoritative provider returns a
+    refused result from the same payload; bounded C7/native-Fe consumers apply
+    their own explicitly tagged diagnostic-limited policy.
     """
     diagnostic = viscous_p_bulk_out_of_domain_diagnostic(
         knudsen_number=knudsen_number,
@@ -2462,6 +2477,10 @@ class EvaporationMixin:
                 sum(overhead_partials_Pa.values())
                 if overhead_pressure_pa is None
                 else float(overhead_pressure_pa)
+            ),
+            'commanded_pressure_pa': max(
+                0.0,
+                float(getattr(self.melt, 'p_total_mbar', 0.0) or 0.0) * 100.0,
             ),
             'gas_temperature_K': float(
                 getattr(self.overhead, 'headspace_temperature_K', 0.0)

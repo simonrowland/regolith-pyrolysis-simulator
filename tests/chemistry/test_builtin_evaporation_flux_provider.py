@@ -1143,10 +1143,9 @@ def test_provider_refuses_universal_melt_renewal_model():
 
 
 @pytest.mark.xdist_group("serial")
-def test_provider_suppresses_ledger_yields_at_transitional_kn_domain():
+def test_provider_refuses_transitional_kn_domain_without_fabricating_zero_flux():
     # Kn≈0.1 at T=2023 K, D=0.12 m, P≈3.63 Pa — transitional. Viscous
-    # Poiseuille P_bulk is out of domain: ledger yields suppressed (empty
-    # flux + diagnostic-limited authority), not HKL-with-invalid-backpressure.
+    # Poiseuille P_bulk is out of domain: flux is not evaluated, not zero.
     # Not a Kn safety/coating gate. Free-molecular + viscous paths remain.
     result = _w3_result_with_controls(
         1.0,
@@ -1155,9 +1154,11 @@ def test_provider_suppresses_ledger_yields_at_transitional_kn_domain():
         gas_temperature_K=2023.15,
     )
 
-    assert result.status == "ok"
+    assert result.status == "refused"
     assert result.diagnostic["reason"] == "viscous_p_bulk_transport_out_of_domain"
-    assert result.diagnostic["evaporation_flux_kg_hr"] == {}
+    assert result.diagnostic["evaporation_flux_status"] == "not_evaluated"
+    assert result.diagnostic["evaporation_flux_kg_hr"] is None
+    assert result.diagnostic["affected_species"] == ("Na",)
     assert result.diagnostic["ledger_yields_authorized"] is False
     assert result.diagnostic["authority_class"] == "diagnostic-limited"
     assert result.diagnostic["p_bulk_transport_domain"] == (
@@ -1170,7 +1171,7 @@ def test_provider_suppresses_ledger_yields_at_transitional_kn_domain():
         "viscous_p_bulk_transport_out_of_domain" in w for w in result.warnings
     )
 
-    # Explicit hard-refuse helper still available for typed paths.
+    # Explicit hard-refuse helper uses the same typed refusal.
     from simulator.evaporation import (
         EvaporationFluxRefusal,
         refuse_viscous_p_bulk_out_of_domain,
@@ -1185,6 +1186,79 @@ def test_provider_suppresses_ledger_yields_at_transitional_kn_domain():
             gas_temperature_K=2023.15,
         )
     assert ei.value.reason == "viscous_p_bulk_transport_out_of_domain"
+
+
+@pytest.mark.xdist_group("serial")
+def test_transitional_refusal_reports_actual_and_commanded_pressure():
+    result = _w3_result_with_controls(
+        1.0,
+        overhead_pressure_pa=3.632,
+        commanded_pressure_pa=0.0,
+        pipe_diameter_m=0.12,
+        gas_temperature_K=2023.15,
+    )
+
+    assert result.status == "refused"
+    assert result.diagnostic["overhead_pressure_pa"] == pytest.approx(3.632)
+    assert result.diagnostic["commanded_pressure_pa"] == 0.0
+    assert result.diagnostic["evaporation_flux_status"] == "not_evaluated"
+    assert result.diagnostic["evaporation_flux_kg_hr"] is None
+
+
+@pytest.mark.parametrize(
+    ("control_overrides", "expected_flux_species"),
+    (
+        ({"vapour_batch_flux_pressures_Pa": {}}, None),
+        ({"vapour_batch_flux_pressures_Pa": {"Na": 0.0}}, None),
+        ({"melt_surface_area_m2": 0.0}, None),
+        ({"available_oxide_kg": {"Na": 0.0}}, None),
+        ({"overhead_partials_Pa": {"Na": 200.0}}, None),
+        (
+            {
+                "vapour_batch_flux_pressures_Pa": {"Na": 3.0},
+                "overhead_partials_Pa": {"Na": 3.0 - 1.0e-13},
+            },
+            None,
+        ),
+        ({"alpha": 0.0}, None),
+        ({"alpha": {"Na": 0.0}}, None),
+        ({"alpha": 1.0e-20}, None),
+        ({"pipe_diameter_m": 0.0}, None),
+        ({"hkl_upper_bound_transport_species": ("Na",)}, "Na"),
+    ),
+    ids=(
+        "empty_batch_map",
+        "nonpositive_equilibrium_pressure",
+        "zero_surface_area",
+        "zero_inventory",
+        "nonpositive_pressure_drive",
+        "de_minimis_positive_pressure_drive",
+        "zero_scalar_accommodation_coefficient",
+        "zero_species_accommodation_coefficient",
+        "de_minimis_hkl_upper_bound",
+        "zero_pipe_diameter",
+        "explicit_species_hkl_upper_bound",
+    ),
+)
+@pytest.mark.xdist_group("serial")
+def test_transitional_domain_preserves_proven_zero_and_explicit_hkl_paths(
+    control_overrides,
+    expected_flux_species,
+):
+    controls = {
+        "overhead_pressure_pa": 3.632,
+        "pipe_diameter_m": 0.12,
+        "gas_temperature_K": 2023.15,
+        **control_overrides,
+    }
+    result = _w3_result_with_controls(1.0, **controls)
+
+    assert result.status == "ok"
+    flux = result.diagnostic["evaporation_flux_kg_hr"]
+    if expected_flux_species is None:
+        assert flux == {}
+    else:
+        assert flux[expected_flux_species] > 0.0
 
 
 @pytest.mark.xdist_group("serial")

@@ -5,6 +5,7 @@ from unittest.mock import patch
 import pytest
 
 from simulator.core import FERRIC_DIVERGENCE_WARNING_THRESHOLD
+from simulator.evaporation import EvaporationFluxRefusal
 from simulator.session_cli import SessionScriptRunner
 import simulator.session_cli as session_cli_module
 from simulator.state import PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS, STOICH_RATIOS
@@ -69,7 +70,9 @@ def _run_script(lines: list[str]):
     return runner.session._sim
 
 
-def _complete_recommended_path(runner: SessionScriptRunner) -> None:
+def _complete_recommended_path(
+    runner: SessionScriptRunner,
+) -> EvaporationFluxRefusal | None:
     # 2026-07-22 B1: advance regardless of a pending decision — the composed
     # canonical path (C4 window + 160 h final C2A + C6-continue) leaves the
     # sim mid-campaign between decisions, and the old early-return on
@@ -78,11 +81,15 @@ def _complete_recommended_path(runner: SessionScriptRunner) -> None:
     for _ in range(8):
         sim = runner.session._sim
         if sim.is_complete():
-            return
+            return None
         decision = sim.pending_decision
         if decision is not None:
             sim.apply_decision(decision.decision_type, decision.recommendation)
-        runner.execute(shlex.split("advance 96"), "advance 96")
+        try:
+            runner.execute(shlex.split("advance 96"), "advance 96")
+        except EvaporationFluxRefusal as exc:
+            return exc
+    return None
 
 
 def _run_staged(*, complete: bool = False):
@@ -116,7 +123,8 @@ def _run_staged(*, complete: bool = False):
         else:
             runner.execute(shlex.split(line), line)
     if complete:
-        _complete_recommended_path(runner)
+        refusal = _complete_recommended_path(runner)
+        return runner.session._sim, refusal
     return runner.session._sim
 
 
@@ -177,7 +185,8 @@ def staged_ceiling_case():
     return _run_staged(complete=True)
 
 
-# gate-2: module fixture now completes the full staged path (C6-continue), ~1700 s; ceiling covers fixture setup.
+# gate-2: module fixture advances the recommended staged path until the first
+# typed transitional-Kn refusal; ceiling covers fixture setup.
 # Nightly (2026-08-02 CI tiering): staged bakeout C2A campaign (~255 s junit).
 @pytest.mark.nightly
 @pytest.mark.xdist_group("magemin_fullrun_b")
@@ -185,7 +194,7 @@ def staged_ceiling_case():
 def test_c2a_staged_k_shuttle_and_conservation_remain_visible(
     staged_ceiling_case,
 ):
-    sim = staged_ceiling_case
+    sim, refusal = staged_ceiling_case
     shuttle_fe = _metal_phase_fe_kg(sim)
     shuttle_snapshots = [
         s for s in sim.record.snapshots
@@ -195,7 +204,25 @@ def test_c2a_staged_k_shuttle_and_conservation_remain_visible(
         snapshot.shuttle_metal_produced_kg_hr for snapshot in shuttle_snapshots
     )
 
-    assert sim.is_complete()
+    assert not sim.is_complete()
+    assert refusal is not None
+    assert refusal.terminal_refusal is True
+    assert refusal.reason == "viscous_p_bulk_transport_out_of_domain"
+    assert refusal.diagnostic["evaporation_flux_status"] == "not_evaluated"
+    assert refusal.diagnostic["evaporation_flux_kg_hr"] is None
+    assert 0.01 <= refusal.diagnostic["knudsen_number"] < 10.0
+    assert refusal.diagnostic["overhead_pressure_mbar"] == pytest.approx(0.2)
+    assert refusal.diagnostic["commanded_pressure_mbar"] == pytest.approx(0.2)
+    assert sim.melt.hour == 13
+    assert sim.melt.campaign.name == "C4"
+    transition_names = [
+        str(getattr(transition, "name", ""))
+        for transition in sim.atom_ledger.transitions
+    ]
+    assert len(transition_names) == 208
+    assert sum(name.startswith("evaporate_") for name in transition_names) == 129
+    assert sum(name.startswith("condense_") for name in transition_names) == 41
+    assert transition_names.count("overhead_bleed") == 13
     assert sim.record.additives_kg["Na"] == pytest.approx(NA_DOSE_KG)
     assert sim._c3_alkali_credit_drawn_kg_by_species == {}
     assert sim._c3_alkali_credit_outstanding_kg_by_species() == {}

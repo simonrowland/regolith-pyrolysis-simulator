@@ -77,6 +77,19 @@ from simulator.state import (
 from tests.chemistry.conftest import _atom_check, _build_sim
 
 
+def _hkl_only_setpoints(setpoints_data):
+    """Keep downstream metallothermic smoke tests on an evaluable flux path."""
+    patched = dict(setpoints_data)
+    kernel_config = dict(patched.get("chemistry_kernel", {}) or {})
+    series_config = dict(
+        kernel_config.get("evaporation_series_resistance", {}) or {}
+    )
+    series_config["gas_resistance_enabled"] = False
+    kernel_config["evaporation_series_resistance"] = series_config
+    patched["chemistry_kernel"] = kernel_config
+    return patched
+
+
 def _dispatch_bound_proposal(kernel, proposal):
     with patch.object(
         BuiltinMetallothermicStepProvider,
@@ -2415,6 +2428,7 @@ def test_c6_static_hold_exercises_c6_proceed_decision_path(
     assert readiness.status == "ok", readiness_detail
 
     patched_setpoints = copy.deepcopy(setpoints_data)
+    patched_setpoints = _hkl_only_setpoints(patched_setpoints)
     c6_cfg = patched_setpoints["campaigns"]["C6"]
     # Pin the selected recipe mechanism: within-noise yield ties choose the
     # colder hold for greater Mg/Al2O3 margin and lower heating energy.
@@ -2547,11 +2561,12 @@ def test_c6_ci_empty_window_records_binding_refusal_without_transitions(
     feedstocks_data,
     setpoints_data,
 ):
+    patched_setpoints = _hkl_only_setpoints(setpoints_data)
     sim = _build_sim(
         "ci_carbonaceous_chondrite",
         vapor_pressure_data,
         feedstocks_data,
-        setpoints_data,
+        patched_setpoints,
         additives_kg={"K": 30.0, "Na": 25.0, "Mg": 60.0},
     )
     sim.start_campaign(CampaignPhase.C0)
@@ -2645,11 +2660,12 @@ def test_full_run_mass_balance_holds_with_kernel_committed_metallothermic(
     coverage the goal requires.
     """
 
+    patched_setpoints = _hkl_only_setpoints(setpoints_data)
     sim = _build_sim(
         feedstock_key,
         vapor_pressure_data,
         feedstocks_data,
-        setpoints_data,
+        patched_setpoints,
         additives_kg=additives_kg,
     )
     sim.start_campaign(CampaignPhase.C0)
@@ -2737,11 +2753,12 @@ def test_mars_basalt_c3_shuttle_conserves_total_elemental_fe(
     feedstocks_data,
     setpoints_data,
 ):
+    patched_setpoints = _hkl_only_setpoints(setpoints_data)
     sim = _build_sim(
         "mars_basalt",
         vapor_pressure_data,
         feedstocks_data,
-        setpoints_data,
+        patched_setpoints,
         additives_kg={"C": 60.0, "K": 30.0, "Na": 25.0},
     )
 

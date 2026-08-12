@@ -6143,6 +6143,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             build_provider_account_view,
         )
         from simulator.chemistry.kernel.dto import IntentRequest
+        from simulator.evaporation import EvaporationFluxRefusal
         from simulator.thermal_train import (
             FiniteCapacity,
             thermal_train_parameters_from_mapping,
@@ -6226,8 +6227,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
             result = provider.dispatch(request)
             if str(result.status) != 'ok':
-                raise RuntimeError(
-                    str((result.diagnostic or {}).get('reason') or result.status)
+                diagnostic = dict(result.diagnostic or {})
+                raise EvaporationFluxRefusal(
+                    str(diagnostic.get('reason') or result.status),
+                    diagnostic,
                 )
             rates = {
                 species: float(rate) * liquid_fraction_factor
@@ -6264,63 +6267,65 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 controls['stoich_by_species'],
             )
 
-        result = solve_capacity_shadow(
-            pre_holdup_mol=pre_holdup,
-            molar_mass_kg_mol=molar_masses,
-            flux_kg_hr_at_partials=flux_at_partials,
-            capacity=capacity,
-            head_bled_species_mol={},
-            external_o2_holdup_mol=float(
-                getattr(
-                    self,
-                    '_o2_bubbler_external_o2_in_overhead_mol',
-                    0.0,
-                ) or 0.0
-            ),
-            temperature_K=self._headspace_temperature_K(),
-            volume_m3=self._headspace_volume_m3(),
-            dt_hr=1.0,
-            bleed_conductance_kg_s=self._headspace_bleed_conductance_kg_s(
-                species_kg_for_M_avg=self._overhead_holdup_species_kg(
-                    pre_holdup
+        try:
+            result = solve_capacity_shadow(
+                pre_holdup_mol=pre_holdup,
+                molar_mass_kg_mol=molar_masses,
+                flux_kg_hr_at_partials=flux_at_partials,
+                capacity=capacity,
+                head_bled_species_mol={},
+                external_o2_holdup_mol=float(
+                    getattr(
+                        self,
+                        '_o2_bubbler_external_o2_in_overhead_mol',
+                        0.0,
+                    ) or 0.0
                 ),
-            ),
-            downstream_pressure_Pa=(
-                self._headspace_downstream_pressure_bar() * 100000.0
-            ),
-            k_relief_kg_hr_Pa=cold_train.relief['k_relief_kg_hr_Pa'],
-            p_open_Pa=cold_train.relief['p_open_Pa'],
-            overhead_source_mol_hr_at_partials=overhead_source_at_partials,
-            total_pressure_Pa_at_partials=(
-                self._evaporation_overhead_total_pressure_Pa
-            ),
-            vessel_rating_Pa=cold_train.relief['vessel_rating_Pa'],
-            accumulator_enabled=accumulator_enabled,
-            cistern_fill_kg=(
-                self.atom_ledger.kg_by_account(
-                    OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT
-                ).get(OXYGEN_SPECIES, 0.0)
-                if accumulator_enabled
-                else 0.0
-            ),
-            cavern_capacity_kg=(
-                thermal_train_parameters_from_mapping().cavern_capacity_kg
-                if accumulator_enabled
-                else 0.0
-            ),
-            controlled_flow=(
-                self._overhead_headspace_config.get(
-                    'downstream_pressure_bar'
-                ) is None
-                and getattr(self.melt.atmosphere, 'name', '') in {
-                    'CONTROLLED_O2',
-                    'CONTROLLED_O2_FLOW',
-                    'O2_BACKPRESSURE',
-                }
-            ),
-        )
-        assert self.atom_ledger.mol_by_account() == ledger_before
-        assert len(self.atom_ledger.transitions) == transition_count_before
+                temperature_K=self._headspace_temperature_K(),
+                volume_m3=self._headspace_volume_m3(),
+                dt_hr=1.0,
+                bleed_conductance_kg_s=self._headspace_bleed_conductance_kg_s(
+                    species_kg_for_M_avg=self._overhead_holdup_species_kg(
+                        pre_holdup
+                    ),
+                ),
+                downstream_pressure_Pa=(
+                    self._headspace_downstream_pressure_bar() * 100000.0
+                ),
+                k_relief_kg_hr_Pa=cold_train.relief['k_relief_kg_hr_Pa'],
+                p_open_Pa=cold_train.relief['p_open_Pa'],
+                overhead_source_mol_hr_at_partials=overhead_source_at_partials,
+                total_pressure_Pa_at_partials=(
+                    self._evaporation_overhead_total_pressure_Pa
+                ),
+                vessel_rating_Pa=cold_train.relief['vessel_rating_Pa'],
+                accumulator_enabled=accumulator_enabled,
+                cistern_fill_kg=(
+                    self.atom_ledger.kg_by_account(
+                        OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT
+                    ).get(OXYGEN_SPECIES, 0.0)
+                    if accumulator_enabled
+                    else 0.0
+                ),
+                cavern_capacity_kg=(
+                    thermal_train_parameters_from_mapping().cavern_capacity_kg
+                    if accumulator_enabled
+                    else 0.0
+                ),
+                controlled_flow=(
+                    self._overhead_headspace_config.get(
+                        'downstream_pressure_bar'
+                    ) is None
+                    and getattr(self.melt.atmosphere, 'name', '') in {
+                        'CONTROLLED_O2',
+                        'CONTROLLED_O2_FLOW',
+                        'O2_BACKPRESSURE',
+                    }
+                ),
+            )
+        finally:
+            assert self.atom_ledger.mol_by_account() == ledger_before
+            assert len(self.atom_ledger.transitions) == transition_count_before
         return result
 
     def _compute_intrinsic_melt_fO2(
@@ -6920,11 +6925,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         except EvaporationFluxConfigurationError as exc:
             raise evaporation_flux_refusal_from_configuration_error(exc) from exc
-        # Transitional Kn domain: suppress vapor capacity (same honesty as
-        # provider diagnostic-limited empty flux) and emit the typed
-        # transport-model validity vocabulary — not bare upper-bound HKL
-        # labeling. Hard refuse remains for uncertified melt resistance
-        # above. t-379 lifts domain suppression.
+        # Transitional Kn domain: this bounded native-Fe projection suppresses
+        # capacity under its diagnostic-limited policy. The authoritative
+        # EVAPORATION_FLUX provider instead refuses; neither path labels the
+        # unsupported result as upper-bound HKL. t-379 lifts this suppression.
         domain_diag = viscous_p_bulk_out_of_domain_diagnostic(
             knudsen_number=float(series_flux.knudsen_number),
             overhead_pressure_pa=overhead_pressure_pa,

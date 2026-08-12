@@ -35,10 +35,17 @@ def _session_config(
     mre_target_species: str = "",
 ) -> SimSessionConfig:
     setpoints = _load("setpoints.yaml")
-    setpoints["chemistry_kernel"] = {
-        **dict(setpoints.get("chemistry_kernel", {}) or {}),
-        "allow_unmeasured_alpha_fallback": True,
-    }
+    kernel_config = dict(setpoints.get("chemistry_kernel", {}) or {})
+    series_config = dict(
+        kernel_config.get("evaporation_series_resistance", {}) or {}
+    )
+    # These tests isolate downstream C5 yield mechanisms. Select the explicit
+    # HKL-only path so unsupported transitional gas transport cannot terminate
+    # the fixture before the electrolysis behavior under test executes.
+    series_config["gas_resistance_enabled"] = False
+    kernel_config["evaporation_series_resistance"] = series_config
+    kernel_config["allow_unmeasured_alpha_fallback"] = True
+    setpoints["chemistry_kernel"] = kernel_config
     return SimSessionConfig(
         feedstock_id=FEEDSTOCK,
         feedstocks=_load("feedstocks.yaml"),

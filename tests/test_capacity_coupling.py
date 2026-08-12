@@ -25,7 +25,10 @@ from simulator.capacity_coupling import (
     solve_capacity_shadow,
 )
 from simulator.core import PyrolysisSimulator
-from simulator.evaporation import _pre_rg_effective_pressure_source
+from simulator.evaporation import (
+    EvaporationFluxRefusal,
+    _pre_rg_effective_pressure_source,
+)
 from simulator.physical_constants import GAS_CONSTANT
 from simulator.state import CampaignPhase, EvaporationFlux
 from simulator.vapour_rail.activity import ActivityVerdictKind
@@ -370,6 +373,49 @@ def test_non_convergent_picard_returns_typed_refusal_without_last_iterate():
     assert result.reason == "picard_non_convergence"
     assert result.iterations == 1
     assert result.authoritative is False
+
+
+@pytest.mark.parametrize("refusal_site", ("flux", "overhead_source"))
+def test_evaporation_refusal_is_not_swallowed_by_shadow_callbacks(refusal_site):
+    diagnostic = {
+        "reason": "viscous_p_bulk_transport_out_of_domain",
+        "evaporation_flux_status": "not_evaluated",
+        "evaporation_flux_kg_hr": None,
+    }
+
+    def raise_refusal(_partials):
+        raise EvaporationFluxRefusal(diagnostic["reason"], diagnostic)
+
+    flux_callback = (
+        raise_refusal if refusal_site == "flux" else lambda _partials: {"O2": 0.0}
+    )
+    overhead_callback = (
+        raise_refusal
+        if refusal_site == "overhead_source"
+        else lambda _partials: {"O2": 0.0}
+    )
+
+    with pytest.raises(EvaporationFluxRefusal) as exc_info:
+        solve_capacity_shadow(
+            pre_holdup_mol={"O2": 0.0},
+            molar_mass_kg_mol={"O2": M_O2},
+            flux_kg_hr_at_partials=flux_callback,
+            capacity=FiniteCapacity(0.032),
+            head_bled_species_mol={},
+            external_o2_holdup_mol=0.0,
+            temperature_K=T_FOR_1000_PA_PER_MOL,
+            volume_m3=1.0,
+            dt_hr=1.0,
+            bleed_conductance_kg_s=1.0,
+            downstream_pressure_Pa=0.0,
+            k_relief_kg_hr_Pa=1.0e-30,
+            p_open_Pa=1.0e9,
+            overhead_source_mol_hr_at_partials=overhead_callback,
+            vessel_rating_Pa=1.0e12,
+        )
+
+    assert exc_info.value.reason == diagnostic["reason"]
+    assert exc_info.value.diagnostic == diagnostic
 
 
 def test_core_refusal_leaves_record_and_ledger_close_report_unchanged(

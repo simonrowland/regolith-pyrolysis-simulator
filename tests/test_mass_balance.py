@@ -18,6 +18,7 @@ from simulator.core import (
     FLOW_MASS_EXCLUDED_ACCOUNTS,
     PyrolysisSimulator,
 )
+from simulator.evaporation import EvaporationFluxRefusal
 from simulator.mass_balance import MassBalance, ZERO_INPUT_BASIS_BREACH
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.runner import build_sio_yield_report
@@ -183,7 +184,9 @@ def _external_input_mass_kg(sim) -> float:
     )
 
 
-def _run_c2a_staged_to_completion(sim) -> int:
+def _run_c2a_staged_to_completion(
+    sim,
+) -> tuple[int, EvaporationFluxRefusal | None]:
     sim.start_campaign(CampaignPhase.C2A_STAGED)
     decision_choice = {
         DecisionType.ROOT_BRANCH: "pyrolysis",
@@ -192,6 +195,7 @@ def _run_c2a_staged_to_completion(sim) -> int:
         DecisionType.C6_PROCEED: "yes",
     }
     steps = 0
+    refusal = None
     while not sim.is_complete() and steps < 500:
         if sim.paused_for_decision:
             decision = sim.pending_decision
@@ -200,14 +204,28 @@ def _run_c2a_staged_to_completion(sim) -> int:
                 choice = (decision.options or [None])[0]
             sim.apply_decision(decision.decision_type, choice)
             continue
-        sim.step()
+        ledger_before = sim.atom_ledger.mol_by_account()
+        transitions_before = tuple(sim.atom_ledger.transitions)
+        drift_before = sim.atom_ledger.element_atom_drift_report()
+        try:
+            sim.step()
+        except EvaporationFluxRefusal as exc:
+            refusal = exc
+            assert sim.atom_ledger.mol_by_account() == ledger_before
+            assert tuple(sim.atom_ledger.transitions) == transitions_before
+            assert sim.atom_ledger.element_atom_drift_report() == drift_before
+            break
         steps += 1
         # Typed campaign-endpoint refusal is non-resumable (no next decision).
         # Treat it as a finished batch for mass-balance closure checks.
         if getattr(sim, "campaign_endpoint_refused", lambda: False)():
             break
-    assert sim.is_complete() or sim.campaign_endpoint_refused()
-    return steps
+    assert (
+        sim.is_complete()
+        or sim.campaign_endpoint_refused()
+        or refusal is not None
+    )
+    return steps, refusal
 
 
 def test_mass_balance_counts_process_inventory_without_o2_double_count():
@@ -341,21 +359,19 @@ def test_c2a_staged_freeze_gate_on_closes_mass_balance(
         record_liquid_fraction,
     )
 
-    steps = _run_c2a_staged_to_completion(sim)
+    steps, refusal = _run_c2a_staged_to_completion(sim)
 
-    # C5 is default-off. With the C4 non-resumable acquisition ceiling this
-    # C2A_STAGED→C4 path saturates transport and refuses rather than
-    # fail-opening into C6 / final boiloff. Live semantic duration pin (not a
-    # golden); both freeze_gate modes refuse at the same hour.
-    # 2026-08-07 b-147 C4 opportunity clock: transport-held hours (nominal
-    # ramp wanted, actual zeroed, throttle recorded) no longer burn the 60 h
-    # acquisition budget, so the old refusal at step 72 no longer fires; with
-    # T stuck (~1300 C) opportunity stays ~0 and the run now terminates via
-    # the held-hours preheat wall at acquisition(60)+process(40)=100 held C4
-    # hours → 127 total steps. SIGN: longer honest drain accounting, then a
-    # typed refusal (c4_preheat_wall_clock_exhausted) — never an infinite
-    # spin; closure asserts below unchanged and still bind.
-    assert steps == 127
+    # The run now stops at the first unsupported transitional-Kn flux point.
+    # The refused hour is rolled back exactly by the helper above; the ledger
+    # prefix still has to close on both freeze-gate paths.
+    # Both configurations complete 13 ledger-authorized hours, then refuse
+    # before committing the first unsupported transitional-Kn hour.
+    assert steps == 13
+    assert refusal is not None
+    assert refusal.reason == "viscous_p_bulk_transport_out_of_domain"
+    assert refusal.diagnostic["evaporation_flux_status"] == "not_evaluated"
+    assert refusal.diagnostic["evaporation_flux_kg_hr"] is None
+    assert 0.01 <= refusal.diagnostic["knudsen_number"] < 10.0
     transition_names = {
         getattr(transition, "name", "")
         for transition in sim.atom_ledger.transitions
@@ -396,14 +412,12 @@ def test_c2a_staged_freeze_gate_on_closes_mass_balance(
 @pytest.mark.xdist_group("magemin_fullrun_b")
 @pytest.mark.timeout(1800)
 @pytest.mark.serial
-def test_cumulative_transition_mass_closure_bounded():
+def test_cumulative_transition_mass_closure_bounded_at_transitional_refusal():
     # DEFAULT_MASS_TOLERANCE_KG (20 g) bounds a single transition only.
-    # A full no-MRE batch through final C2A commits hundreds of
-    # transitions; if each closed a little short/long with a consistent sign,
-    # cumulative drift could grow
-    # unbounded while every individual transition still passed. Guard that
-    # gap directly: sum abs(debit - credit) over every committed transition
-    # and bound the total far below even one per-transition tolerance.
+    # The no-MRE campaign now ends at the first unsupported transitional-Kn
+    # flux point. If each committed prefix transition closed a little short or
+    # long with a consistent sign, cumulative drift could still grow while
+    # every individual transition passed. Guard that prefix directly.
     feedstocks = _load_data_yaml("feedstocks.yaml")
     setpoints = _load_data_yaml("setpoints.yaml")
     vapor_pressures = _load_data_yaml("vapor_pressures.yaml")
@@ -419,7 +433,7 @@ def test_cumulative_transition_mass_closure_bounded():
     sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
     sim.start_campaign(CampaignPhase.C0)
 
-    # Drive the full no-MRE pyrolysis path through the final C2A boiloff.
+    # Drive the no-MRE path until the transitional-Kn refusal.
     decision_choice = {
         DecisionType.ROOT_BRANCH: "pyrolysis",
         DecisionType.PATH_AB: "A_staged",
@@ -427,6 +441,7 @@ def test_cumulative_transition_mass_closure_bounded():
         DecisionType.C6_PROCEED: "yes",
     }
     steps = 0
+    refusal = None
     while not sim.is_complete() and steps < 5000:
         if sim.paused_for_decision:
             decision = sim.pending_decision
@@ -435,12 +450,25 @@ def test_cumulative_transition_mass_closure_bounded():
                 choice = (decision.options or [None])[0]
             sim.apply_decision(decision.decision_type, choice)
             continue
-        sim.step()
+        ledger_before = sim.atom_ledger.mol_by_account()
+        transitions_before = tuple(sim.atom_ledger.transitions)
+        drift_before = sim.atom_ledger.element_atom_drift_report()
+        try:
+            sim.step()
+        except EvaporationFluxRefusal as exc:
+            refusal = exc
+            assert sim.atom_ledger.mol_by_account() == ledger_before
+            assert tuple(sim.atom_ledger.transitions) == transitions_before
+            assert sim.atom_ledger.element_atom_drift_report() == drift_before
+            break
         steps += 1
 
-    assert sim.is_complete()
+    assert refusal is not None
+    assert refusal.reason == "viscous_p_bulk_transport_out_of_domain"
+    assert refusal.diagnostic["evaporation_flux_status"] == "not_evaluated"
+    assert refusal.diagnostic["evaporation_flux_kg_hr"] is None
     transitions = sim.atom_ledger.transitions
-    assert len(transitions) > 100  # a real multi-campaign batch
+    assert transitions
 
     registry = sim.atom_ledger.registry
     cumulative_imbalance_kg = sum(
@@ -453,7 +481,7 @@ def test_cumulative_transition_mass_closure_bounded():
     # single per-transition tolerance -- yet leaves ample headroom.
     assert cumulative_imbalance_kg < 1e-6
 
-    # The final batch mass balance must still close to ~zero. The
+    # The committed prefix at refusal must still close to ~zero. The
     # absolute floor is 5e-12 % (the legacy kg-native path holds
     # ~7e-13 %; the kernel-routed EVAPORATION_TRANSITION provider
     # introduces an additional ULP per species per transition through

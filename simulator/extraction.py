@@ -3665,9 +3665,10 @@ class ExtractionMixin:
             # Kn-domain validity for viscous P_bulk applies here too: the
             # C7 0.01–0.1 mbar shell-route band sits above VISCOUS_KNUDSEN_MAX
             # at typical hold T / D, so the same transport-model validity
-            # treatment as the EVAPORATION_FLUX provider suppresses
-            # ledger-authoritative extent (soft zero + diagnostic-limited).
-            # Not a Kn safety gate / not a coating gate; t-379 (0.7) lifts.
+            # C7-specific diagnostic-limited policy suppresses
+            # ledger-authoritative extent. The authoritative EVAPORATION_FLUX
+            # provider refuses this state. Not a Kn safety/coating gate;
+            # t-379 (0.7) lifts the missing-model restriction.
         else:
             try:
                 series_flux = _series_resistance_evaporation_flux_kg_m2_s(
@@ -3692,7 +3693,7 @@ class ExtractionMixin:
         )
         flux_kg_s_m2 = float(series_flux.flux_kg_s_m2)
         if domain_diag is not None:
-            # Soft-suppress ledger-authoritative C7 extent (provider parity).
+            # C7-specific diagnostic-limited suppression; not provider parity.
             flux_kg_s_m2 = 0.0
         ca_transport_mol = (
             flux_kg_s_m2
@@ -3780,7 +3781,7 @@ class ExtractionMixin:
             # caller's transport_diag splice.
             diagnostic['silent_zero_notes'] = [dict(n) for n in _c7_sz_notes]
         if domain_diag is not None:
-            # Provider-parity validity framing on the C7 ledger path.
+            # Shared validity vocabulary on the C7 diagnostic-limited path.
             diagnostic.update(
                 {
                     'authority_class': domain_diag['authority_class'],

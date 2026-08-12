@@ -87,6 +87,19 @@ from simulator.state import (
 from tests.chemistry.conftest import _build_sim
 
 
+def _hkl_only_setpoints(setpoints_data):
+    """Keep downstream electrolysis smoke tests on an evaluable flux path."""
+    patched = dict(setpoints_data)
+    kernel_config = dict(patched.get("chemistry_kernel", {}) or {})
+    series_config = dict(
+        kernel_config.get("evaporation_series_resistance", {}) or {}
+    )
+    series_config["gas_resistance_enabled"] = False
+    kernel_config["evaporation_series_resistance"] = series_config
+    patched["chemistry_kernel"] = kernel_config
+    return patched
+
+
 def _dispatch_bound_proposal(kernel, proposal):
     with patch.object(
         BuiltinElectrolysisStepProvider,
@@ -157,11 +170,12 @@ def full_electrolysis_run(
     setpoints_data,
 ):
     feedstock_key, additives_kg = request.param
+    patched_setpoints = _hkl_only_setpoints(setpoints_data)
     sim = _build_sim(
         feedstock_key,
         vapor_pressure_data,
         feedstocks_data,
-        setpoints_data,
+        patched_setpoints,
         additives_kg=additives_kg,
     )
     _force_fast_redox_liquidus_floor(sim)

@@ -191,7 +191,7 @@ def test_batch_cli_web_mol_ledger_parity(monkeypatch):
 
 
 def _install_alpha_fallback_fixture(monkeypatch) -> None:
-    """Opt this Cr/Mn-sampling parity fixture into the prototype alpha path."""
+    """Select identical prototype/HKL-only physics on all three surfaces."""
 
     def with_alpha_fallback(setpoints):
         payload = dict(setpoints)
@@ -200,6 +200,14 @@ def _install_alpha_fallback_fixture(monkeypatch) -> None:
         # Pending t-194 grounded values, all three surfaces explicitly use the
         # same alpha=1.0 prototype fallback so this remains a parity test.
         kernel_config["allow_unmeasured_alpha_fallback"] = True
+        series_config = dict(
+            kernel_config.get("evaporation_series_resistance", {}) or {}
+        )
+        # This test compares surface wiring through C4, not the default
+        # transport-domain policy. HKL-only is a modeled, explicit control and
+        # keeps every surface on the same evaluable path.
+        series_config["gas_resistance_enabled"] = False
+        kernel_config["evaporation_series_resistance"] = series_config
         payload["chemistry_kernel"] = kernel_config
         return payload
 
