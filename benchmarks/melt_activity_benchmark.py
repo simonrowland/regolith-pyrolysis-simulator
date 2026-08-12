@@ -1,0 +1,1439 @@
+#!/usr/bin/env python3
+"""Repeatable melt-activity comparison and composition-domain benchmark.
+
+The harness reads a tracked YAML bench set, runs a configurable engine set,
+captures every point as ``ok``, ``out_of_domain``, ``crash``, ``refused``, or
+``unavailable``, and writes deterministic CSV/JSON/Markdown artifacts. For
+gas observables it holds the tracked analytical gas layer constant and swaps
+only the engine-provided melt activity. Engine crashes are data, not process
+failures.
+
+Examples
+--------
+Run the complete tracked benchmark::
+
+    .venv/bin/python benchmarks/melt_activity_benchmark.py
+
+Generate only the stripping-trajectory coverage map::
+
+    .venv/bin/python benchmarks/melt_activity_benchmark.py --mode coverage
+"""
+
+from __future__ import annotations
+
+import argparse
+import csv
+import hashlib
+import json
+import math
+import os
+import shutil
+import sys
+import warnings
+from collections import Counter, defaultdict
+from dataclasses import asdict, dataclass, field
+from pathlib import Path
+from typing import Any, Iterable, Mapping, Protocol, Sequence
+
+import numpy as np
+import yaml
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+DEFAULT_BENCH_SET = REPO_ROOT / "data/melt_activity/basalt-bench-set-v1.yaml"
+DEFAULT_OUTPUT_DIR = REPO_ROOT / "benchmarks/results/melt_activity"
+DEFAULT_ENGINES = ("imcc-published", "imcc-ext", "alphamelts", "vaporock")
+SF04_ANCHOR_SPECIES = ("SiO2", "FeO", "Fe", "Mg", "SiO", "K", "Na", "O2")
+SF04_SHEET_COMPOSITIONS = {
+    "tho": "sf04_tholeiite",
+    "aba": "sf04_alkali_basalt",
+    "kom": "sf04_komatiite",
+    "dun": "sf04_dunite",
+}
+POINT_STATUSES = frozenset(
+    {"ok", "out_of_domain", "crash", "refused", "unavailable"}
+)
+
+
+@dataclass(frozen=True)
+class EngineResult:
+    """One melt-activity engine result at one composition and temperature."""
+
+    status: str
+    activities: Mapping[str, float] = field(default_factory=dict)
+    gammas: Mapping[str, float] = field(default_factory=dict)
+    reason: str = ""
+    details: Mapping[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        if self.status not in POINT_STATUSES:
+            raise ValueError(f"unknown benchmark status {self.status!r}")
+
+
+class MeltActivityEngine(Protocol):
+    name: str
+
+    def evaluate(
+        self,
+        composition_wt_pct: Mapping[str, float],
+        temperature_K: float,
+        fO2_bar: float,
+    ) -> EngineResult: ...
+
+    def coverage(
+        self,
+        composition_wt_pct: Mapping[str, float],
+        temperature_K: float,
+    ) -> EngineResult: ...
+
+
+def _repo_path(value: str | Path) -> Path:
+    path = Path(value)
+    return path if path.is_absolute() else REPO_ROOT / path
+
+
+def _sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _positive_finite(values: Mapping[str, Any]) -> dict[str, float]:
+    result: dict[str, float] = {}
+    for key, raw in values.items():
+        value = float(raw)
+        if value > 0.0 and math.isfinite(value):
+            result[str(key)] = value
+    return result
+
+
+def _normalize_wt(values: Mapping[str, Any]) -> dict[str, float]:
+    positive = _positive_finite(values)
+    total = sum(positive.values())
+    if total <= 0.0:
+        return {}
+    return {key: 100.0 * value / total for key, value in positive.items()}
+
+
+def _wt_to_mol(values: Mapping[str, Any]) -> dict[str, float]:
+    from simulator.accounting.formulas import resolve_species_formula
+
+    return {
+        oxide: (float(wt) / 100.0)
+        / resolve_species_formula(oxide).molar_mass_kg_per_mol()
+        for oxide, wt in _positive_finite(values).items()
+    }
+
+
+def _oxide_mole_fractions(values: Mapping[str, Any]) -> dict[str, float]:
+    mol = _wt_to_mol(values)
+    total = sum(mol.values())
+    return {key: value / total for key, value in mol.items()} if total else {}
+
+
+def _reason_line(value: Any) -> str:
+    return " ".join(str(value or "").split())[:800]
+
+
+def _alphamelts_failure_details(values: Mapping[str, Any]) -> dict[str, Any]:
+    failure = dict(values.get("subprocess_failure", {}) or {})
+    return {
+        key: value
+        for key, value in {
+            "backend_failure_category": values.get("backend_failure_category"),
+            "backend_failure_reason_code": values.get("backend_failure_reason_code"),
+            "backend_status_reason": values.get("backend_status_reason"),
+            "returncode": failure.get("returncode"),
+            "signal": failure.get("signal"),
+            "stage": failure.get("stage"),
+        }.items()
+        if value is not None
+    }
+
+
+def classify_engine_exception(exc: BaseException) -> tuple[str, str]:
+    """Map an engine-boundary exception into the benchmark status vocabulary."""
+
+    text = _reason_line(f"{type(exc).__name__}: {exc}")
+    lowered = text.lower()
+    category = str(getattr(exc, "backend_failure_category", "") or "").lower()
+    if category == "engine_crash" or any(
+        token in lowered for token in ("sigsegv", "sigabrt", "signal 11", "signal 6")
+    ):
+        return "crash", text
+    if "unavailable" in lowered or category == "backend_unavailable":
+        return "unavailable", text
+    if "outside" in lowered or "out_of_domain" in lowered:
+        return "out_of_domain", text
+    return "refused", text
+
+
+def execute_engine(
+    engine: MeltActivityEngine,
+    composition_wt_pct: Mapping[str, float],
+    temperature_K: float,
+    fO2_bar: float,
+) -> EngineResult:
+    """Run one engine without allowing a provider crash to abort the harness."""
+
+    try:
+        return engine.evaluate(composition_wt_pct, temperature_K, fO2_bar)
+    except Exception as exc:
+        status, reason = classify_engine_exception(exc)
+        return EngineResult(status=status, reason=reason)
+
+
+class ImccEngine:
+    """Published or explicitly labelled research IMCC-SF04 adapter."""
+
+    def __init__(self, name: str, pack_path: Path, *, published: bool) -> None:
+        self.name = name
+        self.pack_path = pack_path
+        self.published = published
+        self._pack: Any | None = None
+
+    def _load(self) -> Any:
+        if self._pack is not None:
+            return self._pack
+        from simulator.melt_backend.imcc_sf04 import (
+            ImccDatapack,
+            label_research_datapack,
+            load_datapack,
+        )
+
+        if self.published:
+            self._pack = load_datapack(self.pack_path)
+            return self._pack
+        raw = json.loads(self.pack_path.read_text(encoding="utf-8"))
+        parents = tuple(str(value) for value in raw["parents"])
+        rows = list(raw["rows"])
+        datapack = ImccDatapack(
+            reactions=[str(row["complex"]) for row in rows],
+            nu=np.asarray(
+                [
+                    [float(row["nu"].get(parent, 0.0)) for row in rows]
+                    for parent in parents
+                ],
+                dtype=float,
+            ),
+            A=np.asarray([float(row["A"]) for row in rows], dtype=float),
+            B=np.asarray([float(row["B"]) for row in rows], dtype=float),
+            domains=[tuple(float(v) for v in row["T_domain_K"]) for row in rows],
+            version=str(raw["imcc_sf04_datapack_version"]),
+            parent_oxides=parents,
+        )
+        self._pack = label_research_datapack(
+            datapack,
+            model_id="IMCC-SF04-EXT",
+            coverage="reviewed-central-table-research-extension",
+        )
+        return self._pack
+
+    def evaluate(
+        self,
+        composition_wt_pct: Mapping[str, float],
+        temperature_K: float,
+        fO2_bar: float,
+    ) -> EngineResult:
+        del fO2_bar
+        from simulator.melt_backend.imcc_sf04 import (
+            ImccCompositionOutsideValidatedEnvelopeError,
+            ImccComponentOutsideDomainError,
+            ImccCompositionIncompleteError,
+            ImccFerricInputUnsupportedError,
+            ImccNonconvergenceError,
+            ImccRefusal,
+            ImccTOutsideDatapackDomainError,
+            evaluate,
+        )
+
+        pack = self._load()
+        try:
+            result = evaluate(
+                composition_wt_pct,
+                float(temperature_K),
+                pack,
+                basis_type="wt",
+                enable_sp_extension=not self.published,
+            )
+        except (
+            ImccCompositionOutsideValidatedEnvelopeError,
+            ImccComponentOutsideDomainError,
+            ImccCompositionIncompleteError,
+            ImccFerricInputUnsupportedError,
+            ImccTOutsideDatapackDomainError,
+        ) as exc:
+            return EngineResult(status="out_of_domain", reason=_reason_line(exc))
+        except ImccNonconvergenceError as exc:
+            return EngineResult(status="refused", reason=_reason_line(exc))
+        except ImccRefusal as exc:
+            return EngineResult(status="refused", reason=_reason_line(exc))
+        activities = {
+            oxide: float(value)
+            for oxide, value in zip(result.parent_oxides, result.parent_activity)
+        }
+        gammas = {
+            oxide: float(value)
+            for oxide, value in zip(result.parent_oxides, result.parent_gamma)
+        }
+        labels = result.labels
+        return EngineResult(
+            status="ok",
+            activities=activities,
+            gammas=gammas,
+            details={
+                "model_id": labels.identity["model_id"],
+                "datapack_version": labels.identity["datapack_version"],
+                "trust": labels.trust,
+                "envelope_status": labels.envelope_status,
+                "pack_sha256": _sha256(self.pack_path),
+            },
+        )
+
+    def coverage(
+        self,
+        composition_wt_pct: Mapping[str, float],
+        temperature_K: float,
+    ) -> EngineResult:
+        return self.evaluate(composition_wt_pct, temperature_K, 1.0e-9)
+
+
+class AlphaMeltsEngine:
+    """AlphaMELTS diagnostic provider with typed subprocess failure capture."""
+
+    name = "alphamelts"
+
+    def __init__(self, timeout_s: float = 30.0) -> None:
+        self.timeout_s = float(timeout_s)
+        self._provider: Any | None = None
+        self._initialization_error = ""
+
+    def _initialize(self) -> Any | None:
+        if self._provider is not None or self._initialization_error:
+            return self._provider
+        from engines.alphamelts.provider import AlphaMELTSProvider
+        from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+
+        try:
+            backend = AlphaMELTSBackend()
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                available = backend.initialize(
+                    {"execution_mode": "subprocess", "timeout_s": self.timeout_s}
+                )
+            if not available:
+                self._initialization_error = "AlphaMELTS backend unavailable"
+                return None
+            self._provider = AlphaMELTSProvider(backend)
+        except Exception as exc:
+            self._initialization_error = _reason_line(exc)
+        return self._provider
+
+    def evaluate(
+        self,
+        composition_wt_pct: Mapping[str, float],
+        temperature_K: float,
+        fO2_bar: float,
+    ) -> EngineResult:
+        provider = self._initialize()
+        if provider is None:
+            return EngineResult(status="unavailable", reason=self._initialization_error)
+        from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
+        from simulator.chemistry.kernel.dto import ProviderAccountView
+
+        fO2_log = math.log10(float(fO2_bar))
+        request = IntentRequest(
+            intent=ChemistryIntent.SILICATE_EQUILIBRIUM,
+            account_view=ProviderAccountView(
+                accounts={"process.cleaned_melt": _wt_to_mol(composition_wt_pct)},
+                species_formula_registry={},
+            ),
+            temperature_C=float(temperature_K) - 273.15,
+            pressure_bar=1.0,
+            fO2_log=fO2_log,
+            control_inputs={},
+        )
+        result = provider.dispatch(request)
+        diagnostic = dict(result.diagnostic or {})
+        backend_diag = dict(diagnostic.get("backend_diagnostics", {}) or {})
+        status = str(result.status)
+        if str(backend_diag.get("backend_failure_category", "")) == "engine_crash":
+            return EngineResult(
+                status="crash",
+                reason=_reason_line(
+                    backend_diag.get("backend_status_reason_message")
+                    or "; ".join(result.warnings)
+                ),
+                details=_alphamelts_failure_details(backend_diag),
+            )
+        if status == "not_converged":
+            reason = _reason_line(
+                backend_diag.get("backend_status_reason")
+                or diagnostic.get("backend_status_reason")
+                or "; ".join(result.warnings)
+            )
+            if "sig" in reason.lower():
+                return EngineResult(
+                    status="crash",
+                    reason=reason,
+                    details=_alphamelts_failure_details(backend_diag),
+                )
+            return EngineResult(status="refused", reason=reason, details=backend_diag)
+        if status in {"out_of_domain", "unavailable"}:
+            return EngineResult(
+                status=status,
+                reason=_reason_line("; ".join(result.warnings)),
+                details=backend_diag,
+            )
+        if status != "ok":
+            return EngineResult(
+                status="refused",
+                reason=_reason_line(f"provider status {status}: {'; '.join(result.warnings)}"),
+                details=backend_diag,
+            )
+        activities = _positive_finite(
+            backend_diag.get("diagnostic_oxide_activities", {}) or {}
+        )
+        if not activities:
+            return EngineResult(
+                status="refused",
+                reason="AlphaMELTS returned no canonical oxide-activity surface",
+                details={
+                    "equilibrium_completed": True,
+                    "mode": diagnostic.get("mode"),
+                    "engine_version": diagnostic.get("engine_version"),
+                    "activity_basis": backend_diag.get("diagnostic_activity_basis"),
+                },
+            )
+        x = _oxide_mole_fractions(composition_wt_pct)
+        gammas = {
+            oxide: activity / x[oxide]
+            for oxide, activity in activities.items()
+            if x.get(oxide, 0.0) > 0.0
+        }
+        return EngineResult(
+            status="ok",
+            activities=activities,
+            gammas=gammas,
+            details={
+                "mode": diagnostic.get("mode"),
+                "engine_version": diagnostic.get("engine_version"),
+                "activity_basis": backend_diag.get("diagnostic_activity_basis"),
+            },
+        )
+
+    def coverage(
+        self,
+        composition_wt_pct: Mapping[str, float],
+        temperature_K: float,
+    ) -> EngineResult:
+        del temperature_K
+        from engines.alphamelts.domain import AlphaMELTSDomainGate
+
+        valid, warnings, reason = AlphaMELTSDomainGate.validate_with_reason(
+            composition_wt_pct
+        )
+        return EngineResult(
+            status="ok" if valid else "out_of_domain",
+            reason="" if valid else _reason_line("; ".join(warnings)),
+            details={"domain_reason": reason},
+        )
+
+
+class VapoRockEngine:
+    """VapoRock availability reporter for the activity-only comparison."""
+
+    name = "vaporock"
+
+    def __init__(self) -> None:
+        self._availability_result: tuple[bool, str] | None = None
+
+    def _availability(self) -> tuple[bool, str]:
+        if self._availability_result is not None:
+            return self._availability_result
+        try:
+            from simulator.melt_backend.vaporock import VapoRockBackend
+
+            backend = VapoRockBackend()
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                available = bool(backend.initialize({}))
+            backend.close()
+            self._availability_result = (available, "")
+        except Exception as exc:
+            self._availability_result = (False, _reason_line(exc))
+        return self._availability_result
+
+    def evaluate(
+        self,
+        composition_wt_pct: Mapping[str, float],
+        temperature_K: float,
+        fO2_bar: float,
+    ) -> EngineResult:
+        del composition_wt_pct, temperature_K, fO2_bar
+        available, error = self._availability()
+        reason = (
+            "VapoRock dependency is present but exposes no public per-oxide "
+            "melt-activity surface; internally coupled gas pressures are excluded"
+            if available
+            else f"VapoRock unavailable: {error or 'initialization failed'}"
+        )
+        return EngineResult(
+            status="unavailable",
+            reason=reason,
+            details={"dependency_available": available},
+        )
+
+    def coverage(
+        self,
+        composition_wt_pct: Mapping[str, float],
+        temperature_K: float,
+    ) -> EngineResult:
+        return self.evaluate(composition_wt_pct, temperature_K, 1.0e-9)
+
+
+def load_bench_set(path: Path) -> dict[str, Any]:
+    data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    if not isinstance(data, dict) or data.get("schema_version") != "melt-activity-bench.v1":
+        raise ValueError(f"unsupported melt activity bench set: {path}")
+    if not data.get("compositions") or not data.get("points"):
+        raise ValueError(f"bench set lacks compositions or points: {path}")
+    return data
+
+
+def build_engines(
+    names: Sequence[str], fixture: Mapping[str, Any], *, alphamelts_timeout_s: float
+) -> list[MeltActivityEngine]:
+    packs = dict(fixture["packs"])
+    constructors = {
+        "imcc-published": lambda: ImccEngine(
+            "imcc-published", _repo_path(packs["imcc-published"]), published=True
+        ),
+        "imcc-ext": lambda: ImccEngine(
+            "imcc-ext", _repo_path(packs["imcc-ext"]), published=False
+        ),
+        "alphamelts": lambda: AlphaMeltsEngine(timeout_s=alphamelts_timeout_s),
+        "vaporock": VapoRockEngine,
+    }
+    unknown = sorted(set(names) - set(constructors))
+    if unknown:
+        raise ValueError(f"unknown engines: {', '.join(unknown)}")
+    return [constructors[name]() for name in names]
+
+
+def _prediction_for_point(
+    point: Mapping[str, Any], result: EngineResult
+) -> tuple[float | None, str]:
+    if result.status != "ok":
+        return None, result.reason
+    observable = str(point["observable"])
+    parent = str(point["parent_oxide"])
+    if observable == "activity":
+        value = result.activities.get(parent)
+    elif observable == "activity_coefficient":
+        value = result.gammas.get(parent)
+    elif observable in {"partial_pressure", "evaporation_flux"}:
+        if "fO2_bar" not in point:
+            return None, "gas comparison refused: observation has no independent fO2 pin"
+        try:
+            from simulator.diagnostic_helpers.alphamelts_volatility import (
+                _analytical_vapor_pressures_from_activities,
+                _load_default_vapor_pressure_data,
+            )
+
+            gas = _analytical_vapor_pressures_from_activities(
+                vapor_pressure_data=_load_default_vapor_pressure_data(),
+                temperature_C=float(point["temperature_K"]) - 273.15,
+                pO2_bar=float(point["fO2_bar"]),
+                melt_oxide_activities=result.activities,
+                composition_wt_pct=point["composition_wt_pct"],
+            )["species"].get(str(point["species"]), {})
+            pressure_pa = float(gas["P_eq_Pa"])
+            if observable == "partial_pressure":
+                value = pressure_pa
+            else:
+                from simulator.accounting.formulas import resolve_species_formula
+                from simulator.physical_constants import GAS_CONSTANT
+
+                molar_mass = resolve_species_formula(
+                    str(point["species"])
+                ).molar_mass_kg_per_mol()
+                value = pressure_pa / math.sqrt(
+                    2.0 * math.pi * molar_mass * GAS_CONSTANT * float(point["temperature_K"])
+                )
+        except Exception as exc:
+            return None, f"shared gas layer refused: {_reason_line(exc)}"
+    else:
+        return None, f"unsupported observable {observable!r}"
+    if value is None or not math.isfinite(float(value)) or float(value) <= 0.0:
+        return None, f"engine returned no positive {observable} for {parent}"
+    return float(value), ""
+
+
+def run_points(
+    fixture: Mapping[str, Any], engines: Sequence[MeltActivityEngine]
+) -> list[dict[str, Any]]:
+    compositions = dict(fixture["compositions"])
+    cache: dict[tuple[str, str, float, float], EngineResult] = {}
+    rows: list[dict[str, Any]] = []
+    for point in fixture["points"]:
+        composition_id = str(point["composition_id"])
+        composition = _normalize_wt(compositions[composition_id]["composition_wt_pct"])
+        temperature_K = float(point["temperature_K"])
+        fO2_bar = float(point.get("fO2_bar", 1.0e-9))
+        enriched = {**point, "composition_wt_pct": composition}
+        for engine in engines:
+            key = (engine.name, composition_id, temperature_K, fO2_bar)
+            if key not in cache:
+                cache[key] = execute_engine(engine, composition, temperature_K, fO2_bar)
+            result = cache[key]
+            if (
+                not bool(point.get("score", True))
+                and point.get("dropped_reason")
+                and result.status == "ok"
+            ):
+                result = EngineResult(
+                    status="refused",
+                    reason=str(point["dropped_reason"]),
+                    details={**result.details, "evaluation_status": "ok"},
+                )
+            prediction, prediction_reason = _prediction_for_point(enriched, result)
+            measured = float(point["measured"])
+            residual = (
+                math.log10(prediction / measured)
+                if prediction is not None and measured > 0.0 and bool(point.get("score", True))
+                else None
+            )
+            rows.append(
+                {
+                    "point_id": point["id"],
+                    "population": point["population"],
+                    "material_class": point["material_class"],
+                    "composition_id": composition_id,
+                    "temperature_K": temperature_K,
+                    "species": point["species"],
+                    "parent_oxide": point["parent_oxide"],
+                    "observable": point["observable"],
+                    "measured": measured,
+                    "units": point["units"],
+                    "engine": engine.name,
+                    "status": result.status,
+                    "prediction": prediction,
+                    "residual_dex": residual,
+                    "score": bool(point.get("score", True)),
+                    "reason": prediction_reason or result.reason,
+                    "details": json.dumps(result.details, sort_keys=True, default=str),
+                }
+            )
+    return rows
+
+
+def run_composition_probes(
+    fixture: Mapping[str, Any], engines: Sequence[MeltActivityEngine]
+) -> list[dict[str, Any]]:
+    compositions = dict(fixture["compositions"])
+    rows: list[dict[str, Any]] = []
+    for probe in fixture.get("composition_probes", []):
+        composition_id = str(probe["composition_id"])
+        composition_meta = compositions[composition_id]
+        composition = _normalize_wt(composition_meta["composition_wt_pct"])
+        for engine in engines:
+            result = execute_engine(
+                engine,
+                composition,
+                float(probe["temperature_K"]),
+                float(probe.get("fO2_bar", 1.0e-9)),
+            )
+            rows.append(
+                {
+                    "probe_id": probe["id"],
+                    "composition_id": composition_id,
+                    "material_class": composition_meta["material_class"],
+                    "temperature_K": float(probe["temperature_K"]),
+                    "SiO2_wt_pct": composition.get("SiO2", 0.0),
+                    "engine": engine.name,
+                    "status": result.status,
+                    "reason": result.reason,
+                    "details": json.dumps(result.details, sort_keys=True, default=str),
+                }
+            )
+    return rows
+
+
+def stripping_trajectory(
+    composition_wt_pct: Mapping[str, Any], steps: int
+) -> Iterable[tuple[str, int, float, dict[str, float]]]:
+    base = _normalize_wt(composition_wt_pct)
+    if steps < 2:
+        raise ValueError("coverage steps must be >= 2")
+    for trajectory in ("remove_silica", "strip_modifiers"):
+        for step in range(steps):
+            fraction = 0.95 * step / (steps - 1)
+            changed = dict(base)
+            if trajectory == "remove_silica":
+                changed["SiO2"] = changed.get("SiO2", 0.0) * (1.0 - fraction)
+            else:
+                changed = {
+                    oxide: value if oxide == "SiO2" else value * (1.0 - fraction)
+                    for oxide, value in changed.items()
+                }
+            yield trajectory, step, fraction, _normalize_wt(changed)
+
+
+def run_coverage_map(
+    fixture: Mapping[str, Any], engines: Sequence[MeltActivityEngine], steps: int
+) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for composition_id, meta in fixture["compositions"].items():
+        if meta["material_class"] != "literal_basalt":
+            continue
+        for trajectory, step, fraction, composition in stripping_trajectory(
+            meta["composition_wt_pct"], steps
+        ):
+            row: dict[str, Any] = {
+                "composition_id": composition_id,
+                "trajectory": trajectory,
+                "step": step,
+                "stripped_fraction": fraction,
+                "SiO2_wt_pct": composition.get("SiO2", 0.0),
+                "major_oxide_sum_wt_pct": sum(composition.values()),
+                "composition_json": json.dumps(composition, sort_keys=True),
+            }
+            for engine in engines:
+                try:
+                    result = engine.coverage(composition, 1900.0)
+                except Exception as exc:
+                    status, reason = classify_engine_exception(exc)
+                    result = EngineResult(status=status, reason=reason)
+                row[f"{engine.name}_status"] = result.status
+                row[f"{engine.name}_reason"] = result.reason
+            rows.append(row)
+    return rows
+
+
+def _write_csv(path: Path, rows: Sequence[Mapping[str, Any]]) -> None:
+    fields: list[str] = []
+    for row in rows:
+        for key in row:
+            if key not in fields:
+                fields.append(key)
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fields, extrasaction="ignore")
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+def _optional_float(value: Any) -> float | None:
+    try:
+        parsed = float(value)
+    except (TypeError, ValueError):
+        return None
+    return parsed if math.isfinite(parsed) else None
+
+
+def _read_csv(path: Path) -> list[dict[str, str]]:
+    with path.open(newline="", encoding="utf-8-sig") as handle:
+        return list(csv.DictReader(handle))
+
+
+def run_reference_anchors(fixture: Mapping[str, Any]) -> list[dict[str, Any]]:
+    """Rejoin frozen IMCC and VapoRock rows and retain empirical KEMS evidence."""
+
+    config = dict(fixture["reference_anchors"])
+    imcc_path = _repo_path(config["imcc_magma"]["path"])
+    vaporock_path = _repo_path(config["vaporock_magma_kems"]["path"])
+    for name, path in (
+        ("imcc_magma", imcc_path),
+        ("vaporock_magma_kems", vaporock_path),
+    ):
+        expected_hash = str(config[name]["tracked_sha256"])
+        actual_hash = _sha256(path)
+        if actual_hash != expected_hash:
+            raise ValueError(
+                f"{name} tracked snapshot hash mismatch: "
+                f"expected {expected_hash}, got {actual_hash}"
+            )
+    imcc_rows = _read_csv(imcc_path)
+    vaporock_rows = _read_csv(vaporock_path)
+    vaporock_model: dict[tuple[str, str, float], Mapping[str, str]] = {}
+    for row in vaporock_rows:
+        if row["anchor_class"] != "model_model_MAGMA":
+            continue
+        sheet = str(row["composition_ref"]).removeprefix("SF04-")
+        key = (sheet, str(row["species"]), float(row["T_K"]))
+        if key in vaporock_model:
+            raise ValueError(f"duplicate VapoRock MAGMA anchor key: {key}")
+        vaporock_model[key] = row
+
+    rows: list[dict[str, Any]] = []
+    seen_imcc: set[tuple[str, str, float]] = set()
+    for imcc in imcc_rows:
+        key = (str(imcc["sheet"]), str(imcc["species"]), float(imcc["T_K"]))
+        if key in seen_imcc:
+            raise ValueError(f"duplicate IMCC MAGMA anchor key: {key}")
+        seen_imcc.add(key)
+        vaporock = vaporock_model.get(key)
+        if vaporock is None:
+            continue
+        imcc_reference = float(imcc["log10P_workbook"])
+        vaporock_reference = float(vaporock["log10P_anchor"])
+        imcc_prediction = float(imcc["log10P_shadow"])
+        vaporock_prediction = float(vaporock["log10P_model"])
+        rows.append(
+            {
+                "evidence_class": "model_model_MAGMA",
+                "sheet": key[0],
+                "composition_ref": vaporock["composition_ref"],
+                "temperature_K": key[2],
+                "species": key[1],
+                "imcc_reference_log10P": imcc_reference,
+                "vaporock_reference_log10P": vaporock_reference,
+                "reference_difference_dex": imcc_reference - vaporock_reference,
+                "imcc_prediction_log10P": imcc_prediction,
+                "vaporock_prediction_log10P": vaporock_prediction,
+                "imcc_residual_dex": imcc_prediction - imcc_reference,
+                "vaporock_residual_dex": vaporock_prediction - vaporock_reference,
+                "reference_status": vaporock["status"],
+                "source": vaporock["source"],
+                "note": vaporock["note"],
+            }
+        )
+
+    expected = int(config["expected_shared_cells"])
+    if len(rows) != expected:
+        raise ValueError(
+            f"reference anchor join produced {len(rows)} cells; expected {expected}"
+        )
+
+    for vaporock in vaporock_rows:
+        if vaporock["anchor_class"] != "experimental_KEMS":
+            continue
+        measured = _optional_float(vaporock["log10P_anchor"])
+        predicted = _optional_float(vaporock["log10P_model"])
+        residual = _optional_float(vaporock["residual"])
+        rows.append(
+            {
+                "evidence_class": "experimental_KEMS",
+                "sheet": "",
+                "composition_ref": vaporock["composition_ref"],
+                "temperature_K": float(vaporock["T_K"]),
+                "species": vaporock["species"],
+                "imcc_reference_log10P": None,
+                "vaporock_reference_log10P": measured,
+                "reference_difference_dex": None,
+                "imcc_prediction_log10P": None,
+                "vaporock_prediction_log10P": predicted,
+                "imcc_residual_dex": None,
+                "vaporock_residual_dex": residual,
+                "reference_status": vaporock["status"],
+                "source": vaporock["source"],
+                "note": vaporock["note"],
+            }
+        )
+    return rows
+
+
+def _rmse(values: Iterable[float]) -> float | None:
+    materialized = list(values)
+    if not materialized:
+        return None
+    return math.sqrt(sum(value * value for value in materialized) / len(materialized))
+
+
+def summarize_reference_anchors(
+    fixture: Mapping[str, Any], rows: Sequence[Mapping[str, Any]]
+) -> dict[str, Any]:
+    model_rows = [
+        row for row in rows if row["evidence_class"] == "model_model_MAGMA"
+    ]
+    empirical_rows = [
+        row for row in rows if row["evidence_class"] == "experimental_KEMS"
+    ]
+    per_species: list[dict[str, Any]] = []
+    for species in SF04_ANCHOR_SPECIES:
+        model_group = [row for row in model_rows if row["species"] == species]
+        empirical_group = [
+            row
+            for row in empirical_rows
+            if row["species"] == species
+            and row.get("vaporock_residual_dex") is not None
+        ]
+        per_species.append(
+            {
+                "species": species,
+                "shared_magma_count": len(model_group),
+                "imcc_magma_rmse_dex": _rmse(
+                    float(row["imcc_residual_dex"]) for row in model_group
+                ),
+                "vaporock_magma_rmse_dex": _rmse(
+                    float(row["vaporock_residual_dex"]) for row in model_group
+                ),
+                "empirical_kems_count": len(empirical_group),
+                "vaporock_kems_rmse_dex": _rmse(
+                    float(row["vaporock_residual_dex"]) for row in empirical_group
+                ),
+            }
+        )
+    controller_pool = [
+        row for row in model_rows if row["species"] not in {"K", "Na"}
+    ]
+    expected = fixture["reference_anchors"][
+        "expected_non_alkali_pooled_rmse_dex"
+    ]
+    imcc_pool = _rmse(float(row["imcc_residual_dex"]) for row in controller_pool)
+    vaporock_pool = _rmse(
+        float(row["vaporock_residual_dex"]) for row in controller_pool
+    )
+    assert imcc_pool is not None and vaporock_pool is not None
+    return {
+        "shared_magma_count": len(model_rows),
+        "max_reference_difference_dex": max(
+            abs(float(row["reference_difference_dex"])) for row in model_rows
+        ),
+        "per_species": per_species,
+        "empirical_kems_total": len(empirical_rows),
+        "empirical_kems_scored": sum(
+            row.get("vaporock_residual_dex") is not None for row in empirical_rows
+        ),
+        "controller_pool_count": len(controller_pool),
+        "controller_pool_imcc_rmse_dex": imcc_pool,
+        "controller_pool_vaporock_rmse_dex": vaporock_pool,
+        "controller_anchor_reproduced": (
+            abs(imcc_pool - float(expected["imcc"])) < 5.0e-4
+            and abs(vaporock_pool - float(expected["vaporock"])) < 5.0e-4
+        ),
+    }
+
+
+def run_live_vaporock_anchor_check(
+    fixture: Mapping[str, Any],
+    reference_rows: Sequence[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    """Compare the installed VapoRock build with the frozen tracked snapshot."""
+
+    os.environ.setdefault("MPLCONFIGDIR", "/tmp/regolith-mpl-cache")
+    try:
+        from vaporock import System
+    except Exception as exc:
+        return [
+            {
+                "sheet": "",
+                "temperature_K": None,
+                "species": "",
+                "status": "unavailable",
+                "reason": _reason_line(exc),
+            }
+        ]
+    model_rows = [
+        row
+        for row in reference_rows
+        if row["evidence_class"] == "model_model_MAGMA"
+    ]
+    by_state: dict[tuple[str, float], list[Mapping[str, Any]]] = defaultdict(list)
+    for row in model_rows:
+        by_state[(str(row["sheet"]), float(row["temperature_K"]))].append(row)
+    output: list[dict[str, Any]] = []
+    system = System(vapor_database="JANAF")
+    compositions = fixture["compositions"]
+    for sheet in SF04_SHEET_COMPOSITIONS:
+        states = sorted(
+            (key, group) for key, group in by_state.items() if key[0] == sheet
+        )
+        temperatures = np.asarray([key[1] for key, _ in states], dtype=float)
+        fO2 = np.asarray(
+            [
+                float(next(row for row in group if row["species"] == "O2")[
+                    "vaporock_prediction_log10P"
+                ])
+                for _, group in states
+            ],
+            dtype=float,
+        )
+        composition = compositions[SF04_SHEET_COMPOSITIONS[sheet]][
+            "vaporock_anchor_composition_wt_pct"
+        ]
+        try:
+            system.set_melt_comp(composition)
+            live = system.eval_gas_abundances(temperatures, fO2)
+        except Exception as exc:
+            for (state_sheet, temperature), group in states:
+                for row in group:
+                    output.append(
+                        {
+                            "sheet": state_sheet,
+                            "temperature_K": temperature,
+                            "species": row["species"],
+                            "status": "refused",
+                            "reason": _reason_line(exc),
+                        }
+                    )
+            continue
+        for (_, temperature), group in states:
+            columns = np.asarray(live.columns, dtype=float)
+            column = live.columns[int(np.argmin(np.abs(columns - temperature)))]
+            for row in group:
+                species = str(row["species"])
+                key = f"{species}(g)"
+                value = (
+                    _optional_float(live.loc[key, column])
+                    if key in live.index
+                    else None
+                )
+                frozen = float(row["vaporock_prediction_log10P"])
+                output.append(
+                    {
+                        "sheet": sheet,
+                        "temperature_K": temperature,
+                        "species": species,
+                        "status": "ok" if value is not None else "refused",
+                        "frozen_vaporock_log10P": frozen,
+                        "live_vaporock_log10P": value,
+                        "live_minus_frozen_dex": (
+                            value - frozen if value is not None else None
+                        ),
+                        "reason": "" if value is not None else "species missing",
+                    }
+                )
+    return output
+
+
+def summarize_metrics(rows: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    groups: dict[tuple[str, str, str], list[Mapping[str, Any]]] = defaultdict(list)
+    for row in rows:
+        groups[(str(row["species"]), str(row["observable"]), str(row["engine"]))].append(row)
+    summary: list[dict[str, Any]] = []
+    for key in sorted(groups):
+        species, observable, engine = key
+        group = groups[key]
+        residuals = [
+            float(row["residual_dex"])
+            for row in group
+            if row.get("residual_dex") is not None
+        ]
+        counts = Counter(str(row["status"]) for row in group)
+        summary.append(
+            {
+                "species": species,
+                "observable": observable,
+                "engine": engine,
+                "scored_count": len(residuals),
+                "rmse_dex": (
+                    math.sqrt(sum(value * value for value in residuals) / len(residuals))
+                    if residuals
+                    else None
+                ),
+                "median_signed_residual_dex": (
+                    float(np.median(residuals)) if residuals else None
+                ),
+                **{f"{status}_count": counts[status] for status in sorted(POINT_STATUSES)},
+            }
+        )
+    return summary
+
+
+def _fmt(value: Any, digits: int = 4) -> str:
+    if value is None or value == "":
+        return "—"
+    if isinstance(value, float):
+        return f"{value:.{digits}g}"
+    return str(value)
+
+
+def generate_report(
+    fixture: Mapping[str, Any],
+    point_rows: Sequence[Mapping[str, Any]],
+    probe_rows: Sequence[Mapping[str, Any]],
+    coverage_rows: Sequence[Mapping[str, Any]],
+    reference_rows: Sequence[Mapping[str, Any]] = (),
+    live_vaporock_rows: Sequence[Mapping[str, Any]] = (),
+) -> str:
+    metrics = summarize_metrics(point_rows)
+    point_engines = {str(row["engine"]) for row in point_rows}
+    probe_engines = {str(row["engine"]) for row in probe_rows}
+    coverage_engines = {
+        key.removesuffix("_status")
+        for row in coverage_rows
+        for key in row
+        if key.endswith("_status")
+    }
+    present_engines = point_engines | probe_engines | coverage_engines
+    lines = [
+        "# Melt-activity benchmark report",
+        "",
+        "## Evidence boundary",
+        "",
+        f"Literal SF04 basalt empirical points: **{fixture['provenance']['literal_basalt_empirical_point_count']}**. "
+        "The scored experimental population is six Hastie-1981 KEMS gas-pressure "
+        "points plus six Richter-2007 Type-B CAI-like CMAS gamma targets. "
+        "SF04 workbook pressures are scored only as an explicitly non-empirical regression anchor.",
+        "",
+        "Residual convention: `log10(predicted/measured)`; positive means overprediction. "
+        "No coefficient tuning was performed.",
+        "",
+        "## Per-species comparison",
+        "",
+        "| Species | Observable | Engine | n | RMSE (dex) | Median residual | ok | OOD | crash | refused | unavailable |",
+        "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+    ]
+    for row in metrics:
+        lines.append(
+            "| {species} | {observable} | {engine} | {scored_count} | {rmse} | {median} | {ok} | {ood} | {crash} | {refused} | {unavailable} |".format(
+                **row,
+                rmse=_fmt(row["rmse_dex"]),
+                median=_fmt(row["median_signed_residual_dex"]),
+                ok=row["ok_count"],
+                ood=row["out_of_domain_count"],
+                crash=row["crash_count"],
+                refused=row["refused_count"],
+                unavailable=row["unavailable_count"],
+            )
+        )
+    if reference_rows:
+        anchor = summarize_reference_anchors(fixture, reference_rows)
+        lines.extend(
+            [
+                "",
+                "## Frozen SF04 MAGMA regression anchor",
+                "",
+                f"The tracked source snapshots rejoin **{anchor['shared_magma_count']}** identical "
+                "SF04 cells on `(sheet, species, T_K)`. Their MAGMA references agree to "
+                f"{anchor['max_reference_difference_dex']:.4f} dex at four decimals.",
+                "",
+                "MAGMA is a model-reproduction anchor, not correctness evidence. "
+                "The empirical-KEMS column is the independent measured-pressure check "
+                "available in the frozen VapoRock validation snapshot.",
+                "",
+                "| Species | Shared MAGMA n | IMCC RMSE vs MAGMA | VapoRock RMSE vs MAGMA | Empirical KEMS n | VapoRock RMSE vs KEMS |",
+                "|---|---:|---:|---:|---:|---:|",
+            ]
+        )
+        for row in anchor["per_species"]:
+            lines.append(
+                "| {species} | {shared_magma_count} | {imcc} | {vaporock} | {empirical_kems_count} | {kems} |".format(
+                    **row,
+                    imcc=_fmt(row["imcc_magma_rmse_dex"], 3),
+                    vaporock=_fmt(row["vaporock_magma_rmse_dex"], 3),
+                    kems=_fmt(row["vaporock_kems_rmse_dex"], 3),
+                )
+            )
+        lines.extend(
+            [
+                "",
+                "Controller regression pool (all non-alkali rows, including the O2 fO2 pin): "
+                f"IMCC **{anchor['controller_pool_imcc_rmse_dex']:.3f}** vs "
+                f"VapoRock **{anchor['controller_pool_vaporock_rmse_dex']:.3f}** dex; "
+                f"0.274/0.503 anchor reproduced: **{'yes' if anchor['controller_anchor_reproduced'] else 'no'}**.",
+                "",
+                f"Experimental KEMS snapshot: **{anchor['empirical_kems_scored']} scored / "
+                f"{anchor['empirical_kems_total']} retained** rows. These are independent "
+                "KEMS compositions, not measurements on the four SF04 basalt sheets, and "
+                "therefore do not turn the MAGMA table into empirical basalt evidence.",
+            ]
+        )
+        if live_vaporock_rows:
+            live_deltas = [
+                abs(float(row["live_minus_frozen_dex"]))
+                for row in live_vaporock_rows
+                if row.get("live_minus_frozen_dex") is not None
+            ]
+            live_ok = sum(row.get("status") == "ok" for row in live_vaporock_rows)
+            max_live_delta = max(live_deltas) if live_deltas else None
+            lines.extend(
+                [
+                    "",
+                    "### Installed VapoRock snapshot check",
+                    "",
+                    f"Live comparison produced {live_ok}/{len(live_vaporock_rows)} cells; "
+                    f"maximum live-minus-frozen magnitude: {_fmt(max_live_delta, 6)} dex.",
+                    (
+                        "The installed VapoRock run disagrees with the frozen anchors.csv snapshot; "
+                        "the difference is recorded, not reconciled."
+                        if max_live_delta is None or max_live_delta > 5.0e-4
+                        else "The installed VapoRock run reproduces the frozen snapshot within 0.0005 dex."
+                    ),
+                ]
+            )
+    lines.extend(
+        [
+            "",
+            "## In-domain composition probes",
+            "",
+            "These are engine robustness/coverage probes, not empirical score points.",
+            "",
+            "| Composition | Class | Engine | Status | Reason |",
+            "|---|---|---|---|---|",
+        ]
+    )
+    for row in probe_rows:
+        lines.append(
+            f"| {row['composition_id']} | {row['material_class']} | {row['engine']} | {row['status']} | {_reason_line(row['reason']) or '—'} |"
+        )
+    lines.extend(["", "## Cross-engine verdict", ""])
+    if "alphamelts" not in present_engines:
+        lines.append("AlphaMELTS was not selected; no IMCC-versus-AlphaMELTS verdict was computed.")
+    else:
+        literal_alpha = [
+            row
+            for row in probe_rows
+            if row["material_class"] == "literal_basalt"
+            and row["engine"] == "alphamelts"
+        ]
+        alpha_equilibrium_completed = bool(literal_alpha) and all(
+            json.loads(str(row.get("details") or "{}"))
+            .get("equilibrium_completed", False)
+            for row in literal_alpha
+        )
+        lines.append(
+            "AlphaMELTS equilibrium completed on all literal SF04 basalt probes, but its provider returned no canonical per-oxide activity surface; therefore the fair melt-activity comparison was refused."
+            if alpha_equilibrium_completed
+            else "AlphaMELTS did not complete a usable melt-activity evaluation on all literal SF04 basalts."
+        )
+        imcc_engines = {
+            engine for engine in present_engines if engine.startswith("imcc-")
+        }
+        if not imcc_engines:
+            lines.extend(
+                ["", "No IMCC engine was selected; no cross-engine verdict was computed."]
+            )
+        else:
+            alpha_scored_ids = {
+                str(row["point_id"])
+                for row in point_rows
+                if row["engine"] == "alphamelts"
+                and row.get("residual_dex") is not None
+            }
+            imcc_scored_ids = {
+                str(row["point_id"])
+                for row in point_rows
+                if row["engine"] in imcc_engines
+                and row.get("residual_dex") is not None
+            }
+            shared_scored_ids = alpha_scored_ids & imcc_scored_ids
+            lines.extend(
+                [
+                    "",
+                    (
+                        f"IMCC and AlphaMELTS share {len(shared_scored_ids)} scored experimental points."
+                        if shared_scored_ids
+                        else "IMCC-versus-AlphaMELTS empirical verdict: **none**. No point has both a convention-valid measurement and successful canonical activities from both engine families."
+                    ),
+                ]
+            )
+    lines.extend(["", "## Stripping-trajectory coverage", ""])
+    for engine in sorted(coverage_engines):
+        accepted = sum(row.get(f"{engine}_status") == "ok" for row in coverage_rows)
+        refused = len(coverage_rows) - accepted
+        low_silica = [
+            row for row in coverage_rows if float(row["SiO2_wt_pct"]) < 30.0
+        ]
+        low_refused = sum(row.get(f"{engine}_status") != "ok" for row in low_silica)
+        lines.append(
+            f"- `{engine}`: {accepted}/{len(coverage_rows)} accepted; {refused} refused/unavailable; "
+            f"below 30 wt% SiO2, {low_refused}/{len(low_silica)} refused/unavailable."
+        )
+    alpha_rows = [row for row in coverage_rows if "alphamelts_status" in row]
+    if alpha_rows:
+        lines.extend(["", "AlphaMELTS trajectory boundaries:", ""])
+        boundary_groups: dict[tuple[str, str], list[Mapping[str, Any]]] = defaultdict(list)
+        for row in alpha_rows:
+            boundary_groups[(str(row["composition_id"]), str(row["trajectory"]))].append(row)
+        for (composition_id, trajectory), group in sorted(boundary_groups.items()):
+            ordered = sorted(group, key=lambda row: int(row["step"]))
+            first_refusal = next(
+                (row for row in ordered if row["alphamelts_status"] != "ok"), None
+            )
+            if first_refusal is None:
+                lines.append(f"- `{composition_id}` / `{trajectory}`: no refusal in sweep.")
+            else:
+                lines.append(
+                    f"- `{composition_id}` / `{trajectory}`: first refusal at step {first_refusal['step']}, "
+                    f"SiO2={float(first_refusal['SiO2_wt_pct']):.3f} wt%."
+                )
+    lines.extend(
+        [
+            "",
+            "The CSV preserves each composition step, engine status, and typed reason.",
+        ]
+    )
+    if alpha_rows:
+        lines.append(
+            "It answers the rump question as a curve: AlphaMELTS rejects every normalized step below its 30 wt% SiO2 floor."
+        )
+    lines.extend(
+        [
+            "",
+            "## Honest limits",
+            "",
+            "- No direct experimental activity or partial-pressure points exist for the four literal SF04 basalt sheets in the tracked source inventory.",
+            "- Richter-2007 is an in-domain Type-B CAI-like CMAS melt, not a literal basalt; its six gamma targets are reported separately.",
+            "- Four OCR-digitized Richter Mg flux points are retained but refused for scoring because no independent experimental fO2 pin closes the gas/reference-state comparison.",
+            "- KEMS-008 Table 10 values are kinetic vaporization coefficients, not basalt melt activities.",
+        ]
+    )
+    if "vaporock" in present_engines:
+        lines.append(
+            "- VapoRock currently exposes no public per-oxide melt-activity surface, so its internally coupled gas results are excluded from the activity-only swap; its separate frozen MAGMA/KEMS and optional live-snapshot diagnostics remain reported."
+        )
+    if "alphamelts" in present_engines:
+        lines.append(
+            "- Where AlphaMELTS provides no canonical oxide activity or crashes, that is recorded as a first-class result; it is never replaced by a fallback model."
+        )
+    lines.append("")
+    return "\n".join(lines)
+
+
+def run_benchmark(
+    *,
+    bench_set_path: Path = DEFAULT_BENCH_SET,
+    output_dir: Path = DEFAULT_OUTPUT_DIR,
+    engine_names: Sequence[str] = DEFAULT_ENGINES,
+    mode: str = "all",
+    coverage_steps: int = 21,
+    alphamelts_timeout_s: float = 30.0,
+    live_vaporock_anchor_check: bool = False,
+) -> dict[str, Any]:
+    fixture = load_bench_set(bench_set_path)
+    engines = build_engines(
+        engine_names, fixture, alphamelts_timeout_s=alphamelts_timeout_s
+    )
+    output_dir.mkdir(parents=True, exist_ok=True)
+    generated_names = {
+        "bench-set.yaml",
+        "benchmark-results.csv",
+        "composition-probes.csv",
+        "coverage-map.csv",
+        "reference-anchor-results.csv",
+        "live-vaporock-check.csv",
+        "report.md",
+        "run-metadata.json",
+    }
+    for name in generated_names:
+        (output_dir / name).unlink(missing_ok=True)
+    point_rows: list[dict[str, Any]] = []
+    probe_rows: list[dict[str, Any]] = []
+    coverage_rows: list[dict[str, Any]] = []
+    reference_rows: list[dict[str, Any]] = []
+    live_vaporock_rows: list[dict[str, Any]] = []
+    if mode in {"benchmark", "all"}:
+        point_rows = run_points(fixture, engines)
+        probe_rows = run_composition_probes(fixture, engines)
+        reference_rows = run_reference_anchors(fixture)
+        if live_vaporock_anchor_check:
+            live_vaporock_rows = run_live_vaporock_anchor_check(
+                fixture, reference_rows
+            )
+        _write_csv(output_dir / "benchmark-results.csv", point_rows)
+        _write_csv(output_dir / "composition-probes.csv", probe_rows)
+        _write_csv(output_dir / "reference-anchor-results.csv", reference_rows)
+        if live_vaporock_rows:
+            _write_csv(output_dir / "live-vaporock-check.csv", live_vaporock_rows)
+    if mode in {"coverage", "all"}:
+        coverage_rows = run_coverage_map(fixture, engines, coverage_steps)
+        _write_csv(output_dir / "coverage-map.csv", coverage_rows)
+    shutil.copyfile(bench_set_path, output_dir / "bench-set.yaml")
+    metadata = {
+        "schema_version": "melt-activity-benchmark-run.v1",
+        "bench_set": (
+            str(bench_set_path.relative_to(REPO_ROOT))
+            if bench_set_path.is_relative_to(REPO_ROOT)
+            else str(bench_set_path)
+        ),
+        "bench_set_sha256": _sha256(bench_set_path),
+        "engines": list(engine_names),
+        "mode": mode,
+        "point_status_counts": dict(sorted(Counter(row["status"] for row in point_rows).items())),
+        "probe_status_counts": dict(sorted(Counter(row["status"] for row in probe_rows).items())),
+        "coverage_row_count": len(coverage_rows),
+        "reference_anchor": (
+            summarize_reference_anchors(fixture, reference_rows)
+            if reference_rows
+            else None
+        ),
+        "live_vaporock_anchor_check": {
+            "requested": live_vaporock_anchor_check,
+            "row_count": len(live_vaporock_rows),
+            "status_counts": dict(
+                sorted(Counter(row["status"] for row in live_vaporock_rows).items())
+            ),
+        },
+    }
+    (output_dir / "run-metadata.json").write_text(
+        json.dumps(metadata, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    if mode == "all":
+        (output_dir / "report.md").write_text(
+            generate_report(
+                fixture,
+                point_rows,
+                probe_rows,
+                coverage_rows,
+                reference_rows,
+                live_vaporock_rows,
+            ),
+            encoding="utf-8",
+        )
+    return {
+        "point_rows": point_rows,
+        "probe_rows": probe_rows,
+        "coverage_rows": coverage_rows,
+        "reference_rows": reference_rows,
+        "live_vaporock_rows": live_vaporock_rows,
+        "metadata": metadata,
+    }
+
+
+def build_arg_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        description="Compare melt-activity engines and map stripping-trajectory domain coverage."
+    )
+    parser.add_argument(
+        "--bench-set",
+        type=Path,
+        default=DEFAULT_BENCH_SET,
+        help=f"tracked YAML bench set (default: {DEFAULT_BENCH_SET.relative_to(REPO_ROOT)})",
+    )
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=DEFAULT_OUTPUT_DIR,
+        help=f"artifact directory (default: {DEFAULT_OUTPUT_DIR.relative_to(REPO_ROOT)})",
+    )
+    parser.add_argument(
+        "--engines",
+        default=",".join(DEFAULT_ENGINES),
+        help="comma-separated engines: imcc-published,imcc-ext,alphamelts,vaporock",
+    )
+    parser.add_argument(
+        "--mode", choices=("benchmark", "coverage", "all"), default="all"
+    )
+    parser.add_argument("--coverage-steps", type=int, default=21)
+    parser.add_argument("--alphamelts-timeout-s", type=float, default=30.0)
+    parser.add_argument(
+        "--live-vaporock-anchor-check",
+        action="store_true",
+        help="compare the installed VapoRock build with the frozen tracked snapshot",
+    )
+    return parser
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    args = build_arg_parser().parse_args(argv)
+    names = tuple(value.strip() for value in args.engines.split(",") if value.strip())
+    result = run_benchmark(
+        bench_set_path=args.bench_set.resolve(),
+        output_dir=args.output_dir.resolve(),
+        engine_names=names,
+        mode=args.mode,
+        coverage_steps=args.coverage_steps,
+        alphamelts_timeout_s=args.alphamelts_timeout_s,
+        live_vaporock_anchor_check=args.live_vaporock_anchor_check,
+    )
+    print(
+        f"wrote {args.output_dir}: {len(result['point_rows'])} point-engine rows, "
+        f"{len(result['coverage_rows'])} coverage rows"
+    )
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

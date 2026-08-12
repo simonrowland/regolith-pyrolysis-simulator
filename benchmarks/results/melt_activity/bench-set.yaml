@@ -1,0 +1,404 @@
+schema_version: melt-activity-bench.v1
+title: SF04 in-domain basalt probes, model anchors, and experimental melt targets
+provenance:
+  literal_basalt_empirical_point_count: 0
+  note: >-
+    The repository holds no direct empirical melt-activity measurements for the
+    four literal SF04 basalt sheets. SF04 workbook pressures are model outputs,
+    not experiments. Richter-2007 supplies six convention-usable experimental
+    gamma targets for an in-domain Type-B CAI-like CMAS melt; they are kept in
+    a separate population and never relabelled as basalt measurements.
+    Hastie-1981 supplies six scored K and SiO KEMS pressures for a separate
+    in-domain silicate composition with an IW+2.4 oxygen-fugacity pin.
+  sources:
+    - data/literature/extracts/kems-008-schaefer-fegley-2004.yaml
+    - data/literature/extracts/kems-010-richter-2007.yaml
+    - tests/fixtures/imcc_sf04_magma_workbook.csv
+    - data/melt_activity/reference/imcc-magma-model-v1.csv
+    - data/melt_activity/reference/vaporock-magma-kems-v1.csv
+  composition_transform: >-
+    Fe2O3 folded into FeO with FeO += 0.8998102538090137*Fe2O3;
+    H2O, P2O5, MnO, and other components outside the published eight-parent
+    IMCC basis dropped explicitly; retained oxides renormalized to 100 wt%.
+packs:
+  imcc-published: data/melt_activity/imcc/imcc-sf04-v1.0.2.json
+  imcc-ext: data/melt_activity/imcc/imcc-sf04-ext-v1.json
+  promoted_research_packs:
+    - data/melt_activity/imcc/imcc-sf04-ext-v2.json
+    - data/melt_activity/imcc/imcc-sf04-ext-v3.json
+    - data/melt_activity/imcc/imcc-sf04-ext-v4.json
+reference_anchors:
+  imcc_magma:
+    path: data/melt_activity/reference/imcc-magma-model-v1.csv
+    source_sha256: 81187b97fda64519033ac677aa748591836c328a43939df904035a6e0145bf61
+    tracked_sha256: 513fef7b801f09b1c7a34b5f7b13b53c0832a94dec32141bd1c55ad0e5f7b265
+    selection: SF04 tho/aba/kom/dun; SiO2/FeO/Fe/Mg/SiO/K/Na/O2
+  vaporock_magma_kems:
+    path: data/melt_activity/reference/vaporock-magma-kems-v1.csv
+    source_sha256: eac513d6bfbc93fb595776b381d2a8b4c217bd693037f5a54d001b2a29bc2ccc
+    tracked_sha256: 822c7a881c4f7ee2820c43421e430dc04455457d110c7a6480a42dfe1753151d
+    selection: SF04 model_model_MAGMA rows plus all experimental_KEMS rows
+  shared_join: [sheet, species, T_K]
+  expected_shared_cells: 288
+  expected_non_alkali_pooled_rmse_dex:
+    imcc: 0.274
+    vaporock: 0.503
+fair_comparison:
+  residual: log10(predicted/measured)
+  gas_layer: >-
+    For partial-pressure or flux observations, every engine's oxide activity
+    is passed through the same tracked rail analytical gas layer. An engine's
+    internally coupled gas result is never substituted into that population.
+  direct_activity: Compare pure-liquid-standard-state activity directly.
+  activity_coefficient: Compare gamma=a/x on the named parent-oxide basis.
+compositions:
+  sf04_tholeiite:
+    material_class: literal_basalt
+    source: SF04 workbook sheet tho; Murase and McBirney (1973) composition
+    composition_wt_pct:
+      SiO2: 51.85068
+      MgO: 4.78527
+      FeO: 13.77307
+      CaO: 9.02862
+      Al2O3: 14.80572
+      TiO2: 1.73824
+      Na2O: 3.23108
+      K2O: 0.78732
+    vaporock_anchor_composition_wt_pct:
+      SiO2: 50.71
+      MgO: 4.68
+      Al2O3: 14.48
+      TiO2: 1.70
+      Fe2O3: 4.89
+      FeO: 9.07
+      CaO: 8.83
+      Na2O: 3.16
+      K2O: 0.77
+      MnO: 0.22
+      H2O: 1.04
+      P2O5: 0.36
+  sf04_alkali_basalt:
+    material_class: literal_basalt
+    source: SF04 workbook sheet aba
+    composition_wt_pct:
+      SiO2: 45.53843
+      MgO: 11.25246
+      FeO: 12.45034
+      CaO: 10.32747
+      Al2O3: 14.08845
+      TiO2: 1.99231
+      Na2O: 3.24258
+      K2O: 1.10797
+    vaporock_anchor_composition_wt_pct:
+      SiO2: 44.80
+      MgO: 11.07
+      Al2O3: 13.86
+      TiO2: 1.96
+      Fe2O3: 2.91
+      FeO: 9.63
+      CaO: 10.16
+      Na2O: 3.19
+      K2O: 1.09
+      MnO: 0.17
+      H2O: 0.73
+      P2O5: 0.55
+  sf04_komatiite:
+    material_class: literal_basalt
+    source: SF04 workbook sheet kom; Arndt (2002 pers. comms. to B. Fegley)
+    composition_wt_pct:
+      SiO2: 47.81726
+      MgO: 30.05076
+      FeO: 11.70558
+      CaO: 5.52284
+      Al2O3: 4.10152
+      TiO2: 0.24365
+      Na2O: 0.46701
+      K2O: 0.09137
+    vaporock_anchor_composition_wt_pct:
+      SiO2: 47.10
+      MgO: 29.60
+      Al2O3: 4.04
+      TiO2: 0.24
+      FeO: 11.53
+      CaO: 5.44
+      Na2O: 0.46
+      K2O: 0.09
+      MnO: 0.22
+      P2O5: 0.05
+  sf04_dunite:
+    material_class: literal_basalt
+    source: SF04 workbook sheet dun; MacDonald (1972)
+    composition_wt_pct:
+      SiO2: 40.52026
+      MgO: 43.54416
+      FeO: 13.71806
+      CaO: 0.80637
+      Al2O3: 0.80637
+      TiO2: 0.20159
+      Na2O: 0.30239
+      K2O: 0.10080
+    vaporock_anchor_composition_wt_pct:
+      SiO2: 40.20
+      MgO: 43.20
+      Al2O3: 0.80
+      TiO2: 0.20
+      Fe2O3: 1.90
+      FeO: 11.90
+      CaO: 0.80
+      Na2O: 0.30
+      K2O: 0.10
+      MnO: 0.20
+      H2O: 0.40
+      P2O5: 0.10
+  richter_type_b_cai:
+    material_class: type_b_cai_like_cmas
+    source: Richter et al. 2007; SF04 workbook sheet cab
+    composition_wt_pct:
+      SiO2: 46.00460
+      MgO: 11.48115
+      FeO: 0.0
+      CaO: 23.12231
+      Al2O3: 19.39194
+      TiO2: 0.0
+      Na2O: 0.0
+      K2O: 0.0
+  hastie_case4_k_silicate:
+    material_class: experimental_kems_silicate
+    source: Hastie et al. 1981 case 4; ferric iron folded into FeO
+    composition_wt_pct:
+      SiO2: 60.40588433
+      Al2O3: 26.08892014
+      MgO: 2.10718201
+      FeO: 3.97270548
+      K2O: 7.42530804
+composition_probes:
+  - id: sf04_tholeiite_1900K
+    composition_id: sf04_tholeiite
+    temperature_K: 1900.0
+    fO2_bar: 1.0e-9
+  - id: sf04_alkali_basalt_1900K
+    composition_id: sf04_alkali_basalt
+    temperature_K: 1900.0
+    fO2_bar: 1.0e-9
+  - id: sf04_komatiite_1900K
+    composition_id: sf04_komatiite
+    temperature_K: 1900.0
+    fO2_bar: 1.0e-9
+  - id: sf04_dunite_1900K
+    composition_id: sf04_dunite
+    temperature_K: 1900.0
+    fO2_bar: 1.0e-9
+  - id: richter_type_b_cai_2023K
+    composition_id: richter_type_b_cai
+    temperature_K: 2023.0
+    fO2_bar: 1.0e-9
+points:
+  - id: hastie_k_1917_186
+    population: hastie1981_kems
+    composition_id: hastie_case4_k_silicate
+    material_class: experimental_kems_silicate
+    temperature_K: 1917.186331
+    fO2_bar: 5.694375450159672e-6
+    parent_oxide: K2O
+    species: K
+    observable: partial_pressure
+    measured: 2.8200057899468834
+    units: Pa
+    score: true
+    convention: measured K(g); common analytical gas layer; IW+2.4 fO2 pin
+  - id: hastie_k_1917_282
+    population: hastie1981_kems
+    composition_id: hastie_case4_k_silicate
+    material_class: experimental_kems_silicate
+    temperature_K: 1917.281980
+    fO2_bar: 5.703622101419716e-6
+    parent_oxide: K2O
+    species: K
+    observable: partial_pressure
+    measured: 3.2100367171866595
+    units: Pa
+    score: true
+    convention: measured K(g); common analytical gas layer; IW+2.4 fO2 pin
+  - id: hastie_k_1955_825
+    population: hastie1981_kems
+    composition_id: hastie_case4_k_silicate
+    material_class: experimental_kems_silicate
+    temperature_K: 1955.824724
+    fO2_bar: 1.0822074707553433e-5
+    parent_oxide: K2O
+    species: K
+    observable: partial_pressure
+    measured: 4.530018754322407
+    units: Pa
+    score: true
+    convention: measured K(g); common analytical gas layer; IW+2.4 fO2 pin
+  - id: hastie_sio_1907_796
+    population: hastie1981_kems
+    composition_id: hastie_case4_k_silicate
+    material_class: experimental_kems_silicate
+    temperature_K: 1907.7956677864036
+    fO2_bar: 4.8518840542023325e-6
+    parent_oxide: SiO2
+    species: SiO
+    observable: partial_pressure
+    measured: 0.08272751899576938
+    units: Pa
+    score: true
+    convention: measured SiO(g); common analytical gas layer; IW+2.4 fO2 pin
+  - id: hastie_sio_1909_739
+    population: hastie1981_kems
+    composition_id: hastie_case4_k_silicate
+    material_class: experimental_kems_silicate
+    temperature_K: 1909.7391894913835
+    fO2_bar: 5.016024123842067e-6
+    parent_oxide: SiO2
+    species: SiO
+    observable: partial_pressure
+    measured: 0.11673739559614202
+    units: Pa
+    score: true
+    convention: measured SiO(g); common analytical gas layer; IW+2.4 fO2 pin
+  - id: hastie_sio_1948_149
+    population: hastie1981_kems
+    composition_id: hastie_case4_k_silicate
+    material_class: experimental_kems_silicate
+    temperature_K: 1948.1490556233848
+    fO2_bar: 9.545997136911088e-6
+    parent_oxide: SiO2
+    species: SiO
+    observable: partial_pressure
+    measured: 0.20670929224757628
+    units: Pa
+    score: true
+    convention: measured SiO(g); common analytical gas layer; IW+2.4 fO2 pin
+  - id: richter_mg_gamma_1873
+    population: richter_type_b_cai_gamma
+    composition_id: richter_type_b_cai
+    material_class: type_b_cai_like_cmas
+    temperature_K: 1873.0
+    parent_oxide: MgO
+    species: Mg
+    observable: activity_coefficient
+    measured: 0.06035862
+    units: dimensionless
+    score: true
+    convention: gamma_Mg on Berman CMAS pure-liquid parent reference
+  - id: richter_mg_gamma_2023
+    population: richter_type_b_cai_gamma
+    composition_id: richter_type_b_cai
+    material_class: type_b_cai_like_cmas
+    temperature_K: 2023.0
+    parent_oxide: MgO
+    species: Mg
+    observable: activity_coefficient
+    measured: 0.10738820
+    units: dimensionless
+    score: true
+    convention: gamma_Mg on Berman CMAS pure-liquid parent reference
+  - id: richter_mg_gamma_2173
+    population: richter_type_b_cai_gamma
+    composition_id: richter_type_b_cai
+    material_class: type_b_cai_like_cmas
+    temperature_K: 2173.0
+    parent_oxide: MgO
+    species: Mg
+    observable: activity_coefficient
+    measured: 0.17645311
+    units: dimensionless
+    score: true
+    convention: gamma_Mg on Berman CMAS pure-liquid parent reference
+  - id: richter_si_gamma_1873
+    population: richter_type_b_cai_gamma
+    composition_id: richter_type_b_cai
+    material_class: type_b_cai_like_cmas
+    temperature_K: 1873.0
+    parent_oxide: SiO2
+    species: SiO
+    observable: activity_coefficient
+    measured: 0.06875613
+    units: dimensionless
+    score: true
+    convention: gamma_Si inferred with SiO(g) carrier on the published CMAS basis
+  - id: richter_si_gamma_2023
+    population: richter_type_b_cai_gamma
+    composition_id: richter_type_b_cai
+    material_class: type_b_cai_like_cmas
+    temperature_K: 2023.0
+    parent_oxide: SiO2
+    species: SiO
+    observable: activity_coefficient
+    measured: 0.10655142
+    units: dimensionless
+    score: true
+    convention: gamma_Si inferred with SiO(g) carrier on the published CMAS basis
+  - id: richter_si_gamma_2173
+    population: richter_type_b_cai_gamma
+    composition_id: richter_type_b_cai
+    material_class: type_b_cai_like_cmas
+    temperature_K: 2173.0
+    parent_oxide: SiO2
+    species: SiO
+    observable: activity_coefficient
+    measured: 0.15543251
+    units: dimensionless
+    score: true
+    convention: gamma_Si inferred with SiO(g) carrier on the published CMAS basis
+  - id: richter_mg_flux_2173
+    population: richter_type_b_cai_digitized_flux
+    composition_id: richter_type_b_cai
+    material_class: type_b_cai_like_cmas
+    temperature_K: 2173.15
+    parent_oxide: MgO
+    species: Mg
+    observable: evaporation_flux
+    measured: 2.51189e-3
+    units: mol_m-2_s-1
+    score: false
+    dropped_reason: OCR scatter digitization and no independent experimental fO2 pin
+  - id: richter_mg_flux_2073
+    population: richter_type_b_cai_digitized_flux
+    composition_id: richter_type_b_cai
+    material_class: type_b_cai_like_cmas
+    temperature_K: 2073.15
+    parent_oxide: MgO
+    species: Mg
+    observable: evaporation_flux
+    measured: 6.30957e-4
+    units: mol_m-2_s-1
+    score: false
+    dropped_reason: OCR scatter digitization and no independent experimental fO2 pin
+  - id: richter_mg_flux_1973
+    population: richter_type_b_cai_digitized_flux
+    composition_id: richter_type_b_cai
+    material_class: type_b_cai_like_cmas
+    temperature_K: 1973.15
+    parent_oxide: MgO
+    species: Mg
+    observable: evaporation_flux
+    measured: 1.25893e-4
+    units: mol_m-2_s-1
+    score: false
+    dropped_reason: OCR scatter digitization and no independent experimental fO2 pin
+  - id: richter_mg_flux_1873
+    population: richter_type_b_cai_digitized_flux
+    composition_id: richter_type_b_cai
+    material_class: type_b_cai_like_cmas
+    temperature_K: 1873.15
+    parent_oxide: MgO
+    species: Mg
+    observable: evaporation_flux
+    measured: 1.58489e-5
+    units: mol_m-2_s-1
+    score: false
+    dropped_reason: OCR scatter digitization and no independent experimental fO2 pin
+exclusions:
+  - source: kems-008 Schaefer-Fegley Table 10
+    reason: kinetic vaporization coefficients, mostly survey solids; not basalt melt activities
+  - source: SF04 workbook gas pressures and fluxes
+    reason: model reproduction outputs, not independent empirical observations
+  - source: Richter-2007 Table 1 areas
+    reason: apparatus metadata, not a melt-model target
+  - source: data/presets/kems/halwax_2024_*.yaml
+    reason: pure-solid rate/geometry cases, not melt activities
+  - source: FeS or unlike condensed reference states
+    reason: dropped unless an exact like-for-like parent/reference conversion is available

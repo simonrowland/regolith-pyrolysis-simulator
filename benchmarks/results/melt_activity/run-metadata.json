@@ -1,0 +1,109 @@
+{
+  "bench_set": "data/melt_activity/basalt-bench-set-v1.yaml",
+  "bench_set_sha256": "03746d031dc87c98640e16b927088b4da90017ec7cf1d7789785186bccfedd69",
+  "coverage_row_count": 168,
+  "engines": [
+    "imcc-published",
+    "imcc-ext",
+    "alphamelts",
+    "vaporock"
+  ],
+  "live_vaporock_anchor_check": {
+    "requested": true,
+    "row_count": 288,
+    "status_counts": {
+      "ok": 288
+    }
+  },
+  "mode": "all",
+  "point_status_counts": {
+    "crash": 10,
+    "ok": 24,
+    "out_of_domain": 6,
+    "refused": 8,
+    "unavailable": 16
+  },
+  "probe_status_counts": {
+    "crash": 1,
+    "ok": 10,
+    "refused": 4,
+    "unavailable": 5
+  },
+  "reference_anchor": {
+    "controller_anchor_reproduced": true,
+    "controller_pool_count": 216,
+    "controller_pool_imcc_rmse_dex": 0.2737307414322499,
+    "controller_pool_vaporock_rmse_dex": 0.5030686531060775,
+    "empirical_kems_scored": 7,
+    "empirical_kems_total": 9,
+    "max_reference_difference_dex": 4.978095496177559e-05,
+    "per_species": [
+      {
+        "empirical_kems_count": 0,
+        "imcc_magma_rmse_dex": 0.09898686312313253,
+        "shared_magma_count": 36,
+        "species": "SiO2",
+        "vaporock_kems_rmse_dex": null,
+        "vaporock_magma_rmse_dex": 0.351083034187704
+      },
+      {
+        "empirical_kems_count": 0,
+        "imcc_magma_rmse_dex": 0.184853392959402,
+        "shared_magma_count": 36,
+        "species": "FeO",
+        "vaporock_kems_rmse_dex": null,
+        "vaporock_magma_rmse_dex": 0.4461642142162706
+      },
+      {
+        "empirical_kems_count": 0,
+        "imcc_magma_rmse_dex": 0.1863821734947166,
+        "shared_magma_count": 36,
+        "species": "Fe",
+        "vaporock_kems_rmse_dex": null,
+        "vaporock_magma_rmse_dex": 0.5313459011844878
+      },
+      {
+        "empirical_kems_count": 0,
+        "imcc_magma_rmse_dex": 0.2477124913772802,
+        "shared_magma_count": 36,
+        "species": "Mg",
+        "vaporock_kems_rmse_dex": null,
+        "vaporock_magma_rmse_dex": 0.34603657403838434
+      },
+      {
+        "empirical_kems_count": 3,
+        "imcc_magma_rmse_dex": 0.5563291615883711,
+        "shared_magma_count": 36,
+        "species": "SiO",
+        "vaporock_kems_rmse_dex": 0.24840488307264277,
+        "vaporock_magma_rmse_dex": 0.891109886715874
+      },
+      {
+        "empirical_kems_count": 3,
+        "imcc_magma_rmse_dex": 2.150854549020904,
+        "shared_magma_count": 36,
+        "species": "K",
+        "vaporock_kems_rmse_dex": 0.07248892300158694,
+        "vaporock_magma_rmse_dex": 0.46176791059831485
+      },
+      {
+        "empirical_kems_count": 0,
+        "imcc_magma_rmse_dex": 1.1813644581342737,
+        "shared_magma_count": 36,
+        "species": "Na",
+        "vaporock_kems_rmse_dex": null,
+        "vaporock_magma_rmse_dex": 0.14266757417935666
+      },
+      {
+        "empirical_kems_count": 1,
+        "imcc_magma_rmse_dex": 8.863498704664122e-05,
+        "shared_magma_count": 36,
+        "species": "O2",
+        "vaporock_kems_rmse_dex": 0.33089,
+        "vaporock_magma_rmse_dex": 8.947377020981237e-05
+      }
+    ],
+    "shared_magma_count": 288
+  },
+  "schema_version": "melt-activity-benchmark-run.v1"
+}
