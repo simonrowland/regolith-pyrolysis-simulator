@@ -116,7 +116,7 @@ def residual_baselines() -> dict:
 def test_store_yields_adopted_target_type_observations(
     adopted_observations: list[AdoptedObservation],
 ) -> None:
-    """Battery includes every family and all 15 KEMS sources before precedence."""
+    """Battery includes every family and all KEMS sources before precedence."""
 
     assert adopted_observations, "extract store produced zero ADOPTED observations"
     types = {obs.obs_type for obs in adopted_observations}
@@ -124,7 +124,7 @@ def test_store_yields_adopted_target_type_observations(
     kems = [obs for obs in adopted_observations if obs.source_id.startswith("kems-")]
     # B1 harvest + class-tagged fence rows expanded the KEMS surface; keep the
     # count live-derived so a silent shrink is RED without hard-coding B1 IDs.
-    assert len(kems) == 135
+    assert len(kems) == 152
     assert len({obs.source_id for obs in kems}) == 20
     for obs in adopted_observations:
         assert obs.is_priority_winner or obs.adoption_basis == "mass_spec_extract"
@@ -273,7 +273,7 @@ def test_silicate_melt_alpha_remains_comparable() -> None:
     assert pin_skip is None
 
 
-@pytest.mark.parametrize("species", ("Ca", "Ti"))
+@pytest.mark.parametrize("species", ("Ca", "Ti", "Na"))
 def test_marked_ceiling_receipt_survives_alpha_report_runtime(
     species,
     monkeypatch,
@@ -312,6 +312,13 @@ def test_marked_ceiling_receipt_survives_alpha_report_runtime(
         runtime.get("alpha_context", {}).get("alpha_authority_status")
         == "analytical_upper_bound"
         for runtime in captured_runtime
+    )
+    assert {record.status for record in evaluation.records} == {"assumed-input"}
+    assert evaluation.skip_reason == (
+        "typed-refusal:analytical_upper_bound_not_measurement"
+    )
+    assert not any(
+        record.status in {"match", "mismatch"} for record in evaluation.records
     )
 
 
@@ -631,6 +638,24 @@ def test_dual_axis_skip_records_both_reasons() -> None:
     evaluation = evaluate_observation(obs, vapor_pressure_data=load_vapor_pressure_data())
     assert evaluation.skip_reason == f"typed-refusal:{pin_skip}"
     assert "glass_amorphous" in evaluation.skip_reason
+
+
+def test_wetzel_stale_duplicate_hits_system_class_and_form_gate() -> None:
+    observation = next(
+        row
+        for row in load_adopted_observations()
+        if row.source_id == "wetzel-gail-2013-sio-arrhenius"
+        and row.observation_id == "wetzel_gail_2013_sio_arrhenius"
+    )
+    evaluation = evaluate_observation(
+        observation,
+        vapor_pressure_data=load_vapor_pressure_data(),
+    )
+    assert not any(
+        record.status in {"match", "mismatch"} for record in evaluation.records
+    )
+    assert "not_comparable_system_class:solid_film_growth" in evaluation.skip_reason
+    assert "not_comparable_condensed_form:glass_amorphous" in evaluation.skip_reason
 
 
 def test_solid_claim_above_liquidus_conflicts_fail_closed() -> None:
@@ -1177,6 +1202,41 @@ def test_hkl_assumption_diagnostic_is_not_promoted_or_pinned(
     assert evaluation.skip_reasons
 
 
+@pytest.mark.parametrize(
+    ("observation_id", "skip_reason"),
+    (
+        (
+            "stolyarova_1992_binary_wilson_model_parameters_table2",
+            "typed-refusal:thermodynamic_model_parameter_not_activity_measurement",
+        ),
+        (
+            "halwax_2024_cao_third_law_formation_enthalpy",
+            "typed-refusal:pure_solid_thermochemistry_not_melt_activity",
+        ),
+        (
+            "halwax_2024_mgo_third_law_formation_enthalpy",
+            "typed-refusal:pure_solid_thermochemistry_not_melt_activity",
+        ),
+    ),
+)
+def test_recovered_gibbs_evidence_is_covered_but_never_pin_bearing(
+    observation_id: str,
+    skip_reason: str,
+) -> None:
+    observation = next(
+        row
+        for row in load_adopted_observations()
+        if row.observation_id == observation_id
+    )
+    evaluation = evaluate_observation(
+        observation,
+        vapor_pressure_data=load_vapor_pressure_data(),
+    )
+    assert evaluation.records == []
+    assert evaluation.skip_reason == skip_reason
+    assert evaluation.skip_reasons == [skip_reason]
+
+
 def test_battery_rollup_matches_committed_model_limitations(
     battery_evaluations,
     adopted_observations: list[AdoptedObservation],
@@ -1306,16 +1366,16 @@ def test_coverage_ledger_is_observation_first_and_exact(
     adopted_observations: list[AdoptedObservation],
 ) -> None:
     coverage = coverage_summary(battery_evaluations)
-    # 2026-08-09 form589: condensed-form gate on α path. Class-incomparable
-    # pure-element / molten-metal / solid-film skips remain; form mismatches
-    # (crystalline / partially_molten / unresolved) are additional typed skips.
-    # Counts are live battery, not hand-estimated.
-    assert coverage["observations"] == len(adopted_observations) == 172
-    assert coverage["comparable"] == 23
-    assert coverage["skipped"] == 149
+    # 2026-08-11 evidence recovery: Gibbs tables are coverage-only typed skips;
+    # qualitative rate bounds add rows without numeric residuals; Sossi Na
+    # analytical ceilings remove four comparable points. Counts are live
+    # battery, not hand-estimated.
+    assert coverage["observations"] == len(adopted_observations) == 189
+    assert coverage["comparable"] == 19
+    assert coverage["skipped"] == 170
     assert coverage["comparable"] + coverage["skipped"] == coverage["observations"]
-    assert coverage["comparable_points"] == 56
-    assert coverage["gap_points"] == 233
+    assert coverage["comparable_points"] == 52
+    assert coverage["gap_points"] == 242
     assert all(reason.startswith("typed-refusal:") for reason in coverage["skip_reasons"])
     assert any(
         reason.startswith("typed-refusal:not_comparable_system_class:")
@@ -1338,9 +1398,10 @@ def test_coverage_ledger_is_observation_first_and_exact(
         for key, row in by_type.items()
     } == {
         "activity_coefficient": (49, 0, 49, 0),
-        "alpha": (60, 20, 40, 44),
+        "alpha": (60, 16, 44, 40),
+        "gibbs_table": (12, 0, 12, 0),
         "psat_series": (19, 0, 19, 0),
-        "rate_series": (44, 3, 41, 12),
+        "rate_series": (49, 3, 46, 12),
     }
     by_family = {row["comparison_family"]: row for row in coverage["by_family"]}
     assert {
@@ -1348,10 +1409,11 @@ def test_coverage_ledger_is_observation_first_and_exact(
         for key, row in by_family.items()
     } == {
         "activity_coefficient": (49, 0, 0),
-        "alpha": (60, 20, 44),
+        "alpha": (60, 16, 40),
         "alpha_in_legacy_rate_series": (3, 3, 12),
+        "gibbs_table": (12, 0, 0),
         "psat_series": (19, 0, 0),
-        "rate_hkl": (41, 0, 0),
+        "rate_hkl": (46, 0, 0),
     }
     assert {row["species"] for row in coverage["by_species"]} == {
         obs.species_id for obs in adopted_observations

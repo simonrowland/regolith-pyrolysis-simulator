@@ -61,7 +61,7 @@ MOTZFELDT_TOOL_PATH = REPO_ROOT / "tools" / "motzfeldt.py"
 TOOLS_DIR = REPO_ROOT / "tools"
 
 TARGET_TYPES = frozenset(
-    {"psat_series", "rate_series", "activity_coefficient", "alpha"}
+    {"psat_series", "rate_series", "activity_coefficient", "alpha", "gibbs_table"}
 )
 KEMS_SOURCE_PREFIX = "kems-"
 
@@ -265,6 +265,11 @@ def load_adopted_observations(
                 continue
             is_priority_winner = bool(obs.get("is_priority_winner"))
             is_mass_spec = source_id.startswith(KEMS_SOURCE_PREFIX)
+            # Gibbs tables enter this battery as KEMS evidence coverage only.
+            # Pulling every priority-winner thermochemical table would add the
+            # full 1,600+ row property corpus to a mass-spectrometry ledger.
+            if otype == "gibbs_table" and not is_mass_spec:
+                continue
             if not (is_priority_winner or is_mass_spec):
                 continue
             values = obs.get("values") if isinstance(obs.get("values"), Mapping) else {}
@@ -1241,6 +1246,20 @@ def evaluate_observation(
         return _evaluate_alpha(obs, evaluation)
     if obs.obs_type == "activity_coefficient":
         return _evaluate_activity(obs, evaluation)
+    if obs.obs_type == "gibbs_table":
+        evidence_class = str(obs.values.get("evidence_class") or "")
+        if evidence_class == "thermodynamic_model_parameter":
+            reason = "thermodynamic_model_parameter_not_activity_measurement"
+        elif evidence_class == "pure_solid_thermochemistry":
+            reason = "pure_solid_thermochemistry_not_melt_activity"
+        else:
+            reason = "gibbs_table_not_runtime_observable"
+        evaluation.skip_reason = f"{_TYPED_SKIP_PREFIX}{reason}"
+        evaluation.skip_reasons.append(evaluation.skip_reason)
+        evaluation.runtime_notes.append(
+            "Gibbs evidence is coverage-only and never residual-pin bearing"
+        )
+        return evaluation
     evaluation.skip_reason = f"unknown_observation_type:{obs.obs_type}"
     return evaluation
 
@@ -2525,6 +2544,7 @@ def _evaluate_alpha(
     # (T, α) measurements split — aggregate/midpoint-synthesized points keep
     # the whole-row verdict).
     any_pin_bearing = False
+    analytical_ceiling_seen = False
     for pt in points:
         T_K = float(pt["T_K"])
         expected = float(pt["alpha"])
@@ -2589,6 +2609,17 @@ def _evaluate_alpha(
         )
         if extrapolated:
             runtime["alpha_s_extrapolated"] = True
+        analytical_ceiling = (
+            (runtime.get("alpha_context") or {}).get(
+                ALPHA_AUTHORITY_STATUS_FIELD
+            )
+            == "analytical_upper_bound"
+        )
+        if analytical_ceiling:
+            analytical_ceiling_seen = True
+            runtime["skip_reason"] = (
+                f"{_TYPED_SKIP_PREFIX}analytical_upper_bound_not_measurement"
+            )
         # Pin-bearing only when class AND form match. Form-corrected and all
         # other non-matches keep values for audit but out-of-domain status
         # excludes them from residual pins.
@@ -2612,9 +2643,10 @@ def _evaluate_alpha(
             runtime=runtime,
             unsupported_speciation=actual is None and pin_ok,
             out_of_domain=out_of_domain,
+            assumed_input=analytical_ceiling,
         )
         evaluation.records.append(record)
-        if pin_ok:
+        if pin_ok and not analytical_ceiling:
             any_pin_bearing = True
         if pin_ok and record.status == "mismatch":
             extr_tag = " extrapolated: true" if extrapolated else ""
@@ -2626,6 +2658,11 @@ def _evaluate_alpha(
     if not any_pin_bearing and axes_typed_skip is not None:
         evaluation.skip_reason = axes_typed_skip
         evaluation.skip_reasons.append(axes_typed_skip)
+    elif analytical_ceiling_seen and not any_pin_bearing:
+        evaluation.skip_reason = (
+            f"{_TYPED_SKIP_PREFIX}analytical_upper_bound_not_measurement"
+        )
+        evaluation.skip_reasons.append(evaluation.skip_reason)
     elif not any_numeric:
         evaluation.skip_reason = (
             f"{_TYPED_SKIP_PREFIX}{last_refusal or 'alpha_unsupported'}"

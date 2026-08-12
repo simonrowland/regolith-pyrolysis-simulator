@@ -31,15 +31,15 @@ ul { padding-left: 1.4rem; }</style>
 <ul>
 <li><code>data/foulant_thermo.yaml:105</code> - NaCl.thermo.source: source: &quot;REF-002 NIST WebBook SRD 69 Stull 1947; chloride-coefficients-salvage.md&quot;</li>
 <li><code>data/foulant_thermo.yaml:124</code> - KCl.thermo.source: source: &quot;REF-002 NIST WebBook SRD 69 Stull 1947; chloride-coefficients-salvage.md&quot;</li>
-<li><code>data/vapor_pressures.yaml:437</code> - metals.Al.source: source: &quot;REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 aluminum (C7429905); runtime pure-component source is pure_component_antoine&quot;</li>
-<li><code>data/vapor_pressures.yaml:439</code> - metals.Al.pure_component_antoine.source: source: &quot;REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 aluminum (C7429905); log10(P/bar)=5.73623-13204.109/(T-24.306), converted to Pa by A+5&quot;</li>
-<li><code>data/vapor_pressures.yaml:494</code> - metals.Si.source: source: &quot;REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 silicon (C7440213); runtime pure-component source is pure_component_antoine&quot;</li>
-<li><code>data/vapor_pressures.yaml:496</code> - metals.Si.pure_component_antoine.source: source: &quot;REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 silicon (C7440213); log10(P/bar)=9.56436-23308.848/(T-123.133), converted to Pa by A+5&quot;</li>
-<li><code>data/vapor_pressures.yaml:608</code> - metals.Cr.source: source: &quot;REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 chromium (C7440473); runtime pure-component source is pure_component_antoine&quot;</li>
-<li><code>data/vapor_pressures.yaml:610</code> - metals.Cr.pure_component_antoine.source: source: &quot;REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 chromium (C7440473); log10(P/bar)=6.02371-16064.989/(T-83.86), converted to Pa by A+5&quot;</li>
-<li><code>data/vapor_pressures.yaml:1003</code> - foulant_vapor.NaCl.pure_component_antoine.source: source: &quot;REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 NaCl (C7647145); CRC normal bp 1465 C&quot;</li>
-<li><code>data/vapor_pressures.yaml:1037</code> - foulant_vapor.KCl.pure_component_antoine.source: source: &quot;REF-002 NIST WebBook SRD 69 Stull 1947 KCl (C7447407); CRC bp 1420 C; Clausius-Clapeyron anchored at 1 atm (Stull raw overshoots bp)&quot;</li>
-<li><code>data/vapor_pressures.yaml:1043</code> - foulant_vapor.KCl.antoine.source: source: &quot;REF-002 NIST Stull 1947 mid-range faithful runtime row; bp overshoots - tests use pure_component_antoine&quot;</li>
+<li><code>data/vapor_pressures.yaml:1814</code> - families.metals_al_family.physical_properties.species.Al.source: source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 aluminum (C7429905); pure_component_antoine</li>
+<li><code>data/vapor_pressures.yaml:1818</code> - families.metals_al_family.physical_properties.species.Al.pure_component_antoine.source: source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 aluminum (C7429905); log10(P/bar)=5.73623-13204.109/(T-24.306),</li>
+<li><code>data/vapor_pressures.yaml:1969</code> - families.metals_si_family.physical_properties.species.Si.source: source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 silicon (C7440213); pure_component_antoine</li>
+<li><code>data/vapor_pressures.yaml:1972</code> - families.metals_si_family.physical_properties.species.Si.pure_component_antoine.source: source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 silicon (C7440213); log10(P/bar)=9.56436-23308.848/(T-123.133),</li>
+<li><code>data/vapor_pressures.yaml:2342</code> - families.metals_cr_family.physical_properties.species.Cr.source: source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 chromium (C7440473); pure_component_antoine</li>
+<li><code>data/vapor_pressures.yaml:2346</code> - families.metals_cr_family.physical_properties.species.Cr.pure_component_antoine.source: source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 chromium (C7440473); log10(P/bar)=6.02371-16064.989/(T-83.86),</li>
+<li><code>data/vapor_pressures.yaml:4939</code> - families.foulant_vapor_nacl_family.physical_properties.species.NaCl.pure_component_antoine.source: source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 NaCl (C7647145); CRC normal bp 1465</li>
+<li><code>data/vapor_pressures.yaml:5041</code> - families.foulant_vapor_kcl_family.physical_properties.species.KCl.pure_component_antoine.source: source: REF-002 NIST WebBook SRD 69 Stull 1947 KCl (C7447407); CRC bp 1420 C; Clausius-Clapeyron</li>
+<li><code>data/vapor_pressures.yaml:5072</code> - families.foulant_vapor_kcl_family.physical_properties.species.KCl.fit_target.coefficients.source: source: REF-002 NIST Stull 1947 mid-range faithful runtime row; bp overshoots - tests use</li>
 </ul>
 </section>
 <section class="entry" id="REF-003">
@@ -58,11 +58,12 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
+<li><code>data/literature/extracts/ref-016-sio-kems-1700-2000k.yaml:7</code> - source.citation: \ B. (2004) Icarus 169:216–241,\n    DOI 10.1016/j.icarus.2003.08.023 (REF-018), Table 9 SiO partials\</li>
 <li><code>data/literature/vacuum_pyrolysis_sticking.yaml:69</code> - species.SiO.value.prior_scalar.source: source: &quot;REF-018 REF-016 Schaefer &amp; Fegley 2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa &amp; Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check.&quot;</li>
 <li><code>data/literature/vacuum_pyrolysis_sticking.yaml:100</code> - species.Mg.source: source: &quot;REF-015 REF-018 Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; Schaefer &amp; Fegley 2004 Table 10 Mg2SiO4(liq)/Hashimoto alpha_s=0.20-0.21.&quot;</li>
-<li><code>data/vapor_pressures.yaml:275</code> - metals.Mg.evaporation_alpha.source: source: &quot;REF-015 REF-018 Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; SF2004 Table 10 Mg2SiO4(l), Hashimoto 1990, alpha_s=0.20-0.21&quot;</li>
-<li><code>data/vapor_pressures.yaml:447</code> - metals.Al.evaporation_alpha.source: source: &quot;OWNER-RATIFY proxy_not_intrinsic: REF-018 Schaefer &amp; Fegley 2004 Icarus 169:216-241 Table 10 plus Shahar &amp; Young 2007 CAI modeling; conflicting Al proxy coverage&quot;</li>
-<li><code>data/vapor_pressures.yaml:872</code> - oxide_vapors.SiO.evaporation_alpha.value.prior_scalar.source: source: &quot;REF-018 REF-016 SF2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa &amp; Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check.&quot;</li>
+<li><code>data/vapor_pressures.yaml:1419</code> - families.metals_mg_family.vaporisation_coefficients.evaporation_alpha.source: source: REF-015 REF-018 Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; SF2004 Table</li>
+<li><code>data/vapor_pressures.yaml:1926</code> - families.metals_al_family.vaporisation_coefficients.evaporation_alpha.source: source: &#x27;OWNER-RATIFY proxy_not_intrinsic: REF-018 Schaefer &amp; Fegley 2004 Icarus 169:216-241 Table</li>
+<li><code>data/vapor_pressures.yaml:4726</code> - families.oxide_vapors_sio_family.vaporisation_coefficients.evaporation_alpha.value.prior_scalar.source: source: REF-018 REF-016 SF2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa</li>
 </ul>
 </section>
 <section class="entry" id="REF-032">
@@ -73,10 +74,78 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/vapor_pressures.yaml:526</code> - metals.Ti.source: source: &quot;REF-032 CRC Handbook 84th ed. / Alcock-Itkin-Horrigan 1984 vapor-pressure equation for titanium; runtime pure-component source is pure_component_antoine&quot;</li>
-<li><code>data/vapor_pressures.yaml:528</code> - metals.Ti.pure_component_antoine.source: source: &quot;REF-032 Alcock-Itkin-Horrigan 1984 titanium liquid equation, CRC/CR2 Pa-converted form; dense 10 K minimax refit from 1941-2400 K plus exact 3560.15 K normal-boiling anchor to log10(P/Pa)=A-B/(T+C)&quot;</li>
-<li><code>data/vapor_pressures.yaml:674</code> - metals.Mn.source: source: &quot;REF-020 NIST-JANAF/Chase 1998 solid/liquid Mn-&gt;Mn(g) evaluation; REF-032 Alcock solid, REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as comparators; runtime pure-component source is pure_component_antoine&quot;</li>
-<li><code>data/vapor_pressures.yaml:676</code> - metals.Mn.pure_component_antoine.source: source: &quot;REF-020 NIST-JANAF/Chase 1998 Mn(s/l)-&gt;Mn(g) thermodynamic evaluation fit; REF-032 Alcock solid, REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as documented comparators&quot;</li>
+<li><code>data/literature/extracts/janaf-4th.yaml:665</code> - species.Ti.observation_id.values.independence_note: independence_note: REF-032 is the fit source — cannot self-validate</li>
+<li><code>data/literature/extracts/pound-1972-mccabe-cr.yaml:6</code> - source.citation: α_Cr in docs/lab-validation-whitepaper.md; Alcock et al. (1984) REF-032 Cr equations as second pure-Psat</li>
+<li><code>data/literature/extracts/pound-1972-mccabe-cr.yaml:22</code> - species.Cr.observation_id.locator.note: used for α_Cr in docs/lab-validation-whitepaper.md; Alcock et al. (1984) REF-032 Cr equations</li>
+<li><code>data/literature/extracts/pound-1972-mccabe-cr.yaml:48</code> - path.locator.note: α_Cr in docs/lab-validation-whitepaper.md; Alcock et al. (1984) REF-032 Cr equations as second pure-Psat</li>
+<li><code>data/literature/extracts/ref-032-al.yaml:4</code> - source.citation: citation: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g)</li>
+<li><code>data/literature/extracts/ref-032-al.yaml:18</code> - species.Al.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g)</li>
+<li><code>data/literature/extracts/ref-032-al.yaml:20</code> - species.Al.observation_id.locator.record: record: REF-032#Al</li>
+<li><code>data/literature/extracts/ref-032-al.yaml:42</code> - path.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g) Chase</li>
+<li><code>data/literature/extracts/ref-032-al.yaml:44</code> - path.locator.record: record: REF-032#Al</li>
+<li><code>data/literature/extracts/ref-032-bi.yaml:4</code> - source.citation: citation: Alcock et al. (1984) REF-032 Bi; JANAF Bi(g)</li>
+<li><code>data/literature/extracts/ref-032-bi.yaml:17</code> - species.Bi.observation_id.locator.note: note: Alcock et al. (1984) REF-032 Bi; JANAF Bi(g)</li>
+<li><code>data/literature/extracts/ref-032-bi.yaml:18</code> - species.Bi.observation_id.locator.record: record: REF-032#Bi</li>
+<li><code>data/literature/extracts/ref-032-bi.yaml:38</code> - path.locator.note: note: Alcock et al. (1984) REF-032 Bi; JANAF Bi(g)</li>
+<li><code>data/literature/extracts/ref-032-bi.yaml:39</code> - path.locator.record: record: REF-032#Bi</li>
+<li><code>data/literature/extracts/ref-032-ca.yaml:4</code> - source.citation: citation: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Ca equations; JANAF Ca(g)</li>
+<li><code>data/literature/extracts/ref-032-ca.yaml:18</code> - species.Ca.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Ca equations; JANAF Ca(g)</li>
+<li><code>data/literature/extracts/ref-032-ca.yaml:20</code> - species.Ca.observation_id.locator.record: record: REF-032#Ca</li>
+<li><code>data/literature/extracts/ref-032-ca.yaml:42</code> - path.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Ca equations; JANAF Ca(g) Chase</li>
+<li><code>data/literature/extracts/ref-032-ca.yaml:44</code> - path.locator.record: record: REF-032#Ca</li>
+<li><code>data/literature/extracts/ref-032-fe-liquid-equation.yaml:6</code> - source.citation.Elements: (project REF-032). Fe solid/liquid equations (log10 P form as tabulated).&#x27;</li>
+<li><code>data/literature/extracts/ref-032-fe-liquid-equation.yaml:21</code> - species.Fe.observation_id.locator.note.Elements: (project REF-032). Fe solid/liquid equations (log10 P form as tabulated).&#x27;</li>
+<li><code>data/literature/extracts/ref-032-fe-liquid-equation.yaml:22</code> - species.Fe.observation_id.locator.record: record: REF-032#Fe_liquid_equation</li>
+<li><code>data/literature/extracts/ref-032-fe-liquid-equation.yaml:34</code> - species.Fe.observation_id.values.locator: locator: Can. Metall. Q. 23 (1984) 309; REF-032</li>
+<li><code>data/literature/extracts/ref-032-fe-liquid-equation.yaml:47</code> - path.value.locator: locator: Can. Metall. Q. 23 (1984) 309; REF-032</li>
+<li><code>data/literature/extracts/ref-032-fe-liquid-equation.yaml:52</code> - path.locator.note.Elements: (project REF-032). Fe solid/liquid equations (log10 P form as tabulated).&#x27;</li>
+<li><code>data/literature/extracts/ref-032-fe-liquid-equation.yaml:53</code> - path.locator.record: record: REF-032#Fe_liquid_equation</li>
+<li><code>data/literature/extracts/ref-032-k.yaml:4</code> - source.citation: citation: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) potassium equations — independent</li>
+<li><code>data/literature/extracts/ref-032-k.yaml:18</code> - species.K.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) potassium equations — independent</li>
+<li><code>data/literature/extracts/ref-032-k.yaml:20</code> - species.K.observation_id.locator.record: record: REF-032#K</li>
+<li><code>data/literature/extracts/ref-032-k.yaml:42</code> - path.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) potassium equations — independent</li>
+<li><code>data/literature/extracts/ref-032-k.yaml:44</code> - path.locator.record: record: REF-032#K</li>
+<li><code>data/literature/extracts/ref-032-mg.yaml:4</code> - source.citation: citation: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g)</li>
+<li><code>data/literature/extracts/ref-032-mg.yaml:18</code> - species.Mg.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g)</li>
+<li><code>data/literature/extracts/ref-032-mg.yaml:20</code> - species.Mg.observation_id.locator.record: record: REF-032#Mg</li>
+<li><code>data/literature/extracts/ref-032-mg.yaml:42</code> - path.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g) Chase</li>
+<li><code>data/literature/extracts/ref-032-mg.yaml:44</code> - path.locator.record: record: REF-032#Mg</li>
+<li><code>data/literature/extracts/ref-032-mn-if-not-in-fit.yaml:5</code> - source.citation: REF-032 Mn equations (use Alcock alone as anchor) or Nesmeyanov-class experimental Mn vapor-pressure</li>
+<li><code>data/literature/extracts/ref-032-mn-if-not-in-fit.yaml:20</code> - species.Mn.observation_id.locator.note: REF-032 Mn equations (use Alcock alone as anchor) or Nesmeyanov-class experimental Mn vapor-pressure</li>
+<li><code>data/literature/extracts/ref-032-mn-if-not-in-fit.yaml:22</code> - species.Mn.observation_id.locator.record: record: REF-032#Mn_if_not_in_fit</li>
+<li><code>data/literature/extracts/ref-032-mn-if-not-in-fit.yaml:45</code> - path.locator.note: REF-032 Mn equations (use Alcock alone as anchor) or Nesmeyanov-class experimental Mn vapor-pressure</li>
+<li><code>data/literature/extracts/ref-032-mn-if-not-in-fit.yaml:47</code> - path.locator.record: record: REF-032#Mn_if_not_in_fit</li>
+<li><code>data/literature/extracts/ref-032-na.yaml:4</code> - source.citation: citation: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) sodium vapor-pressure equations</li>
+<li><code>data/literature/extracts/ref-032-na.yaml:18</code> - species.Na.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) sodium vapor-pressure equations</li>
+<li><code>data/literature/extracts/ref-032-na.yaml:20</code> - species.Na.observation_id.locator.record: record: REF-032#Na</li>
+<li><code>data/literature/extracts/ref-032-na.yaml:29</code> - species.Na.observation_id.values.independence_note: independence_note: REF-041 is fit source; REF-032 is independent evaluation</li>
+<li><code>data/literature/extracts/ref-032-na.yaml:39</code> - path.value.independence_note: independence_note: REF-041 is fit source; REF-032 is independent evaluation</li>
+<li><code>data/literature/extracts/ref-032-na.yaml:42</code> - path.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) sodium vapor-pressure equations</li>
+<li><code>data/literature/extracts/ref-032-na.yaml:44</code> - path.locator.record: record: REF-032#Na</li>
+<li><code>data/literature/extracts/ref-032-pb.yaml:4</code> - source.citation: citation: Alcock et al. (1984) REF-032 Pb equations; JANAF Pb(g) Chase 1998; classic Hultgren selected</li>
+<li><code>data/literature/extracts/ref-032-pb.yaml:18</code> - species.Pb.observation_id.locator.note: note: Alcock et al. (1984) REF-032 Pb equations; JANAF Pb(g) Chase 1998; classic Hultgren selected</li>
+<li><code>data/literature/extracts/ref-032-pb.yaml:20</code> - species.Pb.observation_id.locator.record: record: REF-032#Pb</li>
+<li><code>data/literature/extracts/ref-032-pb.yaml:40</code> - path.locator.note: note: Alcock et al. (1984) REF-032 Pb equations; JANAF Pb(g) Chase 1998; classic Hultgren selected</li>
+<li><code>data/literature/extracts/ref-032-pb.yaml:42</code> - path.locator.record: record: REF-032#Pb</li>
+<li><code>data/literature/extracts/ref-032-si.yaml:4</code> - source.citation: citation: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Si equations; JANAF Si(g)</li>
+<li><code>data/literature/extracts/ref-032-si.yaml:18</code> - species.Si.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Si equations; JANAF Si(g)</li>
+<li><code>data/literature/extracts/ref-032-si.yaml:20</code> - species.Si.observation_id.locator.record: record: REF-032#Si</li>
+<li><code>data/literature/extracts/ref-032-si.yaml:42</code> - path.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Si equations; JANAF Si(g) Chase</li>
+<li><code>data/literature/extracts/ref-032-si.yaml:44</code> - path.locator.record: record: REF-032#Si</li>
+<li><code>data/literature/extracts/ref-032-th.yaml:5</code> - source.citation: Alcock et al. (1984) Can. Metall. Q. 23:309 (REF-032) Th equation if present; JANAF Th(g) Chase 1998.</li>
+<li><code>data/literature/extracts/ref-032-th.yaml:19</code> - species.Th.observation_id.locator.note: Alcock et al. (1984) Can. Metall. Q. 23:309 (REF-032) Th equation if present; JANAF Th(g) Chase</li>
+<li><code>data/literature/extracts/ref-032-th.yaml:21</code> - species.Th.observation_id.locator.record: record: REF-032#Th</li>
+<li><code>data/literature/extracts/ref-032-th.yaml:46</code> - path.locator.note: et al. (1984) Can. Metall. Q. 23:309 (REF-032) Th equation if present; JANAF Th(g) Chase 1998.</li>
+<li><code>data/literature/extracts/ref-032-th.yaml:47</code> - path.locator.record: record: REF-032#Th</li>
+<li><code>data/literature/extracts/ref-032-zr.yaml:4</code> - source.citation: citation: &#x27;Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Zr equations; JANAF Zr(g)</li>
+<li><code>data/literature/extracts/ref-032-zr.yaml:18</code> - species.Zr.observation_id.locator.note: note: &#x27;Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Zr equations; JANAF Zr(g)</li>
+<li><code>data/literature/extracts/ref-032-zr.yaml:20</code> - species.Zr.observation_id.locator.record: record: REF-032#Zr</li>
+<li><code>data/literature/extracts/ref-032-zr.yaml:42</code> - path.locator.note: note: &#x27;Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Zr equations; JANAF Zr(g)</li>
+<li><code>data/literature/extracts/ref-032-zr.yaml:44</code> - path.locator.record: record: REF-032#Zr</li>
+<li><code>data/vapor_pressures.yaml:2133</code> - families.metals_ti_family.physical_properties.species.Ti.source: source: REF-032 CRC Handbook 84th ed. / Alcock-Itkin-Horrigan 1984 vapor-pressure equation for</li>
+<li><code>data/vapor_pressures.yaml:2137</code> - families.metals_ti_family.physical_properties.species.Ti.pure_component_antoine.source: source: REF-032 Alcock-Itkin-Horrigan 1984 titanium liquid equation, CRC/CR2 Pa-converted</li>
+<li><code>data/vapor_pressures.yaml:2490</code> - families.metals_mn_family.physical_properties.species.Mn.source: source: REF-020 NIST-JANAF/Chase 1998 solid/liquid Mn-&gt;Mn(g) evaluation; REF-032 Alcock solid,</li>
+<li><code>data/vapor_pressures.yaml:2495</code> - families.metals_mn_family.physical_properties.species.Mn.pure_component_antoine.source: source: REF-020 NIST-JANAF/Chase 1998 Mn(s/l)-&gt;Mn(g) thermodynamic evaluation fit; REF-032</li>
 </ul>
 </section>
 <section class="entry" id="REF-033">
@@ -87,14 +156,12 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/vapor_pressures.yaml:233</code> - metals.Mg.source: source: &quot;REF-033 CRC.b/Stull magnesium pressure-level table fit (1-100000 Pa); runtime pure-component source is pure_component_antoine&quot;</li>
-<li><code>data/vapor_pressures.yaml:235</code> - metals.Mg.pure_component_antoine.source: source: &quot;REF-033 CRC.b/Stull magnesium pressure-level table fit (1-100000 Pa); cross-checked against REF-034 Kaye-Laby/NPL Ambrose pressure-level table; not an Alcock liquid equation&quot;</li>
-<li><code>data/vapor_pressures.yaml:242</code> - metals.Mg.pure_component_antoine.source_validation_points_Pa_K: # REF-033 CRC.b/Stull Mg table: 1,10,100,1000,10000,100000 Pa at</li>
-<li><code>data/vapor_pressures.yaml:258</code> - metals.Mg.reconstructed_vapor_pressure_segment.anchors.temperature_K.source: source: &quot;REF-033 CRC.b/Stull magnesium pressure-level table final certified point&quot;</li>
-<li><code>data/vapor_pressures.yaml:264</code> - metals.Mg.reconstructed_vapor_pressure_segment.provenance: in 1/T from REF-033 CRC.b/Stull&#x27;s certified 1361 K, 100000 Pa endpoint</li>
-<li><code>data/vapor_pressures.yaml:674</code> - metals.Mn.source: source: &quot;REF-020 NIST-JANAF/Chase 1998 solid/liquid Mn-&gt;Mn(g) evaluation; REF-032 Alcock solid, REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as comparators; runtime pure-component source is pure_component_antoine&quot;</li>
-<li><code>data/vapor_pressures.yaml:676</code> - metals.Mn.pure_component_antoine.source: source: &quot;REF-020 NIST-JANAF/Chase 1998 Mn(s/l)-&gt;Mn(g) thermodynamic evaluation fit; REF-032 Alcock solid, REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as documented comparators&quot;</li>
-<li><code>data/vapor_pressures.yaml:686</code> - metals.Mn.pure_component_antoine.default_segment: # Pa=[227,1202,2348,6022,11935,23627,61195,131242]; REF-033 CRC/Stull</li>
+<li><code>data/vapor_pressures.yaml:1168</code> - families.metals_mg_family.physical_properties.species.Mg.source: source: REF-033 CRC.b/Stull magnesium pressure-level table fit (1-100000 Pa); pure_component_antoine</li>
+<li><code>data/vapor_pressures.yaml:1173</code> - families.metals_mg_family.physical_properties.species.Mg.pure_component_antoine.source: source: REF-033 CRC.b/Stull magnesium pressure-level table fit (1-100000 Pa); cross-checked</li>
+<li><code>data/vapor_pressures.yaml:1213</code> - families.metals_mg_family.physical_properties.species.Mg.reconstructed_vapor_pressure_segment.temperature_K.source: source: REF-033 CRC.b/Stull magnesium pressure-level table final certified point</li>
+<li><code>data/vapor_pressures.yaml:1224</code> - families.metals_mg_family.physical_properties.species.Mg.reconstructed_vapor_pressure_segment.provenance: from REF-033 CRC.b/Stull&#x27;&#x27;s certified 1361 K, 100000 Pa endpoint to Pref_GF</li>
+<li><code>data/vapor_pressures.yaml:2491</code> - families.metals_mn_family.physical_properties.species.Mn.source: REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as comparators; pure_component_antoine</li>
+<li><code>data/vapor_pressures.yaml:2496</code> - families.metals_mn_family.physical_properties.species.Mn.pure_component_antoine.source: Alcock solid, REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as documented comparators</li>
 </ul>
 </section>
 <section class="entry" id="REF-034">
@@ -105,11 +172,9 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/vapor_pressures.yaml:235</code> - metals.Mg.pure_component_antoine.source: source: &quot;REF-033 CRC.b/Stull magnesium pressure-level table fit (1-100000 Pa); cross-checked against REF-034 Kaye-Laby/NPL Ambrose pressure-level table; not an Alcock liquid equation&quot;</li>
-<li><code>data/vapor_pressures.yaml:243</code> - metals.Mg.pure_component_antoine.source_validation_points_Pa_K: # 701,773,861,971,1132,1361 K. REF-034 Kaye-Laby/NPL alternative:</li>
-<li><code>data/vapor_pressures.yaml:674</code> - metals.Mn.source: source: &quot;REF-020 NIST-JANAF/Chase 1998 solid/liquid Mn-&gt;Mn(g) evaluation; REF-032 Alcock solid, REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as comparators; runtime pure-component source is pure_component_antoine&quot;</li>
-<li><code>data/vapor_pressures.yaml:676</code> - metals.Mn.pure_component_antoine.source: source: &quot;REF-020 NIST-JANAF/Chase 1998 Mn(s/l)-&gt;Mn(g) thermodynamic evaluation fit; REF-032 Alcock solid, REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as documented comparators&quot;</li>
-<li><code>data/vapor_pressures.yaml:683</code> - metals.Mn.pure_component_antoine.default_segment: # Liquid-source spread at the Kaye-Laby anchors: REF-034 Kaye-Laby/NPL</li>
+<li><code>data/vapor_pressures.yaml:1174</code> - families.metals_mg_family.physical_properties.species.Mg.pure_component_antoine.source: against REF-034 Kaye-Laby/NPL Ambrose pressure-level table; not an Alcock liquid equation</li>
+<li><code>data/vapor_pressures.yaml:2491</code> - families.metals_mn_family.physical_properties.species.Mn.source: REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as comparators; pure_component_antoine</li>
+<li><code>data/vapor_pressures.yaml:2496</code> - families.metals_mn_family.physical_properties.species.Mn.pure_component_antoine.source: Alcock solid, REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as documented comparators</li>
 </ul>
 </section>
 <section class="entry" id="REF-041">
@@ -120,7 +185,9 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/vapor_pressures.yaml:94</code> - metals.Na.pure_component_antoine.source: source: &quot;REF-041 NIST Chemistry WebBook SRD 69 Rodebush and Walters 1930 sodium (C7440235); log10(P/bar)=2.46077-1873.728/(T-416.372), converted to Pa by A+5&quot;</li>
+<li><code>data/literature/extracts/ref-032-na.yaml:29</code> - species.Na.observation_id.values.independence_note: independence_note: REF-041 is fit source; REF-032 is independent evaluation</li>
+<li><code>data/literature/extracts/ref-032-na.yaml:39</code> - path.value.independence_note: independence_note: REF-041 is fit source; REF-032 is independent evaluation</li>
+<li><code>data/vapor_pressures.yaml:797</code> - families.metals_na_family.physical_properties.species.Na.pure_component_antoine.source: source: REF-041 NIST Chemistry WebBook SRD 69 Rodebush and Walters 1930 sodium (C7440235);</li>
 </ul>
 </section>
 <section class="entry" id="REF-042">
@@ -131,7 +198,9 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/vapor_pressures.yaml:187</code> - metals.K.pure_component_antoine.source: source: &quot;REF-042 NIST Chemistry WebBook SRD 69 Fiock and Rodebush 1926 potassium (C7440097); log10(P/bar)=4.45718-4691.58/(T+24.195), converted to Pa by A+5&quot;</li>
+<li><code>data/literature/extracts/ref-032-k.yaml:29</code> - species.K.observation_id.values.independence_note: independence_note: REF-042 is fit source</li>
+<li><code>data/literature/extracts/ref-032-k.yaml:39</code> - path.value.independence_note: independence_note: REF-042 is fit source</li>
+<li><code>data/vapor_pressures.yaml:1039</code> - families.metals_k_family.physical_properties.species.K.pure_component_antoine.source: source: REF-042 NIST Chemistry WebBook SRD 69 Fiock and Rodebush 1926 potassium (C7440097);</li>
 </ul>
 </section>
 <section class="entry" id="REF-043">
@@ -142,8 +211,8 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/vapor_pressures.yaml:378</code> - metals.Ca.source: source: &quot;REF-043 NIST Chemistry WebBook SRD 69 Hartmann and Schneider 1929 calcium (C7440702); runtime pure-component source is pure_component_antoine&quot;</li>
-<li><code>data/vapor_pressures.yaml:380</code> - metals.Ca.pure_component_antoine.source: source: &quot;REF-043 NIST Chemistry WebBook SRD 69 Hartmann and Schneider 1929 calcium (C7440702); log10(P/bar)=2.78473-3121.368/(T-594.591), converted to Pa by A+5&quot;</li>
+<li><code>data/vapor_pressures.yaml:1576</code> - families.metals_ca_family.physical_properties.species.Ca.source: source: REF-043 NIST Chemistry WebBook SRD 69 Hartmann and Schneider 1929 calcium (C7440702);</li>
+<li><code>data/vapor_pressures.yaml:1581</code> - families.metals_ca_family.physical_properties.species.Ca.pure_component_antoine.source: source: REF-043 NIST Chemistry WebBook SRD 69 Hartmann and Schneider 1929 calcium (C7440702);</li>
 </ul>
 </section>
 <section class="entry" id="REF-044">

@@ -32,8 +32,8 @@ This page states the current limitations as facts, with the physical or modeling
 - **Metal-phase stratification is diagnostic-only; general drain-tap behavior is not modelled.** Builtin-authored reduced metal is disposed at hour boundaries into mol-native `process.metal_phase_bottom_pool` and `process.metal_phase_float_layer` accounts, with a first-order contact diagnostic and density-contrast verdict. C6 is the narrow exception: each tick's net thermite Al is atom-conservingly routed from `process.metal_phase` to the existing `terminal.drain_tap_material` product account after back-reduction. If a backend-authored transition touches `process.metal_phase`, that account remains authoritative and the builtin stratifier emits read-only bottom/float projections without committing them. Builtin pool accounts are temporarily restored to legacy `process.metal_phase` staging before chemistry ticks and campaign initialization, so no evaporation, redox, or gas-escape behavior reads the diagnostic split. `product_ledger()` aggregates all three metal-phase accounts plus the terminal tap. Correlations used outside their cited temperature ranges are labeled as extrapolations. A general behavior-changing settling or tap gate remains future work.
 - **MRE decomposition-voltage ladder:** NiO (0.3864 V at 1873.15 K) plus FeO, Cr2O3, MnO, SiO2, TiO2, and Al2O3 are raw-thermo reanchored (`E = -DeltaGf(T)/(nF)`; NIST-JANAF/Chase 1998 and companion evaluations, with phase-correct NiO from Mah & Pankratz 1976 USBM Bulletin 668). Fe2O3's old 0.90 V full-reduction rung is reference-only; live MRE can reduce ferric Fe2O3 to FeO through an uncertified ferric-to-ferrous diagnostic path, not a Fe2O3 -> Fe metal full-reduction rung. Na2O/K2O retain static fallback anchors pending activity/vapor-aware grounding because Na/K are volatile at 1873 K. Voltages are standard-state; runtime applies the Nernst melt-activity + pO2 correction.
 - CoO is intentionally excluded from the MRE ladder: CoO E_decomp is about 0.49 V (Holmes 1986), above the NiO 0.39 V floor, and modeled cobalt feedstock is trace siderophile/native Fe-Ni-Co metal rather than a CoO MRE target.
-- **The evaporation-α surface has tiered coverage.** Tier 1 species Na, K, Fe, Mg, SiO, and Cr carry measured α with citation. Cr is `0.9 ± 0.1` over `1318–1563 K`, from Pound's selected McCabe–Hudson–Paxton solid-Cr Langmuir/Knudsen measurement. It is a clean pure-solid-Cr coefficient, not a silicate-melt coefficient: Cr melt activity remains in `P_sat`, and oxygen-contaminated surfaces can lower α. Tier 2 Ca, Ti, Al, and Mn carry proxy classifications. Mn is the owner-ratified monoatomic-metal class proxy `α=1.0`, envelope `[0.5,1.0]`, over the liquid process band `1519–2334.526 K`; it is not a Mn-specific measurement. Two independent sweeps found no direct Mn HKL coefficient, including a full-text read of Safarian & Engh 2013 with zero Mn value. CrO₂ alone remains tier 3 with no numeric α and fail-loud behavior unless the explicit upper-bound fallback is enabled. Fallback engagement records `unmeasured_alpha_fallback_species`. Melt activity remains in `P_sat`, not α. See [`docs/output-interpretation.md`](output-interpretation.md).
-- **SiO evaporation and cold-wall sticking α are split by interface regime.** HOT source evaporation uses the Wetzel & Gail 2013 Arrhenius compilation `alpha_s_SiO(T)=0.52*exp(-3685/T)` at source T, with microscopic reversibility applying at that source interface; its grounded range is about 1000-1800 K with an uncertainty envelope of 0.003-0.067. COLD-WALL condensation below the valid-range floor uses the grounded Pound 1972 high-supersaturation unity condensation coefficient (`alpha_c=1.0`), carrying the `[0.016, 1.0]` band and the no-direct-cold-wall-SiO-measurement gap. The runtime intentionally does not extrapolate the evaporation Arrhenius onto cold walls; `alpha_e != alpha_c` off-equilibrium at high supersaturation.
+- **The evaporation-α surface has tiered coverage.** K, Fe, Mg, and Cr carry source-specific measured α with citation. Na does not: the unsupported Sossi `[0.9,1.0]` interval is withdrawn, and runtime `alpha_e=1` is a marked analytical ceiling with physical envelope `[0,1]`, never a measurement or residual pin. Cr is `0.9 ± 0.1` over `1318–1563 K`, from Pound's selected McCabe–Hudson–Paxton solid-Cr Langmuir/Knudsen measurement. It is a clean pure-solid-Cr coefficient, not a silicate-melt coefficient: Cr melt activity remains in `P_sat`, and oxygen-contaminated surfaces can lower α. Ca, Ti, Al, Mn, and the current SiO hot-source form are proxy classifications. Mn is the owner-ratified monoatomic-metal class proxy `α=1.0`, envelope `[0.5,1.0]`, over the liquid process band `1519–2334.526 K`; it is not a Mn-specific measurement. CrO₂ alone remains tier 3 with no numeric α and fail-loud behavior unless the explicit upper-bound fallback is enabled. Fallback engagement records `unmeasured_alpha_fallback_species`. Melt activity remains in `P_sat`, not α. See [`docs/output-interpretation.md`](output-interpretation.md).
+- **SiO hot-source and cold-wall coefficients have different authority.** Wetzel & Gail 2013 use `0.52*exp(-3685/T)` as a solid-SiO particle-growth coefficient, not silicate-melt free-evaporation evidence. Runtime retains that form only as an explicitly UNCERTIFIED hot-source proxy over 1000–1800 K with envelope 0.003–0.067; a grounded melt coefficient remains absent. COLD-WALL condensation below the range separately uses the cited Pound 1972 high-supersaturation unity condensation coefficient (`alpha_c=1.0`), carrying the `[0.016, 1.0]` band and the no-direct-cold-wall-SiO-measurement gap.
 - **Robinot-class O2 accuracy is an error budget, not a tuned score.** The lab-validation diagnostic reports a WARN-only `robinot_o2_error_budget` sidecar under `lab_oxygen_atom_partition`; it does not gate, reroute oxygen, debit reagents, or alter any ledger outcome. The two headline miss factors use different published normalizations against Robinot exp. 1 analyzer-visible O2 (`35 mg`): raw faithful source-side O2 potential is `0.881913 g`, or `25.20x`; the literature-alpha/top-area forward prediction is `0.656204 g`, or `18.75x` central (`18.25x-19.04x` area band). The diagnostic decomposes the remaining daylight into sourced terms: plume oxidation (`unquantified`, could lower simulated free O2), deposit gettering (`unquantified`, could lower simulated free O2), melt-redox retention (`runtime_accounted` when the terminal partition exposes it, but Robinot allocation remains unmeasured), post-run air oxidation (`unquantified`, can raise recovered-deposit oxygen but cannot close in-run analyzer O2), and analyzer/flow/baseline integration (`quantified_anchor`: exp. 1 `35 mg`, exp. 2 `39.229 mg`, about `11%` reproducibility floor). The central residual is explicit: `0.621204 g` O2-equivalent remains unallocated among sink channels. Negative result accepted: without position-resolved gas sampling and air-isolated deposit oxidation-state data, the residual is unexplained rather than fit away.
 - Feedstock values include literature-derived ranges and estimates.
 
@@ -258,43 +258,43 @@ are the deliverable (doctrine: *Headline accuracy is the product*).
 Engine refusals surface as typed skips; mismatches are FINDINGs —
 tolerances are **not** widened to pass. Geometry: tools/motzfeldt.py available; geometry inversion is used only with complete numeric inputs, otherwise a typed capability/data gap is reported.
 
-Observations: **172 total / 23 comparable / 149 skipped**. Comparable residual points: **56**; explicit gap records: **233**. Extrapolated-alpha FINDINGs: **13**.
+Observations: **189 total / 19 comparable / 170 skipped**. Comparable residual points: **52**; explicit gap records: **242**. Extrapolated-alpha FINDINGs: **13**.
 
-- In-scope observations evaluated: **172**
-- Comparable observations: **23**
-- Skipped observations with typed reasons: **149**
+- In-scope observations evaluated: **189**
+- Comparable observations: **19**
+- Skipped observations with typed reasons: **170**
 - Species with FINDING (mismatch outside stated/default budget): **4**
 
 | Species | Types | N pts | Match | Mismatch | Skip/gap | Max residual (dex) | Mean residual (dex) | Classification |
 |---|---|---:|---:|---:|---:|---:|---:|---|
-| Al | activity_coefficient,rate_series | 3 | 0 | 0 | 3 | — | — | engine-or-payload-skip |
+| Al | activity_coefficient,rate_series | 4 | 0 | 0 | 4 | — | — | engine-or-payload-skip |
 | Al2O | psat_series | 14 | 0 | 0 | 14 | — | — | engine-or-payload-skip |
 | Al2O3 | alpha | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
-| AlO | psat_series | 6 | 0 | 0 | 6 | — | — | engine-or-payload-skip |
+| AlO | gibbs_table,psat_series | 6 | 0 | 0 | 6 | — | — | engine-or-payload-skip |
 | As | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | As4O6 | activity_coefficient,psat_series | 7 | 0 | 0 | 7 | — | — | engine-or-payload-skip |
 | BaO | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | Bi | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
-| Ca | activity_coefficient,rate_series | 2 | 0 | 0 | 2 | — | — | engine-or-payload-skip |
-| CaO | rate_series | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
+| Ca | activity_coefficient,gibbs_table,rate_series | 5 | 0 | 0 | 5 | — | — | engine-or-payload-skip |
+| CaO | gibbs_table,rate_series | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | Co | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | Cr | activity_coefficient,alpha,psat_series,rate_series | 8 | 0 | 0 | 8 | — | — | engine-or-payload-skip |
 | Cs2O | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | Cu | activity_coefficient,alpha,rate_series | 6 | 0 | 0 | 6 | — | — | engine-or-payload-skip |
 | Eu_metal_and_EuO | activity_coefficient | 2 | 0 | 0 | 2 | — | — | engine-or-payload-skip |
-| Fe | activity_coefficient,alpha,rate_series | 35 | 0 | 13 | 22 | 1.1 | 1.07 | FINDING-mismatch |
+| Fe | activity_coefficient,alpha,gibbs_table,rate_series | 36 | 0 | 13 | 23 | 1.1 | 1.07 | FINDING-mismatch |
 | Ga2O | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | Ge | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | GeO2 | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | In | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
-| K | activity_coefficient,alpha,rate_series | 7 | 1 | 1 | 5 | 0.886 | 0.886 | FINDING-mismatch |
+| K | activity_coefficient,alpha,gibbs_table,rate_series | 7 | 1 | 1 | 5 | 0.886 | 0.886 | FINDING-mismatch |
 | Li2O | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | Mg | activity_coefficient,alpha,psat_series,rate_series | 36 | 8 | 9 | 19 | 0.52 | 0.168 | FINDING-mismatch |
-| MgO | alpha,psat_series,rate_series | 3 | 0 | 0 | 3 | — | — | engine-or-payload-skip |
+| MgO | alpha,gibbs_table,psat_series,rate_series | 3 | 0 | 0 | 3 | — | — | engine-or-payload-skip |
 | Mn | activity_coefficient,alpha,psat_series,rate_series | 10 | 0 | 0 | 10 | — | — | engine-or-payload-skip |
 | MoO2 | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | MoO3 | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
-| Na | activity_coefficient,alpha,psat_series,rate_series | 27 | 4 | 0 | 23 | 0 | 0 | within-budget |
+| Na | activity_coefficient,alpha,gibbs_table,psat_series,rate_series | 27 | 0 | 0 | 27 | — | — | engine-or-payload-skip |
 | NaF | psat_series | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | Ni | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | O | psat_series | 13 | 0 | 0 | 13 | — | — | engine-or-payload-skip |
@@ -310,7 +310,7 @@ Observations: **172 total / 23 comparable / 149 skipped**. Comparable residual p
 | Se_n_ladder | psat_series | 3 | 0 | 0 | 3 | — | — | engine-or-payload-skip |
 | Si | alpha,rate_series | 3 | 0 | 0 | 3 | — | — | engine-or-payload-skip |
 | SiO | alpha,rate_series | 45 | 7 | 13 | 25 | 0.41 | 0.233 | FINDING-mismatch |
-| SiO2 | activity_coefficient,alpha | 3 | 0 | 0 | 3 | — | — | engine-or-payload-skip |
+| SiO2 | activity_coefficient,alpha,gibbs_table | 3 | 0 | 0 | 3 | — | — | engine-or-payload-skip |
 | Sn | activity_coefficient,alpha,rate_series | 5 | 0 | 0 | 5 | — | — | engine-or-payload-skip |
 | SrO | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | Ti | psat_series | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
@@ -325,15 +325,17 @@ Observations: **172 total / 23 comparable / 149 skipped**. Comparable residual p
 
 **Typed observation skips (roadmap, one primary reason per skipped observation):**
 
-- `typed-refusal:form_unresolved`: **8**
+- `typed-refusal:analytical_upper_bound_not_measurement`: **3**
+- `typed-refusal:form_unresolved`: **7**
+- `typed-refusal:gibbs_table_not_runtime_observable`: **9**
 - `typed-refusal:missing_capability:documented_melt_activity_coefficient:FeO`: **2**
 - `typed-refusal:missing_condition:melt_composition`: **1**
 - `typed-refusal:missing_condition:pO2_boundary`: **9**
 - `typed-refusal:missing_condition:standard_state_boundary`: **5**
 - `typed-refusal:missing_numeric_activity`: **36**
-- `typed-refusal:missing_numeric_species_rate`: **24**
-- `typed-refusal:missing_numeric_species_rate:qualitative_bound`: **13**
-- `typed-refusal:no_usable_rate_series_payload`: **1**
+- `typed-refusal:missing_numeric_species_rate`: **25**
+- `typed-refusal:missing_numeric_species_rate:qualitative_bound`: **17**
+- `typed-refusal:no_usable_rate_series_payload`: **2**
 - `typed-refusal:not_comparable_condensed_form:crystalline`: **7**
 - `typed-refusal:not_comparable_condensed_form:crystalline:straddles_transition`: **1**
 - `typed-refusal:not_comparable_condensed_form:partially_molten`: **2**
@@ -341,8 +343,10 @@ Observations: **172 total / 23 comparable / 149 skipped**. Comparable residual p
 - `typed-refusal:not_comparable_system_class:molten_metal`: **11**
 - `typed-refusal:not_comparable_system_class:pure_element_condensed`: **1**
 - `typed-refusal:not_comparable_system_class:pure_element_condensed+not_comparable_condensed_form:crystalline`: **5**
-- `typed-refusal:not_comparable_system_class:solid_film_growth+not_comparable_condensed_form:glass_amorphous`: **2**
+- `typed-refusal:not_comparable_system_class:solid_film_growth+not_comparable_condensed_form:glass_amorphous`: **3**
 - `typed-refusal:pointer_or_anchor_without_numeric_points`: **5**
+- `typed-refusal:pure_solid_thermochemistry_not_melt_activity`: **2**
+- `typed-refusal:thermodynamic_model_parameter_not_activity_measurement`: **1**
 - `typed-refusal:unsupported_observable:clausing_factor_not_species_rate`: **3**
 - `typed-refusal:unsupported_observable:qualitative_activity_ordering`: **11**
 
@@ -351,52 +355,54 @@ Observations: **172 total / 23 comparable / 149 skipped**. Comparable residual p
 | Type | Observations | Comparable | Skipped | Comparable points | Gap points | Typed skip reasons |
 |---|---:|---:|---:|---:|---:|---|
 | activity_coefficient | 49 | 0 | 49 | 0 | 49 | `typed-refusal:missing_capability:documented_melt_activity_coefficient:FeO` ×2; `typed-refusal:missing_numeric_activity` ×36; `typed-refusal:unsupported_observable:qualitative_activity_ordering` ×11 |
-| alpha | 60 | 20 | 40 | 44 | 52 | `typed-refusal:form_unresolved` ×8; `typed-refusal:no_usable_rate_series_payload` ×1; `typed-refusal:not_comparable_condensed_form:crystalline` ×7; `typed-refusal:not_comparable_condensed_form:crystalline:straddles_transition` ×1; `typed-refusal:not_comparable_condensed_form:partially_molten` ×2; `typed-refusal:not_comparable_condensed_form:partially_molten:straddles_transition` ×2; `typed-refusal:not_comparable_system_class:molten_metal` ×11; `typed-refusal:not_comparable_system_class:pure_element_condensed` ×1; `typed-refusal:not_comparable_system_class:pure_element_condensed+not_comparable_condensed_form:crystalline` ×5; `typed-refusal:not_comparable_system_class:solid_film_growth+not_comparable_condensed_form:glass_amorphous` ×2 |
+| alpha | 60 | 16 | 44 | 40 | 56 | `typed-refusal:analytical_upper_bound_not_measurement` ×3; `typed-refusal:form_unresolved` ×7; `typed-refusal:no_usable_rate_series_payload` ×2; `typed-refusal:not_comparable_condensed_form:crystalline` ×7; `typed-refusal:not_comparable_condensed_form:crystalline:straddles_transition` ×1; `typed-refusal:not_comparable_condensed_form:partially_molten` ×2; `typed-refusal:not_comparable_condensed_form:partially_molten:straddles_transition` ×2; `typed-refusal:not_comparable_system_class:molten_metal` ×11; `typed-refusal:not_comparable_system_class:pure_element_condensed` ×1; `typed-refusal:not_comparable_system_class:pure_element_condensed+not_comparable_condensed_form:crystalline` ×5; `typed-refusal:not_comparable_system_class:solid_film_growth+not_comparable_condensed_form:glass_amorphous` ×3 |
+| gibbs_table | 12 | 0 | 12 | 0 | 0 | `typed-refusal:gibbs_table_not_runtime_observable` ×9; `typed-refusal:pure_solid_thermochemistry_not_melt_activity` ×2; `typed-refusal:thermodynamic_model_parameter_not_activity_measurement` ×1 |
 | psat_series | 19 | 0 | 19 | 0 | 88 | `typed-refusal:missing_condition:pO2_boundary` ×9; `typed-refusal:missing_condition:standard_state_boundary` ×5; `typed-refusal:pointer_or_anchor_without_numeric_points` ×5 |
-| rate_series | 44 | 3 | 41 | 12 | 44 | `typed-refusal:missing_condition:melt_composition` ×1; `typed-refusal:missing_numeric_species_rate` ×24; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×13; `typed-refusal:unsupported_observable:clausing_factor_not_species_rate` ×3 |
+| rate_series | 49 | 3 | 46 | 12 | 49 | `typed-refusal:missing_condition:melt_composition` ×1; `typed-refusal:missing_numeric_species_rate` ×25; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×17; `typed-refusal:unsupported_observable:clausing_factor_not_species_rate` ×3 |
 
 **Coverage by comparison family:**
 
 | Comparison family | Observations | Comparable | Skipped | Comparable points | Gap points | Typed skip reasons |
 |---|---:|---:|---:|---:|---:|---|
 | activity_coefficient | 49 | 0 | 49 | 0 | 49 | `typed-refusal:missing_capability:documented_melt_activity_coefficient:FeO` ×2; `typed-refusal:missing_numeric_activity` ×36; `typed-refusal:unsupported_observable:qualitative_activity_ordering` ×11 |
-| alpha | 60 | 20 | 40 | 44 | 52 | `typed-refusal:form_unresolved` ×8; `typed-refusal:no_usable_rate_series_payload` ×1; `typed-refusal:not_comparable_condensed_form:crystalline` ×7; `typed-refusal:not_comparable_condensed_form:crystalline:straddles_transition` ×1; `typed-refusal:not_comparable_condensed_form:partially_molten` ×2; `typed-refusal:not_comparable_condensed_form:partially_molten:straddles_transition` ×2; `typed-refusal:not_comparable_system_class:molten_metal` ×11; `typed-refusal:not_comparable_system_class:pure_element_condensed` ×1; `typed-refusal:not_comparable_system_class:pure_element_condensed+not_comparable_condensed_form:crystalline` ×5; `typed-refusal:not_comparable_system_class:solid_film_growth+not_comparable_condensed_form:glass_amorphous` ×2 |
+| alpha | 60 | 16 | 44 | 40 | 56 | `typed-refusal:analytical_upper_bound_not_measurement` ×3; `typed-refusal:form_unresolved` ×7; `typed-refusal:no_usable_rate_series_payload` ×2; `typed-refusal:not_comparable_condensed_form:crystalline` ×7; `typed-refusal:not_comparable_condensed_form:crystalline:straddles_transition` ×1; `typed-refusal:not_comparable_condensed_form:partially_molten` ×2; `typed-refusal:not_comparable_condensed_form:partially_molten:straddles_transition` ×2; `typed-refusal:not_comparable_system_class:molten_metal` ×11; `typed-refusal:not_comparable_system_class:pure_element_condensed` ×1; `typed-refusal:not_comparable_system_class:pure_element_condensed+not_comparable_condensed_form:crystalline` ×5; `typed-refusal:not_comparable_system_class:solid_film_growth+not_comparable_condensed_form:glass_amorphous` ×3 |
 | alpha_in_legacy_rate_series | 3 | 3 | 0 | 12 | 0 | — |
+| gibbs_table | 12 | 0 | 12 | 0 | 0 | `typed-refusal:gibbs_table_not_runtime_observable` ×9; `typed-refusal:pure_solid_thermochemistry_not_melt_activity` ×2; `typed-refusal:thermodynamic_model_parameter_not_activity_measurement` ×1 |
 | psat_series | 19 | 0 | 19 | 0 | 88 | `typed-refusal:missing_condition:pO2_boundary` ×9; `typed-refusal:missing_condition:standard_state_boundary` ×5; `typed-refusal:pointer_or_anchor_without_numeric_points` ×5 |
-| rate_hkl | 41 | 0 | 41 | 0 | 44 | `typed-refusal:missing_condition:melt_composition` ×1; `typed-refusal:missing_numeric_species_rate` ×24; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×13; `typed-refusal:unsupported_observable:clausing_factor_not_species_rate` ×3 |
+| rate_hkl | 46 | 0 | 46 | 0 | 49 | `typed-refusal:missing_condition:melt_composition` ×1; `typed-refusal:missing_numeric_species_rate` ×25; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×17; `typed-refusal:unsupported_observable:clausing_factor_not_species_rate` ×3 |
 
 **Coverage by species:**
 
 | Species | Observations | Comparable | Skipped | Comparable points | Gap points | Typed skip reasons |
 |---|---:|---:|---:|---:|---:|---|
-| Al | 3 | 0 | 3 | 0 | 3 | `typed-refusal:missing_numeric_activity` ×1; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×2 |
+| Al | 4 | 0 | 4 | 0 | 4 | `typed-refusal:missing_numeric_activity` ×1; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×3 |
 | Al2O | 1 | 0 | 1 | 0 | 14 | `typed-refusal:missing_condition:pO2_boundary` ×1 |
 | Al2O3 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:not_comparable_condensed_form:crystalline:straddles_transition` ×1 |
-| AlO | 1 | 0 | 1 | 0 | 6 | `typed-refusal:missing_condition:pO2_boundary` ×1 |
+| AlO | 2 | 0 | 2 | 0 | 6 | `typed-refusal:gibbs_table_not_runtime_observable` ×1; `typed-refusal:missing_condition:pO2_boundary` ×1 |
 | As | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_activity` ×1 |
 | As4O6 | 3 | 0 | 3 | 0 | 7 | `typed-refusal:missing_condition:standard_state_boundary` ×2; `typed-refusal:unsupported_observable:qualitative_activity_ordering` ×1 |
 | BaO | 1 | 0 | 1 | 0 | 1 | `typed-refusal:unsupported_observable:qualitative_activity_ordering` ×1 |
 | Bi | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_activity` ×1 |
-| Ca | 2 | 0 | 2 | 0 | 2 | `typed-refusal:missing_numeric_activity` ×1; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×1 |
-| CaO | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_species_rate` ×1 |
+| Ca | 6 | 0 | 6 | 0 | 5 | `typed-refusal:gibbs_table_not_runtime_observable` ×1; `typed-refusal:missing_numeric_activity` ×1; `typed-refusal:missing_numeric_species_rate` ×1; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×3 |
+| CaO | 2 | 0 | 2 | 0 | 1 | `typed-refusal:missing_numeric_species_rate` ×1; `typed-refusal:pure_solid_thermochemistry_not_melt_activity` ×1 |
 | Co | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_activity` ×1 |
 | Cr | 7 | 0 | 7 | 0 | 8 | `typed-refusal:missing_condition:pO2_boundary` ×1; `typed-refusal:missing_numeric_activity` ×2; `typed-refusal:missing_numeric_species_rate` ×1; `typed-refusal:not_comparable_system_class:molten_metal` ×1; `typed-refusal:not_comparable_system_class:pure_element_condensed+not_comparable_condensed_form:crystalline` ×2 |
 | Cs2O | 1 | 0 | 1 | 0 | 1 | `typed-refusal:unsupported_observable:qualitative_activity_ordering` ×1 |
 | Cu | 6 | 0 | 6 | 0 | 6 | `typed-refusal:missing_numeric_activity` ×1; `typed-refusal:missing_numeric_species_rate` ×2; `typed-refusal:not_comparable_system_class:molten_metal` ×3 |
 | Eu_metal_and_EuO | 2 | 0 | 2 | 0 | 2 | `typed-refusal:missing_numeric_activity` ×1; `typed-refusal:unsupported_observable:qualitative_activity_ordering` ×1 |
-| Fe | 22 | 4 | 18 | 13 | 22 | `typed-refusal:missing_capability:documented_melt_activity_coefficient:FeO` ×2; `typed-refusal:missing_numeric_activity` ×3; `typed-refusal:missing_numeric_species_rate` ×3; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×1; `typed-refusal:not_comparable_condensed_form:crystalline` ×3; `typed-refusal:not_comparable_system_class:pure_element_condensed+not_comparable_condensed_form:crystalline` ×3; `typed-refusal:unsupported_observable:clausing_factor_not_species_rate` ×3 |
+| Fe | 24 | 4 | 20 | 13 | 23 | `typed-refusal:gibbs_table_not_runtime_observable` ×1; `typed-refusal:missing_capability:documented_melt_activity_coefficient:FeO` ×2; `typed-refusal:missing_numeric_activity` ×3; `typed-refusal:missing_numeric_species_rate` ×3; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×2; `typed-refusal:not_comparable_condensed_form:crystalline` ×3; `typed-refusal:not_comparable_system_class:pure_element_condensed+not_comparable_condensed_form:crystalline` ×3; `typed-refusal:unsupported_observable:clausing_factor_not_species_rate` ×3 |
 | Ga2O | 1 | 0 | 1 | 0 | 1 | `typed-refusal:unsupported_observable:qualitative_activity_ordering` ×1 |
 | Ge | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_activity` ×1 |
 | GeO2 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_activity` ×1 |
 | In | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_activity` ×1 |
-| K | 7 | 2 | 5 | 2 | 5 | `typed-refusal:form_unresolved` ×3; `typed-refusal:missing_numeric_activity` ×1; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×1 |
+| K | 8 | 2 | 6 | 2 | 5 | `typed-refusal:form_unresolved` ×3; `typed-refusal:gibbs_table_not_runtime_observable` ×1; `typed-refusal:missing_numeric_activity` ×1; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×1 |
 | Li2O | 1 | 0 | 1 | 0 | 1 | `typed-refusal:unsupported_observable:qualitative_activity_ordering` ×1 |
 | Mg | 16 | 7 | 9 | 17 | 19 | `typed-refusal:missing_condition:melt_composition` ×1; `typed-refusal:missing_condition:pO2_boundary` ×1; `typed-refusal:missing_numeric_activity` ×2; `typed-refusal:missing_numeric_species_rate` ×3; `typed-refusal:not_comparable_condensed_form:partially_molten` ×1; `typed-refusal:not_comparable_condensed_form:partially_molten:straddles_transition` ×1 |
-| MgO | 3 | 0 | 3 | 0 | 3 | `typed-refusal:missing_numeric_species_rate` ×1; `typed-refusal:not_comparable_condensed_form:crystalline` ×1; `typed-refusal:pointer_or_anchor_without_numeric_points` ×1 |
+| MgO | 4 | 0 | 4 | 0 | 3 | `typed-refusal:missing_numeric_species_rate` ×1; `typed-refusal:not_comparable_condensed_form:crystalline` ×1; `typed-refusal:pointer_or_anchor_without_numeric_points` ×1; `typed-refusal:pure_solid_thermochemistry_not_melt_activity` ×1 |
 | Mn | 8 | 0 | 8 | 0 | 10 | `typed-refusal:missing_condition:pO2_boundary` ×1; `typed-refusal:missing_numeric_activity` ×1; `typed-refusal:missing_numeric_species_rate` ×3; `typed-refusal:not_comparable_system_class:molten_metal` ×3 |
 | MoO2 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_activity` ×1 |
 | MoO3 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_activity` ×1 |
-| Na | 13 | 4 | 9 | 4 | 23 | `typed-refusal:form_unresolved` ×3; `typed-refusal:missing_condition:pO2_boundary` ×2; `typed-refusal:missing_numeric_activity` ×2; `typed-refusal:missing_numeric_species_rate` ×1; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×1 |
+| Na | 16 | 0 | 16 | 0 | 27 | `typed-refusal:analytical_upper_bound_not_measurement` ×3; `typed-refusal:form_unresolved` ×3; `typed-refusal:gibbs_table_not_runtime_observable` ×3; `typed-refusal:missing_condition:pO2_boundary` ×2; `typed-refusal:missing_numeric_activity` ×2; `typed-refusal:missing_numeric_species_rate` ×1; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×1; `typed-refusal:no_usable_rate_series_payload` ×1 |
 | NaF | 1 | 0 | 1 | 0 | 1 | `typed-refusal:pointer_or_anchor_without_numeric_points` ×1 |
 | Ni | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_activity` ×1 |
 | O | 1 | 0 | 1 | 0 | 13 | `typed-refusal:missing_condition:pO2_boundary` ×1 |
@@ -411,8 +417,8 @@ Observations: **172 total / 23 comparable / 149 skipped**. Comparable residual p
 | Sb4O6 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:unsupported_observable:qualitative_activity_ordering` ×1 |
 | Se_n_ladder | 1 | 0 | 1 | 0 | 3 | `typed-refusal:missing_condition:standard_state_boundary` ×1 |
 | Si | 3 | 0 | 3 | 0 | 3 | `typed-refusal:missing_numeric_species_rate` ×1; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×1; `typed-refusal:not_comparable_system_class:pure_element_condensed` ×1 |
-| SiO | 23 | 6 | 17 | 20 | 25 | `typed-refusal:form_unresolved` ×1; `typed-refusal:missing_numeric_species_rate` ×4; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×4; `typed-refusal:no_usable_rate_series_payload` ×1; `typed-refusal:not_comparable_condensed_form:crystalline` ×3; `typed-refusal:not_comparable_condensed_form:partially_molten` ×1; `typed-refusal:not_comparable_condensed_form:partially_molten:straddles_transition` ×1; `typed-refusal:not_comparable_system_class:solid_film_growth+not_comparable_condensed_form:glass_amorphous` ×2 |
-| SiO2 | 3 | 0 | 3 | 0 | 3 | `typed-refusal:form_unresolved` ×1; `typed-refusal:missing_numeric_activity` ×2 |
+| SiO | 23 | 6 | 17 | 20 | 25 | `typed-refusal:missing_numeric_species_rate` ×4; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×4; `typed-refusal:no_usable_rate_series_payload` ×1; `typed-refusal:not_comparable_condensed_form:crystalline` ×3; `typed-refusal:not_comparable_condensed_form:partially_molten` ×1; `typed-refusal:not_comparable_condensed_form:partially_molten:straddles_transition` ×1; `typed-refusal:not_comparable_system_class:solid_film_growth+not_comparable_condensed_form:glass_amorphous` ×3 |
+| SiO2 | 6 | 0 | 6 | 0 | 3 | `typed-refusal:form_unresolved` ×1; `typed-refusal:gibbs_table_not_runtime_observable` ×2; `typed-refusal:missing_numeric_activity` ×2; `typed-refusal:thermodynamic_model_parameter_not_activity_measurement` ×1 |
 | Sn | 5 | 0 | 5 | 0 | 5 | `typed-refusal:missing_numeric_activity` ×1; `typed-refusal:missing_numeric_species_rate` ×2; `typed-refusal:not_comparable_system_class:molten_metal` ×2 |
 | SrO | 1 | 0 | 1 | 0 | 1 | `typed-refusal:unsupported_observable:qualitative_activity_ordering` ×1 |
 | Ti | 1 | 0 | 1 | 0 | 1 | `typed-refusal:pointer_or_anchor_without_numeric_points` ×1 |
@@ -442,24 +448,24 @@ Observations: **172 total / 23 comparable / 149 skipped**. Comparable residual p
 | kems-007-costa-2015 | 4 | 0 | 4 | 0 | 12 | `typed-refusal:not_comparable_condensed_form:crystalline` ×4 |
 | kems-008-schaefer-fegley-2004 | 5 | 2 | 3 | 3 | 3 | `typed-refusal:form_unresolved` ×1; `typed-refusal:not_comparable_condensed_form:crystalline` ×1; `typed-refusal:not_comparable_condensed_form:crystalline:straddles_transition` ×1 |
 | kems-009-safarian-2013 | 2 | 0 | 2 | 0 | 2 | `typed-refusal:missing_numeric_species_rate` ×1; `typed-refusal:not_comparable_system_class:pure_element_condensed` ×1 |
-| kems-010-richter-2007 | 4 | 2 | 2 | 6 | 5 | `typed-refusal:missing_condition:melt_composition` ×1; `typed-refusal:missing_numeric_species_rate` ×1 |
+| kems-010-richter-2007 | 6 | 2 | 4 | 6 | 7 | `typed-refusal:missing_condition:melt_composition` ×1; `typed-refusal:missing_numeric_species_rate` ×1; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×2 |
 | kems-011-wetzel-gail-2013 | 3 | 0 | 3 | 0 | 5 | `typed-refusal:missing_numeric_species_rate` ×1; `typed-refusal:not_comparable_system_class:solid_film_growth+not_comparable_condensed_form:glass_amorphous` ×2 |
-| kems-012-sossi-2019 | 6 | 5 | 1 | 5 | 1 | `typed-refusal:missing_numeric_activity` ×1 |
-| kems-015-hashimoto-1983 | 6 | 0 | 6 | 0 | 6 | `typed-refusal:missing_numeric_species_rate` ×6 |
-| kems-016-stolyarova-1992 | 4 | 0 | 4 | 0 | 4 | `typed-refusal:missing_numeric_activity` ×3; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×1 |
+| kems-012-sossi-2019 | 7 | 2 | 5 | 2 | 4 | `typed-refusal:analytical_upper_bound_not_measurement` ×2; `typed-refusal:gibbs_table_not_runtime_observable` ×1; `typed-refusal:missing_numeric_activity` ×1; `typed-refusal:no_usable_rate_series_payload` ×1 |
+| kems-015-hashimoto-1983 | 9 | 0 | 9 | 0 | 9 | `typed-refusal:missing_numeric_species_rate` ×7; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×2 |
+| kems-016-stolyarova-1992 | 10 | 0 | 10 | 0 | 4 | `typed-refusal:gibbs_table_not_runtime_observable` ×5; `typed-refusal:missing_numeric_activity` ×3; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×1; `typed-refusal:thermodynamic_model_parameter_not_activity_measurement` ×1 |
 | kems-017-stolyarova-2013 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×1 |
 | kems-018-stolyarova-2012 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×1 |
-| kems-022-demaria-1971 | 21 | 0 | 21 | 0 | 81 | `typed-refusal:missing_capability:documented_melt_activity_coefficient:FeO` ×2; `typed-refusal:missing_condition:pO2_boundary` ×9; `typed-refusal:missing_numeric_activity` ×1; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×9 |
+| kems-022-demaria-1971 | 23 | 0 | 23 | 0 | 81 | `typed-refusal:gibbs_table_not_runtime_observable` ×2; `typed-refusal:missing_capability:documented_melt_activity_coefficient:FeO` ×2; `typed-refusal:missing_condition:pO2_boundary` ×9; `typed-refusal:missing_numeric_activity` ×1; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×9 |
 | kems-027-plante-hastie-1983 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_species_rate` ×1 |
-| kems-031-halwax-2024 | 3 | 0 | 3 | 0 | 3 | `typed-refusal:missing_numeric_species_rate` ×2; `typed-refusal:pointer_or_anchor_without_numeric_points` ×1 |
-| kems-032-copland-jacobson-2010 | 4 | 0 | 4 | 0 | 4 | `typed-refusal:missing_numeric_species_rate` ×2; `typed-refusal:unsupported_observable:clausing_factor_not_species_rate` ×2 |
+| kems-031-halwax-2024 | 5 | 0 | 5 | 0 | 3 | `typed-refusal:missing_numeric_species_rate` ×2; `typed-refusal:pointer_or_anchor_without_numeric_points` ×1; `typed-refusal:pure_solid_thermochemistry_not_melt_activity` ×2 |
+| kems-032-copland-jacobson-2010 | 5 | 0 | 5 | 0 | 4 | `typed-refusal:gibbs_table_not_runtime_observable` ×1; `typed-refusal:missing_numeric_species_rate` ×2; `typed-refusal:unsupported_observable:clausing_factor_not_species_rate` ×2 |
 | kems-037-richter-2002 | 4 | 0 | 4 | 0 | 4 | `typed-refusal:not_comparable_condensed_form:partially_molten` ×2; `typed-refusal:not_comparable_condensed_form:partially_molten:straddles_transition` ×2 |
 | kems-041-sossi-fegley-2018 | 29 | 0 | 29 | 0 | 29 | `typed-refusal:missing_numeric_activity` ×28; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×1 |
 | nist-webbook | 2 | 0 | 2 | 0 | 6 | `typed-refusal:missing_condition:standard_state_boundary` ×2 |
 | richter-et-al-2007 | 2 | 2 | 0 | 6 | 0 | — |
-| sossi-et-al-2019 | 1 | 1 | 0 | 1 | 0 | — |
+| sossi-et-al-2019 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:analytical_upper_bound_not_measurement` ×1 |
 | sossi-fegley-2018 | 14 | 0 | 14 | 0 | 14 | `typed-refusal:missing_numeric_activity` ×3; `typed-refusal:unsupported_observable:qualitative_activity_ordering` ×11 |
-| wetzel-gail-2013-sio-arrhenius | 1 | 0 | 1 | 0 | 3 | `typed-refusal:form_unresolved` ×1 |
+| wetzel-gail-2013-sio-arrhenius | 1 | 0 | 1 | 0 | 3 | `typed-refusal:not_comparable_system_class:solid_film_growth+not_comparable_condensed_form:glass_amorphous` ×1 |
 
 **Uncertainty ledger:** extract-side terms are propagated when the
 source supplies a quantitative form (for example Arrhenius activation-energy
@@ -554,10 +560,6 @@ Comparable per-observation residuals and uncertainty ledger:
 | richter-et-al-2007 | richter_2007_mg_cai_arrhenius_langmuir | alpha | Mg | temperature_K=1873 | 0.0603586 | absolute=0.2054316518789593 (point.sigma); Arrhenius E uncertainty propagated as sigma_alpha/alpha=sigma_E/(R*T) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.2 | 0.139641 | 0.520291 | 0.679746 | match |
 | richter-et-al-2007 | richter_2007_mg_cai_arrhenius_langmuir | alpha | Mg | temperature_K=2023 | 0.107388 | absolute=0.3383970051344181 (point.sigma); Arrhenius E uncertainty propagated as sigma_alpha/alpha=sigma_E/(R*T) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.2 | 0.0926118 | 0.270073 | 0.273678 | match |
 | richter-et-al-2007 | richter_2007_mg_cai_arrhenius_langmuir | alpha | Mg | temperature_K=2173 | 0.176453 | absolute=0.5176490661392505 (point.sigma); Arrhenius E uncertainty propagated as sigma_alpha/alpha=sigma_E/(R*T) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.2 | 0.0235469 | 0.0544007 | 0.0454881 | match |
-| kems-012-sossi-2019 | sossi_2019_na_alpha_e_authors_adopted_unity | alpha | Na | temperature_K=1698.15 | 1 | absolute=0.05 (documented default) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 1 | 0 | 0 | 0 | match |
-| kems-012-sossi-2019 | sossi_2019_na_alpha_e_gamma_derived_range | alpha | Na | temperature_K=1673.15 | 1 | absolute=0.7 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 1 | 0 | 0 | 0 | match |
-| kems-012-sossi-2019 | sossi_2019_na_class_and_transport_b1 | alpha | Na | temperature_K=1698.15 | 1 | absolute=0.7 (observation.values.alpha_range); published alpha range half-width | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 1 | 0 | 0 | 0 | match |
-| sossi-et-al-2019 | sossi_2019_na_open_furnace_apparent | alpha | Na | temperature_K=1698.15 | 1 | absolute=0.04999999999999999 (observation.uncertainty.alpha_range); published alpha range half-width | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 1 | 0 | 0 | 0 | match |
 | fedkin-grossman-ghiorso-2006 | fedkin_2006_table3_sio_hashimoto_langmuir | alpha | SiO | temperature_K=1973 | 0.12 | absolute=0.01 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0803277 | -0.0396723 | 0.174316 | 3.96723 | mismatch |
 | fedkin-grossman-ghiorso-2006 | fedkin_2006_table3_sio_hashimoto_langmuir | alpha | SiO | temperature_K=2073 | 0.17 | absolute=0.01 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0879011 | -0.0820989 | 0.286455 | 8.20989 | mismatch |
 | fedkin-grossman-ghiorso-2006 | fedkin_2006_table3_sio_hashimoto_langmuir | alpha | SiO | temperature_K=2173 | 0.2 | absolute=0.01 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0953941 | -0.104606 | 0.321509 | 10.4606 | mismatch |
@@ -589,6 +591,9 @@ Assumption-only engine diagnostics (visible negative results, but excluded from 
 | kems-010-richter-2007 | richter_2007_mg_rate_series_geometry | rate_series | Mg | temperature_K=2073.15 | 0.000630957 | 0.0799963 | 2.10307 | typed-refusal:missing_condition:melt_composition; typed-refusal:missing_condition:pO2_boundary | assumed-input (excluded) |
 | kems-010-richter-2007 | richter_2007_mg_rate_series_geometry | rate_series | Mg | temperature_K=1973.15 | 0.000125893 | 0.0097594 | 1.88942 | typed-refusal:missing_condition:melt_composition; typed-refusal:missing_condition:pO2_boundary | assumed-input (excluded) |
 | kems-010-richter-2007 | richter_2007_mg_rate_series_geometry | rate_series | Mg | temperature_K=1873.15 | 1.58489e-05 | 0.000926307 | 1.76675 | typed-refusal:missing_condition:melt_composition; typed-refusal:missing_condition:pO2_boundary | assumed-input (excluded) |
+| kems-012-sossi-2019 | sossi_2019_na_alpha_e_authors_adopted_unity | alpha | Na | temperature_K=1698.15 | 1 | 1 | 0 | typed-refusal:analytical_upper_bound_not_measurement | assumed-input (excluded) |
+| kems-012-sossi-2019 | sossi_2019_na_class_and_transport_b1 | alpha | Na | temperature_K=1698.15 | 1 | 1 | 0 | typed-refusal:analytical_upper_bound_not_measurement | assumed-input (excluded) |
+| sossi-et-al-2019 | sossi_2019_na_open_furnace_apparent | alpha | Na | temperature_K=1698.15 | 1 | 1 | 0 | typed-refusal:analytical_upper_bound_not_measurement | assumed-input (excluded) |
 
 <!-- END t-512 extract-store reproduction rollup -->
 Four transition-metal monoxide gas carriers were audited, and the source/composition

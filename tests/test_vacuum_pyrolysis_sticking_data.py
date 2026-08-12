@@ -73,7 +73,13 @@ def test_wall_sticking_coefficients_are_cited_or_uncertified():
             assert row["source_url"], species
 
 
-def test_sio_sticking_alpha_s_uses_grounded_arrhenius_form():
+def test_sio_sticking_alpha_s_uses_uncertified_growth_proxy_form():
+    block = _load_sticking_data()["species"]["SiO"]
+    assert block["status"] == "UNCERTIFIED"
+    assert block["value"]["status"] == "UNCERTIFIED"
+    assert block["source_class"] == "solid_film_growth_proxy_not_evaporation_evidence"
+    assert "not a silicate-melt free-evaporation coefficient" in block["source"]
+
     expected = {
         1000.0: 0.52 * math.exp(-3685.0 / 1000.0),
         1500.0: 0.52 * math.exp(-3685.0 / 1500.0),

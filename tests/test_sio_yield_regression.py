@@ -14,6 +14,7 @@ from simulator import condensation as condensation_module
 from simulator.condensation import CondensationModel, KnudsenRegimeRefusal
 from simulator.overhead import OverheadGasModel
 from simulator.runner import (
+    SIO_ALPHA_PROVENANCE,
     _apply_sio_wall_sweep_controls,
     _sio_wall_terminal_mol,
     build_sio_yield_report,
@@ -36,6 +37,14 @@ GOLDENS = (
     ("lunar_mare_low_ti", "lunar_mare_low_ti_c2a.json"),
     ("mars_basalt", "mars_basalt_c2a.json"),
 )
+
+
+def test_sio_alpha_provenance_receipt_and_fixtures_refuse_evaporation_label():
+    assert "UNCERTIFIED solid-SiO particle-growth proxy" in SIO_ALPHA_PROVENANCE
+    assert "not silicate-melt evaporation evidence" in SIO_ALPHA_PROVENANCE
+    for _, golden_name in GOLDENS:
+        golden = json.loads((FIXTURE_DIR / golden_name).read_text())
+        assert golden["alpha_provenance"] == SIO_ALPHA_PROVENANCE
 
 
 def test_sio_wall_sweep_keeps_bulk_gas_temperature_distinct_from_liner():
@@ -400,7 +409,8 @@ def test_sio_yield_cli_matches_golden(tmp_path, feedstock, golden_name):
     assert actual["alpha_provenance"] == (
         "Wetzel & Gail 2013 A&A 553 A92 DOI "
         "10.1051/0004-6361/201220803; "
-        "alpha_s_SiO(T)=0.52*exp(-3685/T), reaction-rate-limited"
+        "alpha_s_SiO(T)=0.52*exp(-3685/T), UNCERTIFIED solid-SiO "
+        "particle-growth proxy, not silicate-melt evaporation evidence"
     )
     assert "order-of-magnitude regime check" in actual["verdict"]
     assert "not 1-decade fidelity" in actual["verdict"]

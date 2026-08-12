@@ -306,7 +306,9 @@ species:
       # docs-private/research/2026-08-08-si-comparability/report.md and
       # validation-data/pin-evidence/mn_mass_spec_melt_first_2026-08-08.yaml
   Na:
-    tier: T3
+    # 2026-08-11: demoted T3 -> T2 when the non-measurement Sossi
+    # mass_spec residual pin was withdrawn. VapoRock external evidence remains.
+    tier: T2
     target_tier: T4
     validations:
       vaporock:
@@ -322,22 +324,12 @@ species:
           - validation-data/pin-evidence/na_vaporock_lh_liquid_2026-08-08.yaml
         internal_notes_refs:
           - docs-private/research/2026-08-08-t383-build/report.md
-      mass_spec:
-        # form589 2026-08-09: Yu C1 form_unresolved excluded (was governing
-        # 0.585 dex). Surviving Sossi liquid rows are form-matched with residual
-        # ~0 (authors_adopted α_e=1 match). RESEED at 0.0 — this is an honest
-        # match residual on the Sossi set, NOT a multi-source robust ceiling
-        # claim and NOT a silent zero after auto-exclusion. Prior Yu pin
-        # 0.585026652 is withdrawn as non-comparable. Two-way ratchet requires
-        # the live residual set to be pinned.
-        pinned_residual_dex: 0.0
-        evidence_refs:
-          - tests/chemistry/extract_store_reproduction_residual_baselines.yaml
-          - docs/model-limitations.md#extract-store-reproduction-battery
-          - validation-data/pin-evidence/na_mass_spec_form_reseed_2026-08-09.yaml
-        internal_notes_refs:
-          - docs-private/research/2026-08-09-form589-impl/report.md
-          - docs-private/research/2026-08-09-condensed-form/report.md
+      # mass_spec withdrawn 2026-08-11 (evidence recovery): the surviving
+      # Sossi Na records are a disagreeing gamma-derived 0.3-1.7 inference and
+      # a separately adopted physical/analytical ceiling alpha_e <= 1. Neither
+      # is a measured coefficient eligible for a residual pin. They remain
+      # visible as typed non-comparable/status-bearing evidence. See
+      # validation-data/pin-evidence/na_mass_spec_analytical_ceiling_withdrawal_2026-08-11.yaml
   Na2:
     tier: T1
     target_tier: T4

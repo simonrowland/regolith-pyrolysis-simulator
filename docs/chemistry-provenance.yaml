@@ -501,30 +501,30 @@ values:
     status: active
 
   - id: Na_evaporation_alpha
-    quantity: "Effective sodium evaporation coefficient used in the Hertz-Knudsen-Langmuir flux path."
+    quantity: "Status-bearing sodium Hertz-Knudsen-Langmuir kinetic ceiling."
     value: 1.0
     units: dimensionless
     tier: UNCERTIFIED
     basis: >-
-      Apparent open-furnace mass-loss coefficient for the mbar-sweep process regime; not the sealed KEMS
-      intrinsic evaporation coefficient.
+      Physical alpha_e <= 1 ceiling. The unsupported [0.9,1.0] interval is withdrawn; Sossi's
+      separately adopted alpha_e=1 is not treated as a measurement.
     range:
       T_K: [1700, 2273]
-      alpha_envelope: [0.9, 1.0]
-      measured_vs_extrapolated: measured-regime-adapted
-    uncertainty: "Sossi open-furnace behavior is near ideal; Fedkin sealed-chamber KEMS alternative is about 0.13 and remains a regime-mismatch warning."
+      alpha_envelope: [0.0, 1.0]
+      measured_vs_extrapolated: analytical-upper-bound
+    uncertainty: "Physical bound only. Sossi's gamma-derived 0.3-1.7 inference at 1400 C is retained as disagreeing report evidence, not an admissible alpha range."
     chosen:
       ref: REF-013
       locus: "Sossi et al. 2019 GCA 260:204-231, open 1 atm gas-mixing furnace ferrobasalt FCMAS mass-loss experiments, LA-ICP-MS residual analyses, and HKL evaporation model; alpha about 1 is a regime inference, not a KEMS table row."
       url: "https://doi.org/10.1016/j.gca.2019.06.021"
-      why: "Closest regime match for continuous sweep/open mass loss, while still uncertified for mbar process use."
+      why: "Documents the conflicting gamma-derived inference and separate author adoption; neither supplies a measured physical interval."
     alternatives:
       - ref: REF-014
         value: "alpha_e about 0.13"
         lacks: "sealed KEMS chamber intrinsic coefficient, not continuous open-sweep routing"
     code_sites:
       - "data/vapor_pressures.yaml:metals.Na.evaporation_alpha"
-    status: active
+    status: active_status_bearing_noncertifying
 
   - id: mre_decomp_voltages_cited_raw_thermo
     quantity: "Standard oxide decomposition voltages with cited high-temperature raw-thermo grounding."

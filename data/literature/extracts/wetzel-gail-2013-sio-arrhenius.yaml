@@ -17,25 +17,32 @@ species:
     - observation_id: wetzel_gail_2013_sio_arrhenius
       type: alpha
       locator:
-        note: Wetzel, S. & Gail, H.-P. (2013), Astron. Astrophys. 553:A92, DOI 10.1051/0004-6361/201220803
-        record: wetzel_gail_2013_sio_arrhenius
+        source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+        equation: '8'
+        line_range: 317-329
+        note: particle-growth equation; authors call alpha(T) a growth coefficient
       T_range_K:
       - 1000.0
       - 1800.0
-      phase: oxide_source_evaporation
+      phase: solid_SiO_film_growth
       condensed_form:
-        state: unresolved
+        state: glass_amorphous
         metastable: false
-        basis: mixed_evidence
-        note: Cited source is amorphous SiO films; adopted Arrhenius not in primary at these T — form + provenance fail-closed
-      standard_state: HOT source evaporation only; cold-wall condensation uses Pound unity separately
-      regime: langmuir_free_evaporation
+        basis: explicit_author
+        note: Solid SiO film growth coefficient on amorphous deposits
+      standard_state: Growth/condensation coefficient for solid SiO; not silicate-melt free-evaporation HKL alpha
+      regime: solid_SiO_growth_coefficient
       units: dimensionless
       values:
         alpha: null
-        alpha_range: null
         gas_species: SiO(g)
-        material: reaction_rate_limited_SiO_source_compilation
+        material: solid_SiO_film_growth
+        method_class: measured_direct
+        system_class: solid_film_growth
+        transformation_class: congruent_no_transformation
+        interfacial_reaction: SiO(g) -> SiO(s_film)
+        alpha_kind: condensation_growth_not_evaporation
+        semantics: competing_observation_do_not_average
         alpha_form:
           type: arrhenius
           expression: alpha = 0.52 * exp(-3685/T_K)
@@ -58,6 +65,17 @@ fidelity_samples:
     uncertainty_envelope:
     - 0.003
     - 0.067
-  note: alpha_form retained verbatim from alpha-kinetics DRAFT (P1-F1 fix)
+  note: Numeric form retained; evidence relabelled to the source's solid-film growth class
   locator:
-    record: wetzel_gail_2013_sio_arrhenius
+    source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+    equation: '8'
+    line_range: 323-326
+- species: SiO
+  observable: alpha
+  observation_id: wetzel_gail_2013_sio_arrhenius
+  field: system_class
+  value: solid_film_growth
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+    paragraph: growth coefficient used in the particle-growth equation
+    line_range: 317-329

@@ -1,0 +1,50 @@
+# Distilled pin evidence — Na mass_spec residual withdrawal
+schema_version: 1
+kind: vapour_rail_pin_evidence
+source_id: evidence-recovery
+date: "2026-08-11"
+species: Na
+validation: mass_spec
+status: withdrawn
+pinned_residual_dex: null
+prior_pinned_residual_dex: 0.0
+residual_change: withdrawn_analytical_upper_bound_not_measurement
+metric: max_absolute_residual_dex
+comparison_basis: >-
+  Historical: extract-store residual against Sossi Na rows that were made
+  executable by an unsupported alpha range and by treating the authors'
+  adopted alpha_e = 1 as a measured value. Withdrawal: Sossi reports a
+  gamma-derived 0.3–1.7 inference at 1400 C, separately adopts alpha_e = 1,
+  and states the physical bound alpha_e <= 1. Neither item is a measured
+  coefficient eligible for a residual pin.
+method: >-
+  2026-08-11 evidence recovery: remove the fabricated [0.9, 1.0] range;
+  retain 0.3–1.7 as disagreeing inferred evidence only; carry the runtime
+  alpha_e = 1 as an analytical_upper_bound status-bearing ceiling. The
+  reproduction battery marks these rows assumed-input and emits
+  typed-refusal:analytical_upper_bound_not_measurement instead of silently
+  scoring a zero residual.
+conditions:
+  source_system: Sossi et al. (2019) Na evaporation from silicate melt
+  source_inference: gamma-derived alpha_e range 0.3–1.7 at 1400 C
+  physical_bound: alpha_e <= 1
+  runtime_status: analytical_upper_bound
+withdrawn_range:
+  former_alpha_range: [0.9, 1.0]
+  reason: source_does_not_report_this_interval
+  source_inference_at_1400C: [0.3, 1.7]
+  source_inference_status: conflicts_with_physical_alpha_upper_bound
+  affected_runtime_species: [Na, Na2, Na2O_gas]
+checkable_claims:
+  - Na mass_spec pin removed because no measured Sossi alpha remains comparable
+  - gamma-derived 0.3–1.7 remains report-only disagreeing inferred evidence
+  - runtime alpha_e = 1 remains a marked analytical ceiling, never a silent ONE
+  - no Na vapor-pressure, activity, or transport parameter retune
+runtime_changes:
+  - simulator/diagnostic_helpers/extract_reproduction.py analytical_upper_bound gate
+  - data/vapor_pressures.yaml sodium-family analytical upper-bound class treatment
+publishable_companion_refs:
+  - docs/model-limitations.md#extract-store-reproduction-battery
+  - data/literature/extracts/kems-012-sossi-2019.yaml
+  - data/literature/extracts/sossi-et-al-2019.yaml
+  - data/vapor_pressures.yaml

@@ -379,21 +379,12 @@ classes. These coverage classes are about *whether a value exists and where it c
 the CITED / ASSUMED / UNCERTIFIED trust tiers of the citation policy, and a species can be in the
 "grounded" coverage class while its value is still UNCERTIFIED.
 
-- **Grounded coefficient.** Sodium, potassium, iron, magnesium, and SiO carry a grounded coefficient
-  with a citation. The sodium value (α ≈ 1.0, envelope 0.9–1.0, over 1700–2273 K) is from Sossi et al.
-  2019 ([doi:10.1016/j.gca.2019.06.021](https://doi.org/10.1016/j.gca.2019.06.021)), an open-furnace
-  mass-loss measurement. It is chosen over the competing KEMS value of ≈ 0.13 from Fedkin et al. 2006
-  (*Geochim. Cosmochim. Acta* 70:206–223,
-  [doi:10.1016/j.gca.2005.08.014](https://doi.org/10.1016/j.gca.2005.08.014)) on physical grounds: the
-  disagreement is methodological — the sealed KEMS chamber measures an intrinsic coefficient against a
-  re-condensing reservoir, whereas the recipes run at millibar overhead with a continuous sweep gas,
-  which is the open-furnace regime with little back-flux. Because the two credible measurements are not
-  reconciled, the sodium coefficient is tagged UNCERTIFIED in the provenance registry, and an operator
-  can select the conservative Fedkin value through the setpoints. Potassium does not inherit sodium's
-  Sossi open-furnace coefficient: the potassium row uses Fedkin et al.'s KEMS intrinsic coefficient
-  `α = 0.13` (envelope 0.10–0.16), distinct from sodium's `α ≈ 1`. These grounded rows carry a
-  confidence-tier-2 label in the coefficient data — a proxy-or-conditional confidence, not a direct
-  regolith-melt measurement — so "grounded" here means sourced and cited, not high-confidence.
+- **Grounded coefficient.** Potassium, iron, and magnesium carry a source-specific coefficient with a
+  citation. Sodium does not: Sossi et al. 2019 report a gamma-derived inference of `0.3–1.7` at 1400 °C,
+  separately adopt `alpha_e = 1`, and state the physical bound `alpha_e <= 1`. The former corpus interval
+  `[0.9,1.0]` is withdrawn. Runtime unity is therefore an explicit analytical upper bound with envelope
+  `[0,1]`, never a measurement or residual pin. Potassium uses Fedkin et al.'s KEMS intrinsic coefficient
+  `α = 0.13` (envelope 0.10–0.16); it does not inherit the sodium ceiling.
 - **Proxy coefficient.** Calcium and titanium use a perovskite (CaTiO₃) proxy; aluminium uses a broad
   conflicting-proxy envelope. These are labelled as proxies, not regolith-melt measurements.
 - **No grounded coefficient.** Chromium, manganese, and the chromium-oxide vapor have no grounded
@@ -406,16 +397,14 @@ the CITED / ASSUMED / UNCERTIFIED trust tiers of the citation policy, and a spec
   records which species used it.
 <!-- impl: §4.2 -> engines/builtin/evaporation_flux.py BuiltinEvaporationFluxProvider.dispatch:715 — alpha fallback policy -->
 
-SiO is treated specially because its coefficient is strongly temperature-dependent, and the
-hot-source and cold-wall interfaces are physically different. Hot-source evaporation uses the Wetzel &
-Gail 2013 Arrhenius compilation, `α_s(T) = 0.52 × exp(−3685/T)` (grounded ≈ 1000–1800 K, envelope
-0.003–0.067; *A&A* 553:A92,
-[doi:10.1051/0004-6361/201220803](https://doi.org/10.1051/0004-6361/201220803)), with microscopic
-reversibility applying at that interface. Cold-wall condensation, below the valid range of that fit,
-uses the Pound 1972 high-supersaturation unity condensation coefficient (α_c = 1.0; *J. Phys. Chem.
-Ref. Data* 1:135, [doi:10.1063/1.3253096](https://doi.org/10.1063/1.3253096)). The model does not
-extrapolate the hot-source Arrhenius onto cold walls: the evaporation and condensation coefficients are
-deliberately different off-equilibrium at high supersaturation.
+SiO is treated specially because the hot-source and cold-wall interfaces are physically different.
+Wetzel & Gail 2013 use `0.52 × exp(−3685/T)` in a solid-SiO particle-growth equation; it is not
+silicate-melt free-evaporation evidence. Runtime temporarily retains that form as an explicitly
+UNCERTIFIED hot-source proxy (1000–1800 K, envelope 0.003–0.067), without a microscopic-reversibility
+claim. Cold-wall condensation below the proxy range separately uses the Pound 1972 high-supersaturation
+unity condensation coefficient (α_c = 1.0; *J. Phys. Chem. Ref. Data* 1:135,
+[doi:10.1063/1.3253096](https://doi.org/10.1063/1.3253096)). A grounded silicate-melt SiO hot-source
+coefficient remains an evidence gap.
 <!-- impl: §4.2 -> data/vapor_pressures.yaml oxide_vapors.SiO.evaporation_alpha:860 — SiO alpha split -->
 
 ### §4.3 The one-hour reservoir model

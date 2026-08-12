@@ -154,7 +154,8 @@ SIO_YIELD_CAMPAIGN_ALIASES: dict[str, str] = {
 }
 SIO_ALPHA_PROVENANCE = (
     "Wetzel & Gail 2013 A&A 553 A92 DOI 10.1051/0004-6361/201220803; "
-    "alpha_s_SiO(T)=0.52*exp(-3685/T), reaction-rate-limited"
+    "alpha_s_SiO(T)=0.52*exp(-3685/T), UNCERTIFIED solid-SiO "
+    "particle-growth proxy, not silicate-melt evaporation evidence"
 )
 SIO_INDUSTRIAL_BENCHMARK_PCT: tuple[int, int] = (8, 15)
 WALL_DEPOSIT_ACCOUNT = "process.wall_deposit"
@@ -3971,8 +3972,9 @@ def build_sio_tsweep_report_markdown(
         "outputs stay inside the [1323, 2400 K] authority band and the "
         "recipe [1050, 1600 C] envelope.",
         "",
-        "Caveat: alpha_SiO uses Wetzel/Gail 2013 alpha_s(T), replacing "
-        "the old Phase 1 fixed 0.04 alpha surface. Stage 3 is post-Cr v2 "
+        "Caveat: alpha_SiO uses the Wetzel/Gail 2013 solid-SiO growth form "
+        "only as an UNCERTIFIED hot-source proxy, not silicate-melt evaporation "
+        "evidence. It replaces the old Phase 1 fixed 0.04 alpha surface. Stage 3 is post-Cr v2 "
         "(commit `bb52c62`) and reports `stage_3_sio_zone_product`.",
         "",
         "## Recommendation",
@@ -4037,7 +4039,8 @@ def build_sio_tsweep_convergence_markdown(
         "Commit chain: Phase 1 alpha surface `fc2d40b`; Phase 2 goldens "
         "refresh landed in controller baseline `a2ab138`.",
         "",
-        "Caveat: alpha_SiO uses Wetzel/Gail 2013 alpha_s(T). Stage 3 is post-Cr v2 "
+        "Caveat: alpha_SiO uses the Wetzel/Gail 2013 solid-SiO growth form as an "
+        "UNCERTIFIED hot-source proxy, not silicate-melt evaporation evidence. Stage 3 is post-Cr v2 "
         "(commit `bb52c62`). Reports are engine-only in [1323, 2400 K] "
         "and recipe-only in [1050, 1600 C].",
         "",

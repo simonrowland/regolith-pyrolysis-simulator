@@ -39,23 +39,27 @@ species:
       regime: open_furnace_apparent
       units: dimensionless
       values:
-        alpha_range:
-        - 0.3
-        - 1.7
         gas_species: Na(g)
         material: ferrobasalt_FCMAS_open_furnace
-        alpha_e_NaO05_at_1400C_range:
+        method_class: model_derived_from_Kstar_and_external_gamma
+        semantics: disagreeing_inferred_evidence_not_physical_alpha_range
+        gamma_derived_alpha_e_inference_at_1400C:
         - 0.3
         - 1.7
+        physical_alpha_upper_bound: 1.0
+        consumer_policy: report_only_not_executable_alpha_range
         note: 'Source §4.6: γ_NaO0.5 ≈ 10^-3 (DeMaria/Gooding/Mathieu) gives α_e,NaO0.5 between 0.3–1.7
-          at 1400 °C. Competing with authors_adopted α_e=1 observation; do not average (VALUE-PRECEDENCE).'
+          at 1400 °C. The inferred span exceeds the source''s α_e<=1 physical bound, so it is disagreeing
+          model-derived evidence, not an admissible alpha range. Competing with the separately authors-adopted
+          α_e=1 observation; do not average (VALUE-PRECEDENCE).'
         missing_for_motzfeldt:
         - orifice_area
         - clausing_factor
         missing_note: Open 1-atm furnace wire-loop experiments — NOT Knudsen-cell geometry.
       uncertainty:
-        note: range from span of literature γ_NaO0.5; not a fit uncertainty
-        alpha_range:
+        note: Span from external literature γ_NaO0.5, not a fit uncertainty or admissible physical alpha range;
+          upper endpoint conflicts with α_e<=1.
+        reported_inference_span:
         - 0.3
         - 1.7
       equipment:
@@ -107,6 +111,10 @@ species:
       units: dimensionless
       values:
         alpha: 1.0
+        alpha_authority_status: analytical_upper_bound
+        alpha_role: authors_adopted_model_value_not_measurement
+        physical_alpha_upper_bound: 1.0
+        semantics: competing_observation_do_not_average
         gas_species: Na(g)
         material: ferrobasalt_FCMAS_open_furnace
         authors_summary: evaporation coefficients close to unity within a factor of 2-3; α_e set to 1
@@ -209,21 +217,23 @@ species:
       units: dimensionless
       values:
         alpha: 1.0
-        alpha_range:
-        - 0.3
-        - 1.7
+        alpha_authority_status: analytical_upper_bound
+        alpha_role: authors_adopted_model_value_not_measurement
+        physical_alpha_upper_bound: 1.0
         gas_species: Na(g)
         material: ferrobasalt_FCMAS_open_furnace_1bar
-        method_class: measured_direct
+        method_class: model_derived_from_Kstar_and_external_gamma
         system_class: silicate_melt
         transformation_class: network_modifier_desorption
         interfacial_reaction: NaO0.5(l) -> Na(g) + 1/4 O2
         transformation_class_confidence: low
         semantics: competing_observation_do_not_average
         authors_adopted_alpha: 1.0
-        gamma_derived_alpha_range_at_1400C:
+        gamma_derived_alpha_e_inference_at_1400C:
         - 0.3
         - 1.7
+        gamma_derived_inference_status: disagrees_with_physical_upper_bound
+        consumer_policy: report_only_inference_plus_status_bearing_ceiling
         transport_treatment: Lumped open-furnace apparent α_e from K*/(γ K). Authors model melt sphere
           with HKL; §4.6 lists diffusion-limited evaporation and gas flow rate among experimental uncertainties
           (±6% random sum, section 4.2) but does NOT apply an explicit gas-phase diffusion residual correction
@@ -232,9 +242,9 @@ species:
         transport_treatment_verdict: lumped_apparent_not_post_diffusion_corrected
         chamber_pressure_bar: 1.0
         gas_mix: 1-atm vertical tube gas-mixing furnace (fO2 buffer; inert carrier + O2 control)
-        note: Authors set α_e=1 after concluding coefficients close to unity within ×2–3; gamma-derived
-          Na range is 0.3–1.7 @1400°C. Runtime envelope 0.9–1.0 is tighter than source range (report in
-          B1-NA-REGIME).
+        note: Authors separately set α_e=1 after concluding coefficients close to unity within ×2–3.
+          The gamma-derived 0.3–1.7 inference at 1400°C exceeds the physical α_e<=1 bound and is retained
+          only as disagreeing report evidence. Runtime uses α=1 solely as a status-bearing analytical ceiling.
         missing_for_motzfeldt:
         - orifice_area
         - clausing_factor
@@ -358,7 +368,7 @@ fidelity_samples:
 - species: Na
   observable: alpha
   observation_id: sossi_2019_na_alpha_e_gamma_derived_range
-  field: alpha_range
+  field: gamma_derived_alpha_e_inference_at_1400C
   value:
   - 0.3
   - 1.7

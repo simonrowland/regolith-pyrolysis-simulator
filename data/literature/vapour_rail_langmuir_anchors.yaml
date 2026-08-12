@@ -7,11 +7,10 @@
 #
 # Diagnostic only: no row certifies; alpha is never fit from VapoRock.
 #
-# Scope note (P2-4 disposition): the Langmuir sidecar currently also holds
-# 1-bar open-furnace *apparent* alphas (Sossi Na) that are not low-backpressure
-# free evaporation. Extraction notes disclose this; a third regime tag
-# (open_furnace_apparent) is deferred rather than inventing loader vocabulary
-# mid-chunk. Do not treat every row here as intrinsic vacuum Langmuir alpha.
+# Scope note (2026-08-11 evidence recovery): the former Sossi Na 1-bar
+# open-furnace row was retired from this low-backpressure Langmuir sidecar.
+# Its unsupported [0.9,1.0] range had no source basis, while the loader has no
+# authority-status field with which to carry alpha=1 as a marked ceiling.
 schema_version: 1
 experimental_regime: langmuir_free_evaporation
 authority: diagnostic_only
@@ -60,27 +59,6 @@ records:
       data/vapor_pressures.yaml REF-014 still carries a known-wrong
       "KEMS sealed-chamber" provenance string (owning-epoch repair; not
       rewritten here).
-    certifies: false
-
-  - record_id: sossi_2019_na_open_furnace_langmuir
-    species: Na
-    regime: langmuir_free_evaporation
-    material: ferrobasalt_FCMAS_open_furnace
-    temperature_range_K: [1573.15, 1823.15]
-    alpha_value: 1.0
-    alpha_range: [0.9, 1.0]
-    citation: >-
-      Sossi et al. (2019) Geochim. Cosmochim. Acta 260:204-231; open-furnace
-      mass-loss Na alpha_e~1 near-ideal (1-bar gas-mixing open-furnace apparent
-      alpha, source_class=open_furnace_apparent_not_intrinsic; NOT a KEMS
-      sealed-chamber intrinsic coefficient and not low-backpressure vacuum
-      Langmuir — filed here as non-KEMS pending open_furnace_apparent regime)
-    doi_or_url: https://doi.org/10.1016/j.gca.2019.06.021
-    extraction_note: >-
-      1-bar open-furnace / free-evaporation *apparent* alpha (vp-acquire-5
-      henrian-correlations.md §5.1/5.3). Not low-backpressure Langmuir; third
-      regime tag deferred (P2-4 disposition). Distinct from KEMS Fe pins and
-      from the vacuum-Langmuir Fedkin/Yu K record in this same sidecar.
     certifies: false
 
   - record_id: safarian_engh_2013_si_pure_langmuir

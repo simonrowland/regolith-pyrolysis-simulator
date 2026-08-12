@@ -57,13 +57,13 @@ species:
   SiO:
     value:
       form: arrhenius
-      # alpha_s_SiO(T)=0.52*exp(-3685/T): Wetzel & Gail 2013 A&A 553 A92 DOI 10.1051/0004-6361/201220803 -- Arrhenius compilation of the SiO evaporation coeff (reaction-rate-limited; cross-checks Gunther 1958, Rocabois 1996, Ferguson&Nuth 2008/2012). Mid-range ~0.04 was the prior fixed pin.
+      # Wetzel & Gail 2013 use 0.52*exp(-3685/T) as a solid-SiO particle-growth coefficient. Runtime retains the form only as an UNCERTIFIED hot-source proxy pending actual silicate-melt SiO evaporation evidence. Mid-range ~0.04 was the prior fixed pin.
       A: 0.52
       B: 3685.0
       valid_range_K: [1000, 1800]
       uncertainty_envelope: [0.003, 0.067]
       cite: "Wetzel&Gail 2013 DOI 10.1051/0004-6361/201220803"
-      status: CITED
+      status: UNCERTIFIED
       prior_scalar:
         value: 0.04
         source: "REF-018 REF-016 Schaefer & Fegley 2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa & Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check."
@@ -75,14 +75,14 @@ species:
       source_url: "https://doi.org/10.1063/1.3253096"
       uncertainty_envelope: [0.016, 1.0]
       uncertainty_flag: "no_direct_cold_wall_SiO_measurement; rarely active - SiO does not evolve from melt below ~1000C, guard for cold-spot faults + initial-fouled-wall Story-2"
-    status: CITED
-    source_class: cited_hkl_accommodation
-    source: "Wetzel & Gail 2013 A&A 553 A92 Arrhenius compilation alpha_s_SiO(T)=0.52*exp(-3685/T), reaction-rate-limited SiO evaporation coefficient. Cold-wall condensation below the valid_range_K floor uses the cited high-supersaturation condensation limit in cold_wall_condensation, not this evaporation Arrhenius."
+    status: UNCERTIFIED
+    source_class: solid_film_growth_proxy_not_evaporation_evidence
+    source: "Wetzel & Gail 2013 A&A 553 A92 use 0.52*exp(-3685/T) as a solid-SiO particle-growth coefficient, not a silicate-melt free-evaporation coefficient. Runtime retains the numeric form only as an explicitly uncertified hot-source proxy. Cold-wall condensation below the valid_range_K floor separately uses the cited Pound high-supersaturation limit."
     source_url: "https://doi.org/10.1051/0004-6361/201220803"
     temperature_range_K: [1000, 1800]
     envelope: [0.003, 0.067]
-    uncertainty_flag: high_T_evaporation_alpha_for_hot_source_only_cold_wall_subfloor_uses_pound_1972_unity_condensation_gate
-    output_status: sourced_with_surface_proxy
+    uncertainty_flag: solid_film_growth_proxy_not_silicate_melt_evaporation_measurement
+    output_status: status_bearing
   CrO2:
     value: 0.90
     status: UNCERTIFIED
@@ -105,14 +105,14 @@ species:
     output_status: sourced_with_surface_proxy
   Na:
     value: 1.0
-    status: CITED
-    source_class: cited_hkl_accommodation
-    source: "REF-013 Sossi et al. 2019 GCA 260:204 reports near-ideal Na alpha_e~1 in open-furnace ferrobasalt FCMAS melt; high-capture value adopted for alkali wall fouling."
+    status: UNCERTIFIED
+    source_class: hkl_ideal_upper_bound
+    source: "Unsupported corpus-created Sossi interval withdrawn 2026-08-11; alpha_s=1 retained only as the physical HKL capture ceiling. Sossi's separate author-adopted alpha_e=1 is context, not a wall-sticking measurement."
     source_url: "https://doi.org/10.1016/j.gca.2019.06.021"
     temperature_range_K: [1700, 2273]
-    envelope: [0.9, 1.0]
-    uncertainty_flag: source_side_open_furnace_to_wall_capture_proxy
-    output_status: sourced_with_surface_proxy
+    envelope: [0.0, 1.0]
+    uncertainty_flag: physical_bound_only_no_direct_Na_wall_sticking_measurement
+    output_status: status_bearing
   K:
     value: 1.0
     status: UNCERTIFIED

@@ -263,6 +263,98 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
             paragraph: iridium loop
             line_range: '107'
+  Ca:
+    observations:
+    - observation_id: richter_2007_ca_non_loss_until_mg_exhausted
+      type: rate_series
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+        section: 4.1 Evaporation rates of silicon and magnesium
+        figure: '2'
+        line_range: '146'
+        paragraph: Calcium and aluminum show no significant evaporation loss until virtually all magnesium has evaporated
+      T_range_K:
+      - 1873.15
+      - 2173.15
+      phase: silicate_melt_Type_B_CAI_like
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: Type-B CAI-like liquids in the reported vacuum runs
+        transition_context:
+          liquidus_K: 1823.0
+          source_locator: Type-B CAI liquidus about 1823 K; all scored runs are hotter
+      standard_state: qualitative vacuum-evaporation loss sequence; not an absolute rate
+      regime: langmuir_free_evaporation
+      units: qualitative bound (no numeric rate)
+      values:
+        quantity: qualitative_non_loss_bound
+        method_class: measured_direct_qualitative
+        system_class: silicate_melt
+        semantics: bound_not_point_ordering
+        component: Ca
+        comparison_component: Mg
+        bound: no_significant_loss_until_Mg_virtually_exhausted
+        numeric_rate_status: not_reported_qualitative_bound_only
+        linked_observation: richter_2007_al_non_loss_until_mg_exhausted
+      equipment:
+        chamber_pressure:
+          value: 0.000133322
+          units: Pa
+          upper_bound: true
+          inferred: true
+          inference: 1e-6 Torr * 133.322 Pa/Torr; source states pressure was less than this value
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+            paragraph: pressure at run conditions was always less than 10^-6 Torr
+            line_range: '105'
+  Al:
+    observations:
+    - observation_id: richter_2007_al_non_loss_until_mg_exhausted
+      type: rate_series
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+        section: 4.1 Evaporation rates of silicon and magnesium
+        figure: '2'
+        line_range: '146'
+        paragraph: Calcium and aluminum show no significant evaporation loss until virtually all magnesium has evaporated
+      T_range_K:
+      - 1873.15
+      - 2173.15
+      phase: silicate_melt_Type_B_CAI_like
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: Type-B CAI-like liquids in the reported vacuum runs
+        transition_context:
+          liquidus_K: 1823.0
+          source_locator: Type-B CAI liquidus about 1823 K; all scored runs are hotter
+      standard_state: qualitative vacuum-evaporation loss sequence; not an absolute rate
+      regime: langmuir_free_evaporation
+      units: qualitative bound (no numeric rate)
+      values:
+        quantity: qualitative_non_loss_bound
+        method_class: measured_direct_qualitative
+        system_class: silicate_melt
+        semantics: bound_not_point_ordering
+        component: Al
+        comparison_component: Mg
+        bound: no_significant_loss_until_Mg_virtually_exhausted
+        numeric_rate_status: not_reported_qualitative_bound_only
+        linked_observation: richter_2007_ca_non_loss_until_mg_exhausted
+      equipment:
+        chamber_pressure:
+          value: 0.000133322
+          units: Pa
+          upper_bound: true
+          inferred: true
+          inference: 1e-6 Torr * 133.322 Pa/Torr; source states pressure was less than this value
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+            paragraph: pressure at run conditions was always less than 10^-6 Torr
+            line_range: '105'
 fidelity_samples:
 - species: Mg
   observable: alpha
@@ -343,3 +435,21 @@ fidelity_samples:
   locator:
     source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
     table: '1'
+- species: Ca
+  observable: rate_series
+  observation_id: richter_2007_ca_non_loss_until_mg_exhausted
+  field: bound
+  value: no_significant_loss_until_Mg_virtually_exhausted
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+    line_range: '146'
+    paragraph: calcium and aluminum do not experience significant loss until virtually all magnesium evaporates
+- species: Al
+  observable: rate_series
+  observation_id: richter_2007_al_non_loss_until_mg_exhausted
+  field: bound
+  value: no_significant_loss_until_Mg_virtually_exhausted
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+    line_range: '146'
+    paragraph: calcium and aluminum do not experience significant loss until virtually all magnesium evaporates

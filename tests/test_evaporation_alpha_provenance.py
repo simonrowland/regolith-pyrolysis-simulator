@@ -11,20 +11,30 @@ import pytest
 import yaml
 
 from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
+from simulator import condensation
 from simulator.chemistry.langmuir_knudsen import grounded_alpha
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.diagnostic_helpers.extract_reproduction import _engine_alpha
 from simulator.diagnostics import pressure_coating_pareto_diagnostic
-from simulator.evaporation import _load_evaporation_alpha_by_species
+from simulator.evaporation import (
+    _load_evaporation_alpha_by_species,
+    _load_evaporation_alpha_envelope_by_species,
+)
 from simulator.fidelity_vocabulary import EvidenceClass
 from simulator.optimize.honesty import optimizer_tier_label
 from simulator.vapour_rail.instrumentation import CONTROL_FLUX_PRESSURES_KEY
-from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+from simulator.vapour_rail.catalog import (
+    compiled_catalog_for,
+    vapor_pressure_legacy_view,
+)
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 VAPOR_PRESSURES_PATH = REPO_ROOT / "data" / "vapor_pressures.yaml"
+STICKING_PATH = (
+    REPO_ROOT / "data" / "literature" / "vacuum_pyrolysis_sticking.yaml"
+)
 SETPOINTS_PATH = REPO_ROOT / "data" / "setpoints.yaml"
 
 EXPECTED_ALPHA = {
@@ -50,12 +60,16 @@ EXPECTED_ALPHA = {
     },
     ("metals", "Na"): {
         "value": 1.0,
-        "envelope": (0.9, 1.0),
+        "envelope": (0.0, 1.0),
         "source": (
-            "OWNER-RATIFY source_class=open_furnace_apparent_not_intrinsic: "
-            "REF-013 Sossi et al. 2019 GCA 260:204, Na alpha_e~1 near-ideal "
-            "open-furnace evaporation from ferrobasalt FCMAS melt; retained "
-            "pending owner ratification against competing Fedkin intrinsic 0.13"
+            "2026-08-11 evidence recovery: unsupported corpus-created Sossi Na alpha "
+            "interval WITHDRAWN. Sossi et al. 2019 report a gamma-derived 0.3-1.7 "
+            "inference at 1400 C that conflicts with the physical alpha_e<=1 bound, "
+            "then separately adopt alpha_e=1. No grounded intrinsic melt-carrier "
+            "coefficient remains. "
+            "Hertz-Knudsen ideal alpha=1 is retained only as an explicit upper-bound "
+            "kinetic ceiling (status-bearing, never certifies; true flux <= this), not "
+            "a measured coefficient and not a silent default."
         ),
         "tier": 2,
     },
@@ -121,21 +135,19 @@ EXPECTED_ALPHA = {
         },
         "envelope": (0.003, 0.067),
         "source": (
-            "Wetzel & Gail 2013 A&A 553 A92 Arrhenius compilation "
-            "alpha_s_SiO(T)=0.52*exp(-3685/T), reaction-rate-limited "
-            "SiO evaporation coefficient. HOT evaporation interface uses "
-            "alpha_s(T) at source T; microscopic reversibility applies there. "
-            "COLD-WALL condensation below valid_range_K floor uses the grounded "
-            "Pound 1972 JPCRD 1:135 DOI 10.1063/1.3253096 unity condensation "
-            "coefficient; alpha_e != alpha_c off-equilibrium at high "
-            "supersaturation."
+            "Wetzel & Gail 2013 A&A 553 A92 use 0.52*exp(-3685/T) as a solid-SiO "
+            "particle-growth coefficient, not silicate-melt free-evaporation "
+            "evidence. Runtime retains the form only as an explicitly UNCERTIFIED "
+            "hot-source proxy pending a grounded SiO melt coefficient. COLD-WALL "
+            "condensation below valid_range_K separately uses the Pound 1972 JPCRD "
+            "1:135 DOI 10.1063/1.3253096 high-supersaturation unity condensation "
+            "coefficient."
         ),
         "tier": 2,
     },
 }
 
 EXPECTED_OWNER_RATIFY_ALPHA = {
-    ("metals", "Na"),
     ("metals", "Al"),
     ("metals", "Mn"),
     ("foulant_vapor", "NaCl"),
@@ -231,6 +243,145 @@ def test_tier_3_species_have_fail_loud_policy_not_placeholder_alpha():
         assert policy["tier"] == 3
         assert policy["policy"] == "fail_loud_missing_alpha"
         assert source_marker in policy["source"]
+
+
+def test_sossi_sodium_family_withdrawal_reaches_every_runtime_store():
+    raw = yaml.safe_load(VAPOR_PRESSURES_PATH.read_text()) or {}
+    families = raw["families"]
+    family_by_species = {
+        "Na": "metals_na_family",
+        "Na2": "oxide_vapors_na2_cluster_family",
+        "Na2O_gas": "oxide_vapors_na2o_family",
+    }
+
+    def forbidden_range_paths(value, path=()):
+        paths = []
+        if isinstance(value, dict):
+            for key, child in value.items():
+                paths.extend(forbidden_range_paths(child, (*path, str(key))))
+        elif isinstance(value, list):
+            if value == [0.9, 1.0]:
+                paths.append(".".join(path))
+            for index, child in enumerate(value):
+                paths.extend(forbidden_range_paths(child, (*path, str(index))))
+        return paths
+
+    sodium_families = {
+        family_id: families[family_id]
+        for family_id in family_by_species.values()
+    }
+    assert forbidden_range_paths(sodium_families) == []
+
+    for species, family_id in family_by_species.items():
+        kinetics = families[family_id]["vaporisation_coefficients"]
+        alpha = kinetics["evaporation_alpha"]
+        assert alpha["value"] == pytest.approx(1.0), species
+        assert alpha["status"] == "analytical_upper_bound", species
+        assert alpha["tag"] == "hkl_ideal_upper_bound_status_bearing", species
+        assert tuple(alpha["envelope"]) == (0.0, 1.0), species
+        assert tuple(
+            kinetics["alpha_domain_and_uncertainty"]["envelope"]
+        ) == (0.0, 1.0), species
+        assert "withdrawn_range" not in alpha, species
+
+    data = _vapor_pressure_data()
+    compiled = compiled_catalog_for(raw)
+    loaded_alpha = _load_evaporation_alpha_by_species(raw)
+    loaded_envelope = _load_evaporation_alpha_envelope_by_species(raw)
+    legacy_location = {
+        "Na": ("metals", "Na"),
+        "Na2": ("oxide_vapors", "Na2"),
+        "Na2O_gas": ("oxide_vapors", "Na2O_gas"),
+    }
+    for species, (section, legacy_species) in legacy_location.items():
+        compiled_kinetics = compiled.species[
+            species
+        ].vaporisation_coefficients
+        assert "withdrawn_range" not in compiled_kinetics.evaporation_alpha, species
+        assert tuple(compiled_kinetics.evaporation_alpha["envelope"]) == (
+            0.0,
+            1.0,
+        ), species
+        assert tuple(
+            compiled_kinetics.alpha_domain_and_uncertainty["envelope"]
+        ) == (0.0, 1.0), species
+        compiled_alpha = data[section][legacy_species]["evaporation_alpha"]
+        assert "withdrawn_range" not in compiled_alpha, species
+        assert tuple(compiled_alpha["envelope"]) == (0.0, 1.0), species
+        spec = loaded_alpha[species]
+        assert spec["form"] == "scalar", species
+        assert spec["value"] == pytest.approx(1.0), species
+        assert spec["alpha_authority_status"] == "analytical_upper_bound", species
+        assert loaded_envelope[species] == (0.0, 1.0), species
+
+    withdrawal_path = (
+        REPO_ROOT
+        / "validation-data"
+        / "pin-evidence"
+        / "na_mass_spec_analytical_ceiling_withdrawal_2026-08-11.yaml"
+    )
+    withdrawal = yaml.safe_load(withdrawal_path.read_text()) or {}
+    assert withdrawal["withdrawn_range"]["former_alpha_range"] == [0.9, 1.0]
+    assert (
+        withdrawal["withdrawn_range"]["reason"]
+        == "source_does_not_report_this_interval"
+    )
+    assert withdrawal["withdrawn_range"]["source_inference_at_1400C"] == [
+        0.3,
+        1.7,
+    ]
+    assert (
+        withdrawal["withdrawn_range"]["source_inference_status"]
+        == "conflicts_with_physical_alpha_upper_bound"
+    )
+    assert withdrawal["withdrawn_range"]["affected_runtime_species"] == [
+        "Na",
+        "Na2",
+        "Na2O_gas",
+    ]
+
+    sticking = yaml.safe_load(STICKING_PATH.read_text()) or {}
+    sticking_na = sticking["species"]["Na"]
+    assert sticking_na["value"] == pytest.approx(1.0)
+    assert sticking_na["status"] == "UNCERTIFIED"
+    assert sticking_na["source_class"] == "hkl_ideal_upper_bound"
+    assert tuple(sticking_na["envelope"]) == (0.0, 1.0)
+    assert forbidden_range_paths({"Na": sticking_na}) == []
+    assert "[0.9,1.0]" not in sticking_na["source"]
+
+    runtime_sticking_na = condensation.STICKING_DATA["species"]["Na"]
+    assert runtime_sticking_na == sticking_na
+    assert condensation.alpha_s("Na", 1700.0, {}) == pytest.approx(1.0)
+
+
+def test_sossi_and_wetzel_withdrawals_reach_runtime_and_user_facing_docs():
+    data = _vapor_pressure_data()
+    sio = data["oxide_vapors"]["SiO"]["evaporation_alpha"]
+    assert sio["value"]["status"] == "UNCERTIFIED"
+    assert sio["tag"] == "solid_film_growth_proxy_not_evaporation_evidence"
+    assert "particle-growth coefficient" in sio["source"]
+    assert "not silicate-melt free-evaporation evidence" in sio["source"]
+
+    docs = "\n".join(
+        (REPO_ROOT / path).read_text()
+        for path in (
+            "docs/chemistry-methods.md",
+            "docs/model-limitations.md",
+            "docs/lab-validation-whitepaper.md",
+            "docs/references/index.html",
+            "docs/references/topics/evaporation.html",
+        )
+    )
+    stale_claims = (
+        "Na `alpha=1.0`, envelope `[0.9,1.0]`",
+        "sodium value (α ≈ 1.0, envelope 0.9–1.0",
+        "HOT source evaporation uses the Wetzel",
+        "for source evaporation; Pound 1972",
+        "OWNER-RATIFY source_class=open_furnace_apparent_not_intrinsic",
+        "reports near-ideal Na alpha_e~1 from mass-spec isotope fractionation",
+    )
+    for claim in stale_claims:
+        assert claim not in docs
 
 
 def test_zhang_2014_catio3_proxy_withdrawn_hkl_upper_bound_posture():

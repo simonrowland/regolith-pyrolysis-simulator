@@ -125,6 +125,122 @@ species:
           locator:
             source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
             paragraph: Prior to evaporation, the pressure in the chamber was 1.3e-8 bar
+    - observation_id: hashimoto_1983_fcmas_qualitative_volatility_order
+      type: rate_series
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        section: ABSTRACT
+        line_range: '11'
+        note: Author-reported gross order of Fe, Mg, Si, Ca, and Al evaporation from FCMAS melt
+      T_range_K:
+      - 1873.15
+      - 2273.15
+      phase: silicate_melt_FCMAS_solar_abundance
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: Samples were evaporated as molten FCMAS spherules.
+      standard_state: vacuum free evaporation of multicomponent melt
+      regime: langmuir_free_evaporation
+      units: qualitative ordering only
+      values:
+        quantity: qualitative_volatility_order
+        method_class: measured_direct_qualitative
+        system_class: silicate_melt
+        semantics: bound_not_point_ordering
+        order_tiers:
+        - - Fe
+        - - Mg
+          - Si
+        - - Ca
+        - - Al
+        source_reported_sequence:
+        - Fe
+        - Mg
+        - Si
+        - Ca
+        - Al
+        mg_si_relative_order: stage_dependent_not_resolved_as_a_rate
+        numeric_rate_status: not_reported_do_not_infer
+        note: The source's gross sequence supports relative extraction order only. Mg and Si change
+          relative behavior with evaporation stage, so their adjacency is typed as one tier rather
+          than a fixed pairwise rate ranking.
+      equipment:
+        chamber_pressure:
+          value: 0.0133322
+          units: Pa
+          inferred: true
+          inference: about 1e-4 Torr during experiments * 133.322 Pa/Torr = 0.0133322 Pa
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+            paragraph: vacuum level in the chamber was about 10^-4 Torr during the experiments
+            line_range: '160'
+  Ca:
+    observations:
+    - observation_id: hashimoto_1983_cao_al2o3_residue_enrichment
+      type: rate_series
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        section: RESULTS AND DISCUSSION
+        line_range: 883-927
+        note: CaO and Al2O3 become enriched in residues as more volatile components are lost
+      T_range_K:
+      - 1873.15
+      - 2273.15
+      phase: silicate_melt_FCMAS_solar_abundance
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: Residue compositions are measured after free evaporation of molten FCMAS spherules.
+      standard_state: vacuum free evaporation of multicomponent melt
+      regime: langmuir_free_evaporation
+      units: qualitative enrichment only
+      values:
+        quantity: qualitative_residue_enrichment
+        method_class: measured_direct_qualitative
+        system_class: silicate_melt
+        semantics: bound_not_point_ordering
+        enriched_components:
+        - CaO
+        - Al2O3
+        trend: enriched_in_residue_with_progressive_evaporation
+        numeric_rate_status: not_reported_do_not_infer
+        note: Residue enrichment is composition-path evidence, not an absolute evaporation rate or
+          an activity coefficient.
+    - observation_id: hashimoto_1983_stage_iv_cao_relative_volatility
+      type: rate_series
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        section: RESULTS AND DISCUSSION
+        line_range: 927-937
+        note: Stage-IV CaO volatility reported as about one third of SiO2; thermodynamic estimate 0.36
+      T_range_K:
+      - 1873.15
+      - 2273.15
+      phase: silicate_melt_FCMAS_solar_abundance_stage_IV
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: Stage IV is the late, CaO-Al2O3-rich molten-residue interval described by the source.
+      standard_state: vacuum free evaporation of multicomponent melt
+      regime: langmuir_free_evaporation
+      units: dimensionless relative volatility
+      values:
+        quantity: approximate_relative_volatility
+        method_class: measured_direct_qualitative_with_thermodynamic_crosscheck
+        system_class: silicate_melt
+        semantics: approximate_relative_ratio_not_absolute_rate
+        numerator: CaO
+        denominator: SiO2
+        stage: IV
+        relative_volatility_approx: 0.3333333333333333
+        thermodynamic_estimate_at_1873_15K: 0.36
+        numeric_rate_status: ratio_only_not_species_rate
+        note: The one-third statement constrains CaO relative to SiO2 only; it is not promoted to an
+          absolute CaO or SiO2 evaporation rate.
   Mg:
     observations:
     - observation_id: hashimoto_1983_mg_fcmas_free_evap_geometry
@@ -335,3 +451,37 @@ fidelity_samples:
   locator:
     source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
     paragraph: preform diameter 4 mm
+- species: Fe
+  observable: rate_series
+  observation_id: hashimoto_1983_fcmas_qualitative_volatility_order
+  field: source_reported_sequence
+  value:
+  - Fe
+  - Mg
+  - Si
+  - Ca
+  - Al
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+    paragraph: gross order of evaporation is Fe, Mg, Si, Ca, and Al
+    line_range: '11'
+- species: Ca
+  observable: rate_series
+  observation_id: hashimoto_1983_cao_al2o3_residue_enrichment
+  field: enriched_components
+  value:
+  - CaO
+  - Al2O3
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+    paragraph: CaO and Al2O3 are enriched in the residual melts
+    line_range: 883-927
+- species: Ca
+  observable: rate_series
+  observation_id: hashimoto_1983_stage_iv_cao_relative_volatility
+  field: relative_volatility_approx
+  value: 0.3333333333333333
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+    paragraph: volatility of CaO is about one third of that of SiO2 in Stage IV
+    line_range: '931'

@@ -393,6 +393,114 @@ def test_repo_extracts_validate_green():
     assert errors == [], "\n".join(errors[:20])
 
 
+def _repo_observation(filename: str, observation_id: str) -> dict:
+    doc = yaml.safe_load((EXTRACTS / filename).read_text())
+    for species in doc["species"].values():
+        for observation in species["observations"]:
+            if observation["observation_id"] == observation_id:
+                return observation
+    raise AssertionError(f"observation not found: {filename}::{observation_id}")
+
+
+def test_sossi_na_inference_and_ceiling_never_recreate_alpha_range():
+    """Na's disagreeing inference and adopted ceiling are not measured ranges."""
+    gamma = _repo_observation(
+        "kems-012-sossi-2019.yaml",
+        "sossi_2019_na_alpha_e_gamma_derived_range",
+    )
+    adopted = _repo_observation(
+        "kems-012-sossi-2019.yaml",
+        "sossi_2019_na_alpha_e_authors_adopted_unity",
+    )
+    legacy = _repo_observation(
+        "sossi-et-al-2019.yaml", "sossi_2019_na_open_furnace_apparent"
+    )
+
+    assert "alpha_range" not in gamma["values"]
+    assert gamma["values"]["gamma_derived_alpha_e_inference_at_1400C"] == [0.3, 1.7]
+    assert gamma["values"]["consumer_policy"] == "report_only_not_executable_alpha_range"
+    assert adopted["values"]["alpha_authority_status"] == "analytical_upper_bound"
+    assert adopted["values"]["physical_alpha_upper_bound"] == 1.0
+    assert "alpha_range" not in legacy["values"]
+    assert legacy["values"]["alpha_authority_status"] == "analytical_upper_bound"
+
+
+def test_wetzel_duplicate_is_typed_as_solid_film_growth():
+    observation = _repo_observation(
+        "wetzel-gail-2013-sio-arrhenius.yaml",
+        "wetzel_gail_2013_sio_arrhenius",
+    )
+    assert observation["values"]["system_class"] == "solid_film_growth"
+    assert observation["values"]["alpha_kind"] == "condensation_growth_not_evaporation"
+    assert observation["condensed_form"]["state"] == "glass_amorphous"
+
+
+def test_recovered_qualitative_sequences_cannot_become_numeric_rates():
+    hashimoto_doc = yaml.safe_load(
+        (EXTRACTS / "kems-015-hashimoto-1983.yaml").read_text()
+    )
+    ca_ids = {
+        row["observation_id"]
+        for row in hashimoto_doc["species"]["Ca"]["observations"]
+    }
+    assert {
+        "hashimoto_1983_cao_al2o3_residue_enrichment",
+        "hashimoto_1983_stage_iv_cao_relative_volatility",
+    } <= ca_ids
+
+    richter = _repo_observation(
+        "kems-010-richter-2007.yaml", "richter_2007_ca_non_loss_until_mg_exhausted"
+    )
+    ordering = _repo_observation(
+        "kems-015-hashimoto-1983.yaml",
+        "hashimoto_1983_fcmas_qualitative_volatility_order",
+    )
+    ratio = _repo_observation(
+        "kems-015-hashimoto-1983.yaml",
+        "hashimoto_1983_stage_iv_cao_relative_volatility",
+    )
+    assert richter["values"]["semantics"] == "bound_not_point_ordering"
+    assert (
+        richter["values"]["numeric_rate_status"]
+        == "not_reported_qualitative_bound_only"
+    )
+    assert ordering["values"]["order_tiers"] == [["Fe"], ["Mg", "Si"], ["Ca"], ["Al"]]
+    assert ordering["values"]["numeric_rate_status"] == "not_reported_do_not_infer"
+    assert ratio["values"]["relative_volatility_approx"] == pytest.approx(1.0 / 3.0)
+    assert ratio["values"]["numeric_rate_status"] == "ratio_only_not_species_rate"
+
+
+def test_stolyarova_wilson_numbers_are_gibbs_model_parameters_only():
+    observation = _repo_observation(
+        "kems-016-stolyarova-1992.yaml",
+        "stolyarova_1992_binary_wilson_model_parameters_table2",
+    )
+    al_si = next(
+        row for row in observation["values"]["parameters"]
+        if row["system"] == "Al2O3-SiO2"
+    )
+    assert observation["type"] == "gibbs_table"
+    assert observation["values"]["evidence_class"] == "thermodynamic_model_parameter"
+    assert observation["values"]["activity_pin_eligible"] is False
+    assert al_si["l210"] == 316.3
+
+
+def test_halwax_pure_solid_formation_enthalpies_are_symmetric():
+    expected = {
+        "halwax_2024_cao_third_law_formation_enthalpy": (-624.5, 3.5, "CaO(s)"),
+        "halwax_2024_mgo_third_law_formation_enthalpy": (-598.0, 10.0, "MgO(s)"),
+    }
+    for observation_id, (value, uncertainty, phase) in expected.items():
+        observation = _repo_observation("kems-031-halwax-2024.yaml", observation_id)
+        assert observation["type"] == "gibbs_table"
+        assert observation["condensed_form"]["state"] == "crystalline"
+        assert observation["values"]["condensed_phase"] == phase
+        assert observation["values"]["delta_f_H_kJ_mol"] == value
+        assert observation["uncertainty"]["delta_f_H_kJ_mol"] == uncertainty
+        assert observation["values"]["melt_activity_applicability"] == "excluded"
+        assert observation["values"]["activity_pin_eligible"] is False
+
+
 def test_source_priority_file_present_and_valid():
     errs = vle.validate_source_priority_file()
     assert errs == []

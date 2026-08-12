@@ -36,23 +36,23 @@ species:
       units: dimensionless
       values:
         alpha: 1.0
-        alpha_range:
-        - 0.9
-        - 1.0
+        alpha_authority_status: analytical_upper_bound
+        alpha_role: authors_adopted_model_value_not_measurement
+        physical_alpha_upper_bound: 1.0
+        semantics: competing_observation_do_not_average
         gas_species: Na(g)
         material: ferrobasalt_FCMAS_open_furnace
       uncertainty:
-        note: Retain as regime-tagged apparent alpha; do not treat as intrinsic vacuum alpha
-        alpha_range:
-        - 0.9
-        - 1.0
+        note: The source gives no 0.9-1.0 interval. The author-adopted unity value is retained only as
+          a status-bearing physical ceiling, not an intrinsic-vacuum measurement.
 fidelity_samples:
 - path: species.Na.observations[sossi_2019_na_open_furnace_apparent].values
   value:
     alpha: 1.0
-    alpha_range:
-    - 0.9
-    - 1.0
+    alpha_authority_status: analytical_upper_bound
+    alpha_role: authors_adopted_model_value_not_measurement
+    physical_alpha_upper_bound: 1.0
+    semantics: competing_observation_do_not_average
     gas_species: Na(g)
     material: ferrobasalt_FCMAS_open_furnace
   note: auto fidelity sample from first observation payload (pilot migration)

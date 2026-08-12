@@ -883,16 +883,21 @@ families:
     vaporisation_coefficients:
       evaporation_alpha:
         value: 1.0
-        source: 'OWNER-RATIFY source_class=open_furnace_apparent_not_intrinsic: REF-013 Sossi et al. 2019
-          GCA 260:204, Na alpha_e~1 near-ideal open-furnace evaporation from ferrobasalt FCMAS melt; retained
-          pending owner ratification against competing Fedkin intrinsic 0.13'
+        status: analytical_upper_bound
+        source: '2026-08-11 evidence recovery: unsupported corpus-created Sossi Na alpha interval WITHDRAWN.
+          Sossi et al. 2019 report a gamma-derived 0.3-1.7 inference at 1400 C that conflicts with
+          the physical alpha_e<=1 bound, then separately adopt alpha_e=1. No grounded intrinsic
+          melt-carrier coefficient remains. Hertz-Knudsen ideal alpha=1 is retained only as an
+          explicit upper-bound kinetic ceiling (status-bearing, never certifies; true flux <= this),
+          not a measured coefficient and not a silent default.'
         T_band_K:
         - 1700
         - 2273
         envelope:
-        - 0.9
+        - 0.0
         - 1.0
         tier: 2
+        tag: hkl_ideal_upper_bound_status_bearing
         competing_sources:
         - source: REF-014 Fedkin et al. 2006 LPSC 37:#2249, KEMS sealed-chamber
           value: 0.13
@@ -902,8 +907,9 @@ families:
         - 1700
         - 2273
         envelope:
-        - 0.9
+        - 0.0
         - 1.0
+        interpretation: physical_upper_bound_not_empirical_interval
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
       acquisition_flag: vapour_pressure_out_of_range:Na
@@ -4714,16 +4720,16 @@ families:
           - 0.003
           - 0.067
           cite: Wetzel&Gail 2013 DOI 10.1051/0004-6361/201220803
-          status: CITED
+          status: UNCERTIFIED
           prior_scalar:
             value: 0.04
             source: REF-018 REF-016 SF2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa
               & Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check.
-        source: Wetzel & Gail 2013 A&A 553 A92 Arrhenius compilation alpha_s_SiO(T)=0.52*exp(-3685/T),
-          reaction-rate-limited SiO evaporation coefficient. HOT evaporation interface uses alpha_s(T)
-          at source T; microscopic reversibility applies there. COLD-WALL condensation below valid_range_K
-          floor uses the grounded Pound 1972 JPCRD 1:135 DOI 10.1063/1.3253096 unity condensation coefficient;
-          alpha_e != alpha_c off-equilibrium at high supersaturation.
+        source: Wetzel & Gail 2013 A&A 553 A92 use 0.52*exp(-3685/T) as a solid-SiO
+          particle-growth coefficient, not silicate-melt free-evaporation evidence. Runtime retains the
+          form only as an explicitly UNCERTIFIED hot-source proxy pending a grounded SiO melt coefficient.
+          COLD-WALL condensation below valid_range_K separately uses the Pound 1972 JPCRD 1:135 DOI
+          10.1063/1.3253096 high-supersaturation unity condensation coefficient.
         T_band_K:
         - 1000
         - 1800
@@ -4731,6 +4737,7 @@ families:
         - 0.003
         - 0.067
         tier: 2
+        tag: solid_film_growth_proxy_not_evaporation_evidence
       alpha_domain_and_uncertainty:
         temperature_K:
         - 1000
@@ -13536,25 +13543,31 @@ families:
     vaporisation_coefficients:
       evaporation_alpha:
         value: 1
-        source: Status-bearing Na class proxy; no Na2-specific measurement exists.
+        status: analytical_upper_bound
+        source: '2026-08-11 evidence recovery sodium-family class treatment: no grounded
+          intrinsic Na melt-carrier coefficient exists, and no Na2-specific measurement exists.
+          Hertz-Knudsen ideal alpha=1 is retained only as an explicit upper-bound kinetic ceiling
+          (status-bearing, never certifies; true flux <= this), not a measured coefficient and not
+          a silent default.'
         T_band_K:
         - 1700
         - 2273
         envelope:
-        - 0.9
+        - 0.0
         - 1
         tier: 2
-        tag: proxy_not_intrinsic
+        tag: hkl_ideal_upper_bound_status_bearing
       alpha_domain_and_uncertainty:
         temperature_K:
         - 1700
         - 2273
         envelope:
-        - 0.9
+        - 0.0
         - 1
+        interpretation: physical_upper_bound_not_empirical_interval
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: evaporation_alpha_proxy:Na2
+      acquisition_flag: evaporation_alpha_hkl_upper_bound_evidence_recovery:Na2
     code_metadata:
       formula_id: Na2
       source_account: process.cleaned_melt
@@ -13738,25 +13751,31 @@ families:
     vaporisation_coefficients:
       evaporation_alpha:
         value: 1
-        source: Status-bearing Na class proxy; no Na2O_gas-specific measurement exists.
+        status: analytical_upper_bound
+        source: '2026-08-11 evidence recovery sodium-family class treatment: no grounded
+          intrinsic Na melt-carrier coefficient exists, and no Na2O_gas-specific measurement exists.
+          Hertz-Knudsen ideal alpha=1 is retained only as an explicit upper-bound kinetic ceiling
+          (status-bearing, never certifies; true flux <= this), not a measured coefficient and not
+          a silent default.'
         T_band_K:
         - 1700
         - 2273
         envelope:
-        - 0.9
+        - 0.0
         - 1
         tier: 2
-        tag: proxy_not_intrinsic
+        tag: hkl_ideal_upper_bound_status_bearing
       alpha_domain_and_uncertainty:
         temperature_K:
         - 1700
         - 2273
         envelope:
-        - 0.9
+        - 0.0
         - 1
+        interpretation: physical_upper_bound_not_empirical_interval
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: evaporation_alpha_proxy:Na2O_gas
+      acquisition_flag: evaporation_alpha_hkl_upper_bound_evidence_recovery:Na2O_gas
     code_metadata:
       formula_id: Na2O_gas
       source_account: process.cleaned_melt

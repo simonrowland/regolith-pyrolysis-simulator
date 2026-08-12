@@ -16,6 +16,12 @@
 # typed-refusal:not_comparable_condensed_form:<state> or form_unresolved.
 # Pin payoff: Fe/K numeric unchanged (grounding → Hashimoto/Sossi liquid);
 # Mg 0.699→0.520; SiO 1.297→0.410; Na mass_spec withdrawn (Yu unresolved).
+#
+# 2026-08-11 evidence recovery: all four surviving Sossi Na zero-residual rows
+# are withdrawn from this pin set. The gamma-derived 0.3–1.7 span is an
+# internally disagreeing inference, while adopted alpha_e=1 is a status-bearing
+# analytical ceiling. Neither is a measured coefficient; no numeric residual
+# was changed or absorbed.
 schema_version: 2
 metric: residual_dex
 band_kind: absolute_dex
@@ -359,47 +365,6 @@ points:
   status: match
   note: Expanded real-harness pin; residual is reported, not tuned.
   temperature_K: 2173.0
-- key: sossi_2019_na_alpha_e_authors_adopted_unity:T=1698.15
-  case_id: kems-012-sossi-2019::sossi_2019_na_alpha_e_authors_adopted_unity
-  source_id: kems-012-sossi-2019
-  observation_type: alpha
-  species: Na
-  residual_dex: 0.0
-  band_dex: 0.01
-  status: match
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 1698.15
-- key: sossi_2019_na_alpha_e_gamma_derived_range:T=1673.15
-  case_id: kems-012-sossi-2019::sossi_2019_na_alpha_e_gamma_derived_range
-  source_id: kems-012-sossi-2019
-  observation_type: alpha
-  species: Na
-  residual_dex: 0.0
-  band_dex: 0.01
-  status: match
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 1673.15
-- key: sossi_2019_na_class_and_transport_b1:T=1698.15
-  case_id: kems-012-sossi-2019::sossi_2019_na_class_and_transport_b1
-  source_id: kems-012-sossi-2019
-  observation_type: alpha
-  species: Na
-  residual_dex: 0.0
-  band_dex: 0.01
-  status: match
-  note: Class-comparable residual pin; residual reported, not tuned (si-comparability
-    2026-08-08).
-  temperature_K: 1698.15
-- key: sossi_2019_na_open_furnace_apparent:T=1698.15
-  case_id: sossi-et-al-2019::sossi_2019_na_open_furnace_apparent
-  source_id: sossi-et-al-2019
-  observation_type: alpha
-  species: Na
-  residual_dex: 0.0
-  band_dex: 0.01
-  status: match
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 1698.15
 - key: fedkin_2006_table3_sio_hashimoto_langmuir:T=1973
   case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir
   source_id: fedkin-grossman-ghiorso-2006

@@ -66,11 +66,50 @@ species:
         chamber_pressure:
           value: 1.0e-05
           units: mbar
+          converted_value_Pa: 0.001
+          conversion: 1.0e-5 mbar * 100 Pa/mbar = 1.0e-3 Pa
           note: heating started after chamber pressure decreased below 10^-5 mbar
           locator:
             source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
             paragraph: pressure decreased below 10^-5 mbar
             line_range: '230'
+    - observation_id: halwax_2024_mgo_third_law_formation_enthalpy
+      type: gibbs_table
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+        table: IV
+        line_range: 595-607
+        note: Third-law standard formation enthalpy for pure solid MgO
+      T_range_K:
+      - 1850.0
+      - 2100.0
+      phase: pure_solid_MgO
+      condensed_form:
+        state: crystalline
+        polymorph: periclase
+        metastable: false
+        basis: explicit_author
+        note: Pure MgO powder in the Ir Knudsen cell; thermochemical result is for MgO(s).
+      standard_state: pure MgO(s), standard formation enthalpy at 298.15 K
+      regime: kems_third_law_thermochemistry
+      units: kJ/mol
+      values:
+        quantity: standard_formation_enthalpy_298_15K
+        evidence_class: pure_solid_thermochemistry
+        method_class: third_law_kems
+        system_class: pure_oxide_condensed
+        condensed_phase: MgO(s)
+        reference_temperature_K: 298.15
+        delta_f_H_kJ_mol: -598.0
+        melt_activity_applicability: excluded
+        activity_pin_eligible: false
+        consumer_policy: thermochemistry_only_not_melt_activity
+        experimental_context:
+          chamber_pressure_before_heating_Pa: 0.001
+          pressure_conversion: 1.0e-5 mbar * 100 Pa/mbar = 1.0e-3 Pa
+      uncertainty:
+        delta_f_H_kJ_mol: 10.0
+        basis: author_reported
     - observation_id: halwax_2024_geometry_not_alpha_b1
       type: psat_series
       locator:
@@ -150,6 +189,43 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
             paragraph: iridium cell; molybdenum container; tantalum radiation shields
             line_range: '222'
+    - observation_id: halwax_2024_cao_third_law_formation_enthalpy
+      type: gibbs_table
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+        table: IV
+        line_range: 595-607
+        note: Third-law standard formation enthalpy for pure solid CaO
+      T_range_K:
+      - 1850.0
+      - 2150.0
+      phase: pure_solid_CaO
+      condensed_form:
+        state: crystalline
+        polymorph: lime
+        metastable: false
+        basis: explicit_author
+        note: Pure CaO powder in the Ir Knudsen cell; thermochemical result is for CaO(s).
+      standard_state: pure CaO(s), standard formation enthalpy at 298.15 K
+      regime: kems_third_law_thermochemistry
+      units: kJ/mol
+      values:
+        quantity: standard_formation_enthalpy_298_15K
+        evidence_class: pure_solid_thermochemistry
+        method_class: third_law_kems
+        system_class: pure_oxide_condensed
+        condensed_phase: CaO(s)
+        reference_temperature_K: 298.15
+        delta_f_H_kJ_mol: -624.5
+        melt_activity_applicability: excluded
+        activity_pin_eligible: false
+        consumer_policy: thermochemistry_only_not_melt_activity
+        experimental_context:
+          chamber_pressure_before_heating_Pa: 0.001
+          pressure_conversion: 1.0e-5 mbar * 100 Pa/mbar = 1.0e-3 Pa
+      uncertainty:
+        delta_f_H_kJ_mol: 3.5
+        basis: author_reported
 fidelity_samples:
 - path: species.MgO.observations[halwax_2024_mgo_kems_geometry_psat_package].equipment.orifice_area.value
   value: 7.068583e-08
@@ -175,3 +251,17 @@ fidelity_samples:
   locator:
     source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
     note: not alpha
+- path: species.MgO.observations[halwax_2024_mgo_third_law_formation_enthalpy].values.delta_f_H_kJ_mol
+  value: -598.0
+  note: 'Table IV: third-law MgO formation enthalpy -598 +/- 10 kJ/mol'
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+    table: IV
+    line_range: '603'
+- path: species.CaO.observations[halwax_2024_cao_third_law_formation_enthalpy].values.delta_f_H_kJ_mol
+  value: -624.5
+  note: 'Table IV: third-law CaO formation enthalpy -624.5 +/- 3.5 kJ/mol'
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+    table: IV
+    line_range: '603'

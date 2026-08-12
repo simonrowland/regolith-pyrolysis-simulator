@@ -32,6 +32,9 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
+<li><code>data/melt_activity_models.yaml:218</code> - model_rows.row_id.source: source: {provider: simulator.fe_redox.kress91_ferrous_feo_activity, engine_version: REF-001-kress-carmichael-1991, database_id: builtin, engine_component_ids: [FeO], basis_coefficients: [1], redox_inputs: [FeOt, Fe2O3], evidence_refs: [REF-001]}</li>
+<li><code>engines/builtin/vapor_pressure.py:2472</code> - def dispatch(self, request: IntentRequest) -&gt; IntentResult: &quot;source_reaction_redox_model_id&quot;: &quot;REF-001-kress-carmichael-1991&quot;,</li>
+<li><code>simulator/equilibrium.py:956</code> - def _sz_below_threshold(species_id: str, p_pa: float, field: str) -&gt; None: else &#x27;REF-001 Kress &amp; Carmichael 1991&#x27;</li>
 <li><code>simulator/fe_redox.py:24</code> - class Kress91InvalidControls(ValueError): # provenance: Kress91 coefficients — REF-001 CMP 108:82-92; ln(fO2) and inverse-T terms.</li>
 <li><code>simulator/fe_redox.py:56</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: # source REF-001 defines the Kress91 liquid relation and 1200 C floor.</li>
 <li><code>simulator/fe_redox.py:62</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: &#x27;REF-001 Kress91 liquid relation; below 1200 C calibration floor&#x27;</li>
@@ -41,6 +44,8 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>simulator/fe_redox.py:100</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: &#x27;source&#x27;: &#x27;REF-001 Kress91 retained beyond REF-053 confirmation band&#x27;,</li>
 <li><code>simulator/fe_redox.py:110</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: &#x27;source&#x27;: &#x27;REF-001 Kress91 outside authorized temperature envelope&#x27;,</li>
 <li><code>simulator/fe_redox.py:215</code> - def kress91_referenced_log_fO2(: # A reference in the REF-001 mid-band is corrupt persisted state and</li>
+<li><code>simulator/vapour_rail/melt_activity_resolver.py:2340</code> - def resolve_feo_shadow(self, query: MeltActivityQuery) -&gt; SourceReactionActivity: chemical_potential_ref=&quot;REF-001-kress-carmichael-1991&quot;,</li>
+<li><code>simulator/vapour_rail/melt_activity_resolver.py:2364</code> - def resolve_feo_shadow(self, query: MeltActivityQuery) -&gt; SourceReactionActivity: &quot;model_version&quot;: &quot;REF-001-kress-carmichael-1991&quot;,</li>
 </ul>
 </section>
 <section class="entry" id="REF-002">
@@ -53,15 +58,15 @@ ul { padding-left: 1.4rem; }</style>
 <ul>
 <li><code>data/foulant_thermo.yaml:105</code> - NaCl.thermo.source: source: &quot;REF-002 NIST WebBook SRD 69 Stull 1947; chloride-coefficients-salvage.md&quot;</li>
 <li><code>data/foulant_thermo.yaml:124</code> - KCl.thermo.source: source: &quot;REF-002 NIST WebBook SRD 69 Stull 1947; chloride-coefficients-salvage.md&quot;</li>
-<li><code>data/vapor_pressures.yaml:437</code> - metals.Al.source: source: &quot;REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 aluminum (C7429905); runtime pure-component source is pure_component_antoine&quot;</li>
-<li><code>data/vapor_pressures.yaml:439</code> - metals.Al.pure_component_antoine.source: source: &quot;REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 aluminum (C7429905); log10(P/bar)=5.73623-13204.109/(T-24.306), converted to Pa by A+5&quot;</li>
-<li><code>data/vapor_pressures.yaml:494</code> - metals.Si.source: source: &quot;REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 silicon (C7440213); runtime pure-component source is pure_component_antoine&quot;</li>
-<li><code>data/vapor_pressures.yaml:496</code> - metals.Si.pure_component_antoine.source: source: &quot;REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 silicon (C7440213); log10(P/bar)=9.56436-23308.848/(T-123.133), converted to Pa by A+5&quot;</li>
-<li><code>data/vapor_pressures.yaml:608</code> - metals.Cr.source: source: &quot;REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 chromium (C7440473); runtime pure-component source is pure_component_antoine&quot;</li>
-<li><code>data/vapor_pressures.yaml:610</code> - metals.Cr.pure_component_antoine.source: source: &quot;REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 chromium (C7440473); log10(P/bar)=6.02371-16064.989/(T-83.86), converted to Pa by A+5&quot;</li>
-<li><code>data/vapor_pressures.yaml:1003</code> - foulant_vapor.NaCl.pure_component_antoine.source: source: &quot;REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 NaCl (C7647145); CRC normal bp 1465 C&quot;</li>
-<li><code>data/vapor_pressures.yaml:1037</code> - foulant_vapor.KCl.pure_component_antoine.source: source: &quot;REF-002 NIST WebBook SRD 69 Stull 1947 KCl (C7447407); CRC bp 1420 C; Clausius-Clapeyron anchored at 1 atm (Stull raw overshoots bp)&quot;</li>
-<li><code>data/vapor_pressures.yaml:1043</code> - foulant_vapor.KCl.antoine.source: source: &quot;REF-002 NIST Stull 1947 mid-range faithful runtime row; bp overshoots - tests use pure_component_antoine&quot;</li>
+<li><code>data/vapor_pressures.yaml:1814</code> - families.metals_al_family.physical_properties.species.Al.source: source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 aluminum (C7429905); pure_component_antoine</li>
+<li><code>data/vapor_pressures.yaml:1818</code> - families.metals_al_family.physical_properties.species.Al.pure_component_antoine.source: source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 aluminum (C7429905); log10(P/bar)=5.73623-13204.109/(T-24.306),</li>
+<li><code>data/vapor_pressures.yaml:1969</code> - families.metals_si_family.physical_properties.species.Si.source: source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 silicon (C7440213); pure_component_antoine</li>
+<li><code>data/vapor_pressures.yaml:1972</code> - families.metals_si_family.physical_properties.species.Si.pure_component_antoine.source: source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 silicon (C7440213); log10(P/bar)=9.56436-23308.848/(T-123.133),</li>
+<li><code>data/vapor_pressures.yaml:2342</code> - families.metals_cr_family.physical_properties.species.Cr.source: source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 chromium (C7440473); pure_component_antoine</li>
+<li><code>data/vapor_pressures.yaml:2346</code> - families.metals_cr_family.physical_properties.species.Cr.pure_component_antoine.source: source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 chromium (C7440473); log10(P/bar)=6.02371-16064.989/(T-83.86),</li>
+<li><code>data/vapor_pressures.yaml:4939</code> - families.foulant_vapor_nacl_family.physical_properties.species.NaCl.pure_component_antoine.source: source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 NaCl (C7647145); CRC normal bp 1465</li>
+<li><code>data/vapor_pressures.yaml:5041</code> - families.foulant_vapor_kcl_family.physical_properties.species.KCl.pure_component_antoine.source: source: REF-002 NIST WebBook SRD 69 Stull 1947 KCl (C7447407); CRC bp 1420 C; Clausius-Clapeyron</li>
+<li><code>data/vapor_pressures.yaml:5072</code> - families.foulant_vapor_kcl_family.physical_properties.species.KCl.fit_target.coefficients.source: source: REF-002 NIST Stull 1947 mid-range faithful runtime row; bp overshoots - tests use</li>
 </ul>
 </section>
 <section class="entry" id="REF-003">
@@ -96,8 +101,8 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/feedstocks.yaml:1182</code> - ceres_regolith.carbon_speciation_provenance.NH3.source: source: &quot;REF-006 De Sanctis M.C. et al. 2015, Nature 526:108, DOI 10.1038/nature16172; Ammannito E. et al. 2016, Science 353:aaf4279, DOI 10.1126/science.aaf4279.&quot;</li>
-<li><code>data/feedstocks.yaml:1192</code> - ceres_regolith.carbon_speciation_provenance.nh4_phyllosilicate.source: source: &quot;REF-006 REF-009 De Sanctis M.C. et al. 2015, Nature 526:108; Ammannito E. et al. 2016, Science 353:aaf4279; De Sanctis M.C. et al. 2018, M&amp;PS 53:1844-1858.&quot;</li>
+<li><code>data/feedstocks.yaml:2162</code> - ceres_regolith.carbon_speciation_provenance.NH3.source: source: &quot;REF-006 De Sanctis M.C. et al. 2015, Nature 526:108, DOI 10.1038/nature16172; Ammannito E. et al. 2016, Science 353:aaf4279, DOI 10.1126/science.aaf4279.&quot;</li>
+<li><code>data/feedstocks.yaml:2172</code> - ceres_regolith.carbon_speciation_provenance.nh4_phyllosilicate.source: source: &quot;REF-006 REF-009 De Sanctis M.C. et al. 2015, Nature 526:108; Ammannito E. et al. 2016, Science 353:aaf4279; De Sanctis M.C. et al. 2018, M&amp;PS 53:1844-1858.&quot;</li>
 </ul>
 </section>
 <section class="entry" id="REF-007">
@@ -116,8 +121,8 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/feedstocks.yaml:1172</code> - ceres_regolith.carbon_speciation_provenance.carbonaceous_organic.source: source: &quot;REF-008 De Sanctis M.C. et al. 2017, Science 355:719-722, DOI 10.1126/science.aaj2305.&quot;</li>
-<li><code>data/feedstocks.yaml:1258</code> - ceres_regolith.stage0_formula_inventory.carbonaceous_organic.source: source: &quot;REF-008 De Sanctis et al. 2017 constrains Ceres global organics to &lt;=1 wt%; generic C/H/O/N inventory is a process surrogate for oxidative cleanup.&quot;</li>
+<li><code>data/feedstocks.yaml:2152</code> - ceres_regolith.carbon_speciation_provenance.carbonaceous_organic.source: source: &quot;REF-008 De Sanctis M.C. et al. 2017, Science 355:719-722, DOI 10.1126/science.aaj2305.&quot;</li>
+<li><code>data/feedstocks.yaml:2238</code> - ceres_regolith.stage0_formula_inventory.carbonaceous_organic.source: source: &quot;REF-008 De Sanctis et al. 2017 constrains Ceres global organics to &lt;=1 wt%; generic C/H/O/N inventory is a process surrogate for oxidative cleanup.&quot;</li>
 </ul>
 </section>
 <section class="entry" id="REF-009">
@@ -128,9 +133,9 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/feedstocks.yaml:1177</code> - ceres_regolith.carbon_speciation_provenance.carbonate_salts.source: source: &quot;REF-009 De Sanctis M.C. et al. 2018, M&amp;PS 53:1844-1858, DOI 10.1111/maps.13104; McSween H.Y. et al. 2018, M&amp;PS 53:1793-1804, DOI 10.1111/maps.12947.&quot;</li>
-<li><code>data/feedstocks.yaml:1187</code> - ceres_regolith.carbon_speciation_provenance.brine_salts.source: source: &quot;REF-009 Castillo-Rogez J.C. et al. 2020, Astrobiology 20:269; De Sanctis M.C. et al. 2018, M&amp;PS 53:1844-1858.&quot;</li>
-<li><code>data/feedstocks.yaml:1192</code> - ceres_regolith.carbon_speciation_provenance.nh4_phyllosilicate.source: source: &quot;REF-006 REF-009 De Sanctis M.C. et al. 2015, Nature 526:108; Ammannito E. et al. 2016, Science 353:aaf4279; De Sanctis M.C. et al. 2018, M&amp;PS 53:1844-1858.&quot;</li>
+<li><code>data/feedstocks.yaml:2157</code> - ceres_regolith.carbon_speciation_provenance.carbonate_salts.source: source: &quot;REF-009 De Sanctis M.C. et al. 2018, M&amp;PS 53:1844-1858, DOI 10.1111/maps.13104; McSween H.Y. et al. 2018, M&amp;PS 53:1793-1804, DOI 10.1111/maps.12947.&quot;</li>
+<li><code>data/feedstocks.yaml:2167</code> - ceres_regolith.carbon_speciation_provenance.brine_salts.source: source: &quot;REF-009 Castillo-Rogez J.C. et al. 2020, Astrobiology 20:269; De Sanctis M.C. et al. 2018, M&amp;PS 53:1844-1858.&quot;</li>
+<li><code>data/feedstocks.yaml:2172</code> - ceres_regolith.carbon_speciation_provenance.nh4_phyllosilicate.source: source: &quot;REF-006 REF-009 De Sanctis M.C. et al. 2015, Nature 526:108; Ammannito E. et al. 2016, Science 353:aaf4279; De Sanctis M.C. et al. 2018, M&amp;PS 53:1844-1858.&quot;</li>
 </ul>
 </section>
 <section class="entry" id="REF-010">
@@ -149,7 +154,7 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/feedstocks.yaml:1326</code> - comet_nucleus.carbon_speciation_provenance.organics.source: source: &quot;REF-030 REF-011 Bardyn A. et al. 2017, MNRAS 469:S712-S722; Bardyn A. et al. 2016, Nature 533:73, DOI 10.1038/nature19320; Fulle M. et al. 2016, ApJ 821:19, DOI 10.3847/0004-637X/821/1/19.&quot;</li>
+<li><code>data/feedstocks.yaml:2306</code> - comet_nucleus.carbon_speciation_provenance.organics.source: source: &quot;REF-030 REF-011 Bardyn A. et al. 2017, MNRAS 469:S712-S722; Bardyn A. et al. 2016, Nature 533:73, DOI 10.1038/nature19320; Fulle M. et al. 2016, ApJ 821:19, DOI 10.3847/0004-637X/821/1/19.&quot;</li>
 </ul>
 </section>
 <section class="entry" id="REF-012">
@@ -172,10 +177,10 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/foulant_thermo.yaml:230</code> - CaCO3.thermo.source: source: &quot;REF-012 NIST WebBook dagger; E1 sec 2.1&quot;</li>
 <li><code>data/foulant_thermo.yaml:250</code> - MgCO3.thermo.source: source: &quot;REF-012 NIST WebBook dagger; E1 sec 2.2&quot;</li>
 <li><code>data/foulant_thermo.yaml:270</code> - Na2CO3.thermo.source: source: &quot;REF-012 NIST WebBook dagger; E1 sec 2.3 C0-corrected (-84 kJ/mol @900 degC)&quot;</li>
-<li><code>data/species_catalog.yaml:122</code> - species.id.source: source: Stoichiometric iron sulfate formula for cation-bearing sulfate Stage 0 routing; NIST WebBook REF-012 and Kanari 2018 per foulant_thermo.yaml.</li>
-<li><code>data/species_catalog.yaml:164</code> - species.id.source: source: Sodium carbonate formula for the carbonate_salts surrogate component and Na2CO3 silicate-displacement gate; NIST WebBook REF-012 per foulant_thermo.yaml.</li>
-<li><code>data/vapor_pressures.yaml:339</code> - metals.Fe.pure_component_antoine.source: source: &quot;REF-012 CRC/NIST normal boiling point; CRC/NIST dH_vap~340 kJ/mol; Clausius-Clapeyron anchored at 1 atm&quot;</li>
-<li><code>simulator/core.py:9676</code> - def _stage0_carbonate_decomposition_extent(: # data/foulant_thermo.yaml REF-012 NIST WebBook dG rows give</li>
+<li><code>data/species_catalog.yaml:122</code> - id.source: REF-012 and Kanari 2018 per foulant_thermo.yaml.</li>
+<li><code>data/species_catalog.yaml:179</code> - id.source: gate; NIST WebBook REF-012 per foulant_thermo.yaml.</li>
+<li><code>data/vapor_pressures.yaml:1487</code> - families.metals_fe_family.physical_properties.species.Fe.pure_component_antoine.source: source: REF-012 CRC/NIST normal boiling point; CRC/NIST dH_vap~340 kJ/mol; Clausius-Clapeyron</li>
+<li><code>simulator/core.py:10196</code> - def _stage0_carbonate_decomposition_extent(: # data/foulant_thermo.yaml REF-012 NIST WebBook dG rows give</li>
 </ul>
 </section>
 <section class="entry" id="REF-013">
@@ -186,13 +191,11 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/literature/vacuum_pyrolysis_sticking.yaml:110</code> - species.Na.source: source: &quot;REF-013 Sossi et al. 2019 GCA 260:204 reports near-ideal Na alpha_e~1 in open-furnace ferrobasalt FCMAS melt; high-capture value adopted for alkali wall fouling.&quot;</li>
 <li><code>data/literature/vacuum_pyrolysis_sticking.yaml:120</code> - species.K.source: source: &quot;REF-013 REF-019 only support a Na analogy for K near-unity alpha; no direct K wall/deposition alpha found, so high-capture default remains UNCERTIFIED.&quot;</li>
-<li><code>data/literature/vacuum_pyrolysis_sticking.yaml:140</code> - species.Mn.source: source: &quot;REF-013 REF-014 discuss Mn volatility but no isolated Hertz-Knudsen/sticking alpha was adopted; retain conservative high-capture default.&quot;</li>
-<li><code>data/setpoints.yaml:379</code> - campaigns.C3.Na2O_activity_gamma: Na2O_activity_gamma: [1.0e-3, 1.0e-2]   # provenance: docs/chemistry-provenance.yaml::gamma_alkali_melt_activity; NaO0.5 value/range from REF-013/REF-019/REF-050; DOI 10.1016/j.gca.2019.06.021 / 10.2138/rmg.2018.84.11</li>
-<li><code>data/vapor_pressures.yaml:102</code> - metals.Na.evaporation_alpha.source: source: &quot;OWNER-RATIFY source_class=open_furnace_apparent_not_intrinsic: REF-013 Sossi et al. 2019 GCA 260:204, Na alpha_e~1 near-ideal open-furnace evaporation from ferrobasalt FCMAS melt; retained pending owner ratification against competing Fedkin intrinsic 0.13&quot;</li>
-<li><code>data/vapor_pressures.yaml:1022</code> - foulant_vapor.NaCl.evaporation_alpha.source: source: &quot;OWNER-RATIFY salt_proxy_not_intrinsic: REF-013 Salt analogy - Sossi et al. 2019 GCA near-ideal alkali evaporation; no isolated regolith-NaCl HK measurement&quot;</li>
-<li><code>data/vapor_pressures.yaml:1052</code> - foulant_vapor.KCl.evaporation_alpha.source: source: &quot;OWNER-RATIFY salt_proxy_not_intrinsic: REF-013 Salt analogy - Sossi et al. 2019 GCA near-ideal alkali evaporation; no isolated regolith-KCl HK measurement&quot;</li>
+<li><code>data/literature/vacuum_pyrolysis_sticking.yaml:145</code> - species.Mn.source: source: &quot;REF-013 REF-014 discuss Mn volatility but no isolated Hertz-Knudsen/sticking alpha was adopted; retain conservative high-capture default.&quot;</li>
+<li><code>data/setpoints.yaml:380</code> - campaigns.C3.Na2O_activity_gamma: Na2O_activity_gamma: [1.0e-3, 1.0e-2]   # provenance: docs/chemistry-provenance.yaml::gamma_alkali_melt_activity; NaO0.5 value/range from REF-013/REF-019/REF-050; DOI 10.1016/j.gca.2019.06.021 / 10.2138/rmg.2018.84.11</li>
+<li><code>data/vapor_pressures.yaml:4992</code> - families.foulant_vapor_nacl_family.vaporisation_coefficients.evaporation_alpha.source: source: &#x27;OWNER-RATIFY salt_proxy_not_intrinsic: REF-013 Salt analogy - Sossi et al. 2019 GCA near-ideal</li>
+<li><code>data/vapor_pressures.yaml:5091</code> - families.foulant_vapor_kcl_family.vaporisation_coefficients.evaporation_alpha.source: source: &#x27;OWNER-RATIFY salt_proxy_not_intrinsic: REF-013 Salt analogy - Sossi et al. 2019 GCA near-ideal</li>
 </ul>
 </section>
 <section class="entry" id="REF-014">
@@ -203,13 +206,14 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
+<li><code>data/literature/extracts/fedkin-grossman-ghiorso-2006.yaml:158</code> - species.K.observation_id.values.draft_runtime_provenance_bug: draft_runtime_provenance_bug: REF-014 string still says KEMS sealed-chamber — false</li>
 <li><code>data/literature/langmuir_knudsen_flux_validation.yaml:32</code> - measurements.potassium_silicate_vacuum.source.citation_id: citation_id: REF-014</li>
 <li><code>data/literature/vacuum_pyrolysis_sticking.yaml:90</code> - species.CrO2.source: source: &quot;REF-014 notes no isolated CrO2 Hertz-Knudsen alpha adopted; retain high-capture default as a fouling-conservative placeholder.&quot;</li>
-<li><code>data/literature/vacuum_pyrolysis_sticking.yaml:140</code> - species.Mn.source: source: &quot;REF-013 REF-014 discuss Mn volatility but no isolated Hertz-Knudsen/sticking alpha was adopted; retain conservative high-capture default.&quot;</li>
-<li><code>data/literature/vacuum_pyrolysis_sticking.yaml:150</code> - species.Cr.source: source: &quot;REF-014 discusses Cr volatility but no isolated Hertz-Knudsen/sticking alpha was adopted; retain conservative high-capture default.&quot;</li>
-<li><code>data/vapor_pressures.yaml:120</code> - metals.Na.evaporation_alpha.competing_sources.source: - source: &quot;REF-014 Fedkin et al. 2006 LPSC 37:#2249, KEMS sealed-chamber&quot;</li>
-<li><code>data/vapor_pressures.yaml:195</code> - metals.K.evaporation_alpha.source: source: &quot;REF-014 Fedkin et al. 2006 LPSC 37:#2249 KEMS sealed-chamber intrinsic K alpha_e~0.13; replaces prior Na open-furnace analogy for series-resistance intrinsic-alpha model&quot;</li>
-<li><code>data/vapor_pressures.yaml:949</code> - oxide_vapors.CrO2.evaporation_alpha_policy.source: source: &quot;REF-014 Fedkin et al. 2006 plus chromia-boiler literature; no isolated CrO2 HK alpha adopted&quot;</li>
+<li><code>data/literature/vacuum_pyrolysis_sticking.yaml:145</code> - species.Mn.source: source: &quot;REF-013 REF-014 discuss Mn volatility but no isolated Hertz-Knudsen/sticking alpha was adopted; retain conservative high-capture default.&quot;</li>
+<li><code>data/literature/vacuum_pyrolysis_sticking.yaml:155</code> - species.Cr.source: source: &quot;REF-014 discusses Cr volatility but no isolated Hertz-Knudsen/sticking alpha was adopted; retain conservative high-capture default.&quot;</li>
+<li><code>data/literature/vapour_rail_langmuir_anchors.yaml:59</code> - records.record_id.extraction_note: data/vapor_pressures.yaml REF-014 still carries a known-wrong</li>
+<li><code>data/vapor_pressures.yaml:902</code> - families.metals_na_family.vaporisation_coefficients.evaporation_alpha.source: - source: REF-014 Fedkin et al. 2006 LPSC 37:#2249, KEMS sealed-chamber</li>
+<li><code>data/vapor_pressures.yaml:1128</code> - families.metals_k_family.vaporisation_coefficients.evaporation_alpha.source: source: REF-014 Fedkin et al. 2006 LPSC 37:#2249 KEMS sealed-chamber intrinsic K alpha_e~0.13;</li>
 </ul>
 </section>
 <section class="entry" id="REF-015">
@@ -221,7 +225,7 @@ ul { padding-left: 1.4rem; }</style>
 <p><strong>Cited by:</strong></p>
 <ul>
 <li><code>data/literature/vacuum_pyrolysis_sticking.yaml:100</code> - species.Mg.source: source: &quot;REF-015 REF-018 Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; Schaefer &amp; Fegley 2004 Table 10 Mg2SiO4(liq)/Hashimoto alpha_s=0.20-0.21.&quot;</li>
-<li><code>data/vapor_pressures.yaml:275</code> - metals.Mg.evaporation_alpha.source: source: &quot;REF-015 REF-018 Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; SF2004 Table 10 Mg2SiO4(l), Hashimoto 1990, alpha_s=0.20-0.21&quot;</li>
+<li><code>data/vapor_pressures.yaml:1419</code> - families.metals_mg_family.vaporisation_coefficients.evaporation_alpha.source: source: REF-015 REF-018 Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; SF2004 Table</li>
 </ul>
 </section>
 <section class="entry" id="REF-016">
@@ -232,11 +236,17 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
+<li><code>data/literature/extracts/costa-jacobson-2015.yaml:58</code> - species.SiO.observation_id.locator.note: runtime cross-check REF-016)</li>
+<li><code>data/literature/extracts/ref-016-sio-kems-1700-2000k.yaml:5</code> - source.citation: \ A=7.83, B=22.43 (grid-25-sio cj2015 @1700–2000 K:\n    4.32e-3 … 4.12e-1 Pa) — project REF-016;\</li>
+<li><code>data/literature/extracts/ref-016-sio-kems-1700-2000k.yaml:24</code> - species.SiO.observation_id.locator.note: \ A=7.83, B=22.43 (grid-25-sio cj2015 @1700–2000 K:\n    4.32e-3 … 4.12e-1 Pa) — project REF-016;\</li>
+<li><code>data/literature/extracts/ref-016-sio-kems-1700-2000k.yaml:27</code> - species.SiO.observation_id.locator.record: record: REF-016#SiO_KEMS_1700_2000K</li>
+<li><code>data/literature/extracts/ref-016-sio-kems-1700-2000k.yaml:52</code> - path.locator.note: \ A=7.83, B=22.43 (grid-25-sio cj2015 @1700–2000 K:\n    4.32e-3 … 4.12e-1 Pa) — project REF-016;\</li>
+<li><code>data/literature/extracts/ref-016-sio-kems-1700-2000k.yaml:55</code> - path.locator.record: record: REF-016#SiO_KEMS_1700_2000K</li>
 <li><code>data/literature/langmuir_knudsen_flux_validation.yaml:45</code> - measurements.iron_olivine_kems.source.citation_id: citation_id: REF-016</li>
 <li><code>data/literature/vacuum_pyrolysis_sticking.yaml:51</code> - species.Fe.source: source: &quot;REF-016 Costa &amp; Jacobson 2015 KEMS Fo93Fa7 olivine, Fe+ alpha=0.011-0.020 at 1700-1800 K; high-side 0.02 adopted for conservative Fe capture.&quot;</li>
 <li><code>data/literature/vacuum_pyrolysis_sticking.yaml:69</code> - species.SiO.value.prior_scalar.source: source: &quot;REF-018 REF-016 Schaefer &amp; Fegley 2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa &amp; Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check.&quot;</li>
-<li><code>data/vapor_pressures.yaml:352</code> - metals.Fe.evaporation_alpha.source: source: &quot;REF-016 Costa &amp; Jacobson 2015 KEMS Fo93Fa7 olivine, Fe+ alpha=0.011-0.020 at 1700-1800 K; Ebel 2005 calculated Fe/FeO alpha~0.2 noted as non-measured high-side proxy&quot;</li>
-<li><code>data/vapor_pressures.yaml:872</code> - oxide_vapors.SiO.evaporation_alpha.value.prior_scalar.source: source: &quot;REF-018 REF-016 SF2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa &amp; Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check.&quot;</li>
+<li><code>data/vapor_pressures.yaml:1539</code> - families.metals_fe_family.vaporisation_coefficients.evaporation_alpha.source: source: REF-016 Costa &amp; Jacobson 2015 KEMS Fo93Fa7 olivine, Fe+ alpha=0.011-0.020 at 1700-1800</li>
+<li><code>data/vapor_pressures.yaml:4726</code> - families.oxide_vapors_sio_family.vaporisation_coefficients.evaporation_alpha.value.prior_scalar.source: source: REF-018 REF-016 SF2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa</li>
 </ul>
 </section>
 <section class="entry" id="REF-017">
@@ -247,9 +257,9 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/vapor_pressures.yaml:504</code> - metals.Si.evaporation_alpha.source: source: &quot;REF-017 Safarian &amp; Engh 2013 Metall. Mater. Trans. A 44:747-753 pure-Si vacuum evaporation; pure elemental Si branch only&quot;</li>
-<li><code>data/vapor_pressures.yaml:759</code> - metals.Mn.evaporation_alpha.source: source: &quot;REF-040 Pound 1972 and REF-017 Safarian &amp; Engh 2013 class basis: owner-ratified monoatomic-class PROXY, no Mn-specific measurement exists; Safarian &amp; Engh 2013 full text read = zero Mn&quot;</li>
-<li><code>docs/lab-validation-whitepaper.md:112</code> - 2.3 Evaporation coefficients: principled treatment: | Mn | 1.0 (tier 2 owner-ratified monoatomic-class proxy); envelope 0.5–1.0; liquid-process band 1519–2334.526 K | REF-040 Pound 1972 and REF-017 Safarian &amp; Engh 2013 establish the near-unity clean monoatomic-metal class basis through Fe/Cr and multi-metal free evaporation | Not a Mn-specific or temperature-calibrated measurement. Two independent sweeps found no direct Mn HKL coefficient; Safarian &amp; Engh 2013 full text contains zero Mn value. Medium-high confidence for clean liquid Mn; solid α-Mn remains unmeasured. Melt activity belongs in `P_sat`. | assumption (owner-ratified proxy) |</li>
+<li><code>data/vapor_pressures.yaml:2090</code> - families.metals_si_family.vaporisation_coefficients.evaporation_alpha.source: source: REF-017 Safarian &amp; Engh 2013 Metall. Mater. Trans. A 44:747-753 pure-Si vacuum evaporation;</li>
+<li><code>data/vapor_pressures.yaml:2793</code> - families.metals_mn_family.vaporisation_coefficients.evaporation_alpha.source: source: &#x27;REF-040 Pound 1972 and REF-017 Safarian &amp; Engh 2013 class basis: owner-ratified monoatomic-class</li>
+<li><code>docs/lab-validation-whitepaper.md:113</code> - 2.3 Evaporation coefficients: principled treatment: | Mn | 1.0 (tier 2 owner-ratified monoatomic-class proxy); envelope 0.5–1.0; liquid-process band 1519–2334.526 K | REF-040 Pound 1972 and REF-017 Safarian &amp; Engh 2013 establish the near-unity clean monoatomic-metal class basis through Fe/Cr and multi-metal free evaporation | Not a Mn-specific or temperature-calibrated measurement. Two independent sweeps found no direct Mn HKL coefficient; Safarian &amp; Engh 2013 full text contains zero Mn value. Medium-high confidence for clean liquid Mn; solid α-Mn remains unmeasured. Melt activity belongs in `P_sat`. | assumption (owner-ratified proxy) |</li>
 </ul>
 </section>
 <section class="entry" id="REF-018">
@@ -260,11 +270,12 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
+<li><code>data/literature/extracts/ref-016-sio-kems-1700-2000k.yaml:7</code> - source.citation: \ B. (2004) Icarus 169:216–241,\n    DOI 10.1016/j.icarus.2003.08.023 (REF-018), Table 9 SiO partials\</li>
 <li><code>data/literature/vacuum_pyrolysis_sticking.yaml:69</code> - species.SiO.value.prior_scalar.source: source: &quot;REF-018 REF-016 Schaefer &amp; Fegley 2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa &amp; Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check.&quot;</li>
 <li><code>data/literature/vacuum_pyrolysis_sticking.yaml:100</code> - species.Mg.source: source: &quot;REF-015 REF-018 Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; Schaefer &amp; Fegley 2004 Table 10 Mg2SiO4(liq)/Hashimoto alpha_s=0.20-0.21.&quot;</li>
-<li><code>data/vapor_pressures.yaml:275</code> - metals.Mg.evaporation_alpha.source: source: &quot;REF-015 REF-018 Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; SF2004 Table 10 Mg2SiO4(l), Hashimoto 1990, alpha_s=0.20-0.21&quot;</li>
-<li><code>data/vapor_pressures.yaml:447</code> - metals.Al.evaporation_alpha.source: source: &quot;OWNER-RATIFY proxy_not_intrinsic: REF-018 Schaefer &amp; Fegley 2004 Icarus 169:216-241 Table 10 plus Shahar &amp; Young 2007 CAI modeling; conflicting Al proxy coverage&quot;</li>
-<li><code>data/vapor_pressures.yaml:872</code> - oxide_vapors.SiO.evaporation_alpha.value.prior_scalar.source: source: &quot;REF-018 REF-016 SF2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa &amp; Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check.&quot;</li>
+<li><code>data/vapor_pressures.yaml:1419</code> - families.metals_mg_family.vaporisation_coefficients.evaporation_alpha.source: source: REF-015 REF-018 Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; SF2004 Table</li>
+<li><code>data/vapor_pressures.yaml:1926</code> - families.metals_al_family.vaporisation_coefficients.evaporation_alpha.source: source: &#x27;OWNER-RATIFY proxy_not_intrinsic: REF-018 Schaefer &amp; Fegley 2004 Icarus 169:216-241 Table</li>
+<li><code>data/vapor_pressures.yaml:4726</code> - families.oxide_vapors_sio_family.vaporisation_coefficients.evaporation_alpha.value.prior_scalar.source: source: REF-018 REF-016 SF2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa</li>
 </ul>
 </section>
 <section class="entry" id="REF-019">
@@ -276,7 +287,7 @@ ul { padding-left: 1.4rem; }</style>
 <p><strong>Cited by:</strong></p>
 <ul>
 <li><code>data/literature/vacuum_pyrolysis_sticking.yaml:120</code> - species.K.source: source: &quot;REF-013 REF-019 only support a Na analogy for K near-unity alpha; no direct K wall/deposition alpha found, so high-capture default remains UNCERTIFIED.&quot;</li>
-<li><code>data/setpoints.yaml:379</code> - campaigns.C3.Na2O_activity_gamma: Na2O_activity_gamma: [1.0e-3, 1.0e-2]   # provenance: docs/chemistry-provenance.yaml::gamma_alkali_melt_activity; NaO0.5 value/range from REF-013/REF-019/REF-050; DOI 10.1016/j.gca.2019.06.021 / 10.2138/rmg.2018.84.11</li>
+<li><code>data/setpoints.yaml:380</code> - campaigns.C3.Na2O_activity_gamma: Na2O_activity_gamma: [1.0e-3, 1.0e-2]   # provenance: docs/chemistry-provenance.yaml::gamma_alkali_melt_activity; NaO0.5 value/range from REF-013/REF-019/REF-050; DOI 10.1016/j.gca.2019.06.021 / 10.2138/rmg.2018.84.11</li>
 <li><code>simulator/mre_ladder.py:31</code> - # provenance: Na2O/K2O legacy rungs -- REF-019 Table 2 plus REF-050/REF-051</li>
 </ul>
 </section>
@@ -288,25 +299,44 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/flowsheet.yaml:276</code> - blocks.id.sub_boxes.id.species: - {symbol_or_group: CO2-CO, status: conditional, condition_note: &quot;refractory-char burnout &gt;900 °C; char survives C0, burns via melt O₂ / reduces FeO per REF-020&quot;, review: {map: &quot;v8&quot;}}</li>
+<li><code>data/flowsheet.yaml:276</code> - blocks.id.sub_boxes.id.species: - {symbol_or_group: CO2-CO, status: conditional, condition_note: &quot;refractory-char burnout &gt;900 °C; char survives C0, burns via melt O2 / reduces FeO per REF-020&quot;, review: {map: &quot;v8&quot;}}</li>
 <li><code>data/foulant_thermo.yaml:74</code> - foulant_dG.FeS_roasting.source: source: &quot;REF-020 E2 sec 2.1 JANAF-class; kinetic-onset tier-2 bracket (DeltaG0 &lt;&lt; 0 @1200-1400 K)&quot;</li>
 <li><code>data/foulant_thermo.yaml:82</code> - foulant_dG.CaS_roasting.source: source: &quot;REF-020 E2 §2.1; kinetic-onset tier-2 bracket&quot;</li>
 <li><code>data/foulant_thermo.yaml:90</code> - foulant_dG.NiS_roasting.source: source: &quot;REF-020 E2 §2.1; kinetic-onset tier-2 bracket&quot;</li>
 <li><code>data/foulant_thermo.yaml:352</code> - FeS.thermo.source: source: &quot;REF-020 E2 §2.1; foulant-disposition-spec roasting row&quot;</li>
 <li><code>data/foulant_thermo.yaml:373</code> - CaS.thermo.source: source: &quot;REF-020 E2 §2.1; oldhamite disposition&quot;</li>
 <li><code>data/foulant_thermo.yaml:394</code> - NiS.thermo.source: source: &quot;REF-020 E2 §2.1; native Ni oxidation path&quot;</li>
-<li><code>data/vapor_pressures.yaml:674</code> - metals.Mn.source: source: &quot;REF-020 NIST-JANAF/Chase 1998 solid/liquid Mn-&gt;Mn(g) evaluation; REF-032 Alcock solid, REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as comparators; runtime pure-component source is pure_component_antoine&quot;</li>
-<li><code>data/vapor_pressures.yaml:676</code> - metals.Mn.pure_component_antoine.source: source: &quot;REF-020 NIST-JANAF/Chase 1998 Mn(s/l)-&gt;Mn(g) thermodynamic evaluation fit; REF-032 Alcock solid, REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as documented comparators&quot;</li>
-<li><code>data/vapor_pressures.yaml:681</code> - metals.Mn.pure_component_antoine.default_segment: # was a mixed-source artifact, so runtime now uses REF-020 NIST/JANAF</li>
-<li><code>data/vapor_pressures.yaml:685</code> - metals.Mn.pure_component_antoine.default_segment: # T_K=[1560,1710,1780,1890,1980,2080,2240,2390]; REF-020 NIST/JANAF</li>
-<li><code>data/vapor_pressures.yaml:695</code> - metals.Mn.pure_component_antoine.segments.name.source: source: &quot;REF-020 NIST-JANAF/Chase 1998 Mn(s) and Mn(g) Shomate thermodynamic evaluation; derived Antoine fit to DeltaG_sub, standard pressure 1 bar, constrained to the stored liquid fit at 1519 K for C0 runtime continuity&quot;</li>
-<li><code>data/vapor_pressures.yaml:732</code> - metals.Mn.pure_component_antoine.segments.name.source: source: &quot;REF-020 NIST-JANAF/Chase 1998 Mn(l) and Mn(g) Shomate thermodynamic evaluation; derived Antoine fit to DeltaG_vap, standard pressure 1 bar, with exact 101325 Pa anchor at 2334.526 K&quot;</li>
-<li><code>data/vapor_pressures.yaml:980</code> - oxide_vapors.CrO2.source: source: &quot;REF-020 JANAF coefficients shipped by VapoRock.&quot;</li>
-<li><code>engines/builtin/stage0_pretreatment.py:1484</code> - def _dispatch_char_feo_reduction(: (REF-020 NIST-JANAF/Chase 1998), so the reaction is spontaneous</li>
-<li><code>simulator/core.py:514</code> - class _MeltRedoxLiquidusFloorFallback: # Premise (owner-ratified t-325 / REF-020 NIST-JANAF/Chase 1998): the C/CO</li>
-<li><code>simulator/runner/__init__.py:2427</code> - def _c0_char_diagnostic(: # owner-flagged 2026-07-15 Ellingham premise, grounded to REF-020</li>
-<li><code>simulator/runner/__init__.py:2552</code> - def coverage_pct(o2_mol: float, required_mol: float) -&gt; float: &quot;owner-flagged 2026-07-15 Ellingham premise; REF-020 &quot;</li>
-<li><code>simulator/runner/__init__.py:2577</code> - def coverage_pct(o2_mol: float, required_mol: float) -&gt; float: &quot;thermodynamic-onset screen from REF-020 JANAF oxide &quot;</li>
+<li><code>data/literature/extracts/datz-smith-taylor-1961-nacl-vapor.yaml:8</code> - source.citation: NaCl(l)/NaCl(g)/Na2Cl2(g) Chase 1998 (REF-020).&#x27;</li>
+<li><code>data/literature/extracts/janaf-4th.yaml:83</code> - species.PO.observation_id.locator.note: note: JANAF PO(g) Chase 1998 (REF-020); Sossi &amp; Fegley 2018 Table 5 carrier role</li>
+<li><code>data/literature/extracts/janaf-4th.yaml:653</code> - species.Ti.observation_id.locator.note: note: &#x27;JANAF Ti(g) Chase 1998 (REF-020) free-energy reconstruction of pure Ti Psat; and/or independent</li>
+<li><code>data/literature/extracts/janaf-4th.yaml:942</code> - species.TiO2_gas.observation_id.locator.note: note: JANAF TiO(g)/TiO2(g) Chase 1998 (REF-020); LH87 Ti–O gas if tabulated; melt-context Ti volatility</li>
+<li><code>data/literature/extracts/janaf-4th.yaml:978</code> - species.MnO_gas.observation_id.locator.note: note: JANAF MnO(g) Chase 1998 (REF-020); Sossi &amp; Fegley 2018 Table 1 MnO(g) entry as literature</li>
+<li><code>data/literature/extracts/janaf-4th.yaml:995</code> - species.NiO_gas.observation_id.locator.note: note: JANAF NiO(g) Chase 1998 (REF-020); oxide vaporization reviews (Kazenas &amp; Tsvetkov) for Ni–O</li>
+<li><code>data/literature/extracts/janaf-4th.yaml:1012</code> - species.O.observation_id.locator.note: note: &#x27;NIST-JANAF O(g) and O2(g) Chase 1998 (REF-020) — equilibrium constant for ½ O2 ⇌ O is the</li>
+<li><code>data/literature/extracts/janaf-4th.yaml:1061</code> - species.BaO.observation_id.locator.note: note: &#x27;NIST-JANAF BaO(g) Chase 1998 (REF-020) — independent evaluation path from LH87 JPCRD review</li>
+<li><code>data/literature/extracts/lh87-cao-g.yaml:5</code> - source.citation: Table 3 CaO(g); + JANAF CaO(g) Chase 1998 (REF-020).</li>
+<li><code>data/literature/extracts/lh87-cao-g.yaml:19</code> - species.CaO_gas.observation_id.locator.note: Table 3 CaO(g); + JANAF CaO(g) Chase 1998 (REF-020).</li>
+<li><code>data/literature/extracts/lh87-cao-g.yaml:43</code> - path.locator.note: Table 3 CaO(g); + JANAF CaO(g) Chase 1998 (REF-020).</li>
+<li><code>data/literature/extracts/lh87-mgo-g.yaml:7</code> - source.citation: NIST-JANAF MgO(g) Chase 1998 (REF-020).</li>
+<li><code>data/literature/extracts/nist-srd69-p4.yaml:6</code> - source.citation: PO(g)/PO2(g) Chase 1998 free energies (REF-020); (2) P4O10(s) sublimation — Muenow et al. / Hashimoto-class</li>
+<li><code>data/literature/extracts/nist-srd69-p4.yaml:22</code> - species.P.observation_id.locator.note: (1) PO/PO2 — JANAF PO(g)/PO2(g) Chase 1998 free energies (REF-020); (2) P4O10(s) sublimation</li>
+<li><code>data/literature/extracts/nist-srd69-p4.yaml:63</code> - path.locator.note: JANAF PO(g)/PO2(g) Chase 1998 free energies (REF-020); (2) P4O10(s) sublimation — Muenow et al.</li>
+<li><code>data/literature/extracts/ref-032-al.yaml:5</code> - source.citation: Chase 1998 (REF-020).</li>
+<li><code>data/literature/extracts/ref-032-al.yaml:19</code> - species.Al.observation_id.locator.note: Chase 1998 (REF-020).</li>
+<li><code>data/literature/extracts/ref-032-al.yaml:43</code> - path.locator.note: 1998 (REF-020).</li>
+<li><code>data/literature/extracts/ref-032-mg.yaml:5</code> - source.citation: Chase 1998 (REF-020) free-energy path as secondary.</li>
+<li><code>data/literature/extracts/ref-032-mg.yaml:19</code> - species.Mg.observation_id.locator.note: Chase 1998 (REF-020) free-energy path as secondary.</li>
+<li><code>data/literature/extracts/ref-032-mg.yaml:43</code> - path.locator.note: 1998 (REF-020) free-energy path as secondary.</li>
+<li><code>data/vapor_pressures.yaml:2490</code> - families.metals_mn_family.physical_properties.species.Mn.source: source: REF-020 NIST-JANAF/Chase 1998 solid/liquid Mn-&gt;Mn(g) evaluation; REF-032 Alcock solid,</li>
+<li><code>data/vapor_pressures.yaml:2495</code> - families.metals_mn_family.physical_properties.species.Mn.pure_component_antoine.source: source: REF-020 NIST-JANAF/Chase 1998 Mn(s/l)-&gt;Mn(g) thermodynamic evaluation fit; REF-032</li>
+<li><code>data/vapor_pressures.yaml:2500</code> - families.metals_mn_family.physical_properties.species.Mn.pure_component_antoine.source: # was a mixed-source artifact, so runtime uses REF-020 NIST/JANAF solid</li>
+<li><code>data/vapor_pressures.yaml:2510</code> - families.metals_mn_family.physical_properties.species.Mn.pure_component_antoine.name.source: source: REF-020 NIST-JANAF/Chase 1998 Mn(s) and Mn(g) Shomate thermodynamic evaluation;</li>
+<li><code>data/vapor_pressures.yaml:2621</code> - families.metals_mn_family.physical_properties.species.Mn.pure_component_antoine.name.source: source: REF-020 NIST-JANAF/Chase 1998 Mn(l) and Mn(g) Shomate thermodynamic evaluation;</li>
+<li><code>engines/builtin/stage0_pretreatment.py:1578</code> - def _dispatch_char_feo_reduction(: (REF-020 NIST-JANAF/Chase 1998), so the reaction is spontaneous</li>
+<li><code>simulator/core.py:590</code> - class _MeltRedoxLiquidusFloorFallback: # Premise (owner-ratified t-325 / REF-020 NIST-JANAF/Chase 1998): the C/CO</li>
+<li><code>simulator/runner/__init__.py:2755</code> - def _c0_char_diagnostic(: # owner-flagged 2026-07-15 Ellingham premise, grounded to REF-020</li>
+<li><code>simulator/runner/__init__.py:2880</code> - def coverage_pct(o2_mol: float, required_mol: float) -&gt; float: &quot;owner-flagged 2026-07-15 Ellingham premise; REF-020 &quot;</li>
+<li><code>simulator/runner/__init__.py:2905</code> - def coverage_pct(o2_mol: float, required_mol: float) -&gt; float: &quot;thermodynamic-onset screen from REF-020 JANAF oxide &quot;</li>
 </ul>
 </section>
 <section class="entry" id="REF-021">
@@ -358,7 +388,7 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/stage0_carbon_partition.yaml:51</code> - phase_partitions.ceres_regolith.f_refractory_organic_C.source: source: &quot;REF-024 sephton_2004_murchison_hydropyrolysis&quot;</li>
 <li><code>data/stage0_carbon_partition.yaml:86</code> - lance_oxidation.source: source: &quot;balanced reaction C + O2 -&gt; CO2; REF-024 supplies the residual-char inventory, not the combustion stoichiometry&quot;</li>
 <li><code>data/stage0_carbon_partition.yaml:92</code> - burnout_kinetics.labile_chon_unlimited_o2.source: source: &quot;REF-024 sephton_2004_stepped_combustion_temperature_classes&quot;</li>
-<li><code>simulator/core.py:9294</code> - def _oxidized_stage0_products(: Premise: Sephton 2004 (REF-024) partitions organic C into labile</li>
+<li><code>simulator/core.py:9814</code> - def _oxidized_stage0_products(: Premise: Sephton 2004 (REF-024) partitions organic C into labile</li>
 </ul>
 </section>
 <section class="entry" id="REF-025">
@@ -369,11 +399,11 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/feedstocks.yaml:979</code> - ci_carbonaceous_chondrite.carbon_speciation_provenance.carbonaceous_organic.source: source: &quot;REF-028 REF-025 REF-027 Yokoyama T. et al. 2023, Science abn7850; Pearson V.K. et al. 2006, M&amp;PS 41:1899-1918; Alexander C.M.O&#x27;D. et al. 2007, GCA 71:4380-4403.&quot;</li>
-<li><code>data/feedstocks.yaml:1009</code> - ci_carbonaceous_chondrite.stage0_formula_inventory.carbonaceous_organic.source: source: &quot;REF-028 REF-025 REF-027 Yokoyama et al. 2023 + Pearson et al. 2006 + Alexander et al. 2007 constrain CI organic matter to 4.0 wt% [3.0, 5.5]; generic C/H/O/N inventory is a process surrogate for oxidative cleanup.&quot;</li>
-<li><code>data/feedstocks.yaml:1086</code> - cm_carbonaceous_chondrite.carbon_speciation_provenance.carbonaceous_organic.source: source: &quot;REF-025 REF-027 Pearson V.K. et al. 2006, M&amp;PS 41:1899-1918; Smith J.W. &amp; Kaplan I.R. 1970, Science 167:1367; Alexander C.M.O&#x27;D. et al. 2007, GCA 71:4380-4403.&quot;</li>
-<li><code>data/feedstocks.yaml:1091</code> - cm_carbonaceous_chondrite.carbon_speciation_provenance.carbonate_salts.source: source: &quot;REF-026 REF-025 Bland P.A. et al. 2004, M&amp;PS 39:3-16; Pearson V.K. et al. 2006, M&amp;PS 41:1899-1918; Zolensky M.E. et al. 2002, M&amp;PS 37:737-761.&quot;</li>
-<li><code>data/feedstocks.yaml:1115</code> - cm_carbonaceous_chondrite.stage0_formula_inventory.carbonaceous_organic.source: source: &quot;REF-025 Pearson et al. 2006 + Smith &amp; Kaplan 1970 constrain CM organic matter to 2.0 wt% [1.5, 3.5]; generic C/H/O/N inventory is a process surrogate for oxidative cleanup.&quot;</li>
+<li><code>data/feedstocks.yaml:1959</code> - ci_carbonaceous_chondrite.carbon_speciation_provenance.carbonaceous_organic.source: source: &quot;REF-028 REF-025 REF-027 Yokoyama T. et al. 2023, Science abn7850; Pearson V.K. et al. 2006, M&amp;PS 41:1899-1918; Alexander C.M.O&#x27;D. et al. 2007, GCA 71:4380-4403.&quot;</li>
+<li><code>data/feedstocks.yaml:1989</code> - ci_carbonaceous_chondrite.stage0_formula_inventory.carbonaceous_organic.source: source: &quot;REF-028 REF-025 REF-027 Yokoyama et al. 2023 + Pearson et al. 2006 + Alexander et al. 2007 constrain CI organic matter to 4.0 wt% [3.0, 5.5]; generic C/H/O/N inventory is a process surrogate for oxidative cleanup.&quot;</li>
+<li><code>data/feedstocks.yaml:2066</code> - cm_carbonaceous_chondrite.carbon_speciation_provenance.carbonaceous_organic.source: source: &quot;REF-025 REF-027 Pearson V.K. et al. 2006, M&amp;PS 41:1899-1918; Smith J.W. &amp; Kaplan I.R. 1970, Science 167:1367; Alexander C.M.O&#x27;D. et al. 2007, GCA 71:4380-4403.&quot;</li>
+<li><code>data/feedstocks.yaml:2071</code> - cm_carbonaceous_chondrite.carbon_speciation_provenance.carbonate_salts.source: source: &quot;REF-026 REF-025 Bland P.A. et al. 2004, M&amp;PS 39:3-16; Pearson V.K. et al. 2006, M&amp;PS 41:1899-1918; Zolensky M.E. et al. 2002, M&amp;PS 37:737-761.&quot;</li>
+<li><code>data/feedstocks.yaml:2095</code> - cm_carbonaceous_chondrite.stage0_formula_inventory.carbonaceous_organic.source: source: &quot;REF-025 Pearson et al. 2006 + Smith &amp; Kaplan 1970 constrain CM organic matter to 2.0 wt% [1.5, 3.5]; generic C/H/O/N inventory is a process surrogate for oxidative cleanup.&quot;</li>
 </ul>
 </section>
 <section class="entry" id="REF-026">
@@ -384,8 +414,8 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/feedstocks.yaml:984</code> - ci_carbonaceous_chondrite.carbon_speciation_provenance.carbonate_salts.source: source: &quot;REF-028 REF-026 Yokoyama T. et al. 2023, Science abn7850; Bland P.A. et al. 2004, M&amp;PS 39:3-16; Endress M. &amp; Bischoff A. 1996, GCA 60:3035-3045.&quot;</li>
-<li><code>data/feedstocks.yaml:1091</code> - cm_carbonaceous_chondrite.carbon_speciation_provenance.carbonate_salts.source: source: &quot;REF-026 REF-025 Bland P.A. et al. 2004, M&amp;PS 39:3-16; Pearson V.K. et al. 2006, M&amp;PS 41:1899-1918; Zolensky M.E. et al. 2002, M&amp;PS 37:737-761.&quot;</li>
+<li><code>data/feedstocks.yaml:1964</code> - ci_carbonaceous_chondrite.carbon_speciation_provenance.carbonate_salts.source: source: &quot;REF-028 REF-026 Yokoyama T. et al. 2023, Science abn7850; Bland P.A. et al. 2004, M&amp;PS 39:3-16; Endress M. &amp; Bischoff A. 1996, GCA 60:3035-3045.&quot;</li>
+<li><code>data/feedstocks.yaml:2071</code> - cm_carbonaceous_chondrite.carbon_speciation_provenance.carbonate_salts.source: source: &quot;REF-026 REF-025 Bland P.A. et al. 2004, M&amp;PS 39:3-16; Pearson V.K. et al. 2006, M&amp;PS 41:1899-1918; Zolensky M.E. et al. 2002, M&amp;PS 37:737-761.&quot;</li>
 </ul>
 </section>
 <section class="entry" id="REF-027">
@@ -396,9 +426,9 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/feedstocks.yaml:979</code> - ci_carbonaceous_chondrite.carbon_speciation_provenance.carbonaceous_organic.source: source: &quot;REF-028 REF-025 REF-027 Yokoyama T. et al. 2023, Science abn7850; Pearson V.K. et al. 2006, M&amp;PS 41:1899-1918; Alexander C.M.O&#x27;D. et al. 2007, GCA 71:4380-4403.&quot;</li>
-<li><code>data/feedstocks.yaml:1009</code> - ci_carbonaceous_chondrite.stage0_formula_inventory.carbonaceous_organic.source: source: &quot;REF-028 REF-025 REF-027 Yokoyama et al. 2023 + Pearson et al. 2006 + Alexander et al. 2007 constrain CI organic matter to 4.0 wt% [3.0, 5.5]; generic C/H/O/N inventory is a process surrogate for oxidative cleanup.&quot;</li>
-<li><code>data/feedstocks.yaml:1086</code> - cm_carbonaceous_chondrite.carbon_speciation_provenance.carbonaceous_organic.source: source: &quot;REF-025 REF-027 Pearson V.K. et al. 2006, M&amp;PS 41:1899-1918; Smith J.W. &amp; Kaplan I.R. 1970, Science 167:1367; Alexander C.M.O&#x27;D. et al. 2007, GCA 71:4380-4403.&quot;</li>
+<li><code>data/feedstocks.yaml:1959</code> - ci_carbonaceous_chondrite.carbon_speciation_provenance.carbonaceous_organic.source: source: &quot;REF-028 REF-025 REF-027 Yokoyama T. et al. 2023, Science abn7850; Pearson V.K. et al. 2006, M&amp;PS 41:1899-1918; Alexander C.M.O&#x27;D. et al. 2007, GCA 71:4380-4403.&quot;</li>
+<li><code>data/feedstocks.yaml:1989</code> - ci_carbonaceous_chondrite.stage0_formula_inventory.carbonaceous_organic.source: source: &quot;REF-028 REF-025 REF-027 Yokoyama et al. 2023 + Pearson et al. 2006 + Alexander et al. 2007 constrain CI organic matter to 4.0 wt% [3.0, 5.5]; generic C/H/O/N inventory is a process surrogate for oxidative cleanup.&quot;</li>
+<li><code>data/feedstocks.yaml:2066</code> - cm_carbonaceous_chondrite.carbon_speciation_provenance.carbonaceous_organic.source: source: &quot;REF-025 REF-027 Pearson V.K. et al. 2006, M&amp;PS 41:1899-1918; Smith J.W. &amp; Kaplan I.R. 1970, Science 167:1367; Alexander C.M.O&#x27;D. et al. 2007, GCA 71:4380-4403.&quot;</li>
 </ul>
 </section>
 <section class="entry" id="REF-028">
@@ -409,9 +439,9 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/feedstocks.yaml:979</code> - ci_carbonaceous_chondrite.carbon_speciation_provenance.carbonaceous_organic.source: source: &quot;REF-028 REF-025 REF-027 Yokoyama T. et al. 2023, Science abn7850; Pearson V.K. et al. 2006, M&amp;PS 41:1899-1918; Alexander C.M.O&#x27;D. et al. 2007, GCA 71:4380-4403.&quot;</li>
-<li><code>data/feedstocks.yaml:984</code> - ci_carbonaceous_chondrite.carbon_speciation_provenance.carbonate_salts.source: source: &quot;REF-028 REF-026 Yokoyama T. et al. 2023, Science abn7850; Bland P.A. et al. 2004, M&amp;PS 39:3-16; Endress M. &amp; Bischoff A. 1996, GCA 60:3035-3045.&quot;</li>
-<li><code>data/feedstocks.yaml:1009</code> - ci_carbonaceous_chondrite.stage0_formula_inventory.carbonaceous_organic.source: source: &quot;REF-028 REF-025 REF-027 Yokoyama et al. 2023 + Pearson et al. 2006 + Alexander et al. 2007 constrain CI organic matter to 4.0 wt% [3.0, 5.5]; generic C/H/O/N inventory is a process surrogate for oxidative cleanup.&quot;</li>
+<li><code>data/feedstocks.yaml:1959</code> - ci_carbonaceous_chondrite.carbon_speciation_provenance.carbonaceous_organic.source: source: &quot;REF-028 REF-025 REF-027 Yokoyama T. et al. 2023, Science abn7850; Pearson V.K. et al. 2006, M&amp;PS 41:1899-1918; Alexander C.M.O&#x27;D. et al. 2007, GCA 71:4380-4403.&quot;</li>
+<li><code>data/feedstocks.yaml:1964</code> - ci_carbonaceous_chondrite.carbon_speciation_provenance.carbonate_salts.source: source: &quot;REF-028 REF-026 Yokoyama T. et al. 2023, Science abn7850; Bland P.A. et al. 2004, M&amp;PS 39:3-16; Endress M. &amp; Bischoff A. 1996, GCA 60:3035-3045.&quot;</li>
+<li><code>data/feedstocks.yaml:1989</code> - ci_carbonaceous_chondrite.stage0_formula_inventory.carbonaceous_organic.source: source: &quot;REF-028 REF-025 REF-027 Yokoyama et al. 2023 + Pearson et al. 2006 + Alexander et al. 2007 constrain CI organic matter to 4.0 wt% [3.0, 5.5]; generic C/H/O/N inventory is a process surrogate for oxidative cleanup.&quot;</li>
 </ul>
 </section>
 <section class="entry" id="REF-029">
@@ -422,10 +452,10 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/feedstocks.yaml:1560</code> - mars_basalt.native_carbonate_provenance.carbonate_salts.source: source: &quot;REF-029 Bandfield J.L., Glotch T.D. &amp; Christensen P.R. 2003, Science 301:1084-1087, DOI 10.1126/science.1088054.&quot;</li>
-<li><code>data/feedstocks.yaml:1654</code> - mars_sulfate_rich.native_carbonate_provenance.carbonate_salts.source: source: &quot;REF-029 Bandfield J.L. et al. 2003, Science 301:1084-1087; Niles P.B. et al. 2017, JGR Planets 122, DOI 10.1002/2016JE005225.&quot;</li>
-<li><code>data/feedstocks.yaml:1728</code> - mars_phyllosilicate_clay.native_carbonate_provenance.carbonate_salts.source: source: &quot;REF-029 Ehlmann B.L. et al. 2008, Science 322:1828, DOI 10.1126/science.1164759; Morris R.V. et al. 2010, Science 328:421, DOI 10.1126/science.1189667; Bandfield J.L. et al. 2003, Science 301:1084.&quot;</li>
-<li><code>data/feedstocks.yaml:1796</code> - mars_perchlorate_rich.native_carbonate_provenance.carbonate_salts.source: source: &quot;REF-029 Bandfield J.L. et al. 2003, Science 301:1084-1087, DOI 10.1126/science.1088054.&quot;</li>
+<li><code>data/feedstocks.yaml:2540</code> - mars_basalt.native_carbonate_provenance.carbonate_salts.source: source: &quot;REF-029 Bandfield J.L., Glotch T.D. &amp; Christensen P.R. 2003, Science 301:1084-1087, DOI 10.1126/science.1088054.&quot;</li>
+<li><code>data/feedstocks.yaml:2634</code> - mars_sulfate_rich.native_carbonate_provenance.carbonate_salts.source: source: &quot;REF-029 Bandfield J.L. et al. 2003, Science 301:1084-1087; Niles P.B. et al. 2017, JGR Planets 122, DOI 10.1002/2016JE005225.&quot;</li>
+<li><code>data/feedstocks.yaml:2708</code> - mars_phyllosilicate_clay.native_carbonate_provenance.carbonate_salts.source: source: &quot;REF-029 Ehlmann B.L. et al. 2008, Science 322:1828, DOI 10.1126/science.1164759; Morris R.V. et al. 2010, Science 328:421, DOI 10.1126/science.1189667; Bandfield J.L. et al. 2003, Science 301:1084.&quot;</li>
+<li><code>data/feedstocks.yaml:2776</code> - mars_perchlorate_rich.native_carbonate_provenance.carbonate_salts.source: source: &quot;REF-029 Bandfield J.L. et al. 2003, Science 301:1084-1087, DOI 10.1126/science.1088054.&quot;</li>
 </ul>
 </section>
 <section class="entry" id="REF-030">
@@ -436,9 +466,9 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/feedstocks.yaml:1326</code> - comet_nucleus.carbon_speciation_provenance.organics.source: source: &quot;REF-030 REF-011 Bardyn A. et al. 2017, MNRAS 469:S712-S722; Bardyn A. et al. 2016, Nature 533:73, DOI 10.1038/nature19320; Fulle M. et al. 2016, ApJ 821:19, DOI 10.3847/0004-637X/821/1/19.&quot;</li>
-<li><code>data/feedstocks.yaml:1330</code> - comet_nucleus.carbon_speciation_provenance.mineral_rebalance.source: source: &quot;REF-030 Bardyn A. et al. 2017, MNRAS 469:S712-S722.&quot;</li>
-<li><code>data/feedstocks.yaml:1351</code> - comet_nucleus.stage0_formula_inventory.organics.source: source: &quot;REF-030 Bardyn et al. 2017 COSIMA dust organic matter (40-50 wt% refractory dust) + Fulle et al. 2016 refractory:H2O ratio; generic C/H/O/N mass fractions remain a process surrogate.&quot;</li>
+<li><code>data/feedstocks.yaml:2306</code> - comet_nucleus.carbon_speciation_provenance.organics.source: source: &quot;REF-030 REF-011 Bardyn A. et al. 2017, MNRAS 469:S712-S722; Bardyn A. et al. 2016, Nature 533:73, DOI 10.1038/nature19320; Fulle M. et al. 2016, ApJ 821:19, DOI 10.3847/0004-637X/821/1/19.&quot;</li>
+<li><code>data/feedstocks.yaml:2310</code> - comet_nucleus.carbon_speciation_provenance.mineral_rebalance.source: source: &quot;REF-030 Bardyn A. et al. 2017, MNRAS 469:S712-S722.&quot;</li>
+<li><code>data/feedstocks.yaml:2331</code> - comet_nucleus.stage0_formula_inventory.organics.source: source: &quot;REF-030 Bardyn et al. 2017 COSIMA dust organic matter (40-50 wt% refractory dust) + Fulle et al. 2016 refractory:H2O ratio; generic C/H/O/N mass fractions remain a process surrogate.&quot;</li>
 </ul>
 </section>
 <section class="entry" id="REF-031">
@@ -449,9 +479,9 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/feedstocks.yaml:601</code> - lunar_eac_1a.source: source: &quot;REF-031 Engelschiøn et al. 2020, Scientific Reports, EAC-1A XRF major-oxide table&quot;</li>
-<li><code>data/feedstocks.yaml:623</code> - lunar_eac_1a.composition_basis.source: source: &quot;REF-031 Engelschiøn et al. 2020 XRF major oxides, wt% on post-LOI/ignited basis&quot;</li>
-<li><code>data/feedstocks.yaml:634</code> - lunar_eac_1a.formula_inventory.unreported_loi_residual.source: source: &quot;REF-031 ACCOUNTING SURROGATE only: explicit 1.6 wt% unreported/LOI residual needed to close the Engelschiøn EAC-1A 98.4 wt% oxide table without renormalizing stated oxides; routed to inert terminal slag and not used as chemistry evidence.&quot;</li>
+<li><code>data/feedstocks.yaml:1560</code> - lunar_eac_1a.source: source: &quot;REF-031 Engelschiøn et al. 2020, Scientific Reports, EAC-1A XRF major-oxide table&quot;</li>
+<li><code>data/feedstocks.yaml:1582</code> - lunar_eac_1a.composition_basis.source: source: &quot;REF-031 Engelschiøn et al. 2020 XRF major oxides, wt% on post-LOI/ignited basis&quot;</li>
+<li><code>data/feedstocks.yaml:1593</code> - lunar_eac_1a.formula_inventory.unreported_loi_residual.source: source: &quot;REF-031 ACCOUNTING SURROGATE only: explicit 1.6 wt% unreported/LOI residual needed to close the Engelschiøn EAC-1A 98.4 wt% oxide table without renormalizing stated oxides; routed to inert terminal slag and not used as chemistry evidence.&quot;</li>
 </ul>
 </section>
 <section class="entry" id="REF-032">
@@ -462,10 +492,78 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/vapor_pressures.yaml:526</code> - metals.Ti.source: source: &quot;REF-032 CRC Handbook 84th ed. / Alcock-Itkin-Horrigan 1984 vapor-pressure equation for titanium; runtime pure-component source is pure_component_antoine&quot;</li>
-<li><code>data/vapor_pressures.yaml:528</code> - metals.Ti.pure_component_antoine.source: source: &quot;REF-032 Alcock-Itkin-Horrigan 1984 titanium liquid equation, CRC/CR2 Pa-converted form; dense 10 K minimax refit from 1941-2400 K plus exact 3560.15 K normal-boiling anchor to log10(P/Pa)=A-B/(T+C)&quot;</li>
-<li><code>data/vapor_pressures.yaml:674</code> - metals.Mn.source: source: &quot;REF-020 NIST-JANAF/Chase 1998 solid/liquid Mn-&gt;Mn(g) evaluation; REF-032 Alcock solid, REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as comparators; runtime pure-component source is pure_component_antoine&quot;</li>
-<li><code>data/vapor_pressures.yaml:676</code> - metals.Mn.pure_component_antoine.source: source: &quot;REF-020 NIST-JANAF/Chase 1998 Mn(s/l)-&gt;Mn(g) thermodynamic evaluation fit; REF-032 Alcock solid, REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as documented comparators&quot;</li>
+<li><code>data/literature/extracts/janaf-4th.yaml:665</code> - species.Ti.observation_id.values.independence_note: independence_note: REF-032 is the fit source — cannot self-validate</li>
+<li><code>data/literature/extracts/pound-1972-mccabe-cr.yaml:6</code> - source.citation: α_Cr in docs/lab-validation-whitepaper.md; Alcock et al. (1984) REF-032 Cr equations as second pure-Psat</li>
+<li><code>data/literature/extracts/pound-1972-mccabe-cr.yaml:22</code> - species.Cr.observation_id.locator.note: used for α_Cr in docs/lab-validation-whitepaper.md; Alcock et al. (1984) REF-032 Cr equations</li>
+<li><code>data/literature/extracts/pound-1972-mccabe-cr.yaml:48</code> - path.locator.note: α_Cr in docs/lab-validation-whitepaper.md; Alcock et al. (1984) REF-032 Cr equations as second pure-Psat</li>
+<li><code>data/literature/extracts/ref-032-al.yaml:4</code> - source.citation: citation: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g)</li>
+<li><code>data/literature/extracts/ref-032-al.yaml:18</code> - species.Al.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g)</li>
+<li><code>data/literature/extracts/ref-032-al.yaml:20</code> - species.Al.observation_id.locator.record: record: REF-032#Al</li>
+<li><code>data/literature/extracts/ref-032-al.yaml:42</code> - path.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g) Chase</li>
+<li><code>data/literature/extracts/ref-032-al.yaml:44</code> - path.locator.record: record: REF-032#Al</li>
+<li><code>data/literature/extracts/ref-032-bi.yaml:4</code> - source.citation: citation: Alcock et al. (1984) REF-032 Bi; JANAF Bi(g)</li>
+<li><code>data/literature/extracts/ref-032-bi.yaml:17</code> - species.Bi.observation_id.locator.note: note: Alcock et al. (1984) REF-032 Bi; JANAF Bi(g)</li>
+<li><code>data/literature/extracts/ref-032-bi.yaml:18</code> - species.Bi.observation_id.locator.record: record: REF-032#Bi</li>
+<li><code>data/literature/extracts/ref-032-bi.yaml:38</code> - path.locator.note: note: Alcock et al. (1984) REF-032 Bi; JANAF Bi(g)</li>
+<li><code>data/literature/extracts/ref-032-bi.yaml:39</code> - path.locator.record: record: REF-032#Bi</li>
+<li><code>data/literature/extracts/ref-032-ca.yaml:4</code> - source.citation: citation: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Ca equations; JANAF Ca(g)</li>
+<li><code>data/literature/extracts/ref-032-ca.yaml:18</code> - species.Ca.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Ca equations; JANAF Ca(g)</li>
+<li><code>data/literature/extracts/ref-032-ca.yaml:20</code> - species.Ca.observation_id.locator.record: record: REF-032#Ca</li>
+<li><code>data/literature/extracts/ref-032-ca.yaml:42</code> - path.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Ca equations; JANAF Ca(g) Chase</li>
+<li><code>data/literature/extracts/ref-032-ca.yaml:44</code> - path.locator.record: record: REF-032#Ca</li>
+<li><code>data/literature/extracts/ref-032-fe-liquid-equation.yaml:6</code> - source.citation.Elements: (project REF-032). Fe solid/liquid equations (log10 P form as tabulated).&#x27;</li>
+<li><code>data/literature/extracts/ref-032-fe-liquid-equation.yaml:21</code> - species.Fe.observation_id.locator.note.Elements: (project REF-032). Fe solid/liquid equations (log10 P form as tabulated).&#x27;</li>
+<li><code>data/literature/extracts/ref-032-fe-liquid-equation.yaml:22</code> - species.Fe.observation_id.locator.record: record: REF-032#Fe_liquid_equation</li>
+<li><code>data/literature/extracts/ref-032-fe-liquid-equation.yaml:34</code> - species.Fe.observation_id.values.locator: locator: Can. Metall. Q. 23 (1984) 309; REF-032</li>
+<li><code>data/literature/extracts/ref-032-fe-liquid-equation.yaml:47</code> - path.value.locator: locator: Can. Metall. Q. 23 (1984) 309; REF-032</li>
+<li><code>data/literature/extracts/ref-032-fe-liquid-equation.yaml:52</code> - path.locator.note.Elements: (project REF-032). Fe solid/liquid equations (log10 P form as tabulated).&#x27;</li>
+<li><code>data/literature/extracts/ref-032-fe-liquid-equation.yaml:53</code> - path.locator.record: record: REF-032#Fe_liquid_equation</li>
+<li><code>data/literature/extracts/ref-032-k.yaml:4</code> - source.citation: citation: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) potassium equations — independent</li>
+<li><code>data/literature/extracts/ref-032-k.yaml:18</code> - species.K.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) potassium equations — independent</li>
+<li><code>data/literature/extracts/ref-032-k.yaml:20</code> - species.K.observation_id.locator.record: record: REF-032#K</li>
+<li><code>data/literature/extracts/ref-032-k.yaml:42</code> - path.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) potassium equations — independent</li>
+<li><code>data/literature/extracts/ref-032-k.yaml:44</code> - path.locator.record: record: REF-032#K</li>
+<li><code>data/literature/extracts/ref-032-mg.yaml:4</code> - source.citation: citation: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g)</li>
+<li><code>data/literature/extracts/ref-032-mg.yaml:18</code> - species.Mg.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g)</li>
+<li><code>data/literature/extracts/ref-032-mg.yaml:20</code> - species.Mg.observation_id.locator.record: record: REF-032#Mg</li>
+<li><code>data/literature/extracts/ref-032-mg.yaml:42</code> - path.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g) Chase</li>
+<li><code>data/literature/extracts/ref-032-mg.yaml:44</code> - path.locator.record: record: REF-032#Mg</li>
+<li><code>data/literature/extracts/ref-032-mn-if-not-in-fit.yaml:5</code> - source.citation: REF-032 Mn equations (use Alcock alone as anchor) or Nesmeyanov-class experimental Mn vapor-pressure</li>
+<li><code>data/literature/extracts/ref-032-mn-if-not-in-fit.yaml:20</code> - species.Mn.observation_id.locator.note: REF-032 Mn equations (use Alcock alone as anchor) or Nesmeyanov-class experimental Mn vapor-pressure</li>
+<li><code>data/literature/extracts/ref-032-mn-if-not-in-fit.yaml:22</code> - species.Mn.observation_id.locator.record: record: REF-032#Mn_if_not_in_fit</li>
+<li><code>data/literature/extracts/ref-032-mn-if-not-in-fit.yaml:45</code> - path.locator.note: REF-032 Mn equations (use Alcock alone as anchor) or Nesmeyanov-class experimental Mn vapor-pressure</li>
+<li><code>data/literature/extracts/ref-032-mn-if-not-in-fit.yaml:47</code> - path.locator.record: record: REF-032#Mn_if_not_in_fit</li>
+<li><code>data/literature/extracts/ref-032-na.yaml:4</code> - source.citation: citation: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) sodium vapor-pressure equations</li>
+<li><code>data/literature/extracts/ref-032-na.yaml:18</code> - species.Na.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) sodium vapor-pressure equations</li>
+<li><code>data/literature/extracts/ref-032-na.yaml:20</code> - species.Na.observation_id.locator.record: record: REF-032#Na</li>
+<li><code>data/literature/extracts/ref-032-na.yaml:29</code> - species.Na.observation_id.values.independence_note: independence_note: REF-041 is fit source; REF-032 is independent evaluation</li>
+<li><code>data/literature/extracts/ref-032-na.yaml:39</code> - path.value.independence_note: independence_note: REF-041 is fit source; REF-032 is independent evaluation</li>
+<li><code>data/literature/extracts/ref-032-na.yaml:42</code> - path.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) sodium vapor-pressure equations</li>
+<li><code>data/literature/extracts/ref-032-na.yaml:44</code> - path.locator.record: record: REF-032#Na</li>
+<li><code>data/literature/extracts/ref-032-pb.yaml:4</code> - source.citation: citation: Alcock et al. (1984) REF-032 Pb equations; JANAF Pb(g) Chase 1998; classic Hultgren selected</li>
+<li><code>data/literature/extracts/ref-032-pb.yaml:18</code> - species.Pb.observation_id.locator.note: note: Alcock et al. (1984) REF-032 Pb equations; JANAF Pb(g) Chase 1998; classic Hultgren selected</li>
+<li><code>data/literature/extracts/ref-032-pb.yaml:20</code> - species.Pb.observation_id.locator.record: record: REF-032#Pb</li>
+<li><code>data/literature/extracts/ref-032-pb.yaml:40</code> - path.locator.note: note: Alcock et al. (1984) REF-032 Pb equations; JANAF Pb(g) Chase 1998; classic Hultgren selected</li>
+<li><code>data/literature/extracts/ref-032-pb.yaml:42</code> - path.locator.record: record: REF-032#Pb</li>
+<li><code>data/literature/extracts/ref-032-si.yaml:4</code> - source.citation: citation: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Si equations; JANAF Si(g)</li>
+<li><code>data/literature/extracts/ref-032-si.yaml:18</code> - species.Si.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Si equations; JANAF Si(g)</li>
+<li><code>data/literature/extracts/ref-032-si.yaml:20</code> - species.Si.observation_id.locator.record: record: REF-032#Si</li>
+<li><code>data/literature/extracts/ref-032-si.yaml:42</code> - path.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Si equations; JANAF Si(g) Chase</li>
+<li><code>data/literature/extracts/ref-032-si.yaml:44</code> - path.locator.record: record: REF-032#Si</li>
+<li><code>data/literature/extracts/ref-032-th.yaml:5</code> - source.citation: Alcock et al. (1984) Can. Metall. Q. 23:309 (REF-032) Th equation if present; JANAF Th(g) Chase 1998.</li>
+<li><code>data/literature/extracts/ref-032-th.yaml:19</code> - species.Th.observation_id.locator.note: Alcock et al. (1984) Can. Metall. Q. 23:309 (REF-032) Th equation if present; JANAF Th(g) Chase</li>
+<li><code>data/literature/extracts/ref-032-th.yaml:21</code> - species.Th.observation_id.locator.record: record: REF-032#Th</li>
+<li><code>data/literature/extracts/ref-032-th.yaml:46</code> - path.locator.note: et al. (1984) Can. Metall. Q. 23:309 (REF-032) Th equation if present; JANAF Th(g) Chase 1998.</li>
+<li><code>data/literature/extracts/ref-032-th.yaml:47</code> - path.locator.record: record: REF-032#Th</li>
+<li><code>data/literature/extracts/ref-032-zr.yaml:4</code> - source.citation: citation: &#x27;Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Zr equations; JANAF Zr(g)</li>
+<li><code>data/literature/extracts/ref-032-zr.yaml:18</code> - species.Zr.observation_id.locator.note: note: &#x27;Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Zr equations; JANAF Zr(g)</li>
+<li><code>data/literature/extracts/ref-032-zr.yaml:20</code> - species.Zr.observation_id.locator.record: record: REF-032#Zr</li>
+<li><code>data/literature/extracts/ref-032-zr.yaml:42</code> - path.locator.note: note: &#x27;Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Zr equations; JANAF Zr(g)</li>
+<li><code>data/literature/extracts/ref-032-zr.yaml:44</code> - path.locator.record: record: REF-032#Zr</li>
+<li><code>data/vapor_pressures.yaml:2133</code> - families.metals_ti_family.physical_properties.species.Ti.source: source: REF-032 CRC Handbook 84th ed. / Alcock-Itkin-Horrigan 1984 vapor-pressure equation for</li>
+<li><code>data/vapor_pressures.yaml:2137</code> - families.metals_ti_family.physical_properties.species.Ti.pure_component_antoine.source: source: REF-032 Alcock-Itkin-Horrigan 1984 titanium liquid equation, CRC/CR2 Pa-converted</li>
+<li><code>data/vapor_pressures.yaml:2490</code> - families.metals_mn_family.physical_properties.species.Mn.source: source: REF-020 NIST-JANAF/Chase 1998 solid/liquid Mn-&gt;Mn(g) evaluation; REF-032 Alcock solid,</li>
+<li><code>data/vapor_pressures.yaml:2495</code> - families.metals_mn_family.physical_properties.species.Mn.pure_component_antoine.source: source: REF-020 NIST-JANAF/Chase 1998 Mn(s/l)-&gt;Mn(g) thermodynamic evaluation fit; REF-032</li>
 </ul>
 </section>
 <section class="entry" id="REF-033">
@@ -476,14 +574,12 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/vapor_pressures.yaml:233</code> - metals.Mg.source: source: &quot;REF-033 CRC.b/Stull magnesium pressure-level table fit (1-100000 Pa); runtime pure-component source is pure_component_antoine&quot;</li>
-<li><code>data/vapor_pressures.yaml:235</code> - metals.Mg.pure_component_antoine.source: source: &quot;REF-033 CRC.b/Stull magnesium pressure-level table fit (1-100000 Pa); cross-checked against REF-034 Kaye-Laby/NPL Ambrose pressure-level table; not an Alcock liquid equation&quot;</li>
-<li><code>data/vapor_pressures.yaml:242</code> - metals.Mg.pure_component_antoine.source_validation_points_Pa_K: # REF-033 CRC.b/Stull Mg table: 1,10,100,1000,10000,100000 Pa at</li>
-<li><code>data/vapor_pressures.yaml:258</code> - metals.Mg.reconstructed_vapor_pressure_segment.anchors.temperature_K.source: source: &quot;REF-033 CRC.b/Stull magnesium pressure-level table final certified point&quot;</li>
-<li><code>data/vapor_pressures.yaml:264</code> - metals.Mg.reconstructed_vapor_pressure_segment.provenance: in 1/T from REF-033 CRC.b/Stull&#x27;s certified 1361 K, 100000 Pa endpoint</li>
-<li><code>data/vapor_pressures.yaml:674</code> - metals.Mn.source: source: &quot;REF-020 NIST-JANAF/Chase 1998 solid/liquid Mn-&gt;Mn(g) evaluation; REF-032 Alcock solid, REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as comparators; runtime pure-component source is pure_component_antoine&quot;</li>
-<li><code>data/vapor_pressures.yaml:676</code> - metals.Mn.pure_component_antoine.source: source: &quot;REF-020 NIST-JANAF/Chase 1998 Mn(s/l)-&gt;Mn(g) thermodynamic evaluation fit; REF-032 Alcock solid, REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as documented comparators&quot;</li>
-<li><code>data/vapor_pressures.yaml:686</code> - metals.Mn.pure_component_antoine.default_segment: # Pa=[227,1202,2348,6022,11935,23627,61195,131242]; REF-033 CRC/Stull</li>
+<li><code>data/vapor_pressures.yaml:1168</code> - families.metals_mg_family.physical_properties.species.Mg.source: source: REF-033 CRC.b/Stull magnesium pressure-level table fit (1-100000 Pa); pure_component_antoine</li>
+<li><code>data/vapor_pressures.yaml:1173</code> - families.metals_mg_family.physical_properties.species.Mg.pure_component_antoine.source: source: REF-033 CRC.b/Stull magnesium pressure-level table fit (1-100000 Pa); cross-checked</li>
+<li><code>data/vapor_pressures.yaml:1213</code> - families.metals_mg_family.physical_properties.species.Mg.reconstructed_vapor_pressure_segment.temperature_K.source: source: REF-033 CRC.b/Stull magnesium pressure-level table final certified point</li>
+<li><code>data/vapor_pressures.yaml:1224</code> - families.metals_mg_family.physical_properties.species.Mg.reconstructed_vapor_pressure_segment.provenance: from REF-033 CRC.b/Stull&#x27;&#x27;s certified 1361 K, 100000 Pa endpoint to Pref_GF</li>
+<li><code>data/vapor_pressures.yaml:2491</code> - families.metals_mn_family.physical_properties.species.Mn.source: REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as comparators; pure_component_antoine</li>
+<li><code>data/vapor_pressures.yaml:2496</code> - families.metals_mn_family.physical_properties.species.Mn.pure_component_antoine.source: Alcock solid, REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as documented comparators</li>
 </ul>
 </section>
 <section class="entry" id="REF-034">
@@ -494,11 +590,9 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/vapor_pressures.yaml:235</code> - metals.Mg.pure_component_antoine.source: source: &quot;REF-033 CRC.b/Stull magnesium pressure-level table fit (1-100000 Pa); cross-checked against REF-034 Kaye-Laby/NPL Ambrose pressure-level table; not an Alcock liquid equation&quot;</li>
-<li><code>data/vapor_pressures.yaml:243</code> - metals.Mg.pure_component_antoine.source_validation_points_Pa_K: # 701,773,861,971,1132,1361 K. REF-034 Kaye-Laby/NPL alternative:</li>
-<li><code>data/vapor_pressures.yaml:674</code> - metals.Mn.source: source: &quot;REF-020 NIST-JANAF/Chase 1998 solid/liquid Mn-&gt;Mn(g) evaluation; REF-032 Alcock solid, REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as comparators; runtime pure-component source is pure_component_antoine&quot;</li>
-<li><code>data/vapor_pressures.yaml:676</code> - metals.Mn.pure_component_antoine.source: source: &quot;REF-020 NIST-JANAF/Chase 1998 Mn(s/l)-&gt;Mn(g) thermodynamic evaluation fit; REF-032 Alcock solid, REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as documented comparators&quot;</li>
-<li><code>data/vapor_pressures.yaml:683</code> - metals.Mn.pure_component_antoine.default_segment: # Liquid-source spread at the Kaye-Laby anchors: REF-034 Kaye-Laby/NPL</li>
+<li><code>data/vapor_pressures.yaml:1174</code> - families.metals_mg_family.physical_properties.species.Mg.pure_component_antoine.source: against REF-034 Kaye-Laby/NPL Ambrose pressure-level table; not an Alcock liquid equation</li>
+<li><code>data/vapor_pressures.yaml:2491</code> - families.metals_mn_family.physical_properties.species.Mn.source: REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as comparators; pure_component_antoine</li>
+<li><code>data/vapor_pressures.yaml:2496</code> - families.metals_mn_family.physical_properties.species.Mn.pure_component_antoine.source: Alcock solid, REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as documented comparators</li>
 </ul>
 </section>
 <section class="entry" id="REF-035">
@@ -551,9 +645,9 @@ ul { padding-left: 1.4rem; }</style>
 <ul>
 <li><code>data/literature/langmuir_knudsen_flux_validation.yaml:17</code> - measurements.chromium_solid_langmuir_knudsen.source.citation_id: citation_id: REF-040</li>
 <li><code>data/literature/vacuum_pyrolysis_sticking.yaml:74</code> - species.SiO.cold_wall_condensation.source: source: &quot;REF-040 Pound 1972 JPCRD 1:135 DOI 10.1063/1.3253096: high-supersaturation condensation coefficient for growth -&gt; unity; evaporation alpha_e != condensation alpha_c off-equilibrium.&quot;</li>
-<li><code>data/vapor_pressures.yaml:618</code> - metals.Cr.evaporation_alpha.source: source: &quot;REF-040 Pound 1972 J. Phys. Chem. Ref. Data 1:135-146 Table 1, DOI 10.1063/1.3253096, selected McCabe, Hudson &amp; Paxton 1958 Trans. Met. Soc. AIME 212:102 Langmuir-vs-Knudsen result for 99.9% polycrystalline solid Cr and monoatomic Cr(g)&quot;</li>
-<li><code>data/vapor_pressures.yaml:759</code> - metals.Mn.evaporation_alpha.source: source: &quot;REF-040 Pound 1972 and REF-017 Safarian &amp; Engh 2013 class basis: owner-ratified monoatomic-class PROXY, no Mn-specific measurement exists; Safarian &amp; Engh 2013 full text read = zero Mn&quot;</li>
-<li><code>docs/lab-validation-whitepaper.md:112</code> - 2.3 Evaporation coefficients: principled treatment: | Mn | 1.0 (tier 2 owner-ratified monoatomic-class proxy); envelope 0.5–1.0; liquid-process band 1519–2334.526 K | REF-040 Pound 1972 and REF-017 Safarian &amp; Engh 2013 establish the near-unity clean monoatomic-metal class basis through Fe/Cr and multi-metal free evaporation | Not a Mn-specific or temperature-calibrated measurement. Two independent sweeps found no direct Mn HKL coefficient; Safarian &amp; Engh 2013 full text contains zero Mn value. Medium-high confidence for clean liquid Mn; solid α-Mn remains unmeasured. Melt activity belongs in `P_sat`. | assumption (owner-ratified proxy) |</li>
+<li><code>data/vapor_pressures.yaml:2452</code> - families.metals_cr_family.vaporisation_coefficients.evaporation_alpha.source: source: REF-040 Pound 1972 J. Phys. Chem. Ref. Data 1:135-146 Table 1, DOI 10.1063/1.3253096,</li>
+<li><code>data/vapor_pressures.yaml:2793</code> - families.metals_mn_family.vaporisation_coefficients.evaporation_alpha.source: source: &#x27;REF-040 Pound 1972 and REF-017 Safarian &amp; Engh 2013 class basis: owner-ratified monoatomic-class</li>
+<li><code>docs/lab-validation-whitepaper.md:113</code> - 2.3 Evaporation coefficients: principled treatment: | Mn | 1.0 (tier 2 owner-ratified monoatomic-class proxy); envelope 0.5–1.0; liquid-process band 1519–2334.526 K | REF-040 Pound 1972 and REF-017 Safarian &amp; Engh 2013 establish the near-unity clean monoatomic-metal class basis through Fe/Cr and multi-metal free evaporation | Not a Mn-specific or temperature-calibrated measurement. Two independent sweeps found no direct Mn HKL coefficient; Safarian &amp; Engh 2013 full text contains zero Mn value. Medium-high confidence for clean liquid Mn; solid α-Mn remains unmeasured. Melt activity belongs in `P_sat`. | assumption (owner-ratified proxy) |</li>
 </ul>
 </section>
 <section class="entry" id="REF-041">
@@ -564,7 +658,9 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/vapor_pressures.yaml:94</code> - metals.Na.pure_component_antoine.source: source: &quot;REF-041 NIST Chemistry WebBook SRD 69 Rodebush and Walters 1930 sodium (C7440235); log10(P/bar)=2.46077-1873.728/(T-416.372), converted to Pa by A+5&quot;</li>
+<li><code>data/literature/extracts/ref-032-na.yaml:29</code> - species.Na.observation_id.values.independence_note: independence_note: REF-041 is fit source; REF-032 is independent evaluation</li>
+<li><code>data/literature/extracts/ref-032-na.yaml:39</code> - path.value.independence_note: independence_note: REF-041 is fit source; REF-032 is independent evaluation</li>
+<li><code>data/vapor_pressures.yaml:797</code> - families.metals_na_family.physical_properties.species.Na.pure_component_antoine.source: source: REF-041 NIST Chemistry WebBook SRD 69 Rodebush and Walters 1930 sodium (C7440235);</li>
 </ul>
 </section>
 <section class="entry" id="REF-042">
@@ -575,7 +671,9 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/vapor_pressures.yaml:187</code> - metals.K.pure_component_antoine.source: source: &quot;REF-042 NIST Chemistry WebBook SRD 69 Fiock and Rodebush 1926 potassium (C7440097); log10(P/bar)=4.45718-4691.58/(T+24.195), converted to Pa by A+5&quot;</li>
+<li><code>data/literature/extracts/ref-032-k.yaml:29</code> - species.K.observation_id.values.independence_note: independence_note: REF-042 is fit source</li>
+<li><code>data/literature/extracts/ref-032-k.yaml:39</code> - path.value.independence_note: independence_note: REF-042 is fit source</li>
+<li><code>data/vapor_pressures.yaml:1039</code> - families.metals_k_family.physical_properties.species.K.pure_component_antoine.source: source: REF-042 NIST Chemistry WebBook SRD 69 Fiock and Rodebush 1926 potassium (C7440097);</li>
 </ul>
 </section>
 <section class="entry" id="REF-043">
@@ -586,8 +684,8 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/vapor_pressures.yaml:378</code> - metals.Ca.source: source: &quot;REF-043 NIST Chemistry WebBook SRD 69 Hartmann and Schneider 1929 calcium (C7440702); runtime pure-component source is pure_component_antoine&quot;</li>
-<li><code>data/vapor_pressures.yaml:380</code> - metals.Ca.pure_component_antoine.source: source: &quot;REF-043 NIST Chemistry WebBook SRD 69 Hartmann and Schneider 1929 calcium (C7440702); log10(P/bar)=2.78473-3121.368/(T-594.591), converted to Pa by A+5&quot;</li>
+<li><code>data/vapor_pressures.yaml:1576</code> - families.metals_ca_family.physical_properties.species.Ca.source: source: REF-043 NIST Chemistry WebBook SRD 69 Hartmann and Schneider 1929 calcium (C7440702);</li>
+<li><code>data/vapor_pressures.yaml:1581</code> - families.metals_ca_family.physical_properties.species.Ca.pure_component_antoine.source: source: REF-043 NIST Chemistry WebBook SRD 69 Hartmann and Schneider 1929 calcium (C7440702);</li>
 </ul>
 </section>
 <section class="entry" id="REF-044">
@@ -648,7 +746,7 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/setpoints.yaml:379</code> - campaigns.C3.Na2O_activity_gamma: Na2O_activity_gamma: [1.0e-3, 1.0e-2]   # provenance: docs/chemistry-provenance.yaml::gamma_alkali_melt_activity; NaO0.5 value/range from REF-013/REF-019/REF-050; DOI 10.1016/j.gca.2019.06.021 / 10.2138/rmg.2018.84.11</li>
+<li><code>data/setpoints.yaml:380</code> - campaigns.C3.Na2O_activity_gamma: Na2O_activity_gamma: [1.0e-3, 1.0e-2]   # provenance: docs/chemistry-provenance.yaml::gamma_alkali_melt_activity; NaO0.5 value/range from REF-013/REF-019/REF-050; DOI 10.1016/j.gca.2019.06.021 / 10.2138/rmg.2018.84.11</li>
 <li><code>simulator/mre_ladder.py:31</code> - # provenance: Na2O/K2O legacy rungs -- REF-019 Table 2 plus REF-050/REF-051</li>
 </ul>
 </section>
@@ -669,7 +767,19 @@ ul { padding-left: 1.4rem; }</style>
 <p><a href="https://doi.org/10.1063/1.555706">doi:10.1063/1.555706</a> | <a href="https://doi.org/10.1063/1.555706">source URL</a></p>
 <blockquote><p>The Gibbs energy functions of condensed phases calculated by this procedure are consistent with the enthalpies of formation of the condensed phase stable at 298.15 K and 1.013 25 bar.</p><footer>p. 153, Sec. 2.1a; Licenses combining the K2O(l) Gibbs-energy-function row directly with the Table 4 dfH298 of K2O(s) in the t-141 KO0.5 standard-term assembly.</footer></blockquote>
 <blockquote><p>Data on the potassium oxides is limited and of uncertain quality.</p><footer>p. 159, Sec. 2.3c; Source-quality caveat carried into the t-141 uncertainty budget for the honest +1.15..+1.28 dex held-out DeMaria residual.</footer></blockquote>
-<p><strong>Cited by:</strong> none</p>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>data/literature/extracts/ref-052-k-o-gas.yaml:4</code> - source.citation: citation: Lamoreaux &amp; Hildenbrand (1984) JPCRD 13:151–173, DOI 10.1063/1.555706 (REF-052), K–O gas species</li>
+<li><code>data/literature/extracts/ref-052-k-o-gas.yaml:18</code> - species.K2O_gas.observation_id.locator.note: note: Lamoreaux &amp; Hildenbrand (1984) JPCRD 13:151–173, DOI 10.1063/1.555706 (REF-052), K–O gas</li>
+<li><code>data/literature/extracts/ref-052-k-o-gas.yaml:20</code> - species.K2O_gas.observation_id.locator.record: record: REF-052#K_O_gas</li>
+<li><code>data/literature/extracts/ref-052-k-o-gas.yaml:42</code> - path.locator.note: note: Lamoreaux &amp; Hildenbrand (1984) JPCRD 13:151–173, DOI 10.1063/1.555706 (REF-052), K–O gas species</li>
+<li><code>data/literature/extracts/ref-052-k-o-gas.yaml:44</code> - path.locator.record: record: REF-052#K_O_gas</li>
+<li><code>data/literature/extracts/ref-052-na-o-gas.yaml:6</code> - source.citation: REF-052), Table 4 Na–O gas species (NaO, Na2O, Na2O2, …). Independent of pure Na metal Rodebush Antoine.</li>
+<li><code>data/literature/extracts/ref-052-na-o-gas.yaml:21</code> - species.Na2O_gas.observation_id.locator.note: REF-052), Table 4 Na–O gas species (NaO, Na2O, Na2O2, …). Independent of pure Na metal Rodebush</li>
+<li><code>data/literature/extracts/ref-052-na-o-gas.yaml:23</code> - species.Na2O_gas.observation_id.locator.record: record: REF-052#Na_O_gas</li>
+<li><code>data/literature/extracts/ref-052-na-o-gas.yaml:47</code> - path.locator.note: REF-052), Table 4 Na–O gas species (NaO, Na2O, Na2O2, …). Independent of pure Na metal Rodebush</li>
+<li><code>data/literature/extracts/ref-052-na-o-gas.yaml:49</code> - path.locator.record: record: REF-052#Na_O_gas</li>
+</ul>
 </section>
 <section class="entry" id="REF-053">
 <h2>REF-053</h2>
@@ -679,7 +789,7 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>docs/chemistry-methods.md:566</code> - §7.1 Iron redox and the total-iron convention: an extrapolation. REF-053 is retained only as provisional comparison evidence until its quote-gated source</li>
+<li><code>docs/chemistry-methods.md:592</code> - §7.1 Iron redox and the total-iron convention: an extrapolation. REF-053 is retained only as provisional comparison evidence until its quote-gated source</li>
 <li><code>simulator/fe_redox.py:81</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: # Aithala, Macris &amp; Hirschmann 2026 (REF-053, doi:10.7185/geochemlet.2617);</li>
 <li><code>simulator/fe_redox.py:88</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: &#x27;REF-001 Kress91 retained; REF-053 confirms high-T extrapolation&#x27;</li>
 <li><code>simulator/fe_redox.py:94</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: # CASE 2100-2500 C: extrapolation with growing uncertainty; REF-053 is</li>
@@ -716,9 +826,9 @@ ul { padding-left: 1.4rem; }</style>
 <blockquote><p>Fractional crystallization of this magma ocean would have produced large enrichments of incompatibles in a residual liquid.</p><footer>NASA NTRS abstract; REEs are incompatible and concentrate in the residual fraction.</footer></blockquote>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>simulator/accounting/queries.py:98</code> - REE_ENRICHMENT_SOURCE_IDS = (&quot;REF-056&quot;, &quot;REF-057&quot;)</li>
-<li><code>simulator/accounting/queries.py:383</code> - def terminal_ree_enrichment_extent(self) -&gt; dict[str, Any]: REEs are treated as refractory, incompatible lithophiles (REF-056,</li>
-<li><code>simulator/extraction.py:2980</code> - def _c7_ree_enrichment_extent(before: dict, after: dict) -&gt; dict: With REE oxides retained in the refractory residue (REF-056/057),</li>
+<li><code>simulator/accounting/queries.py:114</code> - REE_ENRICHMENT_SOURCE_IDS = (&quot;REF-056&quot;, &quot;REF-057&quot;)</li>
+<li><code>simulator/accounting/queries.py:407</code> - def terminal_ree_enrichment_extent(self) -&gt; dict[str, Any]: REEs are treated as refractory, incompatible lithophiles (REF-056,</li>
+<li><code>simulator/extraction.py:3355</code> - def _c7_ree_enrichment_extent(before: dict, after: dict) -&gt; dict: With REE oxides retained in the refractory residue (REF-056/057),</li>
 </ul>
 </section>
 <section class="entry" id="REF-057">
@@ -729,8 +839,8 @@ ul { padding-left: 1.4rem; }</style>
 <blockquote><p>lithophile elements (RLE) including Al, Ti, Ca, Zr, Hf, Sc, Y and the REE</p><footer>accepted manuscript p. 21 (PDF page 20); Ca and REEs belong to the refractory lithophile component retained in the residue.</footer></blockquote>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>simulator/accounting/queries.py:98</code> - REE_ENRICHMENT_SOURCE_IDS = (&quot;REF-056&quot;, &quot;REF-057&quot;)</li>
-<li><code>simulator/accounting/queries.py:384</code> - def terminal_ree_enrichment_extent(self) -&gt; dict[str, Any]: REF-057), so extraction removes carrier mass while the ledger keeps the</li>
+<li><code>simulator/accounting/queries.py:114</code> - REE_ENRICHMENT_SOURCE_IDS = (&quot;REF-056&quot;, &quot;REF-057&quot;)</li>
+<li><code>simulator/accounting/queries.py:408</code> - def terminal_ree_enrichment_extent(self) -&gt; dict[str, Any]: REF-057), so extraction removes carrier mass while the ledger keeps the</li>
 </ul>
 </section>
 <section class="entry" id="REF-058">
@@ -742,12 +852,12 @@ ul { padding-left: 1.4rem; }</style>
 <blockquote><p>1728 K, melting point of Ni; DeltaH = 4.10 kcal/mole.</p><footer>p. 28; Pins the solid-Ni/liquid-Ni segment boundary used by the NiO Ellingham row.</footer></blockquote>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/setpoints.yaml:1447</code> - mre_voltage_sequence.sequence.species.note: NiO graph source: REF-058 Mah &amp; Pankratz 1976 USBM Bulletin 668</li>
+<li><code>data/setpoints.yaml:1457</code> - mre_voltage_sequence.sequence.species.note: NiO graph source: REF-058 Mah &amp; Pankratz 1976 USBM Bulletin 668</li>
 <li><code>engines/builtin/electrolysis_step.py:125</code> - &quot;REF-058 Mah &amp; Pankratz 1976 USBM Bulletin 668 NiO(s) &quot;</li>
 <li><code>simulator/chemistry/ellingham_thermo.py:68</code> - def delta_g_kJ_per_mol_O2(self, temperature_K: float) -&gt; float: # and REF-058 USBM Bulletin 668 for Ni/NiO.</li>
-<li><code>simulator/chemistry/ellingham_thermo.py:292</code> - def delta_g_kJ_per_mol_O2(self, temperature_K: float) -&gt; float: # Ni premise: REF-058, Mah &amp; Pankratz, U.S. Bureau of Mines Bulletin 668</li>
-<li><code>simulator/chemistry/ellingham_thermo.py:312</code> - def delta_g_kJ_per_mol_O2(self, temperature_K: float) -&gt; float: &quot;REF-058 Mah &amp; Pankratz 1976 USBM Bulletin 668, NiO(s) table; confidence: primary-refit&quot;,</li>
-<li><code>simulator/chemistry/ellingham_thermo.py:321</code> - def delta_g_kJ_per_mol_O2(self, temperature_K: float) -&gt; float: &quot;REF-058 Mah &amp; Pankratz 1976 USBM Bulletin 668, NiO(s) table; confidence: primary-refit&quot;,</li>
+<li><code>simulator/chemistry/ellingham_thermo.py:298</code> - def delta_g_kJ_per_mol_O2(self, temperature_K: float) -&gt; float: # Ni premise: REF-058, Mah &amp; Pankratz, U.S. Bureau of Mines Bulletin 668</li>
+<li><code>simulator/chemistry/ellingham_thermo.py:318</code> - def delta_g_kJ_per_mol_O2(self, temperature_K: float) -&gt; float: &quot;REF-058 Mah &amp; Pankratz 1976 USBM Bulletin 668, NiO(s) table; confidence: primary-refit&quot;,</li>
+<li><code>simulator/chemistry/ellingham_thermo.py:327</code> - def delta_g_kJ_per_mol_O2(self, temperature_K: float) -&gt; float: &quot;REF-058 Mah &amp; Pankratz 1976 USBM Bulletin 668, NiO(s) table; confidence: primary-refit&quot;,</li>
 </ul>
 </section>
 </body>
