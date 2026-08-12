@@ -18,6 +18,7 @@ from typing import Any, Dict, Iterable, List, Tuple
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
 from simulator.condensation_routing import target_species_for_stage_number
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
+from simulator.scalar_boundary import is_declared_real_scalar
 
 # ============================================================================
 # SECTION 1: CONSTANTS
@@ -180,9 +181,7 @@ def clamp_stir_factor(value: float) -> float:
     Scalar inputs to ``clamp_stir_state`` map to the axial axis only
     (backward-compat with the 0.5.2 single-axis writer surface).
     """
-    # bool is a subclass of int; reject explicitly before float()
-    # would otherwise coerce True->1.0 / False->0.0.
-    if isinstance(value, bool):
+    if not is_declared_real_scalar(value, allow_numeric_str=True):
         return 0.0
     try:
         raw = float(value)
@@ -618,10 +617,20 @@ class MeltState:
         the current tree; the deprecation surface is read-via-property
         + write-via-setter only.
         """
+        if not is_declared_real_scalar(value, allow_numeric_str=True):
+            raise TypeError("stir_factor must be numeric")
         self.stir_state.axial = float(value)
 
     def validate_melt_pressures(self) -> None:
         try:
+            if not is_declared_real_scalar(
+                self.pO2_mbar,
+                allow_numeric_str=True,
+            ) or not is_declared_real_scalar(
+                self.p_total_mbar,
+                allow_numeric_str=True,
+            ):
+                raise TypeError
             pO2 = float(self.pO2_mbar)
             p_total = float(self.p_total_mbar)
         except (TypeError, ValueError) as exc:

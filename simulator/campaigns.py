@@ -34,6 +34,7 @@ from simulator.lab_schedule import (
     schedule_sample_time_h,
 )
 from simulator.furnace_materials import FURNACE_MAX_T_BOUNDS_C
+from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.optimize.recipe import (
     C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_FLOOR_PER_HR,
     C2A_STAGED_DEPLETION_LOG_SLOPE_FIELD,
@@ -571,6 +572,8 @@ class CampaignManager:
         if value is None:
             return default
         try:
+            if not is_declared_real_scalar(value, allow_numeric_str=True):
+                raise TypeError
             return float(value)
         except (TypeError, ValueError) as exc:
             raise ValueError(f'Invalid numeric campaign setpoint: {value!r}') from exc
@@ -944,6 +947,8 @@ class CampaignManager:
         if raw is None:
             return 0.0
         try:
+            if not is_declared_real_scalar(raw, allow_numeric_str=True):
+                raise TypeError
             value = float(raw)
         except (TypeError, ValueError) as exc:
             raise ValueError(
@@ -965,6 +970,8 @@ class CampaignManager:
         if raw is None:
             return 0.0
         try:
+            if not is_declared_real_scalar(raw, allow_numeric_str=True):
+                raise TypeError
             value = float(raw)
         except (TypeError, ValueError) as exc:
             raise ValueError(
@@ -1495,7 +1502,13 @@ class CampaignManager:
             # active-path fix.  ``pO2_mbar == 0`` leaves atmosphere
             # alone (operator clearing the setpoint, NOT requesting
             # controlled-O2).
-            override_pO2 = float(ovr['pO2_mbar'])
+            raw_override_pO2 = ovr['pO2_mbar']
+            if not is_declared_real_scalar(
+                raw_override_pO2,
+                allow_numeric_str=True,
+            ):
+                raise ValueError("C2A pO2_mbar override must be numeric")
+            override_pO2 = float(raw_override_pO2)
             melt.pO2_mbar = override_pO2
             melt.p_total_mbar = max(melt.p_total_mbar, melt.pO2_mbar)
             if override_pO2 > 0.0:
@@ -1663,6 +1676,16 @@ class CampaignManager:
                 phase_cfg = {}
             inject_band = phase_cfg.get('T_inject_C', ())
             bakeout_band = phase_cfg.get('T_bakeout_C', ())
+            if isinstance(inject_band, (list, tuple)) and inject_band and any(
+                not is_declared_real_scalar(value, allow_numeric_str=True)
+                for value in inject_band
+            ):
+                raise ValueError(f"{phase_key}.T_inject_C must be numeric")
+            if isinstance(bakeout_band, (list, tuple)) and bakeout_band and any(
+                not is_declared_real_scalar(value, allow_numeric_str=True)
+                for value in bakeout_band
+            ):
+                raise ValueError(f"{phase_key}.T_bakeout_C must be numeric")
             default_inject = (
                 max(float(value) for value in inject_band)
                 if isinstance(inject_band, (list, tuple)) and inject_band
@@ -1818,9 +1841,14 @@ class CampaignManager:
             and str(background_gas.get('reported_status', '') or '') != 'not_reported'
         ):
             background_species = str(background_gas.get('species') or '').strip()
+            raw_background_fraction = background_gas.get('mole_fraction', 1.0)
             try:
-                background_fraction = float(
-                    background_gas.get('mole_fraction', 1.0))
+                if not is_declared_real_scalar(
+                    raw_background_fraction,
+                    allow_numeric_str=True,
+                ):
+                    raise TypeError
+                background_fraction = float(raw_background_fraction)
             except (TypeError, ValueError):
                 background_fraction = 0.0
             if background_fraction < 0.0:
@@ -1852,10 +1880,25 @@ class CampaignManager:
         """Apply runtime ramp rate override if set."""
         ovr = self._campaign_overrides(campaign)
         if 'ramp_rate' in ovr:
+            if not is_declared_real_scalar(
+                ovr['ramp_rate'],
+                allow_numeric_str=True,
+            ):
+                raise ValueError("ramp_rate override must be numeric")
             ramp_rate = float(ovr['ramp_rate'])
         elif 'temperature_ramp_C_per_h' in ovr:
+            if not is_declared_real_scalar(
+                ovr['temperature_ramp_C_per_h'],
+                allow_numeric_str=True,
+            ):
+                raise ValueError("temperature_ramp_C_per_h override must be numeric")
             ramp_rate = float(ovr['temperature_ramp_C_per_h'])
         elif 'ramp_rate_C_per_h' in ovr:
+            if not is_declared_real_scalar(
+                ovr['ramp_rate_C_per_h'],
+                allow_numeric_str=True,
+            ):
+                raise ValueError("ramp_rate_C_per_h override must be numeric")
             ramp_rate = float(ovr['ramp_rate_C_per_h'])
         return (target_T, ramp_rate)
 
@@ -1981,7 +2024,13 @@ class CampaignManager:
         # successful reaction without provider dispatch.
         ovr = self._campaign_overrides(campaign)
         if campaign not in (CampaignPhase.C4, CampaignPhase.C6) and 'max_hours' in ovr:
-            max_h = float(ovr['max_hours'])
+            raw_max_hours = ovr['max_hours']
+            if not is_declared_real_scalar(
+                raw_max_hours,
+                allow_numeric_str=True,
+            ):
+                raise ValueError("max_hours override must be numeric")
+            max_h = float(raw_max_hours)
             if max_h > 0 and completed_campaign_hour >= max_h:
                 return True
 

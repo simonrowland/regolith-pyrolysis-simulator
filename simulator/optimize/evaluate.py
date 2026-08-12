@@ -127,6 +127,7 @@ from simulator.pumping_cost import (
 from simulator.reduced_real_determinism import PT0NonFinitePayload
 from simulator.mre_ladder import max_voltage_for_target, parse_ladder_from_setpoints
 from simulator.run_executor import RunExecutor
+from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.runner import PyrolysisRun, RunnerError
 from simulator.transport_regime import TransportRegimeRefusal
 
@@ -3024,6 +3025,8 @@ def _diagnostic_chemistry_kernel_run_config(
 
 def _positive_eval_mass_kg(raw: Any) -> float:
     try:
+        if not is_declared_real_scalar(raw, allow_numeric_str=True):
+            raise TypeError
         mass_kg = float(raw)
     except (TypeError, ValueError) as exc:
         raise EvaluationInputError(
@@ -4975,6 +4978,8 @@ def _finite_float_mapping(values: Mapping[Any, Any]) -> dict[str, float]:
 
 
 def _finite_optional_float(value: Any) -> float | None:
+    if not is_declared_real_scalar(value, allow_numeric_str=True):
+        return None
     try:
         numeric = float(value)
     except (TypeError, ValueError):

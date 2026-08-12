@@ -5,6 +5,8 @@ from collections.abc import MutableMapping
 from enum import Enum
 from typing import Any, Literal
 
+from simulator.scalar_boundary import is_declared_real_scalar
+
 
 MELT_REGIME_EPSILON = 1.0e-12
 
@@ -159,6 +161,8 @@ def _classify_melt_regime(
 
 
 def _finite_float(value: float, name: str) -> float:
+    if not is_declared_real_scalar(value, allow_numeric_str=True):
+        raise TypeError(f"{name} must be numeric")
     number = float(value)
     if not math.isfinite(number):
         raise ValueError(f"{name} must be finite, got {value!r}")
@@ -173,6 +177,8 @@ def _finite_nonnegative(value: float, name: str) -> float:
 
 
 def _liquid_fraction_invalidity(value: float) -> str | None:
+    if not is_declared_real_scalar(value, allow_numeric_str=True):
+        return "not_numeric"
     try:
         number = float(value)
     except (TypeError, ValueError):

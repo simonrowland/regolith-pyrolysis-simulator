@@ -154,6 +154,7 @@ from simulator.chemistry.kernel.dto import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
+from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.account_ids import SOLID_CHAR_CARBON_ACCOUNT
 
 
@@ -311,6 +312,39 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
             return family_reject
         reaction_family = str(controls["reaction_family"])
         control_audit = diagnostic_control_audit(request, include_fO2=False)
+
+        for field_name in (
+            "offgas_products_kg",
+            "oxide_products_kg",
+            "oxygen_products_kg",
+            "products_kg",
+            "salt_products_kg",
+            "sulfide_products_kg",
+        ):
+            values = controls.get(field_name)
+            if isinstance(values, Mapping) and any(
+                not is_declared_real_scalar(value, allow_numeric_str=True)
+                for value in values.values()
+            ):
+                return self._out_of_domain(
+                    f"{field_name} numeric input is missing",
+                    control_audit=control_audit,
+                )
+        phase_specs = controls.get("phase_specs")
+        if isinstance(phase_specs, (list, tuple)):
+            for row in phase_specs:
+                if not isinstance(row, Mapping):
+                    continue
+                for field_name in ("T_C", "pO2_bar"):
+                    value = row.get(field_name)
+                    if value is not None and not is_declared_real_scalar(
+                        value,
+                        allow_numeric_str=True,
+                    ):
+                        return self._out_of_domain(
+                            f"phase_specs.{field_name} numeric input is missing",
+                            control_audit=control_audit,
+                        )
 
         registry = request.account_view.species_formula_registry
 

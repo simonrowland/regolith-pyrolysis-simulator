@@ -21,6 +21,7 @@ from simulator.melt_backend.base import (
     RealBackendFamily,
 )
 from simulator.melt_backend.vaporock import VapoRockBackend
+from simulator.scalar_boundary import is_declared_real_scalar
 
 
 THERMOENGINE_MIN_PRESSURE_BAR = 1.0e-6
@@ -57,21 +58,25 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
         self._thermoengine_transport = None
         self._thermoengine_import_error = None
         self._model = str(config.get('model', self._model))
-        self._health_timeout_s = float(
-            config.get('thermoengine_health_timeout_s', 8.0)
+        raw_health_timeout_s = config.get('thermoengine_health_timeout_s', 8.0)
+        raw_equilibrate_timeout_s = config.get(
+            'thermoengine_equilibrate_timeout_s',
+            THERMOENGINE_WARM_CALL_TIMEOUT_S,
         )
+        for field_name, value in (
+            ('thermoengine_health_timeout_s', raw_health_timeout_s),
+            ('thermoengine_equilibrate_timeout_s', raw_equilibrate_timeout_s),
+        ):
+            if not is_declared_real_scalar(value, allow_numeric_str=True):
+                raise ValueError(f'{field_name} must be numeric')
+        self._health_timeout_s = float(raw_health_timeout_s)
         self._initialize_vaporock_delegate()
 
         try:
             transport = ThermoEngineTransport(
                 model_name=self._model,
                 activity_converter=activity_from_chem_potential,
-                equilibrate_timeout_s=float(
-                    config.get(
-                        'thermoengine_equilibrate_timeout_s',
-                        THERMOENGINE_WARM_CALL_TIMEOUT_S,
-                    )
-                ),
+                equilibrate_timeout_s=float(raw_equilibrate_timeout_s),
             )
             self._thermoengine_transport = transport
             transport.initialize()

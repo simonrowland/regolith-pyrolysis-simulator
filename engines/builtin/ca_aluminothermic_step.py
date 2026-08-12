@@ -25,6 +25,7 @@ from simulator.chemistry.kernel.dto import (
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+from simulator.scalar_boundary import is_declared_real_scalar
 
 
 REACTION_FAMILY_C7_CA_ALUMINOTHERMIC = "c7_ca_aluminothermic"
@@ -730,6 +731,8 @@ class BuiltinCaAluminothermicStepProvider(ChemistryProvider):
 
 
 def _finite_float(value: Any, default: float) -> float:
+    if not is_declared_real_scalar(value, allow_numeric_str=True):
+        return float(default)
     try:
         result = float(value)
     except (TypeError, ValueError):

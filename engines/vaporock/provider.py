@@ -51,6 +51,7 @@ from simulator.melt_backend.melt_envelope import (
     consume_melt_extrapolation_envelope,
     melt_extrapolation_diagnostic,
 )
+from simulator.scalar_boundary import is_declared_real_scalar
 
 
 _INTENTS = frozenset({ChemistryIntent.VAPOR_PRESSURE})
@@ -386,9 +387,14 @@ class VapoRockProvider(ChemistryProvider):
             liquid_fraction = None
             if controls.get('liquid_fraction') is not None:
                 try:
+                    if not is_declared_real_scalar(
+                        controls['liquid_fraction'],
+                        allow_numeric_str=True,
+                    ):
+                        raise TypeError
                     liquid_fraction = float(controls['liquid_fraction'])
                 except (TypeError, ValueError):
-                    liquid_fraction = controls['liquid_fraction']
+                    liquid_fraction = None
             return backend.equilibrate(
                 temperature_C=float(request.temperature_C),
                 pressure_bar=float(request.pressure_bar),

@@ -23,6 +23,8 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 
+from simulator.scalar_boundary import is_declared_real_scalar
+
 CCO_FORMULATION = "JakobssonOskarsson1994_CCO_via_LEPR_graphite_CO_CO2"
 CCO_SOURCE = (
     "Jakobsson & Oskarsson 1994 GCA (CCO point formula, via LEPR/ThermoEngine); "
@@ -63,6 +65,8 @@ class RedoxBufferInterval:
 
 
 def _require_finite_positive(value: float, label: str) -> float:
+    if not is_declared_real_scalar(value, allow_numeric_str=True):
+        raise TypeError(f"{label} must be numeric")
     parsed = float(value)
     if not math.isfinite(parsed) or parsed <= 0.0:
         raise ValueError(f"{label} must be finite and positive")

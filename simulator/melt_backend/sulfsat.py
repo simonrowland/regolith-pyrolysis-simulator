@@ -75,6 +75,7 @@ from importlib import metadata as importlib_metadata
 from typing import Any, Dict, List, Mapping, Optional
 
 from simulator.fe_redox import kress91_split, melt_mol_fractions_for_kress91
+from simulator.scalar_boundary import is_declared_real_scalar
 
 
 # Cleaned-melt oxide -> PySulfSat ``*_Liq`` column name mapping. Every
@@ -309,7 +310,31 @@ class SulfSatGate:
                 calibration_status='unavailable',
             )
 
+        invalid_composition = next(
+            (
+                (oxide, value)
+                for oxide, value in liquid_comp_wt.items()
+                if value is not None
+                and not is_declared_real_scalar(value, allow_numeric_str=True)
+            ),
+            None,
+        )
+        if invalid_composition is not None:
+            oxide, value = invalid_composition
+            return SulfurSaturationResult(
+                warnings=[
+                    f"invalid liquid composition {oxide}={value!r}: "
+                    "expected declared real scalar"
+                ],
+                calibration_status="unavailable",
+            )
+
         try:
+            if not all(
+                is_declared_real_scalar(value, allow_numeric_str=True)
+                for value in (T_K, P_bar, fO2_log, S_input_ppm)
+            ):
+                raise TypeError("expected declared real scalar")
             T_K_f = float(T_K)
             P_bar_f = float(P_bar)
             fO2_log_f = float(fO2_log)
@@ -329,6 +354,11 @@ class SulfSatGate:
         operator_fe3fet: Optional[float] = None
         if Fe3Fet_Liq is not None:
             try:
+                if not is_declared_real_scalar(
+                    Fe3Fet_Liq,
+                    allow_numeric_str=True,
+                ):
+                    raise TypeError("expected declared real scalar")
                 operator_fe3fet = float(Fe3Fet_Liq)
             except (TypeError, ValueError) as exc:
                 return SulfurSaturationResult(

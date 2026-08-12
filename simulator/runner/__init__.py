@@ -119,6 +119,7 @@ from simulator.lab_schedule import (
 from simulator.optimize.recipe import C3_ALKALI_DOSING_ZERO_LEVEL_KG_BY_SPECIES
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.recipe_io import RecipeIOError, load_recipe_patch
+from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.session import (
     SimSession,
     SimSessionConfig,
@@ -671,6 +672,8 @@ def _preset_duration_h(
     provenance: Mapping[str, Any],
 ) -> float:
     try:
+        if not is_declared_real_scalar(value, allow_numeric_str=True):
+            raise TypeError
         duration_h = float(value)
     except (TypeError, ValueError) as exc:
         raise PresetRunnerError(
@@ -848,7 +851,11 @@ def _additives_with_c3_alkali_dosing(
     additives_kg: Mapping[str, float],
     setpoints: Mapping[str, Any],
 ) -> dict[str, float]:
-    additives = {str(k): float(v) for k, v in dict(additives_kg).items()}
+    additives: dict[str, float] = {}
+    for key, value in dict(additives_kg).items():
+        if not is_declared_real_scalar(value, allow_numeric_str=True):
+            raise RunnerError(f"additives_kg[{key!r}] must be numeric")
+        additives[str(key)] = float(value)
     dosing_by_species = _c3_alkali_dosing_kg_by_species(setpoints)
     for species, dose_kg in dosing_by_species.items():
         raw_additive_kg = additives.get(species, 0.0)
@@ -883,6 +890,11 @@ def _c3_alkali_dosing_kg_by_species(
         if key not in dosing or dosing[key] is None:
             continue
         try:
+            if not is_declared_real_scalar(
+                dosing[key],
+                allow_numeric_str=True,
+            ):
+                raise TypeError
             dose_kg = float(dosing[key])
         except (TypeError, ValueError) as exc:
             raise RunnerError(
@@ -982,9 +994,14 @@ class PyrolysisRun:
         # `internal-analytical` token before serialization and translation.
         self.backend_name = canonical_backend_name(self.backend_name)
         self._enforce_preset_comparison_contract()
-        if int(self.hours) < 0:
+        if not is_declared_real_scalar(self.hours, allow_numeric_str=True):
+            raise TypeError(
+                f"hours must be int, float, or str, not {type(self.hours).__name__}"
+            )
+        hours = int(self.hours)
+        if hours < 0:
             raise RunnerError(
-                f"invalid hours: hours must be >= 0; got {int(self.hours)}"
+                f"invalid hours: hours must be >= 0; got {hours}"
             )
         overrides = _canonical_runtime_campaign_overrides(
             runtime_campaign_overrides=self.runtime_campaign_overrides,
@@ -1802,6 +1819,8 @@ def _finite_export_float(value: Any, *, field: str) -> float:
 
 def _positive_mass_kg(value: Any, *, field: str = "mass_kg") -> float:
     try:
+        if not is_declared_real_scalar(value, allow_numeric_str=True):
+            raise TypeError
         mass_kg = float(value)
     except (TypeError, ValueError) as exc:
         raise RunnerError(
@@ -3437,17 +3456,31 @@ def _prepare_sio_campaign_start(
     )
     temp_range = campaign_cfg.get("temp_range_C") or []
     if t_low_c is not None:
+        if not is_declared_real_scalar(t_low_c, allow_numeric_str=True):
+            raise TypeError("t_low_c must be numeric")
         sim.melt.temperature_C = float(t_low_c)
     elif temp_range:
+        if not is_declared_real_scalar(
+            temp_range[0],
+            allow_numeric_str=True,
+        ):
+            raise TypeError("temp_range_C lower bound must be numeric")
         sim.melt.temperature_C = max(sim.melt.temperature_C, float(temp_range[0]))
 
     if ramp_c_per_hr is not None:
+        if not is_declared_real_scalar(
+            ramp_c_per_hr,
+            allow_numeric_str=True,
+        ):
+            raise TypeError("ramp_c_per_hr must be numeric")
         sim.campaign_mgr.overrides.setdefault("C2A", {})["ramp_rate"] = (
             float(ramp_c_per_hr)
         )
 
     if t_hold_c is None:
         return
+    if not is_declared_real_scalar(t_hold_c, allow_numeric_str=True):
+        raise TypeError("t_hold_c must be numeric")
 
     base_get_temp_target = sim.campaign_mgr.get_temp_target
 
@@ -3455,6 +3488,11 @@ def _prepare_sio_campaign_start(
         target, ramp_rate = base_get_temp_target(campaign, campaign_hour, melt)
         if campaign == CampaignPhase.C2A:
             if ramp_c_per_hr is not None:
+                if not is_declared_real_scalar(
+                    ramp_c_per_hr,
+                    allow_numeric_str=True,
+                ):
+                    raise TypeError("ramp_c_per_hr must be numeric")
                 ramp_rate = float(ramp_c_per_hr)
             return (
                 sim.campaign_mgr._clamp_to_furnace_max(float(t_hold_c)),
@@ -3473,6 +3511,8 @@ def _apply_sio_wall_sweep_controls(
 ) -> None:
     runtime_override = sim.campaign_mgr.overrides.setdefault("C2A", {})
     if pO2_mbar is not None:
+        if not is_declared_real_scalar(pO2_mbar, allow_numeric_str=True):
+            raise TypeError("pO2_mbar must be numeric")
         pO2_value = max(0.0, float(pO2_mbar))
         runtime_override["pO2_mbar"] = pO2_value
         sim.melt.pO2_mbar = pO2_value
@@ -3502,6 +3542,11 @@ def _apply_sio_wall_sweep_controls(
     if liner_temperature_c is None:
         return
     overhead_cfg = dict(runtime_override.get("overhead_headspace", {}) or {})
+    if not is_declared_real_scalar(
+        liner_temperature_c,
+        allow_numeric_str=True,
+    ):
+        raise TypeError("liner_temperature_c must be numeric")
     overhead_cfg["liner_temperature_C"] = float(liner_temperature_c)
     overhead_cfg["pipe_segment_temperatures_C"] = float(liner_temperature_c)
     runtime_override["overhead_headspace"] = overhead_cfg
@@ -3552,6 +3597,8 @@ def build_sio_yield_report(
             f"SiO yield report supports campaign {SIO_YIELD_CAMPAIGN!r}; "
             f"got {campaign!r}"
         )
+    if not is_declared_real_scalar(hours, allow_numeric_str=True):
+        raise TypeError(f"hours must be numeric, not {type(hours).__name__}")
     mass_kg = _positive_mass_kg(mass_kg)
 
     from simulator.condensation import alpha_s
@@ -3582,6 +3629,11 @@ def build_sio_yield_report(
 
     runtime_campaign_overrides: dict[str, dict] = {}
     if ramp_c_per_hr is not None:
+        if not is_declared_real_scalar(
+            ramp_c_per_hr,
+            allow_numeric_str=True,
+        ):
+            raise TypeError("ramp_c_per_hr must be numeric")
         runtime_campaign_overrides["C2A"] = {
             "ramp_rate": float(ramp_c_per_hr),
         }

@@ -9,6 +9,7 @@ from dataclasses import dataclass, field
 from typing import Any, Callable, Mapping, Optional, Tuple
 
 from simulator.melt_backend.base import LiquidFractionInvalidError
+from simulator.scalar_boundary import is_declared_real_scalar
 
 
 # MAGEMin-facing default only - the generic finder stays unbounded so
@@ -65,8 +66,16 @@ class MeltFractionSample:
     frac_M: float
 
     def __post_init__(self) -> None:
-        object.__setattr__(self, 'temperature_C', float(self.temperature_C))
-        object.__setattr__(self, 'frac_M', float(self.frac_M))
+        object.__setattr__(
+            self,
+            'temperature_C',
+            _declared_float(self.temperature_C, 'sample_temperature_C'),
+        )
+        object.__setattr__(
+            self,
+            'frac_M',
+            _declared_float(self.frac_M, 'sample_frac_M'),
+        )
         _validate_temperature_C(self.temperature_C, 'sample_temperature_C')
         _validate_optional_fraction(self.frac_M, 'sample_frac_M')
 
@@ -85,20 +94,20 @@ class LiquidusSolidusResult:
 
     def __post_init__(self) -> None:
         if self.liquidus_T_C is not None:
-            object.__setattr__(self, 'liquidus_T_C', float(self.liquidus_T_C))
+            object.__setattr__(self, 'liquidus_T_C', _declared_float(self.liquidus_T_C, 'liquidus_T_C'))
         if self.liquidus_T_K is not None:
-            object.__setattr__(self, 'liquidus_T_K', float(self.liquidus_T_K))
+            object.__setattr__(self, 'liquidus_T_K', _declared_float(self.liquidus_T_K, 'liquidus_T_K'))
         if self.liquidus_T_K is None and self.liquidus_T_C is not None:
             object.__setattr__(self, 'liquidus_T_K', self.liquidus_T_C + 273.15)
         if self.liquidus_T_C is None and self.liquidus_T_K is not None:
             object.__setattr__(self, 'liquidus_T_C', self.liquidus_T_K - 273.15)
         if self.solidus_T_C is not None:
-            object.__setattr__(self, 'solidus_T_C', float(self.solidus_T_C))
+            object.__setattr__(self, 'solidus_T_C', _declared_float(self.solidus_T_C, 'solidus_T_C'))
         if self.liquid_fraction is not None:
             object.__setattr__(
                 self,
                 'liquid_fraction',
-                float(self.liquid_fraction),
+                _declared_float(self.liquid_fraction, 'liquid_fraction'),
             )
         object.__setattr__(self, 'status', str(self.status))
         object.__setattr__(self, 'warnings', tuple(str(w) for w in self.warnings))
@@ -107,6 +116,8 @@ class LiquidusSolidusResult:
             'samples',
             tuple(_coerce_sample(sample) for sample in self.samples),
         )
+        if not is_declared_real_scalar(self.iterations, allow_numeric_str=True):
+            raise TypeError('iterations must be numeric')
         object.__setattr__(self, 'iterations', int(self.iterations))
         object.__setattr__(self, 'diagnostics', dict(self.diagnostics or {}))
         _validate_temperature_pair(
@@ -136,7 +147,7 @@ class LiquidFractionPathPoint:
     liquid_composition_wt_pct: Mapping[str, float] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
-        object.__setattr__(self, 'temperature_C', float(self.temperature_C))
+        object.__setattr__(self, 'temperature_C', _declared_float(self.temperature_C, 'temperature_C'))
         object.__setattr__(
             self,
             'liquid_fraction',
@@ -164,20 +175,20 @@ class EquilibriumCrystallizationPathResult:
 
     def __post_init__(self) -> None:
         if self.liquidus_T_C is not None:
-            object.__setattr__(self, 'liquidus_T_C', float(self.liquidus_T_C))
+            object.__setattr__(self, 'liquidus_T_C', _declared_float(self.liquidus_T_C, 'liquidus_T_C'))
         if self.liquidus_T_K is not None:
-            object.__setattr__(self, 'liquidus_T_K', float(self.liquidus_T_K))
+            object.__setattr__(self, 'liquidus_T_K', _declared_float(self.liquidus_T_K, 'liquidus_T_K'))
         if self.liquidus_T_K is None and self.liquidus_T_C is not None:
             object.__setattr__(self, 'liquidus_T_K', self.liquidus_T_C + 273.15)
         if self.liquidus_T_C is None and self.liquidus_T_K is not None:
             object.__setattr__(self, 'liquidus_T_C', self.liquidus_T_K - 273.15)
         if self.solidus_T_C is not None:
-            object.__setattr__(self, 'solidus_T_C', float(self.solidus_T_C))
+            object.__setattr__(self, 'solidus_T_C', _declared_float(self.solidus_T_C, 'solidus_T_C'))
         if self.liquid_fraction is not None:
             object.__setattr__(
                 self,
                 'liquid_fraction',
-                float(self.liquid_fraction),
+                _declared_float(self.liquid_fraction, 'liquid_fraction'),
             )
         object.__setattr__(self, 'status', str(self.status))
         object.__setattr__(self, 'warnings', tuple(str(w) for w in self.warnings))
@@ -191,6 +202,8 @@ class EquilibriumCrystallizationPathResult:
             'samples',
             tuple(_coerce_sample(sample) for sample in self.samples),
         )
+        if not is_declared_real_scalar(self.iterations, allow_numeric_str=True):
+            raise TypeError('iterations must be numeric')
         object.__setattr__(self, 'iterations', int(self.iterations))
         object.__setattr__(self, 'diagnostics', dict(self.diagnostics or {}))
         _validate_temperature_pair(
@@ -239,11 +252,26 @@ def find_liquidus_solidus_by_fraction(
     residual rather than only checking the budget between calls.
     """
     try:
-        min_T = float(min_T_C)
-        max_T = float(max_T_C)
-        step = float(scan_step_C)
-        tolerance = float(tolerance_C)
-        budget = None if budget_s is None else float(budget_s)
+        min_T = _declared_float(min_T_C, 'min_T_C')
+        max_T = _declared_float(max_T_C, 'max_T_C')
+        step = _declared_float(scan_step_C, 'scan_step_C')
+        tolerance = _declared_float(tolerance_C, 'tolerance_C')
+        solid_threshold = _declared_float(solid_epsilon, 'solid_epsilon')
+        liquid_epsilon_value = _declared_float(
+            liquid_epsilon,
+            'liquid_epsilon',
+        )
+        monotonicity_tolerance = _declared_float(
+            monotonicity_tolerance,
+            'monotonicity_tolerance',
+        )
+        monotone_smoothing_max = _declared_float(
+            monotone_smoothing_max,
+            'monotone_smoothing_max',
+        )
+        if not is_declared_real_scalar(max_bisection_iterations):
+            raise TypeError('max_bisection_iterations must be numeric')
+        budget = None if budget_s is None else _declared_float(budget_s, 'budget_s')
     except (TypeError, ValueError) as exc:
         return _not_converged(f'invalid finder parameter: {exc}')
     if not all(math.isfinite(value) for value in (min_T, max_T, step, tolerance)):
@@ -257,8 +285,7 @@ def find_liquidus_solidus_by_fraction(
     if budget is not None and (not math.isfinite(budget) or budget <= 0.0):
         return _not_converged('invalid finder budget_s: must be finite and positive')
 
-    liquid_threshold = 1.0 - float(liquid_epsilon)
-    solid_threshold = float(solid_epsilon)
+    liquid_threshold = 1.0 - liquid_epsilon_value
     samples: list[MeltFractionSample] = []
     raw_fraction_by_temperature: dict[float, float] = {}
     smoothing_warnings: list[str] = []
@@ -475,8 +502,19 @@ def build_equilibrium_crystallization_path(
     path: list[LiquidFractionPathPoint] = []
     smoothing_warnings: list[str] = []
     try:
-        solidus_T = float(solidus_T_C)
-        liquidus_T = float(liquidus_T_C)
+        solidus_T = _declared_float(solidus_T_C, 'solidus_T_C')
+        liquidus_T = _declared_float(liquidus_T_C, 'liquidus_T_C')
+        grid_step_C = _declared_float(grid_step_C, 'grid_step_C')
+        monotonicity_tolerance = _declared_float(
+            monotonicity_tolerance,
+            'monotonicity_tolerance',
+        )
+        monotone_smoothing_max = _declared_float(
+            monotone_smoothing_max,
+            'monotone_smoothing_max',
+        )
+        if not is_declared_real_scalar(max_points, allow_numeric_str=True):
+            raise TypeError('max_points must be numeric')
         if not solidus_T <= liquidus_T:
             return EquilibriumCrystallizationPathResult(
                 status='not_converged',
@@ -512,8 +550,6 @@ def build_equilibrium_crystallization_path(
         raise
     except Exception as exc:  # noqa: BLE001 - engine sampler boundary
         return EquilibriumCrystallizationPathResult(
-            liquidus_T_C=liquidus_T_C,
-            solidus_T_C=solidus_T_C,
             status='not_converged',
             warnings=tuple([
                 *smoothing_warnings,
@@ -627,7 +663,7 @@ def _monotone_point(
 
 
 def _clamp_fraction(value: float) -> float:
-    frac = float(value)
+    frac = _declared_float(value, 'frac_M')
     if not math.isfinite(frac):
         raise LiquidFractionInvalidError(f'invalid frac_M value: {value!r}')
     if frac < -1.0e-12 or frac > 1.0 + 1.0e-12:
@@ -668,7 +704,9 @@ def _temperature_grid(
     grid_step_C: float,
     max_points: int,
 ) -> Tuple[float, ...]:
-    step = float(grid_step_C)
+    step = _declared_float(grid_step_C, 'grid_step_C')
+    if not is_declared_real_scalar(max_points, allow_numeric_str=True):
+        raise TypeError('max_points must be numeric')
     point_cap = int(max_points)
     if step <= 0.0:
         raise RuntimeError('invalid EC grid_step_C: must be positive')
@@ -692,15 +730,15 @@ def _coerce_path_point(point: object) -> LiquidFractionPathPoint:
         if temperature_C is None:
             temperature_C = point.get('T_C', point.get('T'))
         return LiquidFractionPathPoint(
-            temperature_C=float(temperature_C),
-            liquid_fraction=float(point.get('liquid_fraction')),
+            temperature_C=_declared_float(temperature_C, 'temperature_C'),
+            liquid_fraction=_declared_float(point.get('liquid_fraction'), 'liquid_fraction'),
             liquid_composition_wt_pct=point.get(
                 'liquid_composition_wt_pct', {}
             ),
         )
     return LiquidFractionPathPoint(
-        temperature_C=float(getattr(point, 'temperature_C')),
-        liquid_fraction=float(getattr(point, 'liquid_fraction')),
+        temperature_C=_declared_float(getattr(point, 'temperature_C'), 'temperature_C'),
+        liquid_fraction=_declared_float(getattr(point, 'liquid_fraction'), 'liquid_fraction'),
         liquid_composition_wt_pct=getattr(
             point,
             'liquid_composition_wt_pct',
@@ -720,19 +758,19 @@ def _coerce_sample(sample: object) -> MeltFractionSample:
         if frac_M is None:
             frac_M = sample.get('liquid_fraction')
         return MeltFractionSample(
-            temperature_C=float(temperature_C),
-            frac_M=float(frac_M),
+            temperature_C=_declared_float(temperature_C, 'sample_temperature_C'),
+            frac_M=_declared_float(frac_M, 'sample_frac_M'),
         )
     return MeltFractionSample(
-        temperature_C=float(getattr(sample, 'temperature_C')),
-        frac_M=float(getattr(sample, 'frac_M')),
+        temperature_C=_declared_float(getattr(sample, 'temperature_C'), 'sample_temperature_C'),
+        frac_M=_declared_float(getattr(sample, 'frac_M'), 'sample_frac_M'),
     )
 
 
 def _coerce_composition(composition: Mapping[str, float]) -> dict[str, float]:
     result: dict[str, float] = {}
     for species, value in dict(composition or {}).items():
-        amount = float(value)
+        amount = _declared_float(value, f'liquid_composition_wt_pct.{species}')
         if not math.isfinite(amount):
             raise RuntimeError(
                 f'invalid liquid_composition_wt_pct value for {species}: {value!r}'
@@ -810,17 +848,18 @@ def _invoke_sample_fraction(
     ``lambda T: ...`` unit-test callables keep working unchanged.
     """
     if remaining_budget_s is None:
-        return float(sample_fraction(float(temperature_C)))
+        return _declared_float(sample_fraction(float(temperature_C)), 'frac_M')
     try:
         parameters = inspect.signature(sample_fraction).parameters
     except (TypeError, ValueError):
-        return float(sample_fraction(float(temperature_C)))
+        return _declared_float(sample_fraction(float(temperature_C)), 'frac_M')
     if 'remaining_budget_s' in parameters:
-        return float(
+        return _declared_float(
             sample_fraction(
                 float(temperature_C),
                 remaining_budget_s=float(remaining_budget_s),
-            )
+            ),
+            'frac_M',
         )
     positional = [
         name
@@ -832,10 +871,17 @@ def _invoke_sample_fraction(
         )
     ]
     if len(positional) >= 2:
-        return float(
-            sample_fraction(float(temperature_C), float(remaining_budget_s))
+        return _declared_float(
+            sample_fraction(float(temperature_C), float(remaining_budget_s)),
+            'frac_M',
         )
-    return float(sample_fraction(float(temperature_C)))
+    return _declared_float(sample_fraction(float(temperature_C)), 'frac_M')
+
+
+def _declared_float(value: Any, name: str) -> float:
+    if not is_declared_real_scalar(value, allow_numeric_str=True):
+        raise TypeError(f'{name} must be numeric')
+    return float(value)
 
 
 class _LiquidusFinderBudgetExceeded(RuntimeError):

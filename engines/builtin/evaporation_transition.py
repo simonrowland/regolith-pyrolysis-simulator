@@ -85,6 +85,7 @@ from simulator.chemistry.kernel.dto import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
+from simulator.scalar_boundary import is_declared_real_scalar
 
 
 _NUMERICAL_FLOOR_KG = 1.0e-12
@@ -148,8 +149,20 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
 
         stoich = dict(controls.get("stoich") or {})
         parent_oxide = str(stoich.get("parent_oxide") or "")
-        oxide_per_product_kg = float(stoich.get("oxide_per_product_kg") or 0.0)
-        O2_per_product_kg = float(stoich.get("O2_per_product_kg") or 0.0)
+        oxide_raw = stoich.get("oxide_per_product_kg", 0.0)
+        o2_raw = stoich.get("O2_per_product_kg", 0.0)
+        if not is_declared_real_scalar(
+            oxide_raw,
+            allow_numeric_str=True,
+        ) or not is_declared_real_scalar(o2_raw, allow_numeric_str=True):
+            return IntentResult(
+                intent=ChemistryIntent.EVAPORATION_TRANSITION,
+                status="unsupported",
+                control_audit=control_audit,
+                diagnostic={"reason": "stoich numeric input is missing"},
+            )
+        oxide_per_product_kg = float(oxide_raw)
+        O2_per_product_kg = float(o2_raw)
         if not parent_oxide or oxide_per_product_kg <= 0.0:
             return IntentResult(
                 intent=ChemistryIntent.EVAPORATION_TRANSITION,

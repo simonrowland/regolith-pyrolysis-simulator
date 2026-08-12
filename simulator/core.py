@@ -279,6 +279,7 @@ from simulator.fe_redox import (
     melt_mol_fractions_for_kress91,
 )
 from simulator.melt_regime import MeltRegime, melt_regime
+from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.lab_geometry import LabGeometryError, parse_lab_geometry
 from simulator.lab_schedule import LabScheduleValidationError, interpolate_schedule_points
 from simulator.accounting.completeness import (
@@ -700,6 +701,32 @@ class PoisonedHourError(RuntimeError):
 
 class MeltHeadspaceProjectionError(RuntimeError):
     """Authoritative chemistry requested a missing headspace projection."""
+
+
+def _feedstock_surface_pressure_mbar(feedstock: Mapping[str, Any]) -> float:
+    environment = feedstock.get('environment', {}) or {}
+    surface_pressure = feedstock.get('surface_pressure_mbar')
+    environment_surface_pressure = environment.get('surface_pressure_mbar')
+    if surface_pressure not in (None, ''):
+        if not is_declared_real_scalar(
+            surface_pressure,
+            allow_numeric_str=True,
+        ):
+            raise TypeError("surface_pressure_mbar must be numeric")
+    if environment_surface_pressure not in (None, ''):
+        if not is_declared_real_scalar(
+            environment_surface_pressure,
+            allow_numeric_str=True,
+        ):
+            raise TypeError("environment.surface_pressure_mbar must be numeric")
+    return max(
+        0.0,
+        float(
+            surface_pressure
+            or environment_surface_pressure
+            or 0.0
+        ),
+    )
 
 
 class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
@@ -1252,11 +1279,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.melt.temperature_C = 25.0
         self.melt.atmosphere = Atmosphere.HARD_VACUUM
         environment = fs.get('environment', {}) or {}
-        self.melt.ambient_pressure_mbar = max(
-            0.0,
-            float(fs.get('surface_pressure_mbar')
-                  or environment.get('surface_pressure_mbar')
-                  or 0.0))
+        self.melt.ambient_pressure_mbar = _feedstock_surface_pressure_mbar(fs)
         self.melt.ambient_atmosphere = str(
             fs.get('atmosphere')
             or environment.get('atmosphere')
@@ -3116,6 +3139,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         melt_T_K = float(self.melt.temperature_C) + 273.15
         offset = self._overhead_headspace_config.get('temperature_offset_K')
         if offset is not None:
+            if not is_declared_real_scalar(offset, allow_numeric_str=True):
+                raise TypeError(
+                    'headspace.temperature_offset_K is missing: '
+                    'expected a declared real scalar'
+                )
             return max(1.0, melt_T_K + float(offset))
         model = str(
             self._overhead_headspace_config.get('temperature_model') or 'melt'
@@ -3438,6 +3466,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         configured = self._overhead_headspace_config.get(
             'downstream_pressure_bar')
         if configured is not None:
+            if not is_declared_real_scalar(
+                configured,
+                allow_numeric_str=True,
+            ):
+                raise TypeError(
+                    'headspace.downstream_pressure_bar is missing: '
+                    'expected a declared real scalar'
+                )
             configured_pressure_bar = float(configured)
             if not math.isfinite(configured_pressure_bar):
                 return math.nan
@@ -3572,11 +3608,28 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     def _oxygen_exchange_k_m_s(self, T_K: float) -> tuple[float, str]:
         config = self._oxygen_exchange_config()
-        k_ref = float(config.get('k_O_ref_m_s', 2.0e-5))
-        k_min = float(config.get('k_O_min_m_s', 5.0e-6))
-        k_max = float(config.get('k_O_max_m_s', 5.0e-5))
-        T_ref = float(config.get('T_ref_K', 1773.15))
-        Ea = float(config.get('Ea_J_mol', 150000.0))
+        declared_values = {
+            'T_K': T_K,
+            'k_O_ref_m_s': config.get('k_O_ref_m_s', 2.0e-5),
+            'k_O_min_m_s': config.get('k_O_min_m_s', 5.0e-6),
+            'k_O_max_m_s': config.get('k_O_max_m_s', 5.0e-5),
+            'T_ref_K': config.get('T_ref_K', 1773.15),
+            'Ea_J_mol': config.get('Ea_J_mol', 150000.0),
+        }
+        if not all(
+            is_declared_real_scalar(value, allow_numeric_str=True)
+            for value in declared_values.values()
+        ):
+            raise ValueError(
+                'invalid sso_r.oxygen_exchange numeric config: '
+                'missing declared real scalar'
+            )
+        T_K = float(declared_values['T_K'])
+        k_ref = float(declared_values['k_O_ref_m_s'])
+        k_min = float(declared_values['k_O_min_m_s'])
+        k_max = float(declared_values['k_O_max_m_s'])
+        T_ref = float(declared_values['T_ref_K'])
+        Ea = float(declared_values['Ea_J_mol'])
         if (
             not all(math.isfinite(value) for value in (
                 T_K, k_ref, k_min, k_max, T_ref, Ea
@@ -3604,7 +3657,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     def _oxygen_exchange_effective_melt_depth_m(self) -> float:
         config = self._oxygen_exchange_config()
-        depth = float(config.get('effective_melt_depth_m', 0.2))
+        raw_depth = config.get('effective_melt_depth_m', 0.2)
+        if not is_declared_real_scalar(
+            raw_depth,
+            allow_numeric_str=True,
+        ):
+            raise ValueError(
+                'sso_r.oxygen_exchange.effective_melt_depth_m is missing: '
+                'expected a declared real scalar'
+            )
+        depth = float(raw_depth)
         if not math.isfinite(depth) or depth <= 0.0:
             raise ValueError(
                 'sso_r.oxygen_exchange.effective_melt_depth_m must be > 0; '
@@ -11252,14 +11314,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             raise ValueError(
                 f'{field} must be a finite non-negative number or [low, high] range'
             )
-        if isinstance(value, bool):
-            raise ValueError(
-                f'{field} must be a finite non-negative number or [low, high] range'
-            )
-        if isinstance(value, (int, float)):
+        if is_declared_real_scalar(value) and isinstance(value, (int, float)):
             number = float(value)
         elif isinstance(value, (list, tuple)) and len(value) == 2:
             try:
+                if not is_declared_real_scalar(
+                    value[0],
+                    allow_numeric_str=True,
+                ) or not is_declared_real_scalar(
+                    value[1],
+                    allow_numeric_str=True,
+                ):
+                    raise TypeError
                 low = float(value[0])
                 high = float(value[1])
             except (TypeError, ValueError) as exc:
@@ -11288,13 +11354,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     @staticmethod
     def _representative_number(value: Any) -> Optional[float]:
-        if isinstance(value, bool):
-            return None
-        if isinstance(value, (int, float)):
+        if is_declared_real_scalar(value) and isinstance(value, (int, float)):
             return float(value)
         if isinstance(value, (list, tuple)) and len(value) == 2:
             try:
-                return (float(value[0]) + float(value[1])) / 2.0
+                if not is_declared_real_scalar(
+                    value[0],
+                    allow_numeric_str=True,
+                ) or not is_declared_real_scalar(
+                    value[1],
+                    allow_numeric_str=True,
+                ):
+                    raise TypeError
+                return (
+                    float(value[0]) + float(value[1])
+                ) / 2.0
             except (TypeError, ValueError):
                 return None
         return None

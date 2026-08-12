@@ -17,6 +17,7 @@ from simulator.chemistry.kernel.capabilities import (
 from simulator.chemistry.kernel.dto import IntentRequest, IntentResult
 from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+from simulator.scalar_boundary import is_declared_real_scalar
 
 
 _OXIDE_MOLAR_MASS_G_MOL = {
@@ -269,12 +270,18 @@ class BuiltinOverheadGasEquilibriumProvider(ChemistryProvider):
             if not parent_oxide or not reference_oxide or not reference_species:
                 continue
             fraction_raw = payload.get("fraction", 1.0)
+            scale_raw = payload.get("activity_ratio_scale", 0.0)
+            if not is_declared_real_scalar(
+                fraction_raw,
+                allow_numeric_str=True,
+            ) or not is_declared_real_scalar(scale_raw, allow_numeric_str=True):
+                continue
             spec = {
                 "parent_oxide": parent_oxide,
                 "reference_oxide": reference_oxide,
                 "reference_species": reference_species,
                 "activity_ratio_scale": max(
-                    0.0, float(payload.get("activity_ratio_scale") or 0.0)
+                    0.0, float(scale_raw)
                 ),
                 "fraction": max(0.0, float(fraction_raw)),
             }
@@ -329,6 +336,8 @@ class BuiltinOverheadGasEquilibriumProvider(ChemistryProvider):
             molar_mass = _OXIDE_MOLAR_MASS_G_MOL.get(str(oxide))
             if molar_mass is None:
                 continue
+            if not is_declared_real_scalar(wt_pct, allow_numeric_str=True):
+                continue
             amount = max(0.0, float(wt_pct or 0.0))
             if amount > 0.0:
                 oxide_moles[str(oxide)] = amount / molar_mass
@@ -344,11 +353,14 @@ class BuiltinOverheadGasEquilibriumProvider(ChemistryProvider):
     def _positive_float_mapping(raw: Any) -> dict[str, float]:
         if not isinstance(raw, Mapping):
             return {}
-        return {
-            str(key): max(0.0, float(value))
-            for key, value in dict(raw).items()
-            if max(0.0, float(value or 0.0)) > 0.0
-        }
+        result: dict[str, float] = {}
+        for key, value in dict(raw).items():
+            if not is_declared_real_scalar(value, allow_numeric_str=True):
+                continue
+            numeric = max(0.0, float(value))
+            if numeric > 0.0:
+                result[str(key)] = numeric
+        return result
 
     @classmethod
     def _element_species_mapping(cls, raw: Any) -> dict[str, dict[str, float]]:

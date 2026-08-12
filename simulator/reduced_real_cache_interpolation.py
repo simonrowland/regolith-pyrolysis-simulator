@@ -17,6 +17,7 @@ from simulator.reduced_real_determinism import (
     physics_control_rung_error_budget,
 )
 from simulator.interpolation_uncertainty import build_interpolation_uncertainty_vector
+from simulator.scalar_boundary import is_declared_real_scalar
 
 
 INTERPOLATION_NEIGHBOR_K = 4
@@ -645,6 +646,8 @@ def _weighted_average_scalar(
         value = result.get(field_name)
         if value is None:
             continue
+        if not is_declared_real_scalar(value, allow_numeric_str=True):
+            continue
         weighted += float(weight) * float(value)
         total_weight += float(weight)
     if total_weight <= 0.0:
@@ -769,6 +772,12 @@ def _simplex_barycentric_weights(
 ) -> list[float] | None:
     dimension = len(query_vector)
     if len(simplex_vectors) != dimension + 1:
+        return None
+    if any(
+        not is_declared_real_scalar(value, allow_numeric_str=True)
+        for vector in (query_vector, *simplex_vectors)
+        for value in vector
+    ):
         return None
     v0 = [float(value) for value in simplex_vectors[0]]
     matrix = [

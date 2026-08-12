@@ -6,6 +6,8 @@ import math
 from collections.abc import Mapping
 from typing import Any
 
+from simulator.scalar_boundary import is_declared_real_scalar
+
 DEFAULT_VACUUM_FLOOR_BAR = 1.0e-9
 MOON_VACUUM_FLOOR_BAR = 1.3e-12
 ASTEROID_VACUUM_FLOOR_BAR = 1.0e-14
@@ -45,6 +47,8 @@ def normalize_body_name(body: object) -> str:
 
 def _positive_finite_bar(value: object, *, field: str) -> float:
     try:
+        if not is_declared_real_scalar(value, allow_numeric_str=True):
+            raise TypeError
         pressure_bar = float(value)
     except (TypeError, ValueError) as exc:
         raise ValueError(f"{field} must be numeric, got {value!r}") from exc
@@ -118,4 +122,3 @@ def feedstock_body(feedstock: Mapping[str, Any]) -> str:
         or feedstock.get("planetary_body")
         or environment.get("planetary_body")
     )
-

@@ -6,14 +6,22 @@ from collections.abc import Mapping
 import math
 from typing import Any
 
+from simulator.scalar_boundary import is_declared_real_scalar
+
 
 def _representative_number(value: Any, field: str) -> float | None:
-    if isinstance(value, bool):
-        return None
-    if isinstance(value, (int, float)):
+    if is_declared_real_scalar(value) and isinstance(value, (int, float)):
         return _valid_declared_number(float(value), field)
     if isinstance(value, (list, tuple)) and len(value) == 2:
         try:
+            if not is_declared_real_scalar(
+                value[0],
+                allow_numeric_str=True,
+            ) or not is_declared_real_scalar(
+                value[1],
+                allow_numeric_str=True,
+            ):
+                raise TypeError
             low_raw = float(value[0])
             high_raw = float(value[1])
         except (TypeError, ValueError):

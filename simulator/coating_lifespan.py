@@ -24,6 +24,7 @@ from types import MappingProxyType
 from typing import Any, Callable, Mapping, Sequence
 
 from simulator.diagnostics import wall_deposit_sticking_authority_status
+from simulator.scalar_boundary import is_declared_real_scalar
 
 
 GROUNDING_UNGROUNDED = "ungrounded_threshold"
@@ -346,6 +347,16 @@ def project_lifecycle(
     thickness_limit_m: float | None,
     resinter_threshold_kg: float | None = None,
 ) -> LifecycleProjection:
+    if thickness_limit_m is not None:
+        thickness_limit_m = _positive_finite(
+            thickness_limit_m,
+            "thickness_limit_m",
+        )
+    if resinter_threshold_kg is not None:
+        resinter_threshold_kg = _positive_finite(
+            resinter_threshold_kg,
+            "resinter_threshold_kg",
+        )
     threshold_params = {
         "resinter_threshold_kg": resinter_threshold_kg,
         "thickness_limit_m": thickness_limit_m,
@@ -467,6 +478,11 @@ def campaigns_to_resinter_total(
     resinter_threshold_kg: float | None,
     authoritative_for_resinter: bool,
 ) -> CampaignsToResinterTotal:
+    if resinter_threshold_kg is not None:
+        resinter_threshold_kg = _positive_finite(
+            resinter_threshold_kg,
+            "resinter_threshold_kg",
+        )
     total_wall_load_kg = sum(
         float(kg)
         for species_kg in wall_deposit_by_segment_species_kg.values()
@@ -621,6 +637,8 @@ def _freeze_value(value: Any) -> Any:
 
 def _finite_float(value: Any, field: str) -> float:
     try:
+        if not is_declared_real_scalar(value, allow_numeric_str=True):
+            raise TypeError
         amount = float(value)
     except (TypeError, ValueError) as exc:
         raise FoulingProjectionError(f"{field} must be numeric") from exc

@@ -30,6 +30,7 @@ from simulator.physical_constants import (
     MELT_DISSOCIATION_PO2_MAX_BAR,
     MELT_DISSOCIATION_PO2_MIN_BAR,
 )
+from simulator.scalar_boundary import is_declared_real_scalar
 
 from simulator.alpha_kinetics import AlphaSpecError, parse_alpha_contract
 from simulator.vapour_rail.activity import (
@@ -974,7 +975,10 @@ class CompiledPressureEvaluator:
                 for _component_id, activity_obj in reaction_inputs.activities.items():
                     if hasattr(activity_obj, "as_pressure_activity"):
                         activity_value = activity_obj.as_pressure_activity()
-                    elif isinstance(activity_obj, (int, float)):
+                    elif is_declared_real_scalar(activity_obj) and isinstance(
+                        activity_obj,
+                        (int, float),
+                    ):
                         activity_value = float(activity_obj)
                     if activity_value is not None:
                         break

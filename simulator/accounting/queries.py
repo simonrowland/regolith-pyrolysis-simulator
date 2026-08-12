@@ -28,6 +28,7 @@ from simulator.accounting.formulas import (
     ATOMIC_WEIGHTS_G_PER_MOL,
     resolve_species_formula,
 )
+from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.vapour_rail.instrumentation import (
     FROZEN_SIO_SOURCE_VAPOR_CEILING_MOL,
@@ -1325,6 +1326,8 @@ def _stage0_foulant_registry(sim: Any) -> Any | None:
 
 def _stage0_positive_float(value: Any) -> float:
     try:
+        if not is_declared_real_scalar(value, allow_numeric_str=True):
+            raise TypeError
         amount = float(value)
     except (TypeError, ValueError):
         return 0.0
@@ -1353,6 +1356,8 @@ def _stage0_positive_mass_sum(values: Any) -> float:
 
 def _stage0_optional_float(value: Any) -> float | None:
     try:
+        if not is_declared_real_scalar(value, allow_numeric_str=True):
+            raise TypeError
         amount = float(value)
     except (TypeError, ValueError):
         return None
@@ -2367,6 +2372,8 @@ def _stage0_hourly_residual_interval(
 
 def _stage0_required_non_negative_float(value: Any, name: str) -> float:
     try:
+        if not is_declared_real_scalar(value, allow_numeric_str=True):
+            raise TypeError
         amount = float(value)
     except (TypeError, ValueError) as exc:
         raise AccountingError(f"Stage-0 foulant {name} must be numeric") from exc

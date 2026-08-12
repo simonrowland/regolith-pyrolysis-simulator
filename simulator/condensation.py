@@ -99,6 +99,7 @@ from simulator.accounting.queries import (
 )
 from simulator.config import load_config_bundle
 from simulator.coating_rate import continuous_wall_deposition_flux
+from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.core import (
     CondensationTrain, CondensationStage, EvaporationFlux, MeltState,
 )
@@ -549,7 +550,11 @@ def _validate_alkali_activity_entry(path: Path, species: str, entry: Any) -> Non
             f'{path}: alkali_activity_depression.{species} missing saturation'
         )
     nominal = saturation.get('nominal_cold_wall')
-    if not isinstance(nominal, (int, float)) or float(nominal) <= 0.0:
+    if (
+        not is_declared_real_scalar(nominal)
+        or not isinstance(nominal, (int, float))
+        or float(nominal) <= 0.0
+    ):
         raise ValueError(
             f'{path}: alkali_activity_depression.{species} missing numeric '
             'nominal_cold_wall saturation'
@@ -1818,6 +1823,16 @@ class CondensationModel:
         )
         self.species_formula_registry = species_formula_registry or {}
 
+        for label, value in (
+            ('wall_surface_area_m2', wall_surface_area_m2),
+            ('wall_temperature_C', wall_temperature_C),
+        ):
+            if value is not None and not is_declared_real_scalar(
+                value,
+                allow_numeric_str=True,
+            ):
+                raise ValueError(f'{label} must be numeric')
+
         # 0.5.4.1 review-cluster-C (P2 #1, evening-4commits review):
         # per-instance per-species condensation temperatures so each
         # CondensationModel can carry its own setpoints overrides
@@ -1992,6 +2007,11 @@ class CondensationModel:
         ):
             if raw_temperature is None:
                 continue
+            if not is_declared_real_scalar(
+                raw_temperature,
+                allow_numeric_str=True,
+            ):
+                raise ValueError(f'{label} must be numeric')
             value = float(raw_temperature)
             if not math.isfinite(value) or value <= -273.15:
                 raise ValueError(
@@ -2007,6 +2027,11 @@ class CondensationModel:
                 if not math.isfinite(area) or area < 0.0:
                     raise ValueError(f'stage area {stage!r} must be finite and non-negative')
         if overhead_pressure_mbar is not None:
+            if not is_declared_real_scalar(
+                overhead_pressure_mbar,
+                allow_numeric_str=True,
+            ):
+                raise ValueError('overhead_pressure_mbar must be numeric')
             pressure = float(overhead_pressure_mbar)
             if not math.isfinite(pressure) or pressure < 0.0:
                 raise ValueError(
@@ -2039,9 +2064,17 @@ class CondensationModel:
                 raise ValueError('campaign_hour must be finite and non-negative')
         if pipe_segment_temperatures_C is not None:
             for segment in self.pipe_segments:
-                raw_temperature = float(pipe_segment_temperatures_C.get(
+                raw_temperature = pipe_segment_temperatures_C.get(
                     segment.name, self.wall_temperature_C
-                ))
+                )
+                if not is_declared_real_scalar(
+                    raw_temperature,
+                    allow_numeric_str=True,
+                ):
+                    raise ValueError(
+                        f'{segment.name} wall temperature must be numeric'
+                    )
+                raw_temperature = float(raw_temperature)
                 if (
                     not math.isfinite(raw_temperature)
                     or raw_temperature <= -273.15
@@ -4253,6 +4286,8 @@ def _coerce_alpha_s(
             evaluation_out.update(context.get('alpha_s_evaluation', {}))
         return value
     try:
+        if not is_declared_real_scalar(spec, allow_numeric_str=True):
+            raise TypeError
         alpha_value = float(spec)
     except (TypeError, ValueError):
         # b-149 instance 5: unparseable alpha previously became 0.0 and
@@ -4836,6 +4871,11 @@ def _flowing_species_partial_pressures_pa(
     reported_partial_pressures_mbar: Mapping[str, float] | None = None,
 ) -> dict[str, float]:
     try:
+        if not is_declared_real_scalar(
+            total_pressure_pa,
+            allow_numeric_str=True,
+        ):
+            raise TypeError
         pressure_pa = float(total_pressure_pa)
     except (TypeError, ValueError) as exc:
         raise ValueError(
@@ -4854,11 +4894,18 @@ def _flowing_species_partial_pressures_pa(
     # single-species Na or K at 10 mbar has p_i<=1000 Pa, below P_sat at a
     # 1500 C wall, so that wall cannot collect either alkali by condensation.
     if reported_partial_pressures_mbar is not None:
-        partial_pressures_pa = {
-            str(species): float(partial_pressure_mbar) * 100.0
-            for species, partial_pressure_mbar
-            in reported_partial_pressures_mbar.items()
-        }
+        partial_pressures_pa: dict[str, float] = {}
+        for species, partial_pressure_mbar in reported_partial_pressures_mbar.items():
+            if not is_declared_real_scalar(
+                partial_pressure_mbar,
+                allow_numeric_str=True,
+            ):
+                raise ValueError(
+                    f'reported partial pressure for {species!r} must be numeric'
+                )
+            partial_pressures_pa[str(species)] = (
+                float(partial_pressure_mbar) * 100.0
+            )
     else:
         molar_flow_by_species: dict[str, float] = {}
         for species, raw_rate_kg_hr in species_kg_hr.items():
@@ -4866,6 +4913,11 @@ def _flowing_species_partial_pressures_pa(
             if molar_mass_g_mol is None or molar_mass_g_mol <= 0.0:
                 continue
             try:
+                if not is_declared_real_scalar(
+                    raw_rate_kg_hr,
+                    allow_numeric_str=True,
+                ):
+                    raise TypeError
                 rate_kg_hr = float(raw_rate_kg_hr)
             except (TypeError, ValueError):
                 continue

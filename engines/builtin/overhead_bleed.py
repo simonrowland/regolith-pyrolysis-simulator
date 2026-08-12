@@ -21,6 +21,7 @@ from simulator.chemistry.kernel.dto import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
+from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.account_ids import OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT
 from simulator.thermal_train import OXYGEN_VAPORIZATION_ENTHALPY_J_PER_MOL
 
@@ -65,6 +66,21 @@ def controlled_flow_capacity(
     upstream_pressure_bar: float,
 ) -> EffectiveTransportCapacity:
     """Resolve a controlled-pO2 flow boundary without prescribing suction."""
+
+    declared = {
+        "pipe_capacity_kg_hr": pipe_capacity_kg_hr,
+        "evolved_flux_kg_hr": evolved_flux_kg_hr,
+        "retained_holdup_kg": retained_holdup_kg,
+        "dt_hr": dt_hr,
+        "upstream_pressure_bar": upstream_pressure_bar,
+    }
+    if equipment_capacity_kg_hr is not None:
+        declared["equipment_capacity_kg_hr"] = equipment_capacity_kg_hr
+    if any(
+        not is_declared_real_scalar(value, allow_numeric_str=True)
+        for value in declared.values()
+    ):
+        raise TypeError("controlled-flow capacity input is missing")
 
     pipe_capacity = max(0.0, float(pipe_capacity_kg_hr))
     equipment_capacity = (

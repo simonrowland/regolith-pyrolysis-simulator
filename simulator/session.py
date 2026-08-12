@@ -26,6 +26,7 @@ from simulator.backends import (
 from simulator.core import CampaignPhase, PyrolysisSimulator
 from simulator.feedstock_guard import BlockedFeedstockError, assert_feedstock_loadable
 from simulator.lab_schedule import LAB_SCHEDULE_OVERRIDE_KEY, normalize_lab_schedule
+from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.state import (
     DecisionPoint,
     DecisionType,
@@ -37,6 +38,8 @@ from simulator.state import (
 
 def _finite_float(value: Any, label: str) -> float:
     try:
+        if not is_declared_real_scalar(value, allow_numeric_str=True):
+            raise TypeError
         number = float(value)
     except (TypeError, ValueError) as exc:
         raise ValueError(f"{label} must be numeric") from exc
@@ -673,6 +676,8 @@ def drive_session(
 ) -> Iterable[StepResult]:
     """Drive a session under a policy outside ``advance()``."""
 
+    if not is_declared_real_scalar(hours, allow_numeric_str=True):
+        raise TypeError(f"hours must be numeric, not {type(hours).__name__}")
     for _ in range(int(hours)):
         if stop_at_stage0_exit and _at_stage0_exit(session):
             return

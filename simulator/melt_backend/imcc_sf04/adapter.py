@@ -35,6 +35,7 @@ from simulator.melt_backend.imcc_sf04.kernel import (
     label_research_datapack,
     solve_imcc_sf04,
 )
+from simulator.scalar_boundary import is_declared_real_scalar
 
 
 # Stable molar masses (g/mol) for the IMCC-SF04 parent components.
@@ -138,9 +139,7 @@ class ImccAdapterLabels:
 
 def _as_fraction(value: Any) -> Fraction:
     """Parse a JSON numeric value as an exact rational."""
-    if isinstance(value, str):
-        return Fraction(value)
-    if isinstance(value, (int, float)):
+    if is_declared_real_scalar(value, allow_numeric_str=True):
         return Fraction(str(value))
     raise TypeError(f"cannot parse {value!r} as a rational")
 
@@ -390,8 +389,11 @@ def load_datapack(path: str | Path) -> ImccLoadedDatapack:
 
         A_val = row.get("A")
         B_val = row.get("B")
-        if not isinstance(A_val, (int, float)) or not isinstance(
-            B_val, (int, float)
+        if (
+            not is_declared_real_scalar(A_val)
+            or not isinstance(A_val, (int, float))
+            or not is_declared_real_scalar(B_val)
+            or not isinstance(B_val, (int, float))
         ):
             raise ImccMalformedDatapackError(
                 f"row {idx} A/B must be numeric"
@@ -403,6 +405,13 @@ def load_datapack(path: str | Path) -> ImccLoadedDatapack:
         if not isinstance(t_domain, list) or len(t_domain) != 2:
             raise ImccMalformedDatapackError(
                 f"row {idx} missing valid T_domain_K [low, high]"
+            )
+        if not all(
+            is_declared_real_scalar(value, allow_numeric_str=True)
+            for value in t_domain
+        ):
+            raise ImccMalformedDatapackError(
+                f"row {idx} T_domain_K values must be numeric"
             )
         domains.append((float(t_domain[0]), float(t_domain[1])))
 

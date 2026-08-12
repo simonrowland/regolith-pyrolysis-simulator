@@ -14,6 +14,7 @@ from simulator.chemistry.ellingham_thermo import (
     ellingham_segment_for_temperature,
 )
 from simulator.physical_constants import FARADAY
+from simulator.scalar_boundary import is_declared_real_scalar
 
 # Static decomposition voltages at ~1873 K / ~1600 C (V).
 # Retained as the non-authoritative fallback anchor for species outside the
@@ -97,6 +98,8 @@ class MREDecompositionVoltageReference:
 
 def _coerce_temperature_K(temperature_K: float | None) -> float:
     if temperature_K is None:
+        return MRE_REFERENCE_TEMPERATURE_K
+    if not is_declared_real_scalar(temperature_K, allow_numeric_str=True):
         return MRE_REFERENCE_TEMPERATURE_K
     try:
         value = float(temperature_K)
@@ -276,13 +279,22 @@ def canonical_mre_decomposition_voltage(
 
 def coerce_mre_decomposition_voltage(value: Any) -> float | None:
     """Coerce a YAML decomposition voltage to a finite float."""
-    if value is None or isinstance(value, bool):
+    if value is None or (
+        not isinstance(value, str)
+        and not is_declared_real_scalar(value, allow_numeric_str=True)
+        and not isinstance(value, (list, tuple))
+    ):
         return None
     if isinstance(value, (int, float)):
         voltage = float(value)
         return voltage if math.isfinite(voltage) else None
     if isinstance(value, (list, tuple)):
         if len(value) != 2:
+            return None
+        if not all(
+            is_declared_real_scalar(item, allow_numeric_str=True)
+            for item in value
+        ):
             return None
         try:
             low = float(value[0])

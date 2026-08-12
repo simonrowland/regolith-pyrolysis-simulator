@@ -42,6 +42,7 @@ from simulator.optimize.recipe import (
     allowlist_version as DEFAULT_ALLOWLIST_VERSION,
     default_bounds_digest,
 )
+from simulator.scalar_boundary import is_declared_real_scalar
 
 
 _VERSION_PATH = Path(__file__).resolve().parents[2] / "VERSION"
@@ -129,9 +130,15 @@ class EvalSpec:
         object.__setattr__(
             self, "backend_name", canonical_backend_name(self.backend_name)
         )
-        if not isinstance(self.hours, int):
+        if not is_declared_real_scalar(self.hours) or not isinstance(
+            self.hours,
+            int,
+        ):
             raise TypeError("hours must be an int")
-        if not isinstance(self.mass_kg, (int, float, Decimal)):
+        if not is_declared_real_scalar(self.mass_kg) or not isinstance(
+            self.mass_kg,
+            (int, float, Decimal),
+        ):
             raise TypeError("mass_kg must be numeric")
         if not isinstance(self.c5_enabled, bool):
             raise TypeError("c5_enabled must be a bool")

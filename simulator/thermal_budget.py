@@ -32,6 +32,7 @@ from typing import Any
 from simulator.equipment import EquipmentDesigner, STEFAN_BOLTZMANN
 from simulator.furnace_materials import load_furnace_materials
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.state import GAS_CONSTANT, MOLAR_MASS, OXIDE_TO_METAL, STOICH_RATIOS
 
 
@@ -1172,6 +1173,8 @@ def _kelvin(value_K: float, name: str) -> float:
 
 def _finite(value: float, name: str) -> float:
     try:
+        if not is_declared_real_scalar(value, allow_numeric_str=True):
+            raise TypeError
         number = float(value)
     except (TypeError, ValueError) as exc:
         raise ValueError(f"{name} must be numeric") from exc

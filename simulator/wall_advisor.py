@@ -8,6 +8,8 @@ from typing import Any, Iterable
 
 import yaml
 
+from simulator.scalar_boundary import is_declared_real_scalar
+
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
 DEFAULT_WALL_MATERIALS_PATH = DATA_DIR / "wall_materials.yaml"
@@ -145,6 +147,8 @@ def resolve_wall_operating_point(
 def _validated_knob(name: str, value: float | None) -> float | None:
     if value is None:
         return None
+    if not is_declared_real_scalar(value, allow_numeric_str=True):
+        raise TypeError(f"{name} must be numeric")
     number = float(value)
     if not math.isfinite(number) or number < 0.0:
         raise ValueError(f"{name} must be a non-negative finite value, got {value!r}")
@@ -631,6 +635,8 @@ def _max_rank(current: str, candidate: str | None, ranks: dict[str, int]) -> str
 def _optional_float(value: Any) -> float | None:
     if value is None:
         return None
+    if not is_declared_real_scalar(value, allow_numeric_str=True):
+        raise TypeError("wall service temperature values must be numeric")
     number = float(value)
     if not math.isfinite(number):
         raise ValueError("wall service temperature values must be finite")

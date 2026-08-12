@@ -11,6 +11,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 import math
 
+from simulator.scalar_boundary import is_declared_real_scalar
+
 
 @dataclass(frozen=True)
 class WallDepositionFlux:
@@ -74,6 +76,11 @@ def continuous_wall_deposition_flux(
         "gas_resistance_pa_m2_s_mol": gas_resistance_pa_m2_s_mol,
         "wall_temperature_K": wall_temperature_K,
     }
+    if any(
+        not is_declared_real_scalar(value, allow_numeric_str=True)
+        for value in values.values()
+    ):
+        raise TypeError("wall-deposition rate input is missing")
     if any(not math.isfinite(float(value)) for value in values.values()):
         raise ValueError("wall-deposition rate inputs must be finite")
     if bulk_pressure_pa < 0.0 or equilibrium_pressure_pa < 0.0:
@@ -89,7 +96,11 @@ def continuous_wall_deposition_flux(
     if (
         reevaporation_flux_mol_m2_s is not None
         and (
-            not math.isfinite(float(reevaporation_flux_mol_m2_s))
+            not is_declared_real_scalar(
+                reevaporation_flux_mol_m2_s,
+                allow_numeric_str=True,
+            )
+            or not math.isfinite(float(reevaporation_flux_mol_m2_s))
             or reevaporation_flux_mol_m2_s < 0.0
         )
     ):

@@ -68,6 +68,7 @@ from simulator.alpha_kinetics import (
 from simulator.chemistry.kernel.capabilities import CapabilityProfile, ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, IntentResult
 from simulator.chemistry.kernel.provider import ChemistryProvider
+from simulator.scalar_boundary import is_declared_real_scalar
 
 
 _DEFAULT_EVAPORATION_ALPHA = 1.0
@@ -214,12 +215,17 @@ def _coerce_alpha_by_species(alpha_control) -> dict[str, Any]:
     if isinstance(alpha_control, Mapping):
         coerced: dict[str, Any] = {}
         for species, value in alpha_control.items():
-            coerced[str(species)] = (
-                dict(value) if isinstance(value, Mapping) else float(value)
-            )
+            if isinstance(value, Mapping):
+                coerced[str(species)] = dict(value)
+                continue
+            if not is_declared_real_scalar(value, allow_numeric_str=True):
+                raise TypeError(f"alpha for {species} must be numeric")
+            coerced[str(species)] = float(value)
         return coerced
     if alpha_control is None:
         return {}
+    if not is_declared_real_scalar(alpha_control, allow_numeric_str=True):
+        raise TypeError("alpha_control must be numeric or a mapping")
     return {"*": float(alpha_control)}
 
 
@@ -252,7 +258,13 @@ def _coerce_alpha_envelope_by_species(alpha_envelope_control) -> dict[str, tuple
     for species, envelope in alpha_envelope_control.items():
         if not isinstance(envelope, (list, tuple)) or len(envelope) != 2:
             continue
-        low, high = float(envelope[0]), float(envelope[1])
+        low_raw, high_raw = envelope
+        if not is_declared_real_scalar(
+            low_raw,
+            allow_numeric_str=True,
+        ) or not is_declared_real_scalar(high_raw, allow_numeric_str=True):
+            raise TypeError(f"alpha envelope for {species} must be numeric")
+        low, high = float(low_raw), float(high_raw)
         envelopes[str(species)] = (low, high)
     return envelopes
 
@@ -270,6 +282,8 @@ def _flux_uncertainty_pct(
 
 def _finite_float(value, default: float) -> float:
     try:
+        if not is_declared_real_scalar(value, allow_numeric_str=True):
+            raise TypeError
         raw = float(value)
     except (TypeError, ValueError):
         return default
@@ -291,11 +305,9 @@ def _stir_was_clamped(value, applied: float) -> bool:
 
 
 def _validated_stir_factor(value: Any, *, axis: str) -> float:
-    if isinstance(value, bool):
-        raise EvaporationFluxConfigurationError(
-            f"{axis}_stir_factor must be finite and non-negative"
-        )
     try:
+        if not is_declared_real_scalar(value, allow_numeric_str=True):
+            raise TypeError
         raw = float(value)
     except (TypeError, ValueError) as exc:
         raise EvaporationFluxConfigurationError(
@@ -810,8 +822,52 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         stoich_by_species = dict(controls.get("stoich_by_species") or {})
         available_oxide_kg = dict(controls.get("available_oxide_kg") or {})
 
+        for mapping_name, values in (
+            ("vapour_batch_flux_pressures_Pa", vapor_pressures),
+            ("overhead_partials_Pa", overhead_partials),
+            ("molar_mass_kg_mol", molar_masses_kg_mol),
+            ("available_oxide_kg", available_oxide_kg),
+        ):
+            if any(
+                not is_declared_real_scalar(value, allow_numeric_str=True)
+                for value in values.values()
+            ):
+                return IntentResult(
+                    intent=ChemistryIntent.EVAPORATION_FLUX,
+                    status="refused",
+                    transition=None,
+                    control_audit=control_audit,
+                    diagnostic={"reason": f"invalid_{mapping_name}"},
+                )
+        for species, stoich in stoich_by_species.items():
+            oxide_per_product_kg = (
+                stoich.get("oxide_per_product_kg")
+                if isinstance(stoich, Mapping)
+                else None
+            )
+            if oxide_per_product_kg is not None and not is_declared_real_scalar(
+                oxide_per_product_kg,
+                allow_numeric_str=True,
+            ):
+                return IntentResult(
+                    intent=ChemistryIntent.EVAPORATION_FLUX,
+                    status="refused",
+                    transition=None,
+                    control_audit=control_audit,
+                    diagnostic={
+                        "reason": "invalid_stoich_by_species",
+                        "species": str(species),
+                    },
+                )
+
         try:
-            melt_surface_area_m2 = float(controls.get("melt_surface_area_m2", 0.0))
+            raw_melt_surface_area_m2 = controls.get("melt_surface_area_m2", 0.0)
+            if not is_declared_real_scalar(
+                raw_melt_surface_area_m2,
+                allow_numeric_str=True,
+            ):
+                raise TypeError
+            melt_surface_area_m2 = float(raw_melt_surface_area_m2)
         except (TypeError, ValueError):
             melt_surface_area_m2 = math.nan
         if not math.isfinite(melt_surface_area_m2) or melt_surface_area_m2 < 0.0:

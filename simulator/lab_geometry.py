@@ -7,6 +7,7 @@ import math
 from typing import Any, Mapping
 
 from simulator.state import PipeSegment
+from simulator.scalar_boundary import is_declared_real_scalar
 
 
 LAB_GEOMETRY_SCALE = "gram_lab"
@@ -389,6 +390,8 @@ def _required_unit_interval(value: Any, field: str) -> float:
 
 def _required_finite(value: Any, field: str) -> float:
     try:
+        if not is_declared_real_scalar(value, allow_numeric_str=True):
+            raise TypeError
         result = float(value)
     except (TypeError, ValueError) as exc:
         raise LabGeometryError("invalid_lab_geometry_number", field) from exc

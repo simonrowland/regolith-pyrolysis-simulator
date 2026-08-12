@@ -29,6 +29,7 @@ from simulator.environment import (
     DEFAULT_VACUUM_FLOOR_BAR,
     vacuum_floor_bar_for_environment,
 )
+from simulator.scalar_boundary import is_declared_real_scalar
 
 
 def reject_wrong_intent(
@@ -66,6 +67,29 @@ def unpack_controls(request: IntentRequest) -> dict[str, Any]:
     """
 
     return dict(request.control_inputs or {})
+
+
+_CONTROL_DEFAULT_MISSING = object()
+
+
+def control_float(
+    controls: Mapping[str, Any],
+    name: str,
+    default: Any = _CONTROL_DEFAULT_MISSING,
+) -> float:
+    """Coerce one declared numeric control without admitting booleans.
+
+    Providers use ``default`` only where an omitted/non-scalar control already
+    means missing input.  Without a default, the provider keeps the hard
+    ``ValueError`` contract used by its existing numeric coercion boundary.
+    """
+
+    value = controls.get(name)
+    if not is_declared_real_scalar(value, allow_numeric_str=True):
+        if default is _CONTROL_DEFAULT_MISSING:
+            raise ValueError(f"{name} must be numeric, got {value!r}")
+        return float(default)
+    return float(value)
 
 
 def composition_wt_pct_from_account_view(
@@ -329,7 +353,7 @@ def resolve_transport_pO2_bar(
     if "pO2_bar" in controls and controls.get("pO2_bar") is not None:
         raw_pO2 = controls.get("pO2_bar")
         try:
-            pO2_bar = float(raw_pO2)
+            pO2_bar = control_float(controls, "pO2_bar")
         except (TypeError, ValueError) as exc:
             raise ValueError(
                 f"pO2_bar must be numeric, got {raw_pO2!r}"
@@ -348,6 +372,11 @@ def resolve_transport_pO2_bar(
 
     if request.fO2_log is not None:
         try:
+            if not is_declared_real_scalar(
+                request.fO2_log,
+                allow_numeric_str=True,
+            ):
+                raise TypeError
             fO2_log = float(request.fO2_log)
         except (TypeError, ValueError) as exc:
             raise ValueError(
@@ -386,7 +415,7 @@ def resolve_request_vacuum_floor_bar(
     explicit_floor = controls.get("vacuum_floor_bar")
     if explicit_floor is not None:
         try:
-            resolved_floor = float(explicit_floor)
+            resolved_floor = control_float(controls, "vacuum_floor_bar")
         except (TypeError, ValueError) as exc:
             raise ValueError(
                 f"vacuum_floor_bar must be numeric, got {explicit_floor!r}"
@@ -407,6 +436,8 @@ def resolve_request_vacuum_floor_bar(
         )
 
     try:
+        if not is_declared_real_scalar(floor_bar, allow_numeric_str=True):
+            raise TypeError
         resolved_floor = float(floor_bar)
     except (TypeError, ValueError) as exc:
         raise ValueError(f"floor_bar must be numeric, got {floor_bar!r}") from exc

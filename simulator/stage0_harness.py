@@ -37,6 +37,7 @@ from simulator.core import (
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
 from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
 from simulator.session import SimSession, SimSessionConfig, StepResult
+from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.state import CampaignPhase, DecisionType
 
 STAGE0_CAMPAIGNS = frozenset({CampaignPhase.C0, CampaignPhase.C0B})
@@ -133,7 +134,7 @@ def _resolve_group(
 
 
 def _positive_float(value: Any) -> float | None:
-    if not isinstance(value, (int, float)):
+    if not is_declared_real_scalar(value) or not isinstance(value, (int, float)):
         return None
     parsed = float(value)
     if parsed <= 0.0:

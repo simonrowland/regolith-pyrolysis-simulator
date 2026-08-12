@@ -20,6 +20,7 @@ from simulator.chemistry.kernel.dto import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
+from simulator.scalar_boundary import is_declared_real_scalar
 
 
 PROCESS_OVERHEAD_GAS_ACCOUNT = "process.overhead_gas"
@@ -31,6 +32,8 @@ TRANSITION_NAME = "oxygen_bubbler_passthrough"
 def _finite_nonnegative_control(controls: dict, key: str) -> float:
     raw_value = controls.get(key, 0.0)
     try:
+        if not is_declared_real_scalar(raw_value, allow_numeric_str=True):
+            raise TypeError
         value = float(raw_value)
     except (TypeError, ValueError) as exc:
         raise ValueError(f"{key} must be numeric, got {raw_value!r}") from exc

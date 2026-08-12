@@ -38,6 +38,8 @@ import math
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Mapping, Optional
 
+from simulator.scalar_boundary import is_declared_real_scalar
+
 from simulator.lab_geometry import (
     LAB_GEOMETRY_SCALE,
     LabGeometry,
@@ -435,7 +437,10 @@ class EquipmentDesigner:
     @classmethod
     def _positive_float_or_none(cls, value: Any) -> float | None:
         try:
-            result = float(cls._config_value(value))
+            raw = cls._config_value(value)
+            if not is_declared_real_scalar(raw, allow_numeric_str=True):
+                raise TypeError
+            result = float(raw)
         except (TypeError, ValueError):
             return None
         if not math.isfinite(result) or result <= 0.0:

@@ -117,6 +117,7 @@ from simulator.melt_backend.base import (
 )
 from simulator.melt_backend.melt_envelope import melt_extrapolation_diagnostic
 from simulator.state import OXIDE_SPECIES
+from simulator.scalar_boundary import is_declared_real_scalar
 
 
 # ---------------------------------------------------------------------------
@@ -820,17 +821,25 @@ class VapoRockBackend(MeltBackend):
             self._config.get('warm_worker', False)
         )
         self._reuse_system = bool(self._config.get('reuse_system', False))
-        pool_size = int(self._config.get('warm_pool_size', 1))
+        raw_pool_size = self._config.get('warm_pool_size', 1)
+        if not is_declared_real_scalar(raw_pool_size, allow_numeric_str=True):
+            self._last_error = 'VapoRock warm_pool_size must be numeric'
+            self._warnings.append(self._last_error)
+            return False
+        pool_size = int(raw_pool_size)
         if pool_size <= 0:
             self._last_error = 'VapoRock warm_pool_size must be positive'
             self._warnings.append(self._last_error)
             return False
         self._warm_pool_size = pool_size
-        warm_timeout = float(
-            self._config.get(
-                'warm_call_timeout_s', VAPOROCK_WARM_CALL_TIMEOUT_S
-            )
+        raw_warm_timeout = self._config.get(
+            'warm_call_timeout_s', VAPOROCK_WARM_CALL_TIMEOUT_S
         )
+        if not is_declared_real_scalar(raw_warm_timeout, allow_numeric_str=True):
+            self._last_error = 'VapoRock warm_call_timeout_s must be numeric'
+            self._warnings.append(self._last_error)
+            return False
+        warm_timeout = float(raw_warm_timeout)
         if not math.isfinite(warm_timeout) or warm_timeout <= 0.0:
             self._last_error = (
                 'VapoRock warm_call_timeout_s must be finite and positive'
@@ -838,12 +847,18 @@ class VapoRockBackend(MeltBackend):
             self._warnings.append(self._last_error)
             return False
         self._warm_call_timeout_s = warm_timeout
-        startup_timeout = float(
-            self._config.get(
-                'worker_startup_timeout_s',
-                VAPOROCK_WORKER_STARTUP_TIMEOUT_S,
-            )
+        raw_startup_timeout = self._config.get(
+            'worker_startup_timeout_s',
+            VAPOROCK_WORKER_STARTUP_TIMEOUT_S,
         )
+        if not is_declared_real_scalar(
+            raw_startup_timeout,
+            allow_numeric_str=True,
+        ):
+            self._last_error = 'VapoRock worker_startup_timeout_s must be numeric'
+            self._warnings.append(self._last_error)
+            return False
+        startup_timeout = float(raw_startup_timeout)
         if not math.isfinite(startup_timeout) or startup_timeout <= 0.0:
             self._last_error = (
                 'VapoRock worker_startup_timeout_s must be finite and positive'

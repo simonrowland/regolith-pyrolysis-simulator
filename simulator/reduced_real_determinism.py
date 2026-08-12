@@ -40,6 +40,7 @@ from simulator.fe_redox import (
     kress91_referenced_log_fO2,
 )
 from simulator.fidelity_vocabulary import EvidenceClass
+from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.melt_backend.base import (
     EquilibriumResult,
     RealBackendAuthority,
@@ -172,12 +173,22 @@ class ControlQuantization:
             "pressure_bar_quantum",
             "log_fo2_quantum",
         ):
-            value = float(getattr(self, name))
+            raw_value = getattr(self, name)
+            if not is_declared_real_scalar(
+                raw_value,
+                allow_numeric_str=True,
+            ):
+                raise ValueError(f"{name} must be a positive finite quantum")
+            value = float(raw_value)
             if not math.isfinite(value) or value <= 0.0:
                 raise ValueError(f"{name} must be a positive finite quantum")
             object.__setattr__(self, name, value)
         sig_figs = self.composition_sig_figs
-        if not isinstance(sig_figs, int) or sig_figs < 1:
+        if (
+            not is_declared_real_scalar(sig_figs)
+            or not isinstance(sig_figs, int)
+            or sig_figs < 1
+        ):
             raise ValueError("composition_sig_figs must be an int >= 1")
 
     @classmethod
@@ -3391,7 +3402,10 @@ def _control_float(key: Mapping[str, Any], control_name: str) -> float | None:
     if not isinstance(controls, Mapping):
         return None
     value = controls.get(control_name)
-    if value is None:
+    if value is None or not is_declared_real_scalar(
+        value,
+        allow_numeric_str=True,
+    ):
         return None
     try:
         number = float(value)

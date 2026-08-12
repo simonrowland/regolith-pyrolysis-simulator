@@ -29,6 +29,7 @@ from simulator.optimize.recipe import (
     _default_setpoint_value,
 )
 from simulator.optimize.canonical import canonical_json_dumps
+from simulator.scalar_boundary import is_declared_real_scalar
 
 DEFAULT_ANCHOR_DELTA_FRACTION = 0.15
 # Mirrors the physical regulator band enforced by CampaignManager. Keeping the
@@ -1368,4 +1369,6 @@ def _anchor_from_entries(entries: Any) -> RecipePatch | None:
 def _optional_float(value: Any) -> float | None:
     if value is None:
         return None
+    if not is_declared_real_scalar(value, allow_numeric_str=True):
+        raise TypeError(f"must be numeric, not {type(value).__name__}")
     return float(value)

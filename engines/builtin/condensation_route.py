@@ -90,6 +90,7 @@ from simulator.chemistry.kernel.dto import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
+from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.account_ids import CONDENSATION_RETAINED_HOLDUP_ACCOUNT
 from simulator.condensation import (
     C4B_WALL_ROUTE_ORDER,
@@ -572,6 +573,11 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                 )
             for product, raw_ratio in ratios.items():
                 try:
+                    if not is_declared_real_scalar(
+                        raw_ratio,
+                        allow_numeric_str=True,
+                    ):
+                        raise TypeError
                     ratio = float(raw_ratio)
                 except (TypeError, ValueError):
                     ratio = math.nan
@@ -625,6 +631,11 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
 
         raw_wall_fraction = controls.get("wall_deposit_fraction", 0.0)
         try:
+            if not is_declared_real_scalar(
+                raw_wall_fraction,
+                allow_numeric_str=True,
+            ):
+                raise TypeError
             wall_fraction = float(raw_wall_fraction)
         except (TypeError, ValueError):
             wall_fraction = math.nan
@@ -657,6 +668,11 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         for account, raw_fraction in raw_account_fractions.items():
             account_name = str(account)
             try:
+                if not is_declared_real_scalar(
+                    raw_fraction,
+                    allow_numeric_str=True,
+                ):
+                    raise TypeError
                 fraction = float(raw_fraction)
             except (TypeError, ValueError):
                 fraction = math.nan
@@ -1077,6 +1093,8 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         else:
             value = controls.get("wall_temperature_K")
         try:
+            if not is_declared_real_scalar(value, allow_numeric_str=True):
+                raise TypeError
             temperature_K = float(value)
         except (TypeError, ValueError):
             return None
@@ -1092,6 +1110,13 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         wall_temperature_K: float | None,
     ) -> tuple[float, dict[str, Any]]:
         if species != "Na":
+            if not is_declared_real_scalar(
+                saturation["nominal_cold_wall"],
+                allow_numeric_str=True,
+            ):
+                raise ValueError(
+                    "alkali saturation nominal_cold_wall must be numeric"
+                )
             return float(saturation["nominal_cold_wall"]), {
                 "mode": "fixed_nominal_cold_wall",
                 "proxy_gap": saturation.get("temperature_band_status"),
@@ -1156,6 +1181,16 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                 continue
             if "T_K" not in entry or "ratio" not in entry:
                 continue
+            if not is_declared_real_scalar(
+                entry["T_K"],
+                allow_numeric_str=True,
+            ) or not is_declared_real_scalar(
+                entry["ratio"],
+                allow_numeric_str=True,
+            ):
+                raise ValueError(
+                    "Na saturation temperature_band has non-numeric values"
+                )
             temperature_K = float(entry["T_K"])
             ratio = float(entry["ratio"])
             if not math.isfinite(temperature_K) or not math.isfinite(ratio):
@@ -1328,6 +1363,8 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
     def _wall_deposit_fraction(controls: Mapping[str, Any]) -> float:
         value = controls.get("wall_deposit_fraction", 0.0)
         try:
+            if not is_declared_real_scalar(value, allow_numeric_str=True):
+                raise TypeError
             fraction = float(value)
         except (TypeError, ValueError):
             return 0.0
@@ -1350,6 +1387,11 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                 if account_name not in declared_accounts:
                     continue
                 try:
+                    if not is_declared_real_scalar(
+                        raw_fraction,
+                        allow_numeric_str=True,
+                    ):
+                        raise TypeError
                     fraction = float(raw_fraction)
                 except (TypeError, ValueError):
                     continue

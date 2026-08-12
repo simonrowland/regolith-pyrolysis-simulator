@@ -13,6 +13,8 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any
 
+from simulator.scalar_boundary import is_declared_real_scalar
+
 
 # Tunable parameter block. Every empirical coefficient below is provisional and
 # deliberately local to this file so the MinerU/literature sweep can refine it.
@@ -243,6 +245,8 @@ class StructuralActivityFeatures:
 
 def _positive_float(value: Any) -> float:
     try:
+        if not is_declared_real_scalar(value, allow_numeric_str=True):
+            raise TypeError
         candidate = float(value)
     except (TypeError, ValueError):
         return 0.0

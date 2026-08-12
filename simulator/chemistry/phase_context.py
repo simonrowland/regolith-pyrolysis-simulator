@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Any
 
 from ..melt_regime import MeltRegime, melt_regime
+from ..scalar_boundary import is_declared_real_scalar
 
 LIQUIDUS_MATCH_TOLERANCE_C = 0.05
 COMPOSITION_MATCH_EPS = 1.0e-6
@@ -538,6 +539,8 @@ def _json_mapping(value: Any) -> dict[str, float]:
 def _optional_fraction(value: Any) -> float | None:
     if value is None:
         return None
+    if not is_declared_real_scalar(value, allow_numeric_str=True):
+        return None
     try:
         fraction = float(value)
     except (TypeError, ValueError):
@@ -551,6 +554,8 @@ def _caller_fraction(value: Any) -> float | None:
     if value is None:
         return None
     try:
+        if not is_declared_real_scalar(value, allow_numeric_str=True):
+            raise TypeError
         fraction = float(value)
     except (TypeError, ValueError, OverflowError) as exc:
         raise InvalidLiquidFractionError(
@@ -565,6 +570,8 @@ def _caller_fraction(value: Any) -> float | None:
 
 def _finite(value: Any, name: str) -> float:
     try:
+        if not is_declared_real_scalar(value, allow_numeric_str=True):
+            raise TypeError
         number = float(value)
     except (TypeError, ValueError) as exc:
         raise ValueError(f"{name} must be finite; got {value!r}") from exc

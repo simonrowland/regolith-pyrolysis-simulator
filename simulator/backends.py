@@ -33,6 +33,7 @@ from simulator.melt_backend.base import (
     RealBackendFamily,
 )
 from simulator.melt_backend.thermoengine import ThermoEngineBackend
+from simulator.scalar_boundary import is_declared_real_scalar
 
 
 INELIGIBLE_ACTIVE_BACKENDS = ("vaporock", "magemin")
@@ -422,6 +423,12 @@ def _parse_control_quantization_config(
                 f"missing={missing}; extra={extra}"
             )
         try:
+            for field_name in expected:
+                if not is_declared_real_scalar(
+                    value[field_name],
+                    allow_numeric_str=True,
+                ):
+                    raise TypeError(f"{field_name} must be numeric")
             return ControlQuantization(
                 t_k_quantum=float(value["t_k_quantum"]),
                 pressure_bar_quantum=float(value["pressure_bar_quantum"]),

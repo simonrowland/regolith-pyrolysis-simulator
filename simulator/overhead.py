@@ -53,6 +53,7 @@ from engines.builtin.overhead_bleed import (
     controlled_flow_capacity,
 )
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET  # K — Celsius-to-Kelvin offset
+from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.state import GAS_CONSTANT, MOLAR_MASS  # R: J/(mol·K); molar masses: g/mol
 
 O2_KG_PER_MOL = MOLAR_MASS['O2'] / 1000.0  # kg/mol — O2 molar mass; g/mol -> kg/mol
@@ -163,7 +164,10 @@ def _required_positive_finite_float(
     minimum: float = 0.0,
 ) -> float:
     try:
-        result = float(_config_value(value))
+        raw = _config_value(value)
+        if not is_declared_real_scalar(raw, allow_numeric_str=True):
+            raise TypeError
+        result = float(raw)
     except (TypeError, ValueError) as exc:
         raise OverheadConfigurationError(
             f'{field_name} must be a positive finite value'
@@ -796,7 +800,7 @@ class OverheadGasModel:
         config: Any,
         melt: Optional[MeltState],
     ) -> float:
-        if isinstance(config, (int, float)):
+        if is_declared_real_scalar(config) and isinstance(config, (int, float)):
             return float(config)
         if not isinstance(config, Mapping):
             return DEFAULT_PIPE_TEMPERATURE_C
@@ -852,6 +856,8 @@ class OverheadGasModel:
     @staticmethod
     def _optional_float(value: Any, default: float) -> float:
         try:
+            if not is_declared_real_scalar(value, allow_numeric_str=True):
+                raise TypeError
             result = float(value)
         except (TypeError, ValueError):
             return float(default)

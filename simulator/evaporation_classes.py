@@ -27,6 +27,7 @@ from engines.builtin.evaporation_flux import (
     _series_resistance_evaporation_flux_kg_m2_s,
 )
 from simulator.evaporation import _load_evaporation_alpha_by_species
+from simulator.scalar_boundary import is_declared_real_scalar
 
 # ---------------------------------------------------------------------------
 # Paths / store
@@ -1080,16 +1081,26 @@ def _runtime_alpha_map(
 def _scalar_runtime_alpha(raw: Any) -> tuple[float | None, str]:
     if raw is None:
         return None, "missing"
-    if isinstance(raw, (int, float)) and math.isfinite(float(raw)):
+    if (
+        is_declared_real_scalar(raw)
+        and isinstance(raw, (int, float))
+        and math.isfinite(float(raw))
+    ):
         return float(raw), "scalar"
     if isinstance(raw, Mapping):
         # SiO Arrhenius contract — evaluate note only; caller may pass T.
         form = str(raw.get("form") or "")
         if form == "arrhenius" or "A" in raw:
             return None, "arrhenius_contract"
-        if "value" in raw and isinstance(raw["value"], (int, float)):
+        if (
+            "value" in raw
+            and is_declared_real_scalar(raw["value"])
+            and isinstance(raw["value"], (int, float))
+        ):
             return float(raw["value"]), "mapping_value"
         return None, f"unparsed_mapping:{form or 'unknown'}"
+    if not is_declared_real_scalar(raw):
+        return None, "missing"
     return None, f"unparsed_type:{type(raw).__name__}"
 
 

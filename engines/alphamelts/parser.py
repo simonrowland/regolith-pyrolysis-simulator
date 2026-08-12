@@ -24,6 +24,7 @@ import math
 from typing import Any, Dict, Mapping, Optional, Tuple
 
 from engines.alphamelts.result import LiquidusDiagnostics
+from simulator.scalar_boundary import is_declared_real_scalar
 
 
 class ParserError(RuntimeError):
@@ -388,6 +389,8 @@ def _control_float(
     default: float,
 ) -> float:
     value = controls.get(name, default)
+    if not is_declared_real_scalar(value, allow_numeric_str=True):
+        return float(default)
     try:
         result = float(value)
     except (TypeError, ValueError):

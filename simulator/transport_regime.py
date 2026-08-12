@@ -21,6 +21,7 @@ from simulator.transport_constants import (
     VISCOUS_KNUDSEN_MAX,
 )
 from simulator.physical_constants import BOLTZMANN, GAS_CONSTANT
+from simulator.scalar_boundary import is_declared_real_scalar
 
 
 # Single-sourced from the physical_constants leaf (SC-CONST pass-B); byte-identical
@@ -94,6 +95,8 @@ def _refuse(category: str, detail: str | None = None) -> None:
 
 
 def _require_positive(value: float, *, name: str, category: str) -> float:
+    if not is_declared_real_scalar(value, allow_numeric_str=True):
+        raise TypeError(f"{name} must be numeric")
     value = float(value)
     if not math.isfinite(value) or value <= 0.0:
         _refuse(category, f"{name} must be finite and > 0")
@@ -101,6 +104,8 @@ def _require_positive(value: float, *, name: str, category: str) -> float:
 
 
 def _require_nonnegative(value: float, *, name: str, category: str) -> float:
+    if not is_declared_real_scalar(value, allow_numeric_str=True):
+        raise TypeError(f"{name} must be numeric")
     value = float(value)
     if not math.isfinite(value) or value < 0.0:
         _refuse(category, f"{name} must be finite and >= 0")

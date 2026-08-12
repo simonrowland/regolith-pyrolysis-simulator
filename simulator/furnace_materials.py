@@ -10,6 +10,8 @@ from typing import Any
 
 import yaml
 
+from simulator.scalar_boundary import is_declared_real_scalar
+
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
 DEFAULT_FURNACE_MATERIALS_PATH = DATA_DIR / "furnace_materials.yaml"
@@ -158,6 +160,8 @@ def _catalog_items(catalog: Mapping[str, Any]) -> Mapping[str, Any]:
 
 def _finite_float(value: Any, label: str) -> float:
     try:
+        if not is_declared_real_scalar(value, allow_numeric_str=True):
+            raise TypeError
         result = float(value)
     except (TypeError, ValueError) as exc:
         raise ValueError(f"{label} must be numeric") from exc

@@ -20,6 +20,8 @@ from typing import Any, Final
 
 import yaml
 
+from simulator.scalar_boundary import is_declared_real_scalar
+
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_KEMS_SIDECAR: Final[Path] = (
     _REPO_ROOT / "data" / "literature" / "vapour_rail_kems_anchors.yaml"
@@ -143,6 +145,12 @@ class AlphaProvenance:
 
 class KineticsAnchorError(ValueError):
     """Invalid kinetics anchor payload or provenance violation."""
+
+
+def _anchor_float(value: Any, *, species: str, field: str) -> float:
+    if not is_declared_real_scalar(value, allow_numeric_str=True):
+        raise KineticsAnchorError(f"{species}: {field} must be numeric")
+    return float(value)
 
 
 def load_kems_anchors(path: Path | None = None) -> tuple[KineticsAnchorRecord, ...]:
@@ -291,8 +299,13 @@ def alpha_provenance_from_mapping(
     assert_alpha_source_not_vaporock(source_text)
 
     value = payload.get("value")
-    if value is None and isinstance(payload.get("alpha"), (int, float)):
-        value = payload.get("alpha")
+    legacy_alpha = payload.get("alpha")
+    if (
+        value is None
+        and is_declared_real_scalar(legacy_alpha)
+        and isinstance(legacy_alpha, (int, float))
+    ):
+        value = legacy_alpha
     # Temperature-dependent correlation form (e.g. SiO alpha_s(T) = A exp(-B/T)).
     # Provenance still requires a cited source; the numeric point is left None
     # and status records the correlation rather than inventing a scalar.
@@ -308,18 +321,28 @@ def alpha_provenance_from_mapping(
     else:
         status_token = "measured"
         if value is not None:
-            value = float(value)
+            value = _anchor_float(value, species=species, field="alpha value")
             if not (value >= 0.0):
                 raise KineticsAnchorError(f"{species}: alpha value must be >= 0")
 
     envelope = None
     raw_env = payload.get("envelope") or payload.get("uncertainty_envelope")
     if isinstance(raw_env, (list, tuple)) and len(raw_env) == 2:
-        envelope = (float(raw_env[0]), float(raw_env[1]))
+        envelope = tuple(
+            _anchor_float(item, species=species, field="uncertainty envelope")
+            for item in raw_env
+        )
     elif correlation is not None:
         raw_env = correlation.get("uncertainty_envelope")
         if isinstance(raw_env, (list, tuple)) and len(raw_env) == 2:
-            envelope = (float(raw_env[0]), float(raw_env[1]))
+            envelope = tuple(
+                _anchor_float(
+                    item,
+                    species=species,
+                    field="uncertainty envelope",
+                )
+                for item in raw_env
+            )
 
     t_range = None
     raw_t = (
@@ -328,14 +351,22 @@ def alpha_provenance_from_mapping(
         or payload.get("T_band_K")
     )
     if isinstance(raw_t, (list, tuple)) and len(raw_t) == 2:
-        t_range = (float(raw_t[0]), float(raw_t[1]))
+        t_range = tuple(
+            _anchor_float(item, species=species, field="temperature range")
+            for item in raw_t
+        )
     elif correlation is not None:
         raw_t = correlation.get("valid_range_K")
         if isinstance(raw_t, (list, tuple)) and len(raw_t) == 2:
-            t_range = (float(raw_t[0]), float(raw_t[1]))
+            t_range = tuple(
+                _anchor_float(item, species=species, field="temperature range")
+                for item in raw_t
+            )
 
     tier = payload.get("tier")
     if tier is not None:
+        if not is_declared_real_scalar(tier, allow_numeric_str=True):
+            raise KineticsAnchorError(f"{species}: tier must be numeric")
         tier = int(tier)
 
     if value is None and status_token != "correlation":

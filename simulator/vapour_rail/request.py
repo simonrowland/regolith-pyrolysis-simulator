@@ -31,6 +31,7 @@ from simulator.chemistry.melt_activity import (
     melt_oxide_activity_coefficient,
     single_cation_mole_fractions,
 )
+from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.vapour_rail.activity import (
     ActivityInputDeclaration,
     ActivityVerdictKind,
@@ -369,6 +370,8 @@ def _require_readable_mol(
 ) -> float:
     """Parse one inventory amount; refuse unreadable values (not zero)."""
     try:
+        if not is_declared_real_scalar(value, allow_numeric_str=True):
+            raise TypeError
         amount = float(value)
     except (TypeError, ValueError) as exc:
         raise VapourRequestConstructionError(
@@ -387,6 +390,11 @@ def _positive_mol(mols: Mapping[str, float], species_id: str) -> bool:
     if species_id not in mols:
         return False
     try:
+        if not is_declared_real_scalar(
+            mols[species_id],
+            allow_numeric_str=True,
+        ):
+            raise TypeError
         amount = float(mols[species_id])
     except (TypeError, ValueError) as exc:
         raise VapourRequestConstructionError(

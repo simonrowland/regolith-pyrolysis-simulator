@@ -12,6 +12,7 @@ from typing import Any
 
 from simulator.accounting.exceptions import AccountingError, PoolWithdrawalError
 from simulator.accounting.formulas import resolve_species_formula
+from simulator.scalar_boundary import is_declared_real_scalar
 
 EMPTY_KG_TOLERANCE = 1e-12
 MATERIAL_ORIGINS = frozenset({"feedstock", "reagent"})
@@ -96,6 +97,8 @@ def allocate_pool_withdrawal(
 
 def _pool_number(value: Any, label: str) -> float:
     try:
+        if not is_declared_real_scalar(value, allow_numeric_str=True):
+            raise TypeError
         amount = float(value)
     except (TypeError, ValueError, OverflowError) as exc:
         raise PoolWithdrawalError(f"invalid {label}") from exc

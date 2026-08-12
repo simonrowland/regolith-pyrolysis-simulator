@@ -29,6 +29,7 @@ from simulator.optimize.physics import (
     target_species_yield_report,
 )
 from simulator.optimize.product_pools import COMPOSITION_PRODUCT_POOLS, STREAM_PRODUCT_POOLS
+from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.three_product_report import classify_products
 from simulator.diagnostics import (
     wall_deposit_remobilization_by_segment_species,
@@ -1220,7 +1221,7 @@ def _normalize_tap_grid(raw: Any, where: str) -> str | tuple[int, ...]:
 
 
 def _positive_profile_int(value: Any, where: str) -> int:
-    if isinstance(value, bool):
+    if not is_declared_real_scalar(value, allow_numeric_str=True):
         raise ObjectiveProfileError(f"{where} must be an integer")
     try:
         numeric = int(value)
@@ -2404,6 +2405,8 @@ def _configured_run_hours(run_execution: Any, profile: Mapping[str, Any]) -> int
 
 def _positive_runtime_int(value: Any, where: str) -> int:
     try:
+        if not is_declared_real_scalar(value, allow_numeric_str=True):
+            raise TypeError
         numeric = int(value)
     except (TypeError, ValueError) as exc:
         raise ObjectiveComputationError(f"{where} must be an integer") from exc
@@ -4917,6 +4920,8 @@ def _required_attr_float(obj: Any, attr: str) -> float:
 
 def _finite_float(value: Any, label: str) -> float:
     try:
+        if not is_declared_real_scalar(value, allow_numeric_str=True):
+            raise TypeError
         converted = float(value)
     except (TypeError, ValueError) as exc:
         raise ObjectiveComputationError(f"{label} is not numeric") from exc

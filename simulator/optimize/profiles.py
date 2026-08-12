@@ -37,6 +37,7 @@ from simulator.optimize.product_pools import forbidden_gates_for_pool, product_p
 from simulator.optimize.recipe import RecipePatch, RecipeSchema, RecipeValidationError
 from simulator.chemistry.kernel.config import normalize_chemistry_kernel_config
 from simulator.mre_ladder import max_voltage_for_target, parse_ladder_from_setpoints
+from simulator.scalar_boundary import is_declared_real_scalar
 
 
 PROFILE_SCHEMA_VERSION = "profile-schema-v1"
@@ -422,10 +423,20 @@ def constrained_max_profile(
     if "coating" not in gates:
         gates.append("coating")
     if furnace_T_max_C is not None:
+        if not is_declared_real_scalar(
+            furnace_T_max_C,
+            allow_numeric_str=True,
+        ):
+            raise TypeError("furnace_T_max_C must be numeric")
         constraints["furnace_T_max_C"] = float(furnace_T_max_C)
         if "furnace_temperature" not in gates:
             gates.append("furnace_temperature")
     if cycle_time_max_h is not None:
+        if not is_declared_real_scalar(
+            cycle_time_max_h,
+            allow_numeric_str=True,
+        ):
+            raise TypeError("cycle_time_max_h must be numeric")
         constraints["cycle_time_max_h"] = float(cycle_time_max_h)
         if "cycle_time" not in gates:
             gates.append("cycle_time")
@@ -612,7 +623,11 @@ def _validate_constraints(raw: Any, *, source: str | Path) -> None:
         )
     for key in ("stream_purity_min", "extraction_min_fraction"):
         if key in raw:
-            value = float(raw[key])
+            value = _declared_profile_float(
+                raw[key],
+                source=source,
+                where=f"constraints.{key}",
+            )
             if value < 0.0 or value > 1.0:
                 raise ProfileValidationError(
                     f"{source}: constraints.{key} must be between 0 and 1"
@@ -730,13 +745,25 @@ def _validate_furnace_temperature_cap(
     source: str | Path,
     where: str,
 ) -> None:
-    value = float(raw)
+    value = _declared_profile_float(raw, source=source, where=where)
     low, high = FURNACE_MAX_T_BOUNDS_C
     if value < low or value > high:
         raise ProfileValidationError(
             f"{source}: {where} must be within hardware envelope "
             f"[{low:.0f}, {high:.0f}] degC"
         )
+
+
+def _declared_profile_float(
+    raw: Any,
+    *,
+    source: str | Path,
+    where: str,
+) -> float:
+    if not is_declared_real_scalar(raw, allow_numeric_str=True):
+        float(raw)
+        raise ProfileValidationError(f"{source}: {where} must be numeric")
+    return float(raw)
 
 
 def _validate_target_species(raw: Any, *, source: str | Path) -> None:

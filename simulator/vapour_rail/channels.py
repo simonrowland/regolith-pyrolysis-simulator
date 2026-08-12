@@ -52,6 +52,7 @@ from simulator.physical_constants import (
     MELT_DISSOCIATION_PO2_MAX_BAR,
     MELT_DISSOCIATION_PO2_MIN_BAR,
 )
+from simulator.scalar_boundary import is_declared_real_scalar
 
 # ---------------------------------------------------------------------------
 # Channel vocabulary (design §4)
@@ -298,6 +299,11 @@ def compile_o2_channel_term(
     """
 
     del pO2_reference_bar  # retained on the evaluator for bit-identity rebase
+    if not is_declared_real_scalar(
+        signed_nu_o2,
+        allow_numeric_str=True,
+    ) or not is_declared_real_scalar(target_nu, allow_numeric_str=True):
+        raise TypeError("channel stoichiometry must be numeric")
     if reaction_plane not in REACTION_PLANES:
         raise ValueError(f"unknown reaction plane {reaction_plane!r}")
     return CompiledReactionTerm(
@@ -338,6 +344,11 @@ def compile_channel_term_from_binding(
         raise ValueError(
             f"plane {required_plane!r} not admitted for channel {channel_id}"
         )
+    if not is_declared_real_scalar(
+        signed_nu,
+        allow_numeric_str=True,
+    ) or not is_declared_real_scalar(target_nu, allow_numeric_str=True):
+        raise TypeError("channel stoichiometry must be numeric")
     return CompiledReactionTerm(
         participant_formula=entry.gas_formula,
         role=ReactionTermRole.EXCHANGE_CHANNEL,
@@ -750,6 +761,8 @@ class ReactionThermoInputs:
 def clamp_physical_pO2_bar(pO2_bar: float) -> float:
     """Physical melt/transport pO2 envelope (b-148)."""
 
+    if not is_declared_real_scalar(pO2_bar, allow_numeric_str=True):
+        raise TypeError("pO2_bar must be numeric")
     oxygen = float(pO2_bar)
     if not math.isfinite(oxygen) or oxygen <= 0.0:
         raise ValueError(f"pO2_bar must be finite and positive; got {pO2_bar!r}")
@@ -788,11 +801,21 @@ def o2_potential_from_pO2_bar(
 
     if reaction_plane not in REACTION_PLANES:
         raise ValueError(f"unknown reaction plane {reaction_plane!r}")
+    if not is_declared_real_scalar(
+        temperature_K,
+        allow_numeric_str=True,
+    ):
+        raise TypeError("temperature_K must be numeric")
     temperature_K = float(temperature_K)
     if not math.isfinite(temperature_K) or temperature_K <= 0.0:
         raise ValueError(
             f"temperature_K must be finite and positive; got {temperature_K!r}"
         )
+    if not is_declared_real_scalar(
+        pO2_reference_bar,
+        allow_numeric_str=True,
+    ):
+        raise TypeError("pO2_reference_bar must be numeric")
     p_ref = float(pO2_reference_bar)
     if not math.isfinite(p_ref) or p_ref <= 0.0:
         raise ValueError(

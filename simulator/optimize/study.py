@@ -127,6 +127,7 @@ from simulator.optimize.strategy.staged import (
     enumerate_topologies,
     make_prefix_eval_spec,
 )
+from simulator.scalar_boundary import is_declared_real_scalar
 from web.advisory import ceramic_rump_payload
 
 VALID_FIDELITIES = (
@@ -320,7 +321,6 @@ class StudyConfig:
     seed: int = 0
     warm_start_from: str | Path | Mapping[str, Any] | None = None
     per_eval_timeout_seconds: float | None = None
-
 
 @dataclass(frozen=True)
 class _WarmStartSource:
@@ -1287,12 +1287,23 @@ def _resolve_two_phase_config(
             enabled = override.get("enabled", True)
             if not isinstance(enabled, bool):
                 raise StudyError("two_phase_certify.enabled must be a bool")
+            top_k = override.get("top_k", DEFAULT_TWO_PHASE_TOP_K)
+            threshold = override.get("disagreement_threshold")
+            if not is_declared_real_scalar(top_k, allow_numeric_str=True):
+                raise TypeError("two_phase_certify.top_k must be numeric")
+            if threshold is not None and not is_declared_real_scalar(
+                threshold,
+                allow_numeric_str=True,
+            ):
+                raise TypeError(
+                    "two_phase_certify.disagreement_threshold must be numeric"
+                )
             return TwoPhaseConfig(
                 enabled=enabled,
-                top_k=int(override.get("top_k", DEFAULT_TWO_PHASE_TOP_K)),
+                top_k=int(top_k),
                 disagreement_threshold=(
-                    float(override["disagreement_threshold"])
-                    if override.get("disagreement_threshold") is not None
+                    float(threshold)
+                    if threshold is not None
                     else None
                 ),
             )
@@ -1305,12 +1316,21 @@ def _resolve_two_phase_config(
     enabled = block.get("enabled", False)
     if not isinstance(enabled, bool):
         raise StudyError("two_phase_certify.enabled must be a bool")
+    top_k = block.get("top_k", DEFAULT_TWO_PHASE_TOP_K)
+    threshold = block.get("disagreement_threshold")
+    if not is_declared_real_scalar(top_k, allow_numeric_str=True):
+        raise TypeError("two_phase_certify.top_k must be numeric")
+    if threshold is not None and not is_declared_real_scalar(
+        threshold,
+        allow_numeric_str=True,
+    ):
+        raise TypeError("two_phase_certify.disagreement_threshold must be numeric")
     return TwoPhaseConfig(
         enabled=enabled,
-        top_k=int(block.get("top_k", DEFAULT_TWO_PHASE_TOP_K)),
+        top_k=int(top_k),
         disagreement_threshold=(
-            float(block["disagreement_threshold"])
-            if block.get("disagreement_threshold") is not None
+            float(threshold)
+            if threshold is not None
             else None
         ),
     )
@@ -1674,15 +1694,23 @@ def _load_study_journal(
         raise StudyReplayError(
             "journal replay for warm_start_from requires bundled warm-start seed state"
         )
+    manifest_scalars = {
+        "parallel": manifest.get("parallel", 1),
+        "budget": manifest.get("budget", 0),
+        "seed": manifest.get("seed", 0),
+    }
+    for field_name, value in manifest_scalars.items():
+        if not is_declared_real_scalar(value, allow_numeric_str=True):
+            raise StudyReplayError(f"study manifest {field_name} must be numeric")
     config = StudyConfig(
         profile=resolved_profile,
         feedstock=feedstock,
         strategy=strategy_key,
         fidelity=str(canonical_backend_name(str(manifest.get("fidelity")))),
-        parallel=int(manifest.get("parallel", 1)),
-        budget=int(manifest.get("budget", 0)),
+        parallel=int(manifest_scalars["parallel"]),
+        budget=int(manifest_scalars["budget"]),
         out_dir=root,
-        seed=int(manifest.get("seed", 0)),
+        seed=int(manifest_scalars["seed"]),
     )
     pin_seeds(config.seed)
     requested_topologies = _requested_staged_topologies(resolved_profile, None)
@@ -4581,6 +4609,8 @@ def _status(scored: ScoredResult) -> str:
 
 def _finite(value: Any, label: str) -> float:
     try:
+        if not is_declared_real_scalar(value, allow_numeric_str=True):
+            raise TypeError
         numeric = float(value)
     except (TypeError, ValueError) as exc:
         raise StudyAbort(f"{label} is not numeric") from exc
@@ -4591,6 +4621,8 @@ def _finite(value: Any, label: str) -> float:
 
 def _finite_or_infinite(value: Any, label: str) -> float:
     try:
+        if not is_declared_real_scalar(value, allow_numeric_str=True):
+            raise TypeError
         numeric = float(value)
     except (TypeError, ValueError) as exc:
         raise StudyAbort(f"{label} is not numeric") from exc
@@ -5620,6 +5652,8 @@ def _tap_duration_path(
 
 def _positive_int(value: Any, label: str) -> int:
     try:
+        if not is_declared_real_scalar(value, allow_numeric_str=True):
+            raise TypeError
         numeric = int(value)
     except (TypeError, ValueError) as exc:
         raise StudyAbort(f"{label} must be an integer") from exc

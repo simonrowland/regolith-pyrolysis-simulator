@@ -132,6 +132,7 @@ from simulator.melt_backend.liquidus import (
     find_liquidus_solidus_by_fraction,
 )
 from simulator.state import OXIDE_SPECIES
+from simulator.scalar_boundary import is_declared_real_scalar
 
 
 # 2026-07-23 B1 gate-2 warm-gateway residue: per-call hard wall raised
@@ -413,11 +414,22 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 'regolith-pyrolysis-simulator',
                 'magemin-diagnostics.log',
             )
-            warm_timeout_s = float(self._config.get(
-                'warm_call_timeout_s',
-                MAGEMIN_WARM_CALL_TIMEOUT_S,
-            ))
-            pool_size = int(self._config.get('warm_pool_size', 1))
+            raw_warm_timeout_s = self._config.get(
+                'warm_call_timeout_s', MAGEMIN_WARM_CALL_TIMEOUT_S
+            )
+            raw_pool_size = self._config.get('warm_pool_size', 1)
+            raw_startup_timeout_s = self._config.get(
+                'worker_startup_timeout_s', 30.0
+            )
+            for field_name, value in (
+                ('warm_call_timeout_s', raw_warm_timeout_s),
+                ('warm_pool_size', raw_pool_size),
+                ('worker_startup_timeout_s', raw_startup_timeout_s),
+            ):
+                if not is_declared_real_scalar(value, allow_numeric_str=True):
+                    raise ValueError(f'MAGEMin {field_name} must be numeric')
+            warm_timeout_s = float(raw_warm_timeout_s)
+            pool_size = int(raw_pool_size)
             if not math.isfinite(warm_timeout_s) or warm_timeout_s <= 0.0:
                 raise ValueError(
                     'MAGEMin warm_call_timeout_s must be finite and positive'
@@ -435,9 +447,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         self._database,
                         self._config,
                     ),
-                    startup_timeout_s=float(
-                        self._config.get('worker_startup_timeout_s', 30.0)
-                    ),
+                    startup_timeout_s=float(raw_startup_timeout_s),
                     call_timeout_s=warm_timeout_s,
                     diagnostic_log_path=diagnostic_path.with_name(
                         f'{diagnostic_path.stem}-{index}{diagnostic_path.suffix}'

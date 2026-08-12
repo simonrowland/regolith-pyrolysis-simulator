@@ -10,6 +10,9 @@ import sys
 from typing import Sequence
 
 from simulator.backend_names import canonical_backend_name
+from simulator.scalar_boundary import (
+    is_declared_real_scalar,
+)
 from simulator.optimize.profiles import (
     ProfileValidationError,
     constrained_max_profile,
@@ -291,6 +294,12 @@ def _write_job_status(
 
 
 def _positive_int(value: str) -> int:
+    if not is_declared_real_scalar(value, allow_numeric_str=True):
+        try:
+            int(value)
+        except (TypeError, ValueError):
+            raise
+        raise argparse.ArgumentTypeError("must be an integer")
     parsed = int(value)
     if parsed <= 0:
         raise argparse.ArgumentTypeError("must be positive")
@@ -298,6 +307,12 @@ def _positive_int(value: str) -> int:
 
 
 def _non_negative_int(value: str) -> int:
+    if not is_declared_real_scalar(value, allow_numeric_str=True):
+        try:
+            int(value)
+        except (TypeError, ValueError):
+            raise
+        raise argparse.ArgumentTypeError("must be an integer")
     parsed = int(value)
     if parsed < 0:
         raise argparse.ArgumentTypeError("must be non-negative")
@@ -305,6 +320,12 @@ def _non_negative_int(value: str) -> int:
 
 
 def _positive_float(value: str) -> float:
+    if not is_declared_real_scalar(value, allow_numeric_str=True):
+        try:
+            float(value)
+        except (TypeError, ValueError):
+            raise
+        raise argparse.ArgumentTypeError("must be numeric")
     parsed = float(value)
     if parsed <= 0.0:
         raise argparse.ArgumentTypeError("must be positive")

@@ -106,6 +106,7 @@ from simulator.chemistry.ellingham_thermo import (
 from simulator.chemistry.melt_activity import melt_oxide_activity
 from simulator.mre_ladder import DECOMP_VOLTAGES, mre_decomposition_voltage_reference
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET, FARADAY
+from simulator.scalar_boundary import is_declared_real_scalar
 
 MRE_CURRENT_PARTITION_SOURCE = (
     "heuristic:activity_exp_FdV_over_RT_SEL-1_not_literature_grounded"
@@ -1142,6 +1143,8 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
     @staticmethod
     def _coerce_optional_float(value: Any) -> float | None:
         if value is None:
+            return None
+        if not is_declared_real_scalar(value, allow_numeric_str=True):
             return None
         try:
             coerced = float(value)

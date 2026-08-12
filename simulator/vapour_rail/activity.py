@@ -27,6 +27,7 @@ from simulator.chemistry.melt_activity import (
     melt_oxide_activity_coefficient,
 )
 from simulator.physical_constants import GAS_CONSTANT
+from simulator.scalar_boundary import is_declared_real_scalar
 
 # CODATA R, J/(mol·K). Activities use mu in J/mol so RT ln(a) is dimensionally
 # consistent: [J/mol] / ([J/(mol·K)] · [K]) is dimensionless.
@@ -677,6 +678,15 @@ def activity_from_chemical_potentials(
         ``mu_i = mu_i0`` ⇒ ``a_i = 1`` (pure endmember at the standard state).
     """
 
+    if not is_declared_real_scalar(mu_J_per_mol) or not is_declared_real_scalar(
+        mu0_J_per_mol
+    ) or not is_declared_real_scalar(
+        temperature_K,
+        allow_numeric_str=True,
+    ):
+        raise TypeError("chemical potential inputs must be numeric")
+    mu_J_per_mol = float(mu_J_per_mol)
+    mu0_J_per_mol = float(mu0_J_per_mol)
     if not math.isfinite(mu_J_per_mol) or not math.isfinite(mu0_J_per_mol):
         raise ValueError("chemical potentials must be finite")
     temperature_K = float(temperature_K)
@@ -719,7 +729,10 @@ def prove_pressure_monotone_nondecreasing_in_activity(
         not an upper bound, so the Henrian ``a=1`` path must refuse.
     """
 
-    if not math.isfinite(float(activity_exponent)):
+    if not is_declared_real_scalar(
+        activity_exponent,
+        allow_numeric_str=True,
+    ) or not math.isfinite(float(activity_exponent)):
         return False
     return float(activity_exponent) >= 0.0
 
@@ -772,6 +785,11 @@ def henrian_unknown_gamma_upper_bound(
         )
 
     try:
+        if not is_declared_real_scalar(
+            activity_exponent,
+            allow_numeric_str=True,
+        ):
+            raise TypeError
         exponent = float(activity_exponent)
     except (TypeError, ValueError):
         exponent = math.nan
@@ -799,6 +817,11 @@ def henrian_unknown_gamma_upper_bound(
 
     x_value: float | None
     try:
+        if mole_fraction is not None and not is_declared_real_scalar(
+            mole_fraction,
+            allow_numeric_str=True,
+        ):
+            raise TypeError
         x_value = None if mole_fraction is None else float(mole_fraction)
     except (TypeError, ValueError):
         x_value = None
@@ -940,6 +963,11 @@ class CondensedPhaseActivityProvider:
         self._map: dict[str, PhaseEndmemberMap] = {
             item.component_id: item for item in (phase_endmember_map or ())
         }
+        if not is_declared_real_scalar(
+            per_call_deadline_s,
+            allow_numeric_str=True,
+        ):
+            raise TypeError("per_call_deadline_s must be numeric")
         self.per_call_deadline_s = float(per_call_deadline_s)
 
     def resolve_source_reaction_activity(
@@ -1034,6 +1062,11 @@ class CondensedPhaseActivityProvider:
                     solve_group_id=solve_group_id,
                 )
             try:
+                if not is_declared_real_scalar(
+                    reported_activity,
+                    allow_numeric_str=True,
+                ):
+                    raise TypeError
                 value = float(reported_activity)
             except (TypeError, ValueError):
                 value = math.nan
@@ -1122,6 +1155,21 @@ class CondensedPhaseActivityProvider:
 
         if measured_gamma is not None and mole_fraction is not None:
             # Point path for an independently supplied gamma (still diagnostic).
+            if not is_declared_real_scalar(
+                measured_gamma,
+                allow_numeric_str=True,
+            ) or not is_declared_real_scalar(
+                mole_fraction,
+                allow_numeric_str=True,
+            ):
+                return _refusal(
+                    declaration.component_id,
+                    ActivityRefusalCode.MISSING_EVIDENCE,
+                    "measured_gamma and mole_fraction must be numeric",
+                    standard_state=declaration.standard_state,
+                    state_fingerprint=state_fingerprint,
+                    solve_group_id=solve_group_id,
+                )
             if mole_fraction < 0.0 or not math.isfinite(mole_fraction):
                 return _refusal(
                     declaration.component_id,

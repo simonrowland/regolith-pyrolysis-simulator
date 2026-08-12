@@ -19,6 +19,7 @@ from simulator.cost_energy import (
     project_owner_ratify_money,
 )
 from simulator.pumping_cost import estimate_subambient_pump_cost, pumping_cost_parameters
+from simulator.scalar_boundary import is_declared_real_scalar
 
 VECTOR_TOLERANCE = 1e-12
 COST_LEDGER_SCHEMA_VERSION = "cost-ledger-v1"
@@ -46,6 +47,8 @@ _RETURN_SUMMARY = object()
 
 def _finite(value: Any, default: float = 0.0) -> float:
     try:
+        if not is_declared_real_scalar(value, allow_numeric_str=True):
+            raise TypeError
         number = float(value)
     except (TypeError, ValueError):
         return default
@@ -87,7 +90,10 @@ class CostVector:
 
     def __post_init__(self) -> None:
         for name in self._fields():
-            value = float(getattr(self, name))
+            raw_value = getattr(self, name)
+            if not is_declared_real_scalar(raw_value, allow_numeric_str=True):
+                raise TypeError(f"{name} must be numeric")
+            value = float(raw_value)
             if not math.isfinite(value):
                 raise ValueError(f"{name} must be finite")
             object.__setattr__(self, name, 0.0 if abs(value) <= VECTOR_TOLERANCE else value)
@@ -113,6 +119,8 @@ class CostVector:
         )
 
     def scale(self, factor: float) -> "CostVector":
+        if not is_declared_real_scalar(factor, allow_numeric_str=True):
+            raise TypeError("cost scale factor must be numeric")
         factor = float(factor)
         if not math.isfinite(factor):
             raise ValueError("cost scale factor must be finite")
@@ -144,6 +152,11 @@ class CostLot:
     provenance: Mapping[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
+        if not is_declared_real_scalar(
+            self.quantity_kg,
+            allow_numeric_str=True,
+        ):
+            raise TypeError("CostLot quantity_kg must be numeric")
         quantity = float(self.quantity_kg)
         if not math.isfinite(quantity) or quantity < -VECTOR_TOLERANCE:
             raise ValueError("CostLot quantity_kg must be finite and non-negative")

@@ -7,6 +7,8 @@ import math
 from types import MappingProxyType
 from typing import Any
 
+from simulator.scalar_boundary import is_declared_real_scalar
+
 
 SCHEMA_VERSION = "interpolation_uncertainty_vector.v1"
 RANKED_TABLE_SCHEMA_VERSION = "interpolation_uncertainty_ranked_tables.v1"
@@ -524,7 +526,11 @@ def _numeric_rank_key(point: Mapping[str, Any]) -> tuple[float, str]:
 
 def _stable_point_key(point: Mapping[str, Any]) -> tuple[int, str]:
     sequence = point.get("sequence_index")
-    sequence_value = int(sequence) if isinstance(sequence, int) else 10**12
+    sequence_value = (
+        int(sequence)
+        if is_declared_real_scalar(sequence) and isinstance(sequence, int)
+        else 10**12
+    )
     return (sequence_value, str(point.get("point_id", "")))
 
 
@@ -687,6 +693,8 @@ def _alkali_present(alkali: str, species: Sequence[str]) -> bool:
 
 
 def _finite_float(value: Any) -> float | None:
+    if not is_declared_real_scalar(value, allow_numeric_str=True):
+        return None
     try:
         result = float(value)
     except (TypeError, ValueError):

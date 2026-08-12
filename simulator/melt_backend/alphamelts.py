@@ -76,6 +76,7 @@ from simulator.melt_backend.liquidus import (
 )
 from simulator.melt_backend.melt_envelope import melt_extrapolation_diagnostic
 from simulator.physical_constants import GAS_CONSTANT
+from simulator.scalar_boundary import is_declared_real_scalar
 
 
 logger = logging.getLogger(__name__)
@@ -300,6 +301,8 @@ class AlphaMELTSConfigurationError(ValueError):
 
 def _validated_timeout_s(value: object) -> float:
     try:
+        if not is_declared_real_scalar(value, allow_numeric_str=True):
+            raise TypeError
         timeout_s = float(value)
     except (TypeError, ValueError) as exc:
         raise AlphaMELTSConfigurationError(
@@ -1067,6 +1070,8 @@ class _MELTSBackendSupport(MeltBackend):
     def _optional_float(self, value) -> Optional[float]:
         if value is None or value == '':
             return None
+        if not is_declared_real_scalar(value, allow_numeric_str=True):
+            raise TypeError(f"must be numeric, not {type(value).__name__}")
         return float(value)
 
     def _normalize_redox_buffer(self, value) -> Optional[str]:

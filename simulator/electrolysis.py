@@ -59,6 +59,7 @@ from simulator.core import (
 )
 from simulator.mre_ladder import DECOMP_VOLTAGES, mre_decomposition_voltage_reference
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+from simulator.scalar_boundary import is_declared_real_scalar
 
 
 FERRIC_TO_FERROUS_REFERENCE_V = 0.65
@@ -178,7 +179,10 @@ def coerce_gas_product_fugacity_bar(value) -> dict[str, float]:
     for metal, raw_fugacity in value.items():
         if not isinstance(metal, str) or metal not in known_metals:
             raise ValueError(f"unknown gas-product metal species: {metal}")
-        if isinstance(raw_fugacity, bool):
+        if not is_declared_real_scalar(
+            raw_fugacity,
+            allow_numeric_str=True,
+        ):
             raise TypeError(f"{metal} fugacity must not be boolean")
         try:
             fugacity = float(raw_fugacity)
