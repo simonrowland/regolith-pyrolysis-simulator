@@ -9,6 +9,7 @@ The filename is historical only; VapoRock is diagnostic-only.
 
 from __future__ import annotations
 
+from dataclasses import asdict
 import pathlib
 import types
 from pathlib import Path
@@ -21,7 +22,9 @@ from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 from engines.vaporock import VapoRockDiagnostics, VapoRockProvider
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.core import PyrolysisSimulator
+from simulator.fidelity_vocabulary import STATUS_BEARING_NON_AUTHORITATIVE
 from simulator.melt_backend.base import EquilibriumResult, InternalAnalyticalBackend
+from simulator.melt_backend.melt_envelope import melt_extrapolation_envelope
 
 
 DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
@@ -219,6 +222,7 @@ def test_builtin_authority_dispatches_even_when_vaporock_available(
     shadow = _shadow_result(sim)
     assert shadow.status == "non_authoritative"
     shadow_diag = dict(shadow.diagnostic or {})
+    assert shadow_diag["instrument_status"] == STATUS_BEARING_NON_AUTHORITATIVE
     assert shadow_diag.get("vapor_pressures_Pa") == {}
     full = dict(shadow_diag.get("vaporock_full_speciation_Pa") or {})
     assert full["Na"] == pytest.approx(1234.5)
@@ -239,6 +243,7 @@ def test_vaporock_full_speciation_stays_out_of_evaporation_flux(
     shadow = _shadow_result(sim)
     assert shadow.status == "non_authoritative"
     shadow_diag = dict(shadow.diagnostic or {})
+    assert shadow_diag["instrument_status"] == STATUS_BEARING_NON_AUTHORITATIVE
     assert shadow_diag.get("vapor_pressures_Pa") == {}
     full = dict(shadow_diag.get("vaporock_full_speciation_Pa") or {})
     assert full["Na"] == pytest.approx(1234.5)
@@ -311,6 +316,7 @@ def test_allow_fallback_flag_does_not_change_builtin_authority(
     shadow = _shadow_result(sim)
     assert shadow.status == "non_authoritative"
     shadow_diag = dict(shadow.diagnostic or {})
+    assert shadow_diag["instrument_status"] == STATUS_BEARING_NON_AUTHORITATIVE
     assert shadow_diag.get("vapor_pressures_Pa") == {}
     assert shadow_diag.get("vaporock_full_speciation_Pa", {}).get(
         "Na"
@@ -340,6 +346,7 @@ def test_non_authoritative_vaporock_empty_output_does_not_trip_core_guard(
     shadow = _shadow_result(sim)
     assert shadow.status == "non_authoritative"
     shadow_diag = dict(shadow.diagnostic or {})
+    assert shadow_diag["instrument_status"] == STATUS_BEARING_NON_AUTHORITATIVE
     assert shadow_diag.get("vapor_pressures_Pa") == {}
     assert shadow_diag.get("vaporock_full_speciation_Pa", {}).get(
         "Na"
@@ -406,6 +413,7 @@ def test_vaporock_provider_module_does_not_import_ledger_transition_proposal():
 
 def test_vaporock_diagnostics_payload_round_trips():
     diag = VapoRockDiagnostics(
+        **asdict(melt_extrapolation_envelope(1800.0, "MELTS-v1.0")),
         vapor_pressures_Pa={"Na": 100.0},
         vaporock_full_speciation_Pa={"Na": 100.0},
         activities={},
@@ -425,10 +433,20 @@ def test_vaporock_diagnostics_payload_round_trips():
         "engine_version",
         "backend_status",
         "backend_warnings",
+        "melt_model_id",
+        "T_calib_max_K",
+        "melt_model_extrapolation_K",
+        "melt_extrap_sigma_mu_J_mol",
+        "melt_extrap_sigma_log10_P",
+        "melt_extrap_status",
+        "constants_version",
+        "instrument_status",
     }
     assert payload["vapor_pressures_Pa"] == {}
     assert payload["vaporock_full_speciation_Pa"] == {"Na": 100.0}
     assert payload["backend_warnings"] == ("hello",)
+    assert payload["melt_extrap_status"] == "extrapolated"
+    assert payload["instrument_status"] == STATUS_BEARING_NON_AUTHORITATIVE
 
 
 # ---------------------------------------------------------------------------
@@ -510,6 +528,9 @@ def test_raw_vaporock_provider_cannot_be_authoritative_for_vapor_pressure(
 
     shadow = _shadow_result(sim)
     assert shadow.status == "non_authoritative"
+    assert shadow.diagnostic["instrument_status"] == (
+        STATUS_BEARING_NON_AUTHORITATIVE
+    )
     assert dict(shadow.diagnostic or {}).get("vapor_pressures_Pa") == {}
 
 

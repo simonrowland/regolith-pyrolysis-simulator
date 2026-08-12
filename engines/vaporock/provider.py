@@ -25,6 +25,7 @@ plane.
 
 from __future__ import annotations
 
+from dataclasses import asdict
 import math
 from typing import Any, Mapping, Optional
 
@@ -45,10 +46,16 @@ from simulator.chemistry.kernel.dto import (
 )
 from simulator.chemistry.kernel.errors import ProviderUnavailableError
 from simulator.chemistry.kernel.provider import ChemistryProvider
+from simulator.melt_backend.melt_envelope import (
+    MeltExtrapolationEnvelope,
+    consume_melt_extrapolation_envelope,
+    melt_extrapolation_diagnostic,
+)
 
 
 _INTENTS = frozenset({ChemistryIntent.VAPOR_PRESSURE})
 _DECLARED_ACCOUNT = 'process.cleaned_melt'
+_MELT_MODEL_ID = 'MELTS-v1.0'
 
 
 class VapoRockProvider(ChemistryProvider):
@@ -147,6 +154,11 @@ class VapoRockProvider(ChemistryProvider):
         if wrong_intent is not None:
             return wrong_intent
 
+        temperature_K = float(request.temperature_C) + 273.15
+        melt_diagnostic = melt_extrapolation_diagnostic(
+            temperature_K,
+            _MELT_MODEL_ID,
+        )
         backend = self._ensure_backend()
         if backend is None or not self._backend_available(backend):
             # As a shadow diagnostic, unavailable VapoRock surfaces as a
@@ -154,7 +166,12 @@ class VapoRockProvider(ChemistryProvider):
             last_error = getattr(backend, '_last_error', None) if backend else None
             raise ProviderUnavailableError(
                 'VapoRock diagnostic provider unavailable: '
-                + (str(last_error) if last_error else 'upstream library not importable')
+                + (str(last_error) if last_error else 'upstream library not importable'),
+                status='unavailable',
+                diagnostic={
+                    **melt_diagnostic,
+                    'backend_status': 'unavailable',
+                },
             )
 
         pO2_bar = self._resolve_pO2_bar(request)
@@ -188,6 +205,10 @@ class VapoRockProvider(ChemistryProvider):
             species_formula_registry=species_registry,
             fO2_log_resolved=fO2_log_resolved,
         )
+        melt_envelope = consume_melt_extrapolation_envelope(
+            melt_diagnostic,
+            temperature_K=temperature_K,
+        )
 
         diagnostics = self._project_equilibrium(
             equilibrium,
@@ -195,6 +216,7 @@ class VapoRockProvider(ChemistryProvider):
             mode=self._mode_label(backend),
             engine_version=self._engine_version(backend),
             allowed_species=self._allowed_species,
+            melt_envelope=melt_envelope,
         )
         return IntentResult(
             intent=ChemistryIntent.VAPOR_PRESSURE,
@@ -386,6 +408,7 @@ class VapoRockProvider(ChemistryProvider):
         mode: str,
         engine_version: str,
         allowed_species: frozenset[str],
+        melt_envelope: MeltExtrapolationEnvelope,
     ) -> VapoRockDiagnostics:
         """Convert an adapter :class:`EquilibriumResult` into VapoRock diagnostics.
 
@@ -398,8 +421,10 @@ class VapoRockProvider(ChemistryProvider):
         finite positive pressure stays under
         ``vaporock_full_speciation_Pa``.
         """
+        envelope_fields = asdict(melt_envelope)
         if equilibrium is None:
             return VapoRockDiagnostics(
+                **envelope_fields,
                 pO2_bar=pO2_bar,
                 mode=mode,
                 engine_version=engine_version,
@@ -431,6 +456,7 @@ class VapoRockProvider(ChemistryProvider):
             getattr(equilibrium, 'status', None) or 'unavailable'
         )
         return VapoRockDiagnostics(
+            **envelope_fields,
             vapor_pressures_Pa=vapor_pressures_Pa,
             vaporock_full_speciation_Pa=vaporock_full_speciation_Pa,
             activities={},  # VapoRock has no per-oxide activity surface

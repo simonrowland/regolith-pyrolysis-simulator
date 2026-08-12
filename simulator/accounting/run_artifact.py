@@ -431,6 +431,7 @@ def build_run_artifact(
         ("vapor_pressure_source_report", "vapor_pressure_source_report"),
         # VR-11 instrumentation (schema-bearing diagnostics; not optimizer keys).
         ("vapour_rail_instrumentation", "vapour_rail_instrumentation"),
+        ("shadow_trace", "shadow_trace"),
         ("condensation_refusals_by_species", "condensation_refusals_by_species"),
         ("yield_disposition", "yield_disposition"),
     ):

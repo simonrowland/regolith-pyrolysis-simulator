@@ -46,6 +46,12 @@ from simulator.melt_backend.base import (
     RealBackendFamily,
     project_melt_to_oxide_projection,
 )
+from simulator.melt_backend.melt_envelope import (
+    MELT_EXTRAPOLATION_ENVELOPE_FIELDS,
+    consume_melt_extrapolation_envelope,
+    has_melt_extrapolation_envelope,
+    melt_extrapolation_diagnostic,
+)
 from simulator.melt_backend.sulfsat import SulfurSaturationResult
 
 
@@ -533,9 +539,30 @@ class PT0DeterminismStore:
         sim._last_vapor_pressures_source = dict(
             payload.get("last_vapor_pressures_source") or {}
         )
-        sim._last_vapor_pressure_diagnostic = dict(
+        vapor_pressure_diagnostic = dict(
             payload.get("last_vapor_pressure_diagnostic") or {}
         )
+        if (
+            vapor_pressure_diagnostic
+            and _payload_consumes_melt_envelope(payload, result)
+        ):
+            temperature_K = float(result.temperature_C) + 273.15
+            if has_melt_extrapolation_envelope(vapor_pressure_diagnostic):
+                consume_melt_extrapolation_envelope(
+                    vapor_pressure_diagnostic,
+                    temperature_K=temperature_K,
+                )
+            vapor_pressure_diagnostic.update(
+                melt_extrapolation_diagnostic(
+                    temperature_K,
+                    "MELTS-v1.0",
+                )
+            )
+            consume_melt_extrapolation_envelope(
+                vapor_pressure_diagnostic,
+                temperature_K=temperature_K,
+            )
+        sim._last_vapor_pressure_diagnostic = vapor_pressure_diagnostic
         sulfur = getattr(result, "sulfur_saturation", None)
         sim._last_sulfur_saturation_result = sulfur
         if getattr(result, "fO2_log", None) is not None:
@@ -2576,10 +2603,19 @@ def equilibrium_payload(sim: Any, result: EquilibriumResult) -> dict[str, Any]:
             "PT-0 equilibrium replay does not support cached ledger transitions"
         )
     intent = _equilibrium_payload_intent(sim)
+    temperature_K = float(result.temperature_C) + 273.15
     payload = {
         "authority": _equilibrium_record_authority(sim, intent),
         "equilibrium_result": {
-            field.name: _json_ready(getattr(result, field.name))
+            field.name: (
+                _cache_payload_diagnostic(
+                    getattr(result, field.name),
+                    temperature_K=temperature_K,
+                )
+                if field.name == "diagnostics"
+                and isinstance(getattr(result, field.name), Mapping)
+                else _json_ready(getattr(result, field.name))
+            )
             for field in dataclasses.fields(EquilibriumResult)
             if field.name != "ledger_transition"
         },
@@ -2587,14 +2623,21 @@ def equilibrium_payload(sim: Any, result: EquilibriumResult) -> dict[str, Any]:
             getattr(sim, "_last_vapor_pressures_source", {}) or {}
         ),
         "last_vapor_pressure_diagnostic": _cache_payload_diagnostic(
-            getattr(sim, "_last_vapor_pressure_diagnostic", {}) or {}
+            getattr(sim, "_last_vapor_pressure_diagnostic", {}) or {},
+            temperature_K=temperature_K,
         ),
     }
     sulfur = getattr(result, "sulfur_saturation", None)
     payload["equilibrium_result"]["sulfur_saturation"] = _json_ready(sulfur)
     if hasattr(result, "alphamelts_diagnostics"):
-        payload["alphamelts_diagnostics"] = _json_ready(
-            getattr(result, "alphamelts_diagnostics")
+        alphamelts_diagnostics = getattr(result, "alphamelts_diagnostics")
+        payload["alphamelts_diagnostics"] = (
+            _cache_payload_diagnostic(
+                alphamelts_diagnostics,
+                temperature_K=temperature_K,
+            )
+            if isinstance(alphamelts_diagnostics, Mapping)
+            else _json_ready(alphamelts_diagnostics)
         )
     return payload
 
@@ -2624,16 +2667,47 @@ def _equilibrium_record_authority(
     }
 
 
-def _cache_payload_diagnostic(value: Mapping[str, Any]) -> dict[str, Any]:
+def _cache_payload_diagnostic(
+    value: Mapping[str, Any],
+    *,
+    temperature_K: float | None = None,
+) -> dict[str, Any]:
+    _validate_cache_inert_envelopes(value, temperature_K=temperature_K)
     return _json_ready(_strip_cache_inert_diagnostic_keys(value))
+
+
+def _validate_cache_inert_envelopes(
+    value: Any,
+    *,
+    temperature_K: float | None = None,
+) -> None:
+    if isinstance(value, Mapping):
+        if has_melt_extrapolation_envelope(value):
+            consume_melt_extrapolation_envelope(
+                value,
+                temperature_K=temperature_K,
+            )
+        for item in value.values():
+            _validate_cache_inert_envelopes(
+                item,
+                temperature_K=temperature_K,
+            )
+    elif isinstance(value, (list, tuple)):
+        for item in value:
+            _validate_cache_inert_envelopes(
+                item,
+                temperature_K=temperature_K,
+            )
 
 
 def _strip_cache_inert_diagnostic_keys(value: Any) -> Any:
     if isinstance(value, Mapping):
+        has_melt_envelope = has_melt_extrapolation_envelope(value)
         return {
             str(key): _strip_cache_inert_diagnostic_keys(item)
             for key, item in value.items()
             if not _is_cache_inert_diagnostic_key(key)
+            and not (has_melt_envelope and str(key) == "instrument_status")
         }
     if isinstance(value, (list, tuple)):
         return [_strip_cache_inert_diagnostic_keys(item) for item in value]
@@ -2643,7 +2717,8 @@ def _strip_cache_inert_diagnostic_keys(value: Any) -> Any:
 def _is_cache_inert_diagnostic_key(key: Any) -> bool:
     text = str(key)
     return (
-        text == "melt_regime_predicate_divergences"
+        text in MELT_EXTRAPOLATION_ENVELOPE_FIELDS
+        or text == "melt_regime_predicate_divergences"
         or text.endswith("_divergences")
     )
 
@@ -2655,9 +2730,58 @@ def equilibrium_from_payload(payload: Mapping[str, Any]) -> EquilibriumResult:
     result = EquilibriumResult(**data)
     if sulfur_data is not None:
         result.sulfur_saturation = SulfurSaturationResult(**dict(sulfur_data))
+    consumes_melt_envelope = _payload_consumes_melt_envelope(payload, result)
+    temperature_K = float(result.temperature_C) + 273.15
+    canonical_diagnostic = (
+        melt_extrapolation_diagnostic(temperature_K, "MELTS-v1.0")
+        if consumes_melt_envelope
+        else None
+    )
     if "alphamelts_diagnostics" in payload:
-        setattr(result, "alphamelts_diagnostics", payload["alphamelts_diagnostics"])
+        alphamelts_diagnostic = payload["alphamelts_diagnostics"]
+        if isinstance(alphamelts_diagnostic, Mapping):
+            alphamelts_diagnostic = dict(alphamelts_diagnostic)
+            if has_melt_extrapolation_envelope(alphamelts_diagnostic):
+                consume_melt_extrapolation_envelope(
+                    alphamelts_diagnostic,
+                    temperature_K=temperature_K,
+                )
+            if canonical_diagnostic is not None:
+                alphamelts_diagnostic.update(canonical_diagnostic)
+                consume_melt_extrapolation_envelope(
+                    alphamelts_diagnostic,
+                    temperature_K=temperature_K,
+                )
+        setattr(result, "alphamelts_diagnostics", alphamelts_diagnostic)
+    if canonical_diagnostic is not None:
+        diagnostic = dict(result.diagnostics or {})
+        if has_melt_extrapolation_envelope(diagnostic):
+            consume_melt_extrapolation_envelope(
+                diagnostic,
+                temperature_K=temperature_K,
+            )
+        diagnostic.update(canonical_diagnostic)
+        consume_melt_extrapolation_envelope(
+            diagnostic,
+            temperature_K=temperature_K,
+        )
+        result.diagnostics = diagnostic
     return result
+
+
+def _payload_consumes_melt_envelope(
+    payload: Mapping[str, Any],
+    result: EquilibriumResult,
+) -> bool:
+    authority = payload.get("authority")
+    if not isinstance(authority, Mapping):
+        return False
+    if str(authority.get("evidence_class") or "") != EvidenceClass.MELTS.value:
+        return False
+    diagnostic = result.diagnostics or {}
+    return str(diagnostic.get("vapor_pressure_backend_status") or "") != (
+        "not_attempted"
+    )
 
 
 def _normalized_status(value: Any) -> str:

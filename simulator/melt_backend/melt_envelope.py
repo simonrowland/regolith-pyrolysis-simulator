@@ -62,8 +62,10 @@ Sanity check (worked numbers; pure arithmetic of the two formulas)
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
-from typing import Dict, Mapping, TypedDict
+from dataclasses import asdict, dataclass
+from typing import Any, Dict, Mapping, TypedDict
+
+from simulator.fidelity_vocabulary import STATUS_BEARING_NON_AUTHORITATIVE
 
 # CODATA / SI gas constant used by HT-PLAN r2 §H2 (exact for this instrument).
 R_J_MOL_K: float = 8.314462618
@@ -106,6 +108,26 @@ MELT_ENVELOPE_CONSTANTS: Dict[str, MeltModelConstants] = {
     },
 }
 
+MELT_EXTRAPOLATION_ENVELOPE_FIELDS = (
+    "melt_model_id",
+    "T_calib_max_K",
+    "melt_model_extrapolation_K",
+    "melt_extrap_sigma_mu_J_mol",
+    "melt_extrap_sigma_log10_P",
+    "melt_extrap_status",
+    "constants_version",
+)
+MELT_EXTRAPOLATION_ENVELOPE_VOCABULARY = frozenset(
+    (*MELT_EXTRAPOLATION_ENVELOPE_FIELDS, "instrument_status")
+)
+
+
+def has_melt_extrapolation_envelope(diagnostic: Mapping[str, Any]) -> bool:
+    return any(
+        field in diagnostic
+        for field in MELT_EXTRAPOLATION_ENVELOPE_VOCABULARY
+    )
+
 
 class UnknownMeltModelIdError(KeyError):
     """Raised when melt_model_id is not in the versioned constants table.
@@ -122,6 +144,10 @@ class UnknownMeltModelIdError(KeyError):
         )
 
 
+class MeltEnvelopeValidationError(ValueError):
+    """Persisted H2 envelope is missing, partial, or internally inconsistent."""
+
+
 @dataclass(frozen=True)
 class MeltExtrapolationEnvelope:
     """Diagnostic H2 melt-leg envelope at one evaluation temperature.
@@ -135,7 +161,7 @@ class MeltExtrapolationEnvelope:
     melt_model_extrapolation_K: float
     melt_extrap_sigma_mu_J_mol: float
     melt_extrap_sigma_log10_P: float
-    melt_extrap_status: str  # "in_calibration" | "extrapolated"
+    melt_extrap_status: str  # in_calibration | extrapolated | out_of_domain
     constants_version: str
 
 
@@ -168,14 +194,27 @@ def melt_extrapolation_envelope(
     Notes
     -----
     status is ``\"in_calibration\"`` when T_K <= T_calib_max_K, else
-    ``\"extrapolated\"``. Both σ fields are exactly 0.0 inside calibration.
+    ``\"extrapolated\"``. Non-finite inputs fail closed as ``\"out_of_domain\"``.
+    Both σ fields are exactly 0.0 inside calibration and out of domain.
     """
     consts: Mapping[str, object] = _lookup_constants(melt_model_id)
     t_calib = float(consts["T_calib_max_K"])
     s_ex = float(consts["S_ex_bound_J_molK"])
     version = str(consts["constants_version"])
 
-    extrap_k = max(0.0, float(T_K) - t_calib)
+    temperature_K = float(T_K)
+    if not math.isfinite(temperature_K):
+        return MeltExtrapolationEnvelope(
+            melt_model_id=melt_model_id,
+            T_calib_max_K=t_calib,
+            melt_model_extrapolation_K=0.0,
+            melt_extrap_sigma_mu_J_mol=0.0,
+            melt_extrap_sigma_log10_P=0.0,
+            melt_extrap_status="out_of_domain",
+            constants_version=version,
+        )
+
+    extrap_k = max(0.0, temperature_K - t_calib)
     sigma_mu = s_ex * extrap_k
 
     if extrap_k == 0.0:
@@ -186,7 +225,7 @@ def melt_extrapolation_envelope(
         # Projection: σ_log10P = σ_μ / (ln(10) · R · T).  T_K is above
         # T_calib_max (1700 K for MELTS-v1.0), so T_K > 0 is guaranteed for
         # any registered model; keep the division explicit.
-        sigma_log10_p = sigma_mu / (_LN10 * R_J_MOL_K * float(T_K))
+        sigma_log10_p = sigma_mu / (_LN10 * R_J_MOL_K * temperature_K)
 
     return MeltExtrapolationEnvelope(
         melt_model_id=melt_model_id,
@@ -197,3 +236,150 @@ def melt_extrapolation_envelope(
         melt_extrap_status=status,
         constants_version=version,
     )
+
+
+def melt_extrapolation_diagnostic(
+    T_K: float,
+    melt_model_id: str,
+) -> dict[str, Any]:
+    """Build and self-validate the persisted H2 diagnostic projection."""
+
+    envelope = melt_extrapolation_envelope(T_K, melt_model_id)
+    diagnostic = asdict(envelope)
+    diagnostic["instrument_status"] = (
+        "non_authoritative"
+        if envelope.melt_extrap_status == "in_calibration"
+        else STATUS_BEARING_NON_AUTHORITATIVE
+    )
+    consume_melt_extrapolation_envelope(
+        diagnostic,
+        temperature_K=T_K,
+    )
+    return diagnostic
+
+
+def consume_melt_extrapolation_envelope(
+    diagnostic: Mapping[str, Any],
+    *,
+    temperature_K: float | None = None,
+    require_instrument_status: bool = True,
+) -> MeltExtrapolationEnvelope:
+    """Parse and semantically validate every persisted H2 envelope field."""
+
+    present = {
+        field
+        for field in MELT_EXTRAPOLATION_ENVELOPE_FIELDS
+        if field in diagnostic
+    }
+    required = set(MELT_EXTRAPOLATION_ENVELOPE_FIELDS)
+    if present != required:
+        missing = sorted(required - present)
+        kind = (
+            "partial"
+            if has_melt_extrapolation_envelope(diagnostic)
+            else "missing"
+        )
+        raise MeltEnvelopeValidationError(
+            f"{kind} H2 melt envelope; missing fields: {missing}"
+        )
+
+    model_id = str(diagnostic["melt_model_id"])
+    try:
+        constants = _lookup_constants(model_id)
+    except UnknownMeltModelIdError as exc:
+        raise MeltEnvelopeValidationError(
+            f"melt_model_id is not registered: {model_id!r}"
+        ) from exc
+
+    numeric = {
+        field: _finite_envelope_float(diagnostic[field], field)
+        for field in (
+            "T_calib_max_K",
+            "melt_model_extrapolation_K",
+            "melt_extrap_sigma_mu_J_mol",
+            "melt_extrap_sigma_log10_P",
+        )
+    }
+    status = str(diagnostic["melt_extrap_status"])
+    version = str(diagnostic["constants_version"])
+    if status not in {"in_calibration", "extrapolated", "out_of_domain"}:
+        raise MeltEnvelopeValidationError(
+            f"melt_extrap_status is invalid: {status!r}"
+        )
+
+    _require_envelope_close(
+        "T_calib_max_K",
+        numeric["T_calib_max_K"],
+        float(constants["T_calib_max_K"]),
+    )
+    if version != str(constants["constants_version"]):
+        raise MeltEnvelopeValidationError(
+            "constants_version does not match the registered melt model"
+        )
+
+    if temperature_K is None:
+        if status == "out_of_domain":
+            comparison_temperature_K = math.nan
+        elif status == "extrapolated":
+            comparison_temperature_K = (
+                numeric["T_calib_max_K"]
+                + numeric["melt_model_extrapolation_K"]
+            )
+        else:
+            comparison_temperature_K = numeric["T_calib_max_K"]
+    else:
+        comparison_temperature_K = float(temperature_K)
+    expected = melt_extrapolation_envelope(comparison_temperature_K, model_id)
+    expected_values = asdict(expected)
+    for field in MELT_EXTRAPOLATION_ENVELOPE_FIELDS:
+        actual = diagnostic[field]
+        wanted = expected_values[field]
+        if field in numeric:
+            _require_envelope_close(field, numeric[field], float(wanted))
+        elif str(actual) != str(wanted):
+            raise MeltEnvelopeValidationError(
+                f"{field} is inconsistent with the melt model and temperature"
+            )
+
+    expected_instrument_status = (
+        "non_authoritative"
+        if status == "in_calibration"
+        else STATUS_BEARING_NON_AUTHORITATIVE
+    )
+    if require_instrument_status:
+        instrument_status = diagnostic.get("instrument_status")
+        if str(instrument_status or "") != expected_instrument_status:
+            raise MeltEnvelopeValidationError(
+                "instrument_status is inconsistent with melt_extrap_status"
+            )
+
+    return MeltExtrapolationEnvelope(
+        melt_model_id=model_id,
+        T_calib_max_K=numeric["T_calib_max_K"],
+        melt_model_extrapolation_K=numeric["melt_model_extrapolation_K"],
+        melt_extrap_sigma_mu_J_mol=numeric["melt_extrap_sigma_mu_J_mol"],
+        melt_extrap_sigma_log10_P=numeric["melt_extrap_sigma_log10_P"],
+        melt_extrap_status=status,
+        constants_version=version,
+    )
+
+
+def _finite_envelope_float(value: Any, field: str) -> float:
+    if isinstance(value, bool):
+        raise MeltEnvelopeValidationError(f"{field} must be a finite number")
+    try:
+        number = float(value)
+    except (TypeError, ValueError) as exc:
+        raise MeltEnvelopeValidationError(
+            f"{field} must be a finite number"
+        ) from exc
+    if not math.isfinite(number):
+        raise MeltEnvelopeValidationError(f"{field} must be finite")
+    return number
+
+
+def _require_envelope_close(field: str, actual: float, expected: float) -> None:
+    if not math.isclose(actual, expected, rel_tol=1e-12, abs_tol=1e-12):
+        raise MeltEnvelopeValidationError(
+            f"{field} is inconsistent with the melt model and temperature"
+        )

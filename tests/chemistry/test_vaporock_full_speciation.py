@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+from dataclasses import asdict
 import importlib
 import json
 import types
@@ -12,7 +13,12 @@ import simulator.melt_backend.vaporock as vaporock_module
 from engines.vaporock import VapoRockDiagnostics, VapoRockProvider
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
+from simulator.fidelity_vocabulary import STATUS_BEARING_NON_AUTHORITATIVE
+from simulator.melt_backend.melt_envelope import melt_extrapolation_envelope
 from simulator.melt_backend.vaporock import VapoRockBackend
+
+
+_MELT_MODEL_ID = "MELTS-v1.0"
 
 
 def _install_fake_vaporock(monkeypatch, fake_module) -> None:
@@ -122,12 +128,22 @@ def test_provider_keeps_authoritative_pressure_dict_empty():
         status="ok",
     )
 
+    in_calibration = melt_extrapolation_envelope(1600.0, _MELT_MODEL_ID)
     diagnostics = VapoRockProvider._project_equilibrium(
         equilibrium,
         pO2_bar=1e-9,
         mode="system_eval_gas_abundances",
         engine_version="test",
         allowed_species=frozenset(filtered_before),
+        melt_envelope=in_calibration,
+    )
+    extrapolated = VapoRockProvider._project_equilibrium(
+        equilibrium,
+        pO2_bar=1e-9,
+        mode="system_eval_gas_abundances",
+        engine_version="test",
+        allowed_species=frozenset(filtered_before),
+        melt_envelope=melt_extrapolation_envelope(1800.0, _MELT_MODEL_ID),
     )
 
     assert json.dumps(diagnostics.vapor_pressures_Pa, sort_keys=True) == "{}"
@@ -138,6 +154,66 @@ def test_provider_keeps_authoritative_pressure_dict_empty():
     assert full["O2"] == pytest.approx(1.0e-4)
     assert full["Si2"] == pytest.approx(1.0e-7)
     assert full["SiO2_gas"] == pytest.approx(1.0e-9)
+    pre_instrument_fields = (
+        "vapor_pressures_Pa",
+        "vaporock_full_speciation_Pa",
+        "activities",
+        "pO2_bar",
+        "mode",
+        "engine_version",
+        "backend_status",
+        "backend_warnings",
+    )
+    assert {
+        field: getattr(diagnostics, field) for field in pre_instrument_fields
+    } == {
+        field: getattr(extrapolated, field) for field in pre_instrument_fields
+    }
+    assert diagnostics.melt_extrap_status == "in_calibration"
+    assert extrapolated.melt_extrap_status == "extrapolated"
+    assert extrapolated.melt_extrap_sigma_mu_J_mol > 0.0
+    assert extrapolated.melt_extrap_sigma_log10_P > 0.0
+
+
+def test_provider_dispatch_emits_status_bearing_h2_envelope_without_authority():
+    full_speciation = {"Na": 100.0, "SiO": 0.25, "O2": 1.0e-4}
+
+    class FakeBackend:
+        def __init__(self):
+            self.calls = []
+
+        def is_available(self):
+            return True
+
+        def get_engine_version(self):
+            return "test"
+
+        def equilibrate(self, **kwargs):
+            self.calls.append(dict(kwargs))
+            return types.SimpleNamespace(
+                vapor_pressures_Pa=full_speciation,
+                vaporock_full_speciation_Pa=full_speciation,
+                warnings=(),
+                status="ok",
+            )
+
+    backend = FakeBackend()
+    result = VapoRockProvider(backend=backend).dispatch(
+        _vaporock_po2_request(1e-9)
+    )
+    expected = asdict(
+        melt_extrapolation_envelope(1500.0 + 273.15, _MELT_MODEL_ID)
+    )
+
+    assert backend.calls
+    assert result.status == "non_authoritative"
+    assert result.diagnostic["instrument_status"] == (
+        STATUS_BEARING_NON_AUTHORITATIVE
+    )
+    assert result.transition is None
+    assert result.diagnostic["vapor_pressures_Pa"] == {}
+    assert result.diagnostic["vaporock_full_speciation_Pa"] == full_speciation
+    assert {key: result.diagnostic[key] for key in expected} == expected
 
 
 def test_provider_allowed_species_honors_inactive_consumer_status(
@@ -183,6 +259,7 @@ def test_provider_allowed_species_honors_inactive_consumer_status(
         mode="system_eval_gas_abundances",
         engine_version="test",
         allowed_species=allowed_species,
+        melt_envelope=melt_extrapolation_envelope(1800.0, _MELT_MODEL_ID),
     )
 
     assert diagnostics.vapor_pressures_Pa == {}
@@ -198,6 +275,7 @@ def test_provider_allowed_species_honors_inactive_consumer_status(
 
 def test_vaporock_diagnostic_payload_round_trips_full_speciation():
     diagnostics = VapoRockDiagnostics(
+        **asdict(melt_extrapolation_envelope(1800.0, _MELT_MODEL_ID)),
         vapor_pressures_Pa={"Na": 100.0},
         vaporock_full_speciation_Pa={
             "Na": 100.0,
@@ -217,6 +295,8 @@ def test_vaporock_diagnostic_payload_round_trips_full_speciation():
     assert payload["vaporock_full_speciation_Pa"]["SiO2_gas"] == pytest.approx(
         1.0e-9
     )
+    assert payload["melt_extrap_status"] == "extrapolated"
+    assert payload["melt_extrap_sigma_mu_J_mol"] > 0.0
 
 
 def test_installed_vaporock_full_speciation_has_structural_tail():

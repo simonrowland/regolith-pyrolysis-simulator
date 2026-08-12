@@ -9,8 +9,11 @@ import pytest
 from simulator.melt_backend.melt_envelope import (
     MELT_ENVELOPE_CONSTANTS,
     R_J_MOL_K,
+    MeltEnvelopeValidationError,
     MeltExtrapolationEnvelope,
     UnknownMeltModelIdError,
+    consume_melt_extrapolation_envelope,
+    melt_extrapolation_diagnostic,
     melt_extrapolation_envelope,
 )
 
@@ -123,6 +126,74 @@ def test_envelope_is_frozen():
     env = melt_extrapolation_envelope(_T_CALIB, _MODEL)
     with pytest.raises(Exception):
         env.melt_extrap_status = "mutated"  # type: ignore[misc]
+
+
+@pytest.mark.parametrize("temperature_K", [float("nan"), float("inf"), -float("inf")])
+def test_nonfinite_temperature_is_marked_out_of_domain(temperature_K: float):
+    envelope = melt_extrapolation_envelope(temperature_K, _MODEL)
+
+    assert envelope.melt_extrap_status == "out_of_domain"
+    assert envelope.melt_model_extrapolation_K == 0.0
+    assert envelope.melt_extrap_sigma_mu_J_mol == 0.0
+    assert envelope.melt_extrap_sigma_log10_P == 0.0
+    assert all(
+        math.isfinite(value)
+        for value in (
+            envelope.T_calib_max_K,
+            envelope.melt_model_extrapolation_K,
+            envelope.melt_extrap_sigma_mu_J_mol,
+            envelope.melt_extrap_sigma_log10_P,
+        )
+    )
+
+
+def test_typed_consumer_semantically_validates_every_envelope_field():
+    temperature_K = _T_CALIB + 100.0
+    diagnostic = melt_extrapolation_diagnostic(temperature_K, _MODEL)
+
+    consumed = consume_melt_extrapolation_envelope(
+        diagnostic,
+        temperature_K=temperature_K,
+    )
+
+    assert consumed == melt_extrapolation_envelope(temperature_K, _MODEL)
+
+    corrupt_values = {
+        "melt_model_id": "not-a-registered-model",
+        "T_calib_max_K": _T_CALIB + 1.0,
+        "melt_model_extrapolation_K": 99.0,
+        "melt_extrap_sigma_mu_J_mol": 99.0,
+        "melt_extrap_sigma_log10_P": 99.0,
+        "melt_extrap_status": "in_calibration",
+        "constants_version": "stale-constants",
+    }
+    for field, corrupt_value in corrupt_values.items():
+        corrupt = dict(diagnostic)
+        corrupt[field] = corrupt_value
+        with pytest.raises(MeltEnvelopeValidationError, match=field):
+            consume_melt_extrapolation_envelope(
+                corrupt,
+                temperature_K=temperature_K,
+            )
+
+
+def test_typed_consumer_rejects_partial_envelope_instead_of_dropping_it():
+    diagnostic = melt_extrapolation_diagnostic(_T_CALIB, _MODEL)
+    diagnostic.pop("constants_version")
+
+    with pytest.raises(MeltEnvelopeValidationError, match="partial"):
+        consume_melt_extrapolation_envelope(
+            diagnostic,
+            temperature_K=_T_CALIB,
+        )
+
+
+def test_typed_consumer_classifies_marker_only_envelope_as_partial():
+    with pytest.raises(MeltEnvelopeValidationError, match="partial"):
+        consume_melt_extrapolation_envelope(
+            {"instrument_status": "status_bearing_non_authoritative"},
+            temperature_K=_T_CALIB,
+        )
 
 
 def test_r_constant_matches_ht_plan():

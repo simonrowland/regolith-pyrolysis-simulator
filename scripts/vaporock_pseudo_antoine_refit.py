@@ -9,6 +9,7 @@ coefficients only after reviewing the residual table.
 from __future__ import annotations
 
 import argparse
+from collections import Counter
 import json
 import math
 import sys
@@ -24,6 +25,10 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
 
 from engines.builtin.vapor_pressure import _ELLINGHAM_THERMO
+from simulator.melt_backend.melt_envelope import (
+    consume_melt_extrapolation_envelope,
+    melt_extrapolation_diagnostic,
+)
 from simulator.state import GAS_CONSTANT
 
 
@@ -62,6 +67,16 @@ OLD_METADATA_RESIDUALS = {
     "Fe": 0.023,
     "SiO": 0.113,
 }
+MELT_MODEL_ID = "MELTS-v1.0"
+
+
+class VapoRockRefitCellError(RuntimeError):
+    """Fail-loud VapoRock cell error carrying its validated H2 diagnostic."""
+
+    def __init__(self, message: str, diagnostic: dict[str, Any]) -> None:
+        super().__init__(message)
+        self.status = "refused"
+        self.diagnostic = dict(diagnostic)
 
 
 def parse_args() -> argparse.Namespace:
@@ -123,11 +138,26 @@ def vaporock_pressures_pa(
     composition_wt_pct: dict[str, float],
     temperature_k: float,
     species: tuple[str, ...],
-) -> tuple[float, dict[str, float]]:
-    system = vaporock.System()
-    system.set_melt_comp(composition_wt_pct)
-    logfo2 = float(vaporock.redox_buffer(temperature_k, "IW"))
-    result = system.eval_gas_abundances(temperature_k, logfo2)
+) -> tuple[float, dict[str, float], dict[str, Any]]:
+    melt_diagnostic = melt_extrapolation_diagnostic(
+        temperature_k,
+        MELT_MODEL_ID,
+    )
+    consume_melt_extrapolation_envelope(
+        melt_diagnostic,
+        temperature_K=temperature_k,
+    )
+    try:
+        system = vaporock.System()
+        system.set_melt_comp(composition_wt_pct)
+        logfo2 = float(vaporock.redox_buffer(temperature_k, "IW"))
+        result = system.eval_gas_abundances(temperature_k, logfo2)
+    except Exception as exc:  # noqa: BLE001 - fail-loud upstream boundary
+        raise VapoRockRefitCellError(
+            f"VapoRock refit cell failed at {temperature_k:g} K: "
+            f"{type(exc).__name__}: {exc}",
+            melt_diagnostic,
+        ) from exc
     pressures: dict[str, float] = {}
     for name in species:
         try:
@@ -137,7 +167,7 @@ def vaporock_pressures_pa(
         pressure_pa = 10.0**log10_bar * 1.0e5
         if math.isfinite(pressure_pa) and pressure_pa > 0.0:
             pressures[name] = pressure_pa
-    return logfo2, pressures
+    return logfo2, pressures, melt_diagnostic
 
 
 def fallback_activity_term(
@@ -288,11 +318,27 @@ def main() -> int:
     feedstocks = load_yaml(REPO_ROOT / "data" / "feedstocks.yaml")
 
     samples_by_species: dict[str, list[dict[str, Any]]] = {name: [] for name in species}
+    melt_diagnostics: list[dict[str, Any]] = []
     for feedstock_id in args.feedstocks:
         feedstock = feedstocks[feedstock_id]
         composition = clean_silicate_composition(feedstock["composition_wt_pct"])
         for temperature_k in temps:
-            logfo2, pressures = vaporock_pressures_pa(composition, temperature_k, species)
+            logfo2, pressures, melt_diagnostic = vaporock_pressures_pa(
+                composition,
+                temperature_k,
+                species,
+            )
+            consume_melt_extrapolation_envelope(
+                melt_diagnostic,
+                temperature_K=temperature_k,
+            )
+            melt_diagnostics.append(
+                {
+                    "feedstock": feedstock_id,
+                    "temperature_K": temperature_k,
+                    **melt_diagnostic,
+                }
+            )
             for name, pressure_pa in pressures.items():
                 activity = fallback_activity_term(
                     species=name,
@@ -350,6 +396,7 @@ def main() -> int:
         "vaporock": {
             "module_file": getattr(vaporock, "__file__", "unknown"),
         },
+        "melt_extrapolation_diagnostics": melt_diagnostics,
         "rows": rows,
     }
     if args.json:
@@ -358,6 +405,17 @@ def main() -> int:
         print(
             f"grid: {len(args.feedstocks)} feedstocks x {len(temps)} temperatures = "
             f"{len(args.feedstocks) * len(temps)} cells; C bound +/-{args.c_bound:g} K"
+        )
+        status_counts = Counter(
+            str(row["melt_extrap_status"])
+            for row in melt_diagnostics
+        )
+        print(
+            "melt instrument: "
+            + ", ".join(
+                f"{status}={count}"
+                for status, count in sorted(status_counts.items())
+            )
         )
         print("| species | n | old metadata | old dense | new dense | rmse | A | B | C | tier |")
         print("|---|---:|---:|---:|---:|---:|---:|---:|---:|---|")

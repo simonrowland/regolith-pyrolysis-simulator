@@ -13,6 +13,7 @@ from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.core import PyrolysisSimulator
 from engines.domain_reason import OutOfDomainReason
+from simulator.fidelity_vocabulary import STATUS_BEARING_NON_AUTHORITATIVE
 from simulator.melt_backend.base import (
     DEFAULT_BACKEND_CAPABILITIES,
     InternalAnalyticalBackend,
@@ -54,6 +55,26 @@ def _vaporock_diagnostic_pressures(result):
         getattr(result, "vaporock_full_speciation_Pa", {})
         or result.vapor_pressures_Pa
         or {}
+    )
+
+
+def _assert_h2_melt_envelope(diagnostics, *, temperature_K, status):
+    extrapolation_K = max(0.0, temperature_K - 1700.0)
+    assert diagnostics["melt_model_id"] == "MELTS-v1.0"
+    assert diagnostics["T_calib_max_K"] == 1700.0
+    assert diagnostics["melt_model_extrapolation_K"] == pytest.approx(
+        extrapolation_K
+    )
+    assert diagnostics["melt_extrap_sigma_mu_J_mol"] == pytest.approx(
+        5.0 * extrapolation_K
+    )
+    assert diagnostics["melt_extrap_sigma_log10_P"] >= 0.0
+    assert diagnostics["melt_extrap_status"] == status
+    assert diagnostics["constants_version"] == "2026-08-10.ht-c3.1"
+    assert diagnostics["instrument_status"] == (
+        "non_authoritative"
+        if status == "in_calibration"
+        else STATUS_BEARING_NON_AUTHORITATIVE
     )
 
 
@@ -170,6 +191,11 @@ def test_unavailable_equilibrate_returns_empty_result_with_warning():
     assert result.phases_present == []
     assert result.warnings == ["VapoRock backend not initialized"]
     assert result.status == "unavailable"
+    _assert_h2_melt_envelope(
+        result.diagnostics,
+        temperature_K=1873.15,
+        status="extrapolated",
+    )
 
 
 def test_empty_melt_composition_marks_status_out_of_domain(monkeypatch):
@@ -1104,6 +1130,11 @@ def test_temperature_domain_gate_refuses_outside_envelope(monkeypatch):
     )
     assert calls["n"] == 0
     assert any("outside admitted domain" in w for w in result.warnings)
+    _assert_h2_melt_envelope(
+        result.diagnostics,
+        temperature_K=10000.0,
+        status="extrapolated",
+    )
 
     # Below floor.
     result_lo = backend.equilibrate(
@@ -1115,6 +1146,52 @@ def test_temperature_domain_gate_refuses_outside_envelope(monkeypatch):
     assert result_lo.diagnostics["backend_status_reason"] == (
         OutOfDomainReason.TEMPERATURE_RANGE.value
     )
+    assert calls["n"] == 0
+
+
+@pytest.mark.parametrize(
+    "temperature_C",
+    [float("nan"), float("inf"), -float("inf")],
+)
+def test_nonfinite_temperature_has_fail_closed_h2_envelope(
+    monkeypatch,
+    temperature_C,
+):
+    calls = {"n": 0}
+
+    def calc_vapor_pressures(**_):
+        calls["n"] += 1
+        return {"Na": 1.0}
+
+    _install_fake_import(
+        monkeypatch,
+        types.SimpleNamespace(calc_vapor_pressures=calc_vapor_pressures),
+    )
+    backend = VapoRockBackend()
+    assert backend.initialize({"warm_worker": False}) is True
+
+    result = backend.equilibrate(
+        temperature_C,
+        composition_mol={"SiO2": 1.0},
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+    )
+
+    assert result.status == "out_of_domain"
+    assert result.diagnostics["backend_status_reason"] == (
+        OutOfDomainReason.TEMPERATURE_RANGE.value
+    )
+    assert result.diagnostics["melt_extrap_status"] == "out_of_domain"
+    assert result.diagnostics["instrument_status"] == (
+        STATUS_BEARING_NON_AUTHORITATIVE
+    )
+    for field in (
+        "T_calib_max_K",
+        "melt_model_extrapolation_K",
+        "melt_extrap_sigma_mu_J_mol",
+        "melt_extrap_sigma_log10_P",
+    ):
+        assert math.isfinite(result.diagnostics[field])
     assert calls["n"] == 0
 
 
@@ -1146,6 +1223,11 @@ def test_temperature_domain_gate_admits_envelope_edges(monkeypatch):
             OutOfDomainReason.TEMPERATURE_RANGE.value,
             OutOfDomainReason.SUM_PRESSURE_SANITY.value,
         } if "backend_status_reason" in result.diagnostics else True
+        _assert_h2_melt_envelope(
+            result.diagnostics,
+            temperature_K=t_k,
+            status="in_calibration" if t_k <= 1700.0 else "extrapolated",
+        )
 
     assert seen_T == pytest.approx([1350.0, 1950.0])
 
@@ -1344,8 +1426,11 @@ def test_provider_forwards_liquid_fraction_and_domain_refuses():
     )
     result = provider.dispatch(request)
     assert seen["liquid_fraction"] == pytest.approx(0.4)
-    # Provider stays diagnostic/non-authoritative regardless of backend status.
+    # Provider control status stays invariant; the instrument carries its marker.
     assert result.status == "non_authoritative"
+    assert result.diagnostic["instrument_status"] == (
+        STATUS_BEARING_NON_AUTHORITATIVE
+    )
     assert result.transition is None
     assert provider.capability_profile().is_authoritative_for == frozenset()
 

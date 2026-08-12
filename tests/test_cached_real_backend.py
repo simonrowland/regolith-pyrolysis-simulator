@@ -29,6 +29,10 @@ from simulator.melt_backend.base import (
     RealBackendAuthority,
     RealBackendFamily,
 )
+from simulator.melt_backend.melt_envelope import (
+    consume_melt_extrapolation_envelope,
+    melt_extrapolation_diagnostic,
+)
 from simulator.reduced_real_determinism import (
     ControlQuantization,
     PT0CacheCollision,
@@ -986,6 +990,18 @@ def test_cached_real_replays_row_written_by_populate_driver_store(
     assert replay_sim._last_reduced_real_cache_state == "cached_exact"
     assert replay_result.status == live_result.status
     assert replay_result.vapor_pressures_Pa == live_result.vapor_pressures_Pa
+    consume_melt_extrapolation_envelope(
+        replay_result.diagnostics,
+        temperature_K=float(replay_result.temperature_C) + 273.15,
+    )
+    expected_envelope = melt_extrapolation_diagnostic(
+        float(replay_result.temperature_C) + 273.15,
+        "MELTS-v1.0",
+    )
+    assert {
+        field: replay_result.diagnostics[field]
+        for field in expected_envelope
+    } == expected_envelope
 
 
 def test_cached_real_authorized_backend_identity_partitions_cache(

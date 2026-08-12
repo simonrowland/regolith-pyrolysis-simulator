@@ -74,6 +74,7 @@ from simulator.melt_backend.liquidus import (
     LiquidusSolidusResult,
     find_liquidus_solidus_by_fraction,
 )
+from simulator.melt_backend.melt_envelope import melt_extrapolation_diagnostic
 from simulator.physical_constants import GAS_CONSTANT
 
 
@@ -116,6 +117,14 @@ MELTS_OXIDE_ALIASES.update({
 FE_REDOX_BUFFERS = {'QFM', 'NNO', 'IW', 'HM'}
 FE_REDOX_BUFFER_ALIASES = {'FMQ': 'QFM'}
 FE3_TO_FEOT_FACTOR = 0.8998
+_MELT_MODEL_ID = 'MELTS-v1.0'
+
+
+def _h2_melt_envelope_diagnostics(temperature_C: float) -> dict[str, Any]:
+    return melt_extrapolation_diagnostic(
+        float(temperature_C) + 273.15,
+        _MELT_MODEL_ID,
+    )
 
 ALPHAMELTS_REASON_TIMEOUT = 'timeout'
 ALPHAMELTS_REASON_SUBPROCESS_DIED = 'subprocess_died'
@@ -2190,6 +2199,7 @@ class _MELTSBackendSupport(MeltBackend):
             # Vapor pressures via the real VapoRock helper if available,
             # fed the SOLVED equilibrium liquid composition (not the
             # pre-equilibrium input); explicit Antoine fallback otherwise.
+            vaporock_envelope_diagnostics: dict[str, Any] = {}
             if self._vaporock_available:
                 eq.vapor_pressures_Pa, source = (
                     self._vapor_pressures_via_vaporock_or_antoine(
@@ -2200,6 +2210,9 @@ class _MELTSBackendSupport(MeltBackend):
                         pressure_bar=solved_pressure_bar,
                         activities=eq.activity_coefficients,
                     )
+                )
+                vaporock_envelope_diagnostics = (
+                    _h2_melt_envelope_diagnostics(temperature_C)
                 )
             else:
                 # Use activity x Antoine fallback rows only when the
@@ -2222,7 +2235,10 @@ class _MELTSBackendSupport(MeltBackend):
                 source,
             )
             eq.diagnostics = self._vapor_pressure_diagnostics(
-                eq.diagnostics,
+                {
+                    **eq.diagnostics,
+                    **vaporock_envelope_diagnostics,
+                },
                 eq.vapor_pressures_Pa,
                 source,
             )

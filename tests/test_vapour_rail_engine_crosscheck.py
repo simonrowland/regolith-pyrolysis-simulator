@@ -159,6 +159,11 @@ def test_runner_reports_magnitude_slopes_and_asymmetries_without_verdict():
 
     assert len(rail.requests) == 6
     assert len(vaporock.calls) == 6
+    assert all(
+        cell["vaporock_h2_melt_envelope"]["melt_extrap_status"]
+        == "in_calibration"
+        for cell in report["cell_runs"]
+    )
     for request, call in zip(rail.requests, vaporock.calls, strict=True):
         assert request.fO2_log == call["fO2_log"]
         assert request.control_inputs["intrinsic_fO2_log"] == call["fO2_log"]
@@ -169,6 +174,77 @@ def test_runner_reports_magnitude_slopes_and_asymmetries_without_verdict():
             call["composition_mol"]
         )
         assert "liquid_fraction" not in call
+
+
+def test_crosscheck_serializes_extrapolated_h2_envelope_with_existing_status():
+    report = run_engine_crosscheck(
+        composition=COMPOSITION,
+        temperatures_K=[1950.0],
+        fo2_log10_bar=[-9.0, -8.0],
+        rail_provider=_FakeRailProvider(),
+        rail_declared_species=["SiO", "Na"],
+        vaporock_backend=_FakeWarmVapoRock(),
+        vaporock_declared_species=["SiO", "Na"],
+        generated_at="2026-08-11T00:00:00+00:00",
+    )
+
+    replayed = json.loads(json.dumps(report, sort_keys=True))
+    cell = replayed["cell_runs"][0]
+    envelope = cell["vaporock_h2_melt_envelope"]
+    assert cell["vaporock_instrument_status"] == (
+        "status_bearing_non_authoritative"
+    )
+    assert envelope == {
+        "T_calib_max_K": 1700.0,
+        "constants_version": "2026-08-10.ht-c3.1",
+        "melt_extrap_sigma_log10_P": pytest.approx(
+            envelope["melt_extrap_sigma_log10_P"]
+        ),
+        "melt_extrap_sigma_mu_J_mol": 1250.0,
+        "melt_extrap_status": "extrapolated",
+        "melt_model_extrapolation_K": 250.0,
+        "melt_model_id": "MELTS-v1.0",
+    }
+    assert envelope["melt_extrap_sigma_log10_P"] > 0.0
+
+
+@pytest.mark.parametrize(
+    "partial_envelope",
+    (
+        {"melt_model_id": "MELTS-v1.0"},
+        {"instrument_status": "status_bearing_non_authoritative"},
+    ),
+)
+def test_crosscheck_rejects_partial_h2_envelope(partial_envelope):
+    raw_cells = [
+        {
+            "temperature_K": 1500.0,
+            "fo2_log10_bar": -9.0,
+            "rail": {
+                "status": "ok",
+                "reason": None,
+                "pressures_Pa": {"SiO": 1.0},
+            },
+            "vaporock": {
+                "status": "non_authoritative",
+                "reason": None,
+                "pressures_Pa": {"SiO": 1.0},
+                **partial_envelope,
+            },
+        }
+    ]
+
+    with pytest.raises(ValueError, match="partial H2 melt envelope"):
+        build_crosscheck_report(
+            composition=COMPOSITION,
+            temperatures_K=[1500.0],
+            fo2_log10_bar=[-9.0],
+            raw_cells=raw_cells,
+            rail_declared_species=["SiO"],
+            vaporock_declared_species=["SiO"],
+            p_floor_Pa=1.0e-30,
+            generated_at="fixed",
+        )
 
 
 def test_censored_pressures_remain_intervals_and_do_not_enter_slopes():

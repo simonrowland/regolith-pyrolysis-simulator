@@ -115,6 +115,7 @@ from simulator.melt_backend.base import (
     project_melt_to_oxide_projection,
     split_cleaned_melt_account,
 )
+from simulator.melt_backend.melt_envelope import melt_extrapolation_diagnostic
 from simulator.state import OXIDE_SPECIES
 
 
@@ -128,6 +129,7 @@ from simulator.state import OXIDE_SPECIES
 # A finite provider return is therefore no evidence of domain validity.
 VAPOROCK_T_MIN_K = 1350.0
 VAPOROCK_T_MAX_K = 1950.0
+_MELT_MODEL_ID = 'MELTS-v1.0'
 # In-domain mare totals are ≪ 1 bar even at 1950 K / reducing fO2. Ten bar
 # is a conservative sum-pressure sanity ceiling well below the probe's
 # 10000 K garbage (~8.3e5 bar) and well above any admitted-grid total.
@@ -1027,6 +1029,12 @@ class VapoRockBackend(MeltBackend):
         ``EquilibriumResult`` and appends a one-line warning rather
         than raising.
         """
+        temperature_K = temperature_C_to_K(temperature_C)
+        melt_envelope_diagnostics = melt_extrapolation_diagnostic(
+            temperature_K,
+            _MELT_MODEL_ID,
+        )
+
         if not self._available or (
             self._warm_pool is None and self._vaporock is None
         ):
@@ -1036,18 +1044,23 @@ class VapoRockBackend(MeltBackend):
                 fO2_log=fO2_log,
                 status='unavailable',
                 warnings=['VapoRock backend not initialized'],
+                diagnostics=melt_envelope_diagnostics,
             )
 
         prior_warnings: List[str] = []
-        temperature_K = temperature_C_to_K(temperature_C)
 
         # --- HARD external temperature gate (before any engine call) ---
         if not vaporock_temperature_in_domain(temperature_K):
             diagnostics = {
+                **melt_envelope_diagnostics,
                 'backend_status_reason': (
                     OutOfDomainReason.TEMPERATURE_RANGE.value
                 ),
-                'temperature_K': float(temperature_K),
+                **(
+                    {'temperature_K': float(temperature_K)}
+                    if math.isfinite(temperature_K)
+                    else {'temperature_input_category': 'non_finite'}
+                ),
                 'vaporock_t_min_K': VAPOROCK_T_MIN_K,
                 'vaporock_t_max_K': VAPOROCK_T_MAX_K,
                 'requested_pressure_bar': float(pressure_bar),
@@ -1088,6 +1101,7 @@ class VapoRockBackend(MeltBackend):
                         coerced if math.isfinite(coerced) else repr(liquid_fraction)
                     )
             diagnostics = {
+                **melt_envelope_diagnostics,
                 'backend_status_reason': (
                     OutOfDomainReason.LIQUID_STATE.value
                 ),
@@ -1152,6 +1166,10 @@ class VapoRockBackend(MeltBackend):
             dropped_accounts=dropped_accounts,
             dropped_account_species=dropped_account_species,
         )
+        projection_diagnostics = {
+            **melt_envelope_diagnostics,
+            **projection_diagnostics,
+        }
         if (
             projection.dropped_mass_kg_by_species
             or dropped_accounts

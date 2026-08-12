@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor
+from dataclasses import asdict
 import json
 from pathlib import Path
 import subprocess
@@ -10,12 +11,31 @@ from types import SimpleNamespace
 import pytest
 from flask import Flask
 
+from engines.vaporock import VapoRockDiagnostics, VapoRockProvider
 from simulator.accounting.run_artifact import (
     ARTIFACT_SCHEMA_VERSION,
     CONFIDENCE_MAX_MASS_BALANCE_RESIDUAL_PCT,
     RunArtifactContractError,
     build_run_artifact,
 )
+from simulator.chemistry.kernel import (
+    CapabilityProfile,
+    ChemistryIntent,
+    ChemistryProvider,
+    IntentRequest,
+    IntentResult,
+    ProviderRegistry,
+)
+from simulator.chemistry.kernel.dto import ProviderAccountView
+from simulator.chemistry.kernel.planner import Planner
+from simulator.fidelity_vocabulary import STATUS_BEARING_NON_AUTHORITATIVE
+from simulator.melt_backend.melt_envelope import (
+    MELT_EXTRAPOLATION_ENVELOPE_FIELDS,
+    MeltEnvelopeValidationError,
+    melt_extrapolation_diagnostic,
+    melt_extrapolation_envelope,
+)
+from simulator.run_executor import _collect_shadow_trace
 from web import events as web_events
 from web import routes as web_routes
 from web import run_store as run_store_module
@@ -200,6 +220,212 @@ def test_build_run_artifact_omits_yield_disposition_when_runner_omits_it() -> No
     artifact = build_run_artifact(payload, run_id="run-without-yield")
 
     assert "yield_disposition" not in artifact["terminal"]
+
+
+def test_h2_vaporock_envelope_survives_runner_artifact_and_disk_replay(
+    tmp_path,
+) -> None:
+    envelope = melt_extrapolation_envelope(1800.0, "MELTS-v1.0")
+    diagnostics = VapoRockDiagnostics(
+        **asdict(envelope),
+        vaporock_full_speciation_Pa={"Na": 100.0},
+        pO2_bar=1e-9,
+        mode="fake",
+        engine_version="test",
+        backend_status="ok",
+    )
+    result = IntentResult(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        status="non_authoritative",
+        transition=None,
+        diagnostic=diagnostics.as_diagnostic(),
+    )
+    sim = SimpleNamespace(
+        _chem_kernel=SimpleNamespace(
+            planner=SimpleNamespace(
+                shadow_trace=(
+                    {
+                        "event": "shadow_dispatch",
+                        "provider_id": "vaporock",
+                        "intent": ChemistryIntent.VAPOR_PRESSURE.value,
+                        "result": result,
+                    },
+                )
+            )
+        )
+    )
+    runner_trace = _collect_shadow_trace(sim, [])
+    payload = _runner_payload("ok")
+    payload["shadow_trace"] = runner_trace
+    artifact = build_run_artifact(payload, run_id="run-h2")
+    store = RunArtifactStore(tmp_path / "runs")
+
+    assert store.save("run-h2", artifact) is True
+    serialized = json.loads(
+        (store.runs_dir / "run-h2.json").read_text(encoding="utf-8")
+    )
+    replayed = store.load("run-h2")
+    assert replayed is not None
+
+    expected = melt_extrapolation_diagnostic(1800.0, "MELTS-v1.0")
+    serialized_diagnostic = serialized["terminal"]["shadow_trace"][0][
+        "result"
+    ]["diagnostic"]
+    replayed_diagnostic = replayed["terminal"]["shadow_trace"][0]["result"][
+        "diagnostic"
+    ]
+    assert serialized_diagnostic == expected
+    assert replayed_diagnostic == expected
+    assert set(serialized_diagnostic) == set(expected)
+    assert serialized["terminal"]["shadow_trace"][0]["result"]["status"] == (
+        "non_authoritative"
+    )
+    assert serialized_diagnostic["instrument_status"] == (
+        STATUS_BEARING_NON_AUTHORITATIVE
+    )
+
+    serialized_diagnostic.pop("constants_version")
+    (store.runs_dir / "run-h2.json").write_text(
+        json.dumps(serialized, allow_nan=False),
+        encoding="utf-8",
+    )
+    with pytest.raises(RunStoreCorruptionError, match="partial H2 melt envelope"):
+        store.load("run-h2")
+
+
+@pytest.mark.parametrize(
+    "missing_field",
+    (*MELT_EXTRAPOLATION_ENVELOPE_FIELDS, "instrument_status"),
+)
+def test_runner_rejects_partial_vaporock_envelope(missing_field: str) -> None:
+    diagnostic = melt_extrapolation_diagnostic(1800.0, "MELTS-v1.0")
+    diagnostic.pop(missing_field)
+    sim = SimpleNamespace(
+        _chem_kernel=SimpleNamespace(
+            planner=SimpleNamespace(
+                shadow_trace=(
+                    {
+                        "event": "shadow_dispatch",
+                        "provider_id": "vaporock",
+                        "intent": ChemistryIntent.VAPOR_PRESSURE.value,
+                        "result": IntentResult(
+                            intent=ChemistryIntent.VAPOR_PRESSURE,
+                            status="non_authoritative",
+                            diagnostic=diagnostic,
+                        ),
+                    },
+                )
+            )
+        )
+    )
+
+    with pytest.raises(MeltEnvelopeValidationError):
+        _collect_shadow_trace(sim, [])
+
+
+def test_vaporock_provider_unavailable_survives_planner_artifact_and_replay(
+    tmp_path,
+) -> None:
+    class AuthoritativeProvider(ChemistryProvider):
+        def capability_profile(self) -> CapabilityProfile:
+            return CapabilityProfile(
+                provider_id="authoritative",
+                intents=frozenset({ChemistryIntent.VAPOR_PRESSURE}),
+                is_authoritative_for=frozenset(
+                    {ChemistryIntent.VAPOR_PRESSURE}
+                ),
+                declared_accounts=frozenset({"process.cleaned_melt"}),
+            )
+
+        def dispatch(self, request: IntentRequest) -> IntentResult:
+            return IntentResult(intent=request.intent, status="ok")
+
+    class UnavailableBackend:
+        _last_error = "forced unavailable"
+
+        @staticmethod
+        def is_available() -> bool:
+            return False
+
+    registry = ProviderRegistry()
+    registry.register(
+        AuthoritativeProvider(),
+        [ChemistryIntent.VAPOR_PRESSURE],
+    )
+    registry.register(
+        VapoRockProvider(backend=UnavailableBackend()),
+        [ChemistryIntent.VAPOR_PRESSURE],
+        shadow=True,
+    )
+    planner = Planner(registry)
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {}},
+            species_formula_registry={},
+        ),
+        temperature_C=1500.0,
+        pressure_bar=1.0e-6,
+    )
+
+    authoritative_result = planner.dispatch(request)
+    expected_diagnostic = {
+        **melt_extrapolation_diagnostic(1500.0 + 273.15, "MELTS-v1.0"),
+        "backend_status": "unavailable",
+    }
+    assert authoritative_result.status == "ok"
+    assert planner.shadow_trace == (
+        {
+            "event": "shadow_error",
+            "provider_id": "vaporock",
+            "intent": "vapor_pressure",
+            "error": (
+                "ProviderUnavailableError('VapoRock diagnostic provider "
+                "unavailable: forced unavailable')"
+            ),
+            "result": {
+                "status": "unavailable",
+                "diagnostic": expected_diagnostic,
+            },
+        },
+    )
+
+    runner_trace = _collect_shadow_trace(
+        SimpleNamespace(
+            _chem_kernel=SimpleNamespace(planner=planner),
+        ),
+        [],
+    )
+    expected_compact_diagnostic = melt_extrapolation_diagnostic(
+        1500.0 + 273.15,
+        "MELTS-v1.0",
+    )
+    assert runner_trace == [
+        {
+            "event": "shadow_error",
+            "provider_id": "vaporock",
+            "intent": "vapor_pressure",
+            "result": {
+                "status": "unavailable",
+                "diagnostic": expected_compact_diagnostic,
+            },
+            "error": (
+                "ProviderUnavailableError('VapoRock diagnostic provider "
+                "unavailable: forced unavailable')"
+            ),
+        }
+    ]
+
+    payload = _runner_payload("ok")
+    payload["shadow_trace"] = runner_trace
+    store = RunArtifactStore(tmp_path / "runs")
+    assert store.save(
+        "run-provider-unavailable",
+        build_run_artifact(payload, run_id="run-provider-unavailable"),
+    )
+    replayed = store.load("run-provider-unavailable")
+    assert replayed is not None
+    assert replayed["terminal"]["shadow_trace"] == runner_trace
 
 
 @pytest.mark.parametrize(

@@ -26,6 +26,10 @@ from simulator.melt_backend.base import (
     RealBackendFamily,
 )
 from simulator.melt_backend.magemin import MAGEMinBackend
+from simulator.melt_backend.melt_envelope import (
+    MeltEnvelopeValidationError,
+    melt_extrapolation_diagnostic,
+)
 from simulator.optimize.determinism import deterministic_result_view
 from simulator.reduced_real_determinism import (
     ControlQuantization,
@@ -811,6 +815,156 @@ def test_equilibrium_payload_hash_ignores_melt_regime_divergence_diagnostics():
     )
     assert "melt_regime_predicate_divergences" in live_diagnostic
     assert "future_melt_regime_divergences" in live_diagnostic
+
+
+def test_equilibrium_envelope_is_cache_inert_and_attached_on_legacy_replay(
+    tmp_path: Path,
+):
+    legacy_result = EquilibriumResult(
+        temperature_C=1600.0,
+        pressure_bar=1.0e-6,
+        phase_assemblage_available=False,
+        status="ok",
+        diagnostics={"existing_diagnostic": "unchanged"},
+    )
+    instrumented_result = copy.deepcopy(legacy_result)
+    expected_diagnostic = melt_extrapolation_diagnostic(
+        1600.0 + 273.15,
+        "MELTS-v1.0",
+    )
+    instrumented_result.diagnostics.update(expected_diagnostic)
+    legacy_result.alphamelts_diagnostics = {"transport": "subprocess"}
+    instrumented_result.alphamelts_diagnostics = {
+        "transport": "subprocess",
+        **expected_diagnostic,
+    }
+    legacy_sim = SimpleNamespace(
+        _last_vapor_pressure_diagnostic={"backend_status": "ok"},
+    )
+    instrumented_sim = SimpleNamespace(
+        _last_vapor_pressure_diagnostic={
+            "backend_status": "ok",
+            **expected_diagnostic,
+        },
+    )
+    legacy_payload = rrd.equilibrium_payload(legacy_sim, legacy_result)
+    instrumented_payload = rrd.equilibrium_payload(
+        instrumented_sim,
+        instrumented_result,
+    )
+    legacy_payload["authority"] = copy.deepcopy(_alphamelts_record_authority())
+    instrumented_payload["authority"] = copy.deepcopy(
+        _alphamelts_record_authority()
+    )
+
+    assert canonical_json_bytes(instrumented_payload) == canonical_json_bytes(
+        legacy_payload
+    )
+
+    unchanged_key = {
+        "namespace_id": "alphamelts:equilibrium-composite",
+        "composition_mol_fraction": [["SiO2", 1.0]],
+        "controls": {"T_K": 1873.15, "pressure_bar": 1.0e-6},
+        "model": {},
+        "vapor_pressure_provider_selection": {},
+    }
+    store = PT0DeterminismStore(
+        "capture",
+        db_path=tmp_path / "h2-cache-inert.sqlite",
+    )
+    store._store("equilibrium_post_record", unchanged_key, legacy_payload)
+    store._store("equilibrium_post_record", unchanged_key, instrumented_payload)
+
+    replayed = rrd.equilibrium_from_payload(legacy_payload)
+    assert {
+        field: replayed.diagnostics[field]
+        for field in expected_diagnostic
+    } == expected_diagnostic
+    assert {
+        field: replayed.alphamelts_diagnostics[field]
+        for field in expected_diagnostic
+    } == expected_diagnostic
+
+    partial_payload = copy.deepcopy(legacy_payload)
+    partial_payload["alphamelts_diagnostics"] = {
+        "melt_model_id": "MELTS-v1.0"
+    }
+    with pytest.raises(MeltEnvelopeValidationError, match="partial H2"):
+        rrd.equilibrium_from_payload(partial_payload)
+
+
+@pytest.mark.parametrize(
+    "carrier",
+    (
+        "equilibrium_result.diagnostics",
+        "last_vapor_pressure_diagnostic",
+        "alphamelts_diagnostics",
+    ),
+)
+def test_marker_only_melt_envelope_is_rejected_on_every_cache_carrier(
+    carrier: str,
+):
+    result = EquilibriumResult(
+        temperature_C=1600.0,
+        pressure_bar=1.0e-6,
+        phase_assemblage_available=False,
+        status="ok",
+        diagnostics={"existing_diagnostic": "unchanged"},
+    )
+    result.alphamelts_diagnostics = {"transport": "subprocess"}
+    sim = SimpleNamespace(
+        _last_vapor_pressure_diagnostic={"backend_status": "ok"},
+    )
+    marker = {"instrument_status": "status_bearing_non_authoritative"}
+    if carrier == "equilibrium_result.diagnostics":
+        result.diagnostics.update(marker)
+    elif carrier == "last_vapor_pressure_diagnostic":
+        sim._last_vapor_pressure_diagnostic.update(marker)
+    else:
+        result.alphamelts_diagnostics.update(marker)
+
+    with pytest.raises(MeltEnvelopeValidationError, match="partial H2"):
+        rrd.equilibrium_payload(sim, result)
+
+
+@pytest.mark.parametrize(
+    "carrier",
+    (
+        "equilibrium_result.diagnostics",
+        "last_vapor_pressure_diagnostic",
+        "alphamelts_diagnostics",
+    ),
+)
+def test_marker_only_melt_envelope_is_rejected_before_replay_reconstruction(
+    carrier: str,
+):
+    result = EquilibriumResult(
+        temperature_C=1600.0,
+        pressure_bar=1.0e-6,
+        phase_assemblage_available=False,
+        status="ok",
+        diagnostics={"existing_diagnostic": "unchanged"},
+    )
+    sim = SimpleNamespace(
+        _last_vapor_pressure_diagnostic={"backend_status": "ok"},
+    )
+    payload = rrd.equilibrium_payload(sim, result)
+    payload["authority"] = copy.deepcopy(_alphamelts_record_authority())
+    marker = {"instrument_status": "status_bearing_non_authoritative"}
+    if carrier == "equilibrium_result.diagnostics":
+        payload["equilibrium_result"]["diagnostics"] = marker
+        replay = lambda: rrd.equilibrium_from_payload(payload)
+    elif carrier == "last_vapor_pressure_diagnostic":
+        payload["last_vapor_pressure_diagnostic"] = marker
+        store = PT0DeterminismStore("capture")
+        replay_sim = SimpleNamespace()
+        replay = lambda: store._equilibrium_from_payload(replay_sim, payload)
+    else:
+        payload["alphamelts_diagnostics"] = marker
+        replay = lambda: rrd.equilibrium_from_payload(payload)
+
+    with pytest.raises(MeltEnvelopeValidationError, match="partial H2"):
+        replay()
 
 
 def test_strict_pt1_put_rejects_builtin_fallback_vapor_source(

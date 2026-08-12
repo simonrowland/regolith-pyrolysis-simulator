@@ -185,14 +185,19 @@ class Planner:
                 )
                 shadow_result = shadow.dispatch(shadow_request)
             except Exception as exc:  # noqa: BLE001 -- never block dispatch
-                self._append_shadow_trace(
-                    {
-                        "event": "shadow_error",
-                        "provider_id": provider_id,
-                        "intent": request.intent.value,
-                        "error": self._safe_exception_repr(exc),
+                error_record: dict[str, Any] = {
+                    "event": "shadow_error",
+                    "provider_id": provider_id,
+                    "intent": request.intent.value,
+                    "error": self._safe_exception_repr(exc),
+                }
+                diagnostic = getattr(exc, "diagnostic", None)
+                if isinstance(diagnostic, Mapping):
+                    error_record["result"] = {
+                        "status": getattr(exc, "status", None),
+                        "diagnostic": dict(diagnostic),
                     }
-                )
+                self._append_shadow_trace(error_record)
                 continue
             shadow_results.append((shadow, provider_id, shadow_result))
             self._append_shadow_trace(

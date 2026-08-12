@@ -8,6 +8,8 @@ invariant.
 
 from __future__ import annotations
 
+from collections.abc import Mapping
+
 
 class KernelError(Exception):
     """Base class for all chemistry-kernel failures."""
@@ -31,6 +33,21 @@ class ControlAuditMismatch(KernelError):
 
 class ProviderUnavailableError(KernelError):
     """No authoritative provider is registered for the requested intent."""
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        status: str | None = None,
+        diagnostic: Mapping[str, object] | None = None,
+    ) -> None:
+        super().__init__(message)
+        if status is not None or not hasattr(self, "status"):
+            self.status = status
+        if diagnostic is not None:
+            self.diagnostic = dict(diagnostic)
+        elif not hasattr(self, "diagnostic"):
+            self.diagnostic = None
 
 
 class ProposalRejected(KernelError):

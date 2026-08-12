@@ -20,6 +20,10 @@ from typing import Any
 from flask import current_app
 
 from simulator.accounting.run_artifact import build_run_artifact
+from simulator.melt_backend.melt_envelope import (
+    MeltEnvelopeValidationError,
+    consume_melt_extrapolation_envelope,
+)
 
 
 DEFAULT_RETENTION = 100
@@ -225,6 +229,42 @@ class RunArtifactStore:
                     f"timesteps[{index}].summary.metal_yields_kg to be an object, "
                     f"got {type(metal_yields).__name__}",
                 )
+        shadow_trace = artifact["terminal"].get("shadow_trace")
+        if shadow_trace is None:
+            return
+        if not isinstance(shadow_trace, list):
+            raise RunStoreCorruptionError(
+                run_id,
+                path,
+                "expected terminal.shadow_trace to be an array",
+            )
+        for index, record in enumerate(shadow_trace):
+            if not isinstance(record, Mapping):
+                continue
+            if str(record.get("provider_id") or "") != "vaporock":
+                continue
+            if record.get("event") not in ("shadow_dispatch", "shadow_error"):
+                continue
+            result = record.get("result")
+            diagnostic = (
+                result.get("diagnostic")
+                if isinstance(result, Mapping)
+                else None
+            )
+            if not isinstance(diagnostic, Mapping):
+                raise RunStoreCorruptionError(
+                    run_id,
+                    path,
+                    f"terminal.shadow_trace[{index}] lacks an H2 diagnostic",
+                )
+            try:
+                consume_melt_extrapolation_envelope(diagnostic)
+            except MeltEnvelopeValidationError as exc:
+                raise RunStoreCorruptionError(
+                    run_id,
+                    path,
+                    f"terminal.shadow_trace[{index}] invalid H2 diagnostic: {exc}",
+                ) from exc
 
     def list_runs(self) -> list[dict[str, Any]]:
         summaries: list[dict[str, Any]] = []

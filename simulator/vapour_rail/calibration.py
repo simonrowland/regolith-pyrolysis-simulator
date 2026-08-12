@@ -35,6 +35,12 @@ from typing import Any, Final
 import yaml
 
 from simulator.fe_redox import feo_iw_log10_fO2_bar
+from simulator.melt_backend.melt_envelope import (
+    MELT_EXTRAPOLATION_ENVELOPE_FIELDS,
+    consume_melt_extrapolation_envelope,
+    has_melt_extrapolation_envelope,
+    melt_extrapolation_diagnostic,
+)
 from simulator.melt_backend.vaporock import (
     VAPOROCK_T_MAX_K,
     VAPOROCK_T_MIN_K,
@@ -65,6 +71,7 @@ DEFAULT_P_FLOOR_PA: Final[float] = 1.0e-30
 # Owner-approved relative flux error budget (HKL: |Δlog10 J| = |Δlog10 P|).
 # Stored as metadata; not a magic runtime threshold.
 DEFAULT_EPSILON_J: Final[float] = 0.30  # 30 % relative flux tolerance
+_MELT_MODEL_ID: Final[str] = "MELTS-v1.0"
 
 SIDECAR_KIND: Final[str] = "vapour_rail_calibration"
 SIDECAR_SCHEMA_VERSION: Final[int] = 1
@@ -1114,7 +1121,8 @@ CREATE TABLE IF NOT EXISTS cells (
     split TEXT NOT NULL,
     status TEXT NOT NULL,
     composition_json TEXT NOT NULL,
-    warnings_json TEXT NOT NULL
+    warnings_json TEXT NOT NULL,
+    diagnostics_json TEXT NOT NULL DEFAULT '{}'
 );
 
 CREATE TABLE IF NOT EXISTS observations (
@@ -1160,6 +1168,15 @@ class CalibrationResearchStore:
         self._conn = sqlite3.connect(str(self.path))
         self._conn.execute("PRAGMA foreign_keys = ON")
         self._conn.executescript(_SCHEMA_SQL)
+        cell_columns = {
+            str(row[1])
+            for row in self._conn.execute("PRAGMA table_info(cells)").fetchall()
+        }
+        if "diagnostics_json" not in cell_columns:
+            self._conn.execute(
+                "ALTER TABLE cells ADD COLUMN diagnostics_json "
+                "TEXT NOT NULL DEFAULT '{}'"
+            )
         self._conn.commit()
 
     def close(self) -> None:
@@ -1192,14 +1209,21 @@ class CalibrationResearchStore:
         status: str,
         warnings: Sequence[str] = (),
         observations: Sequence[SpeciesObservation] = (),
+        diagnostics: Mapping[str, Any] | None = None,
     ) -> None:
+        diagnostic_payload = dict(diagnostics or {})
+        if diagnostic_payload:
+            consume_melt_extrapolation_envelope(
+                diagnostic_payload,
+                temperature_K=float(cell.temperature_K),
+            )
         self._conn.execute(
             """
             INSERT OR REPLACE INTO cells(
                 cell_id, formulation_id, formulation_family, temperature_K,
                 fo2_label, fO2_log, split, status, composition_json,
-                warnings_json
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                warnings_json, diagnostics_json
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 cell.cell_id,
@@ -1212,6 +1236,7 @@ class CalibrationResearchStore:
                 status,
                 json.dumps(dict(cell.formulation.composition_mol), sort_keys=True),
                 json.dumps(list(warnings)),
+                json.dumps(diagnostic_payload, sort_keys=True),
             ),
         )
         self._conn.execute(
@@ -1268,7 +1293,7 @@ class CalibrationResearchStore:
         self._conn.commit()
 
     def digest(self) -> str:
-        """Content digest of cells+observations for the promotion sidecar."""
+        """Digest promotion-relevant cell and observation inputs only."""
 
         h = hashlib.sha256()
         cur = self._conn.execute(
@@ -1357,6 +1382,25 @@ def evaluate_cell(
         or getattr(result, "vapor_pressures_Pa", None)
         or {}
     )
+    result_diagnostics = dict(getattr(result, "diagnostics", None) or {})
+    computed_envelope = melt_extrapolation_diagnostic(
+        float(cell.temperature_K),
+        _MELT_MODEL_ID,
+    )
+    envelope_source = (
+        result_diagnostics
+        if has_melt_extrapolation_envelope(result_diagnostics)
+        else computed_envelope
+    )
+    consume_melt_extrapolation_envelope(
+        envelope_source,
+        temperature_K=float(cell.temperature_K),
+    )
+    envelope = {
+        field: envelope_source[field]
+        for field in MELT_EXTRAPOLATION_ENVELOPE_FIELDS
+    }
+    instrument_status = envelope_source["instrument_status"]
 
     observations: list[SpeciesObservation] = []
     if status not in {"ok", "non_authoritative"}:
@@ -1379,8 +1423,10 @@ def evaluate_cell(
             )
 
     return {
+        **envelope,
         "cell_id": cell.cell_id,
         "status": status,
+        "instrument_status": instrument_status,
         "warnings": warnings,
         "observations": observations,
         "n_pressures": len(pressures),
@@ -1448,6 +1494,13 @@ def run_calibration_campaign(
                     status=str(evaluated["status"]),
                     warnings=list(evaluated["warnings"]),
                     observations=observations,
+                    diagnostics={
+                        field: evaluated[field]
+                        for field in MELT_EXTRAPOLATION_ENVELOPE_FIELDS
+                    }
+                    | {
+                        "instrument_status": evaluated["instrument_status"],
+                    },
                 )
                 cell_results.append(
                     {

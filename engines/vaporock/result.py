@@ -24,6 +24,10 @@ Schema:
 * ``engine_version`` -- whatever the adapter reported (best-effort).
 * ``backend_status`` -- ``EquilibriumResult.status`` from the adapter.
 * ``backend_warnings`` -- non-fatal warnings the adapter surfaced.
+* H2 melt-leg envelope -- ``melt_model_id``, ``T_calib_max_K``,
+  ``melt_model_extrapolation_K``, ``melt_extrap_sigma_mu_J_mol``,
+  ``melt_extrap_sigma_log10_P``, and ``melt_extrap_status``. The associated
+  ``constants_version`` pins the versioned constants table.
 
 This module MUST NOT import :class:`LedgerTransitionProposal` -- the
 writer-purity invariant test enforces this at the AST level.
@@ -34,11 +38,23 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, Mapping, Tuple
 
+from simulator.fidelity_vocabulary import STATUS_BEARING_NON_AUTHORITATIVE
+from simulator.melt_backend.melt_envelope import (
+    consume_melt_extrapolation_envelope,
+)
+
 
 @dataclass(frozen=True)
 class VapoRockDiagnostics:
     """Frozen diagnostic payload returned by :class:`VapoRockProvider`."""
 
+    melt_model_id: str
+    T_calib_max_K: float
+    melt_model_extrapolation_K: float
+    melt_extrap_sigma_mu_J_mol: float
+    melt_extrap_sigma_log10_P: float
+    melt_extrap_status: str
+    constants_version: str
     vapor_pressures_Pa: Mapping[str, float] = field(default_factory=dict)
     vaporock_full_speciation_Pa: Mapping[str, float] = field(
         default_factory=dict
@@ -51,6 +67,33 @@ class VapoRockDiagnostics:
     backend_warnings: Tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
+        object.__setattr__(self, 'melt_model_id', str(self.melt_model_id))
+        object.__setattr__(self, 'T_calib_max_K', float(self.T_calib_max_K))
+        object.__setattr__(
+            self,
+            'melt_model_extrapolation_K',
+            float(self.melt_model_extrapolation_K),
+        )
+        object.__setattr__(
+            self,
+            'melt_extrap_sigma_mu_J_mol',
+            float(self.melt_extrap_sigma_mu_J_mol),
+        )
+        object.__setattr__(
+            self,
+            'melt_extrap_sigma_log10_P',
+            float(self.melt_extrap_sigma_log10_P),
+        )
+        object.__setattr__(
+            self,
+            'melt_extrap_status',
+            str(self.melt_extrap_status),
+        )
+        object.__setattr__(
+            self,
+            'constants_version',
+            str(self.constants_version),
+        )
         object.__setattr__(
             self,
             'vapor_pressures_Pa',
@@ -87,7 +130,14 @@ class VapoRockDiagnostics:
     def as_diagnostic(self) -> Dict[str, Any]:
         """Plain-dict projection for ``IntentResult.diagnostic``."""
 
-        return asdict(self)
+        diagnostic = asdict(self)
+        diagnostic["instrument_status"] = (
+            "non_authoritative"
+            if self.melt_extrap_status == "in_calibration"
+            else STATUS_BEARING_NON_AUTHORITATIVE
+        )
+        consume_melt_extrapolation_envelope(diagnostic)
+        return diagnostic
 
 
 __all__ = ('VapoRockDiagnostics',)

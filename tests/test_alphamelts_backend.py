@@ -1666,6 +1666,8 @@ def test_alphamelts_python_api_clamped_pressure_reports_solved_condition(
 ):
     backend = AlphaMELTSBackend()
     backend._mode = 'python_api'
+    backend._vaporock_available = True
+    backend._vaporock_helper = _vaporock_helper_returning({'SiO': 0.25})
     seen = {}
 
     def fake_parse(
@@ -1687,6 +1689,7 @@ def test_alphamelts_python_api_clamped_pressure_reports_solved_condition(
             phases_present=['liquid'],
             phase_masses_kg={'liquid': 1.0},
             liquid_fraction=1.0,
+            liquid_composition_wt_pct={'SiO2': 100.0},
             warnings=list(warnings or []),
             status='ok',
             diagnostics=dict(diagnostics or {}),
@@ -1725,6 +1728,13 @@ def test_alphamelts_python_api_clamped_pressure_reports_solved_condition(
     assert result.diagnostics['operating_point_clamped'] is True
     assert result.diagnostics['temperature_clamped'] is False
     assert result.diagnostics['pressure_clamped'] is True
+    assert result.diagnostics['melt_model_id'] == 'MELTS-v1.0'
+    assert result.diagnostics['melt_extrap_status'] == 'extrapolated'
+    assert result.diagnostics['melt_extrap_sigma_log10_P'] > 0.0
+    assert (
+        result.diagnostics['instrument_status']
+        == 'status_bearing_non_authoritative'
+    )
     assert result.diagnostics['requested_pressure_bar'] == pytest.approx(1e-9)
     assert result.diagnostics['solved_pressure_bar'] == pytest.approx(1e-6)
     assert result.status == 'out_of_domain'
@@ -6497,6 +6507,13 @@ def test_thermoengine_callsite_wires_vaporock_source_and_solved_liquid(monkeypat
 
     assert eq.vapor_pressures_Pa == {'Na': 9.9, 'SiO': 0.3}
     assert set(eq.vapor_pressures_source.values()) == {'vaporock'}
+    assert eq.diagnostics['melt_model_id'] == 'MELTS-v1.0'
+    assert eq.diagnostics['melt_extrap_status'] == 'extrapolated'
+    assert eq.diagnostics['melt_extrap_sigma_mu_J_mol'] > 0.0
+    assert (
+        eq.diagnostics['instrument_status']
+        == 'status_bearing_non_authoritative'
+    )
     # The post-equilibrium SOLVED liquid (not the pre-equilibrium input)
     # is what reached the VapoRock helper.
     assert helper.calls[0]['composition_kg'] == solved_liquid

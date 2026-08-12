@@ -26,6 +26,12 @@ import yaml
 from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
+from simulator.melt_backend.melt_envelope import (
+    MELT_EXTRAPOLATION_ENVELOPE_FIELDS,
+    consume_melt_extrapolation_envelope,
+    has_melt_extrapolation_envelope,
+    melt_extrapolation_diagnostic,
+)
 from simulator.melt_backend.vaporock import (
     VAPOROCK_T_MAX_K,
     VAPOROCK_T_MIN_K,
@@ -52,7 +58,8 @@ DEFAULT_VAPOR_PRESSURE_PATH: Final[Path] = (
 DEFAULT_FEEDSTOCK_ID: Final[str] = "lunar_mare_low_ti"
 DEFAULT_FO2_LOG10_BAR: Final[tuple[float, ...]] = (-9.0, -8.0, -7.0)
 DEFAULT_PRESSURE_BAR: Final[float] = 1.0e-6
-REPORT_SCHEMA_VERSION: Final[int] = 1
+REPORT_SCHEMA_VERSION: Final[int] = 2
+_MELT_MODEL_ID: Final[str] = "MELTS-v1.0"
 
 
 class EngineCrosscheckError(RuntimeError):
@@ -300,6 +307,10 @@ def _run_vaporock_cell(
         raise EngineCrosscheckError(
             f"refusing out-of-domain VapoRock call at {temperature_K:g} K"
         )
+    computed_envelope = melt_extrapolation_diagnostic(
+        float(temperature_K),
+        _MELT_MODEL_ID,
+    )
     try:
         result = backend.equilibrate(
             temperature_C=temperature_K - 273.15,
@@ -309,6 +320,7 @@ def _run_vaporock_cell(
         )
     except Exception as exc:  # noqa: BLE001 -- recorded diagnostic refusal
         return {
+            **computed_envelope,
             "status": "refused",
             "reason": f"{type(exc).__name__}: {exc}",
             "warnings": [],
@@ -321,12 +333,28 @@ def _run_vaporock_cell(
         or getattr(result, "vapor_pressures_Pa", None)
         or {}
     )
+    result_diagnostics = dict(getattr(result, "diagnostics", None) or {})
+    envelope_source = (
+        result_diagnostics
+        if has_melt_extrapolation_envelope(result_diagnostics)
+        else computed_envelope
+    )
+    consume_melt_extrapolation_envelope(
+        envelope_source,
+        temperature_K=float(temperature_K),
+    )
+    envelope = {
+        field: envelope_source[field]
+        for field in MELT_EXTRAPOLATION_ENVELOPE_FIELDS
+    }
     reason = None
     if status not in {"ok", "non_authoritative"}:
         reason = "; ".join(str(item) for item in warnings) or status
         pressures = {}
     return {
+        **envelope,
         "status": status,
+        "instrument_status": envelope_source["instrument_status"],
         "reason": reason,
         "warnings": warnings,
         "pressures_Pa": pressures,
@@ -651,8 +679,30 @@ def build_crosscheck_report(
         if item["divergence_label"] == "wild_ge_2_dex"
     ]
     timestamp = generated_at or datetime.now(timezone.utc).isoformat()
-    cell_runs = [
-        {
+    cell_runs: list[dict[str, Any]] = []
+    for cell in sorted(
+        raw_cells,
+        key=lambda item: (item["temperature_K"], item["fo2_log10_bar"]),
+    ):
+        computed_envelope = melt_extrapolation_diagnostic(
+            float(cell["temperature_K"]),
+            _MELT_MODEL_ID,
+        )
+        vaporock_cell = cell["vaporock"]
+        envelope_source = (
+            vaporock_cell
+            if has_melt_extrapolation_envelope(vaporock_cell)
+            else computed_envelope
+        )
+        consume_melt_extrapolation_envelope(
+            envelope_source,
+            temperature_K=float(cell["temperature_K"]),
+        )
+        envelope = {
+            field: envelope_source[field]
+            for field in MELT_EXTRAPOLATION_ENVELOPE_FIELDS
+        }
+        cell_runs.append({
             "temperature_K": float(cell["temperature_K"]),
             "fo2_log10_bar": float(cell["fo2_log10_bar"]),
             "rail_status": cell["rail"]["status"],
@@ -662,12 +712,11 @@ def build_crosscheck_report(
             "vaporock_reason": cell["vaporock"].get("reason"),
             "vaporock_warnings": list(cell["vaporock"].get("warnings") or []),
             "vaporock_pressure_count": len(cell["vaporock"]["pressures_Pa"]),
-        }
-        for cell in sorted(
-            raw_cells,
-            key=lambda item: (item["temperature_K"], item["fo2_log10_bar"]),
-        )
-    ]
+            "vaporock_instrument_status": envelope_source[
+                "instrument_status"
+            ],
+            "vaporock_h2_melt_envelope": envelope,
+        })
     return {
         "schema_version": REPORT_SCHEMA_VERSION,
         "kind": "vapour_rail_engine_crosscheck",

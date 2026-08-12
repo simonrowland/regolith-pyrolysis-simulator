@@ -32,6 +32,10 @@ from simulator.alphamelts_reference_pressure import (  # noqa: E402
     annotate_alphamelts_reference_pressure,
 )
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend  # noqa: E402
+from simulator.melt_backend.melt_envelope import (  # noqa: E402
+    consume_melt_extrapolation_envelope,
+    melt_extrapolation_diagnostic,
+)
 from simulator.melt_backend.vaporock import VapoRockBackend  # noqa: E402
 from simulator.optimize.canonical import (  # noqa: E402
     canonical_json_dumps,
@@ -50,7 +54,8 @@ DEFAULT_PROFILE_FILES = (
 )
 FOCUS_SPECIES = ("Na", "K", "SiO", "Fe", "Mg", "Si", "O", "Ca")
 SMOKE_SPECIES = ("Na", "SiO", "Fe")
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
+MELT_MODEL_ID = "MELTS-v1.0"
 
 
 @dataclass(frozen=True)
@@ -74,6 +79,7 @@ class Row:
     antoine_pa: float | None
     log10_delta: float | None
     flags: tuple[str, ...]
+    melt_diagnostic: Mapping[str, Any]
 
 
 class ShadowStore:
@@ -120,12 +126,39 @@ class ShadowStore:
                     antoine_Pa REAL,
                     log10_delta REAL,
                     flags TEXT NOT NULL,
+                    melt_diagnostic_json TEXT NOT NULL,
                     created_at TEXT NOT NULL,
                     git_dirty INTEGER NOT NULL,
                     PRIMARY KEY (cache_key, species)
                 )
                 """
             )
+            columns = {
+                str(row["name"])
+                for row in conn.execute("PRAGMA table_info(shadow_rows)")
+            }
+            if "melt_diagnostic_json" not in columns:
+                conn.execute(
+                    "ALTER TABLE shadow_rows "
+                    "ADD COLUMN melt_diagnostic_json TEXT"
+                )
+            for legacy in conn.execute(
+                "SELECT rowid, T_K FROM shadow_rows "
+                "WHERE melt_diagnostic_json IS NULL"
+            ):
+                diagnostic = melt_extrapolation_diagnostic(
+                    float(legacy["T_K"]),
+                    MELT_MODEL_ID,
+                )
+                consume_melt_extrapolation_envelope(
+                    diagnostic,
+                    temperature_K=float(legacy["T_K"]),
+                )
+                conn.execute(
+                    "UPDATE shadow_rows SET melt_diagnostic_json = ? "
+                    "WHERE rowid = ?",
+                    (melt_diagnostic_json(diagnostic), int(legacy["rowid"])),
+                )
             conn.execute(
                 """
                 CREATE INDEX IF NOT EXISTS idx_shadow_rows_cell_key
@@ -148,11 +181,22 @@ class ShadowStore:
 
     def cell_present(self, cell_key: str) -> bool:
         with self._connect() as conn:
-            row = conn.execute(
-                "SELECT 1 FROM shadow_rows WHERE cell_key = ? LIMIT 1",
+            rows = list(conn.execute(
+                "SELECT T_K, melt_diagnostic_json FROM shadow_rows "
+                "WHERE cell_key = ?",
                 (cell_key,),
-            ).fetchone()
-        return row is not None
+            ))
+        self._consume_stored_diagnostics(rows)
+        return bool(rows)
+
+    @staticmethod
+    def _consume_stored_diagnostics(rows: Sequence[sqlite3.Row]) -> None:
+        for row in rows:
+            diagnostic = json.loads(str(row["melt_diagnostic_json"]))
+            consume_melt_extrapolation_envelope(
+                diagnostic,
+                temperature_K=float(row["T_K"]),
+            )
 
     def upsert_rows(
         self,
@@ -176,6 +220,10 @@ class ShadowStore:
         inserted: list[sqlite3.Row] = []
         with self._connect() as conn:
             for row in rows:
+                consume_melt_extrapolation_envelope(
+                    row.melt_diagnostic,
+                    temperature_K=cell.t_k,
+                )
                 cache_key = make_cache_key(
                     cell=cell,
                     species=row.species,
@@ -191,9 +239,10 @@ class ShadowStore:
                         composition_digest, T_K, fO2_log10_bar, pressure,
                         pressure_context_json, backend, engine_versions_json,
                         VERSION, data_digests_json, vaporock_Pa, antoine_Pa,
-                        log10_delta, flags, created_at, git_dirty
+                        log10_delta, flags, melt_diagnostic_json, created_at,
+                        git_dirty
                     )
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ON CONFLICT(cache_key, species) DO UPDATE SET
                         cell_key = excluded.cell_key,
                         profile_id = excluded.profile_id,
@@ -210,6 +259,7 @@ class ShadowStore:
                         antoine_Pa = excluded.antoine_Pa,
                         log10_delta = excluded.log10_delta,
                         flags = excluded.flags,
+                        melt_diagnostic_json = excluded.melt_diagnostic_json,
                         created_at = excluded.created_at,
                         git_dirty = excluded.git_dirty
                     """,
@@ -231,6 +281,7 @@ class ShadowStore:
                         row.antoine_pa,
                         row.log10_delta,
                         canonical_json(list(row.flags)),
+                        melt_diagnostic_json(row.melt_diagnostic),
                         created_at,
                         int(git_dirty),
                     ),
@@ -248,7 +299,8 @@ class ShadowStore:
                 stored = conn.execute(
                     """
                     SELECT cache_key, profile_id, species, vaporock_Pa,
-                           antoine_Pa, log10_delta, flags
+                           antoine_Pa, log10_delta, flags, T_K,
+                           melt_diagnostic_json
                     FROM shadow_rows
                     WHERE cache_key = ? AND species = ?
                     """,
@@ -260,24 +312,28 @@ class ShadowStore:
 
     def verdict_rows(self) -> list[sqlite3.Row]:
         with self._connect() as conn:
-            return list(
+            rows = list(
                 conn.execute(
                     """
-                    SELECT species, log10_delta, flags, profile_id, T_K
+                    SELECT species, log10_delta, flags, profile_id, T_K,
+                           melt_diagnostic_json
                     FROM shadow_rows
                     ORDER BY species, profile_id, T_K
                     """
                 )
             )
+        self._consume_stored_diagnostics(rows)
+        return rows
 
     def rows_for_cell(self, cell_key: str, species: Sequence[str]) -> list[sqlite3.Row]:
         placeholders = ", ".join("?" for _ in species)
         with self._connect() as conn:
-            return list(
+            rows = list(
                 conn.execute(
                     f"""
                     SELECT cache_key, profile_id, species, vaporock_Pa,
-                           antoine_Pa, log10_delta, flags
+                           antoine_Pa, log10_delta, flags, T_K,
+                           melt_diagnostic_json
                     FROM shadow_rows
                     WHERE cell_key = ? AND species IN ({placeholders})
                     ORDER BY species
@@ -285,6 +341,8 @@ class ShadowStore:
                     (cell_key, *species),
                 )
             )
+        self._consume_stored_diagnostics(rows)
+        return rows
 
 
 def parse_args() -> argparse.Namespace:
@@ -454,10 +512,15 @@ def solve_cell(
     cell: Cell,
     large_delta_log10: float,
 ) -> list[Row]:
+    melt_diagnostic = melt_extrapolation_diagnostic(cell.t_k, MELT_MODEL_ID)
+    consume_melt_extrapolation_envelope(
+        melt_diagnostic,
+        temperature_K=cell.t_k,
+    )
     if not alpha_ready or not alpha.is_available():
-        return failure_rows(cell, "engine_unavailable:alphamelts")
+        return failure_rows(cell, "engine_unavailable:alphamelts", melt_diagnostic)
     if not vaporock_ready or not vaporock.is_available():
-        return failure_rows(cell, "engine_unavailable:vaporock")
+        return failure_rows(cell, "engine_unavailable:vaporock", melt_diagnostic)
 
     try:
         evaluation_pressure_bar = alphamelts_condensed_phase_pressure_bar(
@@ -477,11 +540,19 @@ def solve_cell(
             evaluation_pressure_bar=evaluation_pressure_bar,
         )
     except Exception as exc:  # noqa: BLE001
-        return failure_rows(cell, f"cell_failed:alphamelts_exception:{type(exc).__name__}:{exc}")
+        return failure_rows(
+            cell,
+            f"cell_failed:alphamelts_exception:{type(exc).__name__}:{exc}",
+            melt_diagnostic,
+        )
 
     if result.status != "ok":
         detail = "; ".join(result.warnings) or result.status
-        return failure_rows(cell, f"cell_failed:alphamelts_status:{detail}")
+        return failure_rows(
+            cell,
+            f"cell_failed:alphamelts_status:{detail}",
+            melt_diagnostic,
+        )
 
     melt_wt = {
         str(species): float(value)
@@ -489,7 +560,11 @@ def solve_cell(
         if finite_positive(value)
     }
     if not melt_wt:
-        return failure_rows(cell, "cell_failed:species_mapping:no_solved_liquid_composition")
+        return failure_rows(
+            cell,
+            "cell_failed:species_mapping:no_solved_liquid_composition",
+            melt_diagnostic,
+        )
 
     activities = dict(result.activity_coefficients or {})
     try:
@@ -500,7 +575,11 @@ def solve_cell(
             pressure_bar=cell.pressure_bar,
         )
     except Exception as exc:  # noqa: BLE001
-        return failure_rows(cell, f"cell_failed:vaporock_exception:{type(exc).__name__}:{exc}")
+        return failure_rows(
+            cell,
+            f"cell_failed:vaporock_exception:{type(exc).__name__}:{exc}",
+            melt_diagnostic,
+        )
 
     vaporock_pressures = dict(vaporock_result.vapor_pressures_Pa or {})
     antoine_pressures = alpha._activities_times_antoine(  # noqa: SLF001
@@ -515,6 +594,7 @@ def solve_cell(
             antoine_pressures,
             ("cell_failed:vaporock_status:" + detail,),
             large_delta_log10,
+            melt_diagnostic,
         )
 
     volatile_bearing = alpha._melt_has_antoine_vapor_precursor(  # noqa: SLF001
@@ -525,12 +605,14 @@ def solve_cell(
         return failure_rows(
             cell,
             "cell_failed:no_pressures_for_volatile_bearing_melt",
+            melt_diagnostic,
         )
     return rows_from_pressures(
         vaporock_pressures,
         antoine_pressures,
         (),
         large_delta_log10,
+        melt_diagnostic,
     )
 
 
@@ -539,7 +621,9 @@ def rows_from_pressures(
     antoine_pressures: Mapping[str, Any],
     cell_flags: tuple[str, ...],
     large_delta_log10: float,
+    melt_diagnostic: Mapping[str, Any],
 ) -> list[Row]:
+    consume_melt_extrapolation_envelope(melt_diagnostic)
     species_names = sorted(
         {normalize_species_name(s) for s in vaporock_pressures}
         | {normalize_species_name(s) for s in antoine_pressures}
@@ -572,12 +656,21 @@ def rows_from_pressures(
                 antoine_pa=antoine_pa,
                 log10_delta=log10_delta,
                 flags=tuple(sorted(set(flags))),
+                melt_diagnostic=dict(melt_diagnostic),
             )
         )
     return rows
 
 
-def failure_rows(cell: Cell, reason: str) -> list[Row]:
+def failure_rows(
+    cell: Cell,
+    reason: str,
+    melt_diagnostic: Mapping[str, Any],
+) -> list[Row]:
+    consume_melt_extrapolation_envelope(
+        melt_diagnostic,
+        temperature_K=cell.t_k,
+    )
     flag = reason if reason.startswith("cell_failed:") else f"cell_failed:{reason}"
     return [
         Row(
@@ -586,6 +679,7 @@ def failure_rows(cell: Cell, reason: str) -> list[Row]:
             antoine_pa=None,
             log10_delta=None,
             flags=(flag,),
+            melt_diagnostic=dict(melt_diagnostic),
         )
         for species in FOCUS_SPECIES
     ]
@@ -881,6 +975,10 @@ def canonical_json(value: Any) -> str:
     return canonical_json_dumps(normalize_canonical_value(value))
 
 
+def melt_diagnostic_json(value: Mapping[str, Any]) -> str:
+    return json.dumps(value, sort_keys=True, separators=(",", ":"))
+
+
 def sha256_canonical(value: Any) -> str:
     return hashlib.sha256(canonical_json(value).encode("utf-8")).hexdigest()
 
@@ -1004,7 +1102,8 @@ def write_build_summary(
         "cache_key, species, cell_key, profile_id, composition_digest, T_K, "
         "fO2_log10_bar, pressure, pressure_context_json, backend, "
         "engine_versions_json, VERSION, data_digests_json, vaporock_Pa, "
-        "antoine_Pa, log10_delta, flags, created_at, git_dirty"
+        "antoine_Pa, log10_delta, flags, melt_diagnostic_json, created_at, "
+        "git_dirty"
     )
     lines = [
         "# VapoRock Antoine Shadow Matrix Build Summary",

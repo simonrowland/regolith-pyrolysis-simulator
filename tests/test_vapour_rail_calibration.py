@@ -27,6 +27,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.melt_backend.melt_envelope import melt_extrapolation_diagnostic
 from simulator.melt_backend.vaporock import (
     VAPOROCK_T_MAX_K,
     VAPOROCK_T_MIN_K,
@@ -348,6 +349,32 @@ def test_evaluate_cell_requires_warm_pool_and_censors(monkeypatch):
     assert kinds["SiO"] is ObservationKind.POINT
     assert kinds["Fe"] is ObservationKind.CENSORED_SUB_FLOOR
     assert kinds["Na"] is ObservationKind.CENSORED_SUB_FLOOR
+    assert out["melt_model_id"] == "MELTS-v1.0"
+    assert out["melt_extrap_status"] in {"in_calibration", "extrapolated"}
+    assert out["constants_version"] == "2026-08-10.ht-c3.1"
+
+
+def test_evaluate_cell_rejects_marker_only_h2_diagnostic(monkeypatch):
+    backend = VapoRockBackend()
+    backend._available = True
+    backend._warm_pool = object()
+
+    result = type(
+        "MarkerOnlyResult",
+        (),
+        {
+            "status": "ok",
+            "warnings": [],
+            "vapor_pressures_Pa": {"SiO": 1.0e-4},
+            "diagnostics": {
+                "instrument_status": "status_bearing_non_authoritative"
+            },
+        },
+    )()
+    monkeypatch.setattr(backend, "equilibrate", lambda **kwargs: result)
+
+    with pytest.raises(ValueError, match="partial H2 melt envelope"):
+        evaluate_cell(backend, build_calibration_cells()[0], species=("SiO",))
 
 
 def test_research_store_roundtrip_and_digest(tmp_path: Path):
@@ -362,7 +389,15 @@ def test_research_store_roundtrip_and_digest(tmp_path: Path):
                 censor_pressure(1.0e-6, species="SiO"),
                 censor_pressure(0.0, species="Fe"),
             ]
-            store.insert_cell(cell, status="ok", observations=obs)
+            store.insert_cell(
+                cell,
+                status="ok",
+                observations=obs,
+                diagnostics=melt_extrapolation_diagnostic(
+                    cell.temperature_K,
+                    "MELTS-v1.0",
+                ),
+            )
         digest = store.digest()
         assert len(digest) == 64
         assert store.get_meta("calibration_id") == "vr10-test"
@@ -371,6 +406,33 @@ def test_research_store_roundtrip_and_digest(tmp_path: Path):
     # Second open sees the same rows.
     with CalibrationResearchStore(store_path) as store:
         assert store.digest() == digest
+        raw_diagnostics = store._conn.execute(
+            "SELECT diagnostics_json FROM cells ORDER BY cell_id LIMIT 1"
+        ).fetchone()[0]
+        persisted = json.loads(raw_diagnostics)
+        assert persisted == melt_extrapolation_diagnostic(
+            cells[0].temperature_K,
+            "MELTS-v1.0",
+        )
+        persisted["research_note"] = "diagnostic digest is cache-inert"
+        store._conn.execute(
+            "UPDATE cells SET diagnostics_json = ? WHERE cell_id = ?",
+            (json.dumps(persisted, sort_keys=True), cells[0].cell_id),
+        )
+        store._conn.commit()
+        assert store.digest() == digest
+
+
+def test_research_store_rejects_partial_h2_diagnostic(tmp_path: Path):
+    cell = build_calibration_cells()[0]
+
+    with CalibrationResearchStore(tmp_path / "partial.sqlite") as store:
+        with pytest.raises(ValueError, match="partial H2 melt envelope"):
+            store.insert_cell(
+                cell,
+                status="ok",
+                diagnostics={"melt_model_id": "MELTS-v1.0"},
+            )
 
 
 def test_run_calibration_campaign_with_fake_warm_backend(
@@ -379,6 +441,7 @@ def test_run_calibration_campaign_with_fake_warm_backend(
     backend = VapoRockBackend()
     backend._available = True
     backend._warm_pool = object()
+    store_path = tmp_path / "run.sqlite"
 
     class _Result:
         status = "ok"
@@ -389,7 +452,7 @@ def test_run_calibration_campaign_with_fake_warm_backend(
     # Tiny cell set for speed.
     cells = build_calibration_cells()[:4]
     report = run_calibration_campaign(
-        store_path=tmp_path / "run.sqlite",
+        store_path=store_path,
         calibration_id="vr10-fake",
         backend=backend,
         cells=cells,
@@ -398,6 +461,23 @@ def test_run_calibration_campaign_with_fake_warm_backend(
     assert report.calibration_id == "vr10-fake"
     assert report.cell_counts["evaluated_cells"] == 4
     assert report.cell_counts["ok"] == 4
+    with CalibrationResearchStore(store_path) as store:
+        persisted = json.loads(
+            store._conn.execute(
+                "SELECT diagnostics_json FROM cells ORDER BY cell_id LIMIT 1"
+            ).fetchone()[0]
+        )
+    assert set(persisted) == {
+        "T_calib_max_K",
+        "constants_version",
+        "instrument_status",
+        "melt_extrap_sigma_log10_P",
+        "melt_extrap_sigma_mu_J_mol",
+        "melt_extrap_status",
+        "melt_model_extrapolation_K",
+        "melt_model_id",
+    }
+    assert persisted["melt_model_id"] == "MELTS-v1.0"
     assert report.per_row_state
     assert report.source_selection_fractions["fraction_selectable"] == pytest.approx(
         1.0

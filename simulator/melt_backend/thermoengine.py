@@ -12,6 +12,7 @@ from engines.alphamelts.thermoengine import (
 from simulator.engine_pool import EngineWorkerTimeout
 from simulator.melt_backend.alphamelts import (
     _MELTSBackendSupport,
+    _h2_melt_envelope_diagnostics,
     activity_from_chem_potential,
 )
 from simulator.melt_backend.base import (
@@ -262,6 +263,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                 'authoritative_for_solved_conditions': True,
             })
             status = 'ok' if payload.phases_present else 'not_converged'
+            vaporock_envelope_diagnostics = {}
             if self._vaporock_available:
                 vapor_pressures, vapor_pressure_source = (
                     self._vapor_pressures_via_vaporock_or_antoine(
@@ -272,6 +274,9 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                         pressure_bar=solved_pressure_bar,
                         activities=payload.activity_coefficients,
                     )
+                )
+                vaporock_envelope_diagnostics = (
+                    _h2_melt_envelope_diagnostics(temperature_C)
                 )
             else:
                 projection = self._activities_times_antoine_or_fail(
@@ -314,6 +319,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                 diagnostics=self._vapor_pressure_diagnostics(
                     {
                         **clamp_diagnostics,
+                        **vaporock_envelope_diagnostics,
                         'thermodynamic_basis': dict(
                             payload.thermodynamic_basis
                         ),

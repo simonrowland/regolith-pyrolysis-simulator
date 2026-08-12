@@ -25,6 +25,10 @@ from simulator.core import (
 )
 from simulator.electrolysis import MREElectrolysisRefusal
 from simulator.evaporation import EvaporationFluxRefusal
+from simulator.melt_backend.melt_envelope import (
+    MELT_EXTRAPOLATION_ENVELOPE_FIELDS,
+    consume_melt_extrapolation_envelope,
+)
 from simulator.pumping_cost import pumping_context_from_sim
 from simulator.session import (
     DecisionPolicy,
@@ -51,7 +55,6 @@ _ALL_TYPED_PHYSICS_REFUSALS = (
     MREElectrolysisRefusal,
     *_TYPED_PHYSICS_REFUSALS,
 )
-
 
 def _typed_refusal_reason(exc: BaseException) -> str:
     for attr in ("reason", "category"):
@@ -691,15 +694,61 @@ def _collect_shadow_trace(
         kernel_events = list(shadow_trace)
     except TypeError:
         kernel_events = []
-    # Only surface ``parity_warning`` entries -- the bulk shadow
-    # dispatch records are noise for the operator-facing JSON.
+    # Only surface parity entries plus the compact H2 envelope from VapoRock;
+    # the bulk shadow pressure/speciation records remain operator-facing noise.
     for record in kernel_events:
         if not isinstance(record, Mapping):
             continue
         event_type = record.get("event")
         if event_type in ("parity_warning", "parity_error"):
             events.append(_json_safe(dict(record)))
+            continue
+        compact_envelope = _compact_vaporock_envelope_record(record)
+        if compact_envelope is not None:
+            events.append(compact_envelope)
     return events
+
+
+def _compact_vaporock_envelope_record(
+    record: Mapping[str, Any],
+) -> dict[str, Any] | None:
+    event_type = record.get("event")
+    if event_type not in ("shadow_dispatch", "shadow_error"):
+        return None
+    if str(record.get("provider_id") or "") != "vaporock":
+        return None
+    result = record.get("result")
+    diagnostic = (
+        result.get("diagnostic")
+        if isinstance(result, Mapping)
+        else getattr(result, "diagnostic", None)
+    )
+    if not isinstance(diagnostic, Mapping):
+        return None
+    consume_melt_extrapolation_envelope(diagnostic)
+    result_status = (
+        result.get("status")
+        if isinstance(result, Mapping)
+        else getattr(result, "status", None)
+    )
+    compact = {
+        "event": event_type,
+        "provider_id": "vaporock",
+        "intent": record.get("intent"),
+        "result": {
+            "status": result_status,
+            "diagnostic": {
+                **{
+                    field: diagnostic[field]
+                    for field in MELT_EXTRAPOLATION_ENVELOPE_FIELDS
+                },
+                "instrument_status": diagnostic["instrument_status"],
+            },
+        },
+    }
+    if event_type == "shadow_error":
+        compact["error"] = record.get("error")
+    return _json_safe(compact)
 
 
 def _collect_reduced_real_cache_diagnostic(
