@@ -5,10 +5,10 @@ import pytest
 import yaml
 
 from simulator import condensation as condensation_module
+from simulator import transport_regime as transport_regime_module
 from simulator.condensation import (
     CondensationModel,
     KnudsenRegime,
-    KnudsenRegimeRefusal,
 )
 from simulator.core import PyrolysisSimulator
 from simulator.state import CondensationTrain, EvaporationFlux, MeltState
@@ -140,6 +140,43 @@ def test_knudsen_regime_classification_boundaries(knudsen_number, expected):
     assert condensation_module.classify_knudsen_regime(knudsen_number) is expected
 
 
+def test_condensation_knudsen_classifier_is_shared_transport_contract():
+    assert (
+        condensation_module.classify_knudsen_regime
+        is transport_regime_module.classify_knudsen_regime
+    )
+    assert condensation_module.KnudsenRegime is transport_regime_module.KnudsenRegime
+
+
+@pytest.mark.parametrize(
+    ("knudsen_number", "expected"),
+    [
+        pytest.param(math.nan, None, id="nan"),
+        pytest.param(-1.0, None, id="negative"),
+        pytest.param(-math.inf, None, id="negative-infinity"),
+        pytest.param(0.0, KnudsenRegime.VISCOUS, id="zero"),
+        pytest.param(
+            math.inf,
+            KnudsenRegime.FREE_MOLECULAR,
+            id="positive-infinity",
+        ),
+    ],
+)
+def test_condensation_knudsen_classifier_domain_contract(
+    knudsen_number,
+    expected,
+):
+    if expected is not None:
+        assert condensation_module.classify_knudsen_regime(knudsen_number) is expected
+        return
+
+    with pytest.raises(transport_regime_module.TransportRegimeRefusal) as exc_info:
+        condensation_module.classify_knudsen_regime(knudsen_number)
+
+    assert exc_info.value.category == "invalid_knudsen_number"
+    assert exc_info.value.reason == "invalid_knudsen_number"
+
+
 def test_true_vacuum_mean_free_path_is_infinite_and_routes_continuously():
     assert math.isinf(condensation_module._mean_free_path_m(0.0, 1773.15))
     assert math.isinf(
@@ -162,6 +199,8 @@ def test_true_vacuum_mean_free_path_is_infinite_and_routes_continuously():
         pipe_diameter_m=0.12,
         gas_temperature_C=1500.0,
     )
+    assert model.knudsen_regime is KnudsenRegime.FREE_MOLECULAR
+
     melt = MeltState()
     melt.temperature_C = 1500.0
     flux = EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0)
@@ -461,7 +500,9 @@ def test_c2a_recipe_free_molecular_transport_is_continuous(monkeypatch):
     )
 
 
-def test_direct_condensation_model_without_pressure_refuses_before_routing():
+def test_direct_condensation_model_with_invalid_kn_refuses_before_routing(
+    monkeypatch,
+):
     train = CondensationTrain.create_default()
     model = CondensationModel(train, wall_temperature_C=1800.0)
     melt = MeltState()
@@ -469,16 +510,17 @@ def test_direct_condensation_model_without_pressure_refuses_before_routing():
     flux = EvaporationFlux(species_kg_hr={"Fe": 1.0}, total_kg_hr=1.0)
     stage_collections = [dict(stage.collected_kg) for stage in model.train.stages]
     operating_history = list(model.operating_history)
+    monkeypatch.setattr(
+        condensation_module,
+        "_knudsen_number",
+        lambda *args, **kwargs: -1.0,
+    )
 
-    with pytest.raises(KnudsenRegimeRefusal) as exc_info:
+    with pytest.raises(transport_regime_module.TransportRegimeRefusal) as exc_info:
         model.route(flux, melt)
 
-    assert exc_info.value.reason == "knudsen_policy_unconfigured"
-    assert exc_info.value.diagnostic["status"] == "refused"
-    assert (
-        exc_info.value.diagnostic["reason"]
-        == "knudsen_policy_unconfigured"
-    )
+    assert exc_info.value.category == "invalid_knudsen_number"
+    assert exc_info.value.reason == "invalid_knudsen_number"
     assert [dict(stage.collected_kg) for stage in model.train.stages] == (
         stage_collections
     )

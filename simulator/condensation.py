@@ -63,7 +63,6 @@ import warnings
 from collections.abc import Mapping, MutableMapping
 from contextvars import ContextVar
 from dataclasses import dataclass, field, replace
-from enum import Enum
 from pathlib import Path
 from typing import Any, Dict
 
@@ -87,6 +86,7 @@ from simulator.transport_constants import (
     N2_COLLISION_DIAMETER_M,
     VISCOUS_KNUDSEN_MAX,
 )
+from simulator.transport_regime import KnudsenRegime, classify_knudsen_regime
 from simulator.physical_constants import (
     AVOGADRO,
     BOLTZMANN,
@@ -1646,12 +1646,6 @@ def _transport_parameter_notice(
             'species-specific data replaces them.'
         ),
     }
-
-
-class KnudsenRegime(Enum):
-    VISCOUS = 'viscous'
-    TRANSITIONAL = 'transitional'
-    FREE_MOLECULAR = 'free_molecular'
 
 
 class KnudsenRegimeRefusal(RuntimeError):
@@ -5687,16 +5681,6 @@ def _knudsen_regime_factor(knudsen_number: float) -> float:
         return 0.0
     factor = knudsen_number / (knudsen_number + CONTINUUM_BUFFER_KN)
     return max(0.0, min(1.0, factor))
-
-
-def classify_knudsen_regime(knudsen_number: float) -> KnudsenRegime:
-    if not math.isfinite(knudsen_number):
-        return KnudsenRegime.FREE_MOLECULAR
-    if knudsen_number < VISCOUS_KNUDSEN_MAX:
-        return KnudsenRegime.VISCOUS
-    if knudsen_number < FREE_MOLECULAR_KNUDSEN_MIN:
-        return KnudsenRegime.TRANSITIONAL
-    return KnudsenRegime.FREE_MOLECULAR
 
 
 def _invalid_pipe_diameter_diagnostic(

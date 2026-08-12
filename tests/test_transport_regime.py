@@ -362,6 +362,32 @@ def test_knudsen_handoff_boundaries_match_project_thresholds(
 
 
 @pytest.mark.parametrize(
+    ("knudsen_number", "expected"),
+    [
+        pytest.param(math.nan, None, id="nan"),
+        pytest.param(-1.0, None, id="negative"),
+        pytest.param(-math.inf, None, id="negative-infinity"),
+        pytest.param(0.0, tr.KnudsenRegime.VISCOUS, id="zero"),
+        pytest.param(
+            math.inf,
+            tr.KnudsenRegime.FREE_MOLECULAR,
+            id="positive-infinity",
+        ),
+    ],
+)
+def test_knudsen_classifier_domain_contract(knudsen_number, expected):
+    if expected is not None:
+        assert tr.classify_knudsen_regime(knudsen_number) is expected
+        return
+
+    with pytest.raises(tr.TransportRegimeRefusal) as exc_info:
+        tr.classify_knudsen_regime(knudsen_number)
+
+    assert exc_info.value.category == "invalid_knudsen_number"
+    assert exc_info.value.reason == "invalid_knudsen_number"
+
+
+@pytest.mark.parametrize(
     ("call", "expected_category"),
     [
         (
