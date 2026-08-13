@@ -8,33 +8,38 @@ Residual convention: `log10(predicted/measured)`; positive means overprediction.
 
 ## Per-species comparison
 
-| Species | Observable | Engine | n | RMSE (dex) | Median residual | ok | OOD | crash | refused | unavailable |
-|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| K | partial_pressure | alphamelts | 0 | — | — | 0 | 3 | 0 | 0 | 0 |
-| K | partial_pressure | imcc-ext | 3 | 0.933 | -0.9496 | 3 | 0 | 0 | 0 | 0 |
-| K | partial_pressure | imcc-published | 3 | 0.9339 | -0.9505 | 3 | 0 | 0 | 0 | 0 |
-| K | partial_pressure | internal_analytic | 3 | 0.373 | 0.3825 | 3 | 0 | 0 | 0 | 0 |
-| K | partial_pressure | vaporock | 0 | — | — | 0 | 0 | 0 | 0 | 3 |
-| Mg | activity_coefficient | alphamelts | 0 | — | — | 0 | 0 | 3 | 0 | 0 |
-| Mg | activity_coefficient | imcc-ext | 3 | 0.1182 | 0.05689 | 3 | 0 | 0 | 0 | 0 |
-| Mg | activity_coefficient | imcc-published | 3 | 0.1103 | 0.05021 | 3 | 0 | 0 | 0 | 0 |
-| Mg | activity_coefficient | internal_analytic | 3 | 0.9525 | 0.9217 | 3 | 0 | 0 | 0 | 0 |
-| Mg | activity_coefficient | vaporock | 0 | — | — | 0 | 0 | 0 | 0 | 3 |
-| Mg | evaporation_flux | alphamelts | 0 | — | — | 0 | 0 | 4 | 0 | 0 |
-| Mg | evaporation_flux | imcc-ext | 0 | — | — | 0 | 0 | 0 | 4 | 0 |
-| Mg | evaporation_flux | imcc-published | 0 | — | — | 0 | 0 | 0 | 4 | 0 |
-| Mg | evaporation_flux | internal_analytic | 0 | — | — | 0 | 0 | 0 | 4 | 0 |
-| Mg | evaporation_flux | vaporock | 0 | — | — | 0 | 0 | 0 | 0 | 4 |
-| SiO | activity_coefficient | alphamelts | 0 | — | — | 0 | 0 | 3 | 0 | 0 |
-| SiO | activity_coefficient | imcc-ext | 3 | 0.5754 | 0.5414 | 3 | 0 | 0 | 0 | 0 |
-| SiO | activity_coefficient | imcc-published | 3 | 0.5769 | 0.5429 | 3 | 0 | 0 | 0 | 0 |
-| SiO | activity_coefficient | internal_analytic | 3 | 0.9451 | 0.9251 | 3 | 0 | 0 | 0 | 0 |
-| SiO | activity_coefficient | vaporock | 0 | — | — | 0 | 0 | 0 | 0 | 3 |
-| SiO | partial_pressure | alphamelts | 0 | — | — | 0 | 3 | 0 | 0 | 0 |
-| SiO | partial_pressure | imcc-ext | 3 | 0.2309 | -0.2496 | 3 | 0 | 0 | 0 | 0 |
-| SiO | partial_pressure | imcc-published | 3 | 0.2307 | -0.2495 | 3 | 0 | 0 | 0 | 0 |
-| SiO | partial_pressure | internal_analytic | 3 | 0.2563 | -0.2757 | 3 | 0 | 0 | 0 | 0 |
-| SiO | partial_pressure | vaporock | 0 | — | — | 0 | 0 | 0 | 0 | 3 |
+| Species | Observable | Engine | n | RMSE (dex) | Median residual | ok | OOD | crash | refused | observable unavailable | unavailable |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| K | partial_pressure | alphamelts | 0 | — | — | 0 | 0 | 0 | 0 | 3 | 0 |
+| K | partial_pressure | imcc-ext | 3 | 0.933 | -0.9496 | 3 | 0 | 0 | 0 | 0 | 0 |
+| K | partial_pressure | imcc-published | 3 | 0.9339 | -0.9505 | 3 | 0 | 0 | 0 | 0 | 0 |
+| K | partial_pressure | internal_analytic | 3 | 0.373 | 0.3825 | 3 | 0 | 0 | 0 | 0 | 0 |
+| K | partial_pressure | thermoengine | 0 | — | — | 0 | 0 | 0 | 0 | 3 | 0 |
+| K | partial_pressure | vaporock | 0 | — | — | 0 | 0 | 0 | 0 | 0 | 3 |
+| Mg | activity_coefficient | alphamelts | 0 | — | — | 0 | 0 | 3 | 0 | 0 | 0 |
+| Mg | activity_coefficient | imcc-ext | 3 | 0.1182 | 0.05689 | 3 | 0 | 0 | 0 | 0 | 0 |
+| Mg | activity_coefficient | imcc-published | 3 | 0.1103 | 0.05021 | 3 | 0 | 0 | 0 | 0 | 0 |
+| Mg | activity_coefficient | internal_analytic | 3 | 0.9525 | 0.9217 | 3 | 0 | 0 | 0 | 0 | 0 |
+| Mg | activity_coefficient | thermoengine | 0 | — | — | 0 | 0 | 0 | 0 | 3 | 0 |
+| Mg | activity_coefficient | vaporock | 0 | — | — | 0 | 0 | 0 | 0 | 0 | 3 |
+| Mg | evaporation_flux | alphamelts | 0 | — | — | 0 | 0 | 4 | 0 | 0 | 0 |
+| Mg | evaporation_flux | imcc-ext | 0 | — | — | 0 | 0 | 0 | 4 | 0 | 0 |
+| Mg | evaporation_flux | imcc-published | 0 | — | — | 0 | 0 | 0 | 4 | 0 | 0 |
+| Mg | evaporation_flux | internal_analytic | 0 | — | — | 0 | 0 | 0 | 4 | 0 | 0 |
+| Mg | evaporation_flux | thermoengine | 0 | — | — | 0 | 0 | 0 | 4 | 0 | 0 |
+| Mg | evaporation_flux | vaporock | 0 | — | — | 0 | 0 | 0 | 0 | 0 | 4 |
+| SiO | activity_coefficient | alphamelts | 0 | — | — | 0 | 0 | 3 | 0 | 0 | 0 |
+| SiO | activity_coefficient | imcc-ext | 3 | 0.5754 | 0.5414 | 3 | 0 | 0 | 0 | 0 | 0 |
+| SiO | activity_coefficient | imcc-published | 3 | 0.5769 | 0.5429 | 3 | 0 | 0 | 0 | 0 | 0 |
+| SiO | activity_coefficient | internal_analytic | 3 | 0.9451 | 0.9251 | 3 | 0 | 0 | 0 | 0 | 0 |
+| SiO | activity_coefficient | thermoengine | 3 | 0.7269 | 0.7028 | 3 | 0 | 0 | 0 | 0 | 0 |
+| SiO | activity_coefficient | vaporock | 0 | — | — | 0 | 0 | 0 | 0 | 0 | 3 |
+| SiO | partial_pressure | alphamelts | 0 | — | — | 0 | 0 | 0 | 0 | 3 | 0 |
+| SiO | partial_pressure | imcc-ext | 3 | 0.2309 | -0.2496 | 3 | 0 | 0 | 0 | 0 | 0 |
+| SiO | partial_pressure | imcc-published | 3 | 0.2307 | -0.2495 | 3 | 0 | 0 | 0 | 0 | 0 |
+| SiO | partial_pressure | internal_analytic | 3 | 0.2563 | -0.2757 | 3 | 0 | 0 | 0 | 0 | 0 |
+| SiO | partial_pressure | thermoengine | 3 | 0.2508 | -0.2692 | 3 | 0 | 0 | 0 | 0 | 0 |
+| SiO | partial_pressure | vaporock | 0 | — | — | 0 | 0 | 0 | 0 | 0 | 3 |
 
 ## IMCC versus internal_analytic decision column
 
@@ -88,27 +93,32 @@ These are engine robustness/coverage probes, not empirical score points.
 | sf04_tholeiite | literal_basalt | imcc-published | ok | — |
 | sf04_tholeiite | literal_basalt | imcc-ext | ok | — |
 | sf04_tholeiite | literal_basalt | internal_analytic | ok | — |
-| sf04_tholeiite | literal_basalt | alphamelts | refused | AlphaMELTS returned no canonical oxide-activity surface |
+| sf04_tholeiite | literal_basalt | alphamelts | ok | — |
+| sf04_tholeiite | literal_basalt | thermoengine | ok | — |
 | sf04_tholeiite | literal_basalt | vaporock | unavailable | VapoRock dependency is present but exposes no public per-oxide melt-activity surface; internally coupled gas pressures are excluded |
 | sf04_alkali_basalt | literal_basalt | imcc-published | ok | — |
 | sf04_alkali_basalt | literal_basalt | imcc-ext | ok | — |
 | sf04_alkali_basalt | literal_basalt | internal_analytic | ok | — |
-| sf04_alkali_basalt | literal_basalt | alphamelts | refused | AlphaMELTS returned no canonical oxide-activity surface |
+| sf04_alkali_basalt | literal_basalt | alphamelts | ok | — |
+| sf04_alkali_basalt | literal_basalt | thermoengine | ok | — |
 | sf04_alkali_basalt | literal_basalt | vaporock | unavailable | VapoRock dependency is present but exposes no public per-oxide melt-activity surface; internally coupled gas pressures are excluded |
 | sf04_komatiite | literal_basalt | imcc-published | ok | — |
 | sf04_komatiite | literal_basalt | imcc-ext | ok | — |
 | sf04_komatiite | literal_basalt | internal_analytic | ok | — |
-| sf04_komatiite | literal_basalt | alphamelts | refused | AlphaMELTS returned no canonical oxide-activity surface |
+| sf04_komatiite | literal_basalt | alphamelts | ok | — |
+| sf04_komatiite | literal_basalt | thermoengine | ok | — |
 | sf04_komatiite | literal_basalt | vaporock | unavailable | VapoRock dependency is present but exposes no public per-oxide melt-activity surface; internally coupled gas pressures are excluded |
 | sf04_dunite | literal_basalt | imcc-published | ok | — |
 | sf04_dunite | literal_basalt | imcc-ext | ok | — |
 | sf04_dunite | literal_basalt | internal_analytic | ok | — |
-| sf04_dunite | literal_basalt | alphamelts | refused | AlphaMELTS returned no canonical oxide-activity surface |
+| sf04_dunite | literal_basalt | alphamelts | ok | — |
+| sf04_dunite | literal_basalt | thermoengine | out_of_domain | RuntimeError: ThermoEngine equilibrium failed: ThermoEngine equilibrium failed: ThermoEngine absolute fO2 target is outside the attainable Fe-redox bracket: requested=-9 Traceback (most recent call last): File "/Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/simulator/engine_pool.py", line 125, in _run_engine_worker result = handler(resource, request, errlog) ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ File "/Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/engines/alphamelts/thermoengine.py", line 163, in _handle_thermoengine_request return transport._equilibrate_in_process(**kwargs) ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ File "/Users/simonrowland/L |
 | sf04_dunite | literal_basalt | vaporock | unavailable | VapoRock dependency is present but exposes no public per-oxide melt-activity surface; internally coupled gas pressures are excluded |
 | richter_type_b_cai | type_b_cai_like_cmas | imcc-published | ok | — |
 | richter_type_b_cai | type_b_cai_like_cmas | imcc-ext | ok | — |
 | richter_type_b_cai | type_b_cai_like_cmas | internal_analytic | ok | — |
 | richter_type_b_cai | type_b_cai_like_cmas | alphamelts | crash | AlphaMELTS subprocess exited before producing a result [backend_status_reason=subprocess_died]: SIGSEGV (returncode -11) |
+| richter_type_b_cai | type_b_cai_like_cmas | thermoengine | unavailable | AlphaMELTS adapter not available (no ThermoEngine, PetThermoTools, or subprocess transport) |
 | richter_type_b_cai | type_b_cai_like_cmas | vaporock | unavailable | VapoRock dependency is present but exposes no public per-oxide melt-activity surface; internally coupled gas pressures are excluded |
 
 ## Cross-engine verdict
@@ -117,12 +127,15 @@ AlphaMELTS equilibrium completed on all literal SF04 basalt probes, but its prov
 
 IMCC-versus-AlphaMELTS empirical verdict: **none**. No point has both a convention-valid measurement and successful canonical activities from both engine families.
 
+ThermoEngine produced 6/16 usable benchmark predictions; converged results without the requested canonical observable remain typed `observable_unavailable`.
+
 ## Stripping-trajectory coverage
 
 - `alphamelts`: 112/168 accepted; 56 refused/unavailable; below 30 wt% SiO2, 0/40 accepted and 40/40 refused/unavailable.
 - `imcc-ext`: 159/168 accepted; 9 refused/unavailable; below 30 wt% SiO2, 37/40 accepted and 3/40 refused/unavailable.
 - `imcc-published`: 162/168 accepted; 6 refused/unavailable; below 30 wt% SiO2, 38/40 accepted and 2/40 refused/unavailable.
 - `internal_analytic`: 168/168 accepted; 0 refused/unavailable; below 30 wt% SiO2, 40/40 accepted and 0/40 refused/unavailable.
+- `thermoengine`: 112/168 accepted; 56 refused/unavailable; below 30 wt% SiO2, 0/40 accepted and 40/40 refused/unavailable.
 - `vaporock`: 0/168 accepted; 168 refused/unavailable; below 30 wt% SiO2, 0/40 accepted and 40/40 refused/unavailable.
 
 AlphaMELTS trajectory boundaries:

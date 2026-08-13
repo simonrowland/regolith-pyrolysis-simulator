@@ -44,6 +44,10 @@ class ThermoEngineIsolationError(RuntimeError):
     """Refusal to run native ThermoEngine outside its killable worker."""
 
 
+class ThermoEngineFO2UndefinedError(ValueError):
+    """A finite intrinsic fO2 diagnostic is physically undefined."""
+
+
 _FO2_ECHO_TOLERANCE = 1.0e-3
 _FO2_MONOTONIC_EPSILON = 1.0e-7
 _FO2_FRACTION_WIDTH_TOLERANCE = 1.0e-10
@@ -182,6 +186,7 @@ class ThermoEnginePayload:
     activity_coefficients: Mapping[str, float] = field(default_factory=dict)
     fe_redox_split: Mapping[str, float] = field(default_factory=dict)
     solved_fO2_log: Optional[float] = None
+    solved_fO2_reason: Optional[str] = None
     phase_universe_size: int = 0
     fO2_solve_count: int = 0
     solver_status: Optional[str] = None
@@ -569,6 +574,7 @@ print('ok')
         pressure_mpa = max(float(pressure_bar) / 10.0, 1.0e-7)
         pressure_bar = pressure_mpa * 10.0
         solved_fO2_log: Optional[float] = None
+        solved_fO2_reason: Optional[str] = None
         fO2_solve_count = 1
         if fO2_log is None:
             melts.set_bulk_composition(bulk_wt)
@@ -604,12 +610,15 @@ print('ok')
 
         phases = tuple(str(phase) for phase in melts.get_list_of_phases_in_assemblage(root))
         if fO2_log is None and self._select_liquid_phase(phases) is not None:
-            solved_fO2_log = self._echo_log_fO2(
-                melts,
-                root,
-                temperature_C=float(temperature_C),
-                pressure_bar=float(pressure_bar),
-            )
+            try:
+                solved_fO2_log = self._echo_log_fO2(
+                    melts,
+                    root,
+                    temperature_C=float(temperature_C),
+                    pressure_bar=float(pressure_bar),
+                )
+            except ThermoEngineFO2UndefinedError:
+                solved_fO2_reason = 'undefined_zero_ferric_liquid'
         phase_masses_kg = {
             phase: float(melts.get_mass_of_phase(root, phase)) / 1000.0
             for phase in phases
@@ -831,6 +840,7 @@ print('ok')
             activity_coefficients=activities,
             fe_redox_split=fe_redox_split,
             solved_fO2_log=solved_fO2_log,
+            solved_fO2_reason=solved_fO2_reason,
             phase_universe_size=len(melts.get_phase_names()),
             fO2_solve_count=fO2_solve_count,
             solver_status=status_text,
@@ -1198,7 +1208,7 @@ print('ok')
             liquid['Fe2O3'] = 0.0
             liquid_fe2o3 = 0.0
         if liquid_fe2o3 == 0.0:
-            raise ValueError(
+            raise ThermoEngineFO2UndefinedError(
                 'ThermoEngine liquid Fe2O3 is at the zero-ferric limiting '
                 'state; finite Kress91 fO2 echo is undefined'
             )
@@ -1418,6 +1428,7 @@ def thermoengine_available(backend: Any) -> bool:
 
 
 __all__ = (
+    'ThermoEngineFO2UndefinedError',
     'ThermoEnginePayload',
     'ThermoEngineTransport',
     'equilibrate_via_thermoengine',

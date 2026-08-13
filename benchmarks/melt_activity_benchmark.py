@@ -2,8 +2,9 @@
 """Repeatable melt-activity comparison and composition-domain benchmark.
 
 The harness reads a tracked YAML bench set, runs a configurable engine set,
-captures every point as ``ok``, ``out_of_domain``, ``crash``, ``refused``, or
-``unavailable``, and writes deterministic CSV/JSON/Markdown artifacts. For
+captures every point as ``ok``, ``out_of_domain``, ``crash``, ``refused``,
+``observable_unavailable``, or ``unavailable``, and writes deterministic
+CSV/JSON/Markdown artifacts. For
 gas observables it converts parent-formula activities to each rail's
 single-cation basis, then holds the tracked analytical gas layer constant and
 swaps only that converted melt activity. Activity coefficients are normalized
@@ -51,6 +52,7 @@ DEFAULT_ENGINES = (
     "imcc-ext",
     "internal_analytic",
     "alphamelts",
+    "thermoengine",
     "vaporock",
 )
 SF04_ANCHOR_SPECIES = ("SiO2", "FeO", "Fe", "Mg", "SiO", "K", "Na", "O2")
@@ -61,7 +63,14 @@ SF04_SHEET_COMPOSITIONS = {
     "dun": "sf04_dunite",
 }
 POINT_STATUSES = frozenset(
-    {"ok", "out_of_domain", "crash", "refused", "unavailable"}
+    {
+        "ok",
+        "out_of_domain",
+        "crash",
+        "refused",
+        "observable_unavailable",
+        "unavailable",
+    }
 )
 
 
@@ -87,7 +96,7 @@ class MeltActivityEngine(Protocol):
         self,
         composition_wt_pct: Mapping[str, float],
         temperature_K: float,
-        fO2_bar: float,
+        fO2_bar: float | None,
     ) -> EngineResult: ...
 
     def coverage(
@@ -209,7 +218,7 @@ def execute_engine(
     engine: MeltActivityEngine,
     composition_wt_pct: Mapping[str, float],
     temperature_K: float,
-    fO2_bar: float,
+    fO2_bar: float | None,
 ) -> EngineResult:
     """Run one engine without allowing a provider crash to abort the harness."""
 
@@ -270,7 +279,7 @@ class ImccEngine:
         self,
         composition_wt_pct: Mapping[str, float],
         temperature_K: float,
-        fO2_bar: float,
+        fO2_bar: float | None,
     ) -> EngineResult:
         del fO2_bar
         from simulator.melt_backend.imcc_sf04 import (
@@ -354,7 +363,7 @@ class InternalAnalyticalEngine:
         self,
         composition_wt_pct: Mapping[str, float],
         temperature_K: float,
-        fO2_bar: float,
+        fO2_bar: float | None,
     ) -> EngineResult:
         from simulator.core import PyrolysisSimulator
         from simulator.melt_backend.base import InternalAnalyticalBackend
@@ -374,12 +383,13 @@ class InternalAnalyticalEngine:
         )
         sim.load_batch("benchmark", mass_kg=100.0)
         sim.melt.temperature_C = float(temperature_K) - 273.15
-        sim.melt.p_total_mbar = max(1.0e-3, float(fO2_bar) * 1000.0)
-        sim.melt.pO2_mbar = float(fO2_bar) * 1000.0
-        sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = math.log10(
-            float(fO2_bar)
-        )
-        sim.melt.oxygen_reservoir.headspace_transport_pO2_bar = float(fO2_bar)
+        if fO2_bar is not None:
+            sim.melt.p_total_mbar = max(1.0e-3, float(fO2_bar) * 1000.0)
+            sim.melt.pO2_mbar = float(fO2_bar) * 1000.0
+            sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = math.log10(
+                float(fO2_bar)
+            )
+            sim.melt.oxygen_reservoir.headspace_transport_pO2_bar = float(fO2_bar)
         result = sim._get_equilibrium()
         raw_status = str(result.status)
         status = (
@@ -480,7 +490,7 @@ class AlphaMeltsEngine:
         self,
         composition_wt_pct: Mapping[str, float],
         temperature_K: float,
-        fO2_bar: float,
+        fO2_bar: float | None,
     ) -> EngineResult:
         provider = self._initialize()
         if provider is None:
@@ -488,7 +498,7 @@ class AlphaMeltsEngine:
         from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
         from simulator.chemistry.kernel.dto import ProviderAccountView
 
-        fO2_log = math.log10(float(fO2_bar))
+        fO2_log = None if fO2_bar is None else math.log10(float(fO2_bar))
         request = IntentRequest(
             intent=ChemistryIntent.SILICATE_EQUILIBRIUM,
             account_view=ProviderAccountView(
@@ -538,18 +548,33 @@ class AlphaMeltsEngine:
                 reason=_reason_line(f"provider status {status}: {'; '.join(result.warnings)}"),
                 details=backend_diag,
             )
+        reported_activities = _positive_finite(
+            backend_diag.get("diagnostic_reported_activities", {}) or {}
+        )
         activities = _positive_finite(
             backend_diag.get("diagnostic_oxide_activities", {}) or {}
         )
+        activity_label_map = dict(
+            backend_diag.get("diagnostic_activity_label_map", {}) or {}
+        )
+        unmapped_activity_labels = sorted(
+            label
+            for label, label_details in activity_label_map.items()
+            if not dict(label_details or {}).get("oxide_activity")
+        )
         if not activities:
             return EngineResult(
-                status="refused",
-                reason="AlphaMELTS returned no canonical oxide-activity surface",
+                status="ok",
                 details={
                     "equilibrium_completed": True,
+                    "execution_status": "completed_without_observable",
+                    "observable_supported": False,
+                    "finite_prediction": False,
                     "mode": diagnostic.get("mode"),
                     "engine_version": diagnostic.get("engine_version"),
                     "activity_basis": backend_diag.get("diagnostic_activity_basis"),
+                    "reported_activity_labels": sorted(reported_activities),
+                    "unmapped_activity_labels": unmapped_activity_labels,
                 },
             )
         x = _oxide_mole_fractions(composition_wt_pct)
@@ -563,9 +588,15 @@ class AlphaMeltsEngine:
             activities=activities,
             gammas=gammas,
             details={
+                "equilibrium_completed": True,
+                "execution_status": "converged",
+                "observable_supported": True,
+                "finite_prediction": True,
                 "mode": diagnostic.get("mode"),
                 "engine_version": diagnostic.get("engine_version"),
                 "activity_basis": backend_diag.get("diagnostic_activity_basis"),
+                "reported_activity_labels": sorted(reported_activities),
+                "unmapped_activity_labels": unmapped_activity_labels,
             },
         )
 
@@ -585,6 +616,33 @@ class AlphaMeltsEngine:
             reason="" if valid else _reason_line("; ".join(warnings)),
             details={"domain_reason": reason},
         )
+
+
+class ThermoEngineMeltActivityEngine(AlphaMeltsEngine):
+    """In-process ThermoEngine MELTS diagnostic with intrinsic-fO2 support."""
+
+    name = "thermoengine"
+
+    def _initialize(self) -> Any | None:
+        if self._provider is not None or self._initialization_error:
+            return self._provider
+        from engines.alphamelts.provider import AlphaMELTSProvider
+        from simulator.melt_backend.thermoengine import ThermoEngineBackend
+
+        try:
+            backend = ThermoEngineBackend()
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                available = backend.initialize({
+                    "thermoengine_equilibrate_timeout_s": self.timeout_s,
+                })
+            if not available:
+                self._initialization_error = "ThermoEngine backend unavailable"
+                return None
+            self._provider = AlphaMELTSProvider(backend)
+        except Exception as exc:
+            self._initialization_error = _reason_line(exc)
+        return self._provider
 
 
 class VapoRockEngine:
@@ -615,7 +673,7 @@ class VapoRockEngine:
         self,
         composition_wt_pct: Mapping[str, float],
         temperature_K: float,
-        fO2_bar: float,
+        fO2_bar: float | None,
     ) -> EngineResult:
         del composition_wt_pct, temperature_K, fO2_bar
         available, error = self._availability()
@@ -661,6 +719,9 @@ def build_engines(
         ),
         "internal_analytic": InternalAnalyticalEngine,
         "alphamelts": lambda: AlphaMeltsEngine(timeout_s=alphamelts_timeout_s),
+        "thermoengine": lambda: ThermoEngineMeltActivityEngine(
+            timeout_s=alphamelts_timeout_s
+        ),
         "vaporock": VapoRockEngine,
     }
     unknown = sorted(set(names) - set(constructors))
@@ -716,6 +777,14 @@ def _prediction_for_point(
     else:
         return None, f"unsupported observable {observable!r}"
     if value is None or not math.isfinite(float(value)) or float(value) <= 0.0:
+        unmapped_labels = tuple(result.details.get("unmapped_activity_labels", ()))
+        if observable in {"activity", "activity_coefficient"} and unmapped_labels:
+            return None, (
+                f"engine completed equilibrium but computed activity under "
+                f"unmapped endmember/component label(s) "
+                f"{', '.join(str(label) for label in unmapped_labels)}; "
+                f"no authoritative {parent} basis conversion"
+            )
         return None, f"engine returned no positive {observable} for {parent}"
     return float(value), ""
 
@@ -724,13 +793,21 @@ def run_points(
     fixture: Mapping[str, Any], engines: Sequence[MeltActivityEngine]
 ) -> list[dict[str, Any]]:
     compositions = dict(fixture["compositions"])
-    cache: dict[tuple[str, str, float, float], EngineResult] = {}
+    cache: dict[tuple[str, str, float, float | None], EngineResult] = {}
     rows: list[dict[str, Any]] = []
     for point in fixture["points"]:
         composition_id = str(point["composition_id"])
         composition = _normalize_wt(compositions[composition_id]["composition_wt_pct"])
         temperature_K = float(point["temperature_K"])
-        fO2_bar = float(point.get("fO2_bar", 1.0e-9))
+        activity_observable = str(point["observable"]) in {
+            "activity",
+            "activity_coefficient",
+        }
+        fO2_bar = (
+            None
+            if activity_observable or point.get("fO2_bar") is None
+            else float(point["fO2_bar"])
+        )
         enriched = {**point, "composition_wt_pct": composition}
         for engine in engines:
             key = (engine.name, composition_id, temperature_K, fO2_bar)
@@ -749,7 +826,7 @@ def run_points(
                 )
             prediction, prediction_reason = _prediction_for_point(enriched, result)
             point_status = (
-                "refused"
+                "observable_unavailable"
                 if result.status == "ok" and prediction is None
                 else result.status
             )
@@ -1362,12 +1439,12 @@ def generate_report(
         "",
         "## Per-species comparison",
         "",
-        "| Species | Observable | Engine | n | RMSE (dex) | Median residual | ok | OOD | crash | refused | unavailable |",
-        "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+        "| Species | Observable | Engine | n | RMSE (dex) | Median residual | ok | OOD | crash | refused | observable unavailable | unavailable |",
+        "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
     ]
     for row in metrics:
         lines.append(
-            "| {species} | {observable} | {engine} | {scored_count} | {rmse} | {median} | {ok} | {ood} | {crash} | {refused} | {unavailable} |".format(
+            "| {species} | {observable} | {engine} | {scored_count} | {rmse} | {median} | {ok} | {ood} | {crash} | {refused} | {observable_unavailable} | {unavailable} |".format(
                 **row,
                 rmse=_fmt(row["rmse_dex"]),
                 median=_fmt(row["median_signed_residual_dex"]),
@@ -1375,6 +1452,7 @@ def generate_report(
                 ood=row["out_of_domain_count"],
                 crash=row["crash_count"],
                 refused=row["refused_count"],
+                observable_unavailable=row["observable_unavailable_count"],
                 unavailable=row["unavailable_count"],
             )
         )
@@ -1529,6 +1607,21 @@ def generate_report(
                     ),
                 ]
             )
+    if "thermoengine" in present_engines:
+        thermoengine_rows = [
+            row for row in point_rows if row["engine"] == "thermoengine"
+        ]
+        thermoengine_usable = sum(
+            row.get("status") == "ok" and row.get("prediction") is not None
+            for row in thermoengine_rows
+        )
+        lines.extend([
+            "",
+            f"ThermoEngine produced {thermoengine_usable}/{len(thermoengine_rows)} "
+            "usable benchmark predictions; converged results without the "
+            "requested canonical observable remain typed "
+            "`observable_unavailable`.",
+        ])
     lines.extend(["", "## Stripping-trajectory coverage", ""])
     for engine in sorted(coverage_engines):
         accepted = sum(row.get(f"{engine}_status") == "ok" for row in coverage_rows)
@@ -1738,7 +1831,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--engines",
         default=",".join(DEFAULT_ENGINES),
-        help="comma-separated engines: imcc-published,imcc-ext,internal_analytic,alphamelts,vaporock",
+        help="comma-separated engines: imcc-published,imcc-ext,internal_analytic,alphamelts,thermoengine,vaporock",
     )
     parser.add_argument(
         "--mode", choices=("benchmark", "coverage", "all"), default="all"

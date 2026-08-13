@@ -118,6 +118,19 @@ def test_cross_engine_shared_count_requires_both_engine_families_to_score():
     assert "share 1 scored" not in report
 
 
+def test_build_engines_includes_intrinsic_thermoengine_leg():
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+
+    engines = benchmark.build_engines(
+        ("thermoengine",), fixture, alphamelts_timeout_s=17.0
+    )
+
+    assert len(engines) == 1
+    assert isinstance(engines[0], benchmark.ThermoEngineMeltActivityEngine)
+    assert engines[0].name == "thermoengine"
+    assert engines[0].timeout_s == 17.0
+
+
 def test_coverage_map_records_melts_refusal_below_30_sio2():
     fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
     rows = benchmark.run_coverage_map(
@@ -301,7 +314,7 @@ def test_internal_analytical_live_adapter_converts_gamma_to_parent_oxide_basis()
     assert result.gammas["MgO"] == pytest.approx(0.8968179981767649)
 
 
-def test_missing_point_observable_is_recorded_as_refused():
+def test_missing_point_observable_is_recorded_as_observable_unavailable():
     fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
     fixture["points"] = [
         point for point in fixture["points"] if point["id"] == "hastie_k_1917_186"
@@ -316,9 +329,45 @@ def test_missing_point_observable_is_recorded_as_refused():
 
     row = benchmark.run_points(fixture, [_MissingActivity()])[0]
 
-    assert row["status"] == "refused"
+    assert row["status"] == "observable_unavailable"
     assert row["prediction"] is None
     assert "no positive partial_pressure" in row["reason"]
+
+
+def test_activity_observable_without_oxide_label_is_typed_separately_from_refusal():
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    point = next(
+        point
+        for point in fixture["points"]
+        if point["observable"] == "activity_coefficient"
+    )
+    fixture["points"] = [{
+        **point,
+        "species": "Na",
+        "parent_oxide": "Na2O",
+        "observable": "activity",
+        "fO2_bar": 1.0e-6,
+    }]
+
+    class _EndmemberLabelEngine(_FakeActivityEngine):
+        name = "alphamelts"
+
+        def evaluate(self, composition_wt_pct, temperature_K, fO2_bar):
+            del composition_wt_pct, temperature_K
+            assert fO2_bar is None
+            return benchmark.EngineResult(
+                status="ok",
+                activities={"SiO2": 0.2},
+                details={"unmapped_activity_labels": ["Na2SiO3"]},
+            )
+
+    row = benchmark.run_points(fixture, [_EndmemberLabelEngine()])[0]
+
+    assert row["status"] == "observable_unavailable"
+    assert row["prediction"] is None
+    assert "computed activity under unmapped" in row["reason"]
+    assert "Na2SiO3" in row["reason"]
+    assert "no authoritative Na2O basis conversion" in row["reason"]
 
 
 def test_paired_decision_uses_identical_scored_points():
@@ -433,3 +482,59 @@ def test_provider_crash_diagnostic_overrides_out_of_domain_status():
 
     assert result.status == "crash"
     assert "SIGSEGV" in result.reason
+
+
+def test_real_alphamelts_producer_types_unmapped_label_as_ok_not_refused():
+    """The REAL AlphaMeltsEngine producer must emit ok/completed_without_observable
+    when the engine computed an activity under an unmapped endmember label.
+
+    The sibling typed-differentiation tests inject an already-typed EngineResult, so
+    they stay green even if the producer regresses to `refused` — the mutation the
+    2026-08-13 adversarial closer found surviving. This test drives the real
+    producer through a stubbed provider so that mutation is killed: a provider that
+    reports only `Na2SiO3` (no oxide mapping) must yield producer status `ok`, and
+    the pipeline must type the row `observable_unavailable`, never `refused`.
+    """
+    class _UnmappedLabelProvider:
+        def dispatch(self, request):
+            del request
+            return SimpleNamespace(
+                status="ok",
+                warnings=[],
+                diagnostic={
+                    "backend_diagnostics": {
+                        "diagnostic_reported_activities": {"Na2SiO3": 0.31},
+                        "diagnostic_oxide_activities": {},
+                        "diagnostic_activity_label_map": {"Na2SiO3": {}},
+                        "diagnostic_activity_basis": "endmember",
+                    },
+                },
+            )
+
+    engine = benchmark.AlphaMeltsEngine()
+    engine._provider = _UnmappedLabelProvider()
+
+    produced = engine.evaluate({"SiO2": 70.0, "Na2O": 30.0}, 1473.0, None)
+
+    # Producer half: computed-but-unmapped is NOT a refusal.
+    assert produced.status == "ok"
+    assert produced.details["execution_status"] == "completed_without_observable"
+    assert produced.details["unmapped_activity_labels"] == ["Na2SiO3"]
+    assert not produced.activities
+
+    # Consumer half: the row types as unavailable-observable, not refused.
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    point = next(
+        p for p in fixture["points"] if p["observable"] == "activity_coefficient"
+    )
+    fixture["points"] = [{
+        **point,
+        "species": "Na",
+        "parent_oxide": "Na2O",
+        "observable": "activity",
+        "fO2_bar": 1.0e-6,
+    }]
+    row = benchmark.run_points(fixture, [engine])[0]
+    assert row["status"] == "observable_unavailable"
+    assert row["status"] != "refused"
+    assert "Na2SiO3" in row["reason"]

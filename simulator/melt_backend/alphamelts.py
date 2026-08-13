@@ -186,7 +186,10 @@ ALPHAMELTS_EXECUTED_T_TOLERANCE_C = 2.0 * (2.0 ** (11 - 23))
 # executed 952.377380 → table cell "952.38"). Table-vs-stdout consistency
 # uses that print quantum, not the float32 residual bound above.
 ALPHAMELTS_SYSTEM_TABLE_T_TOLERANCE_C = 0.01
-ALPHAMELTS_FO2_ECHO_TOLERANCE_LOG10 = 1.0e-6
+# System_main_tbl.txt prints fO2(absolute) to 3 decimal places. Nearest-value
+# rounding therefore loses up to 0.5e-3 log10 units; the extra 1e-7 clears the
+# decimal-to-binary boundary while remaining below one emitted 1e-3 quantum.
+ALPHAMELTS_FO2_ECHO_TOLERANCE_LOG10 = 5.001e-4
 ALPHAMELTS_PHASE_MASS_DISPLAY_RESOLUTION_G = 0.001
 # alphaMELTS input serialization emits an oxide only above this wt% value.
 # Values at/below it are native zero-component cells, regardless of Python sign.

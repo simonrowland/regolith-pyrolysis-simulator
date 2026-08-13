@@ -4741,6 +4741,184 @@ def test_thermoengine_imposed_fo2_seeds_feo_only_bulk_with_positive_kress91(
     assert solved == pytest.approx(-8.0)
 
 
+def test_thermoengine_fe_free_intrinsic_solve_keeps_activities_with_typed_none(
+    monkeypatch,
+):
+    class FakeMelts:
+        def get_oxide_names(self):
+            return ('SiO2', 'Al2O3')
+
+        def get_phase_names(self):
+            return ('Liquid',)
+
+        def set_bulk_composition(self, bulk_wt):
+            self.bulk_wt = dict(bulk_wt)
+
+        def equilibrate_tp(self, temperature_C, pressure_mpa, *, initialize):
+            assert initialize is True
+            return [('success', temperature_C, pressure_mpa, self)]
+
+        def get_list_of_phases_in_assemblage(self, root):
+            assert root is self
+            return ('Liquid',)
+
+        def get_mass_of_phase(self, root, phase):
+            assert root is self
+            assert phase == 'Liquid'
+            return 1000.0
+
+        def get_composition_of_phase(self, root, phase, basis):
+            assert root is self
+            assert phase == 'Liquid'
+            if basis == 'oxide_wt':
+                return dict(self.bulk_wt)
+            assert basis == 'component'
+            return {'SiO2': 0.7, 'Al2O3': 0.3}
+
+        def get_property_of_phase(self, root, phase, property_name):
+            assert root is self
+            assert phase == 'Liquid'
+            return 3.0 if property_name == 'Density' else 1.0
+
+        def get_dictionary_of_affinities(self, root, sort=False):
+            assert root is self
+            assert sort is False
+            return {}
+
+    melts = FakeMelts()
+    transport = ThermoEngineTransport(
+        activity_converter=activity_from_chem_potential,
+    )
+    transport._equilibrate = object()
+    transport._liq_phase = object()
+    transport._database = object()
+    transport._chem = types.SimpleNamespace(
+        OXIDE_ORDER=('SiO2', 'Al2O3', 'FeO', 'Fe2O3')
+    )
+    monkeypatch.setattr(transport, '_new_melts_model', lambda: melts)
+    monkeypatch.setattr(transport, '_clear_operation_palette', lambda: None)
+    monkeypatch.setattr(
+        transport,
+        '_chemical_potentials_for_phase',
+        lambda *_args, **_kwargs: {'SiO2': -1000.0},
+    )
+    monkeypatch.setattr(
+        transport,
+        '_activities_from_chemical_potentials',
+        lambda **_kwargs: {'SiO2': 0.4},
+    )
+
+    result = transport._equilibrate_in_process(
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+        comp_wt={'SiO2': 70.0, 'Al2O3': 30.0},
+        fO2_log=None,
+    )
+
+    assert result.solved_fO2_log is None
+    assert result.solved_fO2_reason == 'undefined_zero_ferric_liquid'
+    assert result.activity_coefficients == {'SiO2': 0.4}
+    assert result.phases_present == ('Liquid',)
+
+
+def test_thermoengine_backend_keeps_fe_free_activity_payload_when_fo2_undefined():
+    backend = ThermoEngineBackend()
+    backend._mode = 'thermoengine'
+
+    class FakeTransport:
+        def equilibrate(self, **kwargs):
+            assert kwargs['fO2_log'] is None
+            assert kwargs['comp_wt']['FeO'] == 0.0
+            assert kwargs['comp_wt']['Fe2O3'] == 0.0
+            return ThermoEnginePayload(
+                phases_present=('Liquid',),
+                phase_masses_kg={'Liquid': 1.0},
+                liquid_fraction=1.0,
+                liquid_composition_wt_pct={'SiO2': 70.0, 'Al2O3': 30.0},
+                activity_coefficients={'SiO2': 0.4},
+                solved_fO2_log=None,
+                solved_fO2_reason='undefined_zero_ferric_liquid',
+            )
+
+        def close(self):
+            return None
+
+    backend._thermoengine_transport = FakeTransport()
+
+    result = backend.equilibrate(
+        temperature_C=1400.0,
+        composition_kg={'SiO2': 0.7, 'Al2O3': 0.3},
+        fO2_log=None,
+        pressure_bar=1.0,
+    )
+
+    assert result.status == 'ok'
+    assert result.fO2_log is None
+    assert result.activity_coefficients == {'SiO2': 0.4}
+    assert result.diagnostics['solved_fO2_reason'] == (
+        'undefined_zero_ferric_liquid'
+    )
+    assert result.diagnostics['fO2_transport'] == (
+        'thermoengine_intrinsic_undefined'
+    )
+    assert result.diagnostics['vapor_pressure_backend_status'] == 'refused'
+    assert result.diagnostics['vapor_pressure_backend_status_reason'] == (
+        'undefined_fO2'
+    )
+
+
+def test_thermoengine_backend_rejects_untyped_missing_intrinsic_fo2():
+    backend = ThermoEngineBackend()
+    backend._mode = 'thermoengine'
+
+    class FakeTransport:
+        def equilibrate(self, **kwargs):
+            assert kwargs['fO2_log'] is None
+            return ThermoEnginePayload(
+                phases_present=('Liquid',),
+                phase_masses_kg={'Liquid': 1.0},
+                liquid_fraction=1.0,
+                liquid_composition_wt_pct={'SiO2': 100.0},
+                activity_coefficients={'SiO2': 0.4},
+                solved_fO2_log=None,
+                solved_fO2_reason=None,
+            )
+
+        def close(self):
+            return None
+
+    backend._thermoengine_transport = FakeTransport()
+
+    with pytest.raises(
+        RuntimeError,
+        match='omitted solved fO2 without a typed proven-undefined reason',
+    ):
+        backend.equilibrate(
+            temperature_C=1400.0,
+            composition_kg={'SiO2': 0.7, 'Al2O3': 0.3},
+            fO2_log=None,
+            pressure_bar=1.0,
+        )
+
+
+def test_thermoengine_pinned_fo2_request_on_fe_free_composition_still_refuses():
+    transport = ThermoEngineTransport(
+        activity_converter=activity_from_chem_potential,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match='cannot impose absolute fO2 without FeO/Fe2O3',
+    ):
+        transport._solve_imposed_fO2(
+            temperature_C=1400.0,
+            pressure_bar=1.0,
+            pressure_mpa=0.1,
+            bulk_wt={'SiO2': 70.0, 'Al2O3': 30.0},
+            target_fO2_log=-8.0,
+        )
+
+
 def test_thermoengine_echo_clamps_roundoff_negative_fe2o3_to_zero_limit():
     class FakeMelts:
         def get_list_of_phases_in_assemblage(self, _root):
@@ -5858,8 +6036,14 @@ Melt fraction = 1.0
     assert result.diagnostics['authoritative_for_requested_conditions'] is False
 
 
-def test_alphamelts_subprocess_accepts_fo2_echo_rounding():
+def test_alphamelts_fe_bearing_benchmark_point_accepts_three_decimal_fo2_echo():
     backend = AlphaMELTSBackend()
+    fixture = _load_data('melt_activity/basalt-bench-set-v1.yaml')
+    point = next(
+        point for point in fixture['points']
+        if point['id'] == 'hastie_k_1917_186'
+    )
+    requested_fO2_log = math.log10(float(point['fO2_bar']))
     output = """
 <> Stable liquid assemblage achieved.
 Initial alphaMELTS calculation at: P 1.000000 (bars), T 1200.000000 (C)
@@ -5873,10 +6057,10 @@ Melt fraction = 1.0
         output,
         temperature_C=1200.0,
         total_input_kg=10.0,
-        fO2_log=-9.0000004,
+        fO2_log=requested_fO2_log,
         system_output=_system_main_fixture(
             temperature_C=1200.0,
-            fO2_log=-9.0,
+            fO2_log=round(requested_fO2_log, 3),
         ),
     )
 

@@ -11,6 +11,7 @@ from engines.alphamelts.thermoengine import (
 )
 from simulator.engine_pool import EngineWorkerTimeout
 from simulator.melt_backend.alphamelts import (
+    VaporPressureActivityRefusal,
     _MELTSBackendSupport,
     _h2_melt_envelope_diagnostics,
     activity_from_chem_potential,
@@ -231,14 +232,26 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                 fO2_log=fO2_log,
                 warnings=tuple(result_warnings),
             )
-            if payload.solved_fO2_log is None:
+            solved_fO2_log = (
+                None
+                if payload.solved_fO2_log is None
+                else float(payload.solved_fO2_log)
+            )
+            if (
+                solved_fO2_log is None
+                and payload.solved_fO2_reason
+                != 'undefined_zero_ferric_liquid'
+            ):
                 raise RuntimeError(
-                    'ThermoEngine equilibrium did not report a solved fO2'
+                    'ThermoEngine equilibrium omitted solved fO2 without a '
+                    'typed proven-undefined reason'
                 )
-            solved_fO2_log = float(payload.solved_fO2_log)
-            if fO2_log is None:
-                fO2_transport = 'thermoengine_intrinsic_closed'
-            else:
+            if fO2_log is not None:
+                if solved_fO2_log is None:
+                    raise RuntimeError(
+                        'ThermoEngine equilibrium did not report the requested '
+                        'solved fO2'
+                    )
                 echo_delta = abs(solved_fO2_log - float(fO2_log))
                 if echo_delta >= 1.0e-3:
                     raise RuntimeError(
@@ -249,8 +262,13 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                 fO2_transport = 'thermoengine_oxygen_root'
                 clamp_diagnostics['requested_fO2_log'] = float(fO2_log)
                 clamp_diagnostics['fO2_echo_abs_delta'] = echo_delta
+            elif solved_fO2_log is None:
+                fO2_transport = 'thermoengine_intrinsic_undefined'
+            else:
+                fO2_transport = 'thermoengine_intrinsic_closed'
             clamp_diagnostics.update({
                 'solved_fO2_log': solved_fO2_log,
+                'solved_fO2_reason': payload.solved_fO2_reason,
                 'fO2_transport': fO2_transport,
                 'thermoengine_default_phase_universe_size': (
                     payload.phase_universe_size
@@ -269,7 +287,17 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
             })
             status = 'ok' if payload.phases_present else 'not_converged'
             vaporock_envelope_diagnostics = {}
-            if self._vaporock_available:
+            if solved_fO2_log is None:
+                vapor_pressures = {}
+                vapor_pressure_source = VaporPressureActivityRefusal(
+                    missing_precursor_species=(),
+                    context=(
+                        'ThermoEngine vapor projection requires a finite fO2; '
+                        f'{payload.solved_fO2_reason or "intrinsic fO2 unavailable"}'
+                    ),
+                    reason='undefined_fO2',
+                )
+            elif self._vaporock_available:
                 vapor_pressures, vapor_pressure_source = (
                     self._vapor_pressures_via_vaporock_or_antoine(
                         T_C=temperature_C,
