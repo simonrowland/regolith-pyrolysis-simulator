@@ -2,7 +2,7 @@
 
 ## Evidence boundary
 
-Literal SF04 basalt empirical points: **0**. The scored experimental population is six Hastie-1981 KEMS gas-pressure points plus six Richter-2007 Type-B CAI-like CMAS gamma targets. SF04 workbook pressures are scored only as an explicitly non-empirical regression anchor.
+Literal SF04 basalt empirical points: **0**. The scored experimental population is six Hastie-1981 KEMS gas-pressure points, six Richter-2007 Type-B CAI-like CMAS gamma targets, and 12 Tsaplin-2000 Na2O-SiO2 a(SiO2) targets. SF04 workbook pressures are scored only as an explicitly non-empirical regression anchor.
 
 Residual convention: `log10(predicted/measured)`; positive means overprediction. No coefficient tuning was performed.
 
@@ -28,6 +28,18 @@ Residual convention: `log10(predicted/measured)`; positive means overprediction.
 | Mg | evaporation_flux | internal_analytic | 0 | — | — | 0 | 0 | 0 | 4 | 0 | 0 |
 | Mg | evaporation_flux | thermoengine | 0 | — | — | 0 | 0 | 0 | 4 | 0 | 0 |
 | Mg | evaporation_flux | vaporock | 0 | — | — | 0 | 0 | 0 | 0 | 0 | 4 |
+| Na | activity | alphamelts | 0 | — | — | 0 | 12 | 0 | 0 | 0 | 0 |
+| Na | activity | imcc-ext | 0 | — | — | 0 | 12 | 0 | 0 | 0 | 0 |
+| Na | activity | imcc-published | 0 | — | — | 0 | 12 | 0 | 0 | 0 | 0 |
+| Na | activity | internal_analytic | 0 | — | — | 12 | 0 | 0 | 0 | 0 | 0 |
+| Na | activity | thermoengine | 0 | — | — | 0 | 1 | 0 | 1 | 6 | 4 |
+| Na | activity | vaporock | 0 | — | — | 0 | 0 | 0 | 0 | 0 | 12 |
+| SiO | activity | alphamelts | 0 | — | — | 0 | 12 | 0 | 0 | 0 | 0 |
+| SiO | activity | imcc-ext | 0 | — | — | 0 | 12 | 0 | 0 | 0 | 0 |
+| SiO | activity | imcc-published | 0 | — | — | 0 | 12 | 0 | 0 | 0 | 0 |
+| SiO | activity | internal_analytic | 12 | 2.28 | 0.9987 | 12 | 0 | 0 | 0 | 0 | 0 |
+| SiO | activity | thermoengine | 6 | 1.169 | -0.8839 | 6 | 1 | 0 | 1 | 0 | 4 |
+| SiO | activity | vaporock | 0 | — | — | 0 | 0 | 0 | 0 | 0 | 12 |
 | SiO | activity_coefficient | alphamelts | 0 | — | — | 0 | 0 | 3 | 0 | 0 | 0 |
 | SiO | activity_coefficient | imcc-ext | 3 | 0.5754 | 0.5414 | 3 | 0 | 0 | 0 | 0 | 0 |
 | SiO | activity_coefficient | imcc-published | 3 | 0.5769 | 0.5429 | 3 | 0 | 0 | 0 | 0 | 0 |
@@ -94,25 +106,25 @@ These are engine robustness/coverage probes, not empirical score points.
 | sf04_tholeiite | literal_basalt | imcc-ext | ok | — |
 | sf04_tholeiite | literal_basalt | internal_analytic | ok | — |
 | sf04_tholeiite | literal_basalt | alphamelts | ok | — |
-| sf04_tholeiite | literal_basalt | thermoengine | ok | — |
+| sf04_tholeiite | literal_basalt | thermoengine | unavailable | AlphaMELTS adapter not available (no ThermoEngine, PetThermoTools, or subprocess transport) |
 | sf04_tholeiite | literal_basalt | vaporock | unavailable | VapoRock dependency is present but exposes no public per-oxide melt-activity surface; internally coupled gas pressures are excluded |
 | sf04_alkali_basalt | literal_basalt | imcc-published | ok | — |
 | sf04_alkali_basalt | literal_basalt | imcc-ext | ok | — |
 | sf04_alkali_basalt | literal_basalt | internal_analytic | ok | — |
 | sf04_alkali_basalt | literal_basalt | alphamelts | ok | — |
-| sf04_alkali_basalt | literal_basalt | thermoengine | ok | — |
+| sf04_alkali_basalt | literal_basalt | thermoengine | unavailable | AlphaMELTS adapter not available (no ThermoEngine, PetThermoTools, or subprocess transport) |
 | sf04_alkali_basalt | literal_basalt | vaporock | unavailable | VapoRock dependency is present but exposes no public per-oxide melt-activity surface; internally coupled gas pressures are excluded |
 | sf04_komatiite | literal_basalt | imcc-published | ok | — |
 | sf04_komatiite | literal_basalt | imcc-ext | ok | — |
 | sf04_komatiite | literal_basalt | internal_analytic | ok | — |
 | sf04_komatiite | literal_basalt | alphamelts | ok | — |
-| sf04_komatiite | literal_basalt | thermoengine | ok | — |
+| sf04_komatiite | literal_basalt | thermoengine | unavailable | AlphaMELTS adapter not available (no ThermoEngine, PetThermoTools, or subprocess transport) |
 | sf04_komatiite | literal_basalt | vaporock | unavailable | VapoRock dependency is present but exposes no public per-oxide melt-activity surface; internally coupled gas pressures are excluded |
 | sf04_dunite | literal_basalt | imcc-published | ok | — |
 | sf04_dunite | literal_basalt | imcc-ext | ok | — |
 | sf04_dunite | literal_basalt | internal_analytic | ok | — |
 | sf04_dunite | literal_basalt | alphamelts | ok | — |
-| sf04_dunite | literal_basalt | thermoengine | out_of_domain | RuntimeError: ThermoEngine equilibrium failed: ThermoEngine equilibrium failed: ThermoEngine absolute fO2 target is outside the attainable Fe-redox bracket: requested=-9 Traceback (most recent call last): File "/Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/simulator/engine_pool.py", line 125, in _run_engine_worker result = handler(resource, request, errlog) ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ File "/Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/engines/alphamelts/thermoengine.py", line 163, in _handle_thermoengine_request return transport._equilibrate_in_process(**kwargs) ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ File "/Users/simonrowland/L |
+| sf04_dunite | literal_basalt | thermoengine | unavailable | AlphaMELTS adapter not available (no ThermoEngine, PetThermoTools, or subprocess transport) |
 | sf04_dunite | literal_basalt | vaporock | unavailable | VapoRock dependency is present but exposes no public per-oxide melt-activity surface; internally coupled gas pressures are excluded |
 | richter_type_b_cai | type_b_cai_like_cmas | imcc-published | ok | — |
 | richter_type_b_cai | type_b_cai_like_cmas | imcc-ext | ok | — |
@@ -127,7 +139,7 @@ AlphaMELTS equilibrium completed on all literal SF04 basalt probes, but its prov
 
 IMCC-versus-AlphaMELTS empirical verdict: **none**. No point has both a convention-valid measurement and successful canonical activities from both engine families.
 
-ThermoEngine produced 6/16 usable benchmark predictions; converged results without the requested canonical observable remain typed `observable_unavailable`.
+ThermoEngine produced 12/40 usable benchmark predictions; converged results without the requested canonical observable remain typed `observable_unavailable`.
 
 ## Stripping-trajectory coverage
 

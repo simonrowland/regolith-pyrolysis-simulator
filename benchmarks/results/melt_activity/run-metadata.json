@@ -1,6 +1,6 @@
 {
   "bench_set": "data/melt_activity/basalt-bench-set-v1.yaml",
-  "bench_set_sha256": "3506b9b780ad8a411c47ca3e7f4fa98544572adc28569dab3607828b0b19d7ab",
+  "bench_set_sha256": "d5411e8240de47ed3503841c7e32d9612f585209d77586f8869186041978e305",
   "coverage_row_count": 168,
   "engines": [
     "imcc-published",
@@ -118,16 +118,16 @@
   ],
   "point_status_counts": {
     "crash": 10,
-    "observable_unavailable": 12,
-    "ok": 42,
-    "refused": 16,
-    "unavailable": 16
+    "observable_unavailable": 18,
+    "ok": 72,
+    "out_of_domain": 74,
+    "refused": 18,
+    "unavailable": 48
   },
   "probe_status_counts": {
     "crash": 1,
-    "ok": 22,
-    "out_of_domain": 1,
-    "unavailable": 6
+    "ok": 19,
+    "unavailable": 10
   },
   "reference_anchor": {
     "controller_anchor_reproduced": true,
