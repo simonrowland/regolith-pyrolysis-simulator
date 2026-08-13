@@ -197,3 +197,20 @@ their Shomate polynomial silently — `O2(g)`, declared to 2000 K, returns a smo
 exists as an external gate in `simulator/melt_backend/vaporock.py`. A future patch should make
 out-of-domain evaluation typed rather than silent; until then the external gate is the only
 thing standing between us and confident nonsense.
+
+### openmolcas — v26.06 (built locally at `~/opt/openmolcas` on mac-studio-256-1)
+
+No patch. One **known gap** recorded here so nobody in this project reaches for the wrong tool.
+
+**RASSI silently computes cross-geometry overlaps in the wrong basis (b-196).** RASSI reads a
+single `RUNFILE`, hence one geometry and one AO basis. Given `JobIph` files from *different*
+geometries it does not compare, warn, or refuse — it runs clean (`rc=0`, "Happy landing") and prints
+a plausible state-overlap matrix. Measured on this build: a cross-geometry overlap of `0.998` that
+would pass any sane continuity gate, while its own reported state energies fail to reproduce the
+source RASSCF values (one of four matched; worst case 9.43 Eh off), and a printed MO-overlap
+diagonal reaches `1.00005` — impossible for normalized orbitals under a consistent metric.
+
+This is the same **"fabricates, does not refuse"** class as the VapoRock `T_max` gap above. Do not
+use RASSI to measure state continuity across a potential-energy scan; the wavefunction overlap must
+be constructed with the cross-geometry AO overlap, which RASSI does not form. Evidence and exact
+reproduction: `docs-private/research/2026-08-09-upstream-mission/md-chunk2/RASSI-XGEOM-PROBE.md`.
