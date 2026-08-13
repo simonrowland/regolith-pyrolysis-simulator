@@ -1,0 +1,196 @@
+schema_version: 1
+kind: melts_liquid_w_matrix
+format: yaml
+format_reason: YAML matches data/ provenance pins and keeps the 105-edge t-647 missing-pair table human-diffable.
+  The matrix is small; JSON would add no numeric fidelity here.
+description: Live ThermoEngine MELTS v1.0 liquid Margules W matrix. 105 bilateral edges over the 15 LiquidMelts
+  endmembers. Extracted from the installed module, not from papers.
+captured_at: '2026-08-13T15:41:10Z'
+extraction_script: scripts/extract_melts_liquid_w_matrix.py
+engine:
+  name: thermoengine
+  package_version: 1.2.0
+  melts_model: MELTSv1.0.2
+  liquid_model: v1.0
+  phase_class: LiquidMelts
+  phase_name: Liquid
+  phase_source: objc
+  phase_identifier: Objective-C-base
+  phase_abbrev: Liq
+  cache_identity: thermoengine MELTS 1.0.2 (liq_mod v1.0) (digest=sha256:e7f3f959424820e0ebe712b95b5d66b7a4e23a29b9869dd1e2a484affe409f74)
+  module_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/ThermoEngine/thermoengine/thermoengine/__init__.py
+  import_path: simulator.engine_local_config.setup_thermoengine_dylib_path; thermoengine.model.Database(database='Berman',
+    liq_mod='v1.0', calib=True).get_phase('Liq')
+endmember_basis:
+- SiO2
+- TiO2
+- Al2O3
+- Fe2O3
+- MgCr2O4
+- Fe2SiO4
+- MnSi0.5O2
+- Mg2SiO4
+- NiSi0.5O2
+- CoSi0.5O2
+- CaSiO3
+- Na2SiO3
+- KAlSiO4
+- Ca3(PO4)2
+- H2O
+units:
+  W: joules
+  source: thermoengine Phase.getUnitsForParameterName_ / param_units
+t_p_dependence:
+  form: constant
+  W_H: live_parameter_vector
+  W_S: absent_from_live_parameter_vector
+  W_V: absent_from_live_parameter_vector
+  evidence: The live LiquidMelts calibration vector is 105 names of the form W(i,j), all units 'joules'.
+    No WS/WV (or other T/P polynomial) names are exposed.
+classification:
+  engine_has_fitted_flag: false
+  fitted_rule: live W_joules != 0.0
+  zero_absent_rule: live W_joules == 0.0 exactly
+  note: Load-bearing for t-647. The engine stores a complete 105-slot vector and does not mark fitted
+    vs placeholder; exact zero is the only live distinction, and MELTS treats those edges as ideal.
+counts:
+  endmembers: 15
+  edges: 105
+  fitted: 98
+  zero_absent: 7
+zero_absent_pairs:
+- - H2O
+  - MgCr2O4
+- - Ca3(PO4)2
+  - MnSi0.5O2
+- - H2O
+  - MnSi0.5O2
+- - Ca3(PO4)2
+  - NiSi0.5O2
+- - H2O
+  - NiSi0.5O2
+- - Ca3(PO4)2
+  - CoSi0.5O2
+- - H2O
+  - CoSi0.5O2
+drift_guard_sample_indices:
+- 0
+- 1
+- 10
+- 35
+- 40
+- 59
+- 75
+- 76
+- 88
+- 89
+- 93
+- 94
+- 104
+matrix_digest: sha256:6d36ec6555a9d510cdcdeef7e5ad68b431282309ccfa0c641e97ae4ec1f8a876
+edges:
+  - {index: 0, component_i: TiO2, component_j: SiO2, engine_param_name: 'W(TiO2      ,SiO2)', status: fitted, form: constant, W_joules: 26266.7, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 1, component_i: Al2O3, component_j: SiO2, engine_param_name: 'W(Al2O3     ,SiO2)', status: fitted, form: constant, W_joules: -39120.0, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 2, component_i: Fe2O3, component_j: SiO2, engine_param_name: 'W(Fe2O3     ,SiO2)', status: fitted, form: constant, W_joules: 8110.3, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 3, component_i: MgCr2O4, component_j: SiO2, engine_param_name: 'W(MgCr2O4   ,SiO2)', status: fitted, form: constant, W_joules: 27886.3, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 4, component_i: Fe2SiO4, component_j: SiO2, engine_param_name: 'W(Fe2SiO4   ,SiO2)', status: fitted, form: constant, W_joules: 23660.9, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 5, component_i: MnSi0.5O2, component_j: SiO2, engine_param_name: 'W(MnSi0.5O2 ,SiO2)', status: fitted, form: constant, W_joules: 18393.9, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 6, component_i: Mg2SiO4, component_j: SiO2, engine_param_name: 'W(Mg2SiO4   ,SiO2)', status: fitted, form: constant, W_joules: 3421.0, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 7, component_i: NiSi0.5O2, component_j: SiO2, engine_param_name: 'W(NiSi0.5O2 ,SiO2)', status: fitted, form: constant, W_joules: 25197.4, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 8, component_i: CoSi0.5O2, component_j: SiO2, engine_param_name: 'W(CoSi0.5O2 ,SiO2)', status: fitted, form: constant, W_joules: 14802.8, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 9, component_i: CaSiO3, component_j: SiO2, engine_param_name: 'W(CaSiO3    ,SiO2)', status: fitted, form: constant, W_joules: -863.7, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 10, component_i: Na2SiO3, component_j: SiO2, engine_param_name: 'W(Na2SiO3   ,SiO2)', status: fitted, form: constant, W_joules: -99039.0, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 11, component_i: KAlSiO4, component_j: SiO2, engine_param_name: 'W(KAlSiO4   ,SiO2)', status: fitted, form: constant, W_joules: -33921.7, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 12, component_i: Ca3(PO4)2, component_j: SiO2, engine_param_name: 'W(Ca3(PO4)2 ,SiO2)', status: fitted, form: constant, W_joules: 61891.6, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 13, component_i: H2O, component_j: SiO2, engine_param_name: 'W(H2O       ,SiO2)', status: fitted, form: constant, W_joules: 30967.3, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 14, component_i: Al2O3, component_j: TiO2, engine_param_name: 'W(Al2O3     ,TiO2)', status: fitted, form: constant, W_joules: -29449.8, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 15, component_i: Fe2O3, component_j: TiO2, engine_param_name: 'W(Fe2O3     ,TiO2)', status: fitted, form: constant, W_joules: -84756.9, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 16, component_i: MgCr2O4, component_j: TiO2, engine_param_name: 'W(MgCr2O4   ,TiO2)', status: fitted, form: constant, W_joules: -72303.4, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 17, component_i: Fe2SiO4, component_j: TiO2, engine_param_name: 'W(Fe2SiO4   ,TiO2)', status: fitted, form: constant, W_joules: 5209.1, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 18, component_i: MnSi0.5O2, component_j: TiO2, engine_param_name: 'W(MnSi0.5O2 ,TiO2)', status: fitted, form: constant, W_joules: -16123.5, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 19, component_i: Mg2SiO4, component_j: TiO2, engine_param_name: 'W(Mg2SiO4   ,TiO2)', status: fitted, form: constant, W_joules: -4178.3, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 20, component_i: NiSi0.5O2, component_j: TiO2, engine_param_name: 'W(NiSi0.5O2 ,TiO2)', status: fitted, form: constant, W_joules: 3614.8, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 21, component_i: CoSi0.5O2, component_j: TiO2, engine_param_name: 'W(CoSi0.5O2 ,TiO2)', status: fitted, form: constant, W_joules: -1640.0, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 22, component_i: CaSiO3, component_j: TiO2, engine_param_name: 'W(CaSiO3    ,TiO2)', status: fitted, form: constant, W_joules: -35372.5, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 23, component_i: Na2SiO3, component_j: TiO2, engine_param_name: 'W(Na2SiO3   ,TiO2)', status: fitted, form: constant, W_joules: -15415.6, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 24, component_i: KAlSiO4, component_j: TiO2, engine_param_name: 'W(KAlSiO4   ,TiO2)', status: fitted, form: constant, W_joules: -48094.6, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 25, component_i: Ca3(PO4)2, component_j: TiO2, engine_param_name: 'W(Ca3(PO4)2 ,TiO2)', status: fitted, form: constant, W_joules: 25938.8, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 26, component_i: H2O, component_j: TiO2, engine_param_name: 'W(H2O       ,TiO2)', status: fitted, form: constant, W_joules: 81879.1, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 27, component_i: Fe2O3, component_j: Al2O3, engine_param_name: 'W(Fe2O3     ,Al2O3)', status: fitted, form: constant, W_joules: -17089.4, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 28, component_i: MgCr2O4, component_j: Al2O3, engine_param_name: 'W(MgCr2O4   ,Al2O3)', status: fitted, form: constant, W_joules: -31770.3, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 29, component_i: Fe2SiO4, component_j: Al2O3, engine_param_name: 'W(Fe2SiO4   ,Al2O3)', status: fitted, form: constant, W_joules: -30509.0, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 30, component_i: MnSi0.5O2, component_j: Al2O3, engine_param_name: 'W(MnSi0.5O2 ,Al2O3)', status: fitted, form: constant, W_joules: -53874.9, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 31, component_i: Mg2SiO4, component_j: Al2O3, engine_param_name: 'W(Mg2SiO4   ,Al2O3)', status: fitted, form: constant, W_joules: -32880.3, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 32, component_i: NiSi0.5O2, component_j: Al2O3, engine_param_name: 'W(NiSi0.5O2 ,Al2O3)', status: fitted, form: constant, W_joules: 2985.2, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 33, component_i: CoSi0.5O2, component_j: Al2O3, engine_param_name: 'W(CoSi0.5O2 ,Al2O3)', status: fitted, form: constant, W_joules: -2677.4, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 34, component_i: CaSiO3, component_j: Al2O3, engine_param_name: 'W(CaSiO3    ,Al2O3)', status: fitted, form: constant, W_joules: -57917.9, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 35, component_i: Na2SiO3, component_j: Al2O3, engine_param_name: 'W(Na2SiO3   ,Al2O3)', status: fitted, form: constant, W_joules: -130785.0, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 36, component_i: KAlSiO4, component_j: Al2O3, engine_param_name: 'W(KAlSiO4   ,Al2O3)', status: fitted, form: constant, W_joules: -25859.2, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 37, component_i: Ca3(PO4)2, component_j: Al2O3, engine_param_name: 'W(Ca3(PO4)2 ,Al2O3)', status: fitted, form: constant, W_joules: 52220.8, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 38, component_i: H2O, component_j: Al2O3, engine_param_name: 'W(H2O       ,Al2O3)', status: fitted, form: constant, W_joules: -16098.1, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 39, component_i: MgCr2O4, component_j: Fe2O3, engine_param_name: 'W(MgCr2O4   ,Fe2O3)', status: fitted, form: constant, W_joules: 21605.9, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 40, component_i: Fe2SiO4, component_j: Fe2O3, engine_param_name: 'W(Fe2SiO4   ,Fe2O3)', status: fitted, form: constant, W_joules: -179064.9, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 41, component_i: MnSi0.5O2, component_j: Fe2O3, engine_param_name: 'W(MnSi0.5O2 ,Fe2O3)', status: fitted, form: constant, W_joules: 3907.9, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 42, component_i: Mg2SiO4, component_j: Fe2O3, engine_param_name: 'W(Mg2SiO4   ,Fe2O3)', status: fitted, form: constant, W_joules: -71518.6, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 43, component_i: NiSi0.5O2, component_j: Fe2O3, engine_param_name: 'W(NiSi0.5O2 ,Fe2O3)', status: fitted, form: constant, W_joules: 408.7, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 44, component_i: CoSi0.5O2, component_j: Fe2O3, engine_param_name: 'W(CoSi0.5O2 ,Fe2O3)', status: fitted, form: constant, W_joules: -223.7, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 45, component_i: CaSiO3, component_j: Fe2O3, engine_param_name: 'W(CaSiO3    ,Fe2O3)', status: fitted, form: constant, W_joules: 12076.6, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 46, component_i: Na2SiO3, component_j: Fe2O3, engine_param_name: 'W(Na2SiO3   ,Fe2O3)', status: fitted, form: constant, W_joules: -149662.2, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 47, component_i: KAlSiO4, component_j: Fe2O3, engine_param_name: 'W(KAlSiO4   ,Fe2O3)', status: fitted, form: constant, W_joules: 57555.9, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 48, component_i: Ca3(PO4)2, component_j: Fe2O3, engine_param_name: 'W(Ca3(PO4)2 ,Fe2O3)', status: fitted, form: constant, W_joules: -4213.9, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 49, component_i: H2O, component_j: Fe2O3, engine_param_name: 'W(H2O       ,Fe2O3)', status: fitted, form: constant, W_joules: 31405.5, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 50, component_i: Fe2SiO4, component_j: MgCr2O4, engine_param_name: 'W(Fe2SiO4   ,MgCr2O4)', status: fitted, form: constant, W_joules: -82971.8, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 51, component_i: MnSi0.5O2, component_j: MgCr2O4, engine_param_name: 'W(MnSi0.5O2 ,MgCr2O4)', status: fitted, form: constant, W_joules: 182.4, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 52, component_i: Mg2SiO4, component_j: MgCr2O4, engine_param_name: 'W(Mg2SiO4   ,MgCr2O4)', status: fitted, form: constant, W_joules: 46049.2, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 53, component_i: NiSi0.5O2, component_j: MgCr2O4, engine_param_name: 'W(NiSi0.5O2 ,MgCr2O4)', status: fitted, form: constant, W_joules: -266.0, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 54, component_i: CoSi0.5O2, component_j: MgCr2O4, engine_param_name: 'W(CoSi0.5O2 ,MgCr2O4)', status: fitted, form: constant, W_joules: -384.0, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 55, component_i: CaSiO3, component_j: MgCr2O4, engine_param_name: 'W(CaSiO3    ,MgCr2O4)', status: fitted, form: constant, W_joules: 30704.7, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 56, component_i: Na2SiO3, component_j: MgCr2O4, engine_param_name: 'W(Na2SiO3   ,MgCr2O4)', status: fitted, form: constant, W_joules: 113646.0, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 57, component_i: KAlSiO4, component_j: MgCr2O4, engine_param_name: 'W(KAlSiO4   ,MgCr2O4)', status: fitted, form: constant, W_joules: 75709.1, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 58, component_i: Ca3(PO4)2, component_j: MgCr2O4, engine_param_name: 'W(Ca3(PO4)2 ,MgCr2O4)', status: fitted, form: constant, W_joules: 5341.8, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 59, component_i: H2O, component_j: MgCr2O4, engine_param_name: 'W(H2O       ,MgCr2O4)', status: zero_absent, form: constant, W_joules: 0.0, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 60, component_i: MnSi0.5O2, component_j: Fe2SiO4, engine_param_name: 'W(MnSi0.5O2 ,Fe2SiO4)', status: fitted, form: constant, W_joules: -6823.9, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 61, component_i: Mg2SiO4, component_j: Fe2SiO4, engine_param_name: 'W(Mg2SiO4   ,Fe2SiO4)', status: fitted, form: constant, W_joules: -37256.7, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 62, component_i: NiSi0.5O2, component_j: Fe2SiO4, engine_param_name: 'W(NiSi0.5O2 ,Fe2SiO4)', status: fitted, form: constant, W_joules: -17019.8, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 63, component_i: CoSi0.5O2, component_j: Fe2SiO4, engine_param_name: 'W(CoSi0.5O2 ,Fe2SiO4)', status: fitted, form: constant, W_joules: -11746.3, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 64, component_i: CaSiO3, component_j: Fe2SiO4, engine_param_name: 'W(CaSiO3    ,Fe2SiO4)', status: fitted, form: constant, W_joules: -12970.8, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 65, component_i: Na2SiO3, component_j: Fe2SiO4, engine_param_name: 'W(Na2SiO3   ,Fe2SiO4)', status: fitted, form: constant, W_joules: -90533.8, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 66, component_i: KAlSiO4, component_j: Fe2SiO4, engine_param_name: 'W(KAlSiO4   ,Fe2SiO4)', status: fitted, form: constant, W_joules: 23649.4, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 67, component_i: Ca3(PO4)2, component_j: Fe2SiO4, engine_param_name: 'W(Ca3(PO4)2 ,Fe2SiO4)', status: fitted, form: constant, W_joules: 87410.3, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 68, component_i: H2O, component_j: Fe2SiO4, engine_param_name: 'W(H2O       ,Fe2SiO4)', status: fitted, form: constant, W_joules: 28873.6, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 69, component_i: Mg2SiO4, component_j: MnSi0.5O2, engine_param_name: 'W(Mg2SiO4   ,MnSi0.5O2)', status: fitted, form: constant, W_joules: -13040.1, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 70, component_i: NiSi0.5O2, component_j: MnSi0.5O2, engine_param_name: 'W(NiSi0.5O2 ,MnSi0.5O2)', status: fitted, form: constant, W_joules: 785.8, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 71, component_i: CoSi0.5O2, component_j: MnSi0.5O2, engine_param_name: 'W(CoSi0.5O2 ,MnSi0.5O2)', status: fitted, form: constant, W_joules: -50.6, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 72, component_i: CaSiO3, component_j: MnSi0.5O2, engine_param_name: 'W(CaSiO3    ,MnSi0.5O2)', status: fitted, form: constant, W_joules: 2934.6, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 73, component_i: Na2SiO3, component_j: MnSi0.5O2, engine_param_name: 'W(Na2SiO3   ,MnSi0.5O2)', status: fitted, form: constant, W_joules: -15780.8, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 74, component_i: KAlSiO4, component_j: MnSi0.5O2, engine_param_name: 'W(KAlSiO4   ,MnSi0.5O2)', status: fitted, form: constant, W_joules: 23727.4, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 75, component_i: Ca3(PO4)2, component_j: MnSi0.5O2, engine_param_name: 'W(Ca3(PO4)2 ,MnSi0.5O2)', status: zero_absent, form: constant, W_joules: 0.0, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 76, component_i: H2O, component_j: MnSi0.5O2, engine_param_name: 'W(H2O       ,MnSi0.5O2)', status: zero_absent, form: constant, W_joules: 0.0, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 77, component_i: NiSi0.5O2, component_j: Mg2SiO4, engine_param_name: 'W(NiSi0.5O2 ,Mg2SiO4)', status: fitted, form: constant, W_joules: -21175.5, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 78, component_i: CoSi0.5O2, component_j: Mg2SiO4, engine_param_name: 'W(CoSi0.5O2 ,Mg2SiO4)', status: fitted, form: constant, W_joules: -14994.9, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 79, component_i: CaSiO3, component_j: Mg2SiO4, engine_param_name: 'W(CaSiO3    ,Mg2SiO4)', status: fitted, form: constant, W_joules: -31731.9, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 80, component_i: Na2SiO3, component_j: Mg2SiO4, engine_param_name: 'W(Na2SiO3   ,Mg2SiO4)', status: fitted, form: constant, W_joules: -41876.9, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 81, component_i: KAlSiO4, component_j: Mg2SiO4, engine_param_name: 'W(KAlSiO4   ,Mg2SiO4)', status: fitted, form: constant, W_joules: 22323.1, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 82, component_i: Ca3(PO4)2, component_j: Mg2SiO4, engine_param_name: 'W(Ca3(PO4)2 ,Mg2SiO4)', status: fitted, form: constant, W_joules: -23208.8, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 83, component_i: H2O, component_j: Mg2SiO4, engine_param_name: 'W(H2O       ,Mg2SiO4)', status: fitted, form: constant, W_joules: 35633.7, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 84, component_i: CoSi0.5O2, component_j: NiSi0.5O2, engine_param_name: 'W(CoSi0.5O2 ,NiSi0.5O2)', status: fitted, form: constant, W_joules: 258.9, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 85, component_i: CaSiO3, component_j: NiSi0.5O2, engine_param_name: 'W(CaSiO3    ,NiSi0.5O2)', status: fitted, form: constant, W_joules: 7027.5, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 86, component_i: Na2SiO3, component_j: NiSi0.5O2, engine_param_name: 'W(Na2SiO3   ,NiSi0.5O2)', status: fitted, form: constant, W_joules: -3647.8, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 87, component_i: KAlSiO4, component_j: NiSi0.5O2, engine_param_name: 'W(KAlSiO4   ,NiSi0.5O2)', status: fitted, form: constant, W_joules: 4261.4, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 88, component_i: Ca3(PO4)2, component_j: NiSi0.5O2, engine_param_name: 'W(Ca3(PO4)2 ,NiSi0.5O2)', status: zero_absent, form: constant, W_joules: 0.0, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 89, component_i: H2O, component_j: NiSi0.5O2, engine_param_name: 'W(H2O       ,NiSi0.5O2)', status: zero_absent, form: constant, W_joules: 0.0, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 90, component_i: CaSiO3, component_j: CoSi0.5O2, engine_param_name: 'W(CaSiO3    ,CoSi0.5O2)', status: fitted, form: constant, W_joules: -26685.7, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 91, component_i: Na2SiO3, component_j: CoSi0.5O2, engine_param_name: 'W(Na2SiO3   ,CoSi0.5O2)', status: fitted, form: constant, W_joules: 531.2, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 92, component_i: KAlSiO4, component_j: CoSi0.5O2, engine_param_name: 'W(KAlSiO4   ,CoSi0.5O2)', status: fitted, form: constant, W_joules: 265.7, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 93, component_i: Ca3(PO4)2, component_j: CoSi0.5O2, engine_param_name: 'W(Ca3(PO4)2 ,CoSi0.5O2)', status: zero_absent, form: constant, W_joules: 0.0, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 94, component_i: H2O, component_j: CoSi0.5O2, engine_param_name: 'W(H2O       ,CoSi0.5O2)', status: zero_absent, form: constant, W_joules: 0.0, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 95, component_i: Na2SiO3, component_j: CaSiO3, engine_param_name: 'W(Na2SiO3   ,CaSiO3)', status: fitted, form: constant, W_joules: -13247.1, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 96, component_i: KAlSiO4, component_j: CaSiO3, engine_param_name: 'W(KAlSiO4   ,CaSiO3)', status: fitted, form: constant, W_joules: 17111.1, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 97, component_i: Ca3(PO4)2, component_j: CaSiO3, engine_param_name: 'W(Ca3(PO4)2 ,CaSiO3)', status: fitted, form: constant, W_joules: 37070.3, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 98, component_i: H2O, component_j: CaSiO3, engine_param_name: 'W(H2O       ,CaSiO3)', status: fitted, form: constant, W_joules: 20374.6, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 99, component_i: KAlSiO4, component_j: Na2SiO3, engine_param_name: 'W(KAlSiO4   ,Na2SiO3)', status: fitted, form: constant, W_joules: 6522.8, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 100, component_i: Ca3(PO4)2, component_j: Na2SiO3, engine_param_name: 'W(Ca3(PO4)2 ,Na2SiO3)', status: fitted, form: constant, W_joules: 15571.9, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 101, component_i: H2O, component_j: Na2SiO3, engine_param_name: 'W(H2O       ,Na2SiO3)', status: fitted, form: constant, W_joules: -96937.6, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 102, component_i: Ca3(PO4)2, component_j: KAlSiO4, engine_param_name: 'W(Ca3(PO4)2 ,KAlSiO4)', status: fitted, form: constant, W_joules: 17100.6, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 103, component_i: H2O, component_j: KAlSiO4, engine_param_name: 'W(H2O       ,KAlSiO4)', status: fitted, form: constant, W_joules: 10374.2, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
+  - {index: 104, component_i: H2O, component_j: Ca3(PO4)2, engine_param_name: 'W(H2O       ,Ca3(PO4)2)', status: fitted, form: constant, W_joules: 43451.3, W_S_joules_per_K: null, W_V_joules_per_bar: null, units: joules}
