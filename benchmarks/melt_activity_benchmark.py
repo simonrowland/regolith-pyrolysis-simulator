@@ -1431,8 +1431,9 @@ def generate_report(
         "",
         f"Literal SF04 basalt empirical points: **{fixture['provenance']['literal_basalt_empirical_point_count']}**. "
         "The scored experimental population is six Hastie-1981 KEMS gas-pressure "
-        "points, six Richter-2007 Type-B CAI-like CMAS gamma targets, and 12 "
-        "Tsaplin-2000 Na2O-SiO2 a(SiO2) targets. "
+        "points, six Richter-2007 Type-B CAI-like CMAS gamma targets, 12 "
+        "Tsaplin-2000 Na2O-SiO2 a(SiO2) targets, and 28 Yamaguchi-1983 "
+        "Na2O-SiO2 liquid-reference a(SiO2) targets. "
         "SF04 workbook pressures are scored only as an explicitly non-empirical regression anchor.",
         "",
         "Residual convention: `log10(predicted/measured)`; positive means overprediction. "

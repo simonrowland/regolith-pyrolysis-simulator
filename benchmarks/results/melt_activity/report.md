@@ -2,7 +2,7 @@
 
 ## Evidence boundary
 
-Literal SF04 basalt empirical points: **0**. The scored experimental population is six Hastie-1981 KEMS gas-pressure points, six Richter-2007 Type-B CAI-like CMAS gamma targets, and 12 Tsaplin-2000 Na2O-SiO2 a(SiO2) targets. SF04 workbook pressures are scored only as an explicitly non-empirical regression anchor.
+Literal SF04 basalt empirical points: **0**. The scored experimental population is six Hastie-1981 KEMS gas-pressure points, six Richter-2007 Type-B CAI-like CMAS gamma targets, 12 Tsaplin-2000 Na2O-SiO2 a(SiO2) targets, and 28 Yamaguchi-1983 Na2O-SiO2 liquid-reference a(SiO2) targets. SF04 workbook pressures are scored only as an explicitly non-empirical regression anchor.
 
 Residual convention: `log10(predicted/measured)`; positive means overprediction. No coefficient tuning was performed.
 
@@ -28,18 +28,18 @@ Residual convention: `log10(predicted/measured)`; positive means overprediction.
 | Mg | evaporation_flux | internal_analytic | 0 | — | — | 0 | 0 | 0 | 4 | 0 | 0 |
 | Mg | evaporation_flux | thermoengine | 0 | — | — | 0 | 0 | 0 | 4 | 0 | 0 |
 | Mg | evaporation_flux | vaporock | 0 | — | — | 0 | 0 | 0 | 0 | 0 | 4 |
-| Na | activity | alphamelts | 0 | — | — | 0 | 12 | 0 | 0 | 0 | 0 |
-| Na | activity | imcc-ext | 0 | — | — | 0 | 12 | 0 | 0 | 0 | 0 |
-| Na | activity | imcc-published | 0 | — | — | 0 | 12 | 0 | 0 | 0 | 0 |
-| Na | activity | internal_analytic | 0 | — | — | 12 | 0 | 0 | 0 | 0 | 0 |
-| Na | activity | thermoengine | 0 | — | — | 0 | 1 | 0 | 1 | 6 | 4 |
-| Na | activity | vaporock | 0 | — | — | 0 | 0 | 0 | 0 | 0 | 12 |
-| SiO | activity | alphamelts | 0 | — | — | 0 | 12 | 0 | 0 | 0 | 0 |
-| SiO | activity | imcc-ext | 0 | — | — | 0 | 12 | 0 | 0 | 0 | 0 |
-| SiO | activity | imcc-published | 0 | — | — | 0 | 12 | 0 | 0 | 0 | 0 |
-| SiO | activity | internal_analytic | 12 | 2.28 | 0.9987 | 12 | 0 | 0 | 0 | 0 | 0 |
-| SiO | activity | thermoengine | 6 | 1.169 | -0.8839 | 6 | 1 | 0 | 1 | 0 | 4 |
-| SiO | activity | vaporock | 0 | — | — | 0 | 0 | 0 | 0 | 0 | 12 |
+| Na | activity | alphamelts | 0 | — | — | 0 | 54 | 0 | 0 | 0 | 0 |
+| Na | activity | imcc-ext | 0 | — | — | 0 | 54 | 0 | 0 | 0 | 0 |
+| Na | activity | imcc-published | 0 | — | — | 0 | 54 | 0 | 0 | 0 | 0 |
+| Na | activity | internal_analytic | 0 | — | — | 54 | 0 | 0 | 0 | 0 | 0 |
+| Na | activity | thermoengine | 0 | — | — | 0 | 1 | 0 | 1 | 6 | 46 |
+| Na | activity | vaporock | 0 | — | — | 0 | 0 | 0 | 0 | 0 | 54 |
+| SiO | activity | alphamelts | 0 | — | — | 0 | 40 | 0 | 0 | 0 | 0 |
+| SiO | activity | imcc-ext | 0 | — | — | 0 | 40 | 0 | 0 | 0 | 0 |
+| SiO | activity | imcc-published | 0 | — | — | 0 | 40 | 0 | 0 | 0 | 0 |
+| SiO | activity | internal_analytic | 40 | 1.789 | 0.8094 | 40 | 0 | 0 | 0 | 0 | 0 |
+| SiO | activity | thermoengine | 6 | 1.169 | -0.8839 | 6 | 1 | 0 | 1 | 0 | 32 |
+| SiO | activity | vaporock | 0 | — | — | 0 | 0 | 0 | 0 | 0 | 40 |
 | SiO | activity_coefficient | alphamelts | 0 | — | — | 0 | 0 | 3 | 0 | 0 | 0 |
 | SiO | activity_coefficient | imcc-ext | 3 | 0.5754 | 0.5414 | 3 | 0 | 0 | 0 | 0 | 0 |
 | SiO | activity_coefficient | imcc-published | 3 | 0.5769 | 0.5429 | 3 | 0 | 0 | 0 | 0 | 0 |
@@ -91,11 +91,6 @@ Controller regression pool (all non-alkali rows, including the O2 fO2 pin): IMCC
 
 Experimental KEMS snapshot: **7 scored / 9 retained** rows. These are independent KEMS compositions, not measurements on the four SF04 basalt sheets, and therefore do not turn the MAGMA table into empirical basalt evidence.
 
-### Installed VapoRock snapshot check
-
-Live comparison produced 288/288 cells; maximum live-minus-frozen magnitude: 4.64992e-05 dex.
-The installed VapoRock run reproduces the frozen snapshot within 0.0005 dex.
-
 ## In-domain composition probes
 
 These are engine robustness/coverage probes, not empirical score points.
@@ -139,7 +134,7 @@ AlphaMELTS equilibrium completed on all literal SF04 basalt probes, but its prov
 
 IMCC-versus-AlphaMELTS empirical verdict: **none**. No point has both a convention-valid measurement and successful canonical activities from both engine families.
 
-ThermoEngine produced 12/40 usable benchmark predictions; converged results without the requested canonical observable remain typed `observable_unavailable`.
+ThermoEngine produced 12/110 usable benchmark predictions; converged results without the requested canonical observable remain typed `observable_unavailable`.
 
 ## Stripping-trajectory coverage
 

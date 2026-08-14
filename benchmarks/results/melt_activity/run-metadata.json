@@ -1,6 +1,6 @@
 {
   "bench_set": "data/melt_activity/basalt-bench-set-v1.yaml",
-  "bench_set_sha256": "d5411e8240de47ed3503841c7e32d9612f585209d77586f8869186041978e305",
+  "bench_set_sha256": "ea34345206776088334cbf321e6de97f864ca58b0270dcf4663983089196e496",
   "coverage_row_count": 168,
   "engines": [
     "imcc-published",
@@ -11,11 +11,9 @@
     "vaporock"
   ],
   "live_vaporock_anchor_check": {
-    "requested": true,
-    "row_count": 288,
-    "status_counts": {
-      "ok": 288
-    }
+    "requested": false,
+    "row_count": 0,
+    "status_counts": {}
   },
   "mode": "all",
   "paired_decisions": [
@@ -119,10 +117,10 @@
   "point_status_counts": {
     "crash": 10,
     "observable_unavailable": 18,
-    "ok": 72,
-    "out_of_domain": 74,
+    "ok": 142,
+    "out_of_domain": 284,
     "refused": 18,
-    "unavailable": 48
+    "unavailable": 188
   },
   "probe_status_counts": {
     "crash": 1,

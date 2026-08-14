@@ -13,6 +13,11 @@ provenance:
     Tsaplin-2000 supplies 12 scored SiO2 activity targets from Na2O-SiO2
     binary melts; its 12 measured Na2O activities are retained but held from
     scoring pending an authoritative oxide-basis engine result.
+    Yamaguchi-1983 supplies 28 scored SiO2 activity targets from seven
+    Na2O-SiO2 binary melts at four frozen temperature nodes. The published
+    Tridymite-reference activities are retained alongside controller-directed
+    liquid-reference conversions. Its 42 measured Na2O activities are retained
+    but held from scoring pending an authoritative oxide-basis engine result.
   sources:
     - data/literature/extracts/kems-008-schaefer-fegley-2004.yaml
     - data/literature/extracts/kems-010-richter-2007.yaml
@@ -20,6 +25,7 @@ provenance:
     - data/melt_activity/reference/imcc-magma-model-v1.csv
     - data/melt_activity/reference/vaporock-magma-kems-v1.csv
     - docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    - docs/references/pdfs/99-kems-langmuir/yam1983.pdf
   composition_transform: >-
     Fe2O3 folded into FeO with FeO += 0.8998102538090137*Fe2O3;
     H2O, P2O5, MnO, and other components outside the published eight-parent
@@ -331,6 +337,104 @@ compositions:
     composition_wt_pct:
       SiO2: 34.197643
       Na2O: 65.802357
+    composition_note: >-
+      Published binary mole fraction converted to oxide wt% using
+      M(SiO2)=60.083 g/mol and M(Na2O)=61.97853856 g/mol:
+      wt_i=100*x_i*M_i/sum(x_j*M_j).
+  yamaguchi1983_na2o_sio2_x0205:
+    material_class: na_silicate_binary_melt
+    source: >-
+      Yamaguchi, Imai & Goto (1983), Journal of the Japan Institute of Metals
+      47(9), 736-742, DOI 10.2320/jinstmet1952.47.9_736, Tables 1-2,
+      Na2O-SiO2 row x(Na2O)=0.205.
+    published_x_Na2O: 0.205
+    composition_wt_pct:
+      SiO2: 78.989140
+      Na2O: 21.010860
+    composition_note: >-
+      Published binary mole fraction converted to oxide wt% using
+      M(SiO2)=60.083 g/mol and M(Na2O)=61.97853856 g/mol:
+      wt_i=100*x_i*M_i/sum(x_j*M_j).
+  yamaguchi1983_na2o_sio2_x0298:
+    material_class: na_silicate_binary_melt
+    source: >-
+      Yamaguchi, Imai & Goto (1983), Journal of the Japan Institute of Metals
+      47(9), 736-742, DOI 10.2320/jinstmet1952.47.9_736, Tables 1-2,
+      Na2O-SiO2 row x(Na2O)=0.298.
+    published_x_Na2O: 0.298
+    composition_wt_pct:
+      SiO2: 69.546162
+      Na2O: 30.453838
+    composition_note: >-
+      Published binary mole fraction converted to oxide wt% using
+      M(SiO2)=60.083 g/mol and M(Na2O)=61.97853856 g/mol:
+      wt_i=100*x_i*M_i/sum(x_j*M_j).
+  yamaguchi1983_na2o_sio2_x0356:
+    material_class: na_silicate_binary_melt
+    source: >-
+      Yamaguchi, Imai & Goto (1983), Journal of the Japan Institute of Metals
+      47(9), 736-742, DOI 10.2320/jinstmet1952.47.9_736, Tables 1-2,
+      Na2O-SiO2 row x(Na2O)=0.356.
+    published_x_Na2O: 0.356
+    composition_wt_pct:
+      SiO2: 63.684736
+      Na2O: 36.315264
+    composition_note: >-
+      Published binary mole fraction converted to oxide wt% using
+      M(SiO2)=60.083 g/mol and M(Na2O)=61.97853856 g/mol:
+      wt_i=100*x_i*M_i/sum(x_j*M_j).
+  yamaguchi1983_na2o_sio2_x0400:
+    material_class: na_silicate_binary_melt
+    source: >-
+      Yamaguchi, Imai & Goto (1983), Journal of the Japan Institute of Metals
+      47(9), 736-742, DOI 10.2320/jinstmet1952.47.9_736, Tables 1-2,
+      Na2O-SiO2 row x(Na2O)=0.400.
+    published_x_Na2O: 0.400
+    composition_wt_pct:
+      SiO2: 59.252268
+      Na2O: 40.747732
+    composition_note: >-
+      Published binary mole fraction converted to oxide wt% using
+      M(SiO2)=60.083 g/mol and M(Na2O)=61.97853856 g/mol:
+      wt_i=100*x_i*M_i/sum(x_j*M_j).
+  yamaguchi1983_na2o_sio2_x0429:
+    material_class: na_silicate_binary_melt
+    source: >-
+      Yamaguchi, Imai & Goto (1983), Journal of the Japan Institute of Metals
+      47(9), 736-742, DOI 10.2320/jinstmet1952.47.9_736, Tables 1-2,
+      Na2O-SiO2 row x(Na2O)=0.429.
+    published_x_Na2O: 0.429
+    composition_wt_pct:
+      SiO2: 56.337507
+      Na2O: 43.662493
+    composition_note: >-
+      Published binary mole fraction converted to oxide wt% using
+      M(SiO2)=60.083 g/mol and M(Na2O)=61.97853856 g/mol:
+      wt_i=100*x_i*M_i/sum(x_j*M_j).
+  yamaguchi1983_na2o_sio2_x0500:
+    material_class: na_silicate_binary_melt
+    source: >-
+      Yamaguchi, Imai & Goto (1983), Journal of the Japan Institute of Metals
+      47(9), 736-742, DOI 10.2320/jinstmet1952.47.9_736, Tables 1-2,
+      Na2O-SiO2 row x(Na2O)=0.500.
+    published_x_Na2O: 0.500
+    composition_wt_pct:
+      SiO2: 49.223532
+      Na2O: 50.776468
+    composition_note: >-
+      Published binary mole fraction converted to oxide wt% using
+      M(SiO2)=60.083 g/mol and M(Na2O)=61.97853856 g/mol:
+      wt_i=100*x_i*M_i/sum(x_j*M_j).
+  yamaguchi1983_na2o_sio2_x0601:
+    material_class: na_silicate_binary_melt
+    source: >-
+      Yamaguchi, Imai & Goto (1983), Journal of the Japan Institute of Metals
+      47(9), 736-742, DOI 10.2320/jinstmet1952.47.9_736, Tables 1-2,
+      Na2O-SiO2 row x(Na2O)=0.601.
+    published_x_Na2O: 0.601
+    composition_wt_pct:
+      SiO2: 39.157544
+      Na2O: 60.842456
     composition_note: >-
       Published binary mole fraction converted to oxide wt% using
       M(SiO2)=60.083 g/mol and M(Na2O)=61.97853856 g/mol:
@@ -1519,6 +1623,4015 @@ points:
       page: "PDF page 22"
       transcriber: "OpenAI Codex"
       transcription_date: "2026-08-13"
+# Yamaguchi activities use the PARENT-OXIDE FORMULA-UNIT basis. Table 1
+# a(Na2O) comes from the authors' beta-alumina EMF measurements; Table 2
+# a(SiO2) comes from Gibbs-Duhem integration of that measured a(Na2O), followed
+# by the authors' own least-squares reduction. The PDF page images, not OCR,
+# are numeric authority; all Table 1 and Table 2 coefficients below were
+# visually checked against PDF pages 3 and 5.
+#
+# Controller-directed SiO2 standard-state conversion:
+# Premise: mu = mu_trid^0 + RT ln(a_trid) = mu_liq^0 + RT ln(a_liq), and
+# DeltaG_fus(T) = mu_liq^0 - mu_trid^0.
+# Algebra: ln(a_liq) = ln(a_trid) - DeltaG_fus/(RT), hence
+# a_liq = a_trid * exp(-DeltaG_fus/(RT)).
+# DeltaG_fus is GSIO2LIQ(T)-GTRIDYM(T) from de Abreu & Fabrichnaya (2024),
+# Table 4, DOI 10.3390/solids5020020, whose Si-O functions cite Dumitrescu &
+# Sundman (1995), DOI 10.1016/0955-2219(95)93945-Y.
+# Unit check: (J/mol)/[(J/(mol K))*K] is dimensionless, valid for exp().
+# Sanity at 1473 K: DeltaG_fus=1854.380434 J/mol gives multiplier 0.859493032445
+# (<1 below fusion), so a_liq=0.859493032445*a_trid; as DeltaG_fus tends to zero
+# at fusion, the multiplier tends to one.
+# Conversion uncertainty is separate from the published coefficient errors:
+# |G_cristobalite-G_tridymite|/(RT ln 10), retaining Yamaguchi's explicit
+# polymorph caveat (Tridymite reference; no Cristobalite correction at 1773 K).
+# The scored frozen nodes stop at 1673 K, so no 1773 K extrapolation is emitted.
+  - id: yamaguchi1983_a_sio2_liquid_x0205_1373
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0205
+    material_class: na_silicate_binary_melt
+    temperature_K: 1373.0
+    parent_oxide: SiO2
+    species: SiO
+    observable: activity
+    measured: 0.82683155722015
+    as_published_tridymite_activity: 0.99288956598148
+    units: dimensionless
+    score: true
+    scoring_status: SCORED-ELIGIBLE
+    evidence_class: experimental_gibbs_duhem_derived_controller_standard_state_converted
+    source_evidence_class: experimental_gibbs_duhem_derived
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_SiO2,tridymite) = A_prime/T + B_prime"
+      table_1e_minus_4_A_prime: -0.0593
+      table_1e_minus_4_delta_A_prime: 0.0026
+      A_prime_K: -593
+      delta_A_prime_K: 26
+      B_prime: 0.435
+      delta_B_prime: 0.017
+      validity_range_K: [1373.0, 1773.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.0254479105060308
+      standard_state_conversion_uncertainty_log10_dex: 0.00379559588654322
+      combined_sigma_log10_dex: 0.0257294130764169
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A_prime/T)^2 + delta_B_prime^2). The conversion line is a
+        separate conservative polymorph sensitivity: the absolute difference
+        between Tridymite- and Cristobalite-reference conversions in the cited
+        condensed-phase Gibbs functions, divided by R*T*ln(10).
+    standard_state_conversion:
+      directive: controller_directed
+      from_standard_state: pure_solid_SiO2_tridymite
+      to_standard_state: pure_liquid_SiO2
+      delta_G_fusion_J_mol: 2089.294188
+      activity_multiplier: 0.832752790994253
+      thermodynamic_source: >-
+        de Abreu & Fabrichnaya (2024), Solids 5, 303-320, Table 4 condensed-phase
+        SiO2 functions GSIO2LIQ and GTRIDYM, DOI 10.3390/solids5020020; those
+        functions cite Dumitrescu & Sundman (1995),
+        DOI 10.1016/0955-2219(95)93945-Y.
+      uncertainty_basis: >-
+        Yamaguchi used Tridymite over 1143-1740 K and explicitly applied no
+        correction at 1773 K where Cristobalite is stable. No 1773 K row is
+        emitted because it is outside the frozen node set; the polymorph
+        sensitivity is nevertheless retained as a separate uncertainty.
+    convention: >-
+      Parent-oxide formula-unit activity. The as-published Tridymite-reference
+      value is preserved above; measured is the controller-directed pure-liquid
+      reference conversion. No single-cation conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 2, coefficients of least-square lines for -log a(SiO2)"
+      row: "x(Na2O)=0.205 coefficient row evaluated at T=1373 K"
+      page: "PDF page 5 (journal page 740)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_sio2_liquid_x0205_1473
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0205
+    material_class: na_silicate_binary_melt
+    temperature_K: 1473.0
+    parent_oxide: SiO2
+    species: SiO
+    observable: activity
+    measured: 0.797667926045802
+    as_published_tridymite_activity: 0.928067937650082
+    units: dimensionless
+    score: true
+    scoring_status: SCORED-ELIGIBLE
+    evidence_class: experimental_gibbs_duhem_derived_controller_standard_state_converted
+    source_evidence_class: experimental_gibbs_duhem_derived
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_SiO2,tridymite) = A_prime/T + B_prime"
+      table_1e_minus_4_A_prime: -0.0593
+      table_1e_minus_4_delta_A_prime: 0.0026
+      A_prime_K: -593
+      delta_A_prime_K: 26
+      B_prime: 0.435
+      delta_B_prime: 0.017
+      validity_range_K: [1373.0, 1773.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.0245063184992977
+      standard_state_conversion_uncertainty_log10_dex: 0.00286544325531226
+      combined_sigma_log10_dex: 0.0246732732210064
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A_prime/T)^2 + delta_B_prime^2). The conversion line is a
+        separate conservative polymorph sensitivity: the absolute difference
+        between Tridymite- and Cristobalite-reference conversions in the cited
+        condensed-phase Gibbs functions, divided by R*T*ln(10).
+    standard_state_conversion:
+      directive: controller_directed
+      from_standard_state: pure_solid_SiO2_tridymite
+      to_standard_state: pure_liquid_SiO2
+      delta_G_fusion_J_mol: 1854.380434
+      activity_multiplier: 0.859493032444952
+      thermodynamic_source: >-
+        de Abreu & Fabrichnaya (2024), Solids 5, 303-320, Table 4 condensed-phase
+        SiO2 functions GSIO2LIQ and GTRIDYM, DOI 10.3390/solids5020020; those
+        functions cite Dumitrescu & Sundman (1995),
+        DOI 10.1016/0955-2219(95)93945-Y.
+      uncertainty_basis: >-
+        Yamaguchi used Tridymite over 1143-1740 K and explicitly applied no
+        correction at 1773 K where Cristobalite is stable. No 1773 K row is
+        emitted because it is outside the frozen node set; the polymorph
+        sensitivity is nevertheless retained as a separate uncertainty.
+    convention: >-
+      Parent-oxide formula-unit activity. The as-published Tridymite-reference
+      value is preserved above; measured is the controller-directed pure-liquid
+      reference conversion. No single-cation conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 2, coefficients of least-square lines for -log a(SiO2)"
+      row: "x(Na2O)=0.205 coefficient row evaluated at T=1473 K"
+      page: "PDF page 5 (journal page 740)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_sio2_liquid_x0205_1573
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0205
+    material_class: na_silicate_binary_melt
+    temperature_K: 1573.0
+    parent_oxide: SiO2
+    species: SiO
+    observable: activity
+    measured: 0.775716947339342
+    as_published_tridymite_activity: 0.8749568784911
+    units: dimensionless
+    score: true
+    scoring_status: SCORED-ELIGIBLE
+    evidence_class: experimental_gibbs_duhem_derived_controller_standard_state_converted
+    source_evidence_class: experimental_gibbs_duhem_derived
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_SiO2,tridymite) = A_prime/T + B_prime"
+      table_1e_minus_4_A_prime: -0.0593
+      table_1e_minus_4_delta_A_prime: 0.0026
+      A_prime_K: -593
+      delta_A_prime_K: 26
+      B_prime: 0.435
+      delta_B_prime: 0.017
+      validity_range_K: [1373.0, 1773.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.0237108705480425
+      standard_state_conversion_uncertainty_log10_dex: 0.00179298122184088
+      combined_sigma_log10_dex: 0.0237785652176052
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A_prime/T)^2 + delta_B_prime^2). The conversion line is a
+        separate conservative polymorph sensitivity: the absolute difference
+        between Tridymite- and Cristobalite-reference conversions in the cited
+        condensed-phase Gibbs functions, divided by R*T*ln(10).
+    standard_state_conversion:
+      directive: controller_directed
+      from_standard_state: pure_solid_SiO2_tridymite
+      to_standard_state: pure_liquid_SiO2
+      delta_G_fusion_J_mol: 1574.498203
+      activity_multiplier: 0.886577346162589
+      thermodynamic_source: >-
+        de Abreu & Fabrichnaya (2024), Solids 5, 303-320, Table 4 condensed-phase
+        SiO2 functions GSIO2LIQ and GTRIDYM, DOI 10.3390/solids5020020; those
+        functions cite Dumitrescu & Sundman (1995),
+        DOI 10.1016/0955-2219(95)93945-Y.
+      uncertainty_basis: >-
+        Yamaguchi used Tridymite over 1143-1740 K and explicitly applied no
+        correction at 1773 K where Cristobalite is stable. No 1773 K row is
+        emitted because it is outside the frozen node set; the polymorph
+        sensitivity is nevertheless retained as a separate uncertainty.
+    convention: >-
+      Parent-oxide formula-unit activity. The as-published Tridymite-reference
+      value is preserved above; measured is the controller-directed pure-liquid
+      reference conversion. No single-cation conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 2, coefficients of least-square lines for -log a(SiO2)"
+      row: "x(Na2O)=0.205 coefficient row evaluated at T=1573 K"
+      page: "PDF page 5 (journal page 740)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_sio2_liquid_x0205_1673
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0205
+    material_class: na_silicate_binary_melt
+    temperature_K: 1673.0
+    parent_oxide: SiO2
+    species: SiO
+    observable: activity
+    measured: 0.759285998251407
+    as_published_tridymite_activity: 0.830716962194753
+    units: dimensionless
+    score: true
+    scoring_status: SCORED-ELIGIBLE
+    evidence_class: experimental_gibbs_duhem_derived_controller_standard_state_converted
+    source_evidence_class: experimental_gibbs_duhem_derived
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_SiO2,tridymite) = A_prime/T + B_prime"
+      table_1e_minus_4_A_prime: -0.0593
+      table_1e_minus_4_delta_A_prime: 0.0026
+      A_prime_K: -593
+      delta_A_prime_K: 26
+      B_prime: 0.435
+      delta_B_prime: 0.017
+      validity_range_K: [1373.0, 1773.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.0230330404678403
+      standard_state_conversion_uncertainty_log10_dex: 0.000710019122704031
+      combined_sigma_log10_dex: 0.023043981434374
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A_prime/T)^2 + delta_B_prime^2). The conversion line is a
+        separate conservative polymorph sensitivity: the absolute difference
+        between Tridymite- and Cristobalite-reference conversions in the cited
+        condensed-phase Gibbs functions, divided by R*T*ln(10).
+    standard_state_conversion:
+      directive: controller_directed
+      from_standard_state: pure_solid_SiO2_tridymite
+      to_standard_state: pure_liquid_SiO2
+      delta_G_fusion_J_mol: 1250.665381
+      activity_multiplier: 0.914012874186864
+      thermodynamic_source: >-
+        de Abreu & Fabrichnaya (2024), Solids 5, 303-320, Table 4 condensed-phase
+        SiO2 functions GSIO2LIQ and GTRIDYM, DOI 10.3390/solids5020020; those
+        functions cite Dumitrescu & Sundman (1995),
+        DOI 10.1016/0955-2219(95)93945-Y.
+      uncertainty_basis: >-
+        Yamaguchi used Tridymite over 1143-1740 K and explicitly applied no
+        correction at 1773 K where Cristobalite is stable. No 1773 K row is
+        emitted because it is outside the frozen node set; the polymorph
+        sensitivity is nevertheless retained as a separate uncertainty.
+    convention: >-
+      Parent-oxide formula-unit activity. The as-published Tridymite-reference
+      value is preserved above; measured is the controller-directed pure-liquid
+      reference conversion. No single-cation conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 2, coefficients of least-square lines for -log a(SiO2)"
+      row: "x(Na2O)=0.205 coefficient row evaluated at T=1673 K"
+      page: "PDF page 5 (journal page 740)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0205_1173
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0205
+    material_class: na_silicate_binary_melt
+    temperature_K: 1173.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 1.75075718142008e-12
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    extrapolation_flag: beyond_per_composition_measurement_window
+    extrapolation_note: >-
+      Exact evaluation of the published A/T + B fit, but at a (composition, T) the source did not
+      measure: Fig. 4 shows per-composition measurement windows narrower than the paper's global
+      1173-1673 K statement. Not an invented row; a faithful fit evaluation outside the measured
+      window. Controller ruling 2026-08-13: ANNOTATE rather than drop, because the row is
+      HELD-NOT-SCORED and affects no result today, while dropping would destroy transcribed source
+      data needed once the a(Na2O) basis question settles. THIS FLAG MUST BE RE-ADJUDICATED against
+      Fig. 4 before any promotion of this row to SCORED-ELIGIBLE.
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 1.502
+      table_1e_minus_4_delta_A: 0.044
+      A_K: 15020
+      delta_A_K: 440
+      B: -1.048
+      delta_B: 0.281
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.468685325809995
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.205 coefficient row evaluated at T=1173 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0205_1273
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0205
+    material_class: na_silicate_binary_melt
+    temperature_K: 1273.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 1.77459708719133e-11
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    extrapolation_flag: beyond_per_composition_measurement_window
+    extrapolation_note: >-
+      Exact evaluation of the published A/T + B fit, but at a (composition, T) the source did not
+      measure: Fig. 4 shows per-composition measurement windows narrower than the paper's global
+      1173-1673 K statement. Not an invented row; a faithful fit evaluation outside the measured
+      window. Controller ruling 2026-08-13: ANNOTATE rather than drop, because the row is
+      HELD-NOT-SCORED and affects no result today, while dropping would destroy transcribed source
+      data needed once the a(Na2O) basis question settles. THIS FLAG MUST BE RE-ADJUDICATED against
+      Fig. 4 before any promotion of this row to SCORED-ELIGIBLE.
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 1.502
+      table_1e_minus_4_delta_A: 0.044
+      A_K: 15020
+      delta_A_K: 440
+      B: -1.048
+      delta_B: 0.281
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.445452760288974
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.205 coefficient row evaluated at T=1273 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0205_1373
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0205
+    material_class: na_silicate_binary_melt
+    temperature_K: 1373.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 1.2836646035861e-10
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 1.502
+      table_1e_minus_4_delta_A: 0.044
+      A_K: 15020
+      delta_A_K: 440
+      B: -1.048
+      delta_B: 0.281
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.426215370576526
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.205 coefficient row evaluated at T=1373 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0205_1473
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0205
+    material_class: na_silicate_binary_melt
+    temperature_K: 1473.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 7.09778562992602e-10
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 1.502
+      table_1e_minus_4_delta_A: 0.044
+      A_K: 15020
+      delta_A_K: 440
+      B: -1.048
+      delta_B: 0.281
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.410108196758721
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.205 coefficient row evaluated at T=1473 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0205_1573
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0205
+    material_class: na_silicate_binary_melt
+    temperature_K: 1573.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 3.15767053776927e-9
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 1.502
+      table_1e_minus_4_delta_A: 0.044
+      A_K: 15020
+      delta_A_K: 440
+      B: -1.048
+      delta_B: 0.281
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.396490144753677
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.205 coefficient row evaluated at T=1573 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0205_1673
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0205
+    material_class: na_silicate_binary_melt
+    temperature_K: 1673.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 1.17521130185051e-8
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    extrapolation_flag: beyond_per_composition_measurement_window
+    extrapolation_note: >-
+      Exact evaluation of the published A/T + B fit, but at a (composition, T) the source did not
+      measure: Fig. 4 shows per-composition measurement windows narrower than the paper's global
+      1173-1673 K statement. Not an invented row; a faithful fit evaluation outside the measured
+      window. Controller ruling 2026-08-13: ANNOTATE rather than drop, because the row is
+      HELD-NOT-SCORED and affects no result today, while dropping would destroy transcribed source
+      data needed once the a(Na2O) basis question settles. THIS FLAG MUST BE RE-ADJUDICATED against
+      Fig. 4 before any promotion of this row to SCORED-ELIGIBLE.
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 1.502
+      table_1e_minus_4_delta_A: 0.044
+      A_K: 15020
+      delta_A_K: 440
+      B: -1.048
+      delta_B: 0.281
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.384877012051405
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.205 coefficient row evaluated at T=1673 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_sio2_liquid_x0298_1373
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0298
+    material_class: na_silicate_binary_melt
+    temperature_K: 1373.0
+    parent_oxide: SiO2
+    species: SiO
+    observable: activity
+    measured: 0.31825617570439
+    as_published_tridymite_activity: 0.382173652428607
+    units: dimensionless
+    score: true
+    scoring_status: SCORED-ELIGIBLE
+    evidence_class: experimental_gibbs_duhem_derived_controller_standard_state_converted
+    source_evidence_class: experimental_gibbs_duhem_derived
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_SiO2,tridymite) = A_prime/T + B_prime"
+      table_1e_minus_4_A_prime: 0.0612
+      table_1e_minus_4_delta_A_prime: 0.0057
+      A_prime_K: 612
+      delta_A_prime_K: 57
+      B_prime: -0.028
+      delta_B_prime: 0.037
+      validity_range_K: [1373.0, 1773.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.0556101562669112
+      standard_state_conversion_uncertainty_log10_dex: 0.00379559588654322
+      combined_sigma_log10_dex: 0.0557395373874257
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A_prime/T)^2 + delta_B_prime^2). The conversion line is a
+        separate conservative polymorph sensitivity: the absolute difference
+        between Tridymite- and Cristobalite-reference conversions in the cited
+        condensed-phase Gibbs functions, divided by R*T*ln(10).
+    standard_state_conversion:
+      directive: controller_directed
+      from_standard_state: pure_solid_SiO2_tridymite
+      to_standard_state: pure_liquid_SiO2
+      delta_G_fusion_J_mol: 2089.294188
+      activity_multiplier: 0.832752790994253
+      thermodynamic_source: >-
+        de Abreu & Fabrichnaya (2024), Solids 5, 303-320, Table 4 condensed-phase
+        SiO2 functions GSIO2LIQ and GTRIDYM, DOI 10.3390/solids5020020; those
+        functions cite Dumitrescu & Sundman (1995),
+        DOI 10.1016/0955-2219(95)93945-Y.
+      uncertainty_basis: >-
+        Yamaguchi used Tridymite over 1143-1740 K and explicitly applied no
+        correction at 1773 K where Cristobalite is stable. No 1773 K row is
+        emitted because it is outside the frozen node set; the polymorph
+        sensitivity is nevertheless retained as a separate uncertainty.
+    convention: >-
+      Parent-oxide formula-unit activity. The as-published Tridymite-reference
+      value is preserved above; measured is the controller-directed pure-liquid
+      reference conversion. No single-cation conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 2, coefficients of least-square lines for -log a(SiO2)"
+      row: "x(Na2O)=0.298 coefficient row evaluated at T=1373 K"
+      page: "PDF page 5 (journal page 740)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_sio2_liquid_x0298_1473
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0298
+    material_class: na_silicate_binary_melt
+    temperature_K: 1473.0
+    parent_oxide: SiO2
+    species: SiO
+    observable: activity
+    measured: 0.352179234649951
+    as_published_tridymite_activity: 0.40975228577261
+    units: dimensionless
+    score: true
+    scoring_status: SCORED-ELIGIBLE
+    evidence_class: experimental_gibbs_duhem_derived_controller_standard_state_converted
+    source_evidence_class: experimental_gibbs_duhem_derived
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_SiO2,tridymite) = A_prime/T + B_prime"
+      table_1e_minus_4_A_prime: 0.0612
+      table_1e_minus_4_delta_A_prime: 0.0057
+      A_prime_K: 612
+      delta_A_prime_K: 57
+      B_prime: -0.028
+      delta_B_prime: 0.037
+      validity_range_K: [1373.0, 1773.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.0535389767205253
+      standard_state_conversion_uncertainty_log10_dex: 0.00286544325531226
+      combined_sigma_log10_dex: 0.0536156021446217
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A_prime/T)^2 + delta_B_prime^2). The conversion line is a
+        separate conservative polymorph sensitivity: the absolute difference
+        between Tridymite- and Cristobalite-reference conversions in the cited
+        condensed-phase Gibbs functions, divided by R*T*ln(10).
+    standard_state_conversion:
+      directive: controller_directed
+      from_standard_state: pure_solid_SiO2_tridymite
+      to_standard_state: pure_liquid_SiO2
+      delta_G_fusion_J_mol: 1854.380434
+      activity_multiplier: 0.859493032444952
+      thermodynamic_source: >-
+        de Abreu & Fabrichnaya (2024), Solids 5, 303-320, Table 4 condensed-phase
+        SiO2 functions GSIO2LIQ and GTRIDYM, DOI 10.3390/solids5020020; those
+        functions cite Dumitrescu & Sundman (1995),
+        DOI 10.1016/0955-2219(95)93945-Y.
+      uncertainty_basis: >-
+        Yamaguchi used Tridymite over 1143-1740 K and explicitly applied no
+        correction at 1773 K where Cristobalite is stable. No 1773 K row is
+        emitted because it is outside the frozen node set; the polymorph
+        sensitivity is nevertheless retained as a separate uncertainty.
+    convention: >-
+      Parent-oxide formula-unit activity. The as-published Tridymite-reference
+      value is preserved above; measured is the controller-directed pure-liquid
+      reference conversion. No single-cation conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 2, coefficients of least-square lines for -log a(SiO2)"
+      row: "x(Na2O)=0.298 coefficient row evaluated at T=1473 K"
+      page: "PDF page 5 (journal page 740)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_sio2_liquid_x0298_1573
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0298
+    material_class: na_silicate_binary_melt
+    temperature_K: 1573.0
+    parent_oxide: SiO2
+    species: SiO
+    observable: activity
+    measured: 0.386056749789502
+    as_published_tridymite_activity: 0.435446215110828
+    units: dimensionless
+    score: true
+    scoring_status: SCORED-ELIGIBLE
+    evidence_class: experimental_gibbs_duhem_derived_controller_standard_state_converted
+    source_evidence_class: experimental_gibbs_duhem_derived
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_SiO2,tridymite) = A_prime/T + B_prime"
+      table_1e_minus_4_A_prime: 0.0612
+      table_1e_minus_4_delta_A_prime: 0.0057
+      A_prime_K: 612
+      delta_A_prime_K: 57
+      B_prime: -0.028
+      delta_B_prime: 0.037
+      validity_range_K: [1373.0, 1773.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.0517888333928272
+      standard_state_conversion_uncertainty_log10_dex: 0.00179298122184088
+      combined_sigma_log10_dex: 0.0518198614997366
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A_prime/T)^2 + delta_B_prime^2). The conversion line is a
+        separate conservative polymorph sensitivity: the absolute difference
+        between Tridymite- and Cristobalite-reference conversions in the cited
+        condensed-phase Gibbs functions, divided by R*T*ln(10).
+    standard_state_conversion:
+      directive: controller_directed
+      from_standard_state: pure_solid_SiO2_tridymite
+      to_standard_state: pure_liquid_SiO2
+      delta_G_fusion_J_mol: 1574.498203
+      activity_multiplier: 0.886577346162589
+      thermodynamic_source: >-
+        de Abreu & Fabrichnaya (2024), Solids 5, 303-320, Table 4 condensed-phase
+        SiO2 functions GSIO2LIQ and GTRIDYM, DOI 10.3390/solids5020020; those
+        functions cite Dumitrescu & Sundman (1995),
+        DOI 10.1016/0955-2219(95)93945-Y.
+      uncertainty_basis: >-
+        Yamaguchi used Tridymite over 1143-1740 K and explicitly applied no
+        correction at 1773 K where Cristobalite is stable. No 1773 K row is
+        emitted because it is outside the frozen node set; the polymorph
+        sensitivity is nevertheless retained as a separate uncertainty.
+    convention: >-
+      Parent-oxide formula-unit activity. The as-published Tridymite-reference
+      value is preserved above; measured is the controller-directed pure-liquid
+      reference conversion. No single-cation conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 2, coefficients of least-square lines for -log a(SiO2)"
+      row: "x(Na2O)=0.298 coefficient row evaluated at T=1573 K"
+      page: "PDF page 5 (journal page 740)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_sio2_liquid_x0298_1673
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0298
+    material_class: na_silicate_binary_melt
+    temperature_K: 1673.0
+    parent_oxide: SiO2
+    species: SiO
+    observable: activity
+    measured: 0.419896631519375
+    as_published_tridymite_activity: 0.45939903405948
+    units: dimensionless
+    score: true
+    scoring_status: SCORED-ELIGIBLE
+    evidence_class: experimental_gibbs_duhem_derived_controller_standard_state_converted
+    source_evidence_class: experimental_gibbs_duhem_derived
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_SiO2,tridymite) = A_prime/T + B_prime"
+      table_1e_minus_4_A_prime: 0.0612
+      table_1e_minus_4_delta_A_prime: 0.0057
+      A_prime_K: 612
+      delta_A_prime_K: 57
+      B_prime: -0.028
+      delta_B_prime: 0.037
+      validity_range_K: [1373.0, 1773.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.0502971286386882
+      standard_state_conversion_uncertainty_log10_dex: 0.000710019122704031
+      combined_sigma_log10_dex: 0.050302139879446
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A_prime/T)^2 + delta_B_prime^2). The conversion line is a
+        separate conservative polymorph sensitivity: the absolute difference
+        between Tridymite- and Cristobalite-reference conversions in the cited
+        condensed-phase Gibbs functions, divided by R*T*ln(10).
+    standard_state_conversion:
+      directive: controller_directed
+      from_standard_state: pure_solid_SiO2_tridymite
+      to_standard_state: pure_liquid_SiO2
+      delta_G_fusion_J_mol: 1250.665381
+      activity_multiplier: 0.914012874186864
+      thermodynamic_source: >-
+        de Abreu & Fabrichnaya (2024), Solids 5, 303-320, Table 4 condensed-phase
+        SiO2 functions GSIO2LIQ and GTRIDYM, DOI 10.3390/solids5020020; those
+        functions cite Dumitrescu & Sundman (1995),
+        DOI 10.1016/0955-2219(95)93945-Y.
+      uncertainty_basis: >-
+        Yamaguchi used Tridymite over 1143-1740 K and explicitly applied no
+        correction at 1773 K where Cristobalite is stable. No 1773 K row is
+        emitted because it is outside the frozen node set; the polymorph
+        sensitivity is nevertheless retained as a separate uncertainty.
+    convention: >-
+      Parent-oxide formula-unit activity. The as-published Tridymite-reference
+      value is preserved above; measured is the controller-directed pure-liquid
+      reference conversion. No single-cation conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 2, coefficients of least-square lines for -log a(SiO2)"
+      row: "x(Na2O)=0.298 coefficient row evaluated at T=1673 K"
+      page: "PDF page 5 (journal page 740)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0298_1173
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0298
+    material_class: na_silicate_binary_melt
+    temperature_K: 1173.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 6.45579456080494e-11
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 1.175
+      table_1e_minus_4_delta_A: 0.019
+      A_K: 11750
+      delta_A_K: 190
+      B: 0.173
+      delta_B: 0.144
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.216732136301072
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.298 coefficient row evaluated at T=1173 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0298_1273
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0298
+    material_class: na_silicate_binary_melt
+    temperature_K: 1273.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 3.95216470495615e-10
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 1.175
+      table_1e_minus_4_delta_A: 0.019
+      A_K: 11750
+      delta_A_K: 190
+      B: 0.173
+      delta_B: 0.144
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.207394976602359
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.298 coefficient row evaluated at T=1273 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0298_1373
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0298
+    material_class: na_silicate_binary_melt
+    temperature_K: 1373.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 1.85822199572827e-9
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 1.175
+      table_1e_minus_4_delta_A: 0.019
+      A_K: 11750
+      delta_A_K: 190
+      B: 0.173
+      delta_B: 0.144
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.199714504008716
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.298 coefficient row evaluated at T=1373 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0298_1473
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0298
+    material_class: na_silicate_binary_melt
+    temperature_K: 1473.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 7.08079702516962e-9
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 1.175
+      table_1e_minus_4_delta_A: 0.019
+      A_K: 11750
+      delta_A_K: 190
+      B: 0.173
+      delta_B: 0.144
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.193323621258384
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.298 coefficient row evaluated at T=1473 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0298_1573
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0298
+    material_class: na_silicate_binary_melt
+    temperature_K: 1573.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 2.27613006662943e-8
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 1.175
+      table_1e_minus_4_delta_A: 0.019
+      A_K: 11750
+      delta_A_K: 190
+      B: 0.173
+      delta_B: 0.144
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.187951626879247
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.298 coefficient row evaluated at T=1573 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0298_1673
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0298
+    material_class: na_silicate_binary_melt
+    temperature_K: 1673.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 6.36339061910488e-8
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 1.175
+      table_1e_minus_4_delta_A: 0.019
+      A_K: 11750
+      delta_A_K: 190
+      B: 0.173
+      delta_B: 0.144
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.183395175911859
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.298 coefficient row evaluated at T=1673 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_sio2_liquid_x0356_1373
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0356
+    material_class: na_silicate_binary_melt
+    temperature_K: 1373.0
+    parent_oxide: SiO2
+    species: SiO
+    observable: activity
+    measured: 0.137473483445519
+    as_published_tridymite_activity: 0.165083185468984
+    units: dimensionless
+    score: true
+    scoring_status: SCORED-ELIGIBLE
+    evidence_class: experimental_gibbs_duhem_derived_controller_standard_state_converted
+    source_evidence_class: experimental_gibbs_duhem_derived
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_SiO2,tridymite) = A_prime/T + B_prime"
+      table_1e_minus_4_A_prime: 0.0967
+      table_1e_minus_4_delta_A_prime: 0.0143
+      A_prime_K: 967
+      delta_A_prime_K: 143
+      B_prime: 0.078
+      delta_B_prime: 0.092
+      validity_range_K: [1373.0, 1773.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.138965943709131
+      standard_state_conversion_uncertainty_log10_dex: 0.00379559588654322
+      combined_sigma_log10_dex: 0.139017768861046
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A_prime/T)^2 + delta_B_prime^2). The conversion line is a
+        separate conservative polymorph sensitivity: the absolute difference
+        between Tridymite- and Cristobalite-reference conversions in the cited
+        condensed-phase Gibbs functions, divided by R*T*ln(10).
+    standard_state_conversion:
+      directive: controller_directed
+      from_standard_state: pure_solid_SiO2_tridymite
+      to_standard_state: pure_liquid_SiO2
+      delta_G_fusion_J_mol: 2089.294188
+      activity_multiplier: 0.832752790994253
+      thermodynamic_source: >-
+        de Abreu & Fabrichnaya (2024), Solids 5, 303-320, Table 4 condensed-phase
+        SiO2 functions GSIO2LIQ and GTRIDYM, DOI 10.3390/solids5020020; those
+        functions cite Dumitrescu & Sundman (1995),
+        DOI 10.1016/0955-2219(95)93945-Y.
+      uncertainty_basis: >-
+        Yamaguchi used Tridymite over 1143-1740 K and explicitly applied no
+        correction at 1773 K where Cristobalite is stable. No 1773 K row is
+        emitted because it is outside the frozen node set; the polymorph
+        sensitivity is nevertheless retained as a separate uncertainty.
+    convention: >-
+      Parent-oxide formula-unit activity. The as-published Tridymite-reference
+      value is preserved above; measured is the controller-directed pure-liquid
+      reference conversion. No single-cation conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 2, coefficients of least-square lines for -log a(SiO2)"
+      row: "x(Na2O)=0.356 coefficient row evaluated at T=1373 K"
+      page: "PDF page 5 (journal page 740)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_sio2_liquid_x0356_1473
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0356
+    material_class: na_silicate_binary_melt
+    temperature_K: 1473.0
+    parent_oxide: SiO2
+    species: SiO
+    observable: activity
+    measured: 0.158401391762815
+    as_published_tridymite_activity: 0.184296306989505
+    units: dimensionless
+    score: true
+    scoring_status: SCORED-ELIGIBLE
+    evidence_class: experimental_gibbs_duhem_derived_controller_standard_state_converted
+    source_evidence_class: experimental_gibbs_duhem_derived
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_SiO2,tridymite) = A_prime/T + B_prime"
+      table_1e_minus_4_A_prime: 0.0967
+      table_1e_minus_4_delta_A_prime: 0.0143
+      A_prime_K: 967
+      delta_A_prime_K: 143
+      B_prime: 0.078
+      delta_B_prime: 0.092
+      validity_range_K: [1373.0, 1773.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.13374856748118
+      standard_state_conversion_uncertainty_log10_dex: 0.00286544325531226
+      combined_sigma_log10_dex: 0.133779258737359
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A_prime/T)^2 + delta_B_prime^2). The conversion line is a
+        separate conservative polymorph sensitivity: the absolute difference
+        between Tridymite- and Cristobalite-reference conversions in the cited
+        condensed-phase Gibbs functions, divided by R*T*ln(10).
+    standard_state_conversion:
+      directive: controller_directed
+      from_standard_state: pure_solid_SiO2_tridymite
+      to_standard_state: pure_liquid_SiO2
+      delta_G_fusion_J_mol: 1854.380434
+      activity_multiplier: 0.859493032444952
+      thermodynamic_source: >-
+        de Abreu & Fabrichnaya (2024), Solids 5, 303-320, Table 4 condensed-phase
+        SiO2 functions GSIO2LIQ and GTRIDYM, DOI 10.3390/solids5020020; those
+        functions cite Dumitrescu & Sundman (1995),
+        DOI 10.1016/0955-2219(95)93945-Y.
+      uncertainty_basis: >-
+        Yamaguchi used Tridymite over 1143-1740 K and explicitly applied no
+        correction at 1773 K where Cristobalite is stable. No 1773 K row is
+        emitted because it is outside the frozen node set; the polymorph
+        sensitivity is nevertheless retained as a separate uncertainty.
+    convention: >-
+      Parent-oxide formula-unit activity. The as-published Tridymite-reference
+      value is preserved above; measured is the controller-directed pure-liquid
+      reference conversion. No single-cation conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 2, coefficients of least-square lines for -log a(SiO2)"
+      row: "x(Na2O)=0.356 coefficient row evaluated at T=1473 K"
+      page: "PDF page 5 (journal page 740)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_sio2_liquid_x0356_1573
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0356
+    material_class: na_silicate_binary_melt
+    temperature_K: 1573.0
+    parent_oxide: SiO2
+    species: SiO
+    observable: activity
+    measured: 0.179873730792865
+    as_published_tridymite_activity: 0.20288554808153
+    units: dimensionless
+    score: true
+    scoring_status: SCORED-ELIGIBLE
+    evidence_class: experimental_gibbs_duhem_derived_controller_standard_state_converted
+    source_evidence_class: experimental_gibbs_duhem_derived
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_SiO2,tridymite) = A_prime/T + B_prime"
+      table_1e_minus_4_A_prime: 0.0967
+      table_1e_minus_4_delta_A_prime: 0.0143
+      A_prime_K: 967
+      delta_A_prime_K: 143
+      B_prime: 0.078
+      delta_B_prime: 0.092
+      validity_range_K: [1373.0, 1773.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.129338558867483
+      standard_state_conversion_uncertainty_log10_dex: 0.00179298122184088
+      combined_sigma_log10_dex: 0.129350986047959
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A_prime/T)^2 + delta_B_prime^2). The conversion line is a
+        separate conservative polymorph sensitivity: the absolute difference
+        between Tridymite- and Cristobalite-reference conversions in the cited
+        condensed-phase Gibbs functions, divided by R*T*ln(10).
+    standard_state_conversion:
+      directive: controller_directed
+      from_standard_state: pure_solid_SiO2_tridymite
+      to_standard_state: pure_liquid_SiO2
+      delta_G_fusion_J_mol: 1574.498203
+      activity_multiplier: 0.886577346162589
+      thermodynamic_source: >-
+        de Abreu & Fabrichnaya (2024), Solids 5, 303-320, Table 4 condensed-phase
+        SiO2 functions GSIO2LIQ and GTRIDYM, DOI 10.3390/solids5020020; those
+        functions cite Dumitrescu & Sundman (1995),
+        DOI 10.1016/0955-2219(95)93945-Y.
+      uncertainty_basis: >-
+        Yamaguchi used Tridymite over 1143-1740 K and explicitly applied no
+        correction at 1773 K where Cristobalite is stable. No 1773 K row is
+        emitted because it is outside the frozen node set; the polymorph
+        sensitivity is nevertheless retained as a separate uncertainty.
+    convention: >-
+      Parent-oxide formula-unit activity. The as-published Tridymite-reference
+      value is preserved above; measured is the controller-directed pure-liquid
+      reference conversion. No single-cation conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 2, coefficients of least-square lines for -log a(SiO2)"
+      row: "x(Na2O)=0.356 coefficient row evaluated at T=1573 K"
+      page: "PDF page 5 (journal page 740)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_sio2_liquid_x0356_1673
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0356
+    material_class: na_silicate_binary_melt
+    temperature_K: 1673.0
+    parent_oxide: SiO2
+    species: SiO
+    observable: activity
+    measured: 0.201812808662316
+    as_published_tridymite_activity: 0.220798649955402
+    units: dimensionless
+    score: true
+    scoring_status: SCORED-ELIGIBLE
+    evidence_class: experimental_gibbs_duhem_derived_controller_standard_state_converted
+    source_evidence_class: experimental_gibbs_duhem_derived
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_SiO2,tridymite) = A_prime/T + B_prime"
+      table_1e_minus_4_A_prime: 0.0967
+      table_1e_minus_4_delta_A_prime: 0.0143
+      A_prime_K: 967
+      delta_A_prime_K: 143
+      B_prime: 0.078
+      delta_B_prime: 0.092
+      validity_range_K: [1373.0, 1773.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.125578695781145
+      standard_state_conversion_uncertainty_log10_dex: 0.000710019122704031
+      combined_sigma_log10_dex: 0.125580702981182
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A_prime/T)^2 + delta_B_prime^2). The conversion line is a
+        separate conservative polymorph sensitivity: the absolute difference
+        between Tridymite- and Cristobalite-reference conversions in the cited
+        condensed-phase Gibbs functions, divided by R*T*ln(10).
+    standard_state_conversion:
+      directive: controller_directed
+      from_standard_state: pure_solid_SiO2_tridymite
+      to_standard_state: pure_liquid_SiO2
+      delta_G_fusion_J_mol: 1250.665381
+      activity_multiplier: 0.914012874186864
+      thermodynamic_source: >-
+        de Abreu & Fabrichnaya (2024), Solids 5, 303-320, Table 4 condensed-phase
+        SiO2 functions GSIO2LIQ and GTRIDYM, DOI 10.3390/solids5020020; those
+        functions cite Dumitrescu & Sundman (1995),
+        DOI 10.1016/0955-2219(95)93945-Y.
+      uncertainty_basis: >-
+        Yamaguchi used Tridymite over 1143-1740 K and explicitly applied no
+        correction at 1773 K where Cristobalite is stable. No 1773 K row is
+        emitted because it is outside the frozen node set; the polymorph
+        sensitivity is nevertheless retained as a separate uncertainty.
+    convention: >-
+      Parent-oxide formula-unit activity. The as-published Tridymite-reference
+      value is preserved above; measured is the controller-directed pure-liquid
+      reference conversion. No single-cation conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 2, coefficients of least-square lines for -log a(SiO2)"
+      row: "x(Na2O)=0.356 coefficient row evaluated at T=1673 K"
+      page: "PDF page 5 (journal page 740)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0356_1173
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0356
+    material_class: na_silicate_binary_melt
+    temperature_K: 1173.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 3.09566869726624e-10
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 1.143
+      table_1e_minus_4_delta_A: 0.016
+      A_K: 11430
+      delta_A_K: 160
+      B: -0.235
+      delta_B: 0.117
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.17970701486223
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.356 coefficient row evaluated at T=1173 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0356_1273
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0356
+    material_class: na_silicate_binary_melt
+    temperature_K: 1273.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 1.80388871131029e-9
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 1.143
+      table_1e_minus_4_delta_A: 0.016
+      A_K: 11430
+      delta_A_K: 160
+      B: -0.235
+      delta_B: 0.117
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.171715784455831
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.356 coefficient row evaluated at T=1273 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0356_1373
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0356
+    material_class: na_silicate_binary_melt
+    temperature_K: 1373.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 8.13137283849479e-9
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 1.143
+      table_1e_minus_4_delta_A: 0.016
+      A_K: 11430
+      delta_A_K: 160
+      B: -0.235
+      delta_B: 0.117
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.165133196272479
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.356 coefficient row evaluated at T=1373 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0356_1473
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0356
+    material_class: na_silicate_binary_melt
+    temperature_K: 1473.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 2.98762349129017e-8
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 1.143
+      table_1e_minus_4_delta_A: 0.016
+      A_K: 11430
+      delta_A_K: 160
+      B: -0.235
+      delta_B: 0.117
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.159648703415675
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.356 coefficient row evaluated at T=1473 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0356_1573
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0356
+    material_class: na_silicate_binary_melt
+    temperature_K: 1573.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 9.3031496351076e-8
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 1.143
+      table_1e_minus_4_delta_A: 0.016
+      A_K: 11430
+      delta_A_K: 160
+      B: -0.235
+      delta_B: 0.117
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.155033026558451
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.356 coefficient row evaluated at T=1573 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0356_1673
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0356
+    material_class: na_silicate_binary_melt
+    temperature_K: 1673.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 2.52907521419167e-7
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 1.143
+      table_1e_minus_4_delta_A: 0.016
+      A_K: 11430
+      delta_A_K: 160
+      B: -0.235
+      delta_B: 0.117
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.151113717523868
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.356 coefficient row evaluated at T=1673 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_sio2_liquid_x0400_1373
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0400
+    material_class: na_silicate_binary_melt
+    temperature_K: 1373.0
+    parent_oxide: SiO2
+    species: SiO
+    observable: activity
+    measured: 0.0526280744931288
+    as_published_tridymite_activity: 0.0631977161316917
+    units: dimensionless
+    score: true
+    scoring_status: SCORED-ELIGIBLE
+    evidence_class: experimental_gibbs_duhem_derived_controller_standard_state_converted
+    source_evidence_class: experimental_gibbs_duhem_derived
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_SiO2,tridymite) = A_prime/T + B_prime"
+      table_1e_minus_4_A_prime: 0.114
+      table_1e_minus_4_delta_A_prime: 0.014
+      A_prime_K: 1140
+      delta_A_prime_K: 140
+      B_prime: 0.369
+      delta_B_prime: 0.088
+      validity_range_K: [1373.0, 1773.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.134689147498456
+      standard_state_conversion_uncertainty_log10_dex: 0.00379559588654322
+      combined_sigma_log10_dex: 0.134742617615937
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A_prime/T)^2 + delta_B_prime^2). The conversion line is a
+        separate conservative polymorph sensitivity: the absolute difference
+        between Tridymite- and Cristobalite-reference conversions in the cited
+        condensed-phase Gibbs functions, divided by R*T*ln(10).
+    standard_state_conversion:
+      directive: controller_directed
+      from_standard_state: pure_solid_SiO2_tridymite
+      to_standard_state: pure_liquid_SiO2
+      delta_G_fusion_J_mol: 2089.294188
+      activity_multiplier: 0.832752790994253
+      thermodynamic_source: >-
+        de Abreu & Fabrichnaya (2024), Solids 5, 303-320, Table 4 condensed-phase
+        SiO2 functions GSIO2LIQ and GTRIDYM, DOI 10.3390/solids5020020; those
+        functions cite Dumitrescu & Sundman (1995),
+        DOI 10.1016/0955-2219(95)93945-Y.
+      uncertainty_basis: >-
+        Yamaguchi used Tridymite over 1143-1740 K and explicitly applied no
+        correction at 1773 K where Cristobalite is stable. No 1773 K row is
+        emitted because it is outside the frozen node set; the polymorph
+        sensitivity is nevertheless retained as a separate uncertainty.
+    convention: >-
+      Parent-oxide formula-unit activity. The as-published Tridymite-reference
+      value is preserved above; measured is the controller-directed pure-liquid
+      reference conversion. No single-cation conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 2, coefficients of least-square lines for -log a(SiO2)"
+      row: "x(Na2O)=0.400 coefficient row evaluated at T=1373 K"
+      page: "PDF page 5 (journal page 740)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_sio2_liquid_x0400_1473
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0400
+    material_class: na_silicate_binary_melt
+    temperature_K: 1473.0
+    parent_oxide: SiO2
+    species: SiO
+    observable: activity
+    measured: 0.061845998678681
+    as_published_tridymite_activity: 0.0719563700275163
+    units: dimensionless
+    score: true
+    scoring_status: SCORED-ELIGIBLE
+    evidence_class: experimental_gibbs_duhem_derived_controller_standard_state_converted
+    source_evidence_class: experimental_gibbs_duhem_derived
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_SiO2,tridymite) = A_prime/T + B_prime"
+      table_1e_minus_4_A_prime: 0.114
+      table_1e_minus_4_delta_A_prime: 0.014
+      A_prime_K: 1140
+      delta_A_prime_K: 140
+      B_prime: 0.369
+      delta_B_prime: 0.088
+      validity_range_K: [1373.0, 1773.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.12952754995397
+      standard_state_conversion_uncertainty_log10_dex: 0.00286544325531226
+      combined_sigma_log10_dex: 0.129559241129792
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A_prime/T)^2 + delta_B_prime^2). The conversion line is a
+        separate conservative polymorph sensitivity: the absolute difference
+        between Tridymite- and Cristobalite-reference conversions in the cited
+        condensed-phase Gibbs functions, divided by R*T*ln(10).
+    standard_state_conversion:
+      directive: controller_directed
+      from_standard_state: pure_solid_SiO2_tridymite
+      to_standard_state: pure_liquid_SiO2
+      delta_G_fusion_J_mol: 1854.380434
+      activity_multiplier: 0.859493032444952
+      thermodynamic_source: >-
+        de Abreu & Fabrichnaya (2024), Solids 5, 303-320, Table 4 condensed-phase
+        SiO2 functions GSIO2LIQ and GTRIDYM, DOI 10.3390/solids5020020; those
+        functions cite Dumitrescu & Sundman (1995),
+        DOI 10.1016/0955-2219(95)93945-Y.
+      uncertainty_basis: >-
+        Yamaguchi used Tridymite over 1143-1740 K and explicitly applied no
+        correction at 1773 K where Cristobalite is stable. No 1773 K row is
+        emitted because it is outside the frozen node set; the polymorph
+        sensitivity is nevertheless retained as a separate uncertainty.
+    convention: >-
+      Parent-oxide formula-unit activity. The as-published Tridymite-reference
+      value is preserved above; measured is the controller-directed pure-liquid
+      reference conversion. No single-cation conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 2, coefficients of least-square lines for -log a(SiO2)"
+      row: "x(Na2O)=0.400 coefficient row evaluated at T=1473 K"
+      page: "PDF page 5 (journal page 740)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_sio2_liquid_x0400_1573
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0400
+    material_class: na_silicate_binary_melt
+    temperature_K: 1573.0
+    parent_oxide: SiO2
+    species: SiO
+    observable: activity
+    measured: 0.0714474633552164
+    as_published_tridymite_activity: 0.0805879641121732
+    units: dimensionless
+    score: true
+    scoring_status: SCORED-ELIGIBLE
+    evidence_class: experimental_gibbs_duhem_derived_controller_standard_state_converted
+    source_evidence_class: experimental_gibbs_duhem_derived
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_SiO2,tridymite) = A_prime/T + B_prime"
+      table_1e_minus_4_A_prime: 0.114
+      table_1e_minus_4_delta_A_prime: 0.014
+      A_prime_K: 1140
+      delta_A_prime_K: 140
+      B_prime: 0.369
+      delta_B_prime: 0.088
+      validity_range_K: [1373.0, 1773.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.125161253918057
+      standard_state_conversion_uncertainty_log10_dex: 0.00179298122184088
+      combined_sigma_log10_dex: 0.125174095818593
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A_prime/T)^2 + delta_B_prime^2). The conversion line is a
+        separate conservative polymorph sensitivity: the absolute difference
+        between Tridymite- and Cristobalite-reference conversions in the cited
+        condensed-phase Gibbs functions, divided by R*T*ln(10).
+    standard_state_conversion:
+      directive: controller_directed
+      from_standard_state: pure_solid_SiO2_tridymite
+      to_standard_state: pure_liquid_SiO2
+      delta_G_fusion_J_mol: 1574.498203
+      activity_multiplier: 0.886577346162589
+      thermodynamic_source: >-
+        de Abreu & Fabrichnaya (2024), Solids 5, 303-320, Table 4 condensed-phase
+        SiO2 functions GSIO2LIQ and GTRIDYM, DOI 10.3390/solids5020020; those
+        functions cite Dumitrescu & Sundman (1995),
+        DOI 10.1016/0955-2219(95)93945-Y.
+      uncertainty_basis: >-
+        Yamaguchi used Tridymite over 1143-1740 K and explicitly applied no
+        correction at 1773 K where Cristobalite is stable. No 1773 K row is
+        emitted because it is outside the frozen node set; the polymorph
+        sensitivity is nevertheless retained as a separate uncertainty.
+    convention: >-
+      Parent-oxide formula-unit activity. The as-published Tridymite-reference
+      value is preserved above; measured is the controller-directed pure-liquid
+      reference conversion. No single-cation conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 2, coefficients of least-square lines for -log a(SiO2)"
+      row: "x(Na2O)=0.400 coefficient row evaluated at T=1573 K"
+      page: "PDF page 5 (journal page 740)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_sio2_liquid_x0400_1673
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0400
+    material_class: na_silicate_binary_melt
+    temperature_K: 1673.0
+    parent_oxide: SiO2
+    species: SiO
+    observable: activity
+    measured: 0.0813844950776096
+    as_published_tridymite_activity: 0.0890408629637869
+    units: dimensionless
+    score: true
+    scoring_status: SCORED-ELIGIBLE
+    evidence_class: experimental_gibbs_duhem_derived_controller_standard_state_converted
+    source_evidence_class: experimental_gibbs_duhem_derived
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_SiO2,tridymite) = A_prime/T + B_prime"
+      table_1e_minus_4_A_prime: 0.114
+      table_1e_minus_4_delta_A_prime: 0.014
+      A_prime_K: 1140
+      delta_A_prime_K: 140
+      B_prime: 0.369
+      delta_B_prime: 0.088
+      validity_range_K: [1373.0, 1773.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.121435902946928
+      standard_state_conversion_uncertainty_log10_dex: 0.000710019122704031
+      combined_sigma_log10_dex: 0.121437978621559
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A_prime/T)^2 + delta_B_prime^2). The conversion line is a
+        separate conservative polymorph sensitivity: the absolute difference
+        between Tridymite- and Cristobalite-reference conversions in the cited
+        condensed-phase Gibbs functions, divided by R*T*ln(10).
+    standard_state_conversion:
+      directive: controller_directed
+      from_standard_state: pure_solid_SiO2_tridymite
+      to_standard_state: pure_liquid_SiO2
+      delta_G_fusion_J_mol: 1250.665381
+      activity_multiplier: 0.914012874186864
+      thermodynamic_source: >-
+        de Abreu & Fabrichnaya (2024), Solids 5, 303-320, Table 4 condensed-phase
+        SiO2 functions GSIO2LIQ and GTRIDYM, DOI 10.3390/solids5020020; those
+        functions cite Dumitrescu & Sundman (1995),
+        DOI 10.1016/0955-2219(95)93945-Y.
+      uncertainty_basis: >-
+        Yamaguchi used Tridymite over 1143-1740 K and explicitly applied no
+        correction at 1773 K where Cristobalite is stable. No 1773 K row is
+        emitted because it is outside the frozen node set; the polymorph
+        sensitivity is nevertheless retained as a separate uncertainty.
+    convention: >-
+      Parent-oxide formula-unit activity. The as-published Tridymite-reference
+      value is preserved above; measured is the controller-directed pure-liquid
+      reference conversion. No single-cation conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 2, coefficients of least-square lines for -log a(SiO2)"
+      row: "x(Na2O)=0.400 coefficient row evaluated at T=1673 K"
+      page: "PDF page 5 (journal page 740)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0400_1173
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0400
+    material_class: na_silicate_binary_melt
+    temperature_K: 1173.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 2.27097905470555e-9
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    extrapolation_flag: beyond_per_composition_measurement_window
+    extrapolation_note: >-
+      Exact evaluation of the published A/T + B fit, but at a (composition, T) the source did not
+      measure: Fig. 4 shows per-composition measurement windows narrower than the paper's global
+      1173-1673 K statement. Not an invented row; a faithful fit evaluation outside the measured
+      window. Controller ruling 2026-08-13: ANNOTATE rather than drop, because the row is
+      HELD-NOT-SCORED and affects no result today, while dropping would destroy transcribed source
+      data needed once the a(Na2O) basis question settles. THIS FLAG MUST BE RE-ADJUDICATED against
+      Fig. 4 before any promotion of this row to SCORED-ELIGIBLE.
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 1.085
+      table_1e_minus_4_delta_A: 0.04
+      A_K: 10850
+      delta_A_K: 400
+      B: -0.606
+      delta_B: 0.262
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.430033800929457
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.400 coefficient row evaluated at T=1173 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0400_1273
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0400
+    material_class: na_silicate_binary_melt
+    temperature_K: 1273.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 1.21011430358903e-8
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    extrapolation_flag: beyond_per_composition_measurement_window
+    extrapolation_note: >-
+      Exact evaluation of the published A/T + B fit, but at a (composition, T) the source did not
+      measure: Fig. 4 shows per-composition measurement windows narrower than the paper's global
+      1173-1673 K statement. Not an invented row; a faithful fit evaluation outside the measured
+      window. Controller ruling 2026-08-13: ANNOTATE rather than drop, because the row is
+      HELD-NOT-SCORED and affects no result today, while dropping would destroy transcribed source
+      data needed once the a(Na2O) basis question settles. THIS FLAG MUST BE RE-ADJUDICATED against
+      Fig. 4 before any promotion of this row to SCORED-ELIGIBLE.
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 1.085
+      table_1e_minus_4_delta_A: 0.04
+      A_K: 10850
+      delta_A_K: 400
+      B: -0.606
+      delta_B: 0.262
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.409117576554112
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.400 coefficient row evaluated at T=1273 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0400_1373
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0400
+    material_class: na_silicate_binary_melt
+    temperature_K: 1373.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 5.05354926718542e-8
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 1.085
+      table_1e_minus_4_delta_A: 0.04
+      A_K: 10850
+      delta_A_K: 400
+      B: -0.606
+      delta_B: 0.262
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.391814788126713
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.400 coefficient row evaluated at T=1373 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0400_1473
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0400
+    material_class: na_silicate_binary_melt
+    temperature_K: 1473.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 1.73812140770083e-7
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 1.085
+      table_1e_minus_4_delta_A: 0.04
+      A_K: 10850
+      delta_A_K: 400
+      B: -0.606
+      delta_B: 0.262
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.377340599643628
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.400 coefficient row evaluated at T=1473 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0400_1573
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0400
+    material_class: na_silicate_binary_melt
+    temperature_K: 1573.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 5.1091916444548e-7
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 1.085
+      table_1e_minus_4_delta_A: 0.04
+      A_K: 10850
+      delta_A_K: 400
+      B: -0.606
+      delta_B: 0.262
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.365113675139959
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.400 coefficient row evaluated at T=1573 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0400_1673
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0400
+    material_class: na_silicate_binary_melt
+    temperature_K: 1673.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 0.00000132021405355549
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    extrapolation_flag: beyond_per_composition_measurement_window
+    extrapolation_note: >-
+      Exact evaluation of the published A/T + B fit, but at a (composition, T) the source did not
+      measure: Fig. 4 shows per-composition measurement windows narrower than the paper's global
+      1173-1673 K statement. Not an invented row; a faithful fit evaluation outside the measured
+      window. Controller ruling 2026-08-13: ANNOTATE rather than drop, because the row is
+      HELD-NOT-SCORED and affects no result today, while dropping would destroy transcribed source
+      data needed once the a(Na2O) basis question settles. THIS FLAG MUST BE RE-ADJUDICATED against
+      Fig. 4 before any promotion of this row to SCORED-ELIGIBLE.
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 1.085
+      table_1e_minus_4_delta_A: 0.04
+      A_K: 10850
+      delta_A_K: 400
+      B: -0.606
+      delta_B: 0.262
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.354695253209386
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.400 coefficient row evaluated at T=1673 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_sio2_liquid_x0429_1373
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0429
+    material_class: na_silicate_binary_melt
+    temperature_K: 1373.0
+    parent_oxide: SiO2
+    species: SiO
+    observable: activity
+    measured: 0.0304170925530449
+    as_published_tridymite_activity: 0.0365259569010017
+    units: dimensionless
+    score: true
+    scoring_status: SCORED-ELIGIBLE
+    evidence_class: experimental_gibbs_duhem_derived_controller_standard_state_converted
+    source_evidence_class: experimental_gibbs_duhem_derived
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_SiO2,tridymite) = A_prime/T + B_prime"
+      table_1e_minus_4_A_prime: 0.132
+      table_1e_minus_4_delta_A_prime: 0.021
+      A_prime_K: 1320
+      delta_A_prime_K: 210
+      B_prime: 0.476
+      delta_B_prime: 0.137
+      validity_range_K: [1373.0, 1773.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.205335395198165
+      standard_state_conversion_uncertainty_log10_dex: 0.00379559588654322
+      combined_sigma_log10_dex: 0.205370472729944
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A_prime/T)^2 + delta_B_prime^2). The conversion line is a
+        separate conservative polymorph sensitivity: the absolute difference
+        between Tridymite- and Cristobalite-reference conversions in the cited
+        condensed-phase Gibbs functions, divided by R*T*ln(10).
+    standard_state_conversion:
+      directive: controller_directed
+      from_standard_state: pure_solid_SiO2_tridymite
+      to_standard_state: pure_liquid_SiO2
+      delta_G_fusion_J_mol: 2089.294188
+      activity_multiplier: 0.832752790994253
+      thermodynamic_source: >-
+        de Abreu & Fabrichnaya (2024), Solids 5, 303-320, Table 4 condensed-phase
+        SiO2 functions GSIO2LIQ and GTRIDYM, DOI 10.3390/solids5020020; those
+        functions cite Dumitrescu & Sundman (1995),
+        DOI 10.1016/0955-2219(95)93945-Y.
+      uncertainty_basis: >-
+        Yamaguchi used Tridymite over 1143-1740 K and explicitly applied no
+        correction at 1773 K where Cristobalite is stable. No 1773 K row is
+        emitted because it is outside the frozen node set; the polymorph
+        sensitivity is nevertheless retained as a separate uncertainty.
+    convention: >-
+      Parent-oxide formula-unit activity. The as-published Tridymite-reference
+      value is preserved above; measured is the controller-directed pure-liquid
+      reference conversion. No single-cation conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 2, coefficients of least-square lines for -log a(SiO2)"
+      row: "x(Na2O)=0.429 coefficient row evaluated at T=1373 K"
+      page: "PDF page 5 (journal page 740)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_sio2_liquid_x0429_1473
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0429
+    material_class: na_silicate_binary_melt
+    temperature_K: 1473.0
+    parent_oxide: SiO2
+    species: SiO
+    observable: activity
+    measured: 0.0364848037175107
+    as_published_tridymite_activity: 0.0424492140602052
+    units: dimensionless
+    score: true
+    scoring_status: SCORED-ELIGIBLE
+    evidence_class: experimental_gibbs_duhem_derived_controller_standard_state_converted
+    source_evidence_class: experimental_gibbs_duhem_derived
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_SiO2,tridymite) = A_prime/T + B_prime"
+      table_1e_minus_4_A_prime: 0.132
+      table_1e_minus_4_delta_A_prime: 0.021
+      A_prime_K: 1320
+      delta_A_prime_K: 210
+      B_prime: 0.476
+      delta_B_prime: 0.137
+      validity_range_K: [1373.0, 1773.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.197722327882881
+      standard_state_conversion_uncertainty_log10_dex: 0.00286544325531226
+      combined_sigma_log10_dex: 0.197743090166193
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A_prime/T)^2 + delta_B_prime^2). The conversion line is a
+        separate conservative polymorph sensitivity: the absolute difference
+        between Tridymite- and Cristobalite-reference conversions in the cited
+        condensed-phase Gibbs functions, divided by R*T*ln(10).
+    standard_state_conversion:
+      directive: controller_directed
+      from_standard_state: pure_solid_SiO2_tridymite
+      to_standard_state: pure_liquid_SiO2
+      delta_G_fusion_J_mol: 1854.380434
+      activity_multiplier: 0.859493032444952
+      thermodynamic_source: >-
+        de Abreu & Fabrichnaya (2024), Solids 5, 303-320, Table 4 condensed-phase
+        SiO2 functions GSIO2LIQ and GTRIDYM, DOI 10.3390/solids5020020; those
+        functions cite Dumitrescu & Sundman (1995),
+        DOI 10.1016/0955-2219(95)93945-Y.
+      uncertainty_basis: >-
+        Yamaguchi used Tridymite over 1143-1740 K and explicitly applied no
+        correction at 1773 K where Cristobalite is stable. No 1773 K row is
+        emitted because it is outside the frozen node set; the polymorph
+        sensitivity is nevertheless retained as a separate uncertainty.
+    convention: >-
+      Parent-oxide formula-unit activity. The as-published Tridymite-reference
+      value is preserved above; measured is the controller-directed pure-liquid
+      reference conversion. No single-cation conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 2, coefficients of least-square lines for -log a(SiO2)"
+      row: "x(Na2O)=0.429 coefficient row evaluated at T=1473 K"
+      page: "PDF page 5 (journal page 740)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_sio2_liquid_x0429_1573
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0429
+    material_class: na_silicate_binary_melt
+    temperature_K: 1573.0
+    parent_oxide: SiO2
+    species: SiO
+    observable: activity
+    measured: 0.0429097308898325
+    as_published_tridymite_activity: 0.0483993089554573
+    units: dimensionless
+    score: true
+    scoring_status: SCORED-ELIGIBLE
+    evidence_class: experimental_gibbs_duhem_derived_controller_standard_state_converted
+    source_evidence_class: experimental_gibbs_duhem_derived
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_SiO2,tridymite) = A_prime/T + B_prime"
+      table_1e_minus_4_A_prime: 0.132
+      table_1e_minus_4_delta_A_prime: 0.021
+      A_prime_K: 1320
+      delta_A_prime_K: 210
+      B_prime: 0.476
+      delta_B_prime: 0.137
+      validity_range_K: [1373.0, 1773.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.19129039138249
+      standard_state_conversion_uncertainty_log10_dex: 0.00179298122184088
+      combined_sigma_log10_dex: 0.191298794081217
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A_prime/T)^2 + delta_B_prime^2). The conversion line is a
+        separate conservative polymorph sensitivity: the absolute difference
+        between Tridymite- and Cristobalite-reference conversions in the cited
+        condensed-phase Gibbs functions, divided by R*T*ln(10).
+    standard_state_conversion:
+      directive: controller_directed
+      from_standard_state: pure_solid_SiO2_tridymite
+      to_standard_state: pure_liquid_SiO2
+      delta_G_fusion_J_mol: 1574.498203
+      activity_multiplier: 0.886577346162589
+      thermodynamic_source: >-
+        de Abreu & Fabrichnaya (2024), Solids 5, 303-320, Table 4 condensed-phase
+        SiO2 functions GSIO2LIQ and GTRIDYM, DOI 10.3390/solids5020020; those
+        functions cite Dumitrescu & Sundman (1995),
+        DOI 10.1016/0955-2219(95)93945-Y.
+      uncertainty_basis: >-
+        Yamaguchi used Tridymite over 1143-1740 K and explicitly applied no
+        correction at 1773 K where Cristobalite is stable. No 1773 K row is
+        emitted because it is outside the frozen node set; the polymorph
+        sensitivity is nevertheless retained as a separate uncertainty.
+    convention: >-
+      Parent-oxide formula-unit activity. The as-published Tridymite-reference
+      value is preserved above; measured is the controller-directed pure-liquid
+      reference conversion. No single-cation conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 2, coefficients of least-square lines for -log a(SiO2)"
+      row: "x(Na2O)=0.429 coefficient row evaluated at T=1573 K"
+      page: "PDF page 5 (journal page 740)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_sio2_liquid_x0429_1673
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0429
+    material_class: na_silicate_binary_melt
+    temperature_K: 1673.0
+    parent_oxide: SiO2
+    species: SiO
+    observable: activity
+    measured: 0.0496535746708353
+    as_published_tridymite_activity: 0.0543248088436487
+    units: dimensionless
+    score: true
+    scoring_status: SCORED-ELIGIBLE
+    evidence_class: experimental_gibbs_duhem_derived_controller_standard_state_converted
+    source_evidence_class: experimental_gibbs_duhem_derived
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_SiO2,tridymite) = A_prime/T + B_prime"
+      table_1e_minus_4_A_prime: 0.132
+      table_1e_minus_4_delta_A_prime: 0.021
+      A_prime_K: 1320
+      delta_A_prime_K: 210
+      B_prime: 0.476
+      delta_B_prime: 0.137
+      validity_range_K: [1373.0, 1773.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.185809113555297
+      standard_state_conversion_uncertainty_log10_dex: 0.000710019122704031
+      combined_sigma_log10_dex: 0.185810470123079
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A_prime/T)^2 + delta_B_prime^2). The conversion line is a
+        separate conservative polymorph sensitivity: the absolute difference
+        between Tridymite- and Cristobalite-reference conversions in the cited
+        condensed-phase Gibbs functions, divided by R*T*ln(10).
+    standard_state_conversion:
+      directive: controller_directed
+      from_standard_state: pure_solid_SiO2_tridymite
+      to_standard_state: pure_liquid_SiO2
+      delta_G_fusion_J_mol: 1250.665381
+      activity_multiplier: 0.914012874186864
+      thermodynamic_source: >-
+        de Abreu & Fabrichnaya (2024), Solids 5, 303-320, Table 4 condensed-phase
+        SiO2 functions GSIO2LIQ and GTRIDYM, DOI 10.3390/solids5020020; those
+        functions cite Dumitrescu & Sundman (1995),
+        DOI 10.1016/0955-2219(95)93945-Y.
+      uncertainty_basis: >-
+        Yamaguchi used Tridymite over 1143-1740 K and explicitly applied no
+        correction at 1773 K where Cristobalite is stable. No 1773 K row is
+        emitted because it is outside the frozen node set; the polymorph
+        sensitivity is nevertheless retained as a separate uncertainty.
+    convention: >-
+      Parent-oxide formula-unit activity. The as-published Tridymite-reference
+      value is preserved above; measured is the controller-directed pure-liquid
+      reference conversion. No single-cation conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 2, coefficients of least-square lines for -log a(SiO2)"
+      row: "x(Na2O)=0.429 coefficient row evaluated at T=1673 K"
+      page: "PDF page 5 (journal page 740)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0429_1173
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0429
+    material_class: na_silicate_binary_melt
+    temperature_K: 1173.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 4.94839797645043e-9
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 1.075
+      table_1e_minus_4_delta_A: 0.016
+      A_K: 10750
+      delta_A_K: 160
+      B: -0.859
+      delta_B: 0.121
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.182336532792235
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.429 coefficient row evaluated at T=1173 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0429_1273
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0429
+    material_class: na_silicate_binary_melt
+    temperature_K: 1273.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 2.59645613407005e-8
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 1.075
+      table_1e_minus_4_delta_A: 0.016
+      A_K: 10750
+      delta_A_K: 160
+      B: -0.859
+      delta_B: 0.121
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.17446578642038
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.429 coefficient row evaluated at T=1273 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0429_1373
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0429
+    material_class: na_silicate_binary_melt
+    temperature_K: 1373.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 1.07011318712451e-7
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 1.075
+      table_1e_minus_4_delta_A: 0.016
+      A_K: 10750
+      delta_A_K: 160
+      B: -0.859
+      delta_B: 0.121
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.167990989374922
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.429 coefficient row evaluated at T=1373 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0429_1473
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0429
+    material_class: na_silicate_binary_melt
+    temperature_K: 1473.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 3.63888869053409e-7
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 1.075
+      table_1e_minus_4_delta_A: 0.016
+      A_K: 10750
+      delta_A_K: 160
+      B: -0.859
+      delta_B: 0.121
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.162602916647599
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.429 coefficient row evaluated at T=1473 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0429_1573
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0429
+    material_class: na_silicate_binary_melt
+    temperature_K: 1573.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 0.00000105907077557658
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 1.075
+      table_1e_minus_4_delta_A: 0.016
+      A_K: 10750
+      delta_A_K: 160
+      B: -0.859
+      delta_B: 0.121
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.15807352505677
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.429 coefficient row evaluated at T=1573 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0429_1673
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0429
+    material_class: na_silicate_binary_melt
+    temperature_K: 1673.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 0.00000271279648833737
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 1.075
+      table_1e_minus_4_delta_A: 0.016
+      A_K: 10750
+      delta_A_K: 160
+      B: -0.859
+      delta_B: 0.121
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.154231500102551
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.429 coefficient row evaluated at T=1673 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_sio2_liquid_x0500_1373
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0500
+    material_class: na_silicate_binary_melt
+    temperature_K: 1373.0
+    parent_oxide: SiO2
+    species: SiO
+    observable: activity
+    measured: 0.00415848956673873
+    as_published_tridymite_activity: 0.0049936663217589
+    units: dimensionless
+    score: true
+    scoring_status: SCORED-ELIGIBLE
+    evidence_class: experimental_gibbs_duhem_derived_controller_standard_state_converted
+    source_evidence_class: experimental_gibbs_duhem_derived
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_SiO2,tridymite) = A_prime/T + B_prime"
+      table_1e_minus_4_A_prime: 0.235
+      table_1e_minus_4_delta_A_prime: 0.008
+      A_prime_K: 2350
+      delta_A_prime_K: 80
+      B_prime: 0.59
+      delta_B_prime: 0.05
+      validity_range_K: [1373.0, 1773.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.0767788585991694
+      standard_state_conversion_uncertainty_log10_dex: 0.00379559588654322
+      combined_sigma_log10_dex: 0.0768726198065683
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A_prime/T)^2 + delta_B_prime^2). The conversion line is a
+        separate conservative polymorph sensitivity: the absolute difference
+        between Tridymite- and Cristobalite-reference conversions in the cited
+        condensed-phase Gibbs functions, divided by R*T*ln(10).
+    standard_state_conversion:
+      directive: controller_directed
+      from_standard_state: pure_solid_SiO2_tridymite
+      to_standard_state: pure_liquid_SiO2
+      delta_G_fusion_J_mol: 2089.294188
+      activity_multiplier: 0.832752790994253
+      thermodynamic_source: >-
+        de Abreu & Fabrichnaya (2024), Solids 5, 303-320, Table 4 condensed-phase
+        SiO2 functions GSIO2LIQ and GTRIDYM, DOI 10.3390/solids5020020; those
+        functions cite Dumitrescu & Sundman (1995),
+        DOI 10.1016/0955-2219(95)93945-Y.
+      uncertainty_basis: >-
+        Yamaguchi used Tridymite over 1143-1740 K and explicitly applied no
+        correction at 1773 K where Cristobalite is stable. No 1773 K row is
+        emitted because it is outside the frozen node set; the polymorph
+        sensitivity is nevertheless retained as a separate uncertainty.
+    convention: >-
+      Parent-oxide formula-unit activity. The as-published Tridymite-reference
+      value is preserved above; measured is the controller-directed pure-liquid
+      reference conversion. No single-cation conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 2, coefficients of least-square lines for -log a(SiO2)"
+      row: "x(Na2O)=0.500 coefficient row evaluated at T=1373 K"
+      page: "PDF page 5 (journal page 740)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_sio2_liquid_x0500_1473
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0500
+    material_class: na_silicate_binary_melt
+    temperature_K: 1473.0
+    parent_oxide: SiO2
+    species: SiO
+    observable: activity
+    measured: 0.00560865581323018
+    as_published_tridymite_activity: 0.00652553959311985
+    units: dimensionless
+    score: true
+    scoring_status: SCORED-ELIGIBLE
+    evidence_class: experimental_gibbs_duhem_derived_controller_standard_state_converted
+    source_evidence_class: experimental_gibbs_duhem_derived
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_SiO2,tridymite) = A_prime/T + B_prime"
+      table_1e_minus_4_A_prime: 0.235
+      table_1e_minus_4_delta_A_prime: 0.008
+      A_prime_K: 2350
+      delta_A_prime_K: 80
+      B_prime: 0.59
+      delta_B_prime: 0.05
+      validity_range_K: [1373.0, 1773.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.073821928487249
+      standard_state_conversion_uncertainty_log10_dex: 0.00286544325531226
+      combined_sigma_log10_dex: 0.0738775195213397
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A_prime/T)^2 + delta_B_prime^2). The conversion line is a
+        separate conservative polymorph sensitivity: the absolute difference
+        between Tridymite- and Cristobalite-reference conversions in the cited
+        condensed-phase Gibbs functions, divided by R*T*ln(10).
+    standard_state_conversion:
+      directive: controller_directed
+      from_standard_state: pure_solid_SiO2_tridymite
+      to_standard_state: pure_liquid_SiO2
+      delta_G_fusion_J_mol: 1854.380434
+      activity_multiplier: 0.859493032444952
+      thermodynamic_source: >-
+        de Abreu & Fabrichnaya (2024), Solids 5, 303-320, Table 4 condensed-phase
+        SiO2 functions GSIO2LIQ and GTRIDYM, DOI 10.3390/solids5020020; those
+        functions cite Dumitrescu & Sundman (1995),
+        DOI 10.1016/0955-2219(95)93945-Y.
+      uncertainty_basis: >-
+        Yamaguchi used Tridymite over 1143-1740 K and explicitly applied no
+        correction at 1773 K where Cristobalite is stable. No 1773 K row is
+        emitted because it is outside the frozen node set; the polymorph
+        sensitivity is nevertheless retained as a separate uncertainty.
+    convention: >-
+      Parent-oxide formula-unit activity. The as-published Tridymite-reference
+      value is preserved above; measured is the controller-directed pure-liquid
+      reference conversion. No single-cation conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 2, coefficients of least-square lines for -log a(SiO2)"
+      row: "x(Na2O)=0.500 coefficient row evaluated at T=1473 K"
+      page: "PDF page 5 (journal page 740)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_sio2_liquid_x0500_1573
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0500
+    material_class: na_silicate_binary_melt
+    temperature_K: 1573.0
+    parent_oxide: SiO2
+    species: SiO
+    observable: activity
+    measured: 0.00730728498371247
+    as_published_tridymite_activity: 0.00824212914455903
+    units: dimensionless
+    score: true
+    scoring_status: SCORED-ELIGIBLE
+    evidence_class: experimental_gibbs_duhem_derived_controller_standard_state_converted
+    source_evidence_class: experimental_gibbs_duhem_derived
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_SiO2,tridymite) = A_prime/T + B_prime"
+      table_1e_minus_4_A_prime: 0.235
+      table_1e_minus_4_delta_A_prime: 0.008
+      A_prime_K: 2350
+      delta_A_prime_K: 80
+      B_prime: 0.59
+      delta_B_prime: 0.05
+      validity_range_K: [1373.0, 1773.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.0713201222024214
+      standard_state_conversion_uncertainty_log10_dex: 0.00179298122184088
+      combined_sigma_log10_dex: 0.0713426563328714
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A_prime/T)^2 + delta_B_prime^2). The conversion line is a
+        separate conservative polymorph sensitivity: the absolute difference
+        between Tridymite- and Cristobalite-reference conversions in the cited
+        condensed-phase Gibbs functions, divided by R*T*ln(10).
+    standard_state_conversion:
+      directive: controller_directed
+      from_standard_state: pure_solid_SiO2_tridymite
+      to_standard_state: pure_liquid_SiO2
+      delta_G_fusion_J_mol: 1574.498203
+      activity_multiplier: 0.886577346162589
+      thermodynamic_source: >-
+        de Abreu & Fabrichnaya (2024), Solids 5, 303-320, Table 4 condensed-phase
+        SiO2 functions GSIO2LIQ and GTRIDYM, DOI 10.3390/solids5020020; those
+        functions cite Dumitrescu & Sundman (1995),
+        DOI 10.1016/0955-2219(95)93945-Y.
+      uncertainty_basis: >-
+        Yamaguchi used Tridymite over 1143-1740 K and explicitly applied no
+        correction at 1773 K where Cristobalite is stable. No 1773 K row is
+        emitted because it is outside the frozen node set; the polymorph
+        sensitivity is nevertheless retained as a separate uncertainty.
+    convention: >-
+      Parent-oxide formula-unit activity. The as-published Tridymite-reference
+      value is preserved above; measured is the controller-directed pure-liquid
+      reference conversion. No single-cation conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 2, coefficients of least-square lines for -log a(SiO2)"
+      row: "x(Na2O)=0.500 coefficient row evaluated at T=1573 K"
+      page: "PDF page 5 (journal page 740)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_sio2_liquid_x0500_1673
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0500
+    material_class: na_silicate_binary_melt
+    temperature_K: 1673.0
+    parent_oxide: SiO2
+    species: SiO
+    observable: activity
+    measured: 0.00925315910201907
+    as_published_tridymite_activity: 0.0101236638600424
+    units: dimensionless
+    score: true
+    scoring_status: SCORED-ELIGIBLE
+    evidence_class: experimental_gibbs_duhem_derived_controller_standard_state_converted
+    source_evidence_class: experimental_gibbs_duhem_derived
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_SiO2,tridymite) = A_prime/T + B_prime"
+      table_1e_minus_4_A_prime: 0.235
+      table_1e_minus_4_delta_A_prime: 0.008
+      A_prime_K: 2350
+      delta_A_prime_K: 80
+      B_prime: 0.59
+      delta_B_prime: 0.05
+      validity_range_K: [1373.0, 1773.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.069185178369148
+      standard_state_conversion_uncertainty_log10_dex: 0.000710019122704031
+      combined_sigma_log10_dex: 0.0691888215908135
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A_prime/T)^2 + delta_B_prime^2). The conversion line is a
+        separate conservative polymorph sensitivity: the absolute difference
+        between Tridymite- and Cristobalite-reference conversions in the cited
+        condensed-phase Gibbs functions, divided by R*T*ln(10).
+    standard_state_conversion:
+      directive: controller_directed
+      from_standard_state: pure_solid_SiO2_tridymite
+      to_standard_state: pure_liquid_SiO2
+      delta_G_fusion_J_mol: 1250.665381
+      activity_multiplier: 0.914012874186864
+      thermodynamic_source: >-
+        de Abreu & Fabrichnaya (2024), Solids 5, 303-320, Table 4 condensed-phase
+        SiO2 functions GSIO2LIQ and GTRIDYM, DOI 10.3390/solids5020020; those
+        functions cite Dumitrescu & Sundman (1995),
+        DOI 10.1016/0955-2219(95)93945-Y.
+      uncertainty_basis: >-
+        Yamaguchi used Tridymite over 1143-1740 K and explicitly applied no
+        correction at 1773 K where Cristobalite is stable. No 1773 K row is
+        emitted because it is outside the frozen node set; the polymorph
+        sensitivity is nevertheless retained as a separate uncertainty.
+    convention: >-
+      Parent-oxide formula-unit activity. The as-published Tridymite-reference
+      value is preserved above; measured is the controller-directed pure-liquid
+      reference conversion. No single-cation conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 2, coefficients of least-square lines for -log a(SiO2)"
+      row: "x(Na2O)=0.500 coefficient row evaluated at T=1673 K"
+      page: "PDF page 5 (journal page 740)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0500_1173
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0500
+    material_class: na_silicate_binary_melt
+    temperature_K: 1173.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 6.84399152245455e-8
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    extrapolation_flag: beyond_per_composition_measurement_window
+    extrapolation_note: >-
+      Exact evaluation of the published A/T + B fit, but at a (composition, T) the source did not
+      measure: Fig. 4 shows per-composition measurement windows narrower than the paper's global
+      1173-1673 K statement. Not an invented row; a faithful fit evaluation outside the measured
+      window. Controller ruling 2026-08-13: ANNOTATE rather than drop, because the row is
+      HELD-NOT-SCORED and affects no result today, while dropping would destroy transcribed source
+      data needed once the a(Na2O) basis question settles. THIS FLAG MUST BE RE-ADJUDICATED against
+      Fig. 4 before any promotion of this row to SCORED-ELIGIBLE.
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 0.942
+      table_1e_minus_4_delta_A: 0.036
+      A_K: 9420
+      delta_A_K: 360
+      B: -0.866
+      delta_B: 0.254
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.398380354250667
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.500 coefficient row evaluated at T=1173 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0500_1273
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0500
+    material_class: na_silicate_binary_melt
+    temperature_K: 1273.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 2.92521040261905e-7
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    extrapolation_flag: beyond_per_composition_measurement_window
+    extrapolation_note: >-
+      Exact evaluation of the published A/T + B fit, but at a (composition, T) the source did not
+      measure: Fig. 4 shows per-composition measurement windows narrower than the paper's global
+      1173-1673 K statement. Not an invented row; a faithful fit evaluation outside the measured
+      window. Controller ruling 2026-08-13: ANNOTATE rather than drop, because the row is
+      HELD-NOT-SCORED and affects no result today, while dropping would destroy transcribed source
+      data needed once the a(Na2O) basis question settles. THIS FLAG MUST BE RE-ADJUDICATED against
+      Fig. 4 before any promotion of this row to SCORED-ELIGIBLE.
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 0.942
+      table_1e_minus_4_delta_A: 0.036
+      A_K: 9420
+      delta_A_K: 360
+      B: -0.866
+      delta_B: 0.254
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.380118251430871
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.500 coefficient row evaluated at T=1273 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0500_1373
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0500
+    material_class: na_silicate_binary_melt
+    temperature_K: 1373.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 0.00000101183904685551
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 0.942
+      table_1e_minus_4_delta_A: 0.036
+      A_K: 9420
+      delta_A_K: 360
+      B: -0.866
+      delta_B: 0.254
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.365054257388916
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.500 coefficient row evaluated at T=1373 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0500_1473
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0500
+    material_class: na_silicate_binary_melt
+    temperature_K: 1473.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 0.00000295724961351528
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 0.942
+      table_1e_minus_4_delta_A: 0.036
+      A_K: 9420
+      delta_A_K: 360
+      B: -0.866
+      delta_B: 0.254
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.352486824991977
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.500 coefficient row evaluated at T=1473 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0500_1573
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0500
+    material_class: na_silicate_binary_melt
+    temperature_K: 1573.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 0.00000754124590249138
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 0.942
+      table_1e_minus_4_delta_A: 0.036
+      A_K: 9420
+      delta_A_K: 360
+      B: -0.866
+      delta_B: 0.254
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.34189740650831
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.500 coefficient row evaluated at T=1573 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0500_1673
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0500
+    material_class: na_silicate_binary_melt
+    temperature_K: 1673.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 0.0000171947669544805
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    extrapolation_flag: beyond_per_composition_measurement_window
+    extrapolation_note: >-
+      Exact evaluation of the published A/T + B fit, but at a (composition, T) the source did not
+      measure: Fig. 4 shows per-composition measurement windows narrower than the paper's global
+      1173-1673 K statement. Not an invented row; a faithful fit evaluation outside the measured
+      window. Controller ruling 2026-08-13: ANNOTATE rather than drop, because the row is
+      HELD-NOT-SCORED and affects no result today, while dropping would destroy transcribed source
+      data needed once the a(Na2O) basis question settles. THIS FLAG MUST BE RE-ADJUDICATED against
+      Fig. 4 before any promotion of this row to SCORED-ELIGIBLE.
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 0.942
+      table_1e_minus_4_delta_A: 0.036
+      A_K: 9420
+      delta_A_K: 360
+      B: -0.866
+      delta_B: 0.254
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.332895517161029
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.500 coefficient row evaluated at T=1673 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_sio2_liquid_x0601_1373
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0601
+    material_class: na_silicate_binary_melt
+    temperature_K: 1373.0
+    parent_oxide: SiO2
+    species: SiO
+    observable: activity
+    measured: 0.0000529018598133939
+    as_published_tridymite_activity: 0.0000635264875548871
+    units: dimensionless
+    score: true
+    scoring_status: SCORED-ELIGIBLE
+    evidence_class: experimental_gibbs_duhem_derived_controller_standard_state_converted
+    source_evidence_class: experimental_gibbs_duhem_derived
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_SiO2,tridymite) = A_prime/T + B_prime"
+      table_1e_minus_4_A_prime: 0.399
+      table_1e_minus_4_delta_A_prime: 0.018
+      A_prime_K: 3990
+      delta_A_prime_K: 180
+      B_prime: 1.291
+      delta_B_prime: 0.109
+      validity_range_K: [1373.0, 1773.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.170493849476875
+      standard_state_conversion_uncertainty_log10_dex: 0.00379559588654322
+      combined_sigma_log10_dex: 0.170536093709153
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A_prime/T)^2 + delta_B_prime^2). The conversion line is a
+        separate conservative polymorph sensitivity: the absolute difference
+        between Tridymite- and Cristobalite-reference conversions in the cited
+        condensed-phase Gibbs functions, divided by R*T*ln(10).
+    standard_state_conversion:
+      directive: controller_directed
+      from_standard_state: pure_solid_SiO2_tridymite
+      to_standard_state: pure_liquid_SiO2
+      delta_G_fusion_J_mol: 2089.294188
+      activity_multiplier: 0.832752790994253
+      thermodynamic_source: >-
+        de Abreu & Fabrichnaya (2024), Solids 5, 303-320, Table 4 condensed-phase
+        SiO2 functions GSIO2LIQ and GTRIDYM, DOI 10.3390/solids5020020; those
+        functions cite Dumitrescu & Sundman (1995),
+        DOI 10.1016/0955-2219(95)93945-Y.
+      uncertainty_basis: >-
+        Yamaguchi used Tridymite over 1143-1740 K and explicitly applied no
+        correction at 1773 K where Cristobalite is stable. No 1773 K row is
+        emitted because it is outside the frozen node set; the polymorph
+        sensitivity is nevertheless retained as a separate uncertainty.
+    convention: >-
+      Parent-oxide formula-unit activity. The as-published Tridymite-reference
+      value is preserved above; measured is the controller-directed pure-liquid
+      reference conversion. No single-cation conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 2, coefficients of least-square lines for -log a(SiO2)"
+      row: "x(Na2O)=0.601 coefficient row evaluated at T=1373 K"
+      page: "PDF page 5 (journal page 740)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_sio2_liquid_x0601_1473
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0601
+    material_class: na_silicate_binary_melt
+    temperature_K: 1473.0
+    parent_oxide: SiO2
+    species: SiO
+    observable: activity
+    measured: 0.000085997281527877
+    as_published_tridymite_activity: 0.000100055821608286
+    units: dimensionless
+    score: true
+    scoring_status: SCORED-ELIGIBLE
+    evidence_class: experimental_gibbs_duhem_derived_controller_standard_state_converted
+    source_evidence_class: experimental_gibbs_duhem_derived
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_SiO2,tridymite) = A_prime/T + B_prime"
+      table_1e_minus_4_A_prime: 0.399
+      table_1e_minus_4_delta_A_prime: 0.018
+      A_prime_K: 3990
+      delta_A_prime_K: 180
+      B_prime: 1.291
+      delta_B_prime: 0.109
+      validity_range_K: [1373.0, 1773.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.163749016632867
+      standard_state_conversion_uncertainty_log10_dex: 0.00286544325531226
+      combined_sigma_log10_dex: 0.163774085902747
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A_prime/T)^2 + delta_B_prime^2). The conversion line is a
+        separate conservative polymorph sensitivity: the absolute difference
+        between Tridymite- and Cristobalite-reference conversions in the cited
+        condensed-phase Gibbs functions, divided by R*T*ln(10).
+    standard_state_conversion:
+      directive: controller_directed
+      from_standard_state: pure_solid_SiO2_tridymite
+      to_standard_state: pure_liquid_SiO2
+      delta_G_fusion_J_mol: 1854.380434
+      activity_multiplier: 0.859493032444952
+      thermodynamic_source: >-
+        de Abreu & Fabrichnaya (2024), Solids 5, 303-320, Table 4 condensed-phase
+        SiO2 functions GSIO2LIQ and GTRIDYM, DOI 10.3390/solids5020020; those
+        functions cite Dumitrescu & Sundman (1995),
+        DOI 10.1016/0955-2219(95)93945-Y.
+      uncertainty_basis: >-
+        Yamaguchi used Tridymite over 1143-1740 K and explicitly applied no
+        correction at 1773 K where Cristobalite is stable. No 1773 K row is
+        emitted because it is outside the frozen node set; the polymorph
+        sensitivity is nevertheless retained as a separate uncertainty.
+    convention: >-
+      Parent-oxide formula-unit activity. The as-published Tridymite-reference
+      value is preserved above; measured is the controller-directed pure-liquid
+      reference conversion. No single-cation conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 2, coefficients of least-square lines for -log a(SiO2)"
+      row: "x(Na2O)=0.601 coefficient row evaluated at T=1473 K"
+      page: "PDF page 5 (journal page 740)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_sio2_liquid_x0601_1573
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0601
+    material_class: na_silicate_binary_melt
+    temperature_K: 1573.0
+    parent_oxide: SiO2
+    species: SiO
+    observable: activity
+    measured: 0.000131874940067378
+    as_published_tridymite_activity: 0.000148746119713275
+    units: dimensionless
+    score: true
+    scoring_status: SCORED-ELIGIBLE
+    evidence_class: experimental_gibbs_duhem_derived_controller_standard_state_converted
+    source_evidence_class: experimental_gibbs_duhem_derived
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_SiO2,tridymite) = A_prime/T + B_prime"
+      table_1e_minus_4_A_prime: 0.399
+      table_1e_minus_4_delta_A_prime: 0.018
+      A_prime_K: 3990
+      delta_A_prime_K: 180
+      B_prime: 1.291
+      delta_B_prime: 0.109
+      validity_range_K: [1373.0, 1773.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.158036258954321
+      standard_state_conversion_uncertainty_log10_dex: 0.00179298122184088
+      combined_sigma_log10_dex: 0.158046429652615
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A_prime/T)^2 + delta_B_prime^2). The conversion line is a
+        separate conservative polymorph sensitivity: the absolute difference
+        between Tridymite- and Cristobalite-reference conversions in the cited
+        condensed-phase Gibbs functions, divided by R*T*ln(10).
+    standard_state_conversion:
+      directive: controller_directed
+      from_standard_state: pure_solid_SiO2_tridymite
+      to_standard_state: pure_liquid_SiO2
+      delta_G_fusion_J_mol: 1574.498203
+      activity_multiplier: 0.886577346162589
+      thermodynamic_source: >-
+        de Abreu & Fabrichnaya (2024), Solids 5, 303-320, Table 4 condensed-phase
+        SiO2 functions GSIO2LIQ and GTRIDYM, DOI 10.3390/solids5020020; those
+        functions cite Dumitrescu & Sundman (1995),
+        DOI 10.1016/0955-2219(95)93945-Y.
+      uncertainty_basis: >-
+        Yamaguchi used Tridymite over 1143-1740 K and explicitly applied no
+        correction at 1773 K where Cristobalite is stable. No 1773 K row is
+        emitted because it is outside the frozen node set; the polymorph
+        sensitivity is nevertheless retained as a separate uncertainty.
+    convention: >-
+      Parent-oxide formula-unit activity. The as-published Tridymite-reference
+      value is preserved above; measured is the controller-directed pure-liquid
+      reference conversion. No single-cation conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 2, coefficients of least-square lines for -log a(SiO2)"
+      row: "x(Na2O)=0.601 coefficient row evaluated at T=1573 K"
+      page: "PDF page 5 (journal page 740)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_sio2_liquid_x0601_1673
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0601
+    material_class: na_silicate_binary_melt
+    temperature_K: 1673.0
+    parent_oxide: SiO2
+    species: SiO
+    observable: activity
+    measured: 0.000192759181922749
+    as_published_tridymite_activity: 0.000210893289762722
+    units: dimensionless
+    score: true
+    scoring_status: SCORED-ELIGIBLE
+    evidence_class: experimental_gibbs_duhem_derived_controller_standard_state_converted
+    source_evidence_class: experimental_gibbs_duhem_derived
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_SiO2,tridymite) = A_prime/T + B_prime"
+      table_1e_minus_4_A_prime: 0.399
+      table_1e_minus_4_delta_A_prime: 0.018
+      A_prime_K: 3990
+      delta_A_prime_K: 180
+      B_prime: 1.291
+      delta_B_prime: 0.109
+      validity_range_K: [1373.0, 1773.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.153156313407177
+      standard_state_conversion_uncertainty_log10_dex: 0.000710019122704031
+      combined_sigma_log10_dex: 0.153157959191261
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A_prime/T)^2 + delta_B_prime^2). The conversion line is a
+        separate conservative polymorph sensitivity: the absolute difference
+        between Tridymite- and Cristobalite-reference conversions in the cited
+        condensed-phase Gibbs functions, divided by R*T*ln(10).
+    standard_state_conversion:
+      directive: controller_directed
+      from_standard_state: pure_solid_SiO2_tridymite
+      to_standard_state: pure_liquid_SiO2
+      delta_G_fusion_J_mol: 1250.665381
+      activity_multiplier: 0.914012874186864
+      thermodynamic_source: >-
+        de Abreu & Fabrichnaya (2024), Solids 5, 303-320, Table 4 condensed-phase
+        SiO2 functions GSIO2LIQ and GTRIDYM, DOI 10.3390/solids5020020; those
+        functions cite Dumitrescu & Sundman (1995),
+        DOI 10.1016/0955-2219(95)93945-Y.
+      uncertainty_basis: >-
+        Yamaguchi used Tridymite over 1143-1740 K and explicitly applied no
+        correction at 1773 K where Cristobalite is stable. No 1773 K row is
+        emitted because it is outside the frozen node set; the polymorph
+        sensitivity is nevertheless retained as a separate uncertainty.
+    convention: >-
+      Parent-oxide formula-unit activity. The as-published Tridymite-reference
+      value is preserved above; measured is the controller-directed pure-liquid
+      reference conversion. No single-cation conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 2, coefficients of least-square lines for -log a(SiO2)"
+      row: "x(Na2O)=0.601 coefficient row evaluated at T=1673 K"
+      page: "PDF page 5 (journal page 740)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0601_1173
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0601
+    material_class: na_silicate_binary_melt
+    temperature_K: 1173.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 0.00000336709137247502
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    extrapolation_flag: beyond_per_composition_measurement_window
+    extrapolation_note: >-
+      Exact evaluation of the published A/T + B fit, but at a (composition, T) the source did not
+      measure: Fig. 4 shows per-composition measurement windows narrower than the paper's global
+      1173-1673 K statement. Not an invented row; a faithful fit evaluation outside the measured
+      window. Controller ruling 2026-08-13: ANNOTATE rather than drop, because the row is
+      HELD-NOT-SCORED and affects no result today, while dropping would destroy transcribed source
+      data needed once the a(Na2O) basis question settles. THIS FLAG MUST BE RE-ADJUDICATED against
+      Fig. 4 before any promotion of this row to SCORED-ELIGIBLE.
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 0.805
+      table_1e_minus_4_delta_A: 0.079
+      A_K: 8050
+      delta_A_K: 790
+      B: -1.39
+      delta_B: 0.565
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.879095814426319
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.601 coefficient row evaluated at T=1173 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0601_1273
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0601
+    material_class: na_silicate_binary_melt
+    temperature_K: 1273.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 0.000011650781747924
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    extrapolation_flag: beyond_per_composition_measurement_window
+    extrapolation_note: >-
+      Exact evaluation of the published A/T + B fit, but at a (composition, T) the source did not
+      measure: Fig. 4 shows per-composition measurement windows narrower than the paper's global
+      1173-1673 K statement. Not an invented row; a faithful fit evaluation outside the measured
+      window. Controller ruling 2026-08-13: ANNOTATE rather than drop, because the row is
+      HELD-NOT-SCORED and affects no result today, while dropping would destroy transcribed source
+      data needed once the a(Na2O) basis question settles. THIS FLAG MUST BE RE-ADJUDICATED against
+      Fig. 4 before any promotion of this row to SCORED-ELIGIBLE.
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 0.805
+      table_1e_minus_4_delta_A: 0.079
+      A_K: 8050
+      delta_A_K: 790
+      B: -1.39
+      delta_B: 0.565
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.839253331767078
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.601 coefficient row evaluated at T=1273 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0601_1373
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0601
+    material_class: na_silicate_binary_melt
+    temperature_K: 1373.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 0.000033645457529584
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 0.805
+      table_1e_minus_4_delta_A: 0.079
+      A_K: 8050
+      delta_A_K: 790
+      B: -1.39
+      delta_B: 0.565
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.806405528705793
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.601 coefficient row evaluated at T=1373 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0601_1473
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0601
+    material_class: na_silicate_binary_melt
+    temperature_K: 1473.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 0.0000841322805233388
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 0.805
+      table_1e_minus_4_delta_A: 0.079
+      A_K: 8050
+      delta_A_K: 790
+      B: -1.39
+      delta_B: 0.565
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.779015152900633
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.601 coefficient row evaluated at T=1473 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0601_1573
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0601
+    material_class: na_silicate_binary_melt
+    temperature_K: 1573.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 0.000187236423536741
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 0.805
+      table_1e_minus_4_delta_A: 0.079
+      A_K: 8050
+      delta_A_K: 790
+      B: -1.39
+      delta_B: 0.565
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.755946425692171
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.601 coefficient row evaluated at T=1573 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
+  - id: yamaguchi1983_a_na2o_x0601_1673
+    population: yamaguchi1983_emf_na2o_sio2
+    composition_id: yamaguchi1983_na2o_sio2_x0601
+    material_class: na_silicate_binary_melt
+    temperature_K: 1673.0
+    parent_oxide: Na2O
+    species: Na
+    observable: activity
+    measured: 0.00037869059458877
+    units: dimensionless
+    score: false
+    scoring_status: HELD-NOT-SCORED
+    extrapolation_flag: beyond_per_composition_measurement_window
+    extrapolation_note: >-
+      Exact evaluation of the published A/T + B fit, but at a (composition, T) the source did not
+      measure: Fig. 4 shows per-composition measurement windows narrower than the paper's global
+      1173-1673 K statement. Not an invented row; a faithful fit evaluation outside the measured
+      window. Controller ruling 2026-08-13: ANNOTATE rather than drop, because the row is
+      HELD-NOT-SCORED and affects no result today, while dropping would destroy transcribed source
+      data needed once the a(Na2O) basis question settles. THIS FLAG MUST BE RE-ADJUDICATED against
+      Fig. 4 before any promotion of this row to SCORED-ELIGIBLE.
+    scoring_status_reason: "no authoritative oxide-basis conversion; see b-199 / G3"
+    evidence_class: experimental_emf_leastsquares_reduction
+    reduction_class: authors_own_least_squares
+    published_coefficients:
+      equation: "-log10(a_Na2O,liquid) = A/T + B"
+      table_1e_minus_4_A: 0.805
+      table_1e_minus_4_delta_A: 0.079
+      A_K: 8050
+      delta_A_K: 790
+      B: -1.39
+      delta_B: 0.565
+      validity_range_K: [1173.0, 1673.0]
+    uncertainty:
+      published_coefficient_sigma_log10_dex: 0.736344448124525
+      statement: >-
+        Published coefficient errors propagated as
+        sqrt((delta_A/T)^2 + delta_B^2); no uncertainty is invented.
+    convention: >-
+      a(Na2O) on the parent-oxide formula-unit basis against a pure-liquid-Na2O
+      standard state, evaluated from the published authors-own least-squares
+      coefficients and retained without proxy conversion. No single-cation
+      conversion or square root applied.
+    provenance:
+      source_citation: >-
+        Yamaguchi, S.; Imai, A.; Goto, K.S. (1983), Measurement of Activity
+        of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid
+        Electrolyte, Journal of the Japan Institute of Metals 47(9), 736-742.
+      source_doi: 10.2320/jinstmet1952.47.9_736
+      source_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
+      table: "Table 1, coefficients of lines for -log a(Na2O)"
+      row: "x(Na2O)=0.601 coefficient row evaluated at T=1673 K"
+      page: "PDF page 3 (journal page 738)"
+      transcriber: "OpenAI Codex"
+      transcription_date: "2026-08-13"
+
 exclusions:
   - source: kems-008 Schaefer-Fegley Table 10
     reason: kinetic vaporization coefficients, mostly survey solids; not basalt melt activities
