@@ -306,6 +306,64 @@ def test_na_anchor_requires_a_nonmissing_channel_per_cluster() -> None:
     assert excinfo.value.abort_type == "ABORT-RANKING-INSTRUMENT-NULL"
 
 
+MANIFEST_C = SealedNaManifest.from_bytes(
+    _manifest_bytes(
+        ("src-a", "comp-1", 40.0, 60.0, ("activity:X",)),
+        ("src-b", "comp-2", 30.0, 55.0, ("activity:X",)),
+        ("src-b", "comp-3", 35.0, 58.0, ("activity:X",)),
+        ("src-c", "comp-4", 20.0, 50.0, ("activity:X",)),
+    )
+)
+
+
+def test_a9_reading_a_dark_cluster_does_not_abort() -> None:
+    """AMBIGUITY A-9 reading A: a dark cluster is typed missing, not an abort.
+
+    This is the real 2026-08-14 run's shape: two independent Na-bearing
+    sources carry live channels while a third cluster returns nothing. Under
+    the superseded corpus-wide reading this raised
+    ABORT-RANKING-INSTRUMENT-NULL; under the blind-adjudicated ruling in
+    ADJUDICATION-A9.md it must produce metrics, with the dark cluster's cells
+    still counted as missing so an auditor can see it. Red-by-revert against
+    the previous dark-cluster abort.
+    """
+    responses = [
+        _shifted("src-a", "comp-1", "activity:X", 0.20, manifest=MANIFEST_C),
+        _shifted("src-b", "comp-2", "activity:X", 0.10, manifest=MANIFEST_C),
+        _response(
+            "src-c", "comp-4", "activity:X",
+            None, None, None, missing="engine_refused", manifest=MANIFEST_C,
+        ),
+    ]
+    metrics = compute_join_metrics(responses, evidence_grade=3, na_anchor=True)
+    assert metrics.C == 2
+    assert metrics.R_measured > 0.0
+    # The dark cluster does not vanish: its absent cells stay counted.
+    assert metrics.n_missing > 0
+
+
+def test_a9_two_live_clusters_from_one_source_are_not_two_anchors() -> None:
+    """Item 4's "independent" anchors means independent BY SOURCE.
+
+    Two compositions from a single study are one measurement tradition. This
+    direction is STRICTER than counting clusters, so it can only make the
+    refusal more likely -- it exists because it is the faithful reading of
+    ADJUDICATION-A9, not because of any outcome.
+    """
+    responses = [
+        _shifted("src-b", "comp-2", "activity:X", 0.20, manifest=MANIFEST_C),
+        _shifted("src-b", "comp-3", "activity:X", 0.30, manifest=MANIFEST_C),
+        _response(
+            "src-a", "comp-1", "activity:X",
+            None, None, None, missing="engine_refused", manifest=MANIFEST_C,
+        ),
+    ]
+    with pytest.raises(AbortRankingInstrumentNull) as excinfo:
+        compute_join_metrics(responses, evidence_grade=3, na_anchor=True)
+    assert excinfo.value.abort_type == "ABORT-RANKING-INSTRUMENT-NULL"
+    assert "SOURCES" in str(excinfo.value)
+
+
 def test_na_anchor_passes_when_gate_and_c_positive() -> None:
     responses = [
         _shifted("src-a", "comp-1", "activity:X", 0.20, manifest=MANIFEST_A),

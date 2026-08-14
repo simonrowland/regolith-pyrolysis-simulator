@@ -568,21 +568,45 @@ def compute_join_metrics(
                 "rank-1 Na join has fewer than two eligible Na-bearing "
                 f"source clusters with sealed-manifest proof ({len(bearing)})"
             )
+        # AMBIGUITY A-9, RESOLVED: "at least one nonmissing channel per
+        # cluster" ranges over the two-or-more QUALIFYING Na-bearing anchor
+        # clusters, NOT over every cluster in the sealed corpus. See
+        # ADJUDICATION-A9.md (blind-adjudicated and recorded BEFORE the first
+        # re-run, precisely so this could not be decided after seeing an
+        # abort). This runner previously shipped the strict corpus-wide
+        # reading as a fail-closed default while the question was open; that
+        # default is now superseded by the ruling, not relaxed by a result.
+        #
+        # Consequence, stated in the ruling: a high-Na cluster that returns no
+        # channel does NOT abort. Its absent cells stay typed and are counted
+        # in the released missing counts (``n_missing`` below), so a dark
+        # cluster remains VISIBLE to an auditor rather than vanishing.
         nonmissing_by_cluster = {
             cluster_id: sum(
                 1 for member in members if channel_shift(member) is not None
             )
             for cluster_id, members in clusters.items()
         }
-        dark = sorted(
+        anchors = [
             cluster_id
-            for cluster_id, count in nonmissing_by_cluster.items()
-            if count == 0
-        )
-        if dark:
+            for cluster_id in bearing
+            if nonmissing_by_cluster.get(cluster_id, 0) > 0
+        ]
+        # Item 4 requires the anchors be "independent" clusters, which
+        # ADJUDICATION-A9 reads as independent BY SOURCE. Two compositions
+        # from one study are one measurement tradition, not two, so they
+        # cannot both count toward the pair. This is STRICTER than counting
+        # clusters and can only make the refusal more likely -- it is
+        # implemented here because it is the faithful reading, not because of
+        # any outcome.
+        anchor_sources = {
+            cluster_id.split("::", 1)[0] for cluster_id in anchors
+        }
+        if len(anchor_sources) < 2:
             raise AbortRankingInstrumentNull(
-                "rank-1 Na join clusters with no nonmissing channel: "
-                f"{dark}"
+                "rank-1 Na join has fewer than two independent Na-bearing "
+                "SOURCES carrying a nonmissing channel (A-9 reading A): "
+                f"anchors={sorted(anchors)} sources={sorted(anchor_sources)}"
             )
     metrics = _metrics_from_shifts(
         computable,
