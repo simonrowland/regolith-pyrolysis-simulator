@@ -20,6 +20,12 @@ Run the complete tracked benchmark::
 Generate only the stripping-trajectory coverage map::
 
     .venv/bin/python benchmarks/melt_activity_benchmark.py --mode coverage
+
+Regeneration is guarded against silent shrinkage: a run refuses to replace
+the output set with a smaller one — e.g. disabling the live VapoRock anchor
+check, which is on by default, or narrowing ``--mode`` on a populated
+directory — unless each dropped artifact is explicitly retired with
+``--retire-artifact NAME`` (logged as a warning and in run-metadata.json).
 """
 
 from __future__ import annotations
@@ -44,6 +50,11 @@ import yaml
 REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
+
+from simulator.regeneration_guard import (
+    RegenerationShrinkageError,
+    assert_no_silent_artifact_loss,
+)
 
 DEFAULT_BENCH_SET = REPO_ROOT / "data/melt_activity/basalt-bench-set-v1.yaml"
 DEFAULT_OUTPUT_DIR = REPO_ROOT / "benchmarks/results/melt_activity"
@@ -1707,6 +1718,39 @@ def generate_report(
     return "\n".join(lines)
 
 
+GENERATED_ARTIFACT_NAMES = frozenset(
+    {
+        "bench-set.yaml",
+        "benchmark-results.csv",
+        "composition-probes.csv",
+        "coverage-map.csv",
+        "live-vaporock-check.csv",
+        "paired-decisions.csv",
+        "reference-anchor-results.csv",
+        "report.md",
+        "run-metadata.json",
+    }
+)
+
+
+def _planned_artifact_names(mode: str, live_vaporock_anchor_check: bool) -> set[str]:
+    planned = {"bench-set.yaml", "run-metadata.json"}
+    if mode in {"benchmark", "all"}:
+        planned |= {
+            "benchmark-results.csv",
+            "composition-probes.csv",
+            "paired-decisions.csv",
+            "reference-anchor-results.csv",
+        }
+        if live_vaporock_anchor_check:
+            planned.add("live-vaporock-check.csv")
+    if mode in {"coverage", "all"}:
+        planned.add("coverage-map.csv")
+    if mode == "all":
+        planned.add("report.md")
+    return planned
+
+
 def run_benchmark(
     *,
     bench_set_path: Path = DEFAULT_BENCH_SET,
@@ -1715,25 +1759,22 @@ def run_benchmark(
     mode: str = "all",
     coverage_steps: int = 21,
     alphamelts_timeout_s: float = 30.0,
-    live_vaporock_anchor_check: bool = False,
+    live_vaporock_anchor_check: bool = True,
+    retired_artifacts: Sequence[str] = (),
 ) -> dict[str, Any]:
     fixture = load_bench_set(bench_set_path)
     engines = build_engines(
         engine_names, fixture, alphamelts_timeout_s=alphamelts_timeout_s
     )
     output_dir.mkdir(parents=True, exist_ok=True)
-    generated_names = {
-        "bench-set.yaml",
-        "benchmark-results.csv",
-        "composition-probes.csv",
-        "coverage-map.csv",
-        "reference-anchor-results.csv",
-        "paired-decisions.csv",
-        "live-vaporock-check.csv",
-        "report.md",
-        "run-metadata.json",
-    }
-    for name in generated_names:
+    planned_names = _planned_artifact_names(mode, live_vaporock_anchor_check)
+    guard = assert_no_silent_artifact_loss(
+        output_dir,
+        planned_names,
+        managed=GENERATED_ARTIFACT_NAMES,
+        retired=retired_artifacts,
+    )
+    for name in planned_names | set(retired_artifacts):
         (output_dir / name).unlink(missing_ok=True)
     point_rows: list[dict[str, Any]] = []
     probe_rows: list[dict[str, Any]] = []
@@ -1786,6 +1827,11 @@ def run_benchmark(
             "status_counts": dict(
                 sorted(Counter(row["status"] for row in live_vaporock_rows).items())
             ),
+        },
+        "artifact_guard": {
+            "planned": sorted(guard.planned),
+            "retired": sorted(str(name) for name in retired_artifacts),
+            "retired_removed": sorted(guard.retired_removed),
         },
     }
     (output_dir / "run-metadata.json").write_text(
@@ -1842,24 +1888,45 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--alphamelts-timeout-s", type=float, default=30.0)
     parser.add_argument(
         "--live-vaporock-anchor-check",
-        action="store_true",
-        help="compare the installed VapoRock build with the frozen tracked snapshot",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help=(
+            "compare the installed VapoRock build with the frozen tracked "
+            "snapshot (default: on; --no-live-vaporock-anchor-check on a "
+            "directory holding live-vaporock-check.csv refuses unless the "
+            "artifact is explicitly retired)"
+        ),
+    )
+    parser.add_argument(
+        "--retire-artifact",
+        action="append",
+        default=[],
+        metavar="NAME",
+        help=(
+            "declare a previously generated artifact intentionally retired; "
+            "the regeneration guard warns and permits its removal (repeatable)"
+        ),
     )
     return parser
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    args = build_arg_parser().parse_args(argv)
+    parser = build_arg_parser()
+    args = parser.parse_args(argv)
     names = tuple(value.strip() for value in args.engines.split(",") if value.strip())
-    result = run_benchmark(
-        bench_set_path=args.bench_set.resolve(),
-        output_dir=args.output_dir.resolve(),
-        engine_names=names,
-        mode=args.mode,
-        coverage_steps=args.coverage_steps,
-        alphamelts_timeout_s=args.alphamelts_timeout_s,
-        live_vaporock_anchor_check=args.live_vaporock_anchor_check,
-    )
+    try:
+        result = run_benchmark(
+            bench_set_path=args.bench_set.resolve(),
+            output_dir=args.output_dir.resolve(),
+            engine_names=names,
+            mode=args.mode,
+            coverage_steps=args.coverage_steps,
+            alphamelts_timeout_s=args.alphamelts_timeout_s,
+            live_vaporock_anchor_check=args.live_vaporock_anchor_check,
+            retired_artifacts=tuple(args.retire_artifact),
+        )
+    except RegenerationShrinkageError as exc:
+        parser.error(str(exc))
     print(
         f"wrote {args.output_dir}: {len(result['point_rows'])} point-engine rows, "
         f"{len(result['coverage_rows'])} coverage rows"
