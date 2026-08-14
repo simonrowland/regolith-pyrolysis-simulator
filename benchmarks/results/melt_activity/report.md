@@ -91,6 +91,11 @@ Controller regression pool (all non-alkali rows, including the O2 fO2 pin): IMCC
 
 Experimental KEMS snapshot: **7 scored / 9 retained** rows. These are independent KEMS compositions, not measurements on the four SF04 basalt sheets, and therefore do not turn the MAGMA table into empirical basalt evidence.
 
+### Installed VapoRock snapshot check
+
+Live comparison produced 288/288 cells; maximum live-minus-frozen magnitude: 4.64992e-05 dex.
+The installed VapoRock run reproduces the frozen snapshot within 0.0005 dex.
+
 ## In-domain composition probes
 
 These are engine robustness/coverage probes, not empirical score points.
