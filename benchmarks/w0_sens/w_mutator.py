@@ -287,6 +287,19 @@ def _sha256_text(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
+def observed_value_fingerprint(value: float) -> str:
+    """SHA-256 over ``repr(float(value))`` — provenance for a readback MISMATCH.
+
+    A mismatch abort reports THAT the readback disagreed, the parameter
+    slot, and this fingerprint — never the value itself: when the pristine
+    build resolves, the readback IS the quarantined held W, and emitting it
+    into an abort record would breach WQ-1 in the instrument's own refusal
+    output. A custodian holding the quarantine envelope verifies a
+    candidate value ``v`` by comparing ``observed_value_fingerprint(v)``.
+    """
+    return _sha256_text(repr(float(value)))
+
+
 def repo_root() -> Path:
     return Path(__file__).resolve().parents[2]
 
@@ -773,8 +786,10 @@ class W0WMutator:
         readback = float(payload["readback_J"])
         if readback != value:
             raise AbortWMutator(
-                f"readback of the substituted value {readback!r} J does not "
-                f"equal the frozen value {value!r} J"
+                f"readback of the substituted value for {self._param_name!r} "
+                f"(slot {capture.slot_index}) does not equal the frozen "
+                f"{value!r} J; observed_value_sha256="
+                f"{observed_value_fingerprint(readback)}"
             )
         changed_slots = tuple(int(slot) for slot in payload["changed_slots"])
         if changed_slots != (capture.slot_index,):

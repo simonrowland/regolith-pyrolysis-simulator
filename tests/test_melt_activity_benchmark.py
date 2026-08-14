@@ -4,10 +4,15 @@ from __future__ import annotations
 
 from types import SimpleNamespace
 
+import json
 import pytest
 import yaml
 
 from benchmarks import melt_activity_benchmark as benchmark
+from simulator.regeneration_guard import (
+    RegenerationShrinkageError,
+    RetiredArtifactWarning,
+)
 
 
 class _FakeActivityEngine:
@@ -53,6 +58,7 @@ def test_harness_runs_end_to_end_on_tiny_fixture(tmp_path, monkeypatch):
     assert (output_dir / "coverage-map.csv").is_file()
     assert (output_dir / "paired-decisions.csv").is_file()
     assert (output_dir / "reference-anchor-results.csv").is_file()
+    assert (output_dir / "live-vaporock-check.csv").is_file()
     assert result["metadata"]["reference_anchor"]["shared_magma_count"] == 288
     assert "Literal SF04 basalt empirical points: **0**" in (
         output_dir / "report.md"
@@ -62,33 +68,109 @@ def test_harness_runs_end_to_end_on_tiny_fixture(tmp_path, monkeypatch):
     ).read_text(encoding="utf-8")
 
 
-def test_mode_specific_run_removes_stale_incompatible_outputs(tmp_path, monkeypatch):
+def _run_tiny_full_benchmark(output_dir, monkeypatch, **overrides):
     monkeypatch.setattr(
         benchmark,
         "build_engines",
         lambda names, fixture, alphamelts_timeout_s: [_FakeActivityEngine()],
     )
-    output_dir = tmp_path / "out"
-    benchmark.run_benchmark(
+    kwargs = dict(
         output_dir=output_dir,
         engine_names=("fake",),
         coverage_steps=3,
     )
+    kwargs.update(overrides)
+    return benchmark.run_benchmark(**kwargs)
 
-    benchmark.run_benchmark(
-        output_dir=output_dir,
-        engine_names=("fake",),
-        mode="coverage",
-        coverage_steps=3,
+
+def test_regeneration_without_live_check_refuses_to_drop_anchor_csv(
+    tmp_path, monkeypatch
+):
+    """b-200: skipping the live anchor check must not silently delete its CSV."""
+    output_dir = tmp_path / "out"
+    _run_tiny_full_benchmark(output_dir, monkeypatch)
+    assert (output_dir / "live-vaporock-check.csv").is_file()
+
+    with pytest.raises(RegenerationShrinkageError) as excinfo:
+        _run_tiny_full_benchmark(
+            output_dir, monkeypatch, live_vaporock_anchor_check=False
+        )
+
+    assert "live-vaporock-check.csv" in str(excinfo.value)
+    assert "benchmark-results.csv" not in str(excinfo.value)
+    assert (output_dir / "live-vaporock-check.csv").is_file()
+
+
+def test_retire_artifact_opt_out_removes_the_anchor_csv_loudly(
+    tmp_path, monkeypatch
+):
+    output_dir = tmp_path / "out"
+    _run_tiny_full_benchmark(output_dir, monkeypatch)
+
+    with pytest.warns(RetiredArtifactWarning, match="live-vaporock-check.csv"):
+        result = _run_tiny_full_benchmark(
+            output_dir,
+            monkeypatch,
+            live_vaporock_anchor_check=False,
+            retired_artifacts=("live-vaporock-check.csv",),
+        )
+
+    assert not (output_dir / "live-vaporock-check.csv").exists()
+    assert (output_dir / "benchmark-results.csv").is_file()
+    guard_metadata = result["metadata"]["artifact_guard"]
+    assert guard_metadata["retired"] == ["live-vaporock-check.csv"]
+    assert guard_metadata["retired_removed"] == ["live-vaporock-check.csv"]
+    assert result["metadata"]["live_vaporock_anchor_check"]["requested"] is False
+    on_disk = json.loads(
+        (output_dir / "run-metadata.json").read_text(encoding="utf-8")
     )
+    assert on_disk["artifact_guard"]["retired"] == ["live-vaporock-check.csv"]
+
+
+def test_mode_scoped_run_refuses_to_drop_unregenerated_artifacts(
+    tmp_path, monkeypatch
+):
+    output_dir = tmp_path / "out"
+    _run_tiny_full_benchmark(output_dir, monkeypatch)
+
+    dropped = (
+        "benchmark-results.csv",
+        "composition-probes.csv",
+        "live-vaporock-check.csv",
+        "paired-decisions.csv",
+        "reference-anchor-results.csv",
+        "report.md",
+    )
+    with pytest.raises(RegenerationShrinkageError) as excinfo:
+        _run_tiny_full_benchmark(output_dir, monkeypatch, mode="coverage")
+    for name in dropped:
+        assert name in str(excinfo.value)
+
+    with pytest.warns(RetiredArtifactWarning):
+        _run_tiny_full_benchmark(
+            output_dir, monkeypatch, mode="coverage", retired_artifacts=dropped
+        )
 
     assert (output_dir / "coverage-map.csv").is_file()
-    assert not (output_dir / "benchmark-results.csv").exists()
-    assert not (output_dir / "composition-probes.csv").exists()
-    assert not (output_dir / "reference-anchor-results.csv").exists()
-    assert not (output_dir / "paired-decisions.csv").exists()
-    assert not (output_dir / "live-vaporock-check.csv").exists()
-    assert not (output_dir / "report.md").exists()
+    for name in dropped:
+        assert not (output_dir / name).exists()
+
+
+def test_live_vaporock_anchor_check_defaults_on():
+    args = benchmark.build_arg_parser().parse_args([])
+
+    assert args.live_vaporock_anchor_check is True
+    assert "live-vaporock-check.csv" in benchmark._planned_artifact_names(
+        "all", True
+    )
+    assert "live-vaporock-check.csv" not in benchmark._planned_artifact_names(
+        "all", False
+    )
+    assert benchmark._planned_artifact_names(
+        "benchmark", False
+    ) | {"live-vaporock-check.csv"} == benchmark._planned_artifact_names(
+        "benchmark", True
+    )
 
 
 def test_cross_engine_shared_count_requires_both_engine_families_to_score():

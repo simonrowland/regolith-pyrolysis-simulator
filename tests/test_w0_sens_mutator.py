@@ -29,6 +29,7 @@ from benchmarks.w0_sens.w_mutator import (
     NonProductionMutationBuild,
     W0WMutator,
     comment_form,
+    observed_value_fingerprint,
     patch_initializer,
     synthetic_response_gate,
 )
@@ -356,8 +357,41 @@ def test_parent_rechecks_worker_reported_readback(tmp_path) -> None:
         return payload
 
     mutator = _mutator(tmp_path, worker_runner=lying_runner)
-    with pytest.raises(AbortWMutator):
+    with pytest.raises(AbortWMutator) as excinfo:
         mutator.make_build(PLUS_J, row_id="row-1")
+    # HIGH-1: the parent-side recheck reports a MISMATCH FACT — slot plus
+    # fingerprint — never the observed value (10001.0 here; in production
+    # it could be the quarantined held W).
+    assert "10001" not in str(excinfo.value)
+    assert observed_value_fingerprint(10_001.0) in str(excinfo.value)
+
+
+def test_substitution_mismatch_reports_a_fact_never_the_value() -> None:
+    """HIGH-1 reviewer probe, verbatim shape: an invented stand-in for the
+    held W as the mismatching readback must not appear in worker output."""
+    param = "W(A         ,B)"
+    secret = 314159.0  # invented stand-in for a quarantined held value
+    with pytest.raises(worker._WorkerAbort) as excinfo:
+        worker._assert_substitution_live([param], [secret], param, 0.0)
+    detail = str(excinfo.value)
+    assert "314159" not in detail
+    assert "numerically silent" in detail
+    assert "slot 0" in detail
+    # Provenance without disclosure: the fingerprint is present, and the
+    # custodian can verify a candidate value against it.
+    assert observed_value_fingerprint(secret) in detail
+    assert observed_value_fingerprint(secret) == hashlib.sha256(
+        repr(float(secret)).encode("utf-8")
+    ).hexdigest()
+
+
+def test_fingerprint_formula_is_identical_worker_and_parent() -> None:
+    """One fingerprint recipe across the worker, the mutator parent, and
+    the evaluator, so a custodian verification matches every record."""
+    value = -0.123456789e7
+    assert w_mutator.observed_value_fingerprint(value) == hashlib.sha256(
+        repr(float(value)).encode("utf-8")
+    ).hexdigest()
 
 
 def test_exact_engine_name_form_required(tmp_path) -> None:

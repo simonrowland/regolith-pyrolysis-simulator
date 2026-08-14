@@ -33,10 +33,12 @@ each either a positive finite activity or a typed-missing cell) and computes
 
 Missing/refused model CELLS remain typed missing and are never imputed
 zero (step 4): every absent cell (control or either sign) must carry a
-typed reason at construction, partially missing channels keep their typed
-missing signs in the shift record, and released missing counts are cell
+typed reason at construction, and released missing counts are cell
 counts, so a missing sign always counts (step 6 "typed missing counts").
-This module never runs the screen, never reads a quarantined W value, and
+A channel with a typed-missing sign is MISSING, not affected (step 5
+measures the shift "across the two perturbations"; AMBIGUITY A-16 in
+``benchmarks/w0_sens/screen.py``). This module never runs the screen,
+never reads a quarantined W value, and
 never produces a ranking: the step-7 reserve-versus-fourth
 ``ABORT-RANKING-INVALIDATED`` comparison is a ranking decision and is
 deliberately not implemented here.
@@ -63,6 +65,32 @@ from benchmarks.w0_sens import W0SensAbort
 
 
 AFFECTED_THRESHOLD_DEX = 0.05
+# Inclusive-boundary noise floor, in dex. The log10 evaluation of a
+# nominal 0.05 dex shift lands a few ulps BELOW the float 0.05
+# (``math.log10(10.0**0.05) == 0.04999999999999996``), so a strict ``>=``
+# against the frozen constant would EXCLUDE a shift sitting exactly on the
+# frozen bar, which step 5 ("at least 0.05 dex") counts as affected. The
+# comparison is therefore made in dex space against the exact frozen
+# constant plus this ulp-scale floor — never by round-tripping through a
+# ``10**0.05`` ratio, whose own float error is what broke the boundary.
+#
+# The tolerance is ULP-BOUNDED, not an absolute epsilon. An earlier fix used an
+# absolute 1e-12 dex floor; a closing pass showed that is ~144,000 ulps of 0.05,
+# so it admitted genuinely sub-threshold shifts (0.05 - 5e-13 and 0.05 - 9e-13
+# both classified as affected). That is the opposite error from the original
+# defect: the original excluded the exact boundary, the over-wide floor included
+# values below it.
+#
+# The slack is sized from a measurement, not chosen by feel. Sweeping the
+# 10**x -> log10 round trip over 20k points either side of the bar gives a
+# worst-case error of 6.0 ulps of 0.05 (the exact-0.05 case is itself 6.0 ulps
+# low, landing on 0.04999999999999996). The nearest margin that must still be
+# REJECTED is 5e-13 dex, which is 7.2e4 ulps below the bar. Any slack between
+# ~8 and ~1e4 ulps therefore separates them; 16 gives 2.7x headroom over the
+# measured error while staying ~4500x below the smallest real margin, so it
+# cannot reclassify a physically distinguishable shift.
+_DEX_BOUNDARY_ULP_SLACK = 16
+_DEX_BOUNDARY_NOISE_FLOOR_DEX = _DEX_BOUNDARY_ULP_SLACK * math.ulp(AFFECTED_THRESHOLD_DEX)
 S_SHIFT_UNIT_DEX = 0.1
 BOOTSTRAP_SEED = 649013
 BOOTSTRAP_REPLICATES = 10_000
@@ -411,35 +439,34 @@ def delta_c(y_perturbed: float, y_control: float) -> float:
 def channel_shift(response: ChannelResponse) -> ChannelShift | None:
     """Shift record for one channel, or ``None`` when uncomputable.
 
-    A channel is computable when its control cell and at least one signed
-    perturbation cell are present; the shift is the larger signed-magnitude
-    ``delta_c`` across the available perturbations. A missing sign rides
-    the record as a typed ``(cell, reason)`` pair in ``missing_signs`` and
-    counts toward released typed missing counts; missing cells are never
+    A channel is computable only when its control cell AND BOTH signed
+    perturbation cells are present: step 5 measures the larger
+    signed-magnitude shift "across the two perturbations", so a channel
+    with one typed-missing sign is MISSING, not affected (AMBIGUITY A-16 —
+    one signed response is never silently sufficient). Its typed missing
+    cells still count toward released typed missing counts and are never
     imputed zero.
     """
     if response.missing is not None or response.y_control is None:
         return None
-    reasons = dict(response.missing_cells or {})
-    deltas: dict[str, float] = {}
-    if response.y_plus is not None:
-        deltas["delta_plus"] = delta_c(response.y_plus, response.y_control)
-    if response.y_minus is not None:
-        deltas["delta_minus"] = delta_c(response.y_minus, response.y_control)
-    if not deltas:
+    if response.y_plus is None or response.y_minus is None:
         return None
-    missing_signs = tuple(
-        (name, reasons[name]) for name in ("y_plus", "y_minus") if name in reasons
-    )
-    shift = max(abs(value) for value in deltas.values())
+    delta_plus = delta_c(response.y_plus, response.y_control)
+    delta_minus = delta_c(response.y_minus, response.y_control)
+    shift = max(abs(delta_plus), abs(delta_minus))
     return ChannelShift(
         cluster_id=response.cluster_id,
         channel=response.channel,
-        delta_plus=deltas.get("delta_plus"),
-        delta_minus=deltas.get("delta_minus"),
+        delta_plus=delta_plus,
+        delta_minus=delta_minus,
         shift_dex=shift,
-        affected=shift >= AFFECTED_THRESHOLD_DEX,
-        missing_signs=missing_signs,
+        affected=shift >= AFFECTED_THRESHOLD_DEX
+        or math.isclose(
+            shift,
+            AFFECTED_THRESHOLD_DEX,
+            rel_tol=0.0,
+            abs_tol=_DEX_BOUNDARY_NOISE_FLOOR_DEX,
+        ),
     )
 
 

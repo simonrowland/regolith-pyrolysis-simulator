@@ -18,6 +18,7 @@ import pytest
 
 from benchmarks.w0_sens.driver import (
     AFFECTED_THRESHOLD_DEX,
+    _DEX_BOUNDARY_NOISE_FLOOR_DEX,
     BOOTSTRAP_PERCENTILES,
     BOOTSTRAP_REPLICATES,
     BOOTSTRAP_SEED,
@@ -145,21 +146,50 @@ def test_delta_c_exact() -> None:
     assert delta_c(0.5, 2.0) == pytest.approx(-math.log10(4.0))
 
 
-def test_affected_threshold_is_inclusive_at_0_05_dex(monkeypatch) -> None:
+def test_affected_threshold_is_inclusive_at_0_05_dex() -> None:
     over = channel_shift(_shifted("src-a", "comp-1", "activity:X", 0.0500001))
     under = channel_shift(_shifted("src-a", "comp-1", "activity:X", 0.0499999))
     assert over is not None and over.affected is True
     assert under is not None and under.affected is False
-    # The log10 round trip lands a nominal 0.05 dex shift a few ulps below
-    # the float 0.05; pin inclusivity by comparing at the computed value.
+    # The boundary is INCLUSIVE at the REAL frozen threshold: the log10
+    # round trip lands a nominal 0.05 dex shift a few ulps below the float
+    # 0.05 (0.04999999999999996), and step 5's "at least 0.05 dex" still
+    # counts it. No threshold is moved to make this pass.
+    assert AFFECTED_THRESHOLD_DEX == 0.05
     on = channel_shift(_shifted("src-a", "comp-1", "activity:X", 0.05))
-    assert on is not None and on.shift_dex == pytest.approx(0.05)
-    monkeypatch.setattr(
-        "benchmarks.w0_sens.driver.AFFECTED_THRESHOLD_DEX", on.shift_dex
-    )
-    assert channel_shift(
-        _shifted("src-a", "comp-1", "activity:X", 0.05)
-    ).affected is True
+    assert on is not None
+    assert on.shift_dex == pytest.approx(0.05)
+    assert on.affected is True
+    # The noise floor is ulp-scale only: a shift a distinguishable margin
+    # below the bar is NOT affected.
+    below = channel_shift(_shifted("src-a", "comp-1", "activity:X", 0.05 - 1.0e-9))
+    assert below is not None and below.affected is False
+
+
+def test_near_below_boundary_is_not_affected() -> None:
+    """Regression: the tolerance must not admit sub-threshold shifts.
+
+    An earlier fix of the exclusive-boundary defect used an absolute 1e-12 dex
+    floor, which is ~144,000 ulps of 0.05 and classified both of the margins
+    below as affected. These are the two counterexamples that found it. They
+    are genuinely below the bar -- 10**(0.05-5e-13) and 10**0.05 differ by
+    thousands of float ulps, so no round trip can confuse them -- and the
+    threshold stays at the frozen 0.05 rather than being moved to pass.
+    """
+    assert AFFECTED_THRESHOLD_DEX == 0.05
+    for margin in (5.0e-13, 9.0e-13, 1.0e-12, 1.0e-11):
+        shift = channel_shift(_shifted("src-a", "comp-1", "activity:X", 0.05 - margin))
+        assert shift is not None, margin
+        assert shift.affected is False, f"0.05 - {margin} must be below the bar"
+    # ...while the exact boundary and its own representation error still pass.
+    for value in (0.05, math.nextafter(0.05, 0.0), math.nextafter(0.05, 1.0)):
+        shift = channel_shift(_shifted("src-a", "comp-1", "activity:X", value))
+        assert shift is not None and shift.affected is True, value
+    # The tolerance is derived from the threshold, not a hand-picked epsilon,
+    # and stays inside the gap between the measured 6-ulp round-trip error and
+    # the 7.2e4-ulp nearest margin that must be rejected.
+    assert _DEX_BOUNDARY_NOISE_FLOOR_DEX == 16 * math.ulp(AFFECTED_THRESHOLD_DEX)
+    assert 8 * math.ulp(0.05) <= _DEX_BOUNDARY_NOISE_FLOOR_DEX <= 1.0e4 * math.ulp(0.05)
 
 
 def test_larger_signed_magnitude_across_both_signs_governs() -> None:
@@ -301,18 +331,33 @@ def test_missing_cells_are_never_imputed_zero() -> None:
     )
     assert channel_shift(typed_missing) is None
     assert channel_shift(control_missing) is None
-    shift = channel_shift(sign_missing)
-    assert shift is not None and shift.delta_plus is None
-    assert shift.shift_dex == pytest.approx(0.06)
+    # A-16: one typed-missing sign makes the channel MISSING, not affected.
+    assert channel_shift(sign_missing) is None
 
     metrics = compute_join_metrics(
         [typed_missing, control_missing, sign_missing], evidence_grade=2
     )
-    assert metrics.C == 1
-    assert metrics.R_measured == pytest.approx(2 * (1 * 0.6))
+    assert metrics.C == 0
+    assert metrics.R_measured == 0.0
     # Cell-level typed missing counts: 3 (whole channel) + 1 (control) + 1
     # (sign). Partial missingness is never dropped from the released counts.
     assert metrics.n_missing == 5
+
+
+def test_one_signed_response_is_missing_not_affected() -> None:
+    """Review MEDIUM-5 / AMBIGUITY A-16: "across the two perturbations"
+    requires BOTH signed responses; a single sign clearing the bar — even
+    by a wide margin — yields a missing channel, never an affected one.
+    """
+    response = _response(
+        "src-a", "comp-1", "activity:X", 1.0, 10.0**0.06, None,
+        missing_cells={"y_minus": "engine_refused"},
+    )
+    assert channel_shift(response) is None
+    metrics = compute_join_metrics([response], evidence_grade=3)
+    assert metrics.C == 0
+    assert metrics.R_measured == 0.0
+    assert metrics.n_missing == 1  # the typed missing sign still counts
 
 
 def test_missing_sign_carries_a_typed_reason() -> None:
@@ -321,12 +366,11 @@ def test_missing_sign_carries_a_typed_reason() -> None:
         missing_cells={"y_minus": "engine_refused"},
     )
     assert response.typed_missing_cells() == (("y_minus", "engine_refused"),)
-    shift = channel_shift(response)
-    assert shift is not None
-    assert shift.missing_signs == (("y_minus", "engine_refused"),)
-    assert shift.delta_minus is None
-    assert shift.shift_dex == pytest.approx(0.07)
+    # A-16: the channel is missing (uncomputable), not affected — but its
+    # typed missing sign is retained and counted, never imputed zero.
+    assert channel_shift(response) is None
     metrics = compute_join_metrics([response], evidence_grade=3)
+    assert metrics.C == 0
     assert metrics.n_missing == 1
 
 
