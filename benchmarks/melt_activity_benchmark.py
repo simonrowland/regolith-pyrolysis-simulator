@@ -67,6 +67,11 @@ DEFAULT_ENGINES = (
     "thermoengine",
     "vaporock",
 )
+# Rail-owned MELTS SiO2 trust window. Default matches the historical
+# engine-imposed [30, 80] so coverage goldens stay put. This is not the
+# adapter's two-component alkali-silica crash guard.
+DEFAULT_MELTS_SILICATE_NETWORK_BAND_WT_PCT = (30.0, 80.0)
+VAPOROCK_PRESSURE_OBSERVABLES = frozenset({"partial_pressure", "evaporation_flux"})
 SF04_ANCHOR_SPECIES = ("SiO2", "FeO", "Fe", "Mg", "SiO", "K", "Na", "O2")
 SF04_SHEET_COMPOSITIONS = {
     "tho": "sf04_tholeiite",
@@ -95,6 +100,7 @@ class EngineResult:
     gammas: Mapping[str, float] = field(default_factory=dict)
     reason: str = ""
     details: Mapping[str, Any] = field(default_factory=dict)
+    partial_pressures: Mapping[str, float] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         if self.status not in POINT_STATUSES:
@@ -472,8 +478,17 @@ class AlphaMeltsEngine:
 
     name = "alphamelts"
 
-    def __init__(self, timeout_s: float = 30.0) -> None:
+    def __init__(
+        self,
+        timeout_s: float = 30.0,
+        silicate_network_band: tuple[float, float] | None = None,
+    ) -> None:
         self.timeout_s = float(timeout_s)
+        self.silicate_network_band = (
+            DEFAULT_MELTS_SILICATE_NETWORK_BAND_WT_PCT
+            if silicate_network_band is None
+            else (float(silicate_network_band[0]), float(silicate_network_band[1]))
+        )
         self._provider: Any | None = None
         self._initialization_error = ""
 
@@ -620,13 +635,24 @@ class AlphaMeltsEngine:
         del temperature_K
         from engines.alphamelts.domain import AlphaMELTSDomainGate
 
-        valid, warnings, reason = AlphaMELTSDomainGate.validate_with_reason(
-            composition_wt_pct
+        assessment = AlphaMELTSDomainGate.assess(
+            composition_wt_pct,
+            silicate_network_band=self.silicate_network_band,
         )
         return EngineResult(
-            status="ok" if valid else "out_of_domain",
-            reason="" if valid else _reason_line("; ".join(warnings)),
-            details={"domain_reason": reason},
+            status="ok" if assessment.valid else "out_of_domain",
+            reason=(
+                ""
+                if assessment.valid
+                else _reason_line("; ".join(assessment.warnings))
+            ),
+            details={
+                "domain_reason": assessment.reason,
+                "failed_constraints": list(assessment.failed_constraints),
+                "silicate_network_band_wt_pct": list(
+                    assessment.silicate_network_band_wt_pct
+                ),
+            },
         )
 
 
@@ -658,16 +684,22 @@ class ThermoEngineMeltActivityEngine(AlphaMeltsEngine):
 
 
 class VapoRockEngine:
-    """VapoRock availability reporter for the activity-only comparison."""
+    """VapoRock vapour-pressure (offgas) leg.
+
+    VapoRock emits log10 partial pressures, not per-oxide melt
+    activities. Activity/gamma calls are typed as a missing observable
+    without asking the library for a quantity it does not produce.
+    """
 
     name = "vaporock"
 
     def __init__(self) -> None:
-        self._availability_result: tuple[bool, str] | None = None
+        self._backend: Any | None = None
+        self._initialization_error = ""
 
-    def _availability(self) -> tuple[bool, str]:
-        if self._availability_result is not None:
-            return self._availability_result
+    def _initialize(self) -> Any | None:
+        if self._backend is not None or self._initialization_error:
+            return self._backend
         try:
             from simulator.melt_backend.vaporock import VapoRockBackend
 
@@ -675,11 +707,13 @@ class VapoRockEngine:
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
                 available = bool(backend.initialize({}))
-            backend.close()
-            self._availability_result = (available, "")
+            if not available:
+                self._initialization_error = "VapoRock backend unavailable"
+                return None
+            self._backend = backend
         except Exception as exc:
-            self._availability_result = (False, _reason_line(exc))
-        return self._availability_result
+            self._initialization_error = _reason_line(exc)
+        return self._backend
 
     def evaluate(
         self,
@@ -687,18 +721,89 @@ class VapoRockEngine:
         temperature_K: float,
         fO2_bar: float | None,
     ) -> EngineResult:
-        del composition_wt_pct, temperature_K, fO2_bar
-        available, error = self._availability()
-        reason = (
-            "VapoRock dependency is present but exposes no public per-oxide "
-            "melt-activity surface; internally coupled gas pressures are excluded"
-            if available
-            else f"VapoRock unavailable: {error or 'initialization failed'}"
+        backend = self._initialize()
+        if backend is None:
+            return EngineResult(
+                status="unavailable",
+                reason=f"VapoRock unavailable: {self._initialization_error}",
+                details={"dependency_available": False},
+            )
+        if fO2_bar is None:
+            return EngineResult(
+                status="ok",
+                reason=(
+                    "VapoRock emits log10 partial pressures, not per-oxide "
+                    "melt activities"
+                ),
+                details={
+                    "dependency_available": True,
+                    "observable_family": "partial_pressure",
+                    "observable_supported": False,
+                    "finite_prediction": False,
+                    "execution_status": "completed_without_observable",
+                },
+            )
+        if float(fO2_bar) <= 0.0 or not math.isfinite(float(fO2_bar)):
+            return EngineResult(
+                status="refused",
+                reason="VapoRock vapour-pressure solve requires a positive finite fO2 pin",
+                details={
+                    "dependency_available": True,
+                    "observable_family": "partial_pressure",
+                    "observable_supported": True,
+                },
+            )
+        result = backend.equilibrate(
+            temperature_C=float(temperature_K) - 273.15,
+            composition_kg={
+                str(oxide): float(wt) for oxide, wt in composition_wt_pct.items()
+            },
+            fO2_log=math.log10(float(fO2_bar)),
+            pressure_bar=1.0e-6,
         )
+        raw_status = str(result.status)
+        pressures = _positive_finite(
+            getattr(result, "vaporock_full_speciation_Pa", None)
+            or result.vapor_pressures_Pa
+            or {}
+        )
+        details = {
+            "dependency_available": True,
+            "observable_family": "partial_pressure",
+            "observable_supported": True,
+            "finite_prediction": bool(pressures),
+            "backend_status": raw_status,
+            "units": "Pa",
+            "source": "vaporock_eval_gas_abundances",
+        }
+        if raw_status == "unavailable":
+            return EngineResult(
+                status="unavailable",
+                reason=_reason_line("; ".join(result.warnings)),
+                details=details,
+            )
+        if raw_status == "out_of_domain":
+            return EngineResult(
+                status="out_of_domain",
+                reason=_reason_line("; ".join(result.warnings)),
+                details=details,
+            )
+        if raw_status not in {"ok", "non_authoritative"}:
+            return EngineResult(
+                status="refused",
+                reason=_reason_line(
+                    f"provider status {raw_status}: {'; '.join(result.warnings)}"
+                ),
+                details=details,
+            )
         return EngineResult(
-            status="unavailable",
-            reason=reason,
-            details={"dependency_available": available},
+            status="ok",
+            partial_pressures=pressures,
+            details={
+                **details,
+                "execution_status": "converged",
+                "species": sorted(pressures),
+            },
         )
 
     def coverage(
@@ -730,7 +835,10 @@ def build_engines(
             "imcc-ext", _repo_path(packs["imcc-ext"]), published=False
         ),
         "internal_analytic": InternalAnalyticalEngine,
-        "alphamelts": lambda: AlphaMeltsEngine(timeout_s=alphamelts_timeout_s),
+        "alphamelts": lambda: AlphaMeltsEngine(
+            timeout_s=alphamelts_timeout_s,
+            silicate_network_band=DEFAULT_MELTS_SILICATE_NETWORK_BAND_WT_PCT,
+        ),
         "thermoengine": lambda: ThermoEngineMeltActivityEngine(
             timeout_s=alphamelts_timeout_s
         ),
@@ -740,6 +848,35 @@ def build_engines(
     if unknown:
         raise ValueError(f"unknown engines: {', '.join(unknown)}")
     return [constructors[name]() for name in names]
+
+
+def _native_partial_pressure_pa(
+    result: EngineResult, species: str
+) -> float | None:
+    pressures = result.partial_pressures or {}
+    if species in pressures:
+        return float(pressures[species])
+    namespaced = f"{species}_gas"
+    if namespaced in pressures:
+        return float(pressures[namespaced])
+    return None
+
+
+def _hertz_knudsen_flux_mol_m2_s(
+    pressure_pa: float, species: str, temperature_K: float
+) -> float:
+    from simulator.accounting.formulas import resolve_species_formula
+    from simulator.physical_constants import GAS_CONSTANT
+
+    molar_mass = resolve_species_formula(species).molar_mass_kg_per_mol()
+    # Premise: Hertz–Knudsen molar flux into vacuum is
+    # J = P / sqrt(2 π M R T). Algebra: P has units kg m^-1 s^-2;
+    # sqrt(M R T) = sqrt((kg/mol)·(J mol^-1 K^-1)·K) = kg m s^-1 mol^-1;
+    # so J has units mol m^-2 s^-1. Sanity: flux rises with P and falls
+    # with sqrt(T); this is the same form as the shared analytical path.
+    return pressure_pa / math.sqrt(
+        2.0 * math.pi * molar_mass * GAS_CONSTANT * float(temperature_K)
+    )
 
 
 def _prediction_for_point(
@@ -754,6 +891,20 @@ def _prediction_for_point(
     elif observable == "activity_coefficient":
         value = result.gammas.get(parent)
     elif observable in {"partial_pressure", "evaporation_flux"}:
+        native_pa = _native_partial_pressure_pa(result, str(point["species"]))
+        if native_pa is not None:
+            value = (
+                native_pa
+                if observable == "partial_pressure"
+                else _hertz_knudsen_flux_mol_m2_s(
+                    native_pa, str(point["species"]), float(point["temperature_K"])
+                )
+            )
+            if value is None or not math.isfinite(float(value)) or float(value) <= 0.0:
+                return None, (
+                    f"engine returned no positive {observable} for {parent}"
+                )
+            return float(value), ""
         if "fO2_bar" not in point:
             return None, "gas comparison refused: observation has no independent fO2 pin"
         try:
@@ -775,14 +926,10 @@ def _prediction_for_point(
             if observable == "partial_pressure":
                 value = pressure_pa
             else:
-                from simulator.accounting.formulas import resolve_species_formula
-                from simulator.physical_constants import GAS_CONSTANT
-
-                molar_mass = resolve_species_formula(
-                    str(point["species"])
-                ).molar_mass_kg_per_mol()
-                value = pressure_pa / math.sqrt(
-                    2.0 * math.pi * molar_mass * GAS_CONSTANT * float(point["temperature_K"])
+                value = _hertz_knudsen_flux_mol_m2_s(
+                    pressure_pa,
+                    str(point["species"]),
+                    float(point["temperature_K"]),
                 )
         except Exception as exc:
             return None, f"shared gas layer refused: {_reason_line(exc)}"
@@ -797,6 +944,8 @@ def _prediction_for_point(
                 f"{', '.join(str(label) for label in unmapped_labels)}; "
                 f"no authoritative {parent} basis conversion"
             )
+        if result.details.get("observable_supported") is False and result.reason:
+            return None, result.reason
         return None, f"engine returned no positive {observable} for {parent}"
     return float(value), ""
 
@@ -1456,7 +1605,18 @@ def generate_report(
         "| Species | Observable | Engine | n | RMSE (dex) | Median residual | ok | OOD | crash | refused | observable unavailable | unavailable |",
         "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
     ]
+    activity_metrics = []
+    vaporock_pressure_metrics = []
     for row in metrics:
+        if (
+            row["engine"] == "vaporock"
+            and row["observable"] not in VAPOROCK_PRESSURE_OBSERVABLES
+        ):
+            continue
+        if row["engine"] == "vaporock":
+            vaporock_pressure_metrics.append(row)
+        activity_metrics.append(row)
+    for row in activity_metrics:
         lines.append(
             "| {species} | {observable} | {engine} | {scored_count} | {rmse} | {median} | {ok} | {ood} | {crash} | {refused} | {observable_unavailable} | {unavailable} |".format(
                 **row,
@@ -1694,6 +1854,50 @@ def generate_report(
                     **row
                 )
             )
+    if "vaporock" in present_engines:
+        vaporock_pp = [
+            row
+            for row in point_rows
+            if row["engine"] == "vaporock"
+            and row["observable"] == "partial_pressure"
+        ]
+        vaporock_scored = [
+            row for row in vaporock_pp if row.get("residual_dex") is not None
+        ]
+        lines.extend(
+            [
+                "",
+                "## VapoRock vapour-pressure leg",
+                "",
+                "VapoRock is scored on native log10 partial pressures converted to Pa, "
+                "not on per-oxide melt activities. Activity and gamma points are omitted "
+                "from the comparison table rather than reported as a dead activity engine.",
+                "",
+                f"Partial-pressure points: **{len(vaporock_scored)} scored / "
+                f"{len(vaporock_pp)} planned**.",
+            ]
+        )
+        if vaporock_pressure_metrics:
+            lines.extend(
+                [
+                    "",
+                    "| Species | n | RMSE (dex) | Median residual | ok | OOD | refused |",
+                    "|---|---:|---:|---:|---:|---:|---:|",
+                ]
+            )
+            for row in vaporock_pressure_metrics:
+                if row["observable"] != "partial_pressure":
+                    continue
+                lines.append(
+                    "| {species} | {scored_count} | {rmse} | {median} | {ok} | {ood} | {refused} |".format(
+                        **row,
+                        rmse=_fmt(row["rmse_dex"]),
+                        median=_fmt(row["median_signed_residual_dex"]),
+                        ok=row["ok_count"],
+                        ood=row["out_of_domain_count"],
+                        refused=row["refused_count"],
+                    )
+                )
     lines.extend(
         [
             "",
@@ -1703,13 +1907,16 @@ def generate_report(
             "- Richter-2007 is an in-domain Type-B CAI-like CMAS melt, not a literal basalt; its six gamma targets are reported separately.",
             "- Four OCR-digitized Richter Mg flux points are retained but refused for scoring because no independent experimental fO2 pin closes the gas/reference-state comparison.",
             "- KEMS-008 Table 10 values are kinetic vaporization coefficients, not basalt melt activities.",
-            "- Every scored gas observable uses the fixture's pinned fO2 and the shared tracked analytical gas layer. Parent-formula activities are converted to the rail's single-cation component basis first; internally coupled engine gas pressures are excluded.",
+            "- Melt-activity engines score gas observables through the fixture's pinned fO2 and the shared tracked analytical gas layer. Parent-formula activities are converted to the rail's single-cation component basis first. VapoRock is the exception: it is scored on its native offgas partial pressures, not on a derived activity surface.",
             "- Activity coefficients are reported as `gamma = a/x` on the parent-oxide formula-unit basis. The internal analytical adapter converts its native single-cation activity and mole-fraction provenance before comparison.",
         ]
     )
     if "vaporock" in present_engines:
         lines.append(
-            "- VapoRock currently exposes no public per-oxide melt-activity surface, so its internally coupled gas results are excluded from the activity-only swap; its separate frozen MAGMA/KEMS and optional live-snapshot diagnostics remain reported."
+            "- VapoRock is a vapour-pressure / offgas engine: native partial "
+            "pressures are scored on their own leg. Activity/gamma points stay "
+            "unasked (`observable_unavailable`). Frozen MAGMA/KEMS and the "
+            "live-versus-frozen drift check remain."
         )
     if "alphamelts" in present_engines:
         lines.append(

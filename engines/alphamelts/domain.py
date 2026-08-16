@@ -22,7 +22,8 @@ kernel planner / provider can decide whether to surface
 from __future__ import annotations
 
 import re
-from typing import Dict, Iterable, List, Mapping, Tuple
+from dataclasses import dataclass
+from typing import Dict, Iterable, List, Mapping, Sequence, Tuple
 
 from engines.domain_reason import OutOfDomainReason, reason_value
 
@@ -46,17 +47,63 @@ _OXIDE_ALIASES.update({
     'feototal': 'FeO_total',
     'feo_tot': 'FeO_total',
 })
-# Tolerance constants. Match the AlphaMELTS adapter DomainGate values. The
-# MELTS binding spec uses a strict silicate-network admission criterion:
-# major oxide sum must be >95.0 wt%, so an exact 95.0 wt% boundary is rejected.
-_SIO2_MIN_WT_PCT = 30.0
-_SIO2_MAX_WT_PCT = 80.0
+# Default SiO2 calibration band. This is a trust window, not a crash
+# guard: outside it MELTS can still compute, but the rail does not fully
+# trust the extrapolation. The two-component alkali-silica SIGSEGV guard
+# lives in the adapter and stays hard-coded. The rail owns this band and
+# may pass a different interval; the default keeps current goldens.
+DEFAULT_SIO2_MIN_WT_PCT = 30.0
+DEFAULT_SIO2_MAX_WT_PCT = 80.0
+DEFAULT_SILICATE_NETWORK_BAND_WT_PCT: Tuple[float, float] = (
+    DEFAULT_SIO2_MIN_WT_PCT,
+    DEFAULT_SIO2_MAX_WT_PCT,
+)
 _MAJOR_OXIDE_MIN_TOTAL_WT_PCT = 95.0
+
+CONSTRAINT_OXIDE_BASIS = 'oxide_basis'
+CONSTRAINT_SILICATE_NETWORK_BAND = 'silicate_network_band'
+CONSTRAINT_MAJOR_OXIDE_SUM = 'major_oxide_sum'
 
 # Halides / sulfur that, if encountered as elements in a species name,
 # disqualify the species outright (mirrors
 # ``alphamelts._is_non_oxide_species_name``).
 _NON_OXIDE_ELEMENT_FLAGS = frozenset({'Cl', 'F', 'Br', 'I', 'S'})
+
+
+@dataclass(frozen=True)
+class DomainGateAssessment:
+    """Structured domain-gate result, including every failed constraint."""
+
+    valid: bool
+    warnings: Tuple[str, ...]
+    reason: str | None
+    failed_constraints: Tuple[str, ...]
+    silicate_network_band_wt_pct: Tuple[float, float]
+
+
+def _resolve_silicate_network_band(
+    silicate_network_band: Sequence[float] | None,
+) -> Tuple[float, float]:
+    if silicate_network_band is None:
+        return DEFAULT_SILICATE_NETWORK_BAND_WT_PCT
+    if len(silicate_network_band) != 2:
+        raise ValueError(
+            'silicate_network_band must be a (min_wt_pct, max_wt_pct) pair'
+        )
+    minimum = float(silicate_network_band[0])
+    maximum = float(silicate_network_band[1])
+    if (
+        minimum != minimum
+        or maximum != maximum
+        or minimum in (float('inf'), float('-inf'))
+        or maximum in (float('inf'), float('-inf'))
+        or minimum > maximum
+    ):
+        raise ValueError(
+            'silicate_network_band must be a finite min<=max wt% interval, '
+            f'got {tuple(silicate_network_band)!r}'
+        )
+    return (minimum, maximum)
 
 
 class AlphaMELTSDomainGate:
@@ -75,9 +122,10 @@ class AlphaMELTSDomainGate:
        basis); the redox enforcement is performed by
        ``AlphaMELTSBackend._normalize_composition_to_melts_basis`` which
        raises if FeO_total is supplied without an explicit redox policy.
-    3. **Silicate-network criteria** — SiO2 in [30, 80] wt%; sum of
-       major oxides > 95 wt%. Outside this range MELTS extrapolations
-       are physically meaningless.
+    3. **Silicate-network criteria** — SiO2 inside the rail-owned
+       calibration band (default [30, 80] wt%); sum of major oxides
+       > 95 wt%. The band is a trust window the caller controls, not an
+       engine crash guard.
     4. **Composition-only gate** — operating-point checks live at the
        transport/provider layer where temperature and pressure are available.
        This validator has no T/P inputs and must not claim to certify them.
@@ -90,6 +138,8 @@ class AlphaMELTSDomainGate:
     @staticmethod
     def validate(
         composition_wt_pct: Mapping[str, float],
+        *,
+        silicate_network_band: Sequence[float] | None = None,
     ) -> Tuple[bool, List[str]]:
         """Validate ``composition_wt_pct`` against the MELTS 14-oxide basis.
 
@@ -100,30 +150,64 @@ class AlphaMELTSDomainGate:
             silicate-oxide melt projection (``MeltState.composition_wt_pct``
             or the kernel's account-view oxide projection). Non-oxide
             species in this mapping are treated as a domain violation.
+        silicate_network_band:
+            Rail-owned ``(min, max)`` SiO2 wt% interval. ``None`` uses
+            :data:`DEFAULT_SILICATE_NETWORK_BAND_WT_PCT` ([30, 80]).
 
         Returns
         -------
         ``(valid, warnings)`` -- ``valid`` is ``True`` iff every check
         passed; ``warnings`` lists the human-readable rejection reasons.
         """
-        valid, warnings, _reason = AlphaMELTSDomainGate.validate_with_reason(
-            composition_wt_pct
+        assessment = AlphaMELTSDomainGate.assess(
+            composition_wt_pct,
+            silicate_network_band=silicate_network_band,
         )
-        return valid, warnings
+        return assessment.valid, list(assessment.warnings)
 
     @staticmethod
     def validate_with_reason(
         composition_wt_pct: Mapping[str, float],
+        *,
+        silicate_network_band: Sequence[float] | None = None,
     ) -> Tuple[bool, List[str], str | None]:
         """Validate and return the structured out-of-domain reason code."""
+        assessment = AlphaMELTSDomainGate.assess(
+            composition_wt_pct,
+            silicate_network_band=silicate_network_band,
+        )
+        return assessment.valid, list(assessment.warnings), assessment.reason
+
+    @staticmethod
+    def assess(
+        composition_wt_pct: Mapping[str, float],
+        *,
+        silicate_network_band: Sequence[float] | None = None,
+    ) -> DomainGateAssessment:
+        """Validate and report every failed constraint by name.
+
+        ``failed_constraints`` distinguishes the rail-owned silicate-
+        network band from the oxide-basis and major-oxide-sum checks.
+        ``reason`` keeps the existing first-wins ``OutOfDomainReason``
+        token so current callers stay golden-neutral.
+        """
+        band = _resolve_silicate_network_band(silicate_network_band)
+        sio2_min_wt_pct, sio2_max_wt_pct = band
         warnings: List[str] = []
+        failed: List[str] = []
         reason: OutOfDomainReason | None = None
 
         if not composition_wt_pct:
             warnings.append(
                 'AlphaMELTSDomainGate: empty composition; cannot equilibrate.'
             )
-            return False, warnings, OutOfDomainReason.MAJOR_SUM.value
+            return DomainGateAssessment(
+                valid=False,
+                warnings=tuple(warnings),
+                reason=OutOfDomainReason.MAJOR_SUM.value,
+                failed_constraints=(CONSTRAINT_MAJOR_OXIDE_SUM,),
+                silicate_network_band_wt_pct=band,
+            )
 
         canonical_wt: Dict[str, float] = {}
         non_oxides: List[str] = []
@@ -143,6 +227,8 @@ class AlphaMELTSDomainGate:
                 continue
             if wt < 0.0:
                 reason = reason or OutOfDomainReason.MAJOR_SUM
+                if CONSTRAINT_MAJOR_OXIDE_SUM not in failed:
+                    failed.append(CONSTRAINT_MAJOR_OXIDE_SUM)
                 warnings.append(
                     f'AlphaMELTSDomainGate: negative wt% for {raw_name!r}'
                 )
@@ -168,6 +254,7 @@ class AlphaMELTSDomainGate:
 
         if non_oxides:
             reason = OutOfDomainReason.FORBIDDEN_SPECIES
+            failed.append(CONSTRAINT_OXIDE_BASIS)
             warnings.append(
                 'AlphaMELTSDomainGate: non-oxide species present '
                 f'(metal / sulfide / halide -- must route through Stage 0 '
@@ -175,18 +262,21 @@ class AlphaMELTSDomainGate:
             )
         if unrecognised:
             reason = reason or OutOfDomainReason.FORBIDDEN_SPECIES
+            if CONSTRAINT_OXIDE_BASIS not in failed:
+                failed.append(CONSTRAINT_OXIDE_BASIS)
             warnings.append(
                 'AlphaMELTSDomainGate: unrecognised species outside MELTS '
                 f'14-oxide basis: {sorted(unrecognised)}'
             )
 
         sio2_pct = canonical_wt.get('SiO2', 0.0)
-        if sio2_pct < _SIO2_MIN_WT_PCT or sio2_pct > _SIO2_MAX_WT_PCT:
+        if sio2_pct < sio2_min_wt_pct or sio2_pct > sio2_max_wt_pct:
             reason = reason or OutOfDomainReason.SILICATE_WINDOW
+            failed.append(CONSTRAINT_SILICATE_NETWORK_BAND)
             warnings.append(
                 f'AlphaMELTSDomainGate: SiO2 = {sio2_pct:.3f} wt% outside '
                 f'MELTS calibration range '
-                f'[{_SIO2_MIN_WT_PCT}, {_SIO2_MAX_WT_PCT}] wt%.'
+                f'[{sio2_min_wt_pct}, {sio2_max_wt_pct}] wt%.'
             )
 
         # Major oxide sum: MELTS 14-oxide basis members plus FeO_total.
@@ -200,6 +290,8 @@ class AlphaMELTSDomainGate:
         )
         if major_total <= _MAJOR_OXIDE_MIN_TOTAL_WT_PCT:
             reason = reason or OutOfDomainReason.MAJOR_SUM
+            if CONSTRAINT_MAJOR_OXIDE_SUM not in failed:
+                failed.append(CONSTRAINT_MAJOR_OXIDE_SUM)
             warnings.append(
                 f'AlphaMELTSDomainGate: major-oxide sum = {major_total:.3f} '
                 f'wt% <= {_MAJOR_OXIDE_MIN_TOTAL_WT_PCT} wt%; composition '
@@ -208,7 +300,15 @@ class AlphaMELTSDomainGate:
 
         if warnings and reason is None:
             reason = OutOfDomainReason.MAJOR_SUM
-        return (not warnings), warnings, reason_value(reason)
+            if CONSTRAINT_MAJOR_OXIDE_SUM not in failed:
+                failed.append(CONSTRAINT_MAJOR_OXIDE_SUM)
+        return DomainGateAssessment(
+            valid=not warnings,
+            warnings=tuple(warnings),
+            reason=reason_value(reason),
+            failed_constraints=tuple(failed),
+            silicate_network_band_wt_pct=band,
+        )
 
     @staticmethod
     def oxide_basis() -> Tuple[str, ...]:
@@ -323,6 +423,13 @@ def _safe_float(value: object) -> float:
 # Re-export the non-oxide detector so tests can pin it directly.
 __all__: Iterable[str] = (
     'AlphaMELTSDomainGate',
+    'CONSTRAINT_MAJOR_OXIDE_SUM',
+    'CONSTRAINT_OXIDE_BASIS',
+    'CONSTRAINT_SILICATE_NETWORK_BAND',
+    'DEFAULT_SILICATE_NETWORK_BAND_WT_PCT',
+    'DEFAULT_SIO2_MAX_WT_PCT',
+    'DEFAULT_SIO2_MIN_WT_PCT',
+    'DomainGateAssessment',
     'MELTS_OXIDE_BASIS',
     'canonical_melt_oxide_activity_name',
 )

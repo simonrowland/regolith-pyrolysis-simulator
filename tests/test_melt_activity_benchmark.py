@@ -566,6 +566,157 @@ def test_provider_crash_diagnostic_overrides_out_of_domain_status():
     assert "SIGSEGV" in result.reason
 
 
+def test_coverage_silicate_band_is_rail_owned():
+    composition = {"SiO2": 10.0, "MgO": 45.0, "FeO": 45.0}
+    default = benchmark.AlphaMeltsEngine()
+    widened = benchmark.AlphaMeltsEngine(silicate_network_band=(0.0, 100.0))
+
+    refused = default.coverage(composition, 1900.0)
+    admitted = widened.coverage(composition, 1900.0)
+
+    assert refused.status == "out_of_domain"
+    assert "silicate_network_band" in refused.details["failed_constraints"]
+    assert refused.details["silicate_network_band_wt_pct"] == [30.0, 80.0]
+    assert admitted.status == "ok"
+    assert admitted.details["failed_constraints"] == []
+
+
+def test_vaporock_activity_call_does_not_ask_the_library(monkeypatch):
+    calls = []
+
+    class _Backend:
+        def initialize(self, config):
+            del config
+            return True
+
+        def equilibrate(self, **kwargs):
+            calls.append(kwargs)
+            raise AssertionError("activity path must not call equilibrate")
+
+    monkeypatch.setattr(
+        "simulator.melt_backend.vaporock.VapoRockBackend",
+        lambda: _Backend(),
+    )
+    engine = benchmark.VapoRockEngine()
+    result = engine.evaluate({"SiO2": 50.0, "MgO": 50.0}, 1900.0, None)
+
+    assert result.status == "ok"
+    assert result.activities == {}
+    assert result.partial_pressures == {}
+    assert result.details["observable_supported"] is False
+    assert "partial pressures" in result.reason
+    assert calls == []
+
+
+def test_vaporock_evaluate_returns_native_partial_pressures(monkeypatch):
+    class _Result:
+        status = "ok"
+        warnings = ()
+        vapor_pressures_Pa = {"SiO": 0.11, "K": 2.5}
+        vaporock_full_speciation_Pa = {"SiO": 0.11, "K": 2.5, "O2": 0.5}
+
+    class _Backend:
+        def initialize(self, config):
+            del config
+            return True
+
+        def equilibrate(self, **kwargs):
+            assert kwargs["fO2_log"] == pytest.approx(-5.0)
+            return _Result()
+
+    monkeypatch.setattr(
+        "simulator.melt_backend.vaporock.VapoRockBackend",
+        lambda: _Backend(),
+    )
+    engine = benchmark.VapoRockEngine()
+    result = engine.evaluate({"SiO2": 50.0, "MgO": 50.0}, 1900.0, 1.0e-5)
+
+    assert result.status == "ok"
+    assert result.partial_pressures["SiO"] == pytest.approx(0.11)
+    assert result.activities == {}
+    assert result.details["observable_family"] == "partial_pressure"
+
+
+def test_vaporock_partial_pressure_is_scored_on_native_offgas():
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    point = next(
+        item
+        for item in fixture["points"]
+        if item["id"] == "hastie_sio_1907_796"
+    )
+    composition = benchmark._normalize_wt(
+        fixture["compositions"][point["composition_id"]]["composition_wt_pct"]
+    )
+    produced = benchmark.EngineResult(
+        status="ok",
+        partial_pressures={"SiO": 0.2, "K": 3.0},
+        details={"observable_family": "partial_pressure"},
+    )
+
+    prediction, reason = benchmark._prediction_for_point(
+        {**point, "composition_wt_pct": composition},
+        produced,
+    )
+
+    assert reason == ""
+    assert prediction == pytest.approx(0.2)
+
+
+def test_vaporock_activity_rows_are_typed_not_dead():
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    point = next(
+        item
+        for item in fixture["points"]
+        if item["observable"] == "activity"
+    )
+    fixture["points"] = [point]
+
+    class _Vaporock(benchmark.VapoRockEngine):
+        def evaluate(self, composition_wt_pct, temperature_K, fO2_bar):
+            assert fO2_bar is None
+            return super().evaluate(composition_wt_pct, temperature_K, fO2_bar)
+
+        def _initialize(self):
+            return object()
+
+    row = benchmark.run_points(fixture, [_Vaporock()])[0]
+
+    assert row["engine"] == "vaporock"
+    assert row["status"] == "observable_unavailable"
+    assert row["prediction"] is None
+    assert row["status"] != "unavailable"
+    assert "partial pressures" in row["reason"]
+
+
+def test_report_presents_vaporock_as_vapour_pressure_leg_not_empty_activity():
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    rows = [
+        {
+            "point_id": "hastie_sio_1907_796",
+            "species": "SiO",
+            "observable": "partial_pressure",
+            "engine": "vaporock",
+            "status": "ok",
+            "residual_dex": 0.05,
+        },
+        {
+            "point_id": "tsaplin_dummy",
+            "species": "Na",
+            "observable": "activity",
+            "engine": "vaporock",
+            "status": "observable_unavailable",
+            "residual_dex": None,
+        },
+    ]
+
+    report = benchmark.generate_report(fixture, rows, [], [])
+
+    assert "## VapoRock vapour-pressure leg" in report
+    assert "1 scored / 1 planned" in report
+    assert "| Na | activity | vaporock |" not in report
+    assert "| SiO | partial_pressure | vaporock | 1 |" in report
+
+
 def test_real_alphamelts_producer_types_unmapped_label_as_ok_not_refused():
     """The REAL AlphaMeltsEngine producer must emit ok/completed_without_observable
     when the engine computed an activity under an unmapped endmember label.
