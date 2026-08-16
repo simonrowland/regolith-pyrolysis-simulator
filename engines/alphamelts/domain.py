@@ -47,11 +47,28 @@ _OXIDE_ALIASES.update({
     'feototal': 'FeO_total',
     'feo_tot': 'FeO_total',
 })
-# Default SiO2 calibration band. This is a trust window, not a crash
-# guard: outside it MELTS can still compute, but the rail does not fully
-# trust the extrapolation. The two-component alkali-silica SIGSEGV guard
-# lives in the adapter and stays hard-coded. The rail owns this band and
-# may pass a different interval; the default keeps current goldens.
+# Default SiO2 calibration band. Within [CRASH_FLOOR, 100] it is a trust
+# window the rail owns; BELOW the floor it is not a trust question at all,
+# because the engine dies.
+#
+# MEASURED 2026-08-16 (docs-private/research/2026-08-16-rump-hotwire/report.md):
+# with the band lowered, alphaMELTS SIGABRTs on ALL 40 multi-component
+# sub-30 wt% points, in 2-4.5 s, reproduced in fresh isolated processes.
+# Alkali basalt, dunite and komatiite die at 34.0 wt%; tholeiite returns at
+# 33.96 (with no activities) and dies at 31.65. This was NOT the
+# two-component alkali-silica guard -- these are full multi-oxide rump
+# compositions, and the crash happens anyway.
+#
+# So the earlier comment here, that outside the band MELTS can still compute
+# and the rail merely distrusts it, is FALSE below the floor and has been
+# removed. A configurable band without a floor would let an operator set
+# 28 wt% on the strength of that claim and take a SIGABRT.
+#
+# The floor is set at the most conservative observed death (34.0), not the
+# most permissive (31.65): tholeiite survives slightly lower, but a floor
+# must hold for every composition the rail can present, and three of four
+# basalts die at 34.
+_SIO2_CRASH_FLOOR_WT_PCT = 34.0
 DEFAULT_SIO2_MIN_WT_PCT = 30.0
 DEFAULT_SIO2_MAX_WT_PCT = 80.0
 DEFAULT_SILICATE_NETWORK_BAND_WT_PCT: Tuple[float, float] = (
@@ -85,6 +102,14 @@ def _resolve_silicate_network_band(
     silicate_network_band: Sequence[float] | None,
 ) -> Tuple[float, float]:
     if silicate_network_band is None:
+        # The DEFAULT is grandfathered and deliberately NOT floor-checked.
+        # Note what that means: the default lower bound is 30.0, which is
+        # BELOW the measured 34.0 crash floor, so the default band admits a
+        # 30-34 wt% sliver in which three of four basalts SIGABRT. That is a
+        # PRE-EXISTING hazard, not one the rail-owned band introduced, and
+        # narrowing the default is golden-affecting -- it must be a separate,
+        # deliberate decision rather than a side effect of adding the floor.
+        # Filed rather than silently changed.
         return DEFAULT_SILICATE_NETWORK_BAND_WT_PCT
     if len(silicate_network_band) != 2:
         raise ValueError(
@@ -102,6 +127,25 @@ def _resolve_silicate_network_band(
         raise ValueError(
             'silicate_network_band must be a finite min<=max wt% interval, '
             f'got {tuple(silicate_network_band)!r}'
+        )
+    # Non-bypassable for an EXPLICIT band. Below the floor alphaMELTS SIGABRTs rather than
+    # returning a distrusted number, so this is doctrine category (1) -- the
+    # engine CANNOT compute -- not category (2) out-of-domain physics. It is
+    # the same class as the adapter's two-component SIGSEGV guard and is
+    # equally not a knob. Widening the band is a trust decision; lowering it
+    # past the floor is a crash.
+    # Passing the default explicitly must behave exactly like passing nothing;
+    # an API where the documented default is itself rejected is a trap.
+    if (minimum, maximum) == DEFAULT_SILICATE_NETWORK_BAND_WT_PCT:
+        return DEFAULT_SILICATE_NETWORK_BAND_WT_PCT
+    if minimum < _SIO2_CRASH_FLOOR_WT_PCT:
+        raise ValueError(
+            f'silicate_network_band lower bound {minimum} wt% is below the '
+            f'measured alphaMELTS crash floor of {_SIO2_CRASH_FLOOR_WT_PCT} '
+            'wt%. All 40 multi-component sub-30 wt% points SIGABRT '
+            '(2026-08-16 rump-hotwire); three of four basalts die at 34.0. '
+            'The rump is MELTS-INOPERABLE, not MELTS-untrusted -- route it '
+            'to IMCC, which returns on 38 of the same 40 points.'
         )
     return (minimum, maximum)
 
@@ -124,8 +168,9 @@ class AlphaMELTSDomainGate:
        raises if FeO_total is supplied without an explicit redox policy.
     3. **Silicate-network criteria** — SiO2 inside the rail-owned
        calibration band (default [30, 80] wt%); sum of major oxides
-       > 95 wt%. The band is a trust window the caller controls, not an
-       engine crash guard.
+       > 95 wt%. The band is a trust window the caller controls DOWN TO
+       the measured crash floor at 34.0 wt%; below that alphaMELTS
+       SIGABRTs and the band stops being a trust question.
     4. **Composition-only gate** — operating-point checks live at the
        transport/provider layer where temperature and pressure are available.
        This validator has no T/P inputs and must not claim to certify them.

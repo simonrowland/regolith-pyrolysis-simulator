@@ -43,27 +43,31 @@ def test_assess_default_band_is_golden_neutral_with_validate() -> None:
 
 
 def test_widened_rail_band_admits_low_silica_that_default_refuses() -> None:
-    composition = {"SiO2": 10.0, "MgO": 45.0, "FeO": 45.0}
+    # UPDATED 2026-08-16: was SiO2 10.0 with band (0, 100), which asserted the
+    # band could be opened down to 10 wt%. The rump-hotwire measurement showed
+    # alphaMELTS SIGABRTs there, so a sub-floor band is now refused outright.
+    # Widening is still real -- it just goes UPWARD from the default max.
+    composition = {"SiO2": 85.0, "MgO": 7.5, "FeO": 7.5}
     default = AlphaMELTSDomainGate.assess(composition)
     widened = AlphaMELTSDomainGate.assess(
-        composition, silicate_network_band=(0.0, 100.0)
+        composition, silicate_network_band=(34.0, 100.0)
     )
 
     assert default.valid is False
     assert CONSTRAINT_SILICATE_NETWORK_BAND in default.failed_constraints
     assert widened.valid is True
     assert widened.failed_constraints == ()
-    assert widened.silicate_network_band_wt_pct == (0.0, 100.0)
+    assert widened.silicate_network_band_wt_pct == (34.0, 100.0)
 
 
 def test_failed_constraints_distinguish_band_from_oxide_basis_and_major_sum() -> None:
     oxide_basis = AlphaMELTSDomainGate.assess(
         {"SiO2": 50.0, "MgO": 50.0, "Fe": 5.0},
-        silicate_network_band=(0.0, 100.0),
+        silicate_network_band=(34.0, 100.0),
     )
     major_sum = AlphaMELTSDomainGate.assess(
         {"SiO2": 40.0, "FeO": 1.0},
-        silicate_network_band=(0.0, 100.0),
+        silicate_network_band=(34.0, 100.0),
     )
     both = AlphaMELTSDomainGate.assess(
         {"SiO2": 10.0, "Fe": 90.0},
@@ -86,8 +90,8 @@ def test_failed_constraints_distinguish_band_from_oxide_basis_and_major_sum() ->
 
 def test_validate_accepts_rail_band_without_changing_two_tuple_contract() -> None:
     valid, warnings = AlphaMELTSDomainGate.validate(
-        {"SiO2": 10.0, "MgO": 45.0, "FeO": 45.0},
-        silicate_network_band=(5.0, 90.0),
+        {"SiO2": 40.0, "MgO": 30.0, "FeO": 30.0},
+        silicate_network_band=(34.0, 90.0),
     )
     assert valid is True
     assert warnings == []

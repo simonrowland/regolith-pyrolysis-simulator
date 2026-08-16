@@ -567,9 +567,14 @@ def test_provider_crash_diagnostic_overrides_out_of_domain_status():
 
 
 def test_coverage_silicate_band_is_rail_owned():
-    composition = {"SiO2": 10.0, "MgO": 45.0, "FeO": 45.0}
+    # UPDATED 2026-08-16: was SiO2 10.0 with band (0, 100). That asserted the
+    # rail could open alphaMELTS down to 10 wt%; the rump-hotwire measurement
+    # found it SIGABRTs on all 40 multi-component sub-30 points, so a band
+    # below the 34.0 wt% crash floor is now refused. Widening is still
+    # rail-owned -- it goes UPWARD past the default 80 wt% max.
+    composition = {"SiO2": 85.0, "MgO": 7.5, "FeO": 7.5}
     default = benchmark.AlphaMeltsEngine()
-    widened = benchmark.AlphaMeltsEngine(silicate_network_band=(0.0, 100.0))
+    widened = benchmark.AlphaMeltsEngine(silicate_network_band=(34.0, 100.0))
 
     refused = default.coverage(composition, 1900.0)
     admitted = widened.coverage(composition, 1900.0)
