@@ -370,6 +370,15 @@ def test_k_at_1650c_drives_flux_with_extrapolation_status(
     assert answer.extra.get("out_of_range") is True
     assert answer.verdict_status == "status_bearing_non_authoritative"
     assert answer.certification_ceiling == "never"
+    carrier_authority = flux.carrier_authority_by_species["K"]
+    assert carrier_authority["validation_status"] == answer.validation_status
+    assert carrier_authority["verdict_status"] == answer.verdict_status
+    assert carrier_authority["certification_ceiling"] == answer.certification_ceiling
+    assert carrier_authority["is_refused"] is False
+    smoothed = sim._apply_analytic_evaporation_depletion(flux)
+    assert smoothed.carrier_authority_by_species == (
+        flux.carrier_authority_by_species
+    )
     overlay = sim._last_vapour_batch_flux_overlay
     assert overlay["selected_runtime_pa_by_species"]["K"] == pytest.approx(
         seam_pa, rel=0.0, abs=0.0

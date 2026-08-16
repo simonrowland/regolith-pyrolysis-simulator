@@ -55,6 +55,8 @@ def test_scalar_alpha_s_range_travels_through_stage_provenance():
     assert record["temperature_range_K"] == [1700, 1800]
     assert record["alpha_s_valid_range_K"] == [1700.0, 1800.0]
     assert record["alpha_s_extrapolated"] is True
+    assert record["alpha_s_domain_status"] == "out_of_domain"
+    assert record["output_status"] == "status_bearing"
     assert "Fe alpha_s scalar coefficient extrapolated" in record[
         "alpha_s_extrapolation_warning"
     ]

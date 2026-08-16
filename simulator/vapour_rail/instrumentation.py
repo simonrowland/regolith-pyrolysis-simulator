@@ -14,6 +14,7 @@ outcome (proved / mismatch / not-fixed / typed disagreement), never hardcoded.
 from __future__ import annotations
 
 import ast
+import copy
 import math
 import re
 from collections.abc import Mapping, Sequence
@@ -23,6 +24,7 @@ from types import MappingProxyType
 from typing import Any, Iterator
 
 from simulator.vapour_rail.batch import (
+    CERTIFICATION_CEILING_NEVER,
     FluxDiagnosticUpperBound,
     FluxEligible,
     FluxRefusal,
@@ -31,6 +33,7 @@ from simulator.vapour_rail.batch import (
     PressureValue,
     VapourAnswer,
     VapourBatch,
+    VERDICT_AUTHORITATIVE,
     ZeroByPhysics,
 )
 
@@ -46,6 +49,140 @@ SHADOW_NONFINITE_LIVE = "nonfinite_live"
 SHADOW_ABSENT_COMPARISON = "absent_comparison"
 
 _SHADOW_EQUAL_TRUE_OUTCOMES = frozenset({SHADOW_PROVED})
+
+VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE = "authoritative"
+VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING = "status_bearing"
+VAPOUR_CARRIER_AUTHORITY_REFUSED = "refused"
+VAPOUR_CARRIER_AUTHORITY_PROVEN_ZERO = "proven_zero"
+VAPOUR_CARRIER_AUTHORITY_MISSING = "missing"
+_VAPOUR_CARRIER_AUTHORITY_SEVERITY: Mapping[str, int] = MappingProxyType({
+    VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE: 0,
+    VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING: 1,
+    VAPOUR_CARRIER_AUTHORITY_MISSING: 2,
+    VAPOUR_CARRIER_AUTHORITY_PROVEN_ZERO: 3,
+    VAPOUR_CARRIER_AUTHORITY_REFUSED: 4,
+})
+
+
+def vapour_carrier_authority_severity(status: str) -> int:
+    """Return fail-closed ordering for the five canonical carrier states."""
+
+    return _VAPOUR_CARRIER_AUTHORITY_SEVERITY.get(
+        str(status),
+        _VAPOUR_CARRIER_AUTHORITY_SEVERITY[VAPOUR_CARRIER_AUTHORITY_MISSING],
+    )
+
+
+def vapour_carrier_lineage_species(
+    value: Any,
+    *,
+    default_species: str | None = None,
+) -> tuple[str, ...]:
+    """Return the distinct carriers represented by one lineage value."""
+
+    if isinstance(value, str):
+        raw_species = (value,)
+    elif isinstance(value, Sequence) and not isinstance(value, (bytes, bytearray)):
+        raw_species = tuple(str(species) for species in value)
+    else:
+        raw_species = ()
+    species = tuple(sorted({item for item in raw_species if item}))
+    if species:
+        return species
+    if default_species:
+        return (str(default_species),)
+    return ()
+
+
+def merge_vapour_carrier_lineage(
+    current: Any,
+    carrier_species: Any,
+) -> str | list[str]:
+    """Return a deterministic single-or-multi carrier lineage value."""
+
+    merged = tuple(sorted(
+        set(vapour_carrier_lineage_species(current))
+        | set(vapour_carrier_lineage_species(carrier_species))
+    ))
+    if len(merged) == 1:
+        return merged[0]
+    return list(merged)
+
+
+def vapour_carrier_authority_status(
+    record: Any,
+    *,
+    expected_species_id: str | None = None,
+) -> str:
+    """Classify one serialized VapourAnswer without erasing typed outcomes."""
+
+    if not isinstance(record, Mapping):
+        return VAPOUR_CARRIER_AUTHORITY_MISSING
+    record_species_id = str(record.get("species_id", "")).strip()
+    if not record_species_id:
+        return VAPOUR_CARRIER_AUTHORITY_REFUSED
+    if (
+        expected_species_id is not None
+        and record_species_id != str(expected_species_id)
+    ):
+        return VAPOUR_CARRIER_AUTHORITY_REFUSED
+    explicit_authority_status = str(
+        record.get("authority_status", "")
+    ).strip().lower()
+    if explicit_authority_status:
+        if (
+            explicit_authority_status == "missing"
+            and "pressure" not in record
+            and "flux" not in record
+        ):
+            return VAPOUR_CARRIER_AUTHORITY_MISSING
+        return VAPOUR_CARRIER_AUTHORITY_REFUSED
+    pressure = record.get("pressure")
+    flux = record.get("flux")
+    pressure_kind = (
+        str(pressure.get("kind", "")) if isinstance(pressure, Mapping) else ""
+    )
+    flux_kind = str(flux.get("kind", "")) if isinstance(flux, Mapping) else ""
+    if pressure_kind not in {
+        "value",
+        "upper_bound",
+        "zero_by_physics",
+        "refusal",
+    } or flux_kind not in {
+        "eligible",
+        "diagnostic_upper_bound",
+        "refusal",
+    }:
+        return VAPOUR_CARRIER_AUTHORITY_REFUSED
+    if (
+        pressure_kind == "upper_bound"
+    ) != (
+        flux_kind == "diagnostic_upper_bound"
+    ):
+        return VAPOUR_CARRIER_AUTHORITY_REFUSED
+    if (
+        bool(record.get("is_refused", False))
+        or pressure_kind == "refusal"
+        or flux_kind == "refusal"
+    ):
+        return VAPOUR_CARRIER_AUTHORITY_REFUSED
+    if pressure_kind == "zero_by_physics":
+        return VAPOUR_CARRIER_AUTHORITY_PROVEN_ZERO
+    verdict = str(record.get("verdict_status", "")).strip().lower()
+    ceiling = str(record.get("certification_ceiling", "")).strip().lower()
+    validation = str(record.get("validation_status", "")).strip().lower()
+    active = record.get("is_flux_active")
+    if (
+        pressure_kind == "value"
+        and flux_kind == "eligible"
+        and verdict == VERDICT_AUTHORITATIVE
+        and bool(ceiling)
+        and ceiling != CERTIFICATION_CEILING_NEVER
+        and validation == "validated"
+        and active is True
+    ):
+        return VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE
+    return VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING
 
 # ---------------------------------------------------------------------------
 # Nine-row advisory source-vapour ceiling (DESIGN-REV5 §7.1)
@@ -1319,10 +1456,10 @@ def condensation_refusals_payload(
             "has_refusals": False,
         }
     by_species = {
-        str(species): dict(record) if isinstance(record, Mapping) else {
+        str(species): copy.deepcopy(dict(record)) if isinstance(record, Mapping) else {
             "status": "refused",
             "reason": "untyped",
-            "raw": record,
+            "raw": copy.deepcopy(record),
         }
         for species, record in sorted(refusals.items())
     }

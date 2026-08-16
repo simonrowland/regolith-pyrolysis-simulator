@@ -9,6 +9,7 @@ from simulator import transport_regime as transport_regime_module
 from simulator.condensation import (
     CondensationModel,
     KnudsenRegime,
+    KnudsenRegimeRefusal,
 )
 from simulator.core import PyrolysisSimulator
 from simulator.state import CondensationTrain, EvaporationFlux, MeltState
@@ -210,6 +211,26 @@ def test_true_vacuum_mean_free_path_is_infinite_and_routes_continuously():
     assert result.knudsen_regime_diagnostic["regime"] == (
         KnudsenRegime.FREE_MOLECULAR.value
     )
+    result.knudsen_regime_diagnostic["segments"][0]["regime"] = "tampered"
+    assert model.last_knudsen_regime_diagnostic["segments"][0][
+        "regime"
+    ] != "tampered"
+    assert model.operating_history[-1]["knudsen_regime_diagnostic"][
+        "segments"
+    ][0]["regime"] != "tampered"
+
+
+def test_typed_refusal_diagnostics_deep_copy_caller_payloads() -> None:
+    from simulator.evaporation import EvaporationFluxRefusal
+
+    source = {"reason": "test", "nested": {"status": "original"}}
+    evaporation = EvaporationFluxRefusal("test", source)
+    knudsen = KnudsenRegimeRefusal(source)
+
+    source["nested"]["status"] = "tampered"
+
+    assert evaporation.diagnostic["nested"]["status"] == "original"
+    assert knudsen.diagnostic["nested"]["status"] == "original"
 
 
 def test_c2a_knudsen_pressure_floor_recovers_stranded_setpoint():

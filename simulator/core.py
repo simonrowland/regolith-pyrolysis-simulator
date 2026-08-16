@@ -12561,6 +12561,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     )
                     if species in evap_flux.species_kg_hr
                 }
+                evap_flux.carrier_authority_by_species = copy.deepcopy(
+                    live_effective_flux.carrier_authority_by_species
+                )
                 evap_flux.update_totals()
             else:
                 evap_flux = self._calculate_evaporation(equilibrium)
@@ -12579,7 +12582,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # Send evaporated species through the 8-stage train.
         # Each stage collects species based on its temperature.
         self._ledger_committed_evap_flux_this_tick = evap_flux
-        if evap_flux.total_kg_hr > 0:
+        if (
+            evap_flux.total_kg_hr > 0
+            or bool(evap_flux.carrier_authority_by_species)
+        ):
             self._configure_condensation_operating_conditions(evap_flux)
             self._apply_lab_surface_temperatures(sample_time_h=sample_time_h)
             overhead_flux = self._route_to_condensation(evap_flux)

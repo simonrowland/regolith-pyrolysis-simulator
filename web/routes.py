@@ -39,7 +39,10 @@ from simulator.transport_constants import (
     MEAN_FREE_PATH_FORMULA_ID,
 )
 from simulator.corpus_version import current_corpus_version, interoperable_corpus_versions
-from simulator.diagnostics import coating_summary_with_grounded_authority
+from simulator.diagnostics import (
+    coating_summary_with_grounded_authority,
+    coating_wall_deposit_payload,
+)
 from simulator.fidelity_vocabulary import canonicalize_fidelity_emission
 from simulator.feedstock_composition import normalized_feedstock_component_masses_kg
 from simulator.furnace_materials import (
@@ -1962,11 +1965,7 @@ def _product_strip(result: Mapping[str, Any]) -> dict[str, Any]:
 
 def _coating_readout(result: Mapping[str, Any]) -> dict[str, Any]:
     result = coating_summary_with_grounded_authority(result)
-    wall = (
-        result.get('wall_deposit_kg_by_segment_species')
-        or result.get('wall_deposit_kg_by_zone_species')
-        or result.get('wall_deposit_kg')
-    )
+    wall = coating_wall_deposit_payload(result)
     total_kg = _sum_nested_numbers(wall)
     campaigns = result.get('campaigns_to_resinter')
     positive_deposit = total_kg is not None and total_kg > 0.0

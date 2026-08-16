@@ -1659,10 +1659,10 @@ class KnudsenRegimeRefusal(RuntimeError):
     reason = KNUDSEN_REFUSAL_REASON
 
     def __init__(self, diagnostic: Mapping[str, Any]):
-        self.diagnostic = dict(diagnostic)
+        self.diagnostic = copy.deepcopy(dict(diagnostic))
         self.reason = str(
-            diagnostic.get('reason_refused')
-            or diagnostic.get('reason')
+            self.diagnostic.get('reason_refused')
+            or self.diagnostic.get('reason')
             or KNUDSEN_REFUSAL_REASON
         )
         super().__init__(self.reason)
@@ -1730,6 +1730,7 @@ class CondensationRouteResult:
     """Per-hour routing plan; quantities are projections until ledger credit."""
 
     remaining_by_species: Dict[str, float] = field(default_factory=dict)
+    retained_in_source_by_species: Dict[str, float] = field(default_factory=dict)
     condensed_by_stage_species: Dict[int, Dict[str, float]] = field(default_factory=dict)
     wall_deposit_by_species: Dict[str, float] = field(default_factory=dict)
     wall_deposit_by_segment_species: Dict[str, Dict[str, float]] = field(
@@ -1761,6 +1762,10 @@ class CondensationRouteResult:
     transport_parameter_notice: Dict[str, Any] = field(default_factory=dict)
     capture_budget_regularizer_notice: Dict[str, Any] = field(default_factory=dict)
     condensation_refusals_by_species: Dict[str, Dict[str, Any]] = field(
+        default_factory=dict)
+    carrier_authority_by_species: Dict[str, Dict[str, Any]] = field(
+        default_factory=dict)
+    condensation_authority_by_species: Dict[str, Dict[str, Any]] = field(
         default_factory=dict)
     stage_area_geometry_provenance_notice: Dict[str, Any] = field(
         default_factory=dict)
@@ -1928,6 +1933,7 @@ class CondensationModel:
         self.last_capture_budget_regularizer_notice: dict[str, Any] = {}
         # VR-11 / B2: consumer-facing condensation refusal channel.
         self.last_condensation_refusals_by_species: dict[str, dict[str, Any]] = {}
+        self.last_condensation_authority_by_species: dict[str, dict[str, Any]] = {}
         self.last_wall_deposition_rate_shadow_candidate: dict[
             str, dict[str, Any]
         ] = {}
@@ -1960,6 +1966,7 @@ class CondensationModel:
 
         self.last_sticking_alpha_provenance_notice = {}
         self.last_condensation_refusals_by_species = {}
+        self.last_condensation_authority_by_species = {}
 
     def configure_operating_conditions(
         self,
@@ -2220,7 +2227,9 @@ class CondensationModel:
                 segment.name: float(wall_temperature_C)
                 for segment in self.pipe_segments
             })
-        self.last_knudsen_regime_diagnostic = self._current_knudsen_diagnostic()
+        self.last_knudsen_regime_diagnostic = copy.deepcopy(
+            self._current_knudsen_diagnostic()
+        )
         # gstack reviewer Phase B P2: previously this snapshot was gated
         # ONLY on ``overhead_pressure_mbar is not None``, so a caller that
         # tweaked wall temperatures or stir_factor without supplying a
@@ -2290,7 +2299,7 @@ class CondensationModel:
                 "knudsen_warnings": tuple(
                     self.last_knudsen_regime_diagnostic.get(
                         "warnings", ())),
-                "knudsen_regime_diagnostic": dict(
+                "knudsen_regime_diagnostic": copy.deepcopy(
                     self.last_knudsen_regime_diagnostic),
             }
             # Record the as-requested stir_factor only when it was passed
@@ -2546,6 +2555,7 @@ class CondensationModel:
         the simulator commits the matching ledger transition.
         """
         remaining_by_species = {}
+        retained_in_source_by_species: Dict[str, float] = {}
         condensed_by_stage_species: Dict[int, Dict[str, float]] = {}
         wall_deposit_by_species: Dict[str, float] = {}
         wall_deposit_by_segment_species: Dict[str, Dict[str, float]] = {}
@@ -2560,6 +2570,58 @@ class CondensationModel:
         wall_sticking_alpha_provenance_by_species: dict[str, Any] = {}
         transport_parameter_notice_by_species: dict[str, Any] = {}
         condensation_refusals_by_species: dict[str, dict[str, Any]] = {}
+        from simulator.vapour_rail.instrumentation import (
+            VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE,
+            VAPOUR_CARRIER_AUTHORITY_MISSING,
+            VAPOUR_CARRIER_AUTHORITY_PROVEN_ZERO,
+            VAPOUR_CARRIER_AUTHORITY_REFUSED,
+            VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING,
+            merge_vapour_carrier_lineage,
+            vapour_carrier_authority_severity,
+            vapour_carrier_authority_status,
+        )
+
+        raw_carrier_authority = getattr(
+            evap_flux, 'carrier_authority_by_species', {}
+        )
+        carrier_authority_by_species = {
+            str(species): copy.deepcopy(dict(record))
+            for species, record in (
+                raw_carrier_authority.items()
+                if isinstance(raw_carrier_authority, Mapping)
+                else ()
+            )
+            if isinstance(record, Mapping)
+        }
+        carrier_authority_status_by_species = {
+            species: vapour_carrier_authority_status(
+                record,
+                expected_species_id=species,
+            )
+            for species, record in carrier_authority_by_species.items()
+        }
+        for species in evap_flux.species_kg_hr:
+            carrier_authority_status_by_species.setdefault(
+                str(species), VAPOUR_CARRIER_AUTHORITY_MISSING
+            )
+        condensation_authority_by_species: dict[str, dict[str, Any]] = {
+            species: {
+                'status': status,
+                'authoritative_for_condensation': (
+                    status == VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE
+                ),
+                'carrier_authority': copy.deepcopy(
+                    carrier_authority_by_species.get(species, {})
+                ),
+            }
+            for species, status in sorted(
+                carrier_authority_status_by_species.items()
+            )
+        }
+        non_debiting_carrier_statuses = {
+            VAPOUR_CARRIER_AUTHORITY_REFUSED,
+            VAPOUR_CARRIER_AUTHORITY_PROVEN_ZERO,
+        }
         # VR-11 / B3: stage-local efficiency zeros mint typed pass-through
         # outcomes (no longer silent return 0.0 without a consumer channel).
         efficiency_outcomes_by_species: dict[str, list[dict[str, Any]]] = {}
@@ -2582,8 +2644,8 @@ class CondensationModel:
             temps=self.condensation_temperatures_C,
             vapor_pressure_data=self.vapor_pressure_data,
         )
-        self.last_cold_spot_diagnostic = diagnostic
-        self.cold_spot_history.append(diagnostic)
+        self.last_cold_spot_diagnostic = copy.deepcopy(diagnostic)
+        self.cold_spot_history.append(copy.deepcopy(diagnostic))
         cold_spot_warnings = tuple(diagnostic.get('warnings', ()))
         if self.operating_history:
             self.operating_history[-1]['cold_spot_warning_count'] = len(
@@ -2592,6 +2654,11 @@ class CondensationModel:
 
         stage_route_by_species: dict[str, dict[str, Any]] = {}
         for species, rate_kg_hr in evap_flux.species_kg_hr.items():
+            if (
+                carrier_authority_status_by_species.get(species)
+                in non_debiting_carrier_statuses
+            ):
+                continue
             if not _species_has_antoine_data(
                 species,
                 vapor_pressure_data=self.vapor_pressure_data,
@@ -2742,6 +2809,39 @@ class CondensationModel:
             wall_deposit_fraction_by_species[species] = 0.0
             wall_deposit_account_fractions_by_species[species] = {}
 
+            carrier_status = carrier_authority_status_by_species.get(
+                species, VAPOUR_CARRIER_AUTHORITY_MISSING
+            )
+            if carrier_status in non_debiting_carrier_statuses:
+                retained_source_mass = max(0.0, float(rate_kg_hr))
+                remaining_by_species[species] = 0.0
+                retained_in_source_by_species[species] = retained_source_mass
+                reason = (
+                    'upstream_vapour_carrier_refused'
+                    if carrier_status == VAPOUR_CARRIER_AUTHORITY_REFUSED
+                    else 'positive_mass_conflicts_with_upstream_proven_zero'
+                )
+                condensation_refusals_by_species[species] = {
+                    'status': 'refused',
+                    'reason': reason,
+                    'output_status': 'refused',
+                    'upstream_authority_status': carrier_status,
+                    'authoritative_for_condensation': False,
+                    'authoritative_for_terminal_offgas': False,
+                    'mass_disposition': 'retained_in_source_pending_authority',
+                    'input_mass_kg_hr': float(rate_kg_hr),
+                    'remaining_mass_kg_hr': 0.0,
+                    'retained_in_source_mass_kg_hr': retained_source_mass,
+                    'condensed_mass_kg_hr': 0.0,
+                    'mass_closure_error_kg_hr': abs(
+                        float(rate_kg_hr) - retained_source_mass
+                    ),
+                    'carrier_authority': copy.deepcopy(
+                        carrier_authority_by_species.get(species, {})
+                    ),
+                }
+                continue
+
             if not _species_has_antoine_data(
                 species,
                 vapor_pressure_data=self.vapor_pressure_data,
@@ -2798,6 +2898,22 @@ class CondensationModel:
             capture_budget_alpha_record = dict(
                 stage_route['capture_budget_alpha_record']
             )
+            # Stage and capture-budget alpha records control the absence of a
+            # wall sink as well as a positive sink.  Preserve that evidence
+            # before any numerical-zero branch so a zero cannot erase a
+            # status-bearing coefficient evaluation.
+            alpha_provenance = (
+                wall_sticking_alpha_provenance_by_species
+                .setdefault(species, {})
+            )
+            for stage_number, record in stage_alpha_records_by_stage.items():
+                alpha_provenance[f'stage_{stage_number}'] = copy.deepcopy(
+                    record
+                )
+            if capture_budget_alpha_record:
+                alpha_provenance['capture_budget'] = copy.deepcopy(
+                    capture_budget_alpha_record
+                )
             capture_budget_kg = float(stage_route['capture_budget_kg'])
             if hkl_sink_total_kg <= 1e-15:
                 capture_budget_kg = 0.0
@@ -2855,28 +2971,142 @@ class CondensationModel:
                             stage_impurity[species] = (
                                 stage_impurity.get(species, 0.0)
                                 + condensed_kg)
-                if wall_deposit_kg > 1e-15:
-                    alpha_provenance = (
-                        wall_sticking_alpha_provenance_by_species
-                        .setdefault(species, {})
-                    )
-                    for stage_number, record in (
-                        stage_alpha_records_by_stage.items()
-                    ):
-                        alpha_provenance[f'stage_{stage_number}'] = dict(
-                            record)
-                    if capture_budget_alpha_record:
-                        alpha_provenance['capture_budget'] = dict(
-                            capture_budget_alpha_record)
-
             remaining_by_species[species] = max(
                 0.0, rate_kg_hr - capture_budget_kg)
 
-        from simulator.diagnostics import wall_sticking_alpha_provenance_notice
+        from simulator.diagnostics import (
+            _status_bearing_alpha_record,
+            wall_sticking_alpha_provenance_notice,
+        )
 
         sticking_notice = wall_sticking_alpha_provenance_notice(
             wall_sticking_alpha_by_species,
             wall_sticking_alpha_provenance_by_species,
+        )
+        current_alpha_provenance = sticking_notice.get(
+            'alpha_s_provenance_by_species',
+            {},
+        )
+        accumulated_alpha_provenance = copy.deepcopy(
+            current_alpha_provenance
+            if isinstance(current_alpha_provenance, Mapping)
+            else {}
+        )
+        prior_alpha_provenance = self.last_sticking_alpha_provenance_notice.get(
+            'alpha_s_provenance_by_species',
+            {},
+        )
+        if isinstance(prior_alpha_provenance, Mapping):
+            for species, prior_by_surface in prior_alpha_provenance.items():
+                if not isinstance(prior_by_surface, Mapping):
+                    continue
+                accumulated_by_surface = accumulated_alpha_provenance.setdefault(
+                    str(species),
+                    {},
+                )
+                if not isinstance(accumulated_by_surface, dict):
+                    continue
+                for surface, prior_record in prior_by_surface.items():
+                    if not isinstance(prior_record, Mapping):
+                        continue
+                    current_record = accumulated_by_surface.get(str(surface))
+                    if (
+                        not isinstance(current_record, Mapping)
+                        or _status_bearing_alpha_record(prior_record)
+                    ):
+                        accumulated_by_surface[str(surface)] = copy.deepcopy(
+                            dict(prior_record)
+                        )
+        sticking_notice = dict(sticking_notice)
+        sticking_notice['alpha_s_provenance_by_species'] = (
+            accumulated_alpha_provenance
+        )
+        wall_carrier_authority_by_species: dict[str, dict[str, Any]] = {}
+        wall_carrier_lineage_by_deposited_species: dict[str, Any] = {}
+        for species, deposited_kg in wall_deposit_by_species.items():
+            if float(deposited_kg) <= 1e-15:
+                continue
+            record = carrier_authority_by_species.get(species)
+            wall_carrier_authority_by_species[species] = (
+                copy.deepcopy(record)
+                if isinstance(record, Mapping)
+                else {
+                    'species_id': species,
+                    'authority_status': VAPOUR_CARRIER_AUTHORITY_MISSING,
+                }
+            )
+            wall_carrier_lineage_by_deposited_species[species] = species
+        # Audit carriers are a typed channel, not a positive-mass projection.
+        # Preserve exact zero-rate/refused/proven-zero keys so an upstream
+        # refusal cannot disappear merely because no ledger debit followed.
+        for species in sorted(
+            set(evap_flux.species_kg_hr)
+            | set(carrier_authority_by_species)
+        ):
+            record = carrier_authority_by_species.get(species)
+            wall_carrier_authority_by_species.setdefault(
+                species,
+                (
+                    copy.deepcopy(dict(record))
+                    if isinstance(record, Mapping)
+                    else {
+                        'species_id': species,
+                        'authority_status': VAPOUR_CARRIER_AUTHORITY_MISSING,
+                    }
+                ),
+            )
+            wall_carrier_lineage_by_deposited_species.setdefault(
+                species,
+                species,
+            )
+        prior_carriers = self.last_sticking_alpha_provenance_notice.get(
+            'vapour_carrier_authority_by_species',
+            {},
+        )
+        if isinstance(prior_carriers, Mapping):
+            for species, prior_record in prior_carriers.items():
+                if not isinstance(prior_record, Mapping):
+                    continue
+                current_record = wall_carrier_authority_by_species.get(
+                    str(species)
+                )
+                current_status = vapour_carrier_authority_status(
+                    current_record,
+                    expected_species_id=str(species),
+                )
+                prior_status = vapour_carrier_authority_status(
+                    prior_record,
+                    expected_species_id=str(species),
+                )
+                if (
+                    current_record is None
+                    or vapour_carrier_authority_severity(prior_status)
+                    > vapour_carrier_authority_severity(current_status)
+                ):
+                    wall_carrier_authority_by_species[str(species)] = (
+                        copy.deepcopy(dict(prior_record))
+                    )
+        sticking_notice['vapour_carrier_authority_required'] = True
+        sticking_notice['vapour_carrier_authority_by_species'] = (
+            wall_carrier_authority_by_species
+        )
+        prior_lineage = self.last_sticking_alpha_provenance_notice.get(
+            'vapour_carrier_lineage_by_deposited_species',
+            {},
+        )
+        if isinstance(prior_lineage, Mapping):
+            for product_species, carrier_species in prior_lineage.items():
+                product_key = str(product_species)
+                wall_carrier_lineage_by_deposited_species[product_key] = (
+                    merge_vapour_carrier_lineage(
+                        wall_carrier_lineage_by_deposited_species.get(
+                            product_key
+                        ),
+                        carrier_species,
+                    )
+                )
+        sticking_notice['vapour_carrier_lineage_by_deposited_species'] = (
+            wall_carrier_lineage_by_deposited_species
         )
         prior_refusals = self.last_sticking_alpha_provenance_notice.get(
             'wall_saturation_pressure_refusals_by_species',
@@ -2917,11 +3147,13 @@ class CondensationModel:
             sticking_notice['alpha_s_extrapolation_warnings'] = (
                 alpha_extrapolation_warnings
             )
-        self.last_sticking_alpha_provenance_notice = dict(sticking_notice)
+        self.last_sticking_alpha_provenance_notice = copy.deepcopy(
+            sticking_notice
+        )
         if sticking_notice and self.operating_history:
             self.operating_history[-1][
                 'wall_sticking_alpha_provenance_notice'
-            ] = dict(sticking_notice)
+            ] = copy.deepcopy(sticking_notice)
 
         transport_notice: dict[str, Any] = {}
         if transport_parameter_notice_by_species:
@@ -2933,21 +3165,23 @@ class CondensationModel:
                 'carrier_gas': self.carrier_gas,
                 'output_status': 'status_bearing',
             }
-        self.last_transport_parameter_notice = dict(transport_notice)
+        self.last_transport_parameter_notice = copy.deepcopy(transport_notice)
         if transport_notice and self.operating_history:
             self.operating_history[-1][
                 'transport_parameter_notice'
-            ] = dict(transport_notice)
+            ] = copy.deepcopy(transport_notice)
 
         capture_notice = (
             dict(CAPTURE_BUDGET_REGULARIZER_NOTICE)
             if used_capture_budget_regularizer else {}
         )
-        self.last_capture_budget_regularizer_notice = dict(capture_notice)
+        self.last_capture_budget_regularizer_notice = copy.deepcopy(
+            capture_notice
+        )
         if capture_notice and self.operating_history:
             self.operating_history[-1][
                 'capture_budget_regularizer_notice'
-            ] = dict(capture_notice)
+            ] = copy.deepcopy(capture_notice)
 
         # VR-11 / B3: fold stage-local efficiency pass-through outcomes into
         # condensation_refusals_by_species so B2 consumers can see them.
@@ -2973,8 +3207,91 @@ class CondensationModel:
                 'stage_outcomes': list(outcomes),
             }
 
+        for species, authority in condensation_authority_by_species.items():
+            input_mass = max(
+                0.0, float(evap_flux.species_kg_hr.get(species, 0.0) or 0.0)
+            )
+            remaining_mass = max(
+                0.0, float(remaining_by_species.get(species, input_mass) or 0.0)
+            )
+            retained_source_mass = max(
+                0.0,
+                float(
+                    retained_in_source_by_species.get(species, 0.0) or 0.0
+                ),
+            )
+            stage_condensed_mass = sum(
+                max(0.0, float(by_species.get(species, 0.0) or 0.0))
+                for by_species in condensed_by_stage_species.values()
+            )
+            wall_deposit_mass = max(
+                0.0,
+                float(wall_deposit_by_species.get(species, 0.0) or 0.0),
+            )
+            condensed_mass = stage_condensed_mass + wall_deposit_mass
+            authority.update({
+                'input_mass_kg_hr': input_mass,
+                'remaining_mass_kg_hr': remaining_mass,
+                'retained_in_source_mass_kg_hr': retained_source_mass,
+                'stage_condensed_mass_kg_hr': stage_condensed_mass,
+                'wall_deposit_mass_kg_hr': wall_deposit_mass,
+                'condensed_mass_kg_hr': condensed_mass,
+                'mass_closure_error_kg_hr': abs(
+                    input_mass
+                    - remaining_mass
+                    - retained_source_mass
+                    - condensed_mass
+                ),
+                'authoritative_for_terminal_offgas': (
+                    False
+                    if retained_source_mass > 1e-15
+                    else authority['authoritative_for_condensation']
+                    if remaining_mass > 1e-15
+                    else None
+                ),
+            })
+            status = str(authority.get('status', ''))
+            if status not in {
+                VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING,
+                VAPOUR_CARRIER_AUTHORITY_MISSING,
+            }:
+                continue
+            existing = dict(
+                condensation_refusals_by_species.get(species, {}) or {}
+            )
+            if not existing:
+                existing = {
+                    'status': 'status_bearing',
+                    'reason': (
+                        'upstream_vapour_carrier_authority_missing'
+                        if status == VAPOUR_CARRIER_AUTHORITY_MISSING
+                        else 'upstream_vapour_carrier_non_authoritative'
+                    ),
+                    'output_status': 'status_bearing',
+                }
+            existing.update({
+                'upstream_authority_status': status,
+                'authoritative_for_condensation': False,
+                'authoritative_for_terminal_offgas': (
+                    False if remaining_mass > 1e-15 else None
+                ),
+                'input_mass_kg_hr': input_mass,
+                'remaining_mass_kg_hr': remaining_mass,
+                'condensed_mass_kg_hr': condensed_mass,
+                'mass_closure_error_kg_hr': authority[
+                    'mass_closure_error_kg_hr'
+                ],
+                'carrier_authority': copy.deepcopy(
+                    authority.get('carrier_authority', {})
+                ),
+            })
+            condensation_refusals_by_species[species] = existing
+
         self.last_condensation_refusals_by_species = copy.deepcopy(
             condensation_refusals_by_species
+        )
+        self.last_condensation_authority_by_species = copy.deepcopy(
+            condensation_authority_by_species
         )
         if self.operating_history:
             self.operating_history[-1][
@@ -2988,31 +3305,49 @@ class CondensationModel:
                 ] = copy.deepcopy(condensation_refusals_by_species)
 
         return CondensationRouteResult(
-            remaining_by_species=remaining_by_species,
-            condensed_by_stage_species=condensed_by_stage_species,
-            wall_deposit_by_species=wall_deposit_by_species,
-            wall_deposit_by_segment_species=wall_deposit_by_segment_species,
-            wall_deposit_fraction_by_species=wall_deposit_fraction_by_species,
+            remaining_by_species=copy.deepcopy(remaining_by_species),
+            retained_in_source_by_species=copy.deepcopy(
+                retained_in_source_by_species
+            ),
+            condensed_by_stage_species=copy.deepcopy(
+                condensed_by_stage_species
+            ),
+            wall_deposit_by_species=copy.deepcopy(wall_deposit_by_species),
+            wall_deposit_by_segment_species=copy.deepcopy(
+                wall_deposit_by_segment_species
+            ),
+            wall_deposit_fraction_by_species=copy.deepcopy(
+                wall_deposit_fraction_by_species
+            ),
             wall_deposit_account_fractions_by_species=(
-                wall_deposit_account_fractions_by_species),
+                copy.deepcopy(wall_deposit_account_fractions_by_species)),
             wall_route_species_order=_wall_route_species_order(
                 evap_flux.species_kg_hr.keys()
             ),
             wall_alkali_binding_diagnostic_state_by_segment=copy.deepcopy(
                 self.wall_alkali_binding_diagnostic_state_by_account
             ),
-            impurity_by_stage_species=impurity_by_stage_species,
-            antoine_extrapolations=dict(antoine_extrapolations),
+            impurity_by_stage_species=copy.deepcopy(
+                impurity_by_stage_species
+            ),
+            antoine_extrapolations=copy.deepcopy(antoine_extrapolations),
             antoine_extrapolation_warnings=tuple(
                 antoine_extrapolation_warnings),
-            cold_spot_warnings=cold_spot_warnings,
-            knudsen_regime_diagnostic=knudsen_diagnostic,
-            sticking_alpha_provenance_notice=sticking_notice,
-            transport_parameter_notice=transport_notice,
-            capture_budget_regularizer_notice=capture_notice,
+            cold_spot_warnings=copy.deepcopy(cold_spot_warnings),
+            knudsen_regime_diagnostic=copy.deepcopy(knudsen_diagnostic),
+            sticking_alpha_provenance_notice=copy.deepcopy(sticking_notice),
+            transport_parameter_notice=copy.deepcopy(transport_notice),
+            capture_budget_regularizer_notice=copy.deepcopy(capture_notice),
             condensation_refusals_by_species=(
-                condensation_refusals_by_species),
-            stage_area_geometry_provenance_notice=geometry_notice,
+                copy.deepcopy(condensation_refusals_by_species)),
+            carrier_authority_by_species=copy.deepcopy(
+                carrier_authority_by_species
+            ),
+            condensation_authority_by_species=(
+                copy.deepcopy(condensation_authority_by_species)),
+            stage_area_geometry_provenance_notice=copy.deepcopy(
+                geometry_notice
+            ),
         )
 
     def adjust_c2a_pressure_setpoint(
@@ -3147,15 +3482,16 @@ class CondensationModel:
 
     def _enforce_knudsen_regime(self) -> dict[str, Any]:
         diagnostic = self._current_knudsen_diagnostic()
-        self.last_knudsen_regime_diagnostic = diagnostic
+        self.last_knudsen_regime_diagnostic = copy.deepcopy(diagnostic)
         if diagnostic.get('status') == 'refused':
             raise KnudsenRegimeRefusal(diagnostic)
         warnings = tuple(diagnostic.get('warnings', ()))
         if warnings and self.operating_history:
             self.operating_history[-1]['knudsen_warnings'] = warnings
-            self.operating_history[-1]['knudsen_regime_diagnostic'] = dict(
-                diagnostic)
-        return diagnostic
+            self.operating_history[-1]['knudsen_regime_diagnostic'] = (
+                copy.deepcopy(diagnostic)
+            )
+        return copy.deepcopy(diagnostic)
 
     def _wall_deposit_candidate_kg(
         self,
@@ -4434,6 +4770,19 @@ def _alpha_record(
     spec = _alpha_s_spec_from_entry(species, entry)
     if isinstance(spec, Mapping):
         record['alpha_s_coefficient_spec'] = dict(spec)
+    if (
+        bool(record.get('alpha_s_extrapolated', False))
+        and not bool(record.get('alpha_s_cold_wall_condensation', False))
+    ):
+        # Fail-closed category 2: keep the computed coefficient and mark its
+        # consumption. A cited fit used outside its domain cannot certify the
+        # wall mass it drives.
+        record['alpha_s_domain_status'] = 'out_of_domain'
+        record['output_status'] = 'status_bearing'
+        record['alpha_s_authoritative_at_temperature'] = False
+    elif record.get('alpha_s_valid_range_K') is not None:
+        record['alpha_s_domain_status'] = 'in_domain'
+        record['alpha_s_authoritative_at_temperature'] = True
     return record
 
 

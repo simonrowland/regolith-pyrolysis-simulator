@@ -23,8 +23,16 @@ import math
 from types import MappingProxyType
 from typing import Any, Callable, Mapping, Sequence
 
-from simulator.diagnostics import wall_deposit_sticking_authority_status
+from simulator.diagnostics import (
+    _status_bearing_alpha_record,
+    wall_deposit_sticking_authority_status,
+)
 from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.vapour_rail.instrumentation import (
+    merge_vapour_carrier_lineage,
+    vapour_carrier_authority_severity,
+    vapour_carrier_authority_status,
+)
 
 
 GROUNDING_UNGROUNDED = "ungrounded_threshold"
@@ -228,22 +236,95 @@ def _merged_wall_deposit_sticking_authority(
     for authority in (carried_authority, run_authority):
         if not isinstance(authority, Mapping):
             continue
-        for key in (
-            "alpha_s_provenance_by_species",
-            "wall_saturation_pressure_refusals_by_species",
-        ):
-            raw = authority.get(key)
-            if not isinstance(raw, Mapping):
-                continue
-            by_species = merged.setdefault(key, {})
-            if not isinstance(by_species, dict):
-                continue
-            for species, by_segment in raw.items():
-                if not isinstance(by_segment, Mapping):
-                    continue
-                current = by_species.setdefault(str(species), {})
-                if isinstance(current, dict):
-                    current.update(_plain_authority_mapping(by_segment))
+
+        raw_alpha = authority.get("alpha_s_provenance_by_species")
+        if isinstance(raw_alpha, Mapping):
+            alpha_by_species = merged.setdefault(
+                "alpha_s_provenance_by_species",
+                {},
+            )
+            if isinstance(alpha_by_species, dict):
+                for species, by_segment in raw_alpha.items():
+                    if not isinstance(by_segment, Mapping):
+                        continue
+                    current_by_segment = alpha_by_species.setdefault(
+                        str(species),
+                        {},
+                    )
+                    if not isinstance(current_by_segment, dict):
+                        continue
+                    for segment, raw_record in by_segment.items():
+                        if not isinstance(raw_record, Mapping):
+                            continue
+                        record = _plain_authority_mapping(raw_record)
+                        current = current_by_segment.get(str(segment))
+                        if (
+                            not isinstance(current, Mapping)
+                            or (
+                                not _status_bearing_alpha_record(current)
+                                and _status_bearing_alpha_record(record)
+                            )
+                        ):
+                            current_by_segment[str(segment)] = record
+
+        raw_refusals = authority.get(
+            "wall_saturation_pressure_refusals_by_species"
+        )
+        if isinstance(raw_refusals, Mapping):
+            refusals_by_species = merged.setdefault(
+                "wall_saturation_pressure_refusals_by_species",
+                {},
+            )
+            if isinstance(refusals_by_species, dict):
+                for species, by_segment in raw_refusals.items():
+                    if not isinstance(by_segment, Mapping):
+                        continue
+                    current = refusals_by_species.setdefault(str(species), {})
+                    if isinstance(current, dict):
+                        current.update(_plain_authority_mapping(by_segment))
+
+        raw_carriers = authority.get("vapour_carrier_authority_by_species")
+        if isinstance(raw_carriers, Mapping):
+            carriers_by_species = merged.setdefault(
+                "vapour_carrier_authority_by_species",
+                {},
+            )
+            if isinstance(carriers_by_species, dict):
+                for species, raw_record in raw_carriers.items():
+                    if not isinstance(raw_record, Mapping):
+                        continue
+                    species_key = str(species)
+                    record = _plain_authority_mapping(raw_record)
+                    current = carriers_by_species.get(species_key)
+                    current_status = vapour_carrier_authority_status(
+                        current,
+                        expected_species_id=species_key,
+                    )
+                    record_status = vapour_carrier_authority_status(
+                        record,
+                        expected_species_id=species_key,
+                    )
+                    if (
+                        not isinstance(current, Mapping)
+                        or vapour_carrier_authority_severity(record_status)
+                        > vapour_carrier_authority_severity(current_status)
+                    ):
+                        carriers_by_species[species_key] = record
+        raw_lineage = authority.get(
+            "vapour_carrier_lineage_by_deposited_species"
+        )
+        if isinstance(raw_lineage, Mapping):
+            lineage = merged.setdefault(
+                "vapour_carrier_lineage_by_deposited_species",
+                {},
+            )
+            if isinstance(lineage, dict):
+                for product_species, carrier_species in raw_lineage.items():
+                    product_key = str(product_species)
+                    lineage[product_key] = merge_vapour_carrier_lineage(
+                        lineage.get(product_key),
+                        carrier_species,
+                    )
     return merged
 
 

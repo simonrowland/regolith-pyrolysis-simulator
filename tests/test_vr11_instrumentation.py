@@ -54,6 +54,11 @@ from simulator.vapour_rail.instrumentation import (
     SHADOW_REFUSED_VS_LIVE,
     SHADOW_RESOLUTION_ERROR,
     SOURCE_VAPOUR_CEILING_ROWS,
+    VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE,
+    VAPOUR_CARRIER_AUTHORITY_MISSING,
+    VAPOUR_CARRIER_AUTHORITY_PROVEN_ZERO,
+    VAPOUR_CARRIER_AUTHORITY_REFUSED,
+    VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING,
     assert_no_flux_consumer_iterates_compatibility_maps,
     compatibility_pressure_read_context,
     compare_live_shadow_to_batch_flux,
@@ -63,9 +68,180 @@ from simulator.vapour_rail.instrumentation import (
     flux_pressures_from_batch,
     serialize_vapour_batch,
     source_vapour_ceiling_table,
+    vapour_carrier_authority_severity,
+    vapour_carrier_authority_status,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def test_carrier_authority_severity_orders_all_five_states() -> None:
+    statuses = (
+        VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE,
+        VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING,
+        VAPOUR_CARRIER_AUTHORITY_MISSING,
+        VAPOUR_CARRIER_AUTHORITY_PROVEN_ZERO,
+        VAPOUR_CARRIER_AUTHORITY_REFUSED,
+    )
+
+    assert [vapour_carrier_authority_severity(status) for status in statuses] == [
+        0, 1, 2, 3, 4,
+    ]
+
+
+@pytest.mark.parametrize("record_species_id", ("", "Mg"))
+def test_carrier_authority_refuses_invalid_species_identity(
+    record_species_id: str,
+) -> None:
+    record = {
+        "species_id": record_species_id,
+        "pressure": {"kind": "value", "pa": 1.0},
+        "flux": {"kind": "eligible"},
+        "verdict_status": "authoritative",
+        "certification_ceiling": "validated_point",
+        "validation_status": "validated",
+        "is_union_flux_eligible": True,
+        "is_flux_active": True,
+    }
+
+    assert vapour_carrier_authority_status(
+        record,
+        expected_species_id="Na",
+    ) == VAPOUR_CARRIER_AUTHORITY_REFUSED
+
+
+def test_carrier_identity_mismatch_denies_even_if_record_claims_missing() -> None:
+    assert vapour_carrier_authority_status(
+        {
+            "species_id": "Mg",
+            "authority_status": "missing",
+        },
+        expected_species_id="Na",
+    ) == VAPOUR_CARRIER_AUTHORITY_REFUSED
+
+
+def test_exact_synthetic_missing_carrier_remains_missing() -> None:
+    assert vapour_carrier_authority_status(
+        {
+            "species_id": "Na",
+            "authority_status": "missing",
+        },
+        expected_species_id="Na",
+    ) == VAPOUR_CARRIER_AUTHORITY_MISSING
+
+
+@pytest.mark.parametrize("authority_status", ("missing", "unknown"))
+def test_full_carrier_cannot_claim_synthetic_authority_status(
+    authority_status: str,
+) -> None:
+    assert vapour_carrier_authority_status(
+        {
+            "species_id": "Na",
+            "authority_status": authority_status,
+            "pressure": {"kind": "value", "pa": 1.0},
+            "flux": {"kind": "eligible", "alpha_ref": "alpha:Na"},
+            "verdict_status": "authoritative",
+            "certification_ceiling": "validated_point",
+            "validation_status": "validated",
+            "is_union_flux_eligible": True,
+            "is_flux_active": True,
+        },
+        expected_species_id="Na",
+    ) == VAPOUR_CARRIER_AUTHORITY_REFUSED
+
+
+@pytest.mark.parametrize(
+    ("pressure_kind", "flux_kind"),
+    (
+        ("unknown", "eligible"),
+        ("value", "unknown"),
+        ("", "eligible"),
+        ("value", ""),
+    ),
+)
+def test_carrier_authority_refuses_unknown_or_empty_outcome_tokens(
+    pressure_kind: str,
+    flux_kind: str,
+) -> None:
+    assert vapour_carrier_authority_status(
+        {
+            "species_id": "Na",
+            "pressure": {"kind": pressure_kind, "pa": 1.0},
+            "flux": {"kind": flux_kind, "alpha_ref": "alpha:Na"},
+            "verdict_status": "authoritative",
+            "certification_ceiling": "validated_point",
+            "validation_status": "validated",
+            "is_union_flux_eligible": True,
+            "is_flux_active": True,
+        },
+        expected_species_id="Na",
+    ) == VAPOUR_CARRIER_AUTHORITY_REFUSED
+
+
+def test_carrier_authority_preserves_recognized_diagnostic_bound_pair() -> None:
+    assert vapour_carrier_authority_status(
+        {
+            "species_id": "Na",
+            "pressure": {"kind": "upper_bound", "pa": 1.0},
+            "flux": {
+                "kind": "diagnostic_upper_bound",
+                "alpha_ref": "alpha:Na",
+            },
+            "verdict_status": "status_bearing_non_authoritative",
+            "certification_ceiling": "never",
+            "validation_status": "pending_validation",
+            "is_union_flux_eligible": False,
+            "is_flux_active": False,
+        },
+        expected_species_id="Na",
+    ) == VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING
+
+
+@pytest.mark.parametrize(
+    ("pressure_kind", "flux_kind"),
+    (
+        ("upper_bound", "eligible"),
+        ("value", "diagnostic_upper_bound"),
+    ),
+)
+def test_carrier_authority_refuses_disagreeing_bound_tokens(
+    pressure_kind: str,
+    flux_kind: str,
+) -> None:
+    assert vapour_carrier_authority_status(
+        {
+            "species_id": "Na",
+            "pressure": {"kind": pressure_kind, "pa": 1.0},
+            "flux": {"kind": flux_kind, "alpha_ref": "alpha:Na"},
+            "verdict_status": "authoritative",
+            "certification_ceiling": "validated_point",
+            "validation_status": "validated",
+            "is_union_flux_eligible": True,
+            "is_flux_active": True,
+        },
+        expected_species_id="Na",
+    ) == VAPOUR_CARRIER_AUTHORITY_REFUSED
+
+
+def test_epoch_dormant_carrier_cannot_mint_authority() -> None:
+    report = serialize_vapour_batch(
+        _toy_batch({"Na"}, flux_active=set())
+    )
+    assert report is not None
+    record = report["channels_by_species"]["Na"]
+    record.update(
+        verdict_status="authoritative",
+        certification_ceiling="validated_point",
+        validation_status="validated",
+    )
+
+    assert record["is_union_flux_eligible"] is True
+    assert record["is_flux_active"] is False
+    assert record["is_flux_dormant_by_epoch"] is True
+    assert vapour_carrier_authority_status(
+        record,
+        expected_species_id="Na",
+    ) == VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING
 
 
 def test_legacy_activation_set_uses_only_finite_pressure_keys() -> None:
@@ -295,12 +471,24 @@ def test_b111_condensation_refusals_payload_and_model_consumer() -> None:
             "status": "refused",
             "reason": "antoine_data_unavailable",
             "output_status": "status_bearing",
+            "carrier_authority": {
+                "pressure": {"kind": "refusal", "code": "test_refusal"},
+            },
+            "stage_outcomes": [{"stage": 3, "status": "pass_through"}],
         }
     }
     payload = condensation_refusals_payload(raw)
     assert payload["has_refusals"] is True
     assert payload["n_species"] == 1
     assert payload["by_species"]["X"]["reason"] == "antoine_data_unavailable"
+    payload["by_species"]["X"]["carrier_authority"]["pressure"]["code"] = (
+        "mutated"
+    )
+    payload["by_species"]["X"]["stage_outcomes"][0]["status"] = "mutated"
+    assert raw["X"]["carrier_authority"]["pressure"]["code"] == (
+        "test_refusal"
+    )
+    assert raw["X"]["stage_outcomes"][0]["status"] == "pass_through"
 
     model = _efficiency_model()
     model.last_condensation_refusals_by_species = dict(raw)
@@ -310,6 +498,12 @@ def test_b111_condensation_refusals_payload_and_model_consumer() -> None:
 
     diag = condensation_refusals_diagnostic(sim)
     assert diag["has_refusals"] is True
+    diag["by_species"]["X"]["carrier_authority"]["pressure"]["code"] = (
+        "mutated_again"
+    )
+    assert model.last_condensation_refusals_by_species["X"][
+        "carrier_authority"
+    ]["pressure"]["code"] == "test_refusal"
     panel = condensation_refusals_panel_payload(sim)
     assert panel["status"] == "ok"
     assert panel["by_species"]["X"]["reason"] == "antoine_data_unavailable"
@@ -1106,13 +1300,23 @@ def test_vapour_rail_instrumentation_diagnostic_shape() -> None:
         },
         _last_vapour_batch_resolve_error={},
         condensation_model=SimpleNamespace(
-            last_condensation_refusals_by_species={}
+            last_condensation_refusals_by_species={},
+            last_condensation_authority_by_species={},
         ),
     )
     diag = vapour_rail_instrumentation_diagnostic(sim)
     assert diag["schema"] == "vapour_rail_instrumentation.v1"
     assert diag["shadow_equal"] is True
     assert diag["shadow_outcome"] == SHADOW_PROVED
+    original_pressure = sim._last_vapour_batch_report["channels_by_species"][
+        "Na"
+    ]["pressure"]
+    diag["vapour_batch"]["channels_by_species"]["Na"]["pressure"] = {
+        "kind": "mutated"
+    }
+    assert sim._last_vapour_batch_report["channels_by_species"]["Na"][
+        "pressure"
+    ] == original_pressure
     assert diag["melt_activity_shadow"]["schema"] == "melt_activity_shadow.v1"
     assert diag["melt_activity_shadow"]["record_limit"] == 64
     assert diag["melt_activity_shadow"]["record_truncated"] is False
@@ -1403,6 +1607,7 @@ def test_sc50_vr_instrumentation_surface_fields_have_consumers() -> None:
         "flux_overlay",
         "source_vapour_ceiling_table",
         "condensation_refusals",
+        "condensation_authority",
     ):
         assert key in diag, f"diagnostic lost producer key {key!r}"
     for key in (
@@ -1413,6 +1618,7 @@ def test_sc50_vr_instrumentation_surface_fields_have_consumers() -> None:
         "n_flux_active",
         "n_refused",
         "refusals_by_species",
+        "condensation_authority",
     ):
         assert key in panel, f"panel lost producer key {key!r}"
         assert key in advisory_js, (
@@ -1518,6 +1724,18 @@ def test_coating_readout_consumes_status_bearing_refusal_count() -> None:
             },
             "campaigns_to_resinter": 5.0,
             "wall_deposit_sticking_authority": {
+                "vapour_carrier_authority_by_species": {
+                    "Mg": {
+                        "species_id": "Mg",
+                        "pressure": {"kind": "value", "pa": 1.0},
+                        "flux": {"kind": "eligible"},
+                        "verdict_status": "status_bearing_non_authoritative",
+                        "certification_ceiling": "never",
+                        "validation_status": "pending_validation",
+                        "is_union_flux_eligible": True,
+                        "is_flux_active": True,
+                    }
+                },
                 "wall_saturation_pressure_refusals_by_species": {
                     "Mg": {
                         "hot_wall": {

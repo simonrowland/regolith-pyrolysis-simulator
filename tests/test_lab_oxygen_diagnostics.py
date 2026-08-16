@@ -476,6 +476,18 @@ def test_segment_deposit_requires_matching_sticking_provenance_record():
             }
         },
     )
+    notice["vapour_carrier_authority_by_species"] = {
+        "Na": {
+            "species_id": "Na",
+            "pressure": {"kind": "value", "pa": 1.0},
+            "flux": {"kind": "eligible"},
+            "verdict_status": "authoritative",
+            "certification_ceiling": "validated_point",
+            "validation_status": "validated",
+            "is_union_flux_eligible": True,
+            "is_flux_active": True,
+        }
+    }
 
     authority = wall_deposit_sticking_authority_status(
         {"stage_1": {"Na": 0.1}, "stage_2": {"Na": 0.2}},

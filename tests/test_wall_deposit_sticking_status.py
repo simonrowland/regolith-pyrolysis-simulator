@@ -21,14 +21,60 @@ from simulator.optimize.study import (
 from simulator.runner import _wall_fouling_report
 from simulator.state import HourSnapshot, PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX
 from simulator.trace import PhysicsTrace
+from simulator.vapour_rail.instrumentation import (
+    vapour_carrier_authority_status,
+)
 from web.routes import _coating_readout
 
 
 pytestmark = pytest.mark.usefixtures("production_configured_condensation_route")
 
 
+def _carrier_authority(
+    species: str,
+    *,
+    status: str = "authoritative",
+) -> dict[str, dict[str, object]]:
+    if status == "refused":
+        pressure = {"kind": "refusal", "code": "test_refusal"}
+        flux = {"kind": "refusal", "code": "test_refusal"}
+    elif status == "proven_zero":
+        pressure = {"kind": "zero_by_physics", "evidence_ref": "test:zero"}
+        flux = {"kind": "eligible", "alpha_ref": "test:alpha"}
+    else:
+        pressure = {"kind": "value", "pa": 1.0}
+        flux = {"kind": "eligible", "alpha_ref": "test:alpha"}
+    authoritative = status == "authoritative"
+    return {
+        species: {
+            "species_id": species,
+            "pressure": pressure,
+            "flux": flux,
+            "is_refused": status == "refused",
+            "is_union_flux_eligible": status in {
+                "authoritative", "status_bearing"
+            },
+            "is_flux_active": status in {
+                "authoritative", "status_bearing"
+            },
+            "validation_status": (
+                "validated" if authoritative else "modeled-PENDING"
+            ),
+            "verdict_status": (
+                "authoritative"
+                if authoritative
+                else "status_bearing_non_authoritative"
+            ),
+            "certification_ceiling": (
+                "validated_point" if authoritative else "never"
+            ),
+        }
+    }
+
+
 def _alpha_notice(species: str, *, cited: bool) -> dict[str, object]:
     return {
+        "vapour_carrier_authority_by_species": _carrier_authority(species),
         "alpha_s_provenance_by_species": {
             species: {
                 "hot_wall": {
@@ -50,6 +96,7 @@ def _alpha_notice(species: str, *, cited: bool) -> dict[str, object]:
 
 def _cited_missing_alpha_notice(species: str) -> dict[str, object]:
     return {
+        "vapour_carrier_authority_by_species": _carrier_authority(species),
         "alpha_s_provenance_by_species": {
             species: {
                 "hot_wall": {
@@ -65,11 +112,15 @@ def _cited_missing_alpha_notice(species: str) -> dict[str, object]:
 
 
 def _missing_record_notice(species: str) -> dict[str, object]:
-    return {"alpha_s_provenance_by_species": {species: {}}}
+    return {
+        "vapour_carrier_authority_by_species": _carrier_authority(species),
+        "alpha_s_provenance_by_species": {species: {}},
+    }
 
 
 def _sourced_missing_output_notice(species: str) -> dict[str, object]:
     return {
+        "vapour_carrier_authority_by_species": _carrier_authority(species),
         "alpha_s_provenance_by_species": {
             species: {
                 "hot_wall": {
@@ -232,7 +283,11 @@ def _route_wall_deposit_authority(
     melt = MeltState()
     melt.temperature_C = 1700.0
     route = model.route(
-        EvaporationFlux(species_kg_hr={species: 1.0}, total_kg_hr=1.0),
+        EvaporationFlux(
+            species_kg_hr={species: 1.0},
+            total_kg_hr=1.0,
+            carrier_authority_by_species=_carrier_authority(species),
+        ),
         melt,
     )
     authority = wall_deposit_sticking_authority_status(
@@ -262,6 +317,14 @@ def _coating_surfaces(
     *,
     kg: float = 0.05,
 ) -> dict[str, object]:
+    notice = copy.deepcopy(notice)
+    carrier_authority = notice.setdefault(
+        "vapour_carrier_authority_by_species", {}
+    )
+    if isinstance(carrier_authority, dict):
+        carrier_authority.setdefault(
+            species, _carrier_authority(species)[species]
+        )
     wall = {("hot_wall", species): kg}
     sim = _fake_sim(wall, notice)
     trace = PhysicsTrace.from_simulator(sim)
@@ -556,7 +619,7 @@ def test_uncertified_capture_budget_alpha_driving_wall_deposit_fails_closed(
     )
 
 
-def test_grounded_stage_alpha_driving_wall_deposit_stays_authoritative() -> None:
+def test_grounded_but_out_of_domain_alpha_cannot_certify_wall_deposit() -> None:
     route, authority = _route_wall_deposit_authority(
         "Fe",
         materials=_materials_with_stage_alpha(
@@ -572,10 +635,337 @@ def test_grounded_stage_alpha_driving_wall_deposit_stays_authoritative() -> None
     )
 
     assert route.wall_deposit_by_species["Fe"] > 0.0
-    assert authority["authoritative_for_deposit_mass"] is True
+    assert authority["authoritative_for_deposit_mass"] is False
+    assert authority["code"] == "wall_deposit_sticking_alpha_out_of_domain"
     provenance = authority["alpha_s_provenance_by_species"]["Fe"]
     assert provenance["stage_1"]["citation_status"] == "CITED"
     assert provenance["capture_budget"]["citation_status"] == "CITED"
+
+
+def test_out_of_domain_cited_fe_alpha_computes_but_marks_wall_non_authoritative(
+) -> None:
+    route, authority = _route_wall_deposit_authority(
+        "Fe",
+        wall_temperature_C=900.0,
+    )
+
+    assert route.wall_deposit_by_species["Fe"] > 0.0
+    records = [
+        record
+        for record in route.sticking_alpha_provenance_notice[
+            "alpha_s_provenance_by_species"
+        ]["Fe"].values()
+        if isinstance(record, dict)
+    ]
+    assert records
+    extrapolated = [
+        record for record in records if record["alpha_s_extrapolated"] is True
+    ]
+    assert extrapolated
+    assert all(record["output_status"] == "status_bearing" for record in extrapolated)
+    assert authority["authoritative_for_deposit_mass"] is False
+    assert authority["code"] == "wall_deposit_sticking_alpha_out_of_domain"
+    assert authority["out_of_domain_alpha_species"] == ["Fe"]
+
+
+@pytest.mark.parametrize(
+    ("temperature_K", "expected_authoritative"),
+    ((1750.0, True), (1800.1, False)),
+)
+def test_positive_deposit_distinguishes_in_range_and_above_range_alpha(
+    temperature_K: float,
+    expected_authoritative: bool,
+) -> None:
+    record = condensation_module._alpha_record(
+        species="Fe",
+        entry={
+            "value_ref": (
+                "data/literature/vacuum_pyrolysis_sticking.yaml::"
+                "species.Fe.value"
+            )
+        },
+        source="test::Fe",
+        T_K=temperature_K,
+    )
+    notice = {
+        "alpha_s_provenance_by_species": {
+            "Fe": {"hot_wall": record}
+        },
+        "vapour_carrier_authority_by_species": _carrier_authority("Fe"),
+    }
+
+    authority = wall_deposit_sticking_authority_status(
+        {"hot_wall": {"Fe": 0.1}},
+        notice,
+    )
+
+    assert authority["authoritative_for_deposit_mass"] is (
+        expected_authoritative
+    )
+    if expected_authoritative:
+        assert record["alpha_s_domain_status"] == "in_domain"
+    else:
+        assert record["alpha_s_domain_status"] == "out_of_domain"
+        assert authority["code"] == "wall_deposit_sticking_alpha_out_of_domain"
+
+
+def test_later_no_deposit_route_cannot_erase_prior_out_of_domain_authority(
+) -> None:
+    model = CondensationModel(
+        CondensationTrain.create_default(),
+        wall_temperature_C=900.0,
+    )
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={"Fe": 1.0},
+        campaign_name="C0",
+    )
+    flux = EvaporationFlux(
+        species_kg_hr={"Fe": 1.0},
+        total_kg_hr=1.0,
+        carrier_authority_by_species=_carrier_authority("Fe"),
+    )
+    first = model.route(flux, MeltState(temperature_C=1700.0))
+    assert first.wall_deposit_by_species["Fe"] > 0.0
+
+    model.configure_operating_conditions(
+        wall_temperature_C=2000.0,
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={"Fe": 1.0},
+        campaign_name="C0",
+    )
+    second = model.route(flux, MeltState(temperature_C=1700.0))
+    cumulative = wall_deposit_sticking_authority_status(
+        first.wall_deposit_by_segment_species,
+        second.sticking_alpha_provenance_notice,
+    )
+
+    assert second.wall_deposit_by_species.get("Fe", 0.0) == pytest.approx(0.0)
+    assert cumulative["authoritative_for_deposit_mass"] is False
+    assert cumulative["code"] == "wall_deposit_sticking_alpha_out_of_domain"
+
+
+@pytest.mark.parametrize(
+    ("first_status", "second_status", "expected_status"),
+    (
+        ("status_bearing", "refused", "refused"),
+        ("refused", "status_bearing", "refused"),
+        ("status_bearing", "proven_zero", "proven_zero"),
+        ("proven_zero", "authoritative", "proven_zero"),
+    ),
+)
+def test_cumulative_carrier_authority_preserves_worst_status(
+    first_status: str,
+    second_status: str,
+    expected_status: str,
+) -> None:
+    model = CondensationModel(
+        CondensationTrain.create_default(),
+        wall_temperature_C=900.0,
+    )
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={"Fe": 1.0},
+        campaign_name="C0",
+    )
+    for status in (first_status, second_status):
+        model.route(
+            EvaporationFlux(
+                species_kg_hr={"Fe": 1.0},
+                total_kg_hr=1.0,
+                carrier_authority_by_species=_carrier_authority(
+                    "Fe",
+                    status=status,
+                ),
+            ),
+            MeltState(temperature_C=1700.0),
+        )
+
+    carrier = model.last_sticking_alpha_provenance_notice[
+        "vapour_carrier_authority_by_species"
+    ]["Fe"]
+    assert vapour_carrier_authority_status(
+        carrier,
+        expected_species_id="Fe",
+    ) == expected_status
+
+
+def test_returned_authority_notice_cannot_mutate_model_history() -> None:
+    model = CondensationModel(
+        CondensationTrain.create_default(),
+        wall_temperature_C=900.0,
+    )
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={"Fe": 1.0},
+        campaign_name="C0",
+    )
+    route = model.route(
+        EvaporationFlux(
+            species_kg_hr={"Fe": 1.0},
+            total_kg_hr=1.0,
+            carrier_authority_by_species=_carrier_authority("Fe"),
+        ),
+        MeltState(temperature_C=1700.0),
+    )
+
+    returned_record = route.sticking_alpha_provenance_notice[
+        "vapour_carrier_authority_by_species"
+    ]["Fe"]
+    returned_record["pressure"]["kind"] = "tampered"
+
+    stored_record = model.last_sticking_alpha_provenance_notice[
+        "vapour_carrier_authority_by_species"
+    ]["Fe"]
+    assert stored_record["pressure"]["kind"] == "value"
+    returned_transport = route.transport_parameter_notice[
+        "by_species"
+    ]["Fe"]["rows"]["Fe"]
+    returned_transport["status"] = "tampered"
+    assert model.last_transport_parameter_notice[
+        "by_species"
+    ]["Fe"]["rows"]["Fe"]["status"] != "tampered"
+
+
+def test_status_bearing_carrier_keeps_mass_but_cannot_certify_wall_deposit(
+) -> None:
+    model = CondensationModel(
+        CondensationTrain.create_default(),
+        wall_temperature_C=1476.85,
+    )
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={"Fe": 1.0},
+        campaign_name="C0",
+    )
+    route = model.route(
+        EvaporationFlux(
+            species_kg_hr={"Fe": 1.0},
+            total_kg_hr=1.0,
+            carrier_authority_by_species=_carrier_authority(
+                "Fe", status="status_bearing"
+            ),
+        ),
+        MeltState(temperature_C=1700.0),
+    )
+    authority = wall_deposit_sticking_authority_status(
+        route.wall_deposit_by_segment_species,
+        route.sticking_alpha_provenance_notice,
+    )
+
+    assert route.wall_deposit_by_species["Fe"] > 0.0
+    assert route.remaining_by_species["Fe"] < 1.0
+    assert route.condensation_authority_by_species["Fe"]["status"] == (
+        "status_bearing"
+    )
+    assert authority["authoritative_for_deposit_mass"] is False
+    assert authority["code"] == "wall_deposit_vapour_carrier_non_authoritative"
+    assert authority["non_authoritative_carrier_species"] == ["Fe"]
+
+
+def test_malformed_carrier_missing_effective_activity_cannot_certify_deposit(
+) -> None:
+    notice = _alpha_notice("Fe", cited=True)
+    notice["vapour_carrier_authority_by_species"]["Fe"].pop(
+        "is_flux_active"
+    )
+
+    authority = wall_deposit_sticking_authority_status(
+        {"hot_wall": {"Fe": 0.1}},
+        notice,
+    )
+
+    assert authority["authoritative_for_deposit_mass"] is False
+    assert authority["code"] == "wall_deposit_vapour_carrier_non_authoritative"
+    assert authority["non_authoritative_carrier_species"] == ["Fe"]
+
+
+def test_miskeyed_carrier_record_cannot_certify_another_species() -> None:
+    notice = _alpha_notice("Fe", cited=True)
+    notice["vapour_carrier_authority_by_species"]["Fe"]["species_id"] = "Na"
+
+    authority = wall_deposit_sticking_authority_status(
+        {"hot_wall": {"Fe": 0.1}},
+        notice,
+    )
+
+    assert authority["authoritative_for_deposit_mass"] is False
+    assert authority["non_authoritative_carrier_species"] == ["Fe"]
+
+
+def test_reactive_wall_products_inherit_input_carrier_authority() -> None:
+    notice = _alpha_notice("SiO", cited=True)
+    notice["vapour_carrier_lineage_by_deposited_species"] = {
+        "Si": "SiO",
+        "SiO2": "SiO",
+    }
+
+    authority = wall_deposit_sticking_authority_status(
+        {"hot_wall": {"Si": 0.02, "SiO2": 0.03}},
+        notice,
+    )
+
+    assert authority["missing_carrier_authority_species"] == []
+    assert authority["non_authoritative_carrier_species"] == []
+    assert authority["authoritative_for_deposit_mass"] is True
+    assert authority["vapour_carrier_lineage_by_deposited_species"] == {
+        "Si": "SiO",
+        "SiO2": "SiO",
+    }
+
+
+@pytest.mark.parametrize(
+    ("carrier_status", "expected_status", "expected_reason"),
+    (
+        ("refused", "refused", "upstream_vapour_carrier_refused"),
+        (
+            "proven_zero",
+            "proven_zero",
+            "positive_mass_conflicts_with_upstream_proven_zero",
+        ),
+    ),
+)
+def test_non_debiting_carrier_states_remain_distinct_and_mass_explicit(
+    carrier_status: str,
+    expected_status: str,
+    expected_reason: str,
+) -> None:
+    model = CondensationModel(
+        CondensationTrain.create_default(),
+        wall_temperature_C=1476.85,
+    )
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={"Fe": 1.0},
+        campaign_name="C0",
+    )
+    route = model.route(
+        EvaporationFlux(
+            species_kg_hr={"Fe": 1.0},
+            total_kg_hr=1.0,
+            carrier_authority_by_species=_carrier_authority(
+                "Fe", status=carrier_status
+            ),
+        ),
+        MeltState(temperature_C=1700.0),
+    )
+
+    assert route.wall_deposit_by_species == {}
+    assert route.remaining_by_species == {"Fe": 0.0}
+    assert route.retained_in_source_by_species == {"Fe": 1.0}
+    refusal = route.condensation_refusals_by_species["Fe"]
+    assert refusal["upstream_authority_status"] == expected_status
+    assert refusal["reason"] == expected_reason
+    assert refusal["input_mass_kg_hr"] == pytest.approx(1.0)
+    assert refusal["remaining_mass_kg_hr"] == pytest.approx(0.0)
+    assert refusal["retained_in_source_mass_kg_hr"] == pytest.approx(1.0)
+    assert refusal["mass_closure_error_kg_hr"] == pytest.approx(0.0)
+    wall_authority = wall_deposit_sticking_authority_status(
+        {},
+        route.sticking_alpha_provenance_notice,
+    )
+    assert wall_authority["authoritative_for_deposit_mass"] is False
+    assert wall_authority[f"{carrier_status}_carrier_species"] == ["Fe"]
 
 
 @pytest.mark.parametrize(
@@ -622,7 +1012,7 @@ def test_analytical_value_ref_material_alpha_cannot_certify_wall_deposit(
     assert "cannot certify" in record["certification_status_reason"]
 
 
-def test_zero_deposit_stage_alpha_status_stays_authoritative() -> None:
+def test_zero_deposit_stage_alpha_status_remains_non_authoritative() -> None:
     route, authority = _route_wall_deposit_authority(
         "Fe",
         materials=_materials_with_stage_alpha(
@@ -639,7 +1029,23 @@ def test_zero_deposit_stage_alpha_status_stays_authoritative() -> None:
     )
 
     assert route.wall_deposit_by_species.get("Fe", 0.0) == pytest.approx(0.0)
-    assert authority["authoritative_for_deposit_mass"] is True
+    assert authority["authoritative_for_deposit_mass"] is False
+    assert authority["code"] == "wall_deposit_sticking_alpha_uncertified"
+    assert authority["uncertified_alpha_species"] == ["Fe"]
+    assert authority["out_of_domain_alpha_species"] == ["Fe"]
+    assert authority["deposited_species"] == []
+
+
+def test_zero_deposit_out_of_domain_alpha_remains_non_authoritative() -> None:
+    route, authority = _route_wall_deposit_authority(
+        "Fe",
+        wall_temperature_C=2000.0,
+    )
+
+    assert route.wall_deposit_by_species.get("Fe", 0.0) == pytest.approx(0.0)
+    assert authority["authoritative_for_deposit_mass"] is False
+    assert authority["code"] == "wall_deposit_sticking_alpha_out_of_domain"
+    assert authority["out_of_domain_alpha_species"] == ["Fe"]
     assert authority["deposited_species"] == []
 
 
@@ -687,7 +1093,8 @@ def test_out_of_domain_wall_psat_refusal_is_status_bearing() -> None:
     assert authority["authoritative_for_deposit_mass"] is False
     assert authority["output_status"] == "status_bearing"
     assert authority["code"] == "wall_deposit_saturation_pressure_refused"
-    assert authority["status_bearing_alpha_count"] == 0
+    assert authority["status_bearing_alpha_count"] == 1
+    assert authority["out_of_domain_alpha_species"] == ["Mg"]
     assert authority["status_bearing_refusal_count"] == 1
     assert authority["wall_saturation_pressure_refused_species"] == ["Mg"]
     fouling = _wall_fouling_report(
@@ -891,7 +1298,7 @@ def test_missing_or_wrong_species_alpha_status_reaches_all_coating_surfaces(
     assert leaderboard_row["coating_output_status"] == "status_bearing"
 
 
-def test_zero_deposit_uncertified_alpha_status_stays_authoritative() -> None:
+def test_zero_deposit_uncertified_alpha_status_remains_non_authoritative() -> None:
     notice = _alpha_notice("K", cited=False)
 
     surfaces = _coating_surfaces("K", notice, kg=0.0)
@@ -901,16 +1308,16 @@ def test_zero_deposit_uncertified_alpha_status_stays_authoritative() -> None:
     readout = surfaces["readout"]
     leaderboard_row = surfaces["leaderboard_row"]
 
-    assert coating.status == "available"
-    assert coating.authoritative is True
-    assert fouling["status"] == "available"
-    assert fouling["authoritative_for_resinter"] is True
-    assert product_summary["coating_status"] == "available"
-    assert product_summary["coating_authoritative"] is True
-    assert readout["status"] == "available"
-    assert readout["authoritative"] is True
-    assert leaderboard_row["coating_status"] == "available"
-    assert leaderboard_row["coating_authoritative"] is True
+    assert coating.status == "warning"
+    assert coating.authoritative is False
+    assert fouling["status"] == "warning"
+    assert fouling["authoritative_for_resinter"] is False
+    assert product_summary["coating_status"] == "warning"
+    assert product_summary["coating_authoritative"] is False
+    assert readout["status"] == "warning"
+    assert readout["authoritative"] is False
+    assert leaderboard_row["coating_status"] == "warning"
+    assert leaderboard_row["coating_authoritative"] is False
 
 
 def test_web_positive_deposit_without_authority_defaults_non_authoritative() -> None:
@@ -937,6 +1344,47 @@ def test_web_positive_deposit_without_authority_defaults_non_authoritative() -> 
     assert "authority missing" in readout["reason"]
     assert zero_readout["status"] == "available"
     assert zero_readout["authoritative"] is True
+
+
+def test_web_zero_deposit_reclassifies_status_bearing_authority_evidence(
+) -> None:
+    notice = _alpha_notice("Fe", cited=True)
+    notice["vapour_carrier_authority_by_species"] = _carrier_authority(
+        "Fe", status="status_bearing"
+    )
+    readout = _coating_readout({
+        "wall_deposit_kg_by_segment_species": {"hot_wall": {"Fe": 0.0}},
+        "campaigns_to_resinter": "infinite",
+        "coating_authoritative": True,
+        "wall_deposit_sticking_authority": notice,
+    })
+
+    assert readout["status"] == "warning"
+    assert readout["authoritative"] is False
+    assert readout["output_status"] == "status_bearing"
+
+
+def test_web_wall_alias_selection_prefers_nonempty_and_rejects_conflict(
+) -> None:
+    notice = _alpha_notice("Fe", cited=True)
+    nonempty_after_empty = _coating_readout({
+        "wall_deposit_kg_by_segment_species": {},
+        "wall_deposit_kg_by_zone_species": {"hot_wall": {"Fe": 0.25}},
+        "campaigns_to_resinter": 5.0,
+        "wall_deposit_sticking_authority": notice,
+    })
+    conflicting = _coating_readout({
+        "wall_deposit_kg_by_segment_species": {"hot_wall": {"Fe": 0.25}},
+        "wall_deposit_kg_by_zone_species": {"hot_wall": {"Fe": 0.5}},
+        "campaigns_to_resinter": 5.0,
+        "wall_deposit_sticking_authority": notice,
+    })
+
+    assert nonempty_after_empty["total_kg"] == pytest.approx(0.25)
+    assert nonempty_after_empty["authoritative"] is True
+    assert conflicting["status"] == "warning"
+    assert conflicting["authoritative"] is False
+    assert "aliases contain conflicting" in conflicting["reason"]
 
 
 def test_web_readout_provenance_overrides_stale_true_summary_bool() -> None:
@@ -1006,6 +1454,9 @@ def test_cited_cumulative_authority_subset_deposit_stays_authoritative() -> None
     notice = _alpha_notice("Fe", cited=True)
     notice["alpha_s_provenance_by_species"].update(
         _alpha_notice("Mg", cited=True)["alpha_s_provenance_by_species"]
+    )
+    notice["vapour_carrier_authority_by_species"].update(
+        _carrier_authority("Mg")
     )
     sim = _fake_sim(
         {("hot_wall", "Fe"): 0.05, ("hot_wall", "Mg"): 0.02},

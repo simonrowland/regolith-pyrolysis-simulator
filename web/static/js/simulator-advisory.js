@@ -641,6 +641,34 @@ function renderVapourRailInstrumentationPanel(payload) {
     } else {
         appendCeramicLine(content, 'Refused species', 'absent');
     }
+    const condensationAuthority = advisoryObject(
+        payload.condensation_authority
+    );
+    if (condensationAuthority) {
+        const counts = advisoryObject(
+            condensationAuthority.status_counts
+        ) || {};
+        const countSummary = Object.keys(counts).sort().map(
+            (key) => `${key}=${counts[key]}`
+        );
+        appendCeramicLine(
+            content,
+            'Condensation authority',
+            countSummary.length ? countSummary.join(', ') : 'none'
+        );
+        appendCeramicLine(
+            content,
+            'Condensation closure max (kg/h)',
+            Object.prototype.hasOwnProperty.call(
+                condensationAuthority,
+                'max_mass_closure_error_kg_hr'
+            )
+                ? String(condensationAuthority.max_mass_closure_error_kg_hr)
+                : 'absent'
+        );
+    } else {
+        appendCeramicLine(content, 'Condensation authority', 'absent');
+    }
     appendCeramicLine(content, 'Diagnostic only', String(!!payload.diagnostic_only));
 }
 

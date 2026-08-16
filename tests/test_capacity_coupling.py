@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import math
-from dataclasses import asdict
+from dataclasses import asdict, replace
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -36,9 +36,11 @@ from simulator.vapour_rail.batch import FluxEligible, PressureRefusal, PressureV
 from simulator.vapour_rail.catalog import OUT_OF_RANGE_STATUS
 from simulator.vapour_rail.instrumentation import (
     EffectivePressureSource,
+    VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE,
     compare_live_shadow_to_batch_flux,
     flux_pressures_from_batch,
     serialize_vapour_batch,
+    vapour_carrier_authority_status,
 )
 from simulator.thermal_train import (
     FiniteCapacity,
@@ -490,6 +492,116 @@ def test_real_finite_capacity_result_drives_live_short_session_once(monkeypatch)
         for transition in active.atom_ledger.transitions
     ) == 1
     assert shadow_results[0].mass_closure_error_pct <= 5.0e-12
+
+
+def test_all_zero_capacity_flux_preserves_and_routes_live_carrier_authority(
+    monkeypatch,
+):
+    active = _real_capacity_sim()
+    active.start_campaign(CampaignPhase.C0)
+    _capacity, cold_train = active._cold_train_capacity_policy()
+    monkeypatch.setattr(
+        active,
+        "_cold_train_capacity_policy",
+        lambda: (FiniteCapacity(1.0e-8), cold_train),
+    )
+    active.atom_ledger.load_external(
+        "process.overhead_gas",
+        {"O2": 1.0e-4},
+        source="capacity carrier authority fixture",
+        material_origin="feedstock",
+    )
+
+    rate_kg_hr = 0.0
+    carrier_record = {
+        "species_id": "Fe",
+        "pressure": {"kind": "value", "pa": 1.0},
+        "flux": {"kind": "eligible", "alpha_ref": "test:alpha"},
+        "is_refused": False,
+        "is_union_flux_eligible": True,
+        "is_flux_active": True,
+        "validation_status": "validated",
+        "verdict_status": "authoritative",
+        "certification_ceiling": "validated_point",
+    }
+    refused_na_record = {
+        "species_id": "Na",
+        "pressure": {"kind": "refusal", "code": "test_refusal"},
+        "flux": {"kind": "refusal", "code": "test_refusal"},
+        "is_refused": True,
+        "is_union_flux_eligible": False,
+        "is_flux_active": False,
+        "validation_status": "modeled-PENDING",
+        "verdict_status": "status_bearing_non_authoritative",
+        "certification_ceiling": "never",
+    }
+    live_flux = EvaporationFlux(
+        species_kg_hr={},
+        carrier_authority_by_species={
+            "Fe": carrier_record,
+            "Na": refused_na_record,
+        },
+    )
+    live_flux.update_totals()
+
+    real_shadow = active._compute_capacity_coupling_shadow
+
+    def solved_shadow(equilibrium):
+        result = real_shadow(equilibrium)
+        assert isinstance(result, CapacityShadowResult)
+        return replace(
+            result,
+            evaporation_flux_kg_hr={},
+        )
+
+    monkeypatch.setattr(active, "_compute_capacity_coupling_shadow", solved_shadow)
+    monkeypatch.setattr(
+        active,
+        "_calculate_evaporation",
+        lambda equilibrium, **kwargs: live_flux,
+    )
+    monkeypatch.setattr(
+        active,
+        "_apply_analytic_evaporation_depletion",
+        lambda flux: flux,
+    )
+
+    routed_fluxes = []
+    real_route = active.condensation_model.route
+
+    def observed_route(evap_flux, melt):
+        routed_fluxes.append(evap_flux)
+        return real_route(evap_flux, melt)
+
+    monkeypatch.setattr(active.condensation_model, "route", observed_route)
+    active.step()
+
+    assert routed_fluxes
+    routed = routed_fluxes[0]
+    assert routed.species_kg_hr == {}
+    assert routed.carrier_authority_by_species == {
+        "Fe": carrier_record,
+        "Na": refused_na_record,
+    }
+    assert active.condensation_model.last_sticking_alpha_provenance_notice[
+        "vapour_carrier_authority_by_species"
+    ] == {
+        "Fe": carrier_record,
+        "Na": refused_na_record,
+    }
+    assert active.condensation_model.last_condensation_authority_by_species[
+        "Fe"
+    ]["carrier_authority"] == carrier_record
+    assert active.condensation_model.last_condensation_authority_by_species[
+        "Na"
+    ]["carrier_authority"] == refused_na_record
+    assert (
+        vapour_carrier_authority_status(
+            routed.carrier_authority_by_species["Fe"],
+            expected_species_id="Fe",
+        )
+        == VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE
+    )
 
 
 def test_default_runtime_policy_is_no_cold_train():

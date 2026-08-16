@@ -295,6 +295,7 @@ def vapour_rail_instrumentation_panel_payload(sim: Any) -> dict[str, Any]:
         or [],
         "setpoints_t_cond_audit": payload.get("setpoints_t_cond_audit") or {},
         "condensation_refusals": payload.get("condensation_refusals") or {},
+        "condensation_authority": payload.get("condensation_authority") or {},
         "message": (
             "Exact-key vapour channel answers and advisory diagnostics; "
             "not flux-authoritative until an R-family flip."

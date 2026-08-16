@@ -55,6 +55,7 @@ from simulator.condensation import (
     CondensationRouteResult,
     _wall_route_species_order,
 )
+from simulator.diagnostics import wall_deposit_sticking_authority_status
 from simulator.state import (
     CampaignPhase,
     DecisionType,
@@ -740,6 +741,621 @@ def test_evaporation_caller_dispatches_condensation_floor_to_provider(
         assert sim.atom_ledger.kg_by_account("process.condensation_train")[
             "Na"
         ] == pytest.approx(condensed_kg)
+
+
+@pytest.mark.parametrize(
+    (
+        "status",
+        "record_species_id",
+        "pressure",
+        "flux_outcome",
+        "active",
+        "expected_status",
+        "reason",
+    ),
+    [
+        (
+            "refused",
+            "Fe",
+            {"kind": "refusal", "code": "test_missing_channel_contract"},
+            {"kind": "refusal", "code": "test_missing_channel_contract"},
+            False,
+            "refused",
+            "upstream_vapour_carrier_refused",
+        ),
+        (
+            "proven_zero",
+            "Fe",
+            {"kind": "zero_by_physics", "evidence_ref": "test:zero"},
+            {"kind": "eligible", "alpha_ref": "test:alpha"},
+            False,
+            "proven_zero",
+            "positive_mass_conflicts_with_upstream_proven_zero",
+        ),
+        (
+            "species_mismatch",
+            "Mg",
+            {"kind": "value", "pa": 1.0},
+            {"kind": "eligible", "alpha_ref": "test:alpha"},
+            True,
+            "refused",
+            "upstream_vapour_carrier_refused",
+        ),
+        (
+            "malformed_pressure",
+            "Fe",
+            {"kind": "unknown"},
+            {"kind": "eligible", "alpha_ref": "test:alpha"},
+            True,
+            "refused",
+            "upstream_vapour_carrier_refused",
+        ),
+        (
+            "malformed_flux",
+            "Fe",
+            {"kind": "value", "pa": 1.0},
+            {"kind": "unknown"},
+            True,
+            "refused",
+            "upstream_vapour_carrier_refused",
+        ),
+        (
+            "disagreeing_pressure_bound",
+            "Fe",
+            {"kind": "upper_bound", "pa": 1.0},
+            {"kind": "eligible", "alpha_ref": "test:alpha"},
+            True,
+            "refused",
+            "upstream_vapour_carrier_refused",
+        ),
+        (
+            "disagreeing_flux_bound",
+            "Fe",
+            {"kind": "value", "pa": 1.0},
+            {
+                "kind": "diagnostic_upper_bound",
+                "alpha_ref": "test:alpha",
+            },
+            True,
+            "refused",
+            "upstream_vapour_carrier_refused",
+        ),
+        (
+            "full_record_claims_missing",
+            "Fe",
+            {"kind": "value", "pa": 1.0},
+            {"kind": "eligible", "alpha_ref": "test:alpha"},
+            True,
+            "refused",
+            "upstream_vapour_carrier_refused",
+        ),
+    ],
+)
+def test_non_debiting_carrier_remains_in_source_and_closes_mass(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    status,
+    record_species_id,
+    pressure,
+    flux_outcome,
+    active,
+    expected_status,
+    reason,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    rate_kg_hr = 1.0e-6
+    source_before = float(
+        sim.atom_ledger.kg_by_account("process.cleaned_melt").get("FeO", 0.0)
+    )
+    overhead_before = float(
+        sim.atom_ledger.kg_by_account("process.overhead_gas").get("Fe", 0.0)
+    )
+    terminal_before = float(
+        sim.atom_ledger.kg_by_account("terminal.offgas").get("Fe", 0.0)
+    )
+    transition_count_before = len(sim.atom_ledger.transitions)
+    flux = EvaporationFlux(
+        species_kg_hr={"Fe": rate_kg_hr},
+        total_kg_hr=rate_kg_hr,
+        carrier_authority_by_species={
+            "Fe": {
+                "species_id": record_species_id,
+                "pressure": pressure,
+                "flux": flux_outcome,
+                "is_refused": status == "refused",
+                "is_union_flux_eligible": active,
+                "is_flux_active": active,
+                **(
+                    {"authority_status": "missing"}
+                    if status == "full_record_claims_missing"
+                    else {}
+                ),
+                "validation_status": (
+                    "validated"
+                    if status in {
+                        "species_mismatch",
+                        "malformed_pressure",
+                        "malformed_flux",
+                        "disagreeing_pressure_bound",
+                        "disagreeing_flux_bound",
+                        "full_record_claims_missing",
+                    }
+                    else "modeled-PENDING"
+                ),
+                "verdict_status": (
+                    "authoritative"
+                    if status in {
+                        "species_mismatch",
+                        "malformed_pressure",
+                        "malformed_flux",
+                        "disagreeing_pressure_bound",
+                        "disagreeing_flux_bound",
+                        "full_record_claims_missing",
+                    }
+                    else "status_bearing_non_authoritative"
+                ),
+                "certification_ceiling": (
+                    "validated_point"
+                    if status in {
+                        "species_mismatch",
+                        "malformed_pressure",
+                        "malformed_flux",
+                        "disagreeing_pressure_bound",
+                        "disagreeing_flux_bound",
+                        "full_record_claims_missing",
+                    }
+                    else "never"
+                ),
+            }
+        },
+    )
+
+    residual = sim._route_to_condensation(flux)
+
+    assert residual.species_kg_hr.get("Fe", 0.0) == pytest.approx(0.0)
+    refusal = sim.condensation_model.last_condensation_refusals_by_species["Fe"]
+    assert refusal["reason"] == reason
+    assert refusal["mass_disposition"] == (
+        "retained_in_source_pending_authority"
+    )
+    assert refusal["input_mass_kg_hr"] == pytest.approx(rate_kg_hr)
+    assert refusal["remaining_mass_kg_hr"] == pytest.approx(0.0)
+    assert refusal["retained_in_source_mass_kg_hr"] == pytest.approx(
+        rate_kg_hr
+    )
+    assert refusal["condensed_mass_kg_hr"] == pytest.approx(0.0)
+    assert refusal["mass_closure_error_kg_hr"] == pytest.approx(0.0)
+    source_after = float(
+        sim.atom_ledger.kg_by_account("process.cleaned_melt").get("FeO", 0.0)
+    )
+    overhead_after = float(
+        sim.atom_ledger.kg_by_account("process.overhead_gas").get("Fe", 0.0)
+    )
+    assert source_after == pytest.approx(source_before)
+    assert overhead_after == pytest.approx(overhead_before)
+    committed_flux = sim._ledger_committed_evap_flux_this_tick
+    assert committed_flux.species_kg_hr == {}
+    assert committed_flux.carrier_authority_by_species == (
+        flux.carrier_authority_by_species
+    )
+    assert refusal["carrier_authority"] == (
+        flux.carrier_authority_by_species["Fe"]
+    )
+    assert refusal["authoritative_for_terminal_offgas"] is False
+
+    new_transitions = sim.atom_ledger.transitions[transition_count_before:]
+    evaporation_transitions = [
+        transition
+        for transition in new_transitions
+        if transition.name.startswith("evaporate_")
+    ]
+    condensation_transitions = [
+        transition
+        for transition in new_transitions
+        if transition.name.startswith("condense_")
+    ]
+    assert evaporation_transitions == []
+    assert condensation_transitions == []
+    wall_authority = wall_deposit_sticking_authority_status(
+        {},
+        sim.condensation_model.last_sticking_alpha_provenance_notice,
+    )
+    assert wall_authority["authoritative_for_deposit_mass"] is False
+    assert wall_authority[
+        f"{expected_status}_carrier_species"
+    ] == ["Fe"]
+
+    sim._dispatch_overhead_bleed(force_drain_all=True)
+    terminal_after = float(
+        sim.atom_ledger.kg_by_account("terminal.offgas").get("Fe", 0.0)
+    )
+    assert terminal_after == pytest.approx(terminal_before)
+
+    registry = sim.atom_ledger.registry
+    for transition in sim.atom_ledger.transitions[transition_count_before:]:
+        assert transition.debit_mass_kg(registry) == pytest.approx(
+            transition.credit_mass_kg(registry),
+            rel=0.0,
+            abs=1.0e-15,
+        )
+        debit_atoms = transition.debit_atom_moles(registry)
+        credit_atoms = transition.credit_atom_moles(registry)
+        assert all(
+            abs(
+                float(credit_atoms.get(element, 0.0))
+                - float(debit_atoms.get(element, 0.0))
+            )
+            <= 1.0e-15
+            for element in set(debit_atoms) | set(credit_atoms)
+        )
+    assert abs(sim._make_snapshot().mass_balance_error_pct) <= 5.0e-12
+
+
+@pytest.mark.parametrize(
+    "status",
+    ("authoritative", "status_bearing", "missing"),
+)
+def test_computed_carrier_authority_paths_close_actual_ledger(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    status,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    rate_kg_hr = 1.0e-6
+    carrier_authority = {}
+    if status != "missing":
+        authoritative = status == "authoritative"
+        carrier_authority = {
+            "Fe": {
+                "species_id": "Fe",
+                "pressure": {"kind": "value", "pa": 1.0},
+                "flux": {"kind": "eligible", "alpha_ref": "test:alpha"},
+                "is_refused": False,
+                "is_union_flux_eligible": True,
+                "is_flux_active": True,
+                "validation_status": (
+                    "validated" if authoritative else "modeled-PENDING"
+                ),
+                "verdict_status": (
+                    "authoritative"
+                    if authoritative
+                    else "status_bearing_non_authoritative"
+                ),
+                "certification_ceiling": (
+                    "validated_point" if authoritative else "never"
+                ),
+            }
+        }
+    cleaned_feo_before = float(
+        sim.atom_ledger.kg_by_account("process.cleaned_melt").get("FeO", 0.0)
+    )
+    overhead_fe_before = float(
+        sim.atom_ledger.kg_by_account("process.overhead_gas").get("Fe", 0.0)
+    )
+    condensed_fe_before = float(
+        sim.atom_ledger.kg_by_account("process.condensation_train").get(
+            "Fe", 0.0
+        )
+    )
+    terminal_fe_before = float(
+        sim.atom_ledger.kg_by_account("terminal.offgas").get("Fe", 0.0)
+    )
+    transition_count_before = len(sim.atom_ledger.transitions)
+    residual = sim._route_to_condensation(
+        EvaporationFlux(
+            species_kg_hr={"Fe": rate_kg_hr},
+            total_kg_hr=rate_kg_hr,
+            carrier_authority_by_species=carrier_authority,
+        )
+    )
+    authority = sim.condensation_model.last_condensation_authority_by_species[
+        "Fe"
+    ]
+    assert authority["status"] == status
+    assert authority["mass_closure_error_kg_hr"] == pytest.approx(0.0)
+    assert (
+        authority["authoritative_for_condensation"]
+        is (status == "authoritative")
+    )
+    assert authority["carrier_authority"] == carrier_authority.get("Fe", {})
+    assert authority["authoritative_for_terminal_offgas"] is (
+        status == "authoritative"
+    )
+    assert residual.carrier_authority_by_species == carrier_authority
+    assert residual.total_kg_hr >= 0.0
+
+    route_transitions = sim.atom_ledger.transitions[transition_count_before:]
+    evaporation_transitions = [
+        transition
+        for transition in route_transitions
+        if transition.name == "evaporate_Fe"
+    ]
+    condensation_transitions = [
+        transition
+        for transition in route_transitions
+        if transition.name == "condense_Fe"
+    ]
+    assert len(evaporation_transitions) == 1
+    assert len(condensation_transitions) == 1
+    assert (
+        sim.atom_ledger.kg_by_account("process.cleaned_melt").get("FeO", 0.0)
+        < cleaned_feo_before
+    )
+    overhead_fe_after_route = float(
+        sim.atom_ledger.kg_by_account("process.overhead_gas").get("Fe", 0.0)
+    )
+    condensed_fe_after_route = float(
+        sim.atom_ledger.kg_by_account("process.condensation_train").get(
+            "Fe", 0.0
+        )
+    )
+    assert overhead_fe_after_route > overhead_fe_before
+    assert condensed_fe_after_route > condensed_fe_before
+    assert authority["condensed_mass_kg_hr"] == pytest.approx(
+        condensed_fe_after_route - condensed_fe_before,
+        rel=0.0,
+        abs=1.0e-15,
+    )
+    assert authority["stage_condensed_mass_kg_hr"] + authority[
+        "wall_deposit_mass_kg_hr"
+    ] == pytest.approx(
+        authority["condensed_mass_kg_hr"],
+        rel=0.0,
+        abs=1.0e-15,
+    )
+    assert residual.species_kg_hr["Fe"] == pytest.approx(
+        overhead_fe_after_route - overhead_fe_before,
+        rel=0.0,
+        abs=1.0e-15,
+    )
+
+    sim._dispatch_overhead_bleed(force_drain_all=True)
+    terminal_fe_after = float(
+        sim.atom_ledger.kg_by_account("terminal.offgas").get("Fe", 0.0)
+    )
+    assert terminal_fe_after - terminal_fe_before == pytest.approx(
+        residual.species_kg_hr["Fe"],
+        rel=0.0,
+        abs=1.0e-15,
+    )
+    assert sim.atom_ledger.kg_by_account("process.overhead_gas").get(
+        "Fe", 0.0
+    ) == pytest.approx(overhead_fe_before, rel=0.0, abs=1.0e-15)
+    registry = sim.atom_ledger.registry
+    new_transitions = sim.atom_ledger.transitions[transition_count_before:]
+    assert new_transitions
+    for transition in new_transitions:
+        assert transition.debit_mass_kg(registry) == pytest.approx(
+            transition.credit_mass_kg(registry),
+            rel=0.0,
+            abs=1.0e-15,
+        )
+        debit_atoms = transition.debit_atom_moles(registry)
+        credit_atoms = transition.credit_atom_moles(registry)
+        assert all(
+            abs(
+                float(credit_atoms.get(element, 0.0))
+                - float(debit_atoms.get(element, 0.0))
+            )
+            <= 1.0e-15
+            for element in set(debit_atoms) | set(credit_atoms)
+        )
+    assert abs(sim._make_snapshot().mass_balance_error_pct) <= 5.0e-12
+
+
+def test_committed_reactive_products_record_input_carrier_lineage(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    rate_kg_hr = 1.0e-3
+    condensed_kg = 4.0e-4
+    carrier = {
+        "species_id": "SiO",
+        "pressure": {"kind": "value", "pa": 1.0},
+        "flux": {"kind": "eligible"},
+        "verdict_status": "status_bearing_non_authoritative",
+        "certification_ceiling": "never",
+        "validation_status": "modeled-PENDING",
+        "is_union_flux_eligible": True,
+        "is_flux_active": True,
+    }
+    notice = {
+        "vapour_carrier_authority_by_species": {
+            "SiO": carrier,
+        },
+        "alpha_s_provenance_by_species": {
+            "SiO": {
+                "stage_0_to_stage_1": {
+                    "segment": "stage_0_to_stage_1",
+                    "species": "SiO",
+                    "alpha_s": 0.02,
+                    "citation_status": "CITED",
+                    "status": "sourced",
+                    "output_status": "sourced_with_surface_proxy",
+                }
+            }
+        },
+    }
+    sim.condensation_model.last_sticking_alpha_provenance_notice = notice
+    route_result = CondensationRouteResult(
+        remaining_by_species={"SiO": rate_kg_hr - condensed_kg},
+        wall_deposit_by_species={"SiO": condensed_kg},
+        wall_deposit_by_segment_species={
+            "stage_0_to_stage_1": {"SiO": condensed_kg}
+        },
+        wall_deposit_fraction_by_species={"SiO": 1.0},
+        wall_deposit_account_fractions_by_species={
+            "SiO": {
+                "process.wall_deposit_segment_stage_0_to_stage_1": 1.0
+            }
+        },
+        wall_route_species_order=("SiO",),
+        condensation_authority_by_species={
+            "SiO": {
+                "status": "authoritative",
+                "authoritative_for_condensation": True,
+            }
+        },
+    )
+    sim.condensation_model.route = lambda evap_flux, melt: route_result
+    transition_count_before = len(sim.atom_ledger.transitions)
+
+    residual = sim._route_to_condensation(
+        EvaporationFlux(
+            species_kg_hr={"SiO": rate_kg_hr},
+            total_kg_hr=rate_kg_hr,
+            carrier_authority_by_species={"SiO": carrier},
+        )
+    )
+
+    lineage = sim.condensation_model.last_sticking_alpha_provenance_notice[
+        "vapour_carrier_lineage_by_deposited_species"
+    ]
+    assert lineage == {"Si": "SiO", "SiO2": "SiO"}
+    new_transitions = sim.atom_ledger.transitions[transition_count_before:]
+    assert [transition.name for transition in new_transitions] == [
+        "evaporate_SiO",
+        "condense_SiO",
+    ]
+    wall_account = sim.atom_ledger.kg_by_account(
+        "process.wall_deposit_segment_stage_0_to_stage_1"
+    )
+    assert wall_account["Si"] > 0.0
+    assert wall_account["SiO2"] > 0.0
+    assert residual.species_kg_hr["SiO"] == pytest.approx(
+        rate_kg_hr - condensed_kg,
+        rel=0.0,
+        abs=1.0e-15,
+    )
+    authority = wall_deposit_sticking_authority_status(
+        {"stage_0_to_stage_1": wall_account},
+        sim.condensation_model.last_sticking_alpha_provenance_notice,
+    )
+    assert authority["missing_carrier_authority_species"] == []
+    assert authority["authoritative_for_deposit_mass"] is False
+    assert authority["non_authoritative_carrier_species"] == [
+        "Si", "SiO", "SiO2",
+    ]
+    assert authority["vapour_carrier_lineage_by_deposited_species"] == lineage
+
+    sio_alpha = sim.condensation_model.last_sticking_alpha_provenance_notice[
+        "alpha_s_provenance_by_species"
+    ]["SiO"]["stage_0_to_stage_1"]
+    sio_alpha.update({
+        "alpha_s_extrapolated": True,
+        "alpha_s_domain_status": "out_of_domain",
+        "alpha_s_authoritative_at_temperature": False,
+        "output_status": "status_bearing",
+    })
+    mg_carrier = {
+        "species_id": "Mg",
+        "pressure": {"kind": "value", "pa": 1.0},
+        "flux": {"kind": "eligible"},
+        "verdict_status": "authoritative",
+        "certification_ceiling": "validated_point",
+        "validation_status": "validated",
+        "is_union_flux_eligible": True,
+        "is_flux_active": True,
+    }
+    notice = sim.condensation_model.last_sticking_alpha_provenance_notice
+    notice["vapour_carrier_authority_by_species"]["Mg"] = mg_carrier
+    notice["alpha_s_provenance_by_species"]["Mg"] = {
+        "stage_0_to_stage_1": {
+            "segment": "stage_0_to_stage_1",
+            "species": "Mg",
+            "alpha_s": 0.02,
+            "citation_status": "CITED",
+            "status": "sourced",
+            "output_status": "sourced_with_surface_proxy",
+        }
+    }
+    mg_rate_kg_hr = 1.0e-3
+    mg_condensed_kg = 4.0e-4
+    mg_route_result = CondensationRouteResult(
+        remaining_by_species={"Mg": mg_rate_kg_hr - mg_condensed_kg},
+        wall_deposit_by_species={"Mg": mg_condensed_kg},
+        wall_deposit_by_segment_species={
+            "stage_0_to_stage_1": {"Mg": mg_condensed_kg}
+        },
+        wall_deposit_fraction_by_species={"Mg": 1.0},
+        wall_deposit_account_fractions_by_species={
+            "Mg": {
+                "process.wall_deposit_segment_stage_0_to_stage_1": 1.0
+            }
+        },
+        wall_route_species_order=("Mg",),
+        condensation_authority_by_species={
+            "Mg": {
+                "status": "authoritative",
+                "authoritative_for_condensation": True,
+            }
+        },
+    )
+    sim.condensation_model.route = lambda evap_flux, melt: mg_route_result
+    mg_residual = sim._route_to_condensation(
+        EvaporationFlux(
+            species_kg_hr={"Mg": mg_rate_kg_hr},
+            total_kg_hr=mg_rate_kg_hr,
+            carrier_authority_by_species={"Mg": mg_carrier},
+        )
+    )
+    lineage = sim.condensation_model.last_sticking_alpha_provenance_notice[
+        "vapour_carrier_lineage_by_deposited_species"
+    ]
+    assert lineage["Si"] == ["Mg", "SiO"]
+    assert lineage["SiO2"] == ["Mg", "SiO"]
+    assert mg_residual.species_kg_hr["Mg"] == pytest.approx(
+        mg_rate_kg_hr - mg_condensed_kg,
+        rel=0.0,
+        abs=1.0e-15,
+    )
+    wall_account = sim.atom_ledger.kg_by_account(
+        "process.wall_deposit_segment_stage_0_to_stage_1"
+    )
+    mixed_authority = wall_deposit_sticking_authority_status(
+        {"stage_0_to_stage_1": wall_account},
+        sim.condensation_model.last_sticking_alpha_provenance_notice,
+    )
+    assert mixed_authority["authoritative_for_deposit_mass"] is False
+    assert "Si" in mixed_authority["non_authoritative_carrier_species"]
+    assert "Si" in mixed_authority["out_of_domain_alpha_species"]
+    assert mixed_authority[
+        "vapour_carrier_lineage_by_deposited_species"
+    ]["Si"] == ["Mg", "SiO"]
+    registry = sim.atom_ledger.registry
+    all_new_transitions = sim.atom_ledger.transitions[transition_count_before:]
+    assert [transition.name for transition in all_new_transitions] == [
+        "evaporate_SiO",
+        "condense_SiO",
+        "evaporate_Mg",
+        "condense_Mg",
+    ]
+    for transition in all_new_transitions:
+        assert transition.debit_mass_kg(registry) == pytest.approx(
+            transition.credit_mass_kg(registry),
+            rel=0.0,
+            abs=1.0e-15,
+        )
+    assert abs(sim._make_snapshot().mass_balance_error_pct) <= 5.0e-12
 
 
 def test_subfloor_holdup_persists_one_tick_then_accumulates_and_drains(

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import math
 from collections import defaultdict
 from collections.abc import Mapping
@@ -67,7 +68,7 @@ class EvaporationFluxRefusal(ProviderUnavailableError):
 
     def __init__(self, reason: str, diagnostic: Mapping[str, Any]):
         self.reason = str(reason)
-        self.diagnostic = dict(diagnostic)
+        self.diagnostic = copy.deepcopy(dict(diagnostic))
         super().__init__(self.reason)
 
 
@@ -592,6 +593,14 @@ class EvaporationMixin:
             )
         )
         batch_report = serialize_vapour_batch(vapour_batch)
+        if isinstance(batch_report, Mapping):
+            channels = batch_report.get('channels_by_species')
+            if isinstance(channels, Mapping):
+                flux.carrier_authority_by_species = {
+                    str(species): dict(record)
+                    for species, record in channels.items()
+                    if isinstance(record, Mapping)
+                }
         self._last_vapour_batch = vapour_batch
         self._last_vapour_batch_report = batch_report
         self._last_vapour_batch_flux_overlay = flux_overlay_report
@@ -2604,6 +2613,11 @@ class EvaporationMixin:
                 )
                 if float(effective_rates.get(species, 0.0)) > 1.0e-12
             },
+            # Canonical serialized answers are treated as immutable evidence;
+            # depletion changes rates only and can safely share the records.
+            carrier_authority_by_species=(
+                evap_flux.carrier_authority_by_species
+            ),
         )
         smoothed.update_totals()
         return smoothed
@@ -2921,6 +2935,12 @@ class EvaporationMixin:
                 )
                 if species in committed_species_kg_hr
             },
+            # Preserve the exact-key audit union even when a refused/proven-zero
+            # carrier has no committed mass. Hour snapshots must retain why it
+            # did not debit, not only the subset that produced kg/hr.
+            carrier_authority_by_species=(
+                evap_flux.carrier_authority_by_species
+            ),
         )
         committed_flux.update_totals()
         self._ledger_committed_evap_flux_this_tick = committed_flux
@@ -2934,6 +2954,9 @@ class EvaporationMixin:
                 )
                 if float(residual_species_kg_hr.get(species, 0.0)) > 1.0e-12
             },
+            carrier_authority_by_species=(
+                evap_flux.carrier_authority_by_species
+            ),
         )
         residual_flux.update_totals()
         return residual_flux
@@ -2946,6 +2969,35 @@ class EvaporationMixin:
         *,
         apply_evaporative_redox_source_terms: bool = True,
     ) -> dict[str, Any]:
+        authority = dict(
+            getattr(route_result, 'condensation_authority_by_species', {}).get(
+                species,
+                {},
+            )
+            or {}
+        )
+        retained_source_kg = float(
+            getattr(route_result, 'retained_in_source_by_species', {}).get(
+                species,
+                0.0,
+            )
+            or 0.0
+        )
+        if (
+            str(authority.get('status', '')) in {'refused', 'proven_zero'}
+            or retained_source_kg > 1e-15
+        ):
+            # The rail did not authorize an evaporation debit. Keep the
+            # candidate mass in its source account; returning no transition
+            # also keeps it out of terminal offgas after the end-of-hour bleed.
+            return {
+                'credited_condensed_kg': 0.0,
+                'remaining_kg': 0.0,
+                'retained_in_source_kg': retained_source_kg,
+                'evaporation_transition': None,
+                'authority_status': authority.get('status'),
+            }
+
         metals_data = self.vapor_pressures.get('metals', {})
         oxide_vapors_data = self.vapor_pressures.get('oxide_vapors', {})
         sp_data = metals_data.get(species, {})
@@ -3214,6 +3266,10 @@ class EvaporationMixin:
         # Delta provenance is the committed, post-validation kernel credit.
         # CondensationRouteResult is only the pre-commit projection; Phase-O
         # coating gates need the deposition that actually landed in the ledger.
+        from simulator.vapour_rail.instrumentation import (
+            merge_vapour_carrier_lineage,
+        )
+
         accounts_by_species = (
             diagnostic.get('wall_deposit_accounts_kg_delta_by_species') or {}
         )
@@ -3230,6 +3286,20 @@ class EvaporationMixin:
                     amount = float(kg)
                     if abs(amount) <= 1e-12:
                         continue
+                    notice = (
+                        self.condensation_model
+                        .last_sticking_alpha_provenance_notice
+                    )
+                    lineage = notice.setdefault(
+                        'vapour_carrier_lineage_by_deposited_species',
+                        {},
+                    )
+                    if isinstance(lineage, dict):
+                        product_key = str(product_species)
+                        lineage[product_key] = merge_vapour_carrier_lineage(
+                            lineage.get(product_key),
+                            species,
+                        )
                     key = (segment, str(product_species))
                     deltas = self._last_wall_deposit_by_segment_species_delta
                     deltas[key] = deltas.get(key, 0.0) + amount

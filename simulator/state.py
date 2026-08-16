@@ -854,6 +854,11 @@ class EvaporationFlux:
 
     total_kg_hr: float = 0.0
     dominant_species: str = ''
+    # Canonical serialized VapourAnswer records keyed by carrier species.
+    # Condensation consumes these verdicts; kg/hr alone may not mint authority.
+    carrier_authority_by_species: Dict[str, Dict[str, Any]] = field(
+        default_factory=dict
+    )
 
     def update_totals(self):
         self.total_kg_hr = sum(self.species_kg_hr.values())

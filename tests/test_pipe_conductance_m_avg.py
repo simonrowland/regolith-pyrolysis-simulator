@@ -636,7 +636,22 @@ def test_default_stage_geometry_provenance_reaches_coating_authority():
     melt = MeltState()
     melt.temperature_C = 1700.0
     route = condensation.route(
-        EvaporationFlux(species_kg_hr={"Fe": 1.0}, total_kg_hr=1.0),
+        EvaporationFlux(
+            species_kg_hr={"Fe": 1.0},
+            total_kg_hr=1.0,
+            carrier_authority_by_species={
+                "Fe": {
+                    "species_id": "Fe",
+                    "pressure": {"kind": "value", "pa": 1.0},
+                    "flux": {"kind": "eligible"},
+                    "verdict_status": "authoritative",
+                    "certification_ceiling": "validated_point",
+                    "validation_status": "validated",
+                    "is_union_flux_eligible": True,
+                    "is_flux_active": True,
+                }
+            },
+        ),
         melt,
     )
 
@@ -646,7 +661,10 @@ def test_default_stage_geometry_provenance_reaches_coating_authority():
         route.sticking_alpha_provenance_notice,
     )
     assert authority["authoritative_for_coating"] is False
-    assert authority["code"] == "wall_deposit_surface_geometry_provenance"
+    # b-170: the sampled Fe coefficient is outside its 1700-1800 K source
+    # range, so alpha authority is the primary refusal; geometry remains a
+    # concurrent status-bearing input in the same payload.
+    assert authority["code"] == "wall_deposit_sticking_alpha_out_of_domain"
     assert authority["surface_geometry_status_bearing"] is True
     surface_geometry = authority["surface_geometry_provenance"]
     assert surface_geometry["provisional"] is True

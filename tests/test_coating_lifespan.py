@@ -29,6 +29,18 @@ def _trace(deposit, authority=None):
 
 def _alpha_notice(species: str, *, cited: bool = True) -> dict[str, object]:
     return {
+        "vapour_carrier_authority_by_species": {
+            species: {
+                "species_id": species,
+                "pressure": {"kind": "value", "pa": 1.0},
+                "flux": {"kind": "eligible"},
+                "verdict_status": "authoritative",
+                "certification_ceiling": "validated_point",
+                "validation_status": "validated",
+                "is_union_flux_eligible": True,
+                "is_flux_active": True,
+            }
+        },
         "alpha_s_provenance_by_species": {
             species: {
                 "hot_wall": {
@@ -197,6 +209,147 @@ def test_merge_run_snapshot_preserves_carried_positive_and_new_refusal() -> None
     assert authority["deposited_species"] == ("SiO",)
     assert authority["wall_saturation_pressure_refused_species"] == ("Mg",)
     assert "Mg" in authority["wall_saturation_pressure_refusals_by_species"]
+
+
+def test_merge_run_snapshot_preserves_carried_refusal_before_later_deposit(
+) -> None:
+    carried = FoulingTerminalSnapshot.from_trace(
+        _trace({}, _wall_pressure_refusal_notice())
+    )
+    run_export = FoulingTerminalSnapshot.from_trace(
+        _trace(
+            {("hot_wall", "SiO"): 1.0},
+            _alpha_notice("SiO", cited=True),
+        )
+    )
+
+    post_merge, _per_run_net = merge_run_snapshot(carried, run_export)
+
+    authority = post_merge.wall_deposit_sticking_authority
+    assert authority["authoritative_for_resinter"] is False
+    assert authority["deposited_species"] == ("SiO",)
+    assert authority["wall_saturation_pressure_refused_species"] == ("Mg",)
+    assert "Mg" in authority["wall_saturation_pressure_refusals_by_species"]
+
+
+def test_merge_run_snapshot_preserves_status_bearing_carrier_authority() -> None:
+    notice = _alpha_notice("Fe", cited=True)
+    carrier = notice["vapour_carrier_authority_by_species"]["Fe"]
+    carrier.update({
+        "verdict_status": "status_bearing_non_authoritative",
+        "certification_ceiling": "never",
+        "validation_status": "modeled-PENDING",
+    })
+    run_export = FoulingTerminalSnapshot.from_trace(
+        _trace({("hot_wall", "Fe"): 0.25}, notice)
+    )
+
+    post_merge, _per_run_net = merge_run_snapshot(None, run_export)
+
+    authority = post_merge.wall_deposit_sticking_authority
+    assert authority["authoritative_for_resinter"] is False
+    assert authority["non_authoritative_carrier_species"] == ("Fe",)
+    assert authority["vapour_carrier_authority_by_species"]["Fe"] == carrier
+
+
+def test_merge_cannot_overwrite_carried_status_bearing_carrier() -> None:
+    carried_notice = _alpha_notice("Fe", cited=True)
+    carried_carrier = carried_notice["vapour_carrier_authority_by_species"][
+        "Fe"
+    ]
+    carried_carrier.update({
+        "verdict_status": "status_bearing_non_authoritative",
+        "certification_ceiling": "never",
+        "validation_status": "modeled-PENDING",
+    })
+    carried = FoulingTerminalSnapshot.from_trace(
+        _trace({("hot_wall", "Fe"): 0.25}, carried_notice)
+    )
+    run_export = FoulingTerminalSnapshot.from_trace(
+        _trace({("hot_wall", "Fe"): 0.10}, _alpha_notice("Fe", cited=True))
+    )
+
+    post_merge, _per_run_net = merge_run_snapshot(carried, run_export)
+
+    authority = post_merge.wall_deposit_sticking_authority
+    assert authority["authoritative_for_resinter"] is False
+    assert authority["non_authoritative_carrier_species"] == ("Fe",)
+    assert authority["vapour_carrier_authority_by_species"]["Fe"] == (
+        carried_carrier
+    )
+
+
+@pytest.mark.parametrize("later_status", ("proven_zero", "refused"))
+def test_merge_promotes_later_worse_typed_carrier(later_status: str) -> None:
+    carried_notice = _alpha_notice("Fe", cited=True)
+    carried_notice["vapour_carrier_authority_by_species"]["Fe"].update({
+        "verdict_status": "status_bearing_non_authoritative",
+        "certification_ceiling": "never",
+        "validation_status": "modeled-PENDING",
+    })
+    later_notice = _alpha_notice("Fe", cited=True)
+    later_carrier = later_notice["vapour_carrier_authority_by_species"]["Fe"]
+    later_carrier.update({
+        "pressure": (
+            {"kind": "refusal", "code": "test_refusal"}
+            if later_status == "refused"
+            else {"kind": "zero_by_physics", "evidence_ref": "test:zero"}
+        ),
+        "flux": (
+            {"kind": "refusal", "code": "test_refusal"}
+            if later_status == "refused"
+            else {"kind": "eligible", "alpha_ref": "test:alpha"}
+        ),
+        "is_refused": later_status == "refused",
+        "is_union_flux_eligible": False,
+        "is_flux_active": False,
+        "verdict_status": "status_bearing_non_authoritative",
+        "certification_ceiling": "never",
+        "validation_status": "modeled-PENDING",
+    })
+    carried = FoulingTerminalSnapshot.from_trace(
+        _trace({("hot_wall", "Fe"): 0.25}, carried_notice)
+    )
+    run_export = FoulingTerminalSnapshot.from_trace(
+        _trace({}, later_notice)
+    )
+
+    post_merge, _per_run_net = merge_run_snapshot(carried, run_export)
+
+    authority = post_merge.wall_deposit_sticking_authority
+    assert authority["authoritative_for_resinter"] is False
+    assert authority[f"{later_status}_carrier_species"] == ("Fe",)
+    assert authority["vapour_carrier_authority_by_species"]["Fe"] == (
+        later_carrier
+    )
+
+
+def test_merge_cannot_overwrite_carried_out_of_domain_alpha() -> None:
+    carried_notice = _alpha_notice("Fe", cited=True)
+    carried_alpha = carried_notice["alpha_s_provenance_by_species"]["Fe"][
+        "hot_wall"
+    ]
+    carried_alpha.update({
+        "alpha_s_extrapolated": True,
+        "alpha_s_domain_status": "out_of_domain",
+        "alpha_s_authoritative_at_temperature": False,
+        "output_status": "status_bearing",
+    })
+    carried = FoulingTerminalSnapshot.from_trace(
+        _trace({("hot_wall", "Fe"): 0.25}, carried_notice)
+    )
+    run_export = FoulingTerminalSnapshot.from_trace(
+        _trace({("hot_wall", "Fe"): 0.10}, _alpha_notice("Fe", cited=True))
+    )
+
+    post_merge, _per_run_net = merge_run_snapshot(carried, run_export)
+
+    authority = post_merge.wall_deposit_sticking_authority
+    assert authority["authoritative_for_resinter"] is False
+    assert authority["out_of_domain_alpha_species"] == ("Fe",)
+    assert authority["alpha_s_provenance_by_species"]["Fe"]["hot_wall"] == (
+        carried_alpha
+    )
 
 
 def test_limiter_stack_provisional_verdict_and_threshold_parametric_motion() -> None:

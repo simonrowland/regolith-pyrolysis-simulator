@@ -26,6 +26,9 @@ WALL_STICKING_ALPHA_NOTICE_CODE = (
 WALL_STICKING_ALPHA_UNCERTIFIED_CODE = (
     "wall_deposit_sticking_alpha_uncertified"
 )
+WALL_STICKING_ALPHA_OUT_OF_DOMAIN_CODE = (
+    "wall_deposit_sticking_alpha_out_of_domain"
+)
 WALL_STICKING_ALPHA_MISSING_CODE = (
     "wall_deposit_sticking_alpha_provenance_missing"
 )
@@ -35,6 +38,20 @@ WALL_SURFACE_GEOMETRY_PROVENANCE_CODE = (
 WALL_SATURATION_PRESSURE_REFUSED_CODE = (
     "wall_deposit_saturation_pressure_refused"
 )
+WALL_VAPOUR_CARRIER_NON_AUTHORITATIVE_CODE = (
+    "wall_deposit_vapour_carrier_non_authoritative"
+)
+WALL_VAPOUR_CARRIER_AUTHORITY_MISSING_CODE = (
+    "wall_deposit_vapour_carrier_authority_missing"
+)
+WALL_DEPOSIT_ALIAS_CONFLICT_CODE = (
+    "wall_deposit_payload_alias_conflict"
+)
+_COATING_WALL_DEPOSIT_KEYS = (
+    "wall_deposit_kg_by_segment_species",
+    "wall_deposit_kg_by_zone_species",
+    "wall_deposit_kg",
+)
 _WALL_DEPOSIT_AUTHORITY_PAYLOAD_KEYS = frozenset({
     "authoritative",
     "authoritative_for_deposit_mass",
@@ -42,6 +59,8 @@ _WALL_DEPOSIT_AUTHORITY_PAYLOAD_KEYS = frozenset({
     "authoritative_for_resinter",
     "deposited_species",
     "uncertified_alpha_species",
+    "vapour_carrier_authority_by_species",
+    "vapour_carrier_lineage_by_deposited_species",
 })
 
 
@@ -51,12 +70,28 @@ def _status_bearing_alpha_record(record: Mapping[str, Any]) -> bool:
     output_status = str(record.get("output_status", "status_bearing"))
     return (
         not _valid_sticking_probability(record.get("alpha_s"))
+        or bool(record.get("alpha_s_extrapolated", False))
         or citation_status != "CITED"
         or status != "sourced"
         or output_status in {
             "status_bearing",
             "uncertainty_only",
         }
+    )
+
+
+def _uncertified_alpha_record(record: Mapping[str, Any]) -> bool:
+    citation_status = str(record.get("citation_status", "UNCITED")).upper()
+    status = str(record.get("status", "proxy"))
+    output_status = str(record.get("output_status", "status_bearing"))
+    return (
+        not _valid_sticking_probability(record.get("alpha_s"))
+        or citation_status != "CITED"
+        or status != "sourced"
+        or (
+            output_status in {"status_bearing", "uncertainty_only"}
+            and not bool(record.get("alpha_s_extrapolated", False))
+        )
     )
 
 
@@ -152,6 +187,14 @@ def wall_sticking_alpha_provenance_notice(
         for record in records
         if _status_bearing_alpha_record(record)
     ]
+    out_of_domain = [
+        record
+        for record in records
+        if bool(record.get("alpha_s_extrapolated", False))
+    ]
+    uncertified = [
+        record for record in records if _uncertified_alpha_record(record)
+    ]
     source_classes = sorted({
         str(record.get("source_class", ""))
         for record in records
@@ -164,6 +207,10 @@ def wall_sticking_alpha_provenance_notice(
         "code": (
             WALL_STICKING_ALPHA_MISSING_CODE
             if provenance_missing
+            else WALL_STICKING_ALPHA_UNCERTIFIED_CODE
+            if uncertified
+            else WALL_STICKING_ALPHA_OUT_OF_DOMAIN_CODE
+            if out_of_domain
             else WALL_STICKING_ALPHA_UNCERTIFIED_CODE
             if status_bearing
             else WALL_STICKING_ALPHA_NOTICE_CODE
@@ -212,6 +259,12 @@ def wall_sticking_alpha_provenance_notice(
         "status_bearing_alpha_count": (
             len(species) if provenance_missing else len(status_bearing)
         ),
+        "out_of_domain_alpha_count": len(out_of_domain),
+        "out_of_domain_alpha_species": sorted({
+            str(record.get("species"))
+            for record in out_of_domain
+            if record.get("species")
+        }),
         "message": (
             "Wall-deposition sticking alpha_s values are read from the "
             "literature sidecar where available; UNCERTIFIED or fail-closed "
@@ -228,6 +281,17 @@ def wall_deposit_sticking_authority_status(
 ) -> dict[str, Any]:
     """Return authority status for wall-deposit derived fouling readouts."""
 
+    from simulator.vapour_rail.instrumentation import (
+        VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE,
+        VAPOUR_CARRIER_AUTHORITY_MISSING,
+        VAPOUR_CARRIER_AUTHORITY_PROVEN_ZERO,
+        VAPOUR_CARRIER_AUTHORITY_REFUSED,
+        VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING,
+        vapour_carrier_authority_severity,
+        vapour_carrier_authority_status,
+        vapour_carrier_lineage_species,
+    )
+
     deposited_species = _positive_wall_deposit_species(wall_deposit_kg)
     notice = dict(alpha_notice or {})
     if wall_deposit_sticking_authority_is_payload(alpha_notice):
@@ -237,31 +301,101 @@ def wall_deposit_sticking_authority_status(
     saturation_pressure_refusals = (
         _wall_saturation_pressure_refusals_by_species(notice)
     )
+    carrier_authority = _vapour_carrier_authority_by_species(notice)
+    carrier_lineage = _vapour_carrier_lineage_by_deposited_species(notice)
+    carrier_species = tuple(sorted(
+        set(deposited_species) | set(carrier_authority)
+    ))
+    def _lineage_sources(species: str) -> tuple[str, ...]:
+        return vapour_carrier_lineage_species(
+            carrier_lineage.get(species),
+            default_species=species,
+        )
+
+    def _combined_carrier_status(species: str) -> str:
+        statuses = (
+            vapour_carrier_authority_status(
+                carrier_authority.get(source_species),
+                expected_species_id=source_species,
+            )
+            for source_species in _lineage_sources(species)
+        )
+        return max(
+            statuses,
+            key=vapour_carrier_authority_severity,
+        )
+
+    carrier_status_by_species = {
+        species: _combined_carrier_status(species)
+        for species in carrier_species
+    }
+    non_authoritative_carrier_species = tuple(sorted(
+        species
+        for species, status in carrier_status_by_species.items()
+        if status != VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE
+    ))
+    refused_carrier_species = tuple(sorted(
+        species
+        for species, status in carrier_status_by_species.items()
+        if status == VAPOUR_CARRIER_AUTHORITY_REFUSED
+    ))
+    proven_zero_carrier_species = tuple(sorted(
+        species
+        for species, status in carrier_status_by_species.items()
+        if status == VAPOUR_CARRIER_AUTHORITY_PROVEN_ZERO
+    ))
+    missing_carrier_authority_species = tuple(sorted(
+        species
+        for species, status in carrier_status_by_species.items()
+        if status == VAPOUR_CARRIER_AUTHORITY_MISSING
+    ))
+    carrier_authority_kwargs = {
+        "vapour_carrier_authority_by_species": carrier_authority,
+        "vapour_carrier_lineage_by_deposited_species": carrier_lineage,
+        "non_authoritative_carrier_species": (
+            non_authoritative_carrier_species
+        ),
+        "refused_carrier_species": refused_carrier_species,
+        "proven_zero_carrier_species": proven_zero_carrier_species,
+        "missing_carrier_authority_species": (
+            missing_carrier_authority_species
+        ),
+    }
     refused_species = tuple(sorted(saturation_pressure_refusals))
     geometry_notice = _surface_geometry_provenance_notice(notice)
     geometry_status_bearing = _surface_geometry_status_bearing(geometry_notice)
-    if not deposited_species and not refused_species:
-        return _wall_deposit_authority_payload(
-            authoritative=True,
-            code=WALL_STICKING_ALPHA_NOTICE_CODE,
-            deposited_species=(),
-            uncertified_species=(),
-            provenance={},
-            surface_geometry_provenance=geometry_notice,
-            geometry_status_bearing=False,
-        )
-
     provenance = _alpha_provenance_by_species(notice)
-    status_bearing_species = _status_bearing_alpha_species(provenance)
+    alpha_candidate_species = tuple(sorted(
+        set(deposited_species)
+        | set(carrier_authority)
+        | set(provenance)
+    ))
+    provenance_species = tuple(sorted({
+        source_species
+        for species in alpha_candidate_species
+        for source_species in _lineage_sources(species)
+    }))
+    uncertified_source_species = _uncertified_alpha_species(provenance)
+    out_of_domain_species = tuple(sorted(
+        species
+        for species in alpha_candidate_species
+        if any(
+            source_species in _out_of_domain_alpha_species(provenance)
+            for source_species in _lineage_sources(species)
+        )
+    ))
     deposit_pairs = _positive_wall_deposit_segment_species(wall_deposit_kg)
     if deposit_pairs:
         missing_pairs = tuple(
             pair
             for pair in deposit_pairs
-            if not _alpha_segment_species_has_provenance_record(
-                provenance,
-                segment=pair[0],
-                species=pair[1],
+            if not all(
+                _alpha_segment_species_has_provenance_record(
+                    provenance,
+                    segment=pair[0],
+                    species=source_species,
+                )
+                for source_species in _lineage_sources(pair[1])
             )
         )
         missing_species = tuple(sorted({species for _, species in missing_pairs}))
@@ -269,24 +403,129 @@ def wall_deposit_sticking_authority_status(
         missing_pairs = ()
         missing_species = tuple(
             species
-            for species in deposited_species
-            if not _alpha_species_has_provenance_record(provenance.get(species))
+            for species in alpha_candidate_species
+            if not all(
+                _alpha_species_has_provenance_record(
+                    provenance.get(source_species)
+                )
+                for source_species in _lineage_sources(species)
+            )
         )
     if str(notice.get("code", "")) == WALL_STICKING_ALPHA_MISSING_CODE:
         missing_species = deposited_species
         missing_pairs = deposit_pairs
     uncertified_species = tuple(
-        species for species in deposited_species if species in status_bearing_species
+        species
+        for species in alpha_candidate_species
+        if any(
+            source_species in uncertified_source_species
+            for source_species in _lineage_sources(species)
+        )
     )
+    carrier_authority_kwargs["out_of_domain_alpha_species"] = (
+        out_of_domain_species
+    )
+    if (
+        not deposited_species
+        and not refused_species
+        and not non_authoritative_carrier_species
+        and not missing_species
+        and not uncertified_species
+        and not out_of_domain_species
+    ):
+        return _wall_deposit_authority_payload(
+            authoritative=True,
+            code=WALL_STICKING_ALPHA_NOTICE_CODE,
+            deposited_species=(),
+            uncertified_species=(),
+            provenance=_provenance_subset(provenance, provenance_species),
+            surface_geometry_provenance=geometry_notice,
+            geometry_status_bearing=False,
+            **carrier_authority_kwargs,
+        )
+    if non_authoritative_carrier_species:
+        alpha_status_species = tuple(sorted(
+            set(missing_species)
+            | set(uncertified_species)
+            | set(out_of_domain_species)
+        ))
+        code = (
+            WALL_VAPOUR_CARRIER_AUTHORITY_MISSING_CODE
+            if missing_carrier_authority_species
+            else WALL_VAPOUR_CARRIER_NON_AUTHORITATIVE_CODE
+        )
+        status_fragments = [
+            f"{species}={carrier_status_by_species[species]}"
+            for species in non_authoritative_carrier_species
+        ]
+        if missing_carrier_authority_species:
+            carrier_message = (
+                "Vapour carrier authority missing for "
+                + ", ".join(missing_carrier_authority_species)
+                + "; "
+            )
+        elif deposited_species:
+            carrier_message = (
+                "Wall deposition consumed vapour carriers without rail "
+                "authority (" + ", ".join(status_fragments) + "); "
+            )
+        else:
+            carrier_message = (
+                "Wall routing carried non-authoritative vapour evidence ("
+                + ", ".join(status_fragments)
+                + "); zero wall deposition cannot be certified from that "
+                "evidence; "
+            )
+        payload = _wall_deposit_authority_payload(
+            authoritative=False,
+            code=code,
+            deposited_species=deposited_species,
+            uncertified_species=alpha_status_species,
+            provenance=_provenance_subset(provenance, provenance_species),
+            surface_geometry_provenance=geometry_notice,
+            geometry_status_bearing=geometry_status_bearing,
+            message=(
+                carrier_message
+                + "numerical mass remains computed and ledger-visible, but "
+                "coating and fouling readouts are non-authoritative."
+            ),
+            **carrier_authority_kwargs,
+        )
+        codes = [code]
+        if refused_species:
+            codes.append(WALL_SATURATION_PRESSURE_REFUSED_CODE)
+        if missing_species:
+            codes.append(WALL_STICKING_ALPHA_MISSING_CODE)
+        if out_of_domain_species:
+            codes.append(WALL_STICKING_ALPHA_OUT_OF_DOMAIN_CODE)
+        if uncertified_species:
+            codes.append(WALL_STICKING_ALPHA_UNCERTIFIED_CODE)
+        payload["codes"] = codes
+        payload["vapour_carrier_authority_status_by_species"] = (
+            carrier_status_by_species
+        )
+        if refused_species:
+            payload["status_bearing_refusal_count"] = len(refused_species)
+            payload["wall_saturation_pressure_refused_species"] = list(
+                refused_species
+            )
+            payload["wall_saturation_pressure_refusals_by_species"] = (
+                saturation_pressure_refusals
+            )
+        return payload
     if refused_species:
         alpha_status_species = tuple(sorted(
-            set(missing_species) | set(uncertified_species)
+            set(missing_species)
+            | set(uncertified_species)
+            | set(out_of_domain_species)
         ))
         codes = [WALL_SATURATION_PRESSURE_REFUSED_CODE]
         if missing_species:
             codes.append(WALL_STICKING_ALPHA_MISSING_CODE)
         if uncertified_species:
             codes.append(WALL_STICKING_ALPHA_UNCERTIFIED_CODE)
+        if out_of_domain_species:
+            codes.append(WALL_STICKING_ALPHA_OUT_OF_DOMAIN_CODE)
         message = (
             "Wall saturation pressure was refused outside its source-certified "
             "Antoine domain for "
@@ -306,10 +545,11 @@ def wall_deposit_sticking_authority_status(
             code=WALL_SATURATION_PRESSURE_REFUSED_CODE,
             deposited_species=deposited_species,
             uncertified_species=alpha_status_species,
-            provenance=_provenance_subset(provenance, deposited_species),
+            provenance=_provenance_subset(provenance, provenance_species),
             surface_geometry_provenance=geometry_notice,
             geometry_status_bearing=geometry_status_bearing,
             message=message,
+            **carrier_authority_kwargs,
         )
         payload["codes"] = codes
         payload["status_bearing_refusal_count"] = len(refused_species)
@@ -320,13 +560,35 @@ def wall_deposit_sticking_authority_status(
             saturation_pressure_refusals
         )
         return payload
+    if (
+        out_of_domain_species
+        and not missing_species
+        and not uncertified_species
+    ):
+        return _wall_deposit_authority_payload(
+            authoritative=False,
+            code=WALL_STICKING_ALPHA_OUT_OF_DOMAIN_CODE,
+            deposited_species=deposited_species,
+            uncertified_species=(),
+            provenance=_provenance_subset(provenance, provenance_species),
+            surface_geometry_provenance=geometry_notice,
+            geometry_status_bearing=geometry_status_bearing,
+            message=(
+                "Wall-deposit sticking alpha_s was computed outside its "
+                "declared temperature domain for "
+                + ", ".join(out_of_domain_species)
+                + "; mass remains computed and ledger-visible, but coating "
+                "and fouling readouts are status-bearing."
+            ),
+            **carrier_authority_kwargs,
+        )
     if missing_species:
         payload = _wall_deposit_authority_payload(
             authoritative=False,
             code=WALL_STICKING_ALPHA_MISSING_CODE,
             deposited_species=deposited_species,
             uncertified_species=missing_species,
-            provenance=_provenance_subset(provenance, deposited_species),
+            provenance=_provenance_subset(provenance, provenance_species),
             surface_geometry_provenance=geometry_notice,
             geometry_status_bearing=geometry_status_bearing,
             message=(
@@ -334,6 +596,7 @@ def wall_deposit_sticking_authority_status(
                 "missing, so coating and fouling readouts are non-authoritative "
                 "until the coefficient status travels with the deposit."
             ),
+            **carrier_authority_kwargs,
         )
         if missing_pairs:
             payload["missing_alpha_segment_species"] = [
@@ -348,9 +611,10 @@ def wall_deposit_sticking_authority_status(
             code=WALL_STICKING_ALPHA_UNCERTIFIED_CODE,
             deposited_species=deposited_species,
             uncertified_species=uncertified_species,
-            provenance=_provenance_subset(provenance, deposited_species),
+            provenance=_provenance_subset(provenance, provenance_species),
             surface_geometry_provenance=geometry_notice,
             geometry_status_bearing=geometry_status_bearing,
+            **carrier_authority_kwargs,
         )
 
     if geometry_status_bearing:
@@ -359,7 +623,7 @@ def wall_deposit_sticking_authority_status(
             code=WALL_SURFACE_GEOMETRY_PROVENANCE_CODE,
             deposited_species=deposited_species,
             uncertified_species=(),
-            provenance=_provenance_subset(provenance, deposited_species),
+            provenance=_provenance_subset(provenance, provenance_species),
             surface_geometry_provenance=geometry_notice,
             geometry_status_bearing=True,
             message=(
@@ -367,6 +631,7 @@ def wall_deposit_sticking_authority_status(
                 "engineering-default stage areas; coating and fouling readouts "
                 "are status-bearing until condenser surface areas are certified."
             ),
+            **carrier_authority_kwargs,
         )
 
     return _wall_deposit_authority_payload(
@@ -374,9 +639,10 @@ def wall_deposit_sticking_authority_status(
         code=WALL_STICKING_ALPHA_NOTICE_CODE,
         deposited_species=deposited_species,
         uncertified_species=(),
-        provenance=_provenance_subset(provenance, deposited_species),
+        provenance=_provenance_subset(provenance, provenance_species),
         surface_geometry_provenance=geometry_notice,
         geometry_status_bearing=False,
+        **carrier_authority_kwargs,
     )
 
 
@@ -386,14 +652,26 @@ def coating_summary_with_grounded_authority(
     """Return a coating summary where positive deposits trust provenance only."""
 
     result = dict(summary)
-    wall_deposit = _coating_wall_deposit_payload(result)
+    wall_deposit = coating_wall_deposit_payload(result)
+    alias_conflicts = coating_wall_deposit_alias_conflicts(result)
     total_kg = _sum_wall_deposit_kg(wall_deposit)
     authority_input = result.get("wall_deposit_sticking_authority")
     has_pressure_refusal = (
         isinstance(authority_input, Mapping)
         and bool(_wall_saturation_pressure_refusals_by_species(authority_input))
     )
-    if total_kg is None or (total_kg <= _EPS and not has_pressure_refusal):
+    has_authority_evidence = (
+        isinstance(authority_input, Mapping) and bool(authority_input)
+    )
+    if total_kg is None and not alias_conflicts:
+        return result
+    if (
+        total_kg is not None
+        and total_kg <= _EPS
+        and not has_pressure_refusal
+        and not has_authority_evidence
+        and not alias_conflicts
+    ):
         return result
 
     if isinstance(wall_deposit, Mapping):
@@ -415,6 +693,28 @@ def coating_summary_with_grounded_authority(
             ),
         )
 
+    if alias_conflicts:
+        authority = _plain_mapping(authority)
+        authority.update({
+            "authoritative": False,
+            "authoritative_for_deposit_mass": False,
+            "authoritative_for_coating": False,
+            "authoritative_for_resinter": False,
+            "code": WALL_DEPOSIT_ALIAS_CONFLICT_CODE,
+            "output_status": "status_bearing",
+            "conflicting_wall_deposit_aliases": list(alias_conflicts),
+            "message": (
+                "Wall-deposit payload aliases contain conflicting positive "
+                "values; coating and fouling readouts are non-authoritative "
+                "until one canonical ledger projection is supplied."
+            ),
+        })
+        codes = [WALL_DEPOSIT_ALIAS_CONFLICT_CODE]
+        for code in authority.get("codes", ()):
+            if code not in codes:
+                codes.append(str(code))
+        authority["codes"] = codes
+
     authoritative = bool(authority.get("authoritative_for_coating", False))
     result["coating_authoritative"] = authoritative
     result["coating_status"] = "available" if authoritative else "warning"
@@ -429,15 +729,94 @@ def coating_summary_with_grounded_authority(
     return result
 
 
-def _coating_wall_deposit_payload(summary: Mapping[str, Any]) -> Any:
-    for key in (
-        "wall_deposit_kg_by_segment_species",
-        "wall_deposit_kg_by_zone_species",
-        "wall_deposit_kg",
-    ):
-        if key in summary:
-            return summary[key]
-    return None
+def _coating_wall_deposit_selection(
+    summary: Mapping[str, Any],
+) -> tuple[Any, tuple[str, ...]]:
+    present = [
+        (key, summary[key])
+        for key in _COATING_WALL_DEPOSIT_KEYS
+        if key in summary
+    ]
+    if not present:
+        return None, ()
+    positive = [
+        (key, value)
+        for key, value in present
+        if (_sum_wall_deposit_kg(value) or 0.0) > _EPS
+    ]
+    selected_key, selected_value = (positive or present)[0]
+    conflicts = tuple(
+        key
+        for key, value in positive[1:]
+        if not _wall_deposit_aliases_equivalent(value, selected_value)
+    )
+    if conflicts:
+        conflicts = (selected_key, *conflicts)
+    return selected_value, conflicts
+
+
+def _wall_deposit_aliases_equivalent(left: Any, right: Any) -> bool:
+    left_total = _sum_wall_deposit_kg(left)
+    right_total = _sum_wall_deposit_kg(right)
+    if left_total is None or right_total is None:
+        return left_total is right_total
+    tolerance = _EPS * max(1.0, abs(left_total), abs(right_total))
+    if abs(left_total - right_total) > tolerance:
+        return False
+    left_species = _wall_deposit_kg_by_species(left)
+    right_species = _wall_deposit_kg_by_species(right)
+    if left_species is None or right_species is None:
+        return True
+    for species in set(left_species) | set(right_species):
+        left_kg = left_species.get(species, 0.0)
+        right_kg = right_species.get(species, 0.0)
+        species_tolerance = _EPS * max(1.0, abs(left_kg), abs(right_kg))
+        if abs(left_kg - right_kg) > species_tolerance:
+            return False
+    return True
+
+
+def _wall_deposit_kg_by_species(value: Any) -> dict[str, float] | None:
+    if not isinstance(value, Mapping):
+        return None
+    totals: dict[str, float] = {}
+    found = False
+    for key, nested in value.items():
+        if isinstance(key, tuple) and len(key) == 2:
+            kg = _finite_float(nested)
+            if kg is not None:
+                species = str(key[1])
+                totals[species] = totals.get(species, 0.0) + kg
+                found = True
+            continue
+        if isinstance(nested, Mapping):
+            for species, raw_kg in nested.items():
+                kg = _finite_float(raw_kg)
+                if kg is None:
+                    continue
+                species_key = str(species)
+                totals[species_key] = totals.get(species_key, 0.0) + kg
+                found = True
+            continue
+        kg = _finite_float(nested)
+        if kg is not None:
+            totals[str(key)] = totals.get(str(key), 0.0) + kg
+            found = True
+    return totals if found else None
+
+
+def coating_wall_deposit_payload(summary: Mapping[str, Any]) -> Any:
+    """Select the canonical non-empty wall projection across legacy aliases."""
+
+    return _coating_wall_deposit_selection(summary)[0]
+
+
+def coating_wall_deposit_alias_conflicts(
+    summary: Mapping[str, Any],
+) -> tuple[str, ...]:
+    """Return positive wall aliases that disagree with the selected payload."""
+
+    return _coating_wall_deposit_selection(summary)[1]
 
 
 def _sum_wall_deposit_kg(value: Any) -> float | None:
@@ -471,6 +850,13 @@ def _wall_deposit_authority_payload(
     provenance: Mapping[str, Any],
     surface_geometry_provenance: Mapping[str, Any] | None = None,
     geometry_status_bearing: bool = False,
+    vapour_carrier_authority_by_species: Mapping[str, Any] | None = None,
+    vapour_carrier_lineage_by_deposited_species: Mapping[str, Any] | None = None,
+    non_authoritative_carrier_species: Sequence[str] = (),
+    refused_carrier_species: Sequence[str] = (),
+    proven_zero_carrier_species: Sequence[str] = (),
+    missing_carrier_authority_species: Sequence[str] = (),
+    out_of_domain_alpha_species: Sequence[str] = (),
     message: str | None = None,
 ) -> dict[str, Any]:
     if message is None:
@@ -498,7 +884,23 @@ def _wall_deposit_authority_payload(
         "deposited_species": list(deposited_species),
         "uncertified_alpha_species": list(uncertified_species),
         "status_bearing_alpha_count": len(uncertified_species),
+        "out_of_domain_alpha_species": list(out_of_domain_alpha_species),
+        "out_of_domain_alpha_count": len(out_of_domain_alpha_species),
         "alpha_s_provenance_by_species": _plain_mapping(provenance),
+        "vapour_carrier_authority_by_species": _plain_mapping(
+            vapour_carrier_authority_by_species or {}
+        ),
+        "vapour_carrier_lineage_by_deposited_species": _plain_mapping(
+            vapour_carrier_lineage_by_deposited_species or {}
+        ),
+        "non_authoritative_carrier_species": list(
+            non_authoritative_carrier_species
+        ),
+        "refused_carrier_species": list(refused_carrier_species),
+        "proven_zero_carrier_species": list(proven_zero_carrier_species),
+        "missing_carrier_authority_species": list(
+            missing_carrier_authority_species
+        ),
         "grounding_target": WALL_STICKING_ALPHA_GROUNDING_TARGET,
         "message": message,
     }
@@ -637,6 +1039,67 @@ def _status_bearing_alpha_species(
             if isinstance(record, Mapping) and _status_bearing_alpha_record(record):
                 result.add(str(species))
                 break
+    return result
+
+
+def _out_of_domain_alpha_species(
+    provenance: Mapping[str, Mapping[str, Any]],
+) -> set[str]:
+    result: set[str] = set()
+    for species, by_segment in provenance.items():
+        if any(
+            isinstance(record, Mapping)
+            and bool(record.get("alpha_s_extrapolated", False))
+            for record in by_segment.values()
+        ):
+            result.add(str(species))
+    return result
+
+
+def _uncertified_alpha_species(
+    provenance: Mapping[str, Mapping[str, Any]],
+) -> set[str]:
+    result: set[str] = set()
+    for species, by_segment in provenance.items():
+        if any(
+            isinstance(record, Mapping)
+            and _uncertified_alpha_record(record)
+            for record in by_segment.values()
+        ):
+            result.add(str(species))
+    return result
+
+
+def _vapour_carrier_authority_by_species(
+    notice: Mapping[str, Any],
+) -> dict[str, Mapping[str, Any]]:
+    raw = notice.get("vapour_carrier_authority_by_species")
+    if not isinstance(raw, Mapping):
+        return {}
+    return {
+        str(species): record
+        for species, record in raw.items()
+        if isinstance(record, Mapping)
+    }
+
+
+def _vapour_carrier_lineage_by_deposited_species(
+    notice: Mapping[str, Any],
+) -> dict[str, str | tuple[str, ...]]:
+    from simulator.vapour_rail.instrumentation import (
+        vapour_carrier_lineage_species,
+    )
+
+    raw = notice.get("vapour_carrier_lineage_by_deposited_species")
+    if not isinstance(raw, Mapping):
+        return {}
+    result: dict[str, str | tuple[str, ...]] = {}
+    for product_species, carrier_species in raw.items():
+        product_key = str(product_species)
+        sources = vapour_carrier_lineage_species(carrier_species)
+        if not product_key or not sources:
+            continue
+        result[product_key] = sources[0] if len(sources) == 1 else sources
     return result
 
 
@@ -1434,11 +1897,49 @@ def condensation_refusals_diagnostic(sim: Any) -> dict[str, Any]:
         condensation_model = getattr(sim, "_condensation_model", None)
     refusals = {}
     if condensation_model is not None:
-        refusals = dict(
+        refusals = (
             getattr(condensation_model, "last_condensation_refusals_by_species", {})
             or {}
         )
     return condensation_refusals_payload(refusals)
+
+
+def condensation_authority_diagnostic(sim: Any) -> dict[str, Any]:
+    """Per-carrier rail authority after condensation routing."""
+
+    condensation_model = getattr(sim, "condensation_model", None)
+    if condensation_model is None:
+        condensation_model = getattr(sim, "_condensation_model", None)
+    raw = {}
+    if condensation_model is not None:
+        raw = dict(
+            getattr(
+                condensation_model,
+                "last_condensation_authority_by_species",
+                {},
+            )
+            or {}
+        )
+    by_species = {
+        str(species): _plain_mapping(record)
+        for species, record in sorted(raw.items())
+        if isinstance(record, Mapping)
+    }
+    status_counts: dict[str, int] = {}
+    max_closure_error = 0.0
+    for record in by_species.values():
+        status = str(record.get("status") or "missing")
+        status_counts[status] = status_counts.get(status, 0) + 1
+        closure_error = _finite_float(record.get("mass_closure_error_kg_hr"))
+        if closure_error is not None:
+            max_closure_error = max(max_closure_error, abs(closure_error))
+    return {
+        "schema": "condensation_authority.v1",
+        "n_species": len(by_species),
+        "status_counts": status_counts,
+        "max_mass_closure_error_kg_hr": max_closure_error,
+        "by_species": by_species,
+    }
 
 
 def vapour_rail_instrumentation_diagnostic(sim: Any) -> dict[str, Any]:
@@ -1455,9 +1956,16 @@ def vapour_rail_instrumentation_diagnostic(sim: Any) -> dict[str, Any]:
     report = getattr(sim, "_last_vapour_batch_report", None)
     if report is None and batch is not None:
         report = serialize_vapour_batch(batch)
-    overlay = dict(getattr(sim, "_last_vapour_batch_flux_overlay", {}) or {})
-    resolve_error = dict(getattr(sim, "_last_vapour_batch_resolve_error", {}) or {})
+    if isinstance(report, Mapping):
+        report = _plain_mapping(report)
+    overlay = _plain_mapping(
+        getattr(sim, "_last_vapour_batch_flux_overlay", {}) or {}
+    )
+    resolve_error = _plain_mapping(
+        getattr(sim, "_last_vapour_batch_resolve_error", {}) or {}
+    )
     condensation = condensation_refusals_diagnostic(sim)
+    condensation_authority = condensation_authority_diagnostic(sim)
     return {
         "schema": "vapour_rail_instrumentation.v1",
         "vapour_batch": report,
@@ -1468,6 +1976,7 @@ def vapour_rail_instrumentation_diagnostic(sim: Any) -> dict[str, Any]:
         "flux_overlay": overlay,
         "resolve_error": resolve_error or None,
         "condensation_refusals": condensation,
+        "condensation_authority": condensation_authority,
         "source_vapour_ceiling_table": source_vapour_ceiling_table(),
         "setpoints_t_cond_audit": dict(SETPOINTS_T_COND_AUDIT),
         # Never default absent proof to True.
