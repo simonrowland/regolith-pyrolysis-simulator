@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import pathlib
 import pytest
 
 from engines.alphamelts.domain import (
@@ -107,3 +108,31 @@ def test_two_component_alkali_silica_is_not_refused_by_this_gate() -> None:
     assessment = AlphaMELTSDomainGate.assess({"SiO2": 70.0, "Na2O": 30.0})
     assert assessment.valid is True
     assert assessment.failed_constraints == ()
+
+
+def test_unrecognised_backend_status_refuses_instead_of_passing():
+    """An unknown adapter status must not be reported as a successful run.
+
+    engines/alphamelts/provider.py mapped anything outside its four-token
+    whitelist to 'ok'. A repo scan found backend_status is also set to failed,
+    missing, stale, not_run, not_attempted, stub, diagnostic_stub, fallback,
+    mixed_backend and no_compared_results -- three of those in production code
+    at simulator/optimize/fidelity.py. Every one would have been reported as a
+    successful equilibrium. Unknown is a missing input, doctrine category (1),
+    so it refuses.
+    """
+    import engines.alphamelts.provider as provider_mod
+
+    src = pathlib.Path(provider_mod.__file__).read_text()
+    # Strip comments before grepping: the fix's own comment quotes the old
+    # fail-open form, and a guard that trips on its own documentation is a
+    # guard that will be deleted rather than believed.
+    code = "\n".join(
+        line.split("#", 1)[0] for line in src.splitlines()
+    )
+    assert "else 'ok'" not in code, (
+        "unknown backend_status must not default to ok"
+    )
+    assert "kernel_status = 'unavailable'" in code
+    # And the refusal must be visible, not silent.
+    assert "unrecognised backend_status" in src

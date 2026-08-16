@@ -267,15 +267,35 @@ class AlphaMELTSProvider(ChemistryProvider):
         diagnostics = _with_backend_status_reason(diagnostics)
 
         backend_status = diagnostics.backend_status
-        # Map the adapter's status vocabulary onto the kernel's:
-        # 'ok' / 'not_converged' / 'out_of_domain' / 'unavailable' /
-        # 'unsupported'. The adapter already uses the same vocabulary so
-        # this is mostly a pass-through; we surface 'unavailable' when
-        # the adapter signalled it during the run (e.g. PetThermoTools
-        # path crashed mid-call and the adapter zeroed _mode).
-        kernel_status = backend_status if backend_status in (
-            'ok', 'not_converged', 'out_of_domain', 'unavailable'
-        ) else 'ok'
+        # Map the adapter's status vocabulary onto the kernel's. An
+        # UNRECOGNISED status refuses; it does NOT pass as success.
+        #
+        # This previously read `else 'ok'`, which is fail-open on exactly the
+        # case you cannot reason about: a status nobody taught this mapper.
+        # The project vocabulary is much wider than the four accepted here --
+        # a repo scan finds backend_status also set to failed, missing, stale,
+        # not_run, not_attempted, stub, diagnostic_stub, fallback,
+        # mixed_backend and no_compared_results, three of them in production
+        # code at simulator/optimize/fidelity.py. Every one of those would
+        # have been reported as a successful equilibrium. `failed -> ok` and
+        # `missing -> ok` are the whole fail-open class in two tokens.
+        #
+        # Doctrine: an unknown state is a missing input, category (1), so it
+        # refuses. 'unavailable' is the kernel's no-usable-result token, and
+        # the unrecognised value is recorded in the diagnostic rather than
+        # dropped, so the refusal is debuggable instead of merely safe.
+        _KERNEL_STATUSES = ('ok', 'not_converged', 'out_of_domain', 'unavailable')
+        extra_warnings: tuple[str, ...] = ()
+        if backend_status in _KERNEL_STATUSES:
+            kernel_status = backend_status
+        else:
+            kernel_status = 'unavailable'
+            # Carried as an extra warning rather than appended to
+            # diagnostics.backend_warnings, which is a tuple in some paths.
+            extra_warnings = (
+                f'unrecognised backend_status {backend_status!r} refused as '
+                f'unavailable; kernel accepts {_KERNEL_STATUSES}',
+            )
 
         return IntentResult(
             intent=request.intent,
@@ -283,7 +303,7 @@ class AlphaMELTSProvider(ChemistryProvider):
             transition=None,  # Diagnostic-only -- checklist item 5.
             control_audit=control_audit,
             diagnostic=diagnostics.as_diagnostic(),
-            warnings=tuple(diagnostics.backend_warnings),
+            warnings=tuple(diagnostics.backend_warnings) + extra_warnings,
         )
 
     # ------------------------------------------------------------------
