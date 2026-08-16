@@ -1206,6 +1206,66 @@ def test_transitional_refusal_reports_actual_and_commanded_pressure():
     assert result.diagnostic["evaporation_flux_kg_hr"] is None
 
 
+@pytest.mark.xdist_group("serial")
+def test_prepass_records_missing_alpha_on_transitional_domain_refusal():
+    """b-194: a request-level missing alpha must not stay silent in the
+    transport pre-pass. Unity remains the Hertz-Knudsen screening ceiling
+    (Na still loads ``affected_species``), but the same ``missing_alpha``
+    record the authoritative loop emits must be on the early-return
+    diagnostic.
+    """
+
+    vacuum = _w3_result_with_controls(1.0, alpha={})
+    transitional = _w3_result_with_controls(
+        1.0,
+        alpha={},
+        overhead_pressure_pa=3.632,
+        pipe_diameter_m=0.12,
+        gas_temperature_K=2023.15,
+    )
+
+    assert vacuum.status == "ok"
+    assert set(vacuum.diagnostic["missing_alpha"]) == {"Na"}
+    vacuum_record = vacuum.diagnostic["missing_alpha"]["Na"]
+    assert vacuum_record["policy"] == "fail_loud_missing_alpha"
+    assert vacuum_record["fallback_control"] == (
+        "chemistry_kernel.allow_unmeasured_alpha_fallback"
+    )
+    assert vacuum_record["P_eq_Pa"] == pytest.approx(100.0)
+    assert vacuum_record["P_bulk_Pa"] == pytest.approx(0.0)
+    assert vacuum_record["baseline_alpha_1_rate_kg_hr"] > 1.0e-12
+    assert vacuum.diagnostic["species_refusals"]["Na"]["reason"] == (
+        "missing_evaporation_alpha"
+    )
+
+    assert transitional.status == "refused"
+    assert transitional.diagnostic["reason"] == (
+        "viscous_p_bulk_transport_out_of_domain"
+    )
+    assert transitional.diagnostic["affected_species"] == ("Na",)
+    assert transitional.diagnostic["evaporation_flux_status"] == "not_evaluated"
+    assert transitional.diagnostic["evaporation_flux_kg_hr"] is None
+    assert set(transitional.diagnostic["missing_alpha"]) == {"Na"}
+    prepass_record = transitional.diagnostic["missing_alpha"]["Na"]
+    assert prepass_record["policy"] == vacuum_record["policy"]
+    assert prepass_record["fallback_control"] == vacuum_record["fallback_control"]
+    assert prepass_record["P_eq_Pa"] == pytest.approx(vacuum_record["P_eq_Pa"])
+    assert prepass_record["P_bulk_Pa"] == pytest.approx(
+        vacuum_record["P_bulk_Pa"]
+    )
+    assert prepass_record["baseline_alpha_1_rate_kg_hr"] > 1.0e-12
+    refusal = transitional.diagnostic["species_refusals"]["Na"]
+    assert refusal["status"] == "refused"
+    assert refusal["reason"] == "missing_evaporation_alpha"
+    assert refusal["disposition"] == "retained_in_condensed_parent_oxide"
+    assert refusal["parent_oxide"] == "Na2O"
+    assert any(
+        "evaporation_alpha is missing" in warning
+        and "Na" in warning
+        for warning in transitional.warnings
+    )
+
+
 @pytest.mark.parametrize(
     ("control_overrides", "expected_flux_species"),
     (
