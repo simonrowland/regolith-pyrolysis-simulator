@@ -13,6 +13,7 @@ retired. Deliberate removal stays possible; silent removal does not.
 
 from __future__ import annotations
 
+import contextlib
 import warnings
 from dataclasses import dataclass
 from pathlib import Path
@@ -84,3 +85,63 @@ def assert_no_silent_artifact_loss(
     return RegenerationGuardReport(
         present=present, planned=planned_set, retired_removed=retired_removed
     )
+
+
+class PlannedArtifactNotWrittenError(RegenerationShrinkageError):
+    """A run planned an artifact, deleted the old copy, and never wrote it."""
+
+
+def verify_planned_artifacts_written(
+    output_dir: Path, report: RegenerationGuardReport
+) -> None:
+    """Refuse a run that planned an artifact and then did not write it.
+
+    The pre-write check compares what is PRESENT against what is PLANNED, so a
+    name in ``planned`` passes it by construction. That leaves a gap the
+    pre-write check cannot see: the caller unlinks every planned name, the run
+    then writes only some of them -- a conditional write whose condition came
+    out false, an early return, a swallowed error -- and the run reports
+    success with the artifact gone. That is the b-200 shape reproduced inside
+    the b-200 fix (kimi cross-cut M4).
+
+    A plan is a promise, not evidence. This is the evidence.
+
+    Empty files count as not written: a zero-byte CSV where rows were expected
+    is the same silent loss wearing a filename.
+    """
+    missing = sorted(
+        name for name in report.planned
+        if not (Path(output_dir) / name).is_file()
+        or (Path(output_dir) / name).stat().st_size == 0
+    )
+    if missing:
+        raise PlannedArtifactNotWrittenError(
+            f"regeneration of {output_dir} planned {len(report.planned)} "
+            f"artifact(s) but did not write {len(missing)}: "
+            f"{', '.join(missing)}. The previous copies were already removed, "
+            "so the output set has shrunk while the run reported success. "
+            "Write the artifact, or declare it retired through the explicit "
+            "opt-out instead of planning it."
+        )
+
+
+@contextlib.contextmanager
+def regeneration_guard(
+    output_dir: Path,
+    planned: Iterable[str],
+    *,
+    managed: Iterable[str],
+    retired: Iterable[str] = (),
+):
+    """Pre-write shrink check on entry, written-what-you-planned check on exit.
+
+    Preferred over calling the two checks by hand: the post-check is the one
+    that is easy to forget, and forgetting it restores the exact hole this
+    exists to close. The exit check runs only on the success path -- a run that
+    raised has already failed loudly and does not need a second complaint.
+    """
+    report = assert_no_silent_artifact_loss(
+        output_dir, planned, managed=managed, retired=retired
+    )
+    yield report
+    verify_planned_artifacts_written(output_dir, report)

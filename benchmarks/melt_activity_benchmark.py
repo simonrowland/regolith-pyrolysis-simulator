@@ -54,6 +54,7 @@ if str(REPO_ROOT) not in sys.path:
 from simulator.regeneration_guard import (
     RegenerationShrinkageError,
     assert_no_silent_artifact_loss,
+    verify_planned_artifacts_written,
 )
 
 DEFAULT_BENCH_SET = REPO_ROOT / "data/melt_activity/basalt-bench-set-v1.yaml"
@@ -1774,6 +1775,12 @@ def run_benchmark(
         managed=GENERATED_ARTIFACT_NAMES,
         retired=retired_artifacts,
     )
+    # The pre-write check above cannot see a planned-but-unwritten artifact --
+    # `planned` passes it by construction. Every planned name is unlinked
+    # below, and several writes downstream are CONDITIONAL (the live-vaporock
+    # CSV writes only when its row list is non-empty), so a false condition
+    # would delete the previous copy and report success. The post-run check at
+    # the end of this function is what closes that.
     for name in planned_names | set(retired_artifacts):
         (output_dir / name).unlink(missing_ok=True)
     point_rows: list[dict[str, Any]] = []
@@ -1849,6 +1856,10 @@ def run_benchmark(
             ),
             encoding="utf-8",
         )
+    # Every planned artifact was unlinked before the run; prove each one came
+    # back. Without this a false condition on a conditional write leaves the
+    # output set smaller than it started while the run reports success.
+    verify_planned_artifacts_written(output_dir, guard)
     return {
         "point_rows": point_rows,
         "probe_rows": probe_rows,
