@@ -21,7 +21,7 @@ from simulator.melt_backend.imcc_sf04.kernel import solve_imcc_sf04
 
 
 BASE_DATAPACK = Path(
-    "docs-private/research/2026-08-09-upstream-mission/IMCC-impl/datapack/datapack.json"
+    "data/melt_activity/imcc/imcc-sf04-v1.0.2.json"
 )
 EXT4 = Path(
     "docs-private/research/2026-08-09-upstream-mission/IMCC-impl/ext4"

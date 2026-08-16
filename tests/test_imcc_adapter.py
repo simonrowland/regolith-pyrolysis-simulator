@@ -39,7 +39,7 @@ from simulator.melt_backend.imcc_sf04.kernel import (
 
 
 DATAPACK_PATH = Path(
-    "docs-private/research/2026-08-09-upstream-mission/IMCC-impl/datapack/datapack.json"
+    "data/melt_activity/imcc/imcc-sf04-v1.0.2.json"
 )
 
 

@@ -468,7 +468,7 @@ def test_gas_layer_uses_imcc_activities() -> None:
     from simulator.melt_backend.imcc_sf04 import load_datapack as load_imcc_datapack
 
     imcc_pack = load_imcc_datapack(
-        Path("docs-private/research/2026-08-09-upstream-mission/IMCC-impl/datapack/datapack.json")
+        Path("data/melt_activity/imcc/imcc-sf04-v1.0.2.json")
     )
     # Case 1 from Hastie 1985 — a multicomponent lunar-glass-like composition.
     composition = {
