@@ -10,6 +10,7 @@ import yaml
 
 from benchmarks import melt_activity_benchmark as benchmark
 from simulator.regeneration_guard import (
+    PlannedArtifactNotWrittenError,
     RegenerationShrinkageError,
     RetiredArtifactWarning,
 )
@@ -171,6 +172,44 @@ def test_live_vaporock_anchor_check_defaults_on():
     ) | {"live-vaporock-check.csv"} == benchmark._planned_artifact_names(
         "benchmark", True
     )
+
+
+def test_run_benchmark_refuses_when_planned_live_vaporock_csv_is_not_written(
+    tmp_path, monkeypatch
+):
+    """Pin the run_benchmark post-check (the :1862 call-site hunk).
+
+    Reverting only verify_planned_artifacts_written(...) in run_benchmark
+    reopens the planned-but-unwritten hole while every guard-module test
+    stays green. This test goes red on that revert.
+    """
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    fixture["points"] = fixture["points"][:1]
+    fixture["composition_probes"] = fixture["composition_probes"][:1]
+    fixture_path = tmp_path / "tiny.yaml"
+    fixture_path.write_text(yaml.safe_dump(fixture, sort_keys=False), encoding="utf-8")
+    monkeypatch.setattr(
+        benchmark,
+        "build_engines",
+        lambda names, fixture, alphamelts_timeout_s: [_FakeActivityEngine()],
+    )
+    monkeypatch.setattr(
+        benchmark, "run_live_vaporock_anchor_check", lambda *a, **k: []
+    )
+    output_dir = tmp_path / "out"
+    output_dir.mkdir()
+    (output_dir / "live-vaporock-check.csv").write_text("previous run\n")
+
+    with pytest.raises(PlannedArtifactNotWrittenError) as excinfo:
+        benchmark.run_benchmark(
+            bench_set_path=fixture_path,
+            output_dir=output_dir,
+            engine_names=("fake",),
+            coverage_steps=3,
+        )
+
+    assert "live-vaporock-check.csv" in str(excinfo.value)
+    assert not (output_dir / "live-vaporock-check.csv").is_file()
 
 
 def test_cross_engine_shared_count_requires_both_engine_families_to_score():

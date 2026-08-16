@@ -2,6 +2,11 @@
 
 from __future__ import annotations
 
+import ast
+import importlib.util
+import re
+from pathlib import Path
+
 import pytest
 
 from simulator.regeneration_guard import (
@@ -13,6 +18,80 @@ from simulator.regeneration_guard import (
     regeneration_guard,
     verify_planned_artifacts_written,
 )
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+
+# Independent CLIs. There is no single write() chokepoint they all funnel
+# through; requiring one would be a package-wide I/O refactor. This inventory
+# is detection: a new regen-named producer that is not classified here fails
+# CI instead of shipping as a silent bypass.
+GUARDED_REGENERATION_WRITERS = frozenset(
+    {
+        "benchmarks/melt_activity_benchmark.py",
+        "tools/migrate_pilot_extracts.py",
+    }
+)
+CLASSIFIED_UNGUARDED_WRITERS = {
+    "scripts/regenerate_runner_goldens.py": (
+        "multi-artifact goldens; narrowing SCENARIOS leaves orphans"
+    ),
+    "scripts/regenerate_cache_identity_goldens.py": (
+        "golden regen; not wired through the guard"
+    ),
+    "scripts/regenerate_coating_diagnostic_golden.py": (
+        "machine-sensitive golden; not wired through the guard"
+    ),
+    "scripts/generate_optimizer_recipe_vocabulary.py": (
+        "single-artifact rewrite; name-set guard cannot see in-file shrink"
+    ),
+    "benchmarks/engine_throughput_bench.py": (
+        "single-artifact --rebless-ratchet; name-set guard cannot see in-file shrink"
+    ),
+    "tools/vp_cea_ingest.py": (
+        "single-artifact rewrite; name-set guard cannot see in-file shrink"
+    ),
+    "web/report_viewer/freeze_sample.py": (
+        "single-artifact rewrite; name-set guard cannot see in-file shrink"
+    ),
+}
+_REGEN_NAME_RE = re.compile(
+    r"(^|[_\-/])(regenerate|regen|rebless)([_\-/]|$)|migrate_.*extract",
+    re.IGNORECASE,
+)
+_SEARCH_ROOTS = ("tools", "scripts", "benchmarks", "web")
+
+
+def _writer_calls_post_check(source: str) -> bool:
+    """True if source uses the context manager or both pre- and post-checks."""
+    tree = ast.parse(source)
+    called: set[str] = set()
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        func = node.func
+        if isinstance(func, ast.Name):
+            called.add(func.id)
+        elif isinstance(func, ast.Attribute):
+            called.add(func.attr)
+    if "regeneration_guard" in called:
+        return True
+    return (
+        "assert_no_silent_artifact_loss" in called
+        and "verify_planned_artifacts_written" in called
+    )
+
+
+def _discover_regen_named_writers() -> list[str]:
+    found: list[str] = []
+    for root_name in _SEARCH_ROOTS:
+        root = REPO_ROOT / root_name
+        if not root.is_dir():
+            continue
+        for path in root.rglob("*.py"):
+            relative = path.relative_to(REPO_ROOT).as_posix()
+            if _REGEN_NAME_RE.search(path.name) or _REGEN_NAME_RE.search(relative):
+                found.append(relative)
+    return sorted(found)
 
 MANAGED = ("alpha.csv", "beta.csv", "gamma.csv")
 
@@ -157,3 +236,93 @@ def test_context_manager_runs_both_checks(tmp_path):
         with regeneration_guard(tmp_path, {"a.csv"}, managed={"a.csv"}):
             (tmp_path / "a.csv").unlink()
             raise ValueError("boom")
+
+
+def test_writer_calls_post_check_requires_both_halves_or_the_context_manager():
+    pre_only = (
+        "from simulator.regeneration_guard import assert_no_silent_artifact_loss\n"
+        "assert_no_silent_artifact_loss(d, p, managed=m)\n"
+    )
+    both = (
+        "from simulator.regeneration_guard import (\n"
+        "    assert_no_silent_artifact_loss, verify_planned_artifacts_written,\n"
+        ")\n"
+        "r = assert_no_silent_artifact_loss(d, p, managed=m)\n"
+        "verify_planned_artifacts_written(d, r)\n"
+    )
+    via_cm = (
+        "from simulator.regeneration_guard import regeneration_guard\n"
+        "with regeneration_guard(d, p, managed=m):\n"
+        "    pass\n"
+    )
+    assert not _writer_calls_post_check(pre_only)
+    assert _writer_calls_post_check(both)
+    assert _writer_calls_post_check(via_cm)
+    assert not _writer_calls_post_check("print('no guard')\n")
+
+
+def test_guarded_regeneration_writers_call_the_post_check():
+    overlap = GUARDED_REGENERATION_WRITERS & CLASSIFIED_UNGUARDED_WRITERS.keys()
+    assert not overlap, f"writer listed as both guarded and unguarded: {sorted(overlap)}"
+    missing = []
+    unguarded = []
+    for relative in sorted(GUARDED_REGENERATION_WRITERS):
+        path = REPO_ROOT / relative
+        if not path.is_file():
+            missing.append(relative)
+            continue
+        if not _writer_calls_post_check(path.read_text(encoding="utf-8")):
+            unguarded.append(relative)
+    assert not missing, f"guarded writer path missing: {missing}"
+    assert not unguarded, (
+        "regeneration writer no longer calls the post-check "
+        f"(pre-write-only is the 4fb9337f hole): {unguarded}"
+    )
+
+
+def test_classified_unguarded_writers_still_exist():
+    missing = [
+        relative
+        for relative in CLASSIFIED_UNGUARDED_WRITERS
+        if not (REPO_ROOT / relative).is_file()
+    ]
+    assert not missing, f"classified unguarded writer path missing: {missing}"
+
+
+def test_regen_named_writers_must_be_classified():
+    classified = GUARDED_REGENERATION_WRITERS | CLASSIFIED_UNGUARDED_WRITERS.keys()
+    discovered = _discover_regen_named_writers()
+    unknown = [path for path in discovered if path not in classified]
+    assert not unknown, (
+        "new regen-named write path is unclassified; add it to "
+        "GUARDED_REGENERATION_WRITERS (and wire the guard) or to "
+        f"CLASSIFIED_UNGUARDED_WRITERS with a reason: {unknown}"
+    )
+
+
+def _load_migrate_pilot_extracts():
+    path = REPO_ROOT / "tools" / "migrate_pilot_extracts.py"
+    spec = importlib.util.spec_from_file_location("migrate_pilot_extracts", path)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_migrate_pilot_extracts_refuses_when_janaf_unlinked_and_not_rewritten(
+    tmp_path, monkeypatch
+):
+    """Live P1-1 bypass: unlink of tracked janaf-4th.yaml plus empty rewrite."""
+    migrate = _load_migrate_pilot_extracts()
+    extracts = tmp_path / "extracts"
+    extracts.mkdir()
+    (extracts / "janaf-4th.yaml").write_text("previous run\n", encoding="utf-8")
+    (extracts / "nasa-cea-thermo.yaml").write_text("untouched\n", encoding="utf-8")
+    monkeypatch.setattr(migrate, "EXTRACTS", extracts)
+    monkeypatch.setattr(migrate, "_find_research", lambda *a, **k: None)
+    monkeypatch.setattr(migrate, "annotate_all_extracts_fidelity", lambda: 0)
+
+    with pytest.raises(PlannedArtifactNotWrittenError) as excinfo:
+        migrate.main()
+
+    assert "janaf-4th.yaml" in str(excinfo.value)
