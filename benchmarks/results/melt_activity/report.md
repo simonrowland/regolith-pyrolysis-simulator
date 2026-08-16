@@ -139,7 +139,9 @@ AlphaMELTS equilibrium completed on all literal SF04 basalt probes, but its prov
 
 IMCC-versus-AlphaMELTS empirical verdict: **none**. No point has both a convention-valid measurement and successful canonical activities from both engine families.
 
-ThermoEngine produced 12/110 usable benchmark predictions; converged results without the requested canonical observable remain typed `observable_unavailable`.
+ThermoEngine sequential one-process yield: 12/110 usable benchmark predictions. This figure is a post-latch artifact: after `tsaplin2000_a_na2o_x0477_1373` the in-process adapter died (RuntimeError: ThermoEngine equilibrium failed: ThermoEngine equilibrium failed: ThermoEngine Liquid GibbsFreeEnergy is not finite: nan), and the remaining 78 ThermoEngine rows — including all 70 Yamaguchi 1983 points — inherited `unavailable` ("adapter not available"). Do not read the sequential count as ThermoEngine being unable to score those later points.
+Isolated ThermoEngine re-evaluation of the latched points (fresh adapter after each adapter-death; not taken from the latched CSV) produced 20/78 usable predictions (Yamaguchi: 20/70). Combined coverage of the 110-point set is therefore 32/110: sequential pre-latch usable plus isolated latched-point usable.
+Converged results without the requested canonical observable remain typed `observable_unavailable`.
 
 ## Stripping-trajectory coverage
 

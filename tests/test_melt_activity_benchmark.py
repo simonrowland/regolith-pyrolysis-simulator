@@ -659,3 +659,181 @@ def test_real_alphamelts_producer_types_unmapped_label_as_ok_not_refused():
     assert row["status"] == "observable_unavailable"
     assert row["status"] != "refused"
     assert "Na2SiO3" in row["reason"]
+
+
+def _te_row(point_id, status, *, prediction=None, reason=""):
+    return {
+        "point_id": point_id,
+        "species": "SiO2",
+        "observable": "activity",
+        "engine": "thermoengine",
+        "status": status,
+        "prediction": prediction,
+        "reason": reason,
+    }
+
+
+def test_short_latch_reason_strips_traceback():
+    text = (
+        "RuntimeError: ThermoEngine equilibrium failed: "
+        "ThermoEngine Liquid GibbsFreeEnergy is not finite: nan "
+        "Traceback (most recent call last): File \"x.py\", line 1"
+    )
+    assert benchmark._short_latch_reason(text) == (
+        "RuntimeError: ThermoEngine equilibrium failed: "
+        "ThermoEngine Liquid GibbsFreeEnergy is not finite: nan"
+    )
+
+
+def test_detect_thermoengine_adapter_latch_finds_post_refuse_unavailable_run():
+    rows = [
+        _te_row("hastie_sio_1907_796", "ok", prediction=0.05),
+        _te_row(
+            "tsaplin2000_a_sio2_x0477_1373",
+            "refused",
+            reason="RuntimeError: ThermoEngine equilibrium failed",
+        ),
+        _te_row(
+            "tsaplin2000_a_sio2_x0430_1473",
+            "unavailable",
+            reason="AlphaMELTS adapter not available (no ThermoEngine, PetThermoTools, or subprocess transport)",
+        ),
+        _te_row(
+            "yamaguchi1983_a_sio2_liquid_x0205_1373",
+            "unavailable",
+            reason="AlphaMELTS adapter not available (no ThermoEngine, PetThermoTools, or subprocess transport)",
+        ),
+    ]
+
+    latch = benchmark.detect_thermoengine_adapter_latch(rows)
+
+    assert latch is not None
+    assert latch["latch_after_point_id"] == "tsaplin2000_a_sio2_x0477_1373"
+    assert latch["sequential_usable"] == 1
+    assert latch["sequential_total"] == 4
+    assert latch["latched_count"] == 2
+    assert latch["yamaguchi_latched_count"] == 1
+    assert latch["latched_point_ids"] == [
+        "tsaplin2000_a_sio2_x0430_1473",
+        "yamaguchi1983_a_sio2_liquid_x0205_1373",
+    ]
+
+
+def test_detect_thermoengine_adapter_latch_absent_when_all_rows_are_live():
+    rows = [
+        _te_row("hastie_sio_1907_796", "ok", prediction=0.05),
+        _te_row("tsaplin2000_a_sio2_x0753_1273", "ok", prediction=0.2),
+        _te_row(
+            "yamaguchi1983_a_sio2_liquid_x0205_1373",
+            "ok",
+            prediction=0.6,
+        ),
+    ]
+
+    assert benchmark.detect_thermoengine_adapter_latch(rows) is None
+
+
+def test_generate_report_does_not_publish_latched_count_as_engine_capability():
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    rows = [
+        _te_row("hastie_sio_1907_796", "ok", prediction=0.05),
+        _te_row(
+            "tsaplin2000_a_sio2_x0477_1373",
+            "refused",
+            reason="RuntimeError: ThermoEngine equilibrium failed",
+        ),
+        _te_row(
+            "yamaguchi1983_a_sio2_liquid_x0205_1373",
+            "unavailable",
+            reason="AlphaMELTS adapter not available (no ThermoEngine, PetThermoTools, or subprocess transport)",
+        ),
+    ]
+
+    report = benchmark.generate_report(fixture, rows, [], [])
+
+    assert "ThermoEngine sequential one-process yield: 1/3" in report
+    assert "post-latch artifact" in report
+    assert "tsaplin2000_a_sio2_x0477_1373" in report
+    assert "Do not read the sequential count" in report
+    assert "ThermoEngine produced 1/3 usable" not in report
+    assert "Isolated ThermoEngine re-evaluation" in report
+    assert "not asserted here" in report
+
+
+def test_generate_report_states_measured_unlatched_coverage_when_supplied():
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    rows = [
+        _te_row("hastie_sio_1907_796", "ok", prediction=0.05),
+        _te_row(
+            "tsaplin2000_a_sio2_x0477_1373",
+            "refused",
+            reason="RuntimeError: ThermoEngine equilibrium failed",
+        ),
+        _te_row(
+            "yamaguchi1983_a_sio2_liquid_x0205_1373",
+            "unavailable",
+            reason="AlphaMELTS adapter not available (no ThermoEngine, PetThermoTools, or subprocess transport)",
+        ),
+    ]
+    latch = benchmark.detect_thermoengine_adapter_latch(rows)
+    assert latch is not None
+    latch = {
+        **latch,
+        "isolated_usable": 1,
+        "isolated_total": 1,
+        "isolated_yamaguchi_usable": 1,
+        "isolated_yamaguchi_total": 1,
+        "true_usable": 2,
+        "true_total": 3,
+    }
+
+    report = benchmark.generate_report(
+        fixture, rows, [], [], thermoengine_latch=latch
+    )
+
+    assert "post-latch artifact" in report
+    assert "produced 1/1 usable predictions (Yamaguchi: 1/1)" in report
+    assert "2/3" in report
+    assert "not taken from the latched CSV" in report
+
+
+def test_isolated_thermoengine_retries_after_adapter_unavailable():
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    yamaguchi = next(
+        point
+        for point in fixture["points"]
+        if point["id"].startswith("yamaguchi1983_a_sio2_liquid")
+    )
+    fixture = {**fixture, "points": [yamaguchi]}
+
+    class _DieOnceThenScore:
+        calls = 0
+
+        def evaluate(self, composition_wt_pct, temperature_K, fO2_bar):
+            del composition_wt_pct, temperature_K, fO2_bar
+            type(self).calls += 1
+            if type(self).calls == 1:
+                return benchmark.EngineResult(
+                    status="unavailable",
+                    reason=(
+                        "AlphaMELTS adapter not available "
+                        "(no ThermoEngine, PetThermoTools, or subprocess transport)"
+                    ),
+                )
+            return benchmark.EngineResult(
+                status="ok",
+                activities={"SiO2": 0.55},
+                gammas={"SiO2": 0.55},
+            )
+
+    measured = benchmark.measure_isolated_thermoengine_points(
+        fixture,
+        [yamaguchi["id"]],
+        engine_factory=_DieOnceThenScore,
+    )
+
+    assert measured["usable"] == 1
+    assert measured["total"] == 1
+    assert measured["yamaguchi_usable"] == 1
+    assert measured["restarts"] == 1
+    assert measured["rows"][0]["prediction"] is not None
