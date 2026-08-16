@@ -501,6 +501,17 @@ def melt_oxide_activity(
             activity_model=MELT_OXIDE_IDEAL_SOLUTION_MODEL,
             evidence_tier=MELT_OXIDE_IDEAL_ASSERTION_TIER,
             temperature_K=resolved_temperature_K,
+            # The dataclass default is "temperature_not_supplied", which is
+            # the WRONG REASON here and had been shipping on this path.
+            # Temperature is irrelevant when NO gamma coefficient exists for
+            # this parent at any temperature -- a consumer reading
+            # "temperature_not_supplied" would reasonably conclude that
+            # supplying T makes the value authoritative, and it never will.
+            # The P2O5 branch a few lines above already marks its own unity
+            # fallback non-authoritative; this branch was the asymmetric one.
+            # Same shape as the "adapter not available" mislabel: a specific,
+            # checkable, false statement about WHY.
+            authority_status="declared_ideal_no_gamma_coefficient_non_authoritative",
         )
 
     activity_authority_status = "temperature_not_supplied"
