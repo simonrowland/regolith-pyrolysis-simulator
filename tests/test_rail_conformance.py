@@ -34,6 +34,8 @@ from simulator.vapour_rail.batch import (
     FluxActivationContext,
     FluxDiagnosticUpperBound,
     FluxEligible,
+    FluxRefusal,
+    PressureRefusal,
     PressureUpperBound,
     PressureValue,
 )
@@ -933,9 +935,9 @@ def test_c2_pressure_is_finite_over_required_grid(species_id: str) -> None:
 
 @pytest.mark.parametrize("species_id", STRUCTURAL_SPECIES)
 def test_c2_out_of_domain_value_is_typed_diagnostic_flux(species_id: str) -> None:
-    # Runtime contract b-142: the anti-cliff continuation is the best available
-    # status-bearing point estimate. It evolves inventory while its verdict and
-    # certification ceiling remain explicitly non-authoritative.
+    # Runtime contract b-142: the anti-cliff continuation is normally the best
+    # available status-bearing point estimate. Rows whose source polynomials are
+    # narrower than the outer continuation declare a typed refusal instead.
     if CATALOG.species[species_id].code_metadata.source_account == "process.stage0_foulant":
         direct = _evaluate(species_id, 2300.0)
         split = chi_escape_salt(species_id, 2300.0 - 273.15, 1.0e-3)
@@ -945,7 +947,18 @@ def test_c2_out_of_domain_value_is_typed_diagnostic_flux(species_id: str) -> Non
         evaluator = CATALOG.evaluator_for(species_id)
         out_of_range_temperature_K = evaluator.valid_temperature_K[1] + 1.0
         batch, answer = _resolve_one(species_id, out_of_range_temperature_K)
-        if answer.extra.get("alpha_authority_status") == "diagnostic_upper_bound":
+        typed_refusal = (
+            CATALOG.species[species_id].code_metadata.raw.get(
+                "out_of_domain_disposition"
+            )
+            == "typed_refusal"
+        )
+        if typed_refusal:
+            assert isinstance(answer.pressure, PressureRefusal)
+            assert answer.pressure.code == "outside_declared_evaluator_domain"
+            assert isinstance(answer.flux, FluxRefusal)
+            assert species_id not in batch.flux_active_species_ids
+        elif answer.extra.get("alpha_authority_status") == "diagnostic_upper_bound":
             assert isinstance(answer.pressure, PressureUpperBound)
             assert isinstance(answer.flux, FluxDiagnosticUpperBound)
             assert species_id not in batch.flux_active_species_ids
@@ -953,10 +966,11 @@ def test_c2_out_of_domain_value_is_typed_diagnostic_flux(species_id: str) -> Non
             assert isinstance(answer.pressure, PressureValue)
             assert isinstance(answer.flux, FluxEligible)
             assert species_id in batch.flux_active_species_ids
-        assert answer.extra["out_of_range"] is True
-        assert answer.extra["status"]
-        assert answer.extra["acquisition_flag"]
-        assert answer.pressure.pa > 0.0
+        if not typed_refusal:
+            assert answer.extra["out_of_range"] is True
+            assert answer.extra["status"]
+            assert answer.extra["acquisition_flag"]
+            assert answer.pressure.pa > 0.0
 
 
 @pytest.mark.parametrize("species_id", STRUCTURAL_SPECIES)

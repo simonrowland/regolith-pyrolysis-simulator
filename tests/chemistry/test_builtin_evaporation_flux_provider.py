@@ -1384,10 +1384,12 @@ def test_provider_refuses_missing_species_transport_parameters():
     (
         ("FeO_association_gas", "FeO", 0.0718440),
         ("NiO_gas", "NiO", 0.0746924),
+        ("MnO_gas", "MnO", 0.070937044),
+        ("CoO_gas", "CoO", 0.074932194),
     ),
 )
 @pytest.mark.xdist_group("serial")
-def test_t609_diagnostic_upper_screen_has_explicit_transport_proxy(
+def test_monoxide_diagnostic_upper_screen_has_explicit_transport_proxy(
     species_id,
     parent_oxide,
     molar_mass,
@@ -1414,8 +1416,11 @@ def test_t609_diagnostic_upper_screen_has_explicit_transport_proxy(
     assert "missing_transport_parameters" not in result.diagnostic
 
 
-@pytest.mark.parametrize("species_id", ("FeO_association_gas", "NiO_gas"))
-def test_t609_flux_dormant_carriers_remain_pressure_observable_without_legacy_debit(
+@pytest.mark.parametrize(
+    "species_id",
+    ("FeO_association_gas", "NiO_gas", "MnO_gas", "CoO_gas"),
+)
+def test_monoxide_flux_dormant_carriers_remain_pressure_observable_without_legacy_debit(
     vapor_pressure_data,
     species_id,
 ):

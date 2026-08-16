@@ -60,6 +60,11 @@ from simulator.vapour_rail.u0_manifest import (
     canonicalize_gas_id,
     load_u0_manifest,
 )
+from simulator.vapour_rail.domain_policy import (
+    DomainPolicyError,
+    REFUSAL_OUTSIDE_DECLARED_DOMAIN,
+    declared_domain_transition,
+)
 
 if TYPE_CHECKING:
     from simulator.vapour_rail.catalog import CompiledSpecies
@@ -1153,6 +1158,22 @@ def refusal_closure(
             and state is not None
             and state.temperature_K is not None
         ):
+            try:
+                domain_transition = declared_domain_transition(
+                    compiled, state.temperature_K
+                )
+            except DomainPolicyError as exc:
+                return _make_refusal(
+                    rule,
+                    REFUSAL_MISSING_CHANNEL_CONTRACT,
+                    str(exc),
+                )
+            if domain_transition.refuses:
+                return _make_refusal(
+                    rule,
+                    domain_transition.refusal_code or REFUSAL_MISSING_CHANNEL_CONTRACT,
+                    domain_transition.detail or "declared evaluator domain refused",
+                )
             evaluator_activity_exponent = float(
                 getattr(compiled.evaluator, "activity_exponent", 0.0) or 0.0
             )

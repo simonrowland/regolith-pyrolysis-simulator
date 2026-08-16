@@ -111,15 +111,12 @@ ALLOWED_RETAINED_FP_IDS = frozenset({"Cl", "He", "N"})
 # non-delta non-R non-U failures.
 #
 # Provenance (strict probe at authoring):
-# - MnO / MnO_gas: request children include MnO_gas without literature
 # - Cr2O3 / Cr2O3_gas: request children include Cr2O3_gas without literature
 # - Na2CO3: stage-0 products include Na2SiO3 without literature
 OPEN_ACQUISITION_DEBT_IDS = frozenset(
     {
         "Cr2O3",
         "Cr2O3_gas",
-        "MnO",
-        "MnO_gas",
         "Na2CO3",
     }
 )

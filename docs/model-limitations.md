@@ -596,15 +596,16 @@ Assumption-only engine diagnostics (visible negative results, but excluded from 
 | sossi-et-al-2019 | sossi_2019_na_open_furnace_apparent | alpha | Na | temperature_K=1698.15 | 1 | 1 | 0 | typed-refusal:analytical_upper_bound_not_measurement | assumed-input (excluded) |
 
 <!-- END t-512 extract-store reproduction rollup -->
-Four transition-metal monoxide gas carriers were audited, and the source/composition
-split remains decisive:
+Four transition-metal monoxide gas carriers now have executable, status-bearing catalog rows.
+The class-level thermochemistry omission is closed, while pressure-reference and kinetic authority
+remain deliberately limited:
 
 | carrier | source thermochemistry | catalog row | nature of the gap |
 |---|---|---|---|
 | `FeO(g)` | **available** (NASA CEA) | present | diagnostic-only CEA gas-association composition; never debits or certifies |
 | `NiO(g)` | **available** (NASA CEA) | present | diagnostic-only CEA gas-exchange composition; never debits or certifies |
-| `MnO(g)` | **absent** (no JANAF-4th Mn-oxide gas table; not in CEA) | absent | needs first-principles work |
-| `CoO(g)` | **absent** (JANAF-4th has CoO(cr) only; not in CEA) | absent | needs first-principles work |
+| `MnO(g)` | **available** (reviewed IVTAN table 1436 Shomate fit, 1000–3000 K) | present | composed on the existing liquid-MnO reference; executable only on the 1519–2273.15 K intersection; typed refusal outside |
+| `CoO(g)` | **available** (reviewed IVTAN table 1335 Shomate fit, 1000–3000 K) | present | composed on the reviewed CoO(cr)-to-Co(g) screen; executable only on the 1400–2000 K intersection; typed refusal outside |
 
 `FeO(g)` is the consequential one for oxidising recipes. Its landed association row
 derives the `+0.5` O2-channel exponent from `Fe(g) + 0.5 O2(g) -> FeO(g)` and exposes the
@@ -612,25 +613,37 @@ competitor in the oxidative-volatility screen. It remains an upper-screen instru
 the Fe base is an activity-folded effective-pressure fit and the FeO kinetic coefficient
 is an explicit Hertz–Knudsen `alpha=1` ceiling, not form- and class-matched validation.
 The resulting pressure is observable, but the channel is never flux-eligible and never
-debits inventory. No selective high-fO2 extraction window may be certified from this row. The Mn and Co
-bounds below quantify the still-unmodelled members of the same class.
+debits inventory. No selective high-fO2 extraction window may be certified from this row.
 
-### Omitted metal-monoxide gas channels (MnO, CoO)
+### Transition-metal monoxide gas channels: coverage closed, authority still limited
 
-VapoRock patch `0001` (and the simulator’s VapoRock-coupled path that consumes it) carries **Mn and Co as atomic gas only**. The monoxide channels **MnO(g)** and **CoO(g)** are **not** in the gas set: JANAF 4th has no Mn-oxide gas tables and only CoO(cr); NASA CEA supplies FeO(g)/NiO(g) but not MnO(g)/CoO(g). Melt-oxide basis rows MnO/NiO/CoO remain so monatomic metal reactions atom-balance. **Fe and Ni are no longer in this catalog hole**; their new rows remain diagnostic-only, non-debiting, and non-authoritative.
+The VapoRock gas set still carries Mn and Co as atomic gas only, but the simulator catalog no longer
+inherits that omission. t-622 adopts the independently reviewed HT-C8 IVTAN MnO(g)/CoO(g) candidate
+rows without retuning their coefficients. Both channels compose the gas-only association against an
+existing condensed-reference screen, derive congruent activity exponent 1 and oxygen exponent 0 from
+stoichiometry, and preserve the full gas-fit domain and uncertainty receipt. Runtime evaluation refuses
+outside the narrower executable pressure intersection before any continuation can reach the flux path.
 
-**Bound (Pedley & Marshall 1983 ΔfH ± gef for MO; CEA NASA-9 for M(g)+O₂; range = ±Pedley uncertainty through \(\exp(\delta D_0/RT)\)):** fraction of metal-atom gas that could ride as MO under equilibrium,
+The retained dissociation-energy widths are 1.8 kcal mol⁻¹ for MnO and 0.13 eV for CoO (the wider
+Sorensen/Pedley–Marshall envelope, not IVTAN’s ±2.51 kcal shorthand). At 1500/2000/2500 K these
+become ±0.262/0.197/0.157 dex for MnO and ±0.437/0.328/0.262 dex for CoO. The earlier
+omission screen remains useful context for the physical importance of the newly visible channels:
 
 \[
 f_{\mathrm{MO}} = \frac{r}{1+r},\quad r = K_p(T)\,p_{\mathrm{O_2}}^{1/2}.
 \]
 
-| condition | Mn omitted channel (upper bound) | Co omitted channel (upper bound) |
+| condition | MnO association-envelope context | CoO association-envelope context |
 |-----------|----------------------------------|----------------------------------|
 | Deep vacuum floor (\(p_{\mathrm{O_2}}\sim 10^{-12}\) bar) | **negligible–minor** (≲4% in gate band; ≪1% above ~2000 K) | **negligible** (≪0.1%) |
 | C2A vacuum ceiling (\(p_{\mathrm{O_2}}\sim 10^{-8}\) bar) | **MATERIAL below ~1950 K** at Pedley upper (up to tens of %; nominal is minor); minor above ~2100 K | **negligible** (≤~1% at cold gate edge) |
 | Elevated pO₂ ≳ 0.1 mbar (C2B/C3/C4/C6 Si-hold, C5 MRE 0.01–0.1 bar) | **MATERIAL** all T bands (upper often ≳50–100%) | **MATERIAL** in gate/recipe bands; minor–MATERIAL in planned-raise band |
 
-Mn’s width is dominated by Pedley’s class-6 ±10 kcal mol⁻¹ on MnO(g) (factor ~×16 on \(K_p\) at 1800 K). Co is class-4 ±3 kcal (factor ~×2.3 at 1800 K). Association is exothermic: **hotter T at fixed pO₂ reduces** \(f_{\mathrm{MO}}\) — HT raises do not amplify this omission; oxidizing overhead does.
+Association is exothermic: **hotter T at fixed pO₂ reduces** \(f_{\mathrm{MO}}\); oxidizing
+overhead, not an HT raise, strengthens the monoxide competitor.
 
-**What not to claim:** complete Mn or Co gas-phase speciation, or Mn/Co condenser-stage purity, under elevated-pO₂ recipes while monoxides remain omitted. Vacuum-floor atomic-only runs are within a stated few-percent (Mn) / sub-percent (Co) channel bound. Full write-up and grid: `docs-private/research/2026-08-09-upstream-mission/HT-C8-bound/omitted-channel-bound.md`.
+**What not to claim:** authoritative Mn/Co flux, inventory depletion, condenser-stage purity, or a
+certified selective extraction window. All four monoxide rows share the diagnostic `alpha=1` upper-bound
+policy, remain flux-dormant at every temperature, and retain C5 ledger gaps until form- and
+system-class-matched kinetic evidence exists. Full historical bound and grid:
+`docs-private/research/2026-08-09-upstream-mission/HT-C8-bound/omitted-channel-bound.md`.

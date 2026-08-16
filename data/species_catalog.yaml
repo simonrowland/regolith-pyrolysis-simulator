@@ -1151,29 +1151,34 @@ species:
   atoms:
     Co: 1
     O: 1
+  molar_mass_g_mol: 74.932194
   basis: molecular_formula
   category: vapor_species
   phase: gas
   catalog_role: gas
-  direct_vapour_flux: false
+  direct_vapour_flux: true
   formula_alias: CoO
   validation:
     status: pending_validation
     anchor_refs: []
   pressure_observable: equilibrium_partial_pressure
   valid_domain:
-    status: pending_acquisition
-    temperature_K: null
+    status: active
+    temperature_K:
+    - 1400
+    - 2000
   extrapolation_policy: conservative_slope_continuation
   out_of_range_status: out_of_range_conservative_continuation
-  acquisition_flag: vapour_pressure_pending_acquisition:CoO_gas
+  acquisition_flag: evaporation_alpha_hkl_upper_bound_t622:CoO_gas
   code_metadata:
     formula_id: CoO
     canonical_aliases:
     - CoO
-    collision_only_suffix: true
-    request_rule: pending_family_compilation
-  source: VR-1 U0 collision_gas membership set
+    collision_only_suffix: false
+    request_rule: source_inventory_present
+    source_account: process.cleaned_melt
+  source: t-622 adopted reviewed IVTAN CoO(g) Shomate rows on the CoO(cr)-to-Co(g) reference
+    screen; diagnostic-only, never inventory-debiting, and never certifying.
 - id: Cr2O3_gas
   formula: Cr2O3
   atoms:
@@ -1526,29 +1531,34 @@ species:
   atoms:
     Mn: 1
     O: 1
+  molar_mass_g_mol: 70.937044
   basis: molecular_formula
   category: vapor_species
   phase: gas
   catalog_role: gas
-  direct_vapour_flux: false
+  direct_vapour_flux: true
   formula_alias: MnO
   validation:
     status: pending_validation
     anchor_refs: []
   pressure_observable: equilibrium_partial_pressure
   valid_domain:
-    status: pending_acquisition
-    temperature_K: null
+    status: active
+    temperature_K:
+    - 1519
+    - 2273.15
   extrapolation_policy: conservative_slope_continuation
   out_of_range_status: out_of_range_conservative_continuation
-  acquisition_flag: vapour_pressure_pending_acquisition:MnO_gas
+  acquisition_flag: evaporation_alpha_hkl_upper_bound_t622:MnO_gas
   code_metadata:
     formula_id: MnO
     canonical_aliases:
     - MnO
-    collision_only_suffix: true
-    request_rule: pending_family_compilation
-  source: VR-1 U0 collision_gas membership set
+    collision_only_suffix: false
+    request_rule: source_inventory_present
+    source_account: process.cleaned_melt
+  source: t-622 adopted reviewed IVTAN MnO(g) Shomate rows on the existing liquid-MnO
+    standard-reaction base; diagnostic-only, never inventory-debiting, and never certifying.
 - id: Na2O_gas
   formula: Na2O
   atoms:

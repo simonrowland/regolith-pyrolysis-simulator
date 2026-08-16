@@ -14637,6 +14637,344 @@ families:
       canonical_aliases:
       - NiO
       hot_train_applicability: applicable
+  oxide_vapors_mno_family:
+    physical_properties:
+      species:
+        MnO_gas:
+          formula: MnO
+          molar_mass_g_mol: 70.937044
+          parent_oxide: MnO
+          fit_target: standard_reaction_term
+          authority_class: analytical_non_authoritative
+          acquisition_status: ivtan_candidate_adopted_with_condensed_reference_composition
+          runtime_disposition: status_bearing_non_authoritative
+          retain_analytical_pressure_channel: true
+          flux_dormant: true
+          gas_rail_standard_reaction:
+            status: available_diagnostic_only
+            reaction: MnO(l) -> MnO(g)
+          reaction:
+            formula: MnO(l) -> MnO(g)
+            basis: Existing liquid-MnO-to-Mn standard-reaction reference composed with the reviewed
+              IVTAN MnO(g) Shomate rows and landed NASA CEA Mn/O2 gas rows.
+            derivation: Congruent transfer of one MnO reservoir unit into one MnO vapor; the O2 terms
+              in the monatomic base and gas association cancel in the net source reaction.
+          stoich_oxide_per_vapor: 1.0
+          stoich_O2_per_vapor: 0.0
+          stoichiometry_derivation: One mol MnO parent transfers intact to one mol MnO vapor, giving
+            1 kg parent/kg vapor and 0 kg O2/kg vapor; mass sanity is 1=1+0.
+          oxide_activity_exponent: 1.0
+          pO2_reference_bar: 1.0
+          gas_thermo_fit_domain_K:
+          - 1000.0
+          - 3000.0
+          thermochemistry_uncertainty:
+            authority: Smoes-Drowart dissociation-energy width
+            sigma_G_J_per_mol: 7531.2
+            d0_width_kcal_per_mol: 1.8
+            sigma_log10_K_at_1500_2000_2500_K:
+            - 0.262254560
+            - 0.196690920
+            - 0.157352736
+          notes: Status-bearing analytical carrier. The reviewed gas thermochemistry is available over
+            1000-3000 K; the executable pressure domain is the narrower intersection with the existing
+            liquid-MnO reference. Neither that composition nor the ideal-HKL kinetic ceiling can certify.
+          validation:
+            status: pending_validation
+            certification_ceiling: never
+            anchor_refs: []
+          source_reactions:
+          - id: liquid_mno_to_mno_gas
+            thermodynamic_standard_state:
+              convention: raoultian_pure_endmember
+              phase: liquid
+              reference_pressure_bar: 1.0
+              component_basis: raoultian_pure_endmember
+            reactants:
+            - formula: MnO
+              stoichiometry: 1.0
+            products:
+            - formula: MnO
+              stoichiometry: 1.0
+            activity_input:
+              component_id: MnO
+              standard_state:
+                convention: raoultian_pure_endmember
+                phase: liquid
+                reference_pressure_bar: 1.0
+                component_basis: raoultian_pure_endmember
+              activity_model: provider_reported_thermodynamic_activity
+              allow_henrian_upper_bound: false
+              compound_bearing: false
+              require_assemblage_match: false
+          pressure_models:
+          - fit_target: standard_reaction_term
+            pressure_kind: equilibrium_partial_pressure
+            species_basis: monomer
+            valid_domain:
+              temperature_K:
+              - 1519
+              - 2273.15
+            provenance:
+            - source_id: ivtan-mno-coo-thermo
+              observation_ids:
+              - ivtan_MnO_gibbs
+              status: reviewed_candidate_adopted
+            - source_id: nasa-cea-thermo
+              observation_ids:
+              - cea_Mn_gibbs
+              - cea_O2_gibbs
+            - source_id: metals_mn_family
+              observation_id: liquid_mno_reference_fit
+              status: structural_computational_provenance_only
+            evaluator_family: shomate
+            source_reaction_id: liquid_mno_to_mno_gas
+            activity_semantics: source_reaction_activity
+            composition_mode: source_reaction_activity
+            base_reference_pressure_model:
+              evaluator_family: antoine
+              coefficients:
+                A: 12.5780234
+                B: 28619.0370835
+                C: -118.49
+            base_vapor_formula: Mn
+            gas_exchange_reaction:
+              reactants:
+              - formula: Mn
+                stoichiometry: 1.0
+              - formula: O2
+                stoichiometry: 0.5
+              products:
+              - formula: MnO
+                stoichiometry: 1.0
+            species_thermo:
+              Mn:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_Mn_gibbs
+              MnO:
+                extract_ref:
+                  source_id: ivtan-mno-coo-thermo
+                  observation_id: ivtan_MnO_gibbs
+              O2:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_O2_gibbs
+            activity_exponent: 1.0
+            pO2_reference_bar: 1.0
+    fiat_routing:
+      plant_bin: null
+      engineering_capture_policy: temperature_threshold
+      products_and_coproducts: []
+      process_or_terminal_destination: process.condensation_train
+      condensation_reference_at_1mbar_C: null
+      condensation_reference_derivation: No within-domain 100 Pa root claimed; routing remains a diagnostic
+        proxy and never validation evidence.
+    vaporisation_coefficients:
+      evaporation_alpha:
+        value: 1.0
+        status: diagnostic_upper_bound
+        source: No form- and system-class-matched MnO(g) kinetic coefficient; Hertz-Knudsen ideal alpha=1
+          retained as an explicit diagnostic upper-bound ceiling. It never debits inventory and is never
+          a measured value.
+        T_band_K:
+        - 1000
+        - 3000
+        envelope:
+        - 0.01
+        - 1.0
+        tier: 2
+        tag: hkl_ideal_upper_bound_status_bearing
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 1000
+        - 3000
+        envelope:
+        - 0.01
+        - 1.0
+      extrapolation_policy: conservative_slope_continuation
+      out_of_range_status: out_of_range_conservative_continuation
+      acquisition_flag: evaporation_alpha_hkl_upper_bound_t622:MnO_gas
+    code_metadata:
+      formula_id: MnO_gas
+      source_account: process.cleaned_melt
+      request_rule: source_inventory_present
+      solve_group_id: oxide_vapors_mno_family
+      compatibility_projection: oxide_vapors
+      canonical_aliases:
+      - MnO
+      hot_train_applicability: applicable
+      out_of_domain_disposition: typed_refusal
+  oxide_vapors_coo_family:
+    physical_properties:
+      species:
+        CoO_gas:
+          formula: CoO
+          molar_mass_g_mol: 74.932194
+          parent_oxide: CoO
+          fit_target: standard_reaction_term
+          authority_class: analytical_non_authoritative
+          acquisition_status: ivtan_candidate_adopted_with_condensed_reference_composition
+          runtime_disposition: status_bearing_non_authoritative
+          retain_analytical_pressure_channel: true
+          flux_dormant: true
+          gas_rail_standard_reaction:
+            status: available_diagnostic_only
+            reaction: CoO(cr) -> CoO(g)
+          reaction:
+            formula: CoO(cr) -> CoO(g)
+            basis: Reviewed IMCC CoO(cr)-to-Co(g) unit-activity screen composed with the reviewed IVTAN
+              CoO(g) Shomate rows and landed NASA CEA Co/O2 gas rows.
+            derivation: Congruent transfer of one CoO crystalline reference unit into one CoO vapor; the
+              O2 terms in the monatomic base and gas association cancel in the net source reaction.
+          stoich_oxide_per_vapor: 1.0
+          stoich_O2_per_vapor: 0.0
+          stoichiometry_derivation: One mol CoO parent transfers intact to one mol CoO vapor, giving
+            1 kg parent/kg vapor and 0 kg O2/kg vapor; mass sanity is 1=1+0.
+          oxide_activity_exponent: 1.0
+          pO2_reference_bar: 1.0
+          gas_thermo_fit_domain_K:
+          - 1000.0
+          - 3000.0
+          thermochemistry_uncertainty:
+            authority: Sorensen 2020 retention of Pedley-Marshall dissociation-energy width
+            sigma_G_J_per_mol: 12543.093176
+            d0_width_eV: 0.13
+            sigma_log10_K_at_1500_2000_2500_K:
+            - 0.436780776
+            - 0.327585582
+            - 0.262068466
+          notes: Status-bearing analytical carrier. The reviewed gas thermochemistry is available over
+            1000-3000 K; the executable pressure domain is the narrower intersection with the reviewed
+            CoO(cr)-to-Co(g) screen. The 0.13 eV width is retained rather than the IVTAN shorthand.
+          validation:
+            status: pending_validation
+            certification_ceiling: never
+            anchor_refs: []
+          source_reactions:
+          - id: crystalline_coo_to_coo_gas
+            thermodynamic_standard_state:
+              convention: raoultian_pure_endmember
+              phase: crystalline
+              reference_pressure_bar: 1.0
+              component_basis: raoultian_pure_endmember
+            reactants:
+            - formula: CoO
+              stoichiometry: 1.0
+            products:
+            - formula: CoO
+              stoichiometry: 1.0
+            activity_input:
+              component_id: CoO
+              standard_state:
+                convention: raoultian_pure_endmember
+                phase: crystalline
+                reference_pressure_bar: 1.0
+                component_basis: raoultian_pure_endmember
+              activity_model: provider_reported_thermodynamic_activity
+              allow_henrian_upper_bound: false
+              compound_bearing: false
+              require_assemblage_match: false
+          pressure_models:
+          - fit_target: standard_reaction_term
+            pressure_kind: equilibrium_partial_pressure
+            species_basis: monomer
+            valid_domain:
+              temperature_K:
+              - 1400
+              - 2000
+            provenance:
+            - source_id: ivtan-mno-coo-thermo
+              observation_ids:
+              - ivtan_CoO_gibbs
+              status: reviewed_candidate_adopted
+            - source_id: nasa-cea-thermo
+              observation_ids:
+              - cea_Co_gibbs
+              - cea_O2_gibbs
+            - source_id: imcc-sf04-ext-v3
+              observation_id: coo_cr_to_co_gas_unit_activity_screen
+              status: structural_computational_provenance_only
+              fit_residual_dex:
+                max_abs: 0.009107
+            evaluator_family: shomate
+            source_reaction_id: crystalline_coo_to_coo_gas
+            activity_semantics: source_reaction_activity
+            composition_mode: source_reaction_activity
+            base_reference_pressure_model:
+              evaluator_family: antoine
+              coefficients:
+                A: 15.740530534105403
+                B: 33711.05599615616
+                C: 0.0
+            base_vapor_formula: Co
+            gas_exchange_reaction:
+              reactants:
+              - formula: Co
+                stoichiometry: 1.0
+              - formula: O2
+                stoichiometry: 0.5
+              products:
+              - formula: CoO
+                stoichiometry: 1.0
+            species_thermo:
+              Co:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_Co_gibbs
+              CoO:
+                extract_ref:
+                  source_id: ivtan-mno-coo-thermo
+                  observation_id: ivtan_CoO_gibbs
+              O2:
+                extract_ref:
+                  source_id: nasa-cea-thermo
+                  observation_id: cea_O2_gibbs
+            activity_exponent: 1.0
+            pO2_reference_bar: 1.0
+    fiat_routing:
+      plant_bin: null
+      engineering_capture_policy: temperature_threshold
+      products_and_coproducts: []
+      process_or_terminal_destination: process.condensation_train
+      condensation_reference_at_1mbar_C: null
+      condensation_reference_derivation: No within-domain 100 Pa root claimed; routing remains a diagnostic
+        proxy and never validation evidence.
+    vaporisation_coefficients:
+      evaporation_alpha:
+        value: 1.0
+        status: diagnostic_upper_bound
+        source: No form- and system-class-matched CoO(g) kinetic coefficient; Hertz-Knudsen ideal alpha=1
+          retained as an explicit diagnostic upper-bound ceiling. It never debits inventory and is never
+          a measured value.
+        T_band_K:
+        - 1000
+        - 3000
+        envelope:
+        - 0.01
+        - 1.0
+        tier: 2
+        tag: hkl_ideal_upper_bound_status_bearing
+      alpha_domain_and_uncertainty:
+        temperature_K:
+        - 1000
+        - 3000
+        envelope:
+        - 0.01
+        - 1.0
+      extrapolation_policy: conservative_slope_continuation
+      out_of_range_status: out_of_range_conservative_continuation
+      acquisition_flag: evaporation_alpha_hkl_upper_bound_t622:CoO_gas
+    code_metadata:
+      formula_id: CoO_gas
+      source_account: process.cleaned_melt
+      request_rule: source_inventory_present
+      solve_group_id: oxide_vapors_coo_family
+      compatibility_projection: oxide_vapors
+      canonical_aliases:
+      - CoO
+      hot_train_applicability: applicable
+      out_of_domain_disposition: typed_refusal
   t583_status_ba2_family:
     physical_properties:
       species:

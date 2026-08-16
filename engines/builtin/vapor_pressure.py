@@ -62,6 +62,10 @@ from engines.builtin._common import (
     resolve_request_vacuum_floor_bar,
     resolve_transport_pO2_bar,
 )
+from simulator.vapour_rail.domain_policy import (
+    DomainPolicyError,
+    declared_domain_transition,
+)
 from simulator.chemistry.kernel.capabilities import CapabilityProfile, ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, IntentResult
 from simulator.chemistry.kernel.provider import ChemistryProvider
@@ -2117,13 +2121,15 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             C = antoine.get('C', 0)
             valid = data.get('valid_range_K', [0, 9999])
             compiled_evaluator = None
+            compiled_species = None
             if not A > 0 and self._vapour_rail_catalog is not None:
                 try:
                     # b-189-exempt: applicability gated at loop top
+                    compiled_species = self._vapour_rail_catalog.species[name]
                     compiled_evaluator = self._vapour_rail_catalog.evaluator_for(
                         name
                     )
-                except ValueError:
+                except (KeyError, ValueError):
                     pass
             if not A > 0 and compiled_evaluator is None:
                 continue
@@ -2222,6 +2228,28 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         f"{T_K:.2f} K"
                     )
             if compiled_evaluator is not None:
+                assert compiled_species is not None
+                try:
+                    domain_transition = declared_domain_transition(
+                        compiled_species, T_K
+                    )
+                except DomainPolicyError as exc:
+                    raise VaporPressureComputationError(
+                        f"{name}: {exc}"
+                    ) from exc
+                if domain_transition.refuses:
+                    oxide_vapor_extrapolations[name] = {
+                        "temperature_K": T_K,
+                        "valid_range_K": compiled_evaluator.valid_temperature_K,
+                        "status": domain_transition.disposition,
+                        "refusal_code": domain_transition.refusal_code,
+                        "detail": domain_transition.detail,
+                    }
+                    warnings.append(
+                        f"{name}: {domain_transition.refusal_code}: "
+                        f"{domain_transition.detail}"
+                    )
+                    continue
                 # Explicit unit/reference inputs here are the declared standard
                 # reaction reference, not evaluator defaults. The live point
                 # below uses the physical activity and the evaluator's named

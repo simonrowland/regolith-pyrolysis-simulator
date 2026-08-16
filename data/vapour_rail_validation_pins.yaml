@@ -132,6 +132,15 @@ species:
       # not_comparable_system_class exclusions; they are not silicate-melt
       # carrier validation. See docs-private/research/2026-08-08-si-comparability/report.md
       # and validation-data/pin-evidence/cr_mass_spec_melt_first_2026-08-08.yaml
+  CoO_gas:
+    tier: T1
+    target_tier: T4
+    validations:
+      structural:
+        evidence_refs:
+          - data/vapor_pressures.yaml
+          - data/literature/extracts/ivtan-mno-coo-thermo.yaml
+          - validation-data/pin-evidence/t622_additivity_2026-08-12.yaml
   CrO2:
     tier: T2
     target_tier: T4
@@ -305,6 +314,15 @@ species:
       # melt Mn carrier validation. See
       # docs-private/research/2026-08-08-si-comparability/report.md and
       # validation-data/pin-evidence/mn_mass_spec_melt_first_2026-08-08.yaml
+  MnO_gas:
+    tier: T1
+    target_tier: T4
+    validations:
+      structural:
+        evidence_refs:
+          - data/vapor_pressures.yaml
+          - data/literature/extracts/ivtan-mno-coo-thermo.yaml
+          - validation-data/pin-evidence/t622_additivity_2026-08-12.yaml
   Na:
     # 2026-08-11: demoted T3 -> T2 when the non-measurement Sossi
     # mass_spec residual pin was withdrawn. VapoRock external evidence remains.

@@ -4,9 +4,9 @@ description: Generated (element, neutral gas carrier) demand. Oxygen and the lum
   are not element owners; individual REEs enter when feedstocks declare resolvable formulas.
 counts:
   elements: 69
-  carriers: 956
-  pairs: 1873
-  catalog_linked_pairs: 349
+  carriers: 957
+  pairs: 1874
+  catalog_linked_pairs: 351
 provenance:
   feedstocks: data/feedstocks.yaml
   nasa_cea_extract: data/literature/extracts/nasa-cea-thermo.yaml
@@ -481,6 +481,7 @@ carriers:
 - ClO2
 - ClO4
 - Co
+- CoO_gas
 - Cr
 - Cr2O3_gas
 - CrN
@@ -10810,6 +10811,21 @@ pairs:
   - nasa_cea_extract:Co
   catalog_family_ids: []
   catalog_species_ids: []
+  thermo_available: true
+- element: Co
+  carrier: CoO_gas
+  formula: CoO
+  atoms:
+    Co: 1.0
+    O: 1.0
+  sources:
+  - vapor_pressures_catalog
+  source_species_ids:
+  - vapor_pressures_catalog:CoO_gas
+  catalog_family_ids:
+  - oxide_vapors_coo_family
+  catalog_species_ids:
+  - CoO_gas
   thermo_available: true
 - element: Cr
   carrier: Cr
@@ -21744,10 +21760,14 @@ pairs:
     O: 1.0
   sources:
   - janaf_4th_extract
+  - vapor_pressures_catalog
   source_species_ids:
   - janaf_4th_extract:MnO_gas
-  catalog_family_ids: []
-  catalog_species_ids: []
+  - vapor_pressures_catalog:MnO_gas
+  catalog_family_ids:
+  - oxide_vapors_mno_family
+  catalog_species_ids:
+  - MnO_gas
   thermo_available: true
 - element: Mo
   carrier: Mo

@@ -4226,6 +4226,13 @@ entries:
   missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
   filed: tddharness-seed
   since: '2026-08-04'
+- element: Co
+  carrier: CoO_gas
+  contract: C5
+  reason: acquisition-pending
+  missing: diagnostic-only alpha upper bound forbids inventory debit; C5 activation requires form- and system-class-matched kinetic evidence
+  filed: t622-triage
+  since: '2026-08-12'
 - element: Cr
   carrier: Cr2O3_gas
   contract: C1-C5
@@ -8746,11 +8753,11 @@ entries:
   since: '2026-08-05'
 - element: Mn
   carrier: MnO_gas
-  contract: C1-C5
+  contract: C5
   reason: acquisition-pending
-  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
-  filed: tddharness-seed
-  since: '2026-08-04'
+  missing: diagnostic-only alpha upper bound forbids inventory debit; C5 activation requires form- and system-class-matched kinetic evidence
+  filed: t622-triage
+  since: '2026-08-12'
 - element: Mo
   carrier: Mo
   contract: C1-C5

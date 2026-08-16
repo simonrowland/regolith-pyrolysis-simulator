@@ -254,6 +254,14 @@ def test_provider_declares_only_cleaned_melt_account(vapor_pressure_data):
     assert profile.declared_accounts == frozenset({"process.cleaned_melt"})
 
 
+def test_t622_request_and_builtin_provider_share_one_domain_policy_callable() -> None:
+    from simulator.vapour_rail import request as request_module
+    from simulator.vapour_rail.domain_policy import declared_domain_transition
+
+    assert vapor_pressure_module.declared_domain_transition is declared_domain_transition
+    assert request_module.declared_domain_transition is declared_domain_transition
+
+
 def _ca_range_extrapolation_request() -> IntentRequest:
     return IntentRequest(
         intent=ChemistryIntent.VAPOR_PRESSURE,
@@ -291,6 +299,48 @@ def _mn_vapor_request_at_T_K(temperature_K: float) -> IntentRequest:
         pressure_bar=1e-6,
         control_inputs={"pO2_bar": 1e-9},
     )
+
+
+def _co_vapor_request_at_T_K(temperature_K: float) -> IntentRequest:
+    return IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {"CoO": 1.0}},
+            species_formula_registry={},
+        ),
+        temperature_C=temperature_K - 273.15,
+        pressure_bar=1e-6,
+        control_inputs={"pO2_bar": 1e-9},
+    )
+
+
+@pytest.mark.parametrize(
+    ("species_id", "request_factory", "out_of_domain_K", "in_domain_K"),
+    (
+        ("MnO_gas", _mn_vapor_request_at_T_K, 1400.0, 1800.0),
+        ("CoO_gas", _co_vapor_request_at_T_K, 2100.0, 1800.0),
+    ),
+)
+def test_t622_builtin_provider_applies_typed_ood_before_evaluation(
+    vapor_pressure_data,
+    species_id,
+    request_factory,
+    out_of_domain_K,
+    in_domain_K,
+) -> None:
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+
+    refused = provider.dispatch(request_factory(out_of_domain_K))
+    transition = refused.diagnostic["extrapolated_beyond_valid_range_K"][
+        species_id
+    ]
+    assert transition["status"] == "typed_refusal"
+    assert transition["refusal_code"] == "outside_declared_evaluator_domain"
+    assert species_id not in refused.diagnostic["vapor_pressures_Pa"]
+
+    accepted = provider.dispatch(request_factory(in_domain_K))
+    assert species_id in accepted.diagnostic["vapor_pressures_Pa"]
+    assert species_id not in accepted.diagnostic["extrapolated_beyond_valid_range_K"]
 
 
 class _CaOnlyMelt:

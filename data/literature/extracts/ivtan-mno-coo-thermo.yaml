@@ -1,0 +1,137 @@
+schema_version: literature_extract.v1
+source_id: ivtan-mno-coo-thermo
+source:
+  citation: IVTAN Thermodynamic Database electronic tables; per-species electronic-page identities retained below.
+  version: HT-C8-wave2-reviewed-2026-08-11
+extraction:
+  method: HT-C8 Wave-2 least-squares Shomate transcription of the IVTAN electronic tables
+  date: '2026-08-09'
+  worker: engine-patches
+  provenance_path: docs-private/research/2026-08-09-upstream-mission/HT-C8-mnco/wave2/candidate-bundle.json
+review_status: reviewed
+species:
+  MnO:
+    observations:
+    - observation_id: ivtan_MnO_gibbs
+      type: gibbs_table
+      locator:
+        table: 1436
+        candidate_row: MnO(g)
+        url: https://www.chem.msu.ru/rus/tsiv/Mn/print-MnO.html
+        authors: A. V. Gusarov; A. N. Kulikov
+        page_date: '2008-12-17'
+      T_range_K:
+      - 1000.0
+      - 3000.0
+      phase: gas
+      standard_state: ideal gas P°=100000 Pa
+      regime: gas_standard_state_thermo
+      units: Shomate polynomial (Cp J/mol/K, H kJ/mol, S J/mol/K)
+      uncertainty:
+        authority: Smoes-Drowart dissociation-energy width
+        sigma_G_J_per_mol: 7531.2
+        d0_width_kcal_per_mol: 1.8
+        sigma_log10_K_at_1500_2000_2500_K:
+        - 0.262254560
+        - 0.196690920
+        - 0.157352736
+      values:
+        evaluator_family: shomate
+        formula: MnO
+        delta_f_H_298_15_J_per_mol: 155620.0
+        reference_pressure_Pa: 100000.0
+        fit_max_abs_residual_J_per_mol: 1.99
+        cross_compilation_offset_dex: 0.076815671
+        citation: IVTAN table 1436; HT-C8 Wave-2 reviewed candidate row
+        segments:
+        - T_min_K: 1000.0
+          T_max_K: 2000.0
+          coefficients:
+            A: 45.75783747
+            B: -10.89186842
+            C: 4.60756286
+            D: -0.1828805977
+            E: -2.424549708
+            F: 136.0904276
+            G: 285.3928578
+            H: 155.62
+        - T_min_K: 2000.0
+          T_max_K: 3000.0
+          coefficients:
+            A: 49.23849149
+            B: -16.70974471
+            C: 7.998335629
+            D: -0.8471212092
+            E: -2.858724243
+            F: 134.1627361
+            G: 289.5513484
+            H: 155.62
+  CoO:
+    observations:
+    - observation_id: ivtan_CoO_gibbs
+      type: gibbs_table
+      locator:
+        table: 1335
+        candidate_row: CoO(g)
+        url: https://www.chem.msu.ru/rus/tsiv/Co/print-CoO.html
+        authors: E. A. Shenyavskaya; A. V. Gusarov
+        page_date: '2007-01-18'
+      T_range_K:
+      - 1000.0
+      - 3000.0
+      phase: gas
+      standard_state: ideal gas P°=100000 Pa
+      regime: gas_standard_state_thermo
+      units: Shomate polynomial (Cp J/mol/K, H kJ/mol, S J/mol/K)
+      uncertainty:
+        authority: Sorensen 2020 retention of Pedley-Marshall dissociation-energy width
+        sigma_G_J_per_mol: 12543.093176
+        d0_width_eV: 0.13
+        sigma_log10_K_at_1500_2000_2500_K:
+        - 0.436780776
+        - 0.327585582
+        - 0.262068466
+      values:
+        evaluator_family: shomate
+        formula: CoO
+        delta_f_H_298_15_J_per_mol: 282396.0
+        reference_pressure_Pa: 100000.0
+        fit_max_abs_residual_J_per_mol: 1.60
+        cross_compilation_offset_dex: 0.127927663
+        citation: IVTAN table 1335; HT-C8 Wave-2 reviewed candidate row
+        segments:
+        - T_min_K: 1000.0
+          T_max_K: 2000.0
+          coefficients:
+            A: 56.59845462
+            B: -30.90699531
+            C: 20.53920485
+            D: -3.470698915
+            E: -2.259342875
+            F: 260.6630346
+            G: 300.905494
+            H: 282.396
+        - T_min_K: 2000.0
+          T_max_K: 3000.0
+          coefficients:
+            A: -21.72422716
+            B: 46.69265164
+            C: -8.292468372
+            D: 0.3368798948
+            E: 29.67750671
+            F: 339.7316432
+            G: 251.4972846
+            H: 282.396
+fidelity_samples:
+- species: MnO
+  observation_id: ivtan_MnO_gibbs
+  field: fit_max_abs_residual_J_per_mol
+  value: 1.99
+  locator:
+    record: IVTAN table 1436, MnO(g), HT-C8 Wave-2 reviewed fit receipt
+- species: CoO
+  observation_id: ivtan_CoO_gibbs
+  field: fit_max_abs_residual_J_per_mol
+  value: 1.60
+  locator:
+    record: IVTAN table 1335, CoO(g), HT-C8 Wave-2 reviewed fit receipt

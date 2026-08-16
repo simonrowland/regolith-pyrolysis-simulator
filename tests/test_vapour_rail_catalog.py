@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+import csv
 import math
 from pathlib import Path
 import subprocess
@@ -52,9 +53,11 @@ COLLISION_GASES = {
 ACTIVE_COLLISION_GASES = {
     "Al2O3_gas",
     "CaO_gas",
+    "CoO_gas",
     "FeO_association_gas",
     "K2O_gas",
     "MgO_gas",
+    "MnO_gas",
     "Na2O_gas",
     "NiO_gas",
     "SiO2_gas",
@@ -124,6 +127,138 @@ def test_t609_cross_revision_additivity_evidence_is_reproducible() -> None:
         "candidate_evaluation_grid_sha256"
     ]
     assert evidence["t583_coverage"]["total_t583_compositions_covered"] == 251
+
+
+def test_t622_cross_revision_additivity_evidence_is_reproducible() -> None:
+    root = Path(__file__).resolve().parents[1]
+    evidence_path = (
+        root
+        / "validation-data"
+        / "pin-evidence"
+        / "t622_additivity_2026-08-12.yaml"
+    )
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(root / "scripts" / "prove_t622_cross_revision_additivity.py"),
+            "--check",
+            "--output",
+            str(evidence_path),
+        ],
+        cwd=root,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    evidence = yaml.safe_load(evidence_path.read_text(encoding="utf-8"))
+    equivalence = evidence["preexisting_equivalence"]
+    assert (
+        f"PASS: {equivalence['compiled_species_compared']} pre-existing species, "
+        f"{equivalence['evaluation_cases_compared']} exact grid cases"
+        in completed.stdout
+    )
+    assert evidence["result"] == "pass"
+    assert evidence["method"]["baseline_revision"] == (
+        "97969c434cb679d149756cbfd119e40220763d7a"
+    )
+    assert evidence["method"]["compiler_common_mode"] is False
+    assert evidence["species_delta"] == {
+        "baseline_compiled_species": 229,
+        "candidate_compiled_species": 231,
+        "additions": ["CoO_gas", "MnO_gas"],
+        "removals": [],
+    }
+    assert equivalence["compiled_dataclasses_exact"] is True
+    assert equivalence["evaluation_results_and_exceptions_exact"] is True
+    assert equivalence["baseline_compiled_dataclasses_sha256"] == equivalence[
+        "candidate_compiled_dataclasses_sha256"
+    ]
+    assert equivalence["baseline_evaluation_grid_sha256"] == equivalence[
+        "candidate_evaluation_grid_sha256"
+    ]
+
+
+def test_t622_oxidative_window_envelope_evidence_is_reproducible() -> None:
+    root = Path(__file__).resolve().parents[1]
+    output = (
+        root
+        / "docs-private"
+        / "research"
+        / "2026-08-12-t622-mno-coo"
+        / "oxidative-window-envelope.csv"
+    )
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(root / "scripts" / "prove_t622_oxidative_window.py"),
+            "--check",
+            "--output",
+            str(output),
+        ],
+        cwd=root,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    assert "38520 element-grid evaluations summarized in 120 rows" in completed.stdout
+    with output.open(newline="", encoding="utf-8") as handle:
+        rows = list(csv.DictReader(handle))
+    assert len(rows) == 120
+    assert {row["fO2_grid_points"] for row in rows} == {"321"}
+    candidates = [row for row in rows if row["element"] in {"Mn", "Co"}]
+    assert all(row["candidate_carrier"] in {"MnO_gas", "CoO_gas"} for row in candidates)
+    assert all(
+        "WINDOWS-UNKNOWABLE-UNTIL-MODELED" not in row["window_state_counts"]
+        for row in candidates
+    )
+    co_rows = [row for row in candidates if row["element"] == "Co"]
+    assert all(
+        row["element_coverage_status"] == "incomplete_atomic_Co_not_compiled"
+        for row in co_rows
+    )
+    assert all(not row["candidate_nominal_fraction_min"] for row in co_rows)
+    assert all(
+        not row["nominal_modeled_element_pressure_min_Pa"]
+        and not row["nominal_modeled_element_pressure_max_Pa"]
+        and not row["lower_modeled_element_pressure_min_Pa"]
+        and not row["upper_modeled_element_pressure_max_Pa"]
+        for row in co_rows
+    )
+
+
+def test_t622_mno_coo_are_congruent_diagnostic_composites() -> None:
+    payload = _yaml("vapor_pressures.yaml")
+    catalog = compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)
+    expected = {
+        "MnO_gas": ("oxide_vapors_mno_family", (1519.0, 2273.15), 0.0010798340273847744),
+        "CoO_gas": ("oxide_vapors_coo_family", (1400.0, 2000.0), 0.03810104876926756),
+    }
+    for species_id, (family_id, domain, expected_pressure) in expected.items():
+        compiled = catalog.species[species_id]
+        row = payload["families"][family_id]["physical_properties"]["species"][
+            species_id
+        ]
+        evaluator = compiled.evaluator
+        assert evaluator is not None
+        assert evaluator.evaluator_family == "shomate"
+        assert compiled.valid_temperature_K == domain
+        assert evaluator.activity_exponent == pytest.approx(1.0)
+        assert evaluator.pO2_exponent == pytest.approx(0.0)
+        assert evaluator.o2_channel_term is None
+        assert row["runtime_disposition"] == "status_bearing_non_authoritative"
+        assert row["retain_analytical_pressure_channel"] is True
+        assert row["flux_dormant"] is True
+        assert row["validation"]["certification_ceiling"] == "never"
+        assert row["gas_thermo_fit_domain_K"] == [1000.0, 3000.0]
+
+        p_unit = evaluator.evaluate(1800.0, source_activity=1.0).pressure_pa
+        p_half = evaluator.evaluate(1800.0, source_activity=0.5).pressure_pa
+        p_other_o2 = evaluator.evaluate(
+            1800.0, source_activity=1.0, pO2_bar=1.0e-12
+        ).pressure_pa
+        assert p_unit == pytest.approx(expected_pressure, rel=2.0e-12)
+        assert p_half == pytest.approx(0.5 * p_unit, rel=1.0e-12)
+        assert p_other_o2 == pytest.approx(p_unit, rel=0.0, abs=0.0)
 
 
 def test_t609_feo_nio_exponents_are_stoichiometry_derived() -> None:
@@ -210,9 +345,14 @@ def test_t609_nio_congruent_limit_is_activity_linear_and_po2_neutral() -> None:
 
 @pytest.mark.parametrize(
     "family_id",
-    ("oxide_vapors_feo_association_family", "oxide_vapors_nio_family"),
+    (
+        "oxide_vapors_feo_association_family",
+        "oxide_vapors_nio_family",
+        "oxide_vapors_mno_family",
+        "oxide_vapors_coo_family",
+    ),
 )
-def test_t609_unknown_declared_alpha_authority_fails_closed(family_id: str) -> None:
+def test_monoxide_unknown_declared_alpha_authority_fails_closed(family_id: str) -> None:
     payload = _yaml("vapor_pressures.yaml")
     alpha = payload["families"][family_id]["vaporisation_coefficients"][
         "evaporation_alpha"
@@ -425,8 +565,9 @@ def test_production_schema_compiles_exact_four_strata_and_legacy_projection() ->
     # 2026-08-05 MC-4 wave-1 integration: the union of wave A (Al/C/Ca/Cl/
     # Cr/Fe/H) and wave B (K/Mg/N/Na/P/S/Si) carriers projects 30 oxide-vapor
     # rows through the pre-RG compatibility seam. t-609 adds the status-bearing
-    # FeO association and NiO channels without activating t-583's FeO audit row.
-    assert len(legacy["oxide_vapors"]) == 31
+    # FeO association and NiO channels without activating t-583's FeO audit row;
+    # t-622 adds the diagnostic MnO/CoO channels.
+    assert len(legacy["oxide_vapors"]) == 33
     # 2026-08-05 MC-4 integration: the A+B union projects 24 foulant rows
     # (wave A adds the CaCl2/Cl-family foulant carriers; wave B the chloride
     # dimers) — one more than either wave alone pinned.
@@ -456,6 +597,7 @@ def test_production_schema_compiles_exact_four_strata_and_legacy_projection() ->
         "TiO",
         "TiO2_gas",
         "CaO_gas",
+        "CoO_gas",
         "AlO",
         "Al2O",
         "Al2",
@@ -476,6 +618,7 @@ def test_production_schema_compiles_exact_four_strata_and_legacy_projection() ->
         "K2O_gas",
         "Mg2",
         "MgO_gas",
+        "MnO_gas",
         "Na2",
         "Na2O_gas",
         "NiO_gas",

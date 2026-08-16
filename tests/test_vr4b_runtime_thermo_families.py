@@ -1276,6 +1276,108 @@ def test_cea_ingest_T_min_T_max_domain_shape_compiles() -> None:
     assert "M" in catalog.species
 
 
+def test_t622_reviewed_ivtan_shomate_rows_compile_on_declared_intersections() -> None:
+    extract = yaml.safe_load(
+        (DATA / "literature" / "extracts" / "ivtan-mno-coo-thermo.yaml").read_text()
+    )
+    catalog = compile_vapour_rail_catalog(
+        yaml.safe_load((DATA / "vapor_pressures.yaml").read_text()),
+        emit_u0_request_rules=False,
+    )
+    expected = {
+        "MnO": {
+            "species_id": "MnO_gas",
+            "observation_id": "ivtan_MnO_gibbs",
+            "domain": (1519.0, 2273.15),
+            "coefficients": (
+                {
+                    "A": 45.75783747,
+                    "B": -10.89186842,
+                    "C": 4.60756286,
+                    "D": -0.1828805977,
+                    "E": -2.424549708,
+                    "F": 136.0904276,
+                    "G": 285.3928578,
+                    "H": 155.62,
+                },
+                {
+                    "A": 49.23849149,
+                    "B": -16.70974471,
+                    "C": 7.998335629,
+                    "D": -0.8471212092,
+                    "E": -2.858724243,
+                    "F": 134.1627361,
+                    "G": 289.5513484,
+                    "H": 155.62,
+                },
+            ),
+            "sigma_G": 7531.2,
+            "sigma_dex": [0.262254560, 0.196690920, 0.157352736],
+            "fit_residual": 1.99,
+            "cross_offset": 0.076815671,
+        },
+        "CoO": {
+            "species_id": "CoO_gas",
+            "observation_id": "ivtan_CoO_gibbs",
+            "domain": (1400.0, 2000.0),
+            "coefficients": (
+                {
+                    "A": 56.59845462,
+                    "B": -30.90699531,
+                    "C": 20.53920485,
+                    "D": -3.470698915,
+                    "E": -2.259342875,
+                    "F": 260.6630346,
+                    "G": 300.905494,
+                    "H": 282.396,
+                },
+                {
+                    "A": -21.72422716,
+                    "B": 46.69265164,
+                    "C": -8.292468372,
+                    "D": 0.3368798948,
+                    "E": 29.67750671,
+                    "F": 339.7316432,
+                    "G": 251.4972846,
+                    "H": 282.396,
+                },
+            ),
+            "sigma_G": 12543.093176,
+            "sigma_dex": [0.436780776, 0.327585582, 0.262068466],
+            "fit_residual": 1.60,
+            "cross_offset": 0.127927663,
+        },
+    }
+
+    for formula, pin in expected.items():
+        observation = extract["species"][formula]["observations"][0]
+        values = observation["values"]
+        assert observation["observation_id"] == pin["observation_id"]
+        assert observation["T_range_K"] == [1000.0, 3000.0]
+        assert values["evaluator_family"] == "shomate"
+        assert tuple(
+            segment["coefficients"] for segment in values["segments"]
+        ) == pin["coefficients"]
+        assert observation["uncertainty"]["sigma_G_J_per_mol"] == pin["sigma_G"]
+        assert observation["uncertainty"][
+            "sigma_log10_K_at_1500_2000_2500_K"
+        ] == pin["sigma_dex"]
+        assert values["fit_max_abs_residual_J_per_mol"] == pin["fit_residual"]
+        assert values["cross_compilation_offset_dex"] == pin["cross_offset"]
+
+        compiled = catalog.species[pin["species_id"]]
+        assert compiled.valid_temperature_K == pin["domain"]
+        evaluator = compiled.evaluator
+        assert evaluator is not None
+        for temperature_K in pin["domain"]:
+            evaluated = evaluator.evaluate(
+                temperature_K, source_activity=1.0, pO2_bar=1.0
+            )
+            assert math.isfinite(evaluated.pressure_pa)
+            assert evaluated.pressure_pa > 0.0
+            assert evaluated.out_of_range is False
+
+
 def test_shomate_formation_from_coefficient_H_non_cancelling() -> None:
     """Formation from coeff H must enter ΔG (CX P1 — H2O-class latent heat).
 

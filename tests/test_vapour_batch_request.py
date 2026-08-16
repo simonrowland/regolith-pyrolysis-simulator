@@ -54,6 +54,7 @@ from simulator.vapour_rail.request import (
     REFUSAL_INAPPLICABLE_PREDICATE,
     REFUSAL_MISSING_OUTCOME_STATE,
     REFUSAL_NO_ADMITTED_SOURCE,
+    REFUSAL_OUTSIDE_DECLARED_DOMAIN,
     ProviderDomainCandidate,
     RequestRule,
     VapourResolveState,
@@ -922,6 +923,67 @@ def test_t609_real_rows_stay_status_bearing_through_request_layer(
     assert "FeO_association_gas" in fe_only
     assert "FeO_gas" not in fe_only
     assert "NiO_gas" not in fe_only
+
+
+@pytest.mark.parametrize(
+    ("species_id", "parent_oxide", "temperature_K", "expected_refusal"),
+    (
+        ("MnO_gas", "MnO", 1500.0, True),
+        ("MnO_gas", "MnO", 1800.0, False),
+        ("MnO_gas", "MnO", 2400.0, True),
+        ("CoO_gas", "CoO", 1300.0, True),
+        ("CoO_gas", "CoO", 1800.0, False),
+        ("CoO_gas", "CoO", 2100.0, True),
+    ),
+)
+def test_t622_real_rows_share_diagnostic_only_typed_ood_policy(
+    species_id: str,
+    parent_oxide: str,
+    temperature_K: float,
+    expected_refusal: bool,
+) -> None:
+    catalog = compile_vapour_rail_catalog(
+        _yaml("vapor_pressures.yaml"), u0_manifest=load_u0_manifest()
+    )
+    declaration = catalog.species[species_id].source_reaction_activity
+    assert declaration is not None
+    state = VapourResolveState(
+        temperature_K=temperature_K,
+        process_phase="stage0",
+        stage="stage0",
+        total_pressure_Pa=1.0e5,
+        fO2_bar=1.0,
+        source_reaction_activities={species_id: 0.4},
+        source_reaction_activity_provider="t622_real_file_probe",
+        source_reaction_activity_evidence_refs={
+            species_id: "tests/test_vapour_batch_request.py:t622"
+        },
+        source_reaction_activity_standard_states={
+            species_id: declaration.standard_state
+        },
+    )
+    batch = catalog.resolve_batch(
+        {"process.cleaned_melt": {parent_oxide: 1.0}},
+        state,
+        flux_activation_context=_rg_activation_context(),
+    )
+    answer = batch.channel(species_id)
+
+    assert answer.validation_status == "pending_validation"
+    assert answer.verdict_status == "status_bearing_non_authoritative"
+    assert answer.certification_ceiling == "never"
+    assert not answer.is_flux_active
+    if expected_refusal:
+        assert isinstance(answer.pressure, PressureRefusal)
+        assert answer.pressure.code == REFUSAL_OUTSIDE_DECLARED_DOMAIN
+        assert isinstance(answer.flux, FluxRefusal)
+    else:
+        assert isinstance(answer.pressure, PressureUpperBound)
+        assert isinstance(answer.flux, FluxDiagnosticUpperBound)
+        assert answer.extra["alpha_inventory_policy"] == (
+            "diagnostic_only_no_inventory_debit"
+        )
+        assert answer.extra["alpha_authority_status"] == "diagnostic_upper_bound"
 
 
 def test_t568_shadow_is_golden_neutral_and_fail_isolated(monkeypatch) -> None:
