@@ -2806,8 +2806,6 @@ class CondensationModel:
                 }
 
         for species, rate_kg_hr in evap_flux.species_kg_hr.items():
-            wall_deposit_fraction_by_species[species] = 0.0
-            wall_deposit_account_fractions_by_species[species] = {}
 
             carrier_status = carrier_authority_status_by_species.get(
                 species, VAPOUR_CARRIER_AUTHORITY_MISSING
@@ -2842,17 +2840,21 @@ class CondensationModel:
                 }
                 continue
 
-            if not _species_has_antoine_data(
+            admission_refusal = _condensation_admission_refusal(
                 species,
                 vapor_pressure_data=self.vapor_pressure_data,
-            ):
+            )
+            if admission_refusal is not None:
                 remaining_by_species[species] = max(0.0, rate_kg_hr)
                 condensation_refusals_by_species[species] = {
                     'status': 'refused',
-                    'reason': 'antoine_data_unavailable',
+                    'reason': admission_refusal,
                     'output_status': 'status_bearing',
                 }
                 continue
+
+            wall_deposit_fraction_by_species[species] = 0.0
+            wall_deposit_account_fractions_by_species[species] = {}
 
             stage_route = stage_route_by_species[species]
             T_cond = float(stage_route['T_cond_C'])
@@ -4265,7 +4267,56 @@ def _missing_required_antoine_keys(block: Any) -> tuple[str, ...]:
     return tuple(sorted(missing))
 
 
-def _species_has_antoine_data(
+CONDENSATION_ADMISSION_REFUSAL_NO_DATA = "antoine_data_unavailable"
+
+
+def _assert_condensation_applicable(
+    species: str,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None = None,
+) -> None:
+    """Raise when a declared catalog row is off the hot-train surface.
+
+    Applicability must bind before either legacy or compiled coefficient-source
+    lookup. Condensation deliberately has no Stage-0 context, so ``stage0_only``
+    rows refuse here; Stage-0 callers can supply context at the catalog seam.
+    """
+
+    catalog_payload = _authoritative_vapour_catalog_payload(vapor_pressure_data)
+    if catalog_payload is None:
+        return
+    from simulator.vapour_rail.catalog import compiled_catalog_for
+
+    compiled_catalog_for(
+        catalog_payload, emit_u0_request_rules=False
+    ).assert_hot_train_applicable(species)
+
+
+def _condensation_admission_refusal(
+    species: str,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None = None,
+) -> str | None:
+    """Return the primary refusal code, or ``None`` when routing may proceed."""
+
+    from simulator.vapour_rail.catalog import HotTrainInapplicable
+
+    try:
+        _assert_condensation_applicable(
+            species,
+            vapor_pressure_data=vapor_pressure_data,
+        )
+    except HotTrainInapplicable as exc:
+        return exc.refusal_code
+    if _species_has_compiled_or_legacy_pressure(
+        species,
+        vapor_pressure_data=vapor_pressure_data,
+    ):
+        return None
+    return CONDENSATION_ADMISSION_REFUSAL_NO_DATA
+
+
+def _species_has_compiled_or_legacy_pressure(
     species: str,
     *,
     vapor_pressure_data: Mapping[str, Any] | None = None,
@@ -4291,6 +4342,7 @@ def _species_has_antoine_data(
 
         try:
             # Reuse process-memoized compile; evaluator-only (no U0 rules).
+            # b-189-exempt: capability probe; production caller gates first
             compiled_catalog_for(
                 catalog_payload, emit_u0_request_rules=False
             ).evaluator_for(species)
@@ -4299,6 +4351,17 @@ def _species_has_antoine_data(
         else:
             return True
     return False
+
+
+def _species_has_antoine_data(
+    species: str,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None = None,
+) -> bool:
+    return _condensation_admission_refusal(
+        species,
+        vapor_pressure_data=vapor_pressure_data,
+    ) is None
 
 
 def apply_setpoints_condensation_temperature_overrides(
@@ -5034,7 +5097,13 @@ def _antoine_psat_pa(
     vapor_pressure_data: Mapping[str, Any] | None = None,
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
+    enforce_hot_train_applicability: bool = True,
 ) -> float | None:
+    if enforce_hot_train_applicability:
+        _assert_condensation_applicable(
+            species,
+            vapor_pressure_data=vapor_pressure_data,
+        )
     data = _species_vapor_data(
         species,
         vapor_pressure_data=vapor_pressure_data,
@@ -5050,6 +5119,7 @@ def _antoine_psat_pa(
         from simulator.vapour_rail.catalog import compiled_catalog_for
 
         # Hot Psat path: reuse memoized compile; no U0 rule emission.
+        # b-189-exempt: gated above unless diagnostic reproduction opts out
         evaluator = compiled_catalog_for(
             catalog_payload, emit_u0_request_rules=False
         ).evaluator_for(species)
@@ -5130,6 +5200,7 @@ def _try_antoine_psat_pa(
     vapor_pressure_data: Mapping[str, Any] | None = None,
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
+    enforce_hot_train_applicability: bool = True,
 ) -> tuple[float | None, bool]:
     """Return a wall pressure or a named, fail-closed range refusal.
 
@@ -5149,6 +5220,7 @@ def _try_antoine_psat_pa(
             vapor_pressure_data=vapor_pressure_data,
             antoine_extrapolations=antoine_extrapolations,
             antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+            enforce_hot_train_applicability=enforce_hot_train_applicability,
         )
     except (CatalogCompileError, VaporPressureRangeError) as exc:
         if (
@@ -5625,15 +5697,15 @@ def _wall_deposition_driving_pressure_pa(
                     "reactive_product_backstop"
                 )
             return max(0.0, local_pressure_pa)
-        has_antoine_data = _species_has_antoine_data(
+        admission_refusal = _condensation_admission_refusal(
             species,
             vapor_pressure_data=vapor_pressure_data,
         )
-        if not has_antoine_data:
+        if admission_refusal is not None:
             raise WallSaturationPressureRefusal(
                 species,
                 T_surface_K,
-                "antoine_data_unavailable",
+                admission_refusal,
             )
         range_relation = _wall_antoine_temperature_relation(
             species,

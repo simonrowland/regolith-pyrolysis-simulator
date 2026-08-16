@@ -1137,6 +1137,9 @@ def _engine_pure_psat_pa(
             species,
             T_K,
             vapor_pressure_data=vapor_pressure_data,
+            # Reproduction against measurement is how an unvalidated row
+            # earns applicability; governing this path would lock it out.
+            enforce_hot_train_applicability=False,
         )
     except Exception as exc:  # noqa: BLE001 — surface as typed refusal
         return None, f"pure_psat_exception:{type(exc).__name__}:{exc}"

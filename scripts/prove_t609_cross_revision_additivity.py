@@ -215,6 +215,7 @@ def _build_snapshot(import_root: Path) -> dict[str, Any]:
     for species_id in sorted(catalog.species):
         species = catalog.species[species_id]
         compiled[species_id] = _canonical(species)
+        # b-189-exempt: offline additivity proof
         evaluator = species.evaluator
         if evaluator is None:
             evaluations[species_id] = []

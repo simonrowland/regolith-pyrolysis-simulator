@@ -779,8 +779,8 @@ def test_b1_standard_reaction_without_antoine_uses_shared_evaluator() -> None:
     assert "antoine" not in serialized
 
     catalog = compile_vapour_rail_catalog(payload)
-    evaporation_evaluator = catalog.evaluator_for_evaporation("K")
-    condensation_evaluator = catalog.evaluator_for_condensation("K")
+    evaporation_evaluator = catalog.evaluator_for_hot_train("K")
+    condensation_evaluator = catalog.evaluator_for_hot_train("K")
     assert evaporation_evaluator is condensation_evaluator
 
     evaporation = evaporation_evaluator.evaluate(
@@ -950,9 +950,9 @@ def test_config_bundle_retains_compiler_capability_for_b1(
         materials=bundle.materials,
     )
     assert sim.vapour_rail_catalog is not None
-    assert sim.vapour_rail_catalog.evaluator_for_evaporation(
+    assert sim.vapour_rail_catalog.evaluator_for_hot_train(
         "K"
-    ) is sim.vapour_rail_catalog.evaluator_for_condensation("K")
+    ) is sim.vapour_rail_catalog.evaluator_for_hot_train("K")
 
 
 def test_anti_cliff_continuation_is_status_bearing_physical_reciprocal_T() -> None:

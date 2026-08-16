@@ -824,6 +824,18 @@ class CatalogCompileError(ValueError):
     """Raised when schema-v2 data cannot be compiled without inference."""
 
 
+class HotTrainInapplicable(CatalogCompileError):
+    """A sound compiled row that declares itself off the hot-train surface."""
+
+    def __init__(self, species_id: str, detail: str) -> None:
+        from simulator.vapour_rail.request import REFUSAL_INAPPLICABLE_PREDICATE
+
+        self.species_id = str(species_id)
+        self.refusal_code = REFUSAL_INAPPLICABLE_PREDICATE
+        self.refusal_detail = str(detail)
+        super().__init__(f"{species_id}: {self.refusal_code} ({detail})")
+
+
 class PressureObservable(str, Enum):
     EQUILIBRIUM_PARTIAL_PRESSURE = "equilibrium_partial_pressure"
     PURE_COMPONENT_SATURATION_PRESSURE = "pure_component_saturation_pressure"
@@ -1544,6 +1556,12 @@ class VapourRailCatalog:
         return self._request_rules
 
     def evaluator_for(self, species_id: str) -> CompiledPressureEvaluator:
+        """Return consumer-agnostic pressure math for a compiled row.
+
+        Hot-train production code must use ``evaluator_for_hot_train`` or
+        ``assert_hot_train_applicable``; the artifact guard enforces this.
+        """
+
         try:
             evaluator = self._species[species_id].evaluator
         except KeyError as exc:
@@ -1554,11 +1572,49 @@ class VapourRailCatalog:
             )
         return evaluator
 
-    def evaluator_for_evaporation(self, species_id: str) -> CompiledPressureEvaluator:
-        return self.evaluator_for(species_id)
+    def assert_hot_train_applicable(
+        self,
+        species_id: str,
+        *,
+        process_phase: str | None = None,
+        stage: str | None = None,
+    ) -> None:
+        """Raise when a compiled row declares itself off the hot train.
 
-    def evaluator_for_condensation(self, species_id: str) -> CompiledPressureEvaluator:
-        return self.evaluator_for(species_id)
+        Applicability is a relation between a row and this consumer. An absent
+        row has made no declaration, so its existing evaluator refusal remains
+        authoritative.
+        """
+
+        from simulator.vapour_rail.request import applicability_verdict
+
+        compiled = self._species.get(species_id)
+        if compiled is None:
+            return
+        active, detail = applicability_verdict(
+            compiled.code_metadata.hot_train_applicability,
+            process_phase=process_phase,
+            stage=stage,
+        )
+        if not active:
+            raise HotTrainInapplicable(species_id, detail)
+
+    def evaluator_for_hot_train(
+        self,
+        species_id: str,
+        *,
+        process_phase: str | None = None,
+        stage: str | None = None,
+    ) -> CompiledPressureEvaluator:
+        """Return pressure math after enforcing declared hot-train intent."""
+
+        evaluator = self.evaluator_for(species_id)
+        self.assert_hot_train_applicable(
+            species_id,
+            process_phase=process_phase,
+            stage=stage,
+        )
+        return evaluator
 
     def legacy_view(self) -> dict[str, Any]:
         return deepcopy(self._legacy_projection)

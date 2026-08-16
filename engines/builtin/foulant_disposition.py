@@ -154,8 +154,10 @@ def _compiled_carrier_pressure(
 
     catalog = compiled_catalog_for(payload)
     species = catalog.species.get(carrier_key)
+    # b-189-exempt: Stage-0 salt escape; hot-train applicability does not bind
     if species is None or species.evaluator is None:
         raise KeyError(f"compiled vapor-pressure row missing for carrier {carrier_key!r}")
+    # b-189-exempt: Stage-0 salt escape; hot-train applicability does not bind
     evaluator = species.evaluator
     evaluation = evaluator.evaluate(
         temperature_K,

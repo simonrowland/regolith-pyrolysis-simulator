@@ -37,7 +37,10 @@ from simulator.vapour_rail.batch import (
     PressureUpperBound,
     PressureValue,
 )
-from simulator.vapour_rail.catalog import compile_vapour_rail_catalog
+from simulator.vapour_rail.catalog import (
+    HotTrainInapplicable,
+    compile_vapour_rail_catalog,
+)
 from simulator.vapour_rail.engine_crosscheck import (
     _run_rail_cell,
     load_rail_provider,
@@ -851,8 +854,12 @@ def test_c1_keys_resolve_through_real_consumers(
     compiled = CATALOG.species[species_id]
     rule = CATALOG_RULES[species_id]
 
-    assert CATALOG.evaluator_for_evaporation(species_id) is compiled.evaluator
-    assert CATALOG.evaluator_for_condensation(species_id) is compiled.evaluator
+    assert CATALOG.evaluator_for(species_id) is compiled.evaluator
+    if compiled.code_metadata.hot_train_applicability in {"applicable", "always"}:
+        assert CATALOG.evaluator_for_hot_train(species_id) is compiled.evaluator
+    else:
+        with pytest.raises(HotTrainInapplicable):
+            CATALOG.evaluator_for_hot_train(species_id)
     assert all(
         (rule.has_pressure_evaluator, rule.has_alpha, rule.has_route, rule.has_formula)
     )

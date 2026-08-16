@@ -1332,7 +1332,10 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         )
                     )
                 ):
-                    evaluator = self._vapour_rail_catalog.evaluator_for(species)
+                    evaluator = self._vapour_rail_catalog.evaluator_for_hot_train(
+                        species,
+                        process_phase=controls.get("process_phase"),
+                    )
                     compiled_reference_evaluator = evaluator
                     # This is the declared standard-reaction reference point,
                     # not a live melt evaluation. Make both neutral inputs
@@ -2091,13 +2094,17 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     )
 
         oxide_vapors_data = self._vapor_pressure_data.get('oxide_vapors', {}) or {}
+        from simulator.vapour_rail.catalog import CatalogCompileError
+
         for name, data in oxide_vapors_data.items():
-            if (
-                str((data or {}).get("hot_train_applicability") or "")
-                == "stage0_only"
-                and str(controls.get("process_phase") or "") != "stage0"
-            ):
-                continue
+            if self._vapour_rail_catalog is not None:
+                try:
+                    self._vapour_rail_catalog.assert_hot_train_applicable(
+                        name,
+                        process_phase=controls.get("process_phase"),
+                    )
+                except CatalogCompileError:
+                    continue
             if bool((data or {}).get("interval_required")):
                 reject_noncertifying_vapor_pressure_row(
                     name,
@@ -2112,6 +2119,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             compiled_evaluator = None
             if not A > 0 and self._vapour_rail_catalog is not None:
                 try:
+                    # b-189-exempt: applicability gated at loop top
                     compiled_evaluator = self._vapour_rail_catalog.evaluator_for(
                         name
                     )

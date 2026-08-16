@@ -215,6 +215,7 @@ def declared_rail_pressure_species(catalog_payload: Mapping[str, Any]) -> tuple[
         sorted(
             species_id
             for species_id, species in catalog.species.items()
+            # b-189-exempt: existence probe, no pressure read
             if species.evaluator is not None
             and species.pressure_observable
             is PressureObservable.EQUILIBRIUM_PARTIAL_PRESSURE

@@ -110,6 +110,62 @@ def test_no_direct_melt_regime_membership_comparisons_outside_helper():
     assert not violations, "\n".join(violations)
 
 
+def test_pressure_channel_consumers_declare_intent():
+    """Every raw compiled-evaluator consumer declares its governing intent."""
+
+    repo = Path(__file__).parent.parent
+    violations = []
+    for root in (
+        repo / "simulator",
+        repo / "engines",
+        repo / "web",
+        repo / "tools",
+        repo / "scripts",
+    ):
+        for path in root.rglob("*.py"):
+            relative = path.relative_to(repo).as_posix()
+            if relative.startswith("simulator/vapour_rail/"):
+                continue
+            violations.extend(
+                _pressure_channel_intent_violations(path.read_text(), relative)
+            )
+
+    assert not violations, "\n".join(violations)
+
+
+def _pressure_channel_intent_violations(
+    source: str,
+    label: str,
+) -> list[str]:
+    lines = source.splitlines()
+    tree = ast.parse(source, filename=label)
+    violations = []
+    for node in ast.walk(tree):
+        is_raw_lookup = (
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Attribute)
+            and node.func.attr == "evaluator_for"
+        )
+        is_raw_read = (
+            isinstance(node, ast.Attribute)
+            and node.attr == "evaluator"
+            and isinstance(node.ctx, ast.Load)
+        )
+        if not (is_raw_lookup or is_raw_read):
+            continue
+        marker_lines = lines[max(0, node.lineno - 2) : node.lineno]
+        if any(_has_b189_exemption(line) for line in marker_lines):
+            continue
+        expression = ast.unparse(node)
+        violations.append(f"{label}:{node.lineno}: {expression}")
+    return violations
+
+
+def _has_b189_exemption(line: str) -> bool:
+    marker = "# b-189-exempt:"
+    return marker in line and bool(line.split(marker, 1)[1].strip())
+
+
 def _melt_regime_membership_ast_violations(
     path: Path,
     repo: Path,

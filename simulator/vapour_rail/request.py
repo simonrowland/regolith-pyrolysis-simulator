@@ -788,6 +788,39 @@ def assert_request_coverage(
         )
 
 
+def applicability_verdict(
+    predicate: str,
+    *,
+    process_phase: str | None = None,
+    stage: str | None = None,
+) -> tuple[bool, str]:
+    """Shared body of the declared-applicability predicate.
+
+    Reads no :class:`RequestRule` fields, so catalog consumers can apply the
+    same token semantics without importing or constructing a rule. Unknown
+    predicates fail closed (b-175 doctrine).
+    """
+
+    if predicate in {"applicable", "always"}:
+        return True, ""
+    if predicate in {"not_applicable", "inapplicable"}:
+        return (
+            False,
+            f"declared applicability predicate {predicate!r} is inactive",
+        )
+    if predicate == "stage0_only":
+        phase = process_phase or ""
+        st = stage or ""
+        if phase == "stage0" or st == "stage0":
+            return True, ""
+        return (
+            False,
+            "stage0_only predicate inactive outside stage0 "
+            f"(process_phase={phase!r}, stage={st!r})",
+        )
+    return False, f"unrecognized applicability predicate {predicate!r}"
+
+
 def _predicate_active(
     rule: RequestRule,
     state: VapourResolveState | None,
@@ -801,31 +834,22 @@ def _predicate_active(
             False,
             "c0b_p_cleanup admits only P2O5-sourced carrier rules",
         )
-    if predicate in {"applicable", "always"}:
+    active, detail = applicability_verdict(
+        predicate,
+        process_phase=(state.process_phase if state else None),
+        stage=stage,
+    )
+    # Stage-0 P carriers run inside the legacy hot-train request surface.
+    # Wake only P2O5-sourced rules; treating the entire request as stage0
+    # changes unrelated volatile-channel eligibility. (Unchanged pre-b-189.)
+    if (
+        not active
+        and predicate == "stage0_only"
+        and stage in {"stage0_p_carriers", "c0b_p_cleanup"}
+        and "P2O5" in rule.parent_species_ids
+    ):
         return True, ""
-    if predicate in {"not_applicable", "inapplicable"}:
-        return (
-            False,
-            f"declared applicability predicate {predicate!r} is inactive",
-        )
-    if predicate == "stage0_only":
-        phase = (state.process_phase if state else None) or ""
-        if phase == "stage0" or stage == "stage0":
-            return True, ""
-        # Stage-0 P carriers run inside the legacy hot-train request surface.
-        # Wake only P2O5-sourced rules; treating the entire request as stage0
-        # changes unrelated volatile-channel eligibility.
-        if stage in {"stage0_p_carriers", "c0b_p_cleanup"} and (
-            "P2O5" in rule.parent_species_ids
-        ):
-            return True, ""
-        return (
-            False,
-            "stage0_only predicate inactive outside stage0 "
-            f"(process_phase={phase!r}, stage={stage!r})",
-        )
-    # Unknown predicates fail closed as inactive with evidence.
-    return False, f"unrecognized applicability predicate {predicate!r}"
+    return active, detail
 
 
 def _executable_contract_refusal(rule: RequestRule) -> str | None:

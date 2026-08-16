@@ -1168,6 +1168,7 @@ def compose(*, pilot: str | None, apply: bool) -> Mapping[str, Any]:
     for spec in specs:
         per_tier_unique[spec.tier] += 1
         if spec.carrier in catalog_species:
+            # b-189-exempt: catalog composition tooling
             if compiled_before.species[spec.carrier].evaluator is not None:
                 family_id, existing_row, _family = locations[spec.carrier]
                 if existing_row.get("chemical_family") == "t583_composed_carrier":
@@ -1229,6 +1230,7 @@ def compose(*, pilot: str | None, apply: bool) -> Mapping[str, Any]:
     compiled = compile_vapour_rail_catalog(yaml.safe_load(catalog_after))
     for carrier in generated + upgraded:
         species = compiled.species[carrier]
+        # b-189-exempt: catalog composition tooling
         if species.evaluator is None:
             raise AssertionError(f"{carrier}: generated row did not compile an evaluator")
         if species.code_metadata.hot_train_applicability != "not_applicable":
@@ -1310,6 +1312,7 @@ def _summary(candidates: Iterable[Candidate]) -> dict[str, Any]:
     locations = _catalog_locations()
     selected_ids = {row.carrier for row in selected}
     existing_evaluators = {
+        # b-189-exempt: catalog composition tooling
         carrier: compiled_catalog.species[carrier].evaluator is not None
         for carrier in sorted(selected_ids & catalog_species)
     }
